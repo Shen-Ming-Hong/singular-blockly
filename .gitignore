@@ -1,0 +1,28 @@
+# 編譯輸出目錄
+dist/
+
+# 依賴套件
+node_modules/
+
+# VS Code 相關
+.vscode-test/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+
+# 擴充套件相關
+*.vsix
+
+# 作業系統相關
+.DS_Store
+Thumbs.db
+
+# 原始碼地圖檔案
+*.js.map
+*.css.map
+
+# 暫存檔案
+*.log
+.cache/
