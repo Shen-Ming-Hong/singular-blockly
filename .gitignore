@@ -26,3 +26,4 @@ Thumbs.db
 # 暫存檔案
 *.log
 .cache/
+media/toolbox/temp_toolbox.json
