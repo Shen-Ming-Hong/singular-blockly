@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
 	console.log('Blockly Edit page loaded');
 	const workspace = Blockly.inject('blocklyDiv', {
@@ -19,9 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			startScale: 1.0, // 初始縮放比例
 			maxScale: 3, // 最大縮放比例
 			minScale: 0.3, // 最小縮放比例
-			scaleSpeed: 1.2 // 縮放速度
+			scaleSpeed: 1.2, // 縮放速度
 		},
-		theme: 'modern'
+		theme: 'modern',
 	});
 
 	window.addEventListener('resize', () => {
