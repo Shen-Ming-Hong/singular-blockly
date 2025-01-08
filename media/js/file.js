@@ -1,16 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
+
+	// 載入 toolbox 配置
+	const response = await fetch(window.TOOLBOX_URL);
+	const toolboxConfig = await response.json();
 	const workspace = Blockly.inject('blocklyDiv', {
-		toolbox: `
-			<xml xmlns="https://developers.google.com/blockly/xml">
-				<block type="controls_if"></block>
-				<block type="logic_compare"></block>
-				<block type="math_number"></block>
-				<block type="math_arithmetic"></block>
-				<block type="text"></block>
-				<block type="text_print"></block>
-			</xml>
-		`,
+		toolbox: toolboxConfig,
 		trashcan: true, // 添加垃圾桶
 		zoom: {
 			controls: true, // 添加放大縮小控制

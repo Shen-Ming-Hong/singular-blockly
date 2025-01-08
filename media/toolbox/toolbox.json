@@ -1,0 +1,704 @@
+{
+	"kind": "categoryToolbox",
+	"contents": [
+		{
+			"kind": "toolboxlabel",
+			"name": "Custom Toolbox",
+			"colour": "darkslategrey"
+		},
+		{
+			"kind": "category",
+			"name": "Logic",
+			"categorystyle": "logic_category",
+			"css-icon": "customIcon fa fa-cog",
+			"contents": [
+				{
+					"kind": "block",
+					"type": "controls_if"
+				},
+				{
+					"kind": "block",
+					"type": "logic_compare"
+				},
+				{
+					"kind": "block",
+					"type": "logic_operation"
+				},
+				{
+					"kind": "block",
+					"type": "logic_negate"
+				},
+				{
+					"kind": "block",
+					"type": "logic_boolean"
+				},
+				{
+					"kind": "block",
+					"type": "logic_null",
+					"disabled": "true"
+				},
+				{
+					"kind": "block",
+					"type": "logic_ternary"
+				}
+			]
+		},
+		{
+			"kind": "category",
+			"name": "Loops",
+			"categorystyle": "loop_category",
+			"contents": [
+				{
+					"kind": "block",
+					"type": "controls_repeat_ext",
+					"inputs": {
+						"TIMES": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 10
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "controls_repeat",
+					"disabled": "true"
+				},
+				{
+					"kind": "block",
+					"type": "controls_whileUntil"
+				},
+				{
+					"kind": "block",
+					"type": "controls_for",
+					"inputs": {
+						"FROM": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						},
+						"TO": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 10
+								}
+							}
+						},
+						"BY": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "controls_forEach"
+				},
+				{
+					"kind": "block",
+					"type": "controls_flow_statements"
+				}
+			]
+		},
+		{
+			"kind": "category",
+			"name": "Math",
+			"categorystyle": "math_category",
+			"contents": [
+				{
+					"kind": "block",
+					"type": "math_number",
+					"gap": 32,
+					"fields": {
+						"NUM": 123
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_arithmetic",
+					"inputs": {
+						"A": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						},
+						"B": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_single",
+					"inputs": {
+						"NUM": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 9
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_trig",
+					"inputs": {
+						"NUM": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 45
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_constant"
+				},
+				{
+					"kind": "block",
+					"type": "math_number_property",
+					"inputs": {
+						"NUMBER_TO_CHECK": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 0
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_round",
+					"inputs": {
+						"NUM": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 3.1
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_on_list"
+				},
+				{
+					"kind": "block",
+					"type": "math_modulo",
+					"inputs": {
+						"DIVIDEND": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 64
+								}
+							}
+						},
+						"DIVISOR": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 10
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_constrain",
+					"inputs": {
+						"VALUE": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 50
+								}
+							}
+						},
+						"LOW": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						},
+						"HIGH": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 100
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_random_int",
+					"inputs": {
+						"FROM": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						},
+						"TO": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 100
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "math_random_float"
+				},
+				{
+					"kind": "block",
+					"type": "math_atan2",
+					"inputs": {
+						"X": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						},
+						"Y": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 1
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"kind": "category",
+			"name": "Text",
+			"categorystyle": "text_category",
+			"contents": [
+				{
+					"kind": "block",
+					"type": "text"
+				},
+				{
+					"kind": "block",
+					"type": "text_join"
+				},
+				{
+					"kind": "block",
+					"type": "text_append",
+					"inputs": {
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text"
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_length",
+					"inputs": {
+						"VALUE": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": "abc"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_isEmpty",
+					"inputs": {
+						"VALUE": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": ""
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_indexOf",
+					"inputs": {
+						"VALUE": {
+							"block": {
+								"kind": "block",
+								"type": "variables_get",
+								"fields": {
+									"VAR": "text"
+								}
+							}
+						},
+						"FIND": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": "abc"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_charAt",
+					"inputs": {
+						"VALUE": {
+							"block": {
+								"kind": "block",
+								"type": "variables_get",
+								"fields": {
+									"VAR": "text"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_getSubstring",
+					"inputs": {
+						"STRING": {
+							"block": {
+								"kind": "block",
+								"type": "variables_get",
+								"fields": {
+									"VAR": "text"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_changeCase",
+					"inputs": {
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": "abc"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_trim",
+					"inputs": {
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": "abc"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_count",
+					"inputs": {
+						"SUB": {
+							"shadow": {
+								"kind": "block",
+								"type": "text"
+							}
+						},
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text"
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_replace",
+					"inputs": {
+						"FROM": {
+							"shadow": {
+								"kind": "block",
+								"type": "text"
+							}
+						},
+						"TO": {
+							"shadow": {
+								"kind": "block",
+								"type": "text"
+							}
+						},
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text"
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_reverse",
+					"inputs": {
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text"
+							}
+						}
+					}
+				},
+				{
+					"kind": "label",
+					"text": "Input/Output:",
+					"web-class": "ioLabel"
+				},
+				{
+					"kind": "block",
+					"type": "text_print",
+					"inputs": {
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": "abc"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "text_prompt_ext",
+					"inputs": {
+						"TEXT": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": "abc"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"kind": "category",
+			"name": "Lists",
+			"categorystyle": "list_category",
+			"contents": [
+				{
+					"kind": "block",
+					"type": "lists_create_with",
+					"mutation": {
+						"items": "0"
+					}
+				},
+				{
+					"kind": "block",
+					"type": "lists_create_with"
+				},
+				{
+					"kind": "block",
+					"type": "lists_repeat",
+					"inputs": {
+						"NUM": {
+							"shadow": {
+								"kind": "block",
+								"type": "math_number",
+								"fields": {
+									"NUM": 5
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "lists_length"
+				},
+				{
+					"kind": "block",
+					"type": "lists_isEmpty"
+				},
+				{
+					"kind": "block",
+					"type": "lists_indexOf",
+					"inputs": {
+						"VALUE": {
+							"block": {
+								"kind": "block",
+								"type": "variables_get",
+								"fields": {
+									"VAR": "list"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "lists_getIndex",
+					"inputs": {
+						"VALUE": {
+							"block": {
+								"kind": "block",
+								"type": "variables_get",
+								"fields": {
+									"VAR": "list"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "lists_setIndex",
+					"inputs": {
+						"LIST": {
+							"block": {
+								"kind": "block",
+								"type": "variables_get",
+								"fields": {
+									"VAR": "list"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "lists_getSublist",
+					"inputs": {
+						"LIST": {
+							"block": {
+								"kind": "block",
+								"type": "variables_get",
+								"fields": {
+									"VAR": "list"
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "lists_split",
+					"inputs": {
+						"DELIM": {
+							"shadow": {
+								"kind": "block",
+								"type": "text",
+								"fields": {
+									"TEXT": ","
+								}
+							}
+						}
+					}
+				},
+				{
+					"kind": "block",
+					"type": "lists_sort"
+				},
+				{
+					"kind": "block",
+					"type": "lists_reverse"
+				}
+			]
+		},
+		{
+			"kind": "sep"
+		},
+		{
+			"kind": "category",
+			"name": "Variables",
+			"categorystyle": "variable_category",
+			"custom": "VARIABLE"
+		},
+		{
+			"kind": "category",
+			"name": "Functions",
+			"categorystyle": "procedure_category",
+			"custom": "PROCEDURE"
+		}
+	]
+}

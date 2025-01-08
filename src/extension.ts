@@ -26,9 +26,12 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 	const htmlPath = vscode.Uri.file(context.asAbsolutePath('media/html/blocklyEdit.html'));
 	const cssPath = vscode.Uri.file(context.asAbsolutePath('media/css/file.css'));
 	const jsPath = vscode.Uri.file(context.asAbsolutePath('media/js/file.js'));
+	const toolboxPath = vscode.Uri.file(context.asAbsolutePath('media/toolbox/toolbox.json'));
 
 	const cssUri = webview.asWebviewUri(cssPath);
 	const jsUri = webview.asWebviewUri(jsPath);
+	const toolboxUri = webview.asWebviewUri(toolboxPath);
+
 	const blocklyCompressedJsUri = webview.asWebviewUri(
 		vscode.Uri.file(context.asAbsolutePath('node_modules/blockly/blockly_compressed.js'))
 	);
@@ -51,6 +54,7 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 	htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{msgEnJsUri}', msgEnJsUri.toString());
 	htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
+	htmlContent = htmlContent.replace('{toolboxUri}', toolboxUri.toString());
 
 	return htmlContent;
 }
