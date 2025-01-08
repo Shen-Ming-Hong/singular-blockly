@@ -1,0 +1,124 @@
+{
+	"kind": "category",
+	"name": "Lists",
+	"categorystyle": "list_category",
+	"contents": [
+		{
+			"kind": "block",
+			"type": "lists_create_with",
+			"mutation": {
+				"items": "0"
+			}
+		},
+		{
+			"kind": "block",
+			"type": "lists_create_with"
+		},
+		{
+			"kind": "block",
+			"type": "lists_repeat",
+			"inputs": {
+				"NUM": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 5
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "lists_length"
+		},
+		{
+			"kind": "block",
+			"type": "lists_isEmpty"
+		},
+		{
+			"kind": "block",
+			"type": "lists_indexOf",
+			"inputs": {
+				"VALUE": {
+					"block": {
+						"kind": "block",
+						"type": "variables_get",
+						"fields": {
+							"VAR": "list"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "lists_getIndex",
+			"inputs": {
+				"VALUE": {
+					"block": {
+						"kind": "block",
+						"type": "variables_get",
+						"fields": {
+							"VAR": "list"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "lists_setIndex",
+			"inputs": {
+				"LIST": {
+					"block": {
+						"kind": "block",
+						"type": "variables_get",
+						"fields": {
+							"VAR": "list"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "lists_getSublist",
+			"inputs": {
+				"LIST": {
+					"block": {
+						"kind": "block",
+						"type": "variables_get",
+						"fields": {
+							"VAR": "list"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "lists_split",
+			"inputs": {
+				"DELIM": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": ","
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "lists_sort"
+		},
+		{
+			"kind": "block",
+			"type": "lists_reverse"
+		}
+	]
+}

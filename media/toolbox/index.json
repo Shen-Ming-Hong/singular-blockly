@@ -1,0 +1,40 @@
+{
+	"kind": "categoryToolbox",
+	"contents": [
+		{
+			"kind": "toolboxlabel",
+			"name": "Custom Toolbox",
+			"colour": "darkslategrey"
+		},
+		{
+			"$include": "./categories/logic.json"
+		},
+		{
+			"$include": "./categories/loops.json"
+		},
+		{
+			"$include": "./categories/math.json"
+		},
+		{
+			"$include": "./categories/text.json"
+		},
+		{
+			"$include": "./categories/lists.json"
+		},
+		{
+			"kind": "sep"
+		},
+		{
+			"kind": "category",
+			"name": "Variables",
+			"categorystyle": "variable_category",
+			"custom": "VARIABLE"
+		},
+		{
+			"kind": "category",
+			"name": "Functions",
+			"categorystyle": "procedure_category",
+			"custom": "PROCEDURE"
+		}
+	]
+}

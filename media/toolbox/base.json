@@ -1,0 +1,25 @@
+{
+	"kind": "categoryToolbox",
+	"contents": [
+		{
+			"kind": "toolboxlabel",
+			"name": "Custom Toolbox",
+			"colour": "darkslategrey"
+		},
+		{
+			"kind": "sep"
+		},
+		{
+			"kind": "category",
+			"name": "Variables",
+			"categorystyle": "variable_category",
+			"custom": "VARIABLE"
+		},
+		{
+			"kind": "category",
+			"name": "Functions",
+			"categorystyle": "procedure_category",
+			"custom": "PROCEDURE"
+		}
+	]
+}

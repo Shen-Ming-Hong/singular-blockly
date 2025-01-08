@@ -1,0 +1,230 @@
+{
+	"kind": "category",
+	"name": "Text",
+	"categorystyle": "text_category",
+	"contents": [
+		{
+			"kind": "block",
+			"type": "text"
+		},
+		{
+			"kind": "block",
+			"type": "text_join"
+		},
+		{
+			"kind": "block",
+			"type": "text_append",
+			"inputs": {
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text"
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_length",
+			"inputs": {
+				"VALUE": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": "abc"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_isEmpty",
+			"inputs": {
+				"VALUE": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": ""
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_indexOf",
+			"inputs": {
+				"VALUE": {
+					"block": {
+						"kind": "block",
+						"type": "variables_get",
+						"fields": {
+							"VAR": "text"
+						}
+					}
+				},
+				"FIND": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": "abc"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_charAt",
+			"inputs": {
+				"VALUE": {
+					"block": {
+						"kind": "block",
+						"type": "variables_get",
+						"fields": {
+							"VAR": "text"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_getSubstring",
+			"inputs": {
+				"STRING": {
+					"block": {
+						"kind": "block",
+						"type": "variables_get",
+						"fields": {
+							"VAR": "text"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_changeCase",
+			"inputs": {
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": "abc"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_trim",
+			"inputs": {
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": "abc"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_count",
+			"inputs": {
+				"SUB": {
+					"shadow": {
+						"kind": "block",
+						"type": "text"
+					}
+				},
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text"
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_replace",
+			"inputs": {
+				"FROM": {
+					"shadow": {
+						"kind": "block",
+						"type": "text"
+					}
+				},
+				"TO": {
+					"shadow": {
+						"kind": "block",
+						"type": "text"
+					}
+				},
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text"
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_reverse",
+			"inputs": {
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text"
+					}
+				}
+			}
+		},
+		{
+			"kind": "label",
+			"text": "Input/Output:",
+			"web-class": "ioLabel"
+		},
+		{
+			"kind": "block",
+			"type": "text_print",
+			"inputs": {
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": "abc"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "text_prompt_ext",
+			"inputs": {
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": "abc"
+						}
+					}
+				}
+			}
+		}
+	]
+}

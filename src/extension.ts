@@ -9,12 +9,12 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('Hello World from Singular Blockly!');
 	});
 
-	const openBlocklyEdit = vscode.commands.registerCommand('singular-blockly.openBlocklyEdit', () => {
+	const openBlocklyEdit = vscode.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
 		const panel = vscode.window.createWebviewPanel('blocklyEdit', 'Blockly Edit', vscode.ViewColumn.One, {
 			enableScripts: true,
 		});
 
-		panel.webview.html = getWebviewContent(context, panel.webview);
+		panel.webview.html = await getWebviewContent(context, panel.webview);
 	});
 
 	context.subscriptions.push(disposable, openBlocklyEdit);
@@ -22,11 +22,36 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview) {
+// 新增一個函數來遞迴處理 JSON 引入
+async function resolveToolboxIncludes(context: vscode.ExtensionContext, json: any): Promise<any> {
+	if (typeof json !== 'object') {
+		return json;
+	}
+
+	if (Array.isArray(json)) {
+		const results = await Promise.all(json.map(item => resolveToolboxIncludes(context, item)));
+		return results;
+	}
+
+	if (json.$include) {
+		const includePath = context.asAbsolutePath(path.join('media/toolbox', json.$include));
+		const content = JSON.parse(await fs.promises.readFile(includePath, 'utf8'));
+		return content;
+	}
+
+	const result: any = {};
+	for (const key in json) {
+		result[key] = await resolveToolboxIncludes(context, json[key]);
+	}
+	return result;
+}
+
+// 修改 getWebviewContent 函數
+async function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview) {
 	const htmlPath = vscode.Uri.file(context.asAbsolutePath('media/html/blocklyEdit.html'));
 	const cssPath = vscode.Uri.file(context.asAbsolutePath('media/css/file.css'));
 	const jsPath = vscode.Uri.file(context.asAbsolutePath('media/js/file.js'));
-	const toolboxPath = vscode.Uri.file(context.asAbsolutePath('media/toolbox/toolbox.json'));
+	const toolboxPath = vscode.Uri.file(context.asAbsolutePath('media/toolbox/index.json'));
 
 	const cssUri = webview.asWebviewUri(cssPath);
 	const jsUri = webview.asWebviewUri(jsPath);
@@ -54,7 +79,18 @@ function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Web
 	htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{msgEnJsUri}', msgEnJsUri.toString());
 	htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
-	htmlContent = htmlContent.replace('{toolboxUri}', toolboxUri.toString());
+
+	// 讀取並處理 toolbox 配置
+	const toolboxJsonPath = context.asAbsolutePath('media/toolbox/index.json');
+	const toolboxJson = JSON.parse(await fs.promises.readFile(toolboxJsonPath, 'utf8'));
+	const resolvedToolbox = await resolveToolboxIncludes(context, toolboxJson);
+
+	// 將處理後的配置寫入臨時檔案
+	const tempToolboxPath = context.asAbsolutePath('media/toolbox/temp_toolbox.json');
+	await fs.promises.writeFile(tempToolboxPath, JSON.stringify(resolvedToolbox, null, 2));
+	const tempToolboxUri = webview.asWebviewUri(vscode.Uri.file(tempToolboxPath));
+
+	htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 
 	return htmlContent;
 }
