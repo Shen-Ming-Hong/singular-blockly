@@ -10,8 +10,17 @@ Blockly.Blocks['arduino_setup_loop'] = {
 
 Blockly.Blocks['arduino_digital_write'] = {
 	init: function () {
-		this.appendValueInput('PIN').setCheck('Number').appendField('數位寫入 腳位');
-		this.appendValueInput('VALUE').setCheck('Boolean').appendField('數值');
+		this.appendDummyInput()
+			.appendField('數位寫入 腳位')
+			.appendField(new Blockly.FieldNumber(13, 0, 127), 'PIN')
+			.appendField('數值')
+			.appendField(
+				new Blockly.FieldDropdown([
+					['HIGH', 'HIGH'],
+					['LOW', 'LOW'],
+				]),
+				'VALUE'
+			);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(230);
@@ -22,7 +31,7 @@ Blockly.Blocks['arduino_digital_write'] = {
 
 Blockly.Blocks['arduino_digital_read'] = {
 	init: function () {
-		this.appendValueInput('PIN').setCheck('Number').appendField('數位讀取 腳位');
+		this.appendDummyInput().appendField('數位讀取 腳位').appendField(new Blockly.FieldNumber(2, 0, 127), 'PIN');
 		this.setOutput(true, 'Boolean');
 		this.setColour(230);
 		this.setTooltip('從指定的腳位讀取數位輸入值');
@@ -32,8 +41,11 @@ Blockly.Blocks['arduino_digital_read'] = {
 
 Blockly.Blocks['arduino_analog_write'] = {
 	init: function () {
-		this.appendValueInput('PIN').setCheck('Number').appendField('類比寫入 腳位');
-		this.appendValueInput('VALUE').setCheck('Number').appendField('數值');
+		this.appendDummyInput()
+			.appendField('類比寫入 腳位')
+			.appendField(new Blockly.FieldNumber(3, 0, 127), 'PIN')
+			.appendField('數值')
+			.appendField(new Blockly.FieldNumber(0, 0, 255), 'VALUE');
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(230);
@@ -44,7 +56,7 @@ Blockly.Blocks['arduino_analog_write'] = {
 
 Blockly.Blocks['arduino_analog_read'] = {
 	init: function () {
-		this.appendValueInput('PIN').setCheck('Number').appendField('類比讀取 腳位');
+		this.appendDummyInput().appendField('類比讀取 腳位').appendField(new Blockly.FieldNumber(0, 0, 127), 'PIN');
 		this.setOutput(true, 'Number');
 		this.setColour(230);
 		this.setTooltip('從指定的腳位讀取類比值(0-1023)');
@@ -54,8 +66,7 @@ Blockly.Blocks['arduino_analog_read'] = {
 
 Blockly.Blocks['arduino_delay'] = {
 	init: function () {
-		this.appendValueInput('DELAY').setCheck('Number').appendField('等待');
-		this.appendDummyInput().appendField('毫秒');
+		this.appendDummyInput().appendField('等待').appendField(new Blockly.FieldNumber(1000, 0), 'TIME').appendField('毫秒');
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(230);

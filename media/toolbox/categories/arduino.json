@@ -9,63 +9,23 @@
 		},
 		{
 			"kind": "block",
-			"type": "arduino_digital_write",
-			"inputs": {
-				"PIN": {
-					"shadow": {
-						"type": "math_number",
-						"fields": { "NUM": 13 }
-					}
-				}
-			}
+			"type": "arduino_digital_write"
 		},
 		{
 			"kind": "block",
-			"type": "arduino_digital_read",
-			"inputs": {
-				"PIN": {
-					"shadow": {
-						"type": "math_number",
-						"fields": { "NUM": 2 }
-					}
-				}
-			}
+			"type": "arduino_digital_read"
 		},
 		{
 			"kind": "block",
-			"type": "arduino_analog_write",
-			"inputs": {
-				"PIN": {
-					"shadow": {
-						"type": "math_number",
-						"fields": { "NUM": 3 }
-					}
-				}
-			}
+			"type": "arduino_analog_write"
 		},
 		{
 			"kind": "block",
-			"type": "arduino_analog_read",
-			"inputs": {
-				"PIN": {
-					"shadow": {
-						"type": "math_number",
-						"fields": { "NUM": 0 }
-					}
-				}
-			}
+			"type": "arduino_analog_read"
 		},
 		{
 			"kind": "block",
-			"type": "arduino_delay",
-			"inputs": {
-				"DELAY": {
-					"shadow": {
-						"type": "math_number",
-						"fields": { "NUM": 1000 }
-					}
-				}
-			}
+			"type": "arduino_delay"
 		}
 	]
 }
