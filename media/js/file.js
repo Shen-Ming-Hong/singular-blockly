@@ -41,11 +41,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	});
 
-	// 修改 resize 事件處理，移到 DOM 元素初始化之後
+	// handleResize 的定義
 	const handleResize = () => {
 		Blockly.svgResize(workspace);
 	};
 
+	// 註冊到 window 的 resize 事件
 	window.addEventListener('resize', handleResize);
 
 	// 初始觸發一次 resize
