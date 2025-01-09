@@ -10,13 +10,24 @@
 </head>
 
 <body>
-    <div id="blocklyDiv" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+    <div class="container">
+        <div id="blocklyArea">
+            <div id="blocklyDiv"></div>
+        </div>
+        <div id="codePreview">
+            <button id="closeButton">×</button>
+            <pre><code id="generatedCode"></code></pre>
+        </div>
+    </div>
+    <button id="codeButton">&lt;/&gt;</button>
     <script src="{blocklyCompressedJsUri}"></script>
     <script src="{blocksCompressedJsUri}"></script>
     <script src="{javascriptCompressedJsUri}"></script>
     <script src="{msgEnJsUri}"></script>
     <script src="{themeModernJsUri}"></script>
     <script src="{themesUri}/singular.js"></script>
+    <script src="{arduinoJsUri}"></script>
+    <script src="{arduinoBlocksUri}"></script>
     <script src="{jsUri}"></script>
 </body>
 

@@ -71,6 +71,14 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 		vscode.Uri.file(context.asAbsolutePath('node_modules/@blockly/theme-modern/dist/index.js'))
 	);
 
+	// 加入 arduino.js 的路徑
+	const arduinoJsPath = vscode.Uri.file(context.asAbsolutePath('media/generators/arduino.js'));
+	const arduinoJsUri = webview.asWebviewUri(arduinoJsPath);
+
+	// 加入 arduino blocks 的路徑
+	const arduinoBlocksPath = vscode.Uri.file(context.asAbsolutePath('media/js/blocks/arduino.js'));
+	const arduinoBlocksUri = webview.asWebviewUri(arduinoBlocksPath);
+
 	let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
 	htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
 	htmlContent = htmlContent.replace('{jsUri}', jsUri.toString());
@@ -79,6 +87,12 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{msgEnJsUri}', msgEnJsUri.toString());
 	htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
+
+	// 替換 arduino.js 路徑
+	htmlContent = htmlContent.replace('{arduinoJsUri}', arduinoJsUri.toString());
+
+	// 替換 Arduino blocks 路徑
+	htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());
 
 	// 讀取並處理 toolbox 配置
 	const toolboxJsonPath = context.asAbsolutePath('media/toolbox/index.json');

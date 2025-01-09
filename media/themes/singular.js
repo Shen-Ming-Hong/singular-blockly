@@ -64,6 +64,7 @@ const singularTheme = Blockly.Theme.defineTheme('singular', {
 		list_category: { colour: '#F06292' },
 		variable_category: { colour: '#4DB6AC' },
 		procedure_category: { colour: '#7986CB' },
+		arduino_category: { colour: '#00979C' }, // Arduino 標準藍色
 	},
 	fontStyle: {
 		family: 'Inter, system-ui, -apple-system, sans-serif',
