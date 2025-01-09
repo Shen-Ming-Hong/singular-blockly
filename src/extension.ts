@@ -2,8 +2,6 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-let mainCppDocument: vscode.TextDocument | undefined;
-
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "singular-blockly" is now active!');
 

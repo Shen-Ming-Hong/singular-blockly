@@ -12,30 +12,6 @@ html {
 	height: 100%;
 }
 
-#codeButton {
-	position: fixed;
-	top: 20px;
-	right: 20px;
-	padding: 8px 12px;
-	background-color: #4caf50;
-	color: white;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-	z-index: 1000;
-	font-family: 'Consolas', monospace;
-	font-size: 14px;
-	font-weight: bold;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-	transition: all 0.3s ease;
-}
-
-#codeButton:hover {
-	background-color: #45a049;
-	transform: translateY(-1px);
-	box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
-}
-
 .container {
 	display: flex;
 	width: 100%;

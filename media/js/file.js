@@ -1,10 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
 
-	// 先取得所有 DOM 元素
-	const blocklyDiv = document.getElementById('blocklyDiv');
-	const blocklyArea = document.getElementById('blocklyArea'); // 添加這行
-
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
 	const toolboxConfig = await response.json();
