@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+let mainCppDocument: vscode.TextDocument | undefined;
+
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, your extension "singular-blockly" is now active!');
 
@@ -15,6 +17,40 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 
 		panel.webview.html = await getWebviewContent(context, panel.webview);
+
+		// 確保 src 目錄存在
+		const srcPath = path.join(context.extensionPath, 'src');
+		if (!fs.existsSync(srcPath)) {
+			await fs.promises.mkdir(srcPath, { recursive: true });
+		}
+
+		// 監聽來自 webview 的訊息
+		panel.webview.onDidReceiveMessage(async message => {
+			if (message.command === 'updateCode') {
+				// 取得當前工作區域
+				const workspaceFolders = vscode.workspace.workspaceFolders;
+				if (!workspaceFolders) {
+					vscode.window.showErrorMessage('請先開啟一個專案資料夾！');
+					return;
+				}
+
+				const workspaceRoot = workspaceFolders[0].uri.fsPath;
+				const srcDir = path.join(workspaceRoot, 'src');
+				if (!fs.existsSync(srcDir)) {
+					await fs.promises.mkdir(srcDir, { recursive: true });
+				}
+
+				const filePath = vscode.Uri.file(path.join(srcDir, 'main.cpp'));
+
+				try {
+					// 直接寫入檔案，不需要開啟或關閉
+					await fs.promises.writeFile(filePath.fsPath, message.code);
+				} catch (error) {
+					vscode.window.showErrorMessage(`無法儲存檔案: ${(error as Error).message}`);
+					console.error(error);
+				}
+			}
+		});
 	});
 
 	context.subscriptions.push(disposable, openBlocklyEdit);

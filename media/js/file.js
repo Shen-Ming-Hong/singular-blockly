@@ -2,10 +2,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
 
 	// 先取得所有 DOM 元素
-	const codeButton = document.getElementById('codeButton');
-	const codePreview = document.getElementById('codePreview');
-	const closeButton = document.getElementById('closeButton');
-	const generatedCode = document.getElementById('generatedCode');
 	const blocklyDiv = document.getElementById('blocklyDiv');
 	const blocklyArea = document.getElementById('blocklyArea'); // 添加這行
 
@@ -26,12 +22,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 		theme: window.SingularBlocklyTheme, // 使用全局主題
 	});
 
+	const vscode = acquireVsCodeApi();
+
 	// 更新程式碼預覽的函數
 	const updateCodePreview = () => {
-		if (codePreview.classList.contains('active')) {
-			const code = arduinoGenerator.workspaceToCode(workspace);
-			generatedCode.textContent = code;
-		}
+		const code = arduinoGenerator.workspaceToCode(workspace);
+		vscode.postMessage({
+			command: 'updateCode',
+			code: code,
+		});
 	};
 
 	// 修改 workspace change listener
@@ -55,18 +54,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始觸發一次 resize
 	handleResize();
-
-	// 設置按鈕和預覽視窗的事件處理
-	codeButton.addEventListener('click', () => {
-		codePreview.classList.toggle('active');
-		blocklyArea.classList.toggle('preview-active'); // 修改這行
-		updateCodePreview();
-		handleResize();
-	});
-
-	closeButton.addEventListener('click', () => {
-		codePreview.classList.remove('active');
-		blocklyArea.classList.remove('preview-active'); // 修改這行
-		handleResize();
-	});
 });

@@ -4,36 +4,74 @@ const Blockly = window.Blockly;
 window.arduinoGenerator = new Blockly.Generator('Arduino');
 
 window.arduinoGenerator.init = function (workspace) {
-	// 只初始化變數，不預設任何程式碼
 	window.arduinoGenerator.definitions_ = Object.create(null);
 	window.arduinoGenerator.functionNames_ = Object.create(null);
 };
 
 window.arduinoGenerator.finish = function (code) {
+	// 先輸出所有定義
 	let definitions = '';
 	for (let name in window.arduinoGenerator.definitions_) {
 		definitions += window.arduinoGenerator.definitions_[name];
 	}
-
-	// 只在有 setup 和 loop 定義時才添加基本結構
-	if (!window.arduinoGenerator.definitions_['setup'] && !window.arduinoGenerator.definitions_['loop']) {
-		return code; // 如果沒有 setup 和 loop，直接返回代碼
-	}
-
+	// 確保返回完整的程式碼
 	return definitions + code;
 };
 
-// Arduino setup_loop 積木的代碼生成
+// 修改 arduino_setup_loop 的產生器
 window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
+	// 取得 setup 和 loop 區塊的程式碼
 	let setupCode = window.arduinoGenerator.statementToCode(block, 'SETUP') || '';
 	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP') || '';
 
-	// 當這個積木被使用時，添加必要的結構
-	window.arduinoGenerator.definitions_['include'] = '#include <Arduino.h>\n';
-	window.arduinoGenerator.definitions_['setup'] = 'void setup() {\n' + setupCode + '}\n\n';
-	window.arduinoGenerator.definitions_['loop'] = 'void loop() {\n' + loopCode + '}\n';
+	// 確保縮排正確
+	setupCode = setupCode
+		.split('\n')
+		.map(line => '  ' + line)
+		.join('\n');
+	loopCode = loopCode
+		.split('\n')
+		.map(line => '  ' + line)
+		.join('\n');
 
-	return '';
+	// 產生完整的程式碼結構
+	let code = '#include <Arduino.h>\n\n';
+	code += 'void setup() {\n' + setupCode + '}\n\n';
+	code += 'void loop() {\n' + loopCode + '}\n';
+
+	return code;
+};
+
+// 移除在 definitions_ 中的 setup 和 loop，因為現在直接在上面產生
+delete window.arduinoGenerator.definitions_['setup'];
+delete window.arduinoGenerator.definitions_['loop'];
+
+// IO 相關積木生成器
+window.arduinoGenerator.forBlock['arduino_digital_write'] = function (block) {
+	const pin = window.arduinoGenerator.valueToCode(block, 'PIN', window.arduinoGenerator.ORDER_ATOMIC) || '13';
+	const value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_ATOMIC) || 'HIGH';
+	return `digitalWrite(${pin}, ${value});\n`;
+};
+
+window.arduinoGenerator.forBlock['arduino_digital_read'] = function (block) {
+	const pin = window.arduinoGenerator.valueToCode(block, 'PIN', window.arduinoGenerator.ORDER_ATOMIC) || '2';
+	return [`digitalRead(${pin})`, window.arduinoGenerator.ORDER_ATOMIC];
+};
+
+window.arduinoGenerator.forBlock['arduino_analog_write'] = function (block) {
+	const pin = window.arduinoGenerator.valueToCode(block, 'PIN', window.arduinoGenerator.ORDER_ATOMIC) || '3';
+	const value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_ATOMIC) || '0';
+	return `analogWrite(${pin}, ${value});\n`;
+};
+
+window.arduinoGenerator.forBlock['arduino_analog_read'] = function (block) {
+	const pin = window.arduinoGenerator.valueToCode(block, 'PIN', window.arduinoGenerator.ORDER_ATOMIC) || '0';
+	return [`analogRead(${pin})`, window.arduinoGenerator.ORDER_ATOMIC];
+};
+
+window.arduinoGenerator.forBlock['arduino_delay'] = function (block) {
+	const delay = window.arduinoGenerator.valueToCode(block, 'DELAY', window.arduinoGenerator.ORDER_ATOMIC) || '1000';
+	return `delay(${delay});\n`;
 };
 
 // 邏輯積木
@@ -129,7 +167,9 @@ window.arduinoGenerator.forBlock['text'] = function (block) {
 // 文字輸出（Serial.println）
 window.arduinoGenerator.forBlock['text_print'] = function (block) {
 	const msg = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
-	return `Serial.println(${msg});\n`;
+	// 確保 Serial 初始化
+	window.arduinoGenerator.definitions_['serial_begin'] = '  Serial.begin(9600);\n';
+	return `  Serial.println(${msg});\n`;
 };
 
 // 設定運算子優先順序常數
