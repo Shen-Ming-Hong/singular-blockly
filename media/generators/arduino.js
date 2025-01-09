@@ -146,6 +146,11 @@ window.arduinoGenerator.forBlock['logic_boolean'] = function (block) {
 	return [code, window.arduinoGenerator.ORDER_ATOMIC];
 };
 
+// 空值
+window.arduinoGenerator.forBlock['logic_null'] = function (block) {
+	return ['NULL', window.arduinoGenerator.ORDER_ATOMIC];
+};
+
 // 三元運算子
 window.arduinoGenerator.forBlock['logic_ternary'] = function (block) {
 	const condition = window.arduinoGenerator.valueToCode(block, 'IF', window.arduinoGenerator.ORDER_CONDITIONAL) || 'false';
