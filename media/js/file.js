@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			minScale: 0.3, // 最小縮放比例
 			scaleSpeed: 1.2, // 縮放速度
 		},
-		theme: 'modern',
+		theme: window.SingularBlocklyTheme, // 使用全局主題
 	});
 
 	window.addEventListener('resize', () => {

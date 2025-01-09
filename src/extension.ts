@@ -92,5 +92,9 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 
 	htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 
+	const themesUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('media/themes')));
+
+	htmlContent = htmlContent.replace('{themesUri}', themesUri.toString());
+
 	return htmlContent;
 }
