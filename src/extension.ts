@@ -105,13 +105,27 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 		vscode.Uri.file(context.asAbsolutePath('node_modules/@blockly/theme-modern/dist/index.js'))
 	);
 
-	// 加入 arduino.js 的路徑
-	const arduinoJsPath = vscode.Uri.file(context.asAbsolutePath('media/generators/arduino.js'));
-	const arduinoJsUri = webview.asWebviewUri(arduinoJsPath);
+	// 更新 Arduino 生成器路徑
+	const arduinoGeneratorPath = vscode.Uri.file(context.asAbsolutePath('media/blockly/generators/arduino/index.js'));
+	const arduinoGeneratorUri = webview.asWebviewUri(arduinoGeneratorPath);
 
-	// 加入 arduino blocks 的路徑
-	const arduinoBlocksPath = vscode.Uri.file(context.asAbsolutePath('media/js/blocks/arduino.js'));
+	// 更新 Arduino blocks 路徑
+	const arduinoBlocksPath = vscode.Uri.file(context.asAbsolutePath('media/blockly/blocks/arduino.js'));
 	const arduinoBlocksUri = webview.asWebviewUri(arduinoBlocksPath);
+
+	// Arduino 生成器模組路徑
+	const arduinoModules = [
+		'io.js',
+		'logic.js',
+		'loops.js',
+		'math.js',
+		'text.js',
+		'lists.js'  // 新增這行
+	].map(file => {
+		const modulePath = vscode.Uri.file(context.asAbsolutePath(`media/blockly/generators/arduino/${file}`));
+		const moduleUri = webview.asWebviewUri(modulePath);
+		return `<script src="${moduleUri}"></script>`;
+	}).join('\n    ');
 
 	let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
 	htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
@@ -122,11 +136,14 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	htmlContent = htmlContent.replace('{msgEnJsUri}', msgEnJsUri.toString());
 	htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
 
-	// 替換 arduino.js 路徑
-	htmlContent = htmlContent.replace('{arduinoJsUri}', arduinoJsUri.toString());
+	// 替換 Arduino 生成器路徑
+	htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());
 
 	// 替換 Arduino blocks 路徑
 	htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());
+
+	// 替換 Arduino 生成器模組路徑
+	htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 
 	// 讀取並處理 toolbox 配置
 	const toolboxJsonPath = context.asAbsolutePath('media/toolbox/index.json');
@@ -140,7 +157,8 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 
 	htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 
-	const themesUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('media/themes')));
+	// 更新主題路徑
+	const themesUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('media/blockly/themes')));
 
 	htmlContent = htmlContent.replace('{themesUri}', themesUri.toString());
 

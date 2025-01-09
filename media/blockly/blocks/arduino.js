@@ -3,7 +3,6 @@ Blockly.Blocks['arduino_setup_loop'] = {
 		this.appendStatementInput('SETUP').setCheck(null).appendField('初始化');
 		this.appendStatementInput('LOOP').setCheck(null).appendField('重複執行');
 		this.setColour(230);
-		this.setDeletable(false);
 		this.setTooltip('Arduino 程式的基本結構');
 		this.setHelpUrl('');
 	},
