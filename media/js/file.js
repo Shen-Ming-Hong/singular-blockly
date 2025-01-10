@@ -20,6 +20,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	const vscode = acquireVsCodeApi();
 
+	// 處理開發板選擇
+	const boardSelect = document.getElementById('boardSelect');
+	boardSelect.addEventListener('change', event => {
+		const selectedBoard = event.target.value;
+		vscode.postMessage({
+			command: 'updateBoard',
+			board: selectedBoard,
+		});
+	});
+
 	// 更新程式碼預覽的函數
 	const updateCodePreview = () => {
 		const code = arduinoGenerator.workspaceToCode(workspace);

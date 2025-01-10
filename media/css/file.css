@@ -33,3 +33,24 @@ html {
 	height: 100%;
 	transition: width 0.3s ease;
 }
+
+.board-select {
+	position: absolute;
+	top: 10px;
+	right: 10px; /* 改為 right */
+	left: auto; /* 移除 left */
+	z-index: 1000;
+	background-color: white;
+	padding: 8px;
+	border-radius: 4px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.board-select label {
+	margin-right: 8px;
+}
+
+.board-select select {
+	padding: 4px;
+	border-radius: 4px;
+}

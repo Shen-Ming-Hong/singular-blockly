@@ -47,6 +47,30 @@ export function activate(context: vscode.ExtensionContext) {
 					vscode.window.showErrorMessage(`無法儲存檔案: ${(error as Error).message}`);
 					console.error(error);
 				}
+			} else if (message.command === 'updateBoard') {
+				const workspaceFolders = vscode.workspace.workspaceFolders;
+				if (!workspaceFolders) {
+					vscode.window.showErrorMessage('請先開啟一個專案資料夾！');
+					return;
+				}
+
+				const workspaceRoot = workspaceFolders[0].uri.fsPath;
+				const platformioIni = path.join(workspaceRoot, 'platformio.ini');
+				const boardConfig = getBoardConfig(message.board);
+
+				try {
+					if (message.board === 'none') {
+						if (fs.existsSync(platformioIni)) {
+							await fs.promises.unlink(platformioIni);
+						}
+					} else {
+						await fs.promises.writeFile(platformioIni, boardConfig);
+						vscode.window.showInformationMessage(`已更新開發板設定為: ${message.board}`);
+					}
+				} catch (error) {
+					vscode.window.showErrorMessage(`無法更新 platformio.ini: ${(error as Error).message}`);
+					console.error(error);
+				}
 			}
 		});
 	});
@@ -120,12 +144,14 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 		'loops.js',
 		'math.js',
 		'text.js',
-		'lists.js'  // 新增這行
-	].map(file => {
-		const modulePath = vscode.Uri.file(context.asAbsolutePath(`media/blockly/generators/arduino/${file}`));
-		const moduleUri = webview.asWebviewUri(modulePath);
-		return `<script src="${moduleUri}"></script>`;
-	}).join('\n    ');
+		'lists.js', // 新增這行
+	]
+		.map(file => {
+			const modulePath = vscode.Uri.file(context.asAbsolutePath(`media/blockly/generators/arduino/${file}`));
+			const moduleUri = webview.asWebviewUri(modulePath);
+			return `<script src="${moduleUri}"></script>`;
+		})
+		.join('\n    ');
 
 	let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
 	htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
@@ -164,3 +190,31 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 
 	return htmlContent;
 }
+
+// 新增一個函數來取得開發板配置
+const getBoardConfig = (board: string): string => {
+	const configs: { [key: string]: string } = {
+		uno: `[env:uno]
+platform = atmelavr
+board = uno
+framework = arduino`,
+		nano: `[env:nano]
+platform = atmelavr
+board = nanoatmega328
+framework = arduino`,
+		mega: `[env:mega]
+platform = atmelavr
+board = megaatmega2560
+framework = arduino`,
+		esp32: `[env:esp32]
+platform = espressif32
+board = esp32dev
+framework = arduino`,
+		supermini: `[env:lolin_c3_mini]
+platform = espressif32
+board = lolin_c3_mini
+framework = arduino`,
+		none: ``, // 空配置
+	};
+	return configs[board] || configs.none;
+};
