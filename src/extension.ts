@@ -66,6 +66,15 @@ export function activate(context: vscode.ExtensionContext) {
 					} else {
 						await fs.promises.writeFile(platformioIni, boardConfig);
 						vscode.window.showInformationMessage(`已更新開發板設定為: ${message.board}`);
+
+						// 提示使用者需要重新載入
+						const reload = '重新載入視窗';
+						const result = await vscode.window.showInformationMessage('需要重新載入視窗以套用新的開發板設定。', reload);
+
+						if (result === reload) {
+							// 執行重新載入命令
+							await vscode.commands.executeCommand('workbench.action.reloadWindow');
+						}
 					}
 				} catch (error) {
 					vscode.window.showErrorMessage(`無法更新 platformio.ini: ${(error as Error).message}`);
