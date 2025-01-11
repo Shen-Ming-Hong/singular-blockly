@@ -102,17 +102,19 @@ export function activate(context: vscode.ExtensionContext) {
 						} else {
 							const isFirstTime = !fs.existsSync(platformioIni);
 							await fs.promises.writeFile(platformioIni, boardConfig);
-							
+
 							// 使用 setTimeout 延遲顯示訊息，避免干擾面板顯示
 							setTimeout(() => {
-								vscode.window.showInformationMessage(
-									`已更新開發板設定為: ${message.board}${isFirstTime ? '\n請重新載入視窗以完成設定' : ''}`,
-									...(isFirstTime ? ['重新載入'] : [])
-								).then(selection => {
-									if (selection === '重新載入') {
-										vscode.commands.executeCommand('workbench.action.reloadWindow');
-									}
-								});
+								vscode.window
+									.showInformationMessage(
+										`已更新開發板設定為: ${message.board}${isFirstTime ? '\n請重新載入視窗以完成設定' : ''}`,
+										...(isFirstTime ? ['重新載入'] : [])
+									)
+									.then(selection => {
+										if (selection === '重新載入') {
+											vscode.commands.executeCommand('workbench.action.reloadWindow');
+										}
+									});
 							}, 100);
 
 							// 確保 Blockly 編輯器保持在最前面
@@ -134,17 +136,13 @@ export function activate(context: vscode.ExtensionContext) {
 							const cleanState = message.state ? JSON.parse(JSON.stringify(message.state)) : {};
 							const saveData = {
 								workspace: cleanState,
-								board: message.board || 'none'
+								board: message.board || 'none',
 							};
-							
+
 							// 寫入前先驗證 JSON 是否有效
 							JSON.parse(JSON.stringify(saveData)); // 測試序列化
-							
-							await fs.promises.writeFile(
-								mainJsonPath,
-								JSON.stringify(saveData, null, 2),
-								{ encoding: 'utf8' }
-							);
+
+							await fs.promises.writeFile(mainJsonPath, JSON.stringify(saveData, null, 2), { encoding: 'utf8' });
 						} catch (error) {
 							console.error('保存工作區狀態失敗:', error);
 							vscode.window.showErrorMessage(`無法保存工作區狀態: ${(error as Error).message}`);
@@ -162,14 +160,13 @@ export function activate(context: vscode.ExtensionContext) {
 								try {
 									// 先嘗試解析 JSON
 									const saveData = JSON.parse(fileContent);
-									
+
 									// 驗證資料結構
-									if (saveData && typeof saveData === 'object' && 
-										saveData.workspace && saveData.board) {
+									if (saveData && typeof saveData === 'object' && saveData.workspace && saveData.board) {
 										currentPanel?.webview.postMessage({
 											command: 'loadWorkspace',
 											state: saveData.workspace,
-											board: saveData.board
+											board: saveData.board,
 										});
 									} else {
 										throw new Error('無效的工作區狀態格式');
@@ -178,11 +175,7 @@ export function activate(context: vscode.ExtensionContext) {
 									console.error('JSON 解析錯誤:', parseError);
 									// 建立新的空白狀態
 									const newState = { workspace: {}, board: 'none' };
-									await fs.promises.writeFile(
-										mainJsonPath,
-										JSON.stringify(newState, null, 2),
-										'utf8'
-									);
+									await fs.promises.writeFile(mainJsonPath, JSON.stringify(newState, null, 2), 'utf8');
 								}
 							}
 						}
