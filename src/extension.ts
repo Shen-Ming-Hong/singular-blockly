@@ -84,6 +84,16 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	});
 
+	// 建立狀態列按鈕
+	const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+	blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
+	blocklyStatusBarItem.text = '$(symbol-variable)';
+	blocklyStatusBarItem.tooltip = '開啟 Blockly 編輯器';
+	blocklyStatusBarItem.show();
+
+	// 將狀態列按鈕加入訂閱清單
+	context.subscriptions.push(blocklyStatusBarItem);
+
 	context.subscriptions.push(disposable, openBlocklyEdit);
 }
 

@@ -20,7 +20,8 @@
 			},
 			{
 				"command": "singular-blockly.openBlocklyEdit",
-				"title": "Open Blockly Edit"
+				"title": "Open Blockly Edit",
+				"icon": "./images/blockly.svg"
 			}
 		]
 	},
@@ -54,6 +55,7 @@
 		"@blockly/theme-modern": "^6.0.10"
 	},
 	"extensionDependencies": [
-		"ms-vscode.cpptools"
+		"ms-vscode.cpptools",
+		"platformio.platformio-ide"
 	]
 }
