@@ -14,9 +14,31 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 
 		const openBlocklyEdit = vscode.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
-			const panel = vscode.window.createWebviewPanel('blocklyEdit', 'Blockly Edit', vscode.ViewColumn.One, {
-				enableScripts: true,
+			// 將面板保存為全局變數，以便後續引用
+			let currentPanel: vscode.WebviewPanel | undefined = vscode.window.createWebviewPanel(
+				'blocklyEdit',
+				'Blockly Edit',
+				{
+					viewColumn: vscode.ViewColumn.One,
+					preserveFocus: true, // 加入此設定確保焦點不會被搶走
+				},
+				{
+					enableScripts: true,
+					retainContextWhenHidden: true, // 保持 webview 內容，避免重新加載
+				}
+			);
+
+			// 監聽面板關閉事件
+			currentPanel.onDidDispose(() => {
+				currentPanel = undefined;
 			});
+
+			// 確保面板始終顯示在最前面
+			async function ensurePanelVisible() {
+				if (currentPanel) {
+					currentPanel.reveal(vscode.ViewColumn.One, true); // true 表示不獲取焦點
+				}
+			}
 
 			// 確保 blockly 目錄存在
 			const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -28,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			}
 
-			panel.webview.html = await getWebviewContent(context, panel.webview);
+			currentPanel.webview.html = await getWebviewContent(context, currentPanel.webview);
 
 			// 確保 src 目錄存在
 			const srcPath = path.join(context.extensionPath, 'src');
@@ -37,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			// 監聽來自 webview 的訊息
-			panel.webview.onDidReceiveMessage(async message => {
+			currentPanel.webview.onDidReceiveMessage(async message => {
 				if (message.command === 'updateCode') {
 					// 取得當前工作區域
 					const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -79,7 +101,13 @@ export function activate(context: vscode.ExtensionContext) {
 							}
 						} else {
 							await fs.promises.writeFile(platformioIni, boardConfig);
-							vscode.window.showInformationMessage(`已更新開發板設定為: ${message.board}`);
+							// 使用 setTimeout 延遲顯示訊息，避免干擾面板顯示
+							setTimeout(() => {
+								vscode.window.showInformationMessage(`已更新開發板設定為: ${message.board}`);
+							}, 100);
+
+							// 確保 Blockly 編輯器保持在最前面
+							setTimeout(ensurePanelVisible, 200);
 						}
 					} catch (error) {
 						vscode.window.showErrorMessage(`無法更新 platformio.ini: ${(error as Error).message}`);
@@ -93,8 +121,23 @@ export function activate(context: vscode.ExtensionContext) {
 						const mainJsonPath = path.join(blocklyDir, 'main.json');
 
 						try {
-							await fs.promises.writeFile(mainJsonPath, JSON.stringify(message.state, null, 2));
+							// 驗證並清理資料
+							const cleanState = message.state ? JSON.parse(JSON.stringify(message.state)) : {};
+							const saveData = {
+								workspace: cleanState,
+								board: message.board || 'none'
+							};
+							
+							// 寫入前先驗證 JSON 是否有效
+							JSON.parse(JSON.stringify(saveData)); // 測試序列化
+							
+							await fs.promises.writeFile(
+								mainJsonPath,
+								JSON.stringify(saveData, null, 2),
+								{ encoding: 'utf8' }
+							);
 						} catch (error) {
+							console.error('保存工作區狀態失敗:', error);
 							vscode.window.showErrorMessage(`無法保存工作區狀態: ${(error as Error).message}`);
 						}
 					}
@@ -106,8 +149,32 @@ export function activate(context: vscode.ExtensionContext) {
 							const mainJsonPath = path.join(workspaceRoot, 'blockly', 'main.json');
 
 							if (fs.existsSync(mainJsonPath)) {
-								const state = JSON.parse(await fs.promises.readFile(mainJsonPath, 'utf8'));
-								panel.webview.postMessage({ command: 'loadWorkspace', state });
+								const fileContent = await fs.promises.readFile(mainJsonPath, 'utf8');
+								try {
+									// 先嘗試解析 JSON
+									const saveData = JSON.parse(fileContent);
+									
+									// 驗證資料結構
+									if (saveData && typeof saveData === 'object' && 
+										saveData.workspace && saveData.board) {
+										currentPanel?.webview.postMessage({
+											command: 'loadWorkspace',
+											state: saveData.workspace,
+											board: saveData.board
+										});
+									} else {
+										throw new Error('無效的工作區狀態格式');
+									}
+								} catch (parseError) {
+									console.error('JSON 解析錯誤:', parseError);
+									// 建立新的空白狀態
+									const newState = { workspace: {}, board: 'none' };
+									await fs.promises.writeFile(
+										mainJsonPath,
+										JSON.stringify(newState, null, 2),
+										'utf8'
+									);
+								}
 							}
 						}
 					} catch (error) {

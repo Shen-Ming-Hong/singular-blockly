@@ -20,6 +20,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	const vscode = acquireVsCodeApi();
 
+	// 保存工作區狀態的函數
+	const saveWorkspaceState = () => {
+		try {
+			const state = Blockly.serialization.workspaces.save(workspace);
+			vscode.postMessage({
+				command: 'saveWorkspace',
+				state: state,
+				board: boardSelect.value,
+			});
+		} catch (error) {
+			console.error('保存工作區狀態失敗:', error);
+		}
+	};
+
+	// 單一的工作區變更監聽器
+	workspace.addChangeListener(event => {
+		if (event.isUiEvent) return; // 忽略 UI 事件
+
+		// 更新程式碼
+		if (
+			event.type === Blockly.Events.BLOCK_MOVE ||
+			event.type === Blockly.Events.BLOCK_CHANGE ||
+			event.type === Blockly.Events.BLOCK_DELETE ||
+			event.type === Blockly.Events.BLOCK_CREATE
+		) {
+			const code = arduinoGenerator.workspaceToCode(workspace);
+			vscode.postMessage({
+				command: 'updateCode',
+				code: code,
+			});
+		}
+
+		// 保存工作區狀態
+		saveWorkspaceState();
+	});
+
 	// 處理開發板選擇
 	const boardSelect = document.getElementById('boardSelect');
 	boardSelect.addEventListener('change', event => {
@@ -28,48 +64,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 			command: 'updateBoard',
 			board: selectedBoard,
 		});
-	});
-
-	// 更新程式碼預覽的函數
-	const updateCodePreview = () => {
-		const code = arduinoGenerator.workspaceToCode(workspace);
-		vscode.postMessage({
-			command: 'updateCode',
-			code: code,
-		});
-	};
-
-	// 修改 workspace change listener
-	workspace.addChangeListener(function (event) {
-		if (
-			event.type === Blockly.Events.BLOCK_MOVE ||
-			event.type === Blockly.Events.BLOCK_CHANGE ||
-			event.type === Blockly.Events.BLOCK_DELETE ||
-			event.type === Blockly.Events.BLOCK_CREATE
-		) {
-			updateCodePreview(); // 更新程式碼預覽
-		}
+		saveWorkspaceState();
 	});
 
 	// 監聽來自擴充功能的訊息
 	window.addEventListener('message', event => {
 		const message = event.data;
 		if (message.command === 'loadWorkspace') {
-			Blockly.serialization.workspaces.load(message.state, workspace);
+			try {
+				if (message.state) {
+					Blockly.serialization.workspaces.load(message.state, workspace);
+				}
+				if (message.board) {
+					boardSelect.value = message.board;
+					vscode.postMessage({
+						command: 'updateBoard',
+						board: message.board,
+					});
+				}
+			} catch (error) {
+				console.error('載入工作區狀態失敗:', error);
+			}
 		}
-	});
-
-	// 每當工作區變更時保存狀態
-	workspace.addChangeListener(e => {
-		if (e.isUiEvent) {
-			return;
-		} // 忽略 UI 事件
-
-		const state = Blockly.serialization.workspaces.save(workspace);
-		vscode.postMessage({
-			command: 'saveWorkspace',
-			state: state,
-		});
 	});
 
 	// 請求初始狀態
