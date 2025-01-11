@@ -20,11 +20,6 @@
 		},
 		{
 			"kind": "block",
-			"type": "controls_repeat",
-			"disabled": "true"
-		},
-		{
-			"kind": "block",
 			"type": "controls_whileUntil"
 		},
 		{

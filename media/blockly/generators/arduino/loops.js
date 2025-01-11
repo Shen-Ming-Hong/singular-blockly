@@ -1,11 +1,10 @@
 window.arduinoGenerator.forBlock['controls_repeat_ext'] = function (block) {
 	const repeats = window.arduinoGenerator.valueToCode(block, 'TIMES', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
-	let code = '';
-	const loopVar = window.arduinoGenerator.variableDB_.getDistinctName('count', 'VARIABLE');
+	// 使用固定的變數名稱模式
+	const loopVar = '_i' + Math.floor(Math.random() * 10000);
 
-	code += `for (int ${loopVar} = 0; ${loopVar} < ${repeats}; ${loopVar}++) {\n${branch}}\n`;
-	return code;
+	return `for (int ${loopVar} = 0; ${loopVar} < ${repeats}; ${loopVar}++) {\n${branch}}\n`;
 };
 
 window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
@@ -21,7 +20,8 @@ window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['controls_for'] = function (block) {
-	const variable = window.arduinoGenerator.valueToCode(block, 'VAR', window.arduinoGenerator.ORDER_ATOMIC) || 'i';
+	// 使用 getFieldValue 而不是 valueToCode 來獲取變數名稱
+	const variable = block.getFieldValue('VARIABLE') || 'i';
 	const from = window.arduinoGenerator.valueToCode(block, 'FROM', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const to = window.arduinoGenerator.valueToCode(block, 'TO', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const step = window.arduinoGenerator.valueToCode(block, 'BY', window.arduinoGenerator.ORDER_ASSIGNMENT) || '1';
@@ -31,10 +31,26 @@ window.arduinoGenerator.forBlock['controls_for'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['controls_forEach'] = function (block) {
-	const variable = window.arduinoGenerator.valueToCode(block, 'VAR', window.arduinoGenerator.ORDER_ATOMIC) || 'x';
+	// 使用 getFieldValue 取得變數名稱，與 controls_for 保持一致
+	const variable = block.getFieldValue('VARIABLE') || 'x';
 	const list = window.arduinoGenerator.valueToCode(block, 'LIST', window.arduinoGenerator.ORDER_ASSIGNMENT) || '[]';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
-	const loopVar = window.arduinoGenerator.variableDB_.getDistinctName('count', 'VARIABLE');
 
 	return `for (auto ${variable} : ${list}) {\n${branch}}\n`;
+};
+
+window.arduinoGenerator.forBlock['controls_flow_statements'] = function (block) {
+	const flowType = block.getFieldValue('FLOW');
+	let code = '';
+
+	switch (flowType) {
+		case 'BREAK':
+			code = 'break;\n';
+			break;
+		case 'CONTINUE':
+			code = 'continue;\n';
+			break;
+	}
+
+	return code;
 };
