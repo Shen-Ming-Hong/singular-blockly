@@ -3,98 +3,110 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "singular-blockly" is now active!');
+	console.log('開始啟動 Singular Blockly 擴充功能...');
 
-	const disposable = vscode.commands.registerCommand('singular-blockly.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from Singular Blockly!');
-	});
+	try {
+		console.log('正在註冊指令...');
+		console.log('Congratulations, your extension "singular-blockly" is now active!');
 
-	const openBlocklyEdit = vscode.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
-		const panel = vscode.window.createWebviewPanel('blocklyEdit', 'Blockly Edit', vscode.ViewColumn.One, {
-			enableScripts: true,
+		const disposable = vscode.commands.registerCommand('singular-blockly.helloWorld', () => {
+			vscode.window.showInformationMessage('Hello World from Singular Blockly!');
 		});
 
-		panel.webview.html = await getWebviewContent(context, panel.webview);
+		const openBlocklyEdit = vscode.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
+			const panel = vscode.window.createWebviewPanel('blocklyEdit', 'Blockly Edit', vscode.ViewColumn.One, {
+				enableScripts: true,
+			});
 
-		// 確保 src 目錄存在
-		const srcPath = path.join(context.extensionPath, 'src');
-		if (!fs.existsSync(srcPath)) {
-			await fs.promises.mkdir(srcPath, { recursive: true });
-		}
+			panel.webview.html = await getWebviewContent(context, panel.webview);
 
-		// 監聽來自 webview 的訊息
-		panel.webview.onDidReceiveMessage(async message => {
-			if (message.command === 'updateCode') {
-				// 取得當前工作區域
-				const workspaceFolders = vscode.workspace.workspaceFolders;
-				if (!workspaceFolders) {
-					vscode.window.showErrorMessage('請先開啟一個專案資料夾！');
-					return;
-				}
-
-				const workspaceRoot = workspaceFolders[0].uri.fsPath;
-				const srcDir = path.join(workspaceRoot, 'src');
-				if (!fs.existsSync(srcDir)) {
-					await fs.promises.mkdir(srcDir, { recursive: true });
-				}
-
-				const filePath = vscode.Uri.file(path.join(srcDir, 'main.cpp'));
-
-				try {
-					// 直接寫入檔案，不需要開啟或關閉
-					await fs.promises.writeFile(filePath.fsPath, message.code);
-				} catch (error) {
-					vscode.window.showErrorMessage(`無法儲存檔案: ${(error as Error).message}`);
-					console.error(error);
-				}
-			} else if (message.command === 'updateBoard') {
-				const workspaceFolders = vscode.workspace.workspaceFolders;
-				if (!workspaceFolders) {
-					vscode.window.showErrorMessage('請先開啟一個專案資料夾！');
-					return;
-				}
-
-				const workspaceRoot = workspaceFolders[0].uri.fsPath;
-				const platformioIni = path.join(workspaceRoot, 'platformio.ini');
-				const boardConfig = getBoardConfig(message.board);
-
-				try {
-					if (message.board === 'none') {
-						if (fs.existsSync(platformioIni)) {
-							await fs.promises.unlink(platformioIni);
-						}
-					} else {
-						await fs.promises.writeFile(platformioIni, boardConfig);
-						vscode.window.showInformationMessage(`已更新開發板設定為: ${message.board}`);
-
-						// 提示使用者需要重新載入
-						const reload = '重新載入視窗';
-						const result = await vscode.window.showInformationMessage('需要重新載入視窗以套用新的開發板設定。', reload);
-
-						if (result === reload) {
-							// 執行重新載入命令
-							await vscode.commands.executeCommand('workbench.action.reloadWindow');
-						}
-					}
-				} catch (error) {
-					vscode.window.showErrorMessage(`無法更新 platformio.ini: ${(error as Error).message}`);
-					console.error(error);
-				}
+			// 確保 src 目錄存在
+			const srcPath = path.join(context.extensionPath, 'src');
+			if (!fs.existsSync(srcPath)) {
+				await fs.promises.mkdir(srcPath, { recursive: true });
 			}
+
+			// 監聽來自 webview 的訊息
+			panel.webview.onDidReceiveMessage(async message => {
+				if (message.command === 'updateCode') {
+					// 取得當前工作區域
+					const workspaceFolders = vscode.workspace.workspaceFolders;
+					if (!workspaceFolders) {
+						vscode.window.showErrorMessage('請先開啟一個專案資料夾！');
+						return;
+					}
+
+					const workspaceRoot = workspaceFolders[0].uri.fsPath;
+					const srcDir = path.join(workspaceRoot, 'src');
+					if (!fs.existsSync(srcDir)) {
+						await fs.promises.mkdir(srcDir, { recursive: true });
+					}
+
+					const filePath = vscode.Uri.file(path.join(srcDir, 'main.cpp'));
+
+					try {
+						// 直接寫入檔案，不需要開啟或關閉
+						await fs.promises.writeFile(filePath.fsPath, message.code);
+					} catch (error) {
+						vscode.window.showErrorMessage(`無法儲存檔案: ${(error as Error).message}`);
+						console.error(error);
+					}
+				} else if (message.command === 'updateBoard') {
+					const workspaceFolders = vscode.workspace.workspaceFolders;
+					if (!workspaceFolders) {
+						vscode.window.showErrorMessage('請先開啟一個專案資料夾！');
+						return;
+					}
+
+					const workspaceRoot = workspaceFolders[0].uri.fsPath;
+					const platformioIni = path.join(workspaceRoot, 'platformio.ini');
+					const boardConfig = getBoardConfig(message.board);
+
+					try {
+						if (message.board === 'none') {
+							if (fs.existsSync(platformioIni)) {
+								await fs.promises.unlink(platformioIni);
+							}
+						} else {
+							await fs.promises.writeFile(platformioIni, boardConfig);
+							vscode.window.showInformationMessage(`已更新開發板設定為: ${message.board}`);
+
+							// 提示使用者需要重新載入
+							const reload = '重新載入視窗';
+							const result = await vscode.window.showInformationMessage('需要重新載入視窗以套用新的開發板設定。', reload);
+
+							if (result === reload) {
+								// 執行重新載入命令
+								await vscode.commands.executeCommand('workbench.action.reloadWindow');
+							}
+						}
+					} catch (error) {
+						vscode.window.showErrorMessage(`無法更新 platformio.ini: ${(error as Error).message}`);
+						console.error(error);
+					}
+				}
+			});
 		});
-	});
 
-	// 建立狀態列按鈕
-	const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-	blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
-	blocklyStatusBarItem.text = '$(symbol-variable)';
-	blocklyStatusBarItem.tooltip = '開啟 Blockly 編輯器';
-	blocklyStatusBarItem.show();
+		console.log('正在建立狀態列按鈕...');
+		// 建立狀態列按鈕
+		const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+		blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
+		blocklyStatusBarItem.text = '$(symbol-variable)';
+		blocklyStatusBarItem.tooltip = '開啟 Blockly 編輯器';
+		blocklyStatusBarItem.show();
 
-	// 將狀態列按鈕加入訂閱清單
-	context.subscriptions.push(blocklyStatusBarItem);
+		console.log('正在設定訂閱...');
+		// 將狀態列按鈕加入訂閱清單
+		context.subscriptions.push(blocklyStatusBarItem);
 
-	context.subscriptions.push(disposable, openBlocklyEdit);
+		context.subscriptions.push(disposable, openBlocklyEdit);
+
+		console.log('Singular Blockly 擴充功能已完全啟動！');
+	} catch (error) {
+		console.error('Singular Blockly 啟動時發生錯誤:', error);
+		vscode.window.showErrorMessage(`Singular Blockly 啟動失敗: ${error}`);
+	}
 }
 
 export function deactivate() {}
