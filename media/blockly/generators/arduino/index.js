@@ -25,25 +25,43 @@ window.arduinoGenerator.finish = function (code) {
 	return definitions + code;
 };
 
+// 新增 scrub_ 函數來處理區塊堆疊
+window.arduinoGenerator.scrub_ = function (block, code, opt_thisOnly) {
+	const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+	const nextCode = opt_thisOnly ? '' : window.arduinoGenerator.blockToCode(nextBlock);
+	return code + nextCode;
+};
+
 window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	// 取得 setup 和 loop 區塊的程式碼
-	let setupCode = window.arduinoGenerator.statementToCode(block, 'SETUP') || '';
-	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP') || '';
+	let setupCode = window.arduinoGenerator.statementToCode(block, 'SETUP');
+	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP');
 
-	// 確保縮排正確
-	setupCode = setupCode
-		.split('\n')
-		.map(line => '  ' + line)
-		.join('\n');
-	loopCode = loopCode
-		.split('\n')
-		.map(line => '  ' + line)
-		.join('\n');
+	// 處理縮排
+	if (setupCode) {
+		setupCode = setupCode
+			.split('\n')
+			.filter(line => line.length > 0)
+			.map(line => '  ' + line.trim())
+			.join('\n');
+	}
 
-	// 產生完整的程式碼結構
+	if (loopCode) {
+		loopCode = loopCode
+			.split('\n')
+			.filter(line => line.length > 0)
+			.map(line => '  ' + line.trim())
+			.join('\n');
+	}
+
+	// 產生程式碼
 	let code = '#include <Arduino.h>\n\n';
-	code += 'void setup() {\n' + setupCode + '}\n\n';
-	code += 'void loop() {\n' + loopCode + '}\n';
+	code += 'void setup() {\n';
+	code += setupCode ? setupCode + '\n' : '';
+	code += '}\n\n';
+	code += 'void loop() {\n';
+	code += loopCode ? loopCode + '\n' : '';
+	code += '}\n';
 
 	return code;
 };
