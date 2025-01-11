@@ -36,7 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 單一的工作區變更監聽器
 	workspace.addChangeListener(event => {
-		if (event.isUiEvent) return; // 忽略 UI 事件
+		if (event.isUiEvent) {
+			return;
+		} // 忽略 UI 事件
 
 		// 更新程式碼
 		if (

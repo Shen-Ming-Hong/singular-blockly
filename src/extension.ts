@@ -100,10 +100,19 @@ export function activate(context: vscode.ExtensionContext) {
 								await fs.promises.unlink(platformioIni);
 							}
 						} else {
+							const isFirstTime = !fs.existsSync(platformioIni);
 							await fs.promises.writeFile(platformioIni, boardConfig);
+							
 							// 使用 setTimeout 延遲顯示訊息，避免干擾面板顯示
 							setTimeout(() => {
-								vscode.window.showInformationMessage(`已更新開發板設定為: ${message.board}`);
+								vscode.window.showInformationMessage(
+									`已更新開發板設定為: ${message.board}${isFirstTime ? '\n請重新載入視窗以完成設定' : ''}`,
+									...(isFirstTime ? ['重新載入'] : [])
+								).then(selection => {
+									if (selection === '重新載入') {
+										vscode.commands.executeCommand('workbench.action.reloadWindow');
+									}
+								});
 							}, 100);
 
 							// 確保 Blockly 編輯器保持在最前面
