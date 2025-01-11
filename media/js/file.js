@@ -51,6 +51,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	});
 
+	// 監聽來自擴充功能的訊息
+	window.addEventListener('message', event => {
+		const message = event.data;
+		if (message.command === 'loadWorkspace') {
+			Blockly.serialization.workspaces.load(message.state, workspace);
+		}
+	});
+
+	// 每當工作區變更時保存狀態
+	workspace.addChangeListener(e => {
+		if (e.isUiEvent) {
+			return;
+		} // 忽略 UI 事件
+
+		const state = Blockly.serialization.workspaces.save(workspace);
+		vscode.postMessage({
+			command: 'saveWorkspace',
+			state: state,
+		});
+	});
+
+	// 請求初始狀態
+	vscode.postMessage({
+		command: 'requestInitialState',
+	});
+
 	// handleResize 的定義
 	const handleResize = () => {
 		Blockly.svgResize(workspace);

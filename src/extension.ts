@@ -18,6 +18,16 @@ export function activate(context: vscode.ExtensionContext) {
 				enableScripts: true,
 			});
 
+			// 確保 blockly 目錄存在
+			const workspaceFolders = vscode.workspace.workspaceFolders;
+			if (workspaceFolders) {
+				const workspaceRoot = workspaceFolders[0].uri.fsPath;
+				const blocklyDir = path.join(workspaceRoot, 'blockly');
+				if (!fs.existsSync(blocklyDir)) {
+					await fs.promises.mkdir(blocklyDir, { recursive: true });
+				}
+			}
+
 			panel.webview.html = await getWebviewContent(context, panel.webview);
 
 			// 確保 src 目錄存在
@@ -74,6 +84,34 @@ export function activate(context: vscode.ExtensionContext) {
 					} catch (error) {
 						vscode.window.showErrorMessage(`無法更新 platformio.ini: ${(error as Error).message}`);
 						console.error(error);
+					}
+				} else if (message.command === 'saveWorkspace') {
+					const workspaceFolders = vscode.workspace.workspaceFolders;
+					if (workspaceFolders) {
+						const workspaceRoot = workspaceFolders[0].uri.fsPath;
+						const blocklyDir = path.join(workspaceRoot, 'blockly');
+						const mainJsonPath = path.join(blocklyDir, 'main.json');
+
+						try {
+							await fs.promises.writeFile(mainJsonPath, JSON.stringify(message.state, null, 2));
+						} catch (error) {
+							vscode.window.showErrorMessage(`無法保存工作區狀態: ${(error as Error).message}`);
+						}
+					}
+				} else if (message.command === 'requestInitialState') {
+					try {
+						const workspaceFolders = vscode.workspace.workspaceFolders;
+						if (workspaceFolders) {
+							const workspaceRoot = workspaceFolders[0].uri.fsPath;
+							const mainJsonPath = path.join(workspaceRoot, 'blockly', 'main.json');
+
+							if (fs.existsSync(mainJsonPath)) {
+								const state = JSON.parse(await fs.promises.readFile(mainJsonPath, 'utf8'));
+								panel.webview.postMessage({ command: 'loadWorkspace', state });
+							}
+						}
+					} catch (error) {
+						console.error('讀取工作區狀態失敗:', error);
 					}
 				}
 			});
