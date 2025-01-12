@@ -20,8 +20,10 @@ window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['controls_for'] = function (block) {
-	// 使用 getFieldValue 而不是 valueToCode 來獲取變數名稱
-	const variable = block.getFieldValue('VARIABLE') || 'i';
+	// 直接從變數欄位獲取名稱
+	const varField = block.getField('VAR');
+	const variable = varField ? varField.getText() : 'i'; // 使用 getText() 獲取實際顯示的變數名稱
+
 	const from = window.arduinoGenerator.valueToCode(block, 'FROM', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const to = window.arduinoGenerator.valueToCode(block, 'TO', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const step = window.arduinoGenerator.valueToCode(block, 'BY', window.arduinoGenerator.ORDER_ASSIGNMENT) || '1';
@@ -31,8 +33,10 @@ window.arduinoGenerator.forBlock['controls_for'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['controls_forEach'] = function (block) {
-	// 使用 getFieldValue 取得變數名稱，與 controls_for 保持一致
-	const variable = block.getFieldValue('VARIABLE') || 'x';
+	// 對 forEach 使用相同的方式
+	const varField = block.getField('VAR');
+	const variable = varField ? varField.getText() : 'x'; // 使用 getText() 獲取實際顯示的變數名稱
+
 	const list = window.arduinoGenerator.valueToCode(block, 'LIST', window.arduinoGenerator.ORDER_ASSIGNMENT) || '[]';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 
