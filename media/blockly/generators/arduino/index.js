@@ -4,8 +4,10 @@ const Blockly = window.Blockly;
 window.arduinoGenerator = new Blockly.Generator('Arduino');
 
 window.arduinoGenerator.init = function (workspace) {
+	window.arduinoGenerator.includes_ = Object.create(null); // 新增 includes
+	window.arduinoGenerator.variables_ = Object.create(null); // 新增 variables
 	window.arduinoGenerator.definitions_ = Object.create(null);
-	window.arduinoGenerator.functionNames_ = Object.create(null);
+	window.arduinoGenerator.functions_ = Object.create(null);
 
 	// 初始化 nameDB_
 	if (!window.arduinoGenerator.nameDB_) {
@@ -16,16 +18,38 @@ window.arduinoGenerator.init = function (workspace) {
 };
 
 window.arduinoGenerator.finish = function (code) {
-	// 先輸出所有定義
+	// 首先輸出所有 include
+	let includes = '';
+	for (let name in window.arduinoGenerator.includes_) {
+		includes += window.arduinoGenerator.includes_[name] + '\n';
+	}
+	includes += '\n';
+
+	// 輸出全域變數宣告
+	let variables = '';
+	for (let name in window.arduinoGenerator.variables_) {
+		variables += window.arduinoGenerator.variables_[name] + '\n';
+	}
+	if (variables) {
+		variables += '\n';
+	}
+
+	// 輸出其他定義
 	let definitions = '';
 	for (let name in window.arduinoGenerator.definitions_) {
 		definitions += window.arduinoGenerator.definitions_[name];
 	}
-	// 確保返回完整的程式碼
-	return definitions + code;
+
+	// 輸出函數定義
+	let functions = '';
+	for (let name in window.arduinoGenerator.functions_) {
+		functions += window.arduinoGenerator.functions_[name] + '\n';
+	}
+
+	// 返回完整程式碼，依序是：includes、變數、定義、函數、主程式
+	return includes + variables + definitions + functions + code;
 };
 
-// 新增 scrub_ 函數來處理區塊堆疊
 window.arduinoGenerator.scrub_ = function (block, code, opt_thisOnly) {
 	const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
 	const nextCode = opt_thisOnly ? '' : window.arduinoGenerator.blockToCode(nextBlock);
@@ -34,6 +58,8 @@ window.arduinoGenerator.scrub_ = function (block, code, opt_thisOnly) {
 
 window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	// 取得 setup 和 loop 區塊的程式碼
+	// 自動包含 Arduino.h
+	window.arduinoGenerator.includes_['arduino'] = '#include <Arduino.h>';
 	let setupCode = window.arduinoGenerator.statementToCode(block, 'SETUP');
 	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP');
 
@@ -55,7 +81,7 @@ window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	}
 
 	// 產生程式碼
-	let code = '#include <Arduino.h>\n\n';
+	let code = '\n';
 	code += 'void setup() {\n';
 	code += setupCode ? setupCode + '\n' : '';
 	code += '}\n\n';
@@ -65,9 +91,6 @@ window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 
 	return code;
 };
-
-delete window.arduinoGenerator.definitions_['setup'];
-delete window.arduinoGenerator.definitions_['loop'];
 
 // 運算子優先順序常數定義
 window.arduinoGenerator.ORDER_ATOMIC = 0; // 0 "" ...
