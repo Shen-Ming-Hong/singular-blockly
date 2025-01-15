@@ -105,4 +105,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始觸發一次 resize
 	handleResize();
+
+	// 覆寫變數下拉選單的創建方法
+	Blockly.FieldVariable.dropdownCreate = function () {
+		const workspace = Blockly.getMainWorkspace();
+		const variableList = workspace.getAllVariables().map(variable => [variable.name, variable.name]);
+
+		// 加入分隔線與選項
+		if (variableList.length > 0) {
+			const currentName = this.getText(); // 獲取當前變數名稱
+			variableList.push(['---', '---']);
+			variableList.push([Blockly.Msg['RENAME_VARIABLE'], Blockly.Msg['RENAME_VARIABLE']]);
+			// 正確格式化刪除變數的選項文字
+			variableList.push([Blockly.Msg['DELETE_VARIABLE'].replace('%1', currentName), Blockly.Msg['DELETE_VARIABLE']]);
+			variableList.push(['---', '---']);
+		}
+
+		// 加入 "新增變數" 選項
+		variableList.push([Blockly.Msg['NEW_VARIABLE'], Blockly.Msg['NEW_VARIABLE']]);
+
+		return variableList;
+	};
 });
