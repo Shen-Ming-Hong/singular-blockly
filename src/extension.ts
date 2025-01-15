@@ -187,7 +187,9 @@ export function activate(context: vscode.ExtensionContext) {
 						prompt: message.isRename ? `請輸入新的變數名稱 (目前: ${message.currentName})` : '請輸入新變數名稱',
 						value: message.currentName || '',
 						validateInput: text => {
-							if (!text) return '變數名稱不能為空';
+							if (!text) {
+								return '變數名稱不能為空';
+							}
 							if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(text)) {
 								return '變數名稱只能包含字母、數字和底線，且不能以數字開頭';
 							}
