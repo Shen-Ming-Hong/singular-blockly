@@ -182,6 +182,35 @@ export function activate(context: vscode.ExtensionContext) {
 					} catch (error) {
 						console.error('讀取工作區狀態失敗:', error);
 					}
+				} else if (message.command === 'promptNewVariable') {
+					const result = await vscode.window.showInputBox({
+						prompt: message.isRename ? `請輸入新的變數名稱 (目前: ${message.currentName})` : '請輸入新變數名稱',
+						value: message.currentName || '',
+						validateInput: text => {
+							if (!text) return '變數名稱不能為空';
+							if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(text)) {
+								return '變數名稱只能包含字母、數字和底線，且不能以數字開頭';
+							}
+							return null;
+						},
+					});
+
+					if (result !== undefined) {
+						currentPanel?.webview.postMessage({
+							command: 'createVariable',
+							name: result,
+							isRename: message.isRename,
+							oldName: message.currentName,
+						});
+					}
+				} else if (message.command === 'confirmDeleteVariable') {
+					const result = await vscode.window.showWarningMessage(`確定要刪除變數 "${message.variableName}" 嗎？`, '確定', '取消');
+
+					currentPanel?.webview.postMessage({
+						command: 'deleteVariable',
+						confirmed: result === '確定',
+						name: message.variableName,
+					});
 				}
 			});
 		});

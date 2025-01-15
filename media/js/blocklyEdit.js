@@ -1,3 +1,6 @@
+// 在頁面最上方宣告全域 vscode API 實例
+const vscode = acquireVsCodeApi();
+
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
 
@@ -18,7 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		theme: window.SingularBlocklyTheme, // 使用全局主題
 	});
 
-	const vscode = acquireVsCodeApi();
+	// 移除這行，因為已經在全域宣告
+	// const vscode = acquireVsCodeApi();
 
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
@@ -72,21 +76,59 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 監聽來自擴充功能的訊息
 	window.addEventListener('message', event => {
 		const message = event.data;
-		if (message.command === 'loadWorkspace') {
-			try {
-				if (message.state) {
-					Blockly.serialization.workspaces.load(message.state, workspace);
+		const workspace = Blockly.getMainWorkspace();
+
+		switch (message.command) {
+			case 'createVariable':
+				if (message.name) {
+					if (message.isRename && message.oldName) {
+						// 修正：直接使用變數 ID 進行重命名
+						const variable = workspace.getVariable(message.oldName);
+						if (variable) {
+							// 使用 workspace 的 renameVariableById 方法
+							workspace.renameVariableById(variable.getId(), message.name);
+
+							// 觸發工作區變更事件以更新程式碼
+							workspace.fireChangeListener({
+								type: Blockly.Events.VAR_RENAME,
+								varId: variable.getId(),
+								oldName: message.oldName,
+								newName: message.name,
+							});
+						}
+					} else {
+						// 新增變數
+						workspace.createVariable(message.name);
+					}
 				}
-				if (message.board) {
-					boardSelect.value = message.board;
-					vscode.postMessage({
-						command: 'updateBoard',
-						board: message.board,
-					});
+				break;
+
+			case 'deleteVariable':
+				if (message.confirmed) {
+					const variable = workspace.getVariable(message.name);
+					if (variable) {
+						workspace.deleteVariable(variable);
+					}
 				}
-			} catch (error) {
-				console.error('載入工作區狀態失敗:', error);
-			}
+				break;
+
+			// ...保留其他既有的 case...
+			case 'loadWorkspace':
+				try {
+					if (message.state) {
+						Blockly.serialization.workspaces.load(message.state, workspace);
+					}
+					if (message.board) {
+						boardSelect.value = message.board;
+						vscode.postMessage({
+							command: 'updateBoard',
+							board: message.board,
+						});
+					}
+				} catch (error) {
+					console.error('載入工作區狀態失敗:', error);
+				}
+				break;
 		}
 	});
 
@@ -125,5 +167,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 		variableList.push([Blockly.Msg['NEW_VARIABLE'], Blockly.Msg['NEW_VARIABLE']]);
 
 		return variableList;
+	};
+
+	// 覆寫變數下拉選單的變更監聽器
+	Blockly.FieldVariable.prototype.onItemSelected_ = function (menu, menuItem) {
+		const workspace = this.sourceBlock_.workspace;
+		const id = this.getValue();
+		const variable = workspace.getVariableById(id);
+
+		if (menuItem.getValue() === Blockly.Msg['NEW_VARIABLE']) {
+			// 請求使用者輸入新變數名稱
+			vscode.postMessage({
+				command: 'promptNewVariable',
+				currentName: '',
+			});
+		} else if (menuItem.getValue() === Blockly.Msg['RENAME_VARIABLE']) {
+			if (variable) {
+				// 請求使用者輸入新名稱
+				vscode.postMessage({
+					command: 'promptNewVariable',
+					currentName: variable.name,
+					isRename: true,
+				});
+			}
+		} else if (menuItem.getValue() === Blockly.Msg['DELETE_VARIABLE']) {
+			if (variable) {
+				// 詢問使用者是否要刪除變數
+				vscode.postMessage({
+					command: 'confirmDeleteVariable',
+					variableName: variable.name,
+				});
+			}
+		} else if (menuItem.getValue() !== '---') {
+			// 正常選擇變數
+			this.setValue(menuItem.getValue());
+		}
 	};
 });
