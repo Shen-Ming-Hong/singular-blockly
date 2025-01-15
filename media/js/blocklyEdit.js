@@ -183,37 +183,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 覆寫變數下拉選單的創建方法
 	Blockly.FieldVariable.dropdownCreate = function () {
 		const workspace = Blockly.getMainWorkspace();
-		const variableList = workspace.getAllVariables().map(variable => [variable.name, variable.name]);
+		// 修改這行：使用變數的 ID 作為值
+		const variableList = workspace.getAllVariables().map(variable => [variable.name, variable.getId()]);
 
 		// 加入分隔線與選項
 		if (variableList.length > 0) {
 			const currentName = this.getText(); // 獲取當前變數名稱
 			variableList.push(['---', '---']);
 			variableList.push([Blockly.Msg['RENAME_VARIABLE'], Blockly.Msg['RENAME_VARIABLE']]);
-			// 正確格式化刪除變數的選項文字
 			variableList.push([Blockly.Msg['DELETE_VARIABLE'].replace('%1', currentName), Blockly.Msg['DELETE_VARIABLE']]);
 			variableList.push(['---', '---']);
 		}
 
-		// 加入 "新增變數" 選項
 		variableList.push([Blockly.Msg['NEW_VARIABLE'], Blockly.Msg['NEW_VARIABLE']]);
-
 		return variableList;
 	};
 
 	// 覆寫變數下拉選單的變更監聽器
 	Blockly.FieldVariable.prototype.onItemSelected_ = function (menu, menuItem) {
 		const workspace = this.sourceBlock_.workspace;
-		const id = this.getValue();
-		const variable = workspace.getVariableById(id);
+		const value = menuItem.getValue();
 
-		if (menuItem.getValue() === Blockly.Msg['NEW_VARIABLE']) {
+		if (value === Blockly.Msg['NEW_VARIABLE']) {
 			// 請求使用者輸入新變數名稱
 			vscode.postMessage({
 				command: 'promptNewVariable',
 				currentName: '',
 			});
-		} else if (menuItem.getValue() === Blockly.Msg['RENAME_VARIABLE']) {
+		} else if (value === Blockly.Msg['RENAME_VARIABLE']) {
+			const id = this.getValue();
+			const variable = workspace.getVariableById(id);
 			if (variable) {
 				// 請求使用者輸入新名稱
 				vscode.postMessage({
@@ -222,7 +221,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 					isRename: true,
 				});
 			}
-		} else if (menuItem.getValue() === Blockly.Msg['DELETE_VARIABLE']) {
+		} else if (value === Blockly.Msg['DELETE_VARIABLE']) {
+			const id = this.getValue();
+			const variable = workspace.getVariableById(id);
 			if (variable) {
 				// 詢問使用者是否要刪除變數
 				vscode.postMessage({
@@ -230,9 +231,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 					variableName: variable.name,
 				});
 			}
-		} else if (menuItem.getValue() !== '---') {
-			// 正常選擇變數
-			this.setValue(menuItem.getValue());
+		} else if (value !== '---') {
+			// 正常選擇變數：直接使用變數 ID
+			this.setValue(value);
 		}
 	};
 
