@@ -21,6 +21,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 		theme: window.SingularBlocklyTheme, // 使用全局主題
 	});
 
+	// 覆寫變數類別的flyout生成函數，隱藏內建的新增變數按鈕
+	workspace.registerToolboxCategoryCallback('VARIABLE', function (workspace) {
+		return workspace
+			.getAllVariables()
+			.map(variable => {
+				// 為每個變數創建 get 和 set 積木
+				return [
+					Blockly.utils.xml.textToDom(
+						`<block type="variables_get">
+							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
+						</block>`
+					),
+					Blockly.utils.xml.textToDom(
+						`<block type="variables_set">
+							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
+						</block>`
+					),
+				];
+			})
+			.flat(); // 展平陣列
+	});
+
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
 		try {
