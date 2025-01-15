@@ -107,7 +107,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 				if (message.confirmed) {
 					const variable = workspace.getVariable(message.name);
 					if (variable) {
-						workspace.deleteVariable(variable);
+						const varId = variable.getId();
+
+						// 先找出所有使用這個變數的積木
+						const blocks = workspace
+							.getBlocksByType('variables_get')
+							.concat(workspace.getBlocksByType('variables_set'))
+							.filter(block => block.getField('VAR').getText() === message.name);
+
+						// 移除所有使用這個變數的積木
+						blocks.forEach(block => {
+							block.dispose(false);
+						});
+
+						// 從工作區中移除變數定義
+						workspace.deleteVariableById(varId);
+
+						// 手動觸發更新
+						const code = arduinoGenerator.workspaceToCode(workspace);
+						vscode.postMessage({
+							command: 'updateCode',
+							code: code,
+						});
+						saveWorkspaceState();
 					}
 				}
 				break;
