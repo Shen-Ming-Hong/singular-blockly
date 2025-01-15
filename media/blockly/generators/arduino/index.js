@@ -191,3 +191,107 @@ window.arduinoGenerator.forBlock['variables_set'] = function (block) {
 
 	return `${varName} = ${value};\n`;
 };
+
+// 處理函數定義積木 (無回傳值)
+window.arduinoGenerator.forBlock['procedures_defnoreturn'] = function (block) {
+	// 獲取函數名稱
+	const funcName = block.getFieldValue('NAME');
+	let branch = window.arduinoGenerator.statementToCode(block, 'STACK');
+
+	// 如果函數內容不是空的，確保適當的縮排
+	if (branch) {
+		branch = branch
+			.split('\n')
+			.map(line => '  ' + line)
+			.join('\n');
+	}
+
+	// 生成函數定義
+	const code = `void ${funcName}() {\n${branch}\n}\n`;
+
+	// 將函數定義儲存到函數集合中
+	window.arduinoGenerator.functions_[funcName] = code;
+
+	return null;
+};
+
+// 處理函數呼叫積木 (無回傳值)
+window.arduinoGenerator.forBlock['procedures_callnoreturn'] = function (block) {
+	// 獲取函數名稱
+	const funcName = block.getFieldValue('NAME');
+	// 生成函數呼叫
+	return `${funcName}();\n`;
+};
+
+// 處理帶回傳值的函數定義
+window.arduinoGenerator.forBlock['procedures_defreturn'] = function (block) {
+	// 獲取函數名稱
+	const funcName = block.getFieldValue('NAME');
+	let branch = window.arduinoGenerator.statementToCode(block, 'STACK');
+	const returnValue = window.arduinoGenerator.valueToCode(block, 'RETURN', window.arduinoGenerator.ORDER_NONE) || 'NULL';
+
+	// 確保適當的縮排
+	if (branch) {
+		branch = branch
+			.split('\n')
+			.map(line => '  ' + line)
+			.join('\n');
+	}
+
+	// 生成函數定義，預設使用 int 作為回傳型態
+	const code = `int ${funcName}() {\n${branch}  return ${returnValue};\n}\n`;
+
+	// 將函數定義儲存到函數集合中
+	window.arduinoGenerator.functions_[funcName] = code;
+
+	return null;
+};
+
+// 處理帶回傳值的函數呼叫
+window.arduinoGenerator.forBlock['procedures_callreturn'] = function (block) {
+	// 獲取函數名稱
+	const funcName = block.getFieldValue('NAME');
+	// 生成函數呼叫，並設定適當的運算子優先順序
+	return [`${funcName}()`, window.arduinoGenerator.ORDER_ATOMIC];
+};
+
+// 處理帶參數的函數定義 (如果需要的話)
+window.arduinoGenerator.forBlock['procedures_defnoreturn_params'] = function (block) {
+	// 獲取函數名稱和參數
+	const funcName = block.getFieldValue('NAME');
+	const args = block.arguments_ || [];
+	const params = args.map(arg => `int ${arg}`).join(', ');
+
+	let branch = window.arduinoGenerator.statementToCode(block, 'STACK');
+
+	// 確保適當的縮排
+	if (branch) {
+		branch = branch
+			.split('\n')
+			.map(line => '  ' + line)
+			.join('\n');
+	}
+
+	// 生成函數定義
+	const code = `void ${funcName}(${params}) {\n${branch}\n}\n`;
+
+	// 將函數定義儲存到函數集合中
+	window.arduinoGenerator.functions_[funcName] = code;
+
+	return null;
+};
+
+// 處理帶參數的函數呼叫
+window.arduinoGenerator.forBlock['procedures_callnoreturn_params'] = function (block) {
+	// 獲取函數名稱
+	const funcName = block.getFieldValue('NAME');
+	const args = block.arguments_ || [];
+
+	// 獲取所有參數的值
+	const values = args.map(arg => {
+		return window.arduinoGenerator.valueToCode(block, 'ARG' + args.indexOf(arg), window.arduinoGenerator.ORDER_NONE) || '0';
+	});
+
+	// 生成函數呼叫
+	return `${funcName}(${values.join(', ')});\n`;
+};
