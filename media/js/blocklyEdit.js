@@ -97,8 +97,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 							});
 						}
 					} else {
-						// 新增變數
-						workspace.createVariable(message.name);
+						// 新增變數，直接使用 workspace 的方法
+						const existingVar = workspace.getVariable(message.name);
+						if (!existingVar) {
+							workspace.createVariable(message.name);
+							// 觸發更新
+							const code = arduinoGenerator.workspaceToCode(workspace);
+							vscode.postMessage({
+								command: 'updateCode',
+								code: code,
+							});
+							saveWorkspaceState();
+						}
 					}
 				}
 				break;
@@ -224,5 +234,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 正常選擇變數
 			this.setValue(menuItem.getValue());
 		}
+	};
+
+	// 覆寫 Blockly 的變數創建函數，避免使用內建對話框
+	Blockly.Variables.createVariable = function (workspace, opt_callback, opt_type) {
+		// 直接發送訊息給 VS Code，要求輸入新變數名稱
+		vscode.postMessage({
+			command: 'promptNewVariable',
+			currentName: '',
+			type: opt_type || '',
+		});
 	};
 });
