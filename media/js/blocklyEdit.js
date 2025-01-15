@@ -21,9 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		theme: window.SingularBlocklyTheme, // 使用全局主題
 	});
 
-	// 移除這行，因為已經在全域宣告
-	// const vscode = acquireVsCodeApi();
-
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
 		try {
