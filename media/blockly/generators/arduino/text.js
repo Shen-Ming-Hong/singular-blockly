@@ -12,10 +12,19 @@ window.arduinoGenerator.forBlock['text_join'] = function (block) {
 	return [code, window.arduinoGenerator.ORDER_ATOMIC];
 };
 
+// 重新定義 text_print block
 window.arduinoGenerator.forBlock['text_print'] = function (block) {
-	const msg = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
-	window.arduinoGenerator.definitions_['include_serial'] = '#include <Arduino.h>';
+	// 確保包含必要的標頭檔
+	window.arduinoGenerator.includes_['arduino'] = '#include <Arduino.h>';
+
+	// 在 setup 中初始化 Serial
+	window.arduinoGenerator.setupCode_ = window.arduinoGenerator.setupCode_ || [];
 	window.arduinoGenerator.setupCode_.push('Serial.begin(9600);');
+
+	// 獲取要打印的文字
+	const msg = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
+
+	// 生成 Arduino 程式碼
 	return `Serial.println(${msg});\n`;
 };
 
@@ -30,7 +39,9 @@ window.arduinoGenerator.forBlock['text_isEmpty'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['text_append'] = function (block) {
-	const varName = window.arduinoGenerator.nameDB_.getName(block.getFieldValue('VAR'), 'VARIABLE');
+	// 直接使用積木上的變數名稱
+	const varName = block.getField('VAR').getText();
+	window.arduinoGenerator.variables_[varName] = `String ${varName} = "";`;
 	const text = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
 	return `${varName} += ${text};\n`;
 };
@@ -38,14 +49,23 @@ window.arduinoGenerator.forBlock['text_append'] = function (block) {
 window.arduinoGenerator.forBlock['text_indexOf'] = function (block) {
 	const operator = block.getFieldValue('END') === 'FIRST' ? 'indexOf' : 'lastIndexOf';
 	const substring = window.arduinoGenerator.valueToCode(block, 'FIND', window.arduinoGenerator.ORDER_NONE) || '""';
+	const varName = block.getInputTargetBlock('VALUE').getField('VAR').getText();
+	// 加入 String 型態宣告
+	window.arduinoGenerator.variables_[varName] = `String ${varName} = "";`;
 	const text = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_NONE) || '""';
+
 	return [`${text}.${operator}(${substring}) + 1`, window.arduinoGenerator.ORDER_ATOMIC];
 };
 
 window.arduinoGenerator.forBlock['text_charAt'] = function (block) {
 	const where = block.getFieldValue('WHERE') || 'FROM_START';
+	const varName = block.getInputTargetBlock('VALUE').getField('VAR').getText();
+	// 加入 String 型態宣告
+	window.arduinoGenerator.variables_[varName] = `String ${varName} = "";`;
 	const text = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_NONE) || '""';
 	let at;
+
+	// 處理變數輸入
 	if (where === 'RANDOM') {
 		at = `random(${text}.length())`;
 	} else {
@@ -55,6 +75,10 @@ window.arduinoGenerator.forBlock['text_charAt'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['text_getSubstring'] = function (block) {
+	const varName = block.getInputTargetBlock('STRING').getField('VAR').getText();
+	// 加入 String 型態宣告
+	window.arduinoGenerator.variables_[varName] = `String ${varName} = "";`;
+	// 確保處理變數輸入
 	const text = window.arduinoGenerator.valueToCode(block, 'STRING', window.arduinoGenerator.ORDER_NONE) || '""';
 	const where1 = block.getFieldValue('WHERE1');
 	const where2 = block.getFieldValue('WHERE2');
@@ -64,32 +88,11 @@ window.arduinoGenerator.forBlock['text_getSubstring'] = function (block) {
 	return [`${text}.substring(${at1}, ${at2})`, window.arduinoGenerator.ORDER_ATOMIC];
 };
 
-window.arduinoGenerator.forBlock['text_changeCase'] = function (block) {
-	const operator = block.getFieldValue('CASE');
-	const text = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
-	let code;
-	if (operator === 'UPPERCASE') {
-		code = `${text}.toUpperCase()`;
-	} else if (operator === 'LOWERCASE') {
-		code = `${text}.toLowerCase()`;
-	} else {
-		return ['""', window.arduinoGenerator.ORDER_ATOMIC];
-	}
-	return [code, window.arduinoGenerator.ORDER_ATOMIC];
-};
-
-window.arduinoGenerator.forBlock['text_trim'] = function (block) {
-	const mode = block.getFieldValue('MODE');
-	const text = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
-	return [`${text}.trim()`, window.arduinoGenerator.ORDER_ATOMIC];
-};
-
 window.arduinoGenerator.forBlock['text_count'] = function (block) {
 	const sub = window.arduinoGenerator.valueToCode(block, 'SUB', window.arduinoGenerator.ORDER_NONE) || '""';
 	const text = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
 
-	// Arduino String 沒有內建的 count 方法，需要自己實作
-	window.arduinoGenerator.definitions_['text_count'] = `
+	window.arduinoGenerator.functions_['countSubstring'] = `
 int countSubstring(String text, String sub) {
   int count = 0;
   int idx = 0;
@@ -103,18 +106,10 @@ int countSubstring(String text, String sub) {
 	return [`countSubstring(${text}, ${sub})`, window.arduinoGenerator.ORDER_ATOMIC];
 };
 
-window.arduinoGenerator.forBlock['text_replace'] = function (block) {
-	const from = window.arduinoGenerator.valueToCode(block, 'FROM', window.arduinoGenerator.ORDER_NONE) || '""';
-	const to = window.arduinoGenerator.valueToCode(block, 'TO', window.arduinoGenerator.ORDER_NONE) || '""';
-	const text = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
-	return [`${text}.replace(${from}, ${to})`, window.arduinoGenerator.ORDER_ATOMIC];
-};
-
 window.arduinoGenerator.forBlock['text_reverse'] = function (block) {
 	const text = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
 
-	// Arduino String 沒有內建的 reverse 方法，需要自己實作
-	window.arduinoGenerator.definitions_['text_reverse'] = `
+	window.arduinoGenerator.functions_['reverseString'] = `
 String reverseString(String str) {
   String result = "";
   for (int i = str.length() - 1; i >= 0; i--) {
@@ -130,11 +125,9 @@ window.arduinoGenerator.forBlock['text_prompt_ext'] = function (block) {
 	const type = block.getFieldValue('TYPE');
 	const msg = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
 
-	window.arduinoGenerator.definitions_['include_serial'] = '#include <Arduino.h>';
 	window.arduinoGenerator.setupCode_.push('Serial.begin(9600);');
 
-	// 實作簡單的序列埠輸入
-	window.arduinoGenerator.definitions_['text_prompt'] = `
+	window.arduinoGenerator.functions_['serialPrompt'] = `
 String serialPrompt(String msg) {
   Serial.println(msg);
   while (!Serial.available()) {

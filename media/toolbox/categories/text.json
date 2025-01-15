@@ -109,63 +109,9 @@
 		},
 		{
 			"kind": "block",
-			"type": "text_changeCase",
-			"inputs": {
-				"TEXT": {
-					"shadow": {
-						"kind": "block",
-						"type": "text",
-						"fields": {
-							"TEXT": "abc"
-						}
-					}
-				}
-			}
-		},
-		{
-			"kind": "block",
-			"type": "text_trim",
-			"inputs": {
-				"TEXT": {
-					"shadow": {
-						"kind": "block",
-						"type": "text",
-						"fields": {
-							"TEXT": "abc"
-						}
-					}
-				}
-			}
-		},
-		{
-			"kind": "block",
 			"type": "text_count",
 			"inputs": {
 				"SUB": {
-					"shadow": {
-						"kind": "block",
-						"type": "text"
-					}
-				},
-				"TEXT": {
-					"shadow": {
-						"kind": "block",
-						"type": "text"
-					}
-				}
-			}
-		},
-		{
-			"kind": "block",
-			"type": "text_replace",
-			"inputs": {
-				"FROM": {
-					"shadow": {
-						"kind": "block",
-						"type": "text"
-					}
-				},
-				"TO": {
 					"shadow": {
 						"kind": "block",
 						"type": "text"
