@@ -90,6 +90,61 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	});
 
+	Blockly.Variables.createVariableButtonHandler = function (workspace) {
+		const dialog = document.getElementById('variableDialog');
+		const input = document.getElementById('variableNameInput');
+		dialog.style.display = 'block';
+		input.value = '';
+		input.focus();
+
+		// 防止點擊對話框外部自動關閉
+		const clickHandler = function (e) {
+			if (!dialog.contains(e.target)) {
+				cancelVariable();
+				document.removeEventListener('click', clickHandler);
+			}
+		};
+
+		setTimeout(() => {
+			document.addEventListener('click', clickHandler);
+		}, 100);
+	};
+
+	// 確認建立變數
+	window.confirmVariable = function () {
+		const input = document.getElementById('variableNameInput');
+		const name = input.value.trim();
+
+		if (name) {
+			if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+				alert('變數名稱必須以字母或底線開頭，只能包含字母、數字和底線');
+				return;
+			}
+
+			try {
+				workspace.createVariable(name);
+				document.getElementById('variableDialog').style.display = 'none';
+			} catch (e) {
+				console.error('建立變數失敗:', e);
+				alert('建立變數失敗: ' + e.message);
+			}
+		} else {
+			alert('請輸入變數名稱');
+		}
+	};
+
+	// 取消建立變數
+	window.cancelVariable = function () {
+		document.getElementById('variableDialog').style.display = 'none';
+	};
+
+	// 監聽變數對話框的 Enter 鍵
+	document.getElementById('variableNameInput').addEventListener('keypress', function (e) {
+		if (e.key === 'Enter') {
+			confirmVariable();
+		}
+	});
+
 	// 請求初始狀態
 	vscode.postMessage({
 		command: 'requestInitialState',

@@ -10,6 +10,15 @@
 </head>
 
 <body>
+    <!-- 加入自定義變數對話框 -->
+    <div id="variableDialog"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+        background: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
+        <h3>新增變數</h3>
+        <input type="text" id="variableNameInput" placeholder="輸入變數名稱">
+        <button onclick="confirmVariable()">確定</button>
+        <button onclick="cancelVariable()">取消</button>
+    </div>
     <div class="container">
         <div class="board-select">
             <label for="boardSelect">選擇開發板：</label>

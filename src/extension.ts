@@ -236,8 +236,8 @@ async function resolveToolboxIncludes(context: vscode.ExtensionContext, json: an
 // 修改 getWebviewContent 函數
 async function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview) {
 	const htmlPath = vscode.Uri.file(context.asAbsolutePath('media/html/blocklyEdit.html'));
-	const cssPath = vscode.Uri.file(context.asAbsolutePath('media/css/file.css'));
-	const jsPath = vscode.Uri.file(context.asAbsolutePath('media/js/file.js'));
+	const cssPath = vscode.Uri.file(context.asAbsolutePath('media/css/blocklyEdit.css'));
+	const jsPath = vscode.Uri.file(context.asAbsolutePath('media/js/blocklyEdit.js'));
 	const toolboxPath = vscode.Uri.file(context.asAbsolutePath('media/toolbox/index.json'));
 
 	const cssUri = webview.asWebviewUri(cssPath);
