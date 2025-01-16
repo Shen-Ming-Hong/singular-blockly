@@ -112,7 +112,7 @@ Blockly.Blocks['arduino_function'] = {
 			.appendField(':', 'PARAM_LABEL');
 
 		this.appendStatementInput('STACK').setCheck(null);
-		this.setColour(290);
+		this.setColour('#7986CB'); // 修改這裡，使用主題中定義的顏色
 		this.setTooltip('');
 		this.setHelpUrl('');
 
@@ -152,7 +152,7 @@ Blockly.Blocks['arduino_function_mutator'] = {
 	init: function () {
 		this.appendDummyInput().appendField('函式參數');
 		this.appendStatementInput('STACK');
-		this.setColour(290);
+		this.setColour('#7986CB'); // 修改這裡，使用主題中定義的顏色
 		this.setTooltip('');
 		this.setHelpUrl('');
 	},
@@ -175,7 +175,7 @@ Blockly.Blocks['arduino_function_parameter'] = {
 			.appendField(new Blockly.FieldTextInput('x'), 'NAME');
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
-		this.setColour(290);
+		this.setColour('#7986CB'); // 修改這裡，使用主題中定義的顏色
 		this.setTooltip('');
 		this.setHelpUrl('');
 	},
