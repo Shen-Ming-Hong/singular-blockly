@@ -236,6 +236,9 @@ Blockly.Blocks['arduino_function'] = {
 
 	getReturnType_: function (block) {
 		switch (block.type) {
+			case 'math_arithmetic':
+			case 'math_single':
+				return 'float'; // 數學運算應預設為float
 			case 'math_number':
 				// 將 getFieldValue 回傳的數值轉換為字串
 				const numStr = block.getFieldValue('NUM').toString();
