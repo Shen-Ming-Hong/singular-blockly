@@ -245,7 +245,6 @@ Blockly.Blocks['arduino_function'] = {
 			case 'text':
 				return 'String';
 			case 'variables_get':
-				// 取得變數名稱與變數物件
 				const varName = block.getField('VAR').getText();
 				const workspace = block.workspace;
 				const variable = workspace.getVariableById(block.getField('VAR').getValue());
