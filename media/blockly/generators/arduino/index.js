@@ -191,3 +191,22 @@ window.arduinoGenerator.forBlock['variables_set'] = function (block) {
 
 	return `${varName} = ${value};\n`;
 };
+
+window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
+	const funcName = block.getFieldValue('NAME');
+	const statements = window.arduinoGenerator.statementToCode(block, 'STACK');
+
+	// 生成參數列表
+	const args = [];
+	for (let i = 0; i < block.arguments_.length; i++) {
+		args.push(block.argumentTypes_[i] + ' ' + block.arguments_[i]);
+	}
+
+	// 生成函式定義
+	const code = `void ${funcName}(${args.join(', ')}) {\n${statements}}\n\n`;
+
+	// 將函式定義加入到函式區塊
+	window.arduinoGenerator.functions_[funcName] = code;
+
+	return null;
+};

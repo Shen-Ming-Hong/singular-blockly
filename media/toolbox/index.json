@@ -35,9 +35,14 @@
 		},
 		{
 			"kind": "category",
-			"name": "Functions",
+			"name": "函式",
 			"categorystyle": "procedure_category",
-			"custom": "PROCEDURE"
+			"contents": [
+				{
+					"kind": "block",
+					"type": "arduino_function"
+				}
+			]
 		}
 	]
 }
