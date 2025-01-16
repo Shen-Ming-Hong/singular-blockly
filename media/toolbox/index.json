@@ -29,7 +29,7 @@
 		},
 		{
 			"kind": "category",
-			"name": "Variables",
+			"name": "變數",
 			"categorystyle": "variable_category",
 			"custom": "VARIABLE"
 		},
