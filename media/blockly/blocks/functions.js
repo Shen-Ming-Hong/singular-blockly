@@ -203,6 +203,11 @@ Blockly.Blocks['arduino_function'] = {
 			}
 		}
 
+		if (returnInput && returnInput.connection.targetBlock()) {
+			const connectedBlock = returnInput.connection.targetBlock();
+			returnType = this.getReturnType_(connectedBlock);
+		}
+
 		// 添加函式名稱前的回傳類型
 		mainInput.insertFieldAt(0, new Blockly.FieldLabel(returnType + ' '), 'RETURN_TYPE');
 
@@ -229,19 +234,49 @@ Blockly.Blocks['arduino_function'] = {
 		}
 	},
 
-	// 新增：根據連接的積木判斷回傳類型
 	getReturnType_: function (block) {
-		// 根據積木類型判斷回傳值類型
 		switch (block.type) {
 			case 'math_number':
-				return block.getFieldValue('NUM').includes('.') ? 'float' : 'int';
+				// 將 getFieldValue 回傳的數值轉換為字串
+				const numStr = block.getFieldValue('NUM').toString();
+				return numStr.includes('.') ? 'float' : 'int';
 			case 'logic_boolean':
 				return 'boolean';
 			case 'text':
 				return 'String';
 			case 'variables_get':
-				// 可以從變數類型推斷，如果需要的話
-				return 'int'; // 預設 int
+				// 取得變數名稱與變數物件
+				const varName = block.getField('VAR').getText();
+				const workspace = block.workspace;
+				const variable = workspace.getVariableById(block.getField('VAR').getValue());
+
+				// 檢查變數型別
+				if (variable) {
+					const setterBlocks = workspace.getBlocksByType('variables_set').filter(b => b.getField('VAR').getText() === varName);
+
+					if (setterBlocks.length > 0) {
+						const lastSetter = setterBlocks[setterBlocks.length - 1];
+						const valueBlock = lastSetter.getInputTargetBlock('VALUE');
+
+						if (valueBlock) {
+							switch (valueBlock.type) {
+								case 'text':
+								case 'text_join':
+									return 'String';
+								case 'math_number':
+									// 這裡也要確保轉換為字串
+									const value = valueBlock.getFieldValue('NUM').toString();
+									return value.includes('.') ? 'float' : 'int';
+								case 'logic_boolean':
+									return 'boolean';
+								default:
+									return variable.type === 'String' ? 'String' : 'int';
+							}
+						}
+					}
+					return variable.type === 'String' ? 'String' : 'int';
+				}
+				return 'int';
 			default:
 				return 'int';
 		}

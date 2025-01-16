@@ -144,8 +144,8 @@ window.arduinoGenerator.forBlock['variables_set'] = function (block) {
 				varType = 'String';
 				break;
 			case 'math_number':
-				// 檢查數字是否包含小數點
-				const num = valueBlock.getFieldValue('NUM');
+				// 將數值轉換為字串後再檢查是否包含小數點
+				const num = valueBlock.getFieldValue('NUM').toString();
 				if (num.includes('.')) {
 					varType = 'float';
 				} else {
