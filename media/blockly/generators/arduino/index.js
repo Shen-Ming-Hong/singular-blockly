@@ -196,53 +196,97 @@ window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 	const funcName = block.getFieldValue('NAME');
 	const statements = window.arduinoGenerator.statementToCode(block, 'STACK');
 
-	// 取得回傳類型和回傳值
-	let returnType = 'void';
-	let returnValue = '';
-	if (block.workspace.mutator) {
-		const mutatorWorkspace = block.workspace.mutator.getWorkspace();
-		if (mutatorWorkspace) {
-			const containerBlock = mutatorWorkspace.getTopBlocks()[0];
-			if (containerBlock) {
-				const returnBlock = containerBlock.getInputTargetBlock('RETURN');
-				if (returnBlock) {
-					returnType = returnBlock.getFieldValue('TYPE');
-					// 如果有回傳值輸入點，獲取回傳值
-					if (returnType !== 'void') {
-						returnValue =
-							window.arduinoGenerator.valueToCode(block, 'RETURN_VALUE', window.arduinoGenerator.ORDER_ATOMIC) ||
-							getDefaultValue(returnType);
-					}
-				}
-			}
-		}
-	}
-
-	// 生成參數列表
+	// 處理函式參數
 	const args = [];
 	for (let i = 0; i < block.arguments_.length; i++) {
 		args.push(block.argumentTypes_[i] + ' ' + block.arguments_[i]);
 	}
 
+	// 決定回傳型態
+	let returnType = 'void';
+	let hasReturnStatement = false;
+
+	// 檢查回傳值輸入
+	const returnValueInput = block.getInput('RETURN_VALUE');
+	if (returnValueInput && returnValueInput.connection.targetBlock()) {
+		const returnBlock = returnValueInput.connection.targetBlock();
+		returnType = block.getReturnType_(returnBlock); // 使用 functions.js 中定義的方法
+	}
+
 	// 生成函式定義
 	let code = `${returnType} ${funcName}(${args.join(', ')}) {\n`;
-	code += statements;
-	if (returnType !== 'void') {
-		code += `  return ${returnValue};\n`;
+
+	// 添加函式內容
+	if (statements) {
+		// 檢查是否已經有 return 語句
+		hasReturnStatement = statements.includes('return');
+		code += statements;
 	}
+
+	// 處理回傳值
+	if (returnType !== 'void' && !hasReturnStatement) {
+		const returnValue = window.arduinoGenerator.valueToCode(block, 'RETURN_VALUE', window.arduinoGenerator.ORDER_ATOMIC);
+
+		// 根據回傳型態提供預設值
+		let defaultValue;
+		switch (returnType) {
+			case 'String':
+				defaultValue = '""';
+				break;
+			case 'boolean':
+				defaultValue = 'false';
+				break;
+			case 'float':
+				defaultValue = '0.0';
+				break;
+			default:
+				defaultValue = '0';
+		}
+
+		code += `  return ${returnValue || defaultValue};\n`;
+	}
+
 	code += '}\n\n';
 
+	// 將函式定義添加到全域函式集合
 	window.arduinoGenerator.functions_[funcName] = code;
 	return null;
 };
 
-// 新增輔助函數
+// 輔助函數：根據積木類型決定回傳類型
+function getReturnTypeFromBlock(block) {
+	if (!block) {
+		return 'void';
+	}
+
+	switch (block.type) {
+		case 'math_number':
+			const numValue = block.getFieldValue('NUM').toString();
+			return numValue.includes('.') ? 'float' : 'int';
+		case 'text':
+			return 'String';
+		case 'logic_boolean':
+			return 'boolean';
+		case 'variables_get':
+			// 從變數定義推斷類型
+			const varType = block.workspace.getVariableById(block.getField('VAR').getValue())?.type;
+			return varType || 'int';
+		case 'math_arithmetic':
+		case 'math_single':
+			return 'float';
+		default:
+			return 'int';
+	}
+}
+
+// 輔助函數：獲取預設回傳值
 function getDefaultValue(type) {
 	const defaultValues = {
 		int: '0',
 		float: '0.0',
-		boolean: 'false',
 		String: '""',
+		boolean: 'false',
+		void: '',
 	};
 	return defaultValues[type] || '0';
 }
