@@ -81,7 +81,12 @@ const functionMutator = {
 		this.returnBlockId_ = returnBlock ? returnBlock.id : null;
 
 		// 即時更新積木外觀
-		this.updateShape_();
+		if (this._updateTimeout) {
+			clearTimeout(this._updateTimeout);
+		}
+		this._updateTimeout = setTimeout(() => {
+			this.updateShape_();
+		}, 0);
 	},
 
 	saveConnections: function (containerBlock) {
