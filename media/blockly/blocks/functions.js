@@ -370,15 +370,21 @@ Blockly.Blocks['arduino_function_return'] = {
 	onchange: function (e) {
 		if (e.type === Blockly.Events.BLOCK_MOVE || e.type === Blockly.Events.BLOCK_CREATE || e.type === Blockly.Events.BLOCK_DELETE) {
 			const workspace = this.workspace;
-			if (!workspace.isMutator) return;
+			if (!workspace.isMutator) {
+				return;
+			}
 
 			const rootBlock = this.getRootBlock();
-			if (!rootBlock || rootBlock.type !== 'arduino_function_mutator') return;
+			if (!rootBlock || rootBlock.type !== 'arduino_function_mutator') {
+				return;
+			}
 
 			// 找到主要函式積木
 			const mainWorkspace = workspace.options.parentWorkspace;
 			const mainBlock = mainWorkspace?.mutator?.block_;
-			if (!mainBlock) return;
+			if (!mainBlock) {
+				return;
+			}
 
 			// 確認是否連接到 Mutator
 			const isConnected = rootBlock.getInputTargetBlock('RETURN') === this;
