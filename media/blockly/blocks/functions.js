@@ -33,6 +33,12 @@ const functionMutator = {
 		const containerBlock = workspace.newBlock('arduino_function_mutator');
 		containerBlock.initSvg();
 
+		// 保存主積木的回傳值連接
+		const returnValueInput = this.getInput('RETURN_VALUE');
+		if (returnValueInput && returnValueInput.connection.targetBlock()) {
+			this.savedReturnValue_ = returnValueInput.connection.targetBlock();
+		}
+
 		// 恢復回傳類型積木
 		if (this.hasReturn_) {
 			const returnBlock = workspace.newBlock('arduino_function_return');
@@ -86,7 +92,16 @@ const functionMutator = {
 		}
 		this._updateTimeout = setTimeout(() => {
 			this.updateShape_();
+			// 在形狀更新後重新連接回傳值
+			if (this.savedReturnValue_ && this.getInput('RETURN_VALUE')) {
+				this.getInput('RETURN_VALUE').connection.connect(this.savedReturnValue_.outputConnection);
+			}
 		}, 0);
+
+		// 保存回傳積木的連接狀態
+		if (returnBlock) {
+			this.returnConnection_ = returnBlock.outputConnection.targetConnection;
+		}
 	},
 
 	saveConnections: function (containerBlock) {
@@ -95,6 +110,12 @@ const functionMutator = {
 		while (paramBlock) {
 			paramBlock = paramBlock.nextConnection && paramBlock.nextConnection.targetBlock();
 			i++;
+		}
+
+		// 恢復回傳積木的連接狀態
+		const returnBlock = containerBlock.getInputTargetBlock('RETURN');
+		if (returnBlock && this.returnConnection_) {
+			returnBlock.outputConnection.connect(this.returnConnection_);
 		}
 	},
 
@@ -236,6 +257,15 @@ Blockly.Blocks['arduino_function'] = {
 		if (returnType !== 'void') {
 			const validTypes = ['Number', 'String', 'Boolean', null]; // 添加 null 表示接受任意類型
 			this.appendValueInput('RETURN_VALUE').setAlign(Blockly.ALIGN_RIGHT).setCheck(validTypes).appendField('回傳');
+		}
+
+		// 如果有保存的回傳值，嘗試重新連接
+		if (this.savedReturnValue_ && this.getInput('RETURN_VALUE')) {
+			try {
+				this.getInput('RETURN_VALUE').connection.connect(this.savedReturnValue_.outputConnection);
+			} catch (e) {
+				console.warn('無法重新連接回傳值:', e);
+			}
 		}
 	},
 
