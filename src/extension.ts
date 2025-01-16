@@ -297,6 +297,10 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	const arduinoBlocksPath = vscode.Uri.file(context.asAbsolutePath('media/blockly/blocks/arduino.js'));
 	const arduinoBlocksUri = webview.asWebviewUri(arduinoBlocksPath);
 
+	// 添加函式積木路徑
+	const functionBlocksPath = vscode.Uri.file(context.asAbsolutePath('media/blockly/blocks/functions.js'));
+	const functionBlocksUri = webview.asWebviewUri(functionBlocksPath);
+
 	// Arduino 生成器模組路徑
 	const arduinoModules = [
 		'io.js',
@@ -330,6 +334,9 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 
 	// 替換 Arduino 生成器模組路徑
 	htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
+
+	// 替換函式積木路徑
+	htmlContent = htmlContent.replace('{functionBlocksUri}', functionBlocksUri.toString());
 
 	// 讀取並處理 toolbox 配置
 	const toolboxJsonPath = context.asAbsolutePath('media/toolbox/index.json');
