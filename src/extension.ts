@@ -221,7 +221,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// 建立狀態列按鈕
 		const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
 		blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
-		blocklyStatusBarItem.text = '$(symbol-variable)';
+		blocklyStatusBarItem.text = '$(wand)';
 		blocklyStatusBarItem.tooltip = '開啟 Blockly 編輯器';
 		blocklyStatusBarItem.show();
 
