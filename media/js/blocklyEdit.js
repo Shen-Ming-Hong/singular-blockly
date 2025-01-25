@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 		theme: window.SingularBlocklyTheme, // 使用全局主題
 	});
 
+	// 創建預設變數 i
+	if (!workspace.getVariable('i')) {
+		workspace.createVariable('i');
+	}
+
 	// 覆寫變數類別的flyout生成函數，隱藏內建的新增變數按鈕
 	workspace.registerToolboxCategoryCallback('VARIABLE', function (workspace) {
 		return workspace
