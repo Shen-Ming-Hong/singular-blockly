@@ -300,14 +300,7 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	const functionBlocksUri = webview.asWebviewUri(functionBlocksPath);
 
 	// Arduino 生成器模組路徑
-	const arduinoModules = [
-		'io.js',
-		'logic.js',
-		'loops.js',
-		'math.js',
-		'text.js',
-		'lists.js', // 新增這行
-	]
+	const arduinoModules = ['io.js', 'logic.js', 'loops.js', 'math.js', 'text.js', 'lists.js', 'functions.js', 'variables.js']
 		.map(file => {
 			const modulePath = vscode.Uri.file(context.asAbsolutePath(`media/blockly/generators/arduino/${file}`));
 			const moduleUri = webview.asWebviewUri(modulePath);
