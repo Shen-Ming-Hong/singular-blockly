@@ -10,17 +10,11 @@ Blockly.Blocks['arduino_setup_loop'] = {
 
 Blockly.Blocks['arduino_digital_write'] = {
 	init: function () {
-		this.appendDummyInput()
-			.appendField('數位寫入 腳位')
-			.appendField(new Blockly.FieldNumber(13, 0, 127), 'PIN')
-			.appendField('數值')
-			.appendField(
-				new Blockly.FieldDropdown([
-					['HIGH', 'HIGH'],
-					['LOW', 'LOW'],
-				]),
-				'VALUE'
-			);
+		this.appendDummyInput().appendField('數位寫入').appendField('腳位');
+		this.appendValueInput('PIN').setCheck('Number');
+		this.appendDummyInput().appendField('數值');
+		this.appendValueInput('VALUE').setCheck('Boolean');
+		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(230);
@@ -31,7 +25,9 @@ Blockly.Blocks['arduino_digital_write'] = {
 
 Blockly.Blocks['arduino_digital_read'] = {
 	init: function () {
-		this.appendDummyInput().appendField('數位讀取 腳位').appendField(new Blockly.FieldNumber(2, 0, 127), 'PIN');
+		this.appendDummyInput().appendField('數位讀取').appendField('腳位');
+		this.appendValueInput('PIN').setCheck('Number');
+		this.setInputsInline(true);
 		this.setOutput(true, 'Boolean');
 		this.setColour(230);
 		this.setTooltip('從指定的腳位讀取數位輸入值');
@@ -41,11 +37,11 @@ Blockly.Blocks['arduino_digital_read'] = {
 
 Blockly.Blocks['arduino_analog_write'] = {
 	init: function () {
-		this.appendDummyInput()
-			.appendField('類比寫入 腳位')
-			.appendField(new Blockly.FieldNumber(3, 0, 127), 'PIN')
-			.appendField('數值')
-			.appendField(new Blockly.FieldNumber(0, 0, 255), 'VALUE');
+		this.appendDummyInput().appendField('類比寫入').appendField('腳位');
+		this.appendValueInput('PIN').setCheck('Number');
+		this.appendDummyInput().appendField('數值');
+		this.appendValueInput('VALUE').setCheck('Number');
+		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(230);
@@ -56,7 +52,9 @@ Blockly.Blocks['arduino_analog_write'] = {
 
 Blockly.Blocks['arduino_analog_read'] = {
 	init: function () {
-		this.appendDummyInput().appendField('類比讀取 腳位').appendField(new Blockly.FieldNumber(0, 0, 127), 'PIN');
+		this.appendDummyInput().appendField('類比讀取').appendField('腳位');
+		this.appendValueInput('PIN').setCheck('Number');
+		this.setInputsInline(true);
 		this.setOutput(true, 'Number');
 		this.setColour(230);
 		this.setTooltip('從指定的腳位讀取類比值(0-1023)');
