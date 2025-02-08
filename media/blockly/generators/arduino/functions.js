@@ -1,5 +1,23 @@
 window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 	const funcName = block.getFieldValue('NAME');
+
+	// Add event listener for name changes if not already added
+	if (!block.nameChangeHandler_) {
+		block.nameChangeHandler_ = function (event) {
+			if (event.type === Blockly.Events.CHANGE && event.element === 'field' && event.name === 'NAME') {
+				// Find all function_call blocks in the workspace that reference this function
+				const workspace = block.workspace;
+				const callBlocks = workspace.getAllBlocks().filter(b => b.type === 'function_call' && b.functionBlock_ === block);
+
+				// Update each function_call block's name
+				callBlocks.forEach(callBlock => {
+					callBlock.setFieldValue(event.newValue, 'NAME');
+				});
+			}
+		};
+		block.workspace.addChangeListener(block.nameChangeHandler_);
+	}
+
 	const statements = window.arduinoGenerator.statementToCode(block, 'STACK');
 
 	// 處理函式參數
@@ -60,21 +78,20 @@ window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['function_call'] = function (block) {
-	// 取得函式名稱和函式定義積木
 	const functionName = block.getFieldValue('NAME');
 	const functionBlock = block.functionBlock_;
 
-	// 收集所有參數值並確保類型正確
 	const args = [];
 	if (functionBlock && functionBlock.arguments_) {
 		for (let i = 0; i < functionBlock.arguments_.length; i++) {
 			const input = block.getInput('ARG' + i);
-			if (!input) continue;
+			if (!input) {
+				continue;
+			}
 
 			let paramValue = window.arduinoGenerator.valueToCode(block, 'ARG' + i, window.arduinoGenerator.ORDER_NONE);
 			const paramType = functionBlock.argumentTypes_[i];
 
-			// 依據參數類型提供適當的預設值
 			if (!paramValue) {
 				switch (paramType) {
 					case 'String':
@@ -94,15 +111,11 @@ window.arduinoGenerator.forBlock['function_call'] = function (block) {
 		}
 	}
 
-	// 生成函式呼叫程式碼
 	const code = `${functionName}(${args.join(', ')})`;
 
-	// 根據函式是否有回傳值決定回傳方式
 	if (functionBlock && functionBlock.hasReturn_) {
-		// 有回傳值時作為表達式回傳
 		return [code, window.arduinoGenerator.ORDER_UNARY_POSTFIX];
 	} else {
-		// 無回傳值時作為語句回傳，加上分號和換行
 		return code + ';\n';
 	}
 };
