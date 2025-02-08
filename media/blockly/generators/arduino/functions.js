@@ -58,3 +58,51 @@ window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 	window.arduinoGenerator.functions_[funcName] = code;
 	return null;
 };
+
+window.arduinoGenerator.forBlock['function_call'] = function (block) {
+	// 取得函式名稱和函式定義積木
+	const functionName = block.getFieldValue('NAME');
+	const functionBlock = block.functionBlock_;
+
+	// 收集所有參數值並確保類型正確
+	const args = [];
+	if (functionBlock && functionBlock.arguments_) {
+		for (let i = 0; i < functionBlock.arguments_.length; i++) {
+			const input = block.getInput('ARG' + i);
+			if (!input) continue;
+
+			let paramValue = window.arduinoGenerator.valueToCode(block, 'ARG' + i, window.arduinoGenerator.ORDER_NONE);
+			const paramType = functionBlock.argumentTypes_[i];
+
+			// 依據參數類型提供適當的預設值
+			if (!paramValue) {
+				switch (paramType) {
+					case 'String':
+						paramValue = '""';
+						break;
+					case 'boolean':
+						paramValue = 'false';
+						break;
+					case 'float':
+						paramValue = '0.0';
+						break;
+					default:
+						paramValue = '0';
+				}
+			}
+			args.push(paramValue);
+		}
+	}
+
+	// 生成函式呼叫程式碼
+	const code = `${functionName}(${args.join(', ')})`;
+
+	// 根據函式是否有回傳值決定回傳方式
+	if (functionBlock && functionBlock.hasReturn_) {
+		// 有回傳值時作為表達式回傳
+		return [code, window.arduinoGenerator.ORDER_UNARY_POSTFIX];
+	} else {
+		// 無回傳值時作為語句回傳，加上分號和換行
+		return code + ';\n';
+	}
+};

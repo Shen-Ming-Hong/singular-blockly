@@ -171,7 +171,7 @@ Blockly.Blocks['arduino_function'] = {
 	init: function () {
 		this.appendDummyInput('MAIN')
 			.appendField('函式')
-			.appendField(new Blockly.FieldTextInput('myFunction'), 'NAME')
+			.appendField(new Blockly.FieldTextInput('myFunction', this.validateFunctionName_), 'NAME')
 			.appendField(':', 'PARAM_LABEL');
 
 		this.appendStatementInput('STACK').setCheck(null);
@@ -189,6 +189,27 @@ Blockly.Blocks['arduino_function'] = {
 		this.jsonInit({
 			mutator: 'function_mutator',
 		});
+
+		// 追蹤函式名稱變更
+		this.oldName_ = 'myFunction';
+	},
+
+	validateFunctionName_: function (newName) {
+		// 儲存舊名稱以供更新使用
+		const oldName = this.oldName_;
+		this.oldName_ = newName;
+
+		if (this.workspace) {
+			// 找到並更新所有相關的函式調用積木
+			this.workspace
+				.getAllBlocks(false)
+				.filter(block => block.type === 'function_call' && block.getFieldValue('NAME') === oldName)
+				.forEach(callBlock => {
+					callBlock.setFieldValue(newName, 'NAME');
+					callBlock.render();
+				});
+		}
+		return newName;
 	},
 
 	updateShape_: function () {
@@ -267,6 +288,15 @@ Blockly.Blocks['arduino_function'] = {
 				console.warn('無法重新連接回傳值:', e);
 			}
 		}
+
+		// 更新完形狀後，通知所有相關的函式調用積木
+		if (this.workspace) {
+			const funcName = this.getFieldValue('NAME');
+			this.workspace
+				.getAllBlocks(false)
+				.filter(block => block.type === 'function_call' && block.getFieldValue('NAME') === funcName)
+				.forEach(callBlock => callBlock.updateShape_(this));
+		}
 	},
 
 	getReturnType_: function (block) {
@@ -335,8 +365,8 @@ Blockly.Blocks['arduino_function'] = {
 			if (returnInput) {
 				const connectedBlock = returnInput.connection.targetBlock();
 				if (connectedBlock) {
-					const type = this.getReturnType_(connectedBlock);
-					this.updateReturnType_(type);
+					const returnType = this.getReturnType_(connectedBlock);
+					this.updateReturnType_(returnType);
 				}
 			}
 		}
@@ -378,19 +408,77 @@ Blockly.Blocks['arduino_function_parameter'] = {
 	},
 
 	onchange: function (e) {
-		if (e.type === Blockly.Events.CREATE && e.blockId === this.id) {
-			setTimeout(() => {
-				const blocks = this.workspace.getBlocksByType('arduino_function_parameter');
-				const index = blocks.indexOf(this);
-				if (index !== -1) {
-					const letters = 'xyzabcdefghijklmnopqrstuvw';
-					const newName = index < letters.length ? letters[index] : `arg${index}`;
-					if (this.getFieldValue('NAME') === 'x') {
-						this.getField('NAME').setValue(newName);
-					}
+		if (
+			e.type === Blockly.Events.CHANGE ||
+			e.type === Blockly.Events.MOVE ||
+			e.type === Blockly.Events.CREATE ||
+			e.type === Blockly.Events.DELETE
+		) {
+			// 處理自動命名
+			if (e.type === Blockly.Events.CREATE && e.blockId === this.id) {
+				this.handleAutoNaming_();
+			}
+
+			// 取得主積木和主工作區
+			const rootBlock = this.getRootBlock();
+			if (rootBlock?.type === 'arduino_function_mutator') {
+				const mainBlock = this.workspace.options.parentWorkspace?.mutator?.block_;
+				const mainWorkspace = mainBlock?.workspace;
+
+				if (mainBlock && mainWorkspace) {
+					// 更新主積木外觀
+					mainBlock.updateShape_();
+
+					// 找到所有相關的 function_call 積木
+					const funcName = mainBlock.getFieldValue('NAME');
+					const functionCalls = mainWorkspace
+						.getAllBlocks(false)
+						.filter(block => block.type === 'function_call' && block.getFieldValue('NAME') === funcName);
+
+					// 更新每個 function_call 積木的外觀
+					functionCalls.forEach(callBlock => {
+						// 保存連接的積木
+						const savedConnections = [];
+						for (let i = 0; callBlock.getInput('ARG' + i); i++) {
+							const input = callBlock.getInput('ARG' + i);
+							if (input.connection.targetBlock()) {
+								savedConnections.push({
+									index: i,
+									block: input.connection.targetBlock(),
+								});
+							}
+						}
+
+						// 更新形狀
+						callBlock.updateShape_(mainBlock);
+
+						// 重新連接積木
+						savedConnections.forEach(({ index, block }) => {
+							const input = callBlock.getInput('ARG' + index);
+							if (input) {
+								input.connection.connect(block.outputConnection);
+							}
+						});
+
+						// 強制重新渲染
+						callBlock.render();
+					});
 				}
-			}, 0);
+			}
 		}
+	},
+
+	// 抽出自動命名邏輯為獨立函數
+	handleAutoNaming_: function () {
+		setTimeout(() => {
+			const blocks = this.workspace.getBlocksByType('arduino_function_parameter');
+			const index = blocks.indexOf(this);
+			if (index !== -1 && this.getFieldValue('NAME') === 'x') {
+				const letters = 'xyzabcdefghijklmnopqrstuvw';
+				const newName = index < letters.length ? letters[index] : `arg${index}`;
+				this.getField('NAME').setValue(newName);
+			}
+		}, 0);
 	},
 };
 
@@ -416,35 +504,222 @@ Blockly.Blocks['arduino_function_return'] = {
 				return;
 			}
 
-			// 找到主要函式積木
-			const mainWorkspace = workspace.options.parentWorkspace;
-			const mainBlock = mainWorkspace?.mutator?.block_;
-			if (!mainBlock) {
+			// 找到主要函式積木和主工作區
+			const mainBlock = workspace.options.parentWorkspace?.mutator?.block_;
+			const mainWorkspace = mainBlock?.workspace;
+			if (!mainBlock || !mainWorkspace) {
 				return;
 			}
 
-			// 確認是否連接到 Mutator
+			// 檢查連接狀態
 			const isConnected = rootBlock.getInputTargetBlock('RETURN') === this;
 
-			// 更新主積木狀態
 			if (mainBlock.hasReturn_ !== isConnected) {
 				mainBlock.hasReturn_ = isConnected;
-				setTimeout(() => mainBlock.updateShape_(), 0);
+
+				// 更新主積木外觀
+				mainBlock.updateShape_();
+
+				// 尋找並更新所有相關的 function_call 積木
+				const funcName = mainBlock.getFieldValue('NAME');
+				mainWorkspace
+					.getAllBlocks(false)
+					.filter(block => block.type === 'function_call' && block.getFieldValue('NAME') === funcName)
+					.forEach(callBlock => {
+						callBlock.updateShape_(mainBlock);
+						callBlock.render(); // 強制重新渲染
+					});
 			}
 		}
 	},
 };
 
-// 修改函式積木的 onchange 事件處理
-Blockly.Blocks['arduino_function'].onchange = function (e) {
-	if (e.type === Blockly.Events.BLOCK_CHANGE || e.type === Blockly.Events.BLOCK_MOVE) {
-		const returnInput = this.getInput('RETURN_VALUE');
-		if (returnInput) {
-			const connectedBlock = returnInput.connection.targetBlock();
-			if (connectedBlock) {
-				const returnType = this.getReturnType_(connectedBlock);
-				this.updateReturnType_(returnType);
+Blockly.Blocks['function_call'] = {
+	init: function () {
+		this.appendDummyInput().appendField('呼叫').appendField(new Blockly.FieldLabel(''), 'NAME');
+		// 初始設定為輸出模式，之後會根據函式類型動態調整
+		this.setOutput(true, null);
+		this.setColour('#7986CB');
+		this.setTooltip('呼叫函式');
+		this.setHelpUrl('');
+
+		// 添加對應的定義積木引用
+		this.functionBlock_ = null;
+	},
+
+	mutationToDom: function () {
+		const container = document.createElement('mutation');
+		const funcName = this.getFieldValue('NAME');
+		container.setAttribute('name', funcName);
+
+		// 保存參數資訊
+		if (this.functionBlock_) {
+			container.setAttribute('arguments', JSON.stringify(this.functionBlock_.arguments_ || []));
+			container.setAttribute('types', JSON.stringify(this.functionBlock_.argumentTypes_ || []));
+			container.setAttribute('has_return', this.functionBlock_.hasReturn_ ? 'true' : 'false');
+		}
+
+		return container;
+	},
+
+	domToMutation: function (xmlElement) {
+		const funcName = xmlElement.getAttribute('name');
+		this.setFieldValue(funcName, 'NAME');
+
+		// 嘗試找到對應的函式定義積木
+		const workspace = this.workspace;
+		const functionBlocks = workspace
+			.getAllBlocks(false)
+			.filter(block => block.type === 'arduino_function' && block.getFieldValue('NAME') === funcName);
+
+		if (functionBlocks.length > 0) {
+			this.functionBlock_ = functionBlocks[0];
+			this.updateShape_(this.functionBlock_);
+		} else {
+			// 如果找不到函式定義積木，使用保存的參數資訊
+			try {
+				const args = JSON.parse(xmlElement.getAttribute('arguments') || '[]');
+				const types = JSON.parse(xmlElement.getAttribute('types') || '[]');
+				const hasReturn = xmlElement.getAttribute('has_return') === 'true';
+
+				// 創建臨時的參數資訊
+				this.functionBlock_ = {
+					arguments_: args,
+					argumentTypes_: types,
+					hasReturn_: hasReturn,
+				};
+				this.updateShape_(this.functionBlock_);
+			} catch (e) {
+				console.error('Error parsing function call mutation:', e);
 			}
 		}
-	}
+	},
+
+	updateShape_: function (functionBlock) {
+		this.functionBlock_ = functionBlock;
+
+		// 保存輸出連接
+		let outputConnection = null;
+		if (this.outputConnection && this.outputConnection.targetConnection) {
+			outputConnection = this.outputConnection.targetConnection;
+		}
+
+		// 保存前後連接
+		let previousConnection = null;
+		let nextConnection = null;
+		if (this.previousConnection && this.previousConnection.targetConnection) {
+			previousConnection = this.previousConnection.targetConnection;
+		}
+		if (this.nextConnection && this.nextConnection.targetConnection) {
+			nextConnection = this.nextConnection.targetConnection;
+		}
+
+		// 保存現有參數連接
+		const savedConnections = [];
+		this.inputList.slice(1).forEach((input, i) => {
+			if (input.connection && input.connection.targetBlock()) {
+				savedConnections.push({
+					index: i,
+					block: input.connection.targetBlock(),
+				});
+			}
+		});
+
+		// 清除所有輸入除了第一個
+		this.inputList.slice(1).forEach(input => this.removeInput(input.name));
+
+		// 根據函式是否有回傳值設定連接方式
+		if (!functionBlock || !functionBlock.hasReturn_) {
+			// 無回傳值時使用前後連接
+			this.setOutput(false);
+			this.setPreviousStatement(true);
+			this.setNextStatement(true);
+
+			// 嘗試恢復前後連接
+			if (this.previousConnection && previousConnection) {
+				this.previousConnection.connect(previousConnection);
+			}
+			if (this.nextConnection && nextConnection) {
+				this.nextConnection.connect(nextConnection);
+			}
+		} else {
+			// 有回傳值時使用輸出連接
+			this.setOutput(true);
+			this.setPreviousStatement(false);
+			this.setNextStatement(false);
+
+			// 嘗試恢復輸出連接
+			if (this.outputConnection && outputConnection) {
+				this.outputConnection.connect(outputConnection);
+			}
+		}
+
+		if (!functionBlock) {
+			return;
+		}
+
+		// 取得函式的參數和類型
+		const args = functionBlock.arguments_ || [];
+		const types = functionBlock.argumentTypes_ || [];
+
+		// 加入參數輸入點
+		for (let i = 0; i < args.length; i++) {
+			this.appendValueInput('ARG' + i)
+				.setAlign(Blockly.ALIGN_RIGHT)
+				.setCheck(this.getTypeCheck_(types[i]))
+				.appendField(args[i]);
+		}
+
+		// 重新連接參數
+		savedConnections.forEach(({ index, block }) => {
+			const input = this.getInput('ARG' + index);
+			if (input && input.connection) {
+				input.connection.connect(block.outputConnection);
+			}
+		});
+
+		// 強制重新渲染
+		if (this.rendered) {
+			this.render();
+			// 通知工作區有變化
+			this.workspace.fireChangeListener({
+				type: Blockly.Events.CHANGE,
+				blockId: this.id,
+			});
+		}
+	},
+
+	getTypeCheck_: function (type) {
+		switch (type) {
+			case 'int':
+			case 'float':
+				return 'Number';
+			case 'String':
+				return 'String';
+			case 'boolean':
+				return 'Boolean';
+			default:
+				return null;
+		}
+	},
+
+	onchange: function (e) {
+		if (this.workspace.isDragging && this.workspace.isDragging()) {
+			return; // Don't update during drag
+		}
+
+		if (e.type === Blockly.Events.BLOCK_MOVE || e.type === Blockly.Events.BLOCK_CHANGE) {
+			const funcName = this.getFieldValue('NAME');
+			const workspace = this.workspace;
+
+			// 尋找對應的函式定義積木
+			const functionBlock = workspace
+				.getAllBlocks(false)
+				.find(block => block.type === 'arduino_function' && block.getFieldValue('NAME') === funcName);
+
+			if (functionBlock && this.functionBlock_ !== functionBlock) {
+				this.updateShape_(functionBlock);
+			}
+		}
+	},
 };

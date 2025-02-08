@@ -37,12 +37,7 @@
 			"kind": "category",
 			"name": "函式",
 			"categorystyle": "procedure_category",
-			"contents": [
-				{
-					"kind": "block",
-					"type": "arduino_function"
-				}
-			]
+			"custom": "FUNCTION"
 		}
 	]
 }

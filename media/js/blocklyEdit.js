@@ -48,6 +48,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 			.flat(); // 展平陣列
 	});
 
+	// 註冊函式類別的 flyout callback
+	workspace.registerToolboxCategoryCallback('FUNCTION', function (workspace) {
+		// 首先創建函式定義積木
+		const blocks = [Blockly.utils.xml.textToDom(`<block type="arduino_function"></block>`)];
+
+		// 然後為每個已定義的函式創建調用積木
+		const functions = workspace.getBlocksByType('arduino_function', false);
+		const functionCalls = functions.map(functionBlock => {
+			const funcName = functionBlock.getFieldValue('NAME');
+
+			// 創建函式調用積木
+			const callBlockXml = Blockly.utils.xml.textToDom(
+				`<block type="function_call">
+					<field name="NAME">${funcName}</field>
+				</block>`
+			);
+
+			// 使用 requestRender_ 來確保調用積木正確初始化
+			const callBlockId = Blockly.utils.idGenerator.genUid();
+			callBlockXml.setAttribute('id', callBlockId);
+
+			// 在積木被添加到工作區後更新其形狀
+			workspace.registerToolboxCategoryCallback('__TEMP__', function (ws) {
+				setTimeout(() => {
+					const callBlock = workspace.getBlockById(callBlockId);
+					if (callBlock) {
+						callBlock.updateShape_(functionBlock);
+						callBlock.render();
+					}
+				}, 0);
+				return [];
+			});
+
+			return callBlockXml;
+		});
+
+		// 返回合併後的積木陣列
+		return blocks.concat(functionCalls);
+	});
+
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
 		try {
@@ -75,6 +115,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 			event.type === Blockly.Events.BLOCK_DELETE ||
 			event.type === Blockly.Events.BLOCK_CREATE
 		) {
+			// 檢查是否是函式定義積木變化
+			if (event.blockId) {
+				const block = workspace.getBlockById(event.blockId);
+				if (block) {
+					// 如果是函式定義積木或其參數發生變化
+					if (block.type === 'arduino_function') {
+						const funcName = block.getFieldValue('NAME');
+						// 找到並更新所有相關的函式調用積木
+						workspace
+							.getAllBlocks(false)
+							.filter(b => b.type === 'function_call' && b.getFieldValue('NAME') === funcName)
+							.forEach(callBlock => {
+								// 保存現有連接
+								const savedConnections = [];
+								for (let i = 0; callBlock.getInput('ARG' + i); i++) {
+									const input = callBlock.getInput('ARG' + i);
+									if (input.connection.targetBlock()) {
+										savedConnections.push({
+											index: i,
+											block: input.connection.targetBlock(),
+										});
+									}
+								}
+
+								// 更新形狀
+								callBlock.updateShape_(block);
+
+								// 恢復連接
+								savedConnections.forEach(({ index, block }) => {
+									const input = callBlock.getInput('ARG' + index);
+									if (input) {
+										input.connection.connect(block.outputConnection);
+									}
+								});
+
+								callBlock.render();
+							});
+					}
+				}
+			}
+
 			const code = arduinoGenerator.workspaceToCode(workspace);
 			vscode.postMessage({
 				command: 'updateCode',
