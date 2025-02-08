@@ -1,5 +1,6 @@
 # 編譯輸出目錄
 dist/
+out/
 
 # 依賴套件
 node_modules/
@@ -14,16 +15,30 @@ node_modules/
 
 # 擴充套件相關
 *.vsix
+.vscodeignore
 
 # 作業系統相關
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # 原始碼地圖檔案
 *.js.map
 *.css.map
+*.ts.map
 
 # 暫存檔案
 *.log
 .cache/
 media/toolbox/temp_toolbox.json
+coverage/
+.nyc_output/
+
+# IDE 相關
+.idea/
+*.swp
+*.swo
+
+# 環境設定
+.env
+.env.local
