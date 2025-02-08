@@ -1,71 +1,66 @@
-# singular-blockly README
+# Singular Blockly
 
-This is the README for your extension "singular-blockly". After writing up a brief description, we recommend including the following sections.
+A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+This extension integrates Blockly's visual programming interface with Arduino development, making it easier to create Arduino programs using a block-based programming approach.
 
-For example if there is an image subfolder under your extension project workspace:
+Key features include:
 
-\!\[feature X\]\(images/feature-x.png\)
+- Visual block programming interface for Arduino
+- Built-in blocks for Arduino I/O operations
+- Support for functions, variables, loops, and logic operations
+- Custom Arduino-specific blocks
+- Integrated development environment within VS Code
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![Singular Blockly Interface](images/icon.png)
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Visual Studio Code 1.6.0 or higher
+- Basic understanding of Arduino programming concepts
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+- `singularBlockly.enabled`: Enable/disable the Singular Blockly extension
+- `singularBlockly.arduinoPath`: Path to Arduino IDE installation
+
+## How to Use
+
+1. Install the extension
+2. Open the Blockly editor using the command palette (`Ctrl+Shift+P`) and search for "Open Singular Blockly"
+3. Create your program using the visual blocks
+4. Generate Arduino code from your blocks
+5. Upload to your Arduino board
+
+## Available Block Categories
+
+- Arduino I/O Operations
+- Functions and Procedures
+- Variables
+- Lists
+- Logic Operations
+- Loops
+- Math Operations
+- Text Operations
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Please report any issues on our GitHub repository.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+- Initial release with basic Arduino block programming support
+- Integration with VS Code
+- Basic block categories including Arduino operations, functions, and control structures
 
 ---
 
-## Following extension guidelines
+## Contributing
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Contributions are welcome! Please feel free to submit a Pull Request.
