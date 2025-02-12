@@ -2,11 +2,6 @@
 	"kind": "categoryToolbox",
 	"contents": [
 		{
-			"kind": "toolboxlabel",
-			"name": "Custom Toolbox",
-			"colour": "darkslategrey"
-		},
-		{
 			"$include": "./categories/arduino.json"
 		},
 		{

@@ -26,7 +26,7 @@ Blockly.Blocks['arduino_digital_write'] = {
 		this.appendValueInput('VALUE')
 			.setCheck(['Boolean', 'Number', 'String'])
 			.appendField('數值')
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="logic_boolean"><field name="BOOL">LOW</field></shadow>'));
+			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="text"><field name="TEXT">LOW</field></shadow>'));
 
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
@@ -43,9 +43,7 @@ Blockly.Blocks['arduino_digital_write'] = {
 			if (valueInput && valueInput.connection && !valueInput.connection.targetConnection) {
 				// 如果輸入沒有連接，確保 shadow block 存在
 				if (!valueInput.connection.shadowDom_) {
-					valueInput.setShadowDom(
-						Blockly.utils.xml.textToDom('<shadow type="logic_boolean"><field name="BOOL">LOW</field></shadow>')
-					);
+					valueInput.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="text"><field name="TEXT">LOW</field></shadow>'));
 				}
 			}
 		}

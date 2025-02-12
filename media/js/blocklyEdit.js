@@ -1,6 +1,9 @@
 // 在頁面最上方宣告全域 vscode API 實例
 const vscode = acquireVsCodeApi();
 
+// 註冊工具箱元件
+Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCategory.registrationName, Blockly.ToolboxCategory);
+
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
 
@@ -52,23 +55,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 	workspace.registerToolboxCategoryCallback('FUNCTION', function (workspace) {
 		// 首先創建函式定義積木
 		const blocks = [Blockly.utils.xml.textToDom(`<block type="arduino_function"></block>`)];
-
 		// 然後為每個已定義的函式創建調用積木
 		const functions = workspace.getBlocksByType('arduino_function', false);
 		const functionCalls = functions.map(functionBlock => {
 			const funcName = functionBlock.getFieldValue('NAME');
-
 			// 創建函式調用積木
 			const callBlockXml = Blockly.utils.xml.textToDom(
 				`<block type="function_call">
 					<field name="NAME">${funcName}</field>
 				</block>`
 			);
-
 			// 使用 requestRender_ 來確保調用積木正確初始化
 			const callBlockId = Blockly.utils.idGenerator.genUid();
 			callBlockXml.setAttribute('id', callBlockId);
-
 			// 在積木被添加到工作區後更新其形狀
 			workspace.registerToolboxCategoryCallback('__TEMP__', function (ws) {
 				setTimeout(() => {
@@ -80,10 +79,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}, 0);
 				return [];
 			});
-
 			return callBlockXml;
 		});
-
 		// 返回合併後的積木陣列
 		return blocks.concat(functionCalls);
 	});
@@ -137,10 +134,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 										});
 									}
 								}
-
 								// 更新形狀
 								callBlock.updateShape_(block);
-
 								// 恢復連接
 								savedConnections.forEach(({ index, block }) => {
 									const input = callBlock.getInput('ARG' + index);
@@ -148,20 +143,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 										input.connection.connect(block.outputConnection);
 									}
 								});
-
 								callBlock.render();
 							});
 					}
 				}
 			}
-
 			try {
 				const code = arduinoGenerator.workspaceToCode(workspace);
 				vscode.postMessage({
 					command: 'updateCode',
 					code: code,
 				});
-
 				// 只在實際的變更（非拖動中）時保存工作區狀態
 				if (event.type !== Blockly.Events.BLOCK_MOVE || event.oldParentId !== undefined || event.newParentId !== undefined) {
 					saveWorkspaceState();
@@ -187,7 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	window.addEventListener('message', event => {
 		const message = event.data;
 		const workspace = Blockly.getMainWorkspace();
-
 		switch (message.command) {
 			case 'createVariable':
 				if (message.name) {
@@ -197,7 +188,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 						if (variable) {
 							// 使用 workspace 的 renameVariableById 方法
 							workspace.renameVariableById(variable.getId(), message.name);
-
 							// 觸發工作區變更事件以更新程式碼
 							workspace.fireChangeListener({
 								type: Blockly.Events.VAR_RENAME,
@@ -222,27 +212,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}
 				break;
-
 			case 'deleteVariable':
 				if (message.confirmed) {
 					const variable = workspace.getVariable(message.name);
 					if (variable) {
 						const varId = variable.getId();
-
 						// 先找出所有使用這個變數的積木
 						const blocks = workspace
 							.getBlocksByType('variables_get')
 							.concat(workspace.getBlocksByType('variables_set'))
 							.filter(block => block.getField('VAR').getText() === message.name);
-
 						// 移除所有使用這個變數的積木
 						blocks.forEach(block => {
 							block.dispose(false);
 						});
-
 						// 從工作區中移除變數定義
 						workspace.deleteVariableById(varId);
-
 						// 手動觸發更新
 						const code = arduinoGenerator.workspaceToCode(workspace);
 						vscode.postMessage({
@@ -253,7 +238,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}
 				break;
-
 			// ...保留其他既有的 case...
 			case 'loadWorkspace':
 				try {
@@ -295,7 +279,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const workspace = Blockly.getMainWorkspace();
 		// 修改這行：使用變數的 ID 作為值
 		const variableList = workspace.getAllVariables().map(variable => [variable.name, variable.getId()]);
-
 		// 加入分隔線與選項
 		if (variableList.length > 0) {
 			const currentName = this.getText(); // 獲取當前變數名稱
@@ -304,7 +287,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			variableList.push([Blockly.Msg['DELETE_VARIABLE'].replace('%1', currentName), Blockly.Msg['DELETE_VARIABLE']]);
 			variableList.push(['---', '---']);
 		}
-
 		variableList.push([Blockly.Msg['NEW_VARIABLE'], Blockly.Msg['NEW_VARIABLE']]);
 		return variableList;
 	};
@@ -313,7 +295,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	Blockly.FieldVariable.prototype.onItemSelected_ = function (menu, menuItem) {
 		const workspace = this.sourceBlock_.workspace;
 		const value = menuItem.getValue();
-
 		if (value === Blockly.Msg['NEW_VARIABLE']) {
 			// 請求使用者輸入新變數名稱
 			vscode.postMessage({

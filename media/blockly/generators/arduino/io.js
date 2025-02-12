@@ -3,10 +3,15 @@ window.arduinoGenerator.forBlock['arduino_digital_write'] = function (block) {
 		const pin = block.getFieldValue('PIN');
 		let value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_ATOMIC) || 'LOW';
 
+		// 處理文字值，移除引號
+		if (value.startsWith('"') && value.endsWith('"')) {
+			value = value.slice(1, -1);
+		}
+
 		// 處理不同型態的輸入值
-		if (value === 'true') {
+		if (value === 'true' || value === '1' || value === 'HIGH') {
 			value = 'HIGH';
-		} else if (value === 'false') {
+		} else if (value === 'false' || value === '0' || value === 'LOW') {
 			value = 'LOW';
 		} else if (!isNaN(Number(value))) {
 			value = Number(value) ? 'HIGH' : 'LOW';
