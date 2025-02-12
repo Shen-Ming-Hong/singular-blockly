@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		// 更新程式碼
 		if (
-			event.type === Blockly.Events.BLOCK_MOVE ||
+			event.type === Blockly.Events.BLOCK_MOVE || // 移除條件，讓所有移動都觸發更新
 			event.type === Blockly.Events.BLOCK_CHANGE ||
 			event.type === Blockly.Events.BLOCK_DELETE ||
 			event.type === Blockly.Events.BLOCK_CREATE
@@ -119,7 +119,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			if (event.blockId) {
 				const block = workspace.getBlockById(event.blockId);
 				if (block) {
-					// 如果是函式定義積木或其參數發生變化
 					if (block.type === 'arduino_function') {
 						const funcName = block.getFieldValue('NAME');
 						// 找到並更新所有相關的函式調用積木
@@ -156,15 +155,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 			}
 
-			const code = arduinoGenerator.workspaceToCode(workspace);
-			vscode.postMessage({
-				command: 'updateCode',
-				code: code,
-			});
-		}
+			try {
+				const code = arduinoGenerator.workspaceToCode(workspace);
+				vscode.postMessage({
+					command: 'updateCode',
+					code: code,
+				});
 
-		// 保存工作區狀態
-		saveWorkspaceState();
+				// 只在實際的變更（非拖動中）時保存工作區狀態
+				if (event.type !== Blockly.Events.BLOCK_MOVE || event.oldParentId !== undefined || event.newParentId !== undefined) {
+					saveWorkspaceState();
+				}
+			} catch (err) {
+				console.log('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
+			}
+		}
 	});
 
 	// 處理開發板選擇

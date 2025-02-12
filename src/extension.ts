@@ -269,9 +269,11 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	const htmlPath = vscode.Uri.file(context.asAbsolutePath('media/html/blocklyEdit.html'));
 	const cssPath = vscode.Uri.file(context.asAbsolutePath('media/css/blocklyEdit.css'));
 	const jsPath = vscode.Uri.file(context.asAbsolutePath('media/js/blocklyEdit.js'));
+	const boardConfigsPath = vscode.Uri.file(context.asAbsolutePath('media/blockly/blocks/board_configs.js'));
 
 	const cssUri = webview.asWebviewUri(cssPath);
 	const jsUri = webview.asWebviewUri(jsPath);
+	const boardConfigsUri = webview.asWebviewUri(boardConfigsPath);
 
 	const blocklyCompressedJsUri = webview.asWebviewUri(
 		vscode.Uri.file(context.asAbsolutePath('node_modules/blockly/blockly_compressed.js'))
@@ -316,17 +318,10 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{msgEnJsUri}', msgEnJsUri.toString());
 	htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
-
-	// 替換 Arduino 生成器路徑
 	htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());
-
-	// 替換 Arduino blocks 路徑
 	htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());
-
-	// 替換 Arduino 生成器模組路徑
+	htmlContent = htmlContent.replace('{boardConfigsUri}', boardConfigsUri.toString());
 	htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
-
-	// 替換函式積木路徑
 	htmlContent = htmlContent.replace('{functionBlocksUri}', functionBlocksUri.toString());
 
 	// 讀取並處理 toolbox 配置
@@ -343,7 +338,6 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 
 	// 更新主題路徑
 	const themesUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('media/blockly/themes')));
-
 	htmlContent = htmlContent.replace('{themesUri}', themesUri.toString());
 
 	return htmlContent;
