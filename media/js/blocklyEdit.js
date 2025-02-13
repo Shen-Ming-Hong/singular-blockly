@@ -29,13 +29,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 		workspace.createVariable('i');
 	}
 
-	// 覆寫變數類別的flyout生成函數，隱藏內建的新增變數按鈕
+	// 覆寫變數類別的flyout生成函數
 	workspace.registerToolboxCategoryCallback('VARIABLE', function (workspace) {
-		return workspace
-			.getAllVariables()
-			.map(variable => {
-				// 為每個變數創建 get 和 set 積木
-				return [
+		const variableBlocks = [];
+
+		// 添加"新增變數"按鈕
+		variableBlocks.push(
+			Blockly.utils.xml.textToDom('<button text="' + Blockly.Msg['NEW_VARIABLE'] + '" callbackKey="CREATE_VARIABLE"></button>')
+		);
+
+		// 為每個現有變數創建積木
+		const variables = workspace.getAllVariables();
+		if (variables.length > 0) {
+			variables.forEach(variable => {
+				variableBlocks.push(
 					Blockly.utils.xml.textToDom(
 						`<block type="variables_get">
 							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
@@ -45,10 +52,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 						`<block type="variables_set">
 							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
 						</block>`
-					),
-				];
-			})
-			.flat(); // 展平陣列
+					)
+				);
+			});
+		}
+
+		return variableBlocks;
+	});
+
+	// 註冊變數創建按鈕的回調
+	workspace.registerButtonCallback('CREATE_VARIABLE', function () {
+		vscode.postMessage({
+			command: 'promptNewVariable',
+			currentName: '',
+			isRename: false,
+		});
 	});
 
 	// 註冊函式類別的 flyout callback
