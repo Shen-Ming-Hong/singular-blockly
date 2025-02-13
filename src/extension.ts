@@ -7,7 +7,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	try {
 		console.log('正在註冊指令...');
-		console.log('Congratulations, your extension "singular-blockly" is now active!');
 
 		const disposable = vscode.commands.registerCommand('singular-blockly.helloWorld', () => {
 			vscode.window.showInformationMessage('Hello World from Singular Blockly!');
@@ -264,6 +263,81 @@ async function resolveToolboxIncludes(context: vscode.ExtensionContext, json: an
 	return result;
 }
 
+async function getAvailableBlocklyLanguages(context: vscode.ExtensionContext): Promise<string[]> {
+	const msgPath = path.join(context.extensionPath, 'node_modules', 'blockly', 'msg');
+
+	try {
+		// 讀取 msg 目錄下的所有檔案
+		const files = await fs.promises.readdir(msgPath);
+
+		// 過濾出 .js 檔案並移除副檔名
+		const languages = files.filter(file => file.endsWith('.js')).map(file => path.basename(file, '.js'));
+
+		return languages;
+	} catch (error) {
+		console.error('無法讀取 Blockly 語言檔案:', error);
+		return ['en']; // 如果發生錯誤，至少返回英文
+	}
+}
+
+function mapVSCodeLangToBlockly(vscodeLanguage: string): string {
+	// 語言對應表
+	const languageMap: { [key: string]: string } = {
+		'zh-tw': 'zh-hant',
+		en: 'en',
+		'en-us': 'en',
+		// 可以根據需要添加更多對應
+	};
+
+	// 將 VSCode 語言代碼轉換為小寫以進行比對
+	const normalizedLang = vscodeLanguage.toLowerCase();
+
+	// 檢查是否有直接對應
+	if (languageMap[normalizedLang]) {
+		return languageMap[normalizedLang];
+	}
+
+	// 如果沒有完全匹配，嘗試找到基礎語言的對應
+	const baseLang = normalizedLang.split('-')[0];
+	if (languageMap[baseLang]) {
+		return languageMap[baseLang];
+	}
+
+	// 如果都找不到對應，返回預設語言 'en'
+	return 'en';
+}
+
+async function getSupportedLocales(context: vscode.ExtensionContext): Promise<string[]> {
+	const localesPath = path.join(context.extensionPath, 'media/locales');
+	try {
+		const files = await fs.promises.readdir(localesPath);
+		return files.filter(file => fs.statSync(path.join(localesPath, file)).isDirectory());
+	} catch (error) {
+		console.error('無法讀取語言檔案目錄:', error);
+		return ['en']; // 如果發生錯誤，至少返回英文
+	}
+}
+
+async function loadLocaleFiles(context: vscode.ExtensionContext, webview: vscode.Webview): Promise<string> {
+	// 取得支援的語言清單
+	const supportedLocales = await getSupportedLocales(context);
+	console.log('支援的語言:', supportedLocales);
+
+	// 載入語言檔案
+	const localeFiles = supportedLocales.map(locale => {
+		const localePath = vscode.Uri.file(context.asAbsolutePath(`media/locales/${locale}/messages.js`));
+		return {
+			locale,
+			uri: webview.asWebviewUri(localePath).toString(),
+		};
+	});
+
+	// 生成 script 標籤
+	const localeScripts = localeFiles.map(file => `<script src="${file.uri}"></script>`).join('\n    ');
+
+	return localeScripts;
+}
+
 // 修改 getWebviewContent 函數
 async function getWebviewContent(context: vscode.ExtensionContext, webview: vscode.Webview) {
 	const htmlPath = vscode.Uri.file(context.asAbsolutePath('media/html/blocklyEdit.html'));
@@ -284,7 +358,6 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	const javascriptCompressedJsUri = webview.asWebviewUri(
 		vscode.Uri.file(context.asAbsolutePath('node_modules/blockly/javascript_compressed.js'))
 	);
-	const msgEnJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('node_modules/blockly/msg/en.js')));
 	const themeModernJsUri = webview.asWebviewUri(
 		vscode.Uri.file(context.asAbsolutePath('node_modules/@blockly/theme-modern/dist/index.js'))
 	);
@@ -311,12 +384,33 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 		.join('\n    ');
 
 	let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
+
+	const vscodeLanguage = vscode.env.language;
+	const blocklyLanguage = mapVSCodeLangToBlockly(vscodeLanguage);
+	console.log(`VSCode 語言: ${vscodeLanguage} -> Blockly 語言: ${blocklyLanguage}`);
+
+	// 載入對應的 Blockly 語言檔案
+	const msgJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath(`node_modules/blockly/msg/${blocklyLanguage}.js`))); // 獲取可用的 Blockly 語言
+	const availableLanguages = await getAvailableBlocklyLanguages(context);
+	console.log('可用的 Blockly 語言:', availableLanguages);
+	// 載入語言檔案，目前是全部載入，未來可以根據需要進行優化
+	const localeScripts = await loadLocaleFiles(context, webview);
+
+	// 注入語言設定
+	htmlContent = htmlContent.replace("currentLanguage: '{vscodeLanguage}'", `currentLanguage: '${blocklyLanguage}'`);
+	// 在讀取 HTML 內容後，在適當位置注入語言檔案
+	htmlContent = htmlContent.replace(
+		'<script src="{blocklyCompressedJsUri}"></script>',
+		`<script src="{blocklyCompressedJsUri}"></script>
+    ${localeScripts}`
+	);
+
 	htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
 	htmlContent = htmlContent.replace('{jsUri}', jsUri.toString());
 	htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
-	htmlContent = htmlContent.replace('{msgEnJsUri}', msgEnJsUri.toString());
+	htmlContent = htmlContent.replace('{msgJsUri}', msgJsUri.toString());
 	htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
 	htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());
 	htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());

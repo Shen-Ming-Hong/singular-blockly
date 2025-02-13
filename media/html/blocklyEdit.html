@@ -7,6 +7,39 @@
     <title>Blockly Edit</title>
     <link rel="stylesheet" href="{cssUri}">
     <script>window.TOOLBOX_URL = '{toolboxUri}';</script>
+    <script>
+        window.languageManager = {
+            currentLanguage: '{vscodeLanguage}', // 將由 extension.ts 注入
+            messages: {},
+            loadMessages: function (locale, messages) {
+                this.messages[locale] = messages;
+                // 觸發語言檔案載入事件
+                window.dispatchEvent(new CustomEvent('messageLoaded', {
+                    detail: { locale: locale }
+                }));
+            },
+            getMessage: function (key, defaultValue) {
+                const messages = this.messages[this.currentLanguage] || this.messages['en'];
+                return messages[key] || defaultValue || key;
+            },
+            setLanguage: function (locale) {
+                // 檢查語言檔案是否已載入
+                if (!this.messages[locale]) {
+                    console.warn(`Language ${locale} not loaded yet`);
+                    return;
+                }
+                this.currentLanguage = locale;
+                // 觸發語言變更事件
+                window.dispatchEvent(new CustomEvent('languageChanged', {
+                    detail: { language: locale }
+                }));
+                // 重新渲染工作區
+                if (Blockly && Blockly.getMainWorkspace()) {
+                    Blockly.getMainWorkspace().render();
+                }
+            }
+        };
+    </script>
 </head>
 
 <body>
@@ -29,7 +62,7 @@
     <script src="{blocklyCompressedJsUri}"></script>
     <script src="{blocksCompressedJsUri}"></script>
     <script src="{javascriptCompressedJsUri}"></script>
-    <script src="{msgEnJsUri}"></script>
+    <script src="{msgJsUri}"></script>
     <script src="{themeModernJsUri}"></script>
     <script src="{themesUri}/singular.js"></script>
     <script src="{arduinoGeneratorUri}"></script>
