@@ -23,9 +23,27 @@
 			{
 				"command": "singular-blockly.openBlocklyEdit",
 				"title": "Open Blockly Edit",
-				"icon": "./images/blockly.svg"
+				"icon": "images/奇點blockly-01.svg"
 			}
-		]
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "singular-blockly-view",
+					"title": "Singular Blockly",
+					"icon": "images/奇點blockly-01.svg"
+				}
+			]
+		},
+		"views": {
+			"singular-blockly-view": [
+				{
+					"id": "singular-blockly-view",
+					"name": "Singular Blockly",
+					"type": "webview"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run package",

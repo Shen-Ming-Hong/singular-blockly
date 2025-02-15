@@ -8,8 +8,23 @@ export function activate(context: vscode.ExtensionContext) {
 	try {
 		console.log('正在註冊指令...');
 
-		const disposable = vscode.commands.registerCommand('singular-blockly.helloWorld', () => {
-			vscode.window.showInformationMessage('Hello World from Singular Blockly!');
+		// 添加 activitybar 點擊監聽
+		const activityBarListener = vscode.window.registerWebviewViewProvider('singular-blockly-view', {
+			resolveWebviewView: async webviewView => {
+				// 立即執行關閉側邊欄
+				await vscode.commands.executeCommand('workbench.action.closeSidebar');
+				await vscode.commands.executeCommand('singular-blockly.openBlocklyEdit');
+				console.log('初始化完成，關閉側邊欄');
+
+				// 監聽後續的可見性變化
+				webviewView.onDidChangeVisibility(async () => {
+					if (webviewView.visible) {
+						console.log('按下了 activitybar 按鈕！');
+						await vscode.commands.executeCommand('workbench.action.closeSidebar');
+						await vscode.commands.executeCommand('singular-blockly.openBlocklyEdit');
+					}
+				});
+			},
 		});
 
 		const openBlocklyEdit = vscode.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
@@ -227,8 +242,7 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log('正在設定訂閱...');
 		// 將狀態列按鈕加入訂閱清單
 		context.subscriptions.push(blocklyStatusBarItem);
-
-		context.subscriptions.push(disposable, openBlocklyEdit);
+		context.subscriptions.push(activityBarListener);
 
 		console.log('Singular Blockly 擴充功能已完全啟動！');
 	} catch (error) {
