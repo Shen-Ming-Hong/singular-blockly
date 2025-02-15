@@ -186,6 +186,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const boardSelect = document.getElementById('boardSelect');
 	boardSelect.addEventListener('change', event => {
 		const selectedBoard = event.target.value;
+		// 更新全局的currentBoard
+		window.setCurrentBoard(selectedBoard);
+		// 觸發工作區更新以重新整理積木
+		workspace.getAllBlocks().forEach(block => {
+			if (block.type.startsWith('arduino_')) {
+				block.render();
+			}
+		});
 		vscode.postMessage({
 			command: 'updateBoard',
 			board: selectedBoard,
