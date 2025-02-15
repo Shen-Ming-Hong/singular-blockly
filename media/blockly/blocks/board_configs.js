@@ -3,6 +3,8 @@ window.BOARD_CONFIGS = {
 	uno: {
 		name: 'Arduino Uno',
 		digitalPins: [
+			['D0 (RX)', '0'],
+			['D1 (TX)', '1'],
 			['D2', '2'],
 			['D3 (PWM)', '3'],
 			['D4', '4'],
@@ -14,7 +16,7 @@ window.BOARD_CONFIGS = {
 			['D10 (PWM)', '10'],
 			['D11 (PWM)', '11'],
 			['D12', '12'],
-			['D13', '13'],
+			['D13 (LED)', '13'],
 		],
 		analogPins: [
 			['A0', 'A0'],
@@ -33,6 +35,8 @@ window.BOARD_CONFIGS = {
 	nano: {
 		name: 'Arduino Nano',
 		digitalPins: [
+			['D0 (RX)', '0'],
+			['D1 (TX)', '1'],
 			['D2', '2'],
 			['D3 (PWM)', '3'],
 			['D4', '4'],
@@ -44,15 +48,15 @@ window.BOARD_CONFIGS = {
 			['D10 (PWM)', '10'],
 			['D11 (PWM)', '11'],
 			['D12', '12'],
-			['D13', '13'],
+			['D13 (LED)', '13'],
 		],
 		analogPins: [
 			['A0', 'A0'],
 			['A1', 'A1'],
 			['A2', 'A2'],
 			['A3', 'A3'],
-			['A4', 'A4'],
-			['A5', 'A5'],
+			['A4 (SDA)', 'A4'],
+			['A5 (SCL)', 'A5'],
 			['A6', 'A6'],
 			['A7', 'A7'],
 		],
@@ -63,20 +67,30 @@ window.BOARD_CONFIGS = {
 		},
 	},
 	mega: {
-		name: 'Arduino Mega',
+		name: 'Arduino Mega 2560',
 		digitalPins: [
-			['D2', '2'],
+			['D0 (RX0)', '0'],
+			['D1 (TX0)', '1'],
+			['D2 (PWM)', '2'],
 			['D3 (PWM)', '3'],
-			['D4', '4'],
+			['D4 (PWM)', '4'],
 			['D5 (PWM)', '5'],
 			['D6 (PWM)', '6'],
-			['D7', '7'],
-			['D8', '8'],
+			['D7 (PWM)', '7'],
+			['D8 (PWM)', '8'],
 			['D9 (PWM)', '9'],
 			['D10 (PWM)', '10'],
 			['D11 (PWM)', '11'],
-			['D12', '12'],
-			['D13', '13'],
+			['D12 (PWM)', '12'],
+			['D13 (LED)', '13'],
+			['D14 (TX3)', '14'],
+			['D15 (RX3)', '15'],
+			['D16 (TX2)', '16'],
+			['D17 (RX2)', '17'],
+			['D18 (TX1)', '18'],
+			['D19 (RX1)', '19'],
+			['D20 (SDA)', '20'],
+			['D21 (SCL)', '21'],
 			['D22', '22'],
 			['D23', '23'],
 			['D24', '24'],
@@ -91,6 +105,24 @@ window.BOARD_CONFIGS = {
 			['D33', '33'],
 			['D34', '34'],
 			['D35', '35'],
+			['D36', '36'],
+			['D37', '37'],
+			['D38', '38'],
+			['D39', '39'],
+			['D40', '40'],
+			['D41', '41'],
+			['D42', '42'],
+			['D43', '43'],
+			['D44 (PWM)', '44'],
+			['D45 (PWM)', '45'],
+			['D46 (PWM)', '46'],
+			['D47', '47'],
+			['D48', '48'],
+			['D49', '49'],
+			['D50 (MISO)', '50'],
+			['D51 (MOSI)', '51'],
+			['D52 (SCK)', '52'],
+			['D53 (SS)', '53'],
 		],
 		analogPins: [
 			['A0', 'A0'],
@@ -119,7 +151,10 @@ window.BOARD_CONFIGS = {
 	esp32: {
 		name: 'ESP32',
 		digitalPins: [
+			['GPIO0', '0'],
+			['GPIO1 (TX0)', '1'],
 			['GPIO2', '2'],
+			['GPIO3 (RX0)', '3'],
 			['GPIO4', '4'],
 			['GPIO5', '5'],
 			['GPIO12', '12'],
@@ -138,22 +173,26 @@ window.BOARD_CONFIGS = {
 			['GPIO27', '27'],
 			['GPIO32', '32'],
 			['GPIO33', '33'],
+			['GPIO34', '34'],
+			['GPIO35', '35'],
+			['GPIO36', '36'],
+			['GPIO39', '39'],
 		],
 		analogPins: [
-			['GPIO36 (ADC1_CH0)', '36'],
-			['GPIO39 (ADC1_CH3)', '39'],
-			['GPIO34 (ADC1_CH6)', '34'],
-			['GPIO35 (ADC1_CH7)', '35'],
 			['GPIO32 (ADC1_CH4)', '32'],
 			['GPIO33 (ADC1_CH5)', '33'],
+			['GPIO34 (ADC1_CH6)', '34'],
+			['GPIO35 (ADC1_CH7)', '35'],
+			['GPIO36 (ADC1_CH0)', '36'],
+			['GPIO39 (ADC1_CH3)', '39'],
 		],
 		analogOutputRange: {
 			min: 0,
-			max: 4095, // ESP32 LEDC 預設使用 12 位分辨率 (0-4095)
+			max: 4095, // ESP32 的 PWM（LEDC）預設為 12 位元解析度
 			defaultValue: 0,
 		},
 		pwmChannels: {
-			// 定義特定腳位對應的首選 LEDC 通道
+			// 定義特定引腳對應的首選 LEDC 通道
 			18: 0, // GPIO18 優先使用通道 0
 			19: 1, // GPIO19 優先使用通道 1
 			21: 2, // GPIO21 優先使用通道 2
@@ -162,12 +201,14 @@ window.BOARD_CONFIGS = {
 			25: 5, // GPIO25 優先使用通道 5
 			26: 6, // GPIO26 優先使用通道 6
 			27: 7, // GPIO27 優先使用通道 7
-			// 其他腳位將動態分配通道
+			// 其他引腳將動態分配通道
 		},
 	},
 	supermini: {
 		name: 'Super Mini',
 		digitalPins: [
+			['D0 (RX)', '0'],
+			['D1 (TX)', '1'],
 			['D2', '2'],
 			['D3 (PWM)', '3'],
 			['D4', '4'],
@@ -179,17 +220,19 @@ window.BOARD_CONFIGS = {
 			['D10 (PWM)', '10'],
 			['D11 (PWM)', '11'],
 			['D12', '12'],
-			['D13', '13'],
+			['D13 (LED)', '13'],
 		],
 		analogPins: [
 			['A0', 'A0'],
 			['A1', 'A1'],
 			['A2', 'A2'],
 			['A3', 'A3'],
+			['A4 (SDA)', 'A4'],
+			['A5 (SCL)', 'A5'],
 		],
 		analogOutputRange: {
 			min: 0,
-			max: 1023, // 10位分辨率
+			max: 255, // 8位分辨率
 			defaultValue: 0,
 		},
 	},
