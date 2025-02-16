@@ -267,15 +267,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// ...保留其他既有的 case...
 			case 'loadWorkspace':
 				try {
-					if (message.state) {
-						Blockly.serialization.workspaces.load(message.state, workspace);
-					}
 					if (message.board) {
+						// 先設定板子類型
 						boardSelect.value = message.board;
+						window.setCurrentBoard(message.board);
 						vscode.postMessage({
 							command: 'updateBoard',
 							board: message.board,
 						});
+					}
+					if (message.state) {
+						// 然後再載入工作區內容
+						Blockly.serialization.workspaces.load(message.state, workspace);
 					}
 				} catch (error) {
 					console.error('載入工作區狀態失敗:', error);
