@@ -196,3 +196,19 @@ Blockly.Blocks['arduino_delay'] = {
 		this.setHelpUrl('');
 	},
 };
+
+Blockly.Blocks['arduino_level'] = {
+	init: function () {
+		this.appendDummyInput().appendField(
+			new Blockly.FieldDropdown([
+				['HIGH', 'HIGH'],
+				['LOW', 'LOW'],
+			]),
+			'LEVEL'
+		);
+		this.setOutput(true, ['Boolean', 'Number']);
+		this.setColour(230);
+		this.setTooltip('Arduino 的 HIGH (1) 或 LOW (0) 常數');
+		this.setHelpUrl('https://www.arduino.cc/reference/en/language/variables/constants/constants/');
+	},
+};

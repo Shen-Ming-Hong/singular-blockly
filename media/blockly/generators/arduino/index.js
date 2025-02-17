@@ -120,3 +120,8 @@ window.arduinoGenerator.ORDER_LOGICAL_OR = 12; // ||
 window.arduinoGenerator.ORDER_CONDITIONAL = 13; // ?:
 window.arduinoGenerator.ORDER_ASSIGNMENT = 14; // = += -= *= /=
 window.arduinoGenerator.ORDER_NONE = 99; // ()
+
+window.arduinoGenerator.forBlock['arduino_level'] = function (block) {
+	const level = block.getFieldValue('LEVEL');
+	return [level, window.arduinoGenerator.ORDER_ATOMIC];
+};
