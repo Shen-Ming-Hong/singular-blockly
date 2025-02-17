@@ -25,7 +25,7 @@ Blockly.Blocks['arduino_digital_write'] = {
 		this.appendValueInput('VALUE')
 			.setCheck(['Boolean', 'Number', 'String'])
 			.appendField('數值')
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="text"><field name="TEXT">LOW</field></shadow>'));
+			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="arduino_level"><field name="LEVEL">LOW</field></shadow>'));
 
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
@@ -49,7 +49,9 @@ Blockly.Blocks['arduino_digital_write'] = {
 			const valueInput = this.getInput('VALUE');
 			if (valueInput && valueInput.connection && !valueInput.connection.targetConnection) {
 				if (!valueInput.connection.shadowDom_) {
-					valueInput.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="text"><field name="TEXT">LOW</field></shadow>'));
+					valueInput.setShadowDom(
+						Blockly.utils.xml.textToDom('<shadow type="arduino_level"><field name="LEVEL">LOW</field></shadow>')
+					);
 				}
 			}
 		}
