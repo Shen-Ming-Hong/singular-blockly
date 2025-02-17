@@ -266,3 +266,16 @@ Blockly.Blocks['controls_duration'] = {
 		this.setHelpUrl('');
 	},
 };
+
+Blockly.Blocks['text_print'] = {
+	init: function () {
+		this.appendValueInput('TEXT').setCheck(null).appendField('顯示');
+		this.appendDummyInput().appendField(new Blockly.FieldCheckbox('TRUE'), 'NEW_LINE').appendField('換行');
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour(160);
+		this.setTooltip('在序列埠監控視窗顯示文字');
+		this.setHelpUrl('');
+	},
+};
