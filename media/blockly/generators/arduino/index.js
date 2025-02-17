@@ -125,3 +125,10 @@ window.arduinoGenerator.forBlock['arduino_level'] = function (block) {
 	const level = block.getFieldValue('LEVEL');
 	return [level, window.arduinoGenerator.ORDER_ATOMIC];
 };
+
+window.arduinoGenerator.forBlock['arduino_pullup'] = function (block) {
+	const pin = block.getFieldValue('PIN');
+	// 添加到 setup 區塊的程式碼
+	window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, INPUT_PULLUP);`);
+	return '';
+};

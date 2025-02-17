@@ -214,3 +214,37 @@ Blockly.Blocks['arduino_level'] = {
 		this.setHelpUrl('https://www.arduino.cc/reference/en/language/variables/constants/constants/');
 	},
 };
+
+Blockly.Blocks['arduino_pullup'] = {
+	init: function () {
+		this.lastKnownBoard_ = window.currentBoard;
+
+		this.appendDummyInput()
+			.appendField('啟用內建上拉電阻')
+			.appendField('腳位')
+			.appendField(
+				new Blockly.FieldDropdown(function () {
+					return window.getPullupPinOptions();
+				}),
+				'PIN'
+			);
+
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour(230);
+		this.setTooltip('在指定的腳位啟用內建上拉電阻');
+		this.setHelpUrl('');
+	},
+
+	onchange: function (e) {
+		if (window.currentBoard !== this.lastKnownBoard_) {
+			this.lastKnownBoard_ = window.currentBoard;
+			const pinField = this.getField('PIN');
+			if (pinField) {
+				pinField.setValue(pinField.getValue());
+				this.render();
+			}
+		}
+	},
+};

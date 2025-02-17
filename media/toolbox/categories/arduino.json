@@ -30,6 +30,10 @@
 		{
 			"kind": "block",
 			"type": "arduino_level"
+		},
+		{
+			"kind": "block",
+			"type": "arduino_pullup"
 		}
 	]
 }
