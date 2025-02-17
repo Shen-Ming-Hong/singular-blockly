@@ -248,3 +248,21 @@ Blockly.Blocks['arduino_pullup'] = {
 		}
 	},
 };
+
+Blockly.Blocks['controls_duration'] = {
+	init: function () {
+		this.appendDummyInput().appendField('重複執行');
+		this.appendValueInput('DURATION')
+			.setCheck('Number')
+			.appendField('時間')
+			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">1000</field></shadow>'));
+		this.appendDummyInput().appendField('毫秒');
+		this.appendStatementInput('DO').setCheck(null).appendField('執行');
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour(120);
+		this.setTooltip('在指定的時間內重複執行程式');
+		this.setHelpUrl('');
+	},
+};

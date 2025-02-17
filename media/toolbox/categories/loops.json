@@ -62,6 +62,21 @@
 		{
 			"kind": "block",
 			"type": "controls_flow_statements"
+		},
+		{
+			"kind": "block",
+			"type": "controls_duration",
+			"inputs": {
+				"DURATION": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 1000
+						}
+					}
+				}
+			}
 		}
 	]
 }

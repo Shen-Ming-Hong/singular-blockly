@@ -58,3 +58,15 @@ window.arduinoGenerator.forBlock['controls_flow_statements'] = function (block) 
 
 	return code;
 };
+
+window.arduinoGenerator.forBlock['controls_duration'] = function(block) {
+    const duration = window.arduinoGenerator.valueToCode(block, 'DURATION', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
+    const branch = window.arduinoGenerator.statementToCode(block, 'DO');
+    const timeVar = '_startTime' + Math.floor(Math.random() * 10000);
+    
+    // 返回使用 millis() 函數實現的定時迴圈
+    return `unsigned long ${timeVar} = millis();\n` +
+           `while (millis() - ${timeVar} < ${duration}) {\n` +
+           branch +
+           `}\n`;
+};
