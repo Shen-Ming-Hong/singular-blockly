@@ -261,7 +261,7 @@ Blockly.Blocks['controls_duration'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour(120);
+		this.setColour('#A1887F'); // 更新為 loop blocks 的顏色
 		this.setTooltip('在指定的時間內重複執行程式');
 		this.setHelpUrl('');
 	},
@@ -274,7 +274,7 @@ Blockly.Blocks['text_print'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour(160);
+		this.setColour('#FB8C00'); // 更新為 text blocks 的顏色
 		this.setTooltip('在序列埠監控視窗顯示文字');
 		this.setHelpUrl('');
 	},
