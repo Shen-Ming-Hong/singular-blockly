@@ -2,6 +2,7 @@
 
 <a href="https://github.com/google/blockly"><img src="https://tinyurl.com/built-on-blockly" /></a>
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-Scripts-orange.svg)](https://platformio.org/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development, with multi-board support and internationalization.
 
@@ -116,6 +117,18 @@ Please report any issues on our GitHub repository.
 - Custom theme implementation
 
 ---
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Licenses
+
+This project incorporates the following third-party components:
+
+- [Blockly](https://github.com/google/blockly) - Licensed under the Apache License 2.0
+- [PlatformIO](https://platformio.org/) - Licensed under the Apache License 2.0
+- Arduino Core Libraries - Licensed under the LGPL
 
 ## Contributing
 

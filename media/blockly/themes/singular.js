@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * Singular theme configuration
  */
 const singularTheme = Blockly.Theme.defineTheme('singular', {

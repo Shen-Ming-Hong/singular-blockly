@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * Copyright 2012 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 Blockly.Blocks['arduino_setup_loop'] = {
 	init: function () {
 		this.appendStatementInput('SETUP').setCheck(null).appendField('初始化');

@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * Copyright 2012 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 window.arduinoGenerator.forBlock['controls_if'] = function (block) {
 	let code = '';
 	const condition = window.arduinoGenerator.valueToCode(block, 'IF0', window.arduinoGenerator.ORDER_NONE) || 'false';

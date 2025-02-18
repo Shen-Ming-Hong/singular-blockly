@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * Copyright 2012 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 在 ORDER_NONE 定義後面加入變數相關的生成器
 window.arduinoGenerator.forBlock['variables_get'] = function (block) {
 	const varName = block.getField('VAR').getText();

@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * Copyright 2012 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 window.arduinoGenerator.forBlock['lists_create_with'] = function (block) {
 	const elements = new Array(block.itemCount_);
 	for (let i = 0; i < block.itemCount_; i++) {

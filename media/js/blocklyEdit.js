@@ -1,4 +1,8 @@
-// 在頁面最上方宣告全域 vscode API 實例
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
 const vscode = acquireVsCodeApi();
 
 // 註冊工具箱元件

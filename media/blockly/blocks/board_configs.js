@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // 定義全局變數
 window.BOARD_CONFIGS = {
 	uno: {

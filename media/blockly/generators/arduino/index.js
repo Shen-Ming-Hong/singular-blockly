@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * Copyright 2012 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /** @type {import('blockly')} */
 const Blockly = window.Blockly;
 

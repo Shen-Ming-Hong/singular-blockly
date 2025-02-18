@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';

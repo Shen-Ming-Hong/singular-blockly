@@ -1,3 +1,13 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This file contains translations derived from Blockly project
+ * Copyright 2012 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 // Define translations for English
 window.languageManager.loadMessages('en', {
 	// UI Elements
