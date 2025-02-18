@@ -1,51 +1,104 @@
 # Singular Blockly
 
-A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development.
+<a href="https://github.com/google/blockly"><img src="https://tinyurl.com/built-on-blockly" /></a>
+[![PlatformIO](https://img.shields.io/badge/PlatformIO-Scripts-orange.svg)](https://platformio.org/)
+
+A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development, with multi-board support and internationalization.
 
 ## Features
 
-This extension integrates Blockly's visual programming interface with Arduino development, making it easier to create Arduino programs using a block-based programming approach.
+- 🎯 **Multi-Board Support**
+  - Arduino Uno
+  - Arduino Nano
+  - Arduino Mega
+  - ESP32
+  - Super Mini (Lolin C3 Mini)
 
-Key features include:
+- 🌐 **Internationalization Support**
+  - Multiple language support
+  - Automatic language detection based on VS Code settings
+  - Customizable messages for different locales
 
-- Visual block programming interface for Arduino
-- Built-in blocks for Arduino I/O operations
-- Support for functions, variables, loops, and logic operations
-- Custom Arduino-specific blocks
-- Integrated development environment within VS Code
+- 🧩 **Rich Block Categories**
+  - Arduino I/O Operations
+  - Functions with parameter support
+  - Variables with rename/delete capabilities
+  - Lists and Arrays
+  - Logic Operations
+  - Loops
+  - Math Operations
+  - Text Operations
 
-![Singular Blockly Interface](images/icon.png)
+- 💾 **Workspace Management**
+  - Automatic state saving
+  - Project persistence
+  - Board configuration management
+  - Code generation to Arduino (.cpp) files
+  - Automatic PlatformIO configuration generation
+
+- 🛠 **Development Features**
+  - Real-time code generation
+  - Integrated board configuration
+  - Visual block programming interface
+  - Drag-and-drop block management
+  - Zoom controls and trashcan
+  - Custom theme support
+  - PlatformIO integration for hardware upload
 
 ## Requirements
 
 - Visual Studio Code 1.6.0 or higher
 - Basic understanding of Arduino programming concepts
+- PlatformIO IDE Extension (for hardware upload capabilities)
 
-## Extension Settings
+## Usage
 
-This extension contributes the following settings:
+1. Open the extension using:
+   - Click the wand icon (🪄) in the status bar
+   - Use the activity bar button
 
-- `singularBlockly.enabled`: Enable/disable the Singular Blockly extension
-- `singularBlockly.arduinoPath`: Path to Arduino IDE installation
+2. Select your target board from the dropdown menu:
+   - The extension will automatically generate appropriate PlatformIO configuration
+   - A `platformio.ini` file will be created with correct board settings
+   - First-time board selection will prompt for a workspace reload
 
-## How to Use
+3. Create your program using the visual blocks:
+   - Drag blocks from the toolbox
+   - Configure block parameters
+   - Connect blocks to build your logic
 
-1. Install the extension
-2. Open the Blockly editor using the command palette (`Ctrl+Shift+P`) and search for "Open Singular Blockly"
-3. Create your program using the visual blocks
-4. Generate Arduino code from your blocks
-5. Upload to your Arduino board
+4. The extension will automatically:
+   - Generate Arduino code in `src/main.cpp`
+   - Save your workspace state
+   - Update board configurations
+   - Configure PlatformIO settings for hardware upload
 
-## Available Block Categories
+## Supported Boards and Platforms
 
-- Arduino I/O Operations
-- Functions and Procedures
-- Variables
-- Lists
-- Logic Operations
-- Loops
-- Math Operations
-- Text Operations
+Each board is configured with specific PlatformIO settings for optimal compatibility:
+
+### AVR Based
+
+- **Arduino Uno**
+  - Platform: atmelavr
+  - Board: uno
+- **Arduino Nano**
+  - Platform: atmelavr
+  - Board: nanoatmega328
+- **Arduino Mega**
+  - Platform: atmelavr
+  - Board: megaatmega2560
+
+### ESP32 Based
+
+- **ESP32 Dev Module**
+  - Platform: espressif32
+  - Board: esp32dev
+- **Super Mini (Lolin C3 Mini)**
+  - Platform: espressif32
+  - Board: lolin_c3_mini
+
+> Note: The extension will automatically generate the appropriate `platformio.ini` configuration when you select a board, ensuring the correct platform settings for hardware upload.
 
 ## Known Issues
 
@@ -55,9 +108,12 @@ Please report any issues on our GitHub repository.
 
 ### 1.0.0
 
-- Initial release with basic Arduino block programming support
-- Integration with VS Code
-- Basic block categories including Arduino operations, functions, and control structures
+- Multi-board support including Arduino and ESP32 platforms
+- Internationalization with multiple language support
+- Advanced variable management with rename/delete capabilities
+- Function block support with parameter handling
+- Real-time code generation and workspace state persistence
+- Custom theme implementation
 
 ---
 
