@@ -102,10 +102,15 @@ window.arduinoGenerator.forBlock['arduino_level'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['arduino_pullup'] = function (block) {
-	const pin = block.getFieldValue('PIN');
-	// 添加到 setup 區塊的程式碼
-	window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, INPUT_PULLUP);`);
-	return '';
+	try {
+		const pin = block.getFieldValue('PIN');
+		// 添加到 setup 區塊的程式碼
+		window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, INPUT_PULLUP);`);
+		return '';
+	} catch (e) {
+		console.log('Pullup block code generation error:', e);
+		return ''; // 發生錯誤時返回空字串
+	}
 };
 
 window.arduinoGenerator.forBlock['arduino_pin_mode'] = function (block) {
