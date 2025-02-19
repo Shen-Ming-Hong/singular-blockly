@@ -286,3 +286,38 @@ Blockly.Blocks['text_print'] = {
 		this.setHelpUrl('');
 	},
 };
+
+Blockly.Blocks['arduino_pin_mode'] = {
+    init: function() {
+        this.lastKnownBoard_ = window.currentBoard;
+
+        this.appendDummyInput()
+            .appendField('設定腳位')
+            .appendField(new Blockly.FieldDropdown(function() {
+                return window.getDigitalPinOptions();
+            }), 'PIN')
+            .appendField('模式')
+            .appendField(new Blockly.FieldDropdown([
+                ['輸入', 'INPUT'],
+                ['輸出', 'OUTPUT']
+            ]), 'MODE');
+
+        this.setInputsInline(true);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour(230);
+        this.setTooltip('設定指定腳位的運作模式（輸入/輸出）');
+        this.setHelpUrl('');
+    },
+
+    onchange: function() {
+        if (window.currentBoard !== this.lastKnownBoard_) {
+            this.lastKnownBoard_ = window.currentBoard;
+            const pinField = this.getField('PIN');
+            if (pinField) {
+                pinField.setValue(pinField.getValue());
+                this.render();
+            }
+        }
+    }
+};

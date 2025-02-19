@@ -95,3 +95,28 @@ window.arduinoGenerator.forBlock['arduino_delay'] = function (block) {
 		return ''; // 發生錯誤時返回空字串，允許其他積木繼續生成
 	}
 };
+
+window.arduinoGenerator.forBlock['arduino_level'] = function (block) {
+	const level = block.getFieldValue('LEVEL');
+	return [level, window.arduinoGenerator.ORDER_ATOMIC];
+};
+
+window.arduinoGenerator.forBlock['arduino_pullup'] = function (block) {
+	const pin = block.getFieldValue('PIN');
+	// 添加到 setup 區塊的程式碼
+	window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, INPUT_PULLUP);`);
+	return '';
+};
+
+window.arduinoGenerator.forBlock['arduino_pin_mode'] = function (block) {
+	try {
+		const pin = block.getFieldValue('PIN');
+		const mode = block.getFieldValue('MODE');
+		// 添加到 setup 區塊的程式碼
+		window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, ${mode});`);
+		return '';
+	} catch (e) {
+		console.log('Pin mode block code generation error:', e);
+		return ''; // 發生錯誤時返回空字串
+	}
+};
