@@ -1,36 +1,48 @@
 name: Publish VS Code Extension
 
 on:
-  push:
-    tags:
-      - "v*" # 當推送包含 v 開頭的標籤時觸發
+    push:
+        branches:
+            - master
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Run lint
-        run: npm run lint
-        
-      - name: Run tests
-        run: npm test
-        
-      - name: Package extension
-        run: npm run package
-        
-      - name: Publish to VS Code Marketplace
-        run: |
-          npm install -g @vscode/vsce
-          vsce publish -p ${{ secrets.VSCE_PAT }}
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+    publish:
+        runs-on: ubuntu-latest
+        if: contains(github.event.head_commit.message, 'v') && matches(github.event.head_commit.message, '^.*v\d+\.\d+\.\d+.*$')
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Extract version
+              id: version
+              run: |
+                  VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'v\d+\.\d+\.\d+' | head -1)
+                  echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Update package.json version
+              run: |
+                  npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+            - name: Run lint
+              run: npm run lint
+
+            - name: Run tests
+              run: npm test
+
+            - name: Package extension
+              run: npm run package
+
+            - name: Publish to VS Code Marketplace
+              if: success()
+              run: |
+                  npm install -g @vscode/vsce
+                  vsce publish -p ${{ secrets.VSCE_PAT }}
+              env:
+                  VSCE_PAT: ${{ secrets.VSCE_PAT }}
