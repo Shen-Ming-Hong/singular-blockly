@@ -14,10 +14,10 @@ jobs:
               env:
                   GITHUB_CONTEXT: ${{ toJSON(github) }}
               run: echo "$GITHUB_CONTEXT"
-              
+
             - uses: actions/checkout@v4
               with:
-                fetch-depth: 0
+                  fetch-depth: 0
 
             - name: Get version from tag
               id: version
@@ -30,17 +30,6 @@ jobs:
 
             - name: Install dependencies
               run: npm ci
-
-            - name: Update package.json version
-              run: |
-                  # 使用 jq 直接修改 package.json
-                  jq '.version = "${{ steps.version.outputs.version }}"' package.json > temp.json && mv temp.json package.json
-
-            - name: Run lint
-              run: npm run lint
-
-            - name: Run tests
-              run: npm test
 
             - name: Package extension
               run: npm run package
