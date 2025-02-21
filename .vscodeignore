@@ -12,3 +12,18 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
+
+# 必要的資源文件
+!media/**
+!dist/**
+!images/**
+
+# 必要的文件
+!LICENSE
+!NOTICE
+!README.md
+!CHANGELOG.md
+!package.json
+
+!node_modules/blockly/**
+!node_modules/@blockly/**
