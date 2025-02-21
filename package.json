@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development, with multi-board support and internationalization.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.96.0"
@@ -35,7 +35,7 @@
 		"commands": [
 			{
 				"command": "singular-blockly.openBlocklyEdit",
-				"title": "Open Blockly Edit"
+				"title": "Singular Blockly: Open Blockly Edit"
 			}
 		],
 		"viewsContainers": {
