@@ -7,9 +7,25 @@
 	"engines": {
 		"vscode": "^1.96.0"
 	},
+	"preview": true,
+	"publisher": "Ray Shen",
 	"icon": "images/icon.png",
 	"categories": [
 		"Other"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Shen-Ming-Hong/singular-blockly"
+	},
+	"keywords": [
+		"arduino",
+		"blockly",
+		"visual-programming",
+		"education",
+		"microcontroller",
+		"programming",
+		"code-generator",
+		"drag-and-drop"
 	],
 	"activationEvents": [
 		"onStartupFinished"
@@ -18,13 +34,8 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "singular-blockly.helloWorld",
-				"title": "Hello World"
-			},
-			{
 				"command": "singular-blockly.openBlocklyEdit",
-				"title": "Open Blockly Edit",
-				"icon": "images/奇點blockly-01.svg"
+				"title": "Open Blockly Edit"
 			}
 		],
 		"viewsContainers": {
@@ -32,7 +43,7 @@
 				{
 					"id": "singular-blockly-view",
 					"title": "Singular Blockly",
-					"icon": "images/奇點blockly-01.svg"
+					"icon": "images/activitybar.svg"
 				}
 			]
 		},
