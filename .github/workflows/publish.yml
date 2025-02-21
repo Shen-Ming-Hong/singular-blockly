@@ -2,21 +2,18 @@ name: Publish VS Code Extension
 
 on:
     push:
-        branches:
-            - master
+        tags:
+            - 'v*.*.*'
 
 jobs:
     publish:
         runs-on: ubuntu-latest
-        if: contains(github.event.head_commit.message, 'v') && (contains(github.event.head_commit.message, '.') && startsWith(github.event.head_commit.message, 'v'))
         steps:
             - uses: actions/checkout@v4
 
-            - name: Extract version
+            - name: Get version from tag
               id: version
-              run: |
-                  VERSION=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'v\d+\.\d+\.\d+' | head -1)
-                  echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
+              run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
