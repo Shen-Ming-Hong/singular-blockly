@@ -27,3 +27,12 @@ vsc-extension-quickstart.md
 
 !node_modules/blockly/**
 !node_modules/@blockly/**
+
+# 排除額外開發檔案
+**/.git/**
+**/.github/**
+**/test/**
+**/tests/**
+**/.editorconfig
+**/.prettierrc
+**/*.test.js

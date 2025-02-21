@@ -1,6 +1,6 @@
 # Singular Blockly
 
-<a href="https://github.com/google/blockly"><img src="https://tinyurl.com/built-on-blockly" /></a>
+[![Built on Blockly](https://img.shields.io/badge/Built%20on-Blockly-4285F4?style=flat&cacheSeconds=3600&logoWidth=20&labelColor=5F6368&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJMYXllcl82IiBkYXRhLW5hbWU9IkxheWVyIDYiIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KICA8ZGVmcyBpZD0iZGVmczkwMiIvPgogIDxnIGlkPSJnMTAxMyIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjMuNSAtOCkiPgogICAgPHBhdGggaWQ9InBhdGg5MDYiIGZpbGw9IiM0Mjg1ZjQiIGQ9Ik0yMC4xIDMyQzEzLjQgMzIgOCAzNy40IDggNDQuMVYxNDljMCA2LjcgNS40IDEyLjEgMTIuMSAxMi4xSDI1YTIwIDIwIDAgMCAwIDM4LjUgMEg4NGE4IDggMCAwIDAgOC04VjQwbC04LTh6Ii8+CiAgICA8cGF0aCBpZD0icGF0aDkwOCIgZmlsbD0iI2M4ZDFkYiIgZD0iTTgwIDMyVjg1bC0xNi42LTkuNGEzLjYgMy42IDAgMCAwLTUuNCAzLjF2NDAuN2MwIDIuNyAzIDQuNCA1LjQgM2wxNi42LTkuM1YxNjFoNDUuNGM2LjQgMCAxMS42LTUuMiAxMS42LTExLjV2LTEwNmMwLTYuNC01LjItMTEuNS0xMS41LTExLjV6Ii8+CiAgPC9nPgo8L3N2Zz4K)](https://github.com/google/blockly)
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-Scripts-orange.svg)](https://platformio.org/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -48,31 +48,33 @@ A Visual Studio Code extension that provides a visual programming interface usin
 
 ## Requirements
 
-- Visual Studio Code 1.6.0 or higher
+- Visual Studio Code 1.96.0 or higher
 - Basic understanding of Arduino programming concepts
-- PlatformIO IDE Extension (for hardware upload capabilities)
+- Required Extensions:
+  - PlatformIO IDE Extension
+  - C/C++ Extension (ms-vscode.cpptools)
 
 ## Usage
 
 1. Open the extension using:
    - Click the wand icon (🪄) in the status bar
-   - Use the activity bar button
+   - Click the Singular Blockly icon in the activity bar
 
 2. Select your target board from the dropdown menu:
-   - The extension will automatically generate appropriate PlatformIO configuration
-   - A `platformio.ini` file will be created with correct board settings
-   - First-time board selection will prompt for a workspace reload
+   - The extension will automatically create and configure `platformio.ini`
+   - First-time board selection requires a workspace reload
 
 3. Create your program using the visual blocks:
-   - Drag blocks from the toolbox
+   - Drag blocks from the toolbox categories
    - Configure block parameters
    - Connect blocks to build your logic
+   - Changes are auto-saved and persist between sessions
 
 4. The extension will automatically:
    - Generate Arduino code in `src/main.cpp`
-   - Save your workspace state
-   - Update board configurations
-   - Configure PlatformIO settings for hardware upload
+   - Save workspace state in `blockly/main.json`
+   - Update PlatformIO configuration
+   - Provide real-time code(.cpp) generation
 
 ## Supported Boards and Platforms
 
