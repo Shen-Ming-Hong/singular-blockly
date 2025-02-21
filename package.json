@@ -87,7 +87,6 @@
 		"@blockly/theme-modern": "^6.0.10"
 	},
 	"extensionDependencies": [
-		"ms-vscode.cpptools",
 		"platformio.platformio-ide"
 	]
 }
