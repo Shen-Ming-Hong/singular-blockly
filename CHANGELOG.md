@@ -9,7 +9,12 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [未發布 Unreleased]
+## [0.0.8] - 2025-02-21
+
+### 已更新 Updated
+
+- 更新 README.md 文件內容
+  Updated README.md documentation content
 
 ### 新增 Added
 
@@ -49,5 +54,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Added workspace state management
 - 加入單元測試框架
   Added unit testing framework
-
-[未發布 Unreleased]: https://github.com/Shen-Ming-Hong/singular-blockly/commits/master

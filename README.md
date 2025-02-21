@@ -107,19 +107,6 @@ Each board is configured with specific PlatformIO settings for optimal compatibi
 
 Please report any issues on our GitHub repository.
 
-## Release Notes
-
-### 1.0.0
-
-- Multi-board support including Arduino and ESP32 platforms
-- Internationalization with multiple language support
-- Advanced variable management with rename/delete capabilities
-- Function block support with parameter handling
-- Real-time code generation and workspace state persistence
-- Custom theme implementation
-
----
-
 ## License
 
 This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
