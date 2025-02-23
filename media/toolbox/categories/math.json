@@ -1,6 +1,6 @@
 {
 	"kind": "category",
-	"name": "數學",
+	"name": "%{CATEGORY_MATH}",
 	"categorystyle": "math_category",
 	"contents": [
 		{

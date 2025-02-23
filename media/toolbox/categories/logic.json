@@ -1,6 +1,6 @@
 {
 	"kind": "category",
-	"name": "邏輯",
+	"name": "%{CATEGORY_LOGIC}",
 	"categorystyle": "logic_category",
 	"css-icon": "customIcon fa fa-cog",
 	"contents": [

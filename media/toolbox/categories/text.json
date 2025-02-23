@@ -1,6 +1,6 @@
 {
 	"kind": "category",
-	"name": "字串",
+	"name": "%{CATEGORY_TEXT}",
 	"categorystyle": "text_category",
 	"contents": [
 		{

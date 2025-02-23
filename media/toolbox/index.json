@@ -24,13 +24,13 @@
 		},
 		{
 			"kind": "category",
-			"name": "變數",
+			"name": "%{CATEGORY_VARIABLES}",
 			"categorystyle": "variable_category",
 			"custom": "VARIABLE"
 		},
 		{
 			"kind": "category",
-			"name": "函式",
+			"name": "%{CATEGORY_FUNCTIONS}",
 			"categorystyle": "procedure_category",
 			"custom": "FUNCTION"
 		}

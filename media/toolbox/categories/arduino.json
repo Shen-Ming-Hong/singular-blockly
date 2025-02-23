@@ -1,6 +1,6 @@
 {
 	"kind": "category",
-	"name": "Arduino",
+	"name": "%{CATEGORY_ARDUINO}",
 	"categorystyle": "arduino_category",
 	"contents": [
 		{

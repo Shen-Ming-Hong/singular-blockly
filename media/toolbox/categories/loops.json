@@ -1,6 +1,6 @@
 {
 	"kind": "category",
-	"name": "迴圈",
+	"name": "%{CATEGORY_LOOPS}",
 	"categorystyle": "loop_category",
 	"contents": [
 		{

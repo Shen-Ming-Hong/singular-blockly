@@ -1,6 +1,6 @@
 {
 	"kind": "category",
-	"name": "清單/陣列",
+	"name": "%{CATEGORY_LISTS}",
 	"categorystyle": "list_category",
 	"contents": [
 		{
