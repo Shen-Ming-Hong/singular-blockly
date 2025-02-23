@@ -56,21 +56,26 @@ A Visual Studio Code extension that provides a visual programming interface usin
 
 ## Usage
 
-1. Open the extension using:
+1. Open or create a folder in VS Code:
+   - This extension requires a workspace folder to store its files
+   - Use File > Open Folder... or File > New Folder
+   - Make sure you have write permissions in the folder
+
+2. Open the extension using:
    - Click the wand icon (🪄) in the status bar
    - Click the Singular Blockly icon in the activity bar
 
-2. Select your target board from the dropdown menu:
+3. Select your target board from the dropdown menu:
    - The extension will automatically create and configure `platformio.ini`
    - First-time board selection requires a workspace reload
 
-3. Create your program using the visual blocks:
+4. Create your program using the visual blocks:
    - Drag blocks from the toolbox categories
    - Configure block parameters
    - Connect blocks to build your logic
    - Changes are auto-saved and persist between sessions
 
-4. The extension will automatically:
+5. The extension will automatically:
    - Generate Arduino code in `src/main.cpp`
    - Save workspace state in `blockly/main.json`
    - Update PlatformIO configuration
