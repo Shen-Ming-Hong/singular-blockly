@@ -5,9 +5,33 @@ All notable changes to this project will be documented in this file.
 
 此格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 並且本專案遵循 [語意化版本](https://semver.org/lang/zh-TW/)。
-
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.0.9] - 2025-02-24
+
+### 已新增 Added
+
+- 新增語言檔案載入機制及工具箱翻譯前處理功能  
+  Added language file loading mechanism and toolbox translation pre-processing functionality
+- 新增覆寫 Blockly 字串替換函數以支援多語系  
+  Added override for Blockly's message replacement function to support i18n
+
+### 已更新 Updated
+
+- 將積木、板卡配置及函式區塊中硬編碼文字替換為 `window.languageManager.getMessage(...)` 呼叫，提升多語系支援  
+  Replaced hard-coded texts in blocks, board configurations, and function blocks with `window.languageManager.getMessage(...)` calls for enhanced i18n support
+- 更新本地化訊息檔案（en 與 zh-hant），新增多項鍵值（如 ARDUINO_PULLUP、ARDUINO_MODE、DURATION_REPEAT 等）  
+  Updated localization message files (en and zh-hant) with new keys such as ARDUINO_PULLUP, ARDUINO_MODE, DURATION_REPEAT, etc.
+- 更新工具箱類別名稱為翻譯標記（例如：%{CATEGORY_ARDUINO}、%{CATEGORY_LISTS}、%{CATEGORY_LOGIC}、%{CATEGORY_LOOPS}、%{CATEGORY_MATH}、%{CATEGORY_TEXT}、%{CATEGORY_VARIABLES}、%{CATEGORY_FUNCTIONS}）  
+  Updated toolbox category names to use translation tokens (e.g., %{CATEGORY_ARDUINO}, %{CATEGORY_LISTS}, %{CATEGORY_LOGIC}, %{CATEGORY_LOOPS}, %{CATEGORY_MATH}, %{CATEGORY_TEXT}, %{CATEGORY_VARIABLES}, %{CATEGORY_FUNCTIONS})
+
+### 已修改 Changed
+
+- 移除不再需要的 `ms-vscode.cpptools` 相依性  
+  Removed the unnecessary `ms-vscode.cpptools` dependency
+- 更新 extension 以引入語言檔案並支援多語系  
+  Updated extension to include language file loading for enhanced i18n support
 
 ## [0.0.8] - 2025-02-21
 
