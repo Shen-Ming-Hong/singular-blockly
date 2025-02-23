@@ -7,8 +7,8 @@
 
 Blockly.Blocks['arduino_setup_loop'] = {
 	init: function () {
-		this.appendStatementInput('SETUP').setCheck(null).appendField('初始化');
-		this.appendStatementInput('LOOP').setCheck(null).appendField('重複執行');
+		this.appendStatementInput('SETUP').setCheck(null).appendField(window.languageManager.getMessage('ARDUINO_SETUP'));
+		this.appendStatementInput('LOOP').setCheck(null).appendField(window.languageManager.getMessage('ARDUINO_LOOP'));
 		this.setColour('#00979C');
 		this.setTooltip('Arduino 程式的基本結構');
 		this.setHelpUrl('');
@@ -20,8 +20,8 @@ Blockly.Blocks['arduino_digital_write'] = {
 		this.lastKnownBoard_ = window.currentBoard;
 
 		this.appendDummyInput()
-			.appendField('數位寫入')
-			.appendField('腳位')
+			.appendField(window.languageManager.getMessage('ARDUINO_DIGITAL_WRITE'))
+			.appendField(window.languageManager.getMessage('ARDUINO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
 					return window.getDigitalPinOptions();
@@ -31,7 +31,7 @@ Blockly.Blocks['arduino_digital_write'] = {
 
 		this.appendValueInput('VALUE')
 			.setCheck(['Boolean', 'Number', 'String'])
-			.appendField('數值')
+			.appendField(window.languageManager.getMessage('ARDUINO_VALUE'))
 			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="arduino_level"><field name="LEVEL">LOW</field></shadow>'));
 
 		this.setInputsInline(true);
@@ -70,8 +70,8 @@ Blockly.Blocks['arduino_digital_read'] = {
 		this.lastKnownBoard_ = window.currentBoard;
 
 		this.appendDummyInput()
-			.appendField('數位讀取')
-			.appendField('腳位')
+			.appendField(window.languageManager.getMessage('ARDUINO_DIGITAL_READ'))
+			.appendField(window.languageManager.getMessage('ARDUINO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
 					return window.getDigitalPinOptions();
@@ -102,8 +102,8 @@ Blockly.Blocks['arduino_analog_write'] = {
 		const range = window.getAnalogOutputRange();
 
 		this.appendDummyInput()
-			.appendField('類比寫入')
-			.appendField('腳位')
+			.appendField(window.languageManager.getMessage('ARDUINO_ANALOG_WRITE'))
+			.appendField(window.languageManager.getMessage('ARDUINO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
 					return window.getDigitalPinOptions().filter(pin => pin[0].includes('PWM'));
@@ -113,7 +113,7 @@ Blockly.Blocks['arduino_analog_write'] = {
 
 		this.appendValueInput('VALUE')
 			.setCheck(['Number', 'String'])
-			.appendField('數值')
+			.appendField(window.languageManager.getMessage('ARDUINO_VALUE'))
 			.setShadowDom(
 				Blockly.utils.xml.textToDom(`<shadow type="math_number"><field name="NUM">${range.defaultValue}</field></shadow>`)
 			);
@@ -169,8 +169,8 @@ Blockly.Blocks['arduino_analog_read'] = {
 		this.lastKnownBoard_ = window.currentBoard;
 
 		this.appendDummyInput()
-			.appendField('類比讀取')
-			.appendField('腳位')
+			.appendField(window.languageManager.getMessage('ARDUINO_ANALOG_READ'))
+			.appendField(window.languageManager.getMessage('ARDUINO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
 					return window.getAnalogPinOptions();
@@ -197,7 +197,10 @@ Blockly.Blocks['arduino_analog_read'] = {
 
 Blockly.Blocks['arduino_delay'] = {
 	init: function () {
-		this.appendDummyInput().appendField('等待').appendField(new Blockly.FieldNumber(1000, 0), 'TIME').appendField('毫秒');
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('ARDUINO_DELAY'))
+			.appendField(new Blockly.FieldNumber(1000, 0), 'TIME')
+			.appendField(window.languageManager.getMessage('ARDUINO_DELAY_MS'));
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour('#00979C');
@@ -227,8 +230,8 @@ Blockly.Blocks['arduino_pullup'] = {
 		this.lastKnownBoard_ = window.currentBoard;
 
 		this.appendDummyInput()
-			.appendField('啟用內建上拉電阻')
-			.appendField('腳位')
+			.appendField(window.languageManager.getMessage('ARDUINO_PULLUP'))
+			.appendField(window.languageManager.getMessage('ARDUINO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
 					return window.getPullupPinOptions();
@@ -240,7 +243,7 @@ Blockly.Blocks['arduino_pullup'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour('#00979C');
-		this.setTooltip('在指定的腳位啟用內建上拉電阻');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_PULLUP'));
 		this.setHelpUrl('');
 	},
 
@@ -258,17 +261,17 @@ Blockly.Blocks['arduino_pullup'] = {
 
 Blockly.Blocks['controls_duration'] = {
 	init: function () {
-		this.appendDummyInput().appendField('重複執行');
+		this.appendDummyInput().appendField(window.languageManager.getMessage('DURATION_REPEAT'));
 		this.appendValueInput('DURATION')
 			.setCheck('Number')
-			.appendField('時間')
+			.appendField(window.languageManager.getMessage('DURATION_TIME'))
 			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">1000</field></shadow>'));
-		this.appendDummyInput().appendField('毫秒');
-		this.appendStatementInput('DO').setCheck(null).appendField('執行');
+		this.appendDummyInput().appendField(window.languageManager.getMessage('DURATION_MS'));
+		this.appendStatementInput('DO').setCheck(null).appendField(window.languageManager.getMessage('DURATION_DO'));
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#A1887F'); // 更新為 loop blocks 的顏色
+		this.setColour('#A1887F');
 		this.setTooltip('在指定的時間內重複執行程式');
 		this.setHelpUrl('');
 	},
@@ -276,12 +279,14 @@ Blockly.Blocks['controls_duration'] = {
 
 Blockly.Blocks['text_print'] = {
 	init: function () {
-		this.appendValueInput('TEXT').setCheck(null).appendField('顯示');
-		this.appendDummyInput().appendField(new Blockly.FieldCheckbox('TRUE'), 'NEW_LINE').appendField('換行');
+		this.appendValueInput('TEXT').setCheck(null).appendField(window.languageManager.getMessage('TEXT_PRINT_SHOW'));
+		this.appendDummyInput()
+			.appendField(new Blockly.FieldCheckbox('TRUE'), 'NEW_LINE')
+			.appendField(window.languageManager.getMessage('TEXT_PRINT_NEWLINE'));
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#FB8C00'); // 更新為 text blocks 的顏色
+		this.setColour('#FB8C00');
 		this.setTooltip('在序列埠監控視窗顯示文字');
 		this.setHelpUrl('');
 	},
@@ -292,18 +297,19 @@ Blockly.Blocks['arduino_pin_mode'] = {
 		this.lastKnownBoard_ = window.currentBoard;
 
 		this.appendDummyInput()
-			.appendField('設定腳位')
+			.appendField(window.languageManager.getMessage('PIN_MODE_SET'))
+			.appendField(window.languageManager.getMessage('ARDUINO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
 					return window.getDigitalPinOptions();
 				}),
 				'PIN'
 			)
-			.appendField('模式')
+			.appendField(window.languageManager.getMessage('ARDUINO_MODE'))
 			.appendField(
 				new Blockly.FieldDropdown([
-					['輸入', 'INPUT'],
-					['輸出', 'OUTPUT'],
+					[window.languageManager.getMessage('ARDUINO_MODE_INPUT'), 'INPUT'],
+					[window.languageManager.getMessage('ARDUINO_MODE_OUTPUT'), 'OUTPUT'],
 				]),
 				'MODE'
 			);

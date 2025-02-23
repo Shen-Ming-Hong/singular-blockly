@@ -177,7 +177,7 @@ Blockly.Extensions.registerMutator(
 Blockly.Blocks['arduino_function'] = {
 	init: function () {
 		this.appendDummyInput('MAIN')
-			.appendField('函式')
+			.appendField(window.languageManager.getMessage('FUNCTION_CREATE'))
 			.appendField(new Blockly.FieldTextInput('myFunction', this.validateFunctionName_), 'NAME')
 			.appendField(':', 'PARAM_LABEL');
 
@@ -383,9 +383,9 @@ Blockly.Blocks['arduino_function'] = {
 // 參數容器積木
 Blockly.Blocks['arduino_function_mutator'] = {
 	init: function () {
-		this.appendDummyInput().appendField('函式參數');
+		this.appendDummyInput().appendField(window.languageManager.getMessage('FUNCTION_PARAMS'));
 		this.appendStatementInput('STACK');
-		this.appendValueInput('RETURN').setCheck(null).appendField('回傳類型');
+		this.appendValueInput('RETURN').setCheck(null).appendField(window.languageManager.getMessage('FUNCTION_RETURN'));
 		this.setColour('#7986CB'); // 修改這裡，使用主題中定義的顏色
 		this.setTooltip('');
 		this.setHelpUrl('');
@@ -396,7 +396,7 @@ Blockly.Blocks['arduino_function_mutator'] = {
 Blockly.Blocks['arduino_function_parameter'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField('參數')
+			.appendField(window.languageManager.getMessage('FUNCTION_PARAMS'))
 			.appendField(
 				new Blockly.FieldDropdown([
 					['int', 'int'],
@@ -543,7 +543,9 @@ Blockly.Blocks['arduino_function_return'] = {
 
 Blockly.Blocks['function_call'] = {
 	init: function () {
-		this.appendDummyInput().appendField('呼叫').appendField(new Blockly.FieldLabel(''), 'NAME');
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('FUNCTION_CALL'))
+			.appendField(new Blockly.FieldLabel(''), 'NAME');
 		// 初始設定為輸出模式，之後會根據函式類型動態調整
 		this.setOutput(true, null);
 		this.setColour('#7986CB');

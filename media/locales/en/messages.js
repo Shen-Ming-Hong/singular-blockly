@@ -44,6 +44,23 @@ window.languageManager.loadMessages('en', {
 	ARDUINO_VALUE: 'Value',
 	ARDUINO_DELAY: 'Delay',
 	ARDUINO_DELAY_MS: 'milliseconds',
+	ARDUINO_PULLUP: 'Enable Internal Pullup',
+	ARDUINO_MODE: 'Mode',
+	ARDUINO_MODE_INPUT: 'INPUT',
+	ARDUINO_MODE_OUTPUT: 'OUTPUT',
+
+	// Duration block
+	DURATION_REPEAT: 'Repeat for',
+	DURATION_TIME: 'time',
+	DURATION_MS: 'milliseconds',
+	DURATION_DO: 'do',
+
+	// Print block
+	TEXT_PRINT_SHOW: 'print',
+	TEXT_PRINT_NEWLINE: 'newline',
+
+	// Pin Mode block
+	PIN_MODE_SET: 'set',
 
 	// Function Block Labels
 	FUNCTION_CREATE: 'Create Function',
@@ -115,7 +132,6 @@ window.languageManager.loadMessages('en', {
 	RENAME_VARIABLE: 'Rename variable...',
 	NEW_VARIABLE: 'Create variable...',
 	DELETE_VARIABLE: 'Delete variable %1',
-	FUNCTION_CREATE: 'Create Function',
 	PROCEDURE_ALREADY_EXISTS: 'A procedure named "%1" already exists.',
 
 	// Logic block messages

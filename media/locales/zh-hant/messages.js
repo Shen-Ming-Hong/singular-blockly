@@ -44,6 +44,23 @@ window.languageManager.loadMessages('zh-hant', {
 	ARDUINO_VALUE: '數值',
 	ARDUINO_DELAY: '延遲',
 	ARDUINO_DELAY_MS: '毫秒',
+	ARDUINO_PULLUP: '啟用內建上拉電阻',
+	ARDUINO_MODE: '模式',
+	ARDUINO_MODE_INPUT: '輸入',
+	ARDUINO_MODE_OUTPUT: '輸出',
+
+	// Duration block
+	DURATION_REPEAT: '重複執行',
+	DURATION_TIME: '時間',
+	DURATION_MS: '毫秒',
+	DURATION_DO: '執行',
+
+	// Print block
+	TEXT_PRINT_SHOW: '顯示',
+	TEXT_PRINT_NEWLINE: '換行',
+
+	// Pin Mode block
+	PIN_MODE_SET: '設定',
 
 	// Function Block Labels
 	FUNCTION_CREATE: '建立函式',
@@ -115,7 +132,6 @@ window.languageManager.loadMessages('zh-hant', {
 	RENAME_VARIABLE: '重新命名變數...',
 	NEW_VARIABLE: '建立變數...',
 	DELETE_VARIABLE: '刪除變數 %1',
-	FUNCTION_CREATE: '建立函式',
 	PROCEDURE_ALREADY_EXISTS: '已經存在名為「%1」的程序。',
 
 	// Logic block messages

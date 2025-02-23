@@ -427,7 +427,7 @@ window.getCurrentBoard = function () {
 // 獲取數位腳位選項的全局函數
 window.getDigitalPinOptions = function () {
 	if (window.currentBoard === 'none') {
-		return [['無', '-1']];
+		return [[window.languageManager.getMessage('BOARD_NONE'), '-1']];
 	}
 	const board = window.BOARD_CONFIGS[window.currentBoard];
 	return board ? board.digitalPins : [];
@@ -436,7 +436,7 @@ window.getDigitalPinOptions = function () {
 // 獲取類比腳位選項的全局函數
 window.getAnalogPinOptions = function () {
 	if (window.currentBoard === 'none') {
-		return [['無', '-1']];
+		return [[window.languageManager.getMessage('BOARD_NONE'), '-1']];
 	}
 	const board = window.BOARD_CONFIGS[window.currentBoard];
 	return board ? board.analogPins : [];
@@ -463,7 +463,7 @@ window.getPWMChannel = function (pin) {
 
 window.getPullupPinOptions = function () {
 	if (window.currentBoard === 'none') {
-		return [['無', '-1']];
+		return [[window.languageManager.getMessage('BOARD_NONE'), '-1']];
 	}
 	const board = window.BOARD_CONFIGS[window.currentBoard];
 	if (!board || !board.pullupPins) {
