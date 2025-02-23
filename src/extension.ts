@@ -410,6 +410,7 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	console.log(`VSCode 語言: ${vscodeLanguage} -> Blockly 語言: ${blocklyLanguage}`);
 
 	// 載入對應的 Blockly 語言檔案
+	const langJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath(`media/locales/${blocklyLanguage}/messages.js`)));
 	const msgJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath(`node_modules/blockly/msg/${blocklyLanguage}.js`))); // 獲取可用的 Blockly 語言
 	const availableLanguages = await getAvailableBlocklyLanguages(context);
 	console.log('可用的 Blockly 語言:', availableLanguages);
@@ -430,6 +431,7 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
 	htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
+	htmlContent = htmlContent.replace('{langJsUri}', langJsUri.toString());
 	htmlContent = htmlContent.replace('{msgJsUri}', msgJsUri.toString());
 	htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
 	htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());

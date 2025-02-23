@@ -14,6 +14,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
 	const toolboxConfig = await response.json();
+
+	// 新增：在注入前處理 toolbox 配置中的翻譯
+	const processTranslations = obj => {
+		if (typeof obj === 'object') {
+			for (let key in obj) {
+				if (typeof obj[key] === 'string') {
+					obj[key] = Blockly.utils.replaceMessageReferences(obj[key]);
+				} else if (typeof obj[key] === 'object') {
+					processTranslations(obj[key]);
+				}
+			}
+		}
+		return obj;
+	};
+
+	// 處理翻譯
+	processTranslations(toolboxConfig);
+
 	const workspace = Blockly.inject('blocklyDiv', {
 		toolbox: toolboxConfig,
 		trashcan: true, // 添加垃圾桶
@@ -371,3 +389,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 		});
 	};
 });
+
+// 覆寫 Blockly 的字串替換函數
+Blockly.utils.replaceMessageReferences = function (message) {
+	if (!message) {
+		return message;
+	}
+	return message.replace(/%{([^}]*)}/g, function (m, key) {
+		return window.languageManager.getMessage(key, m);
+	});
+};
