@@ -38,6 +38,14 @@
 		{
 			"kind": "block",
 			"type": "arduino_pullup"
+		},
+		{
+			"kind": "block",
+			"type": "seven_segment_pins"
+		},
+		{
+			"kind": "block",
+			"type": "seven_segment_display"
 		}
 	]
 }

@@ -279,4 +279,16 @@ window.languageManager.loadMessages('en', {
 	// Additional Logic Block Messages
 	LOGIC_COMPARE_HELPURL: 'https://en.wikipedia.org/wiki/Inequality_(mathematics)',
 	MATH_NUMBER_HELPURL: 'https://en.wikipedia.org/wiki/Number',
+
+	// Seven Segment Display
+	SEVEN_SEGMENT_DISPLAY: 'Seven Segment Display',
+	SEVEN_SEGMENT_COMMON_CATHODE: 'Common Cathode',
+	SEVEN_SEGMENT_COMMON_ANODE: 'Common Anode',
+	SEVEN_SEGMENT_NUMBER: 'Number (0-9):',
+	SEVEN_SEGMENT_DECIMAL_POINT: 'Decimal Point',
+	SEVEN_SEGMENT_TOOLTIP: 'Display a number (0-9) on a seven-segment display with optional decimal point.',
+
+	// Seven Segment Display Pins
+	SEVEN_SEGMENT_PINS_SET: 'Set seven segment display pins',
+	SEVEN_SEGMENT_PINS_TOOLTIP: 'Configure pins for each segment (A-G) and decimal point (DP) of the seven-segment display.',
 });

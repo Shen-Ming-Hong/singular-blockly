@@ -349,3 +349,88 @@ Blockly.Blocks['math_map'] = {
 		this.setHelpUrl('https://www.arduino.cc/reference/en/language/functions/math/map/');
 	},
 };
+
+Blockly.Blocks['seven_segment_display'] = {
+	init: function () {
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('SEVEN_SEGMENT_DISPLAY'))
+			.appendField(
+				new Blockly.FieldDropdown([
+					[window.languageManager.getMessage('SEVEN_SEGMENT_COMMON_CATHODE'), 'COMMON_CATHODE'],
+					[window.languageManager.getMessage('SEVEN_SEGMENT_COMMON_ANODE'), 'COMMON_ANODE'],
+				]),
+				'TYPE'
+			);
+		this.appendValueInput('NUMBER')
+			.setCheck('Number')
+			.appendField(window.languageManager.getMessage('SEVEN_SEGMENT_NUMBER'))
+			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">0</field></shadow>'));
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('SEVEN_SEGMENT_DECIMAL_POINT'))
+			.appendField(new Blockly.FieldCheckbox('FALSE'), 'DECIMAL_POINT');
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour('#00979C');
+		this.setTooltip(window.languageManager.getMessage('SEVEN_SEGMENT_TOOLTIP'));
+		this.setHelpUrl('https://www.arduino.cc/reference/en/');
+	},
+};
+
+Blockly.Blocks['seven_segment_pins'] = {
+	init: function () {
+		this.lastKnownBoard_ = window.currentBoard;
+
+		this.appendDummyInput().appendField(window.languageManager.getMessage('SEVEN_SEGMENT_PINS_SET'));
+
+		// 為七段顯示器的每個段位添加腳位設定
+		const segments = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'DP'];
+		const positions = [
+			[0, 0],
+			[0, 1], // A, B
+			[1, 0],
+			[1, 1], // C, D
+			[2, 0],
+			[2, 1], // E, F
+			[3, 0],
+			[3, 1], // G, DP
+		];
+
+		for (let i = 0; i < segments.length; i++) {
+			const segment = segments[i];
+			const [row, col] = positions[i];
+
+			this.appendDummyInput()
+				.appendField(segment + ':')
+				.appendField(
+					new Blockly.FieldDropdown(function () {
+						return window.getDigitalPinOptions();
+					}),
+					'PIN_' + segment
+				)
+				.setAlign(Blockly.ALIGN_RIGHT);
+		}
+
+		this.setInputsInline(false);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour('#00979C');
+		this.setTooltip(window.languageManager.getMessage('SEVEN_SEGMENT_PINS_TOOLTIP'));
+		this.setHelpUrl('https://www.arduino.cc/reference/en/');
+	},
+
+	onchange: function () {
+		if (window.currentBoard !== this.lastKnownBoard_) {
+			this.lastKnownBoard_ = window.currentBoard;
+			const segments = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'DP'];
+
+			for (const segment of segments) {
+				const pinField = this.getField('PIN_' + segment);
+				if (pinField) {
+					pinField.setValue(pinField.getValue());
+				}
+			}
+			this.render();
+		}
+	},
+};

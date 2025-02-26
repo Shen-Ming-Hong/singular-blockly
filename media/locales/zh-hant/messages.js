@@ -288,4 +288,15 @@ window.languageManager.loadMessages('zh-hant', {
 	PROCEDURES_CALLNORETURN_TOOLTIP: '執行使用者定義的函式。',
 	PROCEDURES_CALLRETURN_HELPURL: 'https://zh.wikipedia.org/wiki/子程序',
 	PROCEDURES_CALLRETURN_TOOLTIP: '執行使用者定義的函式並使用它的輸出。',
+
+	// Seven Segment Display
+	SEVEN_SEGMENT_DISPLAY: '七段顯示器',
+	SEVEN_SEGMENT_COMMON_CATHODE: '共陰極',
+	SEVEN_SEGMENT_COMMON_ANODE: '共陽極',
+	SEVEN_SEGMENT_NUMBER: '數字 (0-9)：',
+	SEVEN_SEGMENT_DECIMAL_POINT: '小數點',
+	SEVEN_SEGMENT_TOOLTIP: '在七段顯示器上顯示數字(0-9)，可選擇是否顯示小數點。',
+	// Seven Segment Display Pins
+	SEVEN_SEGMENT_PINS_SET: '設定七段顯示器腳位',
+	SEVEN_SEGMENT_PINS_TOOLTIP: '配置七段顯示器的各段(A-G)及小數點(DP)的連接腳位。',
 });

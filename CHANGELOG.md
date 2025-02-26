@@ -8,10 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.1] - 2025-02-26
+## [0.1.2] - 2025-02-26
 
 ### 已新增 Added
 
+- 新增七段顯示器積木 (七段顯示器與顯示器腳位設定)
+  Added seven-segment display blocks (seven-segment display and pin configuration)
+- 新增七段顯示器相關多語系文字
+  Added seven-segment display related i18n text
+- 實作七段顯示器程式碼生成器，支援共陰極與共陽極模式
+  Implemented seven-segment display code generator with support for common cathode and anode modes
+- 可選擇是否顯示小數點
+  Added option to display decimal point
 - 新增數值映射積木 (Arduino map)
   Added value mapping block (Arduino map)
 - 新增數值映射相關多語系文字  

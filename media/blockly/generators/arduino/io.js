@@ -125,3 +125,96 @@ window.arduinoGenerator.forBlock['arduino_pin_mode'] = function (block) {
 		return ''; // 發生錯誤時返回空字串
 	}
 };
+
+window.arduinoGenerator.forBlock['seven_segment_pins'] = function (block) {
+	try {
+		const segments = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'DP'];
+		const pinValues = segments.map(segment => block.getFieldValue('PIN_' + segment));
+
+		// 定義七段顯示器腳位陣列
+		window.arduinoGenerator.variables_['seven_segment_pins'] = `
+// 七段顯示器的引腳連接 (A, B, C, D, E, F, G, DP)
+byte sevenSegmentPins[] = {${pinValues.join(', ')}};
+        `;
+
+		// 將設置引腳模式的程式碼添加到 setup 區塊
+		window.arduinoGenerator.setupCode_.push(`
+  // 設置七段顯示器引腳為輸出模式
+  for (int i = 0; i < 8; i++) {
+    pinMode(sevenSegmentPins[i], OUTPUT);
+  }
+        `);
+
+		return '// 七段顯示器引腳已設定\n';
+	} catch (e) {
+		console.log('Seven segment pins block code generation error:', e);
+		return ''; // 發生錯誤時返回空字串
+	}
+};
+
+window.arduinoGenerator.forBlock['seven_segment_display'] = function (block) {
+	try {
+		const type = block.getFieldValue('TYPE');
+		const number = window.arduinoGenerator.valueToCode(block, 'NUMBER', window.arduinoGenerator.ORDER_NONE) || '0';
+		const decimalPoint = block.getFieldValue('DECIMAL_POINT') === 'TRUE';
+
+		// 七段顯示器碼位定義 (0-9)
+		window.arduinoGenerator.definitions_['seven_segment_digits'] = `
+// 七段顯示器碼位定義 (0-9)
+const byte SEVEN_SEGMENT_DIGITS[] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111  // 9
+};
+        `;
+
+		// 添加七段顯示器函數
+		window.arduinoGenerator.functions_['display_seven_segment'] = `
+void displaySevenSegment(byte pins[], byte value, bool isCommonAnode, bool decimalPoint) {
+  if (value > 9) value = 9;
+  
+  byte segmentValue = SEVEN_SEGMENT_DIGITS[value];
+  if (decimalPoint) {
+    segmentValue |= 0b10000000; // 添加小數點
+  }
+  
+  for (int i = 0; i < 8; i++) {
+    bool segmentState = bitRead(segmentValue, i);
+    if (isCommonAnode) {
+      segmentState = !segmentState; // 如果是共陽極，反轉信號
+    }
+    digitalWrite(pins[i], segmentState);
+  }
+}
+        `;
+
+		// 檢查是否已定義 sevenSegmentPins 數組
+		if (!window.arduinoGenerator.variables_['seven_segment_pins']) {
+			window.arduinoGenerator.variables_['seven_segment_pins'] = `
+// 七段顯示器的引腳連接 (A, B, C, D, E, F, G, DP)
+byte sevenSegmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9}; // 預設引腳連接
+            `;
+
+			// 添加設置引腳模式的程式碼
+			window.arduinoGenerator.setupCode_.push(`
+  // 設置七段顯示器引腳為輸出模式
+  for (int i = 0; i < 8; i++) {
+    pinMode(sevenSegmentPins[i], OUTPUT);
+  }
+            `);
+		}
+
+		const isCommonAnode = type === 'COMMON_ANODE' ? 'true' : 'false';
+		return `displaySevenSegment(sevenSegmentPins, constrain(${number}, 0, 9), ${isCommonAnode}, ${decimalPoint});\n`;
+	} catch (e) {
+		console.log('Seven segment display block code generation error:', e);
+		return ''; // 發生錯誤時返回空字串
+	}
+};
