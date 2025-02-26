@@ -333,3 +333,19 @@ Blockly.Blocks['arduino_pin_mode'] = {
 		}
 	},
 };
+
+Blockly.Blocks['math_map'] = {
+	init: function () {
+		this.appendValueInput('VALUE').setCheck('Number').appendField(window.languageManager.getMessage('MATH_MAP_VALUE'));
+		this.appendValueInput('FROM_LOW').setCheck('Number').appendField('(');
+		this.appendValueInput('FROM_HIGH').setCheck('Number').appendField(',');
+		this.appendValueInput('TO_LOW').setCheck('Number').appendField('→');
+		this.appendValueInput('TO_HIGH').setCheck('Number').appendField(',');
+		this.appendDummyInput().appendField(')');
+		this.setInputsInline(true);
+		this.setOutput(true, 'Number');
+		this.setColour('#66BB6A');
+		this.setTooltip(window.languageManager.getMessage('MATH_MAP_TOOLTIP'));
+		this.setHelpUrl('https://www.arduino.cc/reference/en/language/functions/math/map/');
+	},
+};

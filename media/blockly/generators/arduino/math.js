@@ -180,3 +180,14 @@ window.arduinoGenerator.forBlock['math_atan2'] = function (block) {
 	const code = `atan2(${y}, ${x})`;
 	return [code, window.arduinoGenerator.ORDER_ATOMIC];
 };
+
+window.arduinoGenerator.forBlock['math_map'] = function (block) {
+	const value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_NONE) || '0';
+	const fromLow = window.arduinoGenerator.valueToCode(block, 'FROM_LOW', window.arduinoGenerator.ORDER_NONE) || '0';
+	const fromHigh = window.arduinoGenerator.valueToCode(block, 'FROM_HIGH', window.arduinoGenerator.ORDER_NONE) || '1023';
+	const toLow = window.arduinoGenerator.valueToCode(block, 'TO_LOW', window.arduinoGenerator.ORDER_NONE) || '0';
+	const toHigh = window.arduinoGenerator.valueToCode(block, 'TO_HIGH', window.arduinoGenerator.ORDER_NONE) || '255';
+
+	const code = `map(${value}, ${fromLow}, ${fromHigh}, ${toLow}, ${toHigh})`;
+	return [code, window.arduinoGenerator.ORDER_UNARY_POSTFIX];
+};

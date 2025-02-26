@@ -211,6 +211,57 @@
 					}
 				}
 			}
+		},
+		{
+			"kind": "block",
+			"type": "math_map",
+			"inputs": {
+				"VALUE": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 512
+						}
+					}
+				},
+				"FROM_LOW": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 0
+						}
+					}
+				},
+				"FROM_HIGH": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 1023
+						}
+					}
+				},
+				"TO_LOW": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 0
+						}
+					}
+				},
+				"TO_HIGH": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 255
+						}
+					}
+				}
+			}
 		}
 	]
 }

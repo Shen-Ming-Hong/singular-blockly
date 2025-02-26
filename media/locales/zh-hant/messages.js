@@ -98,6 +98,10 @@ window.languageManager.loadMessages('zh-hant', {
 	MATH_DIVIDE: '除',
 	MATH_POWER: '次方',
 
+	// Math Map Block
+	MATH_MAP_VALUE: '映射',
+	MATH_MAP_TOOLTIP: '將數值從一個範圍重新映射到另一個範圍。例如：map(值, 0, 1023, 0, 255) 會將類比輸入值縮放為 8 位元 PWM 輸出。',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: '請先選擇開發板',
 	ERROR_INVALID_PIN: '無效的腳位編號',

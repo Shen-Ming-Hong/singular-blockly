@@ -98,6 +98,11 @@ window.languageManager.loadMessages('en', {
 	MATH_DIVIDE: 'divide',
 	MATH_POWER: 'power',
 
+	// Math Map Block
+	MATH_MAP_VALUE: 'map',
+	MATH_MAP_TOOLTIP:
+		'Re-maps a number from one range to another. For example, map(value, 0, 1023, 0, 255) will scale an analog input to 8-bit PWM output.',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Please select a board first',
 	ERROR_INVALID_PIN: 'Invalid pin number',
