@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [未發布] - Unreleased
+
+### 已更新 Updated
+
+- 更新 README.md 文件，新增 VS Code 市集徽章（版本、下載量及評分）
+  Updated README.md documentation with VS Code Marketplace badges (version, downloads, and ratings)
+
 ## [0.1.2] - 2025-02-26
 
 ### 已新增 Added
