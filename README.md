@@ -21,7 +21,22 @@ A Visual Studio Code extension that provides a visual programming interface usin
 - 🌐 **Internationalization Support**
   - Multiple language support
   - Automatic language detection based on VS Code settings
-  - Customizable messages for different locales
+  - Supports the following languages:
+    - English (en)
+    - Spanish (es)
+    - Portuguese (pt-br)
+    - French (fr)
+    - German (de)
+    - Italian (it)
+    - Russian (ru)
+    - Japanese (ja)
+    - Korean (ko)
+    - Traditional Chinese (zh-hant)
+    - Polish (pl)
+    - Hungarian (hu)
+    - Turkish (tr)
+    - Bulgarian (bg)
+    - Czech (cs)
 
 - 🧩 **Rich Block Categories**
   - Arduino I/O Operations

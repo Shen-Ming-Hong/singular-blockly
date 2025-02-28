@@ -326,6 +326,19 @@ function mapVSCodeLangToBlockly(vscodeLanguage: string): string {
 		'zh-tw': 'zh-hant',
 		en: 'en',
 		'en-us': 'en',
+		ja: 'ja',
+		es: 'es',
+		'pt-br': 'pt-br',
+		ru: 'ru',
+		ko: 'ko',
+		fr: 'fr',
+		de: 'de',
+		it: 'it',
+		pl: 'pl',
+		hu: 'hu',
+		cs: 'cs',
+		bg: 'bg',
+		tr: 'tr',
 		// Add more mappings as needed
 	};
 

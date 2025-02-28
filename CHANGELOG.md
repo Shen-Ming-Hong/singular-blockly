@@ -10,10 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.1.3] - 2025-02-28
+
 ### 已更新 Updated
 
 - 更新 README.md 文件，新增 VS Code 市集徽章（版本、下載量及評分）
   Updated README.md documentation with VS Code Marketplace badges (version, downloads, and ratings)
+- 新增多種語言支援：西班牙文、法文、匈牙利文、義大利文、日文、韓文、波蘭文、葡萄牙文（巴西）、俄文、土耳其文
+  Added support for multiple languages: Spanish, French, Hungarian, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Turkish
+- 擴展 VSCode 語言檢測與對應支援，自動選擇合適的 Blockly 語言
+  Extended VSCode language detection and mapping, automatically selecting the appropriate Blockly language
 
 ## [0.1.2] - 2025-02-26
 

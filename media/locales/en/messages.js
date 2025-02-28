@@ -160,6 +160,14 @@ window.languageManager.loadMessages('en', {
 	LOGIC_BOOLEAN_FALSE: 'false',
 	LOGIC_NULL: 'null',
 
+	// Additional Logic Block Messages
+	LOGIC_COMPARE_HELPURL: 'https://en.wikipedia.org/wiki/Inequality_(mathematics)',
+	LOGIC_NEGATE_HELPURL: 'https://github.com/google/blockly/wiki/Logic#not',
+	LOGIC_NEGATE_TOOLTIP: 'Returns true if the input is false. Returns false if the input is true.',
+	LOGIC_OPERATION_TOOLTIP_AND: 'Return true if both inputs are true.',
+	LOGIC_OPERATION_TOOLTIP_OR: 'Return true if at least one of the inputs is true.',
+	LOGIC_BOOLEAN_TOOLTIP: 'Returns either true or false.',
+
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'repeat %1 times',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'repeat while',
@@ -167,8 +175,14 @@ window.languageManager.loadMessages('en', {
 	CONTROLS_FOR_TITLE: 'count with %1 from %2 to %3 by %4',
 	CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK: 'break out of loop',
 	CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE: 'continue with next iteration',
+	CONTROLS_REPEAT_TOOLTIP: 'Repeat some statements several times.',
+	CONTROLS_WHILEUNTIL_TOOLTIP_WHILE: 'While a value is true, then do some statements.',
+	CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL: 'While a value is false, then do some statements.',
+	CONTROLS_FOR_TOOLTIP: 'Count from the start number to the end number by the specified interval.',
+	CONTROLS_FLOW_STATEMENTS_WARNING: 'Warning: This block may only be used within a loop.',
 
 	// Math block messages
+	MATH_NUMBER_HELPURL: 'https://en.wikipedia.org/wiki/Number',
 	MATH_NUMBER_TOOLTIP: 'A number.',
 	MATH_ARITHMETIC_OPERATOR_ADD: '+',
 	MATH_ARITHMETIC_OPERATOR_MINUS: '-',
@@ -183,6 +197,12 @@ window.languageManager.loadMessages('en', {
 	MATH_IS_WHOLE: 'is whole',
 	MATH_IS_POSITIVE: 'is positive',
 	MATH_IS_NEGATIVE: 'is negative',
+	MATH_ARITHMETIC_HELPURL: 'https://en.wikipedia.org/wiki/Arithmetic',
+	MATH_ARITHMETIC_TOOLTIP_ADD: 'Return the sum of the two numbers.',
+	MATH_ARITHMETIC_TOOLTIP_MINUS: 'Return the difference of the two numbers.',
+	MATH_ARITHMETIC_TOOLTIP_MULTIPLY: 'Return the product of the two numbers.',
+	MATH_ARITHMETIC_TOOLTIP_DIVIDE: 'Return the quotient of the two numbers.',
+	MATH_ARITHMETIC_TOOLTIP_POWER: 'Return the first number raised to the power of the second number.',
 
 	// Text block messages
 	TEXT_JOIN_TITLE_CREATEWITH: 'create text with',
@@ -196,6 +216,11 @@ window.languageManager.loadMessages('en', {
 	TEXT_CHARAT_FIRST: 'get first letter',
 	TEXT_CHARAT_LAST: 'get last letter',
 	TEXT_CHARAT_RANDOM: 'get random letter',
+	TEXT_JOIN_TOOLTIP: 'Create a piece of text by joining together any number of items.',
+	TEXT_APPEND_VARIABLE: 'item',
+	TEXT_APPEND_TOOLTIP: 'Append some text to variable "%1".',
+	TEXT_LENGTH_TOOLTIP: 'Returns the number of letters (including spaces) in the provided text.',
+	TEXT_ISEMPTY_TOOLTIP: 'Returns true if the provided text is empty.',
 
 	// List block messages
 	LISTS_CREATE_EMPTY_TITLE: 'create empty list',
@@ -211,32 +236,7 @@ window.languageManager.loadMessages('en', {
 	LISTS_GET_INDEX_FIRST: 'first',
 	LISTS_GET_INDEX_LAST: 'last',
 	LISTS_GET_INDEX_RANDOM: 'random',
-
-	// Additional core messages
-	LOGIC_NEGATE_HELPURL: 'https://github.com/google/blockly/wiki/Logic#not',
-	LOGIC_NEGATE_TOOLTIP: 'Returns true if the input is false. Returns false if the input is true.',
-	LOGIC_OPERATION_TOOLTIP_AND: 'Return true if both inputs are true.',
-	LOGIC_OPERATION_TOOLTIP_OR: 'Return true if at least one of the inputs is true.',
-	LOGIC_BOOLEAN_TOOLTIP: 'Returns either true or false.',
-
-	// Math Operations
-	MATH_ARITHMETIC_HELPURL: 'https://en.wikipedia.org/wiki/Arithmetic',
-	MATH_ARITHMETIC_TOOLTIP_ADD: 'Return the sum of the two numbers.',
-	MATH_ARITHMETIC_TOOLTIP_MINUS: 'Return the difference of the two numbers.',
-	MATH_ARITHMETIC_TOOLTIP_MULTIPLY: 'Return the product of the two numbers.',
-	MATH_ARITHMETIC_TOOLTIP_DIVIDE: 'Return the quotient of the two numbers.',
-	MATH_ARITHMETIC_TOOLTIP_POWER: 'Return the first number raised to the power of the second number.',
-
-	// Text Operations
-	TEXT_JOIN_TOOLTIP: 'Create a piece of text by joining together any number of items.',
-	TEXT_APPEND_VARIABLE: 'item',
-	TEXT_APPEND_TOOLTIP: 'Append some text to variable "%1".',
-	TEXT_LENGTH_TOOLTIP: 'Returns the number of letters (including spaces) in the provided text.',
-	TEXT_ISEMPTY_TOOLTIP: 'Returns true if the provided text is empty.',
-
-	// Lists Operations
 	LISTS_CREATE_WITH_TOOLTIP: 'Create a list with any number of items.',
-	LISTS_CREATE_WITH_INPUT_WITH: 'create list with',
 	LISTS_CREATE_EMPTY_TOOLTIP: 'Returns a list, of length 0, containing no data records',
 	LISTS_LENGTH_TOOLTIP: 'Returns the length of a list.',
 	LISTS_ISEMPTY_TOOLTIP: 'Returns true if the list is empty.',
@@ -245,13 +245,6 @@ window.languageManager.loadMessages('en', {
 	VARIABLES_SET: 'set %1 to %2',
 	VARIABLES_GET: '%1',
 	VARIABLES_DEFAULT_NAME: 'item',
-
-	// Loops
-	CONTROLS_REPEAT_TOOLTIP: 'Do some statements several times.',
-	CONTROLS_WHILEUNTIL_TOOLTIP_WHILE: 'While a value is true, then do some statements.',
-	CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL: 'While a value is false, then do some statements.',
-	CONTROLS_FOR_TOOLTIP: 'Count from the start number to the end number by the specified interval.',
-	CONTROLS_FLOW_STATEMENTS_WARNING: 'Warning: This block may only be used within a loop.',
 
 	// If conditions
 	CONTROLS_IF_TOOLTIP_1: 'If a value is true, then do some statements.',
@@ -271,14 +264,12 @@ window.languageManager.loadMessages('en', {
 	PROCEDURES_DEFRETURN_RETURN: 'return',
 	PROCEDURES_DEFRETURN_TOOLTIP: 'Creates a function with an output.',
 	PROCEDURES_DEFRETURN_COMMENT: 'Describe this function...',
+	PROCEDURES_DEFRETURN_PROCEDURE: 'do something with return',
+	PROCEDURES_DEFRETURN_DO: '',
 	PROCEDURES_CALLNORETURN_HELPURL: 'https://en.wikipedia.org/wiki/Subroutine',
 	PROCEDURES_CALLNORETURN_TOOLTIP: 'Run the user-defined function.',
 	PROCEDURES_CALLRETURN_HELPURL: 'https://en.wikipedia.org/wiki/Subroutine',
 	PROCEDURES_CALLRETURN_TOOLTIP: 'Run the user-defined function and use its output.',
-
-	// Additional Logic Block Messages
-	LOGIC_COMPARE_HELPURL: 'https://en.wikipedia.org/wiki/Inequality_(mathematics)',
-	MATH_NUMBER_HELPURL: 'https://en.wikipedia.org/wiki/Number',
 
 	// Seven Segment Display
 	SEVEN_SEGMENT_DISPLAY: 'Seven Segment Display',
@@ -287,7 +278,6 @@ window.languageManager.loadMessages('en', {
 	SEVEN_SEGMENT_NUMBER: 'Number (0-9):',
 	SEVEN_SEGMENT_DECIMAL_POINT: 'Decimal Point',
 	SEVEN_SEGMENT_TOOLTIP: 'Display a number (0-9) on a seven-segment display with optional decimal point.',
-
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Set seven segment display pins',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'Configure pins for each segment (A-G) and decimal point (DP) of the seven-segment display.',
