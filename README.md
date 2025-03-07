@@ -41,6 +41,9 @@ A Visual Studio Code extension that provides a visual programming interface usin
 - 🧩 **Rich Block Categories**
   - Arduino I/O Operations
   - Functions with parameter support
+    - Custom threshold functions with analog input support
+    - Configurable sensor pins and threshold values
+    - Multiple output types (numeric, boolean, string)
   - Variables with rename/delete capabilities
   - Lists and Arrays
   - Logic Operations
@@ -54,6 +57,7 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Board configuration management
   - Code generation to Arduino (.cpp) files
   - Automatic PlatformIO configuration generation
+  - Automatic platformio.ini preview mode management
 
 - 🛠 **Development Features**
   - Real-time code generation

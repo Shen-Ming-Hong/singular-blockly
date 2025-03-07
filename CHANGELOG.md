@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.1.4] - 2025-03-07
+
 ### 新增 Added
 
 - 增加門檻值函式積木，可以建立基於類比輸入的門檻觸發函式
@@ -20,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       Added "Get Threshold Function" block for retrieving function computation results
   - 支援數字、布林值與字串輸出型別
       Support for numeric, boolean, and string output types
+- 新增自動關閉 platformio.ini 預覽模式功能，當開啟 Blockly 編輯器時，會自動監控並關閉預覽模式的 platformio.ini 檔案
+  Added automatic closing of platformio.ini preview mode, which monitors and closes the platformio.ini file in preview mode when the Blockly editor is opened
 
 ## [0.1.3] - 2025-02-28
 
