@@ -49,6 +49,15 @@ window.languageManager.loadMessages('hu', {
 	ARDUINO_MODE_INPUT: 'BEMENET',
 	ARDUINO_MODE_OUTPUT: 'KIMENET',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'nál',
+	THRESHOLD_VALUE: 'ha >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'különben',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Küszöbérték funkció konfigurálása. Amikor az analóg bemenet meghaladja a küszöbértéket, az első kimenetet adja vissza, különben a második kimenetet.',
+	THRESHOLD_TOOLTIP_READ: 'Küszöbérték funkció értékének lekérdezése',
+
 	// Duration block
 	DURATION_REPEAT: 'Ismétlés',
 	DURATION_TIME: 'idő',

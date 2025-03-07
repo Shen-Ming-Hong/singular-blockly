@@ -49,6 +49,15 @@ window.languageManager.loadMessages('cs', {
 	ARDUINO_MODE_INPUT: 'VSTUP',
 	ARDUINO_MODE_OUTPUT: 'VÝSTUP',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'na',
+	THRESHOLD_VALUE: 'pokud >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'jinak',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Nastaví funkci prahové hodnoty. Když analogový vstup překročí prahovou hodnotu, vrátí první výstup, jinak vrátí druhý výstup.',
+	THRESHOLD_TOOLTIP_READ: 'Získá hodnotu z funkce prahové hodnoty',
+
 	// Duration block
 	DURATION_REPEAT: 'Opakovat po',
 	DURATION_TIME: 'čas',

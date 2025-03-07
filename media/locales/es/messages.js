@@ -49,6 +49,15 @@ window.languageManager.loadMessages('es', {
 	ARDUINO_MODE_INPUT: 'ENTRADA',
 	ARDUINO_MODE_OUTPUT: 'SALIDA',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'en',
+	THRESHOLD_VALUE: 'si >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'sino',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Configura una función de umbral. Cuando la entrada analógica excede el umbral, devuelve la primera salida, de lo contrario devuelve la segunda.',
+	THRESHOLD_TOOLTIP_READ: 'Obtener el valor de la función de umbral',
+
 	// Duration block
 	DURATION_REPEAT: 'Repetir por',
 	DURATION_TIME: 'tiempo',

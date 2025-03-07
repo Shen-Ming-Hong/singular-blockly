@@ -49,6 +49,15 @@ window.languageManager.loadMessages('ru', {
 	ARDUINO_MODE_INPUT: 'ВХОД',
 	ARDUINO_MODE_OUTPUT: 'ВЫХОД',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'на',
+	THRESHOLD_VALUE: 'если >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'иначе',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Настраивает функцию порога. Когда аналоговый вход превышает порог, возвращает первый выход, иначе возвращает второй выход.',
+	THRESHOLD_TOOLTIP_READ: 'Получает значение из пороговой функции',
+
 	// Duration block
 	DURATION_REPEAT: 'Повторять в течение',
 	DURATION_TIME: 'времени',

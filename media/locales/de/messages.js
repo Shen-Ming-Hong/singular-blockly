@@ -49,6 +49,15 @@ window.languageManager.loadMessages('de', {
 	ARDUINO_MODE_INPUT: 'EINGANG',
 	ARDUINO_MODE_OUTPUT: 'AUSGANG',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'bei',
+	THRESHOLD_VALUE: 'wenn >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'sonst',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Konfiguriert eine Schwellenwertfunktion. Wenn der Analogeingang den Schwellenwert überschreitet, wird der erste Ausgabewert zurückgegeben, andernfalls der zweite.',
+	THRESHOLD_TOOLTIP_READ: 'Ruft den Wert der Schwellenwertfunktion ab',
+
 	// Duration block
 	DURATION_REPEAT: 'Wiederhole für',
 	DURATION_TIME: 'Zeit',

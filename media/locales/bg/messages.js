@@ -49,6 +49,15 @@ window.languageManager.loadMessages('bg', {
 	ARDUINO_MODE_INPUT: 'ВХОД',
 	ARDUINO_MODE_OUTPUT: 'ИЗХОД',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'на',
+	THRESHOLD_VALUE: 'ако >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'иначе',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Конфигурира функция за праг. Когато аналоговият вход надвиши прага, връща първия изход, в противен случай връща втория.',
+	THRESHOLD_TOOLTIP_READ: 'Получава стойност от функцията за праг',
+
 	// Duration block
 	DURATION_REPEAT: 'Повтори за',
 	DURATION_TIME: 'време',

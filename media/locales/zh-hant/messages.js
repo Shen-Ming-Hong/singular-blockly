@@ -49,6 +49,14 @@ window.languageManager.loadMessages('zh-hant', {
 	ARDUINO_MODE_INPUT: '輸入',
 	ARDUINO_MODE_OUTPUT: '輸出',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: '於',
+	THRESHOLD_VALUE: '若 >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: '否則',
+	THRESHOLD_TOOLTIP_SETUP: '設定一個門檻值函式。當類比輸入值超過門檻值時返回第一個輸出值，否則返回第二個輸出值',
+	THRESHOLD_TOOLTIP_READ: '讀取指定門檻值函式的結果',
+
 	// Duration block
 	DURATION_REPEAT: '重複執行',
 	DURATION_TIME: '時間',

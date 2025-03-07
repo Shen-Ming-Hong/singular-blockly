@@ -49,6 +49,15 @@ window.languageManager.loadMessages('ja', {
 	ARDUINO_MODE_INPUT: '入力',
 	ARDUINO_MODE_OUTPUT: '出力',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'で',
+	THRESHOLD_VALUE: 'もし >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'それ以外',
+	THRESHOLD_TOOLTIP_SETUP:
+		'しきい値関数を設定します。アナログ入力がしきい値を超えたとき最初の出力を返し、それ以外の場合は2番目の出力を返します。',
+	THRESHOLD_TOOLTIP_READ: 'しきい値関数から値を取得',
+
 	// Duration block
 	DURATION_REPEAT: '繰り返し',
 	DURATION_TIME: '時間',

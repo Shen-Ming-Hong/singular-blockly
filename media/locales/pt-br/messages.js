@@ -88,6 +88,15 @@ window.languageManager.loadMessages('pt-br', {
 	LOOP_BREAK: 'interromper',
 	LOOP_CONTINUE: 'continuar',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'em',
+	THRESHOLD_VALUE: 'se >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'senão',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Configura uma função de limiar. Quando a entrada analógica excede o limiar, retorna a primeira saída, caso contrário, retorna a segunda saída.',
+	THRESHOLD_TOOLTIP_READ: 'Obter o valor da função de limiar',
+
 	// Math Block Labels
 	MATH_NUMBER: 'número',
 	MATH_ARITHMETIC: 'aritmética',

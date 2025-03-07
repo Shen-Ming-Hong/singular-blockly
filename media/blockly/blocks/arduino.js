@@ -434,3 +434,60 @@ Blockly.Blocks['seven_segment_pins'] = {
 		}
 	},
 };
+
+Blockly.Blocks['threshold_function_setup'] = {
+	init: function () {
+		this.appendDummyInput().appendField(new Blockly.FieldTextInput('Func0'), 'NAME');
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('THRESHOLD_PIN'))
+			.appendField(
+				new Blockly.FieldDropdown(function () {
+					return window.getAnalogPinOptions();
+				}),
+				'PIN'
+			);
+		this.appendValueInput('THRESHOLD')
+			.setCheck('Number')
+			.appendField(window.languageManager.getMessage('THRESHOLD_VALUE'))
+			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">450</field></shadow>'));
+		this.appendValueInput('HIGH_VALUE')
+			.appendField(window.languageManager.getMessage('THRESHOLD_HIGH_VALUE'))
+			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">1</field></shadow>'));
+		this.appendValueInput('LOW_VALUE')
+			.appendField(window.languageManager.getMessage('THRESHOLD_LOW_VALUE'))
+			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">0</field></shadow>'));
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour('#00979C');
+		this.setTooltip(window.languageManager.getMessage('THRESHOLD_TOOLTIP_SETUP'));
+	},
+};
+
+Blockly.Blocks['threshold_function_read'] = {
+	init: function () {
+		this.appendDummyInput().appendField(
+			new Blockly.FieldDropdown(() => {
+				// Make sure we have access to the workspace
+				const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+				if (!workspace) {
+					return [['Func0', 'Func0']];
+				}
+
+				// Find all threshold function setup blocks to get available function names
+				const blocks = workspace.getAllBlocks(false);
+				const functions = blocks
+					.filter(block => block.type === 'threshold_function_setup')
+					.map(block => {
+						const name = block.getFieldValue('NAME');
+						return [name, name];
+					});
+				return functions.length > 0 ? functions : [['Func0', 'Func0']];
+			}),
+			'FUNC'
+		);
+		this.setOutput(true, null);
+		this.setColour('#00979C');
+		this.setTooltip(window.languageManager.getMessage('THRESHOLD_TOOLTIP_READ'));
+	},
+};

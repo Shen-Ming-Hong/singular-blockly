@@ -49,6 +49,15 @@ window.languageManager.loadMessages('en', {
 	ARDUINO_MODE_INPUT: 'INPUT',
 	ARDUINO_MODE_OUTPUT: 'OUTPUT',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'at',
+	THRESHOLD_VALUE: 'if >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'else',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Configure a threshold function. When analog input exceeds threshold, returns first output, otherwise returns second output.',
+	THRESHOLD_TOOLTIP_READ: 'Get value from the threshold function',
+
 	// Duration block
 	DURATION_REPEAT: 'Repeat for',
 	DURATION_TIME: 'time',

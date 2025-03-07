@@ -49,6 +49,15 @@ window.languageManager.loadMessages('tr', {
 	ARDUINO_MODE_INPUT: 'GİRİŞ',
 	ARDUINO_MODE_OUTPUT: 'ÇIKIŞ',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'üzerinde',
+	THRESHOLD_VALUE: 'eğer >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'değilse',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Bir eşik fonksiyonu yapılandır. Analog giriş eşiği aştığında ilk çıktıyı, aksi takdirde ikinci çıktıyı döndürür.',
+	THRESHOLD_TOOLTIP_READ: 'Eşik fonksiyonundan değer al',
+
 	// Duration block
 	DURATION_REPEAT: 'Tekrarla',
 	DURATION_TIME: 'süre',

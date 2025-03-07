@@ -49,6 +49,15 @@ window.languageManager.loadMessages('fr', {
 	ARDUINO_MODE_INPUT: 'ENTRÉE',
 	ARDUINO_MODE_OUTPUT: 'SORTIE',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'à',
+	THRESHOLD_VALUE: 'si >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'sinon',
+	THRESHOLD_TOOLTIP_SETUP:
+		"Configure une fonction de seuil. Lorsque l'entrée analogique dépasse le seuil, renvoie la première sortie, sinon renvoie la seconde sortie.",
+	THRESHOLD_TOOLTIP_READ: 'Obtenir la valeur de la fonction de seuil',
+
 	// Duration block
 	DURATION_REPEAT: 'Répéter pendant',
 	DURATION_TIME: 'temps',

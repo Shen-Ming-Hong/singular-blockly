@@ -49,6 +49,15 @@ window.languageManager.loadMessages('ko', {
 	ARDUINO_MODE_INPUT: '입력',
 	ARDUINO_MODE_OUTPUT: '출력',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: '에서',
+	THRESHOLD_VALUE: '만약 >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: '아니면',
+	THRESHOLD_TOOLTIP_SETUP:
+		'임계값 함수를 구성합니다. 아날로그 입력이 임계값을 초과하면 첫 번째 출력을 반환하고, 그렇지 않으면 두 번째 출력을 반환합니다.',
+	THRESHOLD_TOOLTIP_READ: '임계값 함수에서 값 가져오기',
+
 	// Duration block
 	DURATION_REPEAT: '반복',
 	DURATION_TIME: '시간',

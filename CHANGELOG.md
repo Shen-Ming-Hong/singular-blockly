@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+### 新增 Added
+
+- 增加門檻值函式積木，可以建立基於類比輸入的門檻觸發函式
+  Added threshold function blocks, allowing creation of threshold-triggered functions based on analog inputs
+  - 新增「設定門檻值函式」積木，用於設定感測器腳位、門檻值與輸出值
+      Added "Set Threshold Function" block for configuring sensor pin, threshold value, and output values
+  - 新增「讀取門檻值函式」積木，用於取得函式運算結果
+      Added "Get Threshold Function" block for retrieving function computation results
+  - 支援數字、布林值與字串輸出型別
+      Support for numeric, boolean, and string output types
+
 ## [0.1.3] - 2025-02-28
 
 ### 已更新 Updated

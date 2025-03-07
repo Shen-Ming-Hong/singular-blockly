@@ -55,6 +55,15 @@ window.languageManager.loadMessages('it', {
 	DURATION_MS: 'millisecondi',
 	DURATION_DO: 'esegui',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'su',
+	THRESHOLD_VALUE: 'se >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'altrimenti',
+	THRESHOLD_TOOLTIP_SETUP:
+		"Configura una funzione di soglia. Quando l'ingresso analogico supera la soglia, restituisce il primo output, altrimenti restituisce il secondo output.",
+	THRESHOLD_TOOLTIP_READ: 'Ottieni il valore dalla funzione di soglia',
+
 	// Print block
 	TEXT_PRINT_SHOW: 'stampa',
 	TEXT_PRINT_NEWLINE: 'nuova riga',

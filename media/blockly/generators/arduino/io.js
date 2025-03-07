@@ -218,3 +218,42 @@ byte sevenSegmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9}; // 預設引腳連接
 		return ''; // 發生錯誤時返回空字串
 	}
 };
+
+window.arduinoGenerator.forBlock['threshold_function_setup'] = function (block) {
+	const name = block.getFieldValue('NAME');
+	const pin = block.getFieldValue('PIN');
+	const threshold = window.arduinoGenerator.valueToCode(block, 'THRESHOLD', window.arduinoGenerator.ORDER_ATOMIC) || '450';
+	const highValue = window.arduinoGenerator.valueToCode(block, 'HIGH_VALUE', window.arduinoGenerator.ORDER_ATOMIC) || '1';
+	const lowValue = window.arduinoGenerator.valueToCode(block, 'LOW_VALUE', window.arduinoGenerator.ORDER_ATOMIC) || '0';
+
+	// 根據高/低輸出值判斷返回類型
+	let returnType = 'int'; // 預設為 int
+
+	// 檢查高值和低值是否有引號（字串）
+	if ((highValue.startsWith('"') && highValue.endsWith('"')) || (lowValue.startsWith('"') && lowValue.endsWith('"'))) {
+		returnType = 'String';
+	}
+	// 檢查是否包含小數點（浮點數）
+	else if (highValue.includes('.') || lowValue.includes('.')) {
+		returnType = 'float';
+	}
+	// 檢查是否為布林值
+	else if ((highValue === 'true' || highValue === 'false') && (lowValue === 'true' || lowValue === 'false')) {
+		returnType = 'boolean';
+	}
+
+	// Generate the threshold function with proper return type
+	window.arduinoGenerator.functions_[`${name}_read`] = `
+${returnType} ${name}_read() {
+    int sensorValue = analogRead(${pin});
+    return (sensorValue > ${threshold}) ? ${highValue} : ${lowValue};
+}`;
+
+	return ''; // Setup block doesn't generate inline code
+};
+
+window.arduinoGenerator.forBlock['threshold_function_read'] = function (block) {
+	const func = block.getFieldValue('FUNC');
+	const code = `${func}_read()`;
+	return [code, window.arduinoGenerator.ORDER_ATOMIC];
+};

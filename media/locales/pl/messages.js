@@ -49,6 +49,15 @@ window.languageManager.loadMessages('pl', {
 	ARDUINO_MODE_INPUT: 'WEJŚCIE',
 	ARDUINO_MODE_OUTPUT: 'WYJŚCIE',
 
+	// Threshold Function Block Labels
+	THRESHOLD_PIN: 'na',
+	THRESHOLD_VALUE: 'jeśli >',
+	THRESHOLD_HIGH_VALUE: '=',
+	THRESHOLD_LOW_VALUE: 'w przeciwnym razie',
+	THRESHOLD_TOOLTIP_SETUP:
+		'Konfiguruje funkcję progową. Gdy wejście analogowe przekroczy próg, zwraca pierwszą wartość wyjściową, w przeciwnym razie zwraca drugą wartość.',
+	THRESHOLD_TOOLTIP_READ: 'Pobiera wartość z funkcji progowej',
+
 	// Duration block
 	DURATION_REPEAT: 'Powtarzaj przez',
 	DURATION_TIME: 'czas',

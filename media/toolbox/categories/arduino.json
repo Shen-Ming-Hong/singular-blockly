@@ -41,6 +41,14 @@
 		},
 		{
 			"kind": "block",
+			"type": "threshold_function_setup"
+		},
+		{
+			"kind": "block",
+			"type": "threshold_function_read"
+		},
+		{
+			"kind": "block",
 			"type": "seven_segment_pins"
 		},
 		{
