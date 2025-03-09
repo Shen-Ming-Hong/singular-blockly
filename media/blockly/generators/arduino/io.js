@@ -5,10 +5,60 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// 建立一個全局物件來追蹤腳位模式的歷史記錄
+window.arduinoGenerator.pinModes_ = {};
+
+// 標準化腳位名稱的輔助函數 (將 'A0', 'A1', 'D0', 'D1' 等轉換為內部一致的格式)
+window.arduinoGenerator.normalizePin = function (pin) {
+	// 先將 pin 轉為字串以確保一致性
+	let pinStr = String(pin);
+
+	// 處理腳位名稱格式，例如將 'D3' 中的數字部分提取出來
+	if (pinStr.startsWith('D')) {
+		return pinStr.substring(1); // 移除 'D' 前綴，保留數字部分
+	}
+
+	// 類比腳位保持原樣 (例如 "A0" 保持為 "A0")
+	return pinStr;
+};
+
+// 新增檢查腳位模式的輔助函數
+window.arduinoGenerator.checkPinMode = function (pin, requiredMode) {
+	// 標準化腳位名稱，確保一致性比較
+	const normalizedPin = window.arduinoGenerator.normalizePin(pin);
+
+	// 檢查腳位歷史模式
+	const currentMode = window.arduinoGenerator.pinModes_[normalizedPin];
+
+	// 如果已有模式且不同於所需模式，新增警告但允許使用
+	if (currentMode && currentMode !== requiredMode) {
+		// 只在腳位模式衝突時才添加警告
+		window.arduinoGenerator.warnings_.push(
+			`提示：腳位 ${pin} 已被設為 ${currentMode} 模式，現在正被用作 ${requiredMode} 模式。若在同一程式流程中，可能需要重新設定腳位模式。`
+		);
+
+		// 更新腳位模式為當前要求的模式
+		window.arduinoGenerator.pinModes_[normalizedPin] = requiredMode;
+
+		// 添加腳位模式切換程式碼 (這裡選擇不自動添加模式切換，僅提供警告)
+		// window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, ${requiredMode}); // 自動切換腳位模式`);
+		return false; // 返回 false 表示有衝突
+	} else if (!currentMode) {
+		// 如果之前沒設定過模式，則記錄並自動加入設定
+		window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, ${requiredMode}); // 自動設定腳位模式`);
+		window.arduinoGenerator.pinModes_[normalizedPin] = requiredMode;
+	}
+
+	return true; // 返回 true 表示沒有衝突
+};
+
 window.arduinoGenerator.forBlock['arduino_digital_write'] = function (block) {
 	try {
 		const pin = block.getFieldValue('PIN');
 		let value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_ATOMIC) || 'LOW';
+
+		// 檢查腳位模式 - 寫入需要 OUTPUT 模式
+		window.arduinoGenerator.checkPinMode(pin, 'OUTPUT');
 
 		// 處理文字值，移除引號
 		if (value.startsWith('"') && value.endsWith('"')) {
@@ -34,6 +84,9 @@ window.arduinoGenerator.forBlock['arduino_digital_write'] = function (block) {
 window.arduinoGenerator.forBlock['arduino_digital_read'] = function (block) {
 	try {
 		const pin = block.getFieldValue('PIN');
+		// 檢查腳位模式 - 讀取需要 INPUT 模式
+		window.arduinoGenerator.checkPinMode(pin, 'INPUT');
+
 		return [`digitalRead(${pin})`, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (e) {
 		console.log('Digital read block code generation error:', e);
@@ -46,6 +99,9 @@ window.arduinoGenerator.forBlock['arduino_analog_write'] = function (block) {
 		const pin = block.getFieldValue('PIN');
 		const currentBoard = window.getCurrentBoard();
 		let value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_ATOMIC) || '0';
+
+		// 檢查腳位模式 - 類比寫入需要 OUTPUT 模式
+		window.arduinoGenerator.checkPinMode(pin, 'OUTPUT');
 
 		// 根據當前開發板獲取範圍
 		const range = window.getAnalogOutputRange();
@@ -79,6 +135,9 @@ window.arduinoGenerator.forBlock['arduino_analog_write'] = function (block) {
 window.arduinoGenerator.forBlock['arduino_analog_read'] = function (block) {
 	try {
 		const pin = block.getFieldValue('PIN');
+		// 檢查腳位模式 - 類比讀取需要 INPUT 模式
+		window.arduinoGenerator.checkPinMode(pin, 'INPUT');
+
 		return [`analogRead(${pin})`, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (e) {
 		console.log('Analog read block code generation error:', e);
@@ -106,6 +165,8 @@ window.arduinoGenerator.forBlock['arduino_pullup'] = function (block) {
 		const pin = block.getFieldValue('PIN');
 		// 添加到 setup 區塊的程式碼
 		window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, INPUT_PULLUP);`);
+		// 記錄腳位模式
+		window.arduinoGenerator.pinModes_[pin] = 'INPUT_PULLUP';
 		return '';
 	} catch (e) {
 		console.log('Pullup block code generation error:', e);
@@ -119,6 +180,8 @@ window.arduinoGenerator.forBlock['arduino_pin_mode'] = function (block) {
 		const mode = block.getFieldValue('MODE');
 		// 添加到 setup 區塊的程式碼
 		window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, ${mode});`);
+		// 記錄腳位模式
+		window.arduinoGenerator.pinModes_[pin] = mode;
 		return '';
 	} catch (e) {
 		console.log('Pin mode block code generation error:', e);
@@ -142,6 +205,8 @@ byte sevenSegmentPins[] = {${pinValues.join(', ')}};
   // 設置七段顯示器引腳為輸出模式
   for (int i = 0; i < 8; i++) {
     pinMode(sevenSegmentPins[i], OUTPUT);
+    // 記錄這些腳位是 OUTPUT 模式
+    // 無法直接獲取腳位編號，七段顯示器會使用 digitalWrite
   }
         `);
 
@@ -207,6 +272,7 @@ byte sevenSegmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9}; // 預設引腳連接
   // 設置七段顯示器引腳為輸出模式
   for (int i = 0; i < 8; i++) {
     pinMode(sevenSegmentPins[i], OUTPUT);
+    // 預設腳位不可直接透過索引獲取，因此不記錄特定狀態
   }
             `);
 		}
@@ -225,6 +291,9 @@ window.arduinoGenerator.forBlock['threshold_function_setup'] = function (block) 
 	const threshold = window.arduinoGenerator.valueToCode(block, 'THRESHOLD', window.arduinoGenerator.ORDER_ATOMIC) || '450';
 	const highValue = window.arduinoGenerator.valueToCode(block, 'HIGH_VALUE', window.arduinoGenerator.ORDER_ATOMIC) || '1';
 	const lowValue = window.arduinoGenerator.valueToCode(block, 'LOW_VALUE', window.arduinoGenerator.ORDER_ATOMIC) || '0';
+
+	// 檢查腳位模式 - 類比讀取需要 INPUT 模式
+	window.arduinoGenerator.checkPinMode(pin, 'INPUT');
 
 	// 根據高/低輸出值判斷返回類型
 	let returnType = 'int'; // 預設為 int

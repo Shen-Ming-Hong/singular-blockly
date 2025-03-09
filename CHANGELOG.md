@@ -10,6 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.1.5] - 2025-03-09
+
+### 新增 Added
+
+- 新增腳位模式追蹤系統，提升 Arduino 積木使用體驗
+  Added pin mode tracking system for enhanced Arduino block experience
+  - 自動記錄每個腳位的模式 (INPUT、OUTPUT、INPUT_PULLUP)
+    Automatically tracks pin modes (INPUT, OUTPUT, INPUT_PULLUP)
+  - 偵測腳位模式衝突並顯示警告
+    Detects pin mode conflicts and displays warnings
+  - 產生程式碼時自動添加必要的 pinMode 設定
+    Automatically adds necessary pinMode configurations during code generation
+  - 程式碼產生時顯示腳位模式警告訊息
+    Displays pin mode warning messages during code generation
+
 ## [0.1.4] - 2025-03-07
 
 ### 新增 Added
