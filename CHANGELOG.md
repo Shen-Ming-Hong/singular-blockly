@@ -10,6 +10,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+### 新增 Added
+
+### 已修復 Fixed
+
+### 已更新 Updated
+
+### 已修改 Changed
+
+## [0.1.6] - 2025-03-19
+
+### 已更新 Updated
+
+- 優化 PlatformIO 整合功能
+  Enhanced PlatformIO integration
+  - 移除舊有的監控系統
+    Removed legacy monitoring system
+  - 新增自動配置 PlatformIO 設定功能，預設停用自動開啟 platformio.ini
+    Added automatic PlatformIO configuration, disabled auto-opening of platformio.ini by default
+  - 改進工作區檢查邏輯
+    Improved workspace validation logic
+
 ## [0.1.5] - 2025-03-09
 
 ### 新增 Added

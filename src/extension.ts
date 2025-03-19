@@ -14,9 +14,6 @@ export function activate(context: vscode.ExtensionContext) {
 	try {
 		console.log('Registering commands...');
 
-		// 用於追踪監控狀態
-		let monitorInterval: NodeJS.Timeout | undefined;
-
 		// Add activity bar click listener
 		const activityBarListener = vscode.window.registerWebviewViewProvider('singular-blockly-view', {
 			resolveWebviewView: async webviewView => {
@@ -37,11 +34,19 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 
 		const openBlocklyEdit = vscode.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
-			// 確保先清除任何現有的監控
-			if (monitorInterval) {
-				clearInterval(monitorInterval);
-				monitorInterval = undefined;
+			// 檢查工作區
+			const workspaceFolders = vscode.workspace.workspaceFolders;
+			if (!workspaceFolders) {
+				vscode.window.showErrorMessage('Please open a project folder first!', 'Open Folder').then(selection => {
+					if (selection === 'Open Folder') {
+						vscode.commands.executeCommand('workbench.action.files.openFolder');
+					}
+				});
+				return;
 			}
+
+			// 設定 PlatformIO 不自動開啟 ini 檔案
+			await configurePlatformIOSettings(workspaceFolders[0].uri.fsPath);
 
 			// Save panel as global variable for later reference
 			let currentPanel: vscode.WebviewPanel | undefined = vscode.window.createWebviewPanel(
@@ -57,76 +62,6 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			);
 
-			// 檢查並關閉預覽模式的 platformio.ini
-			const checkAndClosePlatformioPreview = async () => {
-				try {
-					// 如果 panel 已經不存在，則停止監控
-					if (!currentPanel) {
-						if (monitorInterval) {
-							clearInterval(monitorInterval);
-							monitorInterval = undefined;
-						}
-						return;
-					}
-
-					const tabs = vscode.window.tabGroups.all.flatMap(group => group.tabs);
-					for (const tab of tabs) {
-						// 使用正確的 preview 屬性
-						if (tab.label === 'platformio.ini' && tab.isPreview === true) {
-							console.log('Found platformio.ini in preview mode, activating and closing it...');
-
-							// 先保存當前活動的編輯器
-							const currentActiveEditor = vscode.window.activeTextEditor;
-
-							// 首先查找 platformio.ini 文件的 URI
-							const workspaceFolders = vscode.workspace.workspaceFolders;
-							if (workspaceFolders) {
-								const workspaceRoot = workspaceFolders[0].uri.fsPath;
-								const platformioIniPath = path.join(workspaceRoot, 'platformio.ini');
-								const platformioUri = vscode.Uri.file(platformioIniPath);
-
-								// 先開啟該檔案使其成為活動視窗
-								try {
-									// 使用 showTextDocument 開啟檔案
-									await vscode.window.showTextDocument(platformioUri);
-									// 現在 platformio.ini 是活動視窗，可以安全關閉
-									await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-
-									// 如果原本有其他編輯器開啟，恢復顯示它
-									if (currentActiveEditor && currentPanel) {
-										await currentPanel.reveal(vscode.ViewColumn.One, true);
-									}
-								} catch (err) {
-									console.error('Error activating platformio.ini before closing:', err);
-								}
-							}
-							break;
-						}
-					}
-				} catch (error) {
-					console.error('Error in platformio.ini monitor:', error);
-					// 發生錯誤時停止監控以避免進一步問題
-					if (monitorInterval) {
-						clearInterval(monitorInterval);
-						monitorInterval = undefined;
-					}
-				}
-			};
-
-			// 開始監控，但使用較低的頻率以減少效能開銷
-			monitorInterval = setInterval(checkAndClosePlatformioPreview, 300); // 300ms 檢查一次
-
-			// Listen for panel close event
-			currentPanel.onDidDispose(() => {
-				console.log('Blockly panel disposed, stopping platformio.ini monitor');
-				currentPanel = undefined;
-				// 停止監控
-				if (monitorInterval) {
-					clearInterval(monitorInterval);
-					monitorInterval = undefined;
-				}
-			});
-
 			// Ensure the panel is always visible at the front
 			async function ensurePanelVisible() {
 				if (currentPanel) {
@@ -135,15 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			// Ensure the blockly directory exists
-			const workspaceFolders = vscode.workspace.workspaceFolders;
-			if (!workspaceFolders) {
-				vscode.window.showErrorMessage('Please open a project folder first!', 'Open Folder').then(selection => {
-					if (selection === 'Open Folder') {
-						vscode.commands.executeCommand('workbench.action.files.openFolder');
-					}
-				});
-				return;
-			}
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
 
 			currentPanel.webview.html = await getWebviewContent(context, currentPanel.webview);
 
@@ -348,6 +275,44 @@ export function activate(context: vscode.ExtensionContext) {
 	} catch (error) {
 		console.error('Error starting Singular Blockly:', error);
 		vscode.window.showErrorMessage(`Failed to start Singular Blockly: ${error}`);
+	}
+}
+
+// 新增函數：設定 PlatformIO IDE 不自動開啟 platformio.ini 檔案
+async function configurePlatformIOSettings(workspacePath: string) {
+	try {
+		// 檢查 .vscode 目錄是否存在，若不存在則建立
+		const vscodeDir = path.join(workspacePath, '.vscode');
+		if (!fs.existsSync(vscodeDir)) {
+			await fs.promises.mkdir(vscodeDir, { recursive: true });
+		}
+
+		// 檢查 settings.json 是否存在
+		const settingsPath = path.join(vscodeDir, 'settings.json');
+		let settings = {};
+
+		// 讀取現有設定 (如果存在)
+		if (fs.existsSync(settingsPath)) {
+			const settingsContent = await fs.promises.readFile(settingsPath, 'utf8');
+			try {
+				settings = JSON.parse(settingsContent);
+			} catch (e) {
+				// 如果 JSON 無效，就使用空物件
+				console.error('Invalid settings.json, will override with new settings');
+			}
+		}
+
+		// 設定 PlatformIO 不自動開啟 ini 檔案
+		settings = {
+			...settings,
+			'platformio-ide.autoOpenPlatformIOIniFile': false,
+		};
+
+		// 寫入設定檔
+		await fs.promises.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+		console.log('PlatformIO settings updated: disabled auto-open platformio.ini');
+	} catch (error) {
+		console.error('Failed to configure PlatformIO settings:', error);
 	}
 }
 
