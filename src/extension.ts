@@ -306,6 +306,7 @@ async function configurePlatformIOSettings(workspacePath: string) {
 		settings = {
 			...settings,
 			'platformio-ide.autoOpenPlatformIOIniFile': false,
+			'platformio-ide.disablePIOHomeStartup': true,
 		};
 
 		// 寫入設定檔

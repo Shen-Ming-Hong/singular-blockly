@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
-## [0.1.6] - 2025-03-19
+## [0.1.7] - 2025-03-19
 
 ### 已更新 Updated
 
@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Enhanced PlatformIO integration
   - 移除舊有的監控系統
     Removed legacy monitoring system
+  - 新增預設停用 PlatformIO 首頁啟動功能
+    Added default setting to disable PlatformIO Home startup
   - 新增自動配置 PlatformIO 設定功能，預設停用自動開啟 platformio.ini
     Added automatic PlatformIO configuration, disabled auto-opening of platformio.ini by default
   - 改進工作區檢查邏輯
