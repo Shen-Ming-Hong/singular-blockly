@@ -69,9 +69,6 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			}
 
-			// Ensure the blockly directory exists
-			const workspaceRoot = workspaceFolders[0].uri.fsPath;
-
 			currentPanel.webview.html = await getWebviewContent(context, currentPanel.webview);
 
 			// Ensure the src directory exists

@@ -13,6 +13,10 @@
             messages: {},
             loadMessages: function (locale, messages) {
                 this.messages[locale] = messages;
+
+                // 自動同步翻譯到 Blockly.Msg
+                this.syncToBlocklyMsg(locale, messages);
+
                 // 觸發語言檔案載入事件
                 window.dispatchEvent(new CustomEvent('messageLoaded', {
                     detail: { locale: locale }
@@ -29,6 +33,10 @@
                     return;
                 }
                 this.currentLanguage = locale;
+
+                // 切換語言時也同步翻譯到 Blockly.Msg
+                this.syncToBlocklyMsg(locale, this.messages[locale]);
+
                 // 觸發語言變更事件
                 window.dispatchEvent(new CustomEvent('languageChanged', {
                     detail: { language: locale }
@@ -36,6 +44,24 @@
                 // 重新渲染工作區
                 if (Blockly && Blockly.getMainWorkspace()) {
                     Blockly.getMainWorkspace().render();
+                }
+            },
+            syncToBlocklyMsg: function (locale, messages) {
+                // 確保 Blockly 和 Blockly.Msg 已經定義
+                if (typeof Blockly !== 'undefined' && Blockly.Msg) {
+                    console.log(`同步 ${locale} 翻譯到 Blockly.Msg`);
+
+                    // 遍歷所有翻譯項目
+                    for (const key in messages) {
+                        // 如果 Blockly.Msg 中已經有這個鍵，就覆蓋它
+                        // 如果沒有，就新增這個鍵
+                        Blockly.Msg[key] = messages[key];
+                    }
+                } else {
+                    // 如果 Blockly 還未載入，設置一個短暫的延遲再試一次
+                    setTimeout(() => {
+                        this.syncToBlocklyMsg(locale, messages);
+                    }, 200);
                 }
             }
         };

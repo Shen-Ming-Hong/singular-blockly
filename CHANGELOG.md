@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.1.8] - 2025-03-31
+
+### 已修改 Changed
+
+- 改進多語言處理機制
+  Improved multilingual processing mechanism
+  - 新增 `syncToBlocklyMsg` 函數，自動同步翻譯到 Blockly.Msg
+    Added `syncToBlocklyMsg` function to automatically sync translations to Blockly.Msg
+  - 移除舊版覆蓋 Blockly 訊息的方法
+    Removed legacy method for overriding Blockly messages
+  - 優化語言切換和載入時的翻譯同步處理
+    Enhanced translation synchronization handling during language switching and loading
+
 ## [0.1.7] - 2025-03-19
 
 ### 已更新 Updated
