@@ -123,7 +123,7 @@ window.languageManager.loadMessages('zh-hant', {
 	NEW: '新增',
 	ADD_COMMENT: '新增註解',
 	REMOVE_COMMENT: '移除註解',
-	DUPLICATE_BLOCK: '複製',
+	DUPLICATE_BLOCK: '複製並貼上',
 	HELP: '說明',
 	UNDO: '復原',
 	REDO: '重做',

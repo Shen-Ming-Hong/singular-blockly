@@ -11,6 +11,55 @@ Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCat
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
 
+	// 新增：從自定義翻譯覆蓋 Blockly 內建翻譯的特定項目
+	function overrideBlocklyMessages() {
+		const currentLang = window.languageManager.currentLanguage;
+		const customMessages = window.languageManager.messages[currentLang] || {};
+
+		// 檢查是否有特定翻譯需要覆蓋內建翻譯
+		if (customMessages.DUPLICATE_BLOCK) {
+			Blockly.Msg.DUPLICATE_BLOCK = customMessages.DUPLICATE_BLOCK;
+		}
+
+		// 可以在這裡添加其他需要覆蓋的項目
+	}
+
+	// 監聽語言載入事件
+	window.addEventListener('messageLoaded', function (e) {
+		if (e.detail && e.detail.locale === window.languageManager.currentLanguage) {
+			// 當正確的語言載入時，覆蓋 Blockly 訊息
+			console.log('語言檔案載入完成，覆蓋 Blockly 訊息');
+			overrideBlocklyMessages();
+		}
+	});
+
+	// 初始化完成後立即覆蓋一次
+	setTimeout(overrideBlocklyMessages, 1000);
+
+	// 每當右鍵選單顯示時，重新覆蓋文字
+	document.addEventListener('mousedown', function (e) {
+		if (e.button === 2) {
+			// 右鍵點擊
+			setTimeout(overrideBlocklyMessages, 100);
+		}
+	});
+
+	// 監聽右鍵選單出現事件
+	const observer = new MutationObserver(function (mutations) {
+		mutations.forEach(function (mutation) {
+			if (mutation.addedNodes.length > 0) {
+				for (let node of mutation.addedNodes) {
+					if (node.classList && node.classList.contains('blocklyContextMenu')) {
+						setTimeout(overrideBlocklyMessages, 10);
+					}
+				}
+			}
+		});
+	});
+
+	// 監視整個文檔的變化
+	observer.observe(document.body, { childList: true, subtree: true });
+
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
 	const toolboxConfig = await response.json();
