@@ -112,6 +112,25 @@ window.languageManager.loadMessages('de', {
 	MATH_MAP_TOOLTIP:
 		'Bildet eine Zahl von einem Bereich auf einen anderen ab. Zum Beispiel wird map(Wert, 0, 1023, 0, 255) einen analogen Eingang auf einen 8-Bit-PWM-Ausgang skalieren.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Ordner öffnen',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Bitte öffnen Sie zuerst einen Projektordner!',
+	VSCODE_FAILED_SAVE_FILE: 'Datei konnte nicht gespeichert werden: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Aktualisierung von platformio.ini fehlgeschlagen: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Arbeitsbereichsstatus konnte nicht gespeichert werden: {0}',
+	VSCODE_FAILED_START: 'Start von Singular Blockly fehlgeschlagen: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Möchten Sie die Variable "{0}" wirklich löschen?',
+	VSCODE_BOARD_UPDATED: 'Board-Konfiguration aktualisiert auf: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Bitte Fenster neu laden, um die Einrichtung abzuschließen',
+	VSCODE_ENTER_VARIABLE_NAME: 'Neuen Variablennamen eingeben',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Neuen Variablennamen eingeben (aktuell: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'Variablenname darf nicht leer sein',
+	VSCODE_VARIABLE_NAME_INVALID: 'Variablenname darf nur Buchstaben, Zahlen und Unterstriche enthalten und nicht mit einer Zahl beginnen',
+	VSCODE_RELOAD: 'Neu laden',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Abbrechen',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly-Editor öffnen',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Bitte zuerst ein Board auswählen',
 	ERROR_INVALID_PIN: 'Ungültige Pin-Nummer',

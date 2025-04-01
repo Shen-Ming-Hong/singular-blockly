@@ -13,7 +13,7 @@ window.languageManager.loadMessages('bg', {
 	// UI Elements
 	BLOCKS_TAB: 'Блокове',
 	CODE_TAB: 'Код',
-	BOARD_SELECT_LABEL: 'Изберете платка:',
+	BOARD_SELECT_LABEL: 'Избор на платка:',
 
 	// Board Names
 	BOARD_NONE: 'Няма',
@@ -90,7 +90,7 @@ window.languageManager.loadMessages('bg', {
 
 	// Loop Block Labels
 	LOOP_REPEAT: 'повтори',
-	LOOP_WHILE: 'докато',
+	LOOP_WHILE: 'докато',/
 	LOOP_UNTIL: 'докато не',
 	LOOP_FOR: 'за',
 	LOOP_FOREACH: 'за всеки',
@@ -111,6 +111,25 @@ window.languageManager.loadMessages('bg', {
 	MATH_MAP_VALUE: 'преобразувай',
 	MATH_MAP_TOOLTIP:
 		'Преобразува число от един диапазон в друг. Например, map(стойност, 0, 1023, 0, 255) ще мащабира аналогов вход към 8-битов PWM изход.',
+
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Отваряне на папка',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Моля, първо отворете папка на проекта!',
+	VSCODE_FAILED_SAVE_FILE: 'Неуспешно записване на файла: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Неуспешно актуализиране на platformio.ini: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Не може да се запише състоянието на работната среда: {0}',
+	VSCODE_FAILED_START: 'Неуспешно стартиране на Singular Blockly: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Наистина ли искате да изтриете променливата "{0}"?',
+	VSCODE_BOARD_UPDATED: 'Конфигурацията на платката е актуализирана до: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Моля, презаредете прозореца, за да завършите настройката',
+	VSCODE_ENTER_VARIABLE_NAME: 'Въведете име на новата променлива',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Въведете ново име на променливата (текущо: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'Името на променливата не може да бъде празно',
+	VSCODE_VARIABLE_NAME_INVALID: 'Името на променливата може да съдържа само букви, цифри и подчертаване, и не може да започва с цифра',
+	VSCODE_RELOAD: 'Презареждане',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Отказ',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Отваряне на редактора Blockly',
 
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Моля, първо изберете платка',

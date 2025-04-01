@@ -112,6 +112,25 @@ window.languageManager.loadMessages('pt-br', {
 	MATH_MAP_TOOLTIP:
 		'Remapeia um número de um intervalo para outro. Por exemplo, map(valor, 0, 1023, 0, 255) escalonará uma entrada analógica para uma saída PWM de 8 bits.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Abrir Pasta',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Por favor, abra primeiro uma pasta de projeto!',
+	VSCODE_FAILED_SAVE_FILE: 'Falha ao salvar o arquivo: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Falha ao atualizar platformio.ini: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Não foi possível salvar o estado do espaço de trabalho: {0}',
+	VSCODE_FAILED_START: 'Falha ao iniciar o Singular Blockly: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Tem certeza que deseja excluir a variável "{0}"?',
+	VSCODE_BOARD_UPDATED: 'Configuração da placa atualizada para: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Por favor, recarregue a janela para completar a configuração',
+	VSCODE_ENTER_VARIABLE_NAME: 'Digite o nome da nova variável',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Digite o novo nome da variável (atual: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'O nome da variável não pode estar vazio',
+	VSCODE_VARIABLE_NAME_INVALID: 'O nome da variável só pode conter letras, números e sublinhados, e não pode começar com um número',
+	VSCODE_RELOAD: 'Recarregar',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Cancelar',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Abrir Editor Blockly',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Por favor, selecione uma placa primeiro',
 	ERROR_INVALID_PIN: 'Número de pino inválido',

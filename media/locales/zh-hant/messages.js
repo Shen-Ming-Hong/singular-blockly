@@ -110,6 +110,25 @@ window.languageManager.loadMessages('zh-hant', {
 	MATH_MAP_VALUE: '映射',
 	MATH_MAP_TOOLTIP: '將數值從一個範圍重新映射到另一個範圍。例如：map(值, 0, 1023, 0, 255) 會將類比輸入值縮放為 8 位元 PWM 輸出。',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: '開啟資料夾',
+	VSCODE_PLEASE_OPEN_PROJECT: '請先開啟專案資料夾！',
+	VSCODE_FAILED_SAVE_FILE: '儲存檔案失敗： {0}',
+	VSCODE_FAILED_UPDATE_INI: '更新 platformio.ini 失敗： {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: '無法儲存工作區狀態： {0}',
+	VSCODE_FAILED_START: '啟動 Singular Blockly 失敗： {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: '確定要刪除變數「{0}」嗎？',
+	VSCODE_BOARD_UPDATED: '開發板配置已更新為：{0}',
+	VSCODE_RELOAD_REQUIRED: '，請重新載入視窗以完成設定',
+	VSCODE_ENTER_VARIABLE_NAME: '輸入變數名稱',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: '輸入新的變數名稱（目前：{0}）',
+	VSCODE_VARIABLE_NAME_EMPTY: '變數名稱不能為空',
+	VSCODE_VARIABLE_NAME_INVALID: '變數名稱只能包含字母、數字和底線，且不能以數字開頭',
+	VSCODE_RELOAD: '重新載入',
+	VSCODE_OK: '確定',
+	VSCODE_CANCEL: '取消',
+	VSCODE_OPEN_BLOCKLY_EDITOR: '開啟 Blockly 編輯器',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: '請先選擇開發板',
 	ERROR_INVALID_PIN: '無效的腳位編號',

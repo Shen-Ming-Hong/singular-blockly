@@ -112,11 +112,30 @@ window.languageManager.loadMessages('pl', {
 	MATH_MAP_TOOLTIP:
 		'Mapuje liczbę z jednego zakresu na inny. Na przykład, map(wartość, 0, 1023, 0, 255) przeskaluje wejście analogowe do wyjścia PWM 8-bitowego.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Otwórz folder',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Proszę najpierw otworzyć folder projektu!',
+	VSCODE_FAILED_SAVE_FILE: 'Nie udało się zapisać pliku: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Nie udało się zaktualizować platformio.ini: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Nie można zapisać stanu obszaru roboczego: {0}',
+	VSCODE_FAILED_START: 'Nie udało się uruchomić Singular Blockly: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Czy na pewno chcesz usunąć zmienną "{0}"?',
+	VSCODE_BOARD_UPDATED: 'Konfiguracja płytki zaktualizowana do: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Proszę przeładować okno, aby zakończyć konfigurację',
+	VSCODE_ENTER_VARIABLE_NAME: 'Wprowadź nazwę nowej zmiennej',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Wprowadź nową nazwę zmiennej (obecna: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'Nazwa zmiennej nie może być pusta',
+	VSCODE_VARIABLE_NAME_INVALID: 'Nazwa zmiennej może zawierać tylko litery, cyfry i podkreślenia, i nie może zaczynać się od cyfry',
+	VSCODE_RELOAD: 'Przeładuj',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Anuluj',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Otwórz edytor Blockly',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Proszę najpierw wybrać płytkę',
 	ERROR_INVALID_PIN: 'Nieprawidłowy numer pinu',
 	ERROR_INVALID_VALUE: 'Nieprawidłowa wartość',
-	ERROR_MISSING_TRANSLATION: 'Brak tłumaczenia',
+	ERROR_MISSING_TRANSLATION: 'Brakujące tłumaczenie',
 
 	// Blockly core messages
 	ADD: 'dodaj',

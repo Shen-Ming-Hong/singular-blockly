@@ -18,6 +18,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.2.0] - 2025-04-01
+
+### 新增 Added
+
+- 新增確認對話框機制，改善使用者體驗
+  Added confirmation dialog mechanism for better user experience
+  - 使用 VSCode API 顯示對話框，取代原生瀏覽器對話框
+    Using VSCode API for dialogs instead of native browser dialogs
+  - 優化方塊刪除確認流程
+    Enhanced block deletion confirmation process
+
+### 已更新 Updated
+
+- 增強多語言支援系統
+  Enhanced internationalization support system
+  - 在所有語言檔中新增 VS Code UI 相關訊息翻譯
+    Added VS Code UI related message translations in all language files
+  - 實作完整的 UI 訊息本地化機制
+    Implemented complete UI message localization mechanism
+
+### 已修改 Changed
+
+- 改進方塊整理後的儲存機制
+  Improved block organization and saving mechanism
+  - 方塊整理 (Clean Up) 後自動保存工作區狀態
+    Automatically save workspace state after block cleanup
+  - 優化方塊拖曳與座標變更的儲存邏輯
+    Optimized block dragging and coordinate change saving logic
+
 ## [0.1.8] - 2025-03-31
 
 ### 已修改 Changed

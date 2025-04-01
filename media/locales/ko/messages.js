@@ -112,8 +112,27 @@ window.languageManager.loadMessages('ko', {
 	MATH_MAP_TOOLTIP:
 		'숫자를 한 범위에서 다른 범위로 다시 매핑합니다. 예를 들어, map(value, 0, 1023, 0, 255)는 아날로그 입력을 8비트 PWM 출력으로 스케일링합니다.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: '폴더 열기',
+	VSCODE_PLEASE_OPEN_PROJECT: '먼저 프로젝트 폴더를 열어주세요!',
+	VSCODE_FAILED_SAVE_FILE: '파일 저장 실패: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'platformio.ini 업데이트 실패: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: '작업 공간 상태 저장 실패: {0}',
+	VSCODE_FAILED_START: 'Singular Blockly 시작 실패: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: '변수 "{0}"을(를) 삭제하시겠습니까?',
+	VSCODE_BOARD_UPDATED: '보드 구성이 업데이트됨: {0}',
+	VSCODE_RELOAD_REQUIRED: '，설정을 완료하려면 창을 다시 로드하세요',
+	VSCODE_ENTER_VARIABLE_NAME: '새 변수 이름 입력',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: '새 변수 이름 입력 (현재: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: '변수 이름은 비워둘 수 없습니다',
+	VSCODE_VARIABLE_NAME_INVALID: '변수 이름은 문자, 숫자, 밑줄만 포함할 수 있으며 숫자로 시작할 수 없습니다',
+	VSCODE_RELOAD: '다시 로드',
+	VSCODE_OK: '확인',
+	VSCODE_CANCEL: '취소',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly 편집기 열기',
+
 	// Error Messages
-	ERROR_BOARD_NOT_SELECTED: '보드를 먼저 선택하세요',
+	ERROR_BOARD_NOT_SELECTED: '먼저 보드를 선택해주세요',
 	ERROR_INVALID_PIN: '잘못된 핀 번호',
 	ERROR_INVALID_VALUE: '잘못된 값',
 	ERROR_MISSING_TRANSLATION: '번역 누락',

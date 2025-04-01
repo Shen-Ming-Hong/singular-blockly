@@ -112,10 +112,30 @@ window.languageManager.loadMessages('ru', {
 	MATH_MAP_TOOLTIP:
 		'Преобразует число из одного диапазона в другой. Например, map(значение, 0, 1023, 0, 255) преобразует аналоговый вход в 8-битный ШИМ выход.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Открыть Папку',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Пожалуйста, сначала откройте папку проекта!',
+	VSCODE_FAILED_SAVE_FILE: 'Не удалось сохранить файл: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Не удалось обновить platformio.ini: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Не удалось сохранить состояние рабочего пространства: {0}',
+	VSCODE_FAILED_START: 'Не удалось запустить Singular Blockly: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Вы уверены, что хотите удалить переменную "{0}"?',
+	VSCODE_BOARD_UPDATED: 'Конфигурация платы обновлена до: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Пожалуйста, перезагрузите окно для завершения настройки',
+	VSCODE_ENTER_VARIABLE_NAME: 'Введите имя новой переменной',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Введите новое имя переменной (текущее: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'Имя переменной не может быть пустым',
+	VSCODE_VARIABLE_NAME_INVALID:
+		'Имя переменной может содержать только буквы, цифры и символы подчеркивания, и не может начинаться с цифры',
+	VSCODE_RELOAD: 'Перезагрузить',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Отмена',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Открыть редактор Blockly',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Пожалуйста, сначала выберите плату',
-	ERROR_INVALID_PIN: 'Неверный номер пина',
-	ERROR_INVALID_VALUE: 'Неверное значение',
+	ERROR_INVALID_PIN: 'Недопустимый номер контакта',
+	ERROR_INVALID_VALUE: 'Недопустимое значение',
 	ERROR_MISSING_TRANSLATION: 'Перевод отсутствует',
 
 	// Blockly core messages

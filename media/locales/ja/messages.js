@@ -111,6 +111,25 @@ window.languageManager.loadMessages('ja', {
 	MATH_MAP_VALUE: '値の変換',
 	MATH_MAP_TOOLTIP: 'ある範囲の値を別の範囲に変換します',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'フォルダを開く',
+	VSCODE_PLEASE_OPEN_PROJECT: 'まず、プロジェクトフォルダを開いてください！',
+	VSCODE_FAILED_SAVE_FILE: 'ファイルの保存に失敗しました： {0}',
+	VSCODE_FAILED_UPDATE_INI: 'platformio.iniの更新に失敗しました： {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'ワークスペースの状態を保存できません： {0}',
+	VSCODE_FAILED_START: 'Singular Blocklyの起動に失敗しました： {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: '変数「{0}」を削除してもよろしいですか？',
+	VSCODE_BOARD_UPDATED: 'ボード設定を更新しました： {0}',
+	VSCODE_RELOAD_REQUIRED: '，設定を完了するにはウィンドウを再読み込みしてください',
+	VSCODE_ENTER_VARIABLE_NAME: '新しい変数名を入力してください',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: '新しい変数名を入力してください (現在: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: '変数名は空にできません',
+	VSCODE_VARIABLE_NAME_INVALID: '変数名には文字、数字、アンダースコアのみ使用でき、数字で始めることはできません',
+	VSCODE_RELOAD: '再読み込み',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'キャンセル',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blocklyエディタを開く',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'まず、ボードを選択してください',
 	ERROR_INVALID_PIN: '無効なピン番号',

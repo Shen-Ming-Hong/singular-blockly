@@ -112,11 +112,30 @@ window.languageManager.loadMessages('cs', {
 	MATH_MAP_TOOLTIP:
 		'Mapuje číslo z jednoho rozsahu do druhého. Například map(hodnota, 0, 1023, 0, 255) převede analogový vstup na 8-bitový PWM výstup.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Otevřít složku',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Prosím, nejprve otevřete složku projektu!',
+	VSCODE_FAILED_SAVE_FILE: 'Nepodařilo se uložit soubor: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Nepodařilo se aktualizovat platformio.ini: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Nelze uložit stav pracovního prostoru: {0}',
+	VSCODE_FAILED_START: 'Nepodařilo se spustit Singular Blockly: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Opravdu chcete smazat proměnnou "{0}"?',
+	VSCODE_BOARD_UPDATED: 'Konfigurace desky aktualizována na: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Prosím, znovu načtěte okno pro dokončení nastavení',
+	VSCODE_ENTER_VARIABLE_NAME: 'Zadejte název nové proměnné',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Zadejte nový název proměnné (aktuální: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'Název proměnné nemůže být prázdný',
+	VSCODE_VARIABLE_NAME_INVALID: 'Název proměnné může obsahovat pouze písmena, číslice a podtržítka a nemůže začínat číslicí',
+	VSCODE_RELOAD: 'Znovu načíst',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Zrušit',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Otevřít editor Blockly',
+
 	// Error Messages
-	ERROR_BOARD_NOT_SELECTED: 'Prosím nejprve vyberte desku',
+	ERROR_BOARD_NOT_SELECTED: 'Prosím, nejprve vyberte desku',
 	ERROR_INVALID_PIN: 'Neplatné číslo pinu',
 	ERROR_INVALID_VALUE: 'Neplatná hodnota',
-	ERROR_MISSING_TRANSLATION: 'Chybí překlad',
+	ERROR_MISSING_TRANSLATION: 'Chybějící překlad',
 
 	// Blockly core messages
 	ADD: 'přidat',

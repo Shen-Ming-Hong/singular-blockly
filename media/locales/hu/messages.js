@@ -112,9 +112,28 @@ window.languageManager.loadMessages('hu', {
 	MATH_MAP_TOOLTIP:
 		'Egy számot leképez egyik tartományból egy másikra. Például a map(érték, 0, 1023, 0, 255) egy analóg bemenetet 8-bites PWM kimenetre skáláz.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Mappa megnyitása',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Kérjük, először nyisson meg egy projektmappát!',
+	VSCODE_FAILED_SAVE_FILE: 'Nem sikerült menteni a fájlt: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Nem sikerült frissíteni a platformio.ini fájlt: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Nem sikerült menteni a munkaterület állapotát: {0}',
+	VSCODE_FAILED_START: 'A Singular Blockly indítása nem sikerült: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Biztosan törli a(z) "{0}" változót?',
+	VSCODE_BOARD_UPDATED: 'A panel konfigurációja frissítve: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Kérjük, töltse újra az ablakot a beállítás befejezéséhez',
+	VSCODE_ENTER_VARIABLE_NAME: 'Adja meg az új változó nevét',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Adja meg az új változó nevét (jelenlegi: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'A változó neve nem lehet üres',
+	VSCODE_VARIABLE_NAME_INVALID: 'A változó neve csak betűket, számokat és aláhúzásjeleket tartalmazhat, és nem kezdődhet számmal',
+	VSCODE_RELOAD: 'Újratöltés',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Mégse',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly szerkesztő megnyitása',
+
 	// Error Messages
-	ERROR_BOARD_NOT_SELECTED: 'Kérem válasszon panelt először',
-	ERROR_INVALID_PIN: 'Érvénytelen pin szám',
+	ERROR_BOARD_NOT_SELECTED: 'Kérjük, először válasszon egy panelt',
+	ERROR_INVALID_PIN: 'Érvénytelen tűszám',
 	ERROR_INVALID_VALUE: 'Érvénytelen érték',
 	ERROR_MISSING_TRANSLATION: 'Hiányzó fordítás',
 

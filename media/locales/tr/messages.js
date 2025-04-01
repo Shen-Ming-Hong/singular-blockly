@@ -112,11 +112,30 @@ window.languageManager.loadMessages('tr', {
 	MATH_MAP_TOOLTIP:
 		'Bir sayıyı bir aralıktan diğerine eşler. Örneğin, map(değer, 0, 1023, 0, 255) bir analog girişi 8-bit PWM çıkışına ölçeklendirir.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Klasör Aç',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Lütfen önce bir proje klasörü açın!',
+	VSCODE_FAILED_SAVE_FILE: 'Dosya kaydedilemedi: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'platformio.ini güncellenemedi: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Çalışma alanı durumu kaydedilemedi: {0}',
+	VSCODE_FAILED_START: 'Singular Blockly başlatılamadı: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: '"{0}" değişkenini silmek istediğinizden emin misiniz?',
+	VSCODE_BOARD_UPDATED: 'Kart yapılandırması güncellendi: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Kurulumu tamamlamak için lütfen pencereyi yeniden yükleyin',
+	VSCODE_ENTER_VARIABLE_NAME: 'Yeni değişken adını girin',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Yeni değişken adını girin (mevcut: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'Değişken adı boş olamaz',
+	VSCODE_VARIABLE_NAME_INVALID: 'Değişken adı yalnızca harf, rakam ve alt çizgi içerebilir ve bir rakamla başlayamaz',
+	VSCODE_RELOAD: 'Yeniden Yükle',
+	VSCODE_OK: 'Tamam',
+	VSCODE_CANCEL: 'İptal',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly Düzenleyici Aç',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Lütfen önce bir kart seçin',
 	ERROR_INVALID_PIN: 'Geçersiz pin numarası',
 	ERROR_INVALID_VALUE: 'Geçersiz değer',
-	ERROR_MISSING_TRANSLATION: 'Çeviri eksik',
+	ERROR_MISSING_TRANSLATION: 'Eksik çeviri',
 
 	// Blockly core messages
 	ADD: 'ekle',

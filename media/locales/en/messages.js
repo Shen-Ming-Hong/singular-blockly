@@ -112,11 +112,30 @@ window.languageManager.loadMessages('en', {
 	MATH_MAP_TOOLTIP:
 		'Re-maps a number from one range to another. For example, map(value, 0, 1023, 0, 255) will scale an analog input to 8-bit PWM output.',
 
+	// VS Code UI Messages
+	VSCODE_OPEN_FOLDER: 'Open Folder',
+	VSCODE_PLEASE_OPEN_PROJECT: 'Please open a project folder first!',
+	VSCODE_FAILED_SAVE_FILE: 'Failed to save file: {0}',
+	VSCODE_FAILED_UPDATE_INI: 'Failed to update platformio.ini: {0}',
+	VSCODE_UNABLE_SAVE_WORKSPACE: 'Unable to save workspace state: {0}',
+	VSCODE_FAILED_START: 'Failed to start Singular Blockly: {0}',
+	VSCODE_CONFIRM_DELETE_VARIABLE: 'Are you sure you want to delete variable "{0}"?',
+	VSCODE_BOARD_UPDATED: 'Board configuration updated to: {0}',
+	VSCODE_RELOAD_REQUIRED: '，Please reload window to complete setup',
+	VSCODE_ENTER_VARIABLE_NAME: 'Enter new variable name',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Enter new variable name (current: {0})',
+	VSCODE_VARIABLE_NAME_EMPTY: 'Variable name cannot be empty',
+	VSCODE_VARIABLE_NAME_INVALID: 'Variable name can only contain letters, numbers and underscore, and cannot start with a number',
+	VSCODE_RELOAD: 'Reload',
+	VSCODE_OK: 'OK',
+	VSCODE_CANCEL: 'Cancel',
+	VSCODE_OPEN_BLOCKLY_EDITOR: 'Open Blockly Editor',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Please select a board first',
 	ERROR_INVALID_PIN: 'Invalid pin number',
 	ERROR_INVALID_VALUE: 'Invalid value',
-	ERROR_MISSING_TRANSLATION: 'Translation missing',
+	ERROR_MISSING_TRANSLATION: 'Missing translation',
 
 	// Blockly core messages
 	ADD: 'add',
