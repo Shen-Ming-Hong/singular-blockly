@@ -8,6 +8,33 @@ const vscode = acquireVsCodeApi();
 // 註冊工具箱元件
 Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCategory.registrationName, Blockly.ToolboxCategory);
 
+// 用來儲存等待回應的確認對話框回調函數
+const pendingConfirmCallbacks = new Map();
+let confirmCounter = 0;
+
+// 覆蓋 window.confirm 方法，改用 VSCode API 顯示通知
+window.confirm = function (message) {
+	// 每次呼叫都產生唯一的 ID
+	const confirmId = confirmCounter++;
+
+	// 創建一個 Promise 來等待使用者的回應
+	const confirmPromise = new Promise(resolve => {
+		// 將此 Promise 的 resolve 函數儲存到 Map 中，供稍後回應時使用
+		pendingConfirmCallbacks.set(confirmId, resolve);
+
+		// 將確認請求發送給 VSCode 擴展，包含唯一 ID
+		vscode.postMessage({
+			command: 'confirmDialog',
+			message: message,
+			confirmId: confirmId,
+		});
+	});
+
+	// 立即返回 false，讓 Blockly 不要立即執行刪除動作
+	// 實際的刪除操作會在用戶點選"OK"後，透過另一種方式執行
+	return false;
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
 
@@ -141,13 +168,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 單一的工作區變更監聽器
 	workspace.addChangeListener(event => {
+		// 忽略拖動中的 UI 事件
 		if (event.isUiEvent) {
 			return;
-		} // 忽略 UI 事件
+		}
 
 		// 更新程式碼
 		if (
-			event.type === Blockly.Events.BLOCK_MOVE || // 移除條件，讓所有移動都觸發更新
+			event.type === Blockly.Events.BLOCK_MOVE ||
 			event.type === Blockly.Events.BLOCK_CHANGE ||
 			event.type === Blockly.Events.BLOCK_DELETE ||
 			event.type === Blockly.Events.BLOCK_CREATE
@@ -194,10 +222,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 					command: 'updateCode',
 					code: code,
 				});
-				// 只在實際的變更（非拖動中）時保存工作區狀態
-				if (event.type !== Blockly.Events.BLOCK_MOVE || event.oldParentId !== undefined || event.newParentId !== undefined) {
-					saveWorkspaceState();
-				}
+
+				// 無條件保存所有方塊移動事件，確保座標變更被儲存
+				saveWorkspaceState();
 			} catch (err) {
 				console.log('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
 			}
@@ -286,6 +313,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}
 				break;
+			case 'confirmDialogResult':
+				// 處理從VSCode傳回的確認對話框結果
+				if (message.confirmId !== undefined) {
+					const callback = pendingConfirmCallbacks.get(message.confirmId);
+					if (callback) {
+						// 從等待清單中移除這個回調
+						pendingConfirmCallbacks.delete(message.confirmId);
+
+						// 如果使用者確認要刪除方塊
+						if (message.confirmed) {
+							// 執行刪除工作區中所有方塊的操作
+							workspace.clear();
+
+							// 更新程式碼和保存工作區狀態
+							const code = arduinoGenerator.workspaceToCode(workspace);
+							vscode.postMessage({
+								command: 'updateCode',
+								code: code,
+							});
+							saveWorkspaceState();
+						}
+					}
+				}
+				break;
 			// ...保留其他既有的 case...
 			case 'loadWorkspace':
 				try {
@@ -324,6 +375,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始觸發一次 resize
 	handleResize();
+
+	// 添加監聽右鍵選單中的「整理方塊」操作
+	const originalCleanUp = Blockly.WorkspaceSvg.prototype.cleanUp;
+	if (originalCleanUp) {
+		Blockly.WorkspaceSvg.prototype.cleanUp = function () {
+			// 呼叫原始的清理函數
+			originalCleanUp.call(this);
+
+			// 當清理完成後，延遲一點時間儲存工作區狀態
+			// 這確保了「整理方塊」操作後座標變更會被正確儲存
+			setTimeout(() => {
+				const state = Blockly.serialization.workspaces.save(this);
+				vscode.postMessage({
+					command: 'saveWorkspace',
+					state: state,
+					board: boardSelect.value,
+				});
+				console.log('方塊整理完成，已儲存工作區狀態');
+			}, 300);
+		};
+	}
 
 	// 覆寫變數下拉選單的創建方法
 	Blockly.FieldVariable.dropdownCreate = function () {

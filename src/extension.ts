@@ -8,6 +8,84 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// 用於翻譯的 UI 訊息
+interface UIMessages {
+	[key: string]: string;
+}
+
+// 暫存已載入的訊息
+let cachedMessages: UIMessages = {};
+let currentLanguage: string = 'en';
+
+// 從多語言檔案中讀取 UI 訊息
+async function loadUIMessages(context: vscode.ExtensionContext): Promise<UIMessages> {
+	try {
+		const vscodeLanguage = vscode.env.language;
+		const blocklyLanguage = mapVSCodeLangToBlockly(vscodeLanguage);
+
+		// 如果已經載入此語言，則直接返回已快取的訊息
+		if (cachedMessages && currentLanguage === blocklyLanguage) {
+			return cachedMessages;
+		}
+
+		// 找到對應的語言檔案
+		const langFilePath = path.join(context.extensionPath, 'media/locales', blocklyLanguage, 'messages.js');
+
+		// 如果找不到對應的語言檔，則使用英文
+		if (!fs.existsSync(langFilePath)) {
+			const enFilePath = path.join(context.extensionPath, 'media/locales/en/messages.js');
+			if (!fs.existsSync(enFilePath)) {
+				return {}; // 如果連英文檔案都找不到，返回空物件
+			}
+
+			// 讀取英文語言檔
+			const content = await fs.promises.readFile(enFilePath, 'utf8');
+			cachedMessages = extractMessagesFromJs(content);
+			currentLanguage = 'en';
+		} else {
+			// 讀取對應語言檔
+			const content = await fs.promises.readFile(langFilePath, 'utf8');
+			cachedMessages = extractMessagesFromJs(content);
+			currentLanguage = blocklyLanguage;
+		}
+
+		return cachedMessages;
+	} catch (error) {
+		console.error('Error loading UI messages:', error);
+		return {}; // 發生錯誤時返回空物件
+	}
+}
+
+// 從 JS 檔案中提取訊息
+function extractMessagesFromJs(content: string): UIMessages {
+	const messages: UIMessages = {};
+
+	// 使用正則表達式尋找 VSCODE_ 開頭的訊息
+	const regex = /VSCODE_(\w+):\s*['"](.+?)['"]/g;
+	let match;
+
+	while ((match = regex.exec(content)) !== null) {
+		const key = 'VSCODE_' + match[1];
+		const value = match[2];
+		messages[key] = value;
+	}
+
+	return messages;
+}
+
+// 獲取翻譯後的 UI 訊息
+async function getLocalizedMessage(context: vscode.ExtensionContext, key: string, ...args: any[]): Promise<string> {
+	const messages = await loadUIMessages(context);
+	let message = messages[key] || key; // 如果找不到翻譯，則使用 key 本身
+
+	// 替換參數 {0}, {1}, 等
+	args.forEach((arg, index) => {
+		message = message.replace(new RegExp(`\\{${index}\\}`, 'g'), String(arg));
+	});
+
+	return message;
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Starting Singular Blockly extension...');
 
@@ -37,8 +115,10 @@ export function activate(context: vscode.ExtensionContext) {
 			// 檢查工作區
 			const workspaceFolders = vscode.workspace.workspaceFolders;
 			if (!workspaceFolders) {
-				vscode.window.showErrorMessage('Please open a project folder first!', 'Open Folder').then(selection => {
-					if (selection === 'Open Folder') {
+				const errorMsg = await getLocalizedMessage(context, 'VSCODE_PLEASE_OPEN_PROJECT');
+				const openFolderBtn = await getLocalizedMessage(context, 'VSCODE_OPEN_FOLDER');
+				vscode.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
+					if (selection === openFolderBtn) {
 						vscode.commands.executeCommand('workbench.action.files.openFolder');
 					}
 				});
@@ -83,8 +163,10 @@ export function activate(context: vscode.ExtensionContext) {
 					// Get the current workspace
 					const workspaceFolders = vscode.workspace.workspaceFolders;
 					if (!workspaceFolders) {
-						vscode.window.showErrorMessage('Please open a project folder first!', 'Open Folder').then(selection => {
-							if (selection === 'Open Folder') {
+						const errorMsg = await getLocalizedMessage(context, 'VSCODE_PLEASE_OPEN_PROJECT');
+						const openFolderBtn = await getLocalizedMessage(context, 'VSCODE_OPEN_FOLDER');
+						vscode.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
+							if (selection === openFolderBtn) {
 								vscode.commands.executeCommand('workbench.action.files.openFolder');
 							}
 						});
@@ -103,7 +185,8 @@ export function activate(context: vscode.ExtensionContext) {
 						// Direct file write, no need to open/close
 						await fs.promises.writeFile(filePath.fsPath, message.code);
 					} catch (error) {
-						vscode.window.showErrorMessage(`Failed to save file: ${(error as Error).message}`);
+						const errorMsg = await getLocalizedMessage(context, 'VSCODE_FAILED_SAVE_FILE', (error as Error).message);
+						vscode.window.showErrorMessage(errorMsg);
 						console.error(error);
 					}
 				} else if (message.command === 'updateBoard') {
@@ -131,16 +214,15 @@ export function activate(context: vscode.ExtensionContext) {
 							await fs.promises.writeFile(platformioIni, boardConfig);
 
 							// Use setTimeout to delay the message display to avoid interfering with the panel display
-							setTimeout(() => {
+							setTimeout(async () => {
+								const boardUpdatedMsg = await getLocalizedMessage(context, 'VSCODE_BOARD_UPDATED', message.board);
+								const reloadMsg = isFirstTime ? await getLocalizedMessage(context, 'VSCODE_RELOAD_REQUIRED') : '';
+								const reloadBtn = await getLocalizedMessage(context, 'VSCODE_RELOAD');
+
 								vscode.window
-									.showInformationMessage(
-										`Board configuration updated to: ${message.board}${
-											isFirstTime ? '\nPlease reload window to complete setup' : ''
-										}`,
-										...(isFirstTime ? ['Reload'] : [])
-									)
+									.showInformationMessage(boardUpdatedMsg + reloadMsg, ...(isFirstTime ? [reloadBtn] : []))
 									.then(selection => {
-										if (selection === 'Reload') {
+										if (selection === reloadBtn) {
 											vscode.commands.executeCommand('workbench.action.reloadWindow');
 										}
 									});
@@ -150,7 +232,8 @@ export function activate(context: vscode.ExtensionContext) {
 							setTimeout(ensurePanelVisible, 200);
 						}
 					} catch (error) {
-						vscode.window.showErrorMessage(`Failed to update platformio.ini: ${(error as Error).message}`);
+						const errorMsg = await getLocalizedMessage(context, 'VSCODE_FAILED_UPDATE_INI', (error as Error).message);
+						vscode.window.showErrorMessage(errorMsg);
 						console.error(error);
 					}
 				} else if (message.command === 'saveWorkspace') {
@@ -179,7 +262,8 @@ export function activate(context: vscode.ExtensionContext) {
 							await fs.promises.writeFile(mainJsonPath, JSON.stringify(saveData, null, 2), { encoding: 'utf8' });
 						} catch (error) {
 							console.error('Failed to save workspace state:', error);
-							vscode.window.showErrorMessage(`Unable to save workspace state: ${(error as Error).message}`);
+							const errorMsg = await getLocalizedMessage(context, 'VSCODE_UNABLE_SAVE_WORKSPACE', (error as Error).message);
+							vscode.window.showErrorMessage(errorMsg);
 						}
 					}
 				} else if (message.command === 'requestInitialState') {
@@ -217,15 +301,22 @@ export function activate(context: vscode.ExtensionContext) {
 						console.error('Failed to read workspace state:', error);
 					}
 				} else if (message.command === 'promptNewVariable') {
+					const promptMsg = message.isRename
+						? await getLocalizedMessage(context, 'VSCODE_ENTER_NEW_VARIABLE_NAME', message.currentName)
+						: await getLocalizedMessage(context, 'VSCODE_ENTER_VARIABLE_NAME');
+
+					const emptyErrorMsg = await getLocalizedMessage(context, 'VSCODE_VARIABLE_NAME_EMPTY');
+					const invalidErrorMsg = await getLocalizedMessage(context, 'VSCODE_VARIABLE_NAME_INVALID');
+
 					const result = await vscode.window.showInputBox({
-						prompt: message.isRename ? `Enter new variable name (current: ${message.currentName})` : 'Enter new variable name',
+						prompt: promptMsg,
 						value: message.currentName || '',
 						validateInput: text => {
 							if (!text) {
-								return 'Variable name cannot be empty';
+								return emptyErrorMsg;
 							}
 							if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(text)) {
-								return 'Variable name can only contain letters, numbers and underscore, and cannot start with a number';
+								return invalidErrorMsg;
 							}
 							return null;
 						},
@@ -240,16 +331,31 @@ export function activate(context: vscode.ExtensionContext) {
 						});
 					}
 				} else if (message.command === 'confirmDeleteVariable') {
+					const confirmMsg = await getLocalizedMessage(context, 'VSCODE_CONFIRM_DELETE_VARIABLE', message.variableName);
+					const okBtn = await getLocalizedMessage(context, 'VSCODE_OK');
+					const cancelBtn = await getLocalizedMessage(context, 'VSCODE_CANCEL');
+
+					const result = await vscode.window.showWarningMessage(confirmMsg, okBtn, cancelBtn);
+
+					currentPanel?.webview.postMessage({
+						command: 'deleteVariable',
+						confirmed: result === okBtn,
+						name: message.variableName,
+					});
+				} else if (message.command === 'confirmDialog') {
+					// 處理確認對話框請求
 					const result = await vscode.window.showWarningMessage(
-						`Are you sure you want to delete variable "${message.variableName}"?`,
+						message.message, // 顯示從 webview 傳來的訊息
 						'OK',
 						'Cancel'
 					);
 
+					// 將結果回傳給 webview，包含原始的 confirmId
 					currentPanel?.webview.postMessage({
-						command: 'deleteVariable',
+						command: 'confirmDialogResult',
 						confirmed: result === 'OK',
-						name: message.variableName,
+						originalMessage: message.message,
+						confirmId: message.confirmId, // 回傳原始的 confirmId
 					});
 				}
 			});
@@ -260,7 +366,13 @@ export function activate(context: vscode.ExtensionContext) {
 		const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
 		blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
 		blocklyStatusBarItem.text = '$(wand)';
-		blocklyStatusBarItem.tooltip = 'Open Blockly Editor';
+		blocklyStatusBarItem.tooltip = 'Open Blockly Editor'; // Default tooltip
+
+		// Set localized tooltip asynchronously
+		getLocalizedMessage(context, 'VSCODE_OPEN_BLOCKLY_EDITOR').then(message => {
+			blocklyStatusBarItem.tooltip = message;
+		});
+
 		blocklyStatusBarItem.show();
 
 		console.log('Setting up subscriptions...');
