@@ -18,6 +18,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.3.0] - 2025-04-02
+
+### 新增 Added
+
+- 新增深色主題支援與主題切換功能
+  Added dark theme support and theme switching functionality
+  - 實作 singularDark.js Blockly 深色主題
+    Implemented singularDark.js Blockly dark theme
+  - 新增主題切換按鈕與深色模式樣式
+    Added theme toggle button and dark mode styles
+  - 支援主題偏好設定儲存
+    Support for saving theme preferences
+  - 加入自動主題同步機制，同步編輯器與使用者設定
+    Added automatic theme synchronization between editor and user settings
+
+- 新增 PlatformIO 板子設定整合
+  Added PlatformIO board configuration integration
+  - 為所有支援的開發板新增 platformio 設定
+    Added platformio configuration for all supported boards
+  - 實作 getBoardConfig 函數用於獲取板子的 platformio.ini 設定
+    Implemented getBoardConfig function to retrieve platformio.ini settings for boards
+
+### 已更新 Updated
+
+- 優化使用者介面
+  Enhanced user interface
+  - 重構控制元件區域佈局，改善主題切換與開發板選擇的整合
+    Refactored control element area layout for better theme switching and board selection integration
+  - 改進深色模式下的元件樣式與可讀性
+    Improved component styles and readability in dark mode
+
+### 已修改 Changed
+
+- 改進 VSCode 設定處理機制
+  Improved VSCode settings handling mechanism
+  - 修改 WebView 訊息處理架構，支援主題與板子設定訊息
+    Modified WebView messaging architecture to support theme and board configuration messages
+  - 優化主題與開發板設定的儲存與載入流程
+    Optimized saving and loading processes for theme and board settings
+
 ## [0.2.0] - 2025-04-01
 
 ### 新增 Added

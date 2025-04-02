@@ -202,7 +202,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 					const workspaceRoot = workspaceFolders[0].uri.fsPath;
 					const platformioIni = path.join(workspaceRoot, 'platformio.ini');
-					const boardConfig = getBoardConfig(message.board);
+					const boardConfig = await getBoardConfig(currentPanel, message.board);
 
 					try {
 						if (message.board === 'none') {
@@ -254,6 +254,7 @@ export function activate(context: vscode.ExtensionContext) {
 							const saveData = {
 								workspace: cleanState,
 								board: message.board || 'none',
+								theme: message.theme || 'light', // 儲存主題設定
 							};
 
 							// Validate JSON before writing
@@ -280,11 +281,13 @@ export function activate(context: vscode.ExtensionContext) {
 									const saveData = JSON.parse(fileContent);
 
 									// Validate data structure
-									if (saveData && typeof saveData === 'object' && saveData.workspace && saveData.board) {
+									if (saveData && typeof saveData === 'object' && saveData.workspace) {
+										// 將主題信息一併傳送
 										currentPanel?.webview.postMessage({
 											command: 'loadWorkspace',
 											state: saveData.workspace,
-											board: saveData.board,
+											board: saveData.board || 'none',
+											theme: saveData.theme || 'light', // 附加主題設定
 										});
 									} else {
 										throw new Error('Invalid workspace state format');
@@ -292,7 +295,7 @@ export function activate(context: vscode.ExtensionContext) {
 								} catch (parseError) {
 									console.error('JSON parsing error:', parseError);
 									// Create a new blank state
-									const newState = { workspace: {}, board: 'none' };
+									const newState = { workspace: {}, board: 'none', theme: 'light' };
 									await fs.promises.writeFile(mainJsonPath, JSON.stringify(newState, null, 2), 'utf8');
 								}
 							}
@@ -357,6 +360,111 @@ export function activate(context: vscode.ExtensionContext) {
 						originalMessage: message.message,
 						confirmId: message.confirmId, // 回傳原始的 confirmId
 					});
+				} else if (message.command === 'updateTheme') {
+					// 更新主題設定
+					try {
+						const workspaceFolders = vscode.workspace.workspaceFolders;
+						if (workspaceFolders) {
+							const workspaceRoot = workspaceFolders[0].uri.fsPath;
+							const vscodeDir = path.join(workspaceRoot, '.vscode');
+							const settingsPath = path.join(vscodeDir, 'settings.json');
+
+							// 確保 .vscode 目錄存在
+							if (!fs.existsSync(vscodeDir)) {
+								await fs.promises.mkdir(vscodeDir, { recursive: true });
+							}
+
+							// 讀取現有設定
+							let settings = {};
+							if (fs.existsSync(settingsPath)) {
+								try {
+									const settingsContent = await fs.promises.readFile(settingsPath, 'utf8');
+									settings = JSON.parse(settingsContent);
+								} catch (e) {
+									console.error('Invalid settings.json, will create new one');
+								}
+							}
+
+							// 更新主題設定
+							settings = {
+								...settings,
+								'singular-blockly.theme': message.theme || 'light',
+							};
+
+							// 寫入更新後的設定
+							await fs.promises.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
+							console.log(`Theme preference updated to: ${message.theme}`);
+
+							// 同時更新 blockly/main.json 中的主題設定
+							const blocklyDir = path.join(workspaceRoot, 'blockly');
+							const mainJsonPath = path.join(blocklyDir, 'main.json');
+
+							if (fs.existsSync(mainJsonPath)) {
+								try {
+									const fileContent = await fs.promises.readFile(mainJsonPath, 'utf8');
+									const saveData = JSON.parse(fileContent);
+
+									if (saveData && typeof saveData === 'object') {
+										saveData.theme = message.theme || 'light';
+										await fs.promises.writeFile(mainJsonPath, JSON.stringify(saveData, null, 2), 'utf8');
+									}
+								} catch (e) {
+									console.error('Failed to update theme in main.json:', e);
+								}
+							}
+						}
+					} catch (error) {
+						console.error('Failed to save theme preference:', error);
+					}
+				}
+			});
+		});
+
+		// Register theme toggle command
+		const toggleThemeCommand = vscode.commands.registerCommand('singular-blockly.toggleTheme', async () => {
+			const workspaceFolders = vscode.workspace.workspaceFolders;
+			if (!workspaceFolders) {
+				return;
+			}
+
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
+			const settingsPath = path.join(workspaceRoot, '.vscode', 'settings.json');
+
+			// 讀取現有設定
+			let settings: { [key: string]: any } = {};
+			let currentTheme = 'light';
+
+			if (fs.existsSync(settingsPath)) {
+				try {
+					const settingsContent = await fs.promises.readFile(settingsPath, 'utf8');
+					settings = JSON.parse(settingsContent);
+					currentTheme = settings['singular-blockly.theme'] || 'light';
+				} catch (e) {
+					console.error('Invalid settings.json');
+				}
+			}
+
+			// 切換主題
+			const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+			// 更新設定
+			settings = {
+				...settings,
+				'singular-blockly.theme': newTheme,
+			};
+
+			// 儲存新設定
+			const vscodeDir = path.join(workspaceRoot, '.vscode');
+			if (!fs.existsSync(vscodeDir)) {
+				await fs.promises.mkdir(vscodeDir, { recursive: true });
+			}
+
+			await fs.promises.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
+
+			// 如果 Blockly 編輯器已開啟，通知它更新主題
+			vscode.window.visibleTextEditors.forEach(editor => {
+				if (editor.document.fileName.endsWith('blocklyEdit.html')) {
+					editor.document.save();
 				}
 			});
 		});
@@ -379,6 +487,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// Add status bar button to subscription list
 		context.subscriptions.push(blocklyStatusBarItem);
 		context.subscriptions.push(activityBarListener);
+		context.subscriptions.push(toggleThemeCommand); // 註冊主題切換命令
 
 		console.log('Singular Blockly extension fully activated!');
 	} catch (error) {
@@ -404,18 +513,19 @@ async function configurePlatformIOSettings(workspacePath: string) {
 		if (fs.existsSync(settingsPath)) {
 			const settingsContent = await fs.promises.readFile(settingsPath, 'utf8');
 			try {
-				settings = JSON.parse(settingsContent);
+				settings = JSON.parse(settingsContent) as { [key: string]: any };
 			} catch (e) {
 				// 如果 JSON 無效，就使用空物件
 				console.error('Invalid settings.json, will override with new settings');
 			}
 		}
 
-		// 設定 PlatformIO 不自動開啟 ini 檔案
+		// 設定 PlatformIO 不自動開啟 ini 檔案及 Singular Blockly 主題
 		settings = {
 			...settings,
 			'platformio-ide.autoOpenPlatformIOIniFile': false,
 			'platformio-ide.disablePIOHomeStartup': true,
+			'singular-blockly.theme': (settings as { [key: string]: any })['singular-blockly.theme'] || 'light', // 預設主題設定
 		};
 
 		// 寫入設定檔
@@ -604,10 +714,22 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 	// After reading the HTML content, inject language files at the appropriate location
 	htmlContent = htmlContent.replace(
 		'<script src="{blocklyCompressedJsUri}"></script>',
-		`<script src="{blocklyCompressedJsUri}"></script>
-    ${localeScripts}`
+		`<script src="${blocklyCompressedJsUri}"></script>
+    ${localeScripts}` // Inject locale scripts
 	);
 
+	// 更新主題路徑 - 明確替換主題檔案路徑
+	const themesPath = vscode.Uri.file(context.asAbsolutePath('media/blockly/themes'));
+	const themesUri = webview.asWebviewUri(themesPath);
+	const singularJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('media/blockly/themes/singular.js')));
+	const singularDarkJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('media/blockly/themes/singularDark.js')));
+
+	// 替換主題相關URI
+	htmlContent = htmlContent.replace('{themesUri}', themesUri.toString());
+	htmlContent = htmlContent.replace('{themesUri}/singular.js', singularJsUri.toString());
+	htmlContent = htmlContent.replace('{themesUri}/singularDark.js', singularDarkJsUri.toString());
+
+	// 替換其他URI
 	htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
 	htmlContent = htmlContent.replace('{jsUri}', jsUri.toString());
 	htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
@@ -634,37 +756,86 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 
 	htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 
-	// Update theme path
-	const themesUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath('media/blockly/themes')));
-	htmlContent = htmlContent.replace('{themesUri}', themesUri.toString());
+	// 讀取使用者主題偏好
+	let theme = 'light';
+	try {
+		const workspaceFolders = vscode.workspace.workspaceFolders;
+		if (workspaceFolders) {
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
+			const settingsPath = path.join(workspaceRoot, '.vscode', 'settings.json');
+
+			if (fs.existsSync(settingsPath)) {
+				const settingsContent = await fs.promises.readFile(settingsPath, 'utf8');
+				const settings = JSON.parse(settingsContent);
+				theme = settings['singular-blockly.theme'] || 'light';
+			}
+		}
+	} catch (error) {
+		console.error('Failed to read theme preference:', error);
+	}
+
+	// Inject theme preference
+	htmlContent = htmlContent.replace(/\{theme\}/g, theme);
 
 	return htmlContent;
 }
 
 // Add a function to get board configuration
-const getBoardConfig = (board: string): string => {
-	const configs: { [key: string]: string } = {
-		uno: `[env:uno]
-platform = atmelavr
-board = uno
-framework = arduino`,
-		nano: `[env:nano]
-platform = atmelavr
-board = nanoatmega328
-framework = arduino`,
-		mega: `[env:mega]
-platform = atmelavr
-board = megaatmega2560
-framework = arduino`,
-		esp32: `[env:esp32]
-platform = espressif32
-board = esp32dev
-framework = arduino`,
-		supermini: `[env:lolin_c3_mini]
-platform = espressif32
-board = lolin_c3_mini
-framework = arduino`,
-		none: ``, // Empty configuration
-	};
-	return configs[board] || configs.none;
-};
+async function getBoardConfig(panel: vscode.WebviewPanel | undefined, board: string): Promise<string> {
+	// 如果面板不存在，無法獲取設定
+	if (!panel) {
+		console.log('WebView 面板不可用，無法獲取板子設定');
+		return ''; // 返回空字串
+	}
+
+	// 透過 WebView 獲取板子設定
+	try {
+		console.log(`向 WebView 請求板子設定：${board}`);
+
+		// 設定一個 Promise 等待 webview 回應
+		return new Promise<string>((resolve, reject) => {
+			// 建立唯一的訊息 ID
+			const messageId = `get-board-config-${Date.now()}`;
+			console.log(`建立訊息 ID：${messageId}`);
+
+			// 標記是否已收到回應
+			let responseReceived = false;
+
+			// 設定訊息監聽器
+			const messageListener = panel.webview.onDidReceiveMessage(message => {
+				console.log(`收到 WebView 回應：`, message);
+				if (message.command === 'boardConfigResult' && message.messageId === messageId) {
+					// 設定已收到回應標記
+					responseReceived = true;
+					// 收到回應後，移除監聽器
+					messageListener.dispose();
+					console.log(`成功從 WebView 獲取板子設定`);
+					resolve(message.config || '');
+				}
+			});
+
+			// 發送訊息到 webview，要求取得板子設定
+			panel.webview.postMessage({
+				command: 'getBoardConfig',
+				board: board,
+				messageId: messageId,
+			});
+			console.log(`已發送 getBoardConfig 請求到 WebView，等待回應`);
+
+			// 設定逾時，如果 10 秒內沒有回應，則返回空字串
+			const timeoutId = setTimeout(() => {
+				// 只有在尚未收到回應時才執行超時處理
+				if (!responseReceived) {
+					messageListener.dispose();
+					console.log(`板子設定請求逾時，無法獲取設定`);
+					resolve(''); // 返回空字串
+				} else {
+					console.log(`已收到回應，取消超時處理`);
+				}
+			}, 10000);
+		});
+	} catch (error) {
+		console.error('從 WebView 獲取板子設定時發生錯誤:', error);
+		return ''; // 返回空字串
+	}
+}

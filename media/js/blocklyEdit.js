@@ -5,6 +5,9 @@
  */
 const vscode = acquireVsCodeApi();
 
+// 儲存當前主題設定
+let currentTheme = window.initialTheme || 'light'; // 從 HTML 獲取初始主題設定
+
 // 註冊工具箱元件
 Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCategory.registrationName, Blockly.ToolboxCategory);
 
@@ -35,8 +38,54 @@ window.confirm = function (message) {
 	return false;
 };
 
+// 主題切換處理函數
+function toggleTheme() {
+	// 切換主題
+	currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+	// 更新 UI 狀態
+	updateThemeUI(currentTheme);
+
+	// 儲存設定到 VS Code
+	vscode.postMessage({
+		command: 'updateTheme',
+		theme: currentTheme,
+	});
+}
+
+// 更新 UI 元素以反映當前主題
+function updateThemeUI(theme) {
+	const lightIcon = document.getElementById('lightIcon');
+	const darkIcon = document.getElementById('darkIcon');
+
+	if (theme === 'dark') {
+		document.body.classList.add('dark-mode');
+		document.body.classList.remove('light-mode');
+		lightIcon.style.display = 'none';
+		darkIcon.style.display = 'block';
+
+		// 套用深色主題到 Blockly
+		if (Blockly.getMainWorkspace()) {
+			Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme);
+		}
+	} else {
+		document.body.classList.add('light-mode');
+		document.body.classList.remove('dark-mode');
+		lightIcon.style.display = 'block';
+		darkIcon.style.display = 'none';
+
+		// 套用淺色主題到 Blockly
+		if (Blockly.getMainWorkspace()) {
+			Blockly.getMainWorkspace().setTheme(window.SingularBlocklyTheme);
+		}
+	}
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
 	console.log('Blockly Edit page loaded');
+
+	// 註冊主題切換按鈕事件
+	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
@@ -59,6 +108,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 處理翻譯
 	processTranslations(toolboxConfig);
 
+	// 根據當前主題設定選擇初始主題
+	const theme = currentTheme === 'dark' ? window.SingularBlocklyDarkTheme : window.SingularBlocklyTheme;
+
 	const workspace = Blockly.inject('blocklyDiv', {
 		toolbox: toolboxConfig,
 		trashcan: true, // 添加垃圾桶
@@ -70,8 +122,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			minScale: 0.3, // 最小縮放比例
 			scaleSpeed: 1.2, // 縮放速度
 		},
-		theme: window.SingularBlocklyTheme, // 使用全局主題
+		theme: theme, // 使用根據設定選擇的主題
 	});
+
+	// 根據初始主題設定更新 UI
+	updateThemeUI(currentTheme);
 
 	// 創建預設變數 i
 	if (!workspace.getVariable('i')) {
@@ -160,6 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				command: 'saveWorkspace',
 				state: state,
 				board: boardSelect.value,
+				theme: currentTheme, // 確保主題設定被保存
 			});
 		} catch (error) {
 			console.error('保存工作區狀態失敗:', error);
@@ -254,6 +310,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	window.addEventListener('message', event => {
 		const message = event.data;
 		const workspace = Blockly.getMainWorkspace();
+		console.log(`收到訊息: ${message.command}`, message);
+
 		switch (message.command) {
 			case 'createVariable':
 				if (message.name) {
@@ -337,6 +395,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}
 				break;
+			// 新增：處理獲取板子設定的請求
+			case 'getBoardConfig':
+				// 從全局函數獲取板子設定
+				console.log(`收到獲取板子設定請求，板子類型: ${message.board}`);
+				if (typeof window.getBoardConfig === 'function') {
+					const config = window.getBoardConfig(message.board);
+					console.log(`找到板子設定: `, config);
+					// 回傳設定到擴充功能
+					vscode.postMessage({
+						command: 'boardConfigResult',
+						config: config,
+						messageId: message.messageId, // 返回原始訊息ID以便識別
+					});
+					console.log(`已發送設定回覆，訊息ID: ${message.messageId}`);
+				} else {
+					// 如果函數不存在，返回空字串
+					console.warn('在 WebView 中找不到 getBoardConfig 函數');
+					vscode.postMessage({
+						command: 'boardConfigResult',
+						config: '',
+						messageId: message.messageId,
+					});
+				}
+				break;
 			// ...保留其他既有的 case...
 			case 'loadWorkspace':
 				try {
@@ -349,6 +431,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 							board: message.board,
 						});
 					}
+
+					// 載入主題設定
+					if (message.theme) {
+						currentTheme = message.theme;
+						updateThemeUI(currentTheme);
+					}
+
 					if (message.state) {
 						// 然後再載入工作區內容
 						Blockly.serialization.workspaces.load(message.state, workspace);
@@ -356,6 +445,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 				} catch (error) {
 					console.error('載入工作區狀態失敗:', error);
 				}
+				break;
+			case 'setTheme':
+				// 直接從 VSCode 設定主題
+				currentTheme = message.theme || 'light';
+				updateThemeUI(currentTheme);
 				break;
 		}
 	});
@@ -391,6 +485,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					command: 'saveWorkspace',
 					state: state,
 					board: boardSelect.value,
+					theme: currentTheme, // 確保在整理方塊後也保存主題設定
 				});
 				console.log('方塊整理完成，已儲存工作區狀態');
 			}, 300);

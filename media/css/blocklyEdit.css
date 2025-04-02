@@ -34,16 +34,25 @@ html {
 	transition: width 0.3s ease;
 }
 
-.board-select {
+/* 控制區容器 */
+.controls-container {
 	position: absolute;
 	top: 10px;
 	right: 10px;
 	left: auto;
 	z-index: 1000;
+	display: flex;
+	align-items: center;
 	background-color: white;
 	padding: 8px;
 	border-radius: 4px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.board-select {
+	display: flex;
+	align-items: center;
+	margin-right: 10px;
 }
 
 .board-select label {
@@ -53,4 +62,54 @@ html {
 .board-select select {
 	padding: 4px;
 	border-radius: 4px;
+}
+
+/* 主題切換按鈕樣式 */
+.theme-switch {
+	margin-left: 10px;
+}
+
+#themeToggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	background-color: #f0f0f0;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+#themeToggle:hover {
+	background-color: #e0e0e0;
+}
+
+.theme-icon {
+	color: #333;
+}
+
+/* 深色模式樣式 */
+body.dark-mode .controls-container {
+	background-color: #333333;
+	color: #e0e0e0;
+}
+
+body.dark-mode #themeToggle {
+	background-color: #444444;
+}
+
+body.dark-mode #themeToggle:hover {
+	background-color: #555555;
+}
+
+body.dark-mode .theme-icon {
+	color: #e0e0e0;
+}
+
+body.dark-mode select {
+	background-color: #444444;
+	color: #e0e0e0;
+	border: 1px solid #555555;
 }

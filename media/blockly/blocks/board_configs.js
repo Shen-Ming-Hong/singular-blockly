@@ -59,6 +59,11 @@ window.BOARD_CONFIGS = {
 			A4: true,
 			A5: true,
 		},
+		// 新增 platformio 設定
+		platformConfig: `[env:uno]
+platform = atmelavr
+board = uno
+framework = arduino`,
 	},
 	nano: {
 		name: 'Arduino Nano',
@@ -117,6 +122,11 @@ window.BOARD_CONFIGS = {
 			A6: true,
 			A7: true,
 		},
+		// 新增 platformio 設定
+		platformConfig: `[env:nano]
+platform = atmelavr
+board = nanoatmega328
+framework = arduino`,
 	},
 	mega: {
 		name: 'Arduino Mega 2560',
@@ -271,6 +281,11 @@ window.BOARD_CONFIGS = {
 			A14: true,
 			A15: true,
 		},
+		// 新增 platformio 設定
+		platformConfig: `[env:mega]
+platform = atmelavr
+board = megaatmega2560
+framework = arduino`,
 	},
 	esp32: {
 		name: 'ESP32',
@@ -352,6 +367,11 @@ window.BOARD_CONFIGS = {
 			33: true,
 			// GPIO34 至 GPIO39 無內建上拉電阻
 		},
+		// 新增 platformio 設定
+		platformConfig: `[env:esp32]
+platform = espressif32
+board = esp32dev
+framework = arduino`,
 	},
 	supermini: {
 		name: 'Super Mini',
@@ -406,6 +426,11 @@ window.BOARD_CONFIGS = {
 			A4: true,
 			A5: true,
 		},
+		// 新增 platformio 設定
+		platformConfig: `[env:lolin_c3_mini]
+platform = espressif32
+board = lolin_c3_mini
+framework = arduino`,
 	},
 };
 
@@ -476,4 +501,14 @@ window.getPullupPinOptions = function () {
 		const pinNumber = pin[1];
 		return board.pullupPins[pinNumber];
 	});
+};
+
+// 新增：獲取板子的 platformio.ini 配置
+window.getBoardConfig = function (board) {
+	if (board === 'none') {
+		return ''; // 返回空字串
+	}
+
+	const boardConfig = window.BOARD_CONFIGS[board];
+	return boardConfig ? boardConfig.platformConfig : '';
 };

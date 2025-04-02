@@ -90,7 +90,7 @@ window.languageManager.loadMessages('bg', {
 
 	// Loop Block Labels
 	LOOP_REPEAT: 'повтори',
-	LOOP_WHILE: 'докато',/
+	LOOP_WHILE: 'докато',
 	LOOP_UNTIL: 'докато не',
 	LOOP_FOR: 'за',
 	LOOP_FOREACH: 'за всеки',
