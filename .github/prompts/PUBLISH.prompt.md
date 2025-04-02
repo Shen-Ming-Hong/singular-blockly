@@ -91,6 +91,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    "version": "1.2.3"
    ```
 
+## Git 提交與發布 Git Commit and Release
+
+### 提交變更 Commit Changes
+
+8. 閱讀 #file:.copilot-commit-message-instructions.md 中的規則，並依照指示撰寫符合規範的 commit 訊息：
+   Read the rules in #file:.copilot-commit-message-instructions.md and follow the instructions to write a compliant commit message:
+
+   ```
+   git add CHANGELOG.md package.json
+   git commit -m "適合的commit訊息"
+   ```
+
+### 標記版本 Tag Version
+
+9. 標記此次發布的版本，格式為 v+版本編號：
+   Tag this release version, format is v+version number:
+
+   ```
+   git tag v1.2.3
+   ```
+
+### 上傳到 Git 推送變更 Push to Git
+
+10. 將變更和標記推送到遠端儲存庫：
+    Push changes and tags to the remote repository:
+
+    ```
+    git push
+    git push --tags
+    ```
+
 ## 發布後檢查 Post-Release Checks
 
 - [ ] 確認 CHANGELOG.md 已正確更新
