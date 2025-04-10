@@ -125,6 +125,183 @@ window.confirm = function (message) {
 	return false;
 };
 
+// 備份管理功能
+const backupManager = {
+	// 備份列表
+	backupList: [],
+
+	// 初始化備份管理器
+	init: function () {
+		// 綁定按鈕事件
+		document.getElementById('backupButton').addEventListener('click', this.openModal.bind(this));
+		document.querySelector('.modal-close').addEventListener('click', this.closeModal.bind(this));
+		document.getElementById('createBackupBtn').addEventListener('click', this.showBackupForm.bind(this));
+		document.getElementById('confirmBackupBtn').addEventListener('click', this.createBackup.bind(this));
+		document.getElementById('cancelBackupBtn').addEventListener('click', this.hideBackupForm.bind(this));
+
+		// 初始化備份列表
+		this.refreshBackupList();
+	},
+
+	// 打開模態對話框
+	openModal: function () {
+		document.getElementById('backupModal').style.display = 'block';
+		// 刷新備份列表
+		this.refreshBackupList();
+	},
+
+	// 關閉模態對話框
+	closeModal: function () {
+		document.getElementById('backupModal').style.display = 'none';
+		this.hideBackupForm();
+	},
+
+	// 顯示建立備份表單
+	showBackupForm: function () {
+		// 隱藏建立按鈕
+		document.querySelector('.backup-actions').style.display = 'none';
+		// 顯示表單
+		document.querySelector('.backup-create-form').style.display = 'block';
+
+		// 設定預設的備份名稱（格式：backup_YYYYMMDD_HHMMSS）
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const day = String(now.getDate()).padStart(2, '0');
+		const hours = String(now.getHours()).padStart(2, '0');
+		const minutes = String(now.getMinutes()).padStart(2, '0');
+		const seconds = String(now.getSeconds()).padStart(2, '0');
+		const defaultName = `backup_${year}${month}${day}_${hours}${minutes}${seconds}`;
+
+		document.getElementById('backupName').value = defaultName;
+		document.getElementById('backupName').focus();
+	},
+
+	// 隱藏建立備份表單
+	hideBackupForm: function () {
+		// 顯示建立按鈕
+		document.querySelector('.backup-actions').style.display = 'block';
+		// 隱藏表單
+		document.querySelector('.backup-create-form').style.display = 'none';
+	},
+
+	// 建立備份
+	createBackup: function () {
+		const backupName = document.getElementById('backupName').value.trim();
+		if (!backupName) {
+			alert('請輸入備份名稱');
+			return;
+		}
+
+		// 安全性檢查：確保檔案名稱有效
+		if (!this.isValidFilename(backupName)) {
+			alert('備份名稱包含無效字符，請使用字母、數字、底線和連字符');
+			return;
+		}
+
+		// 獲取工作區狀態
+		try {
+			const workspace = Blockly.getMainWorkspace();
+			const state = Blockly.serialization.workspaces.save(workspace);
+			const boardSelect = document.getElementById('boardSelect');
+
+			// 發送建立備份請求到 VSCode 擴展
+			vscode.postMessage({
+				command: 'createBackup',
+				name: backupName,
+				state: state,
+				board: boardSelect.value,
+				theme: currentTheme,
+			});
+
+			// 隱藏表單
+			this.hideBackupForm();
+
+			// 顯示成功訊息
+			log.info(`建立備份 "${backupName}" 成功`);
+		} catch (error) {
+			log.error('建立備份失敗:', error);
+			alert('建立備份失敗: ' + error.message);
+		}
+	},
+
+	// 驗證檔案名稱
+	isValidFilename: function (filename) {
+		// 只允許字母、數字、底線、連字符和點號
+		return /^[a-zA-Z0-9_\-\.]+$/.test(filename);
+	},
+
+	// 刷新備份列表
+	refreshBackupList: function () {
+		// 發送請求到 VSCode 擴展
+		vscode.postMessage({
+			command: 'getBackupList',
+		});
+	},
+
+	// 更新備份列表 UI
+	updateBackupListUI: function (backups) {
+		const backupListEl = document.getElementById('backupList');
+		// 清空列表
+		backupListEl.innerHTML = '';
+
+		// 如果沒有備份，顯示空白訊息
+		if (!backups || backups.length === 0) {
+			backupListEl.innerHTML = '<div class="empty-backup-list">尚無備份</div>';
+			return;
+		}
+
+		// 更新列表
+		this.backupList = backups;
+		backups.forEach(backup => {
+			// 創建備份項目
+			const backupItem = document.createElement('div');
+			backupItem.className = 'backup-item';
+
+			// 備份信息
+			const backupInfo = document.createElement('div');
+			backupInfo.className = 'backup-info';
+
+			const backupName = document.createElement('div');
+			backupName.className = 'backup-name';
+			backupName.textContent = backup.name;
+
+			const backupDate = document.createElement('div');
+			backupDate.className = 'backup-date';
+			backupDate.textContent = new Date(backup.date).toLocaleString();
+
+			backupInfo.appendChild(backupName);
+			backupInfo.appendChild(backupDate);
+
+			// 操作按鈕
+			const backupActions = document.createElement('div');
+			backupActions.className = 'backup-actions';
+
+			// 刪除按鈕
+			const deleteBtn = document.createElement('button');
+			deleteBtn.className = 'backup-delete';
+			deleteBtn.textContent = '刪除';
+			deleteBtn.addEventListener('click', () => this.deleteBackup(backup.name));
+
+			backupActions.appendChild(deleteBtn);
+
+			// 組合到備份項目
+			backupItem.appendChild(backupInfo);
+			backupItem.appendChild(backupActions);
+
+			// 添加到列表
+			backupListEl.appendChild(backupItem);
+		});
+	}, // 刪除備份
+	deleteBackup: function (backupName) {
+		// 直接發送命令到 VSCode 擴展，讓後端處理確認
+		vscode.postMessage({
+			command: 'deleteBackup',
+			name: backupName,
+		});
+	},
+};
+
 // 主題切換處理函數
 function toggleTheme() {
 	// 切換主題
@@ -173,6 +350,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 註冊主題切換按鈕事件
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+	// 初始化備份管理器
+	backupManager.init();
 
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
@@ -682,6 +862,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 				currentTheme = message.theme || 'light';
 				updateThemeUI(currentTheme);
 				break;
+
+			// 處理備份列表回應
+			case 'backupListResponse':
+				backupManager.updateBackupListUI(message.backups);
+				break;
+
+			// 處理備份建立回應
+			case 'backupCreated':
+				backupManager.refreshBackupList();
+				break;
+
+			// 處理備份刪除回應
+			case 'backupDeleted':
+				backupManager.refreshBackupList();
+				break;
+
+			// 移除多餘的備份載入功能
 		}
 	});
 

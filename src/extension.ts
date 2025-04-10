@@ -473,6 +473,188 @@ export function activate(context: vscode.ExtensionContext) {
 					} catch (error) {
 						log('Failed to save theme preference:', 'error', error);
 					}
+				} else if (message.command === 'createBackup') {
+					// 處理建立備份請求 - 直接複製 main.json 檔案
+					try {
+						const workspaceFolders = vscode.workspace.workspaceFolders;
+						if (workspaceFolders) {
+							const workspaceRoot = workspaceFolders[0].uri.fsPath;
+							const blocklyDir = path.join(workspaceRoot, 'blockly');
+							const mainJsonPath = path.join(blocklyDir, 'main.json');
+							const backupDir = path.join(blocklyDir, 'backup');
+
+							// 確保備份目錄存在
+							if (!fs.existsSync(backupDir)) {
+								await fs.promises.mkdir(backupDir, { recursive: true });
+							}
+
+							// 檢查 main.json 是否存在
+							if (!fs.existsSync(mainJsonPath)) {
+								throw new Error('無法找到 main.json 檔案');
+							}
+
+							// 建立備份檔案路徑
+							const backupPath = path.join(backupDir, `${message.name}.json`);
+
+							// 直接複製檔案
+							await fs.promises.copyFile(mainJsonPath, backupPath);
+
+							// 通知 WebView 備份已建立
+							currentPanel?.webview.postMessage({
+								command: 'backupCreated',
+								name: message.name,
+								success: true,
+							});
+
+							log(`成功建立備份: ${message.name}`, 'info');
+						}
+					} catch (error) {
+						log('建立備份失敗:', 'error', error);
+						currentPanel?.webview.postMessage({
+							command: 'backupCreated',
+							name: message.name,
+							success: false,
+							error: `${error}`,
+						});
+						vscode.window.showErrorMessage(`建立備份失敗: ${error}`);
+					}
+				} else if (message.command === 'getBackupList') {
+					// 處理獲取備份列表請求
+					try {
+						const workspaceFolders = vscode.workspace.workspaceFolders;
+						if (workspaceFolders) {
+							const workspaceRoot = workspaceFolders[0].uri.fsPath;
+							const backupDir = path.join(workspaceRoot, 'blockly', 'backup');
+
+							// 確保備份目錄存在
+							if (!fs.existsSync(backupDir)) {
+								await fs.promises.mkdir(backupDir, { recursive: true });
+								// 回傳空列表
+								currentPanel?.webview.postMessage({
+									command: 'backupListResponse',
+									backups: [],
+								});
+								return;
+							}
+
+							// 讀取備份目錄中的所有檔案
+							const files = await fs.promises.readdir(backupDir);
+							const backupFiles = files.filter(file => file.endsWith('.json'));
+
+							// 收集備份資訊
+							const backups = await Promise.all(
+								backupFiles.map(async file => {
+									const filePath = path.join(backupDir, file);
+									const stats = await fs.promises.stat(filePath);
+									const name = path.basename(file, '.json');
+
+									try {
+										// 讀取備份檔內容以獲取創建日期
+										const content = await fs.promises.readFile(filePath, 'utf8');
+										const data = JSON.parse(content);
+
+										return {
+											name: name,
+											date: data.created || stats.mtime.toISOString(),
+											size: stats.size,
+										};
+									} catch (err) {
+										// 如果讀取檔案失敗，使用檔案系統的修改時間
+										return {
+											name: name,
+											date: stats.mtime.toISOString(),
+											size: stats.size,
+										};
+									}
+								})
+							);
+
+							// 按日期排序（最新的在前）
+							backups.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+							// 回傳備份列表
+							currentPanel?.webview.postMessage({
+								command: 'backupListResponse',
+								backups: backups,
+							});
+
+							log(`成功獲取 ${backups.length} 個備份`, 'info');
+						}
+					} catch (error) {
+						log('獲取備份列表失敗:', 'error', error);
+						currentPanel?.webview.postMessage({
+							command: 'backupListResponse',
+							backups: [],
+							error: `${error}`,
+						});
+					}
+				} else if (message.command === 'deleteBackup') {
+					// 處理刪除備份請求
+					try {
+						const workspaceFolders = vscode.workspace.workspaceFolders;
+						if (!workspaceFolders) {
+							throw new Error('沒有開啟的工作區');
+						}
+
+						// 確保備份名稱存在
+						if (!message.name) {
+							throw new Error('未指定備份名稱');
+						}
+						const workspaceRoot = workspaceFolders[0].uri.fsPath;
+						const backupDir = path.join(workspaceRoot, 'blockly', 'backup');
+						const backupPath = path.join(backupDir, `${message.name}.json`);
+
+						// 檢查備份目錄是否存在
+						if (!fs.existsSync(backupDir)) {
+							throw new Error(`備份目錄不存在`);
+						} // 檢查檔案是否存在
+						if (fs.existsSync(backupPath)) {
+							// 顯示確認對話框，詢問用戶是否確定要刪除
+							const confirmMessage = `確定要刪除備份檔案: ${message.name}.json 嗎？`;
+							const deleteBtn = '刪除';
+							const cancelBtn = '取消';
+
+							const selection = await vscode.window.showWarningMessage(confirmMessage, deleteBtn, cancelBtn);
+
+							if (selection === deleteBtn) {
+								// 用戶確認刪除
+								fs.unlinkSync(backupPath);
+
+								// 驗證文件確實被刪除
+								if (fs.existsSync(backupPath)) {
+									throw new Error(`刪除操作失敗`);
+								}
+
+								// 通知 WebView 備份已刪除
+								currentPanel?.webview.postMessage({
+									command: 'backupDeleted',
+									name: message.name,
+									success: true,
+								});
+
+								log(`成功刪除備份: ${message.name}`, 'info');
+							} else {
+								// 用戶取消刪除
+								currentPanel?.webview.postMessage({
+									command: 'backupDeleted',
+									name: message.name,
+									success: false,
+									cancelled: true,
+								});
+							}
+						} else {
+							throw new Error(`備份 ${message.name} 不存在`);
+						}
+					} catch (error) {
+						log('刪除備份失敗:', 'error', error);
+						currentPanel?.webview.postMessage({
+							command: 'backupDeleted',
+							name: message.name || '未知',
+							success: false,
+							error: `${error}`,
+						});
+						vscode.window.showErrorMessage(`刪除備份失敗: ${error}`);
+					}
 				}
 			});
 		});

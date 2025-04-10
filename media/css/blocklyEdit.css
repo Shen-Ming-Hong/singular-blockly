@@ -86,8 +86,260 @@ html {
 	background-color: #e0e0e0;
 }
 
-.theme-icon {
+/* 備份按鈕樣式 */
+.backup-switch {
+	margin-left: 10px;
+}
+
+#backupButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	background-color: #f0f0f0;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+#backupButton:hover {
+	background-color: #e0e0e0;
+}
+
+.backup-icon {
 	color: #333;
+}
+
+/* Modal 對話框樣式 */
+.modal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 2000;
+	overflow-y: auto;
+}
+
+.modal-content {
+	position: relative;
+	margin: 10% auto;
+	width: 80%;
+	max-width: 600px;
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	animation: modal-appear 0.3s ease;
+}
+
+@keyframes modal-appear {
+	from {
+		opacity: 0;
+		transform: translateY(-50px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 20px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+	margin: 0;
+	font-size: 1.5rem;
+	color: #333;
+}
+
+.modal-close {
+	font-size: 1.8rem;
+	font-weight: bold;
+	color: #888;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.modal-close:hover {
+	color: #333;
+}
+
+.modal-body {
+	padding: 20px;
+}
+
+/* 備份操作區域 */
+.backup-actions {
+	margin-bottom: 20px;
+}
+
+#createBackupBtn {
+	padding: 8px 16px;
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 1rem;
+	transition: background-color 0.2s;
+}
+
+#createBackupBtn:hover {
+	background-color: #45a049;
+}
+
+/* 備份創建表單 */
+.backup-create-form {
+	margin-bottom: 20px;
+	padding: 15px;
+	background-color: #f9f9f9;
+	border-radius: 4px;
+	border: 1px solid #e0e0e0;
+}
+
+.backup-create-form h3 {
+	margin-top: 0;
+	margin-bottom: 15px;
+	color: #333;
+}
+
+.form-group {
+	margin-bottom: 15px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 5px;
+	font-weight: bold;
+	color: #555;
+}
+
+.form-group input {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+}
+
+.form-actions button {
+	padding: 6px 12px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+#confirmBackupBtn {
+	background-color: #4caf50;
+	color: white;
+}
+
+#confirmBackupBtn:hover {
+	background-color: #45a049;
+}
+
+#cancelBackupBtn {
+	background-color: #f1f1f1;
+	color: #333;
+}
+
+#cancelBackupBtn:hover {
+	background-color: #e0e0e0;
+}
+
+/* 備份列表 */
+.backup-list-container {
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.backup-list-container h3 {
+	margin-top: 0;
+	margin-bottom: 10px;
+	color: #333;
+}
+
+.backup-list {
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+}
+
+.backup-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 15px;
+	border-bottom: 1px solid #e0e0e0;
+	transition: background-color 0.2s;
+}
+
+.backup-item:last-child {
+	border-bottom: none;
+}
+
+.backup-item:hover {
+	background-color: #f5f5f5;
+}
+
+.backup-info {
+	flex: 1;
+}
+
+.backup-name {
+	font-weight: bold;
+	margin-bottom: 3px;
+}
+
+.backup-date {
+	font-size: 0.85rem;
+	color: #777;
+}
+
+.backup-actions {
+	display: flex;
+	gap: 5px;
+}
+
+.backup-actions button {
+	padding: 4px 8px;
+	background-color: transparent;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 0.9rem;
+	transition: all 0.2s;
+}
+
+.backup-delete {
+	color: #f44336;
+	border-color: #f44336;
+}
+
+.backup-delete:hover {
+	background-color: #ffebee;
+}
+
+.empty-backup-list {
+	padding: 15px;
+	text-align: center;
+	color: #777;
+	font-style: italic;
 }
 
 /* 深色模式樣式 */
@@ -108,8 +360,89 @@ body.dark-mode .theme-icon {
 	color: #e0e0e0;
 }
 
+body.dark-mode #backupButton {
+	background-color: #444444;
+}
+
+body.dark-mode #backupButton:hover {
+	background-color: #555555;
+}
+
+body.dark-mode .backup-icon {
+	color: #e0e0e0;
+}
+
 body.dark-mode select {
 	background-color: #444444;
 	color: #e0e0e0;
 	border: 1px solid #555555;
+}
+
+body.dark-mode .modal-content {
+	background-color: #333333;
+	color: #e0e0e0;
+}
+
+body.dark-mode .modal-header {
+	border-bottom-color: #555555;
+}
+
+body.dark-mode .modal-header h2 {
+	color: #e0e0e0;
+}
+
+body.dark-mode .modal-close {
+	color: #aaaaaa;
+}
+
+body.dark-mode .modal-close:hover {
+	color: #ffffff;
+}
+
+body.dark-mode .backup-create-form {
+	background-color: #444444;
+	border-color: #555555;
+}
+
+body.dark-mode .backup-create-form h3 {
+	color: #e0e0e0;
+}
+
+body.dark-mode .form-group label {
+	color: #cccccc;
+}
+
+body.dark-mode .form-group input {
+	background-color: #555555;
+	color: #e0e0e0;
+	border-color: #666666;
+}
+
+body.dark-mode #cancelBackupBtn {
+	background-color: #555555;
+	color: #e0e0e0;
+}
+
+body.dark-mode #cancelBackupBtn:hover {
+	background-color: #666666;
+}
+
+body.dark-mode .backup-list {
+	border-color: #555555;
+}
+
+body.dark-mode .backup-item {
+	border-bottom-color: #555555;
+}
+
+body.dark-mode .backup-item:hover {
+	background-color: #3a3a3a;
+}
+
+body.dark-mode .backup-date {
+	color: #aaaaaa;
+}
+
+body.dark-mode .empty-backup-list {
+	color: #aaaaaa;
 }

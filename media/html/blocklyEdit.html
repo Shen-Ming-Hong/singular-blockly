@@ -116,11 +116,53 @@
                     </svg>
                 </button>
             </div>
+            <div class="backup-switch">
+                <button id="backupButton" title="備份管理">
+                    <svg class="backup-icon" viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                    </svg>
+                </button>
+            </div>
         </div>
         <div id="blocklyArea">
             <div id="blocklyDiv"></div>
         </div>
     </div>
+
+    <!-- 備份管理對話框 -->
+    <div id="backupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>備份管理</h2>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="backup-actions">
+                    <button id="createBackupBtn">建立新備份</button>
+                </div>
+                <div class="backup-create-form" style="display: none;">
+                    <h3>建立新備份</h3>
+                    <div class="form-group">
+                        <label for="backupName">備份名稱：</label>
+                        <input type="text" id="backupName" placeholder="輸入備份名稱">
+                    </div>
+                    <div class="form-actions">
+                        <button id="confirmBackupBtn">確認</button>
+                        <button id="cancelBackupBtn">取消</button>
+                    </div>
+                </div>
+                <div class="backup-list-container">
+                    <h3>備份列表</h3>
+                    <div id="backupList" class="backup-list">
+                        <!-- 備份項目將在這裡動態添加 -->
+                        <div class="empty-backup-list">尚無備份</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{blocklyCompressedJsUri}"></script>
     <script src="{blocksCompressedJsUri}"></script>
     <script src="{javascriptCompressedJsUri}"></script>

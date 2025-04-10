@@ -18,6 +18,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.6.0] - 2025-04-10
+
+### 新增 Added
+
+- 新增備份管理功能，支援區塊程式碼的備份與復原
+  Added backup management functionality, supporting block code backup and restoration
+  - 實作備份檔案儲存與載入機制
+    Implemented backup file storage and loading mechanism
+  - 新增備份建立、刪除功能
+    Added backup creation and deletion features
+  - 整合備份管理對話框與使用者介面
+    Integrated backup management dialog and user interface
+
+### 已更新 Updated
+
+- 改進使用者介面
+  Enhanced user interface
+  - 新增備份管理按鈕與對話框
+    Added backup management button and modal dialog
+  - 優化深色模式下的備份管理介面
+    Optimized backup management interface in dark mode
+
 ## [0.5.0] - 2025-04-10
 
 ### 已更新 Updated
