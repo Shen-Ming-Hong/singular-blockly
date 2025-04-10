@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已更新 Updated
 
+### 已修改 Changed
+
+## [0.5.0] - 2025-04-10
+
+### 已更新 Updated
+
 - 優化函數處理機制，提升代碼生成穩定性
   Optimized function processing mechanism to improve code generation stability
   - 改進日誌輸出，增加函數數量和清單的記錄

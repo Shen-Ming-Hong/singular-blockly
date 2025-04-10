@@ -97,7 +97,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    Read the rules in #file:.copilot-commit-message-instructions.md and follow the instructions to write a compliant commit message:
 
    ```
-   git add CHANGELOG.md package.json
+   git add .
    git commit -m "適合的commit訊息"
    ```
 
