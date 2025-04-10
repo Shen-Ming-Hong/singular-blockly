@@ -22,20 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 2. 依照指令結果的內容來更新 CHANGELOG.md 當中的 `## [未發布] - Unreleased` 區段，確保所有重要變更都被記錄。
    Update the `## [未發布] - Unreleased` section in CHANGELOG.md according to the command results, ensuring all significant changes are documented.
 
-### 發布確認 Release Confirmation
-
-3. 詢問使用者是否接著繼續發布還是終止動作
-   Ask the user whether to continue with the release or terminate the action
-   - 如果選擇停止，則不需要執行後續流程
-     If stop is chosen, no further steps are needed
-   - 如果確認繼續，則進行版本更新步驟
-     If continue is confirmed, proceed with the version update steps
-
 ## 版本更新流程 Version Update Process
 
 ### 準備發布日期 Prepare Release Date
 
-4. 執行以下指令獲得今天日期：
+3. 執行以下指令獲得今天日期：
    Execute the following command to get today's date:
 
    ```
@@ -44,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 更新 CHANGELOG.md Update CHANGELOG.md
 
-5. 在 CHANGELOG.md 中進行以下修改：
+4. 在 CHANGELOG.md 中進行以下修改：
    Make the following modifications in CHANGELOG.md:
    - 將目前的 `## [未發布] - Unreleased` 區段改為新版本號和發布日期
      Change the current `## [未發布] - Unreleased` section to the new version number and release date
@@ -61,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    - 日期格式：YYYY-MM-DD（例如：2023-05-20）
      Date format: YYYY-MM-DD (e.g., 2023-05-20)
 
-6. 在新版本號的上方新增一個空白的 `## [未發布] - Unreleased` 區段，為下一版本的變更做準備，格式如下：
+5. 在新版本號的上方新增一個空白的 `## [未發布] - Unreleased` 區段，為下一版本的變更做準備，格式如下：
    Add a blank `## [未發布] - Unreleased` section above the new version number to prepare for the next version's changes, in the following format:
 
    ```markdown
@@ -84,7 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 更新套件版本 Update Package Version
 
-7. 將 package.json 中的 version 欄位更新為與 CHANGELOG.md 中最新發布的版本號一致：
+6. 將 package.json 中的 version 欄位更新為與 CHANGELOG.md 中最新發布的版本號一致：
    Update the version field in package.json to match the latest released version in CHANGELOG.md:
 
    ```json
@@ -102,7 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 提交變更 Commit Changes
 
-8. 閱讀 #file:.copilot-commit-message-instructions.md 中的規則，並依照指示撰寫符合規範的 commit 訊息：
+7. 閱讀 #file:.copilot-commit-message-instructions.md 中的規則，並依照指示撰寫符合規範的 commit 訊息：
    Read the rules in #file:.copilot-commit-message-instructions.md and follow the instructions to write a compliant commit message:
 
    ```
@@ -112,7 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 標記版本 Tag Version
 
-9. 標記此次發布的版本，格式為 v+版本編號：
+8. 標記此次發布的版本，格式為 v+版本編號：
    Tag this release version, format is v+version number:
 
    ```
@@ -121,7 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 上傳到 Git 推送變更 Push to Git
 
-10. 將變更和標記推送到遠端儲存庫：
+9. 將變更和標記推送到遠端儲存庫：
     Push changes and tags to the remote repository:
 
     ```
