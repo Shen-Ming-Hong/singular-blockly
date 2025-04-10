@@ -5,6 +5,107 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// 確保全局日誌函數可用
+if (!window.log) {
+	window.log = {
+		/**
+		 * 輸出偵錯等級的日誌
+		 * @param {string} message - 主要訊息
+		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+		 */
+		debug: function (message, ...args) {
+			console.debug(message, ...args); // 保留在開發者工具中顯示
+
+			// 格式化額外參數
+			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+			// 如果 vscode 已定義，則發送日誌到 VS Code
+			if (window.vscode) {
+				window.vscode.postMessage({
+					command: 'log',
+					source: 'arduino-generator',
+					level: 'debug',
+					message: message,
+					args: formattedArgs,
+					timestamp: new Date().toISOString(),
+				});
+			}
+		},
+
+		/**
+		 * 輸出一般資訊等級的日誌
+		 * @param {string} message - 主要訊息
+		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+		 */
+		info: function (message, ...args) {
+			console.log(message, ...args); // 保留在開發者工具中顯示
+
+			// 格式化額外參數
+			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+			// 如果 vscode 已定義，則發送日誌到 VS Code
+			if (window.vscode) {
+				window.vscode.postMessage({
+					command: 'log',
+					source: 'arduino-generator',
+					level: 'info',
+					message: message,
+					args: formattedArgs,
+					timestamp: new Date().toISOString(),
+				});
+			}
+		},
+
+		/**
+		 * 輸出警告等級的日誌
+		 * @param {string} message - 主要訊息
+		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+		 */
+		warn: function (message, ...args) {
+			console.warn(message, ...args); // 保留在開發者工具中顯示
+
+			// 格式化額外參數
+			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+			// 如果 vscode 已定義，則發送日誌到 VS Code
+			if (window.vscode) {
+				window.vscode.postMessage({
+					command: 'log',
+					source: 'arduino-generator',
+					level: 'warn',
+					message: message,
+					args: formattedArgs,
+					timestamp: new Date().toISOString(),
+				});
+			}
+		},
+
+		/**
+		 * 輸出錯誤等級的日誌
+		 * @param {string} message - 主要訊息
+		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+		 */
+		error: function (message, ...args) {
+			console.error(message, ...args); // 保留在開發者工具中顯示
+
+			// 格式化額外參數
+			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+			// 如果 vscode 已定義，則發送日誌到 VS Code
+			if (window.vscode) {
+				window.vscode.postMessage({
+					command: 'log',
+					source: 'arduino-generator',
+					level: 'error',
+					message: message,
+					args: formattedArgs,
+					timestamp: new Date().toISOString(),
+				});
+			}
+		},
+	};
+}
+
 // 建立一個全局物件來追蹤腳位模式的歷史記錄
 window.arduinoGenerator.pinModes_ = {};
 

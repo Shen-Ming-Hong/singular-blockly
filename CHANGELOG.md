@@ -18,6 +18,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.4.0] - 2025-04-10
+
+### 新增 Added
+
+- 新增統一的日誌系統，支援跨模組的日誌記錄與監控
+  Added unified logging system supporting cross-module logging and monitoring
+  - 實作了分層級的日誌功能 (debug、info、warn、error)
+    Implemented multi-level logging functionality (debug, info, warn, error)
+  - 新增 VS Code 輸出頻道整合，便於除錯
+    Added VS Code output channel integration for easier debugging
+
+### 已修復 Fixed
+
+- 修正函式積木名稱變更時影響其他不相關函式積木的問題
+  Fixed a bug where changing one function block name would affect unrelated function blocks
+- 修正函數呼叫積木在工作區重新載入後連接點消失的問題
+  Fixed function call blocks losing connections after workspace reload
+- 修正多個代碼格式與條件判斷中的括號問題
+  Fixed multiple code formatting issues and missing brackets in conditional statements
+
+### 已更新 Updated
+
+- 重新實作函數與函數呼叫積木，提高穩定性與兼容性
+  Reimplemented function and function call blocks for better stability and compatibility
+  - 統一函數為無回傳值 (void) 類型，簡化設計
+    Unified functions as void type, simplifying the design
+  - 改進函數積木參數的變數整合
+    Improved variable integration for function parameters
+  - 優化函數呼叫積木的連接還原機制
+    Enhanced connection restoration mechanism for function call blocks
+
 ## [0.3.0] - 2025-04-02
 
 ### 新增 Added

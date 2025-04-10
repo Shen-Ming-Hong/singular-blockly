@@ -48,11 +48,27 @@
                 if (Blockly && Blockly.getMainWorkspace()) {
                     Blockly.getMainWorkspace().render();
                 }
-            },
-            syncToBlocklyMsg: function (locale, messages) {
+            }, syncToBlocklyMsg: function (locale, messages) {
                 // 確保 Blockly 和 Blockly.Msg 已經定義
                 if (typeof Blockly !== 'undefined' && Blockly.Msg) {
-                    console.log(`同步 ${locale} 翻譯到 Blockly.Msg`);
+                    // 使用標準化的日誌系統
+                    if (window.log && window.log.info) {
+                        window.log.info(`同步 ${locale} 翻譯到 Blockly.Msg`, {
+                            messageCount: Object.keys(messages).length,
+                            timestamp: new Date().toISOString()
+                        });
+                    } else {
+                        console.log(`同步 ${locale} 翻譯到 Blockly.Msg`);
+                        // 在 log 系統可用後立即初始化它
+                        setTimeout(() => {
+                            if (window.log && window.log.info) {
+                                window.log.info(`語言 ${locale} 已載入`, {
+                                    messageCount: Object.keys(messages).length,
+                                    timestamp: new Date().toISOString()
+                                });
+                            }
+                        }, 100);
+                    }
 
                     // 遍歷所有翻譯項目
                     for (const key in messages) {

@@ -8,6 +8,60 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// 建立輸出頻道
+let outputChannel: vscode.LogOutputChannel | undefined;
+
+// 用於輸出日誌的函數
+function log(message: string, level: 'debug' | 'info' | 'warn' | 'error' = 'info', ...args: any[]) {
+	// 確保輸出頻道已建立
+	if (!outputChannel) {
+		outputChannel = vscode.window.createOutputChannel('Singular Blockly', { log: true });
+	}
+
+	// 格式化訊息
+	const formattedMessage =
+		args.length > 0
+			? message + ' ' + args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg))).join(' ')
+			: message;
+
+	// 根據日誌級別使用對應的輸出方法
+	switch (level) {
+		case 'debug':
+			outputChannel.debug(formattedMessage);
+			break;
+		case 'info':
+			outputChannel.info(formattedMessage);
+			break;
+		case 'warn':
+			outputChannel.warn(formattedMessage);
+			break;
+		case 'error':
+			outputChannel.error(formattedMessage);
+			break;
+		default:
+			outputChannel.info(formattedMessage);
+	}
+}
+
+// 處理來自 WebView 的日誌
+function handleWebViewLog(source: string, level: string, message: string, ...args: any[]) {
+	const prefix = `[WebView:${source}][${level}]`;
+	// 將來自 WebView 的日誌層級轉換為內部日誌層級
+	const logLevel =
+		level === 'debug' || level === 'info' || level === 'warn' || level === 'error'
+			? (level as 'debug' | 'info' | 'warn' | 'error')
+			: 'info'; // 若是未知層級則視為 info
+	log(`${prefix} ${message}`, logLevel, ...args);
+}
+
+// 顯示輸出頻道
+function showOutputChannel() {
+	if (!outputChannel) {
+		outputChannel = vscode.window.createOutputChannel('Singular Blockly', { log: true });
+	}
+	outputChannel.show();
+}
+
 // 用於翻譯的 UI 訊息
 interface UIMessages {
 	[key: string]: string;
@@ -51,7 +105,7 @@ async function loadUIMessages(context: vscode.ExtensionContext): Promise<UIMessa
 
 		return cachedMessages;
 	} catch (error) {
-		console.error('Error loading UI messages:', error);
+		log('Error loading UI messages:', 'error', error);
 		return {}; // 發生錯誤時返回空物件
 	}
 }
@@ -87,10 +141,10 @@ async function getLocalizedMessage(context: vscode.ExtensionContext, key: string
 }
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Starting Singular Blockly extension...');
+	log('Starting Singular Blockly extension...', 'info');
 
 	try {
-		console.log('Registering commands...');
+		log('Registering commands...', 'info');
 
 		// Add activity bar click listener
 		const activityBarListener = vscode.window.registerWebviewViewProvider('singular-blockly-view', {
@@ -98,12 +152,12 @@ export function activate(context: vscode.ExtensionContext) {
 				// Immediately close sidebar
 				await vscode.commands.executeCommand('workbench.action.closeSidebar');
 				await vscode.commands.executeCommand('singular-blockly.openBlocklyEdit');
-				console.log('Initialization complete, closing sidebar');
+				log('Initialization complete, closing sidebar', 'info');
 
 				// Listen for subsequent visibility changes
 				webviewView.onDidChangeVisibility(async () => {
 					if (webviewView.visible) {
-						console.log('Activity bar button clicked!');
+						log('Activity bar button clicked!', 'info');
 						await vscode.commands.executeCommand('workbench.action.closeSidebar');
 						await vscode.commands.executeCommand('singular-blockly.openBlocklyEdit');
 					}
@@ -159,7 +213,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 			// Listen for messages from the webview
 			currentPanel.webview.onDidReceiveMessage(async message => {
-				if (message.command === 'updateCode') {
+				if (message.command === 'log') {
+					// 處理日誌訊息
+					handleWebViewLog(message.source || 'blocklyEdit', message.level || 'info', message.message, ...(message.args || []));
+				} else if (message.command === 'updateCode') {
 					// Get the current workspace
 					const workspaceFolders = vscode.workspace.workspaceFolders;
 					if (!workspaceFolders) {
@@ -187,7 +244,7 @@ export function activate(context: vscode.ExtensionContext) {
 					} catch (error) {
 						const errorMsg = await getLocalizedMessage(context, 'VSCODE_FAILED_SAVE_FILE', (error as Error).message);
 						vscode.window.showErrorMessage(errorMsg);
-						console.error(error);
+						log(errorMsg, 'error', error);
 					}
 				} else if (message.command === 'updateBoard') {
 					const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -234,7 +291,7 @@ export function activate(context: vscode.ExtensionContext) {
 					} catch (error) {
 						const errorMsg = await getLocalizedMessage(context, 'VSCODE_FAILED_UPDATE_INI', (error as Error).message);
 						vscode.window.showErrorMessage(errorMsg);
-						console.error(error);
+						log(errorMsg, 'error', error);
 					}
 				} else if (message.command === 'saveWorkspace') {
 					const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -262,7 +319,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 							await fs.promises.writeFile(mainJsonPath, JSON.stringify(saveData, null, 2), { encoding: 'utf8' });
 						} catch (error) {
-							console.error('Failed to save workspace state:', error);
+							log('Failed to save workspace state:', 'error', error);
 							const errorMsg = await getLocalizedMessage(context, 'VSCODE_UNABLE_SAVE_WORKSPACE', (error as Error).message);
 							vscode.window.showErrorMessage(errorMsg);
 						}
@@ -293,7 +350,7 @@ export function activate(context: vscode.ExtensionContext) {
 										throw new Error('Invalid workspace state format');
 									}
 								} catch (parseError) {
-									console.error('JSON parsing error:', parseError);
+									log('JSON parsing error:', 'error', parseError);
 									// Create a new blank state
 									const newState = { workspace: {}, board: 'none', theme: 'light' };
 									await fs.promises.writeFile(mainJsonPath, JSON.stringify(newState, null, 2), 'utf8');
@@ -301,7 +358,7 @@ export function activate(context: vscode.ExtensionContext) {
 							}
 						}
 					} catch (error) {
-						console.error('Failed to read workspace state:', error);
+						log('Failed to read workspace state:', 'error', error);
 					}
 				} else if (message.command === 'promptNewVariable') {
 					const promptMsg = message.isRename
@@ -381,7 +438,7 @@ export function activate(context: vscode.ExtensionContext) {
 									const settingsContent = await fs.promises.readFile(settingsPath, 'utf8');
 									settings = JSON.parse(settingsContent);
 								} catch (e) {
-									console.error('Invalid settings.json, will create new one');
+									log('Invalid settings.json, will create new one', 'info');
 								}
 							}
 
@@ -393,7 +450,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 							// 寫入更新後的設定
 							await fs.promises.writeFile(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
-							console.log(`Theme preference updated to: ${message.theme}`);
+							log(`Theme preference updated to: ${message.theme}`, 'info');
 
 							// 同時更新 blockly/main.json 中的主題設定
 							const blocklyDir = path.join(workspaceRoot, 'blockly');
@@ -409,12 +466,12 @@ export function activate(context: vscode.ExtensionContext) {
 										await fs.promises.writeFile(mainJsonPath, JSON.stringify(saveData, null, 2), 'utf8');
 									}
 								} catch (e) {
-									console.error('Failed to update theme in main.json:', e);
+									log('Failed to update theme in main.json:', 'error', e);
 								}
 							}
 						}
 					} catch (error) {
-						console.error('Failed to save theme preference:', error);
+						log('Failed to save theme preference:', 'error', error);
 					}
 				}
 			});
@@ -440,7 +497,7 @@ export function activate(context: vscode.ExtensionContext) {
 					settings = JSON.parse(settingsContent);
 					currentTheme = settings['singular-blockly.theme'] || 'light';
 				} catch (e) {
-					console.error('Invalid settings.json');
+					log('Invalid settings.json', 'warn');
 				}
 			}
 
@@ -468,8 +525,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			});
 		});
-
-		console.log('Creating status bar button...');
+		log('Creating status bar button...', 'info');
 		// Create status bar button
 		const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
 		blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
@@ -483,15 +539,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 		blocklyStatusBarItem.show();
 
-		console.log('Setting up subscriptions...');
+		log('Setting up subscriptions...', 'info');
 		// Add status bar button to subscription list
 		context.subscriptions.push(blocklyStatusBarItem);
 		context.subscriptions.push(activityBarListener);
 		context.subscriptions.push(toggleThemeCommand); // 註冊主題切換命令
 
-		console.log('Singular Blockly extension fully activated!');
+		log('Singular Blockly extension fully activated!', 'info');
 	} catch (error) {
-		console.error('Error starting Singular Blockly:', error);
+		log('Error starting Singular Blockly:', 'error', error);
 		vscode.window.showErrorMessage(`Failed to start Singular Blockly: ${error}`);
 	}
 }
@@ -515,8 +571,7 @@ async function configurePlatformIOSettings(workspacePath: string) {
 			try {
 				settings = JSON.parse(settingsContent) as { [key: string]: any };
 			} catch (e) {
-				// 如果 JSON 無效，就使用空物件
-				console.error('Invalid settings.json, will override with new settings');
+				// 如果 JSON 無效，就使用空物件				log('Invalid settings.json, will override with new settings', 'warn');
 			}
 		}
 
@@ -527,12 +582,11 @@ async function configurePlatformIOSettings(workspacePath: string) {
 			'platformio-ide.disablePIOHomeStartup': true,
 			'singular-blockly.theme': (settings as { [key: string]: any })['singular-blockly.theme'] || 'light', // 預設主題設定
 		};
-
 		// 寫入設定檔
 		await fs.promises.writeFile(settingsPath, JSON.stringify(settings, null, 2));
-		console.log('PlatformIO settings updated: disabled auto-open platformio.ini');
+		log('PlatformIO settings updated: disabled auto-open platformio.ini', 'info');
 	} catch (error) {
-		console.error('Failed to configure PlatformIO settings:', error);
+		log('Failed to configure PlatformIO settings:', 'error', error);
 	}
 }
 
@@ -574,7 +628,7 @@ async function getAvailableBlocklyLanguages(context: vscode.ExtensionContext): P
 
 		return languages;
 	} catch (error) {
-		console.error('Unable to read language file directory:', error);
+		log('Unable to read language file directory:', 'error', error);
 		return ['en']; // Return at least English if an error occurs
 	}
 }
@@ -625,7 +679,7 @@ async function getSupportedLocales(context: vscode.ExtensionContext): Promise<st
 		const files = await fs.promises.readdir(localesPath);
 		return files.filter(file => fs.statSync(path.join(localesPath, file)).isDirectory());
 	} catch (error) {
-		console.error('Unable to read language file directory:', error);
+		log('Unable to read language file directory:', 'error', error);
 		return ['en']; // Return at least English if an error occurs
 	}
 }
@@ -633,7 +687,7 @@ async function getSupportedLocales(context: vscode.ExtensionContext): Promise<st
 async function loadLocaleFiles(context: vscode.ExtensionContext, webview: vscode.Webview): Promise<string> {
 	// Get the list of supported languages
 	const supportedLocales = await getSupportedLocales(context);
-	console.log('Supported languages:', supportedLocales);
+	log('Supported languages:', 'info', supportedLocales);
 
 	// Load language files
 	const localeFiles = supportedLocales.map(locale => {
@@ -699,13 +753,13 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 
 	const vscodeLanguage = vscode.env.language;
 	const blocklyLanguage = mapVSCodeLangToBlockly(vscodeLanguage);
-	console.log(`VSCode language: ${vscodeLanguage} -> Blockly language: ${blocklyLanguage}`);
+	log(`VSCode language: ${vscodeLanguage} -> Blockly language: ${blocklyLanguage}`);
 
 	// Load the corresponding Blockly language file
 	const langJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath(`media/locales/${blocklyLanguage}/messages.js`)));
 	const msgJsUri = webview.asWebviewUri(vscode.Uri.file(context.asAbsolutePath(`node_modules/blockly/msg/${blocklyLanguage}.js`))); // Get available Blockly languages
 	const availableLanguages = await getAvailableBlocklyLanguages(context);
-	console.log('Available Blockly languages:', availableLanguages);
+	log('Available Blockly languages:', 'info', availableLanguages);
 	// Load language files, currently loading all, can be optimized as needed in the future
 	const localeScripts = await loadLocaleFiles(context, webview);
 
@@ -771,7 +825,7 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 			}
 		}
 	} catch (error) {
-		console.error('Failed to read theme preference:', error);
+		log('Failed to read theme preference:', 'error', error);
 	}
 
 	// Inject theme preference
@@ -784,32 +838,32 @@ async function getWebviewContent(context: vscode.ExtensionContext, webview: vsco
 async function getBoardConfig(panel: vscode.WebviewPanel | undefined, board: string): Promise<string> {
 	// 如果面板不存在，無法獲取設定
 	if (!panel) {
-		console.log('WebView 面板不可用，無法獲取板子設定');
+		log('WebView 面板不可用，無法獲取板子設定');
 		return ''; // 返回空字串
 	}
 
 	// 透過 WebView 獲取板子設定
 	try {
-		console.log(`向 WebView 請求板子設定：${board}`);
+		log(`向 WebView 請求板子設定：${board}`);
 
 		// 設定一個 Promise 等待 webview 回應
 		return new Promise<string>((resolve, reject) => {
 			// 建立唯一的訊息 ID
 			const messageId = `get-board-config-${Date.now()}`;
-			console.log(`建立訊息 ID：${messageId}`);
+			log(`建立訊息 ID：${messageId}`);
 
 			// 標記是否已收到回應
 			let responseReceived = false;
 
 			// 設定訊息監聽器
 			const messageListener = panel.webview.onDidReceiveMessage(message => {
-				console.log(`收到 WebView 回應：`, message);
+				log(`收到 WebView 回應：`, message);
 				if (message.command === 'boardConfigResult' && message.messageId === messageId) {
 					// 設定已收到回應標記
 					responseReceived = true;
 					// 收到回應後，移除監聽器
 					messageListener.dispose();
-					console.log(`成功從 WebView 獲取板子設定`);
+					log(`成功從 WebView 獲取板子設定`);
 					resolve(message.config || '');
 				}
 			});
@@ -820,22 +874,22 @@ async function getBoardConfig(panel: vscode.WebviewPanel | undefined, board: str
 				board: board,
 				messageId: messageId,
 			});
-			console.log(`已發送 getBoardConfig 請求到 WebView，等待回應`);
+			log(`已發送 getBoardConfig 請求到 WebView，等待回應`);
 
 			// 設定逾時，如果 10 秒內沒有回應，則返回空字串
 			const timeoutId = setTimeout(() => {
 				// 只有在尚未收到回應時才執行超時處理
 				if (!responseReceived) {
 					messageListener.dispose();
-					console.log(`板子設定請求逾時，無法獲取設定`);
+					log(`板子設定請求逾時，無法獲取設定`);
 					resolve(''); // 返回空字串
 				} else {
-					console.log(`已收到回應，取消超時處理`);
+					log(`已收到回應，取消超時處理`);
 				}
 			}, 10000);
 		});
 	} catch (error) {
-		console.error('從 WebView 獲取板子設定時發生錯誤:', error);
+		log('從 WebView 獲取板子設定時發生錯誤:', 'error', error);
 		return ''; // 返回空字串
 	}
 }

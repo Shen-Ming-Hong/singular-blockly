@@ -9,13 +9,14 @@
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
-			],
-			"outFiles": [
-				"${workspaceFolder}/dist/**/*.js"
-			],
-			"preLaunchTask": "${defaultBuildTask}"
+			"args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
+			"preLaunchTask": "${defaultBuildTask}",
+			"trace": true,
+			"internalConsoleOptions": "openOnSessionStart",
+			"env": {
+				"VSCODE_DEBUG_FILTER": "singular-blockly*"
+			}
 		}
 	]
 }

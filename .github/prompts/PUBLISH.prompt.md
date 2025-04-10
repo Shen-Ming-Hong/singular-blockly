@@ -91,6 +91,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    "version": "1.2.3"
    ```
 
+## 發布前檢查 Post-Release Checks
+
+- [ ] 確認 CHANGELOG.md 已正確更新
+      Confirm CHANGELOG.md has been correctly updated
+- [ ] 確認 package.json 版本號已更新
+      Confirm the version number in package.json has been updated
+
 ## Git 提交與發布 Git Commit and Release
 
 ### 提交變更 Commit Changes
@@ -121,13 +128,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     git push
     git push --tags
     ```
-
-## 發布後檢查 Post-Release Checks
-
-- [ ] 確認 CHANGELOG.md 已正確更新
-      Confirm CHANGELOG.md has been correctly updated
-- [ ] 確認 package.json 版本號已更新
-      Confirm the version number in package.json has been updated
 
 ## 注意事項 Notes
 

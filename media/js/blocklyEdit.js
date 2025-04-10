@@ -5,6 +5,93 @@
  */
 const vscode = acquireVsCodeApi();
 
+// 日誌系統
+const log = {
+	/**
+	 * 輸出偵錯等級的日誌
+	 * @param {string} message - 主要訊息
+	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+	 */
+	debug: function (message, ...args) {
+		console.debug(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
+
+		// 格式化額外參數
+		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+		vscode.postMessage({
+			command: 'log',
+			source: 'blocklyEdit',
+			level: 'debug',
+			message: message,
+			args: formattedArgs,
+			timestamp: new Date().toISOString(),
+		});
+	},
+
+	/**
+	 * 輸出一般資訊等級的日誌
+	 * @param {string} message - 主要訊息
+	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+	 */
+	info: function (message, ...args) {
+		console.log(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
+
+		// 格式化額外參數
+		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+		vscode.postMessage({
+			command: 'log',
+			source: 'blocklyEdit',
+			level: 'info',
+			message: message,
+			args: formattedArgs,
+			timestamp: new Date().toISOString(),
+		});
+	},
+
+	/**
+	 * 輸出警告等級的日誌
+	 * @param {string} message - 主要訊息
+	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+	 */
+	warn: function (message, ...args) {
+		console.warn(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
+
+		// 格式化額外參數
+		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+		vscode.postMessage({
+			command: 'log',
+			source: 'blocklyEdit',
+			level: 'warn',
+			message: message,
+			args: formattedArgs,
+			timestamp: new Date().toISOString(),
+		});
+	},
+
+	/**
+	 * 輸出錯誤等級的日誌
+	 * @param {string} message - 主要訊息
+	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
+	 */
+	error: function (message, ...args) {
+		console.error(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
+
+		// 格式化額外參數
+		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+
+		vscode.postMessage({
+			command: 'log',
+			source: 'blocklyEdit',
+			level: 'error',
+			message: message,
+			args: formattedArgs,
+			timestamp: new Date().toISOString(),
+		});
+	},
+};
+
 // 儲存當前主題設定
 let currentTheme = window.initialTheme || 'light'; // 從 HTML 獲取初始主題設定
 
@@ -82,7 +169,7 @@ function updateThemeUI(theme) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-	console.log('Blockly Edit page loaded');
+	log.info('Blockly Edit page loaded');
 
 	// 註冊主題切換按鈕事件
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
@@ -175,36 +262,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 註冊函式類別的 flyout callback
 	workspace.registerToolboxCategoryCallback('FUNCTION', function (workspace) {
+		const blocks = [];
+
 		// 首先創建函式定義積木
-		const blocks = [Blockly.utils.xml.textToDom(`<block type="arduino_function"></block>`)];
+		blocks.push(Blockly.utils.xml.textToDom(`<block type="arduino_function"></block>`));
+
 		// 然後為每個已定義的函式創建調用積木
 		const functions = workspace.getBlocksByType('arduino_function', false);
-		const functionCalls = functions.map(functionBlock => {
-			const funcName = functionBlock.getFieldValue('NAME');
-			// 創建函式調用積木
-			const callBlockXml = Blockly.utils.xml.textToDom(
-				`<block type="function_call">
-					<field name="NAME">${funcName}</field>
-				</block>`
-			);
-			// 使用 requestRender_ 來確保調用積木正確初始化
-			const callBlockId = Blockly.utils.idGenerator.genUid();
-			callBlockXml.setAttribute('id', callBlockId);
-			// 在積木被添加到工作區後更新其形狀
-			workspace.registerToolboxCategoryCallback('__TEMP__', function (ws) {
-				setTimeout(() => {
-					const callBlock = workspace.getBlockById(callBlockId);
-					if (callBlock) {
-						callBlock.updateShape_(functionBlock);
-						callBlock.render();
+		if (functions.length > 0) {
+			functions.forEach(functionBlock => {
+				const funcName = functionBlock.getFieldValue('NAME');
+				if (funcName) {
+					// 為每個已定義的函數創建對應的呼叫積木
+					// 函式現在統一為 void 類型，不再有回傳值
+					const returnType = 'void'; // 使用新的 XML 格式，包含完整的 mutation 資訊，但統一無回傳值
+					let callBlockXml = `
+						<block type="arduino_function_call">
+							<mutation name="${funcName}" version="1" has_return="false" return_type="void"></mutation>
+					`;
+
+					// 添加函數參數資訊
+					if (functionBlock.arguments_ && functionBlock.arguments_.length > 0) {
+						for (let i = 0; i < functionBlock.arguments_.length; i++) {
+							const argName = functionBlock.arguments_[i] || '';
+							const argType = functionBlock.argumentTypes_[i] || 'int';
+							callBlockXml += `<arg name="${argName}" type="${argType}"></arg>`;
+						}
 					}
-				}, 0);
-				return [];
+
+					// 關閉 XML 標籤
+					callBlockXml += '</block>';
+
+					// 轉換為 DOM 元素並添加到積木列表
+					const callBlockDom = Blockly.utils.xml.textToDom(callBlockXml);
+					blocks.push(callBlockDom);
+				}
 			});
-			return callBlockXml;
-		});
-		// 返回合併後的積木陣列
-		return blocks.concat(functionCalls);
+		}
+
+		return blocks;
 	});
 
 	// 保存工作區狀態的函數
@@ -218,7 +314,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				theme: currentTheme, // 確保主題設定被保存
 			});
 		} catch (error) {
-			console.error('保存工作區狀態失敗:', error);
+			log.error('保存工作區狀態失敗:', error);
 		}
 	};
 
@@ -227,6 +323,101 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// 忽略拖動中的 UI 事件
 		if (event.isUiEvent) {
 			return;
+		}
+		// 工作區完全載入後修復函數呼叫積木和連接點
+		if (event.type === Blockly.Events.FINISHED_LOADING) {
+			// 延遲執行以確保所有積木已完全載入
+			setTimeout(() => {
+				log.info('工作區載入完成，開始修復函數呼叫積木關聯');
+
+				// 1. 獲取所有函數定義積木
+				const functionBlocks = workspace.getBlocksByType('arduino_function', false);
+				const functionNamesMap = new Map();
+
+				// 2. 建立函數名稱映射表
+				functionBlocks.forEach(block => {
+					const name = block.getFieldValue('NAME');
+					if (name) {
+						functionNamesMap.set(name, block);
+					}
+				});
+
+				// 3. 更新所有函數呼叫積木
+				const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
+				callBlocks.forEach(block => {
+					// 強制更新呼叫積木
+					block.updateFromFunctionBlock_();
+					log.info(`修復函數呼叫積木: ${block.getFieldValue('NAME')}`);
+				});
+
+				// 4. 為所有函數呼叫積木重建連接點
+				if (window._functionCallBlocks && window._functionCallBlocks.length > 0) {
+					log.info(`開始重建 ${window._functionCallBlocks.length} 個函數呼叫積木的連接點`);
+
+					// 進行兩次連接嘗試，以增加成功率
+					window._functionCallBlocks.forEach(block => {
+						try {
+							// 檢查呼叫積木是否還在工作區中
+							if (block.workspace) {
+								// 第一次嘗試：通過更新函數定義來重建連接
+								block.updateFromFunctionBlock_();
+
+								// 強制立即更新形狀
+								if (block._doUpdateShape) {
+									block._doUpdateShape();
+								}
+
+								log.info(`重建 ${block.getFieldValue('NAME')} 連接點完成`);
+							}
+						} catch (err) {
+							log.warn(`重建函數呼叫積木連接失敗:`, err);
+						}
+					});
+
+					// 重置追蹤列表，避免重複處理
+					window._functionCallBlocks = [];
+				}
+
+				log.info('函數呼叫積木修復完成');
+
+				// 5. 觸發工作區變更，確保連接狀態刷新
+				try {
+					// 使用標準的 fireChangeListener 方法來觸發變更事件
+					const changeEvent = new Blockly.Events.BlockMove();
+					workspace.fireChangeListener(changeEvent);
+					log.info('工作區連接狀態已刷新');
+				} catch (err) {
+					log.warn('刷新工作區連接狀態失敗:', err);
+				}
+			}, 800); // 延長等待時間，確保所有積木已完全載入和初始化
+		}
+
+		// 監聽函數定義變更，自動刷新工具箱
+		if (
+			event.type === Blockly.Events.BLOCK_MOVE ||
+			event.type === Blockly.Events.BLOCK_CHANGE ||
+			event.type === Blockly.Events.BLOCK_DELETE ||
+			event.type === Blockly.Events.BLOCK_CREATE
+		) {
+			// 檢查是否是函數積木的變更
+			const isRelatedToFunction = event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE;
+
+			if (isRelatedToFunction) {
+				const block = workspace.getBlockById(event.blockId);
+				if (block && block.type === 'arduino_function') {
+					// 強制刷新函數類別
+					if (workspace.toolbox_) {
+						// 延遲執行以避免頻繁刷新
+						if (workspace._refreshFunctionTimeout) {
+							clearTimeout(workspace._refreshFunctionTimeout);
+						}
+
+						workspace._refreshFunctionTimeout = setTimeout(() => {
+							workspace.toolbox_.refreshSelection();
+						}, 300);
+					}
+				}
+			}
 		}
 
 		// 更新程式碼
@@ -237,41 +428,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			event.type === Blockly.Events.BLOCK_CREATE
 		) {
 			// 檢查是否是函式定義積木變化
-			if (event.blockId) {
-				const block = workspace.getBlockById(event.blockId);
-				if (block) {
-					if (block.type === 'arduino_function') {
-						const funcName = block.getFieldValue('NAME');
-						// 找到並更新所有相關的函式調用積木
-						workspace
-							.getAllBlocks(false)
-							.filter(b => b.type === 'function_call' && b.getFieldValue('NAME') === funcName)
-							.forEach(callBlock => {
-								// 保存現有連接
-								const savedConnections = [];
-								for (let i = 0; callBlock.getInput('ARG' + i); i++) {
-									const input = callBlock.getInput('ARG' + i);
-									if (input.connection.targetBlock()) {
-										savedConnections.push({
-											index: i,
-											block: input.connection.targetBlock(),
-										});
-									}
-								}
-								// 更新形狀
-								callBlock.updateShape_(block);
-								// 恢復連接
-								savedConnections.forEach(({ index, block }) => {
-									const input = callBlock.getInput('ARG' + index);
-									if (input) {
-										input.connection.connect(block.outputConnection);
-									}
-								});
-								callBlock.render();
-							});
-					}
-				}
-			}
 			try {
 				const code = arduinoGenerator.workspaceToCode(workspace);
 				vscode.postMessage({
@@ -282,7 +438,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				// 無條件保存所有方塊移動事件，確保座標變更被儲存
 				saveWorkspaceState();
 			} catch (err) {
-				console.log('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
+				log.info('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
 			}
 		}
 	});
@@ -310,7 +466,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	window.addEventListener('message', event => {
 		const message = event.data;
 		const workspace = Blockly.getMainWorkspace();
-		console.log(`收到訊息: ${message.command}`, message);
+		log.info(`收到訊息: ${message.command}`, message);
 
 		switch (message.command) {
 			case 'createVariable':
@@ -398,20 +554,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 新增：處理獲取板子設定的請求
 			case 'getBoardConfig':
 				// 從全局函數獲取板子設定
-				console.log(`收到獲取板子設定請求，板子類型: ${message.board}`);
+				log.info(`收到獲取板子設定請求，板子類型: ${message.board}`);
 				if (typeof window.getBoardConfig === 'function') {
 					const config = window.getBoardConfig(message.board);
-					console.log(`找到板子設定: `, config);
+					log.info(`找到板子設定: `, config);
 					// 回傳設定到擴充功能
 					vscode.postMessage({
 						command: 'boardConfigResult',
 						config: config,
 						messageId: message.messageId, // 返回原始訊息ID以便識別
 					});
-					console.log(`已發送設定回覆，訊息ID: ${message.messageId}`);
+					log.info(`已發送設定回覆，訊息ID: ${message.messageId}`);
 				} else {
 					// 如果函數不存在，返回空字串
-					console.warn('在 WebView 中找不到 getBoardConfig 函數');
+					log.warn('在 WebView 中找不到 getBoardConfig 函數');
 					vscode.postMessage({
 						command: 'boardConfigResult',
 						config: '',
@@ -419,7 +575,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 					});
 				}
 				break;
-			// ...保留其他既有的 case...
 			case 'loadWorkspace':
 				try {
 					if (message.board) {
@@ -439,11 +594,87 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 
 					if (message.state) {
+						// 儲存函數名稱以用於追蹤變更
+						const preSaveFunctionNames = new Map();
+						try {
+							// 先取得工作區中的函數名稱以進行比較
+							workspace.getBlocksByType('arduino_function', false).forEach(block => {
+								const name = block.getFieldValue('NAME');
+								if (name) {
+									preSaveFunctionNames.set(block.id, name);
+								}
+							});
+						} catch (e) {
+							log.info('取得現有函數名稱失敗', e);
+						}
+
 						// 然後再載入工作區內容
 						Blockly.serialization.workspaces.load(message.state, workspace);
+
+						// 工作區載入後，立即修復函數名稱關聯
+						setTimeout(() => {
+							log.info('工作區載入完成，修復函數名稱關聯');
+
+							// 取得所有函數積木
+							const functionBlocks = workspace.getBlocksByType('arduino_function', false);
+
+							// 記錄函數定義的名稱變更
+							const functionNameChanges = new Map();
+							functionBlocks.forEach(block => {
+								const oldName = preSaveFunctionNames.get(block.id);
+								const newName = block.getFieldValue('NAME');
+								if (oldName && newName && oldName !== newName) {
+									log.info(`檢測到函數名稱變更: ${oldName} -> ${newName}`);
+									functionNameChanges.set(oldName, newName);
+
+									// 將新名稱保存到 oldName_ 屬性中，以便後續修改名稱時能正確比較
+									block.oldName_ = newName;
+								}
+							});
+
+							// 應用名稱變更到所有函數呼叫積木
+							if (functionNameChanges.size > 0) {
+								const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
+								callBlocks.forEach(block => {
+									const currentName = block.getFieldValue('NAME');
+									const newName = functionNameChanges.get(currentName);
+									if (newName) {
+										log.info(`更新函數呼叫積木名稱: ${currentName} -> ${newName}`);
+
+										// 更新名稱
+										const nameField = block.getField('NAME');
+										if (nameField) {
+											nameField.setValue(newName);
+										}
+									}
+								});
+							}
+
+							// 強制更新所有函數呼叫積木
+							const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
+							callBlocks.forEach(callBlock => {
+								try {
+									log.info(`更新函數呼叫積木: ${callBlock.getFieldValue('NAME')}`);
+									callBlock.updateFromFunctionBlock_();
+								} catch (err) {
+									log.error('更新函數呼叫積木失敗:', err);
+								}
+							});
+
+							// 更新程式碼
+							try {
+								const code = arduinoGenerator.workspaceToCode(workspace);
+								vscode.postMessage({
+									command: 'updateCode',
+									code: code,
+								});
+							} catch (err) {
+								log.warn('更新程式碼失敗:', err);
+							}
+						}, 300);
 					}
 				} catch (error) {
-					console.error('載入工作區狀態失敗:', error);
+					log.error('載入工作區狀態失敗:', error);
 				}
 				break;
 			case 'setTheme':
@@ -487,7 +718,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					board: boardSelect.value,
 					theme: currentTheme, // 確保在整理方塊後也保存主題設定
 				});
-				console.log('方塊整理完成，已儲存工作區狀態');
+				log.info('方塊整理完成，已儲存工作區狀態');
 			}, 300);
 		};
 	}

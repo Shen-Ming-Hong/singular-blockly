@@ -68,8 +68,12 @@ if (!window.pinModeTracker) {
 		// 檢查腳位模式是否符合要求
 		checkMode: function (pin, requiredMode) {
 			const currentMode = this.getMode(pin);
-			if (!currentMode) return true; // 如果沒有設定模式，返回 true (自動設定)
-			if (currentMode === requiredMode) return true; // 如果模式符合，返回 true
+			if (!currentMode) {
+				return true;
+			} // 如果沒有設定模式，返回 true (自動設定)
+			if (currentMode === requiredMode) {
+				return true;
+			} // 如果模式符合，返回 true
 			return false; // 模式不符合，返回 false (衝突)
 		},
 
@@ -91,7 +95,9 @@ if (!window.pinModeTracker) {
 			const blocks = this.getBlocksUsingPin(pin);
 
 			// 如果沒有積木使用此腳位，返回 null
-			if (blocks.length === 0) return null;
+			if (blocks.length === 0) {
+				return null;
+			}
 
 			// 如果有時間戳記錄，使用它
 			if (this.lastUpdateTime[normalizedPin]) {
@@ -99,7 +105,9 @@ if (!window.pinModeTracker) {
 				const lastBlock = Blockly.getMainWorkspace().getBlockById(lastBlockId);
 
 				// 如果找到最後設定的積木且它在當前工作區中，返回它
-				if (lastBlock) return lastBlock;
+				if (lastBlock) {
+					return lastBlock;
+				}
 			}
 
 			// 如果找不到最後設定的積木，返回列表中的最後一個（通常是最後放置的）
@@ -108,7 +116,9 @@ if (!window.pinModeTracker) {
 
 		// 獲取所有使用特定腳位的積木
 		getBlocksUsingPin: function (pin) {
-			if (!Blockly.getMainWorkspace()) return [];
+			if (!Blockly.getMainWorkspace()) {
+				return [];
+			}
 
 			const normalizedPin = this.normalizePin(pin);
 			const blocks = Blockly.getMainWorkspace().getAllBlocks(false);
@@ -133,7 +143,9 @@ if (!window.pinModeTracker) {
 
 		// 更新所有使用特定腳位的積木警告
 		updateBlockWarnings: function (pin) {
-			if (!Blockly.getMainWorkspace()) return;
+			if (!Blockly.getMainWorkspace()) {
+				return;
+			}
 
 			const normalizedPin = this.normalizePin(pin);
 			const blocks = this.getBlocksUsingPin(pin);
@@ -143,16 +155,22 @@ if (!window.pinModeTracker) {
 
 			// 獲取當前腳位的模式
 			const currentMode = this.getMode(pin);
-			if (!currentMode) return;
+			if (!currentMode) {
+				return;
+			}
 
 			// 獲取最後修改此腳位的積木
 			const lastBlock = this.getMostRecentBlock(pin);
-			if (!lastBlock) return;
+			if (!lastBlock) {
+				return;
+			}
 
 			// 遍歷所有積木，找到與最後設置的積木模式不兼容的積木
 			blocks.forEach(block => {
 				// 跳過最後設定的積木
-				if (block.id === lastBlock.id) return;
+				if (block.id === lastBlock.id) {
+					return;
+				}
 
 				// 根據積木類型確定需要的模式
 				let requiredMode;
@@ -286,7 +304,9 @@ if (!window.pinModeTracker) {
 		// 監聽積木變化事件
 		handleBlockEvent: function (event) {
 			// 如果工作區被銷毀，直接返回
-			if (!Blockly.getMainWorkspace()) return;
+			if (!Blockly.getMainWorkspace()) {
+				return;
+			}
 
 			// 處理積木移動事件
 			if (event.type === Blockly.Events.BLOCK_MOVE) {
@@ -310,7 +330,9 @@ if (!window.pinModeTracker) {
 					const usedPins = new Set();
 					blocks.forEach(block => {
 						const pin = block.getFieldValue('PIN');
-						if (pin) usedPins.add(this.normalizePin(pin));
+						if (pin) {
+							usedPins.add(this.normalizePin(pin));
+						}
 					});
 
 					// 對每個腳位重新掃描並更新
@@ -373,7 +395,9 @@ if (!window.pinModeTracker) {
 
 		// 更新所有積木警告
 		updateAllBlockWarnings: function () {
-			if (!Blockly.getMainWorkspace()) return;
+			if (!Blockly.getMainWorkspace()) {
+				return;
+			}
 
 			// 先清除所有積木的警告
 			const blocks = Blockly.getMainWorkspace().getAllBlocks(false);

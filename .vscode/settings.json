@@ -32,5 +32,6 @@
 			"command": "extension.execute",
 			"priority": 4
 		}
-	]
+	],
+	"markdown.validate.enabled": false
 }
