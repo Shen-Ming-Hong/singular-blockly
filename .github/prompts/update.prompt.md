@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 確認變更類型 Confirm Change Types
 
-1. 根據變更的性質，將更新分類為以下類別：
+2. 根據變更的性質，將更新分類為以下類別：
    Based on the nature of the changes, categorize updates into the following categories:
 
    - **新增 Added**: 新功能或新特性
@@ -37,10 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 更新 CHANGELOG.md Update CHANGELOG.md
 
-2. 打開專案的 CHANGELOG.md 檔案
+3. 打開專案的 CHANGELOG.md 檔案
    Open the project's CHANGELOG.md file
 
-3. 在 `## [未發布] - Unreleased` 區段下的適當分類中，添加新的變更項目。使用以下格式：
+4. 在 `## [未發布] - Unreleased` 區段下的適當分類中，添加新的變更項目。使用以下格式：
    Add new change items under the appropriate category in the `## [未發布] - Unreleased` section. Use the following format:
 
    ```markdown
@@ -63,7 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
      Modified behavior of feature C
    ```
 
-4. 確保每個變更都有清晰的描述，並且同時提供中文和英文說明
+5. 確保每個變更都有清晰的描述，並且同時提供中文和英文說明
    Ensure each change has a clear description, providing both Chinese and English explanations
 
 ### 最佳實踐 Best Practices
