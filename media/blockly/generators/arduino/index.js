@@ -50,11 +50,46 @@ window.arduinoGenerator.finish = function (code) {
 		definitions += window.arduinoGenerator.definitions_[name];
 	}
 
-	// 輸出函數定義
-	let functions = '';
-	for (let name in window.arduinoGenerator.functions_) {
-		functions += window.arduinoGenerator.functions_[name] + '\n';
+	// 處理函數: 1. 前向宣告, 2. 按照原始順序定義函數
+	const functionNames = Object.keys(window.arduinoGenerator.functions_);
+	let forwardDeclarations = '';
+	let functionDefinitions = '';
+
+	if (functionNames.length > 0) {
+		// 生成所有函數的前向宣告
+		functionNames.forEach(name => {
+			// 從函數定義提取參數和返回類型
+			const funcDef = window.arduinoGenerator.functions_[name];
+			const signatureMatch = funcDef.match(/^(\w+)\s+(\w+)\s*\((.*?)\)/);
+			if (signatureMatch) {
+				const returnType = signatureMatch[1]; // void, int 等
+				const funcName = signatureMatch[2]; // 函數名稱
+				const params = signatureMatch[3]; // 參數列表
+				forwardDeclarations += `${returnType} ${funcName}(${params});\n`;
+			}
+		});
+
+		// 使用原始順序生成函數定義
+		functionNames.forEach(name => {
+			functionDefinitions += window.arduinoGenerator.functions_[name];
+		});
+
+		// 使用日誌輸出函數定義順序
+		if (typeof log !== 'undefined') {
+			log.info('函數數量:', functionNames.length);
+			log.info('函數列表:', functionNames);
+		} else {
+			console.log('函數數量:', functionNames.length);
+			console.log('函數列表:', functionNames);
+		}
 	}
+
+	// 輸出前向宣告和原始順序的函數定義
+	let functions = '';
+	if (forwardDeclarations) {
+		functions = '// 函數前向宣告\n' + forwardDeclarations + '\n';
+	}
+	functions += functionDefinitions;
 
 	// 輸出警告訊息為註解
 	let warnings = '';

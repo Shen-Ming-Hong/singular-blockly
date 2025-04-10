@@ -16,7 +16,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已更新 Updated
 
+- 優化函數處理機制，提升代碼生成穩定性
+  Optimized function processing mechanism to improve code generation stability
+  - 改進日誌輸出，增加函數數量和清單的記錄
+    Improved logging output with function count and list information
+
 ### 已修改 Changed
+
+- 改進 Arduino 程式碼生成器的函數處理流程
+  Enhanced Arduino generator's function processing workflow
+  - 新增函數前向宣告機制，解決相依性問題
+    Added function forward declarations mechanism to solve dependency issues
+  - 保持函數定義的原始順序，提升生成代碼的一致性
+    Preserved original order of function definitions for better generated code consistency
 
 ## [0.4.0] - 2025-04-10
 
