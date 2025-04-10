@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 1. 執行以下命令檢視自上次發布以來的所有變更：
    Run the following command to view all changes since the last release:
 
-   ```
+   ```bash
    git --no-pager diff HEAD
    ```
 
@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 3. 執行以下指令獲得今天日期：
    Execute the following command to get today's date:
 
-   ```
+   ```bash
    Get-Date -Format "yyyy-MM-dd"
    ```
 
@@ -93,10 +93,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 提交變更 Commit Changes
 
-7. 閱讀 #file:.copilot-commit-message-instructions.md 中的規則，並依照指示撰寫符合規範的 commit 訊息：
-   Read the rules in #file:.copilot-commit-message-instructions.md and follow the instructions to write a compliant commit message:
+7. 搜尋並確實閱讀完 #file:../../.vscode/.copilot-commit-message-instructions.md 當中的規則，並依照指示撰寫符合規範的 commit 訊息：
+   Read the rules in #file:../../.vscode/.copilot-commit-message-instructions.md and follow the instructions to write a compliant commit message:
 
-   ```
+   ```bash
    git add .
    git commit -m "適合的commit訊息"
    ```
@@ -106,7 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 8. 標記此次發布的版本，格式為 v+版本編號：
    Tag this release version, format is v+version number:
 
-   ```
+   ```bash
    git tag v1.2.3
    ```
 
@@ -115,7 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 9. 將變更和標記推送到遠端儲存庫：
     Push changes and tags to the remote repository:
 
-    ```
+    ```bash
     git push
     git push --tags
     ```
