@@ -973,12 +973,44 @@ Blockly.Blocks['threshold_function_read'] = {
 						const name = block.getFieldValue('NAME');
 						return [name, name];
 					});
-				return functions.length > 0 ? functions : [['Func0', 'Func0']];
+
+				// 保留目前已選擇的值 (若存在且仍在有效的選項中)
+				const currentValue = this.getFieldValue('FUNC');
+				const availableFunctions = functions.length > 0 ? functions : [['Func0', 'Func0']];
+
+				// 檢查目前的值是否存在於可用選項中
+				if (currentValue && availableFunctions.some(option => option[1] === currentValue)) {
+					// 如果存在，調整順序把當前選擇的放到第一位
+					const reorderedOptions = [...availableFunctions];
+					const currentIndex = reorderedOptions.findIndex(option => option[1] === currentValue);
+					if (currentIndex > 0) {
+						const currentOption = reorderedOptions.splice(currentIndex, 1)[0];
+						reorderedOptions.unshift(currentOption);
+					}
+					return reorderedOptions;
+				}
+
+				return availableFunctions;
 			}),
 			'FUNC'
 		);
 		this.setOutput(true, null);
 		this.setColour('#00979C');
 		this.setTooltip(window.languageManager.getMessage('THRESHOLD_TOOLTIP_READ'));
+	},
+
+	// 新增變異記錄方法，保存選擇的函式值
+	mutationToDom: function () {
+		const container = Blockly.utils.xml.createElement('mutation');
+		container.setAttribute('func', this.getFieldValue('FUNC'));
+		return container;
+	},
+
+	// 從變異記錄恢復選擇的函式值
+	domToMutation: function (xmlElement) {
+		const func = xmlElement.getAttribute('func');
+		if (func) {
+			this.getField('FUNC').setValue(func);
+		}
 	},
 };

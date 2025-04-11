@@ -18,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.7.0] - 2025-04-11
+
+### 已更新 Updated
+
+- 改進閾值函數讀取區塊功能
+  Enhanced threshold function read block functionality
+  - 現在會保留使用者先前選擇的函數值
+    Now preserves previously selected function value
+  - 新增變異記錄方法，可在重新載入時保持選擇狀態
+    Added mutation recording methods to maintain selection state when reloaded
+
 ## [0.6.0] - 2025-04-10
 
 ### 新增 Added
