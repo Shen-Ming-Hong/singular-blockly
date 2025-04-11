@@ -18,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.9.0] - 2025-04-11
+
+### 新增 Added
+
+- 新增自動檢測需要 Serial 初始化的積木功能
+  Added automatic detection for blocks requiring Serial initialization
+  - 當工作區中存在 text_print 或 text_prompt_ext 積木時，自動添加 Serial.begin(9600)
+    Automatically adds Serial.begin(9600) when text_print or text_prompt_ext blocks exist in workspace
+  - 優化代碼生成流程，提高用戶體驗
+    Optimized code generation process for better user experience
+
 ## [0.8.1] - 2025-04-11
 
 ### 已修復 Fixed

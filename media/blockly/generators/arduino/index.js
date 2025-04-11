@@ -25,6 +25,11 @@ window.arduinoGenerator.init = function (workspace) {
 	}
 	// 重置 nameDB_
 	window.arduinoGenerator.nameDB_.reset();
+
+	// 預先檢查工作區中是否有特定積木，例如需要初始化Serial的積木
+	if (workspace) {
+		window.arduinoGenerator.preCheckWorkspace(workspace);
+	}
 };
 
 window.arduinoGenerator.finish = function (code) {
@@ -161,6 +166,22 @@ window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	code += '}\n';
 
 	return code;
+};
+
+window.arduinoGenerator.preCheckWorkspace = function (workspace) {
+	// 檢查工作區中所有積木，包括函數內部的積木
+	const allBlocks = workspace.getAllBlocks(false);
+
+	// 檢查是否有需要 Serial 初始化的積木（如 text_print, text_prompt_ext）
+	const hasSerialBlocks = allBlocks.some(block => block.type === 'text_print' || block.type === 'text_prompt_ext');
+
+	// 如果有需要 Serial 的積木，確保添加必要的設定
+	if (hasSerialBlocks) {
+		window.arduinoGenerator.includes_['arduino'] = '#include <Arduino.h>';
+		if (!window.arduinoGenerator.setupCode_.includes('Serial.begin(9600);')) {
+			window.arduinoGenerator.setupCode_.push('Serial.begin(9600);');
+		}
+	}
 };
 
 // 運算子優先順序常數定義
