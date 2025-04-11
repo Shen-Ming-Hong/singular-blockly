@@ -18,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.8.1] - 2025-04-11
+
+### 已修復 Fixed
+
+- 修復門檻值函數讀取區塊功能問題
+  Fixed threshold function read block issues
+  - 增強變異記錄與恢復機制，解決運行時選項保存問題
+    Enhanced mutation recording and restoration mechanism to solve runtime option preservation issues
+  - 改進正則表達式處理，支援含有換行符的函式定義
+    Improved regex processing to support function definitions with line breaks
+
 ## [0.8.0] - 2025-04-11
 
 ### 已修改 Changed
