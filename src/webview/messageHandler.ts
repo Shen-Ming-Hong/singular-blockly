@@ -79,6 +79,9 @@ export class WebViewMessageHandler {
 				case 'deleteBackup':
 					await this.handleDeleteBackup(message);
 					break;
+				case 'restoreBackup':
+					await this.handleRestoreBackup(message);
+					break;
 				case 'boardConfigResult':
 					// 這個訊息是對 getBoardConfig 請求的回應，不需要特殊處理
 					break;
@@ -531,6 +534,111 @@ export class WebViewMessageHandler {
 				error: `${error}`,
 			});
 			this.showErrorMessage(`刪除備份失敗: ${error}`);
+		}
+	}
+
+	/**
+	 * 處理還原備份訊息
+	 * @param message 還原備份訊息物件
+	 */
+	private async handleRestoreBackup(message: any): Promise<void> {
+		try {
+			// 確保備份名稱存在
+			if (!message.name) {
+				throw new Error('未指定備份名稱');
+			}
+
+			const blocklyDir = 'blockly';
+			const backupDir = path.join(blocklyDir, 'backup');
+			const mainJsonPath = path.join(blocklyDir, 'main.json');
+			const backupPath = path.join(backupDir, `${message.name}.json`);
+
+			// 檢查備份檔案是否存在
+			if (!this.fileService.fileExists(backupPath)) {
+				throw new Error(`備份 ${message.name} 不存在`);
+			}
+
+			// 顯示確認對話框，詢問用戶是否確定要還原（這是一個破壞性操作）
+			const confirmMessage = `確定要還原備份「${message.name}」嗎？這將覆蓋當前的工作區。`;
+			const restoreBtn = '還原';
+			const cancelBtn = '取消';
+
+			const selection = await vscode.window.showWarningMessage(confirmMessage, restoreBtn, cancelBtn);
+
+			if (selection === restoreBtn) {
+				// 在還原之前，先為當前工作區創建一個臨時備份
+				if (this.fileService.fileExists(mainJsonPath)) {
+					try {
+						// 創建臨時備份名稱，格式：auto_backup_before_restore_YYYYMMDD_HHMMSS
+						const now = new Date();
+						const year = now.getFullYear();
+						const month = String(now.getMonth() + 1).padStart(2, '0');
+						const day = String(now.getDate()).padStart(2, '0');
+						const hours = String(now.getHours()).padStart(2, '0');
+						const minutes = String(now.getMinutes()).padStart(2, '0');
+						const seconds = String(now.getSeconds()).padStart(2, '0');
+						const autoBackupName = `auto_backup_before_restore_${year}${month}${day}_${hours}${minutes}${seconds}`;
+						const autoBackupPath = path.join(backupDir, `${autoBackupName}.json`);
+
+						// 確保備份目錄存在
+						await this.fileService.createDirectory(backupDir);
+
+						// 複製當前的 main.json 到臨時備份
+						await this.fileService.copyFile(mainJsonPath, autoBackupPath);
+
+						log(`在還原前建立的自動備份: ${autoBackupName}`, 'info');
+					} catch (backupError) {
+						// 如果自動備份失敗，記錄錯誤但繼續還原過程
+						log('在還原前建立自動備份失敗:', 'error', backupError);
+					}
+				}
+
+				// 將備份檔案複製回 main.json
+				await this.fileService.copyFile(backupPath, mainJsonPath);
+
+				// 讀取還原後的數據
+				const restoredData = await this.fileService.readJsonFile<any>(mainJsonPath, {
+					workspace: {},
+					board: 'none',
+					theme: 'light',
+				});
+
+				// 通知 WebView 重新載入工作區
+				this.panel.webview.postMessage({
+					command: 'loadWorkspace',
+					state: restoredData.workspace,
+					board: restoredData.board || 'none',
+					theme: restoredData.theme || 'light',
+					isRestored: true,
+					restoreName: message.name,
+				});
+
+				// 通知 WebView 備份已還原
+				this.panel.webview.postMessage({
+					command: 'backupRestored',
+					name: message.name,
+					success: true,
+				});
+
+				log(`成功還原備份: ${message.name}`, 'info');
+			} else {
+				// 用戶取消還原
+				this.panel.webview.postMessage({
+					command: 'backupRestored',
+					name: message.name,
+					success: false,
+					cancelled: true,
+				});
+			}
+		} catch (error) {
+			log('還原備份失敗:', 'error', error);
+			this.panel.webview.postMessage({
+				command: 'backupRestored',
+				name: message.name || '未知',
+				success: false,
+				error: `${error}`,
+			});
+			this.showErrorMessage(`還原備份失敗: ${error}`);
 		}
 	}
 

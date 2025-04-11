@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.10.0] - 2025-04-11
+
+### 新增 Added
+
+- 新增備份還原功能
+  Added backup restoration feature
+  - 用戶現在可以透過界面還原之前創建的備份
+    Users can now restore previously created backups through the interface
+  - 在還原前自動創建臨時備份，確保操作安全
+    Temporary backups are automatically created before restoration to ensure operation safety
+  - 新增還原按鈕和相應的視覺樣式
+    Added restoration button and corresponding visual styles
+
 ## [0.9.0] - 2025-04-11
 
 ### 新增 Added

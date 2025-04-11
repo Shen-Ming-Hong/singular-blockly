@@ -271,11 +271,15 @@ const backupManager = {
 			backupDate.textContent = new Date(backup.date).toLocaleString();
 
 			backupInfo.appendChild(backupName);
-			backupInfo.appendChild(backupDate);
-
-			// 操作按鈕
+			backupInfo.appendChild(backupDate); // 操作按鈕
 			const backupActions = document.createElement('div');
 			backupActions.className = 'backup-actions';
+
+			// 還原按鈕
+			const restoreBtn = document.createElement('button');
+			restoreBtn.className = 'backup-restore';
+			restoreBtn.textContent = '還原';
+			restoreBtn.addEventListener('click', () => this.restoreBackup(backup.name));
 
 			// 刪除按鈕
 			const deleteBtn = document.createElement('button');
@@ -283,6 +287,7 @@ const backupManager = {
 			deleteBtn.textContent = '刪除';
 			deleteBtn.addEventListener('click', () => this.deleteBackup(backup.name));
 
+			backupActions.appendChild(restoreBtn);
 			backupActions.appendChild(deleteBtn);
 
 			// 組合到備份項目
@@ -297,6 +302,15 @@ const backupManager = {
 		// 直接發送命令到 VSCode 擴展，讓後端處理確認
 		vscode.postMessage({
 			command: 'deleteBackup',
+			name: backupName,
+		});
+	},
+
+	// 還原備份
+	restoreBackup: function (backupName) {
+		// 發送還原命令到 VSCode 擴展，讓後端處理確認
+		vscode.postMessage({
+			command: 'restoreBackup',
 			name: backupName,
 		});
 	},
@@ -871,11 +885,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 處理備份建立回應
 			case 'backupCreated':
 				backupManager.refreshBackupList();
-				break;
-
-			// 處理備份刪除回應
+				break; // 處理備份刪除回應
 			case 'backupDeleted':
 				backupManager.refreshBackupList();
+				break;
+
+			// 處理備份還原回應
+			case 'backupRestored':
+				if (message.success) {
+					// 關閉備份對話框
+					backupManager.closeModal();
+					// 顯示成功訊息
+					vscode.postMessage({
+						command: 'log',
+						source: 'blocklyEdit',
+						level: 'info',
+						message: `成功還原備份: ${message.name}`,
+						timestamp: new Date().toISOString(),
+					});
+				}
 				break;
 
 			// 移除多餘的備份載入功能

@@ -326,6 +326,15 @@ html {
 	transition: all 0.2s;
 }
 
+.backup-restore {
+	color: #2196f3;
+	border-color: #2196f3;
+}
+
+.backup-restore:hover {
+	background-color: #e3f2fd;
+}
+
 .backup-delete {
 	color: #f44336;
 	border-color: #f44336;
