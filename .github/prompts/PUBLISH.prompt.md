@@ -89,6 +89,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] 確認 package.json 版本號已更新
       Confirm the version number in package.json has been updated
 
+## 停止，讓使用者完成存檔，等待使用者授權才進行後續動作
+
 ## Git 提交與發布 Git Commit and Release
 
 ### 提交變更 Commit Changes
