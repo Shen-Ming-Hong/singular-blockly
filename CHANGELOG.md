@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.8.0] - 2025-04-11
+
+### 已修改 Changed
+
+- 重構擴充功能架構，提升代碼可維護性與擴展性
+  Refactored extension architecture to improve code maintainability and extensibility
+  - 將大型檔案拆分成模組化的服務類別
+    Split large files into modular service classes
+  - 實作日誌服務、檔案服務、多語言服務和設定管理服務
+    Implemented logging service, file service, locale service, and settings manager
+  - 採用更好的物件導向設計，提高程式碼組織結構
+    Adopted better object-oriented design for improved code organization
+
 ## [0.7.0] - 2025-04-11
 
 ### 已更新 Updated
