@@ -49,7 +49,6 @@ window.arduinoGenerator.finish = function (code) {
 	for (let name in window.arduinoGenerator.definitions_) {
 		definitions += window.arduinoGenerator.definitions_[name];
 	}
-
 	// 處理函數: 1. 前向宣告, 2. 按照原始順序定義函數
 	const functionNames = Object.keys(window.arduinoGenerator.functions_);
 	let forwardDeclarations = '';
@@ -60,7 +59,8 @@ window.arduinoGenerator.finish = function (code) {
 		functionNames.forEach(name => {
 			// 從函數定義提取參數和返回類型
 			const funcDef = window.arduinoGenerator.functions_[name];
-			const signatureMatch = funcDef.match(/^(\w+)\s+(\w+)\s*\((.*?)\)/);
+			// 改進正則表達式以處理開頭可能有換行符的函式定義
+			const signatureMatch = funcDef.match(/^\s*(?:\n|\r\n)?(\w+)\s+(\w+)\s*\((.*?)\)/);
 			if (signatureMatch) {
 				const returnType = signatureMatch[1]; // void, int 等
 				const funcName = signatureMatch[2]; // 函數名稱

@@ -957,40 +957,49 @@ Blockly.Blocks['threshold_function_setup'] = {
 
 Blockly.Blocks['threshold_function_read'] = {
 	init: function () {
+		// 初始化恢復函式名稱的屬性
+		this.restoredFuncValue = 'Func0';
+
 		this.appendDummyInput().appendField(
 			new Blockly.FieldDropdown(() => {
-				// Make sure we have access to the workspace
+				// 取得工作區
 				const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
 				if (!workspace) {
+					log.info('無法取得工作區，返回預設選項 Func0');
 					return [['Func0', 'Func0']];
 				}
 
-				// Find all threshold function setup blocks to get available function names
+				// 優先使用從變異資料恢復的值，然後才是 getFieldValue
+				// 這能解決初始化時序問題
+				const currentValue = this.restoredFuncValue || this.getFieldValue('FUNC') || 'Func0';
+				log.info(`threshold_function_read: 當前選擇的函式名稱: ${currentValue}`);
+
+				// 先建立一個以當前值為首位的選項陣列
+				const options = [[currentValue, currentValue]];
+
+				// 找出所有 threshold_function_setup 積木
 				const blocks = workspace.getAllBlocks(false);
-				const functions = blocks
-					.filter(block => block.type === 'threshold_function_setup')
-					.map(block => {
-						const name = block.getFieldValue('NAME');
-						return [name, name];
-					});
+				const setupBlocks = blocks.filter(block => block.type === 'threshold_function_setup');
+				log.info(`threshold_function_read: 找到 ${setupBlocks.length} 個門檻值函式設定積木`);
 
-				// 保留目前已選擇的值 (若存在且仍在有效的選項中)
-				const currentValue = this.getFieldValue('FUNC');
-				const availableFunctions = functions.length > 0 ? functions : [['Func0', 'Func0']];
-
-				// 檢查目前的值是否存在於可用選項中
-				if (currentValue && availableFunctions.some(option => option[1] === currentValue)) {
-					// 如果存在，調整順序把當前選擇的放到第一位
-					const reorderedOptions = [...availableFunctions];
-					const currentIndex = reorderedOptions.findIndex(option => option[1] === currentValue);
-					if (currentIndex > 0) {
-						const currentOption = reorderedOptions.splice(currentIndex, 1)[0];
-						reorderedOptions.unshift(currentOption);
-					}
-					return reorderedOptions;
+				// 如果沒有找到設定積木，就只返回當前值
+				if (setupBlocks.length === 0) {
+					log.info('threshold_function_read: 未找到門檻值設定積木，僅返回當前選項');
+					return options;
 				}
 
-				return availableFunctions;
+				// 從設定積木中獲取所有函數名稱，排除當前值以避免重複
+				setupBlocks.forEach(block => {
+					const name = block.getFieldValue('NAME');
+					if (name !== currentValue) {
+						// 避免重複添加當前值
+						options.push([name, name]);
+						log.info(`threshold_function_read: 添加選項 ${name}`);
+					}
+				});
+
+				log.info(`threshold_function_read: 返回選項清單: ${JSON.stringify(options)}`);
+				return options;
 			}),
 			'FUNC'
 		);
@@ -1002,7 +1011,11 @@ Blockly.Blocks['threshold_function_read'] = {
 	// 新增變異記錄方法，保存選擇的函式值
 	mutationToDom: function () {
 		const container = Blockly.utils.xml.createElement('mutation');
-		container.setAttribute('func', this.getFieldValue('FUNC'));
+		const funcValue = this.getFieldValue('FUNC');
+		// 同時更新恢復值屬性
+		this.restoredFuncValue = funcValue;
+		container.setAttribute('func', funcValue);
+		log.info(`threshold_function_read: 儲存變異資料，函式名稱: ${funcValue}`);
 		return container;
 	},
 
@@ -1010,7 +1023,23 @@ Blockly.Blocks['threshold_function_read'] = {
 	domToMutation: function (xmlElement) {
 		const func = xmlElement.getAttribute('func');
 		if (func) {
+			log.info(`threshold_function_read: 從變異資料恢復函式名稱: ${func}`);
+			// 在設置字段值的同時，也存儲到我們的備份屬性中
+			this.restoredFuncValue = func;
 			this.getField('FUNC').setValue(func);
+			// 記錄新增的備份存儲機制
+			log.info(`threshold_function_read: 已將函式名稱 ${func} 存入備份屬性`);
+		} else {
+			log.warn('threshold_function_read: 變異資料中沒有找到函式名稱');
+		}
+	},
+
+	// 新增變更處理函數，確保在運行時變更能被記錄
+	onchange: function () {
+		const currentValue = this.getFieldValue('FUNC');
+		if (currentValue && currentValue !== this.restoredFuncValue) {
+			log.info(`threshold_function_read: 函式名稱從 ${this.restoredFuncValue} 變更為 ${currentValue}`);
+			this.restoredFuncValue = currentValue;
 		}
 	},
 };
