@@ -22,6 +22,7 @@ export class WebViewManager {
 	private messageHandler: WebViewMessageHandler | undefined;
 	private fileService: FileService | undefined;
 	private localeService: LocaleService;
+	private previewPanels: Map<string, vscode.WebviewPanel> = new Map();
 
 	/**
 	 * 建立 WebView 管理器實例
@@ -314,5 +315,391 @@ export class WebViewManager {
 	 */
 	getPanel(): vscode.WebviewPanel | undefined {
 		return this.panel;
+	}
+
+	/**
+	 * 預覽備份內容
+	 * @param backupPath 備份檔案的完整路徑
+	 */
+	async previewBackup(backupPath: string): Promise<void> {
+		try {
+			log(`預覽備份文件: ${backupPath}`, 'info');
+
+			// 檢查檔案是否存在
+			if (!fs.existsSync(backupPath)) {
+				log(`備份檔案不存在: ${backupPath}`, 'error');
+				throw new Error(`備份檔案不存在: ${backupPath}`);
+			}
+
+			const fileName = path.basename(backupPath);
+
+			// 如果已有該備份的預覽窗口，直接顯示
+			if (this.previewPanels.has(backupPath)) {
+				this.previewPanels.get(backupPath)?.reveal(vscode.ViewColumn.Two);
+				return;
+			}
+
+			// 初始化檔案服務（如果尚未初始化）
+			if (!this.fileService) {
+				const workspaceFolders = vscode.workspace.workspaceFolders;
+				if (!workspaceFolders) {
+					throw new Error('請先開啟項目資料夾');
+				}
+				const workspaceRoot = workspaceFolders[0].uri.fsPath;
+				this.fileService = new FileService(workspaceRoot);
+			}
+
+			// 建立新的預覽視窗
+			const previewPanel = vscode.window.createWebviewPanel(
+				'blocklyPreview',
+				`預覽 - ${fileName}`,
+				{
+					viewColumn: vscode.ViewColumn.Two,
+					preserveFocus: true,
+				},
+				{
+					enableScripts: true,
+					retainContextWhenHidden: true,
+					localResourceRoots: [
+						vscode.Uri.file(path.join(this.context.extensionPath, 'media')),
+						vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules')),
+					],
+				}
+			);
+
+			// 設定預覽窗口內容
+			previewPanel.webview.html = await this.getPreviewContent(fileName);
+
+			// 監聽視窗關閉事件
+			previewPanel.onDidDispose(() => {
+				this.previewPanels.delete(backupPath);
+				log(`預覽窗口已關閉: ${fileName}`, 'info');
+			});
+
+			// 將視窗添加到管理集合中
+			this.previewPanels.set(backupPath, previewPanel);
+
+			// 從備份檔案載入XML
+			await this.loadBackupContent(backupPath, previewPanel);
+
+			// 監聽來自預覽視窗的訊息
+			previewPanel.webview.onDidReceiveMessage(async message => {
+				await this.handlePreviewMessage(message, backupPath, previewPanel);
+			});
+
+			log(`預覽窗口已創建: ${fileName}`, 'info');
+		} catch (error) {
+			log('建立預覽窗口失敗', 'error', error);
+			throw error;
+		}
+	}
+
+	/**
+	 * 處理來自預覽視窗的訊息
+	 * @param message 訊息內容
+	 * @param backupPath 備份檔案路徑
+	 * @param panel 面板實例
+	 */
+	private async handlePreviewMessage(message: any, backupPath: string, panel: vscode.WebviewPanel): Promise<void> {
+		try {
+			switch (message.command) {
+				case 'log':
+					// 轉發日誌訊息
+					log(message.message, message.level, ...(message.args || []));
+					break;
+
+				case 'themeChanged':
+					// 同步主題變更
+					const settingsManager = new SettingsManager(vscode.workspace.workspaceFolders![0].uri.fsPath);
+					await settingsManager.updateTheme(message.theme);
+
+					// 如果主編輯窗口開啟，也一併更新
+					if (this.panel) {
+						this.panel.webview.postMessage({
+							command: 'updateTheme',
+							theme: message.theme,
+						});
+					}
+
+					// 更新其他所有預覽窗口
+					for (const [path, previewPanel] of this.previewPanels.entries()) {
+						if (path !== backupPath && previewPanel) {
+							previewPanel.webview.postMessage({
+								command: 'updateTheme',
+								theme: message.theme,
+							});
+						}
+					}
+					break;
+
+				case 'loadBackupData':
+					// 重新載入備份數據
+					await this.loadBackupContent(backupPath, panel);
+					break;
+			}
+		} catch (error) {
+			log('處理預覽窗口訊息時發生錯誤', 'error', error);
+		}
+	}
+	/**
+	 * 載入備份檔案內容並傳送到預覽窗口
+	 * @param backupPath 備份檔案路徑
+	 * @param panel 預覽視窗實例
+	 */
+	private async loadBackupContent(backupPath: string, panel: vscode.WebviewPanel): Promise<void> {
+		try {
+			// 根據絕對路徑獲取相對路徑
+			const workspaceFolders = vscode.workspace.workspaceFolders;
+			if (!workspaceFolders) {
+				throw new Error('請先開啟項目資料夾');
+			}
+
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
+
+			// 確保 FileService 已初始化
+			if (!this.fileService) {
+				this.fileService = new FileService(workspaceRoot);
+			}
+
+			// 將絕對路徑轉換為相對路徑
+			let relativePath = backupPath;
+			if (backupPath.startsWith(workspaceRoot)) {
+				relativePath = backupPath.substring(workspaceRoot.length + 1); // +1 移除前導斜線
+			}
+
+			log(`嘗試讀取備份檔案 (相對路徑): ${relativePath}`, 'info');
+
+			// 檢查檔案是否存在
+			if (!this.fileService.fileExists(relativePath)) {
+				throw new Error(`備份檔案不存在: ${relativePath}`);
+			}
+
+			// 使用 FileService 讀取檔案
+			const content = await this.fileService.readFile(relativePath);
+
+			// 檢查內容是否為空
+			if (!content || content.trim() === '') {
+				throw new Error('備份檔案內容為空');
+			}
+
+			log(`成功讀取備份檔案，準備解析JSON`, 'info');
+
+			try {
+				const backupData = JSON.parse(content);
+
+				if (!backupData) {
+					throw new Error('解析JSON後得到空對象');
+				}
+
+				if (!backupData.workspace) {
+					throw new Error('備份檔案中缺少有效的workspace欄位');
+				}
+
+				// 取得工作區狀態
+				const blocklyState = backupData.workspace;
+
+				// 檢查積木狀態是否有效
+				if (!blocklyState || !blocklyState.blocks) {
+					throw new Error('備份檔案中缺少有效的工作區資料');
+				}
+
+				// 將 workspace 對象直接傳送到視窗，讓視窗端負責解析和顯示
+				panel.webview.postMessage({
+					command: 'loadWorkspaceState',
+					workspaceState: blocklyState,
+				});
+
+				log('備份 workspace 狀態已成功載入到預覽窗口', 'info');
+			} catch (parseError) {
+				log('解析JSON內容失敗', 'error', parseError);
+				throw new Error(`無法解析備份檔案內容: ${parseError}`);
+			}
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : '未知錯誤';
+			log(`載入備份內容失敗: ${errorMessage}`, 'error', error);
+
+			// 顯示載入失敗訊息在預覽窗口
+			panel.webview.postMessage({
+				command: 'loadError',
+				error: `載入備份內容失敗: ${errorMessage}`,
+			});
+		}
+	}
+
+	/**
+	 * 獲取預覽窗口的 HTML 內容
+	 * @param fileName 顯示在預覽標題中的檔案名稱
+	 * @returns HTML 字符串
+	 */
+	private async getPreviewContent(fileName: string): Promise<string> {
+		try {
+			const htmlPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/html/blocklyPreview.html'));
+			let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
+
+			// 取得當前語言和主題設定
+			const localeService = new LocaleService(this.context.extensionPath);
+			const blocklyLanguage = localeService.getCurrentLanguage();
+
+			let theme = 'light';
+			if (this.fileService) {
+				const settingsManager = new SettingsManager(vscode.workspace.workspaceFolders![0].uri.fsPath);
+				theme = await settingsManager.getTheme();
+			}
+
+			// 建立預覽頁面時使用的 webview (因為此時還沒有 panel.webview)
+			const tempWebview = this.getWebviewForPreview();
+
+			// 準備各種資源 URI
+			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
+			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyPreview.js'));
+			const boardConfigsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/board_configs.js'));
+
+			// 轉換為 WebView 可用的 URI
+			const cssUri = tempWebview.asWebviewUri(cssPath);
+			const jsUri = tempWebview.asWebviewUri(jsPath);
+			const boardConfigsUri = tempWebview.asWebviewUri(boardConfigsPath);
+
+			// Blockly 核心庫
+			const blocklyCompressedJsUri = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules/blockly/blockly_compressed.js'))
+			);
+			const blocksCompressedJsUri = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules/blockly/blocks_compressed.js'))
+			);
+			const javascriptCompressedJsUri = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules/blockly/javascript_compressed.js'))
+			);
+			const themeModernJsUri = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules/@blockly/theme-modern/dist/index.js'))
+			);
+
+			// Arduino 生成器和區塊
+			const arduinoGeneratorPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/blockly/generators/arduino/index.js')
+			);
+			const arduinoGeneratorUri = tempWebview.asWebviewUri(arduinoGeneratorPath);
+			const arduinoBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/arduino.js'));
+			const arduinoBlocksUri = tempWebview.asWebviewUri(arduinoBlocksPath);
+			const functionBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/functions.js'));
+			const functionBlocksUri = tempWebview.asWebviewUri(functionBlocksPath);
+
+			// Arduino 生成器模組
+			const arduinoModules = ['io.js', 'logic.js', 'loops.js', 'math.js', 'text.js', 'lists.js', 'functions.js', 'variables.js']
+				.map(file => {
+					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
+					const moduleUri = tempWebview.asWebviewUri(modulePath);
+					return `<script src="${moduleUri}"></script>`;
+				})
+				.join('\n    ');
+
+			// 多語言文件
+			const localePath = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, `media/locales/${blocklyLanguage}/messages.js`))
+			);
+
+			const msgJsPath = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, `node_modules/blockly/msg/${blocklyLanguage}.js`))
+			);
+
+			// 載入所有支援的語言文件
+			const localeScripts = await this.loadLocaleFilesForPreview(tempWebview);
+
+			// 主題文件
+			const singularJsUri = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/themes/singular.js'))
+			);
+
+			const singularDarkJsUri = tempWebview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/themes/singularDark.js'))
+			);
+
+			// 替換所有預留位置
+			htmlContent = htmlContent.replace("currentLanguage: '{vscodeLanguage}'", `currentLanguage: '${blocklyLanguage}'`);
+			htmlContent = htmlContent.replace(
+				'<script src="{blocklyCompressedJsUri}"></script>',
+				`<script src="${blocklyCompressedJsUri}"></script>
+    ${localeScripts}` // 注入語言腳本
+			);
+
+			// 設定檔案名稱
+			htmlContent = htmlContent.replace(/\{fileName\}/g, fileName);
+
+			// 替換主題相關 URI
+			htmlContent = htmlContent.replace('{themesUri}/singular.js', singularJsUri.toString());
+			htmlContent = htmlContent.replace('{themesUri}/singularDark.js', singularDarkJsUri.toString());
+
+			// 替換其他 URI
+			htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
+			htmlContent = htmlContent.replace('{previewJsUri}', jsUri.toString());
+			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
+			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
+			htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
+			htmlContent = htmlContent.replace('{langJsUri}', localePath.toString());
+			htmlContent = htmlContent.replace('{msgJsUri}', msgJsPath.toString());
+			htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
+			htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());
+			htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());
+			htmlContent = htmlContent.replace('{boardConfigsUri}', boardConfigsUri.toString());
+			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
+			htmlContent = htmlContent.replace('{functionBlocksUri}', functionBlocksUri.toString());
+
+			// 注入主題偏好
+			htmlContent = htmlContent.replace(/\{theme\}/g, theme);
+
+			return htmlContent;
+		} catch (error) {
+			log('獲取預覽內容時發生錯誤:', 'error', error);
+			throw error;
+		}
+	}
+
+	/**
+	 * 為預覽頁面準備臨時 webview 以生成 URI
+	 * @returns 用於資源地址轉換的 webview
+	 */
+	private getWebviewForPreview(): vscode.Webview {
+		// 如果有存在的面板，重用其 webview
+		if (this.panel) {
+			return this.panel.webview;
+		}
+
+		// 否則創建臨時的 webviewPanel 進行 URI 轉換
+		const tempPanel = vscode.window.createWebviewPanel('blocklyTemp', 'Temp', vscode.ViewColumn.One, {
+			enableScripts: true,
+			localResourceRoots: [
+				vscode.Uri.file(path.join(this.context.extensionPath, 'media')),
+				vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules')),
+			],
+		});
+
+		// 使用後立即處理
+		const webview = tempPanel.webview;
+		tempPanel.dispose();
+
+		return webview;
+	}
+
+	/**
+	 * 載入預覽頁面的語言文件
+	 * @param webview WebView 實例
+	 * @returns 語言腳本 HTML
+	 */
+	private async loadLocaleFilesForPreview(webview: vscode.Webview): Promise<string> {
+		// 獲取支援語言列表
+		const supportedLocales = await this.localeService.getSupportedLocales();
+
+		// 載入語言檔案
+		const localeFiles = supportedLocales.map(locale => {
+			const localePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/locales/${locale}/messages.js`));
+			return {
+				locale,
+				uri: webview.asWebviewUri(localePath).toString(),
+			};
+		});
+
+		// 生成腳本標籤
+		const localeScripts = localeFiles.map(file => `<script src="${file.uri}"></script>`).join('\n    ');
+
+		return localeScripts;
 	}
 }

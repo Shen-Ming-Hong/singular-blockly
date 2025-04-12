@@ -12,6 +12,141 @@ html {
 	height: 100%;
 }
 
+/* 預覽模式樣式 - 現代風格 */
+body.preview-mode {
+	padding-top: 0; /* 移除頂部填充 */
+}
+
+/* 預覽資訊浮動提示 */
+.preview-info {
+	position: fixed;
+	top: 15px;
+	left: 15px;
+	background-color: rgba(255, 255, 255, 0.9);
+	color: #333;
+	padding: 12px 18px;
+	border-radius: 8px;
+	z-index: 2000;
+	backdrop-filter: blur(5px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	opacity: 0.8;
+	transition: opacity 0.3s ease;
+	display: flex;
+	align-items: center;
+	max-width: 400px;
+}
+
+.preview-info:hover {
+	opacity: 1;
+}
+
+body.theme-dark .preview-info {
+	background-color: rgba(50, 50, 50, 0.9);
+	color: #f0f0f0;
+}
+
+.preview-info-content {
+	display: flex;
+	flex-direction: column;
+}
+
+.preview-title {
+	font-weight: 600;
+	font-size: 14px;
+	margin-bottom: 4px;
+	display: flex;
+	align-items: center;
+}
+
+.preview-badge {
+	background-color: #3f51b5;
+	color: white;
+	font-size: 12px;
+	padding: 2px 8px;
+	border-radius: 4px;
+	margin-left: 8px;
+}
+
+body.theme-dark .preview-badge {
+	background-color: #5c6bc0;
+}
+
+.preview-subtitle {
+	font-size: 12px;
+	opacity: 0.8;
+}
+
+.preview-container {
+	height: 100vh;
+}
+
+.preview-blockly-area {
+	border-top: none;
+}
+
+/* 預覽模式控制容器樣式 */
+.preview-controls {
+	display: flex;
+	justify-content: center; /* 水平置中 */
+	align-items: center;
+	padding: 6px;
+	width: auto;
+	min-width: 60px;
+	background-color: rgba(255, 255, 255, 0.9);
+	backdrop-filter: blur(5px);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 深色模式下的預覽控制容器和按鈕 */
+body.theme-dark .preview-controls {
+	background-color: rgba(50, 50, 50, 0.9);
+	color: #e0e0e0;
+}
+
+body.theme-dark .preview-controls #themeToggle {
+	background-color: #444444;
+	color: #e0e0e0;
+}
+
+body.theme-dark .preview-controls #themeToggle:hover {
+	background-color: #555555;
+}
+
+body.theme-dark .preview-controls .theme-icon {
+	color: #e0e0e0;
+}
+
+/* 複製成功提示訊息 */
+.copy-success-message {
+	position: fixed;
+	bottom: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: rgba(0, 0, 0, 0.7);
+	color: white;
+	padding: 10px 20px;
+	border-radius: 4px;
+	z-index: 3000;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+	animation: message-appear 0.3s ease;
+}
+
+.copy-success-message-hide {
+	opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+@keyframes message-appear {
+	from {
+		opacity: 0;
+		transform: translate(-50%, 20px);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+}
+
 .container {
 	display: flex;
 	width: 100%;
@@ -67,6 +202,11 @@ html {
 /* 主題切換按鈕樣式 */
 .theme-switch {
 	margin-left: 10px;
+}
+
+/* 預覽模式下的主題切換按鈕移除左邊距 */
+.preview-controls .theme-switch {
+	margin-left: 0;
 }
 
 #themeToggle {
@@ -283,7 +423,7 @@ html {
 .backup-item {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: center; /* 確保垂直置中 */
 	padding: 10px 15px;
 	border-bottom: 1px solid #e0e0e0;
 	transition: background-color 0.2s;
@@ -313,35 +453,71 @@ html {
 
 .backup-actions {
 	display: flex;
-	gap: 5px;
+	gap: 8px;
 }
 
 .backup-actions button {
-	padding: 4px 8px;
-	background-color: transparent;
-	border: 1px solid #ccc;
-	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px 12px;
+	border-radius: 6px;
 	cursor: pointer;
 	font-size: 0.9rem;
-	transition: all 0.2s;
+	font-weight: 500;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.backup-actions button svg {
+	width: 16px;
+	height: 16px;
+	margin-right: 6px;
+}
+
+.backup-actions button:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+.backup-actions button:active {
+	transform: translateY(1px) scale(0.98);
+}
+
+/* 預覽按鈕 - 次要輪廓型 */
+.backup-preview {
+	color: #5f6368;
+	background-color: transparent;
+	border: 1px solid #dadce0;
+}
+
+.backup-preview:hover {
+	background-color: #f5f5f5;
+	border-color: #bdc1c6;
+}
+
+/* 還原按鈕 - 主要填充型 */
 .backup-restore {
-	color: #2196f3;
-	border-color: #2196f3;
+	color: white;
+	background-color: #1a73e8;
+	border: 1px solid #1a73e8;
 }
 
 .backup-restore:hover {
-	background-color: #e3f2fd;
+	background-color: #1765cc;
+	border-color: #1765cc;
 }
 
+/* 刪除按鈕 - 危險型按鈕 */
 .backup-delete {
-	color: #f44336;
-	border-color: #f44336;
+	color: white;
+	background-color: #ea4335;
+	border: 1px solid #ea4335;
 }
 
 .backup-delete:hover {
-	background-color: #ffebee;
+	background-color: #d93025;
+	border-color: #d93025;
 }
 
 .empty-backup-list {
@@ -352,106 +528,140 @@ html {
 }
 
 /* 深色模式樣式 */
-body.dark-mode .controls-container {
+body.theme-dark .controls-container {
 	background-color: #333333;
 	color: #e0e0e0;
 }
 
-body.dark-mode #themeToggle {
+body.theme-dark #themeToggle {
 	background-color: #444444;
 }
 
-body.dark-mode #themeToggle:hover {
+body.theme-dark #themeToggle:hover {
 	background-color: #555555;
 }
 
-body.dark-mode .theme-icon {
+body.theme-dark .theme-icon {
 	color: #e0e0e0;
 }
 
-body.dark-mode #backupButton {
+body.theme-dark #backupButton {
 	background-color: #444444;
 }
 
-body.dark-mode #backupButton:hover {
+body.theme-dark #backupButton:hover {
 	background-color: #555555;
 }
 
-body.dark-mode .backup-icon {
+body.theme-dark .backup-icon {
 	color: #e0e0e0;
 }
 
-body.dark-mode select {
+body.theme-dark select {
 	background-color: #444444;
 	color: #e0e0e0;
 	border: 1px solid #555555;
 }
 
-body.dark-mode .modal-content {
+body.theme-dark .modal-content {
 	background-color: #333333;
 	color: #e0e0e0;
 }
 
-body.dark-mode .modal-header {
+body.theme-dark .modal-header {
 	border-bottom-color: #555555;
 }
 
-body.dark-mode .modal-header h2 {
+body.theme-dark .modal-header h2 {
 	color: #e0e0e0;
 }
 
-body.dark-mode .modal-close {
+body.theme-dark .modal-close {
 	color: #aaaaaa;
 }
 
-body.dark-mode .modal-close:hover {
+body.theme-dark .modal-close:hover {
 	color: #ffffff;
 }
 
-body.dark-mode .backup-create-form {
+body.theme-dark .backup-create-form {
 	background-color: #444444;
 	border-color: #555555;
 }
 
-body.dark-mode .backup-create-form h3 {
+body.theme-dark .backup-create-form h3 {
 	color: #e0e0e0;
 }
 
-body.dark-mode .form-group label {
+body.theme-dark .form-group label {
 	color: #cccccc;
 }
 
-body.dark-mode .form-group input {
+body.theme-dark .form-group input {
 	background-color: #555555;
 	color: #e0e0e0;
 	border-color: #666666;
 }
 
-body.dark-mode #cancelBackupBtn {
+body.theme-dark #cancelBackupBtn {
 	background-color: #555555;
 	color: #e0e0e0;
 }
 
-body.dark-mode #cancelBackupBtn:hover {
+body.theme-dark #cancelBackupBtn:hover {
 	background-color: #666666;
 }
 
-body.dark-mode .backup-list {
+body.theme-dark .backup-list {
 	border-color: #555555;
 }
 
-body.dark-mode .backup-item {
+body.theme-dark .backup-item {
 	border-bottom-color: #555555;
 }
 
-body.dark-mode .backup-item:hover {
+body.theme-dark .backup-item:hover {
 	background-color: #3a3a3a;
 }
 
-body.dark-mode .backup-date {
+body.theme-dark .backup-date {
 	color: #aaaaaa;
 }
 
-body.dark-mode .empty-backup-list {
+body.theme-dark .empty-backup-list {
 	color: #aaaaaa;
+}
+
+/* 深色模式下的按鈕樣式 */
+body.theme-dark .backup-preview {
+	color: #e0e0e0;
+	border-color: #555555;
+	background-color: transparent;
+}
+
+body.theme-dark .backup-preview:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+	border-color: #777777;
+}
+
+body.theme-dark .backup-restore {
+	color: white;
+	background-color: #4285f4;
+	border-color: #4285f4;
+}
+
+body.theme-dark .backup-restore:hover {
+	background-color: #5c9aff;
+	border-color: #5c9aff;
+}
+
+body.theme-dark .backup-delete {
+	color: white;
+	background-color: #ea4335;
+	border-color: #ea4335;
+}
+
+body.theme-dark .backup-delete:hover {
+	background-color: #ff5246;
+	border-color: #ff5246;
 }

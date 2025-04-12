@@ -275,19 +275,41 @@ const backupManager = {
 			const backupActions = document.createElement('div');
 			backupActions.className = 'backup-actions';
 
+			// 預覽按鈕
+			const previewBtn = document.createElement('button');
+			previewBtn.className = 'backup-preview';
+			previewBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
+                </svg>
+                預覽
+            `;
+			previewBtn.addEventListener('click', () => this.previewBackup(backup.name));
+
 			// 還原按鈕
 			const restoreBtn = document.createElement('button');
 			restoreBtn.className = 'backup-restore';
-			restoreBtn.textContent = '還原';
+			restoreBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" />
+                </svg>
+                還原
+            `;
 			restoreBtn.addEventListener('click', () => this.restoreBackup(backup.name));
 
 			// 刪除按鈕
 			const deleteBtn = document.createElement('button');
 			deleteBtn.className = 'backup-delete';
-			deleteBtn.textContent = '刪除';
+			deleteBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+                </svg>
+                刪除
+            `;
 			deleteBtn.addEventListener('click', () => this.deleteBackup(backup.name));
 
 			backupActions.appendChild(restoreBtn);
+			backupActions.appendChild(previewBtn);
 			backupActions.appendChild(deleteBtn);
 
 			// 組合到備份項目
@@ -305,12 +327,22 @@ const backupManager = {
 			name: backupName,
 		});
 	},
-
 	// 還原備份
 	restoreBackup: function (backupName) {
 		// 發送還原命令到 VSCode 擴展，讓後端處理確認
 		vscode.postMessage({
 			command: 'restoreBackup',
+			name: backupName,
+		});
+	},
+	// 預覽備份
+	previewBackup: function (backupName) {
+		log.info(`預覽備份: ${backupName}`);
+
+		// 發送預覽命令到 VSCode 擴展，只需要傳遞備份名稱
+		// 擴展端會負責構造完整的檔案路徑
+		vscode.postMessage({
+			command: 'previewBackup',
 			name: backupName,
 		});
 	},
@@ -321,8 +353,8 @@ function toggleTheme() {
 	// 切換主題
 	currentTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-	// 更新 UI 狀態
-	updateThemeUI(currentTheme);
+	// 更新主題狀態
+	updateTheme(currentTheme);
 
 	// 儲存設定到 VS Code
 	vscode.postMessage({
@@ -331,14 +363,16 @@ function toggleTheme() {
 	});
 }
 
-// 更新 UI 元素以反映當前主題
-function updateThemeUI(theme) {
+// 更新主題
+function updateTheme(theme) {
 	const lightIcon = document.getElementById('lightIcon');
 	const darkIcon = document.getElementById('darkIcon');
 
+	// 更新 body 的 class，與預覽模式保持一致
+	document.body.classList.remove('theme-light', 'theme-dark');
+	document.body.classList.add(`theme-${theme}`);
+
 	if (theme === 'dark') {
-		document.body.classList.add('dark-mode');
-		document.body.classList.remove('light-mode');
 		lightIcon.style.display = 'none';
 		darkIcon.style.display = 'block';
 
@@ -347,8 +381,6 @@ function updateThemeUI(theme) {
 			Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme);
 		}
 	} else {
-		document.body.classList.add('light-mode');
-		document.body.classList.remove('dark-mode');
 		lightIcon.style.display = 'block';
 		darkIcon.style.display = 'none';
 
@@ -391,10 +423,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 根據當前主題設定選擇初始主題
 	const theme = currentTheme === 'dark' ? window.SingularBlocklyDarkTheme : window.SingularBlocklyTheme;
-
 	const workspace = Blockly.inject('blocklyDiv', {
 		toolbox: toolboxConfig,
+		theme: theme, // 使用根據設定選擇的主題
 		trashcan: true, // 添加垃圾桶
+		move: {
+			scrollbars: true,
+			drag: true,
+			wheel: true,
+		},
 		zoom: {
 			controls: true, // 添加放大縮小控制
 			wheel: true, // 允許使用滾輪縮放
@@ -403,11 +440,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 			minScale: 0.3, // 最小縮放比例
 			scaleSpeed: 1.2, // 縮放速度
 		},
-		theme: theme, // 使用根據設定選擇的主題
 	});
-
 	// 根據初始主題設定更新 UI
-	updateThemeUI(currentTheme);
+	updateTheme(currentTheme);
 
 	// 創建預設變數 i
 	if (!workspace.getVariable('i')) {
@@ -784,7 +819,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					// 載入主題設定
 					if (message.theme) {
 						currentTheme = message.theme;
-						updateThemeUI(currentTheme);
+						updateTheme(currentTheme);
 					}
 
 					if (message.state) {
@@ -874,7 +909,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			case 'setTheme':
 				// 直接從 VSCode 設定主題
 				currentTheme = message.theme || 'light';
-				updateThemeUI(currentTheme);
+				updateTheme(currentTheme);
 				break;
 
 			// 處理備份列表回應

@@ -82,6 +82,9 @@ export class WebViewMessageHandler {
 				case 'restoreBackup':
 					await this.handleRestoreBackup(message);
 					break;
+				case 'previewBackup':
+					await this.handlePreviewBackup(message);
+					break;
 				case 'boardConfigResult':
 					// 這個訊息是對 getBoardConfig 請求的回應，不需要特殊處理
 					break;
@@ -698,5 +701,36 @@ export class WebViewMessageHandler {
 	 */
 	private showErrorMessage(message: string): void {
 		vscode.window.showErrorMessage(message);
+	}
+
+	/**
+	 * 處理預覽備份命令
+	 * @param message 消息內容，包含備份名稱
+	 */
+	private async handlePreviewBackup(message: any): Promise<void> {
+		try {
+			// 確保備份名稱存在
+			if (!message.name) {
+				throw new Error('未指定備份名稱');
+			}
+			log(`正在處理預覽備份請求: ${message.name}`, 'info');
+
+			const blocklyDir = 'blockly';
+			const backupDir = path.join(blocklyDir, 'backup');
+			const backupPath = path.join(backupDir, `${message.name}.json`);
+			// 修正路徑構建，完整路徑應為 {workspace}/blockly/backup/{filename}.json
+			const fullBackupPath = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, backupPath);
+
+			// 檢查備份檔案是否存在
+			if (!this.fileService.fileExists(backupPath)) {
+				throw new Error(`備份 ${message.name} 不存在`);
+			}
+
+			// 執行預覽命令，將預覽命令和完整的備份路徑傳遞給 VS Code
+			await vscode.commands.executeCommand('singular-blockly.previewBackup', fullBackupPath);
+		} catch (error) {
+			log(`預覽備份失敗: ${error}`, 'error');
+			this.showErrorMessage(`預覽備份失敗: ${error}`);
+		}
 	}
 }

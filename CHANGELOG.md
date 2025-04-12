@@ -18,6 +18,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.12.0] - 2025-04-13
+
+### 新增 Added
+
+- 新增備份預覽功能
+  Added backup preview functionality
+  - 用戶現在可以直接在閱讀模式中預覽備份檔案，不需要先還原
+    Users can now preview backup files in read mode without having to restore them first
+  - 新增 blocklyPreview.html 和 blocklyPreview.js 實現預覽視窗功能
+    Added blocklyPreview.html and blocklyPreview.js to implement preview window functionality
+  - 在備份管理面板中新增預覽按鈕，點擊即可在新視窗中查看備份內容
+    Added preview button in the backup management panel for viewing backup content in a new window
+  
+### 已更新 Updated
+
+- 改進 UI 元素設計和互動體驗
+  Improved UI element design and interaction experience
+  - 優化備份操作按鈕的視覺效果，添加圖標提高可識別性
+    Optimized the visual effects of backup operation buttons, adding icons to improve recognizability
+  - 更新主題命名系統，從 dark-mode/light-mode 改為 theme-dark/theme-light
+    Updated theme naming system from dark-mode/light-mode to theme-dark/theme-light
+  - 改進複製功能，新增成功提示訊息
+    Improved copy functionality with success notification messages
+
 ## [0.11.0] - 2025-04-12
 
 ### 新增 Added

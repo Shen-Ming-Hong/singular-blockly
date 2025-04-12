@@ -128,16 +128,82 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 			log('Error toggling theme:', 'error', error);
 		}
 	});
-
 	// 註冊顯示輸出窗口命令
 	const showOutputCommand = vscode.commands.registerCommand('singular-blockly.showOutput', () => {
 		showOutputChannel();
+	});
+	// 註冊預覽備份命令
+	const previewBackupCommand = vscode.commands.registerCommand('singular-blockly.previewBackup', async (backupPath?: string) => {
+		try {
+			log('Preview backup command triggered', 'info');
+
+			// 若沒有提供備份路徑，可能需要讓用戶選擇
+			if (!backupPath) {
+				log('No backup path provided, need to select a backup file', 'info');
+
+				// 獲取工作區路徑
+				const workspaceFolders = vscode.workspace.workspaceFolders;
+				if (!workspaceFolders) {
+					vscode.window.showErrorMessage('請先開啟項目資料夾');
+					return;
+				}
+
+				// 獲取備份目錄
+				const workspaceRoot = workspaceFolders[0].uri.fsPath;
+				const backupsDir = path.join(workspaceRoot, 'backups');
+
+				// 檢查備份目錄是否存在
+				try {
+					const stat = await vscode.workspace.fs.stat(vscode.Uri.file(backupsDir));
+					if ((stat.type & vscode.FileType.Directory) === 0) {
+						vscode.window.showInformationMessage('尚無備份檔案可以預覽');
+						return;
+					}
+				} catch (error) {
+					vscode.window.showInformationMessage('尚無備份檔案可以預覽');
+					return;
+				}
+
+				// 讓用戶選擇備份檔案
+				const fileUris = await vscode.window.showOpenDialog({
+					canSelectFiles: true,
+					canSelectFolders: false,
+					canSelectMany: false,
+					defaultUri: vscode.Uri.file(backupsDir),
+					filters: {
+						備份檔案: ['json'],
+					},
+					title: '選擇要預覽的備份檔案',
+				});
+
+				if (!fileUris || fileUris.length === 0) {
+					return;
+				}
+
+				backupPath = fileUris[0].fsPath;
+			}
+
+			log(`Attempting to preview backup: ${backupPath}`, 'info');
+
+			// 懶初始化 WebView 管理器
+			if (!webViewManager) {
+				webViewManager = new WebViewManager(context);
+			}
+
+			// 調用預覽功能
+			await webViewManager.previewBackup(backupPath);
+		} catch (error) {
+			log('Error previewing backup:', 'error', error);
+			const errorMsg = await localeService.getLocalizedMessage('VSCODE_FAILED_PREVIEW_BACKUP', error);
+			vscode.window.showErrorMessage(errorMsg);
+		}
 	});
 
 	// 添加到訂閱清單
 	context.subscriptions.push(openBlocklyEdit);
 	context.subscriptions.push(toggleThemeCommand);
 	context.subscriptions.push(showOutputCommand);
+	context.subscriptions.push(previewBackupCommand);
 }
 
 /**

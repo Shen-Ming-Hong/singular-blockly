@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockly 預覽 - {fileName}</title>
+    <link rel="stylesheet" href="{cssUri}">
+    <script>
+        // 設定初始主題
+        window.initialTheme = '{theme}' || 'light';
+
+        // 設定預覽模式標識
+        window.isPreviewMode = true;
+        window.previewFileName = '{fileName}';
+
+        window.languageManager = {
+            currentLanguage: '{vscodeLanguage}', // 將由 extension.ts 注入
+            messages: {},
+            loadMessages: function (locale, messages) {
+                this.messages[locale] = messages;
+
+                // 自動同步翻譯到 Blockly.Msg
+                this.syncToBlocklyMsg(locale, messages);
+
+                // 觸發語言檔案載入事件
+                window.dispatchEvent(new CustomEvent('messageLoaded', {
+                    detail: { locale: locale }
+                }));
+            },
+            getMessage: function (key, defaultValue) {
+                const messages = this.messages[this.currentLanguage] || this.messages['en'];
+                return messages[key] || defaultValue || key;
+            },
+            setLanguage: function (locale) {
+                // 檢查語言檔案是否已載入
+                if (!this.messages[locale]) {
+                    console.warn(`Language ${locale} not loaded yet`);
+                    return;
+                }
+                this.currentLanguage = locale;
+
+                // 切換語言時也同步翻譯到 Blockly.Msg
+                this.syncToBlocklyMsg(locale, this.messages[locale]);
+
+                // 觸發語言變更事件
+                window.dispatchEvent(new CustomEvent('languageChanged', {
+                    detail: { language: locale }
+                }));
+                // 重新渲染工作區
+                if (Blockly && Blockly.getMainWorkspace()) {
+                    Blockly.getMainWorkspace().render();
+                }
+            },
+            syncToBlocklyMsg: function (locale, messages) {
+                // 確保 Blockly 和 Blockly.Msg 已經定義
+                if (typeof Blockly !== 'undefined' && Blockly.Msg) {
+                    // 使用標準化的日誌系統
+                    if (window.log && window.log.info) {
+                        window.log.info(`同步 ${locale} 翻譯到 Blockly.Msg`, {
+                            messageCount: Object.keys(messages).length,
+                            timestamp: new Date().toISOString()
+                        });
+                    } else {
+                        console.log(`同步 ${locale} 翻譯到 Blockly.Msg`);
+                        // 在 log 系統可用後立即初始化它
+                        setTimeout(() => {
+                            if (window.log && window.log.info) {
+                                window.log.info(`語言 ${locale} 已載入`, {
+                                    messageCount: Object.keys(messages).length,
+                                    timestamp: new Date().toISOString()
+                                });
+                            }
+                        }, 100);
+                    }
+
+                    // 遍歷所有翻譯項目
+                    for (const key in messages) {
+                        // 如果 Blockly.Msg 中已經有這個鍵，就覆蓋它
+                        // 如果沒有，就新增這個鍵
+                        Blockly.Msg[key] = messages[key];
+                    }
+                } else {
+                    // 如果 Blockly 還未載入，設置一個短暫的延遲再試一次
+                    setTimeout(() => {
+                        this.syncToBlocklyMsg(locale, messages);
+                    }, 200);
+                }
+            }
+        };
+    </script>
+</head>
+
+<body class="theme-{theme} preview-mode">
+    <div class="preview-info">
+        <div class="preview-info-content">
+            <div class="preview-title">
+                {fileName} <span class="preview-badge">預覽</span>
+            </div>
+            <div class="preview-subtitle">使用 Ctrl+C 複製選中的積木</div>
+        </div>
+    </div>
+    <div class="container preview-container">
+        <div class="controls-container preview-controls">
+            <div class="theme-switch">
+                <button id="themeToggle" title="切換主題">
+                    <svg id="lightIcon" class="theme-icon" viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5S14.76,7,12,7L12,7z M2,13h2c0.55,0,1-0.45,1-1s-0.45-1-1-1H2 c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13h2c0.55,0,1-0.45,1-1s-0.45-1-1-1h-2c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2 c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1 S11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0 s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06 c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0 l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41 c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z">
+                        </path>
+                    </svg>
+                    <svg id="darkIcon" class="theme-icon" viewBox="0 0 24 24" width="16" height="16"
+                        style="display:none">
+                        <path fill="currentColor"
+                            d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36c-0.98,1.37-2.58,2.26-4.4,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div id="blocklyArea" class="preview-blockly-area">
+            <div id="blocklyDiv"></div>
+        </div>
+    </div>
+
+    <script src="{blocklyCompressedJsUri}"></script>
+    <script src="{blocksCompressedJsUri}"></script>
+    <script src="{javascriptCompressedJsUri}"></script>
+    <script src="{msgJsUri}"></script>
+    <script src="{langJsUri}"></script>
+    <script src="{themeModernJsUri}"></script>
+    <script src="{themesUri}/singular.js"></script>
+    <script src="{themesUri}/singularDark.js"></script>
+    <script src="{arduinoGeneratorUri}"></script>
+    <script src="{boardConfigsUri}"></script>
+    <script src="{arduinoBlocksUri}"></script>
+    <script src="{functionBlocksUri}"></script>
+    {arduinoModules}
+    <script src="{previewJsUri}"></script>
+</body>
+
+</html>
