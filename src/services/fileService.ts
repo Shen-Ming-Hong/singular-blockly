@@ -189,4 +189,24 @@ export class FileService {
 			throw error;
 		}
 	}
+
+	/**
+	 * 獲取檔案的時間戳信息
+	 * @param relativePath 相對於工作區的檔案路徑
+	 * @returns 包含創建時間、最後修改時間等的物件，若檔案不存在則返回 null
+	 */
+	async getFileStats(relativePath: string): Promise<fs.Stats | null> {
+		try {
+			const fullPath = path.join(this.workspacePath, relativePath);
+
+			if (!fs.existsSync(fullPath)) {
+				return null;
+			}
+
+			return await fs.promises.stat(fullPath);
+		} catch (error) {
+			log(`Failed to get file stats: ${relativePath}`, 'error', error);
+			return null;
+		}
+	}
 }

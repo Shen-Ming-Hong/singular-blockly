@@ -434,25 +434,28 @@ export class WebViewMessageHandler {
 
 			// 收集備份資訊
 			const backups = [];
-
 			for (const file of backupFiles) {
 				const filePath = path.join(backupDir, file);
 				const name = path.basename(file, '.json');
 
 				try {
-					// 讀取備份檔案
-					const data = await this.fileService.readJsonFile<any>(path.join('blockly', 'backup', file), {});
+					// 獲取檔案的時間戳信息
+					const stats = await this.fileService.getFileStats(filePath);
+					// 優先使用檔案的創建時間（birthtime）
+					const fileDate = stats ? stats.birthtime.toISOString() : new Date().toISOString();
 
 					backups.push({
 						name: name,
-						date: data.created || new Date().toISOString(),
-						size: 0, // 暫不處理檔案大小
+						date: fileDate,
+						filePath: filePath, // 添加完整檔案路徑以便預覽功能使用
+						size: stats ? stats.size : 0, // 現在可以處理檔案大小了
 					});
 				} catch (err) {
 					// 如果讀取檔案失敗，使用當前時間
 					backups.push({
 						name: name,
 						date: new Date().toISOString(),
+						filePath: filePath,
 						size: 0,
 					});
 				}
