@@ -18,6 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.11.0] - 2025-04-12
+
+### 新增 Added
+
+- 新增獲取檔案時間戳功能
+  Added file timestamp retrieval functionality
+  - 在 FileService 中新增 getFileStats 方法，可獲取檔案的完整時間戳資訊
+    Added getFileStats method in FileService to retrieve complete timestamp information for files
+  
+### 已更新 Updated
+
+- 改進備份檔案處理機制
+  Improved backup file handling mechanism
+  - 備份列表現在顯示真實的檔案創建時間和大小
+    Backup list now displays actual file creation time and size
+  - 優化備份檔案路徑管理，便於後續功能擴展
+    Optimized backup file path management for future feature extensions
+
 ## [0.10.0] - 2025-04-11
 
 ### 新增 Added
