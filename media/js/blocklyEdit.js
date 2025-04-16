@@ -93,7 +93,57 @@ const log = {
 };
 
 // 儲存當前主題設定
-let currentTheme = window.initialTheme || 'light'; // 從 HTML 獲取初始主題設定
+let currentTheme = window.initialTheme || 'light';
+
+/**
+ * 更新主編輯視窗的UI文字為多語言版本
+ */
+function updateEditorUITexts() {
+	// 獲取語言管理器
+	const languageManager = window.languageManager;
+	if (!languageManager) {
+		log.warn('語言管理器尚未載入，無法更新主編輯視窗文字');
+		return;
+	}
+
+	// 更新主題切換按鈕title屬性
+	const themeToggle = document.getElementById('themeToggle');
+	if (themeToggle) {
+		themeToggle.setAttribute('title', languageManager.getMessage('THEME_TOGGLE', '切換主題'));
+	}
+
+	// 更新選擇開發板標籤文字
+	const boardSelectLabel = document.getElementById('boardSelectLabel');
+	if (boardSelectLabel) {
+		boardSelectLabel.textContent = languageManager.getMessage('BOARD_SELECT_LABEL', '選擇開發板：');
+	}
+}
+
+/**
+ * 更新備份管理視窗的文字為多語言版本
+ */
+function updateBackupModalTexts() {
+	// 獲取語言管理器
+	const languageManager = window.languageManager;
+	if (!languageManager) {
+		log.warn('語言管理器尚未載入，無法更新備份管理視窗文字');
+		return;
+	}
+
+	// 更新標題和按鈕
+	document.getElementById('backupModalTitle').textContent = languageManager.getMessage('BACKUP_MANAGER_TITLE', '備份管理');
+	document.getElementById('createBackupBtn').textContent = languageManager.getMessage('BACKUP_CREATE_NEW', '建立新備份');
+	document.getElementById('createBackupTitle').textContent = languageManager.getMessage('BACKUP_CREATE_NEW', '建立新備份');
+	document.getElementById('backupNameLabel').textContent = languageManager.getMessage('BACKUP_NAME_LABEL', '備份名稱：');
+	document.getElementById('backupName').placeholder = languageManager.getMessage('BACKUP_NAME_PLACEHOLDER', '輸入備份名稱');
+	document.getElementById('confirmBackupBtn').textContent = languageManager.getMessage('BACKUP_CONFIRM', '確認');
+	document.getElementById('cancelBackupBtn').textContent = languageManager.getMessage('BACKUP_CANCEL', '取消');
+	document.getElementById('backupListTitle').textContent = languageManager.getMessage('BACKUP_LIST_TITLE', '備份列表');
+	document.getElementById('emptyBackupMessage').textContent = languageManager.getMessage('BACKUP_LIST_EMPTY', '尚無備份');
+
+	// 更新備份按鈕標題
+	document.getElementById('backupButton').title = languageManager.getMessage('BACKUP_BUTTON_TITLE', '備份管理');
+}
 
 // 註冊工具箱元件
 Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCategory.registrationName, Blockly.ToolboxCategory);
@@ -129,7 +179,6 @@ window.confirm = function (message) {
 const backupManager = {
 	// 備份列表
 	backupList: [],
-
 	// 初始化備份管理器
 	init: function () {
 		// 綁定按鈕事件
@@ -138,6 +187,9 @@ const backupManager = {
 		document.getElementById('createBackupBtn').addEventListener('click', this.showBackupForm.bind(this));
 		document.getElementById('confirmBackupBtn').addEventListener('click', this.createBackup.bind(this));
 		document.getElementById('cancelBackupBtn').addEventListener('click', this.hideBackupForm.bind(this));
+
+		// 更新多國語言文字
+		updateBackupModalTexts();
 
 		// 初始化備份列表
 		this.refreshBackupList();
@@ -238,7 +290,6 @@ const backupManager = {
 			command: 'getBackupList',
 		});
 	},
-
 	// 更新備份列表 UI
 	updateBackupListUI: function (backups) {
 		const backupListEl = document.getElementById('backupList');
@@ -247,7 +298,8 @@ const backupManager = {
 
 		// 如果沒有備份，顯示空白訊息
 		if (!backups || backups.length === 0) {
-			backupListEl.innerHTML = '<div class="empty-backup-list">尚無備份</div>';
+			const emptyMessage = window.languageManager ? window.languageManager.getMessage('BACKUP_LIST_EMPTY', '尚無備份') : '尚無備份';
+			backupListEl.innerHTML = `<div class="empty-backup-list">${emptyMessage}</div>`;
 			return;
 		}
 
@@ -273,38 +325,35 @@ const backupManager = {
 			backupInfo.appendChild(backupName);
 			backupInfo.appendChild(backupDate); // 操作按鈕
 			const backupActions = document.createElement('div');
-			backupActions.className = 'backup-actions';
-
-			// 預覽按鈕
+			backupActions.className = 'backup-actions'; // 預覽按鈕
 			const previewBtn = document.createElement('button');
 			previewBtn.className = 'backup-preview';
+			const previewText = window.languageManager ? window.languageManager.getMessage('BACKUP_PREVIEW_BTN', '預覽') : '預覽';
 			previewBtn.innerHTML = `
                 <svg viewBox="0 0 24 24" width="16" height="16">
                     <path fill="currentColor" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
                 </svg>
-                預覽
+                ${previewText}
             `;
-			previewBtn.addEventListener('click', () => this.previewBackup(backup.name));
-
-			// 還原按鈕
+			previewBtn.addEventListener('click', () => this.previewBackup(backup.name)); // 還原按鈕
 			const restoreBtn = document.createElement('button');
 			restoreBtn.className = 'backup-restore';
+			const restoreText = window.languageManager ? window.languageManager.getMessage('BACKUP_RESTORE_BTN', '還原') : '還原';
 			restoreBtn.innerHTML = `
                 <svg viewBox="0 0 24 24" width="16" height="16">
                     <path fill="currentColor" d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" />
                 </svg>
-                還原
+                ${restoreText}
             `;
-			restoreBtn.addEventListener('click', () => this.restoreBackup(backup.name));
-
-			// 刪除按鈕
+			restoreBtn.addEventListener('click', () => this.restoreBackup(backup.name)); // 刪除按鈕
 			const deleteBtn = document.createElement('button');
 			deleteBtn.className = 'backup-delete';
+			const deleteText = window.languageManager ? window.languageManager.getMessage('BACKUP_DELETE_BTN', '刪除') : '刪除';
 			deleteBtn.innerHTML = `
                 <svg viewBox="0 0 24 24" width="16" height="16">
                     <path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
                 </svg>
-                刪除
+                ${deleteText}
             `;
 			deleteBtn.addEventListener('click', () => this.deleteBackup(backup.name));
 
@@ -391,8 +440,25 @@ function updateTheme(theme) {
 	}
 }
 
+// 監聽語言變更事件
+window.addEventListener('languageChanged', function (event) {
+	log.info(`語言已變更為: ${event.detail.language}`);
+	// 更新主編輯視窗UI文字
+	updateEditorUITexts();
+	// 更新備份管理視窗的文字
+	updateBackupModalTexts();
+	// 如果備份列表已顯示，更新其UI
+	if (document.getElementById('backupModal').style.display === 'block') {
+		// 刷新備份列表以更新按鈕文字
+		backupManager.refreshBackupList();
+	}
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
 	log.info('Blockly Edit page loaded');
+
+	// 更新主編輯視窗UI文字的多語言支援
+	updateEditorUITexts();
 
 	// 註冊主題切換按鈕事件
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);

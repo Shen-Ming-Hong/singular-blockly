@@ -13,7 +13,27 @@ window.languageManager.loadMessages('ru', {
 	// UI Elements
 	BLOCKS_TAB: 'Блоки',
 	CODE_TAB: 'Код',
-	BOARD_SELECT_LABEL: 'Выбрать плату:',
+	BOARD_SELECT_LABEL: 'Выберите плату:',
+
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Предпросмотр',
+	THEME_TOGGLE: 'Сменить тему',
+	PREVIEW_WINDOW_TITLE: 'Blockly Предпросмотр - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Предпросмотр - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Управление резервными копиями',
+	BACKUP_CREATE_NEW: 'Создать новую копию',
+	BACKUP_NAME_LABEL: 'Имя копии:',
+	BACKUP_NAME_PLACEHOLDER: 'Введите имя копии',
+	BACKUP_CONFIRM: 'Подтвердить',
+	BACKUP_CANCEL: 'Отмена',
+	BACKUP_LIST_TITLE: 'Список копий',
+	BACKUP_LIST_EMPTY: 'Копии отсутствуют',
+	BACKUP_BUTTON_TITLE: 'Управление копиями',
+	BACKUP_PREVIEW_BTN: 'Просмотр',
+	BACKUP_RESTORE_BTN: 'Восстановить',
+	BACKUP_DELETE_BTN: 'Удалить',
 
 	// Board Names
 	BOARD_NONE: 'Нет',
@@ -201,7 +221,7 @@ window.languageManager.loadMessages('ru', {
 	CONTROLS_REPEAT_TITLE: 'повторить %1 раз',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'повторять, пока',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'повторять, до тех пор пока не',
-	CONTРОLS_FOR_TITLE: 'считать с %1 от %2 до %3 шагом %4',
+	CONTROLS_FOR_TITLE: 'считать с %1 от %2 до %3 шагом %4',
 	CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK: 'выйти из цикла',
 	CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE: 'перейти к следующей итерации цикла',
 	CONTROLS_REPEAT_TOOLTIP: 'Повторяет выполнение действий несколько раз.',

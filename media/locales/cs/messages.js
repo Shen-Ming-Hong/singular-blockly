@@ -15,6 +15,26 @@ window.languageManager.loadMessages('cs', {
 	CODE_TAB: 'Kód',
 	BOARD_SELECT_LABEL: 'Vybrat desku:',
 
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Náhled',
+	THEME_TOGGLE: 'Přepnout motiv',
+	PREVIEW_WINDOW_TITLE: 'Blockly Náhled - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Náhled - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Správce záloh',
+	BACKUP_CREATE_NEW: 'Vytvořit novou zálohu',
+	BACKUP_NAME_LABEL: 'Název zálohy:',
+	BACKUP_NAME_PLACEHOLDER: 'Zadejte název zálohy',
+	BACKUP_CONFIRM: 'Potvrdit',
+	BACKUP_CANCEL: 'Zrušit',
+	BACKUP_LIST_TITLE: 'Seznam záloh',
+	BACKUP_LIST_EMPTY: 'Žádné dostupné zálohy',
+	BACKUP_BUTTON_TITLE: 'Správce záloh',
+	BACKUP_PREVIEW_BTN: 'Náhled',
+	BACKUP_RESTORE_BTN: 'Obnovit',
+	BACKUP_DELETE_BTN: 'Smazat',
+
 	// Board Names
 	BOARD_NONE: 'Žádná',
 	BOARD_UNO: 'Arduino Uno',

@@ -13,7 +13,27 @@ window.languageManager.loadMessages('fr', {
 	// UI Elements
 	BLOCKS_TAB: 'Blocs',
 	CODE_TAB: 'Code',
-	BOARD_SELECT_LABEL: 'Sélectionner la carte :',
+	BOARD_SELECT_LABEL: 'Sélectionner une carte:',
+
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Aperçu',
+	THEME_TOGGLE: 'Changer de thème',
+	PREVIEW_WINDOW_TITLE: 'Aperçu Blockly - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Aperçu - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Gestionnaire de sauvegardes',
+	BACKUP_CREATE_NEW: 'Créer une nouvelle sauvegarde',
+	BACKUP_NAME_LABEL: 'Nom de la sauvegarde:',
+	BACKUP_NAME_PLACEHOLDER: 'Entrez un nom de sauvegarde',
+	BACKUP_CONFIRM: 'Confirmer',
+	BACKUP_CANCEL: 'Annuler',
+	BACKUP_LIST_TITLE: 'Liste des sauvegardes',
+	BACKUP_LIST_EMPTY: 'Aucune sauvegarde disponible',
+	BACKUP_BUTTON_TITLE: 'Gestionnaire de sauvegardes',
+	BACKUP_PREVIEW_BTN: 'Aperçu',
+	BACKUP_RESTORE_BTN: 'Restaurer',
+	BACKUP_DELETE_BTN: 'Supprimer',
 
 	// Board Names
 	BOARD_NONE: 'Aucune',

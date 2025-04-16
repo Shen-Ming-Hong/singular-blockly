@@ -15,6 +15,26 @@ window.languageManager.loadMessages('de', {
 	CODE_TAB: 'Code',
 	BOARD_SELECT_LABEL: 'Board auswählen:',
 
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Vorschau',
+	THEME_TOGGLE: 'Design wechseln',
+	PREVIEW_WINDOW_TITLE: 'Blockly Vorschau - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Vorschau - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Backup-Verwaltung',
+	BACKUP_CREATE_NEW: 'Neues Backup erstellen',
+	BACKUP_NAME_LABEL: 'Backup-Name:',
+	BACKUP_NAME_PLACEHOLDER: 'Backup-Namen eingeben',
+	BACKUP_CONFIRM: 'Bestätigen',
+	BACKUP_CANCEL: 'Abbrechen',
+	BACKUP_LIST_TITLE: 'Backup-Liste',
+	BACKUP_LIST_EMPTY: 'Keine Backups vorhanden',
+	BACKUP_BUTTON_TITLE: 'Backup-Verwaltung',
+	BACKUP_PREVIEW_BTN: 'Vorschau',
+	BACKUP_RESTORE_BTN: 'Wiederherstellen',
+	BACKUP_DELETE_BTN: 'Löschen',
+
 	// Board Names
 	BOARD_NONE: 'Keine',
 	BOARD_UNO: 'Arduino Uno',

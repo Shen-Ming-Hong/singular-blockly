@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.14.0] - 2025-04-16
+
+### 已更新 Updated
+
+- 增強多語言支援功能
+  Enhanced multilingual support functionality
+  - 改進了使用者介面元素的多語言支援
+    Improved multilingual support for user interface elements
+  - 為備份管理視窗和預覽模式添加多語言支援
+    Added multilingual support for backup management window and preview mode
+  - 增強了從JS檔案中提取訊息的能力
+    Enhanced ability to extract messages from JS files
+
 ## [0.13.2] - 2025-04-16
 
 ### 已修改 Changed

@@ -15,6 +15,26 @@ window.languageManager.loadMessages('pl', {
 	CODE_TAB: 'Kod',
 	BOARD_SELECT_LABEL: 'Wybierz płytkę:',
 
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Podgląd',
+	THEME_TOGGLE: 'Zmień motyw',
+	PREVIEW_WINDOW_TITLE: 'Blockly Podgląd - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Podgląd - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Menedżer kopii zapasowych',
+	BACKUP_CREATE_NEW: 'Utwórz nową kopię',
+	BACKUP_NAME_LABEL: 'Nazwa kopii:',
+	BACKUP_NAME_PLACEHOLDER: 'Wprowadź nazwę kopii',
+	BACKUP_CONFIRM: 'Potwierdź',
+	BACKUP_CANCEL: 'Anuluj',
+	BACKUP_LIST_TITLE: 'Lista kopii',
+	BACKUP_LIST_EMPTY: 'Brak dostępnych kopii',
+	BACKUP_BUTTON_TITLE: 'Menedżer kopii zapasowych',
+	BACKUP_PREVIEW_BTN: 'Podgląd',
+	BACKUP_RESTORE_BTN: 'Przywróć',
+	BACKUP_DELETE_BTN: 'Usuń',
+
 	// Board Names
 	BOARD_NONE: 'Brak',
 	BOARD_UNO: 'Arduino Uno',

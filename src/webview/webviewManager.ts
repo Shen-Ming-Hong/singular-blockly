@@ -347,12 +347,12 @@ export class WebViewManager {
 				}
 				const workspaceRoot = workspaceFolders[0].uri.fsPath;
 				this.fileService = new FileService(workspaceRoot);
-			}
-
-			// 建立新的預覽視窗
+			} // 建立新的預覽視窗
+			// 使用多語言文字作為標題
+			const previewTitle = await this.localeService.getLocalizedMessage('PREVIEW_WINDOW_TITLE_WITH_NAME', fileName);
 			const previewPanel = vscode.window.createWebviewPanel(
 				'blocklyPreview',
-				`預覽 - ${fileName}`,
+				previewTitle,
 				{
 					viewColumn: vscode.ViewColumn.Two,
 					preserveFocus: true,

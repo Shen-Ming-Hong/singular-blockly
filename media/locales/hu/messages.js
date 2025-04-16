@@ -13,7 +13,27 @@ window.languageManager.loadMessages('hu', {
 	// UI Elements
 	BLOCKS_TAB: 'Blokkok',
 	CODE_TAB: 'Kód',
-	BOARD_SELECT_LABEL: 'Válasszon panel:',
+	BOARD_SELECT_LABEL: 'Válassz táblát:',
+
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Előnézet',
+	THEME_TOGGLE: 'Téma váltása',
+	PREVIEW_WINDOW_TITLE: 'Blockly Előnézet - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Előnézet - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Mentés kezelő',
+	BACKUP_CREATE_NEW: 'Új mentés létrehozása',
+	BACKUP_NAME_LABEL: 'Mentés neve:',
+	BACKUP_NAME_PLACEHOLDER: 'Adja meg a mentés nevét',
+	BACKUP_CONFIRM: 'Megerősítés',
+	BACKUP_CANCEL: 'Mégse',
+	BACKUP_LIST_TITLE: 'Mentések listája',
+	BACKUP_LIST_EMPTY: 'Nincs elérhető mentés',
+	BACKUP_BUTTON_TITLE: 'Mentés kezelő',
+	BACKUP_PREVIEW_BTN: 'Előnézet',
+	BACKUP_RESTORE_BTN: 'Visszaállítás',
+	BACKUP_DELETE_BTN: 'Törlés',
 
 	// Board Names
 	BOARD_NONE: 'Nincs',

@@ -13,7 +13,27 @@ window.languageManager.loadMessages('tr', {
 	// UI Elements
 	BLOCKS_TAB: 'Bloklar',
 	CODE_TAB: 'Kod',
-	BOARD_SELECT_LABEL: 'Kart Seç:',
+	BOARD_SELECT_LABEL: 'Kart seç:',
+
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Önizleme',
+	THEME_TOGGLE: 'Temayı değiştir',
+	PREVIEW_WINDOW_TITLE: 'Blockly Önizleme - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Önizleme - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Yedek Yöneticisi',
+	BACKUP_CREATE_NEW: 'Yeni Yedek Oluştur',
+	BACKUP_NAME_LABEL: 'Yedek adı:',
+	BACKUP_NAME_PLACEHOLDER: 'Yedek adı girin',
+	BACKUP_CONFIRM: 'Onayla',
+	BACKUP_CANCEL: 'İptal',
+	BACKUP_LIST_TITLE: 'Yedek Listesi',
+	BACKUP_LIST_EMPTY: 'Yedek bulunmuyor',
+	BACKUP_BUTTON_TITLE: 'Yedek Yöneticisi',
+	BACKUP_PREVIEW_BTN: 'Önizleme',
+	BACKUP_RESTORE_BTN: 'Geri Yükle',
+	BACKUP_DELETE_BTN: 'Sil',
 
 	// Board Names
 	BOARD_NONE: 'Yok',

@@ -15,6 +15,26 @@ window.languageManager.loadMessages('zh-hant', {
 	CODE_TAB: '程式碼',
 	BOARD_SELECT_LABEL: '選擇開發板：',
 
+	// Preview Mode UI
+	PREVIEW_BADGE: '預覽',
+	THEME_TOGGLE: '切換主題',
+	PREVIEW_WINDOW_TITLE: 'Blockly 預覽 - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: '預覽 - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: '備份管理',
+	BACKUP_CREATE_NEW: '建立新備份',
+	BACKUP_NAME_LABEL: '備份名稱：',
+	BACKUP_NAME_PLACEHOLDER: '輸入備份名稱',
+	BACKUP_CONFIRM: '確認',
+	BACKUP_CANCEL: '取消',
+	BACKUP_LIST_TITLE: '備份列表',
+	BACKUP_LIST_EMPTY: '尚無備份',
+	BACKUP_BUTTON_TITLE: '備份管理',
+	BACKUP_PREVIEW_BTN: '預覽',
+	BACKUP_RESTORE_BTN: '還原',
+	BACKUP_DELETE_BTN: '刪除',
+
 	// Board Names
 	BOARD_NONE: '無',
 	BOARD_UNO: 'Arduino Uno',

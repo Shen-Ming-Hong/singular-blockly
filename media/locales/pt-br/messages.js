@@ -13,7 +13,27 @@ window.languageManager.loadMessages('pt-br', {
 	// UI Elements
 	BLOCKS_TAB: 'Blocos',
 	CODE_TAB: 'Código',
-	BOARD_SELECT_LABEL: 'Selecionar Placa:',
+	BOARD_SELECT_LABEL: 'Selecionar placa:',
+
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Pré-visualização',
+	THEME_TOGGLE: 'Alternar tema',
+	PREVIEW_WINDOW_TITLE: 'Pré-visualização Blockly - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Pré-visualização - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Gerenciador de backup',
+	BACKUP_CREATE_NEW: 'Criar novo backup',
+	BACKUP_NAME_LABEL: 'Nome do backup:',
+	BACKUP_NAME_PLACEHOLDER: 'Digite o nome do backup',
+	BACKUP_CONFIRM: 'Confirmar',
+	BACKUP_CANCEL: 'Cancelar',
+	BACKUP_LIST_TITLE: 'Lista de backups',
+	BACKUP_LIST_EMPTY: 'Nenhum backup disponível',
+	BACKUP_BUTTON_TITLE: 'Gerenciador de backup',
+	BACKUP_PREVIEW_BTN: 'Visualizar',
+	BACKUP_RESTORE_BTN: 'Restaurar',
+	BACKUP_DELETE_BTN: 'Excluir',
 
 	// Board Names
 	BOARD_NONE: 'Nenhuma',

@@ -98,6 +98,35 @@ const log = {
 let currentTheme = window.initialTheme || 'light';
 
 /**
+ * 更新介面文字的多國語言支援
+ */
+function updateUITexts() {
+	// 獲取需要更新的元素
+	const previewBadge = document.getElementById('previewBadge');
+	const themeToggle = document.getElementById('themeToggle');
+	const pageTitle = document.getElementById('pageTitle');
+
+	// 使用語言管理器取得翻譯文字
+	if (window.languageManager) {
+		if (previewBadge) {
+			previewBadge.textContent = window.languageManager.getMessage('PREVIEW_BADGE', '預覽');
+		}
+
+		if (themeToggle) {
+			themeToggle.setAttribute('title', window.languageManager.getMessage('THEME_TOGGLE', '切換主題'));
+		}
+
+		// 更新視窗標題
+		if (pageTitle) {
+			const titleTemplate = window.languageManager.getMessage('PREVIEW_WINDOW_TITLE', 'Blockly 預覽 - {0}');
+			const fileName = window.previewFileName || '';
+			const title = titleTemplate.replace('{0}', fileName);
+			document.title = title; // 更新瀏覽器頁籤標題
+		}
+	}
+}
+
+/**
  * 初始化 Blockly 工作區
  * 預覽模式下不需要工具箱
  */
@@ -295,6 +324,20 @@ window.addEventListener('message', event => {
 	}
 });
 
+// 監聽語言變更事件
+window.addEventListener('languageChanged', function (event) {
+	log.info(`語言已變更為: ${event.detail.language}`);
+	// 更新 UI 文字
+	updateUITexts();
+});
+
+// 監聽語言檔案載入事件
+window.addEventListener('messageLoaded', function (event) {
+	log.info(`語言檔案已載入: ${event.detail.locale}`);
+	// 更新 UI 文字
+	updateUITexts();
+});
+
 // 初始化
 document.addEventListener('DOMContentLoaded', async () => {
 	log.info('Blockly Preview page loaded');
@@ -307,4 +350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 根據初始主題設定更新 UI
 	updateTheme(currentTheme);
+
+	// 更新UI文字的多國語言顯示
+	updateUITexts();
 });

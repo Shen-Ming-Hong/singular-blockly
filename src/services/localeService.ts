@@ -92,7 +92,6 @@ export class LocaleService {
 			return {}; // 發生錯誤時返回空物件
 		}
 	}
-
 	/**
 	 * 從 JS 檔案中提取訊息
 	 * @param content JS 檔案內容
@@ -101,14 +100,30 @@ export class LocaleService {
 	private extractMessagesFromJs(content: string): UIMessages {
 		const messages: UIMessages = {};
 
-		// 使用正則表達式尋找 VSCODE_ 開頭的訊息
-		const regex = /VSCODE_(\w+):\s*['"](.+?)['"]/g;
-		let match;
+		// 優先處理 VSCODE_ 開頭的訊息，保持向下兼容
+		const vscodeRegex = /VSCODE_(\w+):\s*['"](.+?)['"]/g;
+		let vscodeMatch;
 
-		while ((match = regex.exec(content)) !== null) {
-			const key = 'VSCODE_' + match[1];
-			const value = match[2];
+		while ((vscodeMatch = vscodeRegex.exec(content)) !== null) {
+			const key = 'VSCODE_' + vscodeMatch[1];
+			const value = vscodeMatch[2];
 			messages[key] = value;
+		}
+
+		// 處理所有其他訊息
+		// 使用正則表達式尋找 loadMessages 函數中的所有鍵值對
+		const messageBlockRegex = /loadMessages\s*\(['"]\w+['"]\s*,\s*\{([\s\S]*?)\}\s*\)/g;
+		let blockMatch;
+		while ((blockMatch = messageBlockRegex.exec(content)) !== null) {
+			const messageBlock = blockMatch[1];
+			// 匹配鍵值對
+			const keyValueRegex = /\s*(\w+):\s*['"](.+?)['"]/g;
+			let keyValueMatch;
+			while ((keyValueMatch = keyValueRegex.exec(messageBlock)) !== null) {
+				const key = keyValueMatch[1];
+				const value = keyValueMatch[2];
+				messages[key] = value;
+			}
 		}
 
 		return messages;

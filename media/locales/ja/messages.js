@@ -15,6 +15,26 @@ window.languageManager.loadMessages('ja', {
 	CODE_TAB: 'コード',
 	BOARD_SELECT_LABEL: 'ボードを選択:',
 
+	// Preview Mode UI
+	PREVIEW_BADGE: 'プレビュー',
+	THEME_TOGGLE: 'テーマ切替',
+	PREVIEW_WINDOW_TITLE: 'Blockly プレビュー - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'プレビュー - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'バックアップ管理',
+	BACKUP_CREATE_NEW: '新規バックアップ作成',
+	BACKUP_NAME_LABEL: 'バックアップ名:',
+	BACKUP_NAME_PLACEHOLDER: 'バックアップ名を入力',
+	BACKUP_CONFIRM: '確認',
+	BACKUP_CANCEL: 'キャンセル',
+	BACKUP_LIST_TITLE: 'バックアップ一覧',
+	BACKUP_LIST_EMPTY: 'バックアップがありません',
+	BACKUP_BUTTON_TITLE: 'バックアップ管理',
+	BACKUP_PREVIEW_BTN: 'プレビュー',
+	BACKUP_RESTORE_BTN: '復元',
+	BACKUP_DELETE_BTN: '削除',
+
 	// Board Names
 	BOARD_NONE: 'なし',
 	BOARD_UNO: 'Arduino Uno',

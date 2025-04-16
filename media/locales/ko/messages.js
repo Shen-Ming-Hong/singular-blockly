@@ -15,6 +15,26 @@ window.languageManager.loadMessages('ko', {
 	CODE_TAB: '코드',
 	BOARD_SELECT_LABEL: '보드 선택:',
 
+	// Preview Mode UI
+	PREVIEW_BADGE: '미리보기',
+	THEME_TOGGLE: '테마 전환',
+	PREVIEW_WINDOW_TITLE: 'Blockly 미리보기 - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: '미리보기 - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: '백업 관리자',
+	BACKUP_CREATE_NEW: '새 백업 만들기',
+	BACKUP_NAME_LABEL: '백업 이름:',
+	BACKUP_NAME_PLACEHOLDER: '백업 이름 입력',
+	BACKUP_CONFIRM: '확인',
+	BACKUP_CANCEL: '취소',
+	BACKUP_LIST_TITLE: '백업 목록',
+	BACKUP_LIST_EMPTY: '사용 가능한 백업 없음',
+	BACKUP_BUTTON_TITLE: '백업 관리자',
+	BACKUP_PREVIEW_BTN: '미리보기',
+	BACKUP_RESTORE_BTN: '복원',
+	BACKUP_DELETE_BTN: '삭제',
+
 	// Board Names
 	BOARD_NONE: '없음',
 	BOARD_UNO: '아두이노 우노',

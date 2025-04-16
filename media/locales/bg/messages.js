@@ -15,6 +15,26 @@ window.languageManager.loadMessages('bg', {
 	CODE_TAB: 'Код',
 	BOARD_SELECT_LABEL: 'Избор на платка:',
 
+	// Preview Mode UI
+	PREVIEW_BADGE: 'Преглед',
+	THEME_TOGGLE: 'Смяна на тема',
+	PREVIEW_WINDOW_TITLE: 'Blockly Преглед - {0}',
+	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Преглед - {0}',
+
+	// Backup Modal UI
+	BACKUP_MANAGER_TITLE: 'Управление на архиви',
+	BACKUP_CREATE_NEW: 'Създаване на нов архив',
+	BACKUP_NAME_LABEL: 'Име на архив:',
+	BACKUP_NAME_PLACEHOLDER: 'Въведете име на архива',
+	BACKUP_CONFIRM: 'Потвърждение',
+	BACKUP_CANCEL: 'Отказ',
+	BACKUP_LIST_TITLE: 'Списък с архиви',
+	BACKUP_LIST_EMPTY: 'Няма налични архиви',
+	BACKUP_BUTTON_TITLE: 'Управление на архиви',
+	BACKUP_PREVIEW_BTN: 'Преглед',
+	BACKUP_RESTORE_BTN: 'Възстановяване',
+	BACKUP_DELETE_BTN: 'Изтриване',
+
 	// Board Names
 	BOARD_NONE: 'Няма',
 	BOARD_UNO: 'Arduino Uno',
