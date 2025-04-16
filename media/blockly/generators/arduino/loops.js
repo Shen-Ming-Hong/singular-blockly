@@ -20,7 +20,7 @@ window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 
 	if (until) {
-		return `while (!${argument0}) {\n${branch}}\n`;
+		return `while (!(${argument0})) {\n${branch}}\n`;
 	} else {
 		return `while (${argument0}) {\n${branch}}\n`;
 	}

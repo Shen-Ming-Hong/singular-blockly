@@ -58,6 +58,8 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Code generation to Arduino (.cpp) files
   - Automatic PlatformIO configuration generation
   - Automatic platformio.ini preview mode management
+  - Backup management with creation, preview, and restoration
+  - Seven-segment display support with common cathode/anode modes
 
 - 🛠 **Development Features**
   - Real-time code generation
@@ -65,8 +67,10 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Visual block programming interface
   - Drag-and-drop block management
   - Zoom controls and trashcan
-  - Custom theme support
+  - Light and dark theme support with theme toggle
   - PlatformIO integration for hardware upload
+  - Pin mode tracking and conflict detection
+  - Value mapping (Arduino map function)
 
 ## Requirements
 

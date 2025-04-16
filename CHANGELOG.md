@@ -18,6 +18,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.13.1] - 2025-04-16
+
+### 已修復 Fixed
+
+- 修復程式碼生成器中的運算優先順序問題
+  Fixed operator precedence issues in code generators
+  - 在邏輯比較運算中加入括號以確保運算優先順序正確
+    Added parentheses to logic comparison operations to ensure correct operator precedence
+  - 在邏輯運算（AND、OR）中加入括號
+    Added parentheses to logic operations (AND, OR)
+  - 在邏輯否定運算中加入括號
+    Added parentheses to logic negation operations
+  - 修正 while-until 迴圈中的條件判斷加入括號
+    Fixed condition evaluation in while-until loops by adding parentheses
+
 ## [0.13.0] - 2025-04-16
 
 ### 已修改 Changed

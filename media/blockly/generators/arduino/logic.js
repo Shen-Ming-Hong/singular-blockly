@@ -39,7 +39,8 @@ window.arduinoGenerator.forBlock['logic_compare'] = function (block) {
 	const order = window.arduinoGenerator.ORDER_RELATIONAL;
 	const argument0 = window.arduinoGenerator.valueToCode(block, 'A', order) || '0';
 	const argument1 = window.arduinoGenerator.valueToCode(block, 'B', order) || '0';
-	return [`${argument0} ${operator} ${argument1}`, order];
+	// 加入括號以確保運算優先順序正確
+	return [`(${argument0} ${operator} ${argument1})`, order];
 };
 
 window.arduinoGenerator.forBlock['logic_operation'] = function (block) {
@@ -51,13 +52,15 @@ window.arduinoGenerator.forBlock['logic_operation'] = function (block) {
 	const order = operator === '&&' ? window.arduinoGenerator.ORDER_LOGICAL_AND : window.arduinoGenerator.ORDER_LOGICAL_OR;
 	const argument0 = window.arduinoGenerator.valueToCode(block, 'A', order) || 'false';
 	const argument1 = window.arduinoGenerator.valueToCode(block, 'B', order) || 'false';
-	const code = `${argument0} ${operator} ${argument1}`;
+	// 加入括號以確保運算優先順序正確
+	const code = `(${argument0} ${operator} ${argument1})`;
 	return [code, order];
 };
 
 window.arduinoGenerator.forBlock['logic_negate'] = function (block) {
 	const argument0 = window.arduinoGenerator.valueToCode(block, 'BOOL', window.arduinoGenerator.ORDER_UNARY_PREFIX) || 'false';
-	const code = '!' + argument0;
+	// 加入括號以確保運算優先順序正確
+	const code = '!(' + argument0 + ')';
 	return [code, window.arduinoGenerator.ORDER_UNARY_PREFIX];
 };
 
