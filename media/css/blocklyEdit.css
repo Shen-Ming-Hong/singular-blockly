@@ -423,6 +423,7 @@ body.theme-dark .preview-controls .theme-icon {
 .backup-actions {
 	display: flex;
 	gap: 8px;
+	flex-wrap: wrap; /* 讓按鈕在空間不足時自動換行 */
 }
 
 .backup-actions button {
@@ -436,6 +437,7 @@ body.theme-dark .preview-controls .theme-icon {
 	font-weight: 500;
 	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	margin-bottom: 4px; /* 添加下方間距以改善換行後的外觀 */
 }
 
 .backup-actions button svg {

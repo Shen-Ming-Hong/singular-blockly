@@ -18,6 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.14.1] - 2025-04-16
+
+### 已更新 Updated
+
+- 改進備份管理界面的響應式設計
+  Improved responsive design of backup management interface
+  - 新增按鈕區域自動換行功能，提高在小視窗下的可用性
+    Added button area auto-wrap functionality to improve usability in small windows
+  - 添加按鈕之間的間距，優化換行後的視覺效果
+    Added spacing between buttons to optimize visual appearance after wrapping
+
+### 已修改 Changed
+
+- 修改自動備份文件的命名格式
+  Modified auto-backup file naming format
+  - 從`auto_backup_before_restore_YYYYMMDD_HHMMSS`簡化為`auto_restore_YYYYMMDD_HHMMSS`
+    Simplified from `auto_backup_before_restore_YYYYMMDD_HHMMSS` to `auto_restore_YYYYMMDD_HHMMSS`
+
 ## [0.14.0] - 2025-04-16
 
 ### 已更新 Updated
