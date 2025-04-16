@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.13.0] - 2025-04-16
+
+### 已修改 Changed
+
+- 移除預覽模式中的複製功能
+  Removed copy functionality from preview mode
+  - 將預覽工作區設為完全唯讀模式
+    Set preview workspace to fully read-only mode
+  - 移除相關的複製界面元素和提示文字
+    Removed related copy UI elements and prompt text
+  - 清理不再需要的複製成功提示樣式和腳本
+    Cleaned up no longer needed copy success notification styles and scripts
+
 ## [0.12.0] - 2025-04-13
 
 ### 新增 Added

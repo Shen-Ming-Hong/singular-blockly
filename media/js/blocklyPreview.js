@@ -6,7 +6,6 @@
 
 const vscode = acquireVsCodeApi();
 let workspace;
-const CLIPBOARD_STORAGE_KEY = 'blockly-clipboard-data';
 
 // 日誌系統
 const log = {
@@ -106,11 +105,10 @@ function initBlocklyWorkspace() {
 	log.info('初始化預覽模式 Blockly 工作區');
 
 	// 選擇適合的主題
-	const theme = currentTheme === 'dark' ? SingularBlocklyDarkTheme : SingularBlocklyTheme;
-	// 初始化工作區 - 不需要工具箱
+	const theme = currentTheme === 'dark' ? SingularBlocklyDarkTheme : SingularBlocklyTheme; // 初始化工作區 - 不需要工具箱
 	workspace = Blockly.inject('blocklyDiv', {
 		theme: theme,
-		readOnly: false, // 允許選擇方便複製，但無法修改積木
+		readOnly: true, // 預覽模式設為真正的唯讀模式
 		move: {
 			scrollbars: true,
 			drag: true,
@@ -129,12 +127,8 @@ function initBlocklyWorkspace() {
 
 	// 將工作區註冊為全局變數 (用於除錯)
 	window.workspace = workspace;
-
 	// 請求載入備份數據
 	requestBackupData();
-
-	// 設定複製功能
-	setupCopyFunctionality();
 
 	log.info('預覽工作區初始化完成');
 }
@@ -149,72 +143,6 @@ function requestBackupData() {
 		command: 'loadBackupData',
 		fileName: window.previewFileName,
 	});
-}
-
-/**
- * 設定積木複製功能
- */
-function setupCopyFunctionality() {
-	// 監聽複製事件 (Ctrl+C)
-	document.addEventListener('keydown', function (e) {
-		// 檢查是否為 Ctrl+C 或 Cmd+C (Mac)
-		if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-			copySelectedBlocks();
-		}
-	});
-}
-
-/**
- * 複製選中的積木
- */
-function copySelectedBlocks() {
-	if (!workspace) {
-		log.warn('複製失敗: 工作區未初始化');
-		return;
-	}
-
-	const selectedBlocks = workspace.getSelectedBlocks();
-	if (!selectedBlocks || selectedBlocks.length === 0) {
-		log.info('沒有選中的積木可供複製');
-		return;
-	}
-
-	log.info(`複製 ${selectedBlocks.length} 個積木`);
-
-	try {
-		// 序列化選中的積木
-		const blocksXml = Blockly.Xml.blockToDom(selectedBlocks[0]);
-		const xmlText = Blockly.Xml.domToText(blocksXml);
-
-		// 儲存到 localStorage 以便能在主編輯器中貼上
-		localStorage.setItem(CLIPBOARD_STORAGE_KEY, xmlText);
-
-		// 顯示提示
-		showCopySuccessMessage();
-
-		log.info('積木複製成功，已保存到剪貼簿', { blockCount: selectedBlocks.length });
-	} catch (error) {
-		log.error('複製積木時發生錯誤', error);
-	}
-}
-
-/**
- * 顯示複製成功的提示訊息
- */
-function showCopySuccessMessage() {
-	const messageContainer = document.createElement('div');
-	messageContainer.className = 'copy-success-message';
-	messageContainer.textContent = '積木已複製，請在主編輯器使用 Ctrl+V 貼上';
-
-	document.body.appendChild(messageContainer);
-
-	// 3秒後移除提示
-	setTimeout(() => {
-		messageContainer.classList.add('copy-success-message-hide');
-		setTimeout(() => {
-			document.body.removeChild(messageContainer);
-		}, 500);
-	}, 3000);
 }
 
 /**
