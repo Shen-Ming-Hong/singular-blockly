@@ -18,6 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.13.2] - 2025-04-16
+
+### 已修改 Changed
+
+- 修改滑鼠滾輪設定，避免與縮放功能衝突
+  Modified mouse wheel settings to avoid conflicts with zoom functionality
+  - 在編輯器中禁用滾輪的移動功能
+    Disabled wheel movement in the editor
+
 ## [0.13.1] - 2025-04-16
 
 ### 已修復 Fixed

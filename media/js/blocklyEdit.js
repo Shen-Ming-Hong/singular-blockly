@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		move: {
 			scrollbars: true,
 			drag: true,
-			wheel: true,
+			wheel: false, // 設為 false 避免與縮放功能衝突
 		},
 		zoom: {
 			controls: true, // 添加放大縮小控制
