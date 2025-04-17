@@ -106,3 +106,37 @@ window.arduinoGenerator.forBlock['ultrasonic_read'] = function (block) {
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC]; // 發生錯誤時返回安全的默認值
 	}
 };
+
+// 新增獨立的超音波觸發積木
+window.arduinoGenerator.forBlock['ultrasonic_trigger'] = function (block) {
+	try {
+		// 檢查是否有定義超音波變數，如果沒有，給出錯誤提示
+		if (!window.arduinoGenerator.variables_['ultrasonic_vars']) {
+			window.arduinoGenerator.warnings_.push('嘗試觸發超音波，但未設定超音波感測器。請先在程式中添加超音波感測器設定積木。');
+			log.warn('嘗試觸發超音波，但未設定超音波感測器');
+			return '// 錯誤：未設定超音波感測器\n'; // 返回註解提示
+		}
+
+		// 確保函數定義只加入一次
+		if (!window.arduinoGenerator.functions_['triggerUltrasonic']) {
+			log.info('新增超音波觸發函數定義');
+			window.arduinoGenerator.functions_['triggerUltrasonic'] = `
+void triggerUltrasonic() {
+  // 發送超音波觸發信號
+  digitalWrite(ultrasonic_trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(ultrasonic_trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(ultrasonic_trigPin, LOW);
+}
+`;
+		}
+
+		// 返回函數調用的程式碼
+		log.debug('生成超音波觸發函數調用');
+		return 'triggerUltrasonic();  // 發送超音波訊號\n';
+	} catch (e) {
+		log.error('超音波觸發程式碼生成錯誤:', e);
+		return ''; // 發生錯誤時返回空字串
+	}
+};

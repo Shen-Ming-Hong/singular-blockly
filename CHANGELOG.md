@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.16.0] - 2025-04-17
+
+### 新增 Added
+
+- 新增超音波觸發積木  
+  Added independent ultrasonic trigger block
+
 ## [0.15.0] - 2025-04-17
 
 ### 新增 Added

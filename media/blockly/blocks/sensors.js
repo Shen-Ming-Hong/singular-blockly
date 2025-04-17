@@ -152,3 +152,41 @@ Blockly.Blocks['ultrasonic_read'] = {
 		this.setHelpUrl('');
 	},
 };
+
+// 新增超音波觸發積木
+Blockly.Blocks['ultrasonic_trigger'] = {
+	init: function () {
+		this.appendDummyInput().appendField(window.languageManager.getMessage('ULTRASONIC_TRIGGER', '發送超音波訊號'));
+
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setStyle('sensor_blocks');
+		this.setTooltip(
+			window.languageManager.getMessage('ULTRASONIC_TOOLTIP_TRIGGER', '發送超音波感測器的觸發訊號，在中斷模式下使用以手動觸發測量。')
+		);
+		this.setHelpUrl('');
+	},
+
+	onchange: function () {
+		// 檢查工作區中是否有超音波感測器積木
+		if (this.workspace && !this.workspace.isFlyout && !this.isInFlyout) {
+			// 尋找超音波感測器積木
+			const blocks = this.workspace.getAllBlocks(false);
+			let hasUltrasonicSensor = false;
+
+			for (let i = 0; i < blocks.length; i++) {
+				if (blocks[i].type === 'ultrasonic_sensor') {
+					hasUltrasonicSensor = true;
+					break;
+				}
+			}
+
+			// 如果沒有找到超音波感測器積木，顯示警告
+			if (!hasUltrasonicSensor) {
+				this.setWarningText(window.languageManager.getMessage('ULTRASONIC_WARNING_NO_SENSOR', '請先添加超音波感測器設定積木！'));
+			} else {
+				this.setWarningText(null);
+			}
+		}
+	},
+};

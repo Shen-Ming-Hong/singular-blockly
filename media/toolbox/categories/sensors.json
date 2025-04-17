@@ -10,6 +10,10 @@
 		{
 			"kind": "block",
 			"type": "ultrasonic_read"
+		},
+		{
+			"kind": "block",
+			"type": "ultrasonic_trigger"
 		}
 	]
 }
