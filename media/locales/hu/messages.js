@@ -52,6 +52,7 @@ window.languageManager.loadMessages('hu', {
 	CATEGORY_VARIABLES: 'Változók',
 	CATEGORY_FUNCTIONS: 'Függvények',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Érzékelők',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Beállítás',
@@ -60,14 +61,25 @@ window.languageManager.loadMessages('hu', {
 	ARDUINO_DIGITAL_READ: 'Digitális olvasás',
 	ARDUINO_ANALOG_WRITE: 'Analóg írás',
 	ARDUINO_ANALOG_READ: 'Analóg olvasás',
-	ARDUINO_PIN: 'Pin',
+	ARDUINO_PIN: 'Láb',
 	ARDUINO_VALUE: 'Érték',
 	ARDUINO_DELAY: 'Késleltetés',
-	ARDUINO_DELAY_MS: 'milliszekundum',
-	ARDUINO_PULLUP: 'Belső pullup engedélyezése',
+	ARDUINO_DELAY_MS: 'ezredmásodperc',
+	ARDUINO_PULLUP: 'Belső felhúzó ellenállás engedélyezése',
 	ARDUINO_MODE: 'Mód',
 	ARDUINO_MODE_INPUT: 'BEMENET',
 	ARDUINO_MODE_OUTPUT: 'KIMENET',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Ultrahangos érzékelő',
+	ULTRASONIC_TRIG_PIN: 'Trig láb',
+	ULTRASONIC_ECHO_PIN: 'Echo láb',
+	ULTRASONIC_USE_INTERRUPT: 'Hardveres megszakítás használata',
+	ULTRASONIC_READ: 'Ultrahangos távolság olvasása (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Ultrahangos érzékelő beállítása Trig és Echo lábakkal. Opcionális hardveres megszakítás a nagyobb pontosság érdekében.',
+	ULTRASONIC_TOOLTIP_READ: 'Az ultrahangos érzékelő által mért távolság olvasása centiméterben.',
+	ULTRASONIC_WARNING: 'A kiválasztott Echo láb {0} nem támogatja a hardveres megszakítást. Kérjük, válasszon egyet ezek közül: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'nál',

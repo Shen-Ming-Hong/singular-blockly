@@ -52,9 +52,10 @@ window.languageManager.loadMessages('pt-br', {
 	CATEGORY_VARIABLES: 'Variáveis',
 	CATEGORY_FUNCTIONS: 'Funções',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Sensores',
 
 	// Arduino Block Labels
-	ARDUINO_SETUP: 'Configurar',
+	ARDUINO_SETUP: 'Configuração',
 	ARDUINO_LOOP: 'Loop',
 	ARDUINO_DIGITAL_WRITE: 'Escrita Digital',
 	ARDUINO_DIGITAL_READ: 'Leitura Digital',
@@ -64,10 +65,21 @@ window.languageManager.loadMessages('pt-br', {
 	ARDUINO_VALUE: 'Valor',
 	ARDUINO_DELAY: 'Atraso',
 	ARDUINO_DELAY_MS: 'milissegundos',
-	ARDUINO_PULLUP: 'Ativar Pullup Interno',
+	ARDUINO_PULLUP: 'Ativar Resistor Interno',
 	ARDUINO_MODE: 'Modo',
 	ARDUINO_MODE_INPUT: 'ENTRADA',
 	ARDUINO_MODE_OUTPUT: 'SAÍDA',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Sensor Ultrassônico',
+	ULTRASONIC_TRIG_PIN: 'Pino Trig',
+	ULTRASONIC_ECHO_PIN: 'Pino Echo',
+	ULTRASONIC_USE_INTERRUPT: 'Usar Interrupção de Hardware',
+	ULTRASONIC_READ: 'Ler Distância Ultrassônica (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Configura o sensor ultrassônico com os pinos Trig e Echo. Interrupção de hardware opcional para maior precisão.',
+	ULTRASONIC_TOOLTIP_READ: 'Lê a distância medida pelo sensor ultrassônico em centímetros.',
+	ULTRASONIC_WARNING: 'O pino Echo {0} selecionado não suporta interrupções de hardware. Por favor, escolha um destes pinos: {1}',
 
 	// Duration block
 	DURATION_REPEAT: 'Repetir por',

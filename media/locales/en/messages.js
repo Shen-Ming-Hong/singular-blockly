@@ -52,6 +52,7 @@ window.languageManager.loadMessages('en', {
 	CATEGORY_VARIABLES: 'Variables',
 	CATEGORY_FUNCTIONS: 'Functions',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Sensors',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',
@@ -68,6 +69,16 @@ window.languageManager.loadMessages('en', {
 	ARDUINO_MODE: 'Mode',
 	ARDUINO_MODE_INPUT: 'INPUT',
 	ARDUINO_MODE_OUTPUT: 'OUTPUT',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Ultrasonic Sensor',
+	ULTRASONIC_TRIG_PIN: 'Trig Pin',
+	ULTRASONIC_ECHO_PIN: 'Echo Pin',
+	ULTRASONIC_USE_INTERRUPT: 'Use Hardware Interrupt',
+	ULTRASONIC_READ: 'Read Ultrasonic Distance (cm)',
+	ULTRASONIC_TOOLTIP_SETUP: 'Configure ultrasonic sensor with Trig and Echo pins. Optional hardware interrupt for better accuracy.',
+	ULTRASONIC_TOOLTIP_READ: 'Read distance measured by ultrasonic sensor in centimeters.',
+	ULTRASONIC_WARNING: 'Selected Echo pin {0} does not support hardware interrupt. Please choose one of these pins: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'at',

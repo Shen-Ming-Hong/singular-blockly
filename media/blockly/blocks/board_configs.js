@@ -32,6 +32,11 @@ window.BOARD_CONFIGS = {
 			['A4 (SDA)', 'A4'],
 			['A5 (SCL)', 'A5'],
 		],
+		// 新增硬體中斷腳位
+		interruptPins: [
+			['D2 (INT0)', '2'],
+			['D3 (INT1)', '3'],
+		],
 		analogOutputRange: {
 			min: 0,
 			max: 255, // 8位分辨率
@@ -92,6 +97,11 @@ framework = arduino`,
 			['A5 (SCL)', 'A5'],
 			['A6', 'A6'],
 			['A7', 'A7'],
+		],
+		// 新增硬體中斷腳位
+		interruptPins: [
+			['D2 (INT0)', '2'],
+			['D3 (INT1)', '3'],
 		],
 		analogOutputRange: {
 			min: 0,
@@ -203,6 +213,15 @@ framework = arduino`,
 			['A13', 'A13'],
 			['A14', 'A14'],
 			['A15', 'A15'],
+		],
+		// 新增硬體中斷腳位
+		interruptPins: [
+			['D2', '2'],
+			['D3', '3'],
+			['D18', '18'],
+			['D19', '19'],
+			['D20 (SDA)', '20'],
+			['D21 (SCL)', '21'],
 		],
 		analogOutputRange: {
 			min: 0,
@@ -317,6 +336,35 @@ framework = arduino`,
 			['GPIO36', '36'],
 			['GPIO39', '39'],
 		],
+		// ESP32 所有數位引腳都可作為中斷引腳
+		interruptPins: [
+			['GPIO0', '0'],
+			['GPIO1 (TX0)', '1'],
+			['GPIO2', '2'],
+			['GPIO3 (RX0)', '3'],
+			['GPIO4', '4'],
+			['GPIO5', '5'],
+			['GPIO12', '12'],
+			['GPIO13', '13'],
+			['GPIO14', '14'],
+			['GPIO15', '15'],
+			['GPIO16', '16'],
+			['GPIO17', '17'],
+			['GPIO18 (PWM)', '18'],
+			['GPIO19', '19'],
+			['GPIO21 (SDA)', '21'],
+			['GPIO22 (SCL)', '22'],
+			['GPIO23', '23'],
+			['GPIO25 (PWM)', '25'],
+			['GPIO26 (PWM)', '26'],
+			['GPIO27', '27'],
+			['GPIO32', '32'],
+			['GPIO33', '33'],
+			['GPIO34', '34'],
+			['GPIO35', '35'],
+			['GPIO36', '36'],
+			['GPIO39', '39'],
+		],
 		analogPins: [
 			['GPIO32 (ADC1_CH4)', '32'],
 			['GPIO33 (ADC1_CH5)', '33'],
@@ -399,6 +447,11 @@ framework = arduino`,
 			['A4 (SDA)', 'A4'],
 			['A5 (SCL)', 'A5'],
 		],
+		// 假設與 Arduino Nano 相同的中斷能力
+		interruptPins: [
+			['D2', '2'],
+			['D3', '3'],
+		],
 		analogOutputRange: {
 			min: 0,
 			max: 255, // 8位分辨率
@@ -465,6 +518,15 @@ window.getAnalogPinOptions = function () {
 	}
 	const board = window.BOARD_CONFIGS[window.currentBoard];
 	return board ? board.analogPins : [];
+};
+
+// 獲取中斷腳位選項的全局函數
+window.getInterruptPinOptions = function () {
+	if (window.currentBoard === 'none') {
+		return [[window.languageManager.getMessage('BOARD_NONE'), '-1']];
+	}
+	const board = window.BOARD_CONFIGS[window.currentBoard];
+	return board && board.interruptPins ? board.interruptPins : [];
 };
 
 // 獲取類比輸出範圍的全局函數

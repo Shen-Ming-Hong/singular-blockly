@@ -52,22 +52,34 @@ window.languageManager.loadMessages('tr', {
 	CATEGORY_VARIABLES: 'Değişkenler',
 	CATEGORY_FUNCTIONS: 'Fonksiyonlar',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Sensörler',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Kurulum',
 	ARDUINO_LOOP: 'Döngü',
-	ARDUINO_DIGITAL_WRITE: 'Dijital Yaz',
-	ARDUINO_DIGITAL_READ: 'Dijital Oku',
-	ARDUINO_ANALOG_WRITE: 'Analog Yaz',
-	ARDUINO_ANALOG_READ: 'Analog Oku',
+	ARDUINO_DIGITAL_WRITE: 'Dijital Yazma',
+	ARDUINO_DIGITAL_READ: 'Dijital Okuma',
+	ARDUINO_ANALOG_WRITE: 'Analog Yazma',
+	ARDUINO_ANALOG_READ: 'Analog Okuma',
 	ARDUINO_PIN: 'Pin',
 	ARDUINO_VALUE: 'Değer',
 	ARDUINO_DELAY: 'Gecikme',
 	ARDUINO_DELAY_MS: 'milisaniye',
-	ARDUINO_PULLUP: 'Dahili Pull-up Etkinleştir',
+	ARDUINO_PULLUP: 'Dahili Pull-up Direncini Etkinleştir',
 	ARDUINO_MODE: 'Mod',
 	ARDUINO_MODE_INPUT: 'GİRİŞ',
 	ARDUINO_MODE_OUTPUT: 'ÇIKIŞ',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Ultrasonik Sensör',
+	ULTRASONIC_TRIG_PIN: 'Trig Pini',
+	ULTRASONIC_ECHO_PIN: 'Echo Pini',
+	ULTRASONIC_USE_INTERRUPT: 'Donanım Kesmesi Kullan',
+	ULTRASONIC_READ: 'Ultrasonik Mesafeyi Oku (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Ultrasonik sensörü Trig ve Echo pinleriyle yapılandırır. Daha yüksek hassasiyet için isteğe bağlı donanım kesmesi.',
+	ULTRASONIC_TOOLTIP_READ: 'Ultrasonik sensörle ölçülen mesafeyi santimetre cinsinden okur.',
+	ULTRASONIC_WARNING: 'Seçilen Echo pini {0} donanım kesmesi desteklemiyor. Lütfen şu pinlerden birini seçin: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'üzerinde',

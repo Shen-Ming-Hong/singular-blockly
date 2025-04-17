@@ -52,6 +52,7 @@ window.languageManager.loadMessages('ru', {
 	CATEGORY_VARIABLES: 'Переменные',
 	CATEGORY_FUNCTIONS: 'Функции',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Датчики',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',
@@ -64,10 +65,21 @@ window.languageManager.loadMessages('ru', {
 	ARDUINO_VALUE: 'Значение',
 	ARDUINO_DELAY: 'Задержка',
 	ARDUINO_DELAY_MS: 'миллисекунд',
-	ARDUINO_PULLUP: 'Включить внутреннюю подтяжку',
+	ARDUINO_PULLUP: 'Включить внутренний подтягивающий резистор',
 	ARDUINO_MODE: 'Режим',
 	ARDUINO_MODE_INPUT: 'ВХОД',
 	ARDUINO_MODE_OUTPUT: 'ВЫХОД',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Ультразвуковой датчик',
+	ULTRASONIC_TRIG_PIN: 'Пин Trig',
+	ULTRASONIC_ECHO_PIN: 'Пин Echo',
+	ULTRASONIC_USE_INTERRUPT: 'Использовать аппаратное прерывание',
+	ULTRASONIC_READ: 'Считать ультразвуковое расстояние (см)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Настраивает ультразвуковой датчик с пинами Trig и Echo. Опциональное аппаратное прерывание для большей точности.',
+	ULTRASONIC_TOOLTIP_READ: 'Считывает расстояние, измеренное ультразвуковым датчиком, в сантиметрах.',
+	ULTRASONIC_WARNING: 'Выбранный пин Echo {0} не поддерживает аппаратные прерывания. Пожалуйста, выберите один из этих пинов: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'на',

@@ -1,0 +1,15 @@
+{
+	"kind": "category",
+	"name": "%{CATEGORY_SENSORS}",
+	"categorystyle": "sensor_category",
+	"contents": [
+		{
+			"kind": "block",
+			"type": "ultrasonic_sensor"
+		},
+		{
+			"kind": "block",
+			"type": "ultrasonic_read"
+		}
+	]
+}

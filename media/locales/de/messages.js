@@ -52,14 +52,15 @@ window.languageManager.loadMessages('de', {
 	CATEGORY_VARIABLES: 'Variablen',
 	CATEGORY_FUNCTIONS: 'Funktionen',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Sensoren',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',
 	ARDUINO_LOOP: 'Schleife',
-	ARDUINO_DIGITAL_WRITE: 'Digital Schreiben',
-	ARDUINO_DIGITAL_READ: 'Digital Lesen',
-	ARDUINO_ANALOG_WRITE: 'Analog Schreiben',
-	ARDUINO_ANALOG_READ: 'Analog Lesen',
+	ARDUINO_DIGITAL_WRITE: 'Digitales Schreiben',
+	ARDUINO_DIGITAL_READ: 'Digitales Lesen',
+	ARDUINO_ANALOG_WRITE: 'Analoges Schreiben',
+	ARDUINO_ANALOG_READ: 'Analoges Lesen',
 	ARDUINO_PIN: 'Pin',
 	ARDUINO_VALUE: 'Wert',
 	ARDUINO_DELAY: 'Verzögerung',
@@ -68,6 +69,17 @@ window.languageManager.loadMessages('de', {
 	ARDUINO_MODE: 'Modus',
 	ARDUINO_MODE_INPUT: 'EINGANG',
 	ARDUINO_MODE_OUTPUT: 'AUSGANG',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Ultraschallsensor',
+	ULTRASONIC_TRIG_PIN: 'Trig Pin',
+	ULTRASONIC_ECHO_PIN: 'Echo Pin',
+	ULTRASONIC_USE_INTERRUPT: 'Hardware-Interrupt verwenden',
+	ULTRASONIC_READ: 'Ultraschall-Entfernung lesen (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Konfiguriert den Ultraschallsensor mit Trig- und Echo-Pins. Optionaler Hardware-Interrupt für höhere Genauigkeit.',
+	ULTRASONIC_TOOLTIP_READ: 'Liest die vom Ultraschallsensor gemessene Entfernung in Zentimetern.',
+	ULTRASONIC_WARNING: 'Der ausgewählte Echo-Pin {0} unterstützt keine Hardware-Interrupts. Bitte wählen Sie einen dieser Pins: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'bei',

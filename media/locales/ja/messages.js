@@ -52,22 +52,35 @@ window.languageManager.loadMessages('ja', {
 	CATEGORY_VARIABLES: '変数',
 	CATEGORY_FUNCTIONS: '関数',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'センサー',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'セットアップ',
 	ARDUINO_LOOP: 'ループ',
-	ARDUINO_DIGITAL_WRITE: 'デジタル出力',
-	ARDUINO_DIGITAL_READ: 'デジタル入力',
-	ARDUINO_ANALOG_WRITE: 'アナログ出力',
-	ARDUINO_ANALOG_READ: 'アナログ入力',
+	ARDUINO_DIGITAL_WRITE: 'デジタル書き込み',
+	ARDUINO_DIGITAL_READ: 'デジタル読み取り',
+	ARDUINO_ANALOG_WRITE: 'アナログ書き込み',
+	ARDUINO_ANALOG_READ: 'アナログ読み取り',
 	ARDUINO_PIN: 'ピン',
 	ARDUINO_VALUE: '値',
 	ARDUINO_DELAY: '遅延',
 	ARDUINO_DELAY_MS: 'ミリ秒',
-	ARDUINO_PULLUP: '内部プルアップ有効',
+	ARDUINO_PULLUP: '内部プルアップを有効にする',
 	ARDUINO_MODE: 'モード',
 	ARDUINO_MODE_INPUT: '入力',
 	ARDUINO_MODE_OUTPUT: '出力',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: '超音波センサー',
+	ULTRASONIC_TRIG_PIN: 'トリガーピン',
+	ULTRASONIC_ECHO_PIN: 'エコーピン',
+	ULTRASONIC_USE_INTERRUPT: 'ハードウェア割り込みを使用',
+	ULTRASONIC_READ: '超音波距離を読み取る (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'トリガーとエコーピンで超音波センサーを設定します。オプションでハードウェア割り込みを使用して精度を向上できます。',
+	ULTRASONIC_TOOLTIP_READ: '超音波センサーで測定した距離をセンチメートル単位で読み取ります。',
+	ULTRASONIC_WARNING:
+		'選択されたエコーピン {0} はハードウェア割り込みをサポートしていません。これらのピンのいずれかを選択してください: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'で',

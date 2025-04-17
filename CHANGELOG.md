@@ -18,6 +18,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.15.0] - 2025-04-17
+
+### 新增 Added
+
+- 新增超音波感測器積木
+  Added ultrasonic sensor blocks
+  - 支援設定 Trig 和 Echo 腳位
+    Support setting Trig and Echo pins
+  - 支援使用硬體中斷提高精確度
+    Support using hardware interrupts for better accuracy
+  - 支援不同開發板的硬體中斷腳位
+    Support hardware interrupt pins for different boards
+
+### 已更新 Updated
+
+- 更新所有語言檔案，支援新增的感測器功能
+  Updated all language files to support new sensor features
+- 開發板配置增強：為所有支援的開發板新增硬體中斷腳位設定
+  Enhanced board configurations: Added hardware interrupt pin configurations for all supported boards
+- 更新積木顏色管理，使用主題樣式而非直接設置顏色
+  Updated block color management to use theme styles instead of direct color setting
+- 更新主題檔案，添加感測器區塊樣式
+  Updated theme files to add sensor block styles
+
 ## [0.14.1] - 2025-04-16
 
 ### 已更新 Updated

@@ -52,22 +52,34 @@ window.languageManager.loadMessages('bg', {
 	CATEGORY_VARIABLES: 'Променливи',
 	CATEGORY_FUNCTIONS: 'Функции',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Сензори',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',
 	ARDUINO_LOOP: 'Цикъл',
-	ARDUINO_DIGITAL_WRITE: 'Цифрово записване',
+	ARDUINO_DIGITAL_WRITE: 'Цифров запис',
 	ARDUINO_DIGITAL_READ: 'Цифрово четене',
-	ARDUINO_ANALOG_WRITE: 'Аналогово записване',
+	ARDUINO_ANALOG_WRITE: 'Аналогов запис',
 	ARDUINO_ANALOG_READ: 'Аналогово четене',
 	ARDUINO_PIN: 'Пин',
 	ARDUINO_VALUE: 'Стойност',
 	ARDUINO_DELAY: 'Забавяне',
 	ARDUINO_DELAY_MS: 'милисекунди',
-	ARDUINO_PULLUP: 'Включи вътрешен издърпващ резистор',
+	ARDUINO_PULLUP: 'Активиране на вътрешен издърпващ резистор',
 	ARDUINO_MODE: 'Режим',
 	ARDUINO_MODE_INPUT: 'ВХОД',
 	ARDUINO_MODE_OUTPUT: 'ИЗХОД',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Ултразвуков сензор',
+	ULTRASONIC_TRIG_PIN: 'Trig пин',
+	ULTRASONIC_ECHO_PIN: 'Echo пин',
+	ULTRASONIC_USE_INTERRUPT: 'Използване на хардуерно прекъсване',
+	ULTRASONIC_READ: 'Прочитане на ултразвуково разстояние (см)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Конфигурира ултразвуковия сензор с Trig и Echo пинове. Опционално хардуерно прекъсване за по-голяма точност.',
+	ULTRASONIC_TOOLTIP_READ: 'Прочита разстоянието, измерено от ултразвуковия сензор в сантиметри.',
+	ULTRASONIC_WARNING: 'Избраният Echo пин {0} не поддържа хардуерни прекъсвания. Моля, изберете един от тези пинове: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'на',

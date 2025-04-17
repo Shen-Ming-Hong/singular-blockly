@@ -52,22 +52,34 @@ window.languageManager.loadMessages('it', {
 	CATEGORY_VARIABLES: 'Variabili',
 	CATEGORY_FUNCTIONS: 'Funzioni',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Sensori',
 
 	// Arduino Block Labels
-	ARDUINO_SETUP: 'Setup',
+	ARDUINO_SETUP: 'Configurazione',
 	ARDUINO_LOOP: 'Loop',
-	ARDUINO_DIGITAL_WRITE: 'Scrivi Digitale',
-	ARDUINO_DIGITAL_READ: 'Leggi Digitale',
-	ARDUINO_ANALOG_WRITE: 'Scrivi Analogico',
-	ARDUINO_ANALOG_READ: 'Leggi Analogico',
+	ARDUINO_DIGITAL_WRITE: 'Scrittura Digitale',
+	ARDUINO_DIGITAL_READ: 'Lettura Digitale',
+	ARDUINO_ANALOG_WRITE: 'Scrittura Analogica',
+	ARDUINO_ANALOG_READ: 'Lettura Analogica',
 	ARDUINO_PIN: 'Pin',
 	ARDUINO_VALUE: 'Valore',
 	ARDUINO_DELAY: 'Ritardo',
 	ARDUINO_DELAY_MS: 'millisecondi',
-	ARDUINO_PULLUP: 'Attiva Pullup Interno',
+	ARDUINO_PULLUP: 'Attiva Resistenza di Pull-up Interna',
 	ARDUINO_MODE: 'Modalità',
 	ARDUINO_MODE_INPUT: 'INPUT',
 	ARDUINO_MODE_OUTPUT: 'OUTPUT',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Sensore a Ultrasuoni',
+	ULTRASONIC_TRIG_PIN: 'Pin Trig',
+	ULTRASONIC_ECHO_PIN: 'Pin Echo',
+	ULTRASONIC_USE_INTERRUPT: 'Usa Interrupt Hardware',
+	ULTRASONIC_READ: 'Leggi Distanza Ultrasuoni (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Configura il sensore a ultrasuoni con i pin Trig ed Echo. Interrupt hardware opzionale per una maggiore precisione.',
+	ULTRASONIC_TOOLTIP_READ: 'Legge la distanza misurata dal sensore a ultrasuoni in centimetri.',
+	ULTRASONIC_WARNING: 'Il pin Echo {0} selezionato non supporta gli interrupt hardware. Si prega di scegliere uno di questi pin: {1}',
 
 	// Duration block
 	DURATION_REPEAT: 'Ripeti per',

@@ -52,6 +52,7 @@ window.languageManager.loadMessages('fr', {
 	CATEGORY_VARIABLES: 'Variables',
 	CATEGORY_FUNCTIONS: 'Fonctions',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Capteurs',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Configuration',
@@ -68,6 +69,18 @@ window.languageManager.loadMessages('fr', {
 	ARDUINO_MODE: 'Mode',
 	ARDUINO_MODE_INPUT: 'ENTRÉE',
 	ARDUINO_MODE_OUTPUT: 'SORTIE',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Capteur ultrason',
+	ULTRASONIC_TRIG_PIN: 'Broche Trig',
+	ULTRASONIC_ECHO_PIN: 'Broche Echo',
+	ULTRASONIC_USE_INTERRUPT: 'Utiliser interruption matérielle',
+	ULTRASONIC_READ: 'Lire distance ultrason (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Configure le capteur ultrason avec les broches Trig et Echo. Interruption matérielle optionnelle pour une meilleure précision.',
+	ULTRASONIC_TOOLTIP_READ: 'Lire la distance mesurée par le capteur ultrason en centimètres.',
+	ULTRASONIC_WARNING:
+		"La broche Echo {0} sélectionnée ne prend pas en charge les interruptions matérielles. Veuillez choisir l'une de ces broches: {1}",
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'à',

@@ -51,11 +51,12 @@ window.languageManager.loadMessages('ko', {
 	CATEGORY_LISTS: '리스트',
 	CATEGORY_VARIABLES: '변수',
 	CATEGORY_FUNCTIONS: '함수',
-	CATEGORY_ARDUINO: '아두이노',
+	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: '센서',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: '설정',
-	ARDUINO_LOOP: '루프',
+	ARDUINO_LOOP: '반복',
 	ARDUINO_DIGITAL_WRITE: '디지털 쓰기',
 	ARDUINO_DIGITAL_READ: '디지털 읽기',
 	ARDUINO_ANALOG_WRITE: '아날로그 쓰기',
@@ -68,6 +69,17 @@ window.languageManager.loadMessages('ko', {
 	ARDUINO_MODE: '모드',
 	ARDUINO_MODE_INPUT: '입력',
 	ARDUINO_MODE_OUTPUT: '출력',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: '초음파 센서',
+	ULTRASONIC_TRIG_PIN: '트리거 핀',
+	ULTRASONIC_ECHO_PIN: '에코 핀',
+	ULTRASONIC_USE_INTERRUPT: '하드웨어 인터럽트 사용',
+	ULTRASONIC_READ: '초음파 거리 읽기 (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'초음파 센서를 트리거 및 에코 핀으로 구성합니다. 선택적으로 하드웨어 인터럽트를 사용하여 정확도를 높일 수 있습니다.',
+	ULTRASONIC_TOOLTIP_READ: '초음파 센서로 측정한 거리를 센티미터 단위로 읽습니다.',
+	ULTRASONIC_WARNING: '선택한 에코 핀 {0}은(는) 하드웨어 인터럽트를 지원하지 않습니다. 다음 핀 중 하나를 선택하세요: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: '에서',

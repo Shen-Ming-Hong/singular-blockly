@@ -441,7 +441,7 @@ Blockly.Blocks['arduino_setup_loop'] = {
 	init: function () {
 		this.appendStatementInput('SETUP').setCheck(null).appendField(window.languageManager.getMessage('ARDUINO_SETUP'));
 		this.appendStatementInput('LOOP').setCheck(null).appendField(window.languageManager.getMessage('ARDUINO_LOOP'));
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip('Arduino 程式的基本結構');
 		this.setHelpUrl('');
 	},
@@ -469,7 +469,7 @@ Blockly.Blocks['arduino_digital_write'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip('寫入數位輸出值到指定的腳位，可以是布林值、數字或變數');
 		this.setHelpUrl('');
 	},
@@ -520,7 +520,7 @@ Blockly.Blocks['arduino_digital_read'] = {
 				'PIN'
 			);
 		this.setOutput(true, 'Boolean');
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip('從指定的腳位讀取數位輸入值');
 		this.setHelpUrl('');
 	},
@@ -571,7 +571,7 @@ Blockly.Blocks['arduino_analog_write'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip(`寫入類比值(${range.min}-${range.max})到指定的腳位`);
 		this.setHelpUrl('');
 	},
@@ -637,7 +637,7 @@ Blockly.Blocks['arduino_analog_read'] = {
 				'PIN'
 			);
 		this.setOutput(true, 'Number');
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip('從指定的腳位讀取類比值');
 		this.setHelpUrl('');
 	},
@@ -671,7 +671,7 @@ Blockly.Blocks['arduino_delay'] = {
 			.appendField(window.languageManager.getMessage('ARDUINO_DELAY_MS'));
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('loop_blocks');
 		this.setTooltip('暫停程式執行指定的毫秒數');
 		this.setHelpUrl('');
 	},
@@ -687,7 +687,7 @@ Blockly.Blocks['arduino_level'] = {
 			'LEVEL'
 		);
 		this.setOutput(true, ['Boolean', 'Number']);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip('Arduino 的 HIGH (1) 或 LOW (0) 常數');
 		this.setHelpUrl('https://www.arduino.cc/reference/en/language/variables/constants/constants/');
 	},
@@ -710,7 +710,7 @@ Blockly.Blocks['arduino_pullup'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip(window.languageManager.getMessage('ARDUINO_PULLUP'));
 		this.setHelpUrl('');
 	},
@@ -754,7 +754,7 @@ Blockly.Blocks['controls_duration'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#A1887F');
+		this.setStyle('loop_blocks');
 		this.setTooltip('在指定的時間內重複執行程式');
 		this.setHelpUrl('');
 	},
@@ -769,7 +769,7 @@ Blockly.Blocks['text_print'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#FB8C00');
+		this.setStyle('text_blocks');
 		this.setTooltip('在序列埠監控視窗顯示文字');
 		this.setHelpUrl('');
 	},
@@ -800,7 +800,7 @@ Blockly.Blocks['arduino_pin_mode'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip('設定指定腳位的運作模式（輸入/輸出）');
 		this.setHelpUrl('');
 	},
@@ -835,7 +835,7 @@ Blockly.Blocks['math_map'] = {
 		this.appendDummyInput().appendField(')');
 		this.setInputsInline(true);
 		this.setOutput(true, 'Number');
-		this.setColour('#66BB6A');
+		this.setStyle('math_blocks');
 		this.setTooltip(window.languageManager.getMessage('MATH_MAP_TOOLTIP'));
 		this.setHelpUrl('https://www.arduino.cc/reference/en/language/functions/math/map/');
 	},
@@ -862,7 +862,7 @@ Blockly.Blocks['seven_segment_display'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip(window.languageManager.getMessage('SEVEN_SEGMENT_TOOLTIP'));
 		this.setHelpUrl('https://www.arduino.cc/reference/en/');
 	},
@@ -905,7 +905,7 @@ Blockly.Blocks['seven_segment_pins'] = {
 		this.setInputsInline(false);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip(window.languageManager.getMessage('SEVEN_SEGMENT_PINS_TOOLTIP'));
 		this.setHelpUrl('https://www.arduino.cc/reference/en/');
 	},
@@ -950,7 +950,7 @@ Blockly.Blocks['threshold_function_setup'] = {
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip(window.languageManager.getMessage('THRESHOLD_TOOLTIP_SETUP'));
 	},
 };
@@ -1004,7 +1004,7 @@ Blockly.Blocks['threshold_function_read'] = {
 			'FUNC'
 		);
 		this.setOutput(true, null);
-		this.setColour('#00979C');
+		this.setStyle('arduino_blocks');
 		this.setTooltip(window.languageManager.getMessage('THRESHOLD_TOOLTIP_READ'));
 	},
 

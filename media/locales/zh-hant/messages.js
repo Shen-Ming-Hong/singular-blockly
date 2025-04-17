@@ -52,6 +52,7 @@ window.languageManager.loadMessages('zh-hant', {
 	CATEGORY_VARIABLES: '變數',
 	CATEGORY_FUNCTIONS: '函式',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: '感測器',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: '設定',
@@ -68,6 +69,16 @@ window.languageManager.loadMessages('zh-hant', {
 	ARDUINO_MODE: '模式',
 	ARDUINO_MODE_INPUT: '輸入',
 	ARDUINO_MODE_OUTPUT: '輸出',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: '超音波感測器',
+	ULTRASONIC_TRIG_PIN: 'Trig 腳位',
+	ULTRASONIC_ECHO_PIN: 'Echo 腳位',
+	ULTRASONIC_USE_INTERRUPT: '使用硬體中斷',
+	ULTRASONIC_READ: '讀取超音波距離 (公分)',
+	ULTRASONIC_TOOLTIP_SETUP: '設定超音波感測器的 Trig 和 Echo 腳位，可選擇使用硬體中斷提高精確度。',
+	ULTRASONIC_TOOLTIP_READ: '讀取超音波感測器測量的距離，單位為公分。',
+	ULTRASONIC_WARNING: '選擇的 Echo 腳位 {0} 不支援硬體中斷。請選擇以下腳位之一: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: '於',

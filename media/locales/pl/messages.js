@@ -52,6 +52,7 @@ window.languageManager.loadMessages('pl', {
 	CATEGORY_VARIABLES: 'Zmienne',
 	CATEGORY_FUNCTIONS: 'Funkcje',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Czujniki',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Konfiguracja',
@@ -63,11 +64,22 @@ window.languageManager.loadMessages('pl', {
 	ARDUINO_PIN: 'Pin',
 	ARDUINO_VALUE: 'Wartość',
 	ARDUINO_DELAY: 'Opóźnienie',
-	ARDUINO_DELAY_MS: 'milisekundy',
-	ARDUINO_PULLUP: 'Włącz wewnętrzny pullup',
+	ARDUINO_DELAY_MS: 'milisekund',
+	ARDUINO_PULLUP: 'Włącz wewnętrzny pull-up',
 	ARDUINO_MODE: 'Tryb',
 	ARDUINO_MODE_INPUT: 'WEJŚCIE',
 	ARDUINO_MODE_OUTPUT: 'WYJŚCIE',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Czujnik ultradźwiękowy',
+	ULTRASONIC_TRIG_PIN: 'Pin Trig',
+	ULTRASONIC_ECHO_PIN: 'Pin Echo',
+	ULTRASONIC_USE_INTERRUPT: 'Użyj przerwania sprzętowego',
+	ULTRASONIC_READ: 'Odczyt odległości ultradźwiękowej (cm)',
+	ULTRASONIC_TOOLTIP_SETUP:
+		'Konfiguruje czujnik ultradźwiękowy z pinami Trig i Echo. Opcjonalne przerwanie sprzętowe dla większej dokładności.',
+	ULTRASONIC_TOOLTIP_READ: 'Odczytuje odległość zmierzoną przez czujnik ultradźwiękowy w centymetrach.',
+	ULTRASONIC_WARNING: 'Wybrany pin Echo {0} nie obsługuje przerwań sprzętowych. Wybierz jeden z tych pinów: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'na',

@@ -159,9 +159,21 @@ export class WebViewManager {
 			const arduinoBlocksUri = webview.asWebviewUri(arduinoBlocksPath);
 			const functionBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/functions.js'));
 			const functionBlocksUri = webview.asWebviewUri(functionBlocksPath);
+			const sensorsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/sensors.js'));
+			const sensorsBlocksUri = webview.asWebviewUri(sensorsBlocksPath);
 
 			// Arduino 生成器模組
-			const arduinoModules = ['io.js', 'logic.js', 'loops.js', 'math.js', 'text.js', 'lists.js', 'functions.js', 'variables.js']
+			const arduinoModules = [
+				'io.js',
+				'logic.js',
+				'loops.js',
+				'math.js',
+				'text.js',
+				'lists.js',
+				'functions.js',
+				'variables.js',
+				'sensors.js',
+			]
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
 					const moduleUri = webview.asWebviewUri(modulePath);
@@ -224,8 +236,9 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{boardConfigsUri}', boardConfigsUri.toString());
-			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{functionBlocksUri}', functionBlocksUri.toString());
+			htmlContent = htmlContent.replace('{sensorsBlocksUri}', sensorsBlocksUri.toString());
+			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 
 			// 注入主題偏好
@@ -582,9 +595,21 @@ export class WebViewManager {
 			const arduinoBlocksUri = tempWebview.asWebviewUri(arduinoBlocksPath);
 			const functionBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/functions.js'));
 			const functionBlocksUri = tempWebview.asWebviewUri(functionBlocksPath);
+			const sensorsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/sensors.js'));
+			const sensorsBlocksUri = tempWebview.asWebviewUri(sensorsBlocksPath);
 
 			// Arduino 生成器模組
-			const arduinoModules = ['io.js', 'logic.js', 'loops.js', 'math.js', 'text.js', 'lists.js', 'functions.js', 'variables.js']
+			const arduinoModules = [
+				'io.js',
+				'logic.js',
+				'loops.js',
+				'math.js',
+				'text.js',
+				'lists.js',
+				'functions.js',
+				'variables.js',
+				'sensors.js',
+			]
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
 					const moduleUri = tempWebview.asWebviewUri(modulePath);
@@ -642,6 +667,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{boardConfigsUri}', boardConfigsUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{functionBlocksUri}', functionBlocksUri.toString());
+			htmlContent = htmlContent.replace('{sensorsBlocksUri}', sensorsBlocksUri.toString());
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);

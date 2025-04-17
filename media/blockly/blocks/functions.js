@@ -308,7 +308,7 @@ Blockly.Blocks['arduino_function'] = {
 			.appendField(':', 'PARAM_LABEL');
 
 		this.appendStatementInput('STACK').setCheck(null);
-		this.setColour('#7986CB'); // 使用主題中定義的顏色
+		this.setStyle('procedure_blocks'); // 使用主題中定義的顏色
 		this.setTooltip('');
 		this.setHelpUrl('');
 
@@ -472,7 +472,7 @@ Blockly.Blocks['arduino_function_mutator'] = {
 		this.appendDummyInput().appendField(window.languageManager.getMessage('FUNCTION_PARAMS'));
 		this.appendStatementInput('STACK');
 		// 移除回傳值輸入點
-		this.setColour('#7986CB'); // 修改這裡，使用主題中定義的顏色
+		this.setStyle('procedure_blocks'); // 修改這裡，使用主題中定義的顏色
 		this.setTooltip('');
 		this.setHelpUrl('');
 	},
@@ -495,7 +495,7 @@ Blockly.Blocks['arduino_function_parameter'] = {
 			.appendField(new Blockly.FieldTextInput('x'), 'NAME');
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
-		this.setColour('#7986CB'); // 修改這裡，使用主題中定義的顏色
+		this.setStyle('procedure_blocks'); // 修改這裡，使用主題中定義的顏色
 		this.setTooltip('');
 		this.setHelpUrl('');
 	},
@@ -549,7 +549,7 @@ Blockly.Blocks['arduino_function_call'] = {
 			.appendField(new Blockly.FieldLabel('myFunction'), 'NAME'); // 使用 FieldLabel 而非 FieldTextInput，讓它不可編輯
 
 		this.setInputsInline(true);
-		this.setColour('#7986CB');
+		this.setStyle('procedure_blocks');
 		this.setTooltip('呼叫一個自定義函數');
 		this.setHelpUrl('');
 

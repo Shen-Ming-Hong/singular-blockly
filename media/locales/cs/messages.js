@@ -52,6 +52,7 @@ window.languageManager.loadMessages('cs', {
 	CATEGORY_VARIABLES: 'Proměnné',
 	CATEGORY_FUNCTIONS: 'Funkce',
 	CATEGORY_ARDUINO: 'Arduino',
+	CATEGORY_SENSORS: 'Senzory',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Nastavení',
@@ -64,10 +65,20 @@ window.languageManager.loadMessages('cs', {
 	ARDUINO_VALUE: 'Hodnota',
 	ARDUINO_DELAY: 'Zpoždění',
 	ARDUINO_DELAY_MS: 'milisekund',
-	ARDUINO_PULLUP: 'Povolit interní pullup',
+	ARDUINO_PULLUP: 'Povolit interní pull-up',
 	ARDUINO_MODE: 'Režim',
 	ARDUINO_MODE_INPUT: 'VSTUP',
 	ARDUINO_MODE_OUTPUT: 'VÝSTUP',
+
+	// Sensor Block Labels
+	ULTRASONIC_SENSOR: 'Ultrazvukový senzor',
+	ULTRASONIC_TRIG_PIN: 'Trig pin',
+	ULTRASONIC_ECHO_PIN: 'Echo pin',
+	ULTRASONIC_USE_INTERRUPT: 'Použít hardwarové přerušení',
+	ULTRASONIC_READ: 'Čtení ultrazvukové vzdálenosti (cm)',
+	ULTRASONIC_TOOLTIP_SETUP: 'Konfiguruje ultrazvukový senzor s Trig a Echo piny. Volitelné hardwarové přerušení pro vyšší přesnost.',
+	ULTRASONIC_TOOLTIP_READ: 'Čte vzdálenost měřenou ultrazvukovým senzorem v centimetrech.',
+	ULTRASONIC_WARNING: 'Vybraný Echo pin {0} nepodporuje hardwarové přerušení. Vyberte prosím jeden z těchto pinů: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'na',
