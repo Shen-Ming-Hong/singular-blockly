@@ -130,6 +130,12 @@ window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	let setupCode = window.arduinoGenerator.statementToCode(block, 'SETUP');
 	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP');
 
+	// 【新增】通用掃描所有 threshold_function_setup 與 ultrasonic_sensor 設定積木，保證加入 setupCode_
+	const ws = Blockly.getMainWorkspace();
+	ws.getAllBlocks(false)
+		.filter(b => b.type === 'threshold_function_setup' || b.type === 'ultrasonic_sensor')
+		.forEach(b => window.arduinoGenerator.forBlock[b.type](b));
+
 	// 處理 setupCode_ 陣列中的額外初始化代碼
 	let extraSetupCode = '';
 	if (window.arduinoGenerator.setupCode_ && window.arduinoGenerator.setupCode_.length > 0) {

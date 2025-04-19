@@ -106,9 +106,6 @@ if (!window.log) {
 	};
 }
 
-// 建立一個全局物件來追蹤腳位模式的歷史記錄
-window.arduinoGenerator.pinModes_ = {};
-
 // 標準化腳位名稱的輔助函數 (將 'A0', 'A1', 'D0', 'D1' 等轉換為內部一致的格式)
 window.arduinoGenerator.normalizePin = function (pin) {
 	// 先將 pin 轉為字串以確保一致性

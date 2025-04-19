@@ -18,6 +18,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.16.1] - 2025-04-19
+
+### 新增 Added
+
+- 新增自動掃描機制，確保 threshold_function_setup 與 ultrasonic_sensor 設定積木正確初始化
+  Added automatic scanning mechanism to ensure threshold_function_setup and ultrasonic_sensor setup blocks are properly initialized
+
+### 已修復 Fixed
+
+- 移除未使用的腳位模式追蹤全局物件，優化記憶體使用
+  Removed unused pin mode tracking global object to optimize memory usage
+
 ## [0.16.0] - 2025-04-17
 
 ### 新增 Added
@@ -204,7 +216,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     Split large files into modular service classes
   - 實作日誌服務、檔案服務、多語言服務和設定管理服務
     Implemented logging service, file service, locale service, and settings manager
-  - 採用更好的物件導向設計，提高程式碼組織結構
+  -採用更好的物件導向設計，提高程式碼組織結構
     Adopted better object-oriented design for improved code organization
 
 ## [0.7.0] - 2025-04-11
