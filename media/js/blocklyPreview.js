@@ -123,6 +123,16 @@ function updateUITexts() {
 			const title = titleTemplate.replace('{0}', fileName);
 			document.title = title; // 更新瀏覽器頁籤標題
 		}
+		// 更新頁面內的預覽標題
+		{
+			const inPageTemplate = window.languageManager.getMessage('PREVIEW_WINDOW_TITLE', 'Blockly 預覽 - {0}');
+			const inPageText = inPageTemplate.replace('{0}', window.previewFileName || '');
+			const previewTitleEl = document.querySelector('.preview-title');
+			if (previewTitleEl) {
+				const badgeText = previewBadge ? previewBadge.textContent : '';
+				previewTitleEl.innerHTML = `${inPageText} <span class="preview-badge" id="previewBadge">${badgeText}</span>`;
+			}
+		}
 	}
 }
 

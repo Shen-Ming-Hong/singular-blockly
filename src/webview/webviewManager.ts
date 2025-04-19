@@ -362,7 +362,7 @@ export class WebViewManager {
 				this.fileService = new FileService(workspaceRoot);
 			} // 建立新的預覽視窗
 			// 使用多語言文字作為標題
-			const previewTitle = await this.localeService.getLocalizedMessage('PREVIEW_WINDOW_TITLE_WITH_NAME', fileName);
+			const previewTitle = await this.localeService.getLocalizedMessage('PREVIEW_WINDOW_TITLE', fileName);
 			const previewPanel = vscode.window.createWebviewPanel(
 				'blocklyPreview',
 				previewTitle,
@@ -549,6 +549,10 @@ export class WebViewManager {
 			const htmlPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/html/blocklyPreview.html'));
 			let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
 
+			// 使用多語言模板更新 HTML <title> 標籤
+			const localizedWindowTitle = await this.localeService.getLocalizedMessage('PREVIEW_WINDOW_TITLE', fileName);
+			htmlContent = htmlContent.replace(/<title[^>]*>[\s\S]*?<\/title>/, `<title id="pageTitle">${localizedWindowTitle}</title>`);
+
 			// 取得當前語言和主題設定
 			const localeService = new LocaleService(this.context.extensionPath);
 			const blocklyLanguage = localeService.getCurrentLanguage();
@@ -648,6 +652,12 @@ export class WebViewManager {
 
 			// 設定檔案名稱
 			htmlContent = htmlContent.replace(/\{fileName\}/g, fileName);
+			// 更新預覽頁面標題欄為多語言模板
+			const localizedInPageTitle = await this.localeService.getLocalizedMessage('PREVIEW_WINDOW_TITLE', fileName);
+			htmlContent = htmlContent.replace(
+				/<div class="preview-title">[\s\S]*?<\/div>/,
+				`<div class="preview-title">${localizedInPageTitle} <span class="preview-badge" id="previewBadge"></span></div>`
+			);
 
 			// 替換主題相關 URI
 			htmlContent = htmlContent.replace('{themesUri}/singular.js', singularJsUri.toString());

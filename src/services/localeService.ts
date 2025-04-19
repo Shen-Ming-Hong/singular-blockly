@@ -112,7 +112,7 @@ export class LocaleService {
 
 		// 處理所有其他訊息
 		// 使用正則表達式尋找 loadMessages 函數中的所有鍵值對
-		const messageBlockRegex = /loadMessages\s*\(['"]\w+['"]\s*,\s*\{([\s\S]*?)\}\s*\)/g;
+		const messageBlockRegex = /loadMessages\s*\(\s*['"][^'"]+['"]\s*,\s*\{([\s\S]*?)\}\s*\)/g;
 		let blockMatch;
 		while ((blockMatch = messageBlockRegex.exec(content)) !== null) {
 			const messageBlock = blockMatch[1];

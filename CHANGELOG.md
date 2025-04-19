@@ -18,6 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.17.0] - 2025-04-19
+
+### 新增 Added
+
+- 在預覽頁面中新增頁內標題更新功能，顯示更加一致的多語言標題
+  Added in-page title update functionality in preview page for consistent multilingual title display
+
+### 已更新 Updated
+
+- 更新預覽頁面，新增對感測器區塊的支援
+  Updated preview page to add support for sensor blocks
+
+### 已改進 Improved
+
+- 改進多語言訊息解析的正則表達式，支援更多格式的訊息定義
+  Improved regex for multilingual message parsing to support more message definition formats
+- 增強預覽視窗的多語言支援，統一視窗標題和頁內標題顯示
+  Enhanced multilingual support for preview windows, unifying window title and in-page title display
+
 ## [0.16.1] - 2025-04-19
 
 ### 新增 Added
