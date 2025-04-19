@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.17.1] - 2025-04-19
+
+### 新增 Added
+
+- 新增複製貼上函數積木時的自動名稱處理功能，避免重複名稱
+  Added automatic name handling when copy-pasting function blocks to avoid duplicate names
+- 新增檢查防止建立同名函數，顯示警告並還原為原有名稱
+  Added check to prevent creating functions with duplicate names, showing warning and reverting to original name
+
+### 已修復 Fixed
+
+- 優化函數複製貼上後的名稱處理邏輯，避免重複函數名稱引起的問題
+  Optimized name handling logic after function block duplication to avoid issues caused by duplicate function names
+
 ## [0.17.0] - 2025-04-19
 
 ### 新增 Added

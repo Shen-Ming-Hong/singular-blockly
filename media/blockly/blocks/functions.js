@@ -395,17 +395,113 @@ Blockly.Blocks['arduino_function'] = {
 			return;
 		}
 
-		if (e.type === Blockly.Events.BLOCK_CHANGE || e.type === Blockly.Events.BLOCK_MOVE) {
-			// 移除回傳值相關的處理邏輯
+		// 處理複製貼上事件 - 檢測剛建立的積木是否是複製貼上的結果
+		if (e.type === Blockly.Events.CREATE && e.ids && e.ids.includes(this.id)) {
+			// 判斷是否是從複製貼上產生的積木 (不是直接從工具箱拖出來的)
+			if (!this.workspace.isFlyout && !this.isInFlyout) {
+				// 獲取當前函式名稱
+				const currentName = this.getFieldValue('NAME');
 
+				// 檢查是否有其他同名函式
+				const otherSameNameFunctions = this.workspace
+					.getBlocksByType('arduino_function', false)
+					.filter(block => block.id !== this.id && block.getFieldValue('NAME') === currentName);
+
+				// 如果有其他同名函式，則修改本積木名稱
+				if (otherSameNameFunctions.length > 0) {
+					// 找出一個不重複的名稱
+					let newName = currentName;
+					let counter = 1;
+
+					while (
+						this.workspace
+							.getBlocksByType('arduino_function', false)
+							.some(block => block.id !== this.id && block.getFieldValue('NAME') === newName)
+					) {
+						newName = `${currentName}${counter}`;
+						counter++;
+					}
+
+					// 重要修改：暫時停用名稱變更事件監聽，以避免觸發呼叫積木名稱的更新
+					this._skipNameChangeUpdate = true;
+
+					// 設定新名稱
+					this.setFieldValue(newName, 'NAME');
+					this.oldName_ = newName; // 更新追蹤的舊名稱
+
+					// 使用自訂的方式通知其他元件進行更新，但不觸發呼叫積木的名稱更新
+					if (this.workspace) {
+						// 建立一個修改事件，但不發送到普通的更新處理管道
+						new Blockly.Events.BlockChange(this, 'field', 'NAME', currentName, newName);
+					}
+
+					// 延遲一段時間後恢復名稱變更事件監聽
+					setTimeout(() => {
+						this._skipNameChangeUpdate = false;
+					}, 200);
+				}
+			}
+		}
+
+		if (e.type === Blockly.Events.BLOCK_CHANGE || e.type === Blockly.Events.BLOCK_MOVE) {
 			// 專門處理函數名稱變更的情況
 			if (e.type === Blockly.Events.BLOCK_CHANGE && e.element === 'field' && e.name === 'NAME') {
 				// 記錄詳細的名稱變更資訊，用於調試
 				console.log(`函數名稱變更事件觸發: ${this.oldName_} -> ${e.newValue}`);
 
+				// 如果是複製貼上引起的名稱變更，跳過更新呼叫積木
+				if (this._skipNameChangeUpdate) {
+					console.log('跳過更新呼叫積木 (由複製貼上引起的名稱變更)');
+					return;
+				} // 新功能：檢查是否有同名函式積木，如果有則阻止修改
+				let newName = e.newValue;
+				if (newName) {
+					// 檢查工作區中是否已存在同名函式積木
+					const sameNameFunctions = this.workspace
+						.getBlocksByType('arduino_function', false)
+						.filter(block => block.id !== this.id && block.getFieldValue('NAME') === newName);
+
+					if (sameNameFunctions.length > 0) {
+						// 有同名函式積木，阻止此次修改
+						console.log(`阻止更改為重複的函式名稱: ${newName}`);
+
+						// 恢復原名稱
+						const oldName = e.oldValue || this.oldName_;
+
+						// 暫時停用事件監聽，避免遞迴觸發
+						this._preventNameChangeUpdate = true;
+
+						// 使用 setTimeout 確保在當前事件處理完成後才設回原名稱
+						setTimeout(() => {
+							// 恢復原名稱
+							this.setFieldValue(oldName, 'NAME');
+
+							// 給用戶顯示警告
+							this.setWarningText(`函式名稱 "${newName}" 已存在，請使用不同的名稱`);
+
+							// 延遲清除警告
+							setTimeout(() => {
+								if (this.getFieldValue('NAME') !== newName) {
+									this.setWarningText(null);
+								}
+							}, 5000);
+
+							// 重新啟用事件監聽
+							this._preventNameChangeUpdate = false;
+						}, 10);
+
+						return;
+					}
+				}
+
+				// 如果是阻止重複名稱的機制觸發的名稱更改，則直接返回
+				if (this._preventNameChangeUpdate) {
+					return;
+				}
+
 				// 檢測函數名稱變化
 				const oldName = e.oldValue || this.oldName_;
-				const newName = e.newValue;
+				newName = e.newValue;
 
 				if (oldName && newName && oldName !== newName) {
 					// 更新使用舊名稱的呼叫積木
@@ -860,10 +956,11 @@ Blockly.Blocks['arduino_function_call'] = {
 		this.setWarningText(functionExists ? null : '函數 ' + funcName + ' 不存在。');
 		return functionExists;
 	},
-
 	// 設置函數名稱（由於使用FieldLabel，需要自行實現setValue方法）
 	setFunctionName: function (name) {
-		if (!name) return;
+		if (!name) {
+			return;
+		}
 
 		const nameField = this.getField('NAME');
 		if (nameField) {
