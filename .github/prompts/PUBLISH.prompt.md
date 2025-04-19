@@ -91,14 +91,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   [ ] 評估是否需要更新 README.md 以反映新版本功能或重要變更
         Evaluate if README.md needs to be updated to reflect new features or important changes
 
-## 停止，讓使用者完成存檔，等待使用者授權才進行後續動作
+# !!!停止，讓使用者完成存檔，等待使用者授權才進行後續動作!!!
 
 ## 開始執行指令 Git 提交與發布 Git Commit and Release
 
 ### 提交變更 Commit Changes
 
-7. 搜尋並確實閱讀完 #file:../../.vscode/.copilot-commit-message-instructions.md 當中的規則，並依照指示撰寫符合規範的 commit 訊息：
-   Read the rules in #file:../../.vscode/.copilot-commit-message-instructions.md and follow the instructions to write a compliant commit message:
+7. 搜尋並確實閱讀完 `.vscode` 資料夾當中的 `.copilot-commit-message-instructions.md` 檔案當中的規則，並依照指示撰寫符合規範的 commit 訊息：
+   Read the rules in `.vscode` folder's `.copilot-commit-message-instructions.md` file and write a commit message that meets the specifications according to the instructions:
 
     ```bash
     git add .
