@@ -6,8 +6,15 @@
  */
 
 window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
-	const funcName = block.getFieldValue('NAME');
+	const displayName = block.getFieldValue('NAME'); // 顯示用的名稱（可以是中文）
+	const funcName = window.arduinoGenerator.convertFunctionName(displayName); // 轉換後的合法函式名稱
 	const statements = window.arduinoGenerator.statementToCode(block, 'STACK');
+
+	// 儲存顯示名稱和實際函式名稱的對應關係
+	if (!window.arduinoGenerator.functionNameMap) {
+		window.arduinoGenerator.functionNameMap = new Map();
+	}
+	window.arduinoGenerator.functionNameMap.set(displayName, funcName);
 
 	// 處理函式參數
 	const args = [];
@@ -15,10 +22,11 @@ window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 		args.push(block.argumentTypes_[i] + ' ' + block.arguments_[i]);
 	}
 
-	// 函式回傳型態固定為 void，不再支援其他回傳類型
+	// 函式回傳型態固定為 void
 	const returnType = 'void';
-	// 生成函式定義
-	let code = `${returnType} ${funcName}(${args.join(', ')}) {\n`;
+	// 生成函式定義，並在註解中保留原始名稱
+	let code = `// 原始函式名稱: ${displayName}\n`;
+	code += `${returnType} ${funcName}(${args.join(', ')}) {\n`;
 
 	// 添加函式內容
 	if (statements) {
@@ -32,21 +40,25 @@ window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 	window.arduinoGenerator.functions_[funcName] = code;
 	return null;
 };
-// 函數呼叫積木的代碼生成器
+
 window.arduinoGenerator.forBlock['arduino_function_call'] = function (block) {
-	// 使用直接變數存放代碼，函數呼叫統一為語句型態
 	let code = '';
 
 	try {
-		// 獲取函數名稱
-		const funcName = block.getFieldValue('NAME');
-		if (!funcName) {
-			console.warn('函數呼叫積木缺少函數名稱');
+		// 獲取顯示用的函式名稱
+		const displayName = block.getFieldValue('NAME');
+		if (!displayName) {
+			log.warn('函數呼叫積木缺少函數名稱');
 			code = '/* 未定義函數 */';
 			return code + ';\n';
 		}
 
-		// 處理函數參數
+		// 獲取實際的函式名稱
+		const funcName = window.arduinoGenerator.functionNameMap
+			? window.arduinoGenerator.functionNameMap.get(displayName)
+			: window.arduinoGenerator.convertFunctionName(displayName);
+
+		// 處理參數
 		const args = [];
 
 		// 根據參數類型提供預設值的輔助函數
@@ -89,7 +101,7 @@ window.arduinoGenerator.forBlock['arduino_function_call'] = function (block) {
 									// 安全地獲取參數代碼
 									argCode = window.arduinoGenerator.valueToCode(block, 'ARG' + i, orderValue);
 								} catch (orderError) {
-									console.warn(`獲取參數代碼失敗，使用備用方法:`, orderError);
+									log.warn(`獲取參數代碼失敗，使用備用方法:`, orderError);
 
 									// 嘗試直接獲取積木的代碼
 									const blockToCode = window.arduinoGenerator.blockToCode(inputBlock);
@@ -108,7 +120,7 @@ window.arduinoGenerator.forBlock['arduino_function_call'] = function (block) {
 						// 添加參數代碼或預設值
 						args.push(argCode || getDefaultValueForType(argType));
 					} catch (paramError) {
-						console.error(`處理參數 ${i} 時出錯:`, paramError);
+						log.error(`處理參數 ${i} 時出錯:`, paramError);
 
 						// 出錯時使用預設值
 						const argType =
@@ -123,7 +135,7 @@ window.arduinoGenerator.forBlock['arduino_function_call'] = function (block) {
 		// 生成函數呼叫代碼
 		code = `${funcName}(${args.join(', ')})`;
 	} catch (e) {
-		console.error('函數呼叫生成錯誤:', e);
+		log.error('函數呼叫生成錯誤:', e);
 		code = '/* 函數呼叫錯誤 */';
 	}
 

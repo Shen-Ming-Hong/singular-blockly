@@ -18,6 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.18.0] - 2025-04-20
+
+### 新增 Added
+
+- 新增函數名稱轉換功能，支援將中文函數名稱轉換為合法的 C++ 函數名稱
+  Added function name conversion functionality to support converting Chinese function names to valid C++ function names
+
+### 已修復 Fixed
+
+- 修復了函數名稱變更時的邏輯和連接恢復機制
+  Fixed function name change logic and connection recovery mechanism
+
+### 已更新 Updated
+
+- 更新使用統一的日誌系統，取代直接使用 console 方法
+  Updated to use unified logging system instead of direct console methods
+- 改進了函數定義處理的正則表達式，使其更健壯
+  Improved the regular expression for function definition processing to make it more robust
+
 ## [0.17.1] - 2025-04-19
 
 ### 新增 Added

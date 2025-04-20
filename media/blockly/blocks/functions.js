@@ -5,71 +5,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// 確保全局日誌函數可用
-if (!window.log) {
-	window.log = {
-		error: function (message, ...args) {
-			console.error(message, ...args); // 保留在開發者工具中顯示
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'functions-blocks',
-					level: 'error',
-					message: message,
-					args: args,
-				});
-			}
-		},
-
-		info: function (message, ...args) {
-			console.log(message, ...args); // 保留在開發者工具中顯示
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'functions-blocks',
-					level: 'info',
-					message: message,
-					args: args,
-				});
-			}
-		},
-
-		warn: function (message, ...args) {
-			console.warn(message, ...args); // 保留在開發者工具中顯示
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'functions-blocks',
-					level: 'warn',
-					message: message,
-					args: args,
-				});
-			}
-		},
-
-		debug: function (message, ...args) {
-			console.debug(message, ...args); // 保留在開發者工具中顯示
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'functions-blocks',
-					level: 'debug',
-					message: message,
-					args: args,
-				});
-			}
-		},
-	};
-}
-
 // 函式積木的 Mutator 定義
 const functionMutator = {
 	mutationToDom: function () {
@@ -447,11 +382,11 @@ Blockly.Blocks['arduino_function'] = {
 			// 專門處理函數名稱變更的情況
 			if (e.type === Blockly.Events.BLOCK_CHANGE && e.element === 'field' && e.name === 'NAME') {
 				// 記錄詳細的名稱變更資訊，用於調試
-				console.log(`函數名稱變更事件觸發: ${this.oldName_} -> ${e.newValue}`);
+				log.info(`函數名稱變更事件觸發: ${this.oldName_} -> ${e.newValue}`);
 
 				// 如果是複製貼上引起的名稱變更，跳過更新呼叫積木
 				if (this._skipNameChangeUpdate) {
-					console.log('跳過更新呼叫積木 (由複製貼上引起的名稱變更)');
+					log.info('跳過更新呼叫積木 (由複製貼上引起的名稱變更)');
 					return;
 				} // 新功能：檢查是否有同名函式積木，如果有則阻止修改
 				let newName = e.newValue;
@@ -463,13 +398,16 @@ Blockly.Blocks['arduino_function'] = {
 
 					if (sameNameFunctions.length > 0) {
 						// 有同名函式積木，阻止此次修改
-						console.log(`阻止更改為重複的函式名稱: ${newName}`);
+						log.info(`阻止更改為重複的函式名稱: ${newName}`);
 
 						// 恢復原名稱
 						const oldName = e.oldValue || this.oldName_;
 
 						// 暫時停用事件監聽，避免遞迴觸發
 						this._preventNameChangeUpdate = true;
+
+						// 重要：記錄此次操作中原始的舊名稱，避免後續錯誤更新
+						this._originalOldName = oldName;
 
 						// 使用 setTimeout 確保在當前事件處理完成後才設回原名稱
 						setTimeout(() => {
@@ -486,10 +424,13 @@ Blockly.Blocks['arduino_function'] = {
 								}
 							}, 5000);
 
-							// 重新啟用事件監聽
-							this._preventNameChangeUpdate = false;
+							// 延遲重新啟用事件監聽
+							setTimeout(() => {
+								this._preventNameChangeUpdate = false;
+							}, 500); // 加長延遲，確保不會過早接收到新事件
 						}, 10);
 
+						// 重要：直接返回，防止後續處理更新呼叫積木
 						return;
 					}
 				}
@@ -502,6 +443,15 @@ Blockly.Blocks['arduino_function'] = {
 				// 檢測函數名稱變化
 				const oldName = e.oldValue || this.oldName_;
 				newName = e.newValue;
+
+				// 重要：檢查是否是因為重複名稱檢查而恢復的原名稱
+				// 如果是從阻止的嘗試恢復原名稱，則不應該觸發呼叫積木的更新
+				if (this._originalOldName === newName) {
+					log.info(`跳過更新呼叫積木 (恢復原名稱: ${newName})`);
+					this._originalOldName = undefined; // 清除標記
+					this.oldName_ = newName; // 更新舊名稱
+					return;
+				}
 
 				if (oldName && newName && oldName !== newName) {
 					// 更新使用舊名稱的呼叫積木
@@ -516,12 +466,12 @@ Blockly.Blocks['arduino_function'] = {
 						return blockName === oldName;
 					});
 
-					console.log(`找到 ${callBlocks.length} 個使用舊名稱 "${oldName}" 的呼叫積木`);
+					log.info(`找到 ${callBlocks.length} 個使用舊名稱 "${oldName}" 的呼叫積木`);
 
 					// 為每個呼叫積木更新函數名稱
 					callBlocks.forEach((callBlock, index) => {
 						try {
-							console.log(`更新呼叫積木 #${index + 1} 名稱: ${oldName} -> ${newName}`);
+							log.info(`更新呼叫積木 #${index + 1} 名稱: ${oldName} -> ${newName}`);
 
 							// 先確認欄位存在
 							const nameField = callBlock.getField('NAME');
@@ -539,7 +489,7 @@ Blockly.Blocks['arduino_function'] = {
 								callBlock.updateFromFunctionBlock_();
 							}
 						} catch (err) {
-							console.error(`更新呼叫積木名稱失敗:`, err);
+							log.error(`更新呼叫積木名稱失敗:`, err);
 						}
 					});
 
@@ -549,7 +499,7 @@ Blockly.Blocks['arduino_function'] = {
 							try {
 								currentWorkspace.toolbox_.refreshSelection();
 							} catch (err) {
-								console.error('工具箱刷新失敗:', err);
+								log.error('工具箱刷新失敗:', err);
 							}
 						}, 200);
 					}
@@ -711,7 +661,7 @@ Blockly.Blocks['arduino_function_call'] = {
 		this.setNextStatement(true);
 
 		if (this.workspace && !this.workspace.isFlyout) {
-			console.log(`函數呼叫積木 "${name}" 設置為語句積木`);
+			log.info(`函數呼叫積木 "${name}" 設置為語句積木`);
 		}
 
 		// 保存所有連接的完整詳細信息
@@ -756,7 +706,7 @@ Blockly.Blocks['arduino_function_call'] = {
 		// 函數呼叫積木統一為語句型積木（無回傳值），不需要輸出連接
 
 		// 為調試記錄詳細的連接資訊
-		console.log(`函數呼叫積木還原前的連接資訊:`, {
+		log.info(`函數呼叫積木還原前的連接資訊:`, {
 			hasParent: !!connectionInfo.parent,
 			hasChild: !!connectionInfo.child,
 			hasOutput: !!connectionInfo.output,
@@ -826,7 +776,7 @@ Blockly.Blocks['arduino_function_call'] = {
 		const totalFailed = mainResult.failed + paramResult.failed;
 
 		if (totalRestored > 0 || totalFailed > 0) {
-			console.log(
+			log.info(
 				`連接還原嘗試 #${this._connectionRestoreStatus.attempt}: ` +
 					`成功=${totalRestored}, 失敗=${totalFailed}, ` +
 					`(主連接: 成功=${mainResult.success}, 失敗=${mainResult.failed}, ` +
@@ -842,7 +792,7 @@ Blockly.Blocks['arduino_function_call'] = {
 		) {
 			setTimeout(() => this._restoreConnections(), 100);
 		} else if (this._connectionRestoreStatus.succeeded > 0) {
-			console.log(`連接恢復完成 (成功: ${this._connectionRestoreStatus.succeeded})`);
+			log.info(`連接恢復完成 (成功: ${this._connectionRestoreStatus.succeeded})`);
 		}
 	},
 
@@ -858,10 +808,10 @@ Blockly.Blocks['arduino_function_call'] = {
 		if (this.previousConnection && connectionInfo.parent && connectionInfo.parent.connection) {
 			try {
 				this.previousConnection.connect(connectionInfo.parent.connection);
-				console.log(`成功還原上方連接`);
+				log.info(`成功還原上方連接`);
 				success++;
 			} catch (err) {
-				console.warn(`還原上方連接失敗:`, err);
+				log.warn(`還原上方連接失敗:`, err);
 				failed++;
 			}
 		}
@@ -870,10 +820,10 @@ Blockly.Blocks['arduino_function_call'] = {
 		if (this.nextConnection && connectionInfo.child && connectionInfo.child.connection) {
 			try {
 				this.nextConnection.connect(connectionInfo.child.connection);
-				console.log(`成功還原下方連接`);
+				log.info(`成功還原下方連接`);
 				success++;
 			} catch (err) {
-				console.warn(`還原下方連接失敗:`, err);
+				log.warn(`還原下方連接失敗:`, err);
 				failed++;
 			}
 		}
@@ -900,17 +850,17 @@ Blockly.Blocks['arduino_function_call'] = {
 					// 先嘗試連接到原始連接點
 					if (paramInfo.connection && paramInfo.connection.getSourceBlock()) {
 						input.connection.connect(paramInfo.connection);
-						console.log(`成功還原參數 ${paramIndex} 連接`);
+						log.info(`成功還原參數 ${paramIndex} 連接`);
 						success++;
 					}
 					// 如果失敗，嘗試連接到目標積木的輸出連接
 					else if (paramInfo.block && paramInfo.block.outputConnection) {
 						input.connection.connect(paramInfo.block.outputConnection);
-						console.log(`成功還原參數 ${paramIndex} 連接到積木輸出`);
+						log.info(`成功還原參數 ${paramIndex} 連接到積木輸出`);
 						success++;
 					}
 				} catch (err) {
-					console.warn(`還原參數 ${paramIndex} 連接失敗:`, err);
+					log.warn(`還原參數 ${paramIndex} 連接失敗:`, err);
 					failed++;
 				}
 			}
@@ -1015,13 +965,13 @@ Blockly.Blocks['arduino_function_call'] = {
 		// 查找相應的函數定義積木
 		const functionBlock = this._findFunctionBlock(funcName);
 		if (!functionBlock) {
-			console.log(`找不到名為 ${funcName} 的函數定義積木`);
+			log.info(`找不到名為 ${funcName} 的函數定義積木`);
 			// 更新警告但不修改參數結構
 			this.checkFunctionExists();
 			return;
 		}
 
-		// 從函數定義積木中取得參數資訊
+		// 從函數定義積木取得參數資訊
 		const [hasChanged, newArgs, newTypes] = this._collectFunctionParameters(functionBlock);
 
 		// 只有在有變更或強制更新時才執行更新
@@ -1171,7 +1121,7 @@ Blockly.Blocks['arduino_function_call'] = {
 						input.connection.connect(paramInfo.connection);
 					}
 				} catch (err) {
-					console.warn(`還原參數 ${paramIndex} 連接失敗:`, err);
+					log.warn(`還原參數 ${paramIndex} 連接失敗:`, err);
 				}
 			}
 		});

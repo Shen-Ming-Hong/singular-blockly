@@ -10,6 +10,47 @@ const Blockly = window.Blockly;
 
 window.arduinoGenerator = new Blockly.Generator('Arduino');
 
+// 函式名稱轉換器: 將中文函式名稱或包含非法字符的函式名稱轉換為合法的 C++ 函式名稱
+window.arduinoGenerator.convertFunctionName = function (name) {
+	// 檢查是否包含中文字符
+	const containsChinese = /[\u4e00-\u9fa5]/.test(name);
+	// 檢查是否以數字開頭
+	const startsWithNumber = /^\d/.test(name);
+	// 檢查是否包含短橫線
+	const containsDash = name.includes('-');
+
+	// 如果不包含中文、不以數字開頭，且不包含短橫線，直接返回原始名稱
+	if (!containsChinese && !startsWithNumber && !containsDash) {
+		return name;
+	}
+
+	// 替換短橫線為底線
+	let processedName = name.replace(/-/g, '_');
+
+	// 如果以數字開頭但不包含中文，只需加前綴
+	if (startsWithNumber && !containsChinese) {
+		return 'fn' + processedName;
+	}
+
+	// 如果包含中文，進行轉換
+	if (containsChinese) {
+		return (
+			'fn' +
+			Array.from(processedName)
+				.map(char => {
+					if (/[a-zA-Z0-9_]/.test(char)) {
+						return char;
+					}
+					return char.charCodeAt(0).toString(16);
+				})
+				.join('_')
+		);
+	}
+
+	// 若只有短橫線，已經替換為底線的名稱可直接返回
+	return processedName;
+};
+
 window.arduinoGenerator.init = function (workspace) {
 	window.arduinoGenerator.includes_ = Object.create(null); // 新增 includes 用於儲存 include 標頭檔
 	window.arduinoGenerator.variables_ = Object.create(null); // 新增 variables 用於儲存全域變數
@@ -53,8 +94,7 @@ window.arduinoGenerator.finish = function (code) {
 	let definitions = '';
 	for (let name in window.arduinoGenerator.definitions_) {
 		definitions += window.arduinoGenerator.definitions_[name];
-	}
-	// 處理函數: 1. 前向宣告, 2. 按照原始順序定義函數
+	} // 處理函數: 1. 前向宣告, 2. 按照原始順序定義函數
 	const functionNames = Object.keys(window.arduinoGenerator.functions_);
 	let forwardDeclarations = '';
 	let functionDefinitions = '';
@@ -64,13 +104,31 @@ window.arduinoGenerator.finish = function (code) {
 		functionNames.forEach(name => {
 			// 從函數定義提取參數和返回類型
 			const funcDef = window.arduinoGenerator.functions_[name];
-			// 改進正則表達式以處理開頭可能有換行符的函式定義
-			const signatureMatch = funcDef.match(/^\s*(?:\n|\r\n)?(\w+)\s+(\w+)\s*\((.*?)\)/);
+
+			// 使用更健壯的正則表達式匹配函式定義
+			// 匹配模式: 首先跳過註解，然後提取返回類型、函式名稱和參數列表
+			const commentPattern = /(?:\/\/.*(?:\r?\n|\r)|\/\*[\s\S]*?\*\/\s*)*/.source;
+			const returnTypePattern = /(\w+)/.source;
+			const funcNamePattern = /\s+([\w\d_]+)/.source;
+			const paramsPattern = /\s*\(([\s\S]*?)\)/.source;
+
+			const fullPattern = new RegExp(`^\\s*${commentPattern}${returnTypePattern}${funcNamePattern}${paramsPattern}`);
+
+			const signatureMatch = funcDef.match(fullPattern);
+
 			if (signatureMatch) {
 				const returnType = signatureMatch[1]; // void, int 等
 				const funcName = signatureMatch[2]; // 函數名稱
-				const params = signatureMatch[3]; // 參數列表
+				const params = signatureMatch[3].trim(); // 參數列表（去除首尾空白）
+
+				// 創建前向宣告
 				forwardDeclarations += `${returnType} ${funcName}(${params});\n`;
+			} else {
+				// 特殊情況處理：對於無法匹配的函式，嘗試更寬鬆的匹配或直接使用函式名
+				log.warn(`無法解析函式簽名：${name}`);
+				// 至少確保函式名稱正確
+				// 默認假設為 void 函式，無參數
+				forwardDeclarations += `void ${name}();\n`;
 			}
 		});
 
