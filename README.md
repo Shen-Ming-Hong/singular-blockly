@@ -40,16 +40,25 @@ A Visual Studio Code extension that provides a visual programming interface usin
 
 - 🧩 **Rich Block Categories**
   - Arduino I/O Operations
+  - Servo Motor Control
+    - Configurable servo setup and angle control
+    - Smart dropdown menu with automatic servo name detection
+  - Sensor Blocks
+    - Ultrasonic Sensor with hardware interrupt support
+    - Seven-segment Display with common cathode/anode modes
+    - Threshold function blocks for analog input monitoring
   - Functions with parameter support
     - Custom threshold functions with analog input support
     - Configurable sensor pins and threshold values
     - Multiple output types (numeric, boolean, string)
+    - Support for converting Chinese function names to valid C++ code
   - Variables with rename/delete capabilities
   - Lists and Arrays
   - Logic Operations
   - Loops
   - Math Operations
   - Text Operations
+  - Value Mapping (Arduino map function)
 
 - 💾 **Workspace Management**
   - Automatic state saving
@@ -58,7 +67,10 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Code generation to Arduino (.cpp) files
   - Automatic PlatformIO configuration generation
   - Automatic platformio.ini preview mode management
-  - Backup management with creation, preview, and restoration
+  - Comprehensive backup system
+    - Backup creation with timestamps
+    - Backup preview without restoration
+    - Safe restoration with automatic temporary backups
   - Seven-segment display support with common cathode/anode modes
 
 - 🛠 **Development Features**
@@ -66,10 +78,15 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Integrated board configuration
   - Visual block programming interface
   - Drag-and-drop block management
+  - Automatic block code generation system for critical blocks
+  - Standardized logging service for code generation
   - Zoom controls and trashcan
   - Light and dark theme support with theme toggle
   - PlatformIO integration for hardware upload
   - Pin mode tracking and conflict detection
+    - Automatically tracks pin modes (INPUT, OUTPUT, INPUT_PULLUP)
+    - Detects pin mode conflicts and displays warnings
+    - Automatically adds necessary pinMode configurations
   - Value mapping (Arduino map function)
 
 ## Requirements

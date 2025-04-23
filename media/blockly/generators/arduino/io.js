@@ -5,106 +5,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// 確保全局日誌函數可用
-if (!window.log) {
-	window.log = {
-		/**
-		 * 輸出偵錯等級的日誌
-		 * @param {string} message - 主要訊息
-		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
-		 */
-		debug: function (message, ...args) {
-			console.debug(message, ...args); // 保留在開發者工具中顯示
-
-			// 格式化額外參數
-			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'arduino-generator',
-					level: 'debug',
-					message: message,
-					args: formattedArgs,
-					timestamp: new Date().toISOString(),
-				});
+// 模組載入時自動註冊需要強制掃描的積木類型
+(function () {
+	// 確保 arduinoGenerator 已初始化
+	if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
+		// 註冊 threshold_function_setup 積木
+		window.arduinoGenerator.registerAlwaysGenerateBlock('threshold_function_setup');
+	} else {
+		// 如果 arduinoGenerator 尚未初始化，則設置一個載入完成後執行的回調
+		window.addEventListener('load', function () {
+			if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
+				window.arduinoGenerator.registerAlwaysGenerateBlock('threshold_function_setup');
 			}
-		},
-
-		/**
-		 * 輸出一般資訊等級的日誌
-		 * @param {string} message - 主要訊息
-		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
-		 */
-		info: function (message, ...args) {
-			console.log(message, ...args); // 保留在開發者工具中顯示
-
-			// 格式化額外參數
-			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'arduino-generator',
-					level: 'info',
-					message: message,
-					args: formattedArgs,
-					timestamp: new Date().toISOString(),
-				});
-			}
-		},
-
-		/**
-		 * 輸出警告等級的日誌
-		 * @param {string} message - 主要訊息
-		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
-		 */
-		warn: function (message, ...args) {
-			console.warn(message, ...args); // 保留在開發者工具中顯示
-
-			// 格式化額外參數
-			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'arduino-generator',
-					level: 'warn',
-					message: message,
-					args: formattedArgs,
-					timestamp: new Date().toISOString(),
-				});
-			}
-		},
-
-		/**
-		 * 輸出錯誤等級的日誌
-		 * @param {string} message - 主要訊息
-		 * @param {...any} args - 額外參數，會被轉換為字串或JSON
-		 */
-		error: function (message, ...args) {
-			console.error(message, ...args); // 保留在開發者工具中顯示
-
-			// 格式化額外參數
-			const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
-
-			// 如果 vscode 已定義，則發送日誌到 VS Code
-			if (window.vscode) {
-				window.vscode.postMessage({
-					command: 'log',
-					source: 'arduino-generator',
-					level: 'error',
-					message: message,
-					args: formattedArgs,
-					timestamp: new Date().toISOString(),
-				});
-			}
-		},
-	};
-}
+		});
+	}
+})();
 
 // 標準化腳位名稱的輔助函數 (將 'A0', 'A1', 'D0', 'D1' 等轉換為內部一致的格式)
 window.arduinoGenerator.normalizePin = function (pin) {
@@ -174,7 +89,7 @@ window.arduinoGenerator.forBlock['arduino_digital_write'] = function (block) {
 
 		return `digitalWrite(${pin}, ${value});\n`;
 	} catch (e) {
-		console.log('Digital write block code generation error:', e);
+		log.error('Digital write block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串，允許其他積木繼續生成
 	}
 };
@@ -187,7 +102,7 @@ window.arduinoGenerator.forBlock['arduino_digital_read'] = function (block) {
 
 		return [`digitalRead(${pin})`, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (e) {
-		console.log('Digital read block code generation error:', e);
+		log.error('Digital read block code generation error:', e);
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC]; // 發生錯誤時返回安全的默認值
 	}
 };
@@ -225,7 +140,7 @@ window.arduinoGenerator.forBlock['arduino_analog_write'] = function (block) {
 
 		return `analogWrite(${pin}, ${value});\n`;
 	} catch (e) {
-		console.log('Analog write block code generation error:', e);
+		log.error('Analog write block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串，允許其他積木繼續生成
 	}
 };
@@ -238,7 +153,7 @@ window.arduinoGenerator.forBlock['arduino_analog_read'] = function (block) {
 
 		return [`analogRead(${pin})`, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (e) {
-		console.log('Analog read block code generation error:', e);
+		log.error('Analog read block code generation error:', e);
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC]; // 發生錯誤時返回安全的默認值
 	}
 };
@@ -248,7 +163,7 @@ window.arduinoGenerator.forBlock['arduino_delay'] = function (block) {
 		const time = block.getFieldValue('TIME');
 		return `delay(${time});\n`;
 	} catch (e) {
-		console.log('Delay block code generation error:', e);
+		log.error('Delay block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串，允許其他積木繼續生成
 	}
 };
@@ -267,7 +182,7 @@ window.arduinoGenerator.forBlock['arduino_pullup'] = function (block) {
 		window.arduinoGenerator.pinModes_[pin] = 'INPUT_PULLUP';
 		return '';
 	} catch (e) {
-		console.log('Pullup block code generation error:', e);
+		log.error('Pullup block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串
 	}
 };
@@ -282,7 +197,7 @@ window.arduinoGenerator.forBlock['arduino_pin_mode'] = function (block) {
 		window.arduinoGenerator.pinModes_[pin] = mode;
 		return '';
 	} catch (e) {
-		console.log('Pin mode block code generation error:', e);
+		log.error('Pin mode block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串
 	}
 };
@@ -310,7 +225,7 @@ byte sevenSegmentPins[] = {${pinValues.join(', ')}};
 
 		return '// 七段顯示器引腳已設定\n';
 	} catch (e) {
-		console.log('Seven segment pins block code generation error:', e);
+		log.error('Seven segment pins block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串
 	}
 };
@@ -378,7 +293,7 @@ byte sevenSegmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9}; // 預設引腳連接
 		const isCommonAnode = type === 'COMMON_ANODE' ? 'true' : 'false';
 		return `displaySevenSegment(sevenSegmentPins, constrain(${number}, 0, 9), ${isCommonAnode}, ${decimalPoint});\n`;
 	} catch (e) {
-		console.log('Seven segment display block code generation error:', e);
+		log.error('Seven segment display block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串
 	}
 };

@@ -10,6 +10,19 @@ const Blockly = window.Blockly;
 
 window.arduinoGenerator = new Blockly.Generator('Arduino');
 
+// 註冊積木類型到 alwaysGenerateBlocks_ 列表的輔助函數
+window.arduinoGenerator.registerAlwaysGenerateBlock = function (blockType) {
+	// 確保 alwaysGenerateBlocks_ 陣列已初始化
+	window.arduinoGenerator.alwaysGenerateBlocks_ = window.arduinoGenerator.alwaysGenerateBlocks_ || [];
+	// 確保不重複添加
+	if (!window.arduinoGenerator.alwaysGenerateBlocks_.includes(blockType)) {
+		window.arduinoGenerator.alwaysGenerateBlocks_.push(blockType);
+		if (typeof log !== 'undefined') {
+			log.debug(`已註冊積木類型 "${blockType}" 到 alwaysGenerateBlocks_ 列表`);
+		}
+	}
+};
+
 // 函式名稱轉換器: 將中文函式名稱或包含非法字符的函式名稱轉換為合法的 C++ 函式名稱
 window.arduinoGenerator.convertFunctionName = function (name) {
 	// 檢查是否包含中文字符
@@ -60,6 +73,8 @@ window.arduinoGenerator.init = function (workspace) {
 	window.arduinoGenerator.warnings_ = []; // 新增 warnings_ 用於儲存警告訊息，如腳位模式不正確
 	window.arduinoGenerator.pinModes_ = {}; // 每次生成代碼時重置腳位模式追蹤
 	window.arduinoGenerator.lib_deps_ = []; // 新增 lib_deps_ 用於儲存 platformio.ini 庫依賴
+	// 初始化為空陣列，各模組將在載入時自動註冊它們的積木類型
+	window.arduinoGenerator.alwaysGenerateBlocks_ = window.arduinoGenerator.alwaysGenerateBlocks_ || []; // 新增 alwaysGenerateBlocks_ 用於儲存「只要召喚出來就一定會有code不論積木放在哪一個位置」情況的所有積木類型
 
 	// 初始化 nameDB_
 	if (!window.arduinoGenerator.nameDB_) {
@@ -181,15 +196,13 @@ window.arduinoGenerator.scrub_ = function (block, code, opt_thisOnly) {
 window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	// 自動包含 Arduino.h
 	window.arduinoGenerator.includes_['arduino'] = '#include <Arduino.h>';
-
 	// 取得一般的 setup 和 loop 區塊程式碼
 	let setupCode = window.arduinoGenerator.statementToCode(block, 'SETUP');
-	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP');
-
-	// 【新增】通用掃描所有 threshold_function_setup 與 ultrasonic_sensor 設定積木，保證加入 setupCode_
+	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP'); // 【新增】通用掃描所有必須生成代碼的積木，不論位置
+	// 使用 alwaysGenerateBlocks_ 陣列來動態確定哪些積木類型需要自動掃描
 	const ws = Blockly.getMainWorkspace();
 	ws.getAllBlocks(false)
-		.filter(b => b.type === 'threshold_function_setup' || b.type === 'ultrasonic_sensor')
+		.filter(b => window.arduinoGenerator.alwaysGenerateBlocks_.includes(b.type))
 		.forEach(b => window.arduinoGenerator.forBlock[b.type](b));
 
 	// 處理 setupCode_ 陣列中的額外初始化代碼

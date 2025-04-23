@@ -1,9 +1,24 @@
-// filepath: e:\singular-blockly\media\blockly\generators\arduino\motors.js
 /**
  * @license
  * Copyright 2025 Singular Blockly Contributors
  * SPDX-License-Identifier: Apache-2.0
  */
+
+// 模組載入時自動註冊需要強制掃描的積木類型
+(function () {
+	// 確保 arduinoGenerator 已初始化
+	if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
+		// 註冊 servo_setup 積木
+		window.arduinoGenerator.registerAlwaysGenerateBlock('servo_setup');
+	} else {
+		// 如果 arduinoGenerator 尚未初始化，則設置一個載入完成後執行的回調
+		window.addEventListener('load', function () {
+			if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
+				window.arduinoGenerator.registerAlwaysGenerateBlock('servo_setup');
+			}
+		});
+	}
+})();
 
 window.arduinoGenerator.forBlock['servo_setup'] = function (block) {
 	try {
@@ -14,7 +29,7 @@ window.arduinoGenerator.forBlock['servo_setup'] = function (block) {
 		// Declare servo variable
 		window.arduinoGenerator.variables_['servo_' + varName] = `Servo ${varName};`;
 		// Attach servo in setup
-		window.arduinoGenerator.setupCode_.push(`  ${varName}.attach(${pin});`);
+		window.arduinoGenerator.setupCode_.push(`${varName}.attach(${pin});`);
 		// Add to lib_deps for platformio.ini
 		if (!window.arduinoGenerator.lib_deps_) {
 			window.arduinoGenerator.lib_deps_ = [];

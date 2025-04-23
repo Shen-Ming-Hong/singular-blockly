@@ -4,6 +4,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// 模組載入時自動註冊需要強制掃描的積木類型
+(function () {
+	// 確保 arduinoGenerator 已初始化
+	if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
+		// 註冊 ultrasonic_sensor 積木
+		window.arduinoGenerator.registerAlwaysGenerateBlock('ultrasonic_sensor');
+	} else {
+		// 如果 arduinoGenerator 尚未初始化，則設置一個載入完成後執行的回調
+		window.addEventListener('load', function () {
+			if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
+				window.arduinoGenerator.registerAlwaysGenerateBlock('ultrasonic_sensor');
+			}
+		});
+	}
+})();
+
 window.arduinoGenerator.forBlock['ultrasonic_sensor'] = function (block) {
 	try {
 		const trigPin = block.getFieldValue('TRIG_PIN');
@@ -53,11 +69,6 @@ void ultrasonicEchoISR() {
 `);
 		} else {
 			// 非中斷模式下，不需要在 setup 中重複設定腳位，因為已經由 pinModeTracker 處理
-			// 這裡只加入註解，表示超音波感測器已設定
-			window.arduinoGenerator.setupCode_.push(`
-  // 超音波感測器已設定
-`);
-
 			// 添加測距函數
 			window.arduinoGenerator.functions_['ultrasonic_measure'] = `
 // 測量超音波距離的函數
@@ -78,9 +89,9 @@ float ultrasonicMeasureDistance() {
 `;
 		}
 
-		return '// 超音波感測器已設定\n';
+		return '';
 	} catch (e) {
-		console.log('Ultrasonic sensor setup code generation error:', e);
+		log.error('Ultrasonic sensor setup code generation error:', e);
 		return ''; // 發生錯誤時返回空字串
 	}
 };
@@ -102,7 +113,7 @@ window.arduinoGenerator.forBlock['ultrasonic_read'] = function (block) {
 			return ['ultrasonicMeasureDistance()', window.arduinoGenerator.ORDER_ATOMIC];
 		}
 	} catch (e) {
-		console.log('Ultrasonic read code generation error:', e);
+		log.error('Ultrasonic read code generation error:', e);
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC]; // 發生錯誤時返回安全的默認值
 	}
 };

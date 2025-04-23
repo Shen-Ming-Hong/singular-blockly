@@ -18,6 +18,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.20.0] - 2025-04-23
+
+### 新增 Added
+
+- 新增積木自動生成機制，讓特定積木類型無論位置都能生成代碼
+  Added automatic block generation mechanism to ensure specific block types generate code regardless of their position
+  - 新增 `alwaysGenerateBlocks_` 陣列用於管理必須生成的積木
+    Added `alwaysGenerateBlocks_` array to manage blocks that must generate code
+  - 提供 `registerAlwaysGenerateBlock` 輔助函數使各模組能註冊自身積木
+    Provided `registerAlwaysGenerateBlock` helper function for modules to register their blocks
+
+### 已更新 Updated
+
+- 改進伺服馬達積木，從文字輸入改為下拉選單
+  Improved servo motor blocks, changing from text input to dropdown menu
+  - 自動顯示工作區中所有已設定的伺服馬達名稱
+    Automatically displays all configured servo motor names in the workspace
+  - 實現變異記錄功能，保存選擇的馬達值
+    Implemented mutation recording to save selected motor values
+
+### 已修改 Changed
+
+- 改進代碼生成的日誌記錄，從 console.log 改為使用標準日誌服務
+  Improved code generation logging, changing from console.log to standard logging service
+
 ## [0.19.0] - 2025-04-23
 
 ### 新增 Added

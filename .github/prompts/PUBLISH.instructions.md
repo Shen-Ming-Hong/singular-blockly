@@ -82,6 +82,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     "version": "1.2.3"
     ```
 
+### 評估 README.md 更新 Evaluate README.md Updates
+
+7. 檢視 CHANGELOG.md 中所有已發布版本的變更記錄，找出可能需要反映在 README.md 中的重要功能或特性：
+   Review all released version change records in CHANGELOG.md to identify important features or characteristics that may need to be reflected in README.md:
+
+    - 不僅考慮當前版本的變更，還要考慮所有之前版本的累積功能
+      Consider not only changes in the current version but also cumulative features from all previous versions
+    - 特別關注以下部分是否需要更新：
+      Pay special attention to whether the following sections need updating:
+        - 功能特性 (Features)
+        - 積木類別 (Block Categories)
+        - 工作區管理 (Workspace Management)
+        - 開發功能 (Development Features)
+        - 使用方法 (Usage)
+        - 支援的開發板 (Supported Boards and Platforms)
+
+8. 根據評估結果更新 README.md 文件，確保其準確反映目前專案的全部功能：
+   Update the README.md file based on the evaluation results to ensure it accurately reflects all current features of the project:
+
+    - 新增的功能應加入相應的部分，並提供簡明的說明
+      Newly added features should be included in the appropriate sections with concise descriptions
+    - 移除已棄用或不再支援的功能說明
+      Remove descriptions of deprecated or no longer supported features
+    - 保持文件風格一致性，遵循既有的格式和語言規範
+      Maintain document style consistency by following existing format and language standards
+
 ## 發布前檢查 Post-Release Checks
 
 -   [ ] 確認 CHANGELOG.md 已正確更新
