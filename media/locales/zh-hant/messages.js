@@ -53,6 +53,15 @@ window.languageManager.loadMessages('zh-hant', {
 	CATEGORY_FUNCTIONS: '函式',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: '感測器',
+	CATEGORY_MOTORS: '馬達',
+
+	// Servo Block Labels
+	SERVO_SETUP: '設定伺服馬達',
+	SERVO_PIN: '腳位',
+	SERVO_SETUP_TOOLTIP: '宣告伺服馬達變數並設定腳位',
+	SERVO_MOVE: '旋轉伺服馬達',
+	SERVO_ANGLE: '角度',
+	SERVO_MOVE_TOOLTIP: '讓伺服馬達轉動到特定角度',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: '設定',

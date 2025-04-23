@@ -53,6 +53,15 @@ window.languageManager.loadMessages('pl', {
 	CATEGORY_FUNCTIONS: 'Funkcje',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Czujniki',
+	CATEGORY_MOTORS: 'Silniki',
+
+	// Servo Block Labels
+	SERVO_SETUP: 'Konfiguracja Serwa',
+	SERVO_PIN: 'Pin',
+	SERVO_SETUP_TOOLTIP: 'Zadeklaruj zmienną serwa i ustaw pin',
+	SERVO_MOVE: 'Obróć Serwo',
+	SERVO_ANGLE: 'Kąt',
+	SERVO_MOVE_TOOLTIP: 'Obróć serwo do określonego kąta',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Konfiguracja',

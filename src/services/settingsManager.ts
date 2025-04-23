@@ -133,4 +133,99 @@ export class SettingsManager {
 		await this.updateTheme(newTheme);
 		return newTheme;
 	}
+
+	/**
+	 * 同步 platformio.ini 的 lib_deps 與提供的函式庫列表
+	 * @param libDeps 當前需要的函式庫依賴列表
+	 */
+	async syncLibraryDeps(libDeps: string[]): Promise<void> {
+		try {
+			const iniPath = 'platformio.ini';
+
+			// 檢查檔案是否存在
+			if (!this.fileService.fileExists(iniPath)) {
+				log(`platformio.ini not found, cannot sync library dependencies`, 'warn');
+				return;
+			}
+
+			// 讀取現有內容
+			const content = await this.fileService.readFile(iniPath);
+			const lines = content.split(/\r?\n/);
+			let updated = false;
+			let inEnvSection = false;
+
+			// 遍歷檔案找到 lib_deps 行並更新
+			for (let i = 0; i < lines.length; i++) {
+				const line = lines[i];
+				const trimmed = line.trim();
+
+				// 檢測環境區段開始
+				if (/^\s*\[env:/.test(line)) {
+					inEnvSection = true;
+					continue;
+				}
+
+				// 當在環境區段中找到 lib_deps 行時
+				if (inEnvSection && trimmed.startsWith('lib_deps')) {
+					// 解析現有依賴
+					const equalIndex = trimmed.indexOf('=');
+					if (equalIndex < 0) {
+						continue;
+					}
+
+					const depsPrefix = trimmed.substring(0, equalIndex + 1);
+					const existingDeps = trimmed
+						.substring(equalIndex + 1)
+						.split(',')
+						.map(d => d.trim())
+						.filter(d => d.length > 0);
+
+					// 如果提供的依賴列表為空，且現有依賴不為空，則移除 lib_deps 行
+					if (libDeps.length === 0 && existingDeps.length > 0) {
+						lines.splice(i, 1);
+						updated = true;
+						log(`Removed lib_deps from platformio.ini as no libraries are needed`, 'info');
+						break;
+					}
+
+					// 如果提供的依賴列表不為空，更新現有依賴行
+					if (libDeps.length > 0) {
+						// 檢查依賴列表是否有變化
+						const sortedExisting = [...existingDeps].sort();
+						const sortedNew = [...libDeps].sort();
+
+						// 如果依賴列表沒有變化，不需要更新
+						if (JSON.stringify(sortedExisting) === JSON.stringify(sortedNew)) {
+							log(`Library dependencies are already in sync`, 'info');
+							return;
+						}
+
+						// 更新依賴行
+						lines[i] = `${depsPrefix} ${libDeps.join(', ')}`;
+						updated = true;
+						log(`Updated lib_deps in platformio.ini: ${libDeps.join(', ')}`, 'info');
+						break;
+					}
+				}
+
+				// 如果遇到新區段開始或檔案結束，且尚未找到 lib_deps 行
+				// 但我們有需要添加的依賴，就在適當位置插入新的 lib_deps 行
+				if (inEnvSection && (line.trim().startsWith('[') || i === lines.length - 1)) {
+					if (libDeps.length > 0) {
+						lines.splice(i, 0, `lib_deps = ${libDeps.join(', ')}`);
+						updated = true;
+						log(`Added lib_deps to platformio.ini: ${libDeps.join(', ')}`, 'info');
+					}
+					break;
+				}
+			}
+
+			// 如果檔案內容有更新，寫回檔案
+			if (updated) {
+				await this.fileService.writeFile(iniPath, lines.join('\n'));
+			}
+		} catch (error) {
+			log(`Failed to sync library dependencies in platformio.ini: ${error}`, 'error', error);
+		}
+	}
 }

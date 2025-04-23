@@ -725,9 +725,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 檢查是否是函式定義積木變化
 			try {
 				const code = arduinoGenerator.workspaceToCode(workspace);
+				// 將庫依賴一併發送
 				vscode.postMessage({
 					command: 'updateCode',
 					code: code,
+					lib_deps: arduinoGenerator.lib_deps_ || [],
 				});
 
 				// 無條件保存所有方塊移動事件，確保座標變更被儲存
@@ -753,6 +755,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		vscode.postMessage({
 			command: 'updateBoard',
 			board: selectedBoard,
+			lib_deps: window.arduinoGenerator.lib_deps_ || [],
 		});
 		saveWorkspaceState();
 	});

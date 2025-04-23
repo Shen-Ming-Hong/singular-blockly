@@ -53,6 +53,15 @@ window.languageManager.loadMessages('ja', {
 	CATEGORY_FUNCTIONS: '関数',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'センサー',
+	CATEGORY_MOTORS: 'モーター',
+
+	// Servo Block Labels
+	SERVO_SETUP: 'サーボモーターの設定',
+	SERVO_PIN: 'ピン',
+	SERVO_SETUP_TOOLTIP: 'サーボモーター変数を宣言してピンを設定する',
+	SERVO_MOVE: 'サーボモーターを回転',
+	SERVO_ANGLE: '角度',
+	SERVO_MOVE_TOOLTIP: 'サーボモーターを特定の角度に回転させる',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'セットアップ',

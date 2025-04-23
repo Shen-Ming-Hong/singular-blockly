@@ -1,0 +1,15 @@
+{
+	"kind": "category",
+	"name": "%{CATEGORY_MOTORS}",
+	"categorystyle": "motors_category",
+	"contents": [
+		{
+			"kind": "block",
+			"type": "servo_setup"
+		},
+		{
+			"kind": "block",
+			"type": "servo_move"
+		}
+	]
+}

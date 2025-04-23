@@ -53,6 +53,15 @@ window.languageManager.loadMessages('pt-br', {
 	CATEGORY_FUNCTIONS: 'Funções',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Sensores',
+	CATEGORY_MOTORS: 'Motores',
+
+	// Servo Block Labels
+	SERVO_SETUP: 'Configurar Motor Servo',
+	SERVO_PIN: 'Pino',
+	SERVO_SETUP_TOOLTIP: 'Declarar variável de motor servo e definir pino',
+	SERVO_MOVE: 'Girar Motor Servo',
+	SERVO_ANGLE: 'Ângulo',
+	SERVO_MOVE_TOOLTIP: 'Girar motor servo para um ângulo específico',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Configuração',

@@ -53,6 +53,15 @@ window.languageManager.loadMessages('tr', {
 	CATEGORY_FUNCTIONS: 'Fonksiyonlar',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Sensörler',
+	CATEGORY_MOTORS: 'Motorlar',
+
+	// Servo Block Labels
+	SERVO_SETUP: 'Servo Motor Kurulum',
+	SERVO_PIN: 'Pin',
+	SERVO_SETUP_TOOLTIP: 'Servo motor değişkeni tanımla ve pin ayarla',
+	SERVO_MOVE: 'Servo Motoru Döndür',
+	SERVO_ANGLE: 'Açı',
+	SERVO_MOVE_TOOLTIP: 'Servo motoru belirli bir açıya döndür',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Kurulum',

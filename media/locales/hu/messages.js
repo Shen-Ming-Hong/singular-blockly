@@ -53,6 +53,15 @@ window.languageManager.loadMessages('hu', {
 	CATEGORY_FUNCTIONS: 'Függvények',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Érzékelők',
+	CATEGORY_MOTORS: 'Motorok',
+
+	// Servo Block Labels
+	SERVO_SETUP: 'Szervomotor beállítása',
+	SERVO_PIN: 'Láb',
+	SERVO_SETUP_TOOLTIP: 'Szervomotor változó deklarálása és láb beállítása',
+	SERVO_MOVE: 'Szervomotor forgatása',
+	SERVO_ANGLE: 'Szög',
+	SERVO_MOVE_TOOLTIP: 'Szervomotor forgatása egy adott szögbe',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Beállítás',

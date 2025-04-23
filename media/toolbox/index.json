@@ -5,6 +5,9 @@
 			"$include": "./categories/arduino.json"
 		},
 		{
+			"$include": "./categories/motors.json"
+		},
+		{
 			"$include": "./categories/sensors.json"
 		},
 		{

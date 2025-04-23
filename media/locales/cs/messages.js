@@ -53,6 +53,15 @@ window.languageManager.loadMessages('cs', {
 	CATEGORY_FUNCTIONS: 'Funkce',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Senzory',
+	CATEGORY_MOTORS: 'Motory',
+
+	// Servo Block Labels
+	SERVO_SETUP: 'Nastavení Servo Motoru',
+	SERVO_PIN: 'Pin',
+	SERVO_SETUP_TOOLTIP: 'Deklarovat proměnnou servo motoru a nastavit pin',
+	SERVO_MOVE: 'Otočit Servo Motor',
+	SERVO_ANGLE: 'Úhel',
+	SERVO_MOVE_TOOLTIP: 'Otočit servo motor na specifický úhel',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Nastavení',

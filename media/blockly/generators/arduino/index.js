@@ -59,6 +59,7 @@ window.arduinoGenerator.init = function (workspace) {
 	window.arduinoGenerator.setupCode_ = []; // 新增 setupCode_ 用於儲存 setup 區塊的程式碼
 	window.arduinoGenerator.warnings_ = []; // 新增 warnings_ 用於儲存警告訊息，如腳位模式不正確
 	window.arduinoGenerator.pinModes_ = {}; // 每次生成代碼時重置腳位模式追蹤
+	window.arduinoGenerator.lib_deps_ = []; // 新增 lib_deps_ 用於儲存 platformio.ini 庫依賴
 
 	// 初始化 nameDB_
 	if (!window.arduinoGenerator.nameDB_) {
@@ -141,9 +142,6 @@ window.arduinoGenerator.finish = function (code) {
 		if (typeof log !== 'undefined') {
 			log.info('函數數量:', functionNames.length);
 			log.info('函數列表:', functionNames);
-		} else {
-			console.log('函數數量:', functionNames.length);
-			console.log('函數列表:', functionNames);
 		}
 	}
 

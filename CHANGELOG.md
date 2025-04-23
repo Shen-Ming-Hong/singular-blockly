@@ -18,6 +18,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.19.0] - 2025-04-23
+
+### 新增 Added
+
+- 新增伺服馬達積木
+  Added servo motor blocks
+  - 支援伺服馬達設定與角度控制
+    Support servo motor setup and angle control
+  - 在所有支援的語言中加入馬達相關翻譯
+    Add motor-related translations in all supported languages
+
+### 已更新 Updated
+
+- 改進函式庫依賴管理
+  Improved library dependency management
+  - 新增 `lib_deps_` 系統用於追蹤函式庫依賴
+    Added `lib_deps_` system for tracking library dependencies
+  - 自動在 platformio.ini 中同步函式庫依賴資訊
+    Automatically synchronize library dependency information in platformio.ini
+
+### 已修改 Changed
+
+- 更新 Blockly 編輯器與預覽頁面，增加馬達積木的主題顏色
+  Updated Blockly editor and preview page with motor block theme colors
+
 ## [0.18.0] - 2025-04-20
 
 ### 新增 Added

@@ -53,6 +53,15 @@ window.languageManager.loadMessages('bg', {
 	CATEGORY_FUNCTIONS: 'Функции',
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Сензори',
+	CATEGORY_MOTORS: 'Мотори',
+
+	// Servo Block Labels
+	SERVO_SETUP: 'Настройване на серво мотор',
+	SERVO_PIN: 'Пин',
+	SERVO_SETUP_TOOLTIP: 'Обявяване на променлива за серво мотор и задаване на пин',
+	SERVO_MOVE: 'Завъртане на серво мотор',
+	SERVO_ANGLE: 'Ъгъл',
+	SERVO_MOVE_TOOLTIP: 'Завъртане на серво мотор до определен ъгъл',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',

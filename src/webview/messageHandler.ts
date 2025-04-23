@@ -109,8 +109,7 @@ export class WebViewMessageHandler {
 	/**
 	 * 處理更新程式碼訊息
 	 * @param message 更新程式碼訊息物件
-	 */
-	private async handleUpdateCode(message: any): Promise<void> {
+	 */ private async handleUpdateCode(message: any): Promise<void> {
 		try {
 			const workspaceFolders = vscode.workspace.workspaceFolders;
 			if (!workspaceFolders) {
@@ -123,13 +122,17 @@ export class WebViewMessageHandler {
 					}
 				});
 				return;
-			}
-
-			// 確保 src 目錄存在
+			} // 確保 src 目錄存在
 			await this.fileService.createDirectory('src');
 
 			// 寫入程式碼
 			await this.fileService.writeFile('src/main.cpp', message.code);
+
+			// 處理函式庫依賴
+			// 使用新的 syncLibraryDeps 方法同步函式庫依賴
+			const libDeps = message.lib_deps && Array.isArray(message.lib_deps) ? message.lib_deps : [];
+			log(`收到函式庫依賴列表: ${libDeps.length > 0 ? libDeps.join(', ') : '(無依賴)'}`, 'info');
+			await this.settingsManager.syncLibraryDeps(libDeps);
 		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_SAVE_FILE', (error as Error).message);
 
@@ -156,7 +159,6 @@ export class WebViewMessageHandler {
 				});
 				return;
 			}
-
 			const workspaceRoot = workspaceFolders[0].uri.fsPath;
 			const platformioIni = 'platformio.ini';
 			const boardConfig = await this.getBoardConfig(message.board);
@@ -166,8 +168,18 @@ export class WebViewMessageHandler {
 					await this.fileService.deleteFile(platformioIni);
 				}
 			} else {
+				// 檢查是否收到了函式庫依賴資訊
+				const libDeps = message.lib_deps && Array.isArray(message.lib_deps) ? message.lib_deps : [];
+				log(`更新開發板時的函式庫依賴列表: ${libDeps.length > 0 ? libDeps.join(', ') : '(無依賴)'}`, 'info');
+
 				const isFirstTime = !this.fileService.fileExists(platformioIni);
 				await this.fileService.writeFile(platformioIni, boardConfig);
+
+				// 如果有函式庫依賴，將它們同步到更新後的 platformio.ini
+				if (libDeps.length > 0) {
+					await this.settingsManager.syncLibraryDeps(libDeps);
+					log(`更新開發板配置後同步函式庫依賴: ${libDeps.join(', ')}`, 'info');
+				}
 
 				// 使用 setTimeout 延遲訊息顯示，避免干擾面板顯示
 				setTimeout(async () => {
