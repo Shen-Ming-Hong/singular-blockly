@@ -82,6 +82,7 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Standardized logging service for code generation
   - Zoom controls and trashcan
   - Light and dark theme support with theme toggle
+  - Touch device support with pinch-to-zoom functionality
   - PlatformIO integration for hardware upload
   - Pin mode tracking and conflict detection
     - Automatically tracks pin modes (INPUT, OUTPUT, INPUT_PULLUP)

@@ -505,6 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			maxScale: 3, // 最大縮放比例
 			minScale: 0.3, // 最小縮放比例
 			scaleSpeed: 1.2, // 縮放速度
+			pinch: true, // 支援觸控設備的縮放
 		},
 	});
 	// 根據初始主題設定更新 UI

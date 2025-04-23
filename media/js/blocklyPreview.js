@@ -142,7 +142,6 @@ function updateUITexts() {
  */
 function initBlocklyWorkspace() {
 	log.info('初始化預覽模式 Blockly 工作區');
-
 	// 選擇適合的主題
 	const theme = currentTheme === 'dark' ? SingularBlocklyDarkTheme : SingularBlocklyTheme; // 初始化工作區 - 不需要工具箱
 	workspace = Blockly.inject('blocklyDiv', {
@@ -151,15 +150,16 @@ function initBlocklyWorkspace() {
 		move: {
 			scrollbars: true,
 			drag: true,
-			wheel: true,
+			wheel: false, // 設為 false 避免與縮放功能衝突
 		},
 		zoom: {
 			controls: true,
-			wheel: true,
+			wheel: true, // 啟用滾輪縮放
 			startScale: 1.0,
 			maxScale: 3,
 			minScale: 0.3,
 			scaleSpeed: 1.2,
+			pinch: true, // 支援觸控設備的縮放
 		},
 		trashcan: false, // 預覽模式不需要垃圾桶
 	});

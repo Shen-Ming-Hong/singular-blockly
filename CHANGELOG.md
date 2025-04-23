@@ -18,6 +18,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.21.0] - 2025-04-23
+
+### 新增 Added
+
+- 新增深色主題圖示於預覽模式中，改善深色模式的視覺體驗
+  Added dark theme icon in preview mode, improving visual experience in dark mode
+
+### 已更新 Updated
+
+- 更新 Blockly 工作區，支援觸控設備的縮放功能 (pinch 縮放)
+  Updated Blockly workspace to support touch device zooming (pinch zoom)
+
+### 已修改 Changed
+
+- 在預覽模式中調整滾輪行為，避免縮放功能與滾動衝突
+  Adjusted wheel behavior in preview mode to avoid conflicts between zooming and scrolling
+
 ## [0.20.0] - 2025-04-23
 
 ### 新增 Added
