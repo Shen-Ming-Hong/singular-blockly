@@ -12,7 +12,7 @@
 	"typescript.tsc.autoDetect": "off",
 	"github.copilot.chat.commitMessageGeneration.instructions": [
 		{
-			"file": ".vscode/.copilot-commit-message-instructions.md"
+			"file": ".copilot-commit-message-instructions.md"
 		}
 	],
 	"MicroPython.executeButton": [
