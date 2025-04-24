@@ -54,7 +54,6 @@ window.languageManager.loadMessages('bg', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Сензори',
 	CATEGORY_MOTORS: 'Мотори',
-
 	// Servo Block Labels
 	SERVO_SETUP: 'Настройване на серво мотор',
 	SERVO_PIN: 'Пин',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('bg', {
 	SERVO_MOVE: 'Завъртане на серво мотор',
 	SERVO_ANGLE: 'Ъгъл',
 	SERVO_MOVE_TOOLTIP: 'Завъртане на серво мотор до определен ъгъл',
+	SERVO_STOP: 'Спиране на серво мотор',
+	SERVO_STOP_TOOLTIP: 'Спиране на изходния сигнал на серво мотора',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',

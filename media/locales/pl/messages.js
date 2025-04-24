@@ -54,7 +54,6 @@ window.languageManager.loadMessages('pl', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Czujniki',
 	CATEGORY_MOTORS: 'Silniki',
-
 	// Servo Block Labels
 	SERVO_SETUP: 'Konfiguracja Serwa',
 	SERVO_PIN: 'Pin',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('pl', {
 	SERVO_MOVE: 'Obróć Serwo',
 	SERVO_ANGLE: 'Kąt',
 	SERVO_MOVE_TOOLTIP: 'Obróć serwo do określonego kąta',
+	SERVO_STOP: 'Zatrzymaj Serwo',
+	SERVO_STOP_TOOLTIP: 'Zatrzymaj sygnał wyjściowy serwa',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Konfiguracja',

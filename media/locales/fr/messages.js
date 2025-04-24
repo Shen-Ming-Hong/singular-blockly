@@ -54,7 +54,6 @@ window.languageManager.loadMessages('fr', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Capteurs',
 	CATEGORY_MOTORS: 'Moteurs',
-
 	// Servo Block Labels
 	SERVO_SETUP: 'Configurer Servo-moteur',
 	SERVO_PIN: 'Broche',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('fr', {
 	SERVO_MOVE: 'Tourner Servo-moteur',
 	SERVO_ANGLE: 'Angle',
 	SERVO_MOVE_TOOLTIP: 'Tourner le servo-moteur à un angle spécifique',
+	SERVO_STOP: 'Arrêter Servo-moteur',
+	SERVO_STOP_TOOLTIP: 'Arrêter le signal de sortie du servo-moteur',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Configuration',

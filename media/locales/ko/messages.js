@@ -54,7 +54,6 @@ window.languageManager.loadMessages('ko', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: '센서',
 	CATEGORY_MOTORS: '모터',
-
 	// Servo Block Labels
 	SERVO_SETUP: '서보 모터 설정',
 	SERVO_PIN: '핀',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('ko', {
 	SERVO_MOVE: '서보 모터 회전',
 	SERVO_ANGLE: '각도',
 	SERVO_MOVE_TOOLTIP: '서보 모터를 특정 각도로 회전',
+	SERVO_STOP: '서보 모터 정지',
+	SERVO_STOP_TOOLTIP: '서보 모터 신호 출력 중지',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: '설정',

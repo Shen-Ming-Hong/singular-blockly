@@ -18,6 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.22.0] - 2025-04-24
+
+### 新增 Added
+
+- 新增伺服馬達停止積木，允許透過 detach() 函數停止伺服訊號輸出
+  Added servo motor stop block, allowing servo signal output to be stopped using the detach() function
+- 為所有支援的語言添加了伺服馬達停止積木的相關翻譯
+  Added translations for the servo motor stop block for all supported languages
+
 ## [0.21.1] - 2025-04-24
 
 ### 已更新 Updated

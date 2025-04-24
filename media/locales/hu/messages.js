@@ -54,7 +54,6 @@ window.languageManager.loadMessages('hu', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Érzékelők',
 	CATEGORY_MOTORS: 'Motorok',
-
 	// Servo Block Labels
 	SERVO_SETUP: 'Szervomotor beállítása',
 	SERVO_PIN: 'Láb',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('hu', {
 	SERVO_MOVE: 'Szervomotor forgatása',
 	SERVO_ANGLE: 'Szög',
 	SERVO_MOVE_TOOLTIP: 'Szervomotor forgatása egy adott szögbe',
+	SERVO_STOP: 'Szervomotor leállítása',
+	SERVO_STOP_TOOLTIP: 'Szervomotor jelkimenet leállítása',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Beállítás',

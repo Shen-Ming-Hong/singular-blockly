@@ -57,3 +57,17 @@ window.arduinoGenerator.forBlock['servo_move'] = function (block) {
 		return '';
 	}
 };
+
+// 新增伺服馬達停止積木的程式碼生成器
+window.arduinoGenerator.forBlock['servo_stop'] = function (block) {
+	try {
+		const varName = block.getFieldValue('VAR');
+		// Ensure Servo library is included
+		window.arduinoGenerator.includes_['servo'] = '#include <Servo.h>';
+		// Stop servo output by detaching it
+		return `${varName}.detach();\n`;
+	} catch (e) {
+		log.error('Servo stop code generation error:', e);
+		return '';
+	}
+};

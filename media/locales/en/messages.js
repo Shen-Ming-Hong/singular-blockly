@@ -54,7 +54,6 @@ window.languageManager.loadMessages('en', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Sensors',
 	CATEGORY_MOTORS: 'Motors',
-
 	// Servo Block Labels
 	SERVO_SETUP: 'Setup Servo Motor',
 	SERVO_PIN: 'Pin',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('en', {
 	SERVO_MOVE: 'Rotate Servo Motor',
 	SERVO_ANGLE: 'Angle',
 	SERVO_MOVE_TOOLTIP: 'Rotate servo motor to specific angle',
+	SERVO_STOP: 'Stop Servo Motor',
+	SERVO_STOP_TOOLTIP: 'Stop servo motor signal output',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',

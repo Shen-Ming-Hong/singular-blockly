@@ -117,8 +117,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   [ ] 評估是否需要更新 README.md 以反映新版本功能或重要變更
         Evaluate if README.md needs to be updated to reflect new features or important changes
 
-# !!!停止，讓使用者完成存檔，等待使用者授權才進行後續動作!!!
-
 ## 注意事項 Notes
 
 -   保持一致的發布流程有助於專案的長期維護

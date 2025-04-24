@@ -54,7 +54,6 @@ window.languageManager.loadMessages('cs', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Senzory',
 	CATEGORY_MOTORS: 'Motory',
-
 	// Servo Block Labels
 	SERVO_SETUP: 'Nastavení Servo Motoru',
 	SERVO_PIN: 'Pin',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('cs', {
 	SERVO_MOVE: 'Otočit Servo Motor',
 	SERVO_ANGLE: 'Úhel',
 	SERVO_MOVE_TOOLTIP: 'Otočit servo motor na specifický úhel',
+	SERVO_STOP: 'Zastavit Servo Motor',
+	SERVO_STOP_TOOLTIP: 'Zastavit výstupní signál servo motoru',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Nastavení',

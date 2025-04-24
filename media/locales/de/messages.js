@@ -54,7 +54,6 @@ window.languageManager.loadMessages('de', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Sensoren',
 	CATEGORY_MOTORS: 'Motoren',
-
 	// Servo Block Labels
 	SERVO_SETUP: 'Servomotor einrichten',
 	SERVO_PIN: 'Pin',
@@ -62,6 +61,8 @@ window.languageManager.loadMessages('de', {
 	SERVO_MOVE: 'Servomotor drehen',
 	SERVO_ANGLE: 'Winkel',
 	SERVO_MOVE_TOOLTIP: 'Servomotor auf bestimmten Winkel drehen',
+	SERVO_STOP: 'Servomotor stoppen',
+	SERVO_STOP_TOOLTIP: 'Ausgangssignal des Servomotors stoppen',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',
