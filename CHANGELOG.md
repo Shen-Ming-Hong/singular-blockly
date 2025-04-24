@@ -18,6 +18,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.21.1] - 2025-04-24
+
+### 已更新 Updated
+
+- 更新 Arduino Nano 的 platformio 設定，將板子類型從 nanoatmega328 改為 nanoatmega328new
+  Updated Arduino Nano platformio configuration, changing board type from nanoatmega328 to nanoatmega328new
+
+### 已修改 Changed
+
+- 改進開發板選擇機制，從靜態 HTML 選項改為動態生成選單
+  Improved board selection mechanism, changing from static HTML options to dynamically generated menu
+  - 開發板選項現在直接從 BOARD_CONFIGS 物件動態產生
+    Board options are now dynamically generated from the BOARD_CONFIGS object
+  - 確保開發板顯示名稱與內部配置保持一致
+    Ensure board display names are consistent with internal configurations
+
 ## [0.21.0] - 2025-04-23
 
 ### 新增 Added

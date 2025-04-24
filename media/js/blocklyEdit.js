@@ -96,6 +96,46 @@ const log = {
 let currentTheme = window.initialTheme || 'light';
 
 /**
+ * 動態生成開發板選擇下拉選單選項
+ */
+function populateBoardOptions() {
+	const boardSelect = document.getElementById('boardSelect');
+	if (!boardSelect) {
+		log.warn('找不到開發板選擇下拉選單元素');
+		return;
+	}
+
+	// 清空現有選項
+	boardSelect.innerHTML = '';
+
+	// 添加 "None" 選項
+	const noneOption = document.createElement('option');
+	noneOption.value = 'none';
+	noneOption.textContent = 'None';
+	boardSelect.appendChild(noneOption);
+
+	// 從 BOARD_CONFIGS 動態生成選項
+	if (window.BOARD_CONFIGS) {
+		Object.keys(window.BOARD_CONFIGS).forEach(boardKey => {
+			const boardConfig = window.BOARD_CONFIGS[boardKey];
+			const option = document.createElement('option');
+			option.value = boardKey;
+			option.textContent = boardConfig.name;
+			boardSelect.appendChild(option);
+		});
+	} else {
+		log.warn('無法找到 BOARD_CONFIGS 物件，無法動態生成開發板選項');
+	}
+
+	// 設定預設選擇
+	if (window.currentBoard && boardSelect.querySelector(`option[value="${window.currentBoard}"]`)) {
+		boardSelect.value = window.currentBoard;
+	} else {
+		boardSelect.value = 'none';
+	}
+}
+
+/**
  * 更新主編輯視窗的UI文字為多語言版本
  */
 function updateEditorUITexts() {
@@ -459,6 +499,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 更新主編輯視窗UI文字的多語言支援
 	updateEditorUITexts();
+
+	// 動態生成開發板選項
+	populateBoardOptions();
 
 	// 註冊主題切換按鈕事件
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);

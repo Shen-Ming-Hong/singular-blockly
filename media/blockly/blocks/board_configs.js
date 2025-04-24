@@ -135,7 +135,7 @@ framework = arduino`,
 		// 新增 platformio 設定
 		platformConfig: `[env:nano]
 platform = atmelavr
-board = nanoatmega328
+board = nanoatmega328new
 framework = arduino`,
 	},
 	mega: {
