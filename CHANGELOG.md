@@ -18,6 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.22.1] - 2025-04-25
+
+### 已更新 Updated
+
+- 更新 ESP32 開發板的引腳定義，標記多個引腳支援 PWM 功能，提供更準確的硬體功能描述
+  Updated ESP32 pin definitions to mark multiple pins as supporting PWM functionality, providing more accurate hardware capability descriptions
+
+### 已修改 Changed
+
+- 改進類比寫入 (analogWrite) 積木的程式碼生成邏輯，現在對所有類型的輸入值（包括數字字面量和表達式）都套用 constrain 函數，確保輸出在開發板支援的範圍內
+  Improved code generation logic for analog write (analogWrite) blocks, now applying constrain function to all types of input values (including numeric literals and expressions), ensuring output is within the range supported by the board
+- 將 `arduino_analog_write` 和 `arduino_digital_write` 積木註冊為始終生成的積木，確保在特定情況下的正確程式碼生成
+  Registered `arduino_analog_write` and `arduino_digital_write` blocks as always-generate blocks, ensuring correct code generation in specific scenarios
+
 ## [0.22.0] - 2025-04-24
 
 ### 新增 Added

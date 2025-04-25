@@ -11,11 +11,15 @@
 	if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
 		// 註冊 threshold_function_setup 積木
 		window.arduinoGenerator.registerAlwaysGenerateBlock('threshold_function_setup');
+		window.arduinoGenerator.registerAlwaysGenerateBlock('arduino_analog_write');
+		window.arduinoGenerator.registerAlwaysGenerateBlock('arduino_digital_write');
 	} else {
 		// 如果 arduinoGenerator 尚未初始化，則設置一個載入完成後執行的回調
 		window.addEventListener('load', function () {
 			if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
 				window.arduinoGenerator.registerAlwaysGenerateBlock('threshold_function_setup');
+				window.arduinoGenerator.registerAlwaysGenerateBlock('arduino_analog_write');
+				window.arduinoGenerator.registerAlwaysGenerateBlock('arduino_digital_write');
 			}
 		});
 	}
@@ -120,9 +124,8 @@ window.arduinoGenerator.forBlock['arduino_analog_write'] = function (block) {
 		const range = window.getAnalogOutputRange();
 
 		// 確保數值在開發板支援的範圍內
-		if (!isNaN(Number(value))) {
-			value = `constrain(${value}, ${range.min}, ${range.max})`;
-		}
+		// 將所有數值表達式都套用 constrain 函數，無論它是數字字面量還是表達式
+		value = `constrain(${value}, ${range.min}, ${range.max})`;
 
 		// ESP32 需要特殊處理
 		if (currentBoard === 'esp32') {
