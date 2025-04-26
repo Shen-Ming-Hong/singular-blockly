@@ -34,6 +34,13 @@ window.languageManager.loadMessages('cs', {
 	BACKUP_PREVIEW_BTN: 'Náhled',
 	BACKUP_RESTORE_BTN: 'Obnovit',
 	BACKUP_DELETE_BTN: 'Smazat',
+	AUTO_BACKUP_TITLE: 'Nastavení automatického zálohování',
+	AUTO_BACKUP_INTERVAL_LABEL: 'Interval zálohování:',
+	AUTO_BACKUP_MINUTES: 'minut',
+	AUTO_BACKUP_SAVE: 'Uložit nastavení',
+	AUTO_BACKUP_SAVED: 'Nastavení automatického zálohování uloženo',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: 'Ruční zálohování',
 
 	// Board Names
 	BOARD_NONE: 'Žádná',

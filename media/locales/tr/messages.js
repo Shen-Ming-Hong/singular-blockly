@@ -34,6 +34,13 @@ window.languageManager.loadMessages('tr', {
 	BACKUP_PREVIEW_BTN: 'Önizleme',
 	BACKUP_RESTORE_BTN: 'Geri Yükle',
 	BACKUP_DELETE_BTN: 'Sil',
+	AUTO_BACKUP_TITLE: 'Otomatik Yedekleme Ayarları',
+	AUTO_BACKUP_INTERVAL_LABEL: 'Yedekleme aralığı:',
+	AUTO_BACKUP_MINUTES: 'dakika',
+	AUTO_BACKUP_SAVE: 'Ayarları Kaydet',
+	AUTO_BACKUP_SAVED: 'Otomatik yedekleme ayarları kaydedildi',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: 'Manuel Yedekleme',
 
 	// Board Names
 	BOARD_NONE: 'Yok',

@@ -291,111 +291,133 @@ body.theme-dark .preview-controls .theme-icon {
 	margin-bottom: 20px;
 }
 
-#createBackupBtn {
-	padding: 8px 16px;
-	background-color: #4caf50;
-	color: white;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 1rem;
-	transition: background-color 0.2s;
+.actions-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 15px;
 }
 
-#createBackupBtn:hover {
-	background-color: #45a049;
-}
-
-/* 備份創建表單 */
-.backup-create-form {
-	margin-bottom: 20px;
-	padding: 15px;
+.action-card {
+	flex: 1;
+	min-width: 200px;
 	background-color: #f9f9f9;
-	border-radius: 4px;
 	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 15px;
 }
 
-.backup-create-form h3 {
+.action-card h3 {
 	margin-top: 0;
-	margin-bottom: 15px;
+	margin-bottom: 12px;
 	color: #333;
+	font-size: 1rem;
+	font-weight: 600;
 }
 
-.form-group {
-	margin-bottom: 15px;
+.action-content {
+	display: flex;
+	flex-direction: column;
 }
 
-.form-group label {
-	display: block;
-	margin-bottom: 5px;
-	font-weight: bold;
+/* 自動備份設定 - 這部分保留讓原有的CSS仍然能匹配到新的元素 */
+.auto-backup-settings {
+	background-color: #f9f9f9;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 15px;
+	margin-top: 15px;
+	margin-bottom: 20px;
+}
+
+.auto-backup-settings h3 {
+	margin-top: 0;
+	margin-bottom: 10px;
+	color: #333;
+	font-size: 1rem;
+}
+
+.interval-input-container {
+	display: flex;
+	align-items: center;
+}
+
+#autoBackupInterval {
+	width: 60px;
+	height: 30px;
+	padding: 4px 8px;
+	font-size: 1rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	margin-right: 8px;
+}
+
+#autoBackupMinutesText {
 	color: #555;
 }
 
-.form-group input {
-	width: 100%;
-	padding: 8px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	box-sizing: border-box;
+#saveAutoBackupBtn {
+	/* 基本樣式已經由 .secondary-btn 提供 */
+	margin-left: 5px;
 }
 
-.form-actions {
-	display: flex;
-	justify-content: flex-end;
-	gap: 10px;
+/* 這些樣式仍然保留以確保向後相容 */
+#saveAutoBackupBtn:hover {
+	background-color: #0b7dda;
 }
 
-.form-actions button {
-	padding: 6px 12px;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-	transition: background-color 0.2s;
+/* 深色模式下的自動備份設定 */
+body.theme-dark .auto-backup-settings {
+	background-color: #2d2d2d;
+	border-color: #3e3e3e;
 }
 
-#confirmBackupBtn {
-	background-color: #4caf50;
-	color: white;
+body.theme-dark .auto-backup-settings h3 {
+	color: #e0e0e0;
 }
 
-#confirmBackupBtn:hover {
-	background-color: #45a049;
+body.theme-dark #autoBackupInterval {
+	background-color: #333;
+	border-color: #555;
+	color: #e0e0e0;
 }
 
-#cancelBackupBtn {
-	background-color: #f1f1f1;
-	color: #333;
+body.theme-dark #autoBackupMinutesText {
+	color: #bbb;
 }
 
-#cancelBackupBtn:hover {
-	background-color: #e0e0e0;
-}
+/* 現在使用 secondary-btn 通用樣式，這些特殊樣式不再需要 */
 
 /* 備份列表 */
 .backup-list-container {
 	max-height: 300px;
 	overflow-y: auto;
+	border-radius: 8px;
+	padding-right: 6px; /* 為捲軸留出更多空間 */
+	-webkit-overflow-scrolling: touch; /* 在 iOS 上提供慣性滾動 */
 }
 
 .backup-list-container h3 {
 	margin-top: 0;
-	margin-bottom: 10px;
+	margin-bottom: 12px;
 	color: #333;
+	font-size: 1.1rem;
+	font-weight: 600;
 }
 
 .backup-list {
 	border: 1px solid #e0e0e0;
-	border-radius: 4px;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .backup-item {
 	display: flex;
 	justify-content: space-between;
 	align-items: center; /* 確保垂直置中 */
-	padding: 10px 15px;
-	border-bottom: 1px solid #e0e0e0;
-	transition: background-color 0.2s;
+	padding: 12px 16px;
+	border-bottom: 1px solid #e9e9e9;
+	transition: all 0.2s ease;
 }
 
 .backup-item:last-child {
@@ -403,21 +425,26 @@ body.theme-dark .preview-controls .theme-icon {
 }
 
 .backup-item:hover {
-	background-color: #f5f5f5;
+	background-color: #f8f8f8;
+	transform: translateX(2px);
 }
 
 .backup-info {
 	flex: 1;
+	padding: 2px 0;
 }
 
 .backup-name {
-	font-weight: bold;
-	margin-bottom: 3px;
+	font-weight: 600;
+	margin-bottom: 4px;
+	color: #444;
+	font-size: 0.95rem;
 }
 
 .backup-date {
 	font-size: 0.85rem;
-	color: #777;
+	color: #888;
+	font-weight: 400;
 }
 
 .backup-actions {
@@ -555,84 +582,291 @@ body.theme-dark .modal-close:hover {
 	color: #ffffff;
 }
 
-body.theme-dark .backup-create-form {
-	background-color: #444444;
-	border-color: #555555;
+/* 備份創建表單 */
+.backup-create-form .backup-control-bar {
+	margin-bottom: 15px;
 }
 
-body.theme-dark .backup-create-form h3 {
+.backup-create-container {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	width: 100%;
+}
+
+.backup-name-input-group {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	flex: 1;
+}
+
+#backupName {
+	flex: 1;
+	min-width: 180px;
+	height: 30px;
+	padding: 4px 8px;
+	font-size: 1rem;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+#confirmBackupBtn {
+	/* 基本樣式由 .primary-btn 提供 */
+	margin-right: 0;
+}
+
+#cancelBackupBtn {
+	/* 基本樣式由 .secondary-btn 提供 */
+	background-color: #f1f1f1;
+	color: #333;
+}
+
+#cancelBackupBtn:hover {
+	background-color: #e0e0e0;
+}
+
+/* 深色模式下的備份創建表單 */
+body.theme-dark #backupName {
+	background-color: #333;
+	border-color: #555;
 	color: #e0e0e0;
-}
-
-body.theme-dark .form-group label {
-	color: #cccccc;
-}
-
-body.theme-dark .form-group input {
-	background-color: #555555;
-	color: #e0e0e0;
-	border-color: #666666;
 }
 
 body.theme-dark #cancelBackupBtn {
-	background-color: #555555;
+	background-color: #555;
 	color: #e0e0e0;
 }
 
 body.theme-dark #cancelBackupBtn:hover {
-	background-color: #666666;
+	background-color: #666;
 }
 
+/* 響應式設計 */
+@media (max-width: 640px) {
+	.actions-row {
+		flex-direction: column;
+	}
+
+	.action-card {
+		width: 100%;
+		margin-bottom: 10px;
+	}
+}
+
+/* 備份控制條 */
+.backup-control-bar {
+	display: flex;
+	align-items: center;
+	background-color: #f5f5f5;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 12px 15px;
+	margin-bottom: 15px;
+	flex-wrap: wrap;
+}
+
+.backup-control-section {
+	display: flex;
+	align-items: center;
+	padding: 4px 0;
+}
+
+.auto-backup-controls {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.auto-backup-input-group {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.backup-control-divider {
+	height: 24px;
+	width: 1px;
+	background-color: #e0e0e0;
+	margin: 0 15px;
+}
+
+.primary-btn {
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.primary-btn:hover {
+	background-color: #45a049;
+}
+
+.secondary-btn {
+	background-color: #2196f3;
+	color: white;
+	border: none;
+	padding: 6px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.secondary-btn:hover {
+	background-color: #0b7dda;
+}
+
+/* 深色模式下的備份控制條 */
+body.theme-dark .backup-control-bar {
+	background-color: #2d2d2d;
+	border-color: #3e3e3e;
+}
+
+body.theme-dark .backup-control-divider {
+	background-color: #3e3e3e;
+}
+
+body.theme-dark #autoBackupInterval {
+	background-color: #333;
+	border: 1px solid #444;
+	color: #e0e0e0;
+}
+
+body.theme-dark #autoBackupMinutesText {
+	color: #bbb;
+}
+
+/* 響應式調整 */
+@media (max-width: 640px) {
+	.backup-control-bar {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+	}
+
+	.backup-control-divider {
+		width: 100%;
+		height: 1px;
+		margin: 5px 0;
+	}
+
+	.auto-backup-controls {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}
+
+/* 深色模式下的備份列表 */
 body.theme-dark .backup-list {
-	border-color: #555555;
+	border: none;
+	border-radius: 8px;
+	background-color: #2d2d2d;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 body.theme-dark .backup-item {
-	border-bottom-color: #555555;
+	border-bottom-color: #444;
 }
 
 body.theme-dark .backup-item:hover {
 	background-color: #3a3a3a;
 }
 
-body.theme-dark .backup-date {
-	color: #aaaaaa;
+body.theme-dark .backup-name {
+	color: #e0e0e0;
+}
+
+/* 自定義捲軸樣式 - 提高選擇器特異性，強制套用樣式 */
+/* 首先定義基本捲軸樣式 */
+.modal-content .backup-list-container {
+	scrollbar-width: thin !important; /* Firefox */
+	scrollbar-color: #c1c1c1 #f1f1f1 !important; /* Firefox */
+}
+
+/* 整體捲軸 - WebKit/Blink */
+.modal-content .backup-list-container::-webkit-scrollbar {
+	width: 12px !important;
+	height: 12px !important;
+}
+
+/* 捲軸軌道 */
+.modal-content .backup-list-container::-webkit-scrollbar-track {
+	background: #f1f1f1 !important;
+	border-radius: 5px !important;
+	margin: 3px 0 !important;
+	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 捲軸滑塊 */
+.modal-content .backup-list-container::-webkit-scrollbar-thumb {
+	background-color: #c1c1c1 !important;
+	border-radius: 5px !important;
+	border: 2px solid #f1f1f1 !important;
+}
+
+/* 滑鼠懸停在捲軸上時 */
+.modal-content .backup-list-container::-webkit-scrollbar-thumb:hover {
+	background-color: #a8a8a8 !important;
+}
+
+/* 捲軸角落 */
+.modal-content .backup-list-container::-webkit-scrollbar-corner {
+	background-color: #f1f1f1 !important;
+}
+
+/* 暗色主題下的捲軸樣式 - 提高選擇器特異性 */
+body.theme-dark .modal-content .backup-list-container {
+	scrollbar-color: #666 #333 !important; /* Firefox */
+}
+
+body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-track {
+	background-color: #333 !important;
+	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-thumb {
+	background-color: #666 !important;
+	border: 2px solid #333 !important;
+}
+
+body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-thumb:hover {
+	background-color: #888 !important;
+}
+
+body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-corner {
+	background-color: #333 !important;
 }
 
 body.theme-dark .empty-backup-list {
-	color: #aaaaaa;
+	color: #999;
 }
 
-/* 深色模式下的按鈕樣式 */
-body.theme-dark .backup-preview {
-	color: #e0e0e0;
-	border-color: #555555;
-	background-color: transparent;
+/* 直接針對備份列表元素設定捲軸樣式，以增加選擇器特異性 */
+#backupModal .backup-list-container {
+	-ms-overflow-style: -ms-autohiding-scrollbar; /* Edge 和 IE 的自動隱藏捲軸 */
+	will-change: scroll-position; /* 提示瀏覽器將滾動操作視為重要的渲染優化目標 */
 }
 
-body.theme-dark .backup-preview:hover {
-	background-color: rgba(255, 255, 255, 0.1);
-	border-color: #777777;
+/* 全局捲軸重置樣式 - 放在頂部確保優先應用 */
+::-webkit-scrollbar {
+	width: initial;
+	height: initial;
 }
 
-body.theme-dark .backup-restore {
-	color: white;
-	background-color: #4285f4;
-	border-color: #4285f4;
+::-webkit-scrollbar-track {
+	background: initial;
+	border-radius: initial;
 }
 
-body.theme-dark .backup-restore:hover {
-	background-color: #5c9aff;
-	border-color: #5c9aff;
-}
-
-body.theme-dark .backup-delete {
-	color: white;
-	background-color: #ea4335;
-	border-color: #ea4335;
-}
-
-body.theme-dark .backup-delete:hover {
-	background-color: #ff5246;
-	border-color: #ff5246;
+::-webkit-scrollbar-thumb {
+	background: initial;
+	border-radius: initial;
+	border: initial;
 }

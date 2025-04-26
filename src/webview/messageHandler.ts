@@ -85,6 +85,12 @@ export class WebViewMessageHandler {
 				case 'previewBackup':
 					await this.handlePreviewBackup(message);
 					break;
+				case 'getAutoBackupSettings':
+					await this.handleGetAutoBackupSettings();
+					break;
+				case 'updateAutoBackupSettings':
+					await this.handleUpdateAutoBackupSettings(message);
+					break;
 				case 'boardConfigResult':
 					// 這個訊息是對 getBoardConfig 請求的回應，不需要特殊處理
 					break;
@@ -239,7 +245,6 @@ export class WebViewMessageHandler {
 			vscode.window.showErrorMessage(errorMsg);
 		}
 	}
-
 	/**
 	 * 處理請求初始狀態訊息
 	 */
@@ -273,6 +278,17 @@ export class WebViewMessageHandler {
 					const newState = { workspace: {}, board: 'none', theme: 'light' };
 					await this.fileService.writeJsonFile(mainJsonPath, newState);
 				}
+			}
+
+			// 發送自動備份設定
+			try {
+				const interval = await this.settingsManager.getAutoBackupInterval();
+				this.panel.webview.postMessage({
+					command: 'autoBackupSettingsResponse',
+					interval: interval,
+				});
+			} catch (error) {
+				log('Failed to get auto backup settings:', 'error', error);
 			}
 		} catch (error) {
 			log('Failed to read workspace state:', 'error', error);
@@ -743,6 +759,34 @@ export class WebViewMessageHandler {
 		} catch (error) {
 			log(`預覽備份失敗: ${error}`, 'error');
 			this.showErrorMessage(`預覽備份失敗: ${error}`);
+		}
+	}
+	/**
+	 * 處理獲取自動備份設定訊息
+	 */
+	private async handleGetAutoBackupSettings(): Promise<void> {
+		try {
+			const interval = await this.settingsManager.getAutoBackupInterval();
+			this.panel.webview.postMessage({
+				command: 'autoBackupSettingsResponse',
+				interval: interval,
+			});
+		} catch (error) {
+			log('獲取自動備份設定失敗:', 'error', error);
+		}
+	}
+
+	/**
+	 * 處理更新自動備份設定訊息
+	 * @param message 更新自動備份設定訊息物件
+	 */
+	private async handleUpdateAutoBackupSettings(message: any): Promise<void> {
+		try {
+			await this.settingsManager.updateAutoBackupInterval(message.interval);
+			log(`自動備份間隔已更新為 ${message.interval} 分鐘`, 'info');
+		} catch (error) {
+			log('更新自動備份設定失敗:', 'error', error);
+			this.showErrorMessage('更新自動備份設定失敗');
 		}
 	}
 }

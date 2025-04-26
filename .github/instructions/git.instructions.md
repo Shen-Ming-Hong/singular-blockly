@@ -2,7 +2,7 @@
 
 ### 提交變更 Commit Changes
 
-1. 搜尋並確實閱讀完 `.copilot-commit-message-instructions.md` 檔案當中的規則，並依照指示撰寫符合規範的 commit 訊息：
+1. 搜尋並確實閱讀完 `.copilot-commit-message-instructions.md` 檔案當中的"全部"規則，並依照指示撰寫符合規範的 commit 訊息：
    Read and follow the rules in the `.copilot-commit-message-instructions.md` file, and write a compliant commit message according to the instructions:
 
     ```bash

@@ -131,18 +131,30 @@
                 <span class="modal-close">&times;</span>
             </div>
             <div class="modal-body">
-                <div class="backup-actions">
-                    <button id="createBackupBtn"></button>
+                <div class="backup-control-bar">
+                    <div class="backup-control-section">
+                        <button id="createBackupBtn" class="primary-btn"></button>
+                    </div>
+                    <div class="backup-control-divider"></div>
+                    <div class="backup-control-section auto-backup-controls">
+                        <label for="autoBackupInterval" id="autoBackupIntervalLabel"></label>
+                        <div class="auto-backup-input-group">
+                            <input type="number" id="autoBackupInterval" min="1" value="30">
+                            <span id="autoBackupMinutesText"></span>
+                            <button id="saveAutoBackupBtn" class="secondary-btn"></button>
+                        </div>
+                    </div>
                 </div>
                 <div class="backup-create-form" style="display: none;">
-                    <h3 id="createBackupTitle"></h3>
-                    <div class="form-group">
-                        <label for="backupName" id="backupNameLabel"></label>
-                        <input type="text" id="backupName" placeholder="">
-                    </div>
-                    <div class="form-actions">
-                        <button id="confirmBackupBtn"></button>
-                        <button id="cancelBackupBtn"></button>
+                    <div class="backup-control-bar">
+                        <div class="backup-create-container">
+                            <label for="backupName" id="backupNameLabel"></label>
+                            <div class="backup-name-input-group">
+                                <input type="text" id="backupName" placeholder="">
+                                <button id="confirmBackupBtn" class="primary-btn"></button>
+                                <button id="cancelBackupBtn" class="secondary-btn"></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="backup-list-container">

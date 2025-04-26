@@ -34,6 +34,13 @@ window.languageManager.loadMessages('hu', {
 	BACKUP_PREVIEW_BTN: 'Előnézet',
 	BACKUP_RESTORE_BTN: 'Visszaállítás',
 	BACKUP_DELETE_BTN: 'Törlés',
+	AUTO_BACKUP_TITLE: 'Automatikus mentés beállításai',
+	AUTO_BACKUP_INTERVAL_LABEL: 'Mentés időköze:',
+	AUTO_BACKUP_MINUTES: 'perc',
+	AUTO_BACKUP_SAVE: 'Beállítások mentése',
+	AUTO_BACKUP_SAVED: 'Automatikus mentés beállításai elmentve',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: 'Kézi mentés',
 
 	// Board Names
 	BOARD_NONE: 'Nincs',

@@ -18,6 +18,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.23.0] - 2025-04-26
+
+### 新增 Added
+
+- 新增自動備份功能，定期儲存工作區以防止意外資料遺失
+  Added auto-backup feature that periodically saves the workspace to prevent accidental data loss
+- 新增自動備份間隔設定功能，使用者可依需求自訂備份頻率
+  Added auto-backup interval setting feature, allowing users to customize backup frequency
+- 新增備份管理介面UI改進，包含按鈕樣式和版面配置優化
+  Added UI improvements to the backup management interface, including button styling and layout optimization
+
+### 已更新 Updated
+
+- 更新備份管理介面的樣式，提供更現代化的使用者體驗
+  Updated the style of the backup management interface for a more modern user experience
+- 為所有支援的語言添加了自動備份相關的翻譯
+  Added translations related to auto-backup for all supported languages
+
+### 已修改 Changed
+
+- 改進備份列表顯示，增加視覺回饋和互動體驗
+  Improved backup list display with enhanced visual feedback and interaction experience
+- 重構備份相關CSS樣式，使用更一致的風格並支援不同設備尺寸
+  Refactored backup-related CSS styles for more consistent styling and support for different device sizes
+
 ## [0.22.1] - 2025-04-25
 
 ### 已更新 Updated

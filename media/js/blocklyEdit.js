@@ -168,18 +168,22 @@ function updateBackupModalTexts() {
 	if (!languageManager) {
 		log.warn('語言管理器尚未載入，無法更新備份管理視窗文字');
 		return;
-	}
-
-	// 更新標題和按鈕
+	} // 更新標題和按鈕
 	document.getElementById('backupModalTitle').textContent = languageManager.getMessage('BACKUP_MANAGER_TITLE', '備份管理');
 	document.getElementById('createBackupBtn').textContent = languageManager.getMessage('BACKUP_CREATE_NEW', '建立新備份');
-	document.getElementById('createBackupTitle').textContent = languageManager.getMessage('BACKUP_CREATE_NEW', '建立新備份');
 	document.getElementById('backupNameLabel').textContent = languageManager.getMessage('BACKUP_NAME_LABEL', '備份名稱：');
 	document.getElementById('backupName').placeholder = languageManager.getMessage('BACKUP_NAME_PLACEHOLDER', '輸入備份名稱');
 	document.getElementById('confirmBackupBtn').textContent = languageManager.getMessage('BACKUP_CONFIRM', '確認');
 	document.getElementById('cancelBackupBtn').textContent = languageManager.getMessage('BACKUP_CANCEL', '取消');
 	document.getElementById('backupListTitle').textContent = languageManager.getMessage('BACKUP_LIST_TITLE', '備份列表');
 	document.getElementById('emptyBackupMessage').textContent = languageManager.getMessage('BACKUP_LIST_EMPTY', '尚無備份');
+	// 更新自動備份區塊文字
+	document.getElementById('autoBackupIntervalLabel').textContent = languageManager.getMessage(
+		'AUTO_BACKUP_INTERVAL_LABEL',
+		'備份間隔時間：'
+	);
+	document.getElementById('autoBackupMinutesText').textContent = languageManager.getMessage('AUTO_BACKUP_MINUTES', '分鐘');
+	document.getElementById('saveAutoBackupBtn').textContent = languageManager.getMessage('AUTO_BACKUP_SAVE', '儲存設定');
 
 	// 更新備份按鈕標題
 	document.getElementById('backupButton').title = languageManager.getMessage('BACKUP_BUTTON_TITLE', '備份管理');
@@ -219,6 +223,11 @@ window.confirm = function (message) {
 const backupManager = {
 	// 備份列表
 	backupList: [],
+	// 自動備份計時器
+	autoBackupTimer: null,
+	// 自動備份間隔（分鐘）
+	autoBackupInterval: 30,
+
 	// 初始化備份管理器
 	init: function () {
 		// 綁定按鈕事件
@@ -227,12 +236,16 @@ const backupManager = {
 		document.getElementById('createBackupBtn').addEventListener('click', this.showBackupForm.bind(this));
 		document.getElementById('confirmBackupBtn').addEventListener('click', this.createBackup.bind(this));
 		document.getElementById('cancelBackupBtn').addEventListener('click', this.hideBackupForm.bind(this));
+		document.getElementById('saveAutoBackupBtn').addEventListener('click', this.saveAutoBackupSettings.bind(this));
 
 		// 更新多國語言文字
 		updateBackupModalTexts();
 
 		// 初始化備份列表
 		this.refreshBackupList();
+
+		// 請求自動備份設定
+		this.requestAutoBackupSettings();
 	},
 
 	// 打開模態對話框
@@ -247,11 +260,10 @@ const backupManager = {
 		document.getElementById('backupModal').style.display = 'none';
 		this.hideBackupForm();
 	},
-
 	// 顯示建立備份表單
 	showBackupForm: function () {
-		// 隱藏建立按鈕
-		document.querySelector('.backup-actions').style.display = 'none';
+		// 隱藏控制欄
+		document.querySelector('.backup-control-bar:not(.backup-create-form .backup-control-bar)').style.display = 'none';
 		// 顯示表單
 		document.querySelector('.backup-create-form').style.display = 'block';
 
@@ -271,8 +283,8 @@ const backupManager = {
 
 	// 隱藏建立備份表單
 	hideBackupForm: function () {
-		// 顯示建立按鈕
-		document.querySelector('.backup-actions').style.display = 'block';
+		// 顯示控制欄
+		document.querySelector('.backup-control-bar:not(.backup-create-form .backup-control-bar)').style.display = 'flex';
 		// 隱藏表單
 		document.querySelector('.backup-create-form').style.display = 'none';
 	},
@@ -434,6 +446,123 @@ const backupManager = {
 			command: 'previewBackup',
 			name: backupName,
 		});
+	},
+
+	// 請求自動備份設定
+	requestAutoBackupSettings: function () {
+		vscode.postMessage({
+			command: 'getAutoBackupSettings',
+		});
+	},
+
+	// 更新自動備份設定界面
+	updateAutoBackupUI: function (minutes) {
+		// 更新輸入框的值
+		document.getElementById('autoBackupInterval').value = minutes;
+
+		// 更新內部變數
+		this.autoBackupInterval = minutes;
+
+		// 如果計時器已存在，先清除
+		if (this.autoBackupTimer) {
+			clearInterval(this.autoBackupTimer);
+		}
+
+		// 設置自動備份計時器 (轉換為毫秒)
+		this.startAutoBackupTimer();
+
+		log.info(`自動備份間隔設定為 ${minutes} 分鐘`);
+	},
+
+	// 開始自動備份計時器
+	startAutoBackupTimer: function () {
+		// 如果間隔為0，則不啟用自動備份
+		if (this.autoBackupInterval <= 0) {
+			return;
+		}
+
+		const intervalMs = this.autoBackupInterval * 60 * 1000;
+		this.autoBackupTimer = setInterval(this.createAutoBackup.bind(this), intervalMs);
+		log.info(`已啟動自動備份，間隔: ${this.autoBackupInterval} 分鐘`);
+	},
+
+	// 儲存自動備份設定
+	saveAutoBackupSettings: function () {
+		const intervalInput = document.getElementById('autoBackupInterval');
+		let interval = parseInt(intervalInput.value, 10);
+
+		// 確保值有效 (最小為1分鐘)
+		if (isNaN(interval) || interval < 1) {
+			interval = 1;
+			intervalInput.value = '1';
+		}
+
+		// 發送設定更新到 VSCode 擴展
+		vscode.postMessage({
+			command: 'updateAutoBackupSettings',
+			interval: interval,
+		});
+
+		// 更新自動備份計時器
+		this.updateAutoBackupUI(interval);
+
+		// 顯示成功訊息
+		const successMessage = window.languageManager
+			? window.languageManager.getMessage('AUTO_BACKUP_SAVED', '自動備份設定已儲存')
+			: '自動備份設定已儲存';
+
+		vscode.postMessage({
+			command: 'log',
+			source: 'blocklyEdit',
+			level: 'info',
+			message: successMessage,
+			timestamp: new Date().toISOString(),
+		});
+	},
+
+	// 建立自動備份
+	createAutoBackup: function () {
+		try {
+			const workspace = Blockly.getMainWorkspace();
+			if (!workspace) {
+				log.warn('無法建立自動備份: 未找到有效的工作區');
+				return;
+			}
+
+			const state = Blockly.serialization.workspaces.save(workspace);
+			if (!state || !state.blocks || state.blocks.blocks.length === 0) {
+				log.info('工作區為空，不建立自動備份');
+				return;
+			}
+
+			const boardSelect = document.getElementById('boardSelect');
+
+			// 生成自動備份名稱 (格式: auto_YYYYMMDD_HHMMSS)
+			const autoBackupPrefix = window.languageManager ? window.languageManager.getMessage('AUTO_BACKUP_PREFIX', 'auto_') : 'auto_';
+
+			const now = new Date();
+			const year = now.getFullYear();
+			const month = String(now.getMonth() + 1).padStart(2, '0');
+			const day = String(now.getDate()).padStart(2, '0');
+			const hours = String(now.getHours()).padStart(2, '0');
+			const minutes = String(now.getMinutes()).padStart(2, '0');
+			const seconds = String(now.getSeconds()).padStart(2, '0');
+			const backupName = `${autoBackupPrefix}${year}${month}${day}_${hours}${minutes}${seconds}`;
+
+			// 發送建立備份請求到 VSCode 擴展
+			vscode.postMessage({
+				command: 'createBackup',
+				name: backupName,
+				state: state,
+				board: boardSelect.value,
+				theme: currentTheme,
+				isAutoBackup: true,
+			});
+
+			log.info(`已建立自動備份: ${backupName}`);
+		} catch (error) {
+			log.error('自動備份失敗:', error);
+		}
 	},
 };
 
@@ -1054,7 +1183,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 				break;
 
-			// 移除多餘的備份載入功能
+			// 處理自動備份設定回應
+			case 'autoBackupSettingsResponse':
+				backupManager.updateAutoBackupUI(message.interval);
+				break;
 		}
 	});
 

@@ -34,6 +34,13 @@ window.languageManager.loadMessages('ko', {
 	BACKUP_PREVIEW_BTN: '미리보기',
 	BACKUP_RESTORE_BTN: '복원',
 	BACKUP_DELETE_BTN: '삭제',
+	AUTO_BACKUP_TITLE: '자동 백업 설정',
+	AUTO_BACKUP_INTERVAL_LABEL: '백업 간격:',
+	AUTO_BACKUP_MINUTES: '분',
+	AUTO_BACKUP_SAVE: '설정 저장',
+	AUTO_BACKUP_SAVED: '자동 백업 설정이 저장되었습니다',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: '수동 백업',
 
 	// Board Names
 	BOARD_NONE: '없음',

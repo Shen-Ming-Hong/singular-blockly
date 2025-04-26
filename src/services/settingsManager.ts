@@ -17,6 +17,10 @@ export class SettingsManager {
 	private readonly SETTINGS_FILE = 'settings.json';
 	private fileService: FileService;
 
+	// 自動備份設定鍵名
+	private readonly AUTO_BACKUP_INTERVAL_KEY = 'singular-blockly.autoBackupInterval';
+	private readonly DEFAULT_AUTO_BACKUP_INTERVAL = 30; // 預設 30 分鐘
+
 	/**
 	 * 建立設定管理器實例
 	 * @param workspacePath 工作區路徑
@@ -227,5 +231,24 @@ export class SettingsManager {
 		} catch (error) {
 			log(`Failed to sync library dependencies in platformio.ini: ${error}`, 'error', error);
 		}
+	}
+
+	/**
+	 * 取得自動備份時間間隔（分鐘）
+	 * @returns 自動備份時間間隔，預設為 5 分鐘
+	 */
+	async getAutoBackupInterval(): Promise<number> {
+		return this.readSetting<number>(this.AUTO_BACKUP_INTERVAL_KEY, this.DEFAULT_AUTO_BACKUP_INTERVAL);
+	}
+
+	/**
+	 * 更新自動備份時間間隔
+	 * @param minutes 分鐘數
+	 */
+	async updateAutoBackupInterval(minutes: number): Promise<void> {
+		// 確保輸入值有效（至少 1 分鐘）
+		const validMinutes = Math.max(1, minutes);
+		await this.updateSetting(this.AUTO_BACKUP_INTERVAL_KEY, validMinutes);
+		log(`Auto backup interval updated to ${validMinutes} minutes`, 'info');
 	}
 }

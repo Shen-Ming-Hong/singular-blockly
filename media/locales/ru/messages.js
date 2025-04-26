@@ -34,6 +34,13 @@ window.languageManager.loadMessages('ru', {
 	BACKUP_PREVIEW_BTN: 'Просмотр',
 	BACKUP_RESTORE_BTN: 'Восстановить',
 	BACKUP_DELETE_BTN: 'Удалить',
+	AUTO_BACKUP_TITLE: 'Настройки автоматического резервирования',
+	AUTO_BACKUP_INTERVAL_LABEL: 'Интервал резервирования:',
+	AUTO_BACKUP_MINUTES: 'минут',
+	AUTO_BACKUP_SAVE: 'Сохранить настройки',
+	AUTO_BACKUP_SAVED: 'Настройки автоматического резервирования сохранены',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: 'Ручное резервирование',
 
 	// Board Names
 	BOARD_NONE: 'Нет',

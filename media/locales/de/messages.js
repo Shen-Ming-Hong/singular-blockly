@@ -34,6 +34,13 @@ window.languageManager.loadMessages('de', {
 	BACKUP_PREVIEW_BTN: 'Vorschau',
 	BACKUP_RESTORE_BTN: 'Wiederherstellen',
 	BACKUP_DELETE_BTN: 'Löschen',
+	AUTO_BACKUP_TITLE: 'Automatische Backup-Einstellungen',
+	AUTO_BACKUP_INTERVAL_LABEL: 'Backup-Intervall:',
+	AUTO_BACKUP_MINUTES: 'Minuten',
+	AUTO_BACKUP_SAVE: 'Einstellungen speichern',
+	AUTO_BACKUP_SAVED: 'Automatische Backup-Einstellungen gespeichert',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: 'Manuelles Backup',
 
 	// Board Names
 	BOARD_NONE: 'Keine',

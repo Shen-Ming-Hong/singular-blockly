@@ -34,6 +34,13 @@ window.languageManager.loadMessages('zh-hant', {
 	BACKUP_PREVIEW_BTN: '預覽',
 	BACKUP_RESTORE_BTN: '還原',
 	BACKUP_DELETE_BTN: '刪除',
+	AUTO_BACKUP_TITLE: '自動備份設定',
+	AUTO_BACKUP_INTERVAL_LABEL: '備份間隔時間：',
+	AUTO_BACKUP_MINUTES: '分鐘',
+	AUTO_BACKUP_SAVE: '儲存設定',
+	AUTO_BACKUP_SAVED: '自動備份設定已儲存',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: '手動備份',
 
 	// Board Names
 	BOARD_NONE: '無',

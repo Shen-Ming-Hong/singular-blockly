@@ -71,6 +71,8 @@ A Visual Studio Code extension that provides a visual programming interface usin
     - Backup creation with timestamps
     - Backup preview without restoration
     - Safe restoration with automatic temporary backups
+    - Auto-backup with configurable time intervals
+    - Modern UI with responsive design for backup management
   - Seven-segment display support with common cathode/anode modes
 
 - 🛠 **Development Features**

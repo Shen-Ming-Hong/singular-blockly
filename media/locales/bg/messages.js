@@ -34,6 +34,13 @@ window.languageManager.loadMessages('bg', {
 	BACKUP_PREVIEW_BTN: 'Преглед',
 	BACKUP_RESTORE_BTN: 'Възстановяване',
 	BACKUP_DELETE_BTN: 'Изтриване',
+	AUTO_BACKUP_TITLE: 'Настройки за автоматично архивиране',
+	AUTO_BACKUP_INTERVAL_LABEL: 'Интервал на архивиране:',
+	AUTO_BACKUP_MINUTES: 'минути',
+	AUTO_BACKUP_SAVE: 'Запазване на настройките',
+	AUTO_BACKUP_SAVED: 'Настройките за автоматично архивиране са запазени',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: 'Ръчно архивиране',
 
 	// Board Names
 	BOARD_NONE: 'Няма',

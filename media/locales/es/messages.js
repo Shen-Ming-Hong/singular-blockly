@@ -34,6 +34,13 @@ window.languageManager.loadMessages('es', {
 	BACKUP_PREVIEW_BTN: 'Previsualizar',
 	BACKUP_RESTORE_BTN: 'Restaurar',
 	BACKUP_DELETE_BTN: 'Eliminar',
+	AUTO_BACKUP_TITLE: 'Configuración de copia automática',
+	AUTO_BACKUP_INTERVAL_LABEL: 'Intervalo de copia:',
+	AUTO_BACKUP_MINUTES: 'minutos',
+	AUTO_BACKUP_SAVE: 'Guardar configuración',
+	AUTO_BACKUP_SAVED: 'Configuración de copia automática guardada',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: 'Copia manual',
 
 	// Board Names
 	BOARD_NONE: 'Ninguna',

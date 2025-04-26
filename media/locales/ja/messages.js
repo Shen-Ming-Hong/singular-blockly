@@ -34,6 +34,13 @@ window.languageManager.loadMessages('ja', {
 	BACKUP_PREVIEW_BTN: 'プレビュー',
 	BACKUP_RESTORE_BTN: '復元',
 	BACKUP_DELETE_BTN: '削除',
+	AUTO_BACKUP_TITLE: '自動バックアップ設定',
+	AUTO_BACKUP_INTERVAL_LABEL: 'バックアップ間隔:',
+	AUTO_BACKUP_MINUTES: '分',
+	AUTO_BACKUP_SAVE: '設定を保存',
+	AUTO_BACKUP_SAVED: '自動バックアップ設定が保存されました',
+	AUTO_BACKUP_PREFIX: 'auto_',
+	MANUAL_BACKUP_TITLE: '手動バックアップ',
 
 	// Board Names
 	BOARD_NONE: 'なし',
