@@ -18,6 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.23.1] - 2025-04-27
+
+### 已修復 Fixed
+
+- 改進了檔案名稱驗證功能，允許使用中文和更多有效字符，排除了檔案系統不允許的特殊字符
+  Improved filename validation to support Chinese characters and more valid characters, excluding only special characters not allowed by the file system
+- 更新了無效檔案名稱的錯誤訊息，使其更具體明確
+  Updated error message for invalid filenames to be more specific and clear
+
 ## [0.23.0] - 2025-04-26
 
 ### 新增 Added

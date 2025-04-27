@@ -296,10 +296,9 @@ const backupManager = {
 			alert('請輸入備份名稱');
 			return;
 		}
-
 		// 安全性檢查：確保檔案名稱有效
 		if (!this.isValidFilename(backupName)) {
-			alert('備份名稱包含無效字符，請使用字母、數字、底線和連字符');
+			alert('備份名稱包含無效字符，請避免使用 \\ / : * ? " < > | 等特殊字符');
 			return;
 		}
 
@@ -331,8 +330,8 @@ const backupManager = {
 
 	// 驗證檔案名稱
 	isValidFilename: function (filename) {
-		// 只允許字母、數字、底線、連字符和點號
-		return /^[a-zA-Z0-9_\-\.]+$/.test(filename);
+		// 允許中文、字母、數字、底線、連字符和點號，排除檔案系統不允許的特殊字符
+		return /^[^\\/:*?"<>|]+$/.test(filename);
 	},
 
 	// 刷新備份列表
