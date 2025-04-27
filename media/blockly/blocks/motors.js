@@ -13,7 +13,8 @@ Blockly.Blocks['servo_setup'] = {
 			.appendField(window.languageManager.getMessage('SERVO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
-					return window.getDigitalPinOptions();
+					// 使用支援PWM的引腳選項，因為伺服馬達需要PWM信號
+					return window.getPWMPinOptions();
 				}),
 				'PIN'
 			);

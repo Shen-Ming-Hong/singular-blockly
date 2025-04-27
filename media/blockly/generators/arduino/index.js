@@ -69,6 +69,7 @@ window.arduinoGenerator.init = function (workspace) {
 	window.arduinoGenerator.variables_ = Object.create(null); // 新增 variables 用於儲存全域變數
 	window.arduinoGenerator.definitions_ = Object.create(null); // 新增 definitions 用於儲存其他定義
 	window.arduinoGenerator.functions_ = Object.create(null); // 新增 functions 用於儲存函數
+	window.arduinoGenerator.comments_ = Object.create(null); // 新增 comments_ 用於儲存註釋
 	window.arduinoGenerator.setupCode_ = []; // 新增 setupCode_ 用於儲存 setup 區塊的程式碼
 	window.arduinoGenerator.warnings_ = []; // 新增 warnings_ 用於儲存警告訊息，如腳位模式不正確
 	window.arduinoGenerator.pinModes_ = {}; // 每次生成代碼時重置腳位模式追蹤
@@ -166,13 +167,21 @@ window.arduinoGenerator.finish = function (code) {
 		functions = '// 函數前向宣告\n' + forwardDeclarations + '\n';
 	}
 	functions += functionDefinitions;
-
 	// 輸出警告訊息為註解
 	let warnings = '';
 	if (window.arduinoGenerator.warnings_ && window.arduinoGenerator.warnings_.length > 0) {
 		warnings += '/* 腳位模式警告:\n';
 		warnings += window.arduinoGenerator.warnings_.map(w => ' * ' + w).join('\n');
 		warnings += '\n */\n\n';
+	}
+
+	// 處理註釋
+	let comments = '';
+	for (let name in window.arduinoGenerator.comments_) {
+		comments += window.arduinoGenerator.comments_[name];
+	}
+	if (comments) {
+		comments += '\n';
 	}
 
 	// 同步腳位模式到 Blockly 積木 (確保積木上能正確顯示警告)
@@ -183,8 +192,8 @@ window.arduinoGenerator.finish = function (code) {
 		}, 0);
 	}
 
-	// 返回完整程式碼，依序是：警告、includes、變數、定義、函數、主程式
-	return warnings + includes + variables + definitions + functions + code;
+	// 返回完整程式碼，依序是：警告、註釋、includes、變數、定義、函數、主程式
+	return warnings + comments + includes + variables + definitions + functions + code;
 };
 
 window.arduinoGenerator.scrub_ = function (block, code, opt_thisOnly) {

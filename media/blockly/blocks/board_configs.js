@@ -550,6 +550,27 @@ window.getAnalogOutputRange = function () {
 	return board ? board.analogOutputRange : { min: 0, max: 255, defaultValue: 0 };
 };
 
+// 獲取支援PWM的引腳選項的全局函數
+window.getPWMPinOptions = function () {
+	if (window.currentBoard === 'none') {
+		return [[window.languageManager.getMessage('BOARD_NONE'), '-1']];
+	}
+
+	const board = window.BOARD_CONFIGS[window.currentBoard];
+	if (!board || !board.digitalPins) {
+		return [];
+	}
+
+	// 根據開發板類型篩選支援PWM的引腳
+	if (window.currentBoard === 'esp32') {
+		// ESP32所有數位引腳都支援PWM，除了輸入專用的引腳
+		return board.digitalPins.filter(pin => !pin[0].includes('Input only'));
+	} else {
+		// 對於其他開發板，篩選名稱中包含"PWM"的引腳
+		return board.digitalPins.filter(pin => pin[0].includes('PWM'));
+	}
+};
+
 // 添加獲取 PWM 通道的輔助函數
 window.getPWMChannel = function (pin) {
 	const board = window.BOARD_CONFIGS[window.currentBoard];

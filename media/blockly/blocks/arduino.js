@@ -550,13 +550,13 @@ Blockly.Blocks['arduino_analog_write'] = {
 	init: function () {
 		this.lastKnownBoard_ = window.currentBoard;
 		const range = window.getAnalogOutputRange();
-
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ARDUINO_ANALOG_WRITE'))
 			.appendField(window.languageManager.getMessage('ARDUINO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
-					return window.getDigitalPinOptions().filter(pin => pin[0].includes('PWM'));
+					// 使用支援PWM的引腳選項，因為類比寫入需要PWM信號
+					return window.getPWMPinOptions();
 				}),
 				'PIN'
 			);

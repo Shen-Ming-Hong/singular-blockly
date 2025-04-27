@@ -40,9 +40,12 @@ A Visual Studio Code extension that provides a visual programming interface usin
 
 - 🧩 **Rich Block Categories**
   - Arduino I/O Operations
+    - Smart pin options with automatic PWM pin detection
+    - Optimized analog write functionality for PWM pins
   - Servo Motor Control
     - Configurable servo setup and angle control
     - Smart dropdown menu with automatic servo name detection
+    - Board-specific servo library support (ESP32/Arduino)
   - Sensor Blocks
     - Ultrasonic Sensor with hardware interrupt support
     - Seven-segment Display with common cathode/anode modes
@@ -82,6 +85,7 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Drag-and-drop block management
   - Automatic block code generation system for critical blocks
   - Standardized logging service for code generation
+  - Code comments generation system for improved readability
   - Zoom controls and trashcan
   - Light and dark theme support with theme toggle
   - Touch device support with pinch-to-zoom functionality

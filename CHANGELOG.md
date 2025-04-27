@@ -18,6 +18,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.24.0] - 2025-04-27
+
+### 新增 Added
+
+- 新增 `getPWMPinOptions()` 函數來獲取支援 PWM 的引腳選項，提高伺服馬達和類比寫入積木的準確性
+  Added `getPWMPinOptions()` function to get PWM-supported pins, improving accuracy for servo and analog write blocks
+- 在程式碼生成中添加註釋系統，使生成的程式碼更易於理解
+  Added comments system in code generation, making generated code more understandable
+
+### 已更新 Updated
+
+- 更新類比寫入積木，現在使用專用的 PWM 引腳選項函數，確保只顯示支援 PWM 的引腳
+  Updated analog write block to use dedicated PWM pin options function, ensuring only PWM-capable pins are displayed
+- 更新伺服馬達積木，現在使用 PWM 引腳選項，確保硬體相容性
+  Updated servo motor blocks to use PWM pin options, ensuring hardware compatibility
+
+### 已修改 Changed
+
+- 為 ESP32 開發板添加專用的伺服馬達支援，使用 ESP32Servo 庫及其特定設定
+  Added dedicated servo support for ESP32 boards, using ESP32Servo library and its specific configurations
+- 改進伺服馬達程式碼生成，根據不同開發板選擇適當的伺服馬達庫和設定
+  Improved servo code generation, selecting appropriate servo libraries and settings based on different boards
+
 ## [0.23.1] - 2025-04-27
 
 ### 已修復 Fixed
