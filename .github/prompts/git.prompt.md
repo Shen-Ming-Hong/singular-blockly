@@ -1,3 +1,7 @@
+---
+mode:"agent"
+---
+
 ## 開始執行指令 Git 提交與發布 Git Commit and Release
 
 ### 提交變更 Commit Changes

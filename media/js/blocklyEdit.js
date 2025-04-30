@@ -5,6 +5,156 @@
  */
 const vscode = acquireVsCodeApi();
 
+// 實驗積木清單
+window.experimentalBlocks = [];
+// 潛在實驗積木清單 - 存儲所有被定義為實驗性的積木類型
+window.potentialExperimentalBlocks = [];
+
+/**
+ * 註冊一個積木為實驗性質
+ * @param {string} blockType - 積木類型名稱
+ */
+window.registerExperimentalBlock = function (blockType) {
+	if (blockType && !window.potentialExperimentalBlocks.includes(blockType)) {
+		// 將積木類型添加到潛在實驗積木清單
+		window.potentialExperimentalBlocks.push(blockType);
+		log.info(`✅ 已註冊新的潛在實驗性積木: ${blockType}`);
+	} else if (blockType && window.potentialExperimentalBlocks.includes(blockType)) {
+		// 已經註冊過的積木
+		log.info(`⚠️ 積木 ${blockType} 已經是潛在實驗性積木，跳過重複註冊`);
+	} else {
+		// 無效的積木類型
+		log.warn(`❌ 嘗試註冊無效的實驗性積木: ${blockType}`);
+	}
+};
+
+/**
+ * 從實驗積木清單中移除積木
+ * @param {string} blockType - 積木類型名稱
+ */
+window.unregisterExperimentalBlock = function (blockType) {
+	if (blockType && window.experimentalBlocks.includes(blockType)) {
+		// 從清單中移除指定積木類型
+		const index = window.experimentalBlocks.indexOf(blockType);
+		window.experimentalBlocks.splice(index, 1);
+		log.info(`🗑️ 已從實驗性積木清單移除: ${blockType}`);
+
+		// 移除後立即輸出更新的清單
+		log.info('實驗積木移除後清單更新 >>>>>>');
+		logExperimentalBlocks();
+		log.info('實驗積木移除後清單更新 <<<<<<');
+		return true;
+	} else if (blockType) {
+		// 清單中沒有這個積木
+		log.info(`⚠️ 積木 ${blockType} 不在實驗性積木清單中，無需移除`);
+	} else {
+		// 無效的積木類型
+		log.warn(`❌ 嘗試移除無效的實驗性積木: ${blockType}`);
+	}
+	return false;
+};
+
+// 紀錄上次輸出的實驗積木清單字串，用於比較是否有變化
+let lastExperimentalBlocksJson = '';
+
+// 輸出實驗積木清單供檢查
+function logExperimentalBlocks() {
+	if (window.experimentalBlocks && window.experimentalBlocks.length > 0) {
+		// 產生目前實驗積木清單的JSON字串
+		const currentJson = JSON.stringify(window.experimentalBlocks);
+
+		// 每次都輸出實驗積木清單，加上時間戳以便追蹤
+		const now = new Date();
+		const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
+		log.info(`[${timestamp}] 當前的實驗性積木清單: ${currentJson}`);
+
+		// 檢查實驗積木清單是否有變化
+		if (currentJson !== lastExperimentalBlocksJson) {
+			log.info(`實驗積木清單已更新! 之前: ${lastExperimentalBlocksJson || '(無)'}`);
+			lastExperimentalBlocksJson = currentJson;
+		} else {
+			// 即使沒有變化也輸出一條訊息
+			log.info(`實驗積木清單沒有變化，保持 ${currentJson.length} 個積木`);
+		}
+	} else {
+		log.info('當前無實驗性積木註冊');
+	}
+}
+
+/**
+ * 更新實驗積木清單，確保清單只包含當前工作區中存在的實驗積木
+ * 同時檢查工作區中的積木，將潛在實驗積木添加到實際的實驗積木清單中
+ * @param {Blockly.Workspace} workspace - 當前工作區
+ */
+function updateExperimentalBlocksList(workspace) {
+	if (!workspace) {
+		return;
+	}
+
+	// 獲取當前工作區中所有積木類型的清單
+	const currentBlockTypes = new Set();
+	const allBlocks = workspace.getAllBlocks(false);
+	allBlocks.forEach(block => {
+		if (block && block.type) {
+			currentBlockTypes.add(block.type);
+		}
+	});
+
+	// 1. 檢查實驗積木清單，移除已不在工作區中的積木類型
+	const blocksToRemove = [];
+	for (const experimentalBlockType of window.experimentalBlocks) {
+		// 檢查該類型的積木是否存在於工作區中
+		const blockStillExists = currentBlockTypes.has(experimentalBlockType);
+
+		// 如果工作區中不存在此類型的積木，則將其添加到待移除清單
+		if (!blockStillExists) {
+			blocksToRemove.push(experimentalBlockType);
+		}
+	}
+
+	// 移除不存在的積木類型
+	if (blocksToRemove.length > 0) {
+		log.info(`檢測到 ${blocksToRemove.length} 個實驗積木已從工作區移除`);
+
+		// 一次性移除所有不存在的積木類型
+		blocksToRemove.forEach(blockType => {
+			window.unregisterExperimentalBlock(blockType);
+		});
+	}
+
+	// 2. 檢查工作區中的積木，將潛在實驗積木添加到實際的實驗積木清單中
+	const blocksToAdd = [];
+
+	// 遍歷工作區中所有的積木類型
+	currentBlockTypes.forEach(blockType => {
+		// 檢查是否是潛在實驗積木
+		if (window.potentialExperimentalBlocks.includes(blockType)) {
+			// 檢查是否已經在實驗積木清單中
+			if (!window.experimentalBlocks.includes(blockType)) {
+				blocksToAdd.push(blockType);
+			}
+		}
+	});
+
+	// 添加新發現的實驗積木
+	if (blocksToAdd.length > 0) {
+		log.info(`檢測到工作區中有 ${blocksToAdd.length} 個新的實驗積木需要添加到清單`);
+
+		blocksToAdd.forEach(blockType => {
+			// 直接添加到實驗積木清單，不調用 registerExperimentalBlock 避免循環
+			if (!window.experimentalBlocks.includes(blockType)) {
+				window.experimentalBlocks.push(blockType);
+				log.info(`✅ 從工作區添加實驗性積木到清單: ${blockType}`);
+			}
+		});
+
+		// 添加後輸出更新的清單
+		log.info('從工作區添加實驗積木後清單更新 >>>>>>');
+		logExperimentalBlocks();
+		log.info('從工作區添加實驗積木後清單更新 <<<<<<');
+	}
+}
+
 // 日誌系統
 const log = {
 	/**
@@ -633,9 +783,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 註冊主題切換按鈕事件
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
 	// 初始化備份管理器
 	backupManager.init();
+	// 在初始化時先輸出一次實驗積木清單
+	log.info('初始化階段輸出實驗積木清單');
+	logExperimentalBlocks();
 
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
@@ -784,7 +936,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			log.error('保存工作區狀態失敗:', error);
 		}
 	};
-
 	// 單一的工作區變更監聽器
 	workspace.addChangeListener(event => {
 		// 忽略拖動中的 UI 事件
@@ -793,6 +944,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 		// 工作區完全載入後修復函數呼叫積木和連接點
 		if (event.type === Blockly.Events.FINISHED_LOADING) {
+			// 工作區載入完成時輸出實驗積木清單
+			log.info('工作區載入完成，輸出實驗積木清單');
+			logExperimentalBlocks();
+
+			// 工作區載入完成後，自動更新實驗積木清單
+			log.info('工作區載入完成，更新實驗積木清單');
+			updateExperimentalBlocksList(workspace);
+
 			// 延遲執行以確保所有積木已完全載入
 			setTimeout(() => {
 				log.info('工作區載入完成，開始修復函數呼叫積木關聯');
@@ -885,15 +1044,74 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}
 			}
-		}
-
-		// 更新程式碼
+		} // 更新程式碼
 		if (
 			event.type === Blockly.Events.BLOCK_MOVE ||
 			event.type === Blockly.Events.BLOCK_CHANGE ||
 			event.type === Blockly.Events.BLOCK_DELETE ||
 			event.type === Blockly.Events.BLOCK_CREATE
 		) {
+			// 記錄積木變動事件
+			const eventType = event.type.toString().replace('Blockly.Events.', '');
+			const blockId = event.blockId || '(未知ID)';
+			let blockInfo = '(未知積木)';
+			let blockType = null;
+
+			// 對於刪除事件，需要特殊處理，因為積木已經從工作區中移除
+			if (event.type === Blockly.Events.BLOCK_DELETE) {
+				// 對於刪除事件，我們可以從事件的oldJson屬性中獲取積木類型
+				if (event.oldJson && event.oldJson.type) {
+					blockType = event.oldJson.type;
+					blockInfo = `刪除的積木類型: ${blockType}`; // 檢查被刪除的積木是否在實驗積木清單中
+					if (window.experimentalBlocks.includes(blockType)) {
+						log.info(`偵測到實驗性積木被刪除: ${blockType}`);
+
+						// 檢查工作區中是否還有同類型的其他積木
+						const sameTypeBlocks = workspace.getBlocksByType(blockType, false);
+
+						// 如果工作區中不再有此類型的積木，則從實驗積木清單中移除
+						if (!sameTypeBlocks || sameTypeBlocks.length === 0) {
+							window.unregisterExperimentalBlock(blockType);
+						} else {
+							log.info(`工作區仍有 ${sameTypeBlocks.length} 個 ${blockType} 積木，保留在實驗積木清單中`);
+						}
+					}
+				}
+			} else {
+				// 對於非刪除事件，嘗試獲取更多積木信息
+				try {
+					const block = workspace.getBlockById(blockId);
+					if (block) {
+						blockType = block.type;
+						blockInfo = `類型: ${blockType}`;
+					}
+				} catch (e) {
+					// 忽略錯誤
+				}
+			}
+			log.info(`積木變動事件: ${eventType}, ID: ${blockId}, ${blockInfo}`);
+
+			// 檢查是否是實驗性積木
+			let isExperimental = false;
+			if (blockType && window.experimentalBlocks.includes(blockType)) {
+				isExperimental = true;
+				log.info(`注意: 變動的積木 "${blockType}" 已在實驗積木清單中`);
+			} else if (blockType && window.potentialExperimentalBlocks.includes(blockType)) {
+				log.info(`注意: 變動的積木 "${blockType}" 是潛在實驗積木，將在更新清單時檢查`);
+			} // 在積木創建或刪除後，更新實驗積木清單
+			if (event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE) {
+				// 延遲執行以確保其他事件處理已完成
+				setTimeout(() => {
+					log.info('檢測到積木變動，主動更新實驗積木清單');
+					updateExperimentalBlocksList(workspace);
+				}, 100);
+			}
+
+			// 輸出最新的實驗積木清單
+			log.info('實驗積木清單檢查開始 >>>>>>');
+			logExperimentalBlocks();
+			log.info('實驗積木清單檢查結束 <<<<<<');
+
 			// 檢查是否是函式定義積木變化
 			try {
 				const code = arduinoGenerator.workspaceToCode(workspace);

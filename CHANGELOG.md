@@ -12,9 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 新增 Added
 
+- 新增編碼馬達相關積木，包括設定、讀取、重設和PID控制功能
+  Added encoder motor blocks, including setup, read, reset and PID control functionality
+- 新增實驗性積木追蹤系統，可自動識別與管理實驗階段的積木
+  Added experimental blocks tracking system to automatically identify and manage blocks in experimental stage
+
 ### 已修復 Fixed
 
 ### 已更新 Updated
+
+- 更新專案資料夾結構，將指導文件從 `instructions` 移至 `prompts` 資料夾並新增模式標記
+  Updated project folder structure, moved instruction files from `instructions` to `prompts` folder and added mode tags
 
 ### 已修改 Changed
 

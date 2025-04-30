@@ -14,6 +14,26 @@
 		{
 			"kind": "block",
 			"type": "servo_stop"
+		},
+		{
+			"kind": "block",
+			"type": "encoder_setup"
+		},
+		{
+			"kind": "block",
+			"type": "encoder_read"
+		},
+		{
+			"kind": "block",
+			"type": "encoder_reset"
+		},
+		{
+			"kind": "block",
+			"type": "encoder_pid_setup"
+		},
+		{
+			"kind": "block",
+			"type": "encoder_pid_compute"
 		}
 	]
 }

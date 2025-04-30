@@ -1,3 +1,7 @@
+---
+mode:"agent"
+---
+
 # 發布流程 Release Process
 
 本文檔描述了專案的版本發布標準流程，確保版本控制和變更追蹤的一致性。
@@ -110,18 +114,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 發布前檢查 Post-Release Checks
 
--   [ ] 確認 CHANGELOG.md 已正確更新
+- [ ] 確認 CHANGELOG.md 已正確更新
         Confirm CHANGELOG.md has been correctly updated
--   [ ] 確認 package.json 版本號已更新
+- [ ] 確認 package.json 版本號已更新
         Confirm the version number in package.json has been updated
--   [ ] 評估是否需要更新 README.md 以反映新版本功能或重要變更
+- [ ] 評估是否需要更新 README.md 以反映新版本功能或重要變更
         Evaluate if README.md needs to be updated to reflect new features or important changes
 
 ## 注意事項 Notes
 
--   保持一致的發布流程有助於專案的長期維護
+- 保持一致的發布流程有助於專案的長期維護
     Maintaining a consistent release process helps with the long-term maintenance of the project
--   詳細的變更日誌讓使用者和開發者能夠清楚了解每個版本的更新內容
+- 詳細的變更日誌讓使用者和開發者能夠清楚了解每個版本的更新內容
     Detailed changelogs allow users and developers to clearly understand the updates in each version
--   遵循語意化版本規範可以清楚傳達每次發布的變更程度
+- 遵循語意化版本規範可以清楚傳達每次發布的變更程度
     Following semantic versioning clearly communicates the extent of changes in each release
