@@ -15,6 +15,11 @@ window.languageManager.loadMessages('bg', {
 	CODE_TAB: 'Код',
 	BOARD_SELECT_LABEL: 'Избор на платка:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Открити са експериментални блокове',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Вашето работно пространство съдържа експериментални блокове (откроени с жълти пунктирани граници). Тези функции могат да бъдат променени или премахнати в бъдещи актуализации, използвайте ги с повишено внимание.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Преглед',
 	THEME_TOGGLE: 'Смяна на тема',

@@ -15,6 +15,11 @@ window.languageManager.loadMessages('tr', {
 	CODE_TAB: 'Kod',
 	BOARD_SELECT_LABEL: 'Kart seç:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Deneysel Bloklar Tespit Edildi',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Çalışma alanınız deneysel bloklar içeriyor (sarı kesikli kenarlıklarla vurgulanmış). Bu özellikler gelecekteki güncellemelerde değişebilir veya kaldırılabilir, dikkatli kullanın.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Önizleme',
 	THEME_TOGGLE: 'Temayı değiştir',

@@ -15,6 +15,11 @@ window.languageManager.loadMessages('hu', {
 	CODE_TAB: 'Kód',
 	BOARD_SELECT_LABEL: 'Válassz táblát:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Kísérleti blokkok észlelve',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'A munkaterület kísérleti blokkokat tartalmaz (sárga szaggatott szegéllyel kiemelve). Ezek a funkciók változhatnak vagy eltávolításra kerülhetnek a jövőbeni frissítésekben, óvatosan használja őket.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Előnézet',
 	THEME_TOGGLE: 'Téma váltása',

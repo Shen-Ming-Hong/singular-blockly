@@ -15,6 +15,11 @@ window.languageManager.loadMessages('en', {
 	CODE_TAB: 'Code',
 	BOARD_SELECT_LABEL: 'Select Board:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Experimental Blocks Detected',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Your workspace contains experimental blocks (highlighted with yellow dashed borders). These features may change or be removed in future updates, use with caution.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Preview',
 	THEME_TOGGLE: 'Toggle Theme',

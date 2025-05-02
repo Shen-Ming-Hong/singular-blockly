@@ -230,7 +230,17 @@ export class WebViewManager {
 
 			// 替換其他 URI
 			htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
+			htmlContent = htmlContent.replace(
+				'{experimentalCssUri}',
+				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/experimentalBlocks.css'))).toString()
+			);
 			htmlContent = htmlContent.replace('{jsUri}', jsUri.toString());
+			htmlContent = htmlContent.replace(
+				'{experimentalMarkerUri}',
+				webview
+					.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/experimentalBlockMarker.js')))
+					.toString()
+			);
 			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());

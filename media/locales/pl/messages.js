@@ -15,6 +15,11 @@ window.languageManager.loadMessages('pl', {
 	CODE_TAB: 'Kod',
 	BOARD_SELECT_LABEL: 'Wybierz płytkę:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Wykryto bloki eksperymentalne',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Twój obszar roboczy zawiera bloki eksperymentalne (wyróżnione żółtymi przerywanymi krawędziami). Te funkcje mogą ulec zmianie lub zostać usunięte w przyszłych aktualizacjach, używaj ich ostrożnie.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Podgląd',
 	THEME_TOGGLE: 'Zmień motyw',

@@ -46,6 +46,9 @@ A Visual Studio Code extension that provides a visual programming interface usin
     - Configurable servo setup and angle control
     - Smart dropdown menu with automatic servo name detection
     - Board-specific servo library support (ESP32/Arduino)
+  - Encoder Motor Support
+    - Setup, read, reset and PID control functionality
+    - Automatic pin management for encoder motors
   - Sensor Blocks
     - Ultrasonic Sensor with hardware interrupt support
     - Seven-segment Display with common cathode/anode modes
@@ -86,6 +89,10 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Automatic block code generation system for critical blocks
   - Standardized logging service for code generation
   - Code comments generation system for improved readability
+  - Experimental blocks tracking system
+    - Visual indication with yellow dashed borders
+    - Notification system for experimental features
+    - Automatic detection and marking of experimental blocks
   - Zoom controls and trashcan
   - Light and dark theme support with theme toggle
   - Touch device support with pinch-to-zoom functionality

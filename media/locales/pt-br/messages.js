@@ -15,6 +15,11 @@ window.languageManager.loadMessages('pt-br', {
 	CODE_TAB: 'Código',
 	BOARD_SELECT_LABEL: 'Selecionar placa:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Blocos experimentais detectados',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Seu espaço de trabalho contém blocos experimentais (destacados com bordas amarelas tracejadas). Esses recursos podem ser alterados ou removidos em atualizações futuras, use com cautela.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Pré-visualização',
 	THEME_TOGGLE: 'Alternar tema',

@@ -15,6 +15,11 @@ window.languageManager.loadMessages('ja', {
 	CODE_TAB: 'コード',
 	BOARD_SELECT_LABEL: 'ボードを選択:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: '実験的ブロックが検出されました',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'ワークスペースに実験的ブロック（黄色の点線の枠で強調表示）が含まれています。これらの機能は将来のアップデートで変更または削除される可能性があります。注意して使用してください。',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'プレビュー',
 	THEME_TOGGLE: 'テーマ切替',

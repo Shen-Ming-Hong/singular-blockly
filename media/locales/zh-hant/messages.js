@@ -15,6 +15,10 @@ window.languageManager.loadMessages('zh-hant', {
 	CODE_TAB: '程式碼',
 	BOARD_SELECT_LABEL: '選擇開發板：',
 
+	// 實驗積木提示
+	EXPERIMENTAL_BLOCKS_TITLE: '發現實驗性積木',
+	EXPERIMENTAL_BLOCKS_DESC: '您的作品中含有黃色虛線標示的實驗性積木，這些功能在未來可能會變更或移除，請謹慎使用。',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: '預覽',
 	THEME_TOGGLE: '切換主題',

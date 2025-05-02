@@ -15,6 +15,11 @@ window.languageManager.loadMessages('cs', {
 	CODE_TAB: 'Kód',
 	BOARD_SELECT_LABEL: 'Vybrat desku:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Nalezeny experimentální bloky',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Váš pracovní prostor obsahuje experimentální bloky (zvýrazněné žlutým přerušovaným okrajem). Tyto funkce se mohou v budoucích aktualizacích změnit nebo být odstraněny, používejte je s opatrností.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Náhled',
 	THEME_TOGGLE: 'Přepnout motiv',

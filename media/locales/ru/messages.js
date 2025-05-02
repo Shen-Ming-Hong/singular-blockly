@@ -15,6 +15,11 @@ window.languageManager.loadMessages('ru', {
 	CODE_TAB: 'Код',
 	BOARD_SELECT_LABEL: 'Выберите плату:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Обнаружены экспериментальные блоки',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Ваша рабочая область содержит экспериментальные блоки (выделенные желтыми пунктирными границами). Эти функции могут измениться или быть удалены в будущих обновлениях, используйте их с осторожностью.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Предпросмотр',
 	THEME_TOGGLE: 'Сменить тему',

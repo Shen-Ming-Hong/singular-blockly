@@ -15,6 +15,11 @@ window.languageManager.loadMessages('it', {
 	CODE_TAB: 'Codice',
 	BOARD_SELECT_LABEL: 'Seleziona scheda:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Blocchi sperimentali rilevati',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Il tuo spazio di lavoro contiene blocchi sperimentali (evidenziati con bordi gialli tratteggiati). Queste funzionalità potrebbero cambiare o essere rimosse in futuri aggiornamenti, usale con cautela.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Anteprima',
 	THEME_TOGGLE: 'Cambia tema',

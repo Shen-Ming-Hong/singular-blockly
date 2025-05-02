@@ -15,6 +15,11 @@ window.languageManager.loadMessages('ko', {
 	CODE_TAB: '코드',
 	BOARD_SELECT_LABEL: '보드 선택:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: '실험적 블록 감지됨',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'작업 공간에 실험적 블록(노란색 점선 테두리로 강조 표시됨)이 포함되어 있습니다. 이러한 기능은 향후 업데이트에서 변경되거나 제거될 수 있으므로 주의해서 사용하세요.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: '미리보기',
 	THEME_TOGGLE: '테마 전환',

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blockly Edit</title>
     <link rel="stylesheet" href="{cssUri}">
+    <link rel="stylesheet" href="{experimentalCssUri}">
     <script>window.TOOLBOX_URL = '{toolboxUri}';</script>
     <script>
         // 設定初始主題
@@ -90,6 +91,14 @@
 <body class="theme-{theme}">
     <div class="container">
         <div class="controls-container">
+            <div id="experimentalBlocksIndicator" class="experimental-blocks-indicator hidden" title="">
+                <div class="indicator-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor"
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                    </svg>
+                </div>
+            </div>
             <div class="board-select">
                 <label for="boardSelect" id="boardSelectLabel"></label>
                 <select id="boardSelect">
@@ -120,6 +129,23 @@
                 </button>
             </div>
         </div>
+
+        <!-- 實驗積木提示容器 -->
+        <div id="experimentalBlocksNotice" class="experimental-blocks-notice">
+            <div class="experimental-notice-content">
+                <div class="experimental-notice-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor"
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                    </svg>
+                </div>
+                <div class="experimental-notice-text">
+                    <div class="experimental-notice-title" id="experimentalNoticeTitle"></div>
+                    <div class="experimental-notice-description" id="experimentalNoticeDesc"></div>
+                </div>
+            </div>
+        </div>
+
         <div id="blocklyArea">
             <div id="blocklyDiv"></div>
         </div>
@@ -183,6 +209,7 @@
     <script src="{sensorsBlocksUri}"></script>
     <script src="{motorsBlocksUri}"></script>
     {arduinoModules}
+    <script src="{experimentalMarkerUri}"></script>
     <script src="{jsUri}"></script>
 </body>
 

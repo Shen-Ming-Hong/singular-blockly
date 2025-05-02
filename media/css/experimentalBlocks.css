@@ -1,0 +1,207 @@
+/**
+ * @license
+ * Copyright 2024 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
+ * 實驗性積木樣式
+ */
+
+/* 為積木路徑添加虛線邊框樣式 - 通用樣式 */
+.blockly-experimental-block {
+	stroke: #ffcc00 !important; /*使用適合亮暗模式的黃色 */
+	filter: drop-shadow(0 0 3px rgba(255, 204, 0, 0.6)) !important; /* 添加黃色發光效果 */
+}
+
+/* 為實驗積木添加流動的虛線效果 */
+.blockly-experimental-block {
+	stroke-dasharray: 5, 3 !important; /* 調整虛線間距 */
+	stroke-width: 2.5px !important; /* 線條寬度 */
+	animation: dash-animation 8s linear infinite !important; /* 動畫速度*/
+}
+
+/* 淺色主題下增強對比度 */
+body.theme-light .blockly-experimental-block {
+	filter: drop-shadow(0 0 3px rgba(255, 204, 0, 0.7)) !important; /* 增強亮色模式下的發光效果 */
+}
+
+/* 深色主題下增強可見性 */
+body.theme-dark .blockly-experimental-block {
+	filter: drop-shadow(0 0 3px rgba(255, 204, 0, 0.8)) !important; /* 增強暗色模式下的發光效果 */
+}
+
+/* 滑鼠懸停效果 - 增強發光 */
+.blocklyDraggable:hover .blockly-experimental-block {
+	filter: drop-shadow(0 0 4px rgba(255, 204, 0, 1)) !important; /* 懸停時增強發光 */
+	stroke-width: 3px !important; /*懸停時線條變粗*/
+}
+/* 提供流動的動畫效果 */
+@keyframes dash-animation {
+	0% {
+		stroke-dashoffset: 24;
+	}
+	100% {
+		stroke-dashoffset: 0;
+	}
+}
+
+/* 實驗積木提示框樣式 */
+.experimental-blocks-notice {
+	position: fixed;
+	top: 20px; /* 從底部改為頂部 */
+	left: 50%; /* 置中顯示 */
+	transform: translateX(-50%); /* 確保完全居中 */
+	z-index: 1000;
+	max-width: 320px;
+	background-color: rgba(255, 255, 255, 0.95);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+	border-radius: 8px;
+	padding: 12px 16px;
+	transition: all 0.3s ease;
+	opacity: 0;
+	opacity: 0;
+	backdrop-filter: blur(5px);
+	pointer-events: none; /* 確保不會干擾滑鼠事件 */
+	border-top: 4px solid #ffcc00; /* 頂部邊框 */
+}
+
+.experimental-blocks-notice.visible {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateX(-50%) translateY(0); /* 確保位置正確 */
+}
+
+.experimental-blocks-notice.hidden {
+	transform: translateX(-50%) translateY(-120%); /* 向上移出畫面 */
+	opacity: 0;
+}
+
+.experimental-notice-content {
+	display: flex;
+	align-items: flex-start;
+}
+
+.experimental-notice-icon {
+	color: #ffcc00;
+	margin-right: 12px;
+	flex-shrink: 0;
+}
+
+.experimental-notice-text {
+	flex: 1;
+}
+
+.experimental-notice-title {
+	font-weight: 600;
+	font-size: 14px;
+	margin-bottom: 6px;
+	color: #333333;
+}
+
+.experimental-notice-description {
+	font-size: 13px;
+	line-height: 1.4;
+	color: #555555;
+}
+
+/* 深色主題樣式調整 */
+body.theme-dark .experimental-blocks-notice {
+	background-color: rgba(50, 50, 50, 0.95);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+	border-top: 4px solid #ffcc00; /* 確保暗模式也保留頂部邊框 */
+}
+
+body.theme-dark .experimental-notice-title {
+	color: #f0f0f0;
+}
+
+body.theme-dark .experimental-notice-description {
+	color: #cccccc;
+}
+
+/* 提示框淡出動畫 */
+@keyframes fade-out {
+	from {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(-50%) translateY(-120%); /* 向上移出畫面 */
+	}
+}
+
+/* 提示框淡入動畫 */
+@keyframes fade-in {
+	from {
+		opacity: 0;
+		transform: translateX(-50%) translateY(-120%); /* 從上方進入 */
+	}
+	to {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+}
+
+.experimental-blocks-notice.fade-in {
+	animation: fade-in 0.5s forwards ease-out;
+}
+
+.experimental-blocks-notice.fade-out {
+	animation: fade-out 0.5s forwards ease-in;
+}
+
+/* 實驗積木持久性指示器樣式 - 已整合到controls-container中 */
+.experimental-blocks-indicator {
+	/* 不再需要固定位置，因為已經包含在controls-container中 */
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+	margin-right: 10px; /* 與其他控制元素保持間距 */
+	transition: all 0.3s ease;
+}
+
+.experimental-blocks-indicator:hover {
+	transform: scale(1.1);
+	z-index: 100; /* 確保懸停時在其他控制項之上 */
+}
+
+.experimental-blocks-indicator.hidden {
+	display: none; /* 簡單地不顯示而不佔據空間 */
+	opacity: 0;
+	width: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.indicator-icon {
+	color: #ffcc00;
+	display: flex;
+	align-items: center;
+	font-size: 18px; /* 增大圖標尺寸 */
+	filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5)); /* 為圖標添加陰影效果 */
+	animation: pulse 2s infinite; /* 添加脈衝動畫引起注意 */
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.1);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+body.theme-dark .indicator-icon {
+	color: #ffdd33; /* 深色模式下使圖標顏色更亮 */
+}
+
+/* 移除不需要的深色主題背景樣式 */

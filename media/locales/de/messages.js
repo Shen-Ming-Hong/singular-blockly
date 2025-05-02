@@ -15,6 +15,11 @@ window.languageManager.loadMessages('de', {
 	CODE_TAB: 'Code',
 	BOARD_SELECT_LABEL: 'Board auswählen:',
 
+	// Experimental Blocks Notice
+	EXPERIMENTAL_BLOCKS_TITLE: 'Experimentelle Blöcke erkannt',
+	EXPERIMENTAL_BLOCKS_DESC:
+		'Ihr Arbeitsbereich enthält experimentelle Blöcke (mit gelben gestrichelten Rändern markiert). Diese Funktionen können sich in zukünftigen Updates ändern oder entfernt werden, nutzen Sie sie mit Vorsicht.',
+
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Vorschau',
 	THEME_TOGGLE: 'Design wechseln',
