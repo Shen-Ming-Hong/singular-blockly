@@ -18,6 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.26.0] - 2025-05-15
+
+### 新增 Added
+
+- 新增超音波觸發（ultrasonic_trigger）和讀取（ultrasonic_read）積木的自動註冊，確保它們能找到超音波感測器積木
+  Added automatic registration of ultrasonic trigger and read blocks, ensuring they can find the ultrasonic sensor block
+
+### 已更新 Updated
+
+- 改進超音波感測器相關積木之間的關聯性，現在超音波觸發和讀取積木能自動偵測工作區中的超音波感測器積木
+  Improved relationship between ultrasonic-related blocks; now ultrasonic trigger and read blocks can automatically detect ultrasonic sensor blocks in the workspace
+- 增強超音波感測器積木的日誌系統，提供更詳細的運行時資訊，有助於除錯
+  Enhanced logging system for ultrasonic sensor blocks, providing more detailed runtime information for debugging
+
+### 已修改 Changed
+
+- 重構超音波感測器程式碼生成邏輯，提升程式碼品質和可維護性
+  Refactored ultrasonic sensor code generation logic for better code quality and maintainability
+
 ## [0.25.0] - 2025-05-02
 
 ### 新增 Added

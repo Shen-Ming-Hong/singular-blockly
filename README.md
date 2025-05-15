@@ -51,6 +51,8 @@ A Visual Studio Code extension that provides a visual programming interface usin
     - Automatic pin management for encoder motors
   - Sensor Blocks
     - Ultrasonic Sensor with hardware interrupt support
+      - Smart block linking for ultrasonic trigger and read operations
+      - Automatic detection and configuration between ultrasonic blocks
     - Seven-segment Display with common cathode/anode modes
     - Threshold function blocks for analog input monitoring
   - Functions with parameter support
