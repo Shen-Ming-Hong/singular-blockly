@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.27.1] - 2025-05-16
+
+### 已修改 Changed
+
+- 改進搜尋結果容器的捲軸樣式，使其與備份管理的捲軸保持一致性
+  Improved scrollbar styles for search results container to maintain consistency with backup management scrollbars
+
 ## [0.27.0] - 2025-05-16
 
 ### 新增 Added
