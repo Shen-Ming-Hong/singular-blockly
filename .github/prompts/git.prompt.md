@@ -16,8 +16,8 @@ mode:"agent"
 
 ### 標記版本 Tag Version
 
-2. 標記此次發布的版本，格式為 v+版本編號：
-   Tag this release version, format is v+version number:
+2. 標記此次發布的版本，格式為 v+版本編號，以 `CHANGELOG.md` 檔案中的最新版本號為準：
+   Tag this release version, using the format v+version number, based on the latest version number in the `CHANGELOG.md` file:
 
     ```bash
     git tag v1.2.3
@@ -29,6 +29,5 @@ mode:"agent"
    Push changes and tags to the remote repository:
 
     ```bash
-    git push
-    git push --tags
+    git push && git push --tags
     ```
