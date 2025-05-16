@@ -54,6 +54,18 @@ window.languageManager.loadMessages('ko', {
 	BOARD_MEGA: '아두이노 메가',
 	BOARD_ESP32: 'ESP32',
 	BOARD_SUPERMINI: '수퍼 미니',
+	// Block Search UI
+	FUNCTION_SEARCH_TITLE: '블록 검색',
+	FUNCTION_SEARCH_BUTTON_TITLE: '블록 검색',
+	FUNCTION_SEARCH_PLACEHOLDER: '블록 이름 또는 매개변수 입력...',
+	FUNCTION_SEARCH_BTN: '검색',
+	FUNCTION_SEARCH_PREV: '이전',
+	FUNCTION_SEARCH_NEXT: '다음',
+	FUNCTION_SEARCH_EMPTY: '아직 검색하지 않음',
+	FUNCTION_SEARCH_NO_RESULTS: '일치하는 블록을 찾을 수 없습니다',
+	FUNCTION_RESULT_PREFIX: '블록: ',
+	FUNCTION_KEYBOARD_SHORTCUT_TIP: '(단축키: Ctrl+F)',
+	FUNCTION_SEARCH_HISTORY_TITLE: '검색 기록',
 
 	// Block Categories
 	CATEGORY_LOGIC: '논리',

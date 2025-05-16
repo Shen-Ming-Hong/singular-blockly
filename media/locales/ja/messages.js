@@ -54,6 +54,18 @@ window.languageManager.loadMessages('ja', {
 	BOARD_MEGA: 'Arduino Mega',
 	BOARD_ESP32: 'ESP32',
 	BOARD_SUPERMINI: 'Super Mini',
+	// Block Search UI
+	FUNCTION_SEARCH_TITLE: 'ブロック検索',
+	FUNCTION_SEARCH_BUTTON_TITLE: 'ブロック検索',
+	FUNCTION_SEARCH_PLACEHOLDER: 'ブロック名やパラメータを入力...',
+	FUNCTION_SEARCH_BTN: '検索',
+	FUNCTION_SEARCH_PREV: '前へ',
+	FUNCTION_SEARCH_NEXT: '次へ',
+	FUNCTION_SEARCH_EMPTY: '未検索',
+	FUNCTION_SEARCH_NO_RESULTS: '一致するブロックが見つかりません',
+	FUNCTION_RESULT_PREFIX: 'ブロック: ',
+	FUNCTION_KEYBOARD_SHORTCUT_TIP: '(ショートカット: Ctrl+F)',
+	FUNCTION_SEARCH_HISTORY_TITLE: '検索履歴',
 
 	// Block Categories
 	CATEGORY_LOGIC: '論理',

@@ -54,6 +54,18 @@ window.languageManager.loadMessages('pt-br', {
 	BOARD_MEGA: 'Arduino Mega',
 	BOARD_ESP32: 'ESP32',
 	BOARD_SUPERMINI: 'Super Mini',
+	// Block Search UI
+	FUNCTION_SEARCH_TITLE: 'Pesquisar Blocos',
+	FUNCTION_SEARCH_BUTTON_TITLE: 'Pesquisar Blocos',
+	FUNCTION_SEARCH_PLACEHOLDER: 'Digite o nome ou parâmetros do bloco...',
+	FUNCTION_SEARCH_BTN: 'Pesquisar',
+	FUNCTION_SEARCH_PREV: 'Anterior',
+	FUNCTION_SEARCH_NEXT: 'Próximo',
+	FUNCTION_SEARCH_EMPTY: 'Ainda não pesquisado',
+	FUNCTION_SEARCH_NO_RESULTS: 'Nenhum bloco correspondente encontrado',
+	FUNCTION_RESULT_PREFIX: 'Bloco: ',
+	FUNCTION_KEYBOARD_SHORTCUT_TIP: '(Atalho: Ctrl+F)',
+	FUNCTION_SEARCH_HISTORY_TITLE: 'Histórico de pesquisa',
 
 	// Block Categories
 	CATEGORY_LOGIC: 'Lógica',

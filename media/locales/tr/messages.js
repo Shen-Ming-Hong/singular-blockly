@@ -54,6 +54,18 @@ window.languageManager.loadMessages('tr', {
 	BOARD_MEGA: 'Arduino Mega',
 	BOARD_ESP32: 'ESP32',
 	BOARD_SUPERMINI: 'Super Mini',
+	// Block Search UI
+	FUNCTION_SEARCH_TITLE: 'Blok Ara',
+	FUNCTION_SEARCH_BUTTON_TITLE: 'Blok Ara',
+	FUNCTION_SEARCH_PLACEHOLDER: 'Blok adı veya parametreleri girin...',
+	FUNCTION_SEARCH_BTN: 'Ara',
+	FUNCTION_SEARCH_PREV: 'Önceki',
+	FUNCTION_SEARCH_NEXT: 'Sonraki',
+	FUNCTION_SEARCH_EMPTY: 'Henüz arama yapılmadı',
+	FUNCTION_SEARCH_NO_RESULTS: 'Eşleşen blok bulunamadı',
+	FUNCTION_RESULT_PREFIX: 'Blok: ',
+	FUNCTION_KEYBOARD_SHORTCUT_TIP: '(Kısayol: Ctrl+F)',
+	FUNCTION_SEARCH_HISTORY_TITLE: 'Arama Geçmişi',
 
 	// Block Categories
 	CATEGORY_LOGIC: 'Mantık',

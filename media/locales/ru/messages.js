@@ -54,6 +54,18 @@ window.languageManager.loadMessages('ru', {
 	BOARD_MEGA: 'Arduino Mega',
 	BOARD_ESP32: 'ESP32',
 	BOARD_SUPERMINI: 'Super Mini',
+	// Block Search UI
+	FUNCTION_SEARCH_TITLE: 'Поиск блоков',
+	FUNCTION_SEARCH_BUTTON_TITLE: 'Поиск блоков',
+	FUNCTION_SEARCH_PLACEHOLDER: 'Введите название блока или параметры...',
+	FUNCTION_SEARCH_BTN: 'Поиск',
+	FUNCTION_SEARCH_PREV: 'Предыдущий',
+	FUNCTION_SEARCH_NEXT: 'Следующий',
+	FUNCTION_SEARCH_EMPTY: 'Поиск еще не выполнен',
+	FUNCTION_SEARCH_NO_RESULTS: 'Совпадающие блоки не найдены',
+	FUNCTION_RESULT_PREFIX: 'Блок: ',
+	FUNCTION_KEYBOARD_SHORTCUT_TIP: '(Комбинация: Ctrl+F)',
+	FUNCTION_SEARCH_HISTORY_TITLE: 'История поиска',
 
 	// Block Categories
 	CATEGORY_LOGIC: 'Логика',

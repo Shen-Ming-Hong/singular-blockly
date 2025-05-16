@@ -18,6 +18,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.27.0] - 2025-05-16
+
+### 新增 Added
+
+- 新增積木搜尋功能，支援在工作區內快速搜尋積木名稱或參數，並可高亮、導覽搜尋結果，支援多國語言與快捷鍵（Ctrl+F）
+  Added block search feature: quickly search blocks by name or parameter in the workspace, highlight and navigate results, with multi-language support and keyboard shortcut (Ctrl+F)
+
+### 已更新 Updated
+
+- 所有支援語言新增積木搜尋相關翻譯字串
+  Added block search related translation strings for all supported languages
+
 ## [0.26.0] - 2025-05-15
 
 ### 新增 Added

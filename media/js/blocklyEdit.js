@@ -197,6 +197,33 @@ function updateBackupModalTexts() {
 	document.getElementById('backupButton').title = languageManager.getMessage('BACKUP_BUTTON_TITLE', '備份管理');
 }
 
+/**
+ * 更新積木搜尋視窗的文字為多語言版本
+ */
+function updateFunctionSearchModalTexts() {
+	// 獲取語言管理器
+	const languageManager = window.languageManager;
+	if (!languageManager) {
+		log.warn('語言管理器尚未載入，無法更新積木搜尋視窗文字');
+		return;
+	} // 更新標題和按鈕
+
+	document.getElementById('functionSearchModalTitle').textContent = languageManager.getMessage('FUNCTION_SEARCH_TITLE', '搜尋積木');
+	document.getElementById('functionSearchInput').placeholder = languageManager.getMessage(
+		'FUNCTION_SEARCH_PLACEHOLDER',
+		'輸入積木名稱或參數...'
+	);
+	// 不再設置按鈕文字，因為使用圖標
+	document.getElementById('prevResultBtn').textContent = languageManager.getMessage('FUNCTION_SEARCH_PREV', '上一個');
+	document.getElementById('nextResultBtn').textContent = languageManager.getMessage('FUNCTION_SEARCH_NEXT', '下一個');
+	document.getElementById('emptySearchMessage').textContent = languageManager.getMessage('FUNCTION_SEARCH_EMPTY', '尚未搜尋');
+
+	// 更新搜尋按鈕標題，包含快捷鍵提示
+	const buttonTitle = languageManager.getMessage('FUNCTION_SEARCH_BUTTON_TITLE', '搜尋積木');
+	const shortcutTip = languageManager.getMessage('FUNCTION_KEYBOARD_SHORTCUT_TIP', '(快捷鍵: Ctrl+F)');
+	document.getElementById('functionSearchToggle').title = `${buttonTitle} ${shortcutTip}`;
+}
+
 // 註冊工具箱元件
 Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCategory.registrationName, Blockly.ToolboxCategory);
 
@@ -573,6 +600,279 @@ const backupManager = {
 	},
 };
 
+// 積木搜尋功能
+const functionSearch = {
+	// 搜尋結果
+	searchResults: [],
+	// 當前選中的結果索引
+	currentResultIndex: -1,
+
+	// 初始化搜尋功能
+	init: function () {
+		// 綁定按鈕事件
+		document.getElementById('functionSearchToggle').addEventListener('click', this.openModal.bind(this));
+		document.getElementById('functionSearchModal').querySelector('.modal-close').addEventListener('click', this.closeModal.bind(this));
+		document.getElementById('functionSearchBtn').addEventListener('click', this.performSearch.bind(this));
+		document.getElementById('functionSearchInput').addEventListener('keypress', e => {
+			if (e.key === 'Enter') {
+				this.performSearch();
+			}
+		});
+		// 點擊modal外部關閉
+		document.getElementById('functionSearchModal').addEventListener('click', event => {
+			// 如果點擊的是modal本身而不是其內容
+			if (event.target === document.getElementById('functionSearchModal')) {
+				log.info('點擊了搜尋模態視窗背景，準備關閉');
+				this.closeModal();
+			}
+		});
+
+		// 綁定結果導航按鈕
+		document.getElementById('prevResultBtn').addEventListener('click', this.navigateToPrevResult.bind(this));
+		document.getElementById('nextResultBtn').addEventListener('click', this.navigateToNextResult.bind(this));
+
+		// 設置快捷鍵 (Ctrl+F)
+		document.addEventListener('keydown', e => {
+			if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+				e.preventDefault(); // 阻止瀏覽器默認搜尋
+				this.openModal();
+			}
+		});
+
+		// 更新多國語言文字
+		updateFunctionSearchModalTexts();
+	},
+
+	// 打開搜尋對話框
+	openModal: function () {
+		document.getElementById('functionSearchModal').style.display = 'block';
+		document.getElementById('functionSearchInput').focus();
+	},
+
+	// 關閉搜尋對話框
+	closeModal: function () {
+		document.getElementById('functionSearchModal').style.display = 'none';
+	},
+
+	// 執行搜尋
+	performSearch: function () {
+		const query = document.getElementById('functionSearchInput').value.trim().toLowerCase();
+		if (!query) {
+			return;
+		}
+
+		log.info(`執行函式積木搜尋: "${query}"`);
+
+		const workspace = Blockly.getMainWorkspace();
+		if (!workspace) {
+			log.warn('無法執行搜尋: 未找到有效的工作區');
+			return;
+		}
+
+		// 清除先前的搜尋結果
+		this.clearResults();
+
+		// 搜尋積木
+		this.searchResults = this.searchBlocks(query);
+
+		// 顯示搜尋結果
+		this.displayResults();
+
+		// 如果有結果，自動選擇第一個
+		if (this.searchResults.length > 0) {
+			this.currentResultIndex = 0;
+			this.highlightCurrentResult();
+			this.updateNavigationVisibility(true);
+		} else {
+			this.updateNavigationVisibility(false);
+		}
+	},
+
+	// 在工作區中搜尋積木
+	searchBlocks: function (query) {
+		const workspace = Blockly.getMainWorkspace();
+		const allBlocks = workspace.getAllBlocks(false);
+
+		return allBlocks.filter(block => {
+			// 搜尋積木類型
+			if (block.type.toLowerCase().includes(query)) {
+				return true;
+			}
+
+			// 搜尋積木文字內容
+			for (const input of block.inputList) {
+				for (const field of input.fieldRow) {
+					if (!field.isVisible() || !field.getValue()) {
+						continue;
+					}
+
+					const fieldValue = String(field.getValue()).toLowerCase();
+					if (fieldValue.includes(query)) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		});
+	},
+
+	// 顯示搜尋結果
+	displayResults: function () {
+		const resultsContainer = document.getElementById('searchResults');
+		resultsContainer.innerHTML = '';
+
+		if (this.searchResults.length === 0) {
+			const emptyMessage = window.languageManager
+				? window.languageManager.getMessage('FUNCTION_SEARCH_NO_RESULTS', '沒有找到匹配的函式積木')
+				: '沒有找到匹配的函式積木';
+
+			resultsContainer.innerHTML = `<div class="empty-search-results">${emptyMessage}</div>`;
+			return;
+		}
+
+		// 創建結果列表
+		const resultList = document.createElement('div');
+		resultList.className = 'result-list';
+
+		this.searchResults.forEach((block, index) => {
+			const resultItem = document.createElement('div');
+			resultItem.className = 'result-item';
+			resultItem.setAttribute('data-index', index);
+			resultItem.id = `search-result-${index}`; // 添加唯一ID
+
+			// 獲取積木預覽文字
+			const previewTexts = [];
+			block.inputList.forEach(input => {
+				input.fieldRow.forEach(field => {
+					if (field.isVisible() && field.getValue()) {
+						const text = field.getText ? field.getText() : String(field.getValue());
+						if (text) {
+							previewTexts.push(text);
+						}
+					}
+				});
+			});
+
+			const blockName = block.type;
+			const previewText = previewTexts.length > 0 ? previewTexts.join(' ') : '';
+
+			const functionPrefix = window.languageManager
+				? window.languageManager.getMessage('FUNCTION_RESULT_PREFIX', '函式: ')
+				: '函式: ';
+
+			resultItem.innerHTML = `
+        <div class="result-title">${functionPrefix}${blockName}</div>
+        <div class="result-preview">${previewText}</div>
+      `;
+
+			// 點擊結果項時聚焦到積木
+			resultItem.addEventListener('click', () => {
+				this.currentResultIndex = index;
+				this.highlightCurrentResult();
+			});
+
+			resultList.appendChild(resultItem);
+		});
+
+		resultsContainer.appendChild(resultList);
+
+		// 更新結果計數
+		document.getElementById('resultCounter').textContent = `1/${this.searchResults.length}`;
+	},
+
+	// 清除所有搜尋結果
+	clearResults: function () {
+		this.searchResults = [];
+		this.currentResultIndex = -1;
+		document.getElementById('searchResults').innerHTML = '';
+	},
+
+	// 清除高亮顯示
+	clearHighlight: function () {
+		// 移除所有積木的高亮樣式
+		const workspace = Blockly.getMainWorkspace();
+		if (workspace) {
+			workspace.getAllBlocks().forEach(block => {
+				if (block.pathObject && block.pathObject.svgPath) {
+					block.pathObject.svgPath.classList.remove('highlight-block');
+				}
+			});
+		}
+	},
+
+	// 高亮當前選中的結果
+	highlightCurrentResult: function () {
+		if (this.currentResultIndex < 0 || this.currentResultIndex >= this.searchResults.length) {
+			return;
+		}
+
+		// 清除先前的高亮
+		this.clearHighlight();
+
+		// 獲取當前積木
+		const block = this.searchResults[this.currentResultIndex];
+
+		// 高亮顯示積木
+		if (block.pathObject && block.pathObject.svgPath) {
+			block.pathObject.svgPath.classList.add('highlight-block');
+		}
+
+		// 移動到積木位置
+		this.centerOnBlock(block);
+
+		// 更新結果計數
+		document.getElementById('resultCounter').textContent = `${this.currentResultIndex + 1}/${this.searchResults.length}`;
+
+		// 更新結果項的視覺選中狀態
+		const resultItems = document.querySelectorAll('.result-item');
+		resultItems.forEach(item => {
+			item.classList.remove('selected');
+			if (parseInt(item.getAttribute('data-index')) === this.currentResultIndex) {
+				item.classList.add('selected');
+				// 確保當前項目在視圖中可見
+				item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+			}
+		});
+	},
+
+	// 將視圖中心移動到指定積木
+	centerOnBlock: function (block) {
+		if (!block) {
+			return;
+		}
+
+		// 通過 Blockly API 將視圖中心移動到積木位置
+		Blockly.getMainWorkspace().centerOnBlock(block.id);
+	},
+
+	// 導航到下一個結果
+	navigateToNextResult: function () {
+		if (this.searchResults.length === 0) {
+			return;
+		}
+
+		this.currentResultIndex = (this.currentResultIndex + 1) % this.searchResults.length;
+		this.highlightCurrentResult();
+	},
+
+	// 導航到上一個結果
+	navigateToPrevResult: function () {
+		if (this.searchResults.length === 0) {
+			return;
+		}
+
+		this.currentResultIndex = (this.currentResultIndex - 1 + this.searchResults.length) % this.searchResults.length;
+		this.highlightCurrentResult();
+	},
+
+	// 更新導航按鈕的可見性
+	updateNavigationVisibility: function (visible) {
+		const navContainer = document.querySelector('.search-navigation');
+		navContainer.style.display = visible ? 'flex' : 'none';
+	},
+};
+
 // 主題切換處理函數
 function toggleTheme() {
 	// 切換主題
@@ -623,6 +923,8 @@ window.addEventListener('languageChanged', function (event) {
 	updateEditorUITexts();
 	// 更新備份管理視窗的文字
 	updateBackupModalTexts();
+	// 更新函式積木搜尋視窗的文字
+	updateFunctionSearchModalTexts();
 	// 如果備份列表已顯示，更新其UI
 	if (document.getElementById('backupModal').style.display === 'block') {
 		// 刷新備份列表以更新按鈕文字
@@ -642,6 +944,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 註冊主題切換按鈕事件
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme); // 初始化備份管理器
 	backupManager.init();
+	// 初始化函式積木搜尋功能
+	functionSearch.init();
 	// 初始化實驗積木提示
 	try {
 		if (window.experimentalBlocksNotice) {
@@ -705,6 +1009,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 	if (!workspace.getVariable('i')) {
 		workspace.createVariable('i');
 	}
+
+	// 添加工作區點擊事件，用於清除搜尋高亮顯示
+	workspace.getInjectionDiv().addEventListener('click', e => {
+		// 檢查點擊是否發生在積木上
+		const targetElement = e.target;
+		// 如果點擊的是工作區背景或空白區域 (非積木)
+		if (!targetElement.closest('.blocklyDraggable') && !targetElement.closest('.blocklyBubbleCanvas')) {
+			// 清除所有積木的高亮樣式
+			workspace.getAllBlocks().forEach(block => {
+				if (block.pathObject && block.pathObject.svgPath) {
+					block.pathObject.svgPath.classList.remove('highlight-block');
+				}
+			});
+		}
+	});
 
 	// 覆寫變數類別的flyout生成函數
 	workspace.registerToolboxCategoryCallback('VARIABLE', function (workspace) {

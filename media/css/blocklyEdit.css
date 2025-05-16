@@ -245,6 +245,14 @@ body.theme-dark .preview-controls .theme-icon {
 	animation: modal-appear 0.3s ease;
 }
 
+/* 函式搜尋模態框內容特別設定 */
+#functionSearchModal .modal-content {
+	margin: 0; /* 移除所有邊距 */
+	margin-right: 0; /* 靠右對齊 */
+	margin-left: auto; /* 左側自動 */
+	width: auto; /* 自動寬度 */
+}
+
 @keyframes modal-appear {
 	from {
 		opacity: 0;
@@ -284,6 +292,33 @@ body.theme-dark .preview-controls .theme-icon {
 
 .modal-body {
 	padding: 20px;
+}
+
+/* 搜尋對話框額外樣式 */
+#functionSearchModal {
+	display: none;
+	position: fixed;
+	z-index: 2001; /* 確保比其他元素高 */
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: transparent; /* 透明背景 */
+	overflow-y: auto;
+	margin-top: 0; /* 確保沒有頂部外邊距 */
+	pointer-events: auto; /* 啟用點擊事件處理 */
+}
+
+/* 只讓模態框內容區域接收點擊事件 */
+#functionSearchModal .modal-content {
+	pointer-events: auto;
+}
+
+#functionSearchModal .modal-close {
+	cursor: pointer !important;
+	font-size: 1.8rem !important;
+	z-index: 2002 !important;
+	position: relative !important;
 }
 
 /* 備份操作區域 */
@@ -870,3 +905,285 @@ body.theme-dark .empty-backup-list {
 	border-radius: initial;
 	border: initial;
 }
+
+/* 函式積木搜尋功能樣式 */
+.function-search {
+	margin-left: 10px; /* 從 5px 改為 10px，與 backup-switch 一致 */
+}
+
+/* 圖標按鈕樣式 */
+.icon-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 40px;
+	padding: 0.5rem;
+}
+
+.icon-btn .search-icon {
+	fill: currentColor; /* 使用當前文字顏色填充SVG */
+}
+
+#functionSearchToggle {
+	background-color: #f0f0f0;
+	border: none;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	transition: background-color 0.2s;
+}
+
+#functionSearchToggle:hover {
+	background-color: #e0e0e0;
+}
+
+body.theme-dark #functionSearchToggle {
+	background-color: #444444;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+body.theme-dark #functionSearchToggle:hover {
+	background-color: #555555;
+}
+
+.search-icon {
+	color: #333;
+}
+
+body.theme-dark .search-icon {
+	color: #f0f0f0;
+}
+
+.function-search-content {
+	position: absolute;
+	top: calc(var(--controls-container-height, 60px) + 10px); /* 動態計算頂部位置 */
+	right: 10px; /* 靠右對齊 */
+	width: 300px; /* 與右上角選單同寬 */
+	background-color: rgba(255, 255, 255, 0.95); /* 半透明背景 */
+	border-radius: 8px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	border: 1px solid #ddd;
+	animation: slideIn 0.3s ease-out;
+}
+
+body.theme-dark .function-search-content {
+	background-color: rgba(40, 44, 52, 0.95); /* 暗色主題半透明背景 */
+	border: 1px solid #444;
+}
+
+@keyframes slideIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.search-input-container {
+	display: flex;
+	margin-bottom: 15px;
+}
+
+#functionSearchInput {
+	flex-grow: 1;
+	padding: 8px 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 14px;
+	margin-right: 10px;
+}
+
+body.theme-dark #functionSearchInput {
+	background-color: #333;
+	color: #f0f0f0;
+	border-color: #555;
+}
+
+/* 搜尋結果樣式 */
+.search-results {
+	max-height: 300px;
+	overflow-y: auto;
+	margin: 8px 0;
+	padding: 5px;
+	background-color: transparent; /* 從 #f9f9f9 改為透明 */
+	border-radius: 5px;
+}
+
+body.theme-dark .search-results {
+	background-color: transparent; /* 從 #2d2d2d 改為透明 */
+}
+
+.empty-search-results {
+	text-align: center;
+	padding: 20px;
+	color: #777;
+}
+
+body.theme-dark .empty-search-results {
+	color: #999;
+}
+
+/* 搜尋歷史樣式 */
+.search-history-container {
+	position: absolute;
+	z-index: 1000;
+	top: 100%;
+	left: 0;
+	right: 90px; /* 留出右側按鈕的空間 */
+	background-color: white;
+	border: 1px solid #ddd;
+	border-radius: 0 0 4px 4px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+body.theme-dark .search-history-container {
+	background-color: #333;
+	border-color: #555;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.search-history-item {
+	padding: 8px 12px;
+	cursor: pointer;
+	border-bottom: 1px solid #eee;
+	transition: background-color 0.2s;
+}
+
+.search-history-item:last-child {
+	border-bottom: none;
+}
+
+.search-history-item:hover {
+	background-color: #f5f5f5;
+}
+
+body.theme-dark .search-history-item {
+	border-bottom-color: #444;
+}
+
+body.theme-dark .search-history-item:hover {
+	background-color: #3a3a3a;
+}
+
+.search-input-container {
+	position: relative;
+}
+
+/* 搜尋結果中積木高亮效果 */
+.highlight-block {
+	stroke: #ffd700 !important; /* 明顯的金黃色 */
+	stroke-width: 4px !important;
+	filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) !important;
+	animation: pulse-border 1.5s infinite alternate;
+}
+
+body.theme-dark .highlight-block {
+	stroke: #ffdf00 !important; /* 在深色主題中使用較亮的黃色 */
+	filter: drop-shadow(0 0 8px rgba(255, 223, 0, 0.8)) !important;
+}
+
+@keyframes pulse-border {
+	from {
+		stroke-width: 4px;
+		filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+	}
+	to {
+		stroke-width: 5px;
+		filter: drop-shadow(0 0 10px rgba(255, 215, 0, 1));
+	}
+}
+
+/* 功能搜尋對話框調整，確保優先層級正確 */
+#functionSearchModal {
+	z-index: 2001 !important;
+}
+
+/* 搜尋結果項目樣式 */
+.result-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.result-item {
+	padding: 10px;
+	border-radius: 4px;
+	background-color: #f5f5f5;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	border-left: 3px solid transparent;
+}
+
+.result-item:hover {
+	background-color: #e0e0e0;
+}
+
+.result-item.selected {
+	background-color: #e3f2fd;
+	border-left: 3px solid #2196f3;
+}
+
+.result-title {
+	font-weight: 600;
+	margin-bottom: 4px;
+	color: #333; /* 加深標題顏色 */
+}
+
+.result-preview {
+	font-size: 0.9em;
+	color: #444; /* 從 #666 改為 #444，增加對比度 */
+}
+
+/* 深色主題下的結果項目樣式 */
+body.theme-dark .result-item {
+	background-color: #333;
+	border-left: 3px solid transparent;
+}
+
+body.theme-dark .result-item:hover {
+	background-color: #444;
+}
+
+body.theme-dark .result-item.selected {
+	background-color: #1e3a5f;
+	border-left: 3px solid #4dabf5;
+}
+
+body.theme-dark .result-title {
+	color: #e0e0e0;
+}
+
+body.theme-dark .result-preview {
+	color: #bbb;
+}
+
+/* 搜尋導航容器 */
+.search-navigation {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 0;
+	margin-top: 10px;
+}
+
+/* 添加 CSS 變數以跟蹤 controls-container 的高度 */
+:root {
+	--controls-container-height: 60px; /* 預設值 */
+}
+
+@media (max-width: 768px) {
+	:root {
+		--controls-container-height: 80px; /* 在小螢幕上可能會更高 */
+	}
+}
+
+/* 確保模態框內容不會受到其他模態框通用樣式的影響 */

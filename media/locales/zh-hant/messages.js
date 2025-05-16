@@ -54,6 +54,19 @@ window.languageManager.loadMessages('zh-hant', {
 	BOARD_ESP32: 'ESP32',
 	BOARD_SUPERMINI: 'Super Mini',
 
+	// Block Search UI
+	FUNCTION_SEARCH_TITLE: '搜尋積木',
+	FUNCTION_SEARCH_BUTTON_TITLE: '搜尋積木',
+	FUNCTION_SEARCH_PLACEHOLDER: '輸入積木名稱或參數...',
+	FUNCTION_SEARCH_BTN: '搜尋',
+	FUNCTION_SEARCH_PREV: '上一個',
+	FUNCTION_SEARCH_NEXT: '下一個',
+	FUNCTION_SEARCH_EMPTY: '尚未搜尋',
+	FUNCTION_SEARCH_NO_RESULTS: '沒有找到匹配的積木',
+	FUNCTION_RESULT_PREFIX: '積木: ',
+	FUNCTION_KEYBOARD_SHORTCUT_TIP: '(快捷鍵: Ctrl+F)',
+	FUNCTION_SEARCH_HISTORY_TITLE: '搜尋歷史',
+
 	// Block Categories
 	CATEGORY_LOGIC: '邏輯',
 	CATEGORY_LOOPS: '迴圈',

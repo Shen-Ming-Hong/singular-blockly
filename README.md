@@ -21,6 +21,7 @@ A Visual Studio Code extension that provides a visual programming interface usin
 - 🌐 **Internationalization Support**
   - Multiple language support
   - Automatic language detection based on VS Code settings
+  - Block search UI supports all available languages
   - Supports the following languages:
     - English (en)
     - Spanish (es)
@@ -95,6 +96,11 @@ A Visual Studio Code extension that provides a visual programming interface usin
     - Visual indication with yellow dashed borders
     - Notification system for experimental features
     - Automatic detection and marking of experimental blocks
+  - 🔍 **Block Search Function**
+    - Quickly search blocks by name or parameter in the workspace
+    - Highlight and navigate search results
+    - Multi-language UI and keyboard shortcut (Ctrl+F) support
+    - Search UI is fully integrated and accessible from the editor
   - Zoom controls and trashcan
   - Light and dark theme support with theme toggle
   - Touch device support with pinch-to-zoom functionality
