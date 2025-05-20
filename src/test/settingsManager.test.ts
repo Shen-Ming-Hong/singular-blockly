@@ -160,19 +160,37 @@ describe('Settings Manager', () => {
 		assert(updateThemeStub.calledWith('dark'));
 	});
 
-	it('should toggle theme from dark to light', async () => {
-		// 設定主題為 dark
-		fileServiceStub.readJsonFile.resolves({
-			'singular-blockly.theme': 'dark',
-		});
-		// 模擬 updateSetting 方法
-		const updateThemeStub = sinon.stub(settingsManager, 'updateTheme').resolves();
+        it('should toggle theme from dark to light', async () => {
+                // 設定主題為 dark
+                fileServiceStub.readJsonFile.resolves({
+                        'singular-blockly.theme': 'dark',
+                });
+                // 模擬 updateSetting 方法
+                const updateThemeStub = sinon.stub(settingsManager, 'updateTheme').resolves();
 
 		// 測試切換主題
-		const newTheme = await settingsManager.toggleTheme();
+                const newTheme = await settingsManager.toggleTheme();
 
 		// 驗證主題切換
-		assert.strictEqual(newTheme, 'light');
-		assert(updateThemeStub.calledWith('light'));
-	});
+                assert.strictEqual(newTheme, 'light');
+                assert(updateThemeStub.calledWith('light'));
+        });
+
+        it('should get auto backup interval', async () => {
+                fileServiceStub.readJsonFile.resolves({
+                        'singular-blockly.autoBackupInterval': 15,
+                });
+
+                const interval = await settingsManager.getAutoBackupInterval();
+
+                assert.strictEqual(interval, 15);
+        });
+
+        it('should update auto backup interval with minimum 1', async () => {
+                const updateSettingStub = sinon.stub(settingsManager, 'updateSetting').resolves();
+
+                await settingsManager.updateAutoBackupInterval(0);
+
+                assert(updateSettingStub.calledWith('singular-blockly.autoBackupInterval', 1));
+        });
 });

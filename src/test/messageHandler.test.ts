@@ -374,9 +374,9 @@ describe('WebView Message Handler', () => {
 		assert.strictEqual(messageArg.success, true);
 	});
 
-	it('should handle errors gracefully', async () => {
-		// 準備測試 - 製造錯誤情境
-		fileServiceStub.createDirectory.rejects(new Error('Test error'));
+        it('should handle errors gracefully', async () => {
+                // 準備測試 - 製造錯誤情境
+                fileServiceStub.createDirectory.rejects(new Error('Test error'));
 
 		// 建立訊息
 		const message = {
@@ -388,10 +388,85 @@ describe('WebView Message Handler', () => {
 		await messageHandler.handleMessage(message);
 
 		// 驗證錯誤處理
-		assert(webviewMock.postMessage.calledOnce);
-		const messageArg = webviewMock.postMessage.getCall(0).args[0];
-		assert.strictEqual(messageArg.command, 'backupCreated');
-		assert.strictEqual(messageArg.success, false);
-		assert(messageArg.error.includes('Test error'));
-	});
+                assert(webviewMock.postMessage.calledOnce);
+                const messageArg = webviewMock.postMessage.getCall(0).args[0];
+                assert.strictEqual(messageArg.command, 'backupCreated');
+                assert.strictEqual(messageArg.success, false);
+                assert(messageArg.error.includes('Test error'));
+        });
+
+        it('should handle confirm dialog', async () => {
+                vscodeMock.window.showWarningMessage.resolves('OK');
+
+                const confirmMessage = {
+                        command: 'confirmDialog',
+                        message: 'Delete?',
+                        confirmId: '123',
+                };
+
+                await messageHandler.handleMessage(confirmMessage);
+
+                assert(vscodeMock.window.showWarningMessage.calledWith('Delete?', 'OK', 'Cancel'));
+                assert(webviewMock.postMessage.calledOnce);
+                const arg = webviewMock.postMessage.getCall(0).args[0];
+                assert.strictEqual(arg.command, 'confirmDialogResult');
+                assert.strictEqual(arg.confirmed, true);
+                assert.strictEqual(arg.originalMessage, 'Delete?');
+                assert.strictEqual(arg.confirmId, '123');
+        });
+
+        it('should handle restore backup message', async () => {
+                const backupPath = path.join('blockly', 'backup', 'my.json');
+                const mainJsonPath = path.join('blockly', 'main.json');
+
+                fileServiceStub.fileExists.withArgs(backupPath).returns(true);
+                fileServiceStub.fileExists.withArgs(mainJsonPath).returns(true);
+                fileServiceStub.copyFile.resolves();
+                fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno', theme: 'light' });
+                vscodeMock.window.showWarningMessage.resolves('還原');
+
+                const restoreMessage = {
+                        command: 'restoreBackup',
+                        name: 'my',
+                };
+
+                await messageHandler.handleMessage(restoreMessage);
+
+                assert(fileServiceStub.copyFile.calledWith(backupPath, mainJsonPath));
+                assert(webviewMock.postMessage.calledTwice);
+                const loadMsg = webviewMock.postMessage.getCall(0).args[0];
+                const resultMsg = webviewMock.postMessage.getCall(1).args[0];
+                assert.strictEqual(loadMsg.command, 'loadWorkspace');
+                assert.strictEqual(resultMsg.command, 'backupRestored');
+                assert.strictEqual(resultMsg.success, true);
+        });
+
+        it('should handle restore backup cancel', async () => {
+                const backupPath = path.join('blockly', 'backup', 'my.json');
+                fileServiceStub.fileExists.withArgs(backupPath).returns(true);
+                vscodeMock.window.showWarningMessage.resolves('取消');
+
+                const restoreMessage = { command: 'restoreBackup', name: 'my' };
+
+                await messageHandler.handleMessage(restoreMessage);
+
+                const resultMsg = webviewMock.postMessage.getCall(0).args[0];
+                assert.strictEqual(resultMsg.command, 'backupRestored');
+                assert.strictEqual(resultMsg.success, false);
+                assert.strictEqual(resultMsg.cancelled, true);
+        });
+
+        it('should handle preview backup message', async () => {
+                const backupPath = path.join('blockly', 'backup', 'pre.json');
+                fileServiceStub.fileExists.withArgs(backupPath).returns(true);
+                vscodeMock.commands.executeCommand.resolves();
+
+                const previewMessage = { command: 'previewBackup', name: 'pre' };
+
+                await messageHandler.handleMessage(previewMessage);
+
+                assert(vscodeMock.commands.executeCommand.calledOnce);
+                const arg = vscodeMock.commands.executeCommand.getCall(0).args[1];
+                assert(arg.endsWith(path.join(workspacePath, backupPath)));
+        });
 });
