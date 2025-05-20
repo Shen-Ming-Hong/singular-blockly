@@ -253,20 +253,52 @@ describe('WebView Manager', () => {
 		assert.strictEqual(webViewManager.getPanel(), undefined);
 	});
 
-	it('should ensure panel is visible', async () => {
-		// 設定 VS Code 工作區
-		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
+        it('should ensure panel is visible', async () => {
+                // 設定 VS Code 工作區
+                vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
 
-		// 建立 WebView
-		await webViewManager.createAndShowWebView();
-		// 如果需要測試 reveal 方法被調用，我們應該在建立面板時替換這個方法為 sinon stub
-		// 但由於這是 VS Code API 方法，我們無法直接使用 resetHistory 和 calledOnce 屬性
-		// 因此我們只能驗證面板存在並且 ensurePanelVisible 不會拋出錯誤
+                // 建立 WebView
+                await webViewManager.createAndShowWebView();
+                // 如果需要測試 reveal 方法被調用，我們應該在建立面板時替換這個方法為 sinon stub
+                // 但由於這是 VS Code API 方法，我們無法直接使用 resetHistory 和 calledOnce 屬性
+                // 因此我們只能驗證面板存在並且 ensurePanelVisible 不會拋出錯誤
 
-		// 執行測試
-		webViewManager.ensurePanelVisible();
+                // 執行測試
+                webViewManager.ensurePanelVisible();
 
-		// 驗證面板仍然存在
-		assert(webViewManager.getPanel() !== undefined);
-	});
+                // 驗證面板仍然存在
+                assert(webViewManager.getPanel() !== undefined);
+        });
+
+        it('should dispose panel when closePanel is called', async () => {
+                // 設定 VS Code 工作區
+                vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
+
+                const disposeStub = sinon.stub();
+
+                // 設定 WebView 面板，確保包含 dispose 方法
+                vscodeMock.window.createWebviewPanel = sinon.stub().returns({
+                        webview: {
+                                html: '',
+                                onDidReceiveMessage: sinon.stub(),
+                                postMessage: sinon.stub().resolves(),
+                                asWebviewUri: sinon.stub().callsFake((uri: any) => uri),
+                        },
+                        onDidDispose: sinon.stub(),
+                        reveal: sinon.stub(),
+                        dispose: disposeStub,
+                });
+
+                // 建立 WebView
+                await webViewManager.createAndShowWebView();
+
+                assert.strictEqual(webViewManager.isPanelCreated(), true);
+
+                // 關閉面板
+                webViewManager.closePanel();
+
+                // 驗證面板已處理並且狀態更新
+                assert(disposeStub.calledOnce);
+                assert.strictEqual(webViewManager.isPanelCreated(), false);
+        });
 });
