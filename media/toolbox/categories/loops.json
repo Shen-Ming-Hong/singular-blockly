@@ -61,7 +61,7 @@
 		},
 		{
 			"kind": "block",
-			"type": "controls_flow_statements"
+			"type": "singular_flow_statements"
 		},
 		{
 			"kind": "block",

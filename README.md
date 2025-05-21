@@ -65,6 +65,9 @@ A Visual Studio Code extension that provides a visual programming interface usin
   - Lists and Arrays
   - Logic Operations
   - Loops
+    - Standard loop blocks (repeat, while, for)
+    - Time-based duration loops (execute for a specific time)
+    - Flow control statements (break, continue) with context validation
   - Math Operations
   - Text Operations
   - Value Mapping (Arduino map function)

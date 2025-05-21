@@ -165,6 +165,10 @@ export class WebViewManager {
 			const motorsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/motors.js'));
 			const motorsBlocksUri = webview.asWebviewUri(motorsBlocksPath);
 
+			// 循環區塊定義
+			const loopsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/loops.js'));
+			const loopsBlocksUri = webview.asWebviewUri(loopsBlocksPath);
+
 			// Arduino 生成器模組
 			const arduinoModules = [
 				'io.js',
@@ -254,6 +258,7 @@ export class WebViewManager {
 			// 載入感測器及馬達區塊定義
 			htmlContent = htmlContent.replace('{sensorsBlocksUri}', sensorsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{motorsBlocksUri}', motorsBlocksUri.toString());
+			htmlContent = htmlContent.replace('{loopsBlocksUri}', loopsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 
@@ -621,6 +626,10 @@ export class WebViewManager {
 			const motorsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/motors.js'));
 			const motorsBlocksUri = tempWebview.asWebviewUri(motorsBlocksPath);
 
+			// 循環區塊定義
+			const loopsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/loops.js'));
+			const loopsBlocksUri = tempWebview.asWebviewUri(loopsBlocksPath);
+
 			// Arduino 生成器模組
 			const arduinoModules = [
 				'io.js',
@@ -700,6 +709,7 @@ export class WebViewManager {
 			// 載入感測器及馬達區塊定義
 			htmlContent = htmlContent.replace('{sensorsBlocksUri}', sensorsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{motorsBlocksUri}', motorsBlocksUri.toString());
+			htmlContent = htmlContent.replace('{loopsBlocksUri}', loopsBlocksUri.toString());
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);

@@ -50,7 +50,7 @@ window.arduinoGenerator.forBlock['controls_forEach'] = function (block) {
 	return `for (auto ${variable} : ${list}) {\n${branch}}\n`;
 };
 
-window.arduinoGenerator.forBlock['controls_flow_statements'] = function (block) {
+window.arduinoGenerator.forBlock['singular_flow_statements'] = function (block) {
 	const flowType = block.getFieldValue('FLOW');
 	let code = '';
 

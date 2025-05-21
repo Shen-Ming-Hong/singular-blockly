@@ -18,6 +18,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.28.0] - 2025-05-21
+
+### 新增 Added
+
+- 新增獨立的 loops.js 文件，專門管理與循環相關的區塊定義
+  Added a dedicated loops.js file for managing loop-related block definitions
+- 新增 `singular_flow_statements` 區塊，包含自定義驗證邏輯確保只在循環內使用
+  Added `singular_flow_statements` block with custom validation logic to ensure it's used only within loops
+
+### 已修改 Changed
+
+- 將 `controls_duration` 區塊從 arduino.js 移動到 loops.js 文件中，改善程式碼組織結構
+  Moved `controls_duration` block from arduino.js to loops.js file, improving code organization
+- 在工具箱中將 `controls_flow_statements` 更改為 `singular_flow_statements`
+  Changed `controls_flow_statements` to `singular_flow_statements` in the toolbox
+
 ## [0.27.1] - 2025-05-16
 
 ### 已修改 Changed
