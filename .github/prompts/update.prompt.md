@@ -1,5 +1,6 @@
 ---
 mode:"agent"
+tools:["run_in_terminal", "file_search", "get_terminal_output", "get_changed_files","read_file"]
 ---
 
 # 更新變更日誌流程 Update Changelog Process
@@ -16,11 +17,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 檢視變更 Review Changes
 
-1. 執行以下命令檢視近期的變更：
-   Run the following command to view recent changes:
+1. 檢視目前工作目錄與最新 commit 的差異：
+   View changes in the working directory compared to the latest commit:
 
-    ```
+    ```bash
     git --no-pager diff HEAD
+    ```
+
+2. 取得最新的 tag 並比較與 HEAD 之間的差異（用於發布前整理 changelog）
+   Get the latest tag and compare with HEAD (for preparing changelog before release):
+
+    ```bash
+    LAST_TAG=$(git describe --tags --abbrev=0)
+    git --no-pager diff $LAST_TAG..HEAD
+    git log $LAST_TAG..HEAD --pretty=format:"- %s (%an)"
     ```
 
 ## 更新變更日誌流程 Update Changelog Process
