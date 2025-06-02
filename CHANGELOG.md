@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修復 Fixed
 
+### 已更新 Updated
+
+### 已修改 Changed
+
+## [0.28.1] - 2025-06-02
+
+### 新增 Added
+
+### 已修復 Fixed
+
 - 修正預覽視窗缺少 loops block 的問題
   Fixed preview window missing loops block
 

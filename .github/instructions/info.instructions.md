@@ -1,3 +1,7 @@
+---
+applyTo: '**'
+---
+
 # 基本資訊
 
 -   這是一個 VScode Extension
