@@ -1,6 +1,6 @@
 ---
-mode:"agent"
-tools:["get_changed_files"]
+mode: 'agent'
+tools: ['changes', 'runCommands', 'search', 'searchResults']
 ---
 
 1. 閱讀設計原則 `.github/instructions/info.instructions.md`

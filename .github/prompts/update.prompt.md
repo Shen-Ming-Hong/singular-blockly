@@ -1,6 +1,6 @@
 ---
-mode:"agent"
-tools:["run_in_terminal", "file_search", "get_terminal_output", "get_changed_files","read_file"]
+mode: 'agent'
+tools: ['changes', 'editFiles', 'runCommands', 'search', 'searchResults']
 ---
 
 # 更新變更日誌流程 Update Changelog Process

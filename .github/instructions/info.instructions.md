@@ -1,5 +1,6 @@
 ---
 applyTo: '**'
+description: '這份指導文件提供了 VScode Extension 開發的基本資訊和原則，幫助開發者撰寫高品質、易於維護的程式碼。'
 ---
 
 # 基本資訊

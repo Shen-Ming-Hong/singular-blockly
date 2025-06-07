@@ -1,5 +1,6 @@
 ---
-mode:"agent"
+mode: 'agent'
+tools: ['changes', 'runCommands', 'search', 'searchResults']
 ---
 
 ## 開始執行指令 Git 提交與發布 Git Commit and Release

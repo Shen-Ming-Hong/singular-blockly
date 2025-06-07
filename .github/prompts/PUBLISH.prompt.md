@@ -1,5 +1,6 @@
 ---
-mode:"agent"
+mode: 'agent'
+tools: ['changes', 'editFiles', 'runCommands', 'search', 'searchResults']
 ---
 
 # 發布流程 Release Process
