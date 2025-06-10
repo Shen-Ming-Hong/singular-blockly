@@ -36,6 +36,7 @@ window.languageManager.loadMessages('cs', {
 	BACKUP_LIST_TITLE: 'Seznam záloh',
 	BACKUP_LIST_EMPTY: 'Žádné dostupné zálohy',
 	BACKUP_BUTTON_TITLE: 'Správce záloh',
+	REFRESH_BUTTON_TITLE: 'Obnovit kód',
 	BACKUP_PREVIEW_BTN: 'Náhled',
 	BACKUP_RESTORE_BTN: 'Obnovit',
 	BACKUP_DELETE_BTN: 'Smazat',

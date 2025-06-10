@@ -36,6 +36,7 @@ window.languageManager.loadMessages('tr', {
 	BACKUP_LIST_TITLE: 'Yedek Listesi',
 	BACKUP_LIST_EMPTY: 'Yedek bulunmuyor',
 	BACKUP_BUTTON_TITLE: 'Yedek Yöneticisi',
+	REFRESH_BUTTON_TITLE: 'Kodu Yenile',
 	BACKUP_PREVIEW_BTN: 'Önizleme',
 	BACKUP_RESTORE_BTN: 'Geri Yükle',
 	BACKUP_DELETE_BTN: 'Sil',

@@ -137,6 +137,46 @@
                     </svg>
                 </button>
             </div>
+            <div class="refresh-switch"> <button id="refreshButton" title="重新整理程式碼">
+                    <svg class="refresh-svg" viewBox="0 0 24 24" width="16" height="16">
+                        <style>
+                            .refresh-svg {
+                                transform-origin: center center;
+                                animation: rotate 1s linear infinite;
+                                animation-play-state: paused;
+                            }
+
+                            .refresh-svg.spinning {
+                                animation-play-state: running;
+                            }
+
+                            @keyframes rotate {
+                                from {
+                                    transform: rotate(0deg);
+                                }
+
+                                to {
+                                    transform: rotate(360deg);
+                                }
+                            }
+
+                            .refresh-path {
+                                stroke: currentColor;
+                                stroke-width: 2;
+                                stroke-linecap: round;
+                                stroke-linejoin: round;
+                                fill: none;
+                            }
+                        </style>
+                        <g class="refresh-icon">
+                            <path class="refresh-path" d="M1 4v6h6" />
+                            <path class="refresh-path" d="M23 20v-6h-6" />
+                            <path class="refresh-path" d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10" />
+                            <path class="refresh-path" d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14" />
+                        </g>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- 實驗積木提示容器 -->

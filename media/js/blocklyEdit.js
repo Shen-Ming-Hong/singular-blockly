@@ -192,9 +192,11 @@ function updateBackupModalTexts() {
 	);
 	document.getElementById('autoBackupMinutesText').textContent = languageManager.getMessage('AUTO_BACKUP_MINUTES', '分鐘');
 	document.getElementById('saveAutoBackupBtn').textContent = languageManager.getMessage('AUTO_BACKUP_SAVE', '儲存設定');
-
 	// 更新備份按鈕標題
 	document.getElementById('backupButton').title = languageManager.getMessage('BACKUP_BUTTON_TITLE', '備份管理');
+
+	// 更新重新整理按鈕標題
+	document.getElementById('refreshButton').title = languageManager.getMessage('REFRESH_BUTTON_TITLE', '重新整理程式碼');
 }
 
 /**
@@ -888,6 +890,51 @@ function toggleTheme() {
 	});
 }
 
+// 重新整理程式碼處理函數
+function handleRefreshCode() {
+	try {
+		log.info('開始重新整理程式碼...');
+
+		// 獲取重新整理按鈕和圖示
+		const refreshButton = document.getElementById('refreshButton');
+		const refreshSvg = refreshButton.querySelector('.refresh-svg');
+
+		// 啟動旋轉動畫
+		refreshSvg.classList.add('spinning');
+
+		// 獲取工作區
+		const workspace = Blockly.getMainWorkspace();
+		if (!workspace) {
+			log.error('無法獲取 Blockly 工作區');
+			return;
+		}
+
+		// 生成程式碼
+		const code = arduinoGenerator.workspaceToCode(workspace);
+
+		// 發送更新訊息到擴充功能
+		vscode.postMessage({
+			command: 'updateCode',
+			code: code,
+			lib_deps: arduinoGenerator.lib_deps_ || [],
+		});
+
+		log.info('程式碼重新整理完成');
+
+		// 2秒後停止旋轉動畫
+		setTimeout(() => {
+			refreshSvg.classList.remove('spinning');
+		}, 2000);
+	} catch (error) {
+		log.error('重新整理程式碼時發生錯誤:', error);
+
+		// 停止旋轉動畫
+		const refreshButton = document.getElementById('refreshButton');
+		const refreshSvg = refreshButton.querySelector('.refresh-svg');
+		refreshSvg.classList.remove('spinning');
+	}
+}
+
 // 更新主題
 function updateTheme(theme) {
 	const lightIcon = document.getElementById('lightIcon');
@@ -940,9 +987,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 動態生成開發板選項
 	populateBoardOptions();
-
 	// 註冊主題切換按鈕事件
-	document.getElementById('themeToggle').addEventListener('click', toggleTheme); // 初始化備份管理器
+	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+	// 註冊重新整理按鈕事件
+	document.getElementById('refreshButton').addEventListener('click', handleRefreshCode);
+
+	// 初始化備份管理器
 	backupManager.init();
 	// 初始化函式積木搜尋功能
 	functionSearch.init();

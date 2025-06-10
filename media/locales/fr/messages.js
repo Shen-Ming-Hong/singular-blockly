@@ -36,6 +36,7 @@ window.languageManager.loadMessages('fr', {
 	BACKUP_LIST_TITLE: 'Liste des sauvegardes',
 	BACKUP_LIST_EMPTY: 'Aucune sauvegarde disponible',
 	BACKUP_BUTTON_TITLE: 'Gestionnaire de sauvegardes',
+	REFRESH_BUTTON_TITLE: 'Actualiser le code',
 	BACKUP_PREVIEW_BTN: 'Aperçu',
 	BACKUP_RESTORE_BTN: 'Restaurer',
 	BACKUP_DELETE_BTN: 'Supprimer',

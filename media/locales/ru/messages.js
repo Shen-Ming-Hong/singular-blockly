@@ -36,6 +36,7 @@ window.languageManager.loadMessages('ru', {
 	BACKUP_LIST_TITLE: 'Список копий',
 	BACKUP_LIST_EMPTY: 'Копии отсутствуют',
 	BACKUP_BUTTON_TITLE: 'Управление копиями',
+	REFRESH_BUTTON_TITLE: 'Обновить код',
 	BACKUP_PREVIEW_BTN: 'Просмотр',
 	BACKUP_RESTORE_BTN: 'Восстановить',
 	BACKUP_DELETE_BTN: 'Удалить',

@@ -36,6 +36,7 @@ window.languageManager.loadMessages('pl', {
 	BACKUP_LIST_TITLE: 'Lista kopii',
 	BACKUP_LIST_EMPTY: 'Brak dostępnych kopii',
 	BACKUP_BUTTON_TITLE: 'Menedżer kopii zapasowych',
+	REFRESH_BUTTON_TITLE: 'Odśwież kod',
 	BACKUP_PREVIEW_BTN: 'Podgląd',
 	BACKUP_RESTORE_BTN: 'Przywróć',
 	BACKUP_DELETE_BTN: 'Usuń',

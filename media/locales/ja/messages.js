@@ -36,6 +36,7 @@ window.languageManager.loadMessages('ja', {
 	BACKUP_LIST_TITLE: 'バックアップ一覧',
 	BACKUP_LIST_EMPTY: 'バックアップがありません',
 	BACKUP_BUTTON_TITLE: 'バックアップ管理',
+	REFRESH_BUTTON_TITLE: 'コードの更新',
 	BACKUP_PREVIEW_BTN: 'プレビュー',
 	BACKUP_RESTORE_BTN: '復元',
 	BACKUP_DELETE_BTN: '削除',

@@ -35,6 +35,7 @@ window.languageManager.loadMessages('zh-hant', {
 	BACKUP_LIST_TITLE: '備份列表',
 	BACKUP_LIST_EMPTY: '尚無備份',
 	BACKUP_BUTTON_TITLE: '備份管理',
+	REFRESH_BUTTON_TITLE: '重新整理程式碼',
 	BACKUP_PREVIEW_BTN: '預覽',
 	BACKUP_RESTORE_BTN: '還原',
 	BACKUP_DELETE_BTN: '刪除',

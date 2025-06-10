@@ -36,6 +36,7 @@ window.languageManager.loadMessages('hu', {
 	BACKUP_LIST_TITLE: 'Mentések listája',
 	BACKUP_LIST_EMPTY: 'Nincs elérhető mentés',
 	BACKUP_BUTTON_TITLE: 'Mentés kezelő',
+	REFRESH_BUTTON_TITLE: 'Kód frissítése',
 	BACKUP_PREVIEW_BTN: 'Előnézet',
 	BACKUP_RESTORE_BTN: 'Visszaállítás',
 	BACKUP_DELETE_BTN: 'Törlés',

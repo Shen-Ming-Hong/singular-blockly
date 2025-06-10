@@ -221,6 +221,32 @@ body.theme-dark .preview-controls .theme-icon {
 	color: #333;
 }
 
+/* 重新整理按鈕樣式 */
+.refresh-switch {
+	margin-left: 10px;
+}
+
+#refreshButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	background-color: #f0f0f0;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+#refreshButton:hover {
+	background-color: #e0e0e0;
+}
+
+.refresh-path {
+	color: #333;
+}
+
 /* Modal 對話框樣式 */
 .modal {
 	display: none;
@@ -587,6 +613,18 @@ body.theme-dark #backupButton:hover {
 }
 
 body.theme-dark .backup-icon {
+	color: #e0e0e0;
+}
+
+body.theme-dark #refreshButton {
+	background-color: #444444;
+}
+
+body.theme-dark #refreshButton:hover {
+	background-color: #555555;
+}
+
+body.theme-dark .refresh-path {
 	color: #e0e0e0;
 }
 

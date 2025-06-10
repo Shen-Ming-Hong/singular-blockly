@@ -11,143 +11,152 @@ A Visual Studio Code extension that provides a visual programming interface usin
 
 ## Features
 
-- 🎯 **Multi-Board Support**
-  - Arduino Uno
-  - Arduino Nano
-  - Arduino Mega
-  - ESP32
-  - Super Mini (Lolin C3 Mini)
+-   🎯 **Multi-Board Support**
 
-- 🌐 **Internationalization Support**
-  - Multiple language support
-  - Automatic language detection based on VS Code settings
-  - Block search UI supports all available languages
-  - Supports the following languages:
-    - English (en)
-    - Spanish (es)
-    - Portuguese (pt-br)
-    - French (fr)
-    - German (de)
-    - Italian (it)
-    - Russian (ru)
-    - Japanese (ja)
-    - Korean (ko)
-    - Traditional Chinese (zh-hant)
-    - Polish (pl)
-    - Hungarian (hu)
-    - Turkish (tr)
-    - Bulgarian (bg)
-    - Czech (cs)
+    -   Arduino Uno
+    -   Arduino Nano
+    -   Arduino Mega
+    -   ESP32
+    -   Super Mini (Lolin C3 Mini)
 
-- 🧩 **Rich Block Categories**
-  - Arduino I/O Operations
-    - Smart pin options with automatic PWM pin detection
-    - Optimized analog write functionality for PWM pins
-  - Servo Motor Control
-    - Configurable servo setup and angle control
-    - Smart dropdown menu with automatic servo name detection
-    - Board-specific servo library support (ESP32/Arduino)
-  - Encoder Motor Support
-    - Setup, read, reset and PID control functionality
-    - Automatic pin management for encoder motors
-  - Sensor Blocks
-    - Ultrasonic Sensor with hardware interrupt support
-      - Smart block linking for ultrasonic trigger and read operations
-      - Automatic detection and configuration between ultrasonic blocks
-    - Seven-segment Display with common cathode/anode modes
-    - Threshold function blocks for analog input monitoring
-  - Functions with parameter support
-    - Custom threshold functions with analog input support
-    - Configurable sensor pins and threshold values
-    - Multiple output types (numeric, boolean, string)
-    - Support for converting Chinese function names to valid C++ code
-  - Variables with rename/delete capabilities
-  - Lists and Arrays
-  - Logic Operations
-  - Loops
-    - Standard loop blocks (repeat, while, for)
-    - Time-based duration loops (execute for a specific time)
-    - Flow control statements (break, continue) with context validation
-  - Math Operations
-  - Text Operations
-  - Value Mapping (Arduino map function)
+-   🌐 **Internationalization Support**
 
-- 💾 **Workspace Management**
-  - Automatic state saving
-  - Project persistence
-  - Board configuration management
-  - Code generation to Arduino (.cpp) files
-  - Automatic PlatformIO configuration generation
-  - Automatic platformio.ini preview mode management
-  - Comprehensive backup system
-    - Backup creation with timestamps
-    - Backup preview without restoration
-    - Safe restoration with automatic temporary backups
-    - Auto-backup with configurable time intervals
-    - Modern UI with responsive design for backup management
-  - Seven-segment display support with common cathode/anode modes
+    -   Multiple language support
+    -   Automatic language detection based on VS Code settings
+    -   Block search UI supports all available languages
+    -   Supports the following languages:
+        -   English (en)
+        -   Spanish (es)
+        -   Portuguese (pt-br)
+        -   French (fr)
+        -   German (de)
+        -   Italian (it)
+        -   Russian (ru)
+        -   Japanese (ja)
+        -   Korean (ko)
+        -   Traditional Chinese (zh-hant)
+        -   Polish (pl)
+        -   Hungarian (hu)
+        -   Turkish (tr)
+        -   Bulgarian (bg)
+        -   Czech (cs)
 
-- 🛠 **Development Features**
-  - Real-time code generation
-  - Integrated board configuration
-  - Visual block programming interface
-  - Drag-and-drop block management
-  - Automatic block code generation system for critical blocks
-  - Standardized logging service for code generation
-  - Code comments generation system for improved readability
-  - Experimental blocks tracking system
-    - Visual indication with yellow dashed borders
-    - Notification system for experimental features
-    - Automatic detection and marking of experimental blocks
-  - 🔍 **Block Search Function**
-    - Quickly search blocks by name or parameter in the workspace
-    - Highlight and navigate search results
-    - Multi-language UI and keyboard shortcut (Ctrl+F) support
-    - Search UI is fully integrated and accessible from the editor
-  - Zoom controls and trashcan
-  - Light and dark theme support with theme toggle
-  - Touch device support with pinch-to-zoom functionality
-  - PlatformIO integration for hardware upload
-  - Pin mode tracking and conflict detection
-    - Automatically tracks pin modes (INPUT, OUTPUT, INPUT_PULLUP)
-    - Detects pin mode conflicts and displays warnings
-    - Automatically adds necessary pinMode configurations
-  - Value mapping (Arduino map function)
+-   🧩 **Rich Block Categories**
+
+    -   Arduino I/O Operations
+        -   Smart pin options with automatic PWM pin detection
+        -   Optimized analog write functionality for PWM pins
+    -   Servo Motor Control
+        -   Configurable servo setup and angle control
+        -   Smart dropdown menu with automatic servo name detection
+        -   Board-specific servo library support (ESP32/Arduino)
+    -   Encoder Motor Support
+        -   Setup, read, reset and PID control functionality
+        -   Automatic pin management for encoder motors
+    -   Sensor Blocks
+        -   Ultrasonic Sensor with hardware interrupt support
+            -   Smart block linking for ultrasonic trigger and read operations
+            -   Automatic detection and configuration between ultrasonic blocks
+        -   Seven-segment Display with common cathode/anode modes
+        -   Threshold function blocks for analog input monitoring
+    -   Functions with parameter support
+        -   Custom threshold functions with analog input support
+        -   Configurable sensor pins and threshold values
+        -   Multiple output types (numeric, boolean, string)
+        -   Support for converting Chinese function names to valid C++ code
+    -   Variables with rename/delete capabilities
+    -   Lists and Arrays
+    -   Logic Operations
+    -   Loops
+        -   Standard loop blocks (repeat, while, for)
+        -   Time-based duration loops (execute for a specific time)
+        -   Flow control statements (break, continue) with context validation
+    -   Math Operations
+    -   Text Operations
+    -   Value Mapping (Arduino map function)
+
+-   💾 **Workspace Management**
+
+    -   Automatic state saving
+    -   Project persistence
+    -   Board configuration management
+    -   Code generation to Arduino (.cpp) files
+    -   Automatic PlatformIO configuration generation
+    -   Automatic platformio.ini preview mode management
+    -   Comprehensive backup system
+        -   Backup creation with timestamps
+        -   Backup preview without restoration
+        -   Safe restoration with automatic temporary backups
+        -   Auto-backup with configurable time intervals
+        -   Modern UI with responsive design for backup management
+    -   Seven-segment display support with common cathode/anode modes
+
+-   🛠 **Development Features**
+    -   Real-time code generation
+    -   Manual code refresh button for instant code regeneration
+    -   Integrated board configuration
+    -   Visual block programming interface
+    -   Drag-and-drop block management
+    -   Automatic block code generation system for critical blocks
+    -   Standardized logging service for code generation
+    -   Code comments generation system for improved readability
+    -   Experimental blocks tracking system
+        -   Visual indication with yellow dashed borders
+        -   Notification system for experimental features
+        -   Automatic detection and marking of experimental blocks
+    -   🔍 **Block Search Function**
+        -   Quickly search blocks by name or parameter in the workspace
+        -   Highlight and navigate search results
+        -   Multi-language UI and keyboard shortcut (Ctrl+F) support
+        -   Search UI is fully integrated and accessible from the editor
+    -   Zoom controls and trashcan
+    -   Light and dark theme support with theme toggle
+    -   Touch device support with pinch-to-zoom functionality
+    -   PlatformIO integration for hardware upload
+    -   Pin mode tracking and conflict detection
+        -   Automatically tracks pin modes (INPUT, OUTPUT, INPUT_PULLUP)
+        -   Detects pin mode conflicts and displays warnings
+        -   Automatically adds necessary pinMode configurations
+    -   Value mapping (Arduino map function)
 
 ## Requirements
 
-- Visual Studio Code 1.96.0 or higher
-- Basic understanding of Arduino programming concepts
-- Required Extensions:
-  - PlatformIO IDE Extension
-  - C/C++ Extension (ms-vscode.cpptools)
+-   Visual Studio Code 1.96.0 or higher
+-   Basic understanding of Arduino programming concepts
+-   Required Extensions:
+    -   PlatformIO IDE Extension
+    -   C/C++ Extension (ms-vscode.cpptools)
 
 ## Usage
 
 1. Open or create a folder in VS Code:
-   - This extension requires a workspace folder to store its files
-   - Use File > Open Folder... or File > New Folder
-   - Make sure you have write permissions in the folder
+
+    - This extension requires a workspace folder to store its files
+    - Use File > Open Folder... or File > New Folder
+    - Make sure you have write permissions in the folder
 
 2. Open the extension using:
-   - Click the wand icon (🪄) in the status bar
-   - Click the Singular Blockly icon in the activity bar
+
+    - Click the wand icon (🪄) in the status bar
+    - Click the Singular Blockly icon in the activity bar
 
 3. Select your target board from the dropdown menu:
-   - The extension will automatically create and configure `platformio.ini`
-   - First-time board selection requires a workspace reload
+
+    - The extension will automatically create and configure `platformio.ini`
+    - First-time board selection requires a workspace reload
 
 4. Create your program using the visual blocks:
-   - Drag blocks from the toolbox categories
-   - Configure block parameters
-   - Connect blocks to build your logic
-   - Changes are auto-saved and persist between sessions
+
+    - Drag blocks from the toolbox categories
+    - Configure block parameters
+    - Connect blocks to build your logic
+    - Changes are auto-saved and persist between sessions
 
 5. The extension will automatically:
-   - Generate Arduino code in `src/main.cpp`
-   - Save workspace state in `blockly/main.json`
-   - Update PlatformIO configuration
-   - Provide real-time code(.cpp) generation
+    - Generate Arduino code in `src/main.cpp`
+    - Save workspace state in `blockly/main.json`
+    - Update PlatformIO configuration
+    - Provide real-time code(.cpp) generation
 
 ## Supported Boards and Platforms
 
@@ -155,24 +164,24 @@ Each board is configured with specific PlatformIO settings for optimal compatibi
 
 ### AVR Based
 
-- **Arduino Uno**
-  - Platform: atmelavr
-  - Board: uno
-- **Arduino Nano**
-  - Platform: atmelavr
-  - Board: nanoatmega328
-- **Arduino Mega**
-  - Platform: atmelavr
-  - Board: megaatmega2560
+-   **Arduino Uno**
+    -   Platform: atmelavr
+    -   Board: uno
+-   **Arduino Nano**
+    -   Platform: atmelavr
+    -   Board: nanoatmega328
+-   **Arduino Mega**
+    -   Platform: atmelavr
+    -   Board: megaatmega2560
 
 ### ESP32 Based
 
-- **ESP32 Dev Module**
-  - Platform: espressif32
-  - Board: esp32dev
-- **Super Mini (Lolin C3 Mini)**
-  - Platform: espressif32
-  - Board: lolin_c3_mini
+-   **ESP32 Dev Module**
+    -   Platform: espressif32
+    -   Board: esp32dev
+-   **Super Mini (Lolin C3 Mini)**
+    -   Platform: espressif32
+    -   Board: lolin_c3_mini
 
 > Note: The extension will automatically generate the appropriate `platformio.ini` configuration when you select a board, ensuring the correct platform settings for hardware upload.
 
@@ -188,9 +197,9 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 This project incorporates the following third-party components:
 
-- [Blockly](https://github.com/google/blockly) - Licensed under the Apache License 2.0
-- [PlatformIO](https://platformio.org/) - Licensed under the Apache License 2.0
-- Arduino Core Libraries - Licensed under the LGPL
+-   [Blockly](https://github.com/google/blockly) - Licensed under the Apache License 2.0
+-   [PlatformIO](https://platformio.org/) - Licensed under the Apache License 2.0
+-   Arduino Core Libraries - Licensed under the LGPL
 
 ## Contributing
 

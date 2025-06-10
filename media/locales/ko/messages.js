@@ -36,6 +36,7 @@ window.languageManager.loadMessages('ko', {
 	BACKUP_LIST_TITLE: '백업 목록',
 	BACKUP_LIST_EMPTY: '사용 가능한 백업 없음',
 	BACKUP_BUTTON_TITLE: '백업 관리자',
+	REFRESH_BUTTON_TITLE: '코드 새로고침',
 	BACKUP_PREVIEW_BTN: '미리보기',
 	BACKUP_RESTORE_BTN: '복원',
 	BACKUP_DELETE_BTN: '삭제',

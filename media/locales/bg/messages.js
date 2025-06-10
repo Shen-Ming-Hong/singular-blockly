@@ -36,6 +36,7 @@ window.languageManager.loadMessages('bg', {
 	BACKUP_LIST_TITLE: 'Списък с архиви',
 	BACKUP_LIST_EMPTY: 'Няма налични архиви',
 	BACKUP_BUTTON_TITLE: 'Управление на архиви',
+	REFRESH_BUTTON_TITLE: 'Обнови кода',
 	BACKUP_PREVIEW_BTN: 'Преглед',
 	BACKUP_RESTORE_BTN: 'Възстановяване',
 	BACKUP_DELETE_BTN: 'Изтриване',
