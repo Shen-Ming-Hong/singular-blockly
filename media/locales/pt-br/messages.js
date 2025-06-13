@@ -381,6 +381,9 @@ window.languageManager.loadMessages('pt-br', {
 	PIXETTO_INIT: 'Inicializar câmera inteligente Pixetto',
 	PIXETTO_RX_PIN: 'Pino RX',
 	PIXETTO_TX_PIN: 'Pino TX',
+	PIXETTO_IS_DETECTED: 'Pixetto Objeto Detectado',
+	PIXETTO_GET_TYPE_ID: 'Pixetto Obter ID do Tipo',
+	PIXETTO_GET_FUNC_ID: 'Pixetto Obter ID da Função',
 	PIXETTO_COLOR_DETECT: 'Pixetto detectar cor',
 	PIXETTO_SHAPE_DETECT: 'Pixetto detectar forma',
 	PIXETTO_FACE_DETECT: 'Pixetto detectar rosto',
@@ -402,6 +405,9 @@ window.languageManager.loadMessages('pt-br', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Inicializar a câmera inteligente Pixetto e configurar os pinos de comunicação UART',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Detectar se o Pixetto detecta algum objeto',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Obter o ID do tipo de objeto detectado pelo Pixetto (cor, forma, etc.)',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'Obter o ID da função atualmente usada pelo Pixetto (detecção de cor, forma, etc.)',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Detectar se o Pixetto detecta um objeto da cor especificada',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Detectar se o Pixetto detecta um objeto da forma especificada',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Detectar se o Pixetto detecta um rosto',

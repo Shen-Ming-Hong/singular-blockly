@@ -380,6 +380,9 @@ window.languageManager.loadMessages('tr', {
 	PIXETTO_INIT: 'Pixetto Akıllı Kamerayı Başlat',
 	PIXETTO_RX_PIN: 'RX Pin',
 	PIXETTO_TX_PIN: 'TX Pin',
+	PIXETTO_IS_DETECTED: 'Pixetto Nesne Algılandı',
+	PIXETTO_GET_TYPE_ID: "Pixetto Tip ID'si Al",
+	PIXETTO_GET_FUNC_ID: "Pixetto Fonksiyon ID'si Al",
 	PIXETTO_COLOR_DETECT: 'Pixetto Renk Tespiti',
 	PIXETTO_SHAPE_DETECT: 'Pixetto Şekil Tespiti',
 	PIXETTO_FACE_DETECT: 'Pixetto Yüz Tespiti',
@@ -401,6 +404,9 @@ window.languageManager.loadMessages('tr', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto akıllı kamerasını başlatın ve UART iletişim pinlerini ayarlayın',
+	PIXETTO_IS_DETECTED_TOOLTIP: "Pixetto'nun herhangi bir nesne algılayıp algılamadığını tespit et",
+	PIXETTO_GET_TYPE_ID_TOOLTIP: "Pixetto tarafından algılanan nesnenin tip ID'sini al (renk, şekil vb.)",
+	PIXETTO_GET_FUNC_ID_TOOLTIP: "Pixetto tarafından şu anda kullanılan fonksiyonun ID'sini al (renk algılama, şekil algılama vb.)",
 	PIXETTO_COLOR_DETECT_TOOLTIP: "Pixetto'nun belirtilen renkteki nesneyi algılayıp algılamadığını tespit edin",
 	PIXETTO_SHAPE_DETECT_TOOLTIP: "Pixetto'nun belirtilen şekildeki nesneyi algılayıp algılamadığını tespit edin",
 	PIXETTO_FACE_DETECT_TOOLTIP: "Pixetto'nun yüz algılayıp algılamadığını tespit edin",

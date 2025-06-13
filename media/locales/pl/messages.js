@@ -380,6 +380,9 @@ window.languageManager.loadMessages('pl', {
 	PIXETTO_INIT: 'Inicjalizuj inteligentną kamerę Pixetto',
 	PIXETTO_RX_PIN: 'Pin RX',
 	PIXETTO_TX_PIN: 'Pin TX',
+	PIXETTO_IS_DETECTED: 'Pixetto Obiekt Wykryty',
+	PIXETTO_GET_TYPE_ID: 'Pixetto Pobierz ID Typu',
+	PIXETTO_GET_FUNC_ID: 'Pixetto Pobierz ID Funkcji',
 	PIXETTO_COLOR_DETECT: 'Pixetto wykrywanie koloru',
 	PIXETTO_SHAPE_DETECT: 'Pixetto wykrywanie kształtu',
 	PIXETTO_FACE_DETECT: 'Pixetto wykrywanie twarzy',
@@ -401,6 +404,9 @@ window.languageManager.loadMessages('pl', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Inicjalizuj inteligentną kamerę Pixetto i ustaw piny komunikacji UART',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Wykryj, czy Pixetto wykrywa jakiś obiekt',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Pobierz ID typu obiektu wykrytego przez Pixetto (kolor, kształt itp.)',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'Pobierz ID funkcji aktualnie używanej przez Pixetto (wykrywanie koloru, kształtu itp.)',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Wykryj, czy Pixetto wykrywa obiekt o określonym kolorze',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Wykryj, czy Pixetto wykrywa obiekt o określonym kształcie',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Wykryj, czy Pixetto wykrywa twarz',

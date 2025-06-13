@@ -39,6 +39,54 @@ Blockly.Blocks['pixetto_init'] = {
 	},
 };
 
+// Pixetto 是否偵測到物體積木
+Blockly.Blocks['pixetto_is_detected'] = {
+	init: function () {
+		this.appendDummyInput().appendField(window.languageManager.getMessage('PIXETTO_IS_DETECTED', 'Pixetto 偵測到物體'));
+
+		this.setInputsInline(true);
+		this.setOutput(true, 'Boolean');
+		this.setStyle('sensor_blocks');
+		this.setTooltip(window.languageManager.getMessage('PIXETTO_IS_DETECTED_TOOLTIP', '檢測 Pixetto 是否偵測到任何物體'));
+		this.setHelpUrl('');
+
+		// 標記為實驗積木
+		window.potentialExperimentalBlocks.push('pixetto_is_detected');
+	},
+};
+
+// Pixetto 取得偵測類型 ID 積木
+Blockly.Blocks['pixetto_get_type_id'] = {
+	init: function () {
+		this.appendDummyInput().appendField(window.languageManager.getMessage('PIXETTO_GET_TYPE_ID', 'Pixetto 取得偵測類型 ID'));
+
+		this.setInputsInline(true);
+		this.setOutput(true, 'Number');
+		this.setStyle('sensor_blocks');
+		this.setTooltip(window.languageManager.getMessage('PIXETTO_GET_TYPE_ID_TOOLTIP', '取得 Pixetto 偵測到的物體類型 ID'));
+		this.setHelpUrl('');
+
+		// 標記為實驗積木
+		window.potentialExperimentalBlocks.push('pixetto_get_type_id');
+	},
+};
+
+// Pixetto 取得功能 ID 積木
+Blockly.Blocks['pixetto_get_func_id'] = {
+	init: function () {
+		this.appendDummyInput().appendField(window.languageManager.getMessage('PIXETTO_GET_FUNC_ID', 'Pixetto 取得功能 ID'));
+
+		this.setInputsInline(true);
+		this.setOutput(true, 'Number');
+		this.setStyle('sensor_blocks');
+		this.setTooltip(window.languageManager.getMessage('PIXETTO_GET_FUNC_ID_TOOLTIP', '取得 Pixetto 目前使用的功能 ID'));
+		this.setHelpUrl('');
+
+		// 標記為實驗積木
+		window.potentialExperimentalBlocks.push('pixetto_get_func_id');
+	},
+};
+
 // Pixetto 顏色偵測積木
 Blockly.Blocks['pixetto_color_detect'] = {
 	init: function () {

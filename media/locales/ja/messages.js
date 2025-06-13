@@ -381,6 +381,9 @@ window.languageManager.loadMessages('ja', {
 	PIXETTO_INIT: 'Pixetto スマートカメラを初期化',
 	PIXETTO_RX_PIN: 'RX ピン',
 	PIXETTO_TX_PIN: 'TX ピン',
+	PIXETTO_IS_DETECTED: 'Pixetto オブジェクト検出',
+	PIXETTO_GET_TYPE_ID: 'Pixetto タイプID取得',
+	PIXETTO_GET_FUNC_ID: 'Pixetto 機能ID取得',
 	PIXETTO_COLOR_DETECT: 'Pixetto 色検出',
 	PIXETTO_SHAPE_DETECT: 'Pixetto 形状検出',
 	PIXETTO_FACE_DETECT: 'Pixetto 顔検出',
@@ -402,6 +405,9 @@ window.languageManager.loadMessages('ja', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto スマートカメラを初期化し、UART通信ピンを設定します',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Pixetto がオブジェクトを検出しているかどうかを検出',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Pixetto が検出したオブジェクトのタイプID（色、形状など）を取得',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'Pixetto が現在使用している機能ID（色検出、形状検出など）を取得',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Pixetto が指定された色のオブジェクトを検出するかを判定します',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Pixetto が指定された形状のオブジェクトを検出するかを判定します',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Pixetto が顔を検出するかを判定します',

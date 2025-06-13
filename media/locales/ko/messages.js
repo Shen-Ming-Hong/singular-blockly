@@ -380,6 +380,9 @@ window.languageManager.loadMessages('ko', {
 	PIXETTO_INIT: 'Pixetto 스마트 카메라 초기화',
 	PIXETTO_RX_PIN: 'RX 핀',
 	PIXETTO_TX_PIN: 'TX 핀',
+	PIXETTO_IS_DETECTED: 'Pixetto 객체 감지됨',
+	PIXETTO_GET_TYPE_ID: 'Pixetto 타입 ID 가져오기',
+	PIXETTO_GET_FUNC_ID: 'Pixetto 기능 ID 가져오기',
 	PIXETTO_COLOR_DETECT: 'Pixetto 색상 감지',
 	PIXETTO_SHAPE_DETECT: 'Pixetto 모양 감지',
 	PIXETTO_FACE_DETECT: 'Pixetto 얼굴 감지',
@@ -401,6 +404,9 @@ window.languageManager.loadMessages('ko', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto 스마트 카메라를 초기화하고 UART 통신 핀을 설정합니다',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Pixetto가 객체를 감지하는지 여부를 탐지',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Pixetto가 감지한 객체의 타입 ID(색상, 모양 등)를 가져옴',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'Pixetto가 현재 사용 중인 기능 ID(색상 감지, 모양 감지 등)를 가져옴',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Pixetto가 지정된 색상의 객체를 감지하는지 확인합니다',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Pixetto가 지정된 모양의 객체를 감지하는지 확인합니다',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Pixetto가 얼굴을 감지하는지 확인합니다',

@@ -16,6 +16,18 @@
         },
         {
             "kind": "block",
+            "type": "pixetto_is_detected"
+        },
+        {
+            "kind": "block",
+            "type": "pixetto_get_type_id"
+        },
+        {
+            "kind": "block",
+            "type": "pixetto_get_func_id"
+        },
+        {
+            "kind": "block",
             "type": "pixetto_color_detect"
         },
         {

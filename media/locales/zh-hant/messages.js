@@ -397,6 +397,9 @@ window.languageManager.loadMessages('zh-hant', {
 	PIXETTO_INIT: '初始化 Pixetto 智慧鏡頭',
 	PIXETTO_RX_PIN: 'RX 腳位',
 	PIXETTO_TX_PIN: 'TX 腳位',
+	PIXETTO_IS_DETECTED: 'Pixetto 偵測到物體',
+	PIXETTO_GET_TYPE_ID: 'Pixetto 取得偵測類型 ID',
+	PIXETTO_GET_FUNC_ID: 'Pixetto 取得功能 ID',
 	PIXETTO_COLOR_DETECT: 'Pixetto 偵測顏色',
 	PIXETTO_SHAPE_DETECT: 'Pixetto 偵測形狀',
 	PIXETTO_FACE_DETECT: 'Pixetto 偵測到人臉',
@@ -418,6 +421,9 @@ window.languageManager.loadMessages('zh-hant', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: '初始化 Pixetto 智慧鏡頭，設定 UART 通訊腳位',
+	PIXETTO_IS_DETECTED_TOOLTIP: '檢測 Pixetto 是否偵測到任何物體',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: '取得 Pixetto 偵測到的物體類型 ID（顏色、形狀等）',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: '取得 Pixetto 目前使用的功能 ID（顏色偵測、形狀偵測等）',
 	PIXETTO_COLOR_DETECT_TOOLTIP: '檢測 Pixetto 是否偵測到指定顏色的物體',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: '檢測 Pixetto 是否偵測到指定形狀的物體',
 	PIXETTO_FACE_DETECT_TOOLTIP: '檢測 Pixetto 是否偵測到人臉',

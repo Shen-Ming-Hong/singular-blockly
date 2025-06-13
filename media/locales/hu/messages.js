@@ -380,6 +380,9 @@ window.languageManager.loadMessages('hu', {
 	PIXETTO_INIT: 'Pixetto intelligens kamera inicializálása',
 	PIXETTO_RX_PIN: 'RX pin',
 	PIXETTO_TX_PIN: 'TX pin',
+	PIXETTO_IS_DETECTED: 'Pixetto Objektum Észlelve',
+	PIXETTO_GET_TYPE_ID: 'Pixetto Típus ID Lekérése',
+	PIXETTO_GET_FUNC_ID: 'Pixetto Funkció ID Lekérése',
 	PIXETTO_COLOR_DETECT: 'Pixetto színfelismerés',
 	PIXETTO_SHAPE_DETECT: 'Pixetto alakzatfelismerés',
 	PIXETTO_FACE_DETECT: 'Pixetto arcfelismerés',
@@ -401,6 +404,9 @@ window.languageManager.loadMessages('hu', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto intelligens kamera inicializálása és UART kommunikációs pinek beállítása',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Annak észlelése, hogy a Pixetto érzékel-e objektumot',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'A Pixetto által észlelt objektum típus ID-jának lekérése (szín, forma stb.)',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'A Pixetto által jelenleg használt funkció ID-jának lekérése (színészlelés, formaészlelés stb.)',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Észleli, hogy a Pixetto meghatározott színű objektumot érzékel-e',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Észleli, hogy a Pixetto meghatározott alakú objektumot érzékel-e',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Észleli, hogy a Pixetto arcot érzékel-e',

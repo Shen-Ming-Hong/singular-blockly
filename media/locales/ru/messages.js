@@ -381,6 +381,9 @@ window.languageManager.loadMessages('ru', {
 	PIXETTO_INIT: 'Инициализировать умную камеру Pixetto',
 	PIXETTO_RX_PIN: 'Пин RX',
 	PIXETTO_TX_PIN: 'Пин TX',
+	PIXETTO_IS_DETECTED: 'Pixetto Объект Обнаружен',
+	PIXETTO_GET_TYPE_ID: 'Pixetto Получить ID Типа',
+	PIXETTO_GET_FUNC_ID: 'Pixetto Получить ID Функции',
 	PIXETTO_COLOR_DETECT: 'Pixetto обнаружение цвета',
 	PIXETTO_SHAPE_DETECT: 'Pixetto обнаружение формы',
 	PIXETTO_FACE_DETECT: 'Pixetto обнаружение лица',
@@ -402,6 +405,9 @@ window.languageManager.loadMessages('ru', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Инициализировать умную камеру Pixetto и настроить пины связи UART',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Обнаружить, обнаруживает ли Pixetto какой-либо объект',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Получить ID типа объекта, обнаруженного Pixetto (цвет, форма и т.д.)',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'Получить ID функции, используемой в данный момент Pixetto (обнаружение цвета, формы и т.д.)',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Определить, обнаруживает ли Pixetto объект указанного цвета',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Определить, обнаруживает ли Pixetto объект указанной формы',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Определить, обнаруживает ли Pixetto лицо',

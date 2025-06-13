@@ -18,6 +18,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.31.0] - 2025-06-13
+
+### 新增 Added
+
+-   新增 Pixetto 基礎檢測積木：是否偵測到物體、取得偵測類型 ID、取得功能 ID
+    Added Pixetto basic detection blocks: object detected check, get type ID, get function ID
+-   增強 Pixetto 程式碼生成邏輯，改善各種偵測模式的準確性和一致性
+    Enhanced Pixetto code generation logic, improving accuracy and consistency of various detection modes
+-   更新所有語言的 Pixetto 翻譯支援，涵蓋新增的積木功能
+    Updated Pixetto translations for all languages, covering newly added block functions
+
+### 已修復 Fixed
+
+-   修正 Pixetto 形狀偵測中六邊形的對應問題（改用五邊形代替）
+    Fixed hexagon mapping issue in Pixetto shape detection (using pentagon instead)
+-   改善 Pixetto 程式碼生成的常數名稱，符合最新函式庫規範
+    Improved Pixetto code generation constant names to comply with latest library specifications
+
+### 已更新 Updated
+
+-   更新 Pixetto 工具箱配置，整合新的基礎檢測積木
+    Updated Pixetto toolbox configuration to integrate new basic detection blocks
+
+### 已修改 Changed
+
+-   重構 Pixetto 偵測積木的程式碼生成方式，使用更精確的條件判斷
+    Refactored Pixetto detection block code generation to use more precise conditional logic
+
 ## [0.30.0] - 2025-06-13
 
 ### 新增 Added

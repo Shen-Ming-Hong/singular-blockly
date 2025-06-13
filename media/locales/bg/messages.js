@@ -380,6 +380,9 @@ window.languageManager.loadMessages('bg', {
 	PIXETTO_INIT: 'Инициализиране на интелигентна камера Pixetto',
 	PIXETTO_RX_PIN: 'RX пин',
 	PIXETTO_TX_PIN: 'TX пин',
+	PIXETTO_IS_DETECTED: 'Pixetto засечен обект',
+	PIXETTO_GET_TYPE_ID: 'Pixetto получаване на ID на тип',
+	PIXETTO_GET_FUNC_ID: 'Pixetto получаване на ID на функция',
 	PIXETTO_COLOR_DETECT: 'Pixetto разпознаване на цвят',
 	PIXETTO_SHAPE_DETECT: 'Pixetto разпознаване на форма',
 	PIXETTO_FACE_DETECT: 'Pixetto разпознаване на лице',
@@ -401,6 +404,9 @@ window.languageManager.loadMessages('bg', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Инициализиране на интелигентната камера Pixetto и настройване на UART комуникационни пинове',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Откриване дали Pixetto засича някакъв обект',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Получаване на ID на типа на засечения обект от Pixetto (цвят, форма и др.)',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'Получаване на ID на текущата функция, използвана от Pixetto (разпознаване на цвят, форма и др.)',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Разпознай дали Pixetto засича обект от определен цвят',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Разпознай дали Pixetto засича обект от определена форма',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Разпознай дали Pixetto засича лице',

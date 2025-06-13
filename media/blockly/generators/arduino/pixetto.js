@@ -10,6 +10,9 @@
 	if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
 		// 註冊 Pixetto 相關積木
 		window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_init');
+		window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_is_detected');
+		window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_get_type_id');
+		window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_get_func_id');
 		window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_color_detect');
 		window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_shape_detect');
 		window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_face_detect');
@@ -24,6 +27,9 @@
 		window.addEventListener('load', function () {
 			if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
 				window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_init');
+				window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_is_detected');
+				window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_get_type_id');
+				window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_get_func_id');
 				window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_color_detect');
 				window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_shape_detect');
 				window.arduinoGenerator.registerAlwaysGenerateBlock('pixetto_face_detect');
@@ -96,6 +102,39 @@ Pixetto pixetto(${rxPin}, ${txPin});  // 建立 Pixetto 物件，設定 RX 和 T
 	}
 };
 
+// Pixetto 是否偵測到物體代碼生成
+window.arduinoGenerator.forBlock['pixetto_is_detected'] = function (block) {
+	try {
+		const code = 'pixetto.isDetected()';
+		return [code, window.arduinoGenerator.ORDER_ATOMIC];
+	} catch (error) {
+		log.error('pixetto_is_detected 代碼生成錯誤:', error);
+		return ['false', window.arduinoGenerator.ORDER_ATOMIC];
+	}
+};
+
+// Pixetto 取得偵測類型 ID 代碼生成
+window.arduinoGenerator.forBlock['pixetto_get_type_id'] = function (block) {
+	try {
+		const code = 'pixetto.getTypeID()';
+		return [code, window.arduinoGenerator.ORDER_ATOMIC];
+	} catch (error) {
+		log.error('pixetto_get_type_id 代碼生成錯誤:', error);
+		return ['-1', window.arduinoGenerator.ORDER_ATOMIC];
+	}
+};
+
+// Pixetto 取得功能 ID 代碼生成
+window.arduinoGenerator.forBlock['pixetto_get_func_id'] = function (block) {
+	try {
+		const code = 'pixetto.getFuncID()';
+		return [code, window.arduinoGenerator.ORDER_ATOMIC];
+	} catch (error) {
+		log.error('pixetto_get_func_id 代碼生成錯誤:', error);
+		return ['-1', window.arduinoGenerator.ORDER_ATOMIC];
+	}
+};
+
 // Pixetto 顏色偵測代碼生成
 window.arduinoGenerator.forBlock['pixetto_color_detect'] = function (block) {
 	try {
@@ -103,18 +142,18 @@ window.arduinoGenerator.forBlock['pixetto_color_detect'] = function (block) {
 
 		// 顏色代碼對應
 		const colorCodes = {
-			RED: 'PIX_COLOR_RED',
-			BLUE: 'PIX_COLOR_BLUE',
-			GREEN: 'PIX_COLOR_GREEN',
-			YELLOW: 'PIX_COLOR_YELLOW',
-			ORANGE: 'PIX_COLOR_ORANGE',
-			PURPLE: 'PIX_COLOR_PURPLE',
-			BLACK: 'PIX_COLOR_BLACK',
-			WHITE: 'PIX_COLOR_WHITE',
+			RED: 'COLOR_RED',
+			BLUE: 'COLOR_BLUE',
+			GREEN: 'COLOR_GREEN',
+			YELLOW: 'COLOR_YELLOW',
+			ORANGE: 'COLOR_ORANGE',
+			PURPLE: 'COLOR_PURPLE',
+			BLACK: 'COLOR_BLACK',
+			WHITE: 'COLOR_WHITE',
 		};
 
-		const code = `pixetto.isDetected(${colorCodes[color]})`;
-		return [code, window.arduinoGenerator.ORDER_FUNCTION_CALL];
+		const code = `(pixetto.isDetected() && pixetto.getFuncID() == Pixetto::FUNC_COLOR_DETECTION && pixetto.getTypeID() == Pixetto::${colorCodes[color]})`;
+		return [code, window.arduinoGenerator.ORDER_LOGICAL_AND];
 	} catch (error) {
 		log.error('pixetto_color_detect 代碼生成錯誤:', error);
 		return ['false', window.arduinoGenerator.ORDER_ATOMIC];
@@ -128,15 +167,15 @@ window.arduinoGenerator.forBlock['pixetto_shape_detect'] = function (block) {
 
 		// 形狀代碼對應
 		const shapeCodes = {
-			TRIANGLE: 'PIX_SHAPE_TRIANGLE',
-			RECTANGLE: 'PIX_SHAPE_RECTANGLE',
-			PENTAGON: 'PIX_SHAPE_PENTAGON',
-			HEXAGON: 'PIX_SHAPE_HEXAGON',
-			CIRCLE: 'PIX_SHAPE_CIRCLE',
+			TRIANGLE: 'SHAPE_TRIANGLE',
+			RECTANGLE: 'SHAPE_RECTANGLE',
+			PENTAGON: 'SHAPE_PENTAGON',
+			HEXAGON: 'SHAPE_PENTAGON', // Pixetto library 沒有六邊形，使用五邊形
+			CIRCLE: 'SHAPE_ROUND',
 		};
 
-		const code = `pixetto.isDetected(${shapeCodes[shape]})`;
-		return [code, window.arduinoGenerator.ORDER_FUNCTION_CALL];
+		const code = `(pixetto.isDetected() && pixetto.getFuncID() == Pixetto::FUNC_SHAPE_DETECTION && pixetto.getTypeID() == Pixetto::${shapeCodes[shape]})`;
+		return [code, window.arduinoGenerator.ORDER_LOGICAL_AND];
 	} catch (error) {
 		log.error('pixetto_shape_detect 代碼生成錯誤:', error);
 		return ['false', window.arduinoGenerator.ORDER_ATOMIC];
@@ -146,8 +185,8 @@ window.arduinoGenerator.forBlock['pixetto_shape_detect'] = function (block) {
 // Pixetto 人臉偵測代碼生成
 window.arduinoGenerator.forBlock['pixetto_face_detect'] = function (block) {
 	try {
-		const code = `pixetto.isDetected(PIX_FACE)`;
-		return [code, window.arduinoGenerator.ORDER_FUNCTION_CALL];
+		const code = `(pixetto.isDetected() && pixetto.getFuncID() == Pixetto::FUNC_FACE_DETECTION)`;
+		return [code, window.arduinoGenerator.ORDER_LOGICAL_AND];
 	} catch (error) {
 		log.error('pixetto_face_detect 代碼生成錯誤:', error);
 		return ['false', window.arduinoGenerator.ORDER_ATOMIC];
@@ -158,7 +197,7 @@ window.arduinoGenerator.forBlock['pixetto_face_detect'] = function (block) {
 window.arduinoGenerator.forBlock['pixetto_apriltag_detect'] = function (block) {
 	try {
 		const tagId = window.arduinoGenerator.valueToCode(block, 'TAG_ID', window.arduinoGenerator.ORDER_ATOMIC) || '0';
-		const code = `(pixetto.isDetected(PIX_APRILTAG) && pixetto.getAprilTagID() == ${tagId})`;
+		const code = `(pixetto.isDetected() && pixetto.getFuncID() == Pixetto::FUNC_APRILTAG && pixetto.getTypeID() == ${tagId})`;
 		return [code, window.arduinoGenerator.ORDER_LOGICAL_AND];
 	} catch (error) {
 		log.error('pixetto_apriltag_detect 代碼生成錯誤:', error);
@@ -170,7 +209,7 @@ window.arduinoGenerator.forBlock['pixetto_apriltag_detect'] = function (block) {
 window.arduinoGenerator.forBlock['pixetto_neural_network'] = function (block) {
 	try {
 		const classId = window.arduinoGenerator.valueToCode(block, 'CLASS_ID', window.arduinoGenerator.ORDER_ATOMIC) || '0';
-		const code = `(pixetto.isDetected(PIX_NEURAL_NETWORK) && pixetto.getNeuralNetworkClassID() == ${classId})`;
+		const code = `(pixetto.isDetected() && pixetto.getFuncID() == Pixetto::FUNC_NEURAL_NETWORK && pixetto.getTypeID() == ${classId})`;
 		return [code, window.arduinoGenerator.ORDER_LOGICAL_AND];
 	} catch (error) {
 		log.error('pixetto_neural_network 代碼生成錯誤:', error);
@@ -182,7 +221,7 @@ window.arduinoGenerator.forBlock['pixetto_neural_network'] = function (block) {
 window.arduinoGenerator.forBlock['pixetto_handwritten_digit'] = function (block) {
 	try {
 		const digit = window.arduinoGenerator.valueToCode(block, 'DIGIT', window.arduinoGenerator.ORDER_ATOMIC) || '0';
-		const code = `(pixetto.isDetected(PIX_HANDWRITTEN_DIGIT) && pixetto.getHandwrittenDigit() == ${digit})`;
+		const code = `(pixetto.isDetected() && pixetto.getFuncID() == Pixetto::FUNC_HANDWRITTEN_DIGITS_DETECTION && pixetto.getTypeID() == ${digit})`;
 		return [code, window.arduinoGenerator.ORDER_LOGICAL_AND];
 	} catch (error) {
 		log.error('pixetto_handwritten_digit 代碼生成錯誤:', error);
@@ -202,9 +241,8 @@ window.arduinoGenerator.forBlock['pixetto_get_position'] = function (block) {
 			WIDTH: 'pixetto.getWidth()',
 			HEIGHT: 'pixetto.getHeight()',
 		};
-
 		const code = positionFunctions[positionType];
-		return [code, window.arduinoGenerator.ORDER_FUNCTION_CALL];
+		return [code, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (error) {
 		log.error('pixetto_get_position 代碼生成錯誤:', error);
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC];
@@ -218,14 +256,14 @@ window.arduinoGenerator.forBlock['pixetto_road_detect'] = function (block) {
 
 		// 道路資訊對應的函數
 		const roadFunctions = {
-			CENTER_X: 'pixetto.getRoadCenterX()',
-			CENTER_Y: 'pixetto.getRoadCenterY()',
-			LEFT_X: 'pixetto.getRoadLeftX()',
-			RIGHT_X: 'pixetto.getRoadRightX()',
+			CENTER_X: 'pixetto.getPosX()',
+			CENTER_Y: 'pixetto.getPosY()',
+			LEFT_X: 'pixetto.getLanesField(Pixetto::LANES_LX1)',
+			RIGHT_X: 'pixetto.getLanesField(Pixetto::LANES_RX1)',
 		};
 
 		const code = roadFunctions[roadInfo];
-		return [code, window.arduinoGenerator.ORDER_FUNCTION_CALL];
+		return [code, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (error) {
 		log.error('pixetto_road_detect 代碼生成錯誤:', error);
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC];
@@ -239,18 +277,18 @@ window.arduinoGenerator.forBlock['pixetto_set_mode'] = function (block) {
 
 		// 模式代碼對應
 		const modeCodes = {
-			COLOR_DETECTION: 'PIX_COLOR_DETECTION',
-			SHAPE_DETECTION: 'PIX_SHAPE_DETECTION',
-			FACE_DETECTION: 'PIX_FACE_DETECTION',
-			APRILTAG_DETECTION: 'PIX_APRILTAG_DETECTION',
-			NEURAL_NETWORK: 'PIX_NEURAL_NETWORK',
-			HANDWRITTEN_DIGIT: 'PIX_HANDWRITTEN_DIGIT',
-			ROAD_DETECTION: 'PIX_ROAD_DETECTION',
-			BALL_DETECTION: 'PIX_BALL_DETECTION',
-			TEMPLATE_MATCHING: 'PIX_TEMPLATE_MATCHING',
+			COLOR_DETECTION: 'FUNC_COLOR_DETECTION',
+			SHAPE_DETECTION: 'FUNC_SHAPE_DETECTION',
+			FACE_DETECTION: 'FUNC_FACE_DETECTION',
+			APRILTAG_DETECTION: 'FUNC_APRILTAG',
+			NEURAL_NETWORK: 'FUNC_NEURAL_NETWORK',
+			HANDWRITTEN_DIGIT: 'FUNC_HANDWRITTEN_DIGITS_DETECTION',
+			ROAD_DETECTION: 'FUNC_LANES_DETECTION',
+			BALL_DETECTION: 'FUNC_SPHERE_DETECTION',
+			TEMPLATE_MATCHING: 'FUNC_TEMPLATE_MATCHING',
 		};
 
-		const code = `pixetto.setMode(${modeCodes[mode]});\n`;
+		const code = `pixetto.enableFunc(Pixetto::${modeCodes[mode]});\n`;
 		return code;
 	} catch (error) {
 		log.error('pixetto_set_mode 代碼生成錯誤:', error);

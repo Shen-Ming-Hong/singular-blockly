@@ -381,6 +381,9 @@ window.languageManager.loadMessages('de', {
 	PIXETTO_INIT: 'Pixetto Smart-Kamera initialisieren',
 	PIXETTO_RX_PIN: 'RX-Pin',
 	PIXETTO_TX_PIN: 'TX-Pin',
+	PIXETTO_IS_DETECTED: 'Pixetto Objekt erkannt',
+	PIXETTO_GET_TYPE_ID: 'Pixetto Typ-ID abrufen',
+	PIXETTO_GET_FUNC_ID: 'Pixetto Funktions-ID abrufen',
 	PIXETTO_COLOR_DETECT: 'Pixetto Farberkennung',
 	PIXETTO_SHAPE_DETECT: 'Pixetto Formerkennung',
 	PIXETTO_FACE_DETECT: 'Pixetto Gesichtserkennung',
@@ -402,6 +405,9 @@ window.languageManager.loadMessages('de', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto Smart-Kamera initialisieren und UART-Kommunikations-Pins einstellen',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Erkennen, ob Pixetto ein Objekt detektiert',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Typ-ID des von Pixetto erkannten Objekts abrufen (Farbe, Form usw.)',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'ID der aktuell von Pixetto verwendeten Funktion abrufen (Farberkennung, Formerkennung usw.)',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Erkennen, ob Pixetto ein Objekt der angegebenen Farbe erkennt',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Erkennen, ob Pixetto ein Objekt der angegebenen Form erkennt',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Erkennen, ob Pixetto ein Gesicht erkennt',

@@ -379,6 +379,9 @@ window.languageManager.loadMessages('cs', {
 	PIXETTO_INIT: 'Inicializace chytré kamery Pixetto',
 	PIXETTO_RX_PIN: 'RX pin',
 	PIXETTO_TX_PIN: 'TX pin',
+	PIXETTO_IS_DETECTED: 'Pixetto detekovaný objekt',
+	PIXETTO_GET_TYPE_ID: 'Pixetto získat ID typu',
+	PIXETTO_GET_FUNC_ID: 'Pixetto získat ID funkce',
 	PIXETTO_COLOR_DETECT: 'Pixetto detekce barvy',
 	PIXETTO_SHAPE_DETECT: 'Pixetto detekce tvaru',
 	PIXETTO_FACE_DETECT: 'Pixetto detekce obličeje',
@@ -400,6 +403,9 @@ window.languageManager.loadMessages('cs', {
 
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Inicializace chytré kamery Pixetto a nastavení komunikačních pinů UART',
+	PIXETTO_IS_DETECTED_TOOLTIP: 'Zjistit, zda Pixetto detekuje nějaký objekt',
+	PIXETTO_GET_TYPE_ID_TOOLTIP: 'Získat ID typu detekovaného objektu z Pixetto (barva, tvar atd.)',
+	PIXETTO_GET_FUNC_ID_TOOLTIP: 'Získat ID aktuální funkce používané Pixetto (detekce barvy, tvaru atd.)',
 	PIXETTO_COLOR_DETECT_TOOLTIP: 'Zjistit, zda Pixetto detekuje objekt zadané barvy',
 	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Zjistit, zda Pixetto detekuje objekt zadaného tvaru',
 	PIXETTO_FACE_DETECT_TOOLTIP: 'Zjistit, zda Pixetto detekuje obličej',
