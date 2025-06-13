@@ -234,6 +234,174 @@ export class SettingsManager {
 	}
 
 	/**
+	 * 同步 platformio.ini 的所有設定（lib_deps、build_flags、lib_ldf_mode）
+	 * @param libDeps 當前需要的函式庫依賴列表
+	 * @param buildFlags 當前需要的編譯標誌列表
+	 * @param libLdfMode 庫連結模式
+	 */
+	async syncPlatformIOSettings(libDeps: string[], buildFlags: string[], libLdfMode: string | null): Promise<void> {
+		try {
+			const iniPath = 'platformio.ini';
+
+			// 檢查檔案是否存在
+			if (!this.fileService.fileExists(iniPath)) {
+				log(`platformio.ini not found, cannot sync platformio settings`, 'warn');
+				return;
+			}
+
+			// 讀取現有內容
+			const content = await this.fileService.readFile(iniPath);
+			const lines = content.split(/\r?\n/);
+			let updated = false;
+			let inEnvSection = false;
+			let libDepsFound = false;
+			let buildFlagsFound = false;
+			let libLdfModeFound = false;
+
+			// 遍歷檔案找到各個設定並更新
+			for (let i = 0; i < lines.length; i++) {
+				const line = lines[i];
+				const trimmed = line.trim();
+
+				// 檢測環境區段開始
+				if (/^\s*\[env:/.test(line)) {
+					inEnvSection = true;
+					continue;
+				}
+
+				// 檢測新區段開始
+				if (inEnvSection && trimmed.startsWith('[') && !trimmed.startsWith('[env:')) {
+					// 在離開 env 區段前，檢查是否需要添加缺少的設定
+					if (libDeps.length > 0 && !libDepsFound) {
+						lines.splice(i, 0, `lib_deps = ${libDeps.join(', ')}`);
+						updated = true;
+						i++; // 調整索引
+						log(`Added lib_deps to platformio.ini: ${libDeps.join(', ')}`, 'info');
+					}
+					if (buildFlags.length > 0 && !buildFlagsFound) {
+						lines.splice(i, 0, `build_flags = `);
+						for (const flag of buildFlags) {
+							lines.splice(i + 1, 0, `    ${flag}`);
+							i++; // 調整索引
+						}
+						updated = true;
+						i++; // 調整索引
+						log(`Added build_flags to platformio.ini: ${buildFlags.join(', ')}`, 'info');
+					}
+					if (libLdfMode && !libLdfModeFound) {
+						lines.splice(i, 0, `lib_ldf_mode = ${libLdfMode}`);
+						updated = true;
+						i++; // 調整索引
+						log(`Added lib_ldf_mode to platformio.ini: ${libLdfMode}`, 'info');
+					}
+					break;
+				}
+
+				if (inEnvSection) {
+					// 處理 lib_deps
+					if (trimmed.startsWith('lib_deps')) {
+						libDepsFound = true;
+						const equalIndex = trimmed.indexOf('=');
+						if (equalIndex >= 0) {
+							const depsPrefix = trimmed.substring(0, equalIndex + 1);
+
+							if (libDeps.length === 0) {
+								lines.splice(i, 1);
+								updated = true;
+								i--; // 調整索引
+								log(`Removed lib_deps from platformio.ini as no libraries are needed`, 'info');
+							} else {
+								lines[i] = `${depsPrefix} ${libDeps.join(', ')}`;
+								updated = true;
+								log(`Updated lib_deps in platformio.ini: ${libDeps.join(', ')}`, 'info');
+							}
+						}
+					}
+					// 處理 build_flags
+					else if (trimmed.startsWith('build_flags')) {
+						buildFlagsFound = true;
+						if (buildFlags.length === 0) {
+							// 移除 build_flags 行及其延續行
+							let j = i;
+							lines.splice(j, 1);
+							// 移除後續的縮排行
+							while (j < lines.length && lines[j].startsWith('    ') && !lines[j].trim().includes('=')) {
+								lines.splice(j, 1);
+							}
+							updated = true;
+							i--; // 調整索引
+							log(`Removed build_flags from platformio.ini as no flags are needed`, 'info');
+						} else {
+							// 更新 build_flags
+							lines[i] = 'build_flags = ';
+							let j = i + 1;
+							// 移除現有的縮排行
+							while (j < lines.length && lines[j].startsWith('    ') && !lines[j].trim().includes('=')) {
+								lines.splice(j, 1);
+							}
+							// 添加新的標誌
+							for (let k = 0; k < buildFlags.length; k++) {
+								lines.splice(i + 1 + k, 0, `    ${buildFlags[k]}`);
+							}
+							updated = true;
+							i += buildFlags.length; // 調整索引
+							log(`Updated build_flags in platformio.ini: ${buildFlags.join(', ')}`, 'info');
+						}
+					}
+					// 處理 lib_ldf_mode
+					else if (trimmed.startsWith('lib_ldf_mode')) {
+						libLdfModeFound = true;
+						const equalIndex = trimmed.indexOf('=');
+						if (equalIndex >= 0) {
+							if (!libLdfMode) {
+								lines.splice(i, 1);
+								updated = true;
+								i--; // 調整索引
+								log(`Removed lib_ldf_mode from platformio.ini`, 'info');
+							} else {
+								const prefix = trimmed.substring(0, equalIndex + 1);
+								lines[i] = `${prefix} ${libLdfMode}`;
+								updated = true;
+								log(`Updated lib_ldf_mode in platformio.ini: ${libLdfMode}`, 'info');
+							}
+						}
+					}
+				}
+			}
+
+			// 如果到了檔案末尾還在 env 區段內，且有需要添加的設定
+			if (inEnvSection) {
+				if (libDeps.length > 0 && !libDepsFound) {
+					lines.push(`lib_deps = ${libDeps.join(', ')}`);
+					updated = true;
+					log(`Added lib_deps to platformio.ini: ${libDeps.join(', ')}`, 'info');
+				}
+				if (buildFlags.length > 0 && !buildFlagsFound) {
+					lines.push('build_flags = ');
+					for (const flag of buildFlags) {
+						lines.push(`    ${flag}`);
+					}
+					updated = true;
+					log(`Added build_flags to platformio.ini: ${buildFlags.join(', ')}`, 'info');
+				}
+				if (libLdfMode && !libLdfModeFound) {
+					lines.push(`lib_ldf_mode = ${libLdfMode}`);
+					updated = true;
+					log(`Added lib_ldf_mode to platformio.ini: ${libLdfMode}`, 'info');
+				}
+			}
+
+			// 如果檔案內容有更新，寫回檔案
+			if (updated) {
+				await this.fileService.writeFile(iniPath, lines.join('\n'));
+			}
+		} catch (error) {
+			log(`Error syncing platformio.ini settings: ${error}`, 'error');
+			throw error;
+		}
+	}
+
+	/**
 	 * 取得自動備份時間間隔（分鐘）
 	 * @returns 自動備份時間間隔，預設為 5 分鐘
 	 */

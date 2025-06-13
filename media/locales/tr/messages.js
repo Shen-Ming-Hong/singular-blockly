@@ -375,4 +375,79 @@ window.languageManager.loadMessages('tr', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Yedi segment ekran pinlerini ayarla',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'Yedi segment ekranın her bir segmenti (A-G) ve ondalık noktası (DP) için pinleri yapılandırın.',
+
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Pixetto Akıllı Kamerayı Başlat',
+	PIXETTO_RX_PIN: 'RX Pin',
+	PIXETTO_TX_PIN: 'TX Pin',
+	PIXETTO_COLOR_DETECT: 'Pixetto Renk Tespiti',
+	PIXETTO_SHAPE_DETECT: 'Pixetto Şekil Tespiti',
+	PIXETTO_FACE_DETECT: 'Pixetto Yüz Tespiti',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto Nisan Etiketi Tespiti',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto Sinir Ağı Tanıma',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto Elle Yazılmış Rakamı Tanı',
+	PIXETTO_GET_POSITION: 'Pixetto Tespit Edilen Nesneyi Al',
+	PIXETTO_ROAD_DETECT: 'Pixetto Yol Tespiti',
+	PIXETTO_SET_MODE: 'Pixetto Fonksiyon Modunu Ayarla',
+	PIXETTO_COLOR: 'Renk',
+	PIXETTO_SHAPE: 'Şekil',
+	PIXETTO_MODE: 'Mod',
+	PIXETTO_TAG_ID: 'Etiket ID',
+	PIXETTO_CLASS_ID: 'Sınıf ID',
+	PIXETTO_DIGIT: 'Rakam',
+	PIXETTO_COORDINATE: 'Koordinat',
+	PIXETTO_ROAD_INFO: 'Bilgi',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Pixetto akıllı kamerasını başlatın ve UART iletişim pinlerini ayarlayın',
+	PIXETTO_COLOR_DETECT_TOOLTIP: "Pixetto'nun belirtilen renkteki nesneyi algılayıp algılamadığını tespit edin",
+	PIXETTO_SHAPE_DETECT_TOOLTIP: "Pixetto'nun belirtilen şekildeki nesneyi algılayıp algılamadığını tespit edin",
+	PIXETTO_FACE_DETECT_TOOLTIP: "Pixetto'nun yüz algılayıp algılamadığını tespit edin",
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: "Pixetto'nun belirtilen ID'li AprilTag algılayıp algılamadığını tespit edin",
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Pixetto sinir ağının belirtilen sınıftaki nesneyi tanıyıp tanımadığını tespit edin',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: "Pixetto'nun belirtilen el yazısı rakamını tanıyıp tanımadığını tespit edin",
+	PIXETTO_GET_POSITION_TOOLTIP: 'Pixetto tarafından algılanan nesnenin konum veya boyut bilgilerini alın',
+	PIXETTO_ROAD_DETECT_TOOLTIP: "Pixetto'dan yol algılama ile ilgili bilgileri alın",
+	PIXETTO_SET_MODE_TOOLTIP: 'Pixetto akıllı kamerasının işlevsel modunu ayarlayın',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: 'Kırmızı',
+	PIXETTO_COLOR_BLUE: 'Mavi',
+	PIXETTO_COLOR_GREEN: 'Yeşil',
+	PIXETTO_COLOR_YELLOW: 'Sarı',
+	PIXETTO_COLOR_ORANGE: 'Turuncu',
+	PIXETTO_COLOR_PURPLE: 'Mor',
+	PIXETTO_COLOR_BLACK: 'Siyah',
+	PIXETTO_COLOR_WHITE: 'Beyaz',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: 'Üçgen',
+	PIXETTO_SHAPE_RECTANGLE: 'Dikdörtgen',
+	PIXETTO_SHAPE_PENTAGON: 'Beşgen',
+	PIXETTO_SHAPE_HEXAGON: 'Altıgen',
+	PIXETTO_SHAPE_CIRCLE: 'Daire',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X Koordinatı',
+	PIXETTO_POSITION_Y: 'Y Koordinatı',
+	PIXETTO_POSITION_WIDTH: 'Genişlik',
+	PIXETTO_POSITION_HEIGHT: 'Yükseklik',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Merkez X',
+	PIXETTO_ROAD_CENTER_Y: 'Merkez Y',
+	PIXETTO_ROAD_LEFT_X: 'Sol Sınır X',
+	PIXETTO_ROAD_RIGHT_X: 'Sağ Sınır X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: 'Renk Algılama',
+	PIXETTO_MODE_SHAPE_DETECTION: 'Şekil Algılama',
+	PIXETTO_MODE_FACE_DETECTION: 'Yüz Algılama',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'AprilTag Algılama',
+	PIXETTO_MODE_NEURAL_NETWORK: 'Sinir Ağı',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: 'El Yazısı Rakam',
+	PIXETTO_MODE_ROAD_DETECTION: 'Yol Algılama',
+	PIXETTO_MODE_BALL_DETECTION: 'Top Algılama',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'Şablon Eşleştirme',
 });

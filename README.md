@@ -59,6 +59,16 @@ A Visual Studio Code extension that provides a visual programming interface usin
             -   Automatic detection and configuration between ultrasonic blocks
         -   Seven-segment Display with common cathode/anode modes
         -   Threshold function blocks for analog input monitoring
+    -   Pixetto Smart Camera
+        -   Complete visual recognition system
+        -   Color detection (8 colors: red, blue, green, yellow, orange, purple, black, white)
+        -   Shape detection (triangle, rectangle, pentagon, hexagon, circle)
+        -   Face detection and AprilTag recognition
+        -   Neural network recognition and handwritten digit recognition
+        -   Road detection with center and boundary information
+        -   Position and size data retrieval (X, Y coordinates, width, height)
+        -   UART communication configuration (RX/TX pins)
+        -   Multiple function modes with easy switching
     -   Functions with parameter support
         -   Custom threshold functions with analog input support
         -   Configurable sensor pins and threshold values

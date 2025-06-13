@@ -169,6 +169,9 @@ export class WebViewManager {
 			const loopsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/loops.js'));
 			const loopsBlocksUri = webview.asWebviewUri(loopsBlocksPath);
 
+			// Pixetto 智慧鏡頭積木定義
+			const pixettoBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/pixetto.js'));
+			const pixettoBlocksUri = webview.asWebviewUri(pixettoBlocksPath);
 			// Arduino 生成器模組
 			const arduinoModules = [
 				'io.js',
@@ -181,6 +184,7 @@ export class WebViewManager {
 				'variables.js',
 				'sensors.js',
 				'motors.js',
+				'pixetto.js',
 			]
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
@@ -259,6 +263,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{sensorsBlocksUri}', sensorsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{motorsBlocksUri}', motorsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{loopsBlocksUri}', loopsBlocksUri.toString());
+			htmlContent = htmlContent.replace('{pixettoBlocksUri}', pixettoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 

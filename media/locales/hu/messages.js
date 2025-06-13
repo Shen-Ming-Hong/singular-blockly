@@ -376,4 +376,78 @@ window.languageManager.loadMessages('hu', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Hétszegmenses kijelző pinek beállítása',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'A hétszegmenses kijelző minden szegmensének (A-G) és tizedespontjának (DP) konfigurálása.',
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Pixetto intelligens kamera inicializálása',
+	PIXETTO_RX_PIN: 'RX pin',
+	PIXETTO_TX_PIN: 'TX pin',
+	PIXETTO_COLOR_DETECT: 'Pixetto színfelismerés',
+	PIXETTO_SHAPE_DETECT: 'Pixetto alakzatfelismerés',
+	PIXETTO_FACE_DETECT: 'Pixetto arcfelismerés',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto AprilTag felismerés',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto neurális hálózat felismerés',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto kézzel írt számjegy felismerés',
+	PIXETTO_GET_POSITION: 'Pixetto észlelt objektum lekérése',
+	PIXETTO_ROAD_DETECT: 'Pixetto útfelismerés',
+	PIXETTO_SET_MODE: 'Pixetto funkciós mód beállítása',
+	PIXETTO_COLOR: 'Szín',
+	PIXETTO_SHAPE: 'Alakzat',
+	PIXETTO_MODE: 'Mód',
+	PIXETTO_TAG_ID: 'Címke ID',
+	PIXETTO_CLASS_ID: 'Osztály ID',
+	PIXETTO_DIGIT: 'Számjegy',
+	PIXETTO_COORDINATE: 'Koordináta',
+	PIXETTO_ROAD_INFO: 'Információ',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Pixetto intelligens kamera inicializálása és UART kommunikációs pinek beállítása',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Észleli, hogy a Pixetto meghatározott színű objektumot érzékel-e',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Észleli, hogy a Pixetto meghatározott alakú objektumot érzékel-e',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Észleli, hogy a Pixetto arcot érzékel-e',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Észleli, hogy a Pixetto meghatározott ID-jű AprilTag-et érzékel-e',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Észleli, hogy a Pixetto neurális hálózat meghatározott osztályú objektumot ismer-e fel',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Észleli, hogy a Pixetto meghatározott kézzel írt számjegyet ismer-e fel',
+	PIXETTO_GET_POSITION_TOOLTIP: 'A Pixetto által észlelt objektum pozíció vagy méret információjának megszerzése',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Útészleléshez kapcsolódó információk megszerzése a Pixetto-tól',
+	PIXETTO_SET_MODE_TOOLTIP: 'A Pixetto intelligens kamera funkcionális módjának beállítása',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: 'Piros',
+	PIXETTO_COLOR_BLUE: 'Kék',
+	PIXETTO_COLOR_GREEN: 'Zöld',
+	PIXETTO_COLOR_YELLOW: 'Sárga',
+	PIXETTO_COLOR_ORANGE: 'Narancssárga',
+	PIXETTO_COLOR_PURPLE: 'Lila',
+	PIXETTO_COLOR_BLACK: 'Fekete',
+	PIXETTO_COLOR_WHITE: 'Fehér',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: 'Háromszög',
+	PIXETTO_SHAPE_RECTANGLE: 'Téglalap',
+	PIXETTO_SHAPE_PENTAGON: 'Ötszög',
+	PIXETTO_SHAPE_HEXAGON: 'Hatszög',
+	PIXETTO_SHAPE_CIRCLE: 'Kör',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X koordináta',
+	PIXETTO_POSITION_Y: 'Y koordináta',
+	PIXETTO_POSITION_WIDTH: 'Szélesség',
+	PIXETTO_POSITION_HEIGHT: 'Magasság',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Központ X',
+	PIXETTO_ROAD_CENTER_Y: 'Központ Y',
+	PIXETTO_ROAD_LEFT_X: 'Bal határ X',
+	PIXETTO_ROAD_RIGHT_X: 'Jobb határ X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: 'Színészlelés',
+	PIXETTO_MODE_SHAPE_DETECTION: 'Alakzatészlelés',
+	PIXETTO_MODE_FACE_DETECTION: 'Arcfelismerés',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'AprilTag észlelés',
+	PIXETTO_MODE_NEURAL_NETWORK: 'Neurális hálózat',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: 'Kézzel írt számjegy',
+	PIXETTO_MODE_ROAD_DETECTION: 'Útészlelés',
+	PIXETTO_MODE_BALL_DETECTION: 'Labdaészlelés',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'Sablon egyeztetés',
 });

@@ -377,4 +377,78 @@ window.languageManager.loadMessages('ru', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Установить пины семисегментного индикатора',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'Настроить пины для каждого сегмента (A-G) и десятичной точки (DP) семисегментного индикатора.',
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Инициализировать умную камеру Pixetto',
+	PIXETTO_RX_PIN: 'Пин RX',
+	PIXETTO_TX_PIN: 'Пин TX',
+	PIXETTO_COLOR_DETECT: 'Pixetto обнаружение цвета',
+	PIXETTO_SHAPE_DETECT: 'Pixetto обнаружение формы',
+	PIXETTO_FACE_DETECT: 'Pixetto обнаружение лица',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto обнаружение AprilTag',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto распознавание нейронной сети',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto распознавание рукописной цифры',
+	PIXETTO_GET_POSITION: 'Pixetto получить обнаруженный объект',
+	PIXETTO_ROAD_DETECT: 'Pixetto обнаружение дороги',
+	PIXETTO_SET_MODE: 'Установить функциональный режим Pixetto',
+	PIXETTO_COLOR: 'Цвет',
+	PIXETTO_SHAPE: 'Форма',
+	PIXETTO_MODE: 'Режим',
+	PIXETTO_TAG_ID: 'ID метки',
+	PIXETTO_CLASS_ID: 'ID класса',
+	PIXETTO_DIGIT: 'Цифра',
+	PIXETTO_COORDINATE: 'Координата',
+	PIXETTO_ROAD_INFO: 'Информация',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Инициализировать умную камеру Pixetto и настроить пины связи UART',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Определить, обнаруживает ли Pixetto объект указанного цвета',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Определить, обнаруживает ли Pixetto объект указанной формы',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Определить, обнаруживает ли Pixetto лицо',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Определить, обнаруживает ли Pixetto AprilTag с указанным ID',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Определить, распознает ли нейронная сеть Pixetto объект указанного класса',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Определить, распознает ли Pixetto указанную рукописную цифру',
+	PIXETTO_GET_POSITION_TOOLTIP: 'Получить информацию о позиции или размере объекта, обнаруженного Pixetto',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Получить информацию, связанную с обнаружением дороги от Pixetto',
+	PIXETTO_SET_MODE_TOOLTIP: 'Установить функциональный режим умной камеры Pixetto',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: 'Красный',
+	PIXETTO_COLOR_BLUE: 'Синий',
+	PIXETTO_COLOR_GREEN: 'Зеленый',
+	PIXETTO_COLOR_YELLOW: 'Желтый',
+	PIXETTO_COLOR_ORANGE: 'Оранжевый',
+	PIXETTO_COLOR_PURPLE: 'Фиолетовый',
+	PIXETTO_COLOR_BLACK: 'Черный',
+	PIXETTO_COLOR_WHITE: 'Белый',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: 'Треугольник',
+	PIXETTO_SHAPE_RECTANGLE: 'Прямоугольник',
+	PIXETTO_SHAPE_PENTAGON: 'Пятиугольник',
+	PIXETTO_SHAPE_HEXAGON: 'Шестиугольник',
+	PIXETTO_SHAPE_CIRCLE: 'Круг',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X координата',
+	PIXETTO_POSITION_Y: 'Y координата',
+	PIXETTO_POSITION_WIDTH: 'Ширина',
+	PIXETTO_POSITION_HEIGHT: 'Высота',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Центр X',
+	PIXETTO_ROAD_CENTER_Y: 'Центр Y',
+	PIXETTO_ROAD_LEFT_X: 'Левая граница X',
+	PIXETTO_ROAD_RIGHT_X: 'Правая граница X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: 'Обнаружение цвета',
+	PIXETTO_MODE_SHAPE_DETECTION: 'Обнаружение формы',
+	PIXETTO_MODE_FACE_DETECTION: 'Обнаружение лица',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'Обнаружение AprilTag',
+	PIXETTO_MODE_NEURAL_NETWORK: 'Нейронная сеть',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: 'Рукописная цифра',
+	PIXETTO_MODE_ROAD_DETECTION: 'Обнаружение дороги',
+	PIXETTO_MODE_BALL_DETECTION: 'Обнаружение мяча',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'Сопоставление шаблонов',
 });

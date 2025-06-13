@@ -392,4 +392,79 @@ window.languageManager.loadMessages('zh-hant', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: '設定七段顯示器腳位',
 	SEVEN_SEGMENT_PINS_TOOLTIP: '配置七段顯示器的各段(A-G)及小數點(DP)的連接腳位。',
+
+	// Pixetto Smart Camera
+	PIXETTO_INIT: '初始化 Pixetto 智慧鏡頭',
+	PIXETTO_RX_PIN: 'RX 腳位',
+	PIXETTO_TX_PIN: 'TX 腳位',
+	PIXETTO_COLOR_DETECT: 'Pixetto 偵測顏色',
+	PIXETTO_SHAPE_DETECT: 'Pixetto 偵測形狀',
+	PIXETTO_FACE_DETECT: 'Pixetto 偵測到人臉',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto 偵測 AprilTag',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto 神經網路辨識',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto 辨識手寫數字',
+	PIXETTO_GET_POSITION: 'Pixetto 獲取偵測物體',
+	PIXETTO_ROAD_DETECT: 'Pixetto 道路偵測',
+	PIXETTO_SET_MODE: '設定 Pixetto 功能模式',
+	PIXETTO_COLOR: '顏色',
+	PIXETTO_SHAPE: '形狀',
+	PIXETTO_MODE: '模式',
+	PIXETTO_TAG_ID: '標籤 ID',
+	PIXETTO_CLASS_ID: '類別 ID',
+	PIXETTO_DIGIT: '數字',
+	PIXETTO_COORDINATE: '座標',
+	PIXETTO_ROAD_INFO: '資訊',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: '初始化 Pixetto 智慧鏡頭，設定 UART 通訊腳位',
+	PIXETTO_COLOR_DETECT_TOOLTIP: '檢測 Pixetto 是否偵測到指定顏色的物體',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: '檢測 Pixetto 是否偵測到指定形狀的物體',
+	PIXETTO_FACE_DETECT_TOOLTIP: '檢測 Pixetto 是否偵測到人臉',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: '檢測 Pixetto 是否偵測到指定 ID 的 AprilTag',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: '檢測 Pixetto 神經網路是否辨識出指定類別的物體',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: '檢測 Pixetto 是否辨識出指定的手寫數字',
+	PIXETTO_GET_POSITION_TOOLTIP: '獲取 Pixetto 偵測到的物體位置或尺寸資訊',
+	PIXETTO_ROAD_DETECT_TOOLTIP: '獲取 Pixetto 道路偵測的相關資訊',
+	PIXETTO_SET_MODE_TOOLTIP: '設定 Pixetto 智慧鏡頭的功能模式',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: '紅色',
+	PIXETTO_COLOR_BLUE: '藍色',
+	PIXETTO_COLOR_GREEN: '綠色',
+	PIXETTO_COLOR_YELLOW: '黃色',
+	PIXETTO_COLOR_ORANGE: '橙色',
+	PIXETTO_COLOR_PURPLE: '紫色',
+	PIXETTO_COLOR_BLACK: '黑色',
+	PIXETTO_COLOR_WHITE: '白色',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: '三角形',
+	PIXETTO_SHAPE_RECTANGLE: '四邊形',
+	PIXETTO_SHAPE_PENTAGON: '五邊形',
+	PIXETTO_SHAPE_HEXAGON: '六邊形',
+	PIXETTO_SHAPE_CIRCLE: '圓形',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X 座標',
+	PIXETTO_POSITION_Y: 'Y 座標',
+	PIXETTO_POSITION_WIDTH: '寬度',
+	PIXETTO_POSITION_HEIGHT: '高度',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: '中心點 X',
+	PIXETTO_ROAD_CENTER_Y: '中心點 Y',
+	PIXETTO_ROAD_LEFT_X: '左邊界 X',
+	PIXETTO_ROAD_RIGHT_X: '右邊界 X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: '顏色偵測',
+	PIXETTO_MODE_SHAPE_DETECTION: '形狀偵測',
+	PIXETTO_MODE_FACE_DETECTION: '人臉偵測',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'AprilTag 偵測',
+	PIXETTO_MODE_NEURAL_NETWORK: '神經網路',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: '手寫數字',
+	PIXETTO_MODE_ROAD_DETECTION: '道路偵測',
+	PIXETTO_MODE_BALL_DETECTION: '球體偵測',
+	PIXETTO_MODE_TEMPLATE_MATCHING: '模板比對',
 });

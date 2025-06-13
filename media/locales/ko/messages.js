@@ -376,4 +376,78 @@ window.languageManager.loadMessages('ko', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: '7세그먼트 디스플레이 핀 설정',
 	SEVEN_SEGMENT_PINS_TOOLTIP: '7세그먼트 디스플레이의 각 세그먼트(A-G)와 소수점(DP)에 대한 핀을 구성합니다.',
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Pixetto 스마트 카메라 초기화',
+	PIXETTO_RX_PIN: 'RX 핀',
+	PIXETTO_TX_PIN: 'TX 핀',
+	PIXETTO_COLOR_DETECT: 'Pixetto 색상 감지',
+	PIXETTO_SHAPE_DETECT: 'Pixetto 모양 감지',
+	PIXETTO_FACE_DETECT: 'Pixetto 얼굴 감지',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto AprilTag 감지',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto 신경망 인식',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto 손글씨 숫자 인식',
+	PIXETTO_GET_POSITION: 'Pixetto 감지된 객체 가져오기',
+	PIXETTO_ROAD_DETECT: 'Pixetto 도로 감지',
+	PIXETTO_SET_MODE: 'Pixetto 기능 모드 설정',
+	PIXETTO_COLOR: '색상',
+	PIXETTO_SHAPE: '모양',
+	PIXETTO_MODE: '모드',
+	PIXETTO_TAG_ID: '태그 ID',
+	PIXETTO_CLASS_ID: '클래스 ID',
+	PIXETTO_DIGIT: '숫자',
+	PIXETTO_COORDINATE: '좌표',
+	PIXETTO_ROAD_INFO: '정보',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Pixetto 스마트 카메라를 초기화하고 UART 통신 핀을 설정합니다',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Pixetto가 지정된 색상의 객체를 감지하는지 확인합니다',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Pixetto가 지정된 모양의 객체를 감지하는지 확인합니다',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Pixetto가 얼굴을 감지하는지 확인합니다',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Pixetto가 지정된 ID의 AprilTag를 감지하는지 확인합니다',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Pixetto 신경망이 지정된 클래스의 객체를 인식하는지 확인합니다',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Pixetto가 지정된 손글씨 숫자를 인식하는지 확인합니다',
+	PIXETTO_GET_POSITION_TOOLTIP: 'Pixetto에서 감지된 객체의 위치 또는 크기 정보를 가져옵니다',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Pixetto에서 도로 감지 관련 정보를 가져옵니다',
+	PIXETTO_SET_MODE_TOOLTIP: 'Pixetto 스마트 카메라의 기능 모드를 설정합니다',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: '빨간색',
+	PIXETTO_COLOR_BLUE: '파란색',
+	PIXETTO_COLOR_GREEN: '초록색',
+	PIXETTO_COLOR_YELLOW: '노란색',
+	PIXETTO_COLOR_ORANGE: '주황색',
+	PIXETTO_COLOR_PURPLE: '보라색',
+	PIXETTO_COLOR_BLACK: '검은색',
+	PIXETTO_COLOR_WHITE: '흰색',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: '삼각형',
+	PIXETTO_SHAPE_RECTANGLE: '사각형',
+	PIXETTO_SHAPE_PENTAGON: '오각형',
+	PIXETTO_SHAPE_HEXAGON: '육각형',
+	PIXETTO_SHAPE_CIRCLE: '원',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X 좌표',
+	PIXETTO_POSITION_Y: 'Y 좌표',
+	PIXETTO_POSITION_WIDTH: '너비',
+	PIXETTO_POSITION_HEIGHT: '높이',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: '중심 X',
+	PIXETTO_ROAD_CENTER_Y: '중심 Y',
+	PIXETTO_ROAD_LEFT_X: '왼쪽 경계 X',
+	PIXETTO_ROAD_RIGHT_X: '오른쪽 경계 X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: '색상 감지',
+	PIXETTO_MODE_SHAPE_DETECTION: '모양 감지',
+	PIXETTO_MODE_FACE_DETECTION: '얼굴 감지',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'AprilTag 감지',
+	PIXETTO_MODE_NEURAL_NETWORK: '신경망',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: '손글씨 숫자',
+	PIXETTO_MODE_ROAD_DETECTION: '도로 감지',
+	PIXETTO_MODE_BALL_DETECTION: '공 감지',
+	PIXETTO_MODE_TEMPLATE_MATCHING: '템플릿 매칭',
 });

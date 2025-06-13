@@ -917,6 +917,8 @@ function handleRefreshCode() {
 			command: 'updateCode',
 			code: code,
 			lib_deps: arduinoGenerator.lib_deps_ || [],
+			build_flags: arduinoGenerator.build_flags_ || [],
+			lib_ldf_mode: arduinoGenerator.lib_ldf_mode_ || null,
 		});
 
 		log.info('程式碼重新整理完成');
@@ -1372,11 +1374,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 檢查是否是函式定義積木變化
 			try {
 				const code = arduinoGenerator.workspaceToCode(workspace);
-				// 將庫依賴一併發送
+				// 將庫依賴和其他設定一併發送
 				vscode.postMessage({
 					command: 'updateCode',
 					code: code,
 					lib_deps: arduinoGenerator.lib_deps_ || [],
+					build_flags: arduinoGenerator.build_flags_ || [],
+					lib_ldf_mode: arduinoGenerator.lib_ldf_mode_ || null,
 				});
 
 				// 無條件保存所有方塊移動事件，確保座標變更被儲存
@@ -1403,6 +1407,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 			command: 'updateBoard',
 			board: selectedBoard,
 			lib_deps: window.arduinoGenerator.lib_deps_ || [],
+			build_flags: window.arduinoGenerator.build_flags_ || [],
+			lib_ldf_mode: window.arduinoGenerator.lib_ldf_mode_ || null,
 		});
 		saveWorkspaceState();
 	});

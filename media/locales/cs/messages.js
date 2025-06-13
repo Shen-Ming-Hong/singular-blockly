@@ -375,4 +375,78 @@ window.languageManager.loadMessages('cs', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Nastavit piny sedmisegmentového displeje',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'Nastavit piny pro každý segment (A-G) a desetinnou tečku (DP) sedmisegmentového displeje.',
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Inicializace chytré kamery Pixetto',
+	PIXETTO_RX_PIN: 'RX pin',
+	PIXETTO_TX_PIN: 'TX pin',
+	PIXETTO_COLOR_DETECT: 'Pixetto detekce barvy',
+	PIXETTO_SHAPE_DETECT: 'Pixetto detekce tvaru',
+	PIXETTO_FACE_DETECT: 'Pixetto detekce obličeje',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto detekce AprilTag',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto rozpoznání neuronové sítě',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto rozpoznání ručně psané číslice',
+	PIXETTO_GET_POSITION: 'Pixetto získat detekovaný objekt',
+	PIXETTO_ROAD_DETECT: 'Pixetto detekce silnic',
+	PIXETTO_SET_MODE: 'Nastavit funkční režim Pixetto',
+	PIXETTO_COLOR: 'Barva',
+	PIXETTO_SHAPE: 'Tvar',
+	PIXETTO_MODE: 'Režim',
+	PIXETTO_TAG_ID: 'ID značky',
+	PIXETTO_CLASS_ID: 'ID třídy',
+	PIXETTO_DIGIT: 'Číslice',
+	PIXETTO_COORDINATE: 'Souřadnice',
+	PIXETTO_ROAD_INFO: 'Informace',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Inicializace chytré kamery Pixetto a nastavení komunikačních pinů UART',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Zjistit, zda Pixetto detekuje objekt zadané barvy',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Zjistit, zda Pixetto detekuje objekt zadaného tvaru',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Zjistit, zda Pixetto detekuje obličej',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Zjistit, zda Pixetto detekuje AprilTag se zadaným ID',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Zjistit, zda neuronová síť Pixetto rozpozná objekt zadané třídy',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Zjistit, zda Pixetto rozpozná zadanou ručně psanou číslici',
+	PIXETTO_GET_POSITION_TOOLTIP: 'Získat informace o poloze nebo velikosti detekovaného objektu Pixetto',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Získat informace související s detekcí silnic od Pixetto',
+	PIXETTO_SET_MODE_TOOLTIP: 'Nastavit funkční režim chytré kamery Pixetto',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: 'Červená',
+	PIXETTO_COLOR_BLUE: 'Modrá',
+	PIXETTO_COLOR_GREEN: 'Zelená',
+	PIXETTO_COLOR_YELLOW: 'Žlutá',
+	PIXETTO_COLOR_ORANGE: 'Oranžová',
+	PIXETTO_COLOR_PURPLE: 'Fialová',
+	PIXETTO_COLOR_BLACK: 'Černá',
+	PIXETTO_COLOR_WHITE: 'Bílá',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: 'Trojúhelník',
+	PIXETTO_SHAPE_RECTANGLE: 'Obdélník',
+	PIXETTO_SHAPE_PENTAGON: 'Pětiúhelník',
+	PIXETTO_SHAPE_HEXAGON: 'Šestiúhelník',
+	PIXETTO_SHAPE_CIRCLE: 'Kruh',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X souřadnice',
+	PIXETTO_POSITION_Y: 'Y souřadnice',
+	PIXETTO_POSITION_WIDTH: 'Šířka',
+	PIXETTO_POSITION_HEIGHT: 'Výška',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Střed X',
+	PIXETTO_ROAD_CENTER_Y: 'Střed Y',
+	PIXETTO_ROAD_LEFT_X: 'Levá hranice X',
+	PIXETTO_ROAD_RIGHT_X: 'Pravá hranice X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: 'Detekce barvy',
+	PIXETTO_MODE_SHAPE_DETECTION: 'Detekce tvaru',
+	PIXETTO_MODE_FACE_DETECTION: 'Detekce obličeje',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'Detekce AprilTag',
+	PIXETTO_MODE_NEURAL_NETWORK: 'Neuronová síť',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: 'Ručně psaná číslice',
+	PIXETTO_MODE_ROAD_DETECTION: 'Detekce silnic',
+	PIXETTO_MODE_BALL_DETECTION: 'Detekce míče',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'Přiřazování šablon',
 });

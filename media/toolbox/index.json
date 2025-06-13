@@ -11,6 +11,9 @@
 			"$include": "./categories/sensors.json"
 		},
 		{
+			"$include": "./categories/pixetto.json"
+		},
+		{
 			"$include": "./categories/logic.json"
 		},
 		{

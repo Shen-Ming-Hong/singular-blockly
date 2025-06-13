@@ -377,4 +377,78 @@ window.languageManager.loadMessages('ja', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: '七段表示器のピンを設定',
 	SEVEN_SEGMENT_PINS_TOOLTIP: '7セグメント表示器の各セグメント(A-G)と小数点(DP)のピン接続を設定します。',
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Pixetto スマートカメラを初期化',
+	PIXETTO_RX_PIN: 'RX ピン',
+	PIXETTO_TX_PIN: 'TX ピン',
+	PIXETTO_COLOR_DETECT: 'Pixetto 色検出',
+	PIXETTO_SHAPE_DETECT: 'Pixetto 形状検出',
+	PIXETTO_FACE_DETECT: 'Pixetto 顔検出',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto AprilTag検出',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto ニューラルネットワーク認識',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto 手書き数字認識',
+	PIXETTO_GET_POSITION: 'Pixetto 検出されたオブジェクトを取得',
+	PIXETTO_ROAD_DETECT: 'Pixetto 道路検出',
+	PIXETTO_SET_MODE: 'Pixetto 機能モードを設定',
+	PIXETTO_COLOR: '色',
+	PIXETTO_SHAPE: '形状',
+	PIXETTO_MODE: 'モード',
+	PIXETTO_TAG_ID: 'タグ ID',
+	PIXETTO_CLASS_ID: 'クラス ID',
+	PIXETTO_DIGIT: '数字',
+	PIXETTO_COORDINATE: '座標',
+	PIXETTO_ROAD_INFO: '情報',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Pixetto スマートカメラを初期化し、UART通信ピンを設定します',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Pixetto が指定された色のオブジェクトを検出するかを判定します',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Pixetto が指定された形状のオブジェクトを検出するかを判定します',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Pixetto が顔を検出するかを判定します',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Pixetto が指定されたIDのAprilTagを検出するかを判定します',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Pixetto ニューラルネットワークが指定されたクラスのオブジェクトを認識するかを判定します',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Pixetto が指定された手書き数字を認識するかを判定します',
+	PIXETTO_GET_POSITION_TOOLTIP: 'Pixetto で検出されたオブジェクトの位置またはサイズ情報を取得します',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Pixetto から道路検出関連の情報を取得します',
+	PIXETTO_SET_MODE_TOOLTIP: 'Pixetto スマートカメラの機能モードを設定します',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: '赤',
+	PIXETTO_COLOR_BLUE: '青',
+	PIXETTO_COLOR_GREEN: '緑',
+	PIXETTO_COLOR_YELLOW: '黄色',
+	PIXETTO_COLOR_ORANGE: 'オレンジ',
+	PIXETTO_COLOR_PURPLE: '紫',
+	PIXETTO_COLOR_BLACK: '黒',
+	PIXETTO_COLOR_WHITE: '白',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: '三角形',
+	PIXETTO_SHAPE_RECTANGLE: '四角形',
+	PIXETTO_SHAPE_PENTAGON: '五角形',
+	PIXETTO_SHAPE_HEXAGON: '六角形',
+	PIXETTO_SHAPE_CIRCLE: '円',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X座標',
+	PIXETTO_POSITION_Y: 'Y座標',
+	PIXETTO_POSITION_WIDTH: '幅',
+	PIXETTO_POSITION_HEIGHT: '高さ',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: '中心X',
+	PIXETTO_ROAD_CENTER_Y: '中心Y',
+	PIXETTO_ROAD_LEFT_X: '左境界X',
+	PIXETTO_ROAD_RIGHT_X: '右境界X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: '色検出',
+	PIXETTO_MODE_SHAPE_DETECTION: '形状検出',
+	PIXETTO_MODE_FACE_DETECTION: '顔検出',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'AprilTag検出',
+	PIXETTO_MODE_NEURAL_NETWORK: 'ニューラルネットワーク',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: '手書き数字',
+	PIXETTO_MODE_ROAD_DETECTION: '道路検出',
+	PIXETTO_MODE_BALL_DETECTION: 'ボール検出',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'テンプレートマッチング',
 });

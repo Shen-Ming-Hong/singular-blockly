@@ -137,8 +137,18 @@ export class WebViewMessageHandler {
 			// 處理函式庫依賴
 			// 使用新的 syncLibraryDeps 方法同步函式庫依賴
 			const libDeps = message.lib_deps && Array.isArray(message.lib_deps) ? message.lib_deps : [];
+			const buildFlags = message.build_flags && Array.isArray(message.build_flags) ? message.build_flags : [];
+			const libLdfMode = message.lib_ldf_mode || null;
+
 			log(`收到函式庫依賴列表: ${libDeps.length > 0 ? libDeps.join(', ') : '(無依賴)'}`, 'info');
-			await this.settingsManager.syncLibraryDeps(libDeps);
+			if (buildFlags.length > 0) {
+				log(`收到編譯標誌: ${buildFlags.join(', ')}`, 'info');
+			}
+			if (libLdfMode) {
+				log(`收到庫連結模式: ${libLdfMode}`, 'info');
+			}
+
+			await this.settingsManager.syncPlatformIOSettings(libDeps, buildFlags, libLdfMode);
 		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_SAVE_FILE', (error as Error).message);
 
@@ -174,17 +184,20 @@ export class WebViewMessageHandler {
 					await this.fileService.deleteFile(platformioIni);
 				}
 			} else {
-				// 檢查是否收到了函式庫依賴資訊
+				// 檢查是否收到了額外的 platformio.ini 設定
 				const libDeps = message.lib_deps && Array.isArray(message.lib_deps) ? message.lib_deps : [];
+				const buildFlags = message.build_flags && Array.isArray(message.build_flags) ? message.build_flags : [];
+				const libLdfMode = message.lib_ldf_mode || null;
+
 				log(`更新開發板時的函式庫依賴列表: ${libDeps.length > 0 ? libDeps.join(', ') : '(無依賴)'}`, 'info');
 
 				const isFirstTime = !this.fileService.fileExists(platformioIni);
 				await this.fileService.writeFile(platformioIni, boardConfig);
 
-				// 如果有函式庫依賴，將它們同步到更新後的 platformio.ini
-				if (libDeps.length > 0) {
-					await this.settingsManager.syncLibraryDeps(libDeps);
-					log(`更新開發板配置後同步函式庫依賴: ${libDeps.join(', ')}`, 'info');
+				// 如果有額外的 platformio.ini 設定，將它們同步到更新後的檔案
+				if (libDeps.length > 0 || buildFlags.length > 0 || libLdfMode) {
+					await this.settingsManager.syncPlatformIOSettings(libDeps, buildFlags, libLdfMode);
+					log(`更新開發板配置後同步 platformio.ini 設定`, 'info');
 				}
 
 				// 使用 setTimeout 延遲訊息顯示，避免干擾面板顯示

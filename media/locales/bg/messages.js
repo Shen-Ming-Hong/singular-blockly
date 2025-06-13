@@ -376,4 +376,78 @@ window.languageManager.loadMessages('bg', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Задай пинове за седемсегментен дисплей',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'Конфигурира пиновете за всеки сегмент (A-G) и десетичната точка (DP) на седемсегментния дисплей.',
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Инициализиране на интелигентна камера Pixetto',
+	PIXETTO_RX_PIN: 'RX пин',
+	PIXETTO_TX_PIN: 'TX пин',
+	PIXETTO_COLOR_DETECT: 'Pixetto разпознаване на цвят',
+	PIXETTO_SHAPE_DETECT: 'Pixetto разпознаване на форма',
+	PIXETTO_FACE_DETECT: 'Pixetto разпознаване на лице',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto разпознаване на AprilTag',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto разпознаване с невронна мрежа',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto разпознаване на ръкописна цифра',
+	PIXETTO_GET_POSITION: 'Pixetto получаване на засечен обект',
+	PIXETTO_ROAD_DETECT: 'Pixetto разпознаване на път',
+	PIXETTO_SET_MODE: 'Задаване на функционален режим Pixetto',
+	PIXETTO_COLOR: 'Цвят',
+	PIXETTO_SHAPE: 'Форма',
+	PIXETTO_MODE: 'Режим',
+	PIXETTO_TAG_ID: 'ID на етикет',
+	PIXETTO_CLASS_ID: 'ID на клас',
+	PIXETTO_DIGIT: 'Цифра',
+	PIXETTO_COORDINATE: 'Координата',
+	PIXETTO_ROAD_INFO: 'Информация',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Инициализиране на интелигентната камера Pixetto и настройване на UART комуникационни пинове',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Разпознай дали Pixetto засича обект от определен цвят',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Разпознай дали Pixetto засича обект от определена форма',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Разпознай дали Pixetto засича лице',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Разпознай дали Pixetto засича AprilTag с определен ID',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Разпознай дали невронната мрежа на Pixetto разпознава обект от определен клас',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Разпознай дали Pixetto разпознава определена ръкописна цифра',
+	PIXETTO_GET_POSITION_TOOLTIP: 'Получи информация за позицията или размера на засечен обект от Pixetto',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Получи информация свързана с разпознаването на пътища от Pixetto',
+	PIXETTO_SET_MODE_TOOLTIP: 'Настрой функционален режим на интелигентната камера Pixetto',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: 'Червено',
+	PIXETTO_COLOR_BLUE: 'Синьо',
+	PIXETTO_COLOR_GREEN: 'Зелено',
+	PIXETTO_COLOR_YELLOW: 'Жълто',
+	PIXETTO_COLOR_ORANGE: 'Оранжево',
+	PIXETTO_COLOR_PURPLE: 'Лилаво',
+	PIXETTO_COLOR_BLACK: 'Черно',
+	PIXETTO_COLOR_WHITE: 'Бяло',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: 'Триъгълник',
+	PIXETTO_SHAPE_RECTANGLE: 'Правоъгълник',
+	PIXETTO_SHAPE_PENTAGON: 'Петоъгълник',
+	PIXETTO_SHAPE_HEXAGON: 'Шестоъгълник',
+	PIXETTO_SHAPE_CIRCLE: 'Кръг',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X координата',
+	PIXETTO_POSITION_Y: 'Y координата',
+	PIXETTO_POSITION_WIDTH: 'Ширина',
+	PIXETTO_POSITION_HEIGHT: 'Височина',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Център X',
+	PIXETTO_ROAD_CENTER_Y: 'Център Y',
+	PIXETTO_ROAD_LEFT_X: 'Лява граница X',
+	PIXETTO_ROAD_RIGHT_X: 'Дясна граница X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: 'Разпознаване на цвят',
+	PIXETTO_MODE_SHAPE_DETECTION: 'Разпознаване на форма',
+	PIXETTO_MODE_FACE_DETECTION: 'Разпознаване на лице',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'Разпознаване на AprilTag',
+	PIXETTO_MODE_NEURAL_NETWORK: 'Невронна мрежа',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: 'Ръкописна цифра',
+	PIXETTO_MODE_ROAD_DETECTION: 'Разпознаване на път',
+	PIXETTO_MODE_BALL_DETECTION: 'Разпознаване на топка',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'Съпоставяне на шаблон',
 });

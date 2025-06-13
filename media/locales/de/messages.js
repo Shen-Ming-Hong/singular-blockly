@@ -377,4 +377,78 @@ window.languageManager.loadMessages('de', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Siebensegmentanzeige-Pins einstellen',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'Konfiguriere Pins für jedes Segment (A-G) und den Dezimalpunkt (DP) der Siebensegmentanzeige.',
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Pixetto Smart-Kamera initialisieren',
+	PIXETTO_RX_PIN: 'RX-Pin',
+	PIXETTO_TX_PIN: 'TX-Pin',
+	PIXETTO_COLOR_DETECT: 'Pixetto Farberkennung',
+	PIXETTO_SHAPE_DETECT: 'Pixetto Formerkennung',
+	PIXETTO_FACE_DETECT: 'Pixetto Gesichtserkennung',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto AprilTag-Erkennung',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto Neuronales Netzwerk Erkennung',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto Handgeschriebene Ziffer erkennen',
+	PIXETTO_GET_POSITION: 'Pixetto Erkanntes Objekt abrufen',
+	PIXETTO_ROAD_DETECT: 'Pixetto Straßenerkennung',
+	PIXETTO_SET_MODE: 'Pixetto Funktionsmodus einstellen',
+	PIXETTO_COLOR: 'Farbe',
+	PIXETTO_SHAPE: 'Form',
+	PIXETTO_MODE: 'Modus',
+	PIXETTO_TAG_ID: 'Tag-ID',
+	PIXETTO_CLASS_ID: 'Klassen-ID',
+	PIXETTO_DIGIT: 'Ziffer',
+	PIXETTO_COORDINATE: 'Koordinate',
+	PIXETTO_ROAD_INFO: 'Information',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Pixetto Smart-Kamera initialisieren und UART-Kommunikations-Pins einstellen',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Erkennen, ob Pixetto ein Objekt der angegebenen Farbe erkennt',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Erkennen, ob Pixetto ein Objekt der angegebenen Form erkennt',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Erkennen, ob Pixetto ein Gesicht erkennt',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Erkennen, ob Pixetto einen AprilTag mit angegebener ID erkennt',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Erkennen, ob das Pixetto-Neuronale-Netzwerk ein Objekt der angegebenen Klasse erkennt',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Erkennen, ob Pixetto eine angegebene handgeschriebene Ziffer erkennt',
+	PIXETTO_GET_POSITION_TOOLTIP: 'Position oder Größeninformationen des von Pixetto erkannten Objekts abrufen',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Straßenerkennungsbezogene Informationen von Pixetto abrufen',
+	PIXETTO_SET_MODE_TOOLTIP: 'Funktionsmodus der Pixetto Smart-Kamera einstellen',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: 'Rot',
+	PIXETTO_COLOR_BLUE: 'Blau',
+	PIXETTO_COLOR_GREEN: 'Grün',
+	PIXETTO_COLOR_YELLOW: 'Gelb',
+	PIXETTO_COLOR_ORANGE: 'Orange',
+	PIXETTO_COLOR_PURPLE: 'Lila',
+	PIXETTO_COLOR_BLACK: 'Schwarz',
+	PIXETTO_COLOR_WHITE: 'Weiß',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: 'Dreieck',
+	PIXETTO_SHAPE_RECTANGLE: 'Rechteck',
+	PIXETTO_SHAPE_PENTAGON: 'Fünfeck',
+	PIXETTO_SHAPE_HEXAGON: 'Sechseck',
+	PIXETTO_SHAPE_CIRCLE: 'Kreis',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X-Koordinate',
+	PIXETTO_POSITION_Y: 'Y-Koordinate',
+	PIXETTO_POSITION_WIDTH: 'Breite',
+	PIXETTO_POSITION_HEIGHT: 'Höhe',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Mitte X',
+	PIXETTO_ROAD_CENTER_Y: 'Mitte Y',
+	PIXETTO_ROAD_LEFT_X: 'Linke Grenze X',
+	PIXETTO_ROAD_RIGHT_X: 'Rechte Grenze X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: 'Farberkennung',
+	PIXETTO_MODE_SHAPE_DETECTION: 'Formerkennung',
+	PIXETTO_MODE_FACE_DETECTION: 'Gesichtserkennung',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'AprilTag-Erkennung',
+	PIXETTO_MODE_NEURAL_NETWORK: 'Neuronales Netzwerk',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: 'Handgeschriebene Ziffer',
+	PIXETTO_MODE_ROAD_DETECTION: 'Straßenerkennung',
+	PIXETTO_MODE_BALL_DETECTION: 'Ballerkennung',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'Vorlagenabgleich',
 });

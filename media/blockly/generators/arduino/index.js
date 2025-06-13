@@ -74,6 +74,8 @@ window.arduinoGenerator.init = function (workspace) {
 	window.arduinoGenerator.warnings_ = []; // 新增 warnings_ 用於儲存警告訊息，如腳位模式不正確
 	window.arduinoGenerator.pinModes_ = {}; // 每次生成代碼時重置腳位模式追蹤
 	window.arduinoGenerator.lib_deps_ = []; // 新增 lib_deps_ 用於儲存 platformio.ini 庫依賴
+	window.arduinoGenerator.build_flags_ = []; // 新增 build_flags_ 用於儲存 platformio.ini 編譯標誌
+	window.arduinoGenerator.lib_ldf_mode_ = null; // 新增 lib_ldf_mode_ 用於儲存 platformio.ini 庫連結模式
 	// 初始化為空陣列，各模組將在載入時自動註冊它們的積木類型
 	window.arduinoGenerator.alwaysGenerateBlocks_ = window.arduinoGenerator.alwaysGenerateBlocks_ || []; // 新增 alwaysGenerateBlocks_ 用於儲存「只要召喚出來就一定會有code不論積木放在哪一個位置」情況的所有積木類型
 

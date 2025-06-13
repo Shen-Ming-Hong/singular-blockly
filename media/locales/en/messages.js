@@ -395,4 +395,79 @@ window.languageManager.loadMessages('en', {
 	// Seven Segment Display Pins
 	SEVEN_SEGMENT_PINS_SET: 'Set seven segment display pins',
 	SEVEN_SEGMENT_PINS_TOOLTIP: 'Configure pins for each segment (A-G) and decimal point (DP) of the seven-segment display.',
+
+	// Pixetto Smart Camera
+	PIXETTO_INIT: 'Initialize Pixetto Smart Camera',
+	PIXETTO_RX_PIN: 'RX Pin',
+	PIXETTO_TX_PIN: 'TX Pin',
+	PIXETTO_COLOR_DETECT: 'Pixetto Detect Color',
+	PIXETTO_SHAPE_DETECT: 'Pixetto Detect Shape',
+	PIXETTO_FACE_DETECT: 'Pixetto Detect Face',
+	PIXETTO_APRILTAG_DETECT: 'Pixetto Detect AprilTag',
+	PIXETTO_NEURAL_NETWORK: 'Pixetto Neural Network Recognition',
+	PIXETTO_HANDWRITTEN_DIGIT: 'Pixetto Recognize Handwritten Digit',
+	PIXETTO_GET_POSITION: 'Pixetto Get Detected Object',
+	PIXETTO_ROAD_DETECT: 'Pixetto Road Detection',
+	PIXETTO_SET_MODE: 'Set Pixetto Function Mode',
+	PIXETTO_COLOR: 'Color',
+	PIXETTO_SHAPE: 'Shape',
+	PIXETTO_MODE: 'Mode',
+	PIXETTO_TAG_ID: 'Tag ID',
+	PIXETTO_CLASS_ID: 'Class ID',
+	PIXETTO_DIGIT: 'Digit',
+	PIXETTO_COORDINATE: 'Coordinate',
+	PIXETTO_ROAD_INFO: 'Information',
+	PIXETTO_CATEGORY: 'Pixetto',
+
+	// Pixetto Tooltips
+	PIXETTO_INIT_TOOLTIP: 'Initialize Pixetto smart camera and set UART communication pins',
+	PIXETTO_COLOR_DETECT_TOOLTIP: 'Detect if Pixetto detects an object of specified color',
+	PIXETTO_SHAPE_DETECT_TOOLTIP: 'Detect if Pixetto detects an object of specified shape',
+	PIXETTO_FACE_DETECT_TOOLTIP: 'Detect if Pixetto detects a face',
+	PIXETTO_APRILTAG_DETECT_TOOLTIP: 'Detect if Pixetto detects an AprilTag with specified ID',
+	PIXETTO_NEURAL_NETWORK_TOOLTIP: 'Detect if Pixetto neural network recognizes an object of specified class',
+	PIXETTO_HANDWRITTEN_DIGIT_TOOLTIP: 'Detect if Pixetto recognizes a specified handwritten digit',
+	PIXETTO_GET_POSITION_TOOLTIP: 'Get position or size information of detected object by Pixetto',
+	PIXETTO_ROAD_DETECT_TOOLTIP: 'Get road detection related information from Pixetto',
+	PIXETTO_SET_MODE_TOOLTIP: 'Set functional mode of Pixetto smart camera',
+
+	// Pixetto Color Options
+	PIXETTO_COLOR_RED: 'Red',
+	PIXETTO_COLOR_BLUE: 'Blue',
+	PIXETTO_COLOR_GREEN: 'Green',
+	PIXETTO_COLOR_YELLOW: 'Yellow',
+	PIXETTO_COLOR_ORANGE: 'Orange',
+	PIXETTO_COLOR_PURPLE: 'Purple',
+	PIXETTO_COLOR_BLACK: 'Black',
+	PIXETTO_COLOR_WHITE: 'White',
+
+	// Pixetto Shape Options
+	PIXETTO_SHAPE_TRIANGLE: 'Triangle',
+	PIXETTO_SHAPE_RECTANGLE: 'Rectangle',
+	PIXETTO_SHAPE_PENTAGON: 'Pentagon',
+	PIXETTO_SHAPE_HEXAGON: 'Hexagon',
+	PIXETTO_SHAPE_CIRCLE: 'Circle',
+
+	// Pixetto Position Options
+	PIXETTO_POSITION_X: 'X Coordinate',
+	PIXETTO_POSITION_Y: 'Y Coordinate',
+	PIXETTO_POSITION_WIDTH: 'Width',
+	PIXETTO_POSITION_HEIGHT: 'Height',
+
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Center X',
+	PIXETTO_ROAD_CENTER_Y: 'Center Y',
+	PIXETTO_ROAD_LEFT_X: 'Left Boundary X',
+	PIXETTO_ROAD_RIGHT_X: 'Right Boundary X',
+
+	// Pixetto Mode Options
+	PIXETTO_MODE_COLOR_DETECTION: 'Color Detection',
+	PIXETTO_MODE_SHAPE_DETECTION: 'Shape Detection',
+	PIXETTO_MODE_FACE_DETECTION: 'Face Detection',
+	PIXETTO_MODE_APRILTAG_DETECTION: 'AprilTag Detection',
+	PIXETTO_MODE_NEURAL_NETWORK: 'Neural Network',
+	PIXETTO_MODE_HANDWRITTEN_DIGIT: 'Handwritten Digit',
+	PIXETTO_MODE_ROAD_DETECTION: 'Road Detection',
+	PIXETTO_MODE_BALL_DETECTION: 'Ball Detection',
+	PIXETTO_MODE_TEMPLATE_MATCHING: 'Template Matching',
 });

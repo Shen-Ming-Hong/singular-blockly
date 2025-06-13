@@ -18,6 +18,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.30.0] - 2025-06-13
+
+### 新增 Added
+
+-   新增 Pixetto 智慧鏡頭支援：完整的視覺識別積木組件
+    Added Pixetto Smart Camera support: Complete visual recognition block components
+-   新增 Pixetto 初始化功能，支援 UART 通訊設定
+    Added Pixetto initialization function with UART communication setup
+-   新增多種 Pixetto 偵測模式：顏色偵測、形狀偵測、人臉偵測、AprilTag 偵測
+    Added multiple Pixetto detection modes: color detection, shape detection, face detection, AprilTag detection
+-   新增 Pixetto 進階功能：神經網路辨識、手寫數字辨識、道路偵測
+    Added Pixetto advanced features: neural network recognition, handwritten digit recognition, road detection
+-   新增 Pixetto 資料讀取功能：座標、尺寸和道路資訊取得
+    Added Pixetto data reading functions: coordinate, size and road information retrieval
+-   新增 15 種語言的 Pixetto 相關翻譯支援
+    Added Pixetto-related translations for 15 languages
+-   增強 platformio.ini 設定同步功能，支援 build_flags 和 lib_ldf_mode 設定
+    Enhanced platformio.ini settings synchronization to support build_flags and lib_ldf_mode configurations
+
+### 已修復 Fixed
+
+### 已更新 Updated
+
+### 已修改 Changed
+
 ## [0.29.0] - 2025-06-10
 
 ### 新增 Added
