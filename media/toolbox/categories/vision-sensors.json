@@ -1,8 +1,12 @@
 {
     "kind": "category",
-    "name": "%{PIXETTO_CATEGORY}",
+    "name": "%{VISION_SENSORS_CATEGORY}",
     "categorystyle": "sensor_category",
     "contents": [
+        {
+            "kind": "label",
+            "text": "%{PIXETTO_LABEL}"
+        },
         {
             "kind": "block",
             "type": "pixetto_init"
@@ -81,15 +85,79 @@
             }
         },
         {
-            "kind": "sep"
-        },
-        {
             "kind": "block",
             "type": "pixetto_get_position"
         },
         {
             "kind": "block",
             "type": "pixetto_road_detect"
+        },
+        {
+            "kind": "sep"
+        },
+        {
+            "kind": "label",
+            "text": "%{HUSKYLENS_LABEL}"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_init_i2c"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_init_uart"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_set_algorithm"
+        },
+        {
+            "kind": "sep"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_request"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_is_learned"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_count_blocks"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_get_block_info"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_count_arrows"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_get_arrow_info"
+        },
+        {
+            "kind": "sep"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_learn",
+            "inputs": {
+                "ID": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_forget"
         }
     ]
 }

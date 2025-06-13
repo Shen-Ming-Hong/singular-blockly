@@ -30,9 +30,14 @@ window.experimentalBlocksNotice = {
 	autoHideTimer: null,
 	// 自動隱藏延遲（毫秒）
 	autoHideDelay: 10000,
-
 	// 初始化提示元素
 	init: function () {
+		// 檢查是否在預覽模式，預覽模式下不需要通知系統
+		if (window.isPreviewMode) {
+			log.info('[實驗積木] 預覽模式下跳過通知系統初始化');
+			return;
+		}
+
 		log.info('[實驗積木] 初始化通知系統');
 
 		this.noticeElement = document.getElementById('experimentalBlocksNotice');
@@ -72,18 +77,16 @@ window.experimentalBlocksNotice = {
 				this.showFullNotice();
 			});
 		}
-
 		// 更新多語言文字
 		this.updateTexts();
-	},
-	// 更新提示文字
+	}, // 更新提示文字
 	updateTexts: function () {
-		// 確保元素已初始化
-		if (!this.titleElement || !this.descriptionElement) {
-			this.init();
+		// 檢查是否在預覽模式，預覽模式下不需要更新文字
+		if (window.isPreviewMode) {
+			return;
 		}
 
-		// 如果元素仍然不存在，記錄錯誤並返回
+		// 如果元素不存在，記錄錯誤並返回（不要再次調用 init 避免無限遞迴）
 		if (!this.titleElement || !this.descriptionElement) {
 			log.error('[實驗積木] 實驗積木提示元素未找到');
 			return;
@@ -102,6 +105,11 @@ window.experimentalBlocksNotice = {
 			: '您的作品中含有黃色虛線標示的實驗性積木，這些功能在未來可能會變更或移除，請謹慎使用。';
 	}, // 檢查是否需要顯示提示
 	checkAndShow: function () {
+		// 檢查是否在預覽模式，預覽模式下不需要顯示通知
+		if (window.isPreviewMode) {
+			return false;
+		}
+
 		// 檢查是否有實驗積木
 		if (window.experimentalBlocks && window.experimentalBlocks.length > 0) {
 			// 檢查工作區中是否實際使用了實驗積木
@@ -127,9 +135,13 @@ window.experimentalBlocksNotice = {
 		this.hideAll();
 		return false;
 	},
-
 	// 顯示提示
 	show: function () {
+		// 檢查是否在預覽模式，預覽模式下不需要顯示通知
+		if (window.isPreviewMode) {
+			return;
+		}
+
 		if (this.isShown) {
 			return;
 		}
@@ -186,9 +198,13 @@ window.experimentalBlocksNotice = {
 		} catch (e) {
 			console.error('隱藏實驗積木提示時發生錯誤:', e);
 		}
-	},
-	// 顯示完整通知
+	}, // 顯示完整通知
 	showFullNotice: function () {
+		// 檢查是否在預覽模式，預覽模式下不需要顯示通知
+		if (window.isPreviewMode) {
+			return;
+		}
+
 		try {
 			if (!this.noticeElement) {
 				log.warn('找不到實驗積木提示元素，無法顯示提示');
@@ -230,13 +246,15 @@ window.experimentalBlocksNotice = {
 		}
 	}, // 顯示持久性指示器
 	showIndicator: function () {
+		// 檢查是否在預覽模式，預覽模式下不需要顯示指示器
+		if (window.isPreviewMode) {
+			return;
+		}
+
 		try {
 			if (!this.indicatorElement) {
-				this.init(); // 嘗試初始化
-				if (!this.indicatorElement) {
-					log.warn('[實驗積木] 找不到實驗積木指示器元素，無法顯示指示器');
-					return;
-				}
+				log.warn('[實驗積木] 找不到實驗積木指示器元素，無法顯示指示器');
+				return;
 			}
 
 			// 更新tooltip文字
@@ -574,9 +592,8 @@ class ExperimentalBlockMarker {
 				}
 			}
 		});
-
 		// 如果發現實驗積木，顯示適當的通知
-		if (experimentalCount > 0 && window.experimentalBlocksNotice) {
+		if (experimentalCount > 0 && window.experimentalBlocksNotice && !window.isPreviewMode) {
 			log.info(`[實驗積木] 檢測到 ${experimentalCount} 個實驗性積木，顯示通知`);
 			// 根據是否已經顯示過通知來決定顯示方式
 			if (window.experimentalBlocksNotice.hasShownNotice) {
@@ -648,15 +665,16 @@ class ExperimentalBlockMarker {
 			if (workspace) {
 				const blocks = workspace.getAllBlocks();
 				const hasWorkspaceExperimentalBlock = blocks.some(block => window.experimentalBlocks.includes(block.type));
-
 				if (!hasWorkspaceExperimentalBlock) {
 					log.info('[實驗積木] 工作區中沒有實驗積木，隱藏所有提示');
-					window.experimentalBlocksNotice.hideAll();
+					if (!window.isPreviewMode) {
+						window.experimentalBlocksNotice.hideAll();
+					}
 				}
 			}
 		} else {
 			// 確保通知狀態與工作區實驗積木狀態一致
-			if (window.experimentalBlocksNotice) {
+			if (window.experimentalBlocksNotice && !window.isPreviewMode) {
 				window.experimentalBlocksNotice.checkAndShow();
 			}
 		}
@@ -675,7 +693,10 @@ class ExperimentalBlockMarker {
 	}
 }
 
-// 當文檔載入完成後初始化
+// 確保只有一個通知系統初始化
+let noticeSystemInitialized = false;
+
+// 當文檔載入完成後初始化 - 統一的初始化入口
 document.addEventListener('DOMContentLoaded', () => {
 	log.info('[實驗積木] DOMContentLoaded 事件觸發，開始初始化');
 
@@ -688,9 +709,31 @@ document.addEventListener('DOMContentLoaded', () => {
 		workspaceExists: typeof Blockly !== 'undefined' && Blockly.getMainWorkspace() !== null,
 		cssLoaded: document.styleSheets.length,
 	});
+	// 確保實驗積木通知系統只初始化一次
+	if (!noticeSystemInitialized && window.experimentalBlocksNotice) {
+		// 檢查是否在預覽模式，預覽模式下不需要通知系統
+		if (window.isPreviewMode) {
+			log.info('[實驗積木] 預覽模式下跳過通知系統初始化');
+			noticeSystemInitialized = true; // 標記為已初始化，避免重複檢查
+		} else {
+			window.experimentalBlocksNotice.init();
+			noticeSystemInitialized = true;
+			log.info('[實驗積木] 通知系統已初始化成功');
+
+			// 檢查DOM中是否存在指示器元素
+			const indicatorElement = document.getElementById('experimentalBlocksIndicator');
+			log.info('[實驗積木] 指示器元素檢查', {
+				exists: indicatorElement ? true : false,
+				id: indicatorElement ? indicatorElement.id : 'missing',
+				classes: indicatorElement ? indicatorElement.className : 'N/A',
+			});
+		}
+	}
 
 	// 創建實驗性積木標記管理器實例
-	window.experimentalBlockMarker = new ExperimentalBlockMarker();
+	if (!window.experimentalBlockMarker) {
+		window.experimentalBlockMarker = new ExperimentalBlockMarker();
+	}
 
 	// 如果Blockly已經載入，初始化標記
 	if (typeof Blockly !== 'undefined') {
@@ -747,130 +790,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		}, 500);
 	}
-});
 
-// 當語言變更時更新工具提示
-window.addEventListener('languageChanged', () => {
-	if (window.experimentalBlockMarker) {
-		window.experimentalBlockMarker.refreshMarks();
-	}
-});
-
-// 監聽工作區變化事件，更新實驗性積木標記
-if (typeof Blockly !== 'undefined') {
-	const originalBlockSvgInit = Blockly.BlockSvg.prototype.initSvg;
-	Blockly.BlockSvg.prototype.initSvg = function () {
-		// 調用原始方法
-		originalBlockSvgInit.call(this);
-
-		// 如果是實驗性積木，添加標記
-		if (window.experimentalBlocks && window.experimentalBlocks.includes(this.type) && window.experimentalBlockMarker) {
-			setTimeout(() => {
-				window.experimentalBlockMarker.markExperimentalBlock(this.getSvgRoot(), this);
-			}, 50);
-		}
-	};
-}
-
-// 監聽工具箱類別變更，確保收集並標記所有可能的實驗積木
-if (typeof Blockly !== 'undefined') {
-	// 保存原始的 ToolboxCategory.prototype.setSelected 方法
-	const originalSetSelected = Blockly.ToolboxCategory.prototype.setSelected;
-
-	// 覆寫 setSelected 方法，在類別選擇變更時收集實驗積木
-	Blockly.ToolboxCategory.prototype.setSelected = function (selected) {
-		// 調用原始方法
-		originalSetSelected.call(this, selected);
-
-		// 如果類別被選中，嘗試收集該類別中的實驗積木並立即標記
-		if (selected && typeof window.collectExperimentalBlocksFromFlyout === 'function') {
-			// 延遲執行，確保飛出窗口已完全渲染
-			setTimeout(() => {
-				log.info(`[實驗積木] 工具箱類別 "${this.name_}" 被選中，檢查實驗積木`);
-				window.collectExperimentalBlocksFromFlyout();
-
-				// 刷新所有實驗積木的標記，確保新打開的類別中的實驗積木被正確標記
-				if (window.experimentalBlockMarker) {
-					log.info(`[實驗積木] 刷新所有實驗積木標記`);
-					window.experimentalBlockMarker.refreshMarks();
-				}
-			}, 300);
-		}
-	};
-}
-
-// 當工作區變化時更新標記
-function setupBlocklyChangeListener() {
-	if (typeof Blockly === 'undefined' || !Blockly.getMainWorkspace()) {
-		// 如果 Blockly 還沒載入，等待一段時間後再嘗試
-		setTimeout(setupBlocklyChangeListener, 200);
-		return;
-	}
-
-	Blockly.getMainWorkspace().addChangeListener(event => {
-		// 當積木類型變更或積木創建/刪除時，更新標記
-		if (
-			(event.type === Blockly.Events.BLOCK_CHANGE ||
-				event.type === Blockly.Events.BLOCK_CREATE ||
-				event.type === Blockly.Events.BLOCK_DELETE) &&
-			window.experimentalBlockMarker
-		) {
-			// 使用防抖動技術避免過多刷新
-			if (window.experimentalMarkerTimeout) {
-				clearTimeout(window.experimentalMarkerTimeout);
-			}
-
-			window.experimentalMarkerTimeout = setTimeout(() => {
-				// 刷新所有實驗積木標記
-				window.experimentalBlockMarker.refreshMarks();
-
-				// 特別處理 BLOCK_DELETE 事件，檢查是否還有實驗積木
-				if (event.type === Blockly.Events.BLOCK_DELETE) {
-					// 檢查工作區中是否還有實驗積木
-					const workspace = Blockly.getMainWorkspace();
-					if (workspace) {
-						const blocks = workspace.getAllBlocks();
-						const hasExperimentalBlock = blocks.some(block => window.experimentalBlocks.includes(block.type));
-
-						if (!hasExperimentalBlock && window.experimentalBlocksNotice) {
-							log.info('[實驗積木] BLOCK_DELETE 事件後檢查：工作區中沒有實驗積木，隱藏所有提示');
-							window.experimentalBlocksNotice.hideAll();
-						}
-					}
-				}
-			}, 200);
-		}
-	});
-}
-
-// 在 Blockly 工作區載入後設置事件監聽
-setupBlocklyChangeListener();
-
-// 確保只有一個通知系統初始化
-let noticeSystemInitialized = false;
-
-// 初始化實驗積木通知系統
-document.addEventListener('DOMContentLoaded', () => {
-	// 確保實驗積木通知系統只初始化一次
-	if (!noticeSystemInitialized && window.experimentalBlocksNotice) {
-		window.experimentalBlocksNotice.init();
-		noticeSystemInitialized = true;
-		log.info('[實驗積木] 通知系統已初始化成功');
-
-		// 檢查DOM中是否存在指示器元素
-		const indicatorElement = document.getElementById('experimentalBlocksIndicator');
-		log.info('[實驗積木] 指示器元素檢查', {
-			exists: indicatorElement ? true : false,
-			id: indicatorElement ? indicatorElement.id : 'missing',
-			classes: indicatorElement ? indicatorElement.className : 'N/A',
-		});
-	}
-});
-
-// 添加監聽Blockly工具箱創建和打開事件
-// 使用 MutationObserver 監聽工具箱相關DOM變化
-if (typeof MutationObserver !== 'undefined') {
-	document.addEventListener('DOMContentLoaded', () => {
+	// 添加監聽Blockly工具箱創建和打開事件
+	// 使用 MutationObserver 監聽工具箱相關DOM變化
+	if (typeof MutationObserver !== 'undefined') {
 		setTimeout(() => {
 			const observer = new MutationObserver(mutations => {
 				// 檢查是否有新添加的工具箱相關DOM元素
@@ -911,5 +834,107 @@ if (typeof MutationObserver !== 'undefined') {
 
 			log.info(`[實驗積木] 已設置DOM變化觀察器，用於監控工具箱創建`);
 		}, 500);
+	}
+
+	// 在統一初始化中設置其他所需的監聽器和方法覆寫
+	setupAdditionalListeners();
+});
+
+// 當語言變更時更新工具提示
+window.addEventListener('languageChanged', () => {
+	if (window.experimentalBlockMarker) {
+		window.experimentalBlockMarker.refreshMarks();
+	}
+});
+
+// 設置額外的監聽器和方法覆寫
+function setupAdditionalListeners() {
+	// 監聽工作區變化事件，更新實驗性積木標記
+	if (typeof Blockly !== 'undefined') {
+		const originalBlockSvgInit = Blockly.BlockSvg.prototype.initSvg;
+		Blockly.BlockSvg.prototype.initSvg = function () {
+			// 調用原始方法
+			originalBlockSvgInit.call(this);
+
+			// 如果是實驗性積木，添加標記
+			if (window.experimentalBlocks && window.experimentalBlocks.includes(this.type) && window.experimentalBlockMarker) {
+				setTimeout(() => {
+					window.experimentalBlockMarker.markExperimentalBlock(this.getSvgRoot(), this);
+				}, 50);
+			}
+		};
+	}
+
+	// 監聽工具箱類別變更，確保收集並標記所有可能的實驗積木
+	if (typeof Blockly !== 'undefined') {
+		// 保存原始的 ToolboxCategory.prototype.setSelected 方法
+		const originalSetSelected = Blockly.ToolboxCategory.prototype.setSelected;
+
+		// 覆寫 setSelected 方法，在類別選擇變更時收集實驗積木
+		Blockly.ToolboxCategory.prototype.setSelected = function (selected) {
+			// 調用原始方法
+			originalSetSelected.call(this, selected);
+
+			// 如果類別被選中，嘗試收集該類別中的實驗積木並立即標記
+			if (selected && typeof window.collectExperimentalBlocksFromFlyout === 'function') {
+				// 延遲執行，確保飛出窗口已完全渲染
+				setTimeout(() => {
+					log.info(`[實驗積木] 工具箱類別 "${this.name_}" 被選中，檢查實驗積木`);
+					window.collectExperimentalBlocksFromFlyout();
+
+					// 刷新所有實驗積木的標記，確保新打開的類別中的實驗積木被正確標記
+					if (window.experimentalBlockMarker) {
+						log.info(`[實驗積木] 刷新所有實驗積木標記`);
+						window.experimentalBlockMarker.refreshMarks();
+					}
+				}, 300);
+			}
+		};
+	}
+
+	// 在 Blockly 工作區載入後設置事件監聽
+	setupBlocklyChangeListener();
+}
+
+// 當工作區變化時更新標記
+function setupBlocklyChangeListener() {
+	if (typeof Blockly === 'undefined' || !Blockly.getMainWorkspace()) {
+		// 如果 Blockly 還沒載入，等待一段時間後再嘗試
+		setTimeout(setupBlocklyChangeListener, 200);
+		return;
+	}
+
+	Blockly.getMainWorkspace().addChangeListener(event => {
+		// 當積木類型變更或積木創建/刪除時，更新標記
+		if (
+			(event.type === Blockly.Events.BLOCK_CHANGE ||
+				event.type === Blockly.Events.BLOCK_CREATE ||
+				event.type === Blockly.Events.BLOCK_DELETE) &&
+			window.experimentalBlockMarker
+		) {
+			// 使用防抖動技術避免過多刷新
+			if (window.experimentalMarkerTimeout) {
+				clearTimeout(window.experimentalMarkerTimeout);
+			}
+
+			window.experimentalMarkerTimeout = setTimeout(() => {
+				// 刷新所有實驗積木標記
+				window.experimentalBlockMarker.refreshMarks();
+
+				// 特別處理 BLOCK_DELETE 事件，檢查是否還有實驗積木
+				if (event.type === Blockly.Events.BLOCK_DELETE) {
+					// 檢查工作區中是否還有實驗積木
+					const workspace = Blockly.getMainWorkspace();
+					if (workspace) {
+						const blocks = workspace.getAllBlocks();
+						const hasExperimentalBlock = blocks.some(block => window.experimentalBlocks.includes(block.type));
+						if (!hasExperimentalBlock && window.experimentalBlocksNotice && !window.isPreviewMode) {
+							log.info('[實驗積木] BLOCK_DELETE 事件後檢查：工作區中沒有實驗積木，隱藏所有提示');
+							window.experimentalBlocksNotice.hideAll();
+						}
+					}
+				}
+			}, 200);
+		}
 	});
 }

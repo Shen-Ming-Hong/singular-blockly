@@ -18,6 +18,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.32.0] - 2025-06-13
+
+### 新增 Added
+
+-   新增 HUSKYLENS 智慧鏡頭積木支援，包含 I2C 和 UART 初始化方式
+    Added HUSKYLENS smart camera block support, including I2C and UART initialization modes
+-   新增 HUSKYLENS 多種辨識演算法積木：人臉辨識、物體追蹤、物體辨識、線路追蹤、顏色辨識、標籤辨識、物體分類
+    Added HUSKYLENS multiple recognition algorithm blocks: face recognition, object tracking, object recognition, line tracking, color recognition, tag recognition, object classification
+-   新增 HUSKYLENS 資料取得積木：方塊和箭頭的偵測結果、位置資訊、ID 等
+    Added HUSKYLENS data retrieval blocks: block and arrow detection results, position information, ID, etc.
+-   新增 HUSKYLENS 學習功能積木：學習物體和忘記所有學習內容
+    Added HUSKYLENS learning function blocks: learn objects and forget all learned content
+-   所有 HUSKYLENS 積木標記為實驗性質，提供視覺指示和通知系統
+    All HUSKYLENS blocks marked as experimental with visual indicators and notification system
+
+### 已更新 Updated
+
+-   更新視覺感測器工具箱分類，整合 HUSKYLENS 積木
+    Updated vision sensors toolbox category to integrate HUSKYLENS blocks
+-   更新實驗積木標記系統，增強對 HUSKYLENS 積木的支援
+    Updated experimental block marking system with enhanced support for HUSKYLENS blocks
+-   更新所有語言文件的授權標頭格式，提升一致性
+    Updated license header format in all language files for improved consistency
+
+### 已修改 Changed
+
+-   重新組織視覺感測器積木分類，將 HUSKYLENS 和 Pixetto 分別標註
+    Reorganized vision sensor block categories with separate labeling for HUSKYLENS and Pixetto
+
 ## [0.31.0] - 2025-06-13
 
 ### 新增 Added

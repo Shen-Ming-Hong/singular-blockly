@@ -69,6 +69,14 @@ A Visual Studio Code extension that provides a visual programming interface usin
         -   Position and size data retrieval (X, Y coordinates, width, height)
         -   UART communication configuration (RX/TX pins)
         -   Multiple function modes with easy switching
+    -   HUSKYLENS Smart Camera (Experimental)
+        -   Advanced AI vision recognition system
+        -   Dual communication modes: I2C and UART
+        -   Multiple recognition algorithms: face recognition, object tracking, object recognition, line tracking, color recognition, tag recognition, object classification
+        -   Real-time data retrieval: block and arrow detection results with position and ID information
+        -   Interactive learning functions: learn objects and forget all learned content
+        -   Easy algorithm switching and configuration
+        -   Comprehensive detection result analysis with count and detailed information blocks
     -   Functions with parameter support
         -   Custom threshold functions with analog input support
         -   Configurable sensor pins and threshold values

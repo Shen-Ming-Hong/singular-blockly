@@ -172,6 +172,10 @@ export class WebViewManager {
 			// Pixetto 智慧鏡頭積木定義
 			const pixettoBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/pixetto.js'));
 			const pixettoBlocksUri = webview.asWebviewUri(pixettoBlocksPath);
+
+			// HUSKYLENS 智慧鏡頭積木定義
+			const huskyLensBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/huskylens.js'));
+			const huskyLensBlocksUri = webview.asWebviewUri(huskyLensBlocksPath);
 			// Arduino 生成器模組
 			const arduinoModules = [
 				'io.js',
@@ -185,6 +189,7 @@ export class WebViewManager {
 				'sensors.js',
 				'motors.js',
 				'pixetto.js',
+				'huskylens.js',
 			]
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
@@ -264,6 +269,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{motorsBlocksUri}', motorsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{loopsBlocksUri}', loopsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{pixettoBlocksUri}', pixettoBlocksUri.toString());
+			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 
@@ -597,10 +603,16 @@ export class WebViewManager {
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyPreview.js'));
 			const boardConfigsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/board_configs.js'));
 
+			// 實驗性 CSS 和標記器
+			const experimentalCssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/experimentalBlocks.css'));
+			const experimentalMarkerPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/experimentalBlockMarker.js'));
+
 			// 轉換為 WebView 可用的 URI
 			const cssUri = tempWebview.asWebviewUri(cssPath);
 			const jsUri = tempWebview.asWebviewUri(jsPath);
 			const boardConfigsUri = tempWebview.asWebviewUri(boardConfigsPath);
+			const experimentalCssUri = tempWebview.asWebviewUri(experimentalCssPath);
+			const experimentalMarkerUri = tempWebview.asWebviewUri(experimentalMarkerPath);
 
 			// Blockly 核心庫
 			const blocklyCompressedJsUri = tempWebview.asWebviewUri(
@@ -635,6 +647,13 @@ export class WebViewManager {
 			const loopsBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/loops.js'));
 			const loopsBlocksUri = tempWebview.asWebviewUri(loopsBlocksPath);
 
+			// Pixetto 智慧鏡頭積木定義
+			const pixettoBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/pixetto.js'));
+			const pixettoBlocksUri = tempWebview.asWebviewUri(pixettoBlocksPath);
+
+			// HUSKYLENS 智慧鏡頭積木定義
+			const huskyLensBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/huskylens.js'));
+			const huskyLensBlocksUri = tempWebview.asWebviewUri(huskyLensBlocksPath);
 			// Arduino 生成器模組
 			const arduinoModules = [
 				'io.js',
@@ -647,6 +666,8 @@ export class WebViewManager {
 				'variables.js',
 				'sensors.js',
 				'motors.js',
+				'pixetto.js',
+				'huskylens.js',
 			]
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
@@ -699,6 +720,8 @@ export class WebViewManager {
 
 			// 替換其他 URI
 			htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
+			htmlContent = htmlContent.replace('{experimentalCssUri}', experimentalCssUri.toString());
+			htmlContent = htmlContent.replace('{experimentalMarkerUri}', experimentalMarkerUri.toString());
 			htmlContent = htmlContent.replace('{previewJsUri}', jsUri.toString());
 			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
@@ -715,6 +738,8 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{sensorsBlocksUri}', sensorsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{motorsBlocksUri}', motorsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{loopsBlocksUri}', loopsBlocksUri.toString());
+			htmlContent = htmlContent.replace('{pixettoBlocksUri}', pixettoBlocksUri.toString());
+			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);
