@@ -1011,17 +1011,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 在初始化時先輸出一次實驗積木清單
 	log.info('初始化階段輸出實驗積木清單');
 	logExperimentalBlocks();
-
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
 	const toolboxConfig = await response.json();
+	// Blockly utils 兼容性包裝器
+	const blocklyUtils = {
+		replaceMessageReferences: text => {
+			// 如果文本為空或未定義，直接返回
+			if (!text) {
+				return text;
+			}
+
+			// 檢查是否有原生 API
+			if (Blockly.utils && typeof Blockly.utils.replaceMessageReferences === 'function') {
+				return Blockly.utils.replaceMessageReferences(text);
+			}
+
+			// 實現自定義的語言變數替換邏輯
+			return text.replace(/%{([^}]*)}/g, function (match, key) {
+				if (window.languageManager && typeof window.languageManager.getMessage === 'function') {
+					return window.languageManager.getMessage(key, match);
+				}
+				return match; // 如果沒有語言管理器，返回原始匹配文本
+			});
+		},
+		textToDom: xmlString => {
+			// 檢查 XML utils API
+			if (Blockly.utils && Blockly.utils.xml && typeof Blockly.utils.xml.textToDom === 'function') {
+				return Blockly.utils.xml.textToDom(xmlString);
+			}
+			// 回退到 DOM 解析
+			const parser = new DOMParser();
+			return parser.parseFromString(xmlString, 'text/xml').documentElement;
+		},
+	};
 
 	// 新增：在注入前處理 toolbox 配置中的翻譯
 	const processTranslations = obj => {
 		if (typeof obj === 'object') {
 			for (let key in obj) {
 				if (typeof obj[key] === 'string') {
-					obj[key] = Blockly.utils.replaceMessageReferences(obj[key]);
+					obj[key] = blocklyUtils.replaceMessageReferences(obj[key]);
 				} else if (typeof obj[key] === 'object') {
 					processTranslations(obj[key]);
 				}
@@ -1080,10 +1110,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 覆寫變數類別的flyout生成函數
 	workspace.registerToolboxCategoryCallback('VARIABLE', function (workspace) {
 		const variableBlocks = [];
-
 		// 添加"新增變數"按鈕
 		variableBlocks.push(
-			Blockly.utils.xml.textToDom('<button text="' + Blockly.Msg['NEW_VARIABLE'] + '" callbackKey="CREATE_VARIABLE"></button>')
+			blocklyUtils.textToDom('<button text="' + Blockly.Msg['NEW_VARIABLE'] + '" callbackKey="CREATE_VARIABLE"></button>')
 		);
 
 		// 為每個現有變數創建積木
@@ -1091,12 +1120,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (variables.length > 0) {
 			variables.forEach(variable => {
 				variableBlocks.push(
-					Blockly.utils.xml.textToDom(
+					blocklyUtils.textToDom(
 						`<block type="variables_get">
 							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
 						</block>`
 					),
-					Blockly.utils.xml.textToDom(
+					blocklyUtils.textToDom(
 						`<block type="variables_set">
 							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
 						</block>`
@@ -1122,7 +1151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const blocks = [];
 
 		// 首先創建函式定義積木
-		blocks.push(Blockly.utils.xml.textToDom(`<block type="arduino_function"></block>`));
+		blocks.push(blocklyUtils.textToDom(`<block type="arduino_function"></block>`));
 
 		// 然後為每個已定義的函式創建調用積木
 		const functions = workspace.getBlocksByType('arduino_function', false);
@@ -1151,7 +1180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					callBlockXml += '</block>';
 
 					// 轉換為 DOM 元素並添加到積木列表
-					const callBlockDom = Blockly.utils.xml.textToDom(callBlockXml);
+					const callBlockDom = blocklyUtils.textToDom(callBlockXml);
 					blocks.push(callBlockDom);
 				}
 			});
@@ -1174,6 +1203,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 			log.error('保存工作區狀態失敗:', error);
 		}
 	};
+	// 檢查是否為積木相關事件的輔助函數
+	const isBlockChangeEvent = event => {
+		return (
+			event.type === Blockly.Events.BLOCK_MOVE ||
+			event.type === Blockly.Events.BLOCK_CHANGE ||
+			event.type === Blockly.Events.BLOCK_DELETE ||
+			event.type === Blockly.Events.BLOCK_CREATE
+		);
+	};
+
 	// 單一的工作區變更監聽器
 	workspace.addChangeListener(event => {
 		// 忽略拖動中的 UI 事件
@@ -1265,14 +1304,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 			}, 800); // 延長等待時間，確保所有積木已完全載入和初始化
 		}
-
 		// 監聽函數定義變更，自動刷新工具箱
-		if (
-			event.type === Blockly.Events.BLOCK_MOVE ||
-			event.type === Blockly.Events.BLOCK_CHANGE ||
-			event.type === Blockly.Events.BLOCK_DELETE ||
-			event.type === Blockly.Events.BLOCK_CREATE
-		) {
+		if (isBlockChangeEvent(event)) {
 			// 檢查是否是函數積木的變更
 			const isRelatedToFunction = event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE;
 
@@ -1293,12 +1326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 			}
 		} // 更新程式碼
-		if (
-			event.type === Blockly.Events.BLOCK_MOVE ||
-			event.type === Blockly.Events.BLOCK_CHANGE ||
-			event.type === Blockly.Events.BLOCK_DELETE ||
-			event.type === Blockly.Events.BLOCK_CREATE
-		) {
+		if (isBlockChangeEvent(event)) {
 			// 記錄積木變動事件
 			const eventType = event.type.toString().replace('Blockly.Events.', '');
 			const blockId = event.blockId || '(未知ID)';
@@ -1773,27 +1801,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 	};
 });
 
-// 覆寫 Blockly 的字串替換函數
+// 覆寫 Blockly 的字串替換函數以支援多語言
 Blockly.utils.replaceMessageReferences = function (message) {
 	if (!message) {
 		return message;
 	}
-	return message.replace(/%{([^}]*)}/g, function (m, key) {
-		return window.languageManager.getMessage(key, m);
+	return message.replace(/%{([^}]*)}/g, function (match, key) {
+		if (window.languageManager && typeof window.languageManager.getMessage === 'function') {
+			return window.languageManager.getMessage(key, match);
+		}
+		return match;
 	});
 };
-
-/**
- * 處理變異對話框
- * @param {Object} option - 對話框選項
- */
-function handleMutatorDialog(option) {
-	// 每個變異對話框都應該包含在一個額外的div中，這樣才能獲得半透明背景
-	const backdrop = document.createElement('div');
-	backdrop.className = 'mutator-backdrop';
-	backdrop.appendChild(option.dialogue);
-	document.body.appendChild(backdrop);
-
-	// 當對話框顯示時，檢查是否需要顯示實驗積木提示
-	window.experimentalBlocksNotice.checkAndShow();
-}

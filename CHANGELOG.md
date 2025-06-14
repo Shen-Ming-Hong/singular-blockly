@@ -18,6 +18,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.32.1] - 2025-06-14
+
+### 已更新 Updated
+
+-   升級 Blockly 版本從 11.2.0 到 11.2.2，提升穩定性和性能
+    Updated Blockly version from 11.2.0 to 11.2.2 for improved stability and performance
+-   改進 Blockly API 兼容性處理，使用新的 `setLocale` API (v11.2.0+) 並保持向後兼容
+    Improved Blockly API compatibility handling, using new `setLocale` API (v11.2.0+) while maintaining backward compatibility
+-   優化程式碼品質，移除重複的程式碼片段和改善函數結構
+    Optimized code quality by removing duplicate code fragments and improving function structure
+-   增強錯誤處理和回退機制，提供更穩定的語言切換體驗
+    Enhanced error handling and fallback mechanisms for more stable language switching experience
+
+### 已修改 Changed
+
+-   更新檢查流程提示檔案，增加新的工具支援選項
+    Updated check process prompt file with additional tool support options
+-   重構語言載入機制，採用更現代和安全的 Blockly API 呼叫方式
+    Refactored language loading mechanism using more modern and secure Blockly API calling methods
+
 ## [0.32.0] - 2025-06-13
 
 ### 新增 Added

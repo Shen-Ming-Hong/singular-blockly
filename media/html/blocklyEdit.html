@@ -54,28 +54,30 @@
                 if (typeof Blockly !== 'undefined' && Blockly.Msg) {
                     // 使用標準化的日誌系統
                     if (window.log && window.log.info) {
-                        window.log.info(`同步 ${locale} 翻譯到 Blockly.Msg`, {
+                        window.log.info(`使用新的 setLocale API 同步 ${locale} 翻譯`, {
                             messageCount: Object.keys(messages).length,
                             timestamp: new Date().toISOString()
                         });
                     } else {
-                        console.log(`同步 ${locale} 翻譯到 Blockly.Msg`);
-                        // 在 log 系統可用後立即初始化它
-                        setTimeout(() => {
-                            if (window.log && window.log.info) {
-                                window.log.info(`語言 ${locale} 已載入`, {
-                                    messageCount: Object.keys(messages).length,
-                                    timestamp: new Date().toISOString()
-                                });
-                            }
-                        }, 100);
+                        console.log(`使用新的 setLocale API 同步 ${locale} 翻譯`);
                     }
 
-                    // 遍歷所有翻譯項目
-                    for (const key in messages) {
-                        // 如果 Blockly.Msg 中已經有這個鍵，就覆蓋它
-                        // 如果沒有，就新增這個鍵
-                        Blockly.Msg[key] = messages[key];
+                    // 使用新的 Blockly.setLocale API (v11.2.0+)
+                    try {
+                        if (typeof Blockly.setLocale === 'function') {
+                            Blockly.setLocale(messages);
+                        } else {
+                            // 回退到舊方法以保持向後兼容
+                            for (const key in messages) {
+                                Blockly.Msg[key] = messages[key];
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('設定語言時發生錯誤，使用回退方法:', error);
+                        // 回退到舊方法
+                        for (const key in messages) {
+                            Blockly.Msg[key] = messages[key];
+                        }
                     }
                 } else {
                     // 如果 Blockly 還未載入，設置一個短暫的延遲再試一次
