@@ -18,6 +18,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.32.2] - 2025-08-05
+
+### 新增 Added
+
+-   新增 form-data 套件依賴 (v4.0.4)，提供表單數據處理功能
+    Added form-data package dependency (v4.0.4) for form data processing functionality
+
+### 已更新 Updated
+
+-   升級 Blockly 版本從 11.2.2 到 11.2.2，保持最新穩定版本
+    Updated Blockly version from 11.2.0 to 11.2.2 to maintain latest stable version
+-   更新多個 ESLint 相關套件到最新版本，提升程式碼品質和安全性
+    Updated multiple ESLint-related packages to latest versions for improved code quality and security
+    -   @eslint/config-array: 0.19.1 → 0.21.0
+    -   @eslint/core: 0.9.1 → 0.15.1
+    -   @eslint/eslintrc: 3.2.0 → 3.3.1
+    -   @eslint/js: 9.17.0 → 9.32.0
+    -   @eslint/object-schema: 2.1.5 → 2.1.6
+    -   @eslint/plugin-kit: 0.2.4 → 0.3.4
+    -   eslint: 9.17.0 → 9.32.0
+    -   其他相關依賴的版本更新
+        Other related dependency version updates
+
 ## [0.32.1] - 2025-06-14
 
 ### 已更新 Updated
