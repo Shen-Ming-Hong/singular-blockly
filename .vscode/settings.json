@@ -1,37 +1,32 @@
-// Place your settings in this file to overwrite default and user settings.
 {
-	"files.exclude": {
-		"out": false, // set this to true to hide the "out" folder with the compiled JS files
-		"dist": false // set this to true to hide the "dist" folder with the compiled JS files
-	},
-	"search.exclude": {
-		"out": true, // set this to false to include "out" folder in search results
-		"dist": true // set this to false to include "dist" folder in search results
-	},
-	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
-	"typescript.tsc.autoDetect": "off",
-	"github.copilot.chat.commitMessageGeneration.instructions": [
-		{
-			"file": ".copilot-commit-message-instructions.md"
-		}
-	],
-	"MicroPython.executeButton": [
-		{
-			"text": "▶",
-			"tooltip": "运行",
-			"alignment": "left",
-			"command": "extension.executeFile",
-			"priority": 3.5
-		}
-	],
-	"MicroPython.syncButton": [
-		{
-			"text": "$(sync)",
-			"tooltip": "同步",
-			"alignment": "left",
-			"command": "extension.execute",
-			"priority": 4
-		}
-	],
-	"markdown.validate.enabled": false
+    "chat.promptFilesRecommendations": {
+        "speckit.constitution": true,
+        "speckit.specify": true,
+        "speckit.plan": true,
+        "speckit.tasks": true,
+        "speckit.implement": true
+    },
+    "chat.tools.terminal.autoApprove": {
+        ".specify/scripts/bash/": true,
+        ".specify/scripts/powershell/": true
+    },
+    "MicroPython.executeButton": [
+        {
+            "text": "▶",
+            "tooltip": "运行",
+            "alignment": "left",
+            "command": "extension.executeFile",
+            "priority": 3.5
+        }
+    ],
+    "MicroPython.syncButton": [
+        {
+            "text": "$(sync)",
+            "tooltip": "同步",
+            "alignment": "left",
+            "command": "extension.execute",
+            "priority": 4
+        }
+    ]
 }
+
