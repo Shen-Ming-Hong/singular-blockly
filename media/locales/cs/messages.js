@@ -90,6 +90,27 @@ window.languageManager.loadMessages('cs', {
 	SERVO_STOP: 'Zastavit Servo Motor',
 	SERVO_STOP_TOOLTIP: 'Zastavit výstupní signál servo motoru',
 
+	// Encoder Motor Control
+	ENCODER_SETUP: 'Nastavit Enkodérový Motor',
+	ENCODER_NAME: 'Název',
+	ENCODER_PIN_A: 'Pin A',
+	ENCODER_PIN_B: 'Pin B',
+	ENCODER_USE_INTERRUPT: 'Použít Přerušení',
+	ENCODER_SETUP_TOOLTIP: 'Nastavit enkodérový motor s názvem a konfigurací pinů',
+	ENCODER_READ: 'Číst Enkodér',
+	ENCODER_READ_TOOLTIP: 'Získat aktuální pozici enkodéru',
+	ENCODER_RESET: 'Resetovat Enkodér',
+	ENCODER_RESET_TOOLTIP: 'Resetovat pozici enkodéru na nulu',
+	ENCODER_PID_SETUP: 'Nastavit PID Řízení',
+	ENCODER_PID_MOTOR: 'Motor',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'Nakonfigurovat PID řízení pro přesnou kontrolu motoru',
+	ENCODER_PID_COMPUTE: 'Vypočítat PID',
+	ENCODER_PID_TARGET: 'Cíl',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'Vypočítat výstup PID řízení na základě cílové pozice',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Nastavení',
 	ARDUINO_LOOP: 'Smyčka',

@@ -1,0 +1,895 @@
+{
+    "version": "1.0.0",
+    "lastUpdated": "2025-10-17T16:30:00Z",
+    "description": "Centralized terminology glossary for Singular Blockly localization. Ensures consistency across 15 supported languages.",
+    "languages": [
+        "ja",
+        "ko",
+        "de",
+        "zh-hant",
+        "es"
+    ],
+    "termCount": 87,
+    "terms": [
+        {
+            "englishTerm": "servo motor",
+            "category": "hardware",
+            "translations": {
+                "ja": {
+                    "term": "サーボモーター",
+                    "usage": "カタカナ表記を使用。「サーボ」のみも可だが文脈で明確な場合のみ。",
+                    "alternatives": [
+                        "サーボ"
+                    ]
+                },
+                "ko": {
+                    "term": "서보 모터",
+                    "usage": "외래어 표기법 준수. 띄어쓰기 필수.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Servomotor",
+                    "usage": "Ein Wort ohne Bindestrich. Kapitalisierung als Substantiv.",
+                    "alternatives": [
+                        "Servo-Motor"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "伺服馬達",
+                    "usage": "台灣常用術語。避免使用「伺服電機」（大陸用語）。",
+                    "alternatives": [
+                        "伺服機"
+                    ]
+                },
+                "es": {
+                    "term": "servomotor",
+                    "usage": "Una palabra, sin guion. Minúscula excepto al inicio de oración.",
+                    "alternatives": [
+                        "servo motor",
+                        "servo"
+                    ]
+                }
+            },
+            "notes": "Common hardware component in Arduino projects. High frequency in toolbox and examples.",
+            "aliases": [
+                "servo",
+                "rc servo",
+                "hobby servo"
+            ]
+        },
+        {
+            "englishTerm": "digital pin",
+            "category": "hardware",
+            "translations": {
+                "ja": {
+                    "term": "デジタルピン",
+                    "usage": "カタカナ表記。「ディジタル」は古い表記のため避ける。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "디지털 핀",
+                    "usage": "띄어쓰기 필수. 외래어 표기법 준수.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Digitalpin",
+                    "usage": "Ein Wort. Alternativ mit Bindestrich möglich.",
+                    "alternatives": [
+                        "Digital-Pin"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "數位腳位",
+                    "usage": "「數位」為台灣正體中文標準（非「數字」）。",
+                    "alternatives": [
+                        "數位引腳"
+                    ]
+                },
+                "es": {
+                    "term": "pin digital",
+                    "usage": "Dos palabras, minúscula. Adjetivo después del sustantivo.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Hardware pin type. Very high frequency in Arduino programming.",
+            "aliases": [
+                "digital I/O",
+                "digital input/output"
+            ]
+        },
+        {
+            "englishTerm": "analog pin",
+            "category": "hardware",
+            "translations": {
+                "ja": {
+                    "term": "アナログピン",
+                    "usage": "カタカナ表記。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "아날로그 핀",
+                    "usage": "띄어쓰기 필수.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Analogpin",
+                    "usage": "Ein Wort ohne Bindestrich.",
+                    "alternatives": [
+                        "Analog-Pin"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "類比腳位",
+                    "usage": "「類比」為台灣標準（非「模擬」）。",
+                    "alternatives": [
+                        "類比引腳"
+                    ]
+                },
+                "es": {
+                    "term": "pin analógico",
+                    "usage": "Dos palabras. Acento en 'analógico'.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Hardware pin type for analog signals.",
+            "aliases": [
+                "analog input",
+                "ADC pin"
+            ]
+        },
+        {
+            "englishTerm": "ultrasonic sensor",
+            "category": "hardware",
+            "translations": {
+                "ja": {
+                    "term": "超音波センサー",
+                    "usage": "「超音波」は漢字、「センサー」はカタカナ。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "초음파 센서",
+                    "usage": "띄어쓰기 필수. 한자어 + 외래어 조합.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Ultraschallsensor",
+                    "usage": "Ein zusammengesetztes Wort.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "超音波感測器",
+                    "usage": "「感測器」為台灣標準（非「傳感器」）。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "sensor ultrasónico",
+                    "usage": "Adjetivo después del sustantivo. Acento en 'ultrasónico'.",
+                    "alternatives": [
+                        "sensor de ultrasonido"
+                    ]
+                }
+            },
+            "notes": "Common distance sensor in robotics projects.",
+            "aliases": [
+                "HC-SR04",
+                "distance sensor"
+            ]
+        },
+        {
+            "englishTerm": "infrared sensor",
+            "category": "hardware",
+            "translations": {
+                "ja": {
+                    "term": "赤外線センサー",
+                    "usage": "「赤外線」は漢字。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "적외선 센서",
+                    "usage": "띄어쓰기 필수.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Infrarotsensor",
+                    "usage": "Ein Wort.",
+                    "alternatives": [
+                        "IR-Sensor"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "紅外線感測器",
+                    "usage": "「感測器」為台灣標準。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "sensor infrarrojo",
+                    "usage": "Adjetivo después del sustantivo.",
+                    "alternatives": [
+                        "sensor IR"
+                    ]
+                }
+            },
+            "notes": "Sensor for detecting infrared light or motion.",
+            "aliases": [
+                "IR sensor",
+                "PIR sensor"
+            ]
+        },
+        {
+            "englishTerm": "light sensor",
+            "category": "hardware",
+            "translations": {
+                "ja": {
+                    "term": "光センサー",
+                    "usage": "「光」は漢字1字で可。",
+                    "alternatives": [
+                        "明るさセンサー"
+                    ]
+                },
+                "ko": {
+                    "term": "광센서",
+                    "usage": "붙여쓰기 가능. 한자어 조합.",
+                    "alternatives": [
+                        "빛 센서"
+                    ]
+                },
+                "de": {
+                    "term": "Lichtsensor",
+                    "usage": "Ein Wort.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "光感測器",
+                    "usage": "簡潔用語。",
+                    "alternatives": [
+                        "亮度感測器"
+                    ]
+                },
+                "es": {
+                    "term": "sensor de luz",
+                    "usage": "Tres palabras con preposición.",
+                    "alternatives": [
+                        "fotosensor"
+                    ]
+                }
+            },
+            "notes": "Detects light intensity (e.g., photoresistor).",
+            "aliases": [
+                "photoresistor",
+                "LDR",
+                "brightness sensor"
+            ]
+        },
+        {
+            "englishTerm": "setup function",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "セットアップ関数",
+                    "usage": "「セットアップ」カタカナ、「関数」漢字。",
+                    "alternatives": [
+                        "setup関数"
+                    ]
+                },
+                "ko": {
+                    "term": "setup 함수",
+                    "usage": "영어 'setup' 그대로 사용. 띄어쓰기.",
+                    "alternatives": [
+                        "셋업 함수"
+                    ]
+                },
+                "de": {
+                    "term": "setup-Funktion",
+                    "usage": "Englisches Wort mit Bindestrich. Alternativ komplett deutsch.",
+                    "alternatives": [
+                        "Einrichtungsfunktion"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "setup 函式",
+                    "usage": "保留英文 'setup'。「函式」為台灣標準（非「函數」）。",
+                    "alternatives": [
+                        "初始化函式"
+                    ]
+                },
+                "es": {
+                    "term": "función setup",
+                    "usage": "Mantener 'setup' en inglés por convención Arduino.",
+                    "alternatives": [
+                        "función de configuración"
+                    ]
+                }
+            },
+            "notes": "Arduino standard function name. Keep 'setup' in English for code consistency.",
+            "aliases": [
+                "initialization function",
+                "init"
+            ]
+        },
+        {
+            "englishTerm": "loop function",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "ループ関数",
+                    "usage": "「ループ」カタカナ。",
+                    "alternatives": [
+                        "loop関数"
+                    ]
+                },
+                "ko": {
+                    "term": "loop 함수",
+                    "usage": "영어 'loop' 그대로 사용.",
+                    "alternatives": [
+                        "루프 함수"
+                    ]
+                },
+                "de": {
+                    "term": "loop-Funktion",
+                    "usage": "Englisches Wort mit Bindestrich.",
+                    "alternatives": [
+                        "Schleifenfunktion"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "loop 函式",
+                    "usage": "保留英文 'loop'。",
+                    "alternatives": [
+                        "迴圈函式"
+                    ]
+                },
+                "es": {
+                    "term": "función loop",
+                    "usage": "Mantener 'loop' en inglés por convención Arduino.",
+                    "alternatives": [
+                        "función de bucle"
+                    ]
+                }
+            },
+            "notes": "Arduino standard function name. Keep 'loop' in English for code consistency.",
+            "aliases": [
+                "main loop",
+                "execution loop"
+            ]
+        },
+        {
+            "englishTerm": "if statement",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "if文",
+                    "usage": "英語 'if' + 漢字「文」。標準的な表記。",
+                    "alternatives": [
+                        "条件文"
+                    ]
+                },
+                "ko": {
+                    "term": "if 문",
+                    "usage": "영어 'if' + 한자어 '문'. 띄어쓰기.",
+                    "alternatives": [
+                        "조건문"
+                    ]
+                },
+                "de": {
+                    "term": "if-Anweisung",
+                    "usage": "Englisches 'if' mit Bindestrich.",
+                    "alternatives": [
+                        "Bedingungsanweisung"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "if 敘述",
+                    "usage": "保留英文 'if'。「敘述」為台灣標準（非「語句」）。",
+                    "alternatives": [
+                        "條件敘述"
+                    ]
+                },
+                "es": {
+                    "term": "sentencia if",
+                    "usage": "Mantener 'if' en inglés.",
+                    "alternatives": [
+                        "condicional if"
+                    ]
+                }
+            },
+            "notes": "Conditional control structure. 'if' keyword typically kept in English.",
+            "aliases": [
+                "conditional",
+                "if-else"
+            ]
+        },
+        {
+            "englishTerm": "for loop",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "forループ",
+                    "usage": "英語 'for' + カタカナ「ループ」。",
+                    "alternatives": [
+                        "for文"
+                    ]
+                },
+                "ko": {
+                    "term": "for 반복문",
+                    "usage": "영어 'for' + 한자어 '반복문'. 띄어쓰기.",
+                    "alternatives": [
+                        "for 루프"
+                    ]
+                },
+                "de": {
+                    "term": "for-Schleife",
+                    "usage": "Englisches 'for' mit Bindestrich.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "for 迴圈",
+                    "usage": "保留英文 'for'。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "bucle for",
+                    "usage": "Mantener 'for' en inglés.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Iteration control structure. 'for' keyword kept in English.",
+            "aliases": [
+                "for statement",
+                "counting loop"
+            ]
+        },
+        {
+            "englishTerm": "while loop",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "whileループ",
+                    "usage": "英語 'while' + カタカナ「ループ」。",
+                    "alternatives": [
+                        "while文"
+                    ]
+                },
+                "ko": {
+                    "term": "while 반복문",
+                    "usage": "영어 'while' + 한자어 '반복문'. 띄어쓰기.",
+                    "alternatives": [
+                        "while 루프"
+                    ]
+                },
+                "de": {
+                    "term": "while-Schleife",
+                    "usage": "Englisches 'while' mit Bindestrich.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "while 迴圈",
+                    "usage": "保留英文 'while'。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "bucle while",
+                    "usage": "Mantener 'while' en inglés.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Conditional loop structure. 'while' keyword kept in English.",
+            "aliases": [
+                "while statement",
+                "conditional loop"
+            ]
+        },
+        {
+            "englishTerm": "variable",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "変数",
+                    "usage": "漢字表記。標準的なプログラミング用語。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "변수",
+                    "usage": "한자어 표기. 프로그래밍 표준 용어.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Variable",
+                    "usage": "Kapitalisierung als Substantiv.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "變數",
+                    "usage": "繁體中文標準用語。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "variable",
+                    "usage": "Minúscula. Mismo que en inglés.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Core programming concept. Standard terminology across languages.",
+            "aliases": [
+                "var",
+                "local variable",
+                "global variable"
+            ]
+        },
+        {
+            "englishTerm": "function",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "関数",
+                    "usage": "漢字表記。数学・プログラミング共通用語。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "함수",
+                    "usage": "한자어 표기. 프로그래밍 표준 용어.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Funktion",
+                    "usage": "Kapitalisierung als Substantiv.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "函式",
+                    "usage": "台灣標準用語（非「函數」）。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "función",
+                    "usage": "Acento en 'ó'.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Core programming concept. Note zh-hant uses 函式 (Taiwan) not 函數 (mainland China).",
+            "aliases": [
+                "method",
+                "procedure",
+                "subroutine"
+            ]
+        },
+        {
+            "englishTerm": "array",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "配列",
+                    "usage": "漢字表記。標準的なプログラミング用語。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "배열",
+                    "usage": "한자어 표기. 프로그래밍 표준 용어.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Array",
+                    "usage": "Englisches Wort übernommen. Kapitalisierung.",
+                    "alternatives": [
+                        "Feld"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "陣列",
+                    "usage": "繁體中文標準用語。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "array",
+                    "usage": "Mantener en inglés por convención técnica.",
+                    "alternatives": [
+                        "arreglo",
+                        "matriz"
+                    ]
+                }
+            },
+            "notes": "Data structure. German and Spanish sometimes keep English term 'array'.",
+            "aliases": [
+                "list",
+                "vector"
+            ]
+        },
+        {
+            "englishTerm": "toolbox",
+            "category": "ui",
+            "translations": {
+                "ja": {
+                    "term": "ツールボックス",
+                    "usage": "カタカナ表記。Blocklyの標準UI用語。",
+                    "alternatives": [
+                        "ツール一覧"
+                    ]
+                },
+                "ko": {
+                    "term": "도구 상자",
+                    "usage": "띄어쓰기. 직역보다는 자연스러운 표현.",
+                    "alternatives": [
+                        "툴박스"
+                    ]
+                },
+                "de": {
+                    "term": "Werkzeugkasten",
+                    "usage": "Deutsches zusammengesetztes Wort.",
+                    "alternatives": [
+                        "Toolbox"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "工具箱",
+                    "usage": "簡潔的中文表達。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "caja de herramientas",
+                    "usage": "Traducción completa al español.",
+                    "alternatives": [
+                        "panel de bloques"
+                    ]
+                }
+            },
+            "notes": "Blockly UI component containing available blocks. High frequency.",
+            "aliases": [
+                "block palette",
+                "block menu"
+            ]
+        },
+        {
+            "englishTerm": "workspace",
+            "category": "ui",
+            "translations": {
+                "ja": {
+                    "term": "ワークスペース",
+                    "usage": "カタカナ表記。Blockly標準用語。",
+                    "alternatives": [
+                        "作業領域"
+                    ]
+                },
+                "ko": {
+                    "term": "작업 공간",
+                    "usage": "띄어쓰기. 자연스러운 한국어 표현.",
+                    "alternatives": [
+                        "워크스페이스"
+                    ]
+                },
+                "de": {
+                    "term": "Arbeitsbereich",
+                    "usage": "Deutsches zusammengesetztes Wort.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "工作區",
+                    "usage": "繁體中文簡潔表達。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "área de trabajo",
+                    "usage": "Traducción al español.",
+                    "alternatives": [
+                        "espacio de trabajo"
+                    ]
+                }
+            },
+            "notes": "Blockly main canvas where blocks are arranged. Very high frequency.",
+            "aliases": [
+                "canvas",
+                "programming area"
+            ]
+        },
+        {
+            "englishTerm": "block",
+            "category": "blockly",
+            "translations": {
+                "ja": {
+                    "term": "ブロック",
+                    "usage": "カタカナ表記。Blocklyの基本概念。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "블록",
+                    "usage": "외래어 표기. Blockly의 핵심 개념.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Block",
+                    "usage": "Englisches Wort übernommen. Kapitalisierung.",
+                    "alternatives": [
+                        "Baustein"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "積木",
+                    "usage": "使用「積木」而非「區塊」，更適合教育情境。",
+                    "alternatives": [
+                        "方塊"
+                    ]
+                },
+                "es": {
+                    "term": "bloque",
+                    "usage": "Traducción al español. Minúscula.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Core Blockly concept. zh-hant uses 積木 (building blocks) for educational context.",
+            "aliases": [
+                "code block",
+                "puzzle piece"
+            ]
+        },
+        {
+            "englishTerm": "category",
+            "category": "blockly",
+            "translations": {
+                "ja": {
+                    "term": "カテゴリ",
+                    "usage": "カタカナ表記。語尾の長音符号は省略可（カテゴリー）。",
+                    "alternatives": [
+                        "カテゴリー",
+                        "分類"
+                    ]
+                },
+                "ko": {
+                    "term": "범주",
+                    "usage": "한자어 표기. 자연스러운 한국어.",
+                    "alternatives": [
+                        "카테고리"
+                    ]
+                },
+                "de": {
+                    "term": "Kategorie",
+                    "usage": "Deutsches Wort. Kapitalisierung.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "分類",
+                    "usage": "繁體中文表達，避免直譯「類別」。",
+                    "alternatives": [
+                        "類別"
+                    ]
+                },
+                "es": {
+                    "term": "categoría",
+                    "usage": "Acento en 'í'.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Blockly toolbox organization. High frequency in UI.",
+            "aliases": [
+                "group",
+                "section"
+            ]
+        },
+        {
+            "englishTerm": "compile",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "コンパイル",
+                    "usage": "カタカナ表記。プログラミング標準用語。",
+                    "alternatives": [
+                        "ビルド"
+                    ]
+                },
+                "ko": {
+                    "term": "컴파일",
+                    "usage": "외래어 표기. 프로그래밍 표준 용어.",
+                    "alternatives": [
+                        "빌드"
+                    ]
+                },
+                "de": {
+                    "term": "kompilieren",
+                    "usage": "Verb. Als Substantiv: 'Kompilierung'.",
+                    "alternatives": [
+                        "übersetzen"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "編譯",
+                    "usage": "繁體中文標準技術用語。",
+                    "alternatives": []
+                },
+                "es": {
+                    "term": "compilar",
+                    "usage": "Verbo. Sustantivo: 'compilación'.",
+                    "alternatives": []
+                }
+            },
+            "notes": "Build process action. Standard programming terminology.",
+            "aliases": [
+                "build",
+                "translate code"
+            ]
+        },
+        {
+            "englishTerm": "upload",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "アップロード",
+                    "usage": "カタカナ表記。Arduino開発の標準用語。",
+                    "alternatives": [
+                        "書き込み"
+                    ]
+                },
+                "ko": {
+                    "term": "업로드",
+                    "usage": "외래어 표기. Arduino 개발 표준 용어.",
+                    "alternatives": [
+                        "전송"
+                    ]
+                },
+                "de": {
+                    "term": "hochladen",
+                    "usage": "Deutsches Verb. Substantiv: 'Hochladen'.",
+                    "alternatives": [
+                        "uploaden"
+                    ]
+                },
+                "zh-hant": {
+                    "term": "上傳",
+                    "usage": "繁體中文標準表達。",
+                    "alternatives": [
+                        "燒錄"
+                    ]
+                },
+                "es": {
+                    "term": "subir",
+                    "usage": "Verbo español. Sustantivo: 'subida' o 'carga'.",
+                    "alternatives": [
+                        "cargar"
+                    ]
+                }
+            },
+            "notes": "Arduino code deployment to board. High frequency action.",
+            "aliases": [
+                "flash",
+                "deploy",
+                "program"
+            ]
+        },
+        {
+            "englishTerm": "serial monitor",
+            "category": "software",
+            "translations": {
+                "ja": {
+                    "term": "シリアルモニター",
+                    "usage": "カタカナ表記。Arduino標準用語。",
+                    "alternatives": []
+                },
+                "ko": {
+                    "term": "시리얼 모니터",
+                    "usage": "띄어쓰기. Arduino 표준 용어.",
+                    "alternatives": []
+                },
+                "de": {
+                    "term": "Serieller Monitor",
+                    "usage": "Beide Wörter kapitalisiert. 'Seriell' als Adjektiv.",
+                    "alternatives": []
+                },
+                "zh-hant": {
+                    "term": "序列埠監控視窗",
+                    "usage": "完整描述性表達。",
+                    "alternatives": [
+                        "串列監視器"
+                    ]
+                },
+                "es": {
+                    "term": "monitor serial",
+                    "usage": "Adjetivo después del sustantivo.",
+                    "alternatives": [
+                        "monitor serie"
+                    ]
+                }
+            },
+            "notes": "Arduino debugging tool. Standard terminology.",
+            "aliases": [
+                "serial console",
+                "UART monitor"
+            ]
+        }
+    ]
+}

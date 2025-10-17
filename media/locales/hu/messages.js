@@ -90,6 +90,27 @@ window.languageManager.loadMessages('hu', {
 	SERVO_STOP: 'Szervomotor leállítása',
 	SERVO_STOP_TOOLTIP: 'Szervomotor jelkimenet leállítása',
 
+	// Encoder Motor Control
+	ENCODER_SETUP: 'Enkóderes motor beállítása',
+	ENCODER_NAME: 'Név',
+	ENCODER_PIN_A: 'A láb',
+	ENCODER_PIN_B: 'B láb',
+	ENCODER_USE_INTERRUPT: 'Megszakítás használata',
+	ENCODER_SETUP_TOOLTIP: 'Enkóderes motor beállítása névvel és lábkonfigurációval',
+	ENCODER_READ: 'Enkóder olvasása',
+	ENCODER_READ_TOOLTIP: 'Enkóder aktuális pozíciójának lekérdezése',
+	ENCODER_RESET: 'Enkóder visszaállítása',
+	ENCODER_RESET_TOOLTIP: 'Enkóder pozíciójának visszaállítása nullára',
+	ENCODER_PID_SETUP: 'PID szabályozás beállítása',
+	ENCODER_PID_MOTOR: 'Motor',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'PID szabályozás konfigurálása pontos motor vezérléshez',
+	ENCODER_PID_COMPUTE: 'PID számítása',
+	ENCODER_PID_TARGET: 'Cél',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'PID szabályozás kimenetének számítása célpozíció alapján',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Beállítás',
 	ARDUINO_LOOP: 'Ciklus',

@@ -90,6 +90,27 @@ window.languageManager.loadMessages('ru', {
 	SERVO_STOP: 'Остановить сервопривод',
 	SERVO_STOP_TOOLTIP: 'Остановить выходной сигнал сервопривода',
 
+	// Encoder Motor Control
+	ENCODER_SETUP: 'Настройка мотора с энкодером',
+	ENCODER_NAME: 'Имя',
+	ENCODER_PIN_A: 'Пин A',
+	ENCODER_PIN_B: 'Пин B',
+	ENCODER_USE_INTERRUPT: 'Использовать прерывание',
+	ENCODER_SETUP_TOOLTIP: 'Настроить мотор с энкодером с параметрами имени и пинов',
+	ENCODER_READ: 'Читать энкодер',
+	ENCODER_READ_TOOLTIP: 'Получить текущую позицию энкодера',
+	ENCODER_RESET: 'Сбросить энкодер',
+	ENCODER_RESET_TOOLTIP: 'Сбросить позицию энкодера до нуля',
+	ENCODER_PID_SETUP: 'Настройка PID-регулятора',
+	ENCODER_PID_MOTOR: 'Мотор',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'Настроить PID-регулятор для точного управления мотором',
+	ENCODER_PID_COMPUTE: 'Вычислить PID',
+	ENCODER_PID_TARGET: 'Цель',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'Вычислить выход PID-регулятора на основе целевой позиции',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',
 	ARDUINO_LOOP: 'Цикл',

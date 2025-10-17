@@ -90,6 +90,27 @@ window.languageManager.loadMessages('ja', {
 	SERVO_STOP: 'サーボモーターを停止',
 	SERVO_STOP_TOOLTIP: 'サーボモーターの信号出力を停止する',
 
+	// Encoder Motor Block Labels
+	ENCODER_SETUP: 'エンコーダーモーターの設定',
+	ENCODER_NAME: '名前',
+	ENCODER_PIN_A: 'ピンA',
+	ENCODER_PIN_B: 'ピンB',
+	ENCODER_USE_INTERRUPT: 'ハードウェア割り込みを使用',
+	ENCODER_SETUP_TOOLTIP: 'ピンAとピンBでエンコーダーモーターを設定します',
+	ENCODER_READ: 'エンコーダーを読み取る',
+	ENCODER_READ_TOOLTIP: 'エンコーダーの現在位置を読み取ります',
+	ENCODER_RESET: 'エンコーダーをリセット',
+	ENCODER_RESET_TOOLTIP: 'エンコーダーをゼロ位置にリセットします',
+	ENCODER_PID_SETUP: 'PID制御の設定',
+	ENCODER_PID_MOTOR: 'モーター',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'エンコーダーモーターのPID制御を設定します',
+	ENCODER_PID_COMPUTE: 'PIDを計算',
+	ENCODER_PID_TARGET: '目標値',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'エンコーダーモーターが目標位置に到達するためのPIDを計算します',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'セットアップ',
 	ARDUINO_LOOP: 'ループ',

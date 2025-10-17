@@ -90,6 +90,27 @@ window.languageManager.loadMessages('pl', {
 	SERVO_STOP: 'Zatrzymaj Serwo',
 	SERVO_STOP_TOOLTIP: 'Zatrzymaj sygnał wyjściowy serwa',
 
+	// Encoder Motor Control
+	ENCODER_SETUP: 'Konfiguruj Silnik Enkodera',
+	ENCODER_NAME: 'Nazwa',
+	ENCODER_PIN_A: 'Pin A',
+	ENCODER_PIN_B: 'Pin B',
+	ENCODER_USE_INTERRUPT: 'Użyj Przerwania',
+	ENCODER_SETUP_TOOLTIP: 'Konfiguruj silnik enkodera z nazwą i konfiguracjami pinów',
+	ENCODER_READ: 'Odczytaj Enkoder',
+	ENCODER_READ_TOOLTIP: 'Pobierz aktualną pozycję enkodera',
+	ENCODER_RESET: 'Resetuj Enkoder',
+	ENCODER_RESET_TOOLTIP: 'Resetuj pozycję enkodera do zera',
+	ENCODER_PID_SETUP: 'Konfiguruj Sterowanie PID',
+	ENCODER_PID_MOTOR: 'Silnik',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'Konfiguruj sterowanie PID dla precyzyjnej kontroli silnika',
+	ENCODER_PID_COMPUTE: 'Oblicz PID',
+	ENCODER_PID_TARGET: 'Cel',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'Oblicz wyjście sterowania PID na podstawie pozycji docelowej',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Konfiguracja',
 	ARDUINO_LOOP: 'Pętla',
