@@ -370,6 +370,44 @@ export class WebViewManager {
 	}
 
 	/**
+	 * 清理過期的臨時工具箱檔案（超過 1 小時）
+	 * 在擴充套件啟動時執行，清理殘留的舊檔案
+	 * @param extensionPath 擴充套件路徑
+	 */
+	static async cleanupStaleTempFiles(extensionPath: string): Promise<void> {
+		const TEMP_FILE_MAX_AGE_MS = 60 * 60 * 1000; // 1 小時
+		const TEMP_FILE_PREFIX = 'temp_toolbox_';
+		const TOOLBOX_DIR = 'media/toolbox';
+
+		try {
+			const fileService = new FileService(extensionPath);
+			const files = await fileService.listFiles(TOOLBOX_DIR);
+			const tempFiles = files.filter(f => f.startsWith(TEMP_FILE_PREFIX) && f.endsWith('.json'));
+
+			let deletedCount = 0;
+			for (const file of tempFiles) {
+				const filePath = `${TOOLBOX_DIR}/${file}`;
+				const stats = await fileService.getFileStats(filePath);
+
+				if (stats) {
+					const ageMs = Date.now() - stats.mtime.getTime();
+					if (ageMs > TEMP_FILE_MAX_AGE_MS) {
+						await fileService.deleteFile(filePath);
+						deletedCount++;
+					}
+				}
+			}
+
+			if (deletedCount > 0) {
+				log(`Cleaned up ${deletedCount} stale temporary toolbox file(s)`, 'info');
+			}
+		} catch (error) {
+			// Non-blocking cleanup - log warning but don't throw
+			log('Warning: Failed to cleanup stale temporary files', 'warn', error);
+		}
+	}
+
+	/**
 	 * 清理臨時工具箱檔案（非阻塞，錯誤不拋出）
 	 */
 	private async cleanupTempFile(): Promise<void> {

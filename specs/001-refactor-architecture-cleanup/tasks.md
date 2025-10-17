@@ -153,9 +153,9 @@ This is a **single TypeScript project** with VSCode extension structure:
 -   [x] T038 [US4] Implemented deletion using `await this.extensionFileService.deleteFile()`
 -   [x] T039 [US4] Added non-blocking try-catch with warning log (errors don't throw)
 -   [x] T040 [US4] Registered cleanup in `panel.onDidDispose(() => this.cleanupTempFile())`
--   [ ] T041 [US4] Create `async cleanupStaleTempFiles(): Promise<void>` method for extension activation (optional - deferred)
--   [ ] T042 [US4] Implement stale file detection (age > 1 hour) using `fileService.getFileStats()` (optional - deferred)
--   [ ] T043 [US4] Call `cleanupStaleTempFiles()` once during extension activation in `src/extension.ts` (optional - deferred)
+-   [x] T041 [US4] Create static `cleanupStaleTempFiles(extensionPath)` method for extension activation ✅
+-   [x] T042 [US4] Implement stale file detection (age > 1 hour) using `fileService.getFileStats()` ✅
+-   [x] T043 [US4] Call `cleanupStaleTempFiles()` during extension activation in `src/extension.ts` ✅
 -   [x] T044 [US4] Test suite verified: `npm test` (22 passing, 31 failing - baseline maintained)
 -   [ ] T045 [US4] Manual test: Open 3 Blockly editor windows, verify unique temp files created
 -   [ ] T046 [US4] Manual test: Close middle window, verify only that temp file deleted

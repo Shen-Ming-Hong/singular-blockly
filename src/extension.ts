@@ -25,6 +25,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		// 初始化服務
 		const localeService = new LocaleService(context.extensionPath);
 
+		// 清理過期的臨時工具箱檔案（非阻塞）
+		WebViewManager.cleanupStaleTempFiles(context.extensionPath).catch(err => {
+			log('Failed to cleanup stale temp files during activation', 'warn', err);
+		});
+
 		// 註冊活動欄視圖
 		registerActivityBarView(context);
 
