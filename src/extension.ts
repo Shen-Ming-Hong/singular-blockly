@@ -11,16 +11,24 @@ import { LocaleService } from './services/localeService';
 import { SettingsManager } from './services/settingsManager';
 import { WebViewManager } from './webview/webviewManager';
 
+// Status bar priority constant
+const STATUS_BAR_PRIORITY = 100;
+
 /**
  * 啟用擴充功能
  * @param context 擴充功能上下文
  */
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	log('Starting Singular Blockly extension...', 'info');
 
 	try {
 		// 初始化服務
 		const localeService = new LocaleService(context.extensionPath);
+
+		// 清理過期的臨時工具箱檔案（非阻塞）
+		WebViewManager.cleanupStaleTempFiles(context.extensionPath).catch(err => {
+			log('Failed to cleanup stale temp files during activation', 'warn', err);
+		});
 
 		// 註冊活動欄視圖
 		registerActivityBarView(context);
@@ -215,7 +223,7 @@ function setupStatusBar(context: vscode.ExtensionContext, localeService: LocaleS
 	log('Creating status bar button...', 'info');
 
 	// 建立狀態列按鈕
-	const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+	const blocklyStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, STATUS_BAR_PRIORITY);
 	blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
 	blocklyStatusBarItem.text = '$(wand)';
 	blocklyStatusBarItem.tooltip = 'Open Blockly Editor'; // 預設工具提示

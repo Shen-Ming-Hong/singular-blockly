@@ -11,6 +11,11 @@ import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 
+// Timing constants
+const UI_MESSAGE_DELAY_MS = 100;
+const UI_REVEAL_DELAY_MS = 200;
+const BOARD_CONFIG_REQUEST_TIMEOUT_MS = 10000;
+
 /**
  * WebView 訊息處理器類別
  * 負責處理 WebView 與擴充功能間的訊息傳遞
@@ -213,10 +218,8 @@ export class WebViewMessageHandler {
 								vscode.commands.executeCommand('workbench.action.reloadWindow');
 							}
 						});
-				}, 100);
-
-				// 確保 Blockly 編輯器保持在前景
-				setTimeout(() => this.panel.reveal(vscode.ViewColumn.One, true), 200);
+				}, UI_MESSAGE_DELAY_MS); // 確保 Blockly 編輯器保持在前景
+				setTimeout(() => this.panel.reveal(vscode.ViewColumn.One, true), UI_REVEAL_DELAY_MS);
 			}
 		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_UPDATE_INI', (error as Error).message);
@@ -727,7 +730,7 @@ export class WebViewMessageHandler {
 					setTimeout(() => {
 						log(`板子設定請求逾時，無法獲取設定`);
 						resolve('');
-					}, 10000);
+					}, BOARD_CONFIG_REQUEST_TIMEOUT_MS);
 				}),
 			]);
 		} catch (error) {

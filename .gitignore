@@ -31,6 +31,7 @@ desktop.ini
 *.log
 .cache/
 media/toolbox/temp_toolbox.json
+media/toolbox/temp_toolbox_*.json
 coverage/
 .nyc_output/
 

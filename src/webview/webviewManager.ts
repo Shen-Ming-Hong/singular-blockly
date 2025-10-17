@@ -5,7 +5,6 @@
  */
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 import * as path from 'path';
 import { log } from '../services/logging';
 import { FileService } from '../services/fileService';
@@ -21,8 +20,10 @@ export class WebViewManager {
 	private panel: vscode.WebviewPanel | undefined;
 	private messageHandler: WebViewMessageHandler | undefined;
 	private fileService: FileService | undefined;
+	private extensionFileService: FileService;
 	private localeService: LocaleService;
 	private previewPanels: Map<string, vscode.WebviewPanel> = new Map();
+	private currentTempToolboxFile: string | null = null;
 
 	/**
 	 * 建立 WebView 管理器實例
@@ -30,6 +31,8 @@ export class WebViewManager {
 	 */
 	constructor(private context: vscode.ExtensionContext) {
 		this.localeService = new LocaleService(context.extensionPath);
+		// Initialize extensionFileService for reading extension resources
+		this.extensionFileService = new FileService(context.extensionPath);
 	}
 
 	/**
@@ -91,6 +94,7 @@ export class WebViewManager {
 		this.panel.onDidDispose(() => {
 			this.panel = undefined;
 			this.messageHandler = undefined;
+			this.cleanupTempFile();
 			log('WebView panel disposed', 'info');
 		});
 
@@ -112,8 +116,7 @@ export class WebViewManager {
 	 */
 	private async getWebviewContent(): Promise<string> {
 		try {
-			const htmlPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/html/blocklyEdit.html'));
-			let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
+			let htmlContent = await this.extensionFileService.readFile('media/html/blocklyEdit.html');
 
 			// 取得當前語言和主題設定
 			const localeService = new LocaleService(this.context.extensionPath);
@@ -176,21 +179,9 @@ export class WebViewManager {
 			// HUSKYLENS 智慧鏡頭積木定義
 			const huskyLensBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/huskylens.js'));
 			const huskyLensBlocksUri = webview.asWebviewUri(huskyLensBlocksPath);
-			// Arduino 生成器模組
-			const arduinoModules = [
-				'io.js',
-				'logic.js',
-				'loops.js',
-				'math.js',
-				'text.js',
-				'lists.js',
-				'functions.js',
-				'variables.js',
-				'sensors.js',
-				'motors.js',
-				'pixetto.js',
-				'huskylens.js',
-			]
+			// Arduino 生成器模組（動態發現）
+			const discoveredModules = await this.discoverArduinoModules();
+			const arduinoModules = discoveredModules
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
 					const moduleUri = webview.asWebviewUri(modulePath);
@@ -208,9 +199,7 @@ export class WebViewManager {
 			);
 
 			// 載入所有支援的語言文件
-			const localeScripts = await this.loadLocaleFiles(webview);
-
-			// 主題文件
+			const localeScripts = await this.loadLocaleScripts(webview); // 主題文件
 			const singularJsUri = webview.asWebviewUri(
 				vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/themes/singular.js'))
 			);
@@ -220,14 +209,15 @@ export class WebViewManager {
 			);
 
 			// 讀取並處理工具箱配置
-			const toolboxJsonPath = path.join(this.context.extensionPath, 'media/toolbox/index.json');
-			const toolboxJson = JSON.parse(fs.readFileSync(toolboxJsonPath, 'utf8'));
+			const toolboxJson = await this.extensionFileService.readJsonFile('media/toolbox/index.json', {});
 			const resolvedToolbox = await this.resolveToolboxIncludes(toolboxJson);
 
-			// 寫入處理後的配置到臨時檔案
-			const tempToolboxPath = path.join(this.context.extensionPath, 'media/toolbox/temp_toolbox.json');
-			fs.writeFileSync(tempToolboxPath, JSON.stringify(resolvedToolbox, null, 2));
-			const tempToolboxUri = webview.asWebviewUri(vscode.Uri.file(tempToolboxPath));
+			// 寫入處理後的配置到唯一命名的臨時檔案
+			this.currentTempToolboxFile = this.generateTempToolboxPath();
+			await this.extensionFileService.writeJsonFile(this.currentTempToolboxFile, resolvedToolbox, true);
+			const tempToolboxUri = webview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, this.currentTempToolboxFile))
+			);
 
 			// 替換所有預留位置
 			htmlContent = htmlContent.replace("currentLanguage: '{vscodeLanguage}'", `currentLanguage: '${blocklyLanguage}'`);
@@ -299,8 +289,8 @@ export class WebViewManager {
 		}
 
 		if (json.$include) {
-			const includePath = path.join(this.context.extensionPath, 'media/toolbox', json.$include);
-			const content = JSON.parse(fs.readFileSync(includePath, 'utf8'));
+			const includePath = `media/toolbox/${json.$include}`;
+			const content = await this.extensionFileService.readJsonFile(includePath, {});
 			return content;
 		}
 
@@ -312,11 +302,11 @@ export class WebViewManager {
 	}
 
 	/**
-	 * 載入所有語言文件
+	 * 載入所有語言文件（統一方法）
 	 * @param webview WebView 實例
 	 * @returns 語言腳本 HTML
 	 */
-	private async loadLocaleFiles(webview: vscode.Webview): Promise<string> {
+	private async loadLocaleScripts(webview: vscode.Webview): Promise<string> {
 		// 獲取支援語言列表
 		const supportedLocales = await this.localeService.getSupportedLocales();
 		log('Supported languages:', 'info', supportedLocales);
@@ -334,6 +324,105 @@ export class WebViewManager {
 		const localeScripts = localeFiles.map(file => `<script src="${file.uri}"></script>`).join('\n    ');
 
 		return localeScripts;
+	}
+
+	/**
+	 * 生成唯一的臨時工具箱檔案路徑
+	 * @returns 臨時檔案的相對路徑
+	 */
+	private generateTempToolboxPath(): string {
+		const timestamp = Date.now();
+		return `media/toolbox/temp_toolbox_${timestamp}.json`;
+	}
+
+	/**
+	 * 自動發現 Arduino 生成器模組
+	 * @returns 模組檔案名稱列表（已排序）
+	 */
+	private async discoverArduinoModules(): Promise<string[]> {
+		try {
+			const generatorsPath = 'media/blockly/generators/arduino';
+			const files = await this.extensionFileService.listFiles(generatorsPath);
+
+			// 過濾 .js 檔案，排除 index.js
+			const modules = files.filter(f => f.endsWith('.js') && f !== 'index.js').sort(); // 字母排序確保載入順序一致
+
+			log(`Discovered ${modules.length} Arduino generator modules`, 'info', modules);
+			return modules;
+		} catch (error) {
+			// Fallback to hardcoded list with warning
+			log('Warning: Failed to scan Arduino generators directory, using fallback list', 'warn', error);
+			return [
+				'functions.js',
+				'huskylens.js',
+				'io.js',
+				'lists.js',
+				'logic.js',
+				'loops.js',
+				'math.js',
+				'motors.js',
+				'pixetto.js',
+				'sensors.js',
+				'text.js',
+				'variables.js',
+			];
+		}
+	}
+
+	/**
+	 * 清理過期的臨時工具箱檔案（超過 1 小時）
+	 * 在擴充套件啟動時執行，清理殘留的舊檔案
+	 * @param extensionPath 擴充套件路徑
+	 */
+	static async cleanupStaleTempFiles(extensionPath: string): Promise<void> {
+		const TEMP_FILE_MAX_AGE_MS = 60 * 60 * 1000; // 1 小時
+		const TEMP_FILE_PREFIX = 'temp_toolbox_';
+		const TOOLBOX_DIR = 'media/toolbox';
+
+		try {
+			const fileService = new FileService(extensionPath);
+			const files = await fileService.listFiles(TOOLBOX_DIR);
+			const tempFiles = files.filter(f => f.startsWith(TEMP_FILE_PREFIX) && f.endsWith('.json'));
+
+			let deletedCount = 0;
+			for (const file of tempFiles) {
+				const filePath = `${TOOLBOX_DIR}/${file}`;
+				const stats = await fileService.getFileStats(filePath);
+
+				if (stats) {
+					const ageMs = Date.now() - stats.mtime.getTime();
+					if (ageMs > TEMP_FILE_MAX_AGE_MS) {
+						await fileService.deleteFile(filePath);
+						deletedCount++;
+					}
+				}
+			}
+
+			if (deletedCount > 0) {
+				log(`Cleaned up ${deletedCount} stale temporary toolbox file(s)`, 'info');
+			}
+		} catch (error) {
+			// Non-blocking cleanup - log warning but don't throw
+			log('Warning: Failed to cleanup stale temporary files', 'warn', error);
+		}
+	}
+
+	/**
+	 * 清理臨時工具箱檔案（非阻塞，錯誤不拋出）
+	 */
+	private async cleanupTempFile(): Promise<void> {
+		if (!this.currentTempToolboxFile) {
+			return;
+		}
+
+		try {
+			await this.extensionFileService.deleteFile(this.currentTempToolboxFile);
+			log(`Cleaned up temp file: ${this.currentTempToolboxFile}`, 'info');
+			this.currentTempToolboxFile = null;
+		} catch (error) {
+			// Non-blocking: log warning but don't throw
+			log(`Warning: Failed to cleanup temp file ${this.currentTempToolboxFile}`, 'warn', error);
+		}
 	}
 
 	/**
@@ -370,8 +459,20 @@ export class WebViewManager {
 		try {
 			log(`預覽備份文件: ${backupPath}`, 'info');
 
-			// 檢查檔案是否存在
-			if (!fs.existsSync(backupPath)) {
+			// 檢查檔案是否存在 (backupPath is absolute, need to make it relative to workspace)
+			const workspaceFolders = vscode.workspace.workspaceFolders;
+			if (!workspaceFolders) {
+				throw new Error('請先開啟項目資料夾');
+			}
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
+			const relativeBackupPath = path.relative(workspaceRoot, backupPath);
+
+			// Initialize workspace file service if needed
+			if (!this.fileService) {
+				this.fileService = new FileService(workspaceRoot);
+			}
+
+			if (!this.fileService.fileExists(relativeBackupPath)) {
 				log(`備份檔案不存在: ${backupPath}`, 'error');
 				throw new Error(`備份檔案不存在: ${backupPath}`);
 			}
@@ -578,8 +679,7 @@ export class WebViewManager {
 	 */
 	private async getPreviewContent(fileName: string): Promise<string> {
 		try {
-			const htmlPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/html/blocklyPreview.html'));
-			let htmlContent = fs.readFileSync(htmlPath.fsPath, 'utf8');
+			let htmlContent = await this.extensionFileService.readFile('media/html/blocklyPreview.html');
 
 			// 使用多語言模板更新 HTML <title> 標籤
 			const localizedWindowTitle = await this.localeService.getLocalizedMessage('PREVIEW_WINDOW_TITLE', fileName);
@@ -654,21 +754,9 @@ export class WebViewManager {
 			// HUSKYLENS 智慧鏡頭積木定義
 			const huskyLensBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/huskylens.js'));
 			const huskyLensBlocksUri = tempWebview.asWebviewUri(huskyLensBlocksPath);
-			// Arduino 生成器模組
-			const arduinoModules = [
-				'io.js',
-				'logic.js',
-				'loops.js',
-				'math.js',
-				'text.js',
-				'lists.js',
-				'functions.js',
-				'variables.js',
-				'sensors.js',
-				'motors.js',
-				'pixetto.js',
-				'huskylens.js',
-			]
+			// Arduino 生成器模組（動態發現）
+			const discoveredModules = await this.discoverArduinoModules();
+			const arduinoModules = discoveredModules
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
 					const moduleUri = tempWebview.asWebviewUri(modulePath);
@@ -686,9 +774,7 @@ export class WebViewManager {
 			);
 
 			// 載入所有支援的語言文件
-			const localeScripts = await this.loadLocaleFilesForPreview(tempWebview);
-
-			// 主題文件
+			const localeScripts = await this.loadLocaleScripts(tempWebview); // 主題文件
 			const singularJsUri = tempWebview.asWebviewUri(
 				vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/themes/singular.js'))
 			);
@@ -782,22 +868,4 @@ export class WebViewManager {
 	 * @param webview WebView 實例
 	 * @returns 語言腳本 HTML
 	 */
-	private async loadLocaleFilesForPreview(webview: vscode.Webview): Promise<string> {
-		// 獲取支援語言列表
-		const supportedLocales = await this.localeService.getSupportedLocales();
-
-		// 載入語言檔案
-		const localeFiles = supportedLocales.map(locale => {
-			const localePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/locales/${locale}/messages.js`));
-			return {
-				locale,
-				uri: webview.asWebviewUri(localePath).toString(),
-			};
-		});
-
-		// 生成腳本標籤
-		const localeScripts = localeFiles.map(file => `<script src="${file.uri}"></script>`).join('\n    ');
-
-		return localeScripts;
-	}
 }

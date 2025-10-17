@@ -1008,9 +1008,18 @@ Blockly.Blocks['threshold_function_read'] = {
 			log.info(`threshold_function_read: 從變異資料恢復函式名稱: ${func}`);
 			// 在設置字段值的同時，也存儲到我們的備份屬性中
 			this.restoredFuncValue = func;
-			this.getField('FUNC').setValue(func);
-			// 記錄新增的備份存儲機制
-			log.info(`threshold_function_read: 已將函式名稱 ${func} 存入備份屬性`);
+			
+			// 容錯處理：嘗試設定值，如果失敗則使用預設值
+			try {
+				this.getField('FUNC').setValue(func);
+				log.info(`threshold_function_read: 已將函式名稱 ${func} 存入備份屬性`);
+			} catch (error) {
+				// 如果恢復的值無效（例如舊版本的 IR_LL, IR_M, IR_R），使用預設值
+				const defaultValue = 'Func0';
+				log.warn(`threshold_function_read: 無法設定函式名稱 "${func}"（可能是舊版本的值），改用預設值 "${defaultValue}"`);
+				this.restoredFuncValue = defaultValue;
+				this.getField('FUNC').setValue(defaultValue);
+			}
 		} else {
 			log.warn('threshold_function_read: 變異資料中沒有找到函式名稱');
 		}
