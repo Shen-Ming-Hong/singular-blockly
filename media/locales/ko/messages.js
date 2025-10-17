@@ -90,6 +90,27 @@ window.languageManager.loadMessages('ko', {
 	SERVO_STOP: '서보 모터 정지',
 	SERVO_STOP_TOOLTIP: '서보 모터 신호 출력 중지',
 
+	// Encoder Motor Block Labels
+	ENCODER_SETUP: '엔코더 모터 설정',
+	ENCODER_NAME: '이름',
+	ENCODER_PIN_A: '핀 A',
+	ENCODER_PIN_B: '핀 B',
+	ENCODER_USE_INTERRUPT: '하드웨어 인터럽트 사용',
+	ENCODER_SETUP_TOOLTIP: '핀 A와 핀 B로 엔코더 모터 설정',
+	ENCODER_READ: '엔코더 읽기',
+	ENCODER_READ_TOOLTIP: '엔코더의 현재 위치 읽기',
+	ENCODER_RESET: '엔코더 리셋',
+	ENCODER_RESET_TOOLTIP: '엔코더를 0 위치로 리셋',
+	ENCODER_PID_SETUP: 'PID 제어 설정',
+	ENCODER_PID_MOTOR: '모터',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: '엔코더 모터의 PID 제어 설정',
+	ENCODER_PID_COMPUTE: 'PID 계산',
+	ENCODER_PID_TARGET: '목표값',
+	ENCODER_PID_COMPUTE_TOOLTIP: '엔코더 모터가 목표 위치에 도달하도록 PID 계산',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: '설정',
 	ARDUINO_LOOP: '반복',

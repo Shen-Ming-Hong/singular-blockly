@@ -90,6 +90,27 @@ window.languageManager.loadMessages('bg', {
 	SERVO_STOP: 'Спиране на серво мотор',
 	SERVO_STOP_TOOLTIP: 'Спиране на изходния сигнал на серво мотора',
 
+	// Encoder Motor Control
+	ENCODER_SETUP: 'Настройка на енкодерен мотор',
+	ENCODER_NAME: 'Име',
+	ENCODER_PIN_A: 'Пин A',
+	ENCODER_PIN_B: 'Пин B',
+	ENCODER_USE_INTERRUPT: 'Използване на прекъсване',
+	ENCODER_SETUP_TOOLTIP: 'Настройка на енкодерен мотор с име и конфигурации на пиновете',
+	ENCODER_READ: 'Четене на енкодер',
+	ENCODER_READ_TOOLTIP: 'Получаване на текущата позиция на енкодера',
+	ENCODER_RESET: 'Нулиране на енкодер',
+	ENCODER_RESET_TOOLTIP: 'Нулиране на позицията на енкодера до нула',
+	ENCODER_PID_SETUP: 'Настройка на PID контрол',
+	ENCODER_PID_MOTOR: 'Мотор',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'Конфигуриране на PID контрол за прецизен контрол на мотора',
+	ENCODER_PID_COMPUTE: 'Изчисляване на PID',
+	ENCODER_PID_TARGET: 'Цел',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'Изчисляване на изход на PID контрол въз основа на целева позиция',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',
 	ARDUINO_LOOP: 'Цикъл',

@@ -1,0 +1,18 @@
+# Prevent publishing development files
+src/
+specs/
+scripts/
+test/
+docs/
+coverage/
+dist/
+out/
+media/toolbox/temp_toolbox.json
+media/toolbox/temp_toolbox_*.json
+node_modules/
+.vscode/
+.github/
+.nyc_output/
+*.log
+.env
+.env.*

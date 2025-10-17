@@ -90,6 +90,27 @@ window.languageManager.loadMessages('pt-br', {
 	SERVO_STOP: 'Parar Motor Servo',
 	SERVO_STOP_TOOLTIP: 'Interromper sinal de saída do motor servo',
 
+	// Encoder Motor Control
+	ENCODER_SETUP: 'Configurar Motor Encoder',
+	ENCODER_NAME: 'Nome',
+	ENCODER_PIN_A: 'Pino A',
+	ENCODER_PIN_B: 'Pino B',
+	ENCODER_USE_INTERRUPT: 'Usar Interrupção',
+	ENCODER_SETUP_TOOLTIP: 'Configurar motor encoder com configurações de nome e pinos',
+	ENCODER_READ: 'Ler Encoder',
+	ENCODER_READ_TOOLTIP: 'Obter posição atual do encoder',
+	ENCODER_RESET: 'Resetar Encoder',
+	ENCODER_RESET_TOOLTIP: 'Resetar posição do encoder para zero',
+	ENCODER_PID_SETUP: 'Configurar Controle PID',
+	ENCODER_PID_MOTOR: 'Motor',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'Configurar controle PID para controle preciso do motor',
+	ENCODER_PID_COMPUTE: 'Calcular PID',
+	ENCODER_PID_TARGET: 'Alvo',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'Calcular saída de controle PID baseado na posição alvo',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Configuração',
 	ARDUINO_LOOP: 'Loop',

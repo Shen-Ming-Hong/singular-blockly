@@ -90,6 +90,27 @@ window.languageManager.loadMessages('tr', {
 	SERVO_STOP: 'Servo Motoru Durdur',
 	SERVO_STOP_TOOLTIP: 'Servo motor sinyal çıkışını durdur',
 
+	// Encoder Motor Control
+	ENCODER_SETUP: 'Enkoder Motor Kurulumu',
+	ENCODER_NAME: 'İsim',
+	ENCODER_PIN_A: 'Pin A',
+	ENCODER_PIN_B: 'Pin B',
+	ENCODER_USE_INTERRUPT: 'Kesme Kullan',
+	ENCODER_SETUP_TOOLTIP: 'İsim ve pin yapılandırmalarıyla enkoder motoru kur',
+	ENCODER_READ: 'Enkoder Oku',
+	ENCODER_READ_TOOLTIP: 'Enkoderin mevcut pozisyonunu al',
+	ENCODER_RESET: 'Enkoder Sıfırla',
+	ENCODER_RESET_TOOLTIP: 'Enkoder pozisyonunu sıfıra sıfırla',
+	ENCODER_PID_SETUP: 'PID Kontrol Kurulumu',
+	ENCODER_PID_MOTOR: 'Motor',
+	ENCODER_PID_KP: 'Kp',
+	ENCODER_PID_KI: 'Ki',
+	ENCODER_PID_KD: 'Kd',
+	ENCODER_PID_SETUP_TOOLTIP: 'Hassas motor kontrolü için PID kontrolü yapılandır',
+	ENCODER_PID_COMPUTE: 'PID Hesapla',
+	ENCODER_PID_TARGET: 'Hedef',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'Hedef pozisyona göre PID kontrol çıkışını hesapla',
+
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Kurulum',
 	ARDUINO_LOOP: 'Döngü',
