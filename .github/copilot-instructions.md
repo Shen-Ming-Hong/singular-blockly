@@ -1,5 +1,9 @@
 # Singular Blockly - AI Coding Agent Instructions
 
+## Language Convention
+
+**IMPORTANT**: When interacting with users, always respond in **Traditional Chinese (繁體中文)** unless the user explicitly requests otherwise. This instruction file is written in English for technical standardization, but all conversational responses should be in Traditional Chinese.
+
 ## Project Overview
 
 **Singular Blockly** is a VSCode extension that provides visual programming for Arduino development using Google Blockly. The extension generates Arduino C++ code and integrates with PlatformIO for hardware deployment.

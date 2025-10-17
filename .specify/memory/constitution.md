@@ -1,10 +1,10 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.1.4 → 1.1.5
+Version Change: 1.1.5 → 1.2.0
 Modified Principles: None (existing principles unchanged)
 Added Principles: None
-Added Sections: None
+Added Sections: "Git Commit Messages" subsection under Development Standards
 Removed Sections: None
 Templates Status:
   ✅ plan-template.md - Verified alignment with all principles (no updates needed)
@@ -31,9 +31,21 @@ Consolidation Notes:
   - File provides no constitutional value - purely operational workflow
   - No information loss - CHANGELOG.md itself documents the format and categories
   - Procedural knowledge better suited for developer guides or automation scripts
+Change Summary (v1.2.0):
+  - Added "Git Commit Messages" subsection under Development Standards
+  - Mandates Traditional Chinese for commit description portions
+  - Requires Conventional Commits format with English type/scope
+  - Provides examples and rationale for the convention
+Version Bump Rationale:
+  - MINOR version bump (1.1.5 → 1.2.0)
+  - New guidance section added (Git Commit Messages)
+  - Materially expands Development Standards requirements
+  - Backward compatible - does not invalidate existing commits
 Follow-up TODOs:
   ⚠️ DELETE .github/prompts/update.prompt.md (no constitutional content; purely procedural)
   ℹ️ Consider moving changelog workflow to CONTRIBUTING.md or CI/CD documentation
+  ℹ️ Consider adding git commit message linting to CI/CD pipeline
+  ℹ️ Update CONTRIBUTING.md to reference commit message standards
 -->
 
 # Singular Blockly Constitution
@@ -229,6 +241,22 @@ When refactoring code, follow these priorities and guidelines:
 -   Ensure code works after each commit
 -   Provide test evidence that refactoring preserves functionality
 
+### Git Commit Messages
+
+All git commit messages MUST follow these conventions:
+
+-   **Format**: Follow Conventional Commits format: `<type>(<scope>): <description>`
+-   **Description Language**: Write the description portion in **Traditional Chinese (繁體中文)**
+-   **Type and Scope**: Keep type and scope in English (e.g., `feat`, `fix`, `docs`, `refactor`, `test`)
+-   **Examples**:
+    -   `feat(blocks): 新增溫度感測器積木`
+    -   `fix(webview): 修正主題切換時的顯示問題`
+    -   `docs(readme): 更新安裝說明`
+    -   `refactor(services): 重構檔案服務以提升可測試性`
+    -   `test(fileService): 增加錯誤處理的測試案例`
+
+**Rationale**: The project is primarily developed for Traditional Chinese-speaking users (Taiwan). Using Traditional Chinese in commit descriptions improves clarity for the core development team and maintainers, while keeping standardized English keywords (type/scope) maintains compatibility with automated tooling and international collaboration.
+
 ## Version Management
 
 The project follows semantic versioning (MAJOR.MINOR.PATCH):
@@ -265,4 +293,8 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.1.5 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+**Version**: 1.2.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+
+```
+
+```
