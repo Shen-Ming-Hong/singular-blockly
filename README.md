@@ -21,25 +21,31 @@ A Visual Studio Code extension that provides a visual programming interface usin
 
 -   🌐 **Internationalization Support**
 
-    -   Multiple language support
+    -   **15 Languages Supported** with 98.94% average translation coverage
     -   Automatic language detection based on VS Code settings
     -   Block search UI supports all available languages
-    -   Supports the following languages:
-        -   English (en)
-        -   Spanish (es)
-        -   Portuguese (pt-br)
-        -   French (fr)
-        -   German (de)
-        -   Italian (it)
-        -   Russian (ru)
-        -   Japanese (ja)
-        -   Korean (ko)
-        -   Traditional Chinese (zh-hant)
-        -   Polish (pl)
-        -   Hungarian (hu)
-        -   Turkish (tr)
-        -   Bulgarian (bg)
-        -   Czech (cs)
+    -   Automated quality validation (CI/CD integration)
+    -   Supported languages:
+        -   English (en) - 99.3% coverage
+        -   Spanish (es) - 98.9% coverage
+        -   Portuguese (pt-br) - 98.9% coverage
+        -   French (fr) - 98.9% coverage
+        -   German (de) - 98.9% coverage
+        -   Italian (it) - 98.9% coverage
+        -   Russian (ru) - 98.9% coverage
+        -   Japanese (ja) - 98.9% coverage
+        -   Korean (ko) - 98.9% coverage
+        -   Traditional Chinese (zh-hant) - 99.3% coverage
+        -   Polish (pl) - 98.9% coverage
+        -   Hungarian (hu) - 98.6% coverage
+        -   Turkish (tr) - 98.9% coverage
+        -   Bulgarian (bg) - 98.6% coverage
+        -   Czech (cs) - 98.6% coverage
+    -   **Quality Assurance**:
+        -   ✅ Automated validation for placeholders, encoding, and consistency
+        -   ✅ Direct translation pattern detection
+        -   ✅ Monthly quality audits via GitHub Actions
+        -   📚 For contributors: See [Localization Quickstart Guide](specs/002-i18n-localization-review/quickstart.md)
 
 -   🧩 **Rich Block Categories**
 

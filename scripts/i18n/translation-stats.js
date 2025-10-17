@@ -28,23 +28,7 @@ const outputArg = args.find(arg => arg.startsWith('--output='));
 const format = formatArg ? formatArg.split('=')[1] : 'both'; // json, markdown, or both
 const outputPath = outputArg ? outputArg.split('=')[1] : null;
 
-const SUPPORTED_LANGUAGES = [
-	'en',
-	'ja',
-	'ko',
-	'de',
-	'zh-hant',
-	'es',
-	'fr',
-	'it',
-	'pl',
-	'pt-br',
-	'ru',
-	'tr',
-	'cs',
-	'hu',
-	'bg',
-];
+const SUPPORTED_LANGUAGES = ['en', 'ja', 'ko', 'de', 'zh-hant', 'es', 'fr', 'it', 'pl', 'pt-br', 'ru', 'tr', 'cs', 'hu', 'bg'];
 
 /**
  * Calculate translation statistics for all languages
@@ -105,19 +89,11 @@ function calculateStatistics() {
 		baselineKeys: totalKeys,
 		languages: languageStats,
 		summary: {
-			averageCoverage:
-				parseFloat(
-					(
-						Object.values(languageStats).reduce((sum, stat) => sum + stat.coverage, 0) /
-						SUPPORTED_LANGUAGES.length
-					).toFixed(2)
-				),
-			fullyTranslatedLanguages: Object.keys(languageStats).filter(
-				lang => languageStats[lang].coverage === 100
-			).length,
-			languagesWithIssues: Object.keys(languageStats).filter(
-				lang => languageStats[lang].emptyKeys > 0
-			).length,
+			averageCoverage: parseFloat(
+				(Object.values(languageStats).reduce((sum, stat) => sum + stat.coverage, 0) / SUPPORTED_LANGUAGES.length).toFixed(2)
+			),
+			fullyTranslatedLanguages: Object.keys(languageStats).filter(lang => languageStats[lang].coverage === 100).length,
+			languagesWithIssues: Object.keys(languageStats).filter(lang => languageStats[lang].emptyKeys > 0).length,
 		},
 	};
 }
@@ -151,15 +127,15 @@ function formatMarkdown(stats) {
 
 	lines.push('## Per-Language Statistics');
 	lines.push('');
-	lines.push(
-		'| Language | Coverage | Translated | Empty | Avg Length | Length Ratio |'
-	);
+	lines.push('| Language | Coverage | Translated | Empty | Avg Length | Length Ratio |');
 	lines.push('|----------|----------|------------|-------|------------|--------------|');
 
 	Object.entries(stats.languages).forEach(([lang, stat]) => {
 		const coverageIcon = stat.coverage === 100 ? '✅' : stat.coverage >= 90 ? '⚠️' : '❌';
 		lines.push(
-			`| ${lang.padEnd(8)} | ${coverageIcon} ${stat.coverage.toFixed(1)}% | ${stat.translatedKeys}/${stat.totalKeys} | ${stat.emptyKeys} | ${stat.averageLength.toFixed(1)} | ${stat.lengthRatio}% |`
+			`| ${lang.padEnd(8)} | ${coverageIcon} ${stat.coverage.toFixed(1)}% | ${stat.translatedKeys}/${stat.totalKeys} | ${
+				stat.emptyKeys
+			} | ${stat.averageLength.toFixed(1)} | ${stat.lengthRatio}% |`
 		);
 	});
 
@@ -209,9 +185,7 @@ function main() {
 				fs.writeFileSync(mdPath, markdownOutput, 'utf8');
 				log.info(`Markdown statistics written to: ${mdPath}`);
 			} else if (format === 'both') {
-				const mdPath = outputPath
-					? outputPath.replace(/\.json$/, '.md')
-					: 'translation-stats.md';
+				const mdPath = outputPath ? outputPath.replace(/\.json$/, '.md') : 'translation-stats.md';
 				fs.writeFileSync(mdPath, markdownOutput, 'utf8');
 				log.info(`Markdown statistics written to: ${mdPath}`);
 			} else {
@@ -223,9 +197,7 @@ function main() {
 		if (outputPath) {
 			console.log('\n=== Summary ===');
 			console.log(`Average Coverage: ${stats.summary.averageCoverage}%`);
-			console.log(
-				`Fully Translated: ${stats.summary.fullyTranslatedLanguages}/${stats.totalLanguages} languages`
-			);
+			console.log(`Fully Translated: ${stats.summary.fullyTranslatedLanguages}/${stats.totalLanguages} languages`);
 			console.log(`Languages with Issues: ${stats.summary.languagesWithIssues}`);
 		}
 
