@@ -20,8 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     Added unique temporary file naming mechanism (`temp_toolbox_{timestamp}.json`) to prevent multi-window conflicts
 -   新增計時常數以提升程式碼可讀性：`UI_MESSAGE_DELAY_MS`, `UI_REVEAL_DELAY_MS`, `BOARD_CONFIG_REQUEST_TIMEOUT_MS`
     Added timing constants to improve code readability: `UI_MESSAGE_DELAY_MS`, `UI_REVEAL_DELAY_MS`, `BOARD_CONFIG_REQUEST_TIMEOUT_MS`
--   新增過期暫存檔案自動清理功能，啟動時清理超過 1 小時的 temp_toolbox_*.json 檔案
-    Added automatic stale temporary file cleanup, removing temp_toolbox_*.json files older than 1 hour on activation
+-   新增過期暫存檔案自動清理功能，啟動時清理超過 1 小時的 temp*toolbox*_.json 檔案
+    Added automatic stale temporary file cleanup, removing temp*toolbox*_.json files older than 1 hour on activation
 
 ### 已修復 Fixed
 
