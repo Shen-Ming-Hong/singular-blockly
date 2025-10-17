@@ -18,6 +18,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.34.0] - 2025-10-17
+
+### 新增 Added
+
+- 新增國際化品質保證系統：4 個自動化工具（驗證、統計、偵測、稽核）
+  Added internationalization quality assurance system: 4 automation tools (validate, stats, detect, audit)
+- 新增 228 個翻譯鍵值，涵蓋 15 種語言（平均覆蓋率 98.94%）
+  Added 228 translation keys across 15 languages (98.94% average coverage)
+- 新增 CI/CD 自動化驗證流程 (`.github/workflows/i18n-validation.yml`)
+  Added CI/CD automated validation workflow (`.github/workflows/i18n-validation.yml`)
+- 新增 5 個語言風格指南 (日文、韓文、德文、西班牙文、繁體中文)
+  Added 5 language style guidelines (Japanese, Korean, German, Spanish, Traditional Chinese)
+- 新增專案術語詞彙表 (`localization-glossary.json`)，895 個術語條目
+  Added project terminology glossary (`localization-glossary.json`) with 895 term entries
+- 新增本地化 PR 模板 (`.github/PULL_REQUEST_TEMPLATE/localization.md`)
+  Added localization PR template (`.github/PULL_REQUEST_TEMPLATE/localization.md`)
+- 新增貢獻者指南 (`CONTRIBUTING.md`)，包含完整的本地化工作流程
+  Added contributor guide (`CONTRIBUTING.md`) with complete localization workflow
+
+### 已修復 Fixed
+
+- 修正 15 種語言的缺失翻譯問題（bg, cs, de, es, fr, hu, it, ja, ko, pl, pt-br, ru, tr, zh-hant, en）
+  Fixed missing translations in 15 languages (bg, cs, de, es, fr, hu, it, ja, ko, pl, pt-br, ru, tr, zh-hant, en)
+- 修正日文、韓文、德文中的直譯和文化不適配問題
+  Fixed literal translations and cultural mismatches in Japanese, Korean, and German
+- 修正術語一致性問題（如 sensor/感測器、motor/馬達 等）
+  Fixed terminology consistency issues (e.g., sensor/感測器, motor/馬達)
+
+### 已更新 Updated
+
+- 更新 README.md 國際化章節，新增品質指標和語言覆蓋率詳情
+  Updated README.md internationalization section with quality metrics and language coverage details
+- 更新所有語言檔案至最新結構（bg, cs, de, es, fr, hu, it, ja, ko, pl, pt-br, ru, tr, zh-hant, en）
+  Updated all language files to latest structure (bg, cs, de, es, fr, hu, it, ja, ko, pl, pt-br, ru, tr, zh-hant, en)
+
+### 技術改進 Technical Improvements
+
+- 建立 4 層驗證機制（JSON Schema → 語法 → 模式 → 稽核）
+  Established 4-layer validation mechanism (JSON Schema → Syntax → Pattern → Audit)
+- 整合 10+ npm 腳本用於 i18n 工作流程
+  Integrated 10+ npm scripts for i18n workflow
+- 建立基準稽核報告系統用於長期品質追蹤
+  Established baseline audit report system for long-term quality tracking
+
+### 文檔 Documentation
+
+- 新增完整的 i18n 專案規格文件 (`specs/002-i18n-localization-review/`)
+  Added complete i18n project specification documentation (`specs/002-i18n-localization-review/`)
+- 新增快速入門指南 (`quickstart.md`)，協助貢獻者參與本地化工作
+  Added quickstart guide (`quickstart.md`) to help contributors participate in localization
+- 新增實作計畫和任務追蹤文件 (`plan.md`, `tasks.md`)
+  Added implementation plan and task tracking documents (`plan.md`, `tasks.md`)
+
 ## [0.33.0] - 2025-10-17
 
 ### 新增 Added
