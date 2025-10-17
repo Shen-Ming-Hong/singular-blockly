@@ -12,6 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 新增 Added
 
+### 已修復 Fixed
+
+### 已更新 Updated
+
+### 已修改 Changed
+
+## [0.33.0] - 2025-10-17
+
+### 新增 Added
+
 -   新增 FileService 雙實例模式：`extensionFileService` 用於擴充套件資源，`fileService` 用於工作區檔案
     Added dual FileService pattern: `extensionFileService` for extension resources, `fileService` for workspace files
 -   新增動態 Arduino 模組發現機制 (`discoverArduinoModules()`)，自動掃描 `media/blockly/generators/arduino/` 目錄
