@@ -10,6 +10,9 @@ on:
         branches:
             - master
             - "localization/**"
+        paths:
+            - "media/locales/**/*.js"
+            - "scripts/i18n/**"
 
 jobs:
     validate-translations:
