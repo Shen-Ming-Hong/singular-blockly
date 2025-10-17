@@ -131,8 +131,8 @@ This is a **single TypeScript project** with VSCode extension structure:
 -   [x] T029 [US3] Deleted old `loadLocaleFilesForPreview()` method (duplicate removed)
 -   [x] T030 [US3] Renamed `loadLocaleFiles()` to `loadLocaleScripts()` (single unified method)
 -   [x] T031 [US3] Test suite verified: `npm test` (22 passing, 31 failing - baseline maintained)
--   [ ] T032 [US3] Manual test: Open main editor and verify all 15 languages load
--   [ ] T033 [US3] Manual test: Open backup preview and verify all 15 languages load
+-   [x] T032 [US3] Manual test: Open main editor and verify all 15 languages load ✅
+-   [x] T033 [US3] Manual test: Open backup preview and verify all 15 languages load ✅
 
 **Checkpoint**: Single locale loading method, 50% code duplication eliminated, test baseline maintained ✅
 
@@ -157,8 +157,8 @@ This is a **single TypeScript project** with VSCode extension structure:
 -   [x] T042 [US4] Implement stale file detection (age > 1 hour) using `fileService.getFileStats()` ✅
 -   [x] T043 [US4] Call `cleanupStaleTempFiles()` during extension activation in `src/extension.ts` ✅
 -   [x] T044 [US4] Test suite verified: `npm test` (22 passing, 31 failing - baseline maintained)
--   [ ] T045 [US4] Manual test: Open 3 Blockly editor windows, verify unique temp files created
--   [ ] T046 [US4] Manual test: Close middle window, verify only that temp file deleted
+-   [x] T045 [US4] Manual test: Open 3 Blockly editor windows, verify unique temp files created ✅
+-   [x] T046 [US4] Manual test: Close middle window, verify only that temp file deleted ✅
 
 **Checkpoint**: Unique timestamp-based temp files (FR-015), automatic cleanup on disposal (FR-016-017), test baseline maintained ✅
 
@@ -183,8 +183,8 @@ This is a **single TypeScript project** with VSCode extension structure:
 -   [x] T055 [US5] HTML template already uses dynamic injection (no hardcoded modules) ✅
 -   [x] T056 [US5] No hardcoded script tags to remove (already dynamic) ✅
 -   [x] T057 [US5] Test suite verified: `npm test` (22 passing, 31 failing - baseline maintained) ✅
--   [ ] T058 [US5] Manual test: Create dummy `media/blockly/generators/arduino/test_module.js`, verify it loads
--   [ ] T059 [US5] Manual test: Delete dummy file, verify it's no longer loaded
+-   [x] T058 [US5] Manual test: Create dummy `media/blockly/generators/arduino/test_module.js`, verify it loads ✅
+-   [x] T059 [US5] Manual test: Delete dummy file, verify it's no longer loaded ✅
 
 **Checkpoint**: Arduino modules auto-discovered, no hardcoded lists, extensible without code changes ✅
 

@@ -3,7 +3,7 @@
 **專案 Project**: Singular Blockly Architecture Cleanup  
 **分支 Branch**: 001-refactor-architecture-cleanup  
 **測試日期 Test Date**: 2025 年 10 月 17 日  
-**測試者 Tester**: ******\_******
+**測試者 Tester**: **\*\***\_**\*\***
 
 ---
 
@@ -549,22 +549,26 @@
 ### 問題 1: 舊版 Workspace 積木選項不相容
 
 **現象 Symptoms**:
+
 ```
-Cannot set the dropdown's value to an unavailable option. 
+Cannot set the dropdown's value to an unavailable option.
 Block type: threshold_function_read, Field name: FUNC, Value: IR_LL/IR_M/IR_R
 ```
 
 **原因 Root Cause**:
-- 舊版本的 workspace JSON 中儲存了已廢棄的函式名稱（如 `IR_LL`, `IR_M`, `IR_R`）
-- 這些是舊版紅外線感測器相關的函式，在當前版本已不存在
+
+-   舊版本的 workspace JSON 中儲存了已廢棄的函式名稱（如 `IR_LL`, `IR_M`, `IR_R`）
+-   這些是舊版紅外線感測器相關的函式，在當前版本已不存在
 
 **解決方案 Solution**:
 ✅ **已修復** - 在 `arduino.js` 的 `threshold_function_read` 積木中新增了容錯處理：
-- 當恢復無效的舊值時，自動降級使用預設值 `Func0`
-- 在 Console 中顯示警告訊息但不中斷載入
-- 使用者無需手動處理，積木會自動修正
+
+-   當恢復無效的舊值時，自動降級使用預設值 `Func0`
+-   在 Console 中顯示警告訊息但不中斷載入
+-   使用者無需手動處理，積木會自動修正
 
 **驗證方法 Verification**:
+
 1. 開啟包含舊版積木的 workspace
 2. 檢查 Console 是否出現警告（應該只有警告，無錯誤）
 3. 確認積木已自動使用預設值 `Func0`
@@ -575,17 +579,20 @@ Block type: threshold_function_read, Field name: FUNC, Value: IR_LL/IR_M/IR_R
 ### 問題 2: WebView Sandbox 安全警告
 
 **現象 Symptoms**:
+
 ```
 An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing.
 ```
 
 **原因 Root Cause**:
-- VSCode WebView 的標準安全性警告
-- 由於 Blockly 需要執行 JavaScript 並存取 DOM，必須啟用這些權限
+
+-   VSCode WebView 的標準安全性警告
+-   由於 Blockly 需要執行 JavaScript 並存取 DOM，必須啟用這些權限
 
 **影響 Impact**:
-- ℹ️ **資訊性訊息** - 不影響功能，可忽略
-- 這是 VSCode 擴充套件開發的正常現象
+
+-   ℹ️ **資訊性訊息** - 不影響功能，可忽略
+-   這是 VSCode 擴充套件開發的正常現象
 
 **無需處理** - 此為預期行為
 
@@ -594,21 +601,24 @@ An iframe which has both allow-scripts and allow-same-origin for its sandbox att
 ### 問題 3: PlatformIO 擴充套件錯誤
 
 **現象 Symptoms**:
+
 ```
 Cannot read properties of undefined (reading 'envs')
 at platformio.platformio-ide
 ```
 
 **原因 Root Cause**:
-- PlatformIO 擴充套件內部錯誤
-- 與 Singular Blockly 無關
+
+-   PlatformIO 擴充套件內部錯誤
+-   與 Singular Blockly 無關
 
 **解決方案 Solution**:
-- 這不是本專案的問題，無需處理
-- 如果影響使用，可嘗試：
-  1. 重新啟動 VSCode
-  2. 更新 PlatformIO 擴充套件
-  3. 在 PlatformIO 專案中執行 `PlatformIO: Re-Init`
+
+-   這不是本專案的問題，無需處理
+-   如果影響使用，可嘗試：
+    1. 重新啟動 VSCode
+    2. 更新 PlatformIO 擴充套件
+    3. 在 PlatformIO 專案中執行 `PlatformIO: Re-Init`
 
 ---
 
@@ -833,9 +843,9 @@ at platformio.platformio-ide
 # 手動測試報告 Manual Test Report
 
 **測試日期**: 2025/10/**/**
-**測試者**: ****\_\_****
-**VSCode 版本**: ****\_\_****
-**作業系統**: Windows/Mac/Linux ****\_\_****
+**測試者**: \***\*\_\_\*\***
+**VSCode 版本**: \***\*\_\_\*\***
+**作業系統**: Windows/Mac/Linux \***\*\_\_\*\***
 
 ## 測試結果總覽
 
@@ -858,10 +868,10 @@ at platformio.platformio-ide
 1. **問題標題**
 
     - 測試: T\_\_\_
-    - 現象: ****\_\_\_****
-    - 重現步驟: ****\_\_\_****
-    - 預期結果: ****\_\_\_****
-    - 實際結果: ****\_\_\_****
+    - 現象: \***\*\_\_\_\*\***
+    - 重現步驟: \***\*\_\_\_\*\***
+    - 預期結果: \***\*\_\_\_\*\***
+    - 實際結果: \***\*\_\_\_\*\***
     - 嚴重程度: 高/中/低
 
 2. ...
@@ -881,7 +891,7 @@ at platformio.platformio-ide
 -   [ ] 發現 \_\_ 個問題
 -   [ ] 建議: 通過/需修正後重測/不通過
 
-**測試者簽名**: ****\_\_****
+**測試者簽名**: \***\*\_\_\*\***
 **日期**: 2025/10/**/**
 ```
 
