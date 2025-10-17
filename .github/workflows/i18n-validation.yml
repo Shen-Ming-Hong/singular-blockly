@@ -2,179 +2,179 @@ name: Translation Quality Validation
 
 # Trigger on pull requests that modify translation files
 on:
-    pull_request:
-        paths:
-            - "media/locales/**/*.js"
-            - "scripts/i18n/**"
-    push:
-        branches:
-            - master
-            - "localization/**"
-        paths:
-            - "media/locales/**/*.js"
-            - "scripts/i18n/**"
+  pull_request:
+    paths:
+      - "media/locales/**/*.js"
+      - "scripts/i18n/**"
+  push:
+    branches:
+      - master
+      - "localization/**"
+    paths:
+      - "media/locales/**/*.js"
+      - "scripts/i18n/**"
 
 jobs:
-    validate-translations:
-        name: Validate Translation Files
-        runs-on: ubuntu-latest
+  validate-translations:
+    name: Validate Translation Files
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "18"
-                  cache: "npm"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Run translation validation
-              id: validation
-              run: |
-                  echo "Running validation on all languages..."
-                  node scripts/i18n/validate-translations.js --all
-              continue-on-error: false
+      - name: Run translation validation
+        id: validation
+        run: |
+          echo "Running validation on all languages..."
+          node scripts/i18n/validate-translations.js --all
+        continue-on-error: false
 
-            - name: Detect translation patterns
-              id: patterns
-              run: |
-                  echo "Detecting common translation patterns..."
-                  node scripts/i18n/detect-patterns.js --all
-              continue-on-error: true # Patterns are warnings only
+      - name: Detect translation patterns
+        id: patterns
+        run: |
+          echo "Detecting common translation patterns..."
+          node scripts/i18n/detect-patterns.js --all
+        continue-on-error: true # Patterns are warnings only
 
-            - name: Comment validation results on PR
-              if: github.event_name == 'pull_request' && failure()
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const output = `## ❌ Translation Validation Failed
+      - name: Comment validation results on PR
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `## ❌ Translation Validation Failed
 
-                      Some translation validation checks failed. Please review the errors above and fix them before merging.
+            Some translation validation checks failed. Please review the errors above and fix them before merging.
 
-                      Common issues:
-                      - Missing or extra placeholders ({0}, %1, etc.)
-                      - Empty translations
-                      - Encoding issues (non-UTF-8)
+            Common issues:
+            - Missing or extra placeholders ({0}, %1, etc.)
+            - Empty translations
+            - Encoding issues (non-UTF-8)
 
-                      To run validation locally:
-                      \`\`\`bash
-                      node scripts/i18n/validate-translations.js --all
-                      node scripts/i18n/detect-patterns.js --all
-                      \`\`\`
+            To run validation locally:
+            \`\`\`bash
+            node scripts/i18n/validate-translations.js --all
+            node scripts/i18n/detect-patterns.js --all
+            \`\`\`
 
-                      See [Translation Guidelines](../specs/002-i18n-localization-review/guidelines/) for more information.
-                      `;
+            See [Translation Guidelines](../specs/002-i18n-localization-review/guidelines/) for more information.
+            `;
 
-                      github.rest.issues.createComment({
-                        issue_number: context.issue.number,
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        body: output
-                      });
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
 
-            - name: Comment pattern warnings on PR
-              if: github.event_name == 'pull_request' && steps.patterns.outcome == 'success'
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const output = `## ⚠️ Translation Pattern Warnings
+      - name: Comment pattern warnings on PR
+        if: github.event_name == 'pull_request' && steps.patterns.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `## ⚠️ Translation Pattern Warnings
 
-                      Some translation patterns were detected that may indicate direct translations. These are warnings only and do not block the PR.
+            Some translation patterns were detected that may indicate direct translations. These are warnings only and do not block the PR.
 
-                      Please review the patterns above and consider:
-                      - Using culturally appropriate terms instead of direct translations
-                      - Following the glossary for technical terms
-                      - Adapting tone and style for the target language
+            Please review the patterns above and consider:
+            - Using culturally appropriate terms instead of direct translations
+            - Following the glossary for technical terms
+            - Adapting tone and style for the target language
 
-                      To check patterns locally:
-                      \`\`\`bash
-                      node scripts/i18n/detect-patterns.js --language=<lang>
-                      \`\`\`
-                      `;
+            To check patterns locally:
+            \`\`\`bash
+            node scripts/i18n/detect-patterns.js --language=<lang>
+            \`\`\`
+            `;
 
-                      github.rest.issues.createComment({
-                        issue_number: context.issue.number,
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        body: output
-                      });
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
 
-    audit-translations:
-        name: Run Translation Audit (Monthly)
-        runs-on: ubuntu-latest
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  audit-translations:
+    name: Run Translation Audit (Monthly)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "18"
-                  cache: "npm"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Run full translation audit
-              run: |
-                  echo "Running full audit on priority languages..."
-                  node scripts/i18n/audit-translations.js --languages=ja,ko,de,zh-hant,es
+      - name: Run full translation audit
+        run: |
+          echo "Running full audit on priority languages..."
+          node scripts/i18n/audit-translations.js --languages=ja,ko,de,zh-hant,es
 
-            - name: Upload audit report
-              uses: actions/upload-artifact@v4
-              with:
-                  name: translation-audit-report
-                  path: specs/002-i18n-localization-review/audit-reports/audit-*.json
-                  retention-days: 90
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: translation-audit-report
+          path: specs/002-i18n-localization-review/audit-reports/audit-*.json
+          retention-days: 90
 
-            - name: Generate audit summary
-              run: |
-                  LATEST_REPORT=$(ls -t specs/002-i18n-localization-review/audit-reports/audit-*.json | head -1)
-                  node scripts/i18n/audit-summary.js "$LATEST_REPORT" > audit-summary.txt
-                  cat audit-summary.txt
+      - name: Generate audit summary
+        run: |
+          LATEST_REPORT=$(ls -t specs/002-i18n-localization-review/audit-reports/audit-*.json | head -1)
+          node scripts/i18n/audit-summary.js "$LATEST_REPORT" > audit-summary.txt
+          cat audit-summary.txt
 
-            - name: Create issue for high-severity problems
-              uses: actions/github-script@v7
-              with:
-                  script: |
-                      const fs = require('fs');
-                      const summaryPath = 'audit-summary.txt';
-                      const summary = fs.existsSync(summaryPath) ? fs.readFileSync(summaryPath, 'utf-8') : 'No summary available';
+      - name: Create issue for high-severity problems
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summaryPath = 'audit-summary.txt';
+            const summary = fs.existsSync(summaryPath) ? fs.readFileSync(summaryPath, 'utf-8') : 'No summary available';
 
-                      // Check if there are high-severity issues
-                      const highSeverityMatch = summary.match(/High Severity:\s+(\d+)/);
-                      const highSeverityCount = highSeverityMatch ? parseInt(highSeverityMatch[1]) : 0;
+            // Check if there are high-severity issues
+            const highSeverityMatch = summary.match(/High Severity:\s+(\d+)/);
+            const highSeverityCount = highSeverityMatch ? parseInt(highSeverityMatch[1]) : 0;
 
-                      if (highSeverityCount > 10) {
-                        const output = `## 🚨 Translation Quality Alert
-                        
-                        The monthly translation audit detected ${highSeverityCount} high-severity issues that need attention.
-                        
-                        ### Summary
-                        \`\`\`
-                        ${summary}
-                        \`\`\`
-                        
-                        ### Action Required
-                        Please review the audit report and prioritize fixing high-frequency, high-severity issues.
-                        
-                        ### Resources
-                        - [Full Audit Report](../specs/002-i18n-localization-review/audit-reports/)
-                        - [Translation Guidelines](../specs/002-i18n-localization-review/guidelines/)
-                        - [Localization Glossary](../specs/002-i18n-localization-review/localization-glossary.json)
-                        `;
-                        
-                        github.rest.issues.create({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          title: `[i18n] Monthly Translation Audit - ${highSeverityCount} High-Severity Issues`,
-                          body: output,
-                          labels: ['localization', 'quality', 'automated']
-                        });
-                      }
+            if (highSeverityCount > 10) {
+              const output = `## 🚨 Translation Quality Alert
+              
+              The monthly translation audit detected ${highSeverityCount} high-severity issues that need attention.
+              
+              ### Summary
+              \`\`\`
+              ${summary}
+              \`\`\`
+              
+              ### Action Required
+              Please review the audit report and prioritize fixing high-frequency, high-severity issues.
+              
+              ### Resources
+              - [Full Audit Report](../specs/002-i18n-localization-review/audit-reports/)
+              - [Translation Guidelines](../specs/002-i18n-localization-review/guidelines/)
+              - [Localization Glossary](../specs/002-i18n-localization-review/localization-glossary.json)
+              `;
+              
+              github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[i18n] Monthly Translation Audit - ${highSeverityCount} High-Severity Issues`,
+                body: output,
+                labels: ['localization', 'quality', 'automated']
+              });
+            }
