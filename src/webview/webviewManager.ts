@@ -28,11 +28,16 @@ export class WebViewManager {
 	/**
 	 * 建立 WebView 管理器實例
 	 * @param context 擴充功能上下文
+	 * @param localeService 語言服務（可選，用於測試）
+	 * @param extensionFileService 擴充功能檔案服務（可選，用於測試）
 	 */
-	constructor(private context: vscode.ExtensionContext) {
-		this.localeService = new LocaleService(context.extensionPath);
-		// Initialize extensionFileService for reading extension resources
-		this.extensionFileService = new FileService(context.extensionPath);
+	constructor(
+		private context: vscode.ExtensionContext,
+		localeService?: LocaleService,
+		extensionFileService?: FileService
+	) {
+		this.localeService = localeService || new LocaleService(context.extensionPath);
+		this.extensionFileService = extensionFileService || new FileService(context.extensionPath);
 	}
 
 	/**

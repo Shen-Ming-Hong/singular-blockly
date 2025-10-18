@@ -14,16 +14,19 @@ import * as sinon from 'sinon';
 import * as path from 'path';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import { WebViewManager } from '../webview/webviewManager';
+import { LocaleService } from '../services/localeService';
 import { FileService } from '../services/fileService';
 import { VSCodeMock, FSMock } from './helpers/mocks';
 
 describe('WebView Preview', () => {
-        let fsServiceMock: any;
-        let fsMock: FSMock;
-        let vscodeMock: VSCodeMock;
-        let originalVscode: any;
-        let webViewManager: WebViewManager;
-        const extensionPath = '/mock/extension';
+	let fsServiceMock: any;
+	let fsMock: FSMock;
+	let vscodeMock: VSCodeMock;
+	let originalVscode: any;
+	let webViewManager: WebViewManager;
+	let localeService: LocaleService;
+	let extensionFileService: FileService;
+	const extensionPath = '/mock/extension';
         const workspacePath = '/mock/workspace';
         const backupRelPath = path.join('blockly', 'backup', 'test.json');
         const backupFullPath = path.join(workspacePath, backupRelPath);
@@ -47,13 +50,23 @@ describe('WebView Preview', () => {
                         fsModule.exports = fsServiceMock;
                 }
 
-                fsMock.addDirectory(path.join(extensionPath, 'media'));
+        	fsMock.addDirectory(path.join(extensionPath, 'media'));
 
-                const context = {
-                        extensionPath,
-                        subscriptions: [],
-                };
-                webViewManager = new WebViewManager(context as any);
+	// 添加語言檔案
+	const localePath = path.join(extensionPath, 'media/locales/en/messages.js');
+	fsMock.addFile(localePath, `Blockly.Msg['VSCODE_PLEASE_OPEN_PROJECT'] = 'Please open a folder first.';`);
+	fsMock.addDirectory(path.join(extensionPath, 'media/locales'));
+	fsMock.addDirectory(path.join(extensionPath, 'media/locales/en'));
+
+	// 初始化 services
+	localeService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
+	extensionFileService = new FileService(extensionPath, fsServiceMock as any);
+
+	const context = {
+		extensionPath,
+		subscriptions: [],
+	};
+	webViewManager = new WebViewManager(context as any, localeService, extensionFileService);
         });
 
         afterEach(() => {

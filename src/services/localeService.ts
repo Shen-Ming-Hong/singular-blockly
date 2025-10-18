@@ -90,26 +90,26 @@ export class LocaleService {
 				return this.cachedMessages.get(blocklyLanguage) || {};
 			}
 
-		// 找到對應的語言檔案
-		const langFilePath = path.join(this.extensionPath, 'media/locales', blocklyLanguage, 'messages.js');
+			// 找到對應的語言檔案
+			const langFilePath = path.join(this.extensionPath, 'media/locales', blocklyLanguage, 'messages.js');
 
-		// 如果找不到對應的語言檔，則使用英文
-		if (!this.fs.existsSync(langFilePath)) {
-			const enFilePath = path.join(this.extensionPath, 'media/locales/en/messages.js');
-			if (!this.fs.existsSync(enFilePath)) {
+			// 如果找不到對應的語言檔，則使用英文
+			if (!this.fs.existsSync(langFilePath)) {
+				const enFilePath = path.join(this.extensionPath, 'media/locales/en/messages.js');
+				if (!this.fs.existsSync(enFilePath)) {
 					return {}; // 如果連英文檔案都找不到，返回空物件
 				}
 
-			// 讀取英文語言檔
-			const content = await this.fs.promises.readFile(enFilePath, 'utf8') as string;
-			const messages = this.extractMessagesFromJs(content);
+				// 讀取英文語言檔
+				const content = (await this.fs.promises.readFile(enFilePath, 'utf8')) as string;
+				const messages = this.extractMessagesFromJs(content);
 				this.cachedMessages.set('en', messages);
 				this.currentLanguage = 'en';
 				return messages;
-		} else {
-			// 讀取對應語言檔
-			const content = await this.fs.promises.readFile(langFilePath, 'utf8') as string;
-			const messages = this.extractMessagesFromJs(content);
+			} else {
+				// 讀取對應語言檔
+				const content = (await this.fs.promises.readFile(langFilePath, 'utf8')) as string;
+				const messages = this.extractMessagesFromJs(content);
 				this.cachedMessages.set(blocklyLanguage, messages);
 				return messages;
 			}
@@ -129,7 +129,7 @@ export class LocaleService {
 		// 處理 Blockly.Msg['KEY'] = 'value' 格式 (標準 Blockly 訊息格式)
 		const blocklyMsgRegex = /Blockly\.Msg\[['"](\w+)['"]\]\s*=\s*['"](.+?)['"]/g;
 		let blocklyMatch;
-		
+
 		while ((blocklyMatch = blocklyMsgRegex.exec(content)) !== null) {
 			const key = blocklyMatch[1];
 			const value = blocklyMatch[2];

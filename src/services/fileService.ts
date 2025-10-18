@@ -47,14 +47,14 @@ export class FileService {
 	 */
 	async writeFile(relativePath: string, content: string): Promise<void> {
 		try {
-		const fullPath = path.join(this.workspacePath, relativePath);
-		const dirPath = path.dirname(fullPath);
+			const fullPath = path.join(this.workspacePath, relativePath);
+			const dirPath = path.dirname(fullPath);
 
-		if (!this.fs.existsSync(dirPath)) {
-			await this.fs.promises.mkdir(dirPath, { recursive: true });
-		}
+			if (!this.fs.existsSync(dirPath)) {
+				await this.fs.promises.mkdir(dirPath, { recursive: true });
+			}
 
-		await this.fs.promises.writeFile(fullPath, content);
+			await this.fs.promises.writeFile(fullPath, content);
 			log(`File written successfully: ${relativePath}`, 'info');
 		} catch (error) {
 			log(`Failed to write file: ${relativePath}`, 'error', error);
@@ -99,10 +99,10 @@ export class FileService {
 	 */
 	async createDirectory(relativePath: string): Promise<void> {
 		try {
-		const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = path.join(this.workspacePath, relativePath);
 
-		if (!this.fs.existsSync(fullPath)) {
-			await this.fs.promises.mkdir(fullPath, { recursive: true });
+			if (!this.fs.existsSync(fullPath)) {
+				await this.fs.promises.mkdir(fullPath, { recursive: true });
 				log(`Directory created: ${relativePath}`, 'info');
 			}
 		} catch (error) {
@@ -119,15 +119,15 @@ export class FileService {
 	async copyFile(sourceRelativePath: string, destRelativePath: string): Promise<void> {
 		try {
 			const sourcePath = path.join(this.workspacePath, sourceRelativePath);
-		const destPath = path.join(this.workspacePath, destRelativePath);
-		const destDir = path.dirname(destPath);
+			const destPath = path.join(this.workspacePath, destRelativePath);
+			const destDir = path.dirname(destPath);
 
-		// 確保目標目錄存在
-		if (!this.fs.existsSync(destDir)) {
-			await this.fs.promises.mkdir(destDir, { recursive: true });
-		}
+			// 確保目標目錄存在
+			if (!this.fs.existsSync(destDir)) {
+				await this.fs.promises.mkdir(destDir, { recursive: true });
+			}
 
-		await this.fs.promises.copyFile(sourcePath, destPath);
+			await this.fs.promises.copyFile(sourcePath, destPath);
 			log(`File copied from ${sourceRelativePath} to ${destRelativePath}`, 'info');
 		} catch (error) {
 			log(`Failed to copy file from ${sourceRelativePath} to ${destRelativePath}`, 'error', error);
@@ -141,10 +141,10 @@ export class FileService {
 	 */
 	async deleteFile(relativePath: string): Promise<void> {
 		try {
-		const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = path.join(this.workspacePath, relativePath);
 
-		if (this.fs.existsSync(fullPath)) {
-			await this.fs.promises.unlink(fullPath);
+			if (this.fs.existsSync(fullPath)) {
+				await this.fs.promises.unlink(fullPath);
 				log(`File deleted: ${relativePath}`, 'info');
 			}
 		} catch (error) {

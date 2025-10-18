@@ -45,14 +45,44 @@ export class VSCodeMock {
 		showErrorMessage: sinon.stub().returns(Promise.resolve()),
 		showInformationMessage: sinon.stub().returns(Promise.resolve()),
 		showWarningMessage: sinon.stub().returns(Promise.resolve()),
-		createWebviewPanel: sinon.stub().returns({
-			webview: {
-				html: '',
-				onDidReceiveMessage: sinon.stub(),
-				postMessage: sinon.stub().returns(Promise.resolve()),
-			},
-			onDidDispose: sinon.stub(),
-			reveal: sinon.stub(),
+		createWebviewPanel: sinon.stub().callsFake((viewType: string, title: string, showOptions: any, options: any) => {
+			const panel = {
+				webview: {
+					html: '',
+					options: options?.enableScripts ? { enableScripts: true } : {},
+					onDidReceiveMessage: sinon.stub().returns({ dispose: sinon.stub() }),
+					postMessage: sinon.stub().returns(Promise.resolve(true)),
+					asWebviewUri: sinon.stub().callsFake((uri: any) => {
+						// 模擬將本地路徑轉換為 webview URI
+						if (uri.fsPath) {
+							return { toString: () => `vscode-resource:${uri.fsPath}` };
+						}
+						return uri;
+					}),
+					cspSource: 'vscode-webview:',
+				},
+				title,
+				viewType,
+				visible: true,
+				active: true,
+				onDidDispose: sinon.stub().callsFake((callback: any) => {
+					panel._onDisposeCallback = callback;
+					return { dispose: sinon.stub() };
+				}),
+				onDidChangeViewState: sinon.stub().returns({ dispose: sinon.stub() }),
+				reveal: sinon.stub().callsFake(() => {
+					panel.visible = true;
+					panel.active = true;
+				}),
+				dispose: sinon.stub().callsFake(() => {
+					panel.visible = false;
+					if (panel._onDisposeCallback) {
+						panel._onDisposeCallback();
+					}
+				}),
+				_onDisposeCallback: null as any,
+			};
+			return panel;
 		}),
 		showInputBox: sinon.stub().returns(Promise.resolve('test')),
 		createStatusBarItem: sinon.stub().returns({
@@ -160,7 +190,7 @@ export class FSMock {
 	public readdirSync = sinon.stub().callsFake((dirPath: string) => {
 		// 正規化路徑分隔符（Windows 使用 \，但我們統一處理為 /）
 		const normalizedDirPath = dirPath.replace(/\\/g, '/');
-		
+
 		if (!this.directories.has(dirPath)) {
 			throw new Error(`ENOENT: no such directory, readdir '${dirPath}'`);
 		}
@@ -181,7 +211,7 @@ export class FSMock {
 		});
 
 		// 找出直接子目錄
-		this.directories.forEach((subDir) => {
+		this.directories.forEach(subDir => {
 			const normalizedSubDir = subDir.replace(/\\/g, '/');
 			if (normalizedSubDir.startsWith(pathPrefix) && normalizedSubDir !== normalizedDirPath) {
 				const relativePath = normalizedSubDir.slice(pathPrefix.length);
@@ -243,35 +273,36 @@ export class FSMock {
 				}
 				throw new Error(`ENOENT: no such file or directory, unlink '${path}'`);
 			},
-		copyFile: async (src: string, dest: string) => {
-			if (this.files.has(src)) {
-				this.files.set(dest, this.files.get(src)!);
-				return true;
-			}
-			throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
-		},
-		stat: async (path: string) => {
-			if (this.files.has(path)) {
-				return {
-					isFile: () => true,
-					isDirectory: () => false,
-					size: this.files.get(path)!.length,
-					mtime: new Date(),
-					ctime: new Date(),
-				};
-			} else if (this.directories.has(path)) {
-				return {
-					isFile: () => false,
-					isDirectory: () => true,
-					size: 0,
-					mtime: new Date(),
-					ctime: new Date(),
-				};
-			}
-			throw new Error(`ENOENT: no such file or directory, stat '${path}'`);
-		},
-	};
-}	/**
+			copyFile: async (src: string, dest: string) => {
+				if (this.files.has(src)) {
+					this.files.set(dest, this.files.get(src)!);
+					return true;
+				}
+				throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
+			},
+			stat: async (path: string) => {
+				if (this.files.has(path)) {
+					return {
+						isFile: () => true,
+						isDirectory: () => false,
+						size: this.files.get(path)!.length,
+						mtime: new Date(),
+						ctime: new Date(),
+					};
+				} else if (this.directories.has(path)) {
+					return {
+						isFile: () => false,
+						isDirectory: () => true,
+						size: 0,
+						mtime: new Date(),
+						ctime: new Date(),
+					};
+				}
+				throw new Error(`ENOENT: no such file or directory, stat '${path}'`);
+			},
+		};
+	}
+	/**
 	 * 模擬 statSync
 	 */
 	public statSync = sinon.stub().callsFake((path: string) => {
