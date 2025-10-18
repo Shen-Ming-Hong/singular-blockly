@@ -1,10 +1,11 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.1.5 → 1.2.0
-Modified Principles: None (existing principles unchanged)
+Version Change: 1.2.0 → 1.2.1
+Modified Principles:
+  - Principle V (Research-Driven Development) - Expanded with alternative tools guidance
 Added Principles: None
-Added Sections: "Git Commit Messages" subsection under Development Standards
+Added Sections: None
 Removed Sections: None
 Templates Status:
   ✅ plan-template.md - Verified alignment with all principles (no updates needed)
@@ -12,40 +13,21 @@ Templates Status:
   ✅ tasks-template.md - Verified alignment with all principles (no updates needed)
   ✅ agent-file-template.md - Verified (no constitution-specific updates needed)
   ✅ checklist-template.md - Verified (no constitution-specific updates needed)
-Procedural Files Analysis:
-  ℹ️ .github/prompts/update.prompt.md - Analyzed for potential principles
-     - Contains changelog maintenance workflow (categorize changes, format entries, git commands)
-     - Version management already covered in "Version Management" section
-     - Documentation standards already covered in "Documentation" section
-     - No new principles identified - purely procedural workflow for changelog updates
-     - Recommendation: DELETE - Content is operational (how to update changelog), not constitutional
-     - Alternative locations: CONTRIBUTING.md, CI/CD scripts, or git hooks
-  ℹ️ .github/prompts/check.prompt.md - Previously analyzed (v1.1.4)
-     - Contains validation workflow (read constitution → check changes → verify library usage)
-     - Recommendation: Keep as operational guide for CI/CD or pre-commit checks
-Consolidation Notes:
-  - update.prompt.md prescribes changelog update procedures, not governance principles
-  - All substantive requirements already in constitution:
-    * Version management (Version Management section - semantic versioning)
-    * Documentation standards (Documentation section - CHANGELOG.md updates)
-  - File provides no constitutional value - purely operational workflow
-  - No information loss - CHANGELOG.md itself documents the format and categories
-  - Procedural knowledge better suited for developer guides or automation scripts
-Change Summary (v1.2.0):
-  - Added "Git Commit Messages" subsection under Development Standards
-  - Mandates Traditional Chinese for commit description portions
-  - Requires Conventional Commits format with English type/scope
-  - Provides examples and rationale for the convention
+Command Files Review:
+  ✅ check.prompt.md - Reviewed, references MCP tools usage (aligned with Principle V)
+  ✅ speckit.constitution.prompt.md - This file (no updates needed)
+  ℹ️ Other speckit.*.prompt.md files - Procedural commands, no constitutional updates needed
+Change Summary (v1.2.1):
+  - Enhanced Principle V (Research-Driven Development) with alternative tool combinations
+  - Added guidance for using fetch_webpage, github_repo, search_code, search_repositories
+  - Specified these tools as alternatives when webSearch is unavailable
+  - Maintains MCP-powered research philosophy while providing practical fallback options
 Version Bump Rationale:
-  - MINOR version bump (1.1.5 → 1.2.0)
-  - New guidance section added (Git Commit Messages)
-  - Materially expands Development Standards requirements
-  - Backward compatible - does not invalidate existing commits
-Follow-up TODOs:
-  ⚠️ DELETE .github/prompts/update.prompt.md (no constitutional content; purely procedural)
-  ℹ️ Consider moving changelog workflow to CONTRIBUTING.md or CI/CD documentation
-  ℹ️ Consider adding git commit message linting to CI/CD pipeline
-  ℹ️ Update CONTRIBUTING.md to reference commit message standards
+  - PATCH version bump (1.2.0 → 1.2.1)
+  - Clarification and expansion of existing principle (Principle V)
+  - No new principles added, no backward incompatibilities
+  - Enhances existing guidance with alternative tool recommendations
+Follow-up TODOs: None
 -->
 
 # Singular Blockly Constitution
@@ -106,11 +88,16 @@ Developers MUST leverage Model Context Protocol (MCP) tools to access current, a
 
 -   Use `resolve-library-id` and `get-library-docs` tools to fetch up-to-date library documentation
 -   Search web resources (`webSearch`) for latest API changes, best practices, and breaking changes
+-   **When `webSearch` is unavailable**: Use alternative tool combinations to complete research tasks:
+    -   `fetch_webpage` - Extract content from specific documentation URLs
+    -   `github_repo` - Search code patterns and implementations in GitHub repositories
+    -   `search_code` (mcp_github_github_search_code) - Fast code search across GitHub using native search engine
+    -   `search_repositories` (mcp_github_github_search_repositories) - Find relevant projects and examples on GitHub
 -   Verify compatibility with current library versions (Blockly, VSCode API, PlatformIO)
 -   Check official documentation before implementing third-party integrations
 -   Document research findings in code comments or specification files
 
-**Rationale**: Web development libraries (Blockly, VSCode API, PlatformIO) evolve rapidly with breaking changes and deprecated APIs. MCP tools provide real-time access to authoritative docs, preventing bugs from outdated assumptions. This principle ensures decisions are grounded in current reality, not stale knowledge.
+**Rationale**: Web development libraries (Blockly, VSCode API, PlatformIO) evolve rapidly with breaking changes and deprecated APIs. MCP tools provide real-time access to authoritative docs, preventing bugs from outdated assumptions. This principle ensures decisions are grounded in current reality, not stale knowledge. When primary search tools are unavailable, the alternative tool combination provides equivalent research capabilities through direct documentation access and code repository searches.
 
 **Example Use Cases**:
 
@@ -118,6 +105,7 @@ Developers MUST leverage Model Context Protocol (MCP) tools to access current, a
 -   When integrating a new library: use MCP to check compatibility and best practices
 -   For VSCode API updates: search for migration guides and changelog information
 -   When troubleshooting: query latest issues and solutions from official sources
+-   **Fallback research workflow**: Use `search_repositories` to find relevant projects → `search_code` to locate specific implementations → `fetch_webpage` to read official documentation → `github_repo` to examine complete repository context
 
 ### VI. Structured Logging
 
@@ -293,7 +281,7 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.2.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-17
+**Version**: 1.2.1 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-18
 
 ```
 
