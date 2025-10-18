@@ -217,32 +217,42 @@ Final Phase: Polish (depends on Phase 5)
 -   **Test**: WebViewManager already supports injected FileService via constructor
 -   **Status**: DEFERRED - Existing pattern is adequate for testing
 
-### T011: [US1] Refactor failing WebViewManager tests
+### T011: [US1] Refactor failing WebViewManager tests ✅
 
--   [ ] Open `src/test/webviewManager.test.ts`
--   [ ] Replace manual mock setup with enhanced VSCodeMock (has asWebviewUri fix)
--   [ ] Add `beforeEach`: Create VSCodeMock, set workspaceFolders, inject via \_setVSCodeApi()
--   [ ] Add `beforeEach`: Create FSMock with HTML templates, inject via \_setFileService()
--   [ ] Update test assertions to use enhanced mock structure
--   [ ] Add `afterEach`: Call \_reset() to restore defaults
--   **File**: `src/test/webviewManager.test.ts`
+-   [x] Open `src/test/webviewManager.test.ts`
+-   [x] Remove @ts-nocheck directive (type safety restored)
+-   [x] Import \_setVSCodeApi and \_reset from webviewManager and messageHandler
+-   [x] Add `beforeEach`: Create VSCodeMock, set workspaceFolders, inject via \_setVSCodeApi()
+-   [x] Add `beforeEach`: Create FSMock with HTML templates, inject via FileService constructor
+-   [x] Update test assertions to use enhanced mock structure
+-   [x] Add `afterEach`: Call \_reset() to restore defaults
+-   [x] Also added DI to messageHandler.ts (replaced 16 vscode API calls)
+-   **File**: `src/test/webviewManager.test.ts`, `src/webview/messageHandler.ts`
 -   **Reference**: `quickstart.md` Part 2 (testing multiple dependencies)
--   **Estimated Time**: 45 minutes
+-   **Estimated Time**: 45 minutes (actual: 60 minutes with messageHandler)
 -   **Dependencies**: T009, T010
 -   **Test**: Run `npm test -- --grep "WebViewManager"`, verify 8/8 passing
+-   **Completed**: 2025-10-18
+-   **Result**: ✅ All 8 WebView Manager tests passing
 
-### T012: [US1] Verify 68/68 tests passing
+### T012: [US1] Verify 68/68 tests passing ⏳
 
--   [ ] Run full test suite: `npm test`
--   [ ] Verify output shows "68 passing"
+-   [x] Run full test suite: `npm test`
+-   [x] Current status: 54 passing / 14 failing (progress from 48/20)
+-   [ ] Target: 68 passing / 0 failing
 -   [ ] Document result in TEST-FRAMEWORK-FIX-PROGRESS.md
 -   [ ] Take snapshot of test output for PR evidence
 -   **File**: `TEST-FRAMEWORK-FIX-PROGRESS.md`
 -   **Estimated Time**: 10 minutes
 -   **Dependencies**: T011
 -   **Test**: `npm test` output shows "68 passing (X ms)"
+-   **Status**: IN PROGRESS - 54/68 passing (79.4%)
+-   **Remaining failures**: 
+     - 3 WebView Preview tests
+     - 10 WebView Message Handler tests  
+     - 1 Extension activate test
 
-**US-001 Completion Criteria**: `npm test` shows 68/68 passing (100% pass rate)
+**US-001 Completion Criteria**: ⏳ IN PROGRESS - Need to fix remaining 14 failing tests
 
 ---
 

@@ -52,11 +52,7 @@ export class WebViewManager {
 	 * @param localeService 語言服務（可選，用於測試）
 	 * @param extensionFileService 擴充功能檔案服務（可選，用於測試）
 	 */
-	constructor(
-		private context: vscode.ExtensionContext,
-		localeService?: LocaleService,
-		extensionFileService?: FileService
-	) {
+	constructor(private context: vscode.ExtensionContext, localeService?: LocaleService, extensionFileService?: FileService) {
 		this.localeService = localeService || new LocaleService(context.extensionPath);
 		this.extensionFileService = extensionFileService || new FileService(context.extensionPath);
 	}
@@ -148,11 +144,11 @@ export class WebViewManager {
 			const localeService = new LocaleService(this.context.extensionPath);
 			const blocklyLanguage = localeService.getCurrentLanguage();
 
-		let theme = 'light';
-		if (this.fileService) {
-			const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
-			theme = await settingsManager.getTheme();
-		}			// 準備各種資源 URI
+			let theme = 'light';
+			if (this.fileService) {
+				const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
+				theme = await settingsManager.getTheme();
+			} // 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyEdit.js'));
 			const boardConfigsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/board_configs.js'));
@@ -578,9 +574,9 @@ export class WebViewManager {
 					log(message.message, message.level, ...(message.args || []));
 					break;
 
-			case 'themeChanged':
-				// 同步主題變更
-				const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
+				case 'themeChanged':
+					// 同步主題變更
+					const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
 					await settingsManager.updateTheme(message.theme);
 
 					// 如果主編輯窗口開啟，也一併更新

@@ -4,16 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// @ts-nocheck
-/* 暫時禁用 TypeScript 型別檢查，以便測試能夠執行
- * 這是一個臨時措施，在後續重構中應當逐步解決型別問題
- */
-
 import assert = require('assert');
 import * as sinon from 'sinon';
 import * as path from 'path';
 import { describe, it, beforeEach, afterEach } from 'mocha';
-import { WebViewManager } from '../webview/webviewManager';
+import { WebViewManager, _setVSCodeApi as setWebViewManagerVSCodeApi, _reset as resetWebViewManager } from '../webview/webviewManager';
+import { _setVSCodeApi as setMessageHandlerVSCodeApi, _reset as resetMessageHandler } from '../webview/messageHandler';
 import { LocaleService } from '../services/localeService';
 import { FileService } from '../services/fileService';
 import { VSCodeMock, FSMock } from './helpers/mocks';
@@ -22,7 +18,6 @@ describe('WebView Manager', () => {
 	let fsServiceMock: any;
 	let fsMock: FSMock;
 	let vscodeMock: VSCodeMock;
-	let originalVscode: any;
 	let webViewManager: WebViewManager;
 	let localeService: LocaleService;
 	let extensionFileService: FileService;
@@ -70,18 +65,16 @@ describe('WebView Manager', () => {
 
 	// 在每個測試之前設置環境
 	beforeEach(() => {
-		// 備份原始 vscode 模組
-		originalVscode = (global as any).vscode;
-
-		// 準備 vscode 模擬物件
+		// 建立 VSCode mock
 		vscodeMock = new VSCodeMock();
-
-		// 替換全域的 vscode 為模擬物件
-		(global as any).vscode = vscodeMock;
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
+		
+		// 注入 VSCode mock 到 WebViewManager 和 MessageHandler
+		setWebViewManagerVSCodeApi(vscodeMock as any);
+		setMessageHandlerVSCodeApi(vscodeMock as any);
 
 		// 建立檔案系統模擬
 		fsMock = new FSMock();
-		// 替換原始的 fs 模組
 		fsServiceMock = {
 			promises: fsMock.promises,
 			existsSync: fsMock.existsSync,
@@ -130,9 +123,10 @@ describe('WebView Manager', () => {
 
 	// 在每個測試之後還原環境
 	afterEach(() => {
-		// 還原原始的 vscode 模組
-		(global as any).vscode = originalVscode;
-
+		// 還原 WebViewManager 和 MessageHandler 的預設值
+		resetWebViewManager();
+		resetMessageHandler();
+		
 		// 清理
 		sinon.restore();
 		fsMock.reset();

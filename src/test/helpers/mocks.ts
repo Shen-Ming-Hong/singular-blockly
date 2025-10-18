@@ -347,12 +347,8 @@ export class FSMock {
 	 */
 	public getState() {
 		return {
-			filesRead: Array.from(this.files.keys()).filter(path => 
-				this.readFileSync.getCalls().some(call => call.args[0] === path)
-			),
-			filesWritten: Array.from(this.files.keys()).filter(path =>
-				this.writeFileSync.getCalls().some(call => call.args[0] === path)
-			),
+			filesRead: Array.from(this.files.keys()).filter(path => this.readFileSync.getCalls().some(call => call.args[0] === path)),
+			filesWritten: Array.from(this.files.keys()).filter(path => this.writeFileSync.getCalls().some(call => call.args[0] === path)),
 			directoriesCreated: Array.from(this.directories),
 			callCount: {
 				readFile: this.readFileSync.callCount,

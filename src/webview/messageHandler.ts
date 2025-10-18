@@ -16,6 +16,24 @@ const UI_MESSAGE_DELAY_MS = 100;
 const UI_REVEAL_DELAY_MS = 200;
 const BOARD_CONFIG_REQUEST_TIMEOUT_MS = 10000;
 
+// VSCode API 引用（可在測試中注入）
+let vscodeApi: typeof vscode = vscode;
+
+/**
+ * 設置 VSCode API 引用（僅用於測試）
+ * @param api VSCode API 實例
+ */
+export function _setVSCodeApi(api: typeof vscode): void {
+	vscodeApi = api;
+}
+
+/**
+ * 重置為生產環境預設值（僅用於測試）
+ */
+export function _reset(): void {
+	vscodeApi = vscode;
+}
+
 /**
  * WebView 訊息處理器類別
  * 負責處理 WebView 與擴充功能間的訊息傳遞
@@ -45,7 +63,7 @@ export class WebViewMessageHandler {
 			this.settingsManager = settingsManager;
 		} else {
 			// 生產環境：創建 services
-			const workspaceFolders = vscode.workspace.workspaceFolders;
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
 				throw new Error('No workspace folder open');
 			}
@@ -142,9 +160,9 @@ export class WebViewMessageHandler {
 				const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 				const openFolderBtn = await this.localeService.getLocalizedMessage('VSCODE_OPEN_FOLDER');
 
-				vscode.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
+				vscodeApi.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
 					if (selection === openFolderBtn) {
-						vscode.commands.executeCommand('workbench.action.files.openFolder');
+						vscodeApi.commands.executeCommand('workbench.action.files.openFolder');
 					}
 				});
 				return;
@@ -172,7 +190,7 @@ export class WebViewMessageHandler {
 		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_SAVE_FILE', (error as Error).message);
 
-			vscode.window.showErrorMessage(errorMsg);
+			vscodeApi.window.showErrorMessage(errorMsg);
 			log(errorMsg, 'error', error);
 		}
 	}
@@ -188,9 +206,9 @@ export class WebViewMessageHandler {
 				const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 				const openFolderBtn = await this.localeService.getLocalizedMessage('VSCODE_OPEN_FOLDER');
 
-				vscode.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
+				vscodeApi.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
 					if (selection === openFolderBtn) {
-						vscode.commands.executeCommand('workbench.action.files.openFolder');
+						vscodeApi.commands.executeCommand('workbench.action.files.openFolder');
 					}
 				});
 				return;
@@ -226,11 +244,11 @@ export class WebViewMessageHandler {
 					const reloadMsg = isFirstTime ? await this.localeService.getLocalizedMessage('VSCODE_RELOAD_REQUIRED') : '';
 					const reloadBtn = await this.localeService.getLocalizedMessage('VSCODE_RELOAD');
 
-					vscode.window
+					vscodeApi.window
 						.showInformationMessage(boardUpdatedMsg + reloadMsg, ...(isFirstTime ? [reloadBtn] : []))
 						.then(selection => {
 							if (selection === reloadBtn) {
-								vscode.commands.executeCommand('workbench.action.reloadWindow');
+								vscodeApi.commands.executeCommand('workbench.action.reloadWindow');
 							}
 						});
 				}, UI_MESSAGE_DELAY_MS); // 確保 Blockly 編輯器保持在前景
@@ -239,7 +257,7 @@ export class WebViewMessageHandler {
 		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_UPDATE_INI', (error as Error).message);
 
-			vscode.window.showErrorMessage(errorMsg);
+			vscodeApi.window.showErrorMessage(errorMsg);
 			log(errorMsg, 'error', error);
 		}
 	}
@@ -273,7 +291,7 @@ export class WebViewMessageHandler {
 			log('Failed to save workspace state:', 'error', error);
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_UNABLE_SAVE_WORKSPACE', (error as Error).message);
 
-			vscode.window.showErrorMessage(errorMsg);
+			vscodeApi.window.showErrorMessage(errorMsg);
 		}
 	}
 	/**
@@ -339,7 +357,7 @@ export class WebViewMessageHandler {
 			const emptyErrorMsg = await this.localeService.getLocalizedMessage('VSCODE_VARIABLE_NAME_EMPTY');
 			const invalidErrorMsg = await this.localeService.getLocalizedMessage('VSCODE_VARIABLE_NAME_INVALID');
 
-			const result = await vscode.window.showInputBox({
+			const result = await vscodeApi.window.showInputBox({
 				prompt: promptMsg,
 				value: message.currentName || '',
 				validateInput: text => {
@@ -376,7 +394,7 @@ export class WebViewMessageHandler {
 			const okBtn = await this.localeService.getLocalizedMessage('VSCODE_OK');
 			const cancelBtn = await this.localeService.getLocalizedMessage('VSCODE_CANCEL');
 
-			const result = await vscode.window.showWarningMessage(confirmMsg, okBtn, cancelBtn);
+			const result = await vscodeApi.window.showWarningMessage(confirmMsg, okBtn, cancelBtn);
 
 			this.panel.webview.postMessage({
 				command: 'deleteVariable',
@@ -394,7 +412,7 @@ export class WebViewMessageHandler {
 	 */
 	private async handleConfirmDialog(message: any): Promise<void> {
 		try {
-			const result = await vscode.window.showWarningMessage(message.message, 'OK', 'Cancel');
+			const result = await vscodeApi.window.showWarningMessage(message.message, 'OK', 'Cancel');
 
 			this.panel.webview.postMessage({
 				command: 'confirmDialogResult',
@@ -564,7 +582,7 @@ export class WebViewMessageHandler {
 				const deleteBtn = '刪除';
 				const cancelBtn = '取消';
 
-				const selection = await vscode.window.showWarningMessage(confirmMessage, deleteBtn, cancelBtn);
+				const selection = await vscodeApi.window.showWarningMessage(confirmMessage, deleteBtn, cancelBtn);
 
 				if (selection === deleteBtn) {
 					// 用戶確認刪除
@@ -628,7 +646,7 @@ export class WebViewMessageHandler {
 			const restoreBtn = '還原';
 			const cancelBtn = '取消';
 
-			const selection = await vscode.window.showWarningMessage(confirmMessage, restoreBtn, cancelBtn);
+			const selection = await vscodeApi.window.showWarningMessage(confirmMessage, restoreBtn, cancelBtn);
 
 			if (selection === restoreBtn) {
 				// 在還原之前，先為當前工作區創建一個臨時備份
@@ -759,7 +777,7 @@ export class WebViewMessageHandler {
 	 * @param message 錯誤訊息
 	 */
 	private showErrorMessage(message: string): void {
-		vscode.window.showErrorMessage(message);
+		vscodeApi.window.showErrorMessage(message);
 	}
 
 	/**
@@ -786,7 +804,7 @@ export class WebViewMessageHandler {
 			}
 
 			// 執行預覽命令，將預覽命令和完整的備份路徑傳遞給 VS Code
-			await vscode.commands.executeCommand('singular-blockly.previewBackup', fullBackupPath);
+			await vscodeApi.commands.executeCommand('singular-blockly.previewBackup', fullBackupPath);
 		} catch (error) {
 			log(`預覽備份失敗: ${error}`, 'error');
 			this.showErrorMessage(`預覽備份失敗: ${error}`);
