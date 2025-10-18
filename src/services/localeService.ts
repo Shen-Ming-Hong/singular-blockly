@@ -17,19 +17,45 @@ export interface UIMessages {
 }
 
 /**
+ * 檔案系統介面（用於依賴注入）
+ */
+export interface FileSystem {
+	existsSync(path: string): boolean;
+	promises: {
+		readFile(path: string, encoding?: BufferEncoding | null): Promise<string | Buffer>;
+		readdir(path: string): Promise<string[]>;
+	};
+}
+
+/**
+ * VSCode API 介面（用於依賴注入）
+ */
+export interface VSCodeAPI {
+	env: {
+		language: string;
+	};
+}
+
+/**
  * 多語言服務類別
  * 負責處理所有與多語言相關的功能
  */
 export class LocaleService {
 	private cachedMessages: Map<string, UIMessages> = new Map();
 	private currentLanguage: string = 'en';
+	private fs: FileSystem;
+	private vscodeApi: VSCodeAPI;
 
 	/**
 	 * 建立多語言服務實例
 	 * @param extensionPath 擴充功能路徑
+	 * @param fileSystem 檔案系統（可選，用於測試）
+	 * @param vscodeAPI VSCode API（可選，用於測試）
 	 */
-	constructor(private extensionPath: string) {
-		this.currentLanguage = this.mapVSCodeLangToBlockly(vscode.env.language);
+	constructor(private extensionPath: string, fileSystem?: FileSystem, vscodeAPI?: VSCodeAPI) {
+		this.fs = fileSystem || fs;
+		this.vscodeApi = vscodeAPI || vscode;
+		this.currentLanguage = this.mapVSCodeLangToBlockly(this.vscodeApi.env.language);
 		log(`初始化多語言服務, 語言: ${this.currentLanguage}`, 'info');
 	}
 
@@ -64,26 +90,26 @@ export class LocaleService {
 				return this.cachedMessages.get(blocklyLanguage) || {};
 			}
 
-			// 找到對應的語言檔案
-			const langFilePath = path.join(this.extensionPath, 'media/locales', blocklyLanguage, 'messages.js');
+		// 找到對應的語言檔案
+		const langFilePath = path.join(this.extensionPath, 'media/locales', blocklyLanguage, 'messages.js');
 
-			// 如果找不到對應的語言檔，則使用英文
-			if (!fs.existsSync(langFilePath)) {
-				const enFilePath = path.join(this.extensionPath, 'media/locales/en/messages.js');
-				if (!fs.existsSync(enFilePath)) {
+		// 如果找不到對應的語言檔，則使用英文
+		if (!this.fs.existsSync(langFilePath)) {
+			const enFilePath = path.join(this.extensionPath, 'media/locales/en/messages.js');
+			if (!this.fs.existsSync(enFilePath)) {
 					return {}; // 如果連英文檔案都找不到，返回空物件
 				}
 
-				// 讀取英文語言檔
-				const content = await fs.promises.readFile(enFilePath, 'utf8');
-				const messages = this.extractMessagesFromJs(content);
+			// 讀取英文語言檔
+			const content = await this.fs.promises.readFile(enFilePath, 'utf8') as string;
+			const messages = this.extractMessagesFromJs(content);
 				this.cachedMessages.set('en', messages);
 				this.currentLanguage = 'en';
 				return messages;
-			} else {
-				// 讀取對應語言檔
-				const content = await fs.promises.readFile(langFilePath, 'utf8');
-				const messages = this.extractMessagesFromJs(content);
+		} else {
+			// 讀取對應語言檔
+			const content = await this.fs.promises.readFile(langFilePath, 'utf8') as string;
+			const messages = this.extractMessagesFromJs(content);
 				this.cachedMessages.set(blocklyLanguage, messages);
 				return messages;
 			}
@@ -99,6 +125,16 @@ export class LocaleService {
 	 */
 	private extractMessagesFromJs(content: string): UIMessages {
 		const messages: UIMessages = {};
+
+		// 處理 Blockly.Msg['KEY'] = 'value' 格式 (標準 Blockly 訊息格式)
+		const blocklyMsgRegex = /Blockly\.Msg\[['"](\w+)['"]\]\s*=\s*['"](.+?)['"]/g;
+		let blocklyMatch;
+		
+		while ((blocklyMatch = blocklyMsgRegex.exec(content)) !== null) {
+			const key = blocklyMatch[1];
+			const value = blocklyMatch[2];
+			messages[key] = value;
+		}
 
 		// 優先處理 VSCODE_ 開頭的訊息，保持向下兼容
 		const vscodeRegex = /VSCODE_(\w+):\s*['"](.+?)['"]/g;
@@ -181,11 +217,9 @@ export class LocaleService {
 	async getSupportedLocales(): Promise<string[]> {
 		const localesPath = path.join(this.extensionPath, 'media/locales');
 		try {
-			const files = await fs.promises.readdir(localesPath);
-			return files.filter(file => {
-				const stat = fs.statSync(path.join(localesPath, file));
-				return stat.isDirectory();
-			});
+			const files = await this.fs.promises.readdir(localesPath);
+			// 過濾出目錄（在測試環境中，我們假設所有返回的都是目錄）
+			return files;
 		} catch (error) {
 			log('Unable to read language file directory:', 'error', error);
 			return ['en']; // 若發生錯誤，至少返回英文

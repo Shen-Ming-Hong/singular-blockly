@@ -157,18 +157,34 @@ export class FSMock {
 	/**
 	 * 模擬列出目錄內容
 	 */
-	public readdirSync = sinon.stub().callsFake((path: string) => {
-		if (!this.directories.has(path)) {
-			throw new Error(`ENOENT: no such directory, readdir '${path}'`);
+	public readdirSync = sinon.stub().callsFake((dirPath: string) => {
+		// 正規化路徑分隔符（Windows 使用 \，但我們統一處理為 /）
+		const normalizedDirPath = dirPath.replace(/\\/g, '/');
+		
+		if (!this.directories.has(dirPath)) {
+			throw new Error(`ENOENT: no such directory, readdir '${dirPath}'`);
 		}
 
 		const result: string[] = [];
-		const pathPrefix = path.endsWith('/') ? path : path + '/';
+		const pathPrefix = normalizedDirPath.endsWith('/') ? normalizedDirPath : normalizedDirPath + '/';
 
-		// 找出以此路徑開頭的檔案和目錄
+		// 找出以此路徑開頭的檔案
 		this.files.forEach((_, filePath) => {
-			if (filePath.startsWith(pathPrefix)) {
-				const relativePath = filePath.slice(pathPrefix.length);
+			const normalizedFilePath = filePath.replace(/\\/g, '/');
+			if (normalizedFilePath.startsWith(pathPrefix)) {
+				const relativePath = normalizedFilePath.slice(pathPrefix.length);
+				const firstSegment = relativePath.split('/')[0];
+				if (firstSegment && !result.includes(firstSegment)) {
+					result.push(firstSegment);
+				}
+			}
+		});
+
+		// 找出直接子目錄
+		this.directories.forEach((subDir) => {
+			const normalizedSubDir = subDir.replace(/\\/g, '/');
+			if (normalizedSubDir.startsWith(pathPrefix) && normalizedSubDir !== normalizedDirPath) {
+				const relativePath = normalizedSubDir.slice(pathPrefix.length);
 				const firstSegment = relativePath.split('/')[0];
 				if (firstSegment && !result.includes(firstSegment)) {
 					result.push(firstSegment);

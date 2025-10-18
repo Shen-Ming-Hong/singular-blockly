@@ -78,8 +78,8 @@ describe('Locale Service', () => {
 		fsMock.addDirectory(path.join(extensionPath, 'media/locales/en'));
 		fsMock.addDirectory(path.join(extensionPath, 'media/locales/zh-hant'));
 
-		// 初始化多語言服務
-		localeService = new LocaleService(extensionPath);
+		// 初始化多語言服務，注入 fs mock 和 vscode mock
+		localeService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
 	});
 
 	// 在每個測試之後還原環境
@@ -99,7 +99,7 @@ describe('Locale Service', () => {
 
 		// 測試設置不同的語言
 		vscodeMock.env.language = 'zh-tw';
-		const zhLocaleService = new LocaleService(extensionPath);
+		const zhLocaleService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
 		// zh-tw 會被映射到 zh-hant
 		assert.strictEqual(zhLocaleService.getCurrentLanguage(), 'zh-hant');
 	});
@@ -126,7 +126,7 @@ describe('Locale Service', () => {
 	it('should get localized messages', async () => {
 		// 先載入訊息
 		await localeService.loadUIMessages();
-		
+
 		// 測試獲取本地化訊息
 		const message = await localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 		assert.strictEqual(message, 'Please open a folder first.');
@@ -139,7 +139,7 @@ describe('Locale Service', () => {
 	it('should fallback to key if message not found', async () => {
 		// 先載入訊息
 		await localeService.loadUIMessages();
-		
+
 		// 測試未找到的訊息回退到鍵名
 		const unknownKey = 'UNKNOWN_KEY';
 		const message = await localeService.getLocalizedMessage(unknownKey);
@@ -147,14 +147,13 @@ describe('Locale Service', () => {
 	});
 
 	it('should get supported locales', async () => {
-		// 設置目錄讀取的返回值
-		sinon.stub(fsServiceMock.promises, 'readdir').resolves(['en', 'zh-hant']);
-
 		// 測試獲取支援的語言列表
 		const locales = await localeService.getSupportedLocales();
 
-		// 驗證語言列表
-		assert.deepStrictEqual(locales, ['en', 'zh-hant']);
+		// 驗證語言列表（mock 中有 en 和 zh-hant 目錄）
+		assert.strictEqual(locales.length, 2);
+		assert(locales.includes('en'));
+		assert(locales.includes('zh-hant'));
 	});
 
 	it('should extract messages from JS file content', () => {
@@ -187,13 +186,9 @@ describe('Locale Service', () => {
 	it('should fallback to English if language file not found', async () => {
 		// 設置一個不存在語言檔案的環境
 		vscodeMock.env.language = 'es'; // 設置為西班牙語
-		const noFileLocaleService = new LocaleService(extensionPath);
+		const noFileLocaleService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
 
-		// 移除西班牙語檔案
-		const esPath = path.join(extensionPath, 'media/locales/es/messages.js');
-		fsMock.files.delete(esPath);
-
-		// 測試訊息載入
+		// 測試訊息載入（西班牙語檔案不存在，應回退到英文）
 		const messages = await noFileLocaleService.loadUIMessages();
 
 		// 驗證回退到英文
