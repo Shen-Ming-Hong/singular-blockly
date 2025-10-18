@@ -74,20 +74,30 @@ window.arduinoGenerator.forBlock['huskylens_init_i2c'] = function (block) {
 			return '// Error: Failed to initialize generator properties\n';
 		}
 
-		// 添加必要的函式庫，並抑制第三方庫的警告
-		window.arduinoGenerator.includes_['huskylens_pragma_start'] =
-			'#pragma GCC diagnostic push\n#pragma GCC diagnostic ignored "-Wreturn-type"\n#pragma GCC diagnostic ignored "-Wunused-variable"';
-		window.arduinoGenerator.includes_['huskylens'] = '#include <HUSKYLENS.h>';
-		window.arduinoGenerator.includes_['huskylens_pragma_end'] = '#pragma GCC diagnostic pop';
-		window.arduinoGenerator.includes_['wire'] = '#include "Wire.h"';
+		// 添加必要的函式庫,並抑制第三方庫的警告 (避免重複添加)
+		if (!window.arduinoGenerator.includes_['huskylens_pragma_start']) {
+			window.arduinoGenerator.includes_['huskylens_pragma_start'] =
+				'#pragma GCC diagnostic push\n#pragma GCC diagnostic ignored "-Wreturn-type"\n#pragma GCC diagnostic ignored "-Wunused-variable"';
+		}
+		if (!window.arduinoGenerator.includes_['huskylens']) {
+			window.arduinoGenerator.includes_['huskylens'] = '#include <HUSKYLENS.h>';
+		}
+		if (!window.arduinoGenerator.includes_['huskylens_pragma_end']) {
+			window.arduinoGenerator.includes_['huskylens_pragma_end'] = '#pragma GCC diagnostic pop';
+		}
+		if (!window.arduinoGenerator.includes_['wire']) {
+			window.arduinoGenerator.includes_['wire'] = '#include "Wire.h"';
+		}
 
-		// 在 lib_deps 中添加 HUSKYLENS 庫
+		// 在 lib_deps 中添加 HUSKYLENS 庫 (已有去重檢查)
 		if (!window.arduinoGenerator.lib_deps_.includes('https://github.com/HuskyLens/HUSKYLENSArduino/archive/refs/heads/master.zip')) {
 			window.arduinoGenerator.lib_deps_.push('https://github.com/HuskyLens/HUSKYLENSArduino/archive/refs/heads/master.zip');
 		}
 
-		// 全域變數宣告
-		window.arduinoGenerator.variables_['huskylens_obj'] = 'HUSKYLENS huskylens;';
+		// 全域變數宣告 (避免重複宣告)
+		if (!window.arduinoGenerator.variables_['huskylens_obj']) {
+			window.arduinoGenerator.variables_['huskylens_obj'] = 'HUSKYLENS huskylens;';
+		}
 
 		// 初始化代碼
 		const initCode = `  // 初始化 HUSKYLENS (I2C)
@@ -147,24 +157,61 @@ window.arduinoGenerator.forBlock['huskylens_init_uart'] = function (block) {
 			return '// Error: Failed to initialize generator properties\n';
 		}
 
-		// 添加必要的函式庫，並抑制第三方庫的警告
-		window.arduinoGenerator.includes_['huskylens_pragma_start'] =
-			'#pragma GCC diagnostic push\n#pragma GCC diagnostic ignored "-Wreturn-type"\n#pragma GCC diagnostic ignored "-Wunused-variable"';
-		window.arduinoGenerator.includes_['huskylens'] = '#include <HUSKYLENS.h>';
-		window.arduinoGenerator.includes_['huskylens_pragma_end'] = '#pragma GCC diagnostic pop';
-		window.arduinoGenerator.includes_['softwareserial'] = '#include <SoftwareSerial.h>';
+		// 添加必要的函式庫,並抑制第三方庫的警告 (避免重複添加)
+		if (!window.arduinoGenerator.includes_['huskylens_pragma_start']) {
+			window.arduinoGenerator.includes_['huskylens_pragma_start'] =
+				'#pragma GCC diagnostic push\n#pragma GCC diagnostic ignored "-Wreturn-type"\n#pragma GCC diagnostic ignored "-Wunused-variable"';
+		}
+		if (!window.arduinoGenerator.includes_['huskylens']) {
+			window.arduinoGenerator.includes_['huskylens'] = '#include <HUSKYLENS.h>';
+		}
+		if (!window.arduinoGenerator.includes_['huskylens_pragma_end']) {
+			window.arduinoGenerator.includes_['huskylens_pragma_end'] = '#pragma GCC diagnostic pop';
+		}
 
-		// 在 lib_deps 中添加 HUSKYLENS 庫
+		// 在 lib_deps 中添加 HUSKYLENS 庫 (已有去重檢查)
 		if (!window.arduinoGenerator.lib_deps_.includes('https://github.com/HuskyLens/HUSKYLENSArduino/archive/refs/heads/master.zip')) {
 			window.arduinoGenerator.lib_deps_.push('https://github.com/HuskyLens/HUSKYLENSArduino/archive/refs/heads/master.zip');
 		}
 
-		// 全域變數宣告
-		window.arduinoGenerator.variables_['huskylens_serial'] = `SoftwareSerial huskySerial(${rxPin}, ${txPin});`;
-		window.arduinoGenerator.variables_['huskylens_obj'] = 'HUSKYLENS huskylens;';
+		// 檢測開發板類型以使用正確的串列埠實作
+		const currentBoard = window.currentBoard || 'uno';
+		const isESP32 = currentBoard.includes('esp32');
 
-		// 初始化代碼
-		const initCode = `  // 初始化 HUSKYLENS (UART)
+		let initCode;
+
+		if (isESP32) {
+			// ESP32 使用 HardwareSerial (不支援 SoftwareSerial) - 避免重複宣告
+			if (!window.arduinoGenerator.variables_['huskylens_serial']) {
+				window.arduinoGenerator.variables_['huskylens_serial'] = 'HardwareSerial huskySerial(1);';
+			}
+			if (!window.arduinoGenerator.variables_['huskylens_obj']) {
+				window.arduinoGenerator.variables_['huskylens_obj'] = 'HUSKYLENS huskylens;';
+			}
+
+			initCode = `  // 初始化 HUSKYLENS (UART - ESP32 使用 HardwareSerial)
+  Serial.begin(9600);
+  huskySerial.begin(9600, SERIAL_8N1, ${rxPin}, ${txPin});
+  while (!huskylens.begin(huskySerial)) {
+    Serial.println(F("HUSKYLENS 初始化失敗，請檢查連線！"));
+    Serial.println(F("1. 檢查接線是否正確？"));
+    Serial.println(F("2. 檢查 HUSKYLENS 是否正常工作？"));
+    delay(100);
+  }
+  Serial.println(F("HUSKYLENS 初始化成功！"));`;
+		} else {
+			// Arduino AVR 使用 SoftwareSerial - 避免重複添加/宣告
+			if (!window.arduinoGenerator.includes_['softwareserial']) {
+				window.arduinoGenerator.includes_['softwareserial'] = '#include <SoftwareSerial.h>';
+			}
+			if (!window.arduinoGenerator.variables_['huskylens_serial']) {
+				window.arduinoGenerator.variables_['huskylens_serial'] = `SoftwareSerial huskySerial(${rxPin}, ${txPin});`;
+			}
+			if (!window.arduinoGenerator.variables_['huskylens_obj']) {
+				window.arduinoGenerator.variables_['huskylens_obj'] = 'HUSKYLENS huskylens;';
+			}
+
+			initCode = `  // 初始化 HUSKYLENS (UART - Arduino AVR 使用 SoftwareSerial)
   Serial.begin(9600);
   huskySerial.begin(9600);
   while (!huskylens.begin(huskySerial)) {
@@ -174,6 +221,7 @@ window.arduinoGenerator.forBlock['huskylens_init_uart'] = function (block) {
     delay(100);
   }
   Serial.println(F("HUSKYLENS 初始化成功！"));`;
+		}
 
 		// 確保 setupCode_ 存在
 		if (!window.arduinoGenerator.setupCode_) {
@@ -241,6 +289,7 @@ window.arduinoGenerator.forBlock['huskylens_get_block_info'] = function (block) 
 	try {
 		const index = block.getFieldValue('INDEX');
 		const infoType = block.getFieldValue('INFO_TYPE');
+		// 注意: HUSKYLENSArduino 函式庫使用 .ID (大寫) 而非 .id
 		const code = `huskylens.getBlock(${index}).${infoType}`;
 		return [code, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (error) {
@@ -265,6 +314,7 @@ window.arduinoGenerator.forBlock['huskylens_get_arrow_info'] = function (block) 
 	try {
 		const index = block.getFieldValue('INDEX');
 		const infoType = block.getFieldValue('INFO_TYPE');
+		// 注意: HUSKYLENSArduino 函式庫使用 .ID (大寫) 而非 .id
 		const code = `huskylens.getArrow(${index}).${infoType}`;
 		return [code, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (error) {
