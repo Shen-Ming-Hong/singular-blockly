@@ -29,16 +29,31 @@ export class WebViewMessageHandler {
 	 * @param context 擴充功能上下文
 	 * @param panel WebView 面板
 	 * @param localeService 多語言服務
+	 * @param fileService 檔案服務（可選，用於測試）
+	 * @param settingsManager 設定管理器（可選，用於測試）
 	 */
-	constructor(private context: vscode.ExtensionContext, private panel: vscode.WebviewPanel, private localeService: LocaleService) {
-		const workspaceFolders = vscode.workspace.workspaceFolders;
-		if (!workspaceFolders) {
-			throw new Error('No workspace folder open');
-		}
+	constructor(
+		private context: vscode.ExtensionContext,
+		private panel: vscode.WebviewPanel,
+		private localeService: LocaleService,
+		fileService?: FileService,
+		settingsManager?: SettingsManager
+	) {
+		if (fileService && settingsManager) {
+			// 測試環境：使用注入的 services
+			this.fileService = fileService;
+			this.settingsManager = settingsManager;
+		} else {
+			// 生產環境：創建 services
+			const workspaceFolders = vscode.workspace.workspaceFolders;
+			if (!workspaceFolders) {
+				throw new Error('No workspace folder open');
+			}
 
-		const workspaceRoot = workspaceFolders[0].uri.fsPath;
-		this.fileService = new FileService(workspaceRoot);
-		this.settingsManager = new SettingsManager(workspaceRoot);
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
+			this.fileService = new FileService(workspaceRoot);
+			this.settingsManager = new SettingsManager(workspaceRoot);
+		}
 	}
 
 	/**

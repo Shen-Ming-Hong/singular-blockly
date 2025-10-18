@@ -15,26 +15,74 @@ import { afterEach, beforeEach } from 'mocha';
  * 模擬 vscode API 的輔助函數
  */
 export class VSCodeMock {
+	private _outputChannel: any = null;
+
 	public window: any = {
-		createOutputChannel: sinon.stub().returns({
-			info: sinon.stub(),
-			debug: sinon.stub(),
-			warn: sinon.stub(),
-			error: sinon.stub(),
-			show: sinon.stub(),
-			dispose: sinon.stub(),
+		createOutputChannel: sinon.stub().callsFake((name: string, options?: any) => {
+			// 如果已經創建過，返回同一個實例
+			if (this._outputChannel) {
+				return this._outputChannel;
+			}
+
+			// 創建 LogOutputChannel mock（有 log: true 選項時）
+			this._outputChannel = {
+				name,
+				appendLine: sinon.stub(),
+				append: sinon.stub(),
+				clear: sinon.stub(),
+				show: sinon.stub(),
+				hide: sinon.stub(),
+				dispose: sinon.stub(),
+				// LogOutputChannel 特有的方法
+				trace: sinon.stub(),
+				debug: sinon.stub(),
+				info: sinon.stub(),
+				warn: sinon.stub(),
+				error: sinon.stub(),
+			};
+			return this._outputChannel;
 		}),
 		showErrorMessage: sinon.stub().returns(Promise.resolve()),
 		showInformationMessage: sinon.stub().returns(Promise.resolve()),
 		showWarningMessage: sinon.stub().returns(Promise.resolve()),
-		createWebviewPanel: sinon.stub().returns({
-			webview: {
-				html: '',
-				onDidReceiveMessage: sinon.stub(),
-				postMessage: sinon.stub().returns(Promise.resolve()),
-			},
-			onDidDispose: sinon.stub(),
-			reveal: sinon.stub(),
+		createWebviewPanel: sinon.stub().callsFake((viewType: string, title: string, showOptions: any, options: any) => {
+			const panel = {
+				webview: {
+					html: '',
+					options: options?.enableScripts ? { enableScripts: true } : {},
+					onDidReceiveMessage: sinon.stub().returns({ dispose: sinon.stub() }),
+					postMessage: sinon.stub().returns(Promise.resolve(true)),
+					asWebviewUri: sinon.stub().callsFake((uri: any) => {
+						// 模擬將本地路徑轉換為 webview URI
+						if (uri.fsPath) {
+							return { toString: () => `vscode-resource:${uri.fsPath}` };
+						}
+						return uri;
+					}),
+					cspSource: 'vscode-webview:',
+				},
+				title,
+				viewType,
+				visible: true,
+				active: true,
+				onDidDispose: sinon.stub().callsFake((callback: any) => {
+					panel._onDisposeCallback = callback;
+					return { dispose: sinon.stub() };
+				}),
+				onDidChangeViewState: sinon.stub().returns({ dispose: sinon.stub() }),
+				reveal: sinon.stub().callsFake(() => {
+					panel.visible = true;
+					panel.active = true;
+				}),
+				dispose: sinon.stub().callsFake(() => {
+					panel.visible = false;
+					if (panel._onDisposeCallback) {
+						panel._onDisposeCallback();
+					}
+				}),
+				_onDisposeCallback: null as any,
+			};
+			return panel;
 		}),
 		showInputBox: sinon.stub().returns(Promise.resolve('test')),
 		createStatusBarItem: sinon.stub().returns({
@@ -75,6 +123,20 @@ export class VSCodeMock {
 		One: 1,
 		Two: 2,
 	};
+
+	/**
+	 * 獲取當前的 output channel mock（用於測試驗證）
+	 */
+	public getOutputChannel(): any {
+		return this._outputChannel;
+	}
+
+	/**
+	 * 重置 output channel（用於測試清理）
+	 */
+	public resetOutputChannel(): void {
+		this._outputChannel = null;
+	}
 }
 
 /**
@@ -125,18 +187,34 @@ export class FSMock {
 	/**
 	 * 模擬列出目錄內容
 	 */
-	public readdirSync = sinon.stub().callsFake((path: string) => {
-		if (!this.directories.has(path)) {
-			throw new Error(`ENOENT: no such directory, readdir '${path}'`);
+	public readdirSync = sinon.stub().callsFake((dirPath: string) => {
+		// 正規化路徑分隔符（Windows 使用 \，但我們統一處理為 /）
+		const normalizedDirPath = dirPath.replace(/\\/g, '/');
+
+		if (!this.directories.has(dirPath)) {
+			throw new Error(`ENOENT: no such directory, readdir '${dirPath}'`);
 		}
 
 		const result: string[] = [];
-		const pathPrefix = path.endsWith('/') ? path : path + '/';
+		const pathPrefix = normalizedDirPath.endsWith('/') ? normalizedDirPath : normalizedDirPath + '/';
 
-		// 找出以此路徑開頭的檔案和目錄
+		// 找出以此路徑開頭的檔案
 		this.files.forEach((_, filePath) => {
-			if (filePath.startsWith(pathPrefix)) {
-				const relativePath = filePath.slice(pathPrefix.length);
+			const normalizedFilePath = filePath.replace(/\\/g, '/');
+			if (normalizedFilePath.startsWith(pathPrefix)) {
+				const relativePath = normalizedFilePath.slice(pathPrefix.length);
+				const firstSegment = relativePath.split('/')[0];
+				if (firstSegment && !result.includes(firstSegment)) {
+					result.push(firstSegment);
+				}
+			}
+		});
+
+		// 找出直接子目錄
+		this.directories.forEach(subDir => {
+			const normalizedSubDir = subDir.replace(/\\/g, '/');
+			if (normalizedSubDir.startsWith(pathPrefix) && normalizedSubDir !== normalizedDirPath) {
+				const relativePath = normalizedSubDir.slice(pathPrefix.length);
 				const firstSegment = relativePath.split('/')[0];
 				if (firstSegment && !result.includes(firstSegment)) {
 					result.push(firstSegment);
@@ -202,9 +280,28 @@ export class FSMock {
 				}
 				throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
 			},
+			stat: async (path: string) => {
+				if (this.files.has(path)) {
+					return {
+						isFile: () => true,
+						isDirectory: () => false,
+						size: this.files.get(path)!.length,
+						mtime: new Date(),
+						ctime: new Date(),
+					};
+				} else if (this.directories.has(path)) {
+					return {
+						isFile: () => false,
+						isDirectory: () => true,
+						size: 0,
+						mtime: new Date(),
+						ctime: new Date(),
+					};
+				}
+				throw new Error(`ENOENT: no such file or directory, stat '${path}'`);
+			},
 		};
 	}
-
 	/**
 	 * 模擬 statSync
 	 */

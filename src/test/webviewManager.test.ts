@@ -14,6 +14,8 @@ import * as sinon from 'sinon';
 import * as path from 'path';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import { WebViewManager } from '../webview/webviewManager';
+import { LocaleService } from '../services/localeService';
+import { FileService } from '../services/fileService';
 import { VSCodeMock, FSMock } from './helpers/mocks';
 
 describe('WebView Manager', () => {
@@ -22,6 +24,8 @@ describe('WebView Manager', () => {
 	let vscodeMock: VSCodeMock;
 	let originalVscode: any;
 	let webViewManager: WebViewManager;
+	let localeService: LocaleService;
+	let extensionFileService: FileService;
 	const extensionPath = '/mock/extension';
 	const mockHtmlContent = `
         <!DOCTYPE html>
@@ -116,8 +120,12 @@ describe('WebView Manager', () => {
 			subscriptions: [],
 		};
 
-		// 初始化 WebView 管理器
-		webViewManager = new WebViewManager(context as any);
+		// 初始化 services
+		localeService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
+		extensionFileService = new FileService(extensionPath, fsServiceMock as any);
+
+		// 初始化 WebView 管理器，注入 services
+		webViewManager = new WebViewManager(context as any, localeService, extensionFileService);
 	});
 
 	// 在每個測試之後還原環境

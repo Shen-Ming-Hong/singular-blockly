@@ -16,6 +16,7 @@ import { describe, it, beforeEach, afterEach } from 'mocha';
 import { WebViewMessageHandler } from '../webview/messageHandler';
 import { LocaleService } from '../services/localeService';
 import { FileService } from '../services/fileService';
+import { SettingsManager } from '../services/settingsManager';
 import { VSCodeMock, FSMock } from './helpers/mocks';
 
 describe('WebView Message Handler', () => {
@@ -28,6 +29,7 @@ describe('WebView Message Handler', () => {
 	let webviewMock: any;
 	let localeServiceStub: sinon.SinonStubbedInstance<LocaleService>;
 	let fileServiceStub: sinon.SinonStubbedInstance<FileService>;
+	let settingsManagerStub: sinon.SinonStubbedInstance<SettingsManager>;
 	const extensionPath = '/mock/extension';
 	const workspacePath = '/mock/workspace';
 
@@ -74,15 +76,20 @@ describe('WebView Message Handler', () => {
 		localeServiceStub = sinon.createStubInstance(LocaleService);
 		localeServiceStub.getLocalizedMessage.resolves('Localized Message');
 
-		// 建立 FileService stub
-		fileServiceStub = sinon.createStubInstance(FileService);
+	// 建立 FileService stub
+	fileServiceStub = sinon.createStubInstance(FileService);
 
-		// 替換 FileService 建構函數
-		const originalFileService = require('../services/fileService').FileService;
-		sinon.stub(require('../services/fileService'), 'FileService').callsFake(() => fileServiceStub);
+	// 建立 SettingsManager stub
+	settingsManagerStub = sinon.createStubInstance(SettingsManager);
 
-		// 初始化訊息處理器
-		messageHandler = new WebViewMessageHandler({ extensionPath } as any, panelMock, localeServiceStub as any);
+	// 初始化訊息處理器，注入所有 stubs
+	messageHandler = new WebViewMessageHandler(
+		{ extensionPath } as any,
+		panelMock,
+		localeServiceStub as any,
+		fileServiceStub as any,
+		settingsManagerStub as any
+	);
 	});
 
 	// 在每個測試之後還原環境

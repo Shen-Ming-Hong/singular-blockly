@@ -9,15 +9,36 @@ import * as path from 'path';
 import { log } from './logging';
 
 /**
+ * 檔案系統介面（用於依賴注入）
+ */
+export interface FileSystem {
+	existsSync(path: string): boolean;
+	promises: {
+		mkdir(path: string, options?: any): Promise<string | void>;
+		writeFile(path: string, content: string): Promise<void>;
+		readFile(path: string, encoding: BufferEncoding): Promise<string>;
+		copyFile(src: string, dest: string): Promise<void>;
+		unlink(path: string): Promise<void>;
+		readdir(path: string): Promise<string[]>;
+		stat(path: string): Promise<fs.Stats>;
+	};
+}
+
+/**
  * 檔案操作服務類別
  * 負責所有專案中的檔案讀寫操作
  */
 export class FileService {
+	private fs: FileSystem;
+
 	/**
 	 * 建立檔案服務實例
 	 * @param workspacePath 工作區路徑
+	 * @param fileSystem 檔案系統（可選，用於測試）
 	 */
-	constructor(private workspacePath: string) {}
+	constructor(private workspacePath: string, fileSystem?: FileSystem) {
+		this.fs = fileSystem || fs;
+	}
 
 	/**
 	 * 寫入檔案內容，如果目錄不存在會自動建立
@@ -29,11 +50,11 @@ export class FileService {
 			const fullPath = path.join(this.workspacePath, relativePath);
 			const dirPath = path.dirname(fullPath);
 
-			if (!fs.existsSync(dirPath)) {
-				await fs.promises.mkdir(dirPath, { recursive: true });
+			if (!this.fs.existsSync(dirPath)) {
+				await this.fs.promises.mkdir(dirPath, { recursive: true });
 			}
 
-			await fs.promises.writeFile(fullPath, content);
+			await this.fs.promises.writeFile(fullPath, content);
 			log(`File written successfully: ${relativePath}`, 'info');
 		} catch (error) {
 			log(`Failed to write file: ${relativePath}`, 'error', error);
@@ -51,11 +72,11 @@ export class FileService {
 		try {
 			const fullPath = path.join(this.workspacePath, relativePath);
 
-			if (!fs.existsSync(fullPath)) {
+			if (!this.fs.existsSync(fullPath)) {
 				return defaultContent;
 			}
 
-			return await fs.promises.readFile(fullPath, 'utf8');
+			return await this.fs.promises.readFile(fullPath, 'utf8');
 		} catch (error) {
 			log(`Failed to read file: ${relativePath}`, 'error', error);
 			return defaultContent;
@@ -69,7 +90,7 @@ export class FileService {
 	 */
 	fileExists(relativePath: string): boolean {
 		const fullPath = path.join(this.workspacePath, relativePath);
-		return fs.existsSync(fullPath);
+		return this.fs.existsSync(fullPath);
 	}
 
 	/**
@@ -80,8 +101,8 @@ export class FileService {
 		try {
 			const fullPath = path.join(this.workspacePath, relativePath);
 
-			if (!fs.existsSync(fullPath)) {
-				await fs.promises.mkdir(fullPath, { recursive: true });
+			if (!this.fs.existsSync(fullPath)) {
+				await this.fs.promises.mkdir(fullPath, { recursive: true });
 				log(`Directory created: ${relativePath}`, 'info');
 			}
 		} catch (error) {
@@ -102,11 +123,11 @@ export class FileService {
 			const destDir = path.dirname(destPath);
 
 			// 確保目標目錄存在
-			if (!fs.existsSync(destDir)) {
-				await fs.promises.mkdir(destDir, { recursive: true });
+			if (!this.fs.existsSync(destDir)) {
+				await this.fs.promises.mkdir(destDir, { recursive: true });
 			}
 
-			await fs.promises.copyFile(sourcePath, destPath);
+			await this.fs.promises.copyFile(sourcePath, destPath);
 			log(`File copied from ${sourceRelativePath} to ${destRelativePath}`, 'info');
 		} catch (error) {
 			log(`Failed to copy file from ${sourceRelativePath} to ${destRelativePath}`, 'error', error);
@@ -122,8 +143,8 @@ export class FileService {
 		try {
 			const fullPath = path.join(this.workspacePath, relativePath);
 
-			if (fs.existsSync(fullPath)) {
-				await fs.promises.unlink(fullPath);
+			if (this.fs.existsSync(fullPath)) {
+				await this.fs.promises.unlink(fullPath);
 				log(`File deleted: ${relativePath}`, 'info');
 			}
 		} catch (error) {
@@ -141,11 +162,11 @@ export class FileService {
 		try {
 			const fullPath = path.join(this.workspacePath, relativePath);
 
-			if (!fs.existsSync(fullPath)) {
+			if (!this.fs.existsSync(fullPath)) {
 				return [];
 			}
 
-			return await fs.promises.readdir(fullPath);
+			return await this.fs.promises.readdir(fullPath);
 		} catch (error) {
 			log(`Failed to list files in directory: ${relativePath}`, 'error', error);
 			return [];
@@ -199,11 +220,11 @@ export class FileService {
 		try {
 			const fullPath = path.join(this.workspacePath, relativePath);
 
-			if (!fs.existsSync(fullPath)) {
+			if (!this.fs.existsSync(fullPath)) {
 				return null;
 			}
 
-			return await fs.promises.stat(fullPath);
+			return await this.fs.promises.stat(fullPath);
 		} catch (error) {
 			log(`Failed to get file stats: ${relativePath}`, 'error', error);
 			return null;
