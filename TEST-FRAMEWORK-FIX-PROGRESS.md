@@ -234,6 +234,38 @@
 -   [Sinon.js Documentation](https://sinonjs.org/releases/latest/)
 -   [Mocha Test Framework](https://mochajs.org/)
 
+## Fail-Fast Mode
+
+為了加速測試開發週期，專案現在支援 fail-fast 模式，該模式會在第一個測試失敗時立即停止測試執行。
+
+### 使用方法
+
+```bash
+# Fail-fast 模式：在第一個失敗時停止
+npm run test:bail
+
+# 標準模式：執行所有測試（預設）
+npm test
+
+# 選擇性重新執行特定測試
+npm test -- --grep "FileService"
+
+# 組合使用 fail-fast 和選擇性測試
+npm run test:bail -- --grep "FailedTest"
+```
+
+### 預期行為
+
+- **fail-fast 模式** (`test:bail`): 遇到第一個測試失敗時立即停止，節省時間
+- **標準模式** (`test`): 執行所有測試，提供完整的測試報告
+- **向後相容**: 現有的測試腳本不受影響
+
+### 使用情境
+
+- **開發中**: 使用 `test:bail` 快速驗證修復
+- **CI/CD**: 使用 `test` 獲得完整的測試覆蓋報告
+- **除錯**: 使用 `--grep` 重複執行特定失敗的測試
+
 ## 備註
 
 本次修復工作聚焦於：

@@ -55,7 +55,11 @@ export class VSCodeMock {
 					asWebviewUri: sinon.stub().callsFake((uri: any) => {
 						// 模擬將本地路徑轉換為 webview URI
 						if (uri.fsPath) {
-							return { toString: () => `vscode-resource:${uri.fsPath}` };
+							return {
+								toString: () => `vscode-resource:${uri.fsPath}`,
+								fsPath: uri.fsPath,
+								scheme: 'vscode-resource',
+							};
 						}
 						return uri;
 					}),
@@ -136,6 +140,21 @@ export class VSCodeMock {
 	 */
 	public resetOutputChannel(): void {
 		this._outputChannel = null;
+	}
+
+	/**
+	 * 獲取 mock 狀態（用於測試斷言） - T007
+	 */
+	public getState() {
+		return {
+			outputChannelsCreated: this._outputChannel ? 1 : 0,
+			webviewPanelsCreated: this.window.createWebviewPanel.callCount,
+			messagesShown: [
+				...this.window.showErrorMessage.getCalls().map((c: any) => ({ type: 'error', message: c.args[0] })),
+				...this.window.showInformationMessage.getCalls().map((c: any) => ({ type: 'info', message: c.args[0] })),
+				...this.window.showWarningMessage.getCalls().map((c: any) => ({ type: 'warning', message: c.args[0] })),
+			],
+		};
 	}
 }
 
@@ -322,6 +341,27 @@ export class FSMock {
 
 		throw new Error(`ENOENT: no such file or directory, stat '${path}'`);
 	});
+
+	/**
+	 * 獲取 mock 狀態（用於測試斷言）
+	 */
+	public getState() {
+		return {
+			filesRead: Array.from(this.files.keys()).filter(path => 
+				this.readFileSync.getCalls().some(call => call.args[0] === path)
+			),
+			filesWritten: Array.from(this.files.keys()).filter(path =>
+				this.writeFileSync.getCalls().some(call => call.args[0] === path)
+			),
+			directoriesCreated: Array.from(this.directories),
+			callCount: {
+				readFile: this.readFileSync.callCount,
+				writeFile: this.writeFileSync.callCount,
+				exists: this.existsSync.callCount,
+				readdir: this.readdirSync.callCount,
+			},
+		};
+	}
 
 	/**
 	 * 重置模擬狀態

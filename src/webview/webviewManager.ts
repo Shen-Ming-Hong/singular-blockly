@@ -12,6 +12,27 @@ import { LocaleService } from '../services/localeService';
 import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
 
+// VSCode API 引用（可在測試中注入）- T009
+let vscodeApi: typeof vscode = vscode;
+let currentPanel: vscode.WebviewPanel | undefined;
+
+/**
+ * 設置 VSCode API 引用（僅用於測試）- T009
+ * @param api VSCode API 實例
+ */
+export function _setVSCodeApi(api: typeof vscode): void {
+	vscodeApi = api;
+	currentPanel = undefined; // 重置快取的 panel
+}
+
+/**
+ * 重置為生產環境預設值（僅用於測試）- T009
+ */
+export function _reset(): void {
+	vscodeApi = vscode;
+	currentPanel = undefined;
+}
+
 /**
  * WebView 管理類別
  * 負責建立和管理擴充功能的 WebView 面板
@@ -45,14 +66,14 @@ export class WebViewManager {
 	 */
 	async createAndShowWebView(): Promise<void> {
 		// 檢查工作區
-		const workspaceFolders = vscode.workspace.workspaceFolders;
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 		if (!workspaceFolders) {
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 			const openFolderBtn = await this.localeService.getLocalizedMessage('VSCODE_OPEN_FOLDER');
 
-			vscode.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
+			vscodeApi.window.showErrorMessage(errorMsg, openFolderBtn).then(selection => {
 				if (selection === openFolderBtn) {
-					vscode.commands.executeCommand('workbench.action.files.openFolder');
+					vscodeApi.commands.executeCommand('workbench.action.files.openFolder');
 				}
 			});
 			return;
@@ -73,7 +94,7 @@ export class WebViewManager {
 		}
 
 		// 建立新的 WebView 面板
-		this.panel = vscode.window.createWebviewPanel(
+		this.panel = vscodeApi.window.createWebviewPanel(
 			'blocklyEdit',
 			'Blockly Edit',
 			{
@@ -127,13 +148,11 @@ export class WebViewManager {
 			const localeService = new LocaleService(this.context.extensionPath);
 			const blocklyLanguage = localeService.getCurrentLanguage();
 
-			let theme = 'light';
-			if (this.fileService) {
-				const settingsManager = new SettingsManager(vscode.workspace.workspaceFolders![0].uri.fsPath);
-				theme = await settingsManager.getTheme();
-			}
-
-			// 準備各種資源 URI
+		let theme = 'light';
+		if (this.fileService) {
+			const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
+			theme = await settingsManager.getTheme();
+		}			// 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyEdit.js'));
 			const boardConfigsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/board_configs.js'));
@@ -465,7 +484,7 @@ export class WebViewManager {
 			log(`預覽備份文件: ${backupPath}`, 'info');
 
 			// 檢查檔案是否存在 (backupPath is absolute, need to make it relative to workspace)
-			const workspaceFolders = vscode.workspace.workspaceFolders;
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
 				throw new Error('請先開啟項目資料夾');
 			}
@@ -492,7 +511,7 @@ export class WebViewManager {
 
 			// 初始化檔案服務（如果尚未初始化）
 			if (!this.fileService) {
-				const workspaceFolders = vscode.workspace.workspaceFolders;
+				const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 				if (!workspaceFolders) {
 					throw new Error('請先開啟項目資料夾');
 				}
@@ -501,11 +520,11 @@ export class WebViewManager {
 			} // 建立新的預覽視窗
 			// 使用多語言文字作為標題
 			const previewTitle = await this.localeService.getLocalizedMessage('PREVIEW_WINDOW_TITLE', fileName);
-			const previewPanel = vscode.window.createWebviewPanel(
+			const previewPanel = vscodeApi.window.createWebviewPanel(
 				'blocklyPreview',
 				previewTitle,
 				{
-					viewColumn: vscode.ViewColumn.Two,
+					viewColumn: 2,
 					preserveFocus: true,
 				},
 				{
@@ -559,9 +578,9 @@ export class WebViewManager {
 					log(message.message, message.level, ...(message.args || []));
 					break;
 
-				case 'themeChanged':
-					// 同步主題變更
-					const settingsManager = new SettingsManager(vscode.workspace.workspaceFolders![0].uri.fsPath);
+			case 'themeChanged':
+				// 同步主題變更
+				const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
 					await settingsManager.updateTheme(message.theme);
 
 					// 如果主編輯窗口開啟，也一併更新
@@ -600,7 +619,7 @@ export class WebViewManager {
 	private async loadBackupContent(backupPath: string, panel: vscode.WebviewPanel): Promise<void> {
 		try {
 			// 根據絕對路徑獲取相對路徑
-			const workspaceFolders = vscode.workspace.workspaceFolders;
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
 				throw new Error('請先開啟項目資料夾');
 			}
@@ -696,7 +715,7 @@ export class WebViewManager {
 
 			let theme = 'light';
 			if (this.fileService) {
-				const settingsManager = new SettingsManager(vscode.workspace.workspaceFolders![0].uri.fsPath);
+				const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
 				theme = await settingsManager.getTheme();
 			}
 
@@ -853,7 +872,7 @@ export class WebViewManager {
 		}
 
 		// 否則創建臨時的 webviewPanel 進行 URI 轉換
-		const tempPanel = vscode.window.createWebviewPanel('blocklyTemp', 'Temp', vscode.ViewColumn.One, {
+		const tempPanel = vscodeApi.window.createWebviewPanel('blocklyTemp', 'Temp', 1, {
 			enableScripts: true,
 			localResourceRoots: [
 				vscode.Uri.file(path.join(this.context.extensionPath, 'media')),
