@@ -93,13 +93,14 @@ describe('Locale Service', () => {
 	});
 
 	it('should initialize with correct language', () => {
-		// 測試初始化語言
+		// 測試初始化語言（VSCode 預設是 'en'）
 		const currentLanguage = localeService.getCurrentLanguage();
 		assert.strictEqual(currentLanguage, 'en');
 
 		// 測試設置不同的語言
 		vscodeMock.env.language = 'zh-tw';
 		const zhLocaleService = new LocaleService(extensionPath);
+		// zh-tw 會被映射到 zh-hant
 		assert.strictEqual(zhLocaleService.getCurrentLanguage(), 'zh-hant');
 	});
 
@@ -123,6 +124,9 @@ describe('Locale Service', () => {
 	});
 
 	it('should get localized messages', async () => {
+		// 先載入訊息
+		await localeService.loadUIMessages();
+		
 		// 測試獲取本地化訊息
 		const message = await localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 		assert.strictEqual(message, 'Please open a folder first.');
@@ -133,6 +137,9 @@ describe('Locale Service', () => {
 	});
 
 	it('should fallback to key if message not found', async () => {
+		// 先載入訊息
+		await localeService.loadUIMessages();
+		
 		// 測試未找到的訊息回退到鍵名
 		const unknownKey = 'UNKNOWN_KEY';
 		const message = await localeService.getLocalizedMessage(unknownKey);

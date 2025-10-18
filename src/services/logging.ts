@@ -9,6 +9,26 @@ import * as vscode from 'vscode';
 // 建立輸出頻道
 let outputChannel: vscode.LogOutputChannel | undefined;
 
+// VSCode API 引用（可在測試中注入）
+let vscodeApi: typeof vscode = vscode;
+
+/**
+ * 設置 VSCode API 引用（僅用於測試）
+ * @param api VSCode API 實例
+ */
+export function _setVSCodeApi(api: any): void {
+	vscodeApi = api;
+	// 重置 output channel，以便使用新的 API
+	outputChannel = undefined;
+}
+
+/**
+ * 獲取當前的 output channel（僅用於測試）
+ */
+export function _getOutputChannel(): any {
+	return outputChannel;
+}
+
 /**
  * 輸出日誌訊息至 VSCode 輸出窗口
  *
@@ -19,7 +39,7 @@ let outputChannel: vscode.LogOutputChannel | undefined;
 export function log(message: string, level: 'debug' | 'info' | 'warn' | 'error' = 'info', ...args: any[]): void {
 	// 確保輸出頻道已建立
 	if (!outputChannel) {
-		outputChannel = vscode.window.createOutputChannel('Singular Blockly', { log: true });
+		outputChannel = vscodeApi.window.createOutputChannel('Singular Blockly', { log: true });
 	}
 
 	// 格式化訊息
@@ -70,7 +90,7 @@ export function handleWebViewLog(source: string, level: string, message: string,
  */
 export function showOutputChannel(): void {
 	if (!outputChannel) {
-		outputChannel = vscode.window.createOutputChannel('Singular Blockly', { log: true });
+		outputChannel = vscodeApi.window.createOutputChannel('Singular Blockly', { log: true });
 	}
 	outputChannel.show();
 }

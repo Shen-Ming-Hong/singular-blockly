@@ -15,14 +15,32 @@ import { afterEach, beforeEach } from 'mocha';
  * 模擬 vscode API 的輔助函數
  */
 export class VSCodeMock {
+	private _outputChannel: any = null;
+
 	public window: any = {
-		createOutputChannel: sinon.stub().returns({
-			info: sinon.stub(),
-			debug: sinon.stub(),
-			warn: sinon.stub(),
-			error: sinon.stub(),
-			show: sinon.stub(),
-			dispose: sinon.stub(),
+		createOutputChannel: sinon.stub().callsFake((name: string, options?: any) => {
+			// 如果已經創建過，返回同一個實例
+			if (this._outputChannel) {
+				return this._outputChannel;
+			}
+
+			// 創建 LogOutputChannel mock（有 log: true 選項時）
+			this._outputChannel = {
+				name,
+				appendLine: sinon.stub(),
+				append: sinon.stub(),
+				clear: sinon.stub(),
+				show: sinon.stub(),
+				hide: sinon.stub(),
+				dispose: sinon.stub(),
+				// LogOutputChannel 特有的方法
+				trace: sinon.stub(),
+				debug: sinon.stub(),
+				info: sinon.stub(),
+				warn: sinon.stub(),
+				error: sinon.stub(),
+			};
+			return this._outputChannel;
 		}),
 		showErrorMessage: sinon.stub().returns(Promise.resolve()),
 		showInformationMessage: sinon.stub().returns(Promise.resolve()),
@@ -75,6 +93,20 @@ export class VSCodeMock {
 		One: 1,
 		Two: 2,
 	};
+
+	/**
+	 * 獲取當前的 output channel mock（用於測試驗證）
+	 */
+	public getOutputChannel(): any {
+		return this._outputChannel;
+	}
+
+	/**
+	 * 重置 output channel（用於測試清理）
+	 */
+	public resetOutputChannel(): void {
+		this._outputChannel = null;
+	}
 }
 
 /**

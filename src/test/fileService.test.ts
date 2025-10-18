@@ -47,15 +47,13 @@ describe('File Service', () => {
 	});
 
 	it('should write file content', async () => {
-		// 監視 writeFile 函數
-		const writeFileSpy = sinon.spy(fsServiceMock.promises, 'writeFile');
-
 		// 執行測試
 		await fileService.writeFile(testFilePath, testContent);
 
-		// 驗證寫入檔案方法被正確調用
+		// 驗證檔案是否被寫入到 mock 中
 		const expectedPath = path.join(workspacePath, testFilePath);
-		assert(writeFileSpy.calledWith(expectedPath, testContent));
+		assert.strictEqual(fsMock.files.has(expectedPath), true);
+		assert.strictEqual(fsMock.files.get(expectedPath), testContent);
 	});
 
 	it('should read file content', async () => {
@@ -95,16 +93,14 @@ describe('File Service', () => {
 	});
 
 	it('should create directory', async () => {
-		// 監視 mkdir 函數
-		const mkdirSpy = sinon.spy(fsServiceMock.promises, 'mkdir');
 		const dirPath = 'test/directory';
 
 		// 執行測試
 		await fileService.createDirectory(dirPath);
 
-		// 驗證目錄創建方法被正確調用
+		// 驗證目錄是否被創建到 mock 中
 		const expectedPath = path.join(workspacePath, dirPath);
-		assert(mkdirSpy.calledWith(expectedPath, { recursive: true }));
+		assert.strictEqual(fsMock.directories.has(expectedPath), true);
 	});
 
 	it('should copy files', async () => {
@@ -114,16 +110,13 @@ describe('File Service', () => {
 		const fullSourcePath = path.join(workspacePath, sourcePath);
 		fsMock.addFile(fullSourcePath, testContent);
 
-		// 監視 copyFile 函數
-		const copyFileSpy = sinon.spy(fsServiceMock.promises, 'copyFile');
-
 		// 執行測試
 		await fileService.copyFile(sourcePath, destPath);
 
-		// 驗證複製方法被正確調用
-		const expectedSourcePath = path.join(workspacePath, sourcePath);
+		// 驗證檔案是否被複製到目標位置
 		const expectedDestPath = path.join(workspacePath, destPath);
-		assert(copyFileSpy.calledWith(expectedSourcePath, expectedDestPath));
+		assert.strictEqual(fsMock.files.has(expectedDestPath), true);
+		assert.strictEqual(fsMock.files.get(expectedDestPath), testContent);
 	});
 
 	it('should delete files', async () => {
@@ -131,14 +124,11 @@ describe('File Service', () => {
 		const fullPath = path.join(workspacePath, testFilePath);
 		fsMock.addFile(fullPath, testContent);
 
-		// 監視 unlink 函數
-		const unlinkSpy = sinon.spy(fsServiceMock.promises, 'unlink');
-
 		// 執行測試
 		await fileService.deleteFile(testFilePath);
 
-		// 驗證刪除方法被正確調用
-		assert(unlinkSpy.calledWith(fullPath));
+		// 驗證檔案是否被刪除
+		assert.strictEqual(fsMock.files.has(fullPath), false);
 	});
 
 	it('should list files in directory', async () => {
@@ -150,9 +140,6 @@ describe('File Service', () => {
 		// 添加一些檔案
 		fsMock.addFile(path.join(fullDirPath, 'file1.txt'), 'content1');
 		fsMock.addFile(path.join(fullDirPath, 'file2.txt'), 'content2');
-
-		// 設置 readdir 的回傳值
-		const readdirStub = sinon.stub(fsServiceMock.promises, 'readdir').resolves(['file1.txt', 'file2.txt']);
 
 		// 執行測試
 		const files = await fileService.listFiles(dirPath);
@@ -181,15 +168,12 @@ describe('File Service', () => {
 		const jsonPath = 'test/config.json';
 		const jsonData = { key: 'value', number: 42 };
 
-		// 監視 writeFile 函數
-		const writeFileSpy = sinon.spy(fsServiceMock.promises, 'writeFile');
-
 		// 執行測試
 		await fileService.writeJsonFile(jsonPath, jsonData, true);
 
-		// 驗證寫入方法被正確調用，且內容為美化的 JSON
+		// 驗證寫入的內容
 		const expectedPath = path.join(workspacePath, jsonPath);
 		const expectedContent = JSON.stringify(jsonData, null, 2);
-		assert(writeFileSpy.calledWith(expectedPath, expectedContent));
+		assert.strictEqual(fsMock.files.get(expectedPath), expectedContent);
 	});
 });
