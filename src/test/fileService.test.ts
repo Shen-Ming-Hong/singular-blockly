@@ -30,14 +30,8 @@ describe('File Service', () => {
 			statSync: fsMock.statSync,
 		};
 
-		// 直接將 fs 模組設為模擬物件
-		const fsModule = require.cache[require.resolve('fs')];
-		if (fsModule) {
-			fsModule.exports = fsServiceMock;
-		}
-
-		// 初始化檔案服務
-		fileService = new FileService(workspacePath);
+		// 初始化檔案服務，注入 fs mock
+		fileService = new FileService(workspacePath, fsServiceMock as any);
 	});
 
 	// 在每個測試之後還原環境

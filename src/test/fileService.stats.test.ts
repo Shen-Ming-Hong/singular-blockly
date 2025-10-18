@@ -30,12 +30,7 @@ describe('File Service - getFileStats', () => {
 			statSync: fsMock.statSync,
 		};
 
-		const fsModule = require.cache[require.resolve('fs')];
-		if (fsModule) {
-			fsModule.exports = fsServiceMock;
-		}
-
-		fileService = new FileService(workspacePath);
+		fileService = new FileService(workspacePath, fsServiceMock as any);
 	});
 
 	afterEach(() => {

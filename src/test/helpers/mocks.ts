@@ -243,17 +243,35 @@ export class FSMock {
 				}
 				throw new Error(`ENOENT: no such file or directory, unlink '${path}'`);
 			},
-			copyFile: async (src: string, dest: string) => {
-				if (this.files.has(src)) {
-					this.files.set(dest, this.files.get(src)!);
-					return true;
-				}
-				throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
-			},
-		};
-	}
-
-	/**
+		copyFile: async (src: string, dest: string) => {
+			if (this.files.has(src)) {
+				this.files.set(dest, this.files.get(src)!);
+				return true;
+			}
+			throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
+		},
+		stat: async (path: string) => {
+			if (this.files.has(path)) {
+				return {
+					isFile: () => true,
+					isDirectory: () => false,
+					size: this.files.get(path)!.length,
+					mtime: new Date(),
+					ctime: new Date(),
+				};
+			} else if (this.directories.has(path)) {
+				return {
+					isFile: () => false,
+					isDirectory: () => true,
+					size: 0,
+					mtime: new Date(),
+					ctime: new Date(),
+				};
+			}
+			throw new Error(`ENOENT: no such file or directory, stat '${path}'`);
+		},
+	};
+}	/**
 	 * 模擬 statSync
 	 */
 	public statSync = sinon.stub().callsFake((path: string) => {
