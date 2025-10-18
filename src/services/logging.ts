@@ -16,7 +16,7 @@ let vscodeApi: typeof vscode = vscode;
  * 設置 VSCode API 引用（僅用於測試）
  * @param api VSCode API 實例
  */
-export function _setVSCodeApi(api: any): void {
+export function _setVSCodeApi(api: typeof vscode): void {
 	vscodeApi = api;
 	// 重置 output channel，以便使用新的 API
 	outputChannel = undefined;
@@ -25,7 +25,7 @@ export function _setVSCodeApi(api: any): void {
 /**
  * 獲取當前的 output channel（僅用於測試）
  */
-export function _getOutputChannel(): any {
+export function _getOutputChannel(): vscode.LogOutputChannel | undefined {
 	return outputChannel;
 }
 
