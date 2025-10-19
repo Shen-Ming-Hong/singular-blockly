@@ -163,6 +163,7 @@ export class VSCodeMock {
  */
 export class FSMock {
 	private _files: Map<string, string> = new Map();
+	private _fileMetadata: Map<string, { mtime: Date; ctime: Date }> = new Map();
 	private _directories: Set<string> = new Set();
 
 	/**
@@ -182,8 +183,8 @@ export class FSMock {
 	 * 模擬讀取檔案內容
 	 */
 	public readFileSync = sinon.stub().callsFake((path: string, encoding?: string) => {
-		if (this._files.has(path)) {
-			return this._files.get(path);
+		if (this.files.has(path)) {
+			return this.files.get(path);
 		}
 		throw new Error(`ENOENT: no such file or directory, open '${path}'`);
 	});
@@ -200,7 +201,9 @@ export class FSMock {
 	 * 模擬檢查檔案是否存在
 	 */
 	public existsSync = sinon.stub().callsFake((path: string) => {
-		return this.files.has(path) || this.directories.has(path);
+		// Normalize Windows backslashes to forward slashes for consistent lookup
+		const normalizedPath = path.replace(/\\/g, '/');
+		return this.files.has(normalizedPath) || this.directories.has(normalizedPath);
 	});
 
 	/**
@@ -210,7 +213,7 @@ export class FSMock {
 		// 正規化路徑分隔符（Windows 使用 \，但我們統一處理為 /）
 		const normalizedDirPath = dirPath.replace(/\\/g, '/');
 
-		if (!this.directories.has(dirPath)) {
+		if (!this.directories.has(normalizedDirPath)) {
 			throw new Error(`ENOENT: no such directory, readdir '${dirPath}'`);
 		}
 
@@ -247,12 +250,21 @@ export class FSMock {
 	/**
 	 * 添加模擬檔案
 	 */
-	public addFile(path: string, content: string): void {
-		this.files.set(path, content);
+	public addFile(path: string, content: string, mtime?: Date): void {
+		// Normalize all paths to forward slashes for consistent storage
+		const normalizedPath = path.replace(/\\/g, '/');
+		this.files.set(normalizedPath, content);
+
+		// Store file metadata (creation and modification time)
+		const now = mtime || new Date();
+		this._fileMetadata.set(normalizedPath, {
+			mtime: now,
+			ctime: now,
+		});
 
 		// 確保此檔案的所有父目錄都存在
-		let dirPath = path;
-		while ((dirPath = path.substring(0, dirPath.lastIndexOf('/'))) !== '') {
+		let dirPath = normalizedPath;
+		while ((dirPath = normalizedPath.substring(0, dirPath.lastIndexOf('/'))) !== '') {
 			this.directories.add(dirPath);
 		}
 	}
@@ -261,7 +273,9 @@ export class FSMock {
 	 * 添加模擬目錄
 	 */
 	public addDirectory(path: string): void {
-		this.directories.add(path);
+		// Normalize all paths to forward slashes for consistent storage
+		const normalizedPath = path.replace(/\\/g, '/');
+		this.directories.add(normalizedPath);
 	}
 
 	/**
@@ -270,45 +284,63 @@ export class FSMock {
 	public get promises() {
 		return {
 			readFile: async (path: string, encoding?: BufferEncoding) => {
-				if (this.files.has(path)) {
-					return this.files.get(path);
+				// Normalize Windows backslashes to forward slashes
+				const normalizedPath = path.replace(/\\/g, '/');
+				if (this.files.has(normalizedPath)) {
+					return this.files.get(normalizedPath);
 				}
 				throw new Error(`ENOENT: no such file or directory, open '${path}'`);
 			},
 			writeFile: async (path: string, content: string) => {
-				this.files.set(path, content);
+				// Normalize Windows backslashes to forward slashes
+				const normalizedPath = path.replace(/\\/g, '/');
+				this.files.set(normalizedPath, content);
 			},
 			mkdir: async (path: string, options?: any) => {
-				this.directories.add(path);
-				return path;
+				// Normalize Windows backslashes to forward slashes
+				const normalizedPath = path.replace(/\\/g, '/');
+				this.directories.add(normalizedPath);
+				return normalizedPath;
 			},
 			readdir: async (path: string) => {
 				return this.readdirSync(path);
 			},
 			unlink: async (path: string) => {
-				if (this.files.has(path)) {
-					this.files.delete(path);
+				// Normalize Windows backslashes to forward slashes
+				const normalizedPath = path.replace(/\\/g, '/');
+				if (this.files.has(normalizedPath)) {
+					this.files.delete(normalizedPath);
+					this._fileMetadata.delete(normalizedPath);
 					return true;
 				}
 				throw new Error(`ENOENT: no such file or directory, unlink '${path}'`);
 			},
 			copyFile: async (src: string, dest: string) => {
-				if (this.files.has(src)) {
-					this.files.set(dest, this.files.get(src)!);
+				// Normalize Windows backslashes to forward slashes
+				const normalizedSrc = src.replace(/\\/g, '/');
+				const normalizedDest = dest.replace(/\\/g, '/');
+				if (this.files.has(normalizedSrc)) {
+					this.files.set(normalizedDest, this.files.get(normalizedSrc)!);
 					return true;
 				}
 				throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
 			},
 			stat: async (path: string) => {
-				if (this.files.has(path)) {
-					return {
-						isFile: () => true,
-						isDirectory: () => false,
-						size: this.files.get(path)!.length,
+				// Normalize Windows backslashes to forward slashes
+				const normalizedPath = path.replace(/\\/g, '/');
+				if (this.files.has(normalizedPath)) {
+					const metadata = this._fileMetadata.get(normalizedPath) || {
 						mtime: new Date(),
 						ctime: new Date(),
 					};
-				} else if (this.directories.has(path)) {
+					return {
+						isFile: () => true,
+						isDirectory: () => false,
+						size: this.files.get(normalizedPath)!.length,
+						mtime: metadata.mtime,
+						ctime: metadata.ctime,
+					};
+				} else if (this.directories.has(normalizedPath)) {
 					return {
 						isFile: () => false,
 						isDirectory: () => true,
@@ -325,22 +357,44 @@ export class FSMock {
 	 * 模擬 statSync
 	 */
 	public statSync = sinon.stub().callsFake((path: string) => {
-		if (this.files.has(path)) {
+		// 正規化路徑
+		const normalizedPath = path.replace(/\\/g, '/');
+
+		if (this.files.has(normalizedPath)) {
+			const metadata = this._fileMetadata.get(normalizedPath) || {
+				mtime: new Date(),
+				ctime: new Date(),
+			};
 			return {
 				isFile: () => true,
 				isDirectory: () => false,
+				size: this.files.get(normalizedPath)!.length,
+				mtime: metadata.mtime,
+				ctime: metadata.ctime,
 			};
 		}
 
-		if (this.directories.has(path)) {
+		if (this.directories.has(normalizedPath)) {
 			return {
 				isFile: () => false,
 				isDirectory: () => true,
+				size: 0,
+				mtime: new Date(),
+				ctime: new Date(),
 			};
 		}
 
 		throw new Error(`ENOENT: no such file or directory, stat '${path}'`);
 	});
+
+	/**
+	 * 清空所有模擬檔案和目錄
+	 */
+	public reset(): void {
+		this.files.clear();
+		this._fileMetadata.clear();
+		this.directories.clear();
+	}
 
 	/**
 	 * 獲取 mock 狀態（用於測試斷言）
@@ -357,14 +411,5 @@ export class FSMock {
 				readdir: this.readdirSync.callCount,
 			},
 		};
-	}
-
-	/**
-	 * 重置模擬狀態
-	 */
-	public reset(): void {
-		this.files.clear();
-		this.directories.clear();
-		sinon.resetHistory();
 	}
 }

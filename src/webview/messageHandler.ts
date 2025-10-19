@@ -153,9 +153,10 @@ export class WebViewMessageHandler {
 	/**
 	 * 處理更新程式碼訊息
 	 * @param message 更新程式碼訊息物件
-	 */ private async handleUpdateCode(message: any): Promise<void> {
+	 */
+	private async handleUpdateCode(message: any): Promise<void> {
 		try {
-			const workspaceFolders = vscode.workspace.workspaceFolders;
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
 				const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 				const openFolderBtn = await this.localeService.getLocalizedMessage('VSCODE_OPEN_FOLDER');
@@ -201,7 +202,7 @@ export class WebViewMessageHandler {
 	 */
 	private async handleUpdateBoard(message: any): Promise<void> {
 		try {
-			const workspaceFolders = vscode.workspace.workspaceFolders;
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
 				const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 				const openFolderBtn = await this.localeService.getLocalizedMessage('VSCODE_OPEN_FOLDER');
@@ -795,8 +796,8 @@ export class WebViewMessageHandler {
 			const blocklyDir = 'blockly';
 			const backupDir = path.join(blocklyDir, 'backup');
 			const backupPath = path.join(backupDir, `${message.name}.json`);
-			// 修正路徑構建，完整路徑應為 {workspace}/blockly/backup/{filename}.json
-			const fullBackupPath = path.join(vscode.workspace.workspaceFolders![0].uri.fsPath, backupPath);
+			// 修正路徑構建,完整路徑應為 {workspace}/blockly/backup/{filename}.json
+			const fullBackupPath = path.join(vscodeApi.workspace.workspaceFolders![0].uri.fsPath, backupPath);
 
 			// 檢查備份檔案是否存在
 			if (!this.fileService.fileExists(backupPath)) {

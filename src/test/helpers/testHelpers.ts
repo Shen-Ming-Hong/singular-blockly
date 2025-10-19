@@ -47,6 +47,7 @@ import { VSCodeMock, FSMock } from './mocks';
  * The instance is isolated from the real filesystem.
  *
  * @param fsMock - FSMock instance with configured test data
+ * @param workspacePath - Optional workspace path (defaults to '/workspace')
  * @returns FileService instance using the provided mock
  *
  * @example
@@ -54,12 +55,26 @@ import { VSCodeMock, FSMock } from './mocks';
  * const fsMock = new FSMock();
  * fsMock.addFile('/workspace/test.json', '{"key": "value"}');
  * const fileService = createIsolatedFileService(fsMock);
- * const data = await fileService.readJsonFile('/workspace/test.json');
+ * const data = await fileService.readJsonFile('test.json', {});
  * ```
  */
-export function createIsolatedFileService(fsMock: FSMock): any {
-	// TODO: Implement after T019 (FileService._setFileSystem)
-	throw new Error('Not implemented - requires FileService._setFileSystem() injection point');
+export function createIsolatedFileService(fsMock: FSMock, workspacePath: string = '/workspace'): any {
+	// Validate mock before creating instance
+	if (!fsMock) {
+		throw new Error(
+			'FSMock is null or undefined.\n' +
+				'Remediation: Create FSMock instance:\n' +
+				'  const fsMock = new FSMock();\n' +
+				'  fsMock.addFile("/workspace/file.txt", "content");\n' +
+				'See quickstart.md for FSMock usage examples.'
+		);
+	}
+
+	// Import FileService dynamically to avoid circular dependencies
+	const { FileService } = require('../../services/fileService');
+
+	// FileService already supports constructor-based DI
+	return new FileService(workspacePath, fsMock);
 }
 
 /**
@@ -69,19 +84,45 @@ export function createIsolatedFileService(fsMock: FSMock): any {
  *
  * @param vscodeMock - VSCodeMock instance with configured workspace
  * @param fileService - FileService instance (can be real or mocked)
+ * @param workspacePath - Optional workspace path (defaults to fileService's workspacePath)
  * @returns SettingsManager instance using the provided mocks
  *
  * @example
  * ```typescript
  * const vscodeMock = new VSCodeMock();
  * vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/workspace' } }];
- * const fileService = createIsolatedFileService(new FSMock());
+ * const fsMock = new FSMock();
+ * const fileService = createIsolatedFileService(fsMock, '/workspace');
  * const settingsManager = createIsolatedSettingsManager(vscodeMock, fileService);
  * ```
  */
-export function createIsolatedSettingsManager(vscodeMock: VSCodeMock, fileService: any): any {
-	// TODO: Implement after T020 (SettingsManager._setVSCodeApi and _setFileService)
-	throw new Error('Not implemented - requires SettingsManager DI methods');
+export function createIsolatedSettingsManager(vscodeMock: VSCodeMock, fileService: any, workspacePath: string = '/workspace'): any {
+	// Validate mocks before creating instance
+	if (!vscodeMock) {
+		throw new Error(
+			'VSCodeMock is null or undefined.\n' +
+				'Remediation: Create VSCodeMock instance:\n' +
+				'  const vscodeMock = new VSCodeMock();\n' +
+				'  vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: "/workspace" } }];\n' +
+				'See quickstart.md for VSCodeMock usage examples.'
+		);
+	}
+
+	validateFileServiceMock(fileService);
+
+	// Import SettingsManager dynamically to avoid circular dependencies
+	const { SettingsManager } = require('../../services/settingsManager');
+
+	// SettingsManager constructor accepts workspacePath
+	// It will internally create its own FileService
+	// For testing, we need to inject the fileService after construction
+	const manager = new SettingsManager(workspacePath);
+
+	// Replace the internal fileService with our mock
+	// @ts-ignore - Accessing private property for testing
+	manager.fileService = fileService;
+
+	return manager;
 }
 
 /**
@@ -90,7 +131,8 @@ export function createIsolatedSettingsManager(vscodeMock: VSCodeMock, fileServic
  * Creates a LocaleService instance with injected VSCode API and FileService mocks.
  *
  * @param vscodeMock - VSCodeMock instance with configured language
- * @param fileService - FileService instance with locale files
+ * @param fsMock - FSMock instance with locale files
+ * @param extensionPath - Extension root path (defaults to '/extension')
  * @returns LocaleService instance using the provided mocks
  *
  * @example
@@ -98,14 +140,37 @@ export function createIsolatedSettingsManager(vscodeMock: VSCodeMock, fileServic
  * const vscodeMock = new VSCodeMock();
  * vscodeMock.env.language = 'zh-hant';
  * const fsMock = new FSMock();
- * fsMock.addFile('/locales/zh-hant/messages.js', 'module.exports = {...}');
- * const fileService = createIsolatedFileService(fsMock);
- * const localeService = createIsolatedLocaleService(vscodeMock, fileService);
+ * fsMock.addFile('/extension/media/locales/zh-hant/messages.js', 'module.exports = {...}');
+ * const localeService = createIsolatedLocaleService(vscodeMock, fsMock);
  * ```
  */
-export function createIsolatedLocaleService(vscodeMock: VSCodeMock, fileService: any): any {
-	// TODO: Implement after T021 (LocaleService._setVSCodeApi and _setFileService)
-	throw new Error('Not implemented - requires LocaleService DI methods');
+export function createIsolatedLocaleService(vscodeMock: VSCodeMock, fsMock: FSMock, extensionPath: string = '/extension'): any {
+	// Validate mocks before creating instance
+	if (!vscodeMock) {
+		throw new Error(
+			'VSCodeMock is null or undefined.\n' +
+				'Remediation: Create VSCodeMock instance:\n' +
+				'  const vscodeMock = new VSCodeMock();\n' +
+				'  vscodeMock.env.language = "en";\n' +
+				'See quickstart.md for VSCodeMock usage examples.'
+		);
+	}
+
+	if (!fsMock) {
+		throw new Error(
+			'FSMock is null or undefined.\n' +
+				'Remediation: Create FSMock instance:\n' +
+				'  const fsMock = new FSMock();\n' +
+				'  fsMock.addFile("/extension/media/locales/en/messages.js", "module.exports = {...}");\n' +
+				'See quickstart.md for FSMock usage examples.'
+		);
+	}
+
+	// Import LocaleService dynamically to avoid circular dependencies
+	const { LocaleService } = require('../../services/localeService');
+
+	// LocaleService already supports constructor-based DI
+	return new LocaleService(extensionPath, fsMock, vscodeMock);
 }
 
 /**
@@ -115,6 +180,7 @@ export function createIsolatedLocaleService(vscodeMock: VSCodeMock, fileService:
  * Automatically validates the WebView mock configuration before creating the instance.
  *
  * @param vscodeMock - VSCodeMock instance with configured webview panel
+ * @param localeService - LocaleService instance for i18n support
  * @param fileService - FileService instance with HTML template files
  * @param extensionPath - Extension root path for resource loading
  * @returns WebViewManager instance using the provided mocks
@@ -125,18 +191,50 @@ export function createIsolatedLocaleService(vscodeMock: VSCodeMock, fileService:
  * vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/workspace' } }];
  * const fsMock = new FSMock();
  * fsMock.addFile('/extension/media/html/blocklyEdit.html', '<html>...</html>');
- * const fileService = createIsolatedFileService(fsMock);
- * const manager = createIsolatedWebViewManager(vscodeMock, fileService, '/extension');
+ * const fileService = createIsolatedFileService(fsMock, '/workspace');
+ * const localeService = createIsolatedLocaleService(vscodeMock, fsMock, '/extension');
+ * const manager = createIsolatedWebViewManager(vscodeMock, localeService, fileService, '/extension');
  * ```
  */
-export function createIsolatedWebViewManager(vscodeMock: VSCodeMock, fileService: any, extensionPath: string): any {
+export function createIsolatedWebViewManager(vscodeMock: VSCodeMock, localeService: any, fileService: any, extensionPath: string): any {
 	// Validate webview mock before creating instance
 	validateWebViewMock(vscodeMock);
+	validateFileServiceMock(fileService);
 
-	// TODO: Implement after T009-T010 (WebViewManager._setVSCodeApi and _setFileService)
-	throw new Error('Not implemented - requires WebViewManager DI methods');
+	if (!localeService) {
+		throw new Error(
+			'LocaleService is null or undefined.\n' +
+				'Remediation: Create LocaleService instance:\n' +
+				'  const localeService = createIsolatedLocaleService(vscodeMock, fsMock, extensionPath);\n' +
+				'See quickstart.md for LocaleService usage examples.'
+		);
+	}
+
+	// Import WebViewManager and related functions using named imports
+	const webviewModule = require('../../webview/webviewManager');
+	const { WebViewManager, _setVSCodeApi } = webviewModule;
+
+	// Set the VSCode API before creating the manager
+	_setVSCodeApi(vscodeMock);
+
+	// Create mock ExtensionContext
+	const mockContext: any = {
+		extensionPath,
+		subscriptions: [],
+		workspaceState: {
+			get: () => undefined,
+			update: () => Promise.resolve(),
+		},
+		globalState: {
+			get: () => undefined,
+			update: () => Promise.resolve(),
+		},
+		extensionUri: { fsPath: extensionPath },
+	};
+
+	// WebViewManager already supports constructor-based DI for localeService and fileService
+	return new WebViewManager(mockContext, localeService, fileService);
 }
-
 /**
  * T017: Validate FileService mock configuration
  *

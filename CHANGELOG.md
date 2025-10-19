@@ -18,6 +18,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+## [0.36.0] - 2025-10-19
+
+### 新增 Added
+
+-   新增 63 個高品質測試,大幅提升測試覆蓋率
+    Added 63 high-quality tests, significantly improved test coverage
+    -   SettingsManager 進階測試 (20 個): syncLibraryDeps, syncPlatformIOSettings, 錯誤處理
+        SettingsManager advanced tests (20 tests): syncLibraryDeps, syncPlatformIOSettings, error handling
+    -   MessageHandler 錯誤處理測試 (25 個): catch blocks, 驗證邏輯, 邊界案例
+        MessageHandler error handling tests (25 tests): catch blocks, validation logic, edge cases
+    -   WebViewManager 進階測試 (8 個): 臨時檔案清理, 錯誤處理, HTML 內容生成
+        WebViewManager advanced tests (8 tests): temp file cleanup, error handling, HTML content generation
+    -   Extension.ts 錯誤處理測試 (10 個): previewBackup, toggleTheme, openBlocklyEdit 錯誤場景
+        Extension.ts error handling tests (10 tests): previewBackup, toggleTheme, openBlocklyEdit error scenarios
+-   新增測試工具模組 (Test Helpers): 隔離服務建立、Mock 驗證函式
+    Added test helper modules: isolated service creation, mock validation functions
+-   新增完整專案文件: COMPLETION-REPORT.md (測試覆蓋率優化專案完成報告)
+    Added comprehensive project documentation: COMPLETION-REPORT.md (test coverage improvement project completion report)
+
+### 已修復 Fixed
+
+-   修正 3 個測試失敗問題: API 方法錯誤、command 名稱不符、非同步回調處理
+    Fixed 3 test failures: API method errors, command name mismatches, async callback handling
+-   修正 5 個 TypeScript 編譯錯誤: 型別不匹配、私有方法存取、檔案 metadata 格式
+    Fixed 5 TypeScript compilation errors: type mismatches, private method access, file metadata format
+
+### 已更新 Updated
+
+-   測試覆蓋率從 83.09% 提升至 87.21% (+4.12%)
+    Test coverage improved from 83.09% to 87.21% (+4.12%)
+    -   Statement coverage: 87.21% (3330/3818 lines)
+    -   Branch coverage: 83.78% (429/512 branches, +12.42%)
+    -   Function coverage: 89.68% (113/126 functions, +7.94%)
+-   核心服務測試覆蓋率達 94.08%: FileService 97.85%, SettingsManager 92.65%, LocaleService 90.67%
+    Core services test coverage reached 94.08%: FileService 97.85%, SettingsManager 92.65%, LocaleService 90.67%
+-   測試執行時間優化至 <3 秒 (從 ~5 秒優化 40%)
+    Test execution time optimized to <3 seconds (40% improvement from ~5 seconds)
+-   測試數量從 127 個增加至 190 個 (+63 tests, +49.6%)
+    Test count increased from 127 to 190 (+63 tests, +49.6%)
+
+### 已修改 Changed
+
+-   重構測試架構: 統一 Mock 管理策略, 改善測試可維護性
+    Refactored test architecture: unified mock management strategy, improved test maintainability
+-   優化測試 setup/teardown 模式: 更清晰的測試結構
+    Optimized test setup/teardown patterns: clearer test structure
+
 ## [0.35.0] - 2025-10-18
 
 ### 新增 Added
