@@ -4,24 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-// @ts-nocheck
-/* 暫時禁用 TypeScript 型別檢查，以便測試能夠執行
- * 這是一個臨時措施，在後續重構中應當逐步解決型別問題
- */
-
 import assert = require('assert');
 import * as sinon from 'sinon';
 import * as path from 'path';
-import * as fs from 'fs';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import { LocaleService } from '../services/localeService';
-import { VSCodeMock, FSMock } from './helpers/mocks';
+import { VSCodeMock, FSMock, createIsolatedLocaleService } from './helpers';
 
 describe('Locale Service', () => {
-	let fsServiceMock: any;
 	let fsMock: FSMock;
 	let vscodeMock: VSCodeMock;
-	let originalVscode: any;
 	let localeService: LocaleService;
 	const extensionPath = '/mock/extension';
 	const enMessagesContent = `
@@ -39,33 +31,11 @@ describe('Locale Service', () => {
         Blockly.Msg['VSCODE_OPEN_BLOCKLY_EDITOR'] = '開啟 Blockly 編輯器';
     `;
 
-	// 在每個測試之前設置環境
+	// 在每個測試之前設置環境 - 使用測試輔助函數簡化設置 (T024)
 	beforeEach(() => {
-		// 備份原始 vscode 模組
-		originalVscode = (global as any).vscode;
-
-		// 準備 vscode 模擬物件
+		fsMock = new FSMock();
 		vscodeMock = new VSCodeMock();
 		vscodeMock.env.language = 'en';
-
-		// 替換全域的 vscode 為模擬物件
-		(global as any).vscode = vscodeMock;
-
-		// 建立檔案系統模擬
-		fsMock = new FSMock();
-		// 替換原始的 fs 模組
-		fsServiceMock = {
-			promises: fsMock.promises,
-			existsSync: fsMock.existsSync,
-			statSync: fsMock.statSync,
-			readFileSync: fsMock.readFileSync,
-		};
-
-		// 直接將 fs 模組設為模擬物件
-		const fsModule = require.cache[require.resolve('fs')];
-		if (fsModule) {
-			fsModule.exports = fsServiceMock;
-		}
 
 		// 添加測試語言檔案
 		const enPath = path.join(extensionPath, 'media/locales/en/messages.js');
@@ -78,15 +48,12 @@ describe('Locale Service', () => {
 		fsMock.addDirectory(path.join(extensionPath, 'media/locales/en'));
 		fsMock.addDirectory(path.join(extensionPath, 'media/locales/zh-hant'));
 
-		// 初始化多語言服務，注入 fs mock 和 vscode mock
-		localeService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
+		// 使用測試輔助函數建立 LocaleService
+		localeService = createIsolatedLocaleService(vscodeMock, fsMock, extensionPath);
 	});
 
 	// 在每個測試之後還原環境
 	afterEach(() => {
-		// 還原原始的 vscode 模組
-		(global as any).vscode = originalVscode;
-
 		// 清理
 		sinon.restore();
 		fsMock.reset();
@@ -99,7 +66,7 @@ describe('Locale Service', () => {
 
 		// 測試設置不同的語言
 		vscodeMock.env.language = 'zh-tw';
-		const zhLocaleService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
+		const zhLocaleService = createIsolatedLocaleService(vscodeMock, fsMock, extensionPath);
 		// zh-tw 會被映射到 zh-hant
 		assert.strictEqual(zhLocaleService.getCurrentLanguage(), 'zh-hant');
 	});
@@ -173,8 +140,8 @@ describe('Locale Service', () => {
 		// 首次載入
 		await localeService.loadUIMessages();
 
-		// 設置監視器
-		const readFileSpy = sinon.spy(fsServiceMock.promises, 'readFile');
+		// 設置監視器 - 監視 fsMock 的 readFile 方法
+		const readFileSpy = sinon.spy(fsMock.promises, 'readFile');
 
 		// 再次載入
 		await localeService.loadUIMessages();
@@ -186,9 +153,9 @@ describe('Locale Service', () => {
 	it('should fallback to English if language file not found', async () => {
 		// 設置一個不存在語言檔案的環境
 		vscodeMock.env.language = 'es'; // 設置為西班牙語
-		const noFileLocaleService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
+		const noFileLocaleService = createIsolatedLocaleService(vscodeMock, fsMock, extensionPath);
 
-		// 測試訊息載入（西班牙語檔案不存在，應回退到英文）
+		// 測試訊息載入（西班牙語檔案不存在,應回退到英文）
 		const messages = await noFileLocaleService.loadUIMessages();
 
 		// 驗證回退到英文
