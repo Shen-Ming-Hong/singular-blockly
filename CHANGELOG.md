@@ -125,8 +125,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 文檔 Documentation
 
--   新增 TEST-FRAMEWORK-FIX-PROGRESS.md：記錄測試框架修復過程
-    Added TEST-FRAMEWORK-FIX-PROGRESS.md: documents test framework fix process
+-   新增 specs/004-test-coverage-improvement/TEST-FRAMEWORK-FIX-PROGRESS.md：記錄測試框架修復過程
+    Added specs/004-test-coverage-improvement/TEST-FRAMEWORK-FIX-PROGRESS.md: documents test framework fix process
 -   更新 specs/003-huskylens-blocks-validation/tasks.md：完整任務追蹤與狀態記錄
     Updated specs/003-huskylens-blocks-validation/tasks.md: complete task tracking and status records
 
