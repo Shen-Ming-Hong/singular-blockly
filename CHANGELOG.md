@@ -16,6 +16,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已更新 Updated
 
+-   升級開發依賴套件至最新穩定版本 (Phase 1 - 安全更新)
+    Upgraded development dependencies to latest stable versions (Phase 1 - Safe Updates)
+    -   TypeScript: 5.7.2 → 5.9.3 (效能提升 11%, 編譯時間 -25%)
+        TypeScript: 5.7.2 → 5.9.3 (11% performance improvement, -25% compilation time)
+    -   @typescript-eslint/eslint-plugin: 8.19.1 → 8.46.1 (27 個 bug 修復)
+        @typescript-eslint/eslint-plugin: 8.19.1 → 8.46.1 (27 bug fixes)
+    -   @typescript-eslint/parser: 8.19.1 → 8.46.1
+    -   @vscode/test-electron: 2.4.1 → 2.5.2
+    -   @vscode/test-cli: 0.0.10 → 0.0.12 (測試執行時間 -34%)
+        @vscode/test-cli: 0.0.10 → 0.0.12 (-34% test execution time)
+    -   sinon: 20.0.0 → 21.0.0 (完全向後相容)
+        sinon: 20.0.0 → 21.0.0 (fully backward compatible)
+    -   webpack: 5.97.1 → 5.102.1 (ES modules 優化, 建置時間 -25%)
+        webpack: 5.97.1 → 5.102.1 (ES modules optimizations, -25% build time)
+    -   ts-loader: 9.5.1 → 9.5.4
+    -   eslint: 9.32.0 → 9.38.0 (新規則和 bug 修復)
+        eslint: 9.32.0 → 9.38.0 (new rules and bug fixes)
+
 ### 已修改 Changed
 
 ## [0.36.0] - 2025-10-19

@@ -1,0 +1,13 @@
+{
+  "task": "T007",
+  "name": "Unit test baseline check",
+  "status": "PASS_WITH_NOTE",
+  "timestamp": "2025-10-20T12:06:35Z",
+  "result": {
+    "totalTests": 191,
+    "passing": 190,
+    "failing": 1,
+    "failedTest": "WebView Manager - should process HTML content with correct replacements",
+    "note": "Pre-existing test failure (architecture issue in test mock setup, not related to dependency versions). Upgrade success criterion: maintain 190 passing, 1 failing (no new failures introduced)."
+  }
+}
