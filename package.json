@@ -87,7 +87,7 @@
 	},
 	"devDependencies": {
 		"@types/mocha": "^10.0.10",
-		"@types/node": "20.x",
+		"@types/node": "^20.19.22",
 		"@types/sinon": "^17.0.4",
 		"@types/vscode": "^1.96.0",
 		"@typescript-eslint/eslint-plugin": "^8.46.1",
@@ -105,7 +105,7 @@
 		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
-		"@blockly/theme-modern": "^6.0.10",
+		"@blockly/theme-modern": "^6.0.12",
 		"form-data": "^4.0.4"
 	},
 	"extensionDependencies": [
