@@ -17,7 +17,7 @@
     "T039_devBuild": "PASS (extension.js + source map verified)",
     "T040_prodBuild": "PASS (0 warnings)",
     "T041_bundleSize": "EXCELLENT (130,506 bytes, 0% change)",
-    "T042_buildTime": "EXCELLENT (-25.22% improvement, 6.1s  4.6s)",
+    "T042_buildTime": "EXCELLENT (-25.22% improvement, 6.1s → 4.6s)",
     "T043_unitTests": "PASS (190/191, baseline maintained)",
     "T044_compilation": "PASS (0 new errors)"
   },
