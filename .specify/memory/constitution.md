@@ -134,6 +134,7 @@ Code MUST strive for 100% test coverage with safe, maintainable test design. Thi
 **Rationale**: High test coverage ensures code reliability and catches regressions early. Avoiding untestable patterns (like infinite event listeners without escape conditions) prevents test suite failures and makes the codebase more maintainable. Well-designed tests serve as living documentation and enable confident refactoring.
 
 **UI Testing Exception**: WebView interactive features (Blockly editor) are permitted to use manual testing as specified in feature specifications, provided that:
+
 -   Manual test scenarios are explicitly documented in the feature specification
 -   Manual tests are executed and results recorded after each significant change
 -   The complexity and ROI of automating WebView tests (requiring Playwright/WebdriverIO setup) outweigh the benefits for the specific feature
