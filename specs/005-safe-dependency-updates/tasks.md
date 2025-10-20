@@ -24,22 +24,22 @@
 **Tasks**:
 
 -   [ ] **T001** 驗證 Node.js 版本 >= 20.x 和 npm >= 10.x  
-        **Files**: N/A (command line check)  
-        **Command**: `node --version && npm --version`  
-        **Success**: Node v20.x.x+ and npm 10.x.x+
+         **Files**: N/A (command line check)  
+         **Command**: `node --version && npm --version`  
+         **Success**: Node v20.x.x+ and npm 10.x.x+
 
 -   [ ] **T002** 確認 Git 工作目錄乾淨且在正確分支  
-        **Files**: N/A  
-        **Command**: `git status` and `git branch`  
-        **Success**: On branch `005-safe-dependency-updates`, no uncommitted changes
+         **Files**: N/A  
+         **Command**: `git status` and `git branch`  
+         **Success**: On branch `005-safe-dependency-updates`, no uncommitted changes
 
 -   [ ] **T003** 執行 `npm list --depth=0` 確認當前依賴完整  
-        **Files**: `package.json`, `package-lock.json`  
-        **Success**: No missing dependencies, all packages listed
+         **Files**: `package.json`, `package-lock.json`  
+         **Success**: No missing dependencies, all packages listed
 
 -   [ ] **T004** 建立效能基準 - 記錄編譯時間、測試時間、產出檔案大小  
-        **Files**: `specs/005-safe-dependency-updates/data/performance-baseline.json`  
-        **Commands**:
+         **Files**: `specs/005-safe-dependency-updates/data/performance-baseline.json`  
+         **Commands**:
 
     -   `Measure-Command { npm run compile }` → record compilation duration
     -   `Measure-Command { npm test }` → record testing duration
@@ -48,13 +48,13 @@
         **Success**: JSON file created with all baseline metrics
 
 -   [ ] **T004a** 執行完整測試套件建立功能基準  
-        **Files**: `specs/005-safe-dependency-updates/data/baseline-test-results.json`  
-        **Command**: `npm test -- --reporter json > specs/005-safe-dependency-updates/data/baseline-test-results.json`  
-        **Success**: 所有 63 個測試名稱、狀態和執行時間記錄於 JSON 檔案  
-        **Note**: 此功能基準用於升級後比對測試案例是否有新增失敗或執行時間異常
+         **Files**: `specs/005-safe-dependency-updates/data/baseline-test-results.json`  
+         **Command**: `npm test -- --reporter json > specs/005-safe-dependency-updates/data/baseline-test-results.json`  
+         **Success**: 所有 63 個測試名稱、狀態和執行時間記錄於 JSON 檔案  
+         **Note**: 此功能基準用於升級後比對測試案例是否有新增失敗或執行時間異常
 
 -   [ ] **T005** 創建升級追蹤日誌檔案結構  
-        **Files**:
+         **Files**:
     -   `specs/005-safe-dependency-updates/data/upgrade-log.json` (empty array)
     -   `specs/005-safe-dependency-updates/data/validation-results/` (directory)
     -   `specs/005-safe-dependency-updates/data/build-artifacts/` (directory)  
@@ -71,44 +71,44 @@
 **Tasks**:
 
 -   [ ] **T006** [P] 執行 TypeScript 編譯基準檢查  
-        **Files**: N/A  
-        **Command**: `npx tsc --noEmit`  
-        **Success**: Exit code 0, no type errors  
-        **Checkpoint**: `compilation-check` (contracts/upgrade-validation-contract.yaml)
+         **Files**: N/A  
+         **Command**: `npx tsc --noEmit`  
+         **Success**: Exit code 0, no type errors  
+         **Checkpoint**: `compilation-check` (contracts/upgrade-validation-contract.yaml)
 
 -   [ ] **T007** [P] 執行單元測試基準檢查  
-        **Files**: N/A  
-        **Command**: `npm test`  
-        **Success**: All 63 tests pass, 100% pass rate  
-        **Checkpoint**: `unit-test-check`
+         **Files**: N/A  
+         **Command**: `npm test`  
+         **Success**: All 63 tests pass, 100% pass rate  
+         **Checkpoint**: `unit-test-check`
 
 -   [ ] **T008** [P] 執行測試覆蓋率基準檢查  
-        **Files**: `coverage/` (generated)  
-        **Command**: `npm run test:coverage`  
-        **Success**: >= 87.21% coverage (lines, statements)  
-        **Checkpoint**: `coverage-check`
+         **Files**: `coverage/` (generated)  
+         **Command**: `npm run test:coverage`  
+         **Success**: >= 87.21% coverage (lines, statements)  
+         **Checkpoint**: `coverage-check`
 
 -   [ ] **T009** [P] 執行 ESLint 基準檢查  
-        **Files**: N/A  
-        **Command**: `npm run lint`  
-        **Success**: Exit code 0, <= 10 warnings  
-        **Checkpoint**: `lint-check`
+         **Files**: N/A  
+         **Command**: `npm run lint`  
+         **Success**: Exit code 0, <= 10 warnings  
+         **Checkpoint**: `lint-check`
 
 -   [ ] **T010** [P] 執行開發建置基準檢查  
-        **Files**: `dist/extension.js`, `dist/extension.js.map`  
-        **Command**: `npm run compile`  
-        **Success**: Build succeeds, files generated  
-        **Checkpoint**: `dev-build-check`
+         **Files**: `dist/extension.js`, `dist/extension.js.map`  
+         **Command**: `npm run compile`  
+         **Success**: Build succeeds, files generated  
+         **Checkpoint**: `dev-build-check`
 
 -   [ ] **T011** [P] 執行生產建置基準檢查  
-        **Files**: `dist/extension.js`  
-        **Command**: `npm run package`  
-        **Success**: Build succeeds, 0 warnings  
-        **Checkpoint**: `prod-build-check`
+         **Files**: `dist/extension.js`  
+         **Command**: `npm run package`  
+         **Success**: Build succeeds, 0 warnings  
+         **Checkpoint**: `prod-build-check`
 
 -   [ ] **T012** 記錄基準驗證結果  
-        **Files**: `specs/005-safe-dependency-updates/data/validation-results/baseline-validation.json`  
-        **Success**: All 6 checkpoints recorded with status, duration, metrics
+         **Files**: `specs/005-safe-dependency-updates/data/validation-results/baseline-validation.json`  
+         **Success**: All 6 checkpoints recorded with status, duration, metrics
 
 **Parallel Opportunities**: T006-T011 可並行執行 (6 個檢查點獨立)
 
@@ -128,83 +128,83 @@
 ### Subtask 1: 升級 TypeScript
 
 -   [ ] **T013** [P1] [US1] 升級 TypeScript 到 5.9.3  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `npm update typescript@5.9.3`  
-        **Success**: `npm list typescript` shows 5.9.3
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `npm update typescript@5.9.3`  
+         **Success**: `npm list typescript` shows 5.9.3
 
 -   [ ] **T014** [P1] [US1] 記錄 TypeScript 升級到日誌  
-        **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
-        **Action**: Append ChangeLogEntry (action: upgrade-started, packageName: typescript)  
-        **Success**: JSON entry created with timestamp, beforeState, afterState
+         **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
+         **Action**: Append ChangeLogEntry (action: upgrade-started, packageName: typescript)  
+         **Success**: JSON entry created with timestamp, beforeState, afterState
 
 -   [ ] **T015** [P1] [US1] 執行 TypeScript 編譯驗證  
-        **Files**: N/A  
-        **Command**: `npx tsc --noEmit`  
-        **Success**: Exit code 0, no "ArrayBuffer" type errors  
-        **Checkpoint**: `compilation-check` (post-typescript-upgrade stage)  
-        **Note**: 此任務必須先於 T016 和 T017 執行,編譯失敗則後續建置無意義
+         **Files**: N/A  
+         **Command**: `npx tsc --noEmit`  
+         **Success**: Exit code 0, no "ArrayBuffer" type errors  
+         **Checkpoint**: `compilation-check` (post-typescript-upgrade stage)  
+         **Note**: 此任務必須先於 T016 和 T017 執行,編譯失敗則後續建置無意義
 
 -   [ ] **T016** [P1] [US1] 執行單元測試驗證 (TypeScript)  
-        **Files**: N/A  
-        **Command**: `npm test`  
-        **Success**: All 63 tests pass  
-        **Checkpoint**: `unit-test-check`  
-        **Prerequisite**: T015 compilation-check 通過
+         **Files**: N/A  
+         **Command**: `npm test`  
+         **Success**: All 63 tests pass  
+         **Checkpoint**: `unit-test-check`  
+         **Prerequisite**: T015 compilation-check 通過
 
 -   [ ] **T017** [P1] [US1] 執行開發建置驗證 (TypeScript)  
-        **Files**: `dist/extension.js`  
-        **Command**: `npm run compile`  
-        **Success**: Build succeeds, compare duration with baseline (≤ +10%)  
-        **Checkpoint**: `dev-build-check`  
-        **Prerequisite**: T015 compilation-check 通過
+         **Files**: `dist/extension.js`  
+         **Command**: `npm run compile`  
+         **Success**: Build succeeds, compare duration with baseline (≤ +10%)  
+         **Checkpoint**: `dev-build-check`  
+         **Prerequisite**: T015 compilation-check 通過
 
 -   [ ] **T018** [P1] [US1] 記錄 TypeScript 驗證結果  
-        **Files**: `specs/005-safe-dependency-updates/data/validation-results/typescript-5.9.3.json`  
-        **Success**: ValidationResult with all checks status, metrics (compilation, test, build)
+         **Files**: `specs/005-safe-dependency-updates/data/validation-results/typescript-5.9.3.json`  
+         **Success**: ValidationResult with all checks status, metrics (compilation, test, build)
 
 ### Subtask 2: 升級 @typescript-eslint
 
 -   [ ] **T019** [P1] [US1] 升級 @typescript-eslint packages 到 8.46.1  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `npm update @typescript-eslint/eslint-plugin@8.46.1 @typescript-eslint/parser@8.46.1`  
-        **Success**: Both packages at 8.46.1
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `npm update @typescript-eslint/eslint-plugin@8.46.1 @typescript-eslint/parser@8.46.1`  
+         **Success**: Both packages at 8.46.1
 
 -   [ ] **T020** [P1] [US1] 記錄 @typescript-eslint 升級到日誌  
-        **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
-        **Success**: 2 ChangeLogEntry records created
+         **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
+         **Success**: 2 ChangeLogEntry records created
 
 -   [ ] **T021** [P1] [US1] [P] 執行 TypeScript 編譯驗證  
-        **Command**: `npx tsc --noEmit`  
-        **Checkpoint**: `compilation-check` (post-typescript-eslint-upgrade stage)
+         **Command**: `npx tsc --noEmit`  
+         **Checkpoint**: `compilation-check` (post-typescript-eslint-upgrade stage)
 
 -   [ ] **T022** [P1] [US1] [P] 執行 ESLint 驗證  
-        **Files**: N/A  
-        **Command**: `npm run lint`  
-        **Success**: Exit code 0, no new errors, warnings documented  
-        **Checkpoint**: `lint-check`
+         **Files**: N/A  
+         **Command**: `npm run lint`  
+         **Success**: Exit code 0, no new errors, warnings documented  
+         **Checkpoint**: `lint-check`
 
 -   [ ] **T023** [P1] [US1] [P] 執行單元測試驗證  
-        **Command**: `npm test`  
-        **Checkpoint**: `unit-test-check`
+         **Command**: `npm test`  
+         **Checkpoint**: `unit-test-check`
 
 -   [ ] **T024** [P1] [US1] [P] 執行開發建置驗證  
-        **Command**: `npm run compile`  
-        **Checkpoint**: `dev-build-check`
+         **Command**: `npm run compile`  
+         **Checkpoint**: `dev-build-check`
 
 -   [ ] **T025** [P1] [US1] [P] 執行生產建置驗證  
-        **Files**: `dist/extension.js`  
-        **Command**: `npm run package`  
-        **Success**: 0 warnings, bundle size ±5%  
-        **Checkpoint**: `prod-build-check`
+         **Files**: `dist/extension.js`  
+         **Command**: `npm run package`  
+         **Success**: 0 warnings, bundle size ±5%  
+         **Checkpoint**: `prod-build-check`
 
 -   [ ] **T026** [P1] [US1] 記錄 @typescript-eslint 驗證結果  
-        **Files**: `specs/005-safe-dependency-updates/data/validation-results/typescript-eslint-8.46.1.json`  
-        **Success**: ValidationResult with all 5 checks
+         **Files**: `specs/005-safe-dependency-updates/data/validation-results/typescript-eslint-8.46.1.json`  
+         **Success**: ValidationResult with all 5 checks
 
 -   [ ] **T027** [P1] [US1] Git commit: TypeScript Ecosystem 升級  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `git add package.json package-lock.json && git commit -m "chore: upgrade TypeScript ecosystem to 5.9.3 and @typescript-eslint to 8.46.1"`  
-        **Success**: Commit created with descriptive message
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `git add package.json package-lock.json && git commit -m "chore: upgrade TypeScript ecosystem to 5.9.3 and @typescript-eslint to 8.46.1"`  
+         **Success**: Commit created with descriptive message
 
 **Parallel Opportunities**: T021-T025 可並行執行 (5 個驗證檢查點)
 
@@ -222,47 +222,47 @@
 **Tasks**:
 
 -   [ ] **T028** [P2] [US2] 升級測試框架套件 (3 packages 同時)  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `npm update @vscode/test-electron@2.5.2 @vscode/test-cli@0.0.12 sinon@21.0.0`  
-        **Success**: All 3 packages at target versions
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `npm update @vscode/test-electron@2.5.2 @vscode/test-cli@0.0.12 sinon@21.0.0`  
+         **Success**: All 3 packages at target versions
 
 -   [ ] **T029** [P2] [US2] 記錄測試框架升級到日誌  
-        **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
-        **Success**: 3 ChangeLogEntry records created
+         **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
+         **Success**: 3 ChangeLogEntry records created
 
 -   [ ] **T030** [P2] [US2] 執行單元測試驗證 - 特別留意 sinon API  
-        **Files**: N/A  
-        **Command**: `npm test`  
-        **Success**: All 63 tests pass, no sinon API errors  
-        **Checkpoint**: `unit-test-check` (post-testing-upgrade stage)  
-        **Note**: sinon 20→21 major version, verify mock/stub/spy functionality
+         **Files**: N/A  
+         **Command**: `npm test`  
+         **Success**: All 63 tests pass, no sinon API errors  
+         **Checkpoint**: `unit-test-check` (post-testing-upgrade stage)  
+         **Note**: sinon 20→21 major version, verify mock/stub/spy functionality
 
 -   [ ] **T031** [P2] [US2] 執行測試覆蓋率驗證  
-        **Files**: `coverage/`  
-        **Command**: `npm run test:coverage`  
-        **Success**: >= 87.21% coverage, delta within -0.5%  
-        **Checkpoint**: `coverage-check`
+         **Files**: `coverage/`  
+         **Command**: `npm run test:coverage`  
+         **Success**: >= 87.21% coverage, delta within -0.5%  
+         **Checkpoint**: `coverage-check`
 
 -   [ ] **T032** [P2] [US2] 測試執行時間比對  
-        **Files**: N/A  
-        **Command**: `Measure-Command { npm test }`  
-        **Success**: Duration increase ≤ 10% vs baseline  
-        **Metrics**: Record totalTests, passedTests, averageTestDuration
+         **Files**: N/A  
+         **Command**: `Measure-Command { npm test }`  
+         **Success**: Duration increase ≤ 10% vs baseline  
+         **Metrics**: Record totalTests, passedTests, averageTestDuration
 
 -   [ ] **T033** [P2] [US2] 驗證 @vscode/test-cli 功能  
-        **Files**: N/A  
-        **Command**: `npm test` (uses test-cli internally)  
-        **Success**: Test output format correct, no CLI errors  
-        **Note**: 0.0.x = experimental API, check for warnings
+         **Files**: N/A  
+         **Command**: `npm test` (uses test-cli internally)  
+         **Success**: Test output format correct, no CLI errors  
+         **Note**: 0.0.x = experimental API, check for warnings
 
 -   [ ] **T034** [P2] [US2] 記錄測試框架驗證結果  
-        **Files**: `specs/005-safe-dependency-updates/data/validation-results/testing-frameworks-upgrade.json`  
-        **Success**: ValidationResult with test + coverage checks
+         **Files**: `specs/005-safe-dependency-updates/data/validation-results/testing-frameworks-upgrade.json`  
+         **Success**: ValidationResult with test + coverage checks
 
 -   [ ] **T035** [P2] [US2] Git commit: Testing Frameworks 升級  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `git commit -m "chore: upgrade testing frameworks"`  
-        **Success**: Commit created
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `git commit -m "chore: upgrade testing frameworks"`  
+         **Success**: Commit created
 
 **Parallel Opportunities**: T030-T031 可獨立但建議順序執行 (測試優先,覆蓋率依賴測試成功)
 
@@ -280,35 +280,35 @@
 **Tasks**:
 
 -   [ ] **T036** [P3] [US3] 升級建置工具套件 (webpack + ts-loader 同步)  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `npm update webpack@5.102.1 ts-loader@9.5.4`  
-        **Success**: Both packages at target versions  
-        **Note**: webpack and ts-loader must upgrade together for compatibility
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `npm update webpack@5.102.1 ts-loader@9.5.4`  
+         **Success**: Both packages at target versions  
+         **Note**: webpack and ts-loader must upgrade together for compatibility
 
 -   [ ] **T037** [P3] [US3] 記錄建置工具升級到日誌  
-        **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
-        **Success**: 2 ChangeLogEntry records
+         **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
+         **Success**: 2 ChangeLogEntry records
 
 -   [ ] **T038** [P3] [US3] 清除舊建置產出  
-        **Files**: `dist/`, `out/`  
-        **Command**: `Remove-Item -Recurse -Force dist/, out/`  
-        **Success**: Directories removed (clean build environment)
+         **Files**: `dist/`, `out/`  
+         **Command**: `Remove-Item -Recurse -Force dist/, out/`  
+         **Success**: Directories removed (clean build environment)
 
 -   [ ] **T039** [P3] [US3] 執行開發建置驗證  
-        **Files**: `dist/extension.js`, `dist/extension.js.map`  
-        **Command**: `npm run compile`  
-        **Success**: Build succeeds, source map generated  
-        **Checkpoint**: `dev-build-check` (post-build-tools-upgrade stage)
+         **Files**: `dist/extension.js`, `dist/extension.js.map`  
+         **Command**: `npm run compile`  
+         **Success**: Build succeeds, source map generated  
+         **Checkpoint**: `dev-build-check` (post-build-tools-upgrade stage)
 
 -   [ ] **T040** [P3] [US3] 執行生產建置驗證  
-        **Files**: `dist/extension.js`  
-        **Command**: `npm run package`  
-        **Success**: 0 warnings, bundle optimization correct  
-        **Checkpoint**: `prod-build-check`
+         **Files**: `dist/extension.js`  
+         **Command**: `npm run package`  
+         **Success**: 0 warnings, bundle optimization correct  
+         **Checkpoint**: `prod-build-check`
 
 -   [ ] **T041** [P3] [US3] 建置產出大小和結構驗證  
-        **Files**: `dist/extension.js`, `dist/extension.js.map`  
-        **Commands**:
+         **Files**: `dist/extension.js`, `dist/extension.js.map`  
+         **Commands**:
 
     -   `Get-ChildItem dist/extension.js | Select-Object Length` → verify size
     -   `Test-Path dist/extension.js.map` → verify source map exists  
@@ -316,26 +316,26 @@
         **Metrics**: Record buildArtifactSize, deltaFromBaseline, sourceMapExists
 
 -   [ ] **T042** [P3] [US3] 建置時間驗證  
-        **Command**: `Measure-Command { npm run compile }`  
-        **Success**: Duration increase ≤ 10% (or faster due to webpack 5.102.1 improvements)  
-        **Metrics**: Record buildTime, deltaFromBaseline
+         **Command**: `Measure-Command { npm run compile }`  
+         **Success**: Duration increase ≤ 10% (or faster due to webpack 5.102.1 improvements)  
+         **Metrics**: Record buildTime, deltaFromBaseline
 
 -   [ ] **T043** [P3] [US3] 執行單元測試驗證 (確認建置正確)  
-        **Command**: `npm test`  
-        **Checkpoint**: `unit-test-check`
+         **Command**: `npm test`  
+         **Checkpoint**: `unit-test-check`
 
 -   [ ] **T044** [P3] [US3] 執行 TypeScript 編譯驗證  
-        **Command**: `npx tsc --noEmit`  
-        **Checkpoint**: `compilation-check`
+         **Command**: `npx tsc --noEmit`  
+         **Checkpoint**: `compilation-check`
 
 -   [ ] **T045** [P3] [US3] 記錄建置工具驗證結果  
-        **Files**: `specs/005-safe-dependency-updates/data/validation-results/build-tools-upgrade.json`  
-        **Success**: ValidationResult with build + compilation + test checks
+         **Files**: `specs/005-safe-dependency-updates/data/validation-results/build-tools-upgrade.json`  
+         **Success**: ValidationResult with build + compilation + test checks
 
 -   [ ] **T046** [P3] [US3] Git commit: Build Tools 升級  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `git commit -m "chore: upgrade build tools"`  
-        **Success**: Commit created
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `git commit -m "chore: upgrade build tools"`  
+         **Success**: Commit created
 
 **Parallel Opportunities**: T039-T040 建置檢查必須順序執行 (開發建置先,生產建置後)
 
@@ -353,45 +353,45 @@
 **Tasks**:
 
 -   [ ] **T047** [P3] [US4] 升級 ESLint  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `npm update eslint@9.38.0`  
-        **Success**: eslint@9.38.0
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `npm update eslint@9.38.0`  
+         **Success**: eslint@9.38.0
 
 -   [ ] **T048** [P3] [US4] 記錄 ESLint 升級到日誌  
-        **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
-        **Success**: ChangeLogEntry created
+         **Files**: `specs/005-safe-dependency-updates/data/upgrade-log.json`  
+         **Success**: ChangeLogEntry created
 
 -   [ ] **T049** [P3] [US4] 執行 ESLint 驗證  
-        **Files**: N/A  
-        **Command**: `npm run lint`  
-        **Success**: Exit code 0, no new errors, warnings <= 10  
-        **Checkpoint**: `lint-check` (post-eslint-upgrade stage)
+         **Files**: N/A  
+         **Command**: `npm run lint`  
+         **Success**: Exit code 0, no new errors, warnings <= 10  
+         **Checkpoint**: `lint-check` (post-eslint-upgrade stage)
 
 -   [ ] **T050** [P3] [US4] 執行 i18n lint 驗證 (optional)  
-        **Files**: N/A  
-        **Command**: `npm run lint:i18n`  
-        **Success**: No errors  
-        **Checkpoint**: `i18n-lint-check`  
-        **Note**: Medium priority, warn only
+         **Files**: N/A  
+         **Command**: `npm run lint:i18n`  
+         **Success**: No errors  
+         **Checkpoint**: `i18n-lint-check`  
+         **Note**: Medium priority, warn only
 
 -   [ ] **T051** [P3] [US4] ESLint 時間驗證  
-        **Command**: `Measure-Command { npm run lint }`  
-        **Success**: Duration ≤ 30 seconds  
-        **Metrics**: Record lint duration, filesScanned
+         **Command**: `Measure-Command { npm run lint }`  
+         **Success**: Duration ≤ 30 seconds  
+         **Metrics**: Record lint duration, filesScanned
 
 -   [ ] **T052** [P3] [US4] 檢視新規則警告並記錄  
-        **Command**: `npm run lint -- --format json > lint-results.json`  
-        **Success**: JSON report generated, warnings documented  
-        **Action**: Review new warnings, decide if code fix or rule adjustment needed
+         **Command**: `npm run lint -- --format json > lint-results.json`  
+         **Success**: JSON report generated, warnings documented  
+         **Action**: Review new warnings, decide if code fix or rule adjustment needed
 
 -   [ ] **T053** [P3] [US4] 記錄 ESLint 驗證結果  
-        **Files**: `specs/005-safe-dependency-updates/data/validation-results/eslint-9.38.0.json`  
-        **Success**: ValidationResult with lint checks
+         **Files**: `specs/005-safe-dependency-updates/data/validation-results/eslint-9.38.0.json`  
+         **Success**: ValidationResult with lint checks
 
 -   [ ] **T054** [P3] [US4] Git commit: ESLint 升級  
-        **Files**: `package.json`, `package-lock.json`  
-        **Command**: `git commit -m "chore: upgrade eslint to 9.38.0"`  
-        **Success**: Commit created
+         **Files**: `package.json`, `package-lock.json`  
+         **Command**: `git commit -m "chore: upgrade eslint to 9.38.0"`  
+         **Success**: Commit created
 
 **Parallel Opportunities**: T049-T050 可並行執行 (lint 和 i18n lint 獨立)
 
@@ -408,115 +408,115 @@
 ### Subtask 1: 完整回歸測試
 
 -   [ ] **T055** 清除所有快取和建置產出  
-        **Files**: `dist/`, `out/`, `coverage/`, `node_modules/.cache/`  
-        **Command**: `Remove-Item -Recurse -Force dist/, out/, coverage/, node_modules/.cache/`  
-        **Success**: All cache directories removed
+         **Files**: `dist/`, `out/`, `coverage/`, `node_modules/.cache/`  
+         **Command**: `Remove-Item -Recurse -Force dist/, out/, coverage/, node_modules/.cache/`  
+         **Success**: All cache directories removed
 
 -   [ ] **T056** 重新安裝依賴 (確保 lock file 正確)  
-        **Files**: `node_modules/`  
-        **Command**: `npm ci`  
-        **Success**: All packages installed from lock file, no warnings
+         **Files**: `node_modules/`  
+         **Command**: `npm ci`  
+         **Success**: All packages installed from lock file, no warnings
 
 -   [ ] **T057** [P] 執行最終 TypeScript 編譯驗證  
-        **Command**: `npx tsc --noEmit`  
-        **Checkpoint**: `compilation-check` (final-validation stage)
+         **Command**: `npx tsc --noEmit`  
+         **Checkpoint**: `compilation-check` (final-validation stage)
 
 -   [ ] **T058** [P] 執行最終單元測試驗證  
-        **Command**: `npm test`  
-        **Success**: All 63 tests pass  
-        **Checkpoint**: `unit-test-check`
+         **Command**: `npm test`  
+         **Success**: All 63 tests pass  
+         **Checkpoint**: `unit-test-check`
 
 -   [ ] **T059** [P] 執行最終測試覆蓋率驗證  
-        **Command**: `npm run test:coverage`  
-        **Success**: >= 87.21% coverage  
-        **Checkpoint**: `coverage-check`
+         **Command**: `npm run test:coverage`  
+         **Success**: >= 87.21% coverage  
+         **Checkpoint**: `coverage-check`
 
 -   [ ] **T060** [P] 執行最終 ESLint 驗證  
-        **Command**: `npm run lint`  
-        **Checkpoint**: `lint-check`
+         **Command**: `npm run lint`  
+         **Checkpoint**: `lint-check`
 
 -   [ ] **T061** [P] 執行最終開發建置驗證  
-        **Command**: `npm run compile`  
-        **Checkpoint**: `dev-build-check`
+         **Command**: `npm run compile`  
+         **Checkpoint**: `dev-build-check`
 
 -   [ ] **T062** [P] 執行最終生產建置驗證  
-        **Command**: `npm run package`  
-        **Checkpoint**: `prod-build-check`
+         **Command**: `npm run package`  
+         **Checkpoint**: `prod-build-check`
 
 -   [ ] **T063** [P] 執行最終 i18n lint 驗證  
-        **Command**: `npm run lint:i18n`  
-        **Checkpoint**: `i18n-lint-check`
+         **Command**: `npm run lint:i18n`  
+         **Checkpoint**: `i18n-lint-check`
 
 -   [ ] **T063a** [P] 執行安全性漏洞掃描  
-        **Files**: N/A  
-        **Command**: `npm audit --audit-level=high`  
-        **Success**: Exit code 0 (無 critical 或 high 級別漏洞)  
-        **Note**: 如有 moderate 或 low 級別漏洞,記錄但不阻斷升級  
-        **Checkpoint**: `security-audit-check`
+         **Files**: N/A  
+         **Command**: `npm audit --audit-level=high`  
+         **Success**: Exit code 0 (無 critical 或 high 級別漏洞)  
+         **Note**: 如有 moderate 或 low 級別漏洞,記錄但不阻斷升級  
+         **Checkpoint**: `security-audit-check`
 
 -   [ ] **T064** 記錄最終驗證結果  
-        **Files**: `specs/005-safe-dependency-updates/data/validation-results/final-validation.json`  
-        **Success**: All 8 checkpoints recorded with pass status (包含 security-audit-check)
+         **Files**: `specs/005-safe-dependency-updates/data/validation-results/final-validation.json`  
+         **Success**: All 8 checkpoints recorded with pass status (包含 security-audit-check)
 
 **Parallel Opportunities**: T057-T063a 所有最終驗證可並行執行 (8 個檢查點)
 
 ### Subtask 2: 跨平台驗證 (CI/CD)
 
 -   [ ] **T065** 推送分支到遠端觸發 CI  
-        **Command**: `git push origin 005-safe-dependency-updates`  
-        **Success**: GitHub Actions workflow triggered
+         **Command**: `git push origin 005-safe-dependency-updates`  
+         **Success**: GitHub Actions workflow triggered
 
 -   [ ] **T066** 驗證 CI 在 Windows 環境通過  
-        **Files**: `.github/workflows/*.yml`  
-        **Success**: All jobs pass on Windows runner
+         **Files**: `.github/workflows/*.yml`  
+         **Success**: All jobs pass on Windows runner
 
 -   [ ] **T067** 驗證 CI 在 macOS 環境通過  
-        **Success**: All jobs pass on macOS runner
+         **Success**: All jobs pass on macOS runner
 
 -   [ ] **T068** 驗證 CI 在 Ubuntu 環境通過  
-        **Success**: All jobs pass on Ubuntu runner
+         **Success**: All jobs pass on Ubuntu runner
 
 ### Subtask 3: 手動功能整合測試
 
 -   [ ] **T069** 在 Extension Development Host 測試 Blockly 編輯器開啟  
-        **Command**: `code --extensionDevelopmentPath=. .`  
-        **Success**: Blockly editor opens without errors
+         **Command**: `code --extensionDevelopmentPath=. .`  
+         **Success**: Blockly editor opens without errors
 
 -   [ ] **T070** 測試積木拖曳和編輯功能  
-        **Success**: Blocks can be dragged, connected, and edited
+         **Success**: Blocks can be dragged, connected, and edited
 
 -   [ ] **T071** 測試程式碼生成功能  
-        **Success**: Arduino code generated correctly
+         **Success**: Arduino code generated correctly
 
 -   [ ] **T072** 測試工作區儲存和載入  
-        **Files**: `{workspace}/blockly/main.json`  
-        **Success**: Workspace saves and loads correctly
+         **Files**: `{workspace}/blockly/main.json`  
+         **Success**: Workspace saves and loads correctly
 
 -   [ ] **T073** 測試板子選擇功能  
-        **Success**: Board selection works (Arduino Uno, ESP32, etc.)
+         **Success**: Board selection works (Arduino Uno, ESP32, etc.)
 
 -   [ ] **T074** 測試主題切換 (亮/暗)  
-        **Success**: Theme switches without visual issues
+         **Success**: Theme switches without visual issues
 
 -   [ ] **T075** 測試 PlatformIO 整合  
-        **Files**: `{workspace}/platformio.ini`  
-        **Success**: PlatformIO config synced correctly
+         **Files**: `{workspace}/platformio.ini`  
+         **Success**: PlatformIO config synced correctly
 
 -   [ ] **T076** 測試多語言切換  
-        **Success**: UI switches between languages (EN, ZH-HANT)
+         **Success**: UI switches between languages (EN, ZH-HANT)
 
 ### Subtask 4: 效能比對報告
 
 -   [ ] **T077** 生成效能比對報告  
-        **Files**: `specs/005-safe-dependency-updates/data/performance-comparison.json`  
-        **Success**: JSON report with before/after metrics, all deltas within tolerances  
-        **Metrics**: compilation delta, testing delta, build size delta, lint duration delta
+         **Files**: `specs/005-safe-dependency-updates/data/performance-comparison.json`  
+         **Success**: JSON report with before/after metrics, all deltas within tolerances  
+         **Metrics**: compilation delta, testing delta, build size delta, lint duration delta
 
 ### Subtask 5: 文件更新
 
 -   [ ] **T078** 更新 CHANGELOG.md  
-        **Files**: `CHANGELOG.md`  
-        **Content**:
+         **Files**: `CHANGELOG.md`  
+         **Content**:
 
     ```markdown
     ### Dependencies
@@ -533,13 +533,13 @@
     ```
 
 -   [ ] **T079** Git commit: CHANGELOG 更新  
-        **Command**: `git add CHANGELOG.md && git commit -m "docs(changelog): update for dependency upgrades"`
+         **Command**: `git add CHANGELOG.md && git commit -m "docs(changelog): update for dependency upgrades"`
 
 ### Subtask 6: Pull Request 創建
 
 -   [ ] **T080** 創建 Pull Request  
-        **Command**: `gh pr create --title "chore: upgrade dependencies (Phase 1 - Safe Updates)" --body "..."`  
-        **Success**: PR created with:
+         **Command**: `gh pr create --title "chore: upgrade dependencies (Phase 1 - Safe Updates)" --body "..."`  
+         **Success**: PR created with:
     -   Descriptive title
     -   Complete upgrade list (9 packages)
     -   Validation results (✅ all tests pass, ✅ coverage maintained, ✅ build size OK)

@@ -13,14 +13,14 @@
 
 為確保文件一致性,以下術語在本專案中具有特定含義:
 
-| 繁體中文 | English | 說明 | 檔案範例 |
-|---------|---------|------|----------|
-| 建置產出 | Build Artifact / Bundle | Webpack 編譯後的輸出檔案 | `dist/extension.js` |
-| 建置產出大小 | Build Artifact Size / Bundle Size | 建置產出檔案的位元組大小 | 用於效能比對 |
-| 編譯 | Compilation | TypeScript 型別檢查和轉譯 | `npx tsc --noEmit` |
-| 建置 | Build | Webpack 打包流程 (包含編譯) | `npm run compile` |
-| 測試覆蓋率 | Test Coverage | 程式碼被測試覆蓋的百分比 | >= 87.21% |
-| 驗證檢查點 | Validation Checkpoint | 自動化驗證關卡 | `compilation-check` |
+| 繁體中文     | English                           | 說明                        | 檔案範例            |
+| ------------ | --------------------------------- | --------------------------- | ------------------- |
+| 建置產出     | Build Artifact / Bundle           | Webpack 編譯後的輸出檔案    | `dist/extension.js` |
+| 建置產出大小 | Build Artifact Size / Bundle Size | 建置產出檔案的位元組大小    | 用於效能比對        |
+| 編譯         | Compilation                       | TypeScript 型別檢查和轉譯   | `npx tsc --noEmit`  |
+| 建置         | Build                             | Webpack 打包流程 (包含編譯) | `npm run compile`   |
+| 測試覆蓋率   | Test Coverage                     | 程式碼被測試覆蓋的百分比    | >= 87.21%           |
+| 驗證檢查點   | Validation Checkpoint             | 自動化驗證關卡              | `compilation-check` |
 
 **使用原則**: 文件中應優先使用繁體中文術語,必要時可在括號中補充英文對照 (如「建置產出 (bundle)」)。
 

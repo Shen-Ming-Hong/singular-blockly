@@ -380,66 +380,72 @@ node --version  # T001
 ### Analysis Results
 
 **發現問題總數**: 12 項
-- **CRITICAL**: 1 項 (Constitution Principle VII 違反 - 已修正,新增 UI 測試豁免條款)
-- **HIGH**: 3 項 (需求覆蓋缺口、驗證標準不一致、任務順序矛盾 - 全部修正)
-- **MEDIUM**: 5 項 (術語不一致、需求重複、命名不統一、格式差異、缺少安全檢查 - 全部修正)
-- **LOW**: 3 項 (文件重複、時間格式、commit 格式 - 全部修正)
+
+-   **CRITICAL**: 1 項 (Constitution Principle VII 違反 - 已修正,新增 UI 測試豁免條款)
+-   **HIGH**: 3 項 (需求覆蓋缺口、驗證標準不一致、任務順序矛盾 - 全部修正)
+-   **MEDIUM**: 5 項 (術語不一致、需求重複、命名不統一、格式差異、缺少安全檢查 - 全部修正)
+-   **LOW**: 3 項 (文件重複、時間格式、commit 格式 - 全部修正)
 
 **覆蓋率統計**:
-- 功能需求覆蓋率: 95.7% (22/23 完整, 1 項部分覆蓋) → 修正後 100% (23/23)
-- User Story 覆蓋率: 93.8% (3.75/4) → 修正後 100% (4/4)
-- Constitution 符合度: 87.5% (7/8) → 修正後 100% (8/8)
+
+-   功能需求覆蓋率: 95.7% (22/23 完整, 1 項部分覆蓋) → 修正後 100% (23/23)
+-   User Story 覆蓋率: 93.8% (3.75/4) → 修正後 100% (4/4)
+-   Constitution 符合度: 87.5% (7/8) → 修正後 100% (8/8)
 
 ### Key Modifications
 
 **Constitution 更新** (`.specify/memory/constitution.md`):
-- 新增 Principle VII "UI Testing Exception" 條款
-- 明確 WebView 互動功能可使用手動測試的條件
+
+-   新增 Principle VII "UI Testing Exception" 條款
+-   明確 WebView 互動功能可使用手動測試的條件
 
 **Specification 改進** (`spec.md`):
-- 合併 FR-001~FR-003 為單一 TypeScript 生態系需求
-- 更新所有後續需求編號 (FR-004~FR-023)
-- 新增 FR-012 (完整功能基準測試)、FR-018 (安全性檢查)、FR-019 (結構驗證)
-- 統一所有 User Story 優先級格式為 [P1/P2/P3]
-- 補充 US3 Acceptance Scenario 4 明確包含結構驗證
+
+-   合併 FR-001~FR-003 為單一 TypeScript 生態系需求
+-   更新所有後續需求編號 (FR-004~FR-023)
+-   新增 FR-012 (完整功能基準測試)、FR-018 (安全性檢查)、FR-019 (結構驗證)
+-   統一所有 User Story 優先級格式為 [P1/P2/P3]
+-   補充 US3 Acceptance Scenario 4 明確包含結構驗證
 
 **Tasks 強化** (`tasks.md`):
-- 新增 T004a: 建立完整功能基準測試 (記錄所有測試案例狀態)
-- 更新 T041: 加入 source map 結構驗證
-- 明確 T015-T017 順序執行依賴 (Prerequisite 標註)
-- 新增 T063a: npm audit 安全性漏洞掃描
-- 移除重複的專案結構章節,引用 plan.md
-- 統一所有時間估算為 ISO 8601 duration 格式 (PT2H40M)
-- 修正 T079 commit 訊息格式 (加入 scope)
-- 更新任務總數為 80 個 (新增 2 個任務)
-- 更新驗證檢查點總數為 8 個 (新增 security-audit-check)
+
+-   新增 T004a: 建立完整功能基準測試 (記錄所有測試案例狀態)
+-   更新 T041: 加入 source map 結構驗證
+-   明確 T015-T017 順序執行依賴 (Prerequisite 標註)
+-   新增 T063a: npm audit 安全性漏洞掃描
+-   移除重複的專案結構章節,引用 plan.md
+-   統一所有時間估算為 ISO 8601 duration 格式 (PT2H40M)
+-   修正 T079 commit 訊息格式 (加入 scope)
+-   更新任務總數為 80 個 (新增 2 個任務)
+-   更新驗證檢查點總數為 8 個 (新增 security-audit-check)
 
 **Data Model 擴充** (`data-model.md`):
-- 新增術語對照表 (Terminology)
-- 統一「建置產出」、「編譯」、「建置」等核心術語定義
-- 提供中英文對照和使用範例
+
+-   新增術語對照表 (Terminology)
+-   統一「建置產出」、「編譯」、「建置」等核心術語定義
+-   提供中英文對照和使用範例
 
 ### Analysis Metrics
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| 需求覆蓋率 | 95.7% | 100% | +4.3% |
-| User Story 覆蓋率 | 93.8% | 100% | +6.2% |
-| Constitution 符合度 | 87.5% | 100% | +12.5% |
-| 總任務數 | 78 | 80 | +2 |
-| 驗證檢查點 | 7 | 8 | +1 |
-| 發現問題 (未修正) | 12 | 0 | -12 |
+| Metric              | Before | After | Improvement |
+| ------------------- | ------ | ----- | ----------- |
+| 需求覆蓋率          | 95.7%  | 100%  | +4.3%       |
+| User Story 覆蓋率   | 93.8%  | 100%  | +6.2%       |
+| Constitution 符合度 | 87.5%  | 100%  | +12.5%      |
+| 總任務數            | 78     | 80    | +2          |
+| 驗證檢查點          | 7      | 8     | +1          |
+| 發現問題 (未修正)   | 12     | 0     | -12         |
 
 ### Validation Status
 
-- ✅ 所有 CRITICAL 問題已解決 (Constitution 違反)
-- ✅ 所有 HIGH 問題已解決 (覆蓋缺口、驗證標準、任務依賴)
-- ✅ 所有 MEDIUM 問題已解決 (術語、重複、格式、安全性)
-- ✅ 所有 LOW 問題已解決 (文件重複、格式統一)
-- ✅ 規格文件完全符合所有 8 項 Constitution 原則
-- ✅ 100% 需求覆蓋率 (23/23 功能需求完整映射到任務)
-- ✅ 100% User Story 驗證標準覆蓋
-- ✅ 0 項孤立任務 (所有任務都有明確需求映射)
+-   ✅ 所有 CRITICAL 問題已解決 (Constitution 違反)
+-   ✅ 所有 HIGH 問題已解決 (覆蓋缺口、驗證標準、任務依賴)
+-   ✅ 所有 MEDIUM 問題已解決 (術語、重複、格式、安全性)
+-   ✅ 所有 LOW 問題已解決 (文件重複、格式統一)
+-   ✅ 規格文件完全符合所有 8 項 Constitution 原則
+-   ✅ 100% 需求覆蓋率 (23/23 功能需求完整映射到任務)
+-   ✅ 100% User Story 驗證標準覆蓋
+-   ✅ 0 項孤立任務 (所有任務都有明確需求映射)
 
 ### Git Commit
 
