@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已更新 Updated
 
+### 已修改 Changed
+
+## [0.37.0] - 2025-10-20
+
+### 已更新 Updated
+
 -   升級開發依賴套件至最新穩定版本 (Phase 1 - 安全更新)
     Upgraded development dependencies to latest stable versions (Phase 1 - Safe Updates)
     -   TypeScript: 5.7.2 → 5.9.3 (效能提升 11%, 編譯時間 -25%)
@@ -34,7 +40,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     -   eslint: 9.32.0 → 9.38.0 (新規則和 bug 修復)
         eslint: 9.32.0 → 9.38.0 (new rules and bug fixes)
 
-### 已修改 Changed
+### 效能改善 Performance Improvements
+
+-   編譯時間減少 25.22%: 6.1s → 4.6s
+    Compilation time reduced by 25.22%: 6.1s → 4.6s
+-   測試執行時間減少 33.81%: 29.6s → 19.6s
+    Test execution time reduced by 33.81%: 29.6s → 19.6s
+-   Lint 時間減少 16.44%: 3.7s → 3.1s
+    Lint duration reduced by 16.44%: 3.7s → 3.1s
+-   Bundle 大小維持穩定: 130,506 bytes (0% 變化)
+    Bundle size maintained: 130,506 bytes (0% change)
 
 ## [0.36.0] - 2025-10-19
 
