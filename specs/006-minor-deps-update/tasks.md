@@ -1,5 +1,9 @@
 # Tasks: 次要依賴更新 (Phase 2)
 
+> **檔案用途**: 此檔案是 Phase 2 依賴升級的完整任務追蹤清單,定義了從環境準備到 PR 建立的所有執行步驟、驗證檢查點和回滾策略。開發者應按照 Phase 順序執行任務,每個任務完成後標記為 `[x]`,以確保升級過程的可追溯性和品質保證。
+>
+> **在專案中的角色**: 作為實作階段的操作指南,補充 `plan.md` (策略規劃) 和 `quickstart.md` (快速執行),提供最細粒度的任務拆解和執行順序定義。
+
 **Input**: 設計文件來自 `/specs/006-minor-deps-update/`  
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/upgrade-validation-contract.yaml, quickstart.md
 
