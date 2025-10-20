@@ -1,0 +1,317 @@
+# Upgrade Validation Contract
+# 升級驗證契約
+#
+# 定義 Phase 2 依賴升級的完整驗證流程和通過標準
+# Phase: 006-minor-deps-update
+# Date: 2025-10-20
+
+version: '1.0'
+feature: '次要依賴更新 (Phase 2)'
+packages:
+    - name: '@blockly/theme-modern'
+      currentVersion: '6.0.10'
+      targetVersion: '6.0.12'
+      updateType: 'patch'
+    - name: '@types/node'
+      currentVersion: '20.17.12'
+      targetVersion: '20.19.22'
+      updateType: 'minor'
+
+# 效能基準 (來自 Phase 1)
+baselines:
+    compileTime: 4.6 # 秒
+    testTime: 19.6 # 秒
+    bundleSize: 130506 # bytes
+    testPassCount: 190 # 通過測試數
+    testTotalCount: 191 # 總測試數
+    coverageRate: 0.8721 # 覆蓋率 (87.21%)
+
+# 效能目標 (允許 10% 編譯/測試時間增加, 2% 檔案大小增加)
+targets:
+    maxCompileTime: 5.06 # ≤ 4.6 × 1.1
+    maxTestTime: 21.58 # ≤ 19.6 × 1.1
+    maxBundleSize: 133116 # ≤ 130506 × 1.02
+    minBundleSizeRatio: 0.98 # ≥ 130506 × 0.98 (127896 bytes)
+    minTestPassCount: 190 # 必須維持
+    minCoverageRate: 0.8721 # ≥ 87.21%
+
+# ============================================================================
+# 第一階段: 編譯檢查 (Compilation Phase)
+# ============================================================================
+compilation_checkpoints:
+    - id: CP-001
+      name: 'TypeScript 編譯檢查'
+      type: automated
+      command: 'npx tsc --noEmit'
+      expectedResult: 'Exit code 0, 無型別錯誤'
+      passCondition: |
+          exitCode === 0 && 
+          !output.includes('error TS')
+      failureAction: ROLLBACK
+      priority: CRITICAL
+      estimatedTime: 10 # 秒
+
+    - id: CP-002
+      name: '開發模式建置'
+      type: automated
+      command: 'npm run compile'
+      expectedResult: 'dist/extension.js 成功生成'
+      passCondition: |
+          exitCode === 0 && 
+          fs.existsSync('dist/extension.js') &&
+          compileTime <= targets.maxCompileTime
+      failureAction: ROLLBACK
+      priority: CRITICAL
+      estimatedTime: 5 # 秒
+      metrics:
+          - name: compileTime
+            unit: seconds
+            target: '≤ 5.06'
+
+    - id: CP-003
+      name: '生產模式建置'
+      type: automated
+      command: 'npm run package'
+      expectedResult: '打包成功,檔案大小在允許範圍內'
+      passCondition: |
+          exitCode === 0 && 
+          fs.existsSync('dist/extension.js') &&
+          bundleSize >= targets.minBundleSizeRatio * baselines.bundleSize &&
+          bundleSize <= targets.maxBundleSize
+      failureAction: ROLLBACK
+      priority: HIGH
+      estimatedTime: 8 # 秒
+      metrics:
+          - name: bundleSize
+            unit: bytes
+            target: '130506 ± 2%'
+
+# ============================================================================
+# 第二階段: 測試檢查 (Testing Phase)
+# ============================================================================
+testing_checkpoints:
+    - id: TP-001
+      name: '完整測試套件執行'
+      type: automated
+      command: 'npm test'
+      expectedResult: '190/191 測試通過 (與基準一致)'
+      passCondition: |
+          exitCode === 0 && 
+          testPassCount >= targets.minTestPassCount &&
+          testTime <= targets.maxTestTime
+      failureAction: ROLLBACK
+      priority: CRITICAL
+      estimatedTime: 20 # 秒
+      metrics:
+          - name: testPassCount
+            unit: count
+            target: '≥ 190'
+          - name: testTime
+            unit: seconds
+            target: '≤ 21.58'
+      notes: |
+          已知 1 個預存測試失敗 (WebView Manager test),
+          不屬於本次升級引入,可接受
+
+    - id: TP-002
+      name: '測試覆蓋率驗證'
+      type: automated
+      command: 'npm run test:coverage'
+      expectedResult: '覆蓋率 ≥ 87.21%'
+      passCondition: |
+          coverageRate >= targets.minCoverageRate
+      failureAction: ROLLBACK
+      priority: HIGH
+      estimatedTime: 25 # 秒
+      metrics:
+          - name: coverageRate
+            unit: percentage
+            target: '≥ 87.21%'
+
+# ============================================================================
+# 第三階段: 安全性檢查 (Security Phase)
+# ============================================================================
+security_checkpoints:
+    - id: SP-001
+      name: 'npm 安全漏洞掃描'
+      type: automated
+      command: 'npm audit --audit-level=high'
+      expectedResult: '0 個 critical/high 級別漏洞'
+      passCondition: |
+          exitCode === 0 ||
+          (!output.includes('critical') && !output.includes('high'))
+      failureAction: ANALYZE
+      priority: HIGH
+      estimatedTime: 5 # 秒
+      notes: |
+          如果發現 high/critical 漏洞,需要分析:
+          1. 是否為新引入的漏洞
+          2. 是否有可用的修補版本
+          3. 是否影響生產環境
+
+# ============================================================================
+# 第四階段: 手動測試 (Manual Testing Phase)
+# ============================================================================
+manual_checkpoints:
+    - id: MP-001
+      name: 'Blockly 編輯器主題切換測試'
+      type: manual
+      priority: CRITICAL
+      estimatedTime: 5 # 分鐘
+      sub_checkpoints:
+          - id: MP-001-1
+            description: '開啟 Extension Development Host (F5)'
+            expectedResult: 'Extension 成功載入,無錯誤訊息'
+          - id: MP-001-2
+            description: '開啟工作區中的任一 .blockly 檔案'
+            expectedResult: 'Blockly 編輯器成功開啟'
+          - id: MP-001-3
+            description: '切換至明亮主題 (Light Theme)'
+            expectedResult: |
+                主題正確套用,所有積木類別正常顯示,顏色配置符合預期
+                視覺驗證檢查清單:
+                - 積木邊框完整無斷裂
+                - 積木顏色與 Phase 1 基準一致
+                - 積木文字清晰可讀,無模糊或重疊
+                - 無 CSS 渲染錯誤(如錯位、溢出)
+                - 工具箱背景和分隔線正確顯示
+          - id: MP-001-4
+            description: '切換至深色主題 (Dark Theme)'
+            expectedResult: |
+                主題正確套用,所有積木類別正常顯示,顏色配置符合預期
+                視覺驗證檢查清單:
+                - 積木邊框完整無斷裂
+                - 積木顏色與 Phase 1 基準一致
+                - 積木文字清晰可讀,無模糊或重疊
+                - 無 CSS 渲染錯誤(如錯位、溢出)
+                - 工具箱背景和分隔線正確顯示
+          - id: MP-001-5
+            description: '測試積木拖放互動'
+            expectedResult: |
+                - 積木可正常拖放
+                - 連接點正確顯示
+                - 積木形狀和陰影正確渲染
+      passCondition: '所有子檢查點通過,無視覺迴歸'
+      failureAction: ROLLBACK
+
+    - id: MP-002
+      name: 'TypeScript 型別提示驗證'
+      type: manual
+      priority: MEDIUM
+      estimatedTime: 3 # 分鐘
+      sub_checkpoints:
+          - id: MP-002-1
+            description: '開啟 src/services/fileService.ts'
+            expectedResult: '檔案正常開啟,無型別錯誤警告'
+          - id: MP-002-2
+            description: '檢查 fs 模組 API 的型別提示'
+            expectedResult: |
+                具體驗證步驟:
+                1. Hover 提示: 將滑鼠懸停在 fs.readFile, fs.writeFile 等 API,顯示完整參數和返回型別
+                2. 自動完成: 按 Ctrl+Space 後列出正確的方法名稱和參數提示
+                3. 錯誤標示: 故意輸入錯誤型別參數(如傳入 number 給 string 參數),應出現紅色波浪線提示
+                4. 參數提示: 在函數呼叫時顯示參數名稱和型別
+          - id: MP-002-3
+            description: '開啟 src/services/settingsManager.ts'
+            expectedResult: 'path 和 fs 模組型別提示正確(使用上述相同驗證步驟)'
+          - id: MP-002-4
+            description: '重啟 TypeScript Server(強制執行)'
+            command: 'Ctrl+Shift+P → TypeScript: Restart TS Server'
+            expectedResult: |
+                重啟後型別提示保持正確,無快取殘留問題
+                執行時機: 在 MP-002-2 型別提示驗證完成後必須執行
+      passCondition: '型別提示品質改善或維持,無新增錯誤'
+      failureAction: ANALYZE
+      notes: |
+          如發現新的型別錯誤警告:
+          1. 評估是否為先前隱藏的真實型別錯誤
+          2. 若為改進,應修正程式碼而非回滾升級
+          3. 若為 @types/node bug,需進一步調查
+
+# ============================================================================
+# 回滾策略 (Rollback Strategies)
+# ============================================================================
+rollback_strategies:
+    - trigger: ROLLBACK
+      name: 'Git 快速回滾'
+      steps:
+          - command: 'git checkout package.json package-lock.json'
+            description: '恢復套件定義檔案'
+          - command: 'npm ci'
+            description: '重新安裝原版本依賴'
+          - command: 'npm test'
+            description: '驗證回滾成功'
+      estimatedTime: 60 # 秒
+
+    - trigger: ANALYZE
+      name: '暫緩並分析'
+      steps:
+          - description: '記錄失敗檢查點的詳細資訊'
+          - description: '與 Phase 1 基準比較差異'
+          - description: '查詢套件 changelog 和已知問題'
+          - description: '決策: 修正問題或執行 ROLLBACK'
+      estimatedTime: 300 # 秒 (5 分鐘)
+
+# ============================================================================
+# 成功標準總結 (Success Criteria Summary)
+# ============================================================================
+success_criteria:
+    compilation:
+        - 'CP-001: TypeScript 編譯成功,無型別錯誤'
+        - 'CP-002: 開發建置成功,編譯時間 ≤ 5.06 秒'
+        - 'CP-003: 生產建置成功,檔案大小在 130,506 ± 2% bytes'
+
+    testing:
+        - 'TP-001: 測試通過率 190/191,執行時間 ≤ 21.58 秒'
+        - 'TP-002: 測試覆蓋率 ≥ 87.21%'
+
+    security:
+        - 'SP-001: npm audit 無 critical/high 級別漏洞'
+
+    manual:
+        - 'MP-001: Blockly 主題切換功能正常,無視覺迴歸'
+        - 'MP-002: TypeScript 型別提示正確,無降級'
+
+    documentation:
+        - 'CHANGELOG.md 已更新,記錄升級內容'
+        - 'Git commit 訊息清晰,包含驗證結果'
+
+# ============================================================================
+# 驗證執行順序 (Validation Execution Order)
+# ============================================================================
+execution_order:
+    - phase: 'Phase 1: Compilation'
+      checkpoints: [CP-001, CP-002, CP-003]
+      stopOnFailure: true
+      estimatedTime: 23 # 秒
+
+    - phase: 'Phase 2: Testing'
+      checkpoints: [TP-001, TP-002]
+      stopOnFailure: true
+      estimatedTime: 45 # 秒
+
+    - phase: 'Phase 3: Security'
+      checkpoints: [SP-001]
+      stopOnFailure: false # 需分析,不立即回滾
+      estimatedTime: 5 # 秒
+
+    - phase: 'Phase 4: Manual Testing'
+      checkpoints: [MP-001, MP-002]
+      stopOnFailure: true
+      estimatedTime: 480 # 秒 (8 分鐘)
+
+# 總預估時間: 23 + 45 + 5 + 480 = 553 秒 ≈ 9.2 分鐘 (自動化部分) + 8 分鐘 (手動) = 17.2 分鐘
+# 加上 npm install 時間 (~3-5 分鐘) 和緩衝時間,總計約 25-30 分鐘
+
+# ============================================================================
+# 契約版本歷史 (Contract Version History)
+# ============================================================================
+changelog:
+    - version: '1.0'
+      date: '2025-10-20'
+      author: 'GitHub Copilot'
+      changes:
+          - '初始契約定義'
+          - '基於 Phase 1 基準設定驗證目標'
+          - '定義 8 個自動化檢查點 + 2 個手動檢查點'
+          - '建立回滾策略和成功標準'
