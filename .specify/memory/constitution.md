@@ -1,32 +1,33 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.2.0 → 1.2.1
-Modified Principles:
-  - Principle V (Research-Driven Development) - Expanded with alternative tools guidance
-Added Principles: None
+Version Change: 1.2.1 → 1.3.0
+Modified Principles: None
+Added Principles:
+  - Principle IX (Traditional Chinese Documentation Standard) - New principle requiring all specifications, plans, and user-facing documentation to be written in Traditional Chinese (zh-TW)
 Added Sections: None
 Removed Sections: None
 Templates Status:
-  ✅ plan-template.md - Verified alignment with all principles (no updates needed)
-  ✅ spec-template.md - Verified alignment with all principles (no updates needed)
-  ✅ tasks-template.md - Verified alignment with all principles (no updates needed)
-  ✅ agent-file-template.md - Verified (no constitution-specific updates needed)
-  ✅ checklist-template.md - Verified (no constitution-specific updates needed)
+  ✅ plan-template.md - Updated with Traditional Chinese requirement in documentation section
+  ✅ spec-template.md - Updated with Traditional Chinese requirement in header and user scenarios
+  ✅ tasks-template.md - Updated with Traditional Chinese requirement in documentation tasks
+  ✅ agent-file-template.md - No updates needed (internal template)
+  ✅ checklist-template.md - No updates needed (internal checklist)
+  ⚠️  .github/copilot-instructions.md - Already contains Traditional Chinese language convention (no updates needed)
 Command Files Review:
-  ✅ check.prompt.md - Reviewed, references MCP tools usage (aligned with Principle V)
-  ✅ speckit.constitution.prompt.md - This file (no updates needed)
-  ℹ️ Other speckit.*.prompt.md files - Procedural commands, no constitutional updates needed
-Change Summary (v1.2.1):
-  - Enhanced Principle V (Research-Driven Development) with alternative tool combinations
-  - Added guidance for using fetch_webpage, github_repo, search_code, search_repositories
-  - Specified these tools as alternatives when webSearch is unavailable
-  - Maintains MCP-powered research philosophy while providing practical fallback options
+  ✅ .github/prompts/speckit.constitution.prompt.md - Reviewed (no updates needed - constitutional update process only)
+  ℹ️  No other command files found in expected location
+Change Summary (v1.3.0):
+  - Added Principle IX (Traditional Chinese Documentation Standard)
+  - Mandates Traditional Chinese (繁體中文, zh-TW) for all specifications, implementation plans, and user-facing documentation
+  - Aligns with project's primary user base in Taiwan and existing language convention in copilot-instructions.md
+  - Technical documentation and code comments may remain in English for international developer collaboration
+  - Commit message descriptions already required to be in Traditional Chinese (existing Git Commit Messages section)
 Version Bump Rationale:
-  - PATCH version bump (1.2.0 → 1.2.1)
-  - Clarification and expansion of existing principle (Principle V)
-  - No new principles added, no backward incompatibilities
-  - Enhances existing guidance with alternative tool recommendations
+  - MINOR version bump (1.2.1 → 1.3.0)
+  - New principle addition that expands governance scope
+  - Backward compatible (existing English docs not invalidated, but future docs must comply)
+  - Material expansion of documentation standards
 Follow-up TODOs: None
 -->
 
@@ -172,6 +173,35 @@ Functions MUST be pure and architecture MUST maximize modularity for long-term m
 -   Reduced coupling (modules depend on interfaces, not implementations)
 -   Improved scalability (features can be developed in parallel)
 
+### IX. Traditional Chinese Documentation Standard
+
+All specifications, implementation plans, and user-facing documentation MUST be written in Traditional Chinese (繁體中文, zh-TW). This means:
+
+-   Feature specifications (spec.md) written in Traditional Chinese
+-   Implementation plans (plan.md) written in Traditional Chinese
+-   User-facing documentation (README.md, user guides) written in Traditional Chinese
+-   Task lists (tasks.md) written in Traditional Chinese
+-   Research documents (research.md) written in Traditional Chinese
+-   All specification artifacts in `/specs/` directory written in Traditional Chinese
+-   Technical documentation and inline code comments MAY remain in English for international developer collaboration
+-   Commit messages MUST use Traditional Chinese for descriptions (as per existing Git Commit Messages standard)
+
+**Rationale**: The primary user base and development team for Singular Blockly are Traditional Chinese speakers in Taiwan. Standardizing documentation in Traditional Chinese ensures maximum clarity and accessibility for the target audience, reduces miscommunication, and aligns with the project's educational mission. This standard complements the existing language convention in `.github/copilot-instructions.md` and extends it to all specification and planning documents.
+
+**Scope Clarification**:
+
+-   **MUST be Traditional Chinese**: User stories, acceptance criteria, requirements, success metrics, implementation plans, research findings, user guides, README files
+-   **MAY be English**: Code comments, API documentation for developers, technical architecture diagrams with English labels, library integration notes
+-   **Already standardized in Traditional Chinese**: Git commit message descriptions (per existing standard)
+
+**Benefits**:
+
+-   Improved clarity for primary stakeholders (educators, students in Taiwan)
+-   Reduced translation overhead and miscommunication
+-   Consistent documentation experience across all project artifacts
+-   Better alignment with educational goals and user needs
+-   Easier onboarding for Traditional Chinese-speaking contributors
+
 ## Development Standards
 
 ### Code Quality
@@ -197,6 +227,8 @@ Functions MUST be pure and architecture MUST maximize modularity for long-term m
 -   Include inline JSDoc comments for public APIs
 -   Maintain instruction files in `.github/instructions/` for development guidance
 -   Keep specification documents in `.specify/` for architectural decisions
+-   All specifications, plans, and user-facing documentation MUST be written in Traditional Chinese (zh-TW) per Principle IX
+-   Technical documentation and code comments MAY remain in English for international collaboration
 
 ### Testing Strategy
 
@@ -290,7 +322,7 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.2.1 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-18
+**Version**: 1.3.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-20
 
 ```
 

@@ -5,6 +5,15 @@
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
+<!--
+  LANGUAGE REQUIREMENT (Principle IX):
+  This implementation plan MUST be written in Traditional Chinese (繁體中文, zh-TW).
+  All planning content, technical context, and documentation should be in Traditional
+  Chinese to align with the project's primary audience and facilitate team collaboration.
+
+  Code snippets and technical references MAY remain in English for developer clarity.
+-->
+
 ## Summary
 
 [Extract from feature spec: primary requirement + technical approach from research]
@@ -41,6 +50,7 @@ Review each core principle from `.specify/memory/constitution.md`:
 -   [ ] **Structured Logging**: Are all diagnostic outputs using the standardized logging service (`log.*` methods)?
 -   [ ] **Comprehensive Test Coverage**: Is the code designed to be 100% testable? Does it avoid infinite loops and blocking operations in tests?
 -   [ ] **Pure Functions and Modular Architecture**: Are functions pure where possible? Is business logic separated from side effects?
+-   [ ] **Traditional Chinese Documentation**: Are all specifications, plans, and user-facing docs written in Traditional Chinese (zh-TW)?
 
 **Research Actions Taken**:
 

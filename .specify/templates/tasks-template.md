@@ -11,6 +11,15 @@ description: 'Task list template for feature implementation'
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+<!--
+  LANGUAGE REQUIREMENT (Principle IX):
+  This task list MUST be written in Traditional Chinese (繁體中文, zh-TW).
+  All task descriptions, checkpoints, and organizational notes should be in Traditional
+  Chinese to align with the project's documentation standards.
+
+  File paths and technical references MAY remain in English for clarity.
+-->
+
 ## Format: `[ID] [P?] [Story] Description`
 
 -   **[P]**: Can run in parallel (different files, no dependencies)
@@ -172,12 +181,16 @@ Examples of foundational tasks (adjust based on your project):
 
 **Purpose**: Improvements that affect multiple user stories
 
--   [ ] TXXX [P] Documentation updates in docs/
+-   [ ] TXXX [P] Documentation updates in docs/ (in Traditional Chinese for user-facing docs per Principle IX)
 -   [ ] TXXX Code cleanup and refactoring per constitution principles (simplicity, modularity, pure functions)
 -   [ ] TXXX Performance optimization across all stories
 -   [ ] TXXX [P] Additional unit tests (if requested) targeting 100% coverage in tests/unit/
 -   [ ] TXXX Security hardening
 -   [ ] TXXX Verify structured logging is used consistently throughout codebase
+-   [ ] TXXX Verify all code achieves 100% test coverage target
+-   [ ] TXXX Confirm no infinite loops or blocking operations in test suite
+-   [ ] TXXX Run quickstart.md validation
+-   [ ] TXXX Verify all specifications and user-facing documentation are in Traditional Chinese (zh-TW)
 -   [ ] TXXX Verify all code achieves 100% test coverage target
 -   [ ] TXXX Confirm no infinite loops or blocking operations in test suite
 -   [ ] TXXX Run quickstart.md validation

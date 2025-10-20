@@ -5,6 +5,15 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+<!--
+  LANGUAGE REQUIREMENT (Principle IX):
+  This specification MUST be written in Traditional Chinese (繁體中文, zh-TW).
+  All user stories, requirements, success criteria, and user-facing content
+  should be in Traditional Chinese to align with the project's primary audience.
+
+  Technical notes and code examples MAY remain in English for developer clarity.
+-->
+
 ## User Scenarios & Testing _(mandatory)_
 
 <!--
@@ -126,3 +135,4 @@ This feature specification aligns with Singular Blockly constitution principles:
 -   **Structured Logging**: Diagnostic outputs will use standardized logging service
 -   **Comprehensive Test Coverage**: Code will be designed for 100% testability with no infinite loops or blocking operations in tests
 -   **Pure Functions and Modular Architecture**: Business logic will be separated from side effects with pure functions where possible
+-   **Traditional Chinese Documentation**: This specification is written in Traditional Chinese (zh-TW) as required
