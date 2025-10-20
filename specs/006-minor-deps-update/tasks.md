@@ -228,10 +228,11 @@
 -   [x] T055 提交變更 (`git commit`)
     -   **訊息格式**: 使用 quickstart.md 中的 Git commit 訊息範本
     -   **包含**: 套件版本、驗證結果摘要
--   [ ] T056 推送分支 (`git push origin 006-minor-deps-update`)
--   [ ] T057 建立 Pull Request
+-   [x] T056 推送分支 (`git push origin 006-minor-deps-update`)
+-   [x] T057 建立 Pull Request
     -   **標題**: `chore(deps): Phase 2 - 升級 @blockly/theme-modern 和 @types/node`
     -   **描述**: 參考 specs/006-minor-deps-update/spec.md,包含驗證結果
+    -   **PR URL**: https://github.com/Shen-Ming-Hong/singular-blockly/pull/11
 
 **檢查點**: 所有變更已記錄並提交,Pull Request 已建立
 
