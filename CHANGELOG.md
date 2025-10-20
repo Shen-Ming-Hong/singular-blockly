@@ -16,14 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已更新 Updated
 
+### 已修改 Changed
+
+## [0.37.1] - 2025-10-20
+
+### 已更新 Updated
+
 -   升級開發依賴套件 (Phase 2 - 次要版本更新)
     Upgraded development dependencies (Phase 2 - Minor updates)
     -   @blockly/theme-modern: 6.0.10 → 6.0.12 (主題系統 bug 修復)
         @blockly/theme-modern: 6.0.10 → 6.0.12 (theme system bug fixes)
     -   @types/node: 20.17.12 → 20.19.22 (Node.js 20.x 型別定義改進)
         @types/node: 20.17.12 → 20.19.22 (Node.js 20.x type definition improvements)
-
-### 已修改 Changed
 
 ## [0.37.0] - 2025-10-20
 
