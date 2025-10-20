@@ -96,7 +96,7 @@
 		"@vscode/test-electron": "^2.5.2",
 		"ajv": "^8.17.1",
 		"blockly": "^11.2.2",
-		"eslint": "^9.16.0",
+		"eslint": "^9.38.0",
 		"fs-extra": "^11.3.2",
 		"sinon": "^21.0.0",
 		"ts-loader": "^9.5.4",
