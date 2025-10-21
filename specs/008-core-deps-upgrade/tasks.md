@@ -392,14 +392,18 @@
     -   [x] Blockly 11 工作區可載入 (官方保證 + Phase 3 驗證 ✅)
     -   [x] CHANGELOG.md 更新 (v0.39.0 ✅)
     -   [x] package.json 版本號更新 (0.39.0 ✅)
--   [ ] T091 [US4] 建立 git tag v0.39.0
--   [ ] T092 [US4] 推送變更到遠端分支
--   [ ] T093 [US4] 建立 Pull Request
-    -   標題: "feat: Upgrade Blockly to 12.3.1 and theme-modern to 7.0.1"
-    -   描述: 引用 spec.md 和 CHANGELOG.md
-    -   請求 code review
+-   [x] T091 [US4] 建立 git tag v0.39.0 ✅
+    -   Tag: v0.39.0
+    -   訊息: 完整升級說明與技術細節
+-   [x] T092 [US4] 推送變更到遠端分支 ✅
+    -   Branch pushed: 008-core-deps-upgrade → origin
+    -   Tag pushed: v0.39.0 → origin (觸發 GitHub Actions)
+-   [x] T093 [US4] 建立 Pull Request ✅
+    -   PR #13: https://github.com/Shen-Ming-Hong/singular-blockly/pull/13
+    -   標題: "feat: 升級 Blockly 至 12.3.1 與 theme-modern 至 7.0.1"
+    -   描述: 完整升級資訊、測試結果表格、文件連結
 
-**Checkpoint**: ✅ User Story 4 完成 - 升級完整記錄且準備發布 (14/17 tasks, 82.4%)
+**Checkpoint**: ✅ User Story 4 完成 - 升級完整記錄且準備發布 (17/17 tasks, 100%)
 
 ---
 
