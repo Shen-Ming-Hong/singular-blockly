@@ -215,7 +215,7 @@
 
 **目的**: 完成升級後的文件更新和最終檢查
 
--   [ ] T017 更新 CHANGELOG.md 記錄升級內容
+-   [x] T017 更新 CHANGELOG.md 記錄升級內容
 
     -   開啟 `E:\singular-blockly\CHANGELOG.md`
     -   在 `## [Unreleased]` 區段下新增:
@@ -237,14 +237,14 @@
     -   將 X.XX% 替換為 T015 記錄的實際變化百分比
     -   儲存檔案
 
--   [ ] T018 [P] 執行最終完整性檢查
+-   [x] T018 [P] 執行最終完整性檢查
 
     -   執行 `npm run compile` (最後一次編譯檢查)
     -   執行 `npm test` (最後一次測試驗證)
     -   若專案有 lint 腳本,執行 `npm run lint` (ESLint 檢查)
     -   驗證所有檢查通過 (編譯和測試為必要,lint 為可選)
 
--   [ ] T019 [P] 驗證 package.json 和 package-lock.json 一致性
+-   [x] T019 [P] 驗證 package.json 和 package-lock.json 一致性
 
     -   執行 `npm list @types/vscode @types/node typescript`
     -   確認版本符合預期:
@@ -253,7 +253,7 @@
         -   typescript: 5.9.3
     -   確認 package-lock.json 已自動更新
 
--   [ ] T020 提交升級變更
+-   [x] T020 提交升級變更
 
     -   執行 `git add package.json package-lock.json tsconfig.json CHANGELOG.md`
     -   執行 commit:
@@ -278,14 +278,14 @@
 
     -   將 X.XX% 替換為實際變化百分比
 
--   [ ] T021 [P] 驗證 Constitution 原則符合性 (最終檢查)
+-   [x] T021 [P] 驗證 Constitution 原則符合性 (最終檢查)
 
     -   確認符合 Principle I (Code Entities as Contracts) - 無新增實體,現有契約不變 ✅
     -   確認符合 Principle V (MCP Tools) - research.md 記錄 MCP 工具使用 ✅
     -   確認符合 Principle VII (Testing) - 190 測試覆蓋率維持 87.21% ✅
     -   確認符合 Principle IX (繁體中文) - 所有文件使用繁體中文 ✅
 
--   [ ] T022 建立升級完成報告
+-   [x] T022 建立升級完成報告
     -   在終端輸出升級摘要 (不需建立檔案,僅顯示於終端):
         -   升級套件清單和版本
         -   編譯時間 (相對基準)
