@@ -18,6 +18,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+-   升級 @types/vscode 從 1.96.0 至 1.105.0
+    Upgraded @types/vscode from 1.96.0 to 1.105.0
+-   升級 @types/node 從 20.19.22 至 22.18.12 以對齊 Node.js 22.16.0 runtime
+    Upgraded @types/node from 20.19.22 to 22.18.12 to align with Node.js 22.16.0 runtime
+-   更新 TypeScript target 從 ES2022 至 ES2023
+    Updated TypeScript target from ES2022 to ES2023
+
+### 技術細節 Technical
+
+-   所有變更向後相容,無破壞性變更
+    All changes are backward compatible with no breaking changes
+-   190 測試全數通過,覆蓋率維持 87.21%
+    All 190 tests passing, coverage maintained at 87.21%
+-   建置產物大小變化: 0% (130,506 bytes, 與基準完全一致)
+    Build artifact size change: 0% (130,506 bytes, identical to baseline)
+
 ## [0.37.1] - 2025-10-20
 
 ### 已更新 Updated
