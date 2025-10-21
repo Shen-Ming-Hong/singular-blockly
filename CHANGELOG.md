@@ -20,6 +20,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 技術細節 Technical
 
+## [0.39.1] - 2025-10-21
+
+### 已修改 Changed
+
+-   重新發布版本,修正標籤發布順序問題
+    Re-release version to fix tag publishing order issue
+-   內容與 0.39.0 完全相同,僅修正發布流程
+    Content identical to 0.39.0, only fixing release process
+
 ## [0.39.0] - 2025-10-21
 
 ### 已更新 Updated
