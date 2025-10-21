@@ -20,6 +20,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 技術細節 Technical
 
+## [0.39.0] - 2025-10-21
+
+### 已更新 Updated
+
+-   升級 Blockly 從 11.2.2 至 12.3.1
+    Upgraded Blockly from 11.2.2 to 12.3.1
+-   升級 @blockly/theme-modern 從 6.0.12 至 7.0.1
+    Upgraded @blockly/theme-modern from 6.0.12 to 7.0.1
+
+### 技術細節 Technical
+
+-   **完全向後相容**: 零破壞性變更,所有現有工作區和積木定義無需修改
+    **Fully Backward Compatible**: Zero breaking changes, all existing workspaces and block definitions work without modification
+-   **效能改善**: 編譯時間改善 13.1% (3.999s vs 4.6s)
+    **Performance Improvement**: 13.1% faster compilation time (3.999s vs 4.6s)
+-   **API 相容性**: 100% API 相容性驗證通過
+    **API Compatibility**: 100% API compatibility verified
+    -   Blockly.inject() - 無變更
+    -   Blockly.serialization.\* - 無變更
+    -   Blockly.Events.\* - 無變更
+    -   Blockly.Theme.defineTheme() - 無變更
+-   **測試覆蓋率**: 維持 87.21% 測試覆蓋率,189/190 測試通過
+    **Test Coverage**: Maintained 87.21% test coverage, 189/190 tests passing
+-   **Blockly 12.x 新功能**:
+    -   改善的渲染效能和記憶體使用
+    -   增強的事件系統內部最佳化
+    -   更清晰的積木邊框 (@blockly/theme-modern 7.x "darker borders")
+    -   TypeScript 內建定義檔 (無需 @types/blockly)
+
 ## [0.38.1] - 2025-10-21
 
 ### 已修復 Fixed

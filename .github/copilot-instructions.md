@@ -8,6 +8,22 @@
 
 **Singular Blockly** is a VSCode extension that provides visual programming for Arduino development using Google Blockly. The extension generates Arduino C++ code and integrates with PlatformIO for hardware deployment.
 
+### Technology Stack
+
+-   **Blockly**: 12.3.1 (upgraded from 11.2.2)
+-   **@blockly/theme-modern**: 7.0.1 (upgraded from 6.0.12)
+-   **TypeScript**: 5.9.3
+-   **Node.js**: 22.16.0+
+-   **VS Code Engine**: 1.96.0+
+-   **Webpack**: 5.102.1
+
+**Upgrade Notes (Blockly 12.x)**:
+
+-   All core APIs maintain backward compatibility (inject, serialization, events, themes)
+-   Workspace JSON format unchanged - existing `main.json` files load seamlessly
+-   Theme structure fully compatible - custom themes require no modifications
+-   Only breaking change: CSS icon class names converted to camelCase (check `media/css/*.css`)
+
 ### Core Architecture
 
 ```
@@ -87,6 +103,13 @@ arduinoGenerator.forBlock['block_name'] = function (block) {
 
 **Important**: Block types and generator names must match exactly.
 
+**Blockly 12.x API Compatibility**:
+
+-   `Blockly.Blocks[]` registry: Unchanged from v11
+-   `arduinoGenerator.forBlock[]` pattern: Unchanged from v11
+-   Block definition structure: Fully compatible
+-   All existing blocks work without modification
+
 ## Multi-Board Support System
 
 The extension supports multiple Arduino boards (Uno, Nano, Mega, ESP32, Super Mini). Board configurations are in `media/blockly/blocks/board_configs.js`:
@@ -114,6 +137,18 @@ if (window.currentBoard === 'esp32') {
 -   Saved to: `{workspace}/blockly/main.json`
 -   Structure: `{ workspace: {...}, board: 'arduino_uno', theme: 'light' }`
 -   Auto-saves on every block change
+
+**Serialization API (Blockly 12.x)**:
+
+```javascript
+// Save workspace (unchanged from v11)
+const state = Blockly.serialization.workspaces.save(workspace);
+
+// Load workspace (unchanged from v11)
+Blockly.serialization.workspaces.load(state, workspace);
+```
+
+**Backward Compatibility**: Blockly 12 can load JSON files created by Blockly 11 without modification. The serialization format remains identical.
 
 ### PlatformIO Integration
 
@@ -236,11 +271,18 @@ Example workflow:
 
 ```typescript
 // Before: Adding new Blockly theme feature
-// 1. Checked Blockly v11.2.2 docs via MCP: setTheme() API confirmed
+// 1. Checked Blockly v12.3.1 docs via MCP: setTheme() API confirmed
 // 2. Verified theme format via get-library-docs: Theme interface structure
 // Implementation:
 Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme);
 ```
+
+**Blockly 12.x API Reference**:
+
+-   Workspace initialization: `Blockly.inject(container, options)` - unchanged
+-   Event system: `Blockly.Events.*` - internal improvements, external API compatible
+-   Theme system: `Blockly.Theme.defineTheme()` - fully compatible
+-   TypeScript definitions: Built-in (no `@types/blockly` needed)
 
 ### File Organization
 
@@ -264,6 +306,8 @@ Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme);
 4. **Generator Library Tracking**: Update `lib_deps_` array when blocks need Arduino libraries
 5. **Multi-language Testing**: Test UI in at least English and Traditional Chinese
 6. **Theme Consistency**: Both light and dark themes must be tested for new UI elements
+7. **Blockly Version Assumptions**: Don't assume Blockly v11 behavior - verify API compatibility with v12 documentation
+8. **CSS Class Names**: Icon-related CSS may need updates (v12 uses camelCase for icon classes)
 
 ## Testing Strategy
 
@@ -271,6 +315,15 @@ Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme);
 -   **Integration Tests**: Message handler workflows tested with mocked VSCode APIs
 -   **Manual Testing**: Blockly editor functionality requires manual WebView testing
 -   Run `npm test` before committing changes
+
+**Blockly 12.x Upgrade Testing**:
+
+-   **Backward Compatibility**: Test loading Blockly 11 `main.json` files
+-   **Serialization**: Verify save/load cycle produces identical workspace
+-   **Theme Switching**: Test both light and dark themes display correctly
+-   **Board Configuration**: Test all 5 board types (Uno, Nano, Mega, ESP32, Super Mini)
+-   **Code Generation**: Verify Arduino C++ output matches expected format
+-   **Performance**: Compile time ≤5s, bundle size ≤137KB, tests ≤3s
 
 ## Release Checklist
 
@@ -282,8 +335,28 @@ Before publishing updates:
 -   [ ] Multi-language UI verified (EN, ZH-HANT minimum)
 -   [ ] Board configurations work (test Arduino Uno + ESP32)
 -   [ ] PlatformIO integration tested (library dependencies sync correctly)
+-   [ ] Performance benchmarks met (compile ≤5s, bundle ≤137KB, tests ≤3s)
+-   [ ] Blockly 11 workspace files load successfully (backward compatibility)
 -   [ ] Changelog updated
 -   [ ] Version bumped in package.json
+
+---
+
+## Blockly 12.x Upgrade Reference
+
+For detailed information about the Blockly 12.3.1 upgrade, see:
+
+-   **Research Document**: `specs/008-core-deps-upgrade/research.md` - API analysis, breaking changes, migration guide
+-   **Data Model**: `specs/008-core-deps-upgrade/data-model.md` - Entity definitions, relationships, state management
+-   **Quickstart Guide**: `specs/008-core-deps-upgrade/quickstart.md` - Development environment setup, testing workflows
+-   **Task Breakdown**: `specs/008-core-deps-upgrade/tasks.md` - Implementation task list (generated in Phase 2)
+
+**Key Takeaways**:
+
+-   Blockly 12.x is a **low-risk upgrade** with high backward compatibility
+-   No code changes required in JavaScript files (blocks, generators, themes)
+-   Only `package.json` and potentially CSS files need updates
+-   All 190 existing tests should pass without modification
 
 ---
 

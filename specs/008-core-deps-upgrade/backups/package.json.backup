@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development, with multi-board support and internationalization.",
-	"version": "0.39.0",
+	"version": "0.38.0",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.105.0"
@@ -95,7 +95,7 @@
 		"@vscode/test-cli": "^0.0.12",
 		"@vscode/test-electron": "^2.5.2",
 		"ajv": "^8.17.1",
-		"blockly": "^12.3.1",
+		"blockly": "^11.2.2",
 		"eslint": "^9.38.0",
 		"fs-extra": "^11.3.2",
 		"sinon": "^21.0.0",
@@ -105,7 +105,7 @@
 		"webpack-cli": "^5.1.4"
 	},
 	"dependencies": {
-		"@blockly/theme-modern": "^7.0.1",
+		"@blockly/theme-modern": "^6.0.12",
 		"form-data": "^4.0.4"
 	},
 	"extensionDependencies": [

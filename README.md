@@ -9,6 +9,13 @@
 
 A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development, with multi-board support and internationalization.
 
+## Core Dependencies
+
+-   **Blockly**: 12.3.1 - Visual programming library
+-   **@blockly/theme-modern**: 7.0.1 - Modern theme with darker borders
+-   **Node.js**: 22.16.0+ required
+-   **VS Code**: 1.105.0+ required
+
 ## Features
 
 -   🎯 **Multi-Board Support**
