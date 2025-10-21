@@ -424,11 +424,11 @@
     -   結果: **0 vulnerabilities** 找到
     -   所有生產依賴項安全無虞
 -   [x] T097 [P] 驗證所有日誌使用 `log.info/error/warn/debug` (不使用 console.log) ✅
-    -   src/**/*.ts: 無 console.log 使用 ✅
-    -   src/**/*.ts: 僅測試檔案註解中有 console.error (可接受) ✅
+    -   src/\*_/_.ts: 無 console.log 使用 ✅
+    -   src/\*_/_.ts: 僅測試檔案註解中有 console.error (可接受) ✅
     -   符合憲章 Principle VI (Structured Logging)
 -   [x] T098 [P] 驗證所有規格和用戶文件使用繁體中文 (zh-TW) ✅
-    -   檢查: specs/008-core-deps-upgrade/*.md
+    -   檢查: specs/008-core-deps-upgrade/\*.md
     -   結果: 所有規格文件(spec.md, plan.md, tasks.md, research.md)已使用繁體中文
     -   符合憲章 Principle IX (Traditional Chinese Documentation Standard)
 -   [x] T099 執行最終 quickstart.md 驗證 ✅
