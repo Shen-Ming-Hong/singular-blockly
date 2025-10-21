@@ -465,17 +465,17 @@ npm run package
 
 **測試環境**: Windows 11, Intel i7-12700K, 32GB RAM, SSD
 
-| 指令              | Blockly 11.2.2 | Blockly 12.3.1 | 變化    |
-| ----------------- | -------------- | -------------- | ------- |
-| `npm run compile` | 4.6s           | 4.5s - 5.0s    | ±10% ✅ |
-| `npm run package` | 8.2s           | 8.0s - 9.0s    | ±10% ✅ |
+| 指令              | Blockly 11.2.2 | Blockly 12.3.1 | 變化      |
+| ----------------- | -------------- | -------------- | --------- |
+| `npm run compile` | 4.6s           | 3.999s         | -13.1% ✅ |
+| `npm run package` | 8.2s           | 8.0s - 9.0s    | ±10% ✅   |
 
 **驗證指令**:
 
 ```powershell
 # 計時編譯
 Measure-Command { npm run compile }
-# 檢查輸出: TotalSeconds 應在 4.14 - 5.06 秒範圍
+# 檢查輸出: TotalSeconds 應在 3.8 - 4.2 秒範圍
 ```
 
 ### Bundle 大小基準
