@@ -20,6 +20,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 技術細節 Technical
 
+## [0.38.1] - 2025-10-21
+
+### 已修復 Fixed
+
+-   修正 package.json 中 engines.vscode 版本要求 (從 ^1.96.0 更新至 ^1.105.0)
+    Fixed engines.vscode version requirement in package.json (updated from ^1.96.0 to ^1.105.0)
+-   修正 GitHub Actions 工作流程中的 Node.js 版本不匹配問題
+    Fixed Node.js version mismatch in GitHub Actions workflows
+-   升級所有 CI/CD 流程使用 Node.js 22 以匹配 @types/node@^22.0.0
+    Upgraded all CI/CD pipelines to use Node.js 22 to match @types/node@^22.0.0
+
+### 技術細節 Technical
+
+-   此修正確保 VSCode Marketplace 發布流程正常運作
+    This fix ensures VSCode Marketplace publishing workflow operates correctly
+-   所有 GitHub Actions workflows 現在使用一致的 Node.js 版本
+    All GitHub Actions workflows now use consistent Node.js version
+
 ## [0.38.0] - 2025-10-21
 
 ### 已修改 Changed
