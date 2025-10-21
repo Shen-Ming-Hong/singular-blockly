@@ -18,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修改 Changed
 
+### 技術細節 Technical
+
+## [0.38.0] - 2025-10-21
+
+### 已修改 Changed
+
 -   升級 @types/vscode 從 1.96.0 至 1.105.0
     Upgraded @types/vscode from 1.96.0 to 1.105.0
 -   升級 @types/node 從 20.19.22 至 22.18.12 以對齊 Node.js 22.16.0 runtime
