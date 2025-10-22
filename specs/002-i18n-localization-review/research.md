@@ -211,12 +211,23 @@
 -   Per-language sub-branches for parallel work: `002-i18n-localization-review/ja`, `/ko`, `/de`, etc.
 -   Merge to main branch only after native speaker approval
 
-**CI/CD Integration**:
+**CI/CD Integration** (Updated per Clarifications Session 2025-10-22):
 
--   Automated checks run on all translation file changes
--   Block merge if automated checks fail
--   Require native speaker reviewer approval (via CODEOWNERS)
--   Feature flags control which languages show new translations
+-   **Automated Audit Checks**: Run `audit-translations.js` on all translation file changes
+-   **Failure Handling (Q1-B)**: Whitelist violations trigger CI warning but allow merge (non-blocking)
+    -   Rationale: Balance code quality with development velocity; prevents false positives from blocking urgent fixes
+    -   Action: Add GitHub Actions step that posts warning comment to PR but returns exit code 0
+-   **PR Review Requirements (Q2-Yes)**: All translation PRs require human code review approval
+    -   Reviewers verify: (1) whitelist additions have valid rationale, (2) new violations follow documented patterns
+    -   Does NOT require native speaker review (too resource-intensive for volunteers)
+-   **Audit Report Retention (Q3-Yes)**: Store audit reports in Git for 6-month retention period
+    -   Location: `specs/002-i18n-localization-review/audit-reports/YYYY-MM-DD.json`
+    -   Purpose: Track violation trends, inform rule governance decisions
+    -   Cleanup: Automated job removes reports older than 6 months
+-   **Rule Health Monitoring (Q5-B)**: Track whitelist effectiveness via audit statistics
+    -   Monitor: Total violations, per-rule match count, false positive rate
+    -   Action: Flag rules with <5 matches in 3 months for governance review
+-   Feature flags control which languages show new translations (unchanged)
 
 **Translation SLA**:
 
@@ -368,6 +379,30 @@ Target: ≥30% improvement across all 3 tasks
 -   Implement automated checks in CI/CD (P3 priority)
 -   Establish CODEOWNERS for language-specific reviewers
 -   Create clear contribution guidelines in localization docs
+
+### Risk 5: Remaining Issues After Whitelist Exhaustion (Q4-B)
+
+**Context**: Clarifications Session 2025-10-22 decision on handling violations that cannot be filtered
+
+**Mitigation Strategy - Document and Accept**:
+
+-   **Decision**: Accept remaining violations as known limitations after whitelist refinement
+-   **Documentation Approach**:
+    -   Create `specs/002-i18n-localization-review/KNOWN-ISSUES.md` listing:
+        1. Each remaining violation pattern with example message keys
+        2. Root cause analysis (e.g., "English word order required by Blockly API")
+        3. Rationale for acceptance (e.g., "Low frequency string, minimal user impact")
+    -   Include acceptance criteria: "Remaining violations affect <2% of strings (85/4262)"
+-   **Communication Plan**:
+    -   Update README localization section with link to KNOWN-ISSUES.md
+    -   Add comment in audit-whitelist.json referencing documentation
+    -   Include summary in Phase completion PR description
+-   **Future Improvement Path**:
+    -   Mark documented issues with "help wanted" label for volunteer contributions
+    -   Track in GitHub Issues for visibility to community translators
+    -   Revisit during major Blockly API upgrades (may unlock new solutions)
+
+**Rationale**: Pragmatic approach balancing perfectionism vs delivery (Principle IV: Avoid Over-Development)
 
 ---
 
