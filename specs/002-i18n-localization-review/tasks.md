@@ -1,5 +1,8 @@
 # 任務清單: 國際化在地化品質審查與改善
 
+> **注意:為了技術相容性,所有檔案路徑與檔名仍以英文標示。**  
+> _Note: All file paths and filenames remain in English for technical compatibility._
+
 **輸入**: 設計文件來自 `/specs/002-i18n-localization-review/`  
 **前置需求**: plan.md ✅, spec.md ✅, research.md ✅, data-model.md ✅, contracts/ ✅, quickstart.md ✅
 
