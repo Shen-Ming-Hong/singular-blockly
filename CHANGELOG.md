@@ -12,13 +12,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 新增 Added
 
+-   新增 ES2023 語法驗證測試套件 (5 個測試)
+    Added ES2023 syntax validation test suite (5 tests)
+    -   toSorted() - 不可變陣列排序
+    -   findLast() - 從末尾查找
+    -   toReversed() - 不可變陣列反轉
+    -   with() - 不可變元素替換
+    -   findLastIndex() - 從末尾查找索引
+
 ### 已修復 Fixed
 
 ### 已更新 Updated
 
+-   升級 @typescript-eslint/eslint-plugin 從 8.46.1 至 8.46.2
+    Upgraded @typescript-eslint/eslint-plugin from 8.46.1 to 8.46.2
+-   升級 webpack-cli 從 5.1.4 至 6.0.1 (MAJOR 版本)
+    Upgraded webpack-cli from 5.1.4 to 6.0.1 (MAJOR version)
+    -   包含 @webpack-cli/configtest 3.0.1, @webpack-cli/info 3.0.1, @webpack-cli/serve 3.0.1
+    -   無需修改配置檔案或腳本
+-   更新 ESLint ecmaVersion 設定從 2022 至 2023
+    Updated ESLint ecmaVersion configuration from 2022 to 2023
+
 ### 已修改 Changed
 
 ### 技術細節 Technical
+
+-   **效能改善**: 編譯時間改善 7% (5775ms → 5368ms)
+    **Performance Improvement**: 7% faster compilation time (5775ms → 5368ms)
+-   **測試覆蓋率提升**: 測試數量從 190 增加至 195
+    **Test Coverage Increased**: Test count increased from 190 to 195
+-   **零破壞性變更**: 所有升級維持完全向後相容
+    **Zero Breaking Changes**: All upgrades maintain full backward compatibility
+-   **Node.js 需求**: webpack-cli 6.x 需要 Node.js 18.12+ (專案使用 22.16.0)
+    **Node.js Requirement**: webpack-cli 6.x requires Node.js 18.12+ (project uses 22.16.0)
 
 ## [0.39.1] - 2025-10-21
 
