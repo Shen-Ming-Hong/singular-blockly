@@ -8,6 +8,7 @@ const { detectTerminologyInconsistency } = require('./lib/detectors/terminology-
 const { detectCulturalMismatch } = require('./lib/detectors/cultural-mismatch');
 const { detectLengthOverflow } = require('./lib/detectors/length-overflow');
 const { detectMissingTranslation } = require('./lib/detectors/missing-translation');
+const { filterIssues, generateWhitelistStats } = require('./lib/whitelist-checker');
 
 async function main() {
 	const args = process.argv.slice(2);
@@ -117,6 +118,39 @@ async function main() {
 		report.issuesPerLanguage[lang] = langIssueCount;
 		log.info(`${lang}: ${langIssueCount} issues found`);
 	});
+
+	// Apply whitelist filtering
+	log.info('Applying whitelist filters...');
+	const filterResult = filterIssues(report.issues, {
+		removeWhitelisted: true,
+		verbose: verboseFlag,
+	});
+
+	// Update report with filtered issues
+	const whitelistedIssues = filterResult.whitelisted;
+	report.issues = filterResult.issues;
+
+	// Recalculate severity counts after filtering
+	report.issuesBySeverity = { high: 0, medium: 0, low: 0 };
+	report.issues.forEach(issue => {
+		report.issuesBySeverity[issue.severity]++;
+	});
+
+	// Recalculate language issue counts after filtering
+	report.issuesPerLanguage = {};
+	languages.forEach(lang => {
+		report.issuesPerLanguage[lang] = report.issues.filter(i => i.language === lang).length;
+	});
+
+	// Add whitelist statistics to report
+	report.whitelistStats = {
+		...filterResult.statistics,
+		breakdown: generateWhitelistStats(whitelistedIssues),
+	};
+
+	log.info(
+		`Whitelist filtering: ${filterResult.statistics.filtered} issues filtered (${filterResult.statistics.filterRate.toFixed(1)}%)`
+	);
 
 	// Calculate totals
 	report.totalIssues = report.issues.length;

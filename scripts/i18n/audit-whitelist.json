@@ -1,0 +1,233 @@
+{
+    "version": "1.0.0",
+    "description": "Whitelist for translation audit false positives. These are legitimate translations that trigger automated checks but are actually correct.",
+    "lastUpdated": "2025-10-22T00:00:00Z",
+    "exemptions": {
+        "lengthOverflow": {
+            "description": "Translations that are legitimately shorter/longer than English due to language characteristics",
+            "rules": [
+                {
+                    "ruleId": "cjk-concise-terms",
+                    "description": "CJK languages (Chinese, Japanese, Korean) use more concise characters for technical terms",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "zh-hant"
+                    ],
+                    "patterns": [
+                        "CATEGORY_.*",
+                        ".*_TOOLTIP",
+                        ".*_HELPURL"
+                    ],
+                    "rationale": "CJK languages naturally use fewer characters for technical terms. E.g., 'Variables' (9 chars) → '変数' (2 chars) in Japanese is standard and complete."
+                },
+                {
+                    "ruleId": "german-compound-words",
+                    "description": "German creates compound words that are legitimately longer",
+                    "languages": [
+                        "de"
+                    ],
+                    "keys": [
+                        "CATEGORY_MATH",
+                        "CATEGORY_LOOPS"
+                    ],
+                    "rationale": "German compound words like 'Mathematik' and 'Schleifen' are standard translations, not UI overflow issues."
+                },
+                {
+                    "ruleId": "brand-names-unchanged",
+                    "description": "Brand names and proper nouns remain in English across all languages",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "de",
+                        "zh-hant",
+                        "es"
+                    ],
+                    "keys": [
+                        "CATEGORY_ARDUINO",
+                        "BOARD_UNO",
+                        "BOARD_NANO",
+                        "BOARD_MEGA",
+                        "BOARD_ESP32",
+                        "BOARD_SUPERMINI"
+                    ],
+                    "rationale": "Arduino is a brand name and should remain unchanged in all languages. Board names (Uno, Nano, Mega, ESP32) are product names and should also remain in English."
+                },
+                {
+                    "ruleId": "technical-urls",
+                    "description": "Technical documentation URLs remain in English",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "de",
+                        "zh-hant",
+                        "es"
+                    ],
+                    "patterns": [
+                        ".*_HELPURL$"
+                    ],
+                    "rationale": "URLs to English documentation (e.g., GitHub wiki) should not be translated."
+                },
+                {
+                    "ruleId": "spanish-natural-expansion",
+                    "description": "Spanish translations naturally expand due to morphology",
+                    "languages": [
+                        "es"
+                    ],
+                    "keys": [
+                        "CATEGORY_MATH"
+                    ],
+                    "rationale": "Spanish 'Matemáticas' is the correct translation of 'Math'. Spanish technical terms often expand due to plural forms and morphological requirements."
+                }
+            ]
+        },
+        "directTranslation": {
+            "description": "Translations that appear to be direct translations but are actually correct standard terminology",
+            "rules": [
+                {
+                    "ruleId": "standard-technical-terms",
+                    "description": "Standard programming and electronics terms that have established translations",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "de",
+                        "zh-hant",
+                        "es"
+                    ],
+                    "keys": [
+                        "CATEGORY_TEXT",
+                        "CATEGORY_LOGIC",
+                        "CATEGORY_LOOPS",
+                        "CATEGORY_MATH",
+                        "CATEGORY_LISTS",
+                        "CATEGORY_VARIABLES",
+                        "CATEGORY_FUNCTIONS"
+                    ],
+                    "rationale": "These are standard technical terms with established translations. Word/character count similarity is expected for universal programming concepts."
+                },
+                {
+                    "ruleId": "cognates-and-loanwords",
+                    "description": "Words that are cognates or established loanwords in target language",
+                    "languages": [
+                        "de",
+                        "es"
+                    ],
+                    "patterns": [
+                        "CATEGORY_.*",
+                        ".*_SENSORS",
+                        ".*_MOTORS"
+                    ],
+                    "examples": {
+                        "de": [
+                            "Text",
+                            "Logik",
+                            "Block",
+                            "Sensoren",
+                            "Motoren"
+                        ],
+                        "es": [
+                            "texto",
+                            "lógica",
+                            "bloque",
+                            "Sensores",
+                            "Motores",
+                            "Variables"
+                        ]
+                    },
+                    "rationale": "German and Spanish share Latin/Greek roots with English. Similar word forms are legitimate cognates, not lazy translations. German plurals often add -en (Sensor→Sensoren). Spanish technical terms often match English exactly due to shared Latin roots."
+                }
+            ]
+        },
+        "missingTranslation": {
+            "description": "Strings that legitimately remain in English",
+            "rules": [
+                {
+                    "ruleId": "brand-and-product-names",
+                    "description": "Brand names, product names, and proper nouns",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "de",
+                        "zh-hant",
+                        "es"
+                    ],
+                    "keys": [
+                        "CATEGORY_ARDUINO",
+                        "BOARD_UNO",
+                        "BOARD_NANO",
+                        "BOARD_MEGA",
+                        "BOARD_ESP32",
+                        "BOARD_SUPERMINI"
+                    ],
+                    "rationale": "Brand names like 'Arduino' and product names like 'Uno', 'Nano', 'Mega', 'ESP32', 'Super Mini' should not be translated."
+                },
+                {
+                    "ruleId": "cognates-and-loanwords-missing",
+                    "description": "Cognates that appear identical to English but are valid translations",
+                    "languages": [
+                        "de",
+                        "es"
+                    ],
+                    "keys": [
+                        "CATEGORY_TEXT",
+                        "CATEGORY_VARIABLES"
+                    ],
+                    "rationale": "German 'Text' and Spanish 'Variables' are legitimate translations that happen to be identical to English. This is common for technical terminology derived from Latin."
+                },
+                {
+                    "ruleId": "programming-keywords",
+                    "description": "Programming language keywords and function names",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "de",
+                        "zh-hant",
+                        "es"
+                    ],
+                    "patterns": [
+                        ".*_FUNCTION_.*",
+                        "SETUP_.*",
+                        "LOOP_.*"
+                    ],
+                    "rationale": "Arduino function names like 'setup' and 'loop' are part of the programming API and should remain in English."
+                },
+                {
+                    "ruleId": "external-urls",
+                    "description": "External documentation URLs",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "de",
+                        "zh-hant",
+                        "es"
+                    ],
+                    "patterns": [
+                        ".*_HELPURL$"
+                    ],
+                    "rationale": "URLs pointing to external English documentation should not be flagged as missing translations."
+                }
+            ]
+        }
+    },
+    "usage": {
+        "description": "How to use this whitelist in audit scripts",
+        "implementation": "Load this file in audit-translations.js and check each detected issue against whitelist rules before adding to report. If issue matches any whitelist rule, skip it or mark as 'whitelisted' with rationale.",
+        "priority": "Whitelist checks should run AFTER detection but BEFORE severity assignment to reduce noise in reports."
+    },
+    "statistics": {
+        "totalRules": 11,
+        "affectedLanguages": [
+            "ja",
+            "ko",
+            "de",
+            "zh-hant",
+            "es"
+        ],
+        "estimatedFalsePositiveReduction": "~70-80% of current high-severity issues"
+    },
+    "maintenance": {
+        "reviewCycle": "quarterly",
+        "addNewRules": "When native speaker feedback indicates a legitimate translation is being flagged incorrectly",
+        "removeRules": "When actual translation errors are found that were previously whitelisted"
+    }
+}
