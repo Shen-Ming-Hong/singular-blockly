@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.41.0] - 2025-10-22
+
 ### 新增 Added
 
 -   **專案安全防護機制** (Project Safety Guard)
@@ -27,21 +29,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 已修復 Fixed
 
--   修正安全警告對話框出現重複取消按鈕的問題
-    Fixed duplicate cancel button issue in safety warning dialog
-
-### 已更新 Updated
-
-### 已修改 Changed
+-   修正安全警告對話框註解描述不準確的問題
+    Fixed inaccurate comment description in safety warning dialog
 
 ### 技術細節 Technical
 
--   新增 `WorkspaceValidator` 服務類別 (296 行)
-    Added WorkspaceValidator service class (296 lines)
--   新增 `ProjectTypeDetector` 純函式模組 (110 行)
-    Added ProjectTypeDetector pure function module (110 lines)
+-   新增 `WorkspaceValidator` 服務類別 (292 行)
+    Added WorkspaceValidator service class (292 lines)
+-   新增 `ProjectTypeDetector` 純函式模組 (109 行)
+    Added ProjectTypeDetector pure function module (109 lines)
 -   新增 54 個單元測試與整合測試 (涵蓋率 100%)
     Added 54 unit and integration tests (100% coverage)
+-   改進測試環境偵測邏輯,支援 NODE_ENV 環境變數
+    Improved test environment detection logic with NODE_ENV support
+-   使用 `path.isAbsolute()` 替代手動路徑驗證,支援 UNC 路徑
+    Replaced manual path validation with `path.isAbsolute()` for UNC path support
+-   JSDoc 範例路徑改用跨平台 POSIX 格式
+    Updated JSDoc example paths to cross-platform POSIX format
 -   Bundle 大小: 152 KiB (+25 KiB)
     Bundle size: 152 KiB (+25 KiB)
 -   測試套件: 249/250 通過 (99.6%)
