@@ -12,6 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 新增 Added
 
+### 已修復 Fixed
+
+### 已更新 Updated
+
+### 已修改 Changed
+
+### 技術細節 Technical
+
+## [0.40.0] - 2025-10-22
+
+### 新增 Added
+
 -   新增 ES2023 語法驗證測試套件 (5 個測試)
     Added ES2023 syntax validation test suite (5 tests)
     -   toSorted() - 不可變陣列排序
@@ -19,8 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     -   toReversed() - 不可變陣列反轉
     -   with() - 不可變元素替換
     -   findLastIndex() - 從末尾查找索引
-
-### 已修復 Fixed
 
 ### 已更新 Updated
 
@@ -32,8 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     -   無需修改配置檔案或腳本
 -   更新 ESLint ecmaVersion 設定從 2022 至 2023
     Updated ESLint ecmaVersion configuration from 2022 to 2023
-
-### 已修改 Changed
 
 ### 技術細節 Technical
 
