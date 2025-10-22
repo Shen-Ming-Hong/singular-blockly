@@ -86,8 +86,11 @@ export class WebViewManager {
 
 		// ===== Phase 3: 專案安全防護機制 =====
 		// 驗證工作區是否為 Blockly 專案,若不是則顯示警告
-		// 測試環境跳過 (避免測試中觸發對話框)
-		const isTestEnvironment = workspaceRoot.includes('/mock/') || workspaceRoot.includes('\\mock\\');
+		// 測試環境跳過 (避免測試中觸發警告)
+		const isTestEnvironment =
+			process.env.NODE_ENV === 'test' ||
+			workspaceRoot.includes('/mock/') ||
+			workspaceRoot.includes('\\mock\\');
 
 		if (!isTestEnvironment) {
 			const validator = new WorkspaceValidator(workspaceRoot, settingsManager, this.localeService);

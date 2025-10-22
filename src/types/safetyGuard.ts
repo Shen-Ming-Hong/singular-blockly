@@ -5,6 +5,8 @@
  * Purpose: 定義功能的 TypeScript 介面、類型別名與常數
  */
 
+import * as path from 'path';
+
 // ============================================================================
 // Core Data Types
 // ============================================================================
@@ -70,7 +72,7 @@ export interface IWorkspaceValidator {
 	 * @throws Error - 當工作區路徑無效或無法存取時
 	 *
 	 * @example
-	 * const result = await validator.validateWorkspace('E:/my-project');
+	 * const result = await validator.validateWorkspace('/path/to/project');
 	 * if (result.shouldShowWarning) {
 	 *   // 顯示警告對話框
 	 * }
@@ -240,8 +242,8 @@ export function isValidWorkspacePath(workspacePath: string): boolean {
 	return (
 		typeof workspacePath === 'string' &&
 		workspacePath.length > 0 &&
-		// 檢查是否為絕對路徑(Windows: C:/, Linux/macOS: /)
-		(workspacePath.startsWith('/') || /^[a-zA-Z]:[/\\]/.test(workspacePath))
+		// 檢查是否為絕對路徑 (支援 Windows, Linux, macOS, UNC 路徑)
+		path.isAbsolute(workspacePath)
 	);
 }
 

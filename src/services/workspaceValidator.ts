@@ -188,7 +188,7 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 			const continueButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_CONTINUE, '繼續');
 			const suppressButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_SUPPRESS, '不再提醒');
 
-			// 顯示模態對話框 (VSCode 會自動提供取消按鈕)
+			// 顯示模態對話框 (使用者按 ESC 或關閉視窗會返回 undefined,視為取消)
 			const selection = await vscode.window.showWarningMessage(message, { modal: true }, continueButton, suppressButton);
 
 			// 解析使用者選擇
