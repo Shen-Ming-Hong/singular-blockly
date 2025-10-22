@@ -497,6 +497,107 @@ The complete terminology glossary file (`localization-glossary.json`) has this t
 
 ---
 
+### 5. WhitelistRule
+
+**Purpose**: Single rule in audit whitelist configuration (`audit-whitelist.json`) for filtering known false positives during automated translation checks.
+
+**Properties**:
+
+| Property       | Type         | Required | Description                                                            |
+| -------------- | ------------ | -------- | ---------------------------------------------------------------------- |
+| `id`           | string       | Yes      | Unique rule identifier (e.g., `WL-001`, `WL-002`)                      |
+| `name`         | string       | Yes      | Human-readable rule name (e.g., "Blockly API Required English Terms")  |
+| `pattern`      | string       | Yes      | String or glob pattern to match against violation text                 |
+| `rationale`    | string       | Yes      | Explanation of why this pattern is whitelisted                         |
+| `addedBy`      | string       | Yes      | GitHub username of person who added rule                               |
+| `addedAt`      | string (ISO) | Yes      | Timestamp when rule was added                                          |
+| `lastReviewed` | string (ISO) | No       | Timestamp of last governance review (Q5 health check)                  |
+| `matchCount`   | number       | No       | Number of violations matched in last audit run (updated automatically) |
+| `tags`         | string[]     | No       | Tags for categorization (e.g., `["api-constraint", "hardware-term"]`)  |
+
+**Example**:
+
+```json
+{
+	"id": "WL-001",
+	"name": "Blockly Workspace API Terms",
+	"pattern": "*workspace*",
+	"rationale": "Blockly core API requires 'workspace' term in English for technical accuracy",
+	"addedBy": "maintainer-username",
+	"addedAt": "2025-10-22T10:30:00Z",
+	"lastReviewed": "2025-10-22T10:30:00Z",
+	"matchCount": 12,
+	"tags": ["api-constraint", "blockly-core"]
+}
+```
+
+---
+
+### 6. RuleHealthMetrics
+
+**Purpose**: Aggregated statistics for whitelist rule effectiveness monitoring (per Clarifications Q5-B). Generated during each audit run to track rule usage and identify stale rules.
+
+**Properties**:
+
+| Property            | Type                   | Required | Description                                                    |
+| ------------------- | ---------------------- | -------- | -------------------------------------------------------------- |
+| `generatedAt`       | string (ISO)           | Yes      | Metrics generation timestamp                                   |
+| `totalRules`        | number                 | Yes      | Total whitelist rules in configuration                         |
+| `totalViolations`   | number                 | Yes      | Total violations before filtering                              |
+| `filteredCount`     | number                 | Yes      | Total violations filtered by whitelist                         |
+| `filterRate`        | number                 | Yes      | Percentage filtered: `(filteredCount / totalViolations) * 100` |
+| `perRuleStats`      | RuleStatistic[]        | Yes      | Per-rule match statistics (see RuleStatistic below)            |
+| `staleRules`        | string[]               | Yes      | Rule IDs with <5 matches in last 3 months (flagged for review) |
+| `topRules`          | string[]               | Yes      | Top 5 rule IDs by match count (most effective filters)         |
+| `recommendedAction` | Record<string, string> | Yes      | Per-rule recommendation: `"keep"`, `"review"`, or `"remove"`   |
+| `auditReportId`     | string                 | Yes      | Reference to associated AuditReport for traceability           |
+
+**RuleStatistic** (nested object):
+
+```typescript
+interface RuleStatistic {
+	ruleId: string; // Whitelist rule ID (e.g., "WL-001")
+	matchCount: number; // Violations matched in this audit run
+	lastMatched: string | null; // ISO timestamp of last match (null if no matches)
+	trend: 'increasing' | 'stable' | 'decreasing'; // Match count trend over last 3 audits
+}
+```
+
+**Example**:
+
+```json
+{
+	"generatedAt": "2025-10-22T15:00:00Z",
+	"totalRules": 8,
+	"totalViolations": 1692,
+	"filteredCount": 149,
+	"filterRate": 8.8,
+	"perRuleStats": [
+		{
+			"ruleId": "WL-001",
+			"matchCount": 45,
+			"lastMatched": "2025-10-22T15:00:00Z",
+			"trend": "stable"
+		},
+		{
+			"ruleId": "WL-008",
+			"matchCount": 3,
+			"lastMatched": "2025-09-15T10:30:00Z",
+			"trend": "decreasing"
+		}
+	],
+	"staleRules": ["WL-008"],
+	"topRules": ["WL-001", "WL-002", "WL-003", "WL-004", "WL-005"],
+	"recommendedAction": {
+		"WL-001": "keep",
+		"WL-008": "review"
+	},
+	"auditReportId": "audit-2025-10-22-post-whitelist"
+}
+```
+
+---
+
 ## Relationships
 
 ```
@@ -504,11 +605,22 @@ AuditReport
   └── contains multiple TranslationQualityIssue[]
       └── each references a message key that should be translated per LocalizationGuideline
           └── which references TerminologyEntry[] in glossary
+  └── associated with RuleHealthMetrics (via auditReportId)
+
+RuleHealthMetrics
+  └── contains RuleStatistic[] for each WhitelistRule
+      └── references WhitelistRule by ruleId
+
+WhitelistRule
+  └── used by audit scripts to filter TranslationQualityIssue[]
+  └── tracked by RuleHealthMetrics for governance
+```
 
 LocalizationGuideline
-  └── terminologyReference points to glossary
-  └── examples demonstrate application of TerminologyEntry translations
-```
+└── terminologyReference points to glossary
+└── examples demonstrate application of TerminologyEntry translations
+
+````
 
 ---
 
@@ -554,7 +666,7 @@ const issue: TranslationQualityIssue = {
 	detectedBy: 'native-speaker-review',
 	detectedAt: new Date().toISOString(),
 };
-```
+````
 
 ### Querying High-Priority Issues from Audit Report
 
@@ -580,6 +692,8 @@ const japaneseTerm = servoTerm.translations.ja.term; // "サーボモーター"
 | AuditReport             | `audit-reports/{reportId}.json`                                                | JSON            |
 | LocalizationGuideline   | `guidelines/{language}.json` (metadata) + `guidelines/{language}.md` (content) | JSON + Markdown |
 | TerminologyEntry        | `localization-glossary.json` → `terms` array                                   | JSON            |
+| WhitelistRule           | `scripts/i18n/audit-whitelist.json` → `rules` array                            | JSON            |
+| RuleHealthMetrics       | `audit-reports/rule-health-{date}.json`                                        | JSON            |
 
 **Directory Structure**:
 
@@ -588,14 +702,21 @@ specs/002-i18n-localization-review/
 ├── localization-glossary.json          # Centralized terminology
 ├── audit-reports/                      # Audit outputs (timestamped)
 │   ├── audit-2025-10-17-baseline.json
-│   └── audit-2025-10-25-post-fixes.json
-└── guidelines/                         # Per-language guidelines
-    ├── ja.json                         # Japanese guideline metadata
-    ├── ja.md                           # Japanese guideline content
-    ├── ko.json + ko.md
-    ├── de.json + de.md
-    ├── zh-hant.json + zh-hant.md
-    └── es.json + es.md
+│   ├── audit-2025-10-25-post-fixes.json
+│   └── rule-health-2025-10-22.json    # Rule effectiveness metrics (Q5)
+├── guidelines/                         # Per-language guidelines
+│   ├── ja.json + ja.md
+│   ├── ko.json + ko.md
+│   ├── de.json + de.md
+│   ├── zh-hant.json + zh-hant.md
+│   └── es.json + es.md
+└── KNOWN-ISSUES.md                     # Documented remaining violations (Q4)
+
+scripts/i18n/
+├── audit-whitelist.json                # Whitelist rules configuration
+├── audit-translations.js               # Main audit script
+└── lib/
+    └── whitelist-checker.js            # Rule matching engine
 ```
 
 ---

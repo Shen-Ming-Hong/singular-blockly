@@ -1,0 +1,170 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://singular-blockly.github.io/schemas/whitelist-config.schema.json",
+    "title": "Audit Whitelist Configuration",
+    "description": "Schema for audit whitelist rules that filter known false positives in translation quality checks. Aligned with Clarifications Session 2025-10-22.",
+    "type": "object",
+    "required": [
+        "version",
+        "lastUpdated",
+        "rules"
+    ],
+    "properties": {
+        "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+            "description": "Semantic version of whitelist configuration",
+            "examples": [
+                "1.0.0",
+                "1.2.3"
+            ]
+        },
+        "lastUpdated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO8601 timestamp of last rule modification"
+        },
+        "rules": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/WhitelistRule"
+            },
+            "description": "Array of whitelist rules for filtering violations"
+        }
+    },
+    "definitions": {
+        "WhitelistRule": {
+            "type": "object",
+            "required": [
+                "id",
+                "name",
+                "pattern",
+                "rationale",
+                "addedBy",
+                "addedAt"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "pattern": "^WL-[0-9]{3}$",
+                    "description": "Unique rule identifier (e.g., WL-001, WL-042)",
+                    "examples": [
+                        "WL-001",
+                        "WL-042"
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 100,
+                    "description": "Human-readable rule name",
+                    "examples": [
+                        "Blockly API Required English Terms",
+                        "Hardware Brand Names",
+                        "Mathematical Symbols"
+                    ]
+                },
+                "pattern": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "String or glob pattern to match against violation text. Supports wildcards (* and ?).",
+                    "examples": [
+                        "*workspace*",
+                        "Arduino*",
+                        "GPIO*"
+                    ]
+                },
+                "rationale": {
+                    "type": "string",
+                    "minLength": 20,
+                    "description": "Explanation of why this pattern is whitelisted. Must justify acceptance of violations matching this pattern.",
+                    "examples": [
+                        "Blockly core API requires 'workspace' term in English for technical accuracy",
+                        "Brand names must remain in English for trademark compliance",
+                        "Mathematical notation is language-independent"
+                    ]
+                },
+                "addedBy": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-]+$",
+                    "description": "GitHub username of person who added this rule",
+                    "examples": [
+                        "maintainer-username",
+                        "contributor-name"
+                    ]
+                },
+                "addedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO8601 timestamp when rule was added"
+                },
+                "lastReviewed": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO8601 timestamp of last governance review (Q5 health check). Null if never reviewed since creation."
+                },
+                "matchCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Number of violations matched in last audit run. Updated automatically by audit script."
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9-]+$"
+                    },
+                    "description": "Tags for categorization (e.g., api-constraint, hardware-term, trademark)",
+                    "examples": [
+                        [
+                            "api-constraint",
+                            "blockly-core"
+                        ],
+                        [
+                            "trademark",
+                            "hardware"
+                        ],
+                        [
+                            "math-notation"
+                        ]
+                    ]
+                }
+            }
+        }
+    },
+    "examples": [
+        {
+            "version": "1.0.0",
+            "lastUpdated": "2025-10-22T10:30:00Z",
+            "rules": [
+                {
+                    "id": "WL-001",
+                    "name": "Blockly Workspace API Terms",
+                    "pattern": "*workspace*",
+                    "rationale": "Blockly core API requires 'workspace' term in English for technical accuracy",
+                    "addedBy": "maintainer-username",
+                    "addedAt": "2025-10-22T10:30:00Z",
+                    "lastReviewed": "2025-10-22T10:30:00Z",
+                    "matchCount": 12,
+                    "tags": [
+                        "api-constraint",
+                        "blockly-core"
+                    ]
+                },
+                {
+                    "id": "WL-002",
+                    "name": "Arduino Hardware Terms",
+                    "pattern": "Arduino*",
+                    "rationale": "Brand name must remain in English for trademark compliance",
+                    "addedBy": "contributor-name",
+                    "addedAt": "2025-10-20T14:00:00Z",
+                    "matchCount": 8,
+                    "tags": [
+                        "trademark",
+                        "hardware"
+                    ]
+                }
+            ]
+        }
+    ]
+}

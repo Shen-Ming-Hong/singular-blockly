@@ -444,6 +444,75 @@ node scripts/i18n/compare-translations.js \
 
 **Output**: Shows improvement metrics (issues resolved, new issues, quality %)
 
+#### 5. Manage Audit Whitelist (Post-Clarifications 2025-10-22)
+
+**View current whitelist rules**:
+
+```bash
+cat scripts/i18n/audit-whitelist.json
+```
+
+**Add new whitelist rule**:
+
+```json
+{
+	"id": "WL-009",
+	"name": "Hardware brand names",
+	"pattern": "*Arduino*",
+	"rationale": "Brand names should remain in English for trademark compliance",
+	"addedBy": "your-github-username",
+	"addedAt": "2025-10-22T10:30:00Z",
+	"tags": ["trademark", "hardware"]
+}
+```
+
+**Rule Design Guidelines**:
+
+-   Use specific patterns (avoid overly broad wildcards like `*a*`)
+-   Document clear rationale (explain WHY this is acceptable)
+-   Add tags for categorization
+-   Include your GitHub username for accountability
+
+**Validate whitelist impact**:
+
+```bash
+node scripts/i18n/audit-translations.js --dry-run
+```
+
+Shows how many violations would be filtered without saving results.
+
+#### 6. Monitor Rule Health (Clarifications Q5-B)
+
+**Generate rule effectiveness report**:
+
+```bash
+node scripts/i18n/audit-translations.js --report-rule-health
+```
+
+**Output**: `specs/002-i18n-localization-review/audit-reports/rule-health-{date}.json`
+
+**Key metrics**:
+
+```json
+{
+	"totalRules": 8,
+	"filteredCount": 149,
+	"filterRate": 8.8,
+	"staleRules": ["WL-008"],
+	"recommendedAction": {
+		"WL-001": "keep",
+		"WL-008": "review"
+	}
+}
+```
+
+**Action on stale rules**:
+
+-   `staleRules` = rules with <5 matches in last 3 months
+-   Review quarterly during governance meetings
+-   Remove rules that no longer match any violations
+-   Update patterns if becoming too broad/narrow
+
 ---
 
 ## For Maintainers
@@ -465,20 +534,22 @@ node scripts/i18n/compare-translations.js \
 
 **Allows parallel work** without conflicts.
 
-#### 2. PR Review Workflow
+#### 2. PR Review Workflow (Updated per Clarifications 2025-10-22)
 
 **Checklist before merge**:
 
-1. ✅ **Automated checks pass**:
+1. ✅ **CI/CD Automated checks** (Q1-B: Non-blocking):
 
     - Translation file schema validation
     - Placeholder variable preservation ({0}, %1)
-    - No empty translations
+    - Audit whitelist violations → **WARNING only** (does not block merge)
+    - GitHub Actions posts warning comment if new violations detected
 
-2. ✅ **Native speaker approval**:
+2. ✅ **Human code review REQUIRED** (Q2-Yes):
 
-    - Assigned native speaker reviewer approved PR
-    - Average score meets threshold (≥4.0 for medium-frequency)
+    - At least one maintainer/developer reviews PR
+    - Verifies: (1) whitelist rule additions have valid rationale, (2) new violations follow documented patterns
+    - **Does NOT require native speaker approval** (volunteer availability too limited)
 
 3. ✅ **Guideline conformance**:
 
@@ -490,14 +561,21 @@ node scripts/i18n/compare-translations.js \
     - UI rendering correct (no text overflow)
     - Language switching works
 
+**Note**: Native speaker approval is **nice-to-have** but NOT required for merge. See Clarifications Session 2025-10-22 for rationale (volunteer availability constraints).
+
 #### 3. Merge Criteria
 
 **Required for merge approval**:
 
--   [ ] Native speaker review: APPROVED
--   [ ] Automated checks: PASSED
--   [ ] UI testing: VERIFIED
--   [ ] Guideline conformance: CONFIRMED
+-   [ ] Human code review: APPROVED (minimum 1 maintainer)
+-   [ ] Automated checks: PASSED (schema validation, placeholders)
+-   [ ] UI testing: VERIFIED (tested in VS Code extension)
+-   [ ] Guideline conformance: CONFIRMED (uses approved terminology)
+-   [ ] Whitelist violations: DOCUMENTED (if adding new rules, rationale provided)
+
+**Optional but encouraged**:
+
+-   [ ] Native speaker review: APPROVED (if volunteer available)
 
 **Merge command**:
 
@@ -532,14 +610,79 @@ Use `--no-ff` to preserve PR history.
 **Metrics to track**:
 
 -   Issues per language (from audit reports)
--   Average native speaker scores
+-   Whitelist effectiveness (filter rate, rule health)
 -   User feedback (GitHub issues tagged `localization`)
 
 **Regression prevention**:
 
 -   Run audit tool on every translation PR
--   Flag new issues introduced
--   Maintain quality baseline
+-   Flag new violations with warnings (non-blocking per Q1-B)
+-   Maintain quality baseline via trend analysis
+
+#### 6. Audit Report Retention Policy (Clarifications Q3-Yes)
+
+**Retention Period**: 6 months
+
+**Storage Location**: `specs/002-i18n-localization-review/audit-reports/`
+
+**File Naming**:
+
+```
+audit-reports/
+├── audit-2025-10-17-baseline.json
+├── audit-2025-10-25-post-fixes.json
+├── rule-health-2025-10-22.json
+└── ...
+```
+
+**Automated Cleanup**:
+
+-   Monthly cron job removes reports older than 6 months
+-   Keeps baseline reports (tagged with `baseline` in filename)
+-   Exports quarterly summaries for long-term trend tracking
+
+**Purpose**:
+
+-   Track violation trends over time
+-   Inform rule governance decisions (identify stale rules)
+-   Audit trail for whitelist changes
+
+**Manual Cleanup Command**:
+
+```bash
+find specs/002-i18n-localization-review/audit-reports/ \
+  -type f -name "*.json" \
+  -mtime +180 ! -name "*baseline*" \
+  -delete
+```
+
+(Deletes files older than 180 days, preserving baseline reports)
+
+#### 7. Handling Remaining Issues (Clarifications Q4-B)
+
+After whitelist refinement, some violations may remain unfixable due to technical constraints.
+
+**Documentation Process**:
+
+1. **Create/Update `KNOWN-ISSUES.md`** in spec directory
+2. **List each remaining pattern** with:
+    - Example message keys affected
+    - Root cause (e.g., "Blockly API requires English term")
+    - Acceptance rationale (e.g., "Low frequency, minimal impact")
+3. **Set acceptance threshold**: Remaining violations must affect <2% of strings
+4. **Mark issues as `help wanted`** in GitHub for future volunteers
+5. **Reference in PR description** when closing feature
+
+**Example Entry**:
+
+```markdown
+### Issue: English "workspace" term in API messages
+
+**Affected Keys**: `WORKSPACE_DELETE`, `WORKSPACE_CLEAR` (5 strings)
+**Root Cause**: Blockly core API uses "workspace" as technical term
+**Impact**: 0.1% of total strings, developer-facing only
+**Status**: Accepted until Blockly v13 API refactor
+```
 
 ---
 
@@ -592,11 +735,273 @@ Maintainers will add approved terms to glossary.
 
 ---
 
+## For Whitelist Rule Contributors
+
+### How to Add or Modify Whitelist Rules
+
+**Context**: The whitelist system filters false positives from translation quality audits. Rules are defined in `scripts/i18n/audit-whitelist.json` and can be maintained by non-developers (linguists, translators) with basic JSON knowledge.
+
+#### Prerequisites
+
+-   Understanding of the specific language's linguistic features
+-   Familiarity with JSON format (basic key-value structure)
+-   Evidence that current audit is incorrectly flagging legitimate translations
+
+#### Step-by-Step Process
+
+##### 1. Identify the False Positive Pattern
+
+Run the audit to see current issues:
+
+```powershell
+npm run audit:translations -- --languages ja,ko,de,zh-hant,es
+```
+
+Example output showing a false positive:
+
+```json
+{
+	"key": "CATEGORY_MATH",
+	"language": "de",
+	"issueType": "lengthOverflow",
+	"severity": "high",
+	"currentValue": "Mathematik",
+	"rationale": "Translation is 120% of English length"
+}
+```
+
+**Analysis**: German "Mathematik" is a legitimate translation of "Math", not an error. German creates compound words that are naturally longer.
+
+##### 2. Understand Rule Structure
+
+Whitelist rules are organized by `issueType`:
+
+```json
+{
+	"exemptions": {
+		"lengthOverflow": {
+			"rules": [...]
+		},
+		"directTranslation": {
+			"rules": [...]
+		},
+		"missingTranslation": {
+			"rules": [...]
+		}
+	}
+}
+```
+
+Each rule has:
+
+-   `ruleId`: Unique identifier (e.g., `"cjk-concise-terms"`)
+-   `description`: Human-readable explanation
+-   `languages`: Array of language codes (e.g., `["ja", "ko", "zh-hant"]`)
+-   `keys` or `patterns`: Specific message keys or wildcard patterns
+-   `rationale`: Why this is a false positive
+-   `examples` (optional): Illustrative cases
+
+##### 3. Determine Rule Scope
+
+**Option A: Specific Keys** (precise, recommended)
+
+```json
+{
+	"ruleId": "german-compound-words",
+	"description": "German creates compound words that are legitimately longer",
+	"languages": ["de"],
+	"keys": ["CATEGORY_MATH", "CATEGORY_LOOPS"],
+	"rationale": "German compound words like 'Mathematik' and 'Schleifen' are standard translations."
+}
+```
+
+**Option B: Pattern Matching** (broader scope)
+
+```json
+{
+	"ruleId": "cjk-concise-terms",
+	"description": "CJK languages use more concise characters",
+	"languages": ["ja", "ko", "zh-hant"],
+	"patterns": ["CATEGORY_.*", ".*_TOOLTIP"],
+	"rationale": "CJK naturally use fewer characters for technical terms."
+}
+```
+
+**Pattern syntax**:
+
+-   `CATEGORY_.*` matches any key starting with `CATEGORY_`
+-   `.*_TOOLTIP` matches any key ending with `_TOOLTIP`
+-   `.*` wildcard matches any characters
+
+##### 4. Add the New Rule
+
+Edit `scripts/i18n/audit-whitelist.json`:
+
+```json
+{
+	"exemptions": {
+		"lengthOverflow": {
+			"rules": [
+				// ... existing rules ...
+				{
+					"ruleId": "your-new-rule-id",
+					"description": "Brief explanation",
+					"languages": ["de"],
+					"keys": ["SPECIFIC_KEY_1", "SPECIFIC_KEY_2"],
+					"rationale": "Detailed linguistic justification"
+				}
+			]
+		}
+	}
+}
+```
+
+**Best practices**:
+
+-   Use descriptive `ruleId` (kebab-case)
+-   Be specific in `rationale` (cite linguistic principles)
+-   Prefer `keys` over `patterns` when possible (avoid over-filtering)
+-   Include `examples` object if rule is complex
+
+##### 5. Test the Rule
+
+Re-run audit to verify the rule filters correctly:
+
+```powershell
+npm run audit:translations -- --languages de
+```
+
+Check output:
+
+-   Issue should no longer appear in main report
+-   Verify `whitelistStats` section shows rule matched
+
+##### 6. Submit Pull Request
+
+**PR Title**: `[i18n] Add whitelist rule: {rule-id}`
+
+**PR Description Template**:
+
+```markdown
+## Summary
+
+Adds whitelist rule to filter false positive: [issue description]
+
+## Rule Details
+
+-   **Rule ID**: `your-new-rule-id`
+-   **Issue Type**: lengthOverflow / directTranslation / missingTranslation
+-   **Languages**: de, es (list all)
+-   **Scope**: 5 specific keys / `CATEGORY_.*` pattern
+
+## Linguistic Justification
+
+[Explain why flagged translations are legitimate]
+
+Example: German compound words naturally expand English roots by 20-40% due to morphological concatenation (e.g., "Mathematik" = "mathematic" + suffix, standard educational term).
+
+## Testing Evidence
+
+Before: 15 false positives flagged
+After: 0 false positives, rule filtered correctly
+
+## Checklist
+
+-   [ ] Rule pattern is specific (avoids over-broad filtering)
+-   [ ] Rationale includes linguistic/cultural explanation
+-   [ ] Tested against current translation files
+-   [ ] No conflicts with existing rules
+-   [ ] Updated `statistics.totalRules` count
+```
+
+##### 7. Rule Governance
+
+**Approval process**: All whitelist changes require maintainer review (PR + approval)
+
+**Review criteria**:
+
+-   ✅ Rule specificity (not too broad)
+-   ✅ Linguistic justification (cite language features)
+-   ✅ No over-filtering (genuine issues still detected)
+-   ✅ Test evidence (before/after metrics)
+
+#### Common Rule Patterns
+
+**Pattern 1: Language-Specific Brevity** (CJK)
+
+```json
+{
+	"ruleId": "cjk-concise-terms",
+	"issueType": "lengthOverflow",
+	"languages": ["ja", "ko", "zh-hant"],
+	"patterns": ["CATEGORY_.*"],
+	"rationale": "CJK use 2-4 characters vs 8-12 English letters for technical terms"
+}
+```
+
+**Pattern 2: Brand Names** (All languages)
+
+```json
+{
+	"ruleId": "brand-names-unchanged",
+	"issueType": "missingTranslation",
+	"languages": ["ja", "ko", "de", "zh-hant", "es"],
+	"keys": ["BOARD_UNO", "BOARD_NANO"],
+	"rationale": "Product names remain in English globally"
+}
+```
+
+**Pattern 3: Technical Cognates** (Germanic/Romance)
+
+```json
+{
+	"ruleId": "cognates-and-loanwords",
+	"issueType": "directTranslation",
+	"languages": ["de", "es"],
+	"patterns": ["CATEGORY_.*"],
+	"rationale": "Shared Latin/Greek roots produce similar word forms"
+}
+```
+
+**Pattern 4: API Function Names**
+
+```json
+{
+	"ruleId": "arduino-api-terms",
+	"issueType": "directTranslation",
+	"languages": ["de", "es"],
+	"patterns": ["ARDUINO_DIGITAL_.*", "ARDUINO_ANALOG_.*"],
+	"rationale": "Arduino API has established educational translations"
+}
+```
+
+#### Troubleshooting
+
+**Q: My rule doesn't match any issues**
+
+-   Check `patterns` use correct wildcard syntax (`.*` not `*`)
+-   Verify `languages` array includes target language
+-   Ensure `issueType` matches report (e.g., `lengthOverflow` not `length_overflow`)
+
+**Q: Rule filters too many issues**
+
+-   Switch from `patterns` to specific `keys` list
+-   Add more specific pattern (e.g., `CATEGORY_LOGIC` instead of `CATEGORY_.*`)
+
+**Q: How do I remove an obsolete rule?**
+
+-   Submit PR deleting the rule from JSON
+-   Explain why rule is no longer needed (e.g., translations were fixed, rule was too broad)
+
+---
+
 ## Resources
 
 -   [Terminology Glossary](./localization-glossary.json)
 -   [Data Model](./data-model.md)
 -   [Language Guidelines](./guidelines/)
+-   [Whitelist Rules](../../scripts/i18n/audit-whitelist.json)
+-   [Known Issues](./KNOWN-ISSUES.md)
 -   [GitHub Issues: Localization](https://github.com/Shen-Ming-Hong/singular-blockly/issues?q=label%3Alocalization)
 
 ---
