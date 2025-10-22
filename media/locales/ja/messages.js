@@ -524,7 +524,18 @@ window.languageManager.loadMessages('ja', {
 	HUSKYLENS_COUNT_BLOCKS_TOOLTIP: 'HUSKYLENS で検出されたブロック数を取得',
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'HUSKYLENS で検出された矢印数を取得',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: '指定されたブロックの情報（位置、サイズ、または ID）を取得',
-	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '指定された矢印の情報（開始点、終了点、または ID）を取得',
-	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS に指定された ID のオブジェクトを学習させる（オブジェクト分類モードのみ）',
+	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '指定された矢印の情報（始点、終点、またはID）を取得',
+	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENSに指定IDのオブジェクトを学習させる（オブジェクト分類モードのみ）',
 	HUSKYLENS_FORGET_TOOLTIP: 'HUSKYLENS の全ての学習済みオブジェクトを削除（オブジェクト分類モードのみ）',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'このプロジェクトにはまだBlocklyブロックがありません。続行すると、ここにblocklyフォルダとファイルが作成されます。続行しますか？',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'{0}プロジェクトを検出しました。このプロジェクトにはまだBlocklyブロックがありません。続行すると、ここにblocklyフォルダとファイルが作成されます。続行しますか？',
+	BUTTON_CONTINUE: '続ける',
+	BUTTON_CANCEL: 'キャンセル',
+	BUTTON_SUPPRESS: '今後表示しない',
+	SAFETY_GUARD_CANCELLED: 'Blocklyエディタを開くのをキャンセルしました',
+	SAFETY_GUARD_SUPPRESSED: '設定を保存しました。今後この警告は表示されません',
 });

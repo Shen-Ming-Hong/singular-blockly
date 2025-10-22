@@ -522,6 +522,17 @@ window.languageManager.loadMessages('tr', {
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'HUSKYLENS tarafından algılanan ok sayısını al',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: 'Belirtilen bloğun bilgilerini al (konum, boyut veya ID)',
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Belirtilen okun bilgilerini al (başlangıç, hedef veya ID)',
-	HUSKYLENS_LEARN_TOOLTIP: "HUSKYLENS'in belirtilen ID ile nesne öğrenmesini sağla (sadece Nesne Sınıflandırma modunda)",
+	HUSKYLENS_LEARN_TOOLTIP: "HUSKYLENS'i belirtilen ID'ye sahip nesneyi öğrenmeye zorla (sadece Nesne Sınıflandırma modunda)",
 	HUSKYLENS_FORGET_TOOLTIP: "HUSKYLENS'ten tüm öğrenilmiş nesneleri temizle (sadece Nesne Sınıflandırma modunda)",
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Bu projede henüz Blockly blokları yok. Devam ederseniz, burada blockly klasörü ve dosyaları oluşturulacak. Devam etmek istiyor musunuz?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'{0} projesi algılandı. Bu projede henüz Blockly blokları yok. Devam ederseniz, burada blockly klasörü ve dosyaları oluşturulacak. Devam etmek istiyor musunuz?',
+	BUTTON_CONTINUE: 'Devam',
+	BUTTON_CANCEL: 'İptal',
+	BUTTON_SUPPRESS: 'Hatırlatma',
+	SAFETY_GUARD_CANCELLED: 'Blockly editörünü açma iptal edildi',
+	SAFETY_GUARD_SUPPRESSED: 'Tercih kaydedildi, bu uyarı bir daha gösterilmeyecek',
 });

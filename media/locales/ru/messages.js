@@ -522,7 +522,18 @@ window.languageManager.loadMessages('ru', {
 	HUSKYLENS_COUNT_BLOCKS_TOOLTIP: 'Получить количество блоков, обнаруженных HUSKYLENS',
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'Получить количество стрелок, обнаруженных HUSKYLENS',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: 'Получить информацию указанного блока (позиция, размер или ID)',
-	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Получить информацию указанной стрелки (начало, цель или ID)',
-	HUSKYLENS_LEARN_TOOLTIP: 'Пусть HUSKYLENS изучит объект с указанным ID (только для режима классификации объектов)',
+	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Получить информацию об указанной стрелке (начало, конец или ID)',
+	HUSKYLENS_LEARN_TOOLTIP: 'Позволить HUSKYLENS изучить объект с указанным ID (только для режима классификации объектов)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Очистить все изученные объекты из HUSKYLENS (только для режима классификации объектов)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'В этом проекте еще нет блоков Blockly. Если вы продолжите, папка и файлы blockly будут созданы здесь. Вы хотите продолжить?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'Обнаружен проект {0}. В этом проекте еще нет блоков Blockly. Если вы продолжите, папка и файлы blockly будут созданы здесь. Вы хотите продолжить?',
+	BUTTON_CONTINUE: 'Продолжить',
+	BUTTON_CANCEL: 'Отмена',
+	BUTTON_SUPPRESS: 'Больше не напоминать',
+	SAFETY_GUARD_CANCELLED: 'Открытие редактора Blockly отменено',
+	SAFETY_GUARD_SUPPRESSED: 'Настройки сохранены, это предупреждение больше не будет отображаться',
 });

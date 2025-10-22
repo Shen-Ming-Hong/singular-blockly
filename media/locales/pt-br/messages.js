@@ -524,4 +524,15 @@ window.languageManager.loadMessages('pt-br', {
 	PIXETTO_MODE_ROAD_DETECTION: 'Detecção de Estrada',
 	PIXETTO_MODE_BALL_DETECTION: 'Detecção de Bola',
 	PIXETTO_MODE_TEMPLATE_MATCHING: 'Correspondência de Modelo',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Este projeto ainda não tem blocos Blockly. Se continuar, pasta e arquivos blockly serão criados aqui. Deseja continuar?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'Projeto {0} detectado. Este projeto ainda não tem blocos Blockly. Se continuar, pasta e arquivos blockly serão criados aqui. Deseja continuar?',
+	BUTTON_CONTINUE: 'Continuar',
+	BUTTON_CANCEL: 'Cancelar',
+	BUTTON_SUPPRESS: 'Não Lembrar',
+	SAFETY_GUARD_CANCELLED: 'Abertura do editor Blockly cancelada',
+	SAFETY_GUARD_SUPPRESSED: 'Preferência salva, este aviso não será exibido novamente',
 });

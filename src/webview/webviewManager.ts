@@ -9,6 +9,7 @@ import * as path from 'path';
 import { log } from '../services/logging';
 import { FileService } from '../services/fileService';
 import { LocaleService } from '../services/localeService';
+import { WorkspaceValidator } from '../services/workspaceValidator';
 import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
 
@@ -83,7 +84,52 @@ export class WebViewManager {
 		const settingsManager = new SettingsManager(workspaceRoot);
 		await settingsManager.configurePlatformIOSettings();
 
-		// 如果已有面板，則顯示已有的面板
+		// ===== Phase 3: 專案安全防護機制 =====
+		// 驗證工作區是否為 Blockly 專案,若不是則顯示警告
+		// 測試環境跳過 (避免測試中觸發對話框)
+		const isTestEnvironment = workspaceRoot.includes('/mock/') || workspaceRoot.includes('\\mock\\');
+
+		if (!isTestEnvironment) {
+			const validator = new WorkspaceValidator(workspaceRoot, settingsManager, this.localeService);
+			const validationResult = await validator.validateWorkspace();
+
+			// 若非 Blockly 專案且需要顯示警告
+			if (!validationResult.isBlocklyProject && validationResult.shouldShowWarning) {
+				log('Non-Blockly project detected, showing safety warning', 'info', {
+					projectType: validationResult.projectType,
+					workspacePath: workspaceRoot,
+				});
+
+				// 顯示安全警告對話框
+				const userChoice = await validator.showSafetyWarning(validationResult.projectType);
+
+				// 處理使用者選擇
+				if (userChoice === 'cancel') {
+					// 使用者取消操作
+					log('User cancelled opening Blockly editor', 'info');
+					const cancelMsg = await this.localeService.getLocalizedMessage('SAFETY_GUARD_CANCELLED', '已取消開啟 Blockly 編輯器');
+					vscodeApi.window.showInformationMessage(cancelMsg);
+					return; // 中止開啟編輯器
+				} else if (userChoice === 'suppress') {
+					// 使用者選擇不再提醒
+					log('User chose to suppress future warnings', 'info');
+					await validator.saveUserPreference(true);
+					const suppressMsg = await this.localeService.getLocalizedMessage(
+						'SAFETY_GUARD_SUPPRESSED',
+						'已儲存偏好設定,未來不再顯示此警告'
+					);
+					vscodeApi.window.showInformationMessage(suppressMsg);
+					// 繼續開啟編輯器
+				} else {
+					// userChoice === 'continue'
+					log('User chose to continue opening editor', 'info');
+					// 繼續開啟編輯器
+				}
+			}
+		}
+		// ===== End of Phase 3 =====
+
+		// 如果已有面板,則顯示已有的面板
 		if (this.panel) {
 			this.panel.reveal(vscode.ViewColumn.One, true);
 			return;

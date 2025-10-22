@@ -12,13 +12,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 新增 Added
 
+-   **專案安全防護機制** (Project Safety Guard)
+    **Project Safety Guard Feature**
+    -   在非 Blockly 專案中開啟編輯器時顯示警告對話框
+        Shows warning dialog when opening editor in non-Blockly projects
+    -   智慧型專案類型識別 (支援 Node.js, Python, Java, .NET, Go 等 6 種類型)
+        Smart project type detection (supports 6 types: Node.js, Python, Java, .NET, Go, etc.)
+    -   三種使用者選擇: 繼續 / 取消 / 不再提醒
+        Three user choices: Continue / Cancel / Don't remind again
+    -   工作區級別的偏好設定記憶
+        Workspace-level preference memory
+    -   完整多語言支援 (15 種語言)
+        Full multilingual support (15 languages)
+
 ### 已修復 Fixed
+
+-   修正安全警告對話框出現重複取消按鈕的問題
+    Fixed duplicate cancel button issue in safety warning dialog
 
 ### 已更新 Updated
 
 ### 已修改 Changed
 
 ### 技術細節 Technical
+
+-   新增 `WorkspaceValidator` 服務類別 (296 行)
+    Added WorkspaceValidator service class (296 lines)
+-   新增 `ProjectTypeDetector` 純函式模組 (110 行)
+    Added ProjectTypeDetector pure function module (110 lines)
+-   新增 54 個單元測試與整合測試 (涵蓋率 100%)
+    Added 54 unit and integration tests (100% coverage)
+-   Bundle 大小: 152 KiB (+25 KiB)
+    Bundle size: 152 KiB (+25 KiB)
+-   測試套件: 249/250 通過 (99.6%)
+    Test suite: 249/250 passing (99.6%)
 
 ## [0.40.0] - 2025-10-22
 

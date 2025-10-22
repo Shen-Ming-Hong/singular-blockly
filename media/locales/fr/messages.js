@@ -528,4 +528,15 @@ window.languageManager.loadMessages('fr', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Obtenir les informations de la flèche spécifiée (origine, cible ou ID)',
 	HUSKYLENS_LEARN_TOOLTIP: "Faire apprendre à HUSKYLENS l'objet avec l'ID spécifié (mode classification d'objet uniquement)",
 	HUSKYLENS_FORGET_TOOLTIP: "Effacer tous les objets appris par HUSKYLENS (mode classification d'objet uniquement)",
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		"Ce projet n'a pas encore de blocs Blockly. Si vous continuez, le dossier et les fichiers blockly seront créés ici. Voulez-vous continuer?",
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		"Projet {0} détecté. Ce projet n'a pas encore de blocs Blockly. Si vous continuez, le dossier et les fichiers blockly seront créés ici. Voulez-vous continuer?",
+	BUTTON_CONTINUE: 'Continuer',
+	BUTTON_CANCEL: 'Annuler',
+	BUTTON_SUPPRESS: 'Ne plus me rappeler',
+	SAFETY_GUARD_CANCELLED: "Ouverture de l'éditeur Blockly annulée",
+	SAFETY_GUARD_SUPPRESSED: 'Préférence enregistrée, cet avertissement ne sera plus affiché',
 });

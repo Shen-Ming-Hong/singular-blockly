@@ -524,4 +524,15 @@ window.languageManager.loadMessages('hu', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Meghatározott nyíl információjának megszerzése (eredet, cél vagy ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS tanítása meghatározott ID-val (csak Objektumosztályozás módban)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Minden tanult objektum törlése a HUSKYLENS-ből (csak Objektumosztályozás módban)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Ez a projekt még nem rendelkezik Blockly blokkokkal. Ha folytatja, blockly mappa és fájlok jönnek létre itt. Folytatja?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'{0} projekt észlelve. Ez a projekt még nem rendelkezik Blockly blokkokkal. Ha folytatja, blockly mappa és fájlok jönnek létre itt. Folytatja?',
+	BUTTON_CONTINUE: 'Folytatás',
+	BUTTON_CANCEL: 'Mégse',
+	BUTTON_SUPPRESS: 'Ne emlékeztessen többé',
+	SAFETY_GUARD_CANCELLED: 'A Blockly szerkesztő megnyitása megszakítva',
+	SAFETY_GUARD_SUPPRESSED: 'Beállítás mentve, ez a figyelmeztetés nem fog újra megjelenni',
 });

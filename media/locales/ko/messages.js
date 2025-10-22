@@ -521,7 +521,18 @@ window.languageManager.loadMessages('ko', {
 	HUSKYLENS_COUNT_BLOCKS_TOOLTIP: 'HUSKYLENS에서 감지된 블록 수 가져오기',
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'HUSKYLENS에서 감지된 화살표 수 가져오기',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: '지정된 블록의 정보 가져오기 (위치, 크기 또는 ID)',
-	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '지정된 화살표의 정보 가져오기 (시작점, 목표점 또는 ID)',
-	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS가 지정된 ID로 객체 학습 (객체 분류 모드에서만)',
+	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '지정된 화살표의 정보 가져오기 (시작점, 끝점 또는 ID)',
+	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS가 지정된 ID의 객체 학습하기 (객체 분류 모드에서만)',
 	HUSKYLENS_FORGET_TOOLTIP: 'HUSKYLENS에서 학습된 모든 객체 지우기 (객체 분류 모드에서만)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'이 프로젝트에는 아직 Blockly 블록이 없습니다. 계속하면 여기에 blockly 폴더와 파일이 생성됩니다. 계속하시겠습니까?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'{0} 프로젝트가 감지되었습니다. 이 프로젝트에는 아직 Blockly 블록이 없습니다. 계속하면 여기에 blockly 폴더와 파일이 생성됩니다. 계속하시겠습니까?',
+	BUTTON_CONTINUE: '계속',
+	BUTTON_CANCEL: '취소',
+	BUTTON_SUPPRESS: '다시 보지 않기',
+	SAFETY_GUARD_CANCELLED: 'Blockly 편집기 열기를 취소했습니다',
+	SAFETY_GUARD_SUPPRESSED: '설정을 저장했습니다. 앞으로 이 경고가 표시되지 않습니다',
 });
