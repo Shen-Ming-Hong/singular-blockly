@@ -1,0 +1,169 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://singular-blockly.github.io/schemas/rule-health-metrics.schema.json",
+    "title": "Rule Health Metrics Report",
+    "description": "Schema for whitelist rule effectiveness monitoring report. Generated during each audit run to track rule usage and identify stale rules per Clarifications Q5-B.",
+    "type": "object",
+    "required": [
+        "generatedAt",
+        "totalRules",
+        "totalViolations",
+        "filteredCount",
+        "filterRate",
+        "perRuleStats",
+        "staleRules",
+        "topRules",
+        "recommendedAction",
+        "auditReportId"
+    ],
+    "properties": {
+        "generatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO8601 timestamp when metrics were generated"
+        },
+        "totalRules": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total whitelist rules in configuration"
+        },
+        "totalViolations": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total violations detected before filtering"
+        },
+        "filteredCount": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total violations filtered by whitelist rules"
+        },
+        "filterRate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of violations filtered: (filteredCount / totalViolations) * 100"
+        },
+        "perRuleStats": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/RuleStatistic"
+            },
+            "description": "Per-rule match statistics for governance review"
+        },
+        "staleRules": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^WL-[0-9]{3}$"
+            },
+            "description": "Rule IDs with <5 matches in last 3 months (flagged for governance review)"
+        },
+        "topRules": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "pattern": "^WL-[0-9]{3}$"
+            },
+            "minItems": 0,
+            "maxItems": 5,
+            "description": "Top 5 rule IDs by match count (most effective filters)"
+        },
+        "recommendedAction": {
+            "type": "object",
+            "patternProperties": {
+                "^WL-[0-9]{3}$": {
+                    "type": "string",
+                    "enum": [
+                        "keep",
+                        "review",
+                        "remove"
+                    ]
+                }
+            },
+            "description": "Per-rule recommendation based on usage patterns"
+        },
+        "auditReportId": {
+            "type": "string",
+            "pattern": "^audit-[0-9]{4}-[0-9]{2}-[0-9]{2}-.+$",
+            "description": "Reference to associated AuditReport for traceability"
+        }
+    },
+    "definitions": {
+        "RuleStatistic": {
+            "type": "object",
+            "required": [
+                "ruleId",
+                "matchCount",
+                "trend"
+            ],
+            "properties": {
+                "ruleId": {
+                    "type": "string",
+                    "pattern": "^WL-[0-9]{3}$",
+                    "description": "Whitelist rule ID (e.g., WL-001)"
+                },
+                "matchCount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Violations matched in this audit run"
+                },
+                "lastMatched": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time",
+                    "description": "ISO8601 timestamp of last match. Null if no matches in this run."
+                },
+                "trend": {
+                    "type": "string",
+                    "enum": [
+                        "increasing",
+                        "stable",
+                        "decreasing"
+                    ],
+                    "description": "Match count trend over last 3 audit runs"
+                }
+            }
+        }
+    },
+    "examples": [
+        {
+            "generatedAt": "2025-10-22T15:00:00Z",
+            "totalRules": 8,
+            "totalViolations": 1692,
+            "filteredCount": 149,
+            "filterRate": 8.8,
+            "perRuleStats": [
+                {
+                    "ruleId": "WL-001",
+                    "matchCount": 45,
+                    "lastMatched": "2025-10-22T15:00:00Z",
+                    "trend": "stable"
+                },
+                {
+                    "ruleId": "WL-008",
+                    "matchCount": 3,
+                    "lastMatched": "2025-09-15T10:30:00Z",
+                    "trend": "decreasing"
+                }
+            ],
+            "staleRules": [
+                "WL-008"
+            ],
+            "topRules": [
+                "WL-001",
+                "WL-002",
+                "WL-003",
+                "WL-004",
+                "WL-005"
+            ],
+            "recommendedAction": {
+                "WL-001": "keep",
+                "WL-002": "keep",
+                "WL-008": "review"
+            },
+            "auditReportId": "audit-2025-10-22-post-whitelist"
+        }
+    ]
+}

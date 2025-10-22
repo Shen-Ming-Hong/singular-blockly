@@ -81,6 +81,7 @@
 		"pretest": "npm run compile-tests && npm run compile && npm run lint",
 		"test:bail": "vscode-test --bail",
 		"test:coverage": "vscode-test --coverage",
+		"test:whitelist": "mocha scripts/i18n/lib/whitelist-checker.test.js",
 		"lint": "eslint src",
 		"lint:i18n": "eslint scripts/i18n --ext .js",
 		"audit:i18n": "node scripts/i18n/audit-translations.js --languages=ja,ko,de,zh-hant,es",
