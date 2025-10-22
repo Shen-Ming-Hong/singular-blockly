@@ -59,6 +59,16 @@
 					"type": "webview"
 				}
 			]
+		},
+		"configuration": {
+			"title": "Singular Blockly",
+			"properties": {
+				"singularBlockly.safetyGuard.suppressWarning": {
+					"type": "boolean",
+					"default": false,
+					"description": "不再顯示非 Blockly 專案的安全警告 (Do not show safety warning for non-Blockly projects)"
+				}
+			}
 		}
 	},
 	"scripts": {

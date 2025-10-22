@@ -524,7 +524,18 @@ window.languageManager.loadMessages('de', {
 	HUSKYLENS_COUNT_BLOCKS_TOOLTIP: 'Anzahl der von HUSKYLENS erkannten Blöcke abrufen',
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'Anzahl der von HUSKYLENS erkannten Pfeile abrufen',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: 'Informationen des angegebenen Blocks abrufen (Position, Größe oder ID)',
-	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Informationen des angegebenen Pfeils abrufen (Startpunkt, Endpunkt oder ID)',
+	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Informationen des angegebenen Pfeils abrufen (Ursprung, Ziel oder ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS Objekt mit angegebener ID lernen lassen (nur im Objektklassifizierungsmodus)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Alle gelernten Objekte von HUSKYLENS löschen (nur im Objektklassifizierungsmodus)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Dieses Projekt hat noch keine Blockly-Blöcke. Wenn Sie fortfahren, werden hier blockly-Ordner und -Dateien erstellt. Möchten Sie fortfahren?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'{0}-Projekt erkannt. Dieses Projekt hat noch keine Blockly-Blöcke. Wenn Sie fortfahren, werden hier blockly-Ordner und -Dateien erstellt. Möchten Sie fortfahren?',
+	BUTTON_CONTINUE: 'Fortfahren',
+	BUTTON_CANCEL: 'Abbrechen',
+	BUTTON_SUPPRESS: 'Nicht mehr erinnern',
+	SAFETY_GUARD_CANCELLED: 'Öffnen des Blockly-Editors abgebrochen',
+	SAFETY_GUARD_SUPPRESSED: 'Einstellung gespeichert, diese Warnung wird nicht mehr angezeigt',
 });

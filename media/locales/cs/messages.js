@@ -520,7 +520,18 @@ window.languageManager.loadMessages('cs', {
 	HUSKYLENS_COUNT_BLOCKS_TOOLTIP: 'Získat počet bloků detekovaných HUSKYLENS',
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'Získat počet šipek detekovaných HUSKYLENS',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: 'Získat informace o zadaném bloku (pozice, velikost nebo ID)',
-	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Získat informace o zadané šipce (počátek, cíl nebo ID)',
-	HUSKYLENS_LEARN_TOOLTIP: 'Nechte HUSKYLENS naučit se objekt se zadaným ID (pouze pro režim Klasifikace objektů)',
+	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Získat informace o určené šipce (počátek, cíl nebo ID)',
+	HUSKYLENS_LEARN_TOOLTIP: 'Nechat HUSKYLENS naučit se objekt se zadaným ID (pouze pro režim Klasifikace objektů)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Vymazat všechny naučené objekty z HUSKYLENS (pouze pro režim Klasifikace objektů)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Tento projekt ještě nemá bloky Blockly. Pokud budete pokračovat, bude zde vytvořena složka a soubory blockly. Chcete pokračovat?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'Detekován projekt {0}. Tento projekt ještě nemá bloky Blockly. Pokud budete pokračovat, bude zde vytvořena složka a soubory blockly. Chcete pokračovat?',
+	BUTTON_CONTINUE: 'Pokračovat',
+	BUTTON_CANCEL: 'Zrušit',
+	BUTTON_SUPPRESS: 'Již nepřipomínat',
+	SAFETY_GUARD_CANCELLED: 'Otevření editoru Blockly bylo zrušeno',
+	SAFETY_GUARD_SUPPRESSED: 'Nastavení uloženo, toto upozornění již nebude zobrazeno',
 });

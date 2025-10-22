@@ -526,4 +526,15 @@ window.languageManager.loadMessages('en', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Get information of specified arrow (origin, target or ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Let HUSKYLENS learn object with specified ID (only for Object Classification mode)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Clear all learned objects from HUSKYLENS (only for Object Classification mode)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'Detected {0} project. This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
+	BUTTON_CONTINUE: 'Continue',
+	BUTTON_CANCEL: 'Cancel',
+	BUTTON_SUPPRESS: 'Do Not Remind',
+	SAFETY_GUARD_CANCELLED: 'Cancelled opening Blockly editor',
+	SAFETY_GUARD_SUPPRESSED: 'Preference saved, this warning will not be shown again',
 });

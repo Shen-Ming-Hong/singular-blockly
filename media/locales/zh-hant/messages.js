@@ -523,4 +523,13 @@ window.languageManager.loadMessages('zh-hant', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '取得指定箭頭的資訊（起點、終點或 ID）',
 	HUSKYLENS_LEARN_TOOLTIP: '讓 HUSKYLENS 學習指定 ID 的物體（僅適用於物體分類模式）',
 	HUSKYLENS_FORGET_TOOLTIP: '清除 HUSKYLENS 所有學習的物體（僅適用於物體分類模式）',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE: '這個專案還沒有 Blockly 積木。如果繼續,會在這裡建立 blockly 資料夾和檔案。要繼續嗎?',
+	SAFETY_WARNING_BODY_WITH_TYPE: '偵測到 {0} 專案。這個專案還沒有 Blockly 積木。如果繼續,會在這裡建立 blockly 資料夾和檔案。要繼續嗎?',
+	BUTTON_CONTINUE: '繼續',
+	BUTTON_CANCEL: '取消',
+	BUTTON_SUPPRESS: '不再提醒',
+	SAFETY_GUARD_CANCELLED: '已取消開啟 Blockly 編輯器',
+	SAFETY_GUARD_SUPPRESSED: '已儲存偏好設定,未來不再顯示此警告',
 });

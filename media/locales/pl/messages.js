@@ -521,7 +521,18 @@ window.languageManager.loadMessages('pl', {
 	HUSKYLENS_COUNT_BLOCKS_TOOLTIP: 'Pobierz liczbę bloków wykrytych przez HUSKYLENS',
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'Pobierz liczbę strzałek wykrytych przez HUSKYLENS',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: 'Pobierz informacje określonego bloku (pozycja, rozmiar lub ID)',
-	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Pobierz informacje określonej strzałki (początek, cel lub ID)',
+	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Pobierz informacje o określonej strzałce (początek, cel lub ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Pozwól HUSKYLENS nauczyć się obiektu o określonym ID (tylko dla trybu Klasyfikacji Obiektów)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Wyczyść wszystkie wyuczone obiekty z HUSKYLENS (tylko dla trybu Klasyfikacji Obiektów)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Ten projekt nie ma jeszcze bloków Blockly. Jeśli kontynuujesz, folder i pliki blockly zostaną utworzone tutaj. Czy chcesz kontynuować?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'Wykryto projekt {0}. Ten projekt nie ma jeszcze bloków Blockly. Jeśli kontynuujesz, folder i pliki blockly zostaną utworzone tutaj. Czy chcesz kontynuować?',
+	BUTTON_CONTINUE: 'Kontynuuj',
+	BUTTON_CANCEL: 'Anuluj',
+	BUTTON_SUPPRESS: 'Nie przypominaj',
+	SAFETY_GUARD_CANCELLED: 'Anulowano otwieranie edytora Blockly',
+	SAFETY_GUARD_SUPPRESSED: 'Zapisano preferencje, to ostrzeżenie nie będzie już wyświetlane',
 });

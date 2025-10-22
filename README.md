@@ -114,6 +114,12 @@ A Visual Studio Code extension that provides a visual programming interface usin
     -   Code generation to Arduino (.cpp) files
     -   Automatic PlatformIO configuration generation
     -   Automatic platformio.ini preview mode management
+    -   **Project Safety Guard** 🛡️
+        -   Automatically detects non-Blockly projects
+        -   Smart project type recognition (Node.js, Python, Java, .NET, Go, etc.)
+        -   Warning dialog with three options: Continue / Cancel / Don't remind again
+        -   Workspace-level preference memory
+        -   Prevents accidental file loss in non-Blockly projects
     -   Comprehensive backup system
         -   Backup creation with timestamps
         -   Backup preview without restoration
@@ -165,6 +171,7 @@ A Visual Studio Code extension that provides a visual programming interface usin
     - This extension requires a workspace folder to store its files
     - Use File > Open Folder... or File > New Folder
     - Make sure you have write permissions in the folder
+    - **Note**: The extension will warn you if opened in a non-Blockly project to prevent accidental file modifications
 
 2. Open the extension using:
 
@@ -215,6 +222,32 @@ Each board is configured with specific PlatformIO settings for optimal compatibi
     -   Board: lolin_c3_mini
 
 > Note: The extension will automatically generate the appropriate `platformio.ini` configuration when you select a board, ensuring the correct platform settings for hardware upload.
+
+## Extension Settings
+
+This extension contributes the following settings:
+
+-   `singularBlockly.safetyGuard.suppressWarning`: Suppress the safety warning when opening the editor in non-Blockly projects
+    -   Type: `boolean`
+    -   Default: `false`
+    -   Workspace-level setting (can be configured per project)
+    -   When enabled, the extension will not show warnings when detecting non-Blockly project types
+
+**Project Safety Guard**:
+
+The extension automatically detects if your workspace is a non-Blockly project (e.g., Node.js, Python, Java projects) and shows a warning dialog to prevent accidental file modifications. You can:
+
+-   Click **Continue** to proceed with opening the editor
+-   Click **Cancel** to abort the operation
+-   Click **Don't remind again** to suppress warnings for this workspace
+
+To re-enable warnings after clicking "Don't remind again", change the workspace setting:
+
+```json
+{
+	"singularBlockly.safetyGuard.suppressWarning": false
+}
+```
 
 ## Known Issues
 

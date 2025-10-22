@@ -524,4 +524,15 @@ window.languageManager.loadMessages('bg', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Получаване на информация за определена стрелка (начало, цел или ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Нека HUSKYLENS научи обект с определен ID (само за режим Класификация на обекти)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Изчистване на всички научени обекти от HUSKYLENS (само за режим Класификация на обекти)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Този проект все още няма Blockly блокове. Ако продължите, тук ще бъдат създадени blockly папка и файлове. Искате ли да продължите?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'Открит е проект {0}. Този проект все още няма Blockly блокове. Ако продължите, тук ще бъдат създадени blockly папка и файлове. Искате ли да продължите?',
+	BUTTON_CONTINUE: 'Продължи',
+	BUTTON_CANCEL: 'Отказ',
+	BUTTON_SUPPRESS: 'Не напомняй',
+	SAFETY_GUARD_CANCELLED: 'Отворянето на редактора Blockly е отменено',
+	SAFETY_GUARD_SUPPRESSED: 'Предпочитанието е запазено, това предупреждение няма да се показва отново',
 });

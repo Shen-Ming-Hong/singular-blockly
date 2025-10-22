@@ -525,7 +525,18 @@ window.languageManager.loadMessages('es', {
 	HUSKYLENS_COUNT_BLOCKS_TOOLTIP: 'Obtener el número de bloques detectados por HUSKYLENS',
 	HUSKYLENS_COUNT_ARROWS_TOOLTIP: 'Obtener el número de flechas detectadas por HUSKYLENS',
 	HUSKYLENS_GET_BLOCK_INFO_TOOLTIP: 'Obtener información del bloque especificado (posición, tamaño o ID)',
-	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Obtener información de la flecha especificada (origen, destino o ID)',
-	HUSKYLENS_LEARN_TOOLTIP: 'Hacer que HUSKYLENS aprenda el objeto con ID especificado (solo modo clasificación de objeto)',
+	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Obtener información de flecha especificada (origen, destino o ID)',
+	HUSKYLENS_LEARN_TOOLTIP: 'Hacer que HUSKYLENS aprenda objeto con ID especificado (solo modo clasificación de objeto)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Borrar todos los objetos aprendidos por HUSKYLENS (solo modo clasificación de objeto)',
+
+	// Safety Guard (Project Safety Protection)
+	SAFETY_WARNING_BODY_NO_TYPE:
+		'Este proyecto aún no tiene bloques Blockly. Si continúa, se crearán carpeta y archivos blockly aquí. ¿Desea continuar?',
+	SAFETY_WARNING_BODY_WITH_TYPE:
+		'Proyecto {0} detectado. Este proyecto aún no tiene bloques Blockly. Si continúa, se crearán carpeta y archivos blockly aquí. ¿Desea continuar?',
+	BUTTON_CONTINUE: 'Continuar',
+	BUTTON_CANCEL: 'Cancelar',
+	BUTTON_SUPPRESS: 'No Recordar',
+	SAFETY_GUARD_CANCELLED: 'Se canceló la apertura del editor Blockly',
+	SAFETY_GUARD_SUPPRESSED: 'Preferencia guardada, esta advertencia no se mostrará de nuevo',
 });
