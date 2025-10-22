@@ -1,33 +1,34 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.2.1 → 1.3.0
+Version Change: 1.3.1 → 1.3.2
 Modified Principles: None
-Added Principles:
-  - Principle IX (Traditional Chinese Documentation Standard) - New principle requiring all specifications, plans, and user-facing documentation to be written in Traditional Chinese (zh-TW)
+Modified Sections:
+  - Git Commit Messages - Added critical warning about git tag usage and CI/CD automation
+Added Principles: None
 Added Sections: None
 Removed Sections: None
 Templates Status:
-  ✅ plan-template.md - Updated with Traditional Chinese requirement in documentation section
-  ✅ spec-template.md - Updated with Traditional Chinese requirement in header and user scenarios
-  ✅ tasks-template.md - Updated with Traditional Chinese requirement in documentation tasks
+  ✅ plan-template.md - No updates needed (development workflow guidance, not template structure)
+  ✅ spec-template.md - No updates needed (specification format unaffected)
+  ✅ tasks-template.md - No updates needed (task structure unaffected)
   ✅ agent-file-template.md - No updates needed (internal template)
   ✅ checklist-template.md - No updates needed (internal checklist)
-  ⚠️  .github/copilot-instructions.md - Already contains Traditional Chinese language convention (no updates needed)
+  ✅ .github/copilot-instructions.md - No updates needed (development patterns unaffected)
 Command Files Review:
-  ✅ .github/prompts/speckit.constitution.prompt.md - Reviewed (no updates needed - constitutional update process only)
-  ℹ️  No other command files found in expected location
-Change Summary (v1.3.0):
-  - Added Principle IX (Traditional Chinese Documentation Standard)
-  - Mandates Traditional Chinese (繁體中文, zh-TW) for all specifications, implementation plans, and user-facing documentation
-  - Aligns with project's primary user base in Taiwan and existing language convention in copilot-instructions.md
-  - Technical documentation and code comments may remain in English for international developer collaboration
-  - Commit message descriptions already required to be in Traditional Chinese (existing Git Commit Messages section)
+  ✅ .github/prompts/speckit.constitution.prompt.md - Reviewed (no updates needed)
+  ℹ️  No other command files found
+Change Summary (v1.3.2):
+  - Added critical warning about git tag usage before releases
+  - Clarified that git tags trigger automated CI/CD release pipeline
+  - Emphasized that tags should only be created during official release process
+  - Added to Git Commit Messages section for visibility
 Version Bump Rationale:
-  - MINOR version bump (1.2.1 → 1.3.0)
-  - New principle addition that expands governance scope
-  - Backward compatible (existing English docs not invalidated, but future docs must comply)
-  - Material expansion of documentation standards
+  - PATCH version bump (1.3.1 → 1.3.2)
+  - Clarification and operational guidance only
+  - No new principles or rules added
+  - Backward compatible (supplements existing git workflow guidance)
+  - Non-semantic refinement of development standards
 Follow-up TODOs: None
 -->
 
@@ -263,28 +264,35 @@ When refactoring code, follow these priorities and guidelines:
 -   Eliminate untestable patterns (infinite loops, blocking operations)
 -   Replace any `console.log` with structured logging (`log.*` methods)
 
-**Commit Standards**:
-
--   Describe refactoring purpose and scope clearly
--   Break large refactorings into small, atomic commits
--   Ensure code works after each commit
--   Provide test evidence that refactoring preserves functionality
-
 ### Git Commit Messages
 
 All git commit messages MUST follow these conventions:
 
 -   **Format**: Follow Conventional Commits format: `<type>(<scope>): <description>`
--   **Description Language**: Write the description portion in **Traditional Chinese (繁體中文)**
 -   **Type and Scope**: Keep type and scope in English (e.g., `feat`, `fix`, `docs`, `refactor`, `test`)
+-   **Description Language**: Write the description portion (after the colon) in **Traditional Chinese (繁體中文)**
 -   **Examples**:
     -   `feat(blocks): 新增溫度感測器積木`
     -   `fix(webview): 修正主題切換時的顯示問題`
     -   `docs(readme): 更新安裝說明`
     -   `refactor(services): 重構檔案服務以提升可測試性`
     -   `test(fileService): 增加錯誤處理的測試案例`
+    -   `chore(deps): 更新 Blockly 至 12.3.1 版本`
+    -   `style(css): 調整深色主題的配色方案`
+    -   `perf(generator): 優化程式碼生成效能`
 
-**Rationale**: The project is primarily developed for Traditional Chinese-speaking users (Taiwan). Using Traditional Chinese in commit descriptions improves clarity for the core development team and maintainers, while keeping standardized English keywords (type/scope) maintains compatibility with automated tooling and international collaboration.
+**Rationale**: The project is primarily developed for Traditional Chinese-speaking users (Taiwan). Using Traditional Chinese in commit descriptions improves clarity for the core development team and maintainers, while keeping standardized English keywords (type/scope) maintains compatibility with automated tooling and international collaboration. This aligns with Principle IX (Traditional Chinese Documentation Standard) and ensures consistent language use across all project artifacts.
+
+**⚠️ CRITICAL: Git Tag Usage Warning**
+
+-   **DO NOT create git tags casually** before an official release
+-   Git tags automatically trigger the CI/CD release pipeline
+-   Tags should only be created as part of the formal release process
+-   Accidental tags can cause unintended package publications to VS Code Marketplace
+-   If you need to mark a commit for reference, use branch names or commit messages instead
+-   **Release Process**: Tags are created by release managers after all pre-release validations pass
+
+**Rationale**: The project uses automated CI/CD workflows that publish to VS Code Marketplace when tags are pushed. Casual tag creation can trigger unwanted releases, potentially publishing incomplete or untested versions to users. This safeguard ensures release integrity and prevents accidental marketplace publications.
 
 ## Version Management
 
@@ -322,7 +330,7 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.3.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-20
+**Version**: 1.3.2 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-23
 
 ```
 
