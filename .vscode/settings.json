@@ -12,8 +12,8 @@
     },
     "MicroPython.executeButton": [
         {
-            "text": "▶",
-            "tooltip": "运行",
+            "text": "\u25b6",
+            "tooltip": "\u8fd0\u884c",
             "alignment": "left",
             "command": "extension.executeFile",
             "priority": 3.5
@@ -22,11 +22,10 @@
     "MicroPython.syncButton": [
         {
             "text": "$(sync)",
-            "tooltip": "同步",
+            "tooltip": "\u540c\u6b65",
             "alignment": "left",
             "command": "extension.execute",
             "priority": 4
         }
     ]
 }
-
