@@ -5,15 +5,6 @@
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
-<!--
-  LANGUAGE REQUIREMENT (Principle IX):
-  This implementation plan MUST be written in Traditional Chinese (繁體中文, zh-TW).
-  All planning content, technical context, and documentation should be in Traditional
-  Chinese to align with the project's primary audience and facilitate team collaboration.
-
-  Code snippets and technical references MAY remain in English for developer clarity.
--->
-
 ## Summary
 
 [Extract from feature spec: primary requirement + technical approach from research]
@@ -38,41 +29,15 @@
 
 ## Constitution Check
 
-_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
+*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-Review each core principle from `.specify/memory/constitution.md`:
-
--   [ ] **Simplicity and Maintainability**: Does the design avoid unnecessary complexity? Are components self-documenting?
--   [ ] **Modularity and Extensibility**: Can new features be added without major refactoring? Are concerns properly separated?
--   [ ] **Avoid Over-Development**: Is this feature truly needed now? Does it deliver core value without speculative additions?
--   [ ] **Flexibility and Adaptability**: Will the implementation support future boards/languages/configurations without code changes?
--   [ ] **Research-Driven Development (MCP-Powered)**: Have you used MCP tools to verify library versions, API compatibility, and best practices?
--   [ ] **Structured Logging**: Are all diagnostic outputs using the standardized logging service (`log.*` methods)?
--   [ ] **Comprehensive Test Coverage**: Is the code designed to be 100% testable? Does it avoid infinite loops and blocking operations in tests?
--   [ ] **Pure Functions and Modular Architecture**: Are functions pure where possible? Is business logic separated from side effects?
--   [ ] **Traditional Chinese Documentation**: Are all specifications, plans, and user-facing docs written in Traditional Chinese (zh-TW)?
-
-**Research Actions Taken**:
-
--   [ ] Verified library documentation using MCP `resolve-library-id` and `get-library-docs` tools
--   [ ] Checked for API breaking changes using web search
--   [ ] Confirmed compatibility with current Blockly/VSCode/PlatformIO versions
--   [ ] Documented research findings: [LINK TO RESEARCH.MD OR INLINE NOTES]
-
-**Testability Assessment**:
-
--   [ ] All business logic can be tested without external dependencies
--   [ ] No infinite loops or blocking operations that prevent test execution
--   [ ] Pure functions identified and separated from side effects
--   [ ] Dependency injection used for testable module boundaries
-
-**Violations Requiring Justification**: [None / List any unavoidable violations with rationale]
+[Gates determined based on constitution file]
 
 ## Project Structure
 
 ### Documentation (this feature)
 
-```
+```text
 specs/[###-feature]/
 ├── plan.md              # This file (/speckit.plan command output)
 ├── research.md          # Phase 0 output (/speckit.plan command)
@@ -83,7 +48,6 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
-
 <!--
   ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
   for this feature. Delete unused options and expand the chosen structure with
@@ -91,7 +55,7 @@ specs/[###-feature]/
   not include Option labels.
 -->
 
-```
+```text
 # [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
 src/
 ├── models/
@@ -132,9 +96,9 @@ directories captured above]
 
 ## Complexity Tracking
 
-_Fill ONLY if Constitution Check has violations that must be justified_
+> **Fill ONLY if Constitution Check has violations that must be justified**
 
-| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
-| -------------------------- | ------------------ | ------------------------------------ |
-| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |
+| Violation | Why Needed | Simpler Alternative Rejected Because |
+|-----------|------------|-------------------------------------|
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
