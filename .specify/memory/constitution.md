@@ -370,7 +370,3 @@ This constitution supersedes all other development practices. All code changes, 
 -   PATCH: Clarifications, wording improvements, typo fixes
 
 **Version**: 1.4.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-11-08
-
-```
-
-```
