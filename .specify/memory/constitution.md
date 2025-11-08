@@ -1,34 +1,45 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.3.1 → 1.3.2
+Version Change: 1.3.2 → 1.4.0
 Modified Principles: None
 Modified Sections:
-  - Git Commit Messages - Added critical warning about git tag usage and CI/CD automation
+  - Git Commit Messages - Expanded to full Conventional Commits 1.0.0 specification
+    * Added comprehensive commit type definitions (11 types with Traditional Chinese descriptions)
+    * Added breaking change marker specification (!)
+    * Added commit body and footer guidance
+    * Reorganized structure with clear requirements and examples sections
+    * Retained existing git tag warning and Traditional Chinese description requirement
 Added Principles: None
 Added Sections: None
 Removed Sections: None
 Templates Status:
-  ✅ plan-template.md - No updates needed (development workflow guidance, not template structure)
+  ✅ plan-template.md - No updates needed (no git commit guidance in template)
   ✅ spec-template.md - No updates needed (specification format unaffected)
   ✅ tasks-template.md - No updates needed (task structure unaffected)
   ✅ agent-file-template.md - No updates needed (internal template)
   ✅ checklist-template.md - No updates needed (internal checklist)
-  ✅ .github/copilot-instructions.md - No updates needed (development patterns unaffected)
+  ✅ .github/copilot-instructions.md - No updates needed (existing commit examples already follow new standard)
 Command Files Review:
   ✅ .github/prompts/speckit.constitution.prompt.md - Reviewed (no updates needed)
   ℹ️  No other command files found
-Change Summary (v1.3.2):
-  - Added critical warning about git tag usage before releases
-  - Clarified that git tags trigger automated CI/CD release pipeline
-  - Emphasized that tags should only be created during official release process
-  - Added to Git Commit Messages section for visibility
+Change Summary (v1.4.0):
+  - Expanded Git Commit Messages section to full Conventional Commits 1.0.0 specification
+  - Added structured requirements section with commit message format rules
+  - Added 11 commit type definitions with Traditional Chinese translations:
+    * feat (新增功能), fix (修復錯誤), docs (文件更新), style (程式碼格式調整)
+    * refactor (重構程式碼), perf (效能優化), test (測試相關), chore (雜項工作)
+    * ci (CI/CD 設定), build (建置系統), revert (回復提交)
+  - Added breaking change marker specification using `!` after type/scope
+  - Added guidance on optional commit body and footer
+  - Reorganized existing examples into structured examples section
+  - Retained all existing guidance (Traditional Chinese descriptions, git tag warning)
 Version Bump Rationale:
-  - PATCH version bump (1.3.1 → 1.3.2)
-  - Clarification and operational guidance only
-  - No new principles or rules added
-  - Backward compatible (supplements existing git workflow guidance)
-  - Non-semantic refinement of development standards
+  - MINOR version bump (1.3.2 → 1.4.0)
+  - Materially expanded Git Commit Messages standard with comprehensive Conventional Commits specification
+  - Added new structured guidance sections (Requirements, Commit Type Definitions, Breaking Change Format)
+  - Backward compatible (existing commit messages already follow this pattern, now formally documented)
+  - No governance changes, only expanded development standards
 Follow-up TODOs: None
 -->
 
@@ -266,22 +277,50 @@ When refactoring code, follow these priorities and guidelines:
 
 ### Git Commit Messages
 
-All git commit messages MUST follow these conventions:
+All git commit messages MUST follow the Conventional Commits 1.0.0 specification with Traditional Chinese descriptions to maintain clear version history and enable automated changelog generation.
 
--   **Format**: Follow Conventional Commits format: `<type>(<scope>): <description>`
--   **Type and Scope**: Keep type and scope in English (e.g., `feat`, `fix`, `docs`, `refactor`, `test`)
--   **Description Language**: Write the description portion (after the colon) in **Traditional Chinese (繁體中文)**
--   **Examples**:
-    -   `feat(blocks): 新增溫度感測器積木`
-    -   `fix(webview): 修正主題切換時的顯示問題`
-    -   `docs(readme): 更新安裝說明`
-    -   `refactor(services): 重構檔案服務以提升可測試性`
-    -   `test(fileService): 增加錯誤處理的測試案例`
-    -   `chore(deps): 更新 Blockly 至 12.3.1 版本`
-    -   `style(css): 調整深色主題的配色方案`
-    -   `perf(generator): 優化程式碼生成效能`
+**Requirements**:
 
-**Rationale**: The project is primarily developed for Traditional Chinese-speaking users (Taiwan). Using Traditional Chinese in commit descriptions improves clarity for the core development team and maintainers, while keeping standardized English keywords (type/scope) maintains compatibility with automated tooling and international collaboration. This aligns with Principle IX (Traditional Chinese Documentation Standard) and ensures consistent language use across all project artifacts.
+-   **Format**: Commit message structure MUST be: `<type>(<scope>): <description>`
+-   **Type**: MUST be one of the defined types (see Commit Type Definitions below)
+-   **Scope**: Optional but recommended for larger changes (e.g., `blocks`, `webview`, `services`, `tests`)
+-   **Description Language**: MUST be written in **Traditional Chinese (繁體中文)**
+-   **Breaking Changes**: MUST include `!` after type/scope for backward-incompatible changes: `feat(api)!: 重構認證系統`
+-   **Commit Body**: Optional but recommended for complex changes requiring additional context
+-   **Commit Footer**: Optional, used for issue references and breaking change details
+
+**Commit Type Definitions**:
+
+-   `feat`: 新增功能 (new feature for the user)
+-   `fix`: 修復錯誤 (bug fix for the user)
+-   `docs`: 文件更新 (documentation only changes)
+-   `style`: 程式碼格式調整 (formatting, missing semicolons, etc.; no code logic change)
+-   `refactor`: 重構程式碼 (refactoring production code without changing external behavior)
+-   `perf`: 效能優化 (code change that improves performance)
+-   `test`: 測試相關 (adding or refactoring tests; no production code change)
+-   `chore`: 雜項工作 (updating build tasks, package manager configs, etc.; no production code change)
+-   `ci`: CI/CD 設定 (changes to CI configuration files and scripts)
+-   `build`: 建置系統 (changes to build system or external dependencies)
+-   `revert`: 回復提交 (reverts a previous commit)
+
+**Examples**:
+
+```
+feat(blocks): 新增溫度感測器積木
+fix(webview): 修正主題切換時的顯示問題
+docs(readme): 更新安裝說明
+docs(constitution): 更新憲法新增提交規範與類型定義
+refactor(services): 重構檔案服務以提升可測試性
+test(fileService): 增加錯誤處理的測試案例
+chore(deps): 更新 Blockly 至 12.3.1 版本
+style(css): 調整深色主題的配色方案
+perf(generator): 優化程式碼生成效能
+ci(github): 新增自動化測試工作流程
+build(webpack): 更新 webpack 設定以支援 ES2022
+revert: 回復 feat(blocks): 新增溫度感測器積木
+```
+
+**Rationale**: Conventional Commits 1.0.0 provides a standardized commit message structure that enables automated tooling (changelog generation, semantic versioning), improves code review efficiency, and maintains clear project history. Traditional Chinese descriptions ensure accessibility for the primary development team and align with Principle IX (Traditional Chinese Documentation Standard). The structured format supports automated release workflows and makes project history more navigable.
 
 **⚠️ CRITICAL: Git Tag Usage Warning**
 
@@ -330,7 +369,7 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.3.2 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-10-23
+**Version**: 1.4.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-11-08
 
 ```
 
