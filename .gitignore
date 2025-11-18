@@ -10,8 +10,8 @@ node_modules/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
-!.vscode/settings.json
 !.vscode/tasks.json
+.vscode/settings.json
 
 # 擴充套件相關
 *.vsix
