@@ -130,7 +130,14 @@ function updateUITexts() {
 			const previewTitleEl = document.querySelector('.preview-title');
 			if (previewTitleEl) {
 				const badgeText = previewBadge ? previewBadge.textContent : '';
-				previewTitleEl.innerHTML = `${inPageText} <span class="preview-badge" id="previewBadge">${badgeText}</span>`;
+				// 修復 XSS 漏洞: 使用 textContent 設定文字,再透過 DOM 操作添加 badge 元素
+				// 避免使用 innerHTML 直接插入未轉義的內容
+				previewTitleEl.textContent = inPageText + ' ';
+				const badgeEl = document.createElement('span');
+				badgeEl.className = 'preview-badge';
+				badgeEl.id = 'previewBadge';
+				badgeEl.textContent = badgeText;
+				previewTitleEl.appendChild(badgeEl);
 			}
 		}
 	}

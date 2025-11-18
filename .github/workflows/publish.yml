@@ -3,12 +3,16 @@ name: Publish VS Code Extension
 on:
     push:
         tags:
-            - 'v[0-9]+.[0-9]+.[0-9]+'
+            - "v[0-9]+.[0-9]+.[0-9]+"
     workflow_dispatch:
 
 jobs:
     publish:
         runs-on: ubuntu-latest
+        # 設定明確的權限,遵循最小權限原則
+        permissions:
+            contents: read # 讀取儲存庫內容
+            id-token: write # 用於身份驗證
         steps:
             - name: Dump GitHub context
               env:
@@ -26,7 +30,7 @@ jobs:
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: '22'
+                  node-version: "22"
 
             - name: Install dependencies
               run: npm ci
