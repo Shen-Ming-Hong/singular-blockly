@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   **國際化品質保證系統** (Internationalization Quality Assurance System)
     **Internationalization Quality Assurance System**
+
     -   建立完整的 i18n 品質保證系統，採用自動化優先策略
         Established comprehensive i18n QA system with automation-first strategy
     -   100% 消除高嚴重性誤報 (61 → 0 個問題)
@@ -31,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   **翻譯審計白名單系統** (Translation Audit Whitelist System)
     **Translation Audit Whitelist System**
+
     -   新增 audit-whitelist.json 包含 8 條過濾規則
         Added audit-whitelist.json with 8 filtering rules
     -   實作 whitelist-checker.js 用於誤報過濾
@@ -66,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   **模板重構** (Template Refactoring)
     **Template Refactoring**
+
     -   簡化 plan-template.md 的技術上下文段落
         Simplified technical context section in plan-template.md
     -   優化 spec-template.md 使用者故事優先級結構
@@ -75,6 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   **憲法更新** (Constitution Update)
     **Constitution Update**
+
     -   更新 constitution.md 至 v1.4.0
         Updated constitution.md to v1.4.0
     -   新增完整 Conventional Commits 1.0.0 規範
