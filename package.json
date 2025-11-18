@@ -121,5 +121,8 @@
 	},
 	"extensionDependencies": [
 		"platformio.platformio-ide"
-	]
+	],
+	"overrides": {
+		"glob": "^11.1.0"
+	}
 }
