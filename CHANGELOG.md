@@ -10,6 +10,118 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.42.0] - 2025-01-18
+
+### 新增 Added
+
+-   **國際化品質保證系統** (Internationalization Quality Assurance System)
+    **Internationalization Quality Assurance System**
+    -   建立完整的 i18n 品質保證系統，採用自動化優先策略
+        Established comprehensive i18n QA system with automation-first strategy
+    -   100% 消除高嚴重性誤報 (61 → 0 個問題)
+        100% high-severity false positive elimination (61 → 0 issues)
+    -   15 種語言平均翻譯覆蓋率達 98.94%
+        98.94% average translation coverage across 15 languages
+    -   33 個單元測試，100% 通過率
+        33 unit tests with 100% pass rate
+    -   Whitelist 規則系統 v1.1.0 (16 條規則，效能 <100ms)
+        Whitelist rule system v1.1.0 (16 rules, <100ms performance)
+    -   CI/CD 自動化品質檢查閘門
+        Zero validation errors with automated CI/CD quality gates
+
+-   **翻譯審計白名單系統** (Translation Audit Whitelist System)
+    **Translation Audit Whitelist System**
+    -   新增 audit-whitelist.json 包含 8 條過濾規則
+        Added audit-whitelist.json with 8 filtering rules
+    -   實作 whitelist-checker.js 用於誤報過濾
+        Implemented whitelist-checker.js for false positive filtering
+    -   整合白名單至 audit-translations.js
+        Integrated whitelist into audit-translations.js
+    -   生成包含白名單統計的審計報告
+        Generated audit report with whitelist statistics
+    -   高嚴重性問題減少 68.9% (61 → 19)
+        Reduced high-severity issues by 68.9% (61 → 19)
+    -   過濾 149 個誤報 (佔總問題的 8.8%)
+        Filtered 149 false positives (8.8% of total issues)
+
+-   **Speckit 自動化增強** (Speckit Automation Enhancement)
+    **Speckit Automation Enhancement**
+    -   擴充 create-new-feature.ps1 功能
+        Extended create-new-feature.ps1 functionality
+    -   改進 update-agent-context.ps1 錯誤處理
+        Improved update-agent-context.ps1 error handling
+    -   新增多個 Speckit prompt 範本以改善開發流程
+        Added multiple Speckit prompt templates to improve development workflow
+
+### 已修復 Fixed
+
+-   **安全性修復** (Security Fix)
+    **Security Fix**
+    -   修復 blocklyPreview 中的 XSS 漏洞
+        Fixed XSS vulnerability in blocklyPreview
+    -   改用 textContent 設定文字並安全地添加 badge 元素
+        Used textContent for text setting and safely added badge elements
+
+### 已變更 Changed
+
+-   **模板重構** (Template Refactoring)
+    **Template Refactoring**
+    -   簡化 plan-template.md 的技術上下文段落
+        Simplified technical context section in plan-template.md
+    -   優化 spec-template.md 使用者故事優先級結構
+        Optimized user story priority structure in spec-template.md
+    -   重組 tasks-template.md 使其更符合獨立測試原則
+        Reorganized tasks-template.md to align with independent testing principles
+
+-   **憲法更新** (Constitution Update)
+    **Constitution Update**
+    -   更新 constitution.md 至 v1.4.0
+        Updated constitution.md to v1.4.0
+    -   新增完整 Conventional Commits 1.0.0 規範
+        Added full Conventional Commits 1.0.0 specification
+    -   新增 11 種 commit type 定義與繁體中文說明
+        Added 11 commit type definitions with Traditional Chinese descriptions
+    -   新增 breaking change 標記規範 (!)
+        Added breaking change marker specification (!)
+    -   新增 git tag 觸發 CI/CD 警告
+        Added git tag triggering CI/CD warning
+
+-   **工作區設定** (Workspace Settings)
+    **Workspace Settings**
+    -   更新 VSCode 工作區設定並調整編輯器配置
+        Updated VSCode workspace settings and adjusted editor configuration
+
+### 文件 Documentation
+
+-   新增 Feature 010 完整規格文件 (Project Safety Guard)
+    Added Feature 010 complete specification documents (Project Safety Guard)
+    -   17 個完整文件，涵蓋完整開發生命週期
+        17 complete documents covering full development lifecycle
+    -   包含規格、研究、資料模型、計畫、任務清單、快速入門等
+        Includes specifications, research, data models, plans, task lists, quickstart guides
+-   更新所有 Speckit 命令提示詞檔案
+    Updated all Speckit command prompt files
+    -   同步格式化與內容改進
+        Synchronized formatting and content improvements
+    -   更新命令執行流程說明
+        Updated command execution flow descriptions
+
+### 技術細節 Technical Details
+
+-   Pure function 架構用於 whitelist-checker.js
+    Pure function architecture for whitelist-checker.js
+-   JSON 驅動的規則配置 (非技術編輯者友好)
+    JSON-driven rule configuration (non-technical editor friendly)
+-   GitHub Actions CI/CD 整合
+    GitHub Actions CI/CD integration
+-   完成 6/8 個開發階段 (Phase 0-4, 7-8)
+    Completed 6/8 development phases (Phase 0-4, 7-8)
+-   測試通過率: 249/250 (99.6%)
+    Test pass rate: 249/250 (99.6%)
+
+相關 PR: #17  
+相關 Issue: #16
+
 ## [0.41.0] - 2025-10-22
 
 ### 新增 Added
