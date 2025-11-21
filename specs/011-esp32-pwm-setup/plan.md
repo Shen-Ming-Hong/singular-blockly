@@ -22,14 +22,14 @@
 
 **Storage**:
 
--   Workspace state: `{workspace}/blockly/main.json` (不持久化 PWM 配置,透過積木存在重建)
+-   Workspace state: `{workspace}/blockly/main.json` (不持久化 PWM 配置,透過積木存在重建；載入工作區時由 rebuildPwmConfig 函數掃描積木並重建全域變數，測試任務包含於 Phase 5 User Story 3)
 -   PlatformIO config: `{workspace}/platformio.ini` (不受此功能影響)
 
 **Testing**:
 
 -   Unit tests: 使用 Mocha + @vscode/test-electron
 -   WebView 互動功能: 手動測試(根據 Constitution Principle VII UI Testing Exception)
--   目標覆蓋率: 100% 核心邏輯
+-   目標覆蓋率: 100% 核心邏輯（定義：Extension Host 環境中的所有 business logic 和 services；WebView 環境中的驗證函數 validateAndAdjustPwmConfig、程式碼生成器邏輯、全域配置管理函數。積木 UI 互動使用手動測試）
 
 **Target Platform**:
 
@@ -159,7 +159,7 @@ specs/011-esp32-pwm-setup/
 ├── data-model.md        # Phase 1 output (/speckit.plan command)
 ├── quickstart.md        # Phase 1 output (/speckit.plan command)
 ├── contracts/           # Phase 1 output (/speckit.plan command)
-│   └── esp32-pwm-api.md # PWM 配置 API 和驗證規則定義
+│   └── esp32-pwm-api.md # PWM 配置 API 和驗證規則定義 (由開發者在 Phase 2 實作前手動建立，或在 Phase 0 研究階段同步撰寫)
 └── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
 ```
 

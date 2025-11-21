@@ -56,10 +56,11 @@
 
 **⚠️ 關鍵**: 此階段必須完成才能開始任何使用者故事的實作
 
--   [ ] T006 在 `media/blockly/generators/arduino/io.js` 開頭新增 `validateAndAdjustPwmConfig` 驗證函數(約 30 行程式碼)
--   [ ] T007 [P] 建立測試檔案 `src/test/suite/pwm-validation.test.ts` 並實作驗證邏輯的單元測試
--   [ ] T008 [P] 在 `media/locales/zh-hant/messages.js` 末尾新增 ESP32 PWM 相關的繁體中文翻譯鍵值(約 5 個鍵值)
--   [ ] T009 [P] 在 `media/locales/en/messages.js` 末尾新增 ESP32 PWM 相關的英文翻譯鍵值(約 5 個鍵值)
+-   [ ] T006 建立 `specs/011-esp32-pwm-setup/contracts/esp32-pwm-api.md` 文件，定義 `validateAndAdjustPwmConfig` 函數的 API 契約（輸入參數：frequency: number, resolution: number；返回值：{ adjustedFrequency: number, adjustedResolution: number, isAdjusted: boolean, warningMessage?: string }）
+-   [ ] T007 在 `media/blockly/generators/arduino/io.js` 開頭新增 `validateAndAdjustPwmConfig` 驗證函數(約 30 行程式碼，依據 contracts/esp32-pwm-api.md 定義實作)
+-   [ ] T008 [P] 建立測試檔案 `src/test/suite/pwm-validation.test.ts` 並實作驗證邏輯的單元測試
+-   [ ] T009 [P] 在 `media/locales/zh-hant/messages.js` 末尾新增 ESP32 PWM 相關的繁體中文翻譯鍵值(約 8 個鍵值：積木標籤、欄位名稱、解析度選項、tooltip 說明文字)
+-   [ ] T010 [P] 在 `media/locales/en/messages.js` 末尾新增 ESP32 PWM 相關的英文翻譯鍵值(約 8 個鍵值：積木標籤、欄位名稱、解析度選項、tooltip 說明文字)
 
 **Checkpoint**: 驗證函數與測試框架已就緒,可開始使用者故事實作
 
@@ -73,26 +74,28 @@
 
 ### 積木定義與介面
 
--   [ ] T010 [P] [US1] 在 `media/blockly/blocks/arduino.js` 末尾新增 `esp32_pwm_setup` 積木定義(約 30 行程式碼,包含 FieldNumber 和 FieldDropdown)
--   [ ] T011 [P] [US1] 在 `media/toolbox/categories/arduino.json` 中的 `arduino_pullup` 積木之後新增 `esp32_pwm_setup` 積木項目
+-   [ ] T011 [P] [US1] 在 `media/blockly/blocks/arduino.js` 末尾新增 `esp32_pwm_setup` 積木定義(約 30 行程式碼,包含 FieldNumber 和 FieldDropdown)
+-   [ ] T012 [P] [US1] 在 `media/toolbox/categories/arduino.json` 中的 `arduino_pullup` 積木之後新增 `esp32_pwm_setup` 積木項目
 
 ### 程式碼生成器修改
 
--   [ ] T012 [US1] 在 `media/blockly/generators/arduino/io.js` 中定位 `arduino_analog_write` 生成器(約第 113 行)的 ESP32 分支
--   [ ] T013 [US1] 修改 `arduino_analog_write` 生成器的 ESP32 分支:讀取全域 PWM 配置(window.esp32PwmFrequency/Resolution),呼叫 validateAndAdjustPwmConfig,生成 ledcSetup/ledcAttachPin/ledcWrite 程式碼(約 40 行修改)
--   [ ] T014 [US1] 在程式碼生成器中實作防重複機制:使用 setupKey 檢查避免同一腳位多次生成 ledcSetup
+**註**：`validateAndAdjustPwmConfig` 函數僅負責驗證與調整邏輯（純函數），不修改全域變數。全域變數 `window.esp32PwmFrequency` 和 `window.esp32PwmResolution` 的寫入由積木的 `onchange` 事件處理（在 Phase 5 實作）。
+
+-   [ ] T013 [US1] 在 `media/blockly/generators/arduino/io.js` 中定位 `arduino_analog_write` 生成器(約第 113 行)的 ESP32 分支
+-   [ ] T014 [US1] 修改 `arduino_analog_write` 生成器的 ESP32 分支:讀取全域 PWM 配置(window.esp32PwmFrequency/Resolution),呼叫 validateAndAdjustPwmConfig,生成 ledcSetup/ledcAttachPin/ledcWrite 程式碼(約 40 行修改)
+-   [ ] T015 [US1] 在程式碼生成器中實作防重複機制:使用 setupKey（生成器內部使用的唯一識別符，格式為 `pwm_setup_${pin}`，用於防止同一腳位多次生成初始化程式碼）檢查避免同一腳位多次生成 ledcSetup
 
 ### 測試與驗證
 
--   [ ] T015 [US1] 執行 Phase 2 建立的單元測試,確認驗證函數邏輯正確(相容配置、不相容配置、邊界值)
--   [ ] T016 [US1] 手動測試:在 Extension Development Host 中開啟 Blockly 編輯器,切換至 ESP32 開發板,驗證工具箱顯示 PWM 設定積木
--   [ ] T017 [US1] 手動測試:拖曳 PWM 設定積木(75000Hz / 8bit) + 類比輸出積木(GPIO25, 值 128),生成程式碼並檢查包含正確的 ledcSetup 和驗證註解
--   [ ] T018 [US1] 實體硬體測試:上傳程式到 ESP32 實體硬體,連接 AT8833CR 馬達驅動模組和直流馬達,驗證馬達正常運轉且無高頻噪音
+-   [ ] T016 [US1] 執行 Phase 2 建立的單元測試,確認驗證函數邏輯正確(相容配置、不相容配置、邊界值)
+-   [ ] T017 [US1] 手動測試:在 Extension Development Host 中開啟 Blockly 編輯器,切換至 ESP32 開發板,驗證工具箱顯示 PWM 設定積木
+-   [ ] T018 [US1] 手動測試:拖曳 PWM 設定積木(75000Hz / 8bit) + 類比輸出積木(GPIO25, 值 128),生成程式碼並檢查包含正確的 ledcSetup 和驗證註解
+-   [ ] T019 [US1] 實體硬體測試:上傳程式到 ESP32 實體硬體,連接 AT8833CR 或 DRV8833 馬達驅動模組和直流馬達,驗證馬達正常運轉且無高頻噪音
 
 ### 工具箱開發板過濾 (FR-008)
 
--   [ ] T019 [US1] 在 `media/js/blocklyEdit.js` 的 `updateToolboxForBoard` 函數中實作邏輯:檢查 `window.currentBoard` 是否為 'esp32' 系列開發板,僅在 ESP32 時於工具箱顯示 `esp32_pwm_setup` 積木
--   [ ] T020 [US1] 手動測試:切換開發板從 Arduino Uno 到 ESP32,驗證工具箱中 PWM 設定積木正確顯示/隱藏
+-   [ ] T020 [US1] 在 `media/js/blocklyEdit.js` 的 `updateToolboxForBoard` 函數中實作邏輯:檢查 `window.currentBoard` 是否為 'esp32' 系列開發板,僅在 ESP32 時於工具箱顯示 `esp32_pwm_setup` 積木（完全隱藏而非禁用）
+-   [ ] T021 [US1] 手動測試:切換開發板從 Arduino Uno 到 ESP32,驗證工具箱中 PWM 設定積木在 Arduino 時完全不可見、在 ESP32 時正常顯示
 
 **Checkpoint**: 使用者可透過積木介面設定 PWM 並正確控制馬達驅動晶片
 
@@ -106,21 +109,21 @@
 
 ### 驗證邏輯增強
 
--   [ ] T021 [US2] 在 `validateAndAdjustPwmConfig` 函數中完善警告訊息格式,確保清楚說明原始設定、限制原因和調整結果(已在 Phase 2 實作基礎,此處優化訊息)
--   [ ] T022 [US2] 在 `arduino_analog_write` 生成器中實作註解插入邏輯:根據 validateAndAdjustPwmConfig 返回結果,在 setupCode\_ 中插入驗證通過或警告註解
+-   [ ] T022 [US2] 在 `validateAndAdjustPwmConfig` 函數中完善警告訊息格式,確保清楚說明原始設定、限制原因和調整結果(已在 Phase 2 實作基礎,此處優化訊息)
+-   [ ] T023 [US2] 在 `arduino_analog_write` 生成器中實作註解插入邏輯:根據 validateAndAdjustPwmConfig 返回結果,在 setupCode\_ 中插入驗證通過或警告註解
 
 ### 測試案例擴充
 
--   [ ] T023 [P] [US2] 在 `src/test/suite/pwm-validation.test.ts` 中新增不相容配置的測試案例(75000Hz @ 12bit → 自動調整為 10bit)
--   [ ] T024 [P] [US2] 在 `src/test/suite/pwm-validation.test.ts` 中新增極限頻率測試案例(80000Hz @ 8bit,確認計算正確性)
--   [ ] T025 [US2] 手動測試:設定不相容參數(75000Hz @ 12bit),生成程式碼,檢查包含 "⚠️ 警告" 註解
--   [ ] T026 [US2] 手動測試:設定相容參數(5000Hz @ 12bit),生成程式碼,檢查包含 "✓ 驗證" 註解
--   [ ] T027 [US2] 實體硬體測試:上傳自動調整後的程式到 ESP32,驗證硬體正常初始化 PWM 且無錯誤
+-   [ ] T024 [P] [US2] 在 `src/test/suite/pwm-validation.test.ts` 中新增不相容配置的測試案例(75000Hz @ 12bit → 自動調整為 10bit)
+-   [ ] T025 [P] [US2] 在 `src/test/suite/pwm-validation.test.ts` 中新增極限頻率測試案例(80000Hz @ 8bit,確認計算正確性)
+-   [ ] T026 [US2] 手動測試:設定不相容參數(75000Hz @ 12bit),生成程式碼,檢查包含 "⚠️ 警告" 註解
+-   [ ] T027 [US2] 手動測試:設定相容參數(5000Hz @ 12bit),生成程式碼,檢查包含 "✓ 驗證" 註解
+-   [ ] T028 [US2] 實體硬體測試:上傳自動調整後的程式到 ESP32,驗證硬體正常初始化 PWM 且無錯誤
 
 ### 邊界情況測試 (Edge Cases)
 
--   [ ] T028 [US2] 手動測試:在 PWM 設定積木的頻率欄位嘗試輸入 90000Hz (超出上限),驗證 FieldNumber 阻擋輸入並保持最大值 80000Hz
--   [ ] T029 [US2] 手動測試:在 PWM 設定積木的頻率欄位嘗試輸入 0Hz (低於下限),驗證 FieldNumber 阻擋輸入並保持最小值 1Hz
+-   [ ] T029 [US2] 手動測試:在 PWM 設定積木的頻率欄位嘗試輸入 90000Hz (超出上限),驗證 FieldNumber 阻擋輸入並保持最大值 80000Hz
+-   [ ] T030 [US2] 手動測試:在 PWM 設定積木的頻率欄位嘗試輸入 0Hz (低於下限),驗證 FieldNumber 阻擋輸入並保持最小值 1Hz
 
 **Checkpoint**: 系統可自動檢測並修正不相容配置,確保生成可運作的程式碼
 
@@ -134,16 +137,17 @@
 
 ### 工作區載入邏輯
 
--   [ ] T030 [US3] 在 `media/js/blocklyEdit.js` 末尾新增 `rebuildPwmConfig(workspace)` 函數:掃描工作區中的 esp32_pwm_setup 積木並重建全域變數,若無積木則使用預設值
--   [ ] T031 [US3] 在 `media/js/blocklyEdit.js` 的 `loadWorkspace` 事件處理器中,於載入工作區狀態後呼叫 `rebuildPwmConfig(workspace)`
--   [ ] T032 [US3] 在 `media/js/blocklyEdit.js` 的工作區變更監聽器中新增邏輯:監聽 esp32_pwm_setup 積木的 BLOCK_CHANGE 事件,即時更新 window.esp32PwmFrequency/Resolution
+-   [ ] T031 [US3] 在 `media/js/blocklyEdit.js` 末尾新增 `rebuildPwmConfig(workspace)` 函數:掃描工作區中的 esp32_pwm_setup 積木並重建全域變數,若無積木則使用預設值
+-   [ ] T032 [US3] 在 `media/js/blocklyEdit.js` 的 `loadWorkspace` 事件處理器中,於載入工作區狀態後呼叫 `rebuildPwmConfig(workspace)`
+-   [ ] T033 [US3] 在 `media/js/blocklyEdit.js` 的工作區變更監聽器中新增邏輯:監聽 esp32_pwm_setup 積木的變更事件（Blockly.Events.BLOCK_CHANGE 用於欄位值更新、Blockly.Events.BLOCK_DELETE 用於積木刪除、Blockly.Events.BLOCK_CREATE 用於積木新增），即時更新 window.esp32PwmFrequency/Resolution 或重置為預設值
 
 ### 預設值機制驗證
 
--   [ ] T033 [US3] 在 `arduino_analog_write` 生成器中確認讀取全域變數時使用容錯語法:`window.esp32PwmFrequency || 75000` 和 `window.esp32PwmResolution || 8`
--   [ ] T034 [US3] 手動測試:建立新專案但不拖曳 PWM 設定積木,直接使用類比輸出積木,生成程式碼並檢查使用預設值 `ledcSetup(..., 75000, 8)`
--   [ ] T035 [US3] 手動測試:開啟舊專案(僅包含類比輸出積木),載入後檢查 Console 訊息確認使用預設值,生成程式碼驗證正確
--   [ ] T036 [US3] 手動測試:切換開發板從 Arduino Uno 到 ESP32,驗證類比輸出積木生成的程式碼使用預設 PWM 設定
+-   [ ] T034 [US3] 在 `arduino_analog_write` 生成器中確認讀取全域變數時使用容錯語法:`window.esp32PwmFrequency || 75000` 和 `window.esp32PwmResolution || 8`
+-   [ ] T035 [US3] 手動測試:建立新專案但不拖曳 PWM 設定積木,直接使用類比輸出積木,生成程式碼並檢查使用預設值 `ledcSetup(..., 75000, 8)`
+-   [ ] T036 [US3] 手動測試:開啟舊專案(僅包含類比輸出積木),載入後檢查 Console 訊息確認 rebuildPwmConfig 正確重建預設值,生成程式碼驗證正確
+-   [ ] T037 [US3] 手動測試:切換開發板從 Arduino Uno 到 ESP32,驗證類比輸出積木生成的程式碼使用預設 PWM 設定
+-   [ ] T038 [US3] 整合測試:驗證從 main.json 載入包含 esp32_pwm_setup 積木的工作區後,全域變數正確重建為積木設定的值（而非預設值）
 
 **Checkpoint**: 舊專案與新專案無 PWM 設定積木時,皆正常使用預設值運作
 
@@ -157,15 +161,15 @@
 
 ### 程式碼生成隔離驗證
 
--   [ ] T037 [US4] 檢視 `media/blockly/generators/arduino/io.js` 中的伺服馬達相關程式碼生成器,確認其使用 ESP32Servo 庫而非 LEDC 系統
--   [ ] T038 [US4] 驗證 `arduino_analog_write` 生成器使用的 LEDC 通道編號不與伺服馬達使用的通道衝突(LEDC 通道 0-15,伺服馬達使用 ESP32Servo 庫的獨立通道)
+-   [ ] T039 [US4] 檢視 `media/blockly/generators/arduino/io.js` 中的伺服馬達相關程式碼生成器,確認其使用 ESP32Servo 庫而非 LEDC 系統
+-   [ ] T040 [US4] 驗證 `arduino_analog_write` 生成器使用的 LEDC 通道編號不與伺服馬達使用的通道衝突(LEDC 通道 0-15,伺服馬達使用 ESP32Servo 庫的獨立通道)
 
 ### 共存測試
 
--   [ ] T039 [US4] 手動測試:建立包含伺服馬達積木(GPIO18, 90 度) + PWM 設定積木(75000Hz / 8bit) + 類比輸出積木(GPIO25, 值 128)的專案
--   [ ] T040 [US4] 生成程式碼並檢查:同時包含 `servo.setPeriodHertz(50)` 和 `ledcSetup(channel, 75000, 8)`,兩者使用不同的程式碼區塊
--   [ ] T041 [US4] 實體硬體測試:上傳程式到 ESP32,連接伺服馬達(GPIO18)和馬達驅動晶片(GPIO25),同時執行並驗證兩者互不干擾
--   [ ] T042 [US4] 在 quickstart.md 或相關文件中新增警告說明:伺服馬達和類比輸出不可使用同一腳位(此為文件需求,非程式驗證)
+-   [ ] T041 [US4] 手動測試:建立包含伺服馬達積木(GPIO18, 90 度) + PWM 設定積木(75000Hz / 8bit) + 類比輸出積木(GPIO25, 值 128)的專案
+-   [ ] T042 [US4] 生成程式碼並檢查:同時包含 `servo.setPeriodHertz(50)` 和 `ledcSetup(channel, 75000, 8)`,兩者使用不同的程式碼區塊
+-   [ ] T043 [US4] 實體硬體測試:上傳程式到 ESP32,連接伺服馬達(GPIO18)和馬達驅動晶片(GPIO25),同時執行並驗證兩者互不干擾
+-   [ ] T044 [US4] 在 quickstart.md 或相關文件中新增警告說明:伺服馬達和類比輸出不可使用同一腳位(此為文件需求,非程式驗證)
 
 **Checkpoint**: 伺服馬達和高頻 PWM 可在同一專案中和平共存
 
@@ -175,14 +179,14 @@
 
 **目的**: 針對所有使用者故事的改進與優化
 
--   [ ] T043 [P] 新增程式碼生成測試案例到 `src/test/suite/code-generation.test.ts`:測試 ESP32 PWM 設定積木的程式碼生成正確性
--   [ ] T044 [P] 執行完整測試套件 `npm test`,確認新增的測試全部通過且未破壞現有測試
--   [ ] T045 檢視生成的 Arduino 程式碼可讀性:確認註解清晰、縮排正確、變數命名符合 Arduino 慣例
--   [ ] T046 [P] 更新 `CHANGELOG.md`:新增 ESP32 PWM 設定功能的版本紀錄(功能描述、影響範圍、向後相容性說明)
--   [ ] T047 檢視 ESLint 與 TypeScript 編譯警告,修正所有程式碼品質問題
--   [ ] T048 執行 quickstart.md 中的所有手動測試檢查清單,確認所有測試案例通過
--   [ ] T049 效能測試:使用包含多個類比輸出積木的複雜專案,測量程式碼生成時間(目標 ≤500ms)
--   [ ] T050 [P] 準備 Pull Request 描述:總結功能、列出變更檔案、附上測試結果截圖(程式碼生成範例、實體硬體運作照片)
+-   [ ] T045 [P] 新增程式碼生成測試案例到 `src/test/suite/code-generation.test.ts`:測試 ESP32 PWM 設定積木的程式碼生成正確性
+-   [ ] T046 [P] 執行完整測試套件 `npm test`,確認新增的測試全部通過且未破壞現有測試
+-   [ ] T047 檢視生成的 Arduino 程式碼可讀性:確認註解清晰、縮排正確、變數命名符合 Arduino 慣例
+-   [ ] T048 [P] 更新 `CHANGELOG.md`:新增 ESP32 PWM 設定功能的版本紀錄(功能描述、影響範圍、向後相容性說明)
+-   [ ] T049 檢視 ESLint 與 TypeScript 編譯警告,修正所有程式碼品質問題
+-   [ ] T050 執行 quickstart.md 中的所有手動測試檢查清單,確認所有測試案例通過
+-   [ ] T051 效能測試:使用包含 10 個類比輸出積木的專案,在 Intel i5 或同等級處理器上測量程式碼生成時間(目標 ≤500ms，符合 spec.md SC-009)
+-   [ ] T052 [P] 準備 Pull Request 描述:總結功能、列出變更檔案、附上測試結果截圖(程式碼生成範例、實體硬體運作照片)
 
 ---
 
@@ -301,16 +305,16 @@ Task T015 → Task T016 → Task T017 → Task T018
 
 ## Task Count Summary (任務統計摘要)
 
--   **Research (Phase 0)**: 4 tasks (新增)
+-   **Research (Phase 0)**: 4 tasks
 -   **Setup (Phase 1)**: 5 tasks
--   **Foundational (Phase 2)**: 4 tasks
--   **User Story 1 (Phase 3)**: 11 tasks (新增 2 個工具箱過濾任務)
--   **User Story 2 (Phase 4)**: 9 tasks (新增 2 個邊界情況測試任務)
--   **User Story 3 (Phase 5)**: 7 tasks
+-   **Foundational (Phase 2)**: 6 tasks (新增 API 契約文件任務，翻譯任務擴充至包含 tooltip)
+-   **User Story 1 (Phase 3)**: 11 tasks
+-   **User Story 2 (Phase 4)**: 9 tasks
+-   **User Story 3 (Phase 5)**: 8 tasks (新增工作區載入整合測試任務)
 -   **User Story 4 (Phase 6)**: 6 tasks
 -   **Polish (Phase 7)**: 8 tasks
 
-**Total Tasks**: 54 tasks (原 46 + 新增 8)
+**Total Tasks**: 57 tasks (原 54 + 新增 3)
 
 **Parallel Opportunities**:
 
@@ -323,15 +327,15 @@ Task T015 → Task T016 → Task T017 → Task T018
 
 **Estimated MVP Scope (User Story 1 Only)**:
 
--   Research (4) + Setup (5) + Foundational (4) + User Story 1 (11) = **24 tasks** for MVP
+-   Research (4) + Setup (5) + Foundational (6) + User Story 1 (11) = **26 tasks** for MVP
 
 **Full Feature Scope**:
 
--   All 54 tasks for complete feature implementation
+-   All 57 tasks for complete feature implementation
 
 ---
 
-**Tasks Version**: 1.1  
+**Tasks Version**: 1.2  
 **Generated**: 2025-01-21  
-**Updated**: 2025-01-21 (新增 Phase 0 研究任務、工具箱過濾任務、邊界情況測試任務)  
+**Updated**: 2025-01-21 (修復分析報告中的 10 個 MEDIUM/HIGH 問題：新增 API 契約文件任務、擴充翻譯任務至 tooltip、補充事件監聽器規格、明確職責分離、統一術語、新增整合測試)  
 **Next Step**: 開始執行 Phase 0: Research,驗證技術假設後進入 Phase 1: Setup
