@@ -59,8 +59,16 @@
 -   [ ] T006 建立 `specs/011-esp32-pwm-setup/contracts/esp32-pwm-api.md` 文件，定義 `validateAndAdjustPwmConfig` 函數的 API 契約（輸入參數：frequency: number, resolution: number；返回值：{ adjustedFrequency: number, adjustedResolution: number, isAdjusted: boolean, warningMessage?: string }）
 -   [ ] T007 在 `media/blockly/generators/arduino/io.js` 開頭新增 `validateAndAdjustPwmConfig` 驗證函數(約 30 行程式碼，依據 contracts/esp32-pwm-api.md 定義實作)
 -   [ ] T008 [P] 建立測試檔案 `src/test/suite/pwm-validation.test.ts` 並實作驗證邏輯的單元測試
--   [ ] T009 [P] 在 `media/locales/zh-hant/messages.js` 末尾新增 ESP32 PWM 相關的繁體中文翻譯鍵值(約 8 個鍵值：積木標籤、欄位名稱、解析度選項、tooltip 說明文字)
--   [ ] T010 [P] 在 `media/locales/en/messages.js` 末尾新增 ESP32 PWM 相關的英文翻譯鍵值(約 8 個鍵值：積木標籤、欄位名稱、解析度選項、tooltip 說明文字)
+-   [ ] T009 [P] 在 `media/locales/zh-hant/messages.js` 末尾新增 ESP32 PWM 相關的繁體中文翻譯鍵值(共 8 個鍵值)：
+    -   `ESP32_PWM_SETUP`：積木標籤「設定 ESP32 PWM」
+    -   `ESP32_PWM_FREQUENCY`：欄位名稱「頻率 (Hz)」
+    -   `ESP32_PWM_RESOLUTION`：欄位名稱「解析度 (bit)」
+    -   `ESP32_PWM_FREQUENCY_TOOLTIP`：頻率欄位 tooltip「設定 PWM 頻率，範圍 1-80000 Hz。高頻率適用於馬達驅動晶片（20-75KHz）」
+    -   `ESP32_PWM_RESOLUTION_TOOLTIP`：解析度欄位 tooltip「設定 PWM 解析度，影響輸出精度。注意：頻率 × 2^解析度 ≤ 80,000,000」
+    -   `ESP32_PWM_RESOLUTION_8BIT`：解析度選項「8 bit (0-255)」
+    -   `ESP32_PWM_RESOLUTION_10BIT`：解析度選項「10 bit (0-1023)」
+    -   `ESP32_PWM_RESOLUTION_12BIT`：解析度選項「12 bit (0-4095)」（及其他解析度選項）
+-   [ ] T010 [P] 在 `media/locales/en/messages.js` 末尾新增 ESP32 PWM 相關的英文翻譯鍵值(共 8 個鍵值，對應 T009 的英文版本)
 
 **Checkpoint**: 驗證函數與測試框架已就緒,可開始使用者故事實作
 
@@ -139,7 +147,10 @@
 
 -   [ ] T031 [US3] 在 `media/js/blocklyEdit.js` 末尾新增 `rebuildPwmConfig(workspace)` 函數:掃描工作區中的 esp32_pwm_setup 積木並重建全域變數,若無積木則使用預設值
 -   [ ] T032 [US3] 在 `media/js/blocklyEdit.js` 的 `loadWorkspace` 事件處理器中,於載入工作區狀態後呼叫 `rebuildPwmConfig(workspace)`
--   [ ] T033 [US3] 在 `media/js/blocklyEdit.js` 的工作區變更監聽器中新增邏輯:監聽 esp32_pwm_setup 積木的變更事件（Blockly.Events.BLOCK_CHANGE 用於欄位值更新、Blockly.Events.BLOCK_DELETE 用於積木刪除、Blockly.Events.BLOCK_CREATE 用於積木新增），即時更新 window.esp32PwmFrequency/Resolution 或重置為預設值
+-   [ ] T033 [US3] 在 `media/js/blocklyEdit.js` 的工作區變更監聽器中新增邏輯:監聽 esp32_pwm_setup 積木的變更事件並執行對應操作：
+    -   **Blockly.Events.BLOCK_CHANGE**（欄位值更新）：讀取積木當前的頻率和解析度值，即時更新 `window.esp32PwmFrequency` 和 `window.esp32PwmResolution`
+    -   **Blockly.Events.BLOCK_CREATE**（積木新增）：讀取新積木的預設值或使用者設定值，更新全域變數（若工作區已有其他 PWM 設定積木，取最後一個）
+    -   **Blockly.Events.BLOCK_DELETE**（積木刪除）：檢查工作區是否還有其他 esp32_pwm_setup 積木，若無則重置全域變數為預設值（75000Hz / 8bit），若有則取剩餘積木的設定值
 
 ### 預設值機制驗證
 
