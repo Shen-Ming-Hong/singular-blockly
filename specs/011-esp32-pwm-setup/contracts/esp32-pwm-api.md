@@ -302,7 +302,7 @@ ledcWrite({channel}, constrain({value}, 0, {maxDuty}));
 
 ```javascript
 // 同一腳位多次呼叫 analogWrite 時,只生成一次 ledcSetup/ledcAttachPin
-const setupKey = `ledc_pin_${pin}`;
+const setupKey = `ledc_pin_${pin}_${finalFreq}_${finalRes}`;
 if (!window.arduinoGenerator.setupCode_.includes(setupKey)) {
 	window.arduinoGenerator.setupCode_.push(`// ${setupKey}`);
 	window.arduinoGenerator.setupCode_.push(`ledcSetup(${channel}, ${freq}, ${res});`);

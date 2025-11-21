@@ -524,6 +524,20 @@ window.languageManager.loadMessages('zh-hant', {
 	HUSKYLENS_LEARN_TOOLTIP: '讓 HUSKYLENS 學習指定 ID 的物體（僅適用於物體分類模式）',
 	HUSKYLENS_FORGET_TOOLTIP: '清除 HUSKYLENS 所有學習的物體（僅適用於物體分類模式）',
 
+	// ESP32 PWM 設定
+	ESP32_PWM_SETUP: 'ESP32 PWM 設定',
+	ESP32_PWM_FREQUENCY: '頻率',
+	ESP32_PWM_RESOLUTION: '解析度',
+	ESP32_PWM_FREQUENCY_TOOLTIP: '設定 PWM 頻率，範圍 1-80000 Hz。高頻率適用於馬達驅動晶片（20-75KHz）',
+	ESP32_PWM_RESOLUTION_TOOLTIP: '設定 PWM 解析度，影響輸出精度。注意：頻率 × 2^解析度 ≤ 80,000,000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bit (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bit (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bit (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bit (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bit (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bit (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bit (0-65535)',
+
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE: '這個專案還沒有 Blockly 積木。如果繼續,會在這裡建立 blockly 資料夾和檔案。要繼續嗎?',
 	SAFETY_WARNING_BODY_WITH_TYPE: '偵測到 {0} 專案。這個專案還沒有 Blockly 積木。如果繼續,會在這裡建立 blockly 資料夾和檔案。要繼續嗎?',

@@ -41,6 +41,10 @@
 		},
 		{
 			"kind": "block",
+			"type": "esp32_pwm_setup"
+		},
+		{
+			"kind": "block",
 			"type": "threshold_function_setup"
 		},
 		{
