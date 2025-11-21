@@ -524,7 +524,19 @@ window.languageManager.loadMessages('tr', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Belirtilen okun bilgilerini al (başlangıç, hedef veya ID)',
 	HUSKYLENS_LEARN_TOOLTIP: "HUSKYLENS'i belirtilen ID'ye sahip nesneyi öğrenmeye zorla (sadece Nesne Sınıflandırma modunda)",
 	HUSKYLENS_FORGET_TOOLTIP: "HUSKYLENS'ten tüm öğrenilmiş nesneleri temizle (sadece Nesne Sınıflandırma modunda)",
-
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'ESP32 PWM Ayarı',
+	ESP32_PWM_FREQUENCY: 'Frekans',
+	ESP32_PWM_RESOLUTION: 'Çözünürlük',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'PWM frekansını ayarla, aralık 1-80000 Hz. Motor sürücü yongaları için yüksek frekans (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'PWM çözünürlüğünü ayarla, çıkış hassasiyetini etkiler. Not: frekans × 2^çözünürlük ≤ 80.000.000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bit (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bit (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bit (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bit (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bit (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bit (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bit (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Bu projede henüz Blockly blokları yok. Devam ederseniz, burada blockly klasörü ve dosyaları oluşturulacak. Devam etmek istiyor musunuz?',

@@ -526,6 +526,20 @@ window.languageManager.loadMessages('ru', {
 	HUSKYLENS_LEARN_TOOLTIP: 'Позволить HUSKYLENS изучить объект с указанным ID (только для режима классификации объектов)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Очистить все изученные объекты из HUSKYLENS (только для режима классификации объектов)',
 
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'Настройка ШИМ ESP32',
+	ESP32_PWM_FREQUENCY: 'Частота',
+	ESP32_PWM_RESOLUTION: 'Разрешение',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'Установить частоту ШИМ, диапазон 1-80000 Гц. Высокая частота для микросхем драйверов двигателя (20-75 кГц)',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'Установить разрешение ШИМ, влияет на точность вывода. Примечание: частота × 2^разрешение ≤ 80 000 000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 бит (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 бит (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 бит (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 бит (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 бит (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 бит (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 бит (0-65535)',
+
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'В этом проекте еще нет блоков Blockly. Если вы продолжите, папка и файлы blockly будут созданы здесь. Вы хотите продолжить?',

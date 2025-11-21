@@ -527,7 +527,19 @@ window.languageManager.loadMessages('ja', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '指定された矢印の情報（始点、終点、またはID）を取得',
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENSに指定IDのオブジェクトを学習させる（オブジェクト分類モードのみ）',
 	HUSKYLENS_FORGET_TOOLTIP: 'HUSKYLENS の全ての学習済みオブジェクトを削除（オブジェクト分類モードのみ）',
-
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'ESP32 PWM設定',
+	ESP32_PWM_FREQUENCY: '周波数',
+	ESP32_PWM_RESOLUTION: '分解能',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'PWM周波数を設定、範囲1-80000 Hz。モータードライバーチップ用の高周波（20-75KHz）',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'PWM分解能を設定、出力精度に影響します。注意：周波数 × 2^分解能 ≤ 80,000,000',
+	ESP32_PWM_RESOLUTION_8BIT: '8ビット (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10ビット (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12ビット (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13ビット (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14ビット (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15ビット (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16ビット (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'このプロジェクトにはまだBlocklyブロックがありません。続行すると、ここにblocklyフォルダとファイルが作成されます。続行しますか？',
