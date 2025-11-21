@@ -530,7 +530,8 @@ window.languageManager.loadMessages('hu', {
 	ESP32_PWM_FREQUENCY: 'Frekvencia',
 	ESP32_PWM_RESOLUTION: 'Felbontás',
 	ESP32_PWM_FREQUENCY_TOOLTIP: 'PWM frekvencia beállítása, tartomány 1-80000 Hz. Magas frekvencia motor meghajtó chipekhez (20-75KHz)',
-	ESP32_PWM_RESOLUTION_TOOLTIP: 'PWM felbontás beállítása, befolyásolja a kimeneti pontosságot. Megjegyzés: frekvencia × 2^felbontás ≤ 80 000 000',
+	ESP32_PWM_RESOLUTION_TOOLTIP:
+		'PWM felbontás beállítása, befolyásolja a kimeneti pontosságot. Megjegyzés: frekvencia × 2^felbontás ≤ 80 000 000',
 	ESP32_PWM_RESOLUTION_8BIT: '8 bit (0-255)',
 	ESP32_PWM_RESOLUTION_10BIT: '10 bit (0-1023)',
 	ESP32_PWM_RESOLUTION_12BIT: '12 bit (0-4095)',

@@ -532,7 +532,8 @@ window.languageManager.loadMessages('fr', {
 	ESP32_PWM_SETUP: 'Configuration PWM ESP32',
 	ESP32_PWM_FREQUENCY: 'Fréquence',
 	ESP32_PWM_RESOLUTION: 'Résolution',
-	ESP32_PWM_FREQUENCY_TOOLTIP: 'Définir la fréquence PWM, plage 1-80000 Hz. Haute fréquence pour les puces de pilotage de moteur (20-75KHz)',
+	ESP32_PWM_FREQUENCY_TOOLTIP:
+		'Définir la fréquence PWM, plage 1-80000 Hz. Haute fréquence pour les puces de pilotage de moteur (20-75KHz)',
 	ESP32_PWM_RESOLUTION_TOOLTIP: 'Définir la résolution PWM, affecte la précision de sortie. Note: fréquence × 2^résolution ≤ 80 000 000',
 	ESP32_PWM_RESOLUTION_8BIT: '8 bits (0-255)',
 	ESP32_PWM_RESOLUTION_10BIT: '10 bits (0-1023)',

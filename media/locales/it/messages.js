@@ -530,7 +530,8 @@ window.languageManager.loadMessages('it', {
 	ESP32_PWM_FREQUENCY: 'Frequenza',
 	ESP32_PWM_RESOLUTION: 'Risoluzione',
 	ESP32_PWM_FREQUENCY_TOOLTIP: 'Imposta frequenza PWM, intervallo 1-80000 Hz. Alta frequenza per chip driver motore (20-75KHz)',
-	ESP32_PWM_RESOLUTION_TOOLTIP: 'Imposta risoluzione PWM, influisce sulla precisione di uscita. Nota: frequenza × 2^risoluzione ≤ 80.000.000',
+	ESP32_PWM_RESOLUTION_TOOLTIP:
+		'Imposta risoluzione PWM, influisce sulla precisione di uscita. Nota: frequenza × 2^risoluzione ≤ 80.000.000',
 	ESP32_PWM_RESOLUTION_8BIT: '8 bits (0-255)',
 	ESP32_PWM_RESOLUTION_10BIT: '10 bits (0-1023)',
 	ESP32_PWM_RESOLUTION_12BIT: '12 bits (0-4095)',

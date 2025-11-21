@@ -528,8 +528,10 @@ window.languageManager.loadMessages('pl', {
 	ESP32_PWM_SETUP: 'Konfiguracja PWM ESP32',
 	ESP32_PWM_FREQUENCY: 'Częstotliwość',
 	ESP32_PWM_RESOLUTION: 'Rozdzielczość',
-	ESP32_PWM_FREQUENCY_TOOLTIP: 'Ustaw częstotliwość PWM, zakres 1-80000 Hz. Wysoka częstotliwość dla układów sterowników silnika (20-75KHz)',
-	ESP32_PWM_RESOLUTION_TOOLTIP: 'Ustaw rozdzielczość PWM, wpływa na precyzję wyjścia. Uwaga: częstotliwość × 2^rozdzielczość ≤ 80 000 000',
+	ESP32_PWM_FREQUENCY_TOOLTIP:
+		'Ustaw częstotliwość PWM, zakres 1-80000 Hz. Wysoka częstotliwość dla układów sterowników silnika (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP:
+		'Ustaw rozdzielczość PWM, wpływa na precyzję wyjścia. Uwaga: częstotliwość × 2^rozdzielczość ≤ 80 000 000',
 	ESP32_PWM_RESOLUTION_8BIT: '8 bitów (0-255)',
 	ESP32_PWM_RESOLUTION_10BIT: '10 bitów (0-1023)',
 	ESP32_PWM_RESOLUTION_12BIT: '12 bitów (0-4095)',

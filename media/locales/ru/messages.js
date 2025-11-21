@@ -530,7 +530,8 @@ window.languageManager.loadMessages('ru', {
 	ESP32_PWM_SETUP: 'Настройка ШИМ ESP32',
 	ESP32_PWM_FREQUENCY: 'Частота',
 	ESP32_PWM_RESOLUTION: 'Разрешение',
-	ESP32_PWM_FREQUENCY_TOOLTIP: 'Установить частоту ШИМ, диапазон 1-80000 Гц. Высокая частота для микросхем драйверов двигателя (20-75 кГц)',
+	ESP32_PWM_FREQUENCY_TOOLTIP:
+		'Установить частоту ШИМ, диапазон 1-80000 Гц. Высокая частота для микросхем драйверов двигателя (20-75 кГц)',
 	ESP32_PWM_RESOLUTION_TOOLTIP: 'Установить разрешение ШИМ, влияет на точность вывода. Примечание: частота × 2^разрешение ≤ 80 000 000',
 	ESP32_PWM_RESOLUTION_8BIT: '8 бит (0-255)',
 	ESP32_PWM_RESOLUTION_10BIT: '10 бит (0-1023)',
