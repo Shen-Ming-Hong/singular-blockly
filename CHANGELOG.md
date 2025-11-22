@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.43.1] - 2025-01-22
+
+### 修復 Fixed
+
+-   **測試框架改進** (Test Framework Improvements)
+    -   修復 WebViewManager 測試中的主題設定讀取問題,確保測試環境正確使用 mock 檔案系統
+        Fixed theme settings reading issue in WebViewManager tests, ensuring test environment correctly uses mock file system
+    -   SettingsManager 與 WebViewManager 現在支援依賴注入,提升測試可靠性
+        SettingsManager and WebViewManager now support dependency injection, improving test reliability
+    -   所有 285 個單元測試穩定通過 (100%)
+        All 285 unit tests passing stably (100%)
+
 ## [0.43.0] - 2025-01-22
 
 ### 新增 Added
