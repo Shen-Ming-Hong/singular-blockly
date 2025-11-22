@@ -91,7 +91,7 @@
 
 -   [x] T013 [US1] 在 `media/blockly/generators/arduino/io.js` 中定位 `arduino_analog_write` 生成器(約第 113 行)的 ESP32 分支
 -   [x] T014 [US1] 修改 `arduino_analog_write` 生成器的 ESP32 分支:讀取全域 PWM 配置(window.esp32PwmFrequency/Resolution),呼叫 validateAndAdjustPwmConfig,生成 ledcSetup/ledcAttachPin/ledcWrite 程式碼(約 40 行修改)
--   [ ] T015 [US1] 在程式碼生成器中實作防重複機制:使用 setupKey（生成器內部使用的唯一識別符，格式為 `ledc_pin_${pin}_${finalFreq}_${finalRes}`，用於防止同一腳位多次生成初始化程式碼）檢查避免同一腳位多次生成 ledcSetup
+-   [x] T015 [US1] 在程式碼生成器中實作防重複機制:使用 setupKey（生成器內部使用的唯一識別符，格式為 `ledc_pin_${pin}_${finalFreq}_${finalRes}`，用於防止同一腳位多次生成初始化程式碼）檢查避免同一腳位多次生成 ledcSetup
 
 ### 測試與驗證
 
@@ -247,7 +247,7 @@ Task T011: "在 media/blockly/blocks/arduino.js 新增 esp32_pwm_setup 積木定
 Task T012: "在 media/toolbox/categories/arduino.json 新增積木項目"
 
 # 完成後,依序進行程式碼生成器修改(同一檔案,無法並行):
-Task T012 → Task T013 → Task T014
+Task T013 → Task T014 → Task T015
 
 # 最後進行測試(依序執行,確保前置條件滿足):
 Task T015 → Task T016 → Task T017 → Task T018

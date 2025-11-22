@@ -9,10 +9,17 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 ## Project Structure
 
 ```text
-src/            # Extension Host (TypeScript)
-media/          # WebView (JavaScript/HTML/CSS)
-src/test/suite/ # Tests
-specs/          # Feature specifications
+src/                # Extension Host (TypeScript)
+  extension.ts      # Main entry point
+  services/         # Core services (fileService, settingsManager, etc.)
+  webview/          # WebView management (webviewManager, messageHandler)
+  test/suite/       # Test files
+media/              # WebView (JavaScript/HTML/CSS)
+  blockly/          # Blockly blocks & generators
+  js/               # blocklyEdit.js, blocklyPreview.js
+  html/             # blocklyEdit.html, blocklyPreview.html
+  locales/          # i18n translations
+specs/              # Feature specifications
 ```
 
 ## Commands

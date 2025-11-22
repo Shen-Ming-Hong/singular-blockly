@@ -301,12 +301,13 @@ ledcWrite({channel}, constrain({value}, 0, {maxDuty}));
 **防重複機制**:
 
 ```javascript
-// 同一腳位多次呼叫 analogWrite 時,只生成一次 ledcSetup/ledcAttachPin
+// 同一腳位多次呼叫 analogWrite 時,只在配置變更時重新生成 ledcSetup/ledcAttachPin
+// setupKey 包含頻率和解析度,確保配置變更時會重新生成程式碼
 const setupKey = `ledc_pin_${pin}_${finalFreq}_${finalRes}`;
-if (!window.arduinoGenerator.setupCode_.includes(setupKey)) {
+if (!window.arduinoGenerator.setupCode_.some(line => line.includes(setupKey))) {
 	window.arduinoGenerator.setupCode_.push(`// ${setupKey}`);
-	window.arduinoGenerator.setupCode_.push(`ledcSetup(${channel}, ${freq}, ${res});`);
-	window.arduinoGenerator.setupCode_.push(`ledcAttachPin(${pin}, ${channel});`);
+	window.arduinoGenerator.setupCode_.push(`ledcSetup(${channel}, ${finalFreq}, ${finalRes});  // 通道${channel}, ${finalFreq}Hz PWM, ${finalRes}位解析度`);
+	window.arduinoGenerator.setupCode_.push(`ledcAttachPin(${pin}, ${channel});  // 將通道${channel}附加到 GPIO${pin}`);
 }
 ```
 
