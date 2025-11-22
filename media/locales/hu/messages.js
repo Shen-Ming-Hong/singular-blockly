@@ -525,6 +525,21 @@ window.languageManager.loadMessages('hu', {
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS tanítása meghatározott ID-val (csak Objektumosztályozás módban)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Minden tanult objektum törlése a HUSKYLENS-ből (csak Objektumosztályozás módban)',
 
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'ESP32 PWM Beállítás',
+	ESP32_PWM_FREQUENCY: 'Frekvencia',
+	ESP32_PWM_RESOLUTION: 'Felbontás',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'PWM frekvencia beállítása, tartomány 1-80000 Hz. Magas frekvencia motor meghajtó chipekhez (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP:
+		'PWM felbontás beállítása, befolyásolja a kimeneti pontosságot. Megjegyzés: frekvencia × 2^felbontás ≤ 80 000 000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bit (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bit (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bit (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bit (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bit (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bit (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bit (0-65535)',
+
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Ez a projekt még nem rendelkezik Blockly blokkokkal. Ha folytatja, blockly mappa és fájlok jönnek létre itt. Folytatja?',

@@ -524,7 +524,21 @@ window.languageManager.loadMessages('pl', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Pobierz informacje o określonej strzałce (początek, cel lub ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Pozwól HUSKYLENS nauczyć się obiektu o określonym ID (tylko dla trybu Klasyfikacji Obiektów)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Wyczyść wszystkie wyuczone obiekty z HUSKYLENS (tylko dla trybu Klasyfikacji Obiektów)',
-
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'Konfiguracja PWM ESP32',
+	ESP32_PWM_FREQUENCY: 'Częstotliwość',
+	ESP32_PWM_RESOLUTION: 'Rozdzielczość',
+	ESP32_PWM_FREQUENCY_TOOLTIP:
+		'Ustaw częstotliwość PWM, zakres 1-80000 Hz. Wysoka częstotliwość dla układów sterowników silnika (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP:
+		'Ustaw rozdzielczość PWM, wpływa na precyzję wyjścia. Uwaga: częstotliwość × 2^rozdzielczość ≤ 80 000 000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bitów (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bitów (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bitów (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bitów (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bitów (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bitów (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bitów (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Ten projekt nie ma jeszcze bloków Blockly. Jeśli kontynuujesz, folder i pliki blockly zostaną utworzone tutaj. Czy chcesz kontynuować?',

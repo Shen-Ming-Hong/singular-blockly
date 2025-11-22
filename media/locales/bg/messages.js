@@ -525,6 +525,20 @@ window.languageManager.loadMessages('bg', {
 	HUSKYLENS_LEARN_TOOLTIP: 'Нека HUSKYLENS научи обект с определен ID (само за режим Класификация на обекти)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Изчистване на всички научени обекти от HUSKYLENS (само за режим Класификация на обекти)',
 
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'Настройка на ESP32 PWM',
+	ESP32_PWM_FREQUENCY: 'Честота',
+	ESP32_PWM_RESOLUTION: 'Резолюция',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'Задайте честота на PWM, диапазон 1-80000 Hz. Висока честота за моторни драйвери (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'Задайте резолюция на PWM, влияе на точността на изхода. Забележка: честота × 2^резолюция ≤ 80 000 000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 бита (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 бита (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 бита (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 бита (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 бита (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 бита (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 бита (0-65535)',
+
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Този проект все още няма Blockly блокове. Ако продължите, тук ще бъдат създадени blockly папка и файлове. Искате ли да продължите?',

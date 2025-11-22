@@ -5,6 +5,57 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * 驗證並調整 ESP32 PWM 配置
+ * 根據 ESP32 硬體限制 (頻率 × 2^解析度 ≤ 80,000,000) 自動調整參數
+ * @param {number} frequency - 目標頻率 (Hz), 範圍: [1, 80000]
+ * @param {number} resolution - 目標解析度 (bit), 範圍: [8, 16]
+ * @returns {Object} 驗證結果
+ *   - frequency: 最終頻率 (與輸入相同)
+ *   - resolution: 最終解析度 (可能已調整)
+ *   - adjusted: 是否進行了自動調整
+ *   - warning: 警告訊息 (僅當 adjusted=true)
+ *   - info: 資訊訊息 (僅當 adjusted=false)
+ */
+window.validateAndAdjustPwmConfig = function (frequency, resolution) {
+	try {
+		const APB_CLK = 80000000; // ESP32 APB_CLK 頻率
+		const maxValue = frequency * Math.pow(2, resolution);
+
+		if (maxValue > APB_CLK) {
+			// 自動調整解析度至最大可用值
+			const maxResolution = Math.floor(Math.log2(APB_CLK / frequency));
+			const adjustedResolution = Math.max(8, maxResolution); // 最低 8 bit
+
+			return {
+				frequency: frequency,
+				resolution: adjustedResolution,
+				adjusted: true,
+				warning:
+					`⚠️ 警告：原始設定 ${frequency}Hz @ ${resolution}bit 超出限制\n` +
+					`   (${frequency} × ${Math.pow(2, resolution)} = ${maxValue} > ${APB_CLK})\n` +
+					`   已自動調整為 ${frequency}Hz @ ${adjustedResolution}bit`,
+			};
+		}
+
+		return {
+			frequency: frequency,
+			resolution: resolution,
+			adjusted: false,
+			info: `✓ 驗證: ${frequency} × ${Math.pow(2, resolution)} = ${maxValue} < ${APB_CLK}`,
+		};
+	} catch (error) {
+		// 容錯處理：返回安全的預設配置
+		console.error('[PWM Validation Error]', error);
+		return {
+			frequency: 75000,
+			resolution: 8,
+			adjusted: true,
+			warning: '⚠️ 驗證過程發生錯誤，已重設為預設值 75000Hz @ 8bit',
+		};
+	}
+};
+
 // 模組載入時自動註冊需要強制掃描的積木類型
 (function () {
 	// 確保 arduinoGenerator 已初始化
@@ -123,24 +174,56 @@ window.arduinoGenerator.forBlock['arduino_analog_write'] = function (block) {
 		// 根據當前開發板獲取範圍
 		const range = window.getAnalogOutputRange();
 
-		// 確保數值在開發板支援的範圍內
-		// 將所有數值表達式都套用 constrain 函數，無論它是數字字面量還是表達式
-		value = `constrain(${value}, ${range.min}, ${range.max})`;
-
 		// ESP32 需要特殊處理
-		if (currentBoard === 'esp32') {
+		if (currentBoard === 'esp32' || currentBoard === 'esp32_super_mini') {
 			let channel = window.getPWMChannel(pin);
 			if (channel === null) {
 				channel = 8 + (parseInt(pin) % 8);
 			}
 
-			window.arduinoGenerator.setupCode_.push(`ledcSetup(${channel}, 5000, 12);  // 通道${channel}, 5KHz PWM, 12位分辨率`);
-			window.arduinoGenerator.setupCode_.push(`ledcAttachPin(${pin}, ${channel});  // 將通道${channel}附加到指定的腳位`);
+			// 讀取全域 PWM 配置 (從 esp32_pwm_setup 積木或預設值)
+			const pwmFreq = window.esp32PwmFrequency || 75000;
+			const pwmRes = window.esp32PwmResolution || 8;
+
+			// 驗證並調整配置
+			const validated = window.validateAndAdjustPwmConfig(pwmFreq, pwmRes);
+			const finalFreq = validated.frequency;
+			const finalRes = validated.resolution;
+			const maxDuty = Math.pow(2, finalRes) - 1;
+
+			// 防重複設定同一腳位
+			const setupKey = `ledc_pin_${pin}_${finalFreq}_${finalRes}`;
+			if (!window.arduinoGenerator.setupCode_.some(line => line.includes(setupKey))) {
+				// 插入驗證結果註解
+				if (validated.adjusted) {
+					const warningLines = validated.warning.split('\n');
+					warningLines.forEach(line => {
+						if (line.trim()) {
+							window.arduinoGenerator.setupCode_.push(`// ${line}`);
+						}
+					});
+				} else {
+					window.arduinoGenerator.setupCode_.push(`// ${validated.info}`);
+				}
+
+				// 插入 LEDC 設定
+				window.arduinoGenerator.setupCode_.push(`// ${setupKey}`);
+				window.arduinoGenerator.setupCode_.push(
+					`ledcSetup(${channel}, ${finalFreq}, ${finalRes});  // 通道${channel}, ${finalFreq}Hz PWM, ${finalRes}位解析度`
+				);
+				window.arduinoGenerator.setupCode_.push(`ledcAttachPin(${pin}, ${channel});  // 將通道${channel}附加到 GPIO${pin}`);
+			}
+
 			window.arduinoGenerator.includes_['esp32_ledc'] = '#include <esp32-hal-ledc.h>';
+
+			// 動態調整 constrain 最大值
+			value = `constrain(${value}, 0, ${maxDuty})`;
 
 			return `ledcWrite(${channel}, ${value});\n`;
 		}
 
+		// 非 ESP32 開發板：標準 Arduino analogWrite
+		value = `constrain(${value}, ${range.min}, ${range.max})`;
 		return `analogWrite(${pin}, ${value});\n`;
 	} catch (e) {
 		log.error('Analog write block code generation error:', e);
@@ -174,6 +257,25 @@ window.arduinoGenerator.forBlock['arduino_delay'] = function (block) {
 window.arduinoGenerator.forBlock['arduino_level'] = function (block) {
 	const level = block.getFieldValue('LEVEL');
 	return [level, window.arduinoGenerator.ORDER_ATOMIC];
+};
+
+window.arduinoGenerator.forBlock['esp32_pwm_setup'] = function (block) {
+	try {
+		// 讀取積木欄位值
+		const frequency = parseInt(block.getFieldValue('FREQUENCY')) || 75000;
+		const resolution = parseInt(block.getFieldValue('RESOLUTION')) || 8;
+
+		// 更新全域變數（供 arduino_analog_write 使用）
+		window.esp32PwmFrequency = frequency;
+		window.esp32PwmResolution = resolution;
+
+		// 此積木僅用於設定配置，不直接生成程式碼
+		// 實際的 PWM 初始化程式碼由 arduino_analog_write 生成
+		return '';
+	} catch (e) {
+		console.error('ESP32 PWM setup block code generation error:', e);
+		return '';
+	}
 };
 
 window.arduinoGenerator.forBlock['arduino_pullup'] = function (block) {

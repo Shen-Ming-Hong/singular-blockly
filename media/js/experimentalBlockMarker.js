@@ -698,10 +698,10 @@ let noticeSystemInitialized = false;
 
 // 當文檔載入完成後初始化 - 統一的初始化入口
 document.addEventListener('DOMContentLoaded', () => {
-	log.info('[實驗積木] DOMContentLoaded 事件觸發，開始初始化');
+	console.log('[實驗積木] DOMContentLoaded 事件觸發，開始初始化');
 
 	// 輸出當前環境信息
-	log.info('[實驗積木] 初始化時環境檢查:', {
+	console.log('[實驗積木] 初始化時環境檢查:', {
 		experimentalBlocksExists: typeof window.experimentalBlocks !== 'undefined',
 		experimentalBlocksIsArray: Array.isArray(window.experimentalBlocks),
 		experimentalBlocksLength: window.experimentalBlocks ? window.experimentalBlocks.length : 0,

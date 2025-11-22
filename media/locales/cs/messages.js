@@ -523,7 +523,19 @@ window.languageManager.loadMessages('cs', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Získat informace o určené šipce (počátek, cíl nebo ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Nechat HUSKYLENS naučit se objekt se zadaným ID (pouze pro režim Klasifikace objektů)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Vymazat všechny naučené objekty z HUSKYLENS (pouze pro režim Klasifikace objektů)',
-
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'Nastavení PWM ESP32',
+	ESP32_PWM_FREQUENCY: 'Frekvence',
+	ESP32_PWM_RESOLUTION: 'Rozlišení',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'Nastavit frekvenci PWM, rozsah 1-80000 Hz. Vysoká frekvence pro motorové ovladače (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'Nastavit rozlišení PWM, ovlivňuje přesnost výstupu. Poznámka: frekvence × 2^rozlišení ≤ 80 000 000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bitů (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bitů (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bitů (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bitů (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bitů (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bitů (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bitů (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Tento projekt ještě nemá bloky Blockly. Pokud budete pokračovat, bude zde vytvořena složka a soubory blockly. Chcete pokračovat?',

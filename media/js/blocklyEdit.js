@@ -1088,9 +1088,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 	updateTheme(currentTheme);
 
 	// 創建預設變數 i
-	if (!workspace.getVariable('i')) {
-		workspace.createVariable('i');
+	if (!workspace.getVariableMap().getVariable('i')) {
+		workspace.getVariableMap().createVariable('i');
 	}
+
+	// 初始化時根據當前開發板過濾 toolbox (預設為 arduino_uno)
+	// 這確保在沒有儲存狀態時,toolbox 也能正確顯示
+	const initialBoard = window.currentBoard || 'arduino_uno';
+	await updateToolboxForBoard(workspace, initialBoard);
 
 	// 添加工作區點擊事件，用於清除搜尋高亮顯示
 	workspace.getInjectionDiv().addEventListener('click', e => {
@@ -1116,7 +1121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		);
 
 		// 為每個現有變數創建積木
-		const variables = workspace.getAllVariables();
+		const variables = workspace.getVariableMap().getAllVariables();
 		if (variables.length > 0) {
 			variables.forEach(variable => {
 				variableBlocks.push(
@@ -1164,10 +1169,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 					const returnType = 'void'; // 使用新的 XML 格式，包含完整的 mutation 資訊，但統一無回傳值
 					let callBlockXml = `
 						<block type="arduino_function_call">
-							<mutation name="${funcName}" version="1" has_return="false" return_type="void"></mutation>
+							<mutation name="${funcName}" version="1" has_return="false" return_type="void">
 					`;
 
-					// 添加函數參數資訊
+					// 添加函數參數資訊（作為 mutation 的子元素）
 					if (functionBlock.arguments_ && functionBlock.arguments_.length > 0) {
 						for (let i = 0; i < functionBlock.arguments_.length; i++) {
 							const argName = functionBlock.arguments_[i] || '';
@@ -1176,8 +1181,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 						}
 					}
 
-					// 關閉 XML 標籤
-					callBlockXml += '</block>';
+					// 關閉 mutation 和 block 標籤
+					callBlockXml += '</mutation></block>';
 
 					// 轉換為 DOM 元素並添加到積木列表
 					const callBlockDom = blocklyUtils.textToDom(callBlockXml);
@@ -1218,7 +1223,56 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// 忽略拖動中的 UI 事件
 		if (event.isUiEvent) {
 			return;
-		} // 工作區完全載入後修復函數呼叫積木和連接點
+		}
+
+		// 監聽 esp32_pwm_setup 積木的變更並即時更新全域配置
+		if (event.type === Blockly.Events.BLOCK_CHANGE && event.blockId) {
+			const block = workspace.getBlockById(event.blockId);
+			if (block && block.type === 'esp32_pwm_setup') {
+				const frequency = parseInt(block.getFieldValue('FREQUENCY')) || 75000;
+				const resolution = parseInt(block.getFieldValue('RESOLUTION')) || 8;
+				window.esp32PwmFrequency = frequency;
+				window.esp32PwmResolution = resolution;
+				console.log(`[PWM Config] 即時更新: ${frequency}Hz @ ${resolution}bit`);
+			}
+		}
+
+		// 監聽 esp32_pwm_setup 積木的新增/刪除
+		if (event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE) {
+			// 檢查是否是 esp32_pwm_setup 積木
+			let isEsp32PwmBlock = false;
+			if (event.type === Blockly.Events.BLOCK_DELETE && event.oldJson && event.oldJson.type === 'esp32_pwm_setup') {
+				isEsp32PwmBlock = true;
+			} else if (event.type === Blockly.Events.BLOCK_CREATE && event.blockId) {
+				const block = workspace.getBlockById(event.blockId);
+				if (block && block.type === 'esp32_pwm_setup') {
+					isEsp32PwmBlock = true;
+				}
+			}
+
+			// 延遲重建配置,確保所有積木事件完成
+			setTimeout(() => {
+				rebuildPwmConfig(workspace);
+
+				// 如果是 esp32_pwm_setup 積木的新增/刪除，立即觸發程式碼更新
+				if (isEsp32PwmBlock) {
+					console.log('[PWM Config] PWM 設定積木變動，觸發程式碼更新');
+					try {
+						const code = arduinoGenerator.workspaceToCode(workspace);
+						vscode.postMessage({
+							command: 'updateCode',
+							code: code,
+							libDeps: arduinoGenerator.lib_deps_ || [],
+							buildFlags: arduinoGenerator.build_flags_ || [],
+						});
+					} catch (error) {
+						console.error('[PWM Config] 程式碼生成失敗:', error);
+					}
+				}
+			}, 100);
+		}
+
+		// 工作區完全載入後修復函數呼叫積木和連接點
 		if (event.type === Blockly.Events.FINISHED_LOADING) {
 			// 工作區載入完成時輸出實驗積木清單
 			log.info('工作區載入完成，輸出實驗積木清單');
@@ -1421,10 +1475,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 處理開發板選擇
 	const boardSelect = document.getElementById('boardSelect');
-	boardSelect.addEventListener('change', event => {
+	boardSelect.addEventListener('change', async event => {
 		const selectedBoard = event.target.value;
 		// 更新全局的currentBoard
 		window.setCurrentBoard(selectedBoard);
+		// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
+		await updateToolboxForBoard(workspace, selectedBoard);
 		// 觸發工作區更新以重新整理積木
 		workspace.getAllBlocks().forEach(block => {
 			if (block.type.startsWith('arduino_')) {
@@ -1442,7 +1498,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	});
 
 	// 監聽來自擴充功能的訊息
-	window.addEventListener('message', event => {
+	window.addEventListener('message', async event => {
 		const message = event.data;
 		const workspace = Blockly.getMainWorkspace();
 		log.info(`收到訊息: ${message.command}`, message);
@@ -1452,7 +1508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				if (message.name) {
 					if (message.isRename && message.oldName) {
 						// 修正：直接使用變數 ID 進行重命名
-						const variable = workspace.getVariable(message.oldName);
+						const variable = workspace.getVariableMap().getVariable(message.oldName);
 						if (variable) {
 							// 使用 workspace 的 renameVariableById 方法
 							workspace.renameVariableById(variable.getId(), message.name);
@@ -1466,9 +1522,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 						}
 					} else {
 						// 新增變數，直接使用 workspace 的方法
-						const existingVar = workspace.getVariable(message.name);
+						const existingVar = workspace.getVariableMap().getVariable(message.name);
 						if (!existingVar) {
-							workspace.createVariable(message.name);
+							workspace.getVariableMap().createVariable(message.name);
 							// 觸發更新
 							const code = arduinoGenerator.workspaceToCode(workspace);
 							vscode.postMessage({
@@ -1482,7 +1538,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 			case 'deleteVariable':
 				if (message.confirmed) {
-					const variable = workspace.getVariable(message.name);
+					const variable = workspace.getVariableMap().getVariable(message.name);
 					if (variable) {
 						const varId = variable.getId();
 						// 先找出所有使用這個變數的積木
@@ -1560,6 +1616,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 						// 先設定板子類型
 						boardSelect.value = message.board;
 						window.setCurrentBoard(message.board);
+						// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
+						await updateToolboxForBoard(workspace, message.board);
 						vscode.postMessage({
 							command: 'updateBoard',
 							board: message.board,
@@ -1589,6 +1647,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 						// 然後再載入工作區內容
 						Blockly.serialization.workspaces.load(message.state, workspace);
+
+						// 重建 ESP32 PWM 配置
+						rebuildPwmConfig(workspace);
 
 						// 工作區載入後，立即修復函數名稱關聯
 						setTimeout(() => {
@@ -1740,7 +1801,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 	Blockly.FieldVariable.dropdownCreate = function () {
 		const workspace = Blockly.getMainWorkspace();
 		// 修改這行：使用變數的 ID 作為值
-		const variableList = workspace.getAllVariables().map(variable => [variable.name, variable.getId()]);
+		const variableList = workspace
+			.getVariableMap()
+			.getAllVariables()
+			.map(variable => [variable.name, variable.getId()]);
 		// 加入分隔線與選項
 		if (variableList.length > 0) {
 			const currentName = this.getText(); // 獲取當前變數名稱
@@ -1765,7 +1829,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			});
 		} else if (value === Blockly.Msg['RENAME_VARIABLE']) {
 			const id = this.getValue();
-			const variable = workspace.getVariableById(id);
+			const variable = workspace.getVariableMap().getVariableById(id);
 			if (variable) {
 				// 請求使用者輸入新名稱
 				vscode.postMessage({
@@ -1776,7 +1840,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			}
 		} else if (value === Blockly.Msg['DELETE_VARIABLE']) {
 			const id = this.getValue();
-			const variable = workspace.getVariableById(id);
+			const variable = workspace.getVariableMap().getVariableById(id);
 			if (variable) {
 				// 詢問使用者是否要刪除變數
 				vscode.postMessage({
@@ -1813,3 +1877,108 @@ Blockly.utils.replaceMessageReferences = function (message) {
 		return match;
 	});
 };
+
+/**
+ * 從工作區重建 ESP32 PWM 配置
+ * 掃描工作區中的 esp32_pwm_setup 積木並重建全域變數
+ * @param {Blockly.Workspace} workspace - Blockly 工作區實例
+ */
+function rebuildPwmConfig(workspace) {
+	try {
+		const pwmBlocks = workspace.getAllBlocks().filter(block => block.type === 'esp32_pwm_setup');
+
+		if (pwmBlocks.length > 0) {
+			// 多個 PWM 設定積木時,以最後一個為準 (後蓋前原則)
+			const lastBlock = pwmBlocks[pwmBlocks.length - 1];
+			window.esp32PwmFrequency = parseInt(lastBlock.getFieldValue('FREQUENCY')) || 75000;
+			window.esp32PwmResolution = parseInt(lastBlock.getFieldValue('RESOLUTION')) || 8;
+			console.log(`[PWM Config] 從積木重建: ${window.esp32PwmFrequency}Hz @ ${window.esp32PwmResolution}bit`);
+		} else {
+			// 無 PWM 設定積木,使用預設值
+			window.esp32PwmFrequency = 75000;
+			window.esp32PwmResolution = 8;
+			console.log('[PWM Config] 使用預設值: 75000Hz @ 8bit');
+		}
+	} catch (error) {
+		console.error('[PWM Config] 重建失敗:', error);
+		// 容錯:設定預設值
+		window.esp32PwmFrequency = 75000;
+		window.esp32PwmResolution = 8;
+	}
+}
+
+/**
+ * 根據開發板類型動態更新 toolbox 以顯示或隱藏 ESP32 專屬積木
+ * @param {Blockly.WorkspaceSvg} workspace - Blockly 工作區實例
+ * @param {string} boardId - 開發板 ID (例如 'esp32', 'esp32_super_mini', 'arduino_uno')
+ */
+async function updateToolboxForBoard(workspace, boardId) {
+	try {
+		// 重新載入原始 toolbox 配置
+		const response = await fetch(window.TOOLBOX_URL);
+		let toolboxConfig = await response.json();
+
+		// 檢查是否為 ESP32 系列開發板
+		const isESP32Board = boardId === 'esp32' || boardId === 'esp32_super_mini';
+
+		// 遞迴過濾 toolbox 中的積木
+		const filterToolboxContents = contents => {
+			if (!contents || !Array.isArray(contents)) return contents;
+
+			return contents.filter(item => {
+				// 如果是 esp32_pwm_setup 積木,只在 ESP32 開發板時顯示
+				if (item.type === 'esp32_pwm_setup') {
+					return isESP32Board;
+				}
+
+				// 如果是 category,遞迴處理其內容
+				if (item.kind === 'category' && item.contents) {
+					item.contents = filterToolboxContents(item.contents);
+				}
+
+				// 保留其他所有項目
+				return true;
+			});
+		};
+
+		// 處理 toolbox 根層級
+		if (toolboxConfig.contents) {
+			toolboxConfig.contents = filterToolboxContents(toolboxConfig.contents);
+		}
+
+		// 處理翻譯 (與初始化時相同)
+		const blocklyUtils = {
+			replaceMessageReferences: text => {
+				if (!text) return text;
+				if (Blockly.utils && typeof Blockly.utils.replaceMessageReferences === 'function') {
+					return Blockly.utils.replaceMessageReferences(text);
+				}
+				if (typeof text !== 'string') return text;
+				return text.replace(/%\{([^}]+)\}/g, (match, key) => {
+					return Blockly.Msg[key] || match;
+				});
+			},
+		};
+
+		const processTranslations = obj => {
+			if (typeof obj === 'object') {
+				for (let key in obj) {
+					if (typeof obj[key] === 'string') {
+						obj[key] = blocklyUtils.replaceMessageReferences(obj[key]);
+					} else if (typeof obj[key] === 'object') {
+						processTranslations(obj[key]);
+					}
+				}
+			}
+			return obj;
+		};
+
+		processTranslations(toolboxConfig);
+
+		// 更新 workspace 的 toolbox
+		workspace.updateToolbox(toolboxConfig);
+		console.log(`[Toolbox] 已根據開發板 ${boardId} 更新 (ESP32: ${isESP32Board})`);
+	} catch (error) {
+		console.error('[Toolbox] 更新失敗:', error);
+	}
+}

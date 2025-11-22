@@ -524,7 +524,19 @@ window.languageManager.loadMessages('pt-br', {
 	PIXETTO_MODE_ROAD_DETECTION: 'Detecção de Estrada',
 	PIXETTO_MODE_BALL_DETECTION: 'Detecção de Bola',
 	PIXETTO_MODE_TEMPLATE_MATCHING: 'Correspondência de Modelo',
-
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'Configuração PWM ESP32',
+	ESP32_PWM_FREQUENCY: 'Frequência',
+	ESP32_PWM_RESOLUTION: 'Resolução',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'Definir frequência PWM, faixa 1-80000 Hz. Alta frequência para chips de driver de motor (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'Definir resolução PWM, afeta a precisão de saída. Nota: frequência × 2^resolução ≤ 80.000.000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bits (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bits (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bits (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bits (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bits (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bits (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bits (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Este projeto ainda não tem blocos Blockly. Se continuar, pasta e arquivos blockly serão criados aqui. Deseja continuar?',

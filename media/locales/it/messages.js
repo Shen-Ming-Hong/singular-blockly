@@ -525,7 +525,20 @@ window.languageManager.loadMessages('it', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Ottieni informazioni della freccia specificata (origine, destinazione o ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Fai apprendere a HUSKYLENS oggetto con ID specificato (solo per modalità Classificazione Oggetti)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Cancella tutti gli oggetti appresi da HUSKYLENS (solo per modalità Classificazione Oggetti)',
-
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'Configurazione PWM ESP32',
+	ESP32_PWM_FREQUENCY: 'Frequenza',
+	ESP32_PWM_RESOLUTION: 'Risoluzione',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'Imposta frequenza PWM, intervallo 1-80000 Hz. Alta frequenza per chip driver motore (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP:
+		'Imposta risoluzione PWM, influisce sulla precisione di uscita. Nota: frequenza × 2^risoluzione ≤ 80.000.000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bits (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bits (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bits (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bits (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bits (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bits (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bits (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Questo progetto non ha ancora blocchi Blockly. Se continui, verranno creati cartella e file blockly qui. Vuoi continuare?',

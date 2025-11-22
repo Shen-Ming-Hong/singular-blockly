@@ -10,6 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+### 新增 Added
+
+-   **ESP32 PWM 頻率與解析度設定** (ESP32 PWM Frequency and Resolution Configuration)
+    **ESP32 PWM Frequency and Resolution Configuration**
+
+    -   新增 `esp32_pwm_setup` 積木，允許使用者自訂 PWM 頻率（1-80000 Hz）和解析度（8-16 bit）
+        Added `esp32_pwm_setup` block for custom PWM frequency (1-80000 Hz) and resolution (8-16 bit) configuration
+    -   支援馬達驅動晶片高頻 PWM 需求（20-75KHz，適用於 AT8833CR、DRV8833 等晶片）
+        Support for high-frequency PWM requirements of motor driver chips (20-75KHz, compatible with AT8833CR, DRV8833, etc.)
+    -   自動驗證與調整機制：符合 ESP32 硬體限制（頻率 × 2^解析度 ≤ 80,000,000）
+        Automatic validation and adjustment: complies with ESP32 hardware limits (frequency × 2^resolution ≤ 80,000,000)
+    -   向後相容：現有專案無需 PWM 設定積木即可使用預設值（75000Hz / 8bit）
+        Backward compatible: existing projects work with default values (75000Hz / 8bit) without PWM setup block
+    -   與 ESP32Servo 伺服馬達積木獨立運作，互不干擾
+        Independent operation with ESP32Servo blocks, no interference
+
 ## [0.42.0] - 2025-01-18
 
 ### 新增 Added

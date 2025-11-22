@@ -742,6 +742,54 @@ Blockly.Blocks['arduino_pullup'] = {
 	},
 };
 
+// ESP32 PWM 設定積木
+Blockly.Blocks['esp32_pwm_setup'] = {
+	init: function () {
+		this.appendDummyInput().appendField('⚙️').appendField(window.languageManager.getMessage('ESP32_PWM_SETUP', 'ESP32 PWM 設定'));
+
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('ESP32_PWM_FREQUENCY', '頻率'))
+			.appendField(new Blockly.FieldNumber(75000, 1, 80000, 1), 'FREQUENCY')
+			.appendField('Hz');
+
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('ESP32_PWM_RESOLUTION', '解析度'))
+			.appendField(
+				new Blockly.FieldDropdown([
+					[window.languageManager.getMessage('ESP32_PWM_RESOLUTION_8BIT', '8 bit (0-255)'), '8'],
+					[window.languageManager.getMessage('ESP32_PWM_RESOLUTION_10BIT', '10 bit (0-1023)'), '10'],
+					[window.languageManager.getMessage('ESP32_PWM_RESOLUTION_12BIT', '12 bit (0-4095)'), '12'],
+					[window.languageManager.getMessage('ESP32_PWM_RESOLUTION_13BIT', '13 bit (0-8191)'), '13'],
+					[window.languageManager.getMessage('ESP32_PWM_RESOLUTION_14BIT', '14 bit (0-16383)'), '14'],
+					[window.languageManager.getMessage('ESP32_PWM_RESOLUTION_15BIT', '15 bit (0-32767)'), '15'],
+					[window.languageManager.getMessage('ESP32_PWM_RESOLUTION_16BIT', '16 bit (0-65535)'), '16'],
+				]),
+				'RESOLUTION'
+			);
+
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setStyle('arduino_blocks');
+		this.setTooltip(
+			window.languageManager.getMessage(
+				'ESP32_PWM_RESOLUTION_TOOLTIP',
+				'設定 ESP32 LEDC PWM 的頻率和解析度。限制: 頻率 × 2^解析度 ≤ 80,000,000'
+			)
+		);
+		this.setHelpUrl('');
+	},
+
+	onchange: function (e) {
+		// 即時更新全域 PWM 配置
+		if (e.type === Blockly.Events.BLOCK_CHANGE && e.blockId === this.id) {
+			const frequency = parseInt(this.getFieldValue('FREQUENCY')) || 75000;
+			const resolution = parseInt(this.getFieldValue('RESOLUTION')) || 8;
+			window.esp32PwmFrequency = frequency;
+			window.esp32PwmResolution = resolution;
+		}
+	},
+};
+
 Blockly.Blocks['text_print'] = {
 	init: function () {
 		this.appendValueInput('TEXT').setCheck(null).appendField(window.languageManager.getMessage('TEXT_PRINT_SHOW'));
@@ -1008,7 +1056,7 @@ Blockly.Blocks['threshold_function_read'] = {
 			log.info(`threshold_function_read: 從變異資料恢復函式名稱: ${func}`);
 			// 在設置字段值的同時，也存儲到我們的備份屬性中
 			this.restoredFuncValue = func;
-			
+
 			// 容錯處理：嘗試設定值，如果失敗則使用預設值
 			try {
 				this.getField('FUNC').setValue(func);

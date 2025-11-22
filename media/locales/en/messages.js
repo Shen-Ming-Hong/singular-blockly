@@ -527,6 +527,20 @@ window.languageManager.loadMessages('en', {
 	HUSKYLENS_LEARN_TOOLTIP: 'Let HUSKYLENS learn object with specified ID (only for Object Classification mode)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Clear all learned objects from HUSKYLENS (only for Object Classification mode)',
 
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'ESP32 PWM Setup',
+	ESP32_PWM_FREQUENCY: 'Frequency',
+	ESP32_PWM_RESOLUTION: 'Resolution',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'Set PWM frequency, range 1-80000 Hz. High frequency for motor driver chips (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'Set PWM resolution, affects output precision. Note: frequency × 2^resolution ≤ 80,000,000',
+	ESP32_PWM_RESOLUTION_8BIT: '8 bit (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10 bit (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12 bit (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13 bit (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14 bit (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15 bit (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16 bit (0-65535)',
+
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',

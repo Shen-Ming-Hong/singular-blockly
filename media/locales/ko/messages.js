@@ -525,6 +525,20 @@ window.languageManager.loadMessages('ko', {
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS가 지정된 ID의 객체 학습하기 (객체 분류 모드에서만)',
 	HUSKYLENS_FORGET_TOOLTIP: 'HUSKYLENS에서 학습된 모든 객체 지우기 (객체 분류 모드에서만)',
 
+	// ESP32 PWM Setup
+	ESP32_PWM_SETUP: 'ESP32 PWM 설정',
+	ESP32_PWM_FREQUENCY: '주파수',
+	ESP32_PWM_RESOLUTION: '해상도',
+	ESP32_PWM_FREQUENCY_TOOLTIP: 'PWM 주파수 설정, 범위 1-80000 Hz. 모터 드라이버 칩용 고주파 (20-75KHz)',
+	ESP32_PWM_RESOLUTION_TOOLTIP: 'PWM 해상도 설정, 출력 정밀도에 영향을 줍니다. 참고: 주파수 × 2^해상도 ≤ 80,000,000',
+	ESP32_PWM_RESOLUTION_8BIT: '8비트 (0-255)',
+	ESP32_PWM_RESOLUTION_10BIT: '10비트 (0-1023)',
+	ESP32_PWM_RESOLUTION_12BIT: '12비트 (0-4095)',
+	ESP32_PWM_RESOLUTION_13BIT: '13비트 (0-8191)',
+	ESP32_PWM_RESOLUTION_14BIT: '14비트 (0-16383)',
+	ESP32_PWM_RESOLUTION_15BIT: '15비트 (0-32767)',
+	ESP32_PWM_RESOLUTION_16BIT: '16비트 (0-65535)',
+
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'이 프로젝트에는 아직 Blockly 블록이 없습니다. 계속하면 여기에 blockly 폴더와 파일이 생성됩니다. 계속하시겠습니까?',
