@@ -9,6 +9,25 @@
 
 A Visual Studio Code extension that provides a visual programming interface using Blockly for Arduino development, with multi-board support and internationalization.
 
+---
+
+## 📑 Table of Contents
+
+-   [Core Dependencies](#core-dependencies)
+-   [Features](#features)
+-   [Installation](#installation)
+-   [Requirements](#requirements)
+-   [Quick Start](#quick-start)
+-   [Usage](#usage)
+-   [Block Categories](#block-categories)
+-   [Supported Boards and Platforms](#supported-boards-and-platforms)
+-   [Extension Settings](#extension-settings)
+-   [Known Issues](#known-issues)
+-   [License](#license)
+-   [Contributing](#contributing)
+
+---
+
 ## Core Dependencies
 
 -   **Blockly**: 12.3.1 - Visual programming library
@@ -18,151 +37,136 @@ A Visual Studio Code extension that provides a visual programming interface usin
 
 ## Features
 
--   🎯 **Multi-Board Support**
+### 🎯 Multi-Board Support
 
-    -   Arduino Uno
-    -   Arduino Nano
-    -   Arduino Mega
-    -   ESP32
-    -   Super Mini (Lolin C3 Mini)
+-   Arduino Uno, Nano, Mega
+-   ESP32 Dev Module
+-   Super Mini (Lolin C3 Mini)
 
--   🌐 **Internationalization Support**
+### 🌐 Internationalization
 
-    -   **15 Languages Supported** with 98.94% average translation coverage
-    -   Automatic language detection based on VS Code settings
-    -   Block search UI supports all available languages
-    -   Automated quality validation (CI/CD integration)
-    -   Supported languages:
-        -   English (en) - 99.3% coverage
-        -   Spanish (es) - 98.9% coverage
-        -   Portuguese (pt-br) - 98.9% coverage
-        -   French (fr) - 98.9% coverage
-        -   German (de) - 98.9% coverage
-        -   Italian (it) - 98.9% coverage
-        -   Russian (ru) - 98.9% coverage
-        -   Japanese (ja) - 98.9% coverage
-        -   Korean (ko) - 98.9% coverage
-        -   Traditional Chinese (zh-hant) - 99.3% coverage
-        -   Polish (pl) - 98.9% coverage
-        -   Hungarian (hu) - 98.6% coverage
-        -   Turkish (tr) - 98.9% coverage
-        -   Bulgarian (bg) - 98.6% coverage
-        -   Czech (cs) - 98.6% coverage
-    -   **Quality Assurance**:
-        -   ✅ Automated validation for placeholders, encoding, and consistency
-        -   ✅ Direct translation pattern detection
-        -   ✅ Monthly quality audits via GitHub Actions
-        -   📚 For contributors: See [Localization Quickstart Guide](specs/002-i18n-localization-review/quickstart.md)
+-   **15 Languages** with 98.94% average coverage
+-   Automatic language detection
+-   Multi-language block search UI
 
--   🧩 **Rich Block Categories**
+<details>
+<summary><b>📊 Supported Languages Coverage</b></summary>
 
-    -   Arduino I/O Operations
-        -   Smart pin options with automatic PWM pin detection
-        -   Optimized analog write functionality for PWM pins
-    -   Servo Motor Control
-        -   Configurable servo setup and angle control
-        -   Smart dropdown menu with automatic servo name detection
-        -   Board-specific servo library support (ESP32/Arduino)
-    -   Encoder Motor Support
-        -   Setup, read, reset and PID control functionality
-        -   Automatic pin management for encoder motors
-    -   Sensor Blocks
-        -   Ultrasonic Sensor with hardware interrupt support
-            -   Smart block linking for ultrasonic trigger and read operations
-            -   Automatic detection and configuration between ultrasonic blocks
-        -   Seven-segment Display with common cathode/anode modes
-        -   Threshold function blocks for analog input monitoring
-    -   Pixetto Smart Camera
-        -   Complete visual recognition system
-        -   Color detection (8 colors: red, blue, green, yellow, orange, purple, black, white)
-        -   Shape detection (triangle, rectangle, pentagon, hexagon, circle)
-        -   Face detection and AprilTag recognition
-        -   Neural network recognition and handwritten digit recognition
-        -   Road detection with center and boundary information
-        -   Position and size data retrieval (X, Y coordinates, width, height)
-        -   UART communication configuration (RX/TX pins)
-        -   Multiple function modes with easy switching
-    -   HUSKYLENS Smart Camera (Experimental)
-        -   Advanced AI vision recognition system
-        -   Dual communication modes: I2C and UART
-        -   Multiple recognition algorithms: face recognition, object tracking, object recognition, line tracking, color recognition, tag recognition, object classification
-        -   Real-time data retrieval: block and arrow detection results with position and ID information
-        -   Interactive learning functions: learn objects and forget all learned content
-        -   Easy algorithm switching and configuration
-        -   Comprehensive detection result analysis with count and detailed information blocks
-    -   Functions with parameter support
-        -   Custom threshold functions with analog input support
-        -   Configurable sensor pins and threshold values
-        -   Multiple output types (numeric, boolean, string)
-        -   Support for converting Chinese function names to valid C++ code
-    -   Variables with rename/delete capabilities
-    -   Lists and Arrays
-    -   Logic Operations
-    -   Loops
-        -   Standard loop blocks (repeat, while, for)
-        -   Time-based duration loops (execute for a specific time)
-        -   Flow control statements (break, continue) with context validation
-    -   Math Operations
-    -   Text Operations
-    -   Value Mapping (Arduino map function)
+| Language            | Code    | Coverage |
+| ------------------- | ------- | -------- |
+| English             | en      | 99.3%    |
+| Traditional Chinese | zh-hant | 99.3%    |
+| Spanish             | es      | 98.9%    |
+| Portuguese (Brazil) | pt-br   | 98.9%    |
+| French              | fr      | 98.9%    |
+| German              | de      | 98.9%    |
+| Italian             | it      | 98.9%    |
+| Russian             | ru      | 98.9%    |
+| Japanese            | ja      | 98.9%    |
+| Korean              | ko      | 98.9%    |
+| Polish              | pl      | 98.9%    |
+| Turkish             | tr      | 98.9%    |
+| Hungarian           | hu      | 98.6%    |
+| Bulgarian           | bg      | 98.6%    |
+| Czech               | cs      | 98.6%    |
 
--   💾 **Workspace Management**
+</details>
 
-    -   Automatic state saving
-    -   Project persistence
-    -   Board configuration management
-    -   Code generation to Arduino (.cpp) files
-    -   Automatic PlatformIO configuration generation
-    -   Automatic platformio.ini preview mode management
-    -   **Project Safety Guard** 🛡️
-        -   Automatically detects non-Blockly projects
-        -   Smart project type recognition (Node.js, Python, Java, .NET, Go, etc.)
-        -   Warning dialog with three options: Continue / Cancel / Don't remind again
-        -   Workspace-level preference memory
-        -   Prevents accidental file loss in non-Blockly projects
-    -   Comprehensive backup system
-        -   Backup creation with timestamps
-        -   Backup preview without restoration
-        -   Safe restoration with automatic temporary backups
-        -   Auto-backup with configurable time intervals
-        -   Modern UI with responsive design for backup management
-    -   Seven-segment display support with common cathode/anode modes
+**Quality Assurance**:
 
--   🛠 **Development Features**
-    -   Real-time code generation
-    -   Manual code refresh button for instant code regeneration
-    -   Integrated board configuration
-    -   Visual block programming interface
-    -   Drag-and-drop block management
-    -   Automatic block code generation system for critical blocks
-    -   Standardized logging service for code generation
-    -   Code comments generation system for improved readability
-    -   Experimental blocks tracking system
-        -   Visual indication with yellow dashed borders
-        -   Notification system for experimental features
-        -   Automatic detection and marking of experimental blocks
-    -   🔍 **Block Search Function**
-        -   Quickly search blocks by name or parameter in the workspace
-        -   Highlight and navigate search results
-        -   Multi-language UI and keyboard shortcut (Ctrl+F) support
-        -   Search UI is fully integrated and accessible from the editor
-    -   Zoom controls and trashcan
-    -   Light and dark theme support with theme toggle
-    -   Touch device support with pinch-to-zoom functionality
-    -   PlatformIO integration for hardware upload
-    -   Pin mode tracking and conflict detection
-        -   Automatically tracks pin modes (INPUT, OUTPUT, INPUT_PULLUP)
-        -   Detects pin mode conflicts and displays warnings
-        -   Automatically adds necessary pinMode configurations
-    -   Value mapping (Arduino map function)
+-   ✅ Automated validation (placeholders, encoding, consistency)
+-   ✅ Direct translation pattern detection
+-   ✅ Monthly CI/CD quality audits
+-   📚 [Localization Quickstart Guide](specs/002-i18n-localization-review/quickstart.md)
+
+### 💾 Workspace Management
+
+-   Automatic state saving and project persistence
+-   Board configuration management
+-   Arduino code generation (.cpp files)
+-   Automatic PlatformIO configuration
+-   **Project Safety Guard** 🛡️
+    -   Smart project type detection (Node.js, Python, Java, etc.)
+    -   Warning dialog to prevent accidental modifications
+    -   Workspace-level preference memory
+-   **Comprehensive Backup System**
+    -   Timestamped backups with preview
+    -   Safe restoration with temporary backups
+    -   Auto-backup with configurable intervals
+    -   Modern responsive UI
+
+### 🛠 Development Features
+
+-   Real-time code generation with manual refresh
+-   Visual drag-and-drop block interface
+-   Integrated board configuration
+-   **Block Search** 🔍
+    -   Search by name or parameter (Ctrl+F)
+    -   Highlight and navigate results
+    -   Multi-language UI support
+-   **Experimental Blocks Tracking**
+    -   Yellow dashed border indicators
+    -   Notification system
+-   Theme support (light/dark with toggle)
+-   Touch device support (pinch-to-zoom)
+-   PlatformIO integration for hardware upload
+-   **Pin Mode Tracking**
+    -   Auto-track modes (INPUT, OUTPUT, INPUT_PULLUP)
+    -   Conflict detection and warnings
+    -   Auto-add pinMode configurations
+
+---
+
+## Installation
+
+### From VS Code Marketplace (Recommended)
+
+1. Open VS Code
+2. Go to Extensions view (`Ctrl+Shift+X` / `Cmd+Shift+X`)
+3. Search for **"Singular Blockly"**
+4. Click **Install**
+
+### Offline Installation (GitHub Release)
+
+For restricted network environments (企業內網 / 教育環境):
+
+1. Download the latest `.vsix` file from [GitHub Releases](https://github.com/Shen-Ming-Hong/singular-blockly/releases)
+2. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+3. Select **"Extensions: Install from VSIX..."**
+4. Choose the downloaded `.vsix` file
+
+**Command Line Alternative**:
+
+```bash
+code --install-extension singular-blockly-X.Y.Z.vsix
+```
+
+---
 
 ## Requirements
 
--   Visual Studio Code 1.96.0 or higher
+-   Visual Studio Code 1.105.0 or higher
+-   Node.js 22.16.0 or higher
 -   Basic understanding of Arduino programming concepts
 -   Required Extensions:
     -   PlatformIO IDE Extension
     -   C/C++ Extension (ms-vscode.cpptools)
+
+---
+
+## Quick Start
+
+**Get started in 3 minutes:**
+
+1. **Install** the extension from VS Code Marketplace
+2. **Open a folder** (File → Open Folder)
+3. **Click the wand icon** 🪄 in the status bar
+4. **Select your Arduino board** from the dropdown
+5. **Drag blocks** from the toolbox and start coding!
+
+> 💡 **First time?** The extension will auto-generate `platformio.ini` and `src/main.cpp` for you.
+
+---
 
 ## Usage
 
@@ -196,52 +200,141 @@ A Visual Studio Code extension that provides a visual programming interface usin
     - Update PlatformIO configuration
     - Provide real-time code(.cpp) generation
 
+---
+
+## Block Categories
+
+### 🔌 Arduino I/O Operations
+
+-   Smart pin options with automatic PWM pin detection
+-   Optimized analog write functionality for PWM pins
+
+### ⚙️ ESP32 PWM Configuration (v0.43.0+)
+
+-   Custom PWM frequency (1-80000 Hz) and resolution (8-16 bit)
+-   High-frequency PWM for motor driver chips (20-75KHz)
+-   Automatic validation: `frequency × 2^resolution ≤ 80,000,000`
+-   Backward compatible (default: 75000Hz / 8bit)
+-   Independent from ESP32Servo blocks
+
+### 🎮 Servo Motor Control
+
+-   Configurable setup and angle control
+-   Smart dropdown with auto-detection
+-   Board-specific library support (ESP32/Arduino)
+
+### 🔧 Encoder Motor Support
+
+-   Setup, read, reset, and PID control
+-   Automatic pin management
+
+### 📡 Sensor Blocks
+
+**Ultrasonic Sensor**
+
+-   Hardware interrupt support
+-   Smart block linking (trigger + read)
+-   Auto-detection between blocks
+
+**Seven-Segment Display**
+
+-   Common cathode/anode modes
+
+**Threshold Functions**
+
+-   Analog input monitoring
+
+### 📷 Pixetto Smart Camera
+
+-   Complete visual recognition system
+-   **Color Detection**: 8 colors (red, blue, green, yellow, orange, purple, black, white)
+-   **Shape Detection**: triangle, rectangle, pentagon, hexagon, circle
+-   **Face Detection** and **AprilTag Recognition**
+-   **Neural Network** and **Handwritten Digit Recognition**
+-   **Road Detection** with center/boundary info
+-   Position data (X, Y, width, height)
+-   UART configuration (RX/TX pins)
+
+### 🤖 HUSKYLENS Smart Camera (Experimental)
+
+-   Advanced AI vision system
+-   **Dual Modes**: I2C and UART
+-   **Recognition Algorithms**:
+    -   Face recognition
+    -   Object tracking/recognition
+    -   Line tracking
+    -   Color recognition
+    -   Tag recognition
+    -   Object classification
+-   Real-time block/arrow detection results
+-   Interactive learning functions
+-   Position and ID information
+
+### 🧮 Programming Constructs
+
+**Functions**
+
+-   Parameter support
+-   Custom threshold functions
+-   Multiple output types (numeric, boolean, string)
+-   Chinese function name conversion
+
+**Variables**
+
+-   Rename/delete capabilities
+
+**Data Structures**
+
+-   Lists and Arrays
+
+**Control Flow**
+
+-   Logic Operations
+-   Loops (repeat, while, for)
+-   Time-based duration loops
+-   Flow control (break, continue) with validation
+
+**Operations**
+
+-   Math Operations
+-   Text Operations
+-   Value Mapping (Arduino `map()` function)
+
+---
+
 ## Supported Boards and Platforms
 
-Each board is configured with specific PlatformIO settings for optimal compatibility:
+Each board is configured with optimized PlatformIO settings:
 
-### AVR Based
+| Board                          | Platform    | Board ID       | Architecture |
+| ------------------------------ | ----------- | -------------- | ------------ |
+| **Arduino Uno**                | atmelavr    | uno            | AVR          |
+| **Arduino Nano**               | atmelavr    | nanoatmega328  | AVR          |
+| **Arduino Mega**               | atmelavr    | megaatmega2560 | AVR          |
+| **ESP32 Dev Module**           | espressif32 | esp32dev       | ESP32        |
+| **Super Mini (Lolin C3 Mini)** | espressif32 | lolin_c3_mini  | ESP32-C3     |
 
--   **Arduino Uno**
-    -   Platform: atmelavr
-    -   Board: uno
--   **Arduino Nano**
-    -   Platform: atmelavr
-    -   Board: nanoatmega328
--   **Arduino Mega**
-    -   Platform: atmelavr
-    -   Board: megaatmega2560
+> 💡 The extension auto-generates `platformio.ini` with correct settings for hardware upload.
 
-### ESP32 Based
-
--   **ESP32 Dev Module**
-    -   Platform: espressif32
-    -   Board: esp32dev
--   **Super Mini (Lolin C3 Mini)**
-    -   Platform: espressif32
-    -   Board: lolin_c3_mini
-
-> Note: The extension will automatically generate the appropriate `platformio.ini` configuration when you select a board, ensuring the correct platform settings for hardware upload.
+---
 
 ## Extension Settings
 
-This extension contributes the following settings:
+-   **`singularBlockly.safetyGuard.suppressWarning`**
+    -   **Type**: `boolean`
+    -   **Default**: `false`
+    -   **Scope**: Workspace-level
+    -   **Description**: Suppress safety warnings when opening non-Blockly projects
 
--   `singularBlockly.safetyGuard.suppressWarning`: Suppress the safety warning when opening the editor in non-Blockly projects
-    -   Type: `boolean`
-    -   Default: `false`
-    -   Workspace-level setting (can be configured per project)
-    -   When enabled, the extension will not show warnings when detecting non-Blockly project types
+### Project Safety Guard 🛡️
 
-**Project Safety Guard**:
+The extension detects non-Blockly projects (Node.js, Python, Java, etc.) and shows a warning dialog:
 
-The extension automatically detects if your workspace is a non-Blockly project (e.g., Node.js, Python, Java projects) and shows a warning dialog to prevent accidental file modifications. You can:
+-   **Continue** → Proceed with opening
+-   **Cancel** → Abort operation
+-   **Don't remind again** → Suppress warnings for this workspace
 
--   Click **Continue** to proceed with opening the editor
--   Click **Cancel** to abort the operation
--   Click **Don't remind again** to suppress warnings for this workspace
-
-To re-enable warnings after clicking "Don't remind again", change the workspace setting:
+**Re-enable warnings** by changing workspace settings:
 
 ```json
 {
@@ -249,9 +342,9 @@ To re-enable warnings after clicking "Don't remind again", change the workspace 
 }
 ```
 
-## Known Issues
+---
 
-Please report any issues on our GitHub repository.
+---
 
 ## License
 
@@ -261,10 +354,18 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 This project incorporates the following third-party components:
 
--   [Blockly](https://github.com/google/blockly) - Licensed under the Apache License 2.0
--   [PlatformIO](https://platformio.org/) - Licensed under the Apache License 2.0
--   Arduino Core Libraries - Licensed under the LGPL
+-   [Blockly](https://github.com/google/blockly) - Apache License 2.0
+-   [PlatformIO](https://platformio.org/) - Apache License 2.0
+-   Arduino Core Libraries - LGPL
+
+---
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+**Resources**:
+
+-   [GitHub Repository](https://github.com/Shen-Ming-Hong/singular-blockly)
+-   [Issue Tracker](https://github.com/Shen-Ming-Hong/singular-blockly/issues)
+-   [Localization Guide](specs/002-i18n-localization-review/quickstart.md)
