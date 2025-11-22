@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.43.0] - 2025-01-22
+
 ### 新增 Added
 
 -   **ESP32 PWM 頻率與解析度設定** (ESP32 PWM Frequency and Resolution Configuration)
@@ -25,6 +27,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
         Backward compatible: existing projects work with default values (75000Hz / 8bit) without PWM setup block
     -   與 ESP32Servo 伺服馬達積木獨立運作，互不干擾
         Independent operation with ESP32Servo blocks, no interference
+
+### 變更 Changed
+
+-   更新 15 種語言翻譯以支援 ESP32 PWM 功能（包含繁體中文、英文、德文、法文、西班牙文、義大利文、日文、韓文、葡萄牙文、波蘭文、土耳其文、捷克文、俄文、匈牙利文、保加利亞文）
+    Updated translations for 15 languages to support ESP32 PWM features (including Traditional Chinese, English, German, French, Spanish, Italian, Japanese, Korean, Portuguese, Polish, Turkish, Czech, Russian, Hungarian, Bulgarian)
+
+### 測試 Tests
+
+-   新增 18 個 PWM 驗證單元測試（100% 通過率）
+    Added 18 PWM validation unit tests (100% pass rate)
+-   新增 15 個程式碼生成文件化測試
+    Added 15 code generation documentation tests
+-   284/285 單元測試通過（99.6%）
+    284/285 unit tests passing (99.6%)
+-   22/22 手動測試通過（100%）
+    22/22 manual tests passing (100%)
+-   5/5 硬體測試通過（100%）
+    5/5 hardware tests passing (100%)
+
+### 維護 Maintenance
+
+-   移除多餘的臨時檔案和升級記錄
+    Removed redundant temporary files and upgrade records
+-   更新 .gitignore 以排除開發過程產物
+    Updated .gitignore to exclude development artifacts
 
 ## [0.42.0] - 2025-01-18
 
