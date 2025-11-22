@@ -2,189 +2,132 @@
 
 ## Language Convention
 
-**IMPORTANT**: When interacting with users, always respond in **Traditional Chinese (繁體中文)** unless the user explicitly requests otherwise. This instruction file is written in English for technical standardization, but all conversational responses should be in Traditional Chinese.
+**IMPORTANT**: Always respond in **Traditional Chinese (繁體中文)** unless explicitly requested otherwise. This file uses English for technical standardization, but all user-facing responses should be in Traditional Chinese.
 
 ## Project Overview
 
-**Singular Blockly** is a VSCode extension that provides visual programming for Arduino development using Google Blockly. The extension generates Arduino C++ code and integrates with PlatformIO for hardware deployment.
+**Singular Blockly** is a VSCode extension providing visual programming for Arduino development using Google Blockly. It generates Arduino C++ code and integrates with PlatformIO for hardware deployment.
 
 ### Technology Stack
 
--   **Blockly**: 12.3.1 (upgraded from 11.2.2)
--   **@blockly/theme-modern**: 7.0.1 (upgraded from 6.0.12)
--   **TypeScript**: 5.9.3
--   **Node.js**: 22.16.0+
--   **VS Code Engine**: 1.96.0+
--   **Webpack**: 5.102.1
+-   **Blockly**: 12.3.1 | **@blockly/theme-modern**: 7.0.1
+-   **TypeScript**: 5.9.3 | **Node.js**: 22.16.0+ | **VS Code**: 1.96.0+
+-   **Webpack**: 5.102.1 (bundles to `dist/extension.js`)
 
-**Upgrade Notes (Blockly 12.x)**:
-
--   All core APIs maintain backward compatibility (inject, serialization, events, themes)
--   Workspace JSON format unchanged - existing `main.json` files load seamlessly
--   Theme structure fully compatible - custom themes require no modifications
--   Only breaking change: CSS icon class names converted to camelCase (check `media/css/*.css`)
-
-### Core Architecture
+### Architecture Overview
 
 ```
 Extension Host (Node.js)           WebView (Browser Context)
 ├── extension.ts                   ├── blocklyEdit.html
-├── webview/                       ├── blocklyEdit.js
-│   ├── webviewManager.ts         └── blockly/
-│   └── messageHandler.ts             ├── blocks/*.js (定義積木)
-└── services/                         └── generators/arduino/*.js (生成程式碼)
+├── webview/                       ├── blocklyEdit.js (1985 lines)
+│   ├── webviewManager.ts (938)   └── blockly/
+│   └── messageHandler.ts (843)       ├── blocks/*.js (block definitions)
+└── services/                         └── generators/arduino/*.js (code gen)
     ├── fileService.ts
     ├── settingsManager.ts
     ├── localeService.ts
+    ├── workspaceValidator.ts
     └── logging.ts
 ```
 
-**Critical Entry Points**: Before modifying ANY code, read these three files in order:
+**Read First** (critical entry points):
 
-1. `src/extension.ts` - Extension activation & command registration
-2. `media/html/blocklyEdit.html` - WebView structure & initialization
-3. `media/js/blocklyEdit.js` - Blockly workspace logic & event handling
+1. `src/extension.ts` - Activation, command registration, activity bar view
+2. `media/html/blocklyEdit.html` - WebView DOM structure, script loading order
+3. `media/js/blocklyEdit.js` - Blockly workspace initialization (line 1068), event handlers
 
-## Key Architectural Patterns
+## Critical Patterns
 
 ### 1. Extension ↔ WebView Communication
 
-**Message-Based Architecture**: The extension and WebView communicate via `postMessage` API:
+**Message flow**: Extension and WebView use `postMessage` bidirectionally:
 
 ```typescript
-// Extension → WebView
+// Extension → WebView (messageHandler.ts)
 panel.webview.postMessage({ command: 'loadWorkspace', state: {...} });
 
-// WebView → Extension
+// WebView → Extension (blocklyEdit.js)
 vscode.postMessage({ command: 'saveWorkspace', state: {...} });
 ```
 
-**Handler Pattern**: `WebViewMessageHandler` (in `messageHandler.ts`) processes all WebView messages using a switch-case pattern. Add new message handlers following this structure:
+**Add handlers in `messageHandler.ts`** using switch-case (never modify `blocklyEdit.js` message sending):
 
 ```typescript
-case 'newCommand':
-    await this.handleNewCommand(message);
-    break;
+case 'newCommand': await this.handleNewCommand(message); break;
 ```
 
-### 2. Service Layer Pattern
+### 2. Service Layer (Never Use `fs` or `console.log` Directly)
 
-All file I/O and settings go through service classes:
+-   **FileService**: All file I/O (workspace + extension contexts)
+-   **SettingsManager**: VSCode settings, PlatformIO `platformio.ini` generation
+-   **LocaleService**: i18n message loading, language mapping (e.g., `zh-tw` → `zh-hant`)
+-   **WorkspaceValidator**: Project type detection (Node.js, Python, etc.)
+-   **logging**: Unified `log.info/error/warn/debug()` - output to "Singular Blockly" channel
 
--   **FileService**: All file operations (read/write/copy/delete)
--   **SettingsManager**: VSCode settings & PlatformIO configuration
--   **LocaleService**: i18n message loading & language detection
--   **logging**: Unified logging (`log.info/error/warn/debug`)
+### 3. Blockly Block Definition (Two-File Pattern)
 
-**Never** use `fs` or `console.log` directly - always use these services.
-
-### 3. Blockly Block Definition Pattern
-
-Each hardware feature has two parts:
-
-**Block Definition** (`media/blockly/blocks/*.js`):
+**Block** (`media/blockly/blocks/sensors.js`) + **Generator** (`generators/arduino/sensors.js`):
 
 ```javascript
-Blockly.Blocks['block_name'] = {
+// 1. Block definition
+Blockly.Blocks['sensor_read'] = {
 	init: function () {
-		this.appendDummyInput().appendField('Block Label');
-		this.setColour(230);
+		this.appendDummyInput().appendField(Blockly.Msg['SENSOR_READ'] || '讀取感測器');
+		this.setOutput(true, 'Number');
+		this.setColour(160);
 	},
 };
-```
 
-**Code Generator** (`media/blockly/generators/arduino/*.js`):
-
-```javascript
-arduinoGenerator.forBlock['block_name'] = function (block) {
-	return 'generated C++ code\n';
+// 2. Code generator (must match block name exactly)
+arduinoGenerator.forBlock['sensor_read'] = function (block) {
+	arduinoGenerator.lib_deps_.push('library@version'); // Auto-add to platformio.ini
+	return ['analogRead(A0)', arduinoGenerator.ORDER_ATOMIC];
 };
 ```
 
-**Important**: Block types and generator names must match exactly.
+**Update `webviewManager.ts` `arduinoModules` array** when adding new generator files.
 
-**Blockly 12.x API Compatibility**:
+## Multi-Board & State Management
 
--   `Blockly.Blocks[]` registry: Unchanged from v11
--   `arduinoGenerator.forBlock[]` pattern: Unchanged from v11
--   Block definition structure: Fully compatible
--   All existing blocks work without modification
+**Board configs** (`media/blockly/blocks/board_configs.js`): Define PlatformIO settings per board (Uno, Nano, Mega, ESP32, Super Mini).
 
-## Multi-Board Support System
-
-The extension supports multiple Arduino boards (Uno, Nano, Mega, ESP32, Super Mini). Board configurations are in `media/blockly/blocks/board_configs.js`:
-
-```javascript
-window.BOARD_CONFIGS = {
-    'arduino_uno': { name: 'Arduino Uno', platform: 'atmelavr', board: 'uno', ... }
-};
-```
-
-**Board-Specific Code Generation**: Use `window.currentBoard` in generators to emit board-specific code:
+**Board-specific generation**: Use `window.currentBoard` in generators:
 
 ```javascript
 if (window.currentBoard === 'esp32') {
-	// ESP32 specific code
+	arduinoGenerator.lib_deps_.push('ESP32Servo@1.2.1');
 } else {
-	// Arduino specific code
+	arduinoGenerator.lib_deps_.push('Servo@1.2.2');
 }
 ```
 
-## State Management & Persistence
-
-### Workspace State
+**Workspace persistence**:
 
 -   Saved to: `{workspace}/blockly/main.json`
 -   Structure: `{ workspace: {...}, board: 'arduino_uno', theme: 'light' }`
+-   API: `Blockly.serialization.workspaces.save/load()` (unchanged in Blockly 12.x)
 -   Auto-saves on every block change
 
-**Serialization API (Blockly 12.x)**:
-
-```javascript
-// Save workspace (unchanged from v11)
-const state = Blockly.serialization.workspaces.save(workspace);
-
-// Load workspace (unchanged from v11)
-Blockly.serialization.workspaces.load(state, workspace);
-```
-
-**Backward Compatibility**: Blockly 12 can load JSON files created by Blockly 11 without modification. The serialization format remains identical.
-
-### PlatformIO Integration
-
--   Configuration: `{workspace}/platformio.ini`
--   Auto-generated when board is selected
--   **Library Dependencies**: Managed via `arduinoGenerator.lib_deps_` array
--   **Build Flags**: Managed via `arduinoGenerator.build_flags_` array
-
-**Adding Library Dependencies**:
-
-```javascript
-arduinoGenerator.lib_deps_.push('library-name@version');
-arduinoGenerator.build_flags_.push('-DFLAG_NAME');
-```
-
-These are synced to `platformio.ini` automatically via `SettingsManager.syncPlatformIOSettings()`.
+**PlatformIO integration**: Libraries/flags auto-sync to `platformio.ini` via `SettingsManager.syncPlatformIOSettings()`.
 
 ## Internationalization (i18n)
 
-### Language Files Structure
+**15 languages** (98.94% avg coverage): EN, ES, PT-BR, FR, DE, IT, RU, JA, KO, ZH-HANT, PL, HU, TR, BG, CS
 
--   Extension messages: `media/locales/{lang}/messages.js`
--   Blockly core: `node_modules/blockly/msg/{lang}.js`
+**Message files**: `media/locales/{lang}/messages.js` (custom) + `node_modules/blockly/msg/{lang}.js` (core)
 
-### Message Loading Flow
+**Usage**:
 
-1. `LocaleService` detects VSCode language
-2. Maps to Blockly language code (e.g., `zh-tw` → `zh-hant`)
-3. Injects both custom and Blockly messages into WebView
-4. `window.languageManager.getMessage(key, default)` retrieves messages
+-   WebView JS: `window.languageManager.getMessage('KEY', 'fallback')`
+-   Extension TS: `localeService.getLocalizedMessage('KEY', default)`
 
-**Adding New Translatable Text**:
+**Quality assurance**:
 
-1. Add key to all `media/locales/*/messages.js` files
-2. Use `languageManager.getMessage('KEY', 'fallback')` in JS
-3. Use `localeService.getLocalizedMessage('KEY', default)` in TS
+-   **Validation**: `npm run validate:i18n` checks placeholders, encoding, consistency
+-   **Audits**: `npm run audit:i18n:all` detects direct translation patterns
+-   **Stats**: `npm run stats:i18n` generates coverage reports
+-   **CI integration**: Monthly automated audits via GitHub Actions
+-   See `specs/002-i18n-localization-review/quickstart.md` for contributor guide
 
 ## Development Workflows
 
@@ -194,170 +137,122 @@ These are synced to `platformio.ini` automatically via `SettingsManager.syncPlat
 npm run watch          # Watch mode for development
 npm run compile        # One-time compilation
 npm run test          # Run test suite
+npm run lint          # ESLint validation
+npm run validate:i18n  # Check translation quality
 ```
 
-### Debugging WebView
+### Debugging
 
-1. Open extension in Extension Development Host (F5)
-2. In the WebView panel: Right-click → "Open Developer Tools"
-3. Use `console.log` in browser context (WebView)
-4. Use `log.info/error` for extension-side logs (Output Channel: "Singular Blockly")
+**WebView**: F5 → Right-click panel → "Open Developer Tools" → Use `console.log`  
+**Extension**: Use `log.info/error()` → Output Channel: "Singular Blockly"
 
 ### Adding New Blockly Blocks
 
-**Complete Workflow**:
+1. Define in `media/blockly/blocks/{category}.js`
+2. Generator in `media/blockly/generators/arduino/{category}.js`
+3. Toolbox entry: `media/toolbox/categories/{category}.json`
+4. i18n: Add messages to all `media/locales/*/messages.js`
+5. Update `arduinoModules` in `webviewManager.ts` if new generator file
 
-1. Define block in `media/blockly/blocks/{category}.js`
-2. Add generator in `media/blockly/generators/arduino/{category}.js`
-3. Add to toolbox: `media/toolbox/categories/{category}.json`
-4. Add i18n messages for all languages
-5. Update `arduinoModules` array in `webviewManager.ts` if new generator file
+## Specs-Driven Development
 
-**Example - New Sensor Block**:
+**All features follow** `/specs/{NNN}-feature-name/` structure:
 
-```javascript
-// 1. blocks/sensors.js
-Blockly.Blocks['sensor_read'] = {
-    init: function() {
-        this.appendDummyInput()
-            .appendField(Blockly.Msg['SENSOR_READ'] || '讀取感測器');
-        this.setOutput(true, 'Number');
-        this.setColour(160);
-    }
-};
+-   `research.md` - API investigation, MCP tool findings
+-   `plan.md` - Implementation strategy, risk assessment
+-   `quickstart.md` - Developer onboarding guide
+-   `tasks.md` - Breakdown for execution
 
-// 2. generators/arduino/sensors.js
-arduinoGenerator.forBlock['sensor_read'] = function(block) {
-    return ['analogRead(A0)', arduinoGenerator.ORDER_ATOMIC];
-};
+**Current specs**: 001-011 cover architecture, i18n, testing, upgrades, safety features
 
-// 3. toolbox/categories/sensors.json
-{
-    "kind": "block",
-    "type": "sensor_read"
-}
+**Before implementation**: Check if spec exists. If modifying core APIs (Blockly, VSCode), document findings in research.md.
 
-// 4. locales/*/messages.js
-'SENSOR_READ': 'Read Sensor'
-```
+## Project Safety Guard 🛡️
+
+**Prevents file loss** in non-Blockly projects (Node.js, Python, Java, etc.):
+
+-   Detection: `WorkspaceValidator` in `src/services/workspaceValidator.ts`
+-   Behavior: Shows warning dialog with Continue/Cancel/Don't remind again
+-   Setting: `singularBlockly.safetyGuard.suppressWarning` (workspace-level)
+-   Test environment: Auto-bypassed via `NODE_ENV === 'test'` check
+
+**Pattern**: Always check `workspaceFolders` exists before file operations.
 
 ## Critical Conventions
 
-### Logging Standards
+### Logging
 
--   **Extension context**: `log.info/error/debug/warn()` (never `console.log`)
--   **WebView context**: `console.log` OK (browser environment)
--   **Always include context**: `log.info('Saving workspace', { board, theme })`
+-   **Extension**: `log.info/error/warn/debug()` (never `console.log`)
+-   **WebView**: `console.log` OK (browser environment)
+-   **Context**: Always include `{ board, file, action }` objects
 
-### Code Generation Comments
+### Code Generation
 
-Add descriptive comments in generated Arduino code:
+Add descriptive comments in Arduino output:
 
 ```javascript
 const comment = '// 設定伺服馬達到 90 度\n';
 return comment + `servo.write(90);\n`;
 ```
 
-### MCP Tool Usage (REQUIRED Before Implementation)
+### Testing Structure
 
-**Before adding/modifying ANY Blockly or VSCode API code**:
+-   **Services**: `src/test/{service}.test.ts` - Unit tests with mocked dependencies
+-   **Integration**: `src/test/integration/` - Cross-component workflows
+-   **Helpers**: `src/test/helpers/` - Mock factories, test utilities
+-   **Pattern**: Mirror source structure in test files
 
-1. Use `resolve-library-id` to find library (e.g., "blockly", "vscode")
-2. Use `get-library-docs` to fetch latest API documentation
-3. Use `webSearch` for breaking changes and migration guides
-4. Document findings in code comments or commit messages
-
-Example workflow:
+Example test structure:
 
 ```typescript
-// Before: Adding new Blockly theme feature
-// 1. Checked Blockly v12.3.1 docs via MCP: setTheme() API confirmed
-// 2. Verified theme format via get-library-docs: Theme interface structure
-// Implementation:
-Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme);
+// src/test/fileService.test.ts
+import { FileService } from '../services/fileService';
+import * as sinon from 'sinon';
+
+suite('FileService', () => {
+    test('should read file correctly', async () => { ... });
+});
 ```
 
-**Blockly 12.x API Reference**:
+### API Documentation Requirement
 
--   Workspace initialization: `Blockly.inject(container, options)` - unchanged
--   Event system: `Blockly.Events.*` - internal improvements, external API compatible
--   Theme system: `Blockly.Theme.defineTheme()` - fully compatible
--   TypeScript definitions: Built-in (no `@types/blockly` needed)
+**Before modifying Blockly/VSCode APIs**:
+
+1. Use MCP `resolve-library-id` + `get-library-docs` OR `webSearch`
+2. Document findings in code comments
+3. Reference spec research.md if available
 
 ### File Organization
 
--   Services in `src/services/` - reusable, testable logic
--   WebView logic in `src/webview/` - WebView-specific handlers
--   Blockly files in `media/blockly/` - visual programming definitions
--   Tests mirror source structure in `src/test/`
-
-### Simplicity Principles
-
--   **Avoid over-engineering**: Implement only what's needed
--   **Readable > Clever**: Clear code beats complex optimizations
--   **Modular but pragmatic**: Create services for shared logic, not every function
--   **Extensible interfaces**: Design for future boards/sensors without rewriting
+-   Services: `src/services/` - Testable, reusable logic
+-   WebView: `src/webview/` - Panel/message handlers
+-   Blockly: `media/blockly/` - Blocks + generators
+-   Tests: `src/test/` - Mirror source structure
 
 ## Common Pitfalls
 
-1. **WebView URI Conversion**: Always use `webview.asWebviewUri()` for resources loaded in WebView
-2. **Workspace Folder Check**: Always verify `vscode.workspace.workspaceFolders` exists before file operations
-3. **Message Handler Registration**: Register in `messageHandler.ts` switch AND add typing in message interfaces
-4. **Generator Library Tracking**: Update `lib_deps_` array when blocks need Arduino libraries
-5. **Multi-language Testing**: Test UI in at least English and Traditional Chinese
-6. **Theme Consistency**: Both light and dark themes must be tested for new UI elements
-7. **Blockly Version Assumptions**: Don't assume Blockly v11 behavior - verify API compatibility with v12 documentation
-8. **CSS Class Names**: Icon-related CSS may need updates (v12 uses camelCase for icon classes)
+1. **WebView URI**: Always `webview.asWebviewUri()` for resources
+2. **Workspace Check**: Verify `workspaceFolders` exists before operations
+3. **Message Handlers**: Register in `messageHandler.ts` switch + type interfaces
+4. **Generator Libraries**: Update `lib_deps_` for Arduino dependencies
+5. **i18n Testing**: Test EN + ZH-HANT minimum
+6. **Theme Testing**: Both light/dark themes required
+7. **Test Bypass**: Safety guard skips in test env via `NODE_ENV === 'test'`
 
-## Testing Strategy
+## Performance Targets
 
--   **Unit Tests**: Service classes (FileService, SettingsManager) have comprehensive tests
--   **Integration Tests**: Message handler workflows tested with mocked VSCode APIs
--   **Manual Testing**: Blockly editor functionality requires manual WebView testing
--   Run `npm test` before committing changes
+-   **Compile**: ≤5s (`npm run compile`)
+-   **Bundle**: ≤137KB (`dist/extension.js`)
+-   **Tests**: ≤3s (`npm test`)
+-   **Backward Compat**: Blockly 11 `main.json` files must load
 
-**Blockly 12.x Upgrade Testing**:
+## Key References
 
--   **Backward Compatibility**: Test loading Blockly 11 `main.json` files
--   **Serialization**: Verify save/load cycle produces identical workspace
--   **Theme Switching**: Test both light and dark themes display correctly
--   **Board Configuration**: Test all 5 board types (Uno, Nano, Mega, ESP32, Super Mini)
--   **Code Generation**: Verify Arduino C++ output matches expected format
--   **Performance**: Compile time ≤5s, bundle size ≤137KB, tests ≤3s
-
-## Release Checklist
-
-Before publishing updates:
-
--   [ ] All tests pass (`npm test`)
--   [ ] Extension compiles (`npm run compile`)
--   [ ] Tested in both light and dark themes
--   [ ] Multi-language UI verified (EN, ZH-HANT minimum)
--   [ ] Board configurations work (test Arduino Uno + ESP32)
--   [ ] PlatformIO integration tested (library dependencies sync correctly)
--   [ ] Performance benchmarks met (compile ≤5s, bundle ≤137KB, tests ≤3s)
--   [ ] Blockly 11 workspace files load successfully (backward compatibility)
--   [ ] Changelog updated
--   [ ] Version bumped in package.json
+-   **Architecture**: `specs/001-refactor-architecture-cleanup/`
+-   **i18n Guide**: `specs/002-i18n-localization-review/quickstart.md`
+-   **Blockly 12**: `specs/008-core-deps-upgrade/research.md`
+-   **Safety Guard**: `specs/010-project-safety-guard/`
 
 ---
 
-## Blockly 12.x Upgrade Reference
-
-For detailed information about the Blockly 12.3.1 upgrade, see:
-
--   **Research Document**: `specs/008-core-deps-upgrade/research.md` - API analysis, breaking changes, migration guide
--   **Data Model**: `specs/008-core-deps-upgrade/data-model.md` - Entity definitions, relationships, state management
--   **Quickstart Guide**: `specs/008-core-deps-upgrade/quickstart.md` - Development environment setup, testing workflows
--   **Task Breakdown**: `specs/008-core-deps-upgrade/tasks.md` - Implementation task list (generated in Phase 2)
-
-**Key Takeaways**:
-
--   Blockly 12.x is a **low-risk upgrade** with high backward compatibility
--   No code changes required in JavaScript files (blocks, generators, themes)
--   Only `package.json` and potentially CSS files need updates
--   All 190 existing tests should pass without modification
-
----
-
-**Remember**: This is a visual programming tool for education. Prioritize clarity and ease-of-use over technical sophistication. When in doubt, check existing patterns in the three core files listed at the top.
+**Remember**: This is an educational tool. Prioritize clarity over complexity. Check the three core files (extension.ts, blocklyEdit.html, blocklyEdit.js) when patterns are unclear.

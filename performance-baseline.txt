@@ -1,3 +1,0 @@
-Compile time baseline: 5774.76353333333 ms
-Bundle size baseline: 127.45 KB (130506 bytes)
-Test pass rate baseline: 189/190 passing (1 failing)

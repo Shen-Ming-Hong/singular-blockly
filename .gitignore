@@ -35,6 +35,13 @@ media/toolbox/temp_toolbox_*.json
 coverage/
 .nyc_output/
 
+# 升級過程記錄檔案 (應記錄在 specs/ 文件中)
+*-baseline.txt
+*-upgrade-versions.txt
+pre-upgrade-versions.txt
+post-upgrade-versions.txt
+performance-baseline.txt
+
 # IDE 相關
 .idea/
 *.swp
