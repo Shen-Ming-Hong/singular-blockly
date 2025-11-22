@@ -1,46 +1,81 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.3.2 → 1.4.0
+Version Change: 1.4.0 → 1.5.0
 Modified Principles: None
-Modified Sections:
-  - Git Commit Messages - Expanded to full Conventional Commits 1.0.0 specification
-    * Added comprehensive commit type definitions (11 types with Traditional Chinese descriptions)
-    * Added breaking change marker specification (!)
-    * Added commit body and footer guidance
-    * Reorganized structure with clear requirements and examples sections
-    * Retained existing git tag warning and Traditional Chinese description requirement
-Added Principles: None
+Modified Sections: None
+Added Principles:
+  - Principle X: Professional Release Management (完整發布管理標準)
+    * 定義語意化版本、版本同步、VSIX 打包、雙語文件、GitHub Release 發布、資產管理、驗證步驟
+    * 提供 6 階段發布工作流檢查清單（預發布驗證、版本管理、建置打包、Git 標籤、GitHub Release 創建、發布後續）
+    * 強制雙語發布說明（繁體中文 + English），包含功能、測試指標、安裝方法、文件連結
+    * 使用 gh CLI 自動化發布流程，VSIX 託管於 GitHub Releases
+    * 涵蓋線上/離線安裝場景，支援企業內網與教育環境
 Added Sections: None
 Removed Sections: None
 Templates Status:
-  ✅ plan-template.md - No updates needed (no git commit guidance in template)
+  ✅ plan-template.md - No updates needed (release process not part of feature planning)
   ✅ spec-template.md - No updates needed (specification format unaffected)
   ✅ tasks-template.md - No updates needed (task structure unaffected)
   ✅ agent-file-template.md - No updates needed (internal template)
   ✅ checklist-template.md - No updates needed (internal checklist)
-  ✅ .github/copilot-instructions.md - No updates needed (existing commit examples already follow new standard)
+  ⚠️  .github/copilot-instructions.md - Potential enhancement recommended
+      * Consider adding "Release Management" section referencing Principle X
+      * Current "Common Pitfalls" could link to release workflow checklist
+      * No breaking changes, enhancement optional for consistency
 Command Files Review:
   ✅ .github/prompts/speckit.constitution.prompt.md - Reviewed (no updates needed)
   ℹ️  No other command files found
-Change Summary (v1.4.0):
-  - Expanded Git Commit Messages section to full Conventional Commits 1.0.0 specification
-  - Added structured requirements section with commit message format rules
-  - Added 11 commit type definitions with Traditional Chinese translations:
-    * feat (新增功能), fix (修復錯誤), docs (文件更新), style (程式碼格式調整)
-    * refactor (重構程式碼), perf (效能優化), test (測試相關), chore (雜項工作)
-    * ci (CI/CD 設定), build (建置系統), revert (回復提交)
-  - Added breaking change marker specification using `!` after type/scope
-  - Added guidance on optional commit body and footer
-  - Reorganized existing examples into structured examples section
-  - Retained all existing guidance (Traditional Chinese descriptions, git tag warning)
+Change Summary (v1.5.0):
+  - Added Principle X: Professional Release Management with comprehensive workflow
+  - Defined mandatory components:
+    * Semantic versioning compliance (MAJOR.MINOR.PATCH)
+    * Version synchronization (package.json, CHANGELOG.md, git tags)
+    * VSIX packaging for offline installation
+    * Bilingual release notes (繁體中文 + English)
+    * GitHub Release publication via gh CLI
+    * Asset management (VSIX on GitHub Releases, excluded from repo)
+    * Verification steps (URL, asset, rendering checks)
+  - Provided 6-phase release workflow checklist:
+    1. Pre-Release Validation (PR merge, branch cleanup, test validation)
+    2. Version Management (package.json, CHANGELOG.md, commit)
+    3. Build and Package (npm run package, npx vsce package)
+    4. Git Tagging (annotated tags, push with --follow-tags)
+    5. GitHub Release Creation (gh release create, asset upload)
+    6. Post-Release (announcements, monitoring, documentation updates)
+  - Established bilingual documentation requirements:
+    * Major features with technical details
+    * Test metrics breakdown (unit/integration/manual/hardware)
+    * Internationalization status
+    * Multiple installation methods with step-by-step guides
+    * Related documentation links
+  - Enforced asset management best practices:
+    * VSIX hosted on GitHub Releases (not in repository)
+    * SHA256 verification for integrity
+    * .gitignore: *.vsix exclusion rule
+  - Benefits documented:
+    * User accessibility (offline installation for restricted networks)
+    * International reach (bilingual documentation)
+    * Distribution reliability (GitHub Releases)
+    * Quality assurance (structured checklist)
+    * Automation readiness (gh CLI workflow)
+    * Professional image (comprehensive release notes)
 Version Bump Rationale:
-  - MINOR version bump (1.3.2 → 1.4.0)
-  - Materially expanded Git Commit Messages standard with comprehensive Conventional Commits specification
-  - Added new structured guidance sections (Requirements, Commit Type Definitions, Breaking Change Format)
-  - Backward compatible (existing commit messages already follow this pattern, now formally documented)
-  - No governance changes, only expanded development standards
-Follow-up TODOs: None
+  - MINOR version bump (1.4.0 → 1.5.0)
+  - New principle addition: Professional Release Management (Principle X)
+  - Materially expanded governance with release workflow standards
+  - Backward compatible (existing practices formalized, no breaking changes)
+  - Establishes repeatable, automated release process for future versions
+  - Aligns with project's educational mission and international accessibility goals
+Context:
+  - Based on v0.43.0 release experience (2025-01-22)
+  - Addresses offline installation requirements for enterprise/education environments
+  - Complements Principle IX (Traditional Chinese Documentation Standard) with bilingual release notes
+  - Formalizes ad-hoc tagging process into professional workflow
+  - Enables future CI/CD automation via gh CLI patterns
+Follow-up TODOs:
+  - Consider adding "Release Management" section to .github/copilot-instructions.md (optional enhancement)
+  - No blocking issues, all templates validated
 -->
 
 # Singular Blockly Constitution
@@ -214,6 +249,77 @@ All specifications, implementation plans, and user-facing documentation MUST be 
 -   Better alignment with educational goals and user needs
 -   Easier onboarding for Traditional Chinese-speaking contributors
 
+### X. Professional Release Management
+
+All version releases MUST follow a standardized, automated workflow with comprehensive bilingual documentation to ensure quality distribution and user accessibility. This means:
+
+-   **Semantic Versioning Compliance**: Follow MAJOR.MINOR.PATCH strictly (breaking/new feature/bugfix)
+-   **Version Synchronization**: Update `package.json` version and create CHANGELOG entry before tagging
+-   **VSIX Packaging**: Build production bundle (`npm run package`) and generate VSIX (`npx @vscode/vsce package`) for offline installation
+-   **Bilingual Release Notes**: Create comprehensive documentation in both Traditional Chinese and English covering:
+    -   Major features and changes (with technical details)
+    -   Test metrics breakdown (unit/integration/manual/hardware)
+    -   Internationalization status (supported languages)
+    -   Installation methods (multiple approaches with step-by-step guides)
+    -   Related documentation links (specs, changelog, project home)
+-   **GitHub Release Publication**: Use `gh release create` CLI to publish releases with:
+    -   Descriptive title format: `[Project Name] vX.Y.Z - [Feature Highlight]`
+    -   VSIX file as downloadable asset (with SHA256 for verification)
+    -   Markdown-formatted release notes with emoji markers for readability
+-   **Asset Management**: Host VSIX on GitHub Releases (not in repository), exclude via `.gitignore: *.vsix`
+-   **Verification Steps**: Confirm release URL accessibility, asset download functionality, and release notes rendering
+
+**Rationale**: Professional release management establishes credibility, enables offline installation for restricted environments (企業內網, 教育環境), and serves both Chinese and international users. Automating the workflow via gh CLI reduces human error and ensures consistency. Bilingual documentation maximizes accessibility while maintaining the project's Traditional Chinese focus (Principle IX). VSIX distribution provides an alternative to VS Code Marketplace for users with network restrictions.
+
+**Release Workflow Checklist**:
+
+1. **Pre-Release Validation**:
+
+    - All feature PRs merged to master branch
+    - Feature branches deleted (local + remote)
+    - Repository cleaned of redundant/temporary files
+    - All tests passing (unit, integration, manual, hardware)
+    - `.gitignore` updated to prevent development artifacts
+
+2. **Version Management**:
+
+    - Update `package.json` version following semantic versioning
+    - Move CHANGELOG "未發布" section to new dated version section
+    - Add comprehensive bilingual entries (新增 Added, 變更 Changed, 測試 Tests, 維護 Maintenance)
+    - Commit: `git commit -m "chore(release): 發布版本 X.Y.Z"`
+
+3. **Build and Package**:
+
+    - Run production build: `npm run package` (webpack production mode)
+    - Generate VSIX: `npx @vscode/vsce package`
+    - Verify output: Check file size, file count, no critical warnings
+
+4. **Git Tagging**:
+
+    - Create annotated tag: `git tag -a vX.Y.Z -m "Release version X.Y.Z\n\n[detailed message]"`
+    - Push commit and tag: `git push origin master --follow-tags`
+
+5. **GitHub Release Creation**:
+
+    - Create bilingual release notes file (temporary, will be deleted)
+    - Execute: `gh release create vX.Y.Z --title "..." --notes-file "release-notes.md" "*.vsix#Singular Blockly Extension Package"`
+    - Verify: Check release URL, asset availability, notes rendering
+    - Cleanup: Remove temporary release notes file
+
+6. **Post-Release**:
+    - Announce release in project channels (if applicable)
+    - Monitor for user feedback and issues
+    - Update documentation if installation methods changed
+
+**Benefits**:
+
+-   **User Accessibility**: Offline installation support for restricted networks
+-   **International Reach**: Bilingual documentation serves global audience
+-   **Distribution Reliability**: GitHub Releases provides versioned, persistent download links
+-   **Quality Assurance**: Structured checklist prevents incomplete releases
+-   **Automation Ready**: gh CLI workflow enables future CI/CD integration
+-   **Professional Image**: Comprehensive release notes establish project credibility
+
 ## Development Standards
 
 ### Code Quality
@@ -369,4 +475,4 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.4.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-11-08
+**Version**: 1.5.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-01-22
