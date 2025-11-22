@@ -24,9 +24,10 @@ export class SettingsManager {
 	/**
 	 * 建立設定管理器實例
 	 * @param workspacePath 工作區路徑
+	 * @param fileService 可選的檔案服務實例（主要用於測試）
 	 */
-	constructor(private workspacePath: string) {
-		this.fileService = new FileService(workspacePath);
+	constructor(private workspacePath: string, fileService?: FileService) {
+		this.fileService = fileService || new FileService(workspacePath);
 	}
 
 	/**

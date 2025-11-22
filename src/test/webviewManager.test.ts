@@ -139,8 +139,11 @@ describe('WebView Manager', () => {
 		localeService = new LocaleService(extensionPath, fsServiceMock as any, vscodeMock as any);
 		extensionFileService = new FileService(extensionPath, fsServiceMock as any);
 
-		// 初始化 WebView 管理器，注入 services
-		webViewManager = new WebViewManager(context as any, localeService, extensionFileService);
+		// 為測試創建工作區 FileService (使用 mock fs)
+		const workspaceFileService = new FileService('/mock/workspace', fsServiceMock as any);
+
+		// 初始化 WebView 管理器,注入 services (包括 workspaceFileService)
+		webViewManager = new WebViewManager(context as any, localeService, extensionFileService, workspaceFileService);
 	});
 
 	// 在每個測試之後還原環境

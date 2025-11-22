@@ -50,12 +50,19 @@ export class WebViewManager {
 	/**
 	 * 建立 WebView 管理器實例
 	 * @param context 擴充功能上下文
-	 * @param localeService 語言服務（可選，用於測試）
-	 * @param extensionFileService 擴充功能檔案服務（可選，用於測試）
+	 * @param localeService 語言服務（可選,用於測試）
+	 * @param extensionFileService 擴充功能檔案服務（可選,用於測試）
+	 * @param workspaceFileService 工作區檔案服務（可選,用於測試）
 	 */
-	constructor(private context: vscode.ExtensionContext, localeService?: LocaleService, extensionFileService?: FileService) {
+	constructor(
+		private context: vscode.ExtensionContext,
+		localeService?: LocaleService,
+		extensionFileService?: FileService,
+		workspaceFileService?: FileService
+	) {
 		this.localeService = localeService || new LocaleService(context.extensionPath);
 		this.extensionFileService = extensionFileService || new FileService(context.extensionPath);
+		this.fileService = workspaceFileService; // 在測試中可以預先注入
 	}
 
 	/**
@@ -76,9 +83,11 @@ export class WebViewManager {
 			return;
 		}
 
-		// 初始化檔案服務
+		// 初始化檔案服務 (如果還沒有建立的話,例如在測試中可能已注入)
 		const workspaceRoot = workspaceFolders[0].uri.fsPath;
-		this.fileService = new FileService(workspaceRoot);
+		if (!this.fileService) {
+			this.fileService = new FileService(workspaceRoot);
+		}
 
 		// 設定 PlatformIO 不自動開啟 ini 檔案
 		const settingsManager = new SettingsManager(workspaceRoot);
@@ -190,11 +199,19 @@ export class WebViewManager {
 			const localeService = new LocaleService(this.context.extensionPath);
 			const blocklyLanguage = localeService.getCurrentLanguage();
 
+			// 取得主題設定 - 傳遞 fileService 確保在測試中使用 mock
 			let theme = 'light';
 			if (this.fileService) {
-				const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
-				theme = await settingsManager.getTheme();
-			} // 準備各種資源 URI
+				try {
+					const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath, this.fileService);
+					theme = await settingsManager.getTheme();
+				} catch (error) {
+					// 若讀取設定失敗,使用預設主題
+					log('Failed to read theme setting, using default', 'warn', { error });
+				}
+			}
+
+			// 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyEdit.js'));
 			const boardConfigsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/board_configs.js'));
