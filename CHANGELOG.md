@@ -10,6 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.43.2] - 2025-11-25
+
+### 修復 Fixed
+
+-   **ESP32 Pixetto 程式碼生成修正** (ESP32 Pixetto Code Generation Fix)
+    -   修正 Pixetto 智慧鏡頭積木在 ESP32 開發板上生成不必要的 SoftwareSerial 引用
+        Fixed Pixetto vision sensor block generating unnecessary SoftwareSerial references on ESP32 boards
+    -   ESP32 不再添加 `#include <SoftwareSerial.h>` 和 AVR 專用 build_flags
+        ESP32 no longer adds `#include <SoftwareSerial.h>` and AVR-specific build_flags
+    -   AVR 開發板（UNO/Nano/Mega）維持現有行為
+        AVR boards (UNO/Nano/Mega) maintain existing behavior
+    -   參照 HuskyLens 實作模式，使用 `window.currentBoard.includes('esp32')` 判斷開發板類型
+        Following HuskyLens implementation pattern, using `window.currentBoard.includes('esp32')` for board type detection
+
+### 測試 Tests
+
+-   4/4 手動測試通過（100%）：ESP32、Arduino UNO、開發板切換、Super Mini 驗證
+    4/4 manual tests passing (100%): ESP32, Arduino UNO, board switching, Super Mini verification
+
 ## [0.43.1] - 2025-01-22
 
 ### 修復 Fixed
