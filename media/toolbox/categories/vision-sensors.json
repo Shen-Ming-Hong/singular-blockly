@@ -16,9 +16,6 @@
             "type": "pixetto_set_mode"
         },
         {
-            "kind": "sep"
-        },
-        {
             "kind": "block",
             "type": "pixetto_is_detected"
         },
@@ -112,9 +109,6 @@
             "type": "huskylens_set_algorithm"
         },
         {
-            "kind": "sep"
-        },
-        {
             "kind": "block",
             "type": "huskylens_request"
         },
@@ -137,9 +131,6 @@
         {
             "kind": "block",
             "type": "huskylens_get_arrow_info"
-        },
-        {
-            "kind": "sep"
         },
         {
             "kind": "block",

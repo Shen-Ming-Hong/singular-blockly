@@ -484,6 +484,9 @@ window.languageManager.loadMessages('pt-br', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Obter informações da seta especificada (origem, destino ou ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Fazer o HUSKYLENS aprender objeto com ID especificado (apenas no modo de classificação de objetos)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Fazer o HUSKYLENS esquecer todos os objetos aprendidos (apenas no modo de classificação de objetos)',
+	HUSKYLENS_I2C_PIN_HINT: 'Fiação: ',
+	HUSKYLENS_UART_PIN_HINT: 'Pinos recomendados: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Qualquer pino digital',
 
 	// Pixetto Color Options
 	PIXETTO_COLOR_RED: 'Vermelho',

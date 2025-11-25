@@ -527,6 +527,9 @@ window.languageManager.loadMessages('de', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Informationen des angegebenen Pfeils abrufen (Ursprung, Ziel oder ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS Objekt mit angegebener ID lernen lassen (nur im Objektklassifizierungsmodus)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Alle gelernten Objekte von HUSKYLENS löschen (nur im Objektklassifizierungsmodus)',
+	HUSKYLENS_I2C_PIN_HINT: 'Verkabelung: ',
+	HUSKYLENS_UART_PIN_HINT: 'Empfohlene Pins: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Beliebiger Digitalpin',
 
 	// Safety Guard (Project Safety Protection)
 	// ESP32 PWM Setup

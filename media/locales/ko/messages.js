@@ -524,6 +524,9 @@ window.languageManager.loadMessages('ko', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '지정된 화살표의 정보 가져오기 (시작점, 끝점 또는 ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS가 지정된 ID의 객체 학습하기 (객체 분류 모드에서만)',
 	HUSKYLENS_FORGET_TOOLTIP: 'HUSKYLENS에서 학습된 모든 객체 지우기 (객체 분류 모드에서만)',
+	HUSKYLENS_I2C_PIN_HINT: '배선: ',
+	HUSKYLENS_UART_PIN_HINT: '권장 핀: ',
+	HUSKYLENS_UART_ANY_DIGITAL: '임의의 디지털 핀',
 
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'ESP32 PWM 설정',

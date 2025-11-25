@@ -4,6 +4,49 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * 開發板腳位對應表
+ * 用於動態 tooltip 顯示各開發板的 I2C/UART 腳位資訊
+ */
+const HUSKYLENS_PIN_INFO = {
+	i2c: {
+		uno: 'A4(SDA)/A5(SCL)',
+		nano: 'A4(SDA)/A5(SCL)',
+		mega: 'D20(SDA)/D21(SCL)',
+		esp32: 'GPIO21(SDA)/GPIO22(SCL)',
+		supermini: 'GPIO8(SDA)/GPIO9(SCL)',
+	},
+	uart: {
+		uno: null, // AVR 板使用 SoftwareSerial，可使用任意數位腳位
+		nano: null,
+		mega: null,
+		esp32: 'GPIO16(RX2)/GPIO17(TX2)',
+		supermini: 'GPIO20(RX)/GPIO21(TX)',
+	},
+};
+
+/**
+ * 取得目前開發板的 I2C 腳位資訊
+ * @returns {string} 腳位描述
+ */
+function getHuskyLensI2CPinInfo() {
+	const board = window.currentBoard || 'uno';
+	return HUSKYLENS_PIN_INFO.i2c[board] || HUSKYLENS_PIN_INFO.i2c.uno;
+}
+
+/**
+ * 取得目前開發板的 UART 腳位建議
+ * @returns {string} 腳位描述或任意數位腳位提示
+ */
+function getHuskyLensUARTPinInfo() {
+	const board = window.currentBoard || 'uno';
+	const pins = HUSKYLENS_PIN_INFO.uart[board];
+	if (pins) {
+		return pins;
+	}
+	return window.languageManager.getMessage('HUSKYLENS_UART_ANY_DIGITAL', '任意數位腳位');
+}
+
 // HUSKYLENS 初始化積木 (I2C)
 Blockly.Blocks['huskylens_init_i2c'] = {
 	init: function () {
@@ -13,7 +56,12 @@ Blockly.Blocks['huskylens_init_i2c'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('sensor_blocks');
-		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_INIT_I2C_TOOLTIP', '使用 I2C 初始化 HUSKYLENS 智慧鏡頭'));
+		this.setTooltip(() => {
+			const baseMsg = window.languageManager.getMessage('HUSKYLENS_INIT_I2C_TOOLTIP', '使用 I2C 初始化 HUSKYLENS 智慧鏡頭');
+			const pinHint = window.languageManager.getMessage('HUSKYLENS_I2C_PIN_HINT', '接線：');
+			const pinInfo = getHuskyLensI2CPinInfo();
+			return baseMsg + '\n' + pinHint + pinInfo;
+		});
 		this.setHelpUrl('');
 
 		// 標記為實驗積木
@@ -48,9 +96,15 @@ Blockly.Blocks['huskylens_init_uart'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('sensor_blocks');
-		this.setTooltip(
-			window.languageManager.getMessage('HUSKYLENS_INIT_UART_TOOLTIP', '使用 UART 初始化 HUSKYLENS 智慧鏡頭，設定 RX/TX 腳位')
-		);
+		this.setTooltip(() => {
+			const baseMsg = window.languageManager.getMessage(
+				'HUSKYLENS_INIT_UART_TOOLTIP',
+				'使用 UART 初始化 HUSKYLENS 智慧鏡頭，設定 RX/TX 腳位'
+			);
+			const pinHint = window.languageManager.getMessage('HUSKYLENS_UART_PIN_HINT', '建議腳位：');
+			const pinInfo = getHuskyLensUARTPinInfo();
+			return baseMsg + '\n' + pinHint + pinInfo;
+		});
 		this.setHelpUrl('');
 
 		// 標記為實驗積木

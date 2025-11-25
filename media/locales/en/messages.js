@@ -526,6 +526,9 @@ window.languageManager.loadMessages('en', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Get information of specified arrow (origin, target or ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Let HUSKYLENS learn object with specified ID (only for Object Classification mode)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Clear all learned objects from HUSKYLENS (only for Object Classification mode)',
+	HUSKYLENS_I2C_PIN_HINT: 'Wiring: ',
+	HUSKYLENS_UART_PIN_HINT: 'Recommended pins: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Any digital pin',
 
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'ESP32 PWM Setup',

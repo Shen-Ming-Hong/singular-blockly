@@ -523,6 +523,9 @@ window.languageManager.loadMessages('cs', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Získat informace o určené šipce (počátek, cíl nebo ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Nechat HUSKYLENS naučit se objekt se zadaným ID (pouze pro režim Klasifikace objektů)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Vymazat všechny naučené objekty z HUSKYLENS (pouze pro režim Klasifikace objektů)',
+	HUSKYLENS_I2C_PIN_HINT: 'Zapojení: ',
+	HUSKYLENS_UART_PIN_HINT: 'Doporučené piny: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Jakýkoliv digitální pin',
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'Nastavení PWM ESP32',
 	ESP32_PWM_FREQUENCY: 'Frekvence',
