@@ -1,81 +1,39 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.4.0 → 1.5.0
-Modified Principles: None
+Version Change: 1.5.0 → 1.5.1
+Modified Principles:
+  - Principle X: Professional Release Management
+    * 強化雙語發布說明要求：每個段落必須同時包含繁體中文與英文內容
+    * 新增發布前雙語完整性驗證步驟
+    * 更新標題格式要求：包含中英文功能亮點
 Modified Sections: None
-Added Principles:
-  - Principle X: Professional Release Management (完整發布管理標準)
-    * 定義語意化版本、版本同步、VSIX 打包、雙語文件、GitHub Release 發布、資產管理、驗證步驟
-    * 提供 6 階段發布工作流檢查清單（預發布驗證、版本管理、建置打包、Git 標籤、GitHub Release 創建、發布後續）
-    * 強制雙語發布說明（繁體中文 + English），包含功能、測試指標、安裝方法、文件連結
-    * 使用 gh CLI 自動化發布流程，VSIX 託管於 GitHub Releases
-    * 涵蓋線上/離線安裝場景，支援企業內網與教育環境
+Added Principles: None
 Added Sections: None
 Removed Sections: None
 Templates Status:
-  ✅ plan-template.md - No updates needed (release process not part of feature planning)
-  ✅ spec-template.md - No updates needed (specification format unaffected)
-  ✅ tasks-template.md - No updates needed (task structure unaffected)
-  ✅ agent-file-template.md - No updates needed (internal template)
-  ✅ checklist-template.md - No updates needed (internal checklist)
-  ⚠️  .github/copilot-instructions.md - Potential enhancement recommended
-      * Consider adding "Release Management" section referencing Principle X
-      * Current "Common Pitfalls" could link to release workflow checklist
-      * No breaking changes, enhancement optional for consistency
+  ✅ All templates - No updates needed (internal principle clarification)
 Command Files Review:
-  ✅ .github/prompts/speckit.constitution.prompt.md - Reviewed (no updates needed)
-  ℹ️  No other command files found
-Change Summary (v1.5.0):
-  - Added Principle X: Professional Release Management with comprehensive workflow
-  - Defined mandatory components:
-    * Semantic versioning compliance (MAJOR.MINOR.PATCH)
-    * Version synchronization (package.json, CHANGELOG.md, git tags)
-    * VSIX packaging for offline installation
-    * Bilingual release notes (繁體中文 + English)
-    * GitHub Release publication via gh CLI
-    * Asset management (VSIX on GitHub Releases, excluded from repo)
-    * Verification steps (URL, asset, rendering checks)
-  - Provided 6-phase release workflow checklist:
-    1. Pre-Release Validation (PR merge, branch cleanup, test validation)
-    2. Version Management (package.json, CHANGELOG.md, commit)
-    3. Build and Package (npm run package, npx vsce package)
-    4. Git Tagging (annotated tags, push with --follow-tags)
-    5. GitHub Release Creation (gh release create, asset upload)
-    6. Post-Release (announcements, monitoring, documentation updates)
-  - Established bilingual documentation requirements:
-    * Major features with technical details
-    * Test metrics breakdown (unit/integration/manual/hardware)
-    * Internationalization status
-    * Multiple installation methods with step-by-step guides
-    * Related documentation links
-  - Enforced asset management best practices:
-    * VSIX hosted on GitHub Releases (not in repository)
-    * SHA256 verification for integrity
-    * .gitignore: *.vsix exclusion rule
-  - Benefits documented:
-    * User accessibility (offline installation for restricted networks)
-    * International reach (bilingual documentation)
-    * Distribution reliability (GitHub Releases)
-    * Quality assurance (structured checklist)
-    * Automation readiness (gh CLI workflow)
-    * Professional image (comprehensive release notes)
+  ✅ All command files - No updates needed
+Change Summary (v1.5.1):
+  - Clarified bilingual release notes requirements:
+    * Added CRITICAL warning: every section MUST have parallel bilingual content
+    * Updated title format to include both Chinese and English feature highlights
+    * Added pre-publish verification step to check bilingual completeness
+  - Lesson learned from v0.44.0 release (2025-11-25):
+    * Initial release notes were Chinese-only, missing English translations
+    * Required post-release edit via `gh release edit` to add English content
+    * This amendment prevents future monolingual releases
 Version Bump Rationale:
-  - MINOR version bump (1.4.0 → 1.5.0)
-  - New principle addition: Professional Release Management (Principle X)
-  - Materially expanded governance with release workflow standards
-  - Backward compatible (existing practices formalized, no breaking changes)
-  - Establishes repeatable, automated release process for future versions
-  - Aligns with project's educational mission and international accessibility goals
+  - PATCH version bump (1.5.0 → 1.5.1)
+  - Clarification of existing bilingual requirement, no new principles
+  - Backward compatible enhancement to release workflow
 Context:
-  - Based on v0.43.0 release experience (2025-01-22)
-  - Addresses offline installation requirements for enterprise/education environments
-  - Complements Principle IX (Traditional Chinese Documentation Standard) with bilingual release notes
-  - Formalizes ad-hoc tagging process into professional workflow
-  - Enables future CI/CD automation via gh CLI patterns
+  - Based on v0.44.0 release experience (2025-11-25)
+  - Addresses gap between stated bilingual requirement and actual enforcement
+  - Ensures future releases are truly bilingual from initial publication
 Follow-up TODOs:
-  - Consider adding "Release Management" section to .github/copilot-instructions.md (optional enhancement)
-  - No blocking issues, all templates validated
+  - None, amendment is self-contained
 -->
 
 # Singular Blockly Constitution
@@ -262,8 +220,9 @@ All version releases MUST follow a standardized, automated workflow with compreh
     -   Internationalization status (supported languages)
     -   Installation methods (multiple approaches with step-by-step guides)
     -   Related documentation links (specs, changelog, project home)
+    -   **⚠️ CRITICAL: Every section MUST have parallel bilingual content** - each heading, paragraph, and list item must present both languages side-by-side or in clearly labeled blocks (繁體中文 followed by English), not just Chinese-only content
 -   **GitHub Release Publication**: Use `gh release create` CLI to publish releases with:
-    -   Descriptive title format: `[Project Name] vX.Y.Z - [Feature Highlight]`
+    -   Descriptive title format: `[Project Name] vX.Y.Z - [Feature Highlight 中文] / [Feature Highlight English]`
     -   VSIX file as downloadable asset (with SHA256 for verification)
     -   Markdown-formatted release notes with emoji markers for readability
 -   **Asset Management**: Host VSIX on GitHub Releases (not in repository), exclude via `.gitignore: *.vsix`
@@ -302,8 +261,9 @@ All version releases MUST follow a standardized, automated workflow with compreh
 5. **GitHub Release Creation**:
 
     - Create bilingual release notes file (temporary, will be deleted)
+    - **⚠️ Pre-publish verification**: Review release notes to ensure EVERY section has both 繁體中文 AND English content - reject if any section is monolingual
     - Execute: `gh release create vX.Y.Z --title "..." --notes-file "release-notes.md" "*.vsix#Singular Blockly Extension Package"`
-    - Verify: Check release URL, asset availability, notes rendering
+    - Verify: Check release URL, asset availability, notes rendering, **bilingual completeness**
     - Cleanup: Remove temporary release notes file
 
 6. **Post-Release**:
@@ -475,4 +435,4 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.5.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-01-22
+**Version**: 1.5.1 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-11-25
