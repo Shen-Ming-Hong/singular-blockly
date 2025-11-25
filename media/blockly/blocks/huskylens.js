@@ -44,7 +44,7 @@ function getHuskyLensUARTPinInfo() {
 	if (pins) {
 		return pins;
 	}
-	return window.languageManager.getMessage('HUSKYLENS_UART_ANY_DIGITAL', 'Any digital pin');
+	return window.languageManager.getMessage('HUSKYLENS_UART_ANY_DIGITAL', '任意數位腳位');
 }
 
 // HUSKYLENS 初始化積木 (I2C)
@@ -58,7 +58,7 @@ Blockly.Blocks['huskylens_init_i2c'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(() => {
 			const baseMsg = window.languageManager.getMessage('HUSKYLENS_INIT_I2C_TOOLTIP', '使用 I2C 初始化 HUSKYLENS 智慧鏡頭');
-			const pinHint = window.languageManager.getMessage('HUSKYLENS_I2C_PIN_HINT', 'Wiring: ');
+			const pinHint = window.languageManager.getMessage('HUSKYLENS_I2C_PIN_HINT', '接線：');
 			const pinInfo = getHuskyLensI2CPinInfo();
 			return baseMsg + '\n' + pinHint + pinInfo;
 		});
@@ -101,7 +101,7 @@ Blockly.Blocks['huskylens_init_uart'] = {
 				'HUSKYLENS_INIT_UART_TOOLTIP',
 				'使用 UART 初始化 HUSKYLENS 智慧鏡頭，設定 RX/TX 腳位'
 			);
-			const pinHint = window.languageManager.getMessage('HUSKYLENS_UART_PIN_HINT', 'Recommended pins: ');
+			const pinHint = window.languageManager.getMessage('HUSKYLENS_UART_PIN_HINT', '建議腳位：');
 			const pinInfo = getHuskyLensUARTPinInfo();
 			return baseMsg + '\n' + pinHint + pinInfo;
 		});
