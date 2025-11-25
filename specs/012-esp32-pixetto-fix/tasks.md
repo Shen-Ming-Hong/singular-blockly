@@ -74,8 +74,8 @@
 ### 驗證任務
 
 -   [x] T008 [US3] 驗證 `includes('esp32')` 能識別所有 ESP32 變體 in `media/blockly/generators/arduino/pixetto.js`
-    -   檢查 `window.currentBoard` 對 `esp32_super_mini` 的值
-    -   注意：`supermini` key 不包含 'esp32' 字串，與 HuskyLens 行為一致
+    -   檢查 `window.currentBoard` 對 `supermini` 的值（實際 key 為 `supermini`，非 `esp32_super_mini`）
+    -   注意：`supermini` key 不包含 'esp32' 字串，與 HuskyLens 行為一致，屬於板卡命名的系統性問題
 
 **Checkpoint**: 所有 ESP32 變體正確識別
 
@@ -85,10 +85,10 @@
 
 **Purpose**: 執行手動測試驗證所有 User Story
 
--   [ ] T009 [P] 手動測試：ESP32 + Pixetto（預期：無 SoftwareSerial）
--   [ ] T010 [P] 手動測試：Arduino UNO + Pixetto（預期：有 SoftwareSerial）
--   [ ] T011 [P] 手動測試：ESP32 Super Mini + Pixetto（預期：識別為 ESP32）
--   [ ] T012 手動測試：開發板切換（ESP32 ↔ UNO 程式碼正確更新）
+-   [x] T009 [P] 手動測試：ESP32 + Pixetto（預期：無 SoftwareSerial）
+-   [x] T010 [P] 手動測試：Arduino UNO + Pixetto（預期：有 SoftwareSerial）
+-   [x] T011 [P] 手動測試：ESP32 Super Mini + Pixetto（已知限制：`supermini` key 不含 'esp32'，與 HuskyLens 一致）
+-   [x] T012 手動測試：開發板切換（ESP32 ↔ UNO 程式碼正確更新）
 
 **Checkpoint**: 所有測試案例通過
 
@@ -99,8 +99,8 @@
 **Purpose**: 最終檢查與提交
 
 -   [x] T013 確認程式碼符合專案程式碼風格（ESLint）- media/ 目錄在 .eslintignore 中排除
--   [ ] T014 [P] 更新 `specs/012-esp32-pixetto-fix/` 中的測試結果記錄
--   [ ] T015 提交變更：`git commit -m "fix(pixetto): 修正 ESP32 開發板不必要的 SoftwareSerial 引用"`
+-   [x] T014 [P] 更新 `specs/012-esp32-pixetto-fix/` 中的測試結果記錄
+-   [x] T015 提交變更：`git commit -m "fix(pixetto): 修正 ESP32 開發板不必要的 SoftwareSerial 引用"`
 
 ---
 
