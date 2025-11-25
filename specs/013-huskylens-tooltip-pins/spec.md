@@ -120,11 +120,11 @@
 
 -   Blockly 12.3.1 的 `setTooltip()` 方法支援函數參數（每次懸停時執行）- 已透過文件確認
 -   `window.currentBoard` 變數在 WebView 環境中可用且包含當前開發板識別碼，可能的值為：
-    - `'uno'` - Arduino Uno
-    - `'nano'` - Arduino Nano
-    - `'mega'` - Arduino Mega
-    - `'esp32'` - ESP32 DevKit
-    - `'supermini'` - ESP32-C3 Super Mini
+    -   `'uno'` - Arduino Uno
+    -   `'nano'` - Arduino Nano
+    -   `'mega'` - Arduino Mega
+    -   `'esp32'` - ESP32 DevKit
+    -   `'supermini'` - ESP32-C3 Super Mini
 -   現有的 `window.languageManager.getMessage()` 機制可用於取得國際化訊息
 
 ## 成功標準
