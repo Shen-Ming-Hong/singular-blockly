@@ -10,6 +10,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.44.0] - 2025-11-25
+
+### 新增 Added
+
+-   **HuskyLens 動態腳位提示** (HuskyLens Dynamic Pin Hints)
+    -   I2C 初始化區塊 tooltip 根據開發板顯示對應腳位資訊
+        I2C initialization block tooltip displays board-specific pin information
+        -   Uno/Nano: A4(SDA)/A5(SCL)
+        -   Mega: D20(SDA)/D21(SCL)
+        -   ESP32: GPIO21(SDA)/GPIO22(SCL)
+        -   Super Mini: GPIO8(SDA)/GPIO9(SCL)
+    -   UART 初始化區塊 tooltip 根據開發板顯示建議腳位
+        UART initialization block tooltip displays recommended pins per board
+        -   AVR 系列: 任意數位腳位 (Any digital pin)
+        -   ESP32: GPIO16(RX2)/GPIO17(TX2)
+        -   Super Mini: GPIO20(RX)/GPIO21(TX)
+    -   使用 Blockly 12.x 動態函數 tooltip 機制，切換開發板後自動更新
+        Uses Blockly 12.x dynamic function tooltip mechanism, auto-updates on board change
+
+### 變更 Changed
+
+-   更新 15 種語言翻譯以支援腳位提示功能
+    Updated translations for 15 languages to support pin hint feature
+    -   新增 i18n 鍵值：`HUSKYLENS_I2C_PIN_HINT`、`HUSKYLENS_UART_PIN_HINT`、`HUSKYLENS_UART_ANY_DIGITAL`
+        Added i18n keys: `HUSKYLENS_I2C_PIN_HINT`, `HUSKYLENS_UART_PIN_HINT`, `HUSKYLENS_UART_ANY_DIGITAL`
+
+### 修復 Fixed
+
+-   **Vision Sensors 工具箱間距一致性** (Vision Sensors Toolbox Spacing Consistency)
+    -   移除 `vision-sensors.json` 中 3 個多餘的 `sep` 分隔符
+        Removed 3 redundant `sep` separators in `vision-sensors.json`
+    -   保留 Pixetto 與 HuskyLens 群組之間的分隔
+        Preserved separator between Pixetto and HuskyLens groups
+    -   工具箱間距現與其他類別（Arduino、感測器、馬達）一致
+        Toolbox spacing now consistent with other categories (Arduino, Sensors, Motors)
+
+### 測試 Tests
+
+-   `npm run validate:i18n`: 14/14 語言 PASS，0 錯誤
+    `npm run validate:i18n`: 14/14 languages PASS, 0 errors
+-   `npm run lint`: 無錯誤
+    `npm run lint`: No errors
+-   `npm run compile`: 成功（4.2 秒）
+    `npm run compile`: Successful (4.2 seconds)
+
 ## [0.43.2] - 2025-11-25
 
 ### 修復 Fixed
