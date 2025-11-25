@@ -525,6 +525,9 @@ window.languageManager.loadMessages('ru', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Получить информацию об указанной стрелке (начало, конец или ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Позволить HUSKYLENS изучить объект с указанным ID (только для режима классификации объектов)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Очистить все изученные объекты из HUSKYLENS (только для режима классификации объектов)',
+	HUSKYLENS_I2C_PIN_HINT: 'Подключение: ',
+	HUSKYLENS_UART_PIN_HINT: 'Рекомендуемые пины: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Любой цифровой пин',
 
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'Настройка ШИМ ESP32',

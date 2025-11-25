@@ -523,6 +523,9 @@ window.languageManager.loadMessages('zh-hant', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '取得指定箭頭的資訊（起點、終點或 ID）',
 	HUSKYLENS_LEARN_TOOLTIP: '讓 HUSKYLENS 學習指定 ID 的物體（僅適用於物體分類模式）',
 	HUSKYLENS_FORGET_TOOLTIP: '清除 HUSKYLENS 所有學習的物體（僅適用於物體分類模式）',
+	HUSKYLENS_I2C_PIN_HINT: '接線：',
+	HUSKYLENS_UART_PIN_HINT: '建議腳位：',
+	HUSKYLENS_UART_ANY_DIGITAL: '任意數位腳位',
 
 	// ESP32 PWM 設定
 	ESP32_PWM_SETUP: 'ESP32 PWM 設定',

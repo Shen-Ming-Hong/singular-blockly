@@ -19,8 +19,8 @@
 
 **Purpose**: 專案結構確認與基礎設定
 
--   [ ] T001 確認功能分支 `013-huskylens-tooltip-pins` 已建立並切換
--   [ ] T002 [P] 執行 `npm run watch` 確認開發環境正常
+-   [x] T001 確認功能分支 `013-huskylens-tooltip-pins` 已建立並切換
+-   [x] T002 [P] 執行 `npm run watch` 確認開發環境正常
 
 ---
 
@@ -30,9 +30,9 @@
 
 **⚠️ 關鍵**: 此階段完成前不可開始任何使用者故事
 
--   [ ] T003 在 `media/blockly/blocks/huskylens.js` 頂部（版權聲明後）新增 `HUSKYLENS_PIN_INFO` 腳位對應表常數
--   [ ] T004 在 `media/blockly/blocks/huskylens.js` 新增 `getHuskyLensI2CPinInfo()` 輔助函數
--   [ ] T005 在 `media/blockly/blocks/huskylens.js` 新增 `getHuskyLensUARTPinInfo()` 輔助函數
+-   [x] T003 在 `media/blockly/blocks/huskylens.js` 頂部（版權聲明後）新增 `HUSKYLENS_PIN_INFO` 腳位對應表常數
+-   [x] T004 在 `media/blockly/blocks/huskylens.js` 新增 `getHuskyLensI2CPinInfo()` 輔助函數
+-   [x] T005 在 `media/blockly/blocks/huskylens.js` 新增 `getHuskyLensUARTPinInfo()` 輔助函數
 
 **Checkpoint**: 基礎函數就緒 - 可開始使用者故事實作
 
@@ -46,7 +46,7 @@
 
 ### Implementation for User Story 1
 
--   [ ] T006 [US1] 修改 `media/blockly/blocks/huskylens.js` 中 `huskylens_init_i2c` 區塊的 `setTooltip()` 從靜態字串改為動態函數
+-   [x] T006 [US1] 修改 `media/blockly/blocks/huskylens.js` 中 `huskylens_init_i2c` 區塊的 `setTooltip()` 從靜態字串改為動態函數
 
 **Checkpoint**: I2C 區塊 tooltip 應顯示動態腳位資訊（使用英文 fallback）
 
@@ -60,7 +60,7 @@
 
 ### Implementation for User Story 2
 
--   [ ] T007 [US2] 修改 `media/blockly/blocks/huskylens.js` 中 `huskylens_init_uart` 區塊的 `setTooltip()` 從靜態字串改為動態函數
+-   [x] T007 [US2] 修改 `media/blockly/blocks/huskylens.js` 中 `huskylens_init_uart` 區塊的 `setTooltip()` 從靜態字串改為動態函數
 
 **Checkpoint**: UART 區塊 tooltip 應顯示動態腳位建議（ESP32 顯示特定腳位，AVR 顯示「Any digital pin」）
 
@@ -74,22 +74,22 @@
 
 ### Implementation for User Story 3
 
--   [ ] T008 [P] [US3] 在 `media/locales/en/messages.js` 新增 `HUSKYLENS_I2C_PIN_HINT`、`HUSKYLENS_UART_PIN_HINT`、`HUSKYLENS_UART_ANY_DIGITAL` 鍵值
--   [ ] T009 [P] [US3] 在 `media/locales/zh-hant/messages.js` 新增對應的繁體中文翻譯
--   [ ] T010 [P] [US3] 在 `media/locales/ja/messages.js` 新增對應的日文翻譯
--   [ ] T011 [P] [US3] 在 `media/locales/ko/messages.js` 新增對應的韓文翻譯
--   [ ] T012 [P] [US3] 在 `media/locales/de/messages.js` 新增對應的德文翻譯
--   [ ] T013 [P] [US3] 在 `media/locales/fr/messages.js` 新增對應的法文翻譯
--   [ ] T014 [P] [US3] 在 `media/locales/es/messages.js` 新增對應的西班牙文翻譯
--   [ ] T015 [P] [US3] 在 `media/locales/it/messages.js` 新增對應的義大利文翻譯
--   [ ] T016 [P] [US3] 在 `media/locales/pt-br/messages.js` 新增對應的巴西葡萄牙文翻譯
--   [ ] T017 [P] [US3] 在 `media/locales/ru/messages.js` 新增對應的俄文翻譯
--   [ ] T018 [P] [US3] 在 `media/locales/pl/messages.js` 新增對應的波蘭文翻譯
--   [ ] T019 [P] [US3] 在 `media/locales/tr/messages.js` 新增對應的土耳其文翻譯
--   [ ] T020 [P] [US3] 在 `media/locales/hu/messages.js` 新增對應的匈牙利文翻譯
--   [ ] T021 [P] [US3] 在 `media/locales/bg/messages.js` 新增對應的保加利亞文翻譯
--   [ ] T022 [P] [US3] 在 `media/locales/cs/messages.js` 新增對應的捷克文翻譯
--   [ ] T023 [US3] 執行 `npm run validate:i18n` 確認所有翻譯鍵值一致
+-   [x] T008 [P] [US3] 在 `media/locales/en/messages.js` 新增 `HUSKYLENS_I2C_PIN_HINT`、`HUSKYLENS_UART_PIN_HINT`、`HUSKYLENS_UART_ANY_DIGITAL` 鍵值
+-   [x] T009 [P] [US3] 在 `media/locales/zh-hant/messages.js` 新增對應的繁體中文翻譯
+-   [x] T010 [P] [US3] 在 `media/locales/ja/messages.js` 新增對應的日文翻譯
+-   [x] T011 [P] [US3] 在 `media/locales/ko/messages.js` 新增對應的韓文翻譯
+-   [x] T012 [P] [US3] 在 `media/locales/de/messages.js` 新增對應的德文翻譯
+-   [x] T013 [P] [US3] 在 `media/locales/fr/messages.js` 新增對應的法文翻譯
+-   [x] T014 [P] [US3] 在 `media/locales/es/messages.js` 新增對應的西班牙文翻譯
+-   [x] T015 [P] [US3] 在 `media/locales/it/messages.js` 新增對應的義大利文翻譯
+-   [x] T016 [P] [US3] 在 `media/locales/pt-br/messages.js` 新增對應的巴西葡萄牙文翻譯
+-   [x] T017 [P] [US3] 在 `media/locales/ru/messages.js` 新增對應的俄文翻譯
+-   [x] T018 [P] [US3] 在 `media/locales/pl/messages.js` 新增對應的波蘭文翻譯
+-   [x] T019 [P] [US3] 在 `media/locales/tr/messages.js` 新增對應的土耳其文翻譯
+-   [x] T020 [P] [US3] 在 `media/locales/hu/messages.js` 新增對應的匈牙利文翻譯
+-   [x] T021 [P] [US3] 在 `media/locales/bg/messages.js` 新增對應的保加利亞文翻譯
+-   [x] T022 [P] [US3] 在 `media/locales/cs/messages.js` 新增對應的捷克文翻譯
+-   [x] T023 [US3] 執行 `npm run validate:i18n` 確認所有翻譯鍵值一致
 
 **Checkpoint**: 所有語言的 tooltip 應顯示對應語言的腳位提示
 
@@ -103,10 +103,10 @@
 
 ### Implementation for User Story 4
 
--   [ ] T024 [US4] 移除 `media/toolbox/categories/vision-sensors.json` 第 19 行附近的 sep（pixetto_set_mode 後）
--   [ ] T025 [US4] 移除 `media/toolbox/categories/vision-sensors.json` 第 115 行附近的 sep（huskylens_set_algorithm 後）
--   [ ] T026 [US4] 移除 `media/toolbox/categories/vision-sensors.json` 第 142 行附近的 sep（huskylens_get_arrow_info 後）
--   [ ] T027 [US4] 確認保留第 96 行附近的 sep（Pixetto 與 HuskyLens 群組分隔）
+-   [x] T024 [US4] 移除 `media/toolbox/categories/vision-sensors.json` 第 19 行附近的 sep（pixetto_set_mode 後）
+-   [x] T025 [US4] 移除 `media/toolbox/categories/vision-sensors.json` 第 115 行附近的 sep（huskylens_set_algorithm 後）
+-   [x] T026 [US4] 移除 `media/toolbox/categories/vision-sensors.json` 第 142 行附近的 sep（huskylens_get_arrow_info 後）
+-   [x] T027 [US4] 確認保留第 96 行附近的 sep（Pixetto 與 HuskyLens 群組分隔）
 
 **Checkpoint**: vision-sensors 工具箱間距應與其他類別一致
 
@@ -116,10 +116,10 @@
 
 **Purpose**: 最終驗收與清理
 
--   [ ] T028 執行 quickstart.md 驗收檢查清單完整測試
--   [ ] T029 [P] 確認 `npm run lint` 無錯誤
--   [ ] T030 [P] 確認 `npm run compile` 成功
--   [ ] T031 更新 spec.md 狀態從「草稿」改為「已完成」
+-   [x] T028 執行 quickstart.md 驗收檢查清單完整測試
+-   [x] T029 [P] 確認 `npm run lint` 無錯誤
+-   [x] T030 [P] 確認 `npm run compile` 成功
+-   [x] T031 更新 spec.md 狀態從「草稿」改為「已完成」
 
 ---
 

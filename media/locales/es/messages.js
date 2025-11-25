@@ -528,6 +528,9 @@ window.languageManager.loadMessages('es', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Obtener información de flecha especificada (origen, destino o ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Hacer que HUSKYLENS aprenda objeto con ID especificado (solo modo clasificación de objeto)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Borrar todos los objetos aprendidos por HUSKYLENS (solo modo clasificación de objeto)',
+	HUSKYLENS_I2C_PIN_HINT: 'Cableado: ',
+	HUSKYLENS_UART_PIN_HINT: 'Pines recomendados: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Cualquier pin digital',
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'Configuración PWM ESP32',
 	ESP32_PWM_FREQUENCY: 'Frecuencia',

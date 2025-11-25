@@ -524,6 +524,9 @@ window.languageManager.loadMessages('bg', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Получаване на информация за определена стрелка (начало, цел или ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Нека HUSKYLENS научи обект с определен ID (само за режим Класификация на обекти)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Изчистване на всички научени обекти от HUSKYLENS (само за режим Класификация на обекти)',
+	HUSKYLENS_I2C_PIN_HINT: 'Окабеляване: ',
+	HUSKYLENS_UART_PIN_HINT: 'Препоръчителни пинове: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Всеки цифров пин',
 
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'Настройка на ESP32 PWM',

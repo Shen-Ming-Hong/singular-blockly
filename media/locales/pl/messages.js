@@ -524,6 +524,9 @@ window.languageManager.loadMessages('pl', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Pobierz informacje o określonej strzałce (początek, cel lub ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'Pozwól HUSKYLENS nauczyć się obiektu o określonym ID (tylko dla trybu Klasyfikacji Obiektów)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Wyczyść wszystkie wyuczone obiekty z HUSKYLENS (tylko dla trybu Klasyfikacji Obiektów)',
+	HUSKYLENS_I2C_PIN_HINT: 'Okablowanie: ',
+	HUSKYLENS_UART_PIN_HINT: 'Zalecane piny: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Dowolny pin cyfrowy',
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'Konfiguracja PWM ESP32',
 	ESP32_PWM_FREQUENCY: 'Częstotliwość',

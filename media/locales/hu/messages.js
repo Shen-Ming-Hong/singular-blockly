@@ -524,6 +524,9 @@ window.languageManager.loadMessages('hu', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Meghatározott nyíl információjának megszerzése (eredet, cél vagy ID)',
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENS tanítása meghatározott ID-val (csak Objektumosztályozás módban)',
 	HUSKYLENS_FORGET_TOOLTIP: 'Minden tanult objektum törlése a HUSKYLENS-ből (csak Objektumosztályozás módban)',
+	HUSKYLENS_I2C_PIN_HINT: 'Bekötés: ',
+	HUSKYLENS_UART_PIN_HINT: 'Ajánlott pinek: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Bármely digitális pin',
 
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'ESP32 PWM Beállítás',

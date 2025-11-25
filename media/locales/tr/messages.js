@@ -524,6 +524,9 @@ window.languageManager.loadMessages('tr', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: 'Belirtilen okun bilgilerini al (başlangıç, hedef veya ID)',
 	HUSKYLENS_LEARN_TOOLTIP: "HUSKYLENS'i belirtilen ID'ye sahip nesneyi öğrenmeye zorla (sadece Nesne Sınıflandırma modunda)",
 	HUSKYLENS_FORGET_TOOLTIP: "HUSKYLENS'ten tüm öğrenilmiş nesneleri temizle (sadece Nesne Sınıflandırma modunda)",
+	HUSKYLENS_I2C_PIN_HINT: 'Kablolama: ',
+	HUSKYLENS_UART_PIN_HINT: 'Önerilen pinler: ',
+	HUSKYLENS_UART_ANY_DIGITAL: 'Herhangi bir dijital pin',
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'ESP32 PWM Ayarı',
 	ESP32_PWM_FREQUENCY: 'Frekans',

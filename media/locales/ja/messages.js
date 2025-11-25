@@ -527,6 +527,9 @@ window.languageManager.loadMessages('ja', {
 	HUSKYLENS_GET_ARROW_INFO_TOOLTIP: '指定された矢印の情報（始点、終点、またはID）を取得',
 	HUSKYLENS_LEARN_TOOLTIP: 'HUSKYLENSに指定IDのオブジェクトを学習させる（オブジェクト分類モードのみ）',
 	HUSKYLENS_FORGET_TOOLTIP: 'HUSKYLENS の全ての学習済みオブジェクトを削除（オブジェクト分類モードのみ）',
+	HUSKYLENS_I2C_PIN_HINT: '配線：',
+	HUSKYLENS_UART_PIN_HINT: '推奨ピン：',
+	HUSKYLENS_UART_ANY_DIGITAL: '任意のデジタルピン',
 	// ESP32 PWM Setup
 	ESP32_PWM_SETUP: 'ESP32 PWM設定',
 	ESP32_PWM_FREQUENCY: '周波数',

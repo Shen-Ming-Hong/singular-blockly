@@ -2,7 +2,7 @@
 
 **功能分支**: `013-huskylens-tooltip-pins`  
 **建立日期**: 2025-11-25  
-**狀態**: 草稿  
+**狀態**: 已完成  
 **輸入描述**: 為 HuskyLens I2C/UART 初始化區塊新增動態腳位提示 tooltip，根據選擇的開發板（ESP32、Uno、Mega 等）顯示對應的接線建議，並修復 vision-sensors 工具箱的視覺間距不一致問題
 
 ## 背景與動機
