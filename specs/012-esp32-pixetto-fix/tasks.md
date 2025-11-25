@@ -24,8 +24,8 @@
 
 **Purpose**: 確認開發環境和參考範本
 
--   [ ] T001 確認功能分支 `012-esp32-pixetto-fix` 已切換
--   [ ] T002 檢視 `media/blockly/generators/arduino/huskylens.js` 第 183-216 行作為參考範本
+-   [x] T001 確認功能分支 `012-esp32-pixetto-fix` 已切換
+-   [x] T002 檢視 `media/blockly/generators/arduino/huskylens.js` 第 183-216 行作為參考範本
 
 **Checkpoint**: 開發環境就緒，參考範本已理解
 
@@ -39,24 +39,24 @@
 
 ### 實作任務
 
--   [ ] T004 [US1/US2] 在 `pixetto_init` 函數開頭新增開發板類型檢測邏輯 in `media/blockly/generators/arduino/pixetto.js`
+-   [x] T004 [US1/US2] 在 `pixetto_init` 函數開頭新增開發板類型檢測邏輯 in `media/blockly/generators/arduino/pixetto.js`
 
     ```javascript
     const currentBoard = window.currentBoard || 'uno';
     const isESP32 = currentBoard.includes('esp32');
     ```
 
--   [ ] T005 [US1/US2] 修改 SoftwareSerial include 邏輯為條件判斷 in `media/blockly/generators/arduino/pixetto.js`
+-   [x] T005 [US1/US2] 修改 SoftwareSerial include 邏輯為條件判斷 in `media/blockly/generators/arduino/pixetto.js`
 
     -   ESP32: 不添加 `#include <SoftwareSerial.h>`
     -   AVR: 維持添加 SoftwareSerial
 
--   [ ] T006 [US1/US2] 修改 build_flags 邏輯為條件判斷 in `media/blockly/generators/arduino/pixetto.js`
+-   [x] T006 [US1/US2] 修改 build_flags 邏輯為條件判斷 in `media/blockly/generators/arduino/pixetto.js`
 
     -   ESP32: 不添加 AVR 專用 `-I"$PROJECT_PACKAGES_DIR/framework-arduino-avr/..."`
     -   AVR: 維持添加 build_flags
 
--   [ ] T007 [US1/US2] 更新變數宣告區塊的註解，標明開發板類型 in `media/blockly/generators/arduino/pixetto.js`
+-   [x] T007 [US1/US2] 更新變數宣告區塊的註解，標明開發板類型 in `media/blockly/generators/arduino/pixetto.js`
     ```javascript
     const boardComment = isESP32 ? '// ESP32 使用硬體 Serial2' : '// Arduino AVR 使用 SoftwareSerial';
     ```
@@ -73,8 +73,9 @@
 
 ### 驗證任務
 
--   [ ] T008 [US3] 驗證 `includes('esp32')` 能識別所有 ESP32 變體 in `media/blockly/generators/arduino/pixetto.js`
+-   [x] T008 [US3] 驗證 `includes('esp32')` 能識別所有 ESP32 變體 in `media/blockly/generators/arduino/pixetto.js`
     -   檢查 `window.currentBoard` 對 `esp32_super_mini` 的值
+    -   注意：`supermini` key 不包含 'esp32' 字串，與 HuskyLens 行為一致
 
 **Checkpoint**: 所有 ESP32 變體正確識別
 
@@ -97,7 +98,7 @@
 
 **Purpose**: 最終檢查與提交
 
--   [ ] T013 確認程式碼符合專案程式碼風格（ESLint）
+-   [x] T013 確認程式碼符合專案程式碼風格（ESLint）- media/ 目錄在 .eslintignore 中排除
 -   [ ] T014 [P] 更新 `specs/012-esp32-pixetto-fix/` 中的測試結果記錄
 -   [ ] T015 提交變更：`git commit -m "fix(pixetto): 修正 ESP32 開發板不必要的 SoftwareSerial 引用"`
 

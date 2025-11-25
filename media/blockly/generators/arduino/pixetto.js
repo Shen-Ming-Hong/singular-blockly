@@ -51,9 +51,17 @@ window.arduinoGenerator.forBlock['pixetto_init'] = function (block) {
 		const txPin = block.getFieldValue('TX_PIN');
 		log.info(`pixetto_init: 設定 Pixetto 智慧鏡頭，RX=${rxPin}, TX=${txPin}`);
 
-		// 添加 Pixetto 相關函式庫
+		// 檢測開發板類型（參照 huskylens.js 實作模式）
+		const currentBoard = window.currentBoard || 'uno';
+		const isESP32 = currentBoard.includes('esp32');
+
+		// 添加 Pixetto 函式庫
 		window.arduinoGenerator.includes_['pixetto'] = '#include <Pixetto.h>';
-		window.arduinoGenerator.includes_['softwareserial'] = '#include <SoftwareSerial.h>';
+
+		// Arduino AVR 使用 SoftwareSerial，ESP32 使用 HardwareSerial（庫內部處理）
+		if (!isESP32) {
+			window.arduinoGenerator.includes_['softwareserial'] = '#include <SoftwareSerial.h>';
+		}
 
 		// 在 lib_deps 中添加 Pixetto 庫
 		if (!window.arduinoGenerator.lib_deps_) {
@@ -63,21 +71,24 @@ window.arduinoGenerator.forBlock['pixetto_init'] = function (block) {
 			window.arduinoGenerator.lib_deps_.push('pixetto/Pixetto@^1.6.6');
 		}
 
-		// 添加 Pixetto 所需的 build_flags
-		if (!window.arduinoGenerator.build_flags_) {
-			window.arduinoGenerator.build_flags_ = [];
-		}
-		const pixettoBuildFlag = '-I"$PROJECT_PACKAGES_DIR/framework-arduino-avr/libraries/SoftwareSerial/src"';
-		if (!window.arduinoGenerator.build_flags_.includes(pixettoBuildFlag)) {
-			window.arduinoGenerator.build_flags_.push(pixettoBuildFlag);
+		// 添加 Pixetto 所需的 build_flags（僅 AVR 需要）
+		if (!isESP32) {
+			if (!window.arduinoGenerator.build_flags_) {
+				window.arduinoGenerator.build_flags_ = [];
+			}
+			const pixettoBuildFlag = '-I"$PROJECT_PACKAGES_DIR/framework-arduino-avr/libraries/SoftwareSerial/src"';
+			if (!window.arduinoGenerator.build_flags_.includes(pixettoBuildFlag)) {
+				window.arduinoGenerator.build_flags_.push(pixettoBuildFlag);
+			}
 		}
 
 		// 設定 lib_ldf_mode
 		window.arduinoGenerator.lib_ldf_mode_ = 'deep+';
 
-		// 定義全域變數
+		// 定義全域變數（標明開發板類型）
+		const boardComment = isESP32 ? '// ESP32 使用硬體 Serial2' : '// Arduino AVR 使用 SoftwareSerial';
 		window.arduinoGenerator.variables_['pixetto_vars'] = `
-// Pixetto 智慧鏡頭變數
+${boardComment}
 Pixetto pixetto(${rxPin}, ${txPin});  // 建立 Pixetto 物件，設定 RX 和 TX 腳位
 `;
 		// 在 setup() 函數中初始化
