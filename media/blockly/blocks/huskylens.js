@@ -106,9 +106,6 @@ Blockly.Blocks['huskylens_init_uart'] = {
 			return baseMsg + '\n' + pinHint + pinInfo;
 		});
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('huskylens_init_uart');
 	},
 };
 
@@ -159,9 +156,6 @@ Blockly.Blocks['huskylens_request'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_REQUEST_TOOLTIP', '從 HUSKYLENS 請求最新的辨識結果'));
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('huskylens_request');
 	},
 };
 
@@ -191,9 +185,6 @@ Blockly.Blocks['huskylens_count_blocks'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_COUNT_BLOCKS_TOOLTIP', '取得 HUSKYLENS 偵測到的方塊數量'));
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('huskylens_count_blocks');
 	},
 };
 
@@ -220,9 +211,6 @@ Blockly.Blocks['huskylens_get_block_info'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_INFO_TOOLTIP', '取得指定方塊的資訊（位置、大小或 ID）'));
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('huskylens_get_block_info');
 	},
 };
 

@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.44.1] - 2025-11-26
+
+### 變更 Changed
+
+-   **視覺感測器積木正式化** (Vision Sensor Blocks Graduation)
+    -   將 8 個已測試完成的 Pixetto 與 HUSKYLENS 積木從實驗階段移除
+        Graduated 8 tested Pixetto and HUSKYLENS blocks from experimental status
+    -   Pixetto 正式積木：初始化、偵測到物體、取得偵測類型 ID、獲取偵測物體座標
+        Pixetto graduated blocks: init, is_detected, get_type_id, get_position
+    -   HUSKYLENS 正式積木：UART 初始化、請求辨識結果、偵測到的方塊數量、取得方塊資訊
+        HUSKYLENS graduated blocks: init_uart, request, count_blocks, get_block_info
+    -   其餘視覺感測器積木維持實驗階段標記
+        Remaining vision sensor blocks retain experimental status
+
 ## [0.44.0] - 2025-11-25
 
 ### 新增 Added

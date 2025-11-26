@@ -33,9 +33,6 @@ Blockly.Blocks['pixetto_init'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('PIXETTO_INIT_TOOLTIP', '初始化 Pixetto 智慧鏡頭，設定 UART 通訊腳位'));
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('pixetto_init');
 	},
 };
 
@@ -49,9 +46,6 @@ Blockly.Blocks['pixetto_is_detected'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('PIXETTO_IS_DETECTED_TOOLTIP', '檢測 Pixetto 是否偵測到任何物體'));
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('pixetto_is_detected');
 	},
 };
 
@@ -65,9 +59,6 @@ Blockly.Blocks['pixetto_get_type_id'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('PIXETTO_GET_TYPE_ID_TOOLTIP', '取得 Pixetto 偵測到的物體類型 ID'));
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('pixetto_get_type_id');
 	},
 };
 
@@ -242,9 +233,6 @@ Blockly.Blocks['pixetto_get_position'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('PIXETTO_GET_POSITION_TOOLTIP', '獲取 Pixetto 偵測到的物體位置或尺寸資訊'));
 		this.setHelpUrl('');
-
-		// 標記為實驗積木
-		window.potentialExperimentalBlocks.push('pixetto_get_position');
 	},
 };
 
