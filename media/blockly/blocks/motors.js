@@ -34,8 +34,8 @@ Blockly.Blocks['servo_move'] = {
 			.appendField(window.languageManager.getMessage('SERVO_MOVE'))
 			.appendField(
 				new Blockly.FieldDropdown(() => {
-					// 取得工作區
-					const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+					const workspace = this.workspace || Blockly.getMainWorkspace();
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myServo');
 						return [['myServo', 'myServo']];
@@ -128,8 +128,8 @@ Blockly.Blocks['servo_stop'] = {
 			.appendField(window.languageManager.getMessage('SERVO_STOP'))
 			.appendField(
 				new Blockly.FieldDropdown(() => {
-					// 取得工作區
-					const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+					const workspace = this.workspace || Blockly.getMainWorkspace();
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myServo');
 						return [['myServo', 'myServo']];
@@ -313,6 +313,37 @@ Blockly.Blocks['encoder_setup'] = {
 		// 更新引腳下拉選單
 		this.updatePinDropdowns();
 	},
+
+	// ========== JSON 序列化 hooks（Blockly 12.x 優先使用）==========
+
+	/**
+	 * 保存積木的額外狀態到 JSON
+	 * @returns {Object} 可 JSON 序列化的狀態物件
+	 */
+	saveExtraState: function () {
+		return {
+			useInterrupt: this.useInterruptPins_,
+		};
+	},
+
+	/**
+	 * 從 JSON 還原積木的額外狀態
+	 * @param {Object} state - 之前由 saveExtraState 返回的狀態物件
+	 */
+	loadExtraState: function (state) {
+		if (state && typeof state.useInterrupt === 'boolean') {
+			this.useInterruptPins_ = state.useInterrupt;
+
+			// 設定勾選框狀態
+			const field = this.getField('USE_INTERRUPT');
+			if (field) {
+				field.setValue(state.useInterrupt ? 'TRUE' : 'FALSE');
+			}
+
+			// 更新引腳下拉選單
+			this.updatePinDropdowns();
+		}
+	},
 };
 
 // 新增讀取編碼馬達位置積木
@@ -325,8 +356,8 @@ Blockly.Blocks['encoder_read'] = {
 			.appendField(window.languageManager.getMessage('ENCODER_READ'))
 			.appendField(
 				new Blockly.FieldDropdown(() => {
-					// 取得工作區
-					const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+					const workspace = this.workspace || Blockly.getMainWorkspace();
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myEncoder');
 						return [['myEncoder', 'myEncoder']];
@@ -403,6 +434,32 @@ Blockly.Blocks['encoder_read'] = {
 			log.warn('encoder_read: 變異資料中沒有找到編碼馬達名稱');
 		}
 	},
+
+	// ========== JSON 序列化 hooks（Blockly 12.x 優先使用）==========
+
+	/**
+	 * 保存積木的額外狀態到 JSON
+	 * @returns {Object} 可 JSON 序列化的狀態物件
+	 */
+	saveExtraState: function () {
+		return {
+			encoder: this.getFieldValue('VAR') || 'myEncoder',
+		};
+	},
+
+	/**
+	 * 從 JSON 還原積木的額外狀態
+	 * @param {Object} state - 之前由 saveExtraState 返回的狀態物件
+	 */
+	loadExtraState: function (state) {
+		if (state && state.encoder) {
+			this.restoredEncoderValue = state.encoder;
+			const field = this.getField('VAR');
+			if (field) {
+				field.setValue(state.encoder);
+			}
+		}
+	},
 };
 
 // 新增重設編碼馬達積木
@@ -415,8 +472,8 @@ Blockly.Blocks['encoder_reset'] = {
 			.appendField(window.languageManager.getMessage('ENCODER_RESET'))
 			.appendField(
 				new Blockly.FieldDropdown(() => {
-					// 取得工作區
-					const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+					const workspace = this.workspace || Blockly.getMainWorkspace();
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myEncoder');
 						return [['myEncoder', 'myEncoder']];
@@ -494,6 +551,32 @@ Blockly.Blocks['encoder_reset'] = {
 			log.warn('encoder_reset: 變異資料中沒有找到編碼馬達名稱');
 		}
 	},
+
+	// ========== JSON 序列化 hooks（Blockly 12.x 優先使用）==========
+
+	/**
+	 * 保存積木的額外狀態到 JSON
+	 * @returns {Object} 可 JSON 序列化的狀態物件
+	 */
+	saveExtraState: function () {
+		return {
+			encoder: this.getFieldValue('VAR') || 'myEncoder',
+		};
+	},
+
+	/**
+	 * 從 JSON 還原積木的額外狀態
+	 * @param {Object} state - 之前由 saveExtraState 返回的狀態物件
+	 */
+	loadExtraState: function (state) {
+		if (state && state.encoder) {
+			this.restoredEncoderValue = state.encoder;
+			const field = this.getField('VAR');
+			if (field) {
+				field.setValue(state.encoder);
+			}
+		}
+	},
 };
 
 // 新增PID控制器設定積木
@@ -508,8 +591,8 @@ Blockly.Blocks['encoder_pid_setup'] = {
 			.appendField(window.languageManager.getMessage('ENCODER_PID_MOTOR'))
 			.appendField(
 				new Blockly.FieldDropdown(() => {
-					// 取得工作區
-					const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+					const workspace = this.workspace || Blockly.getMainWorkspace();
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myEncoder');
 						return [['myEncoder', 'myEncoder']];
@@ -594,6 +677,32 @@ Blockly.Blocks['encoder_pid_setup'] = {
 			log.warn('encoder_pid_setup: 變異資料中沒有找到編碼馬達名稱');
 		}
 	},
+
+	// ========== JSON 序列化 hooks（Blockly 12.x 優先使用）==========
+
+	/**
+	 * 保存積木的額外狀態到 JSON
+	 * @returns {Object} 可 JSON 序列化的狀態物件
+	 */
+	saveExtraState: function () {
+		return {
+			encoder: this.getFieldValue('VAR') || 'myEncoder',
+		};
+	},
+
+	/**
+	 * 從 JSON 還原積木的額外狀態
+	 * @param {Object} state - 之前由 saveExtraState 返回的狀態物件
+	 */
+	loadExtraState: function (state) {
+		if (state && state.encoder) {
+			this.restoredEncoderValue = state.encoder;
+			const field = this.getField('VAR');
+			if (field) {
+				field.setValue(state.encoder);
+			}
+		}
+	},
 };
 
 // 新增計算PID積木
@@ -606,8 +715,8 @@ Blockly.Blocks['encoder_pid_compute'] = {
 			.appendField(window.languageManager.getMessage('ENCODER_PID_COMPUTE'))
 			.appendField(
 				new Blockly.FieldDropdown(() => {
-					// 取得工作區
-					const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+					const workspace = this.workspace || Blockly.getMainWorkspace();
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myPID');
 						return [['myPID', 'myPID']];
@@ -683,6 +792,32 @@ Blockly.Blocks['encoder_pid_compute'] = {
 			this.getField('PID_VAR').setValue(pid);
 		} else {
 			log.warn('encoder_pid_compute: 變異資料中沒有找到PID名稱');
+		}
+	},
+
+	// ========== JSON 序列化 hooks（Blockly 12.x 優先使用）==========
+
+	/**
+	 * 保存積木的額外狀態到 JSON
+	 * @returns {Object} 可 JSON 序列化的狀態物件
+	 */
+	saveExtraState: function () {
+		return {
+			pid: this.getFieldValue('PID_VAR') || 'myPID',
+		};
+	},
+
+	/**
+	 * 從 JSON 還原積木的額外狀態
+	 * @param {Object} state - 之前由 saveExtraState 返回的狀態物件
+	 */
+	loadExtraState: function (state) {
+		if (state && state.pid) {
+			this.restoredPIDValue = state.pid;
+			const field = this.getField('PID_VAR');
+			if (field) {
+				field.setValue(state.pid);
+			}
 		}
 	},
 };

@@ -272,6 +272,7 @@ window.arduinoGenerator.preCheckWorkspace = function (workspace) {
 
 // 運算子優先順序常數定義
 window.arduinoGenerator.ORDER_ATOMIC = 0; // 0 "" ...
+window.arduinoGenerator.ORDER_FUNCTION_CALL = 0; // func() - 函數呼叫優先級最高
 window.arduinoGenerator.ORDER_UNARY_POSTFIX = 1; // expr++ expr--
 window.arduinoGenerator.ORDER_UNARY_PREFIX = 2; // -expr !expr
 window.arduinoGenerator.ORDER_MULTIPLICATIVE = 3; // * / %
@@ -287,3 +288,24 @@ window.arduinoGenerator.ORDER_LOGICAL_OR = 12; // ||
 window.arduinoGenerator.ORDER_CONDITIONAL = 13; // ?:
 window.arduinoGenerator.ORDER_ASSIGNMENT = 14; // = += -= *= /=
 window.arduinoGenerator.ORDER_NONE = 99; // ()
+
+/**
+ * 處理獨立的 value block（naked value）
+ * 在 Arduino C++ 中，裸露的表達式（如 myEncoder.getCount()）是無效語法。
+ * 此方法將這些裸露表達式轉為註釋，保留除錯資訊同時避免編譯錯誤。
+ *
+ * @param {string} line - 由獨立 value block 生成的程式碼
+ * @returns {string} 轉為註釋的程式碼
+ */
+window.arduinoGenerator.scrubNakedValue = function (line) {
+	// 移除首尾空白
+	const trimmed = line.trim();
+
+	// 如果是空行，直接返回空字串
+	if (!trimmed) {
+		return '';
+	}
+
+	// 將裸露表達式轉為註釋
+	return '// 未連接的表達式: ' + trimmed + '\n';
+};
