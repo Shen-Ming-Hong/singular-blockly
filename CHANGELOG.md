@@ -10,6 +10,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.45.0] - 2025-12-11
+
+### 新增 Added
+
+-   **Encoder 積木 JSON 序列化修復** (Encoder Block JSON Serialization Fix)
+
+    -   為 5 個 encoder 積木新增 `saveExtraState`/`loadExtraState` JSON hooks
+        Added `saveExtraState`/`loadExtraState` JSON hooks for 5 encoder blocks
+    -   修復 Blockly 12.x 中積木連接關係在保存/載入後遺失的問題
+        Fixed block connection loss after save/load in Blockly 12.x
+    -   影響積木：`encoder_setup`、`encoder_read`、`encoder_reset`、`encoder_pid_setup`、`encoder_pid_compute`
+        Affected blocks: `encoder_setup`, `encoder_read`, `encoder_reset`, `encoder_pid_setup`, `encoder_pid_compute`
+
+-   **裸露表達式防護機制** (Naked Value Expression Protection)
+    -   新增 `arduinoGenerator.scrubNakedValue` 方法
+        Added `arduinoGenerator.scrubNakedValue` method
+    -   將獨立放置的 value block 轉為註釋，避免 Arduino C++ 編譯錯誤
+        Converts standalone value blocks to comments, preventing Arduino C++ compilation errors
+    -   例如：`myEncoder.getCount();` → `// 未連接的表達式: myEncoder.getCount()`
+        Example: `myEncoder.getCount();` → `// 未連接的表達式: myEncoder.getCount()`
+
+### 修復 Fixed
+
+-   **FieldDropdown 箭頭函數參考問題** (FieldDropdown Arrow Function Reference Issue)
+
+    -   修復 7 處 `this.sourceBlock_` 在箭頭函數中為 undefined 的問題
+        Fixed 7 instances of `this.sourceBlock_` being undefined in arrow functions
+    -   改用 `this.workspace || Blockly.getMainWorkspace()` 取得工作區
+        Changed to use `this.workspace || Blockly.getMainWorkspace()` for workspace access
+    -   影響檔案：`motors.js`（6 處）、`arduino.js`（1 處）
+        Affected files: `motors.js` (6 places), `arduino.js` (1 place)
+
+-   **ORDER_FUNCTION_CALL 常數遺漏** (ORDER_FUNCTION_CALL Constant Missing)
+    -   補充 `arduinoGenerator.ORDER_FUNCTION_CALL` 常數定義
+        Added `arduinoGenerator.ORDER_FUNCTION_CALL` constant definition
+    -   解決 "Expecting valid order from value block" 錯誤
+        Fixed "Expecting valid order from value block" error
+
+### 維護 Maintenance
+
+-   新增完整規格文件 `specs/014-block-serialization-fix/`
+    Added complete specification documents in `specs/014-block-serialization-fix/`
+
+### 測試 Tests
+
+-   手動測試：encoder_read 連接 text_print 後保存/載入，連接關係正確保持
+    Manual test: encoder_read connected to text_print saves/loads with connection preserved
+-   手動測試：程式碼生成正確產生 `Serial.println(myEncoder.getCount());`
+    Manual test: Code generation correctly produces `Serial.println(myEncoder.getCount());`
+-   手動測試：獨立放置的 encoder_read 生成註釋而非裸露表達式
+    Manual test: Standalone encoder_read generates comment instead of naked expression
+
 ## [0.44.1] - 2025-11-26
 
 ### 變更 Changed
