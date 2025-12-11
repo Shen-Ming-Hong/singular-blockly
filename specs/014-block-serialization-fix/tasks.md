@@ -81,19 +81,21 @@
 
 -   [ ] T016 [US1] 手動測試：建立 `encoder_setup` + `encoder_read` 連接到 `text_print` 的積木組合，保存後重新載入，確認連接關係正確保持
 -   [ ] T017 [US1] 手動測試：檢查生成的程式碼，確認 `myEncoder.getCount()` 出現在正確的上下文中（如 `Serial.println()`）
--   [ ] T018 [US1] 手動測試：載入舊版 `main.json`（只有 XML extraState），確認 encoder 積木狀態正確還原（向後相容）
+-   [ ] T018 [US1] 手動測試：載入舊版 `main.json`（只有 XML extraState 或混合 JSON/XML 格式），確認 encoder 積木狀態正確還原（向後相容與混合序列化）
 
 **Checkpoint**: 所有 5 個 encoder 積木的 JSON 序列化已修復，連接關係在保存/載入後正確保持
 
 ---
 
-## Phase 4: User Story 2 - 裸露表達式防護機制 (Priority: P1)
+## Phase 4: User Story 2 - 裸露表達式防護機制驗證 (Priority: P1)
 
-**Goal**: 確保獨立的 value block 不會產生裸露表達式，避免編譯錯誤
+**Goal**: 驗證 Phase 2 實作的 `scrubNakedValue` 防護機制正確運作，確保獨立的 value block 不會產生裸露表達式
+
+**Note**: 實作已在 Phase 2 (T004) 完成，本階段專注於驗證測試
 
 **Independent Test**: 故意將 value block 獨立放置 → 生成程式碼 → 確認無裸露表達式
 
-### Implementation for User Story 2
+### Verification for User Story 2
 
 -   [ ] T019 [US2] 手動測試：故意將 `encoder_read` 獨立放置（不連接到任何積木），確認生成的程式碼為 `// 未連接的表達式: myEncoder.getCount()` 而非裸露表達式
 -   [ ] T020 [US2] 手動測試：獨立放置 `math_number` 積木，確認該數字不會作為裸露表達式出現在程式碼中

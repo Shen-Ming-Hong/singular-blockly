@@ -152,6 +152,41 @@ window.arduinoGenerator.scrubNakedValue = function (line) {
     - 載入該檔案
     - ✅ 驗證：積木狀態正確還原
 
+#### 如何建立舊版 main.json 測試檔案
+
+**方法 1：手動建立**
+
+在 `{workspace}/blockly/` 目錄下建立 `main.json`，使用以下結構（模擬只有 XML extraState 的舊格式）：
+
+```json
+{
+	"blocks": {
+		"languageVersion": 0,
+		"blocks": [
+			{
+				"type": "encoder_read",
+				"id": "test_block_1",
+				"x": 100,
+				"y": 100,
+				"fields": {
+					"VAR": "myEncoder"
+				}
+			}
+		]
+	}
+}
+```
+
+**方法 2：從現有專案取得**
+
+1. 使用修復前的版本建立包含 encoder 積木的工作區
+2. 保存專案，複製 `blockly/main.json`
+3. 此檔案將只有 XML mutation 格式（無 `extraState` 欄位）
+
+**方法 3：混合格式測試**
+
+建立同時包含有 `extraState` 和無 `extraState` 積木的檔案，驗證系統能正確處理混合情況
+
 ### 自動測試（可選）
 
 如需添加單元測試，建立 `src/test/serialization.test.ts`：
