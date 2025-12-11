@@ -75,6 +75,12 @@ interface BlockDefinition {
 	/** 搜尋標籤（含中英文關鍵字） */
 	tags: string[];
 
+	/** 相關積木類型列表 */
+	relatedBlocks?: string[];
+
+	/** 使用注意事項 */
+	notes?: LocalizedStrings;
+
 	/** 是否為實驗性功能 */
 	experimental?: boolean;
 }
@@ -476,6 +482,8 @@ interface GetBlockUsageOutput {
 	};
 	boards: BoardType[];
 	tags: string[];
+	relatedBlocks?: string[];
+	notes?: string;
 }
 ```
 

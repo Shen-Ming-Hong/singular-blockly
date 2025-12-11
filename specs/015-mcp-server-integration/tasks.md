@@ -38,7 +38,7 @@
 -   [ ] T008 建立 MCP Provider 註冊模組，實作 McpServerDefinitionProvider in src/mcp/mcpProvider.ts
 -   [ ] T009 修改 src/extension.ts 在 activate 中呼叫 registerMcpProvider
 -   [ ] T010 [P] 建立工具索引匯出檔案 src/mcp/tools/index.ts
--   [ ] T011 建立 FileWatcher 服務監聽 main.json 變更 in src/mcp/fileWatcher.ts
+-   [ ] T011 建立 FileWatcher 機制監聽 main.json 變更，整合至 src/webview/webviewManager.ts
 -   [ ] T012 [P] 建立積木字典生成腳本 scripts/generate-block-dictionary.js
 -   [ ] T013 執行 generate-block-dictionary 生成初始 src/mcp/block-dictionary.json
 
@@ -95,7 +95,7 @@
 -   [ ] T026 [US1] 實作 get_workspace_state 工具：讀取 main.json in src/mcp/tools/workspaceOps.ts
 -   [ ] T027 [US1] 實作 update_workspace 工具的 'add' action：新增積木 in src/mcp/tools/workspaceOps.ts
 -   [ ] T028 [US1] 實作 update_workspace 的 JSON 結構驗證邏輯
--   [ ] T029 [US1] 實作 update_workspace 的備份機制：寫入前備份為 main.json.bak
+-   [ ] T029 [US1] 實作 update_workspace 的備份機制：寫入前備份為 main.json.bak，並在回傳訊息中告知 AI 可透過 main.json.bak 回復
 -   [ ] T030 [US1] 實作 refresh_editor 工具：通知 WebView 重載 in src/mcp/tools/workspaceOps.ts
 -   [ ] T031 [US1] 修改 src/webview/messageHandler.ts 處理 'reloadWorkspace' 命令
 -   [ ] T032 [US1] 修改 src/webview/webviewManager.ts 整合 FileWatcher 觸發重載

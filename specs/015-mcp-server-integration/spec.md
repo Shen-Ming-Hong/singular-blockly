@@ -43,7 +43,7 @@
 
 1. **Given** MCP Server 已啟動，**When** AI 呼叫 get_block_usage("servo_setup")，**Then** 回傳包含欄位說明、JSON 範例、程式碼範例的完整資訊
 2. **Given** MCP Server 已啟動，**When** AI 呼叫 search_blocks("馬達")，**Then** 回傳所有與馬達相關的積木列表
-3. **Given** MCP Server 已啟動，**When** AI 呼叫 list_blocks_by_category("Motors")，**Then** 回傳 Motors 分類下的所有積木
+3. **Given** MCP Server 已啟動，**When** AI 呼叫 list_blocks_by_category("motors")，**Then** 回傳 motors 分類下的所有積木
 
 ---
 

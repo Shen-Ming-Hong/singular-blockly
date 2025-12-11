@@ -19,7 +19,7 @@
 **Project Type**: Single（VS Code Extension + WebView + MCP Server）  
 **Performance Goals**: MCP 工具回應 ≤500ms, 編輯器刷新 ≤2s, Server 啟動 ≤3s  
 **Constraints**: 需 VSCode 1.99+ (MCP API), 向後相容既有 main.json 格式  
-**Scale/Scope**: 約 55 個自訂積木的字典、8 個 MCP 工具、5 種支援板卡
+**Scale/Scope**: 約 55 個自訂積木的字典、9 個 MCP 工具、5 種支援板卡
 
 ## Constitution Check
 
@@ -29,7 +29,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 | ---------------------- | ----------------------------------------------------- | ------- |
 | I. 簡潔與可維護性      | MCP Server 模組獨立、工具函數單一職責                 | ✅ PASS |
 | II. 模組化與可擴展性   | 工具可動態註冊、積木字典可擴展                        | ✅ PASS |
-| III. 避免過度開發      | 僅實作 spec 定義的 8 個工具                           | ✅ PASS |
+| III. 避免過度開發      | 僅實作 spec 定義的 9 個工具                           | ✅ PASS |
 | IV. 彈性與適應性       | 支援多板卡、多語言積木名稱                            | ✅ PASS |
 | V. 研究驅動開發        | 已使用 MCP 查詢 VSCode MCP API 與 TypeScript SDK 文件 | ✅ PASS |
 | VI. 結構化日誌         | 使用 `log.*` 記錄 MCP 工具調用                        | ✅ PASS |
@@ -117,7 +117,7 @@ Phase 1 產出：
 | ------------------------------------------------------ | ---- | -------------------------------- |
 | [research.md](./research.md)                           | ✅   | 技術研究報告                     |
 | [data-model.md](./data-model.md)                       | ✅   | 完整資料模型定義                 |
-| [contracts/mcp-tools.json](./contracts/mcp-tools.json) | ✅   | 8 個 MCP 工具的 JSON Schema 契約 |
+| [contracts/mcp-tools.json](./contracts/mcp-tools.json) | ✅   | 9 個 MCP 工具的 JSON Schema 契約 |
 | [quickstart.md](./quickstart.md)                       | ✅   | 開發者快速入門指南               |
 
 ---
@@ -128,7 +128,7 @@ Phase 1 產出：
 | ---------------------- | ---------- | ------------------------------ |
 | I. 簡潔與可維護性      | ✅         | 工具函數單一職責，<200 行      |
 | II. 模組化與可擴展性   | ✅         | 工具可動態註冊於 `tools/` 目錄 |
-| III. 避免過度開發      | ✅         | 僅實作 spec 定義的 8 個工具    |
+| III. 避免過度開發      | ✅         | 僅實作 spec 定義的 9 個工具    |
 | IV. 彈性與適應性       | ✅         | 支援 5 種板卡、15 種語言       |
 | V. 研究驅動開發        | ✅         | research.md 完整記錄 API 研究  |
 | VI. 結構化日誌         | ✅         | 使用 log.\* 記錄工具調用       |

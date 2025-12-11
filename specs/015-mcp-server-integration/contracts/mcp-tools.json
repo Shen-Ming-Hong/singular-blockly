@@ -150,6 +150,17 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "relatedBlocks": {
+                        "type": "array",
+                        "description": "相關積木類型列表",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "使用注意事項"
                     }
                 },
                 "required": [
