@@ -992,8 +992,8 @@ Blockly.Blocks['threshold_function_read'] = {
 
 		this.appendDummyInput().appendField(
 			new Blockly.FieldDropdown(() => {
-				// 取得工作區
-				const workspace = this.sourceBlock_ ? this.sourceBlock_.workspace : Blockly.getMainWorkspace();
+				// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+				const workspace = this.workspace || Blockly.getMainWorkspace();
 				if (!workspace) {
 					log.info('無法取得工作區，返回預設選項 Func0');
 					return [['Func0', 'Func0']];

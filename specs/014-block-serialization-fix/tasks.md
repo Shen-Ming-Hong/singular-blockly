@@ -25,9 +25,9 @@
 
 **Purpose**: 確認開發環境與理解現有程式碼
 
--   [ ] T001 切換到功能分支 `014-block-serialization-fix` 並執行 `npm run watch`
--   [ ] T002 閱讀 `media/blockly/blocks/motors.js` 中現有 encoder 積木定義，理解 `mutationToDom`/`domToMutation` 實作
--   [ ] T003 [P] 閱讀 `media/blockly/generators/arduino/index.js` 了解 `arduinoGenerator` 結構
+-   [x] T001 切換到功能分支 `014-block-serialization-fix` 並執行 `npm run watch`
+-   [x] T002 閱讀 `media/blockly/blocks/motors.js` 中現有 encoder 積木定義，理解 `mutationToDom`/`domToMutation` 實作
+-   [x] T003 [P] 閱讀 `media/blockly/generators/arduino/index.js` 了解 `arduinoGenerator` 結構
 
 ---
 
@@ -37,7 +37,7 @@
 
 **⚠️ CRITICAL**: 必須先完成此階段，確保即使序列化失敗也不會產生編譯錯誤
 
--   [ ] T004 在 `media/blockly/generators/arduino/index.js` 中實作 `arduinoGenerator.scrubNakedValue` 方法，將獨立 value block 轉為註釋
+-   [x] T004 在 `media/blockly/generators/arduino/index.js` 中實作 `arduinoGenerator.scrubNakedValue` 方法，將獨立 value block 轉為註釋
 -   [ ] T005 手動測試：放置獨立的 `math_number` 積木，確認生成的程式碼為註釋而非裸露數字
 
 **Checkpoint**: scrubNakedValue 防護機制就緒，獨立 value block 不再造成編譯錯誤
@@ -54,28 +54,28 @@
 
 #### encoder_setup 積木
 
--   [ ] T006 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_setup` 積木添加 `saveExtraState` 方法，返回 `{ useInterrupt: boolean }`
--   [ ] T007 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_setup` 積木添加 `loadExtraState` 方法，還原 `useInterruptPins_` 並更新 UI
+-   [x] T006 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_setup` 積木添加 `saveExtraState` 方法，返回 `{ useInterrupt: boolean }`
+-   [x] T007 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_setup` 積木添加 `loadExtraState` 方法，還原 `useInterruptPins_` 並更新 UI
 
 #### encoder_read 積木（用戶報告的主要問題）
 
--   [ ] T008 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_read` 積木添加 `saveExtraState` 方法，返回 `{ encoder: string }`
--   [ ] T009 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_read` 積木添加 `loadExtraState` 方法，還原 `restoredEncoderValue` 和欄位值
+-   [x] T008 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_read` 積木添加 `saveExtraState` 方法，返回 `{ encoder: string }`
+-   [x] T009 [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_read` 積木添加 `loadExtraState` 方法，還原 `restoredEncoderValue` 和欄位值
 
 #### encoder_reset 積木
 
--   [ ] T010 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_reset` 積木添加 `saveExtraState` 方法，返回 `{ encoder: string }`
--   [ ] T011 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_reset` 積木添加 `loadExtraState` 方法，還原 `restoredEncoderValue` 和欄位值
+-   [x] T010 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_reset` 積木添加 `saveExtraState` 方法，返回 `{ encoder: string }`
+-   [x] T011 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_reset` 積木添加 `loadExtraState` 方法，還原 `restoredEncoderValue` 和欄位值
 
 #### encoder_pid_setup 積木
 
--   [ ] T012 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_setup` 積木添加 `saveExtraState` 方法，返回 `{ encoder: string }`
--   [ ] T013 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_setup` 積木添加 `loadExtraState` 方法，還原 `restoredEncoderValue` 和欄位值
+-   [x] T012 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_setup` 積木添加 `saveExtraState` 方法，返回 `{ encoder: string }`
+-   [x] T013 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_setup` 積木添加 `loadExtraState` 方法，還原 `restoredEncoderValue` 和欄位值
 
 #### encoder_pid_compute 積木
 
--   [ ] T014 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_compute` 積木添加 `saveExtraState` 方法，返回 `{ pid: string }`
--   [ ] T015 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_compute` 積木添加 `loadExtraState` 方法，還原 `restoredPIDValue` 和欄位值
+-   [x] T014 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_compute` 積木添加 `saveExtraState` 方法，返回 `{ pid: string }`
+-   [x] T015 [P] [US1] 在 `media/blockly/blocks/motors.js` 中為 `encoder_pid_compute` 積木添加 `loadExtraState` 方法，還原 `restoredPIDValue` 和欄位值
 
 #### User Story 1 驗證
 
@@ -122,9 +122,9 @@
 
 **Purpose**: 程式碼品質與文件更新
 
--   [ ] T026 [P] 執行 `npm run lint` 確認程式碼符合 ESLint 規範
--   [ ] T027 [P] 在程式碼中添加描述性註釋，說明 JSON hooks 的用途
--   [ ] T028 更新 `specs/014-block-serialization-fix/quickstart.md` 的檢查清單，標記所有完成項目
+-   [x] T026 [P] 執行 `npm run lint` 確認程式碼符合 ESLint 規範
+-   [x] T027 [P] 在程式碼中添加描述性註釋，說明 JSON hooks 的用途
+-   [x] T028 更新 `specs/014-block-serialization-fix/quickstart.md` 的檢查清單，標記所有完成項目
 -   [ ] T029 執行 quickstart.md 中的所有驗證步驟，確認功能完整
 
 ---

@@ -234,11 +234,11 @@ suite('Encoder Block Serialization', () => {
 
 完成實作前，確保以下項目都已完成：
 
--   [ ] `encoder_setup` 添加 `saveExtraState`/`loadExtraState`
--   [ ] `encoder_read` 添加 `saveExtraState`/`loadExtraState`
--   [ ] `encoder_reset` 添加 `saveExtraState`/`loadExtraState`
--   [ ] `encoder_pid_setup` 添加 `saveExtraState`/`loadExtraState`
--   [ ] `encoder_pid_compute` 添加 `saveExtraState`/`loadExtraState`
--   [ ] `arduinoGenerator.scrubNakedValue` 已實作
+-   [x] `encoder_setup` 添加 `saveExtraState`/`loadExtraState`
+-   [x] `encoder_read` 添加 `saveExtraState`/`loadExtraState`
+-   [x] `encoder_reset` 添加 `saveExtraState`/`loadExtraState`
+-   [x] `encoder_pid_setup` 添加 `saveExtraState`/`loadExtraState`
+-   [x] `encoder_pid_compute` 添加 `saveExtraState`/`loadExtraState`
+-   [x] `arduinoGenerator.scrubNakedValue` 已實作
 -   [ ] 手動測試通過（序列化、程式碼生成、向後相容）
--   [ ] 程式碼風格符合 ESLint 規範
+-   [x] 程式碼風格符合 ESLint 規範
