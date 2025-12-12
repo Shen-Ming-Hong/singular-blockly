@@ -115,8 +115,6 @@ window.languageManager.loadMessages('hu', {
 	ENCODER_PID_COMPUTE_TOOLTIP: 'PID szabályozás kimenetének számítása célpozíció alapján',
 	ENCODER_PID_RESET: 'PID visszaállítása',
 	ENCODER_PID_RESET_TOOLTIP: 'PID szabályozó állapotának visszaállítása (integrál felhalmozódás törlése, számláló visszaállítása)',
-	ENCODER_PID_RESET: 'PID visszaállítása',
-	ENCODER_PID_RESET_TOOLTIP: 'PID szabályozó állapotának visszaállítása (integrál felhalmozódás törlése, számláló visszaállítása)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Beállítás',

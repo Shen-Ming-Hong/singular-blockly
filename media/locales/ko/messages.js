@@ -115,8 +115,6 @@ window.languageManager.loadMessages('ko', {
 	ENCODER_PID_COMPUTE_TOOLTIP: '엔코더 모터가 목표 위치에 도달하도록 PID 계산',
 	ENCODER_PID_RESET: 'PID 재설정',
 	ENCODER_PID_RESET_TOOLTIP: 'PID 컨트롤러 상태 재설정 (적분 누적 지우기, 카운터 재설정)',
-	ENCODER_PID_RESET: 'PID 재설정',
-	ENCODER_PID_RESET_TOOLTIP: 'PID 컨트롤러 상태 재설정 (적분 누적 지우기, 카운터 재설정)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: '설정',

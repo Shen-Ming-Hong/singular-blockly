@@ -115,8 +115,6 @@ window.languageManager.loadMessages('bg', {
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Изчисляване на изход на PID контрол въз основа на целева позиция',
 	ENCODER_PID_RESET: 'Нулиране на PID',
 	ENCODER_PID_RESET_TOOLTIP: 'Нулиране на състоянието на PID контролера (изчистване на интегралното натрупване, нулиране на брояча)',
-	ENCODER_PID_RESET: 'Нулиране на PID',
-	ENCODER_PID_RESET_TOOLTIP: 'Нулиране на състоянието на PID контролера (изчистване на интегралното натрупване, нулиране на брояча)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',

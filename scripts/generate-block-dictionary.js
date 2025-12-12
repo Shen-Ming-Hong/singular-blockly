@@ -12,9 +12,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// 支援的語言
-const SUPPORTED_LOCALES = ['en', 'zh-hant', 'ja', 'ko', 'es', 'pt-br', 'fr', 'de', 'it', 'ru', 'pl', 'hu', 'tr', 'bg', 'cs'];
-
 // 支援的板卡
 const SUPPORTED_BOARDS = ['arduino_uno', 'arduino_nano', 'arduino_mega', 'esp32', 'esp32_supermini'];
 
@@ -1344,7 +1341,7 @@ function generateSearchIndex(blocks) {
 		}
 
 		// 從名稱建立索引
-		for (const [locale, name] of Object.entries(block.names)) {
+		for (const [_locale, name] of Object.entries(block.names)) {
 			const words = name.toLowerCase().split(/\s+/);
 			for (const word of words) {
 				if (word.length > 1) {

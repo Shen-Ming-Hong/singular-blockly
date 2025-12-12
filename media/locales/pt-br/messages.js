@@ -115,8 +115,6 @@ window.languageManager.loadMessages('pt-br', {
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Calcular saída de controle PID baseado na posição alvo',
 	ENCODER_PID_RESET: 'Reiniciar PID',
 	ENCODER_PID_RESET_TOOLTIP: 'Reiniciar o estado do controlador PID (limpar acumulação integral, reiniciar contador)',
-	ENCODER_PID_RESET: 'Reiniciar PID',
-	ENCODER_PID_RESET_TOOLTIP: 'Reiniciar o estado do controlador PID (limpar acumulação integral, reiniciar contador)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Configuração',

@@ -87,50 +87,6 @@ function readWorkspaceState(workspacePath: string): WorkspaceState | null {
 }
 
 /**
- * 寫入 Blockly 工作區狀態
- * @param workspacePath 工作區路徑
- * @param state 工作區狀態
- * @param createBackup 是否建立備份（預設 true）
- * @returns 包含成功狀態和備份路徑的物件
- */
-function writeWorkspaceState(
-	workspacePath: string,
-	state: WorkspaceState,
-	createBackup: boolean = true
-): { success: boolean; backupPath?: string } {
-	const blocklyDir = path.join(workspacePath, 'blockly');
-	const mainJsonPath = path.join(blocklyDir, 'main.json');
-	const backupPath = path.join(blocklyDir, 'main.json.bak');
-
-	try {
-		// 確保目錄存在
-		if (!fs.existsSync(blocklyDir)) {
-			fs.mkdirSync(blocklyDir, { recursive: true });
-		}
-
-		// 建立備份（如果原檔案存在且需要備份）
-		let backupCreated = false;
-		if (createBackup && fs.existsSync(mainJsonPath)) {
-			try {
-				fs.copyFileSync(mainJsonPath, backupPath);
-				backupCreated = true;
-			} catch (backupError) {
-				// 備份失敗不阻止寫入，但記錄警告
-				console.error('[workspaceOps] Failed to create backup:', backupError);
-			}
-		}
-
-		// 添加時間戳
-		state.timestamp = new Date().toISOString();
-
-		fs.writeFileSync(mainJsonPath, JSON.stringify(state, null, 2), 'utf8');
-		return { success: true, backupPath: backupCreated ? backupPath : undefined };
-	} catch {
-		return { success: false };
-	}
-}
-
-/**
  * 遞迴計算所有積木
  */
 function countBlocks(blocks: WorkspaceBlock[]): number {
