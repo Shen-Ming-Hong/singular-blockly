@@ -88,10 +88,7 @@ suite('Block Dictionary Tests', () => {
 				const hasChinese = block.tags.some((tag: string) => hasChineseChar(tag));
 				const hasEnglish = block.tags.some((tag: string) => hasEnglishWord(tag));
 
-				assert.ok(
-					hasChinese || hasEnglish,
-					`Block ${block.type} should have searchable tags`
-				);
+				assert.ok(hasChinese || hasEnglish, `Block ${block.type} should have searchable tags`);
 			}
 		});
 
@@ -101,10 +98,7 @@ suite('Block Dictionary Tests', () => {
 			for (const blockType of coreBlocks) {
 				const block = dictionary.blocks.find((b: BlockDefinition) => b.type === blockType);
 				if (block) {
-					assert.ok(
-						block.tags && block.tags.length >= 2,
-						`Core block ${blockType} should have at least 2 tags`
-					);
+					assert.ok(block.tags && block.tags.length >= 2, `Core block ${blockType} should have at least 2 tags`);
 				}
 			}
 		});
@@ -157,9 +151,7 @@ suite('Block Dictionary Tests', () => {
 				for (const input of block.inputs) {
 					// input 類型應該是 value 或 statement，不應該是 number
 					if (input.type === 'number') {
-						assert.fail(
-							`Block ${block.type} has number type in inputs - should be in fields`
-						);
+						assert.fail(`Block ${block.type} has number type in inputs - should be in fields`);
 					}
 				}
 			}
@@ -196,13 +188,8 @@ suite('Block Dictionary Tests', () => {
 
 		test('all categories should have at least one block', () => {
 			for (const category of dictionary.categories) {
-				const blocksInCategory = dictionary.blocks.filter(
-					(b: BlockDefinition) => b.category === category.id
-				);
-				assert.ok(
-					blocksInCategory.length > 0,
-					`Category "${category.id}" has no blocks`
-				);
+				const blocksInCategory = dictionary.blocks.filter((b: BlockDefinition) => b.category === category.id);
+				assert.ok(blocksInCategory.length > 0, `Category "${category.id}" has no blocks`);
 			}
 		});
 	});
@@ -225,12 +212,7 @@ suite('Block Dictionary Tests', () => {
 		});
 
 		test('should have all essential logic blocks', () => {
-			const essentialLogicBlocks = [
-				'controls_if',
-				'logic_compare',
-				'logic_operation',
-				'logic_boolean',
-			];
+			const essentialLogicBlocks = ['controls_if', 'logic_compare', 'logic_operation', 'logic_boolean'];
 
 			for (const blockType of essentialLogicBlocks) {
 				const block = dictionary.blocks.find((b: BlockDefinition) => b.type === blockType);
@@ -239,11 +221,7 @@ suite('Block Dictionary Tests', () => {
 		});
 
 		test('should have all essential loop blocks', () => {
-			const essentialLoopBlocks = [
-				'controls_repeat_ext',
-				'controls_whileUntil',
-				'controls_for',
-			];
+			const essentialLoopBlocks = ['controls_repeat_ext', 'controls_whileUntil', 'controls_for'];
 
 			for (const blockType of essentialLoopBlocks) {
 				const block = dictionary.blocks.find((b: BlockDefinition) => b.type === blockType);
@@ -252,9 +230,7 @@ suite('Block Dictionary Tests', () => {
 		});
 
 		test('should have motor/servo blocks', () => {
-			const motorBlocks = dictionary.blocks.filter(
-				(b: BlockDefinition) => b.category === 'motors'
-			);
+			const motorBlocks = dictionary.blocks.filter((b: BlockDefinition) => b.category === 'motors');
 			assert.ok(motorBlocks.length >= 3, 'Should have at least 3 motor blocks');
 		});
 	});
@@ -267,10 +243,7 @@ suite('Block Dictionary Tests', () => {
 				if (!block.boards || !Array.isArray(block.boards)) continue;
 
 				for (const board of block.boards) {
-					assert.ok(
-						validBoards.includes(board),
-						`Block ${block.type} has invalid board "${board}"`
-					);
+					assert.ok(validBoards.includes(board), `Block ${block.type} has invalid board "${board}"`);
 				}
 			}
 		});
