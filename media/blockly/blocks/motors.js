@@ -901,8 +901,7 @@ Blockly.Blocks['encoder_pid_reset'] = {
 		this.setNextStatement(true, null);
 		this.setStyle('motors_blocks');
 		this.setTooltip(
-			window.languageManager.getMessage('ENCODER_PID_RESET_TOOLTIP') ||
-				'重設 PID 控制器狀態（清除 I 項累積、重設 lastCount）'
+			window.languageManager.getMessage('ENCODER_PID_RESET_TOOLTIP') || '重設 PID 控制器狀態（清除 I 項累積、重設 lastCount）'
 		);
 		this.setHelpUrl('');
 
