@@ -269,34 +269,39 @@ export function registerWorkspaceOpsTools(server: McpServer): void {
 	);
 
 	// === refresh_editor ===
-	server.tool('refresh_editor', '通知 VSCode 擴充功能重新載入 Blockly 編輯器。【重要】重新載入後，請使用 get_generated_code 工具確認 src/main.cpp 的程式碼已正確更新。', {}, async () => {
-		// MCP Server 透過標準輸出通訊，無法直接控制 VSCode
-		// 這個工具會返回指示訊息，讓使用者知道需要重新整理
+	server.tool(
+		'refresh_editor',
+		'通知 VSCode 擴充功能重新載入 Blockly 編輯器。【重要】重新載入後，請使用 get_generated_code 工具確認 src/main.cpp 的程式碼已正確更新。',
+		{},
+		async () => {
+			// MCP Server 透過標準輸出通訊，無法直接控制 VSCode
+			// 這個工具會返回指示訊息，讓使用者知道需要重新整理
 
-		logToolCall('refresh_editor', {}, { success: true, message: 'Refresh instructions sent' });
+			logToolCall('refresh_editor', {}, { success: true, message: 'Refresh instructions sent' });
 
-		return {
-			content: [
-				{
-					type: 'text' as const,
-					text: JSON.stringify(
-						{
-							success: true,
-							message: '已發送重新載入請求',
-							instructions: [
-								'如果編輯器沒有自動更新，請：',
-								'1. 關閉目前的 Blockly 編輯器標籤',
-								'2. 重新開啟 main.json 檔案',
-								'或',
-								'1. 按 Ctrl+Shift+P (Mac: Cmd+Shift+P)',
-								'2. 輸入 "Developer: Reload Window"',
-							],
-						},
-						null,
-						2
-					),
-				},
-			],
-		};
-	});
+			return {
+				content: [
+					{
+						type: 'text' as const,
+						text: JSON.stringify(
+							{
+								success: true,
+								message: '已發送重新載入請求',
+								instructions: [
+									'如果編輯器沒有自動更新，請：',
+									'1. 關閉目前的 Blockly 編輯器標籤',
+									'2. 重新開啟 main.json 檔案',
+									'或',
+									'1. 按 Ctrl+Shift+P (Mac: Cmd+Shift+P)',
+									'2. 輸入 "Developer: Reload Window"',
+								],
+							},
+							null,
+							2
+						),
+					},
+				],
+			};
+		}
+	);
 }
