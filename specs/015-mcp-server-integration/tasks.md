@@ -19,11 +19,11 @@
 
 **Purpose**: 專案設定與基礎結構建立
 
--   [ ] T001 安裝 MCP SDK 依賴：`npm install @modelcontextprotocol/sdk zod`
--   [ ] T002 [P] 更新 package.json 添加 mcpServerDefinitionProviders 貢獻點
--   [ ] T003 [P] 建立 MCP 模組目錄結構 src/mcp/ 與 src/mcp/tools/
--   [ ] T004 [P] 更新 tsconfig.json 確保 MCP 模組正確編譯
--   [ ] T005 [P] 更新 webpack.config.js 添加 MCP Server 打包配置
+-   [x] T001 安裝 MCP SDK 依賴：`npm install @modelcontextprotocol/sdk zod`
+-   [x] T002 [P] 更新 package.json 添加 mcpServerDefinitionProviders 貢獻點
+-   [x] T003 [P] 建立 MCP 模組目錄結構 src/mcp/ 與 src/mcp/tools/
+-   [x] T004 [P] 更新 tsconfig.json 確保 MCP 模組正確編譯
+-   [x] T005 [P] 更新 webpack.config.js 添加 MCP Server 打包配置
 
 ---
 
@@ -33,14 +33,14 @@
 
 **⚠️ 關鍵**: 此階段必須完成後才能開始任何 User Story 工作
 
--   [ ] T006 建立積木字典資料結構與載入器 in src/mcp/blockDictionary.ts
--   [ ] T007 建立 MCP Server 主入口，使用 STDIO Transport in src/mcp/mcpServer.ts
--   [ ] T008 建立 MCP Provider 註冊模組，實作 McpServerDefinitionProvider in src/mcp/mcpProvider.ts
--   [ ] T009 修改 src/extension.ts 在 activate 中呼叫 registerMcpProvider
--   [ ] T010 [P] 建立工具索引匯出檔案 src/mcp/tools/index.ts
--   [ ] T011 建立 FileWatcher 機制監聽 main.json 變更，整合至 src/webview/webviewManager.ts
--   [ ] T012 [P] 建立積木字典生成腳本 scripts/generate-block-dictionary.js
--   [ ] T013 執行 generate-block-dictionary 生成初始 src/mcp/block-dictionary.json
+-   [x] T006 建立積木字典資料結構與載入器 in src/mcp/blockDictionary.ts
+-   [x] T007 建立 MCP Server 主入口，使用 STDIO Transport in src/mcp/mcpServer.ts
+-   [x] T008 建立 MCP Provider 註冊模組，實作 McpServerDefinitionProvider in src/mcp/mcpProvider.ts
+-   [x] T009 修改 src/extension.ts 在 activate 中呼叫 registerMcpProvider
+-   [x] T010 [P] 建立工具索引匯出檔案 src/mcp/tools/index.ts
+-   [x] T011 建立 FileWatcher 機制監聯 main.json 變更，整合至 src/webview/webviewManager.ts
+-   [x] T012 [P] 建立積木字典生成腳本 scripts/generate-block-dictionary.js
+-   [x] T013 執行 generate-block-dictionary 生成初始 src/mcp/block-dictionary.json
 
 **Checkpoint**: 基礎設施就緒 - 可開始平行實作 User Stories
 
@@ -54,12 +54,12 @@
 
 ### Implementation for User Story 2
 
--   [ ] T014 [US2] 實作 get_block_usage 工具：查詢積木用法 in src/mcp/tools/blockQuery.ts
--   [ ] T015 [US2] 實作 search_blocks 工具：關鍵字搜尋積木（含中英文） in src/mcp/tools/blockQuery.ts
--   [ ] T016 [US2] 實作 list_blocks_by_category 工具：列出分類積木 in src/mcp/tools/blockQuery.ts
--   [ ] T017 [US2] 實作積木搜尋索引建立邏輯 in src/mcp/blockDictionary.ts
--   [ ] T018 [US2] 添加多語言支援（zh-hant 預設）至積木查詢工具
--   [ ] T019 [US2] 註冊 blockQuery 工具至 MCP Server in src/mcp/mcpServer.ts
+-   [x] T014 [US2] 實作 get_block_usage 工具：查詢積木用法 in src/mcp/tools/blockQuery.ts
+-   [x] T015 [US2] 實作 search_blocks 工具：關鍵字搜尋積木（含中英文） in src/mcp/tools/blockQuery.ts
+-   [x] T016 [US2] 實作 list_blocks_by_category 工具：列出分類積木 in src/mcp/tools/blockQuery.ts
+-   [x] T017 [US2] 實作積木搜尋索引建立邏輯 in src/mcp/blockDictionary.ts
+-   [x] T018 [US2] 添加多語言支援（zh-hant 預設）至積木查詢工具
+-   [x] T019 [US2] 註冊 blockQuery 工具至 MCP Server in src/mcp/mcpServer.ts
 
 **Checkpoint**: User Story 2 完成 - AI 可查詢任何積木的用法
 
@@ -73,12 +73,12 @@
 
 ### Implementation for User Story 3
 
--   [ ] T020 [US3] 實作 get_platform_config 工具：解析 platformio.ini in src/mcp/tools/platformConfig.ts
--   [ ] T021 [US3] 實作 get_board_pins 工具：回傳板卡引腳配置 in src/mcp/tools/platformConfig.ts
--   [ ] T022 [US3] 實作 get_generated_code 工具：讀取 main.cpp in src/mcp/tools/platformConfig.ts
--   [ ] T023 [US3] 整合現有 board_configs.js 資料至板卡配置查詢
--   [ ] T024 [US3] 處理 platformio.ini 不存在的錯誤情況
--   [ ] T025 [US3] 註冊 platformConfig 工具至 MCP Server in src/mcp/mcpServer.ts
+-   [x] T020 [US3] 實作 get_platform_config 工具：解析 platformio.ini in src/mcp/tools/platformConfig.ts
+-   [x] T021 [US3] 實作 get_board_pins 工具：回傳板卡引腳配置 in src/mcp/tools/platformConfig.ts
+-   [x] T022 [US3] 實作 get_generated_code 工具：讀取 main.cpp in src/mcp/tools/platformConfig.ts
+-   [x] T023 [US3] 整合現有 board_configs.js 資料至板卡配置查詢
+-   [x] T024 [US3] 處理 platformio.ini 不存在的錯誤情況
+-   [x] T025 [US3] 註冊 platformConfig 工具至 MCP Server in src/mcp/mcpServer.ts
 
 **Checkpoint**: User Story 3 完成 - AI 可讀取任何專案配置
 
@@ -92,16 +92,16 @@
 
 ### Implementation for User Story 1
 
--   [ ] T026 [US1] 實作 get_workspace_state 工具：讀取 main.json in src/mcp/tools/workspaceOps.ts
--   [ ] T027 [US1] 實作 update_workspace 工具的 'add' action：新增積木 in src/mcp/tools/workspaceOps.ts
--   [ ] T028 [US1] 實作 update_workspace 的 JSON 結構驗證邏輯
--   [ ] T029 [US1] 實作 update_workspace 的備份機制：寫入前備份為 main.json.bak，並在回傳訊息中告知 AI 可透過 main.json.bak 回復
--   [ ] T030 [US1] 實作 refresh_editor 工具：通知 WebView 重載 in src/mcp/tools/workspaceOps.ts
--   [ ] T031 [US1] 修改 src/webview/messageHandler.ts 處理 'reloadWorkspace' 命令
--   [ ] T032 [US1] 修改 src/webview/webviewManager.ts 整合 FileWatcher 觸發重載
--   [ ] T033 [US1] 實作 FileWatcher 去抖動邏輯（500ms debounce）
--   [ ] T034 [US1] 實作避免內部更新觸發 FileWatcher 的機制
--   [ ] T035 [US1] 註冊 workspaceOps 工具至 MCP Server in src/mcp/mcpServer.ts
+-   [x] T026 [US1] 實作 get_workspace_state 工具：讀取 main.json in src/mcp/tools/workspaceOps.ts
+-   [x] T027 [US1] 實作 update_workspace 工具的 'add' action：新增積木 in src/mcp/tools/workspaceOps.ts
+-   [x] T028 [US1] 實作 update_workspace 的 JSON 結構驗證邏輯
+-   [x] T029 [US1] 實作 update_workspace 的備份機制：寫入前備份為 main.json.bak，並在回傳訊息中告知 AI 可透過 main.json.bak 回復
+-   [x] T030 [US1] 實作 refresh_editor 工具：通知 WebView 重載 in src/mcp/tools/workspaceOps.ts
+-   [x] T031 [US1] 修改 src/webview/messageHandler.ts 處理 'reloadWorkspace' 命令
+-   [x] T032 [US1] 修改 src/webview/webviewManager.ts 整合 FileWatcher 觸發重載
+-   [x] T033 [US1] 實作 FileWatcher 去抖動邏輯（500ms debounce）
+-   [x] T034 [US1] 實作避免內部更新觸發 FileWatcher 的機制
+-   [x] T035 [US1] 註冊 workspaceOps 工具至 MCP Server in src/mcp/mcpServer.ts
 
 **Checkpoint**: User Story 1 完成 - AI 可新增積木並觸發編輯器更新
 
@@ -115,10 +115,10 @@
 
 ### Implementation for User Story 4
 
--   [ ] T036 [US4] 實作 update_workspace 的 'modify' action：修改積木欄位 in src/mcp/tools/workspaceOps.ts
--   [ ] T037 [US4] 實作積木 ID 查找與欄位更新邏輯
--   [ ] T038 [US4] 實作修改操作的欄位驗證（確認欄位存在於積木定義）
--   [ ] T039 [US4] 處理修改不存在積木的錯誤情況
+-   [x] T036 [US4] 實作 update_workspace 的 'modify' action：修改積木欄位 in src/mcp/tools/workspaceOps.ts
+-   [x] T037 [US4] 實作積木 ID 查找與欄位更新邏輯
+-   [x] T038 [US4] 實作修改操作的欄位驗證（確認欄位存在於積木定義）
+-   [x] T039 [US4] 處理修改不存在積木的錯誤情況
 
 **Checkpoint**: User Story 4 完成 - AI 可修改任何積木的欄位
 
@@ -132,10 +132,10 @@
 
 ### Implementation for User Story 5
 
--   [ ] T040 [US5] 實作 update_workspace 的 'remove' action：刪除積木 in src/mcp/tools/workspaceOps.ts
--   [ ] T041 [US5] 實作多積木刪除邏輯（批次刪除）
--   [ ] T042 [US5] 處理刪除連接中積木時的連接關係處理
--   [ ] T043 [US5] 處理刪除不存在積木的錯誤情況
+-   [x] T040 [US5] 實作 update_workspace 的 'remove' action：刪除積木 in src/mcp/tools/workspaceOps.ts
+-   [x] T041 [US5] 實作多積木刪除邏輯（批次刪除）
+-   [x] T042 [US5] 處理刪除連接中積木時的連接關係處理
+-   [x] T043 [US5] 處理刪除不存在積木的錯誤情況
 
 **Checkpoint**: User Story 5 完成 - AI 可刪除任何積木
 
@@ -145,19 +145,19 @@
 
 **Purpose**: 優化與跨 User Story 的改進
 
--   [ ] T044 [P] 完善積木字典涵蓋所有 55 個自訂積木
--   [ ] T045 [P] 添加結構化日誌記錄 MCP 工具調用 in src/mcp/tools/\*.ts
--   [ ] T046 [P] 實作 update_workspace 的 'replace' action：完整替換工作區狀態
--   [ ] T047 Edge Case：處理 main.json 不存在時回傳空工作區
--   [ ] T048 Edge Case：處理 WebView 未開啟時 refresh_editor 的提示訊息
--   [ ] T049 Edge Case：處理積木字典找不到積木時的錯誤訊息
--   [ ] T050 Edge Case：處理不支援板卡類型時列出支援清單
--   [ ] T051 [P] 建立 MCP 工具單元測試 in src/test/mcp/blockQuery.test.ts
--   [ ] T052 [P] 建立 MCP 工具單元測試 in src/test/mcp/workspaceOps.test.ts
--   [ ] T053 [P] 建立 MCP 工具單元測試 in src/test/mcp/platformConfig.test.ts
--   [ ] T054 建立整合測試驗證完整工作流程 in src/test/integration/mcpIntegration.test.ts
--   [ ] T055 更新 README.md 添加 MCP Server 功能說明
--   [ ] T056 執行 quickstart.md 驗證流程確認功能正常
+-   [x] T044 [P] 完善積木字典涵蓋所有 62 個自訂積木 (原目標 55 個，已超額完成)
+-   [x] T045 [P] 添加結構化日誌記錄 MCP 工具調用 in src/mcp/tools/\*.ts
+-   [x] T046 [P] 實作 update_workspace 的 'replace' action：完整替換工作區狀態
+-   [x] T047 Edge Case：處理 main.json 不存在時回傳空工作區
+-   [x] T048 Edge Case：處理 WebView 未開啟時 refresh_editor 的提示訊息
+-   [x] T049 Edge Case：處理積木字典找不到積木時的錯誤訊息
+-   [x] T050 Edge Case：處理不支援板卡類型時列出支援清單
+-   [x] T051 [P] 建立 MCP 工具單元測試 in src/test/mcp/blockQuery.test.ts
+-   [x] T052 [P] 建立 MCP 工具單元測試 in src/test/mcp/workspaceOps.test.ts
+-   [x] T053 [P] 建立 MCP 工具單元測試 in src/test/mcp/platformConfig.test.ts
+-   [x] T054 建立整合測試驗證完整工作流程 in src/test/mcp/mcpIntegration.test.ts
+-   [x] T055 更新 README.md 添加 MCP Server 功能說明
+-   [x] T056 執行 quickstart.md 驗證流程確認功能正常
 
 ---
 

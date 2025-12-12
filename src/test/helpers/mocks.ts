@@ -102,6 +102,14 @@ export class VSCodeMock {
 
 	public workspace: any = {
 		workspaceFolders: [{ uri: { fsPath: '/mock/workspace' } }],
+		createFileSystemWatcher: sinon.stub().callsFake(() => {
+			return {
+				onDidChange: sinon.stub().returns({ dispose: sinon.stub() }),
+				onDidCreate: sinon.stub().returns({ dispose: sinon.stub() }),
+				onDidDelete: sinon.stub().returns({ dispose: sinon.stub() }),
+				dispose: sinon.stub(),
+			};
+		}),
 	};
 
 	public commands: any = {

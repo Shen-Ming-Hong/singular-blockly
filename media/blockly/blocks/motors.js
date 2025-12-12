@@ -584,6 +584,7 @@ Blockly.Blocks['encoder_pid_setup'] = {
 	init: function () {
 		// 初始化恢復編碼馬達變數名稱的屬性
 		this.restoredEncoderValue = 'myEncoder';
+		this.restoredModeValue = 'POSITION';
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ENCODER_PID_SETUP'))
@@ -630,6 +631,14 @@ Blockly.Blocks['encoder_pid_setup'] = {
 					return options;
 				}),
 				'VAR'
+			)
+			.appendField(window.languageManager.getMessage('ENCODER_PID_MODE'))
+			.appendField(
+				new Blockly.FieldDropdown([
+					[window.languageManager.getMessage('ENCODER_PID_MODE_POSITION'), 'POSITION'],
+					[window.languageManager.getMessage('ENCODER_PID_MODE_SPEED'), 'SPEED'],
+				]),
+				'MODE'
 			);
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ENCODER_PID_KP'))
@@ -654,27 +663,35 @@ Blockly.Blocks['encoder_pid_setup'] = {
 		}
 	},
 
-	// 新增變異記錄方法，保存選擇的編碼馬達值
+	// 新增變異記錄方法，保存選擇的編碼馬達值和模式
 	mutationToDom: function () {
 		const container = Blockly.utils.xml.createElement('mutation');
 		const encoderValue = this.getFieldValue('VAR');
+		const modeValue = this.getFieldValue('MODE');
 		// 同時更新恢復值屬性
 		this.restoredEncoderValue = encoderValue;
+		this.restoredModeValue = modeValue;
 		container.setAttribute('encoder', encoderValue);
-		log.info(`encoder_pid_setup: 儲存變異資料，編碼馬達名稱: ${encoderValue}`);
+		container.setAttribute('mode', modeValue);
+		log.info(`encoder_pid_setup: 儲存變異資料，編碼馬達名稱: ${encoderValue}, 模式: ${modeValue}`);
 		return container;
 	},
 
-	// 從變異記錄恢復選擇的編碼馬達值
+	// 從變異記錄恢復選擇的編碼馬達值和模式
 	domToMutation: function (xmlElement) {
 		const encoder = xmlElement.getAttribute('encoder');
+		const mode = xmlElement.getAttribute('mode');
 		if (encoder) {
 			log.info(`encoder_pid_setup: 從變異資料恢復編碼馬達名稱: ${encoder}`);
-			// 在設置字段值的同時，也存儲到我們的備份屬性中
 			this.restoredEncoderValue = encoder;
 			this.getField('VAR').setValue(encoder);
 		} else {
 			log.warn('encoder_pid_setup: 變異資料中沒有找到編碼馬達名稱');
+		}
+		if (mode) {
+			log.info(`encoder_pid_setup: 從變異資料恢復模式: ${mode}`);
+			this.restoredModeValue = mode;
+			this.getField('MODE').setValue(mode);
 		}
 	},
 
@@ -687,6 +704,7 @@ Blockly.Blocks['encoder_pid_setup'] = {
 	saveExtraState: function () {
 		return {
 			encoder: this.getFieldValue('VAR') || 'myEncoder',
+			mode: this.getFieldValue('MODE') || 'POSITION',
 		};
 	},
 
@@ -700,6 +718,13 @@ Blockly.Blocks['encoder_pid_setup'] = {
 			const field = this.getField('VAR');
 			if (field) {
 				field.setValue(state.encoder);
+			}
+		}
+		if (state && state.mode) {
+			this.restoredModeValue = state.mode;
+			const modeField = this.getField('MODE');
+			if (modeField) {
+				modeField.setValue(state.mode);
 			}
 		}
 	},

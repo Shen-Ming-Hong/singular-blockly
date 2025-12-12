@@ -146,7 +146,8 @@ window.arduinoGenerator.forBlock['encoder_setup'] = function (block) {
 		}
 
 		// 根據開發板選擇適當的編碼馬達庫
-		if (currentBoard === 'esp32') {			// 使用 ESP32 專用的編碼馬達庫
+		if (currentBoard === 'esp32') {
+			// 使用 ESP32 專用的編碼馬達庫
 			window.arduinoGenerator.includes_['encoder'] = '#include <ESP32Encoder.h>';
 
 			// 在 lib_deps 中添加 ESP32Encoder 庫
@@ -158,12 +159,13 @@ window.arduinoGenerator.forBlock['encoder_setup'] = function (block) {
 			}
 
 			// 宣告編碼馬達變數
-			window.arduinoGenerator.variables_['encoder_' + varName] = `ESP32Encoder ${varName};`;			// 設置 ESP32 編碼馬達
+			window.arduinoGenerator.variables_['encoder_' + varName] = `ESP32Encoder ${varName};`; // 設置 ESP32 編碼馬達
 			window.arduinoGenerator.setupCode_.push(`// 設定編碼馬達 ${varName}`);
 			window.arduinoGenerator.setupCode_.push(`ESP32Encoder::useInternalWeakPullResistors=puType::up;`);
 			window.arduinoGenerator.setupCode_.push(`${varName}.attachHalfQuad(${pinA}, ${pinB});`);
 			window.arduinoGenerator.setupCode_.push(`${varName}.clearCount();`);
-		} else {// 標準 Arduino 開發板的編碼馬達庫
+		} else {
+			// 標準 Arduino 開發板的編碼馬達庫
 			window.arduinoGenerator.includes_['encoder'] = '#include <Encoder.h>';
 
 			// 在 lib_deps 中添加標準 Encoder 庫
@@ -230,10 +232,20 @@ window.arduinoGenerator.forBlock['encoder_pid_setup'] = function (block) {
 	try {
 		const pidVarName = block.getFieldValue('PID_VAR');
 		const encoderVarName = block.getFieldValue('VAR');
+		const mode = block.getFieldValue('MODE') || 'POSITION';
 		const kp = block.getFieldValue('KP');
 		const ki = block.getFieldValue('KI');
 		const kd = block.getFieldValue('KD');
 		const currentBoard = window.getCurrentBoard();
+
+		// 儲存 PID 名稱對應的編碼器名稱和模式（供 encoder_pid_compute 使用）
+		if (!window.arduinoGenerator.pidEncoderMap_) {
+			window.arduinoGenerator.pidEncoderMap_ = {};
+		}
+		window.arduinoGenerator.pidEncoderMap_[pidVarName] = {
+			encoder: encoderVarName,
+			mode: mode,
+		};
 
 		// 添加 QuickPID 庫
 		window.arduinoGenerator.includes_['quickpid'] = '#include <QuickPID.h>';
@@ -249,11 +261,19 @@ window.arduinoGenerator.forBlock['encoder_pid_setup'] = function (block) {
 		window.arduinoGenerator.variables_[`pid_input_${pidVarName}`] = `float ${pidVarName}_input = 0;`;
 		window.arduinoGenerator.variables_[`pid_setpoint_${pidVarName}`] = `float ${pidVarName}_setpoint = 0;`;
 		window.arduinoGenerator.variables_[`pid_output_${pidVarName}`] = `float ${pidVarName}_output = 0;`;
-		window.arduinoGenerator.variables_[`pid_${pidVarName}`] = `QuickPID ${pidVarName}(&${pidVarName}_input, &${pidVarName}_output, &${pidVarName}_setpoint, ${kp}, ${ki}, ${kd}, QuickPID::DIRECT);`;
+		window.arduinoGenerator.variables_[
+			`pid_${pidVarName}`
+		] = `QuickPID ${pidVarName}(&${pidVarName}_input, &${pidVarName}_output, &${pidVarName}_setpoint, ${kp}, ${ki}, ${kd}, QuickPID::Action::direct);`;
+
+		// 速度模式需要額外的 lastCount 變數來計算速度
+		if (mode === 'SPEED') {
+			window.arduinoGenerator.variables_[`pid_lastCount_${pidVarName}`] = `long ${pidVarName}_lastCount = 0;`;
+		}
 
 		// 設置 PID 控制器
-		window.arduinoGenerator.setupCode_.push(`// 設定PID控制器 ${pidVarName} 用於編碼馬達 ${encoderVarName}`);
-		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetMode(QuickPID::AUTOMATIC);`);
+		const modeComment = mode === 'SPEED' ? '速度控制' : '位置控制';
+		window.arduinoGenerator.setupCode_.push(`// 設定PID控制器 ${pidVarName} 用於編碼馬達 ${encoderVarName} (${modeComment})`);
+		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetMode(QuickPID::Control::automatic);`);
 		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetOutputLimits(-255, 255);`);
 		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetSampleTimeUs(10000);  // 10ms 更新頻率`);
 
@@ -269,16 +289,40 @@ window.arduinoGenerator.forBlock['encoder_pid_compute'] = function (block) {
 	try {
 		const pidVarName = block.getFieldValue('PID_VAR');
 		const targetValue = window.arduinoGenerator.valueToCode(block, 'TARGET', window.arduinoGenerator.ORDER_NONE) || '0';
-		
-		// 生成 PID 計算代碼
-		let code = `// 更新PID設定點和輸入值\n`;
-		code += `${pidVarName}_setpoint = ${targetValue};\n`;
-		code += `// 此處需要根據實際情況取得當前馬達位置的輸入值\n`;
-		code += `// (由於無法直接從積木中獲取對應的編碼馬達名稱，用戶需要自行更新此行)\n`;
-		code += `// ${pidVarName}_input = encoderName.read() 或 encoderName.getCount();\n`;
-		code += `// 計算PID輸出\n`;
-		code += `${pidVarName}.Compute();\n`;
-		
+		const currentBoard = window.getCurrentBoard();
+
+		// 從映射中取得對應的編碼器名稱和模式
+		const pidConfig = window.arduinoGenerator.pidEncoderMap_?.[pidVarName];
+		const encoderVarName = pidConfig?.encoder || 'encoder';
+		const mode = pidConfig?.mode || 'POSITION';
+
+		// 根據板卡選擇正確的編碼器讀取方法
+		const encoderReadMethod = currentBoard === 'esp32' ? 'getCount()' : 'read()';
+
+		let preCode;
+		if (mode === 'SPEED') {
+			// 速度模式：計算編碼器讀數的變化量作為輸入
+			preCode = `// PID 速度控制 - ${pidVarName}\n`;
+			preCode += `long ${pidVarName}_currentCount = ${encoderVarName}.${encoderReadMethod};\n`;
+			preCode += `${pidVarName}_input = ${pidVarName}_currentCount - ${pidVarName}_lastCount;\n`;
+			preCode += `${pidVarName}_setpoint = ${targetValue};\n`;
+			preCode += `${pidVarName}.Compute();\n`;
+			preCode += `${pidVarName}_lastCount = ${pidVarName}_currentCount;\n`;
+		} else {
+			// 位置模式：直接使用編碼器讀數作為輸入
+			preCode = `// PID 位置控制 - ${pidVarName}\n`;
+			preCode += `${pidVarName}_input = ${encoderVarName}.${encoderReadMethod};\n`;
+			preCode += `${pidVarName}_setpoint = ${targetValue};\n`;
+			preCode += `${pidVarName}.Compute();\n`;
+		}
+
+		// 將計算代碼加入 loopCode（確保在使用輸出值之前執行）
+		if (!window.arduinoGenerator.loopCodeOnce_) {
+			window.arduinoGenerator.loopCodeOnce_ = {};
+		}
+		const codeKey = `pid_compute_${pidVarName}`;
+		window.arduinoGenerator.loopCodeOnce_[codeKey] = preCode;
+
 		// 返回PID計算的輸出值
 		return [`${pidVarName}_output`, window.arduinoGenerator.ORDER_ATOMIC];
 	} catch (e) {

@@ -102,13 +102,16 @@ window.languageManager.loadMessages('zh-hant', {
 	ENCODER_RESET_TOOLTIP: '將編碼馬達位置重設為零',
 	ENCODER_PID_SETUP: '設定PID控制',
 	ENCODER_PID_MOTOR: '馬達',
+	ENCODER_PID_MODE: '模式',
+	ENCODER_PID_MODE_POSITION: '位置',
+	ENCODER_PID_MODE_SPEED: '速度',
 	ENCODER_PID_KP: 'Kp',
 	ENCODER_PID_KI: 'Ki',
 	ENCODER_PID_KD: 'Kd',
-	ENCODER_PID_SETUP_TOOLTIP: '為編碼馬達設定PID控制參數',
+	ENCODER_PID_SETUP_TOOLTIP: '為編碼馬達設定PID控制參數（位置模式：轉到目標後停止，速度模式：持續以目標速度運轉）',
 	ENCODER_PID_COMPUTE: '計算PID',
 	ENCODER_PID_TARGET: '目標值',
-	ENCODER_PID_COMPUTE_TOOLTIP: '計算PID以控制編碼馬達達到目標位置',
+	ENCODER_PID_COMPUTE_TOOLTIP: '計算PID以控制編碼馬達達到目標位置或速度',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: '設定',

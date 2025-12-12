@@ -46,6 +46,10 @@ export class WebViewManager {
 	private localeService: LocaleService;
 	private previewPanels: Map<string, vscode.WebviewPanel> = new Map();
 	private currentTempToolboxFile: string | null = null;
+	// FileWatcher 機制 - T011
+	private fileWatcher: vscode.FileSystemWatcher | undefined;
+	private fileWatcherDebounceTimer: NodeJS.Timeout | undefined;
+	private isInternalUpdate: boolean = false; // 避免內部更新觸發 FileWatcher
 
 	/**
 	 * 建立 WebView 管理器實例
@@ -164,16 +168,30 @@ export class WebViewManager {
 		// 建立訊息處理器
 		this.messageHandler = new WebViewMessageHandler(this.context, this.panel, this.localeService);
 
-		// 監聽 WebView 訊息
-		this.panel.webview.onDidReceiveMessage(message => this.messageHandler?.handleMessage(message));
+		// 監聯 WebView 訊息
+		this.panel.webview.onDidReceiveMessage(message => {
+			// 攔截 saveWorkspace 命令，設置內部更新標記以避免 FileWatcher 觸發重載
+			if (message.command === 'saveWorkspace') {
+				this.markInternalUpdateStart();
+				// 延遲重置標記，確保檔案系統事件已完成
+				setTimeout(() => {
+					this.markInternalUpdateEnd();
+				}, 1000);
+			}
+			this.messageHandler?.handleMessage(message);
+		});
 
 		// 當面板關閉時清理資源
 		this.panel.onDidDispose(() => {
 			this.panel = undefined;
 			this.messageHandler = undefined;
 			this.cleanupTempFile();
+			this.disposeFileWatcher(); // 清理 FileWatcher
 			log('WebView panel disposed', 'info');
 		});
+
+		// 設置 FileWatcher 監聽 main.json 變更 - T011
+		this.setupFileWatcher();
 
 		log('WebView panel created and shown', 'info');
 	}
@@ -951,4 +969,147 @@ export class WebViewManager {
 	 * @param webview WebView 實例
 	 * @returns 語言腳本 HTML
 	 */
+
+	// ===== FileWatcher 機制 - T011 =====
+
+	/**
+	 * 設置 FileWatcher 監聽 main.json 變更
+	 * 用於 MCP Server 修改工作區後自動重載編輯器
+	 */
+	private setupFileWatcher(): void {
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			return;
+		}
+
+		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+		const mainJsonPattern = new vscode.RelativePattern(workspaceRoot, 'blockly/main.json');
+
+		// 清理現有的 FileWatcher
+		this.disposeFileWatcher();
+
+		// 建立新的 FileWatcher
+		this.fileWatcher = vscodeApi.workspace.createFileSystemWatcher(mainJsonPattern);
+
+		// 監聽檔案變更
+		this.fileWatcher.onDidChange(uri => {
+			this.handleFileChange(uri);
+		});
+
+		// 監聽檔案建立（首次建立 main.json）
+		this.fileWatcher.onDidCreate(uri => {
+			this.handleFileChange(uri);
+		});
+
+		log('FileWatcher setup for main.json', 'info');
+	}
+
+	/**
+	 * 處理檔案變更事件
+	 * 實作去抖動邏輯（500ms debounce）- T033
+	 */
+	private handleFileChange(uri: vscode.Uri): void {
+		// 避免內部更新觸發 - T034
+		if (this.isInternalUpdate) {
+			log('Ignoring internal update to main.json', 'debug');
+			return;
+		}
+
+		// 清除現有的 debounce timer
+		if (this.fileWatcherDebounceTimer) {
+			clearTimeout(this.fileWatcherDebounceTimer);
+		}
+
+		// 設定 500ms 去抖動
+		this.fileWatcherDebounceTimer = setTimeout(() => {
+			this.triggerWorkspaceReload(uri);
+		}, 500);
+	}
+
+	/**
+	 * 觸發工作區重載
+	 */
+	private async triggerWorkspaceReload(uri: vscode.Uri): Promise<void> {
+		log(`FileWatcher detected change in ${uri.fsPath}`, 'info');
+
+		// 確保面板存在
+		if (!this.panel || !this.messageHandler || !this.fileService) {
+			log('Panel or services not available for reload', 'warn');
+			return;
+		}
+
+		try {
+			// 設置內部更新標記，防止後續保存操作觸發 FileWatcher 循環
+			this.markInternalUpdateStart();
+
+			// 讀取更新後的 workspace 狀態
+			const mainJsonPath = 'blockly/main.json';
+			const exists = await this.fileService.fileExists(mainJsonPath);
+
+			if (!exists) {
+				log('Workspace file not found, skipping reload', 'warn');
+				this.markInternalUpdateEnd();
+				return;
+			}
+
+			const content = await this.fileService.readFile(mainJsonPath);
+			const saveData = JSON.parse(content);
+
+			// 驗證資料結構並發送 loadWorkspace 命令
+			if (saveData && typeof saveData === 'object' && saveData.workspace) {
+				await this.panel.webview.postMessage({
+					command: 'loadWorkspace',
+					state: saveData.workspace,
+					board: saveData.board || 'none',
+					theme: saveData.theme || 'light',
+					source: 'fileWatcher', // 標記來源，讓 WebView 知道這是外部觸發的重載
+				});
+				log('Workspace reload triggered via FileWatcher with loadWorkspace', 'info');
+			} else {
+				log('Invalid workspace state format in file', 'warn');
+			}
+
+			// 延遲重置內部更新標記，給 WebView 足夠時間完成載入和保存
+			setTimeout(() => {
+				this.markInternalUpdateEnd();
+			}, 2000);
+		} catch (error) {
+			log('Failed to trigger workspace reload', 'error', { error });
+			this.markInternalUpdateEnd();
+		}
+	}
+
+	/**
+	 * 清理 FileWatcher 資源
+	 */
+	private disposeFileWatcher(): void {
+		if (this.fileWatcherDebounceTimer) {
+			clearTimeout(this.fileWatcherDebounceTimer);
+			this.fileWatcherDebounceTimer = undefined;
+		}
+
+		if (this.fileWatcher) {
+			this.fileWatcher.dispose();
+			this.fileWatcher = undefined;
+			log('FileWatcher disposed', 'info');
+		}
+	}
+
+	/**
+	 * 標記內部更新開始
+	 * 用於避免內部保存操作觸發 FileWatcher
+	 */
+	public markInternalUpdateStart(): void {
+		this.isInternalUpdate = true;
+	}
+
+	/**
+	 * 標記內部更新結束
+	 */
+	public markInternalUpdateEnd(): void {
+		// 延遲重置，確保檔案系統事件已完成
+		setTimeout(() => {
+			this.isInternalUpdate = false;
+		}, 100);
+	}
 }
