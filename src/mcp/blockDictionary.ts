@@ -705,6 +705,9 @@ function getContextValueForField(context: BlockContext, fieldName: string): unkn
 		BOOL: 'value',
 		USE_INTERRUPT: 'useInterrupt',
 		NAME: 'functionName',
+		// 時間相關
+		TIME: 'time',
+		MS: 'ms',
 		// 腳位相關
 		RX_PIN: 'rxPin',
 		TX_PIN: 'txPin',

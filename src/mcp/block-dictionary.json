@@ -269,19 +269,20 @@
       ]
     },
     {
-      "type": "delay_ms",
+      "type": "arduino_delay",
+      "aliasOf": "delay_ms",
       "category": "arduino",
       "names": {
         "zh-hant": "延遲",
         "en": "Delay"
       },
       "descriptions": {
-        "zh-hant": "暫停程式執行指定的毫秒數",
-        "en": "Pause program execution for specified milliseconds"
+        "zh-hant": "暫停程式執行指定的毫秒數 (使用 arduino_delay 積木)",
+        "en": "Pause program execution for specified milliseconds (uses arduino_delay block)"
       },
       "fields": [
         {
-          "name": "MS",
+          "name": "TIME",
           "type": "number",
           "label": {
             "zh-hant": "毫秒",
@@ -306,7 +307,9 @@
         "延遲",
         "等待",
         "時間"
-      ]
+      ],
+      "deprecated": true,
+      "useInstead": "arduino_delay"
     },
     {
       "type": "pin_mode",
@@ -2953,21 +2956,22 @@
         "en": "Arduino Delay"
       },
       "descriptions": {
-        "zh-hant": "暫停程式執行指定的時間",
-        "en": "Pause program execution for specified time"
+        "zh-hant": "暫停程式執行指定的時間（毫秒）",
+        "en": "Pause program execution for specified time (milliseconds)"
       },
-      "fields": [],
-      "inputs": [
+      "fields": [
         {
-          "name": "DELAY_TIME",
-          "type": "value",
+          "name": "TIME",
+          "type": "number",
           "label": {
             "zh-hant": "時間 (毫秒)",
             "en": "Time (ms)"
           },
-          "check": "Number"
+          "default": 1000,
+          "min": 0
         }
       ],
+      "inputs": [],
       "boards": [
         "arduino_uno",
         "arduino_nano",
