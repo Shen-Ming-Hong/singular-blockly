@@ -299,32 +299,36 @@ window.arduinoGenerator.forBlock['encoder_pid_compute'] = function (block) {
 		// 根據板卡選擇正確的編碼器讀取方法
 		const encoderReadMethod = currentBoard === 'esp32' ? 'getCount()' : 'read()';
 
-		let preCode;
+		// 建立 PID 計算輔助函數 - 確保計算邏輯在需要時被執行
+		const funcName = `${pidVarName}_compute`;
 		if (mode === 'SPEED') {
 			// 速度模式：計算編碼器讀數的變化量作為輸入
-			preCode = `// PID 速度控制 - ${pidVarName}\n`;
-			preCode += `long ${pidVarName}_currentCount = ${encoderVarName}.${encoderReadMethod};\n`;
-			preCode += `${pidVarName}_input = ${pidVarName}_currentCount - ${pidVarName}_lastCount;\n`;
-			preCode += `${pidVarName}_setpoint = ${targetValue};\n`;
-			preCode += `${pidVarName}.Compute();\n`;
-			preCode += `${pidVarName}_lastCount = ${pidVarName}_currentCount;\n`;
+			window.arduinoGenerator.functions_[funcName] = `
+// PID 速度控制計算函數 - ${pidVarName}
+float ${funcName}(float targetSpeed) {
+  long ${pidVarName}_currentCount = ${encoderVarName}.${encoderReadMethod};
+  ${pidVarName}_input = ${pidVarName}_currentCount - ${pidVarName}_lastCount;
+  ${pidVarName}_setpoint = targetSpeed;
+  ${pidVarName}.Compute();
+  ${pidVarName}_lastCount = ${pidVarName}_currentCount;
+  return ${pidVarName}_output;
+}
+`;
 		} else {
 			// 位置模式：直接使用編碼器讀數作為輸入
-			preCode = `// PID 位置控制 - ${pidVarName}\n`;
-			preCode += `${pidVarName}_input = ${encoderVarName}.${encoderReadMethod};\n`;
-			preCode += `${pidVarName}_setpoint = ${targetValue};\n`;
-			preCode += `${pidVarName}.Compute();\n`;
+			window.arduinoGenerator.functions_[funcName] = `
+// PID 位置控制計算函數 - ${pidVarName}
+float ${funcName}(float targetPosition) {
+  ${pidVarName}_input = ${encoderVarName}.${encoderReadMethod};
+  ${pidVarName}_setpoint = targetPosition;
+  ${pidVarName}.Compute();
+  return ${pidVarName}_output;
+}
+`;
 		}
 
-		// 將計算代碼加入 loopCode（確保在使用輸出值之前執行）
-		if (!window.arduinoGenerator.loopCodeOnce_) {
-			window.arduinoGenerator.loopCodeOnce_ = {};
-		}
-		const codeKey = `pid_compute_${pidVarName}`;
-		window.arduinoGenerator.loopCodeOnce_[codeKey] = preCode;
-
-		// 返回PID計算的輸出值
-		return [`${pidVarName}_output`, window.arduinoGenerator.ORDER_ATOMIC];
+		// 返回函數呼叫，確保計算邏輯在表達式求值時執行
+		return [`${funcName}(${targetValue})`, window.arduinoGenerator.ORDER_FUNCTION_CALL];
 	} catch (e) {
 		log.error('Encoder PID compute code generation error:', e);
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC];
