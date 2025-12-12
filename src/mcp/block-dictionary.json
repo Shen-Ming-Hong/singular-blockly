@@ -1,6 +1,6 @@
 {
   "version": "0.45.0",
-  "generatedAt": "2025-12-12T09:04:19.185Z",
+  "generatedAt": "2025-12-12T09:07:36.719Z",
   "blocks": [
     {
       "type": "arduino_setup",
@@ -3593,18 +3593,19 @@
         "zh-hant": "根據門檻函式讀取輸出值",
         "en": "Read output value based on threshold function"
       },
-      "fields": [],
-      "inputs": [
+      "fields": [
         {
-          "name": "INPUT",
-          "type": "value",
+          "name": "FUNC",
+          "type": "dropdown",
           "label": {
-            "zh-hant": "輸入值",
-            "en": "Input"
+            "zh-hant": "函式",
+            "en": "Function"
           },
-          "check": "Number"
+          "options": "dynamic:thresholdFunctions",
+          "default": "Func0"
         }
       ],
+      "inputs": [],
       "output": {
         "type": "Number"
       },
