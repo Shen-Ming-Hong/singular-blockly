@@ -3530,8 +3530,8 @@
         "en": "Threshold Function Setup"
       },
       "descriptions": {
-        "zh-hant": "設定門檻函式的參數，用於將輸入映射到輸出",
-        "en": "Setup threshold function parameters for mapping input to output"
+        "zh-hant": "設定門檻函式的參數，用於將輸入映射到輸出。注意：函式名稱（如 Func0）可透過下拉選單上方的輸入框自訂修改",
+        "en": "Setup threshold function parameters for mapping input to output. Note: The function name (e.g., Func0) can be customized via the input field above the dropdown"
       },
       "fields": [],
       "inputs": [
@@ -3580,7 +3580,11 @@
       ],
       "relatedBlocks": [
         "threshold_function_read"
-      ]
+      ],
+      "usageNotes": {
+        "zh-hant": "函式名稱預設為 Func0，但可以透過積木上方的輸入框自訂為任意名稱。建議使用有意義的名稱，例如「亮度門檻」或「溫度警報」",
+        "en": "Function name defaults to Func0 but can be customized via the input field on the block. Consider using meaningful names like \"brightnessThreshold\" or \"tempAlert\""
+      }
     },
     {
       "type": "threshold_function_read",
@@ -3590,8 +3594,8 @@
         "en": "Threshold Function Read"
       },
       "descriptions": {
-        "zh-hant": "根據門檻函式讀取輸出值",
-        "en": "Read output value based on threshold function"
+        "zh-hant": "根據門檻函式讀取輸出值。選擇的函式名稱需與設定積木中定義的名稱相符",
+        "en": "Read output value based on threshold function. Selected function name must match the name defined in setup block"
       },
       "fields": [
         {
@@ -3626,7 +3630,11 @@
       ],
       "relatedBlocks": [
         "threshold_function_setup"
-      ]
+      ],
+      "usageNotes": {
+        "zh-hant": "下拉選單會顯示所有已定義的門檻函式。如果在設定積木中自訂了函式名稱，這裡也會顯示對應的自訂名稱",
+        "en": "Dropdown shows all defined threshold functions. If you customized the function name in the setup block, the custom name will appear here"
+      }
     },
     {
       "type": "controls_if",
