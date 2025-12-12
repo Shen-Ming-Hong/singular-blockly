@@ -4152,7 +4152,8 @@
         "encoder_read",
         "encoder_reset",
         "encoder_pid_setup",
-        "encoder_pid_compute"
+        "encoder_pid_compute",
+        "encoder_pid_reset"
       ],
       "interrupt": [
         "encoder_setup"
@@ -4160,7 +4161,10 @@
       "編碼": [
         "encoder_setup",
         "encoder_read",
-        "encoder_reset"
+        "encoder_reset",
+        "encoder_pid_setup",
+        "encoder_pid_compute",
+        "encoder_pid_reset"
       ],
       "中斷": [
         "encoder_setup"
@@ -4190,7 +4194,8 @@
         "encoder_reset"
       ],
       "重設": [
-        "encoder_reset"
+        "encoder_reset",
+        "encoder_pid_reset"
       ],
       "歸零": [
         "encoder_reset"
@@ -4844,7 +4849,8 @@
       ],
       "編碼器": [
         "encoder_pid_setup",
-        "encoder_pid_compute"
+        "encoder_pid_compute",
+        "encoder_pid_reset"
       ],
       "compute": [
         "encoder_pid_compute"
