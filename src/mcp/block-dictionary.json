@@ -1,6 +1,6 @@
 {
   "version": "0.45.0",
-  "generatedAt": "2025-12-11T16:00:59.609Z",
+  "generatedAt": "2025-12-12T08:11:58.511Z",
   "blocks": [
     {
       "type": "arduino_setup",
@@ -2946,46 +2946,6 @@
         "類比",
         "讀取",
         "輸入"
-      ]
-    },
-    {
-      "type": "arduino_delay",
-      "category": "arduino",
-      "names": {
-        "zh-hant": "Arduino 延遲",
-        "en": "Arduino Delay"
-      },
-      "descriptions": {
-        "zh-hant": "暫停程式執行指定的時間（毫秒）",
-        "en": "Pause program execution for specified time (milliseconds)"
-      },
-      "fields": [
-        {
-          "name": "TIME",
-          "type": "number",
-          "label": {
-            "zh-hant": "時間 (毫秒)",
-            "en": "Time (ms)"
-          },
-          "default": 1000,
-          "min": 0
-        }
-      ],
-      "inputs": [],
-      "boards": [
-        "arduino_uno",
-        "arduino_nano",
-        "arduino_mega",
-        "esp32",
-        "esp32_supermini"
-      ],
-      "tags": [
-        "delay",
-        "wait",
-        "time",
-        "延遲",
-        "等待",
-        "時間"
       ]
     },
     {
@@ -6794,7 +6754,7 @@
       "digital_read": 3,
       "analog_write": 4,
       "analog_read": 5,
-      "delay_ms": 6,
+      "arduino_delay": 6,
       "pin_mode": 7,
       "servo_setup": 8,
       "servo_move": 9,
@@ -6842,64 +6802,63 @@
       "arduino_digital_read": 51,
       "arduino_analog_write": 52,
       "arduino_analog_read": 53,
-      "arduino_delay": 54,
-      "arduino_level": 55,
-      "arduino_pullup": 56,
-      "arduino_pin_mode": 57,
-      "text_print": 58,
-      "math_map": 59,
-      "ultrasonic_trigger": 60,
-      "encoder_pid_setup": 61,
-      "encoder_pid_compute": 62,
-      "encoder_pid_reset": 63,
-      "threshold_function_setup": 64,
-      "threshold_function_read": 65,
-      "controls_if": 66,
-      "logic_compare": 67,
-      "logic_operation": 68,
-      "logic_negate": 69,
-      "logic_boolean": 70,
-      "logic_null": 71,
-      "logic_ternary": 72,
-      "controls_repeat_ext": 73,
-      "controls_whileUntil": 74,
-      "controls_for": 75,
-      "controls_forEach": 76,
-      "math_number": 77,
-      "math_arithmetic": 78,
-      "math_single": 79,
-      "math_trig": 80,
-      "math_constant": 81,
-      "math_number_property": 82,
-      "math_round": 83,
-      "math_on_list": 84,
-      "math_modulo": 85,
-      "math_constrain": 86,
-      "math_random_int": 87,
-      "math_random_float": 88,
-      "math_atan2": 89,
-      "text": 90,
-      "text_join": 91,
-      "text_append": 92,
-      "text_length": 93,
-      "text_isEmpty": 94,
-      "text_indexOf": 95,
-      "text_charAt": 96,
-      "text_getSubstring": 97,
-      "text_count": 98,
-      "text_reverse": 99,
-      "text_prompt_ext": 100,
-      "lists_create_with": 101,
-      "lists_repeat": 102,
-      "lists_length": 103,
-      "lists_isEmpty": 104,
-      "lists_indexOf": 105,
-      "lists_getIndex": 106,
-      "lists_setIndex": 107,
-      "lists_getSublist": 108,
-      "lists_sort": 109,
-      "lists_split": 110,
-      "lists_reverse": 111
+      "arduino_level": 54,
+      "arduino_pullup": 55,
+      "arduino_pin_mode": 56,
+      "text_print": 57,
+      "math_map": 58,
+      "ultrasonic_trigger": 59,
+      "encoder_pid_setup": 60,
+      "encoder_pid_compute": 61,
+      "encoder_pid_reset": 62,
+      "threshold_function_setup": 63,
+      "threshold_function_read": 64,
+      "controls_if": 65,
+      "logic_compare": 66,
+      "logic_operation": 67,
+      "logic_negate": 68,
+      "logic_boolean": 69,
+      "logic_null": 70,
+      "logic_ternary": 71,
+      "controls_repeat_ext": 72,
+      "controls_whileUntil": 73,
+      "controls_for": 74,
+      "controls_forEach": 75,
+      "math_number": 76,
+      "math_arithmetic": 77,
+      "math_single": 78,
+      "math_trig": 79,
+      "math_constant": 80,
+      "math_number_property": 81,
+      "math_round": 82,
+      "math_on_list": 83,
+      "math_modulo": 84,
+      "math_constrain": 85,
+      "math_random_int": 86,
+      "math_random_float": 87,
+      "math_atan2": 88,
+      "text": 89,
+      "text_join": 90,
+      "text_append": 91,
+      "text_length": 92,
+      "text_isEmpty": 93,
+      "text_indexOf": 94,
+      "text_charAt": 95,
+      "text_getSubstring": 96,
+      "text_count": 97,
+      "text_reverse": 98,
+      "text_prompt_ext": 99,
+      "lists_create_with": 100,
+      "lists_repeat": 101,
+      "lists_length": 102,
+      "lists_isEmpty": 103,
+      "lists_indexOf": 104,
+      "lists_getIndex": 105,
+      "lists_setIndex": 106,
+      "lists_getSublist": 107,
+      "lists_sort": 108,
+      "lists_split": 109,
+      "lists_reverse": 110
     },
     "byCategory": {
       "arduino": [
@@ -6920,9 +6879,8 @@
         54,
         55,
         56,
-        57,
-        64,
-        65
+        63,
+        64
       ],
       "motors": [
         8,
@@ -6931,14 +6889,14 @@
         11,
         12,
         13,
+        60,
         61,
-        62,
-        63
+        62
       ],
       "sensors": [
         14,
         15,
-        60
+        59
       ],
       "vision": [
         16,
@@ -6973,10 +6931,10 @@
       "loops": [
         38,
         39,
+        72,
         73,
         74,
-        75,
-        76
+        75
       ],
       "functions": [
         40,
@@ -6985,7 +6943,8 @@
         43
       ],
       "text": [
-        58,
+        57,
+        89,
         90,
         91,
         92,
@@ -6995,11 +6954,11 @@
         96,
         97,
         98,
-        99,
-        100
+        99
       ],
       "math": [
-        59,
+        58,
+        76,
         77,
         78,
         79,
@@ -7011,19 +6970,19 @@
         85,
         86,
         87,
-        88,
-        89
+        88
       ],
       "logic": [
+        65,
         66,
         67,
         68,
         69,
         70,
-        71,
-        72
+        71
       ],
       "lists": [
+        100,
         101,
         102,
         103,
@@ -7033,17 +6992,12 @@
         107,
         108,
         109,
-        110,
-        111
+        110
       ]
     },
     "searchIndex": {
       "setup": [
         "arduino_setup",
-        "servo_setup",
-        "encoder_setup",
-        "seven_segment_pins",
-        "esp32_pwm_setup",
         "arduino_setup_loop",
         "encoder_pid_setup",
         "threshold_function_setup"
@@ -7051,17 +7005,10 @@
       "arduino": [
         "arduino_setup",
         "arduino_loop",
-        "arduino_setup_loop",
-        "arduino_digital_write",
-        "arduino_digital_read",
-        "arduino_analog_write",
-        "arduino_analog_read",
-        "arduino_delay"
+        "arduino_setup_loop"
       ],
       "設定": [
         "arduino_setup",
-        "huskylens_set_algorithm",
-        "esp32_pwm_setup",
         "pixetto_set_mode",
         "arduino_setup_loop",
         "encoder_pid_setup",
@@ -7070,26 +7017,33 @@
       ],
       "初始化": [
         "arduino_setup",
-        "huskylens_init_i2c",
-        "huskylens_init_uart",
         "pixetto_init"
       ],
       "loop": [
         "arduino_loop",
         "controls_duration",
         "singular_flow_statements",
-        "arduino_setup_loop"
+        "arduino_setup_loop",
+        "controls_repeat_ext",
+        "controls_whileUntil",
+        "controls_for",
+        "controls_forEach"
       ],
       "迴圈": [
         "arduino_loop",
         "controls_duration",
         "singular_flow_statements",
-        "arduino_setup_loop"
+        "arduino_setup_loop",
+        "controls_repeat_ext",
+        "controls_whileUntil",
+        "controls_for",
+        "controls_forEach"
       ],
       "重複": [
         "arduino_loop",
         "controls_duration",
-        "controls_repeat_ext"
+        "controls_repeat_ext",
+        "lists_repeat"
       ],
       "digital": [
         "digital_write",
@@ -7129,10 +7083,6 @@
         "arduino_pin_mode",
         "text_print"
       ],
-      "數位寫入": [
-        "digital_write",
-        "arduino_digital_write"
-      ],
       "read": [
         "digital_read",
         "analog_read",
@@ -7159,10 +7109,6 @@
         "arduino_pin_mode",
         "text_prompt_ext"
       ],
-      "數位讀取": [
-        "digital_read",
-        "arduino_digital_read"
-      ],
       "analog": [
         "analog_write",
         "analog_read",
@@ -7181,40 +7127,26 @@
         "arduino_analog_write",
         "arduino_analog_read"
       ],
-      "類比寫入": [
-        "analog_write",
-        "arduino_analog_write"
-      ],
       "adc": [
         "analog_read"
       ],
-      "類比讀取": [
-        "analog_read",
-        "arduino_analog_read"
-      ],
       "delay": [
-        "delay_ms",
         "arduino_delay"
       ],
       "wait": [
-        "delay_ms",
         "arduino_delay"
       ],
       "time": [
-        "delay_ms",
-        "controls_duration",
-        "arduino_delay"
+        "arduino_delay",
+        "controls_duration"
       ],
       "延遲": [
-        "delay_ms",
         "arduino_delay"
       ],
       "等待": [
-        "delay_ms",
         "arduino_delay"
       ],
       "時間": [
-        "delay_ms",
         "arduino_delay"
       ],
       "pin": [
@@ -7224,7 +7156,8 @@
       "mode": [
         "pin_mode",
         "pixetto_set_mode",
-        "arduino_pin_mode"
+        "arduino_pin_mode",
+        "encoder_pid_setup"
       ],
       "腳位": [
         "pin_mode",
@@ -7233,10 +7166,8 @@
       "模式": [
         "pin_mode",
         "pixetto_set_mode",
-        "arduino_pin_mode"
-      ],
-      "設定腳位模式": [
-        "pin_mode"
+        "arduino_pin_mode",
+        "encoder_pid_setup"
       ],
       "servo": [
         "servo_setup",
@@ -7259,31 +7190,24 @@
       "舵機": [
         "servo_setup"
       ],
-      "設定伺服馬達": [
-        "servo_setup"
-      ],
       "move": [
         "servo_move"
       ],
       "angle": [
-        "servo_move"
+        "servo_move",
+        "math_atan2"
       ],
       "轉動": [
         "servo_move"
       ],
       "角度": [
-        "servo_move"
-      ],
-      "旋轉伺服馬達": [
-        "servo_move"
+        "servo_move",
+        "math_atan2"
       ],
       "stop": [
         "servo_stop"
       ],
       "停止": [
-        "servo_stop"
-      ],
-      "停止伺服馬達": [
         "servo_stop"
       ],
       "encoder": [
@@ -7300,34 +7224,30 @@
       "編碼": [
         "encoder_setup",
         "encoder_read",
-        "encoder_reset",
-        "encoder_pid_setup",
-        "encoder_pid_compute",
-        "encoder_pid_reset"
+        "encoder_reset"
       ],
       "中斷": [
-        "encoder_setup"
-      ],
-      "設定編碼馬達": [
         "encoder_setup"
       ],
       "position": [
         "encoder_read",
         "huskylens_get_block_info",
         "pixetto_get_position",
-        "huskylens_get_arrow_info"
+        "huskylens_get_arrow_info",
+        "encoder_pid_setup"
       ],
       "位置": [
         "encoder_read",
         "huskylens_get_block_info",
         "pixetto_get_position",
-        "huskylens_get_arrow_info"
-      ],
-      "讀取編碼馬達": [
-        "encoder_read"
+        "huskylens_get_arrow_info",
+        "encoder_pid_setup",
+        "text_indexOf",
+        "lists_indexOf"
       ],
       "reset": [
-        "encoder_reset"
+        "encoder_reset",
+        "encoder_pid_reset"
       ],
       "zero": [
         "encoder_reset"
@@ -7339,17 +7259,13 @@
       "歸零": [
         "encoder_reset"
       ],
-      "重設編碼馬達": [
-        "encoder_reset"
-      ],
       "ultrasonic": [
         "ultrasonic_sensor",
         "ultrasonic_read",
         "ultrasonic_trigger"
       ],
       "sensor": [
-        "ultrasonic_sensor",
-        "ultrasonic_trigger"
+        "ultrasonic_sensor"
       ],
       "distance": [
         "ultrasonic_sensor",
@@ -7372,13 +7288,7 @@
         "ultrasonic_read",
         "ultrasonic_trigger"
       ],
-      "超音波感測器": [
-        "ultrasonic_sensor"
-      ],
       "cm": [
-        "ultrasonic_read"
-      ],
-      "讀取超音波距離": [
         "ultrasonic_read"
       ],
       "huskylens": [
@@ -7420,14 +7330,6 @@
         "huskylens_init_i2c",
         "pixetto_neural_network"
       ],
-      "(i2c)": [
-        "huskylens_init_i2c"
-      ],
-      "init": [
-        "huskylens_init_i2c",
-        "huskylens_init_uart",
-        "pixetto_init"
-      ],
       "uart": [
         "huskylens_init_uart",
         "pixetto_init"
@@ -7435,9 +7337,6 @@
       "serial": [
         "huskylens_init_uart",
         "text_print"
-      ],
-      "(uart)": [
-        "huskylens_init_uart"
       ],
       "algorithm": [
         "huskylens_set_algorithm"
@@ -7469,11 +7368,6 @@
         "pixetto_neural_network",
         "pixetto_handwritten_digit"
       ],
-      "set": [
-        "huskylens_set_algorithm",
-        "pixetto_set_mode",
-        "lists_setIndex"
-      ],
       "request": [
         "huskylens_request"
       ],
@@ -7486,16 +7380,16 @@
       "資料": [
         "huskylens_request"
       ],
-      "辨識結果": [
-        "huskylens_request"
-      ],
       "blocks": [
         "huskylens_count_blocks"
       ],
       "count": [
         "huskylens_count_blocks",
         "huskylens_count_arrows",
-        "text_count"
+        "controls_for",
+        "text_length",
+        "text_count",
+        "lists_length"
       ],
       "方塊": [
         "huskylens_count_blocks",
@@ -7503,13 +7397,10 @@
       ],
       "數量": [
         "huskylens_count_blocks",
-        "huskylens_count_arrows"
-      ],
-      "方塊數量": [
-        "huskylens_count_blocks"
+        "huskylens_count_arrows",
+        "lists_length"
       ],
       "block": [
-        "huskylens_count_blocks",
         "huskylens_get_block_info"
       ],
       "info": [
@@ -7519,22 +7410,6 @@
       "資訊": [
         "huskylens_get_block_info",
         "huskylens_get_arrow_info"
-      ],
-      "取得": [
-        "huskylens_get_block_info",
-        "huskylens_get_arrow_info",
-        "lists_getIndex"
-      ],
-      "方塊資訊": [
-        "huskylens_get_block_info"
-      ],
-      "get": [
-        "huskylens_get_block_info",
-        "pixetto_get_type_id",
-        "pixetto_get_func_id",
-        "pixetto_get_position",
-        "huskylens_get_arrow_info",
-        "lists_getIndex"
       ],
       "seven": [
         "seven_segment_pins",
@@ -7558,12 +7433,6 @@
       "led": [
         "seven_segment_pins"
       ],
-      "設定七段顯示器腳位": [
-        "seven_segment_pins"
-      ],
-      "pins": [
-        "seven_segment_pins"
-      ],
       "number": [
         "seven_segment_display",
         "math_number"
@@ -7575,9 +7444,6 @@
         "seven_segment_display",
         "pixetto_handwritten_digit",
         "math_number"
-      ],
-      "七段顯示器顯示": [
-        "seven_segment_display"
       ],
       "esp32": [
         "esp32_pwm_setup"
@@ -7612,6 +7478,9 @@
         "pixetto_road_detect",
         "pixetto_set_mode"
       ],
+      "init": [
+        "pixetto_init"
+      ],
       "detect": [
         "pixetto_is_detected",
         "pixetto_color_detect",
@@ -7631,17 +7500,6 @@
       "物體": [
         "pixetto_is_detected"
       ],
-      "偵測到物體": [
-        "pixetto_is_detected"
-      ],
-      "is": [
-        "pixetto_is_detected",
-        "huskylens_is_learned"
-      ],
-      "detected": [
-        "pixetto_is_detected",
-        "pixetto_face_detect"
-      ],
       "type": [
         "pixetto_get_type_id"
       ],
@@ -7650,9 +7508,6 @@
         "pixetto_get_func_id"
       ],
       "類型": [
-        "pixetto_get_type_id"
-      ],
-      "取得偵測類型": [
         "pixetto_get_type_id"
       ],
       "function": [
@@ -7667,13 +7522,7 @@
       "功能": [
         "pixetto_get_func_id"
       ],
-      "取得功能": [
-        "pixetto_get_func_id"
-      ],
       "顏色": [
-        "pixetto_color_detect"
-      ],
-      "偵測顏色": [
         "pixetto_color_detect"
       ],
       "shape": [
@@ -7682,13 +7531,7 @@
       "形狀": [
         "pixetto_shape_detect"
       ],
-      "偵測形狀": [
-        "pixetto_shape_detect"
-      ],
       "人臉": [
-        "pixetto_face_detect"
-      ],
-      "偵測到人臉": [
         "pixetto_face_detect"
       ],
       "apriltag": [
@@ -7706,9 +7549,6 @@
       "神經網路": [
         "pixetto_neural_network"
       ],
-      "神經網路辨識": [
-        "pixetto_neural_network"
-      ],
       "handwritten": [
         "pixetto_handwritten_digit"
       ],
@@ -7718,16 +7558,10 @@
       "手寫": [
         "pixetto_handwritten_digit"
       ],
-      "辨識手寫數字": [
-        "pixetto_handwritten_digit"
-      ],
       "coordinate": [
         "pixetto_get_position"
       ],
       "座標": [
-        "pixetto_get_position"
-      ],
-      "獲取偵測物體座標": [
         "pixetto_get_position"
       ],
       "road": [
@@ -7736,26 +7570,19 @@
       "道路": [
         "pixetto_road_detect"
       ],
-      "道路偵測": [
-        "pixetto_road_detect"
-      ],
-      "detection": [
-        "pixetto_road_detect"
-      ],
-      "功能模式": [
-        "pixetto_set_mode"
+      "set": [
+        "pixetto_set_mode",
+        "lists_setIndex"
       ],
       "duration": [
         "controls_duration"
       ],
       "repeat": [
         "controls_duration",
-        "controls_repeat_ext"
+        "controls_repeat_ext",
+        "lists_repeat"
       ],
       "限時": [
-        "controls_duration"
-      ],
-      "限時重複": [
         "controls_duration"
       ],
       "break": [
@@ -7771,12 +7598,6 @@
         "singular_flow_statements"
       ],
       "繼續": [
-        "singular_flow_statements"
-      ],
-      "流程控制": [
-        "singular_flow_statements"
-      ],
-      "control": [
         "singular_flow_statements"
       ],
       "define": [
@@ -7800,16 +7621,10 @@
       "程序": [
         "arduino_function"
       ],
-      "定義函式": [
-        "arduino_function"
-      ],
       "call": [
         "arduino_function_call"
       ],
       "呼叫": [
-        "arduino_function_call"
-      ],
-      "呼叫函式": [
         "arduino_function_call"
       ],
       "mutator": [
@@ -7826,19 +7641,10 @@
       "容器": [
         "arduino_function_mutator"
       ],
-      "函式參數容器": [
-        "arduino_function_mutator"
-      ],
-      "container": [
-        "arduino_function_mutator"
-      ],
       "argument": [
         "arduino_function_parameter"
       ],
       "引數": [
-        "arduino_function_parameter"
-      ],
-      "函式參數": [
         "arduino_function_parameter"
       ],
       "arrows": [
@@ -7848,14 +7654,7 @@
         "huskylens_count_arrows",
         "huskylens_get_arrow_info"
       ],
-      "箭頭數量": [
-        "huskylens_count_arrows"
-      ],
       "arrow": [
-        "huskylens_count_arrows",
-        "huskylens_get_arrow_info"
-      ],
-      "箭頭資訊": [
         "huskylens_get_arrow_info"
       ],
       "learn": [
@@ -7880,7 +7679,8 @@
         "huskylens_forget"
       ],
       "清除": [
-        "huskylens_forget"
+        "huskylens_forget",
+        "encoder_pid_reset"
       ],
       "learned": [
         "huskylens_is_learned"
@@ -7893,16 +7693,6 @@
       ],
       "檢查": [
         "huskylens_is_learned"
-      ],
-      "設定與迴圈": [
-        "arduino_setup_loop"
-      ],
-      "and": [
-        "arduino_setup_loop",
-        "logic_operation"
-      ],
-      "(pwm)": [
-        "arduino_analog_write"
       ],
       "level": [
         "arduino_level"
@@ -7939,15 +7729,9 @@
       "電阻": [
         "arduino_pullup"
       ],
-      "上拉電阻": [
-        "arduino_pullup"
-      ],
       "output": [
         "arduino_pin_mode",
         "text_print"
-      ],
-      "腳位模式設定": [
-        "arduino_pin_mode"
       ],
       "print": [
         "text_print"
@@ -7958,14 +7742,12 @@
       "列印": [
         "text_print"
       ],
-      "序列埠輸出": [
-        "text_print"
-      ],
       "map": [
         "math_map"
       ],
       "range": [
-        "math_map"
+        "math_map",
+        "math_constrain"
       ],
       "convert": [
         "math_map"
@@ -7974,12 +7756,10 @@
         "math_map"
       ],
       "範圍": [
-        "math_map"
+        "math_map",
+        "math_constrain"
       ],
       "轉換": [
-        "math_map"
-      ],
-      "數值映射": [
         "math_map"
       ],
       "trigger": [
@@ -7988,17 +7768,21 @@
       "觸發": [
         "ultrasonic_trigger"
       ],
-      "觸發超音波感測器": [
-        "ultrasonic_trigger"
-      ],
       "pid": [
         "encoder_pid_setup",
-        "encoder_pid_compute"
+        "encoder_pid_compute",
+        "encoder_pid_reset"
       ],
       "編碼器": [
         "encoder_pid_setup",
         "encoder_pid_compute",
         "encoder_pid_reset"
+      ],
+      "speed": [
+        "encoder_pid_setup"
+      ],
+      "速度": [
+        "encoder_pid_setup"
       ],
       "compute": [
         "encoder_pid_compute"
@@ -8015,12 +7799,6 @@
         "threshold_function_setup",
         "threshold_function_read"
       ],
-      "門檻函式設定": [
-        "threshold_function_setup"
-      ],
-      "門檻函式讀取": [
-        "threshold_function_read"
-      ],
       "if": [
         "controls_if"
       ],
@@ -8030,6 +7808,10 @@
       "condition": [
         "controls_if"
       ],
+      "logic": [
+        "controls_if",
+        "logic_operation"
+      ],
       "如果": [
         "controls_if"
       ],
@@ -8038,11 +7820,16 @@
       ],
       "條件": [
         "controls_if",
-        "logic_ternary"
+        "logic_ternary",
+        "controls_whileUntil"
       ],
       "判斷": [
         "controls_if",
         "logic_ternary"
+      ],
+      "邏輯": [
+        "controls_if",
+        "logic_operation"
       ],
       "compare": [
         "logic_compare"
@@ -8068,6 +7855,12 @@
       "小於": [
         "logic_compare"
       ],
+      "相等": [
+        "logic_compare"
+      ],
+      "and": [
+        "logic_operation"
+      ],
       "or": [
         "logic_operation"
       ],
@@ -8076,6 +7869,10 @@
       ],
       "或": [
         "logic_operation"
+      ],
+      "運算": [
+        "logic_operation",
+        "math_arithmetic"
       ],
       "not": [
         "logic_negate"
@@ -8088,6 +7885,11 @@
       ],
       "否定": [
         "logic_negate"
+      ],
+      "反轉": [
+        "logic_negate",
+        "text_reverse",
+        "lists_reverse"
       ],
       "true": [
         "logic_boolean"
@@ -8110,32 +7912,34 @@
       "null": [
         "logic_null"
       ],
+      "empty": [
+        "logic_null",
+        "text_isEmpty",
+        "lists_isEmpty"
+      ],
+      "空": [
+        "logic_null",
+        "text_isEmpty",
+        "lists_isEmpty"
+      ],
       "空值": [
         "logic_null"
       ],
       "ternary": [
         "logic_ternary"
       ],
+      "conditional": [
+        "logic_ternary"
+      ],
       "三元": [
         "logic_ternary"
       ],
-      "logic": [
-        "controls_if",
-        "logic_compare",
-        "logic_operation",
-        "logic_negate",
-        "logic_boolean",
-        "logic_null",
-        "logic_ternary"
+      "times": [
+        "controls_repeat_ext"
       ],
-      "邏輯": [
-        "controls_if",
-        "logic_compare",
-        "logic_operation",
-        "logic_negate",
-        "logic_boolean",
-        "logic_null",
-        "logic_ternary"
+      "次數": [
+        "controls_repeat_ext",
+        "text_count"
       ],
       "while": [
         "controls_whileUntil"
@@ -8143,9 +7947,20 @@
       "until": [
         "controls_whileUntil"
       ],
+      "當": [
+        "controls_whileUntil"
+      ],
+      "直到": [
+        "controls_whileUntil"
+      ],
       "for": [
-        "controls_for",
-        "controls_forEach"
+        "controls_for"
+      ],
+      "計數": [
+        "controls_for"
+      ],
+      "變數": [
+        "controls_for"
       ],
       "foreach": [
         "controls_forEach"
@@ -8153,20 +7968,38 @@
       "each": [
         "controls_forEach"
       ],
-      "當": [
-        "controls_whileUntil"
-      ],
-      "直到": [
-        "controls_whileUntil"
-      ],
-      "計數": [
-        "controls_for"
+      "list": [
+        "controls_forEach",
+        "math_on_list",
+        "lists_create_with",
+        "lists_repeat"
       ],
       "每個": [
         "controls_forEach"
       ],
+      "清單": [
+        "controls_forEach",
+        "math_on_list",
+        "lists_create_with",
+        "lists_repeat"
+      ],
+      "value": [
+        "math_number"
+      ],
+      "constant": [
+        "math_number",
+        "math_constant"
+      ],
+      "數值": [
+        "math_number"
+      ],
+      "常數": [
+        "math_number",
+        "math_constant"
+      ],
       "add": [
-        "math_arithmetic"
+        "math_arithmetic",
+        "text_append"
       ],
       "subtract": [
         "math_arithmetic"
@@ -8178,9 +8011,6 @@
         "math_arithmetic"
       ],
       "power": [
-        "math_arithmetic"
-      ],
-      "arithmetic": [
         "math_arithmetic"
       ],
       "加": [
@@ -8195,7 +8025,10 @@
       "除": [
         "math_arithmetic"
       ],
-      "運算": [
+      "次方": [
+        "math_arithmetic"
+      ],
+      "算術": [
         "math_arithmetic"
       ],
       "sqrt": [
@@ -8204,10 +8037,22 @@
       "abs": [
         "math_single"
       ],
+      "log": [
+        "math_single"
+      ],
+      "exp": [
+        "math_single"
+      ],
       "平方根": [
         "math_single"
       ],
       "絕對值": [
+        "math_single"
+      ],
+      "對數": [
+        "math_single"
+      ],
+      "指數": [
         "math_single"
       ],
       "sin": [
@@ -8220,18 +8065,29 @@
         "math_trig"
       ],
       "trig": [
-        "math_trig"
+        "math_trig",
+        "math_atan2"
       ],
       "三角": [
+        "math_trig",
+        "math_atan2"
+      ],
+      "正弦": [
+        "math_trig"
+      ],
+      "餘弦": [
+        "math_trig"
+      ],
+      "正切": [
         "math_trig"
       ],
       "pi": [
         "math_constant"
       ],
-      "constant": [
+      "euler": [
         "math_constant"
       ],
-      "常數": [
+      "圓周率": [
         "math_constant"
       ],
       "even": [
@@ -8243,6 +8099,9 @@
       "prime": [
         "math_number_property"
       ],
+      "property": [
+        "math_number_property"
+      ],
       "偶數": [
         "math_number_property"
       ],
@@ -8252,10 +8111,25 @@
       "質數": [
         "math_number_property"
       ],
+      "屬性": [
+        "math_number_property"
+      ],
       "round": [
         "math_round"
       ],
+      "ceiling": [
+        "math_round"
+      ],
+      "floor": [
+        "math_round"
+      ],
       "四捨五入": [
+        "math_round"
+      ],
+      "進位": [
+        "math_round"
+      ],
+      "捨去": [
         "math_round"
       ],
       "sum": [
@@ -8288,7 +8162,13 @@
       "remainder": [
         "math_modulo"
       ],
+      "mod": [
+        "math_modulo"
+      ],
       "餘數": [
+        "math_modulo"
+      ],
+      "取餘": [
         "math_modulo"
       ],
       "constrain": [
@@ -8300,22 +8180,43 @@
       "限制": [
         "math_constrain"
       ],
+      "約束": [
+        "math_constrain"
+      ],
       "random": [
         "math_random_int",
         "math_random_float"
+      ],
+      "integer": [
+        "math_random_int"
       ],
       "隨機": [
         "math_random_int",
         "math_random_float"
       ],
+      "整數": [
+        "math_random_int"
+      ],
       "亂數": [
         "math_random_int",
         "math_random_float"
       ],
+      "float": [
+        "math_random_float"
+      ],
+      "fraction": [
+        "math_random_float"
+      ],
+      "小數": [
+        "math_random_float"
+      ],
+      "atan2": [
+        "math_atan2"
+      ],
       "text": [
         "text",
         "text_join",
-        "text_length"
+        "text_append"
       ],
       "string": [
         "text"
@@ -8323,7 +8224,7 @@
       "文字": [
         "text",
         "text_join",
-        "text_length"
+        "text_append"
       ],
       "字串": [
         "text"
@@ -8348,7 +8249,14 @@
       "附加": [
         "text_append"
       ],
+      "添加": [
+        "text_append"
+      ],
       "length": [
+        "text_length",
+        "lists_length"
+      ],
+      "size": [
         "text_length",
         "lists_length"
       ],
@@ -8356,11 +8264,14 @@
         "text_length",
         "lists_length"
       ],
-      "empty": [
+      "字數": [
+        "text_length"
+      ],
+      "blank": [
         "text_isEmpty",
         "lists_isEmpty"
       ],
-      "空": [
+      "空白": [
         "text_isEmpty",
         "lists_isEmpty"
       ],
@@ -8369,6 +8280,10 @@
         "lists_indexOf"
       ],
       "search": [
+        "text_indexOf",
+        "lists_indexOf"
+      ],
+      "index": [
         "text_indexOf",
         "lists_indexOf"
       ],
@@ -8386,53 +8301,100 @@
       "character": [
         "text_charAt"
       ],
+      "letter": [
+        "text_charAt"
+      ],
       "字元": [
         "text_charAt"
       ],
+      "字母": [
+        "text_charAt"
+      ],
       "substring": [
+        "text_getSubstring"
+      ],
+      "slice": [
+        "text_getSubstring",
+        "lists_getSublist"
+      ],
+      "portion": [
         "text_getSubstring",
         "lists_getSublist"
       ],
       "子字串": [
         "text_getSubstring"
       ],
+      "擷取": [
+        "text_getSubstring",
+        "lists_getSublist"
+      ],
+      "occurrences": [
+        "text_count"
+      ],
+      "出現": [
+        "text_count"
+      ],
       "reverse": [
         "text_reverse",
         "lists_reverse"
       ],
-      "反轉": [
+      "flip": [
+        "text_reverse",
+        "lists_reverse"
+      ],
+      "倒序": [
         "text_reverse",
         "lists_reverse"
       ],
       "prompt": [
         "text_prompt_ext"
       ],
+      "ask": [
+        "text_prompt_ext"
+      ],
       "提示": [
         "text_prompt_ext"
       ],
-      "list": [
-        "lists_create_with",
-        "lists_length",
-        "lists_getIndex",
-        "lists_setIndex"
-      ],
-      "array": [
-        "lists_create_with"
-      ],
-      "清單": [
-        "lists_create_with",
-        "lists_length",
-        "lists_getIndex",
-        "lists_setIndex"
-      ],
-      "陣列": [
-        "lists_create_with"
+      "詢問": [
+        "text_prompt_ext"
       ],
       "create": [
         "lists_create_with"
       ],
+      "array": [
+        "lists_create_with"
+      ],
       "建立": [
         "lists_create_with"
+      ],
+      "陣列": [
+        "lists_create_with"
+      ],
+      "fill": [
+        "lists_repeat"
+      ],
+      "填充": [
+        "lists_repeat"
+      ],
+      "get": [
+        "lists_getIndex"
+      ],
+      "remove": [
+        "lists_getIndex"
+      ],
+      "item": [
+        "lists_getIndex",
+        "lists_setIndex"
+      ],
+      "取得": [
+        "lists_getIndex"
+      ],
+      "移除": [
+        "lists_getIndex"
+      ],
+      "項目": [
+        "lists_getIndex",
+        "lists_setIndex"
       ],
       "insert": [
         "lists_setIndex"
@@ -8449,20 +8411,26 @@
       "sort": [
         "lists_sort"
       ],
+      "order": [
+        "lists_sort"
+      ],
       "排序": [
+        "lists_sort"
+      ],
+      "順序": [
         "lists_sort"
       ],
       "split": [
         "lists_split"
       ],
+      "delimiter": [
+        "lists_split"
+      ],
       "分割": [
         "lists_split"
       ],
-      "fill": [
-        "lists_repeat"
-      ],
-      "填充": [
-        "lists_repeat"
+      "分隔": [
+        "lists_split"
       ]
     }
   }
