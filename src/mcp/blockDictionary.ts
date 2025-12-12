@@ -390,6 +390,9 @@ export interface BlockContext {
 	// variables_get
 	variableName?: string;
 	variableId?: string;
+
+	// 允許使用任意 key（支援直接使用 field name）
+	[key: string]: unknown;
 }
 
 export interface JsonTemplate {
@@ -674,10 +677,21 @@ export function generateBlockJsonTemplate(block: BlockDefinition, context: Block
 
 /**
  * 從 context 中取得欄位值
+ * 支援多種命名格式：
+ * - 直接匹配：context.RX_PIN -> field RX_PIN
+ * - 駝峰式：context.rxPin -> field RX_PIN
+ * - 特定映射：context.pin -> field PIN
  */
 function getContextValueForField(context: BlockContext, fieldName: string): unknown {
-	// 直接映射常用欄位名稱
-	const fieldMappings: Record<string, keyof BlockContext> = {
+	const contextRecord = context as Record<string, unknown>;
+
+	// 1. 直接匹配 field name（優先級最高）
+	if (contextRecord[fieldName] !== undefined) {
+		return contextRecord[fieldName];
+	}
+
+	// 2. 特定映射（常用縮寫）
+	const fieldMappings: Record<string, string> = {
 		PIN: 'pin',
 		PIN_A: 'pinA',
 		PIN_B: 'pinB',
@@ -691,14 +705,40 @@ function getContextValueForField(context: BlockContext, fieldName: string): unkn
 		BOOL: 'value',
 		USE_INTERRUPT: 'useInterrupt',
 		NAME: 'functionName',
+		// 腳位相關
+		RX_PIN: 'rxPin',
+		TX_PIN: 'txPin',
+		TRIG_PIN: 'trigPin',
+		ECHO_PIN: 'echoPin',
+		// 七段顯示器
+		PIN_C: 'pinC',
+		PIN_D: 'pinD',
+		PIN_E: 'pinE',
+		PIN_F: 'pinF',
+		PIN_G: 'pinG',
+		PIN_DP: 'pinDP',
+		TYPE: 'type',
+		// 其他常用
+		ALGORITHM: 'algorithm',
+		COLOR: 'color',
+		MODE: 'mode',
+		FREQUENCY: 'frequency',
+		RESOLUTION: 'resolution',
+		FLOW: 'flow',
 	};
 
 	const contextKey = fieldMappings[fieldName];
-	if (contextKey && context[contextKey] !== undefined) {
-		return context[contextKey];
+	if (contextKey && contextRecord[contextKey] !== undefined) {
+		return contextRecord[contextKey];
 	}
 
-	// 通用欄位名稱（直接小寫匹配）
+	// 3. 駝峰式轉換（FIELD_NAME -> fieldName）
+	const camelCaseKey = fieldName.toLowerCase().replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+	if (contextRecord[camelCaseKey] !== undefined) {
+		return contextRecord[camelCaseKey];
+	}
+
+	// 4. 不區分大小寫的模糊匹配
 	const lowerFieldName = fieldName.toLowerCase();
 	for (const [key, value] of Object.entries(context)) {
 		if (key.toLowerCase() === lowerFieldName && value !== undefined) {
@@ -711,29 +751,52 @@ function getContextValueForField(context: BlockContext, fieldName: string): unkn
 
 /**
  * 從 context 中取得輸入端值
+ * 支援多種命名格式：
+ * - 直接匹配：context.THRESHOLD -> input THRESHOLD
+ * - 駝峰式：context.threshold -> input THRESHOLD
+ * - 特定映射：context.value -> input VALUE
  */
 function getContextValueForInput(context: BlockContext, inputName: string): unknown {
-	// 直接映射常用輸入端名稱
-	const inputMappings: Record<string, keyof BlockContext | string> = {
+	const contextRecord = context as Record<string, unknown>;
+
+	// 1. 直接匹配 input name（優先級最高）
+	if (contextRecord[inputName] !== undefined) {
+		return contextRecord[inputName];
+	}
+
+	// 2. 特定映射（常用縮寫）
+	const inputMappings: Record<string, string> = {
 		VALUE: 'value',
 		TARGET: 'targetValue',
 		NUM: 'value',
 		TEXT: 'value',
-		TIMES: 'value',
-		FROM: 'value',
-		TO: 'value',
-		BY: 'value',
+		TIMES: 'times',
+		FROM: 'from',
+		TO: 'to',
+		BY: 'by',
+		// 門檻函式相關
+		THRESHOLD: 'threshold',
+		LOW_OUTPUT: 'lowOutput',
+		HIGH_OUTPUT: 'highOutput',
+		// 迴圈相關
+		DURATION: 'duration',
 	};
 
 	const contextKey = inputMappings[inputName];
-	if (contextKey && typeof contextKey === 'string') {
-		const value = (context as Record<string, unknown>)[contextKey];
+	if (contextKey) {
+		const value = contextRecord[contextKey];
 		if (value !== undefined) {
 			return value;
 		}
 	}
 
-	// 通用輸入端名稱（直接小寫匹配）
+	// 3. 駝峰式轉換（INPUT_NAME -> inputName）
+	const camelCaseKey = inputName.toLowerCase().replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+	if (contextRecord[camelCaseKey] !== undefined) {
+		return contextRecord[camelCaseKey];
+	}
+
+	// 4. 不區分大小寫的模糊匹配
 	const lowerInputName = inputName.toLowerCase();
 	for (const [key, value] of Object.entries(context)) {
 		if (key.toLowerCase() === lowerInputName && value !== undefined) {
