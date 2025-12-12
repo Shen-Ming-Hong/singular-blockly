@@ -3811,8 +3811,9 @@
       "ultrasonic_trigger": 60,
       "encoder_pid_setup": 61,
       "encoder_pid_compute": 62,
-      "threshold_function_setup": 63,
-      "threshold_function_read": 64
+      "encoder_pid_reset": 63,
+      "threshold_function_setup": 64,
+      "threshold_function_read": 65
     },
     "byCategory": {
       "arduino": [
@@ -3834,8 +3835,8 @@
         55,
         56,
         57,
-        63,
-        64
+        64,
+        65
       ],
       "motors": [
         8,
@@ -3845,7 +3846,8 @@
         12,
         13,
         61,
-        62
+        62,
+        63
       ],
       "sensors": [
         14,
