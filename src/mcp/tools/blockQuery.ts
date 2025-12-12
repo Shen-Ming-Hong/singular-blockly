@@ -45,6 +45,8 @@ const SupportedLocaleSchema = z
 const BoardTypeSchema = z.enum(['arduino_uno', 'arduino_nano', 'arduino_mega', 'esp32', 'esp32_supermini']).describe('板卡類型');
 
 // Context Schema 定義
+// 使用 .passthrough() 允許傳入任意欄位名稱（如 RX_PIN, TX_PIN, PIN_A 等）
+// 這是因為不同積木有不同的欄位名稱，無法窮舉所有欄位
 const BlockContextSchema = z
 	.object({
 		// arduino_function_call
@@ -82,9 +84,38 @@ const BlockContextSchema = z
 		value: z.union([z.number(), z.string(), z.boolean()]).optional().describe('值'),
 		variableName: z.string().optional().describe('變數名稱'),
 		variableId: z.string().optional().describe('變數 ID'),
+
+		// 腳位相關（支援直接傳入欄位名稱）
+		RX_PIN: z.union([z.string(), z.number()]).optional().describe('RX 腳位'),
+		TX_PIN: z.union([z.string(), z.number()]).optional().describe('TX 腳位'),
+		TRIG_PIN: z.union([z.string(), z.number()]).optional().describe('觸發腳位'),
+		ECHO_PIN: z.union([z.string(), z.number()]).optional().describe('回聲腳位'),
+
+		// 七段顯示器腳位
+		PIN_A: z.union([z.string(), z.number()]).optional().describe('七段顯示器 A 腳位'),
+		PIN_B: z.union([z.string(), z.number()]).optional().describe('七段顯示器 B 腳位'),
+		PIN_C: z.union([z.string(), z.number()]).optional().describe('七段顯示器 C 腳位'),
+		PIN_D: z.union([z.string(), z.number()]).optional().describe('七段顯示器 D 腳位'),
+		PIN_E: z.union([z.string(), z.number()]).optional().describe('七段顯示器 E 腳位'),
+		PIN_F: z.union([z.string(), z.number()]).optional().describe('七段顯示器 F 腳位'),
+		PIN_G: z.union([z.string(), z.number()]).optional().describe('七段顯示器 G 腳位'),
+		PIN_DP: z.union([z.string(), z.number()]).optional().describe('七段顯示器 DP 腳位'),
+
+		// 時間相關
+		duration: z.number().optional().describe('持續時間 (毫秒)'),
+		time: z.number().optional().describe('時間值'),
+
+		// 感測器相關
+		algorithm: z.string().optional().describe('HuskyLens 演算法'),
+		color: z.string().optional().describe('顏色設定'),
+		mode: z.string().optional().describe('模式設定'),
+
+		// 列表相關
+		itemCount: z.number().optional().describe('清單項目數量'),
 	})
+	.passthrough() // 允許傳入未定義的欄位（如 SOME_OTHER_PIN）
 	.optional()
-	.describe('積木上下文，用於生成可直接使用的 JSON 模板');
+	.describe('積木上下文，用於生成可直接使用的 JSON 模板。支援直接傳入欄位名稱（如 RX_PIN: "16"）或駝峰式命名（如 rxPin: "16"）');
 
 // === 工具註冊 ===
 
