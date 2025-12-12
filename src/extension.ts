@@ -10,6 +10,7 @@ import { log, showOutputChannel, disposeOutputChannel } from './services/logging
 import { LocaleService } from './services/localeService';
 import { SettingsManager } from './services/settingsManager';
 import { WebViewManager } from './webview/webviewManager';
+import { registerMcpProvider } from './mcp/mcpProvider';
 
 // Status bar priority constant
 const STATUS_BAR_PRIORITY = 100;
@@ -56,6 +57,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		// 設定狀態列按鈕
 		setupStatusBar(context, localeService);
+
+		// 註冊 MCP Provider（VSCode 1.105.0+ 支援）
+		registerMcpProviderIfAvailable(context);
 
 		log('Singular Blockly extension fully activated!', 'info');
 	} catch (error) {
@@ -229,6 +233,23 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 	context.subscriptions.push(toggleThemeCommand);
 	context.subscriptions.push(showOutputCommand);
 	context.subscriptions.push(previewBackupCommand);
+}
+
+/**
+ * 註冊 MCP Provider（如果 VSCode 版本支援）
+ * @param context 擴充功能上下文
+ */
+function registerMcpProviderIfAvailable(context: vscode.ExtensionContext) {
+	log('Checking MCP API availability...', 'info');
+
+	const disposable = registerMcpProvider(context);
+
+	if (disposable) {
+		context.subscriptions.push(disposable);
+		log('MCP Provider registered and added to subscriptions', 'info');
+	} else {
+		log('MCP Provider not registered (API not available)', 'info');
+	}
 }
 
 /**

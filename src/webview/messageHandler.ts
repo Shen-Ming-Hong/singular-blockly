@@ -132,6 +132,10 @@ export class WebViewMessageHandler {
 				case 'boardConfigResult':
 					// 這個訊息是對 getBoardConfig 請求的回應，不需要特殊處理
 					break;
+				// MCP Server 整合 - T031: 處理工作區重載請求
+				case 'requestWorkspaceReload':
+					await this.handleRequestWorkspaceReload();
+					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
 					break;
@@ -837,6 +841,42 @@ export class WebViewMessageHandler {
 		} catch (error) {
 			log('更新自動備份設定失敗:', 'error', error);
 			this.showErrorMessage('更新自動備份設定失敗');
+		}
+	}
+
+	// ===== MCP Server 整合 - T031 =====
+
+	/**
+	 * 處理工作區重載請求
+	 * 當 MCP Server 或 FileWatcher 觸發重載時呼叫
+	 */
+	private async handleRequestWorkspaceReload(): Promise<void> {
+		try {
+			log('Processing workspace reload request', 'info');
+
+			// 讀取最新的 main.json
+			const blocklyDir = 'blockly';
+			const mainJsonPath = path.join(blocklyDir, 'main.json');
+
+			if (!this.fileService.fileExists(mainJsonPath)) {
+				log('main.json not found, skipping reload', 'warn');
+				return;
+			}
+
+			const content = await this.fileService.readFile(mainJsonPath);
+			const state = JSON.parse(content);
+
+			// 發送工作區狀態給 WebView
+			this.panel.webview.postMessage({
+				command: 'loadWorkspace',
+				state: state,
+				source: 'mcpReload',
+			});
+
+			log('Workspace reloaded via MCP integration', 'info');
+		} catch (error) {
+			log('Failed to reload workspace:', 'error', error);
+			this.showErrorMessage(`重載工作區失敗: ${error}`);
 		}
 	}
 }

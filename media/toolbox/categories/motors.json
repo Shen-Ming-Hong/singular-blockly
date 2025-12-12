@@ -34,6 +34,10 @@
 		{
 			"kind": "block",
 			"type": "encoder_pid_compute"
+		},
+		{
+			"kind": "block",
+			"type": "encoder_pid_reset"
 		}
 	]
 }

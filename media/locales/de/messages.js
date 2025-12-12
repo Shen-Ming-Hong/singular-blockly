@@ -106,10 +106,15 @@ window.languageManager.loadMessages('de', {
 	ENCODER_PID_KP: 'Kp',
 	ENCODER_PID_KI: 'Ki',
 	ENCODER_PID_KD: 'Kd',
-	ENCODER_PID_SETUP_TOOLTIP: 'PID-Steuerung für präzise Motorsteuerung konfigurieren',
+	ENCODER_PID_MODE: 'Modus',
+	ENCODER_PID_MODE_POSITION: 'Position',
+	ENCODER_PID_MODE_SPEED: 'Geschwindigkeit',
+	ENCODER_PID_SETUP_TOOLTIP: 'PID-Regelung für präzise Motorsteuerung konfigurieren. Wählen Sie Positions- oder Geschwindigkeitsmodus.',
 	ENCODER_PID_COMPUTE: 'PID berechnen',
 	ENCODER_PID_TARGET: 'Ziel',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'PID-Steuerungsausgabe basierend auf Zielposition berechnen',
+	ENCODER_PID_RESET: 'PID zurücksetzen',
+	ENCODER_PID_RESET_TOOLTIP: 'PID-Regler-Status zurücksetzen (Integralakkumulation löschen, Zähler zurücksetzen)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',

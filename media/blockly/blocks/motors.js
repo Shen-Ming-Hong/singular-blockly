@@ -584,6 +584,7 @@ Blockly.Blocks['encoder_pid_setup'] = {
 	init: function () {
 		// 初始化恢復編碼馬達變數名稱的屬性
 		this.restoredEncoderValue = 'myEncoder';
+		this.restoredModeValue = 'POSITION';
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ENCODER_PID_SETUP'))
@@ -630,6 +631,14 @@ Blockly.Blocks['encoder_pid_setup'] = {
 					return options;
 				}),
 				'VAR'
+			)
+			.appendField(window.languageManager.getMessage('ENCODER_PID_MODE'))
+			.appendField(
+				new Blockly.FieldDropdown([
+					[window.languageManager.getMessage('ENCODER_PID_MODE_POSITION'), 'POSITION'],
+					[window.languageManager.getMessage('ENCODER_PID_MODE_SPEED'), 'SPEED'],
+				]),
+				'MODE'
 			);
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ENCODER_PID_KP'))
@@ -654,27 +663,35 @@ Blockly.Blocks['encoder_pid_setup'] = {
 		}
 	},
 
-	// 新增變異記錄方法，保存選擇的編碼馬達值
+	// 新增變異記錄方法，保存選擇的編碼馬達值和模式
 	mutationToDom: function () {
 		const container = Blockly.utils.xml.createElement('mutation');
 		const encoderValue = this.getFieldValue('VAR');
+		const modeValue = this.getFieldValue('MODE');
 		// 同時更新恢復值屬性
 		this.restoredEncoderValue = encoderValue;
+		this.restoredModeValue = modeValue;
 		container.setAttribute('encoder', encoderValue);
-		log.info(`encoder_pid_setup: 儲存變異資料，編碼馬達名稱: ${encoderValue}`);
+		container.setAttribute('mode', modeValue);
+		log.info(`encoder_pid_setup: 儲存變異資料，編碼馬達名稱: ${encoderValue}, 模式: ${modeValue}`);
 		return container;
 	},
 
-	// 從變異記錄恢復選擇的編碼馬達值
+	// 從變異記錄恢復選擇的編碼馬達值和模式
 	domToMutation: function (xmlElement) {
 		const encoder = xmlElement.getAttribute('encoder');
+		const mode = xmlElement.getAttribute('mode');
 		if (encoder) {
 			log.info(`encoder_pid_setup: 從變異資料恢復編碼馬達名稱: ${encoder}`);
-			// 在設置字段值的同時，也存儲到我們的備份屬性中
 			this.restoredEncoderValue = encoder;
 			this.getField('VAR').setValue(encoder);
 		} else {
 			log.warn('encoder_pid_setup: 變異資料中沒有找到編碼馬達名稱');
+		}
+		if (mode) {
+			log.info(`encoder_pid_setup: 從變異資料恢復模式: ${mode}`);
+			this.restoredModeValue = mode;
+			this.getField('MODE').setValue(mode);
 		}
 	},
 
@@ -687,6 +704,7 @@ Blockly.Blocks['encoder_pid_setup'] = {
 	saveExtraState: function () {
 		return {
 			encoder: this.getFieldValue('VAR') || 'myEncoder',
+			mode: this.getFieldValue('MODE') || 'POSITION',
 		};
 	},
 
@@ -700,6 +718,13 @@ Blockly.Blocks['encoder_pid_setup'] = {
 			const field = this.getField('VAR');
 			if (field) {
 				field.setValue(state.encoder);
+			}
+		}
+		if (state && state.mode) {
+			this.restoredModeValue = state.mode;
+			const modeField = this.getField('MODE');
+			if (modeField) {
+				modeField.setValue(state.mode);
 			}
 		}
 	},
@@ -792,6 +817,122 @@ Blockly.Blocks['encoder_pid_compute'] = {
 			this.getField('PID_VAR').setValue(pid);
 		} else {
 			log.warn('encoder_pid_compute: 變異資料中沒有找到PID名稱');
+		}
+	},
+
+	// ========== JSON 序列化 hooks（Blockly 12.x 優先使用）==========
+
+	/**
+	 * 保存積木的額外狀態到 JSON
+	 * @returns {Object} 可 JSON 序列化的狀態物件
+	 */
+	saveExtraState: function () {
+		return {
+			pid: this.getFieldValue('PID_VAR') || 'myPID',
+		};
+	},
+
+	/**
+	 * 從 JSON 還原積木的額外狀態
+	 * @param {Object} state - 之前由 saveExtraState 返回的狀態物件
+	 */
+	loadExtraState: function (state) {
+		if (state && state.pid) {
+			this.restoredPIDValue = state.pid;
+			const field = this.getField('PID_VAR');
+			if (field) {
+				field.setValue(state.pid);
+			}
+		}
+	},
+};
+
+// 新增重設 PID 積木
+Blockly.Blocks['encoder_pid_reset'] = {
+	init: function () {
+		// 初始化恢復PID變數名稱的屬性
+		this.restoredPIDValue = 'myPID';
+
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('ENCODER_PID_RESET') || '重設 PID')
+			.appendField(
+				new Blockly.FieldDropdown(() => {
+					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
+					const workspace = this.workspace || Blockly.getMainWorkspace();
+					if (!workspace) {
+						log.info('無法取得工作區，返回預設選項 myPID');
+						return [['myPID', 'myPID']];
+					}
+
+					// 優先使用從變異資料恢復的值，然後才是 getFieldValue
+					const currentValue = this.restoredPIDValue || this.getFieldValue('PID_VAR') || 'myPID';
+					log.info(`encoder_pid_reset: 當前選擇的PID名稱: ${currentValue}`);
+
+					// 先建立一個以當前值為首位的選項陣列
+					const options = [[currentValue, currentValue]];
+
+					// 找出所有 encoder_pid_setup 積木
+					const blocks = workspace.getAllBlocks(false);
+					const setupBlocks = blocks.filter(block => block.type === 'encoder_pid_setup');
+					log.info(`encoder_pid_reset: 找到 ${setupBlocks.length} 個PID設定積木`);
+
+					// 如果沒有找到設定積木，就只返回當前值
+					if (setupBlocks.length === 0) {
+						log.info('encoder_pid_reset: 未找到PID設定積木，僅返回當前選項');
+						return options;
+					}
+
+					// 從設定積木中獲取所有PID名稱，排除當前值以避免重複
+					setupBlocks.forEach(block => {
+						const name = block.getFieldValue('PID_VAR');
+						if (name !== currentValue) {
+							// 避免重複添加當前值
+							options.push([name, name]);
+							log.info(`encoder_pid_reset: 添加選項 ${name}`);
+						}
+					});
+
+					log.info(`encoder_pid_reset: 返回選項清單: ${JSON.stringify(options)}`);
+					return options;
+				}),
+				'PID_VAR'
+			);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setStyle('motors_blocks');
+		this.setTooltip(
+			window.languageManager.getMessage('ENCODER_PID_RESET_TOOLTIP') || '重設 PID 控制器狀態（清除 I 項累積、重設 lastCount）'
+		);
+		this.setHelpUrl('');
+
+		// 根據環境設定積木的實驗性或預覽狀態
+		if (typeof window.registerPreviewBlock === 'function') {
+			window.registerPreviewBlock('encoder_pid_reset');
+		}
+		if (typeof window.registerExperimentalBlock === 'function') {
+			window.registerExperimentalBlock('encoder_pid_reset');
+		}
+	},
+
+	// 新增變異記錄方法，保存選擇的PID值
+	mutationToDom: function () {
+		const container = Blockly.utils.xml.createElement('mutation');
+		const pidValue = this.getFieldValue('PID_VAR');
+		// 同時更新恢復值屬性
+		this.restoredPIDValue = pidValue;
+		container.setAttribute('pid', pidValue);
+		log.info(`encoder_pid_reset: 儲存變異資料，PID名稱: ${pidValue}`);
+		return container;
+	},
+
+	// 從變異記錄恢復選擇的PID值
+	domToMutation: function (xmlElement) {
+		const pid = xmlElement.getAttribute('pid');
+		if (pid) {
+			log.info(`encoder_pid_reset: 從變異資料恢復PID名稱: ${pid}`);
+			this.restoredPIDValue = pid;
+		} else {
+			log.warn('encoder_pid_reset: 變異資料中沒有找到PID名稱');
 		}
 	},
 

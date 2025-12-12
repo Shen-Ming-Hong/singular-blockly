@@ -115,6 +115,43 @@ A Visual Studio Code extension that provides a visual programming interface usin
     -   Conflict detection and warnings
     -   Auto-add pinMode configurations
 
+### 🤖 AI Integration with MCP Server
+
+Seamless integration with GitHub Copilot and AI assistants through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+
+**AI-Assisted Block Programming:**
+
+-   **Block Query**: Ask AI "How do I use the servo motor block?" and get detailed usage info
+-   **Smart Suggestions**: AI understands your hardware setup and suggests compatible blocks
+-   **Natural Language**: Add blocks using commands like "Add an ultrasonic sensor block"
+-   **Project Awareness**: AI knows your board type, pins, and current workspace state
+
+**Available MCP Tools:**
+
+| Tool                      | Description                                               |
+| ------------------------- | --------------------------------------------------------- |
+| `get_block_usage`         | Get detailed block documentation with fields and examples |
+| `search_blocks`           | Search blocks by keyword (Chinese/English)                |
+| `list_blocks_by_category` | Browse blocks by category                                 |
+| `get_workspace_state`     | Read current workspace and block arrangement              |
+| `update_workspace`        | Add, modify, delete, or replace blocks                    |
+| `refresh_editor`          | Sync changes to the visual editor                         |
+| `get_platform_config`     | Get board configuration and PlatformIO settings           |
+| `get_board_pins`          | Query pin capabilities (digital, analog, PWM, I2C)        |
+| `get_generated_code`      | Read the generated Arduino code                           |
+
+**Getting Started with AI:**
+
+1. Open VS Code with Copilot Agent Mode enabled
+2. The MCP Server auto-registers when extension activates
+3. Use natural language in Copilot chat:
+    - "What servo blocks are available?"
+    - "Add a servo setup block on pin 9"
+    - "Change the servo angle to 45 degrees"
+    - "Show me the generated Arduino code"
+
+> 💡 **Tip**: The AI maintains workspace backup (main.json.bak) for safe modifications.
+
 ---
 
 ## Installation

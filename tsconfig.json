@@ -1,11 +1,16 @@
 {
 	"compilerOptions": {
 		"module": "Node16",
+		"moduleResolution": "Node16",
 		"target": "ES2023",
 		"lib": ["ES2023"],
 		"sourceMap": true,
 		"rootDir": "src",
-		"strict": true /* enable all strict type-checking options */
+		"outDir": "out",
+		"strict": true /* enable all strict type-checking options */,
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true /* Skip type checking of declaration files in node_modules */
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */

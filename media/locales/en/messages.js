@@ -102,13 +102,19 @@ window.languageManager.loadMessages('en', {
 	ENCODER_RESET_TOOLTIP: 'Reset encoder to zero position',
 	ENCODER_PID_SETUP: 'Setup PID Control',
 	ENCODER_PID_MOTOR: 'Motor',
+	ENCODER_PID_MODE: 'Mode',
+	ENCODER_PID_MODE_POSITION: 'Position',
+	ENCODER_PID_MODE_SPEED: 'Speed',
 	ENCODER_PID_KP: 'Kp',
 	ENCODER_PID_KI: 'Ki',
 	ENCODER_PID_KD: 'Kd',
-	ENCODER_PID_SETUP_TOOLTIP: 'Setup PID control for encoder motor',
+	ENCODER_PID_SETUP_TOOLTIP: 'Setup PID control for encoder motor (Position mode: stop at target, Speed mode: maintain target speed)',
 	ENCODER_PID_COMPUTE: 'Compute PID',
 	ENCODER_PID_TARGET: 'Target',
-	ENCODER_PID_COMPUTE_TOOLTIP: 'Compute PID for encoder motor to reach target position',
+	ENCODER_PID_COMPUTE_TOOLTIP: 'Compute PID for encoder motor to reach target position or speed',
+	ENCODER_PID_RESET: 'Reset PID',
+	ENCODER_PID_RESET_TOOLTIP:
+		'Reset PID controller state (clear integral accumulation, reset counter), useful when changing direction or restarting control',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',

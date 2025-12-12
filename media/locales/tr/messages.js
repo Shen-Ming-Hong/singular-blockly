@@ -106,10 +106,15 @@ window.languageManager.loadMessages('tr', {
 	ENCODER_PID_KP: 'Kp',
 	ENCODER_PID_KI: 'Ki',
 	ENCODER_PID_KD: 'Kd',
-	ENCODER_PID_SETUP_TOOLTIP: 'Hassas motor kontrolü için PID kontrolü yapılandır',
+	ENCODER_PID_MODE: 'Mod',
+	ENCODER_PID_MODE_POSITION: 'Pozisyon',
+	ENCODER_PID_MODE_SPEED: 'Hız',
+	ENCODER_PID_SETUP_TOOLTIP: 'Hassas motor kontrolü için PID kontrolü yapılandır. Pozisyon veya hız modunu seçin.',
 	ENCODER_PID_COMPUTE: 'PID Hesapla',
 	ENCODER_PID_TARGET: 'Hedef',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Hedef pozisyona göre PID kontrol çıkışını hesapla',
+	ENCODER_PID_RESET: 'PID\'i Sıfırla',
+	ENCODER_PID_RESET_TOOLTIP: 'PID denetleyici durumunu sıfırla (integral birikimini temizle, sayacı sıfırla)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Kurulum',

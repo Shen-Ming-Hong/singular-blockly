@@ -106,10 +106,15 @@ window.languageManager.loadMessages('pt-br', {
 	ENCODER_PID_KP: 'Kp',
 	ENCODER_PID_KI: 'Ki',
 	ENCODER_PID_KD: 'Kd',
-	ENCODER_PID_SETUP_TOOLTIP: 'Configurar controle PID para controle preciso do motor',
+	ENCODER_PID_MODE: 'Modo',
+	ENCODER_PID_MODE_POSITION: 'Posição',
+	ENCODER_PID_MODE_SPEED: 'Velocidade',
+	ENCODER_PID_SETUP_TOOLTIP: 'Configurar controle PID para controle preciso do motor. Selecione modo de posição ou velocidade.',
 	ENCODER_PID_COMPUTE: 'Calcular PID',
 	ENCODER_PID_TARGET: 'Alvo',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Calcular saída de controle PID baseado na posição alvo',
+	ENCODER_PID_RESET: 'Reiniciar PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Reiniciar o estado do controlador PID (limpar acumulação integral, reiniciar contador)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Configuração',

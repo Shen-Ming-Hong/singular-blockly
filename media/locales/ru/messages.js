@@ -106,10 +106,15 @@ window.languageManager.loadMessages('ru', {
 	ENCODER_PID_KP: 'Kp',
 	ENCODER_PID_KI: 'Ki',
 	ENCODER_PID_KD: 'Kd',
-	ENCODER_PID_SETUP_TOOLTIP: 'Настроить PID-регулятор для точного управления мотором',
+	ENCODER_PID_MODE: 'Режим',
+	ENCODER_PID_MODE_POSITION: 'Позиция',
+	ENCODER_PID_MODE_SPEED: 'Скорость',
+	ENCODER_PID_SETUP_TOOLTIP: 'Настроить PID-регулятор для точного управления мотором. Выберите режим позиции или скорости.',
 	ENCODER_PID_COMPUTE: 'Вычислить PID',
 	ENCODER_PID_TARGET: 'Цель',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Вычислить выход PID-регулятора на основе целевой позиции',
+	ENCODER_PID_RESET: 'Сбросить PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Сбросить состояние ПИД-регулятора (очистить интегральное накопление, сбросить счетчик)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',

@@ -106,10 +106,15 @@ window.languageManager.loadMessages('bg', {
 	ENCODER_PID_KP: 'Kp',
 	ENCODER_PID_KI: 'Ki',
 	ENCODER_PID_KD: 'Kd',
-	ENCODER_PID_SETUP_TOOLTIP: 'Конфигуриране на PID контрол за прецизен контрол на мотора',
+	ENCODER_PID_MODE: 'Режим',
+	ENCODER_PID_MODE_POSITION: 'Позиция',
+	ENCODER_PID_MODE_SPEED: 'Скорост',
+	ENCODER_PID_SETUP_TOOLTIP: 'Конфигуриране на PID контрол за прецизен контрол на мотора. Изберете режим за позиция или скорост.',
 	ENCODER_PID_COMPUTE: 'Изчисляване на PID',
 	ENCODER_PID_TARGET: 'Цел',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Изчисляване на изход на PID контрол въз основа на целева позиция',
+	ENCODER_PID_RESET: 'Нулиране на PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Нулиране на състоянието на PID контролера (изчистване на интегралното натрупване, нулиране на брояча)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',

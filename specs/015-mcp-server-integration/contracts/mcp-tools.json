@@ -1,0 +1,847 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Singular Blockly MCP Tools Contract",
+    "description": "MCP 工具契約定義 - Singular Blockly VSCode Extension",
+    "version": "1.0.0",
+    "tools": {
+        "get_block_usage": {
+            "name": "get_block_usage",
+            "title": "查詢積木用法",
+            "description": "查詢特定積木的用法、欄位、範例。返回積木的完整定義，包含欄位說明、輸入連接點、程式碼範例等。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "blockType": {
+                        "type": "string",
+                        "description": "積木類型識別碼，例如 'servo_setup', 'huskylens_init'"
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "語言代碼，預設 'zh-hant'",
+                        "enum": [
+                            "en",
+                            "zh-hant",
+                            "ja",
+                            "ko",
+                            "es",
+                            "pt-br",
+                            "fr",
+                            "de",
+                            "it",
+                            "ru",
+                            "pl",
+                            "hu",
+                            "tr",
+                            "bg",
+                            "cs"
+                        ],
+                        "default": "zh-hant"
+                    }
+                },
+                "required": [
+                    "blockType"
+                ]
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "category": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "fields": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "text",
+                                        "number",
+                                        "dropdown",
+                                        "checkbox",
+                                        "angle",
+                                        "colour"
+                                    ]
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "default": {},
+                                "options": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "value": {
+                                                "type": "string"
+                                            },
+                                            "label": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "inputs": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "value",
+                                        "statement"
+                                    ]
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "check": {}
+                            }
+                        }
+                    },
+                    "output": {
+                        "type": "object",
+                        "properties": {
+                            "type": {}
+                        }
+                    },
+                    "example": {
+                        "type": "object",
+                        "properties": {
+                            "json": {
+                                "type": "object"
+                            },
+                            "arduinoCode": {
+                                "type": "string"
+                            },
+                            "description": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "boards": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "relatedBlocks": {
+                        "type": "array",
+                        "description": "相關積木類型列表",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "使用注意事項"
+                    }
+                },
+                "required": [
+                    "type",
+                    "name",
+                    "category",
+                    "description",
+                    "fields",
+                    "boards"
+                ]
+            }
+        },
+        "search_blocks": {
+            "name": "search_blocks",
+            "title": "搜尋積木",
+            "description": "使用關鍵字搜尋積木，支援中英文搜尋。返回相關度排序的積木列表。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "搜尋關鍵字，支援中英文"
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "限定搜尋分類，例如 'motors', 'sensors'"
+                    },
+                    "board": {
+                        "type": "string",
+                        "description": "限定支援的板卡",
+                        "enum": [
+                            "arduino_uno",
+                            "arduino_nano",
+                            "arduino_mega",
+                            "esp32",
+                            "esp32_supermini"
+                        ]
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "語言代碼",
+                        "default": "zh-hant"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "返回結果數量上限",
+                        "default": 10,
+                        "minimum": 1,
+                        "maximum": 50
+                    }
+                },
+                "required": [
+                    "query"
+                ]
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string"
+                    },
+                    "totalResults": {
+                        "type": "integer"
+                    },
+                    "results": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "category": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "type": "string"
+                                },
+                                "relevanceScore": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "name",
+                                "category",
+                                "relevanceScore"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "query",
+                    "totalResults",
+                    "results"
+                ]
+            }
+        },
+        "list_blocks_by_category": {
+            "name": "list_blocks_by_category",
+            "title": "列出分類積木",
+            "description": "列出特定分類下的所有積木。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "type": "string",
+                        "description": "分類 ID，例如 'motors', 'sensors', 'logic', 'loops'"
+                    },
+                    "language": {
+                        "type": "string",
+                        "description": "語言代碼",
+                        "default": "zh-hant"
+                    }
+                },
+                "required": [
+                    "category"
+                ]
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "category": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "colour": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "blocks": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "category",
+                    "blocks",
+                    "totalCount"
+                ]
+            }
+        },
+        "get_workspace_state": {
+            "name": "get_workspace_state",
+            "title": "取得工作區狀態",
+            "description": "取得目前 Blockly 工作區的狀態，包含積木列表、板卡設定等。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "includeFullJson": {
+                        "type": "boolean",
+                        "description": "是否包含完整 JSON（大型專案時可能較大）",
+                        "default": false
+                    }
+                }
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "board": {
+                        "type": "string"
+                    },
+                    "theme": {
+                        "type": "string",
+                        "enum": [
+                            "light",
+                            "dark"
+                        ]
+                    },
+                    "blockCount": {
+                        "type": "integer"
+                    },
+                    "topLevelBlockCount": {
+                        "type": "integer"
+                    },
+                    "blocks": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                },
+                                "position": {
+                                    "type": "object",
+                                    "properties": {
+                                        "x": {
+                                            "type": "number"
+                                        },
+                                        "y": {
+                                            "type": "number"
+                                        }
+                                    }
+                                },
+                                "fields": {
+                                    "type": "object"
+                                },
+                                "connections": {
+                                    "type": "object",
+                                    "properties": {
+                                        "previous": {
+                                            "type": "string"
+                                        },
+                                        "next": {
+                                            "type": "string"
+                                        },
+                                        "parent": {
+                                            "type": "string"
+                                        },
+                                        "inputs": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "variables": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "fullJson": {
+                        "type": "object"
+                    }
+                },
+                "required": [
+                    "board",
+                    "theme",
+                    "blockCount",
+                    "blocks"
+                ]
+            }
+        },
+        "update_workspace": {
+            "name": "update_workspace",
+            "title": "更新工作區",
+            "description": "更新 Blockly 工作區，支援新增、移除、修改積木或完整替換。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "description": "操作類型",
+                        "enum": [
+                            "add",
+                            "remove",
+                            "modify",
+                            "replace"
+                        ]
+                    },
+                    "blocks": {
+                        "type": "array",
+                        "description": "要新增的積木（action = 'add' 時必填）",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "blockIds": {
+                        "type": "array",
+                        "description": "要移除的積木 ID（action = 'remove' 時必填）",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "modifications": {
+                        "type": "array",
+                        "description": "要修改的積木（action = 'modify' 時必填）",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "fields": {
+                                    "type": "object"
+                                },
+                                "position": {
+                                    "type": "object",
+                                    "properties": {
+                                        "x": {
+                                            "type": "number"
+                                        },
+                                        "y": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            },
+                            "required": [
+                                "id"
+                            ]
+                        }
+                    },
+                    "fullState": {
+                        "type": "object",
+                        "description": "完整的工作區狀態（action = 'replace' 時必填）"
+                    }
+                },
+                "required": [
+                    "action"
+                ]
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "action": {
+                        "type": "string"
+                    },
+                    "affectedBlockIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "newState": {
+                        "$ref": "#/tools/get_workspace_state/outputSchema"
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "success",
+                    "action",
+                    "affectedBlockIds",
+                    "newState"
+                ]
+            }
+        },
+        "refresh_editor": {
+            "name": "refresh_editor",
+            "title": "刷新編輯器",
+            "description": "觸發 Blockly 編輯器重新載入工作區狀態。當 main.json 被外部修改後使用。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {}
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "required": [
+                    "success",
+                    "message",
+                    "timestamp"
+                ]
+            }
+        },
+        "get_generated_code": {
+            "name": "get_generated_code",
+            "title": "取得生成程式碼",
+            "description": "取得目前工作區生成的 Arduino 程式碼。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "format": {
+                        "type": "string",
+                        "description": "程式碼格式",
+                        "enum": [
+                            "arduino",
+                            "cpp"
+                        ],
+                        "default": "arduino"
+                    }
+                }
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "board": {
+                        "type": "string"
+                    },
+                    "includes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "libraries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "warnings": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "code",
+                    "language",
+                    "board"
+                ]
+            }
+        },
+        "get_platform_config": {
+            "name": "get_platform_config",
+            "title": "取得平台配置",
+            "description": "取得目前的 PlatformIO 配置資訊。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {}
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "board": {
+                        "type": "string"
+                    },
+                    "platformio": {
+                        "type": "object",
+                        "properties": {
+                            "platform": {
+                                "type": "string"
+                            },
+                            "board": {
+                                "type": "string"
+                            },
+                            "framework": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "libraries": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "version": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "buildFlags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "board",
+                    "platformio"
+                ]
+            }
+        },
+        "get_board_pins": {
+            "name": "get_board_pins",
+            "title": "取得板卡腳位",
+            "description": "取得指定板卡的腳位配置資訊。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "board": {
+                        "type": "string",
+                        "description": "板卡類型，不指定則使用目前板卡",
+                        "enum": [
+                            "arduino_uno",
+                            "arduino_nano",
+                            "arduino_mega",
+                            "esp32",
+                            "esp32_supermini"
+                        ]
+                    }
+                }
+            },
+            "outputSchema": {
+                "type": "object",
+                "properties": {
+                    "board": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "pins": {
+                        "type": "object",
+                        "properties": {
+                            "digital": {
+                                "type": "array",
+                                "items": {}
+                            },
+                            "analog": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "pwm": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
+                            },
+                            "interrupt": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
+                            },
+                            "i2c": {
+                                "type": "object",
+                                "properties": {
+                                    "sda": {},
+                                    "scl": {}
+                                }
+                            },
+                            "spi": {
+                                "type": "object",
+                                "properties": {
+                                    "mosi": {
+                                        "type": "integer"
+                                    },
+                                    "miso": {
+                                        "type": "integer"
+                                    },
+                                    "sck": {
+                                        "type": "integer"
+                                    },
+                                    "ss": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "touch": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "capabilities": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": [
+                    "board",
+                    "name",
+                    "pins",
+                    "capabilities"
+                ]
+            }
+        }
+    },
+    "categories": [
+        {
+            "id": "logic",
+            "name": "邏輯"
+        },
+        {
+            "id": "loops",
+            "name": "迴圈"
+        },
+        {
+            "id": "math",
+            "name": "數學"
+        },
+        {
+            "id": "text",
+            "name": "文字"
+        },
+        {
+            "id": "lists",
+            "name": "清單"
+        },
+        {
+            "id": "variables",
+            "name": "變數"
+        },
+        {
+            "id": "functions",
+            "name": "函式"
+        },
+        {
+            "id": "motors",
+            "name": "馬達"
+        },
+        {
+            "id": "sensors",
+            "name": "感測器"
+        },
+        {
+            "id": "displays",
+            "name": "顯示器"
+        },
+        {
+            "id": "communication",
+            "name": "通訊"
+        },
+        {
+            "id": "time",
+            "name": "時間"
+        },
+        {
+            "id": "pins",
+            "name": "腳位"
+        }
+    ],
+    "boards": [
+        {
+            "id": "arduino_uno",
+            "name": "Arduino Uno"
+        },
+        {
+            "id": "arduino_nano",
+            "name": "Arduino Nano"
+        },
+        {
+            "id": "arduino_mega",
+            "name": "Arduino Mega"
+        },
+        {
+            "id": "esp32",
+            "name": "ESP32"
+        },
+        {
+            "id": "esp32_supermini",
+            "name": "ESP32 Super Mini"
+        }
+    ]
+}

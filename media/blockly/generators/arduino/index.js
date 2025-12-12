@@ -71,6 +71,8 @@ window.arduinoGenerator.init = function (workspace) {
 	window.arduinoGenerator.functions_ = Object.create(null); // 新增 functions 用於儲存函數
 	window.arduinoGenerator.comments_ = Object.create(null); // 新增 comments_ 用於儲存註釋
 	window.arduinoGenerator.setupCode_ = []; // 新增 setupCode_ 用於儲存 setup 區塊的程式碼
+	window.arduinoGenerator.loopCodeOnce_ = Object.create(null); // 新增 loopCodeOnce_ 用於儲存 loop 開頭的一次性初始化程式碼
+	window.arduinoGenerator.pidEncoderMap_ = Object.create(null); // 新增 pidEncoderMap_ 用於儲存 PID 控制器對應的編碼器名稱
 	window.arduinoGenerator.warnings_ = []; // 新增 warnings_ 用於儲存警告訊息，如腳位模式不正確
 	window.arduinoGenerator.pinModes_ = {}; // 每次生成代碼時重置腳位模式追蹤
 	window.arduinoGenerator.lib_deps_ = []; // 新增 lib_deps_ 用於儲存 platformio.ini 庫依賴
@@ -248,6 +250,23 @@ window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	code += setupCode ? setupCode + '\n' : '';
 	code += '}\n\n';
 	code += 'void loop() {\n';
+	// 處理 loopCodeOnce_ 中的程式碼（如 PID 計算），放在 loop 開頭
+	let loopCodeOnce = '';
+	if (window.arduinoGenerator.loopCodeOnce_ && Object.keys(window.arduinoGenerator.loopCodeOnce_).length > 0) {
+		for (let key in window.arduinoGenerator.loopCodeOnce_) {
+			loopCodeOnce += window.arduinoGenerator.loopCodeOnce_[key];
+		}
+		// 處理縮排
+		loopCodeOnce = loopCodeOnce
+			.split('\n')
+			.filter(line => line.length > 0)
+			.map(line => '  ' + line.trim())
+			.join('\n');
+		if (loopCodeOnce) {
+			loopCodeOnce += '\n';
+		}
+	}
+	code += loopCodeOnce ? loopCodeOnce : '';
 	code += loopCode ? loopCode + '\n' : '';
 	code += '}\n';
 

@@ -1,0 +1,1413 @@
+/**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * 積木字典生成腳本
+ * 用於生成 MCP Server 使用的靜態積木字典
+ *
+ * 執行方式: npm run generate:dictionary
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// 支援的板卡
+const SUPPORTED_BOARDS = ['arduino_uno', 'arduino_nano', 'arduino_mega', 'esp32', 'esp32_supermini'];
+
+// 分類定義
+const CATEGORIES = [
+	{ id: 'arduino', name: { 'zh-hant': 'Arduino', en: 'Arduino' }, colour: '#00979D' },
+	{ id: 'motors', name: { 'zh-hant': '馬達', en: 'Motors' }, colour: '#D28230' },
+	{ id: 'sensors', name: { 'zh-hant': '感測器', en: 'Sensors' }, colour: '#5CA65C' },
+	{ id: 'vision', name: { 'zh-hant': '視覺感測', en: 'Vision' }, colour: '#7B68EE' },
+	{ id: 'displays', name: { 'zh-hant': '顯示器', en: 'Displays' }, colour: '#FF6680' },
+	{ id: 'functions', name: { 'zh-hant': '函式', en: 'Functions' }, colour: '#9966FF' },
+	{ id: 'logic', name: { 'zh-hant': '邏輯', en: 'Logic' }, colour: '#5B80A5' },
+	{ id: 'loops', name: { 'zh-hant': '迴圈', en: 'Loops' }, colour: '#5BA55B' },
+	{ id: 'math', name: { 'zh-hant': '數學', en: 'Math' }, colour: '#5B67A5' },
+	{ id: 'text', name: { 'zh-hant': '文字', en: 'Text' }, colour: '#5BA58C' },
+];
+
+/**
+ * 手動維護的積木定義
+ * 由於積木定義使用動態 JS，這裡採用手動維護的方式確保準確性
+ */
+const BLOCK_DEFINITIONS = [
+	// === Arduino 基礎積木 ===
+	{
+		type: 'arduino_setup',
+		category: 'arduino',
+		names: { 'zh-hant': '設定', en: 'Setup' },
+		descriptions: {
+			'zh-hant': 'Arduino 程式的 setup() 函式，在程式開始時執行一次',
+			en: 'Arduino setup() function, runs once at program start',
+		},
+		fields: [],
+		inputs: [{ name: 'SETUP', type: 'statement', label: { 'zh-hant': '設定', en: 'Setup' } }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['setup', 'arduino', '設定', '初始化'],
+	},
+	{
+		type: 'arduino_loop',
+		category: 'arduino',
+		names: { 'zh-hant': '重複', en: 'Loop' },
+		descriptions: {
+			'zh-hant': 'Arduino 程式的 loop() 函式，會不斷重複執行',
+			en: 'Arduino loop() function, runs repeatedly',
+		},
+		fields: [],
+		inputs: [{ name: 'LOOP', type: 'statement', label: { 'zh-hant': '重複執行', en: 'Loop' } }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'arduino', '迴圈', '重複'],
+	},
+	{
+		type: 'digital_write',
+		category: 'arduino',
+		names: { 'zh-hant': '數位寫入', en: 'Digital Write' },
+		descriptions: {
+			'zh-hant': '設定數位腳位的輸出為 HIGH (高電位) 或 LOW (低電位)',
+			en: 'Set a digital pin to HIGH or LOW',
+		},
+		fields: [
+			{
+				name: 'PIN',
+				type: 'dropdown',
+				label: { 'zh-hant': '腳位', en: 'Pin' },
+				options: 'dynamic:digitalPins',
+			},
+			{
+				name: 'VALUE',
+				type: 'dropdown',
+				label: { 'zh-hant': '數值', en: 'Value' },
+				options: [
+					{ value: 'HIGH', label: { 'zh-hant': '高', en: 'HIGH' } },
+					{ value: 'LOW', label: { 'zh-hant': '低', en: 'LOW' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['digital', 'write', 'gpio', '數位', '寫入', '輸出'],
+	},
+	{
+		type: 'digital_read',
+		category: 'arduino',
+		names: { 'zh-hant': '數位讀取', en: 'Digital Read' },
+		descriptions: {
+			'zh-hant': '讀取數位腳位的狀態，返回 HIGH 或 LOW',
+			en: 'Read the state of a digital pin, returns HIGH or LOW',
+		},
+		fields: [
+			{
+				name: 'PIN',
+				type: 'dropdown',
+				label: { 'zh-hant': '腳位', en: 'Pin' },
+				options: 'dynamic:digitalPins',
+			},
+		],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['digital', 'read', 'gpio', '數位', '讀取', '輸入'],
+	},
+	{
+		type: 'analog_write',
+		category: 'arduino',
+		names: { 'zh-hant': '類比寫入', en: 'Analog Write' },
+		descriptions: {
+			'zh-hant': '使用 PWM 設定類比輸出值 (0-255 或 ESP32 0-4095)',
+			en: 'Set analog output value using PWM (0-255 or ESP32 0-4095)',
+		},
+		fields: [
+			{
+				name: 'PIN',
+				type: 'dropdown',
+				label: { 'zh-hant': '腳位', en: 'Pin' },
+				options: 'dynamic:pwmPins',
+			},
+		],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '數值', en: 'Value' }, check: 'Number' }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['analog', 'write', 'pwm', '類比', '寫入'],
+	},
+	{
+		type: 'analog_read',
+		category: 'arduino',
+		names: { 'zh-hant': '類比讀取', en: 'Analog Read' },
+		descriptions: {
+			'zh-hant': '讀取類比腳位的值 (Arduino: 0-1023, ESP32: 0-4095)',
+			en: 'Read analog pin value (Arduino: 0-1023, ESP32: 0-4095)',
+		},
+		fields: [
+			{
+				name: 'PIN',
+				type: 'dropdown',
+				label: { 'zh-hant': '腳位', en: 'Pin' },
+				options: 'dynamic:analogPins',
+			},
+		],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['analog', 'read', 'adc', '類比', '讀取'],
+	},
+	{
+		type: 'delay_ms',
+		category: 'arduino',
+		names: { 'zh-hant': '延遲', en: 'Delay' },
+		descriptions: {
+			'zh-hant': '暫停程式執行指定的毫秒數',
+			en: 'Pause program execution for specified milliseconds',
+		},
+		fields: [
+			{
+				name: 'MS',
+				type: 'number',
+				label: { 'zh-hant': '毫秒', en: 'Milliseconds' },
+				default: 1000,
+				min: 0,
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['delay', 'wait', 'time', '延遲', '等待', '時間'],
+	},
+	{
+		type: 'pin_mode',
+		category: 'arduino',
+		names: { 'zh-hant': '設定腳位模式', en: 'Pin Mode' },
+		descriptions: {
+			'zh-hant': '設定腳位為輸入或輸出模式',
+			en: 'Set pin mode to INPUT or OUTPUT',
+		},
+		fields: [
+			{
+				name: 'PIN',
+				type: 'dropdown',
+				label: { 'zh-hant': '腳位', en: 'Pin' },
+				options: 'dynamic:digitalPins',
+			},
+			{
+				name: 'MODE',
+				type: 'dropdown',
+				label: { 'zh-hant': '模式', en: 'Mode' },
+				options: [
+					{ value: 'INPUT', label: { 'zh-hant': '輸入', en: 'INPUT' } },
+					{ value: 'OUTPUT', label: { 'zh-hant': '輸出', en: 'OUTPUT' } },
+					{ value: 'INPUT_PULLUP', label: { 'zh-hant': '輸入上拉', en: 'INPUT_PULLUP' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['pin', 'mode', 'gpio', '腳位', '模式'],
+	},
+
+	// === 伺服馬達積木 ===
+	{
+		type: 'servo_setup',
+		category: 'motors',
+		names: { 'zh-hant': '設定伺服馬達', en: 'Setup Servo' },
+		descriptions: {
+			'zh-hant': '初始化伺服馬達並設定控制腳位',
+			en: 'Initialize a servo motor and set control pin',
+		},
+		fields: [
+			{
+				name: 'VAR',
+				type: 'text',
+				label: { 'zh-hant': '名稱', en: 'Name' },
+				default: 'myServo',
+			},
+			{
+				name: 'PIN',
+				type: 'dropdown',
+				label: { 'zh-hant': '腳位', en: 'Pin' },
+				options: 'dynamic:pwmPins',
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['servo', 'motor', 'pwm', '伺服', '馬達', '舵機'],
+		relatedBlocks: ['servo_move', 'servo_stop'],
+	},
+	{
+		type: 'servo_move',
+		category: 'motors',
+		names: { 'zh-hant': '旋轉伺服馬達', en: 'Move Servo' },
+		descriptions: {
+			'zh-hant': '控制伺服馬達轉動到指定角度 (0-180 度)',
+			en: 'Move servo motor to specified angle (0-180 degrees)',
+		},
+		fields: [
+			{
+				name: 'VAR',
+				type: 'dropdown',
+				label: { 'zh-hant': '馬達', en: 'Servo' },
+				options: 'dynamic:servoVars',
+			},
+			{
+				name: 'ANGLE',
+				type: 'number',
+				label: { 'zh-hant': '角度', en: 'Angle' },
+				default: 90,
+				min: 0,
+				max: 180,
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['servo', 'move', 'angle', '伺服', '轉動', '角度'],
+		relatedBlocks: ['servo_setup', 'servo_stop'],
+	},
+	{
+		type: 'servo_stop',
+		category: 'motors',
+		names: { 'zh-hant': '停止伺服馬達', en: 'Stop Servo' },
+		descriptions: {
+			'zh-hant': '停止伺服馬達的訊號輸出',
+			en: 'Stop servo motor signal output',
+		},
+		fields: [
+			{
+				name: 'VAR',
+				type: 'dropdown',
+				label: { 'zh-hant': '馬達', en: 'Servo' },
+				options: 'dynamic:servoVars',
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['servo', 'stop', '伺服', '停止'],
+		relatedBlocks: ['servo_setup', 'servo_move'],
+	},
+
+	// === 編碼馬達積木 ===
+	{
+		type: 'encoder_setup',
+		category: 'motors',
+		names: { 'zh-hant': '設定編碼馬達', en: 'Setup Encoder' },
+		descriptions: {
+			'zh-hant': '初始化編碼馬達並設定 A/B 腳位，可選擇使用硬體中斷提高精確度',
+			en: 'Initialize encoder motor with A/B pins, optionally use hardware interrupt for accuracy',
+		},
+		fields: [
+			{ name: 'VAR', type: 'text', label: { 'zh-hant': '名稱', en: 'Name' }, default: 'myEncoder' },
+			{ name: 'USE_INTERRUPT', type: 'checkbox', label: { 'zh-hant': '使用硬體中斷', en: 'Use Interrupt' }, default: false },
+			{ name: 'PIN_A', type: 'dropdown', label: { 'zh-hant': 'A腳位', en: 'Pin A' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_B', type: 'dropdown', label: { 'zh-hant': 'B腳位', en: 'Pin B' }, options: 'dynamic:digitalPins' },
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['encoder', 'motor', 'interrupt', '編碼', '馬達', '中斷'],
+		experimental: true,
+		relatedBlocks: ['encoder_read', 'encoder_reset', 'encoder_pid_setup'],
+	},
+	{
+		type: 'encoder_read',
+		category: 'motors',
+		names: { 'zh-hant': '讀取編碼馬達', en: 'Read Encoder' },
+		descriptions: {
+			'zh-hant': '讀取編碼馬達的當前位置',
+			en: 'Read current position of encoder motor',
+		},
+		fields: [{ name: 'VAR', type: 'dropdown', label: { 'zh-hant': '馬達', en: 'Encoder' }, options: 'dynamic:encoderVars' }],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['encoder', 'read', 'position', '編碼', '讀取', '位置'],
+		experimental: true,
+		relatedBlocks: ['encoder_setup', 'encoder_reset'],
+	},
+	{
+		type: 'encoder_reset',
+		category: 'motors',
+		names: { 'zh-hant': '重設編碼馬達', en: 'Reset Encoder' },
+		descriptions: {
+			'zh-hant': '將編碼馬達位置重設為零',
+			en: 'Reset encoder position to zero',
+		},
+		fields: [{ name: 'VAR', type: 'dropdown', label: { 'zh-hant': '馬達', en: 'Encoder' }, options: 'dynamic:encoderVars' }],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['encoder', 'reset', 'zero', '編碼', '重設', '歸零'],
+		experimental: true,
+		relatedBlocks: ['encoder_setup', 'encoder_read'],
+	},
+
+	// === 超音波感測器積木 ===
+	{
+		type: 'ultrasonic_sensor',
+		category: 'sensors',
+		names: { 'zh-hant': '超音波感測器', en: 'Ultrasonic Sensor' },
+		descriptions: {
+			'zh-hant': '設定超音波感測器的 Trig 和 Echo 腳位，可選擇使用硬體中斷提高精確度',
+			en: 'Setup ultrasonic sensor Trig and Echo pins, optionally use hardware interrupt',
+		},
+		fields: [
+			{ name: 'TRIG_PIN', type: 'dropdown', label: { 'zh-hant': 'Trig 腳位', en: 'Trig Pin' }, options: 'dynamic:digitalPins' },
+			{ name: 'ECHO_PIN', type: 'dropdown', label: { 'zh-hant': 'Echo 腳位', en: 'Echo Pin' }, options: 'dynamic:digitalPins' },
+			{ name: 'USE_INTERRUPT', type: 'checkbox', label: { 'zh-hant': '使用硬體中斷', en: 'Use Interrupt' }, default: false },
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['ultrasonic', 'sensor', 'distance', 'sonar', '超音波', '感測器', '距離'],
+		relatedBlocks: ['ultrasonic_read'],
+	},
+	{
+		type: 'ultrasonic_read',
+		category: 'sensors',
+		names: { 'zh-hant': '讀取超音波距離', en: 'Read Ultrasonic' },
+		descriptions: {
+			'zh-hant': '讀取超音波感測器測量的距離，單位為公分',
+			en: 'Read distance measured by ultrasonic sensor in centimeters',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['ultrasonic', 'read', 'distance', 'cm', '超音波', '讀取', '距離'],
+		relatedBlocks: ['ultrasonic_sensor'],
+	},
+
+	// === HUSKYLENS 積木 ===
+	{
+		type: 'huskylens_init_i2c',
+		category: 'vision',
+		names: { 'zh-hant': '初始化 HUSKYLENS (I2C)', en: 'Init HUSKYLENS (I2C)' },
+		descriptions: {
+			'zh-hant': '使用 I2C 初始化 HUSKYLENS 智慧鏡頭',
+			en: 'Initialize HUSKYLENS using I2C connection',
+		},
+		fields: [],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'i2c', 'vision', 'camera', '鏡頭', '視覺', 'AI'],
+		experimental: true,
+		relatedBlocks: ['huskylens_set_algorithm', 'huskylens_request'],
+	},
+	{
+		type: 'huskylens_init_uart',
+		category: 'vision',
+		names: { 'zh-hant': '初始化 HUSKYLENS (UART)', en: 'Init HUSKYLENS (UART)' },
+		descriptions: {
+			'zh-hant': '使用 UART 初始化 HUSKYLENS 智慧鏡頭，設定 RX/TX 腳位',
+			en: 'Initialize HUSKYLENS using UART, set RX/TX pins',
+		},
+		fields: [
+			{ name: 'RX_PIN', type: 'dropdown', label: { 'zh-hant': 'RX 腳位', en: 'RX Pin' }, options: 'dynamic:digitalPins' },
+			{ name: 'TX_PIN', type: 'dropdown', label: { 'zh-hant': 'TX 腳位', en: 'TX Pin' }, options: 'dynamic:digitalPins' },
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'uart', 'serial', 'vision', 'camera', '鏡頭', '視覺'],
+		relatedBlocks: ['huskylens_set_algorithm', 'huskylens_request'],
+	},
+	{
+		type: 'huskylens_set_algorithm',
+		category: 'vision',
+		names: { 'zh-hant': '設定 HUSKYLENS 演算法', en: 'Set HUSKYLENS Algorithm' },
+		descriptions: {
+			'zh-hant': '設定 HUSKYLENS 使用的辨識演算法',
+			en: 'Set the recognition algorithm for HUSKYLENS',
+		},
+		fields: [
+			{
+				name: 'ALGORITHM',
+				type: 'dropdown',
+				label: { 'zh-hant': '演算法', en: 'Algorithm' },
+				options: [
+					{ value: 'ALGORITHM_FACE_RECOGNITION', label: { 'zh-hant': '人臉辨識', en: 'Face Recognition' } },
+					{ value: 'ALGORITHM_OBJECT_TRACKING', label: { 'zh-hant': '物體追蹤', en: 'Object Tracking' } },
+					{ value: 'ALGORITHM_OBJECT_RECOGNITION', label: { 'zh-hant': '物體辨識', en: 'Object Recognition' } },
+					{ value: 'ALGORITHM_LINE_TRACKING', label: { 'zh-hant': '線路追蹤', en: 'Line Tracking' } },
+					{ value: 'ALGORITHM_COLOR_RECOGNITION', label: { 'zh-hant': '顏色辨識', en: 'Color Recognition' } },
+					{ value: 'ALGORITHM_TAG_RECOGNITION', label: { 'zh-hant': '標籤辨識', en: 'Tag Recognition' } },
+					{ value: 'ALGORITHM_OBJECT_CLASSIFICATION', label: { 'zh-hant': '物體分類', en: 'Object Classification' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'algorithm', 'face', 'object', 'line', 'color', 'tag', '演算法', '辨識'],
+		experimental: true,
+		relatedBlocks: ['huskylens_init_i2c', 'huskylens_init_uart', 'huskylens_request'],
+	},
+	{
+		type: 'huskylens_request',
+		category: 'vision',
+		names: { 'zh-hant': '請求 HUSKYLENS 辨識結果', en: 'Request HUSKYLENS Data' },
+		descriptions: {
+			'zh-hant': '從 HUSKYLENS 請求最新的辨識結果',
+			en: 'Request latest recognition data from HUSKYLENS',
+		},
+		fields: [],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'request', 'data', '請求', '資料'],
+		relatedBlocks: ['huskylens_count_blocks', 'huskylens_count_arrows'],
+	},
+	{
+		type: 'huskylens_count_blocks',
+		category: 'vision',
+		names: { 'zh-hant': 'HUSKYLENS 方塊數量', en: 'HUSKYLENS Block Count' },
+		descriptions: {
+			'zh-hant': '取得 HUSKYLENS 偵測到的方塊數量',
+			en: 'Get the number of blocks detected by HUSKYLENS',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'blocks', 'count', '方塊', '數量'],
+		relatedBlocks: ['huskylens_request', 'huskylens_get_block_info'],
+	},
+	{
+		type: 'huskylens_get_block_info',
+		category: 'vision',
+		names: { 'zh-hant': '取得 HUSKYLENS 方塊資訊', en: 'Get HUSKYLENS Block Info' },
+		descriptions: {
+			'zh-hant': '取得指定方塊的資訊（位置、大小或 ID）',
+			en: 'Get info of specified block (position, size or ID)',
+		},
+		fields: [
+			{ name: 'INDEX', type: 'number', label: { 'zh-hant': '索引', en: 'Index' }, default: 0, min: 0 },
+			{
+				name: 'INFO_TYPE',
+				type: 'dropdown',
+				label: { 'zh-hant': '資訊類型', en: 'Info Type' },
+				options: [
+					{ value: 'xCenter', label: { 'zh-hant': 'X 中心', en: 'X Center' } },
+					{ value: 'yCenter', label: { 'zh-hant': 'Y 中心', en: 'Y Center' } },
+					{ value: 'width', label: { 'zh-hant': '寬度', en: 'Width' } },
+					{ value: 'height', label: { 'zh-hant': '高度', en: 'Height' } },
+					{ value: 'ID', label: { 'zh-hant': 'ID', en: 'ID' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'block', 'info', 'position', '方塊', '資訊', '位置'],
+		relatedBlocks: ['huskylens_count_blocks'],
+	},
+
+	// === 七段顯示器積木 ===
+	{
+		type: 'seven_segment_pins',
+		category: 'displays',
+		names: { 'zh-hant': '設定七段顯示器腳位', en: 'Setup Seven Segment Pins' },
+		descriptions: {
+			'zh-hant': '配置七段顯示器的各段(A-G)及小數點(DP)的連接腳位',
+			en: 'Configure pin connections for seven segment display (A-G and DP)',
+		},
+		fields: [
+			{ name: 'PIN_A', type: 'dropdown', label: { 'zh-hant': 'A 腳位', en: 'Pin A' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_B', type: 'dropdown', label: { 'zh-hant': 'B 腳位', en: 'Pin B' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_C', type: 'dropdown', label: { 'zh-hant': 'C 腳位', en: 'Pin C' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_D', type: 'dropdown', label: { 'zh-hant': 'D 腳位', en: 'Pin D' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_E', type: 'dropdown', label: { 'zh-hant': 'E 腳位', en: 'Pin E' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_F', type: 'dropdown', label: { 'zh-hant': 'F 腳位', en: 'Pin F' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_G', type: 'dropdown', label: { 'zh-hant': 'G 腳位', en: 'Pin G' }, options: 'dynamic:digitalPins' },
+			{ name: 'PIN_DP', type: 'dropdown', label: { 'zh-hant': 'DP 腳位', en: 'Pin DP' }, options: 'dynamic:digitalPins' },
+			{
+				name: 'TYPE',
+				type: 'dropdown',
+				label: { 'zh-hant': '類型', en: 'Type' },
+				options: [
+					{ value: 'COMMON_CATHODE', label: { 'zh-hant': '共陰極', en: 'Common Cathode' } },
+					{ value: 'COMMON_ANODE', label: { 'zh-hant': '共陽極', en: 'Common Anode' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['seven', 'segment', 'display', '七段', '顯示器', 'LED'],
+		relatedBlocks: ['seven_segment_display'],
+	},
+	{
+		type: 'seven_segment_display',
+		category: 'displays',
+		names: { 'zh-hant': '七段顯示器顯示', en: 'Seven Segment Display' },
+		descriptions: {
+			'zh-hant': '在七段顯示器上顯示數字(0-9)，可選擇是否顯示小數點',
+			en: 'Display a number (0-9) on seven segment display, optionally show decimal point',
+		},
+		fields: [
+			{ name: 'NUMBER', type: 'number', label: { 'zh-hant': '數字', en: 'Number' }, default: 0, min: 0, max: 9 },
+			{ name: 'DECIMAL_POINT', type: 'checkbox', label: { 'zh-hant': '小數點', en: 'Decimal Point' }, default: false },
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['seven', 'segment', 'display', 'number', '七段', '顯示', '數字'],
+		relatedBlocks: ['seven_segment_pins'],
+	},
+
+	// === ESP32 特定積木 ===
+	{
+		type: 'esp32_pwm_setup',
+		category: 'arduino',
+		names: { 'zh-hant': 'ESP32 PWM 設定', en: 'ESP32 PWM Setup' },
+		descriptions: {
+			'zh-hant': '設定 ESP32 的 PWM 頻率和解析度。高頻率適用於馬達驅動晶片（20-75KHz）',
+			en: 'Configure ESP32 PWM frequency and resolution. High frequency for motor drivers (20-75KHz)',
+		},
+		fields: [
+			{
+				name: 'FREQUENCY',
+				type: 'number',
+				label: { 'zh-hant': '頻率 (Hz)', en: 'Frequency (Hz)' },
+				default: 5000,
+				min: 1,
+				max: 80000,
+			},
+			{
+				name: 'RESOLUTION',
+				type: 'dropdown',
+				label: { 'zh-hant': '解析度', en: 'Resolution' },
+				options: [
+					{ value: '8', label: { 'zh-hant': '8 bit (0-255)', en: '8 bit (0-255)' } },
+					{ value: '10', label: { 'zh-hant': '10 bit (0-1023)', en: '10 bit (0-1023)' } },
+					{ value: '12', label: { 'zh-hant': '12 bit (0-4095)', en: '12 bit (0-4095)' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['esp32', 'esp32_supermini'],
+		tags: ['esp32', 'pwm', 'ledc', 'frequency', 'resolution', '頻率', '解析度'],
+		notes: {
+			'zh-hant': '注意：頻率 × 2^解析度 ≤ 80,000,000',
+			en: 'Note: frequency × 2^resolution ≤ 80,000,000',
+		},
+	},
+
+	// === Pixetto 智慧鏡頭積木 ===
+	{
+		type: 'pixetto_init',
+		category: 'vision',
+		names: { 'zh-hant': '初始化 Pixetto', en: 'Init Pixetto' },
+		descriptions: {
+			'zh-hant': '初始化 Pixetto 智慧鏡頭，設定 UART 通訊腳位',
+			en: 'Initialize Pixetto smart camera, set UART pins',
+		},
+		fields: [
+			{ name: 'RX_PIN', type: 'dropdown', label: { 'zh-hant': 'RX 腳位', en: 'RX Pin' }, options: 'dynamic:digitalPins' },
+			{ name: 'TX_PIN', type: 'dropdown', label: { 'zh-hant': 'TX 腳位', en: 'TX Pin' }, options: 'dynamic:digitalPins' },
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'init', 'uart', 'camera', '鏡頭', '視覺', '初始化'],
+		relatedBlocks: ['pixetto_is_detected', 'pixetto_set_mode'],
+	},
+	{
+		type: 'pixetto_is_detected',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 偵測到物體', en: 'Pixetto Is Detected' },
+		descriptions: {
+			'zh-hant': '檢測 Pixetto 是否偵測到任何物體',
+			en: 'Check if Pixetto detected any object',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'detect', 'object', '偵測', '物體'],
+		relatedBlocks: ['pixetto_init'],
+	},
+	{
+		type: 'pixetto_get_type_id',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 取得偵測類型 ID', en: 'Pixetto Get Type ID' },
+		descriptions: {
+			'zh-hant': '取得 Pixetto 偵測到的物體類型 ID',
+			en: 'Get type ID of object detected by Pixetto',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'type', 'id', '類型'],
+	},
+	{
+		type: 'pixetto_get_func_id',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 取得功能 ID', en: 'Pixetto Get Function ID' },
+		descriptions: {
+			'zh-hant': '取得 Pixetto 目前使用的功能 ID',
+			en: 'Get current function ID of Pixetto',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'function', 'id', '功能'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_color_detect',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 偵測顏色', en: 'Pixetto Detect Color' },
+		descriptions: {
+			'zh-hant': '檢測 Pixetto 是否偵測到指定顏色的物體',
+			en: 'Check if Pixetto detected specified color',
+		},
+		fields: [
+			{
+				name: 'COLOR',
+				type: 'dropdown',
+				label: { 'zh-hant': '顏色', en: 'Color' },
+				options: [
+					{ value: 'RED', label: { 'zh-hant': '紅色', en: 'Red' } },
+					{ value: 'BLUE', label: { 'zh-hant': '藍色', en: 'Blue' } },
+					{ value: 'GREEN', label: { 'zh-hant': '綠色', en: 'Green' } },
+					{ value: 'YELLOW', label: { 'zh-hant': '黃色', en: 'Yellow' } },
+					{ value: 'ORANGE', label: { 'zh-hant': '橙色', en: 'Orange' } },
+					{ value: 'PURPLE', label: { 'zh-hant': '紫色', en: 'Purple' } },
+					{ value: 'BLACK', label: { 'zh-hant': '黑色', en: 'Black' } },
+					{ value: 'WHITE', label: { 'zh-hant': '白色', en: 'White' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'color', 'detect', '顏色', '偵測'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_shape_detect',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 偵測形狀', en: 'Pixetto Detect Shape' },
+		descriptions: {
+			'zh-hant': '檢測 Pixetto 是否偵測到指定形狀的物體',
+			en: 'Check if Pixetto detected specified shape',
+		},
+		fields: [
+			{
+				name: 'SHAPE',
+				type: 'dropdown',
+				label: { 'zh-hant': '形狀', en: 'Shape' },
+				options: [
+					{ value: 'TRIANGLE', label: { 'zh-hant': '三角形', en: 'Triangle' } },
+					{ value: 'RECTANGLE', label: { 'zh-hant': '四邊形', en: 'Rectangle' } },
+					{ value: 'PENTAGON', label: { 'zh-hant': '五邊形', en: 'Pentagon' } },
+					{ value: 'HEXAGON', label: { 'zh-hant': '六邊形', en: 'Hexagon' } },
+					{ value: 'CIRCLE', label: { 'zh-hant': '圓形', en: 'Circle' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'shape', 'detect', '形狀', '偵測'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_face_detect',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 偵測到人臉', en: 'Pixetto Face Detected' },
+		descriptions: {
+			'zh-hant': '檢測 Pixetto 是否偵測到人臉',
+			en: 'Check if Pixetto detected a face',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'face', 'detect', '人臉', '偵測'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_apriltag_detect',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 偵測 AprilTag', en: 'Pixetto Detect AprilTag' },
+		descriptions: {
+			'zh-hant': '檢測 Pixetto 是否偵測到指定 ID 的 AprilTag',
+			en: 'Check if Pixetto detected AprilTag with specified ID',
+		},
+		fields: [],
+		inputs: [{ name: 'TAG_ID', type: 'value', label: { 'zh-hant': '標籤 ID', en: 'Tag ID' }, check: 'Number' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'apriltag', 'tag', 'detect', '標籤', '偵測'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_neural_network',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 神經網路辨識', en: 'Pixetto Neural Network' },
+		descriptions: {
+			'zh-hant': '檢測 Pixetto 神經網路是否辨識出指定類別的物體',
+			en: 'Check if Pixetto neural network recognized specified class',
+		},
+		fields: [],
+		inputs: [{ name: 'CLASS_ID', type: 'value', label: { 'zh-hant': '類別 ID', en: 'Class ID' }, check: 'Number' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'neural', 'network', 'ai', '神經網路', '辨識'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_handwritten_digit',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 辨識手寫數字', en: 'Pixetto Handwritten Digit' },
+		descriptions: {
+			'zh-hant': '檢測 Pixetto 是否辨識出指定的手寫數字',
+			en: 'Check if Pixetto recognized specified handwritten digit',
+		},
+		fields: [],
+		inputs: [{ name: 'DIGIT', type: 'value', label: { 'zh-hant': '數字', en: 'Digit' }, check: 'Number' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'handwritten', 'digit', '手寫', '數字', '辨識'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_get_position',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 獲取偵測物體座標', en: 'Pixetto Get Position' },
+		descriptions: {
+			'zh-hant': '獲取 Pixetto 偵測到的物體位置或尺寸資訊',
+			en: 'Get position or size info of object detected by Pixetto',
+		},
+		fields: [
+			{
+				name: 'POSITION_TYPE',
+				type: 'dropdown',
+				label: { 'zh-hant': '座標', en: 'Coordinate' },
+				options: [
+					{ value: 'X', label: { 'zh-hant': 'X 座標', en: 'X Position' } },
+					{ value: 'Y', label: { 'zh-hant': 'Y 座標', en: 'Y Position' } },
+					{ value: 'WIDTH', label: { 'zh-hant': '寬度', en: 'Width' } },
+					{ value: 'HEIGHT', label: { 'zh-hant': '高度', en: 'Height' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'position', 'coordinate', '位置', '座標'],
+	},
+	{
+		type: 'pixetto_road_detect',
+		category: 'vision',
+		names: { 'zh-hant': 'Pixetto 道路偵測', en: 'Pixetto Road Detection' },
+		descriptions: {
+			'zh-hant': '獲取 Pixetto 道路偵測的相關資訊',
+			en: 'Get road detection info from Pixetto',
+		},
+		fields: [
+			{
+				name: 'ROAD_INFO',
+				type: 'dropdown',
+				label: { 'zh-hant': '資訊', en: 'Info' },
+				options: [
+					{ value: 'CENTER_X', label: { 'zh-hant': '中心點 X', en: 'Center X' } },
+					{ value: 'CENTER_Y', label: { 'zh-hant': '中心點 Y', en: 'Center Y' } },
+					{ value: 'LEFT_X', label: { 'zh-hant': '左邊界 X', en: 'Left X' } },
+					{ value: 'RIGHT_X', label: { 'zh-hant': '右邊界 X', en: 'Right X' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'road', 'detect', '道路', '偵測'],
+		experimental: true,
+	},
+	{
+		type: 'pixetto_set_mode',
+		category: 'vision',
+		names: { 'zh-hant': '設定 Pixetto 功能模式', en: 'Set Pixetto Mode' },
+		descriptions: {
+			'zh-hant': '設定 Pixetto 智慧鏡頭的功能模式',
+			en: 'Set the function mode of Pixetto smart camera',
+		},
+		fields: [
+			{
+				name: 'MODE',
+				type: 'dropdown',
+				label: { 'zh-hant': '模式', en: 'Mode' },
+				options: [
+					{ value: 'COLOR_DETECTION', label: { 'zh-hant': '顏色偵測', en: 'Color Detection' } },
+					{ value: 'SHAPE_DETECTION', label: { 'zh-hant': '形狀偵測', en: 'Shape Detection' } },
+					{ value: 'FACE_DETECTION', label: { 'zh-hant': '人臉偵測', en: 'Face Detection' } },
+					{ value: 'APRILTAG_DETECTION', label: { 'zh-hant': 'AprilTag 偵測', en: 'AprilTag Detection' } },
+					{ value: 'NEURAL_NETWORK', label: { 'zh-hant': '神經網路', en: 'Neural Network' } },
+					{ value: 'HANDWRITTEN_DIGIT', label: { 'zh-hant': '手寫數字', en: 'Handwritten Digit' } },
+					{ value: 'ROAD_DETECTION', label: { 'zh-hant': '道路偵測', en: 'Road Detection' } },
+					{ value: 'BALL_DETECTION', label: { 'zh-hant': '球體偵測', en: 'Ball Detection' } },
+					{ value: 'TEMPLATE_MATCHING', label: { 'zh-hant': '模板比對', en: 'Template Matching' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['pixetto', 'mode', 'set', '模式', '設定'],
+		experimental: true,
+		relatedBlocks: ['pixetto_init'],
+	},
+
+	// === 迴圈控制積木 ===
+	{
+		type: 'controls_duration',
+		category: 'loops',
+		names: { 'zh-hant': '限時重複', en: 'Duration Repeat' },
+		descriptions: {
+			'zh-hant': '在指定的時間內重複執行程式',
+			en: 'Repeat statements for a specified duration',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'DURATION', type: 'value', label: { 'zh-hant': '時間 (毫秒)', en: 'Duration (ms)' }, check: 'Number' },
+			{ name: 'DO', type: 'statement', label: { 'zh-hant': '執行', en: 'Do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'duration', 'time', 'repeat', '迴圈', '限時', '重複'],
+	},
+	{
+		type: 'singular_flow_statements',
+		category: 'loops',
+		names: { 'zh-hant': '流程控制', en: 'Flow Control' },
+		descriptions: {
+			'zh-hant': '在迴圈中使用 break 或 continue 語句',
+			en: 'Use break or continue statements in loops',
+		},
+		fields: [
+			{
+				name: 'FLOW',
+				type: 'dropdown',
+				label: { 'zh-hant': '流程', en: 'Flow' },
+				options: [
+					{ value: 'BREAK', label: { 'zh-hant': '跳出', en: 'break' } },
+					{ value: 'CONTINUE', label: { 'zh-hant': '繼續', en: 'continue' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'break', 'continue', 'flow', '迴圈', '跳出', '繼續'],
+	},
+
+	// === 函式積木 ===
+	{
+		type: 'arduino_function',
+		category: 'functions',
+		names: { 'zh-hant': '定義函式', en: 'Define Function' },
+		descriptions: {
+			'zh-hant': '建立自定義函式，可包含參數',
+			en: 'Create a custom function with parameters',
+		},
+		fields: [{ name: 'NAME', type: 'text', label: { 'zh-hant': '名稱', en: 'Name' }, default: 'myFunction' }],
+		inputs: [{ name: 'STACK', type: 'statement', label: { 'zh-hant': '程式碼', en: 'Code' } }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['function', 'define', 'procedure', '函式', '定義', '程序'],
+		relatedBlocks: ['arduino_function_call', 'arduino_function_mutator', 'arduino_function_parameter'],
+	},
+	{
+		type: 'arduino_function_call',
+		category: 'functions',
+		names: { 'zh-hant': '呼叫函式', en: 'Call Function' },
+		descriptions: {
+			'zh-hant': '呼叫一個自定義函式',
+			en: 'Call a custom function',
+		},
+		fields: [{ name: 'NAME', type: 'label', label: { 'zh-hant': '函式名稱', en: 'Function Name' } }],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['function', 'call', 'procedure', '函式', '呼叫'],
+		relatedBlocks: ['arduino_function'],
+	},
+	{
+		type: 'arduino_function_mutator',
+		category: 'functions',
+		names: { 'zh-hant': '函式參數容器', en: 'Function Mutator Container' },
+		descriptions: {
+			'zh-hant': '函式積木的 mutator 容器，用於定義函式參數',
+			en: 'Mutator container for function blocks, used to define function parameters',
+		},
+		fields: [],
+		inputs: [{ name: 'STACK', type: 'statement', label: { 'zh-hant': '參數', en: 'Parameters' } }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['function', 'mutator', 'parameter', '函式', '參數', '容器'],
+		internal: true,
+		relatedBlocks: ['arduino_function', 'arduino_function_parameter'],
+	},
+	{
+		type: 'arduino_function_parameter',
+		category: 'functions',
+		names: { 'zh-hant': '函式參數', en: 'Function Parameter' },
+		descriptions: {
+			'zh-hant': '定義函式的參數，包含型別與名稱',
+			en: 'Define function parameter with type and name',
+		},
+		fields: [
+			{
+				name: 'TYPE',
+				type: 'dropdown',
+				label: { 'zh-hant': '型別', en: 'Type' },
+				options: [
+					{ value: 'int', label: { 'zh-hant': '整數 (int)', en: 'int' } },
+					{ value: 'float', label: { 'zh-hant': '浮點數 (float)', en: 'float' } },
+					{ value: 'bool', label: { 'zh-hant': '布林值 (bool)', en: 'bool' } },
+					{ value: 'String', label: { 'zh-hant': '字串 (String)', en: 'String' } },
+				],
+			},
+			{ name: 'NAME', type: 'text', label: { 'zh-hant': '名稱', en: 'Name' }, default: 'x' },
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['function', 'parameter', 'argument', '函式', '參數', '引數'],
+		internal: true,
+		relatedBlocks: ['arduino_function', 'arduino_function_mutator'],
+	},
+
+	// === HUSKYLENS 額外積木 ===
+	{
+		type: 'huskylens_count_arrows',
+		category: 'vision',
+		names: { 'zh-hant': 'HUSKYLENS 箭頭數量', en: 'HUSKYLENS Arrow Count' },
+		descriptions: {
+			'zh-hant': '取得 HUSKYLENS 偵測到的箭頭數量',
+			en: 'Get the number of arrows detected by HUSKYLENS',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'arrows', 'count', '箭頭', '數量'],
+		experimental: true,
+		relatedBlocks: ['huskylens_request', 'huskylens_get_arrow_info'],
+	},
+	{
+		type: 'huskylens_get_arrow_info',
+		category: 'vision',
+		names: { 'zh-hant': '取得 HUSKYLENS 箭頭資訊', en: 'Get HUSKYLENS Arrow Info' },
+		descriptions: {
+			'zh-hant': '取得指定箭頭的資訊（位置或 ID）',
+			en: 'Get info of specified arrow (position or ID)',
+		},
+		fields: [
+			{ name: 'INDEX', type: 'number', label: { 'zh-hant': '索引', en: 'Index' }, default: 0, min: 0 },
+			{
+				name: 'INFO_TYPE',
+				type: 'dropdown',
+				label: { 'zh-hant': '資訊類型', en: 'Info Type' },
+				options: [
+					{ value: 'xOrigin', label: { 'zh-hant': '起點 X', en: 'Origin X' } },
+					{ value: 'yOrigin', label: { 'zh-hant': '起點 Y', en: 'Origin Y' } },
+					{ value: 'xTarget', label: { 'zh-hant': '終點 X', en: 'Target X' } },
+					{ value: 'yTarget', label: { 'zh-hant': '終點 Y', en: 'Target Y' } },
+					{ value: 'ID', label: { 'zh-hant': 'ID', en: 'ID' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'arrow', 'info', 'position', '箭頭', '資訊', '位置'],
+		experimental: true,
+		relatedBlocks: ['huskylens_count_arrows'],
+	},
+	{
+		type: 'huskylens_learn',
+		category: 'vision',
+		names: { 'zh-hant': 'HUSKYLENS 學習', en: 'HUSKYLENS Learn' },
+		descriptions: {
+			'zh-hant': '讓 HUSKYLENS 學習目前畫面中的物體',
+			en: 'Let HUSKYLENS learn the object in current frame',
+		},
+		fields: [],
+		inputs: [{ name: 'ID', type: 'value', label: { 'zh-hant': 'ID', en: 'ID' }, check: 'Number' }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'learn', 'train', '學習', '訓練'],
+		experimental: true,
+	},
+	{
+		type: 'huskylens_forget',
+		category: 'vision',
+		names: { 'zh-hant': 'HUSKYLENS 忘記', en: 'HUSKYLENS Forget' },
+		descriptions: {
+			'zh-hant': '讓 HUSKYLENS 忘記已學習的物體',
+			en: 'Let HUSKYLENS forget learned objects',
+		},
+		fields: [],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'forget', 'clear', '忘記', '清除'],
+		experimental: true,
+	},
+	{
+		type: 'huskylens_is_learned',
+		category: 'vision',
+		names: { 'zh-hant': 'HUSKYLENS 已學習', en: 'HUSKYLENS Is Learned' },
+		descriptions: {
+			'zh-hant': '檢查 HUSKYLENS 是否已學習指定 ID 的物體',
+			en: 'Check if HUSKYLENS has learned object with specified ID',
+		},
+		fields: [],
+		inputs: [{ name: 'ID', type: 'value', label: { 'zh-hant': 'ID', en: 'ID' }, check: 'Number' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'learned', 'check', '已學習', '檢查'],
+		experimental: true,
+	},
+
+	// === Arduino 額外積木 ===
+	{
+		type: 'arduino_setup_loop',
+		category: 'arduino',
+		names: { 'zh-hant': 'Arduino 設定與迴圈', en: 'Arduino Setup and Loop' },
+		descriptions: {
+			'zh-hant': 'Arduino 程式的 setup() 和 loop() 結合的主結構',
+			en: 'Combined Arduino setup() and loop() main structure',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'SETUP', type: 'statement', label: { 'zh-hant': '設定', en: 'Setup' } },
+			{ name: 'LOOP', type: 'statement', label: { 'zh-hant': '迴圈', en: 'Loop' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['arduino', 'setup', 'loop', '設定', '迴圈'],
+	},
+	{
+		type: 'arduino_digital_write',
+		category: 'arduino',
+		names: { 'zh-hant': 'Arduino 數位寫入', en: 'Arduino Digital Write' },
+		descriptions: {
+			'zh-hant': '設定數位腳位的輸出為 HIGH 或 LOW',
+			en: 'Set a digital pin to HIGH or LOW',
+		},
+		fields: [{ name: 'PIN', type: 'dropdown', label: { 'zh-hant': '腳位', en: 'Pin' }, options: 'dynamic:digitalPins' }],
+		inputs: [{ name: 'STATE', type: 'value', label: { 'zh-hant': '狀態', en: 'State' }, check: 'Boolean' }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['digital', 'write', 'gpio', '數位', '寫入', '輸出'],
+	},
+	{
+		type: 'arduino_digital_read',
+		category: 'arduino',
+		names: { 'zh-hant': 'Arduino 數位讀取', en: 'Arduino Digital Read' },
+		descriptions: {
+			'zh-hant': '讀取數位腳位的狀態',
+			en: 'Read the state of a digital pin',
+		},
+		fields: [{ name: 'PIN', type: 'dropdown', label: { 'zh-hant': '腳位', en: 'Pin' }, options: 'dynamic:digitalPins' }],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['digital', 'read', 'gpio', '數位', '讀取', '輸入'],
+	},
+	{
+		type: 'arduino_analog_write',
+		category: 'arduino',
+		names: { 'zh-hant': 'Arduino 類比寫入 (PWM)', en: 'Arduino Analog Write (PWM)' },
+		descriptions: {
+			'zh-hant': '設定 PWM 腳位的輸出值 (0-255)',
+			en: 'Set PWM output value (0-255) on a PWM capable pin',
+		},
+		fields: [{ name: 'PIN', type: 'dropdown', label: { 'zh-hant': '腳位', en: 'Pin' }, options: 'dynamic:pwmPins' }],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '數值', en: 'Value' }, check: 'Number' }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['analog', 'write', 'pwm', '類比', '寫入', 'PWM'],
+	},
+	{
+		type: 'arduino_analog_read',
+		category: 'arduino',
+		names: { 'zh-hant': 'Arduino 類比讀取', en: 'Arduino Analog Read' },
+		descriptions: {
+			'zh-hant': '讀取類比腳位的值 (0-1023)',
+			en: 'Read analog pin value (0-1023)',
+		},
+		fields: [{ name: 'PIN', type: 'dropdown', label: { 'zh-hant': '腳位', en: 'Pin' }, options: 'dynamic:analogPins' }],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['analog', 'read', '類比', '讀取', '輸入'],
+	},
+	{
+		type: 'arduino_delay',
+		category: 'arduino',
+		names: { 'zh-hant': 'Arduino 延遲', en: 'Arduino Delay' },
+		descriptions: {
+			'zh-hant': '暫停程式執行指定的時間',
+			en: 'Pause program execution for specified time',
+		},
+		fields: [],
+		inputs: [{ name: 'DELAY_TIME', type: 'value', label: { 'zh-hant': '時間 (毫秒)', en: 'Time (ms)' }, check: 'Number' }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['delay', 'wait', 'time', '延遲', '等待', '時間'],
+	},
+	{
+		type: 'arduino_level',
+		category: 'arduino',
+		names: { 'zh-hant': '電位', en: 'Level' },
+		descriptions: {
+			'zh-hant': '電位常數：HIGH (高電位) 或 LOW (低電位)',
+			en: 'Level constants: HIGH or LOW',
+		},
+		fields: [
+			{
+				name: 'LEVEL',
+				type: 'dropdown',
+				label: { 'zh-hant': '電位', en: 'Level' },
+				options: [
+					{ value: 'HIGH', label: { 'zh-hant': '高', en: 'HIGH' } },
+					{ value: 'LOW', label: { 'zh-hant': '低', en: 'LOW' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['level', 'high', 'low', '電位', '高', '低'],
+	},
+	{
+		type: 'arduino_pullup',
+		category: 'arduino',
+		names: { 'zh-hant': '上拉電阻', en: 'Pullup' },
+		descriptions: {
+			'zh-hant': '設定數位腳位啟用內部上拉電阻',
+			en: 'Enable internal pullup resistor on a digital pin',
+		},
+		fields: [{ name: 'PIN', type: 'dropdown', label: { 'zh-hant': '腳位', en: 'Pin' }, options: 'dynamic:digitalPins' }],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['pullup', 'resistor', 'input', '上拉', '電阻', '輸入'],
+	},
+	{
+		type: 'arduino_pin_mode',
+		category: 'arduino',
+		names: { 'zh-hant': '腳位模式設定', en: 'Pin Mode' },
+		descriptions: {
+			'zh-hant': '設定指定腳位的運作模式（輸入/輸出）',
+			en: 'Set the mode of a digital pin (INPUT/OUTPUT)',
+		},
+		fields: [
+			{ name: 'PIN', type: 'dropdown', label: { 'zh-hant': '腳位', en: 'Pin' }, options: 'dynamic:digitalPins' },
+			{
+				name: 'MODE',
+				type: 'dropdown',
+				label: { 'zh-hant': '模式', en: 'Mode' },
+				options: [
+					{ value: 'INPUT', label: { 'zh-hant': '輸入', en: 'INPUT' } },
+					{ value: 'OUTPUT', label: { 'zh-hant': '輸出', en: 'OUTPUT' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['pin', 'mode', 'input', 'output', 'gpio', '腳位', '模式', '輸入', '輸出'],
+		relatedBlocks: ['digital_write', 'digital_read'],
+	},
+	{
+		type: 'text_print',
+		category: 'text',
+		names: { 'zh-hant': '序列埠輸出', en: 'Serial Print' },
+		descriptions: {
+			'zh-hant': '透過序列埠輸出文字或數值',
+			en: 'Print text or values to serial port',
+		},
+		fields: [],
+		inputs: [{ name: 'TEXT', type: 'value', label: { 'zh-hant': '文字', en: 'Text' } }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['print', 'serial', 'output', '輸出', '序列埠', '列印'],
+	},
+	{
+		type: 'math_map',
+		category: 'math',
+		names: { 'zh-hant': '數值映射', en: 'Map' },
+		descriptions: {
+			'zh-hant': '將數值從一個範圍映射到另一個範圍',
+			en: 'Map a value from one range to another',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'VALUE', type: 'value', label: { 'zh-hant': '數值', en: 'Value' }, check: 'Number' },
+			{ name: 'FROM_LOW', type: 'value', label: { 'zh-hant': '原範圍最小', en: 'From Low' }, check: 'Number' },
+			{ name: 'FROM_HIGH', type: 'value', label: { 'zh-hant': '原範圍最大', en: 'From High' }, check: 'Number' },
+			{ name: 'TO_LOW', type: 'value', label: { 'zh-hant': '目標範圍最小', en: 'To Low' }, check: 'Number' },
+			{ name: 'TO_HIGH', type: 'value', label: { 'zh-hant': '目標範圍最大', en: 'To High' }, check: 'Number' },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['map', 'range', 'convert', '映射', '範圍', '轉換'],
+	},
+
+	// === 感測器額外積木 ===
+	{
+		type: 'ultrasonic_trigger',
+		category: 'sensors',
+		names: { 'zh-hant': '觸發超音波感測器', en: 'Trigger Ultrasonic Sensor' },
+		descriptions: {
+			'zh-hant': '觸發超音波感測器發送訊號並讀取距離',
+			en: 'Trigger ultrasonic sensor to send signal and read distance',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['ultrasonic', 'trigger', 'distance', '超音波', '觸發', '距離'],
+		relatedBlocks: ['ultrasonic_sensor'],
+	},
+
+	// === 馬達額外積木 ===
+	{
+		type: 'encoder_pid_setup',
+		category: 'motors',
+		names: { 'zh-hant': '編碼器 PID 設定', en: 'Encoder PID Setup' },
+		descriptions: {
+			'zh-hant': '設定編碼器馬達的 PID 控制器參數',
+			en: 'Setup PID controller parameters for encoder motor',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'KP', type: 'value', label: { 'zh-hant': 'Kp', en: 'Kp' }, check: 'Number' },
+			{ name: 'KI', type: 'value', label: { 'zh-hant': 'Ki', en: 'Ki' }, check: 'Number' },
+			{ name: 'KD', type: 'value', label: { 'zh-hant': 'Kd', en: 'Kd' }, check: 'Number' },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['encoder', 'pid', 'setup', '編碼器', 'PID', '設定'],
+		relatedBlocks: ['encoder_setup', 'encoder_pid_compute'],
+	},
+	{
+		type: 'encoder_pid_compute',
+		category: 'motors',
+		names: { 'zh-hant': '編碼器 PID 計算', en: 'Encoder PID Compute' },
+		descriptions: {
+			'zh-hant': '計算 PID 輸出以控制編碼器馬達',
+			en: 'Compute PID output for encoder motor control',
+		},
+		fields: [],
+		inputs: [{ name: 'SETPOINT', type: 'value', label: { 'zh-hant': '目標值', en: 'Setpoint' }, check: 'Number' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['encoder', 'pid', 'compute', '編碼器', 'PID', '計算'],
+		relatedBlocks: ['encoder_pid_setup'],
+	},
+
+	// === 門檻函式積木 ===
+	{
+		type: 'threshold_function_setup',
+		category: 'arduino',
+		names: { 'zh-hant': '門檻函式設定', en: 'Threshold Function Setup' },
+		descriptions: {
+			'zh-hant': '設定門檻函式的參數，用於將輸入映射到輸出',
+			en: 'Setup threshold function parameters for mapping input to output',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'THRESHOLD', type: 'value', label: { 'zh-hant': '門檻值', en: 'Threshold' }, check: 'Number' },
+			{ name: 'LOW_OUTPUT', type: 'value', label: { 'zh-hant': '低於門檻輸出', en: 'Low Output' }, check: 'Number' },
+			{ name: 'HIGH_OUTPUT', type: 'value', label: { 'zh-hant': '高於門檻輸出', en: 'High Output' }, check: 'Number' },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['threshold', 'function', 'setup', '門檻', '函式', '設定'],
+		relatedBlocks: ['threshold_function_read'],
+	},
+	{
+		type: 'threshold_function_read',
+		category: 'arduino',
+		names: { 'zh-hant': '門檻函式讀取', en: 'Threshold Function Read' },
+		descriptions: {
+			'zh-hant': '根據門檻函式讀取輸出值',
+			en: 'Read output value based on threshold function',
+		},
+		fields: [],
+		inputs: [{ name: 'INPUT', type: 'value', label: { 'zh-hant': '輸入值', en: 'Input' }, check: 'Number' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['threshold', 'function', 'read', '門檻', '函式', '讀取'],
+		relatedBlocks: ['threshold_function_setup'],
+	},
+];
+
+/**
+ * 生成搜尋索引
+ */
+function generateSearchIndex(blocks) {
+	const searchIndex = {};
+
+	for (const block of blocks) {
+		// 從所有標籤建立索引
+		for (const tag of block.tags) {
+			const normalizedTag = tag.toLowerCase();
+			if (!searchIndex[normalizedTag]) {
+				searchIndex[normalizedTag] = [];
+			}
+			if (!searchIndex[normalizedTag].includes(block.type)) {
+				searchIndex[normalizedTag].push(block.type);
+			}
+		}
+
+		// 從名稱建立索引
+		for (const [_locale, name] of Object.entries(block.names)) {
+			const words = name.toLowerCase().split(/\s+/);
+			for (const word of words) {
+				if (word.length > 1) {
+					if (!searchIndex[word]) {
+						searchIndex[word] = [];
+					}
+					if (!searchIndex[word].includes(block.type)) {
+						searchIndex[word].push(block.type);
+					}
+				}
+			}
+		}
+	}
+
+	return searchIndex;
+}
+
+/**
+ * 生成完整字典
+ */
+function generateDictionary() {
+	const packageJson = require('../package.json');
+
+	// 建立索引
+	const byType = {};
+	const byCategory = {};
+
+	BLOCK_DEFINITIONS.forEach((block, index) => {
+		byType[block.type] = index;
+
+		if (!byCategory[block.category]) {
+			byCategory[block.category] = [];
+		}
+		byCategory[block.category].push(index);
+	});
+
+	const dictionary = {
+		version: packageJson.version,
+		generatedAt: new Date().toISOString(),
+		blocks: BLOCK_DEFINITIONS,
+		categories: CATEGORIES,
+		indices: {
+			byType,
+			byCategory,
+			searchIndex: generateSearchIndex(BLOCK_DEFINITIONS),
+		},
+	};
+
+	return dictionary;
+}
+
+// 主程式
+function main() {
+	console.log('Generating block dictionary...');
+
+	const dictionary = generateDictionary();
+
+	// 寫入檔案
+	const outputPath = path.join(__dirname, '..', 'src', 'mcp', 'block-dictionary.json');
+	fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+	fs.writeFileSync(outputPath, JSON.stringify(dictionary, null, 2), 'utf8');
+
+	console.log(`Dictionary generated successfully!`);
+	console.log(`  - Blocks: ${dictionary.blocks.length}`);
+	console.log(`  - Categories: ${dictionary.categories.length}`);
+	console.log(`  - Output: ${outputPath}`);
+}
+
+main();

@@ -1194,8 +1194,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return blocks;
 	});
 
+	// 載入鎖定標記，防止 FileWatcher 觸發的 loadWorkspace 立即保存導致無限循環
+	let isLoadingFromFileWatcher = false;
+
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
+		// 如果正在從 FileWatcher 載入，跳過保存以避免無限循環
+		if (isLoadingFromFileWatcher) {
+			log.info('跳過保存：正在從 FileWatcher 載入');
+			return;
+		}
+
 		try {
 			const state = Blockly.serialization.workspaces.save(workspace);
 			vscode.postMessage({
@@ -1218,8 +1227,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 		);
 	};
 
+	// 拖動狀態追蹤：避免在拖動過程中執行昂貴的操作
+	let isDraggingBlock = false;
+	let pendingCodeUpdate = false;
+	let codeUpdateDebounceTimer = null;
+
+	// 延遲執行程式碼更新的函數（避免頻繁更新造成卡頓）
+	const debouncedCodeUpdate = () => {
+		if (codeUpdateDebounceTimer) {
+			clearTimeout(codeUpdateDebounceTimer);
+		}
+		codeUpdateDebounceTimer = setTimeout(() => {
+			try {
+				const code = arduinoGenerator.workspaceToCode(workspace);
+				vscode.postMessage({
+					command: 'updateCode',
+					code: code,
+					lib_deps: arduinoGenerator.lib_deps_ || [],
+					build_flags: arduinoGenerator.build_flags_ || [],
+					lib_ldf_mode: arduinoGenerator.lib_ldf_mode_ || null,
+				});
+				saveWorkspaceState();
+				pendingCodeUpdate = false;
+			} catch (err) {
+				log.info('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
+			}
+		}, 150); // 150ms 延遲，平衡響應速度與性能
+	};
+
 	// 單一的工作區變更監聽器
 	workspace.addChangeListener(event => {
+		// 處理 BLOCK_DRAG 事件來追蹤拖動狀態
+		if (event.type === Blockly.Events.BLOCK_DRAG) {
+			isDraggingBlock = event.isStart;
+			if (!event.isStart && pendingCodeUpdate) {
+				// 拖動結束且有待處理的更新，執行延遲更新
+				debouncedCodeUpdate();
+			}
+			return;
+		}
+
 		// 忽略拖動中的 UI 事件
 		if (event.isUiEvent) {
 			return;
@@ -1448,27 +1495,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}, 100);
 			}
 
-			// 輸出最新的實驗積木清單
-			log.info('實驗積木清單檢查開始 >>>>>>');
-			logExperimentalBlocks();
-			log.info('實驗積木清單檢查結束 <<<<<<');
+			// 輸出最新的實驗積木清單（僅非拖動時）
+			if (!isDraggingBlock) {
+				log.info('實驗積木清單檢查開始 >>>>>>');
+				logExperimentalBlocks();
+				log.info('實驗積木清單檢查結束 <<<<<<');
+			}
 
-			// 檢查是否是函式定義積木變化
-			try {
-				const code = arduinoGenerator.workspaceToCode(workspace);
-				// 將庫依賴和其他設定一併發送
-				vscode.postMessage({
-					command: 'updateCode',
-					code: code,
-					lib_deps: arduinoGenerator.lib_deps_ || [],
-					build_flags: arduinoGenerator.build_flags_ || [],
-					lib_ldf_mode: arduinoGenerator.lib_ldf_mode_ || null,
-				});
-
-				// 無條件保存所有方塊移動事件，確保座標變更被儲存
-				saveWorkspaceState();
-			} catch (err) {
-				log.info('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
+			// 程式碼更新：拖動中時延遲執行，避免卡頓
+			if (isDraggingBlock) {
+				// 標記有待處理的更新，等拖動結束後執行
+				pendingCodeUpdate = true;
+			} else {
+				// 非拖動時使用 debounce 更新，避免短時間內多次更新
+				debouncedCodeUpdate();
 			}
 		}
 	});
@@ -1612,6 +1652,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 			case 'loadWorkspace':
 				try {
+					// 如果是 FileWatcher 觸發的重載，設置鎖定標記防止無限循環
+					const isFromFileWatcher = message.source === 'fileWatcher';
+					if (isFromFileWatcher) {
+						isLoadingFromFileWatcher = true;
+						log.info('FileWatcher 觸發的工作區重載，暫停保存操作');
+					}
+
 					if (message.board) {
 						// 先設定板子類型
 						boardSelect.value = message.board;
@@ -1713,8 +1760,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 							}
 						}, 300);
 					}
+
+					// 如果是 FileWatcher 觸發的重載，延遲後重置鎖定標記
+					if (isFromFileWatcher) {
+						setTimeout(() => {
+							isLoadingFromFileWatcher = false;
+							log.info('FileWatcher 重載完成，恢復保存操作');
+						}, 1500); // 給足夠時間讓所有事件處理完成
+					}
 				} catch (error) {
 					log.error('載入工作區狀態失敗:', error);
+					// 發生錯誤時也要重置鎖定標記
+					isLoadingFromFileWatcher = false;
 				}
 				break;
 			case 'setTheme':
