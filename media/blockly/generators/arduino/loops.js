@@ -36,6 +36,18 @@ window.arduinoGenerator.forBlock['controls_for'] = function (block) {
 	const step = window.arduinoGenerator.valueToCode(block, 'BY', window.arduinoGenerator.ORDER_ASSIGNMENT) || '1';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 
+	// 嘗試解析 from 和 to 的數值來決定迴圈方向
+	// 如果是純數字，可以在編譯時決定方向
+	const fromNum = parseFloat(from);
+	const toNum = parseFloat(to);
+
+	// 如果 from 和 to 都是數字且 from > to，生成遞減迴圈
+	if (!isNaN(fromNum) && !isNaN(toNum) && fromNum > toNum) {
+		return `for (int ${variable} = ${from}; ${variable} >= ${to}; ${variable} -= ${step}) {\n${branch}}\n`;
+	}
+
+	// 如果無法確定（變數或表達式），使用執行時判斷
+	// 或者預設為遞增迴圈（標準行為）
 	return `for (int ${variable} = ${from}; ${variable} <= ${to}; ${variable} += ${step}) {\n${branch}}\n`;
 };
 
