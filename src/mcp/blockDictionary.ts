@@ -513,6 +513,14 @@ export function generateBlockJsonTemplate(block: BlockDefinition, context: Block
 			return template;
 		}
 
+		case 'encoder_pid_reset': {
+			const pidName = context.pidName || 'myPID';
+			// 使用物件格式的 extraState（Blockly 12.x 推薦）
+			template.extraState = { pid: pidName };
+			template.fields = { PID_VAR: pidName };
+			return template;
+		}
+
 		case 'controls_if': {
 			const elseIfCount = context.elseIfCount ?? 0;
 			const hasElse = context.hasElse ?? false;
