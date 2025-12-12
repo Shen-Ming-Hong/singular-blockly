@@ -779,8 +779,8 @@ function getContextValueForInput(context: BlockContext, inputName: string): unkn
 		BY: 'by',
 		// 門檻函式相關
 		THRESHOLD: 'threshold',
-		LOW_OUTPUT: 'lowOutput',
-		HIGH_OUTPUT: 'highOutput',
+		LOW_VALUE: 'lowValue',
+		HIGH_VALUE: 'highValue',
 		// 迴圈相關
 		DURATION: 'duration',
 	};

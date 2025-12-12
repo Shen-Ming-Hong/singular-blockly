@@ -1,6 +1,6 @@
 {
   "version": "0.45.0",
-  "generatedAt": "2025-12-12T08:11:58.511Z",
+  "generatedAt": "2025-12-12T09:04:19.185Z",
   "blocks": [
     {
       "type": "arduino_setup",
@@ -3545,7 +3545,7 @@
           "check": "Number"
         },
         {
-          "name": "LOW_OUTPUT",
+          "name": "LOW_VALUE",
           "type": "value",
           "label": {
             "zh-hant": "低於門檻輸出",
@@ -3554,7 +3554,7 @@
           "check": "Number"
         },
         {
-          "name": "HIGH_OUTPUT",
+          "name": "HIGH_VALUE",
           "type": "value",
           "label": {
             "zh-hant": "高於門檻輸出",
