@@ -4073,6 +4073,2624 @@
       "relatedBlocks": [
         "controls_if"
       ]
+    },
+    {
+      "type": "controls_repeat_ext",
+      "category": "loops",
+      "names": {
+        "zh-hant": "重複次數",
+        "en": "Repeat"
+      },
+      "descriptions": {
+        "zh-hant": "重複執行指定次數",
+        "en": "Repeat statements a specified number of times"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "TIMES",
+          "type": "value",
+          "label": {
+            "zh-hant": "次數",
+            "en": "Times"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": {
+            "zh-hant": "執行",
+            "en": "Do"
+          }
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "repeat",
+        "loop",
+        "times",
+        "重複",
+        "迴圈",
+        "次數"
+      ],
+      "relatedBlocks": [
+        "controls_for",
+        "controls_whileUntil"
+      ]
+    },
+    {
+      "type": "controls_whileUntil",
+      "category": "loops",
+      "names": {
+        "zh-hant": "當...重複",
+        "en": "While/Until"
+      },
+      "descriptions": {
+        "zh-hant": "當條件成立時重複執行，或直到條件成立前重複執行",
+        "en": "Repeat while condition is true, or until condition becomes true"
+      },
+      "fields": [
+        {
+          "name": "MODE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "模式",
+            "en": "Mode"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "當",
+                "en": "while"
+              },
+              "value": "WHILE"
+            },
+            {
+              "label": {
+                "zh-hant": "直到",
+                "en": "until"
+              },
+              "value": "UNTIL"
+            }
+          ],
+          "default": "WHILE"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "BOOL",
+          "type": "value",
+          "label": {
+            "zh-hant": "條件",
+            "en": "Condition"
+          },
+          "check": "Boolean"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": {
+            "zh-hant": "執行",
+            "en": "Do"
+          }
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "while",
+        "until",
+        "loop",
+        "當",
+        "直到",
+        "迴圈",
+        "條件"
+      ],
+      "relatedBlocks": [
+        "controls_repeat_ext",
+        "controls_for"
+      ]
+    },
+    {
+      "type": "controls_for",
+      "category": "loops",
+      "names": {
+        "zh-hant": "計數迴圈",
+        "en": "Count Loop"
+      },
+      "descriptions": {
+        "zh-hant": "使用計數變數從起始值到結束值重複執行",
+        "en": "Count from start to end with a variable"
+      },
+      "fields": [
+        {
+          "name": "VAR",
+          "type": "variable",
+          "label": {
+            "zh-hant": "變數",
+            "en": "Variable"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "FROM",
+          "type": "value",
+          "label": {
+            "zh-hant": "從",
+            "en": "From"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "TO",
+          "type": "value",
+          "label": {
+            "zh-hant": "到",
+            "en": "To"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "BY",
+          "type": "value",
+          "label": {
+            "zh-hant": "間隔",
+            "en": "By"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": {
+            "zh-hant": "執行",
+            "en": "Do"
+          }
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "for",
+        "count",
+        "loop",
+        "計數",
+        "迴圈",
+        "變數"
+      ],
+      "relatedBlocks": [
+        "controls_repeat_ext",
+        "controls_forEach"
+      ]
+    },
+    {
+      "type": "controls_forEach",
+      "category": "loops",
+      "names": {
+        "zh-hant": "對每個項目",
+        "en": "For Each"
+      },
+      "descriptions": {
+        "zh-hant": "對清單中的每個項目執行",
+        "en": "Execute for each item in a list"
+      },
+      "fields": [
+        {
+          "name": "VAR",
+          "type": "variable",
+          "label": {
+            "zh-hant": "項目",
+            "en": "Item"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "LIST",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        },
+        {
+          "name": "DO",
+          "type": "statement",
+          "label": {
+            "zh-hant": "執行",
+            "en": "Do"
+          }
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "foreach",
+        "each",
+        "list",
+        "loop",
+        "每個",
+        "清單",
+        "迴圈"
+      ],
+      "relatedBlocks": [
+        "controls_for",
+        "lists_create_with"
+      ]
+    },
+    {
+      "type": "math_number",
+      "category": "math",
+      "names": {
+        "zh-hant": "數字",
+        "en": "Number"
+      },
+      "descriptions": {
+        "zh-hant": "數字常數",
+        "en": "A number constant"
+      },
+      "fields": [
+        {
+          "name": "NUM",
+          "type": "number",
+          "label": {
+            "zh-hant": "數值",
+            "en": "Number"
+          },
+          "default": 0
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "number",
+        "value",
+        "constant",
+        "數字",
+        "數值",
+        "常數"
+      ],
+      "relatedBlocks": [
+        "math_arithmetic"
+      ]
+    },
+    {
+      "type": "math_arithmetic",
+      "category": "math",
+      "names": {
+        "zh-hant": "算術運算",
+        "en": "Arithmetic"
+      },
+      "descriptions": {
+        "zh-hant": "基本算術運算：加、減、乘、除、次方",
+        "en": "Basic arithmetic: add, subtract, multiply, divide, power"
+      },
+      "fields": [
+        {
+          "name": "OP",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "運算",
+            "en": "Operation"
+          },
+          "options": [
+            {
+              "label": "+",
+              "value": "ADD"
+            },
+            {
+              "label": "-",
+              "value": "MINUS"
+            },
+            {
+              "label": "×",
+              "value": "MULTIPLY"
+            },
+            {
+              "label": "÷",
+              "value": "DIVIDE"
+            },
+            {
+              "label": "^",
+              "value": "POWER"
+            }
+          ],
+          "default": "ADD"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "A",
+          "type": "value",
+          "label": {
+            "zh-hant": "左側",
+            "en": "A"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "B",
+          "type": "value",
+          "label": {
+            "zh-hant": "右側",
+            "en": "B"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "add",
+        "subtract",
+        "multiply",
+        "divide",
+        "power",
+        "加",
+        "減",
+        "乘",
+        "除",
+        "次方",
+        "運算",
+        "算術"
+      ],
+      "relatedBlocks": [
+        "math_number",
+        "math_modulo"
+      ]
+    },
+    {
+      "type": "math_single",
+      "category": "math",
+      "names": {
+        "zh-hant": "單一數學函式",
+        "en": "Single Math Function"
+      },
+      "descriptions": {
+        "zh-hant": "單一數學函式：平方根、絕對值、負號等",
+        "en": "Single math function: square root, absolute, negate, etc."
+      },
+      "fields": [
+        {
+          "name": "OP",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "函式",
+            "en": "Function"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "平方根",
+                "en": "sqrt"
+              },
+              "value": "ROOT"
+            },
+            {
+              "label": {
+                "zh-hant": "絕對值",
+                "en": "abs"
+              },
+              "value": "ABS"
+            },
+            {
+              "label": {
+                "zh-hant": "負號",
+                "en": "-"
+              },
+              "value": "NEG"
+            },
+            {
+              "label": "ln",
+              "value": "LN"
+            },
+            {
+              "label": "log10",
+              "value": "LOG10"
+            },
+            {
+              "label": "e^",
+              "value": "EXP"
+            },
+            {
+              "label": "10^",
+              "value": "POW10"
+            }
+          ],
+          "default": "ROOT"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "NUM",
+          "type": "value",
+          "label": {
+            "zh-hant": "數值",
+            "en": "Number"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "sqrt",
+        "abs",
+        "log",
+        "exp",
+        "平方根",
+        "絕對值",
+        "對數",
+        "指數"
+      ],
+      "relatedBlocks": [
+        "math_arithmetic",
+        "math_trig"
+      ]
+    },
+    {
+      "type": "math_trig",
+      "category": "math",
+      "names": {
+        "zh-hant": "三角函式",
+        "en": "Trigonometry"
+      },
+      "descriptions": {
+        "zh-hant": "三角函式：sin, cos, tan 及其反函式",
+        "en": "Trigonometric functions: sin, cos, tan and their inverses"
+      },
+      "fields": [
+        {
+          "name": "OP",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "函式",
+            "en": "Function"
+          },
+          "options": [
+            {
+              "label": "sin",
+              "value": "SIN"
+            },
+            {
+              "label": "cos",
+              "value": "COS"
+            },
+            {
+              "label": "tan",
+              "value": "TAN"
+            },
+            {
+              "label": "asin",
+              "value": "ASIN"
+            },
+            {
+              "label": "acos",
+              "value": "ACOS"
+            },
+            {
+              "label": "atan",
+              "value": "ATAN"
+            }
+          ],
+          "default": "SIN"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "NUM",
+          "type": "value",
+          "label": {
+            "zh-hant": "角度",
+            "en": "Angle"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "sin",
+        "cos",
+        "tan",
+        "trig",
+        "三角",
+        "正弦",
+        "餘弦",
+        "正切"
+      ],
+      "relatedBlocks": [
+        "math_single",
+        "math_atan2"
+      ]
+    },
+    {
+      "type": "math_constant",
+      "category": "math",
+      "names": {
+        "zh-hant": "數學常數",
+        "en": "Math Constant"
+      },
+      "descriptions": {
+        "zh-hant": "數學常數：π, e, √2 等",
+        "en": "Mathematical constants: π, e, √2, etc."
+      },
+      "fields": [
+        {
+          "name": "CONSTANT",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "常數",
+            "en": "Constant"
+          },
+          "options": [
+            {
+              "label": "π",
+              "value": "PI"
+            },
+            {
+              "label": "e",
+              "value": "E"
+            },
+            {
+              "label": "φ",
+              "value": "GOLDEN_RATIO"
+            },
+            {
+              "label": "√2",
+              "value": "SQRT2"
+            },
+            {
+              "label": "√½",
+              "value": "SQRT1_2"
+            },
+            {
+              "label": "∞",
+              "value": "INFINITY"
+            }
+          ],
+          "default": "PI"
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "pi",
+        "constant",
+        "euler",
+        "常數",
+        "圓周率"
+      ],
+      "relatedBlocks": [
+        "math_number"
+      ]
+    },
+    {
+      "type": "math_number_property",
+      "category": "math",
+      "names": {
+        "zh-hant": "數字屬性",
+        "en": "Number Property"
+      },
+      "descriptions": {
+        "zh-hant": "檢查數字屬性：偶數、奇數、質數等",
+        "en": "Check number properties: even, odd, prime, etc."
+      },
+      "fields": [
+        {
+          "name": "PROPERTY",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "屬性",
+            "en": "Property"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "是偶數",
+                "en": "is even"
+              },
+              "value": "EVEN"
+            },
+            {
+              "label": {
+                "zh-hant": "是奇數",
+                "en": "is odd"
+              },
+              "value": "ODD"
+            },
+            {
+              "label": {
+                "zh-hant": "是質數",
+                "en": "is prime"
+              },
+              "value": "PRIME"
+            },
+            {
+              "label": {
+                "zh-hant": "是整數",
+                "en": "is whole"
+              },
+              "value": "WHOLE"
+            },
+            {
+              "label": {
+                "zh-hant": "是正數",
+                "en": "is positive"
+              },
+              "value": "POSITIVE"
+            },
+            {
+              "label": {
+                "zh-hant": "是負數",
+                "en": "is negative"
+              },
+              "value": "NEGATIVE"
+            },
+            {
+              "label": {
+                "zh-hant": "可被整除",
+                "en": "is divisible by"
+              },
+              "value": "DIVISIBLE_BY"
+            }
+          ],
+          "default": "EVEN"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "NUMBER_TO_CHECK",
+          "type": "value",
+          "label": {
+            "zh-hant": "數值",
+            "en": "Number"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "even",
+        "odd",
+        "prime",
+        "property",
+        "偶數",
+        "奇數",
+        "質數",
+        "屬性"
+      ],
+      "relatedBlocks": [
+        "logic_compare"
+      ]
+    },
+    {
+      "type": "math_round",
+      "category": "math",
+      "names": {
+        "zh-hant": "四捨五入",
+        "en": "Round"
+      },
+      "descriptions": {
+        "zh-hant": "四捨五入、無條件進位或無條件捨去",
+        "en": "Round, ceiling, or floor"
+      },
+      "fields": [
+        {
+          "name": "OP",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "方式",
+            "en": "Mode"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "四捨五入",
+                "en": "round"
+              },
+              "value": "ROUND"
+            },
+            {
+              "label": {
+                "zh-hant": "無條件進位",
+                "en": "round up"
+              },
+              "value": "ROUNDUP"
+            },
+            {
+              "label": {
+                "zh-hant": "無條件捨去",
+                "en": "round down"
+              },
+              "value": "ROUNDDOWN"
+            }
+          ],
+          "default": "ROUND"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "NUM",
+          "type": "value",
+          "label": {
+            "zh-hant": "數值",
+            "en": "Number"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "round",
+        "ceiling",
+        "floor",
+        "四捨五入",
+        "進位",
+        "捨去"
+      ],
+      "relatedBlocks": [
+        "math_single"
+      ]
+    },
+    {
+      "type": "math_on_list",
+      "category": "math",
+      "names": {
+        "zh-hant": "清單運算",
+        "en": "List Operation"
+      },
+      "descriptions": {
+        "zh-hant": "對清單進行數學運算：總和、平均、最大、最小等",
+        "en": "Math operations on list: sum, average, max, min, etc."
+      },
+      "fields": [
+        {
+          "name": "OP",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "運算",
+            "en": "Operation"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "總和",
+                "en": "sum"
+              },
+              "value": "SUM"
+            },
+            {
+              "label": {
+                "zh-hant": "最小值",
+                "en": "min"
+              },
+              "value": "MIN"
+            },
+            {
+              "label": {
+                "zh-hant": "最大值",
+                "en": "max"
+              },
+              "value": "MAX"
+            },
+            {
+              "label": {
+                "zh-hant": "平均",
+                "en": "average"
+              },
+              "value": "AVERAGE"
+            },
+            {
+              "label": {
+                "zh-hant": "中位數",
+                "en": "median"
+              },
+              "value": "MEDIAN"
+            },
+            {
+              "label": {
+                "zh-hant": "眾數",
+                "en": "modes"
+              },
+              "value": "MODE"
+            },
+            {
+              "label": {
+                "zh-hant": "標準差",
+                "en": "std dev"
+              },
+              "value": "STD_DEV"
+            },
+            {
+              "label": {
+                "zh-hant": "隨機",
+                "en": "random"
+              },
+              "value": "RANDOM"
+            }
+          ],
+          "default": "SUM"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "LIST",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "sum",
+        "average",
+        "max",
+        "min",
+        "list",
+        "總和",
+        "平均",
+        "最大",
+        "最小",
+        "清單"
+      ],
+      "relatedBlocks": [
+        "lists_create_with"
+      ]
+    },
+    {
+      "type": "math_modulo",
+      "category": "math",
+      "names": {
+        "zh-hant": "餘數",
+        "en": "Modulo"
+      },
+      "descriptions": {
+        "zh-hant": "計算餘數",
+        "en": "Calculate remainder"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "DIVIDEND",
+          "type": "value",
+          "label": {
+            "zh-hant": "被除數",
+            "en": "Dividend"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "DIVISOR",
+          "type": "value",
+          "label": {
+            "zh-hant": "除數",
+            "en": "Divisor"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "modulo",
+        "remainder",
+        "mod",
+        "餘數",
+        "取餘"
+      ],
+      "relatedBlocks": [
+        "math_arithmetic"
+      ]
+    },
+    {
+      "type": "math_constrain",
+      "category": "math",
+      "names": {
+        "zh-hant": "限制範圍",
+        "en": "Constrain"
+      },
+      "descriptions": {
+        "zh-hant": "將數值限制在指定範圍內",
+        "en": "Constrain a number to be within a range"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "數值",
+            "en": "Value"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "LOW",
+          "type": "value",
+          "label": {
+            "zh-hant": "最小",
+            "en": "Low"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "HIGH",
+          "type": "value",
+          "label": {
+            "zh-hant": "最大",
+            "en": "High"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "constrain",
+        "limit",
+        "range",
+        "限制",
+        "範圍",
+        "約束"
+      ],
+      "relatedBlocks": [
+        "math_map"
+      ]
+    },
+    {
+      "type": "math_random_int",
+      "category": "math",
+      "names": {
+        "zh-hant": "隨機整數",
+        "en": "Random Integer"
+      },
+      "descriptions": {
+        "zh-hant": "產生指定範圍內的隨機整數",
+        "en": "Generate a random integer within a range"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "FROM",
+          "type": "value",
+          "label": {
+            "zh-hant": "從",
+            "en": "From"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "TO",
+          "type": "value",
+          "label": {
+            "zh-hant": "到",
+            "en": "To"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "random",
+        "integer",
+        "隨機",
+        "整數",
+        "亂數"
+      ],
+      "relatedBlocks": [
+        "math_random_float"
+      ]
+    },
+    {
+      "type": "math_random_float",
+      "category": "math",
+      "names": {
+        "zh-hant": "隨機小數",
+        "en": "Random Fraction"
+      },
+      "descriptions": {
+        "zh-hant": "產生 0 到 1 之間的隨機小數",
+        "en": "Generate a random fraction between 0 and 1"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "random",
+        "float",
+        "fraction",
+        "隨機",
+        "小數",
+        "亂數"
+      ],
+      "relatedBlocks": [
+        "math_random_int"
+      ]
+    },
+    {
+      "type": "math_atan2",
+      "category": "math",
+      "names": {
+        "zh-hant": "atan2 函式",
+        "en": "atan2"
+      },
+      "descriptions": {
+        "zh-hant": "計算 atan2(Y, X) 的值",
+        "en": "Calculate atan2(Y, X)"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "X",
+          "type": "value",
+          "label": {
+            "zh-hant": "X",
+            "en": "X"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "Y",
+          "type": "value",
+          "label": {
+            "zh-hant": "Y",
+            "en": "Y"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "atan2",
+        "angle",
+        "trig",
+        "角度",
+        "三角"
+      ],
+      "relatedBlocks": [
+        "math_trig"
+      ]
+    },
+    {
+      "type": "text",
+      "category": "text",
+      "names": {
+        "zh-hant": "文字",
+        "en": "Text"
+      },
+      "descriptions": {
+        "zh-hant": "文字常數",
+        "en": "A text constant"
+      },
+      "fields": [
+        {
+          "name": "TEXT",
+          "type": "text",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "default": ""
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "text",
+        "string",
+        "文字",
+        "字串"
+      ],
+      "relatedBlocks": [
+        "text_join",
+        "text_length"
+      ]
+    },
+    {
+      "type": "text_join",
+      "category": "text",
+      "names": {
+        "zh-hant": "連接文字",
+        "en": "Join Text"
+      },
+      "descriptions": {
+        "zh-hant": "將多個文字連接成一個",
+        "en": "Join multiple text items together"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "join",
+        "concat",
+        "text",
+        "連接",
+        "合併",
+        "文字"
+      ],
+      "relatedBlocks": [
+        "text",
+        "text_append"
+      ]
+    },
+    {
+      "type": "text_append",
+      "category": "text",
+      "names": {
+        "zh-hant": "附加文字",
+        "en": "Append Text"
+      },
+      "descriptions": {
+        "zh-hant": "將文字附加到變數",
+        "en": "Append text to a variable"
+      },
+      "fields": [
+        {
+          "name": "VAR",
+          "type": "variable",
+          "label": {
+            "zh-hant": "變數",
+            "en": "Variable"
+          }
+        }
+      ],
+      "inputs": [
+        {
+          "name": "TEXT",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "append",
+        "add",
+        "text",
+        "附加",
+        "添加",
+        "文字"
+      ],
+      "relatedBlocks": [
+        "text_join"
+      ]
+    },
+    {
+      "type": "text_length",
+      "category": "text",
+      "names": {
+        "zh-hant": "文字長度",
+        "en": "Text Length"
+      },
+      "descriptions": {
+        "zh-hant": "取得文字的字元數",
+        "en": "Get the number of characters in text"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "length",
+        "count",
+        "size",
+        "長度",
+        "字數"
+      ],
+      "relatedBlocks": [
+        "text",
+        "lists_length"
+      ]
+    },
+    {
+      "type": "text_isEmpty",
+      "category": "text",
+      "names": {
+        "zh-hant": "文字是否為空",
+        "en": "Is Text Empty"
+      },
+      "descriptions": {
+        "zh-hant": "檢查文字是否為空",
+        "en": "Check if text is empty"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "empty",
+        "blank",
+        "空",
+        "空白"
+      ],
+      "relatedBlocks": [
+        "lists_isEmpty"
+      ]
+    },
+    {
+      "type": "text_indexOf",
+      "category": "text",
+      "names": {
+        "zh-hant": "搜尋文字",
+        "en": "Find Text"
+      },
+      "descriptions": {
+        "zh-hant": "在文字中搜尋子字串的位置",
+        "en": "Find position of substring in text"
+      },
+      "fields": [
+        {
+          "name": "END",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "搜尋",
+            "en": "Find"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "首次出現",
+                "en": "first"
+              },
+              "value": "FIRST"
+            },
+            {
+              "label": {
+                "zh-hant": "最後出現",
+                "en": "last"
+              },
+              "value": "LAST"
+            }
+          ],
+          "default": "FIRST"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        },
+        {
+          "name": "FIND",
+          "type": "value",
+          "label": {
+            "zh-hant": "搜尋",
+            "en": "Find"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "find",
+        "search",
+        "index",
+        "搜尋",
+        "查找",
+        "位置"
+      ],
+      "relatedBlocks": [
+        "lists_indexOf"
+      ]
+    },
+    {
+      "type": "text_charAt",
+      "category": "text",
+      "names": {
+        "zh-hant": "取得字元",
+        "en": "Get Character"
+      },
+      "descriptions": {
+        "zh-hant": "取得文字中指定位置的字元",
+        "en": "Get character at position in text"
+      },
+      "fields": [
+        {
+          "name": "WHERE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "位置",
+            "en": "Position"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "第 #",
+                "en": "#"
+              },
+              "value": "FROM_START"
+            },
+            {
+              "label": {
+                "zh-hant": "倒數第 #",
+                "en": "# from end"
+              },
+              "value": "FROM_END"
+            },
+            {
+              "label": {
+                "zh-hant": "第一個",
+                "en": "first"
+              },
+              "value": "FIRST"
+            },
+            {
+              "label": {
+                "zh-hant": "最後一個",
+                "en": "last"
+              },
+              "value": "LAST"
+            },
+            {
+              "label": {
+                "zh-hant": "隨機",
+                "en": "random"
+              },
+              "value": "RANDOM"
+            }
+          ],
+          "default": "FROM_START"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "char",
+        "character",
+        "letter",
+        "字元",
+        "字母"
+      ],
+      "relatedBlocks": [
+        "text_getSubstring"
+      ]
+    },
+    {
+      "type": "text_getSubstring",
+      "category": "text",
+      "names": {
+        "zh-hant": "取得子字串",
+        "en": "Get Substring"
+      },
+      "descriptions": {
+        "zh-hant": "取得文字中的一部分",
+        "en": "Get a portion of text"
+      },
+      "fields": [
+        {
+          "name": "WHERE1",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "從",
+            "en": "From"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "第 #",
+                "en": "#"
+              },
+              "value": "FROM_START"
+            },
+            {
+              "label": {
+                "zh-hant": "倒數第 #",
+                "en": "# from end"
+              },
+              "value": "FROM_END"
+            },
+            {
+              "label": {
+                "zh-hant": "第一個",
+                "en": "first"
+              },
+              "value": "FIRST"
+            }
+          ],
+          "default": "FROM_START"
+        },
+        {
+          "name": "WHERE2",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "到",
+            "en": "To"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "第 #",
+                "en": "#"
+              },
+              "value": "FROM_START"
+            },
+            {
+              "label": {
+                "zh-hant": "倒數第 #",
+                "en": "# from end"
+              },
+              "value": "FROM_END"
+            },
+            {
+              "label": {
+                "zh-hant": "最後一個",
+                "en": "last"
+              },
+              "value": "LAST"
+            }
+          ],
+          "default": "FROM_START"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "STRING",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "substring",
+        "slice",
+        "portion",
+        "子字串",
+        "擷取"
+      ],
+      "relatedBlocks": [
+        "text_charAt"
+      ]
+    },
+    {
+      "type": "text_count",
+      "category": "text",
+      "names": {
+        "zh-hant": "計算出現次數",
+        "en": "Count Occurrences"
+      },
+      "descriptions": {
+        "zh-hant": "計算子字串在文字中出現的次數",
+        "en": "Count occurrences of substring in text"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "TEXT",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        },
+        {
+          "name": "SUB",
+          "type": "value",
+          "label": {
+            "zh-hant": "子字串",
+            "en": "Substring"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "count",
+        "occurrences",
+        "計算",
+        "次數",
+        "出現"
+      ],
+      "relatedBlocks": [
+        "text_indexOf"
+      ]
+    },
+    {
+      "type": "text_reverse",
+      "category": "text",
+      "names": {
+        "zh-hant": "反轉文字",
+        "en": "Reverse Text"
+      },
+      "descriptions": {
+        "zh-hant": "反轉文字順序",
+        "en": "Reverse the order of characters in text"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "TEXT",
+          "type": "value",
+          "label": {
+            "zh-hant": "文字",
+            "en": "Text"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "reverse",
+        "flip",
+        "反轉",
+        "倒序"
+      ],
+      "relatedBlocks": [
+        "lists_reverse"
+      ]
+    },
+    {
+      "type": "text_prompt_ext",
+      "category": "text",
+      "names": {
+        "zh-hant": "提示輸入",
+        "en": "Prompt"
+      },
+      "descriptions": {
+        "zh-hant": "顯示提示訊息並取得使用者輸入",
+        "en": "Display prompt and get user input"
+      },
+      "fields": [
+        {
+          "name": "TYPE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "類型",
+            "en": "Type"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "文字",
+                "en": "text"
+              },
+              "value": "TEXT"
+            },
+            {
+              "label": {
+                "zh-hant": "數字",
+                "en": "number"
+              },
+              "value": "NUMBER"
+            }
+          ],
+          "default": "TEXT"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "TEXT",
+          "type": "value",
+          "label": {
+            "zh-hant": "提示",
+            "en": "Prompt"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "prompt",
+        "input",
+        "ask",
+        "提示",
+        "輸入",
+        "詢問"
+      ],
+      "relatedBlocks": [
+        "text"
+      ]
+    },
+    {
+      "type": "lists_create_with",
+      "category": "lists",
+      "names": {
+        "zh-hant": "建立清單",
+        "en": "Create List"
+      },
+      "descriptions": {
+        "zh-hant": "使用指定項目建立清單",
+        "en": "Create a list with specified items"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "list",
+        "create",
+        "array",
+        "清單",
+        "建立",
+        "陣列"
+      ],
+      "relatedBlocks": [
+        "lists_length",
+        "lists_getIndex"
+      ]
+    },
+    {
+      "type": "lists_repeat",
+      "category": "lists",
+      "names": {
+        "zh-hant": "重複項目建立清單",
+        "en": "Create List with Repeat"
+      },
+      "descriptions": {
+        "zh-hant": "建立包含重複項目的清單",
+        "en": "Create a list with item repeated"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "ITEM",
+          "type": "value",
+          "label": {
+            "zh-hant": "項目",
+            "en": "Item"
+          }
+        },
+        {
+          "name": "NUM",
+          "type": "value",
+          "label": {
+            "zh-hant": "次數",
+            "en": "Times"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "list",
+        "repeat",
+        "fill",
+        "清單",
+        "重複",
+        "填充"
+      ],
+      "relatedBlocks": [
+        "lists_create_with"
+      ]
+    },
+    {
+      "type": "lists_length",
+      "category": "lists",
+      "names": {
+        "zh-hant": "清單長度",
+        "en": "List Length"
+      },
+      "descriptions": {
+        "zh-hant": "取得清單的項目數",
+        "en": "Get the number of items in a list"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "length",
+        "count",
+        "size",
+        "長度",
+        "數量"
+      ],
+      "relatedBlocks": [
+        "text_length"
+      ]
+    },
+    {
+      "type": "lists_isEmpty",
+      "category": "lists",
+      "names": {
+        "zh-hant": "清單是否為空",
+        "en": "Is List Empty"
+      },
+      "descriptions": {
+        "zh-hant": "檢查清單是否為空",
+        "en": "Check if list is empty"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "empty",
+        "blank",
+        "空",
+        "空白"
+      ],
+      "relatedBlocks": [
+        "text_isEmpty"
+      ]
+    },
+    {
+      "type": "lists_indexOf",
+      "category": "lists",
+      "names": {
+        "zh-hant": "搜尋項目",
+        "en": "Find Item"
+      },
+      "descriptions": {
+        "zh-hant": "在清單中搜尋項目的位置",
+        "en": "Find position of item in list"
+      },
+      "fields": [
+        {
+          "name": "END",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "搜尋",
+            "en": "Find"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "首次出現",
+                "en": "first"
+              },
+              "value": "FIRST"
+            },
+            {
+              "label": {
+                "zh-hant": "最後出現",
+                "en": "last"
+              },
+              "value": "LAST"
+            }
+          ],
+          "default": "FIRST"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        },
+        {
+          "name": "FIND",
+          "type": "value",
+          "label": {
+            "zh-hant": "項目",
+            "en": "Item"
+          }
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "find",
+        "search",
+        "index",
+        "搜尋",
+        "查找",
+        "位置"
+      ],
+      "relatedBlocks": [
+        "text_indexOf"
+      ]
+    },
+    {
+      "type": "lists_getIndex",
+      "category": "lists",
+      "names": {
+        "zh-hant": "取得清單項目",
+        "en": "Get List Item"
+      },
+      "descriptions": {
+        "zh-hant": "取得或移除清單中的項目",
+        "en": "Get or remove item from list"
+      },
+      "fields": [
+        {
+          "name": "MODE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "操作",
+            "en": "Mode"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "取得",
+                "en": "get"
+              },
+              "value": "GET"
+            },
+            {
+              "label": {
+                "zh-hant": "取得並移除",
+                "en": "get and remove"
+              },
+              "value": "GET_REMOVE"
+            },
+            {
+              "label": {
+                "zh-hant": "移除",
+                "en": "remove"
+              },
+              "value": "REMOVE"
+            }
+          ],
+          "default": "GET"
+        },
+        {
+          "name": "WHERE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "位置",
+            "en": "Position"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "第 #",
+                "en": "#"
+              },
+              "value": "FROM_START"
+            },
+            {
+              "label": {
+                "zh-hant": "倒數第 #",
+                "en": "# from end"
+              },
+              "value": "FROM_END"
+            },
+            {
+              "label": {
+                "zh-hant": "第一個",
+                "en": "first"
+              },
+              "value": "FIRST"
+            },
+            {
+              "label": {
+                "zh-hant": "最後一個",
+                "en": "last"
+              },
+              "value": "LAST"
+            },
+            {
+              "label": {
+                "zh-hant": "隨機",
+                "en": "random"
+              },
+              "value": "RANDOM"
+            }
+          ],
+          "default": "FROM_START"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "get",
+        "remove",
+        "item",
+        "取得",
+        "移除",
+        "項目"
+      ],
+      "relatedBlocks": [
+        "lists_setIndex"
+      ]
+    },
+    {
+      "type": "lists_setIndex",
+      "category": "lists",
+      "names": {
+        "zh-hant": "設定清單項目",
+        "en": "Set List Item"
+      },
+      "descriptions": {
+        "zh-hant": "設定或插入清單中的項目",
+        "en": "Set or insert item in list"
+      },
+      "fields": [
+        {
+          "name": "MODE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "操作",
+            "en": "Mode"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "設定",
+                "en": "set"
+              },
+              "value": "SET"
+            },
+            {
+              "label": {
+                "zh-hant": "插入",
+                "en": "insert"
+              },
+              "value": "INSERT"
+            }
+          ],
+          "default": "SET"
+        },
+        {
+          "name": "WHERE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "位置",
+            "en": "Position"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "第 #",
+                "en": "#"
+              },
+              "value": "FROM_START"
+            },
+            {
+              "label": {
+                "zh-hant": "倒數第 #",
+                "en": "# from end"
+              },
+              "value": "FROM_END"
+            },
+            {
+              "label": {
+                "zh-hant": "第一個",
+                "en": "first"
+              },
+              "value": "FIRST"
+            },
+            {
+              "label": {
+                "zh-hant": "最後一個",
+                "en": "last"
+              },
+              "value": "LAST"
+            },
+            {
+              "label": {
+                "zh-hant": "隨機",
+                "en": "random"
+              },
+              "value": "RANDOM"
+            }
+          ],
+          "default": "FROM_START"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "LIST",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        },
+        {
+          "name": "TO",
+          "type": "value",
+          "label": {
+            "zh-hant": "設為",
+            "en": "To"
+          }
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "set",
+        "insert",
+        "item",
+        "設定",
+        "插入",
+        "項目"
+      ],
+      "relatedBlocks": [
+        "lists_getIndex"
+      ]
+    },
+    {
+      "type": "lists_getSublist",
+      "category": "lists",
+      "names": {
+        "zh-hant": "取得子清單",
+        "en": "Get Sublist"
+      },
+      "descriptions": {
+        "zh-hant": "取得清單的一部分",
+        "en": "Get a portion of list"
+      },
+      "fields": [
+        {
+          "name": "WHERE1",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "從",
+            "en": "From"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "第 #",
+                "en": "#"
+              },
+              "value": "FROM_START"
+            },
+            {
+              "label": {
+                "zh-hant": "倒數第 #",
+                "en": "# from end"
+              },
+              "value": "FROM_END"
+            },
+            {
+              "label": {
+                "zh-hant": "第一個",
+                "en": "first"
+              },
+              "value": "FIRST"
+            }
+          ],
+          "default": "FROM_START"
+        },
+        {
+          "name": "WHERE2",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "到",
+            "en": "To"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "第 #",
+                "en": "#"
+              },
+              "value": "FROM_START"
+            },
+            {
+              "label": {
+                "zh-hant": "倒數第 #",
+                "en": "# from end"
+              },
+              "value": "FROM_END"
+            },
+            {
+              "label": {
+                "zh-hant": "最後一個",
+                "en": "last"
+              },
+              "value": "LAST"
+            }
+          ],
+          "default": "FROM_START"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "LIST",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "sublist",
+        "slice",
+        "portion",
+        "子清單",
+        "擷取"
+      ],
+      "relatedBlocks": [
+        "text_getSubstring"
+      ]
+    },
+    {
+      "type": "lists_sort",
+      "category": "lists",
+      "names": {
+        "zh-hant": "排序清單",
+        "en": "Sort List"
+      },
+      "descriptions": {
+        "zh-hant": "排序清單",
+        "en": "Sort the list"
+      },
+      "fields": [
+        {
+          "name": "TYPE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "類型",
+            "en": "Type"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "數字",
+                "en": "numeric"
+              },
+              "value": "NUMERIC"
+            },
+            {
+              "label": {
+                "zh-hant": "字母",
+                "en": "alphabetic"
+              },
+              "value": "TEXT"
+            },
+            {
+              "label": {
+                "zh-hant": "忽略大小寫",
+                "en": "ignore case"
+              },
+              "value": "IGNORE_CASE"
+            }
+          ],
+          "default": "NUMERIC"
+        },
+        {
+          "name": "DIRECTION",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "方向",
+            "en": "Direction"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "升序",
+                "en": "ascending"
+              },
+              "value": "1"
+            },
+            {
+              "label": {
+                "zh-hant": "降序",
+                "en": "descending"
+              },
+              "value": "-1"
+            }
+          ],
+          "default": "1"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "LIST",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "sort",
+        "order",
+        "排序",
+        "順序"
+      ],
+      "relatedBlocks": [
+        "lists_reverse"
+      ]
+    },
+    {
+      "type": "lists_split",
+      "category": "lists",
+      "names": {
+        "zh-hant": "分割/合併",
+        "en": "Split/Join"
+      },
+      "descriptions": {
+        "zh-hant": "分割文字為清單或合併清單為文字",
+        "en": "Split text to list or join list to text"
+      },
+      "fields": [
+        {
+          "name": "MODE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "模式",
+            "en": "Mode"
+          },
+          "options": [
+            {
+              "label": {
+                "zh-hant": "分割",
+                "en": "split"
+              },
+              "value": "SPLIT"
+            },
+            {
+              "label": {
+                "zh-hant": "合併",
+                "en": "join"
+              },
+              "value": "JOIN"
+            }
+          ],
+          "default": "SPLIT"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "INPUT",
+          "type": "value",
+          "label": {
+            "zh-hant": "輸入",
+            "en": "Input"
+          }
+        },
+        {
+          "name": "DELIM",
+          "type": "value",
+          "label": {
+            "zh-hant": "分隔符",
+            "en": "Delimiter"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "split",
+        "join",
+        "delimiter",
+        "分割",
+        "合併",
+        "分隔"
+      ],
+      "relatedBlocks": [
+        "text_join"
+      ]
+    },
+    {
+      "type": "lists_reverse",
+      "category": "lists",
+      "names": {
+        "zh-hant": "反轉清單",
+        "en": "Reverse List"
+      },
+      "descriptions": {
+        "zh-hant": "反轉清單順序",
+        "en": "Reverse the order of list items"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "LIST",
+          "type": "value",
+          "label": {
+            "zh-hant": "清單",
+            "en": "List"
+          },
+          "check": "Array"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "reverse",
+        "flip",
+        "反轉",
+        "倒序"
+      ],
+      "relatedBlocks": [
+        "text_reverse",
+        "lists_sort"
+      ]
     }
   ],
   "categories": [
@@ -4155,6 +6773,17 @@
         "en": "Text"
       },
       "colour": "#5BA58C"
+    },
+    {
+      "id": "lists",
+      "name": {
+        "zh-hant": "清單",
+        "en": "Lists"
+      },
+      "description": {
+        "zh-hant": "清單操作積木",
+        "en": "List operation blocks"
+      }
     }
   ],
   "indices": {
@@ -4231,7 +6860,46 @@
       "logic_negate": 69,
       "logic_boolean": 70,
       "logic_null": 71,
-      "logic_ternary": 72
+      "logic_ternary": 72,
+      "controls_repeat_ext": 73,
+      "controls_whileUntil": 74,
+      "controls_for": 75,
+      "controls_forEach": 76,
+      "math_number": 77,
+      "math_arithmetic": 78,
+      "math_single": 79,
+      "math_trig": 80,
+      "math_constant": 81,
+      "math_number_property": 82,
+      "math_round": 83,
+      "math_on_list": 84,
+      "math_modulo": 85,
+      "math_constrain": 86,
+      "math_random_int": 87,
+      "math_random_float": 88,
+      "math_atan2": 89,
+      "text": 90,
+      "text_join": 91,
+      "text_append": 92,
+      "text_length": 93,
+      "text_isEmpty": 94,
+      "text_indexOf": 95,
+      "text_charAt": 96,
+      "text_getSubstring": 97,
+      "text_count": 98,
+      "text_reverse": 99,
+      "text_prompt_ext": 100,
+      "lists_create_with": 101,
+      "lists_repeat": 102,
+      "lists_length": 103,
+      "lists_isEmpty": 104,
+      "lists_indexOf": 105,
+      "lists_getIndex": 106,
+      "lists_setIndex": 107,
+      "lists_getSublist": 108,
+      "lists_sort": 109,
+      "lists_split": 110,
+      "lists_reverse": 111
     },
     "byCategory": {
       "arduino": [
@@ -4304,7 +6972,11 @@
       ],
       "loops": [
         38,
-        39
+        39,
+        73,
+        74,
+        75,
+        76
       ],
       "functions": [
         40,
@@ -4313,10 +6985,34 @@
         43
       ],
       "text": [
-        58
+        58,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100
       ],
       "math": [
-        59
+        59,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89
       ],
       "logic": [
         66,
@@ -4326,6 +7022,19 @@
         70,
         71,
         72
+      ],
+      "lists": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
       ]
     },
     "searchIndex": {
@@ -4356,7 +7065,8 @@
         "pixetto_set_mode",
         "arduino_setup_loop",
         "encoder_pid_setup",
-        "threshold_function_setup"
+        "threshold_function_setup",
+        "lists_setIndex"
       ],
       "初始化": [
         "arduino_setup",
@@ -4378,7 +7088,8 @@
       ],
       "重複": [
         "arduino_loop",
-        "controls_duration"
+        "controls_duration",
+        "controls_repeat_ext"
       ],
       "digital": [
         "digital_write",
@@ -4445,7 +7156,8 @@
         "arduino_digital_read",
         "arduino_analog_read",
         "arduino_pullup",
-        "arduino_pin_mode"
+        "arduino_pin_mode",
+        "text_prompt_ext"
       ],
       "數位讀取": [
         "digital_read",
@@ -4759,7 +7471,8 @@
       ],
       "set": [
         "huskylens_set_algorithm",
-        "pixetto_set_mode"
+        "pixetto_set_mode",
+        "lists_setIndex"
       ],
       "request": [
         "huskylens_request"
@@ -4781,7 +7494,8 @@
       ],
       "count": [
         "huskylens_count_blocks",
-        "huskylens_count_arrows"
+        "huskylens_count_arrows",
+        "text_count"
       ],
       "方塊": [
         "huskylens_count_blocks",
@@ -4808,7 +7522,8 @@
       ],
       "取得": [
         "huskylens_get_block_info",
-        "huskylens_get_arrow_info"
+        "huskylens_get_arrow_info",
+        "lists_getIndex"
       ],
       "方塊資訊": [
         "huskylens_get_block_info"
@@ -4818,7 +7533,8 @@
         "pixetto_get_type_id",
         "pixetto_get_func_id",
         "pixetto_get_position",
-        "huskylens_get_arrow_info"
+        "huskylens_get_arrow_info",
+        "lists_getIndex"
       ],
       "seven": [
         "seven_segment_pins",
@@ -4849,14 +7565,16 @@
         "seven_segment_pins"
       ],
       "number": [
-        "seven_segment_display"
+        "seven_segment_display",
+        "math_number"
       ],
       "顯示": [
         "seven_segment_display"
       ],
       "數字": [
         "seven_segment_display",
-        "pixetto_handwritten_digit"
+        "pixetto_handwritten_digit",
+        "math_number"
       ],
       "七段顯示器顯示": [
         "seven_segment_display"
@@ -5031,7 +7749,8 @@
         "controls_duration"
       ],
       "repeat": [
-        "controls_duration"
+        "controls_duration",
+        "controls_repeat_ext"
       ],
       "限時": [
         "controls_duration"
@@ -5211,7 +7930,8 @@
       ],
       "input": [
         "arduino_pullup",
-        "arduino_pin_mode"
+        "arduino_pin_mode",
+        "text_prompt_ext"
       ],
       "上拉": [
         "arduino_pullup"
@@ -5284,7 +8004,8 @@
         "encoder_pid_compute"
       ],
       "計算": [
-        "encoder_pid_compute"
+        "encoder_pid_compute",
+        "text_count"
       ],
       "threshold": [
         "threshold_function_setup",
@@ -5415,6 +8136,333 @@
         "logic_boolean",
         "logic_null",
         "logic_ternary"
+      ],
+      "while": [
+        "controls_whileUntil"
+      ],
+      "until": [
+        "controls_whileUntil"
+      ],
+      "for": [
+        "controls_for",
+        "controls_forEach"
+      ],
+      "foreach": [
+        "controls_forEach"
+      ],
+      "each": [
+        "controls_forEach"
+      ],
+      "當": [
+        "controls_whileUntil"
+      ],
+      "直到": [
+        "controls_whileUntil"
+      ],
+      "計數": [
+        "controls_for"
+      ],
+      "每個": [
+        "controls_forEach"
+      ],
+      "add": [
+        "math_arithmetic"
+      ],
+      "subtract": [
+        "math_arithmetic"
+      ],
+      "multiply": [
+        "math_arithmetic"
+      ],
+      "divide": [
+        "math_arithmetic"
+      ],
+      "power": [
+        "math_arithmetic"
+      ],
+      "arithmetic": [
+        "math_arithmetic"
+      ],
+      "加": [
+        "math_arithmetic"
+      ],
+      "減": [
+        "math_arithmetic"
+      ],
+      "乘": [
+        "math_arithmetic"
+      ],
+      "除": [
+        "math_arithmetic"
+      ],
+      "運算": [
+        "math_arithmetic"
+      ],
+      "sqrt": [
+        "math_single"
+      ],
+      "abs": [
+        "math_single"
+      ],
+      "平方根": [
+        "math_single"
+      ],
+      "絕對值": [
+        "math_single"
+      ],
+      "sin": [
+        "math_trig"
+      ],
+      "cos": [
+        "math_trig"
+      ],
+      "tan": [
+        "math_trig"
+      ],
+      "trig": [
+        "math_trig"
+      ],
+      "三角": [
+        "math_trig"
+      ],
+      "pi": [
+        "math_constant"
+      ],
+      "constant": [
+        "math_constant"
+      ],
+      "常數": [
+        "math_constant"
+      ],
+      "even": [
+        "math_number_property"
+      ],
+      "odd": [
+        "math_number_property"
+      ],
+      "prime": [
+        "math_number_property"
+      ],
+      "偶數": [
+        "math_number_property"
+      ],
+      "奇數": [
+        "math_number_property"
+      ],
+      "質數": [
+        "math_number_property"
+      ],
+      "round": [
+        "math_round"
+      ],
+      "四捨五入": [
+        "math_round"
+      ],
+      "sum": [
+        "math_on_list"
+      ],
+      "average": [
+        "math_on_list"
+      ],
+      "max": [
+        "math_on_list"
+      ],
+      "min": [
+        "math_on_list"
+      ],
+      "總和": [
+        "math_on_list"
+      ],
+      "平均": [
+        "math_on_list"
+      ],
+      "最大": [
+        "math_on_list"
+      ],
+      "最小": [
+        "math_on_list"
+      ],
+      "modulo": [
+        "math_modulo"
+      ],
+      "remainder": [
+        "math_modulo"
+      ],
+      "餘數": [
+        "math_modulo"
+      ],
+      "constrain": [
+        "math_constrain"
+      ],
+      "limit": [
+        "math_constrain"
+      ],
+      "限制": [
+        "math_constrain"
+      ],
+      "random": [
+        "math_random_int",
+        "math_random_float"
+      ],
+      "隨機": [
+        "math_random_int",
+        "math_random_float"
+      ],
+      "亂數": [
+        "math_random_int",
+        "math_random_float"
+      ],
+      "text": [
+        "text",
+        "text_join",
+        "text_length"
+      ],
+      "string": [
+        "text"
+      ],
+      "文字": [
+        "text",
+        "text_join",
+        "text_length"
+      ],
+      "字串": [
+        "text"
+      ],
+      "join": [
+        "text_join",
+        "lists_split"
+      ],
+      "concat": [
+        "text_join"
+      ],
+      "連接": [
+        "text_join"
+      ],
+      "合併": [
+        "text_join",
+        "lists_split"
+      ],
+      "append": [
+        "text_append"
+      ],
+      "附加": [
+        "text_append"
+      ],
+      "length": [
+        "text_length",
+        "lists_length"
+      ],
+      "長度": [
+        "text_length",
+        "lists_length"
+      ],
+      "empty": [
+        "text_isEmpty",
+        "lists_isEmpty"
+      ],
+      "空": [
+        "text_isEmpty",
+        "lists_isEmpty"
+      ],
+      "find": [
+        "text_indexOf",
+        "lists_indexOf"
+      ],
+      "search": [
+        "text_indexOf",
+        "lists_indexOf"
+      ],
+      "搜尋": [
+        "text_indexOf",
+        "lists_indexOf"
+      ],
+      "查找": [
+        "text_indexOf",
+        "lists_indexOf"
+      ],
+      "char": [
+        "text_charAt"
+      ],
+      "character": [
+        "text_charAt"
+      ],
+      "字元": [
+        "text_charAt"
+      ],
+      "substring": [
+        "text_getSubstring",
+        "lists_getSublist"
+      ],
+      "子字串": [
+        "text_getSubstring"
+      ],
+      "reverse": [
+        "text_reverse",
+        "lists_reverse"
+      ],
+      "反轉": [
+        "text_reverse",
+        "lists_reverse"
+      ],
+      "prompt": [
+        "text_prompt_ext"
+      ],
+      "提示": [
+        "text_prompt_ext"
+      ],
+      "list": [
+        "lists_create_with",
+        "lists_length",
+        "lists_getIndex",
+        "lists_setIndex"
+      ],
+      "array": [
+        "lists_create_with"
+      ],
+      "清單": [
+        "lists_create_with",
+        "lists_length",
+        "lists_getIndex",
+        "lists_setIndex"
+      ],
+      "陣列": [
+        "lists_create_with"
+      ],
+      "create": [
+        "lists_create_with"
+      ],
+      "建立": [
+        "lists_create_with"
+      ],
+      "insert": [
+        "lists_setIndex"
+      ],
+      "插入": [
+        "lists_setIndex"
+      ],
+      "sublist": [
+        "lists_getSublist"
+      ],
+      "子清單": [
+        "lists_getSublist"
+      ],
+      "sort": [
+        "lists_sort"
+      ],
+      "排序": [
+        "lists_sort"
+      ],
+      "split": [
+        "lists_split"
+      ],
+      "分割": [
+        "lists_split"
+      ],
+      "fill": [
+        "lists_repeat"
+      ],
+      "填充": [
+        "lists_repeat"
       ]
     }
   }
