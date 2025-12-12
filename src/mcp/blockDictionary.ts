@@ -591,6 +591,24 @@ export function generateBlockJsonTemplate(block: BlockDefinition, context: Block
 				template.fields[field.name] = contextValue;
 			} else if (field.default !== undefined) {
 				template.fields[field.name] = field.default;
+			} else if (field.type === 'dropdown' && field.options) {
+				// 對於 dropdown 類型，如果沒有 default，使用第一個 option 的值
+				if (typeof field.options === 'string') {
+					// 動態 options（如 "dynamic:digitalPins"），根據主板提供預設值
+					const dynamicDefaults: Record<string, string> = {
+						'dynamic:digitalPins': '2',
+						'dynamic:analogPins': 'A0',
+						'dynamic:pwmPins': '3',
+						'dynamic:interruptPins': '2',
+					};
+					template.fields[field.name] = dynamicDefaults[field.options] || '0';
+				} else if (Array.isArray(field.options) && field.options.length > 0) {
+					// 靜態 options 陣列，使用第一個選項的 value
+					template.fields[field.name] = field.options[0].value;
+				}
+			} else if (field.type === 'number') {
+				// 對於 number 類型，如果沒有 default，使用 min 或 0
+				template.fields[field.name] = field.min ?? 0;
 			}
 		}
 	}
@@ -608,6 +626,43 @@ export function generateBlockJsonTemplate(block: BlockDefinition, context: Block
 					const valueBlock = createValueBlock(contextValue);
 					if (valueBlock) {
 						template.inputs[input.name] = { block: valueBlock };
+					}
+				} else {
+					// 如果沒有 context 值，為 Number 類型的輸入提供預設的 math_number 積木
+					// 這確保 jsonTemplate 有完整的預設結構
+					if (input.check === 'Number') {
+						if (!template.inputs) {
+							template.inputs = {};
+						}
+						template.inputs[input.name] = {
+							block: {
+								type: 'math_number',
+								id: '__UNIQUE_ID__',
+								fields: { NUM: 0 },
+							},
+						};
+					} else if (input.check === 'String') {
+						if (!template.inputs) {
+							template.inputs = {};
+						}
+						template.inputs[input.name] = {
+							block: {
+								type: 'text',
+								id: '__UNIQUE_ID__',
+								fields: { TEXT: '' },
+							},
+						};
+					} else if (input.check === 'Boolean') {
+						if (!template.inputs) {
+							template.inputs = {};
+						}
+						template.inputs[input.name] = {
+							block: {
+								type: 'logic_boolean',
+								id: '__UNIQUE_ID__',
+								fields: { BOOL: 'TRUE' },
+							},
+						};
 					}
 				}
 			}
