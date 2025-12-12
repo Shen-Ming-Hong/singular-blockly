@@ -235,7 +235,28 @@ export class WebViewMessageHandler {
 				log(`更新開發板時的函式庫依賴列表: ${libDeps.length > 0 ? libDeps.join(', ') : '(無依賴)'}`, 'info');
 
 				const isFirstTime = !this.fileService.fileExists(platformioIni);
-				await this.fileService.writeFile(platformioIni, boardConfig);
+
+				// 檢查 platformio.ini 內容是否需要更新，避免無謂的覆寫觸發 PlatformIO 重新檢查
+				let needsUpdate = isFirstTime;
+				if (!isFirstTime) {
+					try {
+						const existingConfig = await this.fileService.readFile(platformioIni);
+						// 比較基礎配置是否相同（忽略額外的 lib_deps 等設定，那些由 syncPlatformIOSettings 處理）
+						needsUpdate = existingConfig.trim() !== boardConfig.trim();
+						if (!needsUpdate) {
+							log(`platformio.ini 基礎配置未變更，跳過覆寫`, 'info');
+						}
+					} catch (readError) {
+						// 讀取失敗時仍需更新
+						needsUpdate = true;
+						log(`讀取現有 platformio.ini 失敗，將重新寫入`, 'warn');
+					}
+				}
+
+				if (needsUpdate) {
+					await this.fileService.writeFile(platformioIni, boardConfig);
+					log(`已更新 platformio.ini 基礎配置`, 'info');
+				}
 
 				// 如果有額外的 platformio.ini 設定，將它們同步到更新後的檔案
 				if (libDeps.length > 0 || buildFlags.length > 0 || libLdfMode) {
@@ -243,20 +264,23 @@ export class WebViewMessageHandler {
 					log(`更新開發板配置後同步 platformio.ini 設定`, 'info');
 				}
 
-				// 使用 setTimeout 延遲訊息顯示，避免干擾面板顯示
-				setTimeout(async () => {
-					const boardUpdatedMsg = await this.localeService.getLocalizedMessage('VSCODE_BOARD_UPDATED', message.board);
-					const reloadMsg = isFirstTime ? await this.localeService.getLocalizedMessage('VSCODE_RELOAD_REQUIRED') : '';
-					const reloadBtn = await this.localeService.getLocalizedMessage('VSCODE_RELOAD');
+				// 只有在首次建立或實際更新時才顯示訊息
+				if (needsUpdate) {
+					// 使用 setTimeout 延遲訊息顯示，避免干擾面板顯示
+					setTimeout(async () => {
+						const boardUpdatedMsg = await this.localeService.getLocalizedMessage('VSCODE_BOARD_UPDATED', message.board);
+						const reloadMsg = isFirstTime ? await this.localeService.getLocalizedMessage('VSCODE_RELOAD_REQUIRED') : '';
+						const reloadBtn = await this.localeService.getLocalizedMessage('VSCODE_RELOAD');
 
-					vscodeApi.window
-						.showInformationMessage(boardUpdatedMsg + reloadMsg, ...(isFirstTime ? [reloadBtn] : []))
-						.then(selection => {
-							if (selection === reloadBtn) {
-								vscodeApi.commands.executeCommand('workbench.action.reloadWindow');
-							}
-						});
-				}, UI_MESSAGE_DELAY_MS); // 確保 Blockly 編輯器保持在前景
+						vscodeApi.window
+							.showInformationMessage(boardUpdatedMsg + reloadMsg, ...(isFirstTime ? [reloadBtn] : []))
+							.then(selection => {
+								if (selection === reloadBtn) {
+									vscodeApi.commands.executeCommand('workbench.action.reloadWindow');
+								}
+							});
+					}, UI_MESSAGE_DELAY_MS); // 確保 Blockly 編輯器保持在前景
+				}
 				setTimeout(() => this.panel.reveal(vscode.ViewColumn.One, true), UI_REVEAL_DELAY_MS);
 			}
 		} catch (error) {

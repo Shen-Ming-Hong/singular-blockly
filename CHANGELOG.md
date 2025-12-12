@@ -10,6 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.46.1] - 2025-12-12
+
+### 修復 Fixed
+
+-   **PlatformIO 誤觸發問題** (PlatformIO False Trigger Fix)
+
+    -   修復編輯積木時誤觸發「開發板已切換」訊息的問題
+        Fixed false "board changed" message trigger when editing blocks
+    -   修復每次編輯都觸發 PlatformIO 重新檢查專案的問題
+        Fixed PlatformIO project reconfiguration on every block edit
+    -   新增 `loadWorkspace` 時的開發板比較邏輯，避免無變更時發送 `updateBoard`
+        Added board comparison in `loadWorkspace` to prevent unnecessary `updateBoard` messages
+    -   新增 `platformio.ini` 內容比較，只有實際變更時才覆寫檔案
+        Added `platformio.ini` content comparison, only write when actually changed
+    -   優化 `syncPlatformIOSettings` 函數，比較 `lib_deps`、`build_flags`、`lib_ldf_mode` 新舊值
+        Optimized `syncPlatformIOSettings` to compare existing vs new values for `lib_deps`, `build_flags`, `lib_ldf_mode`
+
+### 維護 Maintenance
+
+-   380 個測試全部通過
+    380 tests passing
+
 ## [0.46.0] - 2025-12-12
 
 ### 新增 Added

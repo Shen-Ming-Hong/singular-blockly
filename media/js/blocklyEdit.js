@@ -1660,15 +1660,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 
 					if (message.board) {
+						// 取得當前板子以比較是否實際變更
+						const previousBoard = boardSelect.value;
 						// 先設定板子類型
 						boardSelect.value = message.board;
 						window.setCurrentBoard(message.board);
 						// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
 						await updateToolboxForBoard(workspace, message.board);
-						vscode.postMessage({
-							command: 'updateBoard',
-							board: message.board,
-						});
+						// 只有當板子實際變更時才發送 updateBoard 訊息
+						// 避免載入工作區時誤觸發 PlatformIO 重新檢查
+						if (previousBoard !== message.board) {
+							log.info(`開發板從 ${previousBoard} 變更為 ${message.board}，發送更新訊息`);
+							vscode.postMessage({
+								command: 'updateBoard',
+								board: message.board,
+							});
+						}
 					}
 
 					// 載入主題設定

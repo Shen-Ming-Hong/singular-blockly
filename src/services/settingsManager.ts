@@ -305,40 +305,68 @@ export class SettingsManager {
 						const equalIndex = trimmed.indexOf('=');
 						if (equalIndex >= 0) {
 							const depsPrefix = trimmed.substring(0, equalIndex + 1);
+							// 取得現有的 lib_deps 值進行比較
+							const existingDeps = trimmed.substring(equalIndex + 1).trim();
+							const newDepsStr = libDeps.join(', ');
 
 							if (libDeps.length === 0) {
-								lines.splice(i, 1);
+								if (existingDeps) {
+									// 只有當現有值非空時才需要移除
+									lines.splice(i, 1);
+									updated = true;
+									i--; // 調整索引
+									log(`Removed lib_deps from platformio.ini as no libraries are needed`, 'info');
+								}
+							} else if (existingDeps !== newDepsStr) {
+								// 只有當值實際變更時才更新
+								lines[i] = `${depsPrefix} ${newDepsStr}`;
 								updated = true;
-								i--; // 調整索引
-								log(`Removed lib_deps from platformio.ini as no libraries are needed`, 'info');
-							} else {
-								lines[i] = `${depsPrefix} ${libDeps.join(', ')}`;
-								updated = true;
-								log(`Updated lib_deps in platformio.ini: ${libDeps.join(', ')}`, 'info');
+								log(`Updated lib_deps in platformio.ini: ${newDepsStr}`, 'info');
 							}
 						}
 					}
 					// 處理 build_flags
 					else if (trimmed.startsWith('build_flags')) {
 						buildFlagsFound = true;
+						// 收集現有的 build_flags（包括延續行）
+						const existingFlags: string[] = [];
+						let j = i + 1;
+						while (j < lines.length && lines[j].startsWith('    ') && !lines[j].trim().includes('=')) {
+							existingFlags.push(lines[j].trim());
+							j++;
+						}
+						// 比較新舊 build_flags 是否相同
+						const flagsEqual =
+							buildFlags.length === existingFlags.length && buildFlags.every((flag, idx) => flag === existingFlags[idx]);
+
 						if (buildFlags.length === 0) {
-							// 移除 build_flags 行及其延續行
-							let j = i;
-							lines.splice(j, 1);
-							// 移除後續的縮排行
-							while (j < lines.length && lines[j].startsWith('    ') && !lines[j].trim().includes('=')) {
-								lines.splice(j, 1);
+							if (existingFlags.length > 0) {
+								// 只有當現有標誌非空時才需要移除
+								lines.splice(i, 1);
+								// 移除後續的縮排行
+								let removeIdx = i;
+								while (
+									removeIdx < lines.length &&
+									lines[removeIdx].startsWith('    ') &&
+									!lines[removeIdx].trim().includes('=')
+								) {
+									lines.splice(removeIdx, 1);
+								}
+								updated = true;
+								i--; // 調整索引
+								log(`Removed build_flags from platformio.ini as no flags are needed`, 'info');
 							}
-							updated = true;
-							i--; // 調整索引
-							log(`Removed build_flags from platformio.ini as no flags are needed`, 'info');
-						} else {
-							// 更新 build_flags
+						} else if (!flagsEqual) {
+							// 只有當值實際變更時才更新
 							lines[i] = 'build_flags = ';
-							let j = i + 1;
 							// 移除現有的縮排行
-							while (j < lines.length && lines[j].startsWith('    ') && !lines[j].trim().includes('=')) {
-								lines.splice(j, 1);
+							let removeIdx = i + 1;
+							while (
+								removeIdx < lines.length &&
+								lines[removeIdx].startsWith('    ') &&
+								!lines[removeIdx].trim().includes('=')
+							) {
+								lines.splice(removeIdx, 1);
 							}
 							// 添加新的標誌
 							for (let k = 0; k < buildFlags.length; k++) {
@@ -354,12 +382,17 @@ export class SettingsManager {
 						libLdfModeFound = true;
 						const equalIndex = trimmed.indexOf('=');
 						if (equalIndex >= 0) {
+							const existingMode = trimmed.substring(equalIndex + 1).trim();
 							if (!libLdfMode) {
-								lines.splice(i, 1);
-								updated = true;
-								i--; // 調整索引
-								log(`Removed lib_ldf_mode from platformio.ini`, 'info');
-							} else {
+								if (existingMode) {
+									// 只有當現有值非空時才需要移除
+									lines.splice(i, 1);
+									updated = true;
+									i--; // 調整索引
+									log(`Removed lib_ldf_mode from platformio.ini`, 'info');
+								}
+							} else if (existingMode !== libLdfMode) {
+								// 只有當值實際變更時才更新
 								const prefix = trimmed.substring(0, equalIndex + 1);
 								lines[i] = `${prefix} ${libLdfMode}`;
 								updated = true;
