@@ -112,6 +112,8 @@ window.languageManager.loadMessages('zh-hant', {
 	ENCODER_PID_COMPUTE: '計算PID',
 	ENCODER_PID_TARGET: '目標值',
 	ENCODER_PID_COMPUTE_TOOLTIP: '計算PID以控制編碼馬達達到目標位置或速度',
+	ENCODER_PID_RESET: '重設PID',
+	ENCODER_PID_RESET_TOOLTIP: '重設PID控制器狀態（清除積分項累積、重設計數器），適用於切換方向或重新啟動控制',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: '設定',

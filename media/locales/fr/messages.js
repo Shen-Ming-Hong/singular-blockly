@@ -113,6 +113,10 @@ window.languageManager.loadMessages('fr', {
 	ENCODER_PID_COMPUTE: 'Calculer PID',
 	ENCODER_PID_TARGET: 'Cible',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Calculer la sortie du contrôle PID basée sur la position cible',
+	ENCODER_PID_RESET: 'Réinitialiser PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Réinitialiser l'état du contrôleur PID (effacer l'accumulation intégrale, réinitialiser le compteur)',
+	ENCODER_PID_RESET: 'Réinitialiser PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Réinitialiser l'état du contrôleur PID (effacer l'accumulation intégrale, réinitialiser le compteur)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Configuration',

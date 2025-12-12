@@ -113,6 +113,10 @@ window.languageManager.loadMessages('ja', {
 	ENCODER_PID_COMPUTE: 'PIDを計算',
 	ENCODER_PID_TARGET: '目標値',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'エンコーダーモーターが目標位置に到達するためのPIDを計算します',
+	ENCODER_PID_RESET: 'PIDをリセット',
+	ENCODER_PID_RESET_TOOLTIP: 'PIDコントローラの状態をリセット（積分値のクリア、カウンタのリセット）',
+	ENCODER_PID_RESET: 'PIDをリセット',
+	ENCODER_PID_RESET_TOOLTIP: 'PIDコントローラの状態をリセット（積分値のクリア、カウンタのリセット）',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'セットアップ',

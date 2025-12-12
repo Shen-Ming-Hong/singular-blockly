@@ -3428,7 +3428,8 @@
       ],
       "relatedBlocks": [
         "encoder_setup",
-        "encoder_pid_compute"
+        "encoder_pid_compute",
+        "encoder_pid_reset"
       ]
     },
     {
@@ -3494,7 +3495,67 @@
         "計算"
       ],
       "relatedBlocks": [
-        "encoder_pid_setup"
+        "encoder_pid_setup",
+        "encoder_pid_reset"
+      ]
+    },
+    {
+      "type": "encoder_pid_reset",
+      "category": "motors",
+      "names": {
+        "zh-hant": "重設 PID",
+        "en": "Reset PID"
+      },
+      "descriptions": {
+        "zh-hant": "重設 PID 控制器狀態（清除積分項累積、重設計數器），適用於切換方向或重新啟動控制",
+        "en": "Reset PID controller state (clear integral accumulation, reset counter), useful when changing direction or restarting control"
+      },
+      "fields": [
+        {
+          "name": "PID_VAR",
+          "type": "dropdown",
+          "options": "dynamic",
+          "default": "myPID",
+          "label": {
+            "zh-hant": "PID 名稱",
+            "en": "PID Name"
+          },
+          "description": {
+            "zh-hant": "PID 變數名稱，與 encoder_pid_setup 中的 PID_VAR 對應",
+            "en": "PID variable name, corresponds to PID_VAR in encoder_pid_setup"
+          }
+        }
+      ],
+      "inputs": [],
+      "extraState": {
+        "pid": {
+          "type": "string",
+          "description": {
+            "zh-hant": "PID 控制器名稱",
+            "en": "PID controller name"
+          },
+          "default": "myPID"
+        }
+      },
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "encoder",
+        "pid",
+        "reset",
+        "編碼器",
+        "PID",
+        "重設",
+        "清除"
+      ],
+      "relatedBlocks": [
+        "encoder_pid_setup",
+        "encoder_pid_compute"
       ]
     },
     {

@@ -334,3 +334,33 @@ float ${funcName}(float targetPosition) {
 		return ['0', window.arduinoGenerator.ORDER_ATOMIC];
 	}
 };
+
+// 重設PID積木的程式碼生成器
+window.arduinoGenerator.forBlock['encoder_pid_reset'] = function (block) {
+	try {
+		const pidVarName = block.getFieldValue('PID_VAR');
+
+		// 從映射中取得對應的模式
+		const pidConfig = window.arduinoGenerator.pidEncoderMap_?.[pidVarName];
+		const mode = pidConfig?.mode || 'POSITION';
+
+		let code = `// 重設 PID 控制器 - ${pidVarName}\n`;
+
+		// 重設 PID 控制器的積分項和輸出
+		code += `${pidVarName}_input = 0;\n`;
+		code += `${pidVarName}_setpoint = 0;\n`;
+		code += `${pidVarName}_output = 0;\n`;
+		code += `${pidVarName}.SetMode(QuickPID::Control::manual);\n`;
+		code += `${pidVarName}.SetMode(QuickPID::Control::automatic);\n`;
+
+		// 速度模式需要額外重設 lastCount
+		if (mode === 'SPEED') {
+			code += `${pidVarName}_lastCount = 0;\n`;
+		}
+
+		return code;
+	} catch (e) {
+		log.error('Encoder PID reset code generation error:', e);
+		return '';
+	}
+};

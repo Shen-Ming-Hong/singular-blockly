@@ -369,6 +369,7 @@ export interface BlockContext {
 	kp?: number;
 	ki?: number;
 	kd?: number;
+	mode?: 'POSITION' | 'SPEED';
 
 	// encoder_pid_compute
 	targetValue?: number;
@@ -394,7 +395,7 @@ export interface BlockContext {
 export interface JsonTemplate {
 	type: string;
 	id: string;
-	extraState?: string;
+	extraState?: string | Record<string, unknown>;
 	fields?: Record<string, unknown>;
 	inputs?: Record<string, { block: JsonTemplate }>;
 }
@@ -483,10 +484,13 @@ export function generateBlockJsonTemplate(block: BlockDefinition, context: Block
 		case 'encoder_pid_setup': {
 			const pidName = context.pidName || 'myPID';
 			const encoderName = context.encoderName || 'myEncoder';
-			template.extraState = `<mutation xmlns="http://www.w3.org/1999/xhtml" encoder="${encoderName}"></mutation>`;
+			const mode = context.mode || 'POSITION';
+			// 使用物件格式的 extraState（Blockly 12.x 推薦）
+			template.extraState = { encoder: encoderName };
 			template.fields = {
 				PID_VAR: pidName,
 				VAR: encoderName,
+				MODE: mode,
 				KP: context.kp ?? 1,
 				KI: context.ki ?? 0,
 				KD: context.kd ?? 0,
@@ -496,7 +500,8 @@ export function generateBlockJsonTemplate(block: BlockDefinition, context: Block
 
 		case 'encoder_pid_compute': {
 			const pidName = context.pidName || 'myPID';
-			template.extraState = `<mutation xmlns="http://www.w3.org/1999/xhtml" pid="${pidName}"></mutation>`;
+			// 使用物件格式的 extraState（Blockly 12.x 推薦）
+			template.extraState = { pid: pidName };
 			template.fields = { PID_VAR: pidName };
 			if (context.targetValue !== undefined) {
 				template.inputs = {

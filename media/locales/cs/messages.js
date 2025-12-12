@@ -113,6 +113,10 @@ window.languageManager.loadMessages('cs', {
 	ENCODER_PID_COMPUTE: 'Vypočítat PID',
 	ENCODER_PID_TARGET: 'Cíl',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Vypočítat výstup PID řízení na základě cílové pozice',
+	ENCODER_PID_RESET: 'Resetovat PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Resetovat stav PID regulátoru (vymazat integrální akumulaci, resetovat čítač)',
+	ENCODER_PID_RESET: 'Resetovat PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Resetovat stav PID regulátoru (vymazat integrální akumulaci, resetovat čítač)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Nastavení',

@@ -113,6 +113,10 @@ window.languageManager.loadMessages('pl', {
 	ENCODER_PID_COMPUTE: 'Oblicz PID',
 	ENCODER_PID_TARGET: 'Cel',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Oblicz wyjście sterowania PID na podstawie pozycji docelowej',
+	ENCODER_PID_RESET: 'Zresetuj PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Zresetuj stan regulatora PID (wyczyść akumulację całki, zresetuj licznik)',
+	ENCODER_PID_RESET: 'Zresetuj PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Zresetuj stan regulatora PID (wyczyść akumulację całki, zresetuj licznik)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Konfiguracja',

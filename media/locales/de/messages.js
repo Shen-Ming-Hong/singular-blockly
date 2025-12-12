@@ -113,6 +113,10 @@ window.languageManager.loadMessages('de', {
 	ENCODER_PID_COMPUTE: 'PID berechnen',
 	ENCODER_PID_TARGET: 'Ziel',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'PID-Steuerungsausgabe basierend auf Zielposition berechnen',
+	ENCODER_PID_RESET: 'PID zurücksetzen',
+	ENCODER_PID_RESET_TOOLTIP: 'PID-Regler-Status zurücksetzen (Integralakkumulation löschen, Zähler zurücksetzen)',
+	ENCODER_PID_RESET: 'PID zurücksetzen',
+	ENCODER_PID_RESET_TOOLTIP: 'PID-Regler-Status zurücksetzen (Integralakkumulation löschen, Zähler zurücksetzen)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',

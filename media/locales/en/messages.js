@@ -112,6 +112,8 @@ window.languageManager.loadMessages('en', {
 	ENCODER_PID_COMPUTE: 'Compute PID',
 	ENCODER_PID_TARGET: 'Target',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Compute PID for encoder motor to reach target position or speed',
+	ENCODER_PID_RESET: 'Reset PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Reset PID controller state (clear integral accumulation, reset counter), useful when changing direction or restarting control',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Setup',

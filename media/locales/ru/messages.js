@@ -113,6 +113,10 @@ window.languageManager.loadMessages('ru', {
 	ENCODER_PID_COMPUTE: 'Вычислить PID',
 	ENCODER_PID_TARGET: 'Цель',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Вычислить выход PID-регулятора на основе целевой позиции',
+	ENCODER_PID_RESET: 'Сбросить PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Сбросить состояние ПИД-регулятора (очистить интегральное накопление, сбросить счетчик)',
+	ENCODER_PID_RESET: 'Сбросить PID',
+	ENCODER_PID_RESET_TOOLTIP: 'Сбросить состояние ПИД-регулятора (очистить интегральное накопление, сбросить счетчик)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Настройка',

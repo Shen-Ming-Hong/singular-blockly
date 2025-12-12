@@ -113,6 +113,10 @@ window.languageManager.loadMessages('tr', {
 	ENCODER_PID_COMPUTE: 'PID Hesapla',
 	ENCODER_PID_TARGET: 'Hedef',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Hedef pozisyona göre PID kontrol çıkışını hesapla',
+	ENCODER_PID_RESET: 'PID'i Sıfırla',
+	ENCODER_PID_RESET_TOOLTIP: 'PID denetleyici durumunu sıfırla (integral birikimini temizle, sayacı sıfırla)',
+	ENCODER_PID_RESET: 'PID'i Sıfırla',
+	ENCODER_PID_RESET_TOOLTIP: 'PID denetleyici durumunu sıfırla (integral birikimini temizle, sayacı sıfırla)',
 
 	// Arduino Block Labels
 	ARDUINO_SETUP: 'Kurulum',
