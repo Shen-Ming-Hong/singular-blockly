@@ -7,7 +7,13 @@
  * 提供 get_workspace_state, refresh_editor 功能
  *
  * 注意：update_workspace 已移除，改為由 AI 直接編輯 main.json
- * 新工作流程：search_blocks → get_block_usage(含context) → AI編輯main.json → refresh_editor
+ * 新工作流程：search_blocks → get_block_usage(含context) → AI編輯main.json → refresh_editor → 驗證main.cpp
+ *
+ * ⚠️ 重要提醒：修改 main.json 後，務必使用 get_generated_code 工具檢查 src/main.cpp
+ *    確保生成的 Arduino 程式碼正確，包括：
+ *    - #include 標頭檔是否完整
+ *    - 變數宣告是否正確
+ *    - setup() 和 loop() 內容是否符合預期
  */
 
 import { z } from 'zod';
@@ -183,7 +189,7 @@ export function registerWorkspaceOpsTools(server: McpServer): void {
 	// === get_workspace_state ===
 	server.tool(
 		'get_workspace_state',
-		'取得目前 Blockly 工作區的狀態，包括所有積木及其配置。',
+		'取得目前 Blockly 工作區的狀態，包括所有積木及其配置。【重要】修改 main.json 後，請務必使用 get_generated_code 工具驗證 src/main.cpp 的程式碼是否正確生成。',
 		{
 			includeBlocks: z.boolean().default(true).optional().describe('是否包含完整的積木資料'),
 		},
@@ -263,7 +269,7 @@ export function registerWorkspaceOpsTools(server: McpServer): void {
 	);
 
 	// === refresh_editor ===
-	server.tool('refresh_editor', '通知 VSCode 擴充功能重新載入 Blockly 編輯器。', {}, async () => {
+	server.tool('refresh_editor', '通知 VSCode 擴充功能重新載入 Blockly 編輯器。【重要】重新載入後，請使用 get_generated_code 工具確認 src/main.cpp 的程式碼已正確更新。', {}, async () => {
 		// MCP Server 透過標準輸出通訊，無法直接控制 VSCode
 		// 這個工具會返回指示訊息，讓使用者知道需要重新整理
 

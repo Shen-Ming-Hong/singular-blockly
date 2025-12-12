@@ -519,7 +519,7 @@ export function registerPlatformConfigTools(server: McpServer): void {
 	// === get_generated_code ===
 	server.tool(
 		'get_generated_code',
-		'取得目前工作區生成的 Arduino 程式碼。',
+		'取得目前工作區生成的 Arduino 程式碼。【建議】在修改 main.json 並執行 refresh_editor 後，務必使用此工具檢查程式碼是否正確生成，包括 #include、變數宣告、setup() 和 loop() 內容。',
 		{
 			format: z.enum(['arduino', 'cpp']).default('arduino').optional().describe('程式碼格式'),
 		},
