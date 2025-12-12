@@ -10,6 +10,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.46.0] - 2025-12-12
+
+### 新增 Added
+
+-   **MCP Server 整合** (MCP Server Integration)
+
+    -   全新 MCP (Model Context Protocol) 伺服器，讓 AI 助手能理解並操作 Blockly 積木系統
+        New MCP (Model Context Protocol) server enabling AI assistants to understand and interact with Blockly block system
+    -   積木字典系統，包含 111 個積木定義與 15 語言 i18n 支援
+        Block dictionary system with 111 block definitions and 15-language i18n support
+    -   VSCode MCP Provider 自動註冊（需 VSCode 1.105.0+）
+        VSCode MCP Provider auto-registration (requires VSCode 1.105.0+)
+    -   8 個 AI 工具：`get_block_usage`、`search_blocks`、`list_blocks_by_category`、`get_platform_config`、`get_board_pins`、`get_generated_code`、`get_workspace_state`、`refresh_editor`
+        8 AI tools: `get_block_usage`, `search_blocks`, `list_blocks_by_category`, `get_platform_config`, `get_board_pins`, `get_generated_code`, `get_workspace_state`, `refresh_editor`
+
+-   **PID 控制器增強** (PID Controller Enhancement)
+
+    -   為 `encoder_pid_setup` 積木新增 MODE 欄位，支援位置模式與速度模式
+        Added MODE field to `encoder_pid_setup` block, supporting Position and Speed modes
+    -   新增 `encoder_pid_reset` 積木，用於重設 PID 控制器狀態
+        Added `encoder_pid_reset` block for resetting PID controller state
+    -   15 語言翻譯更新
+        15-language translation updates
+
+-   **For 迴圈遞減支援** (For Loop Decrement Support)
+    -   `controls_for` 積木現可自動偵測並生成遞減迴圈
+        `controls_for` block now auto-detects and generates decrement loops
+    -   範例：從 10 到 1 會自動生成 `for (int i = 10; i >= 1; i -= 1)`
+        Example: from 10 to 1 auto-generates `for (int i = 10; i >= 1; i -= 1)`
+
+### 修復 Fixed
+
+-   **編輯器效能優化** (Editor Performance Optimization)
+
+    -   修復拖動積木時的延遲問題，使用 `BLOCK_DRAG` 事件追蹤拖動狀態
+        Fixed block dragging lag using `BLOCK_DRAG` event for drag state tracking
+    -   修復拖動後視圖位置重設問題，透過 FileWatcher 內部更新標記避免重載
+        Fixed view position reset after drag via FileWatcher internal update flag
+    -   新增 150ms 防抖動機制優化程式碼更新
+        Added 150ms debounce for code update optimization
+
+-   **字典修正** (Dictionary Fixes)
+    -   修正 `threshold_function_setup` 缺少 NAME 和 PIN 欄位定義
+        Fixed missing NAME and PIN field definitions in `threshold_function_setup`
+    -   新增閾值函式使用說明（函式名稱可自訂）
+        Added usage notes for threshold functions (function name customizable)
+
+### 維護 Maintenance
+
+-   完整規格文件 `specs/015-mcp-server-integration/`
+    Complete specification in `specs/015-mcp-server-integration/`
+-   新增 MCP 測試套件（blockDictionary、blockQuery、platformConfig、workspaceOps）
+    Added MCP test suite (blockDictionary, blockQuery, platformConfig, workspaceOps)
+-   Webpack 配置新增 MCP Server 打包
+    Webpack config added MCP Server bundling
+
+### 測試 Tests
+
+-   380 個測試通過
+    380 tests passing
+-   所有 14 個語言的 i18n 驗證通過
+    All 14 languages passed i18n validation
+
 ## [0.45.0] - 2025-12-11
 
 ### 新增 Added
