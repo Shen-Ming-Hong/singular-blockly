@@ -209,6 +209,8 @@ mqttClient.setCallback(_mqttCallback);
 knolleary/PubSubClient@^2.8
 ```
 
+> ⚠️ **安全性注意事項**：此實作使用標準 `WiFiClient` 而非 `WiFiClientSecure`，MQTT 連線為非加密傳輸。適用於教育環境和公開測試 broker。生產環境應考慮使用 TLS 加密連線。
+
 ---
 
 #### esp32_mqtt_connect
