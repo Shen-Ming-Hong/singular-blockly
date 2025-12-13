@@ -11,18 +11,22 @@
 ### Technology Stack
 
 -   **Blockly**: 12.3.1 | **@blockly/theme-modern**: 7.0.1
--   **TypeScript**: 5.9.3 | **Node.js**: 22.16.0+ | **VS Code**: 1.96.0+
--   **Webpack**: 5.102.1 (bundles to `dist/extension.js`)
+-   **TypeScript**: 5.9.3 | **Node.js**: 22.16.0+ | **VS Code**: 1.105.0+
+-   **Webpack**: 5.102.1 (bundles to `dist/extension.js`, `dist/mcp-server.js`)
 
 ### Architecture Overview
 
 ```
 Extension Host (Node.js)           WebView (Browser Context)
 ├── extension.ts                   ├── blocklyEdit.html
-├── webview/                       ├── blocklyEdit.js (1985 lines)
-│   ├── webviewManager.ts (938)   └── blockly/
-│   └── messageHandler.ts (843)       ├── blocks/*.js (block definitions)
-└── services/                         └── generators/arduino/*.js (code gen)
+├── webview/                       ├── blocklyEdit.js (2049 lines)
+│   ├── webviewManager.ts (1116)  └── blockly/
+│   └── messageHandler.ts (907)       ├── blocks/*.js (block definitions)
+├── mcp/                              └── generators/arduino/*.js (code gen)
+│   ├── mcpProvider.ts (MCP registration)
+│   ├── mcpServer.ts (STDIO transport)
+│   └── tools/*.ts (MCP tools)
+└── services/
     ├── fileService.ts
     ├── settingsManager.ts
     ├── localeService.ts
@@ -32,9 +36,9 @@ Extension Host (Node.js)           WebView (Browser Context)
 
 **Read First** (critical entry points):
 
-1. `src/extension.ts` - Activation, command registration, activity bar view
+1. `src/extension.ts` - Activation, command registration, MCP provider
 2. `media/html/blocklyEdit.html` - WebView DOM structure, script loading order
-3. `media/js/blocklyEdit.js` - Blockly workspace initialization (line 1068), event handlers
+3. `media/js/blocklyEdit.js` - Blockly workspace initialization (line 1070), event handlers
 
 ## Critical Patterns
 
@@ -85,7 +89,33 @@ arduinoGenerator.forBlock['sensor_read'] = function (block) {
 };
 ```
 
-**Update `webviewManager.ts` `arduinoModules` array** when adding new generator files.
+**Update `webviewManager.ts`**: Generator files are auto-discovered via `discoverArduinoModules()` from `media/blockly/generators/arduino/`. No manual array update needed.
+
+## MCP Server Integration (AI Tool Support)
+
+**Architecture**: VSCode 1.105.0+ MCP API with STDIO transport.
+
+**Files**:
+-   `src/mcp/mcpProvider.ts` - Registers `McpServerDefinitionProvider` with VSCode
+-   `src/mcp/mcpServer.ts` - STDIO server entry point (separate bundle)
+-   `src/mcp/tools/*.ts` - Tool implementations (blockQuery, platformConfig, workspaceOps)
+-   `src/mcp/blockDictionary.ts` - Block metadata for AI queries
+
+**Available MCP Tools**:
+| Tool | Purpose |
+|------|---------|
+| `get_block_usage` | Get block docs with JSON template generation |
+| `search_blocks` | Search by keyword (Chinese/English) |
+| `list_blocks_by_category` | Browse blocks by category |
+| `get_workspace_state` | Read current workspace state |
+| `get_generated_code` | Read generated Arduino code |
+| `refresh_editor` | Notify WebView to reload |
+
+**Adding new MCP tools**:
+1. Create tool in `src/mcp/tools/{toolName}.ts`
+2. Export registration function: `registerXxxTools(server: McpServer)`
+3. Register in `src/mcp/mcpServer.ts` via `registerXxxTools(server)`
+4. Use Zod schemas for input validation
 
 ## Multi-Board & State Management
 
@@ -152,7 +182,7 @@ npm run validate:i18n  # Check translation quality
 2. Generator in `media/blockly/generators/arduino/{category}.js`
 3. Toolbox entry: `media/toolbox/categories/{category}.json`
 4. i18n: Add messages to all `media/locales/*/messages.js`
-5. Update `arduinoModules` in `webviewManager.ts` if new generator file
+5. (Auto-discovered) Generator files loaded via `discoverArduinoModules()`
 
 ## Specs-Driven Development
 
@@ -163,7 +193,7 @@ npm run validate:i18n  # Check translation quality
 -   `quickstart.md` - Developer onboarding guide
 -   `tasks.md` - Breakdown for execution
 
-**Current specs**: 001-011 cover architecture, i18n, testing, upgrades, safety features
+**Current specs**: 001-015 cover architecture, i18n, testing, upgrades, safety features, MCP integration
 
 **Before implementation**: Check if spec exists. If modifying core APIs (Blockly, VSCode), document findings in research.md.
 
@@ -252,6 +282,7 @@ suite('FileService', () => {
 -   **i18n Guide**: `specs/002-i18n-localization-review/quickstart.md`
 -   **Blockly 12**: `specs/008-core-deps-upgrade/research.md`
 -   **Safety Guard**: `specs/010-project-safety-guard/`
+-   **MCP Server**: `specs/015-mcp-server-integration/`
 
 ---
 
