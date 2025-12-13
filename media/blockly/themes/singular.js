@@ -76,6 +76,11 @@ const singularTheme = Blockly.Theme.defineTheme('singular', {
 			colourSecondary: '#B356C7',
 			colourTertiary: '#C266D4',
 		},
+		communication_blocks: {
+			colourPrimary: '#5C9AD2', // 通訊積木主色 - 柔和的藍色
+			colourSecondary: '#6BA3D8',
+			colourTertiary: '#7AACDE',
+		},
 	},
 	categoryStyles: {
 		logic_category: { colour: '#78909C' },
@@ -88,6 +93,7 @@ const singularTheme = Blockly.Theme.defineTheme('singular', {
 		arduino_category: { colour: '#00979C' },
 		sensor_category: { colour: '#8A95A8' },
 		motors_category: { colour: '#AB47BC' },
+		communication_category: { colour: '#5C9AD2' },
 	},
 	fontStyle: {
 		family: 'Inter, system-ui, -apple-system, sans-serif',

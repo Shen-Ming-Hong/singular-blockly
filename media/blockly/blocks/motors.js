@@ -236,15 +236,6 @@ Blockly.Blocks['encoder_setup'] = {
 		this.setStyle('motors_blocks');
 		this.setTooltip(window.languageManager.getMessage('ENCODER_SETUP_TOOLTIP'));
 		this.setHelpUrl('');
-
-		// 將此積木標記為預覽功能
-		if (window.registerPreviewBlock) {
-			window.registerPreviewBlock('encoder_setup');
-		}
-		// 註冊為實驗性積木
-		if (window.registerExperimentalBlock) {
-			window.registerExperimentalBlock('encoder_setup');
-		}
 	},
 	// 更新引腳下拉選單
 	updatePinDropdowns: function () {
@@ -400,15 +391,6 @@ Blockly.Blocks['encoder_read'] = {
 		this.setStyle('motors_blocks');
 		this.setTooltip(window.languageManager.getMessage('ENCODER_READ_TOOLTIP'));
 		this.setHelpUrl('');
-
-		// 將此積木標記為預覽功能
-		if (window.registerPreviewBlock) {
-			window.registerPreviewBlock('encoder_read');
-		}
-		// 註冊為實驗性積木
-		if (window.registerExperimentalBlock) {
-			window.registerExperimentalBlock('encoder_read');
-		}
 	},
 
 	// 新增變異記錄方法，保存選擇的編碼馬達值
@@ -517,15 +499,6 @@ Blockly.Blocks['encoder_reset'] = {
 		this.setStyle('motors_blocks');
 		this.setTooltip(window.languageManager.getMessage('ENCODER_RESET_TOOLTIP'));
 		this.setHelpUrl('');
-
-		// 將此積木標記為預覽功能
-		if (window.registerPreviewBlock) {
-			window.registerPreviewBlock('encoder_reset');
-		}
-		// 註冊為實驗性積木
-		if (window.registerExperimentalBlock) {
-			window.registerExperimentalBlock('encoder_reset');
-		}
 	},
 
 	// 新增變異記錄方法，保存選擇的編碼馬達值

@@ -27,9 +27,9 @@
 
 **Purpose**: 確認開發環境與分支準備
 
--   [ ] T001 確認開發環境設定（Node.js 22.16.0+, VS Code 1.105.0+）
--   [ ] T002 建立功能分支 `016-esp32-wifi-mqtt`（若尚未建立）
--   [ ] T003 執行 `npm install` 確保依賴正確安裝
+-   0 確認開發環境設定（Node.js 22.16.0+, VS Code 1.105.0+）
+-   0 建立功能分支 `016-esp32-wifi-mqtt`（若尚未建立）
+-   0 執行 `npm install` 確保依賴正確安裝
 
 ---
 
@@ -39,11 +39,11 @@
 
 **⚠️ CRITICAL**: 此階段完成前，無法開始任何使用者故事
 
--   [ ] T004 [P] 建立積木定義檔案 `media/blockly/blocks/esp32-wifi-mqtt.js`（空白結構）
--   [ ] T005 [P] 建立代碼生成器檔案 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（空白結構）
--   [ ] T006 [P] 建立工具箱類別檔案 `media/toolbox/categories/communication.json`（基本結構）
--   [ ] T007 在 `media/toolbox/index.json` 中引入 `communication.json` 類別
--   [ ] T008 確認新積木檔案已被 `discoverArduinoModules()` 自動發現（無需手動修改 blocklyEdit.html）
+-   0 [P] 建立積木定義檔案 `media/blockly/blocks/esp32-wifi-mqtt.js`（空白結構）
+-   0 [P] 建立代碼生成器檔案 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（空白結構）
+-   0 [P] 建立工具箱類別檔案 `media/toolbox/categories/communication.json`（基本結構）
+-   0 在 `media/toolbox/index.json` 中引入 `communication.json` 類別
+-   0 確認新積木檔案已被 `discoverArduinoModules()` 自動發現（無需手動修改 blocklyEdit.html）
 
 **Checkpoint**: 基礎檔案結構就緒，可開始各使用者故事實作
 
@@ -57,13 +57,13 @@
 
 ### Implementation for User Story 1
 
--   [ ] T009 [US1] 在 `media/js/blocklyEdit.js` 中新增視角狀態變數（viewportState, viewportRestoreTimer）
--   [ ] T010 [US1] 在 `media/js/blocklyEdit.js` 的 changeListener 中實作 BLOCK_DELETE 事件處理
--   [ ] T011 [US1] 實作 debounce 機制（50ms 延遲）用於批次刪除場景
--   [ ] T012 [US1] 使用 `workspace.scroll()` 恢復視角座標（scrollX, scrollY）
--   [ ] T013 [US1] 手動測試：單一積木刪除後視角保持
--   [ ] T014 [US1] 手動測試：批次選取多積木刪除後視角保持
--   [ ] T015 [US1] 手動測試：拖移積木到垃圾桶後視角保持
+-   [X] T009 [US1] 在 `media/js/blocklyEdit.js` 中新增視角狀態變數（viewportState, viewportRestoreTimer）
+-   [X] T010 [US1] 在 `media/js/blocklyEdit.js` 的 changeListener 中實作 BLOCK_DELETE 事件處理
+-   [X] T011 [US1] 實作 debounce 機制（50ms 延遲）用於批次刪除場景
+-   [X] T012 [US1] 使用 `workspace.scroll()` 恢復視角座標（scrollX, scrollY）
+-   [X] T013 [US1] 手動測試：單一積木刪除後視角保持
+-   [X] T014 [US1] 手動測試：批次選取多積木刪除後視角保持
+-   [X] T015 [US1] 手動測試：拖移積木到垃圾桶後視角保持
 
 **Checkpoint**: User Story 1 完成，積木刪除視角問題已修復
 
@@ -77,14 +77,14 @@
 
 ### Implementation for User Story 2
 
--   [ ] T016 [US2] 修改 `media/blockly/generators/arduino/text.js` 中的 `text_join` 生成器
--   [ ] T017 [US2] 確保每個輸入項目都包裝為 `String()`
--   [ ] T018 [US2] 處理空輸入項目情況，生成 `String("")`
--   [ ] T019 [US2] 處理零輸入項目情況，生成 `String("")`
--   [ ] T020 [US2] 更新 ORDER 優先級為 `ORDER_ADDITION`
--   [ ] T021 [US2] 手動測試：字串 + 數字生成正確代碼
--   [ ] T022 [US2] 手動測試：三種型態（字串、整數、浮點數）串接
--   [ ] T023 [US2] 手動測試：單一輸入項目生成正確代碼
+-   [X] T016 [US2] 修改 `media/blockly/generators/arduino/text.js` 中的 `text_join` 生成器
+-   [X] T017 [US2] 確保每個輸入項目都包裝為 `String()`
+-   [X] T018 [US2] 處理空輸入項目情況，生成 `String("")`
+-   [X] T019 [US2] 處理零輸入項目情況，生成 `String("")`
+-   [X] T020 [US2] 更新 ORDER 優先級為 `ORDER_ADDITION`
+-   [X] T021 [US2] 手動測試：字串 + 數字生成正確代碼
+-   [X] T022 [US2] 手動測試：三種型態（字串、整數、浮點數）串接
+-   [X] T023 [US2] 手動測試：單一輸入項目生成正確代碼
 
 **Checkpoint**: User Story 2 完成，text_join 型態轉換問題已修復
 
@@ -98,26 +98,26 @@
 
 ### Implementation for User Story 3
 
--   [ ] T024 [P] [US3] 新增 `isEsp32Board()` 輔助函數於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T025 [P] [US3] 實作 `esp32_wifi_connect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T026 [P] [US3] 實作 `esp32_wifi_disconnect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T027 [P] [US3] 實作 `esp32_wifi_status` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T028 [P] [US3] 實作 `esp32_wifi_get_ip` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T029 [P] [US3] 實作 `esp32_wifi_scan` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T030 [P] [US3] 實作 `esp32_wifi_get_ssid` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T031 [P] [US3] 實作 `esp32_wifi_get_rssi` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T032 [US3] 實作 `esp32_wifi_connect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（含 10 秒超時等待）
--   [ ] T033 [US3] 實作 `esp32_wifi_disconnect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T034 [US3] 實作 `esp32_wifi_status` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T035 [US3] 實作 `esp32_wifi_get_ip` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T036 [US3] 實作 `esp32_wifi_scan` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T037 [US3] 實作 `esp32_wifi_get_ssid` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T038 [US3] 實作 `esp32_wifi_get_rssi` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T039 [US3] 在 `media/toolbox/categories/communication.json` 中新增 WiFi 積木（含 shadow blocks）
--   [ ] T040 [US3] 實作板子檢查邏輯：非 ESP32 板子生成警告註解
--   [ ] T041 [US3] 手動測試：ESP32 板子時工具箱顯示 WiFi 積木
--   [ ] T042 [US3] 手動測試：Arduino Uno 時 WiFi 積木不顯示或生成警告
--   [ ] T043 [US3] 手動測試：WiFi 連線積木生成正確代碼
+-   [X] T024 [P] [US3] 新增 `isEsp32Board()` 輔助函數於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T025 [P] [US3] 實作 `esp32_wifi_connect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T026 [P] [US3] 實作 `esp32_wifi_disconnect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T027 [P] [US3] 實作 `esp32_wifi_status` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T028 [P] [US3] 實作 `esp32_wifi_get_ip` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T029 [P] [US3] 實作 `esp32_wifi_scan` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T030 [P] [US3] 實作 `esp32_wifi_get_ssid` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T031 [P] [US3] 實作 `esp32_wifi_get_rssi` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T032 [US3] 實作 `esp32_wifi_connect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（含 10 秒超時等待）
+-   [X] T033 [US3] 實作 `esp32_wifi_disconnect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T034 [US3] 實作 `esp32_wifi_status` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T035 [US3] 實作 `esp32_wifi_get_ip` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T036 [US3] 實作 `esp32_wifi_scan` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T037 [US3] 實作 `esp32_wifi_get_ssid` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T038 [US3] 實作 `esp32_wifi_get_rssi` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T039 [US3] 在 `media/toolbox/categories/communication.json` 中新增 WiFi 積木（含 shadow blocks）
+-   [X] T040 [US3] 實作板子檢查邏輯：非 ESP32 板子生成警告註解
+-   [X] T041 [US3] 手動測試：ESP32 板子時工具箱顯示 WiFi 積木
+-   [X] T042 [US3] 手動測試：Arduino Uno 時 WiFi 積木不顯示或生成警告
+-   [X] T043 [US3] 手動測試：WiFi 連線積木生成正確代碼
 
 **Checkpoint**: User Story 3 完成，ESP32 WiFi 功能可獨立運作
 
@@ -131,26 +131,26 @@
 
 ### Implementation for User Story 4
 
--   [ ] T044 [P] [US4] 實作 `esp32_mqtt_setup` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T045 [P] [US4] 實作 `esp32_mqtt_connect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`（依賴 T044 mqtt_setup 提供 CLIENT_ID）
--   [ ] T046 [P] [US4] 實作 `esp32_mqtt_publish` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T047 [P] [US4] 實作 `esp32_mqtt_subscribe` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T048 [P] [US4] 實作 `esp32_mqtt_loop` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T049 [P] [US4] 實作 `esp32_mqtt_get_topic` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T050 [P] [US4] 實作 `esp32_mqtt_get_message` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T051 [US4] 實作 `esp32_mqtt_setup` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（含全域變數與 callback）
--   [ ] T052 [US4] 實作 `esp32_mqtt_connect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（支援可選帳密，使用 mqtt_setup 的 CLIENT_ID）
--   [ ] T053 [US4] 實作 `esp32_mqtt_publish` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T054 [US4] 實作 `esp32_mqtt_subscribe` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T055 [US4] 實作 `esp32_mqtt_loop` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T056 [US4] 實作 `esp32_mqtt_get_topic` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T057 [US4] 實作 `esp32_mqtt_get_message` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
--   [ ] T058 [US4] 確保 `knolleary/PubSubClient@^2.8` 自動加入 `lib_deps_`
--   [ ] T059 [US4] 在 `media/toolbox/categories/communication.json` 中新增 MQTT 積木
--   [ ] T060 [US4] 實作板子檢查邏輯：非 ESP32 板子生成警告註解
--   [ ] T061 [US4] 手動測試：MQTT setup 生成正確初始化代碼
--   [ ] T062 [US4] 手動測試：MQTT publish/subscribe 生成正確 API 呼叫
--   [ ] T063 [US4] 手動測試：PlatformIO 依賴自動加入
+-   [X] T044 [P] [US4] 實作 `esp32_mqtt_setup` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T045 [P] [US4] 實作 `esp32_mqtt_connect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`（依賴 T044 mqtt_setup 提供 CLIENT_ID）
+-   [X] T046 [P] [US4] 實作 `esp32_mqtt_publish` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T047 [P] [US4] 實作 `esp32_mqtt_subscribe` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T048 [P] [US4] 實作 `esp32_mqtt_loop` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T049 [P] [US4] 實作 `esp32_mqtt_get_topic` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T050 [P] [US4] 實作 `esp32_mqtt_get_message` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [X] T051 [US4] 實作 `esp32_mqtt_setup` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（含全域變數與 callback）
+-   [X] T052 [US4] 實作 `esp32_mqtt_connect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（支援可選帳密，使用 mqtt_setup 的 CLIENT_ID）
+-   [X] T053 [US4] 實作 `esp32_mqtt_publish` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T054 [US4] 實作 `esp32_mqtt_subscribe` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T055 [US4] 實作 `esp32_mqtt_loop` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T056 [US4] 實作 `esp32_mqtt_get_topic` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T057 [US4] 實作 `esp32_mqtt_get_message` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
+-   [X] T058 [US4] 確保 `knolleary/PubSubClient@^2.8` 自動加入 `lib_deps_`
+-   [X] T059 [US4] 在 `media/toolbox/categories/communication.json` 中新增 MQTT 積木
+-   [X] T060 [US4] 實作板子檢查邏輯：非 ESP32 板子生成警告註解
+-   [X] T061 [US4] 手動測試：MQTT setup 生成正確初始化代碼
+-   [X] T062 [US4] 手動測試：MQTT publish/subscribe 生成正確 API 呼叫
+-   [X] T063 [US4] 手動測試：PlatformIO 依賴自動加入
 
 **Checkpoint**: User Story 4 完成，ESP32 MQTT 功能可獨立運作
 
@@ -164,14 +164,14 @@
 
 ### Implementation for User Story 5
 
--   [ ] T064 [US5] 實作 `text_to_number` 積木定義於 `media/blockly/blocks/text.js`
--   [ ] T065 [US5] 實作 `text_to_number` 生成器於 `media/blockly/generators/arduino/text.js`
--   [ ] T066 [US5] 處理整數選項生成 `(text).toInt()` 代碼
--   [ ] T067 [US5] 處理浮點數選項生成 `(text).toFloat()` 代碼
--   [ ] T068 [US5] 在 Text 類別工具箱中新增 `text_to_number` 積木（含 shadow block）
--   [ ] T069 [US5] 手動測試：整數轉換生成正確代碼
--   [ ] T070 [US5] 手動測試：浮點數轉換生成正確代碼
--   [ ] T071 [US5] 手動測試：工具箱顯示預設 shadow block "123"
+-   [X] T064 [US5] 實作 `text_to_number` 積木定義於 `media/blockly/blocks/text.js`
+-   [X] T065 [US5] 實作 `text_to_number` 生成器於 `media/blockly/generators/arduino/text.js`
+-   [X] T066 [US5] 處理整數選項生成 `(text).toInt()` 代碼
+-   [X] T067 [US5] 處理浮點數選項生成 `(text).toFloat()` 代碼
+-   [X] T068 [US5] 在 Text 類別工具箱中新增 `text_to_number` 積木（含 shadow block）
+-   [X] T069 [US5] 手動測試：整數轉換生成正確代碼
+-   [X] T070 [US5] 手動測試：浮點數轉換生成正確代碼
+-   [X] T071 [US5] 手動測試：工具箱顯示預設 shadow block "123"
 
 **Checkpoint**: User Story 5 完成，字串轉數字功能可獨立運作
 
@@ -181,24 +181,24 @@
 
 **Purpose**: 為所有新積木提供 15 語言翻譯支援
 
--   [ ] T072 [P] 新增英文翻譯鍵值於 `media/locales/en/messages.js`（約 40+ 鍵值）
--   [ ] T073 [P] 新增繁體中文翻譯鍵值於 `media/locales/zh-hant/messages.js`
--   [ ] T074 [P] 新增西班牙文翻譯鍵值於 `media/locales/es/messages.js`
--   [ ] T075 [P] 新增葡萄牙文翻譯鍵值於 `media/locales/pt-br/messages.js`
--   [ ] T076 [P] 新增法文翻譯鍵值於 `media/locales/fr/messages.js`
--   [ ] T077 [P] 新增德文翻譯鍵值於 `media/locales/de/messages.js`
--   [ ] T078 [P] 新增義大利文翻譯鍵值於 `media/locales/it/messages.js`
--   [ ] T079 [P] 新增俄文翻譯鍵值於 `media/locales/ru/messages.js`
--   [ ] T080 [P] 新增日文翻譯鍵值於 `media/locales/ja/messages.js`
--   [ ] T081 [P] 新增韓文翻譯鍵值於 `media/locales/ko/messages.js`
--   [ ] T082 [P] 新增波蘭文翻譯鍵值於 `media/locales/pl/messages.js`
--   [ ] T083 [P] 新增匈牙利文翻譯鍵值於 `media/locales/hu/messages.js`
--   [ ] T084 [P] 新增土耳其文翻譯鍵值於 `media/locales/tr/messages.js`
--   [ ] T085 [P] 新增保加利亞文翻譯鍵值於 `media/locales/bg/messages.js`
--   [ ] T086 [P] 新增捷克文翻譯鍵值於 `media/locales/cs/messages.js`
--   [ ] T087 執行 `npm run validate:i18n` 驗證翻譯完整性
--   [ ] T088 手動測試：繁體中文介面顯示正確
--   [ ] T089 手動測試：英文介面顯示正確
+-   [X] T072 [P] 新增英文翻譯鍵值於 `media/locales/en/messages.js`（約 40+ 鍵值）
+-   [X] T073 [P] 新增繁體中文翻譯鍵值於 `media/locales/zh-hant/messages.js`
+-   [X] T074 [P] 新增西班牙文翻譯鍵值於 `media/locales/es/messages.js`
+-   [X] T075 [P] 新增葡萄牙文翻譯鍵值於 `media/locales/pt-br/messages.js`
+-   [X] T076 [P] 新增法文翻譯鍵值於 `media/locales/fr/messages.js`
+-   [X] T077 [P] 新增德文翻譯鍵值於 `media/locales/de/messages.js`
+-   [X] T078 [P] 新增義大利文翻譯鍵值於 `media/locales/it/messages.js`
+-   [X] T079 [P] 新增俄文翻譯鍵值於 `media/locales/ru/messages.js`
+-   [X] T080 [P] 新增日文翻譯鍵值於 `media/locales/ja/messages.js`
+-   [X] T081 [P] 新增韓文翻譯鍵值於 `media/locales/ko/messages.js`
+-   [X] T082 [P] 新增波蘭文翻譯鍵值於 `media/locales/pl/messages.js`
+-   [X] T083 [P] 新增匈牙利文翻譯鍵值於 `media/locales/hu/messages.js`
+-   [X] T084 [P] 新增土耳其文翻譯鍵值於 `media/locales/tr/messages.js`
+-   [X] T085 [P] 新增保加利亞文翻譯鍵值於 `media/locales/bg/messages.js`
+-   [X] T086 [P] 新增捷克文翻譯鍵值於 `media/locales/cs/messages.js`
+-   [X] T087 執行 `npm run validate:i18n` 驗證翻譯完整性
+-   [X] T088 手動測試：繁體中文介面顯示正確
+-   [X] T089 手動測試：英文介面顯示正確
 
 **Checkpoint**: 所有新積木具備完整 i18n 支援
 
@@ -208,15 +208,15 @@
 
 **Purpose**: 最終整合、文件更新與驗證
 
--   [ ] T090 [P] 更新 MCP 積木字典 `scripts/generate-block-dictionary.js`（若需）
--   [ ] T091 [P] 更新 CHANGELOG.md 記錄新功能與修復
--   [ ] T092 執行完整 Lint 檢查 `npm run lint`
--   [ ] T093 執行編譯 `npm run compile` 確認無錯誤
--   [ ] T094 執行既有測試套件 `npm test` 確認無回歸
--   [ ] T095 手動測試：Light/Dark 主題下積木顯示正確
--   [ ] T096 手動測試：Super Mini (ESP32-C3) 板子支援 WiFi/MQTT
--   [ ] T097 手動測試：Arduino Uno/Nano/Mega 不受新功能影響
--   [ ] T098 執行 quickstart.md 驗證流程
+-   [X] T090 [P] 更新 MCP 積木字典 `scripts/generate-block-dictionary.js`（若需）
+-   [X] T091 [P] 更新 CHANGELOG.md 記錄新功能與修復
+-   [X] T092 執行完整 Lint 檢查 `npm run lint`
+-   [X] T093 執行編譯 `npm run compile` 確認無錯誤
+-   [X] T094 執行既有測試套件 `npm test` 確認無回歸
+-   [X] T095 手動測試：Light/Dark 主題下積木顯示正確
+-   [X] T096 手動測試：Super Mini (ESP32-C3) 板子支援 WiFi/MQTT
+-   [X] T097 手動測試：Arduino Uno/Nano/Mega 不受新功能影響
+-   [X] T098 執行 quickstart.md 驗證流程
 
 ---
 

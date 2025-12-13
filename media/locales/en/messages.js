@@ -560,4 +560,68 @@ window.languageManager.loadMessages('en', {
 	BUTTON_SUPPRESS: 'Do Not Remind',
 	SAFETY_GUARD_CANCELLED: 'Cancelled opening Blockly editor',
 	SAFETY_GUARD_SUPPRESSED: 'Preference saved, this warning will not be shown again',
+
+	// Communication Category
+	CATEGORY_COMMUNICATION: 'Communication',
+	ESP32_WIFI_LABEL: 'WiFi',
+	ESP32_MQTT_LABEL: 'MQTT',
+
+	// WiFi Blocks
+	ESP32_WIFI_CONNECT: 'WiFi Connect',
+	ESP32_WIFI_CONNECT_SSID: 'SSID',
+	ESP32_WIFI_CONNECT_PASSWORD: 'Password',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Connect to WiFi network (10 second timeout)',
+	ESP32_WIFI_DISCONNECT: 'WiFi Disconnect',
+	ESP32_WIFI_DISCONNECT_TOOLTIP: 'Disconnect from WiFi',
+	ESP32_WIFI_STATUS: 'WiFi Connected?',
+	ESP32_WIFI_STATUS_TOOLTIP: 'Returns WiFi connection status',
+	ESP32_WIFI_GET_IP: 'WiFi IP Address',
+	ESP32_WIFI_GET_IP_TOOLTIP: 'Get current IP address',
+	ESP32_WIFI_SCAN: 'Scan WiFi Networks',
+	ESP32_WIFI_SCAN_TOOLTIP: 'Scan and return count of nearby WiFi networks',
+	ESP32_WIFI_GET_SSID: 'Get WiFi SSID',
+	ESP32_WIFI_GET_SSID_INDEX: 'index',
+	ESP32_WIFI_GET_SSID_TOOLTIP: 'Get WiFi name at specified index',
+	ESP32_WIFI_GET_RSSI: 'Get WiFi Signal Strength',
+	ESP32_WIFI_GET_RSSI_INDEX: 'index',
+	ESP32_WIFI_GET_RSSI_TOOLTIP: 'Get signal strength at specified index (dBm)',
+
+	// MQTT Blocks
+	ESP32_MQTT_SETUP: 'MQTT Setup',
+	ESP32_MQTT_SETUP_SERVER: 'Server',
+	ESP32_MQTT_SETUP_PORT: 'Port',
+	ESP32_MQTT_SETUP_CLIENT_ID: 'Client ID',
+	ESP32_MQTT_SETUP_TOOLTIP: 'Configure MQTT server connection parameters',
+	ESP32_MQTT_CONNECT: 'MQTT Connect',
+	ESP32_MQTT_CONNECT_USERNAME: 'Username',
+	ESP32_MQTT_CONNECT_PASSWORD: 'Password',
+	ESP32_MQTT_CONNECT_TOOLTIP: 'Connect to MQTT server',
+	ESP32_MQTT_PUBLISH: 'MQTT Publish',
+	ESP32_MQTT_PUBLISH_TOPIC: 'Topic',
+	ESP32_MQTT_PUBLISH_MESSAGE: 'Message',
+	ESP32_MQTT_PUBLISH_TOOLTIP: 'Publish message to specified topic',
+	ESP32_MQTT_SUBSCRIBE: 'MQTT Subscribe',
+	ESP32_MQTT_SUBSCRIBE_TOPIC: 'Topic',
+	ESP32_MQTT_SUBSCRIBE_TOOLTIP: 'Subscribe to messages from specified topic',
+	ESP32_MQTT_LOOP: 'MQTT Process Messages',
+	ESP32_MQTT_LOOP_TOOLTIP: 'Maintain connection and process received messages (place in loop)',
+	ESP32_MQTT_GET_TOPIC: 'MQTT Latest Topic',
+	ESP32_MQTT_GET_TOPIC_TOOLTIP: 'Get topic of most recently received message',
+	ESP32_MQTT_GET_MESSAGE: 'MQTT Latest Message',
+	ESP32_MQTT_GET_MESSAGE_TOOLTIP: 'Get content of most recently received message',
+	ESP32_MQTT_STATUS: 'MQTT Connected',
+	ESP32_MQTT_STATUS_TOOLTIP: 'Check if connected to MQTT server',
+
+	// Text to Number Block
+	TEXT_TO_NUMBER: 'Text to Number',
+	TEXT_TO_NUMBER_INT: 'Integer',
+	TEXT_TO_NUMBER_FLOAT: 'Float',
+	TEXT_TO_NUMBER_TOOLTIP: 'Convert text to number (invalid input returns 0)',
+
+	// To String Block
+	TO_STRING: 'To String',
+	TO_STRING_TOOLTIP: 'Convert number or boolean to string',
+
+	// ESP32 Only Block Warning
+	ESP32_ONLY_BLOCK_WARNING: 'This block only supports ESP32 series boards',
 });

@@ -205,7 +205,7 @@ const BOARD_CONFIGS: Record<
 			spi: { mosi: 23, miso: 19, sck: 18, ss: 5 },
 			touch: [0, 2, 4, 12, 13, 14, 15, 27, 32, 33],
 		},
-		capabilities: ['wifi', 'bluetooth', 'ble', 'touch_sensor', 'pwm_channels', 'dac', 'adc_12bit'],
+		capabilities: ['wifi', 'bluetooth', 'ble', 'touch_sensor', 'pwm_channels', 'dac', 'adc_12bit', 'mqtt'],
 	},
 	esp32_supermini: {
 		name: 'ESP32 Super Mini',
@@ -238,7 +238,7 @@ const BOARD_CONFIGS: Record<
 			i2c: { sda: 8, scl: 9 },
 			spi: { mosi: 6, miso: 5, sck: 4, ss: 7 },
 		},
-		capabilities: ['wifi', 'ble'],
+		capabilities: ['wifi', 'ble', 'mqtt'],
 	},
 };
 

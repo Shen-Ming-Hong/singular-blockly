@@ -138,6 +138,36 @@
 			}
 		},
 		{
+			"kind": "block",
+			"type": "text_to_number",
+			"inputs": {
+				"TEXT": {
+					"shadow": {
+						"kind": "block",
+						"type": "text",
+						"fields": {
+							"TEXT": "123"
+						}
+					}
+				}
+			}
+		},
+		{
+			"kind": "block",
+			"type": "to_string",
+			"inputs": {
+				"VALUE": {
+					"shadow": {
+						"kind": "block",
+						"type": "math_number",
+						"fields": {
+							"NUM": 123
+						}
+					}
+				}
+			}
+		},
+		{
 			"kind": "label",
 			"text": "Input/Output:",
 			"web-class": "ioLabel"

@@ -14,6 +14,9 @@
 			"$include": "./categories/vision-sensors.json"
 		},
 		{
+			"$include": "./categories/communication.json"
+		},
+		{
 			"$include": "./categories/logic.json"
 		},
 		{

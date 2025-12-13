@@ -555,4 +555,68 @@ window.languageManager.loadMessages('tr', {
 	BUTTON_SUPPRESS: 'Hatırlatma',
 	SAFETY_GUARD_CANCELLED: 'Blockly editörünü açma iptal edildi',
 	SAFETY_GUARD_SUPPRESSED: 'Tercih kaydedildi, bu uyarı bir daha gösterilmeyecek',
+
+	// Communication Category
+	CATEGORY_COMMUNICATION: 'İletişim',
+
+	// ESP32 WiFi
+	ESP32_WIFI_LABEL: 'WiFi',
+	ESP32_WIFI_CONNECT: 'WiFi Bağlan',
+	ESP32_WIFI_CONNECT_SSID: 'SSID',
+	ESP32_WIFI_CONNECT_PASSWORD: 'Şifre',
+	ESP32_WIFI_CONNECT_TOOLTIP: "ESP32'yi belirtilen SSID ve şifre ile WiFi ağına bağla",
+	ESP32_WIFI_DISCONNECT: 'WiFi Bağlantısını Kes',
+	ESP32_WIFI_DISCONNECT_TOOLTIP: "ESP32'nin WiFi bağlantısını kes",
+	ESP32_WIFI_STATUS: 'WiFi Durumu',
+	ESP32_WIFI_STATUS_TOOLTIP: "ESP32'nin WiFi ağına bağlı olup olmadığını kontrol et",
+	ESP32_WIFI_GET_IP: 'WiFi IP Adresini Al',
+	ESP32_WIFI_GET_IP_TOOLTIP: "ESP32'nin yerel IP adresini metin olarak al",
+	ESP32_WIFI_SCAN: 'WiFi Ağlarını Tara',
+	ESP32_WIFI_SCAN_TOOLTIP: 'Mevcut WiFi ağlarını tara ve bulunan ağ sayısını döndür',
+	ESP32_WIFI_GET_SSID: 'Ağ SSID Al',
+	ESP32_WIFI_GET_SSID_INDEX: 'indeks',
+	ESP32_WIFI_GET_SSID_TOOLTIP: 'Verilen indeksteki WiFi ağının SSID adını al',
+	ESP32_WIFI_GET_RSSI: 'Ağ RSSI Al',
+	ESP32_WIFI_GET_RSSI_INDEX: 'indeks',
+	ESP32_WIFI_GET_RSSI_TOOLTIP: 'Verilen indeksteki WiFi ağının sinyal gücünü (RSSI) al',
+
+	// ESP32 MQTT
+	ESP32_MQTT_LABEL: 'MQTT',
+	ESP32_MQTT_SETUP: 'MQTT Kurulum',
+	ESP32_MQTT_SETUP_SERVER: 'Sunucu',
+	ESP32_MQTT_SETUP_PORT: 'Port',
+	ESP32_MQTT_SETUP_CLIENT_ID: 'İstemci ID',
+	ESP32_MQTT_SETUP_TOOLTIP: 'MQTT istemcisini sunucu adresi, port ve istemci kimliği ile yapılandır',
+	ESP32_MQTT_CONNECT: 'MQTT Bağlan',
+	ESP32_MQTT_CONNECT_USERNAME: 'Kullanıcı Adı',
+	ESP32_MQTT_CONNECT_PASSWORD: 'Şifre',
+	ESP32_MQTT_CONNECT_TOOLTIP: 'İsteğe bağlı kullanıcı adı ve şifre ile MQTT sunucusuna bağlan',
+	ESP32_MQTT_PUBLISH: 'MQTT Yayınla',
+	ESP32_MQTT_PUBLISH_TOPIC: 'Konu',
+	ESP32_MQTT_PUBLISH_MESSAGE: 'Mesaj',
+	ESP32_MQTT_PUBLISH_TOOLTIP: 'Bir MQTT konusuna mesaj yayınla',
+	ESP32_MQTT_SUBSCRIBE: 'MQTT Abone Ol',
+	ESP32_MQTT_SUBSCRIBE_TOPIC: 'Konu',
+	ESP32_MQTT_SUBSCRIBE_TOOLTIP: 'Mesaj almak için bir MQTT konusuna abone ol',
+	ESP32_MQTT_LOOP: 'MQTT Döngü',
+	ESP32_MQTT_LOOP_TOOLTIP: 'Gelen MQTT mesajlarını işle (ana döngüde çağır)',
+	ESP32_MQTT_GET_TOPIC: 'MQTT Konu Al',
+	ESP32_MQTT_GET_TOPIC_TOOLTIP: 'En son alınan MQTT mesajının konusunu al',
+	ESP32_MQTT_GET_MESSAGE: 'MQTT Mesaj Al',
+	ESP32_MQTT_GET_MESSAGE_TOOLTIP: 'En son alınan MQTT mesajının içeriğini al',
+	ESP32_MQTT_STATUS: 'MQTT Bağlı',
+	ESP32_MQTT_STATUS_TOOLTIP: 'MQTT sunucusuna bağlı olup olmadığını kontrol et',
+
+	// Text to Number
+	TEXT_TO_NUMBER: 'Metin sayıya',
+	TEXT_TO_NUMBER_INT: 'tam sayı',
+	TEXT_TO_NUMBER_FLOAT: 'ondalık',
+	TEXT_TO_NUMBER_TOOLTIP: 'Metni sayıya dönüştür (tam sayı veya ondalık)',
+
+	// To String Block
+	TO_STRING: 'Metne Dönüştür',
+	TO_STRING_TOOLTIP: 'Sayı veya boolean değeri metne dönüştür',
+
+	// ESP32 Only Block Warning
+	ESP32_ONLY_BLOCK_WARNING: 'Bu blok sadece ESP32 kartlarını destekler',
 });
