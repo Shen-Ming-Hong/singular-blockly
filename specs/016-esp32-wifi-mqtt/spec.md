@@ -51,8 +51,8 @@
 
 1. **Given** 使用者選擇 ESP32 板子, **When** 開啟工具箱, **Then** 可看到「通訊」類別包含 WiFi 相關積木
 2. **Given** 使用者選擇 Arduino Uno 板子, **When** 開啟工具箱, **Then** 「通訊」類別中的 WiFi 積木不顯示或顯示為不支援
-3. **Given** 使用者放置 `wifi_connect` 積木並填入 SSID 和密碼, **When** 生成代碼, **Then** 包含 `#include <WiFi.h>` 和正確的 `WiFi.begin()` 呼叫
-4. **Given** 使用者放置 `wifi_scan` 積木, **When** 生成代碼, **Then** 包含掃描邏輯並可取得網路數量
+3. **Given** 使用者放置 `esp32_wifi_connect` 積木並填入 SSID 和密碼, **When** 生成代碼, **Then** 包含 `#include <WiFi.h>` 和正確的 `WiFi.begin()` 呼叫
+4. **Given** 使用者放置 `esp32_wifi_scan` 積木, **When** 生成代碼, **Then** 包含掃描邏輯並可取得網路數量
 
 ---
 
@@ -66,9 +66,9 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 使用者放置 `mqtt_setup` 積木並設定伺服器位址, **When** 生成代碼, **Then** 包含 `#include <PubSubClient.h>` 和正確的初始化
-2. **Given** 使用者放置 `mqtt_publish` 積木, **When** 生成代碼, **Then** 包含正確的 `mqttClient.publish()` 呼叫
-3. **Given** 使用者放置 `mqtt_subscribe` 積木訂閱主題, **When** 生成代碼, **Then** 包含 `mqttClient.subscribe()` 和回調處理邏輯
+1. **Given** 使用者放置 `esp32_mqtt_setup` 積木並設定伺服器位址, **When** 生成代碼, **Then** 包含 `#include <PubSubClient.h>` 和正確的初始化
+2. **Given** 使用者放置 `esp32_mqtt_publish` 積木, **When** 生成代碼, **Then** 包含正確的 `mqttClient.publish()` 呼叫
+3. **Given** 使用者放置 `esp32_mqtt_subscribe` 積木訂閱主題, **When** 生成代碼, **Then** 包含 `mqttClient.subscribe()` 和回調處理邏輯
 4. **Given** 使用者使用 MQTT 積木, **When** 編譯專案, **Then** PlatformIO 自動安裝 `knolleary/PubSubClient` 依賴
 
 ---
@@ -129,7 +129,7 @@
 **MQTT 積木（New Feature - ESP32 Only）**
 
 -   **FR-014**: 系統 MUST 提供 `esp32_mqtt_setup` 積木，設定 broker 位址、端口、Client ID
--   **FR-015**: 系統 MUST 提供 `esp32_mqtt_connect` 積木，可選填用戶名和密碼
+-   **FR-015**: 系統 MUST 提供 `esp32_mqtt_connect` 積木，可選填用戶名和密碼（連線時使用 `esp32_mqtt_setup` 中設定的 CLIENT_ID）
 -   **FR-016**: 系統 MUST 提供 `esp32_mqtt_publish` 積木，接受主題和訊息輸入
 -   **FR-017**: 系統 MUST 提供 `esp32_mqtt_subscribe` 積木，接受主題輸入
 -   **FR-018**: 系統 MUST 提供 `esp32_mqtt_loop` 積木，用於 loop 函數中維持連線和處理訊息（不含自動重連，tooltip 說明手動重連方式）

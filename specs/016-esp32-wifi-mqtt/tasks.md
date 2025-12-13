@@ -43,7 +43,7 @@
 -   [ ] T005 [P] 建立代碼生成器檔案 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（空白結構）
 -   [ ] T006 [P] 建立工具箱類別檔案 `media/toolbox/categories/communication.json`（基本結構）
 -   [ ] T007 在 `media/toolbox/index.json` 中引入 `communication.json` 類別
--   [ ] T008 確認 `media/html/blocklyEdit.html` 載入新積木檔案（若需手動加入）
+-   [ ] T008 確認新積木檔案已被 `discoverArduinoModules()` 自動發現（無需手動修改 blocklyEdit.html）
 
 **Checkpoint**: 基礎檔案結構就緒，可開始各使用者故事實作
 
@@ -132,14 +132,14 @@
 ### Implementation for User Story 4
 
 -   [ ] T044 [P] [US4] 實作 `esp32_mqtt_setup` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
--   [ ] T045 [P] [US4] 實作 `esp32_mqtt_connect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
+-   [ ] T045 [P] [US4] 實作 `esp32_mqtt_connect` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`（依賴 T044 mqtt_setup 提供 CLIENT_ID）
 -   [ ] T046 [P] [US4] 實作 `esp32_mqtt_publish` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
 -   [ ] T047 [P] [US4] 實作 `esp32_mqtt_subscribe` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
 -   [ ] T048 [P] [US4] 實作 `esp32_mqtt_loop` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
 -   [ ] T049 [P] [US4] 實作 `esp32_mqtt_get_topic` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
 -   [ ] T050 [P] [US4] 實作 `esp32_mqtt_get_message` 積木定義於 `media/blockly/blocks/esp32-wifi-mqtt.js`
 -   [ ] T051 [US4] 實作 `esp32_mqtt_setup` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（含全域變數與 callback）
--   [ ] T052 [US4] 實作 `esp32_mqtt_connect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（支援可選帳密）
+-   [ ] T052 [US4] 實作 `esp32_mqtt_connect` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`（支援可選帳密，使用 mqtt_setup 的 CLIENT_ID）
 -   [ ] T053 [US4] 實作 `esp32_mqtt_publish` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
 -   [ ] T054 [US4] 實作 `esp32_mqtt_subscribe` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
 -   [ ] T055 [US4] 實作 `esp32_mqtt_loop` 生成器於 `media/blockly/generators/arduino/esp32-wifi-mqtt.js`
@@ -164,7 +164,7 @@
 
 ### Implementation for User Story 5
 
--   [ ] T064 [US5] 實作 `text_to_number` 積木定義於 `media/blockly/generators/arduino/text.js`（或 `blocks/text.js`）
+-   [ ] T064 [US5] 實作 `text_to_number` 積木定義於 `media/blockly/blocks/text.js`
 -   [ ] T065 [US5] 實作 `text_to_number` 生成器於 `media/blockly/generators/arduino/text.js`
 -   [ ] T066 [US5] 處理整數選項生成 `(text).toInt()` 代碼
 -   [ ] T067 [US5] 處理浮點數選項生成 `(text).toFloat()` 代碼
