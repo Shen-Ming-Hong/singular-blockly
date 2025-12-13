@@ -848,7 +848,254 @@ const BLOCK_DEFINITIONS = [
 		relatedBlocks: ['pixetto_init'],
 	},
 
-	// === 迴圈控制積木 ===
+	// === Blockly 內建邏輯積木 ===
+	{
+		type: 'controls_if',
+		category: 'logic',
+		names: { 'zh-hant': '如果', en: 'If' },
+		descriptions: {
+			'zh-hant': '如果條件為真，則執行內部的程式碼',
+			en: 'If condition is true, execute the statements inside',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'IF0', type: 'value', label: { 'zh-hant': '如果', en: 'if' }, check: 'Boolean' },
+			{ name: 'DO0', type: 'statement', label: { 'zh-hant': '執行', en: 'do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['if', 'condition', 'logic', '如果', '條件', '邏輯'],
+	},
+	{
+		type: 'logic_compare',
+		category: 'logic',
+		names: { 'zh-hant': '比較', en: 'Compare' },
+		descriptions: {
+			'zh-hant': '比較兩個值的大小或相等性',
+			en: 'Compare two values for equality or size',
+		},
+		fields: [
+			{
+				name: 'OP',
+				type: 'dropdown',
+				label: { 'zh-hant': '運算子', en: 'Operator' },
+				options: [
+					{ value: 'EQ', label: { 'zh-hant': '=', en: '=' } },
+					{ value: 'NEQ', label: { 'zh-hant': '≠', en: '≠' } },
+					{ value: 'LT', label: { 'zh-hant': '<', en: '<' } },
+					{ value: 'LTE', label: { 'zh-hant': '≤', en: '≤' } },
+					{ value: 'GT', label: { 'zh-hant': '>', en: '>' } },
+					{ value: 'GTE', label: { 'zh-hant': '≥', en: '≥' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'A', type: 'value', label: { 'zh-hant': 'A', en: 'A' } },
+			{ name: 'B', type: 'value', label: { 'zh-hant': 'B', en: 'B' } },
+		],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['compare', 'logic', 'equal', 'greater', 'less', '比較', '邏輯', '相等', '大於', '小於'],
+	},
+	{
+		type: 'logic_operation',
+		category: 'logic',
+		names: { 'zh-hant': '邏輯運算', en: 'Logic Operation' },
+		descriptions: {
+			'zh-hant': '執行 AND 或 OR 邏輯運算',
+			en: 'Perform AND or OR logic operation',
+		},
+		fields: [
+			{
+				name: 'OP',
+				type: 'dropdown',
+				label: { 'zh-hant': '運算子', en: 'Operator' },
+				options: [
+					{ value: 'AND', label: { 'zh-hant': '且', en: 'and' } },
+					{ value: 'OR', label: { 'zh-hant': '或', en: 'or' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'A', type: 'value', label: { 'zh-hant': 'A', en: 'A' }, check: 'Boolean' },
+			{ name: 'B', type: 'value', label: { 'zh-hant': 'B', en: 'B' }, check: 'Boolean' },
+		],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['logic', 'and', 'or', 'operation', '邏輯', '且', '或', '運算'],
+	},
+	{
+		type: 'logic_negate',
+		category: 'logic',
+		names: { 'zh-hant': '非', en: 'Not' },
+		descriptions: {
+			'zh-hant': '將布林值反轉（真變假，假變真）',
+			en: 'Invert a boolean value (true becomes false, false becomes true)',
+		},
+		fields: [],
+		inputs: [{ name: 'BOOL', type: 'value', label: { 'zh-hant': '非', en: 'not' }, check: 'Boolean' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['logic', 'not', 'negate', '邏輯', '非', '反轉'],
+	},
+	{
+		type: 'logic_boolean',
+		category: 'logic',
+		names: { 'zh-hant': '布林值', en: 'Boolean' },
+		descriptions: {
+			'zh-hant': '布林常數：真或假',
+			en: 'Boolean constant: true or false',
+		},
+		fields: [
+			{
+				name: 'BOOL',
+				type: 'dropdown',
+				label: { 'zh-hant': '值', en: 'Value' },
+				options: [
+					{ value: 'TRUE', label: { 'zh-hant': '真', en: 'true' } },
+					{ value: 'FALSE', label: { 'zh-hant': '假', en: 'false' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['logic', 'boolean', 'true', 'false', '邏輯', '布林', '真', '假'],
+	},
+	{
+		type: 'logic_null',
+		category: 'logic',
+		names: { 'zh-hant': '空值', en: 'Null' },
+		descriptions: {
+			'zh-hant': '空值常數',
+			en: 'Null constant',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: null },
+		boards: SUPPORTED_BOARDS,
+		tags: ['logic', 'null', 'empty', '邏輯', '空值', '空'],
+	},
+	{
+		type: 'logic_ternary',
+		category: 'logic',
+		names: { 'zh-hant': '三元運算', en: 'Ternary' },
+		descriptions: {
+			'zh-hant': '根據條件回傳不同的值',
+			en: 'Return different values based on condition',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'IF', type: 'value', label: { 'zh-hant': '如果', en: 'if' }, check: 'Boolean' },
+			{ name: 'THEN', type: 'value', label: { 'zh-hant': '則', en: 'then' } },
+			{ name: 'ELSE', type: 'value', label: { 'zh-hant': '否則', en: 'else' } },
+		],
+		output: { type: null },
+		boards: SUPPORTED_BOARDS,
+		tags: ['logic', 'ternary', 'condition', '邏輯', '三元', '條件'],
+	},
+
+	// === Blockly 內建迴圈積木 ===
+	{
+		type: 'controls_repeat_ext',
+		category: 'loops',
+		names: { 'zh-hant': '重複次數', en: 'Repeat' },
+		descriptions: {
+			'zh-hant': '重複執行指定次數的程式碼',
+			en: 'Repeat statements a specified number of times',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'TIMES', type: 'value', label: { 'zh-hant': '次數', en: 'times' }, check: 'Number' },
+			{ name: 'DO', type: 'statement', label: { 'zh-hant': '執行', en: 'do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'repeat', 'times', '迴圈', '重複', '次數'],
+	},
+	{
+		type: 'controls_whileUntil',
+		category: 'loops',
+		names: { 'zh-hant': '條件迴圈', en: 'While/Until' },
+		descriptions: {
+			'zh-hant': '當條件為真時重複執行，或重複執行直到條件為真',
+			en: 'Repeat while condition is true, or until condition becomes true',
+		},
+		fields: [
+			{
+				name: 'MODE',
+				type: 'dropdown',
+				label: { 'zh-hant': '模式', en: 'Mode' },
+				options: [
+					{ value: 'WHILE', label: { 'zh-hant': '當...時', en: 'while' } },
+					{ value: 'UNTIL', label: { 'zh-hant': '直到...', en: 'until' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'BOOL', type: 'value', label: { 'zh-hant': '條件', en: 'condition' }, check: 'Boolean' },
+			{ name: 'DO', type: 'statement', label: { 'zh-hant': '執行', en: 'do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'while', 'until', 'condition', '迴圈', '當', '直到', '條件'],
+	},
+	{
+		type: 'controls_for',
+		category: 'loops',
+		names: { 'zh-hant': '計數迴圈', en: 'For' },
+		descriptions: {
+			'zh-hant': '使用變數從起始值到結束值計數，每次增加指定的步進值',
+			en: 'Count from start to end with specified step',
+		},
+		fields: [{ name: 'VAR', type: 'variable', label: { 'zh-hant': '變數', en: 'Variable' } }],
+		inputs: [
+			{ name: 'FROM', type: 'value', label: { 'zh-hant': '從', en: 'from' }, check: 'Number' },
+			{ name: 'TO', type: 'value', label: { 'zh-hant': '到', en: 'to' }, check: 'Number' },
+			{ name: 'BY', type: 'value', label: { 'zh-hant': '間隔', en: 'by' }, check: 'Number' },
+			{ name: 'DO', type: 'statement', label: { 'zh-hant': '執行', en: 'do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'for', 'count', 'variable', '迴圈', '計數', '變數'],
+	},
+	{
+		type: 'controls_forEach',
+		category: 'loops',
+		names: { 'zh-hant': '清單迴圈', en: 'For Each' },
+		descriptions: {
+			'zh-hant': '對清單中的每個項目執行程式碼',
+			en: 'Execute statements for each item in a list',
+		},
+		fields: [{ name: 'VAR', type: 'variable', label: { 'zh-hant': '變數', en: 'Variable' } }],
+		inputs: [
+			{ name: 'LIST', type: 'value', label: { 'zh-hant': '清單', en: 'list' }, check: 'Array' },
+			{ name: 'DO', type: 'statement', label: { 'zh-hant': '執行', en: 'do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'foreach', 'list', 'array', '迴圈', '清單', '陣列'],
+	},
+	{
+		type: 'controls_flow_statements',
+		category: 'loops',
+		names: { 'zh-hant': '流程控制', en: 'Flow Control' },
+		descriptions: {
+			'zh-hant': '中斷或繼續迴圈',
+			en: 'Break or continue loop',
+		},
+		fields: [
+			{
+				name: 'FLOW',
+				type: 'dropdown',
+				label: { 'zh-hant': '動作', en: 'Action' },
+				options: [
+					{ value: 'BREAK', label: { 'zh-hant': '中斷', en: 'break' } },
+					{ value: 'CONTINUE', label: { 'zh-hant': '繼續', en: 'continue' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'break', 'continue', 'flow', '迴圈', '中斷', '繼續'],
+	},
+
+	// === 自訂迴圈控制積木 ===
 	{
 		type: 'controls_duration',
 		category: 'loops',
@@ -1212,6 +1459,256 @@ const BLOCK_DEFINITIONS = [
 		boards: SUPPORTED_BOARDS,
 		tags: ['print', 'serial', 'output', '輸出', '序列埠', '列印'],
 	},
+
+	// === Blockly 內建數學積木 ===
+	{
+		type: 'math_number',
+		category: 'math',
+		names: { 'zh-hant': '數字', en: 'Number' },
+		descriptions: {
+			'zh-hant': '數字常數',
+			en: 'A number constant',
+		},
+		fields: [{ name: 'NUM', type: 'number', label: { 'zh-hant': '數字', en: 'Number' }, default: 0 }],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'number', 'constant', '數學', '數字', '常數'],
+	},
+	{
+		type: 'math_arithmetic',
+		category: 'math',
+		names: { 'zh-hant': '數學運算', en: 'Arithmetic' },
+		descriptions: {
+			'zh-hant': '基本數學運算（加、減、乘、除、乘方）',
+			en: 'Basic math operations (add, subtract, multiply, divide, power)',
+		},
+		fields: [
+			{
+				name: 'OP',
+				type: 'dropdown',
+				label: { 'zh-hant': '運算子', en: 'Operator' },
+				options: [
+					{ value: 'ADD', label: { 'zh-hant': '+', en: '+' } },
+					{ value: 'MINUS', label: { 'zh-hant': '-', en: '-' } },
+					{ value: 'MULTIPLY', label: { 'zh-hant': '×', en: '×' } },
+					{ value: 'DIVIDE', label: { 'zh-hant': '÷', en: '÷' } },
+					{ value: 'POWER', label: { 'zh-hant': '^', en: '^' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'A', type: 'value', label: { 'zh-hant': 'A', en: 'A' }, check: 'Number' },
+			{ name: 'B', type: 'value', label: { 'zh-hant': 'B', en: 'B' }, check: 'Number' },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'arithmetic', 'add', 'subtract', 'multiply', 'divide', '數學', '運算', '加', '減', '乘', '除'],
+	},
+	{
+		type: 'math_single',
+		category: 'math',
+		names: { 'zh-hant': '數學函數', en: 'Math Function' },
+		descriptions: {
+			'zh-hant': '單元數學函數（平方根、絕對值、負數等）',
+			en: 'Unary math functions (square root, absolute, negate, etc.)',
+		},
+		fields: [
+			{
+				name: 'OP',
+				type: 'dropdown',
+				label: { 'zh-hant': '函數', en: 'Function' },
+				options: [
+					{ value: 'ROOT', label: { 'zh-hant': '平方根', en: 'square root' } },
+					{ value: 'ABS', label: { 'zh-hant': '絕對值', en: 'absolute' } },
+					{ value: 'NEG', label: { 'zh-hant': '負數', en: 'negate' } },
+					{ value: 'LN', label: { 'zh-hant': 'ln', en: 'ln' } },
+					{ value: 'LOG10', label: { 'zh-hant': 'log10', en: 'log10' } },
+					{ value: 'EXP', label: { 'zh-hant': 'e^', en: 'e^' } },
+					{ value: 'POW10', label: { 'zh-hant': '10^', en: '10^' } },
+				],
+			},
+		],
+		inputs: [{ name: 'NUM', type: 'value', label: { 'zh-hant': '數字', en: 'number' }, check: 'Number' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'function', 'sqrt', 'abs', '數學', '函數', '平方根', '絕對值'],
+	},
+	{
+		type: 'math_trig',
+		category: 'math',
+		names: { 'zh-hant': '三角函數', en: 'Trigonometry' },
+		descriptions: {
+			'zh-hant': '三角函數（sin、cos、tan 及其反函數）',
+			en: 'Trigonometric functions (sin, cos, tan and inverses)',
+		},
+		fields: [
+			{
+				name: 'OP',
+				type: 'dropdown',
+				label: { 'zh-hant': '函數', en: 'Function' },
+				options: [
+					{ value: 'SIN', label: { 'zh-hant': 'sin', en: 'sin' } },
+					{ value: 'COS', label: { 'zh-hant': 'cos', en: 'cos' } },
+					{ value: 'TAN', label: { 'zh-hant': 'tan', en: 'tan' } },
+					{ value: 'ASIN', label: { 'zh-hant': 'asin', en: 'asin' } },
+					{ value: 'ACOS', label: { 'zh-hant': 'acos', en: 'acos' } },
+					{ value: 'ATAN', label: { 'zh-hant': 'atan', en: 'atan' } },
+				],
+			},
+		],
+		inputs: [{ name: 'NUM', type: 'value', label: { 'zh-hant': '角度', en: 'angle' }, check: 'Number' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'trig', 'sin', 'cos', 'tan', '數學', '三角', '正弦', '餘弦'],
+	},
+	{
+		type: 'math_constant',
+		category: 'math',
+		names: { 'zh-hant': '數學常數', en: 'Math Constant' },
+		descriptions: {
+			'zh-hant': '數學常數（π、e、φ 等）',
+			en: 'Math constants (π, e, φ, etc.)',
+		},
+		fields: [
+			{
+				name: 'CONSTANT',
+				type: 'dropdown',
+				label: { 'zh-hant': '常數', en: 'Constant' },
+				options: [
+					{ value: 'PI', label: { 'zh-hant': 'π', en: 'π' } },
+					{ value: 'E', label: { 'zh-hant': 'e', en: 'e' } },
+					{ value: 'GOLDEN_RATIO', label: { 'zh-hant': 'φ', en: 'φ' } },
+					{ value: 'SQRT2', label: { 'zh-hant': '√2', en: '√2' } },
+					{ value: 'SQRT1_2', label: { 'zh-hant': '√½', en: '√½' } },
+					{ value: 'INFINITY', label: { 'zh-hant': '∞', en: '∞' } },
+				],
+			},
+		],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'constant', 'pi', '數學', '常數', '圓周率'],
+	},
+	{
+		type: 'math_number_property',
+		category: 'math',
+		names: { 'zh-hant': '數字屬性', en: 'Number Property' },
+		descriptions: {
+			'zh-hant': '檢查數字的屬性（偶數、奇數、質數等）',
+			en: 'Check number property (even, odd, prime, etc.)',
+		},
+		fields: [
+			{
+				name: 'PROPERTY',
+				type: 'dropdown',
+				label: { 'zh-hant': '屬性', en: 'Property' },
+				options: [
+					{ value: 'EVEN', label: { 'zh-hant': '偶數', en: 'even' } },
+					{ value: 'ODD', label: { 'zh-hant': '奇數', en: 'odd' } },
+					{ value: 'PRIME', label: { 'zh-hant': '質數', en: 'prime' } },
+					{ value: 'WHOLE', label: { 'zh-hant': '整數', en: 'whole' } },
+					{ value: 'POSITIVE', label: { 'zh-hant': '正數', en: 'positive' } },
+					{ value: 'NEGATIVE', label: { 'zh-hant': '負數', en: 'negative' } },
+				],
+			},
+		],
+		inputs: [{ name: 'NUMBER_TO_CHECK', type: 'value', label: { 'zh-hant': '數字', en: 'number' }, check: 'Number' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'property', 'even', 'odd', 'prime', '數學', '屬性', '偶數', '奇數', '質數'],
+	},
+	{
+		type: 'math_round',
+		category: 'math',
+		names: { 'zh-hant': '取整', en: 'Round' },
+		descriptions: {
+			'zh-hant': '取整數（四捨五入、無條件捨去、無條件進位）',
+			en: 'Round number (round, floor, ceiling)',
+		},
+		fields: [
+			{
+				name: 'OP',
+				type: 'dropdown',
+				label: { 'zh-hant': '方式', en: 'Mode' },
+				options: [
+					{ value: 'ROUND', label: { 'zh-hant': '四捨五入', en: 'round' } },
+					{ value: 'ROUNDUP', label: { 'zh-hant': '無條件進位', en: 'round up' } },
+					{ value: 'ROUNDDOWN', label: { 'zh-hant': '無條件捨去', en: 'round down' } },
+				],
+			},
+		],
+		inputs: [{ name: 'NUM', type: 'value', label: { 'zh-hant': '數字', en: 'number' }, check: 'Number' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'round', 'floor', 'ceiling', '數學', '取整', '四捨五入'],
+	},
+	{
+		type: 'math_modulo',
+		category: 'math',
+		names: { 'zh-hant': '餘數', en: 'Modulo' },
+		descriptions: {
+			'zh-hant': '計算兩數相除的餘數',
+			en: 'Calculate remainder of division',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'DIVIDEND', type: 'value', label: { 'zh-hant': '被除數', en: 'dividend' }, check: 'Number' },
+			{ name: 'DIVISOR', type: 'value', label: { 'zh-hant': '除數', en: 'divisor' }, check: 'Number' },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'modulo', 'remainder', '數學', '餘數', '取餘'],
+	},
+	{
+		type: 'math_constrain',
+		category: 'math',
+		names: { 'zh-hant': '限制範圍', en: 'Constrain' },
+		descriptions: {
+			'zh-hant': '將數字限制在指定的最小值和最大值之間',
+			en: 'Constrain a number to be between specified min and max values',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'VALUE', type: 'value', label: { 'zh-hant': '數值', en: 'value' }, check: 'Number' },
+			{ name: 'LOW', type: 'value', label: { 'zh-hant': '最小值', en: 'min' }, check: 'Number' },
+			{ name: 'HIGH', type: 'value', label: { 'zh-hant': '最大值', en: 'max' }, check: 'Number' },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'constrain', 'limit', 'clamp', '數學', '限制', '範圍'],
+	},
+	{
+		type: 'math_random_int',
+		category: 'math',
+		names: { 'zh-hant': '隨機整數', en: 'Random Integer' },
+		descriptions: {
+			'zh-hant': '產生指定範圍內的隨機整數',
+			en: 'Generate a random integer within specified range',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'FROM', type: 'value', label: { 'zh-hant': '從', en: 'from' }, check: 'Number' },
+			{ name: 'TO', type: 'value', label: { 'zh-hant': '到', en: 'to' }, check: 'Number' },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'random', 'integer', '數學', '隨機', '整數'],
+	},
+	{
+		type: 'math_random_float',
+		category: 'math',
+		names: { 'zh-hant': '隨機小數', en: 'Random Fraction' },
+		descriptions: {
+			'zh-hant': '產生 0 到 1 之間的隨機小數',
+			en: 'Generate a random fraction between 0 and 1',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['math', 'random', 'float', 'fraction', '數學', '隨機', '小數'],
+	},
 	{
 		type: 'math_map',
 		category: 'math',
@@ -1545,6 +2042,321 @@ const BLOCK_DEFINITIONS = [
 		boards: ['esp32', 'esp32_supermini'],
 		tags: ['mqtt', 'status', 'connected', 'esp32', '狀態', '連線'],
 		relatedBlocks: ['esp32_mqtt_connect'],
+	},
+
+	// === Blockly 內建文字積木 ===
+	{
+		type: 'text',
+		category: 'text',
+		names: { 'zh-hant': '文字', en: 'Text' },
+		descriptions: {
+			'zh-hant': '文字常數',
+			en: 'A text constant',
+		},
+		fields: [{ name: 'TEXT', type: 'text', label: { 'zh-hant': '文字', en: 'Text' }, default: '' }],
+		inputs: [],
+		output: { type: 'String' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'string', 'constant', '文字', '字串', '常數'],
+	},
+	{
+		type: 'text_length',
+		category: 'text',
+		names: { 'zh-hant': '文字長度', en: 'Text Length' },
+		descriptions: {
+			'zh-hant': '取得文字的長度（字元數）',
+			en: 'Get the length of text (number of characters)',
+		},
+		fields: [],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '文字', en: 'text' }, check: 'String' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'length', 'count', '文字', '長度', '計數'],
+	},
+	{
+		type: 'text_isEmpty',
+		category: 'text',
+		names: { 'zh-hant': '文字是否為空', en: 'Text Is Empty' },
+		descriptions: {
+			'zh-hant': '檢查文字是否為空',
+			en: 'Check if text is empty',
+		},
+		fields: [],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '文字', en: 'text' }, check: 'String' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'empty', 'check', '文字', '空', '檢查'],
+	},
+	{
+		type: 'text_indexOf',
+		category: 'text',
+		names: { 'zh-hant': '尋找文字', en: 'Find Text' },
+		descriptions: {
+			'zh-hant': '在文字中尋找子字串的位置',
+			en: 'Find the position of substring in text',
+		},
+		fields: [
+			{
+				name: 'END',
+				type: 'dropdown',
+				label: { 'zh-hant': '方向', en: 'Direction' },
+				options: [
+					{ value: 'FIRST', label: { 'zh-hant': '第一個', en: 'first' } },
+					{ value: 'LAST', label: { 'zh-hant': '最後一個', en: 'last' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'VALUE', type: 'value', label: { 'zh-hant': '文字', en: 'text' }, check: 'String' },
+			{ name: 'FIND', type: 'value', label: { 'zh-hant': '尋找', en: 'find' }, check: 'String' },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'find', 'index', 'search', '文字', '尋找', '索引', '搜尋'],
+	},
+	{
+		type: 'text_charAt',
+		category: 'text',
+		names: { 'zh-hant': '取得字元', en: 'Get Character' },
+		descriptions: {
+			'zh-hant': '取得文字中指定位置的字元',
+			en: 'Get character at specified position in text',
+		},
+		fields: [
+			{
+				name: 'WHERE',
+				type: 'dropdown',
+				label: { 'zh-hant': '位置', en: 'Position' },
+				options: [
+					{ value: 'FROM_START', label: { 'zh-hant': '第', en: '#' } },
+					{ value: 'FROM_END', label: { 'zh-hant': '倒數第', en: '# from end' } },
+					{ value: 'FIRST', label: { 'zh-hant': '第一個', en: 'first' } },
+					{ value: 'LAST', label: { 'zh-hant': '最後一個', en: 'last' } },
+					{ value: 'RANDOM', label: { 'zh-hant': '隨機', en: 'random' } },
+				],
+			},
+		],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '文字', en: 'text' }, check: 'String' }],
+		output: { type: 'String' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'character', 'letter', '文字', '字元', '字母'],
+	},
+	{
+		type: 'text_getSubstring',
+		category: 'text',
+		names: { 'zh-hant': '取得子字串', en: 'Get Substring' },
+		descriptions: {
+			'zh-hant': '取得文字的一部分',
+			en: 'Get a portion of the text',
+		},
+		fields: [],
+		inputs: [{ name: 'STRING', type: 'value', label: { 'zh-hant': '文字', en: 'text' }, check: 'String' }],
+		output: { type: 'String' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'substring', 'slice', '文字', '子字串', '切片'],
+	},
+	{
+		type: 'text_changeCase',
+		category: 'text',
+		names: { 'zh-hant': '改變大小寫', en: 'Change Case' },
+		descriptions: {
+			'zh-hant': '將文字轉換為大寫、小寫或標題格式',
+			en: 'Convert text to uppercase, lowercase, or title case',
+		},
+		fields: [
+			{
+				name: 'CASE',
+				type: 'dropdown',
+				label: { 'zh-hant': '格式', en: 'Case' },
+				options: [
+					{ value: 'UPPERCASE', label: { 'zh-hant': '大寫', en: 'UPPERCASE' } },
+					{ value: 'LOWERCASE', label: { 'zh-hant': '小寫', en: 'lowercase' } },
+					{ value: 'TITLECASE', label: { 'zh-hant': '標題格式', en: 'Title Case' } },
+				],
+			},
+		],
+		inputs: [{ name: 'TEXT', type: 'value', label: { 'zh-hant': '文字', en: 'text' }, check: 'String' }],
+		output: { type: 'String' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'case', 'uppercase', 'lowercase', '文字', '大小寫', '大寫', '小寫'],
+	},
+	{
+		type: 'text_trim',
+		category: 'text',
+		names: { 'zh-hant': '移除空白', en: 'Trim' },
+		descriptions: {
+			'zh-hant': '移除文字兩端的空白字元',
+			en: 'Remove whitespace from both ends of text',
+		},
+		fields: [
+			{
+				name: 'MODE',
+				type: 'dropdown',
+				label: { 'zh-hant': '位置', en: 'Mode' },
+				options: [
+					{ value: 'BOTH', label: { 'zh-hant': '兩端', en: 'both sides' } },
+					{ value: 'LEFT', label: { 'zh-hant': '左端', en: 'left side' } },
+					{ value: 'RIGHT', label: { 'zh-hant': '右端', en: 'right side' } },
+				],
+			},
+		],
+		inputs: [{ name: 'TEXT', type: 'value', label: { 'zh-hant': '文字', en: 'text' }, check: 'String' }],
+		output: { type: 'String' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['text', 'trim', 'whitespace', '文字', '移除', '空白'],
+	},
+
+	// === Blockly 內建清單積木 ===
+	{
+		type: 'lists_create_empty',
+		category: 'lists',
+		names: { 'zh-hant': '建立空清單', en: 'Create Empty List' },
+		descriptions: {
+			'zh-hant': '建立一個空的清單',
+			en: 'Create an empty list',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Array' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'empty', 'create', '清單', '陣列', '空', '建立'],
+	},
+	{
+		type: 'lists_create_with',
+		category: 'lists',
+		names: { 'zh-hant': '建立清單', en: 'Create List' },
+		descriptions: {
+			'zh-hant': '使用指定的項目建立清單',
+			en: 'Create a list with specified items',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Array' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'create', '清單', '陣列', '建立'],
+	},
+	{
+		type: 'lists_repeat',
+		category: 'lists',
+		names: { 'zh-hant': '重複項目清單', en: 'Repeat List' },
+		descriptions: {
+			'zh-hant': '建立一個包含重複項目的清單',
+			en: 'Create a list with repeated items',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'ITEM', type: 'value', label: { 'zh-hant': '項目', en: 'item' } },
+			{ name: 'NUM', type: 'value', label: { 'zh-hant': '次數', en: 'times' }, check: 'Number' },
+		],
+		output: { type: 'Array' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'repeat', '清單', '陣列', '重複'],
+	},
+	{
+		type: 'lists_length',
+		category: 'lists',
+		names: { 'zh-hant': '清單長度', en: 'List Length' },
+		descriptions: {
+			'zh-hant': '取得清單中的項目數量',
+			en: 'Get the number of items in a list',
+		},
+		fields: [],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '清單', en: 'list' }, check: 'Array' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'length', 'count', '清單', '陣列', '長度', '計數'],
+	},
+	{
+		type: 'lists_isEmpty',
+		category: 'lists',
+		names: { 'zh-hant': '清單是否為空', en: 'List Is Empty' },
+		descriptions: {
+			'zh-hant': '檢查清單是否為空',
+			en: 'Check if a list is empty',
+		},
+		fields: [],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '清單', en: 'list' }, check: 'Array' }],
+		output: { type: 'Boolean' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'empty', 'check', '清單', '陣列', '空', '檢查'],
+	},
+	{
+		type: 'lists_indexOf',
+		category: 'lists',
+		names: { 'zh-hant': '尋找項目', en: 'Find Item' },
+		descriptions: {
+			'zh-hant': '在清單中尋找項目的位置',
+			en: 'Find the position of an item in a list',
+		},
+		fields: [
+			{
+				name: 'END',
+				type: 'dropdown',
+				label: { 'zh-hant': '方向', en: 'Direction' },
+				options: [
+					{ value: 'FIRST', label: { 'zh-hant': '第一個', en: 'first' } },
+					{ value: 'LAST', label: { 'zh-hant': '最後一個', en: 'last' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'VALUE', type: 'value', label: { 'zh-hant': '清單', en: 'list' }, check: 'Array' },
+			{ name: 'FIND', type: 'value', label: { 'zh-hant': '項目', en: 'item' } },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'find', 'index', '清單', '陣列', '尋找', '索引'],
+	},
+	{
+		type: 'lists_getIndex',
+		category: 'lists',
+		names: { 'zh-hant': '取得項目', en: 'Get Item' },
+		descriptions: {
+			'zh-hant': '取得清單中指定位置的項目',
+			en: 'Get an item at specified position in a list',
+		},
+		fields: [
+			{
+				name: 'MODE',
+				type: 'dropdown',
+				label: { 'zh-hant': '模式', en: 'Mode' },
+				options: [
+					{ value: 'GET', label: { 'zh-hant': '取得', en: 'get' } },
+					{ value: 'GET_REMOVE', label: { 'zh-hant': '取得並移除', en: 'get and remove' } },
+					{ value: 'REMOVE', label: { 'zh-hant': '移除', en: 'remove' } },
+				],
+			},
+		],
+		inputs: [{ name: 'VALUE', type: 'value', label: { 'zh-hant': '清單', en: 'list' }, check: 'Array' }],
+		output: { type: null },
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'get', 'item', '清單', '陣列', '取得', '項目'],
+	},
+	{
+		type: 'lists_setIndex',
+		category: 'lists',
+		names: { 'zh-hant': '設定項目', en: 'Set Item' },
+		descriptions: {
+			'zh-hant': '設定清單中指定位置的項目',
+			en: 'Set an item at specified position in a list',
+		},
+		fields: [
+			{
+				name: 'MODE',
+				type: 'dropdown',
+				label: { 'zh-hant': '模式', en: 'Mode' },
+				options: [
+					{ value: 'SET', label: { 'zh-hant': '設定', en: 'set' } },
+					{ value: 'INSERT', label: { 'zh-hant': '插入', en: 'insert' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'LIST', type: 'value', label: { 'zh-hant': '清單', en: 'list' }, check: 'Array' },
+			{ name: 'TO', type: 'value', label: { 'zh-hant': '為', en: 'to' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['list', 'array', 'set', 'insert', '清單', '陣列', '設定', '插入'],
 	},
 
 	// === 文字轉換積木 ===
