@@ -307,6 +307,29 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 -   Interactive learning functions
 -   Position and ID information
 
+### 📡 ESP32 WiFi/MQTT Communication (v0.47.0+)
+
+**WiFi Connectivity (ESP32/Super Mini only)**
+
+-   Connect/Disconnect with 10-second timeout protection
+-   Network scanning with SSID and signal strength
+-   Connection status monitoring
+-   IP address retrieval
+
+**MQTT IoT Communication**
+
+-   Broker setup (server, port, client ID)
+-   Publish/Subscribe messaging
+-   Message callback handling
+-   Auto-include PubSubClient library dependency
+
+**Utility Blocks**
+
+-   `to_string` - Convert numbers/booleans to strings
+-   `text_to_number` - Convert strings to integers/floats
+
+> 💡 WiFi/MQTT blocks appear only when ESP32 boards are selected. Non-ESP32 boards show a warning.
+
 ### 🧮 Programming Constructs
 
 **Functions**
