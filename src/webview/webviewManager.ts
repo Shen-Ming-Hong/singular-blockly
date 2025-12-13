@@ -280,6 +280,12 @@ export class WebViewManager {
 			// HUSKYLENS 智慧鏡頭積木定義
 			const huskyLensBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/huskylens.js'));
 			const huskyLensBlocksUri = webview.asWebviewUri(huskyLensBlocksPath);
+
+			// ESP32 WiFi/MQTT 積木定義
+			const esp32WifiMqttBlocksPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/blockly/blocks/esp32-wifi-mqtt.js')
+			);
+			const esp32WifiMqttBlocksUri = webview.asWebviewUri(esp32WifiMqttBlocksPath);
 			// Arduino 生成器模組（動態發現）
 			const discoveredModules = await this.discoverArduinoModules();
 			const arduinoModules = discoveredModules
@@ -361,6 +367,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{loopsBlocksUri}', loopsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{pixettoBlocksUri}', pixettoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
+			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 

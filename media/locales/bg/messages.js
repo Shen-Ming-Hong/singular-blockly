@@ -557,4 +557,68 @@ window.languageManager.loadMessages('bg', {
 	BUTTON_SUPPRESS: 'Не напомняй',
 	SAFETY_GUARD_CANCELLED: 'Отворянето на редактора Blockly е отменено',
 	SAFETY_GUARD_SUPPRESSED: 'Предпочитанието е запазено, това предупреждение няма да се показва отново',
+
+	// Communication Category
+	CATEGORY_COMMUNICATION: 'Комуникация',
+
+	// ESP32 WiFi
+	ESP32_WIFI_LABEL: 'WiFi',
+	ESP32_WIFI_CONNECT: 'Свържи WiFi',
+	ESP32_WIFI_CONNECT_SSID: 'SSID',
+	ESP32_WIFI_CONNECT_PASSWORD: 'Парола',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Свържете ESP32 към WiFi мрежа с посочения SSID и парола',
+	ESP32_WIFI_DISCONNECT: 'Прекъсни WiFi',
+	ESP32_WIFI_DISCONNECT_TOOLTIP: 'Прекъснете WiFi връзката на ESP32',
+	ESP32_WIFI_STATUS: 'Статус на WiFi',
+	ESP32_WIFI_STATUS_TOOLTIP: 'Проверете дали ESP32 е свързан към WiFi мрежа',
+	ESP32_WIFI_GET_IP: 'Вземи WiFi IP адрес',
+	ESP32_WIFI_GET_IP_TOOLTIP: 'Вземете локалния IP адрес на ESP32 като текст',
+	ESP32_WIFI_SCAN: 'Сканирай WiFi мрежи',
+	ESP32_WIFI_SCAN_TOOLTIP: 'Сканирайте за налични WiFi мрежи и върнете броя намерени',
+	ESP32_WIFI_GET_SSID: 'Вземи SSID на мрежа',
+	ESP32_WIFI_GET_SSID_INDEX: 'индекс',
+	ESP32_WIFI_GET_SSID_TOOLTIP: 'Вземете SSID името на WiFi мрежата по даден индекс',
+	ESP32_WIFI_GET_RSSI: 'Вземи RSSI на мрежа',
+	ESP32_WIFI_GET_RSSI_INDEX: 'индекс',
+	ESP32_WIFI_GET_RSSI_TOOLTIP: 'Вземете силата на сигнала (RSSI) на WiFi мрежата по даден индекс',
+
+	// ESP32 MQTT
+	ESP32_MQTT_LABEL: 'MQTT',
+	ESP32_MQTT_SETUP: 'Настройка на MQTT',
+	ESP32_MQTT_SETUP_SERVER: 'Сървър',
+	ESP32_MQTT_SETUP_PORT: 'Порт',
+	ESP32_MQTT_SETUP_CLIENT_ID: 'ID на клиент',
+	ESP32_MQTT_SETUP_TOOLTIP: 'Конфигурирайте MQTT клиент с адрес на сървър, порт и идентификатор на клиент',
+	ESP32_MQTT_CONNECT: 'Свържи MQTT',
+	ESP32_MQTT_CONNECT_USERNAME: 'Потребител',
+	ESP32_MQTT_CONNECT_PASSWORD: 'Парола',
+	ESP32_MQTT_CONNECT_TOOLTIP: 'Свържете се с MQTT брокер с незадължително потребителско име и парола',
+	ESP32_MQTT_PUBLISH: 'Публикувай MQTT',
+	ESP32_MQTT_PUBLISH_TOPIC: 'Тема',
+	ESP32_MQTT_PUBLISH_MESSAGE: 'Съобщение',
+	ESP32_MQTT_PUBLISH_TOOLTIP: 'Публикувайте съобщение в MQTT тема',
+	ESP32_MQTT_SUBSCRIBE: 'Абонирай MQTT',
+	ESP32_MQTT_SUBSCRIBE_TOPIC: 'Тема',
+	ESP32_MQTT_SUBSCRIBE_TOOLTIP: 'Абонирайте се за MQTT тема за получаване на съобщения',
+	ESP32_MQTT_LOOP: 'MQTT цикъл',
+	ESP32_MQTT_LOOP_TOOLTIP: 'Обработете входящите MQTT съобщения (извикайте в главния цикъл)',
+	ESP32_MQTT_GET_TOPIC: 'Вземи MQTT тема',
+	ESP32_MQTT_GET_TOPIC_TOOLTIP: 'Вземете темата на последно полученото MQTT съобщение',
+	ESP32_MQTT_GET_MESSAGE: 'Вземи MQTT съобщение',
+	ESP32_MQTT_GET_MESSAGE_TOOLTIP: 'Вземете съдържанието на последно полученото MQTT съобщение',
+	ESP32_MQTT_STATUS: 'MQTT Свързан',
+	ESP32_MQTT_STATUS_TOOLTIP: 'Проверете дали е свързан с MQTT сървъра',
+
+	// Text to Number
+	TEXT_TO_NUMBER: 'Текст към число',
+	TEXT_TO_NUMBER_INT: 'цяло',
+	TEXT_TO_NUMBER_FLOAT: 'дробно',
+	TEXT_TO_NUMBER_TOOLTIP: 'Преобразувайте текст в число (цяло или дробно)',
+
+	// To String Block
+	TO_STRING: 'Към текст',
+	TO_STRING_TOOLTIP: 'Преобразувайте число или булева стойност в текст',
+
+	// ESP32 Only Block Warning
+	ESP32_ONLY_BLOCK_WARNING: 'Този блок поддържа само платки ESP32',
 });

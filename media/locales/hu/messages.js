@@ -558,4 +558,68 @@ window.languageManager.loadMessages('hu', {
 	BUTTON_SUPPRESS: 'Ne emlékeztessen többé',
 	SAFETY_GUARD_CANCELLED: 'A Blockly szerkesztő megnyitása megszakítva',
 	SAFETY_GUARD_SUPPRESSED: 'Beállítás mentve, ez a figyelmeztetés nem fog újra megjelenni',
+
+	// Communication Category
+	CATEGORY_COMMUNICATION: 'Kommunikáció',
+
+	// ESP32 WiFi
+	ESP32_WIFI_LABEL: 'WiFi',
+	ESP32_WIFI_CONNECT: 'WiFi csatlakozás',
+	ESP32_WIFI_CONNECT_SSID: 'SSID',
+	ESP32_WIFI_CONNECT_PASSWORD: 'Jelszó',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'ESP32 csatlakoztatása WiFi hálózathoz a megadott SSID-del és jelszóval',
+	ESP32_WIFI_DISCONNECT: 'WiFi leválasztás',
+	ESP32_WIFI_DISCONNECT_TOOLTIP: 'ESP32 leválasztása a WiFi hálózatról',
+	ESP32_WIFI_STATUS: 'WiFi állapot',
+	ESP32_WIFI_STATUS_TOOLTIP: 'Ellenőrizze, hogy az ESP32 csatlakozik-e WiFi hálózathoz',
+	ESP32_WIFI_GET_IP: 'WiFi IP cím lekérése',
+	ESP32_WIFI_GET_IP_TOOLTIP: 'Az ESP32 helyi IP címének lekérése szövegként',
+	ESP32_WIFI_SCAN: 'WiFi hálózatok keresése',
+	ESP32_WIFI_SCAN_TOOLTIP: 'Elérhető WiFi hálózatok keresése és a talált hálózatok számának visszaadása',
+	ESP32_WIFI_GET_SSID: 'Hálózat SSID lekérése',
+	ESP32_WIFI_GET_SSID_INDEX: 'index',
+	ESP32_WIFI_GET_SSID_TOOLTIP: 'A megadott indexű WiFi hálózat SSID nevének lekérése',
+	ESP32_WIFI_GET_RSSI: 'Hálózat RSSI lekérése',
+	ESP32_WIFI_GET_RSSI_INDEX: 'index',
+	ESP32_WIFI_GET_RSSI_TOOLTIP: 'A megadott indexű WiFi hálózat jelerősségének (RSSI) lekérése',
+
+	// ESP32 MQTT
+	ESP32_MQTT_LABEL: 'MQTT',
+	ESP32_MQTT_SETUP: 'MQTT beállítás',
+	ESP32_MQTT_SETUP_SERVER: 'Szerver',
+	ESP32_MQTT_SETUP_PORT: 'Port',
+	ESP32_MQTT_SETUP_CLIENT_ID: 'Kliens ID',
+	ESP32_MQTT_SETUP_TOOLTIP: 'MQTT kliens konfigurálása szervercímmel, porttal és kliens azonosítóval',
+	ESP32_MQTT_CONNECT: 'MQTT csatlakozás',
+	ESP32_MQTT_CONNECT_USERNAME: 'Felhasználónév',
+	ESP32_MQTT_CONNECT_PASSWORD: 'Jelszó',
+	ESP32_MQTT_CONNECT_TOOLTIP: 'Csatlakozás MQTT brókerhez opcionális felhasználónévvel és jelszóval',
+	ESP32_MQTT_PUBLISH: 'MQTT publikálás',
+	ESP32_MQTT_PUBLISH_TOPIC: 'Téma',
+	ESP32_MQTT_PUBLISH_MESSAGE: 'Üzenet',
+	ESP32_MQTT_PUBLISH_TOOLTIP: 'Üzenet publikálása egy MQTT témába',
+	ESP32_MQTT_SUBSCRIBE: 'MQTT feliratkozás',
+	ESP32_MQTT_SUBSCRIBE_TOPIC: 'Téma',
+	ESP32_MQTT_SUBSCRIBE_TOOLTIP: 'Feliratkozás egy MQTT témára üzenetek fogadásához',
+	ESP32_MQTT_LOOP: 'MQTT ciklus',
+	ESP32_MQTT_LOOP_TOOLTIP: 'Bejövő MQTT üzenetek feldolgozása (hívja a fő ciklusban)',
+	ESP32_MQTT_GET_TOPIC: 'MQTT téma lekérése',
+	ESP32_MQTT_GET_TOPIC_TOOLTIP: 'A legutóbb fogadott MQTT üzenet témájának lekérése',
+	ESP32_MQTT_GET_MESSAGE: 'MQTT üzenet lekérése',
+	ESP32_MQTT_GET_MESSAGE_TOOLTIP: 'A legutóbb fogadott MQTT üzenet tartalmának lekérése',
+	ESP32_MQTT_STATUS: 'MQTT Csatlakozva',
+	ESP32_MQTT_STATUS_TOOLTIP: 'Ellenőrizze, hogy csatlakozott-e az MQTT szerverhez',
+
+	// Text to Number
+	TEXT_TO_NUMBER: 'Szöveg számmá',
+	TEXT_TO_NUMBER_INT: 'egész',
+	TEXT_TO_NUMBER_FLOAT: 'tört',
+	TEXT_TO_NUMBER_TOOLTIP: 'Szöveg átalakítása számmá (egész vagy tört)',
+
+	// To String Block
+	TO_STRING: 'Szöveggé',
+	TO_STRING_TOOLTIP: 'Szám vagy logikai érték átalakítása szöveggé',
+
+	// ESP32 Only Block Warning
+	ESP32_ONLY_BLOCK_WARNING: 'Ez a blokk csak ESP32 lapkákat támogat',
 });

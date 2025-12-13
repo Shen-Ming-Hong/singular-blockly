@@ -1082,3 +1082,45 @@ Blockly.Blocks['threshold_function_read'] = {
 		}
 	},
 };
+
+/**
+ * 字串轉數字積木
+ * 將字串轉換為整數或浮點數
+ */
+Blockly.Blocks['text_to_number'] = {
+	init: function () {
+		this.appendValueInput('TEXT').setCheck('String').appendField(window.languageManager.getMessage('TEXT_TO_NUMBER', '字串轉數字'));
+
+		this.appendDummyInput().appendField(
+			new Blockly.FieldDropdown([
+				[window.languageManager.getMessage('TEXT_TO_NUMBER_INT', '整數'), 'INT'],
+				[window.languageManager.getMessage('TEXT_TO_NUMBER_FLOAT', '浮點數'), 'FLOAT'],
+			]),
+			'TYPE'
+		);
+
+		this.setInputsInline(true);
+		this.setOutput(true, 'Number');
+		this.setColour(160); // Text 類別顏色
+		this.setTooltip(window.languageManager.getMessage('TEXT_TO_NUMBER_TOOLTIP', '將字串轉換為數字（無效輸入回傳 0）'));
+		this.setHelpUrl('');
+	},
+};
+
+/**
+ * 轉換為字串積木
+ * 將數字、布林值等轉換為字串
+ */
+Blockly.Blocks['to_string'] = {
+	init: function () {
+		this.appendValueInput('VALUE')
+			.setCheck(['Number', 'Boolean'])
+			.appendField(window.languageManager.getMessage('TO_STRING', '轉為字串'));
+
+		this.setInputsInline(true);
+		this.setOutput(true, 'String');
+		this.setColour(160); // Text 類別顏色
+		this.setTooltip(window.languageManager.getMessage('TO_STRING_TOOLTIP', '將數字或布林值轉換為字串'));
+		this.setHelpUrl('');
+	},
+};

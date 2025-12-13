@@ -554,4 +554,68 @@ window.languageManager.loadMessages('cs', {
 	BUTTON_SUPPRESS: 'Již nepřipomínat',
 	SAFETY_GUARD_CANCELLED: 'Otevření editoru Blockly bylo zrušeno',
 	SAFETY_GUARD_SUPPRESSED: 'Nastavení uloženo, toto upozornění již nebude zobrazeno',
+
+	// Communication Category
+	CATEGORY_COMMUNICATION: 'Komunikace',
+
+	// ESP32 WiFi
+	ESP32_WIFI_LABEL: 'WiFi',
+	ESP32_WIFI_CONNECT: 'Připojit WiFi',
+	ESP32_WIFI_CONNECT_SSID: 'SSID',
+	ESP32_WIFI_CONNECT_PASSWORD: 'Heslo',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Připojit ESP32 k WiFi síti s uvedeným SSID a heslem',
+	ESP32_WIFI_DISCONNECT: 'Odpojit WiFi',
+	ESP32_WIFI_DISCONNECT_TOOLTIP: 'Odpojit ESP32 od WiFi sítě',
+	ESP32_WIFI_STATUS: 'Stav WiFi',
+	ESP32_WIFI_STATUS_TOOLTIP: 'Zkontrolovat, zda je ESP32 připojeno k WiFi síti',
+	ESP32_WIFI_GET_IP: 'Získat WiFi IP adresu',
+	ESP32_WIFI_GET_IP_TOOLTIP: 'Získat lokální IP adresu ESP32 jako text',
+	ESP32_WIFI_SCAN: 'Vyhledat WiFi sítě',
+	ESP32_WIFI_SCAN_TOOLTIP: 'Vyhledat dostupné WiFi sítě a vrátit počet nalezených',
+	ESP32_WIFI_GET_SSID: 'Získat SSID sítě',
+	ESP32_WIFI_GET_SSID_INDEX: 'index',
+	ESP32_WIFI_GET_SSID_TOOLTIP: 'Získat název SSID WiFi sítě na daném indexu',
+	ESP32_WIFI_GET_RSSI: 'Získat RSSI sítě',
+	ESP32_WIFI_GET_RSSI_INDEX: 'index',
+	ESP32_WIFI_GET_RSSI_TOOLTIP: 'Získat sílu signálu (RSSI) WiFi sítě na daném indexu',
+
+	// ESP32 MQTT
+	ESP32_MQTT_LABEL: 'MQTT',
+	ESP32_MQTT_SETUP: 'Nastavení MQTT',
+	ESP32_MQTT_SETUP_SERVER: 'Server',
+	ESP32_MQTT_SETUP_PORT: 'Port',
+	ESP32_MQTT_SETUP_CLIENT_ID: 'ID klienta',
+	ESP32_MQTT_SETUP_TOOLTIP: 'Nakonfigurovat MQTT klienta s adresou serveru, portem a ID klienta',
+	ESP32_MQTT_CONNECT: 'Připojit MQTT',
+	ESP32_MQTT_CONNECT_USERNAME: 'Uživatel',
+	ESP32_MQTT_CONNECT_PASSWORD: 'Heslo',
+	ESP32_MQTT_CONNECT_TOOLTIP: 'Připojit se k MQTT brokeru s volitelným uživatelským jménem a heslem',
+	ESP32_MQTT_PUBLISH: 'Publikovat MQTT',
+	ESP32_MQTT_PUBLISH_TOPIC: 'Téma',
+	ESP32_MQTT_PUBLISH_MESSAGE: 'Zpráva',
+	ESP32_MQTT_PUBLISH_TOOLTIP: 'Publikovat zprávu do MQTT tématu',
+	ESP32_MQTT_SUBSCRIBE: 'Odebírat MQTT',
+	ESP32_MQTT_SUBSCRIBE_TOPIC: 'Téma',
+	ESP32_MQTT_SUBSCRIBE_TOOLTIP: 'Odebírat MQTT téma pro příjem zpráv',
+	ESP32_MQTT_LOOP: 'MQTT smyčka',
+	ESP32_MQTT_LOOP_TOOLTIP: 'Zpracovat příchozí MQTT zprávy (volat v hlavní smyčce)',
+	ESP32_MQTT_GET_TOPIC: 'Získat MQTT téma',
+	ESP32_MQTT_GET_TOPIC_TOOLTIP: 'Získat téma naposledy přijaté MQTT zprávy',
+	ESP32_MQTT_GET_MESSAGE: 'Získat MQTT zprávu',
+	ESP32_MQTT_GET_MESSAGE_TOOLTIP: 'Získat obsah naposledy přijaté MQTT zprávy',
+	ESP32_MQTT_STATUS: 'MQTT Připojeno',
+	ESP32_MQTT_STATUS_TOOLTIP: 'Zkontrolovat, zda je připojeno k MQTT serveru',
+
+	// Text to Number
+	TEXT_TO_NUMBER: 'Text na číslo',
+	TEXT_TO_NUMBER_INT: 'celé',
+	TEXT_TO_NUMBER_FLOAT: 'desetinné',
+	TEXT_TO_NUMBER_TOOLTIP: 'Převést text na číslo (celé nebo desetinné)',
+
+	// To String Block
+	TO_STRING: 'Na text',
+	TO_STRING_TOOLTIP: 'Převést číslo nebo boolean na text',
+
+	// ESP32 Only Block Warning
+	ESP32_ONLY_BLOCK_WARNING: 'Tento blok podporuje pouze desky ESP32',
 });

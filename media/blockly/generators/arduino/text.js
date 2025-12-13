@@ -11,12 +11,50 @@ window.arduinoGenerator.forBlock['text'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['text_join'] = function (block) {
-	const items = new Array(block.itemCount_);
-	for (let i = 0; i < block.itemCount_; i++) {
-		items[i] = window.arduinoGenerator.valueToCode(block, 'ADD' + i, window.arduinoGenerator.ORDER_NONE) || '""';
+	// 取得項目數量 - 使用 getInput 計數以相容不同 Blockly 版本
+	let itemCount = block.itemCount_;
+	if (typeof itemCount !== 'number') {
+		// 備用方案：計算實際的 ADD 輸入數量
+		itemCount = 0;
+		while (block.getInput('ADD' + itemCount)) {
+			itemCount++;
+		}
 	}
-	const code = 'String(' + items.join(' + ') + ')';
-	return [code, window.arduinoGenerator.ORDER_ATOMIC];
+
+	// 處理零輸入項目情況
+	if (itemCount === 0) {
+		return ['String("")', window.arduinoGenerator.ORDER_ATOMIC];
+	}
+
+	const items = [];
+	for (let i = 0; i < itemCount; i++) {
+		const item = window.arduinoGenerator.valueToCode(block, 'ADD' + i, window.arduinoGenerator.ORDER_NONE);
+		// 只加入有實際值的項目，跳過空輸入
+		if (item && item !== '') {
+			// 將 item 轉為字串以便檢查
+			const itemStr = String(item);
+			// 檢查是否已經是 String() 包裝，避免重複包裝
+			if (itemStr.startsWith('String(')) {
+				items.push(itemStr);
+			} else {
+				items.push(`String(${itemStr})`);
+			}
+		}
+	}
+
+	// 如果所有輸入都為空，返回空字串
+	if (items.length === 0) {
+		return ['String("")', window.arduinoGenerator.ORDER_ATOMIC];
+	}
+
+	// 處理單一輸入項目情況
+	if (items.length === 1) {
+		return [items[0], window.arduinoGenerator.ORDER_ATOMIC];
+	}
+
+	// 多項目使用 + 串接，使用 ORDER_ADDITIVE 優先級
+	const code = items.join(' + ');
+	return [code, window.arduinoGenerator.ORDER_ADDITIVE];
 };
 
 // 重新定義 text_print block
@@ -222,4 +260,29 @@ String serialPrompt(String msg) {
 		return [`serialPrompt(${msg}).toInt()`, window.arduinoGenerator.ORDER_ATOMIC];
 	}
 	return [`serialPrompt(${msg})`, window.arduinoGenerator.ORDER_ATOMIC];
+};
+
+/**
+ * 字串轉數字積木生成器
+ * 根據選擇的類型生成 toInt() 或 toFloat() 代碼
+ */
+window.arduinoGenerator.forBlock['text_to_number'] = function (block) {
+	const text = window.arduinoGenerator.valueToCode(block, 'TEXT', window.arduinoGenerator.ORDER_NONE) || '""';
+	const type = block.getFieldValue('TYPE');
+
+	if (type === 'FLOAT') {
+		return [`String(${text}).toFloat()`, window.arduinoGenerator.ORDER_ATOMIC];
+	}
+	// 預設為整數
+	return [`String(${text}).toInt()`, window.arduinoGenerator.ORDER_ATOMIC];
+};
+
+/**
+ * 轉換為字串積木生成器
+ * 將數字或布林值轉換為字串
+ */
+window.arduinoGenerator.forBlock['to_string'] = function (block) {
+	const value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_NONE) || '0';
+
+	return [`String(${value})`, window.arduinoGenerator.ORDER_ATOMIC];
 };

@@ -10,6 +10,66 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.47.0] - 2025-12-13
+
+### 新增 Added
+
+-   **ESP32 WiFi/MQTT 通訊積木** (ESP32 WiFi/MQTT Communication Blocks)
+
+    -   新增 7 個 WiFi 積木：連線、斷線、狀態檢查、取得 IP、掃描網路、取得 SSID、取得 RSSI
+        Added 7 WiFi blocks: connect, disconnect, status check, get IP, scan networks, get SSID, get RSSI
+    -   新增 7 個 MQTT 積木：設定、連線、發布、訂閱、迴圈處理、取得主題、取得訊息
+        Added 7 MQTT blocks: setup, connect, publish, subscribe, loop, get topic, get message
+    -   自動引入 PubSubClient@^2.8 函式庫依賴
+        Auto-includes PubSubClient@^2.8 library dependency
+    -   支援 ESP32 與 ESP32-C3 (Super Mini) 開發板
+        Supports ESP32 and ESP32-C3 (Super Mini) boards
+    -   非 ESP32 板使用時生成警告註解
+        Generates warning comment when used with non-ESP32 boards
+
+-   **文字轉數字積木** (Text to Number Block)
+
+    -   新增 `text_to_number` 積木，支援整數與浮點數轉換
+        Added `text_to_number` block supporting integer and float conversion
+    -   使用 Arduino String 類別的 `.toInt()` 與 `.toFloat()` 方法
+        Uses Arduino String class `.toInt()` and `.toFloat()` methods
+    -   適用於 MQTT 訊息處理場景
+        Useful for MQTT message processing scenarios
+
+-   **通訊類別** (Communication Category)
+
+    -   新增「通訊」工具箱類別，整合 WiFi 與 MQTT 積木
+        Added "Communication" toolbox category integrating WiFi and MQTT blocks
+    -   包含完整 shadow blocks 設定
+        Includes complete shadow blocks configuration
+
+### 修復 Fixed
+
+-   **積木刪除視角跳轉問題** (Block Delete Viewport Jump Fix)
+
+    -   修復刪除積木時視角自動跳到原點的問題
+        Fixed viewport automatically jumping to origin when deleting blocks
+    -   實作 50ms debounce 機制處理批次刪除
+        Implemented 50ms debounce mechanism for batch deletions
+    -   使用 `workspace.scroll()` 恢復視角座標
+        Uses `workspace.scroll()` to restore viewport coordinates
+
+-   **text_join 型態錯誤** (text_join Type Error Fix)
+
+    -   修復 `text_join` 積木連接數字時生成指標運算的錯誤
+        Fixed `text_join` block generating pointer arithmetic when joining numbers
+    -   所有輸入項目現在都正確包裝為 `String()`
+        All input items are now correctly wrapped in `String()`
+    -   更新 ORDER 優先級為 `ORDER_ADDITION`
+        Updated ORDER priority to `ORDER_ADDITION`
+
+### 維護 Maintenance
+
+-   15 語言完整 i18n 支援（約 50 個新翻譯鍵值）
+    Full 15-language i18n support (~50 new translation keys)
+-   380 個測試全部通過
+    380 tests passing
+
 ## [0.46.1] - 2025-12-12
 
 ### 修復 Fixed

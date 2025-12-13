@@ -1232,6 +1232,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 	let pendingCodeUpdate = false;
 	let codeUpdateDebounceTimer = null;
 
+	// 視角保持狀態：用於在積木刪除時保持視角位置
+	// stableViewport: 持續追蹤「穩定狀態」的視角（沒有拖曳時的位置）
+	// viewportState: 當拖曳開始時鎖定的視角（用於恢復）
+	// viewportLocked: 是否正在鎖定視角（用於攔截 VIEWPORT_CHANGE 事件）
+	// lockedViewport: 鎖定時的視角位置
+	let stableViewport = null;
+	let viewportState = null;
+	let viewportRestoreTimer = null;
+	let stableViewportUpdateTimer = null;
+	let viewportLocked = false;
+	let lockedViewport = null;
+
 	// 延遲執行程式碼更新的函數（避免頻繁更新造成卡頓）
 	const debouncedCodeUpdate = () => {
 		if (codeUpdateDebounceTimer) {
@@ -1255,14 +1267,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}, 150); // 150ms 延遲，平衡響應速度與性能
 	};
 
-	// 單一的工作區變更監聽器
+	// 單一的工作區變更監聯器
 	workspace.addChangeListener(event => {
+		// 視角鎖定機制：在刪除進行中時，立即恢復視角以防止閃爍
+		if (viewportLocked && event.type === Blockly.Events.VIEWPORT_CHANGE) {
+			// 立即將視角拉回鎖定位置
+			if (lockedViewport) {
+				workspace.scroll(lockedViewport.scrollX, lockedViewport.scrollY);
+			}
+			return;
+		}
+
+		// 持續追蹤穩定的視角位置（在沒有拖曳時更新）
+		// 這樣當拖曳開始時，我們有拖曳「之前」的正確視角位置
+		// 使用 workspace.scrollX/scrollY 而非 getMetrics().viewLeft/viewTop
+		// 因為 scroll() 方法使用的是 scrollX/scrollY 的座標系統
+		if (!isDraggingBlock && !viewportRestoreTimer && !viewportLocked) {
+			clearTimeout(stableViewportUpdateTimer);
+			stableViewportUpdateTimer = setTimeout(() => {
+				stableViewport = {
+					scrollX: workspace.scrollX,
+					scrollY: workspace.scrollY,
+					scale: workspace.getScale(),
+				};
+			}, 50); // 50ms 延遲避免過於頻繁更新
+		}
+
 		// 處理 BLOCK_DRAG 事件來追蹤拖動狀態
 		if (event.type === Blockly.Events.BLOCK_DRAG) {
 			isDraggingBlock = event.isStart;
+
+			// 視角保持機制：在拖曳開始時，使用之前追蹤的穩定視角
+			// 因為 BLOCK_DRAG isStart 觸發時，Blockly 可能已經開始移動視角了
+			if (event.isStart && !viewportState) {
+				// 優先使用之前追蹤的穩定視角，如果沒有則使用當前位置
+				if (stableViewport) {
+					viewportState = { ...stableViewport };
+				} else {
+					viewportState = {
+						scrollX: workspace.scrollX,
+						scrollY: workspace.scrollY,
+						scale: workspace.getScale(),
+					};
+				}
+			}
+
 			if (!event.isStart && pendingCodeUpdate) {
 				// 拖動結束且有待處理的更新，執行延遲更新
 				debouncedCodeUpdate();
+			}
+
+			// 拖曳結束但沒有刪除積木時，清除視角狀態（延遲清除以確保不會過早清除）
+			if (!event.isStart) {
+				setTimeout(() => {
+					// 如果沒有進行中的視角恢復計時器，表示沒有刪除事件，可以清除狀態
+					if (!viewportRestoreTimer && viewportState) {
+						viewportState = null;
+					}
+				}, 200);
 			}
 			return;
 		}
@@ -1270,6 +1332,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// 忽略拖動中的 UI 事件
 		if (event.isUiEvent) {
 			return;
+		}
+
+		// 視角保持機制：在積木刪除時鎖定視角位置，防止 Blockly 內部的視角跳動
+		if (event.type === Blockly.Events.BLOCK_DELETE) {
+			// 立即鎖定視角，使用穩定視角或當前視角
+			if (!viewportLocked) {
+				lockedViewport = stableViewport
+					? { ...stableViewport }
+					: {
+							scrollX: workspace.scrollX,
+							scrollY: workspace.scrollY,
+							scale: workspace.getScale(),
+					  };
+				viewportLocked = true;
+			}
+
+			// 使用 debounce 機制處理批次刪除
+			clearTimeout(viewportRestoreTimer);
+			viewportRestoreTimer = setTimeout(() => {
+				// 解除鎖定並做最終恢復
+				if (lockedViewport) {
+					workspace.scroll(lockedViewport.scrollX, lockedViewport.scrollY);
+					if (workspace.getScale() !== lockedViewport.scale) {
+						workspace.setScale(lockedViewport.scale);
+					}
+				}
+				// 延遲解除鎖定，確保 Blockly 的所有後續視角變更都被攔截
+				setTimeout(() => {
+					viewportLocked = false;
+					lockedViewport = null;
+					viewportState = null;
+				}, 200);
+				viewportRestoreTimer = null;
+			}, 50);
 		}
 
 		// 監聽 esp32_pwm_setup 積木的變更並即時更新全域配置
@@ -1985,13 +2081,18 @@ async function updateToolboxForBoard(workspace, boardId) {
 		// 檢查是否為 ESP32 系列開發板
 		const isESP32Board = boardId === 'esp32' || boardId === 'esp32_super_mini';
 
-		// 遞迴過濾 toolbox 中的積木
+		// 遞迴過濾 toolbox 中的積木和分類
 		const filterToolboxContents = contents => {
 			if (!contents || !Array.isArray(contents)) return contents;
 
 			return contents.filter(item => {
 				// 如果是 esp32_pwm_setup 積木,只在 ESP32 開發板時顯示
 				if (item.type === 'esp32_pwm_setup') {
+					return isESP32Board;
+				}
+
+				// 如果是「通訊」分類 (communication),只在 ESP32 開發板時顯示
+				if (item.kind === 'category' && item.name === '%{CATEGORY_COMMUNICATION}') {
 					return isESP32Board;
 				}
 
@@ -2042,7 +2143,54 @@ async function updateToolboxForBoard(workspace, boardId) {
 		// 更新 workspace 的 toolbox
 		workspace.updateToolbox(toolboxConfig);
 		console.log(`[Toolbox] 已根據開發板 ${boardId} 更新 (ESP32: ${isESP32Board})`);
+
+		// 更新工作區中已存在的 ESP32 專屬積木警告
+		updateEsp32BlockWarnings(workspace, isESP32Board);
 	} catch (error) {
 		console.error('[Toolbox] 更新失敗:', error);
 	}
+}
+
+/**
+ * 更新工作區中 ESP32 專屬積木的警告
+ * @param {Blockly.WorkspaceSvg} workspace - Blockly 工作區實例
+ * @param {boolean} isESP32Board - 是否為 ESP32 開發板
+ */
+function updateEsp32BlockWarnings(workspace, isESP32Board) {
+	// ESP32 專屬積木類型列表
+	const esp32BlockTypes = [
+		'esp32_wifi_connect',
+		'esp32_wifi_disconnect',
+		'esp32_wifi_status',
+		'esp32_wifi_get_ip',
+		'esp32_wifi_scan',
+		'esp32_wifi_get_ssid',
+		'esp32_wifi_get_rssi',
+		'esp32_mqtt_setup',
+		'esp32_mqtt_connect',
+		'esp32_mqtt_publish',
+		'esp32_mqtt_subscribe',
+		'esp32_mqtt_loop',
+		'esp32_mqtt_get_topic',
+		'esp32_mqtt_get_message',
+		'esp32_mqtt_status',
+		'esp32_pwm_setup',
+	];
+
+	const warningMessage = window.languageManager
+		? window.languageManager.getMessage('ESP32_ONLY_BLOCK_WARNING', '此積木僅支援 ESP32 系列開發板')
+		: '此積木僅支援 ESP32 系列開發板';
+
+	// 遍歷工作區中所有積木
+	workspace.getAllBlocks().forEach(block => {
+		if (esp32BlockTypes.includes(block.type)) {
+			if (!isESP32Board) {
+				// 非 ESP32 板子：顯示警告
+				block.setWarningText(warningMessage);
+			} else {
+				// ESP32 板子：移除警告
+				block.setWarningText(null);
+			}
+		}
+	});
 }

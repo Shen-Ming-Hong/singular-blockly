@@ -557,4 +557,68 @@ window.languageManager.loadMessages('pl', {
 	BUTTON_SUPPRESS: 'Nie przypominaj',
 	SAFETY_GUARD_CANCELLED: 'Anulowano otwieranie edytora Blockly',
 	SAFETY_GUARD_SUPPRESSED: 'Zapisano preferencje, to ostrzeżenie nie będzie już wyświetlane',
+
+	// Communication Category
+	CATEGORY_COMMUNICATION: 'Komunikacja',
+
+	// ESP32 WiFi
+	ESP32_WIFI_LABEL: 'WiFi',
+	ESP32_WIFI_CONNECT: 'Połącz WiFi',
+	ESP32_WIFI_CONNECT_SSID: 'SSID',
+	ESP32_WIFI_CONNECT_PASSWORD: 'Hasło',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Połącz ESP32 z siecią WiFi przy użyciu podanego SSID i hasła',
+	ESP32_WIFI_DISCONNECT: 'Rozłącz WiFi',
+	ESP32_WIFI_DISCONNECT_TOOLTIP: 'Rozłącz ESP32 z sieci WiFi',
+	ESP32_WIFI_STATUS: 'Stan WiFi',
+	ESP32_WIFI_STATUS_TOOLTIP: 'Sprawdź, czy ESP32 jest połączone z siecią WiFi',
+	ESP32_WIFI_GET_IP: 'Pobierz adres IP WiFi',
+	ESP32_WIFI_GET_IP_TOOLTIP: 'Pobierz lokalny adres IP ESP32 jako ciąg znaków',
+	ESP32_WIFI_SCAN: 'Skanuj sieci WiFi',
+	ESP32_WIFI_SCAN_TOOLTIP: 'Skanuj dostępne sieci WiFi i zwróć liczbę znalezionych sieci',
+	ESP32_WIFI_GET_SSID: 'Pobierz SSID sieci',
+	ESP32_WIFI_GET_SSID_INDEX: 'indeks',
+	ESP32_WIFI_GET_SSID_TOOLTIP: 'Pobierz nazwę SSID sieci WiFi o podanym indeksie',
+	ESP32_WIFI_GET_RSSI: 'Pobierz RSSI sieci',
+	ESP32_WIFI_GET_RSSI_INDEX: 'indeks',
+	ESP32_WIFI_GET_RSSI_TOOLTIP: 'Pobierz siłę sygnału (RSSI) sieci WiFi o podanym indeksie',
+
+	// ESP32 MQTT
+	ESP32_MQTT_LABEL: 'MQTT',
+	ESP32_MQTT_SETUP: 'Konfiguracja MQTT',
+	ESP32_MQTT_SETUP_SERVER: 'Serwer',
+	ESP32_MQTT_SETUP_PORT: 'Port',
+	ESP32_MQTT_SETUP_CLIENT_ID: 'ID klienta',
+	ESP32_MQTT_SETUP_TOOLTIP: 'Skonfiguruj klienta MQTT z adresem serwera, portem i ID klienta',
+	ESP32_MQTT_CONNECT: 'Połącz MQTT',
+	ESP32_MQTT_CONNECT_USERNAME: 'Użytkownik',
+	ESP32_MQTT_CONNECT_PASSWORD: 'Hasło',
+	ESP32_MQTT_CONNECT_TOOLTIP: 'Połącz z brokerem MQTT z opcjonalną nazwą użytkownika i hasłem',
+	ESP32_MQTT_PUBLISH: 'Publikuj MQTT',
+	ESP32_MQTT_PUBLISH_TOPIC: 'Temat',
+	ESP32_MQTT_PUBLISH_MESSAGE: 'Wiadomość',
+	ESP32_MQTT_PUBLISH_TOOLTIP: 'Opublikuj wiadomość do tematu MQTT',
+	ESP32_MQTT_SUBSCRIBE: 'Subskrybuj MQTT',
+	ESP32_MQTT_SUBSCRIBE_TOPIC: 'Temat',
+	ESP32_MQTT_SUBSCRIBE_TOOLTIP: 'Subskrybuj temat MQTT, aby otrzymywać wiadomości',
+	ESP32_MQTT_LOOP: 'Pętla MQTT',
+	ESP32_MQTT_LOOP_TOOLTIP: 'Przetwarzaj przychodzące wiadomości MQTT (wywołuj w głównej pętli)',
+	ESP32_MQTT_GET_TOPIC: 'Pobierz temat MQTT',
+	ESP32_MQTT_GET_TOPIC_TOOLTIP: 'Pobierz temat ostatnio otrzymanej wiadomości MQTT',
+	ESP32_MQTT_GET_MESSAGE: 'Pobierz wiadomość MQTT',
+	ESP32_MQTT_GET_MESSAGE_TOOLTIP: 'Pobierz zawartość ostatnio otrzymanej wiadomości MQTT',
+	ESP32_MQTT_STATUS: 'MQTT Połączony',
+	ESP32_MQTT_STATUS_TOOLTIP: 'Sprawdź czy połączony z serwerem MQTT',
+
+	// Text to Number
+	TEXT_TO_NUMBER: 'Tekst na liczbę',
+	TEXT_TO_NUMBER_INT: 'całkowita',
+	TEXT_TO_NUMBER_FLOAT: 'zmiennoprzecinkowa',
+	TEXT_TO_NUMBER_TOOLTIP: 'Konwertuj tekst na liczbę (całkowitą lub zmiennoprzecinkową)',
+
+	// To String Block
+	TO_STRING: 'Na tekst',
+	TO_STRING_TOOLTIP: 'Konwertuj liczbę lub wartość logiczną na tekst',
+
+	// ESP32 Only Block Warning
+	ESP32_ONLY_BLOCK_WARNING: 'Ten blok obsługuje tylko płytki ESP32',
 });
