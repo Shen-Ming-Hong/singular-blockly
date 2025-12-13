@@ -10,6 +10,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.47.1] - 2025-12-13
+
+### 修復 Fixed
+
+-   **MCP 積木字典完整性** (MCP Block Dictionary Completeness)
+
+    -   新增 39 個 Blockly 核心積木到 MCP 字典（從 82 個增加到 121 個）
+        Added 39 Blockly core blocks to MCP dictionary (from 82 to 121 blocks)
+    -   包含邏輯積木：`controls_if`、`logic_compare`、`logic_operation` 等 7 個
+        Includes logic blocks: `controls_if`, `logic_compare`, `logic_operation`, etc. (7 blocks)
+    -   包含迴圈積木：`controls_repeat_ext`、`controls_whileUntil`、`controls_for` 等 5 個
+        Includes loop blocks: `controls_repeat_ext`, `controls_whileUntil`, `controls_for`, etc. (5 blocks)
+    -   包含數學積木：`math_number`、`math_arithmetic`、`math_single` 等 12 個
+        Includes math blocks: `math_number`, `math_arithmetic`, `math_single`, etc. (12 blocks)
+    -   包含文字積木：`text`、`text_length`、`text_isEmpty` 等 8 個
+        Includes text blocks: `text`, `text_length`, `text_isEmpty`, etc. (8 blocks)
+    -   包含清單積木：`lists_create_empty`、`lists_create_with`、`lists_length` 等 8 個
+        Includes list blocks: `lists_create_empty`, `lists_create_with`, `lists_length`, etc. (8 blocks)
+    -   修復 AI 工具無法查詢基本積木用法的問題
+        Fixed issue where AI tools couldn't query basic block usage
+
+### 維護 Maintenance
+
+-   380 個測試全部通過
+    380 tests passing
+
 ## [0.47.0] - 2025-12-13
 
 ### 新增 Added
