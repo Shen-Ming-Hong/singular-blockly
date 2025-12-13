@@ -10,6 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.47.2] - 2025-12-13
+
+### 改進 Improved
+
+-   **計算 PID 積木外觀優化** (Encoder PID Compute Block UI Improvement)
+
+    -   將「目標值」輸入改為內嵌模式 (inline)，使積木更緊湊
+        Changed "Target" input to inline mode for a more compact block appearance
+    -   減少積木佔用空間，提升工作區視覺整潔度
+        Reduced block footprint for cleaner workspace layout
+
+### 維護 Maintenance
+
+-   380 個測試全部通過
+    380 tests passing
+
 ## [0.47.1] - 2025-12-13
 
 ### 修復 Fixed

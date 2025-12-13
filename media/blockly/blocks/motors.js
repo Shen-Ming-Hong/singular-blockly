@@ -758,6 +758,7 @@ Blockly.Blocks['encoder_pid_compute'] = {
 		this.setStyle('motors_blocks');
 		this.setTooltip(window.languageManager.getMessage('ENCODER_PID_COMPUTE_TOOLTIP'));
 		this.setHelpUrl('');
+		this.setInputsInline(true);
 
 		// 將此積木標記為預覽功能
 		if (window.registerPreviewBlock) {
