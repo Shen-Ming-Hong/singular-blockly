@@ -1,4 +1,8 @@
 /**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Missing Translation Detector
  *
  * Detects translations that are missing, empty, or use English fallback text

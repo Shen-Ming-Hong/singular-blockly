@@ -1,4 +1,8 @@
 /**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Direct Translation Detector
  *
  * Identifies translations that appear to be word-for-word English translations

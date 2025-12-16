@@ -1,4 +1,8 @@
 /**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Pattern-Based Direct Translation Detector
  *
  * Automatically detects common direct translation patterns that indicate

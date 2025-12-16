@@ -365,7 +365,7 @@
 
     /**
      * @license
-     * Copyright 2024 Singular Blockly Contributors
+     * Copyright 2025 Singular Blockly Contributors
      * SPDX-License-Identifier: Apache-2.0
      */
 

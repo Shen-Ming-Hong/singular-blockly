@@ -1,4 +1,8 @@
 /**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Whitelist Checker for Translation Audit
  *
  * Filters out false positive issues based on whitelist rules.

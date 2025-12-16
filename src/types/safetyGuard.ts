@@ -1,4 +1,8 @@
 /**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * 專案安全防護機制 - TypeScript 型別定義
  *
  * Feature: 010-project-safety-guard

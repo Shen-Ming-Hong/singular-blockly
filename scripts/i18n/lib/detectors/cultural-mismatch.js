@@ -1,4 +1,8 @@
 /**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Cultural Mismatch Detector
  *
  * Detects translations that may be technically correct but culturally inappropriate:

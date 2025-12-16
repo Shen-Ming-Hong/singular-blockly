@@ -1,4 +1,8 @@
 /**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Length Overflow Checker
  *
  * Checks if translations are too long or too short compared to English baseline,
