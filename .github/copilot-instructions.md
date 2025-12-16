@@ -2,7 +2,7 @@
 
 ## Language Convention
 
-**IMPORTANT**: Always respond in **Traditional Chinese (繁體中文)** unless explicitly requested otherwise. This file uses English for technical standardization, but all user-facing responses should be in Traditional Chinese.
+**IMPORTANT**: Always respond in **Traditional Chinese (繁體中文)** unless explicitly requested otherwise.
 
 ## Project Overview
 
@@ -19,9 +19,9 @@
 ```
 Extension Host (Node.js)           WebView (Browser Context)
 ├── extension.ts                   ├── blocklyEdit.html
-├── webview/                       ├── blocklyEdit.js (2049 lines)
-│   ├── webviewManager.ts (1116)  └── blockly/
-│   └── messageHandler.ts (907)       ├── blocks/*.js (block definitions)
+├── webview/                       ├── blocklyEdit.js (~1930 lines)
+│   ├── webviewManager.ts (~970)  └── blockly/
+│   └── messageHandler.ts (~800)      ├── blocks/*.js (block definitions)
 ├── mcp/                              └── generators/arduino/*.js (code gen)
 │   ├── mcpProvider.ts (MCP registration)
 │   ├── mcpServer.ts (STDIO transport)
@@ -38,7 +38,7 @@ Extension Host (Node.js)           WebView (Browser Context)
 
 1. `src/extension.ts` - Activation, command registration, MCP provider
 2. `media/html/blocklyEdit.html` - WebView DOM structure, script loading order
-3. `media/js/blocklyEdit.js` - Blockly workspace initialization (line 1070), event handlers
+3. `media/js/blocklyEdit.js` - Blockly workspace initialization, event handlers
 
 ## Critical Patterns
 
@@ -96,6 +96,7 @@ arduinoGenerator.forBlock['sensor_read'] = function (block) {
 **Architecture**: VSCode 1.105.0+ MCP API with STDIO transport.
 
 **Files**:
+
 -   `src/mcp/mcpProvider.ts` - Registers `McpServerDefinitionProvider` with VSCode
 -   `src/mcp/mcpServer.ts` - STDIO server entry point (separate bundle)
 -   `src/mcp/tools/*.ts` - Tool implementations (blockQuery, platformConfig, workspaceOps)
@@ -112,6 +113,7 @@ arduinoGenerator.forBlock['sensor_read'] = function (block) {
 | `refresh_editor` | Notify WebView to reload |
 
 **Adding new MCP tools**:
+
 1. Create tool in `src/mcp/tools/{toolName}.ts`
 2. Export registration function: `registerXxxTools(server: McpServer)`
 3. Register in `src/mcp/mcpServer.ts` via `registerXxxTools(server)`
@@ -193,7 +195,7 @@ npm run validate:i18n  # Check translation quality
 -   `quickstart.md` - Developer onboarding guide
 -   `tasks.md` - Breakdown for execution
 
-**Current specs**: 001-015 cover architecture, i18n, testing, upgrades, safety features, MCP integration
+**Current specs**: 001-016 cover architecture, i18n, testing, upgrades, safety features, MCP integration, ESP32 WiFi/MQTT
 
 **Before implementation**: Check if spec exists. If modifying core APIs (Blockly, VSCode), document findings in research.md.
 
@@ -283,6 +285,7 @@ suite('FileService', () => {
 -   **Blockly 12**: `specs/008-core-deps-upgrade/research.md`
 -   **Safety Guard**: `specs/010-project-safety-guard/`
 -   **MCP Server**: `specs/015-mcp-server-integration/`
+-   **ESP32 WiFi/MQTT**: `specs/016-esp32-wifi-mqtt/`
 
 ---
 
