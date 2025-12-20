@@ -624,4 +624,9 @@ window.languageManager.loadMessages('en', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'This block only supports ESP32 series boards',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'Backup saved: {0}',
+	BACKUP_QUICK_SAVE_EMPTY: 'Workspace is empty, no backup needed',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Please wait, backup just completed',
 });

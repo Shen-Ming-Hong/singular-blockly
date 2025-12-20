@@ -619,4 +619,9 @@ window.languageManager.loadMessages('tr', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'Bu blok sadece ESP32 kartlarını destekler',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'Yedek kaydedildi: {0}',
+	BACKUP_QUICK_SAVE_EMPTY: 'Çalışma alanı boş, yedekleme gerekli değil',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Lütfen bekleyin, yedekleme az önce tamamlandı',
 });

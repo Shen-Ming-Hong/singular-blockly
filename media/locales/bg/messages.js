@@ -621,4 +621,9 @@ window.languageManager.loadMessages('bg', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'Този блок поддържа само платки ESP32',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'Резервното копие е запазено: {0}',
+	BACKUP_QUICK_SAVE_EMPTY: 'Работното пространство е празно, не е необходимо архивиране',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Моля, изчакайте, архивирането току-що приключи',
 });

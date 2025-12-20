@@ -55,8 +55,7 @@
 
 ### Edge Cases
 
--   當備份過程中發生錯誤時，應顯示錯誤 Toast 通知而非成功通知
--   當使用者同時開啟備份面板對話框時，Ctrl+S 應該仍可正常運作
+-   ~~當備份過程中發生錯誤時，應顯示錯誤 Toast 通知而非成功通知~~ **[延遲實作]**：依據 Constitution 原則 III（避免過度開發），本版本 Toast 不等待 Extension 回傳，錯誤處理留待未來需求確認後實作
 -   當瀏覽器預設的 Ctrl+S（儲存網頁）行為被觸發時，應該被正確攔截（preventDefault）
 
 ## Requirements _(mandatory)_

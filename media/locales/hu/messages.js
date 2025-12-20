@@ -622,4 +622,9 @@ window.languageManager.loadMessages('hu', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'Ez a blokk csak ESP32 lapkákat támogat',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'Biztonsági mentés mentve: {0}',
+	BACKUP_QUICK_SAVE_EMPTY: 'A munkaterület üres, nincs szükség biztonsági mentésre',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Kérem várjon, a biztonsági mentés éppen befejeződött',
 });

@@ -615,4 +615,9 @@ window.languageManager.loadMessages('it', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'Questo blocco supporta solo schede ESP32',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'Backup salvato: {0}',
+	BACKUP_QUICK_SAVE_EMPTY: 'Lo spazio di lavoro è vuoto, backup non necessario',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Attendere, il backup è appena stato completato',
 });

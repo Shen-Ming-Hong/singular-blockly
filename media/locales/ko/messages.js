@@ -615,4 +615,9 @@ window.languageManager.loadMessages('ko', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: '이 블록은 ESP32 시리즈 보드만 지원합니다',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: '백업 저장됨: {0}',
+	BACKUP_QUICK_SAVE_EMPTY: '작업 공간이 비어 있습니다, 백업 불필요',
+	BACKUP_QUICK_SAVE_COOLDOWN: '잠시 기다려 주세요, 백업이 방금 완료되었습니다',
 });

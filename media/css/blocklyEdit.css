@@ -1293,3 +1293,58 @@ body.theme-dark .result-preview {
 }
 
 /* 確保模態框內容不會受到其他模態框通用樣式的影響 */
+
+/* Toast 通知樣式 */
+.toast {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	padding: 12px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 500;
+	z-index: 9999;
+	opacity: 0;
+	transform: translateY(10px);
+	transition: opacity 0.3s ease, transform 0.3s ease;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	pointer-events: none;
+}
+
+.toast.visible {
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
+}
+
+.toast.success {
+	background-color: #4caf50;
+	color: white;
+}
+
+.toast.warning {
+	background-color: #ff9800;
+	color: white;
+}
+
+.toast.error {
+	background-color: #f44336;
+	color: white;
+}
+
+/* 深色主題 Toast 樣式 */
+body.theme-dark .toast {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.theme-dark .toast.success {
+	background-color: #388e3c;
+}
+
+body.theme-dark .toast.warning {
+	background-color: #f57c00;
+}
+
+body.theme-dark .toast.error {
+	background-color: #d32f2f;
+}
