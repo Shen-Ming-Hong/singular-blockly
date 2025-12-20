@@ -616,4 +616,9 @@ window.languageManager.loadMessages('ja', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'このブロックは ESP32 シリーズのボードのみ対応',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'バックアップ保存完了：{0}',
+	BACKUP_QUICK_SAVE_EMPTY: 'ワークスペースが空です、バックアップ不要',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'しばらくお待ちください、バックアップが完了したばかりです',
 });

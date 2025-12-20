@@ -618,4 +618,9 @@ window.languageManager.loadMessages('fr', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'Ce bloc ne supporte que les cartes ESP32',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'Sauvegarde enregistrée : {0}',
+	BACKUP_QUICK_SAVE_EMPTY: "L'espace de travail est vide, aucune sauvegarde nécessaire",
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Veuillez patienter, la sauvegarde vient de se terminer',
 });

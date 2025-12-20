@@ -96,6 +96,182 @@ const log = {
 let currentTheme = window.initialTheme || 'light';
 
 /**
+ * Toast 通知系統
+ * 用於顯示快速備份等操作的即時回饋
+ */
+const toast = {
+	currentToast: null,
+	currentTimeout: null,
+
+	/**
+	 * 顯示 Toast 通知
+	 * @param {string} message - 要顯示的訊息
+	 * @param {string} type - 通知類型：'success' | 'warning' | 'error'
+	 * @param {number} duration - 顯示時長（毫秒），預設 2500ms
+	 */
+	show: function (message, type = 'success', duration = 2500) {
+		// 移除現有 Toast
+		this.hide();
+
+		// 建立 Toast 元素（含 ARIA 無障礙屬性）
+		const toastEl = document.createElement('div');
+		toastEl.className = `toast ${type}`;
+		toastEl.textContent = message;
+		toastEl.setAttribute('role', 'status');
+		toastEl.setAttribute('aria-live', 'polite');
+		document.body.appendChild(toastEl);
+
+		this.currentToast = toastEl;
+
+		// 觸發動畫（使用 requestAnimationFrame 確保 DOM 更新後再添加 class）
+		requestAnimationFrame(() => {
+			toastEl.classList.add('visible');
+		});
+
+		// 自動隱藏
+		this.currentTimeout = setTimeout(() => {
+			toastEl.classList.remove('visible');
+			setTimeout(() => {
+				if (toastEl.parentNode) {
+					toastEl.remove();
+				}
+				if (this.currentToast === toastEl) {
+					this.currentToast = null;
+				}
+			}, 300); // 等待淡出動畫完成
+		}, duration);
+	},
+
+	/**
+	 * 隱藏當前 Toast
+	 */
+	hide: function () {
+		if (this.currentTimeout) {
+			clearTimeout(this.currentTimeout);
+			this.currentTimeout = null;
+		}
+		if (this.currentToast) {
+			this.currentToast.remove();
+			this.currentToast = null;
+		}
+		// 移除所有殘留的 Toast 元素
+		document.querySelectorAll('.toast').forEach(el => el.remove());
+	},
+};
+
+/**
+ * 快速備份功能（Ctrl+S / Cmd+S）
+ * 提供即時備份工作區的快捷鍵功能
+ */
+const quickBackup = {
+	/** 上次成功備份的時間戳（毫秒） */
+	lastSaveTime: 0,
+
+	/** 節流冷卻時間（毫秒），預設 3000ms */
+	COOLDOWN_MS: 3000,
+
+	/**
+	 * 初始化快速備份功能
+	 * 綁定 Ctrl+S (Windows/Linux) 和 Cmd+S (macOS) 鍵盤事件
+	 */
+	init: function () {
+		document.addEventListener('keydown', e => {
+			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+				e.preventDefault(); // 阻止瀏覽器預設的「儲存網頁」對話框
+				this.performQuickSave();
+			}
+		});
+		log.info('快速備份功能已初始化 (Ctrl+S / Cmd+S)');
+	},
+
+	/**
+	 * 檢查是否可以執行備份（節流檢查）
+	 * @returns {boolean} true 表示可以備份，false 表示在冷卻期間
+	 */
+	canSave: function () {
+		const now = Date.now();
+		return now - this.lastSaveTime >= this.COOLDOWN_MS;
+	},
+
+	/**
+	 * 記錄備份時間戳
+	 */
+	recordSave: function () {
+		this.lastSaveTime = Date.now();
+	},
+
+	/**
+	 * 生成備份名稱（格式：backup_YYYYMMDD_HHMMSS）
+	 * @returns {string} 備份名稱
+	 */
+	generateBackupName: function () {
+		const now = new Date();
+		const pad = n => String(n).padStart(2, '0');
+		return `backup_${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(
+			now.getMinutes()
+		)}${pad(now.getSeconds())}`;
+	},
+
+	/**
+	 * 執行快速備份
+	 */
+	performQuickSave: function () {
+		// 1. 節流檢查
+		if (!this.canSave()) {
+			const message = window.languageManager
+				? window.languageManager.getMessage('BACKUP_QUICK_SAVE_COOLDOWN', '請稍候，上次備份剛完成')
+				: '請稍候，上次備份剛完成';
+			toast.show(message, 'warning');
+			log.info('快速備份：冷卻期間，跳過備份');
+			return;
+		}
+
+		// 2. 空工作區檢查
+		const workspace = Blockly.getMainWorkspace();
+		if (!workspace) {
+			log.warn('快速備份：無法取得工作區');
+			return;
+		}
+
+		const state = Blockly.serialization.workspaces.save(workspace);
+		if (!state || !state.blocks || !state.blocks.blocks || state.blocks.blocks.length === 0) {
+			const message = window.languageManager
+				? window.languageManager.getMessage('BACKUP_QUICK_SAVE_EMPTY', '工作區為空，不需要備份')
+				: '工作區為空，不需要備份';
+			toast.show(message, 'warning');
+			log.info('快速備份：工作區為空，跳過備份');
+			return;
+		}
+
+		// 3. 生成備份名稱
+		const backupName = this.generateBackupName();
+
+		// 4. 發送備份請求
+		const boardSelect = document.getElementById('boardSelect');
+		vscode.postMessage({
+			command: 'createBackup',
+			name: backupName,
+			state: state,
+			board: boardSelect ? boardSelect.value : 'arduino_uno',
+			theme: currentTheme,
+			isQuickBackup: true,
+		});
+
+		// 5. 更新節流狀態
+		this.recordSave();
+
+		// 6. 顯示成功 Toast
+		const successTemplate = window.languageManager
+			? window.languageManager.getMessage('BACKUP_QUICK_SAVE_SUCCESS', '備份已儲存：{0}')
+			: '備份已儲存：{0}';
+		const successMessage = successTemplate.replace('{0}', backupName);
+		toast.show(successMessage, 'success');
+
+		log.info(`快速備份完成: ${backupName}`);
+	},
+};
+
+/**
  * 動態生成開發板選擇下拉選單選項
  */
 function populateBoardOptions() {
@@ -998,6 +1174,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	backupManager.init();
 	// 初始化函式積木搜尋功能
 	functionSearch.init();
+	// 初始化快速備份功能 (Ctrl+S / Cmd+S)
+	quickBackup.init();
 	// 初始化實驗積木提示
 	try {
 		if (window.experimentalBlocksNotice) {

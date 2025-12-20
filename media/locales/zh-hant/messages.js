@@ -618,4 +618,9 @@ window.languageManager.loadMessages('zh-hant', {
 
 	// ESP32 專屬積木警告
 	ESP32_ONLY_BLOCK_WARNING: '此積木僅支援 ESP32 系列開發板',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: '備份已儲存：{0}',
+	BACKUP_QUICK_SAVE_EMPTY: '工作區為空，不需要備份',
+	BACKUP_QUICK_SAVE_COOLDOWN: '請稍候，上次備份剛完成',
 });

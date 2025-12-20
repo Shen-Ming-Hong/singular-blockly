@@ -618,4 +618,9 @@ window.languageManager.loadMessages('cs', {
 
 	// ESP32 Only Block Warning
 	ESP32_ONLY_BLOCK_WARNING: 'Tento blok podporuje pouze desky ESP32',
+
+	// Quick Backup Toast Messages
+	BACKUP_QUICK_SAVE_SUCCESS: 'Záloha uložena: {0}',
+	BACKUP_QUICK_SAVE_EMPTY: 'Pracovní prostor je prázdný, záloha není potřeba',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Prosím počkejte, záloha byla právě dokončena',
 });
