@@ -10,6 +10,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+## [0.48.0] - 2025-12-20
+
+### 新增 Added
+
+-   **Ctrl+S 快速備份快捷鍵** (Ctrl+S Quick Backup Shortcut)
+
+    -   在 Blockly 編輯區按下 Ctrl+S（macOS 為 Cmd+S）即可快速備份工作區
+        Press Ctrl+S (Cmd+S on macOS) in Blockly editor for quick workspace backup
+    -   備份檔案自動命名為 `backup_YYYYMMDD_HHMMSS` 格式
+        Backup files auto-named with `backup_YYYYMMDD_HHMMSS` format
+    -   新增 Toast 通知系統，即時顯示備份結果（成功/警告）
+        Added Toast notification system for instant backup feedback (success/warning)
+    -   支援 ARIA 無障礙屬性（role="status", aria-live="polite"）
+        Supports ARIA accessibility attributes (role="status", aria-live="polite")
+
+-   **備份節流機制** (Backup Throttle Mechanism)
+
+    -   3 秒冷卻時間防止短時間內重複建立備份
+        3-second cooldown prevents duplicate backups in short succession
+    -   冷卻期間按下 Ctrl+S 顯示友善提示
+        Shows friendly message when pressing Ctrl+S during cooldown
+
+-   **空工作區保護** (Empty Workspace Protection)
+    -   工作區為空時跳過備份並顯示提示，避免建立無意義的空備份
+        Skips backup and shows notification when workspace is empty
+
+### 維護 Maintenance
+
+-   新增 3 個 i18n 翻譯鍵（15 種語言）
+    Added 3 i18n translation keys (15 languages)
+-   Toast 通知支援淺色/深色主題
+    Toast notifications support light/dark themes
+-   380 個測試全部通過
+    380 tests passing
+
 ## [0.47.2] - 2025-12-13
 
 ### 改進 Improved
