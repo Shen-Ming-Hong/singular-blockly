@@ -12,7 +12,8 @@
 
 -   **Blockly**: 12.3.1 | **@blockly/theme-modern**: 7.0.1
 -   **TypeScript**: 5.9.3 | **Node.js**: 22.16.0+ | **VS Code**: 1.105.0+
--   **Webpack**: 5.102.1 (bundles to `dist/extension.js`, `dist/mcp-server.js`)
+-   **Webpack**: 5.102.1 (dual entry: `dist/extension.js`, `dist/mcp-server.js`)
+-   **MCP SDK**: @modelcontextprotocol/sdk 1.24.3 (STDIO transport)
 
 ### Architecture Overview
 
@@ -195,7 +196,7 @@ npm run validate:i18n  # Check translation quality
 -   `quickstart.md` - Developer onboarding guide
 -   `tasks.md` - Breakdown for execution
 
-**Current specs**: 001-016 cover architecture, i18n, testing, upgrades, safety features, MCP integration, ESP32 WiFi/MQTT
+**Active specs**: `016-esp32-wifi-mqtt`, `017-ctrl-s-quick-backup`
 
 **Before implementation**: Check if spec exists. If modifying core APIs (Blockly, VSCode), document findings in research.md.
 
@@ -234,17 +235,18 @@ return comment + `servo.write(90);\n`;
 -   **Helpers**: `src/test/helpers/` - Mock factories, test utilities
 -   **Pattern**: Mirror source structure in test files
 
-Example test structure:
+**Test helpers** (in `src/test/helpers/testHelpers.ts`):
 
 ```typescript
-// src/test/fileService.test.ts
-import { FileService } from '../services/fileService';
-import * as sinon from 'sinon';
+// Use factory functions for isolated testing
+import { createIsolatedFileService, createIsolatedSettingsManager } from './helpers';
 
-suite('FileService', () => {
-    test('should read file correctly', async () => { ... });
-});
+const fsMock = new FSMock();
+fsMock.addFile('/workspace/blockly/main.json', '{}');
+const fileService = createIsolatedFileService(fsMock, '/workspace');
 ```
+
+**Mock pattern**: Services accept DI via constructor (e.g., `FileService(path, fileSystem?)`).
 
 ### API Documentation Requirement
 
