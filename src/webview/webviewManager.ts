@@ -26,6 +26,7 @@ const BOARD_MAPPING: Record<string, BoardConfigKey> = {
 	esp32: 'esp32',
 	esp32_super_mini: 'supermini',
 	// 相容簡短格式（直接使用 BOARD_CONFIGS key）
+	// 注意：esp32 已在標準格式區段定義，無需重複
 	uno: 'uno',
 	nano: 'nano',
 	mega: 'mega',
@@ -813,12 +814,10 @@ export class WebViewManager {
 					isDefault: boardResult.isDefault,
 				};
 
-				// 如果有無效的 board 值，生成翻譯後的警告訊息
+				// 如果有無效的 board 值，建立警告訊息
+				// 注意：此為邊緣情況，警告訊息直接使用中文（後續可擴展 i18n）
 				if (boardResult.warning) {
-					const warningMsg = await this.localeService.getLocalizedMessage(
-						'PREVIEW_INVALID_BOARD_WARNING',
-						`無法識別的開發板類型 '${boardResult.warning}'，已使用預設 Arduino Uno 配置`
-					);
+					const warningMsg = `無法識別的開發板類型 '${boardResult.warning}'，已使用預設 Arduino Uno 配置`;
 					setBoardMessage.warning = warningMsg;
 					log(`Invalid board value in backup: ${boardResult.warning}, using default 'uno'`, 'warn');
 				} else if (boardResult.isDefault && !backupData.board) {

@@ -352,7 +352,7 @@ function showBoardWarning(message) {
 }
 
 /**
- * 監聯來自擴充功能的訊息
+ * 監聽來自擴充功能的訊息
  */
 window.addEventListener('message', event => {
 	const message = event.data;
