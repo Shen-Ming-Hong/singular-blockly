@@ -12,6 +12,51 @@ import { LocaleService } from '../services/localeService';
 import { WorkspaceValidator } from '../services/workspaceValidator';
 import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
+import { BoardConfigKey, SetBoardMessage } from '../types/previewMessages';
+
+/**
+ * 開發板值映射表
+ * 將備份檔案中的 board 值（如 'arduino_uno'）映射到 BOARD_CONFIGS 的 key（如 'uno'）
+ */
+const BOARD_MAPPING: Record<string, BoardConfigKey> = {
+	// 標準格式（備份檔案使用）
+	arduino_uno: 'uno',
+	arduino_nano: 'nano',
+	arduino_mega: 'mega',
+	esp32: 'esp32',
+	esp32_super_mini: 'supermini',
+	// 相容簡短格式（直接使用 BOARD_CONFIGS key）
+	// 注意：esp32 已在標準格式區段定義，無需重複
+	uno: 'uno',
+	nano: 'nano',
+	mega: 'mega',
+	supermini: 'supermini',
+};
+
+/**
+ * 映射備份檔案的 board 值到 BOARD_CONFIGS key
+ * @param backupBoard 備份檔案中的 board 值
+ * @returns 包含映射後的 board key 和可能的警告訊息
+ */
+function mapBoardValue(backupBoard: string | undefined): { board: BoardConfigKey; warning?: string; isDefault: boolean } {
+	// 若無 board 值，使用預設值
+	if (!backupBoard) {
+		return { board: 'uno', isDefault: true };
+	}
+
+	// 嘗試映射
+	const mappedBoard = BOARD_MAPPING[backupBoard];
+	if (mappedBoard) {
+		return { board: mappedBoard, isDefault: false };
+	}
+
+	// 無法識別的 board 值，使用預設值並回傳警告
+	return {
+		board: 'uno',
+		isDefault: true,
+		warning: backupBoard, // 回傳原始無效值，讓呼叫端生成翻譯後的警告訊息
+	};
+}
 
 // VSCode API 引用（可在測試中注入）- T009
 let vscodeApi: typeof vscode = vscode;
@@ -757,6 +802,33 @@ export class WebViewManager {
 					throw new Error('備份檔案中缺少有效的工作區資料');
 				}
 
+				// === T007-T009: 處理開發板設定 ===
+				// 讀取並映射 board 值
+				const boardResult = mapBoardValue(backupData.board);
+
+				// 建立 setBoard 訊息
+				const setBoardMessage: SetBoardMessage = {
+					command: 'setBoard',
+					board: boardResult.board,
+					originalBoard: backupData.board,
+					isDefault: boardResult.isDefault,
+				};
+
+				// 如果有無效的 board 值，建立警告訊息
+				// 注意：此為邊緣情況，警告訊息直接使用中文（後續可擴展 i18n）
+				if (boardResult.warning) {
+					const warningMsg = `無法識別的開發板類型 '${boardResult.warning}'，已使用預設 Arduino Uno 配置`;
+					setBoardMessage.warning = warningMsg;
+					log(`Invalid board value in backup: ${boardResult.warning}, using default 'uno'`, 'warn');
+				} else if (boardResult.isDefault && !backupData.board) {
+					log(`No board value in backup, using default 'uno'`, 'info');
+				} else {
+					log(`Board value mapped: ${backupData.board} -> ${boardResult.board}`, 'info');
+				}
+
+				// T008: 先發送 setBoard 訊息，再發送 loadWorkspaceState
+				panel.webview.postMessage(setBoardMessage);
+
 				// 將 workspace 對象直接傳送到視窗，讓視窗端負責解析和顯示
 				panel.webview.postMessage({
 					command: 'loadWorkspaceState',
@@ -862,6 +934,13 @@ export class WebViewManager {
 			// HUSKYLENS 智慧鏡頭積木定義
 			const huskyLensBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/huskylens.js'));
 			const huskyLensBlocksUri = tempWebview.asWebviewUri(huskyLensBlocksPath);
+
+			// ESP32 WiFi/MQTT 積木定義 (T015: 確保預覽模式載入)
+			const esp32WifiMqttBlocksPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/blockly/blocks/esp32-wifi-mqtt.js')
+			);
+			const esp32WifiMqttBlocksUri = tempWebview.asWebviewUri(esp32WifiMqttBlocksPath);
+
 			// Arduino 生成器模組（動態發現）
 			const discoveredModules = await this.discoverArduinoModules();
 			const arduinoModules = discoveredModules
@@ -934,6 +1013,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{loopsBlocksUri}', loopsBlocksUri.toString());
 			htmlContent = htmlContent.replace('{pixettoBlocksUri}', pixettoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
+			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);

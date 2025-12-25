@@ -10,6 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] - Unreleased
 
+### 修復 Bug Fixes
+
+-   **修復預覽模式開發板配置顯示錯誤** (Fix Preview Mode Board Configuration Display)
+
+    -   修復 ESP32 備份檔案預覽時顯示 Arduino 腳位而非 GPIO 腳位的問題
+        Fixed ESP32 backup preview showing Arduino pins instead of GPIO pins
+    -   預覽模式現在正確讀取備份檔案中的 `board` 設定並套用對應的腳位配置
+        Preview mode now correctly reads `board` setting from backup and applies corresponding pin configuration
+    -   新增 ESP32 WiFi/MQTT 積木定義載入，確保預覽時正確顯示這些積木
+        Added ESP32 WiFi/MQTT block definitions loading to preview for correct display
+    -   向後相容：舊版備份檔案（無 `board` 欄位）自動使用 Arduino Uno 預設配置
+        Backward compatible: old backups without `board` field default to Arduino Uno configuration
+
 ## [0.48.0] - 2025-12-20
 
 ### 新增 Added
