@@ -27,9 +27,9 @@
 
 **Purpose**: 程式碼閱讀與分析，確認修改位置
 
--   [ ] T001 閱讀現有 `saveWorkspaceState()` 實作於 media/js/blocklyEdit.js
--   [ ] T002 [P] 閱讀現有 `handleSaveWorkspace()` 實作於 src/webview/messageHandler.ts
--   [ ] T003 [P] 確認 `isDraggingBlock` 變數位置與用法於 media/js/blocklyEdit.js
+-   [x] T001 閱讀現有 `saveWorkspaceState()` 實作於 media/js/blocklyEdit.js
+-   [x] T002 [P] 閱讀現有 `handleSaveWorkspace()` 實作於 src/webview/messageHandler.ts
+-   [x] T003 [P] 確認 `isDraggingBlock` 變數位置與用法於 media/js/blocklyEdit.js
 
 ---
 
@@ -39,8 +39,8 @@
 
 **⚠️ 重要**: 此階段必須完成後才能開始 User Story 實作
 
--   [ ] T004 在 messageHandler.ts 新增 `isEmptyWorkspaceState()` 私有方法於 src/webview/messageHandler.ts
--   [ ] T005 [P] 在 blocklyEdit.js 新增 `isWorkspaceStateEmpty()` 輔助函數於 media/js/blocklyEdit.js
+-   [x] T004 在 messageHandler.ts 新增 `isEmptyWorkspaceState()` 私有方法於 src/webview/messageHandler.ts
+-   [x] T005 [P] 在 blocklyEdit.js 新增 `isWorkspaceStateEmpty()` 輔助函數於 media/js/blocklyEdit.js
 
 **Checkpoint**: 基礎函數就緒，可開始 User Story 實作
 
@@ -54,13 +54,13 @@
 
 ### Tests for User Story 1
 
--   [ ] T006 [US1] 新增測試案例 "should save valid workspace state" 於 src/test/messageHandler.test.ts
+-   [x] T006 [US1] 新增測試案例 "should save valid workspace state" 於 src/test/messageHandler.test.ts
 
 ### Implementation for User Story 1
 
--   [ ] T007 [US1] 驗證現有 `saveWorkspaceState()` 正常運作於 media/js/blocklyEdit.js
+-   [x] T007 [US1] 驗證現有 `saveWorkspaceState()` 正常運作於 media/js/blocklyEdit.js
     -   **驗收標準**：手動新增一個方塊 → 等待 2 秒自動儲存 → 關閉編輯器 → 重新開啟 → 方塊仍存在
--   [ ] T008 [US1] 驗證現有 `handleSaveWorkspace()` 正常運作於 src/webview/messageHandler.ts
+-   [x] T008 [US1] 驗證現有 `handleSaveWorkspace()` 正常運作於 src/webview/messageHandler.ts
     -   **驗收標準**：檢查 Output Channel 有顯示儲存相關日誌，且 `blockly/main.json` 檔案內容包含新增的方塊資料
 
 **Checkpoint**: User Story 1 驗證完成，確認現有儲存流程正常
@@ -78,15 +78,15 @@
 
 ### Tests for User Story 2
 
--   [ ] T009 [P] [US2] 新增測試案例 "should reject empty workspace state" 於 src/test/messageHandler.test.ts
--   [ ] T010 [P] [US2] 新增測試案例 "should reject workspace with empty blocks array" 於 src/test/messageHandler.test.ts
--   [ ] T011 [P] [US2] 新增測試案例 "should reject workspace with missing blocks property" 於 src/test/messageHandler.test.ts
+-   [x] T009 [P] [US2] 新增測試案例 "should reject empty workspace state" 於 src/test/messageHandler.test.ts
+-   [x] T010 [P] [US2] 新增測試案例 "should reject workspace with empty blocks array" 於 src/test/messageHandler.test.ts
+-   [x] T011 [P] [US2] 新增測試案例 "should reject workspace with missing blocks property" 於 src/test/messageHandler.test.ts
 
 ### Implementation for User Story 2
 
--   [ ] T012 [US2] 修改 `saveWorkspaceState()` 加入拖曳狀態檢查於 media/js/blocklyEdit.js
--   [ ] T013 [US2] 修改 `saveWorkspaceState()` 加入空狀態檢查（使用 T005 的函數）於 media/js/blocklyEdit.js
--   [ ] T014 [US2] 修改 `handleSaveWorkspace()` 開頭加入空狀態驗證（使用 T004 的方法）於 src/webview/messageHandler.ts
+-   [x] T012 [US2] 修改 `saveWorkspaceState()` 加入拖曳狀態檢查於 media/js/blocklyEdit.js
+-   [x] T013 [US2] 修改 `saveWorkspaceState()` 加入空狀態檢查（使用 T005 的函數）於 media/js/blocklyEdit.js
+-   [x] T014 [US2] 修改 `handleSaveWorkspace()` 開頭加入空狀態驗證（使用 T004 的方法）於 src/webview/messageHandler.ts
 
 **Checkpoint**: User Story 2 完成，拖曳與空狀態皆被正確攔截
 
@@ -100,14 +100,14 @@
 
 ### Tests for User Story 3
 
--   [ ] T015 [P] [US3] 新增測試案例 "should create backup before save when file exists" 於 src/test/messageHandler.test.ts
--   [ ] T016 [P] [US3] 新增測試案例 "should skip backup when main.json does not exist" 於 src/test/messageHandler.test.ts
--   [ ] T017 [P] [US3] 新增測試案例 "should continue save when backup fails" 於 src/test/messageHandler.test.ts
+-   [x] T015 [P] [US3] 新增測試案例 "should create backup before save when file exists" 於 src/test/messageHandler.test.ts
+-   [x] T016 [P] [US3] 新增測試案例 "should skip backup when main.json does not exist" 於 src/test/messageHandler.test.ts
+-   [x] T017 [P] [US3] 新增測試案例 "should continue save when backup fails" 於 src/test/messageHandler.test.ts
 
 ### Implementation for User Story 3
 
--   [ ] T018 [US3] 新增 `createBackupBeforeSave()` 私有方法於 src/webview/messageHandler.ts
--   [ ] T019 [US3] 在 `handleSaveWorkspace()` 中呼叫備份方法（驗證通過後、寫入前）於 src/webview/messageHandler.ts
+-   [x] T018 [US3] 新增 `createBackupBeforeSave()` 私有方法於 src/webview/messageHandler.ts
+-   [x] T019 [US3] 在 `handleSaveWorkspace()` 中呼叫備份方法（驗證通過後、寫入前）於 src/webview/messageHandler.ts
 
 **Checkpoint**: User Story 3 完成，覆寫前自動備份機制就緒
 
@@ -121,11 +121,11 @@
 
 ### Implementation for User Story 4
 
--   [ ] T020 [US4] 在 blocklyEdit.js 的拖曳跳過處加入 `log.info('跳過保存：正在拖曳')` 於 media/js/blocklyEdit.js
--   [ ] T021 [P] [US4] 在 blocklyEdit.js 的空狀態跳過處加入 `log.warn('跳過保存：工作區為空')` 於 media/js/blocklyEdit.js
--   [ ] T022 [P] [US4] 在 messageHandler.ts 的拒絕處加入 `log('Rejected empty workspace save request', 'warn')` 於 src/webview/messageHandler.ts
--   [ ] T023 [P] [US4] 在 messageHandler.ts 的備份成功處加入 `log('Created backup: main.json.bak', 'debug')` 於 src/webview/messageHandler.ts
--   [ ] T024 [US4] 在 messageHandler.ts 的備份失敗處加入警告日誌於 src/webview/messageHandler.ts
+-   [x] T020 [US4] 在 blocklyEdit.js 的拖曳跳過處加入 `log.info('跳過保存：正在拖曳')` 於 media/js/blocklyEdit.js
+-   [x] T021 [P] [US4] 在 blocklyEdit.js 的空狀態跳過處加入 `log.warn('跳過保存：工作區為空')` 於 media/js/blocklyEdit.js
+-   [x] T022 [P] [US4] 在 messageHandler.ts 的拒絕處加入 `log('Rejected empty workspace save request', 'warn')` 於 src/webview/messageHandler.ts
+-   [x] T023 [P] [US4] 在 messageHandler.ts 的備份成功處加入 `log('Created backup: main.json.bak', 'debug')` 於 src/webview/messageHandler.ts
+-   [x] T024 [US4] 在 messageHandler.ts 的備份失敗處加入警告日誌於 src/webview/messageHandler.ts
 
 **Checkpoint**: User Story 4 完成，所有防護機制皆有日誌記錄
 
@@ -135,11 +135,11 @@
 
 **Purpose**: 整體驗證與文件更新
 
--   [ ] T025 執行 `npm run compile` 確認編譯通過
--   [ ] T026 [P] 執行 `npm run test` 確認所有測試通過
--   [ ] T027 [P] 執行 `npm run lint` 確認無 lint 錯誤
--   [ ] T028 執行 quickstart.md 手動測試檢查清單驗證
--   [ ] T029 [P] 更新 CHANGELOG.md 加入本功能說明
+-   [x] T025 執行 `npm run compile` 確認編譯通過
+-   [x] T026 [P] 執行 `npm run test` 確認所有測試通過
+-   [x] T027 [P] 執行 `npm run lint` 確認無 lint 錯誤
+-   [x] T028 執行 quickstart.md 手動測試檢查清單驗證
+-   [x] T029 [P] 更新 CHANGELOG.md 加入本功能說明
 
 ---
 

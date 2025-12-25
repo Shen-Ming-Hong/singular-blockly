@@ -1375,8 +1375,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 載入鎖定標記，防止 FileWatcher 觸發的 loadWorkspace 立即保存導致無限循環
 	let isLoadingFromFileWatcher = false;
 
+	/**
+	 * 判斷 Blockly 序列化狀態是否為空
+	 * @param {Object} state Blockly.serialization.workspaces.save() 的回傳值
+	 * @returns {boolean} true 表示狀態為空
+	 */
+	const isWorkspaceStateEmpty = state => {
+		return !state || !state.blocks || !state.blocks.blocks || state.blocks.blocks.length === 0;
+	};
+
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
+		// 如果正在拖曳方塊，跳過保存以避免資料遺失
+		if (isDraggingBlock) {
+			log.info('跳過保存：正在拖曳');
+			return;
+		}
+
 		// 如果正在從 FileWatcher 載入，跳過保存以避免無限循環
 		if (isLoadingFromFileWatcher) {
 			log.info('跳過保存：正在從 FileWatcher 載入');
@@ -1385,6 +1400,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		try {
 			const state = Blockly.serialization.workspaces.save(workspace);
+
+			// 空狀態檢查 - 防止意外覆寫有效資料
+			if (isWorkspaceStateEmpty(state)) {
+				log.warn('跳過保存：工作區為空');
+				return;
+			}
+
 			vscode.postMessage({
 				command: 'saveWorkspace',
 				state: state,

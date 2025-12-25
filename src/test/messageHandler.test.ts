@@ -191,11 +191,12 @@ describe('WebView Message Handler', () => {
 		// 準備測試
 		fileServiceStub.createDirectory.resolves();
 		fileServiceStub.writeJsonFile.resolves();
+		fileServiceStub.fileExists.returns(false); // 首次儲存，main.json 不存在
 
-		// 建立儲存工作區訊息
+		// 建立儲存工作區訊息（使用有效的方塊資料）
 		const saveWorkspaceMessage = {
 			command: 'saveWorkspace',
-			state: { blocks: [] },
+			state: { blocks: { languageVersion: 0, blocks: [{ type: 'controls_if', id: 'test1' }] } },
 			board: 'arduino:avr:uno',
 			theme: 'light',
 		};
@@ -210,7 +211,7 @@ describe('WebView Message Handler', () => {
 		const writeArgs = fileServiceStub.writeJsonFile.getCall(0).args;
 		assert.strictEqual(writeArgs[0], path.join('blockly', 'main.json'));
 		assert.deepStrictEqual(writeArgs[1], {
-			workspace: { blocks: [] },
+			workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'controls_if', id: 'test1' }] } },
 			board: 'arduino:avr:uno',
 			theme: 'light',
 		});
@@ -702,11 +703,12 @@ describe('WebView Message Handler', () => {
 
 		it('should handle saveWorkspace JSON serialization error', async () => {
 			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.fileExists.returns(false);
 			fileServiceStub.writeJsonFile.rejects(new Error('JSON error'));
 
 			const saveWorkspaceMessage = {
 				command: 'saveWorkspace',
-				state: { blocks: [] },
+				state: { blocks: { languageVersion: 0, blocks: [{ type: 'test', id: '1' }] } },
 				board: 'uno',
 				theme: 'light',
 			};
@@ -826,8 +828,13 @@ describe('WebView Message Handler', () => {
 		it('should handle general message processing error', async () => {
 			// Make handleMessage throw by corrupting internal state
 			fileServiceStub.createDirectory.rejects(new Error('Unexpected error'));
+			fileServiceStub.fileExists.returns(false);
 
-			const message = { command: 'saveWorkspace', state: {} };
+			// 使用有效的 state 以通過空狀態驗證
+			const message = {
+				command: 'saveWorkspace',
+				state: { blocks: { languageVersion: 0, blocks: [{ type: 'test', id: '1' }] } },
+			};
 			await messageHandler.handleMessage(message);
 
 			// Should catch and show error
@@ -960,6 +967,182 @@ describe('WebView Message Handler', () => {
 			const response = panelMock.webview.postMessage.lastCall?.args[0];
 			assert.strictEqual(response.command, 'backupListResponse');
 			assert.ok(Array.isArray(response.backups));
+		});
+
+		// ===== 空 Workspace 防護機制測試 (spec 019) =====
+
+		it('should reject empty workspace state', async () => {
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.writeJsonFile.resolves();
+
+			// 建立空狀態的儲存請求
+			const saveWorkspaceMessage = {
+				command: 'saveWorkspace',
+				state: { blocks: { languageVersion: 0, blocks: [] } },
+				board: 'uno',
+				theme: 'light',
+			};
+
+			await messageHandler.handleMessage(saveWorkspaceMessage);
+
+			// 驗證 writeJsonFile 未被呼叫（空狀態被拒絕）
+			assert.strictEqual(fileServiceStub.writeJsonFile.called, false);
+		});
+
+		it('should reject workspace with missing blocks property', async () => {
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.writeJsonFile.resolves();
+
+			// 建立缺少 blocks 屬性的儲存請求
+			const saveWorkspaceMessage = {
+				command: 'saveWorkspace',
+				state: {},
+				board: 'uno',
+				theme: 'light',
+			};
+
+			await messageHandler.handleMessage(saveWorkspaceMessage);
+
+			// 驗證 writeJsonFile 未被呼叫
+			assert.strictEqual(fileServiceStub.writeJsonFile.called, false);
+		});
+
+		it('should reject workspace with null state', async () => {
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.writeJsonFile.resolves();
+
+			// 建立 null 狀態的儲存請求
+			const saveWorkspaceMessage = {
+				command: 'saveWorkspace',
+				state: null,
+				board: 'uno',
+				theme: 'light',
+			};
+
+			await messageHandler.handleMessage(saveWorkspaceMessage);
+
+			// 驗證 writeJsonFile 未被呼叫
+			assert.strictEqual(fileServiceStub.writeJsonFile.called, false);
+		});
+
+		it('should create backup before save when file exists', async () => {
+			const mainJsonPath = path.join('blockly', 'main.json');
+
+			// 設置已存在的 main.json（有有效方塊）
+			fileServiceStub.fileExists.withArgs(mainJsonPath).returns(true);
+			fileServiceStub.readJsonFile.resolves({
+				workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'old_block', id: 'old1' }] } },
+				board: 'uno',
+				theme: 'light',
+			});
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.copyFile.resolves();
+			fileServiceStub.writeJsonFile.resolves();
+
+			// 發送有效的 saveWorkspace 訊息
+			const saveWorkspaceMessage = {
+				command: 'saveWorkspace',
+				state: { blocks: { languageVersion: 0, blocks: [{ type: 'new_block', id: 'new1' }] } },
+				board: 'uno',
+				theme: 'dark',
+			};
+
+			await messageHandler.handleMessage(saveWorkspaceMessage);
+
+			// 驗證 copyFile 被呼叫以建立備份
+			assert(fileServiceStub.copyFile.called);
+			const copyArgs = fileServiceStub.copyFile.getCall(0).args;
+			assert.strictEqual(copyArgs[0], mainJsonPath);
+			assert.strictEqual(copyArgs[1], mainJsonPath + '.bak');
+
+			// 驗證 writeJsonFile 也被呼叫
+			assert(fileServiceStub.writeJsonFile.called);
+		});
+
+		it('should skip backup when main.json does not exist', async () => {
+			const mainJsonPath = path.join('blockly', 'main.json');
+
+			// 設置 main.json 不存在（新專案首次儲存）
+			fileServiceStub.fileExists.withArgs(mainJsonPath).returns(false);
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.writeJsonFile.resolves();
+
+			// 發送有效的 saveWorkspace 訊息
+			const saveWorkspaceMessage = {
+				command: 'saveWorkspace',
+				state: { blocks: { languageVersion: 0, blocks: [{ type: 'test_block', id: 't1' }] } },
+				board: 'uno',
+				theme: 'light',
+			};
+
+			await messageHandler.handleMessage(saveWorkspaceMessage);
+
+			// 驗證 copyFile 未被呼叫（跳過備份）
+			assert.strictEqual(fileServiceStub.copyFile.called, false);
+
+			// 驗證 writeJsonFile 仍被呼叫
+			assert(fileServiceStub.writeJsonFile.called);
+		});
+
+		it('should skip backup when existing file is empty', async () => {
+			const mainJsonPath = path.join('blockly', 'main.json');
+
+			// 設置已存在但為空的 main.json
+			fileServiceStub.fileExists.withArgs(mainJsonPath).returns(true);
+			fileServiceStub.readJsonFile.resolves({
+				workspace: { blocks: { languageVersion: 0, blocks: [] } },
+				board: 'uno',
+				theme: 'light',
+			});
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.writeJsonFile.resolves();
+
+			// 發送有效的 saveWorkspace 訊息
+			const saveWorkspaceMessage = {
+				command: 'saveWorkspace',
+				state: { blocks: { languageVersion: 0, blocks: [{ type: 'test_block', id: 't1' }] } },
+				board: 'uno',
+				theme: 'light',
+			};
+
+			await messageHandler.handleMessage(saveWorkspaceMessage);
+
+			// 驗證 copyFile 未被呼叫（現有檔案為空，跳過備份）
+			assert.strictEqual(fileServiceStub.copyFile.called, false);
+
+			// 驗證 writeJsonFile 仍被呼叫
+			assert(fileServiceStub.writeJsonFile.called);
+		});
+
+		it('should continue save when backup fails', async () => {
+			const mainJsonPath = path.join('blockly', 'main.json');
+
+			// 設置已存在的 main.json
+			fileServiceStub.fileExists.withArgs(mainJsonPath).returns(true);
+			fileServiceStub.readJsonFile.resolves({
+				workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'old_block', id: 'old1' }] } },
+				board: 'uno',
+				theme: 'light',
+			});
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.copyFile.rejects(new Error('Backup failed'));
+			fileServiceStub.writeJsonFile.resolves();
+
+			// 發送有效的 saveWorkspace 訊息
+			const saveWorkspaceMessage = {
+				command: 'saveWorkspace',
+				state: { blocks: { languageVersion: 0, blocks: [{ type: 'new_block', id: 'new1' }] } },
+				board: 'uno',
+				theme: 'dark',
+			};
+
+			await messageHandler.handleMessage(saveWorkspaceMessage);
+
+			// 驗證 copyFile 被呼叫但失敗
+			assert(fileServiceStub.copyFile.called);
+
+			// 驗證 writeJsonFile 仍被呼叫（備份失敗不阻止儲存）
+			assert(fileServiceStub.writeJsonFile.called);
 		});
 
 		it('should handle promptNewVariable with empty input validation', async () => {

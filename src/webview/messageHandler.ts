@@ -297,11 +297,20 @@ export class WebViewMessageHandler {
 	 */
 	private async handleSaveWorkspace(message: any): Promise<void> {
 		try {
+			// 空狀態驗證 - 防止意外覆寫有效資料
+			if (this.isEmptyWorkspaceState(message.state)) {
+				log('Rejected empty workspace save request', 'warn');
+				return;
+			}
+
 			const blocklyDir = 'blockly';
 			const mainJsonPath = path.join(blocklyDir, 'main.json');
 
 			// 建立 blockly 目錄
 			await this.fileService.createDirectory(blocklyDir);
+
+			// 覆寫前備份
+			await this.createBackupBeforeSave(mainJsonPath);
 
 			// 驗證並清理資料
 			const cleanState = message.state ? JSON.parse(JSON.stringify(message.state)) : {};
@@ -321,6 +330,62 @@ export class WebViewMessageHandler {
 			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_UNABLE_SAVE_WORKSPACE', (error as Error).message);
 
 			vscodeApi.window.showErrorMessage(errorMsg);
+		}
+	}
+
+	/**
+	 * 判斷 workspace 狀態是否為空
+	 * @param state Blockly 序列化狀態
+	 * @returns true 表示狀態為空，應拒絕儲存
+	 */
+	private isEmptyWorkspaceState(state: any): boolean {
+		// 狀態不存在
+		if (!state) {
+			return true;
+		}
+
+		// blocks 屬性不存在
+		if (!state.blocks) {
+			return true;
+		}
+
+		// blocks.blocks 陣列不存在
+		if (!state.blocks.blocks) {
+			return true;
+		}
+
+		// 方塊陣列為空
+		if (state.blocks.blocks.length === 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * 覆寫前備份 main.json 到 main.json.bak
+	 * @param mainJsonPath main.json 的路徑
+	 */
+	private async createBackupBeforeSave(mainJsonPath: string): Promise<void> {
+		try {
+			// 檔案不存在，跳過備份（新專案首次儲存）
+			if (!this.fileService.fileExists(mainJsonPath)) {
+				return;
+			}
+
+			// 讀取現有檔案內容，檢查是否為空
+			const existingData = await this.fileService.readJsonFile<any>(mainJsonPath, null);
+			if (!existingData || this.isEmptyWorkspaceState(existingData.workspace)) {
+				return; // 現有檔案為空，跳過備份
+			}
+
+			// 建立備份
+			const bakPath = mainJsonPath + '.bak';
+			await this.fileService.copyFile(mainJsonPath, bakPath);
+			log('Created backup: main.json.bak', 'debug');
+		} catch (error) {
+			// 備份失敗不阻止儲存
+			log('Failed to create backup', 'warn', error);
 		}
 	}
 	/**
