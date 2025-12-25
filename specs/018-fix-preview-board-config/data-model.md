@@ -64,7 +64,7 @@ interface SetBoardMessage {
 	board: BoardConfigKey;
 	originalBoard?: string; // 原始備份中的 board 值 (用於除錯)
 	isDefault?: boolean; // 是否為預設值 (用於警告顯示)
-	warning?: string; // 警告訊息 (當 board 無效時)
+	warning?: string; // 警告訊息 (當 board 無效時，由 Extension 端透過 localeService 產生已翻譯文字)
 }
 
 // 載入工作區狀態訊息 (現有)

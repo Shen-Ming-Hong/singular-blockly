@@ -39,7 +39,7 @@
 
 -   [ ] T004 在 src/webview/webviewManager.ts 新增 BOARD_MAPPING 常數定義（對應 data-model.md 中的 BoardMapping）
 -   [ ] T005 [P] 在 src/webview/webviewManager.ts 新增 mapBoardValue() 輔助函數，處理備份檔案 board 值到 BOARD_CONFIGS key 的映射
--   [ ] T006 [P] 在 src/types/ 新增 PreviewMessage 類型定義（SetBoardMessage interface），對應 contracts/webview-messages.md
+-   [ ] T006 [P] 在 src/types/previewMessages.ts 新增 PreviewMessage 類型定義（SetBoardMessage interface），對應 contracts/webview-messages.md
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -56,9 +56,9 @@
 -   [ ] T007 [US1] 修改 src/webview/webviewManager.ts 的 loadBackupContent() 方法，讀取 backupData.board 並使用 mapBoardValue() 映射
 -   [ ] T008 [US1] 在 loadBackupContent() 中，於發送 loadWorkspaceState 訊息前先發送 setBoard 訊息（依照 contracts/webview-messages.md 順序）
 -   [ ] T009 [US1] 處理 board 缺失或無效的情況：預設使用 'uno' 並記錄警告日誌
--   [ ] T010 [P] [US1] 修改 media/js/blocklyPreview.js，新增 'setBoard' case 處理，呼叫 window.setCurrentBoard(message.board)
+-   [ ] T010 [US1] 修改 media/js/blocklyPreview.js，新增 'setBoard' case 處理，呼叫 window.setCurrentBoard(message.board)
 -   [ ] T011 [US1] 在 blocklyPreview.js 的 setBoard 處理中，若收到 warning 訊息則呼叫 showBoardWarning() 顯示警告
--   [ ] T012 [P] [US1] 在 media/js/blocklyPreview.js 新增 showBoardWarning(message) 函數，於預覽視窗顯示警告提示
+-   [ ] T012 [P] [US1] 在 media/js/blocklyPreview.js 新增 showBoardWarning(message) 函數，於預覽視窗顯示警告提示（警告訊息由 Extension 端透過 localeService 產生並傳送，WebView 端直接顯示）
 -   [ ] T013 [US1] 手動測試：建立 ESP32 專案備份並開啟預覽，驗證 GPIO 腳位正確顯示
 
 **Checkpoint**: ESP32 備份檔案預覽時，腳位應正確顯示為 GPIO 格式
@@ -130,7 +130,7 @@
 ### Within Each User Story
 
 -   Extension 端修改優先於 WebView 端修改
--   訊息發送邏輯優先於訊息處理邏輯
+-   訊息發送邏輯優先於訊息處理邏輯（T008 → T010 有測試依賴）
 -   核心功能優先於警告顯示
 -   手動測試在該 Story 實作完成後進行
 
@@ -138,8 +138,8 @@
 
 -   T002, T003 可並行（閱讀不同檔案）
 -   T005, T006 可並行（新增不同功能）
--   T010, T012 可並行（不同功能區塊）
--   US1 (T007-T013) 和 US2 (T014-T017) 大部分可並行
+-   T012 與 T011 可並行（警告顯示功能，不同函數）
+-   US1 (T007-T013) 和 US2 (T014-T017) 大部分可並行（注意：T010 需等待 T008 完成才能測試）
 -   T021, T022, T024, T025 可並行（獨立驗證任務）
 
 ---

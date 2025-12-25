@@ -43,6 +43,8 @@ interface SetBoardMessage {
 }
 ```
 
+**i18n 說明**: `warning` 訊息由 Extension 端透過 `localeService.getLocalizedMessage()` 產生，WebView 端直接顯示，無需額外翻譯處理。
+
 #### 2. loadWorkspaceState (現有)
 
 載入 Blockly 工作區狀態。

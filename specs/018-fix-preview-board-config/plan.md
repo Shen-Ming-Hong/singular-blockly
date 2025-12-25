@@ -60,8 +60,8 @@ specs/018-fix-preview-board-config/
 src/
 ├── webview/
 │   └── webviewManager.ts    # 修改: loadBackupContent() 傳送 board 設定
-└── test/
-    └── webviewPreview.test.ts  # 修改: 新增開發板載入測試
+└── types/
+    └── previewMessages.ts   # 新增: PreviewMessage 類型定義
 
 media/
 ├── js/
