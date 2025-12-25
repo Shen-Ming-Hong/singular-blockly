@@ -14,6 +14,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - JSON 檔案 (`{workspace}/blockly/backup/*.json`) (017-ctrl-s-quick-backup)
 - TypeScript 5.9.3, JavaScript ES2023 + Blockly 12.3.1, VS Code API 1.105.0+ (018-fix-preview-board-config)
 - JSON 檔案（備份格式: `{ workspace, board, theme }`） (018-fix-preview-board-config)
+- [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (019-empty-workspace-guard)
+- [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (019-empty-workspace-guard)
 
 -   TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly) (011-esp32-pwm-setup)
 
@@ -42,9 +44,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 019-empty-workspace-guard: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - 018-fix-preview-board-config: Added TypeScript 5.9.3, JavaScript ES2023 + Blockly 12.3.1, VS Code API 1.105.0+
 - 017-ctrl-s-quick-backup: Added TypeScript 5.9.3 / JavaScript (ES2022+) + VSCode Extension API 1.105.0+, Blockly 12.3.1
-- 016-esp32-wifi-mqtt: Added TypeScript 5.9.3 (Extension), JavaScript ES2022 (WebView/Blockly)
 
 
 <!-- MANUAL ADDITIONS START -->
