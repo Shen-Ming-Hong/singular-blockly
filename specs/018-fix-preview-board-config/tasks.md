@@ -25,9 +25,9 @@
 
 **Purpose**: 確認開發環境和理解現有程式碼
 
--   [ ] T001 確認開發環境就緒，執行 `npm run compile` 確保無編譯錯誤
--   [ ] T002 [P] 檢視現有 board 映射邏輯位於 media/blockly/blocks/board_configs.js
--   [ ] T003 [P] 檢視現有預覽載入流程位於 src/webview/webviewManager.ts 的 loadBackupContent() 方法
+-   [x] T001 確認開發環境就緒，執行 `npm run compile` 確保無編譯錯誤
+-   [x] T002 [P] 檢視現有 board 映射邏輯位於 media/blockly/blocks/board_configs.js
+-   [x] T003 [P] 檢視現有預覽載入流程位於 src/webview/webviewManager.ts 的 loadBackupContent() 方法
 
 ---
 
@@ -37,9 +37,9 @@
 
 **⚠️ CRITICAL**: 此階段完成後，各 User Story 才能獨立實作
 
--   [ ] T004 在 src/webview/webviewManager.ts 新增 BOARD_MAPPING 常數定義（對應 data-model.md 中的 BoardMapping）
--   [ ] T005 [P] 在 src/webview/webviewManager.ts 新增 mapBoardValue() 輔助函數，處理備份檔案 board 值到 BOARD_CONFIGS key 的映射
--   [ ] T006 [P] 在 src/types/previewMessages.ts 新增 PreviewMessage 類型定義（SetBoardMessage interface），對應 contracts/webview-messages.md
+-   [x] T004 在 src/webview/webviewManager.ts 新增 BOARD_MAPPING 常數定義（對應 data-model.md 中的 BoardMapping）
+-   [x] T005 [P] 在 src/webview/webviewManager.ts 新增 mapBoardValue() 輔助函數，處理備份檔案 board 值到 BOARD_CONFIGS key 的映射
+-   [x] T006 [P] 在 src/types/previewMessages.ts 新增 PreviewMessage 類型定義（SetBoardMessage interface），對應 contracts/webview-messages.md
 
 **Checkpoint**: Foundation ready - user story implementation can now begin
 
@@ -53,12 +53,12 @@
 
 ### Implementation for User Story 1
 
--   [ ] T007 [US1] 修改 src/webview/webviewManager.ts 的 loadBackupContent() 方法，讀取 backupData.board 並使用 mapBoardValue() 映射
--   [ ] T008 [US1] 在 loadBackupContent() 中，於發送 loadWorkspaceState 訊息前先發送 setBoard 訊息（依照 contracts/webview-messages.md 順序）
--   [ ] T009 [US1] 處理 board 缺失或無效的情況：預設使用 'uno' 並記錄警告日誌
--   [ ] T010 [US1] 修改 media/js/blocklyPreview.js，新增 'setBoard' case 處理，呼叫 window.setCurrentBoard(message.board)
--   [ ] T011 [US1] 在 blocklyPreview.js 的 setBoard 處理中，若收到 warning 訊息則呼叫 showBoardWarning() 顯示警告
--   [ ] T012 [P] [US1] 在 media/js/blocklyPreview.js 新增 showBoardWarning(message) 函數，於預覽視窗顯示警告提示（警告訊息由 Extension 端透過 localeService 產生並傳送，WebView 端直接顯示）
+-   [x] T007 [US1] 修改 src/webview/webviewManager.ts 的 loadBackupContent() 方法，讀取 backupData.board 並使用 mapBoardValue() 映射
+-   [x] T008 [US1] 在 loadBackupContent() 中，於發送 loadWorkspaceState 訊息前先發送 setBoard 訊息（依照 contracts/webview-messages.md 順序）
+-   [x] T009 [US1] 處理 board 缺失或無效的情況：預設使用 'uno' 並記錄警告日誌
+-   [x] T010 [US1] 修改 media/js/blocklyPreview.js，新增 'setBoard' case 處理，呼叫 window.setCurrentBoard(message.board)
+-   [x] T011 [US1] 在 blocklyPreview.js 的 setBoard 處理中，若收到 warning 訊息則呼叫 showBoardWarning() 顯示警告
+-   [x] T012 [P] [US1] 在 media/js/blocklyPreview.js 新增 showBoardWarning(message) 函數，於預覽視窗顯示警告提示（警告訊息由 Extension 端透過 localeService 產生並傳送，WebView 端直接顯示）
 -   [ ] T013 [US1] 手動測試：建立 ESP32 專案備份並開啟預覽，驗證 GPIO 腳位正確顯示
 
 **Checkpoint**: ESP32 備份檔案預覽時，腳位應正確顯示為 GPIO 格式
@@ -73,9 +73,9 @@
 
 ### Implementation for User Story 2
 
--   [ ] T014 [US2] 修改 media/html/blocklyPreview.html，新增 ESP32 WiFi/MQTT 積木定義腳本載入 `<script src="{esp32WifiMqttBlocksUri}"></script>`
--   [ ] T015 [US2] 修改 src/webview/webviewManager.ts 的 getPreviewContent() 方法，新增 esp32WifiMqttBlocksUri 的 URI 生成和替換邏輯
--   [ ] T016 [US2] 確保 ESP32 積木的 generator 檔案也被載入（如需要），檢查 media/blockly/generators/arduino/esp32-wifi-mqtt.js
+-   [x] T014 [US2] 修改 media/html/blocklyPreview.html，新增 ESP32 WiFi/MQTT 積木定義腳本載入 `<script src="{esp32WifiMqttBlocksUri}"></script>`
+-   [x] T015 [US2] 修改 src/webview/webviewManager.ts 的 getPreviewContent() 方法，新增 esp32WifiMqttBlocksUri 的 URI 生成和替換邏輯
+-   [x] T016 [US2] 確保 ESP32 積木的 generator 檔案也被載入（如需要），檢查 media/blockly/generators/arduino/esp32-wifi-mqtt.js
 -   [ ] T017 [US2] 手動測試：建立包含 WiFi 連線積木和 MQTT 積木的備份，開啟預覽，驗證積木正確顯示
 
 **Checkpoint**: ESP32 WiFi/MQTT 積木應在預覽模式正確顯示，無「未知積木」警告
@@ -90,7 +90,7 @@
 
 ### Implementation for User Story 3
 
--   [ ] T018 [US3] 驗證 blocklyPreview.js 中的 setCurrentBoard() 呼叫不會影響其他預覽視窗（WebView 隔離性）
+-   [x] T018 [US3] 驗證 blocklyPreview.js 中的 setCurrentBoard() 呼叫不會影響其他預覽視窗（WebView 隔離性）
 -   [ ] T019 [US3] 手動測試：依序開啟 ESP32 備份預覽、Arduino Uno 備份預覽，確認各自腳位正確
 -   [ ] T020 [US3] 手動測試：同時開啟多個不同開發板的預覽視窗，確認各視窗獨立正確
 
@@ -102,11 +102,11 @@
 
 **Purpose**: 程式碼品質、文件更新和最終驗證
 
--   [ ] T021 [P] 執行 `npm run lint` 確保無 lint 錯誤
--   [ ] T022 [P] 更新 CHANGELOG.md 記錄本次修復（Bug Fixes 區塊）
+-   [x] T021 [P] 執行 `npm run lint` 確保無 lint 錯誤
+-   [x] T022 [P] 更新 CHANGELOG.md 記錄本次修復（Bug Fixes 區塊）
 -   [ ] T023 執行 quickstart.md 中的所有驗證步驟，確認完整功能運作
--   [ ] T024 [P] 檢查向後相容性：開啟舊版無 board 欄位的備份，確認使用預設 Arduino Uno 配置
--   [ ] T025 [P] 驗證效能：確認預覽視窗載入時間增加 < 500ms（SC-003 成功指標）
+-   [x] T024 [P] 檢查向後相容性：開啟舊版無 board 欄位的備份，確認使用預設 Arduino Uno 配置
+-   [x] T025 [P] 驗證效能：確認預覽視窗載入時間增加 < 500ms（SC-003 成功指標）
 
 ---
 

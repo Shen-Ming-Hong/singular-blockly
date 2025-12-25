@@ -315,12 +315,65 @@ function loadWorkspaceFromState(workspaceState) {
 }
 
 /**
- * 監聽來自擴充功能的訊息
+ * 顯示開發板警告訊息
+ * 當備份檔案中的 board 值無效時，在預覽視窗頂部顯示警告
+ * @param {string} message - 警告訊息文字（已由 Extension 端翻譯）
+ */
+function showBoardWarning(message) {
+	// 移除現有的警告（如果有）
+	const existingWarning = document.querySelector('.board-warning');
+	if (existingWarning) {
+		existingWarning.remove();
+	}
+
+	// 建立警告元素
+	const warningEl = document.createElement('div');
+	warningEl.className = 'board-warning';
+	warningEl.style.cssText = `
+		background-color: #ffc107;
+		color: #212529;
+		padding: 8px 16px;
+		font-size: 13px;
+		text-align: center;
+		border-bottom: 1px solid #e0a800;
+	`;
+	warningEl.textContent = message;
+
+	// 插入到 preview-info 後面
+	const previewInfo = document.querySelector('.preview-info');
+	if (previewInfo && previewInfo.parentNode) {
+		previewInfo.parentNode.insertBefore(warningEl, previewInfo.nextSibling);
+	} else {
+		// Fallback: 插入到 body 開頭
+		document.body.insertBefore(warningEl, document.body.firstChild);
+	}
+
+	log.warn(`Board warning displayed: ${message}`);
+}
+
+/**
+ * 監聯來自擴充功能的訊息
  */
 window.addEventListener('message', event => {
 	const message = event.data;
 
 	switch (message.command) {
+		case 'setBoard':
+			// T010: 設定開發板類型（必須在 loadWorkspaceState 之前處理）
+			if (message.board && window.setCurrentBoard) {
+				window.setCurrentBoard(message.board);
+				log.info(`預覽模式開發板已設定為: ${message.board}`, {
+					originalBoard: message.originalBoard,
+					isDefault: message.isDefault,
+				});
+			}
+
+			// T011: 顯示警告（如果有）
+			if (message.warning) {
+				showBoardWarning(message.warning);
+			}
+			break;
+
 		case 'loadWorkspaceState':
 			if (message.workspaceState) {
 				loadWorkspaceFromState(message.workspaceState);
