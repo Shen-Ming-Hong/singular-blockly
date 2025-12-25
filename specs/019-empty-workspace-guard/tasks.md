@@ -59,7 +59,9 @@
 ### Implementation for User Story 1
 
 -   [ ] T007 [US1] 驗證現有 `saveWorkspaceState()` 正常運作於 media/js/blocklyEdit.js
+    -   **驗收標準**：手動新增一個方塊 → 等待 2 秒自動儲存 → 關閉編輯器 → 重新開啟 → 方塊仍存在
 -   [ ] T008 [US1] 驗證現有 `handleSaveWorkspace()` 正常運作於 src/webview/messageHandler.ts
+    -   **驗收標準**：檢查 Output Channel 有顯示儲存相關日誌，且 `blockly/main.json` 檔案內容包含新增的方塊資料
 
 **Checkpoint**: User Story 1 驗證完成，確認現有儲存流程正常
 
