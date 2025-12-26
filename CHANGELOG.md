@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.48.2] - 2025-12-26
+
 ### 修復 Bug Fixes
 
 -   **空 Workspace 防護機制** (Empty Workspace Guard)
