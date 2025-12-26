@@ -8,6 +8,25 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 修復 Bug Fixes
+
+-   **空 Workspace 防護機制** (Empty Workspace Guard)
+
+    -   修復方塊拖曳時意外消失的資料遺失問題
+        Fixed data loss issue where blocks disappear unexpectedly during drag
+    -   WebView 層：拖曳中不儲存，避免序列化不完整狀態
+        WebView layer: Skip save during drag to avoid serializing incomplete state
+    -   WebView 層：空工作區狀態不送出，防止覆寫有效資料
+        WebView layer: Empty workspace state not sent, prevents overwriting valid data
+    -   Extension 層：拒絕空狀態儲存請求，作為第二層防護
+        Extension layer: Reject empty state save requests as second-line defense
+    -   覆寫前自動備份：每次儲存前將現有 `main.json` 備份到 `main.json.bak`
+        Auto backup before overwrite: Backs up existing `main.json` to `main.json.bak` before each save
+    -   新增 7 個單元測試確保防護機制正常運作
+        Added 7 unit tests to ensure guard mechanism works correctly
+
 ## [0.48.1] - 2025-12-25
 
 ### 修復 Bug Fixes
