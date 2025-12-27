@@ -431,8 +431,8 @@ window.languageManager.loadMessages('cs', {
 	// HUSKYLENS Chytrá Kamera
 	HUSKYLENS_INIT_I2C: 'Inicializovat HUSKYLENS (I2C)',
 	HUSKYLENS_INIT_UART: 'Inicializovat HUSKYLENS (UART)',
-	HUSKYLENS_RX_PIN: 'RX pin',
-	HUSKYLENS_TX_PIN: 'TX pin',
+	HUSKYLENS_RX_PIN: 'Připojit k HuskyLens TX →',
+	HUSKYLENS_TX_PIN: 'Připojit k HuskyLens RX →',
 	HUSKYLENS_SET_ALGORITHM: 'Nastavit algoritmus HUSKYLENS na',
 	HUSKYLENS_ALGORITHM_FACE_RECOGNITION: 'Rozpoznávání obličeje',
 	HUSKYLENS_ALGORITHM_OBJECT_TRACKING: 'Sledování objektů',

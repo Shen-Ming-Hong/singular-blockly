@@ -10,6 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 修復 Bug Fixes
+
+-   **修正 HuskyLens 積木 RX/TX 標籤顯示** (Fix HuskyLens Block RX/TX Label Display)
+
+    -   將 HuskyLens UART 積木的標籤從「RX 腳位」「TX 腳位」改為「連接 HuskyLens TX →」「連接 HuskyLens RX →」
+        Changed HuskyLens UART block labels from "RX Pin" / "TX Pin" to "Connect to HuskyLens TX →" / "Connect to HuskyLens RX →"
+    -   更清楚指引使用者 Arduino 腳位應連接到 HuskyLens 的哪個腳位
+        Clearer guidance for users on which HuskyLens pin to connect Arduino pins to
+    -   新增智慧預設腳位：ESP32 (GPIO16/17)、Super Mini (GPIO20/21)、AVR (D2/D3)
+        Added smart default pins: ESP32 (GPIO16/17), Super Mini (GPIO20/21), AVR (D2/D3)
+    -   新增腳位驗證 fallback：當預設腳位不在有效列表中時回退到第一個可用腳位
+        Added pin validation fallback: falls back to first available pin when default is invalid
+    -   支援 15 種語言的 i18n 翻譯
+        Supports i18n translations for 15 languages
+    -   100% 向後相容：舊版 main.json 的 HuskyLens 積木腳位設定能正確還原
+        100% backward compatible: old main.json HuskyLens block pin settings restore correctly
+
 ## [0.48.2] - 2025-12-26
 
 ### 修復 Bug Fixes

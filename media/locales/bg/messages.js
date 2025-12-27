@@ -432,8 +432,8 @@ window.languageManager.loadMessages('bg', {
 	// HUSKYLENS Интелигентна Камера
 	HUSKYLENS_INIT_I2C: 'Инициализирай HUSKYLENS (I2C)',
 	HUSKYLENS_INIT_UART: 'Инициализирай HUSKYLENS (UART)',
-	HUSKYLENS_RX_PIN: 'RX пин',
-	HUSKYLENS_TX_PIN: 'TX пин',
+	HUSKYLENS_RX_PIN: 'Свържи с HuskyLens TX →',
+	HUSKYLENS_TX_PIN: 'Свържи с HuskyLens RX →',
 	HUSKYLENS_SET_ALGORITHM: 'Настрой алгоритъм на HUSKYLENS на',
 	HUSKYLENS_ALGORITHM_FACE_RECOGNITION: 'Разпознаване на лица',
 	HUSKYLENS_ALGORITHM_OBJECT_TRACKING: 'Проследяване на обекти',

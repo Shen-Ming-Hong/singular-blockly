@@ -26,6 +26,38 @@ const HUSKYLENS_PIN_INFO = {
 };
 
 /**
+ * HuskyLens UART 預設腳位配置
+ * 根據不同開發板設定合適的預設 RX/TX 腳位
+ */
+const HUSKYLENS_UART_DEFAULTS = {
+	esp32: { rx: '16', tx: '17' },
+	supermini: { rx: '20', tx: '21' },
+	uno: { rx: '2', tx: '3' },
+	nano: { rx: '2', tx: '3' },
+	mega: { rx: '2', tx: '3' },
+};
+
+/**
+ * 取得目前開發板的 HuskyLens UART 預設腳位
+ * @returns {{ rx: string, tx: string }} 預設腳位
+ */
+function getHuskyLensUARTDefaults() {
+	const board = window.currentBoard || 'uno';
+	return HUSKYLENS_UART_DEFAULTS[board] || HUSKYLENS_UART_DEFAULTS.uno;
+}
+
+/**
+ * 驗證腳位是否在有效列表中，若無效則返回 fallback 值
+ * @param {string} pin 要驗證的腳位
+ * @param {Array} validPins 有效腳位列表 [[display, value], ...]
+ * @returns {string} 有效的腳位值
+ */
+function validateHuskyLensPin(pin, validPins) {
+	const isValid = validPins.some(([, value]) => value === pin);
+	return isValid ? pin : validPins[0]?.[1] || '0';
+}
+
+/**
  * 取得目前開發板的 I2C 腳位資訊
  * @returns {string} 腳位描述
  */
@@ -106,6 +138,14 @@ Blockly.Blocks['huskylens_init_uart'] = {
 			return baseMsg + '\n' + pinHint + pinInfo;
 		});
 		this.setHelpUrl('');
+
+		// 設定預設腳位（根據目前開發板）
+		const defaults = getHuskyLensUARTDefaults();
+		const validPins = window.getDigitalPinOptions();
+		const defaultRx = validateHuskyLensPin(defaults.rx, validPins);
+		const defaultTx = validateHuskyLensPin(defaults.tx, validPins);
+		this.setFieldValue(defaultRx, 'RX_PIN');
+		this.setFieldValue(defaultTx, 'TX_PIN');
 	},
 };
 
