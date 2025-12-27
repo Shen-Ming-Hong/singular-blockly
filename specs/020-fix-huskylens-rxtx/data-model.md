@@ -10,24 +10,25 @@
 
 **欄位結構**:
 
-| 欄位名稱 | 類型 | 說明 | 預設值 |
-|----------|------|------|--------|
+| 欄位名稱 | 類型     | 說明                                  | 預設值           |
+| -------- | -------- | ------------------------------------- | ---------------- |
 | `RX_PIN` | Dropdown | Arduino 接收腳位（連接 HuskyLens TX） | 依開發板動態設定 |
 | `TX_PIN` | Dropdown | Arduino 發送腳位（連接 HuskyLens RX） | 依開發板動態設定 |
 
 **預設腳位對照表**:
 
-| 開發板 | `RX_PIN` 預設值 | `TX_PIN` 預設值 |
-|--------|----------------|----------------|
-| `esp32` | `"16"` | `"17"` |
-| `supermini` | `"20"` | `"21"` |
-| `uno` | `"2"` | `"3"` |
-| `nano` | `"2"` | `"3"` |
-| `mega` | `"2"` | `"3"` |
+| 開發板      | `RX_PIN` 預設值 | `TX_PIN` 預設值 |
+| ----------- | --------------- | --------------- |
+| `esp32`     | `"16"`          | `"17"`          |
+| `supermini` | `"20"`          | `"21"`          |
+| `uno`       | `"2"`           | `"3"`           |
+| `nano`      | `"2"`           | `"3"`           |
+| `mega`      | `"2"`           | `"3"`           |
 
 **驗證規則**:
-- 欄位值必須在 `window.getDigitalPinOptions()` 返回的有效腳位列表中
-- 若預設值不在有效列表中，fallback 到第一個可用腳位
+
+-   欄位值必須在 `window.getDigitalPinOptions()` 返回的有效腳位列表中
+-   若預設值不在有效列表中，fallback 到第一個可用腳位
 
 ---
 
@@ -37,8 +38,8 @@
 
 **訊息鍵對照表**:
 
-| 訊息鍵 | 用途 | 舊值範例 | 新值範例 |
-|--------|------|----------|----------|
+| 訊息鍵             | 用途        | 舊值範例    | 新值範例                |
+| ------------------ | ----------- | ----------- | ----------------------- |
 | `HUSKYLENS_RX_PIN` | RX 腳位標籤 | `'RX 腳位'` | `'連接 HuskyLens TX →'` |
 | `HUSKYLENS_TX_PIN` | TX 腳位標籤 | `'TX 腳位'` | `'連接 HuskyLens RX →'` |
 
@@ -146,11 +147,11 @@
 
 ```javascript
 const HUSKYLENS_UART_DEFAULTS = {
-    esp32: { rx: '16', tx: '17' },
-    supermini: { rx: '20', tx: '21' },
-    uno: { rx: '2', tx: '3' },
-    nano: { rx: '2', tx: '3' },
-    mega: { rx: '2', tx: '3' },
+	esp32: { rx: '16', tx: '17' },
+	supermini: { rx: '20', tx: '21' },
+	uno: { rx: '2', tx: '3' },
+	nano: { rx: '2', tx: '3' },
+	mega: { rx: '2', tx: '3' },
 };
 ```
 
@@ -162,8 +163,8 @@ const HUSKYLENS_UART_DEFAULTS = {
  * @returns {{ rx: string, tx: string }} 預設腳位
  */
 function getHuskyLensUARTDefaults() {
-    const board = window.currentBoard || 'uno';
-    return HUSKYLENS_UART_DEFAULTS[board] || HUSKYLENS_UART_DEFAULTS.uno;
+	const board = window.currentBoard || 'uno';
+	return HUSKYLENS_UART_DEFAULTS[board] || HUSKYLENS_UART_DEFAULTS.uno;
 }
 
 /**
@@ -173,8 +174,8 @@ function getHuskyLensUARTDefaults() {
  * @returns {string} 有效的腳位值
  */
 function validatePin(pin, validPins) {
-    const isValid = validPins.some(([, value]) => value === pin);
-    return isValid ? pin : validPins[0]?.[1] || '0';
+	const isValid = validPins.some(([, value]) => value === pin);
+	return isValid ? pin : validPins[0]?.[1] || '0';
 }
 ```
 
@@ -191,8 +192,9 @@ function validatePin(pin, validPins) {
 ```
 
 **關鍵點**:
-- 新建積木：使用 `HUSKYLENS_UART_DEFAULTS` 設定預設腳位
-- 載入積木：Blockly 自動從 JSON 還原欄位值，不受預設值影響
+
+-   新建積木：使用 `HUSKYLENS_UART_DEFAULTS` 設定預設腳位
+-   載入積木：Blockly 自動從 JSON 還原欄位值，不受預設值影響
 
 ---
 
@@ -202,22 +204,23 @@ function validatePin(pin, validPins) {
 
 ```json
 {
-    "blocks": {
-        "blocks": [
-            {
-                "type": "huskylens_init_uart",
-                "id": "abc123",
-                "fields": {
-                    "RX_PIN": "10",
-                    "TX_PIN": "11"
-                }
-            }
-        ]
-    }
+	"blocks": {
+		"blocks": [
+			{
+				"type": "huskylens_init_uart",
+				"id": "abc123",
+				"fields": {
+					"RX_PIN": "10",
+					"TX_PIN": "11"
+				}
+			}
+		]
+	}
 }
 ```
 
 **保證**:
-- 欄位名稱 `RX_PIN`、`TX_PIN` 保持不變
-- 欄位值格式（字串）保持不變
-- 舊版 main.json 100% 相容
+
+-   欄位名稱 `RX_PIN`、`TX_PIN` 保持不變
+-   欄位值格式（字串）保持不變
+-   舊版 main.json 100% 相容
