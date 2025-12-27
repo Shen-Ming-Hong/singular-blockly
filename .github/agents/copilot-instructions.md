@@ -16,6 +16,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - JSON 檔案（備份格式: `{ workspace, board, theme }`） (018-fix-preview-board-config)
 - TypeScript 5.9.3, JavaScript ES2023 + Blockly 12.3.1, VS Code API 1.105.0+ (019-empty-workspace-guard)
 - JSON 檔案 (`blockly/main.json`, `blockly/main.json.bak`) (019-empty-workspace-guard)
+- JavaScript (ES6+), TypeScript 5.9.3 + Google Blockly 12.3.1, VSCode Extension API 1.105.0+ (020-fix-huskylens-rxtx)
+- Workspace JSON 檔案 (`blockly/main.json`) (020-fix-huskylens-rxtx)
 
 -   TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly) (011-esp32-pwm-setup)
 
@@ -44,9 +46,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 020-fix-huskylens-rxtx: Added JavaScript (ES6+), TypeScript 5.9.3 + Google Blockly 12.3.1, VSCode Extension API 1.105.0+
 - 019-empty-workspace-guard: Added TypeScript 5.9.3, JavaScript ES2023 + Blockly 12.3.1, VS Code API 1.105.0+
 - 018-fix-preview-board-config: Added TypeScript 5.9.3, JavaScript ES2023 + Blockly 12.3.1, VS Code API 1.105.0+
-- 017-ctrl-s-quick-backup: Added TypeScript 5.9.3 / JavaScript (ES2022+) + VSCode Extension API 1.105.0+, Blockly 12.3.1
 
 
 <!-- MANUAL ADDITIONS START -->
