@@ -491,8 +491,8 @@ window.languageManager.loadMessages('es', {
 	// HUSKYLENS Smart Camera
 	HUSKYLENS_INIT_I2C: 'Inicializar HUSKYLENS (I2C)',
 	HUSKYLENS_INIT_UART: 'Inicializar HUSKYLENS (UART)',
-	HUSKYLENS_RX_PIN: 'Pin RX',
-	HUSKYLENS_TX_PIN: 'Pin TX',
+	HUSKYLENS_RX_PIN: 'Conectar a HuskyLens TX →',
+	HUSKYLENS_TX_PIN: 'Conectar a HuskyLens RX →',
 	HUSKYLENS_SET_ALGORITHM: 'Configurar Algoritmo HUSKYLENS',
 	HUSKYLENS_ALGORITHM_FACE_RECOGNITION: 'Reconocimiento Facial',
 	HUSKYLENS_ALGORITHM_OBJECT_TRACKING: 'Seguimiento de Objeto',

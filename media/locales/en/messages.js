@@ -435,8 +435,8 @@ window.languageManager.loadMessages('en', {
 	// HUSKYLENS Block Translations
 	HUSKYLENS_INIT_I2C: 'Initialize HUSKYLENS (I2C)',
 	HUSKYLENS_INIT_UART: 'Initialize HUSKYLENS (UART)',
-	HUSKYLENS_RX_PIN: 'RX Pin',
-	HUSKYLENS_TX_PIN: 'TX Pin',
+	HUSKYLENS_RX_PIN: 'Connect to HuskyLens TX →',
+	HUSKYLENS_TX_PIN: 'Connect to HuskyLens RX →',
 	HUSKYLENS_SET_ALGORITHM: 'Set HUSKYLENS algorithm to',
 	HUSKYLENS_ALGORITHM_FACE_RECOGNITION: 'Face Recognition',
 	HUSKYLENS_ALGORITHM_OBJECT_TRACKING: 'Object Tracking',

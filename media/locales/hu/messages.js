@@ -432,8 +432,8 @@ window.languageManager.loadMessages('hu', {
 	// HUSKYLENS Intelligens Kamera
 	HUSKYLENS_INIT_I2C: 'HUSKYLENS inicializálása (I2C)',
 	HUSKYLENS_INIT_UART: 'HUSKYLENS inicializálása (UART)',
-	HUSKYLENS_RX_PIN: 'RX láb',
-	HUSKYLENS_TX_PIN: 'TX láb',
+	HUSKYLENS_RX_PIN: 'Csatlakozás HuskyLens TX-hez →',
+	HUSKYLENS_TX_PIN: 'Csatlakozás HuskyLens RX-hez →',
 	HUSKYLENS_SET_ALGORITHM: 'HUSKYLENS algoritmus beállítása erre',
 	HUSKYLENS_ALGORITHM_FACE_RECOGNITION: 'Arcfelismerés',
 	HUSKYLENS_ALGORITHM_OBJECT_TRACKING: 'Objektumkövetés',

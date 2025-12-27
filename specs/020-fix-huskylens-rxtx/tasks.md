@@ -25,8 +25,8 @@
 
 **Purpose**: 確認現有程式碼結構和測試環境
 
--   [ ] T001 確認 HuskyLens UART 積木現有結構在 media/blockly/blocks/huskylens.js
--   [ ] T002 [P] 確認 window.currentBoard 和 window.getDigitalPinOptions() 可用性
+-   [x] T001 確認 HuskyLens UART 積木現有結構在 media/blockly/blocks/huskylens.js
+-   [x] T002 [P] 確認 window.currentBoard 和 window.getDigitalPinOptions() 可用性
 
 ---
 
@@ -38,22 +38,22 @@
 
 ### 實作 User Story 1
 
--   [ ] T003 [P] [US1] 更新英語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/en/messages.js
--   [ ] T004 [P] [US1] 更新繁體中文訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/zh-hant/messages.js
--   [ ] T005 [P] [US1] 更新日語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/ja/messages.js
--   [ ] T006 [P] [US1] 更新韓語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/ko/messages.js
--   [ ] T007 [P] [US1] 更新德語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/de/messages.js
--   [ ] T008 [P] [US1] 更新法語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/fr/messages.js
--   [ ] T009 [P] [US1] 更新西班牙語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/es/messages.js
--   [ ] T010 [P] [US1] 更新巴西葡萄牙語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/pt-br/messages.js
--   [ ] T011 [P] [US1] 更新義大利語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/it/messages.js
--   [ ] T012 [P] [US1] 更新俄語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/ru/messages.js
--   [ ] T013 [P] [US1] 更新波蘭語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/pl/messages.js
--   [ ] T014 [P] [US1] 更新匈牙利語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/hu/messages.js
--   [ ] T015 [P] [US1] 更新土耳其語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/tr/messages.js
--   [ ] T016 [P] [US1] 更新保加利亞語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/bg/messages.js
--   [ ] T017 [P] [US1] 更新捷克語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/cs/messages.js
--   [ ] T018 [US1] 執行 npm run validate:i18n 驗證所有語言檔案翻譯品質
+-   [x] T003 [P] [US1] 更新英語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/en/messages.js
+-   [x] T004 [P] [US1] 更新繁體中文訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/zh-hant/messages.js
+-   [x] T005 [P] [US1] 更新日語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/ja/messages.js
+-   [x] T006 [P] [US1] 更新韓語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/ko/messages.js
+-   [x] T007 [P] [US1] 更新德語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/de/messages.js
+-   [x] T008 [P] [US1] 更新法語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/fr/messages.js
+-   [x] T009 [P] [US1] 更新西班牙語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/es/messages.js
+-   [x] T010 [P] [US1] 更新巴西葡萄牙語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/pt-br/messages.js
+-   [x] T011 [P] [US1] 更新義大利語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/it/messages.js
+-   [x] T012 [P] [US1] 更新俄語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/ru/messages.js
+-   [x] T013 [P] [US1] 更新波蘭語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/pl/messages.js
+-   [x] T014 [P] [US1] 更新匈牙利語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/hu/messages.js
+-   [x] T015 [P] [US1] 更新土耳其語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/tr/messages.js
+-   [x] T016 [P] [US1] 更新保加利亞語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/bg/messages.js
+-   [x] T017 [P] [US1] 更新捷克語訊息 HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 在 media/locales/cs/messages.js
+-   [x] T018 [US1] 執行 npm run validate:i18n 驗證所有語言檔案翻譯品質
 
 **Checkpoint**: 此時所有 15 種語言的標籤應顯示新格式「連接 HuskyLens TX/RX →」
 
@@ -67,10 +67,10 @@
 
 ### 實作 User Story 2
 
--   [ ] T019 [US2] 在 media/blockly/blocks/huskylens.js 新增 HUSKYLENS_UART_DEFAULTS 預設腳位配置常數
--   [ ] T020 [US2] 在 media/blockly/blocks/huskylens.js 新增 getHuskyLensUARTDefaults() 輔助函式
--   [ ] T021 [US2] 修改 huskylens_init_uart 積木的 init() 在 media/blockly/blocks/huskylens.js 加入預設腳位設定邏輯
--   [ ] T022 [US2] 實作腳位驗證 fallback 邏輯：當預設腳位不在有效列表中時回退到第一個可用腳位（測試場景：臨時修改 HUSKYLENS_UART_DEFAULTS 中 ESP32 的 rx 為 "99"，確認積木顯示第一個有效腳位而非 "99"）
+-   [x] T019 [US2] 在 media/blockly/blocks/huskylens.js 新增 HUSKYLENS_UART_DEFAULTS 預設腳位配置常數
+-   [x] T020 [US2] 在 media/blockly/blocks/huskylens.js 新增 getHuskyLensUARTDefaults() 輔助函式
+-   [x] T021 [US2] 修改 huskylens_init_uart 積木的 init() 在 media/blockly/blocks/huskylens.js 加入預設腳位設定邏輯
+-   [x] T022 [US2] 實作腳位驗證 fallback 邏輯：當預設腳位不在有效列表中時回退到第一個可用腳位（測試場景：臨時修改 HUSKYLENS_UART_DEFAULTS 中 ESP32 的 rx 為 "99"，確認積木顯示第一個有效腳位而非 "99"）
 
 **Checkpoint**: 此時 ESP32、Super Mini、AVR 開發板應自動設定正確的預設腳位
 
@@ -84,9 +84,9 @@
 
 ### 實作 User Story 3
 
--   [ ] T023 [US3] 確認 RX_PIN 和 TX_PIN 欄位名稱在 media/blockly/blocks/huskylens.js 中保持不變
--   [ ] T024 [US3] 建立測試用舊版 main.json 檔案，含 HuskyLens UART 積木（RX_PIN: "10", TX_PIN: "11"）
--   [ ] T025 [US3] 驗證載入舊版 main.json 後，積木顯示新標籤但保留原本腳位設定
+-   [x] T023 [US3] 確認 RX_PIN 和 TX_PIN 欄位名稱在 media/blockly/blocks/huskylens.js 中保持不變
+-   [x] T024 [US3] 建立測試用舊版 main.json 檔案，含 HuskyLens UART 積木（RX_PIN: "10", TX_PIN: "11"）
+-   [x] T025 [US3] 驗證載入舊版 main.json 後，積木顯示新標籤但保留原本腳位設定
 
 **Checkpoint**: 此時舊版工作區檔案應 100% 相容載入
 
@@ -96,11 +96,11 @@
 
 **Purpose**: 最終驗證和文件更新
 
--   [ ] T026 [P] 執行完整手動測試（參照 quickstart.md 測試指南）
--   [ ] T027 [P] 確認切換開發板後，已存在的積木腳位不會自動更改
--   [ ] T028 更新 CHANGELOG.md 記錄此修正
--   [ ] T029 [US3] 驗證 Arduino generator 輸出正確（確認 SoftwareSerial 初始化使用正確的 RX/TX 腳位對應）在 media/blockly/generators/arduino/huskylens.js
--   [ ] T030 [US1] 驗證缺少翻譯時顯示英文 fallback（移除某語言的 HUSKYLENS_RX_PIN 後確認顯示英文）
+-   [x] T026 [P] 執行完整手動測試（參照 quickstart.md 測試指南）
+-   [x] T027 [P] 確認切換開發板後，已存在的積木腳位不會自動更改
+-   [x] T028 更新 CHANGELOG.md 記錄此修正
+-   [x] T029 [US3] 驗證 Arduino generator 輸出正確（確認 SoftwareSerial 初始化使用正確的 RX/TX 腳位對應）在 media/blockly/generators/arduino/huskylens.js
+-   [x] T030 [US1] 驗證缺少翻譯時顯示英文 fallback（移除某語言的 HUSKYLENS_RX_PIN 後確認顯示英文）
 
 ---
 

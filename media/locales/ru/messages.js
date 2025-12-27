@@ -433,8 +433,8 @@ window.languageManager.loadMessages('ru', {
 	// HUSKYLENS Smart Camera
 	HUSKYLENS_INIT_I2C: 'Инициализировать HUSKYLENS (I2C)',
 	HUSKYLENS_INIT_UART: 'Инициализировать HUSKYLENS (UART)',
-	HUSKYLENS_RX_PIN: 'RX пин',
-	HUSKYLENS_TX_PIN: 'TX пин',
+	HUSKYLENS_RX_PIN: 'Подключить к HuskyLens TX →',
+	HUSKYLENS_TX_PIN: 'Подключить к HuskyLens RX →',
 	HUSKYLENS_SET_ALGORITHM: 'Установить алгоритм HUSKYLENS на',
 	HUSKYLENS_ALGORITHM_FACE_RECOGNITION: 'Распознавание лиц',
 	HUSKYLENS_ALGORITHM_OBJECT_TRACKING: 'Отслеживание объектов',

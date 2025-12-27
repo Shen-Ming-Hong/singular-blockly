@@ -432,8 +432,8 @@ window.languageManager.loadMessages('tr', {
 	// HUSKYLENS Akıllı Kamera
 	HUSKYLENS_INIT_I2C: 'HUSKYLENS başlat (I2C)',
 	HUSKYLENS_INIT_UART: 'HUSKYLENS başlat (UART)',
-	HUSKYLENS_RX_PIN: 'RX pini',
-	HUSKYLENS_TX_PIN: 'TX pini',
+	HUSKYLENS_RX_PIN: "HuskyLens TX'e bağlan →",
+	HUSKYLENS_TX_PIN: "HuskyLens RX'e bağlan →",
 	HUSKYLENS_SET_ALGORITHM: 'HUSKYLENS algoritmasını şuna ayarla',
 	HUSKYLENS_ALGORITHM_FACE_RECOGNITION: 'Yüz tanıma',
 	HUSKYLENS_ALGORITHM_OBJECT_TRACKING: 'Nesne takibi',
