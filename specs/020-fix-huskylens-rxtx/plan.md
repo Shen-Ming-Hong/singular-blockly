@@ -81,6 +81,20 @@ scripts/
 
 **Structure Decision**: 使用現有專案結構，修改積木定義檔案和 15 個語言檔案。不需要新增檔案或改變架構。
 
+## Implementation Phases
+
+| Phase | 名稱         | 目標                          | 預估時間 |
+| ----- | ------------ | ----------------------------- | -------- |
+| 1     | Setup        | 確認現有程式碼結構和測試環境  | 15 分鐘  |
+| 2     | User Story 1 | i18n 標籤更新（15 種語言）    | 30 分鐘  |
+| 3     | User Story 2 | 智慧預設腳位邏輯實作          | 20 分鐘  |
+| 4     | User Story 3 | 向後相容性驗證                | 15 分鐘  |
+| 5     | Polish       | 最終驗證、文件更新、CHANGELOG | 20 分鐘  |
+
+**Phase Dependencies**: Phase 1 → Phase 2/3 (可並行) → Phase 4 → Phase 5
+
+詳細任務清單請參閱 [tasks.md](tasks.md)。
+
 ## Complexity Tracking
 
 > 無違反情況，本功能符合所有 Constitution 原則。

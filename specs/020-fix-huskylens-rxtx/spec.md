@@ -77,13 +77,13 @@
 
 -   **HuskyLens UART 積木 (huskylens_init_uart)**: 用於初始化 HuskyLens 智慧鏡頭的 UART 通訊，包含 RX_PIN 和 TX_PIN 兩個下拉選單欄位
 -   **i18n 訊息**: HUSKYLENS_RX_PIN 和 HUSKYLENS_TX_PIN 訊息鍵，存在於 15 個語言檔案中
--   **開發板配置 (HUSKYLENS_PIN_INFO)**: 定義各開發板的建議 UART 腳位
+-   **開發板配置 (HUSKYLENS_UART_DEFAULTS)**: 定義各開發板的建議 UART 腳位
 
 ## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
--   **SC-001**: 使用者能在 3 秒內從積木標籤理解正確的接線方向（連接 HuskyLens 哪個腳位）
+-   **SC-001**: 積木標籤明確顯示目標裝置腳位名稱（「連接 HuskyLens TX →」），使用者無需查閱外部文件即可理解接線方向
 -   **SC-002**: 100% 的舊版 main.json 工作區檔案能正確載入，腳位設定不遺失
 -   **SC-003**: 15 種語言的標籤翻譯 100% 完成，通過 i18n 驗證腳本檢查
 -   **SC-004**: ESP32、Super Mini、AVR 三類開發板的預設腳位設定 100% 符合建議值

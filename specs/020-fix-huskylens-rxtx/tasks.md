@@ -70,7 +70,7 @@
 -   [ ] T019 [US2] 在 media/blockly/blocks/huskylens.js 新增 HUSKYLENS_UART_DEFAULTS 預設腳位配置常數
 -   [ ] T020 [US2] 在 media/blockly/blocks/huskylens.js 新增 getHuskyLensUARTDefaults() 輔助函式
 -   [ ] T021 [US2] 修改 huskylens_init_uart 積木的 init() 在 media/blockly/blocks/huskylens.js 加入預設腳位設定邏輯
--   [ ] T022 [US2] 實作腳位驗證 fallback 邏輯（若預設腳位不在有效列表中，回退到第一個可用腳位）
+-   [ ] T022 [US2] 實作腳位驗證 fallback 邏輯：當預設腳位不在有效列表中時回退到第一個可用腳位（測試場景：臨時修改 HUSKYLENS_UART_DEFAULTS 中 ESP32 的 rx 為 "99"，確認積木顯示第一個有效腳位而非 "99"）
 
 **Checkpoint**: 此時 ESP32、Super Mini、AVR 開發板應自動設定正確的預設腳位
 
@@ -99,6 +99,8 @@
 -   [ ] T026 [P] 執行完整手動測試（參照 quickstart.md 測試指南）
 -   [ ] T027 [P] 確認切換開發板後，已存在的積木腳位不會自動更改
 -   [ ] T028 更新 CHANGELOG.md 記錄此修正
+-   [ ] T029 [US3] 驗證 Arduino generator 輸出正確（確認 SoftwareSerial 初始化使用正確的 RX/TX 腳位對應）在 media/blockly/generators/arduino/huskylens.js
+-   [ ] T030 [US1] 驗證缺少翻譯時顯示英文 fallback（移除某語言的 HUSKYLENS_RX_PIN 後確認顯示英文）
 
 ---
 
@@ -170,7 +172,7 @@ Task: "更新日語訊息在 media/locales/ja/messages.js"
 | ru      | `'Подключить к HuskyLens TX →'`    | `'Подключить к HuskyLens RX →'`    |
 | pl      | `'Połącz z HuskyLens TX →'`        | `'Połącz z HuskyLens RX →'`        |
 | hu      | `'Csatlakozás HuskyLens TX-hez →'` | `'Csatlakozás HuskyLens RX-hez →'` |
-| tr      | `'HuskyLens TX\'e bağlan →'`       | `'HuskyLens RX\'e bağlan →'`       |
+| tr      | `"HuskyLens TX'e bağlan →"`        | `"HuskyLens RX'e bağlan →"`        |
 | bg      | `'Свържи с HuskyLens TX →'`        | `'Свържи с HuskyLens RX →'`        |
 | cs      | `'Připojit k HuskyLens TX →'`      | `'Připojit k HuskyLens RX →'`      |
 
@@ -192,7 +194,7 @@ const HUSKYLENS_UART_DEFAULTS = {
 
 -   [P] 任務 = 不同檔案、無依賴，可並行執行
 -   [Story] 標籤對應特定 User Story 以便追蹤
--   土耳其語翻譯中的單引號需跳脫為 `\'`
+-   土耳其語翻譯使用雙引號包裹以避免單引號跳脫問題
 -   欄位名稱 `RX_PIN`/`TX_PIN` 絕對不可更改（向後相容性）
 -   每個任務完成後提交
 -   任何檢查點都可暫停驗證
