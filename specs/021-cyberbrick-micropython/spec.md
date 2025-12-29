@@ -162,10 +162,20 @@
 ## Assumptions
 
 -   PlatformIO 已安裝且其 Python 環境可被存取（`~/.platformio/penv/`）
--   mpremote 套件已安裝或可透過 pip 安裝
+-   mpremote 套件若未安裝，系統將自動嘗試安裝
 -   CyberBrick 使用標準 USB CDC 驅動程式，可被系統識別為 COM Port
 -   CyberBrick 的 `/app/rc_main.py` 是開機自動執行的程式入口點
 -   藍牙功能已被官方禁用，不提供相關積木
+
+## Clarifications
+
+### Session 2025-12-29
+
+-   Q: mpremote 工具不存在時的處理策略？ → A: 自動嘗試安裝 mpremote（使用 PlatformIO 的 pip），成功後繼續上傳流程
+-   Q: COM Port 選擇方式？ → A: 自動偵測 CyberBrick（VID/PID）+ 記住上次使用的 Port，多裝置時顯示選單
+-   Q: 上傳失敗時的重試策略？ → A: 自動重試一次（含重新 reset 序列），若仍失敗則顯示錯誤並提供手動重試選項
+-   Q: 備份檔案的保留策略？ → A: 不自動清理，讓使用者手動管理備份（僅在空間不足時提醒）
+-   Q: MicroPython 積木的視覺區分？ → A: 無需特別區分，選擇 CyberBrick 後工具箱完全切換為 MicroPython 積木，不會與 Arduino 積木共存
 
 ## Out of Scope (Phase 2+)
 
