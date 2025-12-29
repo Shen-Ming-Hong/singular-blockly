@@ -358,13 +358,274 @@ media/toolbox/
 ### 待確認事項
 
 1. ✅ CyberBrick 的 `/app/rc_main.py` 路徑（已確認）
-2. ⏳ CyberBrick 實際 USB VID/PID（需實機測試）
-3. ⏳ 板載 LED WS2812 的 RGB 順序（RGB or GRB）
+2. ✅ CyberBrick 實際 USB VID/PID（VID=0x303A, PID=0x1001，已從官方倉庫確認）
+3. ✅ GPIO 腳位對應（從 CyberBrick_ESPNOW 專案確認）
+4. ⏳ 板載 LED WS2812 的 RGB 順序（RGB or GRB，需實機測試）
 
 ### 風險評估
 
-| 風險              | 影響     | 緩解措施                       |
-| ----------------- | -------- | ------------------------------ |
-| mpremote 安裝失敗 | 無法上傳 | 提供詳細錯誤訊息和手動安裝指南 |
-| USB 權限問題      | 無法連接 | 提示使用者檢查驅動程式/權限    |
-| 裝置無回應        | 上傳失敗 | 實作超時和重試機制             |
+| 風險                   | 影響     | 緩解措施                                         |
+| ---------------------- | -------- | ------------------------------------------------ |
+| mpremote 安裝失敗      | 無法上傳 | 提供詳細錯誤訊息和手動安裝指南                   |
+| USB 權限問題           | 無法連接 | 提示使用者檢查驅動程式/權限                      |
+| 裝置無回應             | 上傳失敗 | 實作超時和重試機制                               |
+| bbl_product 模組不可用 | 執行錯誤 | 不依賴官方 frozen 模組，使用標準 MicroPython API |
+| 6 PWM 限制             | 功能受限 | 明確記錄馬達/伺服使用限制                        |
+
+---
+
+## 8. CyberBrick 官方儲存庫研究
+
+### 8.1 CyberBrick_Controller_Core 分析
+
+**來源**: https://github.com/CyberBrick-Official/CyberBrick_Controller_Core
+
+#### 專案結構
+
+```
+CyberBrick_Controller_Core/
+├── src/
+│   ├── app_rc/              # RC 遙控應用程式
+│   │   ├── boot.py          # 啟動腳本
+│   │   └── app/
+│   │       ├── rc_main.py   # 主程式 (~316 行)
+│   │       ├── control.py   # 控制邏輯 (~1151 行)
+│   │       ├── devices.py   # 裝置定義
+│   │       └── parser.py    # 資料解析
+│   └── app_timelapse/       # 延時攝影應用
+├── tools/                   # 開發工具
+└── docs/                    # 文件
+```
+
+#### 啟動流程 (boot.py)
+
+```python
+import bbl_product
+import sys
+
+_PRODUCT_NAME = "RC"
+_PRODUCT_VERSION = "01.00.00.21"
+
+bbl_product.set_app_name(_PRODUCT_NAME)
+bbl_product.set_app_version(_PRODUCT_VERSION)
+
+sys.path.append('/app')
+import rc_main
+rc_main.main()
+```
+
+**重要發現**:
+
+1. `bbl_product` 是 CyberBrick **專有 frozen 模組**，不對外開放
+2. 程式存放於 `/app/` 目錄
+3. 入口點為 `rc_main.main()`
+
+#### 裝置定義 (devices.py)
+
+```python
+class Devices:
+    MOTOR_1 = 1
+    MOTOR_2 = 2
+    LED_1 = 3
+    LED_2 = 4
+    PWM_1 = 5
+    PWM_2 = 6
+    PWM_3 = 7
+    PWM_4 = 8
+    BUZZER_1 = 9
+    BUZZER_2 = 10
+    CODE_EXEC = 11
+```
+
+**CyberBrick 硬體能力**:
+
+-   2 個有刷馬達通道 (MOTOR_1, MOTOR_2)
+-   2 個 NeoPixel LED 通道 (LED_1, LED_2)
+-   4 個 PWM/伺服通道 (PWM_1~PWM_4)
+-   2 個蜂鳴器通道（已移除以節省記憶體）
+
+#### 官方程式碼特性
+
+-   使用 `uasyncio` 非同步框架
+-   使用 `ulogger` 日誌模組
+-   使用 `ujson` JSON 解析
+-   使用 `machine.Timer` 計時器
+-   載入配置檔：`/config/rc_conf.json`
+
+### 8.2 CyberBrick_ESPNOW 分析
+
+**來源**: https://github.com/rotorman/CyberBrick_ESPNOW
+
+#### 專案概述
+
+-   **用途**: 使用 ESP-NOW 協議取代官方 App 控制
+-   **授權**: GPL-3.0
+-   **優勢**: 完全開源，無 frozen 模組依賴
+
+#### GPIO 腳位對應（已確認）
+
+從 `genericRGB.py` 和 `truck.py` 提取的實際腳位：
+
+| 功能           | GPIO | MicroPython 程式碼        | 說明                        |
+| -------------- | ---- | ------------------------- | --------------------------- |
+| **使用者按鈕** | 9    | `button = Pin(9, Pin.IN)` | 板載按鈕                    |
+| **伺服 1**     | 3    | `PWM(Pin(3), freq=50)`    | 伺服馬達通道 1              |
+| **伺服 2**     | 2    | `PWM(Pin(2), freq=50)`    | 伺服馬達通道 2              |
+| **伺服 3**     | 1    | `PWM(Pin(1), freq=50)`    | 伺服馬達通道 3              |
+| **伺服 4**     | 0    | `PWM(Pin(0), freq=50)`    | 伺服馬達通道 4              |
+| **馬達 1A**    | 4    | `PWM(Pin(4), freq=500)`   | 有刷馬達 1 正轉             |
+| **馬達 1B**    | 5    | `PWM(Pin(5), freq=500)`   | 有刷馬達 1 反轉             |
+| **馬達 2A**    | 6    | `PWM(Pin(6), freq=500)`   | 有刷馬達 2 正轉             |
+| **馬達 2B**    | 7    | `PWM(Pin(7), freq=500)`   | 有刷馬達 2 反轉             |
+| **LED 通道 1** | 10   | `NeoPixel(Pin(10), 4)`    | NeoPixel 字串 1（4 顆 LED） |
+| **LED 通道 2** | 8    | `NeoPixel(Pin(8), 4)`     | NeoPixel 字串 2（4 顆 LED） |
+
+#### PWM 頻率設定
+
+| 裝置類型 | 頻率   | 說明                           |
+| -------- | ------ | ------------------------------ |
+| 伺服馬達 | 50 Hz  | 標準伺服 PWM 頻率（20ms 週期） |
+| 有刷馬達 | 500 Hz | 比原廠 50Hz 更平滑的馬達控制   |
+
+#### 伺服馬達脈寬範圍
+
+```python
+# 伺服中點: 1.5ms = 65535/20 * 1.5 = 4915 duty_u16
+# 最小: 0.5ms (SERVOPULSE_0_5MS_TICKS)
+# 最大: 2.5ms (SERVOPULSE_2_5MS_TICKS)
+```
+
+#### 6 PWM 輸出限制
+
+**重要發現**: ESP32-C3 硬體限制同時最多 6 個 PWM 輸出
+
+-   每個伺服需要 1 個 PWM
+-   每個有刷馬達需要 2 個 PWM
+-   組合範例：2 馬達 + 2 伺服 ✅ (2×2 + 2×1 = 6)
+-   不可能：2 馬達 + 4 伺服 ❌ (2×2 + 4×1 = 8)
+
+#### WiFi 配置
+
+```python
+wifi_channel = 1  # WiFi 通道 (1-11)
+sta = network.WLAN(network.STA_IF)
+sta.active(True)
+mac = sta.config('mac')
+```
+
+### 8.3 CyberBrick vs 開源方案比較
+
+| 特性            | 官方 CyberBrick | CyberBrick_ESPNOW     |
+| --------------- | --------------- | --------------------- |
+| 授權            | 專有            | GPL-3.0               |
+| frozen 模組依賴 | ✅ 需要 bbl\_\* | ❌ 純標準 MicroPython |
+| 馬達控制精度    | ~41 級          | 4096 級 (12-bit)      |
+| 伺服角度精度    | ~102 級         | 4096 級               |
+| 馬達 PWM 頻率   | 50 Hz           | 500 Hz                |
+| NeoPixel 控制   | 透過配置檔      | 直接程式碼控制        |
+| 配置方式        | App / JSON      | 程式碼內直接定義      |
+
+### 8.4 對 Singular Blockly 的設計啟示
+
+#### 採用開源方案設計
+
+**Decision**: 基於 CyberBrick_ESPNOW 的開源實作設計積木
+
+**Rationale**:
+
+1. 不依賴專有 frozen 模組
+2. 提供完整的硬體控制
+3. 程式碼透明可學習
+4. 更好的控制精度
+
+#### 預定義腳位常數
+
+```python
+# CyberBrick 硬體常數（建議加入生成程式碼）
+CYBERBRICK_BUTTON = 9
+CYBERBRICK_SERVO1 = 3
+CYBERBRICK_SERVO2 = 2
+CYBERBRICK_SERVO3 = 1
+CYBERBRICK_SERVO4 = 0
+CYBERBRICK_MOTOR1A = 4
+CYBERBRICK_MOTOR1B = 5
+CYBERBRICK_MOTOR2A = 6
+CYBERBRICK_MOTOR2B = 7
+CYBERBRICK_LED1 = 10
+CYBERBRICK_LED2 = 8
+```
+
+#### 積木設計建議
+
+1. **伺服馬達積木**: 使用 0.5-2.5ms 脈寬範圍
+2. **有刷馬達積木**: 支援 -100 ~ +100 速度值，映射到雙 PWM
+3. **NeoPixel 積木**: 預設 4 顆 LED，支援 RGB 色彩
+4. **PWM 限制提示**: 當超過 6 個 PWM 時顯示警告
+
+### 8.5 程式碼範例（基於開源實作）
+
+#### 馬達控制
+
+```python
+from machine import Pin, PWM
+
+# 初始化馬達 1
+M1A = PWM(Pin(4), freq=500, duty_u16=0)
+M1B = PWM(Pin(5), freq=500, duty_u16=0)
+
+def set_motor(speed):
+    """設定馬達速度 (-100 ~ +100)"""
+    if -5 < speed < 5:  # 死區
+        M1A.duty_u16(0)
+        M1B.duty_u16(0)
+    elif speed > 0:
+        M1A.duty_u16(0)
+        M1B.duty_u16(int(speed * 655.35))
+    else:
+        M1A.duty_u16(int(-speed * 655.35))
+        M1B.duty_u16(0)
+```
+
+#### 伺服馬達控制
+
+```python
+from machine import Pin, PWM
+
+# 伺服中點 duty = 65535/20 * 1.5 = 4915
+SERVO_CENTER = 4915
+SERVO_MIN = 1638   # 0.5ms
+SERVO_MAX = 8192   # 2.5ms
+
+S1 = PWM(Pin(3), freq=50, duty_u16=SERVO_CENTER)
+
+def set_servo_angle(angle):
+    """設定伺服角度 (0-180 度)"""
+    duty = int(SERVO_MIN + (SERVO_MAX - SERVO_MIN) * angle / 180)
+    S1.duty_u16(duty)
+```
+
+#### NeoPixel LED 控制
+
+```python
+from machine import Pin
+from neopixel import NeoPixel
+
+# LED 通道 1 (4 顆 LED)
+led1 = NeoPixel(Pin(10), 4)
+
+# 設定所有 LED 為紅色
+for i in range(4):
+    led1[i] = (255, 0, 0)
+led1.write()
+
+# 設定單顆 LED
+led1[0] = (0, 255, 0)  # 綠色
+led1.write()
+```
+
+### 8.6 參考資源
+
+-   [CyberBrick 官方文件](https://makerworld.com/en/cyberbrick/api-doc/)
+-   [CyberBrick_Controller_Core](https://github.com/CyberBrick-Official/CyberBrick_Controller_Core)
+-   [CyberBrick_ESPNOW](https://github.com/rotorman/CyberBrick_ESPNOW)
+-   [CyberBrick MicroPython ESP-NOW API](https://makerworld.com/en/cyberbrick/api-doc/library/espnow.html)

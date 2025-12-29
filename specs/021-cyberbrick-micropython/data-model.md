@@ -53,17 +53,20 @@ window.BOARD_CONFIGS.cyberbrick = {
 		pid: '1001',
 	},
 
+	// === GPIO 腳位定義 ===
+	// 來源：CyberBrick_ESPNOW genericRGB.py 實際測試確認
 	digitalPins: [
-		['GPIO 0', '0'],
-		['GPIO 1', '1'],
-		['GPIO 2 ⚠️', '2'], // Strapping pin warning
-		['GPIO 3', '3'],
-		['GPIO 4', '4'],
-		['GPIO 5', '5'],
-		['GPIO 6', '6'],
-		['GPIO 7', '7'],
-		['GPIO 9 ⚠️', '9'], // BOOT button
-		['GPIO 10', '10'],
+		['GPIO 0 (伺服 4)', '0'],
+		['GPIO 1 (伺服 3)', '1'],
+		['GPIO 2 (伺服 2)', '2'],
+		['GPIO 3 (伺服 1)', '3'],
+		['GPIO 4 (馬達 1A)', '4'],
+		['GPIO 5 (馬達 1B)', '5'],
+		['GPIO 6 (馬達 2A)', '6'],
+		['GPIO 7 (馬達 2B)', '7'],
+		['GPIO 8 (LED 通道 2)', '8'],
+		['GPIO 9 (使用者按鈕)', '9'],
+		['GPIO 10 (LED 通道 1)', '10'],
 	],
 
 	analogPins: [
@@ -72,7 +75,7 @@ window.BOARD_CONFIGS.cyberbrick = {
 		['GPIO 2 (ADC1)', '2'],
 		['GPIO 3 (ADC1)', '3'],
 		['GPIO 4 (ADC1)', '4'],
-		['GPIO 5 (ADC2) ⚠️', '5'], // WiFi conflict warning
+		['GPIO 5 (ADC2) ⚠️', '5'], // WiFi 開啟時不可用
 	],
 
 	interruptPins: [
@@ -84,12 +87,13 @@ window.BOARD_CONFIGS.cyberbrick = {
 		['GPIO 5', '5'],
 		['GPIO 6', '6'],
 		['GPIO 7', '7'],
+		['GPIO 9', '9'],
 		['GPIO 10', '10'],
 	],
 
 	analogOutputRange: {
 		min: 0,
-		max: 1023, // MicroPython PWM 10-bit
+		max: 65535, // MicroPython PWM 16-bit duty_u16
 		defaultValue: 0,
 	},
 
@@ -106,14 +110,59 @@ window.BOARD_CONFIGS.cyberbrick = {
 		10: true,
 	},
 
-	// 特殊功能
-	onboardLed: {
-		pin: 8,
-		type: 'neopixel',
-		count: 1,
+	// === CyberBrick 專屬硬體配置 ===
+	// 來源：CyberBrick_Controller_Core devices.py + CyberBrick_ESPNOW
+	hardware: {
+		// 伺服馬達通道 (50Hz PWM)
+		servos: {
+			servo1: { pin: 3, minPulse: 500, maxPulse: 2500 },
+			servo2: { pin: 2, minPulse: 500, maxPulse: 2500 },
+			servo3: { pin: 1, minPulse: 500, maxPulse: 2500 },
+			servo4: { pin: 0, minPulse: 500, maxPulse: 2500 },
+		},
+		// 有刷馬達通道 (500Hz PWM, 雙腳位 H橋)
+		motors: {
+			motor1: { pinA: 4, pinB: 5, frequency: 500 },
+			motor2: { pinA: 6, pinB: 7, frequency: 500 },
+		},
+		// NeoPixel LED 通道
+		leds: {
+			led1: { pin: 10, count: 4 },
+			led2: { pin: 8, count: 4 },
+		},
+		// 使用者按鈕
+		button: { pin: 9, pullup: true },
 	},
+
+	// PWM 輸出限制警告
+	maxPwmOutputs: 6, // ESP32-C3 硬體限制
 };
 ```
+
+### 1.3 CyberBrick 硬體對應表
+
+基於 CyberBrick_Controller_Core 和 CyberBrick_ESPNOW 專案確認：
+
+| 功能       | GPIO | 頻率   | 說明                        |
+| ---------- | ---- | ------ | --------------------------- |
+| 伺服 1     | 3    | 50 Hz  | 標準伺服馬達                |
+| 伺服 2     | 2    | 50 Hz  | 標準伺服馬達                |
+| 伺服 3     | 1    | 50 Hz  | 標準伺服馬達                |
+| 伺服 4     | 0    | 50 Hz  | 標準伺服馬達                |
+| 馬達 1A    | 4    | 500 Hz | 有刷馬達正轉 (HTD8811 驅動) |
+| 馬達 1B    | 5    | 500 Hz | 有刷馬達反轉                |
+| 馬達 2A    | 6    | 500 Hz | 有刷馬達正轉                |
+| 馬達 2B    | 7    | 500 Hz | 有刷馬達反轉                |
+| LED 通道 1 | 10   | N/A    | NeoPixel WS2812, 4 顆       |
+| LED 通道 2 | 8    | N/A    | NeoPixel WS2812, 4 顆       |
+| 使用者按鈕 | 9    | N/A    | 內建上拉，按下為 LOW        |
+
+**重要限制**：ESP32-C3 硬體同時最多支援 6 個 PWM 輸出
+
+-   組合範例 ✅：2 馬達 (4 PWM) + 2 伺服 (2 PWM) = 6
+-   組合範例 ❌：2 馬達 (4 PWM) + 4 伺服 (4 PWM) = 8 (超出限制)
+
+````
 
 ---
 
@@ -138,7 +187,7 @@ interface WorkspaceState {
 		success: boolean;
 	};
 }
-```
+````
 
 ### 2.2 存儲格式
 

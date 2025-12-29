@@ -49,8 +49,8 @@ TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standa
 
 ## Recent Changes
 - 021-cyberbrick-micropython: Added TypeScript 5.9.3 (Extension) + JavaScript (WebView/Blockly) + Blockly 12.3.1, VS Code API 1.105.0+, mpremote (MicroPython 工具)
+- 021-cyberbrick-micropython: Added TypeScript 5.9.3 (Extension) + JavaScript (WebView/Blockly) + Blockly 12.3.1, VS Code API 1.105.0+, mpremote (MicroPython 工具)
 - 020-fix-huskylens-rxtx: Added JavaScript (ES6+), TypeScript 5.9.3 + Google Blockly 12.3.1, VSCode Extension API 1.105.0+
-- 019-empty-workspace-guard: Added TypeScript 5.9.3, JavaScript ES2023 + Blockly 12.3.1, VS Code API 1.105.0+
 
 
 <!-- MANUAL ADDITIONS START -->
