@@ -40,6 +40,7 @@
 -   [ ] T012 [P] 實作 MicroPython 函數積木生成器 in `media/blockly/generators/micropython/functions.js`
 -   [ ] T013 新增 CyberBrick 主板完整配置（GPIO、ADC、hardware 對應表）in `media/blockly/blocks/board_configs.js`
 -   [ ] T014 擴展 webviewManager.ts 載入 MicroPython 生成器模組 in `src/webview/webviewManager.ts`
+-   [ ] T014a [P] 撰寫 MicroPython 程式碼生成器單元測試（覆蓋率目標 ≥80%，涵蓋所有 FR 需求至少一個測試案例）in `src/test/micropythonGenerator.test.ts`
 
 **Checkpoint**: 基礎架構就緒 - User Story 實作可以開始
 
@@ -86,6 +87,8 @@
 -   [ ] T032 [P] [US2] 實作 requestPortList 與 portListResponse 訊息處理 in `src/webview/messageHandler.ts`
 -   [ ] T033 [US2] 實作連接埠選擇 UI（自動偵測 + 手動選擇）in `media/js/blocklyEdit.js`
 -   [ ] T034 [P] [US2] 新增 MicropythonUploader 單元測試 in `src/test/micropythonUploader.test.ts`
+-   [ ] T034a [US2] 實作上傳失敗錯誤處理與診斷訊息顯示（對應 NFR-004）in `src/services/micropythonUploader.ts`
+-   [ ] T034b [US2] 實作 mpremote 安裝失敗錯誤處理與手動安裝指引（對應 NFR-003）in `src/services/micropythonUploader.ts`
 
 **Checkpoint**: User Story 2 完成 - 使用者可一鍵上傳程式到 CyberBrick
 

@@ -41,6 +41,9 @@ interface BoardConfig {
 
 ### 1.2 CyberBrick 配置實例
 
+> **注意**：此配置為 **核心板 (XA003) 獨立使用模式**，適用於 Phase 1 實作。
+> 搭配擴展板 (XA004) 的 GPIO 配置請參見 §1.4（Phase 2+ 範圍）。
+
 ```javascript
 window.BOARD_CONFIGS.cyberbrick = {
 	name: 'CyberBrick',
@@ -54,28 +57,28 @@ window.BOARD_CONFIGS.cyberbrick = {
 	},
 
 	// === GPIO 腳位定義 ===
-	// 來源：CyberBrick_ESPNOW genericRGB.py 實際測試確認
+	// 來源：Bambu Lab Wiki - CyberBrick 核心板 (XA003) 官方規格
+	// https://wiki.bambulab.com/en/x1/manual/x1-cyberbrick-main-board
 	digitalPins: [
-		['GPIO 0 (伺服 4)', '0'],
-		['GPIO 1 (伺服 3)', '1'],
-		['GPIO 2 (伺服 2)', '2'],
-		['GPIO 3 (伺服 1)', '3'],
-		['GPIO 4 (馬達 1A)', '4'],
-		['GPIO 5 (馬達 1B)', '5'],
-		['GPIO 6 (馬達 2A)', '6'],
-		['GPIO 7 (馬達 2B)', '7'],
-		['GPIO 8 (LED 通道 2)', '8'],
-		['GPIO 9 (使用者按鈕)', '9'],
-		['GPIO 10 (LED 通道 1)', '10'],
+		['GPIO 0', '0'],
+		['GPIO 1', '1'],
+		['GPIO 2', '2'],
+		['GPIO 3', '3'],
+		['GPIO 4', '4'],
+		['GPIO 5', '5'],
+		['GPIO 6', '6'],
+		['GPIO 7', '7'],
+		['GPIO 8 (板載 LED)', '8'], // 系統狀態 LED，1 顆 WS2812
+		['GPIO 9', '9'],
+		['GPIO 10', '10'],
 	],
 
 	analogPins: [
-		['GPIO 0 (ADC1)', '0'],
-		['GPIO 1 (ADC1)', '1'],
-		['GPIO 2 (ADC1)', '2'],
-		['GPIO 3 (ADC1)', '3'],
-		['GPIO 4 (ADC1)', '4'],
-		['GPIO 5 (ADC2) ⚠️', '5'], // WiFi 開啟時不可用
+		['GPIO 0 (ADC)', '0'],
+		['GPIO 1 (ADC)', '1'],
+		['GPIO 2 (ADC)', '2'],
+		['GPIO 3 (ADC)', '3'],
+		['GPIO 4 (ADC)', '4'],
 	],
 
 	interruptPins: [
@@ -110,28 +113,12 @@ window.BOARD_CONFIGS.cyberbrick = {
 		10: true,
 	},
 
-	// === CyberBrick 專屬硬體配置 ===
-	// 來源：CyberBrick_Controller_Core devices.py + CyberBrick_ESPNOW
+	// === CyberBrick 核心板專屬硬體配置 ===
+	// 來源：Bambu Lab Wiki 官方規格
+	// Phase 1: 核心板獨立使用模式
 	hardware: {
-		// 伺服馬達通道 (50Hz PWM)
-		servos: {
-			servo1: { pin: 3, minPulse: 500, maxPulse: 2500 },
-			servo2: { pin: 2, minPulse: 500, maxPulse: 2500 },
-			servo3: { pin: 1, minPulse: 500, maxPulse: 2500 },
-			servo4: { pin: 0, minPulse: 500, maxPulse: 2500 },
-		},
-		// 有刷馬達通道 (500Hz PWM, 雙腳位 H橋)
-		motors: {
-			motor1: { pinA: 4, pinB: 5, frequency: 500 },
-			motor2: { pinA: 6, pinB: 7, frequency: 500 },
-		},
-		// NeoPixel LED 通道
-		leds: {
-			led1: { pin: 10, count: 4 },
-			led2: { pin: 8, count: 4 },
-		},
-		// 使用者按鈕
-		button: { pin: 9, pullup: true },
+		// 板載 RGB LED（系統狀態指示）
+		onboardLed: { pin: 8, count: 1, type: 'WS2812' },
 	},
 
 	// PWM 輸出限制警告
@@ -139,28 +126,41 @@ window.BOARD_CONFIGS.cyberbrick = {
 };
 ```
 
-### 1.3 CyberBrick 硬體對應表
+### 1.3 CyberBrick 核心板硬體對應表
 
-基於 CyberBrick_Controller_Core 和 CyberBrick_ESPNOW 專案確認：
+基於 [Bambu Lab Wiki 官方規格](https://wiki.bambulab.com/en/x1/manual/x1-cyberbrick-main-board) 確認（核心板 XA003）：
 
-| 功能       | GPIO | 頻率   | 說明                        |
-| ---------- | ---- | ------ | --------------------------- |
-| 伺服 1     | 3    | 50 Hz  | 標準伺服馬達                |
-| 伺服 2     | 2    | 50 Hz  | 標準伺服馬達                |
-| 伺服 3     | 1    | 50 Hz  | 標準伺服馬達                |
-| 伺服 4     | 0    | 50 Hz  | 標準伺服馬達                |
-| 馬達 1A    | 4    | 500 Hz | 有刷馬達正轉 (HTD8811 驅動) |
-| 馬達 1B    | 5    | 500 Hz | 有刷馬達反轉                |
-| 馬達 2A    | 6    | 500 Hz | 有刷馬達正轉                |
-| 馬達 2B    | 7    | 500 Hz | 有刷馬達反轉                |
-| LED 通道 1 | 10   | N/A    | NeoPixel WS2812, 4 顆       |
-| LED 通道 2 | 8    | N/A    | NeoPixel WS2812, 4 顆       |
-| 使用者按鈕 | 9    | N/A    | 內建上拉，按下為 LOW        |
+| 功能      | GPIO | 說明                          |
+| --------- | ---- | ----------------------------- |
+| 板載 LED  | 8    | WS2812 x 1，系統狀態指示      |
+| 通用 GPIO | 0-7  | 數位 I/O、PWM、ADC（部分）    |
+| 通用 GPIO | 9-10 | 數位 I/O                      |
+| USB CDC   | N/A  | 原生 USB，用於程式上傳與 REPL |
 
 **重要限制**：ESP32-C3 硬體同時最多支援 6 個 PWM 輸出
 
--   組合範例 ✅：2 馬達 (4 PWM) + 2 伺服 (2 PWM) = 6
--   組合範例 ❌：2 馬達 (4 PWM) + 4 伺服 (4 PWM) = 8 (超出限制)
+---
+
+### 1.4 擴展板配置（Phase 2+ 範圍）
+
+> **Out of Scope for Phase 1**: 以下配置適用於搭配遙控接收底板 (XA004) 使用，
+> 將於 Phase 2 實作。此處僅作為未來參考。
+
+基於 CyberBrick_Controller_Core 和 CyberBrick_ESPNOW 專案：
+
+| 功能     | GPIO | 頻率   | 說明                        |
+| -------- | ---- | ------ | --------------------------- |
+| 伺服 S1  | 3    | 50 Hz  | 標準伺服馬達                |
+| 伺服 S2  | 2    | 50 Hz  | 標準伺服馬達                |
+| 伺服 S3  | 1    | 50 Hz  | 標準伺服馬達                |
+| 伺服 S4  | 0    | 50 Hz  | 標準伺服馬達                |
+| 馬達 M1A | 4    | 500 Hz | 有刷馬達正轉 (HTD8811 驅動) |
+| 馬達 M1B | 5    | 500 Hz | 有刷馬達反轉                |
+| 馬達 M2A | 6    | 500 Hz | 有刷馬達正轉                |
+| 馬達 M2B | 7    | 500 Hz | 有刷馬達反轉                |
+| LED D1   | 10   | N/A    | NeoPixel WS2812 x 4         |
+| LED D2   | 8    | N/A    | NeoPixel WS2812 x 4         |
+| 按鈕     | 9    | N/A    | 內建上拉，按下為 LOW        |
 
 ````
 
@@ -389,7 +389,9 @@ import time
 import network
 
 # [2] Hardware Initialization
+# 核心板板載 LED（GPIO 8, 1 顆 WS2812）
 onboard_led = NeoPixel(Pin(8), 1)
+# 通用 GPIO 配置
 pin_0 = Pin(0, Pin.OUT)
 adc_1 = ADC(Pin(1))
 

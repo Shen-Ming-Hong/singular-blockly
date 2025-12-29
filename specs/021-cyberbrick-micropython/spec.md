@@ -159,6 +159,13 @@
 -   **SC-005**: 主板切換時 100% 顯示警告對話框並在確認後建立工作區備份
 -   **SC-006**: 生成的 MicroPython 程式碼可直接在 CyberBrick REPL 中貼上執行，無需修改
 
+### Non-Functional Requirements
+
+-   **NFR-001**: 程式碼生成 SHOULD 在 1 秒內完成（測量條件：≤100 個區塊的工作區，標準開發環境 i5 等級 CPU、8GB RAM）
+-   **NFR-002**: 上傳服務單元測試覆蓋率 SHOULD ≥80%
+-   **NFR-003**: mpremote 安裝失敗時，系統 MUST 顯示明確的錯誤訊息並提供手動安裝指引
+-   **NFR-004**: 上傳失敗時，系統 MUST 顯示包含失敗階段和具體錯誤的診斷訊息
+
 ## Assumptions
 
 -   PlatformIO 已安裝且其 Python 環境可被存取（`~/.platformio/penv/`）
