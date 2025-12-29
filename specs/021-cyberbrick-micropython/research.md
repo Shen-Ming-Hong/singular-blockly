@@ -113,9 +113,9 @@ COM4 0403:6001 FTDI FT232R USB UART
 
 ## 2. ESP32-C3 GPIO 配置研究
 
-### 2.1 CyberBrick 硬體規格
+### 2.1 CyberBrick 核心板硬體規格
 
-根據 CyberBrick 產品文件：
+根據 [Bambu Lab Wiki 官方文件](https://wiki.bambulab.com/zh/makerworld/cyberbrick/component-list)：
 
 | 項目     | 規格               |
 | -------- | ------------------ |
@@ -126,6 +126,9 @@ COM4 0403:6001 FTDI FT232R USB UART
 | WiFi     | 802.11 b/g/n       |
 | 藍牙     | 已禁用             |
 | USB      | 原生 USB CDC       |
+
+**注意**：上述規格為**核心板 (XA003)** 單獨使用時的配置。搭配**接收底板 (XA004)** 時，
+GPIO 腳位會被分配給伺服馬達、有刷馬達和 LED 通道等功能（詳見 8.2 節 CyberBrick_ESPNOW 分析）。
 
 ### 2.2 GPIO 可用性分析
 
@@ -181,7 +184,7 @@ from neopixel import NeoPixel
 import time
 
 # 硬體初始化區塊
-onboard_led = NeoPixel(Pin(8), 1)
+onboard_led = NeoPixel(Pin(8), 1)  # 核心板板載 LED
 
 # 使用者定義函數區塊
 def user_function():
@@ -359,7 +362,7 @@ media/toolbox/
 
 1. ✅ CyberBrick 的 `/app/rc_main.py` 路徑（已確認）
 2. ✅ CyberBrick 實際 USB VID/PID（VID=0x303A, PID=0x1001，已從官方倉庫確認）
-3. ✅ GPIO 腳位對應（從 CyberBrick_ESPNOW 專案確認）
+3. ✅ GPIO 腳位對應（核心板：GPIO 8 板載 LED，擴展板配置見 8.2 章節）
 4. ⏳ 板載 LED WS2812 的 RGB 順序（RGB or GRB，需實機測試）
 
 ### 風險評估
@@ -452,7 +455,7 @@ class Devices:
 -   使用 `machine.Timer` 計時器
 -   載入配置檔：`/config/rc_conf.json`
 
-### 8.2 CyberBrick_ESPNOW 分析
+### 8.2 CyberBrick_ESPNOW 分析（搭配接收底板）
 
 **來源**: https://github.com/rotorman/CyberBrick_ESPNOW
 
@@ -461,8 +464,12 @@ class Devices:
 -   **用途**: 使用 ESP-NOW 協議取代官方 App 控制
 -   **授權**: GPL-3.0
 -   **優勢**: 完全開源，無 frozen 模組依賴
+-   **硬體配置**: 核心板 (XA003) + 接收底板 (XA004) 組合
 
-#### GPIO 腳位對應（已確認）
+**⚠️ 重要**：以下 GPIO 腳位對應是針對**搭配接收底板**的完整系統，而非核心板單獨使用。
+接收底板將核心板的 GPIO 連接到伺服馬達、有刷馬達和 LED 介面。
+
+#### GPIO 腳位對應（接收底板配置）
 
 從 `genericRGB.py` 和 `truck.py` 提取的實際腳位：
 
