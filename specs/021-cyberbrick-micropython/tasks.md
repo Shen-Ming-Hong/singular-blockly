@@ -32,7 +32,10 @@
 **⚠️ CRITICAL**: 此階段未完成前，所有 User Story 工作無法開始
 
 -   [ ] T005 擴展 BoardConfig 介面新增 language、toolbox、uploadMethod、devicePath 屬性 in `media/blockly/blocks/board_configs.js`
--   [ ] T006 [P] 建立 MicroPython 生成器入口與基礎設定 in `media/blockly/generators/micropython/index.js`
+-   [ ] T006 [P] 建立 MicroPython 生成器入口與基礎設定（包含 imports、變數宣告、主程式結構生成）in `media/blockly/generators/micropython/index.js`
+-   [ ] T006a [P] 建立 `micropython_main` 主程式積木定義（單一 Statement 輸入區段，參考 `arduino_setup_loop` 但簡化為單區段）in `media/blockly/blocks/cyberbrick.js`
+-   [ ] T006b 實作 `micropython_main` 程式碼生成器（收集 imports、變數宣告後輸出主程式內容，不強制迴圈）in `media/blockly/generators/micropython/index.js`
+-   [ ] T006c [P] 新增 `CYBERBRICK_MAIN` 翻譯鍵（主程式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
 -   [ ] T007 [P] 實作 MicroPython 變數積木生成器 in `media/blockly/generators/micropython/variables.js`
 -   [ ] T008 [P] 實作 MicroPython 邏輯積木生成器 in `media/blockly/generators/micropython/logic.js`
 -   [ ] T009 [P] 實作 MicroPython 迴圈積木生成器 in `media/blockly/generators/micropython/loops.js`
@@ -277,7 +280,8 @@
 
 **Phase 2 (Foundational)**:
 
--   T006, T007, T008, T009, T010, T011, T012 可平行執行（所有基礎生成器）
+-   T006, T006a, T006c, T007, T008, T009, T010, T011, T012 可平行執行（所有基礎生成器和主程式積木定義）
+-   T006b 依賴 T006 完成後執行
 
 **Phase 3 (US1)**:
 
@@ -411,7 +415,7 @@ With 2 developers:
 | Phase                  | 任務數量 | 平行任務 |
 | ---------------------- | -------- | -------- |
 | Phase 1: Setup         | 4        | 3        |
-| Phase 2: Foundational  | 11       | 8        |
+| Phase 2: Foundational  | 14       | 11       |
 | Phase 3a: US1 UI/UX    | 7        | 2        |
 | Phase 3b: US1 程式碼   | 7        | 2        |
 | Phase 4: User Story 2  | 15       | 4        |
@@ -420,4 +424,4 @@ With 2 developers:
 | Phase 6a: User Story 6 | 4        | 0        |
 | Phase 7: User Story 5  | 5        | 1        |
 | Phase 8: Polish        | 11       | 4        |
-| **Total**              | **83**   | **28**   |
+| **Total**              | **86**   | **31**   |

@@ -518,17 +518,69 @@ my_variable = 0
 def my_function():
     pass
 
-# [5] Main Program
-while True:
-    # User blocks code here
-    pass
+# [5] Main Program（使用者積木生成的程式碼）
+# 注意：不強制 while True，迴圈邏輯由使用者透過迴圈積木自行決定
+# 以下為使用者在主程式積木內放置的積木內容
+onboard_led[0] = (255, 0, 0)
+onboard_led.write()
 ```
 
 ---
 
-## 9. COM Port Info（連接埠資訊）
+## 9. MicroPython Main Block（主程式積木）
 
-### 9.1 ComPortInfo
+### 9.1 積木定義
+
+主程式積木用於定義 MicroPython 程式的入口點，類似於 Arduino 的 `setup()` 概念，但簡化為單一區段。
+
+```typescript
+interface MicropythonMainBlock {
+	type: 'micropython_main';
+	inputs: {
+		MAIN: StatementInput; // 使用者的主程式邏輯
+	};
+	style: 'procedure_blocks';
+}
+```
+
+### 9.2 積木實作參考
+
+```javascript
+// 參考 arduino_setup_loop 但簡化為單一區段
+Blockly.Blocks['micropython_main'] = {
+	init: function () {
+		this.appendStatementInput('MAIN').setCheck(null).appendField(window.languageManager.getMessage('CYBERBRICK_MAIN', '主程式'));
+		this.setStyle('procedure_blocks');
+		this.setTooltip('MicroPython 程式入口點，使用者的主程式邏輯放在此處');
+		this.setHelpUrl('');
+		this.setDeletable(false); // 不可刪除
+	},
+};
+```
+
+### 9.3 設計原則
+
+| 原則       | 說明                                                              |
+| ---------- | ----------------------------------------------------------------- |
+| 單一區段   | 不像 Arduino 有 setup/loop 兩區段，MicroPython 只需一個主程式區段 |
+| 不強制迴圈 | 使用者自行決定是否使用「重複」積木加入迴圈                        |
+| 程式入口點 | 所有生成的程式碼都在此積木內容之後執行                            |
+| 不可刪除   | 主程式積木為必要元件，不允許使用者刪除                            |
+
+### 9.4 與 Arduino 的對比
+
+| 特性     | Arduino `arduino_setup_loop`   | MicroPython `micropython_main` |
+| -------- | ------------------------------ | ------------------------------ |
+| 區段數量 | 2（setup + loop）              | 1（main）                      |
+| 迴圈結構 | loop 自動無限迴圈              | 使用者自行加入迴圈積木         |
+| 程式結構 | `void setup()` + `void loop()` | 直接執行程式碼                 |
+| 可刪除性 | 不可刪除                       | 不可刪除                       |
+
+---
+
+## 10. COM Port Info（連接埠資訊）
+
+### 10.1 ComPortInfo
 
 ```typescript
 interface ComPortInfo {
@@ -541,7 +593,7 @@ interface ComPortInfo {
 }
 ```
 
-### 9.2 連接埠選擇狀態
+### 10.2 連接埠選擇狀態
 
 ```typescript
 interface PortSelectionState {
@@ -554,7 +606,7 @@ interface PortSelectionState {
 
 ---
 
-## 10. Entity Relationships（實體關係）
+## 11. Entity Relationships（實體關係）
 
 ```
 ┌──────────────────┐
@@ -585,7 +637,7 @@ interface PortSelectionState {
 
 ---
 
-## 11. Validation Rules（驗證規則）
+## 12. Validation Rules（驗證規則）
 
 ### 11.1 BoardConfig 驗證
 
@@ -615,7 +667,7 @@ interface PortSelectionState {
 
 ---
 
-## 12. State Transitions（狀態轉換）
+## 13. State Transitions（狀態轉換）
 
 ### 12.1 主板切換狀態機
 

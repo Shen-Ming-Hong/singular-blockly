@@ -142,6 +142,9 @@
 -   **FR-012**: 系統 MUST 提供 WiFi 連線/斷線/狀態檢查/取得 IP 積木
 -   **FR-013**: 系統 MUST 提供 UART 讀寫積木（R0/T0）
 -   **FR-014**: 系統 MUST 提供標準邏輯/迴圈/變數/數學/文字積木的 MicroPython 版本
+-   **FR-014a**: 系統 MUST 提供 MicroPython 主程式積木（`micropython_main`），使用者的主程式邏輯必須放在此積木內才能生成可執行的 MicroPython 程式碼
+-   **FR-014b**: 主程式積木 MUST 提供單一 Statement 輸入區段，使用者的積木放入後生成主程式內容
+-   **FR-014c**: 主程式積木 MUST NOT 強制生成迴圈結構，迴圈邏輯由使用者透過迴圈積木自行決定
 
 #### 上傳功能
 
