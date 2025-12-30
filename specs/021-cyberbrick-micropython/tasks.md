@@ -1,7 +1,8 @@
 # Tasks: CyberBrick MicroPython 積木支援
 
 **Input**: Design documents from `/specs/021-cyberbrick-micropython/`  
-**Prerequisites**: plan.md ✅, spec.md ✅ (Updated 2025-12-30), research.md ✅, data-model.md ✅, contracts/ ✅, quickstart.md ✅
+**Prerequisites**: plan.md ✅, spec.md ✅ (Updated 2025-12-30), research.md ✅, data-model.md ✅ (Updated 2025-12-30), contracts/ ✅, quickstart.md ✅  
+**Last Updated**: 2025-12-30
 
 ---
 
@@ -19,7 +20,7 @@
 
 -   [ ] T001 建立 MicroPython 生成器目錄結構 in `media/blockly/generators/micropython/`
 -   [ ] T002 [P] 建立 CyberBrick 工具箱檔案 in `media/toolbox/cyberbrick.json`
--   [ ] T003 [P] 新增 MicroPython 上傳相關類型定義 in `src/types/micropython.ts`
+-   [ ] T003 [P] 新增 MicroPython 上傳相關類型定義（含 UploadButtonState、ToastNotification）in `src/types/micropython.ts`
 -   [ ] T004 [P] 擴展 Board 類型定義支援 language 屬性 in `src/types/board.ts`
 
 ---
@@ -60,9 +61,11 @@
 -   [ ] T015b [US1] 實作 CyberBrick 專用工具箱載入邏輯（參考 `updateToolboxForBoard` 函數）in `media/js/blocklyEdit.js`
 -   [ ] T015c [US1] 實作 Arduino 積木隱藏、MicroPython 積木顯示的過濾邏輯 in `media/js/blocklyEdit.js`
 -   [ ] T015d [US1] 新增上傳按鈕 UI（與現有控制區按鈕樣式一致），僅在 CyberBrick 時顯示 in `media/html/blocklyEdit.html` 和 `media/css/blocklyEdit.css`
--   [ ] T015e [P] [US1] 新增 CyberBrick 工具箱分類的 i18n 翻譯鍵（使用 `CATEGORY_CYBERBRICK_*` 格式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
+-   [ ] T015e [US1] 實作上傳按鈕狀態管理（UploadButtonState: visible/disabled/spinning）in `media/js/blocklyEdit.js`
+-   [ ] T015f [P] [US1] 實作 Toast 通知元件（重用/擴展現有 Ctrl+S 通知樣式）in `media/js/blocklyEdit.js` 和 `media/css/blocklyEdit.css`
+-   [ ] T015g [P] [US1] 新增 CyberBrick 工具箱分類的 i18n 翻譯鍵（使用 `CATEGORY_CYBERBRICK_*` 格式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
 
-**UI Checkpoint**: 選擇 CyberBrick 時工具箱正確切換，上傳按鈕正確顯示/隱藏
+**UI Checkpoint**: 選擇 CyberBrick 時工具箱正確切換，上傳按鈕正確顯示/隱藏/旋轉，Toast 通知正常運作
 
 ### Phase 3b: 積木定義與程式碼生成
 
@@ -99,6 +102,7 @@
 -   [ ] T028 [US2] 實作 requestUpload 訊息處理 in `src/webview/messageHandler.ts`
 -   [ ] T029 [US2] 實作 uploadProgress 與 uploadResult 訊息發送 in `src/webview/messageHandler.ts`
 -   [ ] T030 [US2] 實作上傳按鈕點擊處理與進度顯示 UI（按鈕已在 Phase 3a 建立）in `media/js/blocklyEdit.js`
+-   [ ] T030a [US2] 實作上傳結果 Toast 通知處理（成功/失敗，對應 FR-032b）in `media/js/blocklyEdit.js`
 -   [ ] T031 [P] [US2] 實作 requestPortList 與 portListResponse 訊息處理 in `src/webview/messageHandler.ts`
 -   [ ] T032 [US2] 實作連接埠選擇 UI（自動偵測 + 手動選擇）in `media/js/blocklyEdit.js`
 -   [ ] T033 [P] [US2] 新增 MicropythonUploader 單元測試 in `src/test/micropythonUploader.test.ts`
@@ -143,7 +147,8 @@
 
 -   [ ] T043 [P] [US4] 實作語言類型變更偵測邏輯（arduino ↔ micropython）in `media/js/blocklyEdit.js`
 -   [ ] T044 [US4] 實作主板切換時自動呼叫 `quickSaveManager.performQuickSave()` in `media/js/blocklyEdit.js`
--   [ ] T045 [US4] 實作 boardSwitchWarning 訊息發送（當偵測到語言變更）in `src/webview/messageHandler.ts`
+-   [ ] T044a [US4] 實作空工作區檢查（若無積木則跳過確認對話框，對應 FR-023a）in `media/js/blocklyEdit.js`
+-   [ ] T045 [US4] 實作 boardSwitchWarning 訊息發送（當偵測到語言變更且工作區非空）in `src/webview/messageHandler.ts`
 -   [ ] T046 [US4] 實作 boardSwitchConfirm 訊息處理 in `src/webview/messageHandler.ts`
 -   [ ] T047 [US4] 實作主板切換確認對話框 UI in `media/js/blocklyEdit.js`
 -   [ ] T048 [US4] 實作 boardSwitchComplete 訊息處理與工作區清空邏輯 in `src/webview/messageHandler.ts`
@@ -164,7 +169,7 @@
 
 -   [ ] T051 [US6] 實作 platformio.ini 檔案存在檢查邏輯 in `src/webview/messageHandler.ts`
 -   [ ] T052 [US6] 實作 platformio.ini 自動刪除邏輯（選擇 CyberBrick 時觸發）in `src/webview/messageHandler.ts`
--   [ ] T053 [US6] 實作 deletePlatformioConfig 訊息處理（WebView → Extension）in `src/webview/messageHandler.ts`
+-   [ ] T053 [US6] 實作 deletePlatformioIni 訊息處理（WebView → Extension，契約見 contracts/webview-messages.md §3.1）in `src/webview/messageHandler.ts`
 -   [ ] T054 [US6] 新增 platformio.ini 刪除相關日誌（使用 `[blockly]` 標籤）in `src/webview/messageHandler.ts`
 
 **Checkpoint**: User Story 6 完成 - 選擇 CyberBrick 時自動清理 PlatformIO 設定
@@ -304,6 +309,10 @@ Task T015a: "實作主板選單加入 CyberBrick 選項"
 Task T015b: "實作 CyberBrick 專用工具箱載入邏輯"
 Task T015c: "實作 Arduino 積木隱藏、MicroPython 積木顯示"
 Task T015d: "新增上傳按鈕 UI（與現有按鈕樣式一致）"
+Task T015e: "實作上傳按鈕狀態管理（UploadButtonState）"
+# 以下兩個可平行：
+Task T015f: "實作 Toast 通知元件"
+Task T015g: "新增 CyberBrick 工具箱分類的 i18n 翻譯鍵"
 
 # UI Checkpoint 確認後，才能開始 Phase 3b：
 Task T016: "建立 CyberBrick 專用積木定義"
@@ -367,6 +376,9 @@ With 2 developers:
     -   所有日誌必須使用 `[blockly]` 標籤
     -   所有翻譯鍵必須使用 `CATEGORY_CYBERBRICK_*` 或 `CYBERBRICK_*` 格式
     -   上傳按鈕必須與現有控制區按鈕樣式一致
+    -   上傳中狀態必須顯示旋轉動畫（spinning class，同重新整理按鈕）
+    -   上傳結果必須使用 Toast 通知（同 Ctrl+S 備份通知樣式）
+    -   空工作區切換主板時跳過確認對話框（流暢度優先）
 
 ---
 
@@ -376,12 +388,12 @@ With 2 developers:
 | ---------------------- | -------- | -------- |
 | Phase 1: Setup         | 4        | 3        |
 | Phase 2: Foundational  | 11       | 8        |
-| Phase 3a: US1 UI/UX    | 5        | 1        |
+| Phase 3a: US1 UI/UX    | 7        | 2        |
 | Phase 3b: US1 程式碼   | 7        | 2        |
-| Phase 4: User Story 2  | 14       | 4        |
+| Phase 4: User Story 2  | 15       | 4        |
 | Phase 5: User Story 3  | 10       | 3        |
-| Phase 6: User Story 4  | 8        | 1        |
+| Phase 6: User Story 4  | 9        | 1        |
 | Phase 6a: User Story 6 | 4        | 0        |
 | Phase 7: User Story 5  | 5        | 1        |
 | Phase 8: Polish        | 11       | 4        |
-| **Total**              | **79**   | **27**   |
+| **Total**              | **83**   | **28**   |
