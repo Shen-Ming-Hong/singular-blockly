@@ -1,7 +1,7 @@
 # Data Model: CyberBrick MicroPython 積木支援
 
 **Feature Branch**: `021-cyberbrick-micropython`  
-**Last Updated**: 2025-12-29
+**Last Updated**: 2025-12-30
 
 ---
 
@@ -166,9 +166,84 @@ window.BOARD_CONFIGS.cyberbrick = {
 
 ---
 
-## 2. Workspace State（工作區狀態）
+## 2. Upload Button State（上傳按鈕狀態）
 
-### 2.1 擴展 WorkspaceState
+### 2.1 UploadButtonState（2025-12-30 新增）
+
+```typescript
+interface UploadButtonState {
+	visible: boolean;           // 按鈕是否可見（僅 CyberBrick 時 true）
+	disabled: boolean;          // 按鈕是否禁用（上傳中為 true）
+	spinning: boolean;          // 是否顯示旋轉動畫（同重新整理按鈕）
+}
+
+// 狀態轉換
+type UploadButtonTransition =
+	| { type: 'BOARD_CHANGED'; language: 'arduino' | 'micropython' }
+	| { type: 'UPLOAD_STARTED' }
+	| { type: 'UPLOAD_COMPLETED' }
+	| { type: 'UPLOAD_FAILED' };
+```
+
+### 2.2 按鈕狀態機
+
+```
+[Hidden] ──(select CyberBrick)──▶ [Visible/Enabled]
+    ▲                                    │
+    │                                    │ (click upload)
+    │                                    ▼
+    │                            [Visible/Disabled/Spinning]
+    │                                    │
+    │         ┌──────────────────────────┤
+    │         │                          │
+    │    (success)                   (failure)
+    │         │                          │
+    │         ▼                          ▼
+    │   [Show Success Toast]      [Show Error Toast]
+    │         │                          │
+    │         └──────────┬───────────────┘
+    │                    ▼
+    │            [Visible/Enabled]
+    │                    │
+    │                    │ (select Arduino)
+    └────────────────────┘
+```
+
+---
+
+## 3. Toast Notification（Toast 通知）
+
+### 3.1 ToastNotification（2025-12-30 新增）
+
+```typescript
+interface ToastNotification {
+	message: string;            // 顯示訊息
+	type: 'success' | 'error' | 'info' | 'warning';
+	duration?: number;          // 顯示時間（毫秒），預設 3000
+}
+
+// 上傳相關 Toast
+const UPLOAD_TOASTS = {
+	success: {
+		message: '上傳成功！',
+		type: 'success' as const,
+	},
+	failed: {
+		message: '上傳失敗',
+		type: 'error' as const,
+	},
+	connecting: {
+		message: '正在連接 CyberBrick...',
+		type: 'info' as const,
+	},
+};
+```
+
+---
+
+## 4. Workspace State（工作區狀態）
+
+### 4.1 擴展 WorkspaceState
 
 ```typescript
 interface WorkspaceState {
@@ -189,7 +264,7 @@ interface WorkspaceState {
 }
 ````
 
-### 2.2 存儲格式
+### 4.2 存儲格式
 
 儲存於 `{workspace}/blockly/main.json`：
 
@@ -216,9 +291,55 @@ interface WorkspaceState {
 
 ---
 
-## 3. Backup（備份）
+## 5. PlatformIO Cleanup（platformio.ini 清理）
 
-### 3.1 WorkspaceBackup（工作區備份）
+### 5.1 PlatformioCleanupState（2025-12-30 新增）
+
+```typescript
+interface PlatformioCleanupState {
+	fileExists: boolean; // platformio.ini 是否存在
+	deleted: boolean; // 是否已刪除
+	error?: string; // 錯誤訊息（如有）
+}
+
+// 清理觸發條件
+interface CleanupTrigger {
+	event: 'board_changed';
+	fromBoard: string;
+	toBoard: string;
+	toLanguage: 'micropython'; // 僅在切換到 MicroPython 時觸發
+}
+```
+
+### 5.2 清理流程
+
+```
+[Board Changed to CyberBrick]
+           │
+           ▼
+    [Check platformio.ini exists]
+           │
+    ┌──────┴──────┐
+    │             │
+ (exists)    (not exists)
+    │             │
+    ▼             │
+ [Delete file]    │
+    │             │
+    ├─────────────┘
+    │
+    ▼
+ [Log action]
+    │
+    ▼
+ [Continue with toolbox switch]
+```
+
+---
+
+## 6. Backup（備份）
+
+### 6.1 WorkspaceBackup（工作區備份）
 
 ```typescript
 interface WorkspaceBackup {
@@ -239,7 +360,7 @@ type BackupReason =
 	| 'pre_upload'; // 上傳前備份
 ```
 
-### 3.2 DeviceBackup（裝置程式備份）
+### 6.2 DeviceBackup（裝置程式備份）
 
 ```typescript
 interface DeviceBackup {
@@ -253,7 +374,7 @@ interface DeviceBackup {
 }
 ```
 
-### 3.3 備份清單（Manifest）
+### 6.3 備份清單（Manifest）
 
 儲存於 `{workspace}/blockly/backups/manifest.json`：
 
@@ -284,9 +405,9 @@ interface DeviceBackup {
 
 ---
 
-## 4. Upload State（上傳狀態）
+## 7. Upload State（上傳狀態）
 
-### 4.1 UploadProgress
+### 7.1 UploadProgress
 
 ```typescript
 interface UploadProgress {
@@ -309,7 +430,7 @@ type UploadStage =
 	| 'failed'; // 失敗
 ```
 
-### 4.2 UploadResult
+### 7.2 UploadResult
 
 ```typescript
 interface UploadResult {
@@ -335,9 +456,9 @@ interface UploadResult {
 
 ---
 
-## 5. MicroPython Generator State（生成器狀態）
+## 8. MicroPython Generator State（生成器狀態）
 
-### 5.1 GeneratorContext
+### 8.1 GeneratorContext
 
 ```typescript
 interface GeneratorContext {
@@ -375,7 +496,7 @@ interface GeneratorContext {
 }
 ```
 
-### 5.2 生成的程式碼結構
+### 8.2 生成的程式碼結構
 
 ```python
 # === 自動生成 - 請勿手動編輯 ===
@@ -410,9 +531,9 @@ while True:
 
 ---
 
-## 6. COM Port Info（連接埠資訊）
+## 9. COM Port Info（連接埠資訊）
 
-### 6.1 ComPortInfo
+### 9.1 ComPortInfo
 
 ```typescript
 interface ComPortInfo {
@@ -425,7 +546,7 @@ interface ComPortInfo {
 }
 ```
 
-### 6.2 連接埠選擇狀態
+### 9.2 連接埠選擇狀態
 
 ```typescript
 interface PortSelectionState {
@@ -438,7 +559,7 @@ interface PortSelectionState {
 
 ---
 
-## 7. Entity Relationships（實體關係）
+## 10. Entity Relationships（實體關係）
 
 ```
 ┌──────────────────┐
@@ -469,9 +590,9 @@ interface PortSelectionState {
 
 ---
 
-## 8. Validation Rules（驗證規則）
+## 11. Validation Rules（驗證規則）
 
-### 8.1 BoardConfig 驗證
+### 11.1 BoardConfig 驗證
 
 | 欄位         | 規則                                         |
 | ------------ | -------------------------------------------- |
@@ -481,7 +602,7 @@ interface PortSelectionState {
 | uploadMethod | 若 language='micropython'，必須為 'mpremote' |
 | devicePath   | 若 language='micropython'，必須指定          |
 
-### 8.2 Backup 驗證
+### 11.2 Backup 驗證
 
 | 欄位        | 規則                            |
 | ----------- | ------------------------------- |
@@ -489,7 +610,7 @@ interface PortSelectionState {
 | sourceBoard | 必須是有效的 board key          |
 | workspace   | 必須是有效的 Blockly 序列化資料 |
 
-### 8.3 Upload 驗證
+### 11.3 Upload 驗證
 
 | 條件     | 驗證                     |
 | -------- | ------------------------ |
@@ -499,32 +620,40 @@ interface PortSelectionState {
 
 ---
 
-## 9. State Transitions（狀態轉換）
+## 12. State Transitions（狀態轉換）
 
-### 9.1 主板切換狀態機
+### 12.1 主板切換狀態機
 
 ```
-[Any Board] ──(select different language board)──▶ [Show Warning Dialog]
+[Any Board] ──(select different language board)──▶ [Check Workspace Empty?]
                                                            │
                     ┌──────────────────────────────────────┤
                     │                                      │
-                    ▼                                      ▼
-            [User Cancels]                        [User Confirms]
+                (not empty)                            (empty)
                     │                                      │
-                    ▼                                      ▼
-            [Keep Current]                        [Backup Workspace]
-                                                          │
-                                                          ▼
-                                                  [Clear Workspace]
-                                                          │
-                                                          ▼
-                                                  [Switch Board]
-                                                          │
-                                                          ▼
-                                                  [Load New Toolbox]
+                    ▼                                      │
+          [Show Warning Dialog]                            │
+                    │                                      │
+        ┌───────────┼───────────┐                          │
+        │           │           │                          │
+     (cancel)    (confirm)      │                          │
+        │           │           │                          │
+        ▼           ▼           │                          │
+  [Keep Current] [Backup + Clear]                          │
+                    │           │                          │
+                    └───────────┴──────────────────────────┤
+                                                           │
+                                                           ▼
+                                              [Delete platformio.ini if MicroPython]
+                                                           │
+                                                           ▼
+                                                   [Switch Board]
+                                                           │
+                                                           ▼
+                                                   [Load New Toolbox]
 ```
 
-### 9.2 上傳狀態機
+### 12.2 上傳狀態機
 
 ```
 [Idle] ──(click upload)──▶ [Preparing]
@@ -541,7 +670,7 @@ interface PortSelectionState {
                         │         │
               (success) │         │ (fail)
                         │         ▼
-                        │   [Failed] ──▶ [Idle]
+                        │   [Failed] ──▶ [Show Error Toast] ──▶ [Idle]
                         ▼
                     [Resetting]
                         │
@@ -555,5 +684,5 @@ interface PortSelectionState {
                   [Restarting]
                         │
                         ▼
-                   [Completed] ──▶ [Idle]
+                   [Completed] ──▶ [Show Success Toast] ──▶ [Idle]
 ```

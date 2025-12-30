@@ -1,7 +1,7 @@
 # API Contracts: WebView ↔ Extension 訊息
 
 **Feature Branch**: `021-cyberbrick-micropython`  
-**Last Updated**: 2025-12-29
+**Last Updated**: 2025-12-30
 
 本文件定義 WebView 與 Extension 之間的訊息協議，用於 CyberBrick MicroPython 功能。
 
@@ -75,9 +75,32 @@ interface ExtensionMessage {
 
 ---
 
-## 3. 新增訊息 - 上傳功能
+## 3. 新增訊息 - platformio.ini 清理（2025-12-30 新增）
 
-### 3.1 requestUpload
+### 3.1 deletePlatformioIni
+
+**方向**: WebView → Extension
+
+**用途**: 請求刪除 platformio.ini 檔案（切換到 CyberBrick 時）
+
+```typescript
+{
+	command: 'deletePlatformioIni';
+}
+```
+
+**處理邏輯**:
+
+-   Extension 收到後檢查 platformio.ini 是否存在
+-   若存在則刪除，記錄日誌 `[blockly] 已刪除 platformio.ini`
+-   若不存在則跳過，記錄 debug 日誌
+-   不回傳結果（fire-and-forget）
+
+---
+
+## 4. 新增訊息 - 上傳功能
+
+### 4.1 requestUpload
 
 **方向**: WebView → Extension
 
@@ -97,7 +120,7 @@ interface ExtensionMessage {
 -   `board` 必須是支援 MicroPython 的主板
 -   `code` 必須是非空字串
 
-### 3.2 uploadProgress
+### 4.2 uploadProgress
 
 **方向**: Extension → WebView
 
@@ -125,11 +148,11 @@ type UploadStage =
   | 'failed';
 ```
 
-### 3.3 uploadResult
+### 4.3 uploadResult
 
 **方向**: Extension → WebView
 
-**用途**: 回報上傳結果
+**用途**: 回報上傳結果（用於 Toast 通知）
 
 ```typescript
 {
@@ -150,11 +173,17 @@ type UploadStage =
 }
 ```
 
+**WebView 處理**:
+
+-   `success: true` → 顯示 Toast「上傳成功！」（type: success）
+-   `success: false` → 顯示 Toast「上傳失敗：{error.message}」（type: error）
+-   重置上傳按鈕狀態（移除 spinning，啟用按鈕）
+
 ---
 
-## 4. 新增訊息 - 連接埠管理
+## 5. 新增訊息 - 連接埠管理
 
-### 4.1 requestPortList
+### 5.1 requestPortList
 
 **方向**: WebView → Extension
 
@@ -167,7 +196,7 @@ type UploadStage =
 }
 ```
 
-### 4.2 portListResponse
+### 5.2 portListResponse
 
 **方向**: Extension → WebView
 
@@ -190,7 +219,7 @@ interface ComPortInfo {
 }
 ```
 
-### 4.3 selectPort
+### 5.3 selectPort
 
 **方向**: WebView → Extension
 
@@ -206,9 +235,9 @@ interface ComPortInfo {
 
 ---
 
-## 5. 新增訊息 - 備份功能
+## 6. 新增訊息 - 備份功能
 
-### 5.1 requestBackupList
+### 6.1 requestBackupList
 
 **方向**: WebView → Extension
 
@@ -221,7 +250,7 @@ interface ComPortInfo {
 }
 ```
 
-### 5.2 backupListResponse
+### 6.2 backupListResponse
 
 **方向**: Extension → WebView
 
@@ -244,7 +273,7 @@ interface BackupInfo {
 }
 ```
 
-### 5.3 restoreBackup
+### 6.3 restoreBackup
 
 **方向**: WebView → Extension
 
@@ -258,7 +287,7 @@ interface BackupInfo {
 }
 ```
 
-### 5.4 restoreResult
+### 6.4 restoreResult
 
 **方向**: Extension → WebView
 
@@ -274,7 +303,7 @@ interface BackupInfo {
 }
 ```
 
-### 5.5 createBackup
+### 6.5 createBackup
 
 **方向**: WebView → Extension
 
@@ -288,7 +317,7 @@ interface BackupInfo {
 }
 ```
 
-### 5.6 backupCreated
+### 6.6 backupCreated
 
 **方向**: Extension → WebView
 
@@ -305,9 +334,9 @@ interface BackupInfo {
 
 ---
 
-## 6. 新增訊息 - 主板切換
+## 7. 新增訊息 - 主板切換
 
-### 6.1 boardSwitchWarning
+### 7.1 boardSwitchWarning
 
 **方向**: Extension → WebView
 
@@ -324,7 +353,7 @@ interface BackupInfo {
 }
 ```
 
-### 6.2 boardSwitchConfirm
+### 7.2 boardSwitchConfirm
 
 **方向**: WebView → Extension
 
@@ -334,12 +363,12 @@ interface BackupInfo {
 {
 	command: 'boardSwitchConfirm';
 	confirmed: boolean;
-	createBackup: boolean; // 是否建立備份
+	createBackup: boolean; // 是否建立備份（使用現有 Ctrl+S 機制）
 	toBoard: string; // 目標主板
 }
 ```
 
-### 6.3 boardSwitchComplete
+### 7.3 boardSwitchComplete
 
 **方向**: Extension → WebView
 
@@ -358,9 +387,9 @@ interface BackupInfo {
 
 ---
 
-## 7. 新增訊息 - 工具箱
+## 8. 新增訊息 - 工具箱
 
-### 7.1 loadToolbox
+### 8.1 loadToolbox
 
 **方向**: Extension → WebView
 
@@ -374,7 +403,7 @@ interface BackupInfo {
 }
 ```
 
-### 7.2 toolboxLoaded
+### 8.2 toolboxLoaded
 
 **方向**: WebView → Extension
 
@@ -391,9 +420,9 @@ interface BackupInfo {
 
 ---
 
-## 8. 錯誤處理
+## 9. 錯誤處理
 
-### 8.1 錯誤碼定義
+### 9.1 錯誤碼定義
 
 ```typescript
 enum UploadErrorCode {
@@ -410,12 +439,12 @@ enum UploadErrorCode {
 }
 ```
 
-### 8.2 錯誤訊息格式
+### 9.2 錯誤訊息格式
 
 ```typescript
 interface UploadError {
 	code: UploadErrorCode;
-	message: string; // 使用者友善訊息
+	message: string; // 使用者友善訊息（用於 Toast 顯示）
 	details?: string; // 技術細節
 	suggestion?: string; // 建議解決方案
 }
@@ -423,9 +452,9 @@ interface UploadError {
 
 ---
 
-## 9. 訊息流程範例
+## 10. 訊息流程範例
 
-### 9.1 上傳流程
+### 10.1 上傳流程（含 Toast 通知）
 
 ```
 WebView                     Extension
@@ -445,16 +474,18 @@ WebView                     Extension
    │                            │
 ```
 
-### 9.2 主板切換流程
+### 10.2 主板切換流程（含 platformio.ini 清理）
 
 ```
 WebView                     Extension
    │                            │
    │── updateBoard ────────────▶│ (language change detected)
    │                            │
-   │◀── boardSwitchWarning ─────│
+   │◀── boardSwitchWarning ─────│ (若工作區非空)
    │                            │
    │── boardSwitchConfirm ─────▶│ (confirmed: true)
+   │                            │
+   │── deletePlatformioIni ────▶│ (若切換到 MicroPython)
    │                            │
    │◀── loadToolbox ────────────│
    │                            │
@@ -466,9 +497,9 @@ WebView                     Extension
 
 ---
 
-## 10. 版本相容性
+## 11. 版本相容性
 
-### 10.1 訊息版本
+### 11.1 訊息版本
 
 建議在訊息中加入版本號以支援未來擴展：
 
@@ -480,7 +511,7 @@ interface VersionedMessage {
 }
 ```
 
-### 10.2 向後相容
+### 11.2 向後相容
 
 -   新增欄位使用可選屬性（`?`）
 -   不移除現有欄位

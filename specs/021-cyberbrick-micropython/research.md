@@ -365,6 +365,344 @@ media/toolbox/
 3. ✅ GPIO 腳位對應（核心板：GPIO 8 板載 LED，擴展板配置見 8.2 章節）
 4. ⏳ 板載 LED WS2812 的 RGB 順序（RGB or GRB，需實機測試）
 
+---
+
+## 9. UI/UX 元件研究（2025-12-30 新增）
+
+### 9.1 現有控制區按鈕樣式分析
+
+**來源**: `media/css/blocklyEdit.css` 和 `media/html/blocklyEdit.html`
+
+**Decision**: 上傳按鈕使用與現有控制區按鈕相同的 CSS 類別和結構
+
+**Rationale**: 保持 UI 一致性，降低使用者學習成本
+
+#### 現有按鈕結構
+
+```html
+<!-- 主題切換按鈕 -->
+<button id="themeToggle" title="切換主題">
+	<svg>...</svg>
+</button>
+
+<!-- 備份按鈕 -->
+<button id="backupButton" title="快速備份">
+	<svg>...</svg>
+</button>
+
+<!-- 重新整理按鈕 -->
+<button id="refreshButton" title="重新整理">
+	<svg>...</svg>
+</button>
+```
+
+#### CSS 類別
+
+```css
+.controls-container button {
+	/* 現有樣式 */
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 4px;
+	/* hover 效果 */
+}
+
+.controls-container button:hover {
+	background: var(--button-hover-bg);
+}
+
+/* 旋轉動畫（用於重新整理按鈕） */
+.controls-container button.spinning svg {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+```
+
+### 9.2 上傳按鈕設計
+
+**Decision**: 上傳按鈕位於控制區，僅在 CyberBrick 主板時可見
+
+```html
+<!-- 上傳按鈕（僅 CyberBrick） -->
+<button id="uploadButton" title="上傳到 CyberBrick" style="display: none;">
+	<svg viewBox="0 0 24 24">
+		<!-- 上傳圖示 -->
+		<path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z" />
+	</svg>
+</button>
+```
+
+**顯示/隱藏邏輯**:
+
+```javascript
+function updateUploadButtonVisibility(board) {
+	const uploadButton = document.getElementById('uploadButton');
+	const boardConfig = window.BOARD_CONFIGS[board];
+
+	if (boardConfig?.language === 'micropython') {
+		uploadButton.style.display = 'block';
+	} else {
+		uploadButton.style.display = 'none';
+	}
+}
+```
+
+**上傳中狀態**:
+
+```javascript
+function setUploadingState(isUploading) {
+	const uploadButton = document.getElementById('uploadButton');
+	if (isUploading) {
+		uploadButton.disabled = true;
+		uploadButton.classList.add('spinning');
+	} else {
+		uploadButton.disabled = false;
+		uploadButton.classList.remove('spinning');
+	}
+}
+```
+
+### 9.3 Toast 通知元件
+
+**來源**: 現有 Ctrl+S 快速備份功能使用的通知系統
+
+**Decision**: 上傳成功/失敗使用相同的 Toast 通知樣式
+
+```javascript
+// 顯示 Toast 通知
+function showToast(message, type = 'info') {
+	const toast = document.createElement('div');
+	toast.className = `toast toast-${type}`;
+	toast.textContent = message;
+	document.body.appendChild(toast);
+
+	setTimeout(() => {
+		toast.classList.add('fade-out');
+		setTimeout(() => toast.remove(), 300);
+	}, 3000);
+}
+
+// 使用範例
+showToast('上傳成功！', 'success');
+showToast('上傳失敗：連接埠無回應', 'error');
+```
+
+---
+
+## 10. platformio.ini 清理機制研究（2025-12-30 新增）
+
+### 10.1 需求背景
+
+**Decision**: 選擇 CyberBrick 主板時自動刪除 `platformio.ini`
+
+**Rationale**:
+
+1. CyberBrick 使用 MicroPython + mpremote，與 PlatformIO 流程完全獨立
+2. 保留 `platformio.ini` 可能導致使用者混淆
+3. 使用者切換回 Arduino 主板時，系統會自動重新建立 `platformio.ini`
+
+### 10.2 實作位置
+
+**在 `blocklyEdit.js` 的 `handleBoardChange` 函數中**:
+
+```javascript
+async function handleBoardChange(newBoard) {
+	const boardConfig = window.BOARD_CONFIGS[newBoard];
+
+	// 如果切換到 MicroPython 主板
+	if (boardConfig?.language === 'micropython') {
+		// 通知 Extension 刪除 platformio.ini
+		vscode.postMessage({
+			command: 'deletePlatformioIni',
+		});
+		console.log('[blockly] 已請求刪除 platformio.ini');
+	}
+
+	// 繼續現有的主板切換邏輯...
+}
+```
+
+**在 `messageHandler.ts` 中處理**:
+
+```typescript
+case 'deletePlatformioIni':
+  await this.handleDeletePlatformioIni();
+  break;
+
+private async handleDeletePlatformioIni(): Promise<void> {
+  try {
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) return;
+
+    const platformioPath = vscode.Uri.joinPath(
+      workspaceFolder.uri,
+      'platformio.ini'
+    );
+
+    // 檢查檔案是否存在
+    try {
+      await vscode.workspace.fs.stat(platformioPath);
+      // 檔案存在，刪除它
+      await vscode.workspace.fs.delete(platformioPath);
+      log.info('[blockly] 已刪除 platformio.ini');
+    } catch {
+      // 檔案不存在，無需操作
+      log.debug('[blockly] platformio.ini 不存在，跳過刪除');
+    }
+  } catch (error) {
+    log.error('[blockly] 刪除 platformio.ini 失敗', error);
+    // 不阻擋切換流程
+  }
+}
+```
+
+### 10.3 日誌標籤規範
+
+**Decision**: 所有 CyberBrick 相關日誌使用 `[blockly]` 標籤前綴
+
+**Rationale**: 方便除錯追蹤，與現有日誌風格一致
+
+**範例**:
+
+-   `[blockly] 已切換至 CyberBrick 主板`
+-   `[blockly] 已刪除 platformio.ini`
+-   `[blockly] 工具箱已更新為 MicroPython 積木`
+-   `[blockly] 上傳開始：COM3`
+-   `[blockly] 上傳完成`
+-   `[blockly] 上傳失敗：連接埠無回應`
+
+---
+
+## 11. 工具箱切換機制研究（2025-12-30 新增）
+
+### 11.1 現有 updateToolboxForBoard 函數
+
+**來源**: `media/js/blocklyEdit.js` 約 2275 行
+
+**Decision**: 擴展現有函數以支援 MicroPython 工具箱切換
+
+**現有行為**:
+
+-   Arduino Uno 與 ESP32 切換時，隱藏/顯示部分工具箱分類（如 WiFi 分類）
+-   使用 `workspace.updateToolbox()` API 更新工具箱
+
+**擴展設計**:
+
+```javascript
+async function updateToolboxForBoard(board) {
+	const boardConfig = window.BOARD_CONFIGS[board];
+
+	if (boardConfig?.language === 'micropython') {
+		// 載入 MicroPython 工具箱
+		const toolboxJson = await loadToolbox(boardConfig.toolbox || 'cyberbrick.json');
+		workspace.updateToolbox(toolboxJson);
+		console.log('[blockly] 工具箱已切換為 MicroPython 積木');
+	} else {
+		// 載入 Arduino 工具箱
+		const toolboxJson = await loadToolbox('index.json');
+		// 根據主板隱藏特定分類
+		filterToolboxByBoard(toolboxJson, board);
+		workspace.updateToolbox(toolboxJson);
+		console.log('[blockly] 工具箱已切換為 Arduino 積木');
+	}
+}
+```
+
+### 11.2 空工作區跳過對話框
+
+**Decision**: 若工作區為空（無任何積木），跳過確認對話框直接切換
+
+**Rationale**: 流暢度優先，與 Ctrl+S 空工作區跳過備份行為一致
+
+```javascript
+function shouldShowSwitchDialog(workspace, fromLanguage, toLanguage) {
+	// 相同語言不需要對話框
+	if (fromLanguage === toLanguage) return false;
+
+	// 空工作區不需要對話框
+	const topBlocks = workspace.getTopBlocks(false);
+	if (topBlocks.length === 0) {
+		console.log('[blockly] 工作區為空，跳過切換確認對話框');
+		return false;
+	}
+
+	return true;
+}
+```
+
+---
+
+## 12. i18n 翻譯鍵研究（2025-12-30 新增）
+
+### 12.1 翻譯鍵命名規範
+
+**Decision**:
+
+-   CyberBrick 專用分類：`CATEGORY_CYBERBRICK_*`
+-   CyberBrick 專用積木：`CYBERBRICK_*`
+-   MicroPython 通用積木：共用現有 Arduino 翻譯鍵
+
+**Rationale**: 與現有翻譯鍵命名規範一致，避免重複定義
+
+### 12.2 新增翻譯鍵清單
+
+**分類翻譯鍵**:
+
+```javascript
+// 新增到 media/locales/*/messages.js
+CATEGORY_CYBERBRICK_LED: '板載 LED',
+CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+CATEGORY_CYBERBRICK_TIME: '時序',
+```
+
+**積木翻譯鍵**:
+
+```javascript
+// 板載 LED
+CYBERBRICK_LED_SET_COLOR: '設定板載 LED 顏色 R %1 G %2 B %3',
+CYBERBRICK_LED_OFF: '關閉板載 LED',
+
+// GPIO
+CYBERBRICK_GPIO_SET: '設定 GPIO %1 為 %2',
+CYBERBRICK_GPIO_READ: '讀取 GPIO %1',
+CYBERBRICK_PWM_SET: '設定 PWM 腳位 %1 值 %2',
+CYBERBRICK_ADC_READ: '讀取 ADC 腳位 %1',
+
+// WiFi
+CYBERBRICK_WIFI_CONNECT: '連接 WiFi SSID %1 密碼 %2',
+CYBERBRICK_WIFI_DISCONNECT: '斷開 WiFi',
+CYBERBRICK_WIFI_CONNECTED: 'WiFi 已連線？',
+CYBERBRICK_WIFI_IP: '取得 IP 位址',
+
+// 時序
+CYBERBRICK_DELAY_MS: '延時 %1 毫秒',
+CYBERBRICK_DELAY_S: '延時 %1 秒',
+
+// UI
+CYBERBRICK_UPLOAD_BUTTON: '上傳到 CyberBrick',
+CYBERBRICK_UPLOAD_SUCCESS: '上傳成功！',
+CYBERBRICK_UPLOAD_FAILED: '上傳失敗',
+CYBERBRICK_UPLOADING: '上傳中...',
+```
+
+### 12.3 共用翻譯鍵
+
+MicroPython 通用積木（邏輯、迴圈、變數、數學、文字）共用現有翻譯鍵：
+
+-   `CATEGORY_LOGIC`, `CATEGORY_LOOPS`, `CATEGORY_MATH`, `CATEGORY_TEXT`, `CATEGORY_VARIABLES`
+-   這些分類的積木已有完整翻譯，無需重複定義
+
 ### 風險評估
 
 | 風險                   | 影響     | 緩解措施                                         |

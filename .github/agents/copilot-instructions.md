@@ -20,6 +20,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - Workspace JSON 檔案 (`blockly/main.json`) (020-fix-huskylens-rxtx)
 - TypeScript 5.9.3 (Extension) + JavaScript (WebView/Blockly) + Blockly 12.3.1, VS Code API 1.105.0+, mpremote (MicroPython 工具) (021-cyberbrick-micropython)
 - 工作區 `blockly/main.json`（積木狀態）、`blockly/backups/`（備份目錄） (021-cyberbrick-micropython)
+- TypeScript 5.9.3 + JavaScript (WebView) + MicroPython (生成) + Blockly 12.3.1, VS Code Extension API 1.105.0+, mpremote 1.20+ (021-cyberbrick-micropython)
+- `{workspace}/blockly/main.json`（工作區）, `{workspace}/blockly/backups/`（備份） (021-cyberbrick-micropython)
 
 -   TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly) (011-esp32-pwm-setup)
 
@@ -48,9 +50,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 021-cyberbrick-micropython: Added TypeScript 5.9.3 + JavaScript (WebView) + MicroPython (生成) + Blockly 12.3.1, VS Code Extension API 1.105.0+, mpremote 1.20+
 - 021-cyberbrick-micropython: Added TypeScript 5.9.3 (Extension) + JavaScript (WebView/Blockly) + Blockly 12.3.1, VS Code API 1.105.0+, mpremote (MicroPython 工具)
 - 021-cyberbrick-micropython: Added TypeScript 5.9.3 (Extension) + JavaScript (WebView/Blockly) + Blockly 12.3.1, VS Code API 1.105.0+, mpremote (MicroPython 工具)
-- 020-fix-huskylens-rxtx: Added JavaScript (ES6+), TypeScript 5.9.3 + Google Blockly 12.3.1, VSCode Extension API 1.105.0+
 
 
 <!-- MANUAL ADDITIONS START -->

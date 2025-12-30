@@ -1,7 +1,8 @@
 # Quickstart: CyberBrick MicroPython 積木支援
 
 **Feature Branch**: `021-cyberbrick-micropython`  
-**建立日期**: 2025-12-29
+**建立日期**: 2025-12-29  
+**更新日期**: 2025-12-30
 
 本指南協助開發者快速了解並開始實作 CyberBrick MicroPython 功能。
 
@@ -13,8 +14,10 @@
 
 -   MicroPython 程式碼生成器
 -   使用 mpremote 一鍵上傳
--   工作區與裝置程式備份
+-   工作區與裝置程式備份（使用現有 Ctrl+S 機制）
 -   主板切換時的安全保護
+-   **選擇 CyberBrick 時自動刪除 platformio.ini**（2025-12-30 新增）
+-   **上傳按鈕與現有控制區樣式一致**（2025-12-30 新增）
 
 ---
 
@@ -79,19 +82,41 @@ $PIO_PYTHON = "$env:USERPROFILE\.platformio\penv\Scripts\python.exe"
 │  blocklyEdit.js      │  messageHandler.ts                   │
 │  ├─ 主板選擇         │  ├─ handleUpdateBoard()              │
 │  ├─ 積木編輯         │  ├─ handleRequestUpload() [新增]     │
+│  ├─ 上傳按鈕 [新增]  │  ├─ handleDeletePlatformioIni() [新] │
 │  └─ 程式碼顯示       │  └─ handleBoardSwitch() [新增]       │
 │                      │                                       │
 │  generators/         │  services/                            │
 │  ├─ arduino/         │  ├─ fileService.ts                   │
 │  └─ micropython/     │  ├─ settingsManager.ts               │
-│      [新增目錄]      │  └─ micropythonUploader.ts [新增]    │
+│      [新增目錄]      │  ├─ quickSaveManager.ts [重用]       │
+│                      │  └─ micropythonUploader.ts [新增]    │
 │                      │                                       │
 └──────────────────────┴──────────────────────────────────────┘
 ```
 
 ---
 
-## 📝 開發步驟
+## 📝 開發步驟（更新後的優先順序）
+
+### ⚠️ 實作順序（重要）
+
+根據 spec.md FR-033，實作順序 **MUST** 遵循：
+
+1. **Phase 1a**: UI/UX 互動正確性驗證
+    - 工具箱切換（Arduino ↔ MicroPython）
+    - 上傳按鈕顯示/隱藏
+    - platformio.ini 自動刪除
+2. **Phase 1b**: 程式碼生成功能
+
+    - MicroPython 生成器
+    - 核心積木（LED、GPIO、WiFi、時序）
+
+3. **Phase 1c**: 上傳按鈕內部功能
+    - mpremote 整合
+    - 上傳流程
+    - Toast 通知
+
+---
 
 ### Step 1: 擴展主板配置
 
@@ -104,6 +129,7 @@ window.BOARD_CONFIGS.cyberbrick = {
 	toolbox: 'cyberbrick.json', // 新增欄位
 	uploadMethod: 'mpremote', // 新增欄位
 	devicePath: '/app/rc_main.py', // 新增欄位
+	usbIdentifier: { vid: '303A', pid: '1001' }, // 新增欄位
 
 	digitalPins: [
 		['GPIO 0', '0'],
@@ -120,7 +146,91 @@ window.BOARD_CONFIGS.cyberbrick = {
 };
 ```
 
-### Step 2: 建立 MicroPython 生成器
+### Step 2: 新增上傳按鈕（2025-12-30 新增）
+
+編輯 `media/html/blocklyEdit.html`，在控制區新增上傳按鈕：
+
+```html
+<!-- 上傳按鈕（僅 CyberBrick 時可見） -->
+<button id="uploadButton" title="上傳到 CyberBrick" style="display: none;">
+	<svg viewBox="0 0 24 24" width="16" height="16">
+		<path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z" fill="currentColor" />
+	</svg>
+</button>
+```
+
+編輯 `media/js/blocklyEdit.js`，新增按鈕控制邏輯：
+
+```javascript
+// 上傳按鈕顯示/隱藏
+function updateUploadButtonVisibility(board) {
+	const uploadButton = document.getElementById('uploadButton');
+	const boardConfig = window.BOARD_CONFIGS[board];
+
+	if (boardConfig?.language === 'micropython') {
+		uploadButton.style.display = 'block';
+		console.log('[blockly] 上傳按鈕已顯示');
+	} else {
+		uploadButton.style.display = 'none';
+		console.log('[blockly] 上傳按鈕已隱藏');
+	}
+}
+
+// 上傳中狀態（同重新整理按鈕的旋轉動畫）
+function setUploadingState(isUploading) {
+	const uploadButton = document.getElementById('uploadButton');
+	if (isUploading) {
+		uploadButton.disabled = true;
+		uploadButton.classList.add('spinning');
+	} else {
+		uploadButton.disabled = false;
+		uploadButton.classList.remove('spinning');
+	}
+}
+```
+
+### Step 3: platformio.ini 清理（2025-12-30 新增）
+
+編輯 `media/js/blocklyEdit.js`，在主板切換時請求刪除：
+
+```javascript
+async function handleBoardChange(newBoard) {
+	const boardConfig = window.BOARD_CONFIGS[newBoard];
+
+	// 如果切換到 MicroPython 主板，刪除 platformio.ini
+	if (boardConfig?.language === 'micropython') {
+		vscode.postMessage({ command: 'deletePlatformioIni' });
+		console.log('[blockly] 已請求刪除 platformio.ini');
+	}
+
+	// 繼續現有邏輯...
+}
+```
+
+編輯 `src/webview/messageHandler.ts`：
+
+```typescript
+case 'deletePlatformioIni':
+  await this.handleDeletePlatformioIni();
+  break;
+
+private async handleDeletePlatformioIni(): Promise<void> {
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  if (!workspaceFolder) return;
+
+  const platformioPath = vscode.Uri.joinPath(workspaceFolder.uri, 'platformio.ini');
+
+  try {
+    await vscode.workspace.fs.stat(platformioPath);
+    await vscode.workspace.fs.delete(platformioPath);
+    log.info('[blockly] 已刪除 platformio.ini');
+  } catch {
+    log.debug('[blockly] platformio.ini 不存在，跳過刪除');
+  }
+}
+```
+
+### Step 4: 建立 MicroPython 生成器
 
 建立 `media/blockly/generators/micropython/index.js`：
 
@@ -158,7 +268,7 @@ ${blockCode}
 };
 ```
 
-### Step 3: 實作上傳服務
+### Step 5: 實作上傳服務
 
 建立 `src/services/micropythonUploader.ts`：
 
@@ -184,7 +294,6 @@ export class MicropythonUploader {
 	private pythonPath: string;
 
 	constructor() {
-		// PlatformIO Python 路徑
 		this.pythonPath = process.platform === 'win32' ? `${process.env.USERPROFILE}\\.platformio\\penv\\Scripts\\python.exe` : `${process.env.HOME}/.platformio/penv/bin/python`;
 	}
 
@@ -192,18 +301,17 @@ export class MicropythonUploader {
 		const { code, port, devicePath } = options;
 
 		try {
-			// 1. 寫入暫存檔
-			const tempFile = await this.writeTempFile(code);
+			log.info(`[blockly] 上傳開始：${port}`);
 
-			// 2. 執行 mpremote 上傳
+			const tempFile = await this.writeTempFile(code);
 			const cmd = `"${this.pythonPath}" -m mpremote connect ${port} reset + soft-reset + fs cp "${tempFile}" :${devicePath} + reset`;
 
-			log(`執行上傳命令: ${cmd}`, 'info');
 			await execAsync(cmd);
 
+			log.info('[blockly] 上傳完成');
 			return { success: true };
 		} catch (error) {
-			log(`上傳失敗: ${error}`, 'error');
+			log.error(`[blockly] 上傳失敗：${error}`);
 			return { success: false, error: String(error) };
 		}
 	}
@@ -214,34 +322,32 @@ export class MicropythonUploader {
 }
 ```
 
-### Step 4: 擴展訊息處理
+### Step 6: Toast 通知（2025-12-30 新增）
 
-編輯 `src/webview/messageHandler.ts`：
+在 `media/js/blocklyEdit.js` 中新增 Toast 函數（或重用現有）：
 
-```typescript
-// 在 handleMessage switch 中新增
-case 'requestUpload':
-  await this.handleRequestUpload(message);
-  break;
+```javascript
+// 顯示 Toast 通知（同 Ctrl+S 備份通知樣式）
+function showToast(message, type = 'info') {
+	const toast = document.createElement('div');
+	toast.className = `toast toast-${type}`;
+	toast.textContent = message;
+	document.body.appendChild(toast);
 
-case 'boardSwitchConfirm':
-  await this.handleBoardSwitchConfirm(message);
-  break;
+	setTimeout(() => {
+		toast.classList.add('fade-out');
+		setTimeout(() => toast.remove(), 300);
+	}, 3000);
+}
 
-// 新增處理函數
-private async handleRequestUpload(message: any): Promise<void> {
-  const { code, board, port } = message;
-
-  // 驗證主板
-  const boardConfig = this.getBoardConfig(board);
-  if (boardConfig?.language !== 'micropython') {
-    this.sendProgress('failed', '不支援的主板類型');
-    return;
-  }
-
-  // 執行上傳
-  const uploader = new MicropythonUploader();
-  // ...
+// 上傳結果通知
+function handleUploadResult(result) {
+	if (result.success) {
+		showToast('上傳成功！', 'success');
+	} else {
+		showToast(`上傳失敗：${result.error || '未知錯誤'}`, 'error');
+	}
+	setUploadingState(false);
 }
 ```
 
@@ -272,17 +378,43 @@ describe('MicropythonUploader', () => {
 });
 ```
 
-### 手動測試
+### 手動測試（2025-12-30 更新）
 
-| 情境       | 步驟               | 預期結果                      |
-| ---------- | ------------------ | ----------------------------- |
-| 主板切換   | 選擇 CyberBrick    | 工具箱切換為 MicroPython 積木 |
-| 程式碼生成 | 拖拉 LED 積木      | 顯示正確 MicroPython 程式碼   |
-| 上傳程式   | 連接硬體後點擊上傳 | 程式成功執行                  |
+| 情境                | 步驟                      | 預期結果                                |
+| ------------------- | ------------------------- | --------------------------------------- |
+| 主板切換            | 選擇 CyberBrick           | 工具箱切換為 MicroPython 積木           |
+| platformio.ini 刪除 | 選擇 CyberBrick（有 ini） | platformio.ini 被刪除，日誌顯示刪除訊息 |
+| 上傳按鈕顯示        | 選擇 CyberBrick           | 上傳按鈕出現在控制區                    |
+| 上傳按鈕隱藏        | 切換回 Arduino            | 上傳按鈕消失                            |
+| 上傳中狀態          | 點擊上傳按鈕              | 按鈕禁用，圖示旋轉                      |
+| 上傳成功            | 完成上傳                  | Toast 顯示「上傳成功！」                |
+| 上傳失敗            | 上傳時拔除 USB            | Toast 顯示錯誤訊息                      |
+| 程式碼生成          | 拖拉 LED 積木             | 顯示正確 MicroPython 程式碼             |
+| 空工作區切換        | 空工作區時切換主板        | 跳過確認對話框，直接切換                |
 
 ---
 
 ## ⚠️ 注意事項
+
+### 日誌標籤規範（2025-12-30 新增）
+
+所有 CyberBrick 相關日誌必須使用 `[blockly]` 前綴：
+
+```javascript
+// ✅ 正確
+console.log('[blockly] 已切換至 CyberBrick 主板');
+log.info('[blockly] 上傳開始：COM3');
+
+// ❌ 錯誤
+console.log('切換至 CyberBrick');
+log.info('Upload started');
+```
+
+### 翻譯鍵命名（2025-12-30 新增）
+
+-   CyberBrick 專用分類：`CATEGORY_CYBERBRICK_*`
+-   CyberBrick 專用積木：`CYBERBRICK_*`
+-   MicroPython 通用積木：共用現有翻譯鍵
 
 ### 常見問題
 
@@ -302,7 +434,8 @@ describe('MicropythonUploader', () => {
 
 ### 程式碼風格
 
--   使用 `log.*` 方法記錄（不使用 `console.log`）
+-   使用 `log.*` 方法記錄（不使用 `console.log`）- Extension 端
+-   使用 `console.log('[blockly] ...')` - WebView 端
 -   TypeScript 服務使用依賴注入
 -   WebView 程式碼使用 `window.` 全域變數
 
@@ -320,4 +453,4 @@ describe('MicropythonUploader', () => {
 ## 🔗 相關 Specs
 
 -   `specs/016-esp32-wifi-mqtt/` - ESP32 WiFi/MQTT 功能（Arduino）
--   `specs/017-ctrl-s-quick-backup/` - 快速備份功能
+-   `specs/017-ctrl-s-quick-backup/` - 快速備份功能（重用）
