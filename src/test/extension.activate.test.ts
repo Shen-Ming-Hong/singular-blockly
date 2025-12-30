@@ -75,8 +75,8 @@ describe('Extension activate', () => {
 		fsMock.reset();
 	});
 
-	it('registers commands and creates status bar on activate', () => {
-		activate(context as any);
+	it('registers commands and creates status bar on activate', async () => {
+		await activate(context as any);
 
 		const registered = vscodeMock.commands.registerCommand.getCalls().map((c: any) => c.args[0]);
 		assert(registered.includes('singular-blockly.openBlocklyEdit'));
@@ -105,7 +105,7 @@ describe('Extension activate', () => {
 		fsMock.addFile('/mock/workspace/.vscode/settings.json', JSON.stringify({ 'singular-blockly.theme': 'light' }));
 		fsMock.addFile('/mock/workspace/platformio.ini', '[env:uno]\nplatform = atmelavr\n');
 
-		activate(context as any);
+		await activate(context as any);
 
 		// 取得註冊的 openBlocklyEdit 命令處理器
 		const openBlocklyEditCall = vscodeMock.commands.registerCommand
@@ -135,7 +135,7 @@ describe('Extension activate', () => {
 		fsMock.addDirectory('/mock/workspace/.vscode');
 		fsMock.addFile('/mock/workspace/.vscode/settings.json', JSON.stringify({ 'singular-blockly.theme': 'light' }));
 
-		activate(context as any);
+		await activate(context as any);
 
 		// 取得 toggleTheme 命令處理器
 		const toggleThemeCall = vscodeMock.commands.registerCommand
@@ -157,7 +157,7 @@ describe('Extension activate', () => {
 	it('should handle toggleTheme command when no workspace', async () => {
 		vscodeMock.workspace.workspaceFolders = undefined;
 
-		activate(context as any);
+		await activate(context as any);
 
 		// 取得 toggleTheme 命令處理器
 		const toggleThemeCall = vscodeMock.commands.registerCommand
@@ -176,10 +176,10 @@ describe('Extension activate', () => {
 		assert(true, 'Should complete without errors');
 	});
 
-	it('should execute showOutput command', () => {
+	it('should execute showOutput command', async () => {
 		const showOutputStub = sinon.stub(logging, 'showOutputChannel');
 
-		activate(context as any);
+		await activate(context as any);
 
 		// 取得 showOutput 命令處理器
 		const showOutputCall = vscodeMock.commands.registerCommand.getCalls().find((c: any) => c.args[0] === 'singular-blockly.showOutput');
@@ -198,7 +198,7 @@ describe('Extension activate', () => {
 	it('should handle previewBackup command with no workspace', async () => {
 		vscodeMock.workspace.workspaceFolders = undefined;
 
-		activate(context as any);
+		await activate(context as any);
 
 		// 取得 previewBackup 命令處理器
 		const previewBackupCall = vscodeMock.commands.registerCommand
@@ -225,7 +225,7 @@ describe('Extension activate', () => {
 		fsMock.addFile('/mock/extension/media/html/blocklyEdit.html', '<html></html>');
 		fsMock.addDirectory('/mock/extension/media/blockly/generators/arduino');
 
-		activate(context as any);
+		await activate(context as any);
 
 		// 取得 previewBackup 命令處理器
 		const previewBackupCall = vscodeMock.commands.registerCommand
@@ -249,7 +249,7 @@ describe('Extension activate', () => {
 	});
 
 	it('should handle activity bar view provider', async () => {
-		activate(context as any);
+		await activate(context as any);
 
 		// 取得 registerWebviewViewProvider 的呼叫
 		const registerCall = vscodeMock.window.registerWebviewViewProvider.getCall(0);
@@ -297,7 +297,7 @@ describe('Extension activate', () => {
 	});
 
 	it('should handle activity bar visibility change', async () => {
-		activate(context as any);
+		await activate(context as any);
 
 		const registerCall = vscodeMock.window.registerWebviewViewProvider.getCall(0);
 		const provider = registerCall.args[1];
@@ -327,7 +327,7 @@ describe('Extension activate', () => {
 	});
 
 	it('should not execute commands when activity bar becomes invisible', async () => {
-		activate(context as any);
+		await activate(context as any);
 
 		const registerCall = vscodeMock.window.registerWebviewViewProvider.getCall(0);
 		const provider = registerCall.args[1];
@@ -355,7 +355,7 @@ describe('Extension activate', () => {
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
 
 		// Simulate error by not providing required files
-		activate(context as any);
+		await activate(context as any);
 
 		const openBlocklyEditCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -385,7 +385,7 @@ describe('Extension activate', () => {
 		fsMock.addDirectory('/mock/extension/media/blockly/generators/arduino');
 		fsMock.addFile('/mock/extension/media/blockly/generators/arduino/index.js', '');
 
-		activate(context as any);
+		await activate(context as any);
 
 		// First create a webview panel by executing openBlocklyEdit
 		const openBlocklyEditCall = vscodeMock.commands.registerCommand
@@ -421,7 +421,7 @@ describe('Extension activate', () => {
 		// Corrupt settings file to cause error
 		fsMock.addFile('/mock/workspace/.vscode/settings.json', 'invalid json');
 
-		activate(context as any);
+		await activate(context as any);
 
 		const toggleThemeCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -442,7 +442,7 @@ describe('Extension activate', () => {
 		fsMock.addFile('/mock/extension/media/html/blocklyEdit.html', '<html></html>');
 		fsMock.addFile('/mock/extension/media/toolbox/index.json', JSON.stringify({ kind: 'categoryToolbox', contents: [] }));
 
-		activate(context as any);
+		await activate(context as any);
 
 		// Create a mock webview panel
 		const mockPanel = {
@@ -479,7 +479,7 @@ describe('Extension activate', () => {
 			},
 		];
 
-		activate(context as any);
+		await activate(context as any);
 
 		const toggleThemeCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -500,7 +500,7 @@ describe('Extension activate', () => {
 			stat: sinon.stub().rejects(new Error('ENOENT')),
 		};
 
-		activate(context as any);
+		await activate(context as any);
 
 		const previewBackupCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -523,7 +523,7 @@ describe('Extension activate', () => {
 			}),
 		};
 
-		activate(context as any);
+		await activate(context as any);
 
 		const previewBackupCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -540,7 +540,7 @@ describe('Extension activate', () => {
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
 
 		// Don't add required files - will cause error
-		activate(context as any);
+		await activate(context as any);
 
 		const openBlocklyEditCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -565,7 +565,7 @@ describe('Extension activate', () => {
 		// Mock showOpenDialog to return null (user cancelled)
 		vscodeMock.window.showOpenDialog = sinon.stub().resolves(null);
 
-		activate(context as any);
+		await activate(context as any);
 
 		const previewBackupCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -587,7 +587,7 @@ describe('Extension activate', () => {
 			stat: sinon.stub().rejects(new Error('Permission denied')),
 		};
 
-		activate(context as any);
+		await activate(context as any);
 
 		const previewBackupCall = vscodeMock.commands.registerCommand
 			.getCalls()
@@ -610,7 +610,7 @@ describe('Extension activate', () => {
 		// Don't add settings file to trigger read error
 		// fsMock already empty by default
 
-		activate(context as any);
+		await activate(context as any);
 
 		const toggleThemeCall = vscodeMock.commands.registerCommand
 			.getCalls()

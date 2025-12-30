@@ -42,6 +42,7 @@ A Visual Studio Code extension that provides a visual programming interface usin
 -   Arduino Uno, Nano, Mega
 -   ESP32 Dev Module
 -   Super Mini (Lolin C3 Mini)
+-   **🆕 CyberBrick** (ESP32-C3, MicroPython)
 
 ### 🌐 Internationalization
 
@@ -84,6 +85,7 @@ A Visual Studio Code extension that provides a visual programming interface usin
 -   Automatic state saving and project persistence
 -   Board configuration management
 -   Arduino code generation (.cpp files)
+-   **🆕 MicroPython code generation** (CyberBrick)
 -   Automatic PlatformIO configuration
 -   **Project Safety Guard** 🛡️
     -   Smart project type detection (Node.js, Python, Java, etc.)
@@ -188,6 +190,9 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 -   Required Extensions:
     -   PlatformIO IDE Extension
     -   C/C++ Extension (ms-vscode.cpptools)
+-   **For CyberBrick (MicroPython):**
+    -   Python 3.x installed
+    -   `mpremote` tool (`pip install mpremote`)
 
 ---
 
@@ -330,6 +335,40 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 
 > 💡 WiFi/MQTT blocks appear only when ESP32 boards are selected. Non-ESP32 boards show a warning.
 
+### 🐍 CyberBrick MicroPython Blocks (v0.49.0+)
+
+**ESP32-C3 MicroPython visual programming for CyberBrick board:**
+
+**Main & GPIO**
+
+-   Main program structure (setup/loop equivalent)
+-   Digital GPIO read/write
+-   GPIO mode configuration (INPUT/OUTPUT/PULLUP/PULLDOWN)
+
+**LED Control**
+
+-   RGB LED with customizable colors
+-   Brightness control
+
+**Time Functions**
+
+-   Delay in milliseconds
+-   Delay in seconds
+
+**WiFi Connectivity**
+
+-   Connect/Disconnect
+-   Connection status
+-   IP address retrieval
+
+**Built-in MicroPython Generators**
+
+-   Complete logic, loops, math, text, list, variable, and function block support
+-   Clean Python code generation with proper indentation
+-   One-click upload via `mpremote` tool
+
+> 💡 When switching to CyberBrick, `platformio.ini` is auto-removed to avoid conflicts. Workspace is auto-backed up before board switch.
+
 ### 🧮 Programming Constructs
 
 **Functions**
@@ -373,8 +412,9 @@ Each board is configured with optimized PlatformIO settings:
 | **Arduino Mega**               | atmelavr    | megaatmega2560 | AVR          |
 | **ESP32 Dev Module**           | espressif32 | esp32dev       | ESP32        |
 | **Super Mini (Lolin C3 Mini)** | espressif32 | lolin_c3_mini  | ESP32-C3     |
+| **🆕 CyberBrick**              | MicroPython | esp32c3        | ESP32-C3     |
 
-> 💡 The extension auto-generates `platformio.ini` with correct settings for hardware upload.
+> 💡 The extension auto-generates `platformio.ini` with correct settings for hardware upload (Arduino boards), or uses `mpremote` for MicroPython upload (CyberBrick).
 
 ---
 
