@@ -2,6 +2,7 @@
 
 **Feature Branch**: `021-cyberbrick-micropython`  
 **Created**: 2025-12-29  
+**Updated**: 2025-12-30  
 **Status**: Draft  
 **Input**: User description: "為 SingularBlockly 新增 CyberBrick (ESP32-C3) 主板支援，使用 MicroPython 語言與 mpremote 工具實現一鍵上傳，避免手動 Ctrl-C 中斷操作"
 
@@ -57,17 +58,19 @@
 
 ### User Story 4 - 主板切換時的工作區保護 (Priority: P2)
 
-當使用者從其他主板切換到 CyberBrick（或從 CyberBrick 切換到其他主板）時，系統提示工作區將被清空，並在使用者確認後自動備份當前工作區。
+當使用者從其他主板切換到 CyberBrick（或從 CyberBrick 切換到其他主板）時，系統使用現有的 Ctrl+S 備份機制自動儲存當前工作區，然後清空工作區並更新工具箱（參考 Arduino Uno 與 ESP32 切換時隱藏部分工具箱選單的方法），隱藏生成 C++ 的積木，保留生成 Python 的積木。
 
 **Why this priority**: 防止使用者意外丟失積木程式，但可以在核心功能完成後再實作。
 
-**Independent Test**: 切換主板時確認出現警告對話框，確認後備份被建立且工作區被清空。
+**Independent Test**: 切換主板時確認工作區被自動備份（使用 backup_YYYYMMDD_HHMMSS 格式），工作區清空後工具箱正確切換。
 
 **Acceptance Scenarios**:
 
-1. **Given** 使用者有未儲存的積木程式，**When** 切換到不同語言的主板，**Then** 顯示警告對話框說明工作區將被清空
-2. **Given** 使用者在警告對話框中，**When** 點擊「繼續」，**Then** 當前工作區被備份到 `blockly/backups/` 並記錄原主板資訊，然後清空工作區
-3. **Given** 使用者在警告對話框中，**When** 點擊「取消」，**Then** 維持原主板選擇，工作區不變
+1. **Given** 使用者有未儲存的積木程式，**When** 切換到不同語言的主板，**Then** 系統使用現有 Ctrl+S 備份機制自動儲存 main.json（格式：backup_YYYYMMDD_HHMMSS），然後顯示切換確認對話框
+2. **Given** 使用者在確認對話框中，**When** 點擊「繼續」，**Then** 當前工作區被清空，工具箱更新為目標主板的積木選單（CyberBrick 顯示 Python 積木，Arduino 顯示 C++ 積木）
+3. **Given** 使用者在確認對話框中，**When** 點擊「取消」，**Then** 維持原主板選擇，工作區不變
+4. **Given** 使用者從 Arduino 切換到 CyberBrick，**When** 切換完成後，**Then** 工具箱隱藏所有 Arduino/C++ 專用積木，只顯示 MicroPython 積木
+5. **Given** 使用者從 CyberBrick 切換到 Arduino，**When** 切換完成後，**Then** 工具箱隱藏所有 MicroPython 專用積木，只顯示 Arduino/C++ 積木
 
 ---
 
@@ -87,6 +90,22 @@
 
 ---
 
+### User Story 6 - CyberBrick 主板選擇時自動清理 PlatformIO 設定 (Priority: P1)
+
+當使用者選擇 CyberBrick 開發板時，系統自動檢查並刪除工作區中的 `platformio.ini` 檔案，避免與 MicroPython 上傳流程衝突。
+
+**Why this priority**: PlatformIO 設定檔可能導致使用者混淆或上傳流程異常，必須在主板選擇時立即處理。
+
+**Independent Test**: 選擇 CyberBrick 主板後，確認 `platformio.ini` 檔案被刪除（若存在）。
+
+**Acceptance Scenarios**:
+
+1. **Given** 工作區中存在 `platformio.ini` 檔案，**When** 使用者選擇 CyberBrick 主板，**Then** 系統自動刪除 `platformio.ini` 並記錄日誌 `[blockly] 已刪除 platformio.ini`
+2. **Given** 工作區中不存在 `platformio.ini` 檔案，**When** 使用者選擇 CyberBrick 主板，**Then** 系統不進行任何檔案操作，繼續正常流程
+3. **Given** 使用者從 CyberBrick 切換回 Arduino 主板，**When** 使用者首次生成程式碼，**Then** 系統重新建立 `platformio.ini`（現有行為不變）
+
+---
+
 ### Edge Cases
 
 -   **無法連接 CyberBrick**：顯示連線失敗訊息，提示檢查 USB 連線和 COM Port
@@ -94,6 +113,7 @@
 -   **備份空間不足**：警告使用者清理舊備份
 -   **WiFi 連線失敗**：程式中加入錯誤處理，避免無限等待
 -   **切換主板時備份失敗**：顯示錯誤但仍允許使用者選擇是否繼續切換
+-   **platformio.ini 刪除失敗**：記錄錯誤日誌但不阻擋切換流程
 
 ## Requirements _(mandatory)_
 
@@ -104,6 +124,7 @@
 -   **FR-001**: 系統 MUST 在主板選單中提供 "CyberBrick" 選項
 -   **FR-002**: 選擇 CyberBrick 主板時，系統 MUST 自動設定語言為 MicroPython
 -   **FR-003**: 選擇 CyberBrick 主板時，系統 MUST 隱藏所有 Arduino/C++ 積木並顯示 MicroPython 積木
+-   **FR-003a**: 選擇 CyberBrick 主板時，系統 MUST 自動檢查並刪除工作區中的 `platformio.ini` 檔案（若存在）
 
 #### MicroPython 程式碼生成
 
@@ -133,20 +154,45 @@
 
 -   **FR-019**: 首次上傳前，系統 MUST 嘗試讀取並備份現有的 `/app/rc_main.py`
 -   **FR-020**: 備份 MUST 儲存到工作區 `blockly/backups/` 目錄
--   **FR-021**: 備份檔案名稱 MUST 包含時間戳記和主板資訊
+-   **FR-021**: 備份檔案名稱 MUST 包含時間戳記和主板資訊（使用現有 `backup_YYYYMMDD_HHMMSS` 命名格式）
 -   **FR-022**: 系統 MUST 提供從備份還原的功能
 
 #### 主板切換保護
 
--   **FR-023**: 切換到不同程式語言的主板時，系統 MUST 顯示警告對話框
--   **FR-024**: 使用者確認後，系統 MUST 備份當前工作區再清空
--   **FR-025**: 備份 MUST 記錄原本的主板類型以便識別
+-   **FR-023**: 切換到不同程式語言的主板時，系統 MUST 使用現有 Ctrl+S 備份機制自動儲存 main.json
+-   **FR-023a**: 若工作區為空（無任何積木），系統 MUST 跳過確認對話框直接切換
+-   **FR-024**: 使用者確認後，系統 MUST 清空工作區並更新工具箱（參考 `updateToolboxForBoard` 函數的實作模式）
+-   **FR-025**: 工具箱切換 MUST 根據目標主板語言類型（arduino/micropython）隱藏不相容的積木分類
+
+#### 工具箱與 i18n
+
+-   **FR-026**: CyberBrick 專用工具箱分類 MUST 使用統一的翻譯鍵格式：`CATEGORY_CYBERBRICK_*`（例如：`CATEGORY_CYBERBRICK_LED`、`CATEGORY_CYBERBRICK_GPIO`）
+-   **FR-026a**: MicroPython 通用積木分類（邏輯、迴圈、變數、數學、文字）MUST 共用 Arduino 的分類翻譯鍵
+-   **FR-027**: 所有 CyberBrick 專用積木 MUST 使用 `CYBERBRICK_*` 前綴的翻譯鍵（例如：`CYBERBRICK_LED_SET_COLOR`）
+
+#### 日誌記錄
+
+-   **FR-028**: 所有 CyberBrick 相關的日誌訊息 MUST 使用 `[blockly]` 標籤前綴，方便除錯追蹤
+-   **FR-029**: 日誌 MUST 記錄關鍵操作：主板切換、工具箱更新、platformio.ini 刪除、上傳開始/完成/失敗
+
+#### UI/UX 設計
+
+-   **FR-030**: 上傳按鈕 MUST 與積木編輯器右上方現有按鈕（主題切換、備份、重新整理）保持一致的視覺樣式
+-   **FR-031**: 上傳按鈕 MUST 位於控制區域，與其他功能按鈕排列整齊
+-   **FR-032**: 上傳按鈕 MUST 只在選擇 CyberBrick 主板時顯示，其他主板時隱藏
+-   **FR-032a**: 上傳進行中時，上傳按鈕 MUST 禁用並顯示圖示旋轉動畫（同重新整理按鈕）
+-   **FR-032b**: 上傳成功/失敗時 MUST 使用 Toast 通知顯示結果（同 Ctrl+S 備份通知樣式）
+
+#### 實作流程（開發優先級）
+
+-   **FR-033**: 實作順序 MUST 遵循：(1) UI/UX 互動正確性驗證（工具箱切換、上傳按鈕顯示/隱藏）→ (2) 程式碼生成功能 → (3) 上傳按鈕內部功能
 
 ### Key Entities
 
--   **Board Configuration**: 主板設定，包含名稱、語言類型(arduino/micropython)、上傳方式、GPIO 對應表
--   **Workspace Backup**: 工作區備份，包含 JSON 格式的積木狀態、時間戳記、來源主板類型
+-   **Board Configuration**: 主板設定，包含名稱、語言類型(arduino/micropython)、上傳方式、GPIO 對應表、工具箱路徑
+-   **Workspace Backup**: 工作區備份，包含 JSON 格式的積木狀態、時間戳記（`backup_YYYYMMDD_HHMMSS` 格式）、來源主板類型
 -   **Device Backup**: 裝置備份，包含從 CyberBrick 讀取的原始程式檔案、時間戳記
+-   **Upload Button**: 上傳按鈕元件，樣式與現有控制區按鈕一致，僅在 CyberBrick 主板時可見
 
 ## Success Criteria _(mandatory)_
 
@@ -156,8 +202,11 @@
 -   **SC-002**: 上傳程式到 CyberBrick 的整體時間（含中斷+傳輸+重啟）不超過 10 秒
 -   **SC-003**: 100% 的核心積木（LED、GPIO、WiFi、時序）在拖拉後能正確生成可執行的 MicroPython 程式碼
 -   **SC-004**: 首次上傳時 100% 成功建立裝置程式備份（若裝置有原程式）
--   **SC-005**: 主板切換時 100% 顯示警告對話框並在確認後建立工作區備份
+-   **SC-005**: 主板切換時 100% 自動觸發備份（使用現有 Ctrl+S 機制），並在確認後正確切換工具箱
 -   **SC-006**: 生成的 MicroPython 程式碼可直接在 CyberBrick REPL 中貼上執行，無需修改
+-   **SC-007**: 所有 CyberBrick 相關日誌訊息 100% 包含 `[blockly]` 標籤
+-   **SC-008**: 上傳按鈕與現有控制區按鈕（主題切換、備份、重新整理）視覺外觀一致（相同 CSS 類別、尺寸、hover 效果）
+-   **SC-009**: 選擇 CyberBrick 主板時，100% 檢測並刪除 `platformio.ini`（若存在）
 
 ### Non-Functional Requirements
 
@@ -171,8 +220,13 @@
 -   PlatformIO 已安裝且其 Python 環境可被存取（`~/.platformio/penv/`）
 -   mpremote 套件若未安裝，系統將自動嘗試安裝
 -   CyberBrick 使用標準 USB CDC 驅動程式，可被系統識別為 COM Port
+-   CyberBrick 使用 ESP32-C3 預設 VID/PID (VID: 0x303A, PID: 0x1001)
 -   CyberBrick 的 `/app/rc_main.py` 是開機自動執行的程式入口點
 -   藍牙功能已被官方禁用，不提供相關積木
+-   現有的 `quickSaveManager.performQuickSave()` 方法可被主板切換流程重用
+-   現有的 `updateToolboxForBoard()` 函數可被擴展以支援 MicroPython 工具箱切換
+-   現有的按鈕 CSS 樣式（`.controls-container button`）可直接套用到上傳按鈕
+-   現有的 Toast 通知元件可被上傳功能重用
 
 ## Clarifications
 
@@ -183,6 +237,21 @@
 -   Q: 上傳失敗時的重試策略？ → A: 自動重試一次（含重新 reset 序列），若仍失敗則顯示錯誤並提供手動重試選項
 -   Q: 備份檔案的保留策略？ → A: 不自動清理，讓使用者手動管理備份（僅在空間不足時提醒）
 -   Q: MicroPython 積木的視覺區分？ → A: 無需特別區分，選擇 CyberBrick 後工具箱完全切換為 MicroPython 積木，不會與 Arduino 積木共存
+
+### Session 2025-12-30 (更新)
+
+-   Q: CyberBrick 的 USB VID/PID 值為何？ → A: 使用 ESP32-C3 預設 VID/PID (VID: 0x303A, PID: 0x1001)
+-   Q: 主板切換時，若工作區為空是否顯示確認對話框？ → A: 跳過對話框，直接切換（流暢度優先，與 Ctrl+S 空工作區跳過備份一致）
+-   Q: 上傳按鈕在上傳進行中時應如何顯示狀態？ → A: 按鈕禁用 + 圖示旋轉動畫（同重新整理按鈕），維持 UI 一致性
+-   Q: MicroPython 通用積木是否共用 Arduino 的分類結構？ → A: 共用相同分類結構（邏輯、迴圈、變數等使用相同翻譯鍵），僅 CyberBrick 專用積木使用 `CATEGORY_CYBERBRICK_*` 前綴
+-   Q: 上傳成功/失敗時的通知方式為何？ → A: Toast 通知（同 Ctrl+S 備份成功/失敗通知），維持 UI 風格統一
+-   Q: 主板切換時如何備份？ → A: 使用現有 Ctrl+S 快速備份機制（`quickSaveManager.performQuickSave()`），命名格式為 `backup_YYYYMMDD_HHMMSS`
+-   Q: 工具箱切換的參考實作？ → A: 參考 `updateToolboxForBoard()` 函數（在 `blocklyEdit.js` 約 2275 行），此函數已實作 Arduino Uno 與 ESP32 切換時隱藏部分工具箱選單的邏輯
+-   Q: 日誌標籤格式？ → A: 所有相關日誌使用 `[blockly]` 前綴，例如：`console.log('[blockly] 已切換至 CyberBrick 主板')`
+-   Q: CyberBrick 工具箱翻譯鍵格式？ → A: 統一使用 `CATEGORY_CYBERBRICK_*` 和 `CYBERBRICK_*` 前綴，確保與現有翻譯鍵命名規範一致
+-   Q: 上傳按鈕樣式如何保持一致？ → A: 使用與現有控制區按鈕相同的 CSS 類別和結構，參考主題切換、備份、重新整理按鈕的實作
+-   Q: 選擇 CyberBrick 時為何要刪除 platformio.ini？ → A: 避免使用者混淆，CyberBrick 使用 MicroPython 和 mpremote 上傳，與 PlatformIO 流程完全獨立
+-   Q: 實作順序優先級？ → A: 先確保 UI/UX 互動正確（工具箱切換、上傳按鈕顯示/隱藏），再實作程式碼生成，最後實作上傳功能內部邏輯
 
 ## Out of Scope (Phase 2+)
 
