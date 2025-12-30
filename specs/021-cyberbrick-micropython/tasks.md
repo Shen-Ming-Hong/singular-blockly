@@ -45,6 +45,26 @@
 
 **Checkpoint**: 基礎架構就緒 - User Story 實作可以開始
 
+### Phase 2 Debug 驗證（F5 啟動擴充功能）
+
+執行以下步驟驗證 Phase 2 完成度：
+
+1. **啟動 Debug**：按 F5 啟動擴充功能，開啟 Blockly 編輯器
+2. **開啟 DevTools**：在 WebView 面板右鍵 → "Open Developer Tools"
+3. **檢查 Console**：確認無紅色錯誤訊息
+4. **驗證生成器載入**：
+    - 在 Console 輸入 `window.micropythonGenerator` → 應回傳物件
+    - 輸入 `window.BOARD_CONFIGS.cyberbrick` → 應回傳 CyberBrick 配置
+5. **驗證 Extension 日誌**：
+    - 開啟 Output 面板 → 選擇 "Singular Blockly" 頻道
+    - 確認無錯誤，應看到 MicroPython 生成器載入訊息
+
+若有錯誤，檢查：
+
+-   `webviewManager.ts` 是否正確載入 `micropython/*.js`
+-   `board_configs.js` 是否有語法錯誤
+-   各生成器檔案是否有 `window.micropythonGenerator` 存取錯誤
+
 ---
 
 ## Phase 3: User Story 1 - 選擇 CyberBrick 主板並使用積木編程 (Priority: P1) 🎯 MVP
