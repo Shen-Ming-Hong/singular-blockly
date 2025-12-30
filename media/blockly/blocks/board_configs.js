@@ -497,6 +497,83 @@ platform = espressif32
 board = lolin_c3_mini
 framework = arduino`,
 	},
+
+	// === CyberBrick 主板配置 (ESP32-C3, MicroPython) ===
+	cyberbrick: {
+		name: 'CyberBrick',
+		// MicroPython 擴展欄位
+		language: 'micropython',
+		toolbox: 'cyberbrick.json',
+		uploadMethod: 'mpremote',
+		devicePath: '/app/rc_main.py',
+		usbIdentifier: {
+			vid: '303A',
+			pid: '1001',
+		},
+
+		// GPIO 腳位定義
+		// 來源：Bambu Lab Wiki - CyberBrick 核心板 (XA003) 官方規格
+		digitalPins: [
+			['GPIO 0', '0'],
+			['GPIO 1', '1'],
+			['GPIO 2', '2'],
+			['GPIO 3', '3'],
+			['GPIO 4', '4'],
+			['GPIO 5', '5'],
+			['GPIO 6', '6'],
+			['GPIO 7', '7'],
+			['GPIO 8 (板載 LED)', '8'],
+			['GPIO 9', '9'],
+			['GPIO 10', '10'],
+		],
+
+		analogPins: [
+			['GPIO 0 (ADC)', '0'],
+			['GPIO 1 (ADC)', '1'],
+			['GPIO 2 (ADC)', '2'],
+			['GPIO 3 (ADC)', '3'],
+			['GPIO 4 (ADC)', '4'],
+		],
+
+		interruptPins: [
+			['GPIO 0', '0'],
+			['GPIO 1', '1'],
+			['GPIO 3', '3'],
+			['GPIO 4', '4'],
+			['GPIO 5', '5'],
+			['GPIO 6', '6'],
+			['GPIO 7', '7'],
+			['GPIO 9', '9'],
+			['GPIO 10', '10'],
+		],
+
+		analogOutputRange: {
+			min: 0,
+			max: 65535, // MicroPython PWM 16-bit duty_u16
+			defaultValue: 0,
+		},
+
+		pullupPins: {
+			0: true,
+			1: true,
+			2: true,
+			3: true,
+			4: true,
+			5: true,
+			6: true,
+			7: true,
+			9: true,
+			10: true,
+		},
+
+		// CyberBrick 核心板專屬硬體配置
+		hardware: {
+			onboardLed: { pin: 8, count: 1, type: 'WS2812' },
+		},
+
+		// ESP32-C3 硬體同時最多支援 6 個 PWM 輸出
+		maxPwmOutputs: 6,
+	},
 };
 
 // 預設值，設為全局變數

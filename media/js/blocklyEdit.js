@@ -160,6 +160,41 @@ const toast = {
 };
 
 /**
+ * 當前程式語言（用於決定使用哪個生成器）
+ * @type {'arduino' | 'micropython'}
+ */
+window.currentProgrammingLanguage = 'arduino';
+
+/**
+ * 根據當前程式語言生成程式碼
+ * @param {Blockly.Workspace} workspace - Blockly 工作區
+ * @returns {string} 生成的程式碼
+ */
+function generateCode(workspace) {
+	const lang = window.currentProgrammingLanguage;
+	if (lang === 'micropython' && window.micropythonGenerator) {
+		console.log('[blockly] 使用 MicroPython 生成器生成程式碼');
+		return window.micropythonGenerator.workspaceToCode(workspace);
+	}
+	console.log('[blockly] 使用 Arduino 生成器生成程式碼');
+	return window.arduinoGenerator.workspaceToCode(workspace);
+}
+
+/**
+ * 獲取當前使用的生成器
+ * @returns {Blockly.Generator} 當前的程式碼生成器
+ */
+function getCurrentGenerator() {
+	const lang = window.currentProgrammingLanguage;
+	if (lang === 'micropython' && window.micropythonGenerator) {
+		console.log('[blockly] 取得 MicroPython 生成器');
+		return window.micropythonGenerator;
+	}
+	console.log('[blockly] 取得 Arduino 生成器');
+	return window.arduinoGenerator;
+}
+
+/**
  * 快速備份功能（Ctrl+S / Cmd+S）
  * 提供即時備份工作區的快捷鍵功能
  */
@@ -409,6 +444,24 @@ Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCat
 const pendingConfirmCallbacks = new Map();
 let confirmCounter = 0;
 
+/**
+ * 非同步確認對話框（使用 VSCode 原生 API）
+ * @param {string} message - 確認訊息
+ * @returns {Promise<boolean>} - 用戶是否確認
+ */
+async function showAsyncConfirm(message) {
+	const confirmId = confirmCounter++;
+
+	return new Promise(resolve => {
+		pendingConfirmCallbacks.set(confirmId, resolve);
+		vscode.postMessage({
+			command: 'confirmDialog',
+			message: message,
+			confirmId: confirmId,
+		});
+	});
+}
+
 // 覆蓋 window.confirm 方法，改用 VSCode API 顯示通知
 window.confirm = function (message) {
 	// 每次呼叫都產生唯一的 ID
@@ -420,10 +473,12 @@ window.confirm = function (message) {
 		pendingConfirmCallbacks.set(confirmId, resolve);
 
 		// 將確認請求發送給 VSCode 擴展，包含唯一 ID
+		// 標記為 blockly 刪除用途，需要在確認後清除工作區
 		vscode.postMessage({
 			command: 'confirmDialog',
 			message: message,
 			confirmId: confirmId,
+			purpose: 'blocklyDelete', // 標記用途
 		});
 	});
 
@@ -1085,19 +1140,21 @@ function handleRefreshCode() {
 			return;
 		}
 
-		// 生成程式碼
-		const code = arduinoGenerator.workspaceToCode(workspace);
+		// 根據當前程式語言生成程式碼
+		const code = generateCode(workspace);
+		const generator = getCurrentGenerator();
 
 		// 發送更新訊息到擴充功能
 		vscode.postMessage({
 			command: 'updateCode',
 			code: code,
-			lib_deps: arduinoGenerator.lib_deps_ || [],
-			build_flags: arduinoGenerator.build_flags_ || [],
-			lib_ldf_mode: arduinoGenerator.lib_ldf_mode_ || null,
+			language: window.currentProgrammingLanguage,
+			lib_deps: generator.lib_deps_ || [],
+			build_flags: generator.build_flags_ || [],
+			lib_ldf_mode: generator.lib_ldf_mode_ || null,
 		});
 
-		log.info('程式碼重新整理完成');
+		log.info(`程式碼重新整理完成 (語言: ${window.currentProgrammingLanguage})`);
 
 		// 2秒後停止旋轉動畫
 		setTimeout(() => {
@@ -1451,13 +1508,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 		codeUpdateDebounceTimer = setTimeout(() => {
 			try {
-				const code = arduinoGenerator.workspaceToCode(workspace);
+				const code = generateCode(workspace);
+				const generator = getCurrentGenerator();
 				vscode.postMessage({
 					command: 'updateCode',
 					code: code,
-					lib_deps: arduinoGenerator.lib_deps_ || [],
-					build_flags: arduinoGenerator.build_flags_ || [],
-					lib_ldf_mode: arduinoGenerator.lib_ldf_mode_ || null,
+					language: window.currentProgrammingLanguage,
+					lib_deps: generator.lib_deps_ || [],
+					build_flags: generator.build_flags_ || [],
+					lib_ldf_mode: generator.lib_ldf_mode_ || null,
 				});
 				saveWorkspaceState();
 				pendingCodeUpdate = false;
@@ -1601,12 +1660,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 				if (isEsp32PwmBlock) {
 					console.log('[PWM Config] PWM 設定積木變動，觸發程式碼更新');
 					try {
-						const code = arduinoGenerator.workspaceToCode(workspace);
+						const code = generateCode(workspace);
+						const generator = getCurrentGenerator();
 						vscode.postMessage({
 							command: 'updateCode',
 							code: code,
-							libDeps: arduinoGenerator.lib_deps_ || [],
-							buildFlags: arduinoGenerator.build_flags_ || [],
+							language: window.currentProgrammingLanguage,
+							libDeps: generator.lib_deps_ || [],
+							buildFlags: generator.build_flags_ || [],
 						});
 					} catch (error) {
 						console.error('[PWM Config] 程式碼生成失敗:', error);
@@ -1813,6 +1874,78 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const boardSelect = document.getElementById('boardSelect');
 	boardSelect.addEventListener('change', async event => {
 		const selectedBoard = event.target.value;
+		const previousBoard = window.currentBoard || 'none';
+
+		// 取得舊板子和新板子的語言類型
+		const previousConfig = window.BOARD_CONFIGS[previousBoard];
+		const newConfig = window.BOARD_CONFIGS[selectedBoard];
+		const previousLanguage = previousConfig?.language || 'arduino';
+		const newLanguage = newConfig?.language || 'arduino';
+
+		// 檢測語言類型是否變更（arduino ↔ micropython）
+		const isLanguageChanging = previousLanguage !== newLanguage;
+
+		// 檢查工作區是否為空
+		const workspaceState = Blockly.serialization.workspaces.save(workspace);
+		const hasBlocks = workspaceState?.blocks?.blocks && workspaceState.blocks.blocks.length > 0;
+
+		// 標記是否需要強制儲存（當工作區被清空後）
+		let forceEmptySave = false;
+
+		// 如果語言變更且工作區非空，顯示確認對話框
+		if (isLanguageChanging && hasBlocks) {
+			log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區非空，顯示確認對話框`);
+
+			// 構建確認訊息
+			const warningTitle = window.languageManager
+				? window.languageManager.getMessage('BOARD_SWITCH_WARNING_TITLE', '切換開發板類型')
+				: '切換開發板類型';
+			const warningMessage = window.languageManager
+				? window.languageManager.getMessage(
+						'BOARD_SWITCH_WARNING_MESSAGE',
+						'切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？'
+				  )
+				: '切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？';
+
+			// 使用非同步確認對話框（VSCode 原生 API）
+			const confirmed = await showAsyncConfirm(`${warningTitle}\n\n${warningMessage}`);
+
+			if (!confirmed) {
+				// 用戶取消，恢復原來的板子選擇
+				log.info('[blockly] 用戶取消切換，恢復原板子選擇');
+				boardSelect.value = previousBoard;
+				return;
+			}
+
+			// 用戶確認，執行自動備份
+			log.info('[blockly] 用戶確認切換，執行自動備份');
+			const backupName = quickBackup.generateBackupName();
+			vscode.postMessage({
+				command: 'createBackup',
+				name: backupName,
+				state: workspaceState,
+				board: previousBoard,
+				theme: currentTheme,
+				isQuickBackup: true,
+			});
+
+			// 顯示備份成功 Toast
+			const backupSuccessTemplate = window.languageManager
+				? window.languageManager.getMessage('BACKUP_QUICK_SAVE_SUCCESS', '備份已儲存：{0}')
+				: '備份已儲存：{0}';
+			const backupSuccessMessage = backupSuccessTemplate.replace('{0}', backupName);
+			toast.show(backupSuccessMessage, 'success');
+
+			// 清空工作區
+			log.info('[blockly] 清空工作區');
+			workspace.clear();
+
+			// 標記需要強制儲存空工作區
+			forceEmptySave = true;
+		} else if (isLanguageChanging && !hasBlocks) {
+			log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區為空，跳過確認對話框`);
+		}
+
 		// 更新全局的currentBoard
 		window.setCurrentBoard(selectedBoard);
 		// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
@@ -1823,6 +1956,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 				block.render();
 			}
 		});
+
+		// CyberBrick 專用邏輯
+		const boardConfig = window.BOARD_CONFIGS[selectedBoard];
+		if (boardConfig?.language === 'micropython') {
+			// 切換到 MicroPython 主板時，刪除 platformio.ini 避免與 PlatformIO 衝突
+			log.info('[blockly] 切換到 MicroPython 主板，發送刪除 platformio.ini 請求');
+			vscode.postMessage({ command: 'deletePlatformioIni' });
+		}
+
 		vscode.postMessage({
 			command: 'updateBoard',
 			board: selectedBoard,
@@ -1830,7 +1972,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 			build_flags: window.arduinoGenerator.build_flags_ || [],
 			lib_ldf_mode: window.arduinoGenerator.lib_ldf_mode_ || null,
 		});
-		saveWorkspaceState();
+
+		// 如果需要強制儲存（工作區被清空後），直接發送空狀態
+		if (forceEmptySave) {
+			log.info('[blockly] 強制儲存空工作區狀態與新板子設定');
+			const emptyState = Blockly.serialization.workspaces.save(workspace);
+			vscode.postMessage({
+				command: 'saveWorkspace',
+				state: emptyState,
+				board: selectedBoard,
+				theme: currentTheme,
+			});
+		} else {
+			saveWorkspaceState();
+		}
 	});
 
 	// 監聽來自擴充功能的訊息
@@ -1862,10 +2017,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 						if (!existingVar) {
 							workspace.getVariableMap().createVariable(message.name);
 							// 觸發更新
-							const code = arduinoGenerator.workspaceToCode(workspace);
+							const code = generateCode(workspace);
 							vscode.postMessage({
 								command: 'updateCode',
 								code: code,
+								language: window.currentProgrammingLanguage,
 							});
 							saveWorkspaceState();
 						}
@@ -1889,10 +2045,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 						// 從工作區中移除變數定義
 						workspace.deleteVariableById(varId);
 						// 手動觸發更新
-						const code = arduinoGenerator.workspaceToCode(workspace);
+						const code = generateCode(workspace);
 						vscode.postMessage({
 							command: 'updateCode',
 							code: code,
+							language: window.currentProgrammingLanguage,
 						});
 						saveWorkspaceState();
 					}
@@ -1906,18 +2063,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 						// 從等待清單中移除這個回調
 						pendingConfirmCallbacks.delete(message.confirmId);
 
-						// 如果使用者確認要刪除方塊
-						if (message.confirmed) {
-							// 執行刪除工作區中所有方塊的操作
-							workspace.clear();
+						// 根據用途處理不同的邏輯
+						if (message.purpose === 'blocklyDelete') {
+							// 原本的 Blockly 刪除積木用途
+							// 如果使用者確認要刪除方塊
+							if (message.confirmed) {
+								// 執行刪除工作區中所有方塊的操作
+								workspace.clear();
 
-							// 更新程式碼和保存工作區狀態
-							const code = arduinoGenerator.workspaceToCode(workspace);
-							vscode.postMessage({
-								command: 'updateCode',
-								code: code,
-							});
-							saveWorkspaceState();
+								// 更新程式碼和保存工作區狀態
+								const code = generateCode(workspace);
+								vscode.postMessage({
+									command: 'updateCode',
+									code: code,
+									language: window.currentProgrammingLanguage,
+								});
+								saveWorkspaceState();
+							}
+						} else {
+							// 其他用途（如板子切換），直接呼叫回調函數
+							// 讓呼叫者自行處理後續邏輯
+							callback(message.confirmed);
 						}
 					}
 				}
@@ -1971,6 +2137,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 								command: 'updateBoard',
 								board: message.board,
 							});
+						}
+
+						// CyberBrick 專案載入時，確保刪除 platformio.ini 避免衝突
+						const boardConfig = window.BOARD_CONFIGS[message.board];
+						if (boardConfig?.language === 'micropython') {
+							log.info('[blockly] 載入 MicroPython 專案，檢查並刪除 platformio.ini');
+							vscode.postMessage({ command: 'deletePlatformioIni' });
 						}
 					}
 
@@ -2053,10 +2226,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 							// 更新程式碼
 							try {
-								const code = arduinoGenerator.workspaceToCode(workspace);
+								const code = generateCode(workspace);
 								vscode.postMessage({
 									command: 'updateCode',
 									code: code,
+									language: window.currentProgrammingLanguage,
 								});
 							} catch (err) {
 								log.warn('更新程式碼失敗:', err);
@@ -2115,6 +2289,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 處理自動備份設定回應
 			case 'autoBackupSettingsResponse':
 				backupManager.updateAutoBackupUI(message.interval);
+				break;
+
+			// CyberBrick MicroPython 上傳功能
+			case 'uploadProgress':
+				handleUploadProgress(message);
+				break;
+
+			case 'uploadResult':
+				handleUploadResult(message);
+				break;
+
+			case 'portListResponse':
+				handlePortListResponse(message);
 				break;
 		}
 	});
@@ -2269,46 +2456,56 @@ function rebuildPwmConfig(workspace) {
 
 /**
  * 根據開發板類型動態更新 toolbox 以顯示或隱藏 ESP32 專屬積木
+ * 也支援 CyberBrick（MicroPython）的工具箱切換
  * @param {Blockly.WorkspaceSvg} workspace - Blockly 工作區實例
- * @param {string} boardId - 開發板 ID (例如 'esp32', 'esp32_super_mini', 'arduino_uno')
+ * @param {string} boardId - 開發板 ID (例如 'esp32', 'esp32_super_mini', 'arduino_uno', 'cyberbrick')
  */
 async function updateToolboxForBoard(workspace, boardId) {
 	try {
-		// 重新載入原始 toolbox 配置
-		const response = await fetch(window.TOOLBOX_URL);
+		// 檢查是否為 CyberBrick（MicroPython）
+		const isCyberBrick = boardId === 'cyberbrick';
+
+		// 根據開發板類型選擇工具箱 URL
+		const toolboxUrl = isCyberBrick ? window.CYBERBRICK_TOOLBOX_URL : window.TOOLBOX_URL;
+
+		// 重新載入對應的 toolbox 配置
+		const response = await fetch(toolboxUrl);
 		let toolboxConfig = await response.json();
 
-		// 檢查是否為 ESP32 系列開發板
+		// 檢查是否為 ESP32 系列開發板（包括 CyberBrick 的某些功能）
 		const isESP32Board = boardId === 'esp32' || boardId === 'esp32_super_mini';
 
-		// 遞迴過濾 toolbox 中的積木和分類
-		const filterToolboxContents = contents => {
-			if (!contents || !Array.isArray(contents)) return contents;
+		// 如果不是 CyberBrick，才需要過濾 ESP32 專屬積木
+		if (!isCyberBrick) {
+			// 遞迴過濾 toolbox 中的積木和分類
+			const filterToolboxContents = contents => {
+				if (!contents || !Array.isArray(contents)) return contents;
 
-			return contents.filter(item => {
-				// 如果是 esp32_pwm_setup 積木,只在 ESP32 開發板時顯示
-				if (item.type === 'esp32_pwm_setup') {
-					return isESP32Board;
-				}
+				return contents.filter(item => {
+					// 如果是 esp32_pwm_setup 積木,只在 ESP32 開發板時顯示
+					if (item.type === 'esp32_pwm_setup') {
+						return isESP32Board;
+					}
 
-				// 如果是「通訊」分類 (communication),只在 ESP32 開發板時顯示
-				if (item.kind === 'category' && item.name === '%{CATEGORY_COMMUNICATION}') {
-					return isESP32Board;
-				}
+					// 如果是「通訊」分類 (communication),只在 ESP32 開發板時顯示
+					if (item.kind === 'category' && item.name === '%{CATEGORY_COMMUNICATION}') {
+						return isESP32Board;
+					}
 
-				// 如果是 category,遞迴處理其內容
-				if (item.kind === 'category' && item.contents) {
-					item.contents = filterToolboxContents(item.contents);
-				}
+					// 如果是 category,遞迴處理其內容
+					if (item.kind === 'category' && item.contents) {
+						item.contents = filterToolboxContents(item.contents);
+					}
 
-				// 保留其他所有項目
-				return true;
-			});
-		};
+					// 保留其他所有項目
+					return true;
+				});
+			};
 
-		// 處理 toolbox 根層級
-		if (toolboxConfig.contents) {
-			toolboxConfig.contents = filterToolboxContents(toolboxConfig.contents);
+			// 處理 toolbox 根層級
+			if (toolboxConfig.contents) {
+				toolboxConfig.contents = filterToolboxContents(toolboxConfig.contents);
+			}
 		}
 
 		// 處理翻譯 (與初始化時相同)
@@ -2342,13 +2539,199 @@ async function updateToolboxForBoard(workspace, boardId) {
 
 		// 更新 workspace 的 toolbox
 		workspace.updateToolbox(toolboxConfig);
-		console.log(`[Toolbox] 已根據開發板 ${boardId} 更新 (ESP32: ${isESP32Board})`);
+		console.log(`[blockly] 已根據開發板 ${boardId} 更新工具箱 (CyberBrick: ${isCyberBrick}, ESP32: ${isESP32Board})`);
 
-		// 更新工作區中已存在的 ESP32 專屬積木警告
-		updateEsp32BlockWarnings(workspace, isESP32Board);
+		// 更新 UI 元素（上傳按鈕、生成器切換等）
+		updateUIForBoard(boardId, isCyberBrick);
+
+		// 更新工作區中已存在的 ESP32 專屬積木警告（僅針對 Arduino 板）
+		if (!isCyberBrick) {
+			updateEsp32BlockWarnings(workspace, isESP32Board);
+		}
 	} catch (error) {
-		console.error('[Toolbox] 更新失敗:', error);
+		console.error('[blockly] 工具箱更新失敗:', error);
 	}
+}
+
+/**
+ * 根據開發板更新 UI 元素（上傳按鈕、生成器等）
+ * @param {string} boardId - 開發板 ID
+ * @param {boolean} isCyberBrick - 是否為 CyberBrick
+ */
+function updateUIForBoard(boardId, isCyberBrick) {
+	// 更新上傳按鈕顯示/隱藏
+	const uploadContainer = document.getElementById('uploadContainer');
+	const uploadButton = document.getElementById('uploadButton');
+
+	if (uploadContainer) {
+		uploadContainer.style.display = isCyberBrick ? 'block' : 'none';
+	}
+
+	if (uploadButton && window.languageManager) {
+		uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE', 'Upload to CyberBrick');
+	}
+
+	// 記錄當前使用的程式語言
+	window.currentProgrammingLanguage = isCyberBrick ? 'micropython' : 'arduino';
+
+	console.log(
+		`[blockly] UI 已更新: 開發板=${boardId}, 語言=${window.currentProgrammingLanguage}, 上傳按鈕=${isCyberBrick ? '顯示' : '隱藏'}`
+	);
+
+	// 初始化上傳按鈕事件
+	initUploadButton();
+}
+
+// ===== CyberBrick MicroPython 上傳功能 =====
+
+/**
+ * 上傳按鈕狀態
+ */
+const uploadState = {
+	isUploading: false,
+	selectedPort: null,
+};
+
+/**
+ * 初始化上傳按鈕事件
+ */
+function initUploadButton() {
+	const uploadButton = document.getElementById('uploadButton');
+	if (!uploadButton) return;
+
+	// 移除舊的事件監聽器（避免重複綁定）
+	uploadButton.replaceWith(uploadButton.cloneNode(true));
+	const newUploadButton = document.getElementById('uploadButton');
+
+	newUploadButton.addEventListener('click', handleUploadClick);
+}
+
+/**
+ * 處理上傳按鈕點擊
+ */
+async function handleUploadClick() {
+	if (uploadState.isUploading) {
+		console.log('[blockly] 上傳中，忽略點擊');
+		return;
+	}
+
+	const workspace = Blockly.getMainWorkspace();
+	if (!workspace) {
+		toast.show(window.languageManager?.getMessage('UPLOAD_FAILED', '上傳失敗') + ': 工作區未初始化', 'error');
+		return;
+	}
+
+	// 檢查工作區是否有積木
+	const blocks = workspace.getAllBlocks(false);
+	if (blocks.length === 0) {
+		toast.show(window.languageManager?.getMessage('UPLOAD_EMPTY_WORKSPACE', '工作區為空，請先添加積木'), 'warning');
+		return;
+	}
+
+	// 生成程式碼
+	const code = generateCode(workspace);
+	if (!code || code.trim().length === 0) {
+		toast.show(window.languageManager?.getMessage('UPLOAD_NO_CODE', '無法生成程式碼'), 'error');
+		return;
+	}
+
+	// 設置上傳狀態
+	setUploadButtonState('uploading');
+
+	// 發送上傳請求
+	console.log('[blockly] 發送上傳請求');
+	vscode.postMessage({
+		command: 'requestUpload',
+		code: code,
+		board: 'cyberbrick',
+		port: uploadState.selectedPort,
+	});
+}
+
+/**
+ * 設置上傳按鈕狀態
+ * @param {'ready'|'uploading'|'success'|'error'} state - 按鈕狀態
+ */
+function setUploadButtonState(state) {
+	const uploadButton = document.getElementById('uploadButton');
+	if (!uploadButton) return;
+
+	switch (state) {
+		case 'uploading':
+			uploadState.isUploading = true;
+			uploadButton.disabled = true;
+			uploadButton.classList.add('spinning');
+			break;
+		case 'ready':
+		case 'success':
+		case 'error':
+			uploadState.isUploading = false;
+			uploadButton.disabled = false;
+			uploadButton.classList.remove('spinning');
+			break;
+	}
+}
+
+/**
+ * 處理上傳進度訊息
+ * @param {Object} message - 進度訊息
+ */
+function handleUploadProgress(message) {
+	console.log(`[blockly] 上傳進度: ${message.stage} (${message.progress}%) - ${message.message}`);
+
+	// 階段訊息對應
+	const stageMessages = {
+		preparing: window.languageManager?.getMessage('UPLOAD_STAGE_PREPARING', '準備上傳'),
+		checking_tool: window.languageManager?.getMessage('UPLOAD_STAGE_CHECKING', '檢查工具'),
+		installing_tool: window.languageManager?.getMessage('UPLOAD_STAGE_INSTALLING', '安裝工具'),
+		connecting: window.languageManager?.getMessage('UPLOAD_STAGE_CONNECTING', '連接裝置'),
+		resetting: window.languageManager?.getMessage('UPLOAD_STAGE_RESETTING', '重置裝置'),
+		backing_up: window.languageManager?.getMessage('UPLOAD_STAGE_BACKUP', '備份程式'),
+		uploading: window.languageManager?.getMessage('UPLOAD_STAGE_UPLOADING', '上傳程式'),
+		restarting: window.languageManager?.getMessage('UPLOAD_STAGE_RESTARTING', '重啟裝置'),
+		completed: window.languageManager?.getMessage('UPLOAD_STAGE_COMPLETED', '完成'),
+	};
+
+	const stageText = stageMessages[message.stage] || message.message;
+	const progressText = `${stageText} (${message.progress}%)`;
+
+	// 顯示帶有進度的 toast（持續顯示直到下一個更新）
+	toast.show(progressText, 'info', 10000);
+}
+
+/**
+ * 處理上傳結果訊息
+ * @param {Object} message - 結果訊息
+ */
+function handleUploadResult(message) {
+	console.log('[blockly] 上傳結果:', message);
+
+	// 重置按鈕狀態
+	setUploadButtonState(message.success ? 'success' : 'error');
+
+	if (message.success) {
+		const successMsg = window.languageManager?.getMessage('UPLOAD_SUCCESS', '上傳成功！');
+		toast.show(successMsg, 'success');
+	} else {
+		const errorMsg = message.error?.message || '未知錯誤';
+		const failedMsg = window.languageManager?.getMessage('UPLOAD_FAILED', '上傳失敗');
+		toast.show(`${failedMsg}: ${errorMsg}`, 'error', 5000);
+	}
+}
+
+/**
+ * 處理連接埠清單回應
+ * @param {Object} message - 連接埠清單訊息
+ */
+function handlePortListResponse(message) {
+	console.log('[blockly] 連接埠清單:', message);
+
+	if (message.autoDetected) {
+		uploadState.selectedPort = message.autoDetected;
+		console.log(`[blockly] 自動偵測到 CyberBrick: ${message.autoDetected}`);
+	}
+
+	// TODO: 未來可以顯示連接埠選擇 UI
 }
 
 /**

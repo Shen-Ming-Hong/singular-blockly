@@ -253,6 +253,37 @@ body.theme-dark .preview-controls .theme-icon {
 	color: #333;
 }
 
+/* 上傳按鈕樣式（CyberBrick 專用） */
+.upload-switch {
+	margin-left: 10px;
+}
+
+#uploadButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	background-color: #4caf50;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+#uploadButton:hover {
+	background-color: #45a049;
+}
+
+#uploadButton:disabled {
+	background-color: #cccccc;
+	cursor: not-allowed;
+}
+
+.upload-path {
+	color: white;
+}
+
 /* Modal 對話框樣式 */
 .modal {
 	display: none;
@@ -632,6 +663,18 @@ body.theme-dark #refreshButton:hover {
 
 body.theme-dark .refresh-path {
 	color: #e0e0e0;
+}
+
+body.theme-dark #uploadButton {
+	background-color: #388e3c;
+}
+
+body.theme-dark #uploadButton:hover {
+	background-color: #2e7d32;
+}
+
+body.theme-dark #uploadButton:disabled {
+	background-color: #555555;
 }
 
 body.theme-dark select {
@@ -1332,6 +1375,11 @@ body.theme-dark .result-preview {
 	color: white;
 }
 
+.toast.info {
+	background-color: #2196f3;
+	color: white;
+}
+
 /* 深色主題 Toast 樣式 */
 body.theme-dark .toast {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -1347,4 +1395,8 @@ body.theme-dark .toast.warning {
 
 body.theme-dark .toast.error {
 	background-color: #d32f2f;
+}
+
+body.theme-dark .toast.info {
+	background-color: #1976d2;
 }

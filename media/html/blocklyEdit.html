@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{cssUri}">
     <link rel="stylesheet" href="{experimentalCssUri}">
     <script>window.TOOLBOX_URL = '{toolboxUri}';</script>
+    <script>window.CYBERBRICK_TOOLBOX_URL = '{cyberbrickToolboxUri}';</script>
     <script>
         // 設定初始主題
         window.initialTheme = '{theme}' || 'light';
@@ -184,6 +185,47 @@
                     </svg>
                 </button>
             </div>
+            <!-- CyberBrick 上傳按鈕（僅在選擇 CyberBrick 時顯示） -->
+            <div class="upload-switch" id="uploadContainer" style="display: none;">
+                <button id="uploadButton" title="">
+                    <svg class="upload-svg" viewBox="0 0 24 24" width="16" height="16">
+                        <style>
+                            .upload-svg {
+                                transform-origin: center center;
+                                animation: rotate 1s linear infinite;
+                                animation-play-state: paused;
+                            }
+
+                            .upload-svg.spinning {
+                                animation-play-state: running;
+                            }
+
+                            @keyframes rotate {
+                                from {
+                                    transform: rotate(0deg);
+                                }
+
+                                to {
+                                    transform: rotate(360deg);
+                                }
+                            }
+
+                            .upload-path {
+                                stroke: currentColor;
+                                stroke-width: 2;
+                                stroke-linecap: round;
+                                stroke-linejoin: round;
+                                fill: none;
+                            }
+                        </style>
+                        <g class="upload-icon">
+                            <path class="upload-path" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline class="upload-path" points="17 8 12 3 7 8" />
+                            <line class="upload-path" x1="12" y1="3" x2="12" y2="15" />
+                        </g>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- 實驗積木提示容器 -->
@@ -289,8 +331,10 @@
     <script src="{themesUri}/singular.js"></script>
     <script src="{themesUri}/singularDark.js"></script>
     <script src="{arduinoGeneratorUri}"></script>
+    <script src="{micropythonGeneratorUri}"></script>
     <script src="{boardConfigsUri}"></script>
     <script src="{arduinoBlocksUri}"></script>
+    <script src="{cyberbrickBlocksUri}"></script>
     <script src="{loopsBlocksUri}"></script>
     <script src="{functionBlocksUri}"></script>
     <script src="{sensorsBlocksUri}"></script>
@@ -299,6 +343,7 @@
     <script src="{huskyLensBlocksUri}"></script>
     <script src="{esp32WifiMqttBlocksUri}"></script>
     {arduinoModules}
+    {micropythonModules}
     <script src="{jsUri}"></script>
     <script src="{experimentalMarkerUri}"></script>
 </body>

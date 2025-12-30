@@ -623,4 +623,89 @@ window.languageManager.loadMessages('fr', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Sauvegarde enregistrée : {0}',
 	BACKUP_QUICK_SAVE_EMPTY: "L'espace de travail est vide, aucune sauvegarde nécessaire",
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Veuillez patienter, la sauvegarde vient de se terminer',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: 'Changer de type de carte',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		"Passer à un autre type de carte effacera l'espace de travail actuel.\nVotre travail sera automatiquement sauvegardé d'abord.\n\nVoulez-vous continuer ?",
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: 'Temps',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: 'Programme principal',
+	CYBERBRICK_MAIN_TOOLTIP: "Point d'entrée du programme principal CyberBrick. Tout le code doit être placé dans ce bloc.",
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'Définir couleur LED',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: 'Définir couleur LED intégrée',
+	CYBERBRICK_LED_RED: 'Rouge',
+	CYBERBRICK_LED_GREEN: 'Vert',
+	CYBERBRICK_LED_BLUE: 'Bleu',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Définir la couleur de la LED intégrée (GPIO8) avec valeurs RVB (0-255)',
+	CYBERBRICK_LED_OFF: 'Éteindre LED',
+	CYBERBRICK_LED_OFF_TOOLTIP: 'Éteindre la LED intégrée',
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: 'Définir GPIO',
+	CYBERBRICK_GPIO_SET_PREFIX: 'GPIO',
+	CYBERBRICK_GPIO_SET_TO: 'à',
+	CYBERBRICK_GPIO_PIN: 'Broche',
+	CYBERBRICK_GPIO_VALUE: 'Valeur',
+	CYBERBRICK_GPIO_HIGH: 'HAUT',
+	CYBERBRICK_GPIO_LOW: 'BAS',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'Définir broche GPIO à HAUT ou BAS',
+	CYBERBRICK_GPIO_READ: 'Lire GPIO',
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'Lire valeur numérique de la broche GPIO (retourne 0 ou 1)',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: 'Délai (ms)',
+	CYBERBRICK_DELAY_MS_PREFIX: 'Délai',
+	CYBERBRICK_DELAY_MS_SUFFIX: 'ms',
+	CYBERBRICK_DELAY_MS_TOOLTIP: "Suspendre l'exécution du programme pendant les millisecondes spécifiées",
+	CYBERBRICK_DELAY_S: 'Délai (s)',
+	CYBERBRICK_DELAY_S_PREFIX: 'Délai',
+	CYBERBRICK_DELAY_S_SUFFIX: 'secondes',
+	CYBERBRICK_DELAY_S_TOOLTIP: "Suspendre l'exécution du programme pendant les secondes spécifiées",
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'Connecter WiFi',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: 'Mot de passe',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: 'Se connecter au réseau WiFi spécifié',
+	CYBERBRICK_WIFI_DISCONNECT: 'Déconnecter WiFi',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: 'Se déconnecter du réseau WiFi actuel',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi connecté ?',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'Vérifier si WiFi est connecté',
+	CYBERBRICK_WIFI_GET_IP: 'Obtenir adresse IP',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: "Obtenir l'adresse IP actuelle",
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: 'Téléverser vers CyberBrick',
+	UPLOAD_BUTTON_DISABLED_TITLE: "Enregistrez d'abord l'espace de travail pour activer le téléversement",
+	UPLOAD_STARTING: 'Démarrage du téléversement...',
+	UPLOAD_SUCCESS: 'Téléversement réussi !',
+	UPLOAD_FAILED: 'Téléversement échoué : {0}',
+	UPLOAD_NO_PORT: 'Aucun appareil CyberBrick trouvé',
+	UPLOAD_IN_PROGRESS: 'Téléversement en cours...',
+	UPLOAD_EMPTY_WORKSPACE: "L'espace de travail est vide, ajoutez des blocs d'abord",
+	UPLOAD_NO_CODE: 'Impossible de générer le code',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: 'Préparation',
+	UPLOAD_STAGE_CHECKING: 'Vérification des outils',
+	UPLOAD_STAGE_INSTALLING: 'Installation des outils',
+	UPLOAD_STAGE_CONNECTING: 'Connexion au dispositif',
+	UPLOAD_STAGE_RESETTING: 'Réinitialisation du dispositif',
+	UPLOAD_STAGE_BACKUP: 'Sauvegarde',
+	UPLOAD_STAGE_UPLOADING: 'Téléversement',
+	UPLOAD_STAGE_RESTARTING: 'Redémarrage du dispositif',
+	UPLOAD_STAGE_COMPLETED: 'Terminé',
 });

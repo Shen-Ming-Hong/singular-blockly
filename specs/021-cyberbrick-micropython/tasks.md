@@ -18,10 +18,10 @@
 
 **Purpose**: 建立 MicroPython 支援所需的基本目錄結構和類型定義
 
--   [ ] T001 建立 MicroPython 生成器目錄結構 in `media/blockly/generators/micropython/`
--   [ ] T002 [P] 建立 CyberBrick 工具箱檔案 in `media/toolbox/cyberbrick.json`
--   [ ] T003 [P] 新增 MicroPython 上傳相關類型定義（UploadButtonState、UploadProgress、UploadResult）in `src/types/micropython.ts`
--   [ ] T004 [P] 擴展 Board 類型定義支援 language 屬性 in `src/types/board.ts`
+-   [x] T001 建立 MicroPython 生成器目錄結構 in `media/blockly/generators/micropython/`
+-   [x] T002 [P] 建立 CyberBrick 工具箱檔案 in `media/toolbox/cyberbrick.json`
+-   [x] T003 [P] 新增 MicroPython 上傳相關類型定義（UploadButtonState、UploadProgress、UploadResult）in `src/types/micropython.ts`
+-   [x] T004 [P] 擴展 Board 類型定義支援 language 屬性 in `src/types/board.ts`
 
 ---
 
@@ -31,19 +31,20 @@
 
 **⚠️ CRITICAL**: 此階段未完成前，所有 User Story 工作無法開始
 
--   [ ] T005 擴展 BoardConfig 介面新增 language、toolbox、uploadMethod、devicePath 屬性 in `media/blockly/blocks/board_configs.js`
--   [ ] T006 [P] 建立 MicroPython 生成器入口與基礎設定（包含 imports、變數宣告、主程式結構生成）in `media/blockly/generators/micropython/index.js`
--   [ ] T006a [P] 建立 `micropython_main` 主程式積木定義（單一 Statement 輸入區段，參考 `arduino_setup_loop` 但簡化為單區段）in `media/blockly/blocks/cyberbrick.js`
--   [ ] T006b 實作 `micropython_main` 程式碼生成器（收集 imports、變數宣告後輸出主程式內容，不強制迴圈）in `media/blockly/generators/micropython/index.js`
--   [ ] T006c [P] 新增 `CYBERBRICK_MAIN` 翻譯鍵（主程式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
--   [ ] T007 [P] 實作 MicroPython 變數積木生成器 in `media/blockly/generators/micropython/variables.js`
--   [ ] T008 [P] 實作 MicroPython 邏輯積木生成器 in `media/blockly/generators/micropython/logic.js`
--   [ ] T009 [P] 實作 MicroPython 迴圈積木生成器 in `media/blockly/generators/micropython/loops.js`
--   [ ] T010 [P] 實作 MicroPython 數學積木生成器 in `media/blockly/generators/micropython/math.js`
--   [ ] T011 [P] 實作 MicroPython 文字積木生成器 in `media/blockly/generators/micropython/text.js`
--   [ ] T012 [P] 實作 MicroPython 函數積木生成器 in `media/blockly/generators/micropython/functions.js`
--   [ ] T013 新增 CyberBrick 主板完整配置（GPIO、ADC、hardware 對應表）in `media/blockly/blocks/board_configs.js`
--   [ ] T014 擴展 webviewManager.ts 載入 MicroPython 生成器模組 in `src/webview/webviewManager.ts`
+-   [x] T005 擴展 BoardConfig 介面新增 language、toolbox、uploadMethod、devicePath 屬性 in `media/blockly/blocks/board_configs.js`
+-   [x] T006 [P] 建立 MicroPython 生成器入口與基礎設定（包含 imports、變數宣告、主程式結構生成）in `media/blockly/generators/micropython/index.js`
+-   [x] T006a [P] 建立 `micropython_main` 主程式積木定義（單一 Statement 輸入區段，參考 `arduino_setup_loop` 但簡化為單區段）in `media/blockly/blocks/cyberbrick.js`
+-   [x] T006b 實作 `micropython_main` 程式碼生成器（收集 imports、變數宣告後輸出主程式內容，不強制迴圈）in `media/blockly/generators/micropython/cyberbrick.js`
+-   [x] T006c [P] 新增 `CYBERBRICK_MAIN` 翻譯鍵（主程式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
+-   [x] T007 [P] 實作 MicroPython 變數積木生成器 in `media/blockly/generators/micropython/variables.js`
+-   [x] T008 [P] 實作 MicroPython 邏輯積木生成器 in `media/blockly/generators/micropython/logic.js`
+-   [x] T009 [P] 實作 MicroPython 迴圈積木生成器 in `media/blockly/generators/micropython/loops.js`
+-   [x] T010 [P] 實作 MicroPython 數學積木生成器 in `media/blockly/generators/micropython/math.js`
+-   [x] T011 [P] 實作 MicroPython 文字積木生成器 in `media/blockly/generators/micropython/text.js`
+-   [x] T012 [P] 實作 MicroPython 函數積木生成器 in `media/blockly/generators/micropython/functions.js`
+-   [x] T012a [P] 實作 MicroPython 列表積木生成器 in `media/blockly/generators/micropython/lists.js`
+-   [x] T013 新增 CyberBrick 主板完整配置（GPIO、ADC、hardware 對應表）in `media/blockly/blocks/board_configs.js`
+-   [x] T014 擴展 webviewManager.ts 載入 MicroPython 生成器模組 in `src/webview/webviewManager.ts`
 -   [ ] T014a [P] 撰寫 MicroPython 程式碼生成器單元測試（覆蓋率目標 ≥80%，涵蓋所有 FR 需求至少一個測試案例）in `src/test/micropythonGenerator.test.ts`
 
 **Checkpoint**: 基礎架構就緒 - User Story 實作可以開始
@@ -80,28 +81,28 @@
 
 ### Phase 3a: UI/UX 互動（優先）
 
--   [ ] T015a [US1] 實作主板選單加入 CyberBrick 選項（只加選項，不含完整切換邏輯）in `media/js/blocklyEdit.js`
--   [ ] T015b [US1] 實作 CyberBrick 專用工具箱載入邏輯（參考 `updateToolboxForBoard` 函數）in `media/js/blocklyEdit.js`
--   [ ] T015c [US1] 實作 Arduino 積木隱藏、MicroPython 積木顯示的過濾邏輯 in `media/js/blocklyEdit.js`
--   [ ] T015d [US1] 新增上傳按鈕 UI（與現有控制區按鈕樣式一致），僅在 CyberBrick 時顯示 in `media/html/blocklyEdit.html` 和 `media/css/blocklyEdit.css`
--   [ ] T015e [US1] 實作上傳按鈕狀態管理（UploadButtonState: visible/disabled/spinning）in `media/js/blocklyEdit.js`
--   [ ] T015f [P] [US1] 驗證現有 Toast 通知元件支援 'info' 類型，若無則擴展（重用現有 `toast.show()` 函數）in `media/js/blocklyEdit.js`
--   [ ] T015g [P] [US1] 新增 CyberBrick 工具箱分類的 i18n 翻譯鍵（使用 `CATEGORY_CYBERBRICK_*` 格式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
+-   [x] T015a [US1] 實作主板選單加入 CyberBrick 選項（只加選項，不含完整切換邏輯）in `media/js/blocklyEdit.js`
+-   [x] T015b [US1] 實作 CyberBrick 專用工具箱載入邏輯（參考 `updateToolboxForBoard` 函數）in `media/js/blocklyEdit.js`
+-   [x] T015c [US1] 實作 Arduino 積木隱藏、MicroPython 積木顯示的過濾邏輯 in `media/js/blocklyEdit.js`
+-   [x] T015d [US1] 新增上傳按鈕 UI（與現有控制區按鈕樣式一致），僅在 CyberBrick 時顯示 in `media/html/blocklyEdit.html` 和 `media/css/blocklyEdit.css`
+-   [x] T015e [US1] 實作上傳按鈕狀態管理（UploadButtonState: visible/disabled/spinning）in `media/js/blocklyEdit.js`
+-   [x] T015f [P] [US1] 驗證現有 Toast 通知元件支援 'info' 類型，若無則擴展（重用現有 `toast.show()` 函數）in `media/js/blocklyEdit.js`
+-   [x] T015g [P] [US1] 新增 CyberBrick 工具箱分類的 i18n 翻譯鍵（使用 `CATEGORY_CYBERBRICK_*` 格式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
 
 **UI Checkpoint**: 選擇 CyberBrick 時工具箱正確切換，上傳按鈕正確顯示/隱藏/旋轉，Toast 通知正常運作
 
 ### Phase 3b: 積木定義與程式碼生成
 
--   [ ] T016 [P] [US1] 建立 CyberBrick 專用積木定義（LED、GPIO、時序），使用 `CYBERBRICK_*` 翻譯鍵 in `media/blockly/blocks/cyberbrick.js`
--   [ ] T017 [P] [US1] 建立 CyberBrick 工具箱分類配置（核心、控制、LED、GPIO）in `media/toolbox/categories/cyberbrick_core.json`
--   [ ] T018 [US1] 實作 CyberBrick 硬體積木生成器（LED、GPIO、時序）in `media/blockly/generators/micropython/cyberbrick.js`
--   [ ] T019 [US1] 實作生成器切換邏輯（Arduino ↔ MicroPython）in `media/js/blocklyEdit.js`
--   [ ] T020 [US1] 實作 loadToolbox 訊息處理（Extension → WebView）in `src/webview/messageHandler.ts`
--   [ ] T021 [US1] 實作 toolboxLoaded 訊息處理（WebView → Extension）in `src/webview/messageHandler.ts`
+-   [x] T016 [P] [US1] 建立 CyberBrick 專用積木定義（LED、GPIO、時序），使用 `CYBERBRICK_*` 翻譯鍵 in `media/blockly/blocks/cyberbrick.js`
+-   [x] T017 [P] [US1] 建立 CyberBrick 工具箱分類配置（核心、控制、LED、GPIO）in `media/toolbox/categories/cyberbrick_core.json`
+-   [x] T018 [US1] 實作 CyberBrick 硬體積木生成器（LED、GPIO、時序）in `media/blockly/generators/micropython/cyberbrick.js`
+-   [x] T019 [US1] 實作生成器切換邏輯（Arduino ↔ MicroPython）in `media/js/blocklyEdit.js`
+-   [~] T020 [US1] 延後：loadToolbox 訊息處理（目前前端已直接處理工具箱切換，不需 Extension 介入）in `src/webview/messageHandler.ts`
+-   [~] T021 [US1] 延後：toolboxLoaded 訊息處理（目前前端已直接處理工具箱切換，不需 Extension 介入）in `src/webview/messageHandler.ts`
 
 ### Phase 3c: 日誌與完善
 
--   [ ] T022 [US1] 新增所有 CyberBrick 相關日誌（使用 `[blockly]` 標籤），包含主板切換、工具箱更新事件 in `media/js/blocklyEdit.js`
+-   [x] T022 [US1] 新增所有 CyberBrick 相關日誌（使用 `[blockly]` 標籤），包含主板切換、工具箱更新、生成器切換事件 in `media/js/blocklyEdit.js`
 
 **Checkpoint**: User Story 1 完成 - 使用者可選擇 CyberBrick 並生成 MicroPython 程式碼
 
@@ -117,50 +118,46 @@
 
 ### Implementation for User Story 2
 
--   [ ] T023 [P] [US2] 實作 MicropythonUploader 服務基本架構 in `src/services/micropythonUploader.ts`
--   [ ] T024 [P] [US2] 實作 PlatformIO Python 環境偵測邏輯 in `src/services/micropythonUploader.ts`
--   [ ] T025 [US2] 實作 mpremote 工具檢查與自動安裝邏輯 in `src/services/micropythonUploader.ts`
--   [ ] T026 [US2] 實作連接埠偵測與 CyberBrick VID/PID 篩選邏輯 in `src/services/micropythonUploader.ts`
--   [ ] T027 [US2] 實作 reset + soft-reset + upload + reset 完整上傳序列 in `src/services/micropythonUploader.ts`
--   [ ] T028 [US2] 實作 requestUpload 訊息處理 in `src/webview/messageHandler.ts`
--   [ ] T029 [US2] 實作 uploadProgress 與 uploadResult 訊息發送 in `src/webview/messageHandler.ts`
--   [ ] T030 [US2] 實作上傳按鈕點擊處理與進度顯示 UI（按鈕已在 Phase 3a 建立）in `media/js/blocklyEdit.js`
--   [ ] T030a [US2] 實作上傳結果 Toast 通知處理（成功/失敗，對應 FR-032b）in `media/js/blocklyEdit.js`
--   [ ] T031 [P] [US2] 實作 requestPortList 與 portListResponse 訊息處理 in `src/webview/messageHandler.ts`
--   [ ] T032 [US2] 實作連接埠選擇 UI（自動偵測 + 手動選擇）in `media/js/blocklyEdit.js`
+-   [x] T023 [P] [US2] 實作 MicropythonUploader 服務基本架構 in `src/services/micropythonUploader.ts`
+-   [x] T024 [P] [US2] 實作 PlatformIO Python 環境偵測邏輯 in `src/services/micropythonUploader.ts`
+-   [x] T025 [US2] 實作 mpremote 工具檢查與自動安裝邏輯 in `src/services/micropythonUploader.ts`
+-   [x] T026 [US2] 實作連接埠偵測與 CyberBrick VID/PID 篩選邏輯 in `src/services/micropythonUploader.ts`
+-   [x] T027 [US2] 實作 reset + soft-reset + upload + reset 完整上傳序列 in `src/services/micropythonUploader.ts`
+-   [x] T028 [US2] 實作 requestUpload 訊息處理 in `src/webview/messageHandler.ts`
+-   [x] T029 [US2] 實作 uploadProgress 與 uploadResult 訊息發送 in `src/webview/messageHandler.ts`
+-   [x] T030 [US2] 實作上傳按鈕點擊處理與進度顯示 UI（按鈕已在 Phase 3a 建立）in `media/js/blocklyEdit.js`
+-   [x] T030a [US2] 實作上傳結果 Toast 通知處理（成功/失敗，對應 FR-032b）in `media/js/blocklyEdit.js`
+-   [x] T031 [P] [US2] 實作 requestPortList 與 portListResponse 訊息處理 in `src/webview/messageHandler.ts`
+-   [~] T032 [US2] 延後：連接埠選擇 UI（自動偵測 + 手動選擇）- 目前使用自動偵測，延後實作手動選擇 UI in `media/js/blocklyEdit.js`
 -   [ ] T033 [P] [US2] 新增 MicropythonUploader 單元測試 in `src/test/micropythonUploader.test.ts`
--   [ ] T033a [US2] 實作上傳失敗錯誤處理與診斷訊息顯示（對應 NFR-004）in `src/services/micropythonUploader.ts`
--   [ ] T033b [US2] 實作 mpremote 安裝失敗錯誤處理與手動安裝指引（對應 NFR-003）in `src/services/micropythonUploader.ts`
--   [ ] T033c [US2] 新增上傳相關日誌（使用 `[blockly]` 標籤），包含上傳開始/進度/完成/失敗 in `src/services/micropythonUploader.ts`
+-   [x] T033a [US2] 實作上傳失敗錯誤處理與診斷訊息顯示（對應 NFR-004）in `src/services/micropythonUploader.ts`
+-   [x] T033b [US2] 實作 mpremote 安裝失敗錯誤處理與手動安裝指引（對應 NFR-003）in `src/services/micropythonUploader.ts`
+-   [x] T033c [US2] 新增上傳相關日誌（使用 `[blockly]` 標籤），包含上傳開始/進度/完成/失敗 in `src/services/micropythonUploader.ts`
 
 **Checkpoint**: User Story 2 完成 - 使用者可一鍵上傳程式到 CyberBrick
 
 ---
 
-## Phase 5: User Story 3 - 自動備份原有程式 (Priority: P2)
+## Phase 5: User Story 3 - 自動備份原有程式 (Priority: P2) ⏭️ SKIPPED
 
 **Goal**: 首次上傳前自動備份 CyberBrick 中的原有程式
 
-**Independent Test**: 首次上傳時確認備份檔案被建立在工作區的 `blockly/backups/` 目錄
-
-**⚠️ 範圍釐清**: 本階段的 `backupService.ts` **僅處理「裝置程式備份」(DeviceBackup)**，
-即從 CyberBrick 讀取 `/app/rc_main.py` 並備份到本地。
-**工作區積木備份繼續使用現有 `quickBackup` 機制**（在 `blocklyEdit.js` 中已實作）。
+**⏭️ SKIPPED**: 官方已提供還原程式的方法，不需要自行實作備份功能
 
 ### Implementation for User Story 3
 
--   [ ] T034 [P] [US3] 實作備份清單 manifest.json 管理邏輯 in `src/services/backupService.ts`
--   [ ] T035 [P] [US3] 實作裝置程式讀取邏輯（mpremote fs cat）in `src/services/micropythonUploader.ts`
--   [ ] T036 [US3] 實作 DeviceBackup 建立與儲存邏輯 in `src/services/backupService.ts`
--   [ ] T037 [US3] 整合首次上傳前的自動備份流程 in `src/services/micropythonUploader.ts`
--   [ ] T038 [US3] 實作備份內容比對（避免重複備份相同內容）in `src/services/backupService.ts`
--   [ ] T039 [US3] 實作 requestBackupList 與 backupListResponse 訊息處理 in `src/webview/messageHandler.ts`
--   [ ] T040 [US3] 實作 restoreBackup 與 restoreResult 訊息處理（還原到裝置）in `src/webview/messageHandler.ts`
--   [ ] T041 [US3] 實作備份清單 UI 與還原功能 in `media/js/blocklyEdit.js`
--   [ ] T042 [P] [US3] 新增 BackupService 單元測試 in `src/test/backupService.test.ts`
--   [ ] T042a [US3] 新增備份相關日誌（使用 `[blockly]` 標籤）in `src/services/backupService.ts`
+-   [~] T034 [P] [US3] 跳過：官方已提供還原方法
+-   [~] T035 [P] [US3] 跳過：官方已提供還原方法
+-   [~] T036 [US3] 跳過：官方已提供還原方法
+-   [~] T037 [US3] 跳過：官方已提供還原方法
+-   [~] T038 [US3] 跳過：官方已提供還原方法
+-   [~] T039 [US3] 跳過：官方已提供還原方法
+-   [~] T040 [US3] 跳過：官方已提供還原方法
+-   [~] T041 [US3] 跳過：官方已提供還原方法
+-   [~] T042 [P] [US3] 跳過：官方已提供還原方法
+-   [~] T042a [US3] 跳過：官方已提供還原方法
 
-**Checkpoint**: User Story 3 完成 - 系統自動備份裝置原有程式
+**Checkpoint**: User Story 3 跳過 - 官方已提供還原程式的方法
 
 ---
 
@@ -172,17 +169,17 @@
 
 ### Implementation for User Story 4
 
--   [ ] T043 [P] [US4] 實作語言類型變更偵測邏輯（arduino ↔ micropython）in `media/js/blocklyEdit.js`
--   [ ] T044 [US4] 實作主板切換時自動呼叫現有 `quickBackup.performQuickSave()` in `media/js/blocklyEdit.js`
--   [ ] T044a [US4] 實作空工作區檢查（若無積木則跳過確認對話框，對應 FR-023a）in `media/js/blocklyEdit.js`
--   [ ] T045 [US4] 實作 boardSwitchWarning 訊息發送（當偵測到語言變更且工作區非空）in `src/webview/messageHandler.ts`
--   [ ] T046 [US4] 實作 boardSwitchConfirm 訊息處理 in `src/webview/messageHandler.ts`
--   [ ] T047 [US4] 實作主板切換確認對話框 UI in `media/js/blocklyEdit.js`
--   [ ] T048 [US4] 實作 boardSwitchComplete 訊息處理與工作區清空邏輯 in `src/webview/messageHandler.ts`
--   [ ] T049 [US4] 實作工具箱切換邏輯（參考 `updateToolboxForBoard` 的過濾模式）in `media/js/blocklyEdit.js`
--   [ ] T050 [US4] 新增主板切換相關日誌（使用 `[blockly]` 標籤），包含備份觸發、工具箱更新 in `media/js/blocklyEdit.js`
+-   [x] T043 [P] [US4] 實作語言類型變更偵測邏輯（arduino ↔ micropython）in `media/js/blocklyEdit.js`
+-   [x] T044 [US4] 實作主板切換時自動呼叫現有 `quickBackup.performQuickSave()` in `media/js/blocklyEdit.js`
+-   [x] T044a [US4] 實作空工作區檢查（若無積木則跳過確認對話框，對應 FR-023a）in `media/js/blocklyEdit.js`
+-   [~] T045 [US4] 延後：boardSwitchWarning 訊息發送（目前使用 window.confirm）in `src/webview/messageHandler.ts`
+-   [~] T046 [US4] 延後：boardSwitchConfirm 訊息處理（目前使用 window.confirm）in `src/webview/messageHandler.ts`
+-   [x] T047 [US4] 實作主板切換確認對話框 UI（使用 window.confirm）in `media/js/blocklyEdit.js`
+-   [~] T048 [US4] 延後：boardSwitchComplete 訊息處理（目前直接在前端執行工作區清空）in `src/webview/messageHandler.ts`
+-   [x] T049 [US4] 實作工具箱切換邏輯（參考 `updateToolboxForBoard` 的過濾模式）in `media/js/blocklyEdit.js`
+-   [x] T050 [US4] 新增主板切換相關日誌（使用 `[blockly]` 標籤），包含備份觸發、工具箱更新 in `media/js/blocklyEdit.js`
 
-**Checkpoint**: User Story 4 完成 - 主板切換時自動保護工作區並正確切換工具箱
+**Checkpoint**: User Story 4 完成 - 主板切換時自動保護工作區並正確切換工具箱 ✅
 
 ---
 
@@ -194,12 +191,12 @@
 
 ### Implementation for User Story 6
 
--   [ ] T051 [US6] 實作 platformio.ini 檔案存在檢查邏輯 in `src/webview/messageHandler.ts`
--   [ ] T052 [US6] 實作 platformio.ini 自動刪除邏輯（選擇 CyberBrick 時觸發）in `src/webview/messageHandler.ts`
--   [ ] T053 [US6] 實作 deletePlatformioIni 訊息處理（WebView → Extension，契約見 contracts/webview-messages.md §3.1）in `src/webview/messageHandler.ts`
--   [ ] T054 [US6] 新增 platformio.ini 刪除相關日誌（使用 `[blockly]` 標籤）in `src/webview/messageHandler.ts`
+-   [x] T051 [US6] 實作 platformio.ini 檔案存在檢查邏輯 in `src/webview/messageHandler.ts`
+-   [x] T052 [US6] 實作 platformio.ini 自動刪除邏輯（選擇 CyberBrick 時觸發）in `src/webview/messageHandler.ts`
+-   [x] T053 [US6] 實作 deletePlatformioIni 訊息處理（WebView → Extension，契約見 contracts/webview-messages.md §3.1）in `src/webview/messageHandler.ts`
+-   [x] T054 [US6] 新增 platformio.ini 刪除相關日誌（使用 `[blockly]` 標籤）in `src/webview/messageHandler.ts`
 
-**Checkpoint**: User Story 6 完成 - 選擇 CyberBrick 時自動清理 PlatformIO 設定
+**Checkpoint**: User Story 6 完成 - 選擇 CyberBrick 時自動清理 PlatformIO 設定 ✅
 
 ---
 
@@ -211,13 +208,13 @@
 
 ### Implementation for User Story 5
 
--   [ ] T055 [P] [US5] 建立 WiFi 相關積木定義（連線、斷線、狀態、取得 IP），使用 `CYBERBRICK_WIFI_*` 翻譯鍵 in `media/blockly/blocks/cyberbrick.js`
--   [ ] T056 [US5] 實作 WiFi 積木的 MicroPython 生成器 in `media/blockly/generators/micropython/cyberbrick.js`
--   [ ] T057 [US5] 新增 WiFi 積木到 CyberBrick 工具箱 in `media/toolbox/categories/cyberbrick_wifi.json`
--   [ ] T058 [US5] 更新 CyberBrick 工具箱包含 WiFi 分類 in `media/toolbox/cyberbrick.json`
--   [ ] T059 [US5] 新增 WiFi 積木的 i18n 訊息 in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
+-   [x] T055 [P] [US5] 建立 WiFi 相關積木定義（連線、斷線、狀態、取得 IP），使用 `CYBERBRICK_WIFI_*` 翻譯鍵 in `media/blockly/blocks/cyberbrick.js`
+-   [x] T056 [US5] 實作 WiFi 積木的 MicroPython 生成器 in `media/blockly/generators/micropython/cyberbrick.js`
+-   [x] T057 [US5] 新增 WiFi 積木到 CyberBrick 工具箱 in `media/toolbox/categories/cyberbrick_wifi.json`
+-   [x] T058 [US5] 更新 CyberBrick 工具箱包含 WiFi 分類 in `media/toolbox/cyberbrick.json`
+-   [x] T059 [US5] 新增 WiFi 積木的 i18n 訊息 in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
 
-**Checkpoint**: User Story 5 完成 - 使用者可使用 WiFi 功能
+**Checkpoint**: User Story 5 完成 - 使用者可使用 WiFi 功能 ✅
 
 ---
 

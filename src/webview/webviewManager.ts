@@ -25,8 +25,9 @@ const BOARD_MAPPING: Record<string, BoardConfigKey> = {
 	arduino_mega: 'mega',
 	esp32: 'esp32',
 	esp32_super_mini: 'supermini',
+	cyberbrick: 'cyberbrick',
 	// 相容簡短格式（直接使用 BOARD_CONFIGS key）
-	// 注意：esp32 已在標準格式區段定義，無需重複
+	// 注意：esp32, cyberbrick 已在標準格式區段定義，無需重複
 	uno: 'uno',
 	nano: 'nano',
 	mega: 'mega',
@@ -91,6 +92,7 @@ export class WebViewManager {
 	private localeService: LocaleService;
 	private previewPanels: Map<string, vscode.WebviewPanel> = new Map();
 	private currentTempToolboxFile: string | null = null;
+	private currentCyberbrickTempToolboxFile: string | null = null;
 	// FileWatcher 機制 - T011
 	private fileWatcher: vscode.FileSystemWatcher | undefined;
 	private fileWatcherDebounceTimer: NodeJS.Timeout | undefined;
@@ -331,11 +333,34 @@ export class WebViewManager {
 				path.join(this.context.extensionPath, 'media/blockly/blocks/esp32-wifi-mqtt.js')
 			);
 			const esp32WifiMqttBlocksUri = webview.asWebviewUri(esp32WifiMqttBlocksPath);
+
+			// MicroPython 生成器
+			const micropythonGeneratorPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/blockly/generators/micropython/index.js')
+			);
+			const micropythonGeneratorUri = webview.asWebviewUri(micropythonGeneratorPath);
+
+			// CyberBrick 積木定義
+			const cyberbrickBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/cyberbrick.js'));
+			const cyberbrickBlocksUri = webview.asWebviewUri(cyberbrickBlocksPath);
+
 			// Arduino 生成器模組（動態發現）
 			const discoveredModules = await this.discoverArduinoModules();
 			const arduinoModules = discoveredModules
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
+					const moduleUri = webview.asWebviewUri(modulePath);
+					return `<script src="${moduleUri}"></script>`;
+				})
+				.join('\n    ');
+
+			// MicroPython 生成器模組（動態發現）
+			const discoveredMicropythonModules = await this.discoverMicroPythonModules();
+			const micropythonModules = discoveredMicropythonModules
+				.map(file => {
+					const modulePath = vscode.Uri.file(
+						path.join(this.context.extensionPath, `media/blockly/generators/micropython/${file}`)
+					);
 					const moduleUri = webview.asWebviewUri(modulePath);
 					return `<script src="${moduleUri}"></script>`;
 				})
@@ -360,7 +385,7 @@ export class WebViewManager {
 				vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/themes/singularDark.js'))
 			);
 
-			// 讀取並處理工具箱配置
+			// 讀取並處理工具箱配置（Arduino 標準工具箱）
 			const toolboxJson = await this.extensionFileService.readJsonFile('media/toolbox/index.json', {});
 			const resolvedToolbox = await this.resolveToolboxIncludes(toolboxJson);
 
@@ -369,6 +394,17 @@ export class WebViewManager {
 			await this.extensionFileService.writeJsonFile(this.currentTempToolboxFile, resolvedToolbox, true);
 			const tempToolboxUri = webview.asWebviewUri(
 				vscode.Uri.file(path.join(this.context.extensionPath, this.currentTempToolboxFile))
+			);
+
+			// 讀取並處理 CyberBrick 工具箱配置（MicroPython）
+			const cyberbrickToolboxJson = await this.extensionFileService.readJsonFile('media/toolbox/cyberbrick.json', {});
+			const resolvedCyberbrickToolbox = await this.resolveToolboxIncludes(cyberbrickToolboxJson);
+
+			// 寫入 CyberBrick 工具箱臨時檔案
+			this.currentCyberbrickTempToolboxFile = this.generateTempToolboxPath();
+			await this.extensionFileService.writeJsonFile(this.currentCyberbrickTempToolboxFile, resolvedCyberbrickToolbox, true);
+			const tempCyberbrickToolboxUri = webview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, this.currentCyberbrickTempToolboxFile))
 			);
 
 			// 替換所有預留位置
@@ -413,8 +449,12 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{pixettoBlocksUri}', pixettoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
+			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
+			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
+			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
+			htmlContent = htmlContent.replace('{cyberbrickToolboxUri}', tempCyberbrickToolboxUri.toString());
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);
@@ -523,6 +563,27 @@ export class WebViewManager {
 	}
 
 	/**
+	 * 自動發現 MicroPython 生成器模組
+	 * @returns 模組檔案名稱列表（已排序）
+	 */
+	private async discoverMicroPythonModules(): Promise<string[]> {
+		try {
+			const generatorsPath = 'media/blockly/generators/micropython';
+			const files = await this.extensionFileService.listFiles(generatorsPath);
+
+			// 過濾 .js 檔案，排除 index.js
+			const modules = files.filter(f => f.endsWith('.js') && f !== 'index.js').sort();
+
+			log(`Discovered ${modules.length} MicroPython generator modules`, 'info', modules);
+			return modules;
+		} catch (error) {
+			// Fallback to hardcoded list with warning
+			log('Warning: Failed to scan MicroPython generators directory, using fallback list', 'warn', error);
+			return ['cyberbrick.js', 'functions.js', 'lists.js', 'logic.js', 'loops.js', 'math.js', 'text.js', 'variables.js'];
+		}
+	}
+
+	/**
 	 * 清理過期的臨時工具箱檔案（超過 1 小時）
 	 * 在擴充套件啟動時執行，清理殘留的舊檔案
 	 * @param extensionPath 擴充套件路徑
@@ -564,17 +625,28 @@ export class WebViewManager {
 	 * 清理臨時工具箱檔案（非阻塞，錯誤不拋出）
 	 */
 	private async cleanupTempFile(): Promise<void> {
-		if (!this.currentTempToolboxFile) {
-			return;
+		// 清理 Arduino 工具箱臨時檔案
+		if (this.currentTempToolboxFile) {
+			try {
+				await this.extensionFileService.deleteFile(this.currentTempToolboxFile);
+				log(`Cleaned up temp file: ${this.currentTempToolboxFile}`, 'info');
+				this.currentTempToolboxFile = null;
+			} catch (error) {
+				// Non-blocking: log warning but don't throw
+				log(`Warning: Failed to cleanup temp file ${this.currentTempToolboxFile}`, 'warn', error);
+			}
 		}
 
-		try {
-			await this.extensionFileService.deleteFile(this.currentTempToolboxFile);
-			log(`Cleaned up temp file: ${this.currentTempToolboxFile}`, 'info');
-			this.currentTempToolboxFile = null;
-		} catch (error) {
-			// Non-blocking: log warning but don't throw
-			log(`Warning: Failed to cleanup temp file ${this.currentTempToolboxFile}`, 'warn', error);
+		// 清理 CyberBrick 工具箱臨時檔案
+		if (this.currentCyberbrickTempToolboxFile) {
+			try {
+				await this.extensionFileService.deleteFile(this.currentCyberbrickTempToolboxFile);
+				log(`Cleaned up CyberBrick temp file: ${this.currentCyberbrickTempToolboxFile}`, 'info');
+				this.currentCyberbrickTempToolboxFile = null;
+			} catch (error) {
+				// Non-blocking: log warning but don't throw
+				log(`Warning: Failed to cleanup CyberBrick temp file ${this.currentCyberbrickTempToolboxFile}`, 'warn', error);
+			}
 		}
 	}
 
@@ -941,11 +1013,33 @@ export class WebViewManager {
 			);
 			const esp32WifiMqttBlocksUri = tempWebview.asWebviewUri(esp32WifiMqttBlocksPath);
 
+			// MicroPython 生成器
+			const micropythonGeneratorPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/blockly/generators/micropython/index.js')
+			);
+			const micropythonGeneratorUri = tempWebview.asWebviewUri(micropythonGeneratorPath);
+
+			// CyberBrick 積木定義
+			const cyberbrickBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/cyberbrick.js'));
+			const cyberbrickBlocksUri = tempWebview.asWebviewUri(cyberbrickBlocksPath);
+
 			// Arduino 生成器模組（動態發現）
 			const discoveredModules = await this.discoverArduinoModules();
 			const arduinoModules = discoveredModules
 				.map(file => {
 					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/arduino/${file}`));
+					const moduleUri = tempWebview.asWebviewUri(modulePath);
+					return `<script src="${moduleUri}"></script>`;
+				})
+				.join('\n    ');
+
+			// MicroPython 生成器模組（動態發現）
+			const discoveredMicropythonModules = await this.discoverMicroPythonModules();
+			const micropythonModules = discoveredMicropythonModules
+				.map(file => {
+					const modulePath = vscode.Uri.file(
+						path.join(this.context.extensionPath, `media/blockly/generators/micropython/${file}`)
+					);
 					const moduleUri = tempWebview.asWebviewUri(modulePath);
 					return `<script src="${moduleUri}"></script>`;
 				})
@@ -1014,6 +1108,9 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{pixettoBlocksUri}', pixettoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
+			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
+			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
+			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);

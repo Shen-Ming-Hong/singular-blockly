@@ -1,0 +1,41 @@
+{
+    "kind": "category",
+    "name": "%{BKY_CATEGORY_CYBERBRICK_WIFI}",
+    "colour": "210",
+    "contents": [
+        {
+            "kind": "block",
+            "type": "cyberbrick_wifi_connect",
+            "inputs": {
+                "SSID": {
+                    "shadow": {
+                        "type": "text",
+                        "fields": {
+                            "TEXT": "WiFi_Name"
+                        }
+                    }
+                },
+                "PASSWORD": {
+                    "shadow": {
+                        "type": "text",
+                        "fields": {
+                            "TEXT": "password"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_wifi_disconnect"
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_wifi_is_connected"
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_wifi_get_ip"
+        }
+    ]
+}

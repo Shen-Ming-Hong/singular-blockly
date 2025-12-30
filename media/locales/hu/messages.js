@@ -627,4 +627,89 @@ window.languageManager.loadMessages('hu', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Biztonsági mentés mentve: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'A munkaterület üres, nincs szükség biztonsági mentésre',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Kérem várjon, a biztonsági mentés éppen befejeződött',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: 'Lapka típus váltás',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		'A másik lapka típusra váltás törli a jelenlegi munkaterületet.\nA munkája először automatikusan mentésre kerül.\n\nFolytatja?',
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: 'Idő',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: 'Főprogram',
+	CYBERBRICK_MAIN_TOOLTIP: 'CyberBrick főprogram belépési pontja. Minden kódot ebbe a blokkba kell helyezni.',
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'LED szín beállítása',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: 'Beépített LED szín beállítása',
+	CYBERBRICK_LED_RED: 'Piros',
+	CYBERBRICK_LED_GREEN: 'Zöld',
+	CYBERBRICK_LED_BLUE: 'Kék',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'A beépített LED (GPIO8) színének beállítása RGB értékekkel (0-255)',
+	CYBERBRICK_LED_OFF: 'LED kikapcsolása',
+	CYBERBRICK_LED_OFF_TOOLTIP: 'A beépített LED kikapcsolása',
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: 'GPIO beállítása',
+	CYBERBRICK_GPIO_SET_PREFIX: 'GPIO',
+	CYBERBRICK_GPIO_SET_TO: 'értéke',
+	CYBERBRICK_GPIO_PIN: 'Pin',
+	CYBERBRICK_GPIO_VALUE: 'Érték',
+	CYBERBRICK_GPIO_HIGH: 'MAGAS',
+	CYBERBRICK_GPIO_LOW: 'ALACSONY',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'GPIO pin beállítása MAGAS vagy ALACSONY értékre',
+	CYBERBRICK_GPIO_READ: 'GPIO olvasása',
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'Digitális érték olvasása GPIO pinről (0 vagy 1 értéket ad vissza)',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: 'Várakozás (ms)',
+	CYBERBRICK_DELAY_MS_PREFIX: 'Várakozás',
+	CYBERBRICK_DELAY_MS_SUFFIX: 'ms',
+	CYBERBRICK_DELAY_MS_TOOLTIP: 'Program végrehajtásának szüneteltetése a megadott ezredmásodpercig',
+	CYBERBRICK_DELAY_S: 'Várakozás (mp)',
+	CYBERBRICK_DELAY_S_PREFIX: 'Várakozás',
+	CYBERBRICK_DELAY_S_SUFFIX: 'másodperc',
+	CYBERBRICK_DELAY_S_TOOLTIP: 'Program végrehajtásának szüneteltetése a megadott másodpercig',
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'WiFi csatlakozás',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: 'Jelszó',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: 'Csatlakozás a megadott WiFi hálózathoz',
+	CYBERBRICK_WIFI_DISCONNECT: 'WiFi leválasztás',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: 'Leválasztás a jelenlegi WiFi hálózatról',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi csatlakozva?',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'Ellenőrizze, hogy csatlakozik-e a WiFi-hez',
+	CYBERBRICK_WIFI_GET_IP: 'IP cím lekérése',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: 'Aktuális IP cím lekérése',
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: 'Feltöltés CyberBrick-re',
+	UPLOAD_BUTTON_DISABLED_TITLE: 'Először mentse el a munkaterületet a feltöltés engedélyezéséhez',
+	UPLOAD_STARTING: 'Feltöltés indítása...',
+	UPLOAD_SUCCESS: 'Feltöltés sikeres!',
+	UPLOAD_FAILED: 'Feltöltés sikertelen: {0}',
+	UPLOAD_NO_PORT: 'CyberBrick eszköz nem található',
+	UPLOAD_IN_PROGRESS: 'Feltöltés folyamatban...',
+	UPLOAD_EMPTY_WORKSPACE: 'A munkaterület üres, először adjon hozzá blokkokat',
+	UPLOAD_NO_CODE: 'Nem sikerült kódot generálni',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: 'Előkészítés',
+	UPLOAD_STAGE_CHECKING: 'Eszközök ellenőrzése',
+	UPLOAD_STAGE_INSTALLING: 'Eszközök telepítése',
+	UPLOAD_STAGE_CONNECTING: 'Eszköz csatlakoztatása',
+	UPLOAD_STAGE_RESETTING: 'Eszköz visszaállítása',
+	UPLOAD_STAGE_BACKUP: 'Biztonsági mentés',
+	UPLOAD_STAGE_UPLOADING: 'Feltöltés',
+	UPLOAD_STAGE_RESTARTING: 'Eszköz újraindítása',
+	UPLOAD_STAGE_COMPLETED: 'Befejezve',
 });

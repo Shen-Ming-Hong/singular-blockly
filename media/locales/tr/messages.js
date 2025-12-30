@@ -624,4 +624,89 @@ window.languageManager.loadMessages('tr', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Yedek kaydedildi: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Çalışma alanı boş, yedekleme gerekli değil',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Lütfen bekleyin, yedekleme az önce tamamlandı',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: 'Kart türünü değiştir',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		'Farklı bir kart türüne geçiş mevcut çalışma alanını temizleyecektir.\nÇalışmanız önce otomatik olarak yedeklenecektir.\n\nDevam etmek istiyor musunuz?',
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: 'Zaman',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: 'Ana program',
+	CYBERBRICK_MAIN_TOOLTIP: 'CyberBrick ana program giriş noktası. Tüm kod bu bloğun içine yerleştirilmelidir.',
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'LED rengini ayarla',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: 'Dahili LED rengini ayarla',
+	CYBERBRICK_LED_RED: 'Kırmızı',
+	CYBERBRICK_LED_GREEN: 'Yeşil',
+	CYBERBRICK_LED_BLUE: 'Mavi',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Dahili LED (GPIO8) rengini RGB değerleri (0-255) kullanarak ayarla',
+	CYBERBRICK_LED_OFF: "LED'i kapat",
+	CYBERBRICK_LED_OFF_TOOLTIP: "Dahili LED'i kapat",
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: "GPIO'yu ayarla",
+	CYBERBRICK_GPIO_SET_PREFIX: 'GPIO',
+	CYBERBRICK_GPIO_SET_TO: 'olarak',
+	CYBERBRICK_GPIO_PIN: 'Pin',
+	CYBERBRICK_GPIO_VALUE: 'Değer',
+	CYBERBRICK_GPIO_HIGH: 'YÜKSEK',
+	CYBERBRICK_GPIO_LOW: 'DÜŞÜK',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'GPIO pinini YÜKSEK veya DÜŞÜK olarak ayarla',
+	CYBERBRICK_GPIO_READ: "GPIO'yu oku",
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'GPIO pininden dijital değer oku (0 veya 1 döndürür)',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: 'Gecikme (ms)',
+	CYBERBRICK_DELAY_MS_PREFIX: 'Gecikme',
+	CYBERBRICK_DELAY_MS_SUFFIX: 'ms',
+	CYBERBRICK_DELAY_MS_TOOLTIP: 'Program yürütmesini belirtilen milisaniye kadar duraklat',
+	CYBERBRICK_DELAY_S: 'Gecikme (s)',
+	CYBERBRICK_DELAY_S_PREFIX: 'Gecikme',
+	CYBERBRICK_DELAY_S_SUFFIX: 'saniye',
+	CYBERBRICK_DELAY_S_TOOLTIP: 'Program yürütmesini belirtilen saniye kadar duraklat',
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'WiFi bağlan',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: 'Şifre',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: 'Belirtilen WiFi ağına bağlan',
+	CYBERBRICK_WIFI_DISCONNECT: 'WiFi bağlantısını kes',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: 'Mevcut WiFi ağından bağlantıyı kes',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi bağlı mı?',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'WiFi bağlı olup olmadığını kontrol et',
+	CYBERBRICK_WIFI_GET_IP: 'IP adresini al',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: 'Mevcut IP adresini al',
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: "CyberBrick'e yükle",
+	UPLOAD_BUTTON_DISABLED_TITLE: 'Yüklemeyi etkinleştirmek için önce çalışma alanını kaydedin',
+	UPLOAD_STARTING: 'Yükleme başlatılıyor...',
+	UPLOAD_SUCCESS: 'Yükleme başarılı!',
+	UPLOAD_FAILED: 'Yükleme başarısız: {0}',
+	UPLOAD_NO_PORT: 'CyberBrick cihazı bulunamadı',
+	UPLOAD_IN_PROGRESS: 'Yükleniyor...',
+	UPLOAD_EMPTY_WORKSPACE: 'Çalışma alanı boş, önce blok ekleyin',
+	UPLOAD_NO_CODE: 'Kod oluşturulamıyor',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: 'Hazırlanıyor',
+	UPLOAD_STAGE_CHECKING: 'Araçlar kontrol ediliyor',
+	UPLOAD_STAGE_INSTALLING: 'Araçlar yükleniyor',
+	UPLOAD_STAGE_CONNECTING: 'Cihaza bağlanılıyor',
+	UPLOAD_STAGE_RESETTING: 'Cihaz sıfırlanıyor',
+	UPLOAD_STAGE_BACKUP: 'Yedekleniyor',
+	UPLOAD_STAGE_UPLOADING: 'Yükleniyor',
+	UPLOAD_STAGE_RESTARTING: 'Cihaz yeniden başlatılıyor',
+	UPLOAD_STAGE_COMPLETED: 'Tamamlandı',
 });

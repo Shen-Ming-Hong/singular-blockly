@@ -7,12 +7,12 @@
 /**
  * 開發板配置鍵值 - 對應 BOARD_CONFIGS 物件的 key
  */
-export type BoardConfigKey = 'uno' | 'nano' | 'mega' | 'esp32' | 'supermini';
+export type BoardConfigKey = 'uno' | 'nano' | 'mega' | 'esp32' | 'supermini' | 'cyberbrick';
 
 /**
  * 開發板類型 - 備份檔案中儲存的格式
  */
-export type BoardType = 'arduino_uno' | 'arduino_nano' | 'arduino_mega' | 'esp32' | 'esp32_super_mini';
+export type BoardType = 'arduino_uno' | 'arduino_nano' | 'arduino_mega' | 'esp32' | 'esp32_super_mini' | 'cyberbrick';
 
 /**
  * 設定開發板訊息

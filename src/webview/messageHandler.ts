@@ -10,6 +10,7 @@ import { log, handleWebViewLog } from '../services/logging';
 import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
+import { MicropythonUploader, UploadProgress, UploadResult, ComPortInfo } from '../services/micropythonUploader';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -136,6 +137,16 @@ export class WebViewMessageHandler {
 				case 'requestWorkspaceReload':
 					await this.handleRequestWorkspaceReload();
 					break;
+				// CyberBrick MicroPython 上傳功能
+				case 'requestUpload':
+					await this.handleRequestUpload(message);
+					break;
+				case 'requestPortList':
+					await this.handleRequestPortList(message);
+					break;
+				case 'deletePlatformioIni':
+					await this.handleDeletePlatformioIni();
+					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
 					break;
@@ -171,13 +182,25 @@ export class WebViewMessageHandler {
 					}
 				});
 				return;
-			} // 確保 src 目錄存在
+			}
+
+			// 確保 src 目錄存在
 			await this.fileService.createDirectory('src');
 
-			// 寫入程式碼
-			await this.fileService.writeFile('src/main.cpp', message.code);
+			// 根據語言類型決定檔案名稱
+			const isMicroPython = message.language === 'micropython';
+			const fileName = isMicroPython ? 'src/rc_main.py' : 'src/main.cpp';
 
-			// 處理函式庫依賴
+			// 寫入程式碼
+			await this.fileService.writeFile(fileName, message.code);
+			log(`[blockly] 已寫入程式碼到 ${fileName}`, 'info');
+
+			// MicroPython 模式不需要處理 PlatformIO 設定
+			if (isMicroPython) {
+				return;
+			}
+
+			// Arduino 模式：處理函式庫依賴
 			// 使用新的 syncLibraryDeps 方法同步函式庫依賴
 			const libDeps = message.lib_deps && Array.isArray(message.lib_deps) ? message.lib_deps : [];
 			const buildFlags = message.build_flags && Array.isArray(message.build_flags) ? message.build_flags : [];
@@ -222,9 +245,14 @@ export class WebViewMessageHandler {
 			const platformioIni = 'platformio.ini';
 			const boardConfig = await this.getBoardConfig(message.board);
 
-			if (message.board === 'none') {
+			// CyberBrick 和 none 都不需要 platformio.ini
+			const isMicroPythonBoard = message.board === 'cyberbrick';
+
+			if (message.board === 'none' || isMicroPythonBoard) {
+				// 刪除 platformio.ini（如果存在）
 				if (this.fileService.fileExists(platformioIni)) {
 					await this.fileService.deleteFile(platformioIni);
+					log(`[blockly] 已刪除 platformio.ini (board: ${message.board})`, 'info');
 				}
 			} else {
 				// 檢查是否收到了額外的 platformio.ini 設定
@@ -405,11 +433,19 @@ export class WebViewMessageHandler {
 
 					// 驗證資料結構
 					if (saveData && typeof saveData === 'object' && saveData.workspace) {
+						// 🔹 在發送 loadWorkspace 之前，先檢查是否為 MicroPython 專案
+						// 如果是，提前刪除 platformio.ini 避免 PlatformIO 擴充功能鎖定檔案
+						const board = saveData.board || 'none';
+						if (board === 'cyberbrick') {
+							log('[blockly] 偵測到 CyberBrick 專案，提前刪除 platformio.ini', 'info');
+							await this.deletePlatformioIniIfExists();
+						}
+
 						// 將主題信息一併傳送
 						this.panel.webview.postMessage({
 							command: 'loadWorkspace',
 							state: saveData.workspace,
-							board: saveData.board || 'none',
+							board: board,
 							theme: saveData.theme || 'light', // 附加主題設定
 						});
 					} else {
@@ -435,6 +471,23 @@ export class WebViewMessageHandler {
 			}
 		} catch (error) {
 			log('Failed to read workspace state:', 'error', error);
+		}
+	}
+
+	/**
+	 * 刪除 platformio.ini（如果存在）
+	 * 用於 MicroPython 專案避免與 PlatformIO 衝突
+	 */
+	private async deletePlatformioIniIfExists(): Promise<void> {
+		try {
+			if (this.fileService.fileExists('platformio.ini')) {
+				await this.fileService.deleteFile('platformio.ini');
+				log('[blockly] 已刪除 platformio.ini', 'info');
+			} else {
+				log('[blockly] platformio.ini 不存在，跳過刪除', 'debug');
+			}
+		} catch (error) {
+			log('[blockly] 刪除 platformio.ini 失敗', 'error', error);
 		}
 	}
 
@@ -513,6 +566,7 @@ export class WebViewMessageHandler {
 				confirmed: result === 'OK',
 				originalMessage: message.message,
 				confirmId: message.confirmId, // 回傳原始的 confirmId
+				purpose: message.purpose, // 回傳用途標記
 			});
 		} catch (error) {
 			log('Error handling confirmDialog:', 'error', error);
@@ -967,5 +1021,129 @@ export class WebViewMessageHandler {
 			log('Failed to reload workspace:', 'error', error);
 			this.showErrorMessage(`重載工作區失敗: ${error}`);
 		}
+	}
+
+	// ===== CyberBrick MicroPython 上傳功能 - T028/T029/T031 =====
+
+	/**
+	 * 處理上傳請求
+	 * @param message 上傳請求訊息
+	 */
+	private async handleRequestUpload(message: { code: string; board: string; port?: string }): Promise<void> {
+		log('[blockly] 收到上傳請求', 'info', { board: message.board, hasPort: !!message.port });
+
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			this.sendUploadResult({
+				success: false,
+				timestamp: new Date().toISOString(),
+				port: message.port || 'unknown',
+				duration: 0,
+				error: {
+					stage: 'preparing',
+					message: '沒有開啟的工作區',
+				},
+			});
+			return;
+		}
+
+		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+		const uploader = new MicropythonUploader(workspaceRoot);
+
+		try {
+			const result = await uploader.upload(
+				{
+					code: message.code,
+					board: message.board,
+					port: message.port,
+				},
+				(progress: UploadProgress) => {
+					this.sendUploadProgress(progress);
+				}
+			);
+
+			this.sendUploadResult(result);
+		} catch (error) {
+			log('[blockly] 上傳過程發生未預期錯誤', 'error', error);
+			this.sendUploadResult({
+				success: false,
+				timestamp: new Date().toISOString(),
+				port: message.port || 'unknown',
+				duration: 0,
+				error: {
+					stage: 'failed',
+					message: error instanceof Error ? error.message : String(error),
+				},
+			});
+		}
+	}
+
+	/**
+	 * 發送上傳進度到 WebView
+	 * @param progress 上傳進度
+	 */
+	private sendUploadProgress(progress: UploadProgress): void {
+		this.panel.webview.postMessage({
+			command: 'uploadProgress',
+			...progress,
+		});
+	}
+
+	/**
+	 * 發送上傳結果到 WebView
+	 * @param result 上傳結果
+	 */
+	private sendUploadResult(result: UploadResult): void {
+		this.panel.webview.postMessage({
+			command: 'uploadResult',
+			...result,
+		});
+	}
+
+	/**
+	 * 處理連接埠清單請求
+	 * @param message 請求訊息
+	 */
+	private async handleRequestPortList(message: { filter?: 'all' | 'cyberbrick' }): Promise<void> {
+		log('[blockly] 收到連接埠清單請求', 'info', { filter: message.filter });
+
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			this.panel.webview.postMessage({
+				command: 'portListResponse',
+				ports: [],
+				error: '沒有開啟的工作區',
+			});
+			return;
+		}
+
+		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+		const uploader = new MicropythonUploader(workspaceRoot);
+
+		try {
+			const { ports, autoDetected } = await uploader.listPorts(message.filter);
+
+			this.panel.webview.postMessage({
+				command: 'portListResponse',
+				ports,
+				autoDetected,
+			});
+		} catch (error) {
+			log('[blockly] 取得連接埠清單失敗', 'error', error);
+			this.panel.webview.postMessage({
+				command: 'portListResponse',
+				ports: [],
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
+	}
+
+	/**
+	 * 處理刪除 platformio.ini 請求
+	 * 當切換到 CyberBrick 時觸發
+	 */
+	private async handleDeletePlatformioIni(): Promise<void> {
+		log('[blockly] 收到刪除 platformio.ini 請求', 'info');
+		await this.deletePlatformioIniIfExists();
 	}
 }

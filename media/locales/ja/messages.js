@@ -621,4 +621,89 @@ window.languageManager.loadMessages('ja', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'バックアップ保存完了：{0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'ワークスペースが空です、バックアップ不要',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'しばらくお待ちください、バックアップが完了したばかりです',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: 'ボードタイプを切替',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		'異なるボードタイプに切り替えると、現在のワークスペースがクリアされます。\n作業内容は自動的にバックアップされます。\n\n続行しますか？',
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: '時間',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: 'メインプログラム',
+	CYBERBRICK_MAIN_TOOLTIP: 'CyberBrickメインプログラムのエントリーポイント。すべてのコードはこのブロック内に配置してください。',
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'LED色を設定',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: 'オンボードLEDの色を設定',
+	CYBERBRICK_LED_RED: '赤',
+	CYBERBRICK_LED_GREEN: '緑',
+	CYBERBRICK_LED_BLUE: '青',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'オンボードLED（GPIO8）の色をRGB値（0-255）で設定',
+	CYBERBRICK_LED_OFF: 'LEDをオフ',
+	CYBERBRICK_LED_OFF_TOOLTIP: 'オンボードLEDをオフにする',
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: 'GPIO設定',
+	CYBERBRICK_GPIO_SET_PREFIX: 'GPIO',
+	CYBERBRICK_GPIO_SET_TO: 'を',
+	CYBERBRICK_GPIO_PIN: 'ピン',
+	CYBERBRICK_GPIO_VALUE: '値',
+	CYBERBRICK_GPIO_HIGH: 'HIGH',
+	CYBERBRICK_GPIO_LOW: 'LOW',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'GPIOピンをHIGHまたはLOWに設定',
+	CYBERBRICK_GPIO_READ: 'GPIO読取',
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'GPIOピンからデジタル値を読み取る（0または1を返す）',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: '遅延（ミリ秒）',
+	CYBERBRICK_DELAY_MS_PREFIX: '遅延',
+	CYBERBRICK_DELAY_MS_SUFFIX: 'ミリ秒',
+	CYBERBRICK_DELAY_MS_TOOLTIP: '指定したミリ秒間プログラムの実行を一時停止',
+	CYBERBRICK_DELAY_S: '遅延（秒）',
+	CYBERBRICK_DELAY_S_PREFIX: '遅延',
+	CYBERBRICK_DELAY_S_SUFFIX: '秒',
+	CYBERBRICK_DELAY_S_TOOLTIP: '指定した秒数プログラムの実行を一時停止',
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'WiFi接続',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: 'パスワード',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: '指定したWiFiネットワークに接続',
+	CYBERBRICK_WIFI_DISCONNECT: 'WiFi切断',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: '現在のWiFiネットワークから切断',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi接続中？',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'WiFiが接続されているか確認',
+	CYBERBRICK_WIFI_GET_IP: 'IPアドレス取得',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: '現在のIPアドレスを取得',
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: 'CyberBrickにアップロード',
+	UPLOAD_BUTTON_DISABLED_TITLE: 'アップロードを有効にするには、まずワークスペースを保存してください',
+	UPLOAD_STARTING: 'アップロード開始中...',
+	UPLOAD_SUCCESS: 'アップロード成功！',
+	UPLOAD_FAILED: 'アップロード失敗：{0}',
+	UPLOAD_NO_PORT: 'CyberBrickデバイスが見つかりません',
+	UPLOAD_IN_PROGRESS: 'アップロード中...',
+	UPLOAD_EMPTY_WORKSPACE: 'ワークスペースが空です、まずブロックを追加してください',
+	UPLOAD_NO_CODE: 'コードを生成できません',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: '準備中',
+	UPLOAD_STAGE_CHECKING: 'ツール確認中',
+	UPLOAD_STAGE_INSTALLING: 'ツールインストール中',
+	UPLOAD_STAGE_CONNECTING: 'デバイス接続中',
+	UPLOAD_STAGE_RESETTING: 'デバイスリセット中',
+	UPLOAD_STAGE_BACKUP: 'バックアップ中',
+	UPLOAD_STAGE_UPLOADING: 'アップロード中',
+	UPLOAD_STAGE_RESTARTING: 'デバイス再起動中',
+	UPLOAD_STAGE_COMPLETED: '完了',
 });
