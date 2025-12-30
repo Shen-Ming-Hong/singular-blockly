@@ -8,6 +8,29 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.49.0] - 2025-12-30
+
+### 新增功能 Features
+
+-   **CyberBrick MicroPython 支援** (CyberBrick MicroPython Support) 🎉
+
+    -   新增 CyberBrick 主板支援（ESP32-C3 架構），可進行 MicroPython 視覺化程式設計
+        Added CyberBrick board support (ESP32-C3 architecture) for MicroPython visual programming
+    -   實作完整的 MicroPython 程式碼生成器：邏輯、迴圈、數學、文字、列表、變數、函數積木
+        Implemented complete MicroPython code generators: logic, loops, math, text, lists, variables, functions blocks
+    -   新增 CyberBrick 專用積木：主程式、LED（RGB）、GPIO（讀寫）、時序（毫秒/秒延遲）、WiFi（連線/斷線/狀態/IP）
+        Added CyberBrick-specific blocks: main, LED (RGB), GPIO (read/write), time (ms/s delay), WiFi (connect/disconnect/status/IP)
+    -   主板切換時自動備份工作區並切換工具箱（Arduino ↔ MicroPython）
+        Auto-backup workspace and switch toolbox when switching boards (Arduino ↔ MicroPython)
+    -   實作 MicropythonUploader 服務支援一鍵上傳（使用 mpremote）
+        Implemented MicropythonUploader service for one-click upload (using mpremote)
+    -   選擇 CyberBrick 時自動刪除 platformio.ini 避免與 PlatformIO 衝突
+        Auto-delete platformio.ini when CyberBrick selected to avoid PlatformIO conflicts
+    -   支援 15 種語言的 i18n 翻譯（新增 64 個翻譯鍵/語言）
+        Supports i18n translations for 15 languages (64 new translation keys per language)
+    -   Preview 面板支援 CyberBrick 主板
+        Preview panel supports CyberBrick board
+
 ## [0.48.3] - 2025-12-28
 
 ### 修復 Bug Fixes
