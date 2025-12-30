@@ -1,0 +1,103 @@
+{
+    "kind": "category",
+    "name": "%{CATEGORY_CYBERBRICK_CORE}",
+    "categorystyle": "procedure_category",
+    "contents": [
+        {
+            "kind": "block",
+            "type": "micropython_main"
+        },
+        {
+            "kind": "label",
+            "text": "%{CATEGORY_CYBERBRICK_LED}"
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_led_set_color",
+            "inputs": {
+                "RED": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 255
+                        }
+                    }
+                },
+                "GREEN": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 0
+                        }
+                    }
+                },
+                "BLUE": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 0
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_led_off"
+        },
+        {
+            "kind": "label",
+            "text": "%{CATEGORY_CYBERBRICK_GPIO}"
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_gpio_set",
+            "inputs": {
+                "VALUE": {
+                    "shadow": {
+                        "type": "logic_boolean",
+                        "fields": {
+                            "BOOL": "TRUE"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_gpio_read"
+        },
+        {
+            "kind": "label",
+            "text": "%{CATEGORY_CYBERBRICK_TIME}"
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_delay_ms",
+            "inputs": {
+                "TIME": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1000
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_delay_s",
+            "inputs": {
+                "TIME": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

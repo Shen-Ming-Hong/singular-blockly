@@ -1,0 +1,41 @@
+{
+    "kind": "categoryToolbox",
+    "contents": [
+        {
+            "$include": "./categories/cyberbrick_core.json"
+        },
+        {
+            "$include": "./categories/cyberbrick_wifi.json"
+        },
+        {
+            "$include": "./categories/logic.json"
+        },
+        {
+            "$include": "./categories/loops.json"
+        },
+        {
+            "$include": "./categories/math.json"
+        },
+        {
+            "$include": "./categories/text.json"
+        },
+        {
+            "$include": "./categories/lists.json"
+        },
+        {
+            "kind": "sep"
+        },
+        {
+            "kind": "category",
+            "name": "%{CATEGORY_VARIABLES}",
+            "categorystyle": "variable_category",
+            "custom": "VARIABLE"
+        },
+        {
+            "kind": "category",
+            "name": "%{CATEGORY_FUNCTIONS}",
+            "categorystyle": "procedure_category",
+            "custom": "FUNCTION"
+        }
+    ]
+}

@@ -626,4 +626,89 @@ window.languageManager.loadMessages('bg', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Резервното копие е запазено: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Работното пространство е празно, не е необходимо архивиране',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Моля, изчакайте, архивирането току-що приключи',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: 'Превключване на тип платка',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		'Превключването към друг тип платка ще изчисти текущото работно пространство.\nВашата работа ще бъде автоматично архивирана първо.\n\nИскате ли да продължите?',
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: 'Време',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: 'Главна програма',
+	CYBERBRICK_MAIN_TOOLTIP: 'Входна точка на главната програма на CyberBrick. Всички кодове трябва да бъдат поставени вътре в този блок.',
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'Задаване на цвят на LED',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: 'Задаване на цвят на вграден LED',
+	CYBERBRICK_LED_RED: 'Червено',
+	CYBERBRICK_LED_GREEN: 'Зелено',
+	CYBERBRICK_LED_BLUE: 'Синьо',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Задаване на цвят на вградения LED (GPIO8) с RGB стойности (0-255)',
+	CYBERBRICK_LED_OFF: 'Изключване на LED',
+	CYBERBRICK_LED_OFF_TOOLTIP: 'Изключване на вградения LED',
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: 'Задаване на GPIO',
+	CYBERBRICK_GPIO_SET_PREFIX: 'GPIO',
+	CYBERBRICK_GPIO_SET_TO: 'на',
+	CYBERBRICK_GPIO_PIN: 'Пин',
+	CYBERBRICK_GPIO_VALUE: 'Стойност',
+	CYBERBRICK_GPIO_HIGH: 'ВИСОКО',
+	CYBERBRICK_GPIO_LOW: 'НИСКО',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'Задаване на GPIO пин на ВИСОКО или НИСКО',
+	CYBERBRICK_GPIO_READ: 'Четене на GPIO',
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'Четене на цифрова стойност от GPIO пин (връща 0 или 1)',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: 'Забавяне (мс)',
+	CYBERBRICK_DELAY_MS_PREFIX: 'Забавяне',
+	CYBERBRICK_DELAY_MS_SUFFIX: 'мс',
+	CYBERBRICK_DELAY_MS_TOOLTIP: 'Пауза на изпълнението на програмата за зададения брой милисекунди',
+	CYBERBRICK_DELAY_S: 'Забавяне (сек)',
+	CYBERBRICK_DELAY_S_PREFIX: 'Забавяне',
+	CYBERBRICK_DELAY_S_SUFFIX: 'секунди',
+	CYBERBRICK_DELAY_S_TOOLTIP: 'Пауза на изпълнението на програмата за зададения брой секунди',
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'Свързване с WiFi',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: 'Парола',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: 'Свързване към зададената WiFi мрежа',
+	CYBERBRICK_WIFI_DISCONNECT: 'Изключване от WiFi',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: 'Изключване от текущата WiFi мрежа',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi свързан?',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'Проверка дали WiFi е свързан',
+	CYBERBRICK_WIFI_GET_IP: 'Вземи IP адрес',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: 'Вземи текущия IP адрес',
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: 'Качване в CyberBrick',
+	UPLOAD_BUTTON_DISABLED_TITLE: 'Първо запазете работното пространство, за да активирате качването',
+	UPLOAD_STARTING: 'Стартиране на качването...',
+	UPLOAD_SUCCESS: 'Качването е успешно!',
+	UPLOAD_FAILED: 'Качването е неуспешно: {0}',
+	UPLOAD_NO_PORT: 'CyberBrick устройството не е намерено',
+	UPLOAD_IN_PROGRESS: 'Качване...',
+	UPLOAD_EMPTY_WORKSPACE: 'Работното пространство е празно, първо добавете блокове',
+	UPLOAD_NO_CODE: 'Не може да се генерира код',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: 'Подготовка',
+	UPLOAD_STAGE_CHECKING: 'Проверка на инструменти',
+	UPLOAD_STAGE_INSTALLING: 'Инсталиране на инструменти',
+	UPLOAD_STAGE_CONNECTING: 'Свързване на устройство',
+	UPLOAD_STAGE_RESETTING: 'Рестартиране на устройство',
+	UPLOAD_STAGE_BACKUP: 'Архивиране',
+	UPLOAD_STAGE_UPLOADING: 'Качване',
+	UPLOAD_STAGE_RESTARTING: 'Рестартиране на устройство',
+	UPLOAD_STAGE_COMPLETED: 'Завършено',
 });

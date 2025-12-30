@@ -623,4 +623,89 @@ window.languageManager.loadMessages('cs', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Záloha uložena: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Pracovní prostor je prázdný, záloha není potřeba',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Prosím počkejte, záloha byla právě dokončena',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: 'Přepnout typ desky',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		'Přepnutí na jiný typ desky vymaže aktuální pracovní prostor.\nVaše práce bude nejprve automaticky zálohována.\n\nChcete pokračovat?',
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: 'Čas',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: 'Hlavní program',
+	CYBERBRICK_MAIN_TOOLTIP: 'Vstupní bod hlavního programu CyberBrick. Veškerý kód by měl být umístěn uvnitř tohoto bloku.',
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'Nastavit barvu LED',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: 'Nastavit barvu vestavěné LED',
+	CYBERBRICK_LED_RED: 'Červená',
+	CYBERBRICK_LED_GREEN: 'Zelená',
+	CYBERBRICK_LED_BLUE: 'Modrá',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Nastavit barvu vestavěné LED (GPIO8) pomocí hodnot RGB (0-255)',
+	CYBERBRICK_LED_OFF: 'Vypnout LED',
+	CYBERBRICK_LED_OFF_TOOLTIP: 'Vypnout vestavěnou LED',
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: 'Nastavit GPIO',
+	CYBERBRICK_GPIO_SET_PREFIX: 'GPIO',
+	CYBERBRICK_GPIO_SET_TO: 'na',
+	CYBERBRICK_GPIO_PIN: 'Pin',
+	CYBERBRICK_GPIO_VALUE: 'Hodnota',
+	CYBERBRICK_GPIO_HIGH: 'VYSOKÁ',
+	CYBERBRICK_GPIO_LOW: 'NÍZKÁ',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'Nastavit GPIO pin na VYSOKOU nebo NÍZKOU',
+	CYBERBRICK_GPIO_READ: 'Číst GPIO',
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'Číst digitální hodnotu z GPIO pinu (vrací 0 nebo 1)',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: 'Zpoždění (ms)',
+	CYBERBRICK_DELAY_MS_PREFIX: 'Zpoždění',
+	CYBERBRICK_DELAY_MS_SUFFIX: 'ms',
+	CYBERBRICK_DELAY_MS_TOOLTIP: 'Pozastavit provádění programu na zadaný počet milisekund',
+	CYBERBRICK_DELAY_S: 'Zpoždění (s)',
+	CYBERBRICK_DELAY_S_PREFIX: 'Zpoždění',
+	CYBERBRICK_DELAY_S_SUFFIX: 'sekund',
+	CYBERBRICK_DELAY_S_TOOLTIP: 'Pozastavit provádění programu na zadaný počet sekund',
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'Připojit WiFi',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: 'Heslo',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: 'Připojit k zadané WiFi síti',
+	CYBERBRICK_WIFI_DISCONNECT: 'Odpojit WiFi',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: 'Odpojit od aktuální WiFi sítě',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi připojeno?',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda je WiFi připojeno',
+	CYBERBRICK_WIFI_GET_IP: 'Získat IP adresu',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: 'Získat aktuální IP adresu',
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: 'Nahrát do CyberBrick',
+	UPLOAD_BUTTON_DISABLED_TITLE: 'Nejprve uložte pracovní prostor pro povolení nahrávání',
+	UPLOAD_STARTING: 'Zahajování nahrávání...',
+	UPLOAD_SUCCESS: 'Nahrávání úspěšné!',
+	UPLOAD_FAILED: 'Nahrávání selhalo: {0}',
+	UPLOAD_NO_PORT: 'Zařízení CyberBrick nebylo nalezeno',
+	UPLOAD_IN_PROGRESS: 'Nahrávání...',
+	UPLOAD_EMPTY_WORKSPACE: 'Pracovní prostor je prázdný, nejprve přidejte bloky',
+	UPLOAD_NO_CODE: 'Nelze vygenerovat kód',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: 'Příprava',
+	UPLOAD_STAGE_CHECKING: 'Kontrola nástrojů',
+	UPLOAD_STAGE_INSTALLING: 'Instalace nástrojů',
+	UPLOAD_STAGE_CONNECTING: 'Připojování zařízení',
+	UPLOAD_STAGE_RESETTING: 'Resetování zařízení',
+	UPLOAD_STAGE_BACKUP: 'Zálohování',
+	UPLOAD_STAGE_UPLOADING: 'Nahrávání',
+	UPLOAD_STAGE_RESTARTING: 'Restartování zařízení',
+	UPLOAD_STAGE_COMPLETED: 'Dokončeno',
 });

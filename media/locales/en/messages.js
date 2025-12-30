@@ -629,4 +629,89 @@ window.languageManager.loadMessages('en', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Backup saved: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Workspace is empty, no backup needed',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Please wait, backup just completed',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: 'Switch Board Type',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		'Switching to a different board type will clear the current workspace.\nYour work will be automatically backed up first.\n\nDo you want to continue?',
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: 'Time',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: 'Main Program',
+	CYBERBRICK_MAIN_TOOLTIP: 'CyberBrick main program entry point. All code should be placed inside this block.',
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'Set LED Color',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: 'Set onboard LED color',
+	CYBERBRICK_LED_RED: 'Red',
+	CYBERBRICK_LED_GREEN: 'Green',
+	CYBERBRICK_LED_BLUE: 'Blue',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Set the onboard LED (GPIO8) color using RGB values (0-255)',
+	CYBERBRICK_LED_OFF: 'Turn Off LED',
+	CYBERBRICK_LED_OFF_TOOLTIP: 'Turn off the onboard LED',
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: 'Set GPIO',
+	CYBERBRICK_GPIO_SET_PREFIX: 'Set GPIO',
+	CYBERBRICK_GPIO_SET_TO: 'to',
+	CYBERBRICK_GPIO_PIN: 'Pin',
+	CYBERBRICK_GPIO_VALUE: 'Value',
+	CYBERBRICK_GPIO_HIGH: 'HIGH',
+	CYBERBRICK_GPIO_LOW: 'LOW',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'Set GPIO pin to HIGH or LOW',
+	CYBERBRICK_GPIO_READ: 'Read GPIO',
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'Read digital value from GPIO pin (returns 0 or 1)',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: 'Delay (ms)',
+	CYBERBRICK_DELAY_MS_PREFIX: 'Delay',
+	CYBERBRICK_DELAY_MS_SUFFIX: 'ms',
+	CYBERBRICK_DELAY_MS_TOOLTIP: 'Pause program execution for specified milliseconds',
+	CYBERBRICK_DELAY_S: 'Delay (s)',
+	CYBERBRICK_DELAY_S_PREFIX: 'Delay',
+	CYBERBRICK_DELAY_S_SUFFIX: 'seconds',
+	CYBERBRICK_DELAY_S_TOOLTIP: 'Pause program execution for specified seconds',
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'Connect WiFi',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: 'Password',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: 'Connect to specified WiFi network',
+	CYBERBRICK_WIFI_DISCONNECT: 'Disconnect WiFi',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: 'Disconnect from current WiFi network',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi connected?',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'Check if WiFi is connected',
+	CYBERBRICK_WIFI_GET_IP: 'Get IP address',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: 'Get current IP address',
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: 'Upload to CyberBrick',
+	UPLOAD_BUTTON_DISABLED_TITLE: 'Save workspace first to enable upload',
+	UPLOAD_STARTING: 'Starting upload...',
+	UPLOAD_SUCCESS: 'Upload successful!',
+	UPLOAD_FAILED: 'Upload failed: {0}',
+	UPLOAD_NO_PORT: 'No CyberBrick device found',
+	UPLOAD_IN_PROGRESS: 'Uploading...',
+	UPLOAD_EMPTY_WORKSPACE: 'Workspace is empty, please add blocks first',
+	UPLOAD_NO_CODE: 'Unable to generate code',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: 'Preparing',
+	UPLOAD_STAGE_CHECKING: 'Checking tools',
+	UPLOAD_STAGE_INSTALLING: 'Installing tools',
+	UPLOAD_STAGE_CONNECTING: 'Connecting device',
+	UPLOAD_STAGE_RESETTING: 'Resetting device',
+	UPLOAD_STAGE_BACKUP: 'Backing up',
+	UPLOAD_STAGE_UPLOADING: 'Uploading',
+	UPLOAD_STAGE_RESTARTING: 'Restarting device',
+	UPLOAD_STAGE_COMPLETED: 'Completed',
 });

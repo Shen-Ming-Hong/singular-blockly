@@ -6,6 +6,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 import { log, showOutputChannel, disposeOutputChannel } from './services/logging';
 import { LocaleService } from './services/localeService';
 import { SettingsManager } from './services/settingsManager';
@@ -43,6 +44,41 @@ export async function activate(context: vscode.ExtensionContext) {
 	try {
 		// 初始化服務
 		const localeService = new LocaleService(context.extensionPath);
+
+		// 【最優先】檢查是否為 CyberBrick/MicroPython 專案，若是則刪除 platformio.ini
+		// 必須在 PlatformIO 擴充功能偵測到 ini 檔案之前執行
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (workspaceFolders) {
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
+
+			// 檢查 main.json 中的 board 設定
+			const mainJsonPath = path.join(workspaceRoot, 'blockly', 'main.json');
+			const platformioIniPath = path.join(workspaceRoot, 'platformio.ini');
+
+			try {
+				if (fs.existsSync(mainJsonPath)) {
+					const mainJsonContent = fs.readFileSync(mainJsonPath, 'utf-8');
+					const mainJson = JSON.parse(mainJsonContent);
+					const board = mainJson.board || 'none';
+
+					// 如果是 CyberBrick 專案，刪除 platformio.ini
+					if (board === 'cyberbrick') {
+						log('CyberBrick project detected at activation, checking platformio.ini', 'info');
+						if (fs.existsSync(platformioIniPath)) {
+							fs.unlinkSync(platformioIniPath);
+							log('Deleted platformio.ini for CyberBrick project at activation', 'info');
+						}
+					}
+				}
+			} catch (err) {
+				log('Error checking/deleting platformio.ini at activation', 'warn', err);
+			}
+
+			// 設定 PlatformIO 不自動開啟 ini 檔案
+			const settingsManager = new SettingsManager(workspaceRoot);
+			await settingsManager.configurePlatformIOSettings();
+			log('PlatformIO auto-open settings configured at activation', 'info');
+		}
 
 		// 清理過期的臨時工具箱檔案（非阻塞）
 		WebViewManager.cleanupStaleTempFiles(context.extensionPath).catch(err => {

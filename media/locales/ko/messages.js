@@ -620,4 +620,89 @@ window.languageManager.loadMessages('ko', {
 	BACKUP_QUICK_SAVE_SUCCESS: '백업 저장됨: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: '작업 공간이 비어 있습니다, 백업 불필요',
 	BACKUP_QUICK_SAVE_COOLDOWN: '잠시 기다려 주세요, 백업이 방금 완료되었습니다',
+
+	// Board Switch Warning
+	BOARD_SWITCH_WARNING_TITLE: '보드 유형 전환',
+	BOARD_SWITCH_WARNING_MESSAGE:
+		'다른 보드 유형으로 전환하면 현재 작업 공간이 지워집니다.\n작업이 자동으로 백업됩니다.\n\n계속하시겠습니까?',
+
+	// CyberBrick Board
+	BOARD_CYBERBRICK: 'CyberBrick',
+
+	// CyberBrick Category
+	CATEGORY_CYBERBRICK_CORE: 'CyberBrick',
+	CATEGORY_CYBERBRICK_LED: 'LED',
+	CATEGORY_CYBERBRICK_GPIO: 'GPIO',
+	CATEGORY_CYBERBRICK_TIME: '시간',
+
+	// CyberBrick Main Block
+	CYBERBRICK_MAIN: '메인 프로그램',
+	CYBERBRICK_MAIN_TOOLTIP: 'CyberBrick 메인 프로그램 진입점. 모든 코드는 이 블록 안에 배치해야 합니다.',
+
+	// CyberBrick LED Blocks
+	CYBERBRICK_LED_SET_COLOR: 'LED 색상 설정',
+	CYBERBRICK_LED_SET_COLOR_PREFIX: '온보드 LED 색상 설정',
+	CYBERBRICK_LED_RED: '빨강',
+	CYBERBRICK_LED_GREEN: '초록',
+	CYBERBRICK_LED_BLUE: '파랑',
+	CYBERBRICK_LED_SET_COLOR_TOOLTIP: '온보드 LED(GPIO8) 색상을 RGB 값(0-255)으로 설정',
+	CYBERBRICK_LED_OFF: 'LED 끄기',
+	CYBERBRICK_LED_OFF_TOOLTIP: '온보드 LED 끄기',
+
+	// CyberBrick GPIO Blocks
+	CYBERBRICK_GPIO_SET: 'GPIO 설정',
+	CYBERBRICK_GPIO_SET_PREFIX: 'GPIO',
+	CYBERBRICK_GPIO_SET_TO: '을(를)',
+	CYBERBRICK_GPIO_PIN: '핀',
+	CYBERBRICK_GPIO_VALUE: '값',
+	CYBERBRICK_GPIO_HIGH: 'HIGH',
+	CYBERBRICK_GPIO_LOW: 'LOW',
+	CYBERBRICK_GPIO_SET_TOOLTIP: 'GPIO 핀을 HIGH 또는 LOW로 설정',
+	CYBERBRICK_GPIO_READ: 'GPIO 읽기',
+	CYBERBRICK_GPIO_READ_TOOLTIP: 'GPIO 핀에서 디지털 값 읽기 (0 또는 1 반환)',
+
+	// CyberBrick Time Blocks
+	CYBERBRICK_DELAY_MS: '지연 (밀리초)',
+	CYBERBRICK_DELAY_MS_PREFIX: '지연',
+	CYBERBRICK_DELAY_MS_SUFFIX: '밀리초',
+	CYBERBRICK_DELAY_MS_TOOLTIP: '지정된 밀리초 동안 프로그램 실행 일시 중지',
+	CYBERBRICK_DELAY_S: '지연 (초)',
+	CYBERBRICK_DELAY_S_PREFIX: '지연',
+	CYBERBRICK_DELAY_S_SUFFIX: '초',
+	CYBERBRICK_DELAY_S_TOOLTIP: '지정된 초 동안 프로그램 실행 일시 중지',
+
+	// CyberBrick WiFi Blocks
+	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
+	CYBERBRICK_WIFI_CONNECT: 'WiFi 연결',
+	CYBERBRICK_WIFI_SSID: 'SSID',
+	CYBERBRICK_WIFI_PASSWORD: '비밀번호',
+	CYBERBRICK_WIFI_CONNECT_TOOLTIP: '지정된 WiFi 네트워크에 연결',
+	CYBERBRICK_WIFI_DISCONNECT: 'WiFi 연결 해제',
+	CYBERBRICK_WIFI_DISCONNECT_TOOLTIP: '현재 WiFi 네트워크에서 연결 해제',
+	CYBERBRICK_WIFI_IS_CONNECTED: 'WiFi 연결됨?',
+	CYBERBRICK_WIFI_IS_CONNECTED_TOOLTIP: 'WiFi 연결 여부 확인',
+	CYBERBRICK_WIFI_GET_IP: 'IP 주소 가져오기',
+	CYBERBRICK_WIFI_GET_IP_TOOLTIP: '현재 IP 주소 가져오기',
+
+	// CyberBrick Upload
+	UPLOAD_BUTTON_TITLE: 'CyberBrick에 업로드',
+	UPLOAD_BUTTON_DISABLED_TITLE: '업로드를 활성화하려면 먼저 작업 공간을 저장하세요',
+	UPLOAD_STARTING: '업로드 시작 중...',
+	UPLOAD_SUCCESS: '업로드 성공!',
+	UPLOAD_FAILED: '업로드 실패: {0}',
+	UPLOAD_NO_PORT: 'CyberBrick 장치를 찾을 수 없음',
+	UPLOAD_IN_PROGRESS: '업로드 중...',
+	UPLOAD_EMPTY_WORKSPACE: '작업 공간이 비어 있습니다. 먼저 블록을 추가하세요',
+	UPLOAD_NO_CODE: '코드를 생성할 수 없음',
+
+	// Upload progress stages
+	UPLOAD_STAGE_PREPARING: '준비 중',
+	UPLOAD_STAGE_CHECKING: '도구 확인 중',
+	UPLOAD_STAGE_INSTALLING: '도구 설치 중',
+	UPLOAD_STAGE_CONNECTING: '장치 연결 중',
+	UPLOAD_STAGE_RESETTING: '장치 재설정 중',
+	UPLOAD_STAGE_BACKUP: '백업 중',
+	UPLOAD_STAGE_UPLOADING: '업로드 중',
+	UPLOAD_STAGE_RESTARTING: '장치 재시작 중',
+	UPLOAD_STAGE_COMPLETED: '완료',
 });
