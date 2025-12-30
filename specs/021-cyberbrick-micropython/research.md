@@ -472,30 +472,29 @@ function setUploadingState(isUploading) {
 }
 ```
 
-### 9.3 Toast 通知元件
+### 9.3 Toast 通知元件（重用現有實作）
 
-**來源**: 現有 Ctrl+S 快速備份功能使用的通知系統
+**來源**: 現有 Ctrl+S 快速備份功能使用的通知系統（`blocklyEdit.js` L100-160）
 
-**Decision**: 上傳成功/失敗使用相同的 Toast 通知樣式
+**Decision**: 上傳成功/失敗**直接重用現有 `toast` 物件**，不需新增實作
+
+**現有實作位置**: `media/js/blocklyEdit.js`
 
 ```javascript
-// 顯示 Toast 通知
-function showToast(message, type = 'info') {
-	const toast = document.createElement('div');
-	toast.className = `toast toast-${type}`;
-	toast.textContent = message;
-	document.body.appendChild(toast);
+// 現有 toast 物件 API（直接使用，不需新增）
+const toast = {
+	show: function(message, type = 'success', duration = 2500) { ... },
+	hide: function() { ... }
+};
 
-	setTimeout(() => {
-		toast.classList.add('fade-out');
-		setTimeout(() => toast.remove(), 300);
-	}, 3000);
-}
-
-// 使用範例
-showToast('上傳成功！', 'success');
-showToast('上傳失敗：連接埠無回應', 'error');
+// 使用範例（直接呼叫現有函數）
+toast.show('上傳成功！', 'success');
+toast.show('上傳失敗：連接埠無回應', 'error');
+toast.show('正在連接 CyberBrick...', 'info');  // 若需要 info 類型，需驗證現有 CSS 支援
 ```
+
+**⚠️ 注意**: 現有 CSS 樣式支援 `success`、`warning`、`error` 三種類型。
+若需 `info` 類型，需在 `blocklyEdit.css` 補充對應樣式（可複製 warning 樣式修改顏色）。
 
 ---
 

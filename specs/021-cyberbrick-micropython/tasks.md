@@ -20,7 +20,7 @@
 
 -   [ ] T001 建立 MicroPython 生成器目錄結構 in `media/blockly/generators/micropython/`
 -   [ ] T002 [P] 建立 CyberBrick 工具箱檔案 in `media/toolbox/cyberbrick.json`
--   [ ] T003 [P] 新增 MicroPython 上傳相關類型定義（含 UploadButtonState、ToastNotification）in `src/types/micropython.ts`
+-   [ ] T003 [P] 新增 MicroPython 上傳相關類型定義（UploadButtonState、UploadProgress、UploadResult）in `src/types/micropython.ts`
 -   [ ] T004 [P] 擴展 Board 類型定義支援 language 屬性 in `src/types/board.ts`
 
 ---
@@ -82,7 +82,7 @@
 -   [ ] T015c [US1] 實作 Arduino 積木隱藏、MicroPython 積木顯示的過濾邏輯 in `media/js/blocklyEdit.js`
 -   [ ] T015d [US1] 新增上傳按鈕 UI（與現有控制區按鈕樣式一致），僅在 CyberBrick 時顯示 in `media/html/blocklyEdit.html` 和 `media/css/blocklyEdit.css`
 -   [ ] T015e [US1] 實作上傳按鈕狀態管理（UploadButtonState: visible/disabled/spinning）in `media/js/blocklyEdit.js`
--   [ ] T015f [P] [US1] 實作 Toast 通知元件（重用/擴展現有 Ctrl+S 通知樣式）in `media/js/blocklyEdit.js` 和 `media/css/blocklyEdit.css`
+-   [ ] T015f [P] [US1] 驗證現有 Toast 通知元件支援 'info' 類型，若無則擴展（重用現有 `toast.show()` 函數）in `media/js/blocklyEdit.js`
 -   [ ] T015g [P] [US1] 新增 CyberBrick 工具箱分類的 i18n 翻譯鍵（使用 `CATEGORY_CYBERBRICK_*` 格式）in `media/locales/en/messages.js` 和 `media/locales/zh-hant/messages.js`
 
 **UI Checkpoint**: 選擇 CyberBrick 時工具箱正確切換，上傳按鈕正確顯示/隱藏/旋轉，Toast 通知正常運作
@@ -140,6 +140,10 @@
 
 **Independent Test**: 首次上傳時確認備份檔案被建立在工作區的 `blockly/backups/` 目錄
 
+**⚠️ 範圍釐清**: 本階段的 `backupService.ts` **僅處理「裝置程式備份」(DeviceBackup)**，
+即從 CyberBrick 讀取 `/app/rc_main.py` 並備份到本地。
+**工作區積木備份繼續使用現有 `quickBackup` 機制**（在 `blocklyEdit.js` 中已實作）。
+
 ### Implementation for User Story 3
 
 -   [ ] T034 [P] [US3] 實作備份清單 manifest.json 管理邏輯 in `src/services/backupService.ts`
@@ -166,7 +170,7 @@
 ### Implementation for User Story 4
 
 -   [ ] T043 [P] [US4] 實作語言類型變更偵測邏輯（arduino ↔ micropython）in `media/js/blocklyEdit.js`
--   [ ] T044 [US4] 實作主板切換時自動呼叫 `quickSaveManager.performQuickSave()` in `media/js/blocklyEdit.js`
+-   [ ] T044 [US4] 實作主板切換時自動呼叫現有 `quickBackup.performQuickSave()` in `media/js/blocklyEdit.js`
 -   [ ] T044a [US4] 實作空工作區檢查（若無積木則跳過確認對話框，對應 FR-023a）in `media/js/blocklyEdit.js`
 -   [ ] T045 [US4] 實作 boardSwitchWarning 訊息發送（當偵測到語言變更且工作區非空）in `src/webview/messageHandler.ts`
 -   [ ] T046 [US4] 實作 boardSwitchConfirm 訊息處理 in `src/webview/messageHandler.ts`
@@ -252,7 +256,7 @@
 -   **User Story 1 (P1)**: 依賴 Foundational - **Phase 3a (UI/UX) 必須先完成**
 -   **User Story 2 (P1)**: 依賴 User Story 1 Phase 3a（上傳按鈕 UI 已建立）
 -   **User Story 3 (P2)**: 依賴 User Story 2 的 MicropythonUploader 服務
--   **User Story 4 (P2)**: 依賴 Foundational - 使用現有 `quickSaveManager`
+-   **User Story 4 (P2)**: 依賴 Foundational - 使用現有 `quickBackup`（在 `blocklyEdit.js` 中）
 -   **User Story 5 (P3)**: 依賴 User Story 1 的積木架構 - 其餘獨立
 -   **User Story 6 (P1)**: 依賴 Foundational - 可與 US1 Phase 3b 平行
 
@@ -397,7 +401,7 @@ With 2 developers:
     -   所有翻譯鍵必須使用 `CATEGORY_CYBERBRICK_*` 或 `CYBERBRICK_*` 格式
     -   上傳按鈕必須與現有控制區按鈕樣式一致
     -   上傳中狀態必須顯示旋轉動畫（spinning class，同重新整理按鈕）
-    -   上傳結果必須使用 Toast 通知（同 Ctrl+S 備份通知樣式）
+    -   上傳結果必須使用現有 `toast.show()` 函數（同 Ctrl+S 備份通知樣式）
     -   空工作區切換主板時跳過確認對話框（流暢度優先）
 
 ---

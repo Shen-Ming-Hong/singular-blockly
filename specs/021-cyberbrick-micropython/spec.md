@@ -223,10 +223,10 @@
 -   CyberBrick 使用 ESP32-C3 預設 VID/PID (VID: 0x303A, PID: 0x1001)
 -   CyberBrick 的 `/app/rc_main.py` 是開機自動執行的程式入口點
 -   藍牙功能已被官方禁用，不提供相關積木
--   現有的 `quickSaveManager.performQuickSave()` 方法可被主板切換流程重用
+-   現有的 `quickBackup.performQuickSave()` 方法可被主板切換流程重用（在 `blocklyEdit.js` 中已實作）
 -   現有的 `updateToolboxForBoard()` 函數可被擴展以支援 MicroPython 工具箱切換
 -   現有的按鈕 CSS 樣式（`.controls-container button`）可直接套用到上傳按鈕
--   現有的 Toast 通知元件可被上傳功能重用
+-   現有的 `toast.show(message, type)` 函數可被上傳功能重用（在 `blocklyEdit.js` L100-160 已實作）
 
 ## Clarifications
 
@@ -245,7 +245,7 @@
 -   Q: 上傳按鈕在上傳進行中時應如何顯示狀態？ → A: 按鈕禁用 + 圖示旋轉動畫（同重新整理按鈕），維持 UI 一致性
 -   Q: MicroPython 通用積木是否共用 Arduino 的分類結構？ → A: 共用相同分類結構（邏輯、迴圈、變數等使用相同翻譯鍵），僅 CyberBrick 專用積木使用 `CATEGORY_CYBERBRICK_*` 前綴
 -   Q: 上傳成功/失敗時的通知方式為何？ → A: Toast 通知（同 Ctrl+S 備份成功/失敗通知），維持 UI 風格統一
--   Q: 主板切換時如何備份？ → A: 使用現有 Ctrl+S 快速備份機制（`quickSaveManager.performQuickSave()`），命名格式為 `backup_YYYYMMDD_HHMMSS`
+-   Q: 主板切換時如何備份？ → A: 使用現有 Ctrl+S 快速備份機制（`quickBackup.performQuickSave()`），命名格式為 `backup_YYYYMMDD_HHMMSS`
 -   Q: 工具箱切換的參考實作？ → A: 參考 `updateToolboxForBoard()` 函數（在 `blocklyEdit.js` 約 2275 行），此函數已實作 Arduino Uno 與 ESP32 切換時隱藏部分工具箱選單的邏輯
 -   Q: 日誌標籤格式？ → A: 所有相關日誌使用 `[blockly]` 前綴，例如：`console.log('[blockly] 已切換至 CyberBrick 主板')`
 -   Q: CyberBrick 工具箱翻譯鍵格式？ → A: 統一使用 `CATEGORY_CYBERBRICK_*` 和 `CYBERBRICK_*` 前綴，確保與現有翻譯鍵命名規範一致

@@ -213,30 +213,25 @@ type UploadButtonTransition =
 
 ## 3. Toast Notification（Toast 通知）
 
-### 3.1 ToastNotification（2025-12-30 新增）
+### 3.1 現有 Toast 實作（重用）
+
+> **注意**：Toast 通知系統已在 `media/js/blocklyEdit.js` (L100-160) 實作，
+> 提供 `toast.show(message, type, duration)` 函數。
+> 上傳功能應直接重用此實作，**不需要新增任何類型定義**。
 
 ```typescript
-interface ToastNotification {
+// 以下僅為資料模型參考，不需在程式碼中新增
+// 現有 toast.show() 函數已接受這些參數
+interface ToastParams {
 	message: string;            // 顯示訊息
-	type: 'success' | 'error' | 'info' | 'warning';
-	duration?: number;          // 顯示時間（毫秒），預設 3000
+	type: 'success' | 'error' | 'warning';  // 現有支援的類型
+	duration?: number;          // 顯示時間（毫秒），預設 2500
 }
 
-// 上傳相關 Toast
-const UPLOAD_TOASTS = {
-	success: {
-		message: '上傳成功！',
-		type: 'success' as const,
-	},
-	failed: {
-		message: '上傳失敗',
-		type: 'error' as const,
-	},
-	connecting: {
-		message: '正在連接 CyberBrick...',
-		type: 'info' as const,
-	},
-};
+// 上傳功能的 Toast 呼叫範例（直接使用現有 API）
+toast.show('上傳成功！', 'success');
+toast.show('上傳失敗', 'error');
+toast.show('警告：連接不穩定', 'warning');
 ```
 
 ---

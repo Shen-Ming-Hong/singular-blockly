@@ -152,7 +152,7 @@ type UploadStage =
 
 **方向**: Extension → WebView
 
-**用途**: 回報上傳結果（用於 Toast 通知）
+**用途**: 回報上傳結果（用於 Toast 通知，**重用現有 `toast.show()` 函數**）
 
 ```typescript
 {
@@ -173,10 +173,10 @@ type UploadStage =
 }
 ```
 
-**WebView 處理**:
+**WebView 處理**（使用現有 `toast` 物件）:
 
--   `success: true` → 顯示 Toast「上傳成功！」（type: success）
--   `success: false` → 顯示 Toast「上傳失敗：{error.message}」（type: error）
+-   `success: true` → 呼叫 `toast.show('上傳成功！', 'success')`
+-   `success: false` → 呼叫 `toast.show('上傳失敗：' + error.message, 'error')`
 -   重置上傳按鈕狀態（移除 spinning，啟用按鈕）
 
 ---
@@ -454,7 +454,7 @@ interface UploadError {
 
 ## 10. 訊息流程範例
 
-### 10.1 上傳流程（含 Toast 通知）
+### 10.1 上傳流程（含 Toast 通知，重用現有 toast 物件）
 
 ```
 WebView                     Extension

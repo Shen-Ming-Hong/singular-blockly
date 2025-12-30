@@ -78,7 +78,6 @@ src/
 ├── services/
 │   ├── fileService.ts              # 檔案操作（重用）
 │   ├── settingsManager.ts          # 設定管理（重用）
-│   ├── quickSaveManager.ts         # 快速備份（重用）
 │   └── micropythonUploader.ts      # [新增] MicroPython 上傳服務
 ├── webview/
 │   ├── webviewManager.ts           # WebView 管理（擴展）

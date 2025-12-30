@@ -88,7 +88,7 @@ $PIO_PYTHON = "$env:USERPROFILE\.platformio\penv\Scripts\python.exe"
 │  generators/         │  services/                            │
 │  ├─ arduino/         │  ├─ fileService.ts                   │
 │  └─ micropython/     │  ├─ settingsManager.ts               │
-│      [新增目錄]      │  ├─ quickSaveManager.ts [重用]       │
+│      [新增目錄]      │  ├─ blocklyEdit.js [重用 quickBackup]   │
 │                      │  └─ micropythonUploader.ts [新增]    │
 │                      │                                       │
 └──────────────────────┴──────────────────────────────────────┘
@@ -322,30 +322,24 @@ export class MicropythonUploader {
 }
 ```
 
-### Step 6: Toast 通知（2025-12-30 新增）
+### Step 6: Toast 通知（重用現有實作）
 
-在 `media/js/blocklyEdit.js` 中新增 Toast 函數（或重用現有）：
+> **⚠️ 重要**：Toast 通知系統**已存在**於 `media/js/blocklyEdit.js` (L100-160)，
+> 提供 `toast.show(message, type, duration)` 函數，**不需要新增**。
+
+直接使用現有 `toast` 物件：
 
 ```javascript
-// 顯示 Toast 通知（同 Ctrl+S 備份通知樣式）
-function showToast(message, type = 'info') {
-	const toast = document.createElement('div');
-	toast.className = `toast toast-${type}`;
-	toast.textContent = message;
-	document.body.appendChild(toast);
+// 現有 toast API（已實作，直接使用）
+// toast.show(message, type, duration)
+// 支援 type: 'success' | 'warning' | 'error'
 
-	setTimeout(() => {
-		toast.classList.add('fade-out');
-		setTimeout(() => toast.remove(), 300);
-	}, 3000);
-}
-
-// 上傳結果通知
+// 上傳結果通知（直接呼叫現有函數）
 function handleUploadResult(result) {
 	if (result.success) {
-		showToast('上傳成功！', 'success');
+		toast.show('上傳成功！', 'success');
 	} else {
-		showToast(`上傳失敗：${result.error || '未知錯誤'}`, 'error');
+		toast.show(`上傳失敗：${result.error || '未知錯誤'}`, 'error');
 	}
 	setUploadingState(false);
 }
