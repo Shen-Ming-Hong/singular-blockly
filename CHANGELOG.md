@@ -8,6 +8,25 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.0] - 2025-12-31
+
+### 新增功能 Features
+
+-   **MicroPython 自訂函數生成器** (MicroPython Custom Function Generator) 🎉
+
+    -   為 `arduino_function` 積木新增 MicroPython 程式碼生成器，生成 Python `def` 語法
+        Added MicroPython code generator for `arduino_function` blocks, generating Python `def` syntax
+    -   為 `arduino_function_call` 積木新增 MicroPython 生成器，支援函數呼叫語法
+        Added MicroPython generator for `arduino_function_call` blocks, supporting function call syntax
+    -   支援中文函數名稱，保留原始 Unicode 識別符（Python 3 原生支援）
+        Support Chinese function names, preserving original Unicode identifiers (Python 3 native support)
+    -   支援帶參數的自訂函數，參數以 Python 動態型別處理
+        Support custom functions with parameters, handled as Python dynamic types
+    -   空函數體自動生成 `pass` 語句，符合 Python 語法要求
+        Empty function bodies automatically generate `pass` statement, conforming to Python syntax requirements
+    -   修復 CyberBrick Python 模式使用自訂函數時出現的 "MicroPython generator does not know how to generate code" 錯誤
+        Fixed "MicroPython generator does not know how to generate code" error when using custom functions in CyberBrick Python mode
+
 ## [0.49.0] - 2025-12-30
 
 ### 新增功能 Features
