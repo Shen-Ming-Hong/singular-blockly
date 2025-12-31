@@ -172,12 +172,12 @@ if __name__ == "__main__":
 
 ### 3.3 驗收情境檢查清單
 
--   [ ] 無參數函數生成正確（`def funcName():`）
--   [ ] 帶參數函數生成正確（`def funcName(a, b):`）
--   [ ] 空函數體生成 `pass`
--   [ ] 函數呼叫生成正確（`funcName(arg1, arg2)`）
--   [ ] 中文函數名稱保留原樣
--   [ ] 不再出現 "MicroPython generator does not know how to generate code" 錯誤
+-   [x] 無參數函數生成正確（`def funcName():`）
+-   [x] 帶參數函數生成正確（`def funcName(a, b):`）
+-   [x] 空函數體生成 `pass`
+-   [x] 函數呼叫生成正確（`funcName(arg1, arg2)`）
+-   [x] 中文函數名稱保留原樣
+-   [x] 不再出現 "MicroPython generator does not know how to generate code" 錯誤
 
 ---
 

@@ -27,9 +27,9 @@
 
 **Purpose**: 確認開發環境已就緒，熟悉相關程式碼
 
--   [ ] T001 確認開發環境：執行 `npm run watch` 並確認無編譯錯誤
--   [ ] T002 [P] 檢閱現有 Arduino 函數生成器程式碼 `media/blockly/generators/arduino/functions.js`
--   [ ] T003 [P] 檢閱現有 MicroPython 生成器架構 `media/blockly/generators/micropython/index.js`
+-   [x] T001 確認開發環境：執行 `npm run watch` 並確認無編譯錯誤
+-   [x] T002 [P] 檢閱現有 Arduino 函數生成器程式碼 `media/blockly/generators/arduino/functions.js`
+-   [x] T003 [P] 檢閱現有 MicroPython 生成器架構 `media/blockly/generators/micropython/index.js`
 
 ---
 
@@ -39,7 +39,7 @@
 
 **⚠️ CRITICAL**: 此階段必須完成，否則函數定義會出現在錯誤位置
 
--   [ ] T004 **[CRITICAL]** [FR-006] 將 `'arduino_function'` 加入 `allowedTopLevelBlocks_` 陣列，位於 `media/blockly/generators/micropython/index.js`
+-   [x] T004 **[CRITICAL]** [FR-006] 將 `'arduino_function'` 加入 `allowedTopLevelBlocks_` 陣列，位於 `media/blockly/generators/micropython/index.js`
 
 **Checkpoint**: 基礎設施就緒 - 可開始實作 User Story
 
@@ -53,19 +53,19 @@
 
 ### Implementation for User Story 1
 
--   [ ] T005 [US1] [FR-001, FR-004, FR-005] 新增 `arduino_function` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
+-   [x] T005 [US1] [FR-001, FR-004, FR-005] 新增 `arduino_function` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
 
     -   取得函數名稱（支援中文）
     -   生成 Python `def funcName():` 格式
     -   空函數體自動加入 `pass`
     -   使用 `generator.addFunction(funcName, code)` 將函數註冊到 `functions_` Map（確保函數定義輸出到頂層區塊）
 
--   [ ] T006 [US1] [FR-002, FR-007] 新增 `arduino_function_call` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
+-   [x] T006 [US1] [FR-002, FR-007] 新增 `arduino_function_call` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
 
     -   取得函數名稱
     -   生成 `funcName()\n` 呼叫語句
 
--   [ ] T007 [US1] 手動測試：驗證無參數自訂函數在 CyberBrick 模式下正確生成
+-   [x] T007 [US1] 手動測試：驗證無參數自訂函數在 CyberBrick 模式下正確生成
     -   建立無參數函數
     -   在主程式中呼叫
     -   確認無 "MicroPython generator does not know how to generate code" 錯誤
@@ -82,18 +82,18 @@
 
 ### Implementation for User Story 2
 
--   [ ] T008 [US2] [FR-003, FR-004] 擴展 `arduino_function` 生成器支援參數，於 `media/blockly/generators/micropython/functions.js`
+-   [x] T008 [US2] [FR-003, FR-004] 擴展 `arduino_function` 生成器支援參數，於 `media/blockly/generators/micropython/functions.js`
 
     -   讀取 `block.arguments_` 陣列
     -   生成 `def funcName(arg1, arg2):` 格式（忽略型別）
 
--   [ ] T009 [US2] [FR-007, FR-008] 擴展 `arduino_function_call` 生成器支援參數值，於 `media/blockly/generators/micropython/functions.js`
+-   [x] T009 [US2] [FR-007, FR-008] 擴展 `arduino_function_call` 生成器支援參數值，於 `media/blockly/generators/micropython/functions.js`
 
     -   使用 `generator.valueToCode()` 取得 `ARG0`, `ARG1`... 參數值
     -   未連接參數使用 `None` 作為預設值（參見 spec.md Edge Case 定義）
     -   生成 `funcName(value1, value2)\n` 呼叫語句
 
--   [ ] T010 [US2] 手動測試：驗證帶參數自訂函數在 CyberBrick 模式下正確生成
+-   [x] T010 [US2] 手動測試：驗證帶參數自訂函數在 CyberBrick 模式下正確生成
     -   建立帶 2 個參數的函數
     -   呼叫時傳入數值積木
     -   確認參數正確傳遞
@@ -110,12 +110,12 @@
 
 ### Implementation for User Story 3
 
--   [ ] T011 [US3] [FR-006] 驗證 `generator.addFunction()` 正確註冊函數到 `functions_` Map
+-   [x] T011 [US3] [FR-006] 驗證 `generator.addFunction()` 正確註冊函數到 `functions_` Map
 
     -   確認 `finish()` 方法會將函數輸出到 `# [4] User Functions` 區塊
     -   確認函數定義在 `# [5] Main Program` 之前
 
--   [ ] T012 [US3] 手動測試：驗證函數定義位置
+-   [x] T012 [US3] 手動測試：驗證函數定義位置
     -   建立多個自訂函數
     -   確認所有函數定義都在 `# [4] User Functions` 區塊
     -   確認函數定義在主程式之前
@@ -128,22 +128,22 @@
 
 **Purpose**: 邊界案例處理與文件更新
 
--   [ ] T013 [P] 測試邊界案例：中文函數名稱
+-   [x] T013 [P] 測試邊界案例：中文函數名稱
 
     -   建立中文名稱的函數（如「馬達控制」）
     -   確認名稱保留原樣
 
--   [ ] T014 [P] 測試邊界案例：空函數體
+-   [x] T014 [P] 測試邊界案例：空函數體
 
     -   建立無任何內容的函數
     -   確認生成 `pass` 語句
 
--   [ ] T015 [P] 測試邊界案例：多個函數
+-   [x] T015 [P] 測試邊界案例：多個函數
 
     -   建立多個自訂函數
     -   確認按工作區順序生成
 
--   [ ] T016 執行 quickstart.md 驗收清單完整驗證
+-   [x] T016 執行 quickstart.md 驗收清單完整驗證
     -   無參數函數生成正確
     -   帶參數函數生成正確
     -   空函數體生成 `pass`

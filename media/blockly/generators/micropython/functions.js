@@ -152,5 +152,58 @@
 		return code;
 	};
 
+	/**
+	 * 自訂函數定義 (arduino_function)
+	 * 生成 Python def 語法
+	 * 支援中文函數名稱（Python 3 支援 Unicode 識別符）
+	 */
+	generator.forBlock['arduino_function'] = function (block) {
+		// 取得函數名稱（支援中文，Python 3 原生支援）
+		const funcName = block.getFieldValue('NAME');
+
+		// 取得參數名稱（忽略型別，Python 是動態型別語言）
+		const args = block.arguments_ || [];
+
+		// 生成函數體
+		let branch = generator.statementToCode(block, 'STACK');
+
+		// 空函數體需要 pass（Python 語法要求）
+		if (!branch || !branch.trim()) {
+			branch = generator.INDENT + 'pass\n';
+		}
+
+		// 組裝 Python 函數定義
+		const code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + branch;
+
+		// 註冊到 functions_ 集合，由 finish() 輸出到 [4] User Functions 區塊
+		generator.addFunction(funcName, code);
+
+		return null;
+	};
+
+	/**
+	 * 自訂函數呼叫 (arduino_function_call)
+	 * 生成 Python 函數呼叫語法
+	 */
+	generator.forBlock['arduino_function_call'] = function (block) {
+		// 取得函數名稱
+		const funcName = block.getFieldValue('NAME');
+
+		// 取得參數值
+		const args = [];
+		const argCount = block.arguments_?.length || 0;
+
+		for (let i = 0; i < argCount; i++) {
+			const argCode = generator.valueToCode(block, 'ARG' + i, generator.ORDER_NONE);
+			// 未連接的參數使用 None 作為預設值（Python 慣例）
+			args.push(argCode || 'None');
+		}
+
+		// 生成函數呼叫（語句形式，帶換行）
+		const code = funcName + '(' + args.join(', ') + ')\n';
+
+		return code;
+	};
+
 	console.log('[blockly] MicroPython 函數生成器已載入');
 })();
