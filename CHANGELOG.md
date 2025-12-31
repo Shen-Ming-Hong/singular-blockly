@@ -8,6 +8,26 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.5] - 2025-12-31
+
+### 安全性 Security
+
+-   **依賴套件安全性更新** (Dependency Security Update)
+
+    -   修復 `qs` 套件高嚴重性漏洞 (GHSA-6rw7-vpxm-498p)
+        Fixed high severity vulnerability in `qs` package (GHSA-6rw7-vpxm-498p)
+    -   `qs` 從 6.14.0 升級至 6.14.1，防止 arrayLimit bypass 導致的 DoS 記憶體耗盡攻擊
+        Upgraded `qs` from 6.14.0 to 6.14.1 to prevent DoS memory exhaustion via arrayLimit bypass
+
+-   **Code Scanning Alert #7 修復** (Code Scanning Alert #7 Fix)
+
+    -   修復 CodeQL 偵測到的未驗證動態方法呼叫問題
+        Fixed unvalidated dynamic method call detected by CodeQL
+    -   在調用 `callback` 前增加 `typeof callback === 'function'` 類型檢查
+        Added `typeof callback === 'function'` type check before invoking callback
+    -   防止潛在的 TypeError 異常和意外行為
+        Prevents potential TypeError exceptions and unexpected behavior
+
 ## [0.50.4] - 2025-12-31
 
 ### 修復 Bug Fixes
