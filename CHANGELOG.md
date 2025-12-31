@@ -8,6 +8,25 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.4] - 2025-12-31
+
+### 修復 Bug Fixes
+
+-   **Extension Host i18n 硬編碼字串修復** (Extension Host i18n Hardcoded Strings Fix)
+
+    -   修復英文環境顯示 i18n key 名稱而非翻譯文字的問題
+        Fixed English environment showing i18n key names instead of translated text
+    -   修復 MicroPython 上傳進度訊息在非英文環境顯示英文的問題
+        Fixed MicroPython upload progress messages showing English in non-English environments
+    -   修復備份對話框訊息硬編碼中文的問題
+        Fixed backup dialog messages being hardcoded in Chinese
+    -   新增 LocaleService fallback 鏈機制：當前語言 → 英文 → fallback 參數 → key 名稱
+        Added LocaleService fallback chain: current language → English → fallback parameter → key name
+    -   新增 `src/types/i18nKeys.ts` 提供類型安全的 i18n 鍵名常數
+        Added `src/types/i18nKeys.ts` for type-safe i18n key constants
+    -   更新所有 15 種語言的翻譯檔案，新增 39 個翻譯鍵值
+        Updated all 15 language translation files with 39 new translation keys
+
 ## [0.50.3] - 2025-12-31
 
 ### 修復 Bug Fixes

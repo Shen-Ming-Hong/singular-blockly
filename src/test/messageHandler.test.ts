@@ -83,7 +83,14 @@ describe('WebView Message Handler', () => {
 
 		// 建立 LocaleService stub
 		localeServiceStub = sinon.createStubInstance(LocaleService);
-		localeServiceStub.getLocalizedMessage.resolves('Localized Message');
+		// 配置按鈕文字的回傳值，使用英文 fallback
+		localeServiceStub.getLocalizedMessage.callsFake(async (key: string, fallback?: string) => {
+			// 若有提供 fallback，則回傳 fallback 值（模擬 LocaleService 的 fallback 行為）
+			if (fallback !== undefined) {
+				return fallback;
+			}
+			return 'Localized Message';
+		});
 
 		// 建立 FileService stub
 		fileServiceStub = sinon.createStubInstance(FileService);
@@ -391,7 +398,7 @@ describe('WebView Message Handler', () => {
 	it('should handle delete backup message', async () => {
 		// 準備測試
 		fileServiceStub.fileExists.returns(true);
-		vscodeMock.window.showWarningMessage.resolves('刪除');
+		vscodeMock.window.showWarningMessage.resolves('Delete');
 		fileServiceStub.deleteFile.resolves();
 
 		// 建立刪除備份訊息
@@ -464,7 +471,7 @@ describe('WebView Message Handler', () => {
 		fileServiceStub.fileExists.withArgs(mainJsonPath).returns(true);
 		fileServiceStub.copyFile.resolves();
 		fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno', theme: 'light' });
-		vscodeMock.window.showWarningMessage.resolves('還原');
+		vscodeMock.window.showWarningMessage.resolves('Restore');
 
 		const restoreMessage = {
 			command: 'restoreBackup',
@@ -485,7 +492,7 @@ describe('WebView Message Handler', () => {
 	it('should handle restore backup cancel', async () => {
 		const backupPath = path.join('blockly', 'backup', 'my.json');
 		fileServiceStub.fileExists.withArgs(backupPath).returns(true);
-		vscodeMock.window.showWarningMessage.resolves('取消');
+		vscodeMock.window.showWarningMessage.resolves('Cancel');
 
 		const restoreMessage = { command: 'restoreBackup', name: 'my' };
 
@@ -771,7 +778,7 @@ describe('WebView Message Handler', () => {
 
 		it('should handle deleteBackup when user cancels', async () => {
 			fileServiceStub.fileExists.returns(true);
-			vscodeMock.window.showWarningMessage.resolves('取消');
+			vscodeMock.window.showWarningMessage.resolves('Cancel');
 
 			const deleteMessage = { command: 'deleteBackup', name: 'old-backup' };
 			await messageHandler.handleMessage(deleteMessage);
@@ -788,7 +795,7 @@ describe('WebView Message Handler', () => {
 
 			const messageArg = webviewMock.postMessage.getCall(0).args[0];
 			assert.strictEqual(messageArg.success, false);
-			assert(messageArg.error.includes('不存在'));
+			assert(messageArg.error.includes('does not exist'));
 		});
 
 		it('should handle deleteBackup without name', async () => {

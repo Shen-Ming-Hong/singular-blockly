@@ -126,7 +126,7 @@ suite('WorkspaceValidator Tests', () => {
 		});
 
 		test('Should return "continue" when user clicks continue button', async () => {
-			mockShowWarningMessage.resolves('繼續');
+			mockShowWarningMessage.resolves('Continue');
 
 			const result = await validator.showSafetyWarning();
 
@@ -135,7 +135,7 @@ suite('WorkspaceValidator Tests', () => {
 		});
 
 		test('Should return "cancel" when user clicks cancel button', async () => {
-			mockShowWarningMessage.resolves('取消');
+			mockShowWarningMessage.resolves('Cancel');
 
 			const result = await validator.showSafetyWarning();
 
@@ -143,7 +143,7 @@ suite('WorkspaceValidator Tests', () => {
 		});
 
 		test('Should return "suppress" when user clicks suppress button', async () => {
-			mockShowWarningMessage.resolves('不再提醒');
+			mockShowWarningMessage.resolves('Do Not Remind');
 
 			const result = await validator.showSafetyWarning();
 
@@ -159,7 +159,7 @@ suite('WorkspaceValidator Tests', () => {
 		});
 
 		test('Should show message with project type when provided', async () => {
-			mockShowWarningMessage.resolves('繼續');
+			mockShowWarningMessage.resolves('Continue');
 
 			await validator.showSafetyWarning('Node.js');
 
@@ -169,7 +169,7 @@ suite('WorkspaceValidator Tests', () => {
 		});
 
 		test('Should show generic message when project type not provided', async () => {
-			mockShowWarningMessage.resolves('繼續');
+			mockShowWarningMessage.resolves('Continue');
 
 			await validator.showSafetyWarning();
 
@@ -251,8 +251,8 @@ suite('WorkspaceValidator Tests', () => {
 			fsStub.withArgs(sinon.match(/package\.json$/)).returns(true);
 			fsStub.returns(false);
 
-			// Mock 使用者點擊 "繼續"
-			mockShowWarningMessage.resolves('繼續');
+			// Mock 使用者點擊 "Continue"
+			mockShowWarningMessage.resolves('Continue');
 
 			const validator = new WorkspaceValidator(testWorkspacePath, mockSettingsManager, mockLocaleService, mockVscodeFs as any);
 
@@ -272,7 +272,7 @@ suite('WorkspaceValidator Tests', () => {
 			mockVscodeFs.stat.rejects(new Error('Folder not found'));
 			mockSettingsManager.readSetting.resolves(false);
 			mockSettingsManager.updateSetting.resolves();
-			mockShowWarningMessage.resolves('不再提醒');
+			mockShowWarningMessage.resolves('Do Not Remind');
 
 			const validator = new WorkspaceValidator(testWorkspacePath, mockSettingsManager, mockLocaleService, mockVscodeFs as any);
 

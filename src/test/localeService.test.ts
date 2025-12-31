@@ -98,8 +98,12 @@ describe('Locale Service', () => {
 		const message = await localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
 		assert.strictEqual(message, 'Please open a folder first.');
 
-		// 測試帶有參數的訊息
-		const errorMessage = await localeService.getLocalizedMessage('VSCODE_FAILED_SAVE_FILE', 'Permission denied');
+		// 測試帶有參數的訊息（新 API：第二參數是 fallback，第三參數起是格式化參數）
+		const errorMessage = await localeService.getLocalizedMessage(
+			'VSCODE_FAILED_SAVE_FILE',
+			'Failed to save file: {0}', // fallback
+			'Permission denied' // 格式化參數
+		);
 		assert.strictEqual(errorMessage, 'Failed to save file: Permission denied');
 	});
 
