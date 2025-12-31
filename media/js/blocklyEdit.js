@@ -2083,7 +2083,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 						} else {
 							// 其他用途（如板子切換），直接呼叫回調函數
 							// 讓呼叫者自行處理後續邏輯
-							callback(message.confirmed);
+							// 安全檢查：確保 callback 是一個函數再調用
+							if (typeof callback === 'function') {
+								callback(message.confirmed);
+							}
 						}
 					}
 				}
