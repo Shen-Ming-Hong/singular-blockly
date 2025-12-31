@@ -28,7 +28,11 @@
 **Purpose**: 建立 i18n 常數檔案和基礎架構
 
 -   [ ] T001 建立 i18n 鍵名常數檔案 `src/types/i18nKeys.ts`，定義所有訊息鍵名分類（MESSAGE_KEYS, UPLOAD_KEYS, UPLOAD_ERROR_KEYS, BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）
--   [ ] T002 [P] 更新 TypeScript 設定，確保 `src/types/` 目錄下的型別檔案被正確編譯
+-   [ ] T002 [P] 驗證 TypeScript 設定，確保 `src/types/` 目錄下的型別檔案被正確編譯
+    -   **驗證項目**：
+        1. 確認 `tsconfig.json` 的 `include` 陣列包含 `src/**/*`
+        2. 執行 `npm run compile` 無編譯錯誤
+        3. 在 `src/services/localeService.ts` 中 import `I18nKey` 型別，確認 IntelliSense 正常運作
 
 ---
 
@@ -44,6 +48,22 @@
 -   [ ] T006 [P] 新增英文翻譯鍵值到 `media/locales/en/messages.js`（UPLOAD_KEYS, UPLOAD_ERROR_KEYS, BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）
 
 **Checkpoint**: LocaleService 回退鏈機制就緒，User Story 實作可開始
+
+### 參數替換驗證
+
+作為 Phase 2 的一部分，T005 實作時需驗證參數替換邏輯正確運作：
+
+**測試案例**（可在開發過程中手動驗證或透過 console.log）：
+
+```typescript
+// 單一參數替換
+await getLocalizedMessage('BACKUP_CONFIRM_DELETE', 'Delete "{0}"?', 'backup1');
+// 預期輸出: "Delete \"backup1\"?" 或對應翻譯
+
+// 多參數替換
+await getLocalizedMessage('TEST_KEY', '{0} to {1}', 'A', 'B');
+// 預期輸出: "A to B"
+```
 
 ---
 
@@ -71,6 +91,8 @@
 **Goal**: 解決 MicroPython 上傳時進度訊息硬編碼中文的問題
 
 **Independent Test**: 在英文版 VSCode 中選擇 CyberBrick 開發板，上傳程式，驗證進度訊息顯示英文
+
+**WebView 整合說明**: MicroPython 上傳訊息透過 `sendUploadProgress()` 發送到 WebView。WebView 端已有完整的翻譯機制 (`window.languageManager.getMessage`)，會根據 `stage` 參數自動顯示對應語言的訊息。Extension Host 只需將訊息改為英文（作為 fallback），WebView 會負責本地化顯示。**無需修改 WebView 端程式碼**。
 
 ### Implementation for User Story 2
 
@@ -133,9 +155,27 @@
 **Purpose**: 最終驗證和跨功能改進
 
 -   [ ] T036 執行 `npm run validate:i18n` 驗證所有 15 種語言翻譯完整性
+    -   **成功標準**：腳本執行無錯誤，所有新增鍵名在 15 種語言中都有對應翻譯
 -   [ ] T037 [P] 搜尋並確認 Extension Host 端無殘留硬編碼中文字串（MCP 工具除外）
+    -   **驗證命令**：
+        ```powershell
+        # 在專案根目錄執行
+        Get-ChildItem -Path "src" -Include "*.ts" -Recurse | Select-String -Pattern "[\u4e00-\u9fff]+" | Where-Object { $_.Path -notmatch "mcp" }
+        ```
+    -   **成功標準**：上述命令輸出應為空（無結果），或僅包含允許的例外（如註解中的中文說明）
+    -   **已知排除**：
+        -   `src/mcp/**/*.ts` - MCP 工具保持英文（FR-010）
+        -   TypeScript 註解中的中文說明（非使用者可見）
 -   [ ] T038 [P] 更新相關文件，記錄新增的 i18n 鍵名和使用方式
+    -   **更新檔案**：`README.md` 或 `CONTRIBUTING.md` 中的 i18n 開發指南（如適用）
+    -   **內容**：說明如何使用 `I18nKey` 型別和 `LocaleService.getLocalizedMessage()` 的新 fallback 參數
 -   [ ] T039 執行 quickstart.md 中的手動驗證流程
+    -   **成功標準**：所有 User Story 的 Acceptance Scenarios 通過
+    -   **驗證項目**：
+        1. 英文環境警告訊息顯示正確英文
+        2. 繁體中文環境警告訊息顯示正確中文
+        3. 英文環境上傳進度訊息顯示英文
+        4. 英文環境備份對話框顯示英文
 
 ---
 

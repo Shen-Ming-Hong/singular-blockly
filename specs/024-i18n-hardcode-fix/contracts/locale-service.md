@@ -121,4 +121,42 @@ getLocalizedMessage(key: string, ...args: any[]): Promise<string>
 getLocalizedMessage(key: string, fallback?: string, ...args: any[]): Promise<string>
 ```
 
-**注意**：如果舊程式碼傳入的第一個參數是非字串（如數字），行為可能改變。需檢查現有呼叫點。
+### 相容性處理策略
+
+為確保向後相容，實作需採用以下策略：
+
+1. **型別偵測**：檢查第二參數是否為字串
+
+    - 若為字串：視為 `fallback` 參數
+    - 若為非字串（數字、物件等）：視為 `args[0]`，fallback 使用 `undefined`
+
+2. **實作範例**：
+
+```typescript
+async getLocalizedMessage(key: string, fallbackOrArg?: string | any, ...args: any[]): Promise<string> {
+    let fallback: string | undefined;
+    let actualArgs: any[];
+
+    // 偵測第二參數型別
+    if (typeof fallbackOrArg === 'string') {
+        // 新方式：第二參數是 fallback 字串
+        fallback = fallbackOrArg;
+        actualArgs = args;
+    } else if (fallbackOrArg !== undefined) {
+        // 舊方式：第二參數是 args[0]
+        fallback = undefined;
+        actualArgs = [fallbackOrArg, ...args];
+    } else {
+        fallback = undefined;
+        actualArgs = args;
+    }
+    // ... 後續處理
+}
+```
+
+3. **遷移建議**：
+    - 現有呼叫點無需立即修改
+    - 新程式碼建議使用明確的 fallback 參數
+    - 若舊程式碼的第一個參數恰好是字串且代表 args[0]，需檢查並調整
+
+**⚠️ 已知相容性風險**：若現有程式碼呼叫如 `getLocalizedMessage('KEY', 'someValue')` 且 `'someValue'` 原本是 args[0]（非 fallback），行為會改變。經程式碼審查，目前 Extension Host 端無此用法，安全。
