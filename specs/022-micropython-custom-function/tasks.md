@@ -39,7 +39,7 @@
 
 **⚠️ CRITICAL**: 此階段必須完成，否則函數定義會出現在錯誤位置
 
--   [ ] T004 將 `'arduino_function'` 加入 `allowedTopLevelBlocks_` 陣列，位於 `media/blockly/generators/micropython/index.js`
+-   [ ] T004 **[CRITICAL]** [FR-006] 將 `'arduino_function'` 加入 `allowedTopLevelBlocks_` 陣列，位於 `media/blockly/generators/micropython/index.js`
 
 **Checkpoint**: 基礎設施就緒 - 可開始實作 User Story
 
@@ -53,14 +53,14 @@
 
 ### Implementation for User Story 1
 
--   [ ] T005 [US1] 新增 `arduino_function` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
+-   [ ] T005 [US1] [FR-001, FR-004, FR-005] 新增 `arduino_function` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
 
     -   取得函數名稱（支援中文）
     -   生成 Python `def funcName():` 格式
     -   空函數體自動加入 `pass`
-    -   使用 `generator.addFunction()` 註冊函數
+    -   使用 `generator.addFunction(funcName, code)` 將函數註冊到 `functions_` Map（確保函數定義輸出到頂層區塊）
 
--   [ ] T006 [US1] 新增 `arduino_function_call` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
+-   [ ] T006 [US1] [FR-002, FR-007] 新增 `arduino_function_call` MicroPython 生成器於 `media/blockly/generators/micropython/functions.js`
 
     -   取得函數名稱
     -   生成 `funcName()\n` 呼叫語句
@@ -82,15 +82,15 @@
 
 ### Implementation for User Story 2
 
--   [ ] T008 [US2] 擴展 `arduino_function` 生成器支援參數，於 `media/blockly/generators/micropython/functions.js`
+-   [ ] T008 [US2] [FR-003, FR-004] 擴展 `arduino_function` 生成器支援參數，於 `media/blockly/generators/micropython/functions.js`
 
     -   讀取 `block.arguments_` 陣列
     -   生成 `def funcName(arg1, arg2):` 格式（忽略型別）
 
--   [ ] T009 [US2] 擴展 `arduino_function_call` 生成器支援參數值，於 `media/blockly/generators/micropython/functions.js`
+-   [ ] T009 [US2] [FR-007, FR-008] 擴展 `arduino_function_call` 生成器支援參數值，於 `media/blockly/generators/micropython/functions.js`
 
     -   使用 `generator.valueToCode()` 取得 `ARG0`, `ARG1`... 參數值
-    -   未連接參數使用 `None` 作為預設值
+    -   未連接參數使用 `None` 作為預設值（參見 spec.md Edge Case 定義）
     -   生成 `funcName(value1, value2)\n` 呼叫語句
 
 -   [ ] T010 [US2] 手動測試：驗證帶參數自訂函數在 CyberBrick 模式下正確生成
@@ -110,7 +110,7 @@
 
 ### Implementation for User Story 3
 
--   [ ] T011 [US3] 驗證 `generator.addFunction()` 正確註冊函數到 `functions_` Map
+-   [ ] T011 [US3] [FR-006] 驗證 `generator.addFunction()` 正確註冊函數到 `functions_` Map
 
     -   確認 `finish()` 方法會將函數輸出到 `# [4] User Functions` 區塊
     -   確認函數定義在 `# [5] Main Program` 之前

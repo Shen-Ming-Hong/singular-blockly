@@ -47,8 +47,8 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 使用者建立了自訂函數 `blink` 和主程式區塊，**When** 生成代碼，**Then** `def blink():` 出現在 `# Main program` 註解之前，位於檔案頂層
-2. **Given** 工作區同時有多個自訂函數，**When** 生成代碼，**Then** 所有函數定義都在頂層，不會被嵌套在其他函數或區塊內
+1. **Given** 使用者建立了自訂函數 `blink` 和主程式區塊，**When** 生成代碼，**Then** `def blink():` 出現在 `# [4] User Functions` 區塊，位於 `# [5] Main Program` 之前
+2. **Given** 工作區同時有多個自訂函數，**When** 生成代碼，**Then** 所有函數定義都在 `# [4] User Functions` 區塊，不會被嵌套在其他函數或區塊內
 
 ---
 
@@ -57,7 +57,9 @@
 -   自訂函數名稱包含中文字元時：保留原始中文名稱，Python 3 支援 Unicode 識別符
 -   自訂函數內沒有任何語句時，應生成 `pass` 以避免 Python 語法錯誤
 -   函數參數數量為 0 時，應正確生成空括號 `def funcName():`
+-   函數呼叫時參數未連接值積木時，MUST 使用 `None` 作為預設值（如 `funcName(100, None)`）
 -   多個函數的生成順序：按工作區積木順序（由上到下、由左到右）
+-   函數定義 MUST 輸出至程式碼的 `# [4] User Functions` 區塊（即主程式 `# [5] Main Program` 之前）
 
 ## Requirements _(mandatory)_
 
