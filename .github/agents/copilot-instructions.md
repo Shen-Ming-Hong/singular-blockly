@@ -26,6 +26,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - N/A（純程式碼生成，無儲存需求） (022-micropython-custom-function)
 - JavaScript (Node.js 22+), TypeScript 5.9.3 + Node.js fs 模組、glob 模式匹配 (023-i18n-audit-optimization)
 - JSON 檔案 (audit-whitelist.json)、JS 模組 (messages.js) (023-i18n-audit-optimization)
+- TypeScript 5.9.3 + VSCode Extension API 1.105.0+, Blockly 12.3.1 (024-i18n-hardcode-fix)
+- JSON 翻譯檔案 (`media/locales/{lang}/messages.js`) (024-i18n-hardcode-fix)
 
 -   TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly) (011-esp32-pwm-setup)
 
@@ -54,9 +56,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 024-i18n-hardcode-fix: Added TypeScript 5.9.3 + VSCode Extension API 1.105.0+, Blockly 12.3.1
 - 023-i18n-audit-optimization: Added JavaScript (Node.js 22+), TypeScript 5.9.3 + Node.js fs 模組、glob 模式匹配
 - 022-micropython-custom-function: Added JavaScript (ES6+), MicroPython 目標程式碼 + Blockly 12.3.1, 現有 `micropythonGenerator` 生成器框架
-- 021-cyberbrick-micropython: Added TypeScript 5.9.3 + JavaScript (WebView) + MicroPython (生成) + Blockly 12.3.1, VS Code Extension API 1.105.0+, mpremote 1.20+
 
 
 <!-- MANUAL ADDITIONS START -->
