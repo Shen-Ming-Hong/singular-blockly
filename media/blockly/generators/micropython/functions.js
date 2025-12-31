@@ -161,6 +161,12 @@
 		// 取得函數名稱（支援中文，Python 3 原生支援）
 		const funcName = block.getFieldValue('NAME');
 
+		// 防禦性檢查：函數名稱不可為空
+		if (!funcName) {
+			console.warn('[blockly] arduino_function: 函數名稱為空，跳過生成');
+			return null;
+		}
+
 		// 取得參數名稱（忽略型別，Python 是動態型別語言）
 		const args = block.arguments_ || [];
 
@@ -188,6 +194,12 @@
 	generator.forBlock['arduino_function_call'] = function (block) {
 		// 取得函數名稱
 		const funcName = block.getFieldValue('NAME');
+
+		// 防禦性檢查：函數名稱不可為空
+		if (!funcName) {
+			console.warn('[blockly] arduino_function_call: 函數名稱為空，跳過生成');
+			return '';
+		}
 
 		// 取得參數值
 		const args = [];
