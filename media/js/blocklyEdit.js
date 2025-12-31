@@ -2753,20 +2753,20 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 		},
 	};
 
-	// 預設的 fallback 訊息
+	// 預設的 fallback 訊息（使用英文以避免硬編碼中文）
 	const defaultFallbacks = {
-		ERROR_UPLOAD_BOARD_UNSUPPORTED: '僅支援 CyberBrick 主板',
-		ERROR_UPLOAD_CODE_EMPTY: '程式碼不能為空',
-		ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python 環境不存在',
-		ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremote 安裝失敗',
-		ERROR_UPLOAD_DEVICE_NOT_FOUND: '找不到 CyberBrick 裝置',
-		ERROR_UPLOAD_RESET_FAILED: '裝置重置失敗',
-		ERROR_UPLOAD_UPLOAD_FAILED: '程式上傳失敗',
-		ERROR_UPLOAD_RESTART_FAILED: '裝置重啟失敗',
+		ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Only CyberBrick board is supported',
+		ERROR_UPLOAD_CODE_EMPTY: 'Code cannot be empty',
+		ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python environment not found',
+		ERROR_UPLOAD_MPREMOTE_FAILED: 'Failed to install mpremote',
+		ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick device not found',
+		ERROR_UPLOAD_RESET_FAILED: 'Failed to reset device',
+		ERROR_UPLOAD_UPLOAD_FAILED: 'Failed to upload program',
+		ERROR_UPLOAD_RESTART_FAILED: 'Failed to restart device',
 	};
 
 	if (!stage || !errorKeyMap[stage]) {
-		return fallbackMessage || '未知錯誤';
+		return fallbackMessage || 'Unknown error';
 	}
 
 	const stageErrors = errorKeyMap[stage];
@@ -2780,11 +2780,11 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 	}
 
 	if (!errorKey) {
-		return fallbackMessage || '未知錯誤';
+		return fallbackMessage || 'Unknown error';
 	}
 
 	// 取得本地化訊息
-	return window.languageManager?.getMessage(errorKey, defaultFallbacks[errorKey]) || fallbackMessage || '未知錯誤';
+	return window.languageManager?.getMessage(errorKey, defaultFallbacks[errorKey]) || fallbackMessage || 'Unknown error';
 }
 
 /**
