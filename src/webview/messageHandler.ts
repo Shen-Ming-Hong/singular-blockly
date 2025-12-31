@@ -153,7 +153,12 @@ export class WebViewMessageHandler {
 			}
 		} catch (error) {
 			log(`Error handling message: ${message.command}`, 'error', error);
-			this.showErrorMessage(`處理訊息時發生錯誤: ${error}`);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'ERROR_PROCESSING_MESSAGE',
+				'Error processing message: {0}',
+				String(error)
+			);
+			this.showErrorMessage(errorMsg);
 		}
 	}
 
@@ -617,7 +622,8 @@ export class WebViewMessageHandler {
 
 			// 檢查 main.json 是否存在
 			if (!this.fileService.fileExists(mainJsonPath)) {
-				throw new Error('無法找到 main.json 檔案');
+				const errorMsg = await this.localeService.getLocalizedMessage('BACKUP_ERROR_MAIN_NOT_FOUND', 'Cannot find main.json file');
+				throw new Error(errorMsg);
 			}
 
 			// 建立備份檔案路徑
@@ -642,7 +648,12 @@ export class WebViewMessageHandler {
 				success: false,
 				error: `${error}`,
 			});
-			this.showErrorMessage(`建立備份失敗: ${error}`);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_CREATE_FAILED',
+				'Failed to create backup: {0}',
+				String(error)
+			);
+			this.showErrorMessage(errorMsg);
 		}
 	}
 
@@ -717,7 +728,11 @@ export class WebViewMessageHandler {
 		try {
 			// 確保備份名稱存在
 			if (!message.name) {
-				throw new Error('未指定備份名稱');
+				const errorMsg = await this.localeService.getLocalizedMessage(
+					'BACKUP_ERROR_NAME_NOT_SPECIFIED',
+					'Backup name not specified'
+				);
+				throw new Error(errorMsg);
 			}
 
 			const backupDir = path.join('blockly', 'backup');
@@ -726,9 +741,13 @@ export class WebViewMessageHandler {
 			// 檢查檔案是否存在
 			if (this.fileService.fileExists(backupPath)) {
 				// 顯示確認對話框，詢問用戶是否確定要刪除
-				const confirmMessage = `確定要刪除備份檔案: ${message.name}.json 嗎？`;
-				const deleteBtn = '刪除';
-				const cancelBtn = '取消';
+				const confirmMessage = await this.localeService.getLocalizedMessage(
+					'BACKUP_CONFIRM_DELETE',
+					'Are you sure you want to delete backup: {0}.json?',
+					message.name
+				);
+				const deleteBtn = await this.localeService.getLocalizedMessage('BUTTON_DELETE', 'Delete');
+				const cancelBtn = await this.localeService.getLocalizedMessage('BUTTON_CANCEL', 'Cancel');
 
 				const selection = await vscodeApi.window.showWarningMessage(confirmMessage, deleteBtn, cancelBtn);
 
@@ -754,7 +773,12 @@ export class WebViewMessageHandler {
 					});
 				}
 			} else {
-				throw new Error(`備份 ${message.name} 不存在`);
+				const errorMsg = await this.localeService.getLocalizedMessage(
+					'BACKUP_ERROR_NOT_FOUND',
+					'Backup {0} does not exist',
+					message.name
+				);
+				throw new Error(errorMsg);
 			}
 		} catch (error) {
 			log('刪除備份失敗:', 'error', error);
@@ -764,7 +788,12 @@ export class WebViewMessageHandler {
 				success: false,
 				error: `${error}`,
 			});
-			this.showErrorMessage(`刪除備份失敗: ${error}`);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_DELETE_FAILED',
+				'Failed to delete backup: {0}',
+				String(error)
+			);
+			this.showErrorMessage(errorMsg);
 		}
 	}
 
@@ -776,7 +805,11 @@ export class WebViewMessageHandler {
 		try {
 			// 確保備份名稱存在
 			if (!message.name) {
-				throw new Error('未指定備份名稱');
+				const errorMsg = await this.localeService.getLocalizedMessage(
+					'BACKUP_ERROR_NAME_NOT_SPECIFIED',
+					'Backup name not specified'
+				);
+				throw new Error(errorMsg);
 			}
 
 			const blocklyDir = 'blockly';
@@ -786,13 +819,22 @@ export class WebViewMessageHandler {
 
 			// 檢查備份檔案是否存在
 			if (!this.fileService.fileExists(backupPath)) {
-				throw new Error(`備份 ${message.name} 不存在`);
+				const errorMsg = await this.localeService.getLocalizedMessage(
+					'BACKUP_ERROR_NOT_FOUND',
+					'Backup {0} does not exist',
+					message.name
+				);
+				throw new Error(errorMsg);
 			}
 
 			// 顯示確認對話框，詢問用戶是否確定要還原（這是一個破壞性操作）
-			const confirmMessage = `確定要還原備份「${message.name}」嗎？這將覆蓋當前的工作區。`;
-			const restoreBtn = '還原';
-			const cancelBtn = '取消';
+			const confirmMessage = await this.localeService.getLocalizedMessage(
+				'BACKUP_CONFIRM_RESTORE',
+				'Are you sure you want to restore backup "{0}"? This will overwrite the current workspace.',
+				message.name
+			);
+			const restoreBtn = await this.localeService.getLocalizedMessage('BUTTON_RESTORE', 'Restore');
+			const cancelBtn = await this.localeService.getLocalizedMessage('BUTTON_CANCEL', 'Cancel');
 
 			const selection = await vscodeApi.window.showWarningMessage(confirmMessage, restoreBtn, cancelBtn);
 
@@ -869,7 +911,12 @@ export class WebViewMessageHandler {
 				success: false,
 				error: `${error}`,
 			});
-			this.showErrorMessage(`還原備份失敗: ${error}`);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_RESTORE_FAILED',
+				'Failed to restore backup: {0}',
+				String(error)
+			);
+			this.showErrorMessage(errorMsg);
 		}
 	}
 
@@ -936,7 +983,11 @@ export class WebViewMessageHandler {
 		try {
 			// 確保備份名稱存在
 			if (!message.name) {
-				throw new Error('未指定備份名稱');
+				const errorMsg = await this.localeService.getLocalizedMessage(
+					'BACKUP_ERROR_NAME_NOT_SPECIFIED',
+					'Backup name not specified'
+				);
+				throw new Error(errorMsg);
 			}
 			log(`正在處理預覽備份請求: ${message.name}`, 'info');
 
@@ -948,14 +999,24 @@ export class WebViewMessageHandler {
 
 			// 檢查備份檔案是否存在
 			if (!this.fileService.fileExists(backupPath)) {
-				throw new Error(`備份 ${message.name} 不存在`);
+				const errorMsg = await this.localeService.getLocalizedMessage(
+					'BACKUP_ERROR_NOT_FOUND',
+					'Backup {0} does not exist',
+					message.name
+				);
+				throw new Error(errorMsg);
 			}
 
 			// 執行預覽命令，將預覽命令和完整的備份路徑傳遞給 VS Code
 			await vscodeApi.commands.executeCommand('singular-blockly.previewBackup', fullBackupPath);
 		} catch (error) {
 			log(`預覽備份失敗: ${error}`, 'error');
-			this.showErrorMessage(`預覽備份失敗: ${error}`);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_PREVIEW_FAILED',
+				'Failed to preview backup: {0}',
+				String(error)
+			);
+			this.showErrorMessage(errorMsg);
 		}
 	}
 	/**
@@ -983,7 +1044,11 @@ export class WebViewMessageHandler {
 			log(`自動備份間隔已更新為 ${message.interval} 分鐘`, 'info');
 		} catch (error) {
 			log('更新自動備份設定失敗:', 'error', error);
-			this.showErrorMessage('更新自動備份設定失敗');
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_UPDATE_SETTINGS_FAILED',
+				'Failed to update auto backup settings'
+			);
+			this.showErrorMessage(errorMsg);
 		}
 	}
 
@@ -1019,7 +1084,12 @@ export class WebViewMessageHandler {
 			log('Workspace reloaded via MCP integration', 'info');
 		} catch (error) {
 			log('Failed to reload workspace:', 'error', error);
-			this.showErrorMessage(`重載工作區失敗: ${error}`);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'ERROR_RELOAD_WORKSPACE_FAILED',
+				'Failed to reload workspace: {0}',
+				String(error)
+			);
+			this.showErrorMessage(errorMsg);
 		}
 	}
 

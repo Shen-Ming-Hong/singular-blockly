@@ -210,7 +210,11 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 				// 獲取工作區路徑
 				const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 				if (!workspaceFolders) {
-					vscodeApi.window.showErrorMessage('請先開啟項目資料夾');
+					const errorMsg = await localeService.getLocalizedMessage(
+						'ERROR_OPEN_PROJECT_FOLDER_FIRST',
+						'Please open a project folder first'
+					);
+					vscodeApi.window.showErrorMessage(errorMsg);
 					return;
 				}
 
@@ -222,24 +226,28 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 				try {
 					const stat = await vscodeApi.workspace.fs.stat(vscodeApi.Uri.file(backupsDir));
 					if ((stat.type & vscodeApi.FileType.Directory) === 0) {
-						vscodeApi.window.showInformationMessage('尚無備份檔案可以預覽');
+						const infoMsg = await localeService.getLocalizedMessage('INFO_NO_BACKUPS_TO_PREVIEW', 'No backup files to preview');
+						vscodeApi.window.showInformationMessage(infoMsg);
 						return;
 					}
 				} catch (error) {
-					vscodeApi.window.showInformationMessage('尚無備份檔案可以預覽');
+					const infoMsg = await localeService.getLocalizedMessage('INFO_NO_BACKUPS_TO_PREVIEW', 'No backup files to preview');
+					vscodeApi.window.showInformationMessage(infoMsg);
 					return;
 				}
 
 				// 讓用戶選擇備份檔案
+				const selectTitle = await localeService.getLocalizedMessage('DIALOG_SELECT_BACKUP_TITLE', 'Select backup file to preview');
+				const backupFilesLabel = await localeService.getLocalizedMessage('DIALOG_BACKUP_FILES_LABEL', 'Backup Files');
 				const fileUris = await vscodeApi.window.showOpenDialog({
 					canSelectFiles: true,
 					canSelectFolders: false,
 					canSelectMany: false,
 					defaultUri: vscodeApi.Uri.file(backupsDir),
 					filters: {
-						備份檔案: ['json'],
+						[backupFilesLabel]: ['json'],
 					},
-					title: '選擇要預覽的備份檔案',
+					title: selectTitle,
 				});
 				if (!fileUris || fileUris.length === 0) {
 					return;

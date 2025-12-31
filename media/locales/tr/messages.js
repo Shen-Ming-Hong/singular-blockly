@@ -709,4 +709,44 @@ window.languageManager.loadMessages('tr', {
 	UPLOAD_STAGE_UPLOADING: 'Yükleniyor',
 	UPLOAD_STAGE_RESTARTING: 'Cihaz yeniden başlatılıyor',
 	UPLOAD_STAGE_COMPLETED: 'Tamamlandı',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Yalnızca CyberBrick kartı desteklenmektedir',
+	ERROR_UPLOAD_CODE_EMPTY: 'Kod boş olamaz',
+	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python ortamı bulunamadı. Lütfen önce PlatformIO kurun.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremote kurulumu başarısız',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick cihazı bulunamadı. Bağlı olduğundan emin olun.',
+	ERROR_UPLOAD_RESET_FAILED: 'Cihaz sıfırlanamadı',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Program yüklenemedi',
+	ERROR_UPLOAD_RESTART_FAILED: 'Cihaz yeniden başlatılamadı',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: '"{0}" yedeklemesini silmek istediğinizden emin misiniz?',
+	BACKUP_CONFIRM_RESTORE:
+		'"{0}" yedeklemesini geri yüklemek istediğinizden emin misiniz? Bu, mevcut çalışma alanının üzerine yazacaktır.',
+	BACKUP_ERROR_NOT_FOUND: '"{0}" yedeklemesi bulunamadı',
+	BACKUP_ERROR_CREATE_FAILED: 'Yedekleme oluşturulamadı: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Yedekleme silinemedi: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Yedekleme geri yüklenemedi: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Yedekleme önizlenemedi: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Yedekleme adı belirtilmedi',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'main.json dosyası bulunamıyor',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Otomatik yedekleme ayarları güncellenemedi',
+
+	// Button labels
+	BUTTON_DELETE: 'Sil',
+	BUTTON_RESTORE: 'Geri Yükle',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Mesaj işlenirken hata oluştu: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Ayarlar güncellenemedi',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Çalışma alanı yeniden yüklenemedi: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Lütfen önce bir proje klasörü açın',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Önizlenecek yedekleme dosyası yok',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Önizlenecek yedekleme dosyasını seçin',
+	DIALOG_BACKUP_FILES_LABEL: 'Yedekleme Dosyaları',
 });

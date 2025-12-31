@@ -714,4 +714,43 @@ window.languageManager.loadMessages('en', {
 	UPLOAD_STAGE_UPLOADING: 'Uploading',
 	UPLOAD_STAGE_RESTARTING: 'Restarting device',
 	UPLOAD_STAGE_COMPLETED: 'Completed',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Only CyberBrick board is supported',
+	ERROR_UPLOAD_CODE_EMPTY: 'Code cannot be empty',
+	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python environment not found. Please install PlatformIO first.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremote installation failed',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick device not found. Please ensure it is connected.',
+	ERROR_UPLOAD_RESET_FAILED: 'Failed to reset device',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Failed to upload program',
+	ERROR_UPLOAD_RESTART_FAILED: 'Failed to restart device',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Are you sure you want to delete backup "{0}"?',
+	BACKUP_CONFIRM_RESTORE: 'Are you sure you want to restore backup "{0}"? This will overwrite the current workspace.',
+	BACKUP_ERROR_NOT_FOUND: 'Backup "{0}" not found',
+	BACKUP_ERROR_CREATE_FAILED: 'Failed to create backup: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Failed to delete backup: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Failed to restore backup: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Failed to preview backup: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Backup name not specified',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Cannot find main.json file',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Failed to update auto backup settings',
+
+	// Button labels
+	BUTTON_DELETE: 'Delete',
+	BUTTON_RESTORE: 'Restore',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Error processing message: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Failed to update settings',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Failed to reload workspace: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Please open a project folder first',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'No backup files to preview',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Select backup file to preview',
+	DIALOG_BACKUP_FILES_LABEL: 'Backup Files',
 });

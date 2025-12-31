@@ -703,4 +703,43 @@ window.languageManager.loadMessages('pt-br', {
 	UPLOAD_STAGE_UPLOADING: 'Enviando',
 	UPLOAD_STAGE_RESTARTING: 'Reiniciando dispositivo',
 	UPLOAD_STAGE_COMPLETED: 'Concluído',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Apenas a placa CyberBrick é suportada',
+	ERROR_UPLOAD_CODE_EMPTY: 'O código não pode estar vazio',
+	ERROR_UPLOAD_NO_PYTHON: 'Ambiente Python do PlatformIO não encontrado. Por favor, instale o PlatformIO primeiro.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'Falha na instalação do mpremote',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'Dispositivo CyberBrick não encontrado. Certifique-se de que está conectado.',
+	ERROR_UPLOAD_RESET_FAILED: 'Falha ao reiniciar o dispositivo',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Falha ao enviar o programa',
+	ERROR_UPLOAD_RESTART_FAILED: 'Falha ao reiniciar o dispositivo',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Tem certeza de que deseja excluir o backup "{0}"?',
+	BACKUP_CONFIRM_RESTORE: 'Tem certeza de que deseja restaurar o backup "{0}"? Isso substituirá o espaço de trabalho atual.',
+	BACKUP_ERROR_NOT_FOUND: 'Backup "{0}" não encontrado',
+	BACKUP_ERROR_CREATE_FAILED: 'Falha ao criar backup: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Falha ao excluir backup: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Falha ao restaurar backup: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Falha ao visualizar backup: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Nome do backup não especificado',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Não foi possível encontrar o arquivo main.json',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Falha ao atualizar configurações de backup automático',
+
+	// Button labels
+	BUTTON_DELETE: 'Excluir',
+	BUTTON_RESTORE: 'Restaurar',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Erro ao processar mensagem: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Falha ao atualizar configurações',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Falha ao recarregar o espaço de trabalho: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Por favor, abra uma pasta de projeto primeiro',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Nenhum arquivo de backup para visualizar',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Selecione o arquivo de backup para visualizar',
+	DIALOG_BACKUP_FILES_LABEL: 'Arquivos de backup',
 });

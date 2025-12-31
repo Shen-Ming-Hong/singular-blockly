@@ -709,4 +709,44 @@ window.languageManager.loadMessages('de', {
 	UPLOAD_STAGE_UPLOADING: 'Hochladen',
 	UPLOAD_STAGE_RESTARTING: 'Gerät neustarten',
 	UPLOAD_STAGE_COMPLETED: 'Abgeschlossen',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Nur CyberBrick-Board wird unterstützt',
+	ERROR_UPLOAD_CODE_EMPTY: 'Code darf nicht leer sein',
+	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python-Umgebung nicht gefunden. Bitte installieren Sie zuerst PlatformIO.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremote-Installation fehlgeschlagen',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick-Gerät nicht gefunden. Bitte stellen Sie sicher, dass es angeschlossen ist.',
+	ERROR_UPLOAD_RESET_FAILED: 'Gerät konnte nicht zurückgesetzt werden',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Programm konnte nicht hochgeladen werden',
+	ERROR_UPLOAD_RESTART_FAILED: 'Gerät konnte nicht neu gestartet werden',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Sind Sie sicher, dass Sie das Backup "{0}" löschen möchten?',
+	BACKUP_CONFIRM_RESTORE:
+		'Sind Sie sicher, dass Sie das Backup "{0}" wiederherstellen möchten? Dies überschreibt den aktuellen Arbeitsbereich.',
+	BACKUP_ERROR_NOT_FOUND: 'Backup "{0}" nicht gefunden',
+	BACKUP_ERROR_CREATE_FAILED: 'Fehler beim Erstellen des Backups: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Fehler beim Löschen des Backups: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Fehler beim Wiederherstellen des Backups: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Fehler bei der Vorschau des Backups: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Backup-Name nicht angegeben',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'main.json-Datei nicht gefunden',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Fehler beim Aktualisieren der automatischen Backup-Einstellungen',
+
+	// Button labels
+	BUTTON_DELETE: 'Löschen',
+	BUTTON_RESTORE: 'Wiederherstellen',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Fehler bei der Nachrichtenverarbeitung: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Fehler beim Aktualisieren der Einstellungen',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Fehler beim Neuladen des Arbeitsbereichs: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Bitte öffnen Sie zuerst einen Projektordner',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Keine Backup-Dateien zur Vorschau',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Backup-Datei zur Vorschau auswählen',
+	DIALOG_BACKUP_FILES_LABEL: 'Backup-Dateien',
 });

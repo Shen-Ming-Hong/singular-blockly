@@ -706,4 +706,43 @@ window.languageManager.loadMessages('ja', {
 	UPLOAD_STAGE_UPLOADING: 'アップロード中',
 	UPLOAD_STAGE_RESTARTING: 'デバイス再起動中',
 	UPLOAD_STAGE_COMPLETED: '完了',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'CyberBrickボードのみサポートされています',
+	ERROR_UPLOAD_CODE_EMPTY: 'コードが空です',
+	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python環境が見つかりません。先にPlatformIOをインストールしてください。',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremoteのインストールに失敗しました',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrickデバイスが見つかりません。接続を確認してください。',
+	ERROR_UPLOAD_RESET_FAILED: 'デバイスのリセットに失敗しました',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'プログラムのアップロードに失敗しました',
+	ERROR_UPLOAD_RESTART_FAILED: 'デバイスの再起動に失敗しました',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'バックアップ「{0}」を削除してもよろしいですか？',
+	BACKUP_CONFIRM_RESTORE: 'バックアップ「{0}」を復元してもよろしいですか？現在のワークスペースは上書きされます。',
+	BACKUP_ERROR_NOT_FOUND: 'バックアップ「{0}」が見つかりません',
+	BACKUP_ERROR_CREATE_FAILED: 'バックアップの作成に失敗しました：{0}',
+	BACKUP_ERROR_DELETE_FAILED: 'バックアップの削除に失敗しました：{0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'バックアップの復元に失敗しました：{0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'バックアップのプレビューに失敗しました：{0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'バックアップ名が指定されていません',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'main.jsonファイルが見つかりません',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: '自動バックアップ設定の更新に失敗しました',
+
+	// Button labels
+	BUTTON_DELETE: '削除',
+	BUTTON_RESTORE: '復元',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'メッセージの処理中にエラーが発生しました：{0}',
+	ERROR_SETTINGS_UPDATE_FAILED: '設定の更新に失敗しました',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'ワークスペースの再読み込みに失敗しました：{0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: '最初にプロジェクトフォルダを開いてください',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'プレビューするバックアップファイルがありません',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'プレビューするバックアップファイルを選択',
+	DIALOG_BACKUP_FILES_LABEL: 'バックアップファイル',
 });

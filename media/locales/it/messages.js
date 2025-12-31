@@ -637,7 +637,8 @@ window.languageManager.loadMessages('it', {
 
 	// CyberBrick Main Block
 	CYBERBRICK_MAIN: 'Programma principale',
-	CYBERBRICK_MAIN_TOOLTIP: 'Punto di ingresso del programma principale CyberBrick. Tutto il codice dovrebbe essere inserito in questo blocco.',
+	CYBERBRICK_MAIN_TOOLTIP:
+		'Punto di ingresso del programma principale CyberBrick. Tutto il codice dovrebbe essere inserito in questo blocco.',
 
 	// CyberBrick LED Blocks
 	CYBERBRICK_LED_SET_COLOR: 'Imposta colore LED',
@@ -705,4 +706,43 @@ window.languageManager.loadMessages('it', {
 	UPLOAD_STAGE_UPLOADING: 'Caricamento',
 	UPLOAD_STAGE_RESTARTING: 'Riavvio dispositivo',
 	UPLOAD_STAGE_COMPLETED: 'Completato',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Supportata solo la scheda CyberBrick',
+	ERROR_UPLOAD_CODE_EMPTY: 'Il codice non può essere vuoto',
+	ERROR_UPLOAD_NO_PYTHON: 'Ambiente Python PlatformIO non trovato. Installa prima PlatformIO.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'Installazione mpremote fallita',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'Dispositivo CyberBrick non trovato. Assicurati che sia collegato.',
+	ERROR_UPLOAD_RESET_FAILED: 'Impossibile resettare il dispositivo',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Impossibile caricare il programma',
+	ERROR_UPLOAD_RESTART_FAILED: 'Impossibile riavviare il dispositivo',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Sei sicuro di voler eliminare il backup "{0}"?',
+	BACKUP_CONFIRM_RESTORE: 'Sei sicuro di voler ripristinare il backup "{0}"? Questo sovrascriverà lo spazio di lavoro corrente.',
+	BACKUP_ERROR_NOT_FOUND: 'Backup "{0}" non trovato',
+	BACKUP_ERROR_CREATE_FAILED: 'Impossibile creare il backup: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Impossibile eliminare il backup: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Impossibile ripristinare il backup: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: "Impossibile visualizzare l'anteprima del backup: {0}",
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Nome backup non specificato',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Impossibile trovare il file main.json',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Impossibile aggiornare le impostazioni del backup automatico',
+
+	// Button labels
+	BUTTON_DELETE: 'Elimina',
+	BUTTON_RESTORE: 'Ripristina',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: "Errore durante l'elaborazione del messaggio: {0}",
+	ERROR_SETTINGS_UPDATE_FAILED: 'Impossibile aggiornare le impostazioni',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Impossibile ricaricare lo spazio di lavoro: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Aprire prima una cartella del progetto',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Nessun file di backup da visualizzare in anteprima',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Seleziona il file di backup da visualizzare in anteprima',
+	DIALOG_BACKUP_FILES_LABEL: 'File di backup',
 });

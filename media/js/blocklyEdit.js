@@ -2713,10 +2713,78 @@ function handleUploadResult(message) {
 		const successMsg = window.languageManager?.getMessage('UPLOAD_SUCCESS', '上傳成功！');
 		toast.show(successMsg, 'success');
 	} else {
-		const errorMsg = message.error?.message || '未知錯誤';
+		// 根據錯誤階段取得本地化錯誤訊息
+		const errorMsg = getLocalizedUploadError(message.error?.stage, message.error?.message);
 		const failedMsg = window.languageManager?.getMessage('UPLOAD_FAILED', '上傳失敗');
 		toast.show(`${failedMsg}: ${errorMsg}`, 'error', 5000);
 	}
+}
+
+/**
+ * 根據錯誤階段取得本地化的錯誤訊息
+ * @param {string} stage - 錯誤發生的階段
+ * @param {string} fallbackMessage - 預設訊息（來自 Extension Host）
+ * @returns {string} 本地化的錯誤訊息
+ */
+function getLocalizedUploadError(stage, fallbackMessage) {
+	// 階段對應的錯誤訊息鍵名
+	const errorKeyMap = {
+		preparing: {
+			'Only CyberBrick board is supported': 'ERROR_UPLOAD_BOARD_UNSUPPORTED',
+			'Code cannot be empty': 'ERROR_UPLOAD_CODE_EMPTY',
+		},
+		checking_tool: {
+			default: 'ERROR_UPLOAD_NO_PYTHON',
+		},
+		installing_tool: {
+			default: 'ERROR_UPLOAD_MPREMOTE_FAILED',
+		},
+		connecting: {
+			default: 'ERROR_UPLOAD_DEVICE_NOT_FOUND',
+		},
+		resetting: {
+			default: 'ERROR_UPLOAD_RESET_FAILED',
+		},
+		uploading: {
+			default: 'ERROR_UPLOAD_UPLOAD_FAILED',
+		},
+		restarting: {
+			default: 'ERROR_UPLOAD_RESTART_FAILED',
+		},
+	};
+
+	// 預設的 fallback 訊息（使用英文以避免硬編碼中文）
+	const defaultFallbacks = {
+		ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Only CyberBrick board is supported',
+		ERROR_UPLOAD_CODE_EMPTY: 'Code cannot be empty',
+		ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python environment not found',
+		ERROR_UPLOAD_MPREMOTE_FAILED: 'Failed to install mpremote',
+		ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick device not found',
+		ERROR_UPLOAD_RESET_FAILED: 'Failed to reset device',
+		ERROR_UPLOAD_UPLOAD_FAILED: 'Failed to upload program',
+		ERROR_UPLOAD_RESTART_FAILED: 'Failed to restart device',
+	};
+
+	if (!stage || !errorKeyMap[stage]) {
+		return fallbackMessage || 'Unknown error';
+	}
+
+	const stageErrors = errorKeyMap[stage];
+
+	// 嘗試精確匹配錯誤訊息
+	let errorKey = stageErrors[fallbackMessage];
+
+	// 如果沒有精確匹配，使用該階段的預設錯誤
+	if (!errorKey) {
+		errorKey = stageErrors.default;
+	}
+
+	if (!errorKey) {
+		return fallbackMessage || 'Unknown error';
+	}
+
+	// 取得本地化訊息
+	return window.languageManager?.getMessage(errorKey, defaultFallbacks[errorKey]) || fallbackMessage || 'Unknown error';
 }
 
 /**

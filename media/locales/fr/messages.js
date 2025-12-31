@@ -708,4 +708,43 @@ window.languageManager.loadMessages('fr', {
 	UPLOAD_STAGE_UPLOADING: 'Téléversement',
 	UPLOAD_STAGE_RESTARTING: 'Redémarrage du dispositif',
 	UPLOAD_STAGE_COMPLETED: 'Terminé',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Seule la carte CyberBrick est prise en charge',
+	ERROR_UPLOAD_CODE_EMPTY: 'Le code ne peut pas être vide',
+	ERROR_UPLOAD_NO_PYTHON: "Environnement Python PlatformIO introuvable. Veuillez d'abord installer PlatformIO.",
+	ERROR_UPLOAD_MPREMOTE_FAILED: "Échec de l'installation de mpremote",
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: "Appareil CyberBrick introuvable. Veuillez vérifier qu'il est connecté.",
+	ERROR_UPLOAD_RESET_FAILED: "Échec de la réinitialisation de l'appareil",
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Échec du téléversement du programme',
+	ERROR_UPLOAD_RESTART_FAILED: "Échec du redémarrage de l'appareil",
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Êtes-vous sûr de vouloir supprimer la sauvegarde "{0}" ?',
+	BACKUP_CONFIRM_RESTORE: 'Êtes-vous sûr de vouloir restaurer la sauvegarde "{0}" ? Cela écrasera l\'espace de travail actuel.',
+	BACKUP_ERROR_NOT_FOUND: 'Sauvegarde "{0}" introuvable',
+	BACKUP_ERROR_CREATE_FAILED: 'Échec de la création de la sauvegarde : {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Échec de la suppression de la sauvegarde : {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Échec de la restauration de la sauvegarde : {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: "Échec de l'aperçu de la sauvegarde : {0}",
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Nom de sauvegarde non spécifié',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Impossible de trouver le fichier main.json',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Échec de la mise à jour des paramètres de sauvegarde automatique',
+
+	// Button labels
+	BUTTON_DELETE: 'Supprimer',
+	BUTTON_RESTORE: 'Restaurer',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Erreur lors du traitement du message : {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Échec de la mise à jour des paramètres',
+	ERROR_RELOAD_WORKSPACE_FAILED: "Échec du rechargement de l'espace de travail : {0}",
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: "Veuillez d'abord ouvrir un dossier de projet",
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Aucun fichier de sauvegarde à prévisualiser',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Sélectionner le fichier de sauvegarde à prévisualiser',
+	DIALOG_BACKUP_FILES_LABEL: 'Fichiers de sauvegarde',
 });

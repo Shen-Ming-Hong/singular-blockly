@@ -705,4 +705,43 @@ window.languageManager.loadMessages('ko', {
 	UPLOAD_STAGE_UPLOADING: '업로드 중',
 	UPLOAD_STAGE_RESTARTING: '장치 재시작 중',
 	UPLOAD_STAGE_COMPLETED: '완료',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'CyberBrick 보드만 지원됩니다',
+	ERROR_UPLOAD_CODE_EMPTY: '코드가 비어 있습니다',
+	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python 환경을 찾을 수 없습니다. 먼저 PlatformIO를 설치해 주세요.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremote 설치에 실패했습니다',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick 장치를 찾을 수 없습니다. 연결을 확인해 주세요.',
+	ERROR_UPLOAD_RESET_FAILED: '장치 재설정에 실패했습니다',
+	ERROR_UPLOAD_UPLOAD_FAILED: '프로그램 업로드에 실패했습니다',
+	ERROR_UPLOAD_RESTART_FAILED: '장치 재시작에 실패했습니다',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: '백업 "{0}"을(를) 삭제하시겠습니까?',
+	BACKUP_CONFIRM_RESTORE: '백업 "{0}"을(를) 복원하시겠습니까? 현재 작업 공간이 덮어씌워집니다.',
+	BACKUP_ERROR_NOT_FOUND: '백업 "{0}"을(를) 찾을 수 없습니다',
+	BACKUP_ERROR_CREATE_FAILED: '백업 생성 실패: {0}',
+	BACKUP_ERROR_DELETE_FAILED: '백업 삭제 실패: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: '백업 복원 실패: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: '백업 미리보기 실패: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: '백업 이름이 지정되지 않았습니다',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'main.json 파일을 찾을 수 없습니다',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: '자동 백업 설정 업데이트에 실패했습니다',
+
+	// Button labels
+	BUTTON_DELETE: '삭제',
+	BUTTON_RESTORE: '복원',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: '메시지 처리 중 오류 발생: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: '설정 업데이트에 실패했습니다',
+	ERROR_RELOAD_WORKSPACE_FAILED: '작업 공간 다시 로드 실패: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: '먼저 프로젝트 폴더를 열어주세요',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: '미리 볼 백업 파일이 없습니다',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: '미리 볼 백업 파일 선택',
+	DIALOG_BACKUP_FILES_LABEL: '백업 파일',
 });

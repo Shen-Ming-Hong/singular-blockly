@@ -712,4 +712,43 @@ window.languageManager.loadMessages('hu', {
 	UPLOAD_STAGE_UPLOADING: 'Feltöltés',
 	UPLOAD_STAGE_RESTARTING: 'Eszköz újraindítása',
 	UPLOAD_STAGE_COMPLETED: 'Befejezve',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Csak a CyberBrick kártya támogatott',
+	ERROR_UPLOAD_CODE_EMPTY: 'A kód nem lehet üres',
+	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python környezet nem található. Először telepítse a PlatformIO-t.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremote telepítése sikertelen',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick eszköz nem található. Győződjön meg róla, hogy csatlakoztatva van.',
+	ERROR_UPLOAD_RESET_FAILED: 'Nem sikerült visszaállítani az eszközt',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Nem sikerült feltölteni a programot',
+	ERROR_UPLOAD_RESTART_FAILED: 'Nem sikerült újraindítani az eszközt',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Biztosan törölni szeretné a(z) "{0}" biztonsági mentést?',
+	BACKUP_CONFIRM_RESTORE: 'Biztosan visszaállítja a(z) "{0}" biztonsági mentést? Ez felülírja az aktuális munkaterületet.',
+	BACKUP_ERROR_NOT_FOUND: 'A(z) "{0}" biztonsági mentés nem található',
+	BACKUP_ERROR_CREATE_FAILED: 'Nem sikerült létrehozni a biztonsági mentést: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Nem sikerült törölni a biztonsági mentést: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Nem sikerült visszaállítani a biztonsági mentést: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Nem sikerült előnézni a biztonsági mentést: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Nincs megadva a biztonsági mentés neve',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'A main.json fájl nem található',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Nem sikerült frissíteni az automatikus biztonsági mentés beállításait',
+
+	// Button labels
+	BUTTON_DELETE: 'Törlés',
+	BUTTON_RESTORE: 'Visszaállítás',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Hiba az üzenet feldolgozása közben: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Nem sikerült frissíteni a beállításokat',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Nem sikerült újratölteni a munkaterületet: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Kérjük, először nyisson meg egy projektmappát',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Nincsenek biztonsági mentés fájlok az előnézethez',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Válassza ki a biztonsági mentés fájlt az előnézethez',
+	DIALOG_BACKUP_FILES_LABEL: 'Biztonsági mentés fájlok',
 });

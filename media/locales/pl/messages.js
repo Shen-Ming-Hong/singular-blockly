@@ -711,4 +711,43 @@ window.languageManager.loadMessages('pl', {
 	UPLOAD_STAGE_UPLOADING: 'Przesyłanie',
 	UPLOAD_STAGE_RESTARTING: 'Restartowanie urządzenia',
 	UPLOAD_STAGE_COMPLETED: 'Zakończono',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Obsługiwana jest tylko płytka CyberBrick',
+	ERROR_UPLOAD_CODE_EMPTY: 'Kod nie może być pusty',
+	ERROR_UPLOAD_NO_PYTHON: 'Środowisko Python PlatformIO nie znalezione. Najpierw zainstaluj PlatformIO.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'Instalacja mpremote nie powiodła się',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'Urządzenie CyberBrick nie znalezione. Upewnij się, że jest podłączone.',
+	ERROR_UPLOAD_RESET_FAILED: 'Nie udało się zresetować urządzenia',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Nie udało się przesłać programu',
+	ERROR_UPLOAD_RESTART_FAILED: 'Nie udało się zrestartować urządzenia',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Czy na pewno chcesz usunąć kopię zapasową "{0}"?',
+	BACKUP_CONFIRM_RESTORE: 'Czy na pewno chcesz przywrócić kopię zapasową "{0}"? To nadpisze bieżący obszar roboczy.',
+	BACKUP_ERROR_NOT_FOUND: 'Kopia zapasowa "{0}" nie została znaleziona',
+	BACKUP_ERROR_CREATE_FAILED: 'Nie udało się utworzyć kopii zapasowej: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Nie udało się usunąć kopii zapasowej: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Nie udało się przywrócić kopii zapasowej: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Nie udało się wyświetlić podglądu kopii zapasowej: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Nie podano nazwy kopii zapasowej',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Nie można znaleźć pliku main.json',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Nie udało się zaktualizować ustawień automatycznego tworzenia kopii zapasowych',
+
+	// Button labels
+	BUTTON_DELETE: 'Usuń',
+	BUTTON_RESTORE: 'Przywróć',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Błąd podczas przetwarzania wiadomości: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Nie udało się zaktualizować ustawień',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Nie udało się ponownie załadować obszaru roboczego: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Najpierw otwórz folder projektu',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Brak plików kopii zapasowych do podglądu',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Wybierz plik kopii zapasowej do podglądu',
+	DIALOG_BACKUP_FILES_LABEL: 'Pliki kopii zapasowych',
 });
