@@ -224,7 +224,7 @@ export class MicropythonUploader {
 		onProgress?.({
 			stage: 'installing_tool',
 			progress: 30,
-			message: '正在安裝 mpremote...',
+			message: 'Installing mpremote...',
 		});
 
 		try {
@@ -352,24 +352,24 @@ export class MicropythonUploader {
 		onProgress?.({
 			stage: 'preparing',
 			progress: 0,
-			message: '準備上傳...',
+			message: 'Preparing...',
 		});
 
 		// 驗證主板類型
 		if (request.board !== 'cyberbrick') {
-			return this.createFailureResult(startTime, port || 'unknown', 'preparing', '僅支援 CyberBrick 主板');
+			return this.createFailureResult(startTime, port || 'unknown', 'preparing', 'Only CyberBrick board is supported');
 		}
 
 		// 驗證程式碼
 		if (!request.code || request.code.trim().length === 0) {
-			return this.createFailureResult(startTime, port || 'unknown', 'preparing', '程式碼不能為空');
+			return this.createFailureResult(startTime, port || 'unknown', 'preparing', 'Code cannot be empty');
 		}
 
 		// 階段 2: 檢查工具
 		onProgress?.({
 			stage: 'checking_tool',
 			progress: 10,
-			message: '檢查 mpremote 工具...',
+			message: 'Checking mpremote tool...',
 		});
 
 		const hasPython = await this.checkPythonEnvironment();
@@ -378,7 +378,7 @@ export class MicropythonUploader {
 				startTime,
 				port || 'unknown',
 				'checking_tool',
-				'PlatformIO Python 環境不存在，請先安裝 PlatformIO'
+				'PlatformIO Python environment not found. Please install PlatformIO first.'
 			);
 		}
 
@@ -388,7 +388,7 @@ export class MicropythonUploader {
 			onProgress?.({
 				stage: 'installing_tool',
 				progress: 20,
-				message: '安裝 mpremote...',
+				message: 'Installing mpremote...',
 			});
 
 			const installed = await this.installMpremote(onProgress);
@@ -397,8 +397,8 @@ export class MicropythonUploader {
 					startTime,
 					port || 'unknown',
 					'installing_tool',
-					'mpremote 安裝失敗',
-					'請手動執行：pip install mpremote'
+					'mpremote installation failed',
+					'Please run manually: pip install mpremote'
 				);
 			}
 		}
@@ -407,14 +407,19 @@ export class MicropythonUploader {
 		onProgress?.({
 			stage: 'connecting',
 			progress: 40,
-			message: '偵測 CyberBrick...',
+			message: 'Detecting CyberBrick...',
 		});
 
 		// 自動偵測連接埠
 		if (!port) {
 			const { autoDetected } = await this.listPorts('cyberbrick');
 			if (!autoDetected) {
-				return this.createFailureResult(startTime, 'unknown', 'connecting', '找不到 CyberBrick 裝置，請確認已連接');
+				return this.createFailureResult(
+					startTime,
+					'unknown',
+					'connecting',
+					'CyberBrick device not found. Please ensure it is connected.'
+				);
 			}
 			port = autoDetected;
 		}
@@ -425,33 +430,33 @@ export class MicropythonUploader {
 		onProgress?.({
 			stage: 'resetting',
 			progress: 50,
-			message: '重置 CyberBrick...',
+			message: 'Resetting CyberBrick...',
 		});
 
 		try {
 			await this.resetDevice(port);
 		} catch (error) {
-			return this.createFailureResult(startTime, port, 'resetting', '裝置重置失敗', this.getErrorMessage(error));
+			return this.createFailureResult(startTime, port, 'resetting', 'Failed to reset device', this.getErrorMessage(error));
 		}
 
 		// 階段 6: 上傳程式
 		onProgress?.({
 			stage: 'uploading',
 			progress: 70,
-			message: '上傳程式...',
+			message: 'Uploading program...',
 		});
 
 		try {
 			await this.uploadCode(request.code, port);
 		} catch (error) {
-			return this.createFailureResult(startTime, port, 'uploading', '程式上傳失敗', this.getErrorMessage(error));
+			return this.createFailureResult(startTime, port, 'uploading', 'Failed to upload program', this.getErrorMessage(error));
 		}
 
 		// 階段 7: 重啟裝置
 		onProgress?.({
 			stage: 'restarting',
 			progress: 90,
-			message: '重啟 CyberBrick...',
+			message: 'Restarting CyberBrick...',
 		});
 
 		try {
@@ -465,7 +470,7 @@ export class MicropythonUploader {
 		onProgress?.({
 			stage: 'completed',
 			progress: 100,
-			message: '上傳完成！',
+			message: 'Upload complete!',
 		});
 
 		const duration = Date.now() - startTime;

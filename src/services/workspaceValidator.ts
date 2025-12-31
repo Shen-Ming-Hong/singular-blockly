@@ -175,7 +175,7 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 			// 根據是否有專案類型選擇訊息模板
 			const messageKey = projectType ? MESSAGE_KEYS.SAFETY_WARNING_BODY_WITH_TYPE : MESSAGE_KEYS.SAFETY_WARNING_BODY_NO_TYPE;
 
-			// 取得訊息內容 (await 非同步呼叫)
+			// 取得訊息內容 (await 非同步呼叫，帶英文 fallback)
 			let message = await this.localeService.getLocalizedMessage(messageKey, this.getFallbackMessage(messageKey));
 
 			// 如果有專案類型,替換占位符 {0}
@@ -183,10 +183,10 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 				message = message.replace('{0}', projectType);
 			}
 
-			// 按鈕文字 (await 非同步呼叫)
+			// 按鈕文字 (await 非同步呼叫，帶英文 fallback)
 			// 注意: modal 對話框會自動提供預設的取消按鈕,不需要額外添加
-			const continueButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_CONTINUE, '繼續');
-			const suppressButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_SUPPRESS, '不再提醒');
+			const continueButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_CONTINUE, 'Continue');
+			const suppressButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_SUPPRESS, 'Do Not Remind');
 
 			// 顯示模態對話框 (使用者按 ESC 或關閉視窗會返回 undefined,視為取消)
 			const selection = await vscode.window.showWarningMessage(message, { modal: true }, continueButton, suppressButton);
@@ -204,21 +204,21 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 				return 'cancel';
 			}
 		} catch (error) {
-			// LocaleService 失敗時使用硬編碼的後備訊息
+			// LocaleService 失敗時使用硬編碼的後備訊息（英文）
 			log('Error loading localized messages, using fallback', 'warn', { error });
 
-			// 後備訊息 (繁體中文)
+			// 後備訊息（英文）
 			const fallbackMessage = projectType
-				? `偵測到這是一個 ${projectType} 專案。在非 Blockly 專案中開啟編輯器可能會導致檔案遺失。是否繼續?`
-				: '偵測到這可能不是 Blockly 專案。在非 Blockly 專案中開啟編輯器可能會導致檔案遺失。是否繼續?';
+				? `Detected ${projectType} project. Opening the editor in a non-Blockly project may cause file loss. Do you want to continue?`
+				: 'This may not be a Blockly project. Opening the editor in a non-Blockly project may cause file loss. Do you want to continue?';
 
 			// 注意: modal 對話框會自動提供預設的取消按鈕,不需要額外添加
-			const selection = await vscode.window.showWarningMessage(fallbackMessage, { modal: true }, '繼續', '不再提醒');
+			const selection = await vscode.window.showWarningMessage(fallbackMessage, { modal: true }, 'Continue', 'Do Not Remind');
 
 			// 解析使用者選擇 (硬編碼比對)
-			if (selection === '繼續') {
+			if (selection === 'Continue') {
 				return 'continue';
-			} else if (selection === '不再提醒') {
+			} else if (selection === 'Do Not Remind') {
 				return 'suppress';
 			} else {
 				// undefined: 使用者點擊預設取消按鈕或按 ESC
@@ -271,21 +271,21 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 	}
 
 	/**
-	 * 取得訊息的後備文字(當 i18n 失敗時使用)
+	 * 取得訊息的後備文字（當 i18n 失敗時使用）
 	 *
 	 * @param key 訊息鍵名
-	 * @returns 繁體中文後備訊息
+	 * @returns 英文後備訊息
 	 */
 	private getFallbackMessage(key: string): string {
-		// 使用繁體中文作為後備語言(目標使用者為台灣國小學童)
+		// 使用英文作為後備語言，符合 i18n 最佳實踐
 		const fallbackMessages: Record<string, string> = {
 			[MESSAGE_KEYS.SAFETY_WARNING_BODY_NO_TYPE]:
-				'這個專案還沒有 Blockly 積木。如果繼續,會在這裡建立 blockly 資料夾和檔案。要繼續嗎?',
+				'This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
 			[MESSAGE_KEYS.SAFETY_WARNING_BODY_WITH_TYPE]:
-				'偵測到 {0} 專案。這個專案還沒有 Blockly 積木。如果繼續,會在這裡建立 blockly 資料夾和檔案。要繼續嗎?',
-			[MESSAGE_KEYS.BUTTON_CONTINUE]: '繼續',
-			[MESSAGE_KEYS.BUTTON_CANCEL]: '取消',
-			[MESSAGE_KEYS.BUTTON_SUPPRESS]: '不再提醒',
+				'Detected {0} project. This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
+			[MESSAGE_KEYS.BUTTON_CONTINUE]: 'Continue',
+			[MESSAGE_KEYS.BUTTON_CANCEL]: 'Cancel',
+			[MESSAGE_KEYS.BUTTON_SUPPRESS]: 'Do Not Remind',
 		};
 		return fallbackMessages[key] || key;
 	}

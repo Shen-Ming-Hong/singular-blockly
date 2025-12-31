@@ -708,4 +708,43 @@ window.languageManager.loadMessages('cs', {
 	UPLOAD_STAGE_UPLOADING: 'Nahrávání',
 	UPLOAD_STAGE_RESTARTING: 'Restartování zařízení',
 	UPLOAD_STAGE_COMPLETED: 'Dokončeno',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Je podporována pouze deska CyberBrick',
+	ERROR_UPLOAD_CODE_EMPTY: 'Kód nemůže být prázdný',
+	ERROR_UPLOAD_NO_PYTHON: 'Python prostředí PlatformIO nebylo nalezeno. Nejprve nainstalujte PlatformIO.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'Instalace mpremote selhala',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'Zařízení CyberBrick nebylo nalezeno. Ujistěte se, že je připojeno.',
+	ERROR_UPLOAD_RESET_FAILED: 'Nepodařilo se resetovat zařízení',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Nepodařilo se nahrát program',
+	ERROR_UPLOAD_RESTART_FAILED: 'Nepodařilo se restartovat zařízení',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Opravdu chcete smazat zálohu "{0}"?',
+	BACKUP_CONFIRM_RESTORE: 'Opravdu chcete obnovit zálohu "{0}"? Tím se přepíše aktuální pracovní prostor.',
+	BACKUP_ERROR_NOT_FOUND: 'Záloha "{0}" nebyla nalezena',
+	BACKUP_ERROR_CREATE_FAILED: 'Nepodařilo se vytvořit zálohu: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Nepodařilo se smazat zálohu: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Nepodařilo se obnovit zálohu: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Nepodařilo se zobrazit náhled zálohy: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Název zálohy není zadán',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Nelze najít soubor main.json',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Nepodařilo se aktualizovat nastavení automatického zálohování',
+
+	// Button labels
+	BUTTON_DELETE: 'Smazat',
+	BUTTON_RESTORE: 'Obnovit',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Chyba při zpracování zprávy: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Nepodařilo se aktualizovat nastavení',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Nepodařilo se znovu načíst pracovní prostor: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Nejprve otevřete složku projektu',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Žádné záložní soubory k náhledu',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Vyberte záložní soubor pro náhled',
+	DIALOG_BACKUP_FILES_LABEL: 'Záložní soubory',
 });

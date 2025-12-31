@@ -708,4 +708,44 @@ window.languageManager.loadMessages('es', {
 	UPLOAD_STAGE_UPLOADING: 'Cargando',
 	UPLOAD_STAGE_RESTARTING: 'Reiniciando dispositivo',
 	UPLOAD_STAGE_COMPLETED: 'Completado',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Solo se admite la placa CyberBrick',
+	ERROR_UPLOAD_CODE_EMPTY: 'El código no puede estar vacío',
+	ERROR_UPLOAD_NO_PYTHON: 'No se encontró el entorno Python de PlatformIO. Por favor, instale PlatformIO primero.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'Fallo en la instalación de mpremote',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'No se encontró el dispositivo CyberBrick. Por favor, asegúrese de que esté conectado.',
+	ERROR_UPLOAD_RESET_FAILED: 'Error al reiniciar el dispositivo',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Error al cargar el programa',
+	ERROR_UPLOAD_RESTART_FAILED: 'Error al reiniciar el dispositivo',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: '¿Está seguro de que desea eliminar la copia de seguridad "{0}"?',
+	BACKUP_CONFIRM_RESTORE:
+		'¿Está seguro de que desea restaurar la copia de seguridad "{0}"? Esto sobrescribirá el espacio de trabajo actual.',
+	BACKUP_ERROR_NOT_FOUND: 'Copia de seguridad "{0}" no encontrada',
+	BACKUP_ERROR_CREATE_FAILED: 'Error al crear la copia de seguridad: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Error al eliminar la copia de seguridad: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Error al restaurar la copia de seguridad: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Error al previsualizar la copia de seguridad: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Nombre de copia de seguridad no especificado',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'No se puede encontrar el archivo main.json',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Error al actualizar la configuración de copia de seguridad automática',
+
+	// Button labels
+	BUTTON_DELETE: 'Eliminar',
+	BUTTON_RESTORE: 'Restaurar',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Error al procesar el mensaje: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Error al actualizar la configuración',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Error al recargar el espacio de trabajo: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Por favor, abra una carpeta de proyecto primero',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'No hay archivos de copia de seguridad para previsualizar',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Seleccionar archivo de copia de seguridad para previsualizar',
+	DIALOG_BACKUP_FILES_LABEL: 'Archivos de copia de seguridad',
 });

@@ -60,21 +60,99 @@ export class LocaleService {
 	}
 
 	/**
-	 * 獲取本地化訊息
+	 * 獲取本地化訊息（強化版）
+	 *
+	 * 回退順序：
+	 * 1. 當前語言翻譯
+	 * 2. 英文翻譯
+	 * 3. fallback 參數
+	 * 4. 鍵名本身（最後手段）
+	 *
 	 * @param key 訊息鍵名
+	 * @param fallbackOrArg 可選，fallback 字串或第一個格式化參數（向後相容）
 	 * @param args 格式化參數
 	 * @returns 翻譯後的訊息
+	 *
+	 * @example
+	 * // 基本用法
+	 * const msg = await localeService.getLocalizedMessage('BUTTON_CONTINUE');
+	 *
+	 * // 帶 fallback
+	 * const msg = await localeService.getLocalizedMessage('BUTTON_CONTINUE', 'Continue');
+	 *
+	 * // 帶參數
+	 * const msg = await localeService.getLocalizedMessage(
+	 *   'BACKUP_CONFIRM_DELETE',
+	 *   'Are you sure you want to delete "{0}"?',
+	 *   backupName
+	 * );
 	 */
-	async getLocalizedMessage(key: string, ...args: any[]): Promise<string> {
-		const messages = await this.loadUIMessages();
-		let message = messages[key] || key; // 如果找不到翻譯，則使用 key 本身
+	async getLocalizedMessage(key: string, fallbackOrArg?: string | any, ...args: any[]): Promise<string> {
+		// 向後相容：偵測第二參數型別
+		let fallback: string | undefined;
+		let actualArgs: any[];
 
-		// 替換參數 {0}, {1}, 等
-		args.forEach((arg, index) => {
+		if (typeof fallbackOrArg === 'string') {
+			// 新方式：第二參數是 fallback 字串
+			fallback = fallbackOrArg;
+			actualArgs = args;
+		} else if (fallbackOrArg !== undefined) {
+			// 舊方式：第二參數是 args[0]
+			fallback = undefined;
+			actualArgs = [fallbackOrArg, ...args];
+		} else {
+			fallback = undefined;
+			actualArgs = args;
+		}
+
+		// 1. 嘗試當前語言
+		const messages = await this.loadUIMessages();
+		let message = messages[key];
+
+		// 2. 回退到英文（如果當前語言不是英文）
+		if (!message && this.currentLanguage !== 'en') {
+			const enMessages = await this.loadEnglishMessages();
+			message = enMessages[key];
+		}
+
+		// 3. 使用 fallback 參數
+		if (!message) {
+			message = fallback || key;
+		}
+
+		// 4. 替換參數 {0}, {1}, 等
+		actualArgs.forEach((arg, index) => {
 			message = message.replace(new RegExp(`\\{${index}\\}`, 'g'), String(arg));
 		});
 
 		return message;
+	}
+
+	/**
+	 * 載入英文翻譯（用於回退）
+	 * @returns 英文翻譯訊息物件
+	 */
+	private async loadEnglishMessages(): Promise<UIMessages> {
+		// 如果已經快取，直接返回
+		if (this.cachedMessages.has('en')) {
+			return this.cachedMessages.get('en') || {};
+		}
+
+		const enFilePath = path.join(this.extensionPath, 'media/locales/en/messages.js');
+
+		if (!this.fs.existsSync(enFilePath)) {
+			return {};
+		}
+
+		try {
+			const content = (await this.fs.promises.readFile(enFilePath, 'utf8')) as string;
+			const messages = this.extractMessagesFromJs(content);
+			this.cachedMessages.set('en', messages);
+			return messages;
+		} catch (error) {
+			log('Error loading English messages for fallback:', 'error', error);
+			return {};
+		}
 	}
 
 	/**

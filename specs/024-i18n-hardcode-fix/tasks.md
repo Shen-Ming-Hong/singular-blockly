@@ -27,8 +27,8 @@
 
 **Purpose**: 建立 i18n 常數檔案和基礎架構
 
--   [ ] T001 建立 i18n 鍵名常數檔案 `src/types/i18nKeys.ts`，定義所有訊息鍵名分類（MESSAGE_KEYS, UPLOAD_KEYS, UPLOAD_ERROR_KEYS, BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）
--   [ ] T002 [P] 驗證 TypeScript 設定，確保 `src/types/` 目錄下的型別檔案被正確編譯
+-   [x] T001 建立 i18n 鍵名常數檔案 `src/types/i18nKeys.ts`，定義所有訊息鍵名分類（MESSAGE_KEYS, UPLOAD_KEYS, UPLOAD_ERROR_KEYS, BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）
+-   [x] T002 [P] 驗證 TypeScript 設定，確保 `src/types/` 目錄下的型別檔案被正確編譯
     -   **驗證項目**：
         1. 確認 `tsconfig.json` 的 `include` 陣列包含 `src/**/*`
         2. 執行 `npm run compile` 無編譯錯誤
@@ -42,10 +42,10 @@
 
 **⚠️ CRITICAL**: 此階段必須完成，所有 User Story 才能開始
 
--   [ ] T003 新增 `loadEnglishMessages()` 私有方法到 `src/services/localeService.ts`，用於載入英文翻譯作為回退
--   [ ] T004 修改 `getLocalizedMessage()` 方法簽章，新增 `fallback` 參數支援 `src/services/localeService.ts`
--   [ ] T005 實作 `getLocalizedMessage()` 回退鏈邏輯：當前語言 → 英文翻譯 → fallback 參數 → 鍵名 `src/services/localeService.ts`
--   [ ] T006 [P] 新增英文翻譯鍵值到 `media/locales/en/messages.js`（UPLOAD_KEYS, UPLOAD_ERROR_KEYS, BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）
+-   [x] T003 新增 `loadEnglishMessages()` 私有方法到 `src/services/localeService.ts`，用於載入英文翻譯作為回退
+-   [x] T004 修改 `getLocalizedMessage()` 方法簽章，新增 `fallback` 參數支援 `src/services/localeService.ts`
+-   [x] T005 實作 `getLocalizedMessage()` 回退鏈邏輯：當前語言 → 英文翻譯 → fallback 參數 → 鍵名 `src/services/localeService.ts`
+-   [x] T006 [P] 新增英文翻譯鍵值到 `media/locales/en/messages.js`（UPLOAD_KEYS, UPLOAD_ERROR_KEYS, BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）
 
 **Checkpoint**: LocaleService 回退鏈機制就緒，User Story 實作可開始
 
@@ -75,12 +75,12 @@ await getLocalizedMessage('TEST_KEY', '{0} to {1}', 'A', 'B');
 
 ### Implementation for User Story 1
 
--   [ ] T007 [US1] 將 `workspaceValidator.ts` 中 `getFallbackMessage()` 的繁體中文 fallback 改為英文 `src/services/workspaceValidator.ts`
--   [ ] T008 [US1] 修改 `workspaceValidator.ts` 中所有 `getLocalizedMessage()` 呼叫，新增英文 fallback 參數 `src/services/workspaceValidator.ts`
--   [ ] T009 [US1] 匯入 i18nKeys 常數到 `workspaceValidator.ts`，取代硬編碼字串 `src/services/workspaceValidator.ts`
--   [ ] T010 [P] [US1] 新增繁體中文翻譯鍵值到 `media/locales/zh-hant/messages.js`（確保完整）
--   [ ] T011 [P] [US1] 新增日文翻譯鍵值到 `media/locales/ja/messages.js`
--   [ ] T012 [P] [US1] 新增韓文翻譯鍵值到 `media/locales/ko/messages.js`
+-   [x] T007 [US1] 將 `workspaceValidator.ts` 中 `getFallbackMessage()` 的繁體中文 fallback 改為英文 `src/services/workspaceValidator.ts`
+-   [x] T008 [US1] 修改 `workspaceValidator.ts` 中所有 `getLocalizedMessage()` 呼叫，新增英文 fallback 參數 `src/services/workspaceValidator.ts`
+-   [x] T009 [US1] 匯入 i18nKeys 常數到 `workspaceValidator.ts`，取代硬編碼字串 `src/services/workspaceValidator.ts`
+-   [x] T010 [P] [US1] 新增繁體中文翻譯鍵值到 `media/locales/zh-hant/messages.js`（確保完整）
+-   [x] T011 [P] [US1] 新增日文翻譯鍵值到 `media/locales/ja/messages.js`
+-   [x] T012 [P] [US1] 新增韓文翻譯鍵值到 `media/locales/ko/messages.js`
 
 **Checkpoint**: User Story 1 完成，英文環境下警告訊息正確顯示
 
@@ -96,13 +96,13 @@ await getLocalizedMessage('TEST_KEY', '{0} to {1}', 'A', 'B');
 
 ### Implementation for User Story 2
 
--   [ ] T013 [US2] 匯入 i18nKeys 常數（UPLOAD_KEYS, UPLOAD_ERROR_KEYS）到 `src/services/micropythonUploader.ts`
--   [ ] T014 [US2] 將 `micropythonUploader.ts` 中「準備上傳...」等進度訊息改為英文常數 `src/services/micropythonUploader.ts`
--   [ ] T015 [US2] 將 `micropythonUploader.ts` 中「僅支援 CyberBrick 主板」等錯誤訊息改為英文常數 `src/services/micropythonUploader.ts`
--   [ ] T016 [US2] 將 `micropythonUploader.ts` 中所有 `sendUploadProgress()` 呼叫改用英文訊息 `src/services/micropythonUploader.ts`
--   [ ] T017 [P] [US2] 新增西班牙文翻譯鍵值到 `media/locales/es/messages.js`
--   [ ] T018 [P] [US2] 新增法文翻譯鍵值到 `media/locales/fr/messages.js`
--   [ ] T019 [P] [US2] 新增德文翻譯鍵值到 `media/locales/de/messages.js`
+-   [x] T013 [US2] 匯入 i18nKeys 常數（UPLOAD_KEYS, UPLOAD_ERROR_KEYS）到 `src/services/micropythonUploader.ts`
+-   [x] T014 [US2] 將 `micropythonUploader.ts` 中「準備上傳...」等進度訊息改為英文常數 `src/services/micropythonUploader.ts`
+-   [x] T015 [US2] 將 `micropythonUploader.ts` 中「僅支援 CyberBrick 主板」等錯誤訊息改為英文常數 `src/services/micropythonUploader.ts`
+-   [x] T016 [US2] 將 `micropythonUploader.ts` 中所有 `sendUploadProgress()` 呼叫改用英文訊息 `src/services/micropythonUploader.ts`
+-   [x] T017 [P] [US2] 新增西班牙文翻譯鍵值到 `media/locales/es/messages.js`
+-   [x] T018 [P] [US2] 新增法文翻譯鍵值到 `media/locales/fr/messages.js`
+-   [x] T019 [P] [US2] 新增德文翻譯鍵值到 `media/locales/de/messages.js`
 
 **Checkpoint**: User Story 2 完成，MicroPython 上傳進度訊息可本地化
 
@@ -116,15 +116,15 @@ await getLocalizedMessage('TEST_KEY', '{0} to {1}', 'A', 'B');
 
 ### Implementation for User Story 3
 
--   [ ] T020 [US3] 匯入 i18nKeys 常數（BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）到 `src/webview/messageHandler.ts`
--   [ ] T021 [US3] 將 `messageHandler.ts` 中「確定要刪除備份檔案」等確認訊息改用 LocaleService `src/webview/messageHandler.ts`
--   [ ] T022 [US3] 將 `messageHandler.ts` 中「刪除」、「取消」等按鈕文字改用 LocaleService `src/webview/messageHandler.ts`
--   [ ] T023 [US3] 將 `messageHandler.ts` 中「建立備份失敗」等錯誤訊息改用 LocaleService `src/webview/messageHandler.ts`
--   [ ] T024 [US3] 將 `messageHandler.ts` 中「確定要還原備份」確認訊息改用 LocaleService `src/webview/messageHandler.ts`
--   [ ] T025 [US3] 將 `messageHandler.ts` 中「處理訊息時發生錯誤」等通用錯誤改用 LocaleService `src/webview/messageHandler.ts`
--   [ ] T026 [P] [US3] 新增義大利文翻譯鍵值到 `media/locales/it/messages.js`
--   [ ] T027 [P] [US3] 新增俄文翻譯鍵值到 `media/locales/ru/messages.js`
--   [ ] T028 [P] [US3] 新增波蘭文翻譯鍵值到 `media/locales/pl/messages.js`
+-   [x] T020 [US3] 匯入 i18nKeys 常數（BACKUP_KEYS, BUTTON_KEYS, ERROR_KEYS）到 `src/webview/messageHandler.ts`
+-   [x] T021 [US3] 將 `messageHandler.ts` 中「確定要刪除備份檔案」等確認訊息改用 LocaleService `src/webview/messageHandler.ts`
+-   [x] T022 [US3] 將 `messageHandler.ts` 中「刪除」、「取消」等按鈕文字改用 LocaleService `src/webview/messageHandler.ts`
+-   [x] T023 [US3] 將 `messageHandler.ts` 中「建立備份失敗」等錯誤訊息改用 LocaleService `src/webview/messageHandler.ts`
+-   [x] T024 [US3] 將 `messageHandler.ts` 中「確定要還原備份」確認訊息改用 LocaleService `src/webview/messageHandler.ts`
+-   [x] T025 [US3] 將 `messageHandler.ts` 中「處理訊息時發生錯誤」等通用錯誤改用 LocaleService `src/webview/messageHandler.ts`
+-   [x] T026 [P] [US3] 新增義大利文翻譯鍵值到 `media/locales/it/messages.js`
+-   [x] T027 [P] [US3] 新增俄文翻譯鍵值到 `media/locales/ru/messages.js`
+-   [x] T028 [P] [US3] 新增波蘭文翻譯鍵值到 `media/locales/pl/messages.js`
 
 **Checkpoint**: User Story 3 完成，備份功能訊息可本地化
 
@@ -138,13 +138,13 @@ await getLocalizedMessage('TEST_KEY', '{0} to {1}', 'A', 'B');
 
 ### Implementation for User Story 4
 
--   [ ] T029 [US4] 確認所有訊息鍵名都已加入 `I18nKey` 聯合型別 `src/types/i18nKeys.ts`
--   [ ] T030 [US4] 更新 `localeService.ts` 的 `getLocalizedMessage()` 參數型別，接受 `I18nKey` 型別 `src/services/localeService.ts`
--   [ ] T031 [P] [US4] 新增匈牙利文翻譯鍵值到 `media/locales/hu/messages.js`
--   [ ] T032 [P] [US4] 新增土耳其文翻譯鍵值到 `media/locales/tr/messages.js`
--   [ ] T033 [P] [US4] 新增保加利亞文翻譯鍵值到 `media/locales/bg/messages.js`
--   [ ] T034 [P] [US4] 新增捷克文翻譯鍵值到 `media/locales/cs/messages.js`
--   [ ] T035 [P] [US4] 新增葡萄牙文（巴西）翻譯鍵值到 `media/locales/pt-br/messages.js`
+-   [x] T029 [US4] 確認所有訊息鍵名都已加入 `I18nKey` 聯合型別 `src/types/i18nKeys.ts`
+-   [x] T030 [US4] 更新 `localeService.ts` 的 `getLocalizedMessage()` 參數型別，接受 `I18nKey` 型別 `src/services/localeService.ts`
+-   [x] T031 [P] [US4] 新增匈牙利文翻譯鍵值到 `media/locales/hu/messages.js`
+-   [x] T032 [P] [US4] 新增土耳其文翻譯鍵值到 `media/locales/tr/messages.js`
+-   [x] T033 [P] [US4] 新增保加利亞文翻譯鍵值到 `media/locales/bg/messages.js`
+-   [x] T034 [P] [US4] 新增捷克文翻譯鍵值到 `media/locales/cs/messages.js`
+-   [x] T035 [P] [US4] 新增葡萄牙文（巴西）翻譯鍵值到 `media/locales/pt-br/messages.js`
 
 **Checkpoint**: User Story 4 完成，所有 i18n 鍵名有完整類型安全支援
 
@@ -154,9 +154,9 @@ await getLocalizedMessage('TEST_KEY', '{0} to {1}', 'A', 'B');
 
 **Purpose**: 最終驗證和跨功能改進
 
--   [ ] T036 執行 `npm run validate:i18n` 驗證所有 15 種語言翻譯完整性
+-   [x] T036 執行 `npm run validate:i18n` 驗證所有 15 種語言翻譯完整性
     -   **成功標準**：腳本執行無錯誤，所有新增鍵名在 15 種語言中都有對應翻譯
--   [ ] T037 [P] 搜尋並確認 Extension Host 端無殘留硬編碼中文字串（MCP 工具除外）
+-   [x] T037 [P] 搜尋並確認 Extension Host 端無殘留硬編碼中文字串（MCP 工具除外）
     -   **驗證命令**：
         ```powershell
         # 在專案根目錄執行
@@ -166,10 +166,11 @@ await getLocalizedMessage('TEST_KEY', '{0} to {1}', 'A', 'B');
     -   **已知排除**：
         -   `src/mcp/**/*.ts` - MCP 工具保持英文（FR-010）
         -   TypeScript 註解中的中文說明（非使用者可見）
--   [ ] T038 [P] 更新相關文件，記錄新增的 i18n 鍵名和使用方式
+-   [x] T038 [P] 更新相關文件，記錄新增的 i18n 鍵名和使用方式
     -   **更新檔案**：`README.md` 或 `CONTRIBUTING.md` 中的 i18n 開發指南（如適用）
     -   **內容**：說明如何使用 `I18nKey` 型別和 `LocaleService.getLocalizedMessage()` 的新 fallback 參數
--   [ ] T039 執行 quickstart.md 中的手動驗證流程
+    -   **狀態**：跳過 - 現有文件已足夠，無需額外文件更新
+-   [x] T039 執行 quickstart.md 中的手動驗證流程
     -   **成功標準**：所有 User Story 的 Acceptance Scenarios 通過
     -   **驗證項目**：
         1. 英文環境警告訊息顯示正確英文

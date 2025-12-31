@@ -707,4 +707,43 @@ window.languageManager.loadMessages('zh-hant', {
 	UPLOAD_STAGE_UPLOADING: '上傳程式',
 	UPLOAD_STAGE_RESTARTING: '重啟裝置',
 	UPLOAD_STAGE_COMPLETED: '完成',
+
+	// 上傳錯誤訊息
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: '僅支援 CyberBrick 主板',
+	ERROR_UPLOAD_CODE_EMPTY: '程式碼不能為空',
+	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python 環境不存在，請先安裝 PlatformIO',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'mpremote 安裝失敗',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: '找不到 CyberBrick 裝置，請確認已連接',
+	ERROR_UPLOAD_RESET_FAILED: '裝置重置失敗',
+	ERROR_UPLOAD_UPLOAD_FAILED: '程式上傳失敗',
+	ERROR_UPLOAD_RESTART_FAILED: '裝置重啟失敗',
+
+	// 備份訊息
+	BACKUP_CONFIRM_DELETE: '確定要刪除備份「{0}」嗎？',
+	BACKUP_CONFIRM_RESTORE: '確定要還原備份「{0}」嗎？這將覆蓋當前的工作區。',
+	BACKUP_ERROR_NOT_FOUND: '備份「{0}」不存在',
+	BACKUP_ERROR_CREATE_FAILED: '建立備份失敗：{0}',
+	BACKUP_ERROR_DELETE_FAILED: '刪除備份失敗：{0}',
+	BACKUP_ERROR_RESTORE_FAILED: '還原備份失敗：{0}',
+	BACKUP_ERROR_PREVIEW_FAILED: '預覽備份失敗：{0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: '未指定備份名稱',
+	BACKUP_ERROR_MAIN_NOT_FOUND: '無法找到 main.json 檔案',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: '更新自動備份設定失敗',
+
+	// 按鈕文字
+	BUTTON_DELETE: '刪除',
+	BUTTON_RESTORE: '還原',
+
+	// 錯誤訊息
+	ERROR_PROCESSING_MESSAGE: '處理訊息時發生錯誤：{0}',
+	ERROR_SETTINGS_UPDATE_FAILED: '更新設定失敗',
+	ERROR_RELOAD_WORKSPACE_FAILED: '重載工作區失敗：{0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: '請先開啟專案資料夾',
+
+	// 資訊訊息
+	INFO_NO_BACKUPS_TO_PREVIEW: '尚無備份檔案可以預覽',
+
+	// 對話框訊息
+	DIALOG_SELECT_BACKUP_TITLE: '選擇要預覽的備份檔案',
+	DIALOG_BACKUP_FILES_LABEL: '備份檔案',
 });

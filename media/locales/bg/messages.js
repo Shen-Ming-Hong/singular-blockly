@@ -711,4 +711,44 @@ window.languageManager.loadMessages('bg', {
 	UPLOAD_STAGE_UPLOADING: 'Качване',
 	UPLOAD_STAGE_RESTARTING: 'Рестартиране на устройство',
 	UPLOAD_STAGE_COMPLETED: 'Завършено',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Поддържа се само платка CyberBrick',
+	ERROR_UPLOAD_CODE_EMPTY: 'Кодът не може да бъде празен',
+	ERROR_UPLOAD_NO_PYTHON: 'Python средата на PlatformIO не е намерена. Моля, първо инсталирайте PlatformIO.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'Инсталацията на mpremote е неуспешна',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'CyberBrick устройството не е намерено. Моля, уверете се, че е свързано.',
+	ERROR_UPLOAD_RESET_FAILED: 'Неуспешно нулиране на устройството',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Неуспешно качване на програмата',
+	ERROR_UPLOAD_RESTART_FAILED: 'Неуспешно рестартиране на устройството',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Сигурни ли сте, че искате да изтриете резервното копие "{0}"?',
+	BACKUP_CONFIRM_RESTORE:
+		'Сигурни ли сте, че искате да възстановите резервното копие "{0}"? Това ще презапише текущото работно пространство.',
+	BACKUP_ERROR_NOT_FOUND: 'Резервното копие "{0}" не е намерено',
+	BACKUP_ERROR_CREATE_FAILED: 'Неуспешно създаване на резервно копие: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Неуспешно изтриване на резервно копие: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Неуспешно възстановяване на резервно копие: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Неуспешен преглед на резервно копие: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Името на резервното копие не е указано',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Файлът main.json не може да бъде намерен',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Неуспешно актуализиране на настройките за автоматично архивиране',
+
+	// Button labels
+	BUTTON_DELETE: 'Изтрий',
+	BUTTON_RESTORE: 'Възстанови',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Грешка при обработка на съобщението: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Неуспешно актуализиране на настройките',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Неуспешно презареждане на работното пространство: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Моля, първо отворете папка на проекта',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Няма файлове за резервно копие за преглед',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Изберете файл за резервно копие за преглед',
+	DIALOG_BACKUP_FILES_LABEL: 'Файлове за резервно копие',
 });

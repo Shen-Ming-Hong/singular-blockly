@@ -707,4 +707,43 @@ window.languageManager.loadMessages('ru', {
 	UPLOAD_STAGE_UPLOADING: 'Загрузка',
 	UPLOAD_STAGE_RESTARTING: 'Перезапуск устройства',
 	UPLOAD_STAGE_COMPLETED: 'Завершено',
+
+	// Upload error messages
+	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Поддерживается только плата CyberBrick',
+	ERROR_UPLOAD_CODE_EMPTY: 'Код не может быть пустым',
+	ERROR_UPLOAD_NO_PYTHON: 'Среда Python PlatformIO не найдена. Сначала установите PlatformIO.',
+	ERROR_UPLOAD_MPREMOTE_FAILED: 'Не удалось установить mpremote',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'Устройство CyberBrick не найдено. Убедитесь, что оно подключено.',
+	ERROR_UPLOAD_RESET_FAILED: 'Не удалось сбросить устройство',
+	ERROR_UPLOAD_UPLOAD_FAILED: 'Не удалось загрузить программу',
+	ERROR_UPLOAD_RESTART_FAILED: 'Не удалось перезапустить устройство',
+
+	// Backup messages
+	BACKUP_CONFIRM_DELETE: 'Вы уверены, что хотите удалить резервную копию "{0}"?',
+	BACKUP_CONFIRM_RESTORE: 'Вы уверены, что хотите восстановить резервную копию "{0}"? Это перезапишет текущую рабочую область.',
+	BACKUP_ERROR_NOT_FOUND: 'Резервная копия "{0}" не найдена',
+	BACKUP_ERROR_CREATE_FAILED: 'Не удалось создать резервную копию: {0}',
+	BACKUP_ERROR_DELETE_FAILED: 'Не удалось удалить резервную копию: {0}',
+	BACKUP_ERROR_RESTORE_FAILED: 'Не удалось восстановить резервную копию: {0}',
+	BACKUP_ERROR_PREVIEW_FAILED: 'Не удалось просмотреть резервную копию: {0}',
+	BACKUP_ERROR_NAME_NOT_SPECIFIED: 'Имя резервной копии не указано',
+	BACKUP_ERROR_MAIN_NOT_FOUND: 'Не удается найти файл main.json',
+	BACKUP_ERROR_UPDATE_SETTINGS_FAILED: 'Не удалось обновить настройки автоматического резервного копирования',
+
+	// Button labels
+	BUTTON_DELETE: 'Удалить',
+	BUTTON_RESTORE: 'Восстановить',
+
+	// Error messages
+	ERROR_PROCESSING_MESSAGE: 'Ошибка при обработке сообщения: {0}',
+	ERROR_SETTINGS_UPDATE_FAILED: 'Не удалось обновить настройки',
+	ERROR_RELOAD_WORKSPACE_FAILED: 'Не удалось перезагрузить рабочую область: {0}',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Пожалуйста, сначала откройте папку проекта',
+
+	// Info messages
+	INFO_NO_BACKUPS_TO_PREVIEW: 'Нет файлов резервных копий для предварительного просмотра',
+
+	// Dialog messages
+	DIALOG_SELECT_BACKUP_TITLE: 'Выберите файл резервной копии для предварительного просмотра',
+	DIALOG_BACKUP_FILES_LABEL: 'Файлы резервных копий',
 });
