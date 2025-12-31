@@ -138,7 +138,10 @@
                     "ruleId": "cognates-and-loanwords",
                     "description": "Words that are cognates or established loanwords in target language",
                     "languages": [
+                        "ja",
+                        "ko",
                         "de",
+                        "zh-hant",
                         "es"
                     ],
                     "patterns": [
@@ -147,6 +150,10 @@
                         ".*_MOTORS"
                     ],
                     "examples": {
+                        "ja": [
+                            "モーター (Motors)",
+                            "センサー (Sensors)"
+                        ],
                         "de": [
                             "Text",
                             "Logik",
@@ -163,12 +170,13 @@
                             "Variables"
                         ]
                     },
-                    "rationale": "German and Spanish share Latin/Greek roots with English. Similar word forms are legitimate cognates, not lazy translations. German plurals often add -en (Sensor→Sensoren). Spanish technical terms often match English exactly due to shared Latin roots."
+                    "rationale": "German and Spanish share Latin/Greek roots with English. Japanese uses katakana loanwords for technical terms. Similar word forms are legitimate cognates, not lazy translations."
                 },
                 {
                     "ruleId": "arduino-api-terms",
                     "description": "Arduino API function names and technical terms that are standard translations",
                     "languages": [
+                        "ja",
                         "de",
                         "es"
                     ],
@@ -178,6 +186,12 @@
                         "ARDUINO_DELAY"
                     ],
                     "examples": {
+                        "ja": [
+                            "デジタル書き込み (digitalWrite)",
+                            "デジタル読み取り (digitalRead)",
+                            "アナログ書き込み (analogWrite)",
+                            "アナログ読み取り (analogRead)"
+                        ],
                         "de": [
                             "Digitales Schreiben (digitalWrite)",
                             "Digitales Lesen (digitalRead)",
@@ -193,7 +207,7 @@
                             "Retardo (delay)"
                         ]
                     },
-                    "rationale": "Arduino API functions have established German and Spanish translations in educational contexts. These are standard terms used in Arduino education materials, not direct/lazy translations."
+                    "rationale": "Arduino API functions have established Japanese, German and Spanish translations in educational contexts. These are standard terms used in Arduino education materials, not direct/lazy translations."
                 },
                 {
                     "ruleId": "brand-names-in-categories",
@@ -209,6 +223,34 @@
                         "CATEGORY_ARDUINO"
                     ],
                     "rationale": "'Arduino' is a registered brand name and should remain unchanged across all languages, even when used as a category label. This is consistent with international branding standards."
+                },
+                {
+                    "ruleId": "cyberbrick-brand-direct",
+                    "description": "CyberBrick brand names that appear as direct translations",
+                    "languages": [
+                        "ja",
+                        "ko",
+                        "de",
+                        "zh-hant",
+                        "es",
+                        "fr",
+                        "it",
+                        "ru",
+                        "pl",
+                        "hu",
+                        "tr",
+                        "bg",
+                        "cs",
+                        "pt-br"
+                    ],
+                    "keys": [
+                        "CATEGORY_CYBERBRICK_CORE",
+                        "CATEGORY_CYBERBRICK_LED",
+                        "CATEGORY_CYBERBRICK_GPIO",
+                        "CATEGORY_CYBERBRICK_WIFI",
+                        "CATEGORY_CYBERBRICK_TIME"
+                    ],
+                    "rationale": "CyberBrick is a brand name. LED, GPIO, WiFi are international technical acronyms. These should remain unchanged across all languages."
                 }
             ]
         },
@@ -400,7 +442,7 @@
         "priority": "Whitelist checks should run AFTER detection but BEFORE severity assignment to reduce noise in reports."
     },
     "statistics": {
-        "totalRules": 19,
+        "totalRules": 20,
         "affectedLanguages": [
             "ja",
             "ko",
