@@ -25,9 +25,9 @@
 
 **Purpose**: 確認專案結構與現有檔案狀態
 
--   [ ] T001 確認 `scripts/i18n/audit-whitelist.json` 存在且為有效 JSON 格式
--   [ ] T002 [P] 確認 `scripts/i18n/lib/detectors/` 目錄下有 `direct-translation.js`、`length-overflow.js`、`cultural-mismatch.js`
--   [ ] T003 [P] 執行 `npm run validate:i18n` 記錄修改前的基準問題數量
+-   [x] T001 確認 `scripts/i18n/audit-whitelist.json` 存在且為有效 JSON 格式
+-   [x] T002 [P] 確認 `scripts/i18n/lib/detectors/` 目錄下有 `direct-translation.js`、`length-overflow.js`、`cultural-mismatch.js`
+-   [x] T003 [P] 執行 `npm run validate:i18n` 記錄修改前的基準問題數量
 
 ---
 
@@ -47,11 +47,11 @@
 
 ### Implementation for User Story 1
 
--   [ ] T004 [US1] 更新白名單版本為 `1.2.0` 並更新 `lastUpdated` 時間戳記於 `scripts/i18n/audit-whitelist.json`
--   [ ] T005 [US1] 新增 `cyberbrick-brand-terms` 規則至 `missingTranslation.rules` 於 `scripts/i18n/audit-whitelist.json`
--   [ ] T006 [US1] 新增 `technical-acronyms-global` 規則至 `missingTranslation.rules` 於 `scripts/i18n/audit-whitelist.json`
--   [ ] T007 [US1] 新增 `helpurl-exclusion` 規則至所有適用的問題類型（missingTranslation、directTranslation、lengthOverflow）於 `scripts/i18n/audit-whitelist.json`
--   [ ] T008 [US1] 更新白名單 `statistics` 區塊的 `totalRules` 計數於 `scripts/i18n/audit-whitelist.json`
+-   [x] T004 [US1] 更新白名單版本為 `1.2.0` 並更新 `lastUpdated` 時間戳記於 `scripts/i18n/audit-whitelist.json`
+-   [x] T005 [US1] 新增 `cyberbrick-brand-terms` 規則至 `missingTranslation.rules` 於 `scripts/i18n/audit-whitelist.json`
+-   [x] T006 [US1] 新增 `technical-acronyms-global` 規則至 `missingTranslation.rules` 於 `scripts/i18n/audit-whitelist.json`
+-   [x] T007 [US1] 新增 `helpurl-exclusion` 規則至所有適用的問題類型（missingTranslation、directTranslation、lengthOverflow）於 `scripts/i18n/audit-whitelist.json`
+-   [x] T008 [US1] 更新白名單 `statistics` 區塊的 `totalRules` 計數於 `scripts/i18n/audit-whitelist.json`
 
 **Checkpoint**: 執行 `npm run validate:i18n`，確認：
 
@@ -71,8 +71,8 @@
 
 ### Implementation for User Story 2
 
--   [ ] T009 [US2] 修改 `media/locales/ru/messages.js` 第 272 行，將 `CONTROLS_IF_ELSE_TITLE_ELСЕ`（末尾 СЕ 為西里爾字母 U+0421 U+0415）改為 `CONTROLS_IF_ELSE_TITLE_ELSE`（全部為拉丁字母）
--   [ ] T010 [US2] 驗證修正：使用 grep 搜尋確認所有語言的 key 名稱一致
+-   [x] T009 [US2] 修改 `media/locales/ru/messages.js` 第 272 行，將 `CONTROLS_IF_ELSE_TITLE_ELСЕ`（末尾 СЕ 為西里爾字母 U+0421 U+0415）改為 `CONTROLS_IF_ELSE_TITLE_ELSE`（全部為拉丁字母）
+-   [x] T010 [US2] 驗證修正：使用 grep 搜尋確認所有語言的 key 名稱一致
 
 **Checkpoint**: 俄語 key 數量應與繁體中文一致（453 個）
 
@@ -86,9 +86,9 @@
 
 ### Implementation for User Story 3
 
--   [ ] T011 [P] [US3] 修改 `scripts/i18n/lib/detectors/direct-translation.js` 第 68-69 行的 `hasDirectWordCount()` 函數，將 CJK 閾值從 `ratio > 0.8 && ratio < 1.2` 改為 `ratio > 0.6 && ratio < 1.4`（±40%）
--   [ ] T012 [P] [US3] 修改 `scripts/i18n/lib/detectors/length-overflow.js` 第 28-34 行的 `checkLengthRatio()` 函數，新增 `language` 參數並為 CJK 語言將 `ratio < 0.5` 改為 `ratio < 0.3`（30% 下限）
--   [ ] T013 [US3] 定義 CJK 語言常數陣列 `['ja', 'ko', 'zh-hant']` 供兩個檢測器共用（與 spec.md FR-004/FR-005 一致）
+-   [x] T011 [P] [US3] 修改 `scripts/i18n/lib/detectors/direct-translation.js` 第 68-69 行的 `hasDirectWordCount()` 函數，將 CJK 閾值從 `ratio > 0.8 && ratio < 1.2` 改為 `ratio > 0.6 && ratio < 1.4`（±40%）
+-   [x] T012 [P] [US3] 修改 `scripts/i18n/lib/detectors/length-overflow.js` 第 28-34 行的 `checkLengthRatio()` 函數，新增 `language` 參數並為 CJK 語言將 `ratio < 0.5` 改為 `ratio < 0.3`（30% 下限）
+-   [x] T013 [US3] 定義 CJK 語言常數陣列 `['ja', 'ko', 'zh-hant']` 供兩個檢測器共用（與 spec.md FR-004/FR-005 一致）
 
 **Checkpoint**: 執行 `npm run validate:i18n`，確認：
 
@@ -106,8 +106,8 @@
 
 ### Implementation for User Story 4
 
--   [ ] T014 [P] [US4] 修改 `scripts/i18n/lib/detectors/cultural-mismatch.js` 第 125-134 行的 `determineSeverity(key)` 函數，移除頻率判斷邏輯，強制返回 `'low'`
--   [ ] T015 [P] [US4] 修改 `.github/workflows/i18n-validation.yml`，在 PR 失敗條件中排除 `culturalMismatch` 類型
+-   [x] T014 [P] [US4] 修改 `scripts/i18n/lib/detectors/cultural-mismatch.js` 第 125-134 行的 `determineSeverity(key)` 函數，移除頻率判斷邏輯，強制返回 `'low'`
+-   [x] T015 [P] [US4] 修改 `.github/workflows/i18n-validation.yml`，在 PR 失敗條件中排除 `culturalMismatch` 類型
 
 **Checkpoint**: 執行 `npm run validate:i18n`，確認：
 
@@ -120,9 +120,9 @@
 
 **Purpose**: 最終驗證與文件更新
 
--   [ ] T016 執行完整審計驗證：`npm run validate:i18n`，確認高嚴重度問題從 31 降至 5 以下
+-   [x] T016 執行完整審計驗證：`npm run validate:i18n`，確認高嚴重度問題從 31 降至 5 以下
 -   [ ] T017 [P] 更新 `translation-stats.md` 反映新的審計結果
--   [ ] T018 執行 quickstart.md 中的驗證步驟確認所有 Success Criteria 達成
+-   [x] T018 執行 quickstart.md 中的驗證步驟確認所有 Success Criteria 達成
 -   [ ] T019 關閉 Issue #29 並附上修改摘要
 
 ---
@@ -203,14 +203,14 @@ Task T015: 修改 .github/workflows/i18n-validation.yml
 
 ### Success Criteria Checklist
 
--   [ ] SC-001: 高嚴重度問題 < 5（原 31）
--   [ ] SC-002: CyberBrick 相關 key 無誤報
--   [ ] SC-003: \*\_HELPURL key 無誤報
--   [ ] SC-004: CJK directTranslation 問題減少 50%+
--   [ ] SC-005: CJK lengthOverflow (too-short) 減少 40%+
--   [ ] SC-006: PR 不因 culturalMismatch 失敗
--   [ ] SC-007: 俄語 key 數量 = 453
--   [ ] SC-008: 俄語 if-else 顯示「иначе」
+-   [x] SC-001: 高嚴重度問題 < 5（原 31）
+-   [x] SC-002: CyberBrick 相關 key 無誤報
+-   [x] SC-003: \*\_HELPURL key 無誤報
+-   [x] SC-004: CJK directTranslation 問題減少 50%+
+-   [x] SC-005: CJK lengthOverflow (too-short) 減少 40%+
+-   [x] SC-006: PR 不因 culturalMismatch 失敗
+-   [x] SC-007: 俄語 key 數量 = 453
+-   [x] SC-008: 俄語 if-else 顯示「иначе」
 
 ---
 

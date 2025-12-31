@@ -12,6 +12,13 @@
 const { estimateFrequency } = require('../audit-utils');
 
 /**
+ * CJK languages that have higher character efficiency
+ * These languages typically use fewer characters to convey the same meaning as English
+ * @type {string[]}
+ */
+const CJK_LANGUAGES = ['ja', 'ko', 'zh', 'zh-hant', 'zh-hans'];
+
+/**
  * Calculate character length ratio vs English baseline
  * @param {string} sourceText - English source text
  * @param {string} translatedText - Translated text
@@ -31,14 +38,21 @@ function calculateLengthRatio(sourceText, translatedText) {
 /**
  * Check if translation length is within acceptable range
  * @param {number} ratio - Length ratio (target/source)
+ * @param {string} [language] - Target language code (optional, used for CJK-specific thresholds)
  * @returns {string|null} Issue type if out of range, null if okay
  */
-function checkLengthRatio(ratio) {
+function checkLengthRatio(ratio, language) {
 	if (ratio > 1.5) {
 		return 'too-long'; // >150% of English length
 	}
-	if (ratio < 0.5) {
-		return 'too-short'; // <50% of English length
+
+	// Use relaxed threshold for CJK languages due to higher character efficiency
+	// CJK characters convey more meaning per character than alphabetic scripts
+	const isCJK = language && CJK_LANGUAGES.includes(language);
+	const minRatio = isCJK ? 0.3 : 0.5; // 30% for CJK, 50% for others
+
+	if (ratio < minRatio) {
+		return 'too-short';
 	}
 	return null;
 }
@@ -79,11 +93,15 @@ function detectLengthOverflow(key, sourceText, translatedText, language) {
 	}
 
 	const ratio = calculateLengthRatio(sourceText, translatedText);
-	const issueType = checkLengthRatio(ratio);
+	const issueType = checkLengthRatio(ratio, language); // Pass language for CJK-specific thresholds
 
 	if (!issueType) {
 		return null; // Length is within acceptable range
 	}
+
+	// Determine threshold message based on language
+	const isCJK = CJK_LANGUAGES.includes(language);
+	const minThreshold = isCJK ? 30 : 50;
 
 	let rationale;
 	let suggestedAction;
@@ -92,7 +110,7 @@ function detectLengthOverflow(key, sourceText, translatedText, language) {
 		rationale = `Translation is ${Math.round(ratio * 100)}% of English length (>${150}% may cause UI overflow)`;
 		suggestedAction = 'Consider shortening translation or verify UI rendering';
 	} else {
-		rationale = `Translation is ${Math.round(ratio * 100)}% of English length (<${50}% may indicate missing content)`;
+		rationale = `Translation is ${Math.round(ratio * 100)}% of English length (<${minThreshold}% may indicate missing content)`;
 		suggestedAction = 'Verify translation is complete and not abbreviated incorrectly';
 	}
 
