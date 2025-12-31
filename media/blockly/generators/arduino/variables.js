@@ -24,12 +24,12 @@ function getConvertedParamName(varName) {
 	const containsChinese = /[\u4e00-\u9fa5]/.test(varName);
 	const startsWithNumber = /^\d/.test(varName);
 	const containsDash = varName.includes('-');
-	
+
 	if (containsChinese || startsWithNumber || containsDash) {
 		// 使用與函數名稱相同的轉換邏輯
 		return window.arduinoGenerator.convertFunctionName(varName);
 	}
-	
+
 	return varName;
 }
 

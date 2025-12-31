@@ -8,6 +8,21 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.2] - 2025-12-31
+
+### 修復 Bug Fixes
+
+-   **Arduino C++ 中文參數名稱自動轉換** (Arduino C++ Chinese Parameter Name Auto-Conversion)
+
+    -   自訂函數的中文參數名稱自動轉換為合法的 C++ 識別符
+        Chinese parameter names in custom functions are automatically converted to valid C++ identifiers
+    -   新增 `functionParamMap` 追蹤參數名稱轉換對應
+        Added `functionParamMap` to track parameter name conversions
+    -   `variables_get` 和 `variables_set` 生成器現在支援轉換後的參數名稱
+        `variables_get` and `variables_set` generators now support converted parameter names
+    -   中文參數名稱編碼為十六進位格式（例如：「速度」→ `fn901f_5ea6`）
+        Chinese parameter names are encoded to hex format (e.g., '速度' → `fn901f_5ea6`)
+
 ## [0.50.1] - 2025-12-31
 
 ### 修復 Bug Fixes
