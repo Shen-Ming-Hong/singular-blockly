@@ -78,7 +78,12 @@ window.micropythonGenerator.reset = function () {
  * 允許獨立生成的積木類型（不需要連接到主程式）
  * 主要是自訂函數定義，它們會被放到 functions_ 區塊
  */
-window.micropythonGenerator.allowedTopLevelBlocks_ = ['micropython_main', 'procedures_defnoreturn', 'procedures_defreturn'];
+window.micropythonGenerator.allowedTopLevelBlocks_ = [
+	'micropython_main',
+	'procedures_defnoreturn',
+	'procedures_defreturn',
+	'arduino_function',
+];
 
 /**
  * 自訂 workspaceToCode 方法
@@ -144,6 +149,27 @@ window.micropythonGenerator.init = function (workspace) {
 	} else {
 		this.nameDB_.reset();
 	}
+
+	// 每次初始化時覆寫 safeName 方法，保留中文識別符（Python 3 支援 Unicode 識別符）
+	// 注意：Blockly 的方法名是 safeName（無底線）
+	this.nameDB_.safeName = function (name) {
+		if (!name) {
+			return Blockly.Msg.UNNAMED_KEY || 'unnamed';
+		}
+		// Python 3 支援 Unicode 識別符，只需處理：
+		// 1. 空格轉底線
+		// 2. 移除特殊運算符號（保留中文、英文、數字、底線）
+		// 3. 數字開頭加 my_ 前綴
+		let safeName = name.replace(/ /g, '_');
+		// 保留中文（CJK 統一漢字）、英文、數字、底線
+		safeName = safeName.replace(/[^\w\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g, '_');
+		// 數字開頭加前綴
+		if (/^[0-9]/.test(safeName)) {
+			safeName = 'my_' + safeName;
+		}
+		return safeName || 'unnamed';
+	};
+
 	this.nameDB_.setVariableMap(workspace.getVariableMap());
 	this.nameDB_.populateVariables(workspace);
 	this.nameDB_.populateProcedures(workspace);
