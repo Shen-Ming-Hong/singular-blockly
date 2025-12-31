@@ -8,6 +8,19 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.1] - 2025-12-31
+
+### 修復 Bug Fixes
+
+-   **MicroPython 函數生成器防禦性檢查** (MicroPython Function Generator Defensive Check)
+
+    -   為 `arduino_function` 生成器加入函數名稱空值防護
+        Added null check for function name in `arduino_function` generator
+    -   為 `arduino_function_call` 生成器加入函數名稱空值防護
+        Added null check for function name in `arduino_function_call` generator
+    -   函數名稱為空時跳過生成並記錄警告，避免產生無效 Python 語法
+        Skip generation and log warning when function name is empty, preventing invalid Python syntax
+
 ## [0.50.0] - 2025-12-31
 
 ### 新增功能 Features
