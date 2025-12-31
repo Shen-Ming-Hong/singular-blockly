@@ -370,6 +370,8 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 
 > 💡 When switching to CyberBrick, `platformio.ini` is auto-removed to avoid conflicts. Workspace is auto-backed up before board switch.
 
+> ⚠️ **Compatibility Note**: This tool uses the officially supported `mpremote` method to upload code—**it does not modify or damage the official firmware**. You can switch back to the official CyberBrick editor anytime by simply uploading from it, which will overwrite the program directly (tested and verified).
+
 ### 🧮 Programming Constructs
 
 **Functions**
