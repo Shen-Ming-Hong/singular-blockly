@@ -53,6 +53,13 @@ function hasExcessiveKatakana(text) {
 }
 
 /**
+ * CJK languages that have higher character efficiency
+ * These languages typically use fewer characters to convey the same meaning as English
+ * @type {string[]}
+ */
+const CJK_LANGUAGES = ['ja', 'ko', 'zh', 'zh-hant', 'zh-hans'];
+
+/**
  * Check if translation word count is within reasonable range
  * Direct translations often have similar word counts to English
  * @param {string} sourceText - English source text
@@ -62,7 +69,7 @@ function hasExcessiveKatakana(text) {
  */
 function hasDirectWordCount(sourceText, translatedText, language) {
 	// For CJK languages, count characters instead of words
-	const isCJK = ['ja', 'ko', 'zh', 'zh-hant', 'zh-hans'].includes(language);
+	const isCJK = CJK_LANGUAGES.includes(language);
 
 	let sourceCount, targetCount;
 
@@ -73,8 +80,9 @@ function hasDirectWordCount(sourceText, translatedText, language) {
 
 		// CJK typically uses fewer characters than English words
 		// If counts are too similar, might be transliteration
+		// Use wider tolerance (±40%) for CJK languages due to natural character efficiency differences
 		const ratio = targetCount / sourceCount;
-		return ratio > 0.8 && ratio < 1.2;
+		return ratio > 0.6 && ratio < 1.4;
 	} else {
 		// Count words for alphabetic languages
 		sourceCount = sourceText.trim().split(/\s+/).length;

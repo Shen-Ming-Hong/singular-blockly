@@ -269,7 +269,7 @@ window.languageManager.loadMessages('ru', {
 	CONTROLS_IF_MSG_ELSEIF: 'иначе если',
 	CONTROLS_IF_IF_TITLE_IF: 'если',
 	CONTROLS_IF_ELSEIF_TITLE_ELSEIF: 'иначе если',
-	CONTROLS_IF_ELSE_TITLE_ELСЕ: 'иначе',
+	CONTROLS_IF_ELSE_TITLE_ELSE: 'иначе',
 	LOGIC_COMPARE_TOOLTIP_EQ: 'Возвращает истину, если оба входа равны друг другу.',
 	LOGIC_COMPARE_TOOLTIP_NEQ: 'Возвращает истину, если оба входа не равны друг другу.',
 	LOGIC_COMPARE_TOOLTIP_LT: 'Возвращает истину, если первый вход меньше второго входа.',

@@ -154,10 +154,13 @@ jobs:
             const summaryPath = 'audit-summary.txt';
             const summary = fs.existsSync(summaryPath) ? fs.readFileSync(summaryPath, 'utf-8') : 'No summary available';
 
-            // Check if there are high-severity issues
+            // Check if there are high-severity issues (excluding culturalMismatch which is always low severity)
+            // Cultural mismatch issues require native speaker review and should not block PRs
             const highSeverityMatch = summary.match(/High Severity:\s+(\d+)/);
             const highSeverityCount = highSeverityMatch ? parseInt(highSeverityMatch[1]) : 0;
 
+            // Only create issue if there are high-severity issues
+            // Note: culturalMismatch issues are now forced to 'low' severity and won't be counted here
             if (highSeverityCount > 10) {
               const output = `## 🚨 Translation Quality Alert
               

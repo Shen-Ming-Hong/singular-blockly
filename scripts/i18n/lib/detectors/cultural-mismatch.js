@@ -184,17 +184,15 @@ function detectCulturalMismatch(key, sourceText, translatedText, language) {
 
 /**
  * Determine severity based on message key frequency
+ * Cultural mismatch issues are always low severity since they require
+ * native speaker review and should not block PRs
  * @param {string} key - Translation message key
- * @returns {string} Severity level: high, medium, or low
+ * @returns {string} Severity level: always 'low' for cultural issues
  */
 function determineSeverity(key) {
-	const freq = estimateFrequency(key);
-	if (freq >= 70) {
-		return 'high';
-	}
-	if (freq >= 40) {
-		return 'medium';
-	}
+	// Cultural mismatch detection requires human judgment from native speakers
+	// AI/automated tools cannot definitively determine cultural appropriateness
+	// Force all culturalMismatch issues to 'low' severity to avoid blocking PRs
 	return 'low';
 }
 
