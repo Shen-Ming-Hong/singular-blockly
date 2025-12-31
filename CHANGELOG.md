@@ -8,6 +8,31 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.3] - 2025-12-31
+
+### 修復 Bug Fixes
+
+-   **i18n 翻譯審計機制優化** (i18n Translation Audit Optimization)
+
+    -   修復俄語翻譯檔案中 `CONTROLS_IF_ELSE_TITLE_ELSE` 使用西里爾字母的 key 名稱錯誤（СЕ → SE）
+        Fixed Russian translation file key name error using Cyrillic characters (СЕ → SE) in `CONTROLS_IF_ELSE_TITLE_ELSE`
+    -   新增 CyberBrick 品牌名稱白名單規則，避免技術專有名詞誤報
+        Added CyberBrick brand name whitelist rules to prevent technical term false positives
+    -   新增國際技術縮寫白名單（LED/GPIO/PWM/I2C/UART/WiFi）
+        Added international technical acronym whitelist (LED/GPIO/PWM/I2C/UART/WiFi)
+    -   為 CJK 語言（日文、韓文、繁體中文）放寬檢測閾值以適應字元效率差異
+        Relaxed detection thresholds for CJK languages (Japanese, Korean, Traditional Chinese) to accommodate character efficiency differences
+    -   將文化適切性（culturalMismatch）檢測降級為低嚴重性，避免阻擋 PR
+        Downgraded cultural mismatch detection to low severity to prevent blocking PRs
+    -   白名單版本更新至 v1.2.0，總規則數從 16 增至 19
+        Updated whitelist to v1.2.0, total rules increased from 16 to 19
+
+### 維護 Maintenance
+
+-   **Issue #29 已關閉** (Issue #29 Closed)
+    -   解決翻譯審計誤報問題，高嚴重度問題從 31 降至 5 以下
+        Resolved translation audit false positives, high severity issues reduced from 31 to under 5
+
 ## [0.50.2] - 2025-12-31
 
 ### 修復 Bug Fixes
