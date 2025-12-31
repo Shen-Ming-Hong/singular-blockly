@@ -22,6 +22,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - 工作區 `blockly/main.json`（積木狀態）、`blockly/backups/`（備份目錄） (021-cyberbrick-micropython)
 - TypeScript 5.9.3 + JavaScript (WebView) + MicroPython (生成) + Blockly 12.3.1, VS Code Extension API 1.105.0+, mpremote 1.20+ (021-cyberbrick-micropython)
 - `{workspace}/blockly/main.json`（工作區）, `{workspace}/blockly/backups/`（備份） (021-cyberbrick-micropython)
+- JavaScript (ES6+), MicroPython 目標程式碼 + Blockly 12.3.1, 現有 `micropythonGenerator` 生成器框架 (022-micropython-custom-function)
+- N/A（純程式碼生成，無儲存需求） (022-micropython-custom-function)
 
 -   TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly) (011-esp32-pwm-setup)
 
@@ -50,8 +52,8 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 022-micropython-custom-function: Added JavaScript (ES6+), MicroPython 目標程式碼 + Blockly 12.3.1, 現有 `micropythonGenerator` 生成器框架
 - 021-cyberbrick-micropython: Added TypeScript 5.9.3 + JavaScript (WebView) + MicroPython (生成) + Blockly 12.3.1, VS Code Extension API 1.105.0+, mpremote 1.20+
-- 021-cyberbrick-micropython: Added TypeScript 5.9.3 (Extension) + JavaScript (WebView/Blockly) + Blockly 12.3.1, VS Code API 1.105.0+, mpremote (MicroPython 工具)
 - 021-cyberbrick-micropython: Added TypeScript 5.9.3 (Extension) + JavaScript (WebView/Blockly) + Blockly 12.3.1, VS Code API 1.105.0+, mpremote (MicroPython 工具)
 
 
