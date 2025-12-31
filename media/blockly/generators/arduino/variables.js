@@ -5,15 +5,46 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * 檢查變數是否為函數參數，如果是則返回轉換後的參數名稱
+ * @param {string} varName - 原始變數名稱
+ * @returns {string} - 轉換後的變數名稱（如果是函數參數）或原始名稱
+ */
+function getConvertedParamName(varName) {
+	// 檢查是否有函數參數對應表
+	if (window.arduinoGenerator.functionParamMap) {
+		// 遍歷所有函數的參數對應表
+		for (const [funcName, paramMap] of window.arduinoGenerator.functionParamMap) {
+			if (paramMap.has(varName)) {
+				return paramMap.get(varName);
+			}
+		}
+	}
+	// 如果不是函數參數，檢查是否需要轉換（包含中文或其他非法字符）
+	const containsChinese = /[\u4e00-\u9fa5]/.test(varName);
+	const startsWithNumber = /^\d/.test(varName);
+	const containsDash = varName.includes('-');
+	
+	if (containsChinese || startsWithNumber || containsDash) {
+		// 使用與函數名稱相同的轉換邏輯
+		return window.arduinoGenerator.convertFunctionName(varName);
+	}
+	
+	return varName;
+}
+
 // 在 ORDER_NONE 定義後面加入變數相關的生成器
 window.arduinoGenerator.forBlock['variables_get'] = function (block) {
 	const varName = block.getField('VAR').getText();
-	// 不在這裡處理變數宣告,讓各模組自行決定變數類型
-	return [varName, window.arduinoGenerator.ORDER_ATOMIC];
+	// 檢查是否為函數參數，如果是則使用轉換後的名稱
+	const convertedName = getConvertedParamName(varName);
+	return [convertedName, window.arduinoGenerator.ORDER_ATOMIC];
 };
 
 window.arduinoGenerator.forBlock['variables_set'] = function (block) {
 	const varName = block.getField('VAR').getText();
+	// 檢查是否為函數參數，如果是則使用轉換後的名稱
+	const convertedName = getConvertedParamName(varName);
 	const value = window.arduinoGenerator.valueToCode(block, 'VALUE', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 
 	// 檢查連接的值積木類型
@@ -69,9 +100,10 @@ window.arduinoGenerator.forBlock['variables_set'] = function (block) {
 	}
 
 	// 如果是第一次使用此變數，加入變數宣告
-	if (!window.arduinoGenerator.variables_[varName]) {
-		window.arduinoGenerator.variables_[varName] = `${varType} ${varName};`;
+	// 注意：使用轉換後的名稱作為 key 和變數名稱
+	if (!window.arduinoGenerator.variables_[convertedName]) {
+		window.arduinoGenerator.variables_[convertedName] = `${varType} ${convertedName};`;
 	}
 
-	return `${varName} = ${value};\n`;
+	return `${convertedName} = ${value};\n`;
 };

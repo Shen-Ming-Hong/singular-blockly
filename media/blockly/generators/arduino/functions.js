@@ -16,11 +16,23 @@ window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 	}
 	window.arduinoGenerator.functionNameMap.set(displayName, funcName);
 
-	// 處理函式參數
-	const args = [];
-	for (let i = 0; i < block.arguments_.length; i++) {
-		args.push(block.argumentTypes_[i] + ' ' + block.arguments_[i]);
+	// 初始化參數名稱對應表（用於函數呼叫時取得轉換後的參數名稱）
+	if (!window.arduinoGenerator.functionParamMap) {
+		window.arduinoGenerator.functionParamMap = new Map();
 	}
+
+	// 處理函式參數（中文參數名稱需轉換為合法 C++ 變數名稱）
+	const args = [];
+	const paramMap = new Map();
+	for (let i = 0; i < block.arguments_.length; i++) {
+		const originalParamName = block.arguments_[i];
+		// 使用與函式名稱相同的轉換邏輯處理參數名稱
+		const convertedParamName = window.arduinoGenerator.convertFunctionName(originalParamName);
+		paramMap.set(originalParamName, convertedParamName);
+		args.push(block.argumentTypes_[i] + ' ' + convertedParamName);
+	}
+	// 儲存此函數的參數名稱對應關係
+	window.arduinoGenerator.functionParamMap.set(displayName, paramMap);
 
 	// 函式回傳型態固定為 void
 	const returnType = 'void';
