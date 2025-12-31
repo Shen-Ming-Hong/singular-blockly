@@ -65,7 +65,6 @@ scripts/i18n/
 ├── audit-whitelist.json              # 白名單設定 (需修改)
 ├── audit-translations.js             # 審計主程式 (無需修改)
 └── lib/
-    ├── whitelist-checker.js          # 白名單檢查器 (無需修改)
     └── detectors/
         ├── direct-translation.js     # 直接翻譯檢測 (需修改閾值)
         ├── length-overflow.js        # 長度檢測 (需修改閾值)

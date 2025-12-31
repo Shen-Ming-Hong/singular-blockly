@@ -71,7 +71,7 @@
 
 ### Implementation for User Story 2
 
--   [ ] T009 [US2] 修改 `media/locales/ru/messages.js` 第 272 行，將 `CONTROLS_IF_ELSE_TITLE_ELСЕ`（西里爾字母）改為 `CONTROLS_IF_ELSE_TITLE_ELSE`（拉丁字母）
+-   [ ] T009 [US2] 修改 `media/locales/ru/messages.js` 第 272 行，將 `CONTROLS_IF_ELSE_TITLE_ELСЕ`（末尾 СЕ 為西里爾字母 U+0421 U+0415）改為 `CONTROLS_IF_ELSE_TITLE_ELSE`（全部為拉丁字母）
 -   [ ] T010 [US2] 驗證修正：使用 grep 搜尋確認所有語言的 key 名稱一致
 
 **Checkpoint**: 俄語 key 數量應與繁體中文一致（453 個）
@@ -86,9 +86,9 @@
 
 ### Implementation for User Story 3
 
--   [ ] T011 [P] [US3] 修改 `scripts/i18n/lib/detectors/direct-translation.js` 中的 `hasDirectWordCount()` 函數，為 CJK 語言使用 ±40% 閾值（0.6~1.4）
--   [ ] T012 [P] [US3] 修改 `scripts/i18n/lib/detectors/length-overflow.js` 中的 `checkLengthRatio()` 函數，為 CJK 語言使用 30% 最小長度下限
--   [ ] T013 [US3] 定義 CJK 語言常數陣列 `['ja', 'ko', 'zh', 'zh-hant', 'zh-hans']` 供兩個檢測器共用
+-   [ ] T011 [P] [US3] 修改 `scripts/i18n/lib/detectors/direct-translation.js` 第 68-69 行的 `hasDirectWordCount()` 函數，將 CJK 閾值從 `ratio > 0.8 && ratio < 1.2` 改為 `ratio > 0.6 && ratio < 1.4`（±40%）
+-   [ ] T012 [P] [US3] 修改 `scripts/i18n/lib/detectors/length-overflow.js` 第 28-34 行的 `checkLengthRatio()` 函數，新增 `language` 參數並為 CJK 語言將 `ratio < 0.5` 改為 `ratio < 0.3`（30% 下限）
+-   [ ] T013 [US3] 定義 CJK 語言常數陣列 `['ja', 'ko', 'zh-hant']` 供兩個檢測器共用（與 spec.md FR-004/FR-005 一致）
 
 **Checkpoint**: 執行 `npm run validate:i18n`，確認：
 
@@ -106,7 +106,7 @@
 
 ### Implementation for User Story 4
 
--   [ ] T014 [P] [US4] 修改 `scripts/i18n/lib/detectors/cultural-mismatch.js` 中的 `determineSeverity()` 函數，強制返回 `'low'`
+-   [ ] T014 [P] [US4] 修改 `scripts/i18n/lib/detectors/cultural-mismatch.js` 第 125-134 行的 `determineSeverity(key)` 函數，移除頻率判斷邏輯，強制返回 `'low'`
 -   [ ] T015 [P] [US4] 修改 `.github/workflows/i18n-validation.yml`，在 PR 失敗條件中排除 `culturalMismatch` 類型
 
 **Checkpoint**: 執行 `npm run validate:i18n`，確認：
