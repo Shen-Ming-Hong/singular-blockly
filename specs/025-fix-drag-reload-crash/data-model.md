@@ -305,3 +305,135 @@ const isCurrentlyDragging = () => {
 | `media/js/blocklyEdit.js`           | 修改      | `saveWorkspaceState()` 新增剪貼簿鎖定檢查    |
 | `media/js/blocklyEdit.js`           | 修改      | `loadWorkspace` 處理器新增拖曳狀態檢查       |
 | `media/blockly/blocks/functions.js` | 修改      | 更新棄用的 Variable API                      |
+| `src/webview/webviewManager.ts`     | 修改      | `isInternalUpdate` → `internalUpdateCount`   |
+| `src/webview/webviewManager.ts`     | 新增      | `internalUpdateTimer`                        |
+| `src/webview/webviewManager.ts`     | 修改      | `markInternalUpdateStart()` 遞增計數器邏輯   |
+| `src/webview/webviewManager.ts`     | 修改      | `markInternalUpdateEnd()` 2000ms 延遲遞減    |
+| `src/webview/webviewManager.ts`     | 修改      | `handleFileChange()` 檢查 `count > 0`        |
+
+---
+
+## 8. Extension 端內部更新保護機制
+
+此節定義 Extension 端（`webviewManager.ts`）用於防止內部儲存操作觸發 FileWatcher 的機制。
+
+### 8.1 internalUpdateCount (替代原有 isInternalUpdate)
+
+| 屬性   | 值                              |
+| ------ | ------------------------------- |
+| 類型   | `number`                        |
+| 預設值 | `0`                             |
+| 位置   | `src/webview/webviewManager.ts` |
+| 用途   | 追蹤進行中的內部更新操作數量    |
+
+**為什麼用計數器而非布林旗標**:
+
+-   連續快速儲存時，新的儲存可能在前一個的保護視窗過期前開始
+-   計數器確保所有進行中的操作都被追蹤，不會過早重置
+
+**狀態轉換**:
+
+-   `0` → `N`: `markInternalUpdateStart()` 被呼叫（遞增）
+-   `N` → `N-1`: `markInternalUpdateEnd()` 的 2000ms 延遲後遞減
+-   `N` → `0`: 最後一個操作的保護視窗過期
+
+---
+
+### 8.2 internalUpdateTimer (新增)
+
+| 屬性   | 值                              |
+| ------ | ------------------------------- |
+| 類型   | `NodeJS.Timeout \| undefined`   |
+| 預設值 | `undefined`                     |
+| 位置   | `src/webview/webviewManager.ts` |
+| 用途   | 管理延遲遞減計數器的計時器      |
+
+**行為**:
+
+-   每次 `markInternalUpdateStart()` 清除現有計時器
+-   每次 `markInternalUpdateEnd()` 設定新的 2000ms 延遲計時器
+-   計時器觸發時遞減 `internalUpdateCount`
+
+---
+
+### 8.3 INTERNAL_UPDATE_PROTECTION_MS (常數)
+
+| 屬性 | 值                              |
+| ---- | ------------------------------- |
+| 類型 | `number`                        |
+| 值   | `2000`                          |
+| 位置 | `src/webview/webviewManager.ts` |
+| 用途 | 內部更新保護視窗的持續時間      |
+
+**為什麼是 2000ms**:
+
+-   FileWatcher 的 debounce 是 500ms
+-   檔案系統事件可能有額外延遲（特別是網路磁礙或防毒軟體描描）
+-   2000ms 提供足夠的安全間隔，涵蓋大多數延遲情況
+
+---
+
+### 8.4 狀態機：內部更新保護
+
+```
+                    ┌─────────────────┐
+                    │   count = 0      │
+                    │   (無保護)       │
+                    └────────┬────────┘
+                             │
+              markInternalUpdateStart()
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   count = 1      │
+                    │   (保護中)        │◀─── markInternalUpdateStart()
+                    └────────┬────────┘     (count++, 重設計時器)
+                             │
+              markInternalUpdateEnd()
+              (設定 2000ms 計時器)
+                             │
+                             ▼
+                    ┌─────────────────┐
+                    │   2000ms 延遲     │
+                    │   (繼續保護)     │
+                    └────────┬────────┘
+                             │
+                 計時器觸發 (count--)
+                             │
+           ┌────────────────┼────────────────┐
+           │                                 │
+    count > 0?                          count === 0?
+           │                                 │
+           ▼                                 ▼
+  ┌───────────────┐               ┌─────────────────┐
+  │ 繼續保護       │               │   保護解除       │
+  │ FileWatcher   │               │   FileWatcher   │
+  │ 跳過重載       │               │   正常處理       │
+  └───────────────┘               └─────────────────┘
+```
+
+---
+
+### 8.5 競態條件案例
+
+**案例 1: 連續快速儲存**
+
+```
+t=0ms:    儲存 A 開始, count = 1
+t=50ms:   儲存 A 完成, markInternalUpdateEnd() 設定 2000ms 計時器
+t=100ms:  儲存 B 開始, count = 2, 清除舊計時器
+t=150ms:  儲存 B 完成, markInternalUpdateEnd() 設定新 2000ms 計時器
+t=600ms:  FileWatcher 偵測到儲存 A 的變更, count=2 > 0, 跳過重載 ✅
+t=700ms:  FileWatcher 偵測到儲存 B 的變更, count=2 > 0, 跳過重載 ✅
+t=2150ms: 計時器觸發, count = 1
+t=4150ms: 計時器觸發, count = 0, 保護解除
+```
+
+**案例 2: 檔案系統延遲**
+
+```
+t=0ms:    儲存 A 開始, count = 1
+t=50ms:   儲存 A 完成, markInternalUpdateEnd() 設定 2000ms 計時器
+t=1500ms: FileWatcher 偵測到變更 (延遲 1450ms), count=1 > 0, 跳過重載 ✅
+t=2050ms: 計時器觸發, count = 0, 保護解除
+```

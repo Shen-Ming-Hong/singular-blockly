@@ -13,6 +13,7 @@
 2. 新增剪貼簿操作鎖定機制，防止在 Ctrl+C/V/X 處理期間觸發不完整儲存
 3. 將自動儲存 debounce 時間從 150ms 調整為 300ms
 4. 更新 Blockly Variable API 為新版（`workspace.getVariableMap().getVariableById()`）以消除棄用警告
+5. 強化 Extension 端的內部更新保護機制，使用計數器替代布林旗標並延長保護視窗至 2000ms
 
 ## Technical Context
 
@@ -70,10 +71,11 @@ media/
 
 src/
 └── webview/
+    ├── webviewManager.ts    # 修改：內部更新計數器機制、FileWatcher 保護視窗延長
     └── messageHandler.ts    # 可能需要修改：FileWatcher 觸發源標記
 ```
 
-**Structure Decision**: 此功能主要在 WebView 層 (`blocklyEdit.js`) 實作競態條件保護。Extension 側 (`messageHandler.ts`) 可能需要在發送 `loadWorkspace` 訊息時加入來源標記，以便 WebView 區分 FileWatcher 觸發和其他來源。
+**Structure Decision**: 此功能主要在 WebView 層 (`blocklyEdit.js`) 實作競態條件保護。Extension 側 (`messageHandler.ts`) 可能需要在發送 `loadWorkspace` 訊息時加入來源標記，以便 WebView 區分 FileWatcher 觸發和其他來源。Extension 側的 `webviewManager.ts` 需要強化內部更新保護機制，使用計數器替代布林旗標以處理連續快速儲存和檔案系統延遲的情況。
 
 ## Complexity Tracking
 

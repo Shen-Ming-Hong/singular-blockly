@@ -80,6 +80,19 @@ npm run watch
 
 -   ✅ 無 Variable API 棄用警告
 
+### 3.4 測試內部更新保護
+
+1. 開啟 Blockly 專案
+2. 拖放一些積木到工作區
+3. 快速連續按 Ctrl+S 5 次
+4. 觀察 Console 日誌
+
+**預期行為**:
+
+-   ✅ 看到「內部更新計數: N，跳過 FileWatcher 重載」的日誌
+-   ✅ 無 loadWorkspace 執行
+-   ✅ 積木不會重載或閃爍
+
 ---
 
 ## 4. 手動測試清單
@@ -91,6 +104,7 @@ npm run watch
 | 3   | 快速連續貼上            | 連續按 Ctrl+V 5 次            | 所有積木正確建立並儲存 |
 | 4   | 拖曳取消                | 拖曳中按 ESC                  | 無崩潰，滑鼠不鎖定     |
 | 5   | Variable API            | 建立/刪除變數                 | Console 無棄用警告     |
+| 6   | 內部更新保護            | 快速連續 Ctrl+S 5 次          | FileWatcher 不觸發重載 |
 
 ---
 
@@ -102,6 +116,7 @@ npm run watch
 | 自動儲存邏輯       | `media/js/blocklyEdit.js`           | ~1445-1475 |
 | loadWorkspace 處理 | `media/js/blocklyEdit.js`           | ~2118-2230 |
 | Variable API 呼叫  | `media/blockly/blocks/functions.js` | ~148       |
+| 內部更新保護機制   | `src/webview/webviewManager.ts`     | ~95-100    |
 
 ---
 
@@ -116,6 +131,8 @@ log.info('跳過保存：正在拖曳');
 log.info('跳過保存：剪貼簿操作鎖定中');
 log.info('FileWatcher 重載請求已暫存，等待拖曳結束');
 log.info('拖曳結束，執行待處理的 FileWatcher 重載');
+log.info('內部更新計數: N，跳過 FileWatcher 重載');
+log.info('內部更新保護延遲 2000ms 後解除');
 ```
 
 ### WebView DevTools
@@ -144,4 +161,12 @@ FileWatcher 重載請求已暫存，等待拖曳結束
 
 ```
 拖曳結束，執行待處理的 FileWatcher 重載
+```
+
+### Q: 內部更新保護是如何運作的？
+
+A: 當 Extension 執行儲存操作時，會增加 `internalUpdateCount` 計數器。FileWatcher 在檢測到檔案變更時，如果計數器 > 0，就會跳過重載。計數器會在儲存完成後 2000ms 自動遞減，確保即使檔案系統有延遲，保護仍然有效。Console 會顯示：
+
+```
+內部更新計數: 2，跳過 FileWatcher 重載
 ```

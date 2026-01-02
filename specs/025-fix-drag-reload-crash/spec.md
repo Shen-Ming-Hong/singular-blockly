@@ -68,6 +68,22 @@
 
 ---
 
+### User Story 4 - 內部更新保護機制防止 FileWatcher 誤觸發 (Priority: P1)
+
+當 Extension 執行內部儲存操作（自動儲存、手動儲存、備份等）時，不應該觸發 FileWatcher 的 `loadWorkspace` 流程，避免不必要的工作區重載和潛在的競態條件。
+
+**Why this priority**: 這是造成拖曳崩潰的根本原因之一，FileWatcher 誤觸發會導致工作區意外重載。
+
+**Independent Test**: 可透過「連續快速儲存 → 觀察 FileWatcher 是否被觸發」獨立測試。
+
+**Acceptance Scenarios**:
+
+1. **Given** Extension 執行自動儲存操作, **When** FileWatcher 偵測到 main.json 變更, **Then** 系統識別為內部更新並跳過 loadWorkspace
+2. **Given** 連續快速執行多次儲存操作, **When** FileWatcher 事件延遲到達, **Then** 所有事件都被正確識別為內部更新
+3. **Given** 儲存操作完成超過 2000ms, **When** FileWatcher 偵測到變更, **Then** 系統視為外部變更並執行 loadWorkspace
+
+---
+
 ### Edge Cases
 
 -   如果使用者在拖曳結束前關閉編輯器，待處理的重載請求應被丟棄
@@ -88,6 +104,8 @@
 -   **FR-007**: 自動儲存的 debounce 時間必須從 150ms 增加到 300ms
 -   **FR-008**: 所有使用 `workspace.getAllVariables()` 的程式碼必須更新為 `workspace.getVariableMap().getAllVariables()`
 -   **FR-009**: 所有使用 `workspace.getVariableById()` 的程式碼必須更新為 `workspace.getVariableMap().getVariableById()`
+-   **FR-010**: Extension 端必須使用計數器機制（`internalUpdateCount`）追蹤內部更新操作，並在 FileWatcher 處理時檢查此計數器以避免誤觸發
+-   **FR-011**: 內部更新保護視窗必須延長至 2000ms，以涵蓋檔案系統延遲和連續快速儲存的情況
 
 ### Key Entities
 
@@ -96,6 +114,9 @@
 -   **pendingReloadFromFileWatcher**: 新增變數，暫存待處理的重載請求訊息
 -   **clipboardLockTimer**: 新增計時器，管理剪貼簿操作鎖定的動態延長
 -   **CLIPBOARD_MAX_LOCK_TIME**: 常數，剪貼簿操作最大鎖定時間（5000ms）
+-   **internalUpdateCount**: Extension 端計數器，追蹤進行中的內部更新操作數量
+-   **internalUpdateTimer**: Extension 端計時器，用於延遲遞減 internalUpdateCount
+-   **INTERNAL_UPDATE_PROTECTION_MS**: 常數，內部更新保護視窗時間（2000ms）
 
 ## Success Criteria _(mandatory)_
 
@@ -106,6 +127,7 @@
 -   **SC-003**: Console 不再顯示 Blockly Variable API 棄用警告
 -   **SC-004**: 現有的 `.bak` 備份機制不受影響，使用者仍可透過備份檔案恢復
 -   **SC-005**: debounce 時間調整後，自動儲存仍能正常運作，延遲增加對使用體驗影響可忽略
+-   **SC-006**: 內部儲存操作（自動儲存、備份）不會觸發 FileWatcher 重載，即使在連續快速操作或檔案系統延遲的情況下
 
 ## Assumptions
 

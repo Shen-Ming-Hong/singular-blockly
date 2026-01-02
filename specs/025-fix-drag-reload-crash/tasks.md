@@ -64,6 +64,25 @@
 
 ---
 
+## Phase 3a: User Story 4 - 內部更新保護機制防止 FileWatcher 誤觸發 (Priority: P1) 🎯 MVP
+
+**Goal**: 當 Extension 執行內部儲存操作時，FileWatcher 不會誤觸發 loadWorkspace，即使在連續快速儲存或檔案系統延遲的情況下
+
+**Independent Test**: 連續快速儲存 5 次 → 觀察 FileWatcher 是否被觸發 → 無 loadWorkspace 執行
+
+### Implementation for User Story 4
+
+-   [ ] T024 [US4] 將 `isInternalUpdate` 布林旗標改為 `internalUpdateCount` 計數器在 `src/webview/webviewManager.ts`
+-   [ ] T025 [US4] 新增 `internalUpdateTimer` 計時器變數在 `src/webview/webviewManager.ts`
+-   [ ] T026 [US4] 修改 `markInternalUpdateStart()` 為遞增計數器並清除現有計時器在 `src/webview/webviewManager.ts`
+-   [ ] T027 [US4] 修改 `markInternalUpdateEnd()` 為設定 2000ms 延遲遞減計數器在 `src/webview/webviewManager.ts`
+-   [ ] T028 [US4] 修改 `handleFileChange()` 檢查 `internalUpdateCount > 0` 而非布林旗標在 `src/webview/webviewManager.ts`
+-   [ ] T029 [US4] 新增日誌記錄：「內部更新計數: N，跳過 FileWatcher 重載」和「內部更新保護延遲 2000ms 後解除」在 `src/webview/webviewManager.ts`
+
+**Checkpoint**: 此時 User Stories 1 和 4 都應可獨立運作 - 拖曳保護和內部更新保護都已完成
+
+---
+
 ## Phase 4: User Story 2 - 剪貼簿操作期間不觸發不完整儲存 (Priority: P2)
 
 **Goal**: Ctrl+C/V/X 操作期間自動儲存被暫停，確保不會儲存不完整的工作區狀態
@@ -123,6 +142,7 @@
 ### User Story Dependencies
 
 -   **User Story 1 (P1)**: Foundational 完成後可開始 - 無其他故事依賴
+-   **User Story 4 (P1)**: 可與 US1 並行執行 - 修改 Extension 側 `webviewManager.ts`，與 WebView 側修改無衝突
 -   **User Story 2 (P2)**: Foundational 完成後可開始 - 無其他故事依賴（但與 US1 共用 `shouldSkipSave()`）
 -   **User Story 3 (P3)**: Foundational 完成後可開始 - 完全獨立，不依賴其他故事
 
@@ -143,7 +163,8 @@ T005, T006, T007 部分可並行（T005 須先完成才能實作 T006）
 **User Stories 並行可能性:**
 
 ```
-US1, US2, US3 理論上可並行，但建議按優先順序執行以確保 MVP 先完成
+US1, US4 可並行執行（分別修改 WebView 和 Extension 側）
+US2, US3 可在 US1/US4 完成後並行執行
 ```
 
 **Phase 6 (Polish):**
@@ -174,21 +195,23 @@ Task: T007 實作 processPendingReload() 在 media/js/blocklyEdit.js
 
 ## Implementation Strategy
 
-### MVP First (User Story 1 Only)
+### MVP First (User Story 1 + 4)
 
 1. 完成 Phase 1: Setup（驗證 API 支援）
 2. 完成 Phase 2: Foundational（狀態變數和輔助函數）
 3. 完成 Phase 3: User Story 1（拖曳保護）
-4. **STOP and VALIDATE**: 使用 quickstart.md 測試案例 #1 驗證
-5. 部署/演示 MVP
+4. 完成 Phase 3a: User Story 4（內部更新保護）
+5. **STOP and VALIDATE**: 使用 quickstart.md 測試案例 #1, #6 驗證
+6. 部署/演示 MVP
 
 ### Incremental Delivery
 
 1. Setup + Foundational → 基礎就緒
-2. 新增 User Story 1 → 獨立測試 → 部署（MVP！解決核心崩潰問題）
-3. 新增 User Story 2 → 獨立測試 → 部署（增強穩定性）
-4. 新增 User Story 3 → 獨立測試 → 部署（API 現代化）
-5. 每個故事增加價值且不破壞之前的故事
+2. 新增 User Story 1 → 獨立測試 → 部署（拖曳保護！）
+3. 新增 User Story 4 → 獨立測試 → 部署（內部更新保護，MVP 完成！）
+4. 新增 User Story 2 → 獨立測試 → 部署（增強穩定性）
+5. 新增 User Story 3 → 獨立測試 → 部署（API 現代化）
+6. 每個故事增加價值且不破壞之前的故事
 
 ---
 
@@ -201,5 +224,5 @@ Task: T007 實作 processPendingReload() 在 media/js/blocklyEdit.js
 -   在任何檢查點停下來以獨立驗證故事
 -   避免：模糊的任務、同一檔案衝突、破壞獨立性的跨故事依賴
 -   所有日誌使用 `log.*` API（不使用 `console.log`）
--   主要修改檔案：`media/js/blocklyEdit.js`、`media/blockly/blocks/functions.js`、`src/webview/messageHandler.ts`
+-   主要修改檔案：`media/js/blocklyEdit.js`、`media/blockly/blocks/functions.js`、`src/webview/messageHandler.ts`、`src/webview/webviewManager.ts`
 ````

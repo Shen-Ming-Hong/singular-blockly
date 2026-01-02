@@ -176,7 +176,93 @@ if (isClipboardOperationInProgress) {
 
 ---
 
-## 6. 實作決策總結
+## 6. 內部更新保護機制
+
+### 6.1 問題背景
+
+當 Extension 執行內部儲存操作（自動儲存、備份等）時，FileWatcher 會偵測到檔案變更並觸發 `loadWorkspace`。這會導致：
+
+-   不必要的工作區重載
+-   Undo Stack 被清空
+-   與拖曳操作的競態條件
+
+### 6.2 原有機制的問題
+
+原有實作使用 `isInternalUpdate` 布林旗標和 1000ms+100ms 的保護視窗：
+
+```javascript
+// 原有問題程式碼
+markInternalUpdateStart() { this.isInternalUpdate = true; }
+markInternalUpdateEnd() {
+    setTimeout(() => { this.isInternalUpdate = false; }, 100);
+}
+```
+
+**問題 1: 連續快速儲存的競態條件**
+
+```
+t=0ms:    儲存 A 開始, isInternalUpdate = true
+t=50ms:   儲存 A 完成, 設定 100ms 後重置
+t=100ms:  儲存 B 開始, isInternalUpdate = true
+t=150ms:  儲存 A 的計時器觸發, isInternalUpdate = false ❌
+          ↑ 儲存 B 還在進行中，但旗標被重置了！
+t=600ms:  FileWatcher 偵測到儲存 B, isInternalUpdate = false, 觸發重載 ❌
+```
+
+**問題 2: 檔案系統延遲**
+
+```
+t=0ms:    儲存開始, isInternalUpdate = true
+t=50ms:   儲存完成, 設定 100ms 後重置
+t=150ms:  isInternalUpdate = false
+t=1500ms: FileWatcher 偵測到變更 (延遲 1450ms), 觸發重載 ❌
+          ↑ 網路磁礙、防毒軟體等可能造成大延遲
+```
+
+### 6.3 解決方案：計數器機制 + 延長保護視窗
+
+**決定**: 使用 `internalUpdateCount` 計數器替代布林旗標，並將保護視窗延長至 2000ms
+
+**原理**:
+
+```javascript
+markInternalUpdateStart() {
+    if (this.internalUpdateTimer) clearTimeout(this.internalUpdateTimer);
+    this.internalUpdateCount++;
+}
+markInternalUpdateEnd() {
+    this.internalUpdateTimer = setTimeout(() => {
+        if (this.internalUpdateCount > 0) this.internalUpdateCount--;
+    }, 2000);
+}
+handleFileChange() {
+    if (this.internalUpdateCount > 0) return; // 跳過內部更新
+    // ...執行 loadWorkspace
+}
+```
+
+**優點**:
+
+-   計數器正確追蹤多個並行操作
+-   2000ms 涵蓋大多數檔案系統延遲
+-   清除舊計時器避免過期重置
+
+**為什麼是 2000ms**:
+
+-   FileWatcher debounce: 500ms
+-   一般檔案系統延遲: 100-500ms
+-   網路磁礙/防毒軟體: 可能 1000ms+
+-   2000ms 提供足夠安全間隔
+
+**替代方案被拒絕因素**:
+
+-   1000ms: 在網路磁礙場景可能不夠
+-   3000ms+: 延遲過長，可能影響外部變更的即時性
+-   只用布林旗標: 無法處理連續快速儲存
+
+---
+
+## 7. 實作決策總結
 
 | 議題             | 決定                                                 | 理由                     |
 | ---------------- | ---------------------------------------------------- | ------------------------ |
@@ -185,13 +271,15 @@ if (isClipboardOperationInProgress) {
 | 剪貼簿鎖定       | keydown 偵測 + 動態延長計時器                        | 可靠偵測，自適應大量積木 |
 | Variable API     | 遷移到 `getVariableMap()` 方法                       | 官方推薦，消除警告       |
 | Debounce 時間    | 150ms → 300ms                                        | 提升穩定性，影響可忽略   |
+| 內部更新保護     | 計數器機制 + 2000ms 保護視窗                         | 處理連續儲存和檔案延遲   |
 
 ---
 
-## 7. 風險評估
+## 8. 風險評估
 
 | 風險                       | 影響 | 緩解措施                                   |
 | -------------------------- | ---- | ------------------------------------------ |
 | 延遲重載可能導致短暫不同步 | 低   | 拖曳結束後立即執行重載                     |
 | 剪貼簿鎖定過長             | 低   | 動態機制自適應，最長不超過操作完成後 300ms |
 | 新 API 相容性              | 無   | Blockly 12.3.1 已支援，向後相容            |
+| 2000ms 保護延遲外部變更    | 低   | 2000ms 對即時性影響可接受，外部變更較少見  |
