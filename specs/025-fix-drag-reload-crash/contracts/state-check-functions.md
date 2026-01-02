@@ -128,21 +128,32 @@ keydown (Ctrl+C/V/X)
 ┌───────────────────────────────┐
 │ isClipboardOperationInProgress│
 │ = true                        │
+│ clipboardLockStartTime =      │
+│   Date.now()                  │
 │ clipboardLockTimer 設置       │
 └───────────────┬───────────────┘
                 │
                 │ BLOCK_CREATE 事件
                 ▼
 ┌───────────────────────────────┐
-│ 延長 clipboardLockTimer       │
-│ (重設為 300ms)                │
-└───────────────────────────────┘
+│ 檢查已過時間:                  │
+│ Date.now() - clipboardLock-   │
+│ StartTime < CLIPBOARD_MAX_    │
+│ LOCK_TIME (5000ms)?           │
+├───────────────┬───────────────┤
+│     YES       │      NO       │
+│     │         │      │        │
+│     ▼         │      ▼        │
+│ 延長 timer    │ 不延長，      │
+│ (重設為 300ms)│ 維持現有超時  │
+└───────────────┴───────────────┘
                 │
                 │ 計時器超時
                 ▼
 ┌───────────────────────────────┐
 │ isClipboardOperationInProgress│
 │ = false                       │
+│ clipboardLockStartTime = null │
 │ 允許自動儲存                  │
 └───────────────────────────────┘
 ```

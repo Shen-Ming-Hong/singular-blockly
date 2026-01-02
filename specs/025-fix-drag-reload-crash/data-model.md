@@ -110,6 +110,7 @@
 -   初始設定：300ms 超時
 -   動態延長：每次 `BLOCK_CREATE` 事件重設為 300ms
 -   超時時：設置 `isClipboardOperationInProgress = false`
+-   **最大鎖定時間**：5000ms（由 `CLIPBOARD_MAX_LOCK_TIME` 常數定義）
 
 **清理**:
 
@@ -118,7 +119,34 @@
 
 ---
 
-### 3.2 codeUpdateDebounceTimer (現有，需修改)
+### 3.2 CLIPBOARD_MAX_LOCK_TIME (新增常數)
+
+| 屬性 | 值                        |
+| ---- | ------------------------- |
+| 類型 | `number`                  |
+| 值   | `5000`                    |
+| 位置 | `media/js/blocklyEdit.js` |
+| 用途 | 剪貼簿操作鎖定的最大時間  |
+
+---
+
+### 3.3 clipboardLockStartTime (新增)
+
+| 屬性   | 值                        |
+| ------ | ------------------------- | ----- |
+| 類型   | `number                   | null` |
+| 預設值 | `null`                    |
+| 位置   | `media/js/blocklyEdit.js` |
+| 用途   | 記錄剪貼簿操作開始時間戳  |
+
+**行為**:
+
+-   `null` → `Date.now()`: 收到 `keydown` 事件，偵測到 `Ctrl+C/V/X`
+-   `Date.now()` → `null`: 鎖定結束時清除
+
+---
+
+### 3.4 codeUpdateDebounceTimer (現有，需修改)
 
 | 屬性   | 值                               |
 | ------ | -------------------------------- | --------------------- |
@@ -269,6 +297,8 @@ const isCurrentlyDragging = () => {
 | `media/js/blocklyEdit.js`           | 新增      | `isClipboardOperationInProgress`             |
 | `media/js/blocklyEdit.js`           | 新增      | `pendingReloadFromFileWatcher`               |
 | `media/js/blocklyEdit.js`           | 新增      | `clipboardLockTimer`                         |
+| `media/js/blocklyEdit.js`           | 新增      | `CLIPBOARD_MAX_LOCK_TIME` (常數 5000ms)      |
+| `media/js/blocklyEdit.js`           | 新增      | `clipboardLockStartTime`                     |
 | `media/js/blocklyEdit.js`           | 新增      | `isCurrentlyDragging()`                      |
 | `media/js/blocklyEdit.js`           | 新增      | `processPendingReload()`                     |
 | `media/js/blocklyEdit.js`           | 修改      | `codeUpdateDebounceTimer` 超時 150ms → 300ms |

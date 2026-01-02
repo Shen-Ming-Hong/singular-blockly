@@ -95,26 +95,38 @@ const isCurrentlyDragging = isDraggingBlock || workspace.isDragging();
 
 ### 3.2 動態延長鎖定
 
-**決定**: 使用計時器機制，每次 `BLOCK_CREATE` 事件延長鎖定時間
+**決定**: 使用計時器機制，每次 `BLOCK_CREATE` 事件延長鎖定時間，但設置最大鎖定時間上限（5000ms）
 
 **原理**:
 
 ```javascript
 // 初始鎖定 300ms
+clipboardLockStartTime = Date.now();
 clipboardLockTimer = setTimeout(() => {
     isClipboardOperationInProgress = false;
+    clipboardLockStartTime = null;
 }, 300);
 
-// BLOCK_CREATE 時延長
+// BLOCK_CREATE 時延長（需檢查最大時間）
 if (isClipboardOperationInProgress) {
-    clearTimeout(clipboardLockTimer);
-    clipboardLockTimer = setTimeout(..., 300);
+    const elapsed = Date.now() - clipboardLockStartTime;
+    if (elapsed < CLIPBOARD_MAX_LOCK_TIME) { // 5000ms
+        clearTimeout(clipboardLockTimer);
+        clipboardLockTimer = setTimeout(..., 300);
+    }
+    // 若已超過最大時間，不再延長，讓現有計時器自然超時
 }
 ```
 
 -   貼上大量積木時，每個積木建立事件重設計時器
 -   確保所有積木建立完成後才解除鎖定
 -   300ms 基於實測足以涵蓋 Blockly 內部處理時間
+-   **新增**: 5000ms 最大鎖定時間防止無限延長
+
+**替代方案被拒絕因素**:
+
+-   無上限動態延長：可能導致無限鎖定
+-   固定計數限制：不同操作規模差異大，固定計數不夠靈活
 
 ---
 

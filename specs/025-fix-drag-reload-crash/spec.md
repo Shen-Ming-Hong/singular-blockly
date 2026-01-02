@@ -81,10 +81,10 @@
 
 -   **FR-001**: 系統在執行 `loadWorkspace` 前必須檢查拖曳狀態（`isDraggingBlock` 和 `workspace.isDragging()` 雙重檢查，採用 OR 邏輯）
 -   **FR-002**: 當拖曳進行中收到 FileWatcher 觸發的 `loadWorkspace` 請求時，系統必須暫存該請求而非立即執行
--   **FR-003**: 當拖曳結束（`BLOCK_DRAG` 事件 `isStart === false`）時，系統必須檢查並執行任何待處理的重載請求
+-   **FR-003**: 當拖曳結束（`BLOCK_DRAG` 事件 `isStart === false`）時，系統必須在 100ms 延遲後檢查並執行任何待處理的重載請求（延遲確保 Blockly 內部狀態穩定）
 -   **FR-004**: 系統在偵測到 Ctrl+C/V/X 鍵盤事件時，必須設置剪貼簿操作鎖定旗標
 -   **FR-005**: 剪貼簿操作鎖定期間，`saveWorkspaceState()` 必須跳過儲存操作
--   **FR-006**: 當 `BLOCK_CREATE` 事件觸發時，如果剪貼簿操作鎖定中，系統必須動態延長鎖定時間
+-   **FR-006**: 當 `BLOCK_CREATE` 事件觸發時，如果剪貼簿操作鎖定中，系統必須動態延長鎖定時間（每次延長 300ms，最大總鎖定時間 5000ms）
 -   **FR-007**: 自動儲存的 debounce 時間必須從 150ms 增加到 300ms
 -   **FR-008**: 所有使用 `workspace.getAllVariables()` 的程式碼必須更新為 `workspace.getVariableMap().getAllVariables()`
 -   **FR-009**: 所有使用 `workspace.getVariableById()` 的程式碼必須更新為 `workspace.getVariableMap().getVariableById()`
@@ -95,6 +95,7 @@
 -   **isClipboardOperationInProgress**: 新增旗標，追蹤剪貼簿操作狀態
 -   **pendingReloadFromFileWatcher**: 新增變數，暫存待處理的重載請求訊息
 -   **clipboardLockTimer**: 新增計時器，管理剪貼簿操作鎖定的動態延長
+-   **CLIPBOARD_MAX_LOCK_TIME**: 常數，剪貼簿操作最大鎖定時間（5000ms）
 
 ## Success Criteria _(mandatory)_
 

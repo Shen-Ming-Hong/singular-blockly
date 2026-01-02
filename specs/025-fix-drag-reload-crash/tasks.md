@@ -38,6 +38,7 @@
 -   [ ] T002 新增 `isClipboardOperationInProgress` 狀態旗標在 `media/js/blocklyEdit.js` 頂層變數區
 -   [ ] T003 [P] 新增 `pendingReloadFromFileWatcher` 暫存變數在 `media/js/blocklyEdit.js` 頂層變數區
 -   [ ] T004 [P] 新增 `clipboardLockTimer` 計時器變數在 `media/js/blocklyEdit.js` 頂層變數區
+-   [ ] T004a [P] 新增 `CLIPBOARD_MAX_LOCK_TIME` 常數（5000ms）和 `clipboardLockStartTime` 變數在 `media/js/blocklyEdit.js` 頂層變數區
 -   [ ] T005 實作 `isCurrentlyDragging()` 輔助函數在 `media/js/blocklyEdit.js`（採用 OR 邏輯雙重檢查 `isDraggingBlock || workspace.isDragging()`）
 -   [ ] T006 [P] 實作 `shouldSkipSave()` 輔助函數在 `media/js/blocklyEdit.js`（整合所有儲存守衛條件：拖曳、剪貼簿鎖定、FileWatcher 載入）
 -   [ ] T007 [P] 實作 `processPendingReload()` 輔助函數在 `media/js/blocklyEdit.js`（執行待處理的 FileWatcher 重載請求）
@@ -56,7 +57,7 @@
 
 -   [ ] T008 [US1] 修改 `loadWorkspace` 訊息處理器在 `media/js/blocklyEdit.js`：新增 `source === 'fileWatcher'` 檢查，若 `isCurrentlyDragging()` 為 true 則暫存訊息
 -   [ ] T009 [US1] 修改 `BLOCK_DRAG` 事件處理器在 `media/js/blocklyEdit.js`：當 `event.isStart === false` 時呼叫 `processPendingReload()`（延遲 100ms 確保狀態穩定）
--   [ ] T010 [US1] 修改 Extension 側 `messageHandler.ts`：在 FileWatcher 觸發的 `loadWorkspace` 訊息中加入 `source: 'fileWatcher'` 標記
+-   [ ] T010 [US1] 修改 Extension 側 `messageHandler.ts`：檢查現有程式碼是否已有 `source` 標記，若無則在 FileWatcher 觸發的 `loadWorkspace` 訊息中加入 `source: 'fileWatcher'` 標記（先執行 `grep_search` 確認現狀）
 -   [ ] T011 [US1] 新增日誌記錄：「FileWatcher 重載請求已暫存，等待拖曳結束」和「拖曳結束，執行待處理的 FileWatcher 重載」在 `media/js/blocklyEdit.js`
 
 **Checkpoint**: 此時 User Story 1 應可獨立測試 - 拖曳期間 FileWatcher 重載被延遲
@@ -72,7 +73,7 @@
 ### Implementation for User Story 2
 
 -   [ ] T012 [US2] 新增 `keydown` 事件監聽器在 `media/js/blocklyEdit.js`：偵測 Ctrl+C/V/X 時設置 `isClipboardOperationInProgress = true` 並啟動 `clipboardLockTimer`（300ms）
--   [ ] T013 [US2] 修改 `BLOCK_CREATE` 事件處理器在 `media/js/blocklyEdit.js`：若 `isClipboardOperationInProgress` 為 true，重設 `clipboardLockTimer` 動態延長鎖定
+-   [ ] T013 [US2] 修改 `BLOCK_CREATE` 事件處理器在 `media/js/blocklyEdit.js`：若 `isClipboardOperationInProgress` 為 true 且未超過 `CLIPBOARD_MAX_LOCK_TIME`（5000ms），重設 `clipboardLockTimer` 動態延長鎖定
 -   [ ] T014 [US2] 修改 `saveWorkspaceState()` 函數在 `media/js/blocklyEdit.js`：使用 `shouldSkipSave()` 整合所有守衛條件
 -   [ ] T015 [US2] 修改自動儲存 debounce 時間從 150ms 到 300ms 在 `media/js/blocklyEdit.js` 的 `codeUpdateDebounceTimer` 相關程式碼
 -   [ ] T016 [US2] 新增日誌記錄：「剪貼簿操作開始，鎖定自動儲存」和「剪貼簿操作結束，解除鎖定」在 `media/js/blocklyEdit.js`
@@ -90,8 +91,8 @@
 ### Implementation for User Story 3
 
 -   [ ] T017 [US3] 搜尋並更新 `workspace.getVariableById()` 為 `workspace.getVariableMap().getVariableById()` 在 `media/blockly/blocks/functions.js`
--   [ ] T018 [US3] 搜尋專案中所有 `workspace.getAllVariables()` 並更新為 `workspace.getVariableMap().getAllVariables()`（如有）
--   [ ] T019 [US3] 搜尋專案中所有其他棄用的 Blockly Variable API 並更新（如有）
+-   [ ] T018 [US3] 搜尋專案根目錄下所有 `.js` 檔案中的 `workspace.getAllVariables()` 並更新為 `workspace.getVariableMap().getAllVariables()`（搜尋範圍：`media/`、`src/`、排除 `node_modules/`）
+-   [ ] T019 [US3] 搜尋專案根目錄下所有 `.js` 檔案中的其他棄用 Blockly Variable API（如 `workspace.deleteVariable`、`workspace.renameVariable`）並更新（搜尋範圍：`media/`、`src/`、排除 `node_modules/`）
 
 **Checkpoint**: 所有用戶故事都應可獨立運作
 
