@@ -10,7 +10,7 @@ argument-hint: 提供 constitution.md 或專案發布規範檔案路徑
 
 ## 步驟 1：Code Review 評估
 
-1. 讀取目前 PR 的所有 code review 評論(包含 copilot review 建議)
+1. 使用 GH CLI 讀取目前 PR 的所有 code review 評論(包含 copilot review 建議)
 2. 以專業開發者角度評估每一條建議：
     - **採納**：真正有價值、能改善程式碼品質的建議
     - **忽略**：基於錯誤理解、不符合專案架構或過度工程化的建議
