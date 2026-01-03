@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-VSCode extension for visual Arduino/MicroPython programming using Google Blockly. Generates Arduino C++ (via PlatformIO) or MicroPython (via mpremote for CyberBrick) based on board selection.
+VSCode extension for visual Arduino/MicroPython programming using Google Blockly. Generates Arduino C++ (via PlatformIO) or MicroPython (via mpremote for CyberBrick) based on board selection. Supports 15 languages with 99% i18n coverage.
 
 **Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VSCode 1.105.0+ | MCP SDK 1.24.3
 
@@ -15,15 +15,22 @@ VSCode extension for visual Arduino/MicroPython programming using Google Blockly
 ```
 Extension Host (Node.js)              WebView (Browser)
 ├── src/extension.ts          ←→      ├── media/html/blocklyEdit.html
-├── src/webview/                      ├── media/js/blocklyEdit.js
+├── src/webview/                      ├── media/js/blocklyEdit.js (3000+ lines)
 │   ├── webviewManager.ts             └── media/blockly/
-│   └── messageHandler.ts                 ├── blocks/*.js
+│   └── messageHandler.ts                 ├── blocks/*.js (定義積木外觀)
 ├── src/mcp/mcpServer.ts                  └── generators/{arduino,micropython}/*.js
+├── src/mcp/tools/                    
+│   ├── blockQuery.ts         # get_block_usage, search_blocks
+│   ├── platformConfig.ts     # get_platform_config, get_board_pins
+│   └── workspaceOps.ts       # update_workspace, refresh_editor
 └── src/services/
-    ├── fileService.ts        # ALL file I/O (never use fs directly)
+    ├── fileService.ts        # ALL file I/O (inject FileSystem for tests)
     ├── logging.ts            # ALL logging (never use console.log)
-    └── settingsManager.ts    # PlatformIO config
+    ├── settingsManager.ts    # PlatformIO config + theme + auto-backup
+    └── micropythonUploader.ts # mpremote upload for CyberBrick
 ```
+
+**Data Flow**: WebView `saveWorkspace` → `messageHandler.ts` → `FileService` → `blockly/main.json`
 
 ## Critical Patterns
 
@@ -31,59 +38,71 @@ Extension Host (Node.js)              WebView (Browser)
 
 ```typescript
 // Extension → WebView (in messageHandler.ts)
-panel.webview.postMessage({ command: 'loadWorkspace', state: {...} });
+panel.webview.postMessage({ command: 'loadWorkspace', state: {...}, board: 'esp32' });
 
 // WebView → Extension (in blocklyEdit.js)
-vscode.postMessage({ command: 'saveWorkspace', state: {...} });
+vscode.postMessage({ command: 'saveWorkspace', state: {...}, board: currentBoard });
 
 // Add handlers in messageHandler.ts switch-case:
 case 'newCommand': await this.handleNewCommand(message); break;
 ```
 
-### Dual Code Generators
+### Dual Code Generators (Board-Aware)
 
 **Arduino** (`media/blockly/generators/arduino/*.js`):
 
 ```javascript
 arduinoGenerator.forBlock['servo_setup'] = function (block) {
-	arduinoGenerator.lib_deps_.push('ESP32Servo@^3.0.6'); // Auto-add to platformio.ini
-	return ['code', arduinoGenerator.ORDER_ATOMIC];
+	const currentBoard = window.getCurrentBoard(); // 'uno' | 'esp32' | 'mega' ...
+	if (currentBoard === 'esp32') {
+		arduinoGenerator.lib_deps_.push('madhephaestus/ESP32Servo@^3.0.6');
+	} else {
+		arduinoGenerator.lib_deps_.push('arduino-libraries/Servo@^1.2.2');
+	}
+	return ''; // Setup blocks return empty string
 };
 ```
 
 **MicroPython** (`media/blockly/generators/micropython/*.js`):
 
 ```javascript
-micropythonGenerator.forBlock['cyberbrick_led'] = function (block) {
+micropythonGenerator.forBlock['cyberbrick_led_set_color'] = function (block) {
 	generator.addImport('from machine import Pin');
-	generator.addHardwareInit('led', 'led = Pin(8, Pin.OUT)');
-	return 'led.value(1)\n';
+	generator.addImport('from neopixel import NeoPixel');
+	generator.addHardwareInit('onboard_led', 'onboard_led = NeoPixel(Pin(8), 1)');
+	return `onboard_led[0] = (${red}, ${green}, ${blue})\nonboard_led.write()\n`;
 };
 ```
 
 ### Service Layer Rules
 
--   **File I/O**: Use `FileService` only (`src/services/fileService.ts`)
--   **Logging**: Use `log('message', 'info')` from `logging.ts`
+-   **File I/O**: Use `FileService` only — inject `FileSystem` interface for testing
+-   **Logging**: Use `log('message', 'info')` from `logging.ts`; WebView uses `log.info()`
 -   **Workspace**: Always check `vscode.workspace.workspaceFolders` before operations
+-   **Empty State Guard**: `isEmptyWorkspaceState()` prevents overwriting valid data
 
 ## Development Commands
 
 ```powershell
 npm run watch          # Watch mode (F5 to debug)
-npm run test           # Run tests
+npm run test           # Run all tests
+npm run test:coverage  # Run with coverage report
 npm run validate:i18n  # Check all 15 language translations
+npm run audit:i18n:all # Full i18n quality audit
+npm run generate:dictionary  # Update MCP block dictionary
 ```
 
 **Debug WebView**: F5 → Right-click panel → "Open Developer Tools"
 
 ## Adding New Blocks (5-Step Checklist)
 
-1. Block definition: `media/blockly/blocks/{category}.js`
-2. Arduino generator: `media/blockly/generators/arduino/{category}.js`
-3. MicroPython generator: `media/blockly/generators/micropython/{category}.js`
-4. Toolbox entry: `media/toolbox/categories/{category}.json`
-5. i18n keys: All 15 `media/locales/*/messages.js` files
+1. **Block definition**: `media/blockly/blocks/{category}.js` — define appearance, fields, connections
+2. **Arduino generator**: `media/blockly/generators/arduino/{category}.js` — use `window.getCurrentBoard()` for board-specific code
+3. **MicroPython generator**: `media/blockly/generators/micropython/{category}.js` — use `generator.addImport()`, `generator.addHardwareInit()`
+4. **Toolbox entry**: `media/toolbox/categories/{category}.json`
+5. **i18n keys**: All 15 `media/locales/*/messages.js` files (use `npm run validate:i18n` to check)
+
+**For setup blocks** (servo, encoder): Register with `arduinoGenerator.registerAlwaysGenerateBlock('block_type')`
 
 ## MCP Server (AI Tool Integration)
 
@@ -94,6 +113,7 @@ Adding tools:
 1. Create `src/mcp/tools/{name}.ts` with `registerXxxTools(server: McpServer)`
 2. Register in `mcpServer.ts`
 3. Use Zod schemas for input validation
+4. Run `npm run generate:dictionary` to update `block-dictionary.json`
 
 ## Specs-Driven Development
 
@@ -106,19 +126,34 @@ Features documented in `/specs/{NNN}-feature-name/`:
 ## Testing with Dependency Injection
 
 ```typescript
-import { FSMock, createIsolatedFileService } from './helpers';
+// src/test/helpers/mocks.ts provides VSCodeMock, FSMock
+import { FSMock, VSCodeMock } from './helpers/mocks';
+
 const fsMock = new FSMock();
 fsMock.addFile('/workspace/blockly/main.json', '{}');
-const fileService = createIsolatedFileService(fsMock, '/workspace');
+const fileService = new FileService('/workspace', fsMock);
+
+// For messageHandler tests, inject services via constructor:
+const handler = new WebViewMessageHandler(context, panel, localeService, fileService, settingsManager);
 ```
 
 ## Common Pitfalls
 
 1. **WebView resources**: Must use `webview.asWebviewUri()` for all paths
-2. **CyberBrick board**: Extension auto-deletes `platformio.ini` on activation
+2. **CyberBrick board**: Extension auto-deletes `platformio.ini` on activation (see `extension.ts:50-70`)
 3. **Generator block names**: Must match block type exactly (`forBlock['exact_name']`)
-4. **Board detection**: Use `window.currentBoard` in generators for board-specific code
+4. **Board detection**: Use `window.getCurrentBoard()` in generators, `window.currentBoard` is deprecated
+5. **Backup before save**: `createBackupBeforeSave()` creates `main.json.bak` automatically
+6. **i18n placeholders**: Use `{0}`, `{1}` format in `messages.js`, not `%s`
 
----
+## Key File Locations
 
-**Core Files**: [src/extension.ts](src/extension.ts) | [media/js/blocklyEdit.js](media/js/blocklyEdit.js) | [src/webview/messageHandler.ts](src/webview/messageHandler.ts)
+| Purpose | File |
+|---------|------|
+| Extension entry | `src/extension.ts` |
+| WebView main logic | `media/js/blocklyEdit.js` |
+| Message handling | `src/webview/messageHandler.ts` |
+| File operations | `src/services/fileService.ts` |
+| Workspace state | `blockly/main.json` (in user project) |
+| MCP block metadata | `src/mcp/block-dictionary.json` |
+| i18n validation | `scripts/i18n/validate-translations.js` |
