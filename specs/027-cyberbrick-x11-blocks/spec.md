@@ -63,8 +63,8 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 使用者拖出 LED 燈條設定顏色積木並設定 D1 埠、第 2 顆、R=0 G=255 B=128, **When** 生成 MicroPython 程式碼, **Then** 產生 `led1.set_led_effect(0, 1000, 255, 0b0010, 0x00FF80)` 且自動引入 `from bbl.leds import LEDController`
-2. **Given** 使用者選擇輸出口為「全部」, **When** 生成程式碼, **Then** `led_index` 參數為 `0b1111`
+1. **Given** 使用者拖出 LED 燈條設定顏色積木並設定 D1 埠、第 2 顆、R=0 G=255 B=128, **When** 生成 MicroPython 程式碼, **Then** 產生 `np_d1[1] = (0, 255, 128)` 和 `np_d1.write()` 且自動引入 `from machine import Pin` 和 `from neopixel import NeoPixel`
+2. **Given** 使用者選擇輸出口為「全部」, **When** 生成程式碼, **Then** 產生設定所有 4 顆 LED 的程式碼（`np_d1[0]` 到 `np_d1[3]`）
 3. **Given** 使用者滑鼠懸停在 LED 燈條積木上, **When** 顯示 Tooltip, **Then** 顯示「設定 WS2812 LED 燈條顏色，R/G/B 範圍 0-255」
 
 ---
@@ -124,17 +124,17 @@
 -   **FR-011**: 當使用伺服馬達平滑移動積木時，系統必須自動在主程式結尾注入 `servos.timing_proc()` 呼叫；LED 燈條設定立即生效，不需要 timing_proc()
 -   **FR-012**: 所有積木必須提供 Tooltip 說明，包含適用硬體型號和使用提示
 -   **FR-013**: 系統必須為所有 15 種支援語言提供 i18n 翻譯
--   **FR-014**: MicroPython 生成器必須自動引入所需的 `from bbl.xxx import XxxController` 語句
--   **FR-015**: MicroPython 生成器必須自動初始化 Controller 單例（使用 addHardwareInit 確保只初始化一次）
--   **FR-016**: LED 燈條積木必須將 D1/D2 埠位轉換為 API 所需的 'LED1'/'LED2' 字串
--   **FR-017**: LED 燈條積木必須將輸出口選擇轉換為位元遮罩格式（1→0b0001, 2→0b0010, 全部 →0b1111）
+-   **FR-014**: MicroPython 生成器必須自動引入所需的 import 語句（馬達：`from bbl.xxx import XxxController`；LED：`from machine import Pin` 和 `from neopixel import NeoPixel`）
+-   **FR-015**: MicroPython 生成器必須自動初始化硬體（使用 addHardwareInit 確保只初始化一次）
+-   **FR-016**: LED 燈條積木必須將 D1/D2 埠位轉換為對應的 GPIO 腳位（D1→20, D2→21）
+-   **FR-017**: LED 燈條積木必須支援單顆 LED 獨立控制，設定某顆 LED 不影響其他 LED 的狀態
 -   **FR-018**: 生成器必須對超出範圍的數值自動 clamp（角度 0-180°、速度 -100%~100%、馬達 -2048~2048）
 
 ### Key Entities
 
 -   **ServosController**: 伺服馬達控制器單例，管理 S1-S4 四個伺服馬達埠，支援角度控制、平滑移動、速度控制
 -   **MotorsController**: 直流馬達控制器單例，管理 M1-M2 兩個直流馬達埠，支援速度控制（-2048 到 2048）
--   **LEDController**: LED 燈帶控制器，每個 D 埠對應一個實例（LED1/LED2），每個實例管理 4 個輸出口
+-   **NeoPixel**: 原生 MicroPython NeoPixel 物件，每個 D 埠對應一個實例（np_d1/np_d2），每個實例管理 4 顆 LED，支援單顆獨立控制
 
 ## Success Criteria _(mandatory)_
 
@@ -154,11 +154,13 @@
 -   Q: X11 擴展板積木的專屬顏色？ → A: HSV 180（青色），與核心板 HSV 160 區分
 -   Q: 角度/速度超出範圍時的處理方式？ → A: 在生成的程式碼中自動 clamp 到有效範圍
 -   Q: LED 是否需要 timing_proc()？ → A: 不需要，純色設定立即生效；使用者可自行用迴圈實現特效
--   Q: D1-D2 埠控制的 LED 元件名稱？ → A: LED 燈條（台灣主流用詞）- Q: Toolbox 中的積木分組方式？ → A: 按元件類型分組（伺服馬達/直流馬達/LED 燈條），使用 Label 分隔
+-   Q: D1-D2 埠控制的 LED 元件名稱？ → A: LED 燈條（台灣主流用詞）
+-   Q: Toolbox 中的積木分組方式？ → A: 按元件類型分組（伺服馬達/直流馬達/LED 燈條），使用 Label 分隔
+-   Q: LED 燈條使用何種 API？ → A: 使用原生 NeoPixel API（非 LEDController.set_led_effect），支援單顆獨立控制
 
 ## Assumptions
 
 -   使用者已具備基本的 CyberBrick 硬體連接知識
 -   X11 擴展板（Remote Control Receiver Shield-XA004）已正確連接到 Multi-Function Core Board
--   目標硬體上已預裝 CyberBrick MicroPython 韌體，包含 `bbl.servos`、`bbl.motors`、`bbl.leds` 模組
--   LED 燈條使用 WS2812 協議，透過 LED Hub (XA006) 連接到 D1/D2 埠
+-   目標硬體上已預裝 CyberBrick MicroPython 韌體，包含 `bbl.servos`、`bbl.motors` 模組及原生 `neopixel` 模組
+-   LED 燈條使用 WS2812 協議，透過 LED Hub (XA006) 連接到 D1/D2 埠（GPIO 20/21）
