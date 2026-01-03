@@ -142,10 +142,11 @@ const functionMutator = {
 		// 首先移除不再使用的舊參數變數，但保留其他函式積木使用的參數變數
 		if (this.registeredVarIds_) {
 			// 獲取目前已註冊的參數變數
+			// T017: 使用 getVariableMap().getVariableById() 替代棄用的 workspace.getVariableById()
 			const oldVars = this.registeredVarIds_
 				.map(varId => {
 					try {
-						return workspace.getVariableById(varId);
+						return workspace.getVariableMap().getVariableById(varId);
 					} catch (err) {
 						log.error('獲取舊參數變數失敗:', err);
 						return null;

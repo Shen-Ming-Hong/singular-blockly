@@ -1233,6 +1233,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 	functionSearch.init();
 	// 初始化快速備份功能 (Ctrl+S / Cmd+S)
 	quickBackup.init();
+
+	// T015: 初始化剪貼簿操作監聽器 (Ctrl+C/V/X)
+	// 監聽複製、貼上、剪下操作以鎖定保存
+	document.addEventListener('keydown', e => {
+		if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x'].includes(e.key.toLowerCase())) {
+			// 開始剪貼簿操作鎖定
+			startClipboardLock();
+		}
+	});
+	document.addEventListener('keyup', e => {
+		if (['c', 'v', 'x'].includes(e.key.toLowerCase())) {
+			// 延遲結束剪貼簿操作鎖定（確保事件處理完成）
+			setTimeout(() => {
+				endClipboardLock();
+			}, 100);
+		}
+	});
+	log.info('剪貼簿操作監聽器已初始化 (Ctrl+C/V/X)');
+
 	// 初始化實驗積木提示
 	try {
 		if (window.experimentalBlocksNotice) {
@@ -1443,15 +1462,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
-		// 如果正在拖曳方塊，跳過保存以避免資料遺失
-		if (isDraggingBlock) {
-			log.info('跳過保存：正在拖曳');
-			return;
-		}
-
-		// 如果正在從 FileWatcher 載入，跳過保存以避免無限循環
-		if (isLoadingFromFileWatcher) {
-			log.info('跳過保存：正在從 FileWatcher 載入');
+		// T014: 使用整合的 shouldSkipSave() 守衛條件
+		if (shouldSkipSave()) {
 			return;
 		}
 
@@ -1489,6 +1501,133 @@ document.addEventListener('DOMContentLoaded', async () => {
 	let pendingCodeUpdate = false;
 	let codeUpdateDebounceTimer = null;
 
+	// === 025-fix-drag-reload-crash: 新增狀態變數 ===
+	// T002: 剪貼簿操作鎖定旗標 - 防止 Ctrl+C/V/X 期間觸發不完整儲存
+	let isClipboardOperationInProgress = false;
+	// T003: FileWatcher 重載請求暫存 - 延遲到拖曳結束後執行
+	let pendingReloadFromFileWatcher = null;
+	// T004: 剪貼簿操作鎖定計時器
+	let clipboardLockTimer = null;
+	// T004a: 剪貼簿操作最大鎖定時間（防止無限延長）
+	const CLIPBOARD_MAX_LOCK_TIME = 5000; // 5000ms
+	let clipboardLockStartTime = null;
+
+	/**
+	 * T005: 檢查是否正在拖曳中（雙重檢查機制）
+	 * 使用 OR 邏輯同時檢查 isDraggingBlock 旗標和 workspace.isDragging()
+	 * @returns {boolean} 是否正在拖曳
+	 */
+	const isCurrentlyDragging = () => {
+		return isDraggingBlock || (workspace && workspace.isDragging());
+	};
+
+	/**
+	 * T006: 檢查是否應該跳過儲存操作
+	 * 整合所有儲存守衛條件：拖曳、剪貼簿鎖定、FileWatcher 載入
+	 * @returns {boolean} 是否應該跳過儲存
+	 */
+	const shouldSkipSave = () => {
+		// 條件 1: 正在拖曳中
+		if (isCurrentlyDragging()) {
+			log.info('跳過保存：正在拖曳');
+			return true;
+		}
+		// 條件 2: 剪貼簿操作鎖定中
+		if (isClipboardOperationInProgress) {
+			log.info('跳過保存：剪貼簿操作鎖定中');
+			return true;
+		}
+		// 條件 3: 正在從 FileWatcher 載入
+		if (isLoadingFromFileWatcher) {
+			log.info('跳過保存：正在從 FileWatcher 載入');
+			return true;
+		}
+		return false;
+	};
+
+	/**
+	 * T007: 執行待處理的 FileWatcher 重載請求
+	 * 在拖曳結束後檢查並執行暫存的重載請求
+	 */
+	const processPendingReload = () => {
+		if (pendingReloadFromFileWatcher && !isCurrentlyDragging()) {
+			log.info('拖曳結束，執行待處理的 FileWatcher 重載');
+			const pendingMessage = pendingReloadFromFileWatcher;
+			pendingReloadFromFileWatcher = null;
+
+			// 設置 FileWatcher 載入鎖定
+			isLoadingFromFileWatcher = true;
+
+			// 執行重載邏輯（模擬收到 loadWorkspace 訊息）
+			try {
+				if (pendingMessage.board) {
+					const boardSelect = document.getElementById('boardSelect');
+					if (boardSelect) {
+						boardSelect.value = pendingMessage.board;
+						window.setCurrentBoard(pendingMessage.board);
+					}
+				}
+				if (pendingMessage.theme) {
+					currentTheme = pendingMessage.theme;
+					updateTheme(currentTheme);
+				}
+				if (pendingMessage.state) {
+					Blockly.serialization.workspaces.load(pendingMessage.state, workspace);
+					rebuildPwmConfig(workspace);
+				}
+			} catch (error) {
+				log.error('執行待處理的 FileWatcher 重載失敗:', error);
+			}
+
+			// 延遲重置鎖定
+			setTimeout(() => {
+				isLoadingFromFileWatcher = false;
+				log.info('FileWatcher 重載完成，恢復保存操作');
+			}, 1500);
+		}
+	};
+
+	/**
+	 * T012: 開始剪貼簿操作鎖定
+	 * 設置鎖定旗標並啟動安全超時計時器
+	 */
+	const startClipboardLock = () => {
+		isClipboardOperationInProgress = true;
+		clipboardLockStartTime = Date.now();
+
+		// 清除之前的計時器
+		if (clipboardLockTimer) {
+			clearTimeout(clipboardLockTimer);
+		}
+
+		// 設置安全超時（防止無限鎖定）
+		clipboardLockTimer = setTimeout(() => {
+			if (isClipboardOperationInProgress) {
+				log.warn(`剪貼簿操作鎖定超過 ${CLIPBOARD_MAX_LOCK_TIME}ms，強制解鎖`);
+				endClipboardLock();
+			}
+		}, CLIPBOARD_MAX_LOCK_TIME);
+
+		log.info('剪貼簿操作開始，設置鎖定');
+	};
+
+	/**
+	 * T013: 結束剪貼簿操作鎖定
+	 * 清除鎖定旗標和計時器
+	 */
+	const endClipboardLock = () => {
+		isClipboardOperationInProgress = false;
+		clipboardLockStartTime = null;
+
+		if (clipboardLockTimer) {
+			clearTimeout(clipboardLockTimer);
+			clipboardLockTimer = null;
+		}
+
+		log.info('剪貼簿操作結束，解除鎖定');
+	};
+	// === 025-fix-drag-reload-crash: 狀態變數結束 ===
+
 	// 視角保持狀態：用於在積木刪除時保持視角位置
 	// stableViewport: 持續追蹤「穩定狀態」的視角（沒有拖曳時的位置）
 	// viewportState: 當拖曳開始時鎖定的視角（用於恢復）
@@ -1523,7 +1662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			} catch (err) {
 				log.info('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
 			}
-		}, 150); // 150ms 延遲，平衡響應速度與性能
+		}, 300); // T015: 300ms 延遲，配合剪貼簿操作鎖定機制
 	};
 
 	// 單一的工作區變更監聯器
@@ -1584,6 +1723,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 						viewportState = null;
 					}
 				}, 200);
+
+				// T009: 拖曳結束後，延遲 100ms 執行待處理的 FileWatcher 重載請求
+				setTimeout(() => {
+					processPendingReload();
+				}, 100);
 			}
 			return;
 		}
@@ -1636,6 +1780,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 				window.esp32PwmFrequency = frequency;
 				window.esp32PwmResolution = resolution;
 				console.log(`[PWM Config] 即時更新: ${frequency}Hz @ ${resolution}bit`);
+			}
+		}
+
+		// T013: 剪貼簿操作期間新增積木時動態延長鎖定
+		if (event.type === Blockly.Events.BLOCK_CREATE && isClipboardOperationInProgress) {
+			// 檢查是否已超過最大鎖定時間
+			const lockDuration = clipboardLockStartTime ? Date.now() - clipboardLockStartTime : 0;
+			if (lockDuration < CLIPBOARD_MAX_LOCK_TIME) {
+				// 重設鎖定計時器，延長鎖定直到所有積木建立完成
+				if (clipboardLockTimer) {
+					clearTimeout(clipboardLockTimer);
+				}
+				clipboardLockTimer = setTimeout(() => {
+					endClipboardLock();
+				}, 300); // 300ms 後如果沒有新的 BLOCK_CREATE 事件就解除鎖定
+				log.info('剪貼簿操作：偵測到新積木建立，延長鎖定時間');
 			}
 		}
 
@@ -2119,6 +2279,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 				try {
 					// 如果是 FileWatcher 觸發的重載，設置鎖定標記防止無限循環
 					const isFromFileWatcher = message.source === 'fileWatcher';
+
+					// T008: 如果是 FileWatcher 觸發且正在拖曳，延遲執行重載
+					if (isFromFileWatcher && isCurrentlyDragging()) {
+						log.info('[FileWatcher] 偵測到拖曳中，延遲重載請求');
+						pendingReloadFromFileWatcher = {
+							state: message.state,
+							board: message.board,
+							theme: message.theme,
+						};
+						return; // 提前返回，等待拖曳結束後執行
+					}
+
 					if (isFromFileWatcher) {
 						isLoadingFromFileWatcher = true;
 						log.info('FileWatcher 觸發的工作區重載，暫停保存操作');

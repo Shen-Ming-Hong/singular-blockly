@@ -96,7 +96,8 @@ export class WebViewManager {
 	// FileWatcher 機制 - T011
 	private fileWatcher: vscode.FileSystemWatcher | undefined;
 	private fileWatcherDebounceTimer: NodeJS.Timeout | undefined;
-	private isInternalUpdate: boolean = false; // 避免內部更新觸發 FileWatcher
+	// T024: 改用計數器機制，支援巢狀保存操作
+	private internalUpdateCount: number = 0; // 避免內部更新觸發 FileWatcher
 
 	/**
 	 * 建立 WebView 管理器實例
@@ -1193,9 +1194,10 @@ export class WebViewManager {
 	 * 實作去抖動邏輯（500ms debounce）- T033
 	 */
 	private handleFileChange(uri: vscode.Uri): void {
-		// 避免內部更新觸發 - T034
-		if (this.isInternalUpdate) {
-			log('Ignoring internal update to main.json', 'debug');
+		// T027: 避免內部更新觸發 - 使用計數器判斷
+		if (this.isInternalUpdateActive()) {
+			// T029: 新增日誌記錄
+			log(`Ignoring internal update to main.json (count: ${this.internalUpdateCount})`, 'debug');
 			return;
 		}
 
@@ -1280,20 +1282,35 @@ export class WebViewManager {
 	}
 
 	/**
-	 * 標記內部更新開始
-	 * 用於避免內部保存操作觸發 FileWatcher
+	 * T028: 檢查內部更新是否進行中
+	 * @returns 如果有任何內部更新操作正在進行，返回 true
 	 */
-	public markInternalUpdateStart(): void {
-		this.isInternalUpdate = true;
+	public isInternalUpdateActive(): boolean {
+		return this.internalUpdateCount > 0;
 	}
 
 	/**
-	 * 標記內部更新結束
+	 * T025: 標記內部更新開始
+	 * 用於避免內部保存操作觸發 FileWatcher
+	 * 使用計數器支援巢狀保存操作
+	 */
+	public markInternalUpdateStart(): void {
+		this.internalUpdateCount++;
+		log(`Internal update started (count: ${this.internalUpdateCount})`, 'debug');
+	}
+
+	/**
+	 * T026: 標記內部更新結束
+	 * 使用 2000ms 延遲確保檔案系統事件已完成處理
 	 */
 	public markInternalUpdateEnd(): void {
 		// 延遲重置，確保檔案系統事件已完成
+		// 使用 2000ms 保護窗口，確保所有相關的檔案系統事件都已處理完畢
 		setTimeout(() => {
-			this.isInternalUpdate = false;
-		}, 100);
+			if (this.internalUpdateCount > 0) {
+				this.internalUpdateCount--;
+				log(`Internal update ended (count: ${this.internalUpdateCount})`, 'debug');
+			}
+		}, 2000);
 	}
 }
