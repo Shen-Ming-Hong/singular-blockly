@@ -774,4 +774,38 @@ window.languageManager.loadMessages('pl', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Wybierz plik kopii zapasowej do podglądu',
 	DIALOG_BACKUP_FILES_LABEL: 'Pliki kopii zapasowych',
+
+	// X11 Płytka rozszerzeń
+	CATEGORY_X11: 'X11 Rozszerzenie',
+	X11_LABEL_SERVOS: 'Serwomotory',
+	X11_LABEL_MOTORS: 'Silniki',
+	X11_LABEL_LEDS: 'LED',
+
+	// X11 180° Serwo bloki
+	X11_SERVO_180_ANGLE_PREFIX: 'Ustaw serwo',
+	X11_SERVO_180_ANGLE_SUFFIX: 'kąt',
+	X11_SERVO_180_ANGLE_TOOLTIP: 'Ustaw kąt serwa 180° (0-180 stopni)',
+
+	// X11 360° Serwo bloki
+	X11_SERVO_360_SPEED_PREFIX: 'Ustaw serwo',
+	X11_SERVO_360_SPEED_SUFFIX: 'prędkość',
+	X11_SERVO_360_SPEED_TOOLTIP: 'Ustaw prędkość serwa 360° ciągłego obrotu (-100 do 100, ujemna=wstecz)',
+
+	// X11 Blok zatrzymania serwa
+	X11_SERVO_STOP: 'Zatrzymaj serwo',
+	X11_SERVO_STOP_TOOLTIP: 'Zatrzymaj określone serwo',
+
+	// X11 Silnik bloki
+	X11_MOTOR_SPEED_PREFIX: 'Ustaw silnik',
+	X11_MOTOR_SPEED_SUFFIX: 'prędkość',
+	X11_MOTOR_SPEED_TOOLTIP: 'Ustaw prędkość silnika DC (-2048 do 2048, ujemna=wstecz)',
+	X11_MOTOR_STOP: 'Zatrzymaj silnik',
+	X11_MOTOR_STOP_TOOLTIP: 'Zatrzymaj określony silnik',
+
+	// X11 LED bloki
+	X11_LED_SET_COLOR_PREFIX: 'Taśma LED',
+	X11_LED_SET_COLOR_INDEX: 'indeks',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'ustaw kolor R',
+	X11_LED_SET_COLOR_TOOLTIP: 'Ustaw kolor piksela taśmy LED (indeks 0=pierwszy piksel, lub wszystkie)',
+	X11_LED_INDEX_ALL: 'Wszystkie',
 });

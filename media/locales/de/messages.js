@@ -773,4 +773,38 @@ window.languageManager.loadMessages('de', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Backup-Datei zur Vorschau auswählen',
 	DIALOG_BACKUP_FILES_LABEL: 'Backup-Dateien',
+
+	// X11 Erweiterungsboard
+	CATEGORY_X11: 'X11 Erweiterung',
+	X11_LABEL_SERVOS: 'Servomotoren',
+	X11_LABEL_MOTORS: 'Motoren',
+	X11_LABEL_LEDS: 'LEDs',
+
+	// X11 180° Servo Blöcke
+	X11_SERVO_180_ANGLE_PREFIX: 'Setze Servo',
+	X11_SERVO_180_ANGLE_SUFFIX: 'Winkel',
+	X11_SERVO_180_ANGLE_TOOLTIP: 'Setze 180° Servo-Winkel (0-180 Grad)',
+
+	// X11 360° Servo Blöcke
+	X11_SERVO_360_SPEED_PREFIX: 'Setze Servo',
+	X11_SERVO_360_SPEED_SUFFIX: 'Geschwindigkeit',
+	X11_SERVO_360_SPEED_TOOLTIP: 'Setze 360° Endlos-Drehservo Geschwindigkeit (-100 bis 100, negativ=rückwärts)',
+
+	// X11 Servo Stop Block
+	X11_SERVO_STOP: 'Stoppe Servo',
+	X11_SERVO_STOP_TOOLTIP: 'Stoppe den angegebenen Servo',
+
+	// X11 Motor Blöcke
+	X11_MOTOR_SPEED_PREFIX: 'Setze Motor',
+	X11_MOTOR_SPEED_SUFFIX: 'Geschwindigkeit',
+	X11_MOTOR_SPEED_TOOLTIP: 'Setze DC-Motor Geschwindigkeit (-2048 bis 2048, negativ=rückwärts)',
+	X11_MOTOR_STOP: 'Stoppe Motor',
+	X11_MOTOR_STOP_TOOLTIP: 'Stoppe den angegebenen Motor',
+
+	// X11 LED Blöcke
+	X11_LED_SET_COLOR_PREFIX: 'LED-Streifen',
+	X11_LED_SET_COLOR_INDEX: 'Index',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'setze Farbe R',
+	X11_LED_SET_COLOR_TOOLTIP: 'Setze LED-Streifen Pixel-Farbe (Index 0=erstes Pixel, oder alle)',
+	X11_LED_INDEX_ALL: 'Alle',
 });

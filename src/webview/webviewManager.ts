@@ -345,6 +345,10 @@ export class WebViewManager {
 			const cyberbrickBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/cyberbrick.js'));
 			const cyberbrickBlocksUri = webview.asWebviewUri(cyberbrickBlocksPath);
 
+			// X11 擴展板積木定義
+			const x11BlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/x11.js'));
+			const x11BlocksUri = webview.asWebviewUri(x11BlocksPath);
+
 			// Arduino 生成器模組（動態發現）
 			const discoveredModules = await this.discoverArduinoModules();
 			const arduinoModules = discoveredModules
@@ -452,6 +456,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
+			htmlContent = htmlContent.replace('{x11BlocksUri}', x11BlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
@@ -1028,6 +1033,10 @@ export class WebViewManager {
 			const cyberbrickBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/cyberbrick.js'));
 			const cyberbrickBlocksUri = tempWebview.asWebviewUri(cyberbrickBlocksPath);
 
+			// X11 擴展板積木定義
+			const x11BlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/x11.js'));
+			const x11BlocksUri = tempWebview.asWebviewUri(x11BlocksPath);
+
 			// Arduino 生成器模組（動態發現）
 			const discoveredModules = await this.discoverArduinoModules();
 			const arduinoModules = discoveredModules
@@ -1119,6 +1128,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
+			htmlContent = htmlContent.replace('{x11BlocksUri}', x11BlocksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
 
 			// 注入主題偏好

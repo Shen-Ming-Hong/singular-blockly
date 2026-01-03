@@ -769,4 +769,38 @@ window.languageManager.loadMessages('ja', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'プレビューするバックアップファイルを選択',
 	DIALOG_BACKUP_FILES_LABEL: 'バックアップファイル',
+
+	// X11 拡張ボード
+	CATEGORY_X11: 'X11 拡張',
+	X11_LABEL_SERVOS: 'サーボモーター',
+	X11_LABEL_MOTORS: 'モーター',
+	X11_LABEL_LEDS: 'LED',
+
+	// X11 180° サーボブロック
+	X11_SERVO_180_ANGLE_PREFIX: 'サーボ',
+	X11_SERVO_180_ANGLE_SUFFIX: 'の角度を設定',
+	X11_SERVO_180_ANGLE_TOOLTIP: '180° サーボの角度を設定 (0-180度)',
+
+	// X11 360° サーボブロック
+	X11_SERVO_360_SPEED_PREFIX: 'サーボ',
+	X11_SERVO_360_SPEED_SUFFIX: 'の速度を設定',
+	X11_SERVO_360_SPEED_TOOLTIP: '360° 連続回転サーボの速度を設定 (-100～100、負の値=逆回転)',
+
+	// X11 サーボ停止ブロック
+	X11_SERVO_STOP: 'サーボを停止',
+	X11_SERVO_STOP_TOOLTIP: '指定したサーボを停止',
+
+	// X11 モーターブロック
+	X11_MOTOR_SPEED_PREFIX: 'モーター',
+	X11_MOTOR_SPEED_SUFFIX: 'の速度を設定',
+	X11_MOTOR_SPEED_TOOLTIP: 'DCモーターの速度を設定 (-2048～2048、負の値=逆回転)',
+	X11_MOTOR_STOP: 'モーターを停止',
+	X11_MOTOR_STOP_TOOLTIP: '指定したモーターを停止',
+
+	// X11 LED ブロック
+	X11_LED_SET_COLOR_PREFIX: 'LEDテープ',
+	X11_LED_SET_COLOR_INDEX: 'インデックス',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'の色を設定 R',
+	X11_LED_SET_COLOR_TOOLTIP: 'LEDテープのピクセル色を設定 (インデックス 0=最初、または全て)',
+	X11_LED_INDEX_ALL: '全て',
 });

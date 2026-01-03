@@ -773,4 +773,38 @@ window.languageManager.loadMessages('tr', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Önizlenecek yedekleme dosyasını seçin',
 	DIALOG_BACKUP_FILES_LABEL: 'Yedekleme Dosyaları',
+
+	// X11 Genişletme Kartı
+	CATEGORY_X11: 'X11 Uzantı',
+	X11_LABEL_SERVOS: 'Servo Motorlar',
+	X11_LABEL_MOTORS: 'Motorlar',
+	X11_LABEL_LEDS: "LED'ler",
+
+	// X11 180° Servo blokları
+	X11_SERVO_180_ANGLE_PREFIX: 'Servo ayarla',
+	X11_SERVO_180_ANGLE_SUFFIX: 'açı',
+	X11_SERVO_180_ANGLE_TOOLTIP: '180° servo açısını ayarla (0-180 derece)',
+
+	// X11 360° Servo blokları
+	X11_SERVO_360_SPEED_PREFIX: 'Servo ayarla',
+	X11_SERVO_360_SPEED_SUFFIX: 'hız',
+	X11_SERVO_360_SPEED_TOOLTIP: '360° sürekli dönen servo hızını ayarla (-100 ile 100 arası, negatif=geri)',
+
+	// X11 Servo durdurma bloğu
+	X11_SERVO_STOP: 'Servoyu durdur',
+	X11_SERVO_STOP_TOOLTIP: 'Belirtilen servoyu durdur',
+
+	// X11 Motor blokları
+	X11_MOTOR_SPEED_PREFIX: 'Motor ayarla',
+	X11_MOTOR_SPEED_SUFFIX: 'hız',
+	X11_MOTOR_SPEED_TOOLTIP: 'DC motor hızını ayarla (-2048 ile 2048 arası, negatif=geri)',
+	X11_MOTOR_STOP: 'Motoru durdur',
+	X11_MOTOR_STOP_TOOLTIP: 'Belirtilen motoru durdur',
+
+	// X11 LED blokları
+	X11_LED_SET_COLOR_PREFIX: 'LED şerit',
+	X11_LED_SET_COLOR_INDEX: 'indeks',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'renk ayarla R',
+	X11_LED_SET_COLOR_TOOLTIP: 'LED şerit piksel rengini ayarla (indeks 0=ilk piksel veya tümü)',
+	X11_LED_INDEX_ALL: 'Tümü',
 });

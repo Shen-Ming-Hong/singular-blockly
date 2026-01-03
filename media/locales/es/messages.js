@@ -772,4 +772,38 @@ window.languageManager.loadMessages('es', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Seleccionar archivo de copia de seguridad para previsualizar',
 	DIALOG_BACKUP_FILES_LABEL: 'Archivos de copia de seguridad',
+
+	// Placa de extensión X11
+	CATEGORY_X11: 'Extensión X11',
+	X11_LABEL_SERVOS: 'Servos',
+	X11_LABEL_MOTORS: 'Motores',
+	X11_LABEL_LEDS: 'LEDs',
+
+	// Bloques de servo 180° X11
+	X11_SERVO_180_ANGLE_PREFIX: 'Establecer servo',
+	X11_SERVO_180_ANGLE_SUFFIX: 'ángulo',
+	X11_SERVO_180_ANGLE_TOOLTIP: 'Establecer ángulo del servo 180° (0-180 grados)',
+
+	// Bloques de servo 360° X11
+	X11_SERVO_360_SPEED_PREFIX: 'Establecer servo',
+	X11_SERVO_360_SPEED_SUFFIX: 'velocidad',
+	X11_SERVO_360_SPEED_TOOLTIP: 'Establecer velocidad del servo de rotación continua 360° (-100 a 100, negativo=reversa)',
+
+	// Bloque de parada de servo X11
+	X11_SERVO_STOP: 'Detener servo',
+	X11_SERVO_STOP_TOOLTIP: 'Detener el servo especificado',
+
+	// Bloques de motor X11
+	X11_MOTOR_SPEED_PREFIX: 'Establecer motor',
+	X11_MOTOR_SPEED_SUFFIX: 'velocidad',
+	X11_MOTOR_SPEED_TOOLTIP: 'Establecer velocidad del motor DC (-2048 a 2048, negativo=reversa)',
+	X11_MOTOR_STOP: 'Detener motor',
+	X11_MOTOR_STOP_TOOLTIP: 'Detener el motor especificado',
+
+	// Bloques de LED X11
+	X11_LED_SET_COLOR_PREFIX: 'Tira LED',
+	X11_LED_SET_COLOR_INDEX: 'índice',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'establecer color R',
+	X11_LED_SET_COLOR_TOOLTIP: 'Establecer color de píxel de tira LED (índice 0=primer píxel, o todos)',
+	X11_LED_INDEX_ALL: 'Todos',
 });

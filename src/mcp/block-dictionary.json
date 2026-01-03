@@ -1,6 +1,6 @@
 {
-  "version": "0.47.0",
-  "generatedAt": "2025-12-13T10:28:23.032Z",
+  "version": "0.50.7",
+  "generatedAt": "2026-01-03T14:31:03.924Z",
   "blocks": [
     {
       "type": "arduino_setup",
@@ -6562,6 +6562,483 @@
         "text",
         "to_string"
       ]
+    },
+    {
+      "type": "x11_servo_180_angle",
+      "category": "x11",
+      "names": {
+        "zh-hant": "180° 伺服馬達角度",
+        "en": "180° Servo Angle"
+      },
+      "descriptions": {
+        "zh-hant": "適用於 180° 伺服馬達 (PG001)，直接轉到指定角度 (0-180°)",
+        "en": "For 180° servo (PG001), move directly to specified angle (0-180°)"
+      },
+      "fields": [
+        {
+          "name": "PORT",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "埠位",
+            "en": "Port"
+          },
+          "options": [
+            {
+              "value": "1",
+              "label": {
+                "zh-hant": "S1",
+                "en": "S1"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "zh-hant": "S2",
+                "en": "S2"
+              }
+            },
+            {
+              "value": "3",
+              "label": {
+                "zh-hant": "S3",
+                "en": "S3"
+              }
+            },
+            {
+              "value": "4",
+              "label": {
+                "zh-hant": "S4",
+                "en": "S4"
+              }
+            }
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "name": "ANGLE",
+          "type": "value",
+          "label": {
+            "zh-hant": "角度",
+            "en": "Angle"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "x11",
+        "servo",
+        "180",
+        "angle",
+        "伺服",
+        "馬達",
+        "角度",
+        "cyberbrick"
+      ],
+      "relatedBlocks": [
+        "x11_servo_360_speed",
+        "x11_servo_stop"
+      ]
+    },
+    {
+      "type": "x11_servo_360_speed",
+      "category": "x11",
+      "names": {
+        "zh-hant": "360° 伺服馬達速度",
+        "en": "360° Servo Speed"
+      },
+      "descriptions": {
+        "zh-hant": "適用於 360° 伺服馬達 (PG002)，正值順時針、負值逆時針、0 停止",
+        "en": "For 360° servo (PG002), positive clockwise, negative counter-clockwise, 0 stop"
+      },
+      "fields": [
+        {
+          "name": "PORT",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "埠位",
+            "en": "Port"
+          },
+          "options": [
+            {
+              "value": "1",
+              "label": {
+                "zh-hant": "S1",
+                "en": "S1"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "zh-hant": "S2",
+                "en": "S2"
+              }
+            },
+            {
+              "value": "3",
+              "label": {
+                "zh-hant": "S3",
+                "en": "S3"
+              }
+            },
+            {
+              "value": "4",
+              "label": {
+                "zh-hant": "S4",
+                "en": "S4"
+              }
+            }
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "name": "SPEED",
+          "type": "value",
+          "label": {
+            "zh-hant": "速度 %",
+            "en": "Speed %"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "x11",
+        "servo",
+        "360",
+        "speed",
+        "伺服",
+        "馬達",
+        "速度",
+        "cyberbrick"
+      ],
+      "relatedBlocks": [
+        "x11_servo_stop"
+      ]
+    },
+    {
+      "type": "x11_servo_stop",
+      "category": "x11",
+      "names": {
+        "zh-hant": "停止伺服馬達",
+        "en": "Stop Servo"
+      },
+      "descriptions": {
+        "zh-hant": "停止指定埠位的伺服馬達",
+        "en": "Stop servo motor at specified port"
+      },
+      "fields": [
+        {
+          "name": "PORT",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "埠位",
+            "en": "Port"
+          },
+          "options": [
+            {
+              "value": "1",
+              "label": {
+                "zh-hant": "S1",
+                "en": "S1"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "zh-hant": "S2",
+                "en": "S2"
+              }
+            },
+            {
+              "value": "3",
+              "label": {
+                "zh-hant": "S3",
+                "en": "S3"
+              }
+            },
+            {
+              "value": "4",
+              "label": {
+                "zh-hant": "S4",
+                "en": "S4"
+              }
+            }
+          ]
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "x11",
+        "servo",
+        "stop",
+        "伺服",
+        "馬達",
+        "停止",
+        "cyberbrick"
+      ],
+      "relatedBlocks": [
+        "x11_servo_180_angle",
+        "x11_servo_360_speed"
+      ]
+    },
+    {
+      "type": "x11_motor_speed",
+      "category": "x11",
+      "names": {
+        "zh-hant": "直流馬達速度",
+        "en": "DC Motor Speed"
+      },
+      "descriptions": {
+        "zh-hant": "設定直流馬達速度，範圍 -2048 到 2048",
+        "en": "Set DC motor speed, range -2048 to 2048"
+      },
+      "fields": [
+        {
+          "name": "PORT",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "埠位",
+            "en": "Port"
+          },
+          "options": [
+            {
+              "value": "1",
+              "label": {
+                "zh-hant": "M1",
+                "en": "M1"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "zh-hant": "M2",
+                "en": "M2"
+              }
+            }
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "name": "SPEED",
+          "type": "value",
+          "label": {
+            "zh-hant": "速度",
+            "en": "Speed"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "x11",
+        "motor",
+        "dc",
+        "speed",
+        "直流",
+        "馬達",
+        "速度",
+        "cyberbrick"
+      ],
+      "relatedBlocks": [
+        "x11_motor_stop"
+      ]
+    },
+    {
+      "type": "x11_motor_stop",
+      "category": "x11",
+      "names": {
+        "zh-hant": "停止直流馬達",
+        "en": "Stop DC Motor"
+      },
+      "descriptions": {
+        "zh-hant": "停止指定埠位的直流馬達",
+        "en": "Stop DC motor at specified port"
+      },
+      "fields": [
+        {
+          "name": "PORT",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "埠位",
+            "en": "Port"
+          },
+          "options": [
+            {
+              "value": "1",
+              "label": {
+                "zh-hant": "M1",
+                "en": "M1"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "zh-hant": "M2",
+                "en": "M2"
+              }
+            }
+          ]
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "x11",
+        "motor",
+        "dc",
+        "stop",
+        "直流",
+        "馬達",
+        "停止",
+        "cyberbrick"
+      ],
+      "relatedBlocks": [
+        "x11_motor_speed"
+      ]
+    },
+    {
+      "type": "x11_led_set_color",
+      "category": "x11",
+      "names": {
+        "zh-hant": "LED 燈條設定顏色",
+        "en": "LED Strip Set Color"
+      },
+      "descriptions": {
+        "zh-hant": "設定 WS2812 LED 燈條顏色，R/G/B 範圍 0-255",
+        "en": "Set WS2812 LED strip color, R/G/B range 0-255"
+      },
+      "fields": [
+        {
+          "name": "PORT",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "埠位",
+            "en": "Port"
+          },
+          "options": [
+            {
+              "value": "21",
+              "label": {
+                "zh-hant": "D1",
+                "en": "D1"
+              }
+            },
+            {
+              "value": "20",
+              "label": {
+                "zh-hant": "D2",
+                "en": "D2"
+              }
+            }
+          ]
+        },
+        {
+          "name": "INDEX",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "索引",
+            "en": "Index"
+          },
+          "options": [
+            {
+              "value": "0",
+              "label": {
+                "zh-hant": "1",
+                "en": "1"
+              }
+            },
+            {
+              "value": "1",
+              "label": {
+                "zh-hant": "2",
+                "en": "2"
+              }
+            },
+            {
+              "value": "2",
+              "label": {
+                "zh-hant": "3",
+                "en": "3"
+              }
+            },
+            {
+              "value": "3",
+              "label": {
+                "zh-hant": "4",
+                "en": "4"
+              }
+            },
+            {
+              "value": "all",
+              "label": {
+                "zh-hant": "全部",
+                "en": "All"
+              }
+            }
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "name": "RED",
+          "type": "value",
+          "label": {
+            "zh-hant": "紅",
+            "en": "Red"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "GREEN",
+          "type": "value",
+          "label": {
+            "zh-hant": "綠",
+            "en": "Green"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "BLUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "藍",
+            "en": "Blue"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "x11",
+        "led",
+        "strip",
+        "neopixel",
+        "ws2812",
+        "rgb",
+        "color",
+        "LED",
+        "燈條",
+        "顏色",
+        "cyberbrick"
+      ],
+      "relatedBlocks": []
     }
   ],
   "categories": [
@@ -6660,6 +7137,14 @@
         "en": "Lists"
       },
       "colour": "#745BA5"
+    },
+    {
+      "id": "x11",
+      "name": {
+        "zh-hant": "X11 擴展板",
+        "en": "X11 Extension"
+      },
+      "colour": "#34B4B4"
     }
   ],
   "indices": {
@@ -6784,7 +7269,13 @@
       "lists_getIndex": 117,
       "lists_setIndex": 118,
       "to_string": 119,
-      "text_join": 120
+      "text_join": 120,
+      "x11_servo_180_angle": 121,
+      "x11_servo_360_speed": 122,
+      "x11_servo_stop": 123,
+      "x11_motor_speed": 124,
+      "x11_motor_stop": 125,
+      "x11_led_set_color": 126
     },
     "byCategory": {
       "arduino": [
@@ -6931,9 +7422,23 @@
         116,
         117,
         118
+      ],
+      "x11": [
+        121,
+        122,
+        123,
+        124,
+        125,
+        126
       ]
     },
     "searchIndex": {
+      "180": [
+        "x11_servo_180_angle"
+      ],
+      "360": [
+        "x11_servo_360_speed"
+      ],
       "setup": [
         "arduino_setup",
         "servo_setup",
@@ -7151,20 +7656,33 @@
       "servo": [
         "servo_setup",
         "servo_move",
-        "servo_stop"
+        "servo_stop",
+        "x11_servo_180_angle",
+        "x11_servo_360_speed",
+        "x11_servo_stop"
       ],
       "motor": [
         "servo_setup",
-        "encoder_setup"
+        "encoder_setup",
+        "x11_motor_speed",
+        "x11_motor_stop"
       ],
       "伺服": [
         "servo_setup",
         "servo_move",
-        "servo_stop"
+        "servo_stop",
+        "x11_servo_180_angle",
+        "x11_servo_360_speed",
+        "x11_servo_stop"
       ],
       "馬達": [
         "servo_setup",
-        "encoder_setup"
+        "encoder_setup",
+        "x11_servo_180_angle",
+        "x11_servo_360_speed",
+        "x11_servo_stop",
+        "x11_motor_speed",
+        "x11_motor_stop"
       ],
       "舵機": [
         "servo_setup"
@@ -7176,25 +7694,32 @@
         "servo_move"
       ],
       "angle": [
-        "servo_move"
+        "servo_move",
+        "x11_servo_180_angle"
       ],
       "轉動": [
         "servo_move"
       ],
       "角度": [
-        "servo_move"
+        "servo_move",
+        "x11_servo_180_angle"
       ],
       "旋轉伺服馬達": [
         "servo_move"
       ],
       "stop": [
-        "servo_stop"
+        "servo_stop",
+        "x11_servo_stop",
+        "x11_motor_stop"
       ],
       "停止": [
-        "servo_stop"
+        "servo_stop",
+        "x11_servo_stop",
+        "x11_motor_stop"
       ],
       "停止伺服馬達": [
-        "servo_stop"
+        "servo_stop",
+        "x11_servo_stop"
       ],
       "encoder": [
         "encoder_setup",
@@ -7361,7 +7886,8 @@
       ],
       "color": [
         "huskylens_set_algorithm",
-        "pixetto_color_detect"
+        "pixetto_color_detect",
+        "x11_led_set_color"
       ],
       "tag": [
         "huskylens_set_algorithm",
@@ -7378,7 +7904,8 @@
       "set": [
         "huskylens_set_algorithm",
         "pixetto_set_mode",
-        "lists_setIndex"
+        "lists_setIndex",
+        "x11_led_set_color"
       ],
       "request": [
         "huskylens_request"
@@ -7476,7 +8003,8 @@
         "seven_segment_pins"
       ],
       "led": [
-        "seven_segment_pins"
+        "seven_segment_pins",
+        "x11_led_set_color"
       ],
       "設定七段顯示器腳位": [
         "seven_segment_pins"
@@ -7610,7 +8138,8 @@
         "pixetto_get_func_id"
       ],
       "顏色": [
-        "pixetto_color_detect"
+        "pixetto_color_detect",
+        "x11_led_set_color"
       ],
       "偵測顏色": [
         "pixetto_color_detect"
@@ -8786,6 +9315,74 @@
       ],
       "with": [
         "text_join"
+      ],
+      "x11": [
+        "x11_servo_180_angle",
+        "x11_servo_360_speed",
+        "x11_servo_stop",
+        "x11_motor_speed",
+        "x11_motor_stop",
+        "x11_led_set_color"
+      ],
+      "cyberbrick": [
+        "x11_servo_180_angle",
+        "x11_servo_360_speed",
+        "x11_servo_stop",
+        "x11_motor_speed",
+        "x11_motor_stop",
+        "x11_led_set_color"
+      ],
+      "180°": [
+        "x11_servo_180_angle"
+      ],
+      "伺服馬達角度": [
+        "x11_servo_180_angle"
+      ],
+      "speed": [
+        "x11_servo_360_speed",
+        "x11_motor_speed"
+      ],
+      "速度": [
+        "x11_servo_360_speed",
+        "x11_motor_speed"
+      ],
+      "360°": [
+        "x11_servo_360_speed"
+      ],
+      "伺服馬達速度": [
+        "x11_servo_360_speed"
+      ],
+      "dc": [
+        "x11_motor_speed",
+        "x11_motor_stop"
+      ],
+      "直流": [
+        "x11_motor_speed",
+        "x11_motor_stop"
+      ],
+      "直流馬達速度": [
+        "x11_motor_speed"
+      ],
+      "停止直流馬達": [
+        "x11_motor_stop"
+      ],
+      "strip": [
+        "x11_led_set_color"
+      ],
+      "neopixel": [
+        "x11_led_set_color"
+      ],
+      "ws2812": [
+        "x11_led_set_color"
+      ],
+      "rgb": [
+        "x11_led_set_color"
+      ],
+      "燈條": [
+        "x11_led_set_color"
+      ],
+      "燈條設定顏色": [
+        "x11_led_set_color"
       ]
     }
   }

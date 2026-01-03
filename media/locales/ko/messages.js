@@ -768,4 +768,38 @@ window.languageManager.loadMessages('ko', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: '미리 볼 백업 파일 선택',
 	DIALOG_BACKUP_FILES_LABEL: '백업 파일',
+
+	// X11 확장 보드
+	CATEGORY_X11: 'X11 확장',
+	X11_LABEL_SERVOS: '서보 모터',
+	X11_LABEL_MOTORS: '모터',
+	X11_LABEL_LEDS: 'LED',
+
+	// X11 180° 서보 블록
+	X11_SERVO_180_ANGLE_PREFIX: '서보',
+	X11_SERVO_180_ANGLE_SUFFIX: '각도 설정',
+	X11_SERVO_180_ANGLE_TOOLTIP: '180° 서보 각도 설정 (0-180도)',
+
+	// X11 360° 서보 블록
+	X11_SERVO_360_SPEED_PREFIX: '서보',
+	X11_SERVO_360_SPEED_SUFFIX: '속도 설정',
+	X11_SERVO_360_SPEED_TOOLTIP: '360° 연속 회전 서보 속도 설정 (-100~100, 음수=역방향)',
+
+	// X11 서보 정지 블록
+	X11_SERVO_STOP: '서보 정지',
+	X11_SERVO_STOP_TOOLTIP: '지정된 서보 정지',
+
+	// X11 모터 블록
+	X11_MOTOR_SPEED_PREFIX: '모터',
+	X11_MOTOR_SPEED_SUFFIX: '속도 설정',
+	X11_MOTOR_SPEED_TOOLTIP: 'DC 모터 속도 설정 (-2048~2048, 음수=역방향)',
+	X11_MOTOR_STOP: '모터 정지',
+	X11_MOTOR_STOP_TOOLTIP: '지정된 모터 정지',
+
+	// X11 LED 블록
+	X11_LED_SET_COLOR_PREFIX: 'LED 스트립',
+	X11_LED_SET_COLOR_INDEX: '인덱스',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: '색상 설정 R',
+	X11_LED_SET_COLOR_TOOLTIP: 'LED 스트립 픽셀 색상 설정 (인덱스 0=첫 번째, 또는 전체)',
+	X11_LED_INDEX_ALL: '전체',
 });
