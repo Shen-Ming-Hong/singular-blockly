@@ -8,6 +8,63 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.51.0] - 2026-01-04
+
+### 新增功能 Added
+
+-   **CyberBrick X11 擴展板積木選單** (CyberBrick X11 Extension Board Blockly Menu)
+
+    -   新增 6 個積木支援 X11 擴展板（僅 CyberBrick 開發板顯示）
+        Added 6 blocks for X11 extension board (CyberBrick only)
+    -   180° 伺服馬達角度控制：設定 0-180° 角度 (S1-S4 埠位)
+        180° Servo angle control: Set angle 0-180° (ports S1-S4)
+    -   360° 伺服馬達速度控制：設定 -100~100% 旋轉速度 (S1-S4 埠位)
+        360° Servo speed control: Set speed -100~100% (ports S1-S4)
+    -   停止伺服馬達：停止指定埠位的伺服馬達
+        Stop servo: Stop servo motor on specified port
+    -   直流馬達速度控制：設定 -2048~2048 轉速 (M1-M2 埠位)
+        DC Motor speed control: Set speed -2048~2048 (ports M1-M2)
+    -   停止直流馬達：停止指定埠位的直流馬達
+        Stop DC motor: Stop DC motor on specified port
+    -   WS2812 LED 燈條顏色控制：設定 RGB 顏色 (D1-D2 埠位，GPIO21/GPIO20)
+        WS2812 LED strip color control: Set RGB color (ports D1-D2, GPIO21/GPIO20)
+
+-   **MicroPython 程式碼生成器** (MicroPython Code Generator)
+
+    -   使用 `bbl.servos.ServosController` 模組控制伺服馬達
+        Uses `bbl.servos.ServosController` module for servo control
+    -   使用 `bbl.motors.MotorsController` 模組控制直流馬達
+        Uses `bbl.motors.MotorsController` module for DC motor control
+    -   使用 `neopixel.NeoPixel` 模組控制 LED 燈條
+        Uses `neopixel.NeoPixel` module for LED strip control
+    -   自動 import 管理和硬體初始化
+        Automatic import management and hardware initialization
+    -   數值範圍自動 clamp 確保安全
+        Automatic value clamping for safety
+
+-   **15 種語言完整 i18n 支援** (Full i18n Support for 15 Languages)
+
+    -   所有 X11 積木翻譯完整覆蓋
+        All X11 blocks fully translated
+    -   支援繁體中文、英文、日文、韓文、德文、法文、西班牙文、義大利文、
+        葡萄牙文(巴西)、俄文、波蘭文、土耳其文、匈牙利文、捷克文、保加利亞文
+        Supports zh-hant, en, ja, ko, de, fr, es, it, pt-br, ru, pl, tr, hu, cs, bg
+
+### 技術細節 Technical Details
+
+-   **新增檔案 New Files**：
+    -   `media/blockly/blocks/x11.js`：X11 積木定義（6 個積木）
+    -   `media/blockly/generators/micropython/x11.js`：MicroPython 生成器
+    -   `media/toolbox/categories/cyberbrick_x11.json`：Toolbox 類別定義
+-   **Block Dictionary 更新**：
+    -   新增 X11 類別和 6 個積木元資料
+    -   總計 127 blocks, 13 categories
+-   **移除功能 Removed Features**（因 API 限制）：
+    -   伺服馬達平滑移動 (`set_angle_stepping`)：CyberBrick API 存在 bug
+        Servo smooth stepping: CyberBrick API bug (sensitity vs sensitivity typo)
+    -   關閉 LED 燈條積木：使用者可設定 RGB=(0,0,0) 達成相同效果
+        LED off block: Users can set RGB=(0,0,0) for the same effect
+
 ## [0.50.7] - 2026-01-04
 
 ### 新增功能 Added
