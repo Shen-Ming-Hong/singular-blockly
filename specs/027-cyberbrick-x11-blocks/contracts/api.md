@@ -61,9 +61,9 @@ motors.stop(port: int) -> None
 from machine import Pin
 from neopixel import NeoPixel
 
-# 初始化 (每個 D 埠一個實例)
-np_d1 = NeoPixel(Pin(20), 4)  # D1 埠，4 顆 LED
-np_d2 = NeoPixel(Pin(21), 4)  # D2 埠，4 顆 LED
+# 初始化 (每個 D 埠一個實例，依據 bbl.leds 源碼: LED_CHANNEL1=21, LED_CHANNEL2=20)
+np_d1 = NeoPixel(Pin(21), 4)  # D1 埠，4 顆 LED
+np_d2 = NeoPixel(Pin(20), 4)  # D2 埠，4 顆 LED
 
 # 設定單顆 LED 顏色
 np_d1[index] = (red: int, green: int, blue: int)
@@ -208,7 +208,7 @@ if __name__ == '__main__':
 from machine import Pin
 from neopixel import NeoPixel
 
-np_d1 = NeoPixel(Pin(20), 4)
+np_d1 = NeoPixel(Pin(21), 4)  # D1 → GPIO 21
 
 def main():
     np_d1[1] = (max(0, min(255, 0)), max(0, min(255, 255)), max(0, min(255, 128)))
@@ -232,7 +232,7 @@ if __name__ == '__main__':
 from machine import Pin
 from neopixel import NeoPixel
 
-np_d2 = NeoPixel(Pin(21), 4)
+np_d2 = NeoPixel(Pin(20), 4)  # D2 → GPIO 20
 
 def main():
     for i in range(4):

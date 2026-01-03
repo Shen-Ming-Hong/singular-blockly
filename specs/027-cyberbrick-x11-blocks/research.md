@@ -37,14 +37,14 @@
 
 **調查結果**:
 
--   D1 埠對應 GPIO 20
--   D2 埠對應 GPIO 21
+-   D1 埠對應 GPIO 21（LED_CHANNEL1）
+-   D2 埠對應 GPIO 20（LED_CHANNEL2）
 -   每個 LED Hub (XA006) 支援 4 顆 WS2812 LED
 -   NeoPixel API:
     ```python
     from machine import Pin
     from neopixel import NeoPixel
-    np = NeoPixel(Pin(20), 4)  # D1 埠，4 顆 LED
+    np = NeoPixel(Pin(21), 4)  # D1 埠，4 顆 LED
     np[0] = (255, 0, 0)  # 第 1 顆設為紅色
     np.write()  # 立即生效
     ```
@@ -178,8 +178,8 @@ media/toolbox/categories/
 	// 直流馬達埠位選項
 	(['M1', '1'], ['M2', '2'])
 ][
-	// LED 埠位選項
-	(['D1', '20'], ['D2', '21'])
+	// LED 埠位選項（依據 bbl.leds 源碼：LED_CHANNEL1=21, LED_CHANNEL2=20）
+	(['D1', '21'], ['D2', '20'])
 ];
 ```
 

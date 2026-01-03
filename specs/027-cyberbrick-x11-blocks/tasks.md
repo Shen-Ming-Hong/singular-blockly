@@ -32,9 +32,9 @@
 
 **⚠️ CRITICAL**: 必須完成此階段後才能開始任何使用者故事
 
--   [ ] T005 更新 media/toolbox/cyberbrick.json 引入 cyberbrick_x11.json 類別
+-   [ ] T005 更新 media/toolbox/cyberbrick.json 引入 cyberbrick_x11.json 類別（僅 CyberBrick 開發板顯示，沿用現有 Toolbox 條件載入機制）
 -   [ ] T006 [P] 在 media/blockly/generators/micropython/micropython.js 新增 requiresTimingProc 旗標支援
--   [ ] T007 [P] 在 media/blockly/generators/micropython/micropython.js 的 finish() 方法加入 timing_proc() 自動注入邏輯
+-   [ ] T007 [P] 在 media/blockly/generators/micropython/micropython.js 的 finish() 方法加入 timing_proc() 自動注入邏輯（注入位置：生成程式碼的主程式最後一行）
 -   [ ] T008 為所有 15 種語言新增 X11 類別和標籤翻譯鍵 (CATEGORY_X11, X11_LABEL_SERVOS, X11_LABEL_MOTORS, X11_LABEL_LEDS)
 
 **Checkpoint**: 基礎設施就緒 - 可以開始使用者故事實作
@@ -105,7 +105,7 @@
 ### Implementation for User Story 4
 
 -   [ ] T025 [US4] 在 media/blockly/blocks/x11.js 定義 x11_led_set_color 積木（PORT 下拉 D1-D2、INDEX 下拉 1-4/全部、RGB 數值輸入）
--   [ ] T026 [US4] 在 media/blockly/generators/micropython/x11.js 實作 x11_led_set_color 生成器（含 NeoPixel import 和初始化，D1→GPIO20、D2→GPIO21）
+-   [ ] T026 [US4] 在 media/blockly/generators/micropython/x11.js 實作 x11_led_set_color 生成器（含 NeoPixel import 和初始化，D1→GPIO21、D2→GPIO20）
 -   [ ] T027 [US4] 在 media/blockly/blocks/x11.js 定義 x11_led_off 積木
 -   [ ] T028 [US4] 在 media/blockly/generators/micropython/x11.js 實作 x11_led_off 生成器
 -   [ ] T029 [US4] 在 media/toolbox/categories/cyberbrick_x11.json 新增 x11_led_set_color 和 x11_led_off 積木項目
@@ -155,10 +155,10 @@
 
 **Purpose**: 跨使用者故事的品質改進
 
--   [ ] T041 建立 src/test/generators/x11.test.ts 單元測試檔案
--   [ ] T042 [P] 新增伺服馬達生成器單元測試（x11_servo_180_angle、x11_servo_360_speed、x11_servo_stop）
--   [ ] T043 [P] 新增直流馬達生成器單元測試（x11_motor_speed、x11_motor_stop）
--   [ ] T044 [P] 新增 LED 燈條生成器單元測試（x11_led_set_color、x11_led_off）
+-   [ ] T041 建立 src/test/x11.test.ts 單元測試檔案（遵循現有測試目錄結構）
+-   [ ] T042 [P] 新增伺服馬達生成器單元測試（x11_servo_180_angle、x11_servo_360_speed、x11_servo_stop），含 clamp 邏輯驗證（角度 0-180、速度 -100~100）
+-   [ ] T043 [P] 新增直流馬達生成器單元測試（x11_motor_speed、x11_motor_stop），含 clamp 邏輯驗證（速度 -2048~2048）
+-   [ ] T044 [P] 新增 LED 燈條生成器單元測試（x11_led_set_color、x11_led_off），含單顆獨立控制驗證（設定某顆 LED 不影響其他 LED）
 -   [ ] T045 新增平滑移動生成器單元測試（x11_servo_180_stepping + timing_proc 注入驗證）
 -   [ ] T046 執行 npm run test 確保所有單元測試通過
 -   [ ] T047 執行 quickstart.md 驗證流程，確認開發文件正確

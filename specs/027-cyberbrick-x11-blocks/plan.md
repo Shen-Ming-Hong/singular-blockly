@@ -81,8 +81,7 @@ media/html/
 └── blocklyEdit.html              # [修改] 引入 x11.js 腳本
 
 src/test/
-└── generators/
-    └── x11.test.ts               # [新增] X11 生成器單元測試
+└── x11.test.ts                   # [新增] X11 生成器單元測試（遵循現有測試目錄結構）
 ```
 
 **Structure Decision**: 採用 VSCode Extension 標準結構，新增獨立的 x11.js 檔案於現有 blocks 和 generators 目錄中，符合專案模組化原則。Toolbox 使用 $include 機制引入新類別，遵循現有 cyberbrick_core.json 和 cyberbrick_wifi.json 的模式。
