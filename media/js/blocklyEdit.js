@@ -2734,24 +2734,28 @@ async function updateToolboxForBoard(workspace, boardId) {
  * @param {boolean} isCyberBrick - 是否為 CyberBrick
  */
 function updateUIForBoard(boardId, isCyberBrick) {
-	// 更新上傳按鈕顯示/隱藏
+	// 更新上傳按鈕顯示（所有板子都顯示上傳按鈕，但 'none' 時按鈕需要特殊處理）
 	const uploadContainer = document.getElementById('uploadContainer');
 	const uploadButton = document.getElementById('uploadButton');
 
 	if (uploadContainer) {
-		uploadContainer.style.display = isCyberBrick ? 'block' : 'none';
+		// T016: 所有板子都顯示上傳按鈕
+		uploadContainer.style.display = 'block';
 	}
 
+	// T017: 根據板子類型更新 Tooltip
 	if (uploadButton && window.languageManager) {
-		uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE', 'Upload to CyberBrick');
+		if (isCyberBrick) {
+			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE', 'Upload to CyberBrick');
+		} else {
+			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE_ARDUINO', 'Compile and Upload');
+		}
 	}
 
-	// 記錄當前使用的程式語言
+	// T019: 記錄當前使用的程式語言
 	window.currentProgrammingLanguage = isCyberBrick ? 'micropython' : 'arduino';
 
-	console.log(
-		`[blockly] UI 已更新: 開發板=${boardId}, 語言=${window.currentProgrammingLanguage}, 上傳按鈕=${isCyberBrick ? '顯示' : '隱藏'}`
-	);
+	console.log(`[blockly] UI 已更新: 開發板=${boardId}, 語言=${window.currentProgrammingLanguage}, 上傳按鈕=顯示`);
 
 	// 初始化上傳按鈕事件
 	initUploadButton();
@@ -2765,6 +2769,7 @@ function updateUIForBoard(boardId, isCyberBrick) {
 const uploadState = {
 	isUploading: false,
 	selectedPort: null,
+	startTime: 0, // 上傳開始時間戳記
 };
 
 /**
@@ -2790,6 +2795,13 @@ async function handleUploadClick() {
 		return;
 	}
 
+	// T018: 檢查是否已選擇開發板
+	const currentBoard = window.currentBoard || 'none';
+	if (currentBoard === 'none') {
+		toast.show(window.languageManager?.getMessage('UPLOAD_SELECT_BOARD', '請先選擇開發板'), 'warning');
+		return;
+	}
+
 	const workspace = Blockly.getMainWorkspace();
 	if (!workspace) {
 		toast.show(window.languageManager?.getMessage('UPLOAD_FAILED', '上傳失敗') + ': 工作區未初始化', 'error');
@@ -2810,17 +2822,42 @@ async function handleUploadClick() {
 		return;
 	}
 
+	// 重置進度過濾器狀態
+	uploadProgressFilter.reset();
+
+	// 紀錄上傳開始時間
+	uploadState.startTime = Date.now();
+
 	// 設置上傳狀態
 	setUploadButtonState('uploading');
 
-	// 發送上傳請求
-	console.log('[blockly] 發送上傳請求');
-	vscode.postMessage({
-		command: 'requestUpload',
-		code: code,
-		board: 'cyberbrick',
-		port: uploadState.selectedPort,
-	});
+	// 根據程式語言類型發送不同的上傳請求
+	const isMicroPython = window.currentProgrammingLanguage === 'micropython';
+
+	if (isMicroPython) {
+		// CyberBrick MicroPython 上傳請求
+		console.log('[blockly] 發送 MicroPython 上傳請求');
+		vscode.postMessage({
+			command: 'requestUpload',
+			code: code,
+			board: currentBoard,
+			port: uploadState.selectedPort,
+		});
+	} else {
+		// T018: Arduino C++ 上傳請求（包含 lib_deps, build_flags）
+		console.log('[blockly] 發送 Arduino 上傳請求');
+		const generator = getCurrentGenerator();
+		vscode.postMessage({
+			command: 'requestUpload',
+			code: code,
+			board: currentBoard,
+			port: uploadState.selectedPort,
+			// Arduino 專屬欄位
+			lib_deps: generator?.lib_deps_ ? Object.values(generator.lib_deps_) : [],
+			build_flags: generator?.build_flags_ ? Object.values(generator.build_flags_) : [],
+			lib_ldf_mode: generator?.lib_ldf_mode_ || undefined,
+		});
+	}
 }
 
 /**
@@ -2848,14 +2885,119 @@ function setUploadButtonState(state) {
 }
 
 /**
+ * 上傳進度智慧過濾狀態
+ */
+const uploadProgressFilter = {
+	lastMessage: '',
+	lastShowTime: 0,
+	lastImportantTime: 0, // 上次顯示重要訊息的時間
+	lastProgress: -1, // 上次顯示的進度百分比
+	minInterval: 300, // 一般訊息最小顯示間隔（毫秒）
+	importantMinDisplay: 800, // 重要訊息最少顯示時間（毫秒），縮短以避免錯過進度
+	// 重要訊息關鍵字（這些訊息會顯示較久）
+	importantPatterns: [
+		/^RAM:/i, // 記憶體使用
+		/^Flash:/i, // Flash 使用
+		/^Chip:/i, // 晶片資訊
+		/^Port:/i, // 連接埠
+		/^Features:/i, // 功能特性
+		/^Compressed:/i, // 壓縮資訊
+		/^Wrote\s/i, // 寫入完成
+		/^Done\s/i, // 完成時間
+		/✓$/, // 成功標記
+		/successful/i, // 成功訊息
+	],
+	// 可跳過的重複訊息（快速變化的進度）
+	skipPatterns: [
+		/^Writing flash:/i, // 寫入進度（快速變化）
+		/^Erasing flash/i, // 擦除進度
+		/^Uploading:/i, // 上傳百分比
+	],
+
+	/**
+	 * 判斷訊息是否重要
+	 */
+	isImportant(text) {
+		return this.importantPatterns.some(pattern => pattern.test(text));
+	},
+
+	/**
+	 * 判斷訊息是否可跳過（快速變化的進度訊息）
+	 */
+	isSkippable(text) {
+		return this.skipPatterns.some(pattern => pattern.test(text));
+	},
+
+	/**
+	 * 決定是否應該顯示此訊息
+	 * @param {string} text - 要顯示的文字
+	 * @param {number} progress - 當前進度百分比（用於判斷是否有實質進度變化）
+	 */
+	shouldShow(text, progress = -1) {
+		const now = Date.now();
+
+		// 進度百分比有變化時，優先顯示（跳過時間限制）
+		const hasProgressChange = progress >= 0 && progress !== this.lastProgress;
+		if (hasProgressChange) {
+			this.lastProgress = progress;
+		}
+
+		// 如果上一個是重要訊息，確保它至少顯示 importantMinDisplay 時間
+		// 但如果進度有變化，允許更新
+		if (this.lastImportantTime > 0 && now - this.lastImportantTime < this.importantMinDisplay) {
+			// 除非新訊息也是重要訊息，或進度有變化，否則延遲顯示
+			if (!this.isImportant(text) && !hasProgressChange) {
+				return false;
+			}
+		}
+
+		// 重要訊息：一定顯示，且記錄時間
+		if (this.isImportant(text)) {
+			this.lastMessage = text;
+			this.lastShowTime = now;
+			this.lastImportantTime = now;
+			return true;
+		}
+
+		// 完全相同的訊息：跳過
+		if (text === this.lastMessage) {
+			return false;
+		}
+
+		// 快速變化的進度訊息：套用最小間隔（但進度有變化時放寬限制）
+		if (this.isSkippable(text) && !hasProgressChange) {
+			if (now - this.lastShowTime < this.minInterval) {
+				return false;
+			}
+		}
+
+		// 一般訊息：更新狀態並顯示
+		this.lastMessage = text;
+		this.lastShowTime = now;
+		return true;
+	},
+
+	/**
+	 * 重置過濾器狀態（上傳開始時呼叫）
+	 */
+	reset() {
+		this.lastMessage = '';
+		this.lastShowTime = 0;
+		this.lastImportantTime = 0;
+		this.lastProgress = -1;
+	},
+};
+
+/**
  * 處理上傳進度訊息
  * @param {Object} message - 進度訊息
  */
 function handleUploadProgress(message) {
-	console.log(`[blockly] 上傳進度: ${message.stage} (${message.progress}%) - ${message.message}`);
+	console.log(`[blockly] 上傳進度: ${message.stage} (${message.progress}%) - ${message.message}`, message);
 
-	// 階段訊息對應
+	// T041: 階段訊息對應（支援 MicroPython 與 Arduino）
 	const stageMessages = {
+		// MicroPython (CyberBrick) 階段
 		preparing: window.languageManager?.getMessage('UPLOAD_STAGE_PREPARING', '準備上傳'),
 		checking_tool: window.languageManager?.getMessage('UPLOAD_STAGE_CHECKING', '檢查工具'),
 		installing_tool: window.languageManager?.getMessage('UPLOAD_STAGE_INSTALLING', '安裝工具'),
@@ -2865,13 +3007,49 @@ function handleUploadProgress(message) {
 		uploading: window.languageManager?.getMessage('UPLOAD_STAGE_UPLOADING', '上傳程式'),
 		restarting: window.languageManager?.getMessage('UPLOAD_STAGE_RESTARTING', '重啟裝置'),
 		completed: window.languageManager?.getMessage('UPLOAD_STAGE_COMPLETED', '完成'),
+		// T039: Arduino 階段
+		syncing: window.languageManager?.getMessage('ARDUINO_STAGE_SYNCING', 'Syncing settings'),
+		saving: window.languageManager?.getMessage('ARDUINO_STAGE_SAVING', 'Saving workspace'),
+		checking_pio: window.languageManager?.getMessage('ARDUINO_STAGE_CHECKING', 'Checking build tools'),
+		detecting: window.languageManager?.getMessage('ARDUINO_STAGE_DETECTING', 'Detecting board'),
+		compiling: window.languageManager?.getMessage('ARDUINO_STAGE_COMPILING', 'Compiling'),
 	};
 
-	const stageText = stageMessages[message.stage] || message.message;
-	const progressText = `${stageText} (${message.progress}%)`;
+	const stageText = stageMessages[message.stage] || message.stage;
 
-	// 顯示帶有進度的 toast（持續顯示直到下一個更新）
-	toast.show(progressText, 'info', 10000);
+	// 建構進度文字：保留完整資訊 "階段 (進度%) - 詳細訊息"
+	let progressText;
+
+	if (message.message) {
+		// 組合完整進度資訊：階段 (進度%) - 詳細訊息
+		progressText = `${stageText} (${message.progress}%) - ${message.message}`;
+	} else if (message.subProgress !== undefined && message.subProgress > 0) {
+		// 有子進度但無詳細訊息，顯示子進度
+		progressText = `${stageText} (${message.subProgress}%)`;
+	} else {
+		// 一般階段只顯示總進度
+		progressText = `${stageText} (${message.progress}%)`;
+	}
+
+	// 如果有耗時資訊，附加顯示
+	if (message.elapsed !== undefined && message.elapsed > 0) {
+		const elapsedSec = (message.elapsed / 1000).toFixed(1);
+		progressText += ` [${elapsedSec}s]`;
+	}
+
+	// 智慧過濾：避免訊息跳太快或重複顯示
+	// 傳入進度百分比，讓進度變化時優先顯示
+	if (!uploadProgressFilter.shouldShow(progressText, message.progress)) {
+		return; // 跳過此訊息
+	}
+
+	// 根據訊息重要性決定顯示時間
+	// 重要訊息顯示較久，一般訊息持續到下一個更新
+	const isImportant = uploadProgressFilter.isImportant(progressText);
+	const duration = isImportant ? 60000 : 30000; // 重要訊息 60 秒，一般 30 秒
+
+	// 顯示帶有進度的 toast
+	toast.show(progressText, 'info', duration);
 }
 
 /**
@@ -2885,13 +3063,37 @@ function handleUploadResult(message) {
 	setUploadButtonState(message.success ? 'success' : 'error');
 
 	if (message.success) {
-		const successMsg = window.languageManager?.getMessage('UPLOAD_SUCCESS', '上傳成功！');
+		// T040: 根據 mode 區分「編譯成功」與「上傳成功」
+		let successMsg;
+		if (message.mode === 'compile-only') {
+			// Arduino 僅編譯模式
+			successMsg = window.languageManager?.getMessage('ARDUINO_COMPILE_SUCCESS', 'Compile successful');
+		} else if (message.mode === 'upload') {
+			// Arduino 上傳模式
+			successMsg = window.languageManager?.getMessage('ARDUINO_UPLOAD_SUCCESS', 'Upload successful');
+		} else {
+			// MicroPython (CyberBrick) 或舊格式相容
+			successMsg = window.languageManager?.getMessage('UPLOAD_SUCCESS', '上傳成功！');
+		}
+		// 計算並顯示耗時
+		if (uploadState.startTime > 0) {
+			const elapsed = ((Date.now() - uploadState.startTime) / 1000).toFixed(1);
+			successMsg += ` (${elapsed}s)`;
+			uploadState.startTime = 0; // 重置
+		}
 		toast.show(successMsg, 'success');
 	} else {
-		// 根據錯誤階段取得本地化錯誤訊息
+		// T022: 根據錯誤階段取得本地化錯誤訊息
 		const errorMsg = getLocalizedUploadError(message.error?.stage, message.error?.message);
-		const failedMsg = window.languageManager?.getMessage('UPLOAD_FAILED', '上傳失敗');
-		toast.show(`${failedMsg}: ${errorMsg}`, 'error', 5000);
+		const failedTemplate = window.languageManager?.getMessage('UPLOAD_FAILED', 'Upload failed: {0}') || 'Upload failed: {0}';
+		let failedMsg = failedTemplate.replace('{0}', errorMsg);
+		// 加入耗時資訊（如有）
+		if (uploadState.startTime > 0) {
+			const elapsed = ((Date.now() - uploadState.startTime) / 1000).toFixed(1);
+			failedMsg += ` (${elapsed}s)`;
+			uploadState.startTime = 0; // 重置
+		}
+		toast.show(failedMsg, 'error', 5000);
 	}
 }
 
@@ -2902,8 +3104,9 @@ function handleUploadResult(message) {
  * @returns {string} 本地化的錯誤訊息
  */
 function getLocalizedUploadError(stage, fallbackMessage) {
-	// 階段對應的錯誤訊息鍵名
+	// T023: 階段對應的錯誤訊息鍵名（支援 MicroPython 與 Arduino）
 	const errorKeyMap = {
+		// MicroPython (CyberBrick) 階段
 		preparing: {
 			'Only CyberBrick board is supported': 'ERROR_UPLOAD_BOARD_UNSUPPORTED',
 			'Code cannot be empty': 'ERROR_UPLOAD_CODE_EMPTY',
@@ -2926,10 +3129,27 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 		restarting: {
 			default: 'ERROR_UPLOAD_RESTART_FAILED',
 		},
+		// Arduino 階段
+		syncing: {
+			default: 'ERROR_ARDUINO_NO_WORKSPACE',
+		},
+		saving: {
+			default: 'ERROR_ARDUINO_NO_WORKSPACE',
+		},
+		checking_pio: {
+			default: 'ERROR_ARDUINO_PIO_NOT_FOUND',
+		},
+		detecting: {
+			default: 'ERROR_ARDUINO_TIMEOUT',
+		},
+		compiling: {
+			default: 'ERROR_ARDUINO_COMPILE_FAILED',
+		},
 	};
 
 	// 預設的 fallback 訊息（使用英文以避免硬編碼中文）
 	const defaultFallbacks = {
+		// MicroPython
 		ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Only CyberBrick board is supported',
 		ERROR_UPLOAD_CODE_EMPTY: 'Code cannot be empty',
 		ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python environment not found',
@@ -2938,6 +3158,12 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 		ERROR_UPLOAD_RESET_FAILED: 'Failed to reset device',
 		ERROR_UPLOAD_UPLOAD_FAILED: 'Failed to upload program',
 		ERROR_UPLOAD_RESTART_FAILED: 'Failed to restart device',
+		// Arduino
+		ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI not found, please install PlatformIO first',
+		ERROR_ARDUINO_COMPILE_FAILED: 'Compilation failed',
+		ERROR_ARDUINO_UPLOAD_FAILED: 'Upload failed',
+		ERROR_ARDUINO_NO_WORKSPACE: 'Please open a project folder first',
+		ERROR_ARDUINO_TIMEOUT: 'Operation timed out',
 	};
 
 	if (!stage || !errorKeyMap[stage]) {

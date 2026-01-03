@@ -718,6 +718,30 @@ window.languageManager.loadMessages('ru', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Не удалось загрузить программу',
 	ERROR_UPLOAD_RESTART_FAILED: 'Не удалось перезапустить устройство',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Компиляция и загрузка',
+	UPLOAD_SELECT_BOARD: 'Сначала выберите плату',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Синхронизация настроек',
+	ARDUINO_STAGE_SAVING: 'Сохранение рабочей области',
+	ARDUINO_STAGE_CHECKING: 'Проверка компилятора',
+	ARDUINO_STAGE_DETECTING: 'Обнаружение платы',
+	ARDUINO_STAGE_COMPILING: 'Компиляция',
+	ARDUINO_STAGE_UPLOADING: 'Загрузка',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Компиляция успешна!',
+	ARDUINO_UPLOAD_SUCCESS: 'Загрузка успешна!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI не найден. Сначала установите PlatformIO.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Ошибка компиляции',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Ошибка загрузки',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Сначала откройте папку проекта',
+	ERROR_ARDUINO_TIMEOUT: 'Время операции истекло',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Устройство отключено',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Вы уверены, что хотите удалить резервную копию "{0}"?',
 	BACKUP_CONFIRM_RESTORE: 'Вы уверены, что хотите восстановить резервную копию "{0}"? Это перезапишет текущую рабочую область.',

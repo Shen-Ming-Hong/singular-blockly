@@ -720,6 +720,30 @@ window.languageManager.loadMessages('de', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Programm konnte nicht hochgeladen werden',
 	ERROR_UPLOAD_RESTART_FAILED: 'Gerät konnte nicht neu gestartet werden',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Kompilieren & Hochladen',
+	UPLOAD_SELECT_BOARD: 'Bitte zuerst ein Board auswählen',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Einstellungen synchronisieren',
+	ARDUINO_STAGE_SAVING: 'Arbeitsbereich speichern',
+	ARDUINO_STAGE_CHECKING: 'Compiler überprüfen',
+	ARDUINO_STAGE_DETECTING: 'Board erkennen',
+	ARDUINO_STAGE_COMPILING: 'Kompilieren',
+	ARDUINO_STAGE_UPLOADING: 'Hochladen',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Kompilierung erfolgreich!',
+	ARDUINO_UPLOAD_SUCCESS: 'Hochladen erfolgreich!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI nicht gefunden. Bitte installieren Sie zuerst PlatformIO.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Kompilierung fehlgeschlagen',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Hochladen fehlgeschlagen',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Bitte öffnen Sie zuerst einen Projektordner',
+	ERROR_ARDUINO_TIMEOUT: 'Vorgang abgelaufen',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Gerät wurde getrennt',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Sind Sie sicher, dass Sie das Backup "{0}" löschen möchten?',
 	BACKUP_CONFIRM_RESTORE:

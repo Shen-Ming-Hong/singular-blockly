@@ -722,6 +722,30 @@ window.languageManager.loadMessages('bg', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Неуспешно качване на програмата',
 	ERROR_UPLOAD_RESTART_FAILED: 'Неуспешно рестартиране на устройството',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Компилирай и Качи',
+	UPLOAD_SELECT_BOARD: 'Моля, първо изберете платка',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Синхронизиране на настройките',
+	ARDUINO_STAGE_SAVING: 'Запазване на работното пространство',
+	ARDUINO_STAGE_CHECKING: 'Проверка на компилатора',
+	ARDUINO_STAGE_DETECTING: 'Откриване на платката',
+	ARDUINO_STAGE_COMPILING: 'Компилиране',
+	ARDUINO_STAGE_UPLOADING: 'Качване',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Компилацията е успешна!',
+	ARDUINO_UPLOAD_SUCCESS: 'Качването е успешно!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI не е намерен. Моля, първо инсталирайте PlatformIO.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Компилацията е неуспешна',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Качването е неуспешно',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Моля, първо отворете папка на проекта',
+	ERROR_ARDUINO_TIMEOUT: 'Времето за операцията изтече',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Устройството е изключено',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Сигурни ли сте, че искате да изтриете резервното копие "{0}"?',
 	BACKUP_CONFIRM_RESTORE:

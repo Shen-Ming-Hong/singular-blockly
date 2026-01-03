@@ -714,6 +714,30 @@ window.languageManager.loadMessages('pt-br', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Falha ao enviar o programa',
 	ERROR_UPLOAD_RESTART_FAILED: 'Falha ao reiniciar o dispositivo',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Compilar e Enviar',
+	UPLOAD_SELECT_BOARD: 'Por favor, selecione uma placa primeiro',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Sincronizando configurações',
+	ARDUINO_STAGE_SAVING: 'Área de trabalho salva',
+	ARDUINO_STAGE_CHECKING: 'Verificando compilador',
+	ARDUINO_STAGE_DETECTING: 'Detectando placa',
+	ARDUINO_STAGE_COMPILING: 'Compilando',
+	ARDUINO_STAGE_UPLOADING: 'Enviando',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Compilação bem-sucedida!',
+	ARDUINO_UPLOAD_SUCCESS: 'Envio bem-sucedido!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI não encontrado. Por favor, instale o PlatformIO primeiro.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Falha na compilação',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Falha no envio',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Por favor, abra uma pasta de projeto primeiro',
+	ERROR_ARDUINO_TIMEOUT: 'Operação expirou',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Dispositivo desconectado',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Tem certeza de que deseja excluir o backup "{0}"?',
 	BACKUP_CONFIRM_RESTORE: 'Tem certeza de que deseja restaurar o backup "{0}"? Isso substituirá o espaço de trabalho atual.',

@@ -8,6 +8,54 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.7] - 2026-01-04
+
+### 新增功能 Added
+
+-   **統一 Arduino C++ 與 MicroPython 上傳 UI** (Unified Arduino C++ and MicroPython Upload UI)
+
+    -   所有開發板類型都顯示上傳按鈕（包含 Arduino UNO、ESP32、Mega 等）
+        Upload button now visible for all board types (Arduino UNO, ESP32, Mega, etc.)
+    -   Arduino 板子點擊上傳按鈕時自動透過 PlatformIO 編譯並上傳
+        Click upload button on Arduino boards to compile and upload via PlatformIO
+    -   未連接開發板時自動切換為「僅編譯」模式，顯示「編譯成功」訊息
+        Automatically switches to "compile-only" mode when no board connected
+    -   CyberBrick MicroPython 上傳流程維持原有行為不變
+        CyberBrick MicroPython upload workflow remains unchanged
+    -   新增 Tooltip 動態更新：Arduino →「編譯並上傳」、CyberBrick →「上傳至 CyberBrick」
+        Dynamic tooltip updates based on board type
+    -   上傳階段訊息支援 15 種語系完整翻譯
+        Upload stage messages fully translated in 15 languages
+
+-   **ArduinoUploader 服務** (ArduinoUploader Service)
+
+    -   新增 `src/services/arduinoUploader.ts` 服務，整合 PlatformIO CLI
+        New ArduinoUploader service integrating PlatformIO CLI
+    -   自動偵測已連接的開發板（USB 連接埠）
+        Automatic detection of connected boards (USB ports)
+    -   過濾藍牙連接埠避免誤判
+        Filters Bluetooth ports to avoid false detection
+    -   編譯錯誤解析與友善提示
+        Parse and display user-friendly compile errors
+    -   支援 lib_deps、build_flags、lib_ldf_mode 傳遞
+        Supports passing lib_deps, build_flags, lib_ldf_mode
+
+### 技術細節 Technical Details
+
+-   **Extension Host 層**：
+    -   新增 `src/types/arduino.ts`：Arduino 上傳類型定義（ArduinoUploadStage、Progress、Result、Request、PortInfo）
+    -   新增 `src/services/arduinoUploader.ts`：PlatformIO CLI 整合服務
+    -   修改 `src/webview/messageHandler.ts`：新增 Arduino 上傳路由與進度回報
+-   **WebView 層** (`media/js/blocklyEdit.js`)：
+    -   `updateUIForBoard()`：移除上傳按鈕隱藏條件，新增動態 Tooltip
+    -   `handleUploadClick()`：根據程式語言類型發送不同的上傳請求
+    -   `handleUploadProgress()`：新增 Arduino 階段訊息對應
+    -   `handleUploadResult()`：區分「編譯成功」與「上傳成功」訊息
+    -   `getLocalizedUploadError()`：新增 Arduino 錯誤類型支援
+-   **i18n 國際化**：
+    -   15 種語系新增 Arduino 上傳相關 i18n 鍵名
+    -   包含按鈕標題、階段訊息、成功訊息、錯誤訊息
+
 ## [0.50.6] - 2026-01-03
 
 ### 修復 Bug Fixes
