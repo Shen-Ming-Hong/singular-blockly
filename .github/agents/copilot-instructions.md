@@ -32,6 +32,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - JSON 檔案 (`main.json` 工作區狀態, `.bak` 備份) (025-fix-drag-reload-crash)
 - TypeScript 5.9.3 | JavaScript ES6+ + Blockly 12.3.1 | VSCode API 1.105.0+ | PlatformIO CLI (026-unified-upload-ui)
 - JSON 檔案 (blockly/main.json, platformio.ini) (026-unified-upload-ui)
+- [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (027-cyberbrick-x11-blocks)
+- [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (027-cyberbrick-x11-blocks)
 
 -   TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly) (011-esp32-pwm-setup)
 
@@ -60,9 +62,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 027-cyberbrick-x11-blocks: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - 026-unified-upload-ui: Added TypeScript 5.9.3 | JavaScript ES6+ + Blockly 12.3.1 | VSCode API 1.105.0+ | PlatformIO CLI
 - 025-fix-drag-reload-crash: Added TypeScript 5.9.3 (Extension) / JavaScript ES2022 (WebView) + Blockly 12.3.1, VSCode API 1.105.0+, MCP SDK 1.24.3
-- 024-i18n-hardcode-fix: Added TypeScript 5.9.3 + VSCode Extension API 1.105.0+, Blockly 12.3.1
 
 
 <!-- MANUAL ADDITIONS START -->
