@@ -7,12 +7,11 @@
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
-import { spawn, ChildProcess } from 'child_process';
+import { spawn } from 'child_process';
 import { log } from './logging';
 import { SettingsManager } from './settingsManager';
 import {
 	ArduinoUploadStage,
-	ArduinoUploadProgress,
 	ArduinoUploadResult,
 	ArduinoUploadRequest,
 	ArduinoPortInfo,
@@ -807,7 +806,7 @@ export class ArduinoUploader {
 		try {
 			log('[arduino] 開始編譯', 'info');
 
-			const result = await this.executor.exec(`"${this.pioPath}" run --project-dir "${this.workspacePath}"`, {
+			await this.executor.exec(`"${this.pioPath}" run --project-dir "${this.workspacePath}"`, {
 				timeout: this.compileTimeout,
 				cwd: this.workspacePath,
 			});
@@ -836,7 +835,7 @@ export class ArduinoUploader {
 
 			const command = `"${this.pioPath}" run --target upload --upload-port "${port}" --project-dir "${this.workspacePath}"`;
 
-			const result = await this.executor.exec(command, {
+			await this.executor.exec(command, {
 				timeout: this.uploadTimeout,
 				cwd: this.workspacePath,
 			});

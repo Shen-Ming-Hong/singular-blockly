@@ -12,7 +12,7 @@ import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
-import { ArduinoUploadProgress, ArduinoUploadResult, ArduinoUploadRequest, getBoardLanguage } from '../types/arduino';
+import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage } from '../types/arduino';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
