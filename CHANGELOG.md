@@ -8,6 +8,36 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.6] - 2025-01-XX
+
+### 修復 Bug Fixes
+
+-   **修復拖曳時 FileWatcher 重載崩潰問題** (Fix FileWatcher Reload Crash During Drag)
+
+    -   修復在拖曳積木時外部修改 main.json 導致 UI 凍結和積木消失的問題
+        Fixed UI freeze and block disappearance when external changes to main.json occur during block drag
+    -   實作雙重拖曳偵測機制（`isDraggingBlock || workspace.isDragging()`）確保可靠偵測
+        Implemented dual drag detection mechanism for reliable detection
+    -   FileWatcher 觸發的重載請求在拖曳期間自動暫存，拖曳結束後自動執行
+        FileWatcher reload requests are automatically deferred during drag and executed after drag ends
+    -   新增剪貼簿操作鎖定機制，防止 Ctrl+C/V/X 期間觸發不完整儲存
+        Added clipboard operation lock mechanism to prevent incomplete saves during Ctrl+C/V/X
+    -   將內部更新保護從布林旗標升級為計數器機制，支援巢狀保存操作和 2000ms 保護窗口
+        Upgraded internal update protection from boolean flag to counter mechanism with 2000ms protection window
+    -   更新棄用的 Blockly Variable API（`workspace.getVariableById` → `workspace.getVariableMap().getVariableById`）
+        Updated deprecated Blockly Variable API calls for v13 compatibility
+
+### 技術細節 Technical Details
+
+-   **WebView 層** (`media/js/blocklyEdit.js`)：
+    -   新增 `isCurrentlyDragging()` 輔助函數
+    -   新增 `shouldSkipSave()` 整合所有儲存守衛條件
+    -   新增 `processPendingReload()` 延遲執行 FileWatcher 重載
+    -   新增剪貼簿操作鎖定計時器和安全超時機制
+-   **Extension 層** (`src/webview/webviewManager.ts`)：
+    -   `internalUpdateCount` 計數器取代 `isInternalUpdate` 布林值
+    -   2000ms 延遲重置確保檔案系統事件完成
+
 ## [0.50.5] - 2025-12-31
 
 ### 安全性 Security

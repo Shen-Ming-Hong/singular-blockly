@@ -25,7 +25,7 @@
 
 **Purpose**: 專案初始化，無需額外設定
 
--   [ ] T001 驗證 Blockly 12.3.1 BLOCK_DRAG 事件和 isDragging() API 支援
+-   [x] T001 驗證 Blockly 12.3.1 BLOCK_DRAG 事件和 isDragging() API 支援
 
 ---
 
@@ -35,15 +35,15 @@
 
 **⚠️ CRITICAL**: 必須先完成此階段，才能開始用戶故事實作
 
--   [ ] T002 新增 `isClipboardOperationInProgress` 狀態旗標在 `media/js/blocklyEdit.js` 頂層變數區
--   [ ] T003 [P] 新增 `pendingReloadFromFileWatcher` 暫存變數在 `media/js/blocklyEdit.js` 頂層變數區
--   [ ] T004 [P] 新增 `clipboardLockTimer` 計時器變數在 `media/js/blocklyEdit.js` 頂層變數區
--   [ ] T004a [P] 新增 `CLIPBOARD_MAX_LOCK_TIME` 常數（5000ms）和 `clipboardLockStartTime` 變數在 `media/js/blocklyEdit.js` 頂層變數區
--   [ ] T005 實作 `isCurrentlyDragging()` 輔助函數在 `media/js/blocklyEdit.js`（採用 OR 邏輯雙重檢查 `isDraggingBlock || workspace.isDragging()`）
--   [ ] T006 [P] 實作 `shouldSkipSave()` 輔助函數在 `media/js/blocklyEdit.js`（整合所有儲存守衛條件：拖曳、剪貼簿鎖定、FileWatcher 載入）
--   [ ] T007 [P] 實作 `processPendingReload()` 輔助函數在 `media/js/blocklyEdit.js`（執行待處理的 FileWatcher 重載請求）
+-   [x] T002 新增 `isClipboardOperationInProgress` 狀態旗標在 `media/js/blocklyEdit.js` 頂層變數區
+-   [x] T003 [P] 新增 `pendingReloadFromFileWatcher` 暫存變數在 `media/js/blocklyEdit.js` 頂層變數區
+-   [x] T004 [P] 新增 `clipboardLockTimer` 計時器變數在 `media/js/blocklyEdit.js` 頂層變數區
+-   [x] T004a [P] 新增 `CLIPBOARD_MAX_LOCK_TIME` 常數（5000ms）和 `clipboardLockStartTime` 變數在 `media/js/blocklyEdit.js` 頂層變數區
+-   [x] T005 實作 `isCurrentlyDragging()` 輔助函數在 `media/js/blocklyEdit.js`（採用 OR 邏輯雙重檢查 `isDraggingBlock || workspace.isDragging()`）
+-   [x] T006 [P] 實作 `shouldSkipSave()` 輔助函數在 `media/js/blocklyEdit.js`（整合所有儲存守衛條件：拖曳、剪貼簿鎖定、FileWatcher 載入）
+-   [x] T007 [P] 實作 `processPendingReload()` 輔助函數在 `media/js/blocklyEdit.js`（執行待處理的 FileWatcher 重載請求）
 
-**Checkpoint**: 基礎設施就緒 - 可開始用戶故事實作
+**Checkpoint**: 基礎設施就緒 - 可開始用戶故事實作 ✅
 
 ---
 
@@ -55,12 +55,12 @@
 
 ### Implementation for User Story 1
 
--   [ ] T008 [US1] 修改 `loadWorkspace` 訊息處理器在 `media/js/blocklyEdit.js`：新增 `source === 'fileWatcher'` 檢查，若 `isCurrentlyDragging()` 為 true 則暫存訊息
--   [ ] T009 [US1] 修改 `BLOCK_DRAG` 事件處理器在 `media/js/blocklyEdit.js`：當 `event.isStart === false` 時呼叫 `processPendingReload()`（延遲 100ms 確保狀態穩定）
--   [ ] T010 [US1] 修改 Extension 側 `messageHandler.ts`：檢查現有程式碼是否已有 `source` 標記，若無則在 FileWatcher 觸發的 `loadWorkspace` 訊息中加入 `source: 'fileWatcher'` 標記（先執行 `grep_search` 確認現狀）
--   [ ] T011 [US1] 新增日誌記錄：「FileWatcher 重載請求已暫存，等待拖曳結束」和「拖曳結束，執行待處理的 FileWatcher 重載」在 `media/js/blocklyEdit.js`
+-   [x] T008 [US1] 修改 `loadWorkspace` 訊息處理器在 `media/js/blocklyEdit.js`：新增 `source === 'fileWatcher'` 檢查，若 `isCurrentlyDragging()` 為 true 則暫存訊息
+-   [x] T009 [US1] 修改 `BLOCK_DRAG` 事件處理器在 `media/js/blocklyEdit.js`：當 `event.isStart === false` 時呼叫 `processPendingReload()`（延遲 100ms 確保狀態穩定）
+-   [x] T010 [US1] 修改 Extension 側 `messageHandler.ts`：檢查現有程式碼是否已有 `source` 標記，若無則在 FileWatcher 觸發的 `loadWorkspace` 訊息中加入 `source: 'fileWatcher'` 標記（先執行 `grep_search` 確認現狀）
+-   [x] T011 [US1] 新增日誌記錄：「FileWatcher 重載請求已暫存，等待拖曳結束」和「拖曳結束，執行待處理的 FileWatcher 重載」在 `media/js/blocklyEdit.js`
 
-**Checkpoint**: 此時 User Story 1 應可獨立測試 - 拖曳期間 FileWatcher 重載被延遲
+**Checkpoint**: 此時 User Story 1 應可獨立測試 - 拖曳期間 FileWatcher 重載被延遲 ✅
 
 ---
 
@@ -72,14 +72,14 @@
 
 ### Implementation for User Story 4
 
--   [ ] T024 [US4] 將 `isInternalUpdate` 布林旗標改為 `internalUpdateCount` 計數器在 `src/webview/webviewManager.ts`
--   [ ] T025 [US4] 新增 `internalUpdateTimer` 計時器變數在 `src/webview/webviewManager.ts`
--   [ ] T026 [US4] 修改 `markInternalUpdateStart()` 為遞增計數器並清除現有計時器在 `src/webview/webviewManager.ts`
--   [ ] T027 [US4] 修改 `markInternalUpdateEnd()` 為設定 2000ms 延遲遞減計數器在 `src/webview/webviewManager.ts`
--   [ ] T028 [US4] 修改 `handleFileChange()` 檢查 `internalUpdateCount > 0` 而非布林旗標在 `src/webview/webviewManager.ts`
--   [ ] T029 [US4] 新增日誌記錄：「內部更新計數: N，跳過 FileWatcher 重載」和「內部更新保護延遲 2000ms 後解除」在 `src/webview/webviewManager.ts`
+-   [x] T024 [US4] 將 `isInternalUpdate` 布林旗標改為 `internalUpdateCount` 計數器在 `src/webview/webviewManager.ts`
+-   [x] T025 [US4] 新增 `internalUpdateTimer` 計時器變數在 `src/webview/webviewManager.ts`
+-   [x] T026 [US4] 修改 `markInternalUpdateStart()` 為遞增計數器並清除現有計時器在 `src/webview/webviewManager.ts`
+-   [x] T027 [US4] 修改 `markInternalUpdateEnd()` 為設定 2000ms 延遲遞減計數器在 `src/webview/webviewManager.ts`
+-   [x] T028 [US4] 修改 `handleFileChange()` 檢查 `internalUpdateCount > 0` 而非布林旗標在 `src/webview/webviewManager.ts`
+-   [x] T029 [US4] 新增日誌記錄：「內部更新計數: N，跳過 FileWatcher 重載」和「內部更新保護延遲 2000ms 後解除」在 `src/webview/webviewManager.ts`
 
-**Checkpoint**: 此時 User Stories 1 和 4 都應可獨立運作 - 拖曳保護和內部更新保護都已完成
+**Checkpoint**: 此時 User Stories 1 和 4 都應可獨立運作 - 拖曳保護和內部更新保護都已完成 ✅
 
 ---
 
@@ -91,13 +91,13 @@
 
 ### Implementation for User Story 2
 
--   [ ] T012 [US2] 新增 `keydown` 事件監聽器在 `media/js/blocklyEdit.js`：偵測 Ctrl+C/V/X 時設置 `isClipboardOperationInProgress = true` 並啟動 `clipboardLockTimer`（300ms）
--   [ ] T013 [US2] 修改 `BLOCK_CREATE` 事件處理器在 `media/js/blocklyEdit.js`：若 `isClipboardOperationInProgress` 為 true 且未超過 `CLIPBOARD_MAX_LOCK_TIME`（5000ms），重設 `clipboardLockTimer` 動態延長鎖定
--   [ ] T014 [US2] 修改 `saveWorkspaceState()` 函數在 `media/js/blocklyEdit.js`：使用 `shouldSkipSave()` 整合所有守衛條件
--   [ ] T015 [US2] 修改自動儲存 debounce 時間從 150ms 到 300ms 在 `media/js/blocklyEdit.js` 的 `codeUpdateDebounceTimer` 相關程式碼
--   [ ] T016 [US2] 新增日誌記錄：「剪貼簿操作開始，鎖定自動儲存」和「剪貼簿操作結束，解除鎖定」在 `media/js/blocklyEdit.js`
+-   [x] T012 [US2] 新增 `keydown` 事件監聯器在 `media/js/blocklyEdit.js`：偵測 Ctrl+C/V/X 時設置 `isClipboardOperationInProgress = true` 並啟動 `clipboardLockTimer`（300ms）
+-   [x] T013 [US2] 修改 `BLOCK_CREATE` 事件處理器在 `media/js/blocklyEdit.js`：若 `isClipboardOperationInProgress` 為 true 且未超過 `CLIPBOARD_MAX_LOCK_TIME`（5000ms），重設 `clipboardLockTimer` 動態延長鎖定
+-   [x] T014 [US2] 修改 `saveWorkspaceState()` 函數在 `media/js/blocklyEdit.js`：使用 `shouldSkipSave()` 整合所有守衛條件
+-   [x] T015 [US2] 修改自動儲存 debounce 時間從 150ms 到 300ms 在 `media/js/blocklyEdit.js` 的 `codeUpdateDebounceTimer` 相關程式碼
+-   [x] T016 [US2] 新增日誌記錄：「剪貼簿操作開始，鎖定自動儲存」和「剪貼簿操作結束，解除鎖定」在 `media/js/blocklyEdit.js`
 
-**Checkpoint**: 此時 User Stories 1 和 2 都應可獨立運作
+**Checkpoint**: 此時 User Stories 1 和 2 都應可獨立運作 ✅
 
 ---
 
@@ -109,11 +109,11 @@
 
 ### Implementation for User Story 3
 
--   [ ] T017 [US3] 搜尋並更新 `workspace.getVariableById()` 為 `workspace.getVariableMap().getVariableById()` 在 `media/blockly/blocks/functions.js`
--   [ ] T018 [US3] 搜尋專案根目錄下所有 `.js` 檔案中的 `workspace.getAllVariables()` 並更新為 `workspace.getVariableMap().getAllVariables()`（搜尋範圍：`media/`、`src/`、排除 `node_modules/`）
--   [ ] T019 [US3] 搜尋專案根目錄下所有 `.js` 檔案中的其他棄用 Blockly Variable API（如 `workspace.deleteVariable`、`workspace.renameVariable`）並更新（搜尋範圍：`media/`、`src/`、排除 `node_modules/`）
+-   [x] T017 [US3] 搜尋並更新 `workspace.getVariableById()` 為 `workspace.getVariableMap().getVariableById()` 在 `media/blockly/blocks/functions.js`
+-   [x] T018 [US3] 搜尋專案根目錄下所有 `.js` 檔案中的 `workspace.getAllVariables()` 並更新為 `workspace.getVariableMap().getAllVariables()`（搜尋範圍：`media/`、`src/`、排除 `node_modules/`）
+-   [x] T019 [US3] 搜尋專案根目錄下所有 `.js` 檔案中的其他棄用 Blockly Variable API（如 `workspace.deleteVariable`、`workspace.renameVariable`）並更新（搜尋範圍：`media/`、`src/`、排除 `node_modules/`）
 
-**Checkpoint**: 所有用戶故事都應可獨立運作
+**Checkpoint**: 所有用戶故事都應可獨立運作 ✅
 
 ---
 
@@ -121,10 +121,12 @@
 
 **Purpose**: 整體改進和驗證
 
--   [ ] T020 [P] 執行 `quickstart.md` 中的所有手動測試案例驗證修復
--   [ ] T021 [P] 檢查 WebView DevTools Console 確認無任何新增錯誤或警告
--   [ ] T022 更新 CHANGELOG.md 記錄此修復（025-fix-drag-reload-crash）
--   [ ] T023 程式碼清理：移除任何除錯用的 console.log，確保使用 log.\* API
+-   [x] T020 [P] 執行 `quickstart.md` 中的所有手動測試案例驗證修復
+-   [x] T021 [P] 檢查 WebView DevTools Console 確認無任何新增錯誤或警告
+-   [x] T022 更新 CHANGELOG.md 記錄此修復（025-fix-drag-reload-crash）
+-   [x] T023 程式碼清理：移除任何除錯用的 console.log，確保使用 log.\* API
+
+**Checkpoint**: 所有任務完成 ✅
 
 ---
 
