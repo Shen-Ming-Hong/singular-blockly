@@ -115,7 +115,7 @@
                         "import rc_module"
                     ],
                     "hardwareInit": [],
-                    "code": "(rc_module.rc_slave_data() or (2048,)*10)[{CHANNEL}]",
+                    "code": "(rc_module.rc_slave_data() or (2048,)*6 + (1,)*4)[{CHANNEL}]",
                     "order": "ORDER_MEMBER"
                 }
             }
