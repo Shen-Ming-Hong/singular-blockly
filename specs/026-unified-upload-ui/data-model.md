@@ -276,6 +276,7 @@ export type BoardLanguage = 'arduino' | 'micropython';
 /**
  * 板子語言映射表
  * 用於判斷板子應使用哪種上傳流程
+ * 注意：'none' 不在此映射中，需在上傳前檢查並提示使用者選擇開發板
  */
 export const BOARD_LANGUAGE_MAP: Record<string, BoardLanguage> = {
 	// Arduino 類型
@@ -289,9 +290,6 @@ export const BOARD_LANGUAGE_MAP: Record<string, BoardLanguage> = {
 
 	// MicroPython 類型
 	cyberbrick: 'micropython',
-
-	// 無板子選擇
-	none: 'arduino', // 預設使用 Arduino 編譯驗證
 };
 ```
 
@@ -301,10 +299,13 @@ export const BOARD_LANGUAGE_MAP: Record<string, BoardLanguage> = {
 /**
  * 取得板子的程式語言類型
  * @param board 板子 ID
- * @returns 語言類型
+ * @returns 語言類型，當 board 為 'none' 或未知時返回 undefined
  */
-export function getBoardLanguage(board: string): BoardLanguage {
-	return BOARD_LANGUAGE_MAP[board] || 'arduino';
+export function getBoardLanguage(board: string): BoardLanguage | undefined {
+	if (board === 'none' || !BOARD_LANGUAGE_MAP[board]) {
+		return undefined; // 需要提示使用者選擇開發板
+	}
+	return BOARD_LANGUAGE_MAP[board];
 }
 ```
 

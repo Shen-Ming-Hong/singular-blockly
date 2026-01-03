@@ -307,6 +307,16 @@ async function handleUploadClick() {
 		return;
 	}
 
+	// 取得當前板子
+	const currentBoard = window.currentBoard || 'none';
+
+	// 檢查是否已選擇開發板
+	if (currentBoard === 'none') {
+		const msg = window.languageManager?.getMessage('UPLOAD_SELECT_BOARD', 'Please select a board first');
+		toast.show(msg, 'warning');
+		return;
+	}
+
 	// 檢查工作區是否有積木
 	const blocks = workspace.getAllBlocks(false);
 	if (blocks.length === 0) {
@@ -470,10 +480,24 @@ ERROR_ARDUINO_TIMEOUT: '操作逾時',
 -   [ ] 編譯錯誤：顯示錯誤摘要
 -   [ ] 上傳失敗：顯示裝置連線錯誤
 
+### 連線異常測試
+
+-   [ ] USB 中途拔除測試：
+    1. 連接 Arduino 板子，選擇對應板子類型
+    2. 點擊上傳按鈕開始上傳流程
+    3. 等待進入「上傳中」階段後，拔除 USB 連接線
+    4. 驗證系統顯示「上傳失敗：裝置連線中斷」Toast 訊息
+    5. 驗證按鈕恢復可點擊狀態（非持續旋轉）
+    6. 驗證重新連接板子後可再次執行上傳
+
 ### i18n 測試
 
 -   [ ] 切換語言後，所有新增訊息正確翻譯
 -   [ ] 15 個語系都有對應的翻譯鍵名
+-   [ ] i18n UI 渲染驗證（en、zh-hant、ja 三種語系）：
+    -   [ ] 各階段 Toast 訊息（同步設定、編譯中、上傳中）正確顯示
+    -   [ ] 成功訊息（編譯成功、上傳成功）正確顯示
+    -   [ ] 錯誤訊息（PlatformIO 未安裝、編譯失敗）正確顯示
 
 ---
 

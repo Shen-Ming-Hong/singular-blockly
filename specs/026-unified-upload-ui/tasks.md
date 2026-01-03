@@ -104,7 +104,7 @@
 
 -   [ ] T016 [US4] 修改 updateUIForBoard 函式移除 uploadContainer 隱藏條件於 media/js/blocklyEdit.js
 -   [ ] T017 [US4] 新增動態 Tooltip 更新邏輯：Arduino→「編譯並上傳」、CyberBrick→「上傳至 CyberBrick」於 media/js/blocklyEdit.js
--   [ ] T018 [US4] 修改 handleUploadClick 函式支援 Arduino 板子的上傳請求格式（含 lib_deps, build_flags）於 media/js/blocklyEdit.js
+-   [ ] T018 [US4] 修改 handleUploadClick 函式支援 Arduino 板子的上傳請求格式（含 lib_deps, build_flags），並在 board === 'none' 時顯示 Toast 提示「請先選擇開發板」於 media/js/blocklyEdit.js
 -   [ ] T019 [P] [US4] 新增 window.currentProgrammingLanguage 變數追蹤當前程式語言類型於 media/js/blocklyEdit.js
 
 **Checkpoint**: 上傳按鈕應在所有板子顯示且 Tooltip 正確
@@ -154,8 +154,10 @@
 
 **Purpose**: WebView 端的進度與結果訊息處理
 
--   [ ] T039 修改 handleUploadProgress 函式支援 Arduino 階段訊息對應於 media/js/blocklyEdit.js
--   [ ] T040 修改 handleUploadResult 函式區分「編譯成功」與「上傳成功」訊息於 media/js/blocklyEdit.js
+**依賴說明**: Phase 9 需在 Phase 6 (US4) T016-T019 完成後執行，因為 T039-T041 依賴 `handleUploadProgress` 和 `handleUploadResult` 函式存根已存在於 `blocklyEdit.js` 中。
+
+-   [ ] T039 修改 handleUploadProgress 函式支援 Arduino 階段訊息對應於 media/js/blocklyEdit.js（前置：T018 完成）
+-   [ ] T040 修改 handleUploadResult 函式區分「編譯成功」與「上傳成功」訊息於 media/js/blocklyEdit.js（前置：T018 完成）
 -   [ ] T041 新增 Arduino 階段訊息的 i18n 鍵名查詢映射表於 media/js/blocklyEdit.js
 
 ---
@@ -168,6 +170,7 @@
 -   [ ] T043 [P] 更新 CHANGELOG.md 記錄新增功能
 -   [ ] T044 [P] 程式碼清理：移除 console.log，確保使用 log() 服務
 -   [ ] T045 執行完整 i18n 審核 npm run audit:i18n:all
+-   [ ] T046 [P] 手動驗證 i18n UI 渲染：在 en、zh-hant、ja 三種語系下測試 Arduino 上傳 Toast 訊息（階段訊息、成功訊息、錯誤訊息）正確顯示
 
 ---
 
@@ -256,6 +259,9 @@ Task: T026 "新增 Arduino 上傳 i18n 鍵名於 media/locales/ko/messages.js"
 ```javascript
 // 按鈕
 UPLOAD_BUTTON_TITLE_ARDUINO: '編譯並上傳',
+
+// 選擇開發板提示
+UPLOAD_SELECT_BOARD: '請先選擇開發板',
 
 // 階段訊息
 ARDUINO_STAGE_SYNCING: '同步設定',

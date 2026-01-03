@@ -5,7 +5,7 @@
 **Status**: Draft  
 **Input**: User description: "統一 Arduino C++ 與 MicroPython 上傳 UI - 將 Arduino C++ 的編譯/上傳流程整合到現有的 MicroPython 上傳 UI 框架中。Arduino 模式透過 PlatformIO CLI 執行：有偵測到板子時完整上傳，無板子時僅編譯驗證語法。保持一致的上傳按鈕圖示，透過 Toast 文字區分編譯/上傳階段。"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Arduino 板子已連接完整上傳 (Priority: P1)
 
@@ -87,49 +87,53 @@
 
 ### Edge Cases
 
-- 當使用者在上傳過程中拔除 USB 連接？系統應偵測中斷並顯示「上傳失敗：裝置連線中斷」
-- 當工作區是空的（無積木）時點擊上傳？系統應顯示「工作區是空的，請先新增積木」
-- 當多次快速點擊上傳按鈕？系統應忽略重複點擊，按鈕在上傳中狀態時禁用
-- 當編譯工具（PlatformIO CLI）未安裝？系統應顯示友善提示並指引使用者安裝
-- 當板子選擇與實際連接板子不符？依賴 PlatformIO 的自動偵測，可能導致上傳失敗並顯示錯誤訊息
+-   當使用者在上傳過程中拔除 USB 連接？系統應偵測中斷並顯示「上傳失敗：裝置連線中斷」
+-   當工作區是空的（無積木）時點擊上傳？系統應顯示「工作區是空的，請先新增積木」
+-   當多次快速點擊上傳按鈕？系統應忽略重複點擊，按鈕在上傳中狀態時禁用
+-   當編譯工具（PlatformIO CLI）未安裝？系統應顯示友善提示並指引使用者安裝
+-   當板子選擇與實際連接板子不符？依賴 PlatformIO 的自動偵測，可能導致上傳失敗並顯示錯誤訊息
+-   當板子選擇為「none」（無板子選擇）？系統應顯示 Toast 提示「請先選擇開發板」，不執行任何編譯或上傳操作
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
-- **FR-001**: 系統 MUST 在所有板子類型都顯示上傳按鈕（不限於 CyberBrick）
-- **FR-002**: 系統 MUST 根據當前板子語言類型（arduino/micropython）選擇對應的上傳服務
-- **FR-003**: Arduino 模式 MUST 在上傳前自動同步 platformio.ini 設定（lib_deps、build_flags）
-- **FR-004**: Arduino 模式 MUST 在上傳前自動儲存工作區以確保 main.cpp 與積木同步
-- **FR-005**: Arduino 模式 MUST 使用 PlatformIO CLI 絕對路徑執行編譯/上傳（無需虛擬環境）
-- **FR-006**: Arduino 模式 MUST 使用 PlatformIO 自動偵測功能識別連接的板子埠
-- **FR-007**: 當未偵測到 Arduino 板子時，系統 MUST 僅執行編譯驗證（不執行上傳）
-- **FR-008**: 系統 MUST 透過 Toast 訊息即時顯示當前階段（同步設定/編譯中/上傳中/完成）
-- **FR-009**: 系統 MUST 區分「編譯成功」與「上傳成功」的結果訊息
-- **FR-010**: 上傳按鈕的 Tooltip MUST 根據板子類型動態更新
-- **FR-011**: MicroPython（CyberBrick）上傳流程 MUST 維持現有行為不變
-- **FR-012**: 系統 MUST 支援 15 種語系的上傳相關訊息翻譯
+-   **FR-001**: 系統 MUST 在所有板子類型都顯示上傳按鈕（不限於 CyberBrick）
+-   **FR-002**: 系統 MUST 根據當前板子語言類型（arduino/micropython）選擇對應的上傳服務
+-   **FR-003**: Arduino 模式 MUST 在上傳前自動同步 platformio.ini 設定（lib_deps、build_flags）
+-   **FR-004**: Arduino 模式 MUST 在上傳前自動儲存工作區以確保 main.cpp 與積木同步
+-   **FR-005**: Arduino 模式 MUST 使用 PlatformIO CLI 絕對路徑執行編譯/上傳（無需虛擬環境）
+-   **FR-006**: Arduino 模式 MUST 使用 PlatformIO 自動偵測功能識別連接的板子埠
+-   **FR-007**: 當未偵測到 Arduino 板子時，系統 MUST 僅執行編譯驗證（不執行上傳）
+-   **FR-008**: 系統 MUST 透過 Toast 訊息即時顯示當前階段（同步設定/編譯中/上傳中/完成）
+-   **FR-009**: 系統 MUST 區分「編譯成功」與「上傳成功」的結果訊息
+-   **FR-010**: 上傳按鈕的 Tooltip MUST 根據板子類型動態更新
+-   **FR-011**: MicroPython（CyberBrick）上傳流程 MUST 維持現有行為不變
+-   **FR-012**: 系統 MUST 支援 15 種語系的上傳相關訊息翻譯
+-   **FR-013**: 當板子選擇為「none」時，點擊上傳按鈕 MUST 顯示 Toast 提示使用者先選擇開發板，不執行任何編譯或上傳操作
 
 ### Key Entities
 
-- **UploadStage（上傳階段）**: 定義上傳流程的各階段狀態，Arduino 與 MicroPython 各有專屬階段定義
-- **UploadProgress（上傳進度）**: 包含當前階段、進度百分比、訊息文字，用於 WebView 與 Extension 間通訊
-- **UploadResult（上傳結果）**: 包含成功/失敗狀態、時間戳記、錯誤訊息（如有），用於最終結果通知
+-   **UploadStage（上傳階段）**: 定義上傳流程的各階段狀態，Arduino 與 MicroPython 各有專屬階段定義
+-   **UploadProgress（上傳進度）**: 包含當前階段、進度百分比、訊息文字，用於 WebView 與 Extension 間通訊
+-   **UploadResult（上傳結果）**: 包含成功/失敗狀態、時間戳記、錯誤訊息（如有），用於最終結果通知
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
-- **SC-001**: 使用者可在 30 秒內完成從點擊上傳按鈕到看到「編譯成功」訊息（無連接板子情境）
-- **SC-002**: 使用者可在 90 秒內完成從點擊上傳按鈕到看到「上傳成功」訊息（已連接板子情境，視程式複雜度而定）
-- **SC-003**: 100% 的 Arduino 相容板子（Uno、ESP32、Mega 等）都顯示上傳按鈕
-- **SC-004**: 切換板子時，上傳按鈕 Tooltip 在 500ms 內更新為正確文字
-- **SC-005**: 編譯/上傳錯誤時，使用者可從 Toast 訊息理解問題原因（不需查看終端機輸出）
-- **SC-006**: 現有 MicroPython（CyberBrick）使用者的上傳流程體驗不受影響
+> **測試環境基準**: 以下時間指標基於中階開發環境（Intel i5 第 10 代或 Apple M1 或同等效能 CPU、8GB RAM、SSD 儲存裝置）測量。實際時間可能因硬體效能、專案複雜度、網路狀況（首次下載依賴時）有所差異。
+
+-   **SC-001**: 使用者可在 30 秒內完成從點擊上傳按鈕到看到「編譯成功」訊息（無連接板子情境，簡單程式約 100 行 Arduino C++）
+-   **SC-002**: 使用者可在 90 秒內完成從點擊上傳按鈕到看到「上傳成功」訊息（已連接板子情境，視程式複雜度而定）
+-   **SC-003**: 100% 的 Arduino 相容板子（Uno、ESP32、Mega 等）都顯示上傳按鈕
+-   **SC-004**: 切換板子時，上傳按鈕 Tooltip 在 500ms 內更新為正確文字
+-   **SC-005**: 編譯/上傳錯誤時，使用者可從 Toast 訊息理解問題原因（不需查看終端機輸出）
+-   **SC-006**: 現有 MicroPython（CyberBrick）使用者的上傳流程體驗不受影響
 
 ## Assumptions
 
-- 使用者已安裝 PlatformIO IDE 擴充功能（或 PlatformIO Core CLI）
-- PlatformIO CLI 位於預設安裝位置（Windows: `%USERPROFILE%\.platformio\penv\Scripts\pio.exe`，macOS/Linux: `~/.platformio/penv/bin/pio`）
-- Arduino 板子的 USB 驅動程式已正確安裝
-- 編譯/上傳時間會因程式複雜度和電腦效能而異
+-   使用者已安裝 PlatformIO IDE 擴充功能（或 PlatformIO Core CLI）
+-   PlatformIO CLI 位於預設安裝位置（Windows: `%USERPROFILE%\.platformio\penv\Scripts\pio.exe`，macOS/Linux: `~/.platformio/penv/bin/pio`）
+-   Arduino 板子的 USB 驅動程式已正確安裝
+-   編譯/上傳時間會因程式複雜度和電腦效能而異
