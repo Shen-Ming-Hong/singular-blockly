@@ -19,15 +19,18 @@ Extension Host (Node.js)              WebView (Browser)
 │   ├── webviewManager.ts             └── media/blockly/
 │   └── messageHandler.ts                 ├── blocks/*.js (定義積木外觀)
 ├── src/mcp/mcpServer.ts                  └── generators/{arduino,micropython}/*.js
-├── src/mcp/tools/                    
-│   ├── blockQuery.ts         # get_block_usage, search_blocks
+├── src/mcp/tools/
+│   ├── blockQuery.ts         # get_block_usage, search_blocks, list_blocks_by_category
 │   ├── platformConfig.ts     # get_platform_config, get_board_pins
-│   └── workspaceOps.ts       # update_workspace, refresh_editor
+│   └── workspaceOps.ts       # update_workspace, refresh_editor, get_workspace_state
 └── src/services/
     ├── fileService.ts        # ALL file I/O (inject FileSystem for tests)
     ├── logging.ts            # ALL logging (never use console.log)
     ├── settingsManager.ts    # PlatformIO config + theme + auto-backup
-    └── micropythonUploader.ts # mpremote upload for CyberBrick
+    ├── micropythonUploader.ts # mpremote upload for CyberBrick
+    ├── arduinoUploader.ts    # PlatformIO upload for Arduino boards
+    ├── workspaceValidator.ts # Validate workspace state integrity
+    └── projectTypeDetector.ts # Detect non-Blockly projects (safety guard)
 ```
 
 **Data Flow**: WebView `saveWorkspace` → `messageHandler.ts` → `FileService` → `blockly/main.json`
@@ -99,7 +102,7 @@ npm run generate:dictionary  # Update MCP block dictionary
 1. **Block definition**: `media/blockly/blocks/{category}.js` — define appearance, fields, connections
 2. **Arduino generator**: `media/blockly/generators/arduino/{category}.js` — use `window.getCurrentBoard()` for board-specific code
 3. **MicroPython generator**: `media/blockly/generators/micropython/{category}.js` — use `generator.addImport()`, `generator.addHardwareInit()`
-4. **Toolbox entry**: `media/toolbox/categories/{category}.json`
+4. **Toolbox entry**: `media/toolbox/categories/{category}.json` (categories: arduino, communication, cyberbrick\_\*, lists, logic, loops, math, motors, sensors, text, vision-sensors)
 5. **i18n keys**: All 15 `media/locales/*/messages.js` files (use `npm run validate:i18n` to check)
 
 **For setup blocks** (servo, encoder): Register with `arduinoGenerator.registerAlwaysGenerateBlock('block_type')`
@@ -148,12 +151,15 @@ const handler = new WebViewMessageHandler(context, panel, localeService, fileSer
 
 ## Key File Locations
 
-| Purpose | File |
-|---------|------|
-| Extension entry | `src/extension.ts` |
-| WebView main logic | `media/js/blocklyEdit.js` |
-| Message handling | `src/webview/messageHandler.ts` |
-| File operations | `src/services/fileService.ts` |
-| Workspace state | `blockly/main.json` (in user project) |
-| MCP block metadata | `src/mcp/block-dictionary.json` |
-| i18n validation | `scripts/i18n/validate-translations.js` |
+| Purpose            | File                                    |
+| ------------------ | --------------------------------------- |
+| Extension entry    | `src/extension.ts`                      |
+| WebView main logic | `media/js/blocklyEdit.js`               |
+| Message handling   | `src/webview/messageHandler.ts`         |
+| File operations    | `src/services/fileService.ts`           |
+| Workspace state    | `blockly/main.json` (in user project)   |
+| MCP block metadata | `src/mcp/block-dictionary.json`         |
+| i18n validation    | `scripts/i18n/validate-translations.js` |
+| Block definitions  | `media/blockly/blocks/*.js`             |
+| Toolbox categories | `media/toolbox/categories/*.json`       |
+| Translation files  | `media/locales/{lang}/messages.js`      |

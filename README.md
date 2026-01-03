@@ -131,17 +131,17 @@ Seamless integration with GitHub Copilot and AI assistants through the [Model Co
 
 **Available MCP Tools:**
 
-| Tool                      | Description                                               |
-| ------------------------- | --------------------------------------------------------- |
-| `get_block_usage`         | Get detailed block documentation with fields and examples |
-| `search_blocks`           | Search blocks by keyword (Chinese/English)                |
-| `list_blocks_by_category` | Browse blocks by category                                 |
-| `get_workspace_state`     | Read current workspace and block arrangement              |
-| `update_workspace`        | Add, modify, delete, or replace blocks                    |
-| `refresh_editor`          | Sync changes to the visual editor                         |
-| `get_platform_config`     | Get board configuration and PlatformIO settings           |
-| `get_board_pins`          | Query pin capabilities (digital, analog, PWM, I2C)        |
-| `get_generated_code`      | Read the generated Arduino code                           |
+| Tool                      | Description                                                     |
+| ------------------------- | --------------------------------------------------------------- |
+| `get_block_usage`         | Get detailed block documentation with fields and JSON templates |
+| `search_blocks`           | Search blocks by keyword (Chinese/English), sorted by relevance |
+| `list_blocks_by_category` | Browse blocks by category (13 categories available)             |
+| `get_workspace_state`     | Read current workspace, block arrangement, and board config     |
+| `update_workspace`        | Add, modify, delete, or replace blocks in workspace             |
+| `refresh_editor`          | Sync changes to the visual editor after workspace updates       |
+| `get_platform_config`     | Get board configuration and PlatformIO settings                 |
+| `get_board_pins`          | Query pin capabilities (digital, analog, PWM, I2C, SPI)         |
+| `get_generated_code`      | Read the generated Arduino/MicroPython code                     |
 
 **Getting Started with AI:**
 
@@ -150,10 +150,10 @@ Seamless integration with GitHub Copilot and AI assistants through the [Model Co
 3. Use natural language in Copilot chat:
     - "What servo blocks are available?"
     - "Add a servo setup block on pin 9"
-    - "Change the servo angle to 45 degrees"
+    - "Show me blocks in the motors category"
     - "Show me the generated Arduino code"
 
-> 💡 **Tip**: The AI maintains workspace backup (main.json.bak) for safe modifications.
+> 💡 **Tip**: The AI maintains workspace backup (`main.json.bak`) for safe modifications. Use `get_block_usage` with context parameter to get ready-to-use JSON templates.
 
 ---
 
