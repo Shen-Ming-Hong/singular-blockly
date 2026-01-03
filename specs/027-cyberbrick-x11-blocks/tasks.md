@@ -315,5 +315,6 @@ Developer C: User Story 4 (LED 燈條) - T025-T030
 ### 已移除的翻譯鍵 (不再需要)
 
 以下翻譯鍵已移除，不需要新增：
+
 -   ~~`X11_SERVO_180_STEPPING_*`~~ (平滑移動功能因 API bug 移除)
 -   ~~`X11_LED_OFF`、`X11_LED_OFF_TOOLTIP`~~ (使用者可設定 RGB=(0,0,0) 達成關閉效果)
