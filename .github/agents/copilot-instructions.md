@@ -30,6 +30,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - JSON 翻譯檔案 (`media/locales/{lang}/messages.js`) (024-i18n-hardcode-fix)
 - TypeScript 5.9.3 (Extension) / JavaScript ES2022 (WebView) + Blockly 12.3.1, VSCode API 1.105.0+, MCP SDK 1.24.3 (025-fix-drag-reload-crash)
 - JSON 檔案 (`main.json` 工作區狀態, `.bak` 備份) (025-fix-drag-reload-crash)
+- TypeScript 5.9.3 | JavaScript ES6+ + Blockly 12.3.1 | VSCode API 1.105.0+ | PlatformIO CLI (026-unified-upload-ui)
+- JSON 檔案 (blockly/main.json, platformio.ini) (026-unified-upload-ui)
 
 -   TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly) (011-esp32-pwm-setup)
 
@@ -58,9 +60,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 026-unified-upload-ui: Added TypeScript 5.9.3 | JavaScript ES6+ + Blockly 12.3.1 | VSCode API 1.105.0+ | PlatformIO CLI
 - 025-fix-drag-reload-crash: Added TypeScript 5.9.3 (Extension) / JavaScript ES2022 (WebView) + Blockly 12.3.1, VSCode API 1.105.0+, MCP SDK 1.24.3
 - 024-i18n-hardcode-fix: Added TypeScript 5.9.3 + VSCode Extension API 1.105.0+, Blockly 12.3.1
-- 023-i18n-audit-optimization: Added JavaScript (Node.js 22+), TypeScript 5.9.3 + Node.js fs 模組、glob 模式匹配
 
 
 <!-- MANUAL ADDITIONS START -->
