@@ -771,8 +771,8 @@ window.languageManager.loadMessages('zh-hant', {
 	DIALOG_SELECT_BACKUP_TITLE: '選擇要預覽的備份檔案',
 	DIALOG_BACKUP_FILES_LABEL: '備份檔案',
 
-	// X11 擴充板
-	CATEGORY_X11: 'X11 擴充板',
+	// X11 擴展板
+	CATEGORY_X11: 'X11 擴展板',
 	X11_LABEL_SERVOS: '伺服馬達',
 	X11_LABEL_MOTORS: '直流馬達',
 	X11_LABEL_LEDS: 'LED 燈條',
