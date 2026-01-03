@@ -717,6 +717,30 @@ window.languageManager.loadMessages('ja', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'プログラムのアップロードに失敗しました',
 	ERROR_UPLOAD_RESTART_FAILED: 'デバイスの再起動に失敗しました',
 
+	// Arduino アップロードボタン
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'コンパイル＆アップロード',
+	UPLOAD_SELECT_BOARD: '先にボードを選択してください',
+
+	// Arduino アップロード段階
+	ARDUINO_STAGE_SYNCING: '設定を同期中',
+	ARDUINO_STAGE_SAVING: 'ワークスペースを保存中',
+	ARDUINO_STAGE_CHECKING: 'コンパイラを確認中',
+	ARDUINO_STAGE_DETECTING: 'ボードを検出中',
+	ARDUINO_STAGE_COMPILING: 'コンパイル中',
+	ARDUINO_STAGE_UPLOADING: 'アップロード中',
+
+	// Arduino アップロード結果
+	ARDUINO_COMPILE_SUCCESS: 'コンパイル成功！',
+	ARDUINO_UPLOAD_SUCCESS: 'アップロード成功！',
+
+	// Arduino アップロードエラー
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLIが見つかりません。先にPlatformIOをインストールしてください。',
+	ERROR_ARDUINO_COMPILE_FAILED: 'コンパイルに失敗しました',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'アップロードに失敗しました',
+	ERROR_ARDUINO_NO_WORKSPACE: '先にプロジェクトフォルダを開いてください',
+	ERROR_ARDUINO_TIMEOUT: '操作がタイムアウトしました',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'デバイスが切断されました',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'バックアップ「{0}」を削除してもよろしいですか？',
 	BACKUP_CONFIRM_RESTORE: 'バックアップ「{0}」を復元してもよろしいですか？現在のワークスペースは上書きされます。',

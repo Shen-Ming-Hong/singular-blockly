@@ -154,7 +154,11 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 			await webViewManager.createAndShowWebView();
 		} catch (error) {
 			log('Error opening Blockly editor:', 'error', error);
-			const errorMsg = await localeService.getLocalizedMessage('VSCODE_FAILED_OPEN_EDITOR', error);
+			const errorMsg = await localeService.getLocalizedMessage(
+				'VSCODE_FAILED_OPEN_EDITOR',
+				'Failed to open Blockly editor: {0}',
+				String(error)
+			);
 			vscodeApi.window.showErrorMessage(errorMsg);
 		}
 	});
@@ -267,7 +271,11 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 			await webViewManager.previewBackup(backupPath);
 		} catch (error) {
 			log('Error previewing backup:', 'error', error);
-			const errorMsg = await localeService.getLocalizedMessage('VSCODE_FAILED_PREVIEW_BACKUP', error);
+			const errorMsg = await localeService.getLocalizedMessage(
+				'VSCODE_FAILED_PREVIEW_BACKUP',
+				'Failed to preview backup: {0}',
+				String(error)
+			);
 			vscodeApi.window.showErrorMessage(errorMsg);
 		}
 	});

@@ -717,6 +717,30 @@ window.languageManager.loadMessages('it', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Impossibile caricare il programma',
 	ERROR_UPLOAD_RESTART_FAILED: 'Impossibile riavviare il dispositivo',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Compila e Carica',
+	UPLOAD_SELECT_BOARD: 'Seleziona prima una scheda',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Sincronizzazione impostazioni',
+	ARDUINO_STAGE_SAVING: 'Salvataggio area di lavoro',
+	ARDUINO_STAGE_CHECKING: 'Verifica compilatore',
+	ARDUINO_STAGE_DETECTING: 'Rilevamento scheda',
+	ARDUINO_STAGE_COMPILING: 'Compilazione',
+	ARDUINO_STAGE_UPLOADING: 'Caricamento',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Compilazione riuscita!',
+	ARDUINO_UPLOAD_SUCCESS: 'Caricamento riuscito!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI non trovato. Installa prima PlatformIO.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Compilazione fallita',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Caricamento fallito',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Apri prima una cartella di progetto',
+	ERROR_ARDUINO_TIMEOUT: 'Operazione scaduta',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Dispositivo disconnesso',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Sei sicuro di voler eliminare il backup "{0}"?',
 	BACKUP_CONFIRM_RESTORE: 'Sei sicuro di voler ripristinare il backup "{0}"? Questo sovrascriverà lo spazio di lavoro corrente.',

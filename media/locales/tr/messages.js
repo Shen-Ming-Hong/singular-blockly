@@ -720,6 +720,30 @@ window.languageManager.loadMessages('tr', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Program yüklenemedi',
 	ERROR_UPLOAD_RESTART_FAILED: 'Cihaz yeniden başlatılamadı',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Derle ve Yükle',
+	UPLOAD_SELECT_BOARD: 'Lütfen önce bir kart seçin',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Ayarlar senkronize ediliyor',
+	ARDUINO_STAGE_SAVING: 'Çalışma alanı kaydediliyor',
+	ARDUINO_STAGE_CHECKING: 'Derleyici kontrol ediliyor',
+	ARDUINO_STAGE_DETECTING: 'Kart algılanıyor',
+	ARDUINO_STAGE_COMPILING: 'Derleniyor',
+	ARDUINO_STAGE_UPLOADING: 'Yükleniyor',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Derleme başarılı!',
+	ARDUINO_UPLOAD_SUCCESS: 'Yükleme başarılı!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI bulunamadı. Lütfen önce PlatformIO kurun.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Derleme başarısız',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Yükleme başarısız',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Lütfen önce bir proje klasörü açın',
+	ERROR_ARDUINO_TIMEOUT: 'İşlem zaman aşımına uğradı',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Cihazın bağlantısı kesildi',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: '"{0}" yedeklemesini silmek istediğinizden emin misiniz?',
 	BACKUP_CONFIRM_RESTORE:

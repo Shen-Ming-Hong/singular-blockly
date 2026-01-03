@@ -704,7 +704,7 @@ window.languageManager.loadMessages('en', {
 	UPLOAD_EMPTY_WORKSPACE: 'Workspace is empty, please add blocks first',
 	UPLOAD_NO_CODE: 'Unable to generate code',
 
-	// Upload progress stages
+	// Upload progress stages (MicroPython/CyberBrick)
 	UPLOAD_STAGE_PREPARING: 'Preparing',
 	UPLOAD_STAGE_CHECKING: 'Checking tools',
 	UPLOAD_STAGE_INSTALLING: 'Installing tools',
@@ -715,7 +715,7 @@ window.languageManager.loadMessages('en', {
 	UPLOAD_STAGE_RESTARTING: 'Restarting device',
 	UPLOAD_STAGE_COMPLETED: 'Completed',
 
-	// Upload error messages
+	// Upload error messages (MicroPython/CyberBrick)
 	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Only CyberBrick board is supported',
 	ERROR_UPLOAD_CODE_EMPTY: 'Code cannot be empty',
 	ERROR_UPLOAD_NO_PYTHON: 'PlatformIO Python environment not found. Please install PlatformIO first.',
@@ -724,6 +724,30 @@ window.languageManager.loadMessages('en', {
 	ERROR_UPLOAD_RESET_FAILED: 'Failed to reset device',
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Failed to upload program',
 	ERROR_UPLOAD_RESTART_FAILED: 'Failed to restart device',
+
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Compile & Upload',
+	UPLOAD_SELECT_BOARD: 'Please select a board first',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Syncing settings',
+	ARDUINO_STAGE_SAVING: 'Saving workspace',
+	ARDUINO_STAGE_CHECKING: 'Checking compiler',
+	ARDUINO_STAGE_DETECTING: 'Detecting board',
+	ARDUINO_STAGE_COMPILING: 'Compiling',
+	ARDUINO_STAGE_UPLOADING: 'Uploading',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Compile successful!',
+	ARDUINO_UPLOAD_SUCCESS: 'Upload successful!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI not found. Please install PlatformIO first.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Compilation failed',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Upload failed',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Please open a project folder first',
+	ERROR_ARDUINO_TIMEOUT: 'Operation timed out',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Are you sure you want to delete backup "{0}"?',

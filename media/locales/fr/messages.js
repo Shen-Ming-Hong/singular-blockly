@@ -719,6 +719,30 @@ window.languageManager.loadMessages('fr', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Échec du téléversement du programme',
 	ERROR_UPLOAD_RESTART_FAILED: "Échec du redémarrage de l'appareil",
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Compiler & Téléverser',
+	UPLOAD_SELECT_BOARD: "Veuillez d'abord sélectionner une carte",
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Synchronisation des paramètres',
+	ARDUINO_STAGE_SAVING: "Enregistrement de l'espace de travail",
+	ARDUINO_STAGE_CHECKING: 'Vérification du compilateur',
+	ARDUINO_STAGE_DETECTING: 'Détection de la carte',
+	ARDUINO_STAGE_COMPILING: 'Compilation',
+	ARDUINO_STAGE_UPLOADING: 'Téléversement',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Compilation réussie !',
+	ARDUINO_UPLOAD_SUCCESS: 'Téléversement réussi !',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: "PlatformIO CLI introuvable. Veuillez d'abord installer PlatformIO.",
+	ERROR_ARDUINO_COMPILE_FAILED: 'Échec de la compilation',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Échec du téléversement',
+	ERROR_ARDUINO_NO_WORKSPACE: "Veuillez d'abord ouvrir un dossier de projet",
+	ERROR_ARDUINO_TIMEOUT: "L'opération a expiré",
+	ERROR_ARDUINO_DEVICE_DISCONNECT: "L'appareil a été déconnecté",
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Êtes-vous sûr de vouloir supprimer la sauvegarde "{0}" ?',
 	BACKUP_CONFIRM_RESTORE: 'Êtes-vous sûr de vouloir restaurer la sauvegarde "{0}" ? Cela écrasera l\'espace de travail actuel.',

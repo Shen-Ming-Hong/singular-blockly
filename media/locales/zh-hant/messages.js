@@ -718,6 +718,30 @@ window.languageManager.loadMessages('zh-hant', {
 	ERROR_UPLOAD_UPLOAD_FAILED: '程式上傳失敗',
 	ERROR_UPLOAD_RESTART_FAILED: '裝置重啟失敗',
 
+	// Arduino 上傳按鈕
+	UPLOAD_BUTTON_TITLE_ARDUINO: '編譯並上傳',
+	UPLOAD_SELECT_BOARD: '請先選擇開發板',
+
+	// Arduino 上傳階段
+	ARDUINO_STAGE_SYNCING: '同步設定',
+	ARDUINO_STAGE_SAVING: '儲存工作區',
+	ARDUINO_STAGE_CHECKING: '檢查編譯器',
+	ARDUINO_STAGE_DETECTING: '偵測開發板',
+	ARDUINO_STAGE_COMPILING: '編譯中',
+	ARDUINO_STAGE_UPLOADING: '上傳中',
+
+	// Arduino 上傳結果
+	ARDUINO_COMPILE_SUCCESS: '編譯成功！',
+	ARDUINO_UPLOAD_SUCCESS: '上傳成功！',
+
+	// Arduino 上傳錯誤
+	ERROR_ARDUINO_PIO_NOT_FOUND: '找不到 PlatformIO CLI，請先安裝 PlatformIO',
+	ERROR_ARDUINO_COMPILE_FAILED: '編譯失敗',
+	ERROR_ARDUINO_UPLOAD_FAILED: '上傳失敗',
+	ERROR_ARDUINO_NO_WORKSPACE: '請先開啟專案資料夾',
+	ERROR_ARDUINO_TIMEOUT: '操作逾時',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: '裝置已斷開連接',
+
 	// 備份訊息
 	BACKUP_CONFIRM_DELETE: '確定要刪除備份「{0}」嗎？',
 	BACKUP_CONFIRM_RESTORE: '確定要還原備份「{0}」嗎？這將覆蓋當前的工作區。',

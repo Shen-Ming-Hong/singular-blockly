@@ -11,6 +11,8 @@ import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, ComPortInfo } from '../services/micropythonUploader';
+import { ArduinoUploader } from '../services/arduinoUploader';
+import { ArduinoUploadProgress, ArduinoUploadResult, ArduinoUploadRequest, getBoardLanguage } from '../types/arduino';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -33,6 +35,18 @@ export function _setVSCodeApi(api: typeof vscode): void {
  */
 export function _reset(): void {
 	vscodeApi = vscode;
+}
+
+/**
+ * 上傳請求介面（擴展支援 Arduino）
+ */
+interface UploadRequestMessage {
+	code: string;
+	board: string;
+	port?: string;
+	lib_deps?: string[];
+	build_flags?: string[];
+	lib_ldf_mode?: string;
 }
 
 /**
@@ -301,7 +315,11 @@ export class WebViewMessageHandler {
 				if (needsUpdate) {
 					// 使用 setTimeout 延遲訊息顯示，避免干擾面板顯示
 					setTimeout(async () => {
-						const boardUpdatedMsg = await this.localeService.getLocalizedMessage('VSCODE_BOARD_UPDATED', message.board);
+						const boardUpdatedMsg = await this.localeService.getLocalizedMessage(
+							'VSCODE_BOARD_UPDATED',
+							'Board configuration updated to: {0}',
+							message.board
+						);
 						const reloadMsg = isFirstTime ? await this.localeService.getLocalizedMessage('VSCODE_RELOAD_REQUIRED') : '';
 						const reloadBtn = await this.localeService.getLocalizedMessage('VSCODE_RELOAD');
 
@@ -503,7 +521,11 @@ export class WebViewMessageHandler {
 	private async handlePromptNewVariable(message: any): Promise<void> {
 		try {
 			const promptMsg = message.isRename
-				? await this.localeService.getLocalizedMessage('VSCODE_ENTER_NEW_VARIABLE_NAME', message.currentName)
+				? await this.localeService.getLocalizedMessage(
+						'VSCODE_ENTER_NEW_VARIABLE_NAME',
+						'Enter new variable name (current: {0})',
+						message.currentName
+				  )
 				: await this.localeService.getLocalizedMessage('VSCODE_ENTER_VARIABLE_NAME');
 
 			const emptyErrorMsg = await this.localeService.getLocalizedMessage('VSCODE_VARIABLE_NAME_EMPTY');
@@ -542,7 +564,11 @@ export class WebViewMessageHandler {
 	 */
 	private async handleConfirmDeleteVariable(message: any): Promise<void> {
 		try {
-			const confirmMsg = await this.localeService.getLocalizedMessage('VSCODE_CONFIRM_DELETE_VARIABLE', message.variableName);
+			const confirmMsg = await this.localeService.getLocalizedMessage(
+				'VSCODE_CONFIRM_DELETE_VARIABLE',
+				'Are you sure you want to delete variable "{0}"?',
+				message.variableName
+			);
 			const okBtn = await this.localeService.getLocalizedMessage('VSCODE_OK');
 			const cancelBtn = await this.localeService.getLocalizedMessage('VSCODE_CANCEL');
 
@@ -1093,13 +1119,14 @@ export class WebViewMessageHandler {
 		}
 	}
 
-	// ===== CyberBrick MicroPython 上傳功能 - T028/T029/T031 =====
+	// ===== 統一上傳功能 - CyberBrick MicroPython & Arduino C++ =====
 
 	/**
 	 * 處理上傳請求
+	 * 根據板子類型路由到對應的上傳服務
 	 * @param message 上傳請求訊息
 	 */
-	private async handleRequestUpload(message: { code: string; board: string; port?: string }): Promise<void> {
+	private async handleRequestUpload(message: UploadRequestMessage): Promise<void> {
 		log('[blockly] 收到上傳請求', 'info', { board: message.board, hasPort: !!message.port });
 
 		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
@@ -1111,13 +1138,44 @@ export class WebViewMessageHandler {
 				duration: 0,
 				error: {
 					stage: 'preparing',
-					message: '沒有開啟的工作區',
+					message: 'No workspace folder open',
 				},
 			});
 			return;
 		}
 
 		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+		const boardLanguage = getBoardLanguage(message.board);
+
+		// 根據板子語言類型路由到對應的上傳服務
+		if (boardLanguage === 'micropython') {
+			// MicroPython 上傳流程（CyberBrick）
+			await this.handleMicropythonUpload(workspaceRoot, message);
+		} else if (boardLanguage === 'arduino') {
+			// Arduino C++ 上傳流程
+			await this.handleArduinoUpload(workspaceRoot, message);
+		} else {
+			// 未知板子類型
+			log('[blockly] 未知的板子類型', 'warn', { board: message.board });
+			this.sendUploadResult({
+				success: false,
+				timestamp: new Date().toISOString(),
+				port: 'none',
+				duration: 0,
+				error: {
+					stage: 'preparing',
+					message: 'Please select a board first',
+				},
+			});
+		}
+	}
+
+	/**
+	 * 處理 MicroPython 上傳（CyberBrick）
+	 * @param workspaceRoot 工作區根目錄
+	 * @param message 上傳請求訊息
+	 */
+	private async handleMicropythonUpload(workspaceRoot: string, message: UploadRequestMessage): Promise<void> {
 		const uploader = new MicropythonUploader(workspaceRoot);
 
 		try {
@@ -1134,7 +1192,65 @@ export class WebViewMessageHandler {
 
 			this.sendUploadResult(result);
 		} catch (error) {
-			log('[blockly] 上傳過程發生未預期錯誤', 'error', error);
+			log('[blockly] MicroPython 上傳過程發生未預期錯誤', 'error', error);
+			this.sendUploadResult({
+				success: false,
+				timestamp: new Date().toISOString(),
+				port: message.port || 'unknown',
+				duration: 0,
+				error: {
+					stage: 'failed',
+					message: error instanceof Error ? error.message : String(error),
+				},
+			});
+		}
+	}
+
+	/**
+	 * 處理 Arduino C++ 上傳
+	 * @param workspaceRoot 工作區根目錄
+	 * @param message 上傳請求訊息
+	 */
+	private async handleArduinoUpload(workspaceRoot: string, message: UploadRequestMessage): Promise<void> {
+		const uploader = new ArduinoUploader(workspaceRoot);
+
+		try {
+			const request: ArduinoUploadRequest = {
+				code: message.code,
+				board: message.board,
+				port: message.port,
+				lib_deps: message.lib_deps,
+				build_flags: message.build_flags,
+				lib_ldf_mode: message.lib_ldf_mode,
+			};
+
+			const result = await uploader.upload(request, (progress: ArduinoUploadProgress) => {
+				// 轉換 Arduino 進度格式為通用格式
+				this.sendUploadProgress({
+					stage: progress.stage as any, // Arduino stages are compatible
+					progress: progress.progress,
+					message: progress.message,
+					error: progress.error,
+				});
+			});
+
+			// 轉換 Arduino 結果格式為通用格式
+			this.sendUploadResult({
+				success: result.success,
+				timestamp: result.timestamp,
+				port: result.port,
+				duration: result.duration,
+				mode: result.mode, // 包含 'compile-only' | 'upload'
+				error: result.error
+					? {
+							stage: result.error.stage as any,
+							message: result.error.message,
+							details: result.error.details,
+					  }
+					: undefined,
+			});
+		} catch (error) {
+			log('[blockly] Arduino 上傳過程發生未預期錯誤', 'error', error);
 			this.sendUploadResult({
 				success: false,
 				timestamp: new Date().toISOString(),
@@ -1161,9 +1277,9 @@ export class WebViewMessageHandler {
 
 	/**
 	 * 發送上傳結果到 WebView
-	 * @param result 上傳結果
+	 * @param result 上傳結果（支援 Arduino mode 欄位）
 	 */
-	private sendUploadResult(result: UploadResult): void {
+	private sendUploadResult(result: UploadResult & { mode?: 'compile-only' | 'upload' }): void {
 		this.panel.webview.postMessage({
 			command: 'uploadResult',
 			...result,

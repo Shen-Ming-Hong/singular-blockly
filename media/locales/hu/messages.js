@@ -723,6 +723,30 @@ window.languageManager.loadMessages('hu', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Nem sikerült feltölteni a programot',
 	ERROR_UPLOAD_RESTART_FAILED: 'Nem sikerült újraindítani az eszközt',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Fordítás és Feltöltés',
+	UPLOAD_SELECT_BOARD: 'Kérjük, először válasszon egy panelt',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Beállítások szinkronizálása',
+	ARDUINO_STAGE_SAVING: 'Munkaterület mentése',
+	ARDUINO_STAGE_CHECKING: 'Fordító ellenőrzése',
+	ARDUINO_STAGE_DETECTING: 'Panel észlelése',
+	ARDUINO_STAGE_COMPILING: 'Fordítás',
+	ARDUINO_STAGE_UPLOADING: 'Feltöltés',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Fordítás sikeres!',
+	ARDUINO_UPLOAD_SUCCESS: 'Feltöltés sikeres!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI nem található. Kérjük, először telepítse a PlatformIO-t.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Fordítás sikertelen',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Feltöltés sikertelen',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Kérjük, először nyisson meg egy projektmappát',
+	ERROR_ARDUINO_TIMEOUT: 'A művelet időtúllépése',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Az eszköz lecsatlakozott',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Biztosan törölni szeretné a(z) "{0}" biztonsági mentést?',
 	BACKUP_CONFIRM_RESTORE: 'Biztosan visszaállítja a(z) "{0}" biztonsági mentést? Ez felülírja az aktuális munkaterületet.',

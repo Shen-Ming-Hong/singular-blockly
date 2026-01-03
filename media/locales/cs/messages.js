@@ -719,6 +719,30 @@ window.languageManager.loadMessages('cs', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Nepodařilo se nahrát program',
 	ERROR_UPLOAD_RESTART_FAILED: 'Nepodařilo se restartovat zařízení',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Kompilovat a Nahrát',
+	UPLOAD_SELECT_BOARD: 'Nejprve vyberte desku',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Synchronizace nastavení',
+	ARDUINO_STAGE_SAVING: 'Ukládání pracovního prostoru',
+	ARDUINO_STAGE_CHECKING: 'Kontrola kompilátoru',
+	ARDUINO_STAGE_DETECTING: 'Detekce desky',
+	ARDUINO_STAGE_COMPILING: 'Kompilace',
+	ARDUINO_STAGE_UPLOADING: 'Nahrávání',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Kompilace úspěšná!',
+	ARDUINO_UPLOAD_SUCCESS: 'Nahrávání úspěšné!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI nenalezeno. Nejprve nainstalujte PlatformIO.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Kompilace selhala',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Nahrávání selhalo',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Nejprve otevřete složku projektu',
+	ERROR_ARDUINO_TIMEOUT: 'Časový limit operace vypršel',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Zařízení bylo odpojeno',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Opravdu chcete smazat zálohu "{0}"?',
 	BACKUP_CONFIRM_RESTORE: 'Opravdu chcete obnovit zálohu "{0}"? Tím se přepíše aktuální pracovní prostor.',

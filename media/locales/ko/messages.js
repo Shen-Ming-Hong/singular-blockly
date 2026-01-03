@@ -716,6 +716,30 @@ window.languageManager.loadMessages('ko', {
 	ERROR_UPLOAD_UPLOAD_FAILED: '프로그램 업로드에 실패했습니다',
 	ERROR_UPLOAD_RESTART_FAILED: '장치 재시작에 실패했습니다',
 
+	// Arduino 업로드 버튼
+	UPLOAD_BUTTON_TITLE_ARDUINO: '컴파일 및 업로드',
+	UPLOAD_SELECT_BOARD: '먼저 보드를 선택해 주세요',
+
+	// Arduino 업로드 단계
+	ARDUINO_STAGE_SYNCING: '설정 동기화 중',
+	ARDUINO_STAGE_SAVING: '작업 공간 저장 중',
+	ARDUINO_STAGE_CHECKING: '컴파일러 확인 중',
+	ARDUINO_STAGE_DETECTING: '보드 감지 중',
+	ARDUINO_STAGE_COMPILING: '컴파일 중',
+	ARDUINO_STAGE_UPLOADING: '업로드 중',
+
+	// Arduino 업로드 결과
+	ARDUINO_COMPILE_SUCCESS: '컴파일 성공!',
+	ARDUINO_UPLOAD_SUCCESS: '업로드 성공!',
+
+	// Arduino 업로드 오류
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI를 찾을 수 없습니다. 먼저 PlatformIO를 설치해 주세요.',
+	ERROR_ARDUINO_COMPILE_FAILED: '컴파일에 실패했습니다',
+	ERROR_ARDUINO_UPLOAD_FAILED: '업로드에 실패했습니다',
+	ERROR_ARDUINO_NO_WORKSPACE: '먼저 프로젝트 폴더를 열어 주세요',
+	ERROR_ARDUINO_TIMEOUT: '작업 시간이 초과되었습니다',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: '장치 연결이 끊어졌습니다',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: '백업 "{0}"을(를) 삭제하시겠습니까?',
 	BACKUP_CONFIRM_RESTORE: '백업 "{0}"을(를) 복원하시겠습니까? 현재 작업 공간이 덮어씌워집니다.',

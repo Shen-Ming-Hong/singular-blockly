@@ -719,6 +719,30 @@ window.languageManager.loadMessages('es', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Error al cargar el programa',
 	ERROR_UPLOAD_RESTART_FAILED: 'Error al reiniciar el dispositivo',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Compilar y Cargar',
+	UPLOAD_SELECT_BOARD: 'Por favor seleccione una placa primero',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Sincronizando configuración',
+	ARDUINO_STAGE_SAVING: 'Guardando espacio de trabajo',
+	ARDUINO_STAGE_CHECKING: 'Verificando compilador',
+	ARDUINO_STAGE_DETECTING: 'Detectando placa',
+	ARDUINO_STAGE_COMPILING: 'Compilando',
+	ARDUINO_STAGE_UPLOADING: 'Cargando',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: '¡Compilación exitosa!',
+	ARDUINO_UPLOAD_SUCCESS: '¡Carga exitosa!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI no encontrado. Por favor instale PlatformIO primero.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Fallo en la compilación',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Fallo en la carga',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Por favor abra una carpeta de proyecto primero',
+	ERROR_ARDUINO_TIMEOUT: 'La operación expiró',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Dispositivo desconectado',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: '¿Está seguro de que desea eliminar la copia de seguridad "{0}"?',
 	BACKUP_CONFIRM_RESTORE:

@@ -722,6 +722,30 @@ window.languageManager.loadMessages('pl', {
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Nie udało się przesłać programu',
 	ERROR_UPLOAD_RESTART_FAILED: 'Nie udało się zrestartować urządzenia',
 
+	// Arduino Upload Button
+	UPLOAD_BUTTON_TITLE_ARDUINO: 'Kompiluj i Wgraj',
+	UPLOAD_SELECT_BOARD: 'Najpierw wybierz płytkę',
+
+	// Arduino Upload Stages
+	ARDUINO_STAGE_SYNCING: 'Synchronizacja ustawień',
+	ARDUINO_STAGE_SAVING: 'Zapisywanie obszaru roboczego',
+	ARDUINO_STAGE_CHECKING: 'Sprawdzanie kompilatora',
+	ARDUINO_STAGE_DETECTING: 'Wykrywanie płytki',
+	ARDUINO_STAGE_COMPILING: 'Kompilacja',
+	ARDUINO_STAGE_UPLOADING: 'Wgrywanie',
+
+	// Arduino Upload Results
+	ARDUINO_COMPILE_SUCCESS: 'Kompilacja ukończona!',
+	ARDUINO_UPLOAD_SUCCESS: 'Wgrywanie ukończone!',
+
+	// Arduino Upload Errors
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'Nie znaleziono PlatformIO CLI. Najpierw zainstaluj PlatformIO.',
+	ERROR_ARDUINO_COMPILE_FAILED: 'Kompilacja nie powiodła się',
+	ERROR_ARDUINO_UPLOAD_FAILED: 'Wgrywanie nie powiodło się',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Najpierw otwórz folder projektu',
+	ERROR_ARDUINO_TIMEOUT: 'Przekroczono limit czasu operacji',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Urządzenie zostało odłączone',
+
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Czy na pewno chcesz usunąć kopię zapasową "{0}"?',
 	BACKUP_CONFIRM_RESTORE: 'Czy na pewno chcesz przywrócić kopię zapasową "{0}"? To nadpisze bieżący obszar roboczy.',
