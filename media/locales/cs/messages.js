@@ -771,4 +771,38 @@ window.languageManager.loadMessages('cs', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Vyberte záložní soubor pro náhled',
 	DIALOG_BACKUP_FILES_LABEL: 'Záložní soubory',
+
+	// X11 Rozšiřující deska
+	CATEGORY_X11: 'X11 Rozšíření',
+	X11_LABEL_SERVOS: 'Servomotory',
+	X11_LABEL_MOTORS: 'Motory',
+	X11_LABEL_LEDS: 'LED',
+
+	// X11 180° Servo bloky
+	X11_SERVO_180_ANGLE_PREFIX: 'Nastav servo',
+	X11_SERVO_180_ANGLE_SUFFIX: 'úhel',
+	X11_SERVO_180_ANGLE_TOOLTIP: 'Nastav úhel 180° serva (0-180 stupňů)',
+
+	// X11 360° Servo bloky
+	X11_SERVO_360_SPEED_PREFIX: 'Nastav servo',
+	X11_SERVO_360_SPEED_SUFFIX: 'rychlost',
+	X11_SERVO_360_SPEED_TOOLTIP: 'Nastav rychlost 360° kontinualne rotačního serva (-100 až 100, záporné=zpět)',
+
+	// X11 Blok zastavení serva
+	X11_SERVO_STOP: 'Zastav servo',
+	X11_SERVO_STOP_TOOLTIP: 'Zastav určené servo',
+
+	// X11 Motor bloky
+	X11_MOTOR_SPEED_PREFIX: 'Nastav motor',
+	X11_MOTOR_SPEED_SUFFIX: 'rychlost',
+	X11_MOTOR_SPEED_TOOLTIP: 'Nastav rychlost DC motoru (-2048 až 2048, záporné=zpět)',
+	X11_MOTOR_STOP: 'Zastav motor',
+	X11_MOTOR_STOP_TOOLTIP: 'Zastav určený motor',
+
+	// X11 LED bloky
+	X11_LED_SET_COLOR_PREFIX: 'LED pásek',
+	X11_LED_SET_COLOR_INDEX: 'index',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'nastav barvu R',
+	X11_LED_SET_COLOR_TOOLTIP: 'Nastav barvu pixelu LED pásku (index 0=první pixel, nebo všechny)',
+	X11_LED_INDEX_ALL: 'Všechny',
 });

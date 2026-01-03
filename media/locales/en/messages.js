@@ -777,4 +777,38 @@ window.languageManager.loadMessages('en', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Select backup file to preview',
 	DIALOG_BACKUP_FILES_LABEL: 'Backup Files',
+
+	// X11 Extension Board
+	CATEGORY_X11: 'X11 Extension',
+	X11_LABEL_SERVOS: 'Servos',
+	X11_LABEL_MOTORS: 'Motors',
+	X11_LABEL_LEDS: 'LEDs',
+
+	// X11 Servo 180° Blocks
+	X11_SERVO_180_ANGLE_PREFIX: 'Set servo',
+	X11_SERVO_180_ANGLE_SUFFIX: 'angle',
+	X11_SERVO_180_ANGLE_TOOLTIP: 'Set 180° servo angle (0-180 degrees)',
+
+	// X11 Servo 360° Blocks
+	X11_SERVO_360_SPEED_PREFIX: 'Set servo',
+	X11_SERVO_360_SPEED_SUFFIX: 'speed',
+	X11_SERVO_360_SPEED_TOOLTIP: 'Set 360° continuous rotation servo speed (-100 to 100, negative=reverse)',
+
+	// X11 Servo Stop Block
+	X11_SERVO_STOP: 'Stop servo',
+	X11_SERVO_STOP_TOOLTIP: 'Stop the specified servo',
+
+	// X11 Motor Blocks
+	X11_MOTOR_SPEED_PREFIX: 'Set motor',
+	X11_MOTOR_SPEED_SUFFIX: 'speed',
+	X11_MOTOR_SPEED_TOOLTIP: 'Set DC motor speed (-2048 to 2048, negative=reverse)',
+	X11_MOTOR_STOP: 'Stop motor',
+	X11_MOTOR_STOP_TOOLTIP: 'Stop the specified motor',
+
+	// X11 LED Blocks
+	X11_LED_SET_COLOR_PREFIX: 'LED strip',
+	X11_LED_SET_COLOR_INDEX: 'index',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'set color R',
+	X11_LED_SET_COLOR_TOOLTIP: 'Set LED strip pixel color (index 0=first pixel, or all)',
+	X11_LED_INDEX_ALL: 'All',
 });

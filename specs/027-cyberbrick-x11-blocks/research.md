@@ -58,23 +58,21 @@
 
 ---
 
-### 3. timing_proc() 自動注入機制
+### 3. ~~timing_proc() 自動注入機制~~ (已移除)
 
-**決策**: 在 MicroPython 生成器的 `finish()` 方法中檢測是否使用了平滑移動積木，若有則在主程式結尾注入 `servos.timing_proc()`
+**狀態**: 已決定移除此功能
 
-**調查結果**:
+**原因**:
 
--   現有 `finish()` 方法已處理 import 和硬體初始化的注入
--   可透過新增 `generator.requiresTimingProc` 旗標追蹤是否需要注入
--   只有 `set_angle_stepping` 需要 timing_proc()
--   `set_angle`、`set_speed`、`stop` 都是立即生效，不需要 timing_proc()
+-   CyberBrick API 存在 bug（`__init__` 拼寫 `sensitity`，但 `timing_proc` 使用 `sensitivity`）
+-   `set_angle_stepping` 在速度 < 100 時需要持續循環呼叫 `timing_proc()`，實作複雜
+-   使用者可透過「角度控制 + time + sleep」自行實現類似效果
 
-**理由**: 自動注入降低使用者學習門檻，避免忘記呼叫 timing_proc() 導致平滑移動失效
+**移除範圍**:
 
-**實作方式**:
-
-1. 在 `servos_stepping` 生成器中設置 `generator.requiresTimingProc = true`
-2. 在 `finish()` 中檢查此旗標，若為 true 則在 main() 結尾加入 `servos.timing_proc()`
+-   `x11_servo_180_stepping` 積木
+-   `requiresTimingProc` 旗標
+-   所有 `X11_SERVO_180_STEPPING_*` i18n 鍵
 
 ---
 

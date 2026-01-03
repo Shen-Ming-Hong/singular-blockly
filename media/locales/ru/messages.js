@@ -770,4 +770,38 @@ window.languageManager.loadMessages('ru', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Выберите файл резервной копии для предварительного просмотра',
 	DIALOG_BACKUP_FILES_LABEL: 'Файлы резервных копий',
+
+	// X11 Плата расширения
+	CATEGORY_X11: 'X11 Расширение',
+	X11_LABEL_SERVOS: 'Сервомоторы',
+	X11_LABEL_MOTORS: 'Моторы',
+	X11_LABEL_LEDS: 'Светодиоды',
+
+	// X11 180° Серво блоки
+	X11_SERVO_180_ANGLE_PREFIX: 'Установить серво',
+	X11_SERVO_180_ANGLE_SUFFIX: 'угол',
+	X11_SERVO_180_ANGLE_TOOLTIP: 'Установить угол 180° серво (0-180 градусов)',
+
+	// X11 360° Серво блоки
+	X11_SERVO_360_SPEED_PREFIX: 'Установить серво',
+	X11_SERVO_360_SPEED_SUFFIX: 'скорость',
+	X11_SERVO_360_SPEED_TOOLTIP: 'Установить скорость 360° серво непрерывного вращения (-100 до 100, отрицательное=назад)',
+
+	// X11 Блок остановки серво
+	X11_SERVO_STOP: 'Остановить серво',
+	X11_SERVO_STOP_TOOLTIP: 'Остановить указанное серво',
+
+	// X11 Мотор блоки
+	X11_MOTOR_SPEED_PREFIX: 'Установить мотор',
+	X11_MOTOR_SPEED_SUFFIX: 'скорость',
+	X11_MOTOR_SPEED_TOOLTIP: 'Установить скорость DC мотора (-2048 до 2048, отрицательное=назад)',
+	X11_MOTOR_STOP: 'Остановить мотор',
+	X11_MOTOR_STOP_TOOLTIP: 'Остановить указанный мотор',
+
+	// X11 LED блоки
+	X11_LED_SET_COLOR_PREFIX: 'LED лента',
+	X11_LED_SET_COLOR_INDEX: 'индекс',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'установить цвет R',
+	X11_LED_SET_COLOR_TOOLTIP: 'Установить цвет пикселя LED ленты (индекс 0=первый пиксель, или все)',
+	X11_LED_INDEX_ALL: 'Все',
 });

@@ -29,6 +29,7 @@ const CATEGORIES = [
 	{ id: 'math', name: { 'zh-hant': '數學', en: 'Math' }, colour: '#5B67A5' },
 	{ id: 'text', name: { 'zh-hant': '文字', en: 'Text' }, colour: '#5BA58C' },
 	{ id: 'lists', name: { 'zh-hant': '清單', en: 'Lists' }, colour: '#745BA5' },
+	{ id: 'x11', name: { 'zh-hant': 'X11 擴展板', en: 'X11 Extension' }, colour: '#34B4B4' },
 ];
 
 /**
@@ -2395,6 +2396,174 @@ const BLOCK_DEFINITIONS = [
 			en: 'Use the gear icon to add or remove items to join',
 		},
 		relatedBlocks: ['text', 'to_string'],
+	},
+
+	// === CyberBrick X11 擴展板積木 ===
+	{
+		type: 'x11_servo_180_angle',
+		category: 'x11',
+		names: { 'zh-hant': '180° 伺服馬達角度', en: '180° Servo Angle' },
+		descriptions: {
+			'zh-hant': '適用於 180° 伺服馬達 (PG001)，直接轉到指定角度 (0-180°)',
+			en: 'For 180° servo (PG001), move directly to specified angle (0-180°)',
+		},
+		fields: [
+			{
+				name: 'PORT',
+				type: 'dropdown',
+				label: { 'zh-hant': '埠位', en: 'Port' },
+				options: [
+					{ value: '1', label: { 'zh-hant': 'S1', en: 'S1' } },
+					{ value: '2', label: { 'zh-hant': 'S2', en: 'S2' } },
+					{ value: '3', label: { 'zh-hant': 'S3', en: 'S3' } },
+					{ value: '4', label: { 'zh-hant': 'S4', en: 'S4' } },
+				],
+			},
+		],
+		inputs: [{ name: 'ANGLE', type: 'value', label: { 'zh-hant': '角度', en: 'Angle' }, check: 'Number' }],
+		boards: ['cyberbrick'],
+		tags: ['x11', 'servo', '180', 'angle', '伺服', '馬達', '角度', 'cyberbrick'],
+		relatedBlocks: ['x11_servo_360_speed', 'x11_servo_stop'],
+	},
+	{
+		type: 'x11_servo_360_speed',
+		category: 'x11',
+		names: { 'zh-hant': '360° 伺服馬達速度', en: '360° Servo Speed' },
+		descriptions: {
+			'zh-hant': '適用於 360° 伺服馬達 (PG002)，正值順時針、負值逆時針、0 停止',
+			en: 'For 360° servo (PG002), positive clockwise, negative counter-clockwise, 0 stop',
+		},
+		fields: [
+			{
+				name: 'PORT',
+				type: 'dropdown',
+				label: { 'zh-hant': '埠位', en: 'Port' },
+				options: [
+					{ value: '1', label: { 'zh-hant': 'S1', en: 'S1' } },
+					{ value: '2', label: { 'zh-hant': 'S2', en: 'S2' } },
+					{ value: '3', label: { 'zh-hant': 'S3', en: 'S3' } },
+					{ value: '4', label: { 'zh-hant': 'S4', en: 'S4' } },
+				],
+			},
+		],
+		inputs: [{ name: 'SPEED', type: 'value', label: { 'zh-hant': '速度 %', en: 'Speed %' }, check: 'Number' }],
+		boards: ['cyberbrick'],
+		tags: ['x11', 'servo', '360', 'speed', '伺服', '馬達', '速度', 'cyberbrick'],
+		relatedBlocks: ['x11_servo_stop'],
+	},
+	{
+		type: 'x11_servo_stop',
+		category: 'x11',
+		names: { 'zh-hant': '停止伺服馬達', en: 'Stop Servo' },
+		descriptions: {
+			'zh-hant': '停止指定埠位的伺服馬達',
+			en: 'Stop servo motor at specified port',
+		},
+		fields: [
+			{
+				name: 'PORT',
+				type: 'dropdown',
+				label: { 'zh-hant': '埠位', en: 'Port' },
+				options: [
+					{ value: '1', label: { 'zh-hant': 'S1', en: 'S1' } },
+					{ value: '2', label: { 'zh-hant': 'S2', en: 'S2' } },
+					{ value: '3', label: { 'zh-hant': 'S3', en: 'S3' } },
+					{ value: '4', label: { 'zh-hant': 'S4', en: 'S4' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['x11', 'servo', 'stop', '伺服', '馬達', '停止', 'cyberbrick'],
+		relatedBlocks: ['x11_servo_180_angle', 'x11_servo_360_speed'],
+	},
+	{
+		type: 'x11_motor_speed',
+		category: 'x11',
+		names: { 'zh-hant': '直流馬達速度', en: 'DC Motor Speed' },
+		descriptions: {
+			'zh-hant': '設定直流馬達速度，範圍 -2048 到 2048',
+			en: 'Set DC motor speed, range -2048 to 2048',
+		},
+		fields: [
+			{
+				name: 'PORT',
+				type: 'dropdown',
+				label: { 'zh-hant': '埠位', en: 'Port' },
+				options: [
+					{ value: '1', label: { 'zh-hant': 'M1', en: 'M1' } },
+					{ value: '2', label: { 'zh-hant': 'M2', en: 'M2' } },
+				],
+			},
+		],
+		inputs: [{ name: 'SPEED', type: 'value', label: { 'zh-hant': '速度', en: 'Speed' }, check: 'Number' }],
+		boards: ['cyberbrick'],
+		tags: ['x11', 'motor', 'dc', 'speed', '直流', '馬達', '速度', 'cyberbrick'],
+		relatedBlocks: ['x11_motor_stop'],
+	},
+	{
+		type: 'x11_motor_stop',
+		category: 'x11',
+		names: { 'zh-hant': '停止直流馬達', en: 'Stop DC Motor' },
+		descriptions: {
+			'zh-hant': '停止指定埠位的直流馬達',
+			en: 'Stop DC motor at specified port',
+		},
+		fields: [
+			{
+				name: 'PORT',
+				type: 'dropdown',
+				label: { 'zh-hant': '埠位', en: 'Port' },
+				options: [
+					{ value: '1', label: { 'zh-hant': 'M1', en: 'M1' } },
+					{ value: '2', label: { 'zh-hant': 'M2', en: 'M2' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['x11', 'motor', 'dc', 'stop', '直流', '馬達', '停止', 'cyberbrick'],
+		relatedBlocks: ['x11_motor_speed'],
+	},
+	{
+		type: 'x11_led_set_color',
+		category: 'x11',
+		names: { 'zh-hant': 'LED 燈條設定顏色', en: 'LED Strip Set Color' },
+		descriptions: {
+			'zh-hant': '設定 WS2812 LED 燈條顏色，R/G/B 範圍 0-255',
+			en: 'Set WS2812 LED strip color, R/G/B range 0-255',
+		},
+		fields: [
+			{
+				name: 'PORT',
+				type: 'dropdown',
+				label: { 'zh-hant': '埠位', en: 'Port' },
+				options: [
+					{ value: '21', label: { 'zh-hant': 'D1', en: 'D1' } },
+					{ value: '20', label: { 'zh-hant': 'D2', en: 'D2' } },
+				],
+			},
+			{
+				name: 'INDEX',
+				type: 'dropdown',
+				label: { 'zh-hant': '索引', en: 'Index' },
+				options: [
+					{ value: '0', label: { 'zh-hant': '1', en: '1' } },
+					{ value: '1', label: { 'zh-hant': '2', en: '2' } },
+					{ value: '2', label: { 'zh-hant': '3', en: '3' } },
+					{ value: '3', label: { 'zh-hant': '4', en: '4' } },
+					{ value: 'all', label: { 'zh-hant': '全部', en: 'All' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'RED', type: 'value', label: { 'zh-hant': '紅', en: 'Red' }, check: 'Number' },
+			{ name: 'GREEN', type: 'value', label: { 'zh-hant': '綠', en: 'Green' }, check: 'Number' },
+			{ name: 'BLUE', type: 'value', label: { 'zh-hant': '藍', en: 'Blue' }, check: 'Number' },
+		],
+		boards: ['cyberbrick'],
+		tags: ['x11', 'led', 'strip', 'neopixel', 'ws2812', 'rgb', 'color', 'LED', '燈條', '顏色', 'cyberbrick'],
+		relatedBlocks: [],
 	},
 ];
 

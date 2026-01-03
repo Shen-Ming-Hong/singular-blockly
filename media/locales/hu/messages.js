@@ -775,4 +775,38 @@ window.languageManager.loadMessages('hu', {
 	// Dialog messages
 	DIALOG_SELECT_BACKUP_TITLE: 'Válassza ki a biztonsági mentés fájlt az előnézethez',
 	DIALOG_BACKUP_FILES_LABEL: 'Biztonsági mentés fájlok',
+
+	// X11 Bővítőkártya
+	CATEGORY_X11: 'X11 Bővítés',
+	X11_LABEL_SERVOS: 'Szervomotorok',
+	X11_LABEL_MOTORS: 'Motorok',
+	X11_LABEL_LEDS: 'LED-ek',
+
+	// X11 180° Szervo blokkok
+	X11_SERVO_180_ANGLE_PREFIX: 'Állítsd a szervót',
+	X11_SERVO_180_ANGLE_SUFFIX: 'szög',
+	X11_SERVO_180_ANGLE_TOOLTIP: 'Állítsd be a 180° szervo szögét (0-180 fok)',
+
+	// X11 360° Szervo blokkok
+	X11_SERVO_360_SPEED_PREFIX: 'Állítsd a szervót',
+	X11_SERVO_360_SPEED_SUFFIX: 'sebesség',
+	X11_SERVO_360_SPEED_TOOLTIP: 'Állítsd be a 360° folyamatos forgású szervo sebességét (-100-tól 100-ig, negatív=hátra)',
+
+	// X11 Szervo leállítás blokk
+	X11_SERVO_STOP: 'Állítsd le a szervót',
+	X11_SERVO_STOP_TOOLTIP: 'Állítsd le a megadott szervót',
+
+	// X11 Motor blokkok
+	X11_MOTOR_SPEED_PREFIX: 'Állítsd a motort',
+	X11_MOTOR_SPEED_SUFFIX: 'sebesség',
+	X11_MOTOR_SPEED_TOOLTIP: 'Állítsd be a DC motor sebességét (-2048-tól 2048-ig, negatív=hátra)',
+	X11_MOTOR_STOP: 'Állítsd le a motort',
+	X11_MOTOR_STOP_TOOLTIP: 'Állítsd le a megadott motort',
+
+	// X11 LED blokkok
+	X11_LED_SET_COLOR_PREFIX: 'LED szalag',
+	X11_LED_SET_COLOR_INDEX: 'index',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'állítsd színre R',
+	X11_LED_SET_COLOR_TOOLTIP: 'Állítsd be a LED szalag pixel színét (index 0=első pixel, vagy mind)',
+	X11_LED_INDEX_ALL: 'Mind',
 });

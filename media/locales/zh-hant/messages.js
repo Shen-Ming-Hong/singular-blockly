@@ -770,4 +770,38 @@ window.languageManager.loadMessages('zh-hant', {
 	// 對話框訊息
 	DIALOG_SELECT_BACKUP_TITLE: '選擇要預覽的備份檔案',
 	DIALOG_BACKUP_FILES_LABEL: '備份檔案',
+
+	// X11 擴充板
+	CATEGORY_X11: 'X11 擴充板',
+	X11_LABEL_SERVOS: '伺服馬達',
+	X11_LABEL_MOTORS: '直流馬達',
+	X11_LABEL_LEDS: 'LED 燈條',
+
+	// X11 180° 伺服馬達積木
+	X11_SERVO_180_ANGLE_PREFIX: '設定伺服馬達',
+	X11_SERVO_180_ANGLE_SUFFIX: '角度',
+	X11_SERVO_180_ANGLE_TOOLTIP: '設定 180° 伺服馬達角度 (0-180 度)',
+
+	// X11 360° 伺服馬達積木
+	X11_SERVO_360_SPEED_PREFIX: '設定伺服馬達',
+	X11_SERVO_360_SPEED_SUFFIX: '轉速',
+	X11_SERVO_360_SPEED_TOOLTIP: '設定 360° 連續旋轉伺服馬達速度 (-100 到 100，負值為反轉)',
+
+	// X11 停止伺服馬達積木
+	X11_SERVO_STOP: '停止伺服馬達',
+	X11_SERVO_STOP_TOOLTIP: '停止指定的伺服馬達',
+
+	// X11 直流馬達積木
+	X11_MOTOR_SPEED_PREFIX: '設定馬達',
+	X11_MOTOR_SPEED_SUFFIX: '轉速',
+	X11_MOTOR_SPEED_TOOLTIP: '設定直流馬達轉速 (-2048 到 2048，負值為反轉)',
+	X11_MOTOR_STOP: '停止馬達',
+	X11_MOTOR_STOP_TOOLTIP: '停止指定的馬達',
+
+	// X11 LED 燈條積木
+	X11_LED_SET_COLOR_PREFIX: 'LED 燈條',
+	X11_LED_SET_COLOR_INDEX: '第',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: '顆設定顏色 紅',
+	X11_LED_SET_COLOR_TOOLTIP: '設定 LED 燈條像素顏色 (索引 0=第一顆，或全部)',
+	X11_LED_INDEX_ALL: '全部',
 });
