@@ -2993,7 +2993,8 @@ const uploadProgressFilter = {
  * @param {Object} message - 進度訊息
  */
 function handleUploadProgress(message) {
-	console.log(`[blockly] 上傳進度: ${message.stage} (${message.progress}%) - ${message.message}`, message);
+	// Security fix: Use %s format specifier to prevent format string injection (CWE-134)
+	console.log('[blockly] 上傳進度: %s (%s%%) - %s %o', message.stage, message.progress, message.message, message);
 
 	// T041: 階段訊息對應（支援 MicroPython 與 Arduino）
 	const stageMessages = {
