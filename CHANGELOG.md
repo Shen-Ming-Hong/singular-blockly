@@ -8,6 +8,36 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.51.1] - 2026-01-07
+
+### 安全性修復 Security Fixes
+
+-   **修復格式字串注入漏洞 (CWE-134)** (Fix Format String Injection Vulnerability)
+
+    -   修正 `handleUploadProgress()` 中的 `console.log` 使用 `%s` 格式化字串
+        Fixed `console.log` in `handleUploadProgress()` to use `%s` format specifiers
+    -   防止外部輸入觸發格式化字串攻擊
+        Prevents format string attacks from external input
+    -   關閉 GitHub Code Scanning Alert #8
+        Closes GitHub Code Scanning Alert #8
+
+-   **升級 MCP SDK 至最新版本** (Upgrade MCP SDK to Latest Version)
+
+    -   升級 `@modelcontextprotocol/sdk` 從 1.24.3 至 1.25.1
+        Upgraded `@modelcontextprotocol/sdk` from 1.24.3 to 1.25.1
+    -   注意：CVE-2026-0621 (ReDoS) 漏洞尚無上游修補版本
+        Note: CVE-2026-0621 (ReDoS) vulnerability has no upstream fix yet
+    -   風險評估：MCP 伺服器僅接受本地連接，對一般使用影響低
+        Risk assessment: MCP server only accepts local connections, low impact for typical usage
+
+### 新增 Added
+
+-   **SECURITY.md 安全政策文件** (SECURITY.md Security Policy Document)
+    -   記錄已知漏洞與風險評估
+        Documents known vulnerabilities and risk assessment
+    -   提供安全問題回報管道
+        Provides security issue reporting channel
+
 ## [0.51.0] - 2026-01-04
 
 ### 新增功能 Added
