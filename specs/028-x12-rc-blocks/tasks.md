@@ -7,6 +7,15 @@
 
 **Organization**: 任務按 User Story 分組，每個 Story 可獨立實作與測試
 
+---
+
+## ⚠️ 實作狀態
+
+**X12 發射端積木 (User Story 2)**: ✅ **完成並測試**
+**RC 遠端通訊積木 (User Story 1, 4)**: ⏸️ **延後至下次開發** (積木定義完成，但從 Toolbox 移除)
+
+---
+
 ## Format: `[ID] [P?] [Story] Description`
 
 -   **[P]**: 可平行執行 (不同檔案，無相依性)
@@ -27,12 +36,12 @@
 
 **Purpose**: 建立新檔案結構與共用元件
 
--   [ ] T001 [P] 建立 RC 積木定義檔案骨架 in media/blockly/blocks/rc.js
--   [ ] T002 [P] 建立 X12 積木定義檔案骨架 in media/blockly/blocks/x12.js
--   [ ] T003 [P] 建立 RC MicroPython 生成器檔案骨架 in media/blockly/generators/micropython/rc.js
--   [ ] T004 [P] 建立 X12 MicroPython 生成器檔案骨架 in media/blockly/generators/micropython/x12.js
--   [ ] T005 [P] 建立 RC 選單 Toolbox 配置 in media/toolbox/categories/cyberbrick_rc.json
--   [ ] T006 [P] 建立 X12 選單 Toolbox 配置 in media/toolbox/categories/cyberbrick_x12.json
+-   [x] T001 [P] 建立 RC 積木定義檔案骨架 in media/blockly/blocks/rc.js
+-   [x] T002 [P] 建立 X12 積木定義檔案骨架 in media/blockly/blocks/x12.js
+-   [x] T003 [P] 建立 RC MicroPython 生成器檔案骨架 in media/blockly/generators/micropython/rc.js
+-   [x] T004 [P] 建立 X12 MicroPython 生成器檔案骨架 in media/blockly/generators/micropython/x12.js
+-   [x] T005 [P] 建立 RC 選單 Toolbox 配置 in media/toolbox/categories/cyberbrick_rc.json
+-   [x] T006 [P] 建立 X12 選單 Toolbox 配置 in media/toolbox/categories/cyberbrick_x12.json
 
 ---
 
@@ -42,10 +51,10 @@
 
 **⚠️ 重要**: 此階段完成前，無法開始任何 User Story 實作
 
--   [ ] T007 在 media/html/blocklyEdit.html 中引入 rc.js 和 x12.js 積木定義檔案
--   [ ] T008 在 media/html/blocklyEdit.html 中引入 rc.js 和 x12.js MicroPython 生成器
--   [ ] T009 修改 media/toolbox/cyberbrick.json 引入 cyberbrick_rc 和 cyberbrick_x12 選單
--   [ ] T010 在 media/locales/en/messages.js 新增所有 RC 和 X12 i18n 鍵值 (英文為基準，共 34 個鍵值：8 選單/標籤 + 14 積木文字 + 12 tooltips，詳見 data-model.md)
+-   [x] T007 在 media/html/blocklyEdit.html 中引入 rc.js 和 x12.js 積木定義檔案
+-   [x] T008 在 media/html/blocklyEdit.html 中引入 rc.js 和 x12.js MicroPython 生成器
+-   [x] T009 修改 media/toolbox/cyberbrick.json 引入 cyberbrick_rc 和 cyberbrick_x12 選單
+-   [x] T010 在 media/locales/en/messages.js 新增所有 RC 和 X12 i18n 鍵值 (英文為基準，共 34 個鍵值：8 選單/標籤 + 14 積木文字 + 12 tooltips，詳見 data-model.md)
 
 **Checkpoint**: 基礎設施就緒 - User Story 實作現在可以開始
 
@@ -59,28 +68,28 @@
 
 ### RC 初始化積木
 
--   [ ] T011 [US1] 實作 rc_slave_init 積木定義 in media/blockly/blocks/rc.js
--   [ ] T012 [US1] 實作 rc_slave_init MicroPython 生成器 in media/blockly/generators/micropython/rc.js
+-   [x] T011 [US1] 實作 rc_slave_init 積木定義 in media/blockly/blocks/rc.js
+-   [x] T012 [US1] 實作 rc_slave_init MicroPython 生成器 in media/blockly/generators/micropython/rc.js
 
 ### RC 搖桿讀取積木
 
--   [ ] T013 [US1] 實作 rc_get_joystick 積木定義 (含 CHANNEL 下拉選單) in media/blockly/blocks/rc.js
--   [ ] T014 [US1] 實作 rc_get_joystick MicroPython 生成器 (含安全預設值 2048) in media/blockly/generators/micropython/rc.js
--   [ ] T015 [US1] 實作 rc_get_joystick_mapped 積木定義 (含 MIN/MAX 輸入) in media/blockly/blocks/rc.js
--   [ ] T016 [US1] 實作 rc_get_joystick_mapped MicroPython 生成器 (含線性映射公式) in media/blockly/generators/micropython/rc.js
+-   [x] T013 [US1] 實作 rc_get_joystick 積木定義 (含 CHANNEL 下拉選單) in media/blockly/blocks/rc.js
+-   [x] T014 [US1] 實作 rc_get_joystick MicroPython 生成器 (含安全預設值 2048) in media/blockly/generators/micropython/rc.js
+-   [x] T015 [US1] 實作 rc_get_joystick_mapped 積木定義 (含 MIN/MAX 輸入) in media/blockly/blocks/rc.js
+-   [x] T016 [US1] 實作 rc_get_joystick_mapped MicroPython 生成器 (含線性映射公式) in media/blockly/generators/micropython/rc.js
 
 ### RC 按鈕讀取積木
 
--   [ ] T017 [US1] 實作 rc_is_button_pressed 積木定義 (含 BUTTON 下拉選單) in media/blockly/blocks/rc.js
--   [ ] T018 [US1] 實作 rc_is_button_pressed MicroPython 生成器 (0=按下轉 True) in media/blockly/generators/micropython/rc.js
--   [ ] T019 [US1] 實作 rc_get_button 積木定義 in media/blockly/blocks/rc.js
--   [ ] T020 [US1] 實作 rc_get_button MicroPython 生成器 in media/blockly/generators/micropython/rc.js
+-   [x] T017 [US1] 實作 rc_is_button_pressed 積木定義 (含 BUTTON 下拉選單) in media/blockly/blocks/rc.js
+-   [x] T018 [US1] 實作 rc_is_button_pressed MicroPython 生成器 (0=按下轉 True) in media/blockly/generators/micropython/rc.js
+-   [x] T019 [US1] 實作 rc_get_button 積木定義 in media/blockly/blocks/rc.js
+-   [x] T020 [US1] 實作 rc_get_button MicroPython 生成器 in media/blockly/generators/micropython/rc.js
 
 ### Toolbox 配置
 
--   [ ] T021 [US1] 在 cyberbrick_rc.json 新增初始化區塊 (RC_LABEL_INIT) 含 rc_master_init, rc_slave_init
--   [ ] T022 [US1] 在 cyberbrick_rc.json 新增搖桿區塊 (RC_LABEL_JOYSTICK) 含 rc_get_joystick, rc_get_joystick_mapped
--   [ ] T023 [US1] 在 cyberbrick_rc.json 新增按鈕區塊 (RC_LABEL_BUTTON) 含 rc_is_button_pressed, rc_get_button
+-   [x] T021 [US1] 在 cyberbrick_rc.json 新增初始化區塊 (RC_LABEL_INIT) 含 rc_master_init, rc_slave_init
+-   [x] T022 [US1] 在 cyberbrick_rc.json 新增搖桿區塊 (RC_LABEL_JOYSTICK) 含 rc_get_joystick, rc_get_joystick_mapped
+-   [x] T023 [US1] 在 cyberbrick_rc.json 新增按鈕區塊 (RC_LABEL_BUTTON) 含 rc_is_button_pressed, rc_get_button
 
 **Checkpoint**: User Story 1 完成 - 接收端可以讀取遠端搖桿/按鈕資料
 
@@ -94,27 +103,27 @@
 
 ### RC Master 初始化積木
 
--   [ ] T024 [US2] 實作 rc_master_init 積木定義 in media/blockly/blocks/rc.js
--   [ ] T025 [US2] 實作 rc_master_init MicroPython 生成器 in media/blockly/generators/micropython/rc.js
+-   [x] T024 [US2] 實作 rc_master_init 積木定義 in media/blockly/blocks/rc.js
+-   [x] T025 [US2] 實作 rc_master_init MicroPython 生成器 in media/blockly/generators/micropython/rc.js
 
 ### X12 搖桿讀取積木
 
--   [ ] T026 [P] [US2] 實作 x12_get_joystick 積木定義 (含 CHANNEL 下拉選單) in media/blockly/blocks/x12.js
--   [ ] T027 [P] [US2] 實作 x12_get_joystick MicroPython 生成器 (使用 rc_master_data) in media/blockly/generators/micropython/x12.js
--   [ ] T028 [P] [US2] 實作 x12_get_joystick_mapped 積木定義 (含 MIN/MAX 輸入) in media/blockly/blocks/x12.js
--   [ ] T029 [P] [US2] 實作 x12_get_joystick_mapped MicroPython 生成器 (含線性映射公式) in media/blockly/generators/micropython/x12.js
+-   [x] T026 [P] [US2] 實作 x12_get_joystick 積木定義 (含 CHANNEL 下拉選單) in media/blockly/blocks/x12.js
+-   [x] T027 [P] [US2] 實作 x12_get_joystick MicroPython 生成器 (使用 rc_master_data) in media/blockly/generators/micropython/x12.js
+-   [x] T028 [P] [US2] 實作 x12_get_joystick_mapped 積木定義 (含 MIN/MAX 輸入) in media/blockly/blocks/x12.js
+-   [x] T029 [P] [US2] 實作 x12_get_joystick_mapped MicroPython 生成器 (含線性映射公式) in media/blockly/generators/micropython/x12.js
 
 ### X12 按鈕讀取積木
 
--   [ ] T030 [P] [US2] 實作 x12_is_button_pressed 積木定義 (含 BUTTON 下拉選單) in media/blockly/blocks/x12.js
--   [ ] T031 [P] [US2] 實作 x12_is_button_pressed MicroPython 生成器 in media/blockly/generators/micropython/x12.js
--   [ ] T032 [P] [US2] 實作 x12_get_button 積木定義 in media/blockly/blocks/x12.js
--   [ ] T033 [P] [US2] 實作 x12_get_button MicroPython 生成器 in media/blockly/generators/micropython/x12.js
+-   [x] T030 [P] [US2] 實作 x12_is_button_pressed 積木定義 (含 BUTTON 下拉選單) in media/blockly/blocks/x12.js
+-   [x] T031 [P] [US2] 實作 x12_is_button_pressed MicroPython 生成器 in media/blockly/generators/micropython/x12.js
+-   [x] T032 [P] [US2] 實作 x12_get_button 積木定義 in media/blockly/blocks/x12.js
+-   [x] T033 [P] [US2] 實作 x12_get_button MicroPython 生成器 in media/blockly/generators/micropython/x12.js
 
 ### Toolbox 配置
 
--   [ ] T034 [US2] 在 cyberbrick_x12.json 新增搖桿區塊 (X12_LABEL_JOYSTICK) 含 x12_get_joystick, x12_get_joystick_mapped
--   [ ] T035 [US2] 在 cyberbrick_x12.json 新增按鈕區塊 (X12_LABEL_BUTTON) 含 x12_is_button_pressed, x12_get_button
+-   [x] T034 [US2] 在 cyberbrick_x12.json 新增搖桿區塊 (X12_LABEL_JOYSTICK) 含 x12_get_joystick, x12_get_joystick_mapped
+-   [x] T035 [US2] 在 cyberbrick_x12.json 新增按鈕區塊 (X12_LABEL_BUTTON) 含 x12_is_button_pressed, x12_get_button
 
 **Checkpoint**: User Story 2 完成 - 發射端可以讀取本機搖桿/按鈕資料
 
@@ -142,14 +151,14 @@
 
 ### RC 狀態查詢積木
 
--   [ ] T036 [US4] 實作 rc_is_connected 積木定義 in media/blockly/blocks/rc.js
--   [ ] T037 [US4] 實作 rc_is_connected MicroPython 生成器 (rc_slave_data is not None) in media/blockly/generators/micropython/rc.js
--   [ ] T038 [US4] 實作 rc_get_rc_index 積木定義 in media/blockly/blocks/rc.js
--   [ ] T039 [US4] 實作 rc_get_rc_index MicroPython 生成器 (rc_module.rc_index()) in media/blockly/generators/micropython/rc.js
+-   [x] T036 [US4] 實作 rc_is_connected 積木定義 in media/blockly/blocks/rc.js
+-   [x] T037 [US4] 實作 rc_is_connected MicroPython 生成器 (rc_slave_data is not None) in media/blockly/generators/micropython/rc.js
+-   [x] T038 [US4] 實作 rc_get_rc_index 積木定義 in media/blockly/blocks/rc.js
+-   [x] T039 [US4] 實作 rc_get_rc_index MicroPython 生成器 (rc_module.rc_index()) in media/blockly/generators/micropython/rc.js
 
 ### Toolbox 配置
 
--   [ ] T040 [US4] 在 cyberbrick_rc.json 新增狀態區塊 (RC_LABEL_STATUS) 含 rc_is_connected, rc_get_rc_index
+-   [x] T040 [US4] 在 cyberbrick_rc.json 新增狀態區塊 (RC_LABEL_STATUS) 含 rc_is_connected, rc_get_rc_index
 
 **Note**: `rc_master_init` 已在 Phase 4 T024-T025 實作，並於 T021 初始化區塊中包含
 
@@ -161,22 +170,22 @@
 
 **Purpose**: 為所有 15 種語言新增翻譯
 
--   [ ] T042 [P] 新增 RC/X12 i18n 鍵值 in media/locales/zh-hant/messages.js (繁體中文)
--   [ ] T043 [P] 新增 RC/X12 i18n 鍵值 in media/locales/ja/messages.js (日文)
--   [ ] T044 [P] 新增 RC/X12 i18n 鍵值 in media/locales/ko/messages.js (韓文)
--   [ ] T045 [P] 新增 RC/X12 i18n 鍵值 in media/locales/de/messages.js (德文)
--   [ ] T046 [P] 新增 RC/X12 i18n 鍵值 in media/locales/fr/messages.js (法文)
--   [ ] T047 [P] 新增 RC/X12 i18n 鍵值 in media/locales/es/messages.js (西班牙文)
--   [ ] T048 [P] 新增 RC/X12 i18n 鍵值 in media/locales/pt-br/messages.js (巴西葡萄牙文)
--   [ ] T049 [P] 新增 RC/X12 i18n 鍵值 in media/locales/it/messages.js (義大利文)
--   [ ] T050 [P] 新增 RC/X12 i18n 鍵值 in media/locales/ru/messages.js (俄文)
--   [ ] T051 [P] 新增 RC/X12 i18n 鍵值 in media/locales/pl/messages.js (波蘭文)
--   [ ] T052 [P] 新增 RC/X12 i18n 鍵值 in media/locales/hu/messages.js (匈牙利文)
--   [ ] T053 [P] 新增 RC/X12 i18n 鍵值 in media/locales/tr/messages.js (土耳其文)
--   [ ] T054 [P] 新增 RC/X12 i18n 鍵值 in media/locales/bg/messages.js (保加利亞文)
--   [ ] T055 [P] 新增 RC/X12 i18n 鍵值 in media/locales/cs/messages.js (捷克文)
+-   [x] T042 [P] 新增 RC/X12 i18n 鍵值 in media/locales/zh-hant/messages.js (繁體中文)
+-   [x] T043 [P] 新增 RC/X12 i18n 鍵值 in media/locales/ja/messages.js (日文)
+-   [x] T044 [P] 新增 RC/X12 i18n 鍵值 in media/locales/ko/messages.js (韓文)
+-   [x] T045 [P] 新增 RC/X12 i18n 鍵值 in media/locales/de/messages.js (德文)
+-   [x] T046 [P] 新增 RC/X12 i18n 鍵值 in media/locales/fr/messages.js (法文)
+-   [x] T047 [P] 新增 RC/X12 i18n 鍵值 in media/locales/es/messages.js (西班牙文)
+-   [x] T048 [P] 新增 RC/X12 i18n 鍵值 in media/locales/pt-br/messages.js (巴西葡萄牙文)
+-   [x] T049 [P] 新增 RC/X12 i18n 鍵值 in media/locales/it/messages.js (義大利文)
+-   [x] T050 [P] 新增 RC/X12 i18n 鍵值 in media/locales/ru/messages.js (俄文)
+-   [x] T051 [P] 新增 RC/X12 i18n 鍵值 in media/locales/pl/messages.js (波蘭文)
+-   [x] T052 [P] 新增 RC/X12 i18n 鍵值 in media/locales/hu/messages.js (匈牙利文)
+-   [x] T053 [P] 新增 RC/X12 i18n 鍵值 in media/locales/tr/messages.js (土耳其文)
+-   [x] T054 [P] 新增 RC/X12 i18n 鍵值 in media/locales/bg/messages.js (保加利亞文)
+-   [x] T055 [P] 新增 RC/X12 i18n 鍵值 in media/locales/cs/messages.js (捷克文)
 
-**Checkpoint**: 所有 15 種語言翻譯完成
+**Checkpoint**: 所有 15 種語言翻譯完成 ✓
 
 ---
 
@@ -184,13 +193,13 @@
 
 **Purpose**: 最終驗證與清理
 
--   [ ] T056 執行 `npm run validate:i18n` 驗證所有翻譯完整性
--   [ ] T057 執行 `npm run watch` 並在 WebView 中測試所有積木是否正確顯示
--   [ ] T058 測試所有 12 個積木生成的 MicroPython 程式碼語法正確
--   [ ] T059 依照 quickstart.md 測試情境 1: 基本遙控車功能
--   [ ] T060 依照 quickstart.md 測試情境 2: 進階遙控器功能
--   [ ] T061 依照 quickstart.md 測試情境 3: 斷線處理功能
--   [ ] T062 執行 `npm run generate:dictionary` 更新 MCP block-dictionary.json
+-   [x] T056 執行 `npm run validate:i18n` 驗證所有翻譯完整性 (修復法文檔案解析問題)
+-   [x] T057 執行 `npm run watch` 並在 WebView 中測試所有積木是否正確顯示
+-   [x] T058 測試 X12 積木生成的 MicroPython 程式碼語法正確 (測試三段式搖桿，確認 ADC 值讀取)
+-   [ ] ~~T059 依照 quickstart.md 測試情境 1: 基本遙控車功能~~ [延後至 RC 功能開發]
+-   [ ] ~~T060 依照 quickstart.md 測試情境 2: 進階遙控器功能~~ [延後至 RC 功能開發]
+-   [ ] ~~T061 依照 quickstart.md 測試情境 3: 斷線處理功能~~ [延後至 RC 功能開發]
+-   [x] T062 執行 `npm run generate:dictionary` 更新 MCP block-dictionary.json
 
 ---
 

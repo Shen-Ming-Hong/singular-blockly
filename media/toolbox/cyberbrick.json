@@ -8,6 +8,9 @@
             "$include": "./categories/cyberbrick_x11.json"
         },
         {
+            "$include": "./categories/cyberbrick_x12.json"
+        },
+        {
             "$include": "./categories/cyberbrick_wifi.json"
         },
         {

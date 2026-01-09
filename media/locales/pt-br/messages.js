@@ -800,4 +800,32 @@ window.languageManager.loadMessages('pt-br', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'definir cor R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Definir cor do pixel da fita LED (índice 0=primeiro pixel, ou todos)',
 	X11_LED_INDEX_ALL: 'Todos',
+
+	// === Placa de extensão X12 Transmissor ===
+	CATEGORY_X12: 'X12 Extensão',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Botão',
+
+	// Blocos de Joystick X12
+	X12_GET_JOYSTICK_PREFIX: 'Joystick local',
+	X12_GET_JOYSTICK_TOOLTIP: 'Ler valor ADC do joystick local do transmissor (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick local',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'mapear para',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Ler joystick local e mapear para intervalo especificado',
+
+	// Blocos de Botão X12
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Botão local',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'pressionado?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Verificar se o botão local do transmissor está pressionado',
+
+	// === Controle Remoto RC ===
+
+	// Blocos de Inicialização RC
+
+	// Blocos de Joystick RC
+
+	// Blocos de Botão RC
+
+	// Blocos de Status RC
 });

@@ -30,6 +30,8 @@ const CATEGORIES = [
 	{ id: 'text', name: { 'zh-hant': '文字', en: 'Text' }, colour: '#5BA58C' },
 	{ id: 'lists', name: { 'zh-hant': '清單', en: 'Lists' }, colour: '#745BA5' },
 	{ id: 'x11', name: { 'zh-hant': 'X11 擴展板', en: 'X11 Extension' }, colour: '#34B4B4' },
+	{ id: 'x12', name: { 'zh-hant': 'X12 擴展板', en: 'X12 Extension' }, colour: '#34B434' },
+	{ id: 'rc', name: { 'zh-hant': 'RC 遙控', en: 'RC Remote' }, colour: '#34D4D4' },
 ];
 
 /**
@@ -2564,6 +2566,288 @@ const BLOCK_DEFINITIONS = [
 		boards: ['cyberbrick'],
 		tags: ['x11', 'led', 'strip', 'neopixel', 'ws2812', 'rgb', 'color', 'LED', '燈條', '顏色', 'cyberbrick'],
 		relatedBlocks: [],
+	},
+
+	// === CyberBrick X12 擴展板積木 ===
+	{
+		type: 'x12_get_joystick',
+		category: 'x12',
+		names: { 'zh-hant': '本地搖桿', en: 'Local Joystick' },
+		descriptions: {
+			'zh-hant': '讀取 X12 擴展板上本地搖桿的 ADC 值 (0-4095)',
+			en: 'Read ADC value of local joystick on X12 extension board (0-4095)',
+		},
+		fields: [
+			{
+				name: 'AXIS',
+				type: 'dropdown',
+				label: { 'zh-hant': '軸向', en: 'Axis' },
+				options: [
+					{ value: 'L1', label: { 'zh-hant': '左X (L1)', en: 'Left X (L1)' } },
+					{ value: 'L2', label: { 'zh-hant': '左Y (L2)', en: 'Left Y (L2)' } },
+					{ value: 'L3', label: { 'zh-hant': '左Z (L3)', en: 'Left Z (L3)' } },
+					{ value: 'R1', label: { 'zh-hant': '右X (R1)', en: 'Right X (R1)' } },
+					{ value: 'R2', label: { 'zh-hant': '右Y (R2)', en: 'Right Y (R2)' } },
+					{ value: 'R3', label: { 'zh-hant': '右Z (R3)', en: 'Right Z (R3)' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['x12', 'joystick', 'adc', 'local', '搖桿', '擴展板', 'cyberbrick'],
+		relatedBlocks: ['x12_get_joystick_mapped'],
+	},
+	{
+		type: 'x12_get_joystick_mapped',
+		category: 'x12',
+		names: { 'zh-hant': '本地搖桿映射', en: 'Local Joystick Mapped' },
+		descriptions: {
+			'zh-hant': '讀取本地搖桿並映射到指定範圍',
+			en: 'Read local joystick and map to specified range',
+		},
+		fields: [
+			{
+				name: 'AXIS',
+				type: 'dropdown',
+				label: { 'zh-hant': '軸向', en: 'Axis' },
+				options: [
+					{ value: 'L1', label: { 'zh-hant': '左X (L1)', en: 'Left X (L1)' } },
+					{ value: 'L2', label: { 'zh-hant': '左Y (L2)', en: 'Left Y (L2)' } },
+					{ value: 'L3', label: { 'zh-hant': '左Z (L3)', en: 'Left Z (L3)' } },
+					{ value: 'R1', label: { 'zh-hant': '右X (R1)', en: 'Right X (R1)' } },
+					{ value: 'R2', label: { 'zh-hant': '右Y (R2)', en: 'Right Y (R2)' } },
+					{ value: 'R3', label: { 'zh-hant': '右Z (R3)', en: 'Right Z (R3)' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'MIN', type: 'value', label: { 'zh-hant': '最小值', en: 'Min' }, check: 'Number' },
+			{ name: 'MAX', type: 'value', label: { 'zh-hant': '最大值', en: 'Max' }, check: 'Number' },
+		],
+		boards: ['cyberbrick'],
+		tags: ['x12', 'joystick', 'map', 'range', 'local', '搖桿', '映射', '擴展板', 'cyberbrick'],
+		relatedBlocks: ['x12_get_joystick'],
+	},
+	{
+		type: 'x12_is_button_pressed',
+		category: 'x12',
+		names: { 'zh-hant': '本地按鈕按下?', en: 'Local Button Pressed?' },
+		descriptions: {
+			'zh-hant': '檢查 X12 擴展板上的本地按鈕是否被按下',
+			en: 'Check if local button on X12 extension board is pressed',
+		},
+		fields: [
+			{
+				name: 'BUTTON',
+				type: 'dropdown',
+				label: { 'zh-hant': '按鈕', en: 'Button' },
+				options: [
+					{ value: 'K1', label: { 'zh-hant': 'K1', en: 'K1' } },
+					{ value: 'K2', label: { 'zh-hant': 'K2', en: 'K2' } },
+					{ value: 'K3', label: { 'zh-hant': 'K3', en: 'K3' } },
+					{ value: 'K4', label: { 'zh-hant': 'K4', en: 'K4' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['x12', 'button', 'pressed', 'local', '按鈕', '擴展板', 'cyberbrick'],
+		relatedBlocks: ['x12_get_button'],
+	},
+	{
+		type: 'x12_get_button',
+		category: 'x12',
+		names: { 'zh-hant': '本地按鈕狀態', en: 'Local Button State' },
+		descriptions: {
+			'zh-hant': '讀取本地按鈕狀態 (0=按下, 1=放開)',
+			en: 'Read local button state (0=pressed, 1=released)',
+		},
+		fields: [
+			{
+				name: 'BUTTON',
+				type: 'dropdown',
+				label: { 'zh-hant': '按鈕', en: 'Button' },
+				options: [
+					{ value: 'K1', label: { 'zh-hant': 'K1', en: 'K1' } },
+					{ value: 'K2', label: { 'zh-hant': 'K2', en: 'K2' } },
+					{ value: 'K3', label: { 'zh-hant': 'K3', en: 'K3' } },
+					{ value: 'K4', label: { 'zh-hant': 'K4', en: 'K4' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['x12', 'button', 'state', 'local', '按鈕', '狀態', '擴展板', 'cyberbrick'],
+		relatedBlocks: ['x12_is_button_pressed'],
+	},
+
+	// === CyberBrick RC 遙控積木 ===
+	{
+		type: 'rc_master_init',
+		category: 'rc',
+		names: { 'zh-hant': '初始化發射器', en: 'Initialize Transmitter' },
+		descriptions: {
+			'zh-hant': '初始化為發射器模式 (Master)，用於遙控器端',
+			en: 'Initialize as transmitter mode (Master), used on remote controller side',
+		},
+		fields: [],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'master', 'init', 'transmitter', '遙控', '發射', '初始化', 'cyberbrick'],
+		relatedBlocks: ['rc_slave_init'],
+	},
+	{
+		type: 'rc_slave_init',
+		category: 'rc',
+		names: { 'zh-hant': '初始化接收器', en: 'Initialize Receiver' },
+		descriptions: {
+			'zh-hant': '初始化為接收器模式 (Slave)，用於被控設備端',
+			en: 'Initialize as receiver mode (Slave), used on controlled device side',
+		},
+		fields: [],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'slave', 'init', 'receiver', '遙控', '接收', '初始化', 'cyberbrick'],
+		relatedBlocks: ['rc_master_init'],
+	},
+	{
+		type: 'rc_get_joystick',
+		category: 'rc',
+		names: { 'zh-hant': '遠端搖桿', en: 'Remote Joystick' },
+		descriptions: {
+			'zh-hant': '讀取遠端搖桿的 ADC 值 (0-4095)，2048 為中心',
+			en: 'Read ADC value of remote joystick (0-4095), 2048 is center',
+		},
+		fields: [
+			{
+				name: 'AXIS',
+				type: 'dropdown',
+				label: { 'zh-hant': '軸向', en: 'Axis' },
+				options: [
+					{ value: 'L1', label: { 'zh-hant': '左X (L1)', en: 'Left X (L1)' } },
+					{ value: 'L2', label: { 'zh-hant': '左Y (L2)', en: 'Left Y (L2)' } },
+					{ value: 'L3', label: { 'zh-hant': '左Z (L3)', en: 'Left Z (L3)' } },
+					{ value: 'R1', label: { 'zh-hant': '右X (R1)', en: 'Right X (R1)' } },
+					{ value: 'R2', label: { 'zh-hant': '右Y (R2)', en: 'Right Y (R2)' } },
+					{ value: 'R3', label: { 'zh-hant': '右Z (R3)', en: 'Right Z (R3)' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'joystick', 'remote', 'adc', '遙控', '搖桿', '遠端', 'cyberbrick'],
+		relatedBlocks: ['rc_get_joystick_mapped'],
+	},
+	{
+		type: 'rc_get_joystick_mapped',
+		category: 'rc',
+		names: { 'zh-hant': '遠端搖桿映射', en: 'Remote Joystick Mapped' },
+		descriptions: {
+			'zh-hant': '讀取遠端搖桿並映射到指定範圍',
+			en: 'Read remote joystick and map to specified range',
+		},
+		fields: [
+			{
+				name: 'AXIS',
+				type: 'dropdown',
+				label: { 'zh-hant': '軸向', en: 'Axis' },
+				options: [
+					{ value: 'L1', label: { 'zh-hant': '左X (L1)', en: 'Left X (L1)' } },
+					{ value: 'L2', label: { 'zh-hant': '左Y (L2)', en: 'Left Y (L2)' } },
+					{ value: 'L3', label: { 'zh-hant': '左Z (L3)', en: 'Left Z (L3)' } },
+					{ value: 'R1', label: { 'zh-hant': '右X (R1)', en: 'Right X (R1)' } },
+					{ value: 'R2', label: { 'zh-hant': '右Y (R2)', en: 'Right Y (R2)' } },
+					{ value: 'R3', label: { 'zh-hant': '右Z (R3)', en: 'Right Z (R3)' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'MIN', type: 'value', label: { 'zh-hant': '最小值', en: 'Min' }, check: 'Number' },
+			{ name: 'MAX', type: 'value', label: { 'zh-hant': '最大值', en: 'Max' }, check: 'Number' },
+		],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'joystick', 'remote', 'map', 'range', '遙控', '搖桿', '映射', 'cyberbrick'],
+		relatedBlocks: ['rc_get_joystick'],
+	},
+	{
+		type: 'rc_is_button_pressed',
+		category: 'rc',
+		names: { 'zh-hant': '遠端按鈕按下?', en: 'Remote Button Pressed?' },
+		descriptions: {
+			'zh-hant': '檢查遠端按鈕是否被按下',
+			en: 'Check if remote button is pressed',
+		},
+		fields: [
+			{
+				name: 'BUTTON',
+				type: 'dropdown',
+				label: { 'zh-hant': '按鈕', en: 'Button' },
+				options: [
+					{ value: 'K1', label: { 'zh-hant': 'K1', en: 'K1' } },
+					{ value: 'K2', label: { 'zh-hant': 'K2', en: 'K2' } },
+					{ value: 'K3', label: { 'zh-hant': 'K3', en: 'K3' } },
+					{ value: 'K4', label: { 'zh-hant': 'K4', en: 'K4' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'button', 'pressed', 'remote', '遙控', '按鈕', 'cyberbrick'],
+		relatedBlocks: ['rc_get_button'],
+	},
+	{
+		type: 'rc_get_button',
+		category: 'rc',
+		names: { 'zh-hant': '遠端按鈕狀態', en: 'Remote Button State' },
+		descriptions: {
+			'zh-hant': '讀取遠端按鈕狀態 (0=按下, 1=放開)',
+			en: 'Read remote button state (0=pressed, 1=released)',
+		},
+		fields: [
+			{
+				name: 'BUTTON',
+				type: 'dropdown',
+				label: { 'zh-hant': '按鈕', en: 'Button' },
+				options: [
+					{ value: 'K1', label: { 'zh-hant': 'K1', en: 'K1' } },
+					{ value: 'K2', label: { 'zh-hant': 'K2', en: 'K2' } },
+					{ value: 'K3', label: { 'zh-hant': 'K3', en: 'K3' } },
+					{ value: 'K4', label: { 'zh-hant': 'K4', en: 'K4' } },
+				],
+			},
+		],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'button', 'state', 'remote', '遙控', '按鈕', '狀態', 'cyberbrick'],
+		relatedBlocks: ['rc_is_button_pressed'],
+	},
+	{
+		type: 'rc_is_connected',
+		category: 'rc',
+		names: { 'zh-hant': '已連線?', en: 'Connected?' },
+		descriptions: {
+			'zh-hant': '檢查是否已與發射器/接收器連線',
+			en: 'Check if connected with transmitter/receiver',
+		},
+		fields: [],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'connected', 'status', '遙控', '連線', '狀態', 'cyberbrick'],
+		relatedBlocks: ['rc_get_rc_index'],
+	},
+	{
+		type: 'rc_get_rc_index',
+		category: 'rc',
+		names: { 'zh-hant': '配對索引', en: 'Pairing Index' },
+		descriptions: {
+			'zh-hant': '取得配對索引 (0=未配對, 1=Slave 1, 2=Slave 2)',
+			en: 'Get pairing index (0=not paired, 1=Slave 1, 2=Slave 2)',
+		},
+		fields: [],
+		inputs: [],
+		boards: ['cyberbrick'],
+		tags: ['rc', 'index', 'pairing', 'status', '遙控', '配對', '索引', 'cyberbrick'],
+		relatedBlocks: ['rc_is_connected'],
 	},
 ];
 

@@ -2,8 +2,26 @@
 
 **Feature Branch**: `028-x12-rc-blocks`  
 **Created**: 2026-01-04  
-**Status**: Draft  
+**Status**: Partial Complete  
 **Input**: User description: "新增 CyberBrick X12 Remote Control Transmitter Shield 積木選單與獨立 RC 遙控通訊選單"
+
+---
+
+## ⚠️ 延後實作說明
+
+**X12 發射端積木** (Phase 4): ✅ **已完成並測試**
+
+-   `x12_get_joystick` - 讀取本機搖桿
+-   `x12_get_joystick_mapped` - 讀取並映射本機搖桿
+-   `x12_is_button_pressed` - 檢查本機按鈕是否按下
+
+**RC 遠端通訊積木** (Phase 3, 6): ⏸️ **延後至下次開發**
+
+-   需要雙機 (發射端 + 接收端) 配對測試環境
+-   積木定義與生成器程式碼已完成，但暫不在 Toolbox 中顯示
+-   相關檔案保留: `blocks/rc.js`, `generators/micropython/rc.js`, `categories/cyberbrick_rc.json`
+
+---
 
 ## User Scenarios & Testing _(mandatory)_
 

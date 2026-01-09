@@ -808,4 +808,32 @@ window.languageManager.loadMessages('pl', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'ustaw kolor R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Ustaw kolor piksela taśmy LED (indeks 0=pierwszy piksel, lub wszystkie)',
 	X11_LED_INDEX_ALL: 'Wszystkie',
+
+	// === Płytka rozszerzeń X12 Nadajnik ===
+	CATEGORY_X12: 'X12 Rozszerzenie',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Przycisk',
+
+	// X12 Bloki joysticka
+	X12_GET_JOYSTICK_PREFIX: 'Lokalny joystick',
+	X12_GET_JOYSTICK_TOOLTIP: 'Odczytaj wartość ADC lokalnego joysticka nadajnika (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Lokalny joystick',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'mapuj na',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Odczytaj lokalny joystick i mapuj na określony zakres',
+
+	// X12 Bloki przycisków
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Lokalny przycisk',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'wciśnięty?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Sprawdź czy lokalny przycisk nadajnika jest wciśnięty',
+
+	// === Pilot RC ===
+
+	// RC Bloki inicjalizacji
+
+	// RC Bloki joysticka
+
+	// RC Bloki przycisków
+
+	// RC Bloki statusu
 });

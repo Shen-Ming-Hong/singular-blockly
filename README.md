@@ -135,7 +135,7 @@ Seamless integration with GitHub Copilot and AI assistants through the [Model Co
 | ------------------------- | --------------------------------------------------------------- |
 | `get_block_usage`         | Get detailed block documentation with fields and JSON templates |
 | `search_blocks`           | Search blocks by keyword (Chinese/English), sorted by relevance |
-| `list_blocks_by_category` | Browse blocks by category (13 categories available)             |
+| `list_blocks_by_category` | Browse blocks by category (15 categories available)             |
 | `get_workspace_state`     | Read current workspace, block arrangement, and board config     |
 | `update_workspace`        | Add, modify, delete, or replace blocks in workspace             |
 | `refresh_editor`          | Sync changes to the visual editor after workspace updates       |
@@ -361,6 +361,19 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 -   Connect/Disconnect
 -   Connection status
 -   IP address retrieval
+
+**X11 Extension Board (v0.51.0+)**
+
+-   180° Servo angle control (S1-S4 ports)
+-   360° Servo speed control (S1-S4 ports)
+-   DC Motor speed control (M1-M2 ports)
+-   WS2812 LED strip color control (D1-D2 ports)
+
+**🆕 X12 Transmitter Extension Board (v0.52.0+)**
+
+-   Local joystick reading (L1-L3, R1-R3 axes, ADC 0-4095)
+-   Joystick value mapping to custom range
+-   Local button state detection (K1-K4)
 
 **Built-in MicroPython Generators**
 

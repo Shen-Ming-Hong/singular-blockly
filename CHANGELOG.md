@@ -8,6 +8,68 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.52.0] - 2026-01-09
+
+### 新增功能 Added
+
+-   **CyberBrick X12 發射端擴展板積木選單** (CyberBrick X12 Transmitter Extension Board Blocks)
+
+    -   新增 3 個積木支援 X12 發射端擴展板（僅 CyberBrick 開發板顯示）
+        Added 3 blocks for X12 transmitter extension board (CyberBrick only)
+    -   本機搖桿讀取：讀取 ADC 值 0-4095（L1-L3 左搖桿、R1-R3 右搖桿）
+        Local joystick reading: Read ADC value 0-4095 (L1-L3 left, R1-R3 right)
+    -   搖桿數值映射：將 ADC 值映射到自訂範圍（如 -100 ~ 100）
+        Joystick value mapping: Map ADC value to custom range (e.g., -100 ~ 100)
+    -   本機按鈕偵測：檢查 K1-K4 按鈕是否被按下
+        Local button detection: Check if K1-K4 buttons are pressed
+
+-   **RC 遙控通訊積木（預留）** (RC Remote Control Blocks - Reserved)
+
+    -   積木定義與生成器已完成，但暫不在 Toolbox 中顯示
+        Block definitions and generators completed, but not yet visible in Toolbox
+    -   待雙機配對測試環境就緒後啟用
+        Will be enabled after dual-device pairing test environment is ready
+    -   包含：發射端/接收端初始化、遠端搖桿/按鈕讀取、連線狀態檢查
+        Includes: Master/Slave init, remote joystick/button reading, connection status
+
+-   **MicroPython 無限迴圈安全機制** (MicroPython Infinite Loop Safety)
+
+    -   自動偵測 `while True` 迴圈內是否有延遲
+        Auto-detect if `while True` loop contains delay
+    -   若無延遲，自動加入 `time.sleep_ms(10)` 確保可中斷
+        If no delay, auto-add `time.sleep_ms(10)` to ensure interruptibility
+    -   只檢查最外層程式碼，不影響 if/else 內的邏輯
+        Only checks top-level code, doesn't affect logic inside if/else
+
+-   **15 種語言完整 i18n 支援** (Full i18n Support for 15 Languages)
+
+    -   所有 X12 積木翻譯完整覆蓋
+        All X12 blocks fully translated
+    -   RC 積木翻譯預留（待啟用）
+        RC block translations reserved (pending activation)
+
+### 修復 Fixed
+
+-   **修復法文 i18n 檔案解析問題** (Fix French i18n File Parsing Issue)
+
+    -   修正 `translation-reader.js` 解析法文撇號（如 `l'émetteur`）時的錯誤
+        Fixed `translation-reader.js` parsing error with French apostrophes (e.g., `l'émetteur`)
+    -   改用更穩健的 `lastIndexOf('});')` 方法取代字元追蹤
+        Replaced character tracking with more robust `lastIndexOf('});')` approach
+
+### 技術細節 Technical Details
+
+-   **新增檔案 New Files**：
+    -   `media/blockly/blocks/x12.js`：X12 積木定義（3 個積木）
+    -   `media/blockly/blocks/rc.js`：RC 積木定義（8 個積木，預留）
+    -   `media/blockly/generators/micropython/x12.js`：X12 MicroPython 生成器
+    -   `media/blockly/generators/micropython/rc.js`：RC MicroPython 生成器
+    -   `media/toolbox/categories/cyberbrick_x12.json`：X12 Toolbox 類別
+    -   `media/toolbox/categories/cyberbrick_rc.json`：RC Toolbox 類別（預留）
+-   **Block Dictionary 更新**：
+    -   新增 X12 類別（4 積木）和 RC 類別（8 積木）
+    -   總計 139 blocks, 15 categories
+
 ## [0.51.1] - 2026-01-07
 
 ### 安全性修復 Security Fixes

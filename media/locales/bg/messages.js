@@ -809,4 +809,32 @@ window.languageManager.loadMessages('bg', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'задай цвят R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Задай цвят на пиксел на LED лента (индекс 0=първи пиксел, или всички)',
 	X11_LED_INDEX_ALL: 'Всички',
+
+	// === X12 Разширителна плочка Предавател ===
+	CATEGORY_X12: 'X12 Разширение',
+	X12_LABEL_JOYSTICK: 'Джойстик',
+	X12_LABEL_BUTTON: 'Бутон',
+
+	// X12 Джойстик блокове
+	X12_GET_JOYSTICK_PREFIX: 'Локален джойстик',
+	X12_GET_JOYSTICK_TOOLTIP: 'Чети ADC стойност на локалния джойстик на предавателя (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Локален джойстик',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'картирай към',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Чети локален джойстик и картирай към указан диапазон',
+
+	// X12 Бутон блокове
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Локален бутон',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'натиснат?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Провери дали локалният бутон на предавателя е натиснат',
+
+	// === RC Дистанционно ===
+
+	// RC Инициализация блокове
+
+	// RC Джойстик блокове
+
+	// RC Бутон блокове
+
+	// RC Статус блокове
 });

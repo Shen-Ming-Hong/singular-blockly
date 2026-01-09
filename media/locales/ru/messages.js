@@ -804,4 +804,32 @@ window.languageManager.loadMessages('ru', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'установить цвет R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Установить цвет пикселя LED ленты (индекс 0=первый пиксель, или все)',
 	X11_LED_INDEX_ALL: 'Все',
+
+	// === Плата расширения X12 Передатчик ===
+	CATEGORY_X12: 'X12 Расширение',
+	X12_LABEL_JOYSTICK: 'Джойстик',
+	X12_LABEL_BUTTON: 'Кнопка',
+
+	// X12 Блоки джойстика
+	X12_GET_JOYSTICK_PREFIX: 'Локальный джойстик',
+	X12_GET_JOYSTICK_TOOLTIP: 'Читать значение ADC локального джойстика передатчика (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Локальный джойстик',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'отобразить в',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Читать локальный джойстик и отобразить в указанный диапазон',
+
+	// X12 Блоки кнопок
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Локальная кнопка',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'нажата?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Проверить нажата ли локальная кнопка передатчика',
+
+	// === RC Пульт управления ===
+
+	// RC Блоки инициализации
+
+	// RC Блоки джойстика
+
+	// RC Блоки кнопок
+
+	// RC Блоки статуса
 });

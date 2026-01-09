@@ -804,4 +804,32 @@ window.languageManager.loadMessages('zh-hant', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: '顆設定顏色 紅',
 	X11_LED_SET_COLOR_TOOLTIP: '設定 LED 燈條像素顏色 (索引 0=第一顆，或全部)',
 	X11_LED_INDEX_ALL: '全部',
+
+	// === X12 擴展板 ===
+	CATEGORY_X12: 'X12 擴展板',
+	X12_LABEL_JOYSTICK: '搖桿',
+	X12_LABEL_BUTTON: '按鈕',
+
+	// X12 搖桿積木
+	X12_GET_JOYSTICK_PREFIX: '本機搖桿',
+	X12_GET_JOYSTICK_TOOLTIP: '讀取發射端本機搖桿的 ADC 值 (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: '本機搖桿',
+	X12_GET_JOYSTICK_MAPPED_MIN: '映射',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: '讀取發射端本機搖桿並映射到指定範圍',
+
+	// X12 按鈕積木
+	X12_IS_BUTTON_PRESSED_PREFIX: '本機按鈕',
+	X12_IS_BUTTON_PRESSED_SUFFIX: '被按下?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: '檢查發射端本機按鈕是否被按下',
+
+	// === RC 遙控通訊 ===
+
+	// RC 初始化積木
+
+	// RC 搖桿積木
+
+	// RC 按鈕積木
+
+	// RC 狀態積木
 });
