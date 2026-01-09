@@ -802,4 +802,33 @@ window.languageManager.loadMessages('ko', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: '색상 설정 R',
 	X11_LED_SET_COLOR_TOOLTIP: 'LED 스트립 픽셀 색상 설정 (인덱스 0=첫 번째, 또는 전체)',
 	X11_LED_INDEX_ALL: '전체',
+
+	// === X12 송신기 확장 보드 ===
+	CATEGORY_X12: 'X12 확장 보드',
+	X12_LABEL_JOYSTICK: '조이스틱',
+	X12_LABEL_BUTTON: '버튼',
+
+	// X12 조이스틱 블록
+	X12_GET_JOYSTICK_PREFIX: '조이스틱',
+	X12_GET_JOYSTICK_SUFFIX: '값',
+	X12_GET_JOYSTICK_TOOLTIP: '조이스틱 ADC 값 읽기 (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: '조이스틱',
+	X12_GET_JOYSTICK_MAPPED_MIN: '매핑',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: '조이스틱을 읽고 지정된 범위로 매핑',
+
+	// X12 버튼 블록
+	X12_IS_BUTTON_PRESSED_PREFIX: '버튼',
+	X12_IS_BUTTON_PRESSED_SUFFIX: '눌림?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: '버튼이 눌렸는지 확인',
+
+	// === RC 원격 제어 ===
+
+	// RC 초기화 블록
+
+	// RC 조이스틱 블록
+
+	// RC 버튼 블록
+
+	// RC 상태 블록
 });

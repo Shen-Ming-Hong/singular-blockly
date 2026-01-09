@@ -805,4 +805,33 @@ window.languageManager.loadMessages('cs', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'nastav barvu R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Nastav barvu pixelu LED pásku (index 0=první pixel, nebo všechny)',
 	X11_LED_INDEX_ALL: 'Všechny',
+
+	// === X12 Rozšiřující deska Vysílač ===
+	CATEGORY_X12: 'X12 Rozšíření',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Tlačítko',
+
+	// X12 Joystick bloky
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'hodnota',
+	X12_GET_JOYSTICK_TOOLTIP: 'Číst ADC hodnotu joysticku (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'mapovat na',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Číst joystick a mapovat na určený rozsah',
+
+	// X12 Tlačítko bloky
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Tlačítko',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'stisknuto?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Zkontrolovat zda je tlačítko stisknuto',
+
+	// === RC Dálkové ovládání ===
+
+	// RC Inicializace bloky
+
+	// RC Joystick bloky
+
+	// RC Tlačítko bloky
+
+	// RC Stav bloky
 });

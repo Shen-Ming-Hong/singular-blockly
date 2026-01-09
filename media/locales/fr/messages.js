@@ -472,7 +472,8 @@ window.languageManager.loadMessages('fr', {
 	PIXETTO_POSITION_WIDTH: 'Largeur',
 	PIXETTO_POSITION_HEIGHT: 'Hauteur',
 
-	// Pixetto Road Info Options	PIXETTO_ROAD_CENTER_X: 'Centre X',
+	// Pixetto Road Info Options
+	PIXETTO_ROAD_CENTER_X: 'Centre X',
 	PIXETTO_ROAD_CENTER_Y: 'Centre Y',
 	PIXETTO_ROAD_LEFT_X: 'Limite Gauche X',
 	PIXETTO_ROAD_RIGHT_X: 'Limite Droite X',
@@ -805,4 +806,23 @@ window.languageManager.loadMessages('fr', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'définir couleur R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Définir la couleur du pixel de la bande LED (index 0=premier pixel, ou tous)',
 	X11_LED_INDEX_ALL: 'Tous',
+
+	// === Carte d'extension X12 Émetteur ===
+	CATEGORY_X12: 'X12 Extension',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Bouton',
+
+	// Blocs Joystick X12
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'valeur',
+	X12_GET_JOYSTICK_TOOLTIP: 'Lire la valeur ADC du joystick (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'mapper vers',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Lire le joystick et mapper vers une plage spécifiée',
+
+	// Blocs Bouton X12
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Bouton',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'appuyé?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Vérifier si le bouton est appuyé',
 });

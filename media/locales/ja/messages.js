@@ -803,4 +803,33 @@ window.languageManager.loadMessages('ja', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'の色を設定 R',
 	X11_LED_SET_COLOR_TOOLTIP: 'LEDテープのピクセル色を設定 (インデックス 0=最初、または全て)',
 	X11_LED_INDEX_ALL: '全て',
+
+	// === X12 送信機拡張ボード ===
+	CATEGORY_X12: 'X12 拡張ボード',
+	X12_LABEL_JOYSTICK: 'ジョイスティック',
+	X12_LABEL_BUTTON: 'ボタン',
+
+	// X12 ジョイスティックブロック
+	X12_GET_JOYSTICK_PREFIX: 'ジョイスティック',
+	X12_GET_JOYSTICK_SUFFIX: '値',
+	X12_GET_JOYSTICK_TOOLTIP: 'ジョイスティックのADC値を読み取る (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'ジョイスティック',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'マップ',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'ジョイスティックを読み取り、指定範囲にマップ',
+
+	// X12 ボタンブロック
+	X12_IS_BUTTON_PRESSED_PREFIX: 'ボタン',
+	X12_IS_BUTTON_PRESSED_SUFFIX: '押された?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'ボタンが押されているか確認',
+
+	// === RC リモコン通信 ===
+
+	// RC 初期化ブロック
+
+	// RC ジョイスティックブロック
+
+	// RC ボタンブロック
+
+	// RC ステータスブロック
 });

@@ -1,0 +1,69 @@
+{
+    "kind": "category",
+    "name": "%{CATEGORY_RC}",
+    "colour": "160",
+    "contents": [
+        {
+            "kind": "label",
+            "text": "%{RC_LABEL_INIT}"
+        },
+        {
+            "kind": "block",
+            "type": "rc_master_init"
+        },
+        {
+            "kind": "block",
+            "type": "rc_slave_init"
+        },
+        {
+            "kind": "label",
+            "text": "%{RC_LABEL_JOYSTICK}"
+        },
+        {
+            "kind": "block",
+            "type": "rc_get_joystick"
+        },
+        {
+            "kind": "block",
+            "type": "rc_get_joystick_mapped",
+            "inputs": {
+                "MIN": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": -100
+                        }
+                    }
+                },
+                "MAX": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 100
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "label",
+            "text": "%{RC_LABEL_BUTTON}"
+        },
+        {
+            "kind": "block",
+            "type": "rc_is_button_pressed"
+        },
+        {
+            "kind": "label",
+            "text": "%{RC_LABEL_STATUS}"
+        },
+        {
+            "kind": "block",
+            "type": "rc_is_connected"
+        },
+        {
+            "kind": "block",
+            "type": "rc_get_rc_index"
+        }
+    ]
+}

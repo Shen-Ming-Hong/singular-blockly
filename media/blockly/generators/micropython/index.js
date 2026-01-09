@@ -233,10 +233,13 @@ window.micropythonGenerator.finish = function (code) {
 	}
 	fullCode += '\n';
 
-	// 程式進入點
+	// 程式進入點 (加入 KeyboardInterrupt 處理，確保可以中斷程式)
 	fullCode += '\n# Entry point\n';
 	fullCode += 'if __name__ == "__main__":\n';
-	fullCode += this.INDENT + 'main()\n';
+	fullCode += this.INDENT + 'try:\n';
+	fullCode += this.INDENT + this.INDENT + 'main()\n';
+	fullCode += this.INDENT + 'except KeyboardInterrupt:\n';
+	fullCode += this.INDENT + this.INDENT + 'pass\n';
 
 	// 重置命名資料庫
 	this.nameDB_.reset();

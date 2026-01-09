@@ -30,59 +30,16 @@ function loadMessagesFile(lang) {
 		return null;
 	}
 
-	// Find the matching closing brace
-	// We need to count braces to find the correct closing one
-	let braceCount = 0;
-	let objEnd = objStart;
-	let inString = false;
-	let stringChar = null;
-	let escaped = false;
-
-	for (let i = objStart; i < content.length; i++) {
-		const char = content[i];
-		const prevChar = i > 0 ? content[i - 1] : '';
-
-		// Handle escape sequences
-		if (escaped) {
-			escaped = false;
-			continue;
-		}
-
-		if (char === '\\') {
-			escaped = true;
-			continue;
-		}
-
-		// Handle string literals
-		if ((char === '"' || char === "'" || char === '`') && !inString) {
-			inString = true;
-			stringChar = char;
-			continue;
-		}
-
-		if (inString && char === stringChar && prevChar !== '\\') {
-			inString = false;
-			stringChar = null;
-			continue;
-		}
-
-		// Only count braces outside of strings
-		if (!inString) {
-			if (char === '{') {
-				braceCount++;
-			} else if (char === '}') {
-				braceCount--;
-				if (braceCount === 0) {
-					objEnd = i + 1;
-					break;
-				}
-			}
-		}
-	}
-
-	if (objEnd === objStart) {
+	// Find the end by looking for the closing ");" pattern from the end
+	// This is more reliable than trying to track string states with French apostrophes
+	const closingPattern = '});';
+	const closingIdx = content.lastIndexOf(closingPattern);
+	if (closingIdx === -1 || closingIdx < objStart) {
 		return null;
 	}
+
+	// The object ends at the } before ");
+	const objEnd = closingIdx + 1;
 
 	// Extract the object text
 	const objText = content.substring(objStart, objEnd);

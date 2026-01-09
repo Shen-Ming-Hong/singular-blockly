@@ -807,4 +807,33 @@ window.languageManager.loadMessages('de', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'setze Farbe R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Setze LED-Streifen Pixel-Farbe (Index 0=erstes Pixel, oder alle)',
 	X11_LED_INDEX_ALL: 'Alle',
+
+	// === X12 Sender Erweiterungsplatine ===
+	CATEGORY_X12: 'X12 Erweiterung',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Taste',
+
+	// X12 Joystick Blöcke
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'Wert',
+	X12_GET_JOYSTICK_TOOLTIP: 'Joystick ADC-Wert lesen (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'mappen auf',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Joystick lesen und auf Bereich mappen',
+
+	// X12 Tasten Blöcke
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Taste',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'gedrückt?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Prüfen ob Taste gedrückt ist',
+
+	// === RC Fernsteuerung ===
+
+	// RC Initialisierungsblöcke
+
+	// RC Joystick Blöcke
+
+	// RC Tasten Blöcke
+
+	// RC Status Blöcke
 });

@@ -16,6 +16,28 @@
 	}
 
 	/**
+	 * 檢查程式碼最外層是否包含延遲（不檢查 if/else 等第二層以內的內容）
+	 * @param {string} branch - 迴圈內的程式碼
+	 * @returns {boolean} 最外層是否有延遲
+	 */
+	function hasDelayAtTopLevel(branch) {
+		// 分析每一行，只檢查第一層縮排（4 spaces 或 1 tab）的延遲
+		const lines = branch.split('\n');
+		const delayPattern = /time\.sleep|sleep_ms|sleep_us|machine\.idle/;
+		const topLevelIndent = '    '; // generator.INDENT = 4 spaces
+
+		for (const line of lines) {
+			// 檢查是否為第一層縮排（剛好一個縮排，不多不少）
+			if (line.startsWith(topLevelIndent) && !line.startsWith(topLevelIndent + topLevelIndent)) {
+				if (delayPattern.test(line)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * 無限迴圈
 	 */
 	generator.forBlock['controls_whileUntil'] = function (block) {
@@ -26,6 +48,16 @@
 		if (until) {
 			argument0 = 'not ' + argument0;
 		}
+
+		// 如果是無限迴圈 (while True) 且最外層沒有延遲，加入最小延遲避免無法中斷
+		// 只檢查第一層，if/else 內的延遲不算（因為條件不成立時不會執行）
+		const isInfiniteLoop = argument0 === 'True';
+		if (isInfiniteLoop && !hasDelayAtTopLevel(branch)) {
+			generator.addImport('import time');
+			// 在迴圈結尾加入 10ms 延遲，確保 CPU 有機會處理中斷
+			branch += generator.INDENT + 'time.sleep_ms(10)  # 確保可中斷\n';
+		}
+
 		return 'while ' + argument0 + ':\n' + branch;
 	};
 

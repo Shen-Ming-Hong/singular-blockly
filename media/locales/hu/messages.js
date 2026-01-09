@@ -809,4 +809,33 @@ window.languageManager.loadMessages('hu', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'állítsd színre R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Állítsd be a LED szalag pixel színét (index 0=első pixel, vagy mind)',
 	X11_LED_INDEX_ALL: 'Mind',
+
+	// === X12 Bővítőkártya Adó ===
+	CATEGORY_X12: 'X12 Bővítő',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Gomb',
+
+	// X12 Joystick blokkok
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'érték',
+	X12_GET_JOYSTICK_TOOLTIP: 'Olvasd a joystick ADC értékét (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'leképezés',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Olvasd a joystickot és képezd le a megadott tartományra',
+
+	// X12 Gomb blokkok
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Gomb',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'lenyomva?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Ellenőrizd a gomb lenyomását',
+
+	// === RC Távirányító ===
+
+	// RC Inicializálás blokkok
+
+	// RC Joystick blokkok
+
+	// RC Gomb blokkok
+
+	// RC Állapot blokkok
 });

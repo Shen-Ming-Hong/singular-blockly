@@ -807,4 +807,33 @@ window.languageManager.loadMessages('tr', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'renk ayarla R',
 	X11_LED_SET_COLOR_TOOLTIP: 'LED şerit piksel rengini ayarla (indeks 0=ilk piksel veya tümü)',
 	X11_LED_INDEX_ALL: 'Tümü',
+
+	// === X12 Genişletme Kartı Verici ===
+	CATEGORY_X12: 'X12 Genişletme',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Düğme',
+
+	// X12 Joystick blokları
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'değer',
+	X12_GET_JOYSTICK_TOOLTIP: 'Joystick ADC değerini oku (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'eşle',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Joystick oku ve belirtilen aralığa eşle',
+
+	// X12 Düğme blokları
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Düğme',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'basılı mı?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Düğmenin basılı olup olmadığını kontrol et',
+
+	// === RC Uzaktan Kumanda ===
+
+	// RC Başlatma blokları
+
+	// RC Joystick blokları
+
+	// RC Düğme blokları
+
+	// RC Durum blokları
 });

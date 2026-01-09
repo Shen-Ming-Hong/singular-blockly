@@ -1,0 +1,181 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "X12 發射端積木定義",
+    "description": "CyberBrick X12 發射端本機讀取選單的積木 API 合約",
+    "version": "1.0.0",
+    "menuConfig": {
+        "category": "CATEGORY_X12",
+        "colour": 150,
+        "labels": [
+            "X12_LABEL_JOYSTICK",
+            "X12_LABEL_BUTTON"
+        ]
+    },
+    "sharedOptions": {
+        "joystickChannels": [
+            {
+                "label": "L1",
+                "value": "0"
+            },
+            {
+                "label": "L2",
+                "value": "1"
+            },
+            {
+                "label": "L3",
+                "value": "2"
+            },
+            {
+                "label": "R1",
+                "value": "3"
+            },
+            {
+                "label": "R2",
+                "value": "4"
+            },
+            {
+                "label": "R3",
+                "value": "5"
+            }
+        ],
+        "buttonChannels": [
+            {
+                "label": "K1",
+                "value": "6"
+            },
+            {
+                "label": "K2",
+                "value": "7"
+            },
+            {
+                "label": "K3",
+                "value": "8"
+            },
+            {
+                "label": "K4",
+                "value": "9"
+            }
+        ]
+    },
+    "blocks": [
+        {
+            "type": "x12_get_joystick",
+            "category": "joystick",
+            "message": "%{X12_GET_JOYSTICK_PREFIX} %1",
+            "args": [
+                {
+                    "type": "field_dropdown",
+                    "name": "CHANNEL",
+                    "options": "$ref:sharedOptions.joystickChannels"
+                }
+            ],
+            "tooltip": "%{X12_GET_JOYSTICK_TOOLTIP}",
+            "output": "Number",
+            "codeTemplate": {
+                "micropython": {
+                    "imports": [
+                        "import rc_module"
+                    ],
+                    "hardwareInit": [],
+                    "code": "(rc_module.rc_master_data() or (2048,)*10)[{CHANNEL}]",
+                    "order": "ORDER_MEMBER"
+                }
+            }
+        },
+        {
+            "type": "x12_get_joystick_mapped",
+            "category": "joystick",
+            "message": "%{X12_GET_JOYSTICK_MAPPED_PREFIX} %1 %{X12_GET_JOYSTICK_MAPPED_MIN} %2 %{X12_GET_JOYSTICK_MAPPED_MAX} %3",
+            "args": [
+                {
+                    "type": "field_dropdown",
+                    "name": "CHANNEL",
+                    "options": "$ref:sharedOptions.joystickChannels"
+                },
+                {
+                    "type": "input_value",
+                    "name": "MIN",
+                    "check": "Number",
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": -100
+                        }
+                    }
+                },
+                {
+                    "type": "input_value",
+                    "name": "MAX",
+                    "check": "Number",
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 100
+                        }
+                    }
+                }
+            ],
+            "tooltip": "%{X12_GET_JOYSTICK_MAPPED_TOOLTIP}",
+            "output": "Number",
+            "inputsInline": true,
+            "codeTemplate": {
+                "micropython": {
+                    "imports": [
+                        "import rc_module"
+                    ],
+                    "hardwareInit": [],
+                    "code": "((rc_module.rc_master_data() or (2048,)*10)[{CHANNEL}] * ({MAX} - {MIN}) // 4095 + {MIN})",
+                    "order": "ORDER_ADDITIVE"
+                }
+            }
+        },
+        {
+            "type": "x12_is_button_pressed",
+            "category": "button",
+            "message": "%{X12_IS_BUTTON_PRESSED_PREFIX} %1 %{X12_IS_BUTTON_PRESSED_SUFFIX}",
+            "args": [
+                {
+                    "type": "field_dropdown",
+                    "name": "BUTTON",
+                    "options": "$ref:sharedOptions.buttonChannels"
+                }
+            ],
+            "tooltip": "%{X12_IS_BUTTON_PRESSED_TOOLTIP}",
+            "output": "Boolean",
+            "codeTemplate": {
+                "micropython": {
+                    "imports": [
+                        "import rc_module"
+                    ],
+                    "hardwareInit": [],
+                    "code": "((rc_module.rc_master_data() or (2048,)*6 + (1,)*4)[{BUTTON}] == 0)",
+                    "order": "ORDER_RELATIONAL"
+                }
+            }
+        },
+        {
+            "type": "x12_get_button",
+            "category": "button",
+            "message": "%{X12_GET_BUTTON_PREFIX} %1 %{X12_GET_BUTTON_SUFFIX}",
+            "args": [
+                {
+                    "type": "field_dropdown",
+                    "name": "BUTTON",
+                    "options": "$ref:sharedOptions.buttonChannels"
+                }
+            ],
+            "tooltip": "%{X12_GET_BUTTON_TOOLTIP}",
+            "output": "Number",
+            "codeTemplate": {
+                "micropython": {
+                    "imports": [
+                        "import rc_module"
+                    ],
+                    "hardwareInit": [],
+                    "code": "(rc_module.rc_master_data() or (2048,)*6 + (1,)*4)[{BUTTON}]",
+                    "order": "ORDER_MEMBER"
+                }
+            }
+        }
+    ]
+}

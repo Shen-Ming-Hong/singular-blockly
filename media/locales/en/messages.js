@@ -811,4 +811,23 @@ window.languageManager.loadMessages('en', {
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'set color R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Set LED strip pixel color (index 0=first pixel, or all)',
 	X11_LED_INDEX_ALL: 'All',
+
+	// === X12 Extension Board ===
+	CATEGORY_X12: 'X12 Extension',
+	X12_LABEL_JOYSTICK: 'Joystick',
+	X12_LABEL_BUTTON: 'Button',
+
+	// X12 Joystick Blocks
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'value',
+	X12_GET_JOYSTICK_TOOLTIP: 'Read joystick ADC value (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_MAPPED_MIN: 'map to',
+	X12_GET_JOYSTICK_MAPPED_MAX: '~',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Read joystick and map to specified range',
+
+	// X12 Button Blocks
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Button',
+	X12_IS_BUTTON_PRESSED_SUFFIX: 'pressed?',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Check if button is pressed',
 });
