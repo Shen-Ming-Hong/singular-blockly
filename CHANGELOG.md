@@ -8,6 +8,21 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.52.1] - 2026-01-09
+
+### 安全性修復 Security Fixes
+
+-   **修復 MCP SDK ReDoS 安全漏洞 (CVE-2026-0621)** (Fix MCP SDK ReDoS Security Vulnerability)
+
+    -   升級 `@modelcontextprotocol/sdk` 從 1.25.1 至 1.25.2
+        Upgraded `@modelcontextprotocol/sdk` from 1.25.1 to 1.25.2
+    -   修復 `UriTemplate` 類別處理 RFC 6570 擴展陣列模式時的 ReDoS 漏洞
+        Fixed ReDoS vulnerability in `UriTemplate` class when handling RFC 6570 expansion array patterns
+    -   嚴重程度：High (CVSS 4.0: 8.7)
+        Severity: High (CVSS 4.0: 8.7)
+    -   關閉 Dependabot Alert #11
+        Closes Dependabot Alert #11
+
 ## [0.52.0] - 2026-01-09
 
 ### 新增功能 Added
