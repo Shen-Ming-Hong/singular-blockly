@@ -816,17 +816,18 @@ window.languageManager.loadMessages('bg', {
 	X12_LABEL_BUTTON: 'Бутон',
 
 	// X12 Джойстик блокове
-	X12_GET_JOYSTICK_PREFIX: 'Локален джойстик',
-	X12_GET_JOYSTICK_TOOLTIP: 'Чети ADC стойност на локалния джойстик на предавателя (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Локален джойстик',
+	X12_GET_JOYSTICK_PREFIX: 'Джойстик',
+	X12_GET_JOYSTICK_SUFFIX: 'стойност',
+	X12_GET_JOYSTICK_TOOLTIP: 'Чети ADC стойност на джойстика (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Джойстик',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'картирай към',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Чети локален джойстик и картирай към указан диапазон',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Чети джойстик и картирай към указан диапазон',
 
 	// X12 Бутон блокове
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Локален бутон',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Бутон',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'натиснат?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Провери дали локалният бутон на предавателя е натиснат',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Провери дали бутонът е натиснат',
 
 	// === RC Дистанционно ===
 

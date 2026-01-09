@@ -809,17 +809,18 @@ window.languageManager.loadMessages('ko', {
 	X12_LABEL_BUTTON: '버튼',
 
 	// X12 조이스틱 블록
-	X12_GET_JOYSTICK_PREFIX: '로컬 조이스틱',
-	X12_GET_JOYSTICK_TOOLTIP: '송신기의 로컬 조이스틱 ADC 값 읽기 (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: '로컬 조이스틱',
+	X12_GET_JOYSTICK_PREFIX: '조이스틱',
+	X12_GET_JOYSTICK_SUFFIX: '값',
+	X12_GET_JOYSTICK_TOOLTIP: '조이스틱 ADC 값 읽기 (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: '조이스틱',
 	X12_GET_JOYSTICK_MAPPED_MIN: '매핑',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: '로컬 조이스틱을 읽고 지정된 범위로 매핑',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: '조이스틱을 읽고 지정된 범위로 매핑',
 
 	// X12 버튼 블록
-	X12_IS_BUTTON_PRESSED_PREFIX: '로컬 버튼',
+	X12_IS_BUTTON_PRESSED_PREFIX: '버튼',
 	X12_IS_BUTTON_PRESSED_SUFFIX: '눌림?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: '송신기의 로컬 버튼이 눌렸는지 확인',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: '버튼이 눌렸는지 확인',
 
 	// === RC 원격 제어 ===
 

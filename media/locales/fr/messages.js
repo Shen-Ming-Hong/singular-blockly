@@ -813,15 +813,16 @@ window.languageManager.loadMessages('fr', {
 	X12_LABEL_BUTTON: 'Bouton',
 
 	// Blocs Joystick X12
-	X12_GET_JOYSTICK_PREFIX: 'Joystick local',
-	X12_GET_JOYSTICK_TOOLTIP: "Lire la valeur ADC du joystick local de l'émetteur (0-4095)",
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick local',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'valeur',
+	X12_GET_JOYSTICK_TOOLTIP: 'Lire la valeur ADC du joystick (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'mapper vers',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Lire le joystick local et mapper vers une plage spécifiée',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Lire le joystick et mapper vers une plage spécifiée',
 
 	// Blocs Bouton X12
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Bouton local',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Bouton',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'appuyé?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: "Vérifier si le bouton local de l'émetteur est appuyé",
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Vérifier si le bouton est appuyé',
 });

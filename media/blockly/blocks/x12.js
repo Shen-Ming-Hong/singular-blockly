@@ -30,11 +30,12 @@ const X12_BUTTON_CHANNEL_OPTIONS = [
 Blockly.Blocks['x12_get_joystick'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('X12_GET_JOYSTICK_PREFIX', '本機搖桿'))
-			.appendField(new Blockly.FieldDropdown(X12_JOYSTICK_CHANNEL_OPTIONS), 'CHANNEL');
+			.appendField(window.languageManager.getMessage('X12_GET_JOYSTICK_PREFIX', '搖桿'))
+			.appendField(new Blockly.FieldDropdown(X12_JOYSTICK_CHANNEL_OPTIONS), 'CHANNEL')
+			.appendField(window.languageManager.getMessage('X12_GET_JOYSTICK_SUFFIX', '數值'));
 		this.setOutput(true, 'Number');
 		this.setColour(150);
-		this.setTooltip(window.languageManager.getMessage('X12_GET_JOYSTICK_TOOLTIP', '讀取發射端本機搖桿的 ADC 值 (0-4095)'));
+		this.setTooltip(window.languageManager.getMessage('X12_GET_JOYSTICK_TOOLTIP', '讀取搖桿的 ADC 數值 (0-4095)'));
 		this.setHelpUrl('');
 	},
 };
@@ -43,7 +44,7 @@ Blockly.Blocks['x12_get_joystick'] = {
 Blockly.Blocks['x12_get_joystick_mapped'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('X12_GET_JOYSTICK_MAPPED_PREFIX', '本機搖桿'))
+			.appendField(window.languageManager.getMessage('X12_GET_JOYSTICK_MAPPED_PREFIX', '搖桿'))
 			.appendField(new Blockly.FieldDropdown(X12_JOYSTICK_CHANNEL_OPTIONS), 'CHANNEL')
 			.appendField(window.languageManager.getMessage('X12_GET_JOYSTICK_MAPPED_MIN', '映射'));
 		this.appendValueInput('MIN').setCheck('Number');
@@ -52,7 +53,7 @@ Blockly.Blocks['x12_get_joystick_mapped'] = {
 		this.setInputsInline(true);
 		this.setOutput(true, 'Number');
 		this.setColour(150);
-		this.setTooltip(window.languageManager.getMessage('X12_GET_JOYSTICK_MAPPED_TOOLTIP', '讀取發射端本機搖桿並映射到指定範圍'));
+		this.setTooltip(window.languageManager.getMessage('X12_GET_JOYSTICK_MAPPED_TOOLTIP', '讀取搖桿並映射到指定範圍'));
 		this.setHelpUrl('');
 	},
 };
@@ -61,12 +62,12 @@ Blockly.Blocks['x12_get_joystick_mapped'] = {
 Blockly.Blocks['x12_is_button_pressed'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('X12_IS_BUTTON_PRESSED_PREFIX', '本機按鈕'))
+			.appendField(window.languageManager.getMessage('X12_IS_BUTTON_PRESSED_PREFIX', '按鈕'))
 			.appendField(new Blockly.FieldDropdown(X12_BUTTON_CHANNEL_OPTIONS), 'BUTTON')
 			.appendField(window.languageManager.getMessage('X12_IS_BUTTON_PRESSED_SUFFIX', '被按下?'));
 		this.setOutput(true, 'Boolean');
 		this.setColour(150);
-		this.setTooltip(window.languageManager.getMessage('X12_IS_BUTTON_PRESSED_TOOLTIP', '檢查發射端本機按鈕是否被按下'));
+		this.setTooltip(window.languageManager.getMessage('X12_IS_BUTTON_PRESSED_TOOLTIP', '檢查按鈕是否被按下'));
 		this.setHelpUrl('');
 	},
 };

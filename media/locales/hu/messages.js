@@ -816,17 +816,18 @@ window.languageManager.loadMessages('hu', {
 	X12_LABEL_BUTTON: 'Gomb',
 
 	// X12 Joystick blokkok
-	X12_GET_JOYSTICK_PREFIX: 'Helyi joystick',
-	X12_GET_JOYSTICK_TOOLTIP: 'Olvasd az adó helyi joystick ADC értékét (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Helyi joystick',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'érték',
+	X12_GET_JOYSTICK_TOOLTIP: 'Olvasd a joystick ADC értékét (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'leképezés',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Olvasd a helyi joystickot és képezd le a megadott tartományra',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Olvasd a joystickot és képezd le a megadott tartományra',
 
 	// X12 Gomb blokkok
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Helyi gomb',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Gomb',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'lenyomva?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Ellenőrizd az adó helyi gombjának lenyomását',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Ellenőrizd a gomb lenyomását',
 
 	// === RC Távirányító ===
 

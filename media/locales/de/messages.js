@@ -814,17 +814,18 @@ window.languageManager.loadMessages('de', {
 	X12_LABEL_BUTTON: 'Taste',
 
 	// X12 Joystick Blöcke
-	X12_GET_JOYSTICK_PREFIX: 'Lokaler Joystick',
-	X12_GET_JOYSTICK_TOOLTIP: 'Lokalen Joystick ADC-Wert am Sender lesen (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Lokaler Joystick',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'Wert',
+	X12_GET_JOYSTICK_TOOLTIP: 'Joystick ADC-Wert lesen (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'mappen auf',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Lokalen Joystick lesen und auf Bereich mappen',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Joystick lesen und auf Bereich mappen',
 
 	// X12 Tasten Blöcke
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Lokale Taste',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Taste',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'gedrückt?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Prüfen ob lokale Taste am Sender gedrückt ist',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Prüfen ob Taste gedrückt ist',
 
 	// === RC Fernsteuerung ===
 

@@ -811,17 +811,18 @@ window.languageManager.loadMessages('ru', {
 	X12_LABEL_BUTTON: 'Кнопка',
 
 	// X12 Блоки джойстика
-	X12_GET_JOYSTICK_PREFIX: 'Локальный джойстик',
-	X12_GET_JOYSTICK_TOOLTIP: 'Читать значение ADC локального джойстика передатчика (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Локальный джойстик',
+	X12_GET_JOYSTICK_PREFIX: 'Джойстик',
+	X12_GET_JOYSTICK_SUFFIX: 'значение',
+	X12_GET_JOYSTICK_TOOLTIP: 'Читать значение ADC джойстика (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Джойстик',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'отобразить в',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Читать локальный джойстик и отобразить в указанный диапазон',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Читать джойстик и отобразить в указанный диапазон',
 
 	// X12 Блоки кнопок
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Локальная кнопка',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Кнопка',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'нажата?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Проверить нажата ли локальная кнопка передатчика',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Проверить нажата ли кнопка',
 
 	// === RC Пульт управления ===
 

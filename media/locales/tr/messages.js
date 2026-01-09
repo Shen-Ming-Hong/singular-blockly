@@ -814,17 +814,18 @@ window.languageManager.loadMessages('tr', {
 	X12_LABEL_BUTTON: 'Düğme',
 
 	// X12 Joystick blokları
-	X12_GET_JOYSTICK_PREFIX: 'Yerel joystick',
-	X12_GET_JOYSTICK_TOOLTIP: 'Vericinin yerel joystick ADC değerini oku (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Yerel joystick',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'değer',
+	X12_GET_JOYSTICK_TOOLTIP: 'Joystick ADC değerini oku (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'eşle',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Yerel joystick oku ve belirtilen aralığa eşle',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Joystick oku ve belirtilen aralığa eşle',
 
 	// X12 Düğme blokları
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Yerel düğme',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Düğme',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'basılı mı?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Vericinin yerel düğmesinin basılı olup olmadığını kontrol et',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Düğmenin basılı olup olmadığını kontrol et',
 
 	// === RC Uzaktan Kumanda ===
 

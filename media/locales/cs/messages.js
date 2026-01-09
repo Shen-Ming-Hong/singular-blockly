@@ -812,17 +812,18 @@ window.languageManager.loadMessages('cs', {
 	X12_LABEL_BUTTON: 'Tlačítko',
 
 	// X12 Joystick bloky
-	X12_GET_JOYSTICK_PREFIX: 'Lokální joystick',
-	X12_GET_JOYSTICK_TOOLTIP: 'Číst ADC hodnotu lokálního joysticku vysílače (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Lokální joystick',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'hodnota',
+	X12_GET_JOYSTICK_TOOLTIP: 'Číst ADC hodnotu joysticku (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'mapovat na',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Číst lokální joystick a mapovat na určený rozsah',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Číst joystick a mapovat na určený rozsah',
 
 	// X12 Tlačítko bloky
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Lokální tlačítko',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Tlačítko',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'stisknuto?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Zkontrolovat zda je lokální tlačítko vysílače stisknuto',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Zkontrolovat zda je tlačítko stisknuto',
 
 	// === RC Dálkové ovládání ===
 

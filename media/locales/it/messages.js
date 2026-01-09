@@ -810,17 +810,18 @@ window.languageManager.loadMessages('it', {
 	X12_LABEL_BUTTON: 'Pulsante',
 
 	// Blocchi Joystick X12
-	X12_GET_JOYSTICK_PREFIX: 'Joystick locale',
-	X12_GET_JOYSTICK_TOOLTIP: 'Leggi valore ADC del joystick locale del trasmettitore (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick locale',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'valore',
+	X12_GET_JOYSTICK_TOOLTIP: 'Leggi valore ADC del joystick (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'mappa su',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: "Leggi joystick locale e mappa sull'intervallo specificato",
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: "Leggi joystick e mappa sull'intervallo specificato",
 
 	// Blocchi Pulsante X12
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Pulsante locale',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Pulsante',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'premuto?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Controlla se il pulsante locale del trasmettitore è premuto',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Controlla se il pulsante è premuto',
 
 	// === Telecomando RC ===
 

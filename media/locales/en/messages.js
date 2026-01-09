@@ -818,17 +818,18 @@ window.languageManager.loadMessages('en', {
 	X12_LABEL_BUTTON: 'Button',
 
 	// X12 Joystick Blocks
-	X12_GET_JOYSTICK_PREFIX: 'Local Joystick',
-	X12_GET_JOYSTICK_TOOLTIP: 'Read local joystick ADC value (0-4095) on transmitter',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Local Joystick',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'value',
+	X12_GET_JOYSTICK_TOOLTIP: 'Read joystick ADC value (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'map to',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Read local joystick and map to specified range',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Read joystick and map to specified range',
 
 	// X12 Button Blocks
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Local Button',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Button',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'pressed?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Check if local button is pressed on transmitter',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Check if button is pressed',
 
 
 

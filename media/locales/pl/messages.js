@@ -815,17 +815,18 @@ window.languageManager.loadMessages('pl', {
 	X12_LABEL_BUTTON: 'Przycisk',
 
 	// X12 Bloki joysticka
-	X12_GET_JOYSTICK_PREFIX: 'Lokalny joystick',
-	X12_GET_JOYSTICK_TOOLTIP: 'Odczytaj wartość ADC lokalnego joysticka nadajnika (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Lokalny joystick',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'wartość',
+	X12_GET_JOYSTICK_TOOLTIP: 'Odczytaj wartość ADC joysticka (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'mapuj na',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Odczytaj lokalny joystick i mapuj na określony zakres',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Odczytaj joystick i mapuj na określony zakres',
 
 	// X12 Bloki przycisków
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Lokalny przycisk',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Przycisk',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'wciśnięty?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Sprawdź czy lokalny przycisk nadajnika jest wciśnięty',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Sprawdź czy przycisk jest wciśnięty',
 
 	// === Pilot RC ===
 

@@ -810,17 +810,18 @@ window.languageManager.loadMessages('ja', {
 	X12_LABEL_BUTTON: 'ボタン',
 
 	// X12 ジョイスティックブロック
-	X12_GET_JOYSTICK_PREFIX: 'ローカルジョイスティック',
-	X12_GET_JOYSTICK_TOOLTIP: '送信機のローカルジョイスティックADC値を読み取る (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'ローカルジョイスティック',
+	X12_GET_JOYSTICK_PREFIX: 'ジョイスティック',
+	X12_GET_JOYSTICK_SUFFIX: '値',
+	X12_GET_JOYSTICK_TOOLTIP: 'ジョイスティックのADC値を読み取る (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'ジョイスティック',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'マップ',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'ローカルジョイスティックを読み取り、指定範囲にマップ',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'ジョイスティックを読み取り、指定範囲にマップ',
 
 	// X12 ボタンブロック
-	X12_IS_BUTTON_PRESSED_PREFIX: 'ローカルボタン',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'ボタン',
 	X12_IS_BUTTON_PRESSED_SUFFIX: '押された?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: '送信機のローカルボタンが押されているか確認',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'ボタンが押されているか確認',
 
 	// === RC リモコン通信 ===
 

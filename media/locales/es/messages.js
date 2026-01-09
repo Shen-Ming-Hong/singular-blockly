@@ -813,17 +813,18 @@ window.languageManager.loadMessages('es', {
 	X12_LABEL_BUTTON: 'Botón',
 
 	// Bloques de Joystick X12
-	X12_GET_JOYSTICK_PREFIX: 'Joystick local',
-	X12_GET_JOYSTICK_TOOLTIP: 'Leer valor ADC del joystick local del transmisor (0-4095)',
-	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick local',
+	X12_GET_JOYSTICK_PREFIX: 'Joystick',
+	X12_GET_JOYSTICK_SUFFIX: 'valor',
+	X12_GET_JOYSTICK_TOOLTIP: 'Leer valor ADC del joystick (0-4095)',
+	X12_GET_JOYSTICK_MAPPED_PREFIX: 'Joystick',
 	X12_GET_JOYSTICK_MAPPED_MIN: 'mapear a',
 	X12_GET_JOYSTICK_MAPPED_MAX: '~',
-	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Leer joystick local y mapear al rango especificado',
+	X12_GET_JOYSTICK_MAPPED_TOOLTIP: 'Leer joystick y mapear al rango especificado',
 
 	// Bloques de Botón X12
-	X12_IS_BUTTON_PRESSED_PREFIX: 'Botón local',
+	X12_IS_BUTTON_PRESSED_PREFIX: 'Botón',
 	X12_IS_BUTTON_PRESSED_SUFFIX: '¿presionado?',
-	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Verificar si el botón local del transmisor está presionado',
+	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Verificar si el botón está presionado',
 
 	// === Control Remoto RC ===
 
