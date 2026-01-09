@@ -830,9 +830,4 @@ window.languageManager.loadMessages('en', {
 	X12_IS_BUTTON_PRESSED_PREFIX: 'Button',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'pressed?',
 	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Check if button is pressed',
-
-
-
-
-
 });
