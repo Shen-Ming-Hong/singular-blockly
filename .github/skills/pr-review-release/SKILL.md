@@ -246,6 +246,5 @@ https://github.com/{owner}/{repo}/releases/tag/v{VERSION}
 
 ## 相關資源 Related Resources
 
--   [專案憲法](../../../.specify/memory/constitution.md)（若存在）
 -   [語意化版本規範](https://semver.org/lang/zh-TW/)
 -   [Keep a Changelog](https://keepachangelog.com/zh-TW/)
