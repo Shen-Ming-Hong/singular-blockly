@@ -19,7 +19,8 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 -   評估 Copilot review 或人工審查意見
 -   合併 PR 後需要發布新版本
 -   執行完整的發布流程（版本號、CHANGELOG、標籤、Release）
--   需要 squash merge 並清理分支
+-   需要 squash merge 並清理已合併的分支
+-   定期清理已合併到 master 的舊本地分支
 
 ## 工作流程 Workflow
 
@@ -89,10 +90,30 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     git pull origin master
     ```
 
-4. **清理分支**
+4. **清理已合併分支 Branch Cleanup**
+
     ```bash
+    # 更新遠端分支資訊，移除已刪除的遠端分支
+    git fetch --prune
+
     # 刪除本地功能分支（若尚未刪除）
     git branch -d feature-branch-name
+
+    # 批次刪除所有已合併到 master 的本地分支
+    git branch --merged master | grep -v "master" | xargs -r git branch -d
+
+    # 列出並清理標記為 [gone] 的分支（遠端已刪除）
+    git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -d
+    ```
+
+5. **清理 Worktrees（如有使用）**
+
+    ```bash
+    # 列出所有 worktrees
+    git worktree list
+
+    # 移除關聯已刪除分支的 worktree
+    git worktree remove path/to/worktree
     ```
 
 ### Phase 4: 發布流程 Release Process
@@ -183,8 +204,9 @@ gh release view v{VERSION} --web
 
 -   [ ] 變更已提交並推送
 -   [ ] PR 已 squash merge
--   [ ] 功能分支已刪除
 -   [ ] 主分支已同步
+-   [ ] 功能分支已刪除（本地 + 遠端）
+-   [ ] 已清理其他舊的已合併分支
 
 ### 發布階段
 
