@@ -1,37 +1,47 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.5.0 → 1.5.1
-Modified Principles:
-  - Principle X: Professional Release Management
-    * 強化雙語發布說明要求：每個段落必須同時包含繁體中文與英文內容
-    * 新增發布前雙語完整性驗證步驟
-    * 更新標題格式要求：包含中英文功能亮點
-Modified Sections: None
-Added Principles: None
+Version Change: 1.5.1 → 1.6.0
+Modified Principles: None
+Added Principles:
+  - Principle XI: Agent Skills Architecture (全新原則)
+    * 正式認可 Agent Skills 系統作為專案的核心能力擴展機制
+    * 定義六個官方技能：code-simplifier, git-workflow, pr-review-release,
+      security-checker, security-vulnerability-fix, skill-development
+    * 強調技能的模組化設計、漸進式載入策略與安全性要求
+    * 建立技能開發與維護的標準規範
 Added Sections: None
 Removed Sections: None
 Templates Status:
-  ✅ All templates - No updates needed (internal principle clarification)
-Command Files Review:
-  ✅ All command files - No updates needed
-Change Summary (v1.5.1):
-  - Clarified bilingual release notes requirements:
-    * Added CRITICAL warning: every section MUST have parallel bilingual content
-    * Updated title format to include both Chinese and English feature highlights
-    * Added pre-publish verification step to check bilingual completeness
-  - Lesson learned from v0.44.0 release (2025-11-25):
-    * Initial release notes were Chinese-only, missing English translations
-    * Required post-release edit via `gh release edit` to add English content
-    * This amendment prevents future monolingual releases
+  ✅ plan-template.md - No updates needed
+  ✅ spec-template.md - No updates needed
+  ✅ tasks-template.md - No updates needed
+  ✅ checklist-template.md - No updates needed
+Skills Status:
+  ✅ code-simplifier v1.0.0 - 程式碼簡化與重構
+  ✅ git-workflow v1.0.0 - Git 工作流程自動化
+  ✅ pr-review-release v1.0.0 - PR 審查與發布流程
+  ✅ security-checker v1.0.0 - 程式碼安全檢查
+  ✅ security-vulnerability-fix v1.0.0 - 安全漏洞修復
+  ✅ skill-development v1.0.0 - 技能開發元技能
+Change Summary (v1.6.0):
+  - Added new Principle XI: Agent Skills Architecture
+    * Formalizes the Agent Skills system as an extensible capability framework
+    * Documents six official skills for development workflow automation
+    * Establishes standards for skill design, trigger keywords, and security
+    * Defines integration patterns with existing principles (esp. IX, X)
+  - Context from project evolution:
+    * Skills evolved from ad-hoc prompts to structured SKILL.md format
+    * All skills now follow consistent metadata and documentation standards
+    * Progressive disclosure strategy optimizes context window usage
 Version Bump Rationale:
-  - PATCH version bump (1.5.0 → 1.5.1)
-  - Clarification of existing bilingual requirement, no new principles
-  - Backward compatible enhancement to release workflow
+  - MINOR version bump (1.5.1 → 1.6.0)
+  - New principle addition (backward compatible governance expansion)
+  - Formalizes existing practices without changing other principles
 Context:
-  - Based on v0.44.0 release experience (2025-11-25)
-  - Addresses gap between stated bilingual requirement and actual enforcement
-  - Ensures future releases are truly bilingual from initial publication
+  - Amendment date: 2026-01-14
+  - Based on skills directory at .github/skills/ with 6 official skills
+  - Skills inspired by Anthropic official plugins and community best practices
 Follow-up TODOs:
   - None, amendment is self-contained
 -->
@@ -280,6 +290,54 @@ All version releases MUST follow a standardized, automated workflow with compreh
 -   **Automation Ready**: gh CLI workflow enables future CI/CD integration
 -   **Professional Image**: Comprehensive release notes establish project credibility
 
+### XI. Agent Skills Architecture
+
+Development workflows MUST leverage the Agent Skills system for consistent, reusable automation patterns. This means:
+
+-   **Official Skills**: The project maintains six official skills in `.github/skills/`:
+    -   `code-simplifier` — 程式碼簡化與重構，保留功能同時提升可讀性
+    -   `git-workflow` — Git 工作流程自動化，從 commit 到 PR 建立
+    -   `pr-review-release` — PR 審查評估與完整發布流程
+    -   `security-checker` — 編輯程式碼時的即時安全檢查
+    -   `security-vulnerability-fix` — npm 依賴安全漏洞修復工作流程
+    -   `skill-development` — 開發新技能的元技能規範
+-   **Skill Design Standards**: All skills MUST follow SKILL.md format with:
+    -   YAML frontmatter containing `name`, `description`, and optional `metadata`
+    -   Bilingual documentation (Traditional Chinese + English) per Principle IX
+    -   Clear trigger keywords in description to guide AI activation
+    -   Progressive disclosure: SKILL.md < 500 lines, detailed docs in `references/`
+-   **Security Requirements**: Third-party skills MUST pass security review before adoption
+-   **Workflow Integration**: Skills complement but do not replace core principles
+
+**Rationale**: Agent Skills provide a structured, extensible framework for automating development workflows. By standardizing skill design and maintaining official skills, the project ensures consistent quality, reduces repetitive work, and enables new contributors to leverage proven patterns. The skill system follows VS Code's official Agent Skills specification and draws inspiration from Anthropic's official plugins.
+
+**Official Skills Overview**:
+
+| Skill                        | Category     | Trigger Scenarios                     |
+| ---------------------------- | ------------ | ------------------------------------- |
+| `code-simplifier`            | code-quality | 簡化程式碼、重構、cleanup、refactor   |
+| `git-workflow`               | productivity | commit、push、建立 PR、提交程式碼     |
+| `pr-review-release`          | release      | code review、merge、發布版本、release |
+| `security-checker`           | security     | 編輯程式碼、code review、安全檢查     |
+| `security-vulnerability-fix` | security     | Dependabot alerts、CVE、npm audit     |
+| `skill-development`          | meta         | 建立新技能、SKILL.md 格式規範         |
+
+**Skill Development Guidelines**:
+
+1. **Identify Repetitive Workflows**: Document workflows that are executed frequently
+2. **Design Trigger Keywords**: Include both Chinese and English keywords in description
+3. **Follow Progressive Disclosure**: Keep SKILL.md concise, use `references/` for details
+4. **Test Activation**: Verify skills activate on expected trigger phrases
+5. **Maintain Version Discipline**: Follow semantic versioning for skill updates
+
+**Benefits**:
+
+-   **Consistency**: Standardized workflows reduce errors and improve code quality
+-   **Discoverability**: Clear trigger keywords help AI select appropriate skills
+-   **Reusability**: Skills can be shared across projects and contributors
+-   **Context Efficiency**: Progressive disclosure optimizes token usage
+-   **Security**: Formal review process prevents malicious skill adoption
+
 ## Development Standards
 
 ### Code Quality
@@ -435,4 +493,4 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.5.1 | **Ratified**: 2025-10-17 | **Last Amended**: 2025-11-25
+**Version**: 1.6.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2026-01-14
