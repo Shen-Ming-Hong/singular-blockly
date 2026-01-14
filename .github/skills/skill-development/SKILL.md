@@ -20,6 +20,96 @@ A standardized workflow and best practices for developing new Agent Skills.
 -   詢問 SKILL.md 格式規範
 -   設計技能的觸發關鍵字
 -   組織技能的輔助資源
+-   **查找現有可用的 Skills**（避免重複造輪子）
+
+## 查找現有 Skills Finding Existing Skills
+
+在開發新技能前，建議先搜尋是否已有合適的現成技能可以採用或參考。
+
+### 可信賴的 Skills 來源 Trusted Skill Sources
+
+以下來源經過官方認可或社群驗證，可安全使用：
+
+| 信任等級 | 來源                       | 說明                                         | 連結                                                                                              |
+| -------- | -------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 🟢 官方  | **GitHub Awesome Copilot** | GitHub 官方維護的社群技能集合                | [github/awesome-copilot](https://github.com/github/awesome-copilot)                               |
+| 🟢 官方  | **Anthropic Skills**       | Anthropic 官方參考技能（文件編輯、資料分析） | [anthropics/skills](https://github.com/anthropics/skills)                                         |
+| 🟢 官方  | **OpenAI Codex Skills**    | OpenAI 官方 Codex 技能目錄                   | [openai/skills](https://github.com/openai/skills)                                                 |
+| 🟢 官方  | **HuggingFace Skills**     | HuggingFace 官方技能（ML 訓練、資料集建立）  | [huggingface/skills](https://github.com/huggingface/skills)                                       |
+| 🟡 社群  | **Awesome Agent Skills**   | 跨平台技能清單（1.2k+ stars）                | [heilcheng/awesome-agent-skills](https://github.com/heilcheng/awesome-agent-skills)               |
+| 🟡 社群  | **Awesome Copilot Agents** | 社群維護的 Copilot 技能集合                  | [Code-and-Sorts/awesome-copilot-agents](https://github.com/Code-and-Sorts/awesome-copilot-agents) |
+
+### 搜尋現有技能 Search for Existing Skills
+
+1. **在 GitHub 搜尋**
+
+    ```bash
+    # 搜尋技能檔案
+    gh search code "name:" --filename=SKILL.md --language=markdown
+
+    # 搜尋特定功能的技能（例如：code review）
+    gh search repos "agent skills code review" --sort=stars
+    ```
+
+2. **瀏覽官方集合**
+
+    ```bash
+    # 列出 awesome-copilot 的技能目錄
+    gh api repos/github/awesome-copilot/contents/skills --jq '.[].name'
+
+    # 列出 anthropics/skills 的技能
+    gh api repos/anthropics/skills/contents --jq '.[].name'
+    ```
+
+3. **查看技能詳情**
+    ```bash
+    # 讀取特定技能的 SKILL.md
+    gh api repos/{owner}/{repo}/contents/skills/{skill-name}/SKILL.md \
+      --jq '.content' | base64 -d
+    ```
+
+### 安全性檢查 Security Checklist
+
+採用第三方技能前，**務必執行以下檢查**：
+
+| 檢查項目         | 說明                                | 風險             |
+| ---------------- | ----------------------------------- | ---------------- |
+| ✅ 來源可信度    | 確認來自官方或知名社群維護者        | 惡意程式碼注入   |
+| ✅ 審查 SKILL.md | 閱讀完整指令內容，確認無可疑行為    | 非預期的檔案操作 |
+| ✅ 檢查腳本      | 審查 `scripts/` 目錄中的所有腳本    | 任意命令執行     |
+| ✅ 檢查權限      | 確認 `allowed-tools` 欄位的權限範圍 | 過度權限授予     |
+| ✅ 查看 Issues   | 檢查該 repo 是否有安全相關 issues   | 已知漏洞         |
+| ✅ 星數與活躍度  | 優先選擇高星數、持續維護的專案      | 廢棄或品質不佳   |
+
+### 安裝第三方技能 Installing Third-Party Skills
+
+```bash
+# 1. Clone 或下載技能目錄
+git clone --depth=1 --filter=blob:none --sparse \
+  https://github.com/{owner}/{repo}.git temp-skills
+cd temp-skills
+git sparse-checkout set skills/{skill-name}
+
+# 2. 複製到專案
+cp -r skills/{skill-name} /path/to/project/.github/skills/
+
+# 3. 審查並客製化
+code .github/skills/{skill-name}/SKILL.md
+
+# 4. 清理
+cd .. && rm -rf temp-skills
+```
+
+### ⚠️ 安全警告 Security Warning
+
+> **永遠不要**盲目信任來源不明的技能。Skills 雖然主要是文字指令，但可能包含：
+>
+> -   誘導 AI 執行危險操作的指令
+> -   惡意腳本（在 `scripts/` 目錄中）
+> -   外洩敏感資訊的 prompt injection
+>
+> VS Code 提供了腳本執行控制，包括自動核准選項和允許清單。
+> 詳見 [VS Code 安全性文件](https://code.visualstudio.com/docs/copilot/security)
 
 ## 技能結構規範 Skill Structure Specification
 
