@@ -8,6 +8,23 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.52.2] - 2026-01-14
+
+### 安全性修復 Security Fixes
+
+-   **修復 Hono JWT 演算法混淆漏洞** (Fix Hono JWT Algorithm Confusion Vulnerabilities)
+
+    -   升級 `hono` 從 4.11.3 至 4.11.4（間接依賴，透過 `@modelcontextprotocol/sdk`）
+        Upgraded `hono` from 4.11.3 to 4.11.4 (transitive dependency via `@modelcontextprotocol/sdk`)
+    -   修復 JWK Auth Middleware 在缺少 "alg" 時的 JWT 演算法混淆問題
+        Fixed JWK Auth Middleware JWT algorithm confusion when JWK lacks "alg"
+    -   修復 JWT Middleware 因不安全預設值 (HS256) 導致的權杖偽造與認證繞過
+        Fixed JWT Middleware's algorithm confusion via unsafe default (HS256) allowing token forgery
+    -   嚴重程度：High
+        Severity: High
+    -   關閉 Dependabot Alert #12, #13
+        Closes Dependabot Alert #12, #13
+
 ## [0.52.1] - 2026-01-09
 
 ### 安全性修復 Security Fixes
