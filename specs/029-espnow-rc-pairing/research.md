@@ -420,6 +420,25 @@ def _rc_maintenance():
 
 **設計決策**: 將 `_rc_maintenance()` 整合到 `rc_is_connected` 積木中，使用者只需在主迴圈檢查連線狀態，就會自動執行維護。
 
+### 8.9 禁止 WiFi 自動重連 (sta.config(reconnects=0))
+
+**問題根源** (來自 MicroPython 官方文件):
+> "MicroPython re-scans wifi channels when trying to reconnect... This means ESPNow messages will be lost while scanning for the AP. This can be disabled by `sta.config(reconnects=0)`"
+
+當 ESP32 嘗試重新連接 WiFi AP 時，會自動掃描頻道，這會**干擾 ESP-NOW 通訊**，導致訊息遺失。
+
+**解決方案**:
+```python
+_wlan = network.WLAN(network.WLAN.IF_STA)
+_wlan.active(True)
+_wlan.disconnect()
+_wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
+time.sleep_ms(100)
+_wlan.config(channel=N)
+```
+
+**效果**: 發送端和接收端都加入此設定，確保 WiFi 不會自動掃描頻道，維持 ESP-NOW 頻道穩定。
+
 ---
 
 ## 參考資料

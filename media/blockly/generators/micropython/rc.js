@@ -42,6 +42,7 @@ _rc_send_fail_count = 0
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
 _wlan.disconnect()
+_wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
 time.sleep_ms(100)
 _wlan.config(channel=${channel})
 _espnow = espnow.ESPNow()
@@ -177,6 +178,7 @@ def _rc_maintenance():
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
 _wlan.disconnect()
+_wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
 time.sleep_ms(100)
 _wlan.config(channel=${channel})
 _espnow = espnow.ESPNow()
