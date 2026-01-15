@@ -50,3 +50,4 @@ performance-baseline.txt
 # 環境設定
 .env
 .env.local
+RC_example/*
