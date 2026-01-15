@@ -5,6 +5,9 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 ## Active Technologies
 - TypeScript 5.9.3 (Extension) + JavaScript (Blockly blocks/generators) + Blockly 12.3.1, VSCode API 1.105.0+, MicroPython `rc_module` API (028-x12-rc-blocks)
 - N/A (使用現有 blockly/main.json 儲存工作區狀態) (028-x12-rc-blocks)
+- [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (029-espnow-rc-pairing)
+- TypeScript 5.9.3 (Extension) / JavaScript ES6 (Blockly) / MicroPython (Generated) + Blockly 12.3.1, VSCode API 1.105.0+, MicroPython espnow module (029-espnow-rc-pairing)
+- JSON (blockly/main.json workspace state) (029-espnow-rc-pairing)
 
 -   JavaScript (ES6+) - WebView 環境 + Blockly 12.3.1, arduinoGenerator (自訂程式碼生成器) (012-esp32-pixetto-fix)
 -   JavaScript (ES2022) / TypeScript 5.9.3 + Blockly 12.3.1, VS Code Extension API 1.96.0+ (014-block-serialization-fix)
@@ -65,10 +68,10 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 029-espnow-rc-pairing: Added TypeScript 5.9.3 (Extension) / JavaScript ES6 (Blockly) / MicroPython (Generated) + Blockly 12.3.1, VSCode API 1.105.0+, MicroPython espnow module
+- 029-espnow-rc-pairing: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - 028-x12-rc-blocks: Added TypeScript 5.9.3 (Extension) + JavaScript (Blockly blocks/generators) + Blockly 12.3.1, VSCode API 1.105.0+, MicroPython `rc_module` API
 
--   027-cyberbrick-x11-blocks: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
--   026-unified-upload-ui: Added TypeScript 5.9.3 | JavaScript ES6+ + Blockly 12.3.1 | VSCode API 1.105.0+ | PlatformIO CLI
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
