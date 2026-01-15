@@ -8,6 +8,40 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.53.0] - 2026-01-16
+
+### 新增功能 Added
+
+-   **CyberBrick ESP-NOW RC 配對積木** (CyberBrick ESP-NOW RC Pairing Blocks)
+
+    -   新增 10 個積木支援 ESP-NOW 無線遙控配對功能
+        Added 10 blocks for ESP-NOW wireless RC pairing feature
+    -   發射端：初始化發射端、發送資料
+        Transmitter: Master init, Send data
+    -   接收端：初始化接收端、等待配對、是否已連線
+        Receiver: Slave init, Wait connection, Is connected
+    -   資料讀取：搖桿原始值、搖桿映射值、按鈕按下、按鈕狀態
+        Data reading: Joystick raw, Joystick mapped, Button pressed, Button state
+    -   支援配對 ID (1-255) 和 WiFi 頻道 (1-11) 隔離不同組別
+        Supports Pair ID (1-255) and WiFi channel (1-11) to isolate different groups
+    -   解決教室多組同時使用時的訊號干擾問題
+        Solves signal interference when multiple groups operate simultaneously in classroom
+    -   完整 15 語言 i18n 支援
+        Full 15-language i18n support
+
+### 改進 Improved
+
+-   **ESP-NOW 連線穩定性最佳實踐** (ESP-NOW Connection Stability Best Practices)
+
+    -   發送端：失敗重試機制，10 次失敗後自動重新初始化
+        Transmitter: Retry mechanism, auto-reinitialize after 10 failures
+    -   接收端：定期垃圾回收 (30 秒)、irq 錯誤處理、斷線自動重連 (5 秒)
+        Receiver: Periodic GC (30s), irq error handling, auto-reconnect after disconnect (5s)
+    -   增加 rxbuf 緩衝區至 1024 bytes 避免 NO_MEM 錯誤
+        Increased rxbuf buffer to 1024 bytes to avoid NO_MEM errors
+    -   禁止 WiFi 自動重連避免頻道掃描干擾 ESP-NOW (`sta.config(reconnects=0)`)
+        Disabled WiFi auto-reconnect to prevent channel scanning interference
+
 ## [0.52.2] - 2026-01-14
 
 ### 安全性修復 Security Fixes
