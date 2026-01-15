@@ -275,6 +275,42 @@ _led_wait.write()
 
 ---
 
+#### rc_espnow_get_joystick_mapped Generator
+
+**Generated Expression**:
+
+```python
+(int(({MIN}) + (_rc_data[{CHANNEL}] - 0) * (({MAX}) - ({MIN})) / 4095) if _rc_connected else int((({MIN}) + ({MAX})) / 2))
+```
+
+**Return Order**: `ORDER_FUNCTION_CALL`
+
+---
+
+#### rc_espnow_is_button_pressed Generator
+
+**Generated Expression**:
+
+```python
+(_rc_data[{6 + BUTTON_INDEX}] == 0 if _rc_connected else False)
+```
+
+**Return Order**: `ORDER_RELATIONAL`
+
+---
+
+#### rc_espnow_get_button Generator (FR-012)
+
+**Generated Expression**:
+
+```python
+(_rc_data[{6 + BUTTON_INDEX}] if _rc_connected else 1)
+```
+
+**Return Order**: `ORDER_MEMBER`
+
+---
+
 ## Toolbox Category Contract
 
 **File**: `media/toolbox/categories/cyberbrick_rc_espnow.json`
@@ -349,6 +385,10 @@ _led_wait.write()
 		{
 			"kind": "block",
 			"type": "rc_espnow_is_button_pressed"
+		},
+		{
+			"kind": "block",
+			"type": "rc_espnow_get_button"
 		},
 		{
 			"kind": "label",

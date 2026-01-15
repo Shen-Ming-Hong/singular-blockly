@@ -150,14 +150,20 @@
     -   Output: Boolean
 -   [ ] T025 [US4] 實作 `rc_espnow_is_button_pressed` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   回傳 `(_rc_data[{6+index}] == 0 if _rc_connected else False)`
+-   [ ] T025a [P] [US4] 實作 `rc_espnow_get_button` 積木定義 in `media/blockly/blocks/rc-espnow.js` (FR-012)
+    -   Dropdown 欄位：K1-K4
+    -   Output: Number (原始狀態 0 或 1)
+-   [ ] T025b [US4] 實作 `rc_espnow_get_button` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+    -   回傳 `(_rc_data[{6+index}] if _rc_connected else 1)`
 
 ### 安全預設值處理
 
 -   [ ] T026 [US4] 驗證所有資料讀取生成器在斷線時回傳安全預設值 in `media/blockly/generators/micropython/rc-espnow.js`
     -   搖桿：2048（中點）
     -   按鈕：1（放開）= is_pressed 回傳 False
+    -   配對 ID 衝突場景：當多個發射端使用相同 ID 時，接收端應接受最後收到的資料（由 irq callback 自動處理）
 
-**Checkpoint**: User Story 4 完成 - 斷線安全機制可獨立測試
+**Checkpoint**: User Story 4 完成 - 斷線安全機制可獨立測試（含 FR-012 按鈕原始狀態積木）
 
 ---
 

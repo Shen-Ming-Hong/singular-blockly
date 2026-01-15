@@ -135,15 +135,44 @@
 
 ---
 
-### 資料讀取積木（重用現有積木）
+### 資料讀取積木
 
-現有 `rc_get_joystick`, `rc_get_joystick_mapped`, `rc_is_button_pressed`, `rc_get_button` 積木將被修改為：
+#### `rc_espnow_get_joystick`
 
--   讀取全域變數 `_rc_data` 而非呼叫 `rc_slave_data()`
--   保持相同的積木外觀和欄位
--   Generator 根據是否有 `rc_espnow_slave_init` 來決定程式碼生成方式
+-   **類型**: Output (Number)
+-   **欄位**:
+    -   CHANNEL: Dropdown (L1, L2, L3, R1, R2, R3)
+-   **顏色**: 160
+-   **生成程式碼**: 回傳 `(_rc_data[{index}] if _rc_connected else 2048)`
 
-**替代方案決策**: 為保持簡單，新增 `rc_espnow_*` 前綴的讀取積木，與現有積木分開。
+#### `rc_espnow_get_joystick_mapped`
+
+-   **類型**: Output (Number)
+-   **欄位**:
+    -   CHANNEL: Dropdown (L1, L2, L3, R1, R2, R3)
+-   **輸入**:
+    -   MIN: Number input (預設 -100)
+    -   MAX: Number input (預設 100)
+-   **顏色**: 160
+-   **生成程式碼**: 映射 0-4095 → 使用者指定範圍，斷線時回傳映射後的中點值
+
+#### `rc_espnow_is_button_pressed`
+
+-   **類型**: Output (Boolean)
+-   **欄位**:
+    -   BUTTON: Dropdown (K1, K2, K3, K4)
+-   **顏色**: 160
+-   **生成程式碼**: 回傳 `(_rc_data[{6+index}] == 0 if _rc_connected else False)`
+
+#### `rc_espnow_get_button`
+
+-   **類型**: Output (Number)
+-   **欄位**:
+    -   BUTTON: Dropdown (K1, K2, K3, K4)
+-   **顏色**: 160
+-   **生成程式碼**: 回傳按鈕原始狀態 `(_rc_data[{6+index}] if _rc_connected else 1)`
+
+**設計決策**: 新增 `rc_espnow_*` 前綴的讀取積木，與現有 RC 積木分開，保持模組化。
 
 ---
 
@@ -179,6 +208,7 @@
 		{ "kind": "block", "type": "rc_espnow_get_joystick" },
 		{ "kind": "block", "type": "rc_espnow_get_joystick_mapped" },
 		{ "kind": "block", "type": "rc_espnow_is_button_pressed" },
+		{ "kind": "block", "type": "rc_espnow_get_button" },
 
 		{ "kind": "label", "text": "%{RC_ESPNOW_LABEL_STATUS}" },
 		{ "kind": "block", "type": "rc_espnow_is_connected" }
@@ -215,6 +245,7 @@
 -   `RC_ESPNOW_SLAVE_INIT_TOOLTIP`
 -   `RC_ESPNOW_WAIT_CONNECTION`
 -   `RC_ESPNOW_WAIT_TIMEOUT`
+-   `RC_ESPNOW_WAIT_SECONDS`
 -   `RC_ESPNOW_WAIT_TOOLTIP`
 -   `RC_ESPNOW_IS_CONNECTED`
 -   `RC_ESPNOW_IS_CONNECTED_TOOLTIP`
@@ -230,3 +261,5 @@
 -   `RC_ESPNOW_IS_BUTTON_PRESSED_PREFIX`
 -   `RC_ESPNOW_IS_BUTTON_PRESSED_SUFFIX`
 -   `RC_ESPNOW_IS_BUTTON_PRESSED_TOOLTIP`
+-   `RC_ESPNOW_GET_BUTTON_PREFIX`
+-   `RC_ESPNOW_GET_BUTTON_TOOLTIP`
