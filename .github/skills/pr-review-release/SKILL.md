@@ -3,7 +3,7 @@ name: pr-review-release
 description: PR Code Review 評估與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。包含評估 Copilot/人工 review 建議、程式碼修正、Git 合併、語意化版本更新、CHANGELOG、打包發布的完整工作流程。PR review evaluation and release workflow for processing code review comments, merging PRs, semantic versioning, and publishing releases.
 metadata:
     author: singular-blockly
-    version: '1.0.0'
+    version: '1.1.0'
     category: release
 license: Apache-2.0
 ---
@@ -171,23 +171,41 @@ git tag -a v{VERSION} -m "Release v{VERSION}"
 git push origin v{VERSION}
 ```
 
-#### 4.5 GitHub Release
+#### 4.5 GitHub Release（必要步驟 REQUIRED）
+
+**⚠️ 重要：此步驟不可省略！Git tag 不等於 GitHub Release。**
 
 ```bash
-# 建立 Release（含雙語說明）
+# 建立 Release（含雙語說明與 VSIX 附件）
 gh release create v{VERSION} \
-  --title "v{VERSION}" \
-  --notes-file RELEASE_NOTES.md \
-  *.vsix
+  --title "v{VERSION} - 功能摘要 Feature Summary" \
+  --notes "## ✨ New Features | 新功能
+
+### Feature Name | 功能名稱
+- English description | 中文說明
+
+## 🐛 Bug Fixes | 修復
+- Fixed issue | 修正問題
+
+## 📦 Download | 下載
+- **VSIX**: singular-blockly-{VERSION}.vsix
+
+---
+**Full Changelog | 完整變更日誌**: https://github.com/{owner}/{repo}/blob/master/CHANGELOG.md" \
+  ./singular-blockly-{VERSION}.vsix
+```
+
+**驗證 Release 已建立：**
+
+```bash
+gh release view v{VERSION}
+gh release list --limit 3
 ```
 
 #### 4.6 清理 Cleanup
 
 ```bash
-# 刪除臨時檔案
-rm -f RELEASE_NOTES.md
-
-# 驗證發布連結
+# 驗證發布連結可存取
 gh release view v{VERSION} --web
 ```
 
@@ -211,12 +229,13 @@ gh release view v{VERSION} --web
 ### 發布階段
 
 -   [ ] 版本號已更新
--   [ ] CHANGELOG.md 已更新
+-   [ ] CHANGELOG.md 已更新（雙語）
 -   [ ] 所有測試通過
--   [ ] 成功建置打包
+-   [ ] 成功建置打包 VSIX
 -   [ ] Git 標籤已建立並推送
--   [ ] GitHub Release 已發布
--   [ ] 發布連結可存取
+-   [ ] **GitHub Release 已建立**（使用 `gh release create`）
+-   [ ] **Release 含雙語說明與 VSIX 附件**
+-   [ ] 發布連結可存取（使用 `gh release view` 驗證）
 
 ## 輸出格式 Output Format
 
