@@ -832,4 +832,45 @@ window.languageManager.loadMessages('ja', {
 	// RC ボタンブロック
 
 	// RC ステータスブロック
+
+	// === RC接続 ===
+	CATEGORY_RC: 'RC接続',
+	RC_LABEL_MASTER: '📡 送信機',
+	RC_LABEL_SLAVE: '📻 受信機',
+	RC_LABEL_DATA: '📊 データ読取',
+	RC_LABEL_STATUS: '🔗 接続状態',
+
+	// RC 送信機ブロック
+	RC_MASTER_INIT: 'RC送信機を初期化',
+	RC_MASTER_INIT_PAIR_ID: 'ペアID',
+	RC_MASTER_INIT_CHANNEL: 'チャンネル',
+	RC_MASTER_INIT_TOOLTIP: 'RC送信機を初期化、ペアID (1-255) とチャンネル (1-11) を設定',
+	RC_SEND: 'RCデータを送信',
+	RC_SEND_TOOLTIP: 'X12ジョイスティック/ボタンデータを読み取り受信機に送信',
+
+	// RC 受信機ブロック
+	RC_SLAVE_INIT: 'RC受信機を初期化',
+	RC_SLAVE_INIT_PAIR_ID: 'ペアID',
+	RC_SLAVE_INIT_CHANNEL: 'チャンネル',
+	RC_SLAVE_INIT_TOOLTIP: 'RC受信機を初期化、ペアID (1-255) とチャンネル (1-11) を設定',
+	RC_WAIT_CONNECTION: 'ペアリング待機',
+	RC_WAIT_TIMEOUT: 'タイムアウト',
+	RC_WAIT_SECONDS: '秒',
+	RC_WAIT_TOOLTIP: '送信機の接続を待機、LEDが青く点滅、タイムアウト後に続行',
+	RC_IS_CONNECTED: 'RC接続中?',
+	RC_IS_CONNECTED_TOOLTIP: '500ms以内にデータを受信したか確認',
+
+	// RC データ読取ブロック
+	RC_GET_JOYSTICK_PREFIX: 'RC ジョイスティック',
+	RC_GET_JOYSTICK_TOOLTIP: 'リモートジョイスティックの値を読取 (0-4095)、2048が中央',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC ジョイスティック',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'マップ',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'リモートジョイスティックを読み取り指定範囲にマップ',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC ボタン',
+	RC_IS_BUTTON_PRESSED_SUFFIX: '押された?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'リモートボタンが押されているか確認',
+	RC_GET_BUTTON_PREFIX: 'RC ボタン',
+	RC_GET_BUTTON_SUFFIX: '状態',
+	RC_GET_BUTTON_TOOLTIP: 'リモートボタンの状態を読取 (0=押下, 1=解放)',
 });

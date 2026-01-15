@@ -1047,6 +1047,14 @@ export class WebViewManager {
 			const x11BlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/x11.js'));
 			const x11BlocksUri = tempWebview.asWebviewUri(x11BlocksPath);
 
+			// X12 發射端擴展板積木定義
+			const x12BlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/x12.js'));
+			const x12BlocksUri = tempWebview.asWebviewUri(x12BlocksPath);
+
+			// RC 遙控通訊積木定義
+			const rcBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/rc.js'));
+			const rcBlocksUri = tempWebview.asWebviewUri(rcBlocksPath);
+
 			// Arduino 生成器模組（動態發現）
 			const discoveredModules = await this.discoverArduinoModules();
 			const arduinoModules = discoveredModules
@@ -1139,6 +1147,8 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
 			htmlContent = htmlContent.replace('{x11BlocksUri}', x11BlocksUri.toString());
+			htmlContent = htmlContent.replace('{x12BlocksUri}', x12BlocksUri.toString());
+			htmlContent = htmlContent.replace('{rcBlocksUri}', rcBlocksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
 
 			// 注入主題偏好

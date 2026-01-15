@@ -224,8 +224,207 @@ def _check_connected():
 
 ---
 
+## 8. 實作經驗與關鍵發現 (2026-01-15 實測)
+
+### 8.1 廣播模式取代虛擬 MAC
+
+**重大設計變更**: 放棄虛擬 MAC 方案，改用廣播模式
+
+**原設計**:
+
+```python
+# 配對 ID 轉虛擬 MAC (不可行！)
+mac = b'\x02\x00\x00\x00\x00' + bytes([pair_id])
+espnow.add_peer(mac)
+espnow.send(mac, data)  # ❌ ESP-NOW 無法發送到虛擬 MAC
+```
+
+**新設計**:
+
+```python
+# 使用廣播 MAC + 封包內嵌配對 ID
+broadcast = b'\xff\xff\xff\xff\xff\xff'
+espnow.add_peer(broadcast)
+espnow.send(broadcast, struct.pack('<B10h', pair_id, *data))  # ✅ 可運作
+```
+
+**原因**: ESP-NOW 的 `send()` 只能發送到實際存在的 MAC 地址或廣播地址，無法發送到自定義虛擬 MAC。
+
+### 8.2 WiFi 頻道設定關鍵步驟
+
+**問題**: 直接呼叫 `wlan.config(channel=N)` 可能失敗，導致發送端和接收端不在同頻道。
+
+**解決方案**:
+
+```python
+wlan = network.WLAN(network.WLAN.IF_STA)
+wlan.active(True)
+wlan.disconnect()       # ⚠️ 關鍵！必須先斷開連線
+time.sleep_ms(100)      # 等待狀態穩定
+wlan.config(channel=1)  # 現在可以正確設定頻道
+```
+
+### 8.3 struct 封包格式注意事項
+
+**問題**: MicroPython 的 `struct.pack()` 會有記憶體對齊 padding。
+
+| 格式      | 預期大小 | 實際大小 |
+| --------- | -------- | -------- |
+| `'B10h'`  | 21 bytes | 22 bytes |
+| `'<B10h'` | 21 bytes | 22 bytes |
+
+**解決方案**: 接收端必須使用：
+
+```python
+if len(msg) >= 21 and msg[0] == pair_id:
+    data = struct.unpack('<10h', msg[1:21])  # 明確指定 slice
+```
+
+### 8.4 rc_module 與 ESP-NOW 的衝突
+
+**發現**: 原本的 `rc_module` 函式庫會與 ESP-NOW 衝突，導致裝置當機。
+
+**解決方案**: 完全移除對 `rc_module` 的依賴，使用直接硬體存取：
+
+```python
+# X12 硬體直接存取 (不使用 rc_module)
+_x12_adc = {}
+for _i, _p in enumerate([0, 1, 2, 3, 4, 5]):
+    _x12_adc[_i] = ADC(Pin(_p))
+    _x12_adc[_i].atten(ADC.ATTN_11DB)
+_x12_btn = {
+    6: Pin(6, Pin.IN, Pin.PULL_UP),
+    7: Pin(7, Pin.IN, Pin.PULL_UP),
+    8: Pin(21, Pin.IN, Pin.PULL_UP),  # K3 = GPIO21
+    9: Pin(20, Pin.IN, Pin.PULL_UP)   # K4 = GPIO20
+}
+```
+
+### 8.5 X12 按鈕 GPIO 映射
+
+**硬體映射確認**:
+| 按鈕 | GPIO | 說明 |
+|------|------|------|
+| K1 | 6 | 按下=0, 放開=1 |
+| K2 | 7 | 按下=0, 放開=1 |
+| K3 | 21 | 注意：不是連續編號！ |
+| K4 | 20 | 注意：不是連續編號！ |
+
+### 8.6 hardwareInit 排序保證
+
+**問題**: ESP-NOW 初始化必須在 RC 資料讀取之前完成。
+
+**解決方案**: 在 `micropythonGenerator.finish()` 中按 key 排序 hardwareInit：
+
+```javascript
+// 按 key 排序，確保 'espnow_*' 在 'x12_*' 之前
+const hardwareInitKeys = Array.from(this.hardwareInit_.keys()).sort();
+const hardwareInit = hardwareInitKeys.map(k => this.hardwareInit_.get(k)).join('\n');
+```
+
+### 8.7 長時間運作穩定性問題 (2026-01-15 補充)
+
+**問題**: 發射端連續運作一段時間後會變得不穩定，需要 reset 才能恢復。
+
+**根本原因**:
+
+1. ESP-NOW 發送緩衝區滿時會回傳 `ESP_ERR_ESPNOW_NO_MEM`
+2. MicroPython 官方文檔指出：「when this happens, you can delay a while before sending the next data」
+3. 連續快速發送會導致封包堆積在內部緩衝區
+
+**解決方案**:
+
+```python
+# 1. 增加 rxbuf 大小 (預設 526 bytes → 1024 bytes)
+_espnow.config(rxbuf=1024)
+
+# 2. 檢查發送結果，失敗時延遲重試
+if _espnow.send(mac, data):
+    # 發送成功
+    fail_count = 0
+else:
+    # 發送失敗（廣播無 ACK，通常是緩衝區問題）
+    fail_count += 1
+
+# 3. 連續失敗多次時重新初始化 ESP-NOW
+if fail_count > 10:
+    _espnow.active(False)
+    time.sleep_ms(50)
+    _espnow.active(True)
+    _espnow.add_peer(broadcast)
+    fail_count = 0
+```
+
+**最佳實踐來源**:
+
+-   [ESP-IDF 官方文檔](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/network/esp_now.html): 建議發送失敗時延遲再試
+-   [Reddit 討論](https://www.reddit.com/r/esp32/comments/uy3p59/): 在發送後加入 1ms 延遲可解決 NO_MEM 問題
+-   [MicroPython espnow 文檔](https://docs.micropython.org/en/v1.26.0/library/espnow.html): 建議增加 rxbuf 以處理高頻傳輸
+
+### 8.8 接收端長時間運作穩定性 (2026-01-16 補充)
+
+**問題**: 接收端在長時間運作後會變得不穩定，訊號接收不正常。
+
+**根本原因分析**:
+
+1. **記憶體洩漏**: MicroPython 在長時間運行時，頻繁的 struct.unpack 和 tuple 創建會累積記憶體碎片
+2. **irq callback 異常未處理**: callback 中的異常會導致 ESP-NOW 模組狀態不一致
+3. **無斷線重連機制**: 發射端重啟後，接收端無法自動恢復連線
+
+**解決方案**:
+
+```python
+import gc
+
+# 1. irq callback 加入 try-except 防止異常導致系統卡死
+def _rc_recv_cb(e):
+    global _rc_data, _rc_connected, _rc_last_recv, _rc_recv_count
+    try:
+        while True:
+            mac, msg = e.irecv(0)
+            if mac is None:
+                return
+            if len(msg) >= 21 and msg[0] == _rc_pair_id:
+                _rc_data = struct.unpack('<10h', msg[1:21])
+                _rc_connected = True
+                _rc_last_recv = time.ticks_ms()
+                _rc_recv_count += 1
+    except Exception:
+        pass  # 防止 irq 異常導致系統卡死
+
+# 2. 維護函數：定期垃圾回收 + 斷線重連
+def _rc_maintenance():
+    global _rc_last_gc, _rc_connected, _espnow
+    now = time.ticks_ms()
+    
+    # 每 30 秒執行一次垃圾回收
+    if time.ticks_diff(now, _rc_last_gc) > 30000:
+        gc.collect()
+        _rc_last_gc = now
+    
+    # 斷線超過 5 秒，嘗試重新初始化 ESP-NOW
+    if _rc_connected and time.ticks_diff(now, _rc_last_recv) > 5000:
+        try:
+            _espnow.active(False)
+            time.sleep_ms(100)
+            _espnow.active(True)
+            _espnow.config(rxbuf=1024)
+            _espnow.irq(_rc_recv_cb)
+            _rc_connected = False
+        except Exception:
+            pass
+    
+    # 回傳連線狀態 (500ms 內有收到資料)
+    return _rc_connected and time.ticks_diff(now, _rc_last_recv) < 500
+```
+
+**設計決策**: 將 `_rc_maintenance()` 整合到 `rc_is_connected` 積木中，使用者只需在主迴圈檢查連線狀態，就會自動執行維護。
+
+---
+
 ## 參考資料
 
 1. [MicroPython espnow 文檔](https://docs.micropython.org/en/latest/library/espnow.html)
 2. [ESP-NOW 官方說明](https://www.espressif.com/en/products/software/esp-now/overview)
-3. 現有 RC 積木實作：`media/blockly/blocks/rc.js`, `media/blockly/generators/micropython/rc.js`
+3. [ESP-IDF ESP-NOW API](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/network/esp_now.html)
+4. 現有 RC 積木實作：`media/blockly/blocks/rc.js`, `media/blockly/generators/micropython/rc.js`

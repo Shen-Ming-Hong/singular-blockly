@@ -836,4 +836,47 @@ window.languageManager.loadMessages('tr', {
 	// RC Düğme blokları
 
 	// RC Durum blokları
+
+	// === RC Bağlantı ===
+	CATEGORY_RC: 'RC Bağlantı',
+	RC_LABEL_MASTER: '📡 Verici',
+	RC_LABEL_SLAVE: '📻 Alıcı',
+	RC_LABEL_DATA: '📊 Veri',
+	RC_LABEL_STATUS: '🔗 Durum',
+
+	// Verici RC blokları
+	RC_MASTER_INIT: 'RC verici başlat',
+	RC_MASTER_INIT_PAIR_ID: 'eşleştirme ID',
+	RC_MASTER_INIT_CHANNEL: 'kanal',
+	RC_MASTER_INIT_TOOLTIP: 'RC vericiyi eşleştirme ID (1-255) ve kanal (1-11) ile başlat',
+	RC_SEND: 'RC verisi gönder',
+	RC_SEND_TOOLTIP: 'X12 joystick/düğme verilerini oku ve alıcıya gönder',
+
+	// Alıcı RC blokları
+	RC_SLAVE_INIT: 'RC alıcı başlat',
+	RC_SLAVE_INIT_PAIR_ID: 'eşleştirme ID',
+	RC_SLAVE_INIT_CHANNEL: 'kanal',
+	RC_SLAVE_INIT_TOOLTIP: 'RC alıcıyı eşleştirme ID (1-255) ve kanal (1-11) ile başlat',
+	RC_WAIT_CONNECTION: 'Eşleşmeyi bekle',
+	RC_WAIT_TIMEOUT: 'zaman aşımı',
+	RC_WAIT_SECONDS: 'sn',
+	RC_WAIT_TOOLTIP: 'Verici bağlantısını bekle, LED mavi yanıp söner, zaman aşımından sonra devam et',
+
+	// Veri okuma RC blokları
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Uzak joystick değerini oku (0-4095), 2048 merkezdir',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'eşle',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Uzak joystick oku ve belirtilen aralığa eşle',
+	RC_GET_BUTTON_PREFIX: 'RC düğme',
+	RC_GET_BUTTON_SUFFIX: 'durum',
+	RC_GET_BUTTON_TOOLTIP: 'Uzak düğme durumunu oku (0=basılı, 1=serbest)',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC düğme',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'basılı mı?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Uzak düğmenin basılı olup olmadığını kontrol et',
+
+	// Durum RC blokları
+	RC_IS_CONNECTED: 'RC bağlı mı?',
+	RC_IS_CONNECTED_TOOLTIP: '500ms içinde veri alınıp alınmadığını kontrol et',
 });

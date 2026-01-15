@@ -836,4 +836,45 @@ window.languageManager.loadMessages('de', {
 	// RC Tasten Blöcke
 
 	// RC Status Blöcke
+
+	// === RC-Verbindung ===
+	CATEGORY_RC: 'RC-Verbindung',
+	RC_LABEL_MASTER: '📡 Sender',
+	RC_LABEL_SLAVE: '📻 Empfänger',
+	RC_LABEL_DATA: '📊 Daten lesen',
+	RC_LABEL_STATUS: '🔗 Verbindungsstatus',
+
+	// RC Sender Blöcke
+	RC_MASTER_INIT: 'RC-Sender initialisieren',
+	RC_MASTER_INIT_PAIR_ID: 'Paar-ID',
+	RC_MASTER_INIT_CHANNEL: 'Kanal',
+	RC_MASTER_INIT_TOOLTIP: 'RC-Sender mit Paar-ID (1-255) und Kanal (1-11) initialisieren',
+	RC_SEND: 'RC-Daten senden',
+	RC_SEND_TOOLTIP: 'X12 Joystick/Tasten-Daten lesen und an Empfänger senden',
+
+	// RC Empfänger Blöcke
+	RC_SLAVE_INIT: 'RC-Empfänger initialisieren',
+	RC_SLAVE_INIT_PAIR_ID: 'Paar-ID',
+	RC_SLAVE_INIT_CHANNEL: 'Kanal',
+	RC_SLAVE_INIT_TOOLTIP: 'RC-Empfänger mit Paar-ID (1-255) und Kanal (1-11) initialisieren',
+	RC_WAIT_CONNECTION: 'Auf Pairing warten',
+	RC_WAIT_TIMEOUT: 'Timeout',
+	RC_WAIT_SECONDS: 'Sekunden',
+	RC_WAIT_TOOLTIP: 'Auf Sender-Verbindung warten, LED blinkt blau, fährt nach Timeout fort',
+	RC_IS_CONNECTED: 'RC verbunden?',
+	RC_IS_CONNECTED_TOOLTIP: 'Prüfen ob Daten innerhalb 500ms empfangen',
+
+	// RC Daten lesen Blöcke
+	RC_GET_JOYSTICK_PREFIX: 'RC Joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Remote-Joystick-Wert lesen (0-4095), 2048 ist Mitte',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC Joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'mappen auf',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Remote-Joystick lesen und auf Bereich mappen',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC Taste',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'gedrückt?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Prüfen ob Remote-Taste gedrückt ist',
+	RC_GET_BUTTON_PREFIX: 'RC Taste',
+	RC_GET_BUTTON_SUFFIX: 'Status',
+	RC_GET_BUTTON_TOOLTIP: 'Remote-Tasten-Status lesen (0=gedrückt, 1=losgelassen)',
 });

@@ -184,8 +184,9 @@ window.micropythonGenerator.finish = function (code) {
 	// 組合 import 語句
 	const imports = Array.from(this.imports_).sort().join('\n');
 
-	// 組合硬體初始化
-	const hardwareInit = Array.from(this.hardwareInit_.values()).join('\n');
+	// 組合硬體初始化（按 key 排序，確保 espnow_* 在 rc_* 之前）
+	const hardwareInitKeys = Array.from(this.hardwareInit_.keys()).sort();
+	const hardwareInit = hardwareInitKeys.map(k => this.hardwareInit_.get(k)).join('\n');
 
 	// 組合全域變數
 	const variables = Array.from(this.variables_.values())

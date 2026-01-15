@@ -11,6 +11,9 @@
             "$include": "./categories/cyberbrick_x12.json"
         },
         {
+            "$include": "./categories/cyberbrick_rc.json"
+        },
+        {
             "$include": "./categories/cyberbrick_wifi.json"
         },
         {

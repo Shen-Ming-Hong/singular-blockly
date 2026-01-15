@@ -837,4 +837,47 @@ window.languageManager.loadMessages('pl', {
 	// RC Bloki przycisków
 
 	// RC Bloki statusu
+
+	// === Połączenie RC ===
+	CATEGORY_RC: 'Połączenie RC',
+	RC_LABEL_MASTER: '📡 Nadajnik',
+	RC_LABEL_SLAVE: '📻 Odbiornik',
+	RC_LABEL_DATA: '📊 Dane',
+	RC_LABEL_STATUS: '🔗 Status',
+
+	// Bloki nadajnika RC
+	RC_MASTER_INIT: 'Inicjalizuj nadajnik RC',
+	RC_MASTER_INIT_PAIR_ID: 'ID parowania',
+	RC_MASTER_INIT_CHANNEL: 'kanał',
+	RC_MASTER_INIT_TOOLTIP: 'Inicjalizuj nadajnik RC z ID parowania (1-255) i kanałem (1-11)',
+	RC_SEND: 'Wyślij dane RC',
+	RC_SEND_TOOLTIP: 'Odczytaj dane joysticków/przycisków X12 i wyślij do odbiornika',
+
+	// Bloki odbiornika RC
+	RC_SLAVE_INIT: 'Inicjalizuj odbiornik RC',
+	RC_SLAVE_INIT_PAIR_ID: 'ID parowania',
+	RC_SLAVE_INIT_CHANNEL: 'kanał',
+	RC_SLAVE_INIT_TOOLTIP: 'Inicjalizuj odbiornik RC z ID parowania (1-255) i kanałem (1-11)',
+	RC_WAIT_CONNECTION: 'Czekaj na połączenie RC',
+	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_SECONDS: 'sek',
+	RC_WAIT_TOOLTIP: 'Czekaj na połączenie nadajnika, LED miga na niebiesko, kontynuuj po timeout',
+
+	// Bloki odczytu danych RC
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Odczytaj wartość joysticka zdalnego (0-4095), 2048 to środek',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'mapuj na',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Odczytaj joystick zdalny i mapuj na określony zakres',
+	RC_GET_BUTTON_PREFIX: 'RC przycisk',
+	RC_GET_BUTTON_SUFFIX: 'stan',
+	RC_GET_BUTTON_TOOLTIP: 'Odczytaj stan przycisku zdalnego (0=wciśnięty, 1=zwolniony)',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC przycisk',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'wciśnięty?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Sprawdź czy przycisk zdalny jest wciśnięty',
+
+	// Bloki statusu RC
+	RC_IS_CONNECTED: 'RC połączony?',
+	RC_IS_CONNECTED_TOOLTIP: 'Sprawdź czy dane odebrane w ciągu 500ms',
 });

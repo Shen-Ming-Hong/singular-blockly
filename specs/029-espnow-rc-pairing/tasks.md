@@ -15,10 +15,13 @@
 
 ## 技術棧
 
--   **Blockly 積木定義**: `media/blockly/blocks/rc-espnow.js`
--   **MicroPython 生成器**: `media/blockly/generators/micropython/rc-espnow.js`
--   **Toolbox 類別**: `media/toolbox/categories/cyberbrick_rc_espnow.json`
--   **i18n 翻譯**: `media/locales/{lang}/messages.js` (15 種語言)
+> **⚠️ 重大變更**: 實作時發現 rc_module 與 ESP-NOW 衝突，改為直接修改現有 RC 積木
+
+-   **Blockly 積木定義**: `media/blockly/blocks/rc.js` (修改現有檔案)
+-   **MicroPython 生成器**: `media/blockly/generators/micropython/rc.js` (修改現有檔案)
+-   **X12 生成器**: `media/blockly/generators/micropython/x12.js` (修改以移除 rc_module 依賴)
+-   **Toolbox 類別**: `media/toolbox/categories/cyberbrick_rc.json`
+-   **i18n 翻譯**: `media/locales/{lang}/messages.js` (15 種語言，使用 `RC_*` 前綴)
 
 ---
 
@@ -26,9 +29,9 @@
 
 **Purpose**: 建立新檔案結構，不修改現有 RC 積木
 
--   [ ] T001 建立積木定義檔案 `media/blockly/blocks/rc-espnow.js`，包含 IIFE 結構和 getMessage 引用
--   [ ] T002 建立 MicroPython 生成器檔案 `media/blockly/generators/micropython/rc-espnow.js`，包含 IIFE 結構
--   [ ] T003 [P] 建立 Toolbox 類別檔案 `media/toolbox/categories/cyberbrick_rc_espnow.json`
+-   [x] T001 建立積木定義檔案 `media/blockly/blocks/rc-espnow.js`，包含 IIFE 結構和 getMessage 引用
+-   [x] T002 建立 MicroPython 生成器檔案 `media/blockly/generators/micropython/rc-espnow.js`，包含 IIFE 結構
+-   [x] T003 [P] 建立 Toolbox 類別檔案 `media/toolbox/categories/cyberbrick_rc_espnow.json`
 
 ---
 
@@ -40,18 +43,18 @@
 
 ### i18n 翻譯鍵 (依 data-model.md 定義)
 
--   [ ] T004 [P] 新增 zh-hant 翻譯鍵至 `media/locales/zh-hant/messages.js`：
+-   [x] T004 [P] 新增 zh-hant 翻譯鍵至 `media/locales/zh-hant/messages.js`：
     -   類別與標籤：CATEGORY_RC_ESPNOW, RC_ESPNOW_LABEL_MASTER/SLAVE/DATA/STATUS
     -   發射端：RC_ESPNOW_MASTER_INIT*, RC_ESPNOW_SEND*
     -   接收端：RC*ESPNOW_SLAVE_INIT\*, RC_ESPNOW_WAIT*_, RC_ESPNOW_IS_CONNECTED_
     -   資料讀取：RC_ESPNOW_GET_JOYSTICK*, RC_ESPNOW_IS_BUTTON_PRESSED*
--   [ ] T005 [P] 新增 en 翻譯鍵至 `media/locales/en/messages.js` (同上所有鍵)
--   [ ] T006 [P] 新增其他 13 種語言翻譯鍵至 `media/locales/{bg,cs,de,es,fr,hu,it,ja,ko,pl,pt-br,ru,tr}/messages.js`
+-   [x] T005 [P] 新增 en 翻譯鍵至 `media/locales/en/messages.js` (同上所有鍵)
+-   [x] T006 [P] 新增其他 13 種語言翻譯鍵至 `media/locales/{bg,cs,de,es,fr,hu,it,ja,ko,pl,pt-br,ru,tr}/messages.js`
 
 ### Toolbox 整合
 
--   [ ] T007 更新 `media/toolbox/cyberbrick.json`，新增 `cyberbrick_rc_espnow` 類別引用
--   [ ] T008 更新 `media/html/blocklyEdit.html`，引入 `rc-espnow.js` 積木定義和生成器
+-   [x] T007 更新 `media/toolbox/cyberbrick.json`，新增 `cyberbrick_rc_espnow` 類別引用
+-   [x] T008 更新 `media/html/blocklyEdit.html`，引入 `rc-espnow.js` 積木定義和生成器
 
 **Checkpoint**: 翻譯鍵完成，可執行 `npm run validate:i18n` 驗證
 
@@ -65,31 +68,31 @@
 
 ### 發射端積木 (US1)
 
--   [ ] T009 [P] [US1] 實作 `rc_espnow_master_init` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T009 [P] [US1] 實作 `rc_espnow_master_init` 積木定義 in `media/blockly/blocks/rc-espnow.js`
     -   欄位：PAIR_ID (1-255), CHANNEL (1-11)
     -   參考 contracts/block-api.md 規格
--   [ ] T010 [P] [US1] 實作 `rc_espnow_send` 積木定義 in `media/blockly/blocks/rc-espnow.js`
--   [ ] T011 [US1] 實作 `rc_espnow_master_init` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T010 [P] [US1] 實作 `rc_espnow_send` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T011 [US1] 實作 `rc_espnow_master_init` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   使用 generator.addImport() 新增 network, espnow, struct, time, rc_module
     -   使用 generator.addHardwareInit('espnow_master', ...) 初始化 ESP-NOW
     -   配對 ID 轉 MAC: `b'\x02\x00\x00\x00\x00\x{ID:02x}'`
--   [ ] T012 [US1] 實作 `rc_espnow_send` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T012 [US1] 實作 `rc_espnow_send` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   讀取 rc_master_data()、打包發送、sleep_ms(20)
 
 ### 接收端積木 (US1)
 
--   [ ] T013 [P] [US1] 實作 `rc_espnow_slave_init` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T013 [P] [US1] 實作 `rc_espnow_slave_init` 積木定義 in `media/blockly/blocks/rc-espnow.js`
     -   欄位：PAIR_ID (1-255), CHANNEL (1-11)
--   [ ] T014 [US1] 實作 `rc_espnow_slave_init` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T014 [US1] 實作 `rc_espnow_slave_init` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   使用 generator.addHardwareInit('espnow_slave', ...) 初始化 ESP-NOW
     -   註冊 `espnow.irq(_rc_recv_cb)` callback
     -   callback 使用 `irecv(0)` 迴圈讀取所有緩衝區訊息
 
 ### 資料讀取積木 (US1)
 
--   [ ] T015 [P] [US1] 實作 `rc_espnow_get_joystick` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T015 [P] [US1] 實作 `rc_espnow_get_joystick` 積木定義 in `media/blockly/blocks/rc-espnow.js`
     -   Dropdown 欄位：L1-L3, R1-R3
--   [ ] T016 [US1] 實作 `rc_espnow_get_joystick` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T016 [US1] 實作 `rc_espnow_get_joystick` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   回傳 `(_rc_data[{CHANNEL}] if _rc_connected else 2048)`
 
 **Checkpoint**: User Story 1 完成 - 發射端/接收端可配對並傳輸搖桿資料
@@ -102,9 +105,9 @@
 
 **Independent Test**: 接收端開機後 LED 閃爍，發射端開機發送後 LED 停止閃爍
 
--   [ ] T017 [P] [US2] 實作 `rc_espnow_wait_connection` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T017 [P] [US2] 實作 `rc_espnow_wait_connection` 積木定義 in `media/blockly/blocks/rc-espnow.js`
     -   欄位：TIMEOUT (1-60 秒，預設 30)
--   [ ] T018 [US2] 實作 `rc_espnow_wait_connection` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T018 [US2] 實作 `rc_espnow_wait_connection` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   迴圈等待 `_rc_connected=True`
     -   LED 藍色閃爍 (500ms 間隔)
     -   超時後結束等待，程式繼續執行
@@ -119,11 +122,11 @@
 
 **Independent Test**: 發射端在迴圈中每次執行發送積木時，接收端收到一筆更新
 
--   [ ] T019 [US3] 補完 `rc_espnow_send` 生成器的 None 處理 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T019 [US3] 補完 `rc_espnow_send` 生成器的 None 處理 in `media/blockly/generators/micropython/rc-espnow.js`
     -   當 `rc_master_data()` 回傳 None 時發送安全預設值 `(2048,)*6 + (1,)*4`
--   [ ] T020 [P] [US3] 實作 `rc_espnow_get_joystick_mapped` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T020 [P] [US3] 實作 `rc_espnow_get_joystick_mapped` 積木定義 in `media/blockly/blocks/rc-espnow.js`
     -   輸入：CHANNEL (dropdown), MIN (number input), MAX (number input)
--   [ ] T021 [US3] 實作 `rc_espnow_get_joystick_mapped` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T021 [US3] 實作 `rc_espnow_get_joystick_mapped` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   映射 0-4095 → 使用者指定範圍
 
 **Checkpoint**: User Story 3 完成 - 發送積木與映射功能可獨立測試
@@ -138,27 +141,27 @@
 
 ### 連線狀態積木
 
--   [ ] T022 [P] [US4] 實作 `rc_espnow_is_connected` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T022 [P] [US4] 實作 `rc_espnow_is_connected` 積木定義 in `media/blockly/blocks/rc-espnow.js`
     -   Output: Boolean
--   [ ] T023 [US4] 實作 `rc_espnow_is_connected` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T023 [US4] 實作 `rc_espnow_is_connected` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   檢查 `time.ticks_diff(time.ticks_ms(), _rc_last_recv) < 500`
 
 ### 按鈕讀取積木
 
--   [ ] T024 [P] [US4] 實作 `rc_espnow_is_button_pressed` 積木定義 in `media/blockly/blocks/rc-espnow.js`
+-   [x] T024 [P] [US4] 實作 `rc_espnow_is_button_pressed` 積木定義 in `media/blockly/blocks/rc-espnow.js`
     -   Dropdown 欄位：K1-K4
     -   Output: Boolean
--   [ ] T025 [US4] 實作 `rc_espnow_is_button_pressed` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T025 [US4] 實作 `rc_espnow_is_button_pressed` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   回傳 `(_rc_data[{6+index}] == 0 if _rc_connected else False)`
--   [ ] T025a [P] [US4] 實作 `rc_espnow_get_button` 積木定義 in `media/blockly/blocks/rc-espnow.js` (FR-012)
+-   [x] T025a [P] [US4] 實作 `rc_espnow_get_button` 積木定義 in `media/blockly/blocks/rc-espnow.js` (FR-012)
     -   Dropdown 欄位：K1-K4
     -   Output: Number (原始狀態 0 或 1)
--   [ ] T025b [US4] 實作 `rc_espnow_get_button` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T025b [US4] 實作 `rc_espnow_get_button` MicroPython 生成器 in `media/blockly/generators/micropython/rc-espnow.js`
     -   回傳 `(_rc_data[{6+index}] if _rc_connected else 1)`
 
 ### 安全預設值處理
 
--   [ ] T026 [US4] 驗證所有資料讀取生成器在斷線時回傳安全預設值 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T026 [US4] 驗證所有資料讀取生成器在斷線時回傳安全預設值 in `media/blockly/generators/micropython/rc-espnow.js`
     -   搖桿：2048（中點）
     -   按鈕：1（放開）= is_pressed 回傳 False
     -   配對 ID 衝突場景：當多個發射端使用相同 ID 時，接收端應接受最後收到的資料（由 irq callback 自動處理）
@@ -173,8 +176,8 @@
 
 **Independent Test**: 發射端程式同時使用 X12 和 RC 積木，兩者都正常運作
 
--   [ ] T027 [US5] 確保 `rc_espnow_master_init` 生成的 `rc_master_init()` 呼叫使用 addHardwareInit 避免重複 in `media/blockly/generators/micropython/rc-espnow.js`
--   [ ] T028 [US5] 驗證與 X12 積木混用時生成程式碼正確性 - 手動測試並記錄於 quickstart.md
+-   [x] T027 [US5] 確保 `rc_espnow_master_init` 生成的 `rc_master_init()` 呼叫使用 addHardwareInit 避免重複 in `media/blockly/generators/micropython/rc-espnow.js`
+-   [x] T028 [US5] 驗證與 X12 積木混用時生成程式碼正確性 - 手動測試通過 (2026-01-15)
 
 **Checkpoint**: User Story 5 完成 - 相容性驗證通過
 
@@ -184,14 +187,16 @@
 
 **Purpose**: 文件更新、程式碼清理、驗證
 
--   [ ] T029 [P] 補完 Toolbox 類別內容 `media/toolbox/categories/cyberbrick_rc_espnow.json`
+-   [x] T029 [P] 補完 Toolbox 類別內容 `media/toolbox/categories/cyberbrick_rc_espnow.json`
     -   新增所有積木的 shadow blocks (數值輸入預設值)
     -   參考 contracts/block-api.md 中的 Toolbox Category Contract
--   [ ] T030 [P] 執行 `npm run validate:i18n` 確認所有 15 種語言翻譯完整
--   [ ] T031 [P] 新增積木 tooltip 翻譯，說明各積木功能
--   [ ] T032 執行 `npm run generate:dictionary` 更新 MCP block-dictionary.json
--   [ ] T033 依照 quickstart.md 進行端對端硬體測試驗證
--   [ ] T034 程式碼清理：確保所有 IIFE 正確關閉、console.log 僅用於除錯
+-   [x] T030 [P] 執行 `npm run validate:i18n` 確認所有 15 種語言翻譯完整
+-   [x] T031 [P] 新增積木 tooltip 翻譯，說明各積木功能
+-   [x] T032 執行 `npm run generate:dictionary` 更新 MCP block-dictionary.json
+-   [x] T033 依照 quickstart.md 進行端對端硬體測試驗證 (2026-01-15 手動測試通過)
+-   [x] T034 程式碼清理：確保所有 IIFE 正確關閉、console.log 僅用於除錯
+-   [x] T035 UX 命名優化：移除積木名稱中的「ESP-NOW」技術詞彙，類別改為「RC 連線」降低使用者認知負擔
+-   [x] T036 i18n 翻譯鍵命名統一：將所有語言的 `RC_ESPNOW_*` 鍵重命名為 `RC_*` (2026-01-15)
 
 ---
 

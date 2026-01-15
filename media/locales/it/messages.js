@@ -832,4 +832,45 @@ window.languageManager.loadMessages('it', {
 	// Blocchi Pulsante RC
 
 	// Blocchi Stato RC
+
+	// === Connessione RC ===
+	CATEGORY_RC: 'Connessione RC',
+	RC_LABEL_MASTER: '📡 Trasmettitore',
+	RC_LABEL_SLAVE: '📻 Ricevitore',
+	RC_LABEL_DATA: '📊 Lettura dati',
+	RC_LABEL_STATUS: '🔗 Stato connessione',
+
+	// Blocchi Trasmettitore RC
+	RC_MASTER_INIT: 'Inizializza trasmettitore RC',
+	RC_MASTER_INIT_PAIR_ID: 'ID coppia',
+	RC_MASTER_INIT_CHANNEL: 'Canale',
+	RC_MASTER_INIT_TOOLTIP: 'Inizializza trasmettitore RC con ID coppia (1-255) e canale (1-11)',
+	RC_SEND: 'Invia dati RC',
+	RC_SEND_TOOLTIP: 'Leggi dati joystick/pulsanti X12 e invia al ricevitore',
+
+	// Blocchi Ricevitore RC
+	RC_SLAVE_INIT: 'Inizializza ricevitore RC',
+	RC_SLAVE_INIT_PAIR_ID: 'ID coppia',
+	RC_SLAVE_INIT_CHANNEL: 'Canale',
+	RC_SLAVE_INIT_TOOLTIP: 'Inizializza ricevitore RC con ID coppia (1-255) e canale (1-11)',
+	RC_WAIT_CONNECTION: 'Attendi accoppiamento',
+	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_SECONDS: 'secondi',
+	RC_WAIT_TOOLTIP: 'Attendi connessione trasmettitore, LED lampeggia blu, continua dopo timeout',
+	RC_IS_CONNECTED: 'RC connesso?',
+	RC_IS_CONNECTED_TOOLTIP: 'Controlla se dati ricevuti entro 500ms',
+
+	// Blocchi Lettura dati RC
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Leggi valore joystick remoto (0-4095), 2048 è centro',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'mappa su',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Leggi joystick remoto e mappa su intervallo specificato',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC pulsante',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'premuto?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Controlla se pulsante remoto è premuto',
+	RC_GET_BUTTON_PREFIX: 'RC pulsante',
+	RC_GET_BUTTON_SUFFIX: 'stato',
+	RC_GET_BUTTON_TOOLTIP: 'Leggi stato pulsante remoto (0=premuto, 1=rilasciato)',
 });

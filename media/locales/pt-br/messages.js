@@ -829,4 +829,47 @@ window.languageManager.loadMessages('pt-br', {
 	// Blocos de Botão RC
 
 	// Blocos de Status RC
+
+	// === Conexão RC ===
+	CATEGORY_RC: 'Conexão RC',
+	RC_LABEL_MASTER: '📡 Transmissor',
+	RC_LABEL_SLAVE: '📻 Receptor',
+	RC_LABEL_DATA: '📊 Dados',
+	RC_LABEL_STATUS: '🔗 Status',
+
+	// Blocos transmissor RC
+	RC_MASTER_INIT: 'Inicializar transmissor RC',
+	RC_MASTER_INIT_PAIR_ID: 'ID pareamento',
+	RC_MASTER_INIT_CHANNEL: 'canal',
+	RC_MASTER_INIT_TOOLTIP: 'Inicializar transmissor RC com ID pareamento (1-255) e canal (1-11)',
+	RC_SEND: 'Enviar dados RC',
+	RC_SEND_TOOLTIP: 'Ler dados joysticks/botões X12 e enviar ao receptor',
+
+	// Blocos receptor RC
+	RC_SLAVE_INIT: 'Inicializar receptor RC',
+	RC_SLAVE_INIT_PAIR_ID: 'ID pareamento',
+	RC_SLAVE_INIT_CHANNEL: 'canal',
+	RC_SLAVE_INIT_TOOLTIP: 'Inicializar receptor RC com ID pareamento (1-255) e canal (1-11)',
+	RC_WAIT_CONNECTION: 'Aguardar pareamento',
+	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_SECONDS: 'seg',
+	RC_WAIT_TOOLTIP: 'Aguardar conexão transmissor, LED pisca azul, continua após timeout',
+
+	// Blocos leitura dados RC
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Ler valor joystick remoto (0-4095), 2048 é centro',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'mapear para',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Ler joystick remoto e mapear para intervalo especificado',
+	RC_GET_BUTTON_PREFIX: 'RC botão',
+	RC_GET_BUTTON_SUFFIX: 'estado',
+	RC_GET_BUTTON_TOOLTIP: 'Ler estado botão remoto (0=pressionado, 1=solto)',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC botão',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'pressionado?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Verificar se botão remoto está pressionado',
+
+	// Blocos status RC
+	RC_IS_CONNECTED: 'RC conectado?',
+	RC_IS_CONNECTED_TOOLTIP: 'Verificar se dados recebidos em 500ms',
 });

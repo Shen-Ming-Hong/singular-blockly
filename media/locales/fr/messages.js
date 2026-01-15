@@ -825,4 +825,45 @@ window.languageManager.loadMessages('fr', {
 	X12_IS_BUTTON_PRESSED_PREFIX: 'Bouton',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'appuyé?',
 	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Vérifier si le bouton est appuyé',
+
+	// === ESP-NOW RC Appairage Personnalisé ===
+	CATEGORY_RC: 'Connexion RC',
+	RC_LABEL_MASTER: '📡 Émetteur',
+	RC_LABEL_SLAVE: '📻 Récepteur',
+	RC_LABEL_DATA: '📊 Lecture de données',
+	RC_LABEL_STATUS: '🔗 État de connexion',
+
+	// Blocs Émetteur RC
+	RC_MASTER_INIT: 'Initialiser émetteur RC',
+	RC_MASTER_INIT_PAIR_ID: 'ID paire',
+	RC_MASTER_INIT_CHANNEL: 'Canal',
+	RC_MASTER_INIT_TOOLTIP: 'Initialiser émetteur RC avec ID paire (1-255) et canal (1-11)',
+	RC_SEND: 'Envoyer données RC',
+	RC_SEND_TOOLTIP: 'Lire données joystick/boutons X12 et envoyer au récepteur',
+
+	// Blocs Récepteur RC
+	RC_SLAVE_INIT: 'Initialiser récepteur RC',
+	RC_SLAVE_INIT_PAIR_ID: 'ID paire',
+	RC_SLAVE_INIT_CHANNEL: 'Canal',
+	RC_SLAVE_INIT_TOOLTIP: 'Initialiser récepteur RC avec ID paire (1-255) et canal (1-11)',
+	RC_WAIT_CONNECTION: 'Attendre appairage',
+	RC_WAIT_TIMEOUT: 'délai',
+	RC_WAIT_SECONDS: 'secondes',
+	RC_WAIT_TOOLTIP: 'Attendre connexion émetteur, LED clignote bleu, continue après délai',
+	RC_IS_CONNECTED: 'RC connecté?',
+	RC_IS_CONNECTED_TOOLTIP: 'Vérifier si données reçues dans 500ms',
+
+	// Blocs Lecture de données RC
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Lire valeur joystick distant (0-4095), 2048 est centre',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'mapper vers',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Lire joystick distant et mapper vers plage spécifiée',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC bouton',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'appuyé?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Vérifier si bouton distant est appuyé',
+	RC_GET_BUTTON_PREFIX: 'RC bouton',
+	RC_GET_BUTTON_SUFFIX: 'état',
+	RC_GET_BUTTON_TOOLTIP: 'Lire état bouton distant (0=appuyé, 1=relâché)',
 });
