@@ -396,12 +396,12 @@ def _rc_recv_cb(e):
 def _rc_maintenance():
     global _rc_last_gc, _rc_connected, _espnow
     now = time.ticks_ms()
-    
+
     # 每 30 秒執行一次垃圾回收
     if time.ticks_diff(now, _rc_last_gc) > 30000:
         gc.collect()
         _rc_last_gc = now
-    
+
     # 斷線超過 5 秒，嘗試重新初始化 ESP-NOW
     if _rc_connected and time.ticks_diff(now, _rc_last_recv) > 5000:
         try:
@@ -413,7 +413,7 @@ def _rc_maintenance():
             _rc_connected = False
         except Exception:
             pass
-    
+
     # 回傳連線狀態 (500ms 內有收到資料)
     return _rc_connected and time.ticks_diff(now, _rc_last_recv) < 500
 ```
