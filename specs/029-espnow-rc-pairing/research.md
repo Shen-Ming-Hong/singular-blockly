@@ -423,11 +423,13 @@ def _rc_maintenance():
 ### 8.9 禁止 WiFi 自動重連 (sta.config(reconnects=0))
 
 **問題根源** (來自 MicroPython 官方文件):
+
 > "MicroPython re-scans wifi channels when trying to reconnect... This means ESPNow messages will be lost while scanning for the AP. This can be disabled by `sta.config(reconnects=0)`"
 
 當 ESP32 嘗試重新連接 WiFi AP 時，會自動掃描頻道，這會**干擾 ESP-NOW 通訊**，導致訊息遺失。
 
 **解決方案**:
+
 ```python
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
