@@ -172,8 +172,8 @@ def _rc_maintenance():
             _rc_connected = False
         except Exception:
             pass
-    # 回傳連線狀態 (500ms 內有收到資料)
-    return _rc_connected and time.ticks_diff(now, _rc_last_recv) < 500
+    # 回傳連線狀態 (1000ms 內有收到資料，避免偶發延遲誤判)
+    return _rc_connected and time.ticks_diff(now, _rc_last_recv) < 1000
 
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
