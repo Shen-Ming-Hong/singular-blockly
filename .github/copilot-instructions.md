@@ -8,7 +8,7 @@
 
 VSCode extension for visual Arduino/MicroPython programming using Google Blockly. Generates Arduino C++ (via PlatformIO) or MicroPython (via mpremote for CyberBrick) based on board selection. Supports 15 languages with 99% i18n coverage.
 
-**Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VSCode 1.105.0+ | MCP SDK 1.24.3
+**Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VSCode 1.105.0+ | MCP SDK 1.25.2
 
 ## Architecture (Two-Context System)
 
@@ -82,7 +82,33 @@ micropythonGenerator.forBlock['cyberbrick_led_set_color'] = function (block) {
 -   **File I/O**: Use `FileService` only — inject `FileSystem` interface for testing
 -   **Logging**: Use `log('message', 'info')` from `logging.ts`; WebView uses `log.info()`
 -   **Workspace**: Always check `vscode.workspace.workspaceFolders` before operations
--   **Empty State Guard**: `isEmptyWorkspaceState()` prevents overwriting valid data
+-   **Empty State Guard**: `isEmptyWorkspaceState()` prevents overwriting valid data with empty state
+
+### Upload Architecture (Unified UI)
+
+Both Arduino and MicroPython use the same WebView upload UI. The `messageHandler.ts` routes to:
+
+-   `ArduinoUploader` → PlatformIO CLI for compilation/upload
+-   `MicropythonUploader` → `mpremote` tool for CyberBrick
+
+Board language detection via `getBoardLanguage(board)` in `src/types/arduino.ts`.
+
+### CyberBrick Extension Boards (X11/X12)
+
+MicroPython generators for extension boards use `bbl.*` library imports:
+
+```javascript
+// X11 example (media/blockly/generators/micropython/x11.js)
+generator.forBlock['x11_servo_180_angle'] = function (block) {
+	generator.addImport('from bbl.servos import ServosController');
+	generator.addHardwareInit('servos', 'servos = ServosController()');
+	const port = block.getFieldValue('PORT');
+	const angle = generator.valueToCode(block, 'ANGLE', generator.ORDER_NONE) || '0';
+	return `servos.set_angle(${port}, max(0, min(180, ${angle})))\n`;
+};
+```
+
+**Extension board files**: `x11.js` (servos, motors, LEDs) | `x12.js` (joystick, buttons) | `rc.js` (remote control)
 
 ## Development Commands
 
@@ -105,11 +131,11 @@ npm run generate:dictionary  # Update MCP block dictionary
 4. **Toolbox entry**: `media/toolbox/categories/{category}.json` (categories: arduino, communication, cyberbrick\_\*, lists, logic, loops, math, motors, sensors, text, vision-sensors)
 5. **i18n keys**: All 15 `media/locales/*/messages.js` files (use `npm run validate:i18n` to check)
 
-**For setup blocks** (servo, encoder): Register with `arduinoGenerator.registerAlwaysGenerateBlock('block_type')`
+**For setup blocks** (servo, encoder): Register with `arduinoGenerator.registerAlwaysGenerateBlock('block_type')` at module load (see `motors.js` IIFE pattern)
 
 ## MCP Server (AI Tool Integration)
 
-**Entry**: `src/mcp/mcpServer.ts` (STDIO) | **Tools**: `src/mcp/tools/*.ts`
+**Entry**: `src/mcp/mcpServer.ts` (STDIO) | **Provider**: `src/mcp/mcpProvider.ts` | **Tools**: `src/mcp/tools/*.ts`
 
 Adding tools:
 
@@ -140,6 +166,8 @@ const fileService = new FileService('/workspace', fsMock);
 const handler = new WebViewMessageHandler(context, panel, localeService, fileService, settingsManager);
 ```
 
+**Note**: FSMock normalizes paths to forward slashes internally — use either `\` or `/` in tests.
+
 ## Common Pitfalls
 
 1. **WebView resources**: Must use `webview.asWebviewUri()` for all paths
@@ -148,6 +176,7 @@ const handler = new WebViewMessageHandler(context, panel, localeService, fileSer
 4. **Board detection**: Use `window.getCurrentBoard()` in generators, `window.currentBoard` is deprecated
 5. **Backup before save**: `createBackupBeforeSave()` creates `main.json.bak` automatically
 6. **i18n placeholders**: Use `{0}`, `{1}` format in `messages.js`, not `%s`
+7. **VSCode API injection**: Use `_setVSCodeApi()` and `_reset()` for testing (see `extension.ts`, `messageHandler.ts`)
 
 ## Key File Locations
 
@@ -163,3 +192,4 @@ const handler = new WebViewMessageHandler(context, panel, localeService, fileSer
 | Block definitions  | `media/blockly/blocks/*.js`             |
 | Toolbox categories | `media/toolbox/categories/*.json`       |
 | Translation files  | `media/locales/{lang}/messages.js`      |
+| Test mocks         | `src/test/helpers/mocks.ts`             |
