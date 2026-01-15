@@ -5,19 +5,42 @@
     "contents": [
         {
             "kind": "label",
-            "text": "%{RC_LABEL_INIT}"
+            "text": "%{RC_LABEL_MASTER}"
         },
         {
             "kind": "block",
-            "type": "rc_master_init"
+            "type": "rc_master_init",
+            "fields": {
+                "PAIR_ID": 1,
+                "CHANNEL": 1
+            }
         },
         {
             "kind": "block",
-            "type": "rc_slave_init"
+            "type": "rc_send"
         },
         {
             "kind": "label",
-            "text": "%{RC_LABEL_JOYSTICK}"
+            "text": "%{RC_LABEL_SLAVE}"
+        },
+        {
+            "kind": "block",
+            "type": "rc_slave_init",
+            "fields": {
+                "PAIR_ID": 1,
+                "CHANNEL": 1
+            }
+        },
+        {
+            "kind": "block",
+            "type": "rc_wait_connection",
+            "fields": {
+                "TIMEOUT": 30
+            }
+        },
+        {
+            "kind": "label",
+            "text": "%{RC_LABEL_DATA}"
         },
         {
             "kind": "block",
@@ -46,12 +69,12 @@
             }
         },
         {
-            "kind": "label",
-            "text": "%{RC_LABEL_BUTTON}"
+            "kind": "block",
+            "type": "rc_is_button_pressed"
         },
         {
             "kind": "block",
-            "type": "rc_is_button_pressed"
+            "type": "rc_get_button"
         },
         {
             "kind": "label",
@@ -60,10 +83,6 @@
         {
             "kind": "block",
             "type": "rc_is_connected"
-        },
-        {
-            "kind": "block",
-            "type": "rc_get_rc_index"
         }
     ]
 }

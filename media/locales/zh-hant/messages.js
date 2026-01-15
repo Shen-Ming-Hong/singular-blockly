@@ -825,12 +825,43 @@ window.languageManager.loadMessages('zh-hant', {
 	X12_IS_BUTTON_PRESSED_TOOLTIP: '檢查按鈕是否被按下',
 
 	// === RC 遙控通訊 ===
+	CATEGORY_RC: 'RC連線',
+	RC_LABEL_MASTER: '📡 發射端',
+	RC_LABEL_SLAVE: '📻 接收端',
+	RC_LABEL_DATA: '📊 資料讀取',
+	RC_LABEL_STATUS: '🔗 連線狀態',
 
-	// RC 初始化積木
+	// RC 發射端積木
+	RC_MASTER_INIT: '初始化 RC 發射端',
+	RC_MASTER_INIT_PAIR_ID: '配對ID',
+	RC_MASTER_INIT_CHANNEL: '頻道',
+	RC_MASTER_INIT_TOOLTIP: '初始化遙控發射端，設定配對 ID (1-255) 和頻道 (1-11)',
+	RC_SEND: '發送 RC 資料',
+	RC_SEND_TOOLTIP: '讀取 X12 搖桿/按鈕資料並發送給接收端',
 
-	// RC 搖桿積木
+	// RC 接收端積木
+	RC_SLAVE_INIT: '初始化 RC 接收端',
+	RC_SLAVE_INIT_PAIR_ID: '配對ID',
+	RC_SLAVE_INIT_CHANNEL: '頻道',
+	RC_SLAVE_INIT_TOOLTIP: '初始化遙控接收端，設定配對 ID (1-255) 和頻道 (1-11)',
+	RC_WAIT_CONNECTION: '等待配對',
+	RC_WAIT_TIMEOUT: '超時',
+	RC_WAIT_SECONDS: '秒',
+	RC_WAIT_TOOLTIP: '等待發射端連線，LED 藍色閃爍，超時後繼續執行',
+	RC_IS_CONNECTED: 'RC 已連線?',
+	RC_IS_CONNECTED_TOOLTIP: '檢查是否在 500ms 內收到資料',
 
-	// RC 按鈕積木
-
-	// RC 狀態積木
+	// RC 資料讀取積木
+	RC_GET_JOYSTICK_PREFIX: 'RC 搖桿',
+	RC_GET_JOYSTICK_TOOLTIP: '讀取遠端搖桿的值 (0-4095)，2048 為中點',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC 搖桿',
+	RC_GET_JOYSTICK_MAPPED_MIN: '映射',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: '讀取遠端搖桿並映射到指定範圍',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC 按鈕',
+	RC_IS_BUTTON_PRESSED_SUFFIX: '被按下?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: '檢查遠端按鈕是否被按下',
+	RC_GET_BUTTON_PREFIX: 'RC 按鈕',
+	RC_GET_BUTTON_SUFFIX: '狀態',
+	RC_GET_BUTTON_TOOLTIP: '讀取遠端按鈕狀態 (0=按下, 1=放開)',
 });

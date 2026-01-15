@@ -831,4 +831,45 @@ window.languageManager.loadMessages('ko', {
 	// RC 버튼 블록
 
 	// RC 상태 블록
+
+	// === RC 연결 ===
+	CATEGORY_RC: 'RC 연결',
+	RC_LABEL_MASTER: '📡 송신기',
+	RC_LABEL_SLAVE: '📻 수신기',
+	RC_LABEL_DATA: '📊 데이터 읽기',
+	RC_LABEL_STATUS: '🔗 연결 상태',
+
+	// RC 송신기 블록
+	RC_MASTER_INIT: 'RC 송신기 초기화',
+	RC_MASTER_INIT_PAIR_ID: '페어 ID',
+	RC_MASTER_INIT_CHANNEL: '채널',
+	RC_MASTER_INIT_TOOLTIP: 'RC 송신기를 페어 ID (1-255) 및 채널 (1-11)로 초기화',
+	RC_SEND: 'RC 데이터 전송',
+	RC_SEND_TOOLTIP: 'X12 조이스틱/버튼 데이터를 읽고 수신기에 전송',
+
+	// RC 수신기 블록
+	RC_SLAVE_INIT: 'RC 수신기 초기화',
+	RC_SLAVE_INIT_PAIR_ID: '페어 ID',
+	RC_SLAVE_INIT_CHANNEL: '채널',
+	RC_SLAVE_INIT_TOOLTIP: 'RC 수신기를 페어 ID (1-255) 및 채널 (1-11)로 초기화',
+	RC_WAIT_CONNECTION: '페어링 대기',
+	RC_WAIT_TIMEOUT: '타임아웃',
+	RC_WAIT_SECONDS: '초',
+	RC_WAIT_TOOLTIP: '송신기 연결 대기, LED가 파란색으로 깜빡임, 타임아웃 후 계속',
+	RC_IS_CONNECTED: 'RC 연결됨?',
+	RC_IS_CONNECTED_TOOLTIP: '500ms 내 데이터 수신 여부 확인',
+
+	// RC 데이터 읽기 블록
+	RC_GET_JOYSTICK_PREFIX: 'RC 조이스틱',
+	RC_GET_JOYSTICK_TOOLTIP: '원격 조이스틱 값 읽기 (0-4095), 2048이 중앙',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC 조이스틱',
+	RC_GET_JOYSTICK_MAPPED_MIN: '매핑',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: '원격 조이스틱을 읽고 지정 범위로 매핑',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC 버튼',
+	RC_IS_BUTTON_PRESSED_SUFFIX: '눌림?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: '원격 버튼이 눌렸는지 확인',
+	RC_GET_BUTTON_PREFIX: 'RC 버튼',
+	RC_GET_BUTTON_SUFFIX: '상태',
+	RC_GET_BUTTON_TOOLTIP: '원격 버튼 상태 읽기 (0=눌림, 1=해제)',
 });

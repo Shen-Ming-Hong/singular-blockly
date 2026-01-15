@@ -838,4 +838,47 @@ window.languageManager.loadMessages('hu', {
 	// RC Gomb blokkok
 
 	// RC Állapot blokkok
+
+	// === RC Csatlakozás ===
+	CATEGORY_RC: 'RC Csatlakozás',
+	RC_LABEL_MASTER: '📡 Adó',
+	RC_LABEL_SLAVE: '📻 Vevő',
+	RC_LABEL_DATA: '📊 Adatok',
+	RC_LABEL_STATUS: '🔗 Állapot',
+
+	// Adó RC blokkok
+	RC_MASTER_INIT: 'RC adó inicializálása',
+	RC_MASTER_INIT_PAIR_ID: 'párosítási ID',
+	RC_MASTER_INIT_CHANNEL: 'csatorna',
+	RC_MASTER_INIT_TOOLTIP: 'RC adó inicializálása párosítási ID-vel (1-255) és csatornával (1-11)',
+	RC_SEND: 'RC adatok küldése',
+	RC_SEND_TOOLTIP: 'X12 joystick/gomb adatok olvasása és küldése a vevőnek',
+
+	// Vevő RC blokkok
+	RC_SLAVE_INIT: 'RC vevő inicializálása',
+	RC_SLAVE_INIT_PAIR_ID: 'párosítási ID',
+	RC_SLAVE_INIT_CHANNEL: 'csatorna',
+	RC_SLAVE_INIT_TOOLTIP: 'RC vevő inicializálása párosítási ID-vel (1-255) és csatornával (1-11)',
+	RC_WAIT_CONNECTION: 'Párosításra várás',
+	RC_WAIT_TIMEOUT: 'időtúllépés',
+	RC_WAIT_SECONDS: 'mp',
+	RC_WAIT_TOOLTIP: 'Várakozás adó csatlakozására, LED kéken villog, folytatás időtúllépés után',
+
+	// Adatolvasás RC blokkok
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Joystick érték olvasása (0-4095), 2048 a közép',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'leképezés',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Joystick olvasása és leképezése megadott tartományra',
+	RC_GET_BUTTON_PREFIX: 'RC gomb',
+	RC_GET_BUTTON_SUFFIX: 'állapot',
+	RC_GET_BUTTON_TOOLTIP: 'Gomb állapot olvasása (0=lenyomva, 1=elengedve)',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC gomb',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'lenyomva?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Ellenőrizd a gomb lenyomását',
+
+	// Állapot RC blokkok
+	RC_IS_CONNECTED: 'RC csatlakoztatva?',
+	RC_IS_CONNECTED_TOOLTIP: 'Ellenőrizd az adatok érkezését 500ms-on belül',
 });

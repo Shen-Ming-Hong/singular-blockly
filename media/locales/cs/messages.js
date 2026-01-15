@@ -834,4 +834,47 @@ window.languageManager.loadMessages('cs', {
 	// RC Tlačítko bloky
 
 	// RC Stav bloky
+
+	// === RC Připojení ===
+	CATEGORY_RC: 'RC Připojení',
+	RC_LABEL_MASTER: '📡 Vysílač',
+	RC_LABEL_SLAVE: '📻 Přijímač',
+	RC_LABEL_DATA: '📊 Data',
+	RC_LABEL_STATUS: '🔗 Stav',
+
+	// Bloky vysílače RC
+	RC_MASTER_INIT: 'Inicializovat vysílač RC',
+	RC_MASTER_INIT_PAIR_ID: 'ID párování',
+	RC_MASTER_INIT_CHANNEL: 'kanál',
+	RC_MASTER_INIT_TOOLTIP: 'Inicializovat vysílač RC s ID párování (1-255) a kanálem (1-11)',
+	RC_SEND: 'Odeslat data RC',
+	RC_SEND_TOOLTIP: 'Číst data joysticků/tlačítek X12 a odeslat přijímači',
+
+	// Bloky přijímače RC
+	RC_SLAVE_INIT: 'Inicializovat přijímač RC',
+	RC_SLAVE_INIT_PAIR_ID: 'ID párování',
+	RC_SLAVE_INIT_CHANNEL: 'kanál',
+	RC_SLAVE_INIT_TOOLTIP: 'Inicializovat přijímač RC s ID párování (1-255) a kanálem (1-11)',
+	RC_WAIT_CONNECTION: 'Čekat na párování',
+	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_SECONDS: 'sek',
+	RC_WAIT_TOOLTIP: 'Čekat na připojení vysílače, LED bliká modře, pokračovat po timeout',
+
+	// Bloky čtení dat RC
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Číst hodnotu joysticku (0-4095), 2048 je střed',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'mapovat na',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Číst joystick a mapovat na určený rozsah',
+	RC_GET_BUTTON_PREFIX: 'RC tlačítko',
+	RC_GET_BUTTON_SUFFIX: 'stav',
+	RC_GET_BUTTON_TOOLTIP: 'Číst stav tlačítka (0=stisknuto, 1=uvolněno)',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC tlačítko',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'stisknuto?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Zkontrolovat zda je tlačítko stisknuto',
+
+	// Bloky stavu RC
+	RC_IS_CONNECTED: 'RC připojeno?',
+	RC_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda byla přijata data za 500ms',
 });

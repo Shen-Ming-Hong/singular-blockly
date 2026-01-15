@@ -835,4 +835,45 @@ window.languageManager.loadMessages('es', {
 	// Bloques de Botón RC
 
 	// Bloques de Estado RC
+
+	// === Conexión RC ===
+	CATEGORY_RC: 'Conexión RC',
+	RC_LABEL_MASTER: '📡 Transmisor',
+	RC_LABEL_SLAVE: '📻 Receptor',
+	RC_LABEL_DATA: '📊 Lectura de datos',
+	RC_LABEL_STATUS: '🔗 Estado de conexión',
+
+	// Bloques Transmisor RC
+	RC_MASTER_INIT: 'Inicializar transmisor RC',
+	RC_MASTER_INIT_PAIR_ID: 'ID pareja',
+	RC_MASTER_INIT_CHANNEL: 'Canal',
+	RC_MASTER_INIT_TOOLTIP: 'Inicializar transmisor RC con ID pareja (1-255) y canal (1-11)',
+	RC_SEND: 'Enviar datos RC',
+	RC_SEND_TOOLTIP: 'Leer datos joystick/botones X12 y enviar al receptor',
+
+	// Bloques Receptor RC
+	RC_SLAVE_INIT: 'Inicializar receptor RC',
+	RC_SLAVE_INIT_PAIR_ID: 'ID pareja',
+	RC_SLAVE_INIT_CHANNEL: 'Canal',
+	RC_SLAVE_INIT_TOOLTIP: 'Inicializar receptor RC con ID pareja (1-255) y canal (1-11)',
+	RC_WAIT_CONNECTION: 'Esperar emparejamiento',
+	RC_WAIT_TIMEOUT: 'tiempo límite',
+	RC_WAIT_SECONDS: 'segundos',
+	RC_WAIT_TOOLTIP: 'Esperar conexión transmisor, LED parpadea azul, continúa después del tiempo',
+	RC_IS_CONNECTED: '¿RC conectado?',
+	RC_IS_CONNECTED_TOOLTIP: 'Verificar si datos recibidos en 500ms',
+
+	// Bloques Lectura de datos RC
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Leer valor joystick remoto (0-4095), 2048 es centro',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'mapear a',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Leer joystick remoto y mapear al rango especificado',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC botón',
+	RC_IS_BUTTON_PRESSED_SUFFIX: '¿presionado?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Verificar si botón remoto está presionado',
+	RC_GET_BUTTON_PREFIX: 'RC botón',
+	RC_GET_BUTTON_SUFFIX: 'estado',
+	RC_GET_BUTTON_TOOLTIP: 'Leer estado botón remoto (0=presionado, 1=suelto)',
 });

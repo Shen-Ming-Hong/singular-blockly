@@ -830,4 +830,45 @@ window.languageManager.loadMessages('en', {
 	X12_IS_BUTTON_PRESSED_PREFIX: 'Button',
 	X12_IS_BUTTON_PRESSED_SUFFIX: 'pressed?',
 	X12_IS_BUTTON_PRESSED_TOOLTIP: 'Check if button is pressed',
+
+	// === RC Connection ===
+	CATEGORY_RC: 'RC Connection',
+	RC_LABEL_MASTER: '📡 Transmitter',
+	RC_LABEL_SLAVE: '📻 Receiver',
+	RC_LABEL_DATA: '📊 Data Reading',
+	RC_LABEL_STATUS: '🔗 Connection Status',
+
+	// RC Transmitter Blocks
+	RC_MASTER_INIT: 'Initialize RC transmitter',
+	RC_MASTER_INIT_PAIR_ID: 'Pair ID',
+	RC_MASTER_INIT_CHANNEL: 'Channel',
+	RC_MASTER_INIT_TOOLTIP: 'Initialize RC transmitter with pair ID (1-255) and channel (1-11)',
+	RC_SEND: 'Send RC data',
+	RC_SEND_TOOLTIP: 'Read X12 joystick/button data and send to receiver',
+
+	// RC Receiver Blocks
+	RC_SLAVE_INIT: 'Initialize RC receiver',
+	RC_SLAVE_INIT_PAIR_ID: 'Pair ID',
+	RC_SLAVE_INIT_CHANNEL: 'Channel',
+	RC_SLAVE_INIT_TOOLTIP: 'Initialize RC receiver with pair ID (1-255) and channel (1-11)',
+	RC_WAIT_CONNECTION: 'Wait for pairing',
+	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_SECONDS: 'seconds',
+	RC_WAIT_TOOLTIP: 'Wait for transmitter connection, LED flashes blue, continues after timeout',
+	RC_IS_CONNECTED: 'RC connected?',
+	RC_IS_CONNECTED_TOOLTIP: 'Check if data received within 500ms',
+
+	// RC Data Reading Blocks
+	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_TOOLTIP: 'Read remote joystick value (0-4095), 2048 is center',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_MIN: 'map to',
+	RC_GET_JOYSTICK_MAPPED_MAX: '~',
+	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Read remote joystick and map to specified range',
+	RC_IS_BUTTON_PRESSED_PREFIX: 'RC button',
+	RC_IS_BUTTON_PRESSED_SUFFIX: 'pressed?',
+	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Check if remote button is pressed',
+	RC_GET_BUTTON_PREFIX: 'RC button',
+	RC_GET_BUTTON_SUFFIX: 'state',
+	RC_GET_BUTTON_TOOLTIP: 'Read remote button state (0=pressed, 1=released)',
 });
