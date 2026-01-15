@@ -73,6 +73,10 @@
             "type": "rc_is_button_pressed"
         },
         {
+            "kind": "block",
+            "type": "rc_get_button"
+        },
+        {
             "kind": "label",
             "text": "%{RC_LABEL_STATUS}"
         },

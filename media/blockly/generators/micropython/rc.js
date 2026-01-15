@@ -86,7 +86,7 @@ try:
     else:
         _rc_led[0] = (50, 20, 0)
         _rc_send_fail_count += 1
-except OSError as e:
+except OSError:
     _rc_led[0] = (50, 0, 0)
     _rc_send_fail_count += 1
     if _rc_send_fail_count > 10:
