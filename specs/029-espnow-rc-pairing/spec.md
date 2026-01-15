@@ -120,7 +120,9 @@ CyberBrick 官方 `rc_module` 使用 ESP-NOW 廣播模式進行無線通訊，�
 -   **FR-005**: 發射端 MUST 提供手動發送積木，每次執行發送一筆資料
 -   **FR-006**: 發送積木 MUST 自動呼叫 `rc_module.rc_master_data()` 讀取 X12 感測器
 -   **FR-007**: 資料格式 MUST 沿用官方 10 元素 tuple：`[L1, L2, L3, R1, R2, R3, K1, K2, K3, K4]`
--   **FR-008**: 接收端 MUST 將收到的資料存入全域變數 `_rc_data` 供讀取積木使用
+-   **FR-024**: 發送積木 MUST 自動附加 `time.sleep_ms(20)` 確保發送頻率 ≤50Hz
+-   **FR-008**: 接收端 MUST 透過 `espnow.irq(callback)` 非同步接收資料，自動更新全域變數 `_rc_data`
+-   **FR-023**: 接收端 callback MUST 使用 `irecv(0)` 迴圈讀取所有緩衝區訊息，避免遺漏封包
 
 **資料讀取**
 
@@ -178,3 +180,5 @@ CyberBrick 官方 `rc_module` 使用 ESP-NOW 廣播模式進行無線通訊，�
 ### Session 2026-01-15
 
 -   Q: 等待配對超時後的行為？ → A: 超時後結束等待，程式繼續往下執行（由使用者程式決定後續行為如重試或進入離線模式）
+-   Q: 接收端資料接收架構選擇？ → A: 採用非同步接收 (espnow.irq callback)，自動更新 `_rc_data`，無需手動接收積木
+-   Q: 發送頻率控制機制？ → A: 發送積木自動附加 `time.sleep_ms(20)`，確保 ≤50Hz 避免過度發送
