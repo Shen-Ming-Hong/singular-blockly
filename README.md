@@ -19,6 +19,7 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 -   [Installation](#installation)
 -   [Requirements](#requirements)
 -   [Quick Start](#quick-start)
+-   [Examples & Projects](#-examples--projects)
 -   [Usage](#usage)
 -   [Block Categories](#block-categories)
 -   [Supported Boards and Platforms](#supported-boards-and-platforms)
@@ -242,6 +243,18 @@ code --install-extension singular-blockly-X.Y.Z.vsix
     - Save workspace state in `blockly/main.json`
     - Update PlatformIO configuration
     - Provide real-time code(.cpp) generation
+
+---
+
+## 📚 Examples & Projects
+
+Explore real-world projects built with Singular Blockly:
+
+| Project                                                                                | Description                                         | Board      |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------- | ---------- |
+| [CyberBrick SoccerBot](https://github.com/Shen-Ming-Hong/Blockly_SoccerBot) 🌐 EN/繁中 | Remote-controlled soccer robot with ESP-NOW pairing | CyberBrick |
+
+> 💡 **Tip**: Have a project to share? Submit a PR to add it here!
 
 ---
 

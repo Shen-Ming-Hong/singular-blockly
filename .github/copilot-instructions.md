@@ -178,6 +178,21 @@ const handler = new WebViewMessageHandler(context, panel, localeService, fileSer
 6. **i18n placeholders**: Use `{0}`, `{1}` format in `messages.js`, not `%s`
 7. **VSCode API injection**: Use `_setVSCodeApi()` and `_reset()` for testing (see `extension.ts`, `messageHandler.ts`)
 
+## Agent Skills (Automated Workflows)
+
+專案包含 `.github/skills/` 目錄，提供可重用的 AI 工作流程：
+
+| Skill                        | Trigger Keywords                  |
+| ---------------------------- | --------------------------------- |
+| `code-simplifier`            | 簡化程式碼、refactor、cleanup     |
+| `git-workflow`               | commit、push、建立 PR             |
+| `pr-review-release`          | code review、merge PR、發布版本   |
+| `security-checker`           | 編輯程式碼時自動檢查安全風險      |
+| `security-vulnerability-fix` | Dependabot alerts、CVE、npm audit |
+| `skill-development`          | 建立新技能、SKILL.md 格式         |
+
+**使用方式**: Skills 會根據關鍵字自動載入，或手動讀取 `.github/skills/{name}/SKILL.md`
+
 ## Key File Locations
 
 | Purpose            | File                                    |
@@ -193,3 +208,4 @@ const handler = new WebViewMessageHandler(context, panel, localeService, fileSer
 | Toolbox categories | `media/toolbox/categories/*.json`       |
 | Translation files  | `media/locales/{lang}/messages.js`      |
 | Test mocks         | `src/test/helpers/mocks.ts`             |
+| Agent skills       | `.github/skills/{name}/SKILL.md`        |
