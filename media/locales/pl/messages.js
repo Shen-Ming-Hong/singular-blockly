@@ -14,6 +14,8 @@ window.languageManager.loadMessages('pl', {
 	BLOCKS_TAB: 'Bloki',
 	CODE_TAB: 'Kod',
 	BOARD_SELECT_LABEL: 'Wybierz płytkę:',
+	LANGUAGE_SELECT_TOOLTIP: 'Wybierz język',
+	LANGUAGE_AUTO: 'Auto (zgodnie z VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Wykryto bloki eksperymentalne',
@@ -881,3 +883,4 @@ window.languageManager.loadMessages('pl', {
 	RC_IS_CONNECTED: 'RC połączony?',
 	RC_IS_CONNECTED_TOOLTIP: 'Sprawdź czy dane odebrane w ciągu 500ms',
 });
+

@@ -14,6 +14,8 @@ window.languageManager.loadMessages('ja', {
 	BLOCKS_TAB: 'ブロック',
 	CODE_TAB: 'コード',
 	BOARD_SELECT_LABEL: 'ボードを選択:',
+	LANGUAGE_SELECT_TOOLTIP: '言語を選択',
+	LANGUAGE_AUTO: '自動（VS Code に従う）',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: '実験的ブロックが検出されました',
@@ -874,3 +876,4 @@ window.languageManager.loadMessages('ja', {
 	RC_GET_BUTTON_SUFFIX: '状態',
 	RC_GET_BUTTON_TOOLTIP: 'リモートボタンの状態を読取 (0=押下, 1=解放)',
 });
+

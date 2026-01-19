@@ -14,6 +14,8 @@ window.languageManager.loadMessages('zh-hant', {
 	BLOCKS_TAB: '積木',
 	CODE_TAB: '程式碼',
 	BOARD_SELECT_LABEL: '選擇開發板：',
+	LANGUAGE_SELECT_TOOLTIP: '選擇語言',
+	LANGUAGE_AUTO: '自動（跟隨 VS Code）',
 
 	// 實驗積木提示
 	EXPERIMENTAL_BLOCKS_TITLE: '發現實驗性積木',
@@ -865,3 +867,4 @@ window.languageManager.loadMessages('zh-hant', {
 	RC_GET_BUTTON_SUFFIX: '狀態',
 	RC_GET_BUTTON_TOOLTIP: '讀取遠端按鈕狀態 (0=按下, 1=放開)',
 });
+

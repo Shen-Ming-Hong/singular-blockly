@@ -4,6 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+// Provide a safe logger when the main logger is not available.
+const expLog = window.log || {
+	info: (...args) => console.info(...args),
+	warn: (...args) => console.warn(...args),
+	error: (...args) => console.error(...args),
+};
+
+if (!window.log) {
+	window.log = expLog;
+}
+
 // 實驗積木清單
 window.experimentalBlocks = [];
 // 潛在實驗積木清單 - 存儲所有被定義為實驗性的積木類型
@@ -34,11 +45,11 @@ window.experimentalBlocksNotice = {
 	init: function () {
 		// 檢查是否在預覽模式，預覽模式下不需要通知系統
 		if (window.isPreviewMode) {
-			log.info('[實驗積木] 預覽模式下跳過通知系統初始化');
+			expLog.info('[實驗積木] 預覽模式下跳過通知系統初始化');
 			return;
 		}
 
-		log.info('[實驗積木] 初始化通知系統');
+		expLog.info('[實驗積木] 初始化通知系統');
 
 		this.noticeElement = document.getElementById('experimentalBlocksNotice');
 		this.titleElement = document.getElementById('experimentalNoticeTitle');
@@ -46,7 +57,7 @@ window.experimentalBlocksNotice = {
 		this.indicatorElement = document.getElementById('experimentalBlocksIndicator');
 
 		// 記錄元素初始化狀態
-		log.info('[實驗積木] 通知系統元素初始化狀態', {
+		expLog.info('[實驗積木] 通知系統元素初始化狀態', {
 			noticeElement: this.noticeElement ? 'exists' : 'missing',
 			titleElement: this.titleElement ? 'exists' : 'missing',
 			descElement: this.descriptionElement ? 'exists' : 'missing',
@@ -88,7 +99,7 @@ window.experimentalBlocksNotice = {
 
 		// 如果元素不存在，記錄錯誤並返回（不要再次調用 init 避免無限遞迴）
 		if (!this.titleElement || !this.descriptionElement) {
-			log.error('[實驗積木] 實驗積木提示元素未找到');
+			expLog.error('[實驗積木] 實驗積木提示元素未找到');
 			return;
 		}
 
@@ -164,7 +175,7 @@ window.experimentalBlocksNotice = {
 			this.hide();
 		}, this.autoHideDelay);
 
-		log.info('顯示實驗積木提示');
+		expLog.info('顯示實驗積木提示');
 	},
 	// 隱藏提示
 	hide: function () {
@@ -207,7 +218,7 @@ window.experimentalBlocksNotice = {
 
 		try {
 			if (!this.noticeElement) {
-				log.warn('找不到實驗積木提示元素，無法顯示提示');
+				expLog.warn('找不到實驗積木提示元素，無法顯示提示');
 				return;
 			}
 
@@ -236,13 +247,13 @@ window.experimentalBlocksNotice = {
 				this.showIndicator();
 			}, this.autoHideDelay);
 
-			if (typeof log !== 'undefined' && log.info) {
-				log.info('顯示實驗積木完整提示');
+			if (typeof expLog !== 'undefined' && expLog.info) {
+				expLog.info('顯示實驗積木完整提示');
 			} else {
-				log.info('顯示實驗積木完整提示');
+				expLog.info('顯示實驗積木完整提示');
 			}
 		} catch (e) {
-			log.error('顯示實驗積木提示時發生錯誤:', e);
+			expLog.error('顯示實驗積木提示時發生錯誤:', e);
 		}
 	}, // 顯示持久性指示器
 	showIndicator: function () {
@@ -253,7 +264,7 @@ window.experimentalBlocksNotice = {
 
 		try {
 			if (!this.indicatorElement) {
-				log.warn('[實驗積木] 找不到實驗積木指示器元素，無法顯示指示器');
+				expLog.warn('[實驗積木] 找不到實驗積木指示器元素，無法顯示指示器');
 				return;
 			}
 
@@ -278,7 +289,7 @@ window.experimentalBlocksNotice = {
 				}
 			}, 0);
 
-			log.info('[實驗積木] 顯示實驗積木持久性指示器', {
+			expLog.info('[實驗積木] 顯示實驗積木持久性指示器', {
 				element: this.indicatorElement ? 'exists' : 'missing',
 				hasClass: this.indicatorElement ? this.indicatorElement.classList.contains('hidden') : 'N/A',
 				style: this.indicatorElement ? this.indicatorElement.getAttribute('style') : 'N/A',
@@ -305,7 +316,7 @@ window.experimentalBlocksNotice = {
 				}, 0);
 			}
 		} catch (e) {
-			log.error('隱藏所有實驗積木提示時發生錯誤:', e);
+			expLog.error('隱藏所有實驗積木提示時發生錯誤:', e);
 		}
 	},
 };
@@ -318,13 +329,13 @@ window.registerExperimentalBlock = function (blockType) {
 	if (blockType && !window.potentialExperimentalBlocks.includes(blockType)) {
 		// 將積木類型添加到潛在實驗積木清單
 		window.potentialExperimentalBlocks.push(blockType);
-		log.info(`[實驗積木] ✅ 已註冊新的潛在實驗性積木: ${blockType}`);
+		expLog.info(`[實驗積木] ✅ 已註冊新的潛在實驗性積木: ${blockType}`);
 	} else if (blockType && window.potentialExperimentalBlocks.includes(blockType)) {
 		// 已經註冊過的積木
-		log.info(`[實驗積木] ⚠️ 積木 ${blockType} 已經是潛在實驗性積木，跳過重複註冊`);
+		expLog.info(`[實驗積木] ⚠️ 積木 ${blockType} 已經是潛在實驗性積木，跳過重複註冊`);
 	} else {
 		// 無效的積木類型
-		log.warn(`[實驗積木] ❌ 嘗試註冊無效的實驗性積木: ${blockType}`);
+		expLog.warn(`[實驗積木] ❌ 嘗試註冊無效的實驗性積木: ${blockType}`);
 	}
 };
 
@@ -337,19 +348,19 @@ window.unregisterExperimentalBlock = function (blockType) {
 		// 從清單中移除指定積木類型
 		const index = window.experimentalBlocks.indexOf(blockType);
 		window.experimentalBlocks.splice(index, 1);
-		log.info(`[實驗積木] 🗑️ 已從實驗性積木清單移除: ${blockType}`);
+		expLog.info(`[實驗積木] 🗑️ 已從實驗性積木清單移除: ${blockType}`);
 
 		// 移除後立即輸出更新的清單
-		log.info('[實驗積木] 實驗積木移除後清單更新 >>>>>>');
+		expLog.info('[實驗積木] 實驗積木移除後清單更新 >>>>>>');
 		logExperimentalBlocks();
-		log.info('[實驗積木] 實驗積木移除後清單更新 <<<<<<');
+		expLog.info('[實驗積木] 實驗積木移除後清單更新 <<<<<<');
 		return true;
 	} else if (blockType) {
 		// 清單中沒有這個積木
-		log.info(`[實驗積木] ⚠️ 積木 ${blockType} 不在實驗性積木清單中，無需移除`);
+		expLog.info(`[實驗積木] ⚠️ 積木 ${blockType} 不在實驗性積木清單中，無需移除`);
 	} else {
 		// 無效的積木類型
-		log.warn(`[實驗積木] ❌ 嘗試移除無效的實驗性積木: ${blockType}`);
+		expLog.warn(`[實驗積木] ❌ 嘗試移除無效的實驗性積木: ${blockType}`);
 	}
 	return false;
 };
@@ -363,18 +374,18 @@ function logExperimentalBlocks() {
 		// 每次都輸出實驗積木清單，加上時間戳以便追蹤
 		const now = new Date();
 		const timestamp = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}.${now.getMilliseconds()}`;
-		log.info(`[實驗積木] [${timestamp}] 當前的實驗性積木清單: ${currentJson}`);
+		expLog.info(`[實驗積木] [${timestamp}] 當前的實驗性積木清單: ${currentJson}`);
 
 		// 檢查實驗積木清單是否有變化
 		if (currentJson !== lastExperimentalBlocksJson) {
-			log.info(`[實驗積木] 實驗積木清單已更新! 之前: ${lastExperimentalBlocksJson || '(無)'}`);
+			expLog.info(`[實驗積木] 實驗積木清單已更新! 之前: ${lastExperimentalBlocksJson || '(無)'}`);
 			lastExperimentalBlocksJson = currentJson;
 		} else {
 			// 即使沒有變化也輸出一條訊息
-			log.info(`[實驗積木] 實驗積木清單沒有變化，保持 ${currentJson.length} 個積木`);
+			expLog.info(`[實驗積木] 實驗積木清單沒有變化，保持 ${currentJson.length} 個積木`);
 		}
 	} else {
-		log.info('[實驗積木] 當前無實驗性積木註冊');
+		expLog.info('[實驗積木] 當前無實驗性積木註冊');
 	}
 }
 
@@ -415,20 +426,20 @@ window.updateExperimentalBlocksList = function (workspace) {
 
 	// 2. 添加新發現的實驗積木
 	if (blocksToAdd.length > 0) {
-		log.info(`[實驗積木] 檢測到工作區中有 ${blocksToAdd.length} 個新的實驗積木需要添加到清單`);
+		expLog.info(`[實驗積木] 檢測到工作區中有 ${blocksToAdd.length} 個新的實驗積木需要添加到清單`);
 
 		blocksToAdd.forEach(blockType => {
 			// 直接添加到實驗積木清單，不調用 registerExperimentalBlock 避免循環
 			if (!window.experimentalBlocks.includes(blockType)) {
 				window.experimentalBlocks.push(blockType);
-				log.info(`[實驗積木] ✅ 從工作區添加實驗性積木到清單: ${blockType}`);
+				expLog.info(`[實驗積木] ✅ 從工作區添加實驗性積木到清單: ${blockType}`);
 			}
 		});
 
 		// 添加後輸出更新的清單
-		log.info('[實驗積木] 從工作區添加實驗積木後清單更新 >>>>>>');
+		expLog.info('[實驗積木] 從工作區添加實驗積木後清單更新 >>>>>>');
 		logExperimentalBlocks();
-		log.info('[實驗積木] 從工作區添加實驗積木後清單更新 <<<<<<');
+		expLog.info('[實驗積木] 從工作區添加實驗積木後清單更新 <<<<<<');
 	}
 };
 
@@ -451,7 +462,7 @@ window.collectExperimentalBlocksFromFlyout = function () {
 			return;
 		}
 
-		log.info(`[實驗積木] 檢測到工具箱中有 ${flyoutBlocks.length} 個積木，開始檢查實驗積木`);
+		expLog.info(`[實驗積木] 檢測到工具箱中有 ${flyoutBlocks.length} 個積木，開始檢查實驗積木`);
 
 		// 收集工具箱中的積木類型
 		const flyoutBlockTypes = new Set();
@@ -482,37 +493,37 @@ window.collectExperimentalBlocksFromFlyout = function () {
 
 		// 添加工具箱中的實驗積木
 		if (blocksToAdd.length > 0) {
-			log.info(`[實驗積木] 檢測到工具箱中有 ${blocksToAdd.length} 個新的實驗積木需要添加到清單`);
+			expLog.info(`[實驗積木] 檢測到工具箱中有 ${blocksToAdd.length} 個新的實驗積木需要添加到清單`);
 
 			blocksToAdd.forEach(blockType => {
 				if (!window.experimentalBlocks.includes(blockType)) {
 					window.experimentalBlocks.push(blockType);
-					log.info(`[實驗積木] ✅ 從工具箱添加實驗性積木到清單: ${blockType}`);
+					expLog.info(`[實驗積木] ✅ 從工具箱添加實驗性積木到清單: ${blockType}`);
 				}
 			});
 
 			// 添加後輸出更新的清單
-			log.info('[實驗積木] 從工具箱添加實驗積木後清單更新 >>>>>>');
+			expLog.info('[實驗積木] 從工具箱添加實驗積木後清單更新 >>>>>>');
 			logExperimentalBlocks();
-			log.info('[實驗積木] 從工具箱添加實驗積木後清單更新 <<<<<<');
+			expLog.info('[實驗積木] 從工具箱添加實驗積木後清單更新 <<<<<<');
 		} else {
-			log.info(`[實驗積木] 工具箱中沒有新的實驗積木需要添加`);
+			expLog.info(`[實驗積木] 工具箱中沒有新的實驗積木需要添加`);
 		}
 
 		// 立即標記工具箱中的實驗積木
 		if (experimentalFlyoutBlocks.length > 0 && window.experimentalBlockMarker) {
-			log.info(`[實驗積木] 開始標記工具箱中的 ${experimentalFlyoutBlocks.length} 個實驗性積木`);
+			expLog.info(`[實驗積木] 開始標記工具箱中的 ${experimentalFlyoutBlocks.length} 個實驗性積木`);
 
 			experimentalFlyoutBlocks.forEach(block => {
 				const blockSvg = block.getSvgRoot();
 				if (blockSvg) {
 					window.experimentalBlockMarker.markExperimentalBlock(blockSvg, block);
-					log.info(`[實驗積木] 已標記工具箱中的實驗性積木: ${block.type}, id: ${block.id}`);
+					expLog.info(`[實驗積木] 已標記工具箱中的實驗性積木: ${block.type}, id: ${block.id}`);
 				}
 			});
 		}
 	} catch (err) {
-		log.warn(`[實驗積木] 收集工具箱實驗積木時發生錯誤: ${err}`);
+		expLog.warn(`[實驗積木] 收集工具箱實驗積木時發生錯誤: ${err}`);
 	}
 };
 
@@ -526,7 +537,7 @@ class ExperimentalBlockMarker {
 	 */
 	constructor() {
 		this.markedBlocks = new Set(); // 追蹤已標記的積木ID
-		log.info('[實驗積木] 實驗性積木標記管理器已初始化');
+		expLog.info('[實驗積木] 實驗性積木標記管理器已初始化');
 	}
 	/**
 	 * 為實驗性積木添加標記
@@ -535,7 +546,7 @@ class ExperimentalBlockMarker {
 	 */
 	markExperimentalBlock(blockSvg, block) {
 		if (!blockSvg || !block || !block.id || this.markedBlocks.has(block.id)) {
-			log.info(`[實驗積木] 跳過標記 - 無效參數或已標記: ${block ? block.type : 'unknown'}, id: ${block ? block.id : 'unknown'}`);
+			expLog.info(`[實驗積木] 跳過標記 - 無效參數或已標記: ${block ? block.type : 'unknown'}, id: ${block ? block.id : 'unknown'}`);
 			return; // 如果已經標記過或參數無效，直接返回
 		}
 
@@ -544,18 +555,18 @@ class ExperimentalBlockMarker {
 			const pathElement = blockSvg.querySelector('.blocklyPath');
 			if (pathElement) {
 				pathElement.classList.add('blockly-experimental-block');
-				log.info(`[實驗積木] 成功添加虛線動畫效果到積木: ${block.type}, id: ${block.id}`);
+				expLog.info(`[實驗積木] 成功添加虛線動畫效果到積木: ${block.type}, id: ${block.id}`);
 			} else {
-				log.info(`[實驗積木] 找不到積木路徑元素: ${block.type}, id: ${block.id}`);
+				expLog.info(`[實驗積木] 找不到積木路徑元素: ${block.type}, id: ${block.id}`);
 			}
 		} catch (e) {
-			log.info(`[實驗積木] 無法修改積木路徑樣式: ${e}`);
+			expLog.info(`[實驗積木] 無法修改積木路徑樣式: ${e}`);
 		}
 
 		// 記錄此積木已被標記
 		this.markedBlocks.add(block.id);
 
-		log.info(`[實驗積木] 已標記實驗性積木: ${block.type}, id: ${block.id}`);
+		expLog.info(`[實驗積木] 已標記實驗性積木: ${block.type}, id: ${block.id}`);
 	}
 	/**
 	 * 檢查並標記實驗性積木
@@ -563,22 +574,22 @@ class ExperimentalBlockMarker {
 	 */
 	markAllExperimentalBlocks() {
 		if (!window.experimentalBlocks || !Array.isArray(window.experimentalBlocks)) {
-			log.info('[實驗積木] 實驗積木清單不存在或不是陣列', window.experimentalBlocks);
+			expLog.info('[實驗積木] 實驗積木清單不存在或不是陣列', window.experimentalBlocks);
 			return;
 		}
 
 		const workspace = Blockly.getMainWorkspace();
 		if (!workspace) {
-			log.info('[實驗積木] 工作區不存在');
+			expLog.info('[實驗積木] 工作區不存在');
 			return;
 		}
 
 		// 日誌記錄實驗積木清單
-		log.info('[實驗積木] 實驗積木清單', window.experimentalBlocks);
+		expLog.info('[實驗積木] 實驗積木清單', window.experimentalBlocks);
 
 		// 獲取工作區中的所有積木
 		const allBlocks = workspace.getAllBlocks(false);
-		log.info(`[實驗積木] 工作區內積木總數: ${allBlocks.length}`);
+		expLog.info(`[實驗積木] 工作區內積木總數: ${allBlocks.length}`);
 		// 為工作區中的每個實驗性積木添加標記
 		let experimentalCount = 0;
 		allBlocks.forEach(block => {
@@ -588,13 +599,13 @@ class ExperimentalBlockMarker {
 				if (blockSvg) {
 					this.markExperimentalBlock(blockSvg, block);
 				} else {
-					log.info(`[實驗積木] 無法獲取積木SVG: ${block.type}, id: ${block.id}`);
+					expLog.info(`[實驗積木] 無法獲取積木SVG: ${block.type}, id: ${block.id}`);
 				}
 			}
 		});
 		// 如果發現實驗積木，顯示適當的通知
 		if (experimentalCount > 0 && window.experimentalBlocksNotice && !window.isPreviewMode) {
-			log.info(`[實驗積木] 檢測到 ${experimentalCount} 個實驗性積木，顯示通知`);
+			expLog.info(`[實驗積木] 檢測到 ${experimentalCount} 個實驗性積木，顯示通知`);
 			// 根據是否已經顯示過通知來決定顯示方式
 			if (window.experimentalBlocksNotice.hasShownNotice) {
 				window.experimentalBlocksNotice.showIndicator();
@@ -609,7 +620,7 @@ class ExperimentalBlockMarker {
 			const flyout = workspace.getFlyout();
 			if (flyout) {
 				const flyoutBlocks = flyout.getWorkspace().getAllBlocks(false);
-				log.info(`[實驗積木] 工具箱內積木總數: ${flyoutBlocks.length}`);
+				expLog.info(`[實驗積木] 工具箱內積木總數: ${flyoutBlocks.length}`);
 
 				// 為工具箱中的每個實驗性積木添加標記
 				let flyoutExperimentalCount = 0;
@@ -620,19 +631,19 @@ class ExperimentalBlockMarker {
 						if (blockSvg) {
 							this.markExperimentalBlock(blockSvg, block);
 						} else {
-							log.info(`[實驗積木] 無法獲取工具箱積木SVG: ${block.type}, id: ${block.id}`);
+							expLog.info(`[實驗積木] 無法獲取工具箱積木SVG: ${block.type}, id: ${block.id}`);
 						}
 					}
 				});
 
-				log.info(`[實驗積木] 檢測到 ${flyoutExperimentalCount} 個工具箱中的實驗性積木`);
+				expLog.info(`[實驗積木] 檢測到 ${flyoutExperimentalCount} 個工具箱中的實驗性積木`);
 				experimentalCount += flyoutExperimentalCount;
 			}
 		} catch (err) {
-			log.warn(`[實驗積木] 處理工具箱積木時發生錯誤: ${err}`);
+			expLog.warn(`[實驗積木] 處理工具箱積木時發生錯誤: ${err}`);
 		}
 
-		log.info(`[實驗積木] 總共檢測到 ${experimentalCount} 個實驗性積木`);
+		expLog.info(`[實驗積木] 總共檢測到 ${experimentalCount} 個實驗性積木`);
 	}
 	/**
 	 * 清除積木標記
@@ -652,7 +663,7 @@ class ExperimentalBlockMarker {
 	 * 當積木狀態變更時調用，先清除所有標記，然後重新添加
 	 */
 	refreshMarks() {
-		log.info('[實驗積木] 刷新所有積木標記');
+		expLog.info('[實驗積木] 刷新所有積木標記');
 		this.clearMarks();
 
 		// 獲取工作區中所有積木
@@ -666,7 +677,7 @@ class ExperimentalBlockMarker {
 				const blocks = workspace.getAllBlocks();
 				const hasWorkspaceExperimentalBlock = blocks.some(block => window.experimentalBlocks.includes(block.type));
 				if (!hasWorkspaceExperimentalBlock) {
-					log.info('[實驗積木] 工作區中沒有實驗積木，隱藏所有提示');
+					expLog.info('[實驗積木] 工作區中沒有實驗積木，隱藏所有提示');
 					if (!window.isPreviewMode) {
 						window.experimentalBlocksNotice.hideAll();
 					}
@@ -688,7 +699,7 @@ class ExperimentalBlockMarker {
 				}, 100);
 			}
 		} catch (err) {
-			log.warn(`[實驗積木] 刷新工具箱中的積木標記時發生錯誤: ${err}`);
+			expLog.warn(`[實驗積木] 刷新工具箱中的積木標記時發生錯誤: ${err}`);
 		}
 	}
 }
@@ -713,16 +724,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (!noticeSystemInitialized && window.experimentalBlocksNotice) {
 		// 檢查是否在預覽模式，預覽模式下不需要通知系統
 		if (window.isPreviewMode) {
-			log.info('[實驗積木] 預覽模式下跳過通知系統初始化');
+			expLog.info('[實驗積木] 預覽模式下跳過通知系統初始化');
 			noticeSystemInitialized = true; // 標記為已初始化，避免重複檢查
 		} else {
 			window.experimentalBlocksNotice.init();
 			noticeSystemInitialized = true;
-			log.info('[實驗積木] 通知系統已初始化成功');
+			expLog.info('[實驗積木] 通知系統已初始化成功');
 
 			// 檢查DOM中是否存在指示器元素
 			const indicatorElement = document.getElementById('experimentalBlocksIndicator');
-			log.info('[實驗積木] 指示器元素檢查', {
+			expLog.info('[實驗積木] 指示器元素檢查', {
 				exists: indicatorElement ? true : false,
 				id: indicatorElement ? indicatorElement.id : 'missing',
 				classes: indicatorElement ? indicatorElement.className : 'N/A',
@@ -739,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (typeof Blockly !== 'undefined') {
 		// 初始延遲標記
 		setTimeout(() => {
-			log.info('[實驗積木] 延遲初始化標記開始');
+			expLog.info('[實驗積木] 延遲初始化標記開始');
 			window.experimentalBlockMarker.markAllExperimentalBlocks();
 
 			// 監聽Blockly工具箱打開事件
@@ -749,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 					// 監聽工具箱飛出窗口展開事件
 					if (typeof Blockly.Events.listen === 'function') {
-						log.info('[實驗積木] 開始監聽工具箱飛出窗口事件');
+						expLog.info('[實驗積木] 開始監聽工具箱飛出窗口事件');
 
 						// 覆寫Blockly.Flyout.prototype.show方法
 						const originalFlyoutShow = Blockly.Flyout.prototype.show;
@@ -760,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 								// 在飛出窗口顯示後，延遲執行收集和標記操作
 								setTimeout(() => {
-									log.info('[實驗積木] 檢測到工具箱飛出窗口打開，嘗試收集和標記實驗積木');
+									expLog.info('[實驗積木] 檢測到工具箱飛出窗口打開，嘗試收集和標記實驗積木');
 									if (typeof window.collectExperimentalBlocksFromFlyout === 'function') {
 										window.collectExperimentalBlocksFromFlyout();
 									}
@@ -768,22 +779,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 								return result;
 							};
-							log.info('[實驗積木] 已覆寫工具箱飛出窗口顯示方法');
+							expLog.info('[實驗積木] 已覆寫工具箱飛出窗口顯示方法');
 						}
 					}
 				}
 			} catch (err) {
-				log.warn('[實驗積木] 設置工具箱事件監聽失敗:', err);
+				expLog.warn('[實驗積木] 設置工具箱事件監聽失敗:', err);
 			}
 		}, 800);
 	} else {
-		log.info('[實驗積木] Blockly 尚未載入，等待載入後再初始化');
+		expLog.info('[實驗積木] Blockly 尚未載入，等待載入後再初始化');
 
 		// 如果Blockly尚未載入，設置定時器每500毫秒檢查一次
 		const checkInterval = setInterval(() => {
 			if (typeof Blockly !== 'undefined' && Blockly.getMainWorkspace()) {
 				clearInterval(checkInterval);
-				log.info('[實驗積木] Blockly 現在已載入，開始初始化標記');
+				expLog.info('[實驗積木] Blockly 現在已載入，開始初始化標記');
 				window.experimentalBlockMarker.markAllExperimentalBlocks();
 				// 檢查工作區實驗積木狀態
 				window.checkWorkspaceExperimentalBlocksStatus();
@@ -805,7 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
 								// 檢查工具箱飛出元素 (blocklyFlyout)
 								const flyoutElement = node.querySelector('.blocklyFlyout');
 								if (flyoutElement) {
-									log.info(`[實驗積木] 檢測到工具箱飛出元素創建，嘗試收集和標記實驗積木`);
+									expLog.info(`[實驗積木] 檢測到工具箱飛出元素創建，嘗試收集和標記實驗積木`);
 
 									// 延遲執行以確保飛出窗口已完全渲染
 									setTimeout(() => {
@@ -832,7 +843,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				subtree: true,
 			});
 
-			log.info(`[實驗積木] 已設置DOM變化觀察器，用於監控工具箱創建`);
+			expLog.info(`[實驗積木] 已設置DOM變化觀察器，用於監控工具箱創建`);
 		}, 500);
 	}
 
@@ -879,12 +890,12 @@ function setupAdditionalListeners() {
 			if (selected && typeof window.collectExperimentalBlocksFromFlyout === 'function') {
 				// 延遲執行，確保飛出窗口已完全渲染
 				setTimeout(() => {
-					log.info(`[實驗積木] 工具箱類別 "${this.name_}" 被選中，檢查實驗積木`);
+					expLog.info(`[實驗積木] 工具箱類別 "${this.name_}" 被選中，檢查實驗積木`);
 					window.collectExperimentalBlocksFromFlyout();
 
 					// 刷新所有實驗積木的標記，確保新打開的類別中的實驗積木被正確標記
 					if (window.experimentalBlockMarker) {
-						log.info(`[實驗積木] 刷新所有實驗積木標記`);
+						expLog.info(`[實驗積木] 刷新所有實驗積木標記`);
 						window.experimentalBlockMarker.refreshMarks();
 					}
 				}, 300);
@@ -929,7 +940,7 @@ function setupBlocklyChangeListener() {
 						const blocks = workspace.getAllBlocks();
 						const hasExperimentalBlock = blocks.some(block => window.experimentalBlocks.includes(block.type));
 						if (!hasExperimentalBlock && window.experimentalBlocksNotice && !window.isPreviewMode) {
-							log.info('[實驗積木] BLOCK_DELETE 事件後檢查：工作區中沒有實驗積木，隱藏所有提示');
+							expLog.info('[實驗積木] BLOCK_DELETE 事件後檢查：工作區中沒有實驗積木，隱藏所有提示');
 							window.experimentalBlocksNotice.hideAll();
 						}
 					}

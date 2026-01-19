@@ -14,6 +14,8 @@ window.languageManager.loadMessages('fr', {
 	BLOCKS_TAB: 'Blocs',
 	CODE_TAB: 'Code',
 	BOARD_SELECT_LABEL: 'Sélectionner une carte:',
+	LANGUAGE_SELECT_TOOLTIP: 'Sélectionner la langue',
+	LANGUAGE_AUTO: 'Auto (suivre VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Blocs expérimentaux détectés',
@@ -867,3 +869,4 @@ window.languageManager.loadMessages('fr', {
 	RC_GET_BUTTON_SUFFIX: 'état',
 	RC_GET_BUTTON_TOOLTIP: 'Lire état bouton distant (0=appuyé, 1=relâché)',
 });
+

@@ -14,6 +14,8 @@ window.languageManager.loadMessages('cs', {
 	BLOCKS_TAB: 'Bloky',
 	CODE_TAB: 'Kód',
 	BOARD_SELECT_LABEL: 'Vybrat desku:',
+	LANGUAGE_SELECT_TOOLTIP: 'Vybrat jazyk',
+	LANGUAGE_AUTO: 'Automaticky (podle VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Nalezeny experimentální bloky',
@@ -878,3 +880,4 @@ window.languageManager.loadMessages('cs', {
 	RC_IS_CONNECTED: 'RC připojeno?',
 	RC_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda byla přijata data za 500ms',
 });
+

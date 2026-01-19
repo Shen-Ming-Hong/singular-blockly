@@ -14,6 +14,8 @@ window.languageManager.loadMessages('ko', {
 	BLOCKS_TAB: '블록',
 	CODE_TAB: '코드',
 	BOARD_SELECT_LABEL: '보드 선택:',
+	LANGUAGE_SELECT_TOOLTIP: '언어 선택',
+	LANGUAGE_AUTO: '자동 (VS Code 따름)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: '실험적 블록 감지됨',
@@ -873,3 +875,4 @@ window.languageManager.loadMessages('ko', {
 	RC_GET_BUTTON_SUFFIX: '상태',
 	RC_GET_BUTTON_TOOLTIP: '원격 버튼 상태 읽기 (0=눌림, 1=해제)',
 });
+

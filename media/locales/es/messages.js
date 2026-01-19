@@ -14,6 +14,8 @@ window.languageManager.loadMessages('es', {
 	BLOCKS_TAB: 'Bloques',
 	CODE_TAB: 'Código',
 	BOARD_SELECT_LABEL: 'Seleccionar placa:',
+	LANGUAGE_SELECT_TOOLTIP: 'Seleccionar idioma',
+	LANGUAGE_AUTO: 'Automático (seguir VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Bloques experimentales detectados',
@@ -877,3 +879,4 @@ window.languageManager.loadMessages('es', {
 	RC_GET_BUTTON_SUFFIX: 'estado',
 	RC_GET_BUTTON_TOOLTIP: 'Leer estado botón remoto (0=presionado, 1=suelto)',
 });
+

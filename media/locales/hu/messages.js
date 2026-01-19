@@ -14,6 +14,8 @@ window.languageManager.loadMessages('hu', {
 	BLOCKS_TAB: 'Blokkok',
 	CODE_TAB: 'Kód',
 	BOARD_SELECT_LABEL: 'Válassz táblát:',
+	LANGUAGE_SELECT_TOOLTIP: 'Nyelv kiválasztása',
+	LANGUAGE_AUTO: 'Automatikus (VS Code követése)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Kísérleti blokkok észlelve',
@@ -882,3 +884,4 @@ window.languageManager.loadMessages('hu', {
 	RC_IS_CONNECTED: 'RC csatlakoztatva?',
 	RC_IS_CONNECTED_TOOLTIP: 'Ellenőrizd az adatok érkezését 500ms-on belül',
 });
+

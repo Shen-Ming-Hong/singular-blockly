@@ -108,10 +108,36 @@
                 </div>
             </div>
             <div class="board-select">
-                <label for="boardSelect" id="boardSelectLabel"></label>
-                <select id="boardSelect">
+                <label for="boardSelectToggle" id="boardSelectLabel"></label>
+                <div class="board-select-control">
+                    <button id="boardSelectToggle" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span id="boardSelectText"></span>
+                        <svg class="board-select-caret" viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="currentColor" d="M7 10l5 5 5-5H7z" />
+                        </svg>
+                    </button>
+                    <div id="boardDropdown" class="board-dropdown" role="listbox" aria-hidden="true"></div>
+                </div>
+                <select id="boardSelect" aria-hidden="true" tabindex="-1">
                     <!-- 板子選項會由 JS 動態生成 -->
                 </select>
+            </div>
+            <div class="language-switch">
+                <button id="languageToggle" title="" aria-haspopup="true" aria-expanded="false">
+                    <svg class="language-icon lucide-globe" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                        <defs>
+                            <clipPath id="globeClip">
+                                <circle cx="12" cy="12" r="10" />
+                            </clipPath>
+                        </defs>
+                        <circle class="globe-outline" cx="12" cy="12" r="10" />
+                        <path class="globe-line globe-equator" d="M2 12h20" />
+                        <g class="globe-roll" clip-path="url(#globeClip)">
+                            <path class="globe-line globe-meridian" d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                        </g>
+                    </svg>
+                </button>
+                <div id="languageDropdown" class="language-dropdown" role="menu" aria-hidden="true"></div>
             </div>
             <div class="theme-switch">
                 <button id="themeToggle" title="">

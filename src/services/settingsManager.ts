@@ -5,8 +5,35 @@
  */
 
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { FileService } from './fileService';
 import { log } from './logging';
+import { SupportedLanguageCode } from '../types/language';
+
+export const VALID_LANGUAGES = [
+	'auto',
+	'en',
+	'zh-hant',
+	'ja',
+	'ko',
+	'es',
+	'fr',
+	'de',
+	'it',
+	'pt-br',
+	'ru',
+	'pl',
+	'hu',
+	'cs',
+	'bg',
+	'tr',
+] as const;
+
+type LanguagePreference = (typeof VALID_LANGUAGES)[number];
+
+function isValidLanguage(language: string): language is LanguagePreference {
+	return (VALID_LANGUAGES as readonly string[]).includes(language);
+}
 
 /**
  * 設定管理器類別
@@ -129,6 +156,47 @@ export class SettingsManager {
 	}
 
 	/**
+	 * 取得語言偏好設定
+	 * @returns 語言偏好 ('auto' 或語言代碼)
+	 */
+	async getLanguage(): Promise<string> {
+		const language = await this.readSetting<string>('singular-blockly.language', 'auto');
+		if (isValidLanguage(language)) {
+			return language;
+		}
+
+		log(`Invalid language preference detected: ${language}, fallback to auto`, 'warn');
+		return 'auto';
+	}
+
+	/**
+	 * 更新語言偏好設定
+	 * @param language 語言代碼 ('auto' 或有效語言)
+	 */
+	async updateLanguage(language: string): Promise<void> {
+		if (!isValidLanguage(language)) {
+			throw new Error(`Invalid language code: ${language}`);
+		}
+
+		await this.updateSetting('singular-blockly.language', language);
+		log(`Language updated to: ${language}`, 'info');
+	}
+
+	/**
+	 * 解析語言偏好為實際語言代碼
+	 * @param languagePreference 使用者偏好 ('auto' 或語言代碼)
+	 * @returns 實際語言代碼
+	 */
+	resolveLanguage(languagePreference: string): SupportedLanguageCode {
+		const preference = isValidLanguage(languagePreference) ? languagePreference : 'auto';
+		if (preference === 'auto') {
+			return this.mapVSCodeLangToBlockly(vscode.env.language);
+		}
+
+		return preference;
+	}
+
+	/**
 	 * 切換主題
 	 * @returns 切換後的主題
 	 */
@@ -137,6 +205,45 @@ export class SettingsManager {
 		const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 		await this.updateTheme(newTheme);
 		return newTheme;
+	}
+
+	/**
+	 * 將 VSCode 語言代碼映射到 Blockly 語言代碼
+	 * @param vscodeLanguage VSCode 語言代碼
+	 * @returns Blockly 語言代碼
+	 */
+	private mapVSCodeLangToBlockly(vscodeLanguage: string): SupportedLanguageCode {
+		const languageMap: Record<string, SupportedLanguageCode> = {
+			'zh-tw': 'zh-hant',
+			en: 'en',
+			'en-us': 'en',
+			ja: 'ja',
+			es: 'es',
+			'pt-br': 'pt-br',
+			ru: 'ru',
+			ko: 'ko',
+			fr: 'fr',
+			de: 'de',
+			it: 'it',
+			pl: 'pl',
+			hu: 'hu',
+			cs: 'cs',
+			bg: 'bg',
+			tr: 'tr',
+		};
+
+		const normalizedLang = vscodeLanguage.toLowerCase();
+
+		if (languageMap[normalizedLang]) {
+			return languageMap[normalizedLang];
+		}
+
+		const baseLang = normalizedLang.split('-')[0];
+		if (languageMap[baseLang]) {
+			return languageMap[baseLang];
+		}
+
+		return 'en';
 	}
 
 	/**

@@ -14,6 +14,8 @@ window.languageManager.loadMessages('tr', {
 	BLOCKS_TAB: 'Bloklar',
 	CODE_TAB: 'Kod',
 	BOARD_SELECT_LABEL: 'Kart seç:',
+	LANGUAGE_SELECT_TOOLTIP: 'Dil seç',
+	LANGUAGE_AUTO: 'Otomatik (VS Code\'u takip et)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Deneysel Bloklar Tespit Edildi',
@@ -880,3 +882,4 @@ window.languageManager.loadMessages('tr', {
 	RC_IS_CONNECTED: 'RC bağlı mı?',
 	RC_IS_CONNECTED_TOOLTIP: '500ms içinde veri alınıp alınmadığını kontrol et',
 });
+

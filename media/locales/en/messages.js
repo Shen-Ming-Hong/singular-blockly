@@ -14,6 +14,8 @@ window.languageManager.loadMessages('en', {
 	BLOCKS_TAB: 'Blocks',
 	CODE_TAB: 'Code',
 	BOARD_SELECT_LABEL: 'Select Board:',
+	LANGUAGE_SELECT_TOOLTIP: 'Select Language',
+	LANGUAGE_AUTO: 'Auto (follow VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Experimental Blocks Detected',
@@ -872,3 +874,4 @@ window.languageManager.loadMessages('en', {
 	RC_GET_BUTTON_SUFFIX: 'state',
 	RC_GET_BUTTON_TOOLTIP: 'Read remote button state (0=pressed, 1=released)',
 });
+

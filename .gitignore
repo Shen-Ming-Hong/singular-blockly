@@ -1,6 +1,7 @@
 # 編譯輸出目錄
 dist/
 out/
+build/
 
 # 依賴套件
 node_modules/
@@ -50,4 +51,5 @@ performance-baseline.txt
 # 環境設定
 .env
 .env.local
+.env*
 RC_example/*
