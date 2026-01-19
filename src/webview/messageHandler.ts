@@ -317,7 +317,6 @@ export class WebViewMessageHandler {
 			}
 			const workspaceRoot = workspaceFolders[0].uri.fsPath;
 			const platformioIni = 'platformio.ini';
-			const boardConfig = await this.getBoardConfig(message.board);
 
 			// CyberBrick 和 none 都不需要 platformio.ini
 			const isMicroPythonBoard = message.board === 'cyberbrick';
@@ -329,6 +328,7 @@ export class WebViewMessageHandler {
 					log(`[blockly] 已刪除 platformio.ini (board: ${message.board})`, 'info');
 				}
 			} else {
+				const boardConfig = await this.getBoardConfig(message.board);
 				// 檢查是否收到了額外的 platformio.ini 設定
 				const libDeps = message.lib_deps && Array.isArray(message.lib_deps) ? message.lib_deps : [];
 				const buildFlags = message.build_flags && Array.isArray(message.build_flags) ? message.build_flags : [];
@@ -497,6 +497,126 @@ export class WebViewMessageHandler {
 			log('Failed to create backup', 'warn', error);
 		}
 	}
+
+	/**
+	 * 提示使用者輸入新變數名稱
+	 * @param message 提示訊息物件
+	 */
+	private async handlePromptNewVariable(message: any): Promise<void> {
+		try {
+			const isRename = Boolean(message?.isRename);
+			const currentName = typeof message?.currentName === 'string' ? message.currentName : '';
+
+			const prompt = isRename && currentName
+				? await this.localeService.getLocalizedMessage(
+						'VSCODE_ENTER_NEW_VARIABLE_NAME',
+						'Enter new variable name (current: {0})',
+						currentName
+					)
+				: await this.localeService.getLocalizedMessage('VSCODE_ENTER_VARIABLE_NAME', 'Enter variable name');
+
+			const emptyError = await this.localeService.getLocalizedMessage(
+				'VSCODE_VARIABLE_NAME_EMPTY',
+				'Variable name cannot be empty'
+			);
+			const invalidError = await this.localeService.getLocalizedMessage(
+				'VSCODE_VARIABLE_NAME_INVALID',
+				'Variable name can only contain letters, numbers, and underscores, and cannot start with a number'
+			);
+
+			const input = await vscodeApi.window.showInputBox({
+				prompt: prompt,
+				value: isRename ? currentName : undefined,
+				validateInput: (value: string) => {
+					const trimmed = value.trim();
+					if (!trimmed) {
+						return emptyError;
+					}
+
+					if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(trimmed)) {
+						return invalidError;
+					}
+
+					return null;
+				},
+			});
+
+			if (input === undefined) {
+				return; // 使用者取消
+			}
+
+			const name = input.trim();
+			if (!name) {
+				return;
+			}
+
+			this.panel.webview.postMessage({
+				command: 'createVariable',
+				name: name,
+				isRename: isRename,
+				oldName: currentName || undefined,
+			});
+		} catch (error) {
+			log('Failed to prompt new variable name', 'error', error);
+		}
+	}
+
+	/**
+	 * 確認刪除變數
+	 * @param message 確認刪除訊息物件
+	 */
+	private async handleConfirmDeleteVariable(message: any): Promise<void> {
+		try {
+			const variableName = message?.variableName;
+			if (!variableName) {
+				log('Variable name not provided for delete confirmation', 'warn');
+				return;
+			}
+
+			const confirmMessage = await this.localeService.getLocalizedMessage(
+				'VSCODE_CONFIRM_DELETE_VARIABLE',
+				'Confirm delete variable {0}?',
+				variableName
+			);
+			const okLabel = await this.localeService.getLocalizedMessage('VSCODE_OK', 'OK');
+			const cancelLabel = await this.localeService.getLocalizedMessage('VSCODE_CANCEL', 'Cancel');
+
+			const selection = await vscodeApi.window.showWarningMessage(confirmMessage, okLabel, cancelLabel);
+
+			this.panel.webview.postMessage({
+				command: 'deleteVariable',
+				name: variableName,
+				confirmed: selection === okLabel,
+			});
+		} catch (error) {
+			log('Failed to confirm variable deletion', 'error', error);
+		}
+	}
+
+	/**
+	 * 一般確認對話框
+	 * @param message 確認訊息物件
+	 */
+	private async handleConfirmDialog(message: any): Promise<void> {
+		try {
+			const okLabel = await this.localeService.getLocalizedMessage('VSCODE_OK', 'OK');
+			const cancelLabel = await this.localeService.getLocalizedMessage('VSCODE_CANCEL', 'Cancel');
+			const confirmId = message?.confirmId ?? message?.messageId;
+
+			const selection = await vscodeApi.window.showWarningMessage(message?.message || '', okLabel, cancelLabel);
+
+			this.panel.webview.postMessage({
+				command: 'confirmDialogResult',
+				confirmed: selection === okLabel,
+				originalMessage: message?.message,
+				confirmId: confirmId,
+				purpose: message?.purpose,
+			});
+		} catch (error) {
+			log('Failed to handle confirm dialog', 'error', error);
+		}
+	}
+
 	/**
 	 * 處理更新主題訊息
 	 * @param message 更新主題訊息物件
@@ -723,11 +843,17 @@ export class WebViewMessageHandler {
 				isQuickBackup: Boolean(message?.isQuickBackup),
 			});
 		} catch (error) {
-			const errorMsg = await this.localeService.getLocalizedMessage(
+			const rawErrorMessage = error instanceof Error ? error.message : String(error);
+			let errorMsg = await this.localeService.getLocalizedMessage(
 				'BACKUP_ERROR_CREATE_FAILED',
 				'Failed to create backup: {0}',
-				error instanceof Error ? error.message : String(error)
+				rawErrorMessage
 			);
+			if (errorMsg.includes('{0}')) {
+				errorMsg = errorMsg.replace('{0}', rawErrorMessage);
+			} else if (!errorMsg.includes(rawErrorMessage)) {
+				errorMsg = `${errorMsg} ${rawErrorMessage}`;
+			}
 			this.panel.webview.postMessage({
 				command: 'backupCreated',
 				name: backupName,

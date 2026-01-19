@@ -1268,6 +1268,14 @@ export class WebViewManager {
 			return;
 		}
 
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			log('No workspace folder available during FileWatcher reload', 'warn');
+			return;
+		}
+
+		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+
 		try {
 			// 設置內部更新標記，防止後續保存操作觸發 FileWatcher 循環
 			this.markInternalUpdateStart();
