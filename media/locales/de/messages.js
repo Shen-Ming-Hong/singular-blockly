@@ -14,6 +14,8 @@ window.languageManager.loadMessages('de', {
 	BLOCKS_TAB: 'Blöcke',
 	CODE_TAB: 'Code',
 	BOARD_SELECT_LABEL: 'Board auswählen:',
+	LANGUAGE_SELECT_TOOLTIP: 'Sprache auswählen',
+	LANGUAGE_AUTO: 'Auto (VS Code folgen)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Experimentelle Blöcke erkannt',
@@ -878,3 +880,4 @@ window.languageManager.loadMessages('de', {
 	RC_GET_BUTTON_SUFFIX: 'Status',
 	RC_GET_BUTTON_TOOLTIP: 'Remote-Tasten-Status lesen (0=gedrückt, 1=losgelassen)',
 });
+

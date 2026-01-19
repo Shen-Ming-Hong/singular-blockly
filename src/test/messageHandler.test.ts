@@ -97,6 +97,12 @@ describe('WebView Message Handler', () => {
 
 		// 建立 SettingsManager stub
 		settingsManagerStub = sinon.createStubInstance(SettingsManager);
+		settingsManagerStub.getTheme.resolves('light');
+		settingsManagerStub.getLanguage.resolves('auto');
+		settingsManagerStub.resolveLanguage.returns('en');
+		settingsManagerStub.readSetting.resolves('__unset__');
+		settingsManagerStub.updateTheme.resolves();
+		settingsManagerStub.updateLanguage.resolves();
 
 		// 初始化訊息處理器，注入所有 stubs
 		messageHandler = new WebViewMessageHandler(
@@ -205,7 +211,6 @@ describe('WebView Message Handler', () => {
 			command: 'saveWorkspace',
 			state: { blocks: { languageVersion: 0, blocks: [{ type: 'controls_if', id: 'test1' }] } },
 			board: 'arduino:avr:uno',
-			theme: 'light',
 		};
 
 		// 執行測試
@@ -220,7 +225,6 @@ describe('WebView Message Handler', () => {
 		assert.deepStrictEqual(writeArgs[1], {
 			workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'controls_if', id: 'test1' }] } },
 			board: 'arduino:avr:uno',
-			theme: 'light',
 		});
 	});
 
@@ -229,12 +233,14 @@ describe('WebView Message Handler', () => {
 		const savedState = {
 			workspace: { blocks: [] },
 			board: 'arduino:avr:uno',
-			theme: 'light',
 		};
 
 		fileServiceStub.fileExists.returns(true);
 		fileServiceStub.readJsonFile.resolves(savedState);
 		settingsManagerStub.getAutoBackupInterval.resolves(5);
+		settingsManagerStub.getTheme.resolves('dark');
+		settingsManagerStub.getLanguage.resolves('auto');
+		settingsManagerStub.resolveLanguage.returns('en');
 
 		// 建立請求初始狀態訊息
 		const requestMessage = {
@@ -244,18 +250,20 @@ describe('WebView Message Handler', () => {
 		// 執行測試
 		await messageHandler.handleMessage(requestMessage);
 
-		// 驗證回應 - 應該被調用兩次(loadWorkspace + autoBackupSettingsResponse)
+		// 驗證回應 - 應該被調用兩次(init + autoBackupSettingsResponse)
 		assert(webviewMock.postMessage.called);
 
-		// 找到 loadWorkspace 消息
-		const loadWorkspaceCall = webviewMock.postMessage.getCalls().find((call: any) => call.args[0].command === 'loadWorkspace');
-		assert(loadWorkspaceCall, 'loadWorkspace message should be sent');
+		// 找到 init 消息
+		const initCall = webviewMock.postMessage.getCalls().find((call: any) => call.args[0].command === 'init');
+		assert(initCall, 'init message should be sent');
 
-		const messageArg = loadWorkspaceCall.args[0];
-		assert.strictEqual(messageArg.command, 'loadWorkspace');
-		assert.deepStrictEqual(messageArg.state, savedState.workspace);
+		const messageArg = initCall.args[0];
+		assert.strictEqual(messageArg.command, 'init');
+		assert.deepStrictEqual(messageArg.workspace, savedState.workspace);
 		assert.strictEqual(messageArg.board, savedState.board);
-		assert.strictEqual(messageArg.theme, savedState.theme);
+		assert.strictEqual(messageArg.theme, 'dark');
+		assert.strictEqual(messageArg.languagePreference, 'auto');
+		assert.strictEqual(messageArg.resolvedLanguage, 'en');
 	});
 
 	it('should handle prompt new variable message', async () => {
@@ -311,11 +319,6 @@ describe('WebView Message Handler', () => {
 	});
 
 	it('should handle update theme message', async () => {
-		// 準備測試
-		fileServiceStub.fileExists.returns(true);
-		fileServiceStub.readJsonFile.resolves({});
-		fileServiceStub.writeJsonFile.resolves();
-
 		// 建立更新主題訊息
 		const themeMessage = {
 			command: 'updateTheme',
@@ -326,12 +329,49 @@ describe('WebView Message Handler', () => {
 		await messageHandler.handleMessage(themeMessage);
 
 		// 驗證主題設定更新
-		assert(fileServiceStub.readJsonFile.called);
-		assert(fileServiceStub.writeJsonFile.called);
-		// 檢查主題值
-		const writeArgs = fileServiceStub.writeJsonFile.getCall(0).args;
-		// 將 unknown 類型斷言為具有 theme 屬性的物件
-		assert.strictEqual((writeArgs[1] as { theme: string }).theme, 'dark');
+		assert(settingsManagerStub.updateTheme.calledOnce);
+		assert(settingsManagerStub.updateTheme.calledWith('dark'));
+	});
+
+	it('should handle update language message', async () => {
+		settingsManagerStub.resolveLanguage.withArgs('ja').returns('ja');
+
+		const languageMessage = {
+			command: 'updateLanguage',
+			language: 'ja',
+		};
+
+		await messageHandler.handleMessage(languageMessage);
+
+		assert(settingsManagerStub.updateLanguage.calledOnce);
+		assert(settingsManagerStub.updateLanguage.calledWith('ja'));
+
+		const response = webviewMock.postMessage.getCall(0).args[0];
+		assert.strictEqual(response.command, 'languageUpdated');
+		assert.strictEqual(response.languagePreference, 'ja');
+		assert.strictEqual(response.resolvedLanguage, 'ja');
+	});
+
+	it('should fall back to auto when updateLanguage fails', async () => {
+		settingsManagerStub.updateLanguage.onFirstCall().rejects(new Error('Invalid language'));
+		settingsManagerStub.updateLanguage.onSecondCall().resolves();
+
+		const languageMessage = {
+			command: 'updateLanguage',
+			language: 'invalid-lang',
+		};
+
+		await messageHandler.handleMessage(languageMessage);
+
+		assert.strictEqual(settingsManagerStub.updateLanguage.callCount, 2);
+		assert(settingsManagerStub.updateLanguage.firstCall.calledWith('invalid-lang'));
+		assert(settingsManagerStub.updateLanguage.secondCall.calledWith('auto'));
+		assert(settingsManagerStub.resolveLanguage.calledWith('auto'));
+
+		const response = webviewMock.postMessage.getCall(0).args[0];
+		assert.strictEqual(response.command, 'languageUpdated');
+		assert.strictEqual(response.languagePreference, 'auto');
+		assert.strictEqual(response.resolvedLanguage, 'en');
 	});
 
 	it('should handle create backup message', async () => {
@@ -470,7 +510,7 @@ describe('WebView Message Handler', () => {
 		fileServiceStub.fileExists.withArgs(backupPath).returns(true);
 		fileServiceStub.fileExists.withArgs(mainJsonPath).returns(true);
 		fileServiceStub.copyFile.resolves();
-		fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno', theme: 'light' });
+		fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno' });
 		vscodeMock.window.showWarningMessage.resolves('Restore');
 
 		const restoreMessage = {
@@ -717,7 +757,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: { blocks: { languageVersion: 0, blocks: [{ type: 'test', id: '1' }] } },
 				board: 'uno',
-				theme: 'light',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
@@ -753,15 +792,15 @@ describe('WebView Message Handler', () => {
 
 		it('should handle requestInitialState auto backup settings error', async () => {
 			fileServiceStub.fileExists.returns(true);
-			fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno', theme: 'light' });
+			fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno' });
 			settingsManagerStub.getAutoBackupInterval.rejects(new Error('Settings error'));
 
 			const requestMessage = { command: 'requestInitialState' };
 			await messageHandler.handleMessage(requestMessage);
 
-			// Should still send loadWorkspace even if auto backup fails
-			const loadWorkspaceCall = webviewMock.postMessage.getCalls().find((call: any) => call.args[0].command === 'loadWorkspace');
-			assert(loadWorkspaceCall, 'loadWorkspace should still be sent');
+			// Should still send init even if auto backup fails
+			const initCall = webviewMock.postMessage.getCalls().find((call: any) => call.args[0].command === 'init');
+			assert(initCall, 'init should still be sent');
 		});
 
 		it('should handle createBackup when main.json not exists', async () => {
@@ -906,23 +945,15 @@ describe('WebView Message Handler', () => {
 			assert(vscodeMock.window.showWarningMessage.called);
 		});
 
-		it('should handle updateTheme with main.json update error', async () => {
-			fileServiceStub.fileExists.returns(true);
-			fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno', theme: 'light' });
-			fileServiceStub.writeJsonFile.onFirstCall().rejects(new Error('Write failed')); // main.json fails
-			fileServiceStub.writeJsonFile.onSecondCall().resolves(); // settings.json succeeds
-
-			const themeMessage = { command: 'updateTheme', theme: 'dark' };
+		it('should handle updateTheme with default theme', async () => {
+			const themeMessage = { command: 'updateTheme' };
 			await messageHandler.handleMessage(themeMessage);
 
-			// Should attempt to write settings.json even if main.json fails
-			assert(settingsManagerStub.updateTheme.called);
+			assert(settingsManagerStub.updateTheme.calledOnce);
+			assert(settingsManagerStub.updateTheme.calledWith('light'));
 		});
 
 		it('should handle updateTheme with settings save error', async () => {
-			fileServiceStub.fileExists.returns(true);
-			fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno', theme: 'light' });
-			fileServiceStub.writeJsonFile.resolves(); // main.json succeeds
 			settingsManagerStub.updateTheme.rejects(new Error('Settings error'));
 
 			const themeMessage = { command: 'updateTheme', theme: 'dark' };
@@ -987,7 +1018,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: { blocks: { languageVersion: 0, blocks: [] } },
 				board: 'uno',
-				theme: 'light',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
@@ -1005,7 +1035,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: {},
 				board: 'uno',
-				theme: 'light',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
@@ -1023,7 +1052,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: null,
 				board: 'uno',
-				theme: 'light',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
@@ -1040,7 +1068,6 @@ describe('WebView Message Handler', () => {
 			fileServiceStub.readJsonFile.resolves({
 				workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'old_block', id: 'old1' }] } },
 				board: 'uno',
-				theme: 'light',
 			});
 			fileServiceStub.createDirectory.resolves();
 			fileServiceStub.copyFile.resolves();
@@ -1051,7 +1078,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: { blocks: { languageVersion: 0, blocks: [{ type: 'new_block', id: 'new1' }] } },
 				board: 'uno',
-				theme: 'dark',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
@@ -1079,7 +1105,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: { blocks: { languageVersion: 0, blocks: [{ type: 'test_block', id: 't1' }] } },
 				board: 'uno',
-				theme: 'light',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
@@ -1099,7 +1124,6 @@ describe('WebView Message Handler', () => {
 			fileServiceStub.readJsonFile.resolves({
 				workspace: { blocks: { languageVersion: 0, blocks: [] } },
 				board: 'uno',
-				theme: 'light',
 			});
 			fileServiceStub.createDirectory.resolves();
 			fileServiceStub.writeJsonFile.resolves();
@@ -1109,7 +1133,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: { blocks: { languageVersion: 0, blocks: [{ type: 'test_block', id: 't1' }] } },
 				board: 'uno',
-				theme: 'light',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
@@ -1129,7 +1152,6 @@ describe('WebView Message Handler', () => {
 			fileServiceStub.readJsonFile.resolves({
 				workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'old_block', id: 'old1' }] } },
 				board: 'uno',
-				theme: 'light',
 			});
 			fileServiceStub.createDirectory.resolves();
 			fileServiceStub.copyFile.rejects(new Error('Backup failed'));
@@ -1140,7 +1162,6 @@ describe('WebView Message Handler', () => {
 				command: 'saveWorkspace',
 				state: { blocks: { languageVersion: 0, blocks: [{ type: 'new_block', id: 'new1' }] } },
 				board: 'uno',
-				theme: 'dark',
 			};
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);

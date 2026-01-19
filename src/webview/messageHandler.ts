@@ -56,6 +56,14 @@ interface UploadRequestMessage {
 export class WebViewMessageHandler {
 	private fileService: FileService;
 	private settingsManager: SettingsManager;
+	private pendingBoardConfigRequests = new Map<
+		string,
+		{
+			resolve: (config: string) => void;
+			reject: (error: Error) => void;
+			timeout: ReturnType<typeof setTimeout>;
+		}
+	>();
 
 	/**
 	 * 建立 WebView 訊息處理器
@@ -123,6 +131,9 @@ export class WebViewMessageHandler {
 				case 'updateTheme':
 					await this.handleUpdateTheme(message);
 					break;
+				case 'updateLanguage':
+					await this.handleUpdateLanguage(message);
+					break;
 				case 'createBackup':
 					await this.handleCreateBackup(message);
 					break;
@@ -145,7 +156,7 @@ export class WebViewMessageHandler {
 					await this.handleUpdateAutoBackupSettings(message);
 					break;
 				case 'boardConfigResult':
-					// 這個訊息是對 getBoardConfig 請求的回應，不需要特殊處理
+					this.handleBoardConfigResult(message);
 					break;
 				// MCP Server 整合 - T031: 處理工作區重載請求
 				case 'requestWorkspaceReload':
@@ -182,6 +193,50 @@ export class WebViewMessageHandler {
 	 */
 	private handleLogMessage(message: any): void {
 		handleWebViewLog(message.source || 'blocklyEdit', message.level || 'info', message.message, ...(message.args || []));
+	}
+
+	/**
+	 * 從 WebView 取得開發板設定內容
+	 * @param board 開發板代號
+	 * @returns platformio.ini 內容
+	 */
+	private async getBoardConfig(board: string): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const messageId = `boardConfig_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+			const timeout = setTimeout(() => {
+				this.pendingBoardConfigRequests.delete(messageId);
+				reject(new Error('Board config request timeout'));
+			}, BOARD_CONFIG_REQUEST_TIMEOUT_MS);
+
+			this.pendingBoardConfigRequests.set(messageId, { resolve, reject, timeout });
+			this.panel.webview.postMessage({
+				command: 'getBoardConfig',
+				board: board,
+				messageId: messageId,
+			});
+		});
+	}
+
+	/**
+	 * 處理 WebView 回傳的開發板設定
+	 * @param message 回傳訊息
+	 */
+	private handleBoardConfigResult(message: any): void {
+		const messageId = message?.messageId;
+		if (!messageId) {
+			log('Board config response missing messageId', 'warn');
+			return;
+		}
+
+		const pending = this.pendingBoardConfigRequests.get(messageId);
+		if (!pending) {
+			log(`No pending board config request for messageId: ${messageId}`, 'warn');
+			return;
+		}
+
+		clearTimeout(pending.timeout);
+		this.pendingBoardConfigRequests.delete(messageId);
+		pending.resolve(typeof message.config === 'string' ? message.config : '');
 	}
 
 	/**
@@ -335,7 +390,11 @@ export class WebViewMessageHandler {
 				setTimeout(() => this.panel.reveal(vscode.ViewColumn.One, true), UI_REVEAL_DELAY_MS);
 			}
 		} catch (error) {
-			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_UPDATE_INI', (error as Error).message);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'VSCODE_FAILED_UPDATE_INI',
+				'Failed to update platformio.ini: {0}',
+				(error as Error).message
+			);
 
 			vscodeApi.window.showErrorMessage(errorMsg);
 			log(errorMsg, 'error', error);
@@ -368,7 +427,6 @@ export class WebViewMessageHandler {
 			const saveData = {
 				workspace: cleanState,
 				board: message.board || 'none',
-				theme: message.theme || 'light', // 儲存主題設定
 			};
 
 			// 驗證 JSON 是否可序列化
@@ -440,47 +498,109 @@ export class WebViewMessageHandler {
 		}
 	}
 	/**
+	 * 處理更新主題訊息
+	 * @param message 更新主題訊息物件
+	 */
+	private async handleUpdateTheme(message: any): Promise<void> {
+		try {
+			await this.settingsManager.updateTheme(message.theme || 'light');
+		} catch (error) {
+			log('Failed to save theme preference:', 'error', error);
+		}
+	}
+
+	/**
+	 * 處理語言偏好更新訊息
+	 * @param message 語言更新訊息物件
+	 */
+	private async handleUpdateLanguage(message: any): Promise<void> {
+		const requestedLanguage = typeof message.language === 'string' ? message.language : 'auto';
+		let languagePreference = requestedLanguage;
+
+		try {
+			await this.settingsManager.updateLanguage(languagePreference);
+		} catch (error) {
+			log(`Invalid language code received: ${requestedLanguage}, fallback to auto`, 'warn', error);
+			languagePreference = 'auto';
+			try {
+				await this.settingsManager.updateLanguage(languagePreference);
+			} catch (updateError) {
+				log('Failed to update language preference:', 'error', updateError);
+			}
+		}
+
+		const resolvedLanguage = this.settingsManager.resolveLanguage(languagePreference);
+
+		this.panel.webview.postMessage({
+			command: 'languageUpdated',
+			languagePreference: languagePreference,
+			resolvedLanguage: resolvedLanguage,
+		});
+	}
+
+	/**
 	 * 處理請求初始狀態訊息
 	 */
 	private async handleRequestInitialState(): Promise<void> {
 		try {
 			const mainJsonPath = path.join('blockly', 'main.json');
+			let saveData: { workspace: any; board: string } = {
+				workspace: {},
+				board: 'none',
+			};
+
+			await this.migrateThemeFromMainJson(mainJsonPath);
+
+			let theme = 'light';
+			try {
+				theme = await this.settingsManager.getTheme();
+			} catch (error) {
+				log('Failed to read theme setting, using default', 'warn', error);
+			}
 
 			if (this.fileService.fileExists(mainJsonPath)) {
 				try {
-					const saveData = await this.fileService.readJsonFile<any>(mainJsonPath, {
-						workspace: {},
-						board: 'none',
-						theme: 'light',
-					});
+					const existingData = await this.fileService.readJsonFile<any>(mainJsonPath, saveData);
 
 					// 驗證資料結構
-					if (saveData && typeof saveData === 'object' && saveData.workspace) {
-						// 🔹 在發送 loadWorkspace 之前，先檢查是否為 MicroPython 專案
-						// 如果是，提前刪除 platformio.ini 避免 PlatformIO 擴充功能鎖定檔案
-						const board = saveData.board || 'none';
-						if (board === 'cyberbrick') {
-							log('[blockly] 偵測到 CyberBrick 專案，提前刪除 platformio.ini', 'info');
-							await this.deletePlatformioIniIfExists();
-						}
-
-						// 將主題信息一併傳送
-						this.panel.webview.postMessage({
-							command: 'loadWorkspace',
-							state: saveData.workspace,
-							board: board,
-							theme: saveData.theme || 'light', // 附加主題設定
-						});
+					if (existingData && typeof existingData === 'object' && existingData.workspace) {
+						saveData = {
+							workspace: existingData.workspace,
+							board: existingData.board || 'none',
+						};
 					} else {
 						throw new Error('Invalid workspace state format');
 					}
 				} catch (parseError) {
 					log('JSON parsing error:', 'error', parseError);
 					// 建立新的空白狀態
-					const newState = { workspace: {}, board: 'none', theme: 'light' };
-					await this.fileService.writeJsonFile(mainJsonPath, newState);
+					await this.fileService.writeJsonFile(mainJsonPath, saveData);
 				}
 			}
+
+			// 如果是 MicroPython 專案，提前刪除 platformio.ini 避免 PlatformIO 擴充功能鎖定檔案
+			if (saveData.board === 'cyberbrick') {
+				log('[blockly] 偵測到 CyberBrick 專案，提前刪除 platformio.ini', 'info');
+				await this.deletePlatformioIniIfExists();
+			}
+
+			let languagePreference = 'auto';
+			try {
+				languagePreference = await this.settingsManager.getLanguage();
+			} catch (error) {
+				log('Failed to read language preference, fallback to auto', 'warn', error);
+			}
+
+			const resolvedLanguage = this.settingsManager.resolveLanguage(languagePreference);
+
+			this.panel.webview.postMessage({
+				command: 'init',
+				theme: theme,
+				board: saveData.board || 'none',
+				workspace: saveData.workspace || {},
+				languagePreference: languagePreference,
+				resolvedLanguage: resolvedLanguage,
+			});
 
 			// 發送自動備份設定
 			try {
@@ -515,536 +635,388 @@ export class WebViewMessageHandler {
 	}
 
 	/**
-	 * 處理提示新變數訊息
-	 * @param message 提示新變數訊息物件
+	 * 從舊版 main.json 遷移 theme 到 settings.json
+	 * @param mainJsonPath main.json 檔案路徑
 	 */
-	private async handlePromptNewVariable(message: any): Promise<void> {
+	private async migrateThemeFromMainJson(mainJsonPath: string): Promise<void> {
 		try {
-			const promptMsg = message.isRename
-				? await this.localeService.getLocalizedMessage(
-						'VSCODE_ENTER_NEW_VARIABLE_NAME',
-						'Enter new variable name (current: {0})',
-						message.currentName
-				  )
-				: await this.localeService.getLocalizedMessage('VSCODE_ENTER_VARIABLE_NAME');
-
-			const emptyErrorMsg = await this.localeService.getLocalizedMessage('VSCODE_VARIABLE_NAME_EMPTY');
-			const invalidErrorMsg = await this.localeService.getLocalizedMessage('VSCODE_VARIABLE_NAME_INVALID');
-
-			const result = await vscodeApi.window.showInputBox({
-				prompt: promptMsg,
-				value: message.currentName || '',
-				validateInput: text => {
-					if (!text) {
-						return emptyErrorMsg;
-					}
-					if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(text)) {
-						return invalidErrorMsg;
-					}
-					return null;
-				},
-			});
-
-			if (result !== undefined) {
-				this.panel.webview.postMessage({
-					command: 'createVariable',
-					name: result,
-					isRename: message.isRename,
-					oldName: message.currentName,
-				});
+			if (!this.fileService.fileExists(mainJsonPath)) {
+				return;
 			}
-		} catch (error) {
-			log('Error handling promptNewVariable:', 'error', error);
-		}
-	}
 
-	/**
-	 * 處理確認刪除變數訊息
-	 * @param message 確認刪除變數訊息物件
-	 */
-	private async handleConfirmDeleteVariable(message: any): Promise<void> {
-		try {
-			const confirmMsg = await this.localeService.getLocalizedMessage(
-				'VSCODE_CONFIRM_DELETE_VARIABLE',
-				'Are you sure you want to delete variable "{0}"?',
-				message.variableName
-			);
-			const okBtn = await this.localeService.getLocalizedMessage('VSCODE_OK');
-			const cancelBtn = await this.localeService.getLocalizedMessage('VSCODE_CANCEL');
-
-			const result = await vscodeApi.window.showWarningMessage(confirmMsg, okBtn, cancelBtn);
-
-			this.panel.webview.postMessage({
-				command: 'deleteVariable',
-				confirmed: result === okBtn,
-				name: message.variableName,
-			});
-		} catch (error) {
-			log('Error handling confirmDeleteVariable:', 'error', error);
-		}
-	}
-
-	/**
-	 * 處理確認對話框訊息
-	 * @param message 確認對話框訊息物件
-	 */
-	private async handleConfirmDialog(message: any): Promise<void> {
-		try {
-			const result = await vscodeApi.window.showWarningMessage(message.message, 'OK', 'Cancel');
-
-			this.panel.webview.postMessage({
-				command: 'confirmDialogResult',
-				confirmed: result === 'OK',
-				originalMessage: message.message,
-				confirmId: message.confirmId, // 回傳原始的 confirmId
-				purpose: message.purpose, // 回傳用途標記
-			});
-		} catch (error) {
-			log('Error handling confirmDialog:', 'error', error);
-		}
-	}
-
-	/**
-	 * 處理更新主題訊息
-	 * @param message 更新主題訊息物件
-	 */
-	private async handleUpdateTheme(message: any): Promise<void> {
-		try {
-			// 更新主題設定
-			await this.settingsManager.updateTheme(message.theme || 'light');
-
-			// 同時更新 blockly/main.json 中的主題設定
-			const mainJsonPath = path.join('blockly', 'main.json');
-
-			if (this.fileService.fileExists(mainJsonPath)) {
-				try {
-					const saveData = await this.fileService.readJsonFile<any>(mainJsonPath, {});
-
-					if (saveData && typeof saveData === 'object') {
-						saveData.theme = message.theme || 'light';
-						await this.fileService.writeJsonFile(mainJsonPath, saveData);
-					}
-				} catch (e) {
-					log('Failed to update theme in main.json:', 'error', e);
-				}
+			const saveData = await this.fileService.readJsonFile<any>(mainJsonPath, null);
+			if (!saveData || typeof saveData !== 'object' || saveData.theme === undefined) {
+				return;
 			}
+
+			const storedTheme = saveData.theme;
+			const themeSentinel = '__unset__';
+			const currentTheme = await this.settingsManager.readSetting<string>('singular-blockly.theme', themeSentinel);
+
+			if (currentTheme === themeSentinel && (storedTheme === 'light' || storedTheme === 'dark')) {
+				await this.settingsManager.updateTheme(storedTheme);
+				log(`Migrated theme from main.json to settings: ${storedTheme}`, 'info');
+			}
+
+			// 從 main.json 移除 theme 欄位
+			delete saveData.theme;
+			await this.fileService.writeJsonFile(mainJsonPath, saveData);
 		} catch (error) {
-			log('Failed to save theme preference:', 'error', error);
+			log('Failed to migrate theme from main.json:', 'warn', error);
 		}
 	}
 
 	/**
-	 * 處理建立備份訊息
+	 * 建立備份檔案
 	 * @param message 建立備份訊息物件
 	 */
 	private async handleCreateBackup(message: any): Promise<void> {
+		const backupDir = path.join('blockly', 'backup');
+		const mainJsonPath = path.join('blockly', 'main.json');
+		const backupName = message?.name;
+
+		if (!backupName) {
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
+				'Backup name not specified'
+			);
+			this.panel.webview.postMessage({
+				command: 'backupCreated',
+				name: backupName,
+				success: false,
+				error: errorMsg,
+			});
+			return;
+		}
+
 		try {
-			const blocklyDir = 'blockly';
-			const mainJsonPath = path.join(blocklyDir, 'main.json');
-			const backupDir = path.join(blocklyDir, 'backup');
-
-			// 確保備份目錄存在
 			await this.fileService.createDirectory(backupDir);
+			const backupPath = path.join(backupDir, `${backupName}.json`);
 
-			// 檢查 main.json 是否存在
-			if (!this.fileService.fileExists(mainJsonPath)) {
-				const errorMsg = await this.localeService.getLocalizedMessage('BACKUP_ERROR_MAIN_NOT_FOUND', 'Cannot find main.json file');
-				throw new Error(errorMsg);
+			if (message?.state) {
+				const saveData = {
+					workspace: message.state,
+					board: message.board || 'none',
+				};
+				await this.fileService.writeJsonFile(backupPath, saveData);
+			} else {
+				if (!this.fileService.fileExists(mainJsonPath)) {
+					const errorMsg = await this.localeService.getLocalizedMessage(
+						'BACKUP_ERROR_MAIN_NOT_FOUND',
+						'main.json does not exist'
+					);
+					this.panel.webview.postMessage({
+						command: 'backupCreated',
+						name: backupName,
+						success: false,
+						error: errorMsg,
+					});
+					return;
+				}
+				await this.fileService.copyFile(mainJsonPath, backupPath);
 			}
 
-			// 建立備份檔案路徑
-			const backupPath = path.join(backupDir, `${message.name}.json`);
-
-			// 複製檔案
-			await this.fileService.copyFile(mainJsonPath, backupPath);
-
-			// 通知 WebView 備份已建立
 			this.panel.webview.postMessage({
 				command: 'backupCreated',
-				name: message.name,
+				name: backupName,
 				success: true,
+				isQuickBackup: Boolean(message?.isQuickBackup),
 			});
-
-			log(`成功建立備份: ${message.name}`, 'info');
 		} catch (error) {
-			log('建立備份失敗:', 'error', error);
-			this.panel.webview.postMessage({
-				command: 'backupCreated',
-				name: message.name,
-				success: false,
-				error: `${error}`,
-			});
 			const errorMsg = await this.localeService.getLocalizedMessage(
 				'BACKUP_ERROR_CREATE_FAILED',
 				'Failed to create backup: {0}',
-				String(error)
+				error instanceof Error ? error.message : String(error)
 			);
-			this.showErrorMessage(errorMsg);
+			this.panel.webview.postMessage({
+				command: 'backupCreated',
+				name: backupName,
+				success: false,
+				error: errorMsg,
+			});
 		}
 	}
 
 	/**
-	 * 處理獲取備份列表訊息
+	 * 取得備份清單
 	 */
 	private async handleGetBackupList(): Promise<void> {
+		const backupDir = path.join('blockly', 'backup');
+
 		try {
-			const backupDir = path.join('blockly', 'backup');
-
-			// 確保備份目錄存在
 			await this.fileService.createDirectory(backupDir);
-
-			// 讀取備份目錄中的所有檔案
 			const files = await this.fileService.listFiles(backupDir);
-			const backupFiles = files.filter(file => file.endsWith('.json'));
+			const jsonFiles = files.filter(file => file.endsWith('.json'));
 
-			// 收集備份資訊
-			const backups = [];
-			for (const file of backupFiles) {
-				const filePath = path.join(backupDir, file);
-				const name = path.basename(file, '.json');
+			const backups = await Promise.all(
+				jsonFiles.map(async file => {
+					const backupPath = path.join(backupDir, file);
+					const name = file.replace(/\.json$/, '');
+					let date: Date | string | number | null = null;
+					let size: number | undefined;
 
-				try {
-					// 獲取檔案的時間戳信息
-					const stats = await this.fileService.getFileStats(filePath);
-					// 優先使用檔案的創建時間（birthtime）
-					const fileDate = stats ? stats.birthtime.toISOString() : new Date().toISOString();
+					try {
+						const data = await this.fileService.readJsonFile<any>(backupPath, null);
+						if (data && data.date) {
+							date = data.date;
+						}
+					} catch (error) {
+						log('Failed to read backup metadata:', 'warn', error);
+					}
 
-					backups.push({
-						name: name,
-						date: fileDate,
-						filePath: filePath, // 添加完整檔案路徑以便預覽功能使用
-						size: stats ? stats.size : 0, // 現在可以處理檔案大小了
-					});
-				} catch (err) {
-					// 如果讀取檔案失敗，使用當前時間
-					backups.push({
-						name: name,
-						date: new Date().toISOString(),
-						filePath: filePath,
-						size: 0,
-					});
-				}
-			}
+					try {
+						const stats = await this.fileService.getFileStats(backupPath);
+						if (!date && stats?.birthtime) {
+							date = stats.birthtime;
+						}
+						if (stats?.size !== undefined) {
+							size = stats.size;
+						}
+					} catch (error) {
+						log('Failed to get backup file stats:', 'warn', error);
+					}
 
-			// 按日期排序（最新的在前）
+					if (!date) {
+						date = new Date();
+					}
+
+					return {
+						name,
+						date,
+						size,
+					};
+				})
+			);
+
 			backups.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-			// 回傳備份列表
 			this.panel.webview.postMessage({
 				command: 'backupListResponse',
-				backups: backups,
+				backups,
 			});
-
-			log(`成功獲取 ${backups.length} 個備份`, 'info');
 		} catch (error) {
-			log('獲取備份列表失敗:', 'error', error);
+			log('Failed to get backup list:', 'error', error);
 			this.panel.webview.postMessage({
 				command: 'backupListResponse',
 				backups: [],
-				error: `${error}`,
+				error: error instanceof Error ? error.message : String(error),
 			});
 		}
 	}
 
 	/**
-	 * 處理刪除備份訊息
+	 * 刪除備份
 	 * @param message 刪除備份訊息物件
 	 */
 	private async handleDeleteBackup(message: any): Promise<void> {
-		try {
-			// 確保備份名稱存在
-			if (!message.name) {
-				const errorMsg = await this.localeService.getLocalizedMessage(
-					'BACKUP_ERROR_NAME_NOT_SPECIFIED',
-					'Backup name not specified'
-				);
-				throw new Error(errorMsg);
-			}
-
-			const backupDir = path.join('blockly', 'backup');
-			const backupPath = path.join(backupDir, `${message.name}.json`);
-
-			// 檢查檔案是否存在
-			if (this.fileService.fileExists(backupPath)) {
-				// 顯示確認對話框，詢問用戶是否確定要刪除
-				const confirmMessage = await this.localeService.getLocalizedMessage(
-					'BACKUP_CONFIRM_DELETE',
-					'Are you sure you want to delete backup: {0}.json?',
-					message.name
-				);
-				const deleteBtn = await this.localeService.getLocalizedMessage('BUTTON_DELETE', 'Delete');
-				const cancelBtn = await this.localeService.getLocalizedMessage('BUTTON_CANCEL', 'Cancel');
-
-				const selection = await vscodeApi.window.showWarningMessage(confirmMessage, deleteBtn, cancelBtn);
-
-				if (selection === deleteBtn) {
-					// 用戶確認刪除
-					await this.fileService.deleteFile(backupPath);
-
-					// 通知 WebView 備份已刪除
-					this.panel.webview.postMessage({
-						command: 'backupDeleted',
-						name: message.name,
-						success: true,
-					});
-
-					log(`成功刪除備份: ${message.name}`, 'info');
-				} else {
-					// 用戶取消刪除
-					this.panel.webview.postMessage({
-						command: 'backupDeleted',
-						name: message.name,
-						success: false,
-						cancelled: true,
-					});
-				}
-			} else {
-				const errorMsg = await this.localeService.getLocalizedMessage(
-					'BACKUP_ERROR_NOT_FOUND',
-					'Backup {0} does not exist',
-					message.name
-				);
-				throw new Error(errorMsg);
-			}
-		} catch (error) {
-			log('刪除備份失敗:', 'error', error);
+		const backupName = message?.name;
+		if (!backupName) {
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
+				'Backup name not specified'
+			);
 			this.panel.webview.postMessage({
 				command: 'backupDeleted',
-				name: message.name || '未知',
+				name: backupName,
 				success: false,
-				error: `${error}`,
+				error: errorMsg,
 			});
+			return;
+		}
+
+		const backupPath = path.join('blockly', 'backup', `${backupName}.json`);
+		if (!this.fileService.fileExists(backupPath)) {
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_NOT_FOUND',
+				'Backup "{0}" does not exist',
+				backupName
+			);
+			this.panel.webview.postMessage({
+				command: 'backupDeleted',
+				name: backupName,
+				success: false,
+				error: errorMsg,
+			});
+			return;
+		}
+
+		try {
+			const confirmMessage = await this.localeService.getLocalizedMessage(
+				'BACKUP_CONFIRM_DELETE',
+				'Are you sure you want to delete "{0}"?',
+				backupName
+			);
+			const deleteBtn = await this.localeService.getLocalizedMessage('BUTTON_DELETE', 'Delete');
+			const cancelBtn = await this.localeService.getLocalizedMessage('BUTTON_CANCEL', 'Cancel');
+
+			const selection = await vscodeApi.window.showWarningMessage(confirmMessage, deleteBtn, cancelBtn);
+			if (selection !== deleteBtn) {
+				this.panel.webview.postMessage({
+					command: 'backupDeleted',
+					name: backupName,
+					success: false,
+					cancelled: true,
+				});
+				return;
+			}
+
+			await this.fileService.deleteFile(backupPath);
+			this.panel.webview.postMessage({
+				command: 'backupDeleted',
+				name: backupName,
+				success: true,
+			});
+		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage(
 				'BACKUP_ERROR_DELETE_FAILED',
 				'Failed to delete backup: {0}',
-				String(error)
+				error instanceof Error ? error.message : String(error)
 			);
-			this.showErrorMessage(errorMsg);
+			this.panel.webview.postMessage({
+				command: 'backupDeleted',
+				name: backupName,
+				success: false,
+				error: errorMsg,
+			});
 		}
 	}
 
 	/**
-	 * 處理還原備份訊息
+	 * 還原備份
 	 * @param message 還原備份訊息物件
 	 */
 	private async handleRestoreBackup(message: any): Promise<void> {
+		const backupName = message?.name;
+		if (!backupName) {
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
+				'Backup name not specified'
+			);
+			this.panel.webview.postMessage({
+				command: 'backupRestored',
+				name: backupName,
+				success: false,
+				error: errorMsg,
+			});
+			return;
+		}
+
+		const backupPath = path.join('blockly', 'backup', `${backupName}.json`);
+		const mainJsonPath = path.join('blockly', 'main.json');
+
+		if (!this.fileService.fileExists(backupPath)) {
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_NOT_FOUND',
+				'Backup "{0}" does not exist',
+				backupName
+			);
+			this.panel.webview.postMessage({
+				command: 'backupRestored',
+				name: backupName,
+				success: false,
+				error: errorMsg,
+			});
+			return;
+		}
+
 		try {
-			// 確保備份名稱存在
-			if (!message.name) {
-				const errorMsg = await this.localeService.getLocalizedMessage(
-					'BACKUP_ERROR_NAME_NOT_SPECIFIED',
-					'Backup name not specified'
-				);
-				throw new Error(errorMsg);
-			}
-
-			const blocklyDir = 'blockly';
-			const backupDir = path.join(blocklyDir, 'backup');
-			const mainJsonPath = path.join(blocklyDir, 'main.json');
-			const backupPath = path.join(backupDir, `${message.name}.json`);
-
-			// 檢查備份檔案是否存在
-			if (!this.fileService.fileExists(backupPath)) {
-				const errorMsg = await this.localeService.getLocalizedMessage(
-					'BACKUP_ERROR_NOT_FOUND',
-					'Backup {0} does not exist',
-					message.name
-				);
-				throw new Error(errorMsg);
-			}
-
-			// 顯示確認對話框，詢問用戶是否確定要還原（這是一個破壞性操作）
 			const confirmMessage = await this.localeService.getLocalizedMessage(
 				'BACKUP_CONFIRM_RESTORE',
-				'Are you sure you want to restore backup "{0}"? This will overwrite the current workspace.',
-				message.name
+				'Are you sure you want to restore "{0}"?',
+				backupName
 			);
 			const restoreBtn = await this.localeService.getLocalizedMessage('BUTTON_RESTORE', 'Restore');
 			const cancelBtn = await this.localeService.getLocalizedMessage('BUTTON_CANCEL', 'Cancel');
 
 			const selection = await vscodeApi.window.showWarningMessage(confirmMessage, restoreBtn, cancelBtn);
-
-			if (selection === restoreBtn) {
-				// 在還原之前，先為當前工作區創建一個臨時備份
-				if (this.fileService.fileExists(mainJsonPath)) {
-					try {
-						// 創建臨時備份名稱，格式：auto_backup_before_restore_YYYYMMDD_HHMMSS
-						const now = new Date();
-						const year = now.getFullYear();
-						const month = String(now.getMonth() + 1).padStart(2, '0');
-						const day = String(now.getDate()).padStart(2, '0');
-						const hours = String(now.getHours()).padStart(2, '0');
-						const minutes = String(now.getMinutes()).padStart(2, '0');
-						const seconds = String(now.getSeconds()).padStart(2, '0');
-						const autoBackupName = `auto_restore_${year}${month}${day}_${hours}${minutes}${seconds}`;
-						const autoBackupPath = path.join(backupDir, `${autoBackupName}.json`);
-
-						// 確保備份目錄存在
-						await this.fileService.createDirectory(backupDir);
-
-						// 複製當前的 main.json 到臨時備份
-						await this.fileService.copyFile(mainJsonPath, autoBackupPath);
-
-						log(`在還原前建立的自動備份: ${autoBackupName}`, 'info');
-					} catch (backupError) {
-						// 如果自動備份失敗，記錄錯誤但繼續還原過程
-						log('在還原前建立自動備份失敗:', 'error', backupError);
-					}
-				}
-
-				// 將備份檔案複製回 main.json
-				await this.fileService.copyFile(backupPath, mainJsonPath);
-
-				// 讀取還原後的數據
-				const restoredData = await this.fileService.readJsonFile<any>(mainJsonPath, {
-					workspace: {},
-					board: 'none',
-					theme: 'light',
-				});
-
-				// 通知 WebView 重新載入工作區
-				this.panel.webview.postMessage({
-					command: 'loadWorkspace',
-					state: restoredData.workspace,
-					board: restoredData.board || 'none',
-					theme: restoredData.theme || 'light',
-					isRestored: true,
-					restoreName: message.name,
-				});
-
-				// 通知 WebView 備份已還原
+			if (selection !== restoreBtn) {
 				this.panel.webview.postMessage({
 					command: 'backupRestored',
-					name: message.name,
-					success: true,
-				});
-
-				log(`成功還原備份: ${message.name}`, 'info');
-			} else {
-				// 用戶取消還原
-				this.panel.webview.postMessage({
-					command: 'backupRestored',
-					name: message.name,
+					name: backupName,
 					success: false,
 					cancelled: true,
 				});
+				return;
 			}
-		} catch (error) {
-			log('還原備份失敗:', 'error', error);
+
+			await this.fileService.copyFile(backupPath, mainJsonPath);
+			const saveData = await this.fileService.readJsonFile<any>(mainJsonPath, null);
+
+			if (saveData) {
+				this.panel.webview.postMessage({
+					command: 'loadWorkspace',
+					state: saveData,
+					board: saveData.board,
+				});
+			}
+
 			this.panel.webview.postMessage({
 				command: 'backupRestored',
-				name: message.name || '未知',
-				success: false,
-				error: `${error}`,
+				name: backupName,
+				success: true,
 			});
+		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage(
 				'BACKUP_ERROR_RESTORE_FAILED',
 				'Failed to restore backup: {0}',
-				String(error)
+				error instanceof Error ? error.message : String(error)
 			);
-			this.showErrorMessage(errorMsg);
+			this.panel.webview.postMessage({
+				command: 'backupRestored',
+				name: backupName,
+				success: false,
+				error: errorMsg,
+			});
 		}
 	}
 
 	/**
-	 * 從 WebView 獲取板子設定
-	 * @param board 板子名稱
-	 * @returns 板子設定內容
-	 */
-	private async getBoardConfig(board: string): Promise<string> {
-		try {
-			log(`向 WebView 請求板子設定：${board}`);
-
-			// 建立唯一的訊息 ID
-			const messageId = `get-board-config-${Date.now()}`;
-
-			// 創建一個具有超時功能的 Promise
-			return await Promise.race([
-				// 主要的通信 Promise
-				new Promise<string>(resolve => {
-					// 設定訊息監聽器
-					const messageListener = this.panel.webview.onDidReceiveMessage(message => {
-						if (message.command === 'boardConfigResult' && message.messageId === messageId) {
-							messageListener.dispose();
-							log(`成功從 WebView 獲取板子設定`);
-							resolve(message.config || '');
-						}
-					});
-
-					// 發送訊息到 webview
-					this.panel.webview.postMessage({
-						command: 'getBoardConfig',
-						board: board,
-						messageId: messageId,
-					});
-				}),
-
-				// 超時 Promise
-				new Promise<string>(resolve => {
-					setTimeout(() => {
-						log(`板子設定請求逾時，無法獲取設定`);
-						resolve('');
-					}, BOARD_CONFIG_REQUEST_TIMEOUT_MS);
-				}),
-			]);
-		} catch (error) {
-			log('從 WebView 獲取板子設定時發生錯誤:', 'error', error);
-			return '';
-		}
-	}
-
-	/**
-	 * 顯示錯誤訊息
-	 * @param message 錯誤訊息
-	 */
-	private showErrorMessage(message: string): void {
-		vscodeApi.window.showErrorMessage(message);
-	}
-
-	/**
-	 * 處理預覽備份命令
-	 * @param message 消息內容，包含備份名稱
+	 * 預覽備份
+	 * @param message 預覽備份訊息物件
 	 */
 	private async handlePreviewBackup(message: any): Promise<void> {
+		const backupName = message?.name;
+		if (!backupName) {
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
+				'Backup name not specified'
+			);
+			this.showErrorMessage(errorMsg);
+			return;
+		}
+
+		const backupPath = path.join('blockly', 'backup', `${backupName}.json`);
+		if (!this.fileService.fileExists(backupPath)) {
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'BACKUP_ERROR_NOT_FOUND',
+				'Backup "{0}" does not exist',
+				backupName
+			);
+			this.showErrorMessage(errorMsg);
+			return;
+		}
+
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_PLEASE_OPEN_PROJECT');
+			this.showErrorMessage(errorMsg);
+			return;
+		}
+
+		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+		const fullPath = path.join(workspaceRoot, backupPath);
 		try {
-			// 確保備份名稱存在
-			if (!message.name) {
-				const errorMsg = await this.localeService.getLocalizedMessage(
-					'BACKUP_ERROR_NAME_NOT_SPECIFIED',
-					'Backup name not specified'
-				);
-				throw new Error(errorMsg);
-			}
-			log(`正在處理預覽備份請求: ${message.name}`, 'info');
-
-			const blocklyDir = 'blockly';
-			const backupDir = path.join(blocklyDir, 'backup');
-			const backupPath = path.join(backupDir, `${message.name}.json`);
-			// 修正路徑構建,完整路徑應為 {workspace}/blockly/backup/{filename}.json
-			const fullBackupPath = path.join(vscodeApi.workspace.workspaceFolders![0].uri.fsPath, backupPath);
-
-			// 檢查備份檔案是否存在
-			if (!this.fileService.fileExists(backupPath)) {
-				const errorMsg = await this.localeService.getLocalizedMessage(
-					'BACKUP_ERROR_NOT_FOUND',
-					'Backup {0} does not exist',
-					message.name
-				);
-				throw new Error(errorMsg);
-			}
-
-			// 執行預覽命令，將預覽命令和完整的備份路徑傳遞給 VS Code
-			await vscodeApi.commands.executeCommand('singular-blockly.previewBackup', fullBackupPath);
+			await vscodeApi.commands.executeCommand('vscode.open', fullPath);
 		} catch (error) {
-			log(`預覽備份失敗: ${error}`, 'error');
 			const errorMsg = await this.localeService.getLocalizedMessage(
 				'BACKUP_ERROR_PREVIEW_FAILED',
 				'Failed to preview backup: {0}',
-				String(error)
+				error instanceof Error ? error.message : String(error)
 			);
 			this.showErrorMessage(errorMsg);
 		}
 	}
+
 	/**
 	 * 處理獲取自動備份設定訊息
 	 */
@@ -1332,4 +1304,13 @@ export class WebViewMessageHandler {
 		log('[blockly] 收到刪除 platformio.ini 請求', 'info');
 		await this.deletePlatformioIniIfExists();
 	}
+
+	private showErrorMessage(message: string): void {
+		try {
+			vscodeApi.window.showErrorMessage(message);
+		} catch (error) {
+			log('Failed to show error message:', 'error', error);
+		}
+	}
 }
+

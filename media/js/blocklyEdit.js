@@ -94,6 +94,32 @@ const log = {
 
 // 儲存當前主題設定
 let currentTheme = window.initialTheme || 'light';
+// 儲存語言偏好與解析後語言
+let currentLanguagePreference = 'auto';
+let currentResolvedLanguage = window.languageManager ? window.languageManager.currentLanguage : 'en';
+let isLanguageDropdownOpen = false;
+let isBoardDropdownOpen = false;
+let isLanguageSwitchReloading = false;
+let pendingLanguageReloadTimer = null;
+
+const LANGUAGE_OPTIONS = [
+	{ code: 'auto', nativeName: '', isAuto: true },
+	{ code: 'en', nativeName: 'English' },
+	{ code: 'zh-hant', nativeName: '繁體中文' },
+	{ code: 'ja', nativeName: '日本語' },
+	{ code: 'ko', nativeName: '한국어' },
+	{ code: 'es', nativeName: 'Español' },
+	{ code: 'fr', nativeName: 'Français' },
+	{ code: 'de', nativeName: 'Deutsch' },
+	{ code: 'it', nativeName: 'Italiano' },
+	{ code: 'pt-br', nativeName: 'Português (Brasil)' },
+	{ code: 'ru', nativeName: 'Русский' },
+	{ code: 'pl', nativeName: 'Polski' },
+	{ code: 'hu', nativeName: 'Magyar' },
+	{ code: 'cs', nativeName: 'Čeština' },
+	{ code: 'bg', nativeName: 'Български' },
+	{ code: 'tr', nativeName: 'Türkçe' },
+];
 
 /**
  * Toast 通知系統
@@ -344,6 +370,331 @@ function populateBoardOptions() {
 	} else {
 		boardSelect.value = 'none';
 	}
+
+	populateBoardDropdown(boardSelect);
+}
+
+/**
+ * 依據原生 select 生成自訂開發板下拉選單
+ */
+function populateBoardDropdown(boardSelect) {
+	const dropdown = document.getElementById('boardDropdown');
+	if (!dropdown || !boardSelect) {
+		return;
+	}
+
+	dropdown.innerHTML = '';
+
+	Array.from(boardSelect.options).forEach(option => {
+		const optionButton = document.createElement('button');
+		optionButton.type = 'button';
+		optionButton.className = 'board-option';
+		optionButton.dataset.board = option.value;
+		optionButton.setAttribute('role', 'option');
+
+		const label = document.createElement('span');
+		label.className = 'board-option-label';
+		label.textContent = option.textContent || option.value;
+
+		const check = document.createElement('span');
+		check.className = 'board-option-check';
+		check.textContent = '✓';
+
+		optionButton.appendChild(label);
+		optionButton.appendChild(check);
+
+		optionButton.addEventListener('click', event => {
+			event.stopPropagation();
+			if (boardSelect.value !== option.value) {
+				boardSelect.value = option.value;
+				boardSelect.dispatchEvent(new Event('change', { bubbles: true }));
+			}
+			updateBoardSelectionUI(boardSelect);
+			closeBoardDropdown();
+		});
+
+		dropdown.appendChild(optionButton);
+	});
+
+	updateBoardSelectionUI(boardSelect);
+}
+
+/**
+ * 更新開發板下拉選單的目前選取狀態
+ */
+function updateBoardSelectionUI(boardSelect) {
+	const dropdown = document.getElementById('boardDropdown');
+	const label = document.getElementById('boardSelectText');
+	const select = boardSelect || document.getElementById('boardSelect');
+	if (!select) {
+		return;
+	}
+
+	const selectedOption =
+		select.selectedOptions && select.selectedOptions.length > 0
+			? select.selectedOptions[0]
+			: select.querySelector(`option[value="${select.value}"]`);
+
+	if (label) {
+		label.textContent = selectedOption ? selectedOption.textContent : '';
+	}
+
+	if (!dropdown) {
+		return;
+	}
+
+	dropdown.querySelectorAll('.board-option').forEach(optionEl => {
+		const value = optionEl.dataset.board;
+		if (value === select.value) {
+			optionEl.classList.add('selected');
+			optionEl.setAttribute('aria-selected', 'true');
+		} else {
+			optionEl.classList.remove('selected');
+			optionEl.setAttribute('aria-selected', 'false');
+		}
+	});
+}
+
+function openBoardDropdown() {
+	const dropdown = document.getElementById('boardDropdown');
+	if (!dropdown) {
+		return;
+	}
+
+	closeLanguageDropdown();
+
+	dropdown.classList.add('open');
+	dropdown.setAttribute('aria-hidden', 'false');
+	isBoardDropdownOpen = true;
+
+	const toggleButton = document.getElementById('boardSelectToggle');
+	if (toggleButton) {
+		toggleButton.setAttribute('aria-expanded', 'true');
+	}
+}
+
+function closeBoardDropdown() {
+	const dropdown = document.getElementById('boardDropdown');
+	if (!dropdown) {
+		return;
+	}
+	dropdown.classList.remove('open');
+	dropdown.setAttribute('aria-hidden', 'true');
+	isBoardDropdownOpen = false;
+
+	const toggleButton = document.getElementById('boardSelectToggle');
+	if (toggleButton) {
+		toggleButton.setAttribute('aria-expanded', 'false');
+	}
+}
+
+function toggleBoardDropdown() {
+	if (isBoardDropdownOpen) {
+		closeBoardDropdown();
+	} else {
+		openBoardDropdown();
+	}
+}
+
+/**
+ * 動態生成語言選擇下拉選單選項
+ */
+function populateLanguageDropdown() {
+	const dropdown = document.getElementById('languageDropdown');
+	if (!dropdown) {
+		log.warn('找不到語言下拉選單元素');
+		return;
+	}
+
+	const languageManager = window.languageManager;
+	if (!languageManager) {
+		log.warn('語言管理器尚未載入，無法更新語言選單');
+		return;
+	}
+
+	dropdown.innerHTML = '';
+
+	LANGUAGE_OPTIONS.forEach(option => {
+		const optionButton = document.createElement('button');
+		optionButton.type = 'button';
+		optionButton.className = 'language-option';
+		optionButton.dataset.language = option.code;
+
+		const label = document.createElement('span');
+		label.className = 'language-option-label';
+		label.textContent = option.isAuto
+			? languageManager.getMessage('LANGUAGE_AUTO', 'Auto (follow VS Code)')
+			: option.nativeName;
+
+		const check = document.createElement('span');
+		check.className = 'language-option-check';
+		check.textContent = '✓';
+
+		optionButton.appendChild(label);
+		optionButton.appendChild(check);
+
+		optionButton.addEventListener('click', event => {
+			event.stopPropagation();
+			handleLanguageSelection(option.code);
+		});
+
+		dropdown.appendChild(optionButton);
+	});
+
+	updateLanguageSelectionUI();
+}
+
+/**
+ * 更新語言選單的目前選取狀態
+ */
+function updateLanguageSelectionUI() {
+	const dropdown = document.getElementById('languageDropdown');
+	if (!dropdown) {
+		return;
+	}
+
+	dropdown.querySelectorAll('.language-option').forEach(optionEl => {
+		const code = optionEl.dataset.language;
+		if (code === currentLanguagePreference) {
+			optionEl.classList.add('selected');
+		} else {
+			optionEl.classList.remove('selected');
+		}
+	});
+}
+
+/**
+ * 套用語言更新（偏好 + 解析後語言）
+ */
+function applyLanguageUpdate(languagePreference, resolvedLanguage) {
+	currentLanguagePreference = languagePreference || 'auto';
+	if (resolvedLanguage) {
+		currentResolvedLanguage = resolvedLanguage;
+	}
+
+	if (window.languageManager && currentResolvedLanguage) {
+		window.languageManager.setLanguage(currentResolvedLanguage);
+	}
+
+	updateLanguageSelectionUI();
+}
+
+/**
+ * 重新載入工作區以套用最新語言
+ */
+function refreshWorkspaceForLanguage() {
+	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+	if (!workspace) {
+		return;
+	}
+
+	if (isLanguageSwitchReloading) {
+		return;
+	}
+
+	if (typeof workspace.isDragging === 'function' && workspace.isDragging()) {
+		if (!pendingLanguageReloadTimer) {
+			pendingLanguageReloadTimer = setTimeout(() => {
+				pendingLanguageReloadTimer = null;
+				refreshWorkspaceForLanguage();
+			}, 200);
+		}
+		return;
+	}
+
+	try {
+		isLanguageSwitchReloading = true;
+		const state = Blockly.serialization.workspaces.save(workspace);
+		const eventsWereEnabled = Blockly.Events?.isEnabled ? Blockly.Events.isEnabled() : false;
+
+		if (eventsWereEnabled && Blockly.Events?.disable) {
+			Blockly.Events.disable();
+		}
+
+		workspace.clear();
+		Blockly.serialization.workspaces.load(state, workspace);
+		rebuildPwmConfig(workspace);
+		workspace.render();
+
+		if (eventsWereEnabled && Blockly.Events?.enable) {
+			Blockly.Events.enable();
+		}
+	} catch (error) {
+		log.warn('語言切換後重載工作區失敗:', error);
+	} finally {
+		setTimeout(() => {
+			isLanguageSwitchReloading = false;
+		}, 0);
+	}
+}
+
+/**
+ * 處理語言選單點擊
+ */
+function handleLanguageSelection(languageCode) {
+	if (!languageCode) {
+		return;
+	}
+
+	if (languageCode === currentLanguagePreference) {
+		closeLanguageDropdown();
+		return;
+	}
+
+	if (languageCode !== 'auto') {
+		applyLanguageUpdate(languageCode, languageCode);
+	} else {
+		currentLanguagePreference = 'auto';
+		updateLanguageSelectionUI();
+	}
+
+	vscode.postMessage({
+		command: 'updateLanguage',
+		language: languageCode,
+	});
+
+	closeLanguageDropdown();
+}
+
+function openLanguageDropdown() {
+	const dropdown = document.getElementById('languageDropdown');
+	if (!dropdown) {
+		return;
+	}
+
+	closeBoardDropdown();
+
+	dropdown.classList.add('open');
+	dropdown.setAttribute('aria-hidden', 'false');
+	isLanguageDropdownOpen = true;
+
+	const toggleButton = document.getElementById('languageToggle');
+	if (toggleButton) {
+		toggleButton.setAttribute('aria-expanded', 'true');
+	}
+}
+
+function closeLanguageDropdown() {
+	const dropdown = document.getElementById('languageDropdown');
+	if (!dropdown) {
+		return;
+	}
+	dropdown.classList.remove('open');
+	dropdown.setAttribute('aria-hidden', 'true');
+	isLanguageDropdownOpen = false;
+
+	const toggleButton = document.getElementById('languageToggle');
+	if (toggleButton) {
+		toggleButton.setAttribute('aria-expanded', 'false');
+	}
+}
+
+function toggleLanguageDropdown() {
+	if (isLanguageDropdownOpen) {
+		closeLanguageDropdown();
+	} else {
+		openLanguageDropdown();
+	}
 }
 
 /**
@@ -363,6 +714,15 @@ function updateEditorUITexts() {
 		themeToggle.setAttribute('title', languageManager.getMessage('THEME_TOGGLE', '切換主題'));
 	}
 
+	// 更新語言切換按鈕title屬性
+	const languageToggle = document.getElementById('languageToggle');
+	if (languageToggle) {
+		languageToggle.setAttribute('title', languageManager.getMessage('LANGUAGE_SELECT_TOOLTIP', 'Select Language'));
+	}
+
+	// 更新語言下拉選單內容
+	populateLanguageDropdown();
+
 	// 更新選擇開發板標籤文字
 	const boardSelectLabel = document.getElementById('boardSelectLabel');
 	if (boardSelectLabel) {
@@ -371,7 +731,11 @@ function updateEditorUITexts() {
 	// 更新實驗積木提示文字
 	if (window.experimentalBlocksNotice) {
 		try {
-			window.experimentalBlocksNotice.updateTexts();
+			if (typeof window.experimentalBlocksNotice.updateTexts === 'function') {
+				window.experimentalBlocksNotice.updateTexts();
+			} else {
+				log.warn('[實驗積木] experimentalBlocksNotice.updateTexts 不是函式');
+			}
 		} catch (e) {
 			log.error('[實驗積木] 更新實驗積木提示文字時發生錯誤:', e);
 		}
@@ -387,27 +751,55 @@ function updateBackupModalTexts() {
 	if (!languageManager) {
 		log.warn('語言管理器尚未載入，無法更新備份管理視窗文字');
 		return;
-	} // 更新標題和按鈕
-	document.getElementById('backupModalTitle').textContent = languageManager.getMessage('BACKUP_MANAGER_TITLE', '備份管理');
-	document.getElementById('createBackupBtn').textContent = languageManager.getMessage('BACKUP_CREATE_NEW', '建立新備份');
-	document.getElementById('backupNameLabel').textContent = languageManager.getMessage('BACKUP_NAME_LABEL', '備份名稱：');
-	document.getElementById('backupName').placeholder = languageManager.getMessage('BACKUP_NAME_PLACEHOLDER', '輸入備份名稱');
-	document.getElementById('confirmBackupBtn').textContent = languageManager.getMessage('BACKUP_CONFIRM', '確認');
-	document.getElementById('cancelBackupBtn').textContent = languageManager.getMessage('BACKUP_CANCEL', '取消');
-	document.getElementById('backupListTitle').textContent = languageManager.getMessage('BACKUP_LIST_TITLE', '備份列表');
-	document.getElementById('emptyBackupMessage').textContent = languageManager.getMessage('BACKUP_LIST_EMPTY', '尚無備份');
+	}
+
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.textContent = value;
+		}
+	};
+
+	const setPlaceholder = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.placeholder = value;
+		}
+	};
+
+	const setTitle = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.title = value;
+		}
+	};
+
+	// 更新標題和按鈕
+	setText('backupModalTitle', languageManager.getMessage('BACKUP_MANAGER_TITLE', '備份管理'));
+	setText('createBackupBtn', languageManager.getMessage('BACKUP_CREATE_NEW', '建立新備份'));
+	setText('backupNameLabel', languageManager.getMessage('BACKUP_NAME_LABEL', '備份名稱：'));
+	setPlaceholder('backupName', languageManager.getMessage('BACKUP_NAME_PLACEHOLDER', '輸入備份名稱'));
+	setText('confirmBackupBtn', languageManager.getMessage('BACKUP_CONFIRM', '確認'));
+	setText('cancelBackupBtn', languageManager.getMessage('BACKUP_CANCEL', '取消'));
+	setText('backupListTitle', languageManager.getMessage('BACKUP_LIST_TITLE', '備份列表'));
+	setText('emptyBackupMessage', languageManager.getMessage('BACKUP_LIST_EMPTY', '尚無備份'));
+
 	// 更新自動備份區塊文字
-	document.getElementById('autoBackupIntervalLabel').textContent = languageManager.getMessage(
+	setText(
+		'autoBackupIntervalLabel',
+		languageManager.getMessage(
 		'AUTO_BACKUP_INTERVAL_LABEL',
 		'備份間隔時間：'
+		)
 	);
-	document.getElementById('autoBackupMinutesText').textContent = languageManager.getMessage('AUTO_BACKUP_MINUTES', '分鐘');
-	document.getElementById('saveAutoBackupBtn').textContent = languageManager.getMessage('AUTO_BACKUP_SAVE', '儲存設定');
+	setText('autoBackupMinutesText', languageManager.getMessage('AUTO_BACKUP_MINUTES', '分鐘'));
+	setText('saveAutoBackupBtn', languageManager.getMessage('AUTO_BACKUP_SAVE', '儲存設定'));
+
 	// 更新備份按鈕標題
-	document.getElementById('backupButton').title = languageManager.getMessage('BACKUP_BUTTON_TITLE', '備份管理');
+	setTitle('backupButton', languageManager.getMessage('BACKUP_BUTTON_TITLE', '備份管理'));
 
 	// 更新重新整理按鈕標題
-	document.getElementById('refreshButton').title = languageManager.getMessage('REFRESH_BUTTON_TITLE', '重新整理程式碼');
+	setTitle('refreshButton', languageManager.getMessage('REFRESH_BUTTON_TITLE', '重新整理程式碼'));
 }
 
 /**
@@ -419,22 +811,47 @@ function updateFunctionSearchModalTexts() {
 	if (!languageManager) {
 		log.warn('語言管理器尚未載入，無法更新積木搜尋視窗文字');
 		return;
-	} // 更新標題和按鈕
+	}
 
-	document.getElementById('functionSearchModalTitle').textContent = languageManager.getMessage('FUNCTION_SEARCH_TITLE', '搜尋積木');
-	document.getElementById('functionSearchInput').placeholder = languageManager.getMessage(
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.textContent = value;
+		}
+	};
+
+	const setPlaceholder = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.placeholder = value;
+		}
+	};
+
+	const setTitle = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.title = value;
+		}
+	};
+
+	// 更新標題和按鈕
+	setText('functionSearchModalTitle', languageManager.getMessage('FUNCTION_SEARCH_TITLE', '搜尋積木'));
+	setPlaceholder(
+		'functionSearchInput',
+		languageManager.getMessage(
 		'FUNCTION_SEARCH_PLACEHOLDER',
 		'輸入積木名稱或參數...'
+		)
 	);
 	// 不再設置按鈕文字，因為使用圖標
-	document.getElementById('prevResultBtn').textContent = languageManager.getMessage('FUNCTION_SEARCH_PREV', '上一個');
-	document.getElementById('nextResultBtn').textContent = languageManager.getMessage('FUNCTION_SEARCH_NEXT', '下一個');
-	document.getElementById('emptySearchMessage').textContent = languageManager.getMessage('FUNCTION_SEARCH_EMPTY', '尚未搜尋');
+	setText('prevResultBtn', languageManager.getMessage('FUNCTION_SEARCH_PREV', '上一個'));
+	setText('nextResultBtn', languageManager.getMessage('FUNCTION_SEARCH_NEXT', '下一個'));
+	setText('emptySearchMessage', languageManager.getMessage('FUNCTION_SEARCH_EMPTY', '尚未搜尋'));
 
 	// 更新搜尋按鈕標題，包含快捷鍵提示
 	const buttonTitle = languageManager.getMessage('FUNCTION_SEARCH_BUTTON_TITLE', '搜尋積木');
 	const shortcutTip = languageManager.getMessage('FUNCTION_KEYBOARD_SHORTCUT_TIP', '(快捷鍵: Ctrl+F)');
-	document.getElementById('functionSearchToggle').title = `${buttonTitle} ${shortcutTip}`;
+	setTitle('functionSearchToggle', `${buttonTitle} ${shortcutTip}`);
 }
 
 // 註冊工具箱元件
@@ -1207,6 +1624,26 @@ window.addEventListener('languageChanged', function (event) {
 	updateBackupModalTexts();
 	// 更新函式積木搜尋視窗的文字
 	updateFunctionSearchModalTexts();
+	// 更新語言選單文字（例如 Auto 標籤）
+	populateLanguageDropdown();
+
+	// 更新工具箱翻譯與分類標籤
+	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+	if (workspace) {
+		const boardSelect = document.getElementById('boardSelect');
+		const currentBoard = window.currentBoard || (boardSelect ? boardSelect.value : 'none');
+		updateToolboxForBoard(workspace, currentBoard)
+			.then(() => {
+				if (workspace.toolbox_) {
+					workspace.toolbox_.refreshSelection();
+				}
+			})
+			.catch(error => {
+				log.warn('語言切換後更新工具箱失敗:', error);
+			});
+	}
+	// 重新載入工作區以刷新積木文字
+	refreshWorkspaceForLanguage();
 	// 如果備份列表已顯示，更新其UI
 	if (document.getElementById('backupModal').style.display === 'block') {
 		// 刷新備份列表以更新按鈕文字
@@ -1222,8 +1659,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 動態生成開發板選項
 	populateBoardOptions();
-	// 註冊主題切換按鈕事件
+	// 動態生成語言選單
+	populateLanguageDropdown();
+	// Board dropdown toggle
+	const boardSelectToggle = document.getElementById('boardSelectToggle');
+	if (boardSelectToggle) {
+		boardSelectToggle.addEventListener('click', event => {
+			event.stopPropagation();
+			toggleBoardDropdown();
+		});
+	}
+	// Sync board dropdown UI on change
+	const boardSelect = document.getElementById('boardSelect');
+	if (boardSelect) {
+		boardSelect.addEventListener('change', () => updateBoardSelectionUI(boardSelect));
+	}
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+	// 註冊語言切換按鈕事件
+	const languageToggle = document.getElementById('languageToggle');
+	if (languageToggle) {
+		languageToggle.addEventListener('click', event => {
+			event.stopPropagation();
+			toggleLanguageDropdown();
+		});
+	}
+	// 點擊外部區域時關閉語言選單
+	document.addEventListener('click', event => {
+		const languageSwitch = document.querySelector('.language-switch');
+		if (isLanguageDropdownOpen && languageSwitch && !languageSwitch.contains(event.target)) {
+			closeLanguageDropdown();
+		}
+		const boardSelectWrapper = document.querySelector('.board-select');
+		if (isBoardDropdownOpen && boardSelectWrapper && !boardSelectWrapper.contains(event.target)) {
+			closeBoardDropdown();
+		}
+	});
+	// Esc 鍵關閉語言選單
+	document.addEventListener('keydown', event => {
+		if (event.key === 'Escape') {
+			if (isLanguageDropdownOpen) {
+				closeLanguageDropdown();
+			}
+			if (isBoardDropdownOpen) {
+				closeBoardDropdown();
+			}
+		}
+	});
 	// 註冊重新整理按鈕事件
 	document.getElementById('refreshButton').addEventListener('click', handleRefreshCode);
 
@@ -1255,7 +1736,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 初始化實驗積木提示
 	try {
 		if (window.experimentalBlocksNotice) {
-			window.experimentalBlocksNotice.init();
+			if (typeof window.experimentalBlocksNotice.init === 'function') {
+				window.experimentalBlocksNotice.init();
+			} else {
+				log.warn('[實驗積木] experimentalBlocksNotice.init 不是函式');
+			}
 		} else {
 			log.warn('[實驗積木] 實驗積木提示管理器未定義');
 		}
@@ -1264,7 +1749,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 	// 在初始化時先輸出一次實驗積木清單
 	log.info('初始化階段輸出實驗積木清單');
-	logExperimentalBlocks();
+	if (typeof window.logExperimentalBlocks === 'function') { window.logExperimentalBlocks(); }
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
 	const toolboxConfig = await response.json();
@@ -1480,7 +1965,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 				command: 'saveWorkspace',
 				state: state,
 				board: boardSelect.value,
-				theme: currentTheme, // 確保主題設定被保存
 			});
 		} catch (error) {
 			log.error('保存工作區狀態失敗:', error);
@@ -1532,12 +2016,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 			log.info('跳過保存：正在拖曳');
 			return true;
 		}
-		// 條件 2: 剪貼簿操作鎖定中
+		// 條件 2: 語言切換重載中
+		if (isLanguageSwitchReloading) {
+			log.info('跳過保存：語言切換重載中');
+			return true;
+		}
+		// 條件 3: 剪貼簿操作鎖定中
 		if (isClipboardOperationInProgress) {
 			log.info('跳過保存：剪貼簿操作鎖定中');
 			return true;
 		}
-		// 條件 3: 正在從 FileWatcher 載入
+		// 條件 4: 正在從 FileWatcher 載入
 		if (isLoadingFromFileWatcher) {
 			log.info('跳過保存：正在從 FileWatcher 載入');
 			return true;
@@ -1564,6 +2053,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					const boardSelect = document.getElementById('boardSelect');
 					if (boardSelect) {
 						boardSelect.value = pendingMessage.board;
+						updateBoardSelectionUI(boardSelect);
 						window.setCurrentBoard(pendingMessage.board);
 					}
 				}
@@ -1840,7 +2330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (event.type === Blockly.Events.FINISHED_LOADING) {
 			// 工作區載入完成時輸出實驗積木清單
 			log.info('工作區載入完成，輸出實驗積木清單');
-			logExperimentalBlocks();
+			if (typeof window.logExperimentalBlocks === 'function') { window.logExperimentalBlocks(); }
 
 			// 工作區載入完成後，自動更新實驗積木清單
 			log.info('工作區載入完成，更新實驗積木清單');
@@ -1848,7 +2338,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			// 檢查是否需要顯示實驗積木提示
 			setTimeout(() => {
-				experimentalBlocksNotice.checkAndShow();
+				window.experimentalBlocksNotice?.checkAndShow?.();
 			}, 1000);
 
 			// 收集工具箱中的實驗積木
@@ -1991,7 +2481,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				log.info(`注意: 變動的積木 "${blockType}" 已在實驗積木清單中`);
 
 				// 如果使用了實驗積木，顯示提示
-				experimentalBlocksNotice.checkAndShow();
+				window.experimentalBlocksNotice?.checkAndShow?.();
 			} else if (blockType && window.potentialExperimentalBlocks.includes(blockType)) {
 				log.info(`注意: 變動的積木 "${blockType}" 是潛在實驗積木，將在更新清單時檢查`);
 			} // 在積木創建或刪除後，更新實驗積木清單
@@ -2002,7 +2492,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					updateExperimentalBlocksList(workspace);
 
 					// 積木變動後檢查是否需要顯示實驗積木提示
-					window.experimentalBlocksNotice.checkAndShow();
+					window.experimentalBlocksNotice?.checkAndShow?.();
 
 					// 積木變動時也嘗試收集工具箱中的實驗積木
 					if (typeof window.collectExperimentalBlocksFromFlyout === 'function') {
@@ -2015,7 +2505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 輸出最新的實驗積木清單（僅非拖動時）
 			if (!isDraggingBlock) {
 				log.info('實驗積木清單檢查開始 >>>>>>');
-				logExperimentalBlocks();
+				if (typeof window.logExperimentalBlocks === 'function') { window.logExperimentalBlocks(); }
 				log.info('實驗積木清單檢查結束 <<<<<<');
 			}
 
@@ -2031,63 +2521,64 @@ document.addEventListener('DOMContentLoaded', async () => {
 	});
 
 	// 處理開發板選擇
-	const boardSelect = document.getElementById('boardSelect');
-	boardSelect.addEventListener('change', async event => {
-		const selectedBoard = event.target.value;
-		const previousBoard = window.currentBoard || 'none';
+	if (boardSelect) {
+			boardSelect.addEventListener('change', async event => {
+			const selectedBoard = event.target.value;
+			const previousBoard = window.currentBoard || 'none';
 
-		// 取得舊板子和新板子的語言類型
-		const previousConfig = window.BOARD_CONFIGS[previousBoard];
-		const newConfig = window.BOARD_CONFIGS[selectedBoard];
-		const previousLanguage = previousConfig?.language || 'arduino';
-		const newLanguage = newConfig?.language || 'arduino';
+			// 取得舊板子和新板子的語言類型
+			const previousConfig = window.BOARD_CONFIGS[previousBoard];
+			const newConfig = window.BOARD_CONFIGS[selectedBoard];
+			const previousLanguage = previousConfig?.language || 'arduino';
+			const newLanguage = newConfig?.language || 'arduino';
 
-		// 檢測語言類型是否變更（arduino ↔ micropython）
-		const isLanguageChanging = previousLanguage !== newLanguage;
+			// 檢測語言類型是否變更（arduino ↔ micropython）
+			const isLanguageChanging = previousLanguage !== newLanguage;
 
-		// 檢查工作區是否為空
-		const workspaceState = Blockly.serialization.workspaces.save(workspace);
-		const hasBlocks = workspaceState?.blocks?.blocks && workspaceState.blocks.blocks.length > 0;
+			// 檢查工作區是否為空
+			const workspaceState = Blockly.serialization.workspaces.save(workspace);
+			const hasBlocks = workspaceState?.blocks?.blocks && workspaceState.blocks.blocks.length > 0;
 
-		// 標記是否需要強制儲存（當工作區被清空後）
-		let forceEmptySave = false;
+			// 標記是否需要強制儲存（當工作區被清空後）
+			let forceEmptySave = false;
 
-		// 如果語言變更且工作區非空，顯示確認對話框
-		if (isLanguageChanging && hasBlocks) {
-			log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區非空，顯示確認對話框`);
+			// 如果語言變更且工作區非空，顯示確認對話框
+			if (isLanguageChanging && hasBlocks) {
+				log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區非空，顯示確認對話框`);
 
-			// 構建確認訊息
-			const warningTitle = window.languageManager
-				? window.languageManager.getMessage('BOARD_SWITCH_WARNING_TITLE', '切換開發板類型')
-				: '切換開發板類型';
-			const warningMessage = window.languageManager
-				? window.languageManager.getMessage(
-						'BOARD_SWITCH_WARNING_MESSAGE',
-						'切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？'
-				  )
-				: '切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？';
+				// 構建確認訊息
+				const warningTitle = window.languageManager
+					? window.languageManager.getMessage('BOARD_SWITCH_WARNING_TITLE', '切換開發板類型')
+					: '切換開發板類型';
+				const warningMessage = window.languageManager
+					? window.languageManager.getMessage(
+							'BOARD_SWITCH_WARNING_MESSAGE',
+							'切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？'
+					  )
+					: '切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？';
 
-			// 使用非同步確認對話框（VSCode 原生 API）
-			const confirmed = await showAsyncConfirm(`${warningTitle}\n\n${warningMessage}`);
+				// 使用非同步確認對話框（VSCode 原生 API）
+				const confirmed = await showAsyncConfirm(`${warningTitle}\n\n${warningMessage}`);
 
-			if (!confirmed) {
-				// 用戶取消，恢復原來的板子選擇
-				log.info('[blockly] 用戶取消切換，恢復原板子選擇');
-				boardSelect.value = previousBoard;
-				return;
-			}
+				if (!confirmed) {
+					// 用戶取消，恢復原來的板子選擇
+					log.info('[blockly] 用戶取消切換，恢復原板子選擇');
+					boardSelect.value = previousBoard;
+					updateBoardSelectionUI(boardSelect);
+					return;
+				}
 
-			// 用戶確認，執行自動備份
-			log.info('[blockly] 用戶確認切換，執行自動備份');
-			const backupName = quickBackup.generateBackupName();
-			vscode.postMessage({
-				command: 'createBackup',
-				name: backupName,
-				state: workspaceState,
-				board: previousBoard,
-				theme: currentTheme,
-				isQuickBackup: true,
-			});
+				// 用戶確認，執行自動備份
+				log.info('[blockly] 用戶確認切換，執行自動備份');
+				const backupName = quickBackup.generateBackupName();
+				vscode.postMessage({
+					command: 'createBackup',
+					name: backupName,
+					state: workspaceState,
+					board: previousBoard,
+					theme: currentTheme,
+					isQuickBackup: true,
+				});
 
 			// 顯示備份成功 Toast
 			const backupSuccessTemplate = window.languageManager
@@ -2141,12 +2632,172 @@ document.addEventListener('DOMContentLoaded', async () => {
 				command: 'saveWorkspace',
 				state: emptyState,
 				board: selectedBoard,
-				theme: currentTheme,
 			});
 		} else {
 			saveWorkspaceState();
 		}
 	});
+	}
+
+	const handleWorkspaceLoadMessage = async message => {
+		const workspace = Blockly.getMainWorkspace();
+		if (!workspace) {
+			log.warn('找不到主工作區，無法載入狀態');
+			return;
+		}
+
+		try {
+			// 如果是 FileWatcher 觸發的重載，設置鎖定標記防止無限循環
+			const isFromFileWatcher = message.source === 'fileWatcher';
+			const workspaceState = message.state || message.workspace;
+
+			// T008: 如果是 FileWatcher 觸發且正在拖曳，延遲執行重載
+			if (isFromFileWatcher && isCurrentlyDragging()) {
+				log.info('[FileWatcher] 偵測到拖曳中，延遲重載請求');
+				pendingReloadFromFileWatcher = {
+					state: workspaceState,
+					board: message.board,
+					theme: message.theme,
+				};
+				return; // 提前返回，等待拖曳結束後執行
+			}
+
+			if (isFromFileWatcher) {
+				isLoadingFromFileWatcher = true;
+				log.info('FileWatcher 觸發的工作區重載，暫停保存操作');
+			}
+
+			if (message.board) {
+				// 取得當前板子以比較是否實際變更
+				const previousBoard = boardSelect.value;
+				// 先設定板子類型
+				boardSelect.value = message.board;
+				updateBoardSelectionUI(boardSelect);
+				window.setCurrentBoard(message.board);
+				// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
+				await updateToolboxForBoard(workspace, message.board);
+				// 只有當板子實際變更時才發送 updateBoard 訊息
+				// 避免載入工作區時誤觸發 PlatformIO 重新檢查
+				if (previousBoard !== message.board) {
+					log.info(`開發板從 ${previousBoard} 變更為 ${message.board}，發送更新訊息`);
+					vscode.postMessage({
+						command: 'updateBoard',
+						board: message.board,
+					});
+				}
+
+				// CyberBrick 專案載入時，確保刪除 platformio.ini 避免衝突
+				const boardConfig = window.BOARD_CONFIGS[message.board];
+				if (boardConfig?.language === 'micropython') {
+					log.info('[blockly] 載入 MicroPython 專案，檢查並刪除 platformio.ini');
+					vscode.postMessage({ command: 'deletePlatformioIni' });
+				}
+			}
+
+			// 載入主題設定
+			if (message.theme) {
+				currentTheme = message.theme;
+				updateTheme(currentTheme);
+			}
+
+			if (workspaceState) {
+				// 儲存函數名稱以用於追蹤變更
+				const preSaveFunctionNames = new Map();
+				try {
+					// 先取得工作區中的函數名稱以進行比較
+					workspace.getBlocksByType('arduino_function', false).forEach(block => {
+						const name = block.getFieldValue('NAME');
+						if (name) {
+							preSaveFunctionNames.set(block.id, name);
+						}
+					});
+				} catch (e) {
+					log.info('取得現有函數名稱失敗', e);
+				}
+
+				// 然後再載入工作區內容
+				Blockly.serialization.workspaces.load(workspaceState, workspace);
+
+				// 重建 ESP32 PWM 配置
+				rebuildPwmConfig(workspace);
+
+				// 工作區載入後，立即修復函數名稱關聯
+				setTimeout(() => {
+					log.info('工作區載入完成，修復函數名稱關聯');
+
+					// 取得所有函數積木
+					const functionBlocks = workspace.getBlocksByType('arduino_function', false);
+
+					// 記錄函數定義的名稱變更
+					const functionNameChanges = new Map();
+					functionBlocks.forEach(block => {
+						const oldName = preSaveFunctionNames.get(block.id);
+						const newName = block.getFieldValue('NAME');
+						if (oldName && newName && oldName !== newName) {
+							log.info(`檢測到函數名稱變更: ${oldName} -> ${newName}`);
+							functionNameChanges.set(oldName, newName);
+
+							// 將新名稱保存到 oldName_ 屬性中，以便後續修改名稱時能正確比較
+							block.oldName_ = newName;
+						}
+					});
+
+					// 應用名稱變更到所有函數呼叫積木
+					if (functionNameChanges.size > 0) {
+						const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
+						callBlocks.forEach(block => {
+							const currentName = block.getFieldValue('NAME');
+							const newName = functionNameChanges.get(currentName);
+							if (newName) {
+								log.info(`更新函數呼叫積木名稱: ${currentName} -> ${newName}`);
+
+								// 更新名稱
+								const nameField = block.getField('NAME');
+								if (nameField) {
+									nameField.setValue(newName);
+								}
+							}
+						});
+					}
+
+					// 強制更新所有函數呼叫積木
+					const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
+					callBlocks.forEach(callBlock => {
+						try {
+							log.info(`更新函數呼叫積木: ${callBlock.getFieldValue('NAME')}`);
+							callBlock.updateFromFunctionBlock_();
+						} catch (err) {
+							log.error('更新函數呼叫積木失敗:', err);
+						}
+					});
+
+					// 更新程式碼
+					try {
+						const code = generateCode(workspace);
+						vscode.postMessage({
+							command: 'updateCode',
+							code: code,
+							language: window.currentProgrammingLanguage,
+						});
+					} catch (err) {
+						log.warn('更新程式碼失敗:', err);
+					}
+				}, 300);
+			}
+
+			// 如果是 FileWatcher 觸發的重載，延遲後重置鎖定標記
+			if (isFromFileWatcher) {
+				setTimeout(() => {
+					isLoadingFromFileWatcher = false;
+					log.info('FileWatcher 重載完成，恢復保存操作');
+				}, 1500); // 給足夠時間讓所有事件處理完成
+			}
+		} catch (error) {
+			log.error('載入工作區狀態失敗:', error);
+			// 發生錯誤時也要重置鎖定標記
+			isLoadingFromFileWatcher = false;
+		}
+	};
 
 	// 監聽來自擴充功能的訊息
 	window.addEventListener('message', async event => {
@@ -2275,156 +2926,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 					});
 				}
 				break;
+			case 'init':
+				await handleWorkspaceLoadMessage(message);
+				applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
+				break;
+			case 'languageUpdated':
+				applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
+				break;
 			case 'loadWorkspace':
-				try {
-					// 如果是 FileWatcher 觸發的重載，設置鎖定標記防止無限循環
-					const isFromFileWatcher = message.source === 'fileWatcher';
-
-					// T008: 如果是 FileWatcher 觸發且正在拖曳，延遲執行重載
-					if (isFromFileWatcher && isCurrentlyDragging()) {
-						log.info('[FileWatcher] 偵測到拖曳中，延遲重載請求');
-						pendingReloadFromFileWatcher = {
-							state: message.state,
-							board: message.board,
-							theme: message.theme,
-						};
-						return; // 提前返回，等待拖曳結束後執行
-					}
-
-					if (isFromFileWatcher) {
-						isLoadingFromFileWatcher = true;
-						log.info('FileWatcher 觸發的工作區重載，暫停保存操作');
-					}
-
-					if (message.board) {
-						// 取得當前板子以比較是否實際變更
-						const previousBoard = boardSelect.value;
-						// 先設定板子類型
-						boardSelect.value = message.board;
-						window.setCurrentBoard(message.board);
-						// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
-						await updateToolboxForBoard(workspace, message.board);
-						// 只有當板子實際變更時才發送 updateBoard 訊息
-						// 避免載入工作區時誤觸發 PlatformIO 重新檢查
-						if (previousBoard !== message.board) {
-							log.info(`開發板從 ${previousBoard} 變更為 ${message.board}，發送更新訊息`);
-							vscode.postMessage({
-								command: 'updateBoard',
-								board: message.board,
-							});
-						}
-
-						// CyberBrick 專案載入時，確保刪除 platformio.ini 避免衝突
-						const boardConfig = window.BOARD_CONFIGS[message.board];
-						if (boardConfig?.language === 'micropython') {
-							log.info('[blockly] 載入 MicroPython 專案，檢查並刪除 platformio.ini');
-							vscode.postMessage({ command: 'deletePlatformioIni' });
-						}
-					}
-
-					// 載入主題設定
-					if (message.theme) {
-						currentTheme = message.theme;
-						updateTheme(currentTheme);
-					}
-
-					if (message.state) {
-						// 儲存函數名稱以用於追蹤變更
-						const preSaveFunctionNames = new Map();
-						try {
-							// 先取得工作區中的函數名稱以進行比較
-							workspace.getBlocksByType('arduino_function', false).forEach(block => {
-								const name = block.getFieldValue('NAME');
-								if (name) {
-									preSaveFunctionNames.set(block.id, name);
-								}
-							});
-						} catch (e) {
-							log.info('取得現有函數名稱失敗', e);
-						}
-
-						// 然後再載入工作區內容
-						Blockly.serialization.workspaces.load(message.state, workspace);
-
-						// 重建 ESP32 PWM 配置
-						rebuildPwmConfig(workspace);
-
-						// 工作區載入後，立即修復函數名稱關聯
-						setTimeout(() => {
-							log.info('工作區載入完成，修復函數名稱關聯');
-
-							// 取得所有函數積木
-							const functionBlocks = workspace.getBlocksByType('arduino_function', false);
-
-							// 記錄函數定義的名稱變更
-							const functionNameChanges = new Map();
-							functionBlocks.forEach(block => {
-								const oldName = preSaveFunctionNames.get(block.id);
-								const newName = block.getFieldValue('NAME');
-								if (oldName && newName && oldName !== newName) {
-									log.info(`檢測到函數名稱變更: ${oldName} -> ${newName}`);
-									functionNameChanges.set(oldName, newName);
-
-									// 將新名稱保存到 oldName_ 屬性中，以便後續修改名稱時能正確比較
-									block.oldName_ = newName;
-								}
-							});
-
-							// 應用名稱變更到所有函數呼叫積木
-							if (functionNameChanges.size > 0) {
-								const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
-								callBlocks.forEach(block => {
-									const currentName = block.getFieldValue('NAME');
-									const newName = functionNameChanges.get(currentName);
-									if (newName) {
-										log.info(`更新函數呼叫積木名稱: ${currentName} -> ${newName}`);
-
-										// 更新名稱
-										const nameField = block.getField('NAME');
-										if (nameField) {
-											nameField.setValue(newName);
-										}
-									}
-								});
-							}
-
-							// 強制更新所有函數呼叫積木
-							const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
-							callBlocks.forEach(callBlock => {
-								try {
-									log.info(`更新函數呼叫積木: ${callBlock.getFieldValue('NAME')}`);
-									callBlock.updateFromFunctionBlock_();
-								} catch (err) {
-									log.error('更新函數呼叫積木失敗:', err);
-								}
-							});
-
-							// 更新程式碼
-							try {
-								const code = generateCode(workspace);
-								vscode.postMessage({
-									command: 'updateCode',
-									code: code,
-									language: window.currentProgrammingLanguage,
-								});
-							} catch (err) {
-								log.warn('更新程式碼失敗:', err);
-							}
-						}, 300);
-					}
-
-					// 如果是 FileWatcher 觸發的重載，延遲後重置鎖定標記
-					if (isFromFileWatcher) {
-						setTimeout(() => {
-							isLoadingFromFileWatcher = false;
-							log.info('FileWatcher 重載完成，恢復保存操作');
-						}, 1500); // 給足夠時間讓所有事件處理完成
-					}
-				} catch (error) {
-					log.error('載入工作區狀態失敗:', error);
-					// 發生錯誤時也要重置鎖定標記
-					isLoadingFromFileWatcher = false;
-				}
+				await handleWorkspaceLoadMessage(message);
 				break;
 			case 'setTheme':
 				// 直接從 VSCode 設定主題
@@ -2512,7 +3022,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 					command: 'saveWorkspace',
 					state: state,
 					board: boardSelect.value,
-					theme: currentTheme, // 確保在整理方塊後也保存主題設定
 				});
 				log.info('方塊整理完成，已儲存工作區狀態');
 			}, 300);
@@ -3247,3 +3756,4 @@ function updateEsp32BlockWarnings(workspace, isESP32Board) {
 		}
 	});
 }
+

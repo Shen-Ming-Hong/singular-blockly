@@ -14,6 +14,8 @@ window.languageManager.loadMessages('bg', {
 	BLOCKS_TAB: 'Блокове',
 	CODE_TAB: 'Код',
 	BOARD_SELECT_LABEL: 'Избор на платка:',
+	LANGUAGE_SELECT_TOOLTIP: 'Изберете език',
+	LANGUAGE_AUTO: 'Автоматично (следва VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Открити са експериментални блокове',
@@ -882,3 +884,4 @@ window.languageManager.loadMessages('bg', {
 	RC_IS_CONNECTED: 'RC свързан?',
 	RC_IS_CONNECTED_TOOLTIP: 'Провери дали са получени данни за 500мс',
 });
+

@@ -26,8 +26,8 @@
 
 **Purpose**: 專案初始化和基本結構
 
-- [ ] T001 [P] 在 src/types/language.ts 新增語言相關類型定義（SupportedLanguageCode, LanguageOption）
-- [ ] T002 [P] 在 src/services/settingsManager.ts 新增語言設定常數 VALID_LANGUAGES 陣列
+- [x] T001 [P] 在 src/types/language.ts 新增語言相關類型定義（SupportedLanguageCode, LanguageOption）
+- [x] T002 [P] 在 src/services/settingsManager.ts 新增語言設定常數 VALID_LANGUAGES 陣列
 
 ---
 
@@ -37,10 +37,10 @@
 
 **⚠️ CRITICAL**: 必須先完成此階段，才能開始任何使用者故事
 
-- [ ] T003 在 src/services/settingsManager.ts 實作 getLanguage() 方法
-- [ ] T004 在 src/services/settingsManager.ts 實作 updateLanguage() 方法
-- [ ] T005 在 src/services/settingsManager.ts 實作 resolveLanguage() 方法（處理 "auto" 對應）
-- [ ] T006 [P] 在 src/test/services/settingsManager.test.ts 新增語言設定相關單元測試
+- [x] T003 在 src/services/settingsManager.ts 實作 getLanguage() 方法
+- [x] T004 在 src/services/settingsManager.ts 實作 updateLanguage() 方法
+- [x] T005 在 src/services/settingsManager.ts 實作 resolveLanguage() 方法（處理 "auto" 對應）
+- [x] T006 [P] 在 src/test/services/settingsManager.test.ts 新增語言設定相關單元測試
 
 **Checkpoint**: 基礎設施完成 — 可以開始使用者故事實作
 
@@ -56,26 +56,26 @@
 
 #### Extension Host 部分
 
-- [ ] T007 [US1] 在 src/webview/messageHandler.ts 新增 handleUpdateLanguage() 處理 WebView 語言更新請求
-- [ ] T008 [US1] 在 src/webview/messageHandler.ts 的 switch-case 中註冊 'updateLanguage' 訊息處理
-- [ ] T009 [US1] 在 src/webview/webviewManager.ts 修改 init 訊息，加入 languagePreference 和 resolvedLanguage 欄位
+- [x] T007 [US1] 在 src/webview/messageHandler.ts 新增 handleUpdateLanguage() 處理 WebView 語言更新請求
+- [x] T008 [US1] 在 src/webview/messageHandler.ts 的 switch-case 中註冊 'updateLanguage' 訊息處理
+- [x] T009 [US1] 在 src/webview/webviewManager.ts 修改 init 訊息，加入 languagePreference 和 resolvedLanguage 欄位
 
 #### WebView UI 部分
 
-- [ ] T010 [P] [US1] 在 media/html/blocklyEdit.html 控制列新增語言按鈕 HTML 結構（位於開發板選單之後、主題按鈕之前）
-- [ ] T011 [P] [US1] 在 media/css/blocklyEdit.css 新增語言按鈕和下拉選單樣式（32x32px 圓形按鈕、深淺色主題支援）
-- [ ] T012 [US1] 在 media/js/blocklyEdit.js 新增語言選擇器互動邏輯（點擊展開/收合選單）
-- [ ] T013 [US1] 在 media/js/blocklyEdit.js 實作 populateLanguageDropdown() 函數（生成 16 個語言選項）
-- [ ] T014 [US1] 在 media/js/blocklyEdit.js 實作語言切換邏輯（呼叫 window.languageManager.setLanguage() 並發送 updateLanguage 訊息）
-- [ ] T015 [US1] 在 media/js/blocklyEdit.js 處理 languageUpdated 訊息，更新 UI 當前選擇標記
+- [x] T010 [P] [US1] 在 media/html/blocklyEdit.html 控制列新增語言按鈕 HTML 結構（位於開發板選單之後、主題按鈕之前）
+- [x] T011 [P] [US1] 在 media/css/blocklyEdit.css 新增語言按鈕和下拉選單樣式（32x32px 圓形按鈕、深淺色主題支援）
+- [x] T012 [US1] 在 media/js/blocklyEdit.js 新增語言選擇器互動邏輯（點擊展開/收合選單）
+- [x] T013 [US1] 在 media/js/blocklyEdit.js 實作 populateLanguageDropdown() 函數（生成 16 個語言選項）
+- [x] T014 [US1] 在 media/js/blocklyEdit.js 實作語言切換邏輯（呼叫 window.languageManager.setLanguage() 並發送 updateLanguage 訊息）
+- [x] T015 [US1] 在 media/js/blocklyEdit.js 處理 languageUpdated 訊息，更新 UI 當前選擇標記
 
 #### i18n 部分
 
-- [ ] T016 [P] [US1] 在 media/locales/en/messages.js 新增 LANGUAGE_SELECT_TOOLTIP 和 LANGUAGE_AUTO 鍵
-- [ ] T017 [P] [US1] 在 media/locales/zh-hant/messages.js 新增語言選擇器 i18n 翻譯
-- [ ] T018a [P] [US1] 在東亞語言 messages.js 新增語言選擇器翻譯（ja, ko）
-- [ ] T018b [P] [US1] 在歐洲語言 messages.js 新增語言選擇器翻譯（es, fr, de, it, pt-br）
-- [ ] T018c [P] [US1] 在其他語言 messages.js 新增語言選擇器翻譯（ru, pl, hu, cs, bg, tr）
+- [x] T016 [P] [US1] 在 media/locales/en/messages.js 新增 LANGUAGE_SELECT_TOOLTIP 和 LANGUAGE_AUTO 鍵
+- [x] T017 [P] [US1] 在 media/locales/zh-hant/messages.js 新增語言選擇器 i18n 翻譯
+- [x] T018a [P] [US1] 在東亞語言 messages.js 新增語言選擇器翻譯（ja, ko）
+- [x] T018b [P] [US1] 在歐洲語言 messages.js 新增語言選擇器翻譯（es, fr, de, it, pt-br）
+- [x] T018c [P] [US1] 在其他語言 messages.js 新增語言選擇器翻譯（ru, pl, hu, cs, bg, tr）
 
 **Checkpoint**: User Story 1 完成 — 語言切換功能可獨立測試
 
@@ -89,10 +89,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] 在 src/webview/messageHandler.ts 修改 handleSaveWorkspace()，儲存時移除 theme 欄位
-- [ ] T020 [US2] 在 src/webview/messageHandler.ts 新增 migrateThemeFromMainJson() 函數（一次性遷移舊資料）
-- [ ] T021 [US2] 在 src/webview/messageHandler.ts 的載入邏輯中加入 theme 遷移檢查
-- [ ] T022 [US2] 在 media/js/blocklyEdit.js 修改 saveWorkspace() 函數，移除 theme 欄位
+- [x] T019 [US2] 在 src/webview/messageHandler.ts 修改 handleSaveWorkspace()，儲存時移除 theme 欄位
+- [x] T020 [US2] 在 src/webview/messageHandler.ts 新增 migrateThemeFromMainJson() 函數（一次性遷移舊資料）
+- [x] T021 [US2] 在 src/webview/messageHandler.ts 的載入邏輯中加入 theme 遷移檢查
+- [x] T022 [US2] 在 media/js/blocklyEdit.js 修改 saveWorkspace() 函數，移除 theme 欄位
 
 **Checkpoint**: User Story 2 完成 — 設定儲存位置統一可獨立驗證
 
@@ -106,9 +106,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] 在 media/css/blocklyEdit.css 優化下拉選單動畫效果（展開/收合過渡）
-- [ ] T024 [US3] 在 media/js/blocklyEdit.js 新增點擊選單外收合功能（document click 事件監聽）
-- [ ] T025 [US3] 在 media/js/blocklyEdit.js 優化鍵盤可及性（Escape 鍵收合選單）
+- [x] T023 [US3] 在 media/css/blocklyEdit.css 優化下拉選單動畫效果（展開/收合過渡）
+- [x] T024 [US3] 在 media/js/blocklyEdit.js 新增點擊選單外收合功能（document click 事件監聽）
+- [x] T025 [US3] 在 media/js/blocklyEdit.js 優化鍵盤可及性（Escape 鍵收合選單）
 
 **Checkpoint**: User Story 3 完成 — UI 體驗優化可獨立驗證
 
@@ -118,10 +118,10 @@
 
 **Purpose**: 影響多個使用者故事的改進
 
-- [ ] T026 [P] 執行 npm run validate:i18n 確認所有 15 種語言翻譯完整
-- [ ] T027 [P] 更新 docs/specifications/06-features/ 相關文件（如有需要）
-- [ ] T028 執行 quickstart.md 驗證清單，確認所有功能正常運作
-- [ ] T029 [P] 程式碼清理和 ESLint 修正
+- [x] T026 [P] 執行 npm run validate:i18n 確認所有 15 種語言翻譯完整
+- [x] T027 [P] 更新 docs/specifications/06-features/ 相關文件（如有需要）
+- [x] T028 執行 quickstart.md 驗證清單，確認所有功能正常運作
+- [x] T029 [P] 程式碼清理和 ESLint 修正
 
 ---
 

@@ -14,6 +14,8 @@ window.languageManager.loadMessages('ru', {
 	BLOCKS_TAB: 'Блоки',
 	CODE_TAB: 'Код',
 	BOARD_SELECT_LABEL: 'Выберите плату:',
+	LANGUAGE_SELECT_TOOLTIP: 'Выбрать язык',
+	LANGUAGE_AUTO: 'Авто (следовать VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Обнаружены экспериментальные блоки',
@@ -877,3 +879,4 @@ window.languageManager.loadMessages('ru', {
 	RC_IS_CONNECTED: 'RC подключён?',
 	RC_IS_CONNECTED_TOOLTIP: 'Проверить получены ли данные за 500мс',
 });
+
