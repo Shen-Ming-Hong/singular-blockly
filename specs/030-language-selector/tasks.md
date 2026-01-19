@@ -73,7 +73,9 @@
 
 - [ ] T016 [P] [US1] 在 media/locales/en/messages.js 新增 LANGUAGE_SELECT_TOOLTIP 和 LANGUAGE_AUTO 鍵
 - [ ] T017 [P] [US1] 在 media/locales/zh-hant/messages.js 新增語言選擇器 i18n 翻譯
-- [ ] T018 [P] [US1] 在其餘 13 個語言的 messages.js 新增語言選擇器 i18n 翻譯（ja, ko, es, fr, de, it, pt-br, ru, pl, hu, cs, bg, tr）
+- [ ] T018a [P] [US1] 在東亞語言 messages.js 新增語言選擇器翻譯（ja, ko）
+- [ ] T018b [P] [US1] 在歐洲語言 messages.js 新增語言選擇器翻譯（es, fr, de, it, pt-br）
+- [ ] T018c [P] [US1] 在其他語言 messages.js 新增語言選擇器翻譯（ru, pl, hu, cs, bg, tr）
 
 **Checkpoint**: User Story 1 完成 — 語言切換功能可獨立測試
 
@@ -188,7 +190,9 @@ Task: T012 → T013 → T014 → T015
 # i18n 部分（全部可並行，且可與上述並行）
 Task: T016 英文翻譯
 Task: T017 繁體中文翻譯
-Task: T018 其餘 13 語言翻譯
+Task: T018a 東亞語言翻譯 (ja, ko)
+Task: T018b 歐洲語言翻譯 (es, fr, de, it, pt-br)
+Task: T018c 其他語言翻譯 (ru, pl, hu, cs, bg, tr)
 ```
 
 ---
@@ -213,7 +217,7 @@ Task: T018 其餘 13 語言翻譯
 
 ### Suggested MVP Scope
 
-- **最小可行產品**: Phase 1 + Phase 2 + Phase 3 (共 18 個任務)
+- **最小可行產品**: Phase 1 + Phase 2 + Phase 3 (共 20 個任務)
 - **預估時間**: 4-6 小時（依 quickstart.md）
 - **可交付成果**: 完整的語言切換功能，但不含設定遷移和 UI 優化
 

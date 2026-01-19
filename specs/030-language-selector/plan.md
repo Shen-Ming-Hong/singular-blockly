@@ -59,9 +59,11 @@ specs/030-language-selector/
 # VS Code Extension (Two-Context Architecture)
 src/
 ├── extension.ts              # 擴充功能進入點
+├── types/
+│   └── language.ts           # 【新增】語言相關類型定義 (SupportedLanguageCode, LanguageOption)
 ├── services/
-│   ├── localeService.ts      # 【修改】新增語言偏好管理方法
-│   └── settingsManager.ts    # 【修改】新增語言設定存取方法
+│   ├── localeService.ts      # 【修改】語言解析邏輯（resolveLanguage 呼叫此服務取得 VS Code 語言）
+│   └── settingsManager.ts    # 【修改】語言設定存取方法（getLanguage/updateLanguage 讀寫 settings.json）
 ├── webview/
 │   ├── webviewManager.ts     # 【修改】傳遞語言設定到 WebView
 │   └── messageHandler.ts     # 【修改】移除 main.json 中的 theme 欄位
