@@ -8,6 +8,30 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.54.0] - 2026-01-19
+
+### 新增功能 Added
+
+-   **編輯器語言選擇器** (In-editor Language Selector)
+
+    -   工具列地球圖示提供語言下拉選單，立即更新 UI
+        Toolbar globe menu provides a language dropdown with instant UI updates
+    -   Auto 模式跟隨 VS Code 顯示語言
+        Auto mode follows VS Code display language
+    -   語言與開發板下拉選單樣式一致化
+        Unified styling for language and board dropdowns
+
+### 修復 Fixed
+
+-   **WebView 訊息處理穩定性** (WebView Message Handling Stability)
+
+    -   補齊變數建立/刪除/確認對話框處理
+        Restored variable create/delete/confirm dialog handling
+    -   board=none 時不再等待開發板設定請求
+        Avoids waiting for board config when board=none
+    -   FileWatcher reload 正確取得工作區路徑
+        FileWatcher reload now resolves workspace root correctly
+
 ## [0.53.0] - 2026-01-16
 
 ### 新增功能 Added
