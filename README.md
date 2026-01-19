@@ -14,43 +14,50 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 
 ## 📑 Table of Contents
 
--   [Core Dependencies](#core-dependencies)
--   [Features](#features)
--   [Installation](#installation)
--   [Requirements](#requirements)
--   [Quick Start](#quick-start)
--   [Examples & Projects](#-examples--projects)
--   [Usage](#usage)
--   [Block Categories](#block-categories)
--   [Supported Boards and Platforms](#supported-boards-and-platforms)
--   [Extension Settings](#extension-settings)
--   [Known Issues](#known-issues)
--   [License](#license)
--   [Contributing](#contributing)
+- [Core Dependencies](#core-dependencies)
+- [Features](#features)
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+- [Examples & Projects](#-examples--projects)
+- [Usage](#usage)
+- [Block Categories](#block-categories)
+- [Supported Boards and Platforms](#supported-boards-and-platforms)
+- [Extension Settings](#extension-settings)
+- [Known Issues](#known-issues)
+- [License](#license)
+- [Contributing](#contributing)
 
 ---
 
 ## Core Dependencies
 
--   **Blockly**: 12.3.1 - Visual programming library
--   **@blockly/theme-modern**: 7.0.1 - Modern theme with darker borders
--   **Node.js**: 22.16.0+ required
--   **VS Code**: 1.105.0+ required
+- **Blockly**: 12.3.1 - Visual programming library
+- **@blockly/theme-modern**: 7.0.1 - Modern theme with darker borders
+- **Node.js**: 22.16.0+ required
+- **VS Code**: 1.105.0+ required
 
 ## Features
 
 ### 🎯 Multi-Board Support
 
--   Arduino Uno, Nano, Mega
--   ESP32 Dev Module
--   Super Mini (Lolin C3 Mini)
--   **🆕 CyberBrick** (ESP32-C3, MicroPython)
+- Arduino Uno, Nano, Mega
+- ESP32 Dev Module
+- Super Mini (Lolin C3 Mini)
+- **🆕 CyberBrick** (ESP32-C3, MicroPython)
 
 ### 🌐 Internationalization
 
--   **15 Languages** with 98.94% average coverage
--   Automatic language detection
--   Multi-language block search UI
+- **15 Languages** with 98.94% average coverage
+- Automatic language detection (follows VS Code's display language)
+- Multi-language block search UI
+
+**Change Language:**
+
+1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+2. Type "Configure Display Language"
+3. Select your preferred language
+4. VS Code will restart and Blockly will follow
 
 <details>
 <summary><b>📊 Supported Languages Coverage</b></summary>
@@ -77,47 +84,47 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 
 **Quality Assurance**:
 
--   ✅ Automated validation (placeholders, encoding, consistency)
--   ✅ Direct translation pattern detection
--   ✅ Monthly CI/CD quality audits
--   📚 [Localization Quickstart Guide](specs/002-i18n-localization-review/quickstart.md)
+- ✅ Automated validation (placeholders, encoding, consistency)
+- ✅ Direct translation pattern detection
+- ✅ Monthly CI/CD quality audits
+- 📚 [Localization Quickstart Guide](specs/002-i18n-localization-review/quickstart.md)
 
 ### 💾 Workspace Management
 
--   Automatic state saving and project persistence
--   Board configuration management
--   Arduino code generation (.cpp files)
--   **🆕 MicroPython code generation** (CyberBrick)
--   Automatic PlatformIO configuration
--   **Project Safety Guard** 🛡️
-    -   Smart project type detection (Node.js, Python, Java, etc.)
-    -   Warning dialog to prevent accidental modifications
-    -   Workspace-level preference memory
--   **Comprehensive Backup System**
-    -   Timestamped backups with preview
-    -   Safe restoration with temporary backups
-    -   Auto-backup with configurable intervals
-    -   Modern responsive UI
+- Automatic state saving and project persistence
+- Board configuration management
+- Arduino code generation (.cpp files)
+- **🆕 MicroPython code generation** (CyberBrick)
+- Automatic PlatformIO configuration
+- **Project Safety Guard** 🛡️
+    - Smart project type detection (Node.js, Python, Java, etc.)
+    - Warning dialog to prevent accidental modifications
+    - Workspace-level preference memory
+- **Comprehensive Backup System**
+    - Timestamped backups with preview
+    - Safe restoration with temporary backups
+    - Auto-backup with configurable intervals
+    - Modern responsive UI
 
 ### 🛠 Development Features
 
--   Real-time code generation with manual refresh
--   Visual drag-and-drop block interface
--   Integrated board configuration
--   **Block Search** 🔍
-    -   Search by name or parameter (Ctrl+F)
-    -   Highlight and navigate results
-    -   Multi-language UI support
--   **Experimental Blocks Tracking**
-    -   Yellow dashed border indicators
-    -   Notification system
--   Theme support (light/dark with toggle)
--   Touch device support (pinch-to-zoom)
--   PlatformIO integration for hardware upload
--   **Pin Mode Tracking**
-    -   Auto-track modes (INPUT, OUTPUT, INPUT_PULLUP)
-    -   Conflict detection and warnings
-    -   Auto-add pinMode configurations
+- Real-time code generation with manual refresh
+- Visual drag-and-drop block interface
+- Integrated board configuration
+- **Block Search** 🔍
+    - Search by name or parameter (Ctrl+F)
+    - Highlight and navigate results
+    - Multi-language UI support
+- **Experimental Blocks Tracking**
+    - Yellow dashed border indicators
+    - Notification system
+- Theme support (light/dark with toggle)
+- Touch device support (pinch-to-zoom)
+- PlatformIO integration for hardware upload
+- **Pin Mode Tracking**
+    - Auto-track modes (INPUT, OUTPUT, INPUT_PULLUP)
+    - Conflict detection and warnings
+    - Auto-add pinMode configurations
 
 ### 🤖 AI Integration with MCP Server
 
@@ -125,10 +132,10 @@ Seamless integration with GitHub Copilot and AI assistants through the [Model Co
 
 **AI-Assisted Block Programming:**
 
--   **Block Query**: Ask AI "How do I use the servo motor block?" and get detailed usage info
--   **Smart Suggestions**: AI understands your hardware setup and suggests compatible blocks
--   **Natural Language**: Add blocks using commands like "Add an ultrasonic sensor block"
--   **Project Awareness**: AI knows your board type, pins, and current workspace state
+- **Block Query**: Ask AI "How do I use the servo motor block?" and get detailed usage info
+- **Smart Suggestions**: AI understands your hardware setup and suggests compatible blocks
+- **Natural Language**: Add blocks using commands like "Add an ultrasonic sensor block"
+- **Project Awareness**: AI knows your board type, pins, and current workspace state
 
 **Available MCP Tools:**
 
@@ -186,15 +193,15 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 
 ## Requirements
 
--   Visual Studio Code 1.105.0 or higher
--   Node.js 22.16.0 or higher
--   Basic understanding of Arduino programming concepts
--   Required Extensions:
-    -   PlatformIO IDE Extension
-    -   C/C++ Extension (ms-vscode.cpptools)
--   **For CyberBrick (MicroPython):**
-    -   Python 3.x installed
-    -   `mpremote` tool (`pip install mpremote`)
+- Visual Studio Code 1.105.0 or higher
+- Node.js 22.16.0 or higher
+- Basic understanding of Arduino programming concepts
+- Required Extensions:
+    - PlatformIO IDE Extension
+    - C/C++ Extension (ms-vscode.cpptools)
+- **For CyberBrick (MicroPython):**
+    - Python 3.x installed
+    - `mpremote` tool (`pip install mpremote`)
 
 ---
 
@@ -215,24 +222,20 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 ## Usage
 
 1. Open or create a folder in VS Code:
-
     - This extension requires a workspace folder to store its files
     - Use File > Open Folder... or File > New Folder
     - Make sure you have write permissions in the folder
     - **Note**: The extension will warn you if opened in a non-Blockly project to prevent accidental file modifications
 
 2. Open the extension using:
-
     - Click the wand icon (🪄) in the status bar
     - Click the Singular Blockly icon in the activity bar
 
 3. Select your target board from the dropdown menu:
-
     - The extension will automatically create and configure `platformio.ini`
     - First-time board selection requires a workspace reload
 
 4. Create your program using the visual blocks:
-
     - Drag blocks from the toolbox categories
     - Configure block parameters
     - Connect blocks to build your logic
@@ -262,90 +265,90 @@ Explore real-world projects built with Singular Blockly:
 
 ### 🔌 Arduino I/O Operations
 
--   Smart pin options with automatic PWM pin detection
--   Optimized analog write functionality for PWM pins
+- Smart pin options with automatic PWM pin detection
+- Optimized analog write functionality for PWM pins
 
 ### ⚙️ ESP32 PWM Configuration (v0.43.0+)
 
--   Custom PWM frequency (1-80000 Hz) and resolution (8-16 bit)
--   High-frequency PWM for motor driver chips (20-75KHz)
--   Automatic validation: `frequency × 2^resolution ≤ 80,000,000`
--   Backward compatible (default: 75000Hz / 8bit)
--   Independent from ESP32Servo blocks
+- Custom PWM frequency (1-80000 Hz) and resolution (8-16 bit)
+- High-frequency PWM for motor driver chips (20-75KHz)
+- Automatic validation: `frequency × 2^resolution ≤ 80,000,000`
+- Backward compatible (default: 75000Hz / 8bit)
+- Independent from ESP32Servo blocks
 
 ### 🎮 Servo Motor Control
 
--   Configurable setup and angle control
--   Smart dropdown with auto-detection
--   Board-specific library support (ESP32/Arduino)
+- Configurable setup and angle control
+- Smart dropdown with auto-detection
+- Board-specific library support (ESP32/Arduino)
 
 ### 🔧 Encoder Motor Support
 
--   Setup, read, reset, and PID control
--   Automatic pin management
+- Setup, read, reset, and PID control
+- Automatic pin management
 
 ### 📡 Sensor Blocks
 
 **Ultrasonic Sensor**
 
--   Hardware interrupt support
--   Smart block linking (trigger + read)
--   Auto-detection between blocks
+- Hardware interrupt support
+- Smart block linking (trigger + read)
+- Auto-detection between blocks
 
 **Seven-Segment Display**
 
--   Common cathode/anode modes
+- Common cathode/anode modes
 
 **Threshold Functions**
 
--   Analog input monitoring
+- Analog input monitoring
 
 ### 📷 Pixetto Smart Camera
 
--   Complete visual recognition system
--   **Color Detection**: 8 colors (red, blue, green, yellow, orange, purple, black, white)
--   **Shape Detection**: triangle, rectangle, pentagon, hexagon, circle
--   **Face Detection** and **AprilTag Recognition**
--   **Neural Network** and **Handwritten Digit Recognition**
--   **Road Detection** with center/boundary info
--   Position data (X, Y, width, height)
--   UART configuration (RX/TX pins)
+- Complete visual recognition system
+- **Color Detection**: 8 colors (red, blue, green, yellow, orange, purple, black, white)
+- **Shape Detection**: triangle, rectangle, pentagon, hexagon, circle
+- **Face Detection** and **AprilTag Recognition**
+- **Neural Network** and **Handwritten Digit Recognition**
+- **Road Detection** with center/boundary info
+- Position data (X, Y, width, height)
+- UART configuration (RX/TX pins)
 
 ### 🤖 HUSKYLENS Smart Camera (Experimental)
 
--   Advanced AI vision system
--   **Dual Modes**: I2C and UART
--   **Recognition Algorithms**:
-    -   Face recognition
-    -   Object tracking/recognition
-    -   Line tracking
-    -   Color recognition
-    -   Tag recognition
-    -   Object classification
--   Real-time block/arrow detection results
--   Interactive learning functions
--   Position and ID information
+- Advanced AI vision system
+- **Dual Modes**: I2C and UART
+- **Recognition Algorithms**:
+    - Face recognition
+    - Object tracking/recognition
+    - Line tracking
+    - Color recognition
+    - Tag recognition
+    - Object classification
+- Real-time block/arrow detection results
+- Interactive learning functions
+- Position and ID information
 
 ### 📡 ESP32 WiFi/MQTT Communication (v0.47.0+)
 
 **WiFi Connectivity (ESP32/Super Mini only)**
 
--   Connect/Disconnect with 10-second timeout protection
--   Network scanning with SSID and signal strength
--   Connection status monitoring
--   IP address retrieval
+- Connect/Disconnect with 10-second timeout protection
+- Network scanning with SSID and signal strength
+- Connection status monitoring
+- IP address retrieval
 
 **MQTT IoT Communication**
 
--   Broker setup (server, port, client ID)
--   Publish/Subscribe messaging
--   Message callback handling
--   Auto-include PubSubClient library dependency
+- Broker setup (server, port, client ID)
+- Publish/Subscribe messaging
+- Message callback handling
+- Auto-include PubSubClient library dependency
 
 **Utility Blocks**
 
--   `to_string` - Convert numbers/booleans to strings
--   `text_to_number` - Convert strings to integers/floats
+- `to_string` - Convert numbers/booleans to strings
+- `text_to_number` - Convert strings to integers/floats
 
 > 💡 WiFi/MQTT blocks appear only when ESP32 boards are selected. Non-ESP32 boards show a warning.
 
@@ -355,44 +358,44 @@ Explore real-world projects built with Singular Blockly:
 
 **Main & GPIO**
 
--   Main program structure (setup/loop equivalent)
--   Digital GPIO read/write
--   GPIO mode configuration (INPUT/OUTPUT/PULLUP/PULLDOWN)
+- Main program structure (setup/loop equivalent)
+- Digital GPIO read/write
+- GPIO mode configuration (INPUT/OUTPUT/PULLUP/PULLDOWN)
 
 **LED Control**
 
--   RGB LED with customizable colors
--   Brightness control
+- RGB LED with customizable colors
+- Brightness control
 
 **Time Functions**
 
--   Delay in milliseconds
--   Delay in seconds
+- Delay in milliseconds
+- Delay in seconds
 
 **WiFi Connectivity**
 
--   Connect/Disconnect
--   Connection status
--   IP address retrieval
+- Connect/Disconnect
+- Connection status
+- IP address retrieval
 
 **X11 Extension Board (v0.51.0+)**
 
--   180° Servo angle control (S1-S4 ports)
--   360° Servo speed control (S1-S4 ports)
--   DC Motor speed control (M1-M2 ports)
--   WS2812 LED strip color control (D1-D2 ports)
+- 180° Servo angle control (S1-S4 ports)
+- 360° Servo speed control (S1-S4 ports)
+- DC Motor speed control (M1-M2 ports)
+- WS2812 LED strip color control (D1-D2 ports)
 
 **🆕 X12 Transmitter Extension Board (v0.52.0+)**
 
--   Local joystick reading (L1-L3, R1-R3 axes, ADC 0-4095)
--   Joystick value mapping to custom range
--   Local button state detection (K1-K4)
+- Local joystick reading (L1-L3, R1-R3 axes, ADC 0-4095)
+- Joystick value mapping to custom range
+- Local button state detection (K1-K4)
 
 **Built-in MicroPython Generators**
 
--   Complete logic, loops, math, text, list, variable, and function block support
--   Clean Python code generation with proper indentation
--   One-click upload via `mpremote` tool
+- Complete logic, loops, math, text, list, variable, and function block support
+- Clean Python code generation with proper indentation
+- One-click upload via `mpremote` tool
 
 > 💡 When switching to CyberBrick, `platformio.ini` is auto-removed to avoid conflicts. Workspace is auto-backed up before board switch.
 
@@ -402,31 +405,31 @@ Explore real-world projects built with Singular Blockly:
 
 **Functions**
 
--   Parameter support
--   Custom threshold functions
--   Multiple output types (numeric, boolean, string)
--   Chinese function name conversion
+- Parameter support
+- Custom threshold functions
+- Multiple output types (numeric, boolean, string)
+- Chinese function name conversion
 
 **Variables**
 
--   Rename/delete capabilities
+- Rename/delete capabilities
 
 **Data Structures**
 
--   Lists and Arrays
+- Lists and Arrays
 
 **Control Flow**
 
--   Logic Operations
--   Loops (repeat, while, for)
--   Time-based duration loops
--   Flow control (break, continue) with validation
+- Logic Operations
+- Loops (repeat, while, for)
+- Time-based duration loops
+- Flow control (break, continue) with validation
 
 **Operations**
 
--   Math Operations
--   Text Operations
--   Value Mapping (Arduino `map()` function)
+- Math Operations
+- Text Operations
+- Value Mapping (Arduino `map()` function)
 
 ---
 
@@ -449,19 +452,19 @@ Each board is configured with optimized PlatformIO settings:
 
 ## Extension Settings
 
--   **`singularBlockly.safetyGuard.suppressWarning`**
-    -   **Type**: `boolean`
-    -   **Default**: `false`
-    -   **Scope**: Workspace-level
-    -   **Description**: Suppress safety warnings when opening non-Blockly projects
+- **`singularBlockly.safetyGuard.suppressWarning`**
+    - **Type**: `boolean`
+    - **Default**: `false`
+    - **Scope**: Workspace-level
+    - **Description**: Suppress safety warnings when opening non-Blockly projects
 
 ### Project Safety Guard 🛡️
 
 The extension detects non-Blockly projects (Node.js, Python, Java, etc.) and shows a warning dialog:
 
--   **Continue** → Proceed with opening
--   **Cancel** → Abort operation
--   **Don't remind again** → Suppress warnings for this workspace
+- **Continue** → Proceed with opening
+- **Cancel** → Abort operation
+- **Don't remind again** → Suppress warnings for this workspace
 
 **Re-enable warnings** by changing workspace settings:
 
@@ -483,9 +486,9 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 This project incorporates the following third-party components:
 
--   [Blockly](https://github.com/google/blockly) - Apache License 2.0
--   [PlatformIO](https://platformio.org/) - Apache License 2.0
--   Arduino Core Libraries - LGPL
+- [Blockly](https://github.com/google/blockly) - Apache License 2.0
+- [PlatformIO](https://platformio.org/) - Apache License 2.0
+- Arduino Core Libraries - LGPL
 
 ---
 
@@ -495,6 +498,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 **Resources**:
 
--   [GitHub Repository](https://github.com/Shen-Ming-Hong/singular-blockly)
--   [Issue Tracker](https://github.com/Shen-Ming-Hong/singular-blockly/issues)
--   [Localization Guide](specs/002-i18n-localization-review/quickstart.md)
+- [GitHub Repository](https://github.com/Shen-Ming-Hong/singular-blockly)
+- [Issue Tracker](https://github.com/Shen-Ming-Hong/singular-blockly/issues)
+- [Localization Guide](specs/002-i18n-localization-review/quickstart.md)
