@@ -14,6 +14,8 @@ window.languageManager.loadMessages('pt-br', {
 	BLOCKS_TAB: 'Blocos',
 	CODE_TAB: 'Código',
 	BOARD_SELECT_LABEL: 'Selecionar placa:',
+	LANGUAGE_SELECT_TOOLTIP: 'Selecionar idioma',
+	LANGUAGE_AUTO: 'Automático (seguir o VS Code)',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Blocos experimentais detectados',
@@ -873,3 +875,4 @@ window.languageManager.loadMessages('pt-br', {
 	RC_IS_CONNECTED: 'RC conectado?',
 	RC_IS_CONNECTED_TOOLTIP: 'Verificar se dados recebidos em 500ms',
 });
+

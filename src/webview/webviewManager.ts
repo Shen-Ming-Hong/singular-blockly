@@ -263,17 +263,19 @@ export class WebViewManager {
 
 			// 取得當前語言和主題設定
 			const localeService = new LocaleService(this.context.extensionPath);
-			const blocklyLanguage = localeService.getCurrentLanguage();
+			let blocklyLanguage = localeService.getCurrentLanguage();
 
-			// 取得主題設定 - 傳遞 fileService 確保在測試中使用 mock
+			// 取得主題與語言設定 - 傳遞 fileService 確保在測試中使用 mock
 			let theme = 'light';
 			if (this.fileService) {
 				try {
 					const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath, this.fileService);
 					theme = await settingsManager.getTheme();
+					const languagePreference = await settingsManager.getLanguage();
+					blocklyLanguage = settingsManager.resolveLanguage(languagePreference);
 				} catch (error) {
-					// 若讀取設定失敗,使用預設主題
-					log('Failed to read theme setting, using default', 'warn', { error });
+					// 若讀取設定失敗,使用預設設定
+					log('Failed to read theme or language setting, using default', 'warn', { error });
 				}
 			}
 
@@ -959,12 +961,16 @@ export class WebViewManager {
 
 			// 取得當前語言和主題設定
 			const localeService = new LocaleService(this.context.extensionPath);
-			const blocklyLanguage = localeService.getCurrentLanguage();
+			let blocklyLanguage = localeService.getCurrentLanguage();
 
 			let theme = 'light';
-			if (this.fileService) {
+			try {
 				const settingsManager = new SettingsManager(vscodeApi.workspace.workspaceFolders![0].uri.fsPath);
 				theme = await settingsManager.getTheme();
+				const languagePreference = await settingsManager.getLanguage();
+				blocklyLanguage = settingsManager.resolveLanguage(languagePreference);
+			} catch (error) {
+				log('Failed to read theme or language setting for preview, using default', 'warn', { error });
 			}
 
 			// 建立預覽頁面時使用的 webview (因為此時還沒有 panel.webview)
@@ -1262,6 +1268,14 @@ export class WebViewManager {
 			return;
 		}
 
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			log('No workspace folder available during FileWatcher reload', 'warn');
+			return;
+		}
+
+		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+
 		try {
 			// 設置內部更新標記，防止後續保存操作觸發 FileWatcher 循環
 			this.markInternalUpdateStart();
@@ -1281,11 +1295,19 @@ export class WebViewManager {
 
 			// 驗證資料結構並發送 loadWorkspace 命令
 			if (saveData && typeof saveData === 'object' && saveData.workspace) {
+				let theme = 'light';
+				try {
+					const settingsManager = new SettingsManager(workspaceRoot, this.fileService);
+					theme = await settingsManager.getTheme();
+				} catch (error) {
+					log('Failed to read theme during FileWatcher reload, using default', 'warn', { error });
+				}
+
 				await this.panel.webview.postMessage({
 					command: 'loadWorkspace',
 					state: saveData.workspace,
 					board: saveData.board || 'none',
-					theme: saveData.theme || 'light',
+					theme: theme,
 					source: 'fileWatcher', // 標記來源，讓 WebView 知道這是外部觸發的重載
 				});
 				log('Workspace reload triggered via FileWatcher with loadWorkspace', 'info');

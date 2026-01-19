@@ -16,11 +16,8 @@ import * as assert from 'assert';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BlockDictionaryModule = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BlockDictionary = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type BlockDefinition = any;
 
 // 動態載入測試目標
@@ -83,7 +80,9 @@ suite('Block Dictionary Tests', () => {
 			const hasEnglishWord = (str: string) => /[a-zA-Z]/.test(str);
 
 			for (const block of dictionary.blocks) {
-				if (!block.tags || block.tags.length === 0) continue;
+				if (!block.tags || block.tags.length === 0) {
+					continue;
+				}
 
 				const hasChinese = block.tags.some((tag: string) => hasChineseChar(tag));
 				const hasEnglish = block.tags.some((tag: string) => hasEnglishWord(tag));
@@ -107,7 +106,9 @@ suite('Block Dictionary Tests', () => {
 	suite('Dropdown Field Validation', () => {
 		test('dropdown fields should have default values', () => {
 			for (const block of dictionary.blocks) {
-				if (!block.fields) continue;
+				if (!block.fields) {
+					continue;
+				}
 
 				for (const field of block.fields) {
 					if (field.type === 'dropdown') {
@@ -128,7 +129,9 @@ suite('Block Dictionary Tests', () => {
 			const pinFieldNames = ['PIN', 'PIN_A', 'PIN_B', 'RX_PIN', 'TX_PIN', 'TRIG', 'ECHO'];
 
 			for (const block of dictionary.blocks) {
-				if (!block.fields) continue;
+				if (!block.fields) {
+					continue;
+				}
 
 				for (const field of block.fields) {
 					if (pinFieldNames.includes(field.name)) {
@@ -146,7 +149,9 @@ suite('Block Dictionary Tests', () => {
 	suite('Fields vs Inputs Distinction', () => {
 		test('number fields should not be in inputs array', () => {
 			for (const block of dictionary.blocks) {
-				if (!block.inputs) continue;
+				if (!block.inputs) {
+					continue;
+				}
 
 				for (const input of block.inputs) {
 					// input 類型應該是 value 或 statement，不應該是 number
@@ -159,7 +164,9 @@ suite('Block Dictionary Tests', () => {
 
 		test('statement inputs should have type "statement"', () => {
 			for (const block of dictionary.blocks) {
-				if (!block.inputs) continue;
+				if (!block.inputs) {
+					continue;
+				}
 
 				for (const input of block.inputs) {
 					if (input.name.toUpperCase().includes('DO') || input.name === 'STATEMENTS') {
@@ -240,7 +247,9 @@ suite('Block Dictionary Tests', () => {
 			const validBoards = ['arduino_uno', 'arduino_nano', 'arduino_mega', 'esp32', 'esp32_supermini', 'cyberbrick'];
 
 			for (const block of dictionary.blocks) {
-				if (!block.boards || !Array.isArray(block.boards)) continue;
+				if (!block.boards || !Array.isArray(block.boards)) {
+					continue;
+				}
 
 				for (const board of block.boards) {
 					assert.ok(validBoards.includes(board), `Block ${block.type} has invalid board "${board}"`);

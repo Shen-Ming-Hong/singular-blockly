@@ -49,15 +49,22 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 ### 🌐 Internationalization
 
 - **15 Languages** with 98.94% average coverage
-- Automatic language detection (follows VS Code's display language)
+- In-editor language picker (globe icon) with instant UI updates
+- Auto mode follows VS Code's display language
 - Multi-language block search UI
 
-**Change Language:**
+**Change Language (in editor):**
+
+1. Click the globe icon in the Blockly toolbar
+2. Choose **Auto (follow VS Code)** or a specific language
+3. The Blockly UI updates immediately
+
+**Change VS Code Display Language (affects Auto):**
 
 1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
 2. Type "Configure Display Language"
 3. Select your preferred language
-4. VS Code will restart and Blockly will follow
+4. VS Code will restart and Blockly Auto mode will follow
 
 <details>
 <summary><b>📊 Supported Languages Coverage</b></summary>
