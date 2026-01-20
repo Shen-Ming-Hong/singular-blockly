@@ -29,6 +29,7 @@ const CATEGORIES = [
 	{ id: 'math', name: { 'zh-hant': '數學', en: 'Math' }, colour: '#5B67A5' },
 	{ id: 'text', name: { 'zh-hant': '文字', en: 'Text' }, colour: '#5BA58C' },
 	{ id: 'lists', name: { 'zh-hant': '清單', en: 'Lists' }, colour: '#745BA5' },
+	{ id: 'cyberbrick', name: { 'zh-hant': 'CyberBrick', en: 'CyberBrick' }, colour: '#00A0A0' },
 	{ id: 'x11', name: { 'zh-hant': 'X11 擴展板', en: 'X11 Extension' }, colour: '#34B4B4' },
 	{ id: 'x12', name: { 'zh-hant': 'X12 擴展板', en: 'X12 Extension' }, colour: '#34B434' },
 	{ id: 'rc', name: { 'zh-hant': 'RC 遙控', en: 'RC Remote' }, colour: '#34D4D4' },
@@ -2398,6 +2399,41 @@ const BLOCK_DEFINITIONS = [
 			en: 'Use the gear icon to add or remove items to join',
 		},
 		relatedBlocks: ['text', 'to_string'],
+	},
+
+	// === CyberBrick 核心積木 ===
+	{
+		type: 'cyberbrick_ticks_ms',
+		category: 'cyberbrick',
+		names: { 'zh-hant': '取得目前毫秒數', en: 'Get Current Milliseconds' },
+		descriptions: {
+			'zh-hant': '取得目前的毫秒計時值',
+			en: 'Get current millisecond ticks',
+		},
+		fields: [],
+		inputs: [],
+		output: { type: 'Number' },
+		boards: ['cyberbrick'],
+		tags: ['time', 'ticks', 'ms', 'millisecond', '計時', '毫秒', 'cyberbrick'],
+		relatedBlocks: ['cyberbrick_ticks_diff'],
+	},
+	{
+		type: 'cyberbrick_ticks_diff',
+		category: 'cyberbrick',
+		names: { 'zh-hant': '計算時間差', en: 'Time Difference' },
+		descriptions: {
+			'zh-hant': '計算現在與開始之間的毫秒差',
+			en: 'Calculate milliseconds between now and start',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'NOW', type: 'value', label: { 'zh-hant': '現在', en: 'now' }, check: 'Number' },
+			{ name: 'START', type: 'value', label: { 'zh-hant': '開始', en: 'start' }, check: 'Number' },
+		],
+		output: { type: 'Number' },
+		boards: ['cyberbrick'],
+		tags: ['time', 'ticks', 'diff', 'difference', '毫秒', '時間差', 'cyberbrick'],
+		relatedBlocks: ['cyberbrick_ticks_ms'],
 	},
 
 	// === CyberBrick X11 擴展板積木 ===

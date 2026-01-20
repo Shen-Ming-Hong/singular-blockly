@@ -73,6 +73,31 @@
         },
         {
             "kind": "block",
+            "type": "cyberbrick_ticks_ms"
+        },
+        {
+            "kind": "block",
+            "type": "cyberbrick_ticks_diff",
+            "inputs": {
+                "NOW": {
+                    "shadow": {
+                        "kind": "block",
+                        "type": "cyberbrick_ticks_ms"
+                    }
+                },
+                "START": {
+                    "block": {
+                        "kind": "block",
+                        "type": "variables_get",
+                        "fields": {
+                            "VAR": "start"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
             "type": "cyberbrick_delay_ms",
             "inputs": {
                 "TIME": {

@@ -676,6 +676,12 @@ window.languageManager.loadMessages('ru', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Задержка',
 	CYBERBRICK_DELAY_S_SUFFIX: 'секунд',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Приостановить выполнение программы на указанное количество секунд',
+	CYBERBRICK_TICKS_MS: 'Получить текущие миллисекунды',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Получить текущий счетчик миллисекунд',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Разница времени',
+	CYBERBRICK_TICKS_DIFF_NOW: 'сейчас',
+	CYBERBRICK_TICKS_DIFF_START: 'начало',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Вычислить миллисекунды между сейчас и началом',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

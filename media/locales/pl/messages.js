@@ -680,6 +680,12 @@ window.languageManager.loadMessages('pl', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Opóźnienie',
 	CYBERBRICK_DELAY_S_SUFFIX: 'sekund',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Wstrzymaj wykonywanie programu na określoną liczbę sekund',
+	CYBERBRICK_TICKS_MS: 'Pobierz bieżące milisekundy',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Pobierz bieżący licznik milisekund',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Różnica czasu',
+	CYBERBRICK_TICKS_DIFF_NOW: 'teraz',
+	CYBERBRICK_TICKS_DIFF_START: 'początek',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Oblicz milisekundy między teraz a początkiem',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

@@ -674,6 +674,12 @@ window.languageManager.loadMessages('ko', {
 	CYBERBRICK_DELAY_S_PREFIX: '지연',
 	CYBERBRICK_DELAY_S_SUFFIX: '초',
 	CYBERBRICK_DELAY_S_TOOLTIP: '지정된 초 동안 프로그램 실행 일시 중지',
+	CYBERBRICK_TICKS_MS: '현재 밀리초 가져오기',
+	CYBERBRICK_TICKS_MS_TOOLTIP: '현재 밀리초 카운터 가져오기',
+	CYBERBRICK_TICKS_DIFF_PREFIX: '시간 차이',
+	CYBERBRICK_TICKS_DIFF_NOW: '현재',
+	CYBERBRICK_TICKS_DIFF_START: '시작',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: '현재와 시작 사이의 밀리초 계산',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

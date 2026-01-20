@@ -677,6 +677,12 @@ window.languageManager.loadMessages('es', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Retardo',
 	CYBERBRICK_DELAY_S_SUFFIX: 'segundos',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Pausar ejecución del programa por segundos especificados',
+	CYBERBRICK_TICKS_MS: 'Obtener milisegundos actuales',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Obtener el contador actual de milisegundos',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Diferencia de tiempo',
+	CYBERBRICK_TICKS_DIFF_NOW: 'ahora',
+	CYBERBRICK_TICKS_DIFF_START: 'inicio',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Calcular los milisegundos entre ahora y el inicio',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

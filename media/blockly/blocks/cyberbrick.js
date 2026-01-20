@@ -103,6 +103,40 @@ Blockly.Blocks['cyberbrick_gpio_read'] = {
 // === 時序積木 ===
 
 /**
+ * 取得目前毫秒數
+ */
+Blockly.Blocks['cyberbrick_ticks_ms'] = {
+	init: function () {
+		this.appendDummyInput().appendField(window.languageManager.getMessage('CYBERBRICK_TICKS_MS', '取得目前毫秒數'));
+		this.setOutput(true, 'Number');
+		this.setColour(120);
+		this.setTooltip(window.languageManager.getMessage('CYBERBRICK_TICKS_MS_TOOLTIP', '取得目前的毫秒計時值'));
+		this.setHelpUrl('');
+	},
+};
+
+/**
+ * 計算時間差
+ */
+Blockly.Blocks['cyberbrick_ticks_diff'] = {
+	init: function () {
+		this.appendValueInput('NOW')
+			.setCheck('Number')
+			.appendField(window.languageManager.getMessage('CYBERBRICK_TICKS_DIFF_PREFIX', '計算時間差'))
+			.appendField(window.languageManager.getMessage('CYBERBRICK_TICKS_DIFF_NOW', '現在'));
+		this.appendDummyInput().appendField('-');
+		this.appendValueInput('START')
+			.setCheck('Number')
+			.appendField(window.languageManager.getMessage('CYBERBRICK_TICKS_DIFF_START', '開始'));
+		this.setInputsInline(true);
+		this.setOutput(true, 'Number');
+		this.setColour(120);
+		this.setTooltip(window.languageManager.getMessage('CYBERBRICK_TICKS_DIFF_TOOLTIP', '計算現在與開始之間的毫秒差'));
+		this.setHelpUrl('');
+	},
+};
+
+/**
  * 延時（毫秒）
  */
 Blockly.Blocks['cyberbrick_delay_ms'] = {
