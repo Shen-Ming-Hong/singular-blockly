@@ -18,7 +18,7 @@
 **Purpose**: 確認開發環境和分支準備
 
 - [X] T001 切換到功能分支 `031-bugfix-batch-jan` 並確認環境
-- [ ] T002 [P] 執行 `npm run watch` 確認編譯無錯誤
+- [X] T002 [P] 執行 `npm run watch` 確認編譯無錯誤
 
 ---
 
