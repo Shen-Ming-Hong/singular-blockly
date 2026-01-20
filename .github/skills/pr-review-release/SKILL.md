@@ -15,12 +15,12 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 
 ## 適用情境 When to Use
 
--   需要處理 PR 上的 code review 建議
--   評估 Copilot review 或人工審查意見
--   合併 PR 後需要發布新版本
--   執行完整的發布流程（版本號、CHANGELOG、標籤、Release）
--   需要 squash merge 並清理已合併的分支
--   定期清理已合併到 master 的舊本地分支
+- 需要處理 PR 上的 code review 建議
+- 評估 Copilot review 或人工審查意見
+- 合併 PR 後需要發布新版本
+- 執行完整的發布流程（版本號、CHANGELOG、標籤、Release）
+- 需要 squash merge 並清理已合併的分支
+- 定期清理已合併到 master 的舊本地分支
 
 ## 工作流程 Workflow
 
@@ -50,7 +50,6 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 若有採納的建議：
 
 1. **修正程式碼**
-
     - 根據採納的建議進行修改
     - 確保符合專案規範（參考 `copilot-instructions.md`）
 
@@ -123,7 +122,6 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 #### 4.1 版本管理 Version Management
 
 1. **決定版本號**（遵循語意化版本）
-
     - `patch`: Bug 修復、小改進 (0.0.X)
     - `minor`: 新功能、向後相容 (0.X.0)
     - `major`: 破壞性變更 (X.0.0)
@@ -163,12 +161,26 @@ npx @vscode/vsce package
 
 #### 4.4 Git 標籤 Git Tagging
 
+**⚠️ 重要：所有版本標籤必須使用 Annotated Tags（`-a` 參數）**
+
+Annotated tags 包含建立者、日期、訊息等元資料，是正式發布的標準做法。
+
 ```bash
-# 建立版本標籤
+# 建立 Annotated Tag（必須使用 -a 參數）
 git tag -a v{VERSION} -m "Release v{VERSION}"
 
-# 推送標籤
+# 推送標籤到遠端
 git push origin v{VERSION}
+
+# 驗證標籤類型（應顯示 tag 而非 commit）
+git cat-file -t v{VERSION}
+```
+
+**❌ 禁止使用 Lightweight Tags：**
+
+```bash
+# 錯誤示範 - 不要這樣做！
+git tag v{VERSION}  # 缺少 -a 參數，會建立 lightweight tag
 ```
 
 #### 4.5 GitHub Release（必要步驟 REQUIRED）
@@ -213,29 +225,29 @@ gh release view v{VERSION} --web
 
 ### Code Review 階段
 
--   [ ] 讀取所有 PR review 評論
--   [ ] 評估每條建議並記錄理由
--   [ ] 完成採納建議的程式碼修正
--   [ ] 測試通過
+- [ ] 讀取所有 PR review 評論
+- [ ] 評估每條建議並記錄理由
+- [ ] 完成採納建議的程式碼修正
+- [ ] 測試通過
 
 ### Git 操作階段
 
--   [ ] 變更已提交並推送
--   [ ] PR 已 squash merge
--   [ ] 主分支已同步
--   [ ] 功能分支已刪除（本地 + 遠端）
--   [ ] 已清理其他舊的已合併分支
+- [ ] 變更已提交並推送
+- [ ] PR 已 squash merge
+- [ ] 主分支已同步
+- [ ] 功能分支已刪除（本地 + 遠端）
+- [ ] 已清理其他舊的已合併分支
 
 ### 發布階段
 
--   [ ] 版本號已更新
--   [ ] CHANGELOG.md 已更新（雙語）
--   [ ] 所有測試通過
--   [ ] 成功建置打包 VSIX
--   [ ] Git 標籤已建立並推送
--   [ ] **GitHub Release 已建立**（使用 `gh release create`）
--   [ ] **Release 含雙語說明與 VSIX 附件**
--   [ ] 發布連結可存取（使用 `gh release view` 驗證）
+- [ ] 版本號已更新
+- [ ] CHANGELOG.md 已更新（雙語）
+- [ ] 所有測試通過
+- [ ] 成功建置打包 VSIX
+- [ ] Git Annotated Tag 已建立並推送（使用 `git tag -a`）
+- [ ] **GitHub Release 已建立**（使用 `gh release create`）
+- [ ] **Release 含雙語說明與 VSIX 附件**
+- [ ] 發布連結可存取（使用 `gh release view` 驗證）
 
 ## 輸出格式 Output Format
 
@@ -254,9 +266,9 @@ gh release view v{VERSION} --web
 
 ### 變更檔案 Changed Files
 
--   `package.json`
--   `CHANGELOG.md`
--   ...
+- `package.json`
+- `CHANGELOG.md`
+- ...
 
 ### 發布連結 Release Link
 
@@ -265,5 +277,5 @@ https://github.com/{owner}/{repo}/releases/tag/v{VERSION}
 
 ## 相關資源 Related Resources
 
--   [語意化版本規範](https://semver.org/lang/zh-TW/)
--   [Keep a Changelog](https://keepachangelog.com/zh-TW/)
+- [語意化版本規範](https://semver.org/lang/zh-TW/)
+- [Keep a Changelog](https://keepachangelog.com/zh-TW/)
