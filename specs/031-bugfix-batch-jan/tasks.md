@@ -45,7 +45,7 @@
 - [ ] T005 [US1] 在 `media/js/blocklyEdit.js` 的 `loadWorkspace` 處理後呼叫 `updateMainBlockDeletable()`
 - [ ] T006 [US1] 在 `media/js/blocklyEdit.js` 添加 workspace change listener 監聽 `BLOCK_DELETE` 和 `BLOCK_CREATE` 事件，重新計算 deletable 狀態
 - [ ] T007 [P] [US1] 在 `media/blockly/blocks/arduino.js` 的 `arduino_setup_loop` 積木定義中添加 `this.setDeletable(false)`
-- [ ] T008 [US1] 在多積木偵測時透過 `postMessage` 顯示 Toast 警告訊息
+- [ ] T008 [US1] 在多積木偵測時透過 `postMessage` 顯示 Toast 警告訊息，使用 `languageManager.getMessage('MAIN_BLOCK_DUPLICATE_WARNING', '偵測到多個主程式積木，請刪除多餘的積木')` 取得翻譯文字
 - [ ] T009 [US1] 手動測試：載入舊專案含多個主程式積木 → 確認可刪除多餘 → 確認最後一個不可刪除
 - [ ] T010 [US1] 手動測試：CyberBrick 模式拖曳第二個 `micropython_main` → 確認被阻止
 
@@ -100,7 +100,7 @@
 - [ ] T021 [US4] 在掃描工具中實作報告輸出：鍵名、英文預設值、受影響積木類型
 - [ ] T022 [US4] 在 `package.json` 添加 `npm run scan:blockly-msg` script
 - [ ] T023 [US4] 執行掃描工具產生缺失報告
-- [ ] T024 [P] [US4] 補充 `media/locales/en/messages.js` 缺失翻譯鍵（含 `CONTROLS_REPEAT_INPUT_DO`）
+- [ ] T024 [P] [US4] 補充 `media/locales/en/messages.js` 缺失翻譯鍵（含 `CONTROLS_REPEAT_INPUT_DO`、`MAIN_BLOCK_DUPLICATE_WARNING`）
 - [ ] T025 [P] [US4] 補充 `media/locales/zh-hant/messages.js` 缺失翻譯鍵
 - [ ] T026 [P] [US4] 補充 `media/locales/ja/messages.js` 缺失翻譯鍵
 - [ ] T027 [P] [US4] 補充 `media/locales/ko/messages.js` 缺失翻譯鍵

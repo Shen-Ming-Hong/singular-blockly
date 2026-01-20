@@ -76,8 +76,11 @@
 ### Edge Cases
 
 - 當使用者透過 Ctrl+V 快速貼上多個主程式積木時，系統如何處理？
+    - **處理策略**: `maxInstances` 會在貼上時自動阻止超過上限的積木建立；若舊專案載入導致超限，透過動態 `deletable` 控制讓使用者手動刪除
 - 還原備份時 backup 目錄不存在怎麼辦？
+    - **處理策略**: `FileService.copyFile()` 會自動建立父目錄；若來源備份檔案不存在則顯示錯誤訊息並中止還原
 - 翻譯檔案格式錯誤時如何 fallback？
+    - **處理策略**: `languageManager.getMessage()` 接受第二個參數作為 fallback 字串，確保即使翻譯鍵缺失也能顯示預設訊息
 
 ## Requirements _(mandatory)_
 
