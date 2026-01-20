@@ -8,6 +8,39 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.55.0] - 2026-01-20
+
+### 新增功能 Added
+
+-   **CyberBrick 時間回傳值積木** (CyberBrick Time Value Blocks)
+
+    -   新增「取得目前毫秒數／計算時間差」積木，支援非阻塞計時流程
+        Added "Get Current Milliseconds" and "Time Difference" blocks for non-blocking timing
+    -   MicroPython 產碼使用 `time.ticks_ms()` / `time.ticks_diff()`，處理時間 wrap-around
+        MicroPython generation uses `time.ticks_ms()` / `time.ticks_diff()` to handle wrap-around
+
+-   **MCP 積木字典支援** (MCP Block Dictionary Support)
+
+    -   新增 CyberBrick 時間積木條目、分類與搜尋標籤
+        Added CyberBrick time blocks, category, and search tags to MCP dictionary
+
+-   **實驗積木標記** (Experimental Block Marking)
+
+    -   CyberBrick 時間積木加入實驗積木清單並顯示提示
+        Marked CyberBrick time blocks as experimental with workspace indicator
+
+-   **15 種語系 i18n 更新** (15-language i18n Update)
+
+    -   新增時間積木名稱、欄位與提示翻譯
+        Added translations for time block names, fields, and tooltips
+
+### 已更新 Updated
+
+-   **CyberBrick MicroPython 文件** (CyberBrick MicroPython Docs)
+
+    -   補齊時間積木對應表與範例
+        Added time block mappings and examples
+
 ## [0.54.1] - 2026-01-20
 
 ### 新增功能 Added
