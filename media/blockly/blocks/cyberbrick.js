@@ -112,6 +112,9 @@ Blockly.Blocks['cyberbrick_ticks_ms'] = {
 		this.setColour(120);
 		this.setTooltip(window.languageManager.getMessage('CYBERBRICK_TICKS_MS_TOOLTIP', '取得目前的毫秒計時值'));
 		this.setHelpUrl('');
+
+		// 標記為實驗積木
+		window.potentialExperimentalBlocks.push('cyberbrick_ticks_ms');
 	},
 };
 
@@ -133,6 +136,9 @@ Blockly.Blocks['cyberbrick_ticks_diff'] = {
 		this.setColour(120);
 		this.setTooltip(window.languageManager.getMessage('CYBERBRICK_TICKS_DIFF_TOOLTIP', '計算現在與開始之間的毫秒差'));
 		this.setHelpUrl('');
+
+		// 標記為實驗積木
+		window.potentialExperimentalBlocks.push('cyberbrick_ticks_diff');
 	},
 };
 
