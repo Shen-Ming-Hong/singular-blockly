@@ -294,6 +294,7 @@ window.languageManager.loadMessages('ko', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '%1 번 반복',
+	CONTROLS_REPEAT_INPUT_DO: '하기',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: '다음 동안 반복:',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: '다음까지 반복:',
 	CONTROLS_FOR_TITLE: '%1을(를) %2에서 %3까지 %4 단계로 세기',
@@ -622,6 +623,7 @@ window.languageManager.loadMessages('ko', {
 	BACKUP_QUICK_SAVE_SUCCESS: '백업 저장됨: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: '작업 공간이 비어 있습니다, 백업 불필요',
 	BACKUP_QUICK_SAVE_COOLDOWN: '잠시 기다려 주세요, 백업이 방금 완료되었습니다',
+	MAIN_BLOCK_DUPLICATE_WARNING: '여러 개의 메인 프로그램 블록이 감지되었습니다. 불필요한 블록을 삭제해주세요.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: '보드 유형 전환',

@@ -149,6 +149,9 @@ export class WebViewMessageHandler {
 				case 'previewBackup':
 					await this.handlePreviewBackup(message);
 					break;
+				case 'showToast':
+					this.handleShowToast(message);
+					break;
 				case 'getAutoBackupSettings':
 					await this.handleGetAutoBackupSettings();
 					break;
@@ -193,6 +196,29 @@ export class WebViewMessageHandler {
 	 */
 	private handleLogMessage(message: any): void {
 		handleWebViewLog(message.source || 'blocklyEdit', message.level || 'info', message.message, ...(message.args || []));
+	}
+
+	/**
+	 * 顯示 WebView 傳入的提示訊息
+	 * @param message Toast 訊息物件
+	 */
+	private handleShowToast(message: any): void {
+		const toastMessage = typeof message?.message === 'string' ? message.message.trim() : '';
+		if (!toastMessage) {
+			return;
+		}
+
+		switch (message?.type) {
+			case 'error':
+				vscodeApi.window.showErrorMessage(toastMessage);
+				break;
+			case 'warning':
+				vscodeApi.window.showWarningMessage(toastMessage);
+				break;
+			default:
+				vscodeApi.window.showInformationMessage(toastMessage);
+				break;
+		}
 	}
 
 	/**
@@ -1065,6 +1091,14 @@ export class WebViewMessageHandler {
 				return;
 			}
 
+			let autoBackupName: string | undefined;
+			if (this.fileService.fileExists(mainJsonPath)) {
+				const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace(/T/, '_').slice(0, 15);
+				autoBackupName = `auto_restore_${timestamp}`;
+				const autoBackupPath = path.join('blockly', 'backup', `${autoBackupName}.json`);
+				await this.fileService.copyFile(mainJsonPath, autoBackupPath);
+			}
+
 			await this.fileService.copyFile(backupPath, mainJsonPath);
 			const saveData = await this.fileService.readJsonFile<any>(mainJsonPath, null);
 
@@ -1080,6 +1114,7 @@ export class WebViewMessageHandler {
 				command: 'backupRestored',
 				name: backupName,
 				success: true,
+				autoBackupName,
 			});
 		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage(
@@ -1132,7 +1167,7 @@ export class WebViewMessageHandler {
 		const workspaceRoot = workspaceFolders[0].uri.fsPath;
 		const fullPath = path.join(workspaceRoot, backupPath);
 		try {
-			await vscodeApi.commands.executeCommand('vscode.open', fullPath);
+			await vscodeApi.commands.executeCommand('singular-blockly.previewBackup', fullPath);
 		} catch (error) {
 			const errorMsg = await this.localeService.getLocalizedMessage(
 				'BACKUP_ERROR_PREVIEW_FAILED',

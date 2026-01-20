@@ -294,6 +294,7 @@ window.languageManager.loadMessages('de', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'wiederhole %1 mal',
+	CONTROLS_REPEAT_INPUT_DO: 'mache',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'wiederhole solange',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'wiederhole bis',
 	CONTROLS_FOR_TITLE: 'zähle mit %1 von %2 bis %3 mit Schritt %4',
@@ -626,6 +627,7 @@ window.languageManager.loadMessages('de', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Backup gespeichert: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Arbeitsbereich ist leer, kein Backup erforderlich',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Bitte warten, Backup wurde gerade abgeschlossen',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Mehrere Hauptprogramm-Blocks erkannt. Bitte löschen Sie die überflüssigen Blocks.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Board-Typ wechseln',

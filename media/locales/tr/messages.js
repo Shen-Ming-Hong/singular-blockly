@@ -294,6 +294,7 @@ window.languageManager.loadMessages('tr', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '%1 kez tekrarla',
+	CONTROLS_REPEAT_INPUT_DO: 'yap',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'olduğu sürece tekrarla',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'olana kadar tekrarla',
 	CONTROLS_FOR_TITLE: '%1 ile %2 den %3 e %4 artışla say',
@@ -626,6 +627,7 @@ window.languageManager.loadMessages('tr', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Yedek kaydedildi: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Çalışma alanı boş, yedekleme gerekli değil',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Lütfen bekleyin, yedekleme az önce tamamlandı',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Birden fazla ana program blogu algilandi. Fazla bloklari silin.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Kart türünü değiştir',

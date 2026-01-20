@@ -293,6 +293,7 @@ window.languageManager.loadMessages('cs', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'opakuj %1 krát',
+	CONTROLS_REPEAT_INPUT_DO: 'delej',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'opakuj dokud',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'opakuj dokud ne',
 	CONTROLS_FOR_TITLE: 'počítej s %1 od %2 do %3 po %4',
@@ -625,6 +626,7 @@ window.languageManager.loadMessages('cs', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Záloha uložena: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Pracovní prostor je prázdný, záloha není potřeba',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Prosím počkejte, záloha byla právě dokončena',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Bylo zjištěno více bloků hlavního programu. Odstraňte přebytečné bloky.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Přepnout typ desky',

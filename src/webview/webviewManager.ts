@@ -217,7 +217,7 @@ export class WebViewManager {
 		this.messageHandler = new WebViewMessageHandler(this.context, this.panel, this.localeService);
 
 		// 監聯 WebView 訊息
-		this.panel.webview.onDidReceiveMessage(message => {
+		this.panel.webview.onDidReceiveMessage(async message => {
 			// 攔截 saveWorkspace 命令，設置內部更新標記以避免 FileWatcher 觸發重載
 			if (message.command === 'saveWorkspace') {
 				this.markInternalUpdateStart();
@@ -226,7 +226,11 @@ export class WebViewManager {
 					this.markInternalUpdateEnd();
 				}, 1000);
 			}
-			this.messageHandler?.handleMessage(message);
+			await this.messageHandler?.handleMessage(message);
+
+			if (message.command === 'updateLanguage') {
+				await this.syncPreviewLanguage();
+			}
 		});
 
 		// 當面板關閉時清理資源
@@ -828,6 +832,42 @@ export class WebViewManager {
 			}
 		} catch (error) {
 			log('處理預覽窗口訊息時發生錯誤', 'error', error);
+		}
+	}
+
+	/**
+	 * 同步語言設定到所有預覽視窗
+	 */
+	private async syncPreviewLanguage(): Promise<void> {
+		if (this.previewPanels.size === 0) {
+			return;
+		}
+
+		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			return;
+		}
+
+		const workspaceRoot = workspaceFolders[0].uri.fsPath;
+		if (!this.fileService) {
+			this.fileService = new FileService(workspaceRoot);
+		}
+
+		const settingsManager = new SettingsManager(workspaceRoot, this.fileService);
+		let languagePreference = 'auto';
+		try {
+			languagePreference = await settingsManager.getLanguage();
+		} catch (error) {
+			log('Failed to read language preference for preview, fallback to auto', 'warn', { error });
+		}
+
+		const resolvedLanguage = settingsManager.resolveLanguage(languagePreference);
+		for (const previewPanel of this.previewPanels.values()) {
+			previewPanel.webview.postMessage({
+				command: 'updateLanguage',
+				languagePreference: languagePreference,
+				resolvedLanguage: resolvedLanguage,
+			});
 		}
 	}
 	/**

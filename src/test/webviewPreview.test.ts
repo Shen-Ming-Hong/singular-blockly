@@ -145,6 +145,28 @@ describe('WebView Preview', () => {
 		assert(loadStub.calledOnceWith(backupFullPath, panelSender));
 	});
 
+	it('should sync language updates to preview panels', async () => {
+		const panelA: any = { webview: { postMessage: sinon.stub().resolves() } };
+		const panelB: any = { webview: { postMessage: sinon.stub().resolves() } };
+		(webViewManager as any).previewPanels.set('a', panelA);
+		(webViewManager as any).previewPanels.set('b', panelB);
+
+		// 確保 fileService 使用正確的 fsMock
+		(webViewManager as any).fileService = new FileService(workspacePath, fsServiceMock as any);
+
+		sinon.stub(require('../services/settingsManager'), 'SettingsManager').callsFake(function () {
+			return {
+				getLanguage: sinon.stub().resolves('ja'),
+				resolveLanguage: sinon.stub().returns('ja'),
+			};
+		});
+
+		await (webViewManager as any).syncPreviewLanguage();
+
+		assert(panelA.webview.postMessage.calledWithMatch({ command: 'updateLanguage', languagePreference: 'ja', resolvedLanguage: 'ja' }));
+		assert(panelB.webview.postMessage.calledWithMatch({ command: 'updateLanguage', languagePreference: 'ja', resolvedLanguage: 'ja' }));
+	});
+
 	it('loadBackupContent should post workspace state on success', async () => {
 		const backupData = { workspace: { blocks: [] } };
 		const backupContent = JSON.stringify(backupData);

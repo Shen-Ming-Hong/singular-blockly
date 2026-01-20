@@ -6,6 +6,8 @@
 
 const vscode = acquireVsCodeApi();
 let workspace;
+let isLanguageSwitchReloading = false;
+let pendingLanguageReloadTimer = null;
 
 // 日誌系統
 const log = {
@@ -315,6 +317,54 @@ function loadWorkspaceFromState(workspaceState) {
 }
 
 /**
+ * 語言切換後重新載入工作區以刷新積木文字
+ */
+function refreshWorkspaceForLanguage() {
+	if (!workspace) {
+		return;
+	}
+
+	if (isLanguageSwitchReloading) {
+		return;
+	}
+
+	if (typeof workspace.isDragging === 'function' && workspace.isDragging()) {
+		if (!pendingLanguageReloadTimer) {
+			pendingLanguageReloadTimer = setTimeout(() => {
+				pendingLanguageReloadTimer = null;
+				refreshWorkspaceForLanguage();
+			}, 200);
+		}
+		return;
+	}
+
+	let eventsWereEnabled = false;
+
+	try {
+		isLanguageSwitchReloading = true;
+		const state = Blockly.serialization.workspaces.save(workspace);
+		eventsWereEnabled = Blockly.Events?.isEnabled ? Blockly.Events.isEnabled() : false;
+
+		if (eventsWereEnabled && Blockly.Events?.disable) {
+			Blockly.Events.disable();
+		}
+
+		workspace.clear();
+		Blockly.serialization.workspaces.load(state, workspace);
+		workspace.render();
+	} catch (error) {
+		log.warn('語言切換後重載預覽工作區失敗:', error);
+	} finally {
+		if (eventsWereEnabled && Blockly.Events?.enable) {
+			Blockly.Events.enable();
+		}
+		setTimeout(() => {
+			isLanguageSwitchReloading = false;
+		}, 0);
+	}
+}
+
+/**
  * 顯示開發板警告訊息
  * 當備份檔案中的 board 值無效時，在預覽視窗頂部顯示警告
  * @param {string} message - 警告訊息文字（已由 Extension 端翻譯）
@@ -382,6 +432,13 @@ window.addEventListener('message', event => {
 		case 'updateTheme':
 			updateTheme(message.theme, false); // 設置 notifyExtension = false，避免重複通知
 			break;
+		case 'updateLanguage':
+			if (window.languageManager && message.resolvedLanguage) {
+				window.languageManager.setLanguage(message.resolvedLanguage);
+			} else {
+				log.warn('預覽視窗無法更新語言: 缺少 languageManager 或語言代碼', message);
+			}
+			break;
 
 		case 'loadError':
 			// 顯示載入失敗的錯誤訊息
@@ -399,6 +456,8 @@ window.addEventListener('languageChanged', function (event) {
 	log.info(`語言已變更為: ${event.detail.language}`);
 	// 更新 UI 文字
 	updateUITexts();
+	// 重新載入工作區以刷新積木文字
+	refreshWorkspaceForLanguage();
 });
 
 // 監聽語言檔案載入事件

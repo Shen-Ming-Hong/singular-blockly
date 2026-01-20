@@ -95,6 +95,7 @@
 		"audit:i18n:all": "node scripts/i18n/audit-translations.js --languages=ja,ko,de,zh-hant,es,fr,it,pl,pt-br,ru,tr,cs,hu,bg",
 		"audit:i18n:ja": "node scripts/i18n/audit-translations.js --languages=ja",
 		"audit:i18n:summary": "node scripts/i18n/audit-summary.js specs/002-i18n-localization-review/audit-reports/audit-2025-10-17-baseline.json",
+		"scan:blockly-msg": "node scripts/i18n/scan-blockly-msg.js",
 		"validate:i18n": "node scripts/i18n/validate-translations.js --all",
 		"validate:i18n:lang": "node scripts/i18n/validate-translations.js",
 		"detect:i18n": "node scripts/i18n/detect-patterns.js --all",

@@ -294,6 +294,7 @@ window.languageManager.loadMessages('ja', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '%1 回繰り返す',
+	CONTROLS_REPEAT_INPUT_DO: '実行',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: '条件が真の間、繰り返す',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: '条件が真になるまで繰り返す',
 	CONTROLS_FOR_TITLE: 'カウンタ %1 を %2 から %3 まで %4 ずつ増加させながら繰り返す',
@@ -623,6 +624,7 @@ window.languageManager.loadMessages('ja', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'バックアップ保存完了：{0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'ワークスペースが空です、バックアップ不要',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'しばらくお待ちください、バックアップが完了したばかりです',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'メインプログラムブロックが複数検出されました。余分なブロックを削除してください。',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'ボードタイプを切替',

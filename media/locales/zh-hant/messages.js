@@ -290,6 +290,7 @@ window.languageManager.loadMessages('zh-hant', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '重複 %1 次',
+	CONTROLS_REPEAT_INPUT_DO: '執行',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: '重複當',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: '重複直到',
 	CONTROLS_FOR_TITLE: '使用 %1 從 %2 計數到 %3 每次遞增 %4',
@@ -625,6 +626,7 @@ window.languageManager.loadMessages('zh-hant', {
 	BACKUP_QUICK_SAVE_SUCCESS: '備份已儲存：{0}',
 	BACKUP_QUICK_SAVE_EMPTY: '工作區為空，不需要備份',
 	BACKUP_QUICK_SAVE_COOLDOWN: '請稍候，上次備份剛完成',
+	MAIN_BLOCK_DUPLICATE_WARNING: '偵測到多個主程式積木，請刪除多餘的積木',
 
 	// 開發板切換警告
 	BOARD_SWITCH_WARNING_TITLE: '切換開發板類型',

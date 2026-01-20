@@ -1808,6 +1808,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		toolbox: toolboxConfig,
 		theme: theme, // 使用根據設定選擇的主題
 		trashcan: true, // 添加垃圾桶
+		maxInstances: {
+			micropython_main: 1,
+			arduino_setup_loop: 1,
+		},
 		move: {
 			scrollbars: true,
 			drag: true,
@@ -1980,6 +1984,70 @@ document.addEventListener('DOMContentLoaded', async () => {
 		);
 	};
 
+	// 主程式積木類型判定與刪除保護
+	const getMainBlockType = boardId => {
+		if (!boardId) {
+			return 'arduino_setup_loop';
+		}
+		if (boardId === 'cyberbrick') {
+			return 'micropython_main';
+		}
+		const boardConfig = window.BOARD_CONFIGS ? window.BOARD_CONFIGS[boardId] : null;
+		if (boardConfig && boardConfig.language === 'micropython') {
+			return 'micropython_main';
+		}
+		return 'arduino_setup_loop';
+	};
+
+	const mainBlockCountState = {
+		blockType: null,
+		count: 0,
+	};
+
+	const updateMainBlockDeletable = workspace => {
+		if (!workspace) {
+			return;
+		}
+
+		const boardId = window.currentBoard || (boardSelect ? boardSelect.value : 'arduino_uno');
+		const blockType = getMainBlockType(boardId);
+		const blocks = workspace.getBlocksByType(blockType, false);
+
+		if (!blocks || blocks.length === 0) {
+			mainBlockCountState.blockType = blockType;
+			mainBlockCountState.count = 0;
+			return;
+		}
+
+		const shouldBeDeletable = blocks.length > 1;
+		blocks.forEach(block => {
+			if (block && typeof block.setDeletable === 'function') {
+				block.setDeletable(shouldBeDeletable);
+			}
+		});
+
+		const shouldWarn =
+			blocks.length > 1 &&
+			(mainBlockCountState.blockType !== blockType || mainBlockCountState.count !== blocks.length);
+
+		if (shouldWarn) {
+			const warningMessage =
+				window.languageManager?.getMessage(
+					'MAIN_BLOCK_DUPLICATE_WARNING',
+					'偵測到多個主程式積木，請刪除多餘的積木'
+				) || '偵測到多個主程式積木，請刪除多餘的積木';
+
+			vscode.postMessage({
+				command: 'showToast',
+				type: 'warning',
+				message: warningMessage,
+			});
+		}
+
+		mainBlockCountState.blockType = blockType;
+		mainBlockCountState.count = blocks.length;
+	};
+
 	// 拖動狀態追蹤：避免在拖動過程中執行昂貴的操作
 	let isDraggingBlock = false;
 	let pendingCodeUpdate = false;
@@ -2064,6 +2132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				if (pendingMessage.state) {
 					Blockly.serialization.workspaces.load(pendingMessage.state, workspace);
 					rebuildPwmConfig(workspace);
+					updateMainBlockDeletable(workspace);
 				}
 			} catch (error) {
 				log.error('執行待處理的 FileWatcher 重載失敗:', error);
@@ -2324,6 +2393,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}
 			}, 100);
+		}
+
+		if (event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE) {
+			updateMainBlockDeletable(workspace);
 		}
 
 		// 工作區完全載入後修復函數呼叫積木和連接點
@@ -2720,6 +2793,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 				// 重建 ESP32 PWM 配置
 				rebuildPwmConfig(workspace);
+				updateMainBlockDeletable(workspace);
 
 				// 工作區載入後，立即修復函數名稱關聯
 				setTimeout(() => {

@@ -294,6 +294,7 @@ window.languageManager.loadMessages('es', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'repetir %1 veces',
+	CONTROLS_REPEAT_INPUT_DO: 'hacer',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'repetir mientras',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'repetir hasta que',
 	CONTROLS_FOR_TITLE: 'contar con %1 desde %2 hasta %3 de %4 en %4',
@@ -625,6 +626,7 @@ window.languageManager.loadMessages('es', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Copia guardada: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'El espacio de trabajo está vacío, no se necesita copia de seguridad',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Por favor espere, la copia de seguridad acaba de completarse',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Se detectaron varios bloques de programa principal. Elimina los bloques sobrantes.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Cambiar tipo de placa',

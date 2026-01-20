@@ -374,6 +374,21 @@ describe('WebView Message Handler', () => {
 		assert.strictEqual(response.resolvedLanguage, 'en');
 	});
 
+	it('should handle showToast message types', async () => {
+		const baseMessage = { command: 'showToast', message: 'Hello' };
+
+		await messageHandler.handleMessage({ ...baseMessage, type: 'error' });
+		assert(vscodeMock.window.showErrorMessage.calledOnceWith('Hello'));
+		vscodeMock.window.showErrorMessage.resetHistory();
+
+		await messageHandler.handleMessage({ ...baseMessage, type: 'warning' });
+		assert(vscodeMock.window.showWarningMessage.calledOnceWith('Hello'));
+		vscodeMock.window.showWarningMessage.resetHistory();
+
+		await messageHandler.handleMessage({ ...baseMessage });
+		assert(vscodeMock.window.showInformationMessage.calledOnceWith('Hello'));
+	});
+
 	it('should handle create backup message', async () => {
 		// 準備測試
 		fileServiceStub.fileExists.returns(true);
@@ -504,8 +519,11 @@ describe('WebView Message Handler', () => {
 	});
 
 	it('should handle restore backup message', async () => {
+		const clock = sinon.useFakeTimers({ now: new Date('2026-01-20T18:04:09Z') });
 		const backupPath = path.join('blockly', 'backup', 'my.json');
 		const mainJsonPath = path.join('blockly', 'main.json');
+		const autoBackupName = 'auto_restore_20260120_180409';
+		const autoBackupPath = path.join('blockly', 'backup', `${autoBackupName}.json`);
 
 		fileServiceStub.fileExists.withArgs(backupPath).returns(true);
 		fileServiceStub.fileExists.withArgs(mainJsonPath).returns(true);
@@ -518,15 +536,22 @@ describe('WebView Message Handler', () => {
 			name: 'my',
 		};
 
-		await messageHandler.handleMessage(restoreMessage);
+		try {
+			await messageHandler.handleMessage(restoreMessage);
 
-		assert(fileServiceStub.copyFile.calledWith(backupPath, mainJsonPath));
-		assert(webviewMock.postMessage.calledTwice);
-		const loadMsg = webviewMock.postMessage.getCall(0).args[0];
-		const resultMsg = webviewMock.postMessage.getCall(1).args[0];
-		assert.strictEqual(loadMsg.command, 'loadWorkspace');
-		assert.strictEqual(resultMsg.command, 'backupRestored');
-		assert.strictEqual(resultMsg.success, true);
+			assert.strictEqual(fileServiceStub.copyFile.callCount, 2);
+			assert.deepStrictEqual(fileServiceStub.copyFile.getCall(0).args, [mainJsonPath, autoBackupPath]);
+			assert.deepStrictEqual(fileServiceStub.copyFile.getCall(1).args, [backupPath, mainJsonPath]);
+			assert(webviewMock.postMessage.calledTwice);
+			const loadMsg = webviewMock.postMessage.getCall(0).args[0];
+			const resultMsg = webviewMock.postMessage.getCall(1).args[0];
+			assert.strictEqual(loadMsg.command, 'loadWorkspace');
+			assert.strictEqual(resultMsg.command, 'backupRestored');
+			assert.strictEqual(resultMsg.success, true);
+			assert.strictEqual(resultMsg.autoBackupName, autoBackupName);
+		} finally {
+			clock.restore();
+		}
 	});
 
 	it('should handle restore backup cancel', async () => {
@@ -554,8 +579,9 @@ describe('WebView Message Handler', () => {
 		await messageHandler.handleMessage(previewMessage);
 
 		assert(vscodeMock.commands.executeCommand.calledOnce);
-		const arg = vscodeMock.commands.executeCommand.getCall(0).args[1];
-		assert(arg.endsWith(path.join(workspacePath, backupPath)));
+		const args = vscodeMock.commands.executeCommand.getCall(0).args;
+		assert.strictEqual(args[0], 'singular-blockly.previewBackup');
+		assert.strictEqual(args[1], path.join(workspacePath, backupPath));
 	});
 
 	it('should handle get auto backup settings message', async () => {
