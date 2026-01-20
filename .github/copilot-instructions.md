@@ -8,16 +8,16 @@
 
 VSCode extension for visual Arduino/MicroPython programming using Google Blockly. Generates Arduino C++ (via PlatformIO) or MicroPython (via mpremote for CyberBrick) based on board selection. Supports 15 languages with 99% i18n coverage.
 
-**Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VSCode 1.105.0+ | MCP SDK 1.25.2
+**Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VSCode 1.105.0+ | MCP SDK 1.25.2 | Zod 4.1.13
 
 ## Architecture (Two-Context System)
 
 ```
 Extension Host (Node.js)              WebView (Browser)
 ├── src/extension.ts          ←→      ├── media/html/blocklyEdit.html
-├── src/webview/                      ├── media/js/blocklyEdit.js (3000+ lines)
+├── src/webview/                      ├── media/js/blocklyEdit.js
 │   ├── webviewManager.ts             └── media/blockly/
-│   └── messageHandler.ts                 ├── blocks/*.js (定義積木外觀)
+│   └── messageHandler.ts                 ├── blocks/*.js (積木外觀定義)
 ├── src/mcp/mcpServer.ts                  └── generators/{arduino,micropython}/*.js
 ├── src/mcp/tools/
 │   ├── blockQuery.ts         # get_block_usage, search_blocks, list_blocks_by_category
@@ -79,17 +79,17 @@ micropythonGenerator.forBlock['cyberbrick_led_set_color'] = function (block) {
 
 ### Service Layer Rules
 
--   **File I/O**: Use `FileService` only — inject `FileSystem` interface for testing
--   **Logging**: Use `log('message', 'info')` from `logging.ts`; WebView uses `log.info()`
--   **Workspace**: Always check `vscode.workspace.workspaceFolders` before operations
--   **Empty State Guard**: `isEmptyWorkspaceState()` prevents overwriting valid data with empty state
+- **File I/O**: Use `FileService` only — inject `FileSystem` interface for testing
+- **Logging**: Use `log('message', 'info')` from `logging.ts`; WebView uses `log.info()`
+- **Workspace**: Always check `vscode.workspace.workspaceFolders` before operations
+- **Empty State Guard**: `isEmptyWorkspaceState()` prevents overwriting valid data with empty state
 
 ### Upload Architecture (Unified UI)
 
 Both Arduino and MicroPython use the same WebView upload UI. The `messageHandler.ts` routes to:
 
--   `ArduinoUploader` → PlatformIO CLI for compilation/upload
--   `MicropythonUploader` → `mpremote` tool for CyberBrick
+- `ArduinoUploader` → PlatformIO CLI for compilation/upload
+- `MicropythonUploader` → `mpremote` tool for CyberBrick
 
 Board language detection via `getBoardLanguage(board)` in `src/types/arduino.ts`.
 
@@ -128,7 +128,8 @@ npm run generate:dictionary  # Update MCP block dictionary
 1. **Block definition**: `media/blockly/blocks/{category}.js` — define appearance, fields, connections
 2. **Arduino generator**: `media/blockly/generators/arduino/{category}.js` — use `window.getCurrentBoard()` for board-specific code
 3. **MicroPython generator**: `media/blockly/generators/micropython/{category}.js` — use `generator.addImport()`, `generator.addHardwareInit()`
-4. **Toolbox entry**: `media/toolbox/categories/{category}.json` (categories: arduino, communication, cyberbrick\_\*, lists, logic, loops, math, motors, sensors, text, vision-sensors)
+4. **Toolbox entry**: `media/toolbox/categories/{category}.json`
+    - Categories: arduino, communication, cyberbrick_core, cyberbrick_rc, cyberbrick_wifi, cyberbrick_x11, cyberbrick_x12, lists, logic, loops, math, motors, sensors, text, vision-sensors
 5. **i18n keys**: All 15 `media/locales/*/messages.js` files (use `npm run validate:i18n` to check)
 
 **For setup blocks** (servo, encoder): Register with `arduinoGenerator.registerAlwaysGenerateBlock('block_type')` at module load (see `motors.js` IIFE pattern)
@@ -139,18 +140,54 @@ npm run generate:dictionary  # Update MCP block dictionary
 
 Adding tools:
 
-1. Create `src/mcp/tools/{name}.ts` with `registerXxxTools(server: McpServer)`
-2. Register in `mcpServer.ts`
-3. Use Zod schemas for input validation
-4. Run `npm run generate:dictionary` to update `block-dictionary.json`
+1. Create `src/mcp/tools/{name}.ts` with `register{Name}Tools(server: McpServer)` function
+2. Export in `src/mcp/tools/index.ts`
+3. Register in `mcpServer.ts`
+4. Use Zod schemas for input validation
+5. Run `npm run generate:dictionary` to update `block-dictionary.json`
 
 ## Specs-Driven Development
 
 Features documented in `/specs/{NNN}-feature-name/`:
 
--   `spec.md` → Requirements | `plan.md` → Strategy | `tasks.md` → Breakdown
+- `spec.md` → Requirements | `plan.md` → Strategy | `tasks.md` → Breakdown
+
+**Active specs**: Keep only last 3 numbered specs active. Completed specs should be consolidated into `docs/specifications/`.
 
 **Check existing specs before implementing new features.**
+
+## Commit & PR Guidelines
+
+### Commit Message Format (Conventional Commits)
+
+```
+<type>(<scope>): <description>
+
+# Examples:
+feat(mcp): add block search tool
+fix(webview): resolve board detection race condition
+docs(README): update installation steps
+i18n(ja): improve motor block translations
+chore(deps): bump blockly to 12.3.1
+```
+
+**Types**: `feat` | `fix` | `docs` | `i18n` | `chore` | `refactor` | `test` | `style`
+
+### PR Workflow
+
+1. **Create PR** via `git-workflow` skill or manually
+2. **Automated checks**: CI must pass, ESLint clean, no merge conflicts
+3. **Review**: Use `pr-review-release` skill to evaluate Copilot/human review comments
+4. **Merge**: Squash merge to master with `gh pr merge --squash --delete-branch`
+5. **Release**: Version bump → CHANGELOG → Git tag → GitHub Release
+
+### Localization PRs
+
+Use template `.github/PULL_REQUEST_TEMPLATE/localization.md` with:
+
+- Before/after translation examples
+- Validation commands: `npm run validate:i18n` and `npm run detect:i18n:lang`
+- Screenshots of UI changes
 
 ## Testing with Dependency Injection
 
