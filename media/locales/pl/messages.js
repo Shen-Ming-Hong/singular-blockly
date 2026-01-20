@@ -294,6 +294,7 @@ window.languageManager.loadMessages('pl', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'powtórz %1 razy',
+	CONTROLS_REPEAT_INPUT_DO: 'wykonaj',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'powtarzaj dopóki',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'powtarzaj aż do',
 	CONTROLS_FOR_TITLE: 'licz z %1 od %2 do %3 co %4',
@@ -628,6 +629,7 @@ window.languageManager.loadMessages('pl', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Kopia zapasowa zapisana: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Obszar roboczy jest pusty, kopia zapasowa nie jest potrzebna',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Proszę czekać, kopia zapasowa właśnie została ukończona',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Wykryto wiele blokow programu glownego. Usun nadmiarowe bloki.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Zmień typ płytki',

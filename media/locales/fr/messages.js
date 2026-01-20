@@ -296,6 +296,7 @@ window.languageManager.loadMessages('fr', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'répéter %1 fois',
+	CONTROLS_REPEAT_INPUT_DO: 'faire',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'répéter tant que',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: "répéter jusqu'à",
 	CONTROLS_FOR_TITLE: 'compter avec %1 de %2 à %3 par %4',
@@ -626,6 +627,7 @@ window.languageManager.loadMessages('fr', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Sauvegarde enregistrée : {0}',
 	BACKUP_QUICK_SAVE_EMPTY: "L'espace de travail est vide, aucune sauvegarde nécessaire",
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Veuillez patienter, la sauvegarde vient de se terminer',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Plusieurs blocs de programme principal ont ete detectes. Veuillez supprimer les blocs en trop.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Changer de type de carte',

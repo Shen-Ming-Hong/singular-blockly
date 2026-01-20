@@ -294,6 +294,7 @@ window.languageManager.loadMessages('hu', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'ismételd %1 alkalommal',
+	CONTROLS_REPEAT_INPUT_DO: 'csinald',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'ismételd amíg',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'ismételd amíg nem',
 	CONTROLS_FOR_TITLE: 'számláló %1 értéke %2 és %3 között, lépésköz %4',
@@ -629,6 +630,7 @@ window.languageManager.loadMessages('hu', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Biztonsági mentés mentve: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'A munkaterület üres, nincs szükség biztonsági mentésre',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Kérem várjon, a biztonsági mentés éppen befejeződött',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Tobb fo program blokkot eszleltunk. Torold a felesleges blokkokat.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Lapka típus váltás',

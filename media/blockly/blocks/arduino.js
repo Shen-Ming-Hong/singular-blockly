@@ -444,6 +444,7 @@ Blockly.Blocks['arduino_setup_loop'] = {
 		this.setStyle('arduino_blocks');
 		this.setTooltip('Arduino 程式的基本結構');
 		this.setHelpUrl('');
+		this.setDeletable(false);
 	},
 };
 

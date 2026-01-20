@@ -17,7 +17,7 @@
 
 **Purpose**: 確認開發環境和分支準備
 
-- [ ] T001 切換到功能分支 `031-bugfix-batch-jan` 並確認環境
+- [X] T001 切換到功能分支 `031-bugfix-batch-jan` 並確認環境
 - [ ] T002 [P] 執行 `npm run watch` 確認編譯無錯誤
 
 ---
@@ -40,14 +40,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [US1] 在 `media/js/blocklyEdit.js` 的 `Blockly.inject()` 添加 `maxInstances` 配置限制主程式積木為單一實例
-- [ ] T004 [US1] 在 `media/js/blocklyEdit.js` 實作 `updateMainBlockDeletable()` 函數，動態控制 deletable 狀態
-- [ ] T005 [US1] 在 `media/js/blocklyEdit.js` 的 `loadWorkspace` 處理後呼叫 `updateMainBlockDeletable()`
-- [ ] T006 [US1] 在 `media/js/blocklyEdit.js` 添加 workspace change listener 監聽 `BLOCK_DELETE` 和 `BLOCK_CREATE` 事件，重新計算 deletable 狀態
-- [ ] T007 [P] [US1] 在 `media/blockly/blocks/arduino.js` 的 `arduino_setup_loop` 積木定義中添加 `this.setDeletable(false)`
-- [ ] T008 [US1] 在多積木偵測時透過 `postMessage` 顯示 Toast 警告訊息，使用 `languageManager.getMessage('MAIN_BLOCK_DUPLICATE_WARNING', '偵測到多個主程式積木，請刪除多餘的積木')` 取得翻譯文字
-- [ ] T009 [US1] 手動測試：載入舊專案含多個主程式積木 → 確認可刪除多餘 → 確認最後一個不可刪除
-- [ ] T010 [US1] 手動測試：CyberBrick 模式拖曳第二個 `micropython_main` → 確認被阻止
+- [X] T003 [US1] 在 `media/js/blocklyEdit.js` 的 `Blockly.inject()` 添加 `maxInstances` 配置限制主程式積木為單一實例
+- [X] T004 [US1] 在 `media/js/blocklyEdit.js` 實作 `updateMainBlockDeletable()` 函數，動態控制 deletable 狀態
+- [X] T005 [US1] 在 `media/js/blocklyEdit.js` 的 `loadWorkspace` 處理後呼叫 `updateMainBlockDeletable()`
+- [X] T006 [US1] 在 `media/js/blocklyEdit.js` 添加 workspace change listener 監聽 `BLOCK_DELETE` 和 `BLOCK_CREATE` 事件，重新計算 deletable 狀態
+- [X] T007 [P] [US1] 在 `media/blockly/blocks/arduino.js` 的 `arduino_setup_loop` 積木定義中添加 `this.setDeletable(false)`
+- [X] T008 [US1] 在多積木偵測時透過 `postMessage` 顯示 Toast 警告訊息，使用 `languageManager.getMessage('MAIN_BLOCK_DUPLICATE_WARNING', '偵測到多個主程式積木，請刪除多餘的積木')` 取得翻譯文字
+- [X] T009 [US1] 手動測試：載入舊專案含多個主程式積木 → 確認可刪除多餘 → 確認最後一個不可刪除
+- [X] T010 [US1] 手動測試：CyberBrick 模式拖曳第二個 `micropython_main` → 確認被阻止
 
 **Checkpoint**: User Story 1 完成 - 主程式積木刪除限制功能正常運作
 
@@ -55,15 +55,15 @@
 
 ## Phase 4: User Story 2 - Preview Backup File Successfully (Priority: P2)
 
-**Goal**: 使用者點擊備份預覽按鈕後能正確開啟 JSON 檔案
+**Goal**: 使用者點擊備份預覽按鈕後能正確開啟預覽視窗並載入備份
 
-**Independent Test**: 點擊備份管理中的預覽按鈕，驗證檔案是否正確開啟
+**Independent Test**: 點擊備份管理中的預覽按鈕，驗證預覽視窗是否正確開啟並載入積木
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] 修改 `src/webview/messageHandler.ts` 的 `handlePreviewBackup()` 方法，將 `fullPath` 包裝為 `vscode.Uri.file()`
-- [ ] T012 [P] [US2] 更新 `src/test/suite/messageHandler.test.ts` 添加備份預覽 URI 單元測試
-- [ ] T013 [US2] 手動測試：點擊備份預覽按鈕 → 確認檔案正確開啟
+- [X] T011 [US2] 修改 `src/webview/messageHandler.ts` 的 `handlePreviewBackup()` 方法，改用 `singular-blockly.previewBackup` 開啟預覽視窗
+- [X] T012 [P] [US2] 更新 `src/test/messageHandler.test.ts` 添加備份預覽 command 單元測試
+- [X] T013 [US2] 手動測試：點擊備份預覽按鈕 → 確認預覽視窗正確開啟並載入內容
 
 **Checkpoint**: User Story 2 完成 - 備份預覽功能正常運作
 
@@ -77,11 +77,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T014 [US3] 修改 `src/webview/messageHandler.ts` 的 `handleRestoreBackup()` 方法，在 `copyFile()` 前檢查 `main.json` 是否存在
-- [ ] T015 [US3] 在 `handleRestoreBackup()` 實作自動備份邏輯：生成 `auto_restore_YYYYMMDD_HHMMSS.json` 並複製
-- [ ] T016 [US3] 修改 `backupRestored` 回應訊息，添加 `autoBackupName` 欄位
-- [ ] T017 [P] [US3] 更新 `src/test/suite/messageHandler.test.ts` 添加還原前自動備份單元測試
-- [ ] T018 [US3] 手動測試：還原備份 → 確認 `auto_restore_*` 備份已建立 → 確認備份列表顯示
+- [X] T014 [US3] 修改 `src/webview/messageHandler.ts` 的 `handleRestoreBackup()` 方法，在 `copyFile()` 前檢查 `main.json` 是否存在
+- [X] T015 [US3] 在 `handleRestoreBackup()` 實作自動備份邏輯：生成 `auto_restore_YYYYMMDD_HHMMSS.json` 並複製
+- [X] T016 [US3] 修改 `backupRestored` 回應訊息，添加 `autoBackupName` 欄位
+- [X] T017 [P] [US3] 更新 `src/test/suite/messageHandler.test.ts` 添加還原前自動備份單元測試
+- [X] T018 [US3] 手動測試：還原備份 → 確認 `auto_restore_*` 備份已建立 → 確認備份列表顯示
 
 **Checkpoint**: User Story 3 完成 - 還原前自動備份功能正常運作
 
@@ -95,28 +95,28 @@
 
 ### Implementation for User Story 4
 
-- [ ] T019 [US4] 建立 `scripts/i18n/scan-blockly-msg.js` 掃描工具：從 Blockly 官方訊息檔案提取所有 Msg 鍵
-- [ ] T020 [US4] 在掃描工具中實作比對邏輯：掃描專案積木定義找出使用的鍵，比對翻譯檔案識別缺失
-- [ ] T021 [US4] 在掃描工具中實作報告輸出：鍵名、英文預設值、受影響積木類型
-- [ ] T022 [US4] 在 `package.json` 添加 `npm run scan:blockly-msg` script
-- [ ] T023 [US4] 執行掃描工具產生缺失報告
-- [ ] T024 [P] [US4] 補充 `media/locales/en/messages.js` 缺失翻譯鍵（含 `CONTROLS_REPEAT_INPUT_DO`、`MAIN_BLOCK_DUPLICATE_WARNING`）
-- [ ] T025 [P] [US4] 補充 `media/locales/zh-hant/messages.js` 缺失翻譯鍵
-- [ ] T026 [P] [US4] 補充 `media/locales/ja/messages.js` 缺失翻譯鍵
-- [ ] T027 [P] [US4] 補充 `media/locales/ko/messages.js` 缺失翻譯鍵
-- [ ] T028 [P] [US4] 補充 `media/locales/de/messages.js` 缺失翻譯鍵
-- [ ] T029 [P] [US4] 補充 `media/locales/fr/messages.js` 缺失翻譯鍵
-- [ ] T030 [P] [US4] 補充 `media/locales/es/messages.js` 缺失翻譯鍵
-- [ ] T031 [P] [US4] 補充 `media/locales/pt-br/messages.js` 缺失翻譯鍵
-- [ ] T032 [P] [US4] 補充 `media/locales/it/messages.js` 缺失翻譯鍵
-- [ ] T033 [P] [US4] 補充 `media/locales/ru/messages.js` 缺失翻譯鍵
-- [ ] T034 [P] [US4] 補充 `media/locales/pl/messages.js` 缺失翻譯鍵
-- [ ] T035 [P] [US4] 補充 `media/locales/hu/messages.js` 缺失翻譯鍵
-- [ ] T036 [P] [US4] 補充 `media/locales/tr/messages.js` 缺失翻譯鍵
-- [ ] T037 [P] [US4] 補充 `media/locales/bg/messages.js` 缺失翻譯鍵
-- [ ] T038 [P] [US4] 補充 `media/locales/cs/messages.js` 缺失翻譯鍵
-- [ ] T039 [US4] 執行 `npm run validate:i18n` 驗證所有翻譯檔案格式正確
-- [ ] T040 [US4] 手動測試：切換英文 → 確認迴圈積木顯示 "do"
+- [X] T019 [US4] 建立 `scripts/i18n/scan-blockly-msg.js` 掃描工具：從 Blockly 官方訊息檔案提取所有 Msg 鍵
+- [X] T020 [US4] 在掃描工具中實作比對邏輯：掃描專案積木定義找出使用的鍵，比對翻譯檔案識別缺失
+- [X] T021 [US4] 在掃描工具中實作報告輸出：鍵名、英文預設值、受影響積木類型
+- [X] T022 [US4] 在 `package.json` 添加 `npm run scan:blockly-msg` script
+- [X] T023 [US4] 執行掃描工具產生缺失報告
+- [X] T024 [P] [US4] 補充 `media/locales/en/messages.js` 缺失翻譯鍵（含 `CONTROLS_REPEAT_INPUT_DO`、`MAIN_BLOCK_DUPLICATE_WARNING`）
+- [X] T025 [P] [US4] 補充 `media/locales/zh-hant/messages.js` 缺失翻譯鍵
+- [X] T026 [P] [US4] 補充 `media/locales/ja/messages.js` 缺失翻譯鍵
+- [X] T027 [P] [US4] 補充 `media/locales/ko/messages.js` 缺失翻譯鍵
+- [X] T028 [P] [US4] 補充 `media/locales/de/messages.js` 缺失翻譯鍵
+- [X] T029 [P] [US4] 補充 `media/locales/fr/messages.js` 缺失翻譯鍵
+- [X] T030 [P] [US4] 補充 `media/locales/es/messages.js` 缺失翻譯鍵
+- [X] T031 [P] [US4] 補充 `media/locales/pt-br/messages.js` 缺失翻譯鍵
+- [X] T032 [P] [US4] 補充 `media/locales/it/messages.js` 缺失翻譯鍵
+- [X] T033 [P] [US4] 補充 `media/locales/ru/messages.js` 缺失翻譯鍵
+- [X] T034 [P] [US4] 補充 `media/locales/pl/messages.js` 缺失翻譯鍵
+- [X] T035 [P] [US4] 補充 `media/locales/hu/messages.js` 缺失翻譯鍵
+- [X] T036 [P] [US4] 補充 `media/locales/tr/messages.js` 缺失翻譯鍵
+- [X] T037 [P] [US4] 補充 `media/locales/bg/messages.js` 缺失翻譯鍵
+- [X] T038 [P] [US4] 補充 `media/locales/cs/messages.js` 缺失翻譯鍵
+- [X] T039 [US4] 執行 `npm run validate:i18n` 驗證所有翻譯檔案格式正確
+- [X] T040 [US4] 手動測試：切換英文 → 確認迴圈積木顯示 "do"
 
 **Checkpoint**: User Story 4 完成 - 所有翻譯鍵補充完成，掃描工具可用
 
@@ -126,10 +126,25 @@
 
 **Purpose**: 跨 User Story 的收尾工作
 
-- [ ] T041 執行全部單元測試 `npm test` 確認無回歸
-- [ ] T042 [P] 更新 CHANGELOG.md 記錄四個 bug 修復
-- [ ] T043 執行 quickstart.md 驗證流程確認功能正常
-- [ ] T044 程式碼審查與清理
+- [X] T041 執行全部單元測試 `npm test` 確認無回歸
+- [X] T042 [P] 更新 CHANGELOG.md 記錄四個 bug 修復
+- [X] T043 執行 quickstart.md 驗證流程確認功能正常
+- [X] T044 程式碼審查與清理
+
+---
+
+## Phase 8: User Story 5 - Sync Preview Language with Editor (Priority: P3)
+
+**Goal**: 語言切換時，同步更新所有預覽視窗的 UI 與積木文字
+
+**Independent Test**: 開啟預覽視窗 → 切換語言 → 確認預覽 UI 與積木文字同步更新
+
+### Implementation for User Story 5
+
+- [X] T045 [US5] 在 `src/webview/webviewManager.ts` 同步語言更新到所有預覽視窗
+- [X] T046 [US5] 在 `media/js/blocklyPreview.js` 接收語言更新並重新載入工作區以刷新文字
+- [X] T047 [P] [US5] 更新 `src/test/webviewPreview.test.ts` 覆蓋預覽語言同步
+- [X] T048 [US5] 手動測試：切換語言 → 預覽視窗標題與積木文字同步更新
 
 ---
 

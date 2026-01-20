@@ -295,6 +295,7 @@ window.languageManager.loadMessages('ru', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'повторить %1 раз',
+	CONTROLS_REPEAT_INPUT_DO: 'выполнить',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'повторять, пока',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'повторять, до тех пор пока не',
 	CONTROLS_FOR_TITLE: 'считать с %1 от %2 до %3 шагом %4',
@@ -624,6 +625,7 @@ window.languageManager.loadMessages('ru', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Резервная копия сохранена: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Рабочая область пуста, резервное копирование не требуется',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Пожалуйста, подождите, резервное копирование только что завершено',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Обнаружено несколько блоков основной программы. Удалите лишние блоки.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Сменить тип платы',

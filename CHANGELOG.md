@@ -8,6 +8,39 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.54.1] - 2026-01-20
+
+### 新增功能 Added
+
+-   **Blockly.Msg 翻譯鍵掃描工具** (Blockly.Msg Translation Key Scanner)
+
+    -   新增 `npm run scan:blockly-msg` 掃描腳本
+        Added `npm run scan:blockly-msg` scan script
+
+### 修復 Fixed
+
+-   **主程式積木數量限制與刪除保護** (Main Program Block Limits & Deletion Guard)
+
+    -   `maxInstances` 限制主程式積木為單一實例，並動態更新 deletable 狀態
+        Enforced `maxInstances` single-instance limit with dynamic deletable state
+    -   多積木情境顯示警告提示
+        Shows warning when duplicate main blocks are detected
+
+-   **備份預覽 URI 修正** (Backup Preview URI Fix)
+
+    -   `vscode.open` 改用 `vscode.Uri.file()` 包裝路徑
+        `vscode.open` now uses `vscode.Uri.file()` for file paths
+
+-   **還原前自動備份** (Auto Backup Before Restore)
+
+    -   還原前建立 `auto_restore_YYYYMMDD_HHMMSS.json` 備份並回傳檔名
+        Creates `auto_restore_YYYYMMDD_HHMMSS.json` before restore and returns the backup name
+
+-   **Blockly 迴圈翻譯鍵補齊** (Blockly Loop Translation Key Completion)
+
+    -   補上 `CONTROLS_REPEAT_INPUT_DO` 與主程式警告翻譯鍵
+        Added `CONTROLS_REPEAT_INPUT_DO` and main block warning translation keys
+
 ## [0.54.0] - 2026-01-19
 
 ### 新增功能 Added

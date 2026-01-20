@@ -294,6 +294,7 @@ window.languageManager.loadMessages('bg', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'повтори %1 пъти',
+	CONTROLS_REPEAT_INPUT_DO: 'изпълни',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'повтаряй докато',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'повтаряй докато не',
 	CONTROLS_FOR_TITLE: 'брой с %1 от %2 до %3 със стъпка %4',
@@ -628,6 +629,7 @@ window.languageManager.loadMessages('bg', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Резервното копие е запазено: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Работното пространство е празно, не е необходимо архивиране',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Моля, изчакайте, архивирането току-що приключи',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Открити са няколко блока на основната програма. Изтрийте излишните блокове.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Превключване на тип платка',

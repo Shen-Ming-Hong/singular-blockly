@@ -293,6 +293,7 @@ window.languageManager.loadMessages('en', {
 
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'repeat %1 times',
+	CONTROLS_REPEAT_INPUT_DO: 'do',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'repeat while',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'repeat until',
 	CONTROLS_FOR_TITLE: 'count with %1 from %2 to %3 by %4',
@@ -631,6 +632,7 @@ window.languageManager.loadMessages('en', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Backup saved: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Workspace is empty, no backup needed',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Please wait, backup just completed',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Detected multiple main program blocks. Please delete the extra blocks.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Switch Board Type',

@@ -26,16 +26,16 @@
 
 ### User Story 2 - Preview Backup File Successfully (Priority: P2)
 
-使用者想要預覽備份檔案的內容，點擊預覽按鈕後應該能在 VSCode 中開啟對應的 JSON 檔案。
+使用者想要預覽備份檔案的內容，點擊預覽按鈕後應該在 VSCode 中開啟預覽視窗（`blocklyPreview.html`）並載入對應備份。
 
 **Why this priority**: 備份預覽功能完全無法使用，但使用者可透過手動開啟檔案作為暫時替代方案。
 
-**Independent Test**: 點擊備份管理中的預覽按鈕，驗證檔案是否正確開啟。
+**Independent Test**: 點擊備份管理中的預覽按鈕，驗證預覽視窗是否正確開啟並載入積木。
 
 **Acceptance Scenarios**:
 
-1. **Given** 使用者有一個名為 `auto_20260115_180409` 的備份檔案, **When** 使用者點擊該備份的預覽按鈕, **Then** VSCode 成功開啟 `blockly/backup/auto_20260115_180409.json` 檔案
-2. **Given** 使用者點擊預覽按鈕, **When** 檔案路徑包含空格或特殊字元, **Then** 檔案仍能正確開啟
+1. **Given** 使用者有一個名為 `auto_20260115_180409` 的備份檔案, **When** 使用者點擊該備份的預覽按鈕, **Then** VSCode 成功開啟備份預覽視窗並載入 `blockly/backup/auto_20260115_180409.json`
+2. **Given** 使用者點擊預覽按鈕, **When** 檔案路徑包含空格或特殊字元, **Then** 預覽視窗仍能正確開啟並載入內容
 
 ---
 
@@ -73,6 +73,20 @@
 
 ---
 
+### User Story 5 - Sync Preview Language with Editor (Priority: P3)
+
+使用者在主編輯器透過地球圖示切換語言時，所有已開啟的備份預覽視窗也應同步更新語言，確保預覽積木與 UI 文字一致。
+
+**Why this priority**: 預覽視窗語言不同步會造成理解混亂，且使用者容易誤判積木語意。
+
+**Independent Test**: 開啟任一備份預覽視窗，切換語言後確認預覽視窗的積木與標題文字同步更新。
+
+**Acceptance Scenarios**:
+
+1. **Given** 使用者已開啟一個備份預覽視窗, **When** 在主編輯器切換語言, **Then** 預覽視窗的標題與介面文字同步更新
+2. **Given** 使用者已開啟一個備份預覽視窗, **When** 在主編輯器切換語言, **Then** 預覽視窗中的積木文字同步更新為新語言
+3. **Given** 使用者未開啟任何預覽視窗, **When** 在主編輯器切換語言, **Then** 系統不產生錯誤且不影響主編輯器
+
 ### Edge Cases
 
 - 當使用者透過 Ctrl+V 快速貼上多個主程式積木時，系統如何處理？
@@ -90,11 +104,12 @@
 - **FR-002**: 當工作區存在多個主程式積木時，系統 MUST 允許使用者刪除多餘的積木
 - **FR-003**: 當工作區只剩一個主程式積木時，系統 MUST 保護該積木不被刪除
 - **FR-004**: 偵測到多個主程式積木時，系統 SHOULD 顯示 Toast 警告訊息提醒使用者
-- **FR-005**: 備份預覽功能 MUST 使用 `vscode.Uri.file()` 正確包裝檔案路徑
+- **FR-005**: 備份預覽功能 MUST 使用預覽視窗（`blocklyPreview.html`）顯示備份內容，而非直接開啟原始 JSON 檔案
 - **FR-006**: 還原備份確認後，系統 MUST 在覆蓋 `main.json` 前建立 `auto_restore_YYYYMMDD_HHMMSS.json` 備份
 - **FR-007**: 所有 15 個語言翻譯檔案 MUST 包含 `CONTROLS_REPEAT_INPUT_DO` 及其他掃描工具識別出的缺失翻譯鍵
 - **FR-008**: 系統 MUST 提供 Blockly.Msg 翻譯鍵掃描工具（`npm run scan:blockly-msg`），全盤檢查所有 Blockly 內建積木使用的翻譯鍵是否在專案翻譯檔案中定義
 - **FR-009**: 掃描工具 MUST 輸出缺失報告，包含：缺失的鍵名、該鍵的英文預設值、受影響的積木類型
+- **FR-010**: 當語言偏好更新時，系統 MUST 同步更新所有已開啟的備份預覽視窗語言
 
 ### Key Entities
 
@@ -107,11 +122,12 @@
 ### Measurable Outcomes
 
 - **SC-001**: 使用者可在 5 秒內成功刪除多餘的主程式積木
-- **SC-002**: 備份預覽功能 100% 成功開啟檔案（無 URI 錯誤）
+- **SC-002**: 備份預覽功能 100% 成功開啟預覽視窗並載入備份內容
 - **SC-003**: 每次還原備份操作都產生一個 `auto_restore_*` 備份檔案
 - **SC-004**: 所有 15 個語言的 Blockly 內建積木顯示正確翻譯（0 個殘留中文或未翻譯的鍵）
 - **SC-005**: `npm run scan:blockly-msg` 腳本能正確識別所有缺失的 Blockly.Msg 翻譯鍵
 - **SC-006**: 掃描報告識別的所有缺失鍵都已補充到 15 個語言翻譯檔案中
+- **SC-007**: 語言切換後，所有預覽視窗的 UI 與積木文字在 2 秒內同步更新
 
 ## Assumptions
 
