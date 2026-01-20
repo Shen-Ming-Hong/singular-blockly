@@ -48,6 +48,12 @@ performance-baseline.txt
 *.swp
 *.swo
 
+# Codex skills (Junction 連結到 .github/skills/)
+.codex/skills/
+
+# 生成的報告檔案
+translation-stats.md
+
 # 環境設定
 .env
 .env.local
