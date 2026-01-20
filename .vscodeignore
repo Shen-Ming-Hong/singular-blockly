@@ -28,6 +28,15 @@ vsc-extension-quickstart.md
 !node_modules/blockly/**
 !node_modules/@blockly/**
 
+# 排除發布不需的內部資料
+**/.codex/**
+**/.specify/**
+**/specs/**
+**/docs/**
+**/scripts/**
+**/coverage/**
+**/RC_example/**
+
 # 排除額外開發檔案
 **/.git/**
 **/.github/**
