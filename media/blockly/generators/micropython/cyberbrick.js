@@ -127,7 +127,7 @@
 	};
 
 	/**
-	 * 計算時間差
+	 * 計算時間差（NOW - START），NOW 為較新時間，START 為較早時間
 	 */
 	generator.forBlock['cyberbrick_ticks_diff'] = function (block) {
 		generator.addImport('import time');

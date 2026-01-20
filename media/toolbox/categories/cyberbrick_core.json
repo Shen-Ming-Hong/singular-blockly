@@ -86,7 +86,7 @@
                     }
                 },
                 "START": {
-                    "block": {
+                    "shadow": {
                         "kind": "block",
                         "type": "variables_get",
                         "fields": {
