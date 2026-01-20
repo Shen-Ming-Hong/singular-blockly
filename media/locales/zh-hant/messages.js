@@ -676,6 +676,12 @@ window.languageManager.loadMessages('zh-hant', {
 	CYBERBRICK_DELAY_S_PREFIX: '延遲',
 	CYBERBRICK_DELAY_S_SUFFIX: '秒',
 	CYBERBRICK_DELAY_S_TOOLTIP: '暫停程式執行指定的秒數',
+	CYBERBRICK_TICKS_MS: '取得目前毫秒數',
+	CYBERBRICK_TICKS_MS_TOOLTIP: '取得目前的毫秒計時值',
+	CYBERBRICK_TICKS_DIFF_PREFIX: '計算時間差',
+	CYBERBRICK_TICKS_DIFF_NOW: '現在',
+	CYBERBRICK_TICKS_DIFF_START: '開始',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: '計算現在與開始之間的毫秒差',
 
 	// CyberBrick WiFi 積木
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

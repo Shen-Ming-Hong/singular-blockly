@@ -25,6 +25,9 @@
 - Import names should be `camelCase` or `PascalCase` per lint rules.
 - Keep command IDs and settings keys consistent with `package.json` conventions (e.g., `singular-blockly.*`).
 
+## Communication
+- Use Traditional Chinese when replying to the user.
+
 ## Testing Guidelines
 - Frameworks: Mocha + Sinon, with `@vscode/test-electron` for extension integration.
 - File naming: `{module}.test.ts` under `src/test/`.

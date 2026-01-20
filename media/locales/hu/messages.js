@@ -681,6 +681,12 @@ window.languageManager.loadMessages('hu', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Várakozás',
 	CYBERBRICK_DELAY_S_SUFFIX: 'másodperc',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Program végrehajtásának szüneteltetése a megadott másodpercig',
+	CYBERBRICK_TICKS_MS: 'Aktuális ezredmásodperc lekérése',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Az aktuális ezredmásodperc-számláló lekérése',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Időkülönbség',
+	CYBERBRICK_TICKS_DIFF_NOW: 'most',
+	CYBERBRICK_TICKS_DIFF_START: 'kezdet',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Ezredmásodpercek számítása most és a kezdet között',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

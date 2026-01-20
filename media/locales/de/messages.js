@@ -678,6 +678,12 @@ window.languageManager.loadMessages('de', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Verzögerung',
 	CYBERBRICK_DELAY_S_SUFFIX: 'Sekunden',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Programmausführung für angegebene Sekunden pausieren',
+	CYBERBRICK_TICKS_MS: 'Aktuelle Millisekunden abrufen',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Aktuellen Millisekunden-Zähler abrufen',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Zeitdifferenz',
+	CYBERBRICK_TICKS_DIFF_NOW: 'jetzt',
+	CYBERBRICK_TICKS_DIFF_START: 'Start',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Millisekunden zwischen jetzt und Start berechnen',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WLAN',

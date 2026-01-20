@@ -675,6 +675,12 @@ window.languageManager.loadMessages('ja', {
 	CYBERBRICK_DELAY_S_PREFIX: '遅延',
 	CYBERBRICK_DELAY_S_SUFFIX: '秒',
 	CYBERBRICK_DELAY_S_TOOLTIP: '指定した秒数プログラムの実行を一時停止',
+	CYBERBRICK_TICKS_MS: '現在のミリ秒を取得',
+	CYBERBRICK_TICKS_MS_TOOLTIP: '現在のミリ秒カウンタを取得',
+	CYBERBRICK_TICKS_DIFF_PREFIX: '時間差',
+	CYBERBRICK_TICKS_DIFF_NOW: '現在',
+	CYBERBRICK_TICKS_DIFF_START: '開始',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: '現在と開始の間のミリ秒を計算',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

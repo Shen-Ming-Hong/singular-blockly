@@ -677,6 +677,12 @@ window.languageManager.loadMessages('cs', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Zpoždění',
 	CYBERBRICK_DELAY_S_SUFFIX: 'sekund',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Pozastavit provádění programu na zadaný počet sekund',
+	CYBERBRICK_TICKS_MS: 'Získat aktuální milisekundy',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Získat aktuální čítač milisekund',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Časový rozdíl',
+	CYBERBRICK_TICKS_DIFF_NOW: 'nyní',
+	CYBERBRICK_TICKS_DIFF_START: 'začátek',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Vypočítat milisekundy mezi nyní a začátkem',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

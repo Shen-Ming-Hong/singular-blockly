@@ -680,6 +680,12 @@ window.languageManager.loadMessages('bg', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Забавяне',
 	CYBERBRICK_DELAY_S_SUFFIX: 'секунди',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Пауза на изпълнението на програмата за зададения брой секунди',
+	CYBERBRICK_TICKS_MS: 'Вземи текущите милисекунди',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Вземи текущия брояч на милисекундите',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Разлика във времето',
+	CYBERBRICK_TICKS_DIFF_NOW: 'сега',
+	CYBERBRICK_TICKS_DIFF_START: 'начало',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Изчисли милисекундите между сега и началото',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

@@ -116,6 +116,31 @@
 	// === 時序積木 ===
 
 	/**
+	 * 取得目前毫秒數
+	 */
+	generator.forBlock['cyberbrick_ticks_ms'] = function (block) {
+		generator.addImport('import time');
+
+		const code = 'time.ticks_ms()';
+
+		return [code, generator.ORDER_FUNCTION_CALL];
+	};
+
+	/**
+	 * 計算時間差（NOW - START），NOW 為較新時間，START 為較早時間
+	 */
+	generator.forBlock['cyberbrick_ticks_diff'] = function (block) {
+		generator.addImport('import time');
+
+		const now = generator.valueToCode(block, 'NOW', generator.ORDER_NONE) || '0';
+		const start = generator.valueToCode(block, 'START', generator.ORDER_NONE) || '0';
+
+		const code = `time.ticks_diff(${now}, ${start})`;
+
+		return [code, generator.ORDER_FUNCTION_CALL];
+	};
+
+	/**
 	 * 延時（毫秒）
 	 */
 	generator.forBlock['cyberbrick_delay_ms'] = function (block) {

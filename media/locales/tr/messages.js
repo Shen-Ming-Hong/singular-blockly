@@ -678,6 +678,12 @@ window.languageManager.loadMessages('tr', {
 	CYBERBRICK_DELAY_S_PREFIX: 'Gecikme',
 	CYBERBRICK_DELAY_S_SUFFIX: 'saniye',
 	CYBERBRICK_DELAY_S_TOOLTIP: 'Program yürütmesini belirtilen saniye kadar duraklat',
+	CYBERBRICK_TICKS_MS: 'Geçerli milisaniyeyi al',
+	CYBERBRICK_TICKS_MS_TOOLTIP: 'Geçerli milisaniye sayacını al',
+	CYBERBRICK_TICKS_DIFF_PREFIX: 'Zaman farkı',
+	CYBERBRICK_TICKS_DIFF_NOW: 'şimdi',
+	CYBERBRICK_TICKS_DIFF_START: 'başlangıç',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Şimdi ile başlangıç arasındaki milisaniyeyi hesapla',
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',

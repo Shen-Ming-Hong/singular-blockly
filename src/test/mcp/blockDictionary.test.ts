@@ -240,6 +240,16 @@ suite('Block Dictionary Tests', () => {
 			const motorBlocks = dictionary.blocks.filter((b: BlockDefinition) => b.category === 'motors');
 			assert.ok(motorBlocks.length >= 3, 'Should have at least 3 motor blocks');
 		});
+
+		test('should have CyberBrick time blocks', () => {
+			const cyberbrickBlocks = ['cyberbrick_ticks_ms', 'cyberbrick_ticks_diff'];
+
+			for (const blockType of cyberbrickBlocks) {
+				const block = dictionary.blocks.find((b: BlockDefinition) => b.type === blockType);
+				assert.ok(block, `CyberBrick block "${blockType}" should exist`);
+				assert.strictEqual(block?.category, 'cyberbrick', `CyberBrick block "${blockType}" should use cyberbrick category`);
+			}
+		});
 	});
 
 	suite('Board Support Validation', () => {

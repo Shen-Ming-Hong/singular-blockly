@@ -62,6 +62,8 @@
 | `cyberbrick_led_off`       | 關閉板載 LED | `onboard_led[0] = (0, 0, 0); onboard_led.write()` |
 | `cyberbrick_delay_ms`      | 毫秒延遲     | `await asyncio.sleep_ms(ms)`                      |
 | `cyberbrick_delay_s`       | 秒延遲       | `await asyncio.sleep(s)`                          |
+| `cyberbrick_ticks_ms`      | 取得目前毫秒數 | `time.ticks_ms()`                                 |
+| `cyberbrick_ticks_diff`    | 計算時間差   | `time.ticks_diff(now, start)`                     |
 | `cyberbrick_print`         | 序列埠輸出   | `print(msg)`                                      |
 
 ### WiFi 積木 (cyberbrick_wifi)
