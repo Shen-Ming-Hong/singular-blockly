@@ -629,7 +629,7 @@ window.languageManager.loadMessages('pl', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Kopia zapasowa zapisana: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Obszar roboczy jest pusty, kopia zapasowa nie jest potrzebna',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Proszę czekać, kopia zapasowa właśnie została ukończona',
-	MAIN_BLOCK_DUPLICATE_WARNING: 'Wykryto wiele blokow programu glownego. Usun nadmiarowe bloki.',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Wykryto wiele bloków programu głównego. Usuń nadmiarowe bloki.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Zmień typ płytki',

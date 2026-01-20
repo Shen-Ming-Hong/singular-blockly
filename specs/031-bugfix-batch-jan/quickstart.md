@@ -81,18 +81,18 @@ Blockly.Blocks['arduino_setup_loop'] = {
 
 ---
 
-## Bug 2: 備份預覽 URI 錯誤
+## Bug 2: 備份預覽視窗
 
 ### 修改檔案
 
 **`src/webview/messageHandler.ts`** 第 1135 行
 
 ```typescript
-// Before
+// Before：直接開啟 JSON 檔案
 await vscodeApi.commands.executeCommand('vscode.open', fullPath);
 
-// After
-await vscodeApi.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
+// After：改用預覽指令開啟 blocklyPreview.html
+await vscodeApi.commands.executeCommand('singular-blockly.previewBackup', fullPath);
 ```
 
 ---

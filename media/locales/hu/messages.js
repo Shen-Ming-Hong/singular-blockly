@@ -630,7 +630,7 @@ window.languageManager.loadMessages('hu', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Biztonsági mentés mentve: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'A munkaterület üres, nincs szükség biztonsági mentésre',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Kérem várjon, a biztonsági mentés éppen befejeződött',
-	MAIN_BLOCK_DUPLICATE_WARNING: 'Tobb fo program blokkot eszleltunk. Torold a felesleges blokkokat.',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Több fő program blokkot észleltünk. Töröld a felesleges blokkokat.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Lapka típus váltás',

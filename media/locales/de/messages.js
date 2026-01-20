@@ -627,7 +627,7 @@ window.languageManager.loadMessages('de', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Backup gespeichert: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Arbeitsbereich ist leer, kein Backup erforderlich',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Bitte warten, Backup wurde gerade abgeschlossen',
-	MAIN_BLOCK_DUPLICATE_WARNING: 'Mehrere Hauptprogramm-Blocks erkannt. Bitte loschen Sie die uberflussigen Blocks.',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Mehrere Hauptprogramm-Blocks erkannt. Bitte löschen Sie die überflüssigen Blocks.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Board-Typ wechseln',

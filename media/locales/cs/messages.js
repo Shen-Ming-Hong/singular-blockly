@@ -626,7 +626,7 @@ window.languageManager.loadMessages('cs', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Záloha uložena: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'Pracovní prostor je prázdný, záloha není potřeba',
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Prosím počkejte, záloha byla právě dokončena',
-	MAIN_BLOCK_DUPLICATE_WARNING: 'Bylo zjisteno vice bloku hlavniho programu. Odstrante prebytecne bloky.',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Bylo zjištěno více bloků hlavního programu. Odstraňte přebytečné bloky.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Přepnout typ desky',

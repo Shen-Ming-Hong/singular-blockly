@@ -77,35 +77,35 @@ const workspace = Blockly.inject('blocklyDiv', {
 
 ---
 
-### R-003: VSCode vscode.open 命令需要 Uri 物件
+### R-003: 備份預覽應開啟 WebView 預覽視窗
 
-**問題**: `handlePreviewBackup()` 使用 `vscode.open` 命令但傳入字串路徑導致錯誤。
+**問題**: `handlePreviewBackup()` 直接使用 `vscode.open` 開啟 JSON 備份，無法符合「預覽視窗 (blocklyPreview.html)」需求，也無法顯示積木。
 
 **研究結果**:
 
-**Decision**: 將 `fullPath` 字串包裝為 `vscode.Uri.file()` 物件。
+**Decision**: 改為呼叫 `singular-blockly.previewBackup` 指令，由 `WebViewManager` 開啟預覽視窗並載入備份。
 
 **Rationale**:
 
-- VSCode 的 `vscode.open` 命令第一個參數應為 `Uri` 物件，不是字串
-- 目前程式碼 (第 1135 行):
-    ```typescript
-    await vscodeApi.commands.executeCommand('vscode.open', fullPath);
-    ```
-- 應改為:
-    ```typescript
-    await vscodeApi.commands.executeCommand('vscode.open', vscode.Uri.file(fullPath));
-    ```
+- 規格要求使用預覽視窗而非直接開啟 JSON 檔案
+- 預覽視窗可正確載入 Blockly workspace 與 UI，提供一致的閱讀體驗
+- 封裝在指令中，避免重複處理 WebView 建立與載入邏輯
+
+**實作範例**:
+
+```typescript
+await vscodeApi.commands.executeCommand('singular-blockly.previewBackup', fullPath);
+```
 
 **Alternatives considered**:
 
-1. 使用 `vscode.workspace.openTextDocument()` + `vscode.window.showTextDocument()` → 可行但較繁瑣
-2. 保持字串但 escape 特殊字元 → 不正確，根本問題是類型
+1. 使用 `vscode.open` / `openTextDocument()` 開啟 JSON → 只能看到原始檔案內容，不符合預覽需求
+2. 直接在 messageHandler 建立 WebView → 重複邏輯，違反現有架構分層
 
 **注意事項**:
 
-- `vscodeApi` 是已注入的 VSCode API 模組，需確認是否有 `Uri` 可用
-- 若使用原生 VSCode 模組則為 `vscode.Uri.file()`
+- `singular-blockly.previewBackup` 需已註冊並可取得完整備份路徑
+- 指令內會處理 `blocklyPreview.html` 與 workspace 載入流程
 
 ---
 
@@ -180,7 +180,7 @@ const autoRestoreName = `auto_restore_${timestamp}`;
 | ----- | -------------------------------- | ------ | ---- |
 | R-001 | Blockly `maxInstances` 選項      | 低     | 低   |
 | R-002 | 動態 `setDeletable()` + 事件監聽 | 中     | 中   |
-| R-003 | `vscode.Uri.file()` 包裝         | 低     | 低   |
+| R-003 | 預覽指令開啟 blocklyPreview.html | 低     | 低   |
 | R-004 | 還原前複製到 `auto_restore_*`    | 低     | 低   |
 | R-005 | 建立掃描工具 + 補充 15 語言翻譯  | 中     | 低   |
 

@@ -374,6 +374,21 @@ describe('WebView Message Handler', () => {
 		assert.strictEqual(response.resolvedLanguage, 'en');
 	});
 
+	it('should handle showToast message types', async () => {
+		const baseMessage = { command: 'showToast', message: 'Hello' };
+
+		await messageHandler.handleMessage({ ...baseMessage, type: 'error' });
+		assert(vscodeMock.window.showErrorMessage.calledOnceWith('Hello'));
+		vscodeMock.window.showErrorMessage.resetHistory();
+
+		await messageHandler.handleMessage({ ...baseMessage, type: 'warning' });
+		assert(vscodeMock.window.showWarningMessage.calledOnceWith('Hello'));
+		vscodeMock.window.showWarningMessage.resetHistory();
+
+		await messageHandler.handleMessage({ ...baseMessage });
+		assert(vscodeMock.window.showInformationMessage.calledOnceWith('Hello'));
+	});
+
 	it('should handle create backup message', async () => {
 		// 準備測試
 		fileServiceStub.fileExists.returns(true);

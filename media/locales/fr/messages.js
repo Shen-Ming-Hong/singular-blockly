@@ -627,7 +627,7 @@ window.languageManager.loadMessages('fr', {
 	BACKUP_QUICK_SAVE_SUCCESS: 'Sauvegarde enregistrée : {0}',
 	BACKUP_QUICK_SAVE_EMPTY: "L'espace de travail est vide, aucune sauvegarde nécessaire",
 	BACKUP_QUICK_SAVE_COOLDOWN: 'Veuillez patienter, la sauvegarde vient de se terminer',
-	MAIN_BLOCK_DUPLICATE_WARNING: 'Plusieurs blocs de programme principal ont ete detectes. Veuillez supprimer les blocs en trop.',
+	MAIN_BLOCK_DUPLICATE_WARNING: 'Plusieurs blocs de programme principal ont été détectés. Veuillez supprimer les blocs en trop.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Changer de type de carte',
