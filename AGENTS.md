@@ -28,16 +28,6 @@
 ## Communication
 - Use Traditional Chinese when replying to the user.
 
-## Post-Task Notification
-- After completing each task, run the following PowerShell commands to show a Windows notification:
-```powershell
-Add-Type -AssemblyName System.Windows.Forms
-$notification = New-Object System.Windows.Forms.NotifyIcon
-$notification.Icon = [System.Drawing.SystemIcons]::Information
-$notification.Visible = $true
-$notification.ShowBalloonTip(5000, "Codex CLI", "任務執行完畢", [System.Windows.Forms.ToolTipIcon]::Info)
-```
-
 ## Testing Guidelines
 - Frameworks: Mocha + Sinon, with `@vscode/test-electron` for extension integration.
 - File naming: `{module}.test.ts` under `src/test/`.

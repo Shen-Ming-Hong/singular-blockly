@@ -1,7 +1,7 @@
 # 實作計畫：移除 CyberBrick Timer 實驗標記
 
-**分支**：`033-remove-timer-experimental` | **日期**：2026-01-21 | **規格**：`E:\singular-blockly\specs\033-remove-timer-experimental\spec.md`
-**輸入**：功能規格來源 `E:\singular-blockly\specs\033-remove-timer-experimental\spec.md`
+**分支**：`033-remove-timer-experimental` | **日期**：2026-01-21 | **規格**：`specs/033-remove-timer-experimental/spec.md`
+**輸入**：功能規格來源 `specs/033-remove-timer-experimental/spec.md`
 
 **備註**：此模板由 `/speckit.plan` 產生，執行流程請參考 `.specify/templates/agent-file-template.md`。
 
