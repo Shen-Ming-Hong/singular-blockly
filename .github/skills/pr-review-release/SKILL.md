@@ -87,7 +87,10 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     ```bash
     git checkout master
     git pull origin master
+    git status -sb
     ```
+
+    確認主分支已同步且工作目錄乾淨，再進入發布流程。
 
 4. **清理已合併分支 Branch Cleanup**
 
@@ -126,15 +129,22 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     - `minor`: 新功能、向後相容 (0.X.0)
     - `major`: 破壞性變更 (X.0.0)
 
-2. **更新 package.json**
+2. **更新版本號（避免自動建立輕量 tag）**
 
     ```bash
-    npm version patch  # 或 minor / major
+    npm version patch --no-git-tag-version  # 或 minor / major
     ```
 
 3. **更新 CHANGELOG.md**
     - 新增雙語條目（中英文）
     - 格式遵循 Keep a Changelog
+
+4. **提交版本更新**
+
+    ```bash
+    git add package.json package-lock.json CHANGELOG.md
+    git commit -m "chore(release): 發布版本 {VERSION}"
+    ```
 
 #### 4.2 品質驗證 Quality Verification
 
@@ -187,11 +197,11 @@ git tag v{VERSION}  # 缺少 -a 參數，會建立 lightweight tag
 
 **⚠️ 重要：此步驟不可省略！Git tag 不等於 GitHub Release。**
 
-```bash
-# 建立 Release（含雙語說明與 VSIX 附件）
-gh release create v{VERSION} \
-  --title "v{VERSION} - 功能摘要 Feature Summary" \
-  --notes "## ✨ New Features | 新功能
+> 注意：Release 公告容易因 CLI 字串轉義導致跑版，建議使用臨時檔（`release-notes.md`）輸入。
+
+```powershell
+@'
+## ✨ New Features | 新功能
 
 ### Feature Name | 功能名稱
 - English description | 中文說明
@@ -203,17 +213,26 @@ gh release create v{VERSION} \
 - **VSIX**: singular-blockly-{VERSION}.vsix
 
 ---
-**Full Changelog | 完整變更日誌**: https://github.com/{owner}/{repo}/blob/master/CHANGELOG.md" \
-  ./singular-blockly-{VERSION}.vsix
+**Full Changelog | 完整變更日誌**: https://github.com/{owner}/{repo}/blob/master/CHANGELOG.md
+'@ | Set-Content -Path "release-notes.md" -Encoding UTF8
+
+gh release create v{VERSION} -t "v{VERSION}" -F release-notes.md ./singular-blockly-{VERSION}.vsix
+
+Remove-Item -Force release-notes.md
 ```
 
-**驗證 Release 已建立：**
+**Release 版面檢核與修正：**
 
 ```bash
-gh release view v{VERSION}
-gh release list --limit 3
+gh release view v{VERSION} --json body
+gh release view v{VERSION} --web
 ```
 
+若格式跑掉，修正 `release-notes.md` 後重新更新：
+
+```bash
+gh release edit v{VERSION} -F release-notes.md
+```
 #### 4.6 清理 Cleanup
 
 ```bash
@@ -247,6 +266,7 @@ gh release view v{VERSION} --web
 - [ ] Git Annotated Tag 已建立並推送（使用 `git tag -a`）
 - [ ] **GitHub Release 已建立**（使用 `gh release create`）
 - [ ] **Release 含雙語說明與 VSIX 附件**
+- [ ] **Release 版面檢核完成（必要時已修正）**
 - [ ] 發布連結可存取（使用 `gh release view` 驗證）
 
 ## 輸出格式 Output Format
