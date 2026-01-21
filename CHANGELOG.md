@@ -8,6 +8,27 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.0] - 2026-01-21
+
+### 新增功能 Added
+
+-   **CyberBrick 時間積木解除實驗標記** (CyberBrick Time Blocks Graduated)
+
+    -   移除 `cyberbrick_ticks_ms` / `cyberbrick_ticks_diff` 的實驗標記與提示
+        Removed experimental marking and prompts for `cyberbrick_ticks_ms` / `cyberbrick_ticks_diff`
+
+### 維護 Maintenance
+
+-   **規格文件整理** (Specification Docs Update)
+
+    -   補齊本功能的 spec / plan / tasks / research / quickstart / data-model / contracts
+        Added complete spec / plan / tasks / research / quickstart / data-model / contracts for this feature
+
+-   **ESLint 忽略設定調整** (ESLint Ignore Cleanup)
+
+    -   移除已棄用的 `.eslintignore`，統一由 `eslint.config.mjs` ignores 管理
+        Removed deprecated `.eslintignore`; ignores are managed via `eslint.config.mjs`
+
 ## [0.55.0] - 2026-01-20
 
 ### 新增功能 Added
