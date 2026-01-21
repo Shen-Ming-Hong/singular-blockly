@@ -1,8 +1,8 @@
-# Data Model：移除 CyberBrick Timer 實驗標記
+# 資料模型：移除 CyberBrick Timer 實驗標記
 
 > 本功能不新增持久化資料，以下為概念性實體與欄位，用於描述實驗標記判定。
 
-## Entities
+## 實體
 
 ### 1) TimerBlockType
 - **說明**：CyberBrick Timer 積木類型清單。
@@ -24,12 +24,12 @@
   - `blockTypeIds`：工作區所有積木 type 集合
   - `hasExperimentalBlocks`：是否包含實驗積木（由 `experimentalTypeIds` 判定）
 
-## Relationships
+## 關係
 
 - `ExperimentalBlockRegistry.experimentalTypeIds` 用於判斷 `WorkspaceBlockSet.hasExperimentalBlocks`。
 - `TimerBlockType.typeId` 不得出現在 `experimentalTypeIds` 中。
 
-## Validation Rules
+## 驗證規則
 
 - `cyberbrick_ticks_ms` 與 `cyberbrick_ticks_diff` 必須永遠判定為非實驗性。
 - 其他實驗積木判定規則維持既有機制。
