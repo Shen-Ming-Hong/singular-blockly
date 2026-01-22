@@ -53,6 +53,16 @@ window.micropythonGenerator.imports_ = new Set();
 window.micropythonGenerator.variables_ = new Map();
 
 /**
+ * 目前正在生成的函式
+ */
+window.micropythonGenerator.currentFunction_ = 'main';
+
+/**
+ * 函式內賦值追蹤
+ */
+window.micropythonGenerator.functionGlobals_ = new Map();
+
+/**
  * 硬體初始化追蹤
  * 用於收集硬體初始化程式碼（Pin, PWM, ADC 等）
  */
@@ -72,6 +82,8 @@ window.micropythonGenerator.reset = function () {
 	this.variables_.clear();
 	this.hardwareInit_.clear();
 	this.functions_.clear();
+	this.currentFunction_ = 'main';
+	this.functionGlobals_.clear();
 };
 
 /**
@@ -173,6 +185,10 @@ window.micropythonGenerator.init = function (workspace) {
 	this.nameDB_.setVariableMap(workspace.getVariableMap());
 	this.nameDB_.populateVariables(workspace);
 	this.nameDB_.populateProcedures(workspace);
+
+	this.currentFunction_ = 'main';
+	this.functionGlobals_.clear();
+	this.functionGlobals_.set('main', new Set());
 };
 
 /**
@@ -223,8 +239,17 @@ window.micropythonGenerator.finish = function (code) {
 	}
 
 	// 組合主程式，包裝在 def main(): 中
+	const mainGlobals = this.functionGlobals_.get('main');
+	let mainGlobalDecl = '';
+	if (mainGlobals && mainGlobals.size > 0) {
+		mainGlobalDecl = this.INDENT + 'global ' + Array.from(mainGlobals).join(', ') + '\n';
+	}
+
 	fullCode += '# [5] Main Program\n';
 	fullCode += 'def main():\n';
+	if (mainGlobalDecl) {
+		fullCode += mainGlobalDecl;
+	}
 	if (code && code.trim()) {
 		// code 已經有縮排，直接加入
 		fullCode += code;
@@ -243,6 +268,8 @@ window.micropythonGenerator.finish = function (code) {
 	fullCode += this.INDENT + this.INDENT + 'pass\n';
 
 	// 重置命名資料庫
+	this.currentFunction_ = 'main';
+	this.functionGlobals_.clear();
 	this.nameDB_.reset();
 
 	return fullCode;

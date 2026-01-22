@@ -42,6 +42,15 @@
 			args[i] = generator.nameDB_.getName(variables[i], Blockly.VARIABLE_CATEGORY_NAME);
 		}
 
+		const previousFunction = generator.currentFunction_ || 'main';
+		generator.currentFunction_ = funcName;
+		if (!generator.functionGlobals_) {
+			generator.functionGlobals_ = new Map();
+		}
+		if (!generator.functionGlobals_.has(funcName)) {
+			generator.functionGlobals_.set(funcName, new Set());
+		}
+
 		let branch = generator.statementToCode(block, 'STACK');
 		if (generator.STATEMENT_PREFIX) {
 			branch = generator.prefixLines(generator.injectId(generator.STATEMENT_PREFIX, block), generator.INDENT) + branch;
@@ -50,7 +59,21 @@
 			branch = generator.INDENT + 'pass\n';
 		}
 
-		const code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + xfix1 + loopTrap + branch;
+		generator.currentFunction_ = previousFunction;
+
+		const globals = generator.functionGlobals_.get(funcName);
+		let globalDecl = '';
+		if (globals && globals.size > 0) {
+			// Filter out function parameters from globals to avoid Python syntax error:
+			// "name 'x' is parameter and global"
+			const argsSet = new Set(args);
+			const filteredGlobals = Array.from(globals).filter(g => !argsSet.has(g));
+			if (filteredGlobals.length > 0) {
+				globalDecl = generator.INDENT + 'global ' + filteredGlobals.join(', ') + '\n';
+			}
+		}
+
+		const code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + globalDecl + xfix1 + loopTrap + branch;
 
 		// 將函數添加到自訂函數集合
 		generator.addFunction(funcName, code);
@@ -85,6 +108,15 @@
 			args[i] = generator.nameDB_.getName(variables[i], Blockly.VARIABLE_CATEGORY_NAME);
 		}
 
+		const previousFunction = generator.currentFunction_ || 'main';
+		generator.currentFunction_ = funcName;
+		if (!generator.functionGlobals_) {
+			generator.functionGlobals_ = new Map();
+		}
+		if (!generator.functionGlobals_.has(funcName)) {
+			generator.functionGlobals_.set(funcName, new Set());
+		}
+
 		let branch = generator.statementToCode(block, 'STACK');
 		if (generator.STATEMENT_PREFIX) {
 			branch = generator.prefixLines(generator.injectId(generator.STATEMENT_PREFIX, block), generator.INDENT) + branch;
@@ -96,7 +128,21 @@
 		let returnValue = generator.valueToCode(block, 'RETURN', generator.ORDER_NONE) || 'None';
 		returnValue = generator.INDENT + 'return ' + returnValue + '\n';
 
-		const code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + xfix1 + loopTrap + branch + returnValue;
+		generator.currentFunction_ = previousFunction;
+
+		const globals = generator.functionGlobals_.get(funcName);
+		let globalDecl = '';
+		if (globals && globals.size > 0) {
+			// Filter out function parameters from globals to avoid Python syntax error:
+			// "name 'x' is parameter and global"
+			const argsSet = new Set(args);
+			const filteredGlobals = Array.from(globals).filter(g => !argsSet.has(g));
+			if (filteredGlobals.length > 0) {
+				globalDecl = generator.INDENT + 'global ' + filteredGlobals.join(', ') + '\n';
+			}
+		}
+
+		const code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + globalDecl + xfix1 + loopTrap + branch + returnValue;
 
 		// 將函數添加到自訂函數集合
 		generator.addFunction(funcName, code);
@@ -170,6 +216,15 @@
 		// 取得參數名稱（忽略型別，Python 是動態型別語言）
 		const args = block.arguments_ || [];
 
+		const previousFunction = generator.currentFunction_ || 'main';
+		generator.currentFunction_ = funcName;
+		if (!generator.functionGlobals_) {
+			generator.functionGlobals_ = new Map();
+		}
+		if (!generator.functionGlobals_.has(funcName)) {
+			generator.functionGlobals_.set(funcName, new Set());
+		}
+
 		// 生成函數體
 		let branch = generator.statementToCode(block, 'STACK');
 
@@ -178,8 +233,22 @@
 			branch = generator.INDENT + 'pass\n';
 		}
 
+		generator.currentFunction_ = previousFunction;
+
+		const globals = generator.functionGlobals_.get(funcName);
+		let globalDecl = '';
+		if (globals && globals.size > 0) {
+			// Filter out function parameters from globals to avoid Python syntax error:
+			// "name 'x' is parameter and global"
+			const argsSet = new Set(args);
+			const filteredGlobals = Array.from(globals).filter(g => !argsSet.has(g));
+			if (filteredGlobals.length > 0) {
+				globalDecl = generator.INDENT + 'global ' + filteredGlobals.join(', ') + '\n';
+			}
+		}
+
 		// 組裝 Python 函數定義
-		const code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + branch;
+		const code = 'def ' + funcName + '(' + args.join(', ') + '):\n' + globalDecl + branch;
 
 		// 註冊到 functions_ 集合，由 finish() 輸出到 [4] User Functions 區塊
 		generator.addFunction(funcName, code);

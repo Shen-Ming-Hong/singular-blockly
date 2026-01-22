@@ -12,6 +12,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - `.vscode/settings.json` (JSON 設定檔) + `blockly/main.json` (工作區狀態) (030-language-selector)
 - TypeScript 5.9.3 (Extension) | JavaScript ES6 (WebView) + Blockly 12.3.1 | VSCode API 1.105.0+ (031-bugfix-batch-jan)
 - JSON 檔案 (`blockly/main.json`, `blockly/backup/*.json`) (031-bugfix-batch-jan)
+- JavaScript (ES6+) — WebView 瀏覽器環境 + Blockly 12.3.1 (Generator API) (034-micropython-global-vars)
+- N/A（生成器不持久化狀態） (034-micropython-global-vars)
 
 -   JavaScript (ES6+) - WebView 環境 + Blockly 12.3.1, arduinoGenerator (自訂程式碼生成器) (012-esp32-pixetto-fix)
 -   JavaScript (ES2022) / TypeScript 5.9.3 + Blockly 12.3.1, VS Code Extension API 1.96.0+ (014-block-serialization-fix)
@@ -72,9 +74,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 034-micropython-global-vars: Added JavaScript (ES6+) — WebView 瀏覽器環境 + Blockly 12.3.1 (Generator API)
 - 031-bugfix-batch-jan: Added TypeScript 5.9.3 (Extension) | JavaScript ES6 (WebView) + Blockly 12.3.1 | VSCode API 1.105.0+
 - 030-language-selector: Added TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView) + Google Blockly 12.3.1, VS Code Extension API 1.105.0+
-- 029-espnow-rc-pairing: Added TypeScript 5.9.3 (Extension) / JavaScript ES6 (Blockly) / MicroPython (Generated) + Blockly 12.3.1, VSCode API 1.105.0+, MicroPython espnow module
 
 
 <!-- MANUAL ADDITIONS START -->
