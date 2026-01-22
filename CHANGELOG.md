@@ -8,6 +8,19 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.0] - 2026-01-22
+
+### 新增功能 Added
+
+-   **MicroPython 全域變數提升** (MicroPython Global Variable Hoisting)
+
+    -   自訂函式可修改主程式 (`main`) 變數，自動插入 `global` 宣告
+        Custom functions can modify `main` variables; `global` declarations are automatically inserted
+    -   智慧判斷全域變數需求，唯讀變數不產生 `global` 宣告
+        Smart detection of global variable usage; read-only variables do not generate `global` declarations
+    -   過濾函式參數同名變數，避免 Python 語法錯誤
+        Filters out variables with same name as function parameters to prevent Python syntax errors
+
 ## [0.56.0] - 2026-01-21
 
 ### 新增功能 Added
