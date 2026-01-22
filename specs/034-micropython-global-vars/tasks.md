@@ -23,10 +23,10 @@
 
 **Purpose**: 新增追蹤結構到核心生成器
 
-- [ ] T001 在 `media/blockly/generators/micropython/index.js` 新增 `currentFunction_` 屬性宣告
-- [ ] T002 在 `media/blockly/generators/micropython/index.js` 新增 `functionGlobals_` 屬性宣告
-- [ ] T003 在 `media/blockly/generators/micropython/index.js` 的 `init()` 函式中初始化追蹤結構
-- [ ] T004 在 `media/blockly/generators/micropython/index.js` 的 `reset()` 函式中清理追蹤結構
+- [X] T001 在 `media/blockly/generators/micropython/index.js` 新增 `currentFunction_` 屬性宣告
+- [X] T002 在 `media/blockly/generators/micropython/index.js` 新增 `functionGlobals_` 屬性宣告
+- [X] T003 在 `media/blockly/generators/micropython/index.js` 的 `init()` 函式中初始化追蹤結構
+- [X] T004 在 `media/blockly/generators/micropython/index.js` 的 `reset()` 函式中清理追蹤結構
 
 **Checkpoint**: 追蹤結構已建立，可開始修改積木生成器
 
@@ -38,8 +38,8 @@
 
 **⚠️ CRITICAL**: 此階段完成後所有 User Story 才能運作
 
-- [ ] T005 修改 `media/blockly/generators/micropython/variables.js` 的 `variables_set`：呼叫 `addVariable(varName, 'None')`
-- [ ] T006 修改 `media/blockly/generators/micropython/variables.js` 的 `variables_set`：將變數加入 `functionGlobals_` 追蹤
+- [X] T005 修改 `media/blockly/generators/micropython/variables.js` 的 `variables_set`：呼叫 `addVariable(varName, 'None')`
+- [X] T006 修改 `media/blockly/generators/micropython/variables.js` 的 `variables_set`：將變數加入 `functionGlobals_` 追蹤
 
 **Checkpoint**: 變數賦值現在會自動註冊到全域區段並追蹤函式歸屬
 
@@ -53,12 +53,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T007 [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defnoreturn`：生成前設定 `currentFunction_`
-- [ ] T008 [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defnoreturn`：生成後還原 `currentFunction_`
-- [ ] T009 [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defnoreturn`：查詢 `functionGlobals_` 並插入 `global` 宣告
-- [ ] T010 [P] [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defreturn`：同步套用 T007-T009 的修改
-- [ ] T011 [P] [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `arduino_function`：同步套用 T007-T009 的修改
-- [ ] T012 [US1] 修改 `media/blockly/generators/micropython/index.js` 的 `finish()`：在 `def main():` 後插入 `global` 宣告
+- [X] T007 [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defnoreturn`：生成前設定 `currentFunction_`
+- [X] T008 [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defnoreturn`：生成後還原 `currentFunction_`
+- [X] T009 [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defnoreturn`：查詢 `functionGlobals_` 並插入 `global` 宣告
+- [X] T010 [P] [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `procedures_defreturn`：同步套用 T007-T009 的修改
+- [X] T011 [P] [US1] 修改 `media/blockly/generators/micropython/functions.js` 的 `arduino_function`：同步套用 T007-T009 的修改
+- [X] T012 [US1] 修改 `media/blockly/generators/micropython/index.js` 的 `finish()`：在 `def main():` 後插入 `global` 宣告
 
 **Checkpoint**: 自訂函式內修改變數可正確生成 `global` 宣告 ✅
 
@@ -72,8 +72,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] 驗證 `media/blockly/generators/micropython/variables.js` 的 `variables_get` 未追蹤變數（現況正確，確認即可）
-- [ ] T014 [US2] 手動測試：建立只讀取變數的函式，確認無 `global` 宣告
+- [X] T013 [US2] 驗證 `media/blockly/generators/micropython/variables.js` 的 `variables_get` 未追蹤變數（現況正確，確認即可）
+- [X] T014 [US2] 手動測試：建立只讀取變數的函式，確認無 `global` 宣告
 
 **Checkpoint**: 只讀取變數的函式無不必要的 `global` ✅
 
@@ -87,9 +87,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T015 [US3] 確認 `media/blockly/generators/micropython/loops.js` 的 `controls_for` 未呼叫 `addVariable()`（現況正確）
-- [ ] T016 [US3] 確認 `media/blockly/generators/micropython/loops.js` 的 `controls_forEach` 未呼叫 `addVariable()`（現況正確）
-- [ ] T017 [US3] 手動測試：使用迴圈積木，確認迴圈變數不出現在 `[3] Global Variables`
+- [X] T015 [US3] 確認 `media/blockly/generators/micropython/loops.js` 的 `controls_for` 未呼叫 `addVariable()`（現況正確）
+- [X] T016 [US3] 確認 `media/blockly/generators/micropython/loops.js` 的 `controls_forEach` 未呼叫 `addVariable()`（現況正確）
+- [X] T017 [US3] 手動測試：使用迴圈積木，確認迴圈變數不出現在 `[3] Global Variables`
 
 **Checkpoint**: 迴圈變數不會被提升到全域 ✅
 
@@ -103,9 +103,9 @@
 
 ### Implementation for User Story 4
 
-- [ ] T018 [US4] 手動測試：建立兩個函式 `add` 和 `subtract` 都修改變數 `total`
-- [ ] T019 [US4] 驗證兩個函式都有 `global total` 宣告
-- [ ] T020 [US4] 驗證變數值在多個函式順序執行後正確累積
+- [X] T018 [US4] 手動測試：建立兩個函式 `add` 和 `subtract` 都修改變數 `total`
+- [X] T019 [US4] 驗證兩個函式都有 `global total` 宣告
+- [X] T020 [US4] 驗證變數值在多個函式順序執行後正確累積
 
 **Checkpoint**: 多個函式可共享變數並正確修改 ✅
 
@@ -115,10 +115,10 @@
 
 **Purpose**: 確認無回歸並完成驗收
 
-- [ ] T021 [P] 確認現有 MicroPython 積木生成無回歸（執行現有測試）
-- [ ] T022 [P] 執行 quickstart.md 的 3 個測試案例
-- [ ] T023 更新 console.log 訊息（若有新增）
-- [ ] T024 程式碼審查：確認符合 Constitution 原則
+- [X] T021 [P] 確認現有 MicroPython 積木生成無回歸（執行現有測試）
+- [X] T022 [P] 執行 quickstart.md 的 3 個測試案例
+- [X] T023 更新 console.log 訊息（若有新增）
+- [X] T024 程式碼審查：確認符合 Constitution 原則
 
 ---
 

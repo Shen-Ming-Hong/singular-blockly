@@ -140,7 +140,7 @@ def main():
 
 ## 驗收標準
 
-- [ ] 自訂函式內可修改 main 中設定的變數
-- [ ] 只讀取變數的函式無 `global` 宣告
-- [ ] 迴圈變數不出現在 `[3] Global Variables`
-- [ ] 現有 MicroPython 積木無回歸
+- [x] 自訂函式內可修改 main 中設定的變數
+- [x] 只讀取變數的函式無 `global` 宣告
+- [x] 迴圈變數不出現在 `[3] Global Variables`
+- [x] 現有 MicroPython 積木無回歸

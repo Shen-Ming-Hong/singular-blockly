@@ -29,6 +29,18 @@
 	generator.forBlock['variables_set'] = function (block) {
 		const varName = generator.nameDB_.getName(block.getFieldValue('VAR'), Blockly.VARIABLE_CATEGORY_NAME);
 		const value = generator.valueToCode(block, 'VALUE', generator.ORDER_NONE) || '0';
+
+		generator.addVariable(varName, 'None');
+
+		const currentFunc = generator.currentFunction_ || 'main';
+		if (!generator.functionGlobals_) {
+			generator.functionGlobals_ = new Map();
+		}
+		if (!generator.functionGlobals_.has(currentFunc)) {
+			generator.functionGlobals_.set(currentFunc, new Set());
+		}
+		generator.functionGlobals_.get(currentFunc).add(varName);
+
 		return `${varName} = ${value}\n`;
 	};
 
