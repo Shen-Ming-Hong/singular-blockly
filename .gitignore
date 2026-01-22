@@ -51,6 +51,9 @@ performance-baseline.txt
 # Codex skills (Junction 連結到 .github/skills/)
 .codex/skills/
 
+# Agent skills (Junction 連結到 .github/skills/)
+.agent/
+
 # 生成的報告檔案
 translation-stats.md
 
