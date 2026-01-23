@@ -10,6 +10,8 @@ VSCode extension for visual Arduino/MicroPython programming using Google Blockly
 
 **Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VSCode 1.105.0+ | MCP SDK 1.25.2 | Zod 4.1.13
 
+**Current Version**: 0.59.0
+
 ## Architecture (Two-Context System)
 
 ```
@@ -129,7 +131,7 @@ npm run generate:dictionary  # Update MCP block dictionary
 2. **Arduino generator**: `media/blockly/generators/arduino/{category}.js` — use `window.getCurrentBoard()` for board-specific code
 3. **MicroPython generator**: `media/blockly/generators/micropython/{category}.js` — use `generator.addImport()`, `generator.addHardwareInit()`
 4. **Toolbox entry**: `media/toolbox/categories/{category}.json`
-    - Categories: arduino, communication, cyberbrick_core, cyberbrick_rc, cyberbrick_wifi, cyberbrick_x11, cyberbrick_x12, lists, logic, loops, math, motors, sensors, text, vision-sensors
+    - 15 Categories: `arduino`, `communication`, `cyberbrick_core`, `cyberbrick_rc`, `cyberbrick_wifi`, `cyberbrick_x11`, `cyberbrick_x12`, `lists`, `logic`, `loops`, `math`, `motors`, `sensors`, `text`, `vision-sensors`
 5. **i18n keys**: All 15 `media/locales/*/messages.js` files (use `npm run validate:i18n` to check)
 
 **For setup blocks** (servo, encoder): Register with `arduinoGenerator.registerAlwaysGenerateBlock('block_type')` at module load (see `motors.js` IIFE pattern)
@@ -152,7 +154,7 @@ Features documented in `/specs/{NNN}-feature-name/`:
 
 - `spec.md` → Requirements | `plan.md` → Strategy | `tasks.md` → Breakdown
 
-**Active specs**: Keep only last 3 numbered specs active. Completed specs should be consolidated into `docs/specifications/`.
+**Active specs policy**: When exceeding 5 specs, keep only the last 3 active. Older specs should be consolidated into `docs/specifications/`.
 
 **Check existing specs before implementing new features.**
 
