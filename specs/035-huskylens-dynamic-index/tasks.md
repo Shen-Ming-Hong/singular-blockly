@@ -47,8 +47,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T001 [US1] 修改 `huskylens_get_block_info` 積木定義：將 `FieldNumber` 改為 `appendValueInput('INDEX').setCheck('Number')`，並加入 `setInputsInline(true)` in `media/blockly/blocks/huskylens.js`
-- [ ] T002 [US1] 更新 `huskylens_get_block_info` Arduino 產生器：將 `getFieldValue('INDEX')` 改為 `valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0'` in `media/blockly/generators/arduino/huskylens.js`
+- [x] T001 [US1] 修改 `huskylens_get_block_info` 積木定義：將 `FieldNumber` 改為 `appendValueInput('INDEX').setCheck('Number')`，並加入 `setInputsInline(true)` in `media/blockly/blocks/huskylens.js`
+- [x] T002 [US1] 更新 `huskylens_get_block_info` Arduino 產生器：將 `getFieldValue('INDEX')` 改為 `valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0'` in `media/blockly/generators/arduino/huskylens.js`
 
 **Checkpoint**: 方塊積木可接受動態編號，產生正確 Arduino 程式碼
 
@@ -62,8 +62,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T003 [P] [US2] 修改 `huskylens_get_arrow_info` 積木定義：將 `FieldNumber` 改為 `appendValueInput('INDEX').setCheck('Number')`，並加入 `setInputsInline(true)` in `media/blockly/blocks/huskylens.js`
-- [ ] T004 [P] [US2] 更新 `huskylens_get_arrow_info` Arduino 產生器：將 `getFieldValue('INDEX')` 改為 `valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0'` in `media/blockly/generators/arduino/huskylens.js`
+- [x] T003 [P] [US2] 修改 `huskylens_get_arrow_info` 積木定義：將 `FieldNumber` 改為 `appendValueInput('INDEX').setCheck('Number')`，並加入 `setInputsInline(true)` in `media/blockly/blocks/huskylens.js`
+- [x] T004 [P] [US2] 更新 `huskylens_get_arrow_info` Arduino 產生器：將 `getFieldValue('INDEX')` 改為 `valueToCode(block, 'INDEX', ORDER_ATOMIC) || '0'` in `media/blockly/generators/arduino/huskylens.js`
 
 **Checkpoint**: 箭頭積木可接受動態編號，產生正確 Arduino 程式碼
 
@@ -77,8 +77,8 @@
 
 ### Implementation for User Story 3
 
-- [ ] T005 [US3] 更新工具箱設定：為 `huskylens_get_block_info` 新增 `inputs.INDEX.shadow` 設定（type: `math_number`, NUM: 0）in `media/toolbox/categories/vision-sensors.json`
-- [ ] T006 [US3] 更新工具箱設定：為 `huskylens_get_arrow_info` 新增 `inputs.INDEX.shadow` 設定（type: `math_number`, NUM: 0）in `media/toolbox/categories/vision-sensors.json`
+- [x] T005 [US3] 更新工具箱設定：為 `huskylens_get_block_info` 新增 `inputs.INDEX.shadow` 設定（type: `math_number`, NUM: 0）in `media/toolbox/categories/vision-sensors.json`
+- [x] T006 [US3] 更新工具箱設定：為 `huskylens_get_arrow_info` 新增 `inputs.INDEX.shadow` 設定（type: `math_number`, NUM: 0）in `media/toolbox/categories/vision-sensors.json`
 
 **Checkpoint**: 從工具箱拖曳的積木自動填入預設數字 0
 
@@ -88,8 +88,8 @@
 
 **Purpose**: 整體驗證與品質確認
 
-- [ ] T007 手動測試驗證：執行 `npm run watch` → F5 開啟 Extension Development Host → 測試所有 Acceptance Scenarios
-- [ ] T008 產生程式碼驗證：建立包含 for 迴圈的測試積木組合，確認產生的 Arduino 程式碼語法正確
+- [x] T007 手動測試驗證：執行 `npm run watch` → F5 開啟 Extension Development Host → 測試所有 Acceptance Scenarios
+- [x] T008 產生程式碼驗證：建立包含 for 迴圈的測試積木組合，確認產生的 Arduino 程式碼語法正確
 
 ---
 

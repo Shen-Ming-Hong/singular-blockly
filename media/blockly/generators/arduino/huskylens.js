@@ -287,7 +287,7 @@ window.arduinoGenerator.forBlock['huskylens_count_blocks'] = function (block) {
 // HUSKYLENS 方塊資訊代碼生成
 window.arduinoGenerator.forBlock['huskylens_get_block_info'] = function (block) {
 	try {
-		const index = block.getFieldValue('INDEX');
+		const index = window.arduinoGenerator.valueToCode(block, 'INDEX', window.arduinoGenerator.ORDER_ATOMIC) || '0';
 		const infoType = block.getFieldValue('INFO_TYPE');
 		// 注意: HUSKYLENSArduino 函式庫使用 .ID (大寫) 而非 .id
 		const code = `huskylens.getBlock(${index}).${infoType}`;
@@ -312,7 +312,7 @@ window.arduinoGenerator.forBlock['huskylens_count_arrows'] = function (block) {
 // HUSKYLENS 箭頭資訊代碼生成
 window.arduinoGenerator.forBlock['huskylens_get_arrow_info'] = function (block) {
 	try {
-		const index = block.getFieldValue('INDEX');
+		const index = window.arduinoGenerator.valueToCode(block, 'INDEX', window.arduinoGenerator.ORDER_ATOMIC) || '0';
 		const infoType = block.getFieldValue('INFO_TYPE');
 		// 注意: HUSKYLENSArduino 函式庫使用 .ID (大寫) 而非 .id
 		const code = `huskylens.getArrow(${index}).${infoType}`;
