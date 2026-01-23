@@ -116,8 +116,17 @@
 
 - [ ] T030 執行 npm run generate:dictionary 更新 MCP block dictionary
 - [ ] T031 手動測試：按 F5 啟動 Extension Development Host 驗證積木顯示
+    - ✅ 驗收：Toolbox「視覺感測」類別顯示「依 ID 查詢」分隔標籤
+    - ✅ 驗收：三個新積木 (huskylens_request_blocks_id, huskylens_count_blocks_id, huskylens_get_block_id) 皆出現在 Toolbox
 - [ ] T032 手動測試：拖曳三個新積木並驗證程式碼生成
+    - ✅ 驗收：huskylens_request_blocks_id (ID=2) → 生成 `huskylens.requestBlocks(2);`
+    - ✅ 驗收：huskylens_count_blocks_id (ID=1) → 生成 `huskylens.countBlocks(1)`
+    - ✅ 驗收：huskylens_get_block_id (ID=1, INDEX=0, xCenter) → 生成 `huskylens.getBlock(1, 0).xCenter`
+    - ✅ 驗收：5 種屬性選項皆可選擇 (xCenter, yCenter, width, height, ID)
 - [ ] T033 手動測試：切換語言驗證翻譯顯示正確
+    - ✅ 驗收：切換至英文 → 積木顯示英文文字
+    - ✅ 驗收：切換至日文 → 積木顯示日文文字
+    - ✅ 驗收：Tooltip 正確顯示對應語言說明
 - [ ] T034 執行 quickstart.md 驗證流程
 
 ---
@@ -211,29 +220,34 @@ Developer C: Phase 5 (User Story 3 - huskylens_count_blocks_id)
 
 ---
 
-## 翻譯鍵參考 (來自 contracts/block-api.md)
+## 翻譯鍵參考
 
-### 需新增的翻譯鍵
+**權威來源**: [contracts/block-api.md](contracts/block-api.md) Section 4「完整翻譯鍵表」
 
-```javascript
-// HuskyLens ID-Based 積木
-HUSKYLENS_BY_ID_LABEL: '依 ID 查詢',
-HUSKYLENS_REQUEST_BLOCKS_ID: '請求 HUSKYLENS ID',
-HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '的方塊',
-HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: '只請求特定 ID 的方塊辨識結果，可提高效率',
-HUSKYLENS_COUNT_BLOCKS_ID: 'HUSKYLENS ID',
-HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '的方塊數量',
-HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: '取得特定 ID 的方塊數量',
-HUSKYLENS_GET_BLOCK_ID: '取得 ID',
-HUSKYLENS_GET_BLOCK_ID_INDEX: '的第',
-HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '個方塊的',
-HUSKYLENS_GET_BLOCK_ID_TOOLTIP: '取得特定 ID 方塊的位置、大小或 ID 資訊',
-```
+### 需新增的翻譯鍵 (11 個)
 
-### 重用現有翻譯鍵
+| 翻譯鍵                                | 繁體中文                                 | 英文                                                       | 說明             |
+| ------------------------------------- | ---------------------------------------- | ---------------------------------------------------------- | ---------------- |
+| `HUSKYLENS_BY_ID_LABEL`               | 依 ID 查詢                               | Query by ID                                                | Toolbox 分類標籤 |
+| `HUSKYLENS_REQUEST_BLOCKS_ID`         | 請求 HUSKYLENS ID                        | request HUSKYLENS blocks with ID                           | 積木開頭文字     |
+| `HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX`  | 的方塊                                   | _(空字串)_                                                 | 積木結尾文字     |
+| `HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP` | 只請求特定 ID 的方塊辨識結果，可提高效率 | Request only blocks with specific ID for better efficiency | 提示             |
+| `HUSKYLENS_COUNT_BLOCKS_ID`           | HUSKYLENS ID                             | HUSKYLENS block count with ID                              | 積木開頭文字     |
+| `HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX`    | 的方塊數量                               | _(空字串)_                                                 | 積木結尾文字     |
+| `HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP`   | 取得特定 ID 的方塊數量                   | Get the count of blocks with specific ID                   | 提示             |
+| `HUSKYLENS_GET_BLOCK_ID`              | 取得 ID                                  | get block with ID                                          | 積木開頭文字     |
+| `HUSKYLENS_GET_BLOCK_ID_INDEX`        | 的第                                     | index                                                      | 連接詞           |
+| `HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX` | 個方塊的                                 | _(空字串)_                                                 | 連接詞           |
+| `HUSKYLENS_GET_BLOCK_ID_TOOLTIP`      | 取得特定 ID 方塊的位置、大小或 ID 資訊   | Get position, size or ID info of a block with specific ID  | 提示             |
 
-- `HUSKYLENS_X_CENTER`
-- `HUSKYLENS_Y_CENTER`
-- `HUSKYLENS_WIDTH`
-- `HUSKYLENS_HEIGHT`
-- `HUSKYLENS_ID`
+> **Note**: 英文 `_SUFFIX` 鍵為空字串是刻意設計，因英文語法不需要後綴詞
+
+### 重用現有翻譯鍵 (5 個)
+
+| 翻譯鍵               | 用途         |
+| -------------------- | ------------ |
+| `HUSKYLENS_X_CENTER` | 屬性下拉選單 |
+| `HUSKYLENS_Y_CENTER` | 屬性下拉選單 |
+| `HUSKYLENS_WIDTH`    | 屬性下拉選單 |
+| `HUSKYLENS_HEIGHT`   | 屬性下拉選單 |
+| `HUSKYLENS_ID`       | 屬性下拉選單 |
