@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.0] - 2026-01-23
+
+### 新增功能 Added
+
+- **HuskyLens 積木動態編號輸入** (HuskyLens Dynamic Index Input)
+    - 「取得方塊」和「取得箭頭」積木的編號欄位現可連接變數、數字或數學運算積木
+      INDEX field of "Get Block" and "Get Arrow" blocks now accepts variable, number, or math blocks
+    - 支援在迴圈中動態掃描所有偵測結果
+      Enables dynamic iteration over all detected results in loops
+    - 工具箱積木預設顯示數字 0，維持使用體驗
+      Toolbox blocks default to number 0, maintaining user experience
+
 ## [0.57.1] - 2026-01-22
 
 ### 修復 Fixed
