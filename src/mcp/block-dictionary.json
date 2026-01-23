@@ -1,6 +1,6 @@
 {
-  "version": "0.54.1",
-  "generatedAt": "2026-01-20T10:15:46.202Z",
+  "version": "0.58.0",
+  "generatedAt": "2026-01-23T13:13:49.838Z",
   "blocks": [
     {
       "type": "arduino_setup",
@@ -3363,6 +3363,193 @@
         "清除"
       ],
       "experimental": true
+    },
+    {
+      "type": "huskylens_request_blocks_id",
+      "category": "vision",
+      "names": {
+        "zh-hant": "請求 HUSKYLENS ID 方塊",
+        "en": "Request HUSKYLENS Blocks by ID"
+      },
+      "descriptions": {
+        "zh-hant": "只請求特定 ID 的方塊辨識結果，可提高效率",
+        "en": "Request only blocks with specific ID for better efficiency"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "ID",
+          "type": "value",
+          "label": {
+            "zh-hant": "ID",
+            "en": "ID"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "huskylens",
+        "request",
+        "blocks",
+        "id",
+        "請求",
+        "方塊",
+        "ID"
+      ]
+    },
+    {
+      "type": "huskylens_count_blocks_id",
+      "category": "vision",
+      "names": {
+        "zh-hant": "HUSKYLENS ID 方塊數量",
+        "en": "HUSKYLENS Block Count by ID"
+      },
+      "descriptions": {
+        "zh-hant": "取得特定 ID 的方塊數量",
+        "en": "Get the count of blocks with specific ID"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "ID",
+          "type": "value",
+          "label": {
+            "zh-hant": "ID",
+            "en": "ID"
+          },
+          "check": "Number"
+        }
+      ],
+      "output": {
+        "type": "Number"
+      },
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "huskylens",
+        "count",
+        "blocks",
+        "id",
+        "數量",
+        "方塊",
+        "ID"
+      ]
+    },
+    {
+      "type": "huskylens_get_block_id",
+      "category": "vision",
+      "names": {
+        "zh-hant": "取得 ID 方塊資訊",
+        "en": "Get Block Info by ID"
+      },
+      "descriptions": {
+        "zh-hant": "取得特定 ID 方塊的位置、大小或 ID 資訊",
+        "en": "Get position, size or ID info of a block with specific ID"
+      },
+      "fields": [
+        {
+          "name": "INFO_TYPE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "資訊類型",
+            "en": "Info Type"
+          },
+          "options": [
+            {
+              "value": "xCenter",
+              "label": {
+                "zh-hant": "X 中心",
+                "en": "X Center"
+              }
+            },
+            {
+              "value": "yCenter",
+              "label": {
+                "zh-hant": "Y 中心",
+                "en": "Y Center"
+              }
+            },
+            {
+              "value": "width",
+              "label": {
+                "zh-hant": "寬度",
+                "en": "Width"
+              }
+            },
+            {
+              "value": "height",
+              "label": {
+                "zh-hant": "高度",
+                "en": "Height"
+              }
+            },
+            {
+              "value": "ID",
+              "label": {
+                "zh-hant": "ID",
+                "en": "ID"
+              }
+            }
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "name": "ID",
+          "type": "value",
+          "label": {
+            "zh-hant": "ID",
+            "en": "ID"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "INDEX",
+          "type": "value",
+          "label": {
+            "zh-hant": "索引",
+            "en": "Index"
+          },
+          "check": "Number"
+        }
+      ],
+      "output": {
+        "type": "Number"
+      },
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "huskylens",
+        "get",
+        "block",
+        "id",
+        "info",
+        "取得",
+        "方塊",
+        "ID",
+        "資訊",
+        "xCenter",
+        "yCenter",
+        "width",
+        "height"
+      ]
     },
     {
       "type": "huskylens_is_learned",
@@ -8080,87 +8267,90 @@
       "huskylens_get_arrow_info": 57,
       "huskylens_learn": 58,
       "huskylens_forget": 59,
-      "huskylens_is_learned": 60,
-      "arduino_setup_loop": 61,
-      "arduino_digital_write": 62,
-      "arduino_digital_read": 63,
-      "arduino_analog_write": 64,
-      "arduino_analog_read": 65,
-      "arduino_delay": 66,
-      "arduino_level": 67,
-      "arduino_pullup": 68,
-      "arduino_pin_mode": 69,
-      "text_print": 70,
-      "math_number": 71,
-      "math_arithmetic": 72,
-      "math_single": 73,
-      "math_trig": 74,
-      "math_constant": 75,
-      "math_number_property": 76,
-      "math_round": 77,
-      "math_modulo": 78,
-      "math_constrain": 79,
-      "math_random_int": 80,
-      "math_random_float": 81,
-      "math_map": 82,
-      "ultrasonic_trigger": 83,
-      "encoder_pid_setup": 84,
-      "encoder_pid_compute": 85,
-      "threshold_function_setup": 86,
-      "threshold_function_read": 87,
-      "esp32_wifi_connect": 88,
-      "esp32_wifi_disconnect": 89,
-      "esp32_wifi_status": 90,
-      "esp32_wifi_get_ip": 91,
-      "esp32_wifi_scan": 92,
-      "esp32_wifi_get_ssid": 93,
-      "esp32_wifi_get_rssi": 94,
-      "esp32_mqtt_setup": 95,
-      "esp32_mqtt_connect": 96,
-      "esp32_mqtt_publish": 97,
-      "esp32_mqtt_subscribe": 98,
-      "esp32_mqtt_loop": 99,
-      "esp32_mqtt_get_topic": 100,
-      "esp32_mqtt_get_message": 101,
-      "esp32_mqtt_status": 102,
-      "text": 103,
-      "text_length": 104,
-      "text_isEmpty": 105,
-      "text_indexOf": 106,
-      "text_charAt": 107,
-      "text_getSubstring": 108,
-      "text_changeCase": 109,
-      "text_trim": 110,
-      "lists_create_empty": 111,
-      "lists_create_with": 112,
-      "lists_repeat": 113,
-      "lists_length": 114,
-      "lists_isEmpty": 115,
-      "lists_indexOf": 116,
-      "lists_getIndex": 117,
-      "lists_setIndex": 118,
-      "to_string": 119,
-      "text_join": 120,
-      "cyberbrick_ticks_ms": 121,
-      "cyberbrick_ticks_diff": 122,
-      "x11_servo_180_angle": 123,
-      "x11_servo_360_speed": 124,
-      "x11_servo_stop": 125,
-      "x11_motor_speed": 126,
-      "x11_motor_stop": 127,
-      "x11_led_set_color": 128,
-      "x12_get_joystick": 129,
-      "x12_get_joystick_mapped": 130,
-      "x12_is_button_pressed": 131,
-      "x12_get_button": 132,
-      "rc_master_init": 133,
-      "rc_slave_init": 134,
-      "rc_get_joystick": 135,
-      "rc_get_joystick_mapped": 136,
-      "rc_is_button_pressed": 137,
-      "rc_get_button": 138,
-      "rc_is_connected": 139,
-      "rc_get_rc_index": 140
+      "huskylens_request_blocks_id": 60,
+      "huskylens_count_blocks_id": 61,
+      "huskylens_get_block_id": 62,
+      "huskylens_is_learned": 63,
+      "arduino_setup_loop": 64,
+      "arduino_digital_write": 65,
+      "arduino_digital_read": 66,
+      "arduino_analog_write": 67,
+      "arduino_analog_read": 68,
+      "arduino_delay": 69,
+      "arduino_level": 70,
+      "arduino_pullup": 71,
+      "arduino_pin_mode": 72,
+      "text_print": 73,
+      "math_number": 74,
+      "math_arithmetic": 75,
+      "math_single": 76,
+      "math_trig": 77,
+      "math_constant": 78,
+      "math_number_property": 79,
+      "math_round": 80,
+      "math_modulo": 81,
+      "math_constrain": 82,
+      "math_random_int": 83,
+      "math_random_float": 84,
+      "math_map": 85,
+      "ultrasonic_trigger": 86,
+      "encoder_pid_setup": 87,
+      "encoder_pid_compute": 88,
+      "threshold_function_setup": 89,
+      "threshold_function_read": 90,
+      "esp32_wifi_connect": 91,
+      "esp32_wifi_disconnect": 92,
+      "esp32_wifi_status": 93,
+      "esp32_wifi_get_ip": 94,
+      "esp32_wifi_scan": 95,
+      "esp32_wifi_get_ssid": 96,
+      "esp32_wifi_get_rssi": 97,
+      "esp32_mqtt_setup": 98,
+      "esp32_mqtt_connect": 99,
+      "esp32_mqtt_publish": 100,
+      "esp32_mqtt_subscribe": 101,
+      "esp32_mqtt_loop": 102,
+      "esp32_mqtt_get_topic": 103,
+      "esp32_mqtt_get_message": 104,
+      "esp32_mqtt_status": 105,
+      "text": 106,
+      "text_length": 107,
+      "text_isEmpty": 108,
+      "text_indexOf": 109,
+      "text_charAt": 110,
+      "text_getSubstring": 111,
+      "text_changeCase": 112,
+      "text_trim": 113,
+      "lists_create_empty": 114,
+      "lists_create_with": 115,
+      "lists_repeat": 116,
+      "lists_length": 117,
+      "lists_isEmpty": 118,
+      "lists_indexOf": 119,
+      "lists_getIndex": 120,
+      "lists_setIndex": 121,
+      "to_string": 122,
+      "text_join": 123,
+      "cyberbrick_ticks_ms": 124,
+      "cyberbrick_ticks_diff": 125,
+      "x11_servo_180_angle": 126,
+      "x11_servo_360_speed": 127,
+      "x11_servo_stop": 128,
+      "x11_motor_speed": 129,
+      "x11_motor_stop": 130,
+      "x11_led_set_color": 131,
+      "x12_get_joystick": 132,
+      "x12_get_joystick_mapped": 133,
+      "x12_is_button_pressed": 134,
+      "x12_get_button": 135,
+      "rc_master_init": 136,
+      "rc_slave_init": 137,
+      "rc_get_joystick": 138,
+      "rc_get_joystick_mapped": 139,
+      "rc_is_button_pressed": 140,
+      "rc_get_button": 141,
+      "rc_is_connected": 142,
+      "rc_get_rc_index": 143
     },
     "byCategory": {
       "arduino": [
@@ -8173,17 +8363,17 @@
         6,
         7,
         24,
-        61,
-        62,
-        63,
         64,
         65,
         66,
         67,
         68,
         69,
-        86,
-        87
+        70,
+        71,
+        72,
+        89,
+        90
       ],
       "motors": [
         8,
@@ -8192,13 +8382,13 @@
         11,
         12,
         13,
-        84,
-        85
+        87,
+        88
       ],
       "sensors": [
         14,
         15,
-        83
+        86
       ],
       "vision": [
         16,
@@ -8224,7 +8414,10 @@
         57,
         58,
         59,
-        60
+        60,
+        61,
+        62,
+        63
       ],
       "displays": [
         22,
@@ -8255,22 +8448,19 @@
         55
       ],
       "text": [
-        70,
-        103,
-        104,
-        105,
+        73,
         106,
         107,
         108,
         109,
         110,
-        119,
-        120
+        111,
+        112,
+        113,
+        122,
+        123
       ],
       "math": [
-        71,
-        72,
-        73,
         74,
         75,
         76,
@@ -8279,12 +8469,12 @@
         79,
         80,
         81,
-        82
+        82,
+        83,
+        84,
+        85
       ],
       "communication": [
-        88,
-        89,
-        90,
         91,
         92,
         93,
@@ -8296,45 +8486,48 @@
         99,
         100,
         101,
-        102
+        102,
+        103,
+        104,
+        105
       ],
       "lists": [
-        111,
-        112,
-        113,
         114,
         115,
         116,
         117,
-        118
+        118,
+        119,
+        120,
+        121
       ],
       "cyberbrick": [
-        121,
-        122
+        124,
+        125
       ],
       "x11": [
-        123,
-        124,
-        125,
         126,
         127,
-        128
-      ],
-      "x12": [
+        128,
         129,
         130,
-        131,
-        132
+        131
       ],
-      "rc": [
+      "x12": [
+        132,
         133,
         134,
-        135,
+        135
+      ],
+      "rc": [
         136,
         137,
         138,
         139,
-        140
+        140,
+        141,
+        142,
+        143
       ]
     },
     "searchIndex": {
@@ -8734,6 +8927,9 @@
         "huskylens_get_arrow_info",
         "huskylens_learn",
         "huskylens_forget",
+        "huskylens_request_blocks_id",
+        "huskylens_count_blocks_id",
+        "huskylens_get_block_id",
         "huskylens_is_learned"
       ],
       "i2c": [
@@ -8821,13 +9017,15 @@
         "x11_led_set_color"
       ],
       "request": [
-        "huskylens_request"
+        "huskylens_request",
+        "huskylens_request_blocks_id"
       ],
       "data": [
         "huskylens_request"
       ],
       "請求": [
-        "huskylens_request"
+        "huskylens_request",
+        "huskylens_request_blocks_id"
       ],
       "資料": [
         "huskylens_request"
@@ -8836,41 +9034,54 @@
         "huskylens_request"
       ],
       "blocks": [
-        "huskylens_count_blocks"
+        "huskylens_count_blocks",
+        "huskylens_request_blocks_id",
+        "huskylens_count_blocks_id"
       ],
       "count": [
         "huskylens_count_blocks",
         "controls_for",
         "huskylens_count_arrows",
+        "huskylens_count_blocks_id",
         "text_length",
         "lists_length"
       ],
       "方塊": [
         "huskylens_count_blocks",
-        "huskylens_get_block_info"
+        "huskylens_get_block_info",
+        "huskylens_request_blocks_id",
+        "huskylens_count_blocks_id",
+        "huskylens_get_block_id"
       ],
       "數量": [
         "huskylens_count_blocks",
-        "huskylens_count_arrows"
+        "huskylens_count_arrows",
+        "huskylens_count_blocks_id"
       ],
       "方塊數量": [
-        "huskylens_count_blocks"
+        "huskylens_count_blocks",
+        "huskylens_count_blocks_id"
       ],
       "block": [
         "huskylens_count_blocks",
-        "huskylens_get_block_info"
+        "huskylens_get_block_info",
+        "huskylens_count_blocks_id",
+        "huskylens_get_block_id"
       ],
       "info": [
         "huskylens_get_block_info",
-        "huskylens_get_arrow_info"
+        "huskylens_get_arrow_info",
+        "huskylens_get_block_id"
       ],
       "資訊": [
         "huskylens_get_block_info",
-        "huskylens_get_arrow_info"
+        "huskylens_get_arrow_info",
+        "huskylens_get_block_id"
       ],
       "取得": [
         "huskylens_get_block_info",
         "huskylens_get_arrow_info",
+        "huskylens_get_block_id",
         "esp32_wifi_get_ip",
         "esp32_wifi_get_ssid",
         "esp32_wifi_get_rssi",
@@ -8879,7 +9090,8 @@
         "lists_getIndex"
       ],
       "方塊資訊": [
-        "huskylens_get_block_info"
+        "huskylens_get_block_info",
+        "huskylens_get_block_id"
       ],
       "get": [
         "huskylens_get_block_info",
@@ -8887,6 +9099,7 @@
         "pixetto_get_func_id",
         "pixetto_get_position",
         "huskylens_get_arrow_info",
+        "huskylens_get_block_id",
         "esp32_wifi_get_ip",
         "esp32_wifi_get_ssid",
         "esp32_wifi_get_rssi",
@@ -9027,7 +9240,10 @@
       ],
       "id": [
         "pixetto_get_type_id",
-        "pixetto_get_func_id"
+        "pixetto_get_func_id",
+        "huskylens_request_blocks_id",
+        "huskylens_count_blocks_id",
+        "huskylens_get_block_id"
       ],
       "類型": [
         "pixetto_get_type_id"
@@ -9512,6 +9728,23 @@
       ],
       "清除": [
         "huskylens_forget"
+      ],
+      "by": [
+        "huskylens_request_blocks_id",
+        "huskylens_count_blocks_id",
+        "huskylens_get_block_id"
+      ],
+      "xcenter": [
+        "huskylens_get_block_id"
+      ],
+      "ycenter": [
+        "huskylens_get_block_id"
+      ],
+      "width": [
+        "huskylens_get_block_id"
+      ],
+      "height": [
+        "huskylens_get_block_id"
       ],
       "learned": [
         "huskylens_is_learned"

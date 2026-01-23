@@ -464,6 +464,19 @@ window.languageManager.loadMessages('cs', {
 	HUSKYLENS_LEARN: 'Nechte HUSKYLENS naučit se ID',
 	HUSKYLENS_FORGET: 'Nechte HUSKYLENS zapomenout vše naučené',
 
+	// HuskyLens ID-Based Bloky
+	HUSKYLENS_BY_ID_LABEL: 'Dotaz podle ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'požádat o HUSKYLENS bloky s ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Požádat pouze o bloky s určitým ID pro lepší efektivitu',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'počet HUSKYLENS bloků s ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Získat počet bloků s určitým ID',
+	HUSKYLENS_GET_BLOCK_ID: 'získat blok s ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'index',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Získat pozici, velikost nebo ID bloku s určitým ID',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Inicializace chytré kamery Pixetto a nastavení komunikačních pinů UART',
 	PIXETTO_IS_DETECTED_TOOLTIP: 'Zjistit, zda Pixetto detekuje nějaký objekt',
@@ -888,4 +901,3 @@ window.languageManager.loadMessages('cs', {
 	RC_IS_CONNECTED: 'RC připojeno?',
 	RC_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda byla přijata data za 500ms',
 });
-

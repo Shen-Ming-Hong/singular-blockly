@@ -524,6 +524,19 @@ window.languageManager.loadMessages('es', {
 	HUSKYLENS_LEARN: 'HUSKYLENS Aprender ID',
 	HUSKYLENS_FORGET: 'HUSKYLENS Olvidar Todo',
 
+	// HuskyLens ID-Based Bloques
+	HUSKYLENS_BY_ID_LABEL: 'Consultar por ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'solicitar bloques HUSKYLENS con ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Solicitar solo bloques con ID específico para mayor eficiencia',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'cantidad de bloques HUSKYLENS con ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Obtener la cantidad de bloques con ID específico',
+	HUSKYLENS_GET_BLOCK_ID: 'obtener bloque con ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'índice',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Obtener posición, tamaño o ID de un bloque con ID específico',
+
 	// HUSKYLENS Tooltips
 	HUSKYLENS_INIT_I2C_TOOLTIP: 'Inicializar cámara inteligente HUSKYLENS usando I2C',
 	HUSKYLENS_INIT_UART_TOOLTIP: 'Inicializar cámara inteligente HUSKYLENS usando UART, configurar pines RX/TX',
@@ -887,4 +900,3 @@ window.languageManager.loadMessages('es', {
 	RC_GET_BUTTON_SUFFIX: 'estado',
 	RC_GET_BUTTON_TOOLTIP: 'Leer estado botón remoto (0=presionado, 1=suelto)',
 });
-

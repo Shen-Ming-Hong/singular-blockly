@@ -1288,6 +1288,64 @@ const BLOCK_DEFINITIONS = [
 		tags: ['huskylens', 'forget', 'clear', '忘記', '清除'],
 		experimental: true,
 	},
+	// === HuskyLens ID-Based 積木 ===
+	{
+		type: 'huskylens_request_blocks_id',
+		category: 'vision',
+		names: { 'zh-hant': '請求 HUSKYLENS ID 方塊', en: 'Request HUSKYLENS Blocks by ID' },
+		descriptions: {
+			'zh-hant': '只請求特定 ID 的方塊辨識結果，可提高效率',
+			en: 'Request only blocks with specific ID for better efficiency',
+		},
+		fields: [],
+		inputs: [{ name: 'ID', type: 'value', label: { 'zh-hant': 'ID', en: 'ID' }, check: 'Number' }],
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'request', 'blocks', 'id', '請求', '方塊', 'ID'],
+	},
+	{
+		type: 'huskylens_count_blocks_id',
+		category: 'vision',
+		names: { 'zh-hant': 'HUSKYLENS ID 方塊數量', en: 'HUSKYLENS Block Count by ID' },
+		descriptions: {
+			'zh-hant': '取得特定 ID 的方塊數量',
+			en: 'Get the count of blocks with specific ID',
+		},
+		fields: [],
+		inputs: [{ name: 'ID', type: 'value', label: { 'zh-hant': 'ID', en: 'ID' }, check: 'Number' }],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'count', 'blocks', 'id', '數量', '方塊', 'ID'],
+	},
+	{
+		type: 'huskylens_get_block_id',
+		category: 'vision',
+		names: { 'zh-hant': '取得 ID 方塊資訊', en: 'Get Block Info by ID' },
+		descriptions: {
+			'zh-hant': '取得特定 ID 方塊的位置、大小或 ID 資訊',
+			en: 'Get position, size or ID info of a block with specific ID',
+		},
+		fields: [
+			{
+				name: 'INFO_TYPE',
+				type: 'dropdown',
+				label: { 'zh-hant': '資訊類型', en: 'Info Type' },
+				options: [
+					{ value: 'xCenter', label: { 'zh-hant': 'X 中心', en: 'X Center' } },
+					{ value: 'yCenter', label: { 'zh-hant': 'Y 中心', en: 'Y Center' } },
+					{ value: 'width', label: { 'zh-hant': '寬度', en: 'Width' } },
+					{ value: 'height', label: { 'zh-hant': '高度', en: 'Height' } },
+					{ value: 'ID', label: { 'zh-hant': 'ID', en: 'ID' } },
+				],
+			},
+		],
+		inputs: [
+			{ name: 'ID', type: 'value', label: { 'zh-hant': 'ID', en: 'ID' }, check: 'Number' },
+			{ name: 'INDEX', type: 'value', label: { 'zh-hant': '索引', en: 'Index' }, check: 'Number' },
+		],
+		output: { type: 'Number' },
+		boards: SUPPORTED_BOARDS,
+		tags: ['huskylens', 'get', 'block', 'id', 'info', '取得', '方塊', 'ID', '資訊', 'xCenter', 'yCenter', 'width', 'height'],
+	},
 	{
 		type: 'huskylens_is_learned',
 		category: 'vision',

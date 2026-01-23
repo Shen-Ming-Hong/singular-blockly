@@ -465,6 +465,19 @@ window.languageManager.loadMessages('ko', {
 	HUSKYLENS_LEARN: 'HUSKYLENS ID 학습시키기',
 	HUSKYLENS_FORGET: 'HUSKYLENS 모든 학습 내용 지우기',
 
+	// HuskyLens ID-Based 블록
+	HUSKYLENS_BY_ID_LABEL: 'ID로 조회',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'HUSKYLENS ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '의 블록 요청',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: '특정 ID의 블록만 요청하여 효율성 향상',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'HUSKYLENS ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '의 블록 수',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: '특정 ID의 블록 수 가져오기',
+	HUSKYLENS_GET_BLOCK_ID: 'ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: '의',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '번째 블록의',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: '특정 ID 블록의 위치, 크기 또는 ID 정보 가져오기',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto 스마트 카메라를 초기화하고 UART 통신 핀을 설정합니다',
 	PIXETTO_IS_DETECTED_TOOLTIP: 'Pixetto가 객체를 감지하는지 여부를 탐지',
@@ -883,4 +896,3 @@ window.languageManager.loadMessages('ko', {
 	RC_GET_BUTTON_SUFFIX: '상태',
 	RC_GET_BUTTON_TOOLTIP: '원격 버튼 상태 읽기 (0=눌림, 1=해제)',
 });
-

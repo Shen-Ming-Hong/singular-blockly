@@ -523,6 +523,19 @@ window.languageManager.loadMessages('de', {
 	HUSKYLENS_LEARN: 'HUSKYLENS ID lernen',
 	HUSKYLENS_FORGET: 'HUSKYLENS alle lernen vergessen',
 
+	// HuskyLens ID-Based Blöcke
+	HUSKYLENS_BY_ID_LABEL: 'Nach ID abfragen',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'HUSKYLENS Blöcke mit ID anfordern',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Nur Blöcke mit bestimmter ID anfordern für bessere Effizienz',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'HUSKYLENS Blockanzahl mit ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Anzahl der Blöcke mit bestimmter ID abrufen',
+	HUSKYLENS_GET_BLOCK_ID: 'Block mit ID abrufen',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'Index',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Position, Größe oder ID eines Blocks mit bestimmter ID abrufen',
+
 	// HUSKYLENS Tooltips
 	HUSKYLENS_INIT_I2C_TOOLTIP: 'HUSKYLENS Smart-Kamera mit I2C initialisieren',
 	HUSKYLENS_INIT_UART_TOOLTIP: 'HUSKYLENS Smart-Kamera mit UART initialisieren, RX/TX-Pins einstellen',
@@ -888,4 +901,3 @@ window.languageManager.loadMessages('de', {
 	RC_GET_BUTTON_SUFFIX: 'Status',
 	RC_GET_BUTTON_TOOLTIP: 'Remote-Tasten-Status lesen (0=gedrückt, 1=losgelassen)',
 });
-

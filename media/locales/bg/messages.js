@@ -465,6 +465,19 @@ window.languageManager.loadMessages('bg', {
 	HUSKYLENS_LEARN: 'Нека HUSKYLENS научи ID',
 	HUSKYLENS_FORGET: 'Нека HUSKYLENS забрави всичко научено',
 
+	// HuskyLens ID-Based Блокове
+	HUSKYLENS_BY_ID_LABEL: 'Заявка по ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'изискване на HUSKYLENS блокове с ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Изисквайте само блокове с определен ID за по-добра ефективност',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'брой на HUSKYLENS блокове с ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Получаване на броя блокове с определен ID',
+	HUSKYLENS_GET_BLOCK_ID: 'получи блок с ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'индекс',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Получаване на позиция, размер или ID на блок с определен ID',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Инициализиране на интелигентната камера Pixetto и настройване на UART комуникационни пинове',
 	PIXETTO_IS_DETECTED_TOOLTIP: 'Откриване дали Pixetto засича някакъв обект',
@@ -892,4 +905,3 @@ window.languageManager.loadMessages('bg', {
 	RC_IS_CONNECTED: 'RC свързан?',
 	RC_IS_CONNECTED_TOOLTIP: 'Провери дали са получени данни за 500мс',
 });
-

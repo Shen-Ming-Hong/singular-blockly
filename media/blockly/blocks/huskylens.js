@@ -342,3 +342,74 @@ Blockly.Blocks['huskylens_forget'] = {
 		window.potentialExperimentalBlocks.push('huskylens_forget');
 	},
 };
+
+// ============================================================
+// HuskyLens ID-Based 積木（依 ID 查詢）
+// ============================================================
+
+// HUSKYLENS 依 ID 請求方塊積木
+Blockly.Blocks['huskylens_request_blocks_id'] = {
+	init: function () {
+		this.appendValueInput('ID')
+			.setCheck('Number')
+			.appendField(window.languageManager.getMessage('HUSKYLENS_REQUEST_BLOCKS_ID', '請求 HUSKYLENS ID'));
+
+		this.appendDummyInput().appendField(window.languageManager.getMessage('HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX', '的方塊'));
+
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setStyle('sensor_blocks');
+		this.setTooltip(
+			window.languageManager.getMessage('HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP', '只請求特定 ID 的方塊辨識結果，可提高效率')
+		);
+		this.setHelpUrl('');
+	},
+};
+
+// HUSKYLENS 依 ID 取得方塊數量積木
+Blockly.Blocks['huskylens_count_blocks_id'] = {
+	init: function () {
+		this.appendValueInput('ID')
+			.setCheck('Number')
+			.appendField(window.languageManager.getMessage('HUSKYLENS_COUNT_BLOCKS_ID', 'HUSKYLENS ID'));
+
+		this.appendDummyInput().appendField(window.languageManager.getMessage('HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX', '的方塊數量'));
+
+		this.setInputsInline(true);
+		this.setOutput(true, 'Number');
+		this.setStyle('sensor_blocks');
+		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP', '取得特定 ID 的方塊數量'));
+		this.setHelpUrl('');
+	},
+};
+
+// HUSKYLENS 依 ID 取得方塊資訊積木
+Blockly.Blocks['huskylens_get_block_id'] = {
+	init: function () {
+		this.appendValueInput('ID').setCheck('Number').appendField(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_ID', '取得 ID'));
+
+		this.appendValueInput('INDEX')
+			.setCheck('Number')
+			.appendField(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_ID_INDEX', '的第'));
+
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX', '個方塊的'))
+			.appendField(
+				new Blockly.FieldDropdown([
+					[window.languageManager.getMessage('HUSKYLENS_X_CENTER', 'X 中心'), 'xCenter'],
+					[window.languageManager.getMessage('HUSKYLENS_Y_CENTER', 'Y 中心'), 'yCenter'],
+					[window.languageManager.getMessage('HUSKYLENS_WIDTH', '寬度'), 'width'],
+					[window.languageManager.getMessage('HUSKYLENS_HEIGHT', '高度'), 'height'],
+					[window.languageManager.getMessage('HUSKYLENS_ID', 'ID'), 'ID'],
+				]),
+				'INFO_TYPE'
+			);
+
+		this.setInputsInline(true);
+		this.setOutput(true, 'Number');
+		this.setStyle('sensor_blocks');
+		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_ID_TOOLTIP', '取得特定 ID 方塊的位置、大小或 ID 資訊'));
+		this.setHelpUrl('');
+	},
+};

@@ -46,6 +46,34 @@
 	}
 })();
 
+// 模組載入時自動註冊 ID-Based 積木類型
+(function () {
+	function registerIdBasedBlocks() {
+		if (window.arduinoGenerator && typeof window.arduinoGenerator.registerAlwaysGenerateBlock === 'function') {
+			// 註冊 HuskyLens ID-Based 積木
+			window.arduinoGenerator.registerAlwaysGenerateBlock('huskylens_request_blocks_id');
+			window.arduinoGenerator.registerAlwaysGenerateBlock('huskylens_count_blocks_id');
+			window.arduinoGenerator.registerAlwaysGenerateBlock('huskylens_get_block_id');
+			return true;
+		}
+		return false;
+	}
+
+	// 嘗試立即註冊
+	if (!registerIdBasedBlocks()) {
+		window.addEventListener('load', registerIdBasedBlocks);
+
+		let retryCount = 0;
+		const maxRetries = 10;
+		const retryInterval = setInterval(() => {
+			if (registerIdBasedBlocks() || retryCount >= maxRetries) {
+				clearInterval(retryInterval);
+			}
+			retryCount++;
+		}, 100);
+	}
+})();
+
 // HUSKYLENS I2C 初始化代碼生成
 window.arduinoGenerator.forBlock['huskylens_init_i2c'] = function (block) {
 	try {
@@ -343,5 +371,44 @@ window.arduinoGenerator.forBlock['huskylens_forget'] = function (block) {
 	} catch (error) {
 		log.error('Error generating huskylens_forget code:', error);
 		return '// Error: ' + error.message + '\n';
+	}
+};
+
+// ============================================================
+// HuskyLens ID-Based 積木代碼生成（依 ID 查詢）
+// ============================================================
+
+// HUSKYLENS 依 ID 請求方塊代碼生成
+window.arduinoGenerator.forBlock['huskylens_request_blocks_id'] = function (block) {
+	try {
+		const id = window.arduinoGenerator.valueToCode(block, 'ID', window.arduinoGenerator.ORDER_ATOMIC) || '1';
+		return `huskylens.requestBlocks(${id});\n`;
+	} catch (error) {
+		log.error('Error generating huskylens_request_blocks_id code:', error);
+		return '// Error: ' + error.message + '\n';
+	}
+};
+
+// HUSKYLENS 依 ID 取得方塊數量代碼生成
+window.arduinoGenerator.forBlock['huskylens_count_blocks_id'] = function (block) {
+	try {
+		const id = window.arduinoGenerator.valueToCode(block, 'ID', window.arduinoGenerator.ORDER_ATOMIC) || '1';
+		return [`huskylens.countBlocks(${id})`, window.arduinoGenerator.ORDER_ATOMIC];
+	} catch (error) {
+		log.error('Error generating huskylens_count_blocks_id code:', error);
+		return ['0', window.arduinoGenerator.ORDER_ATOMIC];
+	}
+};
+
+// HUSKYLENS 依 ID 取得方塊資訊代碼生成
+window.arduinoGenerator.forBlock['huskylens_get_block_id'] = function (block) {
+	try {
+		const id = window.arduinoGenerator.valueToCode(block, 'ID', window.arduinoGenerator.ORDER_ATOMIC) || '1';
+		const index = window.arduinoGenerator.valueToCode(block, 'INDEX', window.arduinoGenerator.ORDER_ATOMIC) || '0';
+		const infoType = block.getFieldValue('INFO_TYPE');
+		return [`huskylens.getBlock(${id}, ${index}).${infoType}`, window.arduinoGenerator.ORDER_ATOMIC];
+	} catch (error) {
+		log.error('Error generating huskylens_get_block_id code:', error);
+		return ['0', window.arduinoGenerator.ORDER_ATOMIC];
 	}
 };

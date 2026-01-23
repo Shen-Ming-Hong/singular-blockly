@@ -465,6 +465,19 @@ window.languageManager.loadMessages('hu', {
 	HUSKYLENS_LEARN: 'HUSKYLENS tanítása ID-ra',
 	HUSKYLENS_FORGET: 'HUSKYLENS minden tanult elfelejtése',
 
+	// HuskyLens ID-Based Blokkok
+	HUSKYLENS_BY_ID_LABEL: 'Lekérdezés ID alapján',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'HUSKYLENS blokkok kérése ID-val',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Csak adott ID-jú blokkok kérése a jobb hatékonyság érdekében',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'HUSKYLENS blokkok száma ID-val',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Adott ID-jú blokkok számának lekérése',
+	HUSKYLENS_GET_BLOCK_ID: 'blok lekérése ID-val',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'index',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Adott ID-jú blok pozíciójának, méretének vagy ID-jának lekérése',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto intelligens kamera inicializálása és UART kommunikációs pinek beállítása',
 	PIXETTO_IS_DETECTED_TOOLTIP: 'Annak észlelése, hogy a Pixetto érzékel-e objektumot',
@@ -892,4 +905,3 @@ window.languageManager.loadMessages('hu', {
 	RC_IS_CONNECTED: 'RC csatlakoztatva?',
 	RC_IS_CONNECTED_TOOLTIP: 'Ellenőrizd az adatok érkezését 500ms-on belül',
 });
-

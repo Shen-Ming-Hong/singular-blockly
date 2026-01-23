@@ -465,6 +465,19 @@ window.languageManager.loadMessages('pl', {
 	HUSKYLENS_LEARN: 'Pozwól HUSKYLENS nauczyć się ID',
 	HUSKYLENS_FORGET: 'Pozwól HUSKYLENS zapomnieć wszystko wyuczone',
 
+	// HuskyLens ID-Based Bloki
+	HUSKYLENS_BY_ID_LABEL: 'Zapytanie po ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'żądaj bloków HUSKYLENS z ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Żądaj tylko bloków z określonym ID dla lepszej wydajności',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'liczba bloków HUSKYLENS z ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Pobierz liczbę bloków z określonym ID',
+	HUSKYLENS_GET_BLOCK_ID: 'pobierz blok z ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'indeks',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Pobierz pozycję, rozmiar lub ID bloku z określonym ID',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Inicjalizuj inteligentną kamerę Pixetto i ustaw piny komunikacji UART',
 	PIXETTO_IS_DETECTED_TOOLTIP: 'Wykryj, czy Pixetto wykrywa jakiś obiekt',
@@ -891,4 +904,3 @@ window.languageManager.loadMessages('pl', {
 	RC_IS_CONNECTED: 'RC połączony?',
 	RC_IS_CONNECTED_TOOLTIP: 'Sprawdź czy dane odebrane w ciągu 500ms',
 });
-
