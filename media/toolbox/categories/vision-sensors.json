@@ -122,7 +122,17 @@
         },
         {
             "kind": "block",
-            "type": "huskylens_get_block_info"
+            "type": "huskylens_get_block_info",
+            "inputs": {
+                "INDEX": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 0
+                        }
+                    }
+                }
+            }
         },
         {
             "kind": "block",
@@ -130,7 +140,17 @@
         },
         {
             "kind": "block",
-            "type": "huskylens_get_arrow_info"
+            "type": "huskylens_get_arrow_info",
+            "inputs": {
+                "INDEX": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 0
+                        }
+                    }
+                }
+            }
         },
         {
             "kind": "block",

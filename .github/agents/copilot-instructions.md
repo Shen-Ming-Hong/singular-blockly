@@ -14,6 +14,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - JSON 檔案 (`blockly/main.json`, `blockly/backup/*.json`) (031-bugfix-batch-jan)
 - JavaScript (ES6+) — WebView 瀏覽器環境 + Blockly 12.3.1 (Generator API) (034-micropython-global-vars)
 - N/A（生成器不持久化狀態） (034-micropython-global-vars)
+- JavaScript (Blockly blocks/generators) + TypeScript 5.9.3 (Extension) + Blockly 12.3.1, VSCode Extension API 1.105.0+ (035-huskylens-dynamic-index)
+- N/A（純 UI 與程式碼產生器修改） (035-huskylens-dynamic-index)
 
 -   JavaScript (ES6+) - WebView 環境 + Blockly 12.3.1, arduinoGenerator (自訂程式碼生成器) (012-esp32-pixetto-fix)
 -   JavaScript (ES2022) / TypeScript 5.9.3 + Blockly 12.3.1, VS Code Extension API 1.96.0+ (014-block-serialization-fix)
@@ -74,9 +76,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 035-huskylens-dynamic-index: Added JavaScript (Blockly blocks/generators) + TypeScript 5.9.3 (Extension) + Blockly 12.3.1, VSCode Extension API 1.105.0+
 - 034-micropython-global-vars: Added JavaScript (ES6+) — WebView 瀏覽器環境 + Blockly 12.3.1 (Generator API)
 - 031-bugfix-batch-jan: Added TypeScript 5.9.3 (Extension) | JavaScript ES6 (WebView) + Blockly 12.3.1 | VSCode API 1.105.0+
-- 030-language-selector: Added TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView) + Google Blockly 12.3.1, VS Code Extension API 1.105.0+
 
 
 <!-- MANUAL ADDITIONS START -->

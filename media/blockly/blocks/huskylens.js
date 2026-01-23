@@ -231,9 +231,11 @@ Blockly.Blocks['huskylens_count_blocks'] = {
 // HUSKYLENS 方塊資訊積木
 Blockly.Blocks['huskylens_get_block_info'] = {
 	init: function () {
+		this.appendDummyInput().appendField(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_INFO', '取得方塊'));
+
+		this.appendValueInput('INDEX').setCheck('Number');
+
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_INFO', '取得方塊'))
-			.appendField(new Blockly.FieldNumber(0, 0), 'INDEX')
 			.appendField(window.languageManager.getMessage('HUSKYLENS_BLOCK_INFO_TYPE', '的'))
 			.appendField(
 				new Blockly.FieldDropdown([
@@ -273,9 +275,11 @@ Blockly.Blocks['huskylens_count_arrows'] = {
 // HUSKYLENS 箭頭資訊積木
 Blockly.Blocks['huskylens_get_arrow_info'] = {
 	init: function () {
+		this.appendDummyInput().appendField(window.languageManager.getMessage('HUSKYLENS_GET_ARROW_INFO', '取得箭頭'));
+
+		this.appendValueInput('INDEX').setCheck('Number');
+
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('HUSKYLENS_GET_ARROW_INFO', '取得箭頭'))
-			.appendField(new Blockly.FieldNumber(0, 0), 'INDEX')
 			.appendField(window.languageManager.getMessage('HUSKYLENS_ARROW_INFO_TYPE', '的'))
 			.appendField(
 				new Blockly.FieldDropdown([
