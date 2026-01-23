@@ -468,6 +468,19 @@ window.languageManager.loadMessages('en', {
 	HUSKYLENS_LEARN: 'Let HUSKYLENS learn ID',
 	HUSKYLENS_FORGET: 'Let HUSKYLENS forget all learned',
 
+	// HuskyLens ID-Based Blocks
+	HUSKYLENS_BY_ID_LABEL: 'Query by ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'request HUSKYLENS blocks with ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Request only blocks with specific ID for better efficiency',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'HUSKYLENS block count with ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Get the count of blocks with specific ID',
+	HUSKYLENS_GET_BLOCK_ID: 'get block with ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'index',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Get position, size or ID info of a block with specific ID',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Initialize Pixetto smart camera and set UART communication pins',
 	PIXETTO_IS_DETECTED_TOOLTIP: 'Detect if Pixetto detects any object',
@@ -882,4 +895,3 @@ window.languageManager.loadMessages('en', {
 	RC_GET_BUTTON_SUFFIX: 'state',
 	RC_GET_BUTTON_TOOLTIP: 'Read remote button state (0=pressed, 1=released)',
 });
-

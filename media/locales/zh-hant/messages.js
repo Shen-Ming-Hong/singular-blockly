@@ -464,6 +464,19 @@ window.languageManager.loadMessages('zh-hant', {
 	HUSKYLENS_LEARN: '讓 HUSKYLENS 學習 ID',
 	HUSKYLENS_FORGET: '讓 HUSKYLENS 忘記所有學習',
 
+	// HuskyLens ID-Based 積木
+	HUSKYLENS_BY_ID_LABEL: '依 ID 查詢',
+	HUSKYLENS_REQUEST_BLOCKS_ID: '請求 HUSKYLENS ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '的方塊',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: '只請求特定 ID 的方塊辨識結果，可提高效率',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'HUSKYLENS ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '的方塊數量',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: '取得特定 ID 的方塊數量',
+	HUSKYLENS_GET_BLOCK_ID: '取得 ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: '的第',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '個方塊的',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: '取得特定 ID 方塊的位置、大小或 ID 資訊',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: '初始化 Pixetto 智慧鏡頭，設定 UART 通訊腳位',
 	PIXETTO_IS_DETECTED_TOOLTIP: '檢測 Pixetto 是否偵測到任何物體',
@@ -875,4 +888,3 @@ window.languageManager.loadMessages('zh-hant', {
 	RC_GET_BUTTON_SUFFIX: '狀態',
 	RC_GET_BUTTON_TOOLTIP: '讀取遠端按鈕狀態 (0=按下, 1=放開)',
 });
-

@@ -466,6 +466,19 @@ window.languageManager.loadMessages('it', {
 	HUSKYLENS_LEARN: 'Lascia che HUSKYLENS apprenda ID',
 	HUSKYLENS_FORGET: 'Lascia che HUSKYLENS dimentichi tutto appreso',
 
+	// HuskyLens ID-Based Blocchi
+	HUSKYLENS_BY_ID_LABEL: 'Interroga per ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'richiedi blocchi HUSKYLENS con ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: 'Richiedi solo blocchi con ID specifico per maggiore efficienza',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'conteggio blocchi HUSKYLENS con ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Ottieni il conteggio dei blocchi con ID specifico',
+	HUSKYLENS_GET_BLOCK_ID: 'ottieni blocco con ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'indice',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Ottieni posizione, dimensione o ID di un blocco con ID specifico',
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Inizializza la fotocamera intelligente Pixetto e imposta i pin di comunicazione UART',
 	PIXETTO_IS_DETECTED_TOOLTIP: 'Rileva se Pixetto rileva qualche oggetto',
@@ -680,7 +693,7 @@ window.languageManager.loadMessages('it', {
 	CYBERBRICK_TICKS_DIFF_PREFIX: 'Differenza di tempo',
 	CYBERBRICK_TICKS_DIFF_NOW: 'adesso',
 	CYBERBRICK_TICKS_DIFF_START: 'inizio',
-	CYBERBRICK_TICKS_DIFF_TOOLTIP: 'Calcola i millisecondi tra adesso e l\'inizio',
+	CYBERBRICK_TICKS_DIFF_TOOLTIP: "Calcola i millisecondi tra adesso e l'inizio",
 
 	// CyberBrick WiFi Blocks
 	CATEGORY_CYBERBRICK_WIFI: 'WiFi',
@@ -884,4 +897,3 @@ window.languageManager.loadMessages('it', {
 	RC_GET_BUTTON_SUFFIX: 'stato',
 	RC_GET_BUTTON_TOOLTIP: 'Leggi stato pulsante remoto (0=premuto, 1=rilasciato)',
 });
-

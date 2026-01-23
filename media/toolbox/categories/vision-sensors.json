@@ -169,6 +169,63 @@
         {
             "kind": "block",
             "type": "huskylens_forget"
+        },
+        {
+            "kind": "sep"
+        },
+        {
+            "kind": "label",
+            "text": "%{HUSKYLENS_BY_ID_LABEL}"
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_request_blocks_id",
+            "inputs": {
+                "ID": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_count_blocks_id",
+            "inputs": {
+                "ID": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "huskylens_get_block_id",
+            "inputs": {
+                "ID": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                },
+                "INDEX": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 0
+                        }
+                    }
+                }
+            }
         }
     ]
 }

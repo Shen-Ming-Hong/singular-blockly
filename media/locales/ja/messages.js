@@ -523,6 +523,19 @@ window.languageManager.loadMessages('ja', {
 	HUSKYLENS_LEARN: 'HUSKYLENS ID 学習',
 	HUSKYLENS_FORGET: 'HUSKYLENS 全学習削除',
 
+	// HuskyLens ID-Based ブロック
+	HUSKYLENS_BY_ID_LABEL: 'ID で照会',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'HUSKYLENS ID',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: 'のブロックを要求',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: '特定 ID のブロックのみを要求し、効率を向上させる',
+	HUSKYLENS_COUNT_BLOCKS_ID: 'HUSKYLENS ID',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: 'のブロック数',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: '特定 ID のブロック数を取得',
+	HUSKYLENS_GET_BLOCK_ID: 'ID',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'の',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '番目のブロックの',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: '特定 ID ブロックの位置、サイズ、または ID 情報を取得',
+
 	// HUSKYLENS Tooltips
 	HUSKYLENS_INIT_I2C_TOOLTIP: 'I2C を使用して HUSKYLENS スマートカメラを初期化',
 	HUSKYLENS_INIT_UART_TOOLTIP: 'UART を使用して HUSKYLENS スマートカメラを初期化、RX/TX ピンを設定',
@@ -884,4 +897,3 @@ window.languageManager.loadMessages('ja', {
 	RC_GET_BUTTON_SUFFIX: '状態',
 	RC_GET_BUTTON_TOOLTIP: 'リモートボタンの状態を読取 (0=押下, 1=解放)',
 });
-

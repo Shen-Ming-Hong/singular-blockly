@@ -15,7 +15,7 @@ window.languageManager.loadMessages('tr', {
 	CODE_TAB: 'Kod',
 	BOARD_SELECT_LABEL: 'Kart seç:',
 	LANGUAGE_SELECT_TOOLTIP: 'Dil seç',
-	LANGUAGE_AUTO: 'Otomatik (VS Code\'u takip et)',
+	LANGUAGE_AUTO: "Otomatik (VS Code'u takip et)",
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Deneysel Bloklar Tespit Edildi',
@@ -465,6 +465,19 @@ window.languageManager.loadMessages('tr', {
 	HUSKYLENS_LEARN: 'HUSKYLENS ID öğrensin',
 	HUSKYLENS_FORGET: 'HUSKYLENS tüm öğrenilenleri unutsun',
 
+	// HuskyLens ID-Based Bloklar
+	HUSKYLENS_BY_ID_LABEL: 'ID ile sorgula',
+	HUSKYLENS_REQUEST_BLOCKS_ID: 'ID ile HUSKYLENS bloklarını iste',
+	HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP: "Daha iyi verimlilik için yalnızca belirli ID'li blokları iste",
+	HUSKYLENS_COUNT_BLOCKS_ID: 'ID ile HUSKYLENS blok sayısı',
+	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
+	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: "Belirli ID'li blokların sayısını al",
+	HUSKYLENS_GET_BLOCK_ID: 'ID ile blok al',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'indeks',
+	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
+	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: "Belirli ID'li bloğun konum, boyut veya ID bilgisini al",
+
 	// Pixetto Tooltips
 	PIXETTO_INIT_TOOLTIP: 'Pixetto akıllı kamerasını başlatın ve UART iletişim pinlerini ayarlayın',
 	PIXETTO_IS_DETECTED_TOOLTIP: "Pixetto'nun herhangi bir nesne algılayıp algılamadığını tespit et",
@@ -890,4 +903,3 @@ window.languageManager.loadMessages('tr', {
 	RC_IS_CONNECTED: 'RC bağlı mı?',
 	RC_IS_CONNECTED_TOOLTIP: '500ms içinde veri alınıp alınmadığını kontrol et',
 });
-
