@@ -364,6 +364,8 @@ Blockly.Blocks['huskylens_request_blocks_id'] = {
 			window.languageManager.getMessage('HUSKYLENS_REQUEST_BLOCKS_ID_TOOLTIP', '只請求特定 ID 的方塊辨識結果，可提高效率')
 		);
 		this.setHelpUrl('');
+
+		window.potentialExperimentalBlocks.push('huskylens_request_blocks_id');
 	},
 };
 
@@ -381,6 +383,8 @@ Blockly.Blocks['huskylens_count_blocks_id'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP', '取得特定 ID 的方塊數量'));
 		this.setHelpUrl('');
+
+		window.potentialExperimentalBlocks.push('huskylens_count_blocks_id');
 	},
 };
 
@@ -411,5 +415,7 @@ Blockly.Blocks['huskylens_get_block_id'] = {
 		this.setStyle('sensor_blocks');
 		this.setTooltip(window.languageManager.getMessage('HUSKYLENS_GET_BLOCK_ID_TOOLTIP', '取得特定 ID 方塊的位置、大小或 ID 資訊'));
 		this.setHelpUrl('');
+
+		window.potentialExperimentalBlocks.push('huskylens_get_block_id');
 	},
 };
