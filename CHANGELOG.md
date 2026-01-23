@@ -8,6 +8,30 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.59.0] - 2026-01-23
+
+### 新增功能 Added
+
+- **HuskyLens ID-Based 積木查詢** (HuskyLens ID-Based Block Query)
+    - 新增「依 ID 請求方塊」積木：只請求特定 ID 的方塊辨識結果，提高效率
+      New "Request Blocks by ID" block: Request only blocks with specific ID for better efficiency
+    - 新增「依 ID 取得方塊數量」積木：取得特定 ID 的方塊數量
+      New "Count Blocks by ID" block: Get the count of blocks with specific ID
+    - 新增「依 ID 取得方塊資訊」積木：直接取得特定 ID 方塊的座標/尺寸，無需迴圈遍歷
+      New "Get Block by ID" block: Get coordinates/size of specific ID block without loop iteration
+    - 支援 15 種語言翻譯 (165 個翻譯鍵)
+      Supports 15 language translations (165 translation keys)
+    - 更新 MCP 積木字典 (141 → 144 積木)
+      Updated MCP block dictionary (141 → 144 blocks)
+
+- **PR 模板系統** (PR Template System)
+    - 新增預設 PR 模板 (.github/pull_request_template.md)
+      Added default PR template (.github/pull_request_template.md)
+    - 新增功能開發專用模板 (.github/PULL_REQUEST_TEMPLATE/feature.md)
+      Added feature development template (.github/PULL_REQUEST_TEMPLATE/feature.md)
+    - 新增 Bug 修復專用模板 (.github/PULL_REQUEST_TEMPLATE/bugfix.md)
+      Added bugfix template (.github/PULL_REQUEST_TEMPLATE/bugfix.md)
+
 ## [0.58.0] - 2026-01-23
 
 ### 新增功能 Added
