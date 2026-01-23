@@ -22,9 +22,9 @@
 
 <!-- 列出主要變更項目 -->
 
-- 
-- 
-- 
+-
+-
+-
 
 ## 測試計劃 Test Plan
 
@@ -47,6 +47,7 @@
 ---
 
 **For Reviewers**:
+
 - Review code quality and consistency
 - Verify test coverage
 - Check for potential security issues
