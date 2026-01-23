@@ -100,6 +100,10 @@ const KNOWN_EMPTY_KEYS = [
 	'HUSKYLENS_BLOCK_INFO_TYPE',
 	'HUSKYLENS_ARROW_INFO_TYPE',
 	'PIXETTO_ROAD_CENTER_X',
+	// HuskyLens ID-based block suffixes - empty for most languages (grammatical markers only needed in ja/ko/zh-hant)
+	'HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX',
+	'HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX',
+	'HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX',
 ];
 
 /**
