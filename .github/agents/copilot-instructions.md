@@ -18,6 +18,8 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - N/A（純 UI 與程式碼產生器修改） (035-huskylens-dynamic-index)
 - TypeScript 5.9.3 (Extension) + JavaScript ES6 (WebView/Blockly) + Blockly 12.3.1, VSCode API 1.105.0+, HUSKYLENSArduino (Arduino Library) (036-huskylens-id-blocks)
 - N/A（積木定義與程式碼生成，無持久化需求） (036-huskylens-id-blocks)
+- TypeScript 5.9.3 + VSCode API 1.105.0+, mpremote (via PlatformIO Python) (037-cyberbrick-output-monitor)
+- N/A（無持久化需求） (037-cyberbrick-output-monitor)
 
 -   JavaScript (ES6+) - WebView 環境 + Blockly 12.3.1, arduinoGenerator (自訂程式碼生成器) (012-esp32-pixetto-fix)
 -   JavaScript (ES2022) / TypeScript 5.9.3 + Blockly 12.3.1, VS Code Extension API 1.96.0+ (014-block-serialization-fix)
@@ -78,9 +80,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 037-cyberbrick-output-monitor: Added TypeScript 5.9.3 + VSCode API 1.105.0+, mpremote (via PlatformIO Python)
 - 036-huskylens-id-blocks: Added TypeScript 5.9.3 (Extension) + JavaScript ES6 (WebView/Blockly) + Blockly 12.3.1, VSCode API 1.105.0+, HUSKYLENSArduino (Arduino Library)
 - 035-huskylens-dynamic-index: Added JavaScript (Blockly blocks/generators) + TypeScript 5.9.3 (Extension) + Blockly 12.3.1, VSCode Extension API 1.105.0+
-- 034-micropython-global-vars: Added JavaScript (ES6+) — WebView 瀏覽器環境 + Blockly 12.3.1 (Generator API)
 
 
 <!-- MANUAL ADDITIONS START -->
