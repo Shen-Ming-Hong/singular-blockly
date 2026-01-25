@@ -142,6 +142,7 @@ interface MonitorStartedMessage {
 // Monitor 已停止
 interface MonitorStoppedMessage {
 	command: 'monitorStopped';
+	reason?: 'user_closed' | 'upload_started' | 'device_disconnected';
 }
 
 // Monitor 錯誤
@@ -173,5 +174,6 @@ interface MonitorErrorMessage {
 | `MONITOR_CONNECTED`             | 已連接訊息         | 已連接到 {0}             |
 | `MONITOR_STOPPED`               | 已停止訊息         | Monitor 已關閉           |
 | `MONITOR_DEVICE_NOT_FOUND`      | 裝置未找到錯誤     | 找不到 CyberBrick 裝置   |
+| `MONITOR_DEVICE_DISCONNECTED`   | 裝置斷線訊息       | CyberBrick 裝置已斷線    |
 | `MONITOR_CONNECTION_FAILED`     | 連接失敗錯誤       | 無法連接到裝置           |
 | `MONITOR_CLOSED_FOR_UPLOAD`     | 上傳時關閉提示     | Monitor 已為上傳作業暫停 |

@@ -5,7 +5,7 @@
 
 ## Summary
 
-為 CyberBrick (MicroPython) 板提供 Serial Monitor 功能，讓使用者能即時查看裝置的 `print()` 輸出。技術方案使用 VSCode Terminal API 配合 `mpremote` 工具的 `run` 命令建立持久的串流連線，複用現有 `MicropythonUploader` 的 mpremote 安裝檢查與埠偵測邏輯。
+為 CyberBrick (MicroPython) 板提供 Serial Monitor 功能，讓使用者能即時查看裝置的 `print()` 輸出。技術方案使用 VSCode Terminal API 配合 `mpremote` 工具的 `repl` 命令建立持久的串流連線，複用現有 `MicropythonUploader` 的 mpremote 安裝檢查與埠偵測邏輯。
 
 ## Technical Context
 
