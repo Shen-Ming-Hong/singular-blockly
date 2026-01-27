@@ -26,6 +26,7 @@ export class ArduinoMonitorService {
 	private currentPort: string | null = null;
 	private currentBoard: string | null = null;
 	private wasRunningBeforeUpload = false;
+	private isStoppingForUpload = false;
 	private onStoppedCallback: ((reason: MonitorStopReason) => void) | null = null;
 	private disposables: vscode.Disposable[] = [];
 
@@ -123,7 +124,9 @@ export class ArduinoMonitorService {
 
 		if (this.isRunningFlag) {
 			log('[arduino-monitor] 為上傳作業停止 Monitor', 'info');
+			this.isStoppingForUpload = true;
 			await this.stop();
+			this.isStoppingForUpload = false;
 			this.onStoppedCallback?.('upload_started');
 			// 等待 COM 埠釋放
 			await new Promise(resolve => setTimeout(resolve, 500));
@@ -178,8 +181,10 @@ export class ArduinoMonitorService {
 
 		log('[arduino-monitor] Monitor 終端機已關閉', 'info', { port });
 
-		// 通知回調（如果不是上傳時關閉的）
-		this.onStoppedCallback?.('user_closed');
+		// 通知回調（如果不是上傳時關閉的，避免雙重回調）
+		if (!this.isStoppingForUpload) {
+			this.onStoppedCallback?.('user_closed');
+		}
 	}
 
 	/**

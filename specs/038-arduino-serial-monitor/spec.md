@@ -64,8 +64,8 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** platformio.ini 包含 `monitor_speed = 9600`，**When** 用戶開啟 Serial Monitor，**Then** 終端機使用 9600 Baud Rate 連接
-2. **Given** platformio.ini 未設定 monitor_speed，**When** 用戶開啟 Serial Monitor，**Then** 終端機使用預設 115200 Baud Rate 連接
+1. **Given** platformio.ini 包含 `monitor_speed = 115200`，**When** 用戶開啟 Serial Monitor，**Then** 終端機使用 115200 Baud Rate 連接
+2. **Given** platformio.ini 未設定 monitor_speed，**When** 用戶開啟 Serial Monitor，**Then** 終端機使用預設 9600 Baud Rate 連接（與積木 Serial.begin(9600) 一致）
 
 ---
 

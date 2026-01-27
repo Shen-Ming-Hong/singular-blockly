@@ -256,6 +256,53 @@ gh pr checks
 
 ---
 
+### Phase 4: 等待 Code Review 並發布（強制）Wait for Review & Release (REQUIRED)
+
+**⚠️ 阻塞型步驟：PR 建立後必須立即進入此階段，不可中斷流程。**
+
+PR 建立完成後，**必須**立即執行 `pr-review-release` 技能來監聽 Copilot Code Review 結果並完成後續發布流程。
+
+#### 4.1 請求 Copilot Review（若尚未配置）
+
+```bash
+# 請求 Copilot Code Review
+gh pr edit --add-reviewer copilot-pull-request-reviewer
+```
+
+#### 4.2 啟動 Review 監聽
+
+```powershell
+# 執行輪詢腳本等待 Copilot Review 完成
+.\.github\skills\pr-review-release\scripts\poll-review.ps1
+
+# 自訂參數（逾時 60 分鐘，每 30 秒查詢一次）
+.\.github\skills\pr-review-release\scripts\poll-review.ps1 -TimeoutMinutes 60 -PollIntervalSeconds 30
+```
+
+#### 4.3 根據 Review 結果執行後續流程
+
+| Review 狀態 | Exit Code | 後續動作 |
+|-------------|-----------|----------|
+| `COMMENTED` / `APPROVED` | 0 | 評估建議 → 修正（如需）→ Merge → 發布 |
+| `CHANGES_REQUESTED` | 1 | 必須修正 → 重新推送 → 重新等待 Review |
+| 逾時 | 2 | 手動檢查 PR 狀態 |
+
+#### 4.4 執行 pr-review-release 技能
+
+Review 監聽完成後，**強制**進入 `pr-review-release` 技能的完整流程：
+
+1. **Phase 1**: 評估 Review 建議（採納/忽略）
+2. **Phase 2**: 程式碼修正（如有採納的建議）
+3. **Phase 3**: 程式碼簡化（阻塞型）
+4. **Phase 4**: Git 操作（Merge PR、清理分支）
+5. **Phase 5**: 發布流程（版本號、CHANGELOG、Tag、Release）
+
+> 💡 **Agent 整合**：輸入「處理 code review」、「merge PR」或 `@pr-review-release` 觸發技能。
+
+> ❌ **禁止中斷**：完成 PR 建立後不可中止流程，必須完成到發布為止。
+
+---
+
 ## SDD 整合指南 SDD Integration Guide
 
 ### 在 Spec 分支工作時

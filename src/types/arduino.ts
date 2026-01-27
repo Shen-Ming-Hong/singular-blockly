@@ -231,7 +231,7 @@ export type MonitorStopReason =
  * Arduino Monitor 配置
  */
 export interface ArduinoMonitorConfig {
-	/** 通訊速率 (預設: 115200) */
+	/** 通訊速率 (預設: 9600) */
 	baudRate: number;
 	/** 指定連接埠 (預設: 自動偵測) */
 	port?: string;
