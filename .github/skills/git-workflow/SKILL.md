@@ -27,11 +27,11 @@ Automates Git operations during development, from commit to PR creation.
 
 ## 與其他技能的分工 Skill Boundaries
 
-| 階段             | 技能                      | 說明                                   |
-| ---------------- | ------------------------- | -------------------------------------- |
-| 開發中 → PR 建立 | **git-workflow** (本技能) | commit, push, 建立 PR                  |
-| PR 建立 → 發布 | **git-workflow** + `pr-review-release` | 本技能強制觸發 pr-review-release |
-| 程式碼簡化       | `code-simplifier`         | PR 前必須執行（阻塞型）             |
+| 階段             | 技能                                   | 說明                             |
+| ---------------- | -------------------------------------- | -------------------------------- |
+| 開發中 → PR 建立 | **git-workflow** (本技能)              | commit, push, 建立 PR            |
+| PR 建立 → 發布   | **git-workflow** + `pr-review-release` | 本技能強制觸發 pr-review-release |
+| 程式碼簡化       | `code-simplifier`                      | PR 前必須執行（阻塞型）          |
 
 ---
 
@@ -282,11 +282,11 @@ gh pr edit --add-reviewer copilot-pull-request-reviewer
 
 #### 4.3 根據 Review 結果執行後續流程
 
-| Review 狀態 | Exit Code | 後續動作 |
-|-------------|-----------|----------|
-| `COMMENTED` / `APPROVED` | 0 | 評估建議 → 修正（如需）→ Merge → 發布 |
-| `CHANGES_REQUESTED` | 1 | 必須修正 → 重新推送 → 重新等待 Review |
-| 逾時 | 2 | 手動檢查 PR 狀態 |
+| Review 狀態              | Exit Code | 後續動作                              |
+| ------------------------ | --------- | ------------------------------------- |
+| `COMMENTED` / `APPROVED` | 0         | 評估建議 → 修正（如需）→ Merge → 發布 |
+| `CHANGES_REQUESTED`      | 1         | 必須修正 → 重新推送 → 重新等待 Review |
+| 逾時                     | 2         | 手動檢查 PR 狀態                      |
 
 #### 4.4 執行 pr-review-release 技能
 
