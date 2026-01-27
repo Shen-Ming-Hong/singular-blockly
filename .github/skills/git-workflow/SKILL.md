@@ -3,7 +3,7 @@ name: git-workflow
 description: Git 工作流程自動化技能。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。包含自動生成 Conventional Commits 格式訊息、一鍵建立 PR 等功能。靈感來源於 Anthropic 官方 commit-commands plugin。Automates Git workflow including commit message generation, branch push, and PR creation. Inspired by Anthropic's official commit-commands plugin.
 metadata:
     author: singular-blockly
-    version: '1.1.0'
+    version: '1.2.0'
     category: productivity
     inspired-by: anthropics/claude-code/plugins/commit-commands
 license: Apache-2.0
@@ -132,26 +132,49 @@ git push
 
 ---
 
-### Phase 2.5: 程式碼簡化（推薦）Code Simplification (Recommended)
+### Phase 2.5: 程式碼簡化（必須）Code Simplification (REQUIRED)
 
-在建立 PR 前，建議使用 `code-simplifier` 技能檢查程式碼是否有可簡化之處。
-Before creating a PR, it's recommended to use the `code-simplifier` skill to check for simplification opportunities.
+**⚠️ 阻塞型步驟：此步驟必須完成才能建立 PR。**
+
+在建立 PR 前，**必須**使用 `code-simplifier` 技能檢查並簡化程式碼。
+Before creating a PR, you **must** use the `code-simplifier` skill to check and simplify code.
 
 **為何重要 Why Important**：
 - 減少 Code Review 階段的修改建議
 - 提升程式碼可讀性和維護性
 - 確保符合專案程式碼風格
+- 降低後續 token 消耗
 
-**快速檢查 Quick Check**：
-```bash
-# 檢視此分支的所有變更檔案
-git diff master..HEAD --name-only
+**執行步驟 Execution Steps**：
 
-# 執行程式碼簡化技能（針對變更的檔案）
-# 參考 code-simplifier 技能說明
-```
+1. **識別變更檔案**
+    ```bash
+    # 檢視此分支的所有變更檔案
+    git diff master..HEAD --name-only | grep -E '\.(ts|js)$'
+    ```
 
-> 💡 **提示**：如有使用 Agent，可輸入「簡化程式碼」或「refactor」觸發 `code-simplifier` 技能。
+2. **執行程式碼簡化技能**
+    - 閱讀 `code-simplifier` 技能文件
+    - 對變更的 TS/JS 檔案執行簡化
+    - 確保遵循專案 coding standards
+
+3. **簡化完成標準**
+    - [ ] 無不必要的巢狀結構
+    - [ ] 無冗餘程式碼和抽象
+    - [ ] 變數和函式命名清晰
+    - [ ] 無描述顯而易見程式碼的註解
+    - [ ] 測試通過且功能不變
+
+4. **提交簡化變更**
+    ```bash
+    git add .
+    git commit -m "refactor: simplify code for PR readiness"
+    git push
+    ```
+
+> 💡 **Agent 整合**：輸入「簡化程式碼」、「refactor」或 `@code-simplifier` 觸發技能。
+
+> ❌ **禁止跳過**：未完成程式碼簡化不得進入 Phase 3 建立 PR。
 
 ---
 
@@ -294,13 +317,24 @@ gh pr create --fill --base master
 -   [ ] Commit message 符合 Conventional Commits 格式
 -   [ ] Scope 正確反映變更範圍
 
+### 程式碼簡化階段（阻塞型）Before Code Simplification
+
+-   [ ] 已識別所有變更的 TS/JS 檔案
+-   [ ] 已執行 code-simplifier 技能
+-   [ ] 無不必要的巢狀結構
+-   [ ] 無冗餘程式碼和抽象
+-   [ ] 變數和函式命名清晰
+-   [ ] 無描述顯而易見程式碼的註解
+-   [ ] 測試通過且功能不變
+-   [ ] 簡化變更已提交並推送
+
 ### 建立 PR 前 Before PR Creation
 
+-   [ ] **程式碼簡化已完成（必須）**
 -   [ ] 分支已推送到遠端
 -   [ ] PR 描述清楚說明變更內容
 -   [ ] 已關聯相關 Spec（如適用）
 -   [ ] 測試計劃已列出
--   [ ] （推薦）已使用 `code-simplifier` 技能檢查程式碼簡化機會
 
 ### PR 建立後 After PR Creation
 
@@ -316,4 +350,4 @@ gh pr create --fill --base master
 -   [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hant/)
 -   [GitHub CLI 文件](https://cli.github.com/manual/)
 -   [pr-review-release 技能](../pr-review-release/SKILL.md) - PR 審查後的下一步
--   [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（推薦）
+-   [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（必須）
