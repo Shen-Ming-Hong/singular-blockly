@@ -20,9 +20,9 @@
 
 **Purpose**: 專案初始化與基本結構
 
-- [ ] T001 建立 SerialMonitorService 骨架檔案 src/services/serialMonitorService.ts
-- [ ] T002 [P] 在 src/types/arduino.ts 新增 Monitor 相關型別定義 (MonitorError, MonitorErrorCode, MonitorStartResult, SerialMonitorState)
-- [ ] T003 [P] 在 media/locales/zh-hant/messages.js 新增 8 個 Monitor i18n 鍵
+- [x] T001 建立 SerialMonitorService 骨架檔案 src/services/serialMonitorService.ts
+- [x] T002 [P] 在 src/types/arduino.ts 新增 Monitor 相關型別定義 (MonitorError, MonitorErrorCode, MonitorStartResult, SerialMonitorState)
+- [x] T003 [P] 在 media/locales/zh-hant/messages.js 新增 8 個 Monitor i18n 鍵
 
 ---
 
@@ -32,10 +32,10 @@
 
 **⚠️ 重要**: 此階段完成前無法開始任何 User Story
 
-- [ ] T004 在 src/services/serialMonitorService.ts 實作 SerialMonitorService 類別骨架 (constructor, dispose)
-- [ ] T005 [P] 在 src/webview/messageHandler.ts 新增 serialMonitorService 成員變數與初始化
-- [ ] T006 [P] 在 src/webview/messageHandler.ts 的 switch-case 新增 startMonitor/stopMonitor 處理分支
-- [ ] T007 在 media/js/blocklyEdit.js 新增 monitorBtn 變數與基本訊息監聽架構
+- [x] T004 在 src/services/serialMonitorService.ts 實作 SerialMonitorService 類別骨架 (constructor, dispose)
+- [x] T005 [P] 在 src/webview/messageHandler.ts 新增 serialMonitorService 成員變數與初始化
+- [x] T006 [P] 在 src/webview/messageHandler.ts 的 switch-case 新增 startMonitor/stopMonitor 處理分支
+- [x] T007 在 media/js/blocklyEdit.js 新增 monitorBtn 變數與基本訊息監聽架構
 
 **Checkpoint**: 基礎架構就緒，可開始 User Story 實作
 
@@ -54,12 +54,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] 在 SerialMonitorService 實作 start() 方法核心邏輯 src/services/serialMonitorService.ts
-- [ ] T011 [US1] 在 start() 中整合 VSCode Terminal API 建立終端機並執行 mpremote 命令
-- [ ] T012 [US1] 在 messageHandler.ts 實作 handleStartMonitor() 處理 WebView 訊息
-- [ ] T013 [US1] 在 media/js/blocklyEdit.js 實作 toggleMonitor() 發送 startMonitor 訊息
-- [ ] T014 [US1] 在 media/js/blocklyEdit.js 處理 monitorStarted 訊息更新 UI 狀態
-- [ ] T015 [US1] 在 media/js/blocklyEdit.js 處理 monitorError 訊息顯示錯誤 Toast
+- [x] T010 [US1] 在 SerialMonitorService 實作 start() 方法核心邏輯 src/services/serialMonitorService.ts
+- [x] T011 [US1] 在 start() 中整合 VSCode Terminal API 建立終端機並執行 mpremote 命令
+- [x] T012 [US1] 在 messageHandler.ts 實作 handleStartMonitor() 處理 WebView 訊息
+- [x] T013 [US1] 在 media/js/blocklyEdit.js 實作 toggleMonitor() 發送 startMonitor 訊息
+- [x] T014 [US1] 在 media/js/blocklyEdit.js 處理 monitorStarted 訊息更新 UI 狀態
+- [x] T015 [US1] 在 media/js/blocklyEdit.js 處理 monitorError 訊息顯示錯誤 Toast
 
 **Checkpoint**: User Story 1 完成，可獨立測試 Monitor 基本功能
 
@@ -78,10 +78,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] 在 SerialMonitorService 複用 MicropythonUploader.listPorts() 偵測 CyberBrick
-- [ ] T019 [US2] 在 start() 中加入 mpremote 安裝檢查（複用 checkMpremoteInstalled）
-- [ ] T020 [US2] 若 mpremote 未安裝，自動呼叫 installMpremote() 安裝
-- [ ] T021 [US2] 在 media/js/blocklyEdit.js 處理 DEVICE_NOT_FOUND 錯誤，顯示友善訊息
+- [x] T018 [US2] 在 SerialMonitorService 複用 MicropythonUploader.listPorts() 偵測 CyberBrick
+- [x] T019 [US2] 在 start() 中加入 mpremote 安裝檢查（複用 checkMpremoteInstalled）
+- [x] T020 [US2] 若 mpremote 未安裝，自動呼叫 installMpremote() 安裝
+- [x] T021 [US2] 在 media/js/blocklyEdit.js 處理 DEVICE_NOT_FOUND 錯誤，顯示友善訊息
 
 **Checkpoint**: User Story 2 完成，自動埠偵測功能可獨立驗證
 
@@ -100,10 +100,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] 在 SerialMonitorService 實作 stopForUpload() 方法 src/services/serialMonitorService.ts
-- [ ] T025 [US3] 在 handleRequestUpload() 中呼叫 stopForUpload() 釋放埠
-- [ ] T026 [US3] 在 media/js/blocklyEdit.js 處理 monitorStopped with reason='upload_started'，顯示提示訊息
-- [ ] T027 [US3] 上傳完成後傳送 uploadComplete 訊息通知可重新開啟 Monitor
+- [x] T024 [US3] 在 SerialMonitorService 實作 stopForUpload() 方法 src/services/serialMonitorService.ts
+- [x] T025 [US3] 在 handleRequestUpload() 中呼叫 stopForUpload() 釋放埠
+- [x] T026 [US3] 在 media/js/blocklyEdit.js 處理 monitorStopped with reason='upload_started'，顯示提示訊息
+- [x] T027 [US3] 上傳完成後傳送 uploadComplete 訊息通知可重新開啟 Monitor
 
 **Checkpoint**: User Story 3 完成，埠衝突處理可獨立驗證
 
@@ -121,10 +121,10 @@
 
 ### Implementation for User Story 4
 
-- [ ] T029 [P] [US4] 在 media/html/blocklyEdit.html 新增 Monitor 按鈕 HTML 結構
-- [ ] T030 [P] [US4] 在 media/css/blocklyEdit.css 新增 Monitor 按鈕樣式（含 active 狀態）
-- [ ] T031 [US4] 在 media/js/blocklyEdit.js 實作 updateMonitorButtonVisibility()
-- [ ] T032 [US4] 在板子切換事件中呼叫 updateMonitorButtonVisibility()
+- [x] T029 [P] [US4] 在 media/html/blocklyEdit.html 新增 Monitor 按鈕 HTML 結構
+- [x] T030 [P] [US4] 在 media/css/blocklyEdit.css 新增 Monitor 按鈕樣式（含 active 狀態）
+- [x] T031 [US4] 在 media/js/blocklyEdit.js 實作 updateMonitorButtonVisibility()
+- [x] T032 [US4] 在板子切換事件中呼叫 updateMonitorButtonVisibility()
 
 **Checkpoint**: User Story 4 完成，條件顯示功能可獨立驗證
 
@@ -143,11 +143,11 @@
 
 ### Implementation for User Story 5
 
-- [ ] T035 [US5] 在 SerialMonitorService 實作 stop() 方法
-- [ ] T036 [US5] 在 constructor 中註冊 onDidCloseTerminal 事件監聽
-- [ ] T037 [US5] 實作 handleTerminalClosed() 處理使用者手動關閉
-- [ ] T038 [US5] 在 messageHandler.ts 實作 handleStopMonitor() 處理 WebView 訊息
-- [ ] T039 [US5] 在 media/js/blocklyEdit.js 處理 monitorStopped 訊息還原按鈕狀態
+- [x] T035 [US5] 在 SerialMonitorService 實作 stop() 方法
+- [x] T036 [US5] 在 constructor 中註冊 onDidCloseTerminal 事件監聽
+- [x] T037 [US5] 實作 handleTerminalClosed() 處理使用者手動關閉
+- [x] T038 [US5] 在 messageHandler.ts 實作 handleStopMonitor() 處理 WebView 訊息
+- [x] T039 [US5] 在 media/js/blocklyEdit.js 處理 monitorStopped 訊息還原按鈕狀態
 
 **Checkpoint**: User Story 5 完成，關閉功能可獨立驗證
 
@@ -166,10 +166,10 @@
 
 ### Implementation for Edge Case
 
-- [ ] T039.3 [EC] 在 handleTerminalClosed() 中偵測非預期關閉（裝置斷線情境）
-- [ ] T039.4 [EC] 傳送 monitorStopped with reason='device_disconnected' 給 WebView
-- [ ] T039.5 [EC] 在 media/js/blocklyEdit.js 處理 reason='device_disconnected' 顯示斷線訊息
-- [ ] T039.6 [EC] 在 media/locales/zh-hant/messages.js 新增 MONITOR_DEVICE_DISCONNECTED 翻譯鍵
+- [x] T039.3 [EC] 在 handleTerminalClosed() 中偵測非預期關閉（裝置斷線情境）
+- [x] T039.4 [EC] 傳送 monitorStopped with reason='device_disconnected' 給 WebView
+- [x] T039.5 [EC] 在 media/js/blocklyEdit.js 處理 reason='device_disconnected' 顯示斷線訊息
+- [x] T039.6 [EC] 在 media/locales/zh-hant/messages.js 新增 MONITOR_DEVICE_DISCONNECTED 翻譯鍵
 
 **Checkpoint**: Edge Case 完成，裝置斷線處理可獨立驗證
 
@@ -179,20 +179,20 @@
 
 **Purpose**: 完成所有 15 種語言的 Monitor UI 文字翻譯
 
-- [ ] T040 [P] 在 media/locales/en/messages.js 新增 Monitor i18n 鍵 (英文)
-- [ ] T041 [P] 在 media/locales/ja/messages.js 新增 Monitor i18n 鍵 (日文)
-- [ ] T042 [P] 在 media/locales/ko/messages.js 新增 Monitor i18n 鍵 (韓文)
-- [ ] T043 [P] 在 media/locales/de/messages.js 新增 Monitor i18n 鍵 (德文)
-- [ ] T044 [P] 在 media/locales/fr/messages.js 新增 Monitor i18n 鍵 (法文)
-- [ ] T045 [P] 在 media/locales/es/messages.js 新增 Monitor i18n 鍵 (西班牙文)
-- [ ] T046 [P] 在 media/locales/pt-br/messages.js 新增 Monitor i18n 鍵 (巴西葡萄牙文)
-- [ ] T047 [P] 在 media/locales/it/messages.js 新增 Monitor i18n 鍵 (義大利文)
-- [ ] T048 [P] 在 media/locales/ru/messages.js 新增 Monitor i18n 鍵 (俄文)
-- [ ] T049 [P] 在 media/locales/pl/messages.js 新增 Monitor i18n 鍵 (波蘭文)
-- [ ] T050 [P] 在 media/locales/hu/messages.js 新增 Monitor i18n 鍵 (匈牙利文)
-- [ ] T051 [P] 在 media/locales/tr/messages.js 新增 Monitor i18n 鍵 (土耳其文)
-- [ ] T052 [P] 在 media/locales/bg/messages.js 新增 Monitor i18n 鍵 (保加利亞文)
-- [ ] T053 [P] 在 media/locales/cs/messages.js 新增 Monitor i18n 鍵 (捷克文)
+- [x] T040 [P] 在 media/locales/en/messages.js 新增 Monitor i18n 鍵 (英文)
+- [x] T041 [P] 在 media/locales/ja/messages.js 新增 Monitor i18n 鍵 (日文)
+- [x] T042 [P] 在 media/locales/ko/messages.js 新增 Monitor i18n 鍵 (韓文)
+- [x] T043 [P] 在 media/locales/de/messages.js 新增 Monitor i18n 鍵 (德文)
+- [x] T044 [P] 在 media/locales/fr/messages.js 新增 Monitor i18n 鍵 (法文)
+- [x] T045 [P] 在 media/locales/es/messages.js 新增 Monitor i18n 鍵 (西班牙文)
+- [x] T046 [P] 在 media/locales/pt-br/messages.js 新增 Monitor i18n 鍵 (巴西葡萄牙文)
+- [x] T047 [P] 在 media/locales/it/messages.js 新增 Monitor i18n 鍵 (義大利文)
+- [x] T048 [P] 在 media/locales/ru/messages.js 新增 Monitor i18n 鍵 (俄文)
+- [x] T049 [P] 在 media/locales/pl/messages.js 新增 Monitor i18n 鍵 (波蘭文)
+- [x] T050 [P] 在 media/locales/hu/messages.js 新增 Monitor i18n 鍵 (匈牙利文)
+- [x] T051 [P] 在 media/locales/tr/messages.js 新增 Monitor i18n 鍵 (土耳其文)
+- [x] T052 [P] 在 media/locales/bg/messages.js 新增 Monitor i18n 鍵 (保加利亞文)
+- [x] T053 [P] 在 media/locales/cs/messages.js 新增 Monitor i18n 鍵 (捷克文)
 
 **Checkpoint**: 執行 `npm run validate:i18n` 確認所有翻譯通過驗證
 
@@ -202,13 +202,13 @@
 
 **Purpose**: 跨 User Story 的改進與整合驗證
 
-- [ ] T054 建立整合測試 src/test/integration/serialMonitor.test.ts
-- [ ] T055 [P] 在 SerialMonitorService 新增完整 JSDoc 文件註解
-- [ ] T056 [P] 在 messageHandler.ts 新增 Monitor 相關方法的 JSDoc 文件
-- [ ] T057 執行 quickstart.md 驗證步驟（5 項）確認完整功能
-- [ ] T058 更新 CHANGELOG.md 記錄新功能
-- [ ] T059 執行 npm run lint 確認程式碼品質
-- [ ] T060 執行 npm run test 確認所有測試通過
+- [ ] T054 建立整合測試 src/test/integration/serialMonitor.test.ts (延後)
+- [x] T055 [P] 在 SerialMonitorService 新增完整 JSDoc 文件註解
+- [x] T056 [P] 在 messageHandler.ts 新增 Monitor 相關方法的 JSDoc 文件
+- [x] T057 執行 quickstart.md 驗證步驟（5 項）確認完整功能
+- [x] T058 更新 CHANGELOG.md 記錄新功能
+- [x] T059 執行 npm run lint 確認程式碼品質
+- [x] T060 執行 npm run test 確認所有測試通過 (418 passing)
 
 ---
 

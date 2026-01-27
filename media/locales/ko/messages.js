@@ -895,4 +895,15 @@ window.languageManager.loadMessages('ko', {
 	RC_GET_BUTTON_PREFIX: 'RC 버튼',
 	RC_GET_BUTTON_SUFFIX: '상태',
 	RC_GET_BUTTON_TOOLTIP: '원격 버튼 상태 읽기 (0=눌림, 1=해제)',
-});
+
+        // === Serial Monitor ===
+        MONITOR_BUTTON_TITLE: '모니터 열기',
+        MONITOR_BUTTON_STOP_TITLE: '모니터 중지',
+        MONITOR_BUTTON_DISABLED_TITLE: '모니터 (CyberBrick 전용)',
+        MONITOR_STARTING: '모니터 시작 중...',
+        MONITOR_CONNECTED: '{0}에 연결됨',
+        MONITOR_STOPPED: '모니터 중지됨',
+        MONITOR_DEVICE_NOT_FOUND: 'CyberBrick 장치를 찾을 수 없음',
+        MONITOR_DEVICE_DISCONNECTED: 'CyberBrick 장치 연결 끊김',
+        MONITOR_CONNECTION_FAILED: '장치 연결 실패',
+        MONITOR_CLOSED_FOR_UPLOAD: '업로드를 위해 모니터 일시 중지',

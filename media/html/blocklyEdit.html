@@ -124,7 +124,8 @@
             </div>
             <div class="language-switch">
                 <button id="languageToggle" title="" aria-haspopup="true" aria-expanded="false">
-                    <svg class="language-icon lucide-globe" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                    <svg class="language-icon lucide-globe" viewBox="0 0 24 24" width="16" height="16"
+                        aria-hidden="true">
                         <defs>
                             <clipPath id="globeClip">
                                 <circle cx="12" cy="12" r="10" />
@@ -133,7 +134,8 @@
                         <circle class="globe-outline" cx="12" cy="12" r="10" />
                         <path class="globe-line globe-equator" d="M2 12h20" />
                         <g class="globe-roll" clip-path="url(#globeClip)">
-                            <path class="globe-line globe-meridian" d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                            <path class="globe-line globe-meridian"
+                                d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                         </g>
                     </svg>
                 </button>
@@ -248,6 +250,38 @@
                             <path class="upload-path" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline class="upload-path" points="17 8 12 3 7 8" />
                             <line class="upload-path" x1="12" y1="3" x2="12" y2="15" />
+                        </g>
+                    </svg>
+                </button>
+            </div>
+            <!-- CyberBrick Monitor 按鈕（僅在選擇 CyberBrick 時顯示） -->
+            <div class="monitor-switch" id="monitorContainer" style="display: none;">
+                <button id="monitorBtn" title="">
+                    <svg class="monitor-svg" viewBox="0 0 24 24" width="16" height="16">
+                        <style>
+                            .monitor-svg {
+                                transition: color 0.2s ease;
+                            }
+
+                            .monitor-svg.active {
+                                color: var(--vscode-terminal-ansiGreen, #4ec9b0);
+                            }
+
+                            .monitor-path {
+                                stroke: currentColor;
+                                stroke-width: 2;
+                                stroke-linecap: round;
+                                stroke-linejoin: round;
+                                fill: none;
+                            }
+                        </style>
+                        <g class="monitor-icon">
+                            <!-- Terminal / Console icon -->
+                            <rect class="monitor-path" x="2" y="4" width="20" height="14" rx="2" ry="2" />
+                            <line class="monitor-path" x1="8" y1="21" x2="16" y2="21" />
+                            <line class="monitor-path" x1="12" y1="18" x2="12" y2="21" />
+                            <polyline class="monitor-path" points="7 9 9 11 7 13" />
+                            <line class="monitor-path" x1="11" y1="13" x2="16" y2="13" />
                         </g>
                     </svg>
                 </button>

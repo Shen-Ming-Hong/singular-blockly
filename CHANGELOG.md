@@ -8,6 +8,24 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.60.0] - 2026-01-27
+
+### 新增功能 Added
+
+- **CyberBrick 輸出監控器** (CyberBrick Output Monitor)
+    - 新增 Monitor 按鈕：可開啟終端機即時查看 CyberBrick 的 `print()` 輸出
+      New Monitor button: Opens terminal to view CyberBrick `print()` output in real-time
+    - 自動埠偵測：自動偵測已連接的 CyberBrick 裝置，無需手動選擇 COM 埠
+      Auto port detection: Automatically detects connected CyberBrick device, no manual COM port selection needed
+    - 上傳衝突處理：上傳前自動關閉 Monitor 釋放 COM 埠，避免衝突
+      Upload conflict handling: Automatically closes Monitor before upload to release COM port
+    - 條件顯示：Monitor 按鈕僅在選擇 CyberBrick 板時顯示，Arduino 板不顯示
+      Conditional display: Monitor button only shows when CyberBrick board is selected
+    - 使用 pyserial 實現穩定的裝置重置與輸出捕獲，確保從程式開頭顯示所有輸出
+      Uses pyserial for reliable device reset and output capture, ensuring all output from program start
+    - 支援 15 種語言翻譯 (8 個翻譯鍵)
+      Supports 15 language translations (8 translation keys)
+
 ## [0.59.0] - 2026-01-23
 
 ### 新增功能 Added

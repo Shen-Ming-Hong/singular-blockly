@@ -168,3 +168,46 @@ export function getBoardLanguage(board: string): BoardLanguage | undefined {
 	}
 	return BOARD_LANGUAGE_MAP[board];
 }
+
+// ===== Serial Monitor Types =====
+
+/**
+ * Monitor 錯誤代碼
+ */
+export type MonitorErrorCode =
+	| 'DEVICE_NOT_FOUND' // 找不到 CyberBrick 裝置
+	| 'MPREMOTE_NOT_INSTALLED' // mpremote 工具未安裝
+	| 'PORT_IN_USE' // COM 埠被佔用
+	| 'CONNECTION_FAILED'; // 連接失敗
+
+/**
+ * Monitor 錯誤介面
+ */
+export interface MonitorError {
+	/** 錯誤代碼 */
+	code: MonitorErrorCode;
+	/** 錯誤訊息 */
+	message: string;
+}
+
+/**
+ * Monitor 啟動結果
+ */
+export interface MonitorStartResult {
+	/** 是否成功啟動 */
+	success: boolean;
+	/** 連接的 COM 埠 */
+	port: string;
+	/** 錯誤資訊（如有） */
+	error?: MonitorError;
+}
+
+/**
+ * Serial Monitor 狀態
+ */
+export interface SerialMonitorState {
+	/** Monitor 是否正在運行 */
+	isRunning: boolean;
+	/** 當前連接的 COM 埠 */
+	port: string | null;
+}

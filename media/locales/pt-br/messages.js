@@ -895,4 +895,15 @@ window.languageManager.loadMessages('pt-br', {
 	// Blocos status RC
 	RC_IS_CONNECTED: 'RC conectado?',
 	RC_IS_CONNECTED_TOOLTIP: 'Verificar se dados recebidos em 500ms',
-});
+
+        // === Serial Monitor ===
+        MONITOR_BUTTON_TITLE: 'Abrir monitor',
+        MONITOR_BUTTON_STOP_TITLE: 'Parar monitor',
+        MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (apenas para CyberBrick)',
+        MONITOR_STARTING: 'Iniciando monitor...',
+        MONITOR_CONNECTED: 'Conectado a {0}',
+        MONITOR_STOPPED: 'Monitor parado',
+        MONITOR_DEVICE_NOT_FOUND: 'Dispositivo CyberBrick não encontrado',
+        MONITOR_DEVICE_DISCONNECTED: 'Dispositivo CyberBrick desconectado',
+        MONITOR_CONNECTION_FAILED: 'Falha ao conectar ao dispositivo',
+        MONITOR_CLOSED_FOR_UPLOAD: 'Monitor pausado para upload',

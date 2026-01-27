@@ -904,4 +904,15 @@ window.languageManager.loadMessages('bg', {
 	// Блокове статус RC
 	RC_IS_CONNECTED: 'RC свързан?',
 	RC_IS_CONNECTED_TOOLTIP: 'Провери дали са получени данни за 500мс',
-});
+
+        // === Serial Monitor ===
+        MONITOR_BUTTON_TITLE: 'Отвори монитор',
+        MONITOR_BUTTON_STOP_TITLE: 'Спри монитор',
+        MONITOR_BUTTON_DISABLED_TITLE: 'Монитор (само за CyberBrick)',
+        MONITOR_STARTING: 'Стартиране на монитор...',
+        MONITOR_CONNECTED: 'Свързан към {0}',
+        MONITOR_STOPPED: 'Мониторът е спрян',
+        MONITOR_DEVICE_NOT_FOUND: 'CyberBrick устройство не е намерено',
+        MONITOR_DEVICE_DISCONNECTED: 'CyberBrick устройство е изключено',
+        MONITOR_CONNECTION_FAILED: 'Неуспешно свързване с устройството',
+        MONITOR_CLOSED_FOR_UPLOAD: 'Мониторът е паузиран за качване',

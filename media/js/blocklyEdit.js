@@ -522,9 +522,7 @@ function populateLanguageDropdown() {
 
 		const label = document.createElement('span');
 		label.className = 'language-option-label';
-		label.textContent = option.isAuto
-			? languageManager.getMessage('LANGUAGE_AUTO', 'Auto (follow VS Code)')
-			: option.nativeName;
+		label.textContent = option.isAuto ? languageManager.getMessage('LANGUAGE_AUTO', 'Auto (follow VS Code)') : option.nativeName;
 
 		const check = document.createElement('span');
 		check.className = 'language-option-check';
@@ -785,13 +783,7 @@ function updateBackupModalTexts() {
 	setText('emptyBackupMessage', languageManager.getMessage('BACKUP_LIST_EMPTY', '尚無備份'));
 
 	// 更新自動備份區塊文字
-	setText(
-		'autoBackupIntervalLabel',
-		languageManager.getMessage(
-		'AUTO_BACKUP_INTERVAL_LABEL',
-		'備份間隔時間：'
-		)
-	);
+	setText('autoBackupIntervalLabel', languageManager.getMessage('AUTO_BACKUP_INTERVAL_LABEL', '備份間隔時間：'));
 	setText('autoBackupMinutesText', languageManager.getMessage('AUTO_BACKUP_MINUTES', '分鐘'));
 	setText('saveAutoBackupBtn', languageManager.getMessage('AUTO_BACKUP_SAVE', '儲存設定'));
 
@@ -836,13 +828,7 @@ function updateFunctionSearchModalTexts() {
 
 	// 更新標題和按鈕
 	setText('functionSearchModalTitle', languageManager.getMessage('FUNCTION_SEARCH_TITLE', '搜尋積木'));
-	setPlaceholder(
-		'functionSearchInput',
-		languageManager.getMessage(
-		'FUNCTION_SEARCH_PLACEHOLDER',
-		'輸入積木名稱或參數...'
-		)
-	);
+	setPlaceholder('functionSearchInput', languageManager.getMessage('FUNCTION_SEARCH_PLACEHOLDER', '輸入積木名稱或參數...'));
 	// 不再設置按鈕文字，因為使用圖標
 	setText('prevResultBtn', languageManager.getMessage('FUNCTION_SEARCH_PREV', '上一個'));
 	setText('nextResultBtn', languageManager.getMessage('FUNCTION_SEARCH_NEXT', '下一個'));
@@ -1749,7 +1735,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 	// 在初始化時先輸出一次實驗積木清單
 	log.info('初始化階段輸出實驗積木清單');
-	if (typeof window.logExperimentalBlocks === 'function') { window.logExperimentalBlocks(); }
+	if (typeof window.logExperimentalBlocks === 'function') {
+		window.logExperimentalBlocks();
+	}
 	// 載入 toolbox 配置
 	const response = await fetch(window.TOOLBOX_URL);
 	const toolboxConfig = await response.json();
@@ -2027,15 +2015,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		});
 
 		const shouldWarn =
-			blocks.length > 1 &&
-			(mainBlockCountState.blockType !== blockType || mainBlockCountState.count !== blocks.length);
+			blocks.length > 1 && (mainBlockCountState.blockType !== blockType || mainBlockCountState.count !== blocks.length);
 
 		if (shouldWarn) {
 			const warningMessage =
-				window.languageManager?.getMessage(
-					'MAIN_BLOCK_DUPLICATE_WARNING',
-					'偵測到多個主程式積木，請刪除多餘的積木'
-				) || '偵測到多個主程式積木，請刪除多餘的積木';
+				window.languageManager?.getMessage('MAIN_BLOCK_DUPLICATE_WARNING', '偵測到多個主程式積木，請刪除多餘的積木') ||
+				'偵測到多個主程式積木，請刪除多餘的積木';
 
 			vscode.postMessage({
 				command: 'showToast',
@@ -2306,7 +2291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 							scrollX: workspace.scrollX,
 							scrollY: workspace.scrollY,
 							scale: workspace.getScale(),
-					  };
+						};
 				viewportLocked = true;
 			}
 
@@ -2403,7 +2388,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (event.type === Blockly.Events.FINISHED_LOADING) {
 			// 工作區載入完成時輸出實驗積木清單
 			log.info('工作區載入完成，輸出實驗積木清單');
-			if (typeof window.logExperimentalBlocks === 'function') { window.logExperimentalBlocks(); }
+			if (typeof window.logExperimentalBlocks === 'function') {
+				window.logExperimentalBlocks();
+			}
 
 			// 工作區載入完成後，自動更新實驗積木清單
 			log.info('工作區載入完成，更新實驗積木清單');
@@ -2578,7 +2565,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 輸出最新的實驗積木清單（僅非拖動時）
 			if (!isDraggingBlock) {
 				log.info('實驗積木清單檢查開始 >>>>>>');
-				if (typeof window.logExperimentalBlocks === 'function') { window.logExperimentalBlocks(); }
+				if (typeof window.logExperimentalBlocks === 'function') {
+					window.logExperimentalBlocks();
+				}
 				log.info('實驗積木清單檢查結束 <<<<<<');
 			}
 
@@ -2595,7 +2584,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 處理開發板選擇
 	if (boardSelect) {
-			boardSelect.addEventListener('change', async event => {
+		boardSelect.addEventListener('change', async event => {
 			const selectedBoard = event.target.value;
 			const previousBoard = window.currentBoard || 'none';
 
@@ -2627,7 +2616,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					? window.languageManager.getMessage(
 							'BOARD_SWITCH_WARNING_MESSAGE',
 							'切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？'
-					  )
+						)
 					: '切換到不同類型的開發板將清空目前的工作區。\n系統會先自動備份您的工作。\n\n確定要繼續嗎？';
 
 				// 使用非同步確認對話框（VSCode 原生 API）
@@ -2653,63 +2642,63 @@ document.addEventListener('DOMContentLoaded', async () => {
 					isQuickBackup: true,
 				});
 
-			// 顯示備份成功 Toast
-			const backupSuccessTemplate = window.languageManager
-				? window.languageManager.getMessage('BACKUP_QUICK_SAVE_SUCCESS', '備份已儲存：{0}')
-				: '備份已儲存：{0}';
-			const backupSuccessMessage = backupSuccessTemplate.replace('{0}', backupName);
-			toast.show(backupSuccessMessage, 'success');
+				// 顯示備份成功 Toast
+				const backupSuccessTemplate = window.languageManager
+					? window.languageManager.getMessage('BACKUP_QUICK_SAVE_SUCCESS', '備份已儲存：{0}')
+					: '備份已儲存：{0}';
+				const backupSuccessMessage = backupSuccessTemplate.replace('{0}', backupName);
+				toast.show(backupSuccessMessage, 'success');
 
-			// 清空工作區
-			log.info('[blockly] 清空工作區');
-			workspace.clear();
+				// 清空工作區
+				log.info('[blockly] 清空工作區');
+				workspace.clear();
 
-			// 標記需要強制儲存空工作區
-			forceEmptySave = true;
-		} else if (isLanguageChanging && !hasBlocks) {
-			log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區為空，跳過確認對話框`);
-		}
+				// 標記需要強制儲存空工作區
+				forceEmptySave = true;
+			} else if (isLanguageChanging && !hasBlocks) {
+				log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區為空，跳過確認對話框`);
+			}
 
-		// 更新全局的currentBoard
-		window.setCurrentBoard(selectedBoard);
-		// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
-		await updateToolboxForBoard(workspace, selectedBoard);
-		// 觸發工作區更新以重新整理積木
-		workspace.getAllBlocks().forEach(block => {
-			if (block.type.startsWith('arduino_')) {
-				block.render();
+			// 更新全局的currentBoard
+			window.setCurrentBoard(selectedBoard);
+			// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
+			await updateToolboxForBoard(workspace, selectedBoard);
+			// 觸發工作區更新以重新整理積木
+			workspace.getAllBlocks().forEach(block => {
+				if (block.type.startsWith('arduino_')) {
+					block.render();
+				}
+			});
+
+			// CyberBrick 專用邏輯
+			const boardConfig = window.BOARD_CONFIGS[selectedBoard];
+			if (boardConfig?.language === 'micropython') {
+				// 切換到 MicroPython 主板時，刪除 platformio.ini 避免與 PlatformIO 衝突
+				log.info('[blockly] 切換到 MicroPython 主板，發送刪除 platformio.ini 請求');
+				vscode.postMessage({ command: 'deletePlatformioIni' });
+			}
+
+			vscode.postMessage({
+				command: 'updateBoard',
+				board: selectedBoard,
+				lib_deps: window.arduinoGenerator.lib_deps_ || [],
+				build_flags: window.arduinoGenerator.build_flags_ || [],
+				lib_ldf_mode: window.arduinoGenerator.lib_ldf_mode_ || null,
+			});
+
+			// 如果需要強制儲存（工作區被清空後），直接發送空狀態
+			if (forceEmptySave) {
+				log.info('[blockly] 強制儲存空工作區狀態與新板子設定');
+				const emptyState = Blockly.serialization.workspaces.save(workspace);
+				vscode.postMessage({
+					command: 'saveWorkspace',
+					state: emptyState,
+					board: selectedBoard,
+				});
+			} else {
+				saveWorkspaceState();
 			}
 		});
-
-		// CyberBrick 專用邏輯
-		const boardConfig = window.BOARD_CONFIGS[selectedBoard];
-		if (boardConfig?.language === 'micropython') {
-			// 切換到 MicroPython 主板時，刪除 platformio.ini 避免與 PlatformIO 衝突
-			log.info('[blockly] 切換到 MicroPython 主板，發送刪除 platformio.ini 請求');
-			vscode.postMessage({ command: 'deletePlatformioIni' });
-		}
-
-		vscode.postMessage({
-			command: 'updateBoard',
-			board: selectedBoard,
-			lib_deps: window.arduinoGenerator.lib_deps_ || [],
-			build_flags: window.arduinoGenerator.build_flags_ || [],
-			lib_ldf_mode: window.arduinoGenerator.lib_ldf_mode_ || null,
-		});
-
-		// 如果需要強制儲存（工作區被清空後），直接發送空狀態
-		if (forceEmptySave) {
-			log.info('[blockly] 強制儲存空工作區狀態與新板子設定');
-			const emptyState = Blockly.serialization.workspaces.save(workspace);
-			vscode.postMessage({
-				command: 'saveWorkspace',
-				state: emptyState,
-				board: selectedBoard,
-			});
-		} else {
-			saveWorkspaceState();
-		}
-	});
 	}
 
 	const handleWorkspaceLoadMessage = async message => {
@@ -3062,6 +3051,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 			case 'portListResponse':
 				handlePortListResponse(message);
 				break;
+
+			// Serial Monitor 功能
+			case 'monitorStarted':
+				handleMonitorStarted(message);
+				break;
+
+			case 'monitorStopped':
+				handleMonitorStopped(message);
+				break;
+
+			case 'monitorError':
+				handleMonitorError(message);
+				break;
 		}
 	});
 
@@ -3342,6 +3344,10 @@ function updateUIForBoard(boardId, isCyberBrick) {
 
 	// 初始化上傳按鈕事件
 	initUploadButton();
+
+	// 初始化 Monitor 按鈕事件並更新可見性
+	initMonitorButton();
+	updateMonitorButtonVisibility();
 }
 
 // ===== CyberBrick MicroPython 上傳功能 =====
@@ -3831,3 +3837,128 @@ function updateEsp32BlockWarnings(workspace, isESP32Board) {
 	});
 }
 
+// ===== Serial Monitor 功能 =====
+
+/**
+ * Serial Monitor 狀態
+ */
+const monitorState = {
+	isRunning: false,
+	currentPort: null,
+};
+
+/**
+ * 初始化 Monitor 按鈕事件
+ */
+function initMonitorButton() {
+	const monitorBtn = document.getElementById('monitorBtn');
+	if (!monitorBtn) return;
+
+	// 移除舊的事件監聽器（避免重複綁定）
+	monitorBtn.replaceWith(monitorBtn.cloneNode(true));
+	const newMonitorBtn = document.getElementById('monitorBtn');
+
+	newMonitorBtn.addEventListener('click', toggleMonitor);
+	updateMonitorButtonVisibility();
+}
+
+/**
+ * 根據板子類型顯示/隱藏 Monitor 按鈕
+ */
+function updateMonitorButtonVisibility() {
+	const monitorContainer = document.getElementById('monitorContainer');
+	if (!monitorContainer) return;
+
+	const currentBoard = window.currentBoard || 'none';
+	const isCyberBrick = currentBoard === 'cyberbrick';
+
+	monitorContainer.style.display = isCyberBrick ? 'flex' : 'none';
+}
+
+/**
+ * 切換 Monitor 狀態
+ */
+function toggleMonitor() {
+	const currentBoard = window.currentBoard || 'none';
+
+	if (monitorState.isRunning) {
+		vscode.postMessage({ command: 'stopMonitor' });
+	} else {
+		vscode.postMessage({ command: 'startMonitor', board: currentBoard });
+	}
+}
+
+/**
+ * 處理 Monitor 已啟動訊息
+ * @param {Object} message - 訊息物件
+ */
+function handleMonitorStarted(message) {
+	monitorState.isRunning = true;
+	monitorState.currentPort = message.port;
+	updateMonitorButtonState();
+
+	const connectedMsg = window.languageManager?.getMessage('MONITOR_CONNECTED', '已連接到 {0}');
+	const displayMsg = connectedMsg ? connectedMsg.replace('{0}', message.port) : `Connected to ${message.port}`;
+	toast.show(displayMsg, 'success');
+
+	log.info('[blockly] Monitor 已啟動', { port: message.port });
+}
+
+/**
+ * 處理 Monitor 已停止訊息
+ * @param {Object} message - 訊息物件
+ */
+function handleMonitorStopped(message) {
+	monitorState.isRunning = false;
+	monitorState.currentPort = null;
+	updateMonitorButtonState();
+
+	if (message.reason === 'upload_started') {
+		const uploadMsg = window.languageManager?.getMessage('MONITOR_CLOSED_FOR_UPLOAD', 'Monitor 已為上傳作業暫停');
+		toast.show(uploadMsg, 'info');
+	} else if (message.reason === 'device_disconnected') {
+		const disconnectedMsg = window.languageManager?.getMessage('MONITOR_DEVICE_DISCONNECTED', 'CyberBrick 裝置已斷線');
+		toast.show(disconnectedMsg, 'warning');
+	}
+
+	log.info('[blockly] Monitor 已停止', { reason: message.reason });
+}
+
+/**
+ * 處理 Monitor 錯誤訊息
+ * @param {Object} message - 訊息物件
+ */
+function handleMonitorError(message) {
+	monitorState.isRunning = false;
+	monitorState.currentPort = null;
+	updateMonitorButtonState();
+
+	// 根據錯誤代碼取得本地化訊息
+	let errorMsg;
+	if (message.error?.code === 'DEVICE_NOT_FOUND') {
+		errorMsg = window.languageManager?.getMessage('MONITOR_DEVICE_NOT_FOUND', '找不到 CyberBrick 裝置');
+	} else if (message.error?.code === 'MPREMOTE_NOT_INSTALLED') {
+		errorMsg = message.error?.message || 'mpremote not installed';
+	} else {
+		errorMsg = window.languageManager?.getMessage('MONITOR_CONNECTION_FAILED', '無法連接到裝置');
+	}
+
+	toast.show(errorMsg, 'error');
+	log.error('[blockly] Monitor 錯誤', message.error);
+}
+
+/**
+ * 更新 Monitor 按鈕狀態
+ */
+function updateMonitorButtonState() {
+	const monitorBtn = document.getElementById('monitorBtn');
+	if (!monitorBtn) return;
+
+	if (monitorState.isRunning) {
+		monitorBtn.classList.add('active');
+		monitorBtn.title = window.languageManager?.getMessage('MONITOR_BUTTON_STOP_TITLE', '關閉 Monitor') || 'Stop Monitor';
+	} else {
+		monitorBtn.classList.remove('active');
+		monitorBtn.title = window.languageManager?.getMessage('MONITOR_BUTTON_TITLE', '開啟 Monitor') || 'Open Monitor';
+	}
+}

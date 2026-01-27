@@ -896,4 +896,15 @@ window.languageManager.loadMessages('ja', {
 	RC_GET_BUTTON_PREFIX: 'RC ボタン',
 	RC_GET_BUTTON_SUFFIX: '状態',
 	RC_GET_BUTTON_TOOLTIP: 'リモートボタンの状態を読取 (0=押下, 1=解放)',
-});
+
+        // === Serial Monitor ===
+        MONITOR_BUTTON_TITLE: 'モニターを開く',
+        MONITOR_BUTTON_STOP_TITLE: 'モニターを停止',
+        MONITOR_BUTTON_DISABLED_TITLE: 'モニター（CyberBrick専用）',
+        MONITOR_STARTING: 'モニターを起動中...',
+        MONITOR_CONNECTED: '{0} に接続しました',
+        MONITOR_STOPPED: 'モニターが停止しました',
+        MONITOR_DEVICE_NOT_FOUND: 'CyberBrickデバイスが見つかりません',
+        MONITOR_DEVICE_DISCONNECTED: 'CyberBrickデバイスが切断されました',
+        MONITOR_CONNECTION_FAILED: 'デバイスに接続できませんでした',
+        MONITOR_CLOSED_FOR_UPLOAD: 'アップロードのためモニターを一時停止',

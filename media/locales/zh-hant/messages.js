@@ -887,4 +887,16 @@ window.languageManager.loadMessages('zh-hant', {
 	RC_GET_BUTTON_PREFIX: 'RC 按鈕',
 	RC_GET_BUTTON_SUFFIX: '狀態',
 	RC_GET_BUTTON_TOOLTIP: '讀取遠端按鈕狀態 (0=按下, 1=放開)',
+
+	// CyberBrick Serial Monitor
+	MONITOR_BUTTON_TITLE: '開啟 Monitor',
+	MONITOR_BUTTON_STOP_TITLE: '關閉 Monitor',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Monitor 運行中',
+	MONITOR_STARTING: '正在連接裝置...',
+	MONITOR_CONNECTED: '已連接到 {0}',
+	MONITOR_STOPPED: 'Monitor 已關閉',
+	MONITOR_DEVICE_NOT_FOUND: '找不到 CyberBrick 裝置',
+	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick 裝置已斷線',
+	MONITOR_CONNECTION_FAILED: '無法連接到裝置',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor 已為上傳作業暫停',
 });

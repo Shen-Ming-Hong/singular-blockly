@@ -900,4 +900,15 @@ window.languageManager.loadMessages('cs', {
 	// Bloky stavu RC
 	RC_IS_CONNECTED: 'RC připojeno?',
 	RC_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda byla přijata data za 500ms',
-});
+
+        // === Serial Monitor ===
+        MONITOR_BUTTON_TITLE: 'Otevřít monitor',
+        MONITOR_BUTTON_STOP_TITLE: 'Zastavit monitor',
+        MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (pouze pro CyberBrick)',
+        MONITOR_STARTING: 'Spouštění monitoru...',
+        MONITOR_CONNECTED: 'Připojeno k {0}',
+        MONITOR_STOPPED: 'Monitor zastaven',
+        MONITOR_DEVICE_NOT_FOUND: 'Zařízení CyberBrick nenalezeno',
+        MONITOR_DEVICE_DISCONNECTED: 'Zařízení CyberBrick odpojeno',
+        MONITOR_CONNECTION_FAILED: 'Nepodařilo se připojit k zařízení',
+        MONITOR_CLOSED_FOR_UPLOAD: 'Monitor pozastaven pro nahrávání',
