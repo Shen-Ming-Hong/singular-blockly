@@ -1,9 +1,9 @@
 ---
 name: git-workflow
-description: Git 工作流程自動化技能。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。包含自動生成 Conventional Commits 格式訊息、一鍵建立 PR 等功能。靈感來源於 Anthropic 官方 commit-commands plugin。Automates Git workflow including commit message generation, branch push, and PR creation. Inspired by Anthropic's official commit-commands plugin.
+description: Git 工作流程自動化技能，涵蓋從 commit 到發布的完整流程。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。包含自動生成 Conventional Commits 格式訊息、建立 PR、等待 Code Review、觸發發布流程等功能。Automates Git workflow from commit to release. Inspired by Anthropic's official commit-commands plugin.
 metadata:
     author: singular-blockly
-    version: '1.1.0'
+    version: '1.3.0'
     category: productivity
     inspired-by: anthropics/claude-code/plugins/commit-commands
 license: Apache-2.0
@@ -16,21 +16,22 @@ Automates Git operations during development, from commit to PR creation.
 
 ## 核心原則 Core Principles
 
-> **與 SDD 整合**：此技能處理「開發完成到 PR 建立」階段，PR 審查後的操作由 `pr-review-release` 技能處理。
-> **SDD Integration**: This skill handles "development complete to PR creation" phase. Post-review operations are handled by `pr-review-release` skill.
+> **端到端整合**：此技能現在涵蓋從「開發完成」到「版本發布」的完整流程。PR 建立後自動觸發 `pr-review-release` 技能，確保流程不中斷。
+> **End-to-End Integration**: This skill now covers the complete flow from "development complete" to "version release". After PR creation, it automatically triggers `pr-review-release` skill to ensure uninterrupted workflow.
 
 ## 適用情境 When to Use
 
--   完成功能開發，需要提交程式碼
--   準備建立 Pull Request
--   在 spec 分支（如 `016-esp32-wifi-mqtt`）工作時
+- 完成功能開發，需要提交程式碼
+- 準備建立 Pull Request
+- 在 spec 分支（如 `016-esp32-wifi-mqtt`）工作時
 
 ## 與其他技能的分工 Skill Boundaries
 
-| 階段             | 技能                      | 說明                                   |
-| ---------------- | ------------------------- | -------------------------------------- |
-| 開發中 → PR 建立 | **git-workflow** (本技能) | commit, push, 建立 PR                  |
-| PR 審查後 → 發布 | `pr-review-release`       | 評估 review, merge, 清理分支, 版本發布 |
+| 階段             | 技能                                   | 說明                             |
+| ---------------- | -------------------------------------- | -------------------------------- |
+| 開發中 → PR 建立 | **git-workflow** (本技能)              | commit, push, 建立 PR            |
+| PR 建立 → 發布   | **git-workflow** + `pr-review-release` | 本技能強制觸發 pr-review-release |
+| 程式碼簡化       | `code-simplifier`                      | PR 前必須執行（阻塞型）          |
 
 ---
 
@@ -126,32 +127,57 @@ git push
 
 **分支命名規範**（SDD 整合）：
 
--   Spec 分支：`{NNN}-feature-name`（如 `016-esp32-wifi-mqtt`）
--   修復分支：`fix/{issue-number}-description`
--   文件分支：`docs/{description}`
+- Spec 分支：`{NNN}-feature-name`（如 `016-esp32-wifi-mqtt`）
+- 修復分支：`fix/{issue-number}-description`
+- 文件分支：`docs/{description}`
 
 ---
 
-### Phase 2.5: 程式碼簡化（推薦）Code Simplification (Recommended)
+### Phase 2.5: 程式碼簡化（必須）Code Simplification (REQUIRED)
 
-在建立 PR 前，建議使用 `code-simplifier` 技能檢查程式碼是否有可簡化之處。
-Before creating a PR, it's recommended to use the `code-simplifier` skill to check for simplification opportunities.
+**⚠️ 阻塞型步驟：此步驟必須完成才能建立 PR。**
+
+在建立 PR 前，**必須**使用 `code-simplifier` 技能檢查並簡化程式碼。
+Before creating a PR, you **must** use the `code-simplifier` skill to check and simplify code.
 
 **為何重要 Why Important**：
+
 - 減少 Code Review 階段的修改建議
 - 提升程式碼可讀性和維護性
 - 確保符合專案程式碼風格
+- 降低後續 token 消耗
 
-**快速檢查 Quick Check**：
-```bash
-# 檢視此分支的所有變更檔案
-git diff master..HEAD --name-only
+**執行步驟 Execution Steps**：
 
-# 執行程式碼簡化技能（針對變更的檔案）
-# 參考 code-simplifier 技能說明
-```
+1. **識別變更檔案**
 
-> 💡 **提示**：如有使用 Agent，可輸入「簡化程式碼」或「refactor」觸發 `code-simplifier` 技能。
+    ```bash
+    # 檢視此分支的所有變更檔案
+    git diff master..HEAD --name-only | grep -E '\.(ts|js)$'
+    ```
+
+2. **執行程式碼簡化技能**
+    - 閱讀 `code-simplifier` 技能文件
+    - 對變更的 TS/JS 檔案執行簡化
+    - 確保遵循專案 coding standards
+
+3. **簡化完成標準**
+    - [ ] 無不必要的巢狀結構
+    - [ ] 無冗餘程式碼和抽象
+    - [ ] 變數和函式命名清晰
+    - [ ] 無描述顯而易見程式碼的註解
+    - [ ] 測試通過且功能不變
+
+4. **提交簡化變更**
+    ```bash
+    git add .
+    git commit -m "refactor: simplify code for PR readiness"
+    git push
+    ```
+
+> 💡 **Agent 整合**：輸入「簡化程式碼」、「refactor」或 `@code-simplifier` 觸發技能。
+
+> ❌ **禁止跳過**：未完成程式碼簡化不得進入 Phase 3 建立 PR。
 
 ---
 
@@ -178,28 +204,28 @@ git diff master..HEAD --stat
 
 ## 相關 Spec Related Spec
 
--   Spec: `/specs/{NNN}-feature-name/spec.md`
--   Tasks: `/specs/{NNN}-feature-name/tasks.md`
+- Spec: `/specs/{NNN}-feature-name/spec.md`
+- Tasks: `/specs/{NNN}-feature-name/tasks.md`
 
 ## 變更類型 Type of Change
 
--   [ ] 🐛 Bug 修復 (non-breaking change which fixes an issue)
--   [ ] ✨ 新功能 (non-breaking change which adds functionality)
--   [ ] 💥 破壞性變更 (fix or feature that would cause existing functionality to change)
--   [ ] 📝 文件更新 (documentation only changes)
+- [ ] 🐛 Bug 修復 (non-breaking change which fixes an issue)
+- [ ] ✨ 新功能 (non-breaking change which adds functionality)
+- [ ] 💥 破壞性變更 (fix or feature that would cause existing functionality to change)
+- [ ] 📝 文件更新 (documentation only changes)
 
 ## 變更內容 Changes
 
--   {變更 1}
--   {變更 2}
--   {變更 3}
+- {變更 1}
+- {變更 2}
+- {變更 3}
 
 ## 測試計劃 Test Plan
 
--   [ ] `npm run test` 通過
--   [ ] `npm run lint` 通過
--   [ ] `npm run compile` 成功
--   [ ] 手動測試：{測試項目}
+- [ ] `npm run test` 通過
+- [ ] `npm run lint` 通過
+- [ ] `npm run compile` 成功
+- [ ] 手動測試：{測試項目}
 
 ## 螢幕截圖 Screenshots (if applicable)
 
@@ -231,6 +257,53 @@ gh pr checks
 
 ---
 
+### Phase 4: 等待 Code Review 並發布（強制）Wait for Review & Release (REQUIRED)
+
+**⚠️ 阻塞型步驟：PR 建立後必須立即進入此階段，不可中斷流程。**
+
+PR 建立完成後，**必須**立即執行 `pr-review-release` 技能來監聽 Copilot Code Review 結果並完成後續發布流程。
+
+#### 4.1 請求 Copilot Review（若尚未配置）
+
+```bash
+# 請求 Copilot Code Review
+gh pr edit --add-reviewer copilot-pull-request-reviewer
+```
+
+#### 4.2 啟動 Review 監聽
+
+```powershell
+# 執行輪詢腳本等待 Copilot Review 完成
+.\.github\skills\pr-review-release\scripts\poll-review.ps1
+
+# 自訂參數（逾時 60 分鐘，每 30 秒查詢一次）
+.\.github\skills\pr-review-release\scripts\poll-review.ps1 -TimeoutMinutes 60 -PollIntervalSeconds 30
+```
+
+#### 4.3 根據 Review 結果執行後續流程
+
+| Review 狀態              | Exit Code | 後續動作                              |
+| ------------------------ | --------- | ------------------------------------- |
+| `COMMENTED` / `APPROVED` | 0         | 評估建議 → 修正（如需）→ Merge → 發布 |
+| `CHANGES_REQUESTED`      | 1         | 必須修正 → 重新推送 → 重新等待 Review |
+| 逾時                     | 2         | 手動檢查 PR 狀態                      |
+
+#### 4.4 執行 pr-review-release 技能
+
+Review 監聽完成後，**強制**進入 `pr-review-release` 技能的完整流程：
+
+1. **Phase 1**: 評估 Review 建議（採納/忽略）
+2. **Phase 2**: 程式碼修正（如有採納的建議）
+3. **Phase 3**: 程式碼簡化（阻塞型）
+4. **Phase 4**: Git 操作（Merge PR、清理分支）
+5. **Phase 5**: 發布流程（版本號、CHANGELOG、Tag、Release）
+
+> 💡 **Agent 整合**：輸入「處理 code review」、「merge PR」或 `@pr-review-release` 觸發技能。
+
+> ❌ **禁止中斷**：完成 PR 建立後不可中止流程，必須完成到發布為止。
+
+---
+
 ## SDD 整合指南 SDD Integration Guide
 
 ### 在 Spec 分支工作時
@@ -248,9 +321,9 @@ gh pr checks
     git commit -m "feat(blocks): [T025] implement esp32_wifi_connect block"
     ```
 
-3. **開發完成**：使用本技能建立 PR
+3. **開發完成**：使用本技能建立 PR（自動觸發 Review 監聽）
 
-4. **Review 後**：使用 `pr-review-release` 技能處理 merge 和發布
+4. **Review 完成**：本技能自動執行 `pr-review-release` 處理 merge 和發布
 
 ### Commit Message 與 Task 關聯
 
@@ -288,32 +361,55 @@ gh pr create --fill --base master
 
 ### Commit 前 Before Commit
 
--   [ ] 變更已通過 `npm run lint`
--   [ ] 變更已通過 `npm run test`
--   [ ] 變更已通過 `npm run compile`
--   [ ] Commit message 符合 Conventional Commits 格式
--   [ ] Scope 正確反映變更範圍
+- [ ] 變更已通過 `npm run lint`
+- [ ] 變更已通過 `npm run test`
+- [ ] 變更已通過 `npm run compile`
+- [ ] Commit message 符合 Conventional Commits 格式
+- [ ] Scope 正確反映變更範圍
+
+### 程式碼簡化階段（阻塞型）Before Code Simplification
+
+- [ ] 已識別所有變更的 TS/JS 檔案
+- [ ] 已執行 code-simplifier 技能
+- [ ] 無不必要的巢狀結構
+- [ ] 無冗餘程式碼和抽象
+- [ ] 變數和函式命名清晰
+- [ ] 無描述顯而易見程式碼的註解
+- [ ] 測試通過且功能不變
+- [ ] 簡化變更已提交並推送
 
 ### 建立 PR 前 Before PR Creation
 
--   [ ] 分支已推送到遠端
--   [ ] PR 描述清楚說明變更內容
--   [ ] 已關聯相關 Spec（如適用）
--   [ ] 測試計劃已列出
--   [ ] （推薦）已使用 `code-simplifier` 技能檢查程式碼簡化機會
+- [ ] **程式碼簡化已完成（必須）**
+- [ ] 分支已推送到遠端
+- [ ] PR 描述清楚說明變更內容
+- [ ] 已關聯相關 Spec（如適用）
+- [ ] 測試計劃已列出
 
 ### PR 建立後 After PR Creation
 
--   [ ] CI 檢查通過
--   [ ] 等待 Code Review
--   [ ] **→ Review 完成後使用 `pr-review-release` 技能**
+- [ ] CI 檢查通過
+- [ ] 已請求 Copilot Code Review
+- [ ] Review 監聽腳本已啟動
+- [ ] **→ Review 完成後自動執行 `pr-review-release` 技能**
+
+### 發布階段 Release Phase
+
+- [ ] Review 建議已評估處理
+- [ ] 程式碼修正已完成（如需）
+- [ ] 程式碼簡化已完成（阻塞型）
+- [ ] PR 已 Squash Merge
+- [ ] 版本號已更新
+- [ ] CHANGELOG 已更新
+- [ ] Git Tag 已建立
+- [ ] GitHub Release 已建立
 
 ---
 
 ## 相關資源 Related Resources
 
--   [Anthropic commit-commands plugin](https://github.com/anthropics/claude-code/tree/main/plugins/commit-commands) - 本技能靈感來源
--   [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hant/)
--   [GitHub CLI 文件](https://cli.github.com/manual/)
--   [pr-review-release 技能](../pr-review-release/SKILL.md) - PR 審查後的下一步
--   [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（推薦）
+- [Anthropic commit-commands plugin](https://github.com/anthropics/claude-code/tree/main/plugins/commit-commands) - 本技能靈感來源
+- [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hant/)
+- [GitHub CLI 文件](https://cli.github.com/manual/)
+- [pr-review-release 技能](../pr-review-release/SKILL.md) - PR 審查後的下一步
+- [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（必須）
