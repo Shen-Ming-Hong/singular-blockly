@@ -3,7 +3,7 @@ name: pr-review-release
 description: PR Code Review 評估與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。包含評估 Copilot/人工 review 建議、程式碼修正、Git 合併、語意化版本更新、CHANGELOG、打包發布的完整工作流程。PR review evaluation and release workflow for processing code review comments, merging PRs, semantic versioning, and publishing releases.
 metadata:
     author: singular-blockly
-    version: '1.2.0'
+    version: '1.3.0'
     category: release
 license: Apache-2.0
 ---
@@ -106,14 +106,43 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     npm run lint
     ```
 
-3. **程式碼簡化（推薦）Code Simplification (Recommended)**
+### Phase 3: 程式碼簡化（必須）Code Simplification (REQUIRED)
 
-    修正 Code Review 建議後，建議使用 `code-simplifier` 技能進一步優化程式碼。
-    After addressing review feedback, consider using `code-simplifier` skill for further optimization.
+**⚠️ 阻塞型步驟：此步驟必須完成才能進入 Git 操作階段。**
 
-    > 💡 **提示**：如有使用 Agent，可輸入「簡化程式碼」或「refactor」觸發技能。
+修正 Code Review 建議後，**必須**使用 `code-simplifier` 技能進行程式碼簡化：
 
-### Phase 3: Git 操作 Git Operations
+1. **執行程式碼簡化檢查**
+
+    ```bash
+    # 取得本次變更的檔案
+    git diff --name-only origin/master | grep -E '\.(ts|js)$'
+    ```
+
+2. **強制簡化流程**
+    - 閱讀 `code-simplifier` 技能文件
+    - 對所有變更的 TypeScript/JavaScript 檔案執行簡化
+    - 確保遵循專案的 coding standards
+
+3. **簡化完成標準**
+    - [ ] 減少不必要的巢狀結構
+    - [ ] 移除冗餘程式碼和抽象
+    - [ ] 變數和函式命名清晰
+    - [ ] 無描述顯而易見程式碼的註解
+    - [ ] 測試通過且功能不變
+
+4. **提交簡化變更**
+
+    ```bash
+    git add .
+    git commit -m "refactor: simplify code before release"
+    ```
+
+> 💡 **Agent 整合**：輸入「簡化程式碼」、「refactor」或 `@code-simplifier` 觸發技能。
+
+> ❌ **禁止跳過**：未完成程式碼簡化不得進入 Phase 4。
+
+### Phase 4: Git 操作 Git Operations
 
 1. **提交變更**（若有修正）
 
@@ -168,11 +197,11 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     git worktree remove path/to/worktree
     ```
 
-### Phase 4: 發布流程 Release Process
+### Phase 5: 發布流程 Release Process
 
 按照專案憲法（constitution.md）或發布規範執行：
 
-#### 4.1 版本管理 Version Management
+#### 5.1 版本管理 Version Management
 
 1. **決定版本號**（遵循語意化版本）
     - `patch`: Bug 修復、小改進 (0.0.X)
@@ -196,7 +225,7 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     git commit -m "chore(release): 發布版本 {VERSION}"
     ```
 
-#### 4.2 品質驗證 Quality Verification
+#### 5.2 品質驗證 Quality Verification
 
 ```bash
 # 完整測試
@@ -209,7 +238,7 @@ npm run lint
 npm run compile
 ```
 
-#### 4.3 建置與打包 Build & Package
+#### 5.3 建置與打包 Build & Package
 
 ```bash
 # 生產建置
@@ -219,7 +248,7 @@ npm run package
 npx @vscode/vsce package
 ```
 
-#### 4.4 Git 標籤 Git Tagging
+#### 5.4 Git 標籤 Git Tagging
 
 **⚠️ 重要：所有版本標籤必須使用 Annotated Tags（`-a` 參數）**
 
@@ -243,7 +272,7 @@ git cat-file -t v{VERSION}
 git tag v{VERSION}  # 缺少 -a 參數，會建立 lightweight tag
 ```
 
-#### 4.5 GitHub Release（必要步驟 REQUIRED）
+#### 5.5 GitHub Release（必要步驟 REQUIRED）
 
 **⚠️ 重要：此步驟不可省略！Git tag 不等於 GitHub Release。**
 
@@ -284,7 +313,7 @@ gh release view v{VERSION} --web
 gh release edit v{VERSION} -F release-notes.md
 ```
 
-#### 4.6 清理 Cleanup
+#### 5.6 清理 Cleanup
 
 ```bash
 # 驗證發布連結可存取
@@ -305,6 +334,17 @@ gh release view v{VERSION} --web
 - [ ] 評估每條建議並記錄理由
 - [ ] 完成採納建議的程式碼修正
 - [ ] 測試通過
+
+### 程式碼簡化階段（阻塞型）
+
+- [ ] 已識別所有變更的 TS/JS 檔案
+- [ ] 已執行 code-simplifier 技能
+- [ ] 無不必要的巢狀結構
+- [ ] 無冗餘程式碼和抽象
+- [ ] 變數和函式命名清晰
+- [ ] 無描述顯而易見程式碼的註解
+- [ ] 測試通過且功能不變
+- [ ] 簡化變更已提交
 
 ### Git 操作階段
 

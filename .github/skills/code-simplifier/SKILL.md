@@ -3,8 +3,9 @@ name: code-simplifier
 description: 程式碼簡化與重構工作流程。當使用者提到簡化程式碼、清理 PR、重構、程式碼優化、code cleanup、refactor、simplify code、clean up complex code 時自動啟用。靈感來源於 Anthropic Claude Code 團隊內部使用的 code-simplifier agent。A code simplification and refactoring workflow. Inspired by the official code-simplifier agent used internally by the Claude Code team at Anthropic.
 metadata:
     author: singular-blockly
-    version: '1.0.0'
+    version: '1.1.0'
     category: code-quality
+    type: blocking
     inspired-by: anthropics/claude-plugins-official/code-simplifier
 ---
 
@@ -12,6 +13,14 @@ metadata:
 
 簡化與精煉程式碼以提升清晰度、一致性和可維護性，同時完整保留原有功能。
 Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality.
+
+> **⚠️ 阻塞型技能 BLOCKING SKILL**
+>
+> 此技能是 PR 發布流程中的**必須步驟**，非可選的建議型。
+> 在 `pr-review-release` 流程中，必須完成此技能才能進入 Git 操作階段。
+>
+> This skill is a **REQUIRED step** in the PR release workflow, not an optional suggestion.
+> In `pr-review-release` workflow, this skill must be completed before proceeding to Git operations.
 
 ## 核心原則 Core Principles
 
