@@ -257,9 +257,7 @@ except Exception as e:
 		// Windows PowerShell 需要使用 & 運算符執行帶路徑的命令
 		// macOS/Linux 直接執行即可
 		if (this.terminal) {
-			const command = isWindows
-				? `& "${pythonPath}" "${scriptFile}"`
-				: `"${pythonPath}" "${scriptFile}"`;
+			const command = isWindows ? `& "${pythonPath}" "${scriptFile}"` : `"${pythonPath}" "${scriptFile}"`;
 			this.terminal.sendText(command, true);
 		}
 
