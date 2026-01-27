@@ -398,12 +398,14 @@ Explore real-world projects built with Singular Blockly:
 - Joystick value mapping to custom range
 - Local button state detection (K1-K4)
 
-**🆕 Output Monitor (v0.60.0+)**
+**🆕 Serial Monitor (v0.60.0+)**
 
-- Real-time `print()` output viewing in VS Code terminal
-- Auto device detection (no manual COM port selection)
-- Auto-close before upload to release COM port
-- Monitor button only shows when CyberBrick is selected
+- Real-time serial output viewing in VS Code terminal
+- **Arduino boards**: Uses `pio device monitor` with auto baud rate detection from `platformio.ini`
+- **CyberBrick**: Uses `mpremote` for MicroPython `print()` output
+- Auto-close before upload to release COM port, auto-restart after success
+- ESP32 boards auto-enable exception decoder for crash analysis
+- Monitor button shows for all board types
 
 **Built-in MicroPython Generators**
 

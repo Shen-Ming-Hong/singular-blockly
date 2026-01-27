@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.61.0] - 2026-01-27
+
+### 新增功能 Added
+
+- **Arduino Serial Monitor 整合** (Arduino Serial Monitor Integration)
+    - 新增 Monitor 按鈕：對所有 Arduino 開發板顯示，使用 PlatformIO CLI 的 `pio device monitor` 命令
+      New Monitor button: Shows for all Arduino boards, using PlatformIO CLI's `pio device monitor` command
+    - 自動 Baud Rate 偵測：從 `platformio.ini` 讀取 `monitor_speed`，預設 9600（與積木生成的 `Serial.begin(9600)` 一致）
+      Auto baud rate detection: Reads `monitor_speed` from `platformio.ini`, defaults to 9600 (matches block-generated `Serial.begin(9600)`)
+    - ESP32 Exception Decoder：ESP32/Super Mini 開發板自動啟用崩潰訊息解碼
+      ESP32 exception decoder: Auto-enabled for ESP32/Super Mini boards for crash analysis
+    - 上傳整合：上傳時自動停止 Monitor，上傳成功後自動重啟
+      Upload integration: Auto-stop Monitor before upload, auto-restart after success
+    - UI 統一：Monitor 按鈕對所有開發板顯示，與 CyberBrick 體驗一致
+      Unified UI: Monitor button shows for all boards, consistent with CyberBrick experience
+
 ## [0.60.0] - 2026-01-27
 
 ### 新增功能 Added
