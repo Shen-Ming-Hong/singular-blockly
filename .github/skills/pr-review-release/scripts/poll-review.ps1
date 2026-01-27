@@ -50,21 +50,25 @@ if ($PrNumber -eq 0) {
     }
 }
 
-Write-Host "🔍 監聽 PR #$PrNumber 的 Copilot Code Review 狀態" -ForegroundColor Cyan
+Write-Host "🔍 監聯 PR #$PrNumber 的 Copilot Code Review 狀態" -ForegroundColor Cyan
 Write-Host "   逾時: $TimeoutMinutes 分鐘 | 間隔: $PollIntervalSeconds 秒" -ForegroundColor Gray
 Write-Host ("-" * 50)
 
 $startTime = Get-Date
-$copilotLogin = "copilot-pull-request-reviewer"
+# Copilot reviewer 可能以不同的 login 出現
+$copilotLogins = @("copilot-pull-request-reviewer", "Copilot")
 
 function Get-CopilotReviewState {
     param([int]$pr)
     
-    $jqQuery = ".reviews | map(select(.author.login == `"$copilotLogin`")) | last"
-    $review = gh pr view $pr --json reviews --jq $jqQuery 2>$null
-    
-    if ($review -and $review -ne "null") {
-        return $review | ConvertFrom-Json
+    # 嘗試所有可能的 Copilot login
+    foreach ($login in $copilotLogins) {
+        $jqQuery = ".reviews | map(select(.author.login == `"$login`")) | last"
+        $review = gh pr view $pr --json reviews --jq $jqQuery 2>$null
+        
+        if ($review -and $review -ne "null") {
+            return $review | ConvertFrom-Json
+        }
     }
     return $null
 }
@@ -72,12 +76,14 @@ function Get-CopilotReviewState {
 function Get-CopilotReviewComments {
     param([int]$pr)
     
-    # 取得 review threads（包含 line comments）
-    $jqQuery = ".reviews | map(select(.author.login == `"$copilotLogin`"))"
-    $reviews = gh pr view $pr --json reviews --jq $jqQuery 2>$null
-    
-    if ($reviews -and $reviews -ne "[]") {
-        return $reviews
+    # 取得 review threads（包含 line comments）- 嘗試所有可能的 login
+    foreach ($login in $copilotLogins) {
+        $jqQuery = ".reviews | map(select(.author.login == `"$login`"))"
+        $reviews = gh pr view $pr --json reviews --jq $jqQuery 2>$null
+        
+        if ($reviews -and $reviews -ne "[]") {
+            return $reviews
+        }
     }
     return "[]"
 }
@@ -136,7 +142,29 @@ while ($true) {
                 exit 1
             }
             "COMMENTED" {
-                Write-Host "💬 [$timestamp] Copilot 已留言，等待最終決定... (已等待 ${elapsedMinutes}m)" -ForegroundColor Yellow
+                # Copilot Code Review 完成後狀態通常為 COMMENTED（而非 APPROVED）
+                Write-Host "`n💬 [$timestamp] Copilot Code Review 已完成 PR #$PrNumber" -ForegroundColor Green
+                
+                # 輸出完整 review 資訊
+                Write-Host "`n📋 Review 詳情:" -ForegroundColor Cyan
+                $comments = Get-CopilotReviewComments -pr $PrNumber
+                Write-Host $comments
+                
+                # 嘗試取得 line comments（使用 API 搭配 jq 過濾）
+                Write-Host "`n📝 Line Comments:" -ForegroundColor Yellow
+                try {
+                    $jqFilter = '.[] | select(.user.login == "Copilot" or .user.login == "copilot-pull-request-reviewer") | {path: .path, line: .line, body: .body}'
+                    $lineComments = gh api "repos/{owner}/{repo}/pulls/$PrNumber/comments" --jq $jqFilter 2>$null
+                    if ($lineComments) {
+                        Write-Host $lineComments
+                    } else {
+                        Write-Host "(無 line comments)" -ForegroundColor Gray
+                    }
+                } catch {
+                    Write-Host "(無法取得 line comments)" -ForegroundColor Gray
+                }
+                
+                exit 0
             }
             "PENDING" {
                 Write-Host "⏳ [$timestamp] Copilot Review 進行中... (已等待 ${elapsedMinutes}m)" -ForegroundColor Gray
