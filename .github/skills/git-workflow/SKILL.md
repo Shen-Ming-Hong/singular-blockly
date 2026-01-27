@@ -1,9 +1,9 @@
 ---
 name: git-workflow
-description: Git 工作流程自動化技能。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。包含自動生成 Conventional Commits 格式訊息、一鍵建立 PR 等功能。靈感來源於 Anthropic 官方 commit-commands plugin。Automates Git workflow including commit message generation, branch push, and PR creation. Inspired by Anthropic's official commit-commands plugin.
+description: Git 工作流程自動化技能，涵蓋從 commit 到發布的完整流程。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。包含自動生成 Conventional Commits 格式訊息、建立 PR、等待 Code Review、觸發發布流程等功能。Automates Git workflow from commit to release. Inspired by Anthropic's official commit-commands plugin.
 metadata:
     author: singular-blockly
-    version: '1.2.0'
+    version: '1.3.0'
     category: productivity
     inspired-by: anthropics/claude-code/plugins/commit-commands
 license: Apache-2.0
@@ -16,8 +16,8 @@ Automates Git operations during development, from commit to PR creation.
 
 ## 核心原則 Core Principles
 
-> **與 SDD 整合**：此技能處理「開發完成到 PR 建立」階段，PR 審查後的操作由 `pr-review-release` 技能處理。
-> **SDD Integration**: This skill handles "development complete to PR creation" phase. Post-review operations are handled by `pr-review-release` skill.
+> **端到端整合**：此技能現在涵蓋從「開發完成」到「版本發布」的完整流程。PR 建立後自動觸發 `pr-review-release` 技能，確保流程不中斷。
+> **End-to-End Integration**: This skill now covers the complete flow from "development complete" to "version release". After PR creation, it automatically triggers `pr-review-release` skill to ensure uninterrupted workflow.
 
 ## 適用情境 When to Use
 
@@ -30,7 +30,8 @@ Automates Git operations during development, from commit to PR creation.
 | 階段             | 技能                      | 說明                                   |
 | ---------------- | ------------------------- | -------------------------------------- |
 | 開發中 → PR 建立 | **git-workflow** (本技能) | commit, push, 建立 PR                  |
-| PR 審查後 → 發布 | `pr-review-release`       | 評估 review, merge, 清理分支, 版本發布 |
+| PR 建立 → 發布 | **git-workflow** + `pr-review-release` | 本技能強制觸發 pr-review-release |
+| 程式碼簡化       | `code-simplifier`         | PR 前必須執行（阻塞型）             |
 
 ---
 
@@ -320,9 +321,9 @@ Review 監聽完成後，**強制**進入 `pr-review-release` 技能的完整流
     git commit -m "feat(blocks): [T025] implement esp32_wifi_connect block"
     ```
 
-3. **開發完成**：使用本技能建立 PR
+3. **開發完成**：使用本技能建立 PR（自動觸發 Review 監聽）
 
-4. **Review 後**：使用 `pr-review-release` 技能處理 merge 和發布
+4. **Review 完成**：本技能自動執行 `pr-review-release` 處理 merge 和發布
 
 ### Commit Message 與 Task 關聯
 
@@ -388,8 +389,20 @@ gh pr create --fill --base master
 ### PR 建立後 After PR Creation
 
 - [ ] CI 檢查通過
-- [ ] 等待 Code Review
-- [ ] **→ Review 完成後使用 `pr-review-release` 技能**
+- [ ] 已請求 Copilot Code Review
+- [ ] Review 監聽腳本已啟動
+- [ ] **→ Review 完成後自動執行 `pr-review-release` 技能**
+
+### 發布階段 Release Phase
+
+- [ ] Review 建議已評估處理
+- [ ] 程式碼修正已完成（如需）
+- [ ] 程式碼簡化已完成（阻塞型）
+- [ ] PR 已 Squash Merge
+- [ ] 版本號已更新
+- [ ] CHANGELOG 已更新
+- [ ] Git Tag 已建立
+- [ ] GitHub Release 已建立
 
 ---
 
