@@ -24,6 +24,49 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 
 ## 工作流程 Workflow
 
+### Phase 0: 等待 Copilot Review（可選）Wait for Copilot Review (Optional)
+
+若 PR 已配置 Copilot 作為 Reviewer 且尚未完成 review，可使用輪詢腳本等待：
+
+1. **啟動輪詢監聽**
+
+    ```powershell
+    # 使用背景模式執行（Agent 可用 await_terminal 等待結果）
+    .\.github\skills\pr-review-release\scripts\poll-review.ps1
+
+    # 自訂參數
+    .\.github\skills\pr-review-release\scripts\poll-review.ps1 -PrNumber 123 -TimeoutMinutes 60 -PollIntervalSeconds 30
+    ```
+
+2. **腳本行為說明**
+    - 每 60 秒查詢一次 `copilot-pull-request-reviewer` 的 review 狀態
+    - 狀態為 `APPROVED` 時：exit 0，輸出 review 詳情
+    - 狀態為 `CHANGES_REQUESTED` 時：exit 1，輸出需修改的內容
+    - 逾時（預設 30 分鐘）：exit 2
+
+3. **Agent 整合用法**
+
+    ```typescript
+    // 背景執行
+    run_in_terminal({
+    	command: '.\.github\skills\pr-review-release\scripts\poll-review.ps1',
+    	isBackground: true,
+    	goal: '等待 Copilot Code Review',
+    });
+
+    // 等待結果（逾時 30 分鐘）
+    await_terminal({ id: terminalId, timeout: 1800000 });
+    ```
+
+4. **手動查詢 Copilot Review 狀態**
+
+    ```bash
+    # 查詢最新 Copilot review
+    gh pr view --json reviews --jq '.reviews | map(select(.author.login == "copilot-pull-request-reviewer")) | last'
+    ```
+
+---
+
 ### Phase 1: Code Review 評估 Review Evaluation
 
 1. **讀取 PR Review 評論**
@@ -240,6 +283,7 @@ gh release view v{VERSION} --web
 ```bash
 gh release edit v{VERSION} -F release-notes.md
 ```
+
 #### 4.6 清理 Cleanup
 
 ```bash
@@ -248,6 +292,12 @@ gh release view v{VERSION} --web
 ```
 
 ## 檢查清單 Checklist
+
+### 等待 Review 階段（可選）
+
+- [ ] 確認 PR 已配置 Copilot Reviewer
+- [ ] 執行輪詢腳本等待 review 完成
+- [ ] Review 狀態已確認（APPROVED / CHANGES_REQUESTED）
 
 ### Code Review 階段
 
