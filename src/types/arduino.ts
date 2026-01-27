@@ -177,8 +177,12 @@ export function getBoardLanguage(board: string): BoardLanguage | undefined {
 export type MonitorErrorCode =
 	| 'DEVICE_NOT_FOUND' // 找不到 CyberBrick 裝置
 	| 'MPREMOTE_NOT_INSTALLED' // mpremote 工具未安裝
+	| 'PORT_NOT_FOUND' // 找不到裝置 (Arduino)
 	| 'PORT_IN_USE' // COM 埠被佔用
-	| 'CONNECTION_FAILED'; // 連接失敗
+	| 'PIO_NOT_FOUND' // PlatformIO CLI 未安裝
+	| 'UPLOAD_IN_PROGRESS' // 正在上傳中
+	| 'CONNECTION_FAILED' // 連接失敗
+	| 'UNKNOWN'; // 未知錯誤
 
 /**
  * Monitor 錯誤介面
@@ -210,4 +214,42 @@ export interface SerialMonitorState {
 	isRunning: boolean;
 	/** 當前連接的 COM 埠 */
 	port: string | null;
+}
+
+// ===== Arduino Serial Monitor Types =====
+
+/**
+ * Arduino Monitor 停止原因
+ */
+export type MonitorStopReason =
+	| 'user_closed' // 用戶手動關閉終端機
+	| 'upload_started' // 因程式上傳而關閉
+	| 'device_disconnected' // 裝置連線中斷
+	| 'manual_stop'; // 用戶點擊 Monitor 按鈕關閉
+
+/**
+ * Arduino Monitor 配置
+ */
+export interface ArduinoMonitorConfig {
+	/** 通訊速率 (預設: 115200) */
+	baudRate: number;
+	/** 指定連接埠 (預設: 自動偵測) */
+	port?: string;
+	/** 是否使用 ESP32 崩潰解碼器 (ESP32 系列自動啟用) */
+	useExceptionDecoder?: boolean;
+}
+
+/**
+ * ESP32 系列開發板清單
+ * 用於判斷是否啟用 exception decoder
+ */
+export const ESP32_BOARDS: string[] = ['esp32', 'supermini'];
+
+/**
+ * 判斷是否為 ESP32 系列開發板
+ * @param board 開發板類型
+ * @returns 是否為 ESP32 系列
+ */
+export function isEsp32Board(board: string): boolean {
+	return ESP32_BOARDS.includes(board);
 }

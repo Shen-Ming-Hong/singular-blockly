@@ -20,8 +20,8 @@
 
 **Purpose**: 專案結構確認與分支建立
 
-- [ ] T001 確認功能分支 `038-arduino-serial-monitor` 已建立
-- [ ] T002 確認 PlatformIO CLI 可用 (`pio --version`)
+- [x] T001 確認功能分支 `038-arduino-serial-monitor` 已建立
+- [x] T002 確認 PlatformIO CLI 可用 (`pio --version`)
 
 ---
 
@@ -31,7 +31,7 @@
 
 **⚠️ CRITICAL**: 此階段完成前，無法開始任何 User Story
 
-- [ ] T003 新增類型定義於 `src/types/arduino.ts`：
+- [x] T003 新增類型定義於 `src/types/arduino.ts`：
     - `ArduinoMonitorConfig` 介面
     - `MonitorStartResult` 介面
     - `MonitorError` 介面
@@ -39,12 +39,12 @@
     - `MonitorStopReason` 類型
     - `ESP32_BOARDS` 常數陣列
     - `isEsp32Board()` 函式
-- [ ] T004 [P] 建立 `ArduinoMonitorService` 骨架於 `src/services/arduinoMonitorService.ts`：
+- [x] T004 [P] 建立 `ArduinoMonitorService` 骨架於 `src/services/arduinoMonitorService.ts`：
     - 實作 `IArduinoMonitorService` 介面
     - 加入類別成員：`terminal`, `isRunningFlag`, `currentPort`, `wasRunningBeforeUpload`, `onStoppedCallback`
-    - 建構函式中註冊 `vscode.window.onDidCloseTerminal` 監聽
+    - 建構函式中註冊 `vscode.window.onDidCloseTerminal` 監聯
     - 實作 `dispose()` 方法
-- [ ] T005 [P] 更新服務匯出於 `src/services/index.ts`：匯出 `ArduinoMonitorService`
+- [x] T005 [P] 更新服務匯出於 `src/services/index.ts`：匯出 `ArduinoMonitorService`（直接在 messageHandler.ts 匯入）
 
 **Checkpoint**: 基礎架構就緒，可開始 User Story 實作
 
@@ -58,22 +58,22 @@
 
 ### Implementation for User Story 1+2
 
-- [ ] T006 [US1] 實作 `start()` 方法於 `src/services/arduinoMonitorService.ts`：
+- [x] T006 [US1] 實作 `start()` 方法於 `src/services/arduinoMonitorService.ts`：
     - 檢查 `isRunningFlag` 避免重複啟動
     - 建構 `pio device monitor` 命令
     - 使用 `vscode.window.createTerminal()` 建立終端機
     - 設定 `isRunningFlag = true`
     - 回傳 `MonitorStartResult`
-- [ ] T007 [US2] 實作 `stop()` 方法於 `src/services/arduinoMonitorService.ts`：
+- [x] T007 [US2] 實作 `stop()` 方法於 `src/services/arduinoMonitorService.ts`：
     - 呼叫 `terminal.dispose()` 關閉終端機
     - 設定 `isRunningFlag = false`
     - 清空 `currentPort`
-- [ ] T008 [US1] 實作 `handleTerminalClosed()` 方法於 `src/services/arduinoMonitorService.ts`：
+- [x] T008 [US1] 實作 `handleTerminalClosed()` 方法於 `src/services/arduinoMonitorService.ts`：
     - 同步 `isRunningFlag` 狀態
     - 觸發 `onStoppedCallback` 回調
-- [ ] T009 [US1] 實作 `isRunning()` 和 `getCurrentPort()` getter 於 `src/services/arduinoMonitorService.ts`
-- [ ] T010 [US1] 實作 `onStopped()` 回調註冊於 `src/services/arduinoMonitorService.ts`
-- [ ] T011 [US1] 更新 `messageHandler.ts` 加入 Arduino Monitor 路由：
+- [x] T009 [US1] 實作 `isRunning()` 和 `getCurrentPort()` getter 於 `src/services/arduinoMonitorService.ts`
+- [x] T010 [US1] 實作 `onStopped()` 回調註冊於 `src/services/arduinoMonitorService.ts`
+- [x] T011 [US1] 更新 `messageHandler.ts` 加入 Arduino Monitor 路由：
     - 在 `WebViewMessageHandler` 類別加入 `arduinoMonitorService` 成員
     - 修改 `handleStartMonitor()` 依 `getBoardLanguage()` 路由
     - 修改 `handleStopMonitor()` 依板子語言路由
@@ -91,14 +91,16 @@
 
 ### Implementation for User Story 3
 
-- [ ] T012 [US3] 實作 `stopForUpload()` 方法於 `src/services/arduinoMonitorService.ts`：
+- [x] T012 [US3] 實作 `stopForUpload()` 方法於 `src/services/arduinoMonitorService.ts`：
     - 記錄 `wasRunningBeforeUpload = isRunningFlag`
     - 若正在運行則呼叫 `stop()`
-- [ ] T013 [US3] 實作 `restartAfterUpload()` 方法於 `src/services/arduinoMonitorService.ts`：
+- [x] T013 [US3] 實作 `restartAfterUpload()` 方法於 `src/services/arduinoMonitorService.ts`：
     - 檢查 `wasRunningBeforeUpload`
     - 若為 true 則呼叫 `start()`
     - 重置 `wasRunningBeforeUpload = false`
-- [ ] T014 [US3] 修改 `ArduinoUploader.upload()` 於 `src/services/arduinoUploader.ts`：
+- [x] T014 [US3] 修改 `messageHandler.ts` 中的 `handleArduinoUpload()` 方法：
+    - 上傳前呼叫 `arduinoMonitorService.stopForUpload()`
+    - 上傳成功後呼叫 `arduinoMonitorService.restartAfterUpload()`（在 messageHandler.ts 處理）
     - 透過建構函式注入 `ArduinoMonitorService` 實例（與 SerialMonitorService 相同模式）
     - 上傳前呼叫 `arduinoMonitorService.stopForUpload()`
     - 上傳成功後呼叫 `arduinoMonitorService.restartAfterUpload(board, workspacePath)`
@@ -116,12 +118,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T015 [US4] 實作 `getBaudRate()` 私有方法於 `src/services/arduinoMonitorService.ts`：
+- [x] T015 [US4] 實作 `getBaudRate()` 私有方法於 `src/services/arduinoMonitorService.ts`：
     - 讀取 `platformio.ini` 檔案
     - 使用正則表達式解析 `monitor_speed = (\d+)`
     - 解析失敗時回傳預設值 115200
     - 加入 `log()` 記錄實際使用的 baud rate
-- [ ] T016 [US4] 修改 `start()` 方法整合 `getBaudRate()`：
+- [x] T016 [US4] 修改 `start()` 方法整合 `getBaudRate()`：
     - 呼叫 `getBaudRate(workspacePath)` 取得速率
     - 將 `--baud` 參數加入命令
 
@@ -137,7 +139,7 @@
 
 ### Implementation for User Story 5
 
-- [ ] T017 [US5] 修改 `start()` 方法加入 ESP32 判斷於 `src/services/arduinoMonitorService.ts`：
+- [x] T017 [US5] 修改 `start()` 方法加入 ESP32 判斷於 `src/services/arduinoMonitorService.ts`：
     - 使用 `isEsp32Board(board)` 判斷
     - 若為 ESP32 系列，加入 `--filter esp32_exception_decoder` 參數
     - 加入 `log()` 記錄是否啟用 decoder
@@ -154,11 +156,11 @@
 
 ### Implementation for User Story 6
 
-- [ ] T018 [US6] 修改 `updateMonitorButtonVisibility()` 於 `media/js/blocklyEdit.js`：
+- [x] T018 [US6] 修改 `updateMonitorButtonVisibility()` 於 `media/js/blocklyEdit.js`：
     - 移除僅對 CyberBrick 顯示的限制
     - 對所有有效開發板顯示 Monitor 按鈕
     - 加入 `log.info()` 記錄按鈕可見性狀態
-- [ ] T019 [P] [US6] 確認 Monitor 按鈕使用現有 i18n 鍵值：
+- [x] T019 [P] [US6] 確認 Monitor 按鈕使用現有 i18n 鍵值：
     - 驗證 `MONITOR_OPEN` / `MONITOR_CLOSE` 等鍵值可複用
     - 執行 `npm run validate:i18n` 確認無缺失翻譯
 
@@ -170,20 +172,20 @@
 
 **Purpose**: 單元測試與最終驗證
 
-- [ ] T020 [P] 建立測試檔案 `src/test/suite/arduinoMonitorService.test.ts`：
+- [x] T020 [P] 建立測試檔案 `src/test/suite/arduinoMonitorService.test.ts`：
     - 測試 `start()` 方法建立終端機
     - 測試 `stop()` 方法關閉終端機並重置狀態
     - 測試 `stopForUpload()` 記錄先前狀態
     - 測試 `restartAfterUpload()` 條件性重啟
     - 測試 `getBaudRate()` 解析 platformio.ini
     - 測試 `isEsp32Board()` 判斷邏輯
-- [ ] T021 [P] 測試 `messageHandler.ts` 路由邏輯：
+- [x] T021 [P] 測試 `messageHandler.ts` 路由邏輯：
     - 測試 Arduino 板子路由到 ArduinoMonitorService
     - 測試 MicroPython 板子路由到 SerialMonitorService
-- [ ] T022 執行完整測試套件：`npm test`
-- [ ] T023 執行 i18n 驗證：`npm run validate:i18n`
-- [ ] T024 手動測試：依照 `quickstart.md` 驗證所有測試檢查項目
-- [ ] T025 程式碼清理與重構（如有需要）
+- [x] T022 執行完整測試套件：`npm test` - 442 tests passing
+- [x] T023 執行 i18n 驗證：`npm run validate:i18n` - All 14 languages PASS
+- [x] T024 手動測試：依照 `quickstart.md` 驗證所有測試檢查項目 ✅
+- [x] T025 程式碼清理與重構（如有需要）- ESLint PASS
 
 **Checkpoint**: 所有測試通過，功能驗證完成
 

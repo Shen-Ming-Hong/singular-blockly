@@ -3864,15 +3864,23 @@ function initMonitorButton() {
 
 /**
  * 根據板子類型顯示/隱藏 Monitor 按鈕
+ * Monitor 對所有有效開發板（Arduino + MicroPython）都可用
  */
 function updateMonitorButtonVisibility() {
 	const monitorContainer = document.getElementById('monitorContainer');
 	if (!monitorContainer) return;
 
 	const currentBoard = window.currentBoard || 'none';
-	const isCyberBrick = currentBoard === 'cyberbrick';
 
-	monitorContainer.style.display = isCyberBrick ? 'flex' : 'none';
+	// 對所有有效開發板顯示 Monitor 按鈕（不只是 CyberBrick）
+	const shouldShow = currentBoard !== 'none';
+
+	monitorContainer.style.display = shouldShow ? 'flex' : 'none';
+
+	log.info('[Monitor] Button visibility updated:', {
+		board: currentBoard,
+		visible: shouldShow,
+	});
 }
 
 /**

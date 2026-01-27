@@ -12,8 +12,9 @@ import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
-import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage } from '../types/arduino';
+import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStopReason } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
+import { ArduinoMonitorService } from '../services/arduinoMonitorService';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -58,6 +59,7 @@ export class WebViewMessageHandler {
 	private fileService: FileService;
 	private settingsManager: SettingsManager;
 	private serialMonitorService: SerialMonitorService | null = null;
+	private arduinoMonitorService: ArduinoMonitorService | null = null;
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -100,6 +102,15 @@ export class WebViewMessageHandler {
 			// 初始化 Serial Monitor 服務
 			this.serialMonitorService = new SerialMonitorService(workspaceRoot);
 			this.serialMonitorService.onStopped(reason => {
+				this.panel.webview.postMessage({
+					command: 'monitorStopped',
+					reason,
+				});
+			});
+
+			// 初始化 Arduino Monitor 服務
+			this.arduinoMonitorService = new ArduinoMonitorService(workspaceRoot);
+			this.arduinoMonitorService.onStopped(reason => {
 				this.panel.webview.postMessage({
 					command: 'monitorStopped',
 					reason,
@@ -1288,6 +1299,9 @@ export class WebViewMessageHandler {
 		if (this.serialMonitorService?.isRunning()) {
 			await this.serialMonitorService.stopForUpload();
 		}
+		if (this.arduinoMonitorService?.isRunning()) {
+			await this.arduinoMonitorService.stopForUpload();
+		}
 
 		// 根據板子語言類型路由到對應的上傳服務
 		if (boardLanguage === 'micropython') {
@@ -1375,6 +1389,11 @@ export class WebViewMessageHandler {
 					error: progress.error,
 				});
 			});
+
+			// 上傳成功後，根據先前狀態重啟 Arduino Monitor
+			if (result.success && this.arduinoMonitorService) {
+				await this.arduinoMonitorService.restartAfterUpload(message.board, workspaceRoot);
+			}
 
 			// 轉換 Arduino 結果格式為通用格式
 			this.sendUploadResult({
@@ -1479,47 +1498,83 @@ export class WebViewMessageHandler {
 
 	/**
 	 * 處理啟動 Monitor 請求
+	 * 根據開發板語言路由到對應的 Monitor 服務
 	 * @param message 啟動訊息
 	 */
 	private async handleStartMonitor(message: { board: string }): Promise<void> {
-		if (message.board !== 'cyberbrick') {
-			log('[blockly] Monitor 僅支援 CyberBrick', 'warn');
-			return;
-		}
+		const board = message.board;
+		const language = getBoardLanguage(board);
 
-		if (!this.serialMonitorService) {
-			log('[blockly] SerialMonitorService 未初始化', 'error');
-			return;
-		}
+		if (language === 'micropython') {
+			// MicroPython 上傳流程（CyberBrick）
+			if (!this.serialMonitorService) {
+				log('[blockly] SerialMonitorService 未初始化', 'error');
+				return;
+			}
 
-		const result = await this.serialMonitorService.start();
+			const result = await this.serialMonitorService.start();
 
-		if (result.success) {
-			this.panel.webview.postMessage({
-				command: 'monitorStarted',
-				port: result.port,
-			});
+			if (result.success) {
+				this.panel.webview.postMessage({
+					command: 'monitorStarted',
+					port: result.port,
+				});
+			} else {
+				this.panel.webview.postMessage({
+					command: 'monitorError',
+					error: result.error,
+				});
+			}
+		} else if (language === 'arduino') {
+			// Arduino C++ Monitor
+			if (!this.arduinoMonitorService) {
+				log('[blockly] ArduinoMonitorService 未初始化', 'error');
+				return;
+			}
+
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+			if (!workspaceFolders) {
+				log('[blockly] 沒有開啟的工作區', 'error');
+				return;
+			}
+			const workspaceRoot = workspaceFolders[0].uri.fsPath;
+
+			const result = await this.arduinoMonitorService.start(board, workspaceRoot);
+
+			if (result.success) {
+				this.panel.webview.postMessage({
+					command: 'monitorStarted',
+					port: result.port,
+				});
+			} else {
+				this.panel.webview.postMessage({
+					command: 'monitorError',
+					error: result.error,
+				});
+			}
 		} else {
-			this.panel.webview.postMessage({
-				command: 'monitorError',
-				error: result.error,
-			});
+			log('[blockly] Monitor 不支援此開發板', 'warn', { board });
 		}
 	}
 
 	/**
 	 * 處理停止 Monitor 請求
+	 * 會停止所有正在運行的 Monitor 服務
 	 */
 	private async handleStopMonitor(): Promise<void> {
-		if (!this.serialMonitorService) {
-			log('[blockly] SerialMonitorService 未初始化', 'error');
-			return;
+		// 停止 MicroPython Monitor（如果正在運行）
+		if (this.serialMonitorService?.isRunning()) {
+			await this.serialMonitorService.stop();
 		}
 
-		await this.serialMonitorService.stop();
+		// 停止 Arduino Monitor（如果正在運行）
+		if (this.arduinoMonitorService?.isRunning()) {
+			await this.arduinoMonitorService.stop();
+		}
+
 		this.panel.webview.postMessage({
 			command: 'monitorStopped',
-			reason: 'user_closed',
+			reason: 'manual_stop' as MonitorStopReason,
 		});
 	}
 
