@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { log } from './logging';
 import { MicropythonUploader } from './micropythonUploader';
-import { MonitorError, MonitorStartResult } from '../types/arduino';
+import { MonitorStartResult } from '../types/arduino';
 
 /**
  * Serial Monitor 服務
@@ -216,7 +216,7 @@ try:
     s.write(b'\\x04')
     
     print(f"Connected to {port}")
-    print("Press Ctrl+C to stop, Ctrl+D to restart program")
+    print("Ctrl+C sends interrupt to device, close terminal to stop monitor")
     print("-" * 40)
     sys.stdout.flush()
     
@@ -233,10 +233,11 @@ try:
                 except:
                     pass
         except KeyboardInterrupt:
-            # 使用者按 Ctrl+C
+            # 使用者按 Ctrl+C - 傳送中斷指令到裝置
             s.write(b'\\x03')
             time.sleep(0.1)
-            # 檢查是否按了兩次（快速連按）
+            print("\\n[Interrupt sent to device]")
+            sys.stdout.flush()
             continue
         except Exception as e:
             print(f"\\nError: {e}")
@@ -253,8 +254,13 @@ except Exception as e:
 		fs.writeFileSync(scriptFile, monitorScript, 'utf8');
 
 		// 在終端機執行 Python 腳本
+		// Windows PowerShell 需要使用 & 運算符執行帶路徑的命令
+		// macOS/Linux 直接執行即可
 		if (this.terminal) {
-			this.terminal.sendText(`& "${pythonPath}" "${scriptFile}"`, true);
+			const command = isWindows
+				? `& "${pythonPath}" "${scriptFile}"`
+				: `"${pythonPath}" "${scriptFile}"`;
+			this.terminal.sendText(command, true);
 		}
 
 		log('[blockly] 使用 pyserial 啟動 Monitor', 'info', { port, scriptFile });
