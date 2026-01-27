@@ -21,9 +21,9 @@ Automates Git operations during development, from commit to PR creation.
 
 ## 適用情境 When to Use
 
--   完成功能開發，需要提交程式碼
--   準備建立 Pull Request
--   在 spec 分支（如 `016-esp32-wifi-mqtt`）工作時
+- 完成功能開發，需要提交程式碼
+- 準備建立 Pull Request
+- 在 spec 分支（如 `016-esp32-wifi-mqtt`）工作時
 
 ## 與其他技能的分工 Skill Boundaries
 
@@ -126,9 +126,9 @@ git push
 
 **分支命名規範**（SDD 整合）：
 
--   Spec 分支：`{NNN}-feature-name`（如 `016-esp32-wifi-mqtt`）
--   修復分支：`fix/{issue-number}-description`
--   文件分支：`docs/{description}`
+- Spec 分支：`{NNN}-feature-name`（如 `016-esp32-wifi-mqtt`）
+- 修復分支：`fix/{issue-number}-description`
+- 文件分支：`docs/{description}`
 
 ---
 
@@ -140,6 +140,7 @@ git push
 Before creating a PR, you **must** use the `code-simplifier` skill to check and simplify code.
 
 **為何重要 Why Important**：
+
 - 減少 Code Review 階段的修改建議
 - 提升程式碼可讀性和維護性
 - 確保符合專案程式碼風格
@@ -148,6 +149,7 @@ Before creating a PR, you **must** use the `code-simplifier` skill to check and 
 **執行步驟 Execution Steps**：
 
 1. **識別變更檔案**
+
     ```bash
     # 檢視此分支的所有變更檔案
     git diff master..HEAD --name-only | grep -E '\.(ts|js)$'
@@ -201,28 +203,28 @@ git diff master..HEAD --stat
 
 ## 相關 Spec Related Spec
 
--   Spec: `/specs/{NNN}-feature-name/spec.md`
--   Tasks: `/specs/{NNN}-feature-name/tasks.md`
+- Spec: `/specs/{NNN}-feature-name/spec.md`
+- Tasks: `/specs/{NNN}-feature-name/tasks.md`
 
 ## 變更類型 Type of Change
 
--   [ ] 🐛 Bug 修復 (non-breaking change which fixes an issue)
--   [ ] ✨ 新功能 (non-breaking change which adds functionality)
--   [ ] 💥 破壞性變更 (fix or feature that would cause existing functionality to change)
--   [ ] 📝 文件更新 (documentation only changes)
+- [ ] 🐛 Bug 修復 (non-breaking change which fixes an issue)
+- [ ] ✨ 新功能 (non-breaking change which adds functionality)
+- [ ] 💥 破壞性變更 (fix or feature that would cause existing functionality to change)
+- [ ] 📝 文件更新 (documentation only changes)
 
 ## 變更內容 Changes
 
--   {變更 1}
--   {變更 2}
--   {變更 3}
+- {變更 1}
+- {變更 2}
+- {變更 3}
 
 ## 測試計劃 Test Plan
 
--   [ ] `npm run test` 通過
--   [ ] `npm run lint` 通過
--   [ ] `npm run compile` 成功
--   [ ] 手動測試：{測試項目}
+- [ ] `npm run test` 通過
+- [ ] `npm run lint` 通過
+- [ ] `npm run compile` 成功
+- [ ] 手動測試：{測試項目}
 
 ## 螢幕截圖 Screenshots (if applicable)
 
@@ -311,43 +313,43 @@ gh pr create --fill --base master
 
 ### Commit 前 Before Commit
 
--   [ ] 變更已通過 `npm run lint`
--   [ ] 變更已通過 `npm run test`
--   [ ] 變更已通過 `npm run compile`
--   [ ] Commit message 符合 Conventional Commits 格式
--   [ ] Scope 正確反映變更範圍
+- [ ] 變更已通過 `npm run lint`
+- [ ] 變更已通過 `npm run test`
+- [ ] 變更已通過 `npm run compile`
+- [ ] Commit message 符合 Conventional Commits 格式
+- [ ] Scope 正確反映變更範圍
 
 ### 程式碼簡化階段（阻塞型）Before Code Simplification
 
--   [ ] 已識別所有變更的 TS/JS 檔案
--   [ ] 已執行 code-simplifier 技能
--   [ ] 無不必要的巢狀結構
--   [ ] 無冗餘程式碼和抽象
--   [ ] 變數和函式命名清晰
--   [ ] 無描述顯而易見程式碼的註解
--   [ ] 測試通過且功能不變
--   [ ] 簡化變更已提交並推送
+- [ ] 已識別所有變更的 TS/JS 檔案
+- [ ] 已執行 code-simplifier 技能
+- [ ] 無不必要的巢狀結構
+- [ ] 無冗餘程式碼和抽象
+- [ ] 變數和函式命名清晰
+- [ ] 無描述顯而易見程式碼的註解
+- [ ] 測試通過且功能不變
+- [ ] 簡化變更已提交並推送
 
 ### 建立 PR 前 Before PR Creation
 
--   [ ] **程式碼簡化已完成（必須）**
--   [ ] 分支已推送到遠端
--   [ ] PR 描述清楚說明變更內容
--   [ ] 已關聯相關 Spec（如適用）
--   [ ] 測試計劃已列出
+- [ ] **程式碼簡化已完成（必須）**
+- [ ] 分支已推送到遠端
+- [ ] PR 描述清楚說明變更內容
+- [ ] 已關聯相關 Spec（如適用）
+- [ ] 測試計劃已列出
 
 ### PR 建立後 After PR Creation
 
--   [ ] CI 檢查通過
--   [ ] 等待 Code Review
--   [ ] **→ Review 完成後使用 `pr-review-release` 技能**
+- [ ] CI 檢查通過
+- [ ] 等待 Code Review
+- [ ] **→ Review 完成後使用 `pr-review-release` 技能**
 
 ---
 
 ## 相關資源 Related Resources
 
--   [Anthropic commit-commands plugin](https://github.com/anthropics/claude-code/tree/main/plugins/commit-commands) - 本技能靈感來源
--   [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hant/)
--   [GitHub CLI 文件](https://cli.github.com/manual/)
--   [pr-review-release 技能](../pr-review-release/SKILL.md) - PR 審查後的下一步
--   [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（必須）
+- [Anthropic commit-commands plugin](https://github.com/anthropics/claude-code/tree/main/plugins/commit-commands) - 本技能靈感來源
+- [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hant/)
+- [GitHub CLI 文件](https://cli.github.com/manual/)
+- [pr-review-release 技能](../pr-review-release/SKILL.md) - PR 審查後的下一步
+- [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（必須）

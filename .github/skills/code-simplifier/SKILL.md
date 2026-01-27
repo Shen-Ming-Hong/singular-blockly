@@ -29,18 +29,17 @@ Simplifies and refines code for clarity, consistency, and maintainability while 
 
 ## 適用情境 When to Use
 
--   完成一個長時間的 coding session 後，需要清理程式碼
--   在建立 Pull Request 之前，確保程式碼品質
--   複雜重構完成後，需要統一程式碼風格
--   AI 生成的程式碼需要審查和優化
--   發現程式碼過於複雜或難以維護
+- 完成一個長時間的 coding session 後，需要清理程式碼
+- 在建立 Pull Request 之前，確保程式碼品質
+- 複雜重構完成後，需要統一程式碼風格
+- AI 生成的程式碼需要審查和優化
+- 發現程式碼過於複雜或難以維護
 
 ## 工作流程 Workflow
 
 ### Phase 1: 識別範圍 Identify Scope
 
 1. **確認要簡化的程式碼範圍**
-
     - 預設：只處理最近修改的檔案
     - 可指定：特定檔案、目錄或整個專案
 
@@ -54,7 +53,6 @@ Simplifies and refines code for clarity, consistency, and maintainability while 
 ### Phase 2: 分析程式碼 Analyze Code
 
 1. **遵循專案標準** (Project Standards)
-
     - 閱讀專案的 `CLAUDE.md`、`copilot-instructions.md` 或 `.editorconfig`
     - 遵循已建立的 coding standards 和 patterns
     - 對於本專案，參考 `.github/copilot-instructions.md` 中的規範
@@ -72,20 +70,20 @@ Simplifies and refines code for clarity, consistency, and maintainability while 
 
 #### 1. 保留功能 Preserve Functionality
 
--   永遠不改變程式碼的行為
--   所有原始功能、輸出和副作用必須保持不變
--   如果函式返回特定值、處理特定邊界情況，這些都必須維持
+- 永遠不改變程式碼的行為
+- 所有原始功能、輸出和副作用必須保持不變
+- 如果函式返回特定值、處理特定邊界情況，這些都必須維持
 
 #### 2. 遵循專案標準 Apply Project Standards
 
 對於本專案 (singular-blockly)：
 
--   使用 ES modules 並正確排序 imports
--   頂層函式使用 `function` 關鍵字 (非 arrow functions)
--   為頂層函式加入明確的 return type annotations
--   React 元件使用明確的 Props types
--   正確的錯誤處理模式 (盡量避免 try/catch)
--   一致的命名慣例
+- 使用 ES modules 並正確排序 imports
+- 頂層函式使用 `function` 關鍵字 (非 arrow functions)
+- 為頂層函式加入明確的 return type annotations
+- React 元件使用明確的 Props types
+- 正確的錯誤處理模式 (盡量避免 try/catch)
+- 一致的命名慣例
 
 #### 3. 提升清晰度 Enhance Clarity
 
@@ -105,22 +103,22 @@ if (a && b) {
 }
 ```
 
--   減少不必要的複雜度和巢狀
--   消除冗餘程式碼和抽象
--   透過清晰的變數和函式名稱提升可讀性
--   合併相關邏輯
--   移除描述明顯程式碼的多餘註解
+- 減少不必要的複雜度和巢狀
+- 消除冗餘程式碼和抽象
+- 透過清晰的變數和函式名稱提升可讀性
+- 合併相關邏輯
+- 移除描述明顯程式碼的多餘註解
 
 #### 4. 保持平衡 Maintain Balance
 
 **避免過度簡化**：
 
--   ❌ 不要降低程式碼清晰度或可維護性
--   ❌ 不要創造過度聰明、難以理解的解決方案
--   ❌ 不要將太多關注點合併到單一函式或元件
--   ❌ 不要移除有助於程式碼組織的抽象層
--   ❌ 不要為了「更少行數」犧牲可讀性
--   ❌ 不要讓程式碼變得更難除錯或擴展
+- ❌ 不要降低程式碼清晰度或可維護性
+- ❌ 不要創造過度聰明、難以理解的解決方案
+- ❌ 不要將太多關注點合併到單一函式或元件
+- ❌ 不要移除有助於程式碼組織的抽象層
+- ❌ 不要為了「更少行數」犧牲可讀性
+- ❌ 不要讓程式碼變得更難除錯或擴展
 
 **選擇清晰而非簡潔**：
 
@@ -137,8 +135,8 @@ function processPositiveValues(data: DataItem[]): number[] {
 
 #### 5. 專注範圍 Focus Scope
 
--   預設只精煉最近修改或本次 session 中處理過的程式碼
--   除非明確指示，否則不主動審查更廣的範圍
+- 預設只精煉最近修改或本次 session 中處理過的程式碼
+- 除非明確指示，否則不主動審查更廣的範圍
 
 ### Phase 4: 驗證變更 Verify Changes
 
@@ -267,40 +265,40 @@ counter++;
 
 ### 開始前 Before Starting
 
--   [ ] 確認要簡化的程式碼範圍
--   [ ] 閱讀專案的 coding standards (copilot-instructions.md)
--   [ ] 確保 git 工作目錄乾淨或已提交重要變更
+- [ ] 確認要簡化的程式碼範圍
+- [ ] 閱讀專案的 coding standards (copilot-instructions.md)
+- [ ] 確保 git 工作目錄乾淨或已提交重要變更
 
 ### 簡化過程 During Simplification
 
--   [ ] 保留所有原有功能（黃金法則）
--   [ ] 遵循專案既有的 coding patterns
--   [ ] 選擇清晰而非簡潔
--   [ ] 避免巢狀三元運算子
--   [ ] 使用有意義的變數和函式名稱
--   [ ] 移除冗餘的程式碼和抽象
--   [ ] 移除描述顯而易見程式碼的註解
+- [ ] 保留所有原有功能（黃金法則）
+- [ ] 遵循專案既有的 coding patterns
+- [ ] 選擇清晰而非簡潔
+- [ ] 避免巢狀三元運算子
+- [ ] 使用有意義的變數和函式名稱
+- [ ] 移除冗餘的程式碼和抽象
+- [ ] 移除描述顯而易見程式碼的註解
 
 ### 完成後 After Completion
 
--   [ ] 所有測試通過
--   [ ] Linting 無錯誤
--   [ ] Build 成功
--   [ ] 審查 git diff 確認變更合理
--   [ ] 使用 Conventional Commits 格式提交
+- [ ] 所有測試通過
+- [ ] Linting 無錯誤
+- [ ] Build 成功
+- [ ] 審查 git diff 確認變更合理
+- [ ] 使用 Conventional Commits 格式提交
 
 ## Token 效益 Token Efficiency Benefit
 
 簡化程式碼的額外好處：**減少未來 session 的 token 消耗**。
 
--   簡潔的程式碼在 context window 中佔用更少空間
--   Claude 可以在相同 token 預算內閱讀更多程式碼
--   後續的 AI 輔助開發成本更低
+- 簡潔的程式碼在 context window 中佔用更少空間
+- Claude 可以在相同 token 預算內閱讀更多程式碼
+- 後續的 AI 輔助開發成本更低
 
 > 有開發者報告使用 code-simplifier 後，token 消耗減少 20-30%。
 
 ## 相關資源 Related Resources
 
--   [Anthropic Claude Plugins - code-simplifier](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-simplifier) - 原始靈感來源
--   [Building Effective AI Agents](https://www.anthropic.com/research/building-effective-agents) - Anthropic 的 agent 建構指南
--   [ESLint Rules](https://eslint.org/docs/rules/) - JavaScript/TypeScript linting 規則參考
+- [Anthropic Claude Plugins - code-simplifier](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/code-simplifier) - 原始靈感來源
+- [Building Effective AI Agents](https://www.anthropic.com/research/building-effective-agents) - Anthropic 的 agent 建構指南
+- [ESLint Rules](https://eslint.org/docs/rules/) - JavaScript/TypeScript linting 規則參考
