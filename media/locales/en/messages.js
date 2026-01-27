@@ -895,14 +895,15 @@ window.languageManager.loadMessages('en', {
 	RC_GET_BUTTON_SUFFIX: 'state',
 	RC_GET_BUTTON_TOOLTIP: 'Read remote button state (0=pressed, 1=released)',
 
-        // === Serial Monitor ===
-        MONITOR_BUTTON_TITLE: 'Open Monitor',
-        MONITOR_BUTTON_STOP_TITLE: 'Stop Monitor',
-        MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (only available for CyberBrick)',
-        MONITOR_STARTING: 'Starting Monitor...',
-        MONITOR_CONNECTED: 'Connected to {0}',
-        MONITOR_STOPPED: 'Monitor stopped',
-        MONITOR_DEVICE_NOT_FOUND: 'CyberBrick device not found',
-        MONITOR_DEVICE_DISCONNECTED: 'CyberBrick device disconnected',
-        MONITOR_CONNECTION_FAILED: 'Failed to connect to device',
-        MONITOR_CLOSED_FOR_UPLOAD: 'Monitor paused for upload',
+	// === Serial Monitor ===
+	MONITOR_BUTTON_TITLE: 'Open Monitor',
+	MONITOR_BUTTON_STOP_TITLE: 'Stop Monitor',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (only available for CyberBrick)',
+	MONITOR_STARTING: 'Starting Monitor...',
+	MONITOR_CONNECTED: 'Connected to {0}',
+	MONITOR_STOPPED: 'Monitor stopped',
+	MONITOR_DEVICE_NOT_FOUND: 'CyberBrick device not found',
+	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick device disconnected',
+	MONITOR_CONNECTION_FAILED: 'Failed to connect to device',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor paused for upload',
+});

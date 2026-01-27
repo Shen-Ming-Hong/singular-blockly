@@ -904,14 +904,17 @@ window.languageManager.loadMessages('pl', {
 	RC_IS_CONNECTED: 'RC połączony?',
 	RC_IS_CONNECTED_TOOLTIP: 'Sprawdź czy dane odebrane w ciągu 500ms',
 
-        // === Serial Monitor ===
-        MONITOR_BUTTON_TITLE: 'Otwórz monitor',
-        MONITOR_BUTTON_STOP_TITLE: 'Zatrzymaj monitor',
-        MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (tylko dla CyberBrick)',
-        MONITOR_STARTING: 'Uruchamianie monitora...',
-        MONITOR_CONNECTED: 'Połączono z {0}',
-        MONITOR_STOPPED: 'Monitor zatrzymany',
-        MONITOR_DEVICE_NOT_FOUND: 'Nie znaleziono urządzenia CyberBrick',
-        MONITOR_DEVICE_DISCONNECTED: 'Urządzenie CyberBrick odłączone',
+	// === Serial Monitor ===
+	MONITOR_BUTTON_TITLE: 'Otwórz monitor',
+	MONITOR_BUTTON_STOP_TITLE: 'Zatrzymaj monitor',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (tylko dla CyberBrick)',
+	MONITOR_STARTING: 'Uruchamianie monitora...',
+	MONITOR_CONNECTED: 'Połączono z {0}',
+	MONITOR_STOPPED: 'Monitor zatrzymany',
+	MONITOR_DEVICE_NOT_FOUND: 'Nie znaleziono urządzenia CyberBrick',
+	MONITOR_DEVICE_DISCONNECTED: 'Urządzenie CyberBrick odłączone',
+	MONITOR_CONNECTION_FAILED: 'Nie udało się połączyć z urządzeniem',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor wstrzymany do przesłania',
+});
         MONITOR_CONNECTION_FAILED: 'Nie udało się połączyć z urządzeniem',
         MONITOR_CLOSED_FOR_UPLOAD: 'Monitor wstrzymany do przesłania',

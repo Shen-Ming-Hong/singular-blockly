@@ -905,14 +905,18 @@ window.languageManager.loadMessages('hu', {
 	RC_IS_CONNECTED: 'RC csatlakoztatva?',
 	RC_IS_CONNECTED_TOOLTIP: 'Ellenőrizd az adatok érkezését 500ms-on belül',
 
-        // === Serial Monitor ===
-        MONITOR_BUTTON_TITLE: 'Monitor megnyitása',
-        MONITOR_BUTTON_STOP_TITLE: 'Monitor leállítása',
-        MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (csak CyberBrick-hez)',
-        MONITOR_STARTING: 'Monitor indítása...',
-        MONITOR_CONNECTED: 'Csatlakozva: {0}',
-        MONITOR_STOPPED: 'Monitor leállítva',
-        MONITOR_DEVICE_NOT_FOUND: 'CyberBrick eszköz nem található',
+	// === Serial Monitor ===
+	MONITOR_BUTTON_TITLE: 'Monitor megnyitása',
+	MONITOR_BUTTON_STOP_TITLE: 'Monitor leállítása',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (csak CyberBrick-hez)',
+	MONITOR_STARTING: 'Monitor indítása...',
+	MONITOR_CONNECTED: 'Csatlakozva: {0}',
+	MONITOR_STOPPED: 'Monitor leállítva',
+	MONITOR_DEVICE_NOT_FOUND: 'CyberBrick eszköz nem található',
+	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick eszköz lecsatlakozva',
+	MONITOR_CONNECTION_FAILED: 'Nem sikerült csatlakozni az eszközhöz',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor szüneteltetve feltöltéshez',
+});
         MONITOR_DEVICE_DISCONNECTED: 'CyberBrick eszköz lecsatlakozva',
         MONITOR_CONNECTION_FAILED: 'Nem sikerült csatlakozni az eszközhöz',
         MONITOR_CLOSED_FOR_UPLOAD: 'Monitor szüneteltetve feltöltéshez',

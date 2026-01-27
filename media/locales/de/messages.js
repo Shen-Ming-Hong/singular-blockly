@@ -901,14 +901,15 @@ window.languageManager.loadMessages('de', {
 	RC_GET_BUTTON_SUFFIX: 'Status',
 	RC_GET_BUTTON_TOOLTIP: 'Remote-Tasten-Status lesen (0=gedrückt, 1=losgelassen)',
 
-        // === Serial Monitor ===
-        MONITOR_BUTTON_TITLE: 'Monitor öffnen',
-        MONITOR_BUTTON_STOP_TITLE: 'Monitor stoppen',
-        MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (nur für CyberBrick)',
-        MONITOR_STARTING: 'Monitor wird gestartet...',
-        MONITOR_CONNECTED: 'Verbunden mit {0}',
-        MONITOR_STOPPED: 'Monitor gestoppt',
-        MONITOR_DEVICE_NOT_FOUND: 'CyberBrick-Gerät nicht gefunden',
-        MONITOR_DEVICE_DISCONNECTED: 'CyberBrick-Gerät getrennt',
-        MONITOR_CONNECTION_FAILED: 'Verbindung zum Gerät fehlgeschlagen',
-        MONITOR_CLOSED_FOR_UPLOAD: 'Monitor für Upload pausiert',
+	// === Serial Monitor ===
+	MONITOR_BUTTON_TITLE: 'Monitor öffnen',
+	MONITOR_BUTTON_STOP_TITLE: 'Monitor stoppen',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (nur für CyberBrick)',
+	MONITOR_STARTING: 'Monitor wird gestartet...',
+	MONITOR_CONNECTED: 'Verbunden mit {0}',
+	MONITOR_STOPPED: 'Monitor gestoppt',
+	MONITOR_DEVICE_NOT_FOUND: 'CyberBrick-Gerät nicht gefunden',
+	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick-Gerät getrennt',
+	MONITOR_CONNECTION_FAILED: 'Verbindung zum Gerät fehlgeschlagen',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor für Upload pausiert',
+});
