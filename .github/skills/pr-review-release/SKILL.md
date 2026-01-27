@@ -3,7 +3,7 @@ name: pr-review-release
 description: PR Code Review 評估與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。包含評估 Copilot/人工 review 建議、程式碼修正、Git 合併、語意化版本更新、CHANGELOG、打包發布的完整工作流程。PR review evaluation and release workflow for processing code review comments, merging PRs, semantic versioning, and publishing releases.
 metadata:
     author: singular-blockly
-    version: '1.3.0'
+    version: '1.4.0'
     category: release
 license: Apache-2.0
 ---
@@ -396,4 +396,5 @@ https://github.com/{owner}/{repo}/releases/tag/v{VERSION}
 
 - [語意化版本規範](https://semver.org/lang/zh-TW/)
 - [Keep a Changelog](https://keepachangelog.com/zh-TW/)
-- [code-simplifier 技能](../code-simplifier/SKILL.md) - 程式碼簡化與重構
+- [git-workflow 技能](../git-workflow/SKILL.md) - 從 commit 到 PR 建立（自動觸發本技能）
+- [code-simplifier 技能](../code-simplifier/SKILL.md) - 程式碼簡化與重構（阻塞型）
