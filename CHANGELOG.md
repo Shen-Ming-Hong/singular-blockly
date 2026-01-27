@@ -23,8 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       Conditional display: Monitor button only shows when CyberBrick board is selected
     - 使用 pyserial 實現穩定的裝置重置與輸出捕獲，確保從程式開頭顯示所有輸出
       Uses pyserial for reliable device reset and output capture, ensuring all output from program start
-    - 支援 15 種語言翻譯 (8 個翻譯鍵)
-      Supports 15 language translations (8 translation keys)
+    - 支援 15 種語言翻譯 (10 個翻譯鍵)
+      Supports 15 language translations (10 translation keys)
 
 ## [0.59.0] - 2026-01-23
 
