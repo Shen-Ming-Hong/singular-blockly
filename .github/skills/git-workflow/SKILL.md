@@ -3,7 +3,7 @@ name: git-workflow
 description: Git 工作流程自動化技能。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。包含自動生成 Conventional Commits 格式訊息、一鍵建立 PR 等功能。靈感來源於 Anthropic 官方 commit-commands plugin。Automates Git workflow including commit message generation, branch push, and PR creation. Inspired by Anthropic's official commit-commands plugin.
 metadata:
     author: singular-blockly
-    version: '1.0.0'
+    version: '1.1.0'
     category: productivity
     inspired-by: anthropics/claude-code/plugins/commit-commands
 license: Apache-2.0
@@ -129,6 +129,29 @@ git push
 -   Spec 分支：`{NNN}-feature-name`（如 `016-esp32-wifi-mqtt`）
 -   修復分支：`fix/{issue-number}-description`
 -   文件分支：`docs/{description}`
+
+---
+
+### Phase 2.5: 程式碼簡化（推薦）Code Simplification (Recommended)
+
+在建立 PR 前，建議使用 `code-simplifier` 技能檢查程式碼是否有可簡化之處。
+Before creating a PR, it's recommended to use the `code-simplifier` skill to check for simplification opportunities.
+
+**為何重要 Why Important**：
+- 減少 Code Review 階段的修改建議
+- 提升程式碼可讀性和維護性
+- 確保符合專案程式碼風格
+
+**快速檢查 Quick Check**：
+```bash
+# 檢視此分支的所有變更檔案
+git diff master..HEAD --name-only
+
+# 執行程式碼簡化技能（針對變更的檔案）
+# 參考 code-simplifier 技能說明
+```
+
+> 💡 **提示**：如有使用 Agent，可輸入「簡化程式碼」或「refactor」觸發 `code-simplifier` 技能。
 
 ---
 
@@ -277,6 +300,7 @@ gh pr create --fill --base master
 -   [ ] PR 描述清楚說明變更內容
 -   [ ] 已關聯相關 Spec（如適用）
 -   [ ] 測試計劃已列出
+-   [ ] （推薦）已使用 `code-simplifier` 技能檢查程式碼簡化機會
 
 ### PR 建立後 After PR Creation
 
@@ -292,3 +316,4 @@ gh pr create --fill --base master
 -   [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hant/)
 -   [GitHub CLI 文件](https://cli.github.com/manual/)
 -   [pr-review-release 技能](../pr-review-release/SKILL.md) - PR 審查後的下一步
+-   [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（推薦）
