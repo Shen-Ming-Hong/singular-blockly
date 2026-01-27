@@ -902,4 +902,17 @@ window.languageManager.loadMessages('tr', {
 	// Durum RC blokları
 	RC_IS_CONNECTED: 'RC bağlı mı?',
 	RC_IS_CONNECTED_TOOLTIP: '500ms içinde veri alınıp alınmadığını kontrol et',
+
+	// === Serial Monitor ===
+	MONITOR_BUTTON_TITLE: 'Monitörü aç',
+	MONITOR_BUTTON_STOP_TITLE: 'Monitörü durdur',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Monitör (sadece CyberBrick için)',
+	MONITOR_STARTING: 'Monitör başlatılıyor...',
+	MONITOR_CONNECTED: '{0} bağlandı',
+	MONITOR_STOPPED: 'Monitör durduruldu',
+	MONITOR_DEVICE_NOT_FOUND: 'CyberBrick cihazı bulunamadı',
+	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick cihazı bağlantısı kesildi',
+	MONITOR_CONNECTION_FAILED: 'Cihaza bağlanılamadı',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Yükleme için monitör duraksatıldı',
 });
+        MONITOR_CLOSED_FOR_UPLOAD: 'Yükleme için monitör duraklatıldı',

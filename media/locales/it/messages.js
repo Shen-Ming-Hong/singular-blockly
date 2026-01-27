@@ -896,4 +896,16 @@ window.languageManager.loadMessages('it', {
 	RC_GET_BUTTON_PREFIX: 'RC pulsante',
 	RC_GET_BUTTON_SUFFIX: 'stato',
 	RC_GET_BUTTON_TOOLTIP: 'Leggi stato pulsante remoto (0=premuto, 1=rilasciato)',
+
+	// === Serial Monitor ===
+	MONITOR_BUTTON_TITLE: 'Apri monitor',
+	MONITOR_BUTTON_STOP_TITLE: 'Ferma monitor',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Monitor (solo per CyberBrick)',
+	MONITOR_STARTING: 'Avvio monitor...',
+	MONITOR_CONNECTED: 'Connesso a {0}',
+	MONITOR_STOPPED: 'Monitor fermato',
+	MONITOR_DEVICE_NOT_FOUND: 'Dispositivo CyberBrick non trovato',
+	MONITOR_DEVICE_DISCONNECTED: 'Dispositivo CyberBrick disconnesso',
+	MONITOR_CONNECTION_FAILED: 'Connessione al dispositivo fallita',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor in pausa per caricamento',
 });

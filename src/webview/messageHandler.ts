@@ -13,6 +13,7 @@ import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
 import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage } from '../types/arduino';
+import { SerialMonitorService } from '../services/serialMonitorService';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -56,6 +57,7 @@ interface UploadRequestMessage {
 export class WebViewMessageHandler {
 	private fileService: FileService;
 	private settingsManager: SettingsManager;
+	private serialMonitorService: SerialMonitorService | null = null;
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -94,6 +96,15 @@ export class WebViewMessageHandler {
 			const workspaceRoot = workspaceFolders[0].uri.fsPath;
 			this.fileService = new FileService(workspaceRoot);
 			this.settingsManager = new SettingsManager(workspaceRoot);
+
+			// 初始化 Serial Monitor 服務
+			this.serialMonitorService = new SerialMonitorService(workspaceRoot);
+			this.serialMonitorService.onStopped(reason => {
+				this.panel.webview.postMessage({
+					command: 'monitorStopped',
+					reason,
+				});
+			});
 		}
 	}
 
@@ -171,6 +182,13 @@ export class WebViewMessageHandler {
 					break;
 				case 'requestPortList':
 					await this.handleRequestPortList(message);
+					break;
+				// Serial Monitor 功能
+				case 'startMonitor':
+					await this.handleStartMonitor(message);
+					break;
+				case 'stopMonitor':
+					await this.handleStopMonitor();
 					break;
 				case 'deletePlatformioIni':
 					await this.handleDeletePlatformioIni();
@@ -533,18 +551,16 @@ export class WebViewMessageHandler {
 			const isRename = Boolean(message?.isRename);
 			const currentName = typeof message?.currentName === 'string' ? message.currentName : '';
 
-			const prompt = isRename && currentName
-				? await this.localeService.getLocalizedMessage(
-						'VSCODE_ENTER_NEW_VARIABLE_NAME',
-						'Enter new variable name (current: {0})',
-						currentName
-					)
-				: await this.localeService.getLocalizedMessage('VSCODE_ENTER_VARIABLE_NAME', 'Enter variable name');
+			const prompt =
+				isRename && currentName
+					? await this.localeService.getLocalizedMessage(
+							'VSCODE_ENTER_NEW_VARIABLE_NAME',
+							'Enter new variable name (current: {0})',
+							currentName
+						)
+					: await this.localeService.getLocalizedMessage('VSCODE_ENTER_VARIABLE_NAME', 'Enter variable name');
 
-			const emptyError = await this.localeService.getLocalizedMessage(
-				'VSCODE_VARIABLE_NAME_EMPTY',
-				'Variable name cannot be empty'
-			);
+			const emptyError = await this.localeService.getLocalizedMessage('VSCODE_VARIABLE_NAME_EMPTY', 'Variable name cannot be empty');
 			const invalidError = await this.localeService.getLocalizedMessage(
 				'VSCODE_VARIABLE_NAME_INVALID',
 				'Variable name can only contain letters, numbers, and underscores, and cannot start with a number'
@@ -822,10 +838,7 @@ export class WebViewMessageHandler {
 		const backupName = message?.name;
 
 		if (!backupName) {
-			const errorMsg = await this.localeService.getLocalizedMessage(
-				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
-				'Backup name not specified'
-			);
+			const errorMsg = await this.localeService.getLocalizedMessage('BACKUP_ERROR_NAME_NOT_SPECIFIED', 'Backup name not specified');
 			this.panel.webview.postMessage({
 				command: 'backupCreated',
 				name: backupName,
@@ -963,10 +976,7 @@ export class WebViewMessageHandler {
 	private async handleDeleteBackup(message: any): Promise<void> {
 		const backupName = message?.name;
 		if (!backupName) {
-			const errorMsg = await this.localeService.getLocalizedMessage(
-				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
-				'Backup name not specified'
-			);
+			const errorMsg = await this.localeService.getLocalizedMessage('BACKUP_ERROR_NAME_NOT_SPECIFIED', 'Backup name not specified');
 			this.panel.webview.postMessage({
 				command: 'backupDeleted',
 				name: backupName,
@@ -1040,10 +1050,7 @@ export class WebViewMessageHandler {
 	private async handleRestoreBackup(message: any): Promise<void> {
 		const backupName = message?.name;
 		if (!backupName) {
-			const errorMsg = await this.localeService.getLocalizedMessage(
-				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
-				'Backup name not specified'
-			);
+			const errorMsg = await this.localeService.getLocalizedMessage('BACKUP_ERROR_NAME_NOT_SPECIFIED', 'Backup name not specified');
 			this.panel.webview.postMessage({
 				command: 'backupRestored',
 				name: backupName,
@@ -1138,10 +1145,7 @@ export class WebViewMessageHandler {
 	private async handlePreviewBackup(message: any): Promise<void> {
 		const backupName = message?.name;
 		if (!backupName) {
-			const errorMsg = await this.localeService.getLocalizedMessage(
-				'BACKUP_ERROR_NAME_NOT_SPECIFIED',
-				'Backup name not specified'
-			);
+			const errorMsg = await this.localeService.getLocalizedMessage('BACKUP_ERROR_NAME_NOT_SPECIFIED', 'Backup name not specified');
 			this.showErrorMessage(errorMsg);
 			return;
 		}
@@ -1280,6 +1284,11 @@ export class WebViewMessageHandler {
 		const workspaceRoot = workspaceFolders[0].uri.fsPath;
 		const boardLanguage = getBoardLanguage(message.board);
 
+		// 上傳前關閉 Monitor（釋放 COM 埠）
+		if (this.serialMonitorService?.isRunning()) {
+			await this.serialMonitorService.stopForUpload();
+		}
+
 		// 根據板子語言類型路由到對應的上傳服務
 		if (boardLanguage === 'micropython') {
 			// MicroPython 上傳流程（CyberBrick）
@@ -1379,7 +1388,7 @@ export class WebViewMessageHandler {
 							stage: result.error.stage as any,
 							message: result.error.message,
 							details: result.error.details,
-					  }
+						}
 					: undefined,
 			});
 		} catch (error) {
@@ -1466,6 +1475,54 @@ export class WebViewMessageHandler {
 		await this.deletePlatformioIniIfExists();
 	}
 
+	// ===== Serial Monitor 功能 =====
+
+	/**
+	 * 處理啟動 Monitor 請求
+	 * @param message 啟動訊息
+	 */
+	private async handleStartMonitor(message: { board: string }): Promise<void> {
+		if (message.board !== 'cyberbrick') {
+			log('[blockly] Monitor 僅支援 CyberBrick', 'warn');
+			return;
+		}
+
+		if (!this.serialMonitorService) {
+			log('[blockly] SerialMonitorService 未初始化', 'error');
+			return;
+		}
+
+		const result = await this.serialMonitorService.start();
+
+		if (result.success) {
+			this.panel.webview.postMessage({
+				command: 'monitorStarted',
+				port: result.port,
+			});
+		} else {
+			this.panel.webview.postMessage({
+				command: 'monitorError',
+				error: result.error,
+			});
+		}
+	}
+
+	/**
+	 * 處理停止 Monitor 請求
+	 */
+	private async handleStopMonitor(): Promise<void> {
+		if (!this.serialMonitorService) {
+			log('[blockly] SerialMonitorService 未初始化', 'error');
+			return;
+		}
+
+		await this.serialMonitorService.stop();
+		this.panel.webview.postMessage({
+			command: 'monitorStopped',
+			reason: 'user_closed',
+		});
+	}
+
 	private showErrorMessage(message: string): void {
 		try {
 			vscodeApi.window.showErrorMessage(message);
@@ -1474,4 +1531,3 @@ export class WebViewMessageHandler {
 		}
 	}
 }
-

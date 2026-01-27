@@ -398,6 +398,13 @@ Explore real-world projects built with Singular Blockly:
 - Joystick value mapping to custom range
 - Local button state detection (K1-K4)
 
+**🆕 Output Monitor (v0.60.0+)**
+
+- Real-time `print()` output viewing in VS Code terminal
+- Auto device detection (no manual COM port selection)
+- Auto-close before upload to release COM port
+- Monitor button only shows when CyberBrick is selected
+
 **Built-in MicroPython Generators**
 
 - Complete logic, loops, math, text, list, variable, and function block support

@@ -899,4 +899,19 @@ window.languageManager.loadMessages('ru', {
 	// Блоки статуса RC
 	RC_IS_CONNECTED: 'RC подключён?',
 	RC_IS_CONNECTED_TOOLTIP: 'Проверить получены ли данные за 500мс',
+
+	// === Serial Monitor ===
+	MONITOR_BUTTON_TITLE: 'Открыть монитор',
+	MONITOR_BUTTON_STOP_TITLE: 'Остановить монитор',
+	MONITOR_BUTTON_DISABLED_TITLE: 'Монитор (только для CyberBrick)',
+	MONITOR_STARTING: 'Запуск монитора...',
+	MONITOR_CONNECTED: 'Подключено к {0}',
+	MONITOR_STOPPED: 'Монитор остановлен',
+	MONITOR_DEVICE_NOT_FOUND: 'Устройство CyberBrick не найдено',
+	MONITOR_DEVICE_DISCONNECTED: 'Устройство CyberBrick отключено',
+	MONITOR_CONNECTION_FAILED: 'Не удалось подключиться к устройству',
+	MONITOR_CLOSED_FOR_UPLOAD: 'Монитор приостановлен для загрузки',
 });
+        MONITOR_DEVICE_DISCONNECTED: 'Устройство CyberBrick отключено',
+        MONITOR_CONNECTION_FAILED: 'Не удалось подключиться к устройству',
+        MONITOR_CLOSED_FOR_UPLOAD: 'Монитор приостановлен для загрузки',
