@@ -8,6 +8,23 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.61.1] - 2026-02-03
+
+### 安全性修復 Security Fixes
+
+- **修復 Hono 多個中度安全漏洞** (Fix multiple Hono medium-severity vulnerabilities)
+    - 升級 `@modelcontextprotocol/sdk` 從 1.25.2 至 1.25.3，間接升級 `hono` 從 4.11.4 至 4.11.7
+      Upgraded `@modelcontextprotocol/sdk` from 1.25.2 to 1.25.3, indirectly upgrading `hono` from 4.11.4 to 4.11.7
+    - 修復 XSS through ErrorBoundary component (Dependabot Alert #19)
+      Fixed XSS through ErrorBoundary component (Dependabot Alert #19)
+    - 修復 Arbitrary Key Read in Serve static Middleware (Dependabot Alert #18)
+      Fixed Arbitrary Key Read in Serve static Middleware (Dependabot Alert #18)
+    - 修復 Cache middleware Web Cache Deception (Dependabot Alert #17)
+      Fixed Cache middleware Web Cache Deception (Dependabot Alert #17)
+    - 修復 IPv4 address validation bypass allows IP spoofing (Dependabot Alert #16)
+      Fixed IPv4 address validation bypass allows IP spoofing (Dependabot Alert #16)
+    - 嚴重程度 Severity: Medium
+
 ## [0.61.0] - 2026-01-27
 
 ### 新增功能 Added
