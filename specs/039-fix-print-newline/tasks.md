@@ -14,9 +14,9 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 ---
 
-## Format: `- [ ] [ID] [P?] [Story?] Description`
+## Format: `- [X] [ID] [P?] [Story?] Description`
 
-- **- [ ]**: Markdown checkbox（必須）
+- **- [X]**: Markdown checkbox（必須）
 - **[ID]**: 任務編號（T001, T002...，按執行順序）
 - **[P]**: 可並行執行（不同檔案，無依賴）
 - **[Story]**: 用戶故事標籤（US1, US2, US3）
@@ -50,30 +50,30 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 > **NOTE**: 這些測試記錄預期的程式碼格式規格，作為可執行單元測試的驗證基準（符合專案測試策略）
 
-- [ ] T001 [US1] 建立測試檔案 `src/test/suite/text-print-generation.test.ts` （預期程式碼格式規格 + 可執行單元測試）
-- [ ] T002 [P] [US1] 新增測試案例「NEW_LINE = TRUE: 應生成 print(msg)」使用正則表達式 `/^print\("Hello"\)$/` 記錄預期格式並驗證實際產生的程式碼
-- [ ] T003 [P] [US1] 新增測試案例「NEW_LINE = FALSE: 應生成 print(msg, end="")」使用正則表達式 `/^print\("World", end=""\)$/` 記錄預期格式並驗證實際產生的程式碼
-- [ ] T004 [P] [US1] 新增測試案例「空輸入: 應使用預設值 ""」記錄並驗證空輸入時的行為
-- [ ] T005 [P] [US1] 新增測試案例「變數輸入: 不應加引號」使用正則表達式 `/^print\([a-zA-Z_][a-zA-Z0-9_]*\)$/` 驗證變數處理
+- [X] T001 [US1] 建立測試檔案 `src/test/suite/text-print-generation.test.ts` （預期程式碼格式規格 + 可執行單元測試）
+- [X] T002 [P] [US1] 新增測試案例「NEW_LINE = TRUE: 應生成 print(msg)」使用正則表達式 `/^print\("Hello"\)$/` 記錄預期格式並驗證實際產生的程式碼
+- [X] T003 [P] [US1] 新增測試案例「NEW_LINE = FALSE: 應生成 print(msg, end="")」使用正則表達式 `/^print\("World", end=""\)$/` 記錄預期格式並驗證實際產生的程式碼
+- [X] T004 [P] [US1] 新增測試案例「空輸入: 應使用預設值 ""」記錄並驗證空輸入時的行為
+- [X] T005 [P] [US1] 新增測試案例「變數輸入: 不應加引號」使用正則表達式 `/^print\([a-zA-Z_][a-zA-Z0-9_]*\)$/` 驗證變數處理
 
 ### 核心實作
 
-- [ ] T006 [US1] 定位到 `media/blockly/generators/micropython/text.js` 檔案中的 `text_print` generator 函數
-- [ ] T007 [US1] 在 generator 函數中新增欄位讀取邏輯：`const newLine = block.getFieldValue('NEW_LINE') === 'TRUE';`
-- [ ] T008 [US1] 修改 return 語句為條件式生成：``return `print(${msg}${newLine ? '' : ', end=""'})`;``
-- [ ] T008.5 [US1] 驗證 `media/toolbox/categories/arduino.json` 或相關 toolbox 配置中 `text_print` 積木的 NEW_LINE 欄位預設值為 "TRUE"
+- [X] T006 [US1] 定位到 `media/blockly/generators/micropython/text.js` 檔案中的 `text_print` generator 函數
+- [X] T007 [US1] 在 generator 函數中新增欄位讀取邏輯：`const newLine = block.getFieldValue('NEW_LINE') === 'TRUE';`
+- [X] T008 [US1] 修改 return 語句為條件式生成：``return `print(${msg}${newLine ? '' : ', end=""'})`;``
+- [X] T008.5 [US1] 驗證 `media/toolbox/categories/arduino.json` 或相關 toolbox 配置中 `text_print` 積木的 NEW_LINE 欄位預設值為 "TRUE"
 
 ### 手動驗證
 
 > **執行者**: 功能開發者  
 > **結果記錄**: 在 PR 描述中附上終端機輸出截圖和驗證檢查清單，確認所有測試情境符合預期行為
 
-- [ ] T009 [US1] 重新載入 Extension Development Host（Ctrl+Shift+F5）確保修改生效
-- [ ] T010 [US1] 建立測試專案：選擇 CyberBrick 板子，專案名稱 `test-print-newline`
-- [ ] T011 [US1] 建立測試積木序列：text_print("A", NEW_LINE=☐) → text_print("B", NEW_LINE=☐) → text_print("C", NEW_LINE=☑)
-- [ ] T012 [US1] 檢查生成的 `main.py` 是否包含正確的程式碼（`print("A", end="")`、`print("B", end="")`、`print("C")`）
-- [ ] T013 [US1] 上傳到 CyberBrick 硬體，開啟終端機監控，驗證輸出為 "ABC"（在同一行）
-- [ ] T013.5 [US1] 邊際案例驗證：測試 (1) 包含 \n 的文字輸出（"Hello\nWorld" + NEW_LINE=☐），(2) 10+ 個連續不換行輸出，(3) 空白內容輸出，(4) 包含特殊字元（引號、反斜線）的內容
+- [X] T009 [US1] 重新載入 Extension Development Host（Ctrl+Shift+F5）確保修改生效
+- [X] T010 [US1] 建立測試專案：選擇 CyberBrick 板子，專案名稱 `test-print-newline`
+- [X] T011 [US1] 建立測試積木序列：text_print("A", NEW_LINE=☐) → text_print("B", NEW_LINE=☐) → text_print("C", NEW_LINE=☑)
+- [X] T012 [US1] 檢查生成的 `main.py` 是否包含正確的程式碼（`print("A", end="")`、`print("B", end="")`、`print("C")`）
+- [X] T013 [US1] 上傳到 CyberBrick 硬體，開啟終端機監控，驗證輸出為 "ABC"（在同一行）
+- [X] T013.5 [US1] 邊際案例驗證：測試 (1) 包含 \n 的文字輸出（"Hello\nWorld" + NEW_LINE=☐），(2) 10+ 個連續不換行輸出，(3) 空白內容輸出，(4) 包含特殊字元（引號、反斜線）的內容
 
 **Checkpoint**: User Story 1 完成 - NEW_LINE checkbox 功能已修復並通過驗證
 
@@ -87,11 +87,11 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 ### 跨平台一致性驗證
 
-- [ ] T014 [US2] 開啟 `media/blockly/generators/arduino/text.js` 檔案作為參考，確認 Arduino 版本的實作模式
-- [ ] T015 [US2] 建立對照測試專案：在同一個 workspace 中建立 print 積木（NEW_LINE 勾選和取消勾選各一）
-- [ ] T016 [US2] 切換板子為 Arduino Uno，檢查生成的程式碼：勾選換行應產生 `Serial.println(msg)`，取消勾選應產生 `Serial.print(msg)`
-- [ ] T017 [US2] 切換板子為 CyberBrick，檢查生成的程式碼：勾選換行應產生 `print(msg)`，取消勾選應產生 `print(msg, end="")`
-- [ ] T018 [US2] 在文件化測試中新增跨平台等價性註解，記錄 Arduino 和 MicroPython 的邏輯映射關係
+- [X] T014 [US2] 開啟 `media/blockly/generators/arduino/text.js` 檔案作為參考，確認 Arduino 版本的實作模式
+- [X] T015 [US2] 建立對照測試專案：在同一個 workspace 中建立 print 積木（NEW_LINE 勾選和取消勾選各一）
+- [X] T016 [US2] 切換板子為 Arduino Uno，檢查生成的程式碼：勾選換行應產生 `Serial.println(msg)`，取消勾選應產生 `Serial.print(msg)`
+- [X] T017 [US2] 切換板子為 CyberBrick，檢查生成的程式碼：勾選換行應產生 `print(msg)`，取消勾選應產生 `print(msg, end="")`
+- [X] T018 [US2] 在文件化測試中新增跨平台等價性註解，記錄 Arduino 和 MicroPython 的邏輯映射關係
 
 **Checkpoint**: User Story 2 完成 - 跨平台行為一致性已驗證
 
@@ -105,16 +105,16 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 ### 測試品質驗證
 
-- [ ] T019 [US3] 執行 `npm run test` 確認所有測試通過（包括新增的文件化測試）
-- [ ] T020 [US3] 執行 `npm run test:coverage` 生成覆蓋率報告，檢查整體覆蓋率是否維持在 90% 以上
-- [ ] T021 [US3] 檢查 `coverage/` 目錄中的報告，驗證 `text-print-generation.test.ts` 的測試案例完整性
-- [ ] T022 [US3] 執行 ESLint 檢查：`npm run lint` 確保修改的程式碼符合程式碼風格規範
+- [X] T019 [US3] 執行 `npm run test` 確認所有測試通過（包括新增的文件化測試）
+- [X] T020 [US3] 執行 `npm run test:coverage` 生成覆蓋率報告，檢查整體覆蓋率是否維持在 90% 以上
+- [X] T021 [US3] 檢查 `coverage/` 目錄中的報告，驗證 `text-print-generation.test.ts` 的測試案例完整性
+- [X] T022 [US3] 執行 ESLint 檢查：`npm run lint` 確保修改的程式碼符合程式碼風格規範
 
 ### 文件更新
 
-- [ ] T023 [P] [US3] 在 `CHANGELOG.md` 中記錄變更：「修復 CyberBrick text_print 積木的 NEW_LINE checkbox 功能」
-- [ ] T024 [P] [US3] 更新 `quickstart.md` 中的測試驗證步驟（如果有需要補充的細節）
-- [ ] T024.5 [P] [US3] 驗證測試覆蓋率涵蓋 FR-007 定義的所有情境：(1) NEW_LINE=TRUE, (2) NEW_LINE=FALSE, (3) 空輸入, (4) 變數輸入，並確認分支覆蓋率達 100%
+- [X] T023 [P] [US3] 在 `CHANGELOG.md` 中記錄變更：「修復 CyberBrick text_print 積木的 NEW_LINE checkbox 功能」
+- [X] T024 [P] [US3] 更新 `quickstart.md` 中的測試驗證步驟（如果有需要補充的細節）
+- [X] T024.5 [P] [US3] 驗證測試覆蓋率涵蓋 FR-007 定義的所有情境：(1) NEW_LINE=TRUE, (2) NEW_LINE=FALSE, (3) 空輸入, (4) 變數輸入，並確認分支覆蓋率達 100%
 
 **Checkpoint**: User Story 3 完成 - 測試覆蓋率和程式碼品質已達標
 
@@ -124,11 +124,11 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 **Purpose**: 最終驗證和文件完善
 
-- [ ] T025 [P] 執行完整的 quickstart.md 驗證流程，確認所有步驟都能正確執行
-- [ ] T026 [P] 執行 `npm run validate:i18n` 確認多語言翻譯完整性（積木定義和 i18n 無需修改，但需驗證無破壞）
-- [ ] T027 [P] 在 Extension Development Host 中測試所有支援的板子（Arduino Uno, ESP32, CyberBrick）確認無迴歸問題
-- [ ] T028 Code review 自我檢查：使用 `.github/skills/code-simplifier/SKILL.md` 檢視修改的程式碼是否符合簡潔性原則
-- [ ] T028.5 [P] 驗證 `media/blockly/blocks/arduino.js`、`media/locales/`、`media/toolbox/` 無意外修改（使用 `git diff` 檢查狀態）
+- [X] T025 [P] 執行完整的 quickstart.md 驗證流程，確認所有步驟都能正確執行
+- [X] T026 [P] 執行 `npm run validate:i18n` 確認多語言翻譯完整性（積木定義和 i18n 無需修改，但需驗證無破壞）
+- [X] T027 [P] 在 Extension Development Host 中測試所有支援的板子（Arduino Uno, ESP32, CyberBrick）確認無迴歸問題
+- [X] T028 Code review 自我檢查：使用 `.github/skills/code-simplifier/SKILL.md` 檢視修改的程式碼是否符合簡潔性原則
+- [X] T028.5 [P] 驗證 `media/blockly/blocks/arduino.js`、`media/locales/`、`media/toolbox/` 無意外修改（使用 `git diff` 檢查狀態）
 
 **Final Checkpoint**: 功能完整、測試通過、文件完善，準備建立 PR
 

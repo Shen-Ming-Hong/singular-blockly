@@ -189,7 +189,14 @@
 	 */
 	generator.forBlock['text_print'] = function (block) {
 		const msg = generator.valueToCode(block, 'TEXT', generator.ORDER_NONE) || "''";
-		return 'print(' + msg + ')\n';
+
+		// 讀取 NEW_LINE 欄位 (checkbox 值為字串 "TRUE" 或 "FALSE")
+		const newLine = block.getFieldValue('NEW_LINE') === 'TRUE';
+
+		// 根據 NEW_LINE 欄位決定是否添加 end="" 參數
+		// - newLine = true  → print(msg) (預設換行)
+		// - newLine = false → print(msg, end="") (不換行)
+		return 'print(' + msg + (newLine ? '' : ', end=""') + ')\n';
 	};
 
 	/**
