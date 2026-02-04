@@ -42,11 +42,11 @@
 
 - **No NEEDS CLARIFICATION**: 規格中沒有任何 [NEEDS CLARIFICATION] 標記（✅）
 - **Testable requirements**: 所有 FR 和 SC 都可透過具體測試驗證（例如：FR-001 可透過檢查產生的程式碼驗證，SC-003 可透過實機終端機輸出驗證）（✅）
-- **Measurable success criteria**: 
-  - SC-001/SC-002: 可透過程式碼檢查量化（有/無 `end=''` 參數）（✅）
-  - SC-003: 100% 匹配率（✅）
-  - SC-004: 90% 覆蓋率（✅）
-  - SC-005: 視覺對等性（可透過並排測試驗證）（✅）
+- **Measurable success criteria**:
+    - SC-001/SC-002: 可透過程式碼檢查量化（有/無 `end=''` 參數）（✅）
+    - SC-003: 100% 匹配率（✅）
+    - SC-004: 90% 覆蓋率（✅）
+    - SC-005: 視覺對等性（可透過並排測試驗證）（✅）
 - **Technology-agnostic SC**: Success Criteria 描述使用者可觀察的結果，未提及內部實作（✅）
 - **Acceptance scenarios defined**: 每個 User Story 都有 Given-When-Then 格式的驗收情境（✅）
 - **Edge cases identified**: 涵蓋換行字元、連續輸出、空白內容、特殊字元等邊界情況（✅）

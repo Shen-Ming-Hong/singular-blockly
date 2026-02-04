@@ -5,7 +5,7 @@
 **Status**: Draft  
 **Input**: User description: "在使用cyber brick裡面的 print指令的時候，不管有沒有勾後面的換行都會在終端機裡面自動換行，所以後面的那一個換行的勾勾是沒有用的。"
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - 控制連續輸出是否換行 (Priority: P1)
 
@@ -61,7 +61,7 @@
 - **空白內容輸出**：當 print 積木的 TEXT 輸入為空時，不論是否勾選換行，都應該只輸出空字串（勾選則換行，不勾選則無任何輸出）
 - **特殊字元處理**：當 print 內容包含特殊字元（如引號、反斜線）時，`end=''` 參數不應影響字元的正常跳脫處理
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -78,7 +78,7 @@
 - **text_print Block**: Blockly 積木物件，包含一個 VALUE 輸入（TEXT 欄位）和一個 FIELD（NEW_LINE checkbox），定義於 `media/blockly/blocks/arduino.js`
 - **MicroPython Generator Function**: 負責將 `text_print` 積木轉換為 MicroPython 程式碼的產生器函數，位於 `media/blockly/generators/micropython/text.js`，目前版本缺少對 `NEW_LINE` 欄位的處理邏輯
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 
