@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.61.2] - 2026-02-04
+
 ### 錯誤修復 Fixed
 
 - **修復 CyberBrick text_print 積木的換行控制功能** (Fix CyberBrick text_print block newline control)
