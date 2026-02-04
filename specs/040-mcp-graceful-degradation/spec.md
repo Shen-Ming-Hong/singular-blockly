@@ -49,11 +49,11 @@
 
 2. **Given** 警告訊息已顯示，**When** 點擊「安裝 Node.js」按鈕，**Then** 系統預設瀏覽器開啟 https://nodejs.org/ 下載頁面。
 
-3. **Given** 警告訊息已顯示，**When** 點擊「稍後提醒」按鈕，**Then** 訊息框關閉，系統自動將 `singularBlockly.mcp.showStartupWarning` 設定為 `false`，Extension 正常運作，MCP 功能不可用但不顯示錯誤。
+3. **Given** 警告訊息已顯示，**When** 點擊「稍後提醒」按鈕，**Then** 訊息框關閉，系統自動將 `singularBlockly.mcp.showStartupWarning` 設定為 `false` 以永久停用該警告，Extension 正常運作，MCP 功能不可用但不顯示錯誤。
 
 4. **Given** MCP Server 啟動失敗，**When** 使用者嘗試使用 Blockly 編輯器（開啟積木介面、拖放積木、生成程式碼、上傳到硬體），**Then** 所有功能正常運作，沒有任何錯誤或警告。
 
-5. **Given** 使用者已點擊「稍後提醒」（`showStartupWarning` 已設為 `false`），**When** 下次啟動 Extension，**Then** 不再顯示警告訊息，即使 Node.js 仍未安裝。
+5. **Given** 使用者已點擊「稍後提醒」將 `showStartupWarning` 永久設為 `false`，**When** 下次啟動 Extension，**Then** 不再顯示警告訊息，即使 Node.js 仍未安裝。
 
 6. **Given** 警告訊息是繁體中文介面，**When** 使用者檢視訊息內容，**Then** 所有文字都是繁體中文。
 
@@ -172,7 +172,7 @@
 
 - **FR-004**: Extension MUST 解析 `node --version` 輸出（格式如 `v22.16.0`）並進行語意化版本比較
 
-- **FR-005**: Extension MUST 在 Node.js 不可用或版本過低時，記錄詳細錯誤資訊到 Output Channel（包含版本號、路徑、錯誤訊息）
+- **FR-005**: Extension MUST 在 Node.js 不可用或版本過低時,記錄詳細錯誤資訊到 Output Channel,使用結構化格式包含以下欄位:錯誤類型 (NodeErrorType 枚舉值)、nodePath (使用的路徑)、執行命令 (如 "node --version")、stdout/stderr 輸出、時間戳 (ISO 8601格式)、版本號 (若可解析)、完整錯誤訊息。日誌等級使用 error (無法啟動) 或 warn (版本過低但可嘗試啟動)
 
 #### 使用者通知與錯誤處理
 
@@ -182,7 +182,7 @@
 
 - **FR-008**: Extension MUST 提供「安裝 Node.js」按鈕，點擊後在系統預設瀏覽器開啟 https://nodejs.org/ 下載頁面
 
-- **FR-009**: Extension MUST 提供「稍後提醒」按鈕，點擊後自動將 `singularBlockly.mcp.showStartupWarning` 設定為 `false` 並關閉訊息框，永久停用該警告
+- **FR-009**: Extension MUST 提供「稍後提醒」按鈕，點擊後自動將 `singularBlockly.mcp.showStartupWarning` 設定為 `false` 並關閉訊息框以永久停用該警告
 
 - **FR-010**: Extension MUST 尊重 `singularBlockly.mcp.showStartupWarning` 設定，當設為 `false` 時不再顯示警告訊息
 
@@ -194,7 +194,7 @@
 
 - **FR-013**: Extension MUST 在 `nodePath` 設定為空或未設定時，使用預設值 `"node"`（從系統 PATH 尋找）
 
-- **FR-014**: Extension MUST 在使用者修改 `nodePath` 設定時立即驗證路徑的有效性（檔案存在、可執行、是 Node.js），並在無效時顯示警告訊息，提示使用者修正或恢復預設值
+- **FR-014**: Extension MUST 在使用者修改 `nodePath` 設定時使用非同步驗證 (`async/await`) 立即驗證路徑的有效性 (檔案存在、可執行、是 Node.js)。UI 行為規格:使用 `vscode.window.withProgress` 顯示驗證進度通知「正在驗證 Node.js 路徑...」以避免阻塞設定介面。驗證失敗時使用 `vscode.window.showWarningMessage` 顯示警告訊息格式:「指定的 Node.js 路徑無效:[路徑]。錯誤:[具體錯誤]。請修正路徑或清空設定以使用預設的 'node' 命令。」並記錄 warn 等級日誌
 
 - **FR-015**: Extension MUST 提供 `singularBlockly.mcp.showStartupWarning` 設定項（布林值，預設 `true`），控制是否顯示啟動警告
 
@@ -221,9 +221,9 @@
 
 - **FR-022**: Extension MUST 為所有新增的錯誤訊息、設定描述、命令標題提供 15 種語言的翻譯（en, zh-hant, ja, ko, es, pt-br, fr, de, it, ru, pl, hu, tr, bg, cs）
 
-- **FR-023**: Extension MUST 使用現有的 `LocaleService` 來載入本地化訊息
+- **FR-023**: Extension MUST 使用現有的 `LocaleService` 來載入本地化訊息,所有使用者可見的文字(警告訊息、按鈕文字、診斷報告、設定描述)都必須透過 `LocaleService.getMessage(key)` 或 `vscode.l10n.t()` 取得,不得使用硬編碼字串
 
-- **FR-024**: 所有訊息鍵 MUST 遵循現有命名慣例（如 `ERROR_MCP_NODE_NOT_FOUND`、`config.mcp.nodePath`）
+- **FR-024**: 所有訊息鍵 MUST 遵循現有命名慣例。錯誤訊息使用 `ERROR_<MODULE>_<DESCRIPTION>` 格式(如 `ERROR_MCP_NODE_NOT_FOUND`)、設定描述使用 `config.<section>.<key>` 格式(如 `config.mcp.nodePath`)、命令標題使用 `command.<commandId>.title` 格式(如 `command.checkMcpStatus.title`)。所有鍵名使用 SCREAMING_SNAKE_CASE 或 camelCase 且必須在 15 種語言中保持一致
 
 #### 向後相容性
 
@@ -277,7 +277,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 當使用者電腦沒有 Node.js 時，Extension 啟動後 5 秒內顯示清楚的警告訊息，100% 的情況下使用者能理解問題原因和解決方案
+- **SC-001**: 當使用者電腦沒有 Node.js 時,Extension 啟動後 5 秒內顯示清楚的警告訊息。可測量指標:在 5 位測試使用者 (包含初學者與進階開發者) 中,至少 4 位能在 2 分鐘內理解警告訊息內容並採取正確行動 (點擊安裝連結或設定自訂路徑)
 
 - **SC-002**: 使用者點擊「安裝 Node.js」按鈕後，系統瀏覽器在 2 秒內開啟 Node.js 官方下載頁面
 
@@ -291,7 +291,7 @@
 
 - **SC-007**: 現有使用者（已安裝 Node.js 22.16.0+）升級 Extension 後，體驗保持一致，不看到任何新警告或提示
 
-- **SC-008**: 技術支援人員收到 MCP 相關問題時，使用者提供的診斷報告能在 90% 的情況下直接識別問題原因
+- **SC-008**: 技術支援人員收到 MCP 相關問題時,使用者提供的診斷報告能在 90% 的情況下直接識別問題原因。測量方式:分析實際的 10 個 MCP 相關問題案例,診斷報告應直接指出根本原因 (如 Node.js 版本過低、bundle 缺失、路徑錯誤),技術支援人員無需額外詢問即可提供解決方案
 
 - **SC-009**: 使用 nvm/fnm 的進階使用者能透過設定自訂路徑，100% 成功使用指定版本的 Node.js 啟動 MCP Server
 
@@ -299,7 +299,7 @@
 
 - **SC-011**: 在離線環境中，診斷命令仍能正常運作並提供本地化的建議（不依賴網路連線）
 
-- **SC-012**: 單元測試覆蓋率達 90% 以上（針對 Node.js 檢測服務、MCP Provider 初始化邏輯、診斷命令）
+- **SC-012**: 單元測試覆蓋率目標為 100% (Statements, Branches, Functions, Lines),最低可接受門檻為 90%。本功能應持續努力提升至 100%,符合憲法 Principle VII。若階段性交付時未達 100%,應在 CHANGELOG 與 GitHub Issue 中明確記錄剩餘測試工作項目 (針對 Node.js 檢測服務、MCP Provider 初始化邏輯、診斷命令)
 
 ### User Satisfaction Metrics
 

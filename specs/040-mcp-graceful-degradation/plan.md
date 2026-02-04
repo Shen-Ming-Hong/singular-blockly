@@ -24,7 +24,7 @@
 
 - VSCode API 1.105.0+ (MCP Provider API)
 - Node.js child_process (用於執行 `node --version` 檢測)
-- semver 套件 (語意化版本比較) or 自行實作版本比較邏輯
+- 版本比較實作:自行實作 Regex-based 版本解析 (0 依賴策略,見 research.md 決策)
   **Storage**: VSCode workspace settings (`singularBlockly.mcp.nodePath`, `singularBlockly.mcp.showStartupWarning`)  
   **Testing**: Mocha + Sinon + @vscode/test-electron (從 copilot-instructions.md)  
   **Target Platform**: VSCode Extension (Node.js 環境 + Webview)  
@@ -45,13 +45,17 @@
 - 2 個新設定項 (nodePath, showStartupWarning)
 - 15 種語言的翻譯新增
 
-**研究項目 (NEEDS CLARIFICATION)**:
+**技術決策 (已於 research.md 研究完成)**:
 
-1. **Node.js 檢測方法選擇**: `child_process.exec` vs `execSync` vs `spawn` 的優缺點與最佳實踐
-2. **版本比較實作**: 使用 semver 套件 vs 自行實作正規表示式解析的權衡
-3. **VSCode 設定監聽模式**: `onDidChangeConfiguration` 的使用模式與效能考量
-4. **條件式 MCP 註冊**: MCP Provider 註冊邏輯的改造方式(避免破壞現有功能)
-5. **路徑驗證策略**: 如何區分「檔案不存在」vs「不是 Node.js」vs「權限不足」
+所有技術決策已在 Phase 0 研究階段完成並記錄於 [research.md](./research.md),關鍵決策摘要:
+
+1. **Node.js 檢測方法**: 使用 `child_process.exec()` (promisify),非同步執行避免阻塞 UI
+2. **版本比較實作**: 自行實作 Regex-based 版本解析,遵循 0 依賴原則,不使用 semver npm package
+3. **VSCode 設定監聽**: 使用 `vscode.workspace.onDidChangeConfiguration` 監聽設定變更並立即驗證
+4. **條件式 MCP 註冊**: 在 `extension.ts` 的 `registerMcpProviderIfAvailable()` 中加入 Node.js 前置檢查
+5. **路徑驗證策略**: 分階段驗證 - `fs.existsSync()` → `exec("node --version")` → 版本比較
+
+詳細技術選擇理由與替代方案評估請參閱 [research.md](./research.md)
 
 ## Constitution Check
 
@@ -59,19 +63,19 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 ### 核心原則合規性檢查
 
-| 原則                                          | 狀態      | 說明                                                                                                          |
-| --------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------- |
-| I. Simplicity and Maintainability             | ✅ 符合   | 使用清晰的服務層模式(NodeDetectionService),錯誤訊息本地化且易於理解                                           |
-| II. Modularity and Extensibility              | ✅ 符合   | 新增獨立服務(NodeDetectionService, DiagnosticService),不修改現有 MCP Provider 核心邏輯,僅在入口點增加條件判斷 |
-| III. Avoid Over-Development                   | ✅ 符合   | 解決真實使用者痛點(Node.js 缺失導致靜默失敗),功能範圍明確且必要,避免過度設計                                  |
-| IV. Flexibility and Adaptability              | ✅ 符合   | 支援自訂 Node.js 路徑設定,適應 nvm/fnm 等版本管理器使用者,設定驅動行為                                        |
-| V. Research-Driven Development                | ⚠️ 需遵守 | 需透過 MCP 工具研究: Node.js 檢測最佳實踐、semver 版本比較、VSCode 設定 API 模式                              |
-| VI. Structured Logging                        | ⚠️ 需遵守 | 所有 Node.js 檢測錯誤、MCP 啟動失敗、診斷資訊都必須使用 `log.*` 方法記錄,不使用 console.log                   |
-| VII. Comprehensive Test Coverage              | ⚠️ 需遵守 | 目標 90%+ 覆蓋率(SC-012),需為 NodeDetectionService、DiagnosticService、設定驗證邏輯撰寫完整單元測試           |
-| VIII. Pure Functions and Modular Architecture | ⚠️ 需遵守 | 版本比較邏輯應設計為純函數,檢測邏輯與副作用(child_process 呼叫)分離以提升可測試性                             |
-| IX. Traditional Chinese Documentation         | ✅ 符合   | spec.md 與 plan.md 都使用繁體中文撰寫                                                                         |
-| X. Professional Release Management            | ✅ 無影響 | 此為功能開發階段,不涉及發布流程                                                                               |
-| XI. Agent Skills Architecture                 | ✅ 無影響 | 此為功能開發,不涉及技能系統擴展                                                                               |
+| 原則                                          | 狀態      | 說明                                                                                                                              |
+| --------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| I. Simplicity and Maintainability             | ✅ 符合   | 使用清晰的服務層模式(NodeDetectionService),錯誤訊息本地化且易於理解                                                               |
+| II. Modularity and Extensibility              | ✅ 符合   | 新增獨立服務(NodeDetectionService, DiagnosticService),不修改現有 MCP Provider 核心邏輯,僅在入口點增加條件判斷                     |
+| III. Avoid Over-Development                   | ✅ 符合   | 解決真實使用者痛點(Node.js 缺失導致靜默失敗),功能範圍明確且必要,避免過度設計                                                      |
+| IV. Flexibility and Adaptability              | ✅ 符合   | 支援自訂 Node.js 路徑設定,適應 nvm/fnm 等版本管理器使用者,設定驅動行為                                                            |
+| V. Research-Driven Development                | ⚠️ 需遵守 | 需透過 MCP 工具研究: Node.js 檢測最佳實踐、semver 版本比較、VSCode 設定 API 模式                                                  |
+| VI. Structured Logging                        | ⚠️ 需遵守 | 所有 Node.js 檢測錯誤、MCP 啟動失敗、診斷資訊都必須使用 `log.*` 方法記錄,不使用 console.log                                       |
+| VII. Comprehensive Test Coverage              | ⚠️ 需遵守 | 目標 100% 覆蓋率(最低 90%),需為 NodeDetectionService、DiagnosticService、設定驗證邏輯撰寫完整單元測試。未達 100% 時應記錄剩餘工作 |
+| VIII. Pure Functions and Modular Architecture | ⚠️ 需遵守 | 版本比較邏輯應設計為純函數,檢測邏輯與副作用(child_process 呼叫)分離以提升可測試性                                                 |
+| IX. Traditional Chinese Documentation         | ✅ 符合   | spec.md 與 plan.md 都使用繁體中文撰寫                                                                                             |
+| X. Professional Release Management            | ✅ 無影響 | 此為功能開發階段,不涉及發布流程                                                                                                   |
+| XI. Agent Skills Architecture                 | ✅ 無影響 | 此為功能開發,不涉及技能系統擴展                                                                                                   |
 
 ### 開發標準合規性
 
@@ -90,8 +94,9 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 **關鍵風險項目:**
 
 - **測試設計**: 需小心設計 NodeDetectionService 測試,避免實際執行外部命令(使用 Sinon stub)
-- **錯誤訊息本地化**: 需為 15 種語言新增翻譯鍵(使用 `npm run validate:i18n` 驗證)
+- **錯誤訊息本地化**: 需為 15 種語言新增翻譯鍵(使用 `npm run validate:i18n` 驗證),所有訊息必須透過 LocaleService 載入
 - **MCP Provider 條件註冊**: 需確保改動不破壞現有 MCP 功能(有 Node.js 的使用者體驗不變)
+- **測試覆蓋率目標**: 以 100% 為目標,最低 90%。未達 100% 時需在文件中記錄剩餘工作
 
 ## Project Structure
 
@@ -219,9 +224,35 @@ package.json                               # [修改] 新增設定項與命令�
 - ✅ 服務介面設計支援依賴注入 (Dependency Injection),便於測試
 - ✅ 版本比較邏輯設計為純函數,無副作用
 
-### Phase 2: Tasks & Implementation ⏳ PENDING
+### Phase 2: Tasks & Implementation ✅ COMPLETED
 
-**下一步**: 執行 `/speckit.tasks` 命令生成 [tasks.md](./tasks.md) 完成任務分解
+**完成日期**: 2026-02-04
+
+**產出文件**: [tasks.md](./tasks.md)
+
+**任務分解摘要**:
+
+- **總任務數**: 100 個 (T001-T100)
+- **預估時間**: 16-18 小時 (單人) | 10-12 小時 (3 人協作)
+- **Phase 結構**: 9 個 Phase (Setup → Foundational → User Stories → 國際化 → 文件 → 測試 → Polish)
+- **平行執行標記**: 使用 [P] 標記可同時執行的任務
+- **User Story 對應**: 明確標記 [US1], [US2], [US3] 以追蹤覆蓋率
+
+**實作策略**:
+
+1. **MVP 優先策略** (僅 User Story 1): Phase 1 → Phase 2 → Phase 3 → 驗證 → 可選國際化與測試
+2. **完整功能策略** (所有 User Story): 循序完成 Phase 1-9,每個 User Story 完成後獨立驗證
+3. **多人協作策略** (3 位開發者): Foundation ready 後,分工執行 US1/US2/US3
+
+**關鍵里程碑**:
+
+- ✅ Phase 1 (Setup): 型別定義與基礎架構
+- ✅ Phase 2 (Foundational): NodeDetectionService + DiagnosticService (阻擋所有 User Story)
+- ✅ Phase 3-5: User Story 1 (P1) → User Story 2 (P2) → User Story 3 (P3)
+- ✅ Phase 6: 國際化 (15 種語言,32 個翻譯任務可平行)
+- ✅ Phase 7: 文件更新 (README, CHANGELOG, copilot-instructions)
+- ✅ Phase 8: 測試與品質保證 (目標覆蓋率 >= 90%)
+- ✅ Phase 9: Code review 與最終驗證
 
 ---
 

@@ -17,8 +17,8 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 - ✅ quickstart.md (開發流程指引)
 - ✅ contracts/ (VSCode 設定與命令契約)
 
-**Total Tasks**: 42  
-**Estimated Time**: 18-22 hours
+**Total Tasks**: 100  
+**Estimated Time**: 16-18 hours
 
 ---
 
@@ -59,6 +59,7 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 - [ ] T014 [P] 在 `src/services/diagnosticService.ts` 實作 `formatPlainTextReport()` 函數生成純文字格式 (適合複製到 GitHub Issue)
 - [ ] T015 [P] 在 `src/services/diagnosticService.ts` 實作 `copyToClipboard()` 函數使用 vscode.env.clipboard.writeText
 - [ ] T016 [P] 在 `src/services/diagnosticService.ts` 實作 `generateRecommendations()` 函數根據錯誤類型生成可操作建議
+- [ ] T016a [P] 在 `src/services/nodeDetectionService.ts` 實作錯誤日誌記錄,遵循 FR-005 規格:使用結構化格式包含錯誤類型(NodeErrorType)、nodePath、執行命令、stdout/stderr、時間戳(ISO 8601)、版本號(若可解析)、完整錯誤訊息,日誌等級使用 error/warn
 - [ ] T017 執行 `npm run compile` 驗證服務層無編譯錯誤並記錄日誌到 logging.ts
 
 **Checkpoint**: 基礎服務層已完成,可開始 User Story 實作
@@ -74,11 +75,12 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 ### 實作
 
 - [ ] T018 [US1] 在 `src/extension.ts` 建立 `registerMcpProviderIfAvailable()` 函數,加入 Node.js 前置檢測邏輯呼叫 NodeDetectionService.detectNodeJs()
-- [ ] T019 [US1] 在 `src/extension.ts` 實作 `showNodeJsWarning()` 函數,使用 vscode.window.showWarningMessage 顯示本地化警告訊息包含兩個按鈕
+- [ ] T019 [US1] 在 `src/extension.ts` 實作 `showNodeJsWarning()` 函數,使用 vscode.window.showWarningMessage 顯示本地化警告訊息包含兩個按鈕。**所有文字必須透過 LocaleService.getMessage() 取得,不得硬編碼字串**(FR-023)
 - [ ] T020 [US1] 在 `showNodeJsWarning()` 中處理「安裝指引」按鈕點擊,使用 vscode.env.openExternal 開啟 https://nodejs.org/
-- [ ] T021 [US1] 在 `showNodeJsWarning()` 中處理「稍後提醒」按鈕點擊,使用 vscode.workspace.getConfiguration 將 singularBlockly.mcp.showStartupWarning 設為 false
+- [ ] T021 [US1] 在 `showNodeJsWarning()` 中處理「稍後提醒」按鈕點擊,使用 vscode.workspace.getConfiguration 將 singularBlockly.mcp.showStartupWarning 設為 false 以永久停用該警告
 - [ ] T022 [US1] 在 `registerMcpProviderIfAvailable()` 中讀取 showStartupWarning 設定,僅當為 true 時顯示警告
 - [ ] T023 [US1] 在 `registerMcpProviderIfAvailable()` 中加入條件判斷,僅當 Node.js 可用且版本相容時呼叫 registerMcpProvider()
+- [ ] T023a [US1] 在 `registerMcpProviderIfAvailable()` 中加入 VSCode API 版本檢查 (vscode.lm.registerMcpServerDefinitionProvider 存在性),確保 VSCode < 1.105.0 時靜默跳過註冊 (FR-026),記錄 info 日誌但不顯示錯誤
 - [ ] T024 [US1] 修改 `src/extension.ts` 的 `activate()` 函數,將原有的 MCP Provider 註冊邏輯替換為 registerMcpProviderIfAvailable() 呼叫
 - [ ] T025 [US1] 使用 logging.ts 記錄 Node.js 檢測結果與 MCP Provider 註冊狀態 (info/warn 等級)
 
@@ -98,8 +100,8 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 - [ ] T027 [US2] 在 `package.json` 的 contributes.configuration 中新增 singularBlockly.mcp.showStartupWarning 設定項,type: boolean, default: true, scope: machine-overridable
 - [ ] T028 [US2] 在 `src/extension.ts` 建立 `setupConfigurationListener()` 函數,使用 vscode.workspace.onDidChangeConfiguration 監聽 singularBlockly.mcp 設定變更
 - [ ] T029 [US2] 在 `setupConfigurationListener()` 中加入 event.affectsConfiguration('singularBlockly.mcp.nodePath') 檢查
-- [ ] T030 [US2] 在 `setupConfigurationListener()` 中讀取新的 nodePath 設定並立即呼叫 NodeDetectionService.validateNodePath() 驗證
-- [ ] T031 [US2] 在 `setupConfigurationListener()` 中根據 PathValidationResult 顯示警告訊息 (無效路徑) 或資訊訊息 (有效路徑)
+- [ ] T030 [US2] 在 `setupConfigurationListener()` 中讀取新的 nodePath 設定並使用非同步驗證 (async/await),立即呼叫 NodeDetectionService.validateNodePath(),UI 使用 vscode.window.withProgress 顯示驗證進度通知「正在驗證 Node.js 路徑...」以避免阻塞設定介面 (FR-014)
+- [ ] T031 [US2] 在 `setupConfigurationListener()` 中根據 PathValidationResult 顯示警告訊息 (無效路徑,格式:「指定的 Node.js 路徑無效:[路徑]。錯誤:[具體錯誤]。請修正路徑或清空設定以使用預設的 'node' 命令。」) 或資訊訊息 (有效路徑)
 - [ ] T032 [US2] 修改 `src/extension.ts` 的 `activate()` 函數,加入 setupConfigurationListener(context, nodeDetectionService, localeService) 呼叫
 - [ ] T033 [US2] 修改 `registerMcpProviderIfAvailable()` 函數,從設定讀取 nodePath 並傳遞給 detectNodeJs(nodePath)
 - [ ] T034 [US2] 使用 logging.ts 記錄設定變更與路徑驗證結果
@@ -187,12 +189,25 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 - [ ] T080 [P] 建立 `src/test/suite/diagnosticService.test.ts` 測試 collectDiagnostics(), formatReport(), copyToClipboard() 函數 (5+ 測試場景)
 - [ ] T081 [P] 建立 `src/test/integration/mcpGracefulDegradation.test.ts` 測試完整流程 Extension 啟動 → Node.js 檢測 → MCP 註冊 (4+ 測試場景)
 - [ ] T082 執行 `npm test` 確保所有測試通過
-- [ ] T083 執行 `npm run test:coverage` 驗證測試覆蓋率 >= 90% (Statements, Branches, Functions, Lines)
+- [ ] T083 執行 `npm run test:coverage` 驗證測試覆蓋率,目標 100%,最低可接受 90% (Statements, Branches, Functions, Lines)。若未達 100%,記錄剩餘未覆蓋的程式碼區塊與原因
 - [ ] T084 執行 `npm run lint` 確保無 ESLint 錯誤
 - [ ] T085 手動測試 Node.js 不可用場景 (暫時重命名 node.exe 或設定無效路徑)
 - [ ] T086 手動測試診斷命令 (Ctrl+Shift+P → Singular Blockly: Check MCP Status)
 - [ ] T087 手動測試自訂路徑設定變更 (設定有效/無效路徑並觀察警告)
 - [ ] T088 手動測試 15 種語言介面 (切換 VSCode 語言並驗證訊息正確顯示)
+- [ ] T088a-01 [Edge Case] 手動測試:同時缺少 Node.js 和 MCP Server bundle,驗證診斷報告列出兩個問題並按優先級提供建議
+- [ ] T088a-02 [Edge Case] 手動測試:Node.js 版本剛好是 22.16.0,驗證視為合格版本且不顯示警告
+- [ ] T088a-03 [Edge Case] 手動測試:自訂路徑指向符號連結 (symlink),驗證正確解析並驗證最終可執行檔
+- [ ] T088a-04 [Edge Case] 手動測試:Windows 長路徑 (超過 260 字元,使用 \\?\C:\... 格式),驗證自訂路徑設定支援長路徑
+- [ ] T088a-05 [Edge Case] 手動測試:多工作區 (Multi-root workspace),驗證 Node.js 缺失警告僅顯示一次,診斷命令顯示主要工作區路徑
+- [ ] T088a-06 [Edge Case] 手動測試:權限問題,Node.js 可執行檔存在但無執行權限,驗證顯示「權限不足」錯誤而非「未找到」
+- [ ] T088a-07 [Edge Case] 手動測試:中文路徑包含中文字元,驗證自訂路徑正確處理 Windows 路徑編碼問題
+- [ ] T088a-08 [Edge Case] 手動測試:使用 nvm/fnm 快速切換 Node.js 版本後重新啟動 VSCode,驗證使用新版本且不快取舊版本資訊
+- [ ] T088a-09 [Edge Case] 手動測試:VSCode 版本過低 (< 1.105.0),驗證 MCP Provider 靜默跳過註冊,診斷命令顯示「❌ VSCode API 版本過低」
+- [ ] T088a-10 [Edge Case] 手動測試:離線環境,點擊「安裝 Node.js」按鈕驗證顯示「無法開啟瀏覽器,請手動訪問 https://nodejs.org/」訊息
+- [ ] T088a-11 [Edge Case] 手動測試:Extension 更新後 MCP Server bundle 改變,驗證重新啟動後使用新 bundle,檢測邏輯不快取檔案狀態
+- [ ] T088b [SC-011] 手動測試離線環境診斷命令:中斷網路連線後執行診斷命令,驗證仍能正常顯示本地化報告且不依賴網路。點擊「安裝 Node.js」按鈕驗證顯示適當的離線提示訊息
+- [ ] T088c [SC-008] 驗證診斷報告品質:模擬 10 個常見 MCP 問題場景 (1.Node.js 未安裝 2.版本過低 3.路徑錯誤 4.bundle 缺失 5.權限問題 6.VSCode版本過低 7.多個問題同時存在 8.符號連結路徑 9.長路徑 10.中文路徑),執行診斷命令並收集報告,驗證每個場景的報告都能直接識別根本原因且提供可操作建議,記錄驗證結果於測試報告中
 
 ---
 
@@ -200,9 +215,9 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 
 **目的**: 程式碼優化與發布準備
 
-- [ ] T089 Code review - 檢查所有新增檔案遵循 TypeScript strict mode 與 ESLint 規則
+- [ ] T089 Code review - 檢查所有新增檔案遵循 TypeScript strict mode 與 ESLint 規則。**額外檢查項目**(FR-023, FR-024):1) 驗證所有使用者可見文字都透過 LocaleService.getMessage() 或 vscode.l10n.t() 取得,無硬編碼字串 2) 驗證所有訊息鍵遵循命名慣例 (ERROR*MCP*_, config.mcp._, command.\*.title) 3) 驗證 15 種語言翻譯檔案的鍵名一致性
 - [ ] T090 Code review - 確保所有 console.log 已替換為 logging.ts 的 log() 方法
-- [ ] T091 Code review - 驗證所有錯誤處理使用 try-catch 且有適當日誌記錄
+- [ ] T091 Code review - 驗證所有錯誤處理使用 try-catch 且有適當日誌記錄,錯誤日誌符合 FR-005 的結構化格式要求
 - [ ] T092 執行 `specs/040-mcp-graceful-degradation/quickstart.md` 中的所有驗證步驟
 - [ ] T093 使用 F5 啟動 Extension Development Host 並檢查 Output Channel 日誌無異常
 - [ ] T094 在多工作區 (Multi-root workspace) 環境測試 Node.js 缺失警告僅顯示一次
