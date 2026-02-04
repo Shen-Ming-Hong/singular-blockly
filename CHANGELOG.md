@@ -8,6 +8,21 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 錯誤修復 Fixed
+
+- **修復 CyberBrick text_print 積木的換行控制功能** (Fix CyberBrick text_print block newline control)
+    - 修復 MicroPython 版本的 `text_print` 積木 NEW_LINE checkbox 功能，使其能正確控制輸出是否換行
+      Fixed MicroPython version of `text_print` block NEW_LINE checkbox to correctly control output newline behavior
+    - 勾選「換行」時產生 `print(msg)`，取消勾選時產生 `print(msg, end="")`
+      When "New Line" is checked, generates `print(msg)`; when unchecked, generates `print(msg, end="")`
+    - 與 Arduino 版本行為保持一致（`Serial.println()` vs `Serial.print()`）
+      Maintains consistent behavior with Arduino version (`Serial.println()` vs `Serial.print()`)
+    - 修改檔案 Modified files:
+        - `media/blockly/generators/micropython/text.js` (新增 2 行程式碼)
+        - `src/test/suite/text-print-generation.test.ts` (新增文件化測試)
+
 ## [0.61.1] - 2026-02-03
 
 ### 安全性修復 Security Fixes
