@@ -46,29 +46,34 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 **Independent Test**: 建立兩個 print 積木，第一個輸入 "Progress: "，取消勾選換行；第二個輸入 "100%"，勾選換行。產生程式碼並上傳到 CyberBrick，觀察終端機是否顯示 "Progress: 100%"（在同一行）。
 
-### 文件化測試 (Documentation Tests)
+### 預期程式碼格式規格 (Expected Code Format Specification)
 
-> **NOTE**: 這些測試記錄預期的程式碼格式，實際驗證透過手動測試完成（符合專案測試策略）
+> **NOTE**: 這些測試記錄預期的程式碼格式規格，作為可執行單元測試的驗證基準（符合專案測試策略）
 
-- [ ] T001 [US1] 建立文件化測試檔案 `src/test/suite/text-print-generation.test.ts`
-- [ ] T002 [P] [US1] 新增測試案例「NEW_LINE = TRUE: 應生成 print(msg)」使用正則表達式 `/^print\("Hello"\)$/` 記錄預期格式
-- [ ] T003 [P] [US1] 新增測試案例「NEW_LINE = FALSE: 應生成 print(msg, end="")」使用正則表達式 `/^print\("World", end=""\)$/` 記錄預期格式
-- [ ] T004 [P] [US1] 新增測試案例「空輸入: 應使用預設值 ""」記錄空輸入時的行為
+- [ ] T001 [US1] 建立測試檔案 `src/test/suite/text-print-generation.test.ts` （預期程式碼格式規格 + 可執行單元測試）
+- [ ] T002 [P] [US1] 新增測試案例「NEW_LINE = TRUE: 應生成 print(msg)」使用正則表達式 `/^print\("Hello"\)$/` 記錄預期格式並驗證實際產生的程式碼
+- [ ] T003 [P] [US1] 新增測試案例「NEW_LINE = FALSE: 應生成 print(msg, end="")」使用正則表達式 `/^print\("World", end=""\)$/` 記錄預期格式並驗證實際產生的程式碼
+- [ ] T004 [P] [US1] 新增測試案例「空輸入: 應使用預設值 ""」記錄並驗證空輸入時的行為
 - [ ] T005 [P] [US1] 新增測試案例「變數輸入: 不應加引號」使用正則表達式 `/^print\([a-zA-Z_][a-zA-Z0-9_]*\)$/` 驗證變數處理
 
 ### 核心實作
 
-- [ ] T006 [US1] 修改 `media/blockly/generators/micropython/text.js` 檔案中的 `text_print` generator 函數
+- [ ] T006 [US1] 定位到 `media/blockly/generators/micropython/text.js` 檔案中的 `text_print` generator 函數
 - [ ] T007 [US1] 在 generator 函數中新增欄位讀取邏輯：`const newLine = block.getFieldValue('NEW_LINE') === 'TRUE';`
 - [ ] T008 [US1] 修改 return 語句為條件式生成：``return `print(${msg}${newLine ? '' : ', end=""'})`;``
+- [ ] T008.5 [US1] 驗證 `media/toolbox/categories/arduino.json` 或相關 toolbox 配置中 `text_print` 積木的 NEW_LINE 欄位預設值為 "TRUE"
 
 ### 手動驗證
+
+> **執行者**: 功能開發者  
+> **結果記錄**: 在 PR 描述中附上終端機輸出截圖和驗證檢查清單，確認所有測試情境符合預期行為
 
 - [ ] T009 [US1] 重新載入 Extension Development Host（Ctrl+Shift+F5）確保修改生效
 - [ ] T010 [US1] 建立測試專案：選擇 CyberBrick 板子，專案名稱 `test-print-newline`
 - [ ] T011 [US1] 建立測試積木序列：text_print("A", NEW_LINE=☐) → text_print("B", NEW_LINE=☐) → text_print("C", NEW_LINE=☑)
 - [ ] T012 [US1] 檢查生成的 `main.py` 是否包含正確的程式碼（`print("A", end="")`、`print("B", end="")`、`print("C")`）
 - [ ] T013 [US1] 上傳到 CyberBrick 硬體，開啟終端機監控，驗證輸出為 "ABC"（在同一行）
+- [ ] T013.5 [US1] 邊際案例驗證：測試 (1) 包含 \n 的文字輸出（"Hello\nWorld" + NEW_LINE=☐），(2) 10+ 個連續不換行輸出，(3) 空白內容輸出，(4) 包含特殊字元（引號、反斜線）的內容
 
 **Checkpoint**: User Story 1 完成 - NEW_LINE checkbox 功能已修復並通過驗證
 
@@ -109,6 +114,7 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 - [ ] T023 [P] [US3] 在 `CHANGELOG.md` 中記錄變更：「修復 CyberBrick text_print 積木的 NEW_LINE checkbox 功能」
 - [ ] T024 [P] [US3] 更新 `quickstart.md` 中的測試驗證步驟（如果有需要補充的細節）
+- [ ] T024.5 [P] [US3] 驗證測試覆蓋率涵蓋 FR-007 定義的所有情境：(1) NEW_LINE=TRUE, (2) NEW_LINE=FALSE, (3) 空輸入, (4) 變數輸入，並確認分支覆蓋率達 100%
 
 **Checkpoint**: User Story 3 完成 - 測試覆蓋率和程式碼品質已達標
 
@@ -122,6 +128,7 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 - [ ] T026 [P] 執行 `npm run validate:i18n` 確認多語言翻譯完整性（積木定義和 i18n 無需修改，但需驗證無破壞）
 - [ ] T027 [P] 在 Extension Development Host 中測試所有支援的板子（Arduino Uno, ESP32, CyberBrick）確認無迴歸問題
 - [ ] T028 Code review 自我檢查：使用 `.github/skills/code-simplifier/SKILL.md` 檢視修改的程式碼是否符合簡潔性原則
+- [ ] T028.5 [P] 驗證 `media/blockly/blocks/arduino.js`、`media/locales/`、`media/toolbox/` 無意外修改（使用 `git diff` 檢查狀態）
 
 **Final Checkpoint**: 功能完整、測試通過、文件完善，準備建立 PR
 
@@ -214,34 +221,36 @@ description: '修復 CyberBrick Print 積木換行控制 - 任務列表'
 
 ## Parallel Example: User Story 1
 
-### Parallel Batch 1: 文件化測試（4 個任務可同時進行）
+### Parallel Batch 1: 預期程式碼格式規格（4 個任務可同時進行）
 
 ```bash
 # T002, T003, T004, T005 可並行執行，因為它們是不同的測試案例
-Task T002: 新增測試案例「NEW_LINE = TRUE: 應生成 print(msg)」使用正則表達式
-Task T003: 新增測試案例「NEW_LINE = FALSE: 應生成 print(msg, end="")」使用正則表達式
-Task T004: 新增測試案例「空輸入: 應使用預設值 ""」記錄預期行為
-Task T005: 新增測試案例「變數輸入: 不應加引號」使用正則表達式
+Task T002: 新增測試案例「NEW_LINE = TRUE: 應生成 print(msg)」記錄預期格式並驗證
+Task T003: 新增測試案例「NEW_LINE = FALSE: 應生成 print(msg, end="")」記錄預期格式並驗證
+Task T004: 新增測試案例「空輸入: 應使用預設值 ""」記錄並驗證預期行為
+Task T005: 新增測試案例「變數輸入: 不應加引號」驗證變數處理
 ```
 
 ### Sequential: 核心實作（必須按順序）
 
 ```bash
-# T006 → T007 → T008 必須按順序執行（修改同一個函數）
-T006: 修改 media/blockly/generators/micropython/text.js
+# T006 → T007 → T008 → T008.5 必須按順序執行
+T006: 定位到 media/blockly/generators/micropython/text.js 的 text_print 函數
 T007: 新增欄位讀取邏輯
 T008: 修改 return 語句為條件式生成
+T008.5: 驗證 toolbox 預設值為 "TRUE"
 ```
 
 ### Sequential: 手動驗證（必須按順序）
 
 ```bash
-# T009 → T010 → T011 → T012 → T013 必須按順序執行（驗證流程）
+# T009 → T010 → T011 → T012 → T013 → T013.5 必須按順序執行（驗證流程）
 T009: 重新載入 Extension Development Host
 T010: 建立測試專案
 T011: 建立測試積木序列
 T012: 檢查生成的程式碼
 T013: 上傳到硬體並驗證終端機輸出
+T013.5: 驗證邊際案例（包含 \n、連續不換行、空白內容、特殊字元）
 ```
 
 ---
@@ -268,7 +277,7 @@ T013: 上傳到硬體並驗證終端機輸出
 ```bash
 # Sprint 1: MVP (最高優先級)
 Phase 3: User Story 1
-→ 測試獨立性: ✅ 建立 print 積木並驗證程式碼格式
+→ 測試獨立性: ✅ 建立 print 積木並驗證程式碼格式（含邊際案例）
 → 部署/Demo: ✅ 可展示 NEW_LINE checkbox 功能正常
 
 # Sprint 2: 跨平台一致性
@@ -310,21 +319,21 @@ Developer C: Phase 4 (User Story 2) - 研究 Arduino 實作（不修改，等待
 | --------------------------- | -------- | ---------- | ----------- |
 | Phase 1: Setup              | 0        | 0          | 0 分鐘      |
 | Phase 2: Foundational       | 0        | 0          | 0 分鐘      |
-| Phase 3: User Story 1 (MVP) | 13       | 4 (測試)   | 20 分鐘     |
+| Phase 3: User Story 1 (MVP) | 15       | 4 (測試)   | 25 分鐘     |
 | Phase 4: User Story 2       | 5        | 0          | 10 分鐘     |
-| Phase 5: User Story 3       | 6        | 5 (驗證)   | 10 分鐘     |
-| Phase 6: Polish             | 4        | 4 (全部)   | 10 分鐘     |
-| **Total**                   | **28**   | **13**     | **50 分鐘** |
+| Phase 5: User Story 3       | 7        | 5 (驗證)   | 12 分鐘     |
+| Phase 6: Polish             | 5        | 5 (全部)   | 12 分鐘     |
+| **Total**                   | **32**   | **14**     | **59 分鐘** |
 
-**MVP 範圍**: 13 個任務（僅 Phase 3）- 預估 20 分鐘  
-**完整功能**: 28 個任務（所有 Phase）- 預估 50 分鐘
+**MVP 範圍**: 15 個任務（僅 Phase 3）- 預估 25 分鐘  
+**完整功能**: 32 個任務（所有 Phase）- 預估 59 分鐘
 
 **並行加速潛力**:
 
-- 若 4 個文件化測試並行: 節省約 8 分鐘
+- 若 4 個預期程式碼格式規格測試並行: 節省約 8 分鐘
 - 若 Phase 3 測試驗證並行: 節省約 5 分鐘
-- 若 Polish 階段並行: 節省約 6 分鐘
-- **最佳情境總時間**: 約 30 分鐘（單一開發者，充分利用並行）
+- 若 Polish 階段並行: 節省約 7 分鐘
+- **最佳情境總時間**: 約 39 分鐘（單一開發者，充分利用並行）
 
 ---
 
@@ -333,13 +342,14 @@ Developer C: Phase 4 (User Story 2) - 研究 Arduino 實作（不修改，等待
 - **[P] 標記**: 表示任務操作不同檔案或為獨立驗證步驟，可並行執行
 - **[Story] 標籤**: 追蹤任務所屬用戶故事（US1, US2, US3）
 - **獨立可測試**: 每個用戶故事完成後都可獨立驗證功能
-- **測試策略**: 先寫文件化測試（記錄預期格式），再實作（確保理解正確）
-- **Commit 建議**: 每完成一個用戶故事後 commit（T013 後, T018 後, T024 後）
+- **測試策略**: 先寫預期程式碼格式規格（記錄預期格式），再實作（確保理解正確），最後透過可執行單元測試和手動驗證
+- **Commit 建議**: 每完成一個用戶故事後 commit（T013.5 後, T018 後, T024.5 後）
 - **Checkpoint 驗證**: 在每個 Checkpoint 處暫停並執行獨立測試，確保用戶故事完整
 - **避免陷阱**:
-    - ❌ 不要跳過測試步驟（文件化測試也是規格文件）
+    - ❌ 不要跳過測試步驟（預期程式碼格式規格是可執行的驗證基準）
     - ❌ 不要同時修改多個 generator 檔案（易產生衝突）
     - ❌ 不要跳過手動驗證（硬體行為是最終標準）
+    - ❌ 不要忽略邊際案例測試（確保功能在極端情境下仍正常運作）
 
 ---
 

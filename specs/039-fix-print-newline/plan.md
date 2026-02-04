@@ -11,22 +11,22 @@
 
 **技術方法**:
 
-- 讀取 `block.getFieldValue('NEW_LINE')` 並與 `'TRUE'` 比較
-- 使用三元運算子條件式生成: `print(${msg}${newLine ? '' : ', end=""'})`
+- 讀取 `block.getFieldValue('NEW_LINE')` 並與 `'TRUE'` 比較（1 行新增）
+- 使用三元運算子條件式生成: `print(${msg}${newLine ? '' : ', end=""'})`（1 行修改）
 - 參考 Arduino generator 的實作模式確保跨平台一致性
-- 採用文件化測試 + 手動驗證的測試策略
+- 採用預期程式碼格式規格 + 可執行單元測試 + 手動驗證的測試策略
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9.3 (Extension), JavaScript ES2020 (Generator), MicroPython (Target Platform)  
 **Primary Dependencies**: Blockly 12.3.1, VSCode API 1.105.0+, Mocha + Sinon (測試)  
 **Storage**: 檔案系統 (blockly/main.json for workspace state, main.py for generated code)  
-**Testing**: Mocha + Sinon (文件化測試) + 手動驗證 (Extension Development Host + CyberBrick 硬體)  
+**Testing**: Mocha + Sinon (預期程式碼格式規格 + 可執行單元測試) + 手動驗證 (Extension Development Host + CyberBrick 硬體)  
 **Target Platform**: VSCode Extension (Node.js) + WebView (Browser) + CyberBrick 硬體 (MicroPython)
 **Project Type**: 單一專案 (VSCode Extension with WebView architecture)  
 **Performance Goals**: 即時程式碼生成 (<100ms per block), 無感知的 workspace 儲存 (<50ms)  
 **Constraints**: 必須與 Arduino 版本行為一致 (跨平台等價性), 符合 Python 語法規範, 15 種語言 i18n 支援  
-**Scale/Scope**: 單一積木修復, 影響 1 個檔案 (`media/blockly/generators/micropython/text.js`), 新增 2 行程式碼
+**Scale/Scope**: 單一積木修復, 影響 1 個檔案 (`media/blockly/generators/micropython/text.js`), 修改 1 個函數新增 2 行程式碼
 
 ## Constitution Check
 
@@ -42,7 +42,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 | IV. Flexibility             | ✅ PASS        | 支援 Arduino 和 MicroPython 雙平台                 |
 | V. Research-Driven          | 🔄 IN PROGRESS | 需完成 Phase 0 研究                                |
 | VI. Structured Logging      | N/A            | Generator 不使用 logging                           |
-| VII. Test Coverage          | ⚠️ MODIFIED    | 採用文件化測試策略 (符合憲章 UI Testing Exception) |
+| VII. Test Coverage          | ✅ PASS        | 採用預期格式規格 + 手動驗證 (符合憲章 UI Testing Exception) |
 | VIII. Pure Functions        | ✅ PASS        | Generator 是純函數,無副作用                        |
 | IX. Traditional Chinese     | ✅ PASS        | 所有規劃文件使用繁體中文                           |
 | X. Release Management       | N/A            | 未到發布階段                                       |
@@ -52,7 +52,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 **Justifications**:
 
-- **Principle VII (Test Coverage)**: 採用憲章認可的文件化測試模式,因為 Blockly Generator 在 WebView 環境執行,完整自動化測試成本過高且容易誤導。參考 `src/test/suite/code-generation.test.ts` 的現有模式。
+- **Principle VII (Test Coverage)**: 採用憲章認可的 UI Testing Exception 模式（預期程式碼格式規格 + 手動驗證），因為 Blockly Generator 在 WebView 環境執行，完整自動化測試成本過高且容易誤導。參考 `src/test/suite/code-generation.test.ts` 的現有模式。
 
 ---
 
@@ -61,7 +61,7 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 | Principle            | Status  | Notes                                                                                             |
 | -------------------- | ------- | ------------------------------------------------------------------------------------------------- |
 | V. Research-Driven   | ✅ PASS | 已完成 [research.md](research.md): MicroPython API、Blockly Field API、Arduino 參考實作、測試策略 |
-| VII. Test Coverage   | ✅ PASS | 已設計文件化測試 + 手動驗證流程,符合專案慣例                                                      |
+| VII. Test Coverage   | ✅ PASS | 已設計預期程式碼格式規格 + 可執行單元測試 + 手動驗證流程，符合憲章 UI Testing Exception          |
 | VIII. Pure Functions | ✅ PASS | Generator 設計確認為純函數: `(block) => string`,無全域狀態修改                                    |
 
 **Gate Decision**: ✅ **PASS** - 可進入 Phase 2 實作階段

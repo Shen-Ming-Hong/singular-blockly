@@ -71,7 +71,7 @@
 - **FR-004**: 產生的程式碼行為 MUST 與 Arduino 版本的邏輯對等（Arduino: `Serial.print()` vs `Serial.println()` = MicroPython: `print(msg, end='')` vs `print(msg)`）
 - **FR-005**: Toolbox 中的預設值 MUST 維持 `"NEW_LINE": "TRUE"`（新建積木時預設勾選換行）
 - **FR-006**: 積木定義（blocks/arduino.js）、i18n 翻譯檔案（15 種語言）、toolbox 配置 MUST 保持不變（這些部分已經正確）
-- **FR-007**: 修改後的產生器 MUST 包含完整的單元測試，涵蓋勾選和取消勾選兩種情境
+- **FR-007**: 修改後的產生器 MUST 包含完整的預期程式碼格式規格文件（記錄預期輸出格式）以及可執行的單元測試。「完整」定義為涵蓋以下情境：(1) NEW_LINE=TRUE 產生 `print(msg)`，(2) NEW_LINE=FALSE 產生 `print(msg, end='')`，(3) 空輸入使用預設值 ""，(4) 變數輸入不加引號，且分支覆蓋率達 100%
 
 ### Key Entities
 
@@ -84,6 +84,6 @@
 
 - **SC-001**: 使用者建立取消勾選換行的 print 積木後，產生的 MicroPython 程式碼包含 `, end=''` 參數（可透過程式碼檢查驗證）
 - **SC-002**: 使用者建立勾選換行的 print 積木後，產生的 MicroPython 程式碼不包含 `end` 參數（使用 Python 預設行為）
-- **SC-003**: 上傳到 CyberBrick 實機並執行後，終端機行為完全符合 checkbox 的設定（100% 匹配率）
+- **SC-003**: 上傳到 CyberBrick 實機並執行後，終端機行為完全符合 checkbox 設定：勾選時每次輸出自動換行，不勾選時輸出不換行且下一個輸出接續在同一行（透過手動觀察終端機輸出驗證，記錄截圖於 PR）
 - **SC-004**: 單元測試覆蓋率維持在 90% 以上，且 `text_print` MicroPython 產生器有專屬測試案例
 - **SC-005**: Arduino 和 MicroPython 版本的 print 積木在相同 checkbox 設定下，終端機輸出行為保持一致（視覺效果對等）
