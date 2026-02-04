@@ -24,11 +24,18 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 
 ## 工作流程 Workflow
 
-### Phase 0: 等待 Copilot Review（可選）Wait for Copilot Review (Optional)
+### Phase 0: 等待 Copilot Review（必須）Wait for Copilot Review (REQUIRED)
 
-若 PR 已配置 Copilot 作為 Reviewer 且尚未完成 review，可使用輪詢腳本等待：
+**⚠️ 阻塞型步驟：此步驟必須完成才能進入 Code Review 評估階段。**
 
-1. **啟動輪詢監聽**
+1. **請求 Copilot Review（若尚未配置）**
+
+    ```bash
+    # 請求 Copilot 作為 reviewer（使用 gh CLI 避免 MCP 延遲）
+    gh pr edit <PR_NUMBER> --add-reviewer copilot-pull-request-reviewer
+    ```
+
+2. **啟動輪詢監聽**
 
     ```powershell
     # 使用背景模式執行（Agent 可用 await_terminal 等待結果）
@@ -38,27 +45,35 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     .\.github\skills\pr-review-release\scripts\poll-review.ps1 -PrNumber 123 -TimeoutMinutes 60 -PollIntervalSeconds 30
     ```
 
-2. **腳本行為說明**
+3. **腳本行為說明**
     - 每 60 秒查詢一次 `copilot-pull-request-reviewer` 的 review 狀態
     - 狀態為 `APPROVED` 時：exit 0，輸出 review 詳情
     - 狀態為 `CHANGES_REQUESTED` 時：exit 1，輸出需修改的內容
     - 逾時（預設 30 分鐘）：exit 2
 
-3. **Agent 整合用法**
+4. **Agent 整合用法（必須執行）**
 
     ```typescript
-    // 背景執行
+    // 步驟 1: 請求 Copilot Review（使用 gh CLI 避免 MCP 延遲）
+    run_in_terminal({
+    	command: 'gh pr edit <PR_NUMBER> --add-reviewer copilot-pull-request-reviewer',
+    	isBackground: false,
+    	goal: '請求 Copilot Code Review',
+    });
+
+    // 步驟 2: 背景執行輪詢腳本
     run_in_terminal({
     	command: '.\.github\skills\pr-review-release\scripts\poll-review.ps1',
     	isBackground: true,
-    	goal: '等待 Copilot Code Review',
+    	goal: '等待 Copilot Code Review（必須完成）',
     });
 
-    // 等待結果（逾時 30 分鐘）
+    // 步驟 3: 等待結果（逾時 30 分鐘）
     await_terminal({ id: terminalId, timeout: 1800000 });
+    // 必須根據 exit code 判斷後續流程
     ```
 
-4. **手動查詢 Copilot Review 狀態**
+5. **手動查詢 Copilot Review 狀態**
 
     ```bash
     # 查詢最新 Copilot review
@@ -322,11 +337,13 @@ gh release view v{VERSION} --web
 
 ## 檢查清單 Checklist
 
-### 等待 Review 階段（可選）
+### 等待 Review 階段（阻塞型）
 
-- [ ] 確認 PR 已配置 Copilot Reviewer
-- [ ] 執行輪詢腳本等待 review 完成
+- [ ] 若尚未配置，使用 `gh pr edit --add-reviewer copilot-pull-request-reviewer` 請求 Copilot Review
+- [ ] 執行輪詢腳本等待 review 完成（不可跳過）
 - [ ] Review 狀態已確認（APPROVED / CHANGES_REQUESTED）
+
+> ❌ **禁止跳過**：未取得 Copilot Review 結果不得進入 Phase 1。
 
 ### Code Review 階段
 
