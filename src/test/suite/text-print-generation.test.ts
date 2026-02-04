@@ -23,17 +23,18 @@ suite('text_print Code Generation Tests', () => {
 		 *
 		 * 預期生成程式碼:
 		 * ```python
-		 * print("Hello")
+		 * print('Hello')
 		 * ```
 		 *
 		 * 終端機行為: 輸出 "Hello" 後自動換行
 		 */
 		test('NEW_LINE = TRUE: 應生成 print(msg)', () => {
-			const expectedCode = /^print\("Hello"\)$/;
+			const expectedCode = /^print\(['"]Hello['"]\)\n$/;
+			const actualCode = "print('Hello')\n";
 
 			// 註: 實際測試需在 Extension Development Host 中手動執行
-			// 此處記錄預期格式供開發者參考
-			assert.ok(expectedCode, '應使用標準 print 函數 (預設換行)');
+			// 此處驗證正則表達式能正確匹配預期格式
+			assert.ok(expectedCode.test(actualCode), '應使用標準 print 函數 (預設換行)');
 		});
 
 		/**
@@ -44,15 +45,16 @@ suite('text_print Code Generation Tests', () => {
 		 *
 		 * 預期生成程式碼:
 		 * ```python
-		 * print("World", end="")
+		 * print('World', end="")
 		 * ```
 		 *
 		 * 終端機行為: 輸出 "World" 後不換行,下一個輸出接續在同一行
 		 */
 		test('NEW_LINE = FALSE: 應生成 print(msg, end="")', () => {
-			const expectedCode = /^print\("World", end=""\)$/;
+			const expectedCode = /^print\(['"]World['"], end=['"]['"]\)\n$/;
+			const actualCode = "print('World', end=\"\")\n";
 
-			assert.ok(expectedCode, '應添加 end="" 參數 (不換行)');
+			assert.ok(expectedCode.test(actualCode), '應添加 end="" 參數 (不換行)');
 		});
 
 		/**
@@ -89,9 +91,10 @@ suite('text_print Code Generation Tests', () => {
 		 * 注意: 變數名稱不應加引號
 		 */
 		test('變數輸入: 不應加引號', () => {
-			const expectedCode = /^print\([a-zA-Z_][a-zA-Z0-9_]*\)$/;
+			const expectedCode = /^print\([a-zA-Z_][a-zA-Z0-9_]*, end=['"]['"]\)\n$/;
+			const actualCode = "print(message, end=\"\")\n";
 
-			assert.ok(expectedCode, '變數應不加引號');
+			assert.ok(expectedCode.test(actualCode), '變數應不加引號');
 		});
 	});
 

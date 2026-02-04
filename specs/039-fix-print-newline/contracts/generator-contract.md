@@ -145,7 +145,7 @@ interface OutputFormat {
 
 1. **語法有效性**: 輸出是有效的 Python 語法
 2. **單行輸出**: 不包含多行程式碼 (不需要 setup 或 imports)
-3. **終止符**: 不包含結尾的換行符 `\n` (由 Blockly 統一處理)
+3. **終止符**: 輸出字串必須以單一結尾換行符 `\n` 結尾 (符合其他 statement generator 慣例, 由上層直接串接)
 4. **Idempotency**: 相同的輸入永遠產生相同的輸出
 5. **No Side Effects**: Generator 不修改 workspace 或全域狀態
 

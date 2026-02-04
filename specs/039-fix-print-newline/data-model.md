@@ -444,7 +444,7 @@ TEXT = 'Hello\nWorld';
 NEW_LINE = FALSE;
 
 // Generated Code
-print('Hello\nWorld', (end = ''));
+print('Hello\nWorld', end='');
 
 // Terminal Output
 Hello;
