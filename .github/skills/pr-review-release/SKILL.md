@@ -28,14 +28,9 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 
 **⚠️ 阻塞型步驟：此步驟必須完成才能進入 Code Review 評估階段。**
 
-1. **請求 Copilot Review（若尚未配置）**
+> 💡 Copilot Code Review 已在 GitHub 倉庫設定中配置為自動觸發，無需手動請求。
 
-    ```bash
-    # 請求 Copilot 作為 reviewer（使用 gh CLI 避免 MCP 延遲）
-    gh pr edit <PR_NUMBER> --add-reviewer copilot-pull-request-reviewer
-    ```
-
-2. **啟動輪詢監聽**
+1. **啟動輪詢監聽**
 
     ```powershell
     # 使用背景模式執行（Agent 可用 await_terminal 等待結果）
@@ -45,35 +40,28 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     .\.github\skills\pr-review-release\scripts\poll-review.ps1 -PrNumber 123 -TimeoutMinutes 60 -PollIntervalSeconds 30
     ```
 
-3. **腳本行為說明**
+2. **腳本行為說明**
     - 每 60 秒查詢一次 `copilot-pull-request-reviewer` 的 review 狀態
     - 狀態為 `APPROVED` 時：exit 0，輸出 review 詳情
     - 狀態為 `CHANGES_REQUESTED` 時：exit 1，輸出需修改的內容
     - 逾時（預設 30 分鐘）：exit 2
 
-4. **Agent 整合用法（必須執行）**
+3. **Agent 整合用法（必須執行）**
 
     ```typescript
-    // 步驟 1: 請求 Copilot Review（使用 gh CLI 避免 MCP 延遲）
-    run_in_terminal({
-    	command: 'gh pr edit <PR_NUMBER> --add-reviewer copilot-pull-request-reviewer',
-    	isBackground: false,
-    	goal: '請求 Copilot Code Review',
-    });
-
-    // 步驟 2: 背景執行輪詢腳本
+    // 步驟 1: 背景執行輪詢腳本等待自動觸發的 Copilot Review
     run_in_terminal({
     	command: '.\.github\skills\pr-review-release\scripts\poll-review.ps1',
     	isBackground: true,
     	goal: '等待 Copilot Code Review（必須完成）',
     });
 
-    // 步驟 3: 等待結果（逾時 30 分鐘）
+    // 步驟 2: 等待結果（逾時 30 分鐘）
     await_terminal({ id: terminalId, timeout: 1800000 });
     // 必須根據 exit code 判斷後續流程
     ```
 
-5. **手動查詢 Copilot Review 狀態**
+4. **手動查詢 Copilot Review 狀態**
 
     ```bash
     # 查詢最新 Copilot review
@@ -339,8 +327,7 @@ gh release view v{VERSION} --web
 
 ### 等待 Review 階段（阻塞型）
 
-- [ ] 若尚未配置，使用 `gh pr edit --add-reviewer copilot-pull-request-reviewer` 請求 Copilot Review
-- [ ] 執行輪詢腳本等待 review 完成（不可跳過）
+- [ ] 執行輪詢腳本等待自動觸發的 Copilot Review 完成（不可跳過）
 - [ ] Review 狀態已確認（APPROVED / CHANGES_REQUESTED）
 
 > ❌ **禁止跳過**：未取得 Copilot Review 結果不得進入 Phase 1。
