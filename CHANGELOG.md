@@ -32,8 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       Diagnostic reports now display localized text based on user's VSCode language setting
     - 時間戳會使用使用者語言對應的格式顯示（不再硬編碼為 zh-TW）
       Timestamps now use the format corresponding to user's language (no longer hardcoded to zh-TW)
-    - 新增 37 個診斷報告相關翻譯鍵 (DIAG_*, REC_*) 至所有 15 種語言
-      Added 37 diagnostic report translation keys (DIAG_*, REC_*) to all 15 languages
+    - 新增 37 個診斷報告相關翻譯鍵 (DIAG*\*, REC*_) 至所有 15 種語言
+      Added 37 diagnostic report translation keys (DIAG\__, REC\_\*) to all 15 languages
 
 ### 錯誤修復 Fixed
 
