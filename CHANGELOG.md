@@ -10,6 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.62.2] - 2026-02-05
+
+### 安全性修復 Security Fixes
+
+- **修復 MCP SDK 跨客戶端資料洩漏漏洞 (CVE-2026-25536)** (Fix MCP SDK Cross-Client Data Leak Vulnerability)
+    - 升級 `@modelcontextprotocol/sdk` 從 1.25.3 至 1.26.0
+      Upgraded `@modelcontextprotocol/sdk` from 1.25.3 to 1.26.0
+    - 修復當單一 McpServer/Server 和 transport 實例在多個客戶端連線間重用時的跨客戶端回應資料洩漏問題
+      Fixed cross-client response data leak when a single McpServer/Server and transport instance is reused across multiple client connections
+    - 嚴重程度 Severity: High (CVSS: 7.1)
+    - 關閉 Dependabot Alert #21
+      Closes Dependabot Alert #21
+
 ## [0.62.1] - 2026-02-05
 
 ### 改進 Improved
