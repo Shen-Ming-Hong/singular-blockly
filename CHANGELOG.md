@@ -10,6 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.62.1] - 2026-02-05
+
+### 改進 Improved
+
+- **診斷報告完整國際化支援** (Full Internationalization for Diagnostic Reports)
+    - 診斷報告現在會根據使用者的 VSCode 語言設定顯示本地化文字
+      Diagnostic reports now display localized text based on user's VSCode language setting
+    - 時間戳會使用使用者語言對應的格式顯示（不再硬編碼為 zh-TW）
+      Timestamps now use the format corresponding to user's language (no longer hardcoded to zh-TW)
+    - 新增 37 個診斷報告相關翻譯鍵 (DIAG_*, REC_*) 至所有 15 種語言
+      Added 37 diagnostic report translation keys (DIAG_*, REC_*) to all 15 languages
+
+### 錯誤修復 Fixed
+
+- **修復 Copilot Code Review 指出的問題** (Fix issues identified by Copilot Code Review)
+    - 修復 `showNodeJsWarning` 函數中設定更新失敗未處理的問題
+      Fixed unhandled setting update failure in `showNodeJsWarning` function
+    - 修復時間戳格式硬編碼為 zh-TW 的問題，改為動態根據使用者語言設定
+      Fixed hardcoded zh-TW timestamp format, now dynamically uses user's language setting
+    - 修復診斷報告文字硬編碼為繁體中文的問題，改為透過 LocaleService 獲取本地化文字
+      Fixed hardcoded Traditional Chinese text in diagnostic reports, now uses LocaleService for localization
+
 ## [0.62.0] - 2026-02-05
 
 ### 新增功能 Added
