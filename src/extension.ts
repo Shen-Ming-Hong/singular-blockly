@@ -311,8 +311,8 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 						// 收集診斷資訊
 						const report = await diagnosticService.collectDiagnostics(context.extensionPath);
 
-						// 格式化報告
-						const formattedReport = diagnosticService.formatReport(report, { format: 'text', useEmoji: true });
+						// 格式化報告 (now async)
+						const formattedReport = await diagnosticService.formatReport(report, { format: 'text', useEmoji: true });
 
 						// 獲取複製按鈕文字
 						const copyButton = await localeService.getLocalizedMessage(
@@ -448,10 +448,16 @@ async function showNodeJsWarning(nodeDetection: import('./types/nodeDetection').
 		log('User clicked Install Guide button', 'info');
 	} else if (action === laterButton) {
 		// Disable startup warning
-		await vscodeApi.workspace
-			.getConfiguration('singularBlockly.mcp')
-			.update('showStartupWarning', false, vscodeApi.ConfigurationTarget.Global);
-		log('User disabled Node.js startup warning', 'info');
+		try {
+			await vscodeApi.workspace
+				.getConfiguration('singularBlockly.mcp')
+				.update('showStartupWarning', false, vscodeApi.ConfigurationTarget.Global);
+			log('User disabled Node.js startup warning', 'info');
+		} catch (error) {
+			log('Failed to update showStartupWarning setting', 'error', error);
+			// Setting update failed, but don't show another error to user
+			// The warning will appear again on next startup
+		}
 	}
 }
 

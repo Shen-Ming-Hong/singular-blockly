@@ -228,7 +228,7 @@ export interface IDiagnosticService {
 	 * @param options Format options
 	 * @returns Formatted report text
 	 */
-	formatReport(report: McpDiagnosticReport, options?: DiagnosticReportFormatOptions): string;
+	formatReport(report: McpDiagnosticReport, options?: DiagnosticReportFormatOptions): Promise<string>;
 
 	/**
 	 * Copy diagnostic report to clipboard

@@ -19,6 +19,27 @@ import {
 import { log } from './logging';
 
 /**
+ * Map Blockly language codes to locale strings for date formatting
+ */
+const LOCALE_MAP: Record<string, string> = {
+	'zh-hant': 'zh-TW',
+	en: 'en-US',
+	ja: 'ja-JP',
+	ko: 'ko-KR',
+	de: 'de-DE',
+	es: 'es-ES',
+	fr: 'fr-FR',
+	'pt-br': 'pt-BR',
+	it: 'it-IT',
+	ru: 'ru-RU',
+	pl: 'pl-PL',
+	hu: 'hu-HU',
+	cs: 'cs-CZ',
+	tr: 'tr-TR',
+	bg: 'bg-BG',
+};
+
+/**
  * Diagnostic service implementation
  */
 export class DiagnosticService implements IDiagnosticService {
@@ -26,6 +47,14 @@ export class DiagnosticService implements IDiagnosticService {
 		private nodeDetectionService: NodeDetectionService,
 		private localeService: LocaleService
 	) {}
+
+	/**
+	 * Get the locale string for date formatting based on current language
+	 */
+	private getDateLocale(): string {
+		const currentLang = this.localeService.getCurrentLanguage();
+		return LOCALE_MAP[currentLang] || 'en-US';
+	}
 
 	/**
 	 * Collect MCP diagnostic information
@@ -54,8 +83,13 @@ export class DiagnosticService implements IDiagnosticService {
 		// 5. Overall status assessment
 		const overallStatus = this.assessOverallStatus(nodeDetection, mcpServerBundleExists, vscodeApiSupported);
 
-		// 6. Generate recommendations
-		const recommendations = this.generateRecommendations(nodeDetection, mcpServerBundleExists, vscodeApiSupported, workspacePath);
+		// 6. Generate recommendations (now async for localization)
+		const recommendations = await this.generateRecommendations(
+			nodeDetection,
+			mcpServerBundleExists,
+			vscodeApiSupported,
+			workspacePath
+		);
 
 		const report: McpDiagnosticReport = {
 			nodeDetection,
@@ -81,12 +115,12 @@ export class DiagnosticService implements IDiagnosticService {
 	}
 
 	/**
-	 * Format diagnostic report into user-readable text
+	 * Format diagnostic report into user-readable text (async for localization)
 	 * @param report Diagnostic report
 	 * @param options Format options
 	 * @returns Formatted report text
 	 */
-	formatReport(report: McpDiagnosticReport, options?: DiagnosticReportFormatOptions): string {
+	async formatReport(report: McpDiagnosticReport, options?: DiagnosticReportFormatOptions): Promise<string> {
 		const useEmoji = options?.useEmoji ?? true;
 		const checkmark = useEmoji ? '✅' : '[OK]';
 		const cross = useEmoji ? '❌' : '[FAIL]';
@@ -94,46 +128,76 @@ export class DiagnosticService implements IDiagnosticService {
 		const gear = useEmoji ? '⚙️' : '[CFG]';
 		const time = useEmoji ? '⏰' : '[TIME]';
 
-		let reportText = '【MCP Server 診斷報告】\n\n';
+		// Get localized strings
+		const reportTitle = await this.localeService.getLocalizedMessage('DIAG_REPORT_TITLE', 'MCP Server Diagnostic Report');
+		const nodeVersionLabel = await this.localeService.getLocalizedMessage('DIAG_NODEJS_VERSION', 'Node.js Version');
+		const versionTooLow = await this.localeService.getLocalizedMessage(
+			'DIAG_VERSION_TOO_LOW',
+			'Version too low ({0}, requires >= 22.16.0)',
+			report.nodeDetection.version || ''
+		);
+		const mcpBundleLabel = await this.localeService.getLocalizedMessage('DIAG_MCP_BUNDLE', 'MCP Server Bundle');
+		const existsText = await this.localeService.getLocalizedMessage('DIAG_EXISTS', 'Exists');
+		const fileNotFound = await this.localeService.getLocalizedMessage('DIAG_FILE_NOT_FOUND', 'File not found');
+		const vscodeApiLabel = await this.localeService.getLocalizedMessage('DIAG_VSCODE_API_VERSION', 'VSCode API Version');
+		const requiresVersion = await this.localeService.getLocalizedMessage('DIAG_REQUIRES_VERSION', 'requires >= {0}', '1.105.0');
+		const workspaceLabel = await this.localeService.getLocalizedMessage('DIAG_WORKSPACE_PATH', 'Workspace Path');
+		const noneText = await this.localeService.getLocalizedMessage('DIAG_NONE', 'None');
+		const nodePathLabel = await this.localeService.getLocalizedMessage('DIAG_NODEJS_PATH', 'Node.js Path');
+		const systemPath = await this.localeService.getLocalizedMessage('DIAG_SYSTEM_PATH', 'System PATH');
+		const statusLabel = await this.localeService.getLocalizedMessage('DIAG_STATUS', 'Status');
+		const statusOperational = await this.localeService.getLocalizedMessage(
+			'DIAG_STATUS_OPERATIONAL',
+			'MCP Server is operational'
+		);
+		const statusPartial = await this.localeService.getLocalizedMessage(
+			'DIAG_STATUS_PARTIAL',
+			'MCP Server is partially available'
+		);
+		const statusUnavailable = await this.localeService.getLocalizedMessage('DIAG_STATUS_UNAVAILABLE', 'MCP Server is unavailable');
+		const recommendationsLabel = await this.localeService.getLocalizedMessage('DIAG_RECOMMENDATIONS', 'Recommendations');
+		const generatedAt = await this.localeService.getLocalizedMessage('DIAG_GENERATED_AT', 'Generated at');
+
+		let reportText = `【${reportTitle}】\n\n`;
 
 		// Node.js status
 		if (report.nodeDetection.available && report.nodeDetection.versionCompatible) {
-			reportText += `${checkmark} Node.js 版本: ${report.nodeDetection.version}\n`;
+			reportText += `${checkmark} ${nodeVersionLabel}: ${report.nodeDetection.version}\n`;
 		} else if (report.nodeDetection.available && !report.nodeDetection.versionCompatible) {
-			reportText += `${cross} Node.js: 版本過低 (${report.nodeDetection.version}, 需要 >= 22.16.0)\n`;
+			reportText += `${cross} Node.js: ${versionTooLow}\n`;
 		} else {
 			reportText += `${cross} Node.js: ${report.nodeDetection.errorMessage}\n`;
 		}
 
 		// MCP Bundle
-		reportText += `${report.mcpServerBundleExists ? checkmark : cross} MCP Server Bundle: ${
-			report.mcpServerBundleExists ? '存在' : '檔案不存在'
+		reportText += `${report.mcpServerBundleExists ? checkmark : cross} ${mcpBundleLabel}: ${
+			report.mcpServerBundleExists ? existsText : fileNotFound
 		}\n`;
 
 		// VSCode API
-		reportText += `${report.vscodeApiSupported ? checkmark : cross} VSCode API 版本: ${report.vscodeVersion}${
-			!report.vscodeApiSupported ? ' (需要 >= 1.105.0)' : ''
+		reportText += `${report.vscodeApiSupported ? checkmark : cross} ${vscodeApiLabel}: ${report.vscodeVersion}${
+			!report.vscodeApiSupported ? ` (${requiresVersion})` : ''
 		}\n`;
 
 		// Workspace path
-		reportText += `${folder} 工作區路徑: ${report.workspacePath || '無'}\n`;
+		reportText += `${folder} ${workspaceLabel}: ${report.workspacePath || noneText}\n`;
 
 		// Node.js path setting
-		const nodePathDisplay = report.nodeDetection.nodePath === 'node' ? 'node (系統 PATH)' : report.nodeDetection.nodePath;
-		reportText += `${gear} Node.js 路徑: ${nodePathDisplay}\n`;
+		const nodePathDisplay = report.nodeDetection.nodePath === 'node' ? `node (${systemPath})` : report.nodeDetection.nodePath;
+		reportText += `${gear} ${nodePathLabel}: ${nodePathDisplay}\n`;
 
 		// Status
 		const statusText =
 			report.overallStatus === 'operational'
-				? 'MCP Server 可正常運作'
+				? statusOperational
 				: report.overallStatus === 'partially_available'
-					? 'MCP Server 部分可用'
-					: 'MCP Server 無法啟動';
-		reportText += `\n狀態: ${statusText}\n`;
+					? statusPartial
+					: statusUnavailable;
+		reportText += `\n${statusLabel}: ${statusText}\n`;
 
 		// Recommendations
 		if (report.recommendations.length > 0) {
-			reportText += '\n建議:\n';
+			reportText += `\n${recommendationsLabel}:\n`;
 			for (const recommendation of report.recommendations) {
 				reportText += `• ${recommendation}\n`;
 			}
@@ -141,8 +205,9 @@ export class DiagnosticService implements IDiagnosticService {
 
 		// Timestamp (if requested)
 		if (options?.includeTimestamp !== false) {
-			const timestamp = new Date(report.timestamp).toLocaleString('zh-TW', { hour12: false });
-			reportText += `\n${time} 生成時間: ${timestamp}\n`;
+			const dateLocale = this.getDateLocale();
+			const timestamp = new Date(report.timestamp).toLocaleString(dateLocale, { hour12: false });
+			reportText += `\n${time} ${generatedAt}: ${timestamp}\n`;
 		}
 
 		return reportText;
@@ -155,7 +220,7 @@ export class DiagnosticService implements IDiagnosticService {
 	 */
 	async copyToClipboard(report: McpDiagnosticReport): Promise<boolean> {
 		try {
-			const plainTextReport = this.formatPlainTextReport(report);
+			const plainTextReport = await this.formatPlainTextReport(report);
 			await vscode.env.clipboard.writeText(plainTextReport);
 			log('Diagnostic report copied to clipboard', 'info');
 			return true;
@@ -170,43 +235,69 @@ export class DiagnosticService implements IDiagnosticService {
 	 * @param report Diagnostic report
 	 * @returns Plain text formatted report
 	 */
-	private formatPlainTextReport(report: McpDiagnosticReport): string {
-		let text = 'MCP Server 診斷報告\n';
+	private async formatPlainTextReport(report: McpDiagnosticReport): Promise<string> {
+		// Get localized strings
+		const reportTitle = await this.localeService.getLocalizedMessage('DIAG_REPORT_TITLE', 'MCP Server Diagnostic Report');
+		const generatedAt = await this.localeService.getLocalizedMessage('DIAG_GENERATED_AT', 'Generated at');
+		const nodeStatusLabel = await this.localeService.getLocalizedMessage('DIAG_NODEJS_STATUS', 'Node.js Status');
+		const availableLabel = await this.localeService.getLocalizedMessage('DIAG_AVAILABLE', 'Available');
+		const yesText = await this.localeService.getLocalizedMessage('DIAG_YES', 'Yes');
+		const noText = await this.localeService.getLocalizedMessage('DIAG_NO', 'No');
+		const versionLabel = await this.localeService.getLocalizedMessage('DIAG_VERSION', 'Version');
+		const compatibleLabel = await this.localeService.getLocalizedMessage('DIAG_COMPATIBLE', 'Compatible');
+		const errorLabel = await this.localeService.getLocalizedMessage('DIAG_ERROR', 'Error');
+		const pathLabel = await this.localeService.getLocalizedMessage('DIAG_PATH', 'Path');
+		const mcpBundleLabel = await this.localeService.getLocalizedMessage('DIAG_MCP_BUNDLE', 'MCP Server Bundle');
+		const existsLabel = await this.localeService.getLocalizedMessage('DIAG_EXISTS', 'Exists');
+		const vscodeApiLabel = await this.localeService.getLocalizedMessage('DIAG_VSCODE_API_VERSION', 'VSCode API');
+		const supportedLabel = await this.localeService.getLocalizedMessage('DIAG_SUPPORTED', 'Supported');
+		const workspaceLabel = await this.localeService.getLocalizedMessage('DIAG_WORKSPACE_PATH', 'Workspace');
+		const noneText = await this.localeService.getLocalizedMessage('DIAG_NONE', 'None');
+		const overallStatusLabel = await this.localeService.getLocalizedMessage('DIAG_OVERALL_STATUS', 'Overall Status');
+		const operationalShort = await this.localeService.getLocalizedMessage('DIAG_OPERATIONAL_SHORT', 'Operational');
+		const partialShort = await this.localeService.getLocalizedMessage('DIAG_PARTIAL_SHORT', 'Partially available');
+		const unavailableShort = await this.localeService.getLocalizedMessage('DIAG_UNAVAILABLE_SHORT', 'Unavailable');
+		const recommendationsLabel = await this.localeService.getLocalizedMessage('DIAG_RECOMMENDATIONS', 'Recommendations');
+		const systemPath = await this.localeService.getLocalizedMessage('DIAG_SYSTEM_PATH', 'System PATH');
+
+		const dateLocale = this.getDateLocale();
+
+		let text = `${reportTitle}\n`;
 		text += '==================\n';
-		text += `生成時間: ${new Date(report.timestamp).toLocaleString('zh-TW', { hour12: false })}\n\n`;
+		text += `${generatedAt}: ${new Date(report.timestamp).toLocaleString(dateLocale, { hour12: false })}\n\n`;
 
-		text += 'Node.js 狀態:\n';
-		text += `  - 可用: ${report.nodeDetection.available ? '是' : '否'}\n`;
+		text += `${nodeStatusLabel}:\n`;
+		text += `  - ${availableLabel}: ${report.nodeDetection.available ? yesText : noText}\n`;
 		if (report.nodeDetection.version) {
-			text += `  - 版本: ${report.nodeDetection.version}\n`;
-			text += `  - 相容: ${report.nodeDetection.versionCompatible ? '是' : '否'}\n`;
+			text += `  - ${versionLabel}: ${report.nodeDetection.version}\n`;
+			text += `  - ${compatibleLabel}: ${report.nodeDetection.versionCompatible ? yesText : noText}\n`;
 		} else {
-			text += `  - 錯誤: ${report.nodeDetection.errorMessage}\n`;
+			text += `  - ${errorLabel}: ${report.nodeDetection.errorMessage}\n`;
 		}
-		const nodePathDisplay = report.nodeDetection.nodePath === 'node' ? 'node (系統 PATH)' : report.nodeDetection.nodePath;
-		text += `  - 路徑: ${nodePathDisplay}\n\n`;
+		const nodePathDisplay = report.nodeDetection.nodePath === 'node' ? `node (${systemPath})` : report.nodeDetection.nodePath;
+		text += `  - ${pathLabel}: ${nodePathDisplay}\n\n`;
 
-		text += 'MCP Server Bundle:\n';
-		text += `  - 存在: ${report.mcpServerBundleExists ? '是' : '否'}\n`;
-		text += `  - 路徑: ${report.mcpServerBundlePath}\n\n`;
+		text += `${mcpBundleLabel}:\n`;
+		text += `  - ${existsLabel}: ${report.mcpServerBundleExists ? yesText : noText}\n`;
+		text += `  - ${pathLabel}: ${report.mcpServerBundlePath}\n\n`;
 
-		text += 'VSCode API:\n';
-		text += `  - 支援: ${report.vscodeApiSupported ? '是' : '否'}\n`;
-		text += `  - 版本: ${report.vscodeVersion}\n\n`;
+		text += `${vscodeApiLabel}:\n`;
+		text += `  - ${supportedLabel}: ${report.vscodeApiSupported ? yesText : noText}\n`;
+		text += `  - ${versionLabel}: ${report.vscodeVersion}\n\n`;
 
-		text += '工作區:\n';
-		text += `  - 路徑: ${report.workspacePath || '無'}\n\n`;
+		text += `${workspaceLabel}:\n`;
+		text += `  - ${pathLabel}: ${report.workspacePath || noneText}\n\n`;
 
 		const statusText =
 			report.overallStatus === 'operational'
-				? '可正常運作'
+				? operationalShort
 				: report.overallStatus === 'partially_available'
-					? '部分可用'
-					: '無法啟動';
-		text += `綜合狀態: ${statusText}\n`;
+					? partialShort
+					: unavailableShort;
+		text += `${overallStatusLabel}: ${statusText}\n`;
 
 		if (report.recommendations.length > 0) {
-			text += '\n建議:\n';
+			text += `\n${recommendationsLabel}:\n`;
 			for (let i = 0; i < report.recommendations.length; i++) {
 				text += `  ${i + 1}. ${report.recommendations[i]}\n`;
 			}
@@ -252,38 +343,57 @@ export class DiagnosticService implements IDiagnosticService {
 	}
 
 	/**
-	 * Generate actionable recommendations based on diagnostic results
+	 * Generate actionable recommendations based on diagnostic results (async for localization)
 	 * @returns List of recommendations
 	 */
-	private generateRecommendations(
+	private async generateRecommendations(
 		nodeDetection: NodeDetectionResult,
 		mcpBundleExists: boolean,
 		vscodeSupported: boolean,
 		workspacePath: string | null
-	): string[] {
+	): Promise<string[]> {
 		const recommendations: string[] = [];
 
 		// Node.js recommendations
 		if (!nodeDetection.available) {
-			recommendations.push('安裝 Node.js 22.16.0 或更新版本');
-			recommendations.push('若已安裝,請在設定中指定 Node.js 路徑 (singularBlockly.mcp.nodePath)');
+			recommendations.push(
+				await this.localeService.getLocalizedMessage('REC_INSTALL_NODEJS', 'Install Node.js 22.16.0 or later')
+			);
+			recommendations.push(
+				await this.localeService.getLocalizedMessage(
+					'REC_SET_NODEJS_PATH',
+					'If already installed, specify the Node.js path in settings (singularBlockly.mcp.nodePath)'
+				)
+			);
 		} else if (!nodeDetection.versionCompatible) {
-			recommendations.push(`升級 Node.js 至 22.16.0 或更新版本 (目前: ${nodeDetection.version})`);
+			recommendations.push(
+				await this.localeService.getLocalizedMessage(
+					'REC_UPGRADE_NODEJS',
+					'Upgrade Node.js to 22.16.0 or later (current: {0})',
+					nodeDetection.version || ''
+				)
+			);
 		}
 
 		// MCP Bundle recommendations
 		if (!mcpBundleExists) {
-			recommendations.push('執行 `npm run compile` 或重新安裝 Extension');
+			recommendations.push(
+				await this.localeService.getLocalizedMessage('REC_RUN_COMPILE', 'Run `npm run compile` or reinstall the extension')
+			);
 		}
 
 		// VSCode API recommendations
 		if (!vscodeSupported) {
-			recommendations.push('升級 VSCode 至 1.105.0 或更新版本');
+			recommendations.push(
+				await this.localeService.getLocalizedMessage('REC_UPGRADE_VSCODE', 'Upgrade VSCode to 1.105.0 or later')
+			);
 		}
 
 		// Workspace recommendations
 		if (!workspacePath) {
-			recommendations.push('開啟專案資料夾以使用完整功能');
+			recommendations.push(
+				await this.localeService.getLocalizedMessage('REC_OPEN_PROJECT', 'Open a project folder to use full features')
+			);
 		}
 
 		return recommendations;
