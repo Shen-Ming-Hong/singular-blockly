@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "MCPステータスを確認",
+	"config.mcp.nodePath.description": "MCPサーバー用のNode.js実行ファイルのパス。デフォルトの'node'はシステムPATHを使用します。nvm/fnmユーザーは絶対パスを指定してください。",
+	"config.mcp.showStartupWarning.description": "起動時にNode.jsが利用できない、またはバージョンが低い場合に警告メッセージを表示します。MCP AI機能を使用しない場合は無効にできます。"
+}

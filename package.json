@@ -46,6 +46,11 @@
 			{
 				"command": "singular-blockly.previewBackup",
 				"title": "Singular Blockly: Preview Backup"
+			},
+			{
+				"command": "singular-blockly.checkMcpStatus",
+				"title": "%command.checkMcpStatus.title%",
+				"category": "Singular Blockly"
 			}
 		],
 		"viewsContainers": {
@@ -73,6 +78,18 @@
 					"type": "boolean",
 					"default": false,
 					"description": "不再顯示非 Blockly 專案的安全警告 (Do not show safety warning for non-Blockly projects)"
+				},
+				"singularBlockly.mcp.nodePath": {
+					"type": "string",
+					"default": "node",
+					"markdownDescription": "%config.mcp.nodePath.description%",
+					"scope": "machine-overridable"
+				},
+				"singularBlockly.mcp.showStartupWarning": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "%config.mcp.showStartupWarning.description%",
+					"scope": "machine-overridable"
 				}
 			}
 		}

@@ -227,6 +227,18 @@ window.languageManager.loadMessages('de', {
 	VSCODE_CANCEL: 'Abbrechen',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly-Editor öffnen',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 oder höher wurde nicht erkannt. MCP-Funktionen sind nicht verfügbar, aber die Blockly-Bearbeitungsfunktionen funktionieren normal.\n\nFehler: {0}',
+	BUTTON_INSTALL_GUIDE: 'Installationsanleitung',
+	BUTTON_REMIND_LATER: 'Später erinnern',
+	WARNING_INVALID_NODE_PATH: 'Der angegebene Node.js-Pfad ist ungültig: {0}. Fehler: {1}. Bitte korrigieren Sie den Pfad oder löschen Sie die Einstellung, um den Standardbefehl "node" zu verwenden.',
+	INFO_NODE_PATH_VALID: 'Node.js-Pfad ist gültig: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Node.js-Pfad wird überprüft...',
+	PROGRESS_CHECKING_MCP: 'MCP-Serverstatus wird überprüft...',
+	BUTTON_COPY_DIAGNOSTICS: 'Diagnoseinformationen kopieren',
+	INFO_COPIED_TO_CLIPBOARD: 'In die Zwischenablage kopiert',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'MCP-Diagnosebefehl fehlgeschlagen: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Bitte zuerst ein Board auswählen',
 	ERROR_INVALID_PIN: 'Ungültige Pin-Nummer',

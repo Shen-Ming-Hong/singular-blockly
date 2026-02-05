@@ -226,6 +226,18 @@ window.languageManager.loadMessages('cs', {
 	VSCODE_CANCEL: 'Zrušit',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Otevřít editor Blockly',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 nebo vyšší nebyl detekován. Funkce MCP nebudou dostupné, ale funkce úprav Blockly budou fungovat normálně.\n\nChyba: {0}',
+	BUTTON_INSTALL_GUIDE: 'Průvodce instalací',
+	BUTTON_REMIND_LATER: 'Připomenout později',
+	WARNING_INVALID_NODE_PATH: 'Zadaná cesta k Node.js je neplatná: {0}. Chyba: {1}. Opravte prosím cestu nebo vymažte nastavení pro použití výchozího příkazu "node".',
+	INFO_NODE_PATH_VALID: 'Cesta k Node.js je platná: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Ověřování cesty k Node.js...',
+	PROGRESS_CHECKING_MCP: 'Kontrola stavu MCP serveru...',
+	BUTTON_COPY_DIAGNOSTICS: 'Kopírovat diagnostiku',
+	INFO_COPIED_TO_CLIPBOARD: 'Zkopírováno do schránky',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'Diagnostický příkaz MCP selhal: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Prosím, nejprve vyberte desku',
 	ERROR_INVALID_PIN: 'Neplatné číslo pinu',

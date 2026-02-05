@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "MCP állapot ellenőrzése",
+	"config.mcp.nodePath.description": "A Node.js futtatható fájl elérési útja az MCP szerverhez. Az alapértelmezett 'node' a rendszer PATH-ot használja. Az nvm/fnm felhasználóknak a teljes abszolút útvonalat kell megadniuk.",
+	"config.mcp.showStartupWarning.description": "Figyelmeztető üzenet megjelenítése indításkor, ha a Node.js nem érhető el vagy a verzió túl alacsony. Tiltsa le, ha nincs szüksége az MCP AI funkciókra."
+}

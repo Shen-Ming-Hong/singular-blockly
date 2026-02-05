@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "Sprawdź status MCP",
+	"config.mcp.nodePath.description": "Ścieżka do pliku wykonywalnego Node.js dla serwera MCP. Domyślnie 'node' używa systemowego PATH. Użytkownicy nvm/fnm powinni podać pełną ścieżkę bezwzględną.",
+	"config.mcp.showStartupWarning.description": "Pokaż ostrzeżenie przy uruchomieniu, gdy Node.js nie jest dostępny lub wersja jest zbyt niska. Wyłącz, jeśli nie potrzebujesz funkcji MCP AI."
+}

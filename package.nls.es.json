@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "Verificar estado de MCP",
+	"config.mcp.nodePath.description": "Ruta al ejecutable de Node.js para el servidor MCP. El valor predeterminado 'node' usa el PATH del sistema. Para usuarios de nvm/fnm, especifique la ruta absoluta completa.",
+	"config.mcp.showStartupWarning.description": "Mostrar mensaje de advertencia al inicio cuando Node.js no está disponible o la versión es demasiado baja. Desactive esto si no necesita funciones de MCP AI."
+}

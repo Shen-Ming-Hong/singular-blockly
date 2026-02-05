@@ -227,6 +227,18 @@ window.languageManager.loadMessages('bg', {
 	VSCODE_CANCEL: 'Отказ',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Отваряне на редактора Blockly',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 или по-нова версия не е открит. MCP функциите няма да са налични, но функциите за редактиране на Blockly ще работят нормално.\n\nГрешка: {0}',
+	BUTTON_INSTALL_GUIDE: 'Ръководство за инсталация',
+	BUTTON_REMIND_LATER: 'Напомни по-късно',
+	WARNING_INVALID_NODE_PATH: 'Посоченият път на Node.js е невалиден: {0}. Грешка: {1}. Моля, коригирайте пътя или изчистете настройката, за да използвате командата "node" по подразбиране.',
+	INFO_NODE_PATH_VALID: 'Пътят на Node.js е валиден: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Проверка на пътя на Node.js...',
+	PROGRESS_CHECKING_MCP: 'Проверка на състоянието на MCP сървъра...',
+	BUTTON_COPY_DIAGNOSTICS: 'Копиране на диагностика',
+	INFO_COPIED_TO_CLIPBOARD: 'Копирано в клипборда',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'Диагностичната команда на MCP се провали: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Моля, първо изберете платка',
 	ERROR_INVALID_PIN: 'Невалиден номер на пин',

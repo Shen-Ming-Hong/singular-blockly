@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "Проверка на MCP статус",
+	"config.mcp.nodePath.description": "Път до изпълнимия файл Node.js за MCP сървъра. По подразбиране 'node' използва системния PATH. За потребители на nvm/fnm посочете пълния абсолютен път.",
+	"config.mcp.showStartupWarning.description": "Показване на предупредително съобщение при стартиране, когато Node.js не е наличен или версията е твърде ниска. Деактивирайте, ако не се нуждаете от MCP AI функции."
+}

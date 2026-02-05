@@ -228,6 +228,18 @@ window.languageManager.loadMessages('ru', {
 	VSCODE_CANCEL: 'Отмена',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Открыть редактор Blockly',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 или выше не обнаружен. Функции MCP будут недоступны, но функции редактирования Blockly будут работать нормально.\n\nОшибка: {0}',
+	BUTTON_INSTALL_GUIDE: 'Руководство по установке',
+	BUTTON_REMIND_LATER: 'Напомнить позже',
+	WARNING_INVALID_NODE_PATH: 'Указанный путь к Node.js недействителен: {0}. Ошибка: {1}. Пожалуйста, исправьте путь или очистите настройку, чтобы использовать команду "node" по умолчанию.',
+	INFO_NODE_PATH_VALID: 'Путь к Node.js действителен: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Проверка пути Node.js...',
+	PROGRESS_CHECKING_MCP: 'Проверка состояния MCP сервера...',
+	BUTTON_COPY_DIAGNOSTICS: 'Копировать диагностику',
+	INFO_COPIED_TO_CLIPBOARD: 'Скопировано в буфер обмена',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'Сбой диагностической команды MCP: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Пожалуйста, сначала выберите плату',
 	ERROR_INVALID_PIN: 'Недопустимый номер контакта',

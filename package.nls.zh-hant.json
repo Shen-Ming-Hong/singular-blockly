@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "檢查 MCP 狀態",
+	"config.mcp.nodePath.description": "MCP Server 使用的 Node.js 執行檔路徑。預設 'node' 使用系統 PATH。若使用 nvm/fnm，請指定完整絕對路徑（例如：C:\\Users\\username\\.nvm\\versions\\node\\v22.16.0\\node.exe）。",
+	"config.mcp.showStartupWarning.description": "啟動時若 Node.js 不可用或版本過低，顯示警告訊息。若不需要 MCP AI 功能，可停用此警告。"
+}

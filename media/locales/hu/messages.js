@@ -227,6 +227,18 @@ window.languageManager.loadMessages('hu', {
 	VSCODE_CANCEL: 'Mégse',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly szerkesztő megnyitása',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'A Node.js 22.16.0 vagy újabb nem található. Az MCP funkciók nem lesznek elérhetők, de a Blockly szerkesztési funkciók normálisan működnek.\n\nHiba: {0}',
+	BUTTON_INSTALL_GUIDE: 'Telepítési útmutató',
+	BUTTON_REMIND_LATER: 'Emlékeztess később',
+	WARNING_INVALID_NODE_PATH: 'A megadott Node.js útvonal érvénytelen: {0}. Hiba: {1}. Kérjük, javítsa ki az útvonalat, vagy törölje a beállítást az alapértelmezett "node" parancs használatához.',
+	INFO_NODE_PATH_VALID: 'A Node.js útvonal érvényes: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Node.js útvonal ellenőrzése...',
+	PROGRESS_CHECKING_MCP: 'MCP szerver állapotának ellenőrzése...',
+	BUTTON_COPY_DIAGNOSTICS: 'Diagnosztika másolása',
+	INFO_COPIED_TO_CLIPBOARD: 'Vágólapra másolva',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'Az MCP diagnosztikai parancs sikertelen: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Kérjük, először válasszon egy panelt',
 	ERROR_INVALID_PIN: 'Érvénytelen tűszám',

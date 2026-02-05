@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "MCP 상태 확인",
+	"config.mcp.nodePath.description": "MCP 서버용 Node.js 실행 파일 경로입니다. 기본값 'node'는 시스템 PATH를 사용합니다. nvm/fnm 사용자는 전체 절대 경로를 지정하세요.",
+	"config.mcp.showStartupWarning.description": "시작 시 Node.js를 사용할 수 없거나 버전이 낮은 경우 경고 메시지를 표시합니다. MCP AI 기능이 필요하지 않으면 비활성화할 수 있습니다."
+}

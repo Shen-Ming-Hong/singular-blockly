@@ -227,6 +227,18 @@ window.languageManager.loadMessages('ko', {
 	VSCODE_CANCEL: '취소',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly 편집기 열기',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 이상이 감지되지 않았습니다. MCP 기능을 사용할 수 없지만 Blockly 편집 기능은 정상적으로 작동합니다.\n\n오류: {0}',
+	BUTTON_INSTALL_GUIDE: '설치 가이드',
+	BUTTON_REMIND_LATER: '나중에 알림',
+	WARNING_INVALID_NODE_PATH: '지정된 Node.js 경로가 유효하지 않습니다: {0}. 오류: {1}. 경로를 수정하거나 설정을 지워 기본 "node" 명령을 사용하세요.',
+	INFO_NODE_PATH_VALID: 'Node.js 경로가 유효합니다: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Node.js 경로 확인 중...',
+	PROGRESS_CHECKING_MCP: 'MCP 서버 상태 확인 중...',
+	BUTTON_COPY_DIAGNOSTICS: '진단 정보 복사',
+	INFO_COPIED_TO_CLIPBOARD: '클립보드에 복사되었습니다',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'MCP 진단 명령 실패: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: '먼저 보드를 선택해주세요',
 	ERROR_INVALID_PIN: '잘못된 핀 번호',
