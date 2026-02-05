@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "MCP Durumunu Kontrol Et",
+	"config.mcp.nodePath.description": "MCP Sunucusu için Node.js yürütülebilir dosyasının yolu. Varsayılan 'node' sistem PATH'ini kullanır. nvm/fnm kullanıcıları tam mutlak yolu belirtmelidir.",
+	"config.mcp.showStartupWarning.description": "Node.js mevcut değilse veya sürüm çok düşükse başlangıçta uyarı mesajı göster. MCP AI özelliklerine ihtiyacınız yoksa devre dışı bırakın."
+}

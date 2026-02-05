@@ -228,7 +228,17 @@ window.languageManager.loadMessages('fr', {
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Annuler',
 	VSCODE_OPEN_BLOCKLY_EDITOR: "Ouvrir l'éditeur Blockly",
-
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 ou supérieur non détecté. Les fonctionnalités MCP ne seront pas disponibles, mais les fonctionnalités d\'édition Blockly fonctionneront normalement.\n\nErreur : {0}',
+	BUTTON_INSTALL_GUIDE: 'Guide d\'installation',
+	BUTTON_REMIND_LATER: 'Rappeler plus tard',
+	WARNING_INVALID_NODE_PATH: 'Le chemin Node.js spécifié n\'est pas valide : {0}. Erreur : {1}. Veuillez corriger le chemin ou effacer le paramètre pour utiliser la commande "node" par défaut.',
+	INFO_NODE_PATH_VALID: 'Chemin Node.js valide : {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Validation du chemin Node.js...',
+	PROGRESS_CHECKING_MCP: 'Vérification de l\'état du serveur MCP...',
+	BUTTON_COPY_DIAGNOSTICS: 'Copier le diagnostic',
+	INFO_COPIED_TO_CLIPBOARD: 'Copié dans le presse-papiers',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'La commande de diagnostic MCP a échoué : {0}',
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: "Veuillez d'abord sélectionner une carte",
 	ERROR_INVALID_PIN: 'Numéro de broche invalide',

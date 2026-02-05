@@ -227,6 +227,18 @@ window.languageManager.loadMessages('tr', {
 	VSCODE_CANCEL: 'İptal',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly Düzenleyici Aç',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 veya üzeri algılanmadı. MCP özellikleri kullanılamayacak, ancak Blockly düzenleme özellikleri normal çalışacaktır.\n\nHata: {0}',
+	BUTTON_INSTALL_GUIDE: 'Kurulum Kılavuzu',
+	BUTTON_REMIND_LATER: 'Daha sonra hatırlat',
+	WARNING_INVALID_NODE_PATH: 'Belirtilen Node.js yolu geçersiz: {0}. Hata: {1}. Lütfen yolu düzeltin veya varsayılan "node" komutunu kullanmak için ayarı temizleyin.',
+	INFO_NODE_PATH_VALID: 'Node.js yolu geçerli: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Node.js yolu doğrulanıyor...',
+	PROGRESS_CHECKING_MCP: 'MCP sunucu durumu kontrol ediliyor...',
+	BUTTON_COPY_DIAGNOSTICS: 'Tanılamayı Kopyala',
+	INFO_COPIED_TO_CLIPBOARD: 'Panoya kopyalandı',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'MCP tanılama komutu başarısız oldu: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Lütfen önce bir kart seçin',
 	ERROR_INVALID_PIN: 'Geçersiz pin numarası',

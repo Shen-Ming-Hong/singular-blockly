@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "Check MCP Status",
+	"config.mcp.nodePath.description": "Path to Node.js executable for MCP Server. Default 'node' uses system PATH. For nvm/fnm users, specify the full absolute path (e.g., C:\\Users\\username\\.nvm\\versions\\node\\v22.16.0\\node.exe).",
+	"config.mcp.showStartupWarning.description": "Show warning message when Node.js is not available or version is too low at startup. Disable this if you don't need MCP AI features."
+}

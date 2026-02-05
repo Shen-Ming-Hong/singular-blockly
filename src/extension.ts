@@ -12,6 +12,8 @@ import { LocaleService } from './services/localeService';
 import { SettingsManager } from './services/settingsManager';
 import { WebViewManager } from './webview/webviewManager';
 import { registerMcpProvider } from './mcp/mcpProvider';
+import { NodeDetectionService } from './services/nodeDetectionService';
+import { DiagnosticService } from './services/diagnosticService';
 
 // Status bar priority constant
 const STATUS_BAR_PRIORITY = 100;
@@ -44,6 +46,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	try {
 		// 初始化服務
 		const localeService = new LocaleService(context.extensionPath);
+		const nodeDetectionService = new NodeDetectionService();
+		const diagnosticService = new DiagnosticService(nodeDetectionService, localeService);
 
 		// 【最優先】檢查是否為 CyberBrick/MicroPython 專案，若是則刪除 platformio.ini
 		// 必須在 PlatformIO 擴充功能偵測到 ini 檔案之前執行
@@ -89,13 +93,16 @@ export async function activate(context: vscode.ExtensionContext) {
 		registerActivityBarView(context);
 
 		// 註冊命令
-		registerCommands(context, localeService);
+		registerCommands(context, localeService, diagnosticService);
 
 		// 設定狀態列按鈕
 		setupStatusBar(context, localeService);
 
-		// 註冊 MCP Provider（VSCode 1.105.0+ 支援）
-		registerMcpProviderIfAvailable(context);
+		// 註冊 MCP Provider（VSCode 1.105.0+ 支援，需要 Node.js 22.16.0+）
+		await registerMcpProviderIfAvailable(context, nodeDetectionService, localeService);
+
+		// 設定配置變更監聽器（監聽 Node.js 路徑設定變更）
+		setupConfigurationListener(context, nodeDetectionService, localeService);
 
 		log('Singular Blockly extension fully activated!', 'info');
 	} catch (error) {
@@ -136,8 +143,9 @@ function registerActivityBarView(context: vscode.ExtensionContext) {
  * 註冊命令
  * @param context 擴充功能上下文
  * @param localeService 多語言服務
+ * @param diagnosticService 診斷服務
  */
-function registerCommands(context: vscode.ExtensionContext, localeService: LocaleService) {
+function registerCommands(context: vscode.ExtensionContext, localeService: LocaleService, diagnosticService: DiagnosticService) {
 	log('Registering commands...', 'info');
 
 	// WebView 管理器（單例）
@@ -280,28 +288,236 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 		}
 	});
 
+	// 註冊 MCP 狀態診斷命令
+	const checkMcpStatusCommand = vscodeApi.commands.registerCommand(
+		'singular-blockly.checkMcpStatus',
+		async () => {
+			try {
+				log('Executing checkMcpStatus command', 'info');
+
+				// 顯示進度通知
+				const progressMsg = await localeService.getLocalizedMessage(
+					'PROGRESS_CHECKING_MCP',
+					'Checking MCP status...'
+				);
+
+				await vscodeApi.window.withProgress(
+					{
+						location: vscodeApi.ProgressLocation.Notification,
+						title: progressMsg,
+						cancellable: false,
+					},
+					async () => {
+						// 收集診斷資訊
+						const report = await diagnosticService.collectDiagnostics(context.extensionPath);
+
+						// 格式化報告
+						const formattedReport = diagnosticService.formatReport(report, { format: 'text', useEmoji: true });
+
+						// 獲取複製按鈕文字
+						const copyButton = await localeService.getLocalizedMessage(
+							'BUTTON_COPY_DIAGNOSTICS',
+							'複製診斷資訊'
+						);
+
+						// 顯示報告訊息框
+						const action = await vscodeApi.window.showInformationMessage(
+							formattedReport,
+							{ modal: false },
+							copyButton
+						);
+
+						// 處理複製按鈕點擊
+						if (action === copyButton) {
+							const copied = await diagnosticService.copyToClipboard(report);
+							if (copied) {
+								const successMsg = await localeService.getLocalizedMessage(
+									'INFO_COPIED_TO_CLIPBOARD',
+									'已複製到剪貼簿'
+								);
+								vscodeApi.window.showInformationMessage(successMsg);
+								log('Diagnostic report copied to clipboard', 'info');
+							}
+						}
+					}
+				);
+
+				log('checkMcpStatus command completed', 'info');
+			} catch (error) {
+				log('Error executing checkMcpStatus command:', 'error', error);
+				const errorMsg = await localeService.getLocalizedMessage(
+					'ERROR_DIAGNOSTIC_COMMAND_FAILED',
+					'MCP 診斷命令執行失敗: {0}',
+					String(error)
+				);
+				vscodeApi.window.showErrorMessage(errorMsg);
+			}
+		}
+	);
+
 	// 添加到訂閱清單
 	context.subscriptions.push(openBlocklyEdit);
 	context.subscriptions.push(toggleThemeCommand);
 	context.subscriptions.push(showOutputCommand);
 	context.subscriptions.push(previewBackupCommand);
+	context.subscriptions.push(checkMcpStatusCommand);
 }
 
 /**
- * 註冊 MCP Provider（如果 VSCode 版本支援）
+ * 註冊 MCP Provider（如果 VSCode 版本支援且 Node.js 可用）
  * @param context 擴充功能上下文
+ * @param nodeDetectionService Node.js 檢測服務
+ * @param localeService 多語言服務
  */
-function registerMcpProviderIfAvailable(context: vscode.ExtensionContext) {
-	log('Checking MCP API availability...', 'info');
+async function registerMcpProviderIfAvailable(
+	context: vscode.ExtensionContext,
+	nodeDetectionService: NodeDetectionService,
+	localeService: LocaleService
+) {
+	log('Checking MCP prerequisites...', 'info');
+
+	// 1. Check VSCode API version (vscode.lm API availability)
+	if (!vscodeApi.lm || typeof vscodeApi.lm.registerMcpServerDefinitionProvider !== 'function') {
+		log('MCP API not available (VSCode < 1.105.0), skipping MCP Provider registration', 'info');
+		return;
+	}
+
+	// 2. Get Node.js path setting
+	const config = vscodeApi.workspace.getConfiguration('singularBlockly.mcp');
+	const nodePath = config.get<string>('nodePath', 'node');
+	const showStartupWarning = config.get<boolean>('showStartupWarning', true);
+
+	// 3. Detect Node.js
+	const nodeDetection = await nodeDetectionService.detectNodeJs(nodePath);
+
+	// 4. Check if Node.js is available and compatible
+	if (!nodeDetection.available || !nodeDetection.versionCompatible) {
+		log(`Node.js unavailable or incompatible: ${nodeDetection.errorMessage || 'version too low'}`, 'warn', {
+			available: nodeDetection.available,
+			versionCompatible: nodeDetection.versionCompatible,
+			version: nodeDetection.version,
+			errorType: nodeDetection.errorType,
+		});
+
+		// Show warning if enabled
+		if (showStartupWarning) {
+			await showNodeJsWarning(nodeDetection, localeService);
+		}
+
+		// Graceful degradation: skip MCP registration, other features work normally
+		return;
+	}
+
+	// 5. Node.js available and compatible, register MCP Provider
+	log(`Node.js ${nodeDetection.version} detected, registering MCP Provider`, 'info');
 
 	const disposable = registerMcpProvider(context);
 
 	if (disposable) {
 		context.subscriptions.push(disposable);
-		log('MCP Provider registered and added to subscriptions', 'info');
+		log('MCP Provider registered successfully', 'info');
 	} else {
-		log('MCP Provider not registered (API not available)', 'info');
+		log('MCP Provider registration failed', 'warn');
 	}
+}
+
+/**
+ * 顯示 Node.js 不可用警告訊息
+ * @param nodeDetection Node.js 檢測結果
+ * @param localeService 多語言服務
+ */
+async function showNodeJsWarning(nodeDetection: import('./types/nodeDetection').NodeDetectionResult, localeService: LocaleService) {
+	// Get localized messages
+	const warningMsg = await localeService.getLocalizedMessage(
+		'WARNING_NODE_NOT_AVAILABLE',
+		'Node.js 22.16.0 或以上版本未檢測到。MCP 功能將無法使用,但 Blockly 編輯功能仍可正常運作。\n\n錯誤: {0}',
+		nodeDetection.errorMessage || '未知錯誤'
+	);
+
+	const installButton = await localeService.getLocalizedMessage('BUTTON_INSTALL_GUIDE', '安裝指引');
+
+	const laterButton = await localeService.getLocalizedMessage('BUTTON_REMIND_LATER', '稍後提醒');
+
+	// Show warning message with buttons
+	const action = await vscodeApi.window.showWarningMessage(warningMsg, installButton, laterButton);
+
+	// Handle button clicks
+	if (action === installButton) {
+		// Open Node.js download page
+		await vscodeApi.env.openExternal(vscodeApi.Uri.parse('https://nodejs.org/'));
+		log('User clicked Install Guide button', 'info');
+	} else if (action === laterButton) {
+		// Disable startup warning
+		await vscodeApi.workspace
+			.getConfiguration('singularBlockly.mcp')
+			.update('showStartupWarning', false, vscodeApi.ConfigurationTarget.Global);
+		log('User disabled Node.js startup warning', 'info');
+	}
+}
+
+/**
+ * 設定配置變更監聽器
+ * @param context 擴充功能上下文
+ * @param nodeDetectionService Node.js 檢測服務
+ * @param localeService 多語言服務
+ */
+function setupConfigurationListener(
+	context: vscode.ExtensionContext,
+	nodeDetectionService: NodeDetectionService,
+	localeService: LocaleService
+) {
+	const disposable = vscodeApi.workspace.onDidChangeConfiguration(async event => {
+		// Check if singularBlockly.mcp.nodePath setting changed
+		if (!event.affectsConfiguration('singularBlockly.mcp.nodePath')) {
+			return;
+		}
+
+		log('singularBlockly.mcp.nodePath setting changed, validating new path', 'info');
+
+		// Get new nodePath setting
+		const config = vscodeApi.workspace.getConfiguration('singularBlockly.mcp');
+		const nodePath = config.get<string>('nodePath', 'node');
+
+		// Validate path with progress indicator (non-blocking UI)
+		const progressMsg = await localeService.getLocalizedMessage('PROGRESS_VALIDATING_NODE_PATH', '正在驗證 Node.js 路徑...');
+
+		const validationResult = await vscodeApi.window.withProgress(
+			{
+				location: vscodeApi.ProgressLocation.Notification,
+				title: progressMsg,
+				cancellable: false,
+			},
+			async () => {
+				return await nodeDetectionService.validateNodePath(nodePath);
+			}
+		);
+
+		log('Node.js path validation completed', 'info', {
+			nodePath,
+			valid: validationResult.valid,
+			error: validationResult.error,
+			errorType: validationResult.errorType,
+		});
+
+		// Show result message
+		if (!validationResult.valid) {
+			// Invalid path - show warning
+			const warningMsg = await localeService.getLocalizedMessage(
+				'WARNING_INVALID_NODE_PATH',
+				'指定的 Node.js 路徑無效: {0}。錯誤: {1}。請修正路徑或清空設定以使用預設的 "node" 命令。',
+				nodePath,
+				validationResult.error || '未知錯誤'
+			);
+			await vscodeApi.window.showWarningMessage(warningMsg);
+		} else {
+			// Valid path - show info
+			const infoMsg = await localeService.getLocalizedMessage('INFO_NODE_PATH_VALID', 'Node.js 路徑已驗證: {0}', nodePath);
+			await vscodeApi.window.showInformationMessage(infoMsg);
+		}
+	});
+
+	context.subscriptions.push(disposable);
+	log('Configuration listener registered', 'info');
 }
 
 /**

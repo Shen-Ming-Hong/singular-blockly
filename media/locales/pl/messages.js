@@ -227,6 +227,18 @@ window.languageManager.loadMessages('pl', {
 	VSCODE_CANCEL: 'Anuluj',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Otwórz edytor Blockly',
 
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Nie wykryto Node.js 22.16.0 lub nowszego. Funkcje MCP będą niedostępne, ale funkcje edycji Blockly będą działać normalnie.\n\nBłąd: {0}',
+	BUTTON_INSTALL_GUIDE: 'Przewodnik instalacji',
+	BUTTON_REMIND_LATER: 'Przypomnij później',
+	WARNING_INVALID_NODE_PATH: 'Podana ścieżka Node.js jest nieprawidłowa: {0}. Błąd: {1}. Popraw ścieżkę lub wyczyść ustawienie, aby użyć domyślnego polecenia "node".',
+	INFO_NODE_PATH_VALID: 'Ścieżka Node.js jest prawidłowa: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Sprawdzanie ścieżki Node.js...',
+	PROGRESS_CHECKING_MCP: 'Sprawdzanie stanu serwera MCP...',
+	BUTTON_COPY_DIAGNOSTICS: 'Kopiuj diagnostykę',
+	INFO_COPIED_TO_CLIPBOARD: 'Skopiowano do schowka',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'Polecenie diagnostyczne MCP nie powiodło się: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'Proszę najpierw wybrać płytkę',
 	ERROR_INVALID_PIN: 'Nieprawidłowy numer pinu',

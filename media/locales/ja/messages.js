@@ -226,7 +226,17 @@ window.languageManager.loadMessages('ja', {
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'キャンセル',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blocklyエディタを開く',
-
+	// MCP Graceful Degradation Messages
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 以上が検出されませんでした。MCP 機能は利用できませんが、Blockly エディタは正常に動作します。\n\nエラー: {0}',
+	BUTTON_INSTALL_GUIDE: 'インストールガイド',
+	BUTTON_REMIND_LATER: '後で通知',
+	WARNING_INVALID_NODE_PATH: '指定された Node.js パスが無効です: {0}。エラー: {1}。パスを修正するか、設定をクリアしてデフォルトの "node" コマンドを使用してください。',
+	INFO_NODE_PATH_VALID: 'Node.js パスが有効です: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: 'Node.js パスを検証中...',
+	PROGRESS_CHECKING_MCP: 'MCP サーバーの状態を確認中...',
+	BUTTON_COPY_DIAGNOSTICS: '診断情報をコピー',
+	INFO_COPIED_TO_CLIPBOARD: 'クリップボードにコピーしました',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'MCP 診断コマンドが失敗しました: {0}',
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: 'まず、ボードを選択してください',
 	ERROR_INVALID_PIN: '無効なピン番号',

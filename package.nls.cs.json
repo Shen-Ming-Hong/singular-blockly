@@ -1,0 +1,5 @@
+{
+	"command.checkMcpStatus.title": "Zkontrolovat stav MCP",
+	"config.mcp.nodePath.description": "Cesta ke spustitelnému souboru Node.js pro MCP server. Výchozí 'node' používá systémovou PATH. Pro uživatele nvm/fnm zadejte úplnou absolutní cestu.",
+	"config.mcp.showStartupWarning.description": "Zobrazit varovnou zprávu při spuštění, když Node.js není k dispozici nebo je verze příliš nízká. Zakažte, pokud nepotřebujete funkce MCP AI."
+}

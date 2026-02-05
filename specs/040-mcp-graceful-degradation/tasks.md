@@ -34,10 +34,10 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 
 **目的**: 建立型別定義與基礎架構
 
-- [ ] T001 建立 TypeScript 型別定義檔案 `src/types/nodeDetection.ts` 包含 NodeDetectionResult, PathValidationResult, McpDiagnosticReport, McpSettings, NodeVersion, NodeErrorType 介面
-- [ ] T002 在 `src/types/nodeDetection.ts` 新增常數定義 MIN_NODE_VERSION, MIN_NODE_VERSION_STRING, NODE_DETECTION_CONFIG
-- [ ] T003 [P] 在 `src/types/nodeDetection.ts` 定義服務介面 INodeDetectionService, IDiagnosticService
-- [ ] T004 執行 `npm run compile` 驗證型別定義無 TypeScript 錯誤
+- [x] T001 建立 TypeScript 型別定義檔案 `src/types/nodeDetection.ts` 包含 NodeDetectionResult, PathValidationResult, McpDiagnosticReport, McpSettings, NodeVersion, NodeErrorType 介面
+- [x] T002 在 `src/types/nodeDetection.ts` 新增常數定義 MIN_NODE_VERSION, MIN_NODE_VERSION_STRING, NODE_DETECTION_CONFIG
+- [x] T003 [P] 在 `src/types/nodeDetection.ts` 定義服務介面 INodeDetectionService, IDiagnosticService
+- [x] T004 執行 `npm run compile` 驗證型別定義無 TypeScript 錯誤
 
 ---
 
@@ -47,20 +47,20 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 
 **⚠️ CRITICAL**: 此階段必須完成才能進行任何 User Story 實作
 
-- [ ] T005 建立 `src/services/nodeDetectionService.ts` 實作 INodeDetectionService 介面框架
-- [ ] T006 在 `src/services/nodeDetectionService.ts` 實作 `parseVersion()` 函數使用正規表示式解析 "v22.16.0" 格式
-- [ ] T007 在 `src/services/nodeDetectionService.ts` 實作 `isVersionCompatible()` 函數比較版本號 >= 22.16.0
-- [ ] T008 在 `src/services/nodeDetectionService.ts` 實作 `validateNodePath()` 函數使用 fs.existsSync 檢查路徑有效性
-- [ ] T009 在 `src/services/nodeDetectionService.ts` 實作 `detectNodeJs()` 函數使用 child_process.exec 執行 node --version 並處理 5 種錯誤類型 (not_found, not_executable, permission, timeout, version_low)
-- [ ] T010 在 `src/services/nodeDetectionService.ts` 加入 3 秒逾時保護與 windowsHide: true 設定
-- [ ] T011 [P] 建立 `src/services/diagnosticService.ts` 實作 IDiagnosticService 介面框架
-- [ ] T012 [P] 在 `src/services/diagnosticService.ts` 實作 `collectDiagnostics()` 函數整合 NodeDetectionService, 檢查 MCP Server bundle (dist/mcp-server.js), VSCode API 版本, 工作區路徑
-- [ ] T013 [P] 在 `src/services/diagnosticService.ts` 實作 `formatReport()` 函數生成含 emoji (✅/❌/📁/⚙️) 的本地化文字報告
-- [ ] T014 [P] 在 `src/services/diagnosticService.ts` 實作 `formatPlainTextReport()` 函數生成純文字格式 (適合複製到 GitHub Issue)
-- [ ] T015 [P] 在 `src/services/diagnosticService.ts` 實作 `copyToClipboard()` 函數使用 vscode.env.clipboard.writeText
-- [ ] T016 [P] 在 `src/services/diagnosticService.ts` 實作 `generateRecommendations()` 函數根據錯誤類型生成可操作建議
-- [ ] T016a [P] 在 `src/services/nodeDetectionService.ts` 實作錯誤日誌記錄,遵循 FR-005 規格:使用結構化格式包含錯誤類型(NodeErrorType)、nodePath、執行命令、stdout/stderr、時間戳(ISO 8601)、版本號(若可解析)、完整錯誤訊息,日誌等級使用 error/warn
-- [ ] T017 執行 `npm run compile` 驗證服務層無編譯錯誤並記錄日誌到 logging.ts
+- [x] T005 建立 `src/services/nodeDetectionService.ts` 實作 INodeDetectionService 介面框架
+- [x] T006 在 `src/services/nodeDetectionService.ts` 實作 `parseVersion()` 函數使用正規表示式解析 "v22.16.0" 格式
+- [x] T007 在 `src/services/nodeDetectionService.ts` 實作 `isVersionCompatible()` 函數比較版本號 >= 22.16.0
+- [x] T008 在 `src/services/nodeDetectionService.ts` 實作 `validateNodePath()` 函數使用 fs.existsSync 檢查路徑有效性
+- [x] T009 在 `src/services/nodeDetectionService.ts` 實作 `detectNodeJs()` 函數使用 child_process.exec 執行 node --version 並處理 5 種錯誤類型 (not_found, not_executable, permission, timeout, version_low)
+- [x] T010 在 `src/services/nodeDetectionService.ts` 加入 3 秒逾時保護與 windowsHide: true 設定
+- [x] T011 [P] 建立 `src/services/diagnosticService.ts` 實作 IDiagnosticService 介面框架
+- [x] T012 [P] 在 `src/services/diagnosticService.ts` 實作 `collectDiagnostics()` 函數整合 NodeDetectionService, 檢查 MCP Server bundle (dist/mcp-server.js), VSCode API 版本, 工作區路徑
+- [x] T013 [P] 在 `src/services/diagnosticService.ts` 實作 `formatReport()` 函數生成含 emoji (✅/❌/📁/⚙️) 的本地化文字報告
+- [x] T014 [P] 在 `src/services/diagnosticService.ts` 實作 `formatPlainTextReport()` 函數生成純文字格式 (適合複製到 GitHub Issue)
+- [x] T015 [P] 在 `src/services/diagnosticService.ts` 實作 `copyToClipboard()` 函數使用 vscode.env.clipboard.writeText
+- [x] T016 [P] 在 `src/services/diagnosticService.ts` 實作 `generateRecommendations()` 函數根據錯誤類型生成可操作建議
+- [x] T016a [P] 在 `src/services/nodeDetectionService.ts` 實作錯誤日誌記錄,遵循 FR-005 規格:使用結構化格式包含錯誤類型(NodeErrorType)、nodePath、執行命令、stdout/stderr、時間戳(ISO 8601)、版本號(若可解析)、完整錯誤訊息,日誌等級使用 error/warn
+- [x] T017 執行 `npm run compile` 驗證服務層無編譯錯誤並記錄日誌到 logging.ts
 
 **Checkpoint**: 基礎服務層已完成,可開始 User Story 實作
 
@@ -74,15 +74,15 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 
 ### 實作
 
-- [ ] T018 [US1] 在 `src/extension.ts` 建立 `registerMcpProviderIfAvailable()` 函數,加入 Node.js 前置檢測邏輯呼叫 NodeDetectionService.detectNodeJs()
-- [ ] T019 [US1] 在 `src/extension.ts` 實作 `showNodeJsWarning()` 函數,使用 vscode.window.showWarningMessage 顯示本地化警告訊息包含兩個按鈕。**所有文字必須透過 LocaleService.getMessage() 取得,不得硬編碼字串**(FR-023)
-- [ ] T020 [US1] 在 `showNodeJsWarning()` 中處理「安裝指引」按鈕點擊,使用 vscode.env.openExternal 開啟 https://nodejs.org/
-- [ ] T021 [US1] 在 `showNodeJsWarning()` 中處理「稍後提醒」按鈕點擊,使用 vscode.workspace.getConfiguration 將 singularBlockly.mcp.showStartupWarning 設為 false 以永久停用該警告
-- [ ] T022 [US1] 在 `registerMcpProviderIfAvailable()` 中讀取 showStartupWarning 設定,僅當為 true 時顯示警告
-- [ ] T023 [US1] 在 `registerMcpProviderIfAvailable()` 中加入條件判斷,僅當 Node.js 可用且版本相容時呼叫 registerMcpProvider()
-- [ ] T023a [US1] 在 `registerMcpProviderIfAvailable()` 中加入 VSCode API 版本檢查 (vscode.lm.registerMcpServerDefinitionProvider 存在性),確保 VSCode < 1.105.0 時靜默跳過註冊 (FR-026),記錄 info 日誌但不顯示錯誤
-- [ ] T024 [US1] 修改 `src/extension.ts` 的 `activate()` 函數,將原有的 MCP Provider 註冊邏輯替換為 registerMcpProviderIfAvailable() 呼叫
-- [ ] T025 [US1] 使用 logging.ts 記錄 Node.js 檢測結果與 MCP Provider 註冊狀態 (info/warn 等級)
+- [x] T018 [US1] 在 `src/extension.ts` 建立 `registerMcpProviderIfAvailable()` 函數,加入 Node.js 前置檢測邏輯呼叫 NodeDetectionService.detectNodeJs()
+- [x] T019 [US1] 在 `src/extension.ts` 實作 `showNodeJsWarning()` 函數,使用 vscode.window.showWarningMessage 顯示本地化警告訊息包含兩個按鈕。**所有文字必須透過 LocaleService.getMessage() 取得,不得硬編碼字串**(FR-023)
+- [x] T020 [US1] 在 `showNodeJsWarning()` 中處理「安裝指引」按鈕點擊,使用 vscode.env.openExternal 開啟 https://nodejs.org/
+- [x] T021 [US1] 在 `showNodeJsWarning()` 中處理「稍後提醒」按鈕點擊,使用 vscode.workspace.getConfiguration 將 singularBlockly.mcp.showStartupWarning 設為 false 以永久停用該警告
+- [x] T022 [US1] 在 `registerMcpProviderIfAvailable()` 中讀取 showStartupWarning 設定,僅當為 true 時顯示警告
+- [x] T023 [US1] 在 `registerMcpProviderIfAvailable()` 中加入條件判斷,僅當 Node.js 可用且版本相容時呼叫 registerMcpProvider()
+- [x] T023a [US1] 在 `registerMcpProviderIfAvailable()` 中加入 VSCode API 版本檢查 (vscode.lm.registerMcpServerDefinitionProvider 存在性),確保 VSCode < 1.105.0 時靜默跳過註冊 (FR-026),記錄 info 日誌但不顯示錯誤
+- [x] T024 [US1] 修改 `src/extension.ts` 的 `activate()` 函數,將原有的 MCP Provider 註冊邏輯替換為 registerMcpProviderIfAvailable() 呼叫
+- [x] T025 [US1] 使用 logging.ts 記錄 Node.js 檢測結果與 MCP Provider 註冊狀態 (info/warn 等級)
 
 **Checkpoint**: User Story 1 完成 - Node.js 缺失時顯示友善警告,有 Node.js 時功能正常
 
@@ -96,15 +96,15 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 
 ### 實作
 
-- [ ] T026 [US2] 在 `package.json` 的 contributes.configuration 中新增 singularBlockly.mcp.nodePath 設定項,type: string, default: "node", scope: machine-overridable
-- [ ] T027 [US2] 在 `package.json` 的 contributes.configuration 中新增 singularBlockly.mcp.showStartupWarning 設定項,type: boolean, default: true, scope: machine-overridable
-- [ ] T028 [US2] 在 `src/extension.ts` 建立 `setupConfigurationListener()` 函數,使用 vscode.workspace.onDidChangeConfiguration 監聽 singularBlockly.mcp 設定變更
-- [ ] T029 [US2] 在 `setupConfigurationListener()` 中加入 event.affectsConfiguration('singularBlockly.mcp.nodePath') 檢查
-- [ ] T030 [US2] 在 `setupConfigurationListener()` 中讀取新的 nodePath 設定並使用非同步驗證 (async/await),立即呼叫 NodeDetectionService.validateNodePath(),UI 使用 vscode.window.withProgress 顯示驗證進度通知「正在驗證 Node.js 路徑...」以避免阻塞設定介面 (FR-014)
-- [ ] T031 [US2] 在 `setupConfigurationListener()` 中根據 PathValidationResult 顯示警告訊息 (無效路徑,格式:「指定的 Node.js 路徑無效:[路徑]。錯誤:[具體錯誤]。請修正路徑或清空設定以使用預設的 'node' 命令。」) 或資訊訊息 (有效路徑)
-- [ ] T032 [US2] 修改 `src/extension.ts` 的 `activate()` 函數,加入 setupConfigurationListener(context, nodeDetectionService, localeService) 呼叫
-- [ ] T033 [US2] 修改 `registerMcpProviderIfAvailable()` 函數,從設定讀取 nodePath 並傳遞給 detectNodeJs(nodePath)
-- [ ] T034 [US2] 使用 logging.ts 記錄設定變更與路徑驗證結果
+- [x] T026 [US2] 在 `package.json` 的 contributes.configuration 中新增 singularBlockly.mcp.nodePath 設定項,type: string, default: "node", scope: machine-overridable
+- [x] T027 [US2] 在 `package.json` 的 contributes.configuration 中新增 singularBlockly.mcp.showStartupWarning 設定項,type: boolean, default: true, scope: machine-overridable
+- [x] T028 [US2] 在 `src/extension.ts` 建立 `setupConfigurationListener()` 函數,使用 vscode.workspace.onDidChangeConfiguration 監聽 singularBlockly.mcp 設定變更
+- [x] T029 [US2] 在 `setupConfigurationListener()` 中加入 event.affectsConfiguration('singularBlockly.mcp.nodePath') 檢查
+- [x] T030 [US2] 在 `setupConfigurationListener()` 中讀取新的 nodePath 設定並使用非同步驗證 (async/await),立即呼叫 NodeDetectionService.validateNodePath(),UI 使用 vscode.window.withProgress 顯示驗證進度通知「正在驗證 Node.js 路徑...」以避免阻塞設定介面 (FR-014)
+- [x] T031 [US2] 在 `setupConfigurationListener()` 中根據 PathValidationResult 顯示警告訊息 (無效路徑,格式:「指定的 Node.js 路徑無效:[路徑]。錯誤:[具體錯誤]。請修正路徑或清空設定以使用預設的 'node' 命令。」) 或資訊訊息 (有效路徑)
+- [x] T032 [US2] 修改 `src/extension.ts` 的 `activate()` 函數,加入 setupConfigurationListener(context, nodeDetectionService, localeService) 呼叫
+- [x] T033 [US2] 修改 `registerMcpProviderIfAvailable()` 函數,從設定讀取 nodePath 並傳遞給 detectNodeJs(nodePath)
+- [x] T034 [US2] 使用 logging.ts 記錄設定變更與路徑驗證結果
 
 **Checkpoint**: User Story 2 完成 - 使用者可自訂 Node.js 路徑且設定變更時立即驗證
 
@@ -118,14 +118,14 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 
 ### 實作
 
-- [ ] T035 [US3] 在 `package.json` 的 contributes.commands 中新增 singular-blockly.checkMcpStatus 命令定義,title: "%command.checkMcpStatus.title%", category: "Singular Blockly"
-- [ ] T036 [US3] 在 `src/extension.ts` 的 `registerCommands()` 函數中註冊 singular-blockly.checkMcpStatus 命令處理器
-- [ ] T037 [US3] 在命令處理器中使用 vscode.window.withProgress 顯示進度通知「Checking MCP status...」
-- [ ] T038 [US3] 在命令處理器中呼叫 DiagnosticService.collectDiagnostics(context.extensionPath) 收集診斷資訊
-- [ ] T039 [US3] 在命令處理器中呼叫 DiagnosticService.formatReport(report, { useEmoji: true }) 格式化報告
-- [ ] T040 [US3] 在命令處理器中使用 vscode.window.showInformationMessage 顯示格式化報告,附帶「複製診斷資訊」按鈕
-- [ ] T041 [US3] 在命令處理器中處理按鈕點擊,呼叫 DiagnosticService.copyToClipboard(report) 並顯示「已複製到剪貼簿」提示
-- [ ] T042 [US3] 使用 logging.ts 記錄診斷命令執行與錯誤 (若發生)
+- [x] T035 [US3] 在 `package.json` 的 contributes.commands 中新增 singular-blockly.checkMcpStatus 命令定義,title: "%command.checkMcpStatus.title%", category: "Singular Blockly"
+- [x] T036 [US3] 在 `src/extension.ts` 的 `registerCommands()` 函數中註冊 singular-blockly.checkMcpStatus 命令處理器
+- [x] T037 [US3] 在命令處理器中使用 vscode.window.withProgress 顯示進度通知「Checking MCP status...」
+- [x] T038 [US3] 在命令處理器中呼叫 DiagnosticService.collectDiagnostics(context.extensionPath) 收集診斷資訊
+- [x] T039 [US3] 在命令處理器中呼叫 DiagnosticService.formatReport(report, { useEmoji: true }) 格式化報告
+- [x] T040 [US3] 在命令處理器中使用 vscode.window.showInformationMessage 顯示格式化報告,附帶「複製診斷資訊」按鈕
+- [x] T041 [US3] 在命令處理器中處理按鈕點擊,呼叫 DiagnosticService.copyToClipboard(report) 並顯示「已複製到剪貼簿」提示
+- [x] T042 [US3] 使用 logging.ts 記錄診斷命令執行與錯誤 (若發生)
 
 **Checkpoint**: User Story 3 完成 - 診斷命令可執行並提供完整報告與複製功能
 
@@ -135,38 +135,38 @@ description: 'MCP Server 優雅降級與 Node.js 依賴處理 - 任務分解'
 
 **目的**: 為所有新增訊息鍵提供 15 種語言翻譯
 
-- [ ] T043 [P] 在 `package.nls.json` (英文) 新增 command.checkMcpStatus.title, config.mcp.nodePath.description, config.mcp.showStartupWarning.description
-- [ ] T044 [P] 在 `package.nls.zh-hant.json` (繁體中文) 新增對應翻譯
-- [ ] T045 [P] 在 `package.nls.ja.json` (日文) 新增對應翻譯
-- [ ] T046 [P] 在 `package.nls.ko.json` (韓文) 新增對應翻譯
-- [ ] T047 [P] 在 `package.nls.es.json` (西班牙文) 新增對應翻譯
-- [ ] T048 [P] 在 `package.nls.pt-br.json` (葡萄牙文-巴西) 新增對應翻譯
-- [ ] T049 [P] 在 `package.nls.fr.json` (法文) 新增對應翻譯
-- [ ] T050 [P] 在 `package.nls.de.json` (德文) 新增對應翻譯
-- [ ] T051 [P] 在 `package.nls.it.json` (義大利文) 新增對應翻譯
-- [ ] T052 [P] 在 `package.nls.ru.json` (俄文) 新增對應翻譯
-- [ ] T053 [P] 在 `package.nls.pl.json` (波蘭文) 新增對應翻譯
-- [ ] T054 [P] 在 `package.nls.hu.json` (匈牙利文) 新增對應翻譯
-- [ ] T055 [P] 在 `package.nls.tr.json` (土耳其文) 新增對應翻譯
-- [ ] T056 [P] 在 `package.nls.bg.json` (保加利亞文) 新增對應翻譯
-- [ ] T057 [P] 在 `package.nls.cs.json` (捷克文) 新增對應翻譯
-- [ ] T058 [P] 在 `media/locales/en/messages.js` 新增訊息鍵 WARNING_NODE_NOT_AVAILABLE, BUTTON_INSTALL_GUIDE, BUTTON_REMIND_LATER, WARNING_INVALID_NODE_PATH, INFO_NODE_PATH_VALID, PROGRESS_CHECKING_MCP, BUTTON_COPY_DIAGNOSTICS, INFO_COPIED_TO_CLIPBOARD
-- [ ] T059 [P] 在 `media/locales/zh-hant/messages.js` 新增對應繁體中文翻譯
-- [ ] T060 [P] 在 `media/locales/ja/messages.js` 新增對應日文翻譯
-- [ ] T061 [P] 在 `media/locales/ko/messages.js` 新增對應韓文翻譯
-- [ ] T062 [P] 在 `media/locales/es/messages.js` 新增對應西班牙文翻譯
-- [ ] T063 [P] 在 `media/locales/pt-br/messages.js` 新增對應葡萄牙文-巴西翻譯
-- [ ] T064 [P] 在 `media/locales/fr/messages.js` 新增對應法文翻譯
-- [ ] T065 [P] 在 `media/locales/de/messages.js` 新增對應德文翻譯
-- [ ] T066 [P] 在 `media/locales/it/messages.js` 新增對應義大利文翻譯
-- [ ] T067 [P] 在 `media/locales/ru/messages.js` 新增對應俄文翻譯
-- [ ] T068 [P] 在 `media/locales/pl/messages.js` 新增對應波蘭文翻譯
-- [ ] T069 [P] 在 `media/locales/hu/messages.js` 新增對應匈牙利文翻譯
-- [ ] T070 [P] 在 `media/locales/tr/messages.js` 新增對應土耳其文翻譯
-- [ ] T071 [P] 在 `media/locales/bg/messages.js` 新增對應保加利亞文翻譯
-- [ ] T072 [P] 在 `media/locales/cs/messages.js` 新增對應捷克文翻譯
-- [ ] T073 執行 `npm run validate:i18n` 驗證所有語言翻譯完整性
-- [ ] T074 執行 `npm run audit:i18n:all` 確保翻譯品質評分 >= 8.0
+- [x] T043 [P] 在 `package.nls.json` (英文) 新增 command.checkMcpStatus.title, config.mcp.nodePath.description, config.mcp.showStartupWarning.description
+- [x] T044 [P] 在 `package.nls.zh-hant.json` (繁體中文) 新增對應翻譯
+- [x] T045 [P] 在 `package.nls.ja.json` (日文) 新增對應翻譯
+- [x] T046 [P] 在 `package.nls.ko.json` (韓文) 新增對應翻譯
+- [x] T047 [P] 在 `package.nls.es.json` (西班牙文) 新增對應翻譯
+- [x] T048 [P] 在 `package.nls.pt-br.json` (葡萄牙文-巴西) 新增對應翻譯
+- [x] T049 [P] 在 `package.nls.fr.json` (法文) 新增對應翻譯
+- [x] T050 [P] 在 `package.nls.de.json` (德文) 新增對應翻譯
+- [x] T051 [P] 在 `package.nls.it.json` (義大利文) 新增對應翻譯
+- [x] T052 [P] 在 `package.nls.ru.json` (俄文) 新增對應翻譯
+- [x] T053 [P] 在 `package.nls.pl.json` (波蘭文) 新增對應翻譯
+- [x] T054 [P] 在 `package.nls.hu.json` (匈牙利文) 新增對應翻譯
+- [x] T055 [P] 在 `package.nls.tr.json` (土耳其文) 新增對應翻譯
+- [x] T056 [P] 在 `package.nls.bg.json` (保加利亞文) 新增對應翻譯
+- [x] T057 [P] 在 `package.nls.cs.json` (捷克文) 新增對應翻譯
+- [x] T058 [P] 在 `media/locales/en/messages.js` 新增訊息鍵 WARNING_NODE_NOT_AVAILABLE, BUTTON_INSTALL_GUIDE, BUTTON_REMIND_LATER, WARNING_INVALID_NODE_PATH, INFO_NODE_PATH_VALID, PROGRESS_CHECKING_MCP, BUTTON_COPY_DIAGNOSTICS, INFO_COPIED_TO_CLIPBOARD
+- [x] T059 [P] 在 `media/locales/zh-hant/messages.js` 新增對應繁體中文翻譯
+- [x] T060 [P] 在 `media/locales/ja/messages.js` 新增對應日文翻譯
+- [x] T061 [P] 在 `media/locales/ko/messages.js` 新增對應韓文翻譯
+- [x] T062 [P] 在 `media/locales/es/messages.js` 新增對應西班牙文翻譯
+- [x] T063 [P] 在 `media/locales/pt-br/messages.js` 新增對應葡萄牙文-巴西翻譯
+- [x] T064 [P] 在 `media/locales/fr/messages.js` 新增對應法文翻譯
+- [x] T065 [P] 在 `media/locales/de/messages.js` 新增對應德文翻譯
+- [x] T066 [P] 在 `media/locales/it/messages.js` 新增對應義大利文翻譯
+- [x] T067 [P] 在 `media/locales/ru/messages.js` 新增對應俄文翻譯
+- [x] T068 [P] 在 `media/locales/pl/messages.js` 新增對應波蘭文翻譯
+- [x] T069 [P] 在 `media/locales/hu/messages.js` 新增對應匈牙利文翻譯
+- [x] T070 [P] 在 `media/locales/tr/messages.js` 新增對應土耳其文翻譯
+- [x] T071 [P] 在 `media/locales/bg/messages.js` 新增對應保加利亞文翻譯
+- [x] T072 [P] 在 `media/locales/cs/messages.js` 新增對應捷克文翻譯
+- [x] T073 執行 `npm run validate:i18n` 驗證所有語言翻譯完整性
+- [x] T074 執行 `npm run audit:i18n:all` 確保翻譯品質評分 >= 8.0
 
 ---
 

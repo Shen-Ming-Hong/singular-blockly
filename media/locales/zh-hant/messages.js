@@ -223,6 +223,18 @@ window.languageManager.loadMessages('zh-hant', {
 	VSCODE_CANCEL: '取消',
 	VSCODE_OPEN_BLOCKLY_EDITOR: '開啟 Blockly 編輯器',
 
+	// MCP 優雅降級訊息
+	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 或以上版本未檢測到。MCP 功能將無法使用，但 Blockly 編輯功能仍可正常運作。\n\n錯誤: {0}',
+	BUTTON_INSTALL_GUIDE: '安裝指引',
+	BUTTON_REMIND_LATER: '稍後提醒',
+	WARNING_INVALID_NODE_PATH: '指定的 Node.js 路徑無效: {0}。錯誤: {1}。請修正路徑或清空設定以使用預設的 "node" 命令。',
+	INFO_NODE_PATH_VALID: 'Node.js 路徑已驗證: {0}',
+	PROGRESS_VALIDATING_NODE_PATH: '正在驗證 Node.js 路徑...',
+	PROGRESS_CHECKING_MCP: '正在檢查 MCP 狀態...',
+	BUTTON_COPY_DIAGNOSTICS: '複製診斷資訊',
+	INFO_COPIED_TO_CLIPBOARD: '已複製到剪貼簿',
+	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'MCP 診斷命令執行失敗: {0}',
+
 	// Error Messages
 	ERROR_BOARD_NOT_SELECTED: '請先選擇開發板',
 	ERROR_INVALID_PIN: '無效的腳位編號',
