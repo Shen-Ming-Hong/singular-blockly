@@ -10,6 +10,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.62.0] - 2026-02-05
+
+### 新增功能 Added
+
+- **MCP Server 優雅降級與 Node.js 檢測** (MCP Server Graceful Degradation with Node.js Detection)
+    - 新增 NodeDetectionService：自動檢測 Node.js 可用性與版本相容性（需 >= 22.16.0）
+      New NodeDetectionService: Auto-detects Node.js availability and version compatibility (requires >= 22.16.0)
+    - 新增 DiagnosticService：收集 MCP 狀態診斷資訊，支援複製到剪貼簿
+      New DiagnosticService: Collects MCP status diagnostics with clipboard copy support
+    - 新增「檢查 MCP 狀態」命令：顯示完整診斷報告，協助使用者排除問題
+      New "Check MCP Status" command: Shows comprehensive diagnostic report for troubleshooting
+    - 新增 `singularBlockly.mcp.nodePath` 設定：支援自訂 Node.js 路徑（適用於 nvm/fnm 使用者）
+      New `singularBlockly.mcp.nodePath` setting: Custom Node.js path support for nvm/fnm users
+    - 新增 `singularBlockly.mcp.showStartupWarning` 設定：可停用 Node.js 警告訊息
+      New `singularBlockly.mcp.showStartupWarning` setting: Option to disable Node.js warning dialogs
+    - 優雅降級：當 Node.js 不可用時，MCP 功能停用但 Blockly 編輯功能正常運作
+      Graceful degradation: When Node.js unavailable, MCP features disabled but Blockly editing works normally
+
+### 國際化 Internationalization
+
+- **完整 15 語言翻譯支援** (Full 15-Language Translation Support)
+    - 新增 `package.nls.*.json` 檔案，支援 VSCode 設定介面在地化
+      Added `package.nls.*.json` files for VSCode settings UI localization
+    - 新增 10 個 MCP 相關翻譯鍵至所有語言的 `messages.js`
+      Added 10 MCP-related translation keys to all language `messages.js` files
+    - 支援語言 Supported languages: en, zh-hant, ja, ko, de, es, fr, pt-br, it, ru, pl, hu, tr, bg, cs
+
+### 錯誤修復 Fixed
+
+- **修復 Windows 命令執行編碼問題** (Fix Windows Command Execution Encoding Issue)
+    - 修復 Windows CMD Big5 編碼導致中文錯誤訊息亂碼問題
+      Fixed Windows CMD Big5 encoding causing garbled Chinese error messages
+    - 修復 Windows 下 `"node" --version` 引號問題導致命令執行失敗
+      Fixed Windows quote handling issue causing `"node" --version` command failure
+
 ## [0.61.2] - 2026-02-04
 
 ### 錯誤修復 Fixed
