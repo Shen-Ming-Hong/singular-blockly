@@ -438,27 +438,27 @@ async function showNodeJsWarning(nodeDetection: import('./types/nodeDetection').
 
 	const laterButton = await localeService.getLocalizedMessage('BUTTON_REMIND_LATER', '稍後提醒');
 
-	// Show warning message with buttons
-	const action = await vscodeApi.window.showWarningMessage(warningMsg, installButton, laterButton);
-
-	// Handle button clicks
-	if (action === installButton) {
-		// Open Node.js download page
-		await vscodeApi.env.openExternal(vscodeApi.Uri.parse('https://nodejs.org/'));
-		log('User clicked Install Guide button', 'info');
-	} else if (action === laterButton) {
-		// Disable startup warning
-		try {
-			await vscodeApi.workspace
-				.getConfiguration('singularBlockly.mcp')
-				.update('showStartupWarning', false, vscodeApi.ConfigurationTarget.Global);
-			log('User disabled Node.js startup warning', 'info');
-		} catch (error) {
-			log('Failed to update showStartupWarning setting', 'error', error);
-			// Setting update failed, but don't show another error to user
-			// The warning will appear again on next startup
+	// Show warning message with buttons (fire-and-forget to avoid blocking activation)
+	vscodeApi.window.showWarningMessage(warningMsg, installButton, laterButton).then(async action => {
+		// Handle button clicks
+		if (action === installButton) {
+			// Open Node.js download page
+			await vscodeApi.env.openExternal(vscodeApi.Uri.parse('https://nodejs.org/'));
+			log('User clicked Install Guide button', 'info');
+		} else if (action === laterButton) {
+			// Disable startup warning
+			try {
+				await vscodeApi.workspace
+					.getConfiguration('singularBlockly.mcp')
+					.update('showStartupWarning', false, vscodeApi.ConfigurationTarget.Global);
+				log('User disabled Node.js startup warning', 'info');
+			} catch (error) {
+				log('Failed to update showStartupWarning setting', 'error', error);
+				// Setting update failed, but don't show another error to user
+				// The warning will appear again on next startup
+			}
 		}
-	}
+	});
 }
 
 /**
