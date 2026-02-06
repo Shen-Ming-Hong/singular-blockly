@@ -160,9 +160,11 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
     # 推送到功能分支
     git push origin HEAD
 
-    # Squash merge PR
+    # Squash merge PR（--delete-branch 會自動刪除遠端分支）
     gh pr merge --squash --delete-branch
     ```
+
+    **Agent 使用 MCP 工具合併時**：`mcp_github_merge_pull_request` 不會自動刪除遠端分支，必須在步驟 4 手動刪除。
 
 3. **同步主分支**
 
@@ -177,6 +179,9 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 4. **清理已合併分支 Branch Cleanup**
 
     ```bash
+    # 刪除遠端功能分支（若未被 --delete-branch 自動刪除）
+    git push origin --delete feature-branch-name
+
     # 更新遠端分支資訊，移除已刪除的遠端分支
     git fetch --prune
 
@@ -355,7 +360,8 @@ gh release view v{VERSION} --web
 - [ ] 變更已提交並推送
 - [ ] PR 已 squash merge
 - [ ] 主分支已同步
-- [ ] 功能分支已刪除（本地 + 遠端）
+- [ ] **遠端功能分支已刪除**（`git push origin --delete` 或 `--delete-branch`）
+- [ ] 本地功能分支已刪除（`git branch -d`）
 - [ ] 已清理其他舊的已合併分支
 
 ### 發布階段
