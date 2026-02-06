@@ -10,6 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.62.3] - 2026-02-06
+
+### 錯誤修復 Fixed
+
+- **修復 Node.js 警告通知阻塞 Blockly 編輯器開啟** (Fix Node.js warning notification blocking Blockly editor opening)
+    - `showNodeJsWarning()` 使用 `await showWarningMessage()` 等待使用者互動，阻塞 `activate()` 完成，導致 VS Code 不執行擴充功能命令
+      `showNodeJsWarning()` used `await showWarningMessage()` waiting for user interaction, blocking `activate()` completion and preventing VS Code from dispatching extension commands
+    - 改為 fire-and-forget 模式（`.then()` 處理按鈕回應），通知照常顯示但不阻塞啟動
+      Changed to fire-and-forget pattern (`.then()` for button handling), notification still shows but doesn't block activation
+
+- **修復 webpack MCP server 編譯靜默失敗** (Fix webpack MCP server silent build failure)
+    - `mcpServerConfig` 的 `extensionAlias` 與 `@modelcontextprotocol/sdk` 的 exports map 衝突，導致 webpack 靜默失敗（exit code 1，無錯誤訊息）
+      `mcpServerConfig`'s `extensionAlias` conflicted with `@modelcontextprotocol/sdk`'s exports map, causing webpack to fail silently (exit code 1, no error messages)
+    - 將 MCP SDK 和 zod 標記為 externals，MCP server 作為獨立 Node.js 進程可直接存取 node_modules
+      Added MCP SDK and zod as externals since MCP server runs as standalone Node.js process with direct access to node_modules
+
 ## [0.62.2] - 2026-02-05
 
 ### 安全性修復 Security Fixes
