@@ -289,71 +289,55 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 	});
 
 	// 註冊 MCP 狀態診斷命令
-	const checkMcpStatusCommand = vscodeApi.commands.registerCommand(
-		'singular-blockly.checkMcpStatus',
-		async () => {
-			try {
-				log('Executing checkMcpStatus command', 'info');
+	const checkMcpStatusCommand = vscodeApi.commands.registerCommand('singular-blockly.checkMcpStatus', async () => {
+		try {
+			log('Executing checkMcpStatus command', 'info');
 
-				// 顯示進度通知
-				const progressMsg = await localeService.getLocalizedMessage(
-					'PROGRESS_CHECKING_MCP',
-					'Checking MCP status...'
-				);
+			// 顯示進度通知
+			const progressMsg = await localeService.getLocalizedMessage('PROGRESS_CHECKING_MCP', 'Checking MCP status...');
 
-				await vscodeApi.window.withProgress(
-					{
-						location: vscodeApi.ProgressLocation.Notification,
-						title: progressMsg,
-						cancellable: false,
-					},
-					async () => {
-						// 收集診斷資訊
-						const report = await diagnosticService.collectDiagnostics(context.extensionPath);
+			await vscodeApi.window.withProgress(
+				{
+					location: vscodeApi.ProgressLocation.Notification,
+					title: progressMsg,
+					cancellable: false,
+				},
+				async () => {
+					// 收集診斷資訊
+					const report = await diagnosticService.collectDiagnostics(context.extensionPath);
 
-						// 格式化報告 (now async)
-						const formattedReport = await diagnosticService.formatReport(report, { format: 'text', useEmoji: true });
+					// 格式化報告 (now async)
+					const formattedReport = await diagnosticService.formatReport(report, { format: 'text', useEmoji: true });
 
-						// 獲取複製按鈕文字
-						const copyButton = await localeService.getLocalizedMessage(
-							'BUTTON_COPY_DIAGNOSTICS',
-							'複製診斷資訊'
-						);
+					// 獲取複製按鈕文字
+					const copyButton = await localeService.getLocalizedMessage('BUTTON_COPY_DIAGNOSTICS', '複製診斷資訊');
 
-						// 顯示報告訊息框
-						const action = await vscodeApi.window.showInformationMessage(
-							formattedReport,
-							{ modal: false },
-							copyButton
-						);
+					// 顯示報告訊息框
+					const action = await vscodeApi.window.showInformationMessage(formattedReport, { modal: false }, copyButton);
 
-						// 處理複製按鈕點擊
-						if (action === copyButton) {
-							const copied = await diagnosticService.copyToClipboard(report);
-							if (copied) {
-								const successMsg = await localeService.getLocalizedMessage(
-									'INFO_COPIED_TO_CLIPBOARD',
-									'已複製到剪貼簿'
-								);
-								vscodeApi.window.showInformationMessage(successMsg);
-								log('Diagnostic report copied to clipboard', 'info');
-							}
+					// 處理複製按鈕點擊
+					if (action === copyButton) {
+						const copied = await diagnosticService.copyToClipboard(report);
+						if (copied) {
+							const successMsg = await localeService.getLocalizedMessage('INFO_COPIED_TO_CLIPBOARD', '已複製到剪貼簿');
+							vscodeApi.window.showInformationMessage(successMsg);
+							log('Diagnostic report copied to clipboard', 'info');
 						}
 					}
-				);
+				}
+			);
 
-				log('checkMcpStatus command completed', 'info');
-			} catch (error) {
-				log('Error executing checkMcpStatus command:', 'error', error);
-				const errorMsg = await localeService.getLocalizedMessage(
-					'ERROR_DIAGNOSTIC_COMMAND_FAILED',
-					'MCP 診斷命令執行失敗: {0}',
-					String(error)
-				);
-				vscodeApi.window.showErrorMessage(errorMsg);
-			}
+			log('checkMcpStatus command completed', 'info');
+		} catch (error) {
+			log('Error executing checkMcpStatus command:', 'error', error);
+			const errorMsg = await localeService.getLocalizedMessage(
+				'ERROR_DIAGNOSTIC_COMMAND_FAILED',
+				'MCP 診斷命令執行失敗: {0}',
+				String(error)
+			);
+			vscodeApi.window.showErrorMessage(errorMsg);
 		}
-	);
+	});
 
 	// 添加到訂閱清單
 	context.subscriptions.push(openBlocklyEdit);
