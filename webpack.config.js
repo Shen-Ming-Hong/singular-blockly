@@ -58,6 +58,12 @@ const mcpServerConfig = {
 	},
 	externals: {
 		vscode: 'commonjs vscode',
+		// MCP server runs as standalone Node.js process with access to node_modules,
+		// no need to bundle these dependencies. Also avoids extensionAlias conflicts
+		// with SDK's exports map (.js → .ts resolution hitting non-existent files).
+		'@modelcontextprotocol/sdk/server/mcp.js': 'commonjs @modelcontextprotocol/sdk/server/mcp.js',
+		'@modelcontextprotocol/sdk/server/stdio.js': 'commonjs @modelcontextprotocol/sdk/server/stdio.js',
+		zod: 'commonjs zod',
 	},
 	resolve: {
 		extensions: ['.ts', '.js'],
