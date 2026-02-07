@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.63.0] - 2026-02-07
+
+### 新功能 Added
+
+- **伺服馬達角度積木支援動態輸入** (Servo motor angle block now accepts dynamic input)
+    - 將 `servo_move` 積木的角度從固定數字欄位（FieldNumber）改為值輸入插槽（ValueInput），支援插入變數積木、迴圈變數、數學運算等動態值
+      Changed `servo_move` block's angle from fixed FieldNumber to ValueInput, supporting variable blocks, loop counters, and math expressions
+    - Arduino 生成器使用 `constrain(angle, 0, 180)` 保護，防止動態值超出伺服馬達安全範圍
+      Arduino generator uses `constrain(angle, 0, 180)` protection to prevent dynamic values from exceeding servo safe range
+    - 工具箱加入 shadow block（預設值 90），從工具箱拖出時自帶預設角度
+      Added shadow block (default 90) in toolbox, providing default angle when dragged from toolbox
+    - 新增 Blockly 12.x JSON 序列化 hooks（`saveExtraState`/`loadExtraState`）
+      Added Blockly 12.x JSON serialization hooks (`saveExtraState`/`loadExtraState`)
+
 ## [0.62.3] - 2026-02-06
 
 ### 錯誤修復 Fixed
