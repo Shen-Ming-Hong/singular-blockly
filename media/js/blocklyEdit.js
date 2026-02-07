@@ -610,6 +610,7 @@ function refreshWorkspaceForLanguage() {
 		}
 
 		workspace.clear();
+		migrateWorkspaceState(state);
 		Blockly.serialization.workspaces.load(state, workspace);
 		rebuildPwmConfig(workspace);
 		workspace.render();
@@ -2115,6 +2116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					updateTheme(currentTheme);
 				}
 				if (pendingMessage.state) {
+					migrateWorkspaceState(pendingMessage.state);
 					Blockly.serialization.workspaces.load(pendingMessage.state, workspace);
 					rebuildPwmConfig(workspace);
 					updateMainBlockDeletable(workspace);
@@ -2777,7 +2779,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 					log.info('取得現有函數名稱失敗', e);
 				}
 
-				// 然後再載入工作區內容
+				// 遷移舊版格式後再載入工作區內容
+				migrateWorkspaceState(workspaceState);
 				Blockly.serialization.workspaces.load(workspaceState, workspace);
 
 				// 重建 ESP32 PWM 配置
@@ -3190,6 +3193,71 @@ Blockly.utils.replaceMessageReferences = function (message) {
  * 掃描工作區中的 esp32_pwm_setup 積木並重建全域變數
  * @param {Blockly.Workspace} workspace - Blockly 工作區實例
  */
+/**
+ * 遷移舊版 workspace JSON 格式，確保向下相容性
+ * - servo_move: 將舊的 fields.ANGLE (FieldNumber) 轉換為 inputs.ANGLE (ValueInput + shadow block)
+ * @param {Object} state - Blockly workspace JSON state
+ * @returns {Object} 遷移後的 state
+ */
+function migrateWorkspaceState(state) {
+	if (!state || !state.blocks || !state.blocks.blocks) {
+		return state;
+	}
+
+	let migrationCount = 0;
+
+	/**
+	 * 遞迴遍歷所有積木，執行遷移
+	 * @param {Object} block - Blockly block JSON
+	 */
+	function migrateBlock(block) {
+		if (!block) return;
+
+		// 遷移 servo_move: fields.ANGLE → inputs.ANGLE (shadow block)
+		if (block.type === 'servo_move' && block.fields && 'ANGLE' in block.fields) {
+			const angleValue = block.fields.ANGLE;
+			delete block.fields.ANGLE;
+
+			// 只在 inputs.ANGLE 不存在時建立 shadow block（避免覆蓋已遷移的資料）
+			if (!block.inputs || !block.inputs.ANGLE) {
+				if (!block.inputs) block.inputs = {};
+				block.inputs.ANGLE = {
+					shadow: {
+						type: 'math_number',
+						fields: { NUM: angleValue },
+					},
+				};
+				migrationCount++;
+				log.info(`migrateWorkspaceState: 遷移 servo_move 角度 ${angleValue} 從 field 到 ValueInput`);
+			}
+		}
+
+		// 遞迴處理 next 積木
+		if (block.next && block.next.block) {
+			migrateBlock(block.next.block);
+		}
+
+		// 遞迴處理 inputs 中的積木
+		if (block.inputs) {
+			for (const inputName in block.inputs) {
+				const input = block.inputs[inputName];
+				if (input && input.block) {
+					migrateBlock(input.block);
+				}
+			}
+		}
+	}
+
+	// 遍歷所有頂層積木
+	state.blocks.blocks.forEach(block => migrateBlock(block));
+
+	if (migrationCount > 0) {
+		log.info(`migrateWorkspaceState: 共遷移 ${migrationCount} 個 servo_move 積木`);
+	}
+
+	return state;
+}
+
 function rebuildPwmConfig(workspace) {
 	try {
 		const pwmBlocks = workspace.getAllBlocks().filter(block => block.type === 'esp32_pwm_setup');
