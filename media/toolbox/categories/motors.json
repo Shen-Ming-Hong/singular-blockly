@@ -9,7 +9,17 @@
 		},
 		{
 			"kind": "block",
-			"type": "servo_move"
+			"type": "servo_move",
+			"inputs": {
+				"ANGLE": {
+					"shadow": {
+						"type": "math_number",
+						"fields": {
+							"NUM": 90
+						}
+					}
+				}
+			}
 		},
 		{
 			"kind": "block",

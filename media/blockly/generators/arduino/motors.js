@@ -91,7 +91,7 @@ window.arduinoGenerator.forBlock['servo_setup'] = function (block) {
 window.arduinoGenerator.forBlock['servo_move'] = function (block) {
 	try {
 		const varName = block.getFieldValue('VAR');
-		const angle = block.getFieldValue('ANGLE');
+		const angle = window.arduinoGenerator.valueToCode(block, 'ANGLE', window.arduinoGenerator.ORDER_NONE) || '90';
 		const currentBoard = window.getCurrentBoard();
 
 		// 根據開發板選擇適當的伺服馬達庫
@@ -101,8 +101,8 @@ window.arduinoGenerator.forBlock['servo_move'] = function (block) {
 			window.arduinoGenerator.includes_['servo'] = '#include <Servo.h>';
 		}
 
-		// 移動伺服馬達的程式碼對所有開發板都相同
-		return `${varName}.write(${angle});\n`;
+		// 使用 constrain() 確保角度值在 0~180 範圍內
+		return `${varName}.write(constrain(${angle}, 0, 180));\n`;
 	} catch (e) {
 		log.error('Servo move code generation error:', e);
 		return '';
@@ -261,9 +261,8 @@ window.arduinoGenerator.forBlock['encoder_pid_setup'] = function (block) {
 		window.arduinoGenerator.variables_[`pid_input_${pidVarName}`] = `float ${pidVarName}_input = 0;`;
 		window.arduinoGenerator.variables_[`pid_setpoint_${pidVarName}`] = `float ${pidVarName}_setpoint = 0;`;
 		window.arduinoGenerator.variables_[`pid_output_${pidVarName}`] = `float ${pidVarName}_output = 0;`;
-		window.arduinoGenerator.variables_[
-			`pid_${pidVarName}`
-		] = `QuickPID ${pidVarName}(&${pidVarName}_input, &${pidVarName}_output, &${pidVarName}_setpoint, ${kp}, ${ki}, ${kd}, QuickPID::Action::direct);`;
+		window.arduinoGenerator.variables_[`pid_${pidVarName}`] =
+			`QuickPID ${pidVarName}(&${pidVarName}_input, &${pidVarName}_output, &${pidVarName}_setpoint, ${kp}, ${ki}, ${kd}, QuickPID::Action::direct);`;
 
 		// 速度模式需要額外的 lastCount 變數來計算速度
 		if (mode === 'SPEED') {

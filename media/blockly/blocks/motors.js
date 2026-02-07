@@ -73,9 +73,9 @@ Blockly.Blocks['servo_move'] = {
 					return options;
 				}),
 				'VAR'
-			)
-			.appendField(window.languageManager.getMessage('SERVO_ANGLE'))
-			.appendField(new Blockly.FieldNumber(90, 0, 180), 'ANGLE');
+			);
+		this.appendValueInput('ANGLE').setCheck('Number').appendField(window.languageManager.getMessage('SERVO_ANGLE'));
+		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('motors_blocks');
@@ -114,6 +114,32 @@ Blockly.Blocks['servo_move'] = {
 		if (currentValue && currentValue !== this.restoredServoValue) {
 			log.info(`servo_move: 馬達名稱從 ${this.restoredServoValue} 變更為 ${currentValue}`);
 			this.restoredServoValue = currentValue;
+		}
+	},
+
+	// ========== JSON 序列化 hooks（Blockly 12.x 優先使用）==========
+
+	/**
+	 * 保存積木的額外狀態到 JSON
+	 * @returns {Object} 可 JSON 序列化的狀態物件
+	 */
+	saveExtraState: function () {
+		return {
+			servo: this.getFieldValue('VAR') || 'myServo',
+		};
+	},
+
+	/**
+	 * 從 JSON 還原積木的額外狀態
+	 * @param {Object} state - 之前由 saveExtraState 返回的狀態物件
+	 */
+	loadExtraState: function (state) {
+		if (state && state.servo) {
+			this.restoredServoValue = state.servo;
+			const field = this.getField('VAR');
+			if (field) {
+				field.setValue(state.servo);
+			}
 		}
 	},
 };
