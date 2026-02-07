@@ -116,19 +116,19 @@ resolve: {
     extensions: ['.ts', '.js'],
     plugins: [
         {
-            // 自訂 resolver：僅對非 node_modules 的 .js import 嘗試 .ts 解析
+            // 自訂 resolver：僅對相對/絕對路徑的 .js import 嘗試 .ts 解析
             // 取代全域 extensionAlias 以避免與 SDK exports map 衝突
             apply(resolver) {
                 const target = resolver.ensureHook('resolve');
-                resolver.getHook('raw-file')
+                resolver.getHook('described-resolve')
                     .tapAsync('TsJsResolverPlugin', (request, resolveContext, callback) => {
+                        const req = request.request;
                         if (
-                            request.path &&
-                            !request.path.includes('node_modules') &&
-                            request.request &&
-                            request.request.endsWith('.js')
+                            typeof req === 'string' &&
+                            (req.startsWith('./') || req.startsWith('../') || req.startsWith('/')) &&
+                            req.endsWith('.js')
                         ) {
-                            const tsRequest = request.request.replace(/\.js$/, '.ts');
+                            const tsRequest = req.replace(/\.js$/, '.ts');
                             resolver.doResolve(
                                 target,
                                 { ...request, request: tsRequest },
