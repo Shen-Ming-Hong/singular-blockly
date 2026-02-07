@@ -83,7 +83,7 @@
 
 ### Measurable Outcomes
 
-- **SC-001**: 使用者從 Marketplace 安裝 extension 後，MCP Server 能在 5 秒內成功啟動並建立連線
+- **SC-001**: 使用者從 Marketplace 安裝 extension 後，MCP Server 能在 5 秒內成功啟動並建立連線（計時起點為 extension `activate` 事件觸發，終點為 MCP Server 在 stderr 輸出 `[Singular Blockly MCP Server] Started` 訊息）
 - **SC-002**: `npm run compile` 連續編譯均穩定通過，無靜默失敗
 - **SC-003**: 打包後的 `.vsix` 安裝在全新 VS Code 環境中，所有 MCP 工具呼叫（`get_block_usage`、`search_blocks`、`list_blocks_by_category`、`get_workspace_state`）均正常回應
 - **SC-004**: 因 MCP Server 模組載入錯誤而產生的使用者問題降為零

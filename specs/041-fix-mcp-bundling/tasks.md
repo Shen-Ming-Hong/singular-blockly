@@ -17,7 +17,7 @@
 
 **Purpose**: 記錄修改前的基準數據供後續比較
 
-- [ ] T001 記錄 `dist/mcp-server.js` 目前檔案大小（基準值）作為體積比較依據
+- [ ] T001 記錄 `dist/mcp-server.js` 目前檔案大小（基準值）以及執行 `npx @vscode/vsce package` 產生的 `.vsix` 檔案大小（基準值），作為體積比較依據
 
 ---
 
@@ -30,7 +30,7 @@
 ### Implementation
 
 - [ ] T002 [US1] [US2] 移除 `mcpServerConfig.externals` 中的 MCP SDK 和 zod 聲明，僅保留 vscode external，在 `webpack.config.js`
-- [ ] T003 [US1] [US2] 移除 `mcpServerConfig.resolve.extensionAlias`，替換為自訂 TsJsResolverPlugin resolve plugin（僅對非 node_modules 的 `.js` import 嘗試 `.ts` 解析），在 `webpack.config.js`
+- [ ] T003 [US1] [US2] 移除 `mcpServerConfig.resolve.extensionAlias`，替換為自訂 TsJsResolverPlugin resolve plugin（僅對非 node_modules 的 `.js` import 嘗試 `.ts` 解析），在 `webpack.config.js`。實作程式碼參考 [plan.md 「以自訂 resolve plugin 取代 extensionAlias」章節](plan.md)，使用 `resolver.getHook('raw-file')` hook
 - [ ] T004 [US1] [US2] 更新 `mcpServerConfig` 的註解，移除過時的 "MCP server runs as standalone Node.js process with access to node_modules" 說明，在 `webpack.config.js`
 
 **Checkpoint**: webpack.config.js 修改完成，準備進入驗證階段
@@ -48,6 +48,9 @@
 - [ ] T007 [US3] 檢查 `dist/mcp-server.js` 檔案大小是否低於 5 MB 上限
 - [ ] T008 [US1] 執行 `node dist/mcp-server.js` 確認 MCP Server 可正常啟動（應在 stderr 輸出 Started 訊息）
 - [ ] T009 [US2] 執行 `npm test` 確認既有測試全部通過，無副作用
+- [ ] T012 [US1] [P] 驗證 FR-004：檢查 `dist/mcp-server.js` 中包含來自 `src/mcp/tools/blockQuery.ts` 的實際程式碼（如 `get_block_usage` 字串），確認 resolve plugin 成功將 `.js` import 解析到對應 `.ts` 檔案
+- [ ] T013 [US1] [US2] [US3] 驗證 FR-007 + tree-shaking 安全性：執行 `npm run package`（production mode），然後 (1) 檢查 `dist/mcp-server.js` 不含外部 `require("@modelcontextprotocol`)，(2) 執行 `node dist/mcp-server.js` 確認啟動正常，(3) 確認 watch 模式 `npm run watch` 增量編譯無錯誤
+- [ ] T014 [US3] 驗證 `.vsix` 體積增幅：執行 `npx @vscode/vsce package` 打包，比較 `.vsix` 大小與 T001 基準值，確認增幅低於 20%
 
 **Checkpoint**: 所有驗證通過，修復完成
 
@@ -71,15 +74,16 @@
     - T002 → T003 → T004：順序執行（均修改同一檔案 `webpack.config.js`）
 - **Phase 3 (Verification)**: 依賴 Phase 2 完成
     - T005 必須首先完成（編譯成功後才能檢查輸出）
-    - T006、T007 可在 T005 後平行執行
-    - T008、T009 可在 T005 後平行執行
+    - T006、T007、T008、T009、T012 可在 T005 後平行執行
+    - T013 需在 T005 後執行（production build 驗證）
+    - T014 依賴 T013 完成（需 production build 產出的 `.vsix`）
 - **Phase 4 (Polish)**: 依賴 Phase 3 完成
 
 ### User Story Mapping
 
-- **US1（MCP Server 正常啟動）**: T002, T003, T004, T006, T008
-- **US2（Webpack 編譯無錯誤）**: T002, T003, T004, T005, T006, T009
-- **US3（體積合理）**: T007
+- **US1（MCP Server 正常啟動）**: T002, T003, T004, T006, T008, T012, T013
+- **US2（Webpack 編譯無錯誤）**: T002, T003, T004, T005, T006, T009, T013
+- **US3（體積合理）**: T007, T013, T014
 
 ### Parallel Opportunities
 
@@ -89,6 +93,10 @@ T006: 檢查外部 require 呼叫
 T007: 檢查檔案大小
 T008: MCP Server 啟動測試
 T009: npm test
+T012: 驗證 .js→.ts resolve 正確性
+
+# T013 需在 T005 後執行（需先確認 compile 通過再測 production build）
+# T014 依賴 T013 完成（需 production build 產出）
 ```
 
 ---
@@ -104,12 +112,12 @@ T009: npm test
 
 ### Total Effort
 
-- **任務總數**: 11
-- **US1 任務數**: 5（T002, T003, T004, T006, T008）
-- **US2 任務數**: 6（T002, T003, T004, T005, T006, T009）
-- **US3 任務數**: 1（T007）
-- **平行機會**: Phase 3 中 4 項驗證任務可平行執行
-- **預估時間**: 15-30 分鐘（含驗證）
+- **任務總數**: 14
+- **US1 任務數**: 7（T002, T003, T004, T006, T008, T012, T013）
+- **US2 任務數**: 7（T002, T003, T004, T005, T006, T009, T013）
+- **US3 任務數**: 3（T007, T013, T014）
+- **平行機會**: Phase 3 中 5 項驗證任務可平行執行（T006-T009, T012），T013/T014 順序執行
+- **預估時間**: 20-40 分鐘（含驗證）
 - **修改檔案**: 僅 `webpack.config.js`
 
 ---
