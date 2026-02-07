@@ -25,6 +25,7 @@ Auto-generated from all feature plans. Last updated: 2025-11-21
 - TypeScript 5.9.3 (Extension) + JavaScript (WebView/Generators) + Blockly 12.3.1, VSCode API 1.105.0+ (039-fix-print-newline)
 - TypeScript 5.9.3, Node.js 22.16.0+ (runtime requirement for MCP Server) (040-mcp-graceful-degradation)
 - VSCode workspace settings (`singularBlockly.mcp.nodePath`, `singularBlockly.mcp.showStartupWarning`) (040-mcp-graceful-degradation)
+- TypeScript 5.9.3 (ES2023 target, Node16 module) + webpack 5.102.1, ts-loader 9.5.4, @modelcontextprotocol/sdk ^1.26.0, zod ^4.1.13 (041-fix-mcp-bundling)
 
 -   JavaScript (ES6+) - WebView 環境 + Blockly 12.3.1, arduinoGenerator (自訂程式碼生成器) (012-esp32-pixetto-fix)
 -   JavaScript (ES2022) / TypeScript 5.9.3 + Blockly 12.3.1, VS Code Extension API 1.96.0+ (014-block-serialization-fix)
@@ -85,9 +86,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 041-fix-mcp-bundling: Added TypeScript 5.9.3 (ES2023 target, Node16 module) + webpack 5.102.1, ts-loader 9.5.4, @modelcontextprotocol/sdk ^1.26.0, zod ^4.1.13
 - 040-mcp-graceful-degradation: Added TypeScript 5.9.3, Node.js 22.16.0+ (runtime requirement for MCP Server)
 - 039-fix-print-newline: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
-- 038-arduino-serial-monitor: Added TypeScript 5.9.3 (strict mode) + VS Code Extension API 1.105.0+, Blockly 12.3.1, PlatformIO CLI
 
 
 <!-- MANUAL ADDITIONS START -->
