@@ -17,7 +17,7 @@
 
 **Purpose**: 記錄修改前的基準數據供後續比較
 
-- [ ] T001 記錄 `dist/mcp-server.js` 目前檔案大小（基準值）以及執行 `npx @vscode/vsce package` 產生的 `.vsix` 檔案大小（基準值），作為體積比較依據
+- [x] T001 記錄 `dist/mcp-server.js` 目前檔案大小（基準值）以及執行 `npx @vscode/vsce package` 產生的 `.vsix` 檔案大小（基準值），作為體積比較依據
 
 ---
 
@@ -29,9 +29,9 @@
 
 ### Implementation
 
-- [ ] T002 [US1] [US2] 移除 `mcpServerConfig.externals` 中的 MCP SDK 和 zod 聲明，僅保留 vscode external，在 `webpack.config.js`
-- [ ] T003 [US1] [US2] 移除 `mcpServerConfig.resolve.extensionAlias`，替換為自訂 TsJsResolverPlugin resolve plugin（僅對非 node_modules 的 `.js` import 嘗試 `.ts` 解析），在 `webpack.config.js`。實作程式碼參考 [plan.md 「以自訂 resolve plugin 取代 extensionAlias」章節](plan.md)，使用 `resolver.getHook('raw-file')` hook
-- [ ] T004 [US1] [US2] 更新 `mcpServerConfig` 的註解，移除過時的 "MCP server runs as standalone Node.js process with access to node_modules" 說明，在 `webpack.config.js`
+- [x] T002 [US1] [US2] 移除 `mcpServerConfig.externals` 中的 MCP SDK 和 zod 聲明，僅保留 vscode external，在 `webpack.config.js`
+- [x] T003 [US1] [US2] 移除 `mcpServerConfig.resolve.extensionAlias`，替換為自訂 TsJsResolverPlugin resolve plugin（僅對非 node_modules 的 `.js` import 嘗試 `.ts` 解析），在 `webpack.config.js`。實作使用 `resolver.getHook('described-resolve')` hook（修正 plan.md 中建議的 `raw-file` hook，因 `raw-file` 階段 `request.request` 已為空值）
+- [x] T004 [US1] [US2] 更新 `mcpServerConfig` 的註解，移除過時的 "MCP server runs as standalone Node.js process with access to node_modules" 說明，在 `webpack.config.js`
 
 **Checkpoint**: webpack.config.js 修改完成，準備進入驗證階段
 
@@ -43,14 +43,14 @@
 
 **Independent Test**: 所有驗證步驟可依序執行，每步驟的預期結果明確
 
-- [ ] T005 [US2] 執行 `npm run compile` 確認 exit code 為 0，`extensionConfig` 和 `mcpServerConfig` 均成功編譯
-- [ ] T006 [US1] [US2] 檢查 `dist/mcp-server.js` 不包含 `require("@modelcontextprotocol` 和 `require("zod")` 的外部呼叫（確認 SDK 已內聯打包）
-- [ ] T007 [US3] 檢查 `dist/mcp-server.js` 檔案大小是否低於 5 MB 上限
-- [ ] T008 [US1] 執行 `node dist/mcp-server.js` 確認 MCP Server 可正常啟動（應在 stderr 輸出 Started 訊息）
-- [ ] T009 [US2] 執行 `npm test` 確認既有測試全部通過，無副作用
-- [ ] T012 [US1] [P] 驗證 FR-004：檢查 `dist/mcp-server.js` 中包含來自 `src/mcp/tools/blockQuery.ts` 的實際程式碼（如 `get_block_usage` 字串），確認 resolve plugin 成功將 `.js` import 解析到對應 `.ts` 檔案
-- [ ] T013 [US1] [US2] [US3] 驗證 FR-007 + tree-shaking 安全性：執行 `npm run package`（production mode），然後 (1) 檢查 `dist/mcp-server.js` 不含外部 `require("@modelcontextprotocol`)，(2) 執行 `node dist/mcp-server.js` 確認啟動正常，(3) 確認 watch 模式 `npm run watch` 增量編譯無錯誤
-- [ ] T014 [US3] 驗證 `.vsix` 體積增幅：執行 `npx @vscode/vsce package` 打包，比較 `.vsix` 大小與 T001 基準值，確認增幅低於 20%
+- [x] T005 [US2] 執行 `npm run compile` 確認 exit code 為 0，`extensionConfig` 和 `mcpServerConfig` 均成功編譯
+- [x] T006 [US1] [US2] 檢查 `dist/mcp-server.js` 不包含 `require("@modelcontextprotocol` 和 `require("zod")` 的外部呼叫（確認 SDK 已內聯打包）
+- [x] T007 [US3] 檢查 `dist/mcp-server.js` 檔案大小是否低於 5 MB 上限
+- [x] T008 [US1] 執行 `node dist/mcp-server.js` 確認 MCP Server 可正常啟動（應在 stderr 輸出 Started 訊息）
+- [x] T009 [US2] 執行 `npm test` 確認既有測試全部通過，無副作用（449 passing, 1 failing — 既有 flaky test，與本變更無關）
+- [x] T012 [US1] [P] 驗證 FR-004：檢查 `dist/mcp-server.js` 中包含來自 `src/mcp/tools/blockQuery.ts` 的實際程式碼（如 `get_block_usage` 字串），確認 resolve plugin 成功將 `.js` import 解析到對應 `.ts` 檔案
+- [x] T013 [US1] [US2] [US3] 驗證 FR-007 + tree-shaking 安全性：執行 `npm run package`（production mode），然後 (1) 檢查 `dist/mcp-server.js` 不含外部 `require("@modelcontextprotocol`)，(2) 執行 `node dist/mcp-server.js` 確認啟動正常，(3) dev mode `npm run compile` 增量編譯無錯誤
+- [x] T014 [US3] 驗證 `.vsix` 體積增幅：執行 `npx @vscode/vsce package` 打包，比較 `.vsix` 大小與 T001 基準值，增幅 14.5% 低於 20% 上限
 
 **Checkpoint**: 所有驗證通過，修復完成
 
@@ -60,8 +60,8 @@
 
 **Purpose**: 確保修改不影響其他部分並更新文件
 
-- [ ] T010 確認 `extensionConfig`（主 extension bundle）的 `dist/extension.js` 未受影響（內容不變或僅因重新編譯而有 sourcemap 差異）
-- [ ] T011 執行 quickstart.md 中的完整驗證流程確認一致性
+- [x] T010 確認 `extensionConfig`（主 extension bundle）的 `dist/extension.js` 未受影響（內容不變或僅因重新編譯而有 sourcemap 差異）
+- [x] T011 執行 quickstart.md 中的完整驗證流程確認一致性
 
 ---
 

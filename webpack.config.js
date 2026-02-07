@@ -58,18 +58,35 @@ const mcpServerConfig = {
 	},
 	externals: {
 		vscode: 'commonjs vscode',
-		// MCP server runs as standalone Node.js process with access to node_modules,
-		// no need to bundle these dependencies. Also avoids extensionAlias conflicts
-		// with SDK's exports map (.js → .ts resolution hitting non-existent files).
-		'@modelcontextprotocol/sdk/server/mcp.js': 'commonjs @modelcontextprotocol/sdk/server/mcp.js',
-		'@modelcontextprotocol/sdk/server/stdio.js': 'commonjs @modelcontextprotocol/sdk/server/stdio.js',
-		zod: 'commonjs zod',
 	},
 	resolve: {
 		extensions: ['.ts', '.js'],
-		extensionAlias: {
-			'.js': ['.ts', '.js'],
-		},
+		plugins: [
+			{
+				// 自訂 resolver：僅對非 node_modules 的 .js import 嘗試 .ts 解析
+				// 取代全域 extensionAlias 以避免與 SDK exports map 衝突
+				apply(resolver) {
+					const target = resolver.ensureHook('resolve');
+					resolver.getHook('described-resolve').tapAsync('TsJsResolverPlugin', (request, resolveContext, callback) => {
+						if (request.path && !request.path.includes('node_modules') && request.request && request.request.endsWith('.js')) {
+							const tsRequest = request.request.replace(/\.js$/, '.ts');
+							resolver.doResolve(
+								target,
+								{ ...request, request: tsRequest },
+								'TsJsResolverPlugin: .js → .ts',
+								resolveContext,
+								(err, result) => {
+									if (result) return callback(null, result);
+									return callback(); // fallback to original .js
+								}
+							);
+						} else {
+							return callback();
+						}
+					});
+				},
+			},
+		],
 	},
 	module: {
 		rules: [
