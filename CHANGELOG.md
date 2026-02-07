@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.63.2] - 2026-02-08
+
+### 錯誤修復 Fixed
+
+- **修復打包後 MCP Server 無法啟動的問題** (Fix MCP Server failing to start in packaged extension)
+    - 移除 webpack externals 中的 `@modelcontextprotocol/sdk` 和 `zod` 聲明，改為完整打包進 `dist/mcp-server.js`，解決安裝後因 `node_modules` 被排除而找不到模組的問題
+      Removed MCP SDK and zod from webpack externals, bundling them into `dist/mcp-server.js` to fix `Cannot find module` error when `node_modules` is excluded by `.vscodeignore`
+    - 以自訂 `TsJsResolverPlugin` 取代全域 `extensionAlias`，僅對相對路徑的 `.js` import 嘗試 `.ts` 解析，避免與 SDK exports map 衝突
+      Replaced global `extensionAlias` with custom `TsJsResolverPlugin` that only resolves `.js→.ts` for relative path imports, preventing conflicts with SDK exports map
+    - Production build 體積 786 KB（tree-shaking 有效），`.vsix` 體積增幅僅 14.5%
+      Production build size 786 KB (tree-shaking effective), `.vsix` size increase only 14.5%
+
 ## [0.63.1] - 2026-02-07
 
 ### 錯誤修復 Fixed
