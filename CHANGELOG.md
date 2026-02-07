@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.63.1] - 2026-02-07
+
+### 錯誤修復 Fixed
+
+- **修復舊版工作區載入時 servo_move 角度值遺失** (Fix servo_move angle value lost when loading old workspaces)
+    - 新增 `migrateWorkspaceState()` 遷移函數，在 Blockly 反序列化前將舊格式 `fields.ANGLE`（FieldNumber）自動轉換為新格式 `inputs.ANGLE`（ValueInput + shadow block）
+      Added `migrateWorkspaceState()` migration function to convert old `fields.ANGLE` (FieldNumber) to new `inputs.ANGLE` (ValueInput + shadow block) before Blockly deserialization
+    - 覆蓋所有 3 個工作區載入路徑（初始化、FileWatcher、語言切換）
+      Applied to all 3 workspace load paths (init, fileWatcher, language switch)
+
 ## [0.63.0] - 2026-02-07
 
 ### 新功能 Added
