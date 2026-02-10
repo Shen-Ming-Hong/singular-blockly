@@ -814,7 +814,11 @@ window.languageManager.loadMessages('zh-hant', {
 	ERROR_ARDUINO_UPLOAD_FAILED: '上傳失敗',
 	ERROR_ARDUINO_NO_WORKSPACE: '請先開啟專案資料夾',
 	ERROR_ARDUINO_TIMEOUT: '操作逾時',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: '裝置已斷開連接',
+	ERROR_ARDUINO_NO_DEVICE: '未偵測到硬體裝置，請確認開發板已連接',
+	ERROR_ARDUINO_PORT_BUSY: '連接埠被其他程式佔用，請關閉其他序列埠監視器',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: '上傳過程中裝置已斷開連接',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: '上傳逾時，請檢查連接',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: '上傳失敗，請檢查裝置連接',
 
 	// 備份訊息
 	BACKUP_CONFIRM_DELETE: '確定要刪除備份「{0}」嗎？',

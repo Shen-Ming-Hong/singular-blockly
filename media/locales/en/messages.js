@@ -227,10 +227,12 @@ window.languageManager.loadMessages('en', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Open Blockly Editor',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 or higher not detected. MCP features will be unavailable, but Blockly editing features will work normally.\n\nError: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 or higher not detected. MCP features will be unavailable, but Blockly editing features will work normally.\n\nError: {0}',
 	BUTTON_INSTALL_GUIDE: 'Install Guide',
 	BUTTON_REMIND_LATER: 'Remind Later',
-	WARNING_INVALID_NODE_PATH: 'The specified Node.js path is invalid: {0}. Error: {1}. Please correct the path or clear the setting to use the default "node" command.',
+	WARNING_INVALID_NODE_PATH:
+		'The specified Node.js path is invalid: {0}. Error: {1}. Please correct the path or clear the setting to use the default "node" command.',
 	INFO_NODE_PATH_VALID: 'Node.js path verified: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Validating Node.js path...',
 	PROGRESS_CHECKING_MCP: 'Checking MCP status...',
@@ -821,7 +823,11 @@ window.languageManager.loadMessages('en', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Upload failed',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Please open a project folder first',
 	ERROR_ARDUINO_TIMEOUT: 'Operation timed out',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Are you sure you want to delete backup "{0}"?',

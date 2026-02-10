@@ -810,7 +810,11 @@ window.languageManager.loadMessages('pt-br', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Falha no envio',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Por favor, abra uma pasta de projeto primeiro',
 	ERROR_ARDUINO_TIMEOUT: 'Operação expirou',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Dispositivo desconectado',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Tem certeza de que deseja excluir o backup "{0}"?',

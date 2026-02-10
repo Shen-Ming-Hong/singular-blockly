@@ -228,10 +228,12 @@ window.languageManager.loadMessages('de', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly-Editor öffnen',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 oder höher wurde nicht erkannt. MCP-Funktionen sind nicht verfügbar, aber die Blockly-Bearbeitungsfunktionen funktionieren normal.\n\nFehler: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 oder höher wurde nicht erkannt. MCP-Funktionen sind nicht verfügbar, aber die Blockly-Bearbeitungsfunktionen funktionieren normal.\n\nFehler: {0}',
 	BUTTON_INSTALL_GUIDE: 'Installationsanleitung',
 	BUTTON_REMIND_LATER: 'Später erinnern',
-	WARNING_INVALID_NODE_PATH: 'Der angegebene Node.js-Pfad ist ungültig: {0}. Fehler: {1}. Bitte korrigieren Sie den Pfad oder löschen Sie die Einstellung, um den Standardbefehl "node" zu verwenden.',
+	WARNING_INVALID_NODE_PATH:
+		'Der angegebene Node.js-Pfad ist ungültig: {0}. Fehler: {1}. Bitte korrigieren Sie den Pfad oder löschen Sie die Einstellung, um den Standardbefehl "node" zu verwenden.',
 	INFO_NODE_PATH_VALID: 'Node.js-Pfad ist gültig: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Node.js-Pfad wird überprüft...',
 	PROGRESS_CHECKING_MCP: 'MCP-Serverstatus wird überprüft...',
@@ -816,7 +818,11 @@ window.languageManager.loadMessages('de', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Hochladen fehlgeschlagen',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Bitte öffnen Sie zuerst einen Projektordner',
 	ERROR_ARDUINO_TIMEOUT: 'Vorgang abgelaufen',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Gerät wurde getrennt',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Sind Sie sicher, dass Sie das Backup "{0}" löschen möchten?',
