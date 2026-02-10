@@ -3745,16 +3745,18 @@ function handleUploadResult(message) {
 		const errorMsg = getLocalizedUploadError(message.error?.stage, message.error?.message);
 		const failedTemplate = window.languageManager?.getMessage('UPLOAD_FAILED', 'Upload failed: {0}') || 'Upload failed: {0}';
 		let failedMsg = failedTemplate.replace('{0}', errorMsg);
-		// 附加技術細節（如有）
+		// 附加技術細節與耗時資訊（合併為同一組括號）
+		const infoParts = [];
 		if (message.error?.details && message.error.details.trim()) {
-			const truncatedDetails = message.error.details.slice(0, 200);
-			failedMsg += ` (${truncatedDetails})`;
+			infoParts.push(message.error.details.slice(0, 200));
 		}
-		// 加入耗時資訊（如有）
 		if (uploadState.startTime > 0) {
 			const elapsed = ((Date.now() - uploadState.startTime) / 1000).toFixed(1);
-			failedMsg += ` (${elapsed}s)`;
+			infoParts.push(`${elapsed}s`);
 			uploadState.startTime = 0; // 重置
+		}
+		if (infoParts.length > 0) {
+			failedMsg += ` (${infoParts.join(' | ')})`;
 		}
 		toast.show(failedMsg, 'error', 5000);
 	}

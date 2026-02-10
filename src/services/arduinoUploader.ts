@@ -785,14 +785,24 @@ export class ArduinoUploader {
 			log('[arduino] 編譯並上傳成功', 'info');
 			return { success: true };
 		} catch (error: any) {
+			const stdoutContent = error.stdout || '';
 			const stderrContent = error.stderr || error.message || String(error);
-			const errorMessage = this.parseUploadError(stderrContent);
-			const classifiedError = this.classifyUploadError(stderrContent);
-			log('[arduino] 編譯並上傳失敗', 'error', { error: errorMessage });
+			const reachedUploadPhase =
+				stdoutContent.includes('Uploading') ||
+				stdoutContent.includes('upload protocol') ||
+				stdoutContent.includes('Looking for upload port');
+			const isCompileError = !reachedUploadPhase;
+			const stage = isCompileError ? 'compiling' : 'uploading';
+			const errorMessage = isCompileError
+				? this.parseCompileError(stderrContent || 'Compilation failed')
+				: this.parseUploadError(stderrContent);
+			const classifiedError = isCompileError ? 'Compilation failed' : this.classifyUploadError(stderrContent);
+			log(`[arduino] ${stage === 'compiling' ? '編譯' : '上傳'}失敗`, 'error', { error: errorMessage });
 			return {
 				success: false,
 				error: classifiedError,
 				details: errorMessage.slice(0, 200),
+				stage,
 			};
 		}
 	}

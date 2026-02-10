@@ -95,18 +95,19 @@ upload(request, onProgress)
 ├─ [Stage 3: checking_pio, 15%] 檢查 PlatformIO
 │   └─ 失敗 → return { stage: 'checking_pio', message: 'PlatformIO CLI not found' }
 │
-├─ [Stage 4: detecting, 18%] 偵測硬體裝置 ← 新增
-│   ├─ detectDevices() 成功且有裝置 (commandFailed: false, hasDevice: true) → 繼續
-│   ├─ detectDevices() 成功但無裝置 (commandFailed: false, hasDevice: false) → return { stage: 'detecting', message: 'No device detected' }
-│   └─ detectDevices() 失敗 (commandFailed: true) → log warning, fallback 繼續（使用 auto）
-│
-├─ [Stage 5: compiling, 20-55%] 編譯
+├─ [Stage 4: compiling, 20-55%] 編譯
 │   └─ 失敗 → return { stage: 'compiling', message: 'Compilation failed', details: parseCompileError() }
 │
-├─ [Stage 6: uploading, 60-95%] 上傳
+├─ [Stage 5: uploading, 60-95%] 上傳
 │   └─ 失敗 → return { stage: 'uploading', message: classifyUploadError(), details: parseUploadError() }
+│       ├─ 無裝置 → message: 'No device detected'
+│       ├─ 連接埠佔用 → message: 'Port is busy'
+│       ├─ 裝置斷線 → message: 'Device disconnected'
+│       ├─ 連線逾時 → message: 'Upload timed out'
+│       ├─ 連線失敗 → message: 'Connection failed'
+│       └─ 其他 → message: 'Upload failed'
 │
-└─ [Stage 7: completed, 100%] 完成
+└─ [Stage 6: completed, 100%] 完成
 ```
 
 ### classifyUploadError() 函式契約（新增）
@@ -131,6 +132,10 @@ classifyUploadError(stderr: string): string
 | `timed out`               | `'Upload timed out'`    |
 | `failed to connect`       | `'Connection failed'`   |
 | `chip sync`               | `'Connection failed'`   |
+| `upload_port`             | `'No device detected'`  |
+| `no serial port`          | `'No device detected'`  |
+| `no boards found`         | `'No device detected'`  |
+| `looking for upload port` | `'No device detected'`  |
 | 其他                      | `'Upload failed'`       |
 
 ## WebView getLocalizedUploadError() 契約
@@ -161,10 +166,16 @@ if (!message.success && message.error) {
 	const errorMsg = getLocalizedUploadError(message.error.stage, message.error.message);
 	let failedMsg = failedTemplate.replace('{0}', errorMsg);
 
-	// 新增：附加技術細節
+	// 新增：附加技術細節與耗時資訊（合併為同一組括號）
+	const infoParts = [];
 	if (message.error.details && message.error.details.trim()) {
-		const truncatedDetails = message.error.details.slice(0, 200);
-		failedMsg += ` (${truncatedDetails})`;
+		infoParts.push(message.error.details.slice(0, 200));
+	}
+	if (elapsed) {
+		infoParts.push(`${elapsed}s`);
+	}
+	if (infoParts.length > 0) {
+		failedMsg += ` (${infoParts.join(' | ')})`;
 	}
 
 	toast.show(failedMsg, 'error', 5000);
