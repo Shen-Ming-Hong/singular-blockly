@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.64.0] - 2026-02-10
+
+### 新功能 Added
+
+- **Arduino 上傳錯誤分類與明確提示** (Arduino upload error classification with clear messages)
+    - 上傳失敗時根據 PlatformIO stderr 自動分類錯誤原因：未偵測到硬體、連接埠佔用、裝置斷線、連線逾時、連線失敗
+      Upload failures are automatically classified from PlatformIO stderr: no device detected, port busy, device disconnected, upload timeout, connection failed
+    - 即使沒有連接開發板，仍會先執行編譯以確認程式碼語法是否正確
+      Even without a connected board, compilation runs first to verify code syntax
+    - 錯誤訊息支援全部 15 種語言本地化，並附帶截斷後的技術細節（≤200字元）
+      Error messages support all 15 languages with truncated technical details (≤200 chars)
+    - 技術細節與耗時資訊合併為單一括號格式，避免雙括號問題
+      Technical details and elapsed time merged into single parenthesized format
+
 ## [0.63.2] - 2026-02-08
 
 ### 錯誤修復 Fixed
