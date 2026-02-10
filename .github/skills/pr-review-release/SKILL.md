@@ -3,7 +3,7 @@ name: pr-review-release
 description: PR Code Review 評估與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。包含評估 Copilot/人工 review 建議、程式碼修正、Git 合併、語意化版本更新、CHANGELOG、打包發布的完整工作流程。PR review evaluation and release workflow for processing code review comments, merging PRs, semantic versioning, and publishing releases.
 metadata:
     author: singular-blockly
-    version: '1.4.0'
+    version: '1.5.0'
     category: release
 license: Apache-2.0
 ---
@@ -30,43 +30,82 @@ Evaluate PR code reviews from a project developer's perspective and execute the 
 
 > 💡 Copilot Code Review 已在 GitHub 倉庫設定中配置為自動觸發，無需手動請求。
 
-1. **啟動輪詢監聽**
+#### 方法 A：直接使用 gh CLI（推薦）
+
+直接使用 `gh` CLI 查詢最可靠，避免 PowerShell 跳脫問題。
+
+1. **查詢 Review 狀態**
 
     ```powershell
-    # 使用背景模式執行（Agent 可用 await_terminal 等待結果）
-    .\.github\skills\pr-review-release\scripts\poll-review.ps1
+    # 查詢 PR 的所有 reviews（JSON 陣列）
+    gh pr view {PR_NUMBER} --json reviews --jq ".reviews"
 
-    # 自訂參數
-    .\.github\skills\pr-review-release\scripts\poll-review.ps1 -PrNumber 123 -TimeoutMinutes 60 -PollIntervalSeconds 30
+    # 過濾 Copilot review（看 author.login）
+    # Copilot reviewer login: "copilot-pull-request-reviewer" 或 "Copilot"
     ```
 
-2. **腳本行為說明**
-    - 每 60 秒查詢一次 `copilot-pull-request-reviewer` 的 review 狀態
-    - 狀態為 `APPROVED` 時：exit 0，輸出 review 詳情
-    - 狀態為 `CHANGES_REQUESTED` 時：exit 1，輸出需修改的內容
-    - 逾時（預設 30 分鐘）：exit 2
+    > 回傳的 JSON 中找 `author.login` 為 `copilot-pull-request-reviewer` 的項目，
+    > 取最後一筆的 `state` 欄位。完成狀態為 `COMMENTED`、`APPROVED` 或 `CHANGES_REQUESTED`。
+
+2. **取得 Line Comments（逐行建議）**
+
+    ```powershell
+    # 先取得 repo 全名
+    $repo = gh repo view --json nameWithOwner --jq ".nameWithOwner"
+
+    # 取得 Copilot 的 line comments
+    gh api "repos/$repo/pulls/{PR_NUMBER}/comments" --jq '.[] | select(.user.login == "copilot-pull-request-reviewer" or .user.login == "Copilot") | {path, line, body}'
+    ```
 
 3. **Agent 整合用法（必須執行）**
 
-    ```typescript
-    // 步驟 1: 背景執行輪詢腳本等待自動觸發的 Copilot Review
+    ```
+    // 步驟 1: 查詢 PR review 狀態
     run_in_terminal({
-    	command: '.\.github\skills\pr-review-release\scripts\poll-review.ps1',
-    	isBackground: true,
-    	goal: '等待 Copilot Code Review（必須完成）',
+      command: 'gh pr view {PR_NUMBER} --json reviews --jq ".reviews"',
+      isBackground: false,
+      goal: '查詢 Copilot Review 狀態',
     });
-
-    // 步驟 2: 等待結果（逾時 30 分鐘）
-    await_terminal({ id: terminalId, timeout: 1800000 });
-    // 必須根據 exit code 判斷後續流程
+    // 步驟 2: 解析 JSON 輸出，檢查是否有 copilot-pull-request-reviewer
+    // 步驟 3: 若尚未出現，等待 60 秒後重試（最多 30 分鐘）
+    // 步驟 4: Review 完成後，取得 line comments
+    run_in_terminal({
+      command: '$repo = gh repo view --json nameWithOwner --jq ".nameWithOwner"; gh api "repos/$repo/pulls/{PR_NUMBER}/comments" --jq \'[.[] | select(.user.login == "copilot-pull-request-reviewer" or .user.login == "Copilot") | {path, line, body, id}]\'',
+      isBackground: false,
+      goal: '取得 Copilot line comments',
+    });
     ```
 
-4. **手動查詢 Copilot Review 狀態**
+4. **若 Copilot Review 未自動觸發**
 
-    ```bash
-    # 查詢最新 Copilot review
-    gh pr view --json reviews --jq '.reviews | map(select(.author.login == "copilot-pull-request-reviewer")) | last'
+    使用 MCP 工具手動請求：
+
     ```
+    mcp_github_request_copilot_review({
+      owner: "{OWNER}",
+      repo: "{REPO}",
+      pullNumber: {PR_NUMBER}
+    });
+    ```
+
+#### 方法 B：使用輪詢腳本（背景執行）
+
+若偏好背景輪詢，可使用已修復的腳本（v2.0.0）：
+
+```powershell
+# 背景模式執行
+.\.github\skills\pr-review-release\scripts\poll-review.ps1
+
+# 自訂參數
+.\.github\skills\pr-review-release\scripts\poll-review.ps1 -PrNumber 123 -TimeoutMinutes 60 -PollIntervalSeconds 30
+```
+
+腳本行為：
+
+- 每 60 秒查詢一次 Copilot review 狀態
+- 使用 PowerShell 原生 `Where-Object` 過濾（避免 jq 跳脫問題）
+- 動態取得 `owner/repo`（避免文字佔位符問題）
+- `COMMENTED` / `APPROVED`：exit 0 | `CHANGES_REQUESTED`：exit 1 | 逾時：exit 2
 
 ---
 
@@ -332,8 +371,9 @@ gh release view v{VERSION} --web
 
 ### 等待 Review 階段（阻塞型）
 
-- [ ] 執行輪詢腳本等待自動觸發的 Copilot Review 完成（不可跳過）
-- [ ] Review 狀態已確認（APPROVED / CHANGES_REQUESTED）
+- [ ] 使用 `gh pr view` 查詢 Copilot Review 狀態（或使用輪詢腳本）
+- [ ] Review 狀態已確認（COMMENTED / APPROVED / CHANGES_REQUESTED）
+- [ ] 已取得 line comments（`gh api repos/{owner}/{repo}/pulls/{n}/comments`）
 
 > ❌ **禁止跳過**：未取得 Copilot Review 結果不得進入 Phase 1。
 
