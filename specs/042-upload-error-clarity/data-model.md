@@ -22,6 +22,24 @@ export type ArduinoUploadStage =
 	| 'failed';
 ```
 
+### 1b. detectDevices() 回傳型別（修改 — T004 實作目標）
+
+> ⚠️ 以下為 T004 完成後的目標型別。現有原始碼中 `detectDevices()` 尚未包含 `commandFailed` 旗標。
+
+新增 `commandFailed` 旗標以區分「偵測成功但無裝置」與「偵測指令本身失敗」：
+
+```typescript
+// detectDevices() 回傳型別
+async detectDevices(): Promise<{
+	hasDevice: boolean;
+	port?: string;
+	devices: ArduinoPortInfo[];
+	commandFailed: boolean; // 新增：偵測指令是否失敗
+}>
+// 正常無裝置: { hasDevice: false, devices: [], commandFailed: false }
+// 指令異常:   { hasDevice: false, devices: [], commandFailed: true }
+```
+
 ### 2. UploadErrorCategory（新增概念模型）
 
 上傳錯誤的三種主要分類，不新增 TypeScript 型別，透過 `error.message` 字串值傳遞：
@@ -97,13 +115,13 @@ const errorKeyMap = {
 **偵測階段的特殊邏輯**:
 
 - 有裝置：繼續 → `compiling`
-- 無裝置：**立即回傳失敗**，不進入 `compiling`（FR-001）
-- 偵測指令失敗：**fallback 繼續上傳**，使用 `auto` 連接埠（FR-008）
+- 無裝置且 `commandFailed: false`：**立即回傳失敗**，不進入 `compiling`（FR-001）
+- `commandFailed: true`（指令異常）：**fallback 繼續上傳**，使用 `auto` 連接埠（FR-008）
 
 ## 驗證規則
 
 1. `error.details` 長度 ≤ 200 字元（FR-009）
 2. 偵測階段在 `checking_pio` 成功後才執行
-3. 偵測結果 `hasDevice === false` 且偵測指令成功 → 立即 `failed`
-4. 偵測結果 `hasDevice === false` 且偵測指令失敗 → fallback 繼續
+3. 偵測結果 `hasDevice === false` 且 `commandFailed === false` → 立即 `failed`
+4. 偵測結果 `hasDevice === false` 且 `commandFailed === true` → fallback 繼續
 5. 錯誤訊息格式：`UPLOAD_FAILED: {本地化描述}` + 可選 `({技術細節})`

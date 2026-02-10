@@ -19,7 +19,7 @@
 
 **Why this priority**: 這是最常見的上傳失敗情境。目前使用者必須等待整個編譯流程完成後才發現根本沒接硬體，浪費時間且錯誤訊息不明確，常令初學者困惑。
 
-**Independent Test**: 不連接任何 Arduino 板子，直接點擊上傳按鈕。應在 2 秒內看到明確的「未偵測到硬體裝置」提示，且不應進入編譯階段。
+**Independent Test**: 不連接任何 Arduino 板子，直接點擊上傳按鈕。應在 3 秒內看到明確的「未偵測到硬體裝置」提示，且不應進入編譯階段。
 
 **Acceptance Scenarios**:
 
@@ -120,7 +120,7 @@ CyberBrick 開發板使用 MicroPython 上傳流程，目前已有獨立的裝�
 
 ## Assumptions
 
-- PlatformIO CLI 的 `device list` 指令可在 2 秒內回傳結果，不會對上傳體驗造成明顯延遲
+- PlatformIO CLI 的 `device list` 指令典型執行時間為 0.5-2 秒，不會對上傳體驗造成明顯延遲（端到端目標 ≤ 3 秒，見 SC-001；安全 timeout 設為 5 秒，見 research.md R5）
 - 硬體偵測的結果在偵測到上傳開始的短暫時間內不會改變（使用者不太會在此瞬間拔裝置）
 - 現有的 15 種語言翻譯中，新增的 key 可先以英文作為 placeholder，後續透過本地化流程完成翻譯
 

@@ -95,4 +95,4 @@ if (message.error?.details?.trim()) {
 2. **編譯錯誤**: 缺少設定積木 → 點上傳 → 應看到「編譯失敗 (具體錯誤)」
 3. **上傳中拔線**: 開始上傳後拔 USB → 應看到「裝置已斷開」而非「上傳失敗」
 4. **CyberBrick 不受影響**: 用 CyberBrick 上傳 → 行為與之前完全一致
-5. **偵測指令失敗 fallback**: Mock `pio device list` 失敗 → 應繼續上傳流程
+5. **偵測指令失敗 fallback**: 模擬 `pio device list` 失敗（如暫時移除 PlatformIO 的 device list 路徑，或在自動化測試中 mock `detectDevices()` 回傳 `commandFailed: true`）→ 應繼續上傳流程而非阻斷

@@ -96,9 +96,9 @@ upload(request, onProgress)
 │   └─ 失敗 → return { stage: 'checking_pio', message: 'PlatformIO CLI not found' }
 │
 ├─ [Stage 4: detecting, 18%] 偵測硬體裝置 ← 新增
-│   ├─ detectDevices() 成功且有裝置 → 繼續
-│   ├─ detectDevices() 成功但無裝置 → return { stage: 'detecting', message: 'No device detected' }
-│   └─ detectDevices() 失敗（指令異常）→ log warning, fallback 繼續（使用 auto）
+│   ├─ detectDevices() 成功且有裝置 (commandFailed: false, hasDevice: true) → 繼續
+│   ├─ detectDevices() 成功但無裝置 (commandFailed: false, hasDevice: false) → return { stage: 'detecting', message: 'No device detected' }
+│   └─ detectDevices() 失敗 (commandFailed: true) → log warning, fallback 繼續（使用 auto）
 │
 ├─ [Stage 5: compiling, 20-55%] 編譯
 │   └─ 失敗 → return { stage: 'compiling', message: 'Compilation failed', details: parseCompileError() }

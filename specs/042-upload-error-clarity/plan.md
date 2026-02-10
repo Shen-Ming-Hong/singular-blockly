@@ -63,7 +63,7 @@ src/
 ├── services/
 │   └── arduinoUploader.ts       # 修改：在 upload() 中新增 detectDevices() 前置檢查
 ├── types/
-│   └── arduino.ts               # 修改：新增上傳錯誤細分類型常數
+│   └── arduino.ts               # 無需修改（'detecting' 階段已存在於型別定義中）
 └── webview/
     └── messageHandler.ts        # 無需修改（已正確路由上傳請求）
 
@@ -72,10 +72,10 @@ media/
 │   └── blocklyEdit.js           # 修改：擴展 getLocalizedUploadError() 錯誤映射
 │                                # 新增 detecting/uploading 階段的錯誤子分類
 └── locales/
-    ├── en/messages.js           # 修改：新增 6 個錯誤訊息 key
-    ├── zh-hant/messages.js      # 修改：新增 6 個錯誤訊息 key
-    ├── ja/messages.js           # 修改：新增 6 個錯誤訊息 key
-    └── (其他 12 種語言)          # 修改：新增 6 個錯誤訊息 key
+    ├── en/messages.js           # 修改：新增 5 個錯誤訊息 key
+    ├── zh-hant/messages.js      # 修改：新增 5 個錯誤訊息 key
+    ├── ja/messages.js           # 修改：新增 5 個錯誤訊息 key
+    └── (其他 12 種語言)          # 修改：新增 5 個錯誤訊息 key
 
 src/test/
 └── suite/
