@@ -141,6 +141,7 @@ suite('ArduinoUploader Tests', () => {
 			assert.strictEqual(result.hasDevice, true, 'Should detect devices');
 			assert.strictEqual(result.port, 'COM3', 'Should return first device port');
 			assert.strictEqual(result.devices.length, 2, 'Should return all devices');
+			assert.strictEqual(result.commandFailed, false, 'Should not have command failure');
 		});
 
 		test('Should exclude Bluetooth devices', async () => {
@@ -156,6 +157,7 @@ suite('ArduinoUploader Tests', () => {
 			assert.strictEqual(result.hasDevice, true, 'Should detect devices');
 			assert.strictEqual(result.devices.length, 1, 'Should exclude Bluetooth device');
 			assert.strictEqual(result.devices[0].port, 'COM4', 'Should return non-Bluetooth device');
+			assert.strictEqual(result.commandFailed, false, 'Should not have command failure');
 		});
 
 		test('Should return empty when no devices found', async () => {
@@ -166,9 +168,10 @@ suite('ArduinoUploader Tests', () => {
 
 			assert.strictEqual(result.hasDevice, false, 'Should not detect devices');
 			assert.strictEqual(result.devices.length, 0, 'Should return empty array');
+			assert.strictEqual(result.commandFailed, false, 'Command succeeded but no devices');
 		});
 
-		test('Should handle detection errors gracefully', async () => {
+		test('Should handle detection errors gracefully with commandFailed flag', async () => {
 			(mockExecutor.exec as sinon.SinonStub).rejects(new Error('Detection failed'));
 
 			const uploader = new ArduinoUploader(testWorkspacePath, mockExecutor, mockFileSystem, mockSettingsManager);
@@ -176,6 +179,7 @@ suite('ArduinoUploader Tests', () => {
 
 			assert.strictEqual(result.hasDevice, false, 'Should return false on error');
 			assert.strictEqual(result.devices.length, 0, 'Should return empty array');
+			assert.strictEqual(result.commandFailed, true, 'Should indicate command failure');
 		});
 	});
 
@@ -325,7 +329,6 @@ suite('ArduinoUploader Tests', () => {
 			(mockExecutor.exec as sinon.SinonStub)
 				.withArgs(sinon.match(/--version/))
 				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
-			// No device list call needed - we use --target upload directly
 			// Mock spawn for compile failure
 			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
 				code: 1,
@@ -346,6 +349,38 @@ suite('ArduinoUploader Tests', () => {
 			assert.strictEqual(result.error?.stage, 'compiling', 'Should fail at compiling stage');
 		});
 
+		test('Should classify no-device upload error correctly', async () => {
+			const request: ArduinoUploadRequest = {
+				code: 'void setup() {}',
+				board: 'uno',
+			};
+
+			// Setup mocks
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(true);
+			(mockExecutor.exec as sinon.SinonStub)
+				.withArgs(sinon.match(/--version/))
+				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+			// Compile succeeds, upload fails because no board
+			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
+				code: 1,
+				stdout: 'Compiling...\nLinking...\nBuilding .pio/build/uno/firmware.hex\nLooking for upload port...',
+				stderr: 'Error: Please specify upload_port',
+			});
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.success, false, 'Should fail');
+			assert.strictEqual(result.error?.stage, 'uploading', 'Should fail at uploading stage');
+			assert.strictEqual(result.error?.message, 'No device detected', 'Should classify as no device');
+		});
+
 		test('Should fail on upload error', async () => {
 			const request: ArduinoUploadRequest = {
 				code: 'void setup() {}',
@@ -357,7 +392,6 @@ suite('ArduinoUploader Tests', () => {
 			(mockExecutor.exec as sinon.SinonStub)
 				.withArgs(sinon.match(/--version/))
 				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
-			// No device list call needed - we use --target upload directly
 			// Mock spawn - compile+upload in single call, fails during upload phase
 			// Simulate output that shows compile success but upload failure
 			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
@@ -377,6 +411,112 @@ suite('ArduinoUploader Tests', () => {
 
 			assert.strictEqual(result.success, false, 'Should fail');
 			assert.strictEqual(result.error?.stage, 'uploading', 'Should fail at uploading stage');
+		});
+	});
+
+	suite('classifyUploadError() (US3)', () => {
+		let uploader: ArduinoUploader;
+
+		setup(() => {
+			uploader = new ArduinoUploader(testWorkspacePath, mockExecutor, mockFileSystem, mockSettingsManager);
+		});
+
+		test('T016: Should classify port busy errors', () => {
+			assert.strictEqual(uploader.classifyUploadError('could not open port COM3'), 'Port is busy');
+			assert.strictEqual(uploader.classifyUploadError('Error: access denied on port'), 'Port is busy');
+			assert.strictEqual(uploader.classifyUploadError('device or resource busy'), 'Port is busy');
+		});
+
+		test('T016: Should classify device disconnected errors', () => {
+			assert.strictEqual(uploader.classifyUploadError('device disconnected during transfer'), 'Device disconnected');
+		});
+
+		test('T016: Should classify timeout errors', () => {
+			assert.strictEqual(uploader.classifyUploadError('connection timed out waiting for response'), 'Upload timed out');
+		});
+
+		test('T016: Should classify connection failed errors', () => {
+			assert.strictEqual(uploader.classifyUploadError('failed to connect to ESP32'), 'Connection failed');
+			assert.strictEqual(uploader.classifyUploadError('A fatal error occurred: Could not chip sync'), 'Connection failed');
+		});
+
+		test('Should classify no device detected errors', () => {
+			assert.strictEqual(uploader.classifyUploadError('Error: Please specify upload_port'), 'No device detected');
+			assert.strictEqual(uploader.classifyUploadError('no serial port found'), 'No device detected');
+			assert.strictEqual(uploader.classifyUploadError('Looking for upload port...'), 'No device detected');
+		});
+
+		test('T017: Should return Upload failed for unrecognized errors', () => {
+			assert.strictEqual(uploader.classifyUploadError('some unknown error occurred'), 'Upload failed');
+			assert.strictEqual(uploader.classifyUploadError(''), 'Upload failed');
+		});
+	});
+
+	suite('Error Details Truncation (US5)', () => {
+		test('T023: Should truncate error.details to 200 characters', async () => {
+			const request: ArduinoUploadRequest = {
+				code: 'invalid code',
+				board: 'uno',
+			};
+
+			// Setup mocks
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(true);
+			(mockExecutor.exec as sinon.SinonStub)
+				.withArgs(sinon.match(/--version/))
+				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+			// Very long error in stderr
+			const longError = 'error: ' + 'a'.repeat(500);
+			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
+				code: 1,
+				stdout: '',
+				stderr: longError,
+			});
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.success, false, 'Should fail');
+			assert.ok(result.error?.details, 'Should have details');
+			assert.ok((result.error?.details?.length || 0) <= 200, `Details should be ≤200 chars, got ${result.error?.details?.length}`);
+		});
+
+		test('T024: Should have details from PlatformIO when upload fails', async () => {
+			const request: ArduinoUploadRequest = {
+				code: '#include <Arduino.h>\nvoid setup() {}\nvoid loop() {}',
+				board: 'uno',
+			};
+
+			// Setup mocks
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(true);
+			(mockExecutor.exec as sinon.SinonStub)
+				.withArgs(sinon.match(/--version/))
+				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+			// Compile succeeds, upload fails with details
+			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
+				code: 1,
+				stdout: 'Compiling...\nLinking...\nBuilding .pio/build/uno/firmware.hex\nLooking for upload port...',
+				stderr: 'Error: Please specify upload_port',
+			});
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.success, false, 'Should fail');
+			assert.strictEqual(result.error?.stage, 'uploading', 'Should fail at uploading stage');
+			assert.ok(result.error?.details, 'Should have details from PlatformIO output');
+			assert.ok((result.error?.details?.length || 0) <= 200, 'Details should be truncated to 200 chars');
 		});
 	});
 });

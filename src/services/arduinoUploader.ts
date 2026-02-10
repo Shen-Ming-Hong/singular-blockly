@@ -10,13 +10,7 @@ import * as fs from 'fs';
 import { spawn } from 'child_process';
 import { log } from './logging';
 import { SettingsManager } from './settingsManager';
-import {
-	ArduinoUploadStage,
-	ArduinoUploadResult,
-	ArduinoUploadRequest,
-	ArduinoPortInfo,
-	ArduinoProgressCallback,
-} from '../types/arduino';
+import { ArduinoUploadStage, ArduinoUploadResult, ArduinoUploadRequest, ArduinoPortInfo, ArduinoProgressCallback } from '../types/arduino';
 
 /**
  * 預設的編譯逾時時間（毫秒）
@@ -215,9 +209,9 @@ export class ArduinoUploader {
 
 	/**
 	 * 偵測連接的 Arduino 裝置
-	 * @returns 偵測結果，包含是否有裝置及連接埠資訊
+	 * @returns 偵測結果，包含是否有裝置、連接埠資訊及指令是否失敗
 	 */
-	async detectDevices(): Promise<{ hasDevice: boolean; port?: string; devices: ArduinoPortInfo[] }> {
+	async detectDevices(): Promise<{ hasDevice: boolean; port?: string; devices: ArduinoPortInfo[]; commandFailed: boolean }> {
 		try {
 			const result = await this.executor.exec(`"${this.pioPath}" device list --json-output`);
 			const deviceList = JSON.parse(result.stdout);
@@ -247,13 +241,14 @@ export class ArduinoUploader {
 					hasDevice: true,
 					port: validDevices[0].port, // 預設使用第一個裝置
 					devices: validDevices,
+					commandFailed: false,
 				};
 			}
 
-			return { hasDevice: false, devices: [] };
+			return { hasDevice: false, devices: [], commandFailed: false };
 		} catch (error) {
 			log('[arduino] 裝置偵測失敗', 'error', error);
-			return { hasDevice: false, devices: [] };
+			return { hasDevice: false, devices: [], commandFailed: true };
 		}
 	}
 
@@ -773,14 +768,16 @@ export class ArduinoUploader {
 					stdoutContent.includes('Looking for upload port');
 				const isCompileError = !reachedUploadPhase || stderrOutput.includes('error:') || stderrOutput.includes('Error:');
 				const stage = isCompileError ? 'compiling' : 'uploading';
+				const stderrForParsing = stderrOutput || result.stderr || '';
 				const errorMessage = isCompileError
-					? this.parseCompileError(stderrOutput || result.stderr || 'Compilation failed')
-					: this.parseUploadError(stderrOutput || result.stderr || 'Upload failed');
+					? this.parseCompileError(stderrForParsing || 'Compilation failed')
+					: this.parseUploadError(stderrForParsing || 'Upload failed');
+				const classifiedError = isCompileError ? 'Compilation failed' : this.classifyUploadError(stderrForParsing);
 				log(`[arduino] ${stage === 'compiling' ? '編譯' : '上傳'}失敗 (code=${result.code})`, 'error', { error: errorMessage });
 				return {
 					success: false,
-					error: stage === 'compiling' ? 'Compilation failed' : 'Upload failed',
-					details: errorMessage,
+					error: classifiedError,
+					details: errorMessage.slice(0, 200),
 					stage,
 				};
 			}
@@ -788,12 +785,14 @@ export class ArduinoUploader {
 			log('[arduino] 編譯並上傳成功', 'info');
 			return { success: true };
 		} catch (error: any) {
-			const errorMessage = this.parseUploadError(error.stderr || error.message || String(error));
+			const stderrContent = error.stderr || error.message || String(error);
+			const errorMessage = this.parseUploadError(stderrContent);
+			const classifiedError = this.classifyUploadError(stderrContent);
 			log('[arduino] 編譯並上傳失敗', 'error', { error: errorMessage });
 			return {
 				success: false,
-				error: 'Upload failed',
-				details: errorMessage,
+				error: classifiedError,
+				details: errorMessage.slice(0, 200),
 			};
 		}
 	}
@@ -894,6 +893,39 @@ export class ArduinoUploader {
 	}
 
 	/**
+	 * 根據 stderr 內容分類上傳錯誤
+	 * @param stderr PlatformIO 的錯誤輸出
+	 * @returns 語義化的錯誤分類字串（用於 WebView i18n 映射）
+	 */
+	classifyUploadError(stderr: string): string {
+		if (!stderr) {
+			return 'Upload failed';
+		}
+		const lower = stderr.toLowerCase();
+		if (lower.includes('could not open port') || lower.includes('access denied') || lower.includes('device or resource busy')) {
+			return 'Port is busy';
+		}
+		if (lower.includes('device disconnected')) {
+			return 'Device disconnected';
+		}
+		if (lower.includes('timed out')) {
+			return 'Upload timed out';
+		}
+		if (lower.includes('failed to connect') || lower.includes('chip sync')) {
+			return 'Connection failed';
+		}
+		if (
+			lower.includes('upload_port') ||
+			lower.includes('no serial port') ||
+			lower.includes('no boards found') ||
+			lower.includes('looking for upload port')
+		) {
+			return 'No device detected';
+		}
+		return 'Upload failed';
+	}
+
+	/**
 	 * 解析上傳錯誤訊息
 	 * @param stderr 錯誤輸出
 	 * @returns 簡化的錯誤訊息
@@ -989,7 +1021,7 @@ export class ArduinoUploader {
 			// 1. 檢查是否需要重新編譯
 			// 2. 編譯（如有需要）
 			// 3. 嘗試上傳到連接的裝置
-			// 如果沒有裝置連接，編譯會成功但上傳會失敗，這樣用戶可以清楚知道是硬體問題
+			// 若無板子，至少能確認編譯是否有語法錯誤
 			sendProgress('compiling', 20, 'Building & uploading...', 0);
 
 			const result = await this.compileAndUploadWithProgress(

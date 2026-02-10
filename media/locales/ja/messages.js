@@ -227,10 +227,12 @@ window.languageManager.loadMessages('ja', {
 	VSCODE_CANCEL: 'キャンセル',
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blocklyエディタを開く',
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 以上が検出されませんでした。MCP 機能は利用できませんが、Blockly エディタは正常に動作します。\n\nエラー: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 以上が検出されませんでした。MCP 機能は利用できませんが、Blockly エディタは正常に動作します。\n\nエラー: {0}',
 	BUTTON_INSTALL_GUIDE: 'インストールガイド',
 	BUTTON_REMIND_LATER: '後で通知',
-	WARNING_INVALID_NODE_PATH: '指定された Node.js パスが無効です: {0}。エラー: {1}。パスを修正するか、設定をクリアしてデフォルトの "node" コマンドを使用してください。',
+	WARNING_INVALID_NODE_PATH:
+		'指定された Node.js パスが無効です: {0}。エラー: {1}。パスを修正するか、設定をクリアしてデフォルトの "node" コマンドを使用してください。',
 	INFO_NODE_PATH_VALID: 'Node.js パスが有効です: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Node.js パスを検証中...',
 	PROGRESS_CHECKING_MCP: 'MCP サーバーの状態を確認中...',
@@ -812,7 +814,11 @@ window.languageManager.loadMessages('ja', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'アップロードに失敗しました',
 	ERROR_ARDUINO_NO_WORKSPACE: '先にプロジェクトフォルダを開いてください',
 	ERROR_ARDUINO_TIMEOUT: '操作がタイムアウトしました',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'デバイスが切断されました',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'バックアップ「{0}」を削除してもよろしいですか？',

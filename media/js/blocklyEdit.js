@@ -3745,6 +3745,11 @@ function handleUploadResult(message) {
 		const errorMsg = getLocalizedUploadError(message.error?.stage, message.error?.message);
 		const failedTemplate = window.languageManager?.getMessage('UPLOAD_FAILED', 'Upload failed: {0}') || 'Upload failed: {0}';
 		let failedMsg = failedTemplate.replace('{0}', errorMsg);
+		// 附加技術細節（如有）
+		if (message.error?.details && message.error.details.trim()) {
+			const truncatedDetails = message.error.details.slice(0, 200);
+			failedMsg += ` (${truncatedDetails})`;
+		}
 		// 加入耗時資訊（如有）
 		if (uploadState.startTime > 0) {
 			const elapsed = ((Date.now() - uploadState.startTime) / 1000).toFixed(1);
@@ -3782,12 +3787,18 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 			default: 'ERROR_UPLOAD_RESET_FAILED',
 		},
 		uploading: {
+			'Port is busy': 'ERROR_ARDUINO_PORT_BUSY',
+			'Device disconnected': 'ERROR_ARDUINO_DEVICE_DISCONNECT',
+			'Upload timed out': 'ERROR_ARDUINO_UPLOAD_TIMEOUT',
+			'Connection failed': 'ERROR_ARDUINO_UPLOAD_CONNECTION',
+			'No device detected': 'ERROR_ARDUINO_NO_DEVICE',
+			'Upload failed': 'ERROR_ARDUINO_UPLOAD_FAILED',
 			default: 'ERROR_UPLOAD_UPLOAD_FAILED',
 		},
 		restarting: {
 			default: 'ERROR_UPLOAD_RESTART_FAILED',
 		},
-		// Arduino 階段
+		// Arduino 階段（修改）
 		syncing: {
 			default: 'ERROR_ARDUINO_NO_WORKSPACE',
 		},
@@ -3796,9 +3807,6 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 		},
 		checking_pio: {
 			default: 'ERROR_ARDUINO_PIO_NOT_FOUND',
-		},
-		detecting: {
-			default: 'ERROR_ARDUINO_TIMEOUT',
 		},
 		compiling: {
 			default: 'ERROR_ARDUINO_COMPILE_FAILED',
@@ -3822,6 +3830,11 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 		ERROR_ARDUINO_UPLOAD_FAILED: 'Upload failed',
 		ERROR_ARDUINO_NO_WORKSPACE: 'Please open a project folder first',
 		ERROR_ARDUINO_TIMEOUT: 'Operation timed out',
+		ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+		ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+		ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+		ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+		ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 	};
 
 	if (!stage || !errorKeyMap[stage]) {

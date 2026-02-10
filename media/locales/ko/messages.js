@@ -812,7 +812,11 @@ window.languageManager.loadMessages('ko', {
 	ERROR_ARDUINO_UPLOAD_FAILED: '업로드에 실패했습니다',
 	ERROR_ARDUINO_NO_WORKSPACE: '먼저 프로젝트 폴더를 열어 주세요',
 	ERROR_ARDUINO_TIMEOUT: '작업 시간이 초과되었습니다',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: '장치 연결이 끊어졌습니다',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: '백업 "{0}"을(를) 삭제하시겠습니까?',

@@ -228,10 +228,12 @@ window.languageManager.loadMessages('bg', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Отваряне на редактора Blockly',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 или по-нова версия не е открит. MCP функциите няма да са налични, но функциите за редактиране на Blockly ще работят нормално.\n\nГрешка: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 или по-нова версия не е открит. MCP функциите няма да са налични, но функциите за редактиране на Blockly ще работят нормално.\n\nГрешка: {0}',
 	BUTTON_INSTALL_GUIDE: 'Ръководство за инсталация',
 	BUTTON_REMIND_LATER: 'Напомни по-късно',
-	WARNING_INVALID_NODE_PATH: 'Посоченият път на Node.js е невалиден: {0}. Грешка: {1}. Моля, коригирайте пътя или изчистете настройката, за да използвате командата "node" по подразбиране.',
+	WARNING_INVALID_NODE_PATH:
+		'Посоченият път на Node.js е невалиден: {0}. Грешка: {1}. Моля, коригирайте пътя или изчистете настройката, за да използвате командата "node" по подразбиране.',
 	INFO_NODE_PATH_VALID: 'Пътят на Node.js е валиден: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Проверка на пътя на Node.js...',
 	PROGRESS_CHECKING_MCP: 'Проверка на състоянието на MCP сървъра...',
@@ -818,7 +820,11 @@ window.languageManager.loadMessages('bg', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Качването е неуспешно',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Моля, първо отворете папка на проекта',
 	ERROR_ARDUINO_TIMEOUT: 'Времето за операцията изтече',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Устройството е изключено',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Сигурни ли сте, че искате да изтриете резервното копие "{0}"?',

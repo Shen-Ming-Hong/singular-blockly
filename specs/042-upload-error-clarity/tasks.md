@@ -17,9 +17,9 @@
 
 **Purpose**: 確認現有程式碼結構，無需新增專案或模組
 
-- [ ] T001 確認現有上傳流程並標記修改點，閱讀 src/services/arduinoUploader.ts 中 upload() 方法和 detectDevices() 方法。**Deliverable**: 註解標記 upload() 中插入 detecting 階段的行號範圍
-- [ ] T002 [P] 確認現有 WebView 錯誤處理邏輯，閱讀 media/js/blocklyEdit.js 中 getLocalizedUploadError() 和 handleUploadResult()。**Deliverable**: 確認現有 errorKeyMap 中 detecting/uploading 階段的映射現況
-- [ ] T003 [P] 確認現有 i18n key 結構，閱讀 media/locales/en/messages.js 中 ERROR*ARDUINO*\* 相關 key。**Deliverable**: 列出已存在的相關 key 和需新增的 key
+- [x] T001 確認現有上傳流程並標記修改點，閱讀 src/services/arduinoUploader.ts 中 upload() 方法和 detectDevices() 方法。**Deliverable**: 註解標記 upload() 中插入 detecting 階段的行號範圍
+- [x] T002 [P] 確認現有 WebView 錯誤處理邏輯，閱讀 media/js/blocklyEdit.js 中 getLocalizedUploadError() 和 handleUploadResult()。**Deliverable**: 確認現有 errorKeyMap 中 detecting/uploading 階段的映射現況
+- [x] T003 [P] 確認現有 i18n key 結構，閱讀 media/locales/en/messages.js 中 ERROR*ARDUINO*\* 相關 key。**Deliverable**: 列出已存在的相關 key 和需新增的 key
 
 ---
 
@@ -29,12 +29,12 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 修改 src/services/arduinoUploader.ts 中 detectDevices() 方法，使其能區分「偵測成功但無裝置」與「偵測指令本身失敗」：在 catch 區塊中設定回傳值新增 `commandFailed: true` 旗標（例如回傳 `{ hasDevice: false, devices: [], commandFailed: true }`），正常無裝置時 `commandFailed` 為 `false`。同步更新方法的回傳型別
-- [ ] T005 在 src/services/arduinoUploader.ts 中新增 classifyUploadError(stderr: string): string 方法，依據 contracts/upload-error-flow.md 的輸入→輸出映射表實作 pattern matching（port busy / device disconnected / timed out / connection failed / upload failed）。ℹ️ 職責分界：`classifyUploadError()` 回傳語義化分類碼（用於 WebView i18n 映射），`parseUploadError()` 回傳技術細節摘要（填入 `error.details`），兩者互補
-- [ ] T006 [P] 在 media/locales/en/messages.js 中新增 5 個 i18n key：ERROR_ARDUINO_NO_DEVICE, ERROR_ARDUINO_PORT_BUSY, ERROR_ARDUINO_DEVICE_DISCONNECT（更新現有值）, ERROR_ARDUINO_UPLOAD_TIMEOUT, ERROR_ARDUINO_UPLOAD_CONNECTION
-- [ ] T007 [P] 在 media/locales/zh-hant/messages.js 中新增對應的 5 個繁體中文 i18n key，翻譯內容依照 data-model.md 的 i18n Key 清單
-- [ ] T008 在其餘 13 種語言的 media/locales/{bg,cs,de,es,fr,hu,it,ja,ko,pl,pt-br,ru,tr}/messages.js 中新增相同的 5 個 i18n key，先以英文值填充
-- [ ] T009 執行 npm run validate:i18n 確認所有 15 種語言的新 key 無缺漏，同時確認既有的 `ARDUINO_STAGE_DETECTING` key 在所有語言中完整（FR-005 偵測進度提示）
+- [x] T004 修改 src/services/arduinoUploader.ts 中 detectDevices() 方法，使其能區分「偵測成功但無裝置」與「偵測指令本身失敗」：在 catch 區塊中設定回傳值新增 `commandFailed: true` 旗標（例如回傳 `{ hasDevice: false, devices: [], commandFailed: true }`），正常無裝置時 `commandFailed` 為 `false`。同步更新方法的回傳型別
+- [x] T005 在 src/services/arduinoUploader.ts 中新增 classifyUploadError(stderr: string): string 方法，依據 contracts/upload-error-flow.md 的輸入→輸出映射表實作 pattern matching（port busy / device disconnected / timed out / connection failed / upload failed）。ℹ️ 職責分界：`classifyUploadError()` 回傳語義化分類碼（用於 WebView i18n 映射），`parseUploadError()` 回傳技術細節摘要（填入 `error.details`），兩者互補
+- [x] T006 [P] 在 media/locales/en/messages.js 中新增 5 個 i18n key：ERROR_ARDUINO_NO_DEVICE, ERROR_ARDUINO_PORT_BUSY, ERROR_ARDUINO_DEVICE_DISCONNECT（更新現有值）, ERROR_ARDUINO_UPLOAD_TIMEOUT, ERROR_ARDUINO_UPLOAD_CONNECTION
+- [x] T007 [P] 在 media/locales/zh-hant/messages.js 中新增對應的 5 個繁體中文 i18n key，翻譯內容依照 data-model.md 的 i18n Key 清單
+- [x] T008 在其餘 13 種語言的 media/locales/{bg,cs,de,es,fr,hu,it,ja,ko,pl,pt-br,ru,tr}/messages.js 中新增相同的 5 個 i18n key，先以英文值填充
+- [x] T009 執行 npm run validate:i18n 確認所有 15 種語言的新 key 無缺漏，同時確認既有的 `ARDUINO_STAGE_DETECTING` key 在所有語言中完整（FR-005 偵測進度提示）
 
 **Checkpoint**: 基礎型別、錯誤分類函式和 i18n key 就緒，可開始 User Story 實作
 
@@ -48,14 +48,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：detectDevices() 回傳 hasDevice:false 且 commandFailed:false 時，upload() 立即回傳 detecting 階段失敗，不進入 compiling 階段
-- [ ] T011 [P] [US1] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：detectDevices() 回傳 commandFailed:true 時（如 pio 指令異常），upload() fallback 繼續上傳流程，使用 auto 連接埠
+- [x] T010 [P] [US1] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：detectDevices() 回傳 hasDevice:false 且 commandFailed:false 時，upload() 立即回傳 detecting 階段失敗，不進入 compiling 階段
+- [x] T011 [P] [US1] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：detectDevices() 回傳 commandFailed:true 時（如 pio 指令異常），upload() fallback 繼續上傳流程，使用 auto 連接埠
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] 修改 src/services/arduinoUploader.ts 的 upload() 方法，在 checking_pio 成功後（進度 15%）插入 detecting 階段（進度 18%）：呼叫 this.detectDevices()，若 hasDevice 為 false 且 commandFailed 為 false→立即回傳 createFailureResult(stage:'detecting', message:'No device detected')，若 commandFailed 為 true→log warning 並 fallback 繼續。為 detectDevices() 呼叫設定 5 秒 timeout，超時時視為指令失敗並 fallback 繼續
-- [ ] T013 [US1] 修改 media/js/blocklyEdit.js 中 getLocalizedUploadError() 的 errorKeyMap，將 detecting 階段的 default 從 ERROR_ARDUINO_TIMEOUT 改為 ERROR_ARDUINO_NO_DEVICE，並新增 'No device detected' 的精確映射
-- [ ] T013b [P] [US1] 新增 WebView 測試：對 getLocalizedUploadError() 的新增映射邏輯撇寫單元測試（此為純函式，不需 WebView 環境），確認 detecting 階段回傳 ERROR_ARDUINO_NO_DEVICE、uploading 階段的各0 子分類映射正確、且未覆蓋 MicroPython 的 default 行為
+- [x] T012 [US1] 修改 src/services/arduinoUploader.ts 的 upload() 方法，在 checking_pio 成功後（進度 15%）插入 detecting 階段（進度 18%）：呼叫 this.detectDevices()，若 hasDevice 為 false 且 commandFailed 為 false→立即回傳 createFailureResult(stage:'detecting', message:'No device detected')，若 commandFailed 為 true→log warning 並 fallback 繼續。為 detectDevices() 呼叫設定 5 秒 timeout，超時時視為指令失敗並 fallback 繼續
+- [x] T013 [US1] 修改 media/js/blocklyEdit.js 中 getLocalizedUploadError() 的 errorKeyMap，將 detecting 階段的 default 從 ERROR_ARDUINO_TIMEOUT 改為 ERROR_ARDUINO_NO_DEVICE，並新增 'No device detected' 的精確映射
+- [x] T013b [P] [US1] 新增 WebView 測試：對 getLocalizedUploadError() 的新增映射邏輯撇寫單元測試（此為純函式，不需 WebView 環境），確認 detecting 階段回傳 ERROR_ARDUINO_NO_DEVICE、uploading 階段的各0 子分類映射正確、且未覆蓋 MicroPython 的 default 行為
 
 **Checkpoint**: 未連接硬體時上傳應立即顯示明確的「未偵測到硬體裝置」本地化訊息
 
@@ -69,8 +69,8 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] 修改 src/services/arduinoUploader.ts 中 compileAndUploadWithProgress() 的編譯失敗分支，確保 error.details 填入 parseCompileError() 的結果，並截斷至 200 字元
-- [ ] T015 [US2] 修改 media/js/blocklyEdit.js 中 handleUploadResult()，當 message.error.details 存在且非空時，在本地化錯誤描述後附加 ` (${details.slice(0, 200)})`
+- [x] T014 [US2] 修改 src/services/arduinoUploader.ts 中 compileAndUploadWithProgress() 的編譯失敗分支，確保 error.details 填入 parseCompileError() 的結果，並截斷至 200 字元
+- [x] T015 [US2] 修改 media/js/blocklyEdit.js 中 handleUploadResult()，當 message.error.details 存在且非空時，在本地化錯誤描述後附加 ` (${details.slice(0, 200)})`
 
 **Checkpoint**: 編譯失敗時應看到「編譯失敗 (具體的編譯器錯誤摘要)」
 
@@ -84,13 +84,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T016 [P] [US3] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：classifyUploadError() 對各種 stderr pattern（port busy / disconnected / timed out / connection failed）回傳正確分類字串
-- [ ] T017 [P] [US3] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：classifyUploadError() 對無法辨識的錯誤回傳 'Upload failed'
+- [x] T016 [P] [US3] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：classifyUploadError() 對各種 stderr pattern（port busy / disconnected / timed out / connection failed）回傳正確分類字串
+- [x] T017 [P] [US3] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：classifyUploadError() 對無法辨識的錯誤回傳 'Upload failed'
 
 ### Implementation for User Story 3
 
-- [ ] T018 [US3] 修改 src/services/arduinoUploader.ts 中 compileAndUploadWithProgress() 的上傳失敗分支，使用 classifyUploadError(stderr) 設定 error.message（取代原有的固定字串），並將 parseUploadError() 結果作為 error.details
-- [ ] T019 [US3] 修改 media/js/blocklyEdit.js 中 getLocalizedUploadError() 的 errorKeyMap，新增 uploading 階段的 Arduino 子分類映射：'Port is busy'→ERROR_ARDUINO_PORT_BUSY, 'Device disconnected'→ERROR_ARDUINO_DEVICE_DISCONNECT, 'Upload timed out'→ERROR_ARDUINO_UPLOAD_TIMEOUT, 'Connection failed'→ERROR_ARDUINO_UPLOAD_CONNECTION, default→ERROR_ARDUINO_UPLOAD_FAILED。ℹ️ 注意：現有 `uploading` 階段已被 MicroPython 使用（`default: 'ERROR_UPLOAD_UPLOAD_FAILED'`），Arduino 子分類透過 `fallbackMessage` 精確匹配實現，不覆蓋 MicroPython 的 default 行為
+- [x] T018 [US3] 修改 src/services/arduinoUploader.ts 中 compileAndUploadWithProgress() 的上傳失敗分支，使用 classifyUploadError(stderr) 設定 error.message（取代原有的固定字串），並將 parseUploadError() 結果作為 error.details
+- [x] T019 [US3] 修改 media/js/blocklyEdit.js 中 getLocalizedUploadError() 的 errorKeyMap，新增 uploading 階段的 Arduino 子分類映射：'Port is busy'→ERROR_ARDUINO_PORT_BUSY, 'Device disconnected'→ERROR_ARDUINO_DEVICE_DISCONNECT, 'Upload timed out'→ERROR_ARDUINO_UPLOAD_TIMEOUT, 'Connection failed'→ERROR_ARDUINO_UPLOAD_CONNECTION, default→ERROR_ARDUINO_UPLOAD_FAILED。ℹ️ 注意：現有 `uploading` 階段已被 MicroPython 使用（`default: 'ERROR_UPLOAD_UPLOAD_FAILED'`），Arduino 子分類透過 `fallbackMessage` 精確匹配實現，不覆蓋 MicroPython 的 default 行為
 
 **Checkpoint**: 上傳階段失敗時應根據具體原因顯示不同的本地化錯誤訊息
 
@@ -104,9 +104,9 @@
 
 ### Verification for User Story 4
 
-- [ ] T020 [US4] 檢查 src/webview/messageHandler.ts 中 handleRequestUpload() 的 Arduino/MicroPython 路由邏輯，確認改動未觸及 MicroPython 分支
-- [ ] T021 [US4] 檢查 media/js/blocklyEdit.js 中 getLocalizedUploadError() 的 MicroPython 相關映射（preparing, connecting, uploading 等），確認 Arduino 子分類映射未覆蓋 MicroPython 的 default 行為（特別是 `uploading` 階段的 `ERROR_UPLOAD_UPLOAD_FAILED` 保留為 MicroPython default）
-- [ ] T022 [US4] 確認 src/services/arduinoUploader.ts 中 compile() 方法（僅編譯模式）未呼叫 detectDevices()，確保「僅編譯」模式不受偵測階段影響（FR-001 驗證）
+- [x] T020 [US4] 檢查 src/webview/messageHandler.ts 中 handleRequestUpload() 的 Arduino/MicroPython 路由邏輯，確認改動未觸及 MicroPython 分支
+- [x] T021 [US4] 檢查 media/js/blocklyEdit.js 中 getLocalizedUploadError() 的 MicroPython 相關映射（preparing, connecting, uploading 等），確認 Arduino 子分類映射未覆蓋 MicroPython 的 default 行為（特別是 `uploading` 階段的 `ERROR_UPLOAD_UPLOAD_FAILED` 保留為 MicroPython default）
+- [x] T022 [US4] 確認 src/services/arduinoUploader.ts 中 compile() 方法（僅編譯模式）未呼叫 detectDevices()，確保「僅編譯」模式不受偵測階段影響（FR-001 驗證）
 
 **Checkpoint**: CyberBrick 上傳流程行為與改動前完全一致；僅編譯模式正常運作
 
@@ -120,13 +120,13 @@
 
 ### Tests for User Story 5
 
-- [ ] T023 [US5] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：error.details 超過 200 字元時被正確截斷
-- [ ] T024 [P] [US5] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：底層工具未回傳技術細節時，error.details 為 undefined，不出現空括號
+- [x] T023 [US5] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：error.details 超過 200 字元時被正確截斷
+- [x] T024 [P] [US5] 在 src/test/suite/arduinoUploader.test.ts 中新增測試案例：底層工具未回傳技術細節時，error.details 為 undefined，不出現空括號
 
 ### Implementation for User Story 5
 
-- [ ] T025 [US5] 確認 src/services/arduinoUploader.ts 中所有錯誤路徑（detecting / compiling / uploading）的 error.details 填充邏輯正確：detecting 階段無 details；compiling 使用 parseCompileError()；uploading 使用 parseUploadError()，皆截斷至 200 字元
-- [ ] T026 [US5] 驗證 media/js/blocklyEdit.js 中 handleUploadResult() 的 details 顯示 edge case：details 為空字串、僅含空白、或 undefined 時不追加任何文字（不出現空括號或尾隨空格）。這些 edge case 可納入 T013b 的測試中一併驗證
+- [x] T025 [US5] 確認 src/services/arduinoUploader.ts 中所有錯誤路徑（detecting / compiling / uploading）的 error.details 填充邏輯正確：detecting 階段無 details；compiling 使用 parseCompileError()；uploading 使用 parseUploadError()，皆截斷至 200 字元
+- [x] T026 [US5] 驗證 media/js/blocklyEdit.js 中 handleUploadResult() 的 details 顯示 edge case：details 為空字串、僅含空白、或 undefined 時不追加任何文字（不出現空括號或尾隨空格）。這些 edge case 可納入 T013b 的測試中一併驗證
 
 **Checkpoint**: 所有上傳錯誤訊息格式為「本地化描述」或「本地化描述 (技術細節)」
 
@@ -136,10 +136,10 @@
 
 **Purpose**: 驗證、清理、確保整體品質
 
-- [ ] T027 執行 npm run validate:i18n 最終確認全部 15 種語言翻譯無缺漏
-- [ ] T028 [P] 執行 npm run test 確認所有既有測試 + 新增測試通過
-- [ ] T029 [P] 驗證 quickstart.md 的 5 個測試要點（無硬體上傳、編譯錯誤、上傳中拔線、CyberBrick 不受影響、偵測指令失敗 fallback）
-- [ ] T030 檢查所有修改過的檔案中 log() 呼叫是否正確（使用 logging.ts，非 console.log）
+- [x] T027 執行 npm run validate:i18n 最終確認全部 15 種語言翻譯無缺漏
+- [x] T028 [P] 執行 npm run test 確認所有既有測試 + 新增測試通過
+- [x] T029 [P] 驗證 quickstart.md 的 5 個測試要點（無硬體上傳、編譯錯誤、上傳中拔線、CyberBrick 不受影響、偵測指令失敗 fallback）
+- [x] T030 檢查所有修改過的檔案中 log() 呼叫是否正確（使用 logging.ts，非 console.log）
 
 ---
 

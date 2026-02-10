@@ -229,10 +229,12 @@ window.languageManager.loadMessages('it', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Apri Editor Blockly',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 o superiore non rilevato. Le funzionalità MCP non saranno disponibili, ma le funzionalità di modifica di Blockly funzioneranno normalmente.\n\nErrore: {0}',
-	BUTTON_INSTALL_GUIDE: 'Guida all\'installazione',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 o superiore non rilevato. Le funzionalità MCP non saranno disponibili, ma le funzionalità di modifica di Blockly funzioneranno normalmente.\n\nErrore: {0}',
+	BUTTON_INSTALL_GUIDE: "Guida all'installazione",
 	BUTTON_REMIND_LATER: 'Ricorda più tardi',
-	WARNING_INVALID_NODE_PATH: 'Il percorso Node.js specificato non è valido: {0}. Errore: {1}. Correggi il percorso o cancella l\'impostazione per utilizzare il comando "node" predefinito.',
+	WARNING_INVALID_NODE_PATH:
+		'Il percorso Node.js specificato non è valido: {0}. Errore: {1}. Correggi il percorso o cancella l\'impostazione per utilizzare il comando "node" predefinito.',
 	INFO_NODE_PATH_VALID: 'Percorso Node.js valido: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Validazione del percorso Node.js...',
 	PROGRESS_CHECKING_MCP: 'Verifica dello stato del server MCP...',
@@ -249,7 +251,7 @@ window.languageManager.loadMessages('it', {
 	DIAG_FILE_NOT_FOUND: 'File non trovato',
 	DIAG_VSCODE_API_VERSION: 'Versione API di VSCode',
 	DIAG_REQUIRES_VERSION: 'richiede >= {0}',
-	DIAG_WORKSPACE_PATH: 'Percorso dell\'area di lavoro',
+	DIAG_WORKSPACE_PATH: "Percorso dell'area di lavoro",
 	DIAG_NONE: 'Nessuno',
 	DIAG_NODEJS_PATH: 'Percorso di Node.js',
 	DIAG_SYSTEM_PATH: 'PATH di sistema',
@@ -275,7 +277,7 @@ window.languageManager.loadMessages('it', {
 	REC_INSTALL_NODEJS: 'Installa Node.js 22.16.0 o successivo',
 	REC_SET_NODEJS_PATH: 'Se già installato, specifica il percorso di Node.js nelle impostazioni (singularBlockly.mcp.nodePath)',
 	REC_UPGRADE_NODEJS: 'Aggiorna Node.js a 22.16.0 o successivo (attuale: {0})',
-	REC_RUN_COMPILE: 'Esegui `npm run compile` o reinstalla l\'estensione',
+	REC_RUN_COMPILE: "Esegui `npm run compile` o reinstalla l'estensione",
 	REC_UPGRADE_VSCODE: 'Aggiorna VSCode a 1.105.0 o successivo',
 	REC_OPEN_PROJECT: 'Apri una cartella di progetto per utilizzare tutte le funzionalità',
 
@@ -813,7 +815,11 @@ window.languageManager.loadMessages('it', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Caricamento fallito',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Apri prima una cartella di progetto',
 	ERROR_ARDUINO_TIMEOUT: 'Operazione scaduta',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Dispositivo disconnesso',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Sei sicuro di voler eliminare il backup "{0}"?',

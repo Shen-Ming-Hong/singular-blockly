@@ -819,7 +819,11 @@ window.languageManager.loadMessages('hu', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Feltöltés sikertelen',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Kérjük, először nyisson meg egy projektmappát',
 	ERROR_ARDUINO_TIMEOUT: 'A művelet időtúllépése',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Az eszköz lecsatlakozott',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Biztosan törölni szeretné a(z) "{0}" biztonsági mentést?',

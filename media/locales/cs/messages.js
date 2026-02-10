@@ -227,10 +227,12 @@ window.languageManager.loadMessages('cs', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Otevřít editor Blockly',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 nebo vyšší nebyl detekován. Funkce MCP nebudou dostupné, ale funkce úprav Blockly budou fungovat normálně.\n\nChyba: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 nebo vyšší nebyl detekován. Funkce MCP nebudou dostupné, ale funkce úprav Blockly budou fungovat normálně.\n\nChyba: {0}',
 	BUTTON_INSTALL_GUIDE: 'Průvodce instalací',
 	BUTTON_REMIND_LATER: 'Připomenout později',
-	WARNING_INVALID_NODE_PATH: 'Zadaná cesta k Node.js je neplatná: {0}. Chyba: {1}. Opravte prosím cestu nebo vymažte nastavení pro použití výchozího příkazu "node".',
+	WARNING_INVALID_NODE_PATH:
+		'Zadaná cesta k Node.js je neplatná: {0}. Chyba: {1}. Opravte prosím cestu nebo vymažte nastavení pro použití výchozího příkazu "node".',
 	INFO_NODE_PATH_VALID: 'Cesta k Node.js je platná: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Ověřování cesty k Node.js...',
 	PROGRESS_CHECKING_MCP: 'Kontrola stavu MCP serveru...',
@@ -815,7 +817,11 @@ window.languageManager.loadMessages('cs', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Nahrávání selhalo',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Nejprve otevřete složku projektu',
 	ERROR_ARDUINO_TIMEOUT: 'Časový limit operace vypršel',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Zařízení bylo odpojeno',
+	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
+	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Opravdu chcete smazat zálohu "{0}"?',
