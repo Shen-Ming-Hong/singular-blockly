@@ -969,4 +969,8 @@ window.languageManager.loadMessages('cs', {
 	MONITOR_DEVICE_DISCONNECTED: 'Zařízení CyberBrick odpojeno',
 	MONITOR_CONNECTION_FAILED: 'Nepodařilo se připojit k zařízení',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor pozastaven pro nahrávání',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Tento blok musí být umístěn v setup(), loop() nebo ve funkci pro generování kódu.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Tento blok musí být umístěn v main() nebo ve funkci pro generování kódu.',
 });

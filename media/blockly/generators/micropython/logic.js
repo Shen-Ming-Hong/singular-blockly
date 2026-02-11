@@ -19,6 +19,11 @@
 	 * 條件判斷（if/elif/else）
 	 */
 	generator.forBlock['controls_if'] = function (block) {
+		// 深層防護：孤立積木不生成程式碼
+		if (!generator.isInAllowedContext(block)) {
+			return '';
+		}
+
 		let code = '';
 		const condition0 = generator.valueToCode(block, 'IF0', generator.ORDER_NONE) || 'False';
 		let branch0 = generator.statementToCode(block, 'DO0');

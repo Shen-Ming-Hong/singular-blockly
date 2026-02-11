@@ -965,7 +965,8 @@ window.languageManager.loadMessages('es', {
 	MONITOR_DEVICE_DISCONNECTED: 'Dispositivo CyberBrick desconectado',
 	MONITOR_CONNECTION_FAILED: 'Error al conectar con el dispositivo',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor pausado para subida',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Este bloque debe colocarse dentro de setup(), loop() o una función para generar código.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Este bloque debe colocarse dentro de main() o una función para generar código.',
 });
-        MONITOR_DEVICE_DISCONNECTED: 'Dispositivo CyberBrick desconectado',
-        MONITOR_CONNECTION_FAILED: 'Error al conectar con el dispositivo',
-        MONITOR_CLOSED_FOR_UPLOAD: 'Monitor pausado para subida',

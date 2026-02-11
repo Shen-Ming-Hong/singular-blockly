@@ -971,7 +971,8 @@ window.languageManager.loadMessages('hu', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick eszköz lecsatlakozva',
 	MONITOR_CONNECTION_FAILED: 'Nem sikerült csatlakozni az eszközhöz',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor szüneteltetve feltöltéshez',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Ezt a blokkot a setup(), loop() vagy egy függvényen belül kell elhelyezni a kódgeneráláshoz.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Ezt a blokkot a main() vagy egy függvényen belül kell elhelyezni a kódgeneráláshoz.',
 });
-        MONITOR_DEVICE_DISCONNECTED: 'CyberBrick eszköz lecsatlakozva',
-        MONITOR_CONNECTION_FAILED: 'Nem sikerült csatlakozni az eszközhöz',
-        MONITOR_CLOSED_FOR_UPLOAD: 'Monitor szüneteltetve feltöltéshez',

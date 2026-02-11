@@ -964,4 +964,8 @@ window.languageManager.loadMessages('ja', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrickデバイスが切断されました',
 	MONITOR_CONNECTION_FAILED: 'デバイスに接続できませんでした',
 	MONITOR_CLOSED_FOR_UPLOAD: 'アップロードのためモニターを一時停止',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'このブロックはsetup()、loop()、または関数の中に配置する必要があります。',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'このブロックはmain()または関数の中に配置する必要があります。',
 });

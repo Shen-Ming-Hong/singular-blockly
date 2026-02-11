@@ -969,4 +969,8 @@ window.languageManager.loadMessages('de', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick-Gerät getrennt',
 	MONITOR_CONNECTION_FAILED: 'Verbindung zum Gerät fehlgeschlagen',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor für Upload pausiert',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Dieser Block muss in setup(), loop() oder einer Funktion platziert werden, um Code zu erzeugen.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Dieser Block muss in main() oder einer Funktion platziert werden, um Code zu erzeugen.',
 });

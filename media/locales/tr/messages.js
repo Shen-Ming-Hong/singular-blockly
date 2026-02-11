@@ -969,5 +969,8 @@ window.languageManager.loadMessages('tr', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick cihazı bağlantısı kesildi',
 	MONITOR_CONNECTION_FAILED: 'Cihaza bağlanılamadı',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Yükleme için monitör duraksatıldı',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Bu blok, kod üretmek için setup(), loop() veya bir fonksiyonun içine yerleştirilmelidir.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Bu blok, kod üretmek için main() veya bir fonksiyonun içine yerleştirilmelidir.',
 });
-        MONITOR_CLOSED_FOR_UPLOAD: 'Yükleme için monitör duraklatıldı',

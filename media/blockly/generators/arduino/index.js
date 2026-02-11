@@ -10,6 +10,83 @@ const Blockly = window.Blockly;
 
 window.arduinoGenerator = new Blockly.Generator('Arduino');
 
+/**
+ * 允許作為頂層積木生成程式碼的積木類型清單
+ * 用於 workspaceToCode 覆寫中過濾孤立積木
+ */
+window.arduinoGenerator.allowedTopLevelBlocks_ = [
+	'arduino_setup_loop',
+	'arduino_function',
+	'procedures_defnoreturn',
+	'procedures_defreturn',
+];
+
+/**
+ * 檢查積木是否位於合法的 Arduino 程式碼生成容器內
+ * 使用 getSurroundParent() 遞迴向上遍歷父層鏈
+ * @param {!Blockly.Block} block - 要檢查的積木
+ * @returns {boolean} true 表示在合法容器內，false 表示孤立
+ */
+window.arduinoGenerator.isInAllowedContext = function (block) {
+	let current = block;
+	while (current) {
+		current = current.getSurroundParent();
+		if (!current) return false;
+		if (this.allowedTopLevelBlocks_.includes(current.type)) return true;
+	}
+	return false;
+};
+
+/**
+ * 覆寫 workspaceToCode，只處理允許的頂層積木
+ * 孤立積木會被跳過並加上註解提示
+ */
+window.arduinoGenerator.workspaceToCode = function (workspace) {
+	if (!workspace) {
+		console.warn('[Arduino] No workspace provided');
+		return '';
+	}
+
+	// 初始化
+	this.init(workspace);
+
+	// 取得所有頂層積木
+	const blocks = workspace.getTopBlocks(true);
+	let code = '';
+
+	// 只處理允許的頂層積木
+	for (const block of blocks) {
+		if (!block.isEnabled() || block.getInheritedDisabled()) {
+			continue;
+		}
+
+		// 檢查是否為允許的頂層積木
+		if (this.allowedTopLevelBlocks_.includes(block.type)) {
+			const blockCode = this.blockToCode(block);
+			if (typeof blockCode === 'string') {
+				code += blockCode;
+			} else if (Array.isArray(blockCode)) {
+				// Value block 返回 [code, order]
+				// 頂層的 value block 應該被忽略
+			}
+		} else if (!(this.alwaysGenerateBlocks_ && this.alwaysGenerateBlocks_.includes(block.type))) {
+			// 孤立積木：加上跳過註解（排除 alwaysGenerateBlocks_ 中的積木）
+			code += `// [Skipped] Orphan block: ${block.type} (not in setup/loop/function)\n`;
+		}
+	}
+
+	// 完成處理
+	code = this.finish(code);
+
+	// 清理縮排
+	code = code.replace(/^\s+\n/gm, '\n');
+	code = code.replace(/\n\n+/g, '\n\n');
+	code = code.replace(/^\n+/, '');
+	code = code.replace(/\n+$/, '\n');
+
+	return code;
+};
+
 // 註冊積木類型到 alwaysGenerateBlocks_ 列表的輔助函數
 window.arduinoGenerator.registerAlwaysGenerateBlock = function (blockType) {
 	// 確保 alwaysGenerateBlocks_ 陣列已初始化

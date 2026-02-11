@@ -90,7 +90,6 @@ TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standa
 ## Recent Changes
 - 042-upload-error-clarity: Added TypeScript 5.9.3 + Blockly 12.3.1 | VSCode Extension API 1.105.0+ | PlatformIO CLI
 - 041-fix-mcp-bundling: Added TypeScript 5.9.3 (ES2023 target, Node16 module) + webpack 5.102.1, ts-loader 9.5.4, @modelcontextprotocol/sdk ^1.26.0, zod ^4.1.13
-- 040-mcp-graceful-degradation: Added TypeScript 5.9.3, Node.js 22.16.0+ (runtime requirement for MCP Server)
 
 
 <!-- MANUAL ADDITIONS START -->

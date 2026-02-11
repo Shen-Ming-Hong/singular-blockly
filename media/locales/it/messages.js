@@ -965,4 +965,8 @@ window.languageManager.loadMessages('it', {
 	MONITOR_DEVICE_DISCONNECTED: 'Dispositivo CyberBrick disconnesso',
 	MONITOR_CONNECTION_FAILED: 'Connessione al dispositivo fallita',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor in pausa per caricamento',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Questo blocco deve essere posizionato in setup(), loop() o in una funzione per generare codice.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Questo blocco deve essere posizionato in main() o in una funzione per generare codice.',
 });

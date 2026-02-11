@@ -962,5 +962,8 @@ window.languageManager.loadMessages('ko', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick 장치 연결 끊김',
 	MONITOR_CONNECTION_FAILED: '장치 연결 실패',
 	MONITOR_CLOSED_FOR_UPLOAD: '업로드를 위해 모니터 일시 중지',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: '이 블록은 setup(), loop() 또는 함수 안에 배치해야 코드가 생성됩니다.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: '이 블록은 main() 또는 함수 안에 배치해야 코드가 생성됩니다.',
 });
-        MONITOR_CLOSED_FOR_UPLOAD: '업로드를 위해 모니터 일시 중지',

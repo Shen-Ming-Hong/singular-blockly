@@ -973,4 +973,8 @@ window.languageManager.loadMessages('bg', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick устройство е изключено',
 	MONITOR_CONNECTION_FAILED: 'Неуспешно свързване с устройството',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Мониторът е паузиран за качване',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Този блок трябва да бъде поставен в setup(), loop() или функция, за да генерира код.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Този блок трябва да бъде поставен в main() или функция, за да генерира код.',
 });
