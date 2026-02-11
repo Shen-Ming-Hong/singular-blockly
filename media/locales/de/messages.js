@@ -818,11 +818,11 @@ window.languageManager.loadMessages('de', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Hochladen fehlgeschlagen',
 	ERROR_ARDUINO_NO_WORKSPACE: 'Bitte öffnen Sie zuerst einen Projektordner',
 	ERROR_ARDUINO_TIMEOUT: 'Vorgang abgelaufen',
-	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
-	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
-	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
-	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
+	ERROR_ARDUINO_NO_DEVICE: 'Kein Gerät erkannt. Bitte schließen Sie Ihr Board an.',
+	ERROR_ARDUINO_PORT_BUSY: 'Der Port wird von einem anderen Programm verwendet. Schließen Sie andere serielle Monitore.',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Gerät wurde während des Uploads getrennt.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload-Zeitüberschreitung. Überprüfen Sie Ihre Verbindung.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload fehlgeschlagen. Überprüfen Sie die Geräteverbindung.',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'Sind Sie sicher, dass Sie das Backup "{0}" löschen möchten?',
