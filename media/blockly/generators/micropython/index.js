@@ -131,8 +131,10 @@ window.micropythonGenerator.workspaceToCode = function (workspace) {
 				// Value block 返回 [code, order]
 				// 頂層的 value block 應該被忽略
 			}
+		} else {
+			// 孤立積木：加上跳過註解
+			code += `# [Skipped] Orphan block: ${block.type} (not in setup/loop/function)\n`;
 		}
-		// 其他流浪積木會被忽略，不生成程式碼
 	}
 
 	// 完成處理
@@ -367,6 +369,28 @@ window.micropythonGenerator.addFunction = function (name, code) {
 	if (!this.functions_.has(name)) {
 		this.functions_.set(name, { name, code });
 	}
+};
+
+/**
+ * 檢查積木是否位於合法的 MicroPython 程式碼生成容器內
+ * 使用 getSurroundParent() 遞迴向上遍歷父層鏈
+ * @param {!Blockly.Block} block - 要檢查的積木
+ * @returns {boolean} true 表示在合法容器內，false 表示孤立
+ */
+window.micropythonGenerator.isInAllowedContext = function (block) {
+	const allowedContainers = [
+		'micropython_main',
+		'arduino_function',
+		'procedures_defnoreturn',
+		'procedures_defreturn',
+	];
+	let current = block;
+	while (current) {
+		current = current.getSurroundParent();
+		if (!current) return false;
+		if (allowedContainers.includes(current.type)) return true;
+	}
+	return false;
 };
 
 // 記錄載入訊息

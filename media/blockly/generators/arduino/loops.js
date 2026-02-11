@@ -6,7 +6,12 @@
  */
 
 window.arduinoGenerator.forBlock['controls_repeat_ext'] = function (block) {
-	const repeats = window.arduinoGenerator.valueToCode(block, 'TIMES', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
+	const repeats= window.arduinoGenerator.valueToCode(block, 'TIMES', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 	// 使用固定的變數名稱模式
 	const loopVar = '_i' + Math.floor(Math.random() * 10000);
@@ -15,7 +20,12 @@ window.arduinoGenerator.forBlock['controls_repeat_ext'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
-	const until = block.getFieldValue('MODE') === 'UNTIL';
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
+	const until= block.getFieldValue('MODE') === 'UNTIL';
 	const argument0 = window.arduinoGenerator.valueToCode(block, 'BOOL', window.arduinoGenerator.ORDER_NONE) || 'false';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 
@@ -27,6 +37,11 @@ window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['controls_for'] = function (block) {
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
 	// 直接從變數欄位獲取名稱
 	const varField = block.getField('VAR');
 	const variable = varField ? varField.getText() : 'i'; // 使用 getText() 獲取實際顯示的變數名稱
@@ -54,6 +69,11 @@ window.arduinoGenerator.forBlock['controls_for'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['controls_forEach'] = function (block) {
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
 	// 對 forEach 使用相同的方式
 	const varField = block.getField('VAR');
 	const variable = varField ? varField.getText() : 'x'; // 使用 getText() 獲取實際顯示的變數名稱
@@ -65,7 +85,12 @@ window.arduinoGenerator.forBlock['controls_forEach'] = function (block) {
 };
 
 window.arduinoGenerator.forBlock['singular_flow_statements'] = function (block) {
-	const flowType = block.getFieldValue('FLOW');
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
+	const flowType= block.getFieldValue('FLOW');
 	let code = '';
 
 	switch (flowType) {
@@ -81,7 +106,12 @@ window.arduinoGenerator.forBlock['singular_flow_statements'] = function (block) 
 };
 
 window.arduinoGenerator.forBlock['controls_duration'] = function (block) {
-	const duration = window.arduinoGenerator.valueToCode(block, 'DURATION', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
+	const duration= window.arduinoGenerator.valueToCode(block, 'DURATION', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 	const timeVar = '_startTime' + Math.floor(Math.random() * 10000);
 

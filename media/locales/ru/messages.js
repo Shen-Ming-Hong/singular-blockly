@@ -966,7 +966,8 @@ window.languageManager.loadMessages('ru', {
 	MONITOR_DEVICE_DISCONNECTED: 'Устройство CyberBrick отключено',
 	MONITOR_CONNECTION_FAILED: 'Не удалось подключиться к устройству',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Монитор приостановлен для загрузки',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Этот блок должен быть размещён внутри setup(), loop() или функции для генерации кода.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Этот блок должен быть размещён внутри main() или функции для генерации кода.',
 });
-        MONITOR_DEVICE_DISCONNECTED: 'Устройство CyberBrick отключено',
-        MONITOR_CONNECTION_FAILED: 'Не удалось подключиться к устройству',
-        MONITOR_CLOSED_FOR_UPLOAD: 'Монитор приостановлен для загрузки',

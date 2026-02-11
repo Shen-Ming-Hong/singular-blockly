@@ -963,4 +963,8 @@ window.languageManager.loadMessages('en', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick device disconnected',
 	MONITOR_CONNECTION_FAILED: 'Failed to connect to device',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor paused for upload',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'This block must be placed inside setup(), loop(), or a function to generate code.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'This block must be placed inside main() or a function to generate code.',
 });

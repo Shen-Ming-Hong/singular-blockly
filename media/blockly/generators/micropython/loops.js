@@ -41,6 +41,11 @@
 	 * 無限迴圈
 	 */
 	generator.forBlock['controls_whileUntil'] = function (block) {
+		// 深層防護：孤立積木不生成程式碼
+		if (!generator.isInAllowedContext(block)) {
+			return '';
+		}
+
 		const until = block.getFieldValue('MODE') === 'UNTIL';
 		let argument0 = generator.valueToCode(block, 'BOOL', until ? generator.ORDER_LOGICAL_NOT : generator.ORDER_NONE) || 'False';
 		let branch = generator.statementToCode(block, 'DO');
@@ -65,6 +70,11 @@
 	 * 重複 N 次
 	 */
 	generator.forBlock['controls_repeat_ext'] = function (block) {
+		// 深層防護：孤立積木不生成程式碼
+		if (!generator.isInAllowedContext(block)) {
+			return '';
+		}
+
 		const times = generator.valueToCode(block, 'TIMES', generator.ORDER_NONE) || '0';
 		let branch = generator.statementToCode(block, 'DO');
 		branch = branch || generator.INDENT + 'pass\n';
@@ -82,6 +92,11 @@
 	 * 計數迴圈
 	 */
 	generator.forBlock['controls_for'] = function (block) {
+		// 深層防護：孤立積木不生成程式碼
+		if (!generator.isInAllowedContext(block)) {
+			return '';
+		}
+
 		const variable0 = generator.nameDB_.getName(block.getFieldValue('VAR'), Blockly.VARIABLE_CATEGORY_NAME);
 		const argument0 = generator.valueToCode(block, 'FROM', generator.ORDER_NONE) || '0';
 		const argument1 = generator.valueToCode(block, 'TO', generator.ORDER_NONE) || '0';
@@ -100,6 +115,11 @@
 	 * 迭代列表
 	 */
 	generator.forBlock['controls_forEach'] = function (block) {
+		// 深層防護：孤立積木不生成程式碼
+		if (!generator.isInAllowedContext(block)) {
+			return '';
+		}
+
 		const variable0 = generator.nameDB_.getName(block.getFieldValue('VAR'), Blockly.VARIABLE_CATEGORY_NAME);
 		const argument0 = generator.valueToCode(block, 'LIST', generator.ORDER_NONE) || '[]';
 		let branch = generator.statementToCode(block, 'DO');
@@ -111,7 +131,12 @@
 	/**
 	 * 迴圈流程控制（break/continue）
 	 */
-	generator.forBlock['controls_flow_statements'] = function (block) {
+	generator.forBlock['singular_flow_statements'] = function (block) {
+		// 深層防護：孤立積木不生成程式碼
+		if (!generator.isInAllowedContext(block)) {
+			return '';
+		}
+
 		const flow = block.getFieldValue('FLOW');
 		switch (flow) {
 			case 'BREAK':

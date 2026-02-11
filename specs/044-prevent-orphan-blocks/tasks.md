@@ -27,10 +27,10 @@
 
 **Purpose**: Project initialization, shared helpers, and data definitions
 
-- [ ] T001 Define `allowedTopLevelBlocks_` array for Arduino generator in `media/blockly/generators/arduino/index.js` — add property: `['arduino_setup_loop', 'arduino_function', 'procedures_defnoreturn', 'procedures_defreturn']`
-- [ ] T002 [P] Define `ALLOWED_CONTAINERS` merged array and implement global `window.isInAllowedContext(block)` helper function in `media/blockly/blocks/loops.js` — pure function using `getSurroundParent()` recursive traversal per contract §2
-- [ ] T003 [P] Implement generator-specific `window.arduinoGenerator.isInAllowedContext(block)` method in `media/blockly/generators/arduino/index.js` — uses Arduino-only container list per RN-005
-- [ ] T004 [P] Implement generator-specific `window.micropythonGenerator.isInAllowedContext(block)` method in `media/blockly/generators/micropython/index.js` — uses MicroPython-only container list per RN-005
+- [x] T001 Define `allowedTopLevelBlocks_` array for Arduino generator in `media/blockly/generators/arduino/index.js` — add property: `['arduino_setup_loop', 'arduino_function', 'procedures_defnoreturn', 'procedures_defreturn']`
+- [x] T002 [P] Define `ALLOWED_CONTAINERS` merged array and implement global `window.isInAllowedContext(block)` helper function in `media/blockly/blocks/loops.js` — pure function using `getSurroundParent()` recursive traversal per contract §2
+- [x] T003 [P] Implement generator-specific `window.arduinoGenerator.isInAllowedContext(block)` method in `media/blockly/generators/arduino/index.js` — uses Arduino-only container list per RN-005
+- [x] T004 [P] Implement generator-specific `window.micropythonGenerator.isInAllowedContext(block)` method in `media/blockly/generators/micropython/index.js` — uses MicroPython-only container list per RN-005
 
 **Checkpoint**: Core helpers ready — all subsequent phases can reference `isInAllowedContext`
 
@@ -42,8 +42,8 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T005 Implement `workspaceToCode()` override for Arduino generator in `media/blockly/generators/arduino/index.js` — filter top-level blocks via `allowedTopLevelBlocks_`, add `// [Skipped] Orphan block: {type} (not in setup/loop/function)` comment for skipped blocks, preserve `alwaysGenerateBlocks_` mechanism (runs inside `arduino_setup_loop.forBlock`), follow MicroPython pattern at line 106-148
-- [ ] T006 Enhance MicroPython generator `workspaceToCode()` in `media/blockly/generators/micropython/index.js` — confirm existing `allowedTopLevelBlocks_` filtering is present, then add skip comment format `# [Skipped] Orphan block: {type} (not in setup/loop/function)` for orphan blocks that are filtered out (currently silently skipped)
+- [x] T005 Implement `workspaceToCode()` override for Arduino generator in `media/blockly/generators/arduino/index.js` — filter top-level blocks via `allowedTopLevelBlocks_`, add `// [Skipped] Orphan block: {type} (not in setup/loop/function)` comment for skipped blocks, preserve `alwaysGenerateBlocks_` mechanism (runs inside `arduino_setup_loop.forBlock`), follow MicroPython pattern at line 106-148
+- [x] T006 Enhance MicroPython generator `workspaceToCode()` in `media/blockly/generators/micropython/index.js` — confirm existing `allowedTopLevelBlocks_` filtering is present, then add skip comment format `# [Skipped] Orphan block: {type} (not in setup/loop/function)` for orphan blocks that are filtered out (currently silently skipped)
 
 **Checkpoint**: Foundation ready — both generators now filter orphan blocks at the top level. User story implementation can begin.
 
@@ -59,39 +59,39 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T007 [P] [US1] Create unit test file `src/test/suite/orphan-block-guard.test.ts` with test scaffold — import helpers, set up Blockly workspace mock
-- [ ] T008 [P] [US1] Write test: `isInAllowedContext` returns `true` for block directly inside allowed container in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T3)
-- [ ] T009 [P] [US1] Write test: `isInAllowedContext` returns `false` for top-level block with no parent in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T4)
-- [ ] T010 [P] [US1] Write test: `isInAllowedContext` returns `true` for multi-level nesting (loop > if > while) in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T1)
-- [ ] T011 [P] [US1] Write test: `isInAllowedContext` returns `false` for nested orphan (orphan if > while) in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T2)
-- [ ] T012 [P] [US1] Write test: `isInAllowedContext` handles different container types (`procedures_defnoreturn`, `arduino_function`) in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T5)
-- [ ] T013 [P] [US1] Write test: forBlock guard returns empty string for orphan block in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T9)
-- [ ] T014 [P] [US1] Write test: forBlock guard returns valid code for block in allowed context in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T10)
+- [x] T007 [P] [US1] Create unit test file `src/test/suite/orphan-block-guard.test.ts` with test scaffold — import helpers, set up Blockly workspace mock
+- [x] T008 [P] [US1] Write test: `isInAllowedContext` returns `true` for block directly inside allowed container in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T3)
+- [x] T009 [P] [US1] Write test: `isInAllowedContext` returns `false` for top-level block with no parent in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T4)
+- [x] T010 [P] [US1] Write test: `isInAllowedContext` returns `true` for multi-level nesting (loop > if > while) in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T1)
+- [x] T011 [P] [US1] Write test: `isInAllowedContext` returns `false` for nested orphan (orphan if > while) in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T2)
+- [x] T012 [P] [US1] Write test: `isInAllowedContext` handles different container types (`procedures_defnoreturn`, `arduino_function`) in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T5)
+- [x] T013 [P] [US1] Write test: forBlock guard returns empty string for orphan block in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T9)
+- [x] T014 [P] [US1] Write test: forBlock guard returns valid code for block in allowed context in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T10)
 
 ### Implementation for User Story 1 — Arduino Generator Guards
 
-- [ ] T015 [P] [US1] Add `isInAllowedContext` guard to `controls_whileUntil` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
-- [ ] T016 [P] [US1] Add `isInAllowedContext` guard to `controls_for` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
-- [ ] T017 [P] [US1] Add `isInAllowedContext` guard to `controls_forEach` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
-- [ ] T018 [P] [US1] Add `isInAllowedContext` guard to `controls_repeat_ext` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
-- [ ] T019 [P] [US1] Add `isInAllowedContext` guard to `controls_duration` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan (spec enhancement per RN-004, Arduino-only)
-- [ ] T020 [P] [US1] Add `isInAllowedContext` guard to `controls_if` forBlock in `media/blockly/generators/arduino/logic.js` — return `''` if orphan
-- [ ] T021 [P] [US1] Add `isInAllowedContext` guard to `singular_flow_statements` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
+- [x] T015 [P] [US1] Add `isInAllowedContext` guard to `controls_whileUntil` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
+- [x] T016 [P] [US1] Add `isInAllowedContext` guard to `controls_for` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
+- [x] T017 [P] [US1] Add `isInAllowedContext` guard to `controls_forEach` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
+- [x] T018 [P] [US1] Add `isInAllowedContext` guard to `controls_repeat_ext` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
+- [x] T019 [P] [US1] Add `isInAllowedContext` guard to `controls_duration` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan (spec enhancement per RN-004, Arduino-only)
+- [x] T020 [P] [US1] Add `isInAllowedContext` guard to `controls_if` forBlock in `media/blockly/generators/arduino/logic.js` — return `''` if orphan
+- [x] T021 [P] [US1] Add `isInAllowedContext` guard to `singular_flow_statements` forBlock in `media/blockly/generators/arduino/loops.js` — return `''` if orphan
 
 ### Implementation for User Story 1 — MicroPython Generator Guards
 
-- [ ] T022 [P] [US1] Add `isInAllowedContext` guard to `controls_whileUntil` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
-- [ ] T023 [P] [US1] Add `isInAllowedContext` guard to `controls_for` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
-- [ ] T024 [P] [US1] Add `isInAllowedContext` guard to `controls_forEach` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
-- [ ] T025 [P] [US1] Add `isInAllowedContext` guard to `controls_repeat_ext` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
-- [ ] T026 [P] [US1] Add `isInAllowedContext` guard to `controls_if` forBlock in `media/blockly/generators/micropython/logic.js` — return `''` if orphan
-- [ ] T027 [P] [US1] Add `isInAllowedContext` guard to `singular_flow_statements` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan — NOTE: 目前 micropython/loops.js 使用 controls_flow_statements 鍵名，需先重命名為 singular_flow_statements 以匹配 blocks/loops.js 積木定義
+- [x] T022 [P] [US1] Add `isInAllowedContext` guard to `controls_whileUntil` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
+- [x] T023 [P] [US1] Add `isInAllowedContext` guard to `controls_for` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
+- [x] T024 [P] [US1] Add `isInAllowedContext` guard to `controls_forEach` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
+- [x] T025 [P] [US1] Add `isInAllowedContext` guard to `controls_repeat_ext` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
+- [x] T026 [P] [US1] Add `isInAllowedContext` guard to `controls_if` forBlock in `media/blockly/generators/micropython/logic.js` — return `''` if orphan
+- [x] T027 [P] [US1] Add `isInAllowedContext` guard to `singular_flow_statements` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan — NOTE: 目前 micropython/loops.js 使用 controls_flow_statements 鍵名，需先重命名為 singular_flow_statements 以匹配 blocks/loops.js 積木定義
 
 ### User Story 4 Integration (P1 — Regression Protection)
 
-- [ ] T028 [P] [US1] Write test: `workspaceToCode` skips orphan top-level block in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T6)
-- [ ] T029 [P] [US1] Write test: `alwaysGenerateBlocks_` blocks (e.g. `servo_setup`) are not affected by filtering in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T8)
-- [ ] T030 [US1] Run full test suite (`npm test`) and verify all existing tests still pass — no regressions in `src/test/suite/`
+- [x] T028 [P] [US1] Write test: `workspaceToCode` skips orphan top-level block in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T6)
+- [x] T029 [P] [US1] Write test: `alwaysGenerateBlocks_` blocks (e.g. `servo_setup`) are not affected by filtering in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T8)
+- [x] T030 [US1] Run full test suite (`npm test`) and verify all existing tests still pass — no regressions in `src/test/suite/`
 
 **Checkpoint**: At this point, User Story 1 (and the regression protection of User Story 4) should be fully functional. No orphan control block produces code in either generator; all correctly nested blocks continue to work.
 
@@ -105,14 +105,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T031 [P] [US2] Add `onchange` orphan-warning callback to `controls_repeat_ext` block definition in `media/blockly/blocks/loops.js` — use `window.isInAllowedContext(this)` + `setWarningText()` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
-- [ ] T032 [P] [US2] Add `onchange` orphan-warning callback to `controls_whileUntil` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
-- [ ] T033 [P] [US2] Add `onchange` orphan-warning callback to `controls_for` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
-- [ ] T034 [P] [US2] Add `onchange` orphan-warning callback to `controls_forEach` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
-- [ ] T035 [P] [US2] Add `onchange` orphan-warning callback to `controls_duration` block definition in `media/blockly/blocks/loops.js` (Arduino-only, spec enhancement per RN-004)
-- [ ] T036 [US2] Integrate orphan-warning into existing `singular_flow_statements` `onchange` in `media/blockly/blocks/loops.js` — add orphan check with priority over loop warning per contract block-warning-events.md §1
-- [ ] T037 [US2] Add orphan-warning to `controls_if` (Blockly built-in) via Extension/Mixin or direct `onchange` assignment in `media/blockly/blocks/loops.js` — per RN-003, verify Blockly 12.x allows post-init `onchange` override
-- [ ] T038 [US2] Implement generator-mode detection in `onchange` callback to select correct i18n key (`ORPHAN_BLOCK_WARNING_ARDUINO` vs `ORPHAN_BLOCK_WARNING_MICROPYTHON`) per RN-001 and RN-008 — 使用 window.currentGeneratorType 全域變數判斷當前 generator 模式（需在 generator 切換時由 blocklyEdit.js 設定）
+- [x] T031 [P] [US2] Add `onchange` orphan-warning callback to `controls_repeat_ext` block definition in `media/blockly/blocks/loops.js` — use `window.isInAllowedContext(this)` + `setWarningText()` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
+- [x] T032 [P] [US2] Add `onchange` orphan-warning callback to `controls_whileUntil` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
+- [x] T033 [P] [US2] Add `onchange` orphan-warning callback to `controls_for` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
+- [x] T034 [P] [US2] Add `onchange` orphan-warning callback to `controls_forEach` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
+- [x] T035 [P] [US2] Add `onchange` orphan-warning callback to `controls_duration` block definition in `media/blockly/blocks/loops.js` (Arduino-only, spec enhancement per RN-004)
+- [x] T036 [US2] Integrate orphan-warning into existing `singular_flow_statements` `onchange` in `media/blockly/blocks/loops.js` — add orphan check with priority over loop warning per contract block-warning-events.md §1
+- [x] T037 [US2] Add orphan-warning to `controls_if` (Blockly built-in) via Extension/Mixin or direct `onchange` assignment in `media/blockly/blocks/loops.js` — per RN-003, verify Blockly 12.x allows post-init `onchange` override
+- [x] T038 [US2] Implement generator-mode detection in `onchange` callback to select correct i18n key (`ORPHAN_BLOCK_WARNING_ARDUINO` vs `ORPHAN_BLOCK_WARNING_MICROPYTHON`) per RN-001 and RN-008 — 使用 window.currentProgrammingLanguage 全域變數判斷當前 generator 模式（需在 generator 切換時由 blocklyEdit.js 設定）
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently. Orphan blocks are visually flagged and produce no code.
 
@@ -126,21 +126,21 @@
 
 ### Implementation for User Story 3
 
-- [ ] T039 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/en/messages.js` — English: Arduino: "This block must be placed inside setup(), loop(), or a function to generate code." / MicroPython: "This block must be placed inside main() or a function to generate code."
-- [ ] T040 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/zh-hant/messages.js` — 繁體中文
-- [ ] T041 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/ja/messages.js` — 日本語
-- [ ] T042 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/ko/messages.js` — 한국어
-- [ ] T043 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/de/messages.js` — Deutsch
-- [ ] T044 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/fr/messages.js` — Français
-- [ ] T045 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/es/messages.js` — Español
-- [ ] T046 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/it/messages.js` — Italiano
-- [ ] T047 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/pt-br/messages.js` — Português (BR)
-- [ ] T048 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/ru/messages.js` — Русский
-- [ ] T049 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/pl/messages.js` — Polski
-- [ ] T050 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/tr/messages.js` — Türkçe
-- [ ] T051 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/hu/messages.js` — Magyar
-- [ ] T052 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/cs/messages.js` — Čeština
-- [ ] T053 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/bg/messages.js` — Български
+- [x] T039 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/en/messages.js` — English: Arduino: "This block must be placed inside setup(), loop(), or a function to generate code." / MicroPython: "This block must be placed inside main() or a function to generate code."
+- [x] T040 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/zh-hant/messages.js` — 繁體中文
+- [x] T041 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/ja/messages.js` — 日本語
+- [x] T042 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/ko/messages.js` — 한국어
+- [x] T043 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/de/messages.js` — Deutsch
+- [x] T044 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/fr/messages.js` — Français
+- [x] T045 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/es/messages.js` — Español
+- [x] T046 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/it/messages.js` — Italiano
+- [x] T047 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/pt-br/messages.js` — Português (BR)
+- [x] T048 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/ru/messages.js` — Русский
+- [x] T049 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/pl/messages.js` — Polski
+- [x] T050 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/tr/messages.js` — Türkçe
+- [x] T051 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/hu/messages.js` — Magyar
+- [x] T052 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/cs/messages.js` — Čeština
+- [x] T053 [P] [US3] Add `ORPHAN_BLOCK_WARNING_ARDUINO` and `ORPHAN_BLOCK_WARNING_MICROPYTHON` i18n keys to `media/locales/bg/messages.js` — Български
 
 **Checkpoint**: All user stories should now be independently functional. Warnings display in all 15 locales with generator-specific wording.
 
@@ -150,11 +150,11 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T054 [P] Write test: skipped orphan block produces correct comment format in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T7)
-- [ ] T055 [P] Write test: `controls_duration` guard works for Arduino-only (RN-006 T11) in `src/test/suite/orphan-block-guard.test.ts`
-- [ ] T056 [P] Write test: generator-specific warning message text validation (RN-006 T12) in `src/test/suite/orphan-block-guard.test.ts`
-- [ ] T057 Run full build (`npm run compile`) and verify no TypeScript compilation errors
-- [ ] T058 Run full test suite (`npm test`) and verify all tests pass including new orphan-block-guard tests
+- [x] T054 [P] Write test: skipped orphan block produces correct comment format in `src/test/suite/orphan-block-guard.test.ts` (RN-006 T7)
+- [x] T055 [P] Write test: `controls_duration` guard works for Arduino-only (RN-006 T11) in `src/test/suite/orphan-block-guard.test.ts`
+- [x] T056 [P] Write test: generator-specific warning message text validation (RN-006 T12) in `src/test/suite/orphan-block-guard.test.ts`
+- [x] T057 Run full build (`npm run compile`) and verify no TypeScript compilation errors
+- [x] T058 Run full test suite (`npm test`) and verify all tests pass including new orphan-block-guard tests
 - [ ] T059 Run quickstart.md manual test scenarios (6 scenarios) to validate end-to-end behavior
 
 ---

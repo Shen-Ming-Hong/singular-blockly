@@ -970,6 +970,8 @@ window.languageManager.loadMessages('pl', {
 	MONITOR_DEVICE_DISCONNECTED: 'Urządzenie CyberBrick odłączone',
 	MONITOR_CONNECTION_FAILED: 'Nie udało się połączyć z urządzeniem',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor wstrzymany do przesłania',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Ten blok musi być umieszczony w setup(), loop() lub funkcji, aby wygenerować kod.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Ten blok musi być umieszczony w main() lub funkcji, aby wygenerować kod.',
 });
-        MONITOR_CONNECTION_FAILED: 'Nie udało się połączyć z urządzeniem',
-        MONITOR_CLOSED_FOR_UPLOAD: 'Monitor wstrzymany do przesłania',

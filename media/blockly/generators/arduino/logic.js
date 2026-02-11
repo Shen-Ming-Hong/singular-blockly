@@ -6,6 +6,11 @@
  */
 
 window.arduinoGenerator.forBlock['controls_if'] = function (block) {
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
 	let code = '';
 	const condition = window.arduinoGenerator.valueToCode(block, 'IF0', window.arduinoGenerator.ORDER_NONE) || 'false';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO0');

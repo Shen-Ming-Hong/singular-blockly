@@ -10,6 +10,34 @@
  * 包含控制流程語句和特殊循環區塊
  */
 
+/**
+ * 合併的合法容器清單（Arduino + MicroPython）
+ * 供 block.onchange 警告使用，因 onchange 無法預知當前 generator 模式
+ */
+const ALLOWED_CONTAINERS = [
+	'arduino_setup_loop',
+	'arduino_function',
+	'procedures_defnoreturn',
+	'procedures_defreturn',
+	'micropython_main',
+];
+
+/**
+ * 全域 isInAllowedContext helper
+ * 使用合併的容器清單，供 block.onchange 回呼使用
+ * @param {!Blockly.Block} block - 要檢查的積木
+ * @returns {boolean} true 表示在任一 generator 的合法容器內
+ */
+window.isInAllowedContext = function (block) {
+	let current = block;
+	while (current) {
+		current = current.getSurroundParent();
+		if (!current) return false;
+		if (ALLOWED_CONTAINERS.includes(current.type)) return true;
+	}
+	return false;
+};
+
 Blockly.Blocks['controls_duration'] = {
 	init: function () {
 		this.appendDummyInput().appendField(window.languageManager.getMessage('DURATION_REPEAT'));
@@ -25,6 +53,28 @@ Blockly.Blocks['controls_duration'] = {
 		this.setStyle('loop_blocks');
 		this.setTooltip('在指定的時間內重複執行程式');
 		this.setHelpUrl('');
+	},
+
+	// 孤立積木警告：檢查是否在合法容器內
+	onchange: function (e) {
+		if (!this.workspace || this.workspace.isFlyout) return;
+		if (e && e.type !== Blockly.Events.BLOCK_MOVE &&
+			e.type !== Blockly.Events.BLOCK_CREATE &&
+			e.type !== Blockly.Events.FINISHED_LOADING) return;
+
+		const isInContext = window.isInAllowedContext(this);
+		const warningKey = window.currentProgrammingLanguage === 'micropython'
+			? 'ORPHAN_BLOCK_WARNING_MICROPYTHON'
+			: 'ORPHAN_BLOCK_WARNING_ARDUINO';
+
+		if (isInContext) {
+			this.setWarningText(null);
+		} else {
+			this.setWarningText(
+				window.languageManager.getMessage(warningKey) ||
+				'This block must be placed inside setup(), loop(), or a function to generate code.'
+			);
+		}
 	},
 };
 
@@ -52,39 +102,88 @@ Blockly.Blocks['singular_flow_statements'] = {
 		this.setStyle('loop_blocks');
 	},
 
-	// 自定義驗證邏輯
-	onchange: function () {
-		// 檢查此區塊是否在有效的循環區塊內
-		let legal = false;
+	// 自定義驗證邏輯：孤立警告 + 循環檢查
+	onchange: function (e) {
+		if (!this.workspace || this.workspace.isFlyout) return;
+		if (e && e.type !== Blockly.Events.BLOCK_MOVE &&
+			e.type !== Blockly.Events.BLOCK_CREATE &&
+			e.type !== Blockly.Events.FINISHED_LOADING) return;
+
+		// 1. 檢查是否在循環區塊內（原始邏輯）
+		let inLoop = false;
 		let block = this;
 		do {
 			block = block.getSurroundParent();
-			if (!block) {
-				break;
-			}
-
-			// 檢查支援的所有循環區塊
-			if (
-				block.type === 'controls_duration' ||
-				block.type === 'controls_repeat' ||
-				block.type === 'controls_repeat_ext' ||
-				block.type === 'controls_forEach' ||
-				block.type === 'controls_for' ||
-				block.type === 'controls_whileUntil'
-			) {
-				legal = true;
+			if (!block) break;
+			if (['controls_duration', 'controls_repeat', 'controls_repeat_ext',
+				'controls_forEach', 'controls_for', 'controls_whileUntil'].includes(block.type)) {
+				inLoop = true;
 				break;
 			}
 		} while (block);
 
-		// 根據是否在有效循環內設置或清除警告
-		if (legal) {
-			this.setWarningText(null);
-		} else {
+		// 2. 檢查是否在合法容器內
+		const inContext = window.isInAllowedContext(this);
+
+		// 3. 根據 generator 模式選擇 i18n 鍵
+		const warningKey = window.currentProgrammingLanguage === 'micropython'
+			? 'ORPHAN_BLOCK_WARNING_MICROPYTHON'
+			: 'ORPHAN_BLOCK_WARNING_ARDUINO';
+
+		// 4. 警告優先順序：孤立 > 不在循環內 > 清除
+		if (!inContext) {
+			this.setWarningText(
+				window.languageManager.getMessage(warningKey) ||
+				'This block must be placed inside setup(), loop(), or a function to generate code.'
+			);
+		} else if (!inLoop) {
 			this.setWarningText(
 				window.languageManager.getMessage('CONTROLS_FLOW_STATEMENTS_WARNING') ||
-					'Break and continue statements can only be used within a loop.'
+				'Break and continue statements can only be used within a loop.'
 			);
+		} else {
+			this.setWarningText(null);
 		}
 	},
 };
+
+// ============================================================
+// 為 Blockly 內建控制積木添加孤立積木警告 onchange 回呼
+// ============================================================
+
+/**
+ * 通用孤立積木警告回呼
+ * 檢查積木是否在合法容器內，否則顯示警告
+ */
+function orphanWarningOnchange(e) {
+	if (!this.workspace || this.workspace.isFlyout) return;
+	if (e && e.type !== Blockly.Events.BLOCK_MOVE &&
+		e.type !== Blockly.Events.BLOCK_CREATE &&
+		e.type !== Blockly.Events.FINISHED_LOADING) return;
+
+	const isInContext = window.isInAllowedContext(this);
+	const warningKey = window.currentProgrammingLanguage === 'micropython'
+		? 'ORPHAN_BLOCK_WARNING_MICROPYTHON'
+		: 'ORPHAN_BLOCK_WARNING_ARDUINO';
+
+	if (isInContext) {
+		this.setWarningText(null);
+	} else {
+		this.setWarningText(
+			window.languageManager.getMessage(warningKey) ||
+			'This block must be placed inside setup(), loop(), or a function to generate code.'
+		);
+	}
+}
+
+// T031-T034: 循環類內建積木
+['controls_repeat_ext', 'controls_whileUntil', 'controls_for', 'controls_forEach'].forEach(function (blockType) {
+	if (Blockly.Blocks[blockType]) {
+		Blockly.Blocks[blockType].onchange = orphanWarningOnchange;
+	}
+});
+
+// T037: 條件判斷內建積木
+if (Blockly.Blocks['controls_if']) {
+	Blockly.Blocks['controls_if'].onchange = orphanWarningOnchange;
+}

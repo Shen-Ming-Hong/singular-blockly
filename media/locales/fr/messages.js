@@ -955,7 +955,8 @@ window.languageManager.loadMessages('fr', {
 	MONITOR_DEVICE_DISCONNECTED: 'Appareil CyberBrick déconnecté',
 	MONITOR_CONNECTION_FAILED: 'Échec de connexion à l\'appareil',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Moniteur mis en pause pour le téléchargement',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: 'Ce bloc doit être placé dans setup(), loop() ou une fonction pour générer du code.',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Ce bloc doit être placé dans main() ou une fonction pour générer du code.',
 });
-        MONITOR_DEVICE_DISCONNECTED: 'Appareil CyberBrick déconnecté',
-        MONITOR_CONNECTION_FAILED: 'Échec de connexion à l\'appareil',
-        MONITOR_CLOSED_FOR_UPLOAD: 'Moniteur mis en pause pour le téléchargement',

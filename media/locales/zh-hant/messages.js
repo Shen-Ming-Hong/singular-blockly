@@ -954,4 +954,8 @@ window.languageManager.loadMessages('zh-hant', {
 	MONITOR_DEVICE_DISCONNECTED: 'CyberBrick 裝置已斷線',
 	MONITOR_CONNECTION_FAILED: '無法連接到裝置',
 	MONITOR_CLOSED_FOR_UPLOAD: 'Monitor 已為上傳作業暫停',
+
+	// Orphan Block Warnings
+	ORPHAN_BLOCK_WARNING_ARDUINO: '此積木必須放在 setup()、loop() 或函式內才能產生程式碼。',
+	ORPHAN_BLOCK_WARNING_MICROPYTHON: '此積木必須放在 main() 或函式內才能產生程式碼。',
 });
