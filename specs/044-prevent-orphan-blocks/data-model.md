@@ -107,10 +107,11 @@ const ALLOWED_CONTAINERS = [
 
 | 欄位 | 型別 | 說明 |
 |------|------|------|
-| key | `string` | i18n 鍵值：`ORPHAN_BLOCK_WARNING` |
+| key_arduino | `string` | i18n 鍵值：`ORPHAN_BLOCK_WARNING_ARDUINO` |
+| key_micropython | `string` | i18n 鍵值：`ORPHAN_BLOCK_WARNING_MICROPYTHON` |
 | message | `Record<string, string>` | 15 個語系的翻譯字串 |
 
-**語系範例**:
+**語系範例（Arduino — 提及 setup()/loop()/函式）**:
 
 | 語系 | 訊息 |
 |------|------|
@@ -129,6 +130,26 @@ const ALLOWED_CONTAINERS = [
 | `hu` | `Ezt a blokkot a setup(), loop() vagy egy függvényen belül kell elhelyezni a kód generálásához.` |
 | `cs` | `Tento blok musí být umístěn uvnitř setup(), loop() nebo funkce pro generování kódu.` |
 | `bg` | `Този блок трябва да бъде поставен вътре в setup(), loop() или функция, за да генерира код.` |
+
+**語系範例（MicroPython — 提及 main()/函式）**:
+
+| 語系 | 訊息 |
+|------|------|
+| `en` | `This block must be placed inside main() or a function to generate code.` |
+| `zh-hant` | `此積木必須放在 main() 或函式內才能產生程式碼。` |
+| `ja` | `このブロックはコードを生成するために main() または関数の中に配置する必要があります。` |
+| `ko` | `이 블록은 코드를 생성하려면 main() 또는 함수 안에 배치해야 합니다.` |
+| `de` | `Dieser Block muss in main() oder einer Funktion platziert werden, um Code zu generieren.` |
+| `fr` | `Ce bloc doit être placé dans main() ou une fonction pour générer du code.` |
+| `es` | `Este bloque debe colocarse dentro de main() o una función para generar código.` |
+| `it` | `Questo blocco deve essere posizionato all'interno di main() o una funzione per generare codice.` |
+| `pt-br` | `Este bloco deve ser colocado dentro de main() ou uma função para gerar código.` |
+| `ru` | `Этот блок должен быть размещён внутри main() или функции для генерации кода.` |
+| `pl` | `Ten blok musi być umieszczony wewnątrz main() lub funkcji, aby wygenerować kod.` |
+| `tr` | `Bu blok, kod üretmek için main() veya bir fonksiyonun içine yerleştirilmelidir.` |
+| `hu` | `Ezt a blokkot a main() vagy egy függvényen belül kell elhelyezni a kód generálásához.` |
+| `cs` | `Tento blok musí být umístěn uvnitř main() nebo funkce pro generování kódu.` |
+| `bg` | `Този блок трябва да бъде поставен вътре в main() или функция, за да генерира код.` |
 
 ---
 

@@ -145,7 +145,7 @@ function onchange(this: Blockly.Block): void
 - **MUST** 使用 `isInAllowedContext(this)` 判斷積木是否孤立
 - **MUST** 在孤立時呼叫 `this.setWarningText(message)` 設定警告
 - **MUST** 在非孤立時呼叫 `this.setWarningText(null)` 清除警告
-- **MUST** 使用 `window.languageManager.getMessage('ORPHAN_BLOCK_WARNING')` 取得翻譯後的警告訊息
+- **MUST** 根據當前 generator 模式選擇對應的 i18n 鍵：Arduino 模式使用 `window.languageManager.getMessage('ORPHAN_BLOCK_WARNING_ARDUINO')`，MicroPython 模式使用 `window.languageManager.getMessage('ORPHAN_BLOCK_WARNING_MICROPYTHON')`
 - **MUST** 提供英文 fallback 訊息
 - **MUST NOT** 與 `singular_flow_statements` 已有的迴圈檢查衝突
 
@@ -165,13 +165,15 @@ function onchange(this: Blockly.Block): void
  * 必須在所有 15 個語系的 messages.js 中新增
  */
 interface OrphanBlockI18n {
-    /** 孤立積木警告訊息 */
-    ORPHAN_BLOCK_WARNING: string;
+    /** 孤立積木警告訊息（Arduino 模式 — 提及 setup()/loop()/函式） */
+    ORPHAN_BLOCK_WARNING_ARDUINO: string;
+    /** 孤立積木警告訊息（MicroPython 模式 — 提及 main()/函式） */
+    ORPHAN_BLOCK_WARNING_MICROPYTHON: string;
 }
 ```
 
 ### 行為規範
-- **MUST** 在所有 15 個語系檔案中新增 `ORPHAN_BLOCK_WARNING` 鍵值
-- **MUST** 所有訊息內容提及 `setup()`、`loop()` 和函式
+- **MUST** 在所有 15 個語系檔案中新增 `ORPHAN_BLOCK_WARNING_ARDUINO` 和 `ORPHAN_BLOCK_WARNING_MICROPYTHON` 鍵值
+- **MUST** Arduino 訊息內容提及 `setup()`、`loop()` 和函式；MicroPython 訊息內容提及 `main()` 和函式
 - **MUST** 英文作為 fallback 預設值
 - **MUST** 遵循 `window.languageManager.getMessage(key, defaultValue)` 呼叫模式

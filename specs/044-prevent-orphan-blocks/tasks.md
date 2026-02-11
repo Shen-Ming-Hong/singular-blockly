@@ -43,7 +43,7 @@
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
 - [ ] T005 Implement `workspaceToCode()` override for Arduino generator in `media/blockly/generators/arduino/index.js` — filter top-level blocks via `allowedTopLevelBlocks_`, add `// [Skipped] Orphan block: {type} (not in setup/loop/function)` comment for skipped blocks, preserve `alwaysGenerateBlocks_` mechanism (runs inside `arduino_setup_loop.forBlock`), follow MicroPython pattern at line 106-148
-- [ ] T006 Verify MicroPython generator `workspaceToCode()` in `media/blockly/generators/micropython/index.js` already has top-level filtering — confirm `allowedTopLevelBlocks_` is present and add skip comment format `# [Skipped] Orphan block: {type} (not in setup/loop/function)` if missing
+- [ ] T006 Enhance MicroPython generator `workspaceToCode()` in `media/blockly/generators/micropython/index.js` — confirm existing `allowedTopLevelBlocks_` filtering is present, then add skip comment format `# [Skipped] Orphan block: {type} (not in setup/loop/function)` for orphan blocks that are filtered out (currently silently skipped)
 
 **Checkpoint**: Foundation ready — both generators now filter orphan blocks at the top level. User story implementation can begin.
 
@@ -85,7 +85,7 @@
 - [ ] T024 [P] [US1] Add `isInAllowedContext` guard to `controls_forEach` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
 - [ ] T025 [P] [US1] Add `isInAllowedContext` guard to `controls_repeat_ext` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
 - [ ] T026 [P] [US1] Add `isInAllowedContext` guard to `controls_if` forBlock in `media/blockly/generators/micropython/logic.js` — return `''` if orphan
-- [ ] T027 [P] [US1] Add `isInAllowedContext` guard to `singular_flow_statements` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan
+- [ ] T027 [P] [US1] Add `isInAllowedContext` guard to `singular_flow_statements` forBlock in `media/blockly/generators/micropython/loops.js` — return `''` if orphan — NOTE: 目前 micropython/loops.js 使用 controls_flow_statements 鍵名，需先重命名為 singular_flow_statements 以匹配 blocks/loops.js 積木定義
 
 ### User Story 4 Integration (P1 — Regression Protection)
 
@@ -105,14 +105,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T031 [P] [US2] Add `onchange` orphan-warning callback to `controls_repeat_ext` block definition in `media/blockly/blocks/loops.js` — use `window.isInAllowedContext(this)` + `setWarningText()`
-- [ ] T032 [P] [US2] Add `onchange` orphan-warning callback to `controls_whileUntil` block definition in `media/blockly/blocks/loops.js`
-- [ ] T033 [P] [US2] Add `onchange` orphan-warning callback to `controls_for` block definition in `media/blockly/blocks/loops.js`
-- [ ] T034 [P] [US2] Add `onchange` orphan-warning callback to `controls_forEach` block definition in `media/blockly/blocks/loops.js`
+- [ ] T031 [P] [US2] Add `onchange` orphan-warning callback to `controls_repeat_ext` block definition in `media/blockly/blocks/loops.js` — use `window.isInAllowedContext(this)` + `setWarningText()` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
+- [ ] T032 [P] [US2] Add `onchange` orphan-warning callback to `controls_whileUntil` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
+- [ ] T033 [P] [US2] Add `onchange` orphan-warning callback to `controls_for` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
+- [ ] T034 [P] [US2] Add `onchange` orphan-warning callback to `controls_forEach` block definition in `media/blockly/blocks/loops.js` — NOTE: Blockly 內建積木，需透過 Extension/Mixin 或 post-init onchange 覆寫方式掛載（同 T037 策略）
 - [ ] T035 [P] [US2] Add `onchange` orphan-warning callback to `controls_duration` block definition in `media/blockly/blocks/loops.js` (Arduino-only, spec enhancement per RN-004)
 - [ ] T036 [US2] Integrate orphan-warning into existing `singular_flow_statements` `onchange` in `media/blockly/blocks/loops.js` — add orphan check with priority over loop warning per contract block-warning-events.md §1
 - [ ] T037 [US2] Add orphan-warning to `controls_if` (Blockly built-in) via Extension/Mixin or direct `onchange` assignment in `media/blockly/blocks/loops.js` — per RN-003, verify Blockly 12.x allows post-init `onchange` override
-- [ ] T038 [US2] Implement generator-mode detection in `onchange` callback to select correct i18n key (`ORPHAN_BLOCK_WARNING_ARDUINO` vs `ORPHAN_BLOCK_WARNING_MICROPYTHON`) per RN-001 and RN-008 — determine current generator mode via `window.currentGeneratorType` or similar mechanism
+- [ ] T038 [US2] Implement generator-mode detection in `onchange` callback to select correct i18n key (`ORPHAN_BLOCK_WARNING_ARDUINO` vs `ORPHAN_BLOCK_WARNING_MICROPYTHON`) per RN-001 and RN-008 — 使用 window.currentGeneratorType 全域變數判斷當前 generator 模式（需在 generator 切換時由 blocklyEdit.js 設定）
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently. Orphan blocks are visually flagged and produce no code.
 

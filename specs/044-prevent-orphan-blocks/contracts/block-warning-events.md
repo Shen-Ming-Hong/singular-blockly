@@ -31,19 +31,29 @@
  * 孤立積木警告 onchange 回呼
  * 適用於所有控制流程積木
  */
-onchange: function () {
+onchange: function (e) {
     // 1. 檢查積木是否在工作區中（排除 flyout 中的積木）
     if (!this.workspace || this.workspace.isFlyout) return;
 
-    // 2. 使用共用 helper 檢查合法容器
+    // 2. 僅在相關事件時檢查（避免不必要的運算）
+    if (e && e.type !== Blockly.Events.BLOCK_MOVE &&
+        e.type !== Blockly.Events.BLOCK_CREATE &&
+        e.type !== Blockly.Events.FINISHED_LOADING) return;
+
+    // 3. 使用共用 helper 檢查合法容器
     const isInContext = isInAllowedContext(this);
 
-    // 3. 設定或清除警告
+    // 4. 根據 generator 模式選擇對應的 i18n 鍵
+    const warningKey = window.currentGeneratorType === 'micropython'
+        ? 'ORPHAN_BLOCK_WARNING_MICROPYTHON'
+        : 'ORPHAN_BLOCK_WARNING_ARDUINO';
+
+    // 5. 設定或清除警告
     if (isInContext) {
         this.setWarningText(null);
     } else {
         this.setWarningText(
-            window.languageManager.getMessage('ORPHAN_BLOCK_WARNING') ||
+            window.languageManager.getMessage(warningKey) ||
             'This block must be placed inside setup(), loop(), or a function to generate code.'
         );
     }
@@ -57,8 +67,13 @@ onchange: function () {
  * singular_flow_statements 擴展後的 onchange
  * 需同時檢查「迴圈內」與「合法容器內」
  */
-onchange: function () {
+onchange: function (e) {
     if (!this.workspace || this.workspace.isFlyout) return;
+
+    // 0. 僅在相關事件時檢查（避免不必要的運算）
+    if (e && e.type !== Blockly.Events.BLOCK_MOVE &&
+        e.type !== Blockly.Events.BLOCK_CREATE &&
+        e.type !== Blockly.Events.FINISHED_LOADING) return;
 
     // 1. 原有的迴圈檢查
     let inLoop = false;
@@ -76,10 +91,15 @@ onchange: function () {
     // 2. 孤立容器檢查
     const inContext = isInAllowedContext(this);
 
-    // 3. 警告優先序：孤立 > 不在迴圈內
+    // 3. 根據 generator 模式選擇對應的 i18n 鍵
+    const warningKey = window.currentGeneratorType === 'micropython'
+        ? 'ORPHAN_BLOCK_WARNING_MICROPYTHON'
+        : 'ORPHAN_BLOCK_WARNING_ARDUINO';
+
+    // 4. 警告優先序：孤立 > 不在迴圈內
     if (!inContext) {
         this.setWarningText(
-            window.languageManager.getMessage('ORPHAN_BLOCK_WARNING') ||
+            window.languageManager.getMessage(warningKey) ||
             'This block must be placed inside setup(), loop(), or a function to generate code.'
         );
     } else if (!inLoop) {

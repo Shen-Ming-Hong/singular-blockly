@@ -99,7 +99,7 @@
 
 - **FR-001**: 系統 MUST 在程式碼生成時過濾掉所有不在合法頂層容器內的頂層積木，僅為允許的頂層積木類型生成程式碼（Clarification: 預設允許頂層積木清單 - Arduino: `arduino_setup_loop`, `arduino_function`, `procedures_defnoreturn`, `procedures_defreturn`; MicroPython: `micropython_main` 及函式定義）。
 - **FR-002**: 系統 MUST 提供一個共用的上下文檢查機制，用以判斷任意積木是否位於合法容器（`setup()`、`loop()` 或自訂函式）之內
-- **FR-003**: 系統 MUST 僅在下列列舉的控制/流程積木之 forBlock 中加入合法容器檢查作為深層防護（guard）：`controls_whileUntil`、`controls_for`、`controls_forEach`、`controls_repeat_ext`、`controls_if`、`controls_flow_statements`（break/continue）。若不在合法容器內則回傳空字串不生成程式碼。其餘非列舉積木由 `workspaceToCode` 頂層過濾機制（FR-001）統一處理（Clarification: 僅列舉控制/流程積木加 guard，保持實作最小化，依賴 workspaceToCode 提供更廣泛覆蓋）
+- **FR-003**: 系統 MUST 僅在下列列舉的控制/流程積木之 forBlock 中加入合法容器檢查作為深層防護（guard）：`controls_whileUntil`、`controls_for`、`controls_forEach`、`controls_repeat_ext`、`controls_if`、`controls_flow_statements`（程式碼中為 singular_flow_statements）（break/continue）。若不在合法容器內則回傳空字串不生成程式碼。其餘非列舉積木由 `workspaceToCode` 頂層過濾機制（FR-001）統一處理（Clarification: 僅列舉控制/流程積木加 guard，保持實作最小化，依賴 workspaceToCode 提供更廣泛覆蓋）
 - **FR-004**: 系統 MUST 對 Arduino C++ generator 與 MicroPython generator 同時實施上述過濾與防護
 - **FR-005**: 系統 MUST 在孤立的控制積木上顯示視覺化警告訊息，告知使用者需將積木放入合法容器（Clarification: 警告訊息為 generator-specific，Arduino 模式提及 `setup()`/`loop()`/函式，MicroPython 模式提及 `main()`/函式，使用各自獨立的 i18n 鍵）
 - **FR-006**: 系統 MUST 在積木被移入合法容器後自動清除該警告
