@@ -10,6 +10,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.65.1] - 2026-02-12
+
+### 安全性修復 Security Fixes
+
+-   **修復 webpack buildHttp SSRF 漏洞 (CVE-2025-68458)** (Fix webpack buildHttp SSRF vulnerability)
+
+    -   升級 `webpack` 從 5.102.1 至 5.105.1
+        Upgraded `webpack` from 5.102.1 to 5.105.1
+    -   allowedUris 允許清單可透過 URL userinfo (@) 繞過，導致建置時期 SSRF 行為
+        allowedUris allow-list bypass via URL userinfo (@) leading to build-time SSRF behavior
+    -   嚴重程度：Low (CVSS 4.0: 3.7)
+        Severity: Low (CVSS 4.0: 3.7)
+    -   關閉 Dependabot Alert #23
+        Closes Dependabot Alert #23
+
+-   **修復 webpack buildHttp HTTP 重定向繞過漏洞 (CVE-2025-68157)** (Fix webpack buildHttp HTTP redirect bypass vulnerability)
+
+    -   升級 `webpack` 從 5.102.1 至 5.105.1
+        Upgraded `webpack` from 5.102.1 to 5.105.1
+    -   HttpUriPlugin allowedUris 可透過 HTTP 重定向繞過，導致 SSRF 與快取持久化
+        HttpUriPlugin allowedUris bypass via HTTP redirects leading to SSRF and cache persistence
+    -   嚴重程度：Low (CVSS 4.0: 3.7)
+        Severity: Low (CVSS 4.0: 3.7)
+    -   關閉 Dependabot Alert #22
+        Closes Dependabot Alert #22
+
 ## [0.65.0] - 2026-02-12
 
 ### 新功能 Added
