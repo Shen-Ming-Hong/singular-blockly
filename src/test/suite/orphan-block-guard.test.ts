@@ -25,7 +25,6 @@ import * as assert from 'assert';
 function createMockBlock(type: string, parentChain: Array<{ type: string }> = []): any {
 	let callIndex = 0;
 	const chain = parentChain.map(p => {
-		let pCallIndex = 0;
 		// Each parent in the chain also needs getSurroundParent
 		return {
 			type: p.type,
@@ -111,12 +110,6 @@ suite('Orphan Block Guard Tests', () => {
 	suite('isInAllowedContext — 多層嵌套 (RN-006 T1)', () => {
 		test('Arduino: nested block (setup_loop > if > while) returns true', () => {
 			// while is inside if, which is inside arduino_setup_loop
-			const block = createMockBlock('controls_whileUntil', [
-				{ type: 'controls_if' },
-				{ type: 'arduino_setup_loop' },
-			]);
-
-			// Rebuild with proper chain traversal
 			let callIdx = 0;
 			const parents: Array<{ type: string; getSurroundParent: () => any }> = [
 				{ type: 'controls_if', getSurroundParent: () => parents[1] },

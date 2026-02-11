@@ -75,8 +75,8 @@ window.arduinoGenerator.workspaceToCode = function (workspace) {
 				// Value block 返回 [code, order]
 				// 頂層的 value block 應該被忽略
 			}
-		} else {
-			// 孤立積木：加上跳過註解
+		} else if (!(this.alwaysGenerateBlocks_ && this.alwaysGenerateBlocks_.includes(block.type))) {
+			// 孤立積木：加上跳過註解（排除 alwaysGenerateBlocks_ 中的積木）
 			code += `// [Skipped] Orphan block: ${block.type} (not in setup/loop/function)\n`;
 		}
 	}

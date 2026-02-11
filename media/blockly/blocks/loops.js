@@ -169,21 +169,34 @@ function orphanWarningOnchange(e) {
 	if (isInContext) {
 		this.setWarningText(null);
 	} else {
+		const fallbackText = window.currentProgrammingLanguage === 'micropython'
+			? 'This block must be placed inside main() or a function to generate code.'
+			: 'This block must be placed inside setup(), loop(), or a function to generate code.';
 		this.setWarningText(
-			window.languageManager.getMessage(warningKey) ||
-			'This block must be placed inside setup(), loop(), or a function to generate code.'
+			window.languageManager.getMessage(warningKey) || fallbackText
 		);
 	}
+}
+
+// 包裝 onchange handler，保留原有的 handler
+function wrapOnchange(blockDef, newHandler) {
+	const originalOnchange = blockDef.onchange;
+	blockDef.onchange = function (e) {
+		if (originalOnchange) {
+			originalOnchange.call(this, e);
+		}
+		newHandler.call(this, e);
+	};
 }
 
 // T031-T034: 循環類內建積木
 ['controls_repeat_ext', 'controls_whileUntil', 'controls_for', 'controls_forEach'].forEach(function (blockType) {
 	if (Blockly.Blocks[blockType]) {
-		Blockly.Blocks[blockType].onchange = orphanWarningOnchange;
+		wrapOnchange(Blockly.Blocks[blockType], orphanWarningOnchange);
 	}
 });
 
 // T037: 條件判斷內建積木
 if (Blockly.Blocks['controls_if']) {
-	Blockly.Blocks['controls_if'].onchange = orphanWarningOnchange;
+	wrapOnchange(Blockly.Blocks['controls_if'], orphanWarningOnchange);
 }

@@ -11,7 +11,7 @@ window.arduinoGenerator.forBlock['controls_repeat_ext'] = function (block) {
 		return '';
 	}
 
-	const repeats= window.arduinoGenerator.valueToCode(block, 'TIMES', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
+	const repeats = window.arduinoGenerator.valueToCode(block, 'TIMES', window.arduinoGenerator.ORDER_ASSIGNMENT) || '0';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 	// 使用固定的變數名稱模式
 	const loopVar = '_i' + Math.floor(Math.random() * 10000);
@@ -25,7 +25,7 @@ window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
 		return '';
 	}
 
-	const until= block.getFieldValue('MODE') === 'UNTIL';
+	const until = block.getFieldValue('MODE') === 'UNTIL';
 	const argument0 = window.arduinoGenerator.valueToCode(block, 'BOOL', window.arduinoGenerator.ORDER_NONE) || 'false';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 
