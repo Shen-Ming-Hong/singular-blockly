@@ -77,11 +77,11 @@ media/
 │   │       └── logic.js                # 修改：controls_if forBlock 加入 context guard
 │   └── themes/                         # 不修改
 ├── locales/
-│   ├── en/messages.js                  # 修改：新增 ORPHAN_BLOCK_WARNING 鍵值
-│   ├── zh-hant/messages.js             # 修改：新增 ORPHAN_BLOCK_WARNING 鍵值
-│   └── [其他 13 個語系]/messages.js     # 修改：新增 ORPHAN_BLOCK_WARNING 鍵值
+│   ├── en/messages.js                  # 修改：新增 ORPHAN_BLOCK_WARNING_ARDUINO / ORPHAN_BLOCK_WARNING_MICROPYTHON 鍵值（見 spec FR-008）
+│   ├── zh-hant/messages.js             # 修改：新增 ORPHAN_BLOCK_WARNING_ARDUINO / ORPHAN_BLOCK_WARNING_MICROPYTHON 鍵值
+│   └── [其他 13 個語系]/messages.js     # 修改：新增 ORPHAN_BLOCK_WARNING_ARDUINO / ORPHAN_BLOCK_WARNING_MICROPYTHON 鍵值
 └── js/
-    └── blocklyEdit.js                  # 可能修改：workspace change listener 觸發 orphan 檢查
+    └── blocklyEdit.js                  # 預計不修改：block.onchange 已涵蓋觸發場景（見合約 block-warning-events.md §3）
 
 src/
 ├── test/
@@ -127,3 +127,135 @@ src/
 | 積木警告事件合約 | `specs/044-prevent-orphan-blocks/contracts/block-warning-events.md` | Phase 1 |
 | 快速開始指南 | `specs/044-prevent-orphan-blocks/quickstart.md` | Phase 1 |
 | Agent 上下文更新 | `.github/agents/copilot-instructions.md` | Phase 1 |
+
+---
+
+## 審查備註與待辦事項（Review Pass 2025-07-15）
+
+> 以下為 plan.md 審查後發現的差異、補充說明與待解決事項，供 `/speckit.tasks` 與實作階段參考。
+
+### RN-001：i18n 鍵名稱 — spec 要求 generator-specific，下游產出物仍用單一鍵
+
+**嚴重度**: 高（spec 違規）
+
+spec.md FR-008 明確要求：
+
+> 「因警告訊息為 generator-specific，需為 Arduino 與 MicroPython 各建立獨立的 i18n 鍵，例如 `ORPHAN_BLOCK_WARNING_ARDUINO` 與 `ORPHAN_BLOCK_WARNING_MICROPYTHON`」
+
+但以下產出物仍使用單一 `ORPHAN_BLOCK_WARNING` 鍵：
+
+| 產出物 | 影響位置 |
+|--------|----------|
+| research.md | §6 翻譯鍵值設計 |
+| data-model.md | §5 OrphanBlockWarning 實體 |
+| contracts/generator-interfaces.md | 合約 5 i18n 鍵值 |
+| contracts/block-warning-events.md | 合約 1 onchange 回呼範例 |
+| quickstart.md | 開發指南範例 + 語系翻譯範例 |
+
+**TODO**: 實作階段須依 spec FR-008 使用雙鍵：
+- `ORPHAN_BLOCK_WARNING_ARDUINO`：「此積木必須放在 setup()、loop() 或函式內才能產生程式碼。」
+- `ORPHAN_BLOCK_WARNING_MICROPYTHON`：「此積木必須放在 main() 或函式內才能產生程式碼。」
+
+block.onchange 回呼需偵測當前 generator 模式以選擇正確的 i18n 鍵。
+
+---
+
+### RN-002：積木類型名稱差異 — `controls_flow_statements` vs `singular_flow_statements`
+
+**嚴重度**: 中（名稱映射）
+
+spec.md FR-003 與 Clarification Session 2 Q2 使用 `controls_flow_statements`，但程式碼中的實際積木類型為 `singular_flow_statements`（定義於 `media/blockly/blocks/loops.js:31-90`）。
+
+research.md、data-model.md、block-warning-events.md 已正確使用 `singular_flow_statements`。
+
+**結論**: 實作時使用 `singular_flow_statements`。spec 中的 `controls_flow_statements` 應理解為概念名稱；此為專案自訂積木，非 Blockly 內建的 `controls_flow_statements`。
+
+---
+
+### RN-003：`controls_if` 為 Blockly 內建積木 — 需透過 Extension/Mixin 機制整合 onchange
+
+**嚴重度**: 中（實作方案）
+
+block-warning-events.md 已註明「controls_if | Blockly 內建 | 無自訂 | 透過 Extension 新增」，但未具體說明技術方案。
+
+可行方案（依優先順序）：
+1. **直接掛載**：`Blockly.Blocks['controls_if'].onchange = function() { ... }`（在 blocks/loops.js 載入後執行）
+2. **Blockly Extension**：`Blockly.Extensions.register('orphan_warning', function() { this.setOnChange(...) })` 並在 JSON 定義中註冊
+3. **Mixin**：`Blockly.Extensions.registerMixin('orphan_warning_mixin', { onchange: ... })`
+
+**TODO**: 實作時確認 Blockly 12.x 是否允許在積木已初始化後覆寫 `onchange`；若不允許則需使用 Extension 方案。
+
+---
+
+### RN-004：`controls_duration` 超出 spec FR-003 列舉範圍
+
+**嚴重度**: 低（增強項目）
+
+research.md §5 與 data-model.md §3 將 `controls_duration`（Arduino 專用計時迴圈）納入受防護積木，但 spec FR-003 的列舉清單未包含此積木。
+
+**結論**: `controls_duration` 為合理的增強項目（Arduino 專用迴圈積木，語義上與 `controls_whileUntil` 等效）。實作時應一併加入 guard，但需在 tasks.md 中標註為「spec 增強」。
+
+---
+
+### RN-005：`isInAllowedContext` 雙重放置 — 全域 vs Generator 方法
+
+**嚴重度**: 中（架構決策）
+
+目前合約中存在兩種呼叫方式：
+
+| 使用場景 | 呼叫方式 | 容器清單 | 來源 |
+|----------|----------|----------|------|
+| Generator forBlock guard | `window.arduinoGenerator.isInAllowedContext(block)` | Generator-specific | contracts/generator-interfaces.md |
+| Block onchange 警告 | `window.isInAllowedContext(block)` | 合併清單 | contracts/block-warning-events.md |
+
+**分析**: 兩種方式均合理 —— Generator 內的 guard 只需檢查自身容器清單；Block 的 onchange 無法預知當前 generator 模式，故使用合併清單（若積木在任一 generator 的合法容器內即可）。
+
+**TODO**: 實作時確認此設計意圖：
+- `window.isInAllowedContext(block)` — 全域版本，合併 Arduino + MicroPython 容器清單，供 block.onchange 使用
+- `window.arduinoGenerator.isInAllowedContext(block)` — Generator 版本，僅含自身容器，供 forBlock guard 使用
+- 兩者可共用核心邏輯，差異僅在容器清單參數
+
+---
+
+### RN-006：缺少的測試案例
+
+plan.md 僅規劃了 `isInAllowedContext` 單元測試（`orphan-block-guard.test.ts`），但以下場景亦需涵蓋：
+
+| # | 測試場景 | 類型 | 優先度 |
+|---|----------|------|--------|
+| T1 | `isInAllowedContext` — 多層嵌套（loop > if > while）回傳 true | 單元 | P1 |
+| T2 | `isInAllowedContext` — 嵌套孤立（orphan if > while）回傳 false | 單元 | P1 |
+| T3 | `isInAllowedContext` — 直接在合法容器中回傳 true | 單元 | P1 |
+| T4 | `isInAllowedContext` — 頂層積木（無父層）回傳 false | 單元 | P1 |
+| T5 | `isInAllowedContext` — 不同容器類型（procedures_defnoreturn, arduino_function）| 單元 | P1 |
+| T6 | `workspaceToCode` 過濾 — 孤立積木被跳過 | 單元 | P1 |
+| T7 | `workspaceToCode` 過濾 — 被跳過積木產生正確註解格式 | 單元 | P2 |
+| T8 | `workspaceToCode` 過濾 — `alwaysGenerateBlocks_` 不受影響 | 單元 | P1 |
+| T9 | forBlock guard — 孤立時回傳空字串 | 單元 | P1 |
+| T10 | forBlock guard — 合法位置時回傳有效程式碼 | 單元 | P1 |
+| T11 | `controls_duration` guard（Arduino 專用）| 單元 | P2 |
+| T12 | Generator-specific 警告訊息文字驗證 | 單元 | P2 |
+| T13 | `singular_flow_statements` onchange 整合 — 孤立警告優先於迴圈警告 | 手動 | P2 |
+| T14 | 複製貼上孤立積木後觸發警告 | 手動 | P2 |
+| T15 | Undo/Redo 後警告狀態正確更新 | 手動 | P2 |
+
+---
+
+### RN-007：`blocklyEdit.js` 修改判定
+
+plan.md 原標記 `blocklyEdit.js` 為「可能修改」。根據 block-warning-events.md 合約 3 的結論：
+
+> 「不需要額外的 workspace change listener — Blockly 的 onchange 機制已涵蓋所有需要的觸發場景」
+
+**結論**: `blocklyEdit.js` 預計不需要修改。已更新專案結構中的註解。若實作時發現特定事件（如 generator 模式切換）需要 workspace listener，再行評估。
+
+---
+
+### RN-008：合約中 onchange 的 generator 模式偵測未規範
+
+block-warning-events.md 合約 1 的 onchange 範例使用固定的 i18n 鍵與固定的 fallback 訊息（提及 setup/loop）。但依 RN-001（generator-specific i18n），onchange 需知道當前 generator 模式以選擇正確的鍵值。
+
+**TODO**: 實作時需確認如何在 block.onchange 內偵測當前 generator 模式。可行方案：
+1. 檢查 `window.arduinoGenerator` 或 `window.micropythonGenerator` 是否為活躍 generator
+2. 使用全域變數（如 `window.currentGeneratorType`）
+3. 由 `blocklyEdit.js` 在 generator 切換時設定模式標記
