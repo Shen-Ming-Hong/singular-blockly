@@ -10,6 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.65.2] - 2026-02-12
+
+### 🌐 i18n | 國際化
+
+-   **翻譯 Arduino 錯誤訊息至日文、韓文、德文、西班牙文** (Translate Arduino error messages to Japanese, Korean, German, Spanish)
+
+    -   為 Arduino 編譯/上傳錯誤訊息新增多語系翻譯
+        Added multilingual translations for Arduino compile/upload error messages
+    -   涵蓋語言：日文 (ja)、韓文 (ko)、德文 (de)、西班牙文 (es)
+        Languages covered: Japanese (ja), Korean (ko), German (de), Spanish (es)
+    -   關閉 Issues #57, #59 — PR #60
+        Closes Issues #57, #59 — PR #60
+
 ## [0.65.1] - 2026-02-12
 
 ### 安全性修復 Security Fixes
