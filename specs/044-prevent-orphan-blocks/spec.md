@@ -12,6 +12,10 @@
 - Q1: 預設允許哪些頂層積木以產生程式碼？ → A: Option A（使用預設允許頂層積木清單：Arduino: `arduino_setup_loop`, `arduino_function`, `procedures_defnoreturn`, `procedures_defreturn`; MicroPython: `micropython_main` 及函式定義）。
 - Q2: 要在輸出程式碼中如何標記被跳過的孤立積木？ → A: Option A（在輸出程式碼中加入註解，包含積木 type 與簡短定位說明）。
 
+### Session 2026-02-11 (2)
+
+- Q1: 孤立積木的警告訊息應為 generator-specific 還是通用訊息？ → A: Option A（Generator-specific — 各 generator 使用專屬 i18n 鍵，Arduino 提及 `setup()`/`loop()`/函式，MicroPython 提及 `main()`/函式。理由：避免 Arduino 與 MicroPython 使用者混淆，且實作複雜度低）。
+- Q2: 個別 forBlock guard（FR-003）應涵蓋所有積木類型，還是僅列舉的控制/流程積木？ → A: Option A（僅對列舉的控制/流程積木加入 guard：`controls_whileUntil`、`controls_for`、`controls_forEach`、`controls_repeat_ext`、`controls_if`、`controls_flow_statements`（break/continue）；其餘積木由 `workspaceToCode` 過濾處理。理由：保持實作最小化，依賴 workspaceToCode 提供更廣泛的覆蓋）。
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -95,12 +99,12 @@
 
 - **FR-001**: 系統 MUST 在程式碼生成時過濾掉所有不在合法頂層容器內的頂層積木，僅為允許的頂層積木類型生成程式碼（Clarification: 預設允許頂層積木清單 - Arduino: `arduino_setup_loop`, `arduino_function`, `procedures_defnoreturn`, `procedures_defreturn`; MicroPython: `micropython_main` 及函式定義）。
 - **FR-002**: 系統 MUST 提供一個共用的上下文檢查機制，用以判斷任意積木是否位於合法容器（`setup()`、`loop()` 或自訂函式）之內
-- **FR-003**: 系統 MUST 在各控制流程類積木（迴圈、條件判斷、流程控制語句）的程式碼生成邏輯中，加入合法容器檢查作為深層防護，若不在合法容器內則不生成程式碼
+- **FR-003**: 系統 MUST 僅在下列列舉的控制/流程積木之 forBlock 中加入合法容器檢查作為深層防護（guard）：`controls_whileUntil`、`controls_for`、`controls_forEach`、`controls_repeat_ext`、`controls_if`、`controls_flow_statements`（break/continue）。若不在合法容器內則回傳空字串不生成程式碼。其餘非列舉積木由 `workspaceToCode` 頂層過濾機制（FR-001）統一處理（Clarification: 僅列舉控制/流程積木加 guard，保持實作最小化，依賴 workspaceToCode 提供更廣泛覆蓋）
 - **FR-004**: 系統 MUST 對 Arduino C++ generator 與 MicroPython generator 同時實施上述過濾與防護
-- **FR-005**: 系統 MUST 在孤立的控制積木上顯示視覺化警告訊息，告知使用者需將積木放入合法容器
+- **FR-005**: 系統 MUST 在孤立的控制積木上顯示視覺化警告訊息，告知使用者需將積木放入合法容器（Clarification: 警告訊息為 generator-specific，Arduino 模式提及 `setup()`/`loop()`/函式，MicroPython 模式提及 `main()`/函式，使用各自獨立的 i18n 鍵）
 - **FR-006**: 系統 MUST 在積木被移入合法容器後自動清除該警告
 - **FR-007**: 系統 MUST 保留現有的「始終生成」積木機制（如 `servo_setup`、`encoder_setup` 等已註冊的 setup 類積木），確保這些積木即使放在頂層仍能正常生成程式碼
-- **FR-008**: 系統 MUST 為警告訊息提供多語系支援，涵蓋專案現有的所有語系檔案
+- **FR-008**: 系統 MUST 為警告訊息提供多語系支援，涵蓋專案現有的所有語系檔案（Clarification: 因警告訊息為 generator-specific，需為 Arduino 與 MicroPython 各建立獨立的 i18n 鍵，例如 `ORPHAN_BLOCK_WARNING_ARDUINO` 與 `ORPHAN_BLOCK_WARNING_MICROPYTHON`）
 - **FR-009**: 系統 MUST 確保正確嵌套在合法容器內的控制積木不受任何影響，程式碼生成行為與修改前完全一致
 - **FR-010**: 系統 MUST 在工作區變更事件（包含拖放、複製貼上、Undo/Redo）後重新評估積木的孤立狀態
 
