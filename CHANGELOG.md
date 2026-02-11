@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.65.0] - 2026-02-12
+
+### 新功能 Added
+
+- **防止孤立積木產生無效程式碼** (Prevent orphan blocks from generating invalid code)
+    - 三層防護機制：workspaceToCode 過濾器跳過未連接積木、forBlock 守衛阻止孤立積木生成程式碼、onchange 視覺警告提示使用者
+      Three-layer protection: workspaceToCode filter skips unconnected blocks, forBlock guard prevents orphan block code generation, onchange visual warning alerts users
+    - Arduino 與 MicroPython 生成器各自提供在地化警告訊息，支援全部 15 種語言
+      Generator-specific i18n warnings for Arduino and MicroPython, supporting all 15 locales
+    - 492 個測試全數通過
+      492 tests passing
+
 ## [0.64.0] - 2026-02-10
 
 ### 新功能 Added
