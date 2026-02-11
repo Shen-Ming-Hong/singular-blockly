@@ -814,11 +814,11 @@ window.languageManager.loadMessages('ja', {
 	ERROR_ARDUINO_UPLOAD_FAILED: 'アップロードに失敗しました',
 	ERROR_ARDUINO_NO_WORKSPACE: '先にプロジェクトフォルダを開いてください',
 	ERROR_ARDUINO_TIMEOUT: '操作がタイムアウトしました',
-	ERROR_ARDUINO_NO_DEVICE: 'No device detected. Please connect your board.',
-	ERROR_ARDUINO_PORT_BUSY: 'Port is in use by another program. Close other serial monitors.',
-	ERROR_ARDUINO_DEVICE_DISCONNECT: 'Device disconnected during upload.',
-	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Upload timed out. Check your connection.',
-	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Upload failed. Check device connection.',
+	ERROR_ARDUINO_NO_DEVICE: 'デバイスが検出されません。ボードが接続されているか確認してください。',
+	ERROR_ARDUINO_PORT_BUSY: 'ポートは他のプログラムで使用中です。他のシリアルモニターを閉じてください。',
+	ERROR_ARDUINO_DEVICE_DISCONNECT: 'アップロード中にデバイスが切断されました。',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'アップロードがタイムアウトしました。接続を確認してください。',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'アップロードに失敗しました。デバイスの接続を確認してください。',
 
 	// Backup messages
 	BACKUP_CONFIRM_DELETE: 'バックアップ「{0}」を削除してもよろしいですか？',
