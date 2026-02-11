@@ -53,29 +53,7 @@ Blockly.Blocks['controls_duration'] = {
 		this.setStyle('loop_blocks');
 		this.setTooltip('在指定的時間內重複執行程式');
 		this.setHelpUrl('');
-	},
-
-	// 孤立積木警告：檢查是否在合法容器內
-	onchange: function (e) {
-		if (!this.workspace || this.workspace.isFlyout) return;
-		if (e && e.type !== Blockly.Events.BLOCK_MOVE &&
-			e.type !== Blockly.Events.BLOCK_CREATE &&
-			e.type !== Blockly.Events.FINISHED_LOADING) return;
-
-		const isInContext = window.isInAllowedContext(this);
-		const warningKey = window.currentProgrammingLanguage === 'micropython'
-			? 'ORPHAN_BLOCK_WARNING_MICROPYTHON'
-			: 'ORPHAN_BLOCK_WARNING_ARDUINO';
-
-		if (isInContext) {
-			this.setWarningText(null);
-		} else {
-			this.setWarningText(
-				window.languageManager.getMessage(warningKey) ||
-				'This block must be placed inside setup(), loop(), or a function to generate code.'
-			);
-		}
-	},
+	}
 };
 
 Blockly.Blocks['singular_flow_statements'] = {
@@ -189,14 +167,12 @@ function wrapOnchange(blockDef, newHandler) {
 	};
 }
 
-// T031-T034: 循環類內建積木
-['controls_repeat_ext', 'controls_whileUntil', 'controls_for', 'controls_forEach'].forEach(function (blockType) {
+// T031-T037: 循環類與條件判斷內建積木
+['controls_repeat_ext', 'controls_whileUntil', 'controls_for', 'controls_forEach', 'controls_if'].forEach(function (blockType) {
 	if (Blockly.Blocks[blockType]) {
 		wrapOnchange(Blockly.Blocks[blockType], orphanWarningOnchange);
 	}
 });
 
-// T037: 條件判斷內建積木
-if (Blockly.Blocks['controls_if']) {
-	wrapOnchange(Blockly.Blocks['controls_if'], orphanWarningOnchange);
-}
+// controls_duration 無原生 onchange，直接指定
+Blockly.Blocks['controls_duration'].onchange = orphanWarningOnchange;

@@ -28,17 +28,11 @@ window.arduinoGenerator.allowedTopLevelBlocks_ = [
  * @returns {boolean} true 表示在合法容器內，false 表示孤立
  */
 window.arduinoGenerator.isInAllowedContext = function (block) {
-	const allowedContainers = [
-		'arduino_setup_loop',
-		'arduino_function',
-		'procedures_defnoreturn',
-		'procedures_defreturn',
-	];
 	let current = block;
 	while (current) {
 		current = current.getSurroundParent();
 		if (!current) return false;
-		if (allowedContainers.includes(current.type)) return true;
+		if (this.allowedTopLevelBlocks_.includes(current.type)) return true;
 	}
 	return false;
 };

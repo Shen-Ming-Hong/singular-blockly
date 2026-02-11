@@ -57,8 +57,8 @@ function isInAllowedContext(
 	let current: any = block;
 	while (current) {
 		current = current.getSurroundParent();
-		if (!current) return false;
-		if (allowedContainers.includes(current.type)) return true;
+		if (!current) { return false; }
+		if (allowedContainers.includes(current.type)) { return true; }
 	}
 	return false;
 }
