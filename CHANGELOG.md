@@ -10,6 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.65.3] - 2026-02-12
+
+### 🐛 Bug Fixes | 修復
+
+-   **移除 RC 積木選單中多餘的 rc_get_button 積木** (Remove redundant rc_get_button from RC toolbox)
+
+    -   CyberBrick RC 積木選單與 X12 保持一致，只顯示帶 "?" 的 `rc_is_button_pressed` 積木
+        Align RC toolbox with X12 by only showing `rc_is_button_pressed` block
+    -   保留 block 定義與 generator 以維持向後相容
+        Block definition and generator preserved for backward compatibility
+    -   關閉 PR #61
+        Closes PR #61
+
 ## [0.65.2] - 2026-02-12
 
 ### 🌐 i18n | 國際化
