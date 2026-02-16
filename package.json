@@ -51,6 +51,39 @@
 				"command": "singular-blockly.checkMcpStatus",
 				"title": "%command.checkMcpStatus.title%",
 				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.showAIStatusMenu",
+				"title": "Singular Blockly: AI Suggestions Settings",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.toggleAutoTrigger",
+				"title": "Singular Blockly: Toggle AI Auto-Trigger",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.selectAIModel",
+				"title": "Singular Blockly: Select AI Model",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.openAISettings",
+				"title": "Singular Blockly: Open AI Settings",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.triggerAISuggestion",
+				"title": "Singular Blockly: Trigger AI Block Suggestion",
+				"category": "Singular Blockly"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "singular-blockly.triggerAISuggestion",
+				"key": "ctrl+shift+.",
+				"mac": "cmd+shift+.",
+				"when": "activeWebviewPanelId == 'blocklyEdit'"
 			}
 		],
 		"viewsContainers": {
@@ -90,6 +123,35 @@
 					"default": true,
 					"markdownDescription": "%config.mcp.showStartupWarning.description%",
 					"scope": "machine-overridable"
+				},
+				"singularBlockly.ai.enabled": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Enable/disable AI shadow block suggestions. Requires GitHub Copilot extension."
+				},
+				"singularBlockly.ai.autoTrigger": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Automatically trigger AI suggestions when editing blocks. Suggestions are throttled to conserve Copilot quota."
+				},
+				"singularBlockly.ai.model": {
+					"type": "string",
+					"default": "gpt-4o-mini",
+					"markdownDescription": "Language model to use for AI suggestions. Only lightweight models suitable for fast suggestions are listed. Available models depend on your Copilot plan."
+				},
+				"singularBlockly.ai.triggerDelay": {
+					"type": "number",
+					"default": 1500,
+					"minimum": 500,
+					"maximum": 10000,
+					"markdownDescription": "Delay in milliseconds before triggering AI suggestion after a workspace change."
+				},
+				"singularBlockly.ai.maxSuggestionsPerMinute": {
+					"type": "number",
+					"default": 5,
+					"minimum": 1,
+					"maximum": 30,
+					"markdownDescription": "Maximum number of AI suggestion requests per minute."
 				}
 			}
 		}
