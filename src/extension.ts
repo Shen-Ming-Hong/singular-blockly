@@ -14,9 +14,14 @@ import { WebViewManager } from './webview/webviewManager';
 import { registerMcpProvider } from './mcp/mcpProvider';
 import { NodeDetectionService } from './services/nodeDetectionService';
 import { DiagnosticService } from './services/diagnosticService';
+import { AIModelManager } from './services/aiModelManager';
+import { AIStatusBar } from './services/aiStatusBar';
 
 // Status bar priority constant
 const STATUS_BAR_PRIORITY = 100;
+
+// AI model manager (initialized when Copilot is available)
+let aiModelManager: AIModelManager | undefined;
 
 // VSCode API 引用（可在測試中注入）
 let vscodeApi: typeof vscode = vscode;
@@ -92,6 +97,11 @@ export async function activate(context: vscode.ExtensionContext) {
 		// 註冊活動欄視圖
 		registerActivityBarView(context);
 
+		// 初始化 AI 影子建議服務（在註冊命令前完成，確保 WebViewManager 可取得 AIModelManager）
+		await initializeAIServices(context).catch(err => {
+			log('AI services initialization failed (non-critical)', 'warn', err);
+		});
+
 		// 註冊命令
 		registerCommands(context, localeService, diagnosticService);
 
@@ -101,7 +111,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		// 註冊 MCP Provider（VSCode 1.105.0+ 支援，需要 Node.js 22.16.0+）
 		await registerMcpProviderIfAvailable(context, nodeDetectionService, localeService);
 
-		// 設定配置變更監聽器（監聽 Node.js 路徑設定變更）
+		// 設定配置變更監聯器（監聽 Node.js 路徑設定變更）
 		setupConfigurationListener(context, nodeDetectionService, localeService);
 
 		log('Singular Blockly extension fully activated!', 'info');
@@ -157,6 +167,10 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 			// 懶初始化 WebView 管理器
 			if (!webViewManager) {
 				webViewManager = new WebViewManager(context);
+				// Inject AI model manager if available
+				if (aiModelManager) {
+					webViewManager.setAIModelManager(aiModelManager);
+				}
 			}
 
 			await webViewManager.createAndShowWebView();
@@ -339,12 +353,21 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 		}
 	});
 
+	// 註冊手動觸發 AI 積木建議命令（透過 keybinding Ctrl+Shift+. 觸發）
+	const triggerAISuggestionCommand = vscodeApi.commands.registerCommand('singular-blockly.triggerAISuggestion', () => {
+		if (webViewManager && webViewManager.isPanelCreated()) {
+			const panel = webViewManager.getPanel();
+			panel?.webview.postMessage({ command: 'triggerAISuggestion' });
+		}
+	});
+
 	// 添加到訂閱清單
 	context.subscriptions.push(openBlocklyEdit);
 	context.subscriptions.push(toggleThemeCommand);
 	context.subscriptions.push(showOutputCommand);
 	context.subscriptions.push(previewBackupCommand);
 	context.subscriptions.push(checkMcpStatusCommand);
+	context.subscriptions.push(triggerAISuggestionCommand);
 }
 
 /**
@@ -531,6 +554,36 @@ function setupStatusBar(context: vscode.ExtensionContext, localeService: LocaleS
 
 	// 添加到訂閱清單
 	context.subscriptions.push(blocklyStatusBarItem);
+}
+
+/**
+ * 初始化 AI 影子建議服務
+ */
+async function initializeAIServices(context: vscode.ExtensionContext): Promise<void> {
+	const config = vscodeApi.workspace.getConfiguration('singularBlockly.ai');
+	if (!config.get<boolean>('enabled', true)) {
+		log('AI suggestions disabled by user setting', 'info');
+		return;
+	}
+
+	const manager = new AIModelManager();
+	await manager.initialize();
+
+	if (manager.getTier() === 'none') {
+		log('No Copilot available, AI suggestions inactive', 'info');
+		manager.dispose();
+		return;
+	}
+
+	// Store globally so WebViewManager can access it
+	aiModelManager = manager;
+
+	// Create status bar UI
+	const aiStatusBar = new AIStatusBar(manager, context);
+	context.subscriptions.push(aiStatusBar);
+	context.subscriptions.push(manager);
+
+	log(`AI suggestions initialized (tier: ${manager.getTier()})`, 'info');
 }
 
 /**

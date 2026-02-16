@@ -15,6 +15,8 @@ import { ArduinoUploader } from '../services/arduinoUploader';
 import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStopReason } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
+import { AIModelManager } from '../services/aiModelManager';
+import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSuggestionService';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -60,6 +62,8 @@ export class WebViewMessageHandler {
 	private settingsManager: SettingsManager;
 	private serialMonitorService: SerialMonitorService | null = null;
 	private arduinoMonitorService: ArduinoMonitorService | null = null;
+	private aiModelManager?: AIModelManager;
+	private shadowSuggestionService?: ShadowSuggestionService;
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -203,6 +207,16 @@ export class WebViewMessageHandler {
 					break;
 				case 'deletePlatformioIni':
 					await this.handleDeletePlatformioIni();
+					break;
+				// AI Shadow Suggestion 功能
+				case 'requestShadowSuggestion':
+					await this.handleRequestShadowSuggestion(message);
+					break;
+				case 'acceptShadowSuggestion':
+					this.handleAcceptShadowSuggestion(message);
+					break;
+				case 'dismissShadowSuggestion':
+					this.handleDismissShadowSuggestion(message);
 					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
@@ -784,6 +798,11 @@ export class WebViewMessageHandler {
 				});
 			} catch (error) {
 				log('Failed to get auto backup settings:', 'error', error);
+			}
+
+			// Send AI config after WebView is ready (modules are initialized)
+			if (this.aiModelManager) {
+				this.sendAIConfig();
 			}
 		} catch (error) {
 			log('Failed to read workspace state:', 'error', error);
@@ -1584,5 +1603,113 @@ export class WebViewMessageHandler {
 		} catch (error) {
 			log('Failed to show error message:', 'error', error);
 		}
+	}
+
+	// ── AI Shadow Suggestion 功能 ──
+
+	/**
+	 * Initialize AI suggestion services
+	 */
+	initAIServices(aiModelManager: AIModelManager): void {
+		this.aiModelManager = aiModelManager;
+		this.shadowSuggestionService = new ShadowSuggestionService(
+			aiModelManager,
+			this.context.extensionPath
+		);
+
+		log(`AI services initialized in MessageHandler (tier: ${aiModelManager.getTier()})`, 'info');
+
+		// Send initial AI config to WebView
+		this.sendAIConfig();
+
+		// Update WebView when tier changes
+		aiModelManager.onTierChanged(() => this.sendAIConfig());
+
+		// Update WebView when user changes AI settings
+		this.context.subscriptions.push(
+			vscode.workspace.onDidChangeConfiguration(e => {
+				if (e.affectsConfiguration('singularBlockly.ai')) {
+					this.sendAIConfig();
+				}
+			})
+		);
+	}
+
+	/**
+	 * Send current AI configuration to WebView
+	 */
+	private sendAIConfig(): void {
+		if (!this.aiModelManager) {
+			return;
+		}
+
+		try {
+			const config = this.aiModelManager.getEffectiveConfig();
+			const tier = this.aiModelManager.getTier();
+
+			log(`Sending AI config to WebView: tier=${tier}, enabled=${config.enabled}, autoTrigger=${config.autoTrigger}`, 'info');
+
+			this.panel.webview.postMessage({
+				command: 'updateAIConfig',
+				config,
+				tier,
+			});
+		} catch {
+			// Panel may have been disposed; ignore
+		}
+	}
+
+	/**
+	 * Handle shadow suggestion request from WebView
+	 */
+	private async handleRequestShadowSuggestion(message: any): Promise<void> {
+		if (!this.shadowSuggestionService || !this.aiModelManager) {
+			log('Shadow suggestion skipped: service not initialized', 'debug');
+			return;
+		}
+
+		const config = this.aiModelManager.getEffectiveConfig();
+		if (!config.enabled) {
+			log('Shadow suggestion skipped: AI disabled', 'debug');
+			return;
+		}
+
+		const context: WorkspaceContext = message.context;
+		if (!context) {
+			log('Shadow suggestion request missing context', 'warn');
+			return;
+		}
+
+		log(`Shadow suggestion requested (board: ${context.board}, depth: ${context.depth}, selected: ${context.selectedBlock?.type || 'none'})`, 'info');
+
+		try {
+			const result = await this.shadowSuggestionService.requestSuggestion(context);
+			if (result && result.suggestions.length > 0) {
+				log(`Shadow suggestion received: ${result.suggestions.map(s => s.blockType).join(', ')}`, 'info');
+				this.panel.webview.postMessage({
+					command: 'showShadowSuggestion',
+					suggestions: result.suggestions,
+					modelUsed: result.modelUsed,
+				});
+			} else {
+				log('Shadow suggestion: no suggestions returned', 'debug');
+			}
+		} catch (error) {
+			log(`Shadow suggestion request failed: ${error}`, 'error');
+		}
+	}
+
+	/**
+	 * Handle accepted shadow suggestion (for analytics)
+	 */
+	private handleAcceptShadowSuggestion(message: any): void {
+		log(`Shadow suggestion accepted: ${message.blockType}`, 'info');
+	}
+
+	/**
+	 * Handle dismissed shadow suggestion (for analytics)
+	 */
+	private handleDismissShadowSuggestion(message: any): void {
+		log(`Shadow suggestion dismissed: ${message.blockType || 'unknown'}`, 'debug');
 	}
 }
