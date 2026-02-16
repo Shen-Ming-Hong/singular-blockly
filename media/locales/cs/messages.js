@@ -973,4 +973,12 @@ window.languageManager.loadMessages('cs', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Tento blok musí být umístěn v setup(), loop() nebo ve funkci pro generování kódu.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Tento blok musí být umístěn v main() nebo ve funkci pro generování kódu.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab pro přijetí · Esc pro odmítnutí',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab přijmout · Alt+]/[ přepnout · Esc odmítnout',
+	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot není dostupný. Nainstalujte rozšíření a přihlaste se.',
+	AI_QUOTA_EXHAUSTED: 'Kvóta Copilot vyčerpána. Reset příští měsíc nebo upgradujte plán.',
+	AI_AUTO_TRIGGER_WARNING: 'Automatické spouštění spotřebovává váš sdílený bezplatný limit Copilot.',
+	AI_DOWNGRADED_MODEL: 'Prémiová kvóta vyčerpána, používám základní model.',
+	AI_MANUAL_TRIGGER_HINT: 'Stiskněte Ctrl+Shift+Space pro vyvolání AI návrhu',
 });

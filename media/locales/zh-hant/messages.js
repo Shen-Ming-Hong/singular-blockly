@@ -958,4 +958,12 @@ window.languageManager.loadMessages('zh-hant', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: '此積木必須放在 setup()、loop() 或函式內才能產生程式碼。',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: '此積木必須放在 main() 或函式內才能產生程式碼。',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: '按 Tab 接受 · Esc 忽略',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 接受 · Alt+]/[ 切換 · Esc 忽略',
+	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot 不可用，請安裝 Copilot 擴充套件並登入。',
+	AI_QUOTA_EXHAUSTED: 'Copilot 額度已用完，下月重置或升級方案。',
+	AI_AUTO_TRIGGER_WARNING: '自動觸發會消耗您的 Copilot 免費共用額度。',
+	AI_DOWNGRADED_MODEL: 'Premium 額度已用完，使用基礎模型。',
+	AI_MANUAL_TRIGGER_HINT: '按 Ctrl+Shift+Space 觸發 AI 建議',
 });

@@ -966,4 +966,12 @@ window.languageManager.loadMessages('ko', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: '이 블록은 setup(), loop() 또는 함수 안에 배치해야 코드가 생성됩니다.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: '이 블록은 main() 또는 함수 안에 배치해야 코드가 생성됩니다.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab으로 수락 · Esc로 무시',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 수락 · Alt+]/[ 전환 · Esc 무시',
+	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot을 사용할 수 없습니다. 확장을 설치하고 로그인하세요.',
+	AI_QUOTA_EXHAUSTED: 'Copilot 할당량이 소진되었습니다. 다음 달에 재설정되거나 플랜을 업그레이드하세요.',
+	AI_AUTO_TRIGGER_WARNING: '자동 트리거는 공유 Copilot 무료 할당량을 소비합니다.',
+	AI_DOWNGRADED_MODEL: '프리미엄 할당량이 소진되어 기본 모델을 사용합니다.',
+	AI_MANUAL_TRIGGER_HINT: 'Ctrl+Shift+Space를 눌러 AI 제안 트리거',
 });

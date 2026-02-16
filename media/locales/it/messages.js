@@ -969,4 +969,12 @@ window.languageManager.loadMessages('it', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Questo blocco deve essere posizionato in setup(), loop() o in una funzione per generare codice.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Questo blocco deve essere posizionato in main() o in una funzione per generare codice.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab per accettare · Esc per ignorare',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab accetta · Alt+]/[ cambia · Esc ignora',
+	AI_COPILOT_NOT_AVAILABLE: "GitHub Copilot non è disponibile. Installa l'estensione e accedi.",
+	AI_QUOTA_EXHAUSTED: 'Quota Copilot esaurita. Si reimposta il prossimo mese o aggiorna il piano.',
+	AI_AUTO_TRIGGER_WARNING: "L'attivazione automatica consuma la quota condivisa gratuita di Copilot.",
+	AI_DOWNGRADED_MODEL: 'Quota premium esaurita, utilizzo del modello base.',
+	AI_MANUAL_TRIGGER_HINT: 'Premi Ctrl+Shift+Space per attivare il suggerimento IA',
 });

@@ -969,4 +969,12 @@ window.languageManager.loadMessages('es', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Este bloque debe colocarse dentro de setup(), loop() o una función para generar código.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Este bloque debe colocarse dentro de main() o una función para generar código.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab para aceptar · Esc para ignorar',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab aceptar · Alt+]/[ cambiar · Esc ignorar',
+	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot no está disponible. Instale la extensión e inicie sesión.',
+	AI_QUOTA_EXHAUSTED: 'Cuota de Copilot agotada. Se restablece el próximo mes o actualice su plan.',
+	AI_AUTO_TRIGGER_WARNING: 'El activador automático consume su cuota compartida gratuita de Copilot.',
+	AI_DOWNGRADED_MODEL: 'Cuota premium agotada, usando modelo básico.',
+	AI_MANUAL_TRIGGER_HINT: 'Pulse Ctrl+Shift+Space para activar sugerencia IA',
 });

@@ -973,4 +973,12 @@ window.languageManager.loadMessages('tr', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Bu blok, kod üretmek için setup(), loop() veya bir fonksiyonun içine yerleştirilmelidir.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Bu blok, kod üretmek için main() veya bir fonksiyonun içine yerleştirilmelidir.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Kabul etmek için Tab · Yoksaymak için Esc',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab kabul · Alt+]/[ geçiş · Esc yoksay',
+	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot kullanılamıyor. Uzantıyı yükleyin ve giriş yapın.',
+	AI_QUOTA_EXHAUSTED: 'Copilot kotası tükendi. Gelecek ay sıfırlanır veya planınızı yükseltin.',
+	AI_AUTO_TRIGGER_WARNING: 'Otomatik tetikleme, paylaşılan ücretsiz Copilot kotanızı tüketir.',
+	AI_DOWNGRADED_MODEL: 'Premium kota tükendi, temel model kullanılıyor.',
+	AI_MANUAL_TRIGGER_HINT: "AI önerisi tetiklemek için Ctrl+Shift+Space'e basın",
 });
