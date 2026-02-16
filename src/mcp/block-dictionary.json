@@ -1,6 +1,6 @@
 {
-  "version": "0.65.2",
-  "generatedAt": "2026-02-12T04:04:12.163Z",
+  "version": "0.65.3",
+  "generatedAt": "2026-02-16T07:20:47.931Z",
   "blocks": [
     {
       "type": "arduino_setup",
@@ -449,20 +449,19 @@
             "en": "Servo"
           },
           "options": "dynamic:servoVars"
-        },
+        }
+      ],
+      "inputs": [
         {
           "name": "ANGLE",
-          "type": "number",
+          "type": "value",
+          "check": "Number",
           "label": {
             "zh-hant": "角度",
             "en": "Angle"
-          },
-          "default": 90,
-          "min": 0,
-          "max": 180
+          }
         }
       ],
-      "inputs": [],
       "boards": [
         "arduino_uno",
         "arduino_nano",
@@ -1047,16 +1046,6 @@
       },
       "fields": [
         {
-          "name": "INDEX",
-          "type": "number",
-          "label": {
-            "zh-hant": "索引",
-            "en": "Index"
-          },
-          "default": 0,
-          "min": 0
-        },
-        {
           "name": "INFO_TYPE",
           "type": "dropdown",
           "label": {
@@ -1102,7 +1091,17 @@
           ]
         }
       ],
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "INDEX",
+          "type": "value",
+          "check": "Number",
+          "label": {
+            "zh-hant": "索引",
+            "en": "Index"
+          }
+        }
+      ],
       "output": {
         "type": "Number"
       },
@@ -1268,17 +1267,6 @@
       },
       "fields": [
         {
-          "name": "NUMBER",
-          "type": "number",
-          "label": {
-            "zh-hant": "數字",
-            "en": "Number"
-          },
-          "default": 0,
-          "min": 0,
-          "max": 9
-        },
-        {
           "name": "DECIMAL_POINT",
           "type": "checkbox",
           "label": {
@@ -1288,7 +1276,17 @@
           "default": false
         }
       ],
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "NUMBER",
+          "type": "value",
+          "check": "Number",
+          "label": {
+            "zh-hant": "數字",
+            "en": "Number"
+          }
+        }
+      ],
       "boards": [
         "arduino_uno",
         "arduino_nano",
@@ -3216,16 +3214,6 @@
       },
       "fields": [
         {
-          "name": "INDEX",
-          "type": "number",
-          "label": {
-            "zh-hant": "索引",
-            "en": "Index"
-          },
-          "default": 0,
-          "min": 0
-        },
-        {
           "name": "INFO_TYPE",
           "type": "dropdown",
           "label": {
@@ -3271,7 +3259,17 @@
           ]
         }
       ],
-      "inputs": [],
+      "inputs": [
+        {
+          "name": "INDEX",
+          "type": "value",
+          "check": "Number",
+          "label": {
+            "zh-hant": "索引",
+            "en": "Index"
+          }
+        }
+      ],
       "output": {
         "type": "Number"
       },
@@ -3662,7 +3660,7 @@
       ],
       "inputs": [
         {
-          "name": "STATE",
+          "name": "VALUE",
           "type": "value",
           "label": {
             "zh-hant": "狀態",
@@ -4988,36 +4986,36 @@
         "zh-hant": "設定編碼器馬達的 PID 控制器參數",
         "en": "Setup PID controller parameters for encoder motor"
       },
-      "fields": [],
-      "inputs": [
+      "fields": [
         {
           "name": "KP",
-          "type": "value",
+          "type": "number",
           "label": {
             "zh-hant": "Kp",
             "en": "Kp"
           },
-          "check": "Number"
+          "default": 1.0
         },
         {
           "name": "KI",
-          "type": "value",
+          "type": "number",
           "label": {
             "zh-hant": "Ki",
             "en": "Ki"
           },
-          "check": "Number"
+          "default": 0.0
         },
         {
           "name": "KD",
-          "type": "value",
+          "type": "number",
           "label": {
             "zh-hant": "Kd",
             "en": "Kd"
           },
-          "check": "Number"
+          "default": 0.0
         }
       ],
+      "inputs": [],
       "boards": [
         "arduino_uno",
         "arduino_nano",
@@ -5052,7 +5050,7 @@
       "fields": [],
       "inputs": [
         {
-          "name": "SETPOINT",
+          "name": "TARGET",
           "type": "value",
           "label": {
             "zh-hant": "目標值",
@@ -5106,7 +5104,7 @@
           "check": "Number"
         },
         {
-          "name": "LOW_OUTPUT",
+          "name": "LOW_VALUE",
           "type": "value",
           "label": {
             "zh-hant": "低於門檻輸出",
@@ -5115,7 +5113,7 @@
           "check": "Number"
         },
         {
-          "name": "HIGH_OUTPUT",
+          "name": "HIGH_VALUE",
           "type": "value",
           "label": {
             "zh-hant": "高於門檻輸出",
@@ -5544,18 +5542,17 @@
         "zh-hant": "發布訊息到指定的主題",
         "en": "Publish message to specified topic"
       },
-      "fields": [
+      "fields": [],
+      "inputs": [
         {
           "name": "TOPIC",
-          "type": "text",
+          "type": "value",
+          "check": "String",
           "label": {
             "zh-hant": "主題",
             "en": "Topic"
-          },
-          "default": ""
-        }
-      ],
-      "inputs": [
+          }
+        },
         {
           "name": "MESSAGE",
           "type": "value",
@@ -5594,18 +5591,18 @@
         "zh-hant": "訂閱指定的主題",
         "en": "Subscribe to specified topic"
       },
-      "fields": [
+      "fields": [],
+      "inputs": [
         {
           "name": "TOPIC",
-          "type": "text",
+          "type": "value",
+          "check": "String",
           "label": {
             "zh-hant": "主題",
             "en": "Topic"
-          },
-          "default": ""
+          }
         }
       ],
-      "inputs": [],
       "boards": [
         "esp32",
         "esp32_supermini"
@@ -8071,6 +8068,600 @@
         "cyberbrick"
       ],
       "relatedBlocks": [
+        "rc_is_connected"
+      ]
+    },
+    {
+      "type": "micropython_main",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "主程式",
+        "en": "Main Program"
+      },
+      "descriptions": {
+        "zh-hant": "MicroPython 程式入口點，所有程式碼放在此積木內",
+        "en": "MicroPython main program entry point, all code goes inside this block"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "MAIN",
+          "type": "statement",
+          "label": {
+            "zh-hant": "主程式",
+            "en": "Main"
+          }
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "main",
+        "micropython",
+        "主程式",
+        "入口"
+      ],
+      "relatedBlocks": [
+        "arduino_setup_loop"
+      ]
+    },
+    {
+      "type": "cyberbrick_led_set_color",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "設定板載 LED 顏色",
+        "en": "Set Onboard LED Color"
+      },
+      "descriptions": {
+        "zh-hant": "使用 RGB 值設定板載 WS2812 LED 顏色 (0-255)",
+        "en": "Set onboard WS2812 LED color using RGB values (0-255)"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "RED",
+          "type": "value",
+          "label": {
+            "zh-hant": "紅",
+            "en": "R"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "GREEN",
+          "type": "value",
+          "label": {
+            "zh-hant": "綠",
+            "en": "G"
+          },
+          "check": "Number"
+        },
+        {
+          "name": "BLUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "藍",
+            "en": "B"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "led",
+        "rgb",
+        "color",
+        "ws2812",
+        "顏色",
+        "板載LED"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_led_off"
+      ]
+    },
+    {
+      "type": "cyberbrick_led_off",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "關閉板載 LED",
+        "en": "Turn Off Onboard LED"
+      },
+      "descriptions": {
+        "zh-hant": "關閉板載 LED（設為黑色）",
+        "en": "Turn off onboard LED (set to black)"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "led",
+        "off",
+        "關閉",
+        "板載LED"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_led_set_color"
+      ]
+    },
+    {
+      "type": "cyberbrick_gpio_set",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "設定 GPIO 輸出",
+        "en": "Set GPIO Output"
+      },
+      "descriptions": {
+        "zh-hant": "設定 GPIO 腳位的數位輸出值",
+        "en": "Set GPIO pin digital output value"
+      },
+      "fields": [
+        {
+          "name": "PIN",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "腳位",
+            "en": "Pin"
+          },
+          "options": "dynamic"
+        }
+      ],
+      "inputs": [
+        {
+          "name": "VALUE",
+          "type": "value",
+          "label": {
+            "zh-hant": "值",
+            "en": "Value"
+          },
+          "check": "Boolean"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "gpio",
+        "digital",
+        "output",
+        "數位輸出",
+        "腳位"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_gpio_read"
+      ]
+    },
+    {
+      "type": "cyberbrick_gpio_read",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "讀取 GPIO",
+        "en": "Read GPIO"
+      },
+      "descriptions": {
+        "zh-hant": "讀取 GPIO 腳位的數位輸入值",
+        "en": "Read GPIO pin digital input value"
+      },
+      "fields": [
+        {
+          "name": "PIN",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "腳位",
+            "en": "Pin"
+          },
+          "options": "dynamic"
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "gpio",
+        "digital",
+        "input",
+        "數位輸入",
+        "讀取"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_gpio_set"
+      ]
+    },
+    {
+      "type": "cyberbrick_delay_ms",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "延時（毫秒）",
+        "en": "Delay (ms)"
+      },
+      "descriptions": {
+        "zh-hant": "暫停執行指定的毫秒數",
+        "en": "Pause execution for specified milliseconds"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "TIME",
+          "type": "value",
+          "label": {
+            "zh-hant": "毫秒",
+            "en": "Milliseconds"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "delay",
+        "ms",
+        "time",
+        "延時",
+        "毫秒",
+        "等待"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_delay_s"
+      ]
+    },
+    {
+      "type": "cyberbrick_delay_s",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "延時（秒）",
+        "en": "Delay (s)"
+      },
+      "descriptions": {
+        "zh-hant": "暫停執行指定的秒數",
+        "en": "Pause execution for specified seconds"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "TIME",
+          "type": "value",
+          "label": {
+            "zh-hant": "秒",
+            "en": "Seconds"
+          },
+          "check": "Number"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "delay",
+        "seconds",
+        "time",
+        "延時",
+        "秒",
+        "等待"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_delay_ms"
+      ]
+    },
+    {
+      "type": "cyberbrick_wifi_connect",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "連接 WiFi",
+        "en": "Connect WiFi"
+      },
+      "descriptions": {
+        "zh-hant": "連接到指定的 WiFi 網路",
+        "en": "Connect to specified WiFi network"
+      },
+      "fields": [],
+      "inputs": [
+        {
+          "name": "SSID",
+          "type": "value",
+          "label": {
+            "zh-hant": "SSID",
+            "en": "SSID"
+          },
+          "check": "String"
+        },
+        {
+          "name": "PASSWORD",
+          "type": "value",
+          "label": {
+            "zh-hant": "密碼",
+            "en": "Password"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "wifi",
+        "connect",
+        "network",
+        "連線",
+        "網路"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_wifi_disconnect",
+        "cyberbrick_wifi_is_connected"
+      ]
+    },
+    {
+      "type": "cyberbrick_wifi_disconnect",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "斷開 WiFi",
+        "en": "Disconnect WiFi"
+      },
+      "descriptions": {
+        "zh-hant": "斷開目前的 WiFi 連線",
+        "en": "Disconnect current WiFi connection"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "wifi",
+        "disconnect",
+        "斷線",
+        "網路"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_wifi_connect"
+      ]
+    },
+    {
+      "type": "cyberbrick_wifi_is_connected",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "WiFi 已連線？",
+        "en": "WiFi Connected?"
+      },
+      "descriptions": {
+        "zh-hant": "檢查 WiFi 是否已連線",
+        "en": "Check if WiFi is connected"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "wifi",
+        "connected",
+        "status",
+        "已連線",
+        "狀態"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_wifi_connect",
+        "cyberbrick_wifi_get_ip"
+      ]
+    },
+    {
+      "type": "cyberbrick_wifi_get_ip",
+      "category": "cyberbrick",
+      "names": {
+        "zh-hant": "取得 IP 位址",
+        "en": "Get IP Address"
+      },
+      "descriptions": {
+        "zh-hant": "取得目前連線的 IP 位址",
+        "en": "Get current connection IP address"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "cyberbrick",
+        "wifi",
+        "ip",
+        "address",
+        "IP位址",
+        "網路"
+      ],
+      "relatedBlocks": [
+        "cyberbrick_wifi_is_connected"
+      ]
+    },
+    {
+      "type": "text_to_number",
+      "category": "arduino",
+      "names": {
+        "zh-hant": "字串轉數字",
+        "en": "Text to Number"
+      },
+      "descriptions": {
+        "zh-hant": "將字串轉換為數字（整數或浮點數），無效輸入回傳 0",
+        "en": "Convert text to number (integer or float), invalid input returns 0"
+      },
+      "fields": [
+        {
+          "name": "TYPE",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "類型",
+            "en": "Type"
+          },
+          "options": [
+            [
+              "整數",
+              "INT"
+            ],
+            [
+              "浮點數",
+              "FLOAT"
+            ]
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "name": "TEXT",
+          "type": "value",
+          "label": {
+            "zh-hant": "字串",
+            "en": "Text"
+          },
+          "check": "String"
+        }
+      ],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "text",
+        "number",
+        "convert",
+        "parse",
+        "字串",
+        "數字",
+        "轉換"
+      ],
+      "relatedBlocks": []
+    },
+    {
+      "type": "encoder_pid_reset",
+      "category": "motors",
+      "names": {
+        "zh-hant": "重設 PID",
+        "en": "Reset PID"
+      },
+      "descriptions": {
+        "zh-hant": "重設 PID 控制器狀態（清除 I 項累積、重設 lastCount）",
+        "en": "Reset PID controller state (clear integral accumulation, reset lastCount)"
+      },
+      "fields": [
+        {
+          "name": "PID_VAR",
+          "type": "dropdown",
+          "label": {
+            "zh-hant": "PID 變數",
+            "en": "PID Variable"
+          },
+          "options": "dynamic"
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "arduino_uno",
+        "arduino_nano",
+        "arduino_mega",
+        "esp32",
+        "esp32_supermini"
+      ],
+      "tags": [
+        "motors",
+        "encoder",
+        "pid",
+        "reset",
+        "重設",
+        "馬達",
+        "編碼器"
+      ],
+      "relatedBlocks": [
+        "encoder_pid_setup",
+        "encoder_pid_compute"
+      ]
+    },
+    {
+      "type": "rc_send",
+      "category": "rc",
+      "names": {
+        "zh-hant": "發送 RC 資料",
+        "en": "Send RC Data"
+      },
+      "descriptions": {
+        "zh-hant": "讀取 X12 搖桿/按鈕資料並發送給接收端",
+        "en": "Read X12 joystick/button data and send to receiver"
+      },
+      "fields": [],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "rc",
+        "send",
+        "data",
+        "transmit",
+        "發送",
+        "遙控",
+        "資料",
+        "cyberbrick"
+      ],
+      "relatedBlocks": [
+        "rc_master_init"
+      ]
+    },
+    {
+      "type": "rc_wait_connection",
+      "category": "rc",
+      "names": {
+        "zh-hant": "等待配對",
+        "en": "Wait for Connection"
+      },
+      "descriptions": {
+        "zh-hant": "等待發射端連線，LED 藍色閃爍，超時後繼續執行",
+        "en": "Wait for transmitter connection, LED blinks blue, continues after timeout"
+      },
+      "fields": [
+        {
+          "name": "TIMEOUT",
+          "type": "number",
+          "label": {
+            "zh-hant": "超時（秒）",
+            "en": "Timeout (s)"
+          },
+          "default": 30,
+          "min": 1,
+          "max": 60
+        }
+      ],
+      "inputs": [],
+      "boards": [
+        "cyberbrick"
+      ],
+      "tags": [
+        "rc",
+        "wait",
+        "connection",
+        "pairing",
+        "timeout",
+        "等待",
+        "配對",
+        "連線",
+        "cyberbrick"
+      ],
+      "relatedBlocks": [
+        "rc_slave_init",
         "rc_is_connected"
       ]
     }
