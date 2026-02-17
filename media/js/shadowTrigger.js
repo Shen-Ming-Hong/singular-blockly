@@ -32,34 +32,9 @@
 	var isDragging = false;
 	/** @type {string|null} Hash of last request context */
 	var lastRequestContext = null;
-	/** @type {HTMLElement|null} Loading indicator element */
-	var _loadingElement = null;
-	/** @type {ReturnType<typeof setTimeout>|null} Loading auto-hide timer */
-	var _loadingTimeout = null;
+	function _showLoadingIndicator() {}
 
-	/**
-	 * Show a loading indicator in the bottom-right corner.
-	 */
-	function _showLoadingIndicator() {
-		if (!_loadingElement) {
-			_loadingElement = document.createElement('div');
-			_loadingElement.className = 'shadow-suggestion-loading';
-			_loadingElement.textContent = 'AI ✨';
-			document.body.appendChild(_loadingElement);
-		}
-		requestAnimationFrame(function () {
-			_loadingElement.classList.add('visible');
-		});
-	}
-
-	/**
-	 * Hide the loading indicator.
-	 */
-	function _hideLoadingIndicator() {
-		if (_loadingElement) {
-			_loadingElement.classList.remove('visible');
-		}
-	}
+	function _hideLoadingIndicator() {}
 
 	/**
 	 * Create a simple hash string from context key fields for deduplication.

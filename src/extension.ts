@@ -17,9 +17,6 @@ import { DiagnosticService } from './services/diagnosticService';
 import { AIModelManager } from './services/aiModelManager';
 import { AIStatusBar } from './services/aiStatusBar';
 
-// Status bar priority constant
-const STATUS_BAR_PRIORITY = 100;
-
 // AI model manager (initialized when Copilot is available)
 let aiModelManager: AIModelManager | undefined;
 let aiStatusBarInstance: AIStatusBar | undefined;
@@ -105,9 +102,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		// 註冊命令
 		registerCommands(context, localeService, diagnosticService);
-
-		// 設定狀態列按鈕
-		setupStatusBar(context, localeService);
 
 		// 註冊 MCP Provider（VSCode 1.105.0+ 支援，需要 Node.js 22.16.0+）
 		await registerMcpProviderIfAvailable(context, nodeDetectionService, localeService);
@@ -530,31 +524,6 @@ function setupConfigurationListener(
 
 	context.subscriptions.push(disposable);
 	log('Configuration listener registered', 'info');
-}
-
-/**
- * 設定狀態列按鈕
- * @param context 擴充功能上下文
- * @param localeService 多語言服務
- */
-function setupStatusBar(context: vscode.ExtensionContext, localeService: LocaleService) {
-	log('Creating status bar button...', 'info');
-
-	// 建立狀態列按鈕
-	const blocklyStatusBarItem = vscodeApi.window.createStatusBarItem(vscodeApi.StatusBarAlignment.Left, STATUS_BAR_PRIORITY);
-	blocklyStatusBarItem.command = 'singular-blockly.openBlocklyEdit';
-	blocklyStatusBarItem.text = '$(wand)';
-	blocklyStatusBarItem.tooltip = 'Open Blockly Editor'; // 預設工具提示
-
-	// 非同步設定本地化的工具提示
-	localeService.getLocalizedMessage('VSCODE_OPEN_BLOCKLY_EDITOR').then(message => {
-		blocklyStatusBarItem.tooltip = message;
-	});
-
-	blocklyStatusBarItem.show();
-
-	// 添加到訂閱清單
-	context.subscriptions.push(blocklyStatusBarItem);
 }
 
 /**

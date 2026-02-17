@@ -8,7 +8,9 @@
 
 VS Code extension for visual Arduino/MicroPython programming using Google Blockly. Generates Arduino C++ (via PlatformIO) or MicroPython (via mpremote for CyberBrick) based on board selection. Supports 15 languages with 99% i18n coverage.
 
-**Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VS Code 1.105.0+ | MCP SDK 1.25.2 | Zod 4.1.13
+**Tech Stack**: TypeScript 5.9.3 | Blockly 12.3.1 | VS Code 1.105.0+ | MCP SDK 1.26.0 | Zod 4.1.13
+
+**Extension dependency**: PlatformIO IDE (`platformio.platformio-ide`) is declared in `extensionDependencies`.
 
 ## Build, Test, and Lint
 
@@ -20,11 +22,12 @@ npm run lint               # ESLint over src/
 npm test                   # Full test suite via @vscode/test-cli
 npm run test:coverage      # Tests with coverage report
 npm run test:bail          # Stop on first failure
+npm run test:integration   # Integration tests (requires Copilot)
 npm run validate:i18n      # Validate all 15 locale files
 npm run generate:dictionary # Rebuild MCP block-dictionary.json
 ```
 
-**Run a single test file**: There is no built-in single-test runner. Tests run via `@vscode/test-cli` which launches a VS Code instance. To focus on specific tests, use `.only` in Mocha (`describe.only` / `it.only`) then run `npm test`.
+**Run a single test file**: Tests run via `@vscode/test-cli` which launches a VS Code instance. To focus on specific tests, use `.only` in Mocha (`describe.only` / `it.only`) then run `npm test`. Test config is in `.vscode-test.mjs` with two labels: `unit` (excludes integration) and `integration`.
 
 **Debug WebView**: F5 → Right-click Blockly panel → "Open Developer Tools"
 
@@ -40,14 +43,18 @@ Extension Host (Node.js)              WebView (Browser)
 │   └── messageHandler.ts                 ├── blocks/*.js (block definitions)
 ├── src/mcp/mcpServer.ts                  └── generators/{arduino,micropython}/*.js
 ├── src/mcp/tools/*.ts
-└── src/services/
-    ├── fileService.ts         # ALL file I/O (inject FileSystem for tests)
-    ├── logging.ts             # ALL logging (never use console.log)
-    ├── settingsManager.ts     # PlatformIO config + theme + auto-backup
-    ├── arduinoUploader.ts     # PlatformIO CLI upload
-    ├── micropythonUploader.ts # mpremote upload for CyberBrick
-    ├── workspaceValidator.ts  # Workspace state integrity
-    └── projectTypeDetector.ts # Non-Blockly project safety guard
+├── src/services/
+│   ├── fileService.ts         # ALL file I/O (inject FileSystem for tests)
+│   ├── logging.ts             # ALL logging (never use console.log)
+│   ├── settingsManager.ts     # PlatformIO config + theme + auto-backup
+│   ├── arduinoUploader.ts     # PlatformIO CLI upload
+│   ├── micropythonUploader.ts # mpremote upload for CyberBrick
+│   ├── workspaceValidator.ts  # Workspace state integrity
+│   ├── projectTypeDetector.ts # Non-Blockly project safety guard
+│   └── shadowSuggestionService.ts # AI block suggestions via Copilot LM API
+└── src/types/
+    ├── board.ts               # BoardLanguage, UploadMethod types
+    └── arduino.ts             # getBoardLanguage(), board configs
 ```
 
 **Data Flow**: WebView `saveWorkspace` → `messageHandler.ts` → `FileService` → `blockly/main.json`
@@ -173,6 +180,8 @@ Conventional Commits with scopes: `feat(blocks)`, `fix(webview)`, `i18n(ja)`, `c
 
 **Scopes**: `blocks` | `generators` | `i18n` | `webview` | `mcp` | `services` | `toolbox` | `deps`
 
+**Branch naming**: `feature/{name}`, `fix/{description}`, `localization/{lang}/{description}`, `docs/{description}`
+
 ## Common Pitfalls
 
 1. **WebView resources**: Must use `webview.asWebviewUri()` for all paths
@@ -180,3 +189,4 @@ Conventional Commits with scopes: `feat(blocks)`, `fix(webview)`, `i18n(ja)`, `c
 3. **Board detection**: Use `window.getCurrentBoard()` in generators; `window.currentBoard` is deprecated
 4. **i18n placeholders**: Use `{0}`, `{1}` format in `messages.js`, not `%s`
 5. **`alwaysGenerateBlocks_`**: These are scanned by container blocks — do not skip them in `workspaceToCode`
+6. **ESLint scope**: Only `src/` TypeScript is linted; `media/js/` and `media/blockly/` are excluded (browser context)

@@ -75,7 +75,7 @@ export class AIStatusBar implements vscode.Disposable {
 			return;
 		}
 
-		this.statusBarItem.text = tier === 'pro_plus' ? '$(sparkle) AI+' : '$(sparkle) AI';
+		this.statusBarItem.text = '$(sparkle)';
 		this.updateTooltip();
 		this.statusBarItem.show();
 	}
@@ -221,7 +221,7 @@ export class AIStatusBar implements vscode.Disposable {
 	/** Show loading state in status bar during AI request */
 	showLoading(): void {
 		this._previousText = this.statusBarItem.text;
-		this.statusBarItem.text = '$(loading~spin) AI...';
+		this.statusBarItem.text = '$(loading~spin)';
 		this.statusBarItem.tooltip = 'AI suggestion in progress...';
 		this.statusBarItem.show();
 	}
