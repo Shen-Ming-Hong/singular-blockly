@@ -35,6 +35,7 @@ export class AIStatusBar implements vscode.Disposable {
 		// Register commands
 		this.disposables.push(
 			vscode.commands.registerCommand('singular-blockly.showAIStatusMenu', () => this.showStatusMenu()),
+			vscode.commands.registerCommand('singular-blockly.toggleAIEnabled', () => this.toggleAIEnabled()),
 			vscode.commands.registerCommand('singular-blockly.toggleAutoTrigger', () => this.toggleAutoTrigger()),
 			vscode.commands.registerCommand('singular-blockly.selectAIModel', () => this.selectModel()),
 			vscode.commands.registerCommand('singular-blockly.openAISettings', () =>
@@ -108,6 +109,13 @@ export class AIStatusBar implements vscode.Disposable {
 		// Shadow Block Suggestions section header with action icons
 		tooltip.appendMarkdown('**Shadow Block Suggestions** &nbsp; [$(settings-gear)](command:singular-blockly.openAISettings "Open settings") [$(refresh)](command:singular-blockly.triggerAISuggestion "Trigger suggestion")\n\n');
 
+		// AI Suggestions enabled toggle
+		if (config.enabled) {
+			tooltip.appendMarkdown('[$(check) AI Suggestions](command:singular-blockly.toggleAIEnabled "Click to disable")\n\n');
+		} else {
+			tooltip.appendMarkdown('[☐ AI Suggestions](command:singular-blockly.toggleAIEnabled "Click to enable")\n\n');
+		}
+
 		// Auto-trigger toggle — entire line is a clickable command link
 		if (config.autoTrigger) {
 			tooltip.appendMarkdown('[$(check) Auto-trigger](command:singular-blockly.toggleAutoTrigger "Click to disable")\n\n');
@@ -157,6 +165,21 @@ export class AIStatusBar implements vscode.Disposable {
 				await vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', 'singular-blockly');
 				break;
 		}
+	}
+
+	/**
+	 * 切換 AI 建議啟用狀態
+	 */
+	private async toggleAIEnabled(): Promise<void> {
+		const aiConfig = vscode.workspace.getConfiguration('singularBlockly.ai');
+		const current = aiConfig.get<boolean>('enabled', false);
+		const newValue = !current;
+
+		await aiConfig.update('enabled', newValue, vscode.ConfigurationTarget.Global);
+
+		const stateLabel = newValue ? 'enabled' : 'disabled';
+		vscode.window.showInformationMessage(`AI suggestions ${stateLabel}.`);
+		log(`AI suggestions ${stateLabel}`, 'info');
 	}
 
 	/**

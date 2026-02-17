@@ -3137,9 +3137,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 			case 'triggerAISuggestion':
 				// Manual trigger via VS Code keybinding (Ctrl+Shift+.)
+				// Requires enabled=true; autoTrigger is not checked for manual trigger
 				{
 					var triggerConfig = (window.shadowTrigger && window.shadowTrigger.getConfig) ? window.shadowTrigger.getConfig() : null;
-					// Respect enabled setting — don't trigger if AI is disabled
+					// Manual trigger requires AI to be enabled
 					if (triggerConfig && triggerConfig.enabled === false) {
 						break;
 					}

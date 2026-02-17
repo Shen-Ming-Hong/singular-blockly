@@ -142,6 +142,14 @@ if (-not $commandSent) {
     Write-Host "  ⚠️ Could not confirm editor opened after 3 attempts. Waiting for AI anyway..." -ForegroundColor Yellow
 }
 
+# Step 4.5: Trigger AI suggestion manually via Ctrl+Shift+.
+Write-Host '🤖 Triggering AI suggestion (Ctrl+Shift+.)...' -ForegroundColor Cyan
+Start-Sleep -Seconds 5
+try { $wshell.AppActivate($proc.Id) | Out-Null } catch {}
+Start-Sleep -Milliseconds 500
+[System.Windows.Forms.SendKeys]::SendWait('^+.')
+Write-Host "  📝 Sent Ctrl+Shift+. to trigger AI suggestion" -ForegroundColor Green
+
 # Step 5: Monitor logs
 Write-Host "`n📊 Monitoring AI logs (waiting ${WaitForAI}s)..." -ForegroundColor Cyan
 $startTime = Get-Date

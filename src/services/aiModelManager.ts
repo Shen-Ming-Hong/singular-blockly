@@ -35,7 +35,7 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 		autoModel: false,
 	},
 	free: {
-		enabled: true,
+		enabled: false,
 		autoTrigger: true,
 		triggerDelay: 3000,
 		maxPerMinute: 2,
@@ -45,7 +45,7 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 		autoModel: false,
 	},
 	pro: {
-		enabled: true,
+		enabled: false,
 		autoTrigger: true,
 		triggerDelay: 1500,
 		maxPerMinute: 10,
@@ -55,7 +55,7 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 		autoModel: true,
 	},
 	pro_plus: {
-		enabled: true,
+		enabled: false,
 		autoTrigger: true,
 		triggerDelay: 1000,
 		maxPerMinute: 15,
@@ -252,6 +252,7 @@ export class AIModelManager implements vscode.Disposable {
 					max_output_tokens: 16384,
 					max_completion_tokens: 16384,
 					max_tokens: 16384,
+					reasoning_effort: 'low',
 				};
 				const response = await this._cachedModel!.sendRequest(messages, { modelOptions: modelOpts }, token);
 				return response;
@@ -278,7 +279,7 @@ export class AIModelManager implements vscode.Disposable {
 							const fallbackModel = await this.selectModel(family);
 							if (fallbackModel) {
 								try {
-									const retryResponse = await fallbackModel.sendRequest(messages, { modelOptions: { max_output_tokens: 16384, max_completion_tokens: 16384, max_tokens: 16384 } }, token);
+									const retryResponse = await fallbackModel.sendRequest(messages, { modelOptions: { max_output_tokens: 16384, max_completion_tokens: 16384, max_tokens: 16384, reasoning_effort: 'low' } }, token);
 									return retryResponse;
 								} catch (retryErr) {
 									log(`Base model ${family} also failed: ${retryErr}`, 'warn');

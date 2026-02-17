@@ -530,12 +530,6 @@ function setupConfigurationListener(
  * 初始化 AI 影子建議服務
  */
 async function initializeAIServices(context: vscode.ExtensionContext): Promise<void> {
-	const config = vscodeApi.workspace.getConfiguration('singularBlockly.ai');
-	if (!config.get<boolean>('enabled', true)) {
-		log('AI suggestions disabled by user setting', 'info');
-		return;
-	}
-
 	const manager = new AIModelManager();
 	await manager.initialize();
 

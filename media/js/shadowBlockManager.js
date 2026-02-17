@@ -659,9 +659,9 @@
 	 * @returns {*} The created block, or null on failure
 	 */
 	function showSuggestion(suggestion) {
-		console.log('[SB] showSuggestion:', suggestion ? suggestion.blockType : 'null', 'enabled=' + enabled, 'isRendering=' + isRendering);
-		if (!enabled || !suggestion || !suggestion.blockType) {
-			console.warn('[SB] Early exit: enabled=' + enabled + ', suggestion=' + JSON.stringify(suggestion));
+		console.log('[SB] showSuggestion:', suggestion ? suggestion.blockType : 'null', 'isRendering=' + isRendering);
+		if (!suggestion || !suggestion.blockType) {
+			console.warn('[SB] Early exit: suggestion=' + JSON.stringify(suggestion));
 			return null;
 		}
 
@@ -1055,12 +1055,6 @@
 			return;
 		}
 		config = newConfig;
-		if (typeof newConfig.enabled === 'boolean') {
-			enabled = newConfig.enabled;
-		}
-		if (!enabled) {
-			clearSuggestion(false);
-		}
 	}
 
 	/**

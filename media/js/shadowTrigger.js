@@ -32,6 +32,8 @@
 	var isDragging = false;
 	/** @type {string|null} Hash of last request context */
 	var lastRequestContext = null;
+	/** @type {ReturnType<typeof setTimeout>|null} Loading indicator auto-hide timer */
+	var _loadingTimeout = null;
 	function _showLoadingIndicator() {}
 
 	function _hideLoadingIndicator() {}

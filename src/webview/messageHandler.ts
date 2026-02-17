@@ -1671,12 +1671,6 @@ export class WebViewMessageHandler {
 			return;
 		}
 
-		const config = this.aiModelManager.getEffectiveConfig();
-		if (!config.enabled) {
-			log('Shadow suggestion skipped: AI disabled', 'debug');
-			return;
-		}
-
 		const context: WorkspaceContext = message.context;
 		if (!context) {
 			log('Shadow suggestion request missing context', 'warn');

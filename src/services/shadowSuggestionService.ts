@@ -152,10 +152,6 @@ export class ShadowSuggestionService {
 	 */
 	async requestSuggestion(context: WorkspaceContext): Promise<SuggestionResult | null> {
 		const config = this._modelManager.getEffectiveConfig();
-		if (!config.enabled) {
-			log('AI suggestions disabled by configuration', 'debug');
-			return null;
-		}
 
 		const hasBlocks = (context.workspaceTree && context.workspaceTree.length > 0) ||
 			(context.blockTree && context.blockTree.length > 0);

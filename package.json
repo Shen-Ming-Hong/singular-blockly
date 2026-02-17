@@ -58,6 +58,11 @@
 				"category": "Singular Blockly"
 			},
 			{
+				"command": "singular-blockly.toggleAIEnabled",
+				"title": "Singular Blockly: Toggle AI Suggestions",
+				"category": "Singular Blockly"
+			},
+			{
 				"command": "singular-blockly.toggleAutoTrigger",
 				"title": "Singular Blockly: Toggle AI Auto-Trigger",
 				"category": "Singular Blockly"
@@ -126,7 +131,7 @@
 				},
 				"singularBlockly.ai.enabled": {
 					"type": "boolean",
-					"default": true,
+					"default": false,
 					"markdownDescription": "Enable/disable AI shadow block suggestions. Requires GitHub Copilot extension."
 				},
 				"singularBlockly.ai.autoTrigger": {
