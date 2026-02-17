@@ -14,6 +14,7 @@ import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
 import { BoardConfigKey, SetBoardMessage } from '../types/previewMessages';
 import { AIModelManager } from '../services/aiModelManager';
+import { AIStatusBar } from '../services/aiStatusBar';
 
 /**
  * 開發板值映射表
@@ -100,6 +101,7 @@ export class WebViewManager {
 	// T024: 改用計數器機制，支援巢狀保存操作
 	private internalUpdateCount: number = 0; // 避免內部更新觸發 FileWatcher
 	private aiModelManager?: AIModelManager;
+	private aiStatusBar?: AIStatusBar;
 
 	/**
 	 * 建立 WebView 管理器實例
@@ -122,11 +124,12 @@ export class WebViewManager {
 	/**
 	 * Set AI model manager for shadow suggestion features
 	 */
-	setAIModelManager(aiModelManager: AIModelManager): void {
+	setAIModelManager(aiModelManager: AIModelManager, aiStatusBar?: AIStatusBar): void {
 		this.aiModelManager = aiModelManager;
+		this.aiStatusBar = aiStatusBar;
 		// If message handler already exists, initialize AI services
 		if (this.messageHandler) {
-			this.messageHandler.initAIServices(aiModelManager);
+			this.messageHandler.initAIServices(aiModelManager, aiStatusBar);
 		}
 	}
 
@@ -231,7 +234,7 @@ export class WebViewManager {
 
 		// Initialize AI services if available
 		if (this.aiModelManager) {
-			this.messageHandler.initAIServices(this.aiModelManager);
+			this.messageHandler.initAIServices(this.aiModelManager, this.aiStatusBar);
 		}
 
 		// 監聯 WebView 訊息

@@ -201,3 +201,30 @@ body.vscode-high-contrast .shadow-suggestion-hint {
 	color: #ffffff;
 	border: 1px solid rgba(255, 255, 255, 0.6);
 }
+
+/* ===== Loading indicator for AI suggestion requests ===== */
+.shadow-suggestion-loading {
+	position: fixed;
+	bottom: 12px;
+	right: 12px;
+	padding: 6px 14px;
+	background: var(--vscode-badge-background, rgba(0, 120, 212, 0.85));
+	color: var(--vscode-badge-foreground, #fff);
+	border-radius: 12px;
+	font-size: 12px;
+	font-family: var(--vscode-font-family, system-ui);
+	z-index: 1000;
+	pointer-events: none;
+	animation: shadow-loading-pulse 1.5s ease-in-out infinite;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.shadow-suggestion-loading.visible {
+	opacity: 1;
+}
+
+@keyframes shadow-loading-pulse {
+	0%, 100% { opacity: 0.6; }
+	50% { opacity: 1; }
+}

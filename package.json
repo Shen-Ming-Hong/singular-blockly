@@ -181,7 +181,8 @@
 		"detect:i18n:lang": "node scripts/i18n/detect-patterns.js",
 		"stats:i18n": "node scripts/i18n/translation-stats.js --format markdown",
 		"stats:i18n:json": "node scripts/i18n/translation-stats.js --format json",
-		"test": "vscode-test"
+		"test": "vscode-test --label unit",
+		"test:integration": "vscode-test --label integration"
 	},
 	"devDependencies": {
 		"@types/mocha": "^10.0.10",
@@ -194,6 +195,7 @@
 		"@vscode/test-electron": "^2.5.2",
 		"ajv": "^8.17.1",
 		"blockly": "^12.3.1",
+		"copy-webpack-plugin": "^13.0.1",
 		"eslint": "^9.38.0",
 		"fs-extra": "^11.3.2",
 		"glob": "^11.1.0",

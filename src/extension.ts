@@ -22,6 +22,7 @@ const STATUS_BAR_PRIORITY = 100;
 
 // AI model manager (initialized when Copilot is available)
 let aiModelManager: AIModelManager | undefined;
+let aiStatusBarInstance: AIStatusBar | undefined;
 
 // VSCode API 引用（可在測試中注入）
 let vscodeApi: typeof vscode = vscode;
@@ -169,7 +170,7 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 				webViewManager = new WebViewManager(context);
 				// Inject AI model manager if available
 				if (aiModelManager) {
-					webViewManager.setAIModelManager(aiModelManager);
+					webViewManager.setAIModelManager(aiModelManager, aiStatusBarInstance);
 				}
 			}
 
@@ -580,6 +581,7 @@ async function initializeAIServices(context: vscode.ExtensionContext): Promise<v
 
 	// Create status bar UI
 	const aiStatusBar = new AIStatusBar(manager, context);
+	aiStatusBarInstance = aiStatusBar;
 	context.subscriptions.push(aiStatusBar);
 	context.subscriptions.push(manager);
 

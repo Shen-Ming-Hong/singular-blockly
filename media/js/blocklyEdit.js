@@ -3121,6 +3121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 			case 'showShadowSuggestion':
 				console.log('[SB] showShadowSuggestion received:', message.suggestions ? message.suggestions.length : 0, 'suggestions');
+				// Hide loading indicator
+				var loadingEl = document.querySelector('.shadow-suggestion-loading');
+				if (loadingEl) loadingEl.classList.remove('visible');
 				if (window.shadowBlockManager) {
 					window.shadowBlockManager.setSuggestions(message.suggestions);
 				} else {

@@ -207,6 +207,7 @@ export class AIModelManager implements vscode.Disposable {
 			if (models && models.length > 0) {
 				this._cachedModel = models[0];
 				log(`Selected model: ${this._cachedModel.name} (${this._cachedModel.family})`, 'info');
+				log(`Model limits: maxInput=${this._cachedModel.maxInputTokens}`, 'debug');
 				return this._cachedModel;
 			}
 
@@ -215,6 +216,7 @@ export class AIModelManager implements vscode.Disposable {
 			if (fallback && fallback.length > 0) {
 				this._cachedModel = fallback[0];
 				log(`Fallback model selected: ${this._cachedModel.name} (${this._cachedModel.family})`, 'info');
+				log(`Model limits: maxInput=${this._cachedModel.maxInputTokens}`, 'debug');
 				return this._cachedModel;
 			}
 
@@ -246,7 +248,12 @@ export class AIModelManager implements vscode.Disposable {
 
 		for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
 			try {
-				const response = await this._cachedModel!.sendRequest(messages, {}, token);
+				const modelOpts = {
+					max_output_tokens: 16384,
+					max_completion_tokens: 16384,
+					max_tokens: 16384,
+				};
+				const response = await this._cachedModel!.sendRequest(messages, { modelOptions: modelOpts }, token);
 				return response;
 			} catch (err) {
 				if (err instanceof vscode.LanguageModelError) {
@@ -271,7 +278,7 @@ export class AIModelManager implements vscode.Disposable {
 							const fallbackModel = await this.selectModel(family);
 							if (fallbackModel) {
 								try {
-									const retryResponse = await fallbackModel.sendRequest(messages, {}, token);
+									const retryResponse = await fallbackModel.sendRequest(messages, { modelOptions: { max_output_tokens: 16384, max_completion_tokens: 16384, max_tokens: 16384 } }, token);
 									return retryResponse;
 								} catch (retryErr) {
 									log(`Base model ${family} also failed: ${retryErr}`, 'warn');

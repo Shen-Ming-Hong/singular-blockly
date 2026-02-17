@@ -32,6 +32,34 @@
 	var isDragging = false;
 	/** @type {string|null} Hash of last request context */
 	var lastRequestContext = null;
+	/** @type {HTMLElement|null} Loading indicator element */
+	var _loadingElement = null;
+	/** @type {ReturnType<typeof setTimeout>|null} Loading auto-hide timer */
+	var _loadingTimeout = null;
+
+	/**
+	 * Show a loading indicator in the bottom-right corner.
+	 */
+	function _showLoadingIndicator() {
+		if (!_loadingElement) {
+			_loadingElement = document.createElement('div');
+			_loadingElement.className = 'shadow-suggestion-loading';
+			_loadingElement.textContent = 'AI ✨';
+			document.body.appendChild(_loadingElement);
+		}
+		requestAnimationFrame(function () {
+			_loadingElement.classList.add('visible');
+		});
+	}
+
+	/**
+	 * Hide the loading indicator.
+	 */
+	function _hideLoadingIndicator() {
+		if (_loadingElement) {
+			_loadingElement.classList.remove('visible');
+		}
+	}
 
 	/**
 	 * Create a simple hash string from context key fields for deduplication.
@@ -240,6 +268,10 @@
 
 					// Send request to Extension Host
 					console.log('[SB] Sending requestShadowSuggestion to Extension Host');
+					_showLoadingIndicator();
+					// Auto-hide loading after timeout (matches REQUEST_TIMEOUT_MS + buffer)
+					if (_loadingTimeout) clearTimeout(_loadingTimeout);
+					_loadingTimeout = setTimeout(_hideLoadingIndicator, 30000);
 					if (vsCodeApi && typeof vsCodeApi.postMessage === 'function') {
 						vsCodeApi.postMessage({
 							command: 'requestShadowSuggestion',
@@ -299,6 +331,11 @@
 			clearInterval(minuteTimer);
 			minuteTimer = null;
 		}
+		if (_loadingTimeout) {
+			clearTimeout(_loadingTimeout);
+			_loadingTimeout = null;
+		}
+		_hideLoadingIndicator();
 		requestCount = 0;
 		isDragging = false;
 		lastRequestContext = null;

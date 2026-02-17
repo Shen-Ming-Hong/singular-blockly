@@ -16,6 +16,7 @@ import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorS
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
 import { AIModelManager } from '../services/aiModelManager';
+import { AIStatusBar } from '../services/aiStatusBar';
 import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSuggestionService';
 
 // Timing constants
@@ -64,6 +65,7 @@ export class WebViewMessageHandler {
 	private arduinoMonitorService: ArduinoMonitorService | null = null;
 	private aiModelManager?: AIModelManager;
 	private shadowSuggestionService?: ShadowSuggestionService;
+	private aiStatusBar?: AIStatusBar;
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -1610,8 +1612,9 @@ export class WebViewMessageHandler {
 	/**
 	 * Initialize AI suggestion services
 	 */
-	initAIServices(aiModelManager: AIModelManager): void {
+	initAIServices(aiModelManager: AIModelManager, aiStatusBar?: AIStatusBar): void {
 		this.aiModelManager = aiModelManager;
+		this.aiStatusBar = aiStatusBar;
 		this.shadowSuggestionService = new ShadowSuggestionService(
 			aiModelManager,
 			this.context.extensionPath
@@ -1682,9 +1685,15 @@ export class WebViewMessageHandler {
 
 		log(`Shadow suggestion requested (board: ${context.board}, depth: ${context.depth}, selected: ${context.selectedBlock?.type || 'none'})`, 'info');
 
+		const t0 = performance.now();
+		log(`[AI Perf] Shadow suggestion request started (board: ${context.board}, depth: ${context.depth})`, 'info');
+
+		this.aiStatusBar?.showLoading();
 		try {
 			const result = await this.shadowSuggestionService.requestSuggestion(context);
+			const elapsed = (performance.now() - t0).toFixed(0);
 			if (result && result.suggestions.length > 0) {
+				log(`[AI Perf] Full round-trip: ${elapsed}ms → ${result.suggestions.map(s => s.blockType).join(', ')}`, 'info');
 				log(`Shadow suggestion received: ${result.suggestions.map(s => s.blockType).join(', ')}`, 'info');
 				this.panel.webview.postMessage({
 					command: 'showShadowSuggestion',
@@ -1692,10 +1701,14 @@ export class WebViewMessageHandler {
 					modelUsed: result.modelUsed,
 				});
 			} else {
+				log(`[AI Perf] Full round-trip: ${elapsed}ms → no suggestions`, 'info');
 				log('Shadow suggestion: no suggestions returned', 'debug');
 			}
 		} catch (error) {
+			log(`[AI Perf] Full round-trip failed after ${(performance.now() - t0).toFixed(0)}ms: ${error}`, 'error');
 			log(`Shadow suggestion request failed: ${error}`, 'error');
+		} finally {
+			this.aiStatusBar?.hideLoading();
 		}
 	}
 

@@ -65,13 +65,26 @@ const FENCED_JSON_RE = /```(?:json)?\s*([\s\S]*?)```/;
 const BARE_ARRAY_RE = /\[[\s\S]*\]/;
 
 /** Default timeout for AI requests (ms) */
-const REQUEST_TIMEOUT_MS = 15_000;
+const REQUEST_TIMEOUT_MS = 25_000;
 
 /** Maximum number of cached suggestion results */
 const CACHE_MAX_ENTRIES = 20;
 
 /** Cache entry time-to-live (ms) */
 const CACHE_TTL_MS = 5 * 60 * 1000;
+
+/** Map WebView board IDs to block-dictionary.json board names */
+const BOARD_NAME_MAP: Record<string, string> = {
+	uno: 'arduino_uno',
+	nano: 'arduino_nano',
+	mega: 'arduino_mega',
+	esp32: 'esp32',
+	supermini: 'esp32_supermini',
+	cyberbrick: 'cyberbrick',
+};
+
+/** Categories that are universal across all boards — skip board filtering */
+const UNIVERSAL_CATEGORIES = new Set(['logic', 'loops', 'math', 'text', 'lists', 'variables', 'functions']);
 
 /** Cached suggestion entry */
 interface CacheEntry {
@@ -166,8 +179,11 @@ export class ShadowSuggestionService {
 			this._activeCancellationSource = undefined;
 		}
 
+		const t0 = performance.now();
 		try {
 			const messages = this.buildPrompt(context);
+			const t1 = performance.now();
+			log(`[AI Perf] Prompt built in ${(t1 - t0).toFixed(0)}ms`, 'info');
 			const cts = new vscode.CancellationTokenSource();
 			this._activeCancellationSource = cts;
 
@@ -180,6 +196,8 @@ export class ShadowSuggestionService {
 			} finally {
 				clearTimeout(timeoutId);
 			}
+			const t2 = performance.now();
+			log(`[AI Perf] Model responded in ${(t2 - t1).toFixed(0)}ms`, 'info');
 
 			if (!response) {
 				cts.dispose();
@@ -190,13 +208,22 @@ export class ShadowSuggestionService {
 
 			// Collect the streamed response text
 			let text = '';
+
 			for await (const fragment of response.text) {
 				text += fragment;
 			}
+			const t3 = performance.now();
+			log(`[AI Perf] Streaming collected in ${(t3 - t2).toFixed(0)}ms (${text.length} chars)`, 'info');
 			cts.dispose();
 			this._activeCancellationSource = undefined;
 
-			let suggestions = this.parseResponse(text);
+			log(`[AI Debug] Raw response (first 500 chars): ${text.substring(0, 500)}`, 'debug');
+		if (text.length > 500) {
+			log(`[AI Debug] Raw response (last 100 chars): ...${text.substring(text.length - 100)}`, 'debug');
+		}
+		let suggestions = this.parseResponse(text);
+			const t4 = performance.now();
+			log(`[AI Perf] Parsed ${suggestions.length} suggestions in ${(t4 - t3).toFixed(0)}ms`, 'info');
 			log(`Parsed ${suggestions.length} suggestions from AI response (${text.length} chars)`, 'debug');
 			this.ensureRequiredInputs(suggestions);
 			if (suggestions.length > 0 && context.existingBlockTypes) {
@@ -220,10 +247,12 @@ export class ShadowSuggestionService {
 			this._cache.set(cacheKey, { result, timestamp: Date.now() });
 			this.evictCache();
 
+			log(`[AI Perf] Total pipeline: ${(performance.now() - t0).toFixed(0)}ms`, 'info');
 			return result;
 		} catch (err) {
 			this._activeCancellationSource = undefined;
 			if (err instanceof vscode.CancellationError) {
+				log(`[AI Perf] Request cancelled/timed out after ${(performance.now() - t0).toFixed(0)}ms`, 'info');
 				log('Shadow suggestion request cancelled or timed out', 'debug');
 				return null;
 			}
@@ -239,188 +268,55 @@ export class ShadowSuggestionService {
 	 */
 	private buildPrompt(context: WorkspaceContext): vscode.LanguageModelChatMessage[] {
 		const config = this._modelManager.getEffectiveConfig();
-		const blockList = this.loadBlockDictionary(context.language);
+		const blockList = this.loadBlockDictionary(context.language, context.board);
 
 		// Message 1: Static identity + instructions + few-shot examples (User)
 		const systemParts: string[] = [
 			'# Identity',
-			'',
-			'You are an embedded systems programming assistant for Singular Blockly, a visual block-based IDE. Your task is to suggest the NEXT logical block the user most likely needs to advance their program\'s functionality.',
+			'You are a Singular Blockly assistant that observes behavior patterns and predicts the next logical blocks.',
 			'',
 			'# Instructions',
 			'',
 			'## Output Format',
-			'- Respond with ONLY a JSON array. No explanation, no markdown fences, no commentary.',
-			'- Each element: {"blockType":"block_type_name"} or {"blockType":"block_type_name","fields":{"FIELD_NAME":"value"}}',
-			'- Only include "fields" when you know a meaningful, non-default value.',
-			'- For blocks with value inputs (e.g., text_print has a TEXT input), include an "inputs" object mapping input names to child blocks.',
-			'- Example: {"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"hello"}}}}',
-			'- Inputs can be nested: {"blockType":"math_arithmetic","fields":{"OP":"ADD"},"inputs":{"A":{"blockType":"math_number","fields":{"NUM":"1"}},"B":{"blockType":"math_number","fields":{"NUM":"2"}}}}',
-			'- For blocks with statement inputs (shown as `| stmts: NAME` in the block list), you can include child blocks that go INSIDE the statement slot.',
-			'- Statement children use the same "inputs" key: {"blockType":"controls_for","inputs":{"FROM":...,"TO":...,"BY":...,"DO":{"blockType":"cyberbrick_led_set_color",...}}}',
-			'- To chain multiple blocks inside a statement slot, use "next": {"blockType":"...", ...} to append a block after the current one.',
-			'- Example with chained statement children: {"blockType":"controls_for","inputs":{"FROM":...,"TO":...,"BY":...,"DO":{"blockType":"cyberbrick_led_set_color","inputs":{...},"next":{"blockType":"cyberbrick_delay_ms","inputs":{"TIME":{"blockType":"math_number","fields":{"NUM":"10"}}}}}}}',
-			'- For blocks with Number value inputs (e.g., ANGLE, SPEED, TIME), ALWAYS include a math_number child block with a reasonable default value.',
-			'- For blocks with String value inputs (e.g., TEXT, TOPIC), ALWAYS include a text child block with a meaningful default.',
-			'- Empty value input slots make suggestions unusable — always fill them with appropriate child blocks.',
-			'- To reference a user variable, use: {"blockType":"variables_get","fields":{"VAR":"variable_name"}} — use the variable NAME from the User Variables section, not an ID.',
-			'- For controls_for and controls_forEach blocks, ALWAYS include "fields":{"VAR":"variable_name"} using an existing variable from the User Variables section.',
-			'- The code contains a `← INSERT NEW BLOCK HERE` marker showing where new blocks will be inserted. Focus your suggestions on what makes sense at THAT position.',
+			'Respond ONLY with a minified JSON array. No markdown, no explanation.',
+			'Each element: `{"blockType":"name","fields":{...},"inputs":{...}}`',
+			'fields/inputs optional. No whitespace between tokens.',
+			'CRITICAL: Always close all braces/brackets. Response MUST end with `]`.',
 			'',
-			'## Output Schema',
-			'Each suggestion object MUST conform to this structure:',
-			'```',
-			'{ "blockType": "string (must exist in Available Block Types)",',
-			'  "fields": { "FIELD_NAME": "value (must match listed dropdown options)" },',
-			'  "inputs": { "INPUT_NAME": { "blockType": "...", "fields": {...}, "inputs": {...} } }',
-			'}',
-			'```',
-			'- "fields" and "inputs" are optional, but if a block has required value inputs (shown as `| inputs: NAME(Type)` in the block list), you MUST include them.',
-			'- If a block has dropdown fields (shown as `| fields: NAME[opt1|opt2]`), field values MUST be one of the listed options.',
+			'## Pattern Analysis',
+			'1. Identify repeating patterns — loops, sequences with varying parameters',
+			'2. Predict intent — infer the overall goal from existing code',
+			'3. Complete the pattern — if R→G and G→B exist, suggest B→R',
+			'4. Focus on the `← INSERT NEW BLOCK HERE` marker position',
 			'',
-			'## DO',
-			'- Suggest blocks that ADVANCE the program\'s current purpose or logically extend its behavior.',
-			'- The first suggestion should be the most natural and useful next step given the code context.',
-			'- Consider what a beginner or intermediate embedded-systems student would logically need next.',
-			'- When the code shows a clear pattern (e.g., color sequence, sensor readings), continue or enhance that pattern.',
-			'- Prefer statement blocks (blocks that connect vertically) over standalone value blocks.',
-			'',
-			'## DON\'T',
-			'- Do NOT suggest setup/configuration blocks (like arduino_setup_loop) — they already exist.',
-			'- Do NOT suggest blocks that are unrelated to the user\'s current program context or purpose.',
-			'- Do NOT suggest the exact same block type with the same field values that the user already has, unless continuing a meaningful sequence.',
-			'',
-			'## Self-Check (verify before responding)',
-			'1. Every blockType exists in the Available Block Types list.',
-			'2. Every value input listed in the block dictionary has a child block.',
-			'3. Every dropdown field value matches the options shown in `fields: NAME[options]`.',
-			'4. The suggestion is compatible with the insertion point\'s connection type (if specified).',
-			'',
-			'## Strategy',
-			'1. FIRST, analyze the user\'s code to understand its PURPOSE (e.g., "LED color animation", "sensor monitoring", "serial data logging").',
-			'2. THEN, suggest blocks that ADVANCE that purpose:',
-			'   - Animation/sequence code → suggest delay between steps, loop to repeat, more sequence items',
-			'   - Sensor reading code → suggest conditional logic, display output, threshold comparison',
-			'   - Setup without action → suggest the natural action that uses the setup',
-			'3. When you see REPEATED STRUCTURAL PATTERNS in the Block Structure:',
-			'   a. IDENTIFY: What structure repeats? (e.g., "multiple for-loops with LED color settings inside")',
-			'   b. ANALYZE: How do values change across repetitions? (e.g., "RGB channels rotate: (i,255-i,0) → (0,i,255-i)")',
-			'   c. PREDICT: Continue the mathematical or logical pattern. (e.g., "next rotation is (255-i,0,i)")',
-			'   d. COMPLETE: If the pattern appears finished (e.g., all 3 RGB rotations done), suggest what naturally follows (delay, loop wrapper, etc.).',
-			'4. The FIRST suggestion should be the most obvious and useful next step for the current program context.',
-			'5. Subsequent suggestions should offer alternative ways to advance the SAME purpose, not random unrelated blocks.',
-			'6. Only suggest blocks from a genuinely different purpose if the current program\'s purpose appears complete.',
-			'',
-			'## Common Mistakes',
-			'BAD: {"blockType":"servo_move"} ← missing required ANGLE input',
-			'GOOD: {"blockType":"servo_move","inputs":{"ANGLE":{"blockType":"math_number","fields":{"NUM":"90"}}}}',
-			'',
-			'BAD: {"blockType":"digital_write","fields":{"VALUE":"1"}} ← VALUE must be HIGH or LOW',
-			'GOOD: {"blockType":"digital_write","fields":{"VALUE":"HIGH"}}',
-			'',
-			'BAD: {"blockType":"nonexistent_block"} ← blockType not in dictionary',
-			'',
-			'BAD: {"blockType":"controls_for","inputs":{"FROM":...,"TO":...,"BY":...}} ← missing DO statement children when pattern requires them',
-			'GOOD: {"blockType":"controls_for","inputs":{"FROM":...,"TO":...,"BY":...,"DO":{"blockType":"cyberbrick_led_set_color",...}}}',
+			'## Rules',
+			'Suggest 1-3 blocks. First = most natural next step.',
+			'Include value inputs (FROM/TO/BY, colors, delays) with concrete values.',
+			'Include statement children (DO/ELSE) with their inner blocks when continuing a pattern.',
+			'Use variable names from User Variables.',
+			'Dropdown fields: values MUST be from listed options.',
+			'DON\'T suggest: arduino_setup_loop, micropython_main, or unlisted blocks.',
 			'',
 			'# Examples',
 			'',
-			'<user_code id="example-1">',
+			'<user_code id="ex1">',
 			'Board: uno (Arduino C++)',
-			'Code:',
-			'void loop() {',
-			'  Serial.println("1");',
-			'  Serial.println("2");',
-			'  Serial.println("3");',
-			'}',
-			'Already used blocks: arduino_setup_loop, text_print, text',
+			'Code: void loop(){Serial.println("1");Serial.println("2");}',
+			'Used: arduino_setup_loop,text_print,text',
 			'</user_code>',
+			'<response id="ex1">',
+			'[{"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"3"}}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"5"}}}}]',
+			'</response>',
 			'',
-			'<assistant_response id="example-1">',
-			'[{"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"4"}}}},{"blockType":"arduino_delay","inputs":{"DELAY_TIME":{"blockType":"math_number","fields":{"NUM":"1000"}}}},{"blockType":"controls_if"},{"blockType":"analog_read","fields":{"PIN":"A0"}}]',
-			'</assistant_response>',
-			'',
-			'<user_code id="example-2">',
+			'<user_code id="ex2">',
 			'Board: cyberbrick (MicroPython)',
-			'Code:',
-			'def main():',
-			'    onboard_led[0] = (255, 0, 0)',
-			'    onboard_led.write()',
-			'    onboard_led[0] = (0, 255, 0)',
-			'    onboard_led.write()',
-			'    onboard_led[0] = (0, 0, 255)',
-			'    onboard_led.write()',
-			'    # ← INSERT NEW BLOCK HERE',
-			'Already used blocks: micropython_main, cyberbrick_led_set_color',
+			'Code: for i in range(256): led=(i,255-i,0); for i in range(256): led=(0,i,255-i)',
+			'Pattern: RGB cycle — R→G done, G→B done, missing B→R',
+			'Used: micropython_main,controls_for,cyberbrick_led_set_color,cyberbrick_delay_ms,math_number,math_arithmetic,variables_get',
 			'</user_code>',
-			'',
-			'<assistant_response id="example-2">',
-			'[{"blockType":"cyberbrick_delay_ms","inputs":{"TIME":{"blockType":"math_number","fields":{"NUM":"500"}}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"3"}}}},{"blockType":"cyberbrick_led_set_color","inputs":{"RED":{"blockType":"math_number","fields":{"NUM":"255"}},"GREEN":{"blockType":"math_number","fields":{"NUM":"255"}},"BLUE":{"blockType":"math_number","fields":{"NUM":"0"}}}}]',
-			'</assistant_response>',
-			'',
-			'<user_code id="example-3">',
-			'Board: uno (Arduino C++)',
-			'Code:',
-			'void loop() {',
-			'  int sensor = digitalRead(7);',
-			'}',
-			'Already used blocks: arduino_setup_loop, digital_read, math_number',
-			'</user_code>',
-			'',
-			'<assistant_response id="example-3">',
-			'[{"blockType":"controls_if"},{"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"sensor triggered"}}}},{"blockType":"digital_write","fields":{"PIN":"13"}},{"blockType":"arduino_delay","inputs":{"DELAY_TIME":{"blockType":"math_number","fields":{"NUM":"100"}}}}]',
-			'</assistant_response>',
-			'',
-			'<user_code id="example-4">',
-			'Board: esp32 (Arduino C++)',
-			'Code:',
-			'void loop() {',
-			'  int val = analogRead(A0);',
-			'  // ← INSERT NEW BLOCK HERE',
-			'  delay(500);',
-			'}',
-			'Already used blocks: arduino_setup_loop, analog_read, arduino_delay, math_number',
-			'</user_code>',
-			'',
-			'<assistant_response id="example-4">',
-			'[{"blockType":"controls_if"},{"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"sensor value"}}}},{"blockType":"digital_write","fields":{"PIN":"13"}},{"blockType":"analog_write","fields":{"PIN":"13"},"inputs":{"VALUE":{"blockType":"math_number","fields":{"NUM":"128"}}}}]',
-			'</assistant_response>',
-			'',
-			'<user_code id="example-5">',
-			'Board: cyberbrick (MicroPython)',
-			'Code:',
-			'from machine import Pin',
-			'from neopixel import NeoPixel',
-			'import time',
-			'',
-			'onboard_led = NeoPixel(Pin(8), 1)',
-			'',
-			'def main():',
-			'    for i in range(int(1), int(256), int(1)):',
-			'        onboard_led[0] = (i, 255 - i, 0)',
-			'        onboard_led.write()',
-			'        time.sleep_ms(10)',
-			'    for i in range(int(1), int(256), int(1)):',
-			'        onboard_led[0] = (0, i, 255 - i)',
-			'        onboard_led.write()',
-			'        time.sleep_ms(10)',
-			'    # ← INSERT NEW BLOCK HERE',
-			'',
-			'Block Structure:',
-			'micropython_main',
-			'  controls_for (VAR=i, FROM=1, TO=255, BY=1)',
-			'    cyberbrick_led_set_color (RED=i, GREEN=255-i, BLUE=0)',
-			'    cyberbrick_delay_ms (TIME=10)',
-			'  controls_for (VAR=i, FROM=1, TO=255, BY=1)',
-			'    cyberbrick_led_set_color (RED=0, GREEN=i, BLUE=255-i)',
-			'    cyberbrick_delay_ms (TIME=10)',
-			'',
-			'Already used blocks: micropython_main, controls_for, cyberbrick_led_set_color, cyberbrick_delay_ms, math_number, math_arithmetic, variables_get',
-			'</user_code>',
-			'',
-			'<assistant_response id="example-5">',
-			'[{"blockType":"controls_for","inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"1"}},"TO":{"blockType":"math_number","fields":{"NUM":"255"}},"BY":{"blockType":"math_number","fields":{"NUM":"1"}},"DO":{"blockType":"cyberbrick_led_set_color","inputs":{"RED":{"blockType":"math_arithmetic","fields":{"OP":"MINUS"},"inputs":{"A":{"blockType":"math_number","fields":{"NUM":"255"}},"B":{"blockType":"variables_get","fields":{"VAR":"i"}}}},"GREEN":{"blockType":"math_number","fields":{"NUM":"0"}},"BLUE":{"blockType":"variables_get","fields":{"VAR":"i"}}}}}},{"blockType":"cyberbrick_delay_ms","inputs":{"TIME":{"blockType":"math_number","fields":{"NUM":"500"}}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"10"}}}}]',
-			'</assistant_response>',
+			'<response id="ex2">',
+			'[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"0"}},"TO":{"blockType":"math_number","fields":{"NUM":"255"}},"BY":{"blockType":"math_number","fields":{"NUM":"1"}},"DO":{"blockType":"cyberbrick_led_set_color","inputs":{"RED":{"blockType":"variables_get","fields":{"VAR":"i"}},"GREEN":{"blockType":"math_number","fields":{"NUM":"0"}},"BLUE":{"blockType":"math_arithmetic","fields":{"OP":"MINUS"},"inputs":{"A":{"blockType":"math_number","fields":{"NUM":"255"}},"B":{"blockType":"variables_get","fields":{"VAR":"i"}}}}}}}}]',
+			'</response>',
 		];
 
 		// Platform-specific guidance (appended to static prompt)
@@ -440,7 +336,7 @@ export class ShadowSuggestionService {
 		}
 
 		// Message 2: Assistant confirmation (establishes few-shot pattern)
-		const assistantConfirm = 'Understood. I will analyze the program\'s purpose first, then suggest blocks that advance that purpose, with the most natural next step as the first suggestion.';
+		const assistantConfirm = 'Understood. I will analyze patterns, predict intent, output minified JSON array.';
 
 		// Message 3: Dynamic context (User) — changes every request
 		const contextParts: string[] = [];
@@ -512,13 +408,13 @@ export class ShadowSuggestionService {
 
 		// If estimated tokens > 12000, apply priority-based truncation
 		if (estimatedTokens > 12000) {
-			// Strategy 1: Truncate codeSnippet to ±30 lines around INSERT marker
+			// Strategy 1: Truncate codeSnippet to ±15 lines around INSERT marker
 			if (context.codeSnippet) {
 				const lines = context.codeSnippet.split('\n');
 				const markerIdx = lines.findIndex(l => l.includes('INSERT NEW BLOCK HERE'));
-				if (markerIdx >= 0 && lines.length > 60) {
-					const start = Math.max(0, markerIdx - 30);
-					const end = Math.min(lines.length, markerIdx + 30);
+				if (markerIdx >= 0 && lines.length > 30) {
+					const start = Math.max(0, markerIdx - 15);
+					const end = Math.min(lines.length, markerIdx + 15);
 					const truncatedCode = lines.slice(start, end).join('\n');
 					// Replace the code section in contextParts
 					for (let i = 0; i < contextParts.length; i++) {
@@ -534,10 +430,14 @@ export class ShadowSuggestionService {
 			}
 		}
 
+		// Temporary debug: log full dynamic context sent to AI
+		const dynamicContext = contextParts.join('\n');
+		log(`[AI Debug] Dynamic context (${dynamicContext.length} chars)`, 'debug');
+
 		return [
 			vscode.LanguageModelChatMessage.User(systemParts.join('\n')),
 			vscode.LanguageModelChatMessage.Assistant(assistantConfirm),
-			vscode.LanguageModelChatMessage.User(contextParts.join('\n')),
+			vscode.LanguageModelChatMessage.User(dynamicContext),
 		];
 	}
 
@@ -546,19 +446,24 @@ export class ShadowSuggestionService {
 	 */
 	private parseResponse(text: string): BlockSuggestion[] {
 		let parsed: unknown;
+		let strategyUsed = 'direct-parse';
 
 		// Strategy 1: direct JSON.parse
 		try {
 			parsed = JSON.parse(text);
-		} catch {
+		} catch (e) {
+			log(`[AI Debug] Direct JSON.parse failed: ${(e as Error).message}`, 'debug');
+			strategyUsed = 'none';
 			// Strategy 2: extract from markdown fences
 			const fenceMatch = text.match(FENCED_JSON_RE);
 			if (fenceMatch) {
 				try {
 					parsed = JSON.parse(fenceMatch[1]);
+					strategyUsed = 'fenced';
 				} catch {
 					// fall through
 				}
+				log(`[AI Debug] Fenced JSON extraction ${parsed ? 'succeeded' : 'failed'}`, 'debug');
 			}
 
 			// Strategy 3: extract bare JSON array
@@ -567,38 +472,275 @@ export class ShadowSuggestionService {
 				if (arrayMatch) {
 					try {
 						parsed = JSON.parse(arrayMatch[0]);
+						strategyUsed = 'bare-array';
 					} catch {
-						log('Failed to parse any JSON from AI response', 'debug');
-						return [];
+						// Strategy 3.5: bracket-balance repair
+						// When JSON array is found but has unbalanced braces (e.g., truncated output),
+						// try inserting missing closing braces before the final `]`
+						const jsonStr = arrayMatch[0];
+						let opens = 0;
+						let closes = 0;
+						let inStr = false;
+						for (let ci = 0; ci < jsonStr.length; ci++) {
+							const c = jsonStr[ci];
+							if (c === '\\' && inStr) { ci++; continue; }
+							if (c === '"') { inStr = !inStr; continue; }
+							if (inStr) { continue; }
+							if (c === '{') { opens++; }
+							else if (c === '}') { closes++; }
+						}
+						const missing = opens - closes;
+						if (missing > 0 && missing <= 5) {
+							// Insert missing } before the final ]
+							const repaired = jsonStr.slice(0, -1) + '}'.repeat(missing) + ']';
+							try {
+								parsed = JSON.parse(repaired);
+								strategyUsed = 'bracket-balance';
+								log(`[AI Debug] Bracket-balance: added ${missing} closing brace(s)`, 'debug');
+							} catch {
+								// fall through to Strategy 4
+							}
+						}
+					}
+				}
+			}
+
+			// Strategy 4: repair truncated JSON
+			// When model output is truncated mid-JSON, try to find the last complete
+			// top-level object and close the array
+			if (!parsed) {
+				parsed = this.repairTruncatedJson(text);
+				if (parsed) { strategyUsed = 'truncation-repair'; }
+			}
+
+			// Strategy 5: greedy extraction — find individual top-level JSON objects
+			// Handles cases where the response looks like valid JSON but has internal syntax errors
+			if (!parsed) {
+				parsed = this.extractIndividualObjects(text);
+				if (parsed) { strategyUsed = 'greedy-extraction'; }
+			}
+
+			// Strategy 6: regex fallback — extract blockType names from broken JSON
+			if (!parsed) {
+				const blockTypeRegex = /"blockType"\s*:\s*"([^"]+)"/g;
+				let match;
+				const extractedTypes: string[] = [];
+				while ((match = blockTypeRegex.exec(text)) !== null) {
+					// Only keep top-level block types (skip children that might be duplicated)
+					if (!extractedTypes.includes(match[1])) {
+						extractedTypes.push(match[1]);
+					}
+				}
+				if (extractedTypes.length > 0) {
+					parsed = extractedTypes.map(bt => ({ blockType: bt }));
+					strategyUsed = 'regex-fallback';
+					log(`[AI Debug] Regex fallback extracted ${extractedTypes.length} blockTypes: ${extractedTypes.join(', ')}`, 'debug');
+				}
+			}
+
+			if (!parsed) {
+				log('Failed to parse any JSON from AI response', 'info');
+				return [];
+			}
+		}
+
+		if (!Array.isArray(parsed)) {
+			log(`AI response is not a JSON array: ${String(parsed).substring(0, 200)}`, 'info');
+			return [];
+		}
+
+		log(`[AI Debug] Parsed array with ${parsed.length} items via ${strategyUsed}, validating...`, 'info');
+		const validated = parsed.filter((item: any) => this.validateSuggestion(item));
+		if (validated.length < parsed.length) {
+			log(`[AI Debug] Validation rejected ${parsed.length - validated.length} of ${parsed.length} suggestions`, 'debug');
+		}
+		return validated;
+	}
+
+	/**
+	 * Attempt to repair truncated JSON array by finding the last complete top-level object.
+	 * Handles cases where model output token limit cuts off the JSON mid-response.
+	 */
+	private repairTruncatedJson(text: string): unknown | null {
+		// Find the start of the JSON array
+		const arrayStart = text.indexOf('[');
+		if (arrayStart === -1) { return null; }
+
+		const jsonPart = text.substring(arrayStart);
+
+		// Walk through the string tracking bracket/brace depth to find complete objects
+		let depth = 0;
+		let inString = false;
+		let escape = false;
+		let lastCompleteObjectEnd = -1;
+
+		for (let i = 0; i < jsonPart.length; i++) {
+			const ch = jsonPart[i];
+
+			if (escape) {
+				escape = false;
+				continue;
+			}
+
+			if (ch === '\\' && inString) {
+				escape = true;
+				continue;
+			}
+
+			if (ch === '"') {
+				inString = !inString;
+				continue;
+			}
+
+			if (inString) { continue; }
+
+			if (ch === '[' || ch === '{') {
+				depth++;
+			} else if (ch === ']' || ch === '}') {
+				depth--;
+				// depth === 1 means we just closed a top-level object inside the array
+				if (depth === 1 && ch === '}') {
+					lastCompleteObjectEnd = i;
+				}
+				// depth === 0 means array is properly closed — should have been caught by Strategy 1/3
+				if (depth === 0) {
+					// Array looks closed - try parsing as-is first
+					try {
+						return JSON.parse(jsonPart);
+					} catch {
+						// Balanced brackets but internal errors - try truncation repair
+						break;
 					}
 				}
 			}
 		}
 
-		if (!Array.isArray(parsed)) {
-			log('AI response is not a JSON array', 'debug');
-			return [];
+		if (lastCompleteObjectEnd === -1) {
+			return null;
 		}
 
-		return parsed.filter((item: any) => this.validateSuggestion(item));
+		// Truncate after last complete object and close the array
+		const repaired = jsonPart.substring(0, lastCompleteObjectEnd + 1) + ']';
+		try {
+			const result = JSON.parse(repaired);
+			log(`[AI Debug] Truncated JSON repaired: extracted ${Array.isArray(result) ? result.length : 0} items from ${jsonPart.length} chars`, 'debug');
+			return result;
+		} catch {
+			return null;
+		}
+	}
+
+	/**
+	 * Extract individual JSON objects from a response that may have syntax errors.
+	 * Walks through the text character by character, tracking brace depth and string state,
+	 * to identify complete top-level objects within a JSON array.
+	 */
+	private extractIndividualObjects(text: string): unknown[] | null {
+		const arrayStart = text.indexOf('[');
+		if (arrayStart === -1) { return null; }
+
+		const jsonPart = text.substring(arrayStart);
+		const objects: unknown[] = [];
+		let depth = 0;
+		let inString = false;
+		let escape = false;
+		let objectStart = -1;
+
+		for (let i = 0; i < jsonPart.length; i++) {
+			const ch = jsonPart[i];
+
+			if (escape) {
+				escape = false;
+				continue;
+			}
+			if (ch === '\\' && inString) {
+				escape = true;
+				continue;
+			}
+			if (ch === '"') {
+				inString = !inString;
+				continue;
+			}
+			if (inString) { continue; }
+
+			if (ch === '{') {
+				if (depth === 1) {
+					objectStart = i;
+				}
+				depth++;
+			} else if (ch === '}') {
+				depth--;
+				if (depth === 1 && objectStart !== -1) {
+					const objStr = jsonPart.substring(objectStart, i + 1);
+					try {
+						const obj = JSON.parse(objStr);
+						objects.push(obj);
+					} catch {
+						log(`[AI Debug] Skipped malformed object at position ${objectStart}`, 'debug');
+					}
+					objectStart = -1;
+				}
+			} else if (ch === '[' && depth === 0) {
+				depth = 1;
+			} else if (ch === ']' && depth === 1) {
+				break;
+			}
+		}
+
+		// If no complete objects found but we have an objectStart, try parsing partial
+		if (objects.length === 0 && objectStart !== -1) {
+			// Try to find the largest parseable substring
+			for (let end = jsonPart.length - 1; end > objectStart; end--) {
+				if (jsonPart[end] === '}') {
+					const candidate = jsonPart.substring(objectStart, end + 1);
+					try {
+						const obj = JSON.parse(candidate);
+						objects.push(obj);
+						log(`[AI Debug] Greedy extraction recovered partial object from position ${objectStart} to ${end}`, 'debug');
+						break;
+					} catch {
+						// Try next } position
+					}
+				}
+			}
+		}
+
+		if (objects.length > 0) {
+			log(`[AI Debug] Greedy extraction recovered ${objects.length} objects from malformed JSON`, 'debug');
+			return objects;
+		}
+		return null;
 	}
 
 	/**
 	 * Load and cache a block dictionary summary with one-line descriptions, filtered by language.
 	 * Format: "### Category\ntype — description\n..."
 	 */
-	private loadBlockDictionary(language: 'arduino' | 'micropython'): string {
-		const cached = this._blockDictionaryCache.get(language);
+	private loadBlockDictionary(language: 'arduino' | 'micropython', board: string): string {
+		const cacheKey = `${language}:${board}`;
+		const cached = this._blockDictionaryCache.get(cacheKey);
 		if (cached) {
 			return cached;
 		}
 
 		// Categories exclusive to each platform
-		const arduinoOnlyCategories = new Set(['arduino', 'vision', 'x11', 'x12', 'motors', 'sensors', 'rc', 'displays', 'communication']);
+		const arduinoOnlyCategories = new Set(['arduino', 'vision', 'motors', 'sensors', 'displays', 'communication']);
 		const micropythonOnlyCategories = new Set(['cyberbrick']);
 
 		try {
-			const dictPath = path.join(this._extensionPath, 'src', 'mcp', 'block-dictionary.json');
+			// Try multiple possible locations (dist for production, src for development)
+			const candidates = [
+				path.join(this._extensionPath, 'dist', 'block-dictionary.json'),
+				path.join(this._extensionPath, 'src', 'mcp', 'block-dictionary.json'),
+				path.join(this._extensionPath, 'block-dictionary.json'),
+			];
+			const dictPath = candidates.find(p => fs.existsSync(p));
+			if (!dictPath) {
+				log('Block dictionary not found in any expected location', 'warn');
+				const fallback = '(block dictionary unavailable)';
+				this._blockDictionaryCache.set(language, fallback);
+				return fallback;
+			}
 			const raw = fs.readFileSync(dictPath, 'utf-8');
 			const dict = JSON.parse(raw) as {
 				blocks: Array<{
@@ -609,13 +751,15 @@ export class ShadowSuggestionService {
 					fields?: Array<{ name: string; type: string; options?: any }>;
 					internal?: boolean;
 					experimental?: boolean;
+					boards?: string[];
 				}>;
 			};
 
 			// Build block type set for validation (all blocks, unfiltered)
 			this._blockTypeSet = new Set(dict.blocks.map(b => b.type));
 
-			// Filter blocks by language
+			// Filter blocks by language and board
+			const dictBoardName = BOARD_NAME_MAP[board] || board;
 			const filtered = dict.blocks.filter(b => {
 				if (language === 'micropython' && arduinoOnlyCategories.has(b.category)) {
 					return false;
@@ -625,6 +769,10 @@ export class ShadowSuggestionService {
 				}
 				// Exclude internal and experimental blocks from AI suggestions
 				if (b.internal === true || b.experimental === true) {
+					return false;
+				}
+				// Filter by board compatibility (skip universal categories)
+				if (!UNIVERSAL_CATEGORIES.has(b.category) && b.boards && Array.isArray(b.boards) && !b.boards.includes(dictBoardName)) {
 					return false;
 				}
 				return true;
@@ -641,14 +789,13 @@ export class ShadowSuggestionService {
 				}
 			}
 
-			// Group by category with descriptions
+			// Group by category
 			const byCategory = new Map<string, string[]>();
 			for (const block of filtered) {
 				const cat = block.category;
 				if (!byCategory.has(cat)) {
 					byCategory.set(cat, []);
 				}
-				const desc = block.descriptions?.en ?? block.type;
 				const valueInputs = block.inputs?.filter(i => i.type === 'value') ?? [];
 				const inputsSummary = valueInputs.length
 					? ' | inputs: ' + valueInputs.map(i => `${i.name}(${Array.isArray(i.check) ? i.check.join('|') : i.check || 'Any'})`).join(', ')
@@ -667,8 +814,8 @@ export class ShadowSuggestionService {
 						}
 						if (Array.isArray(f.options)) {
 							const values = (f.options as Array<{ value: string }>).map(o => o.value).filter(Boolean);
-							if (values.length > 6) {
-								return `${f.name}[${values.slice(0, 5).join('|')}|...]`;
+							if (values.length > 4) {
+								return `${f.name}[${values.slice(0, 3).join('|')}|...]`;
 							}
 							return `${f.name}[${values.join('|')}]`;
 						}
@@ -679,7 +826,7 @@ export class ShadowSuggestionService {
 					? ' | fields: ' + dropdownFields.join(', ')
 					: '';
 
-				byCategory.get(cat)!.push(`${block.type} — ${desc}${inputsSummary}${stmtsSummary}${fieldsSummary}`);
+				byCategory.get(cat)!.push(`${block.type}${inputsSummary}${stmtsSummary}${fieldsSummary}`);
 			}
 
 			const lines: string[] = [];
@@ -690,13 +837,13 @@ export class ShadowSuggestionService {
 			}
 
 			const result = lines.join('\n').trimEnd();
-			this._blockDictionaryCache.set(language, result);
-			log(`Block dictionary loaded (${language}): ${filtered.length} blocks in ${byCategory.size} categories`, 'info');
+			this._blockDictionaryCache.set(cacheKey, result);
+			log(`Block dictionary loaded (${language}/${board}): ${filtered.length} blocks in ${byCategory.size} categories`, 'info');
 			return result;
 		} catch (err) {
 			log(`Failed to load block dictionary: ${err}`, 'warn');
 			const fallback = '(block dictionary unavailable)';
-			this._blockDictionaryCache.set(language, fallback);
+			this._blockDictionaryCache.set(cacheKey, fallback);
 			return fallback;
 		}
 	}
@@ -707,7 +854,7 @@ export class ShadowSuggestionService {
 	private formatWorkspaceTree(tree: WorkspaceContext['workspaceTree']): string {
 		if (!tree || tree.length === 0) { return ''; }
 
-		const MAX_LINES = 80;
+		const MAX_LINES = 40;
 		const MAX_DEPTH = 4;
 		const lines: string[] = [];
 		let totalNodes = 0;
@@ -897,7 +1044,7 @@ export class ShadowSuggestionService {
 		// Allow variable blocks which are dynamic and not in the static dictionary
 		const dynamicBlocks = new Set(['variables_get', 'variables_set']);
 		if (this._blockTypeSet && !this._blockTypeSet.has(suggestion.blockType) && !dynamicBlocks.has(suggestion.blockType)) {
-			log(`Unknown block type in suggestion: ${suggestion.blockType}`, 'debug');
+			log(`[AI Debug] Rejected: unknown blockType "${suggestion.blockType}"`, 'debug');
 			return false;
 		}
 

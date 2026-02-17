@@ -23,6 +23,7 @@ export class AIStatusBar implements vscode.Disposable {
 	private readonly statusBarItem: vscode.StatusBarItem;
 	private readonly disposables: vscode.Disposable[] = [];
 	private quotaExhausted = false;
+	private _previousText: string | undefined;
 
 	constructor(
 		private readonly aiModelManager: AIModelManager,
@@ -215,6 +216,23 @@ export class AIStatusBar implements vscode.Disposable {
 		await vscode.workspace.getConfiguration('singularBlockly.ai').update('model', family, vscode.ConfigurationTarget.Global);
 		await this.aiModelManager.selectModel(family);
 		log(`AI model changed to ${family}`, 'info');
+	}
+
+	/** Show loading state in status bar during AI request */
+	showLoading(): void {
+		this._previousText = this.statusBarItem.text;
+		this.statusBarItem.text = '$(loading~spin) AI...';
+		this.statusBarItem.tooltip = 'AI suggestion in progress...';
+		this.statusBarItem.show();
+	}
+
+	/** Restore status bar to normal state */
+	hideLoading(): void {
+		if (this._previousText !== undefined) {
+			this.statusBarItem.text = this._previousText;
+			this._previousText = undefined;
+			this.updateTooltip();
+		}
 	}
 
 	dispose(): void {
