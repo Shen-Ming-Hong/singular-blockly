@@ -7,7 +7,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
-import { AIModelManager, CopilotTier, TIER_DEFAULTS } from '../../services/aiModelManager';
+import { AIModelManager, CopilotTier, TIER_DEFAULTS, getModelMaxOutputTokens } from '../../services/aiModelManager';
 
 /**
  * 測試套件: AIModelManager
@@ -165,6 +165,33 @@ suite('AIModelManager Tests', () => {
 
 		test('Should return "none" by default', () => {
 			assert.strictEqual(manager.getTier(), 'none');
+		});
+	});
+
+	suite('getModelMaxOutputTokens()', () => {
+		test('Layer 1: returns maxOutputTokens from API property when valid', () => {
+			const model = { family: 'gpt-4o', maxOutputTokens: 8192 } as any;
+			assert.strictEqual(getModelMaxOutputTokens(model), 8192);
+		});
+
+		test('Layer 2: falls back to KNOWN_MAX_OUTPUT_TOKENS for gpt-4.1 (32768)', () => {
+			const model = { family: 'gpt-4.1' } as any;
+			assert.strictEqual(getModelMaxOutputTokens(model), 32768);
+		});
+
+		test('Layer 2: falls back to KNOWN_MAX_OUTPUT_TOKENS for claude-sonnet-4 (16000)', () => {
+			const model = { family: 'claude-sonnet-4' } as any;
+			assert.strictEqual(getModelMaxOutputTokens(model), 16000);
+		});
+
+		test('Layer 3: returns 16384 for unknown model with no API property', () => {
+			const model = { family: 'unknown-model-xyz' } as any;
+			assert.strictEqual(getModelMaxOutputTokens(model), 16384);
+		});
+
+		test('Edge case: ignores maxOutputTokens = 0, falls back to table', () => {
+			const model = { family: 'gpt-4.1', maxOutputTokens: 0 } as any;
+			assert.strictEqual(getModelMaxOutputTokens(model), 32768);
 		});
 	});
 
@@ -376,6 +403,67 @@ suite('AIModelManager Tests', () => {
 			const response = await manager.sendPrompt(messages, mockToken);
 
 			assert.ok(response, 'Should auto-select model and return response');
+		});
+
+		test('Should send reasoning_effort: low in modelOptions for GPT model', async () => {
+			const gptModel = createMockModel('gpt-4.1');
+			gptModel.sendRequest.resolves({ text: ['response'] });
+			selectChatModelsStub.resolves([gptModel]);
+
+			await manager.selectModel('gpt-4.1');
+			const messages = [vscode.LanguageModelChatMessage.User('test')];
+			await manager.sendPrompt(messages, mockToken);
+
+			assert.ok(gptModel.sendRequest.calledOnce, 'sendRequest should be called');
+			const modelOptions = gptModel.sendRequest.firstCall.args[1].modelOptions;
+			assert.strictEqual(modelOptions.reasoning_effort, 'low');
+			assert.strictEqual(modelOptions.effort, undefined);
+		});
+
+		test('Should send effort: low in modelOptions for Claude model (not reasoning_effort)', async () => {
+			const claudeModel = createMockModel('claude-sonnet-4');
+			claudeModel.sendRequest.resolves({ text: ['response'] });
+			selectChatModelsStub.resolves([claudeModel]);
+
+			await manager.selectModel('claude-sonnet-4');
+			const messages = [vscode.LanguageModelChatMessage.User('test')];
+			await manager.sendPrompt(messages, mockToken);
+
+			assert.ok(claudeModel.sendRequest.calledOnce, 'sendRequest should be called');
+			const modelOptions = claudeModel.sendRequest.firstCall.args[1].modelOptions;
+			assert.strictEqual(modelOptions.effort, 'low');
+			assert.strictEqual(modelOptions.reasoning_effort, undefined);
+		});
+
+		test('Should send no reasoning param in modelOptions for Gemini model', async () => {
+			const geminiModel = createMockModel('gemini-2.5-pro');
+			geminiModel.sendRequest.resolves({ text: ['response'] });
+			selectChatModelsStub.resolves([geminiModel]);
+
+			await manager.selectModel('gemini-2.5-pro');
+			const messages = [vscode.LanguageModelChatMessage.User('test')];
+			await manager.sendPrompt(messages, mockToken);
+
+			assert.ok(geminiModel.sendRequest.calledOnce, 'sendRequest should be called');
+			const modelOptions = geminiModel.sendRequest.firstCall.args[1].modelOptions;
+			assert.strictEqual(modelOptions.reasoning_effort, undefined);
+			assert.strictEqual(modelOptions.effort, undefined);
+		});
+
+		test('Should use known token limit 32768 for gpt-4.1 in modelOptions', async () => {
+			const gptModel = createMockModel('gpt-4.1');
+			gptModel.sendRequest.resolves({ text: ['response'] });
+			selectChatModelsStub.resolves([gptModel]);
+
+			await manager.selectModel('gpt-4.1');
+			const messages = [vscode.LanguageModelChatMessage.User('test')];
+			await manager.sendPrompt(messages, mockToken);
+
+			assert.ok(gptModel.sendRequest.calledOnce, 'sendRequest should be called');
+			const modelOptions = gptModel.sendRequest.firstCall.args[1].modelOptions;
+			assert.strictEqual(modelOptions.max_output_tokens, 32768);
+			assert.strictEqual(modelOptions.max_completion_tokens, 32768);
+			assert.strictEqual(modelOptions.max_tokens, 32768);
 		});
 	});
 

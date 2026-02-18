@@ -78,6 +78,7 @@ suite('ShadowSuggestionService Tests', () => {
 			maxSuggestions: 0,
 			multiSuggestion: false,
 			autoModel: false,
+			reasoningEffort: 'low',
 		};
 	}
 
@@ -92,6 +93,7 @@ suite('ShadowSuggestionService Tests', () => {
 			maxSuggestions: 3,
 			multiSuggestion: true,
 			autoModel: true,
+			reasoningEffort: 'low',
 		};
 	}
 
