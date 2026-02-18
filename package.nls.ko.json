@@ -1,5 +1,10 @@
 {
 	"command.checkMcpStatus.title": "MCP 상태 확인",
 	"config.mcp.nodePath.description": "MCP 서버용 Node.js 실행 파일 경로입니다. 기본값 'node'는 시스템 PATH를 사용합니다. nvm/fnm 사용자는 전체 절대 경로를 지정하세요.",
-	"config.mcp.showStartupWarning.description": "시작 시 Node.js를 사용할 수 없거나 버전이 낮은 경우 경고 메시지를 표시합니다. MCP AI 기능이 필요하지 않으면 비활성화할 수 있습니다."
+	"config.mcp.showStartupWarning.description": "시작 시 Node.js를 사용할 수 없거나 버전이 낮은 경우 경고 메시지를 표시합니다. MCP AI 기능이 필요하지 않으면 비활성화할 수 있습니다.",
+	"singularBlockly.ai.reasoningEffort.description": "AI 블록 제안의 추론 깊이를 제어합니다. 'low'는 속도를 우선시하고, 'high'는 품질을 우선시합니다.",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "AI 블록 제안의 추론 깊이를 제어합니다.\n\n- **low**: 가장 빠른 응답, 최소 추론 (인라인 제안에 권장)\n- **medium**: 속도와 품질의 균형\n- **high**: 가장 깊은 추론, 느린 응답",
+	"singularBlockly.ai.reasoningEffort.low.description": "가장 빠름, 최소 추론 (권장)",
+	"singularBlockly.ai.reasoningEffort.medium.description": "속도와 품질의 균형",
+	"singularBlockly.ai.reasoningEffort.high.description": "가장 깊은 추론, 가장 느린 응답"
 }

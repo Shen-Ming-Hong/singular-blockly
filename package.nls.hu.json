@@ -1,5 +1,10 @@
 {
 	"command.checkMcpStatus.title": "MCP állapot ellenőrzése",
 	"config.mcp.nodePath.description": "A Node.js futtatható fájl elérési útja az MCP szerverhez. Az alapértelmezett 'node' a rendszer PATH-ot használja. Az nvm/fnm felhasználóknak a teljes abszolút útvonalat kell megadniuk.",
-	"config.mcp.showStartupWarning.description": "Figyelmeztető üzenet megjelenítése indításkor, ha a Node.js nem érhető el vagy a verzió túl alacsony. Tiltsa le, ha nincs szüksége az MCP AI funkciókra."
+	"config.mcp.showStartupWarning.description": "Figyelmeztető üzenet megjelenítése indításkor, ha a Node.js nem érhető el vagy a verzió túl alacsony. Tiltsa le, ha nincs szüksége az MCP AI funkciókra.",
+	"singularBlockly.ai.reasoningEffort.description": "Az AI blokk javaslatok gondolkodási mélységét vezérli. A 'low' a sebességet helyezi előtérbe, a 'high' a minőséget.",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "Az AI blokk javaslatok gondolkodási mélységét vezérli.\n\n- **low**: Leggyorsabb válasz, minimális gondolkodás (javasolt az inline javaslatokhoz)\n- **medium**: Egyensúly a sebesség és minőség között\n- **high**: Legmélyebb gondolkodás, lassabb válasz",
+	"singularBlockly.ai.reasoningEffort.low.description": "Leggyorsabb, minimális gondolkodás (javasolt)",
+	"singularBlockly.ai.reasoningEffort.medium.description": "Egyensúly a sebesség és minőség között",
+	"singularBlockly.ai.reasoningEffort.high.description": "Legmélyebb gondolkodás, leglassabb válasz"
 }

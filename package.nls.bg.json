@@ -1,5 +1,10 @@
 {
 	"command.checkMcpStatus.title": "Проверка на MCP статус",
 	"config.mcp.nodePath.description": "Път до изпълнимия файл Node.js за MCP сървъра. По подразбиране 'node' използва системния PATH. За потребители на nvm/fnm посочете пълния абсолютен път.",
-	"config.mcp.showStartupWarning.description": "Показване на предупредително съобщение при стартиране, когато Node.js не е наличен или версията е твърде ниска. Деактивирайте, ако не се нуждаете от MCP AI функции."
+	"config.mcp.showStartupWarning.description": "Показване на предупредително съобщение при стартиране, когато Node.js не е наличен или версията е твърде ниска. Деактивирайте, ако не се нуждаете от MCP AI функции.",
+	"singularBlockly.ai.reasoningEffort.description": "Управлява дълбочината на разсъждение за AI предложения на блокове. 'low' приоритизира скоростта, 'high' приоритизира качеството.",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "Управлява дълбочината на разсъждение за AI предложения на блокове.\n\n- **low**: Най-бърз отговор, минимално разсъждение (препоръчително за вградени предложения)\n- **medium**: Баланс между скорост и качество\n- **high**: Най-дълбоко разсъждение, по-бавен отговор",
+	"singularBlockly.ai.reasoningEffort.low.description": "Най-бърз, минимално разсъждение (препоръчително)",
+	"singularBlockly.ai.reasoningEffort.medium.description": "Баланс между скорост и качество",
+	"singularBlockly.ai.reasoningEffort.high.description": "Най-дълбоко разсъждение, най-бавен отговор"
 }

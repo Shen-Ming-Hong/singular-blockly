@@ -1,5 +1,10 @@
 {
 	"command.checkMcpStatus.title": "Verificar Status do MCP",
 	"config.mcp.nodePath.description": "Caminho para o executável Node.js do servidor MCP. O padrão 'node' usa o PATH do sistema. Para usuários nvm/fnm, especifique o caminho absoluto completo.",
-	"config.mcp.showStartupWarning.description": "Mostrar mensagem de aviso na inicialização quando o Node.js não estiver disponível ou a versão for muito baixa. Desative isso se você não precisar dos recursos de IA do MCP."
+	"config.mcp.showStartupWarning.description": "Mostrar mensagem de aviso na inicialização quando o Node.js não estiver disponível ou a versão for muito baixa. Desative isso se você não precisar dos recursos de IA do MCP.",
+	"singularBlockly.ai.reasoningEffort.description": "Controla a profundidade de raciocínio para sugestões de blocos de IA. 'low' prioriza a velocidade, 'high' prioriza a qualidade.",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "Controla a profundidade de raciocínio para sugestões de blocos de IA.\n\n- **low**: Resposta mais rápida, raciocínio mínimo (recomendado para sugestões em linha)\n- **medium**: Equilíbrio entre velocidade e qualidade\n- **high**: Raciocínio mais profundo, resposta mais lenta",
+	"singularBlockly.ai.reasoningEffort.low.description": "Mais rápido, raciocínio mínimo (recomendado)",
+	"singularBlockly.ai.reasoningEffort.medium.description": "Equilíbrio entre velocidade e qualidade",
+	"singularBlockly.ai.reasoningEffort.high.description": "Raciocínio mais profundo, resposta mais lenta"
 }

@@ -1,5 +1,10 @@
 {
 	"command.checkMcpStatus.title": "MCPステータスを確認",
 	"config.mcp.nodePath.description": "MCPサーバー用のNode.js実行ファイルのパス。デフォルトの'node'はシステムPATHを使用します。nvm/fnmユーザーは絶対パスを指定してください。",
-	"config.mcp.showStartupWarning.description": "起動時にNode.jsが利用できない、またはバージョンが低い場合に警告メッセージを表示します。MCP AI機能を使用しない場合は無効にできます。"
+	"config.mcp.showStartupWarning.description": "起動時にNode.jsが利用できない、またはバージョンが低い場合に警告メッセージを表示します。MCP AI機能を使用しない場合は無効にできます。",
+	"singularBlockly.ai.reasoningEffort.description": "AIブロック提案の推論深度を制御します。'low'は速度を優先し、'high'は品質を優先します。",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "AIブロック提案の推論深度を制御します。\n\n- **low**：最速応答、最小推論（インライン提案に推奨）\n- **medium**：速度と品質のバランス\n- **high**：最深推論、応答が遅い",
+	"singularBlockly.ai.reasoningEffort.low.description": "最速、最小推論（推奨）",
+	"singularBlockly.ai.reasoningEffort.medium.description": "速度と品質のバランス",
+	"singularBlockly.ai.reasoningEffort.high.description": "最深推論、最も遅い応答"
 }

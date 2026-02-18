@@ -1,5 +1,10 @@
 {
 	"command.checkMcpStatus.title": "檢查 MCP 狀態",
 	"config.mcp.nodePath.description": "MCP Server 使用的 Node.js 執行檔路徑。預設 'node' 使用系統 PATH。若使用 nvm/fnm，請指定完整絕對路徑（例如：C:\\Users\\username\\.nvm\\versions\\node\\v22.16.0\\node.exe）。",
-	"config.mcp.showStartupWarning.description": "啟動時若 Node.js 不可用或版本過低，顯示警告訊息。若不需要 MCP AI 功能，可停用此警告。"
+	"config.mcp.showStartupWarning.description": "啟動時若 Node.js 不可用或版本過低，顯示警告訊息。若不需要 MCP AI 功能，可停用此警告。",
+	"singularBlockly.ai.reasoningEffort.description": "控制 AI 積木建議的推理深度。'low' 優先考慮速度，'high' 優先考慮品質。",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "控制 AI 積木建議的推理深度。\n\n- **low**：最快回應，最少推理（建議用於內嵌建議）\n- **medium**：速度與品質的平衡\n- **high**：最深入推理，回應較慢",
+	"singularBlockly.ai.reasoningEffort.low.description": "最快，最少推理（建議）",
+	"singularBlockly.ai.reasoningEffort.medium.description": "速度與品質平衡",
+	"singularBlockly.ai.reasoningEffort.high.description": "最深入推理，回應最慢"
 }
