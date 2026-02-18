@@ -157,6 +157,18 @@
 					"minimum": 1,
 					"maximum": 30,
 					"markdownDescription": "Maximum number of AI suggestion requests per minute."
+				},
+				"singularBlockly.ai.reasoningEffort": {
+					"type": "string",
+					"default": "low",
+					"enum": ["low", "medium", "high"],
+					"enumDescriptions": [
+						"%singularBlockly.ai.reasoningEffort.low.description%",
+						"%singularBlockly.ai.reasoningEffort.medium.description%",
+						"%singularBlockly.ai.reasoningEffort.high.description%"
+					],
+					"description": "%singularBlockly.ai.reasoningEffort.description%",
+					"markdownDescription": "%singularBlockly.ai.reasoningEffort.markdownDescription%"
 				}
 			}
 		}

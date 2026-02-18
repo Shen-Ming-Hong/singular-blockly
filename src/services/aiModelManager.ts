@@ -20,6 +20,7 @@ export interface TierConfig {
 	maxSuggestions: number;
 	multiSuggestion: boolean;
 	autoModel: boolean;
+	reasoningEffort: 'low' | 'medium' | 'high';
 }
 
 /** Default configurations for each Copilot tier */
@@ -33,6 +34,7 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 		maxSuggestions: 0,
 		multiSuggestion: false,
 		autoModel: false,
+		reasoningEffort: 'low',
 	},
 	free: {
 		enabled: false,
@@ -43,6 +45,7 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 		maxSuggestions: 3,
 		multiSuggestion: true,
 		autoModel: false,
+		reasoningEffort: 'low',
 	},
 	pro: {
 		enabled: false,
@@ -53,6 +56,7 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 		maxSuggestions: 3,
 		multiSuggestion: true,
 		autoModel: true,
+		reasoningEffort: 'low',
 	},
 	pro_plus: {
 		enabled: false,
@@ -63,6 +67,7 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 		maxSuggestions: 5,
 		multiSuggestion: true,
 		autoModel: true,
+		reasoningEffort: 'low',
 	},
 };
 
@@ -246,14 +251,11 @@ export class AIModelManager implements vscode.Disposable {
 			}
 		}
 
+		const config = this.getEffectiveConfig();
+
 		for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
 			try {
-				const modelOpts = {
-					max_output_tokens: 16384,
-					max_completion_tokens: 16384,
-					max_tokens: 16384,
-					reasoning_effort: 'low',
-				};
+				const modelOpts = this.buildModelOptions(this._cachedModel!, config.reasoningEffort);
 				const response = await this._cachedModel!.sendRequest(messages, { modelOptions: modelOpts }, token);
 				return response;
 			} catch (err) {
@@ -279,7 +281,8 @@ export class AIModelManager implements vscode.Disposable {
 							const fallbackModel = await this.selectModel(family);
 							if (fallbackModel) {
 								try {
-									const retryResponse = await fallbackModel.sendRequest(messages, { modelOptions: { max_output_tokens: 16384, max_completion_tokens: 16384, max_tokens: 16384, reasoning_effort: 'low' } }, token);
+									const fallbackOpts = this.buildModelOptions(fallbackModel, config.reasoningEffort);
+									const retryResponse = await fallbackModel.sendRequest(messages, { modelOptions: fallbackOpts }, token);
 									return retryResponse;
 								} catch (retryErr) {
 									log(`Base model ${family} also failed: ${retryErr}`, 'warn');
@@ -317,6 +320,7 @@ export class AIModelManager implements vscode.Disposable {
 			maxSuggestions: defaults.maxSuggestions,
 			multiSuggestion: defaults.multiSuggestion,
 			autoModel: defaults.autoModel,
+			reasoningEffort: userConfig.get<'low' | 'medium' | 'high'>('reasoningEffort', defaults.reasoningEffort),
 		};
 	}
 
@@ -353,10 +357,79 @@ export class AIModelManager implements vscode.Disposable {
 		this._cachedModel = undefined;
 	}
 
+	/**
+	 * Build model-specific request options.
+	 *
+	 * **Token limit** (3-layer fallback, same as `getModelMaxOutputTokens`):
+	 *   Layer 1 → `(model as any).maxOutputTokens` (non-standard; Copilot extension may expose it, not guaranteed)
+	 *   Layer 2 → `KNOWN_MAX_OUTPUT_TOKENS` table
+	 *   Layer 3 → 16384
+	 *
+	 * **Why three token keys** (`max_output_tokens`, `max_completion_tokens`, `max_tokens`):
+	 *   Different backend providers use different key names; all three are sent so the correct one
+	 *   is picked up regardless of which provider is routing the request.
+	 *
+	 * **Reasoning effort mapping** (model family → key name):
+	 *   - `gpt*` / `o1` / `o3` / `o4` → `reasoning_effort: <effort>`  (OpenAI)
+	 *   - `claude*`                    → `effort: <effort>`             (Anthropic; budget_tokens deprecated as of Opus 4.6)
+	 *   - Gemini / others              → omitted (no known equivalent via vscode.lm)
+	 *
+	 * Note: `modelOptions` is a pass-through bag; unsupported keys are silently ignored by the provider.
+	 * The Copilot backend may also override these values entirely (known issue: vscode-copilot-release#1352).
+	 */
+	private buildModelOptions(model: vscode.LanguageModelChat, reasoningEffort: 'low' | 'medium' | 'high' = 'low'): Record<string, unknown> {
+		const maxTokens = getModelMaxOutputTokens(model);
+		const opts: Record<string, unknown> = {
+			max_output_tokens: maxTokens,
+			max_completion_tokens: maxTokens,
+			max_tokens: maxTokens,
+		};
+
+		const family = model.family.toLowerCase();
+		if (family.includes('gpt') || family.includes('o1') || family.includes('o3') || family.includes('o4')) {
+			// OpenAI reasoning models use reasoning_effort
+			opts.reasoning_effort = reasoningEffort;
+		} else if (family.includes('claude')) {
+			// Anthropic models use effort (budget_tokens is deprecated as of Opus 4.6)
+			opts.effort = reasoningEffort;
+		}
+		// Gemini and others: no known equivalent via vscode.lm; omit to avoid confusion
+
+		return opts;
+	}
+
 	private sleep(ms: number): Promise<void> {
 		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 }
+
+// ─── Known model metadata tables ───────────────────────────────────────────
+// These are maintained manually since the vscode.lm API does not expose all
+// model metadata to extension consumers (only LanguageModelChatInformation,
+// which is the provider side, has full metadata).
+
+/**
+ * Known max output tokens for common Copilot models.
+ * `maxOutputTokens` is NOT exposed on the `LanguageModelChat` consumer interface
+ * (only on `LanguageModelChatInformation` which is the provider side). We use
+ * `(model as any).maxOutputTokens` as a best-effort Layer 1 read, then fall back
+ * to this table as Layer 2 in `getModelMaxOutputTokens`.
+ * Updated: 2026-02-18
+ */
+const KNOWN_MAX_OUTPUT_TOKENS: Record<string, number> = {
+	'gpt-5-mini': 16384,
+	'gpt-5': 32768,
+	'gpt-4.1': 32768,
+	'gpt-4o': 16384,
+	'gpt-4o-mini': 16384,
+	'claude-haiku-4.5': 8192,
+	'claude-sonnet-4': 16000,
+	'claude-sonnet-4.5': 16000,
+	'claude-opus-4.5': 32000,
+	'claude-opus-4.6': 32000,
+	'gemini-2.0-flash': 8192,
+	'gemini-2.5-pro': 65536,
+};
 
 /**
  * Known premium request multipliers from GitHub Copilot docs.
@@ -399,4 +472,34 @@ export function getModelMultiplierLabel(model: vscode.LanguageModelChat): string
 
 	// Layer 3: Unknown - return undefined to avoid misleading users
 	return undefined;
+}
+
+/**
+ * Get the max output tokens for a model.
+ *
+ * 3-layer fallback strategy:
+ * - Layer 1: `(model as any).maxOutputTokens` — non-standard property; the Copilot
+ *   extension may expose it, but it is not part of the official `LanguageModelChat`
+ *   consumer interface and is therefore not guaranteed to be present.
+ * - Layer 2: `KNOWN_MAX_OUTPUT_TOKENS` table — manually maintained fallback for
+ *   well-known model families (fuzzy-matched on family name).
+ * - Layer 3: 16384 — conservative default when the model is unknown.
+ */
+export function getModelMaxOutputTokens(model: vscode.LanguageModelChat): number {
+	// Layer 1: Try API (non-standard property that Copilot extension may expose)
+	const apiMax = (model as any).maxOutputTokens;
+	if (typeof apiMax === 'number' && apiMax > 0) {
+		return apiMax;
+	}
+
+	// Layer 2: Known values - match by family name with fuzzy matching
+	const family = model.family.toLowerCase();
+	for (const [key, max] of Object.entries(KNOWN_MAX_OUTPUT_TOKENS)) {
+		if (family.includes(key) || key.includes(family)) {
+			return max;
+		}
+	}
+
+	// Layer 3: Default fallback
+	return 16384;
 }
