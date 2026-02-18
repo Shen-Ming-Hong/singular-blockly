@@ -2260,11 +2260,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 單一的工作區變更監聯器
 	workspace.addChangeListener(event => {
-		// AI 影子建議觸發邏輯
-		if (window.shadowTrigger) {
-			window.shadowTrigger.handleWorkspaceEvent(event, workspace);
-		}
-
 		// 視角鎖定機制：在刪除進行中時，立即恢復視角以防止閃爍
 		if (viewportLocked && event.type === Blockly.Events.VIEWPORT_CHANGE) {
 			// 立即將視角拉回鎖定位置
@@ -3128,18 +3123,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 				break;
 			case 'updateAIConfig':
-				if (window.shadowTrigger) {
-					window.shadowTrigger.updateConfig(message.config);
-				}
 				if (window.shadowKeyboardHandler) {
 					window.shadowKeyboardHandler.updateConfig(message.config);
 				}
 				break;
 			case 'triggerAISuggestion':
-				// Manual trigger via VS Code keybinding (Ctrl+Shift+.)
-				// Requires enabled=true; autoTrigger is not checked for manual trigger
+				// Manual trigger via VS Code keybinding (Ctrl+Shift+Space)
+				// Requires enabled=true; checked via shadowKeyboardHandler config
 				{
-					var triggerConfig = (window.shadowTrigger && window.shadowTrigger.getConfig) ? window.shadowTrigger.getConfig() : null;
+					var triggerConfig = (window.shadowKeyboardHandler && window.shadowKeyboardHandler.getConfig) ? window.shadowKeyboardHandler.getConfig() : null;
 					// Manual trigger requires AI to be enabled
 					if (triggerConfig && triggerConfig.enabled === false) {
 						break;
@@ -3174,9 +3166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 	if (window.shadowKeyboardHandler) {
 		window.shadowKeyboardHandler.init(vscode);
-	}
-	if (window.shadowTrigger) {
-		window.shadowTrigger.init(vscode);
 	}
 
 	// handleResize 的定義

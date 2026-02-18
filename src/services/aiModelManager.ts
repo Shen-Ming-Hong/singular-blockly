@@ -13,7 +13,6 @@ export type CopilotTier = 'none' | 'free' | 'pro' | 'pro_plus';
 /** Per-tier configuration for AI suggestions */
 export interface TierConfig {
 	enabled: boolean;
-	autoTrigger: boolean;
 	triggerDelay: number;
 	maxPerMinute: number;
 	contextDepth: 'none' | 'minimal' | 'standard' | 'deep';
@@ -27,7 +26,6 @@ export interface TierConfig {
 export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 	none: {
 		enabled: false,
-		autoTrigger: false,
 		triggerDelay: 0,
 		maxPerMinute: 0,
 		contextDepth: 'none',
@@ -38,7 +36,6 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 	},
 	free: {
 		enabled: false,
-		autoTrigger: true,
 		triggerDelay: 3000,
 		maxPerMinute: 2,
 		contextDepth: 'minimal',
@@ -49,7 +46,6 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 	},
 	pro: {
 		enabled: false,
-		autoTrigger: true,
 		triggerDelay: 1500,
 		maxPerMinute: 10,
 		contextDepth: 'standard',
@@ -60,7 +56,6 @@ export const TIER_DEFAULTS: Record<CopilotTier, TierConfig> = {
 	},
 	pro_plus: {
 		enabled: false,
-		autoTrigger: true,
 		triggerDelay: 1000,
 		maxPerMinute: 15,
 		contextDepth: 'deep',
@@ -313,7 +308,6 @@ export class AIModelManager implements vscode.Disposable {
 		// Only read settings that exist in package.json; the rest come from tier defaults
 		return {
 			enabled: userConfig.get<boolean>('enabled', defaults.enabled),
-			autoTrigger: userConfig.get<boolean>('autoTrigger', defaults.autoTrigger),
 			triggerDelay: userConfig.get<number>('triggerDelay', defaults.triggerDelay),
 			maxPerMinute: userConfig.get<number>('maxSuggestionsPerMinute', defaults.maxPerMinute),
 			contextDepth: defaults.contextDepth,
@@ -430,49 +424,6 @@ const KNOWN_MAX_OUTPUT_TOKENS: Record<string, number> = {
 	'gemini-2.0-flash': 8192,
 	'gemini-2.5-pro': 65536,
 };
-
-/**
- * Known premium request multipliers from GitHub Copilot docs.
- * Updated: 2026-02-16. See https://docs.github.com/en/copilot/concepts/billing/copilot-requests
- */
-const KNOWN_MULTIPLIERS: Record<string, number> = {
-	'gpt-5-mini': 0, 'gpt-4.1': 0, 'gpt-4o': 0,
-	'gemini-2.0-flash': 0.25,
-	'claude-haiku-4.5': 0.33, 'o3-mini': 0.33, 'o4-mini': 0.33,
-	'claude-sonnet-4': 1, 'claude-sonnet-4.5': 1,
-	'gpt-5.1-codex': 1, 'gemini-2.5-pro': 1,
-	'gpt-5': 2,
-	'claude-opus-4.5': 3,
-	'claude-opus-4.6': 9,
-};
-
-/**
- * Get the premium request multiplier label for a model.
- * Layer 1: Try reading from vscode.lm API (future-proof).
- * Layer 2: Use known multiplier map.
- * Layer 3: Unknown models return undefined (don't display to avoid misleading users).
- */
-export function getModelMultiplierLabel(model: vscode.LanguageModelChat): string | undefined {
-	// Layer 1: Try API (proposed API may expose multiplierNumeric in future)
-	const apiMultiplier = (model as any).multiplierNumeric ?? (model as any).multiplier;
-	if (apiMultiplier !== undefined) {
-		const numeric = typeof apiMultiplier === 'number' ? apiMultiplier : parseFloat(String(apiMultiplier));
-		if (!isNaN(numeric)) {
-			return numeric === 0 ? '0x (included)' : `${numeric}x`;
-		}
-	}
-
-	// Layer 2: Known multipliers - match by family name with fuzzy matching
-	const family = model.family.toLowerCase();
-	for (const [key, mult] of Object.entries(KNOWN_MULTIPLIERS)) {
-		if (family.includes(key) || key.includes(family)) {
-			return mult === 0 ? '0x (included)' : `${mult}x`;
-		}
-	}
-
-	// Layer 3: Unknown - return undefined to avoid misleading users
-	return undefined;
-}
 
 /**
  * Get the max output tokens for a model.

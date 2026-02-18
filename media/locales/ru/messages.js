@@ -975,7 +975,6 @@ window.languageManager.loadMessages('ru', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab принять · Alt+]/[ переключить · Esc отмена',
 	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot недоступен. Установите расширение и войдите в систему.',
 	AI_QUOTA_EXHAUSTED: 'Квота Copilot исчерпана. Сброс в следующем месяце или обновите план.',
-	AI_AUTO_TRIGGER_WARNING: 'Автоматический запуск расходует вашу общую бесплатную квоту Copilot.',
 	AI_DOWNGRADED_MODEL: 'Премиум-квота исчерпана, используется базовая модель.',
 	AI_MANUAL_TRIGGER_HINT: 'Нажмите Ctrl+Shift+Space для вызова ИИ-предложения',
 });

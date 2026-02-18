@@ -5,7 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import { AIModelManager, CopilotTier, getModelMultiplierLabel } from './aiModelManager';
+import { AIModelManager, CopilotTier } from './aiModelManager';
 import { log } from './logging';
 
 const TIER_LABELS: Record<CopilotTier, string> = {
@@ -36,7 +36,6 @@ export class AIStatusBar implements vscode.Disposable {
 		this.disposables.push(
 			vscode.commands.registerCommand('singular-blockly.showAIStatusMenu', () => this.showStatusMenu()),
 			vscode.commands.registerCommand('singular-blockly.toggleAIEnabled', () => this.toggleAIEnabled()),
-			vscode.commands.registerCommand('singular-blockly.toggleAutoTrigger', () => this.toggleAutoTrigger()),
 			vscode.commands.registerCommand('singular-blockly.selectAIModel', () => this.selectModel()),
 			vscode.commands.registerCommand('singular-blockly.openAISettings', () =>
 				vscode.commands.executeCommand('workbench.action.openSettings', 'singularBlockly.ai')
@@ -117,12 +116,6 @@ export class AIStatusBar implements vscode.Disposable {
 		}
 
 		// Auto-trigger toggle — entire line is a clickable command link
-		if (config.autoTrigger) {
-			tooltip.appendMarkdown('[$(check) Auto-trigger](command:singular-blockly.toggleAutoTrigger "Click to disable")\n\n');
-		} else {
-			tooltip.appendMarkdown('[☐ Auto-trigger](command:singular-blockly.toggleAutoTrigger "Click to enable")\n\n');
-		}
-
 		tooltip.appendMarkdown('[$(rocket) Change Model...](command:singular-blockly.selectAIModel)\n\n');
 
 		this.statusBarItem.tooltip = tooltip;
@@ -183,27 +176,6 @@ export class AIStatusBar implements vscode.Disposable {
 	}
 
 	/**
-	 * 切換自動觸發設定
-	 */
-	private async toggleAutoTrigger(): Promise<void> {
-		const aiConfig = vscode.workspace.getConfiguration('singularBlockly.ai');
-		const current = aiConfig.get<boolean>('autoTrigger', false);
-		const newValue = !current;
-
-		await aiConfig.update('autoTrigger', newValue, vscode.ConfigurationTarget.Global);
-
-		const stateLabel = newValue ? 'enabled' : 'disabled';
-		vscode.window.showInformationMessage(`AI auto-trigger ${stateLabel}.`);
-		log(`AI auto-trigger ${stateLabel}`, 'info');
-
-		if (newValue && this.aiModelManager.getTier() === 'free') {
-			vscode.window.showWarningMessage(
-				'Auto-trigger is enabled on the Copilot Free plan. This will consume your limited monthly quota faster.'
-			);
-		}
-	}
-
-	/**
 	 * 顯示模型選擇 QuickPick
 	 */
 	private async selectModel(): Promise<void> {
@@ -217,10 +189,9 @@ export class AIStatusBar implements vscode.Disposable {
 		const currentModel = vscode.workspace.getConfiguration('singularBlockly.ai').get<string>('model', 'gpt-4o-mini');
 
 		const items: vscode.QuickPickItem[] = models.map(m => {
-			const multiplierLabel = getModelMultiplierLabel(m);
 			return {
 				label: m.name,
-				description: m.family + (multiplierLabel ? ` · ${multiplierLabel}` : ''),
+				description: m.family,
 				detail: m.family === currentModel ? '$(check) Currently selected' : undefined,
 				picked: m.family === currentModel,
 			};
@@ -235,7 +206,7 @@ export class AIStatusBar implements vscode.Disposable {
 			return;
 		}
 
-		const family = selected.description!.split(' · ')[0];
+		const family = selected.description!;
 		await vscode.workspace.getConfiguration('singularBlockly.ai').update('model', family, vscode.ConfigurationTarget.Global);
 		await this.aiModelManager.selectModel(family);
 		log(`AI model changed to ${family}`, 'info');

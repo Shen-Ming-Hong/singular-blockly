@@ -978,7 +978,6 @@ window.languageManager.loadMessages('de', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab akzeptieren · Alt+]/[ wechseln · Esc ignorieren',
 	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot ist nicht verfügbar. Installieren Sie die Erweiterung und melden Sie sich an.',
 	AI_QUOTA_EXHAUSTED: 'Copilot-Kontingent aufgebraucht. Wird nächsten Monat zurückgesetzt oder Plan upgraden.',
-	AI_AUTO_TRIGGER_WARNING: 'Auto-Trigger verbraucht Ihr gemeinsames kostenloses Copilot-Kontingent.',
 	AI_DOWNGRADED_MODEL: 'Premium-Kontingent aufgebraucht, Basismodell wird verwendet.',
 	AI_MANUAL_TRIGGER_HINT: 'Drücken Sie Ctrl+Shift+Space für KI-Vorschlag',
 });

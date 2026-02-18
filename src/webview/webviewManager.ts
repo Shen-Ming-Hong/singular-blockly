@@ -488,10 +488,6 @@ export class WebViewManager {
 				'{shadowKeyboardHandlerUri}',
 				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/shadowKeyboardHandler.js'))).toString()
 			);
-			htmlContent = htmlContent.replace(
-				'{shadowTriggerUri}',
-				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/shadowTrigger.js'))).toString()
-			);
 			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());

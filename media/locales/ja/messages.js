@@ -973,7 +973,6 @@ window.languageManager.loadMessages('ja', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 適用 · Alt+]/[ 切替 · Esc 無視',
 	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot が利用できません。拡張機能をインストールしてサインインしてください。',
 	AI_QUOTA_EXHAUSTED: 'Copilot のクォータが上限に達しました。来月リセットされるか、プランをアップグレードしてください。',
-	AI_AUTO_TRIGGER_WARNING: '自動トリガーは Copilot の共有無料クォータを消費します。',
 	AI_DOWNGRADED_MODEL: 'プレミアムクォータを使い切りました。基本モデルを使用中。',
 	AI_MANUAL_TRIGGER_HINT: 'Ctrl+Shift+Space で AI 提案をトリガー',
 });

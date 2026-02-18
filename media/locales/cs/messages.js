@@ -978,7 +978,6 @@ window.languageManager.loadMessages('cs', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab přijmout · Alt+]/[ přepnout · Esc odmítnout',
 	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot není dostupný. Nainstalujte rozšíření a přihlaste se.',
 	AI_QUOTA_EXHAUSTED: 'Kvóta Copilot vyčerpána. Reset příští měsíc nebo upgradujte plán.',
-	AI_AUTO_TRIGGER_WARNING: 'Automatické spouštění spotřebovává váš sdílený bezplatný limit Copilot.',
 	AI_DOWNGRADED_MODEL: 'Prémiová kvóta vyčerpána, používám základní model.',
 	AI_MANUAL_TRIGGER_HINT: 'Stiskněte Ctrl+Shift+Space pro vyvolání AI návrhu',
 });

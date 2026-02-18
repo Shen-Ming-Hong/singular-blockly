@@ -972,7 +972,6 @@ window.languageManager.loadMessages('en', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab accept · Alt+]/[ switch · Esc dismiss',
 	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot is not available. Install the Copilot extension and sign in.',
 	AI_QUOTA_EXHAUSTED: 'Copilot quota exhausted. Resets next month or upgrade your plan.',
-	AI_AUTO_TRIGGER_WARNING: 'Auto-trigger consumes your shared Copilot free quota.',
 	AI_DOWNGRADED_MODEL: 'Premium quota used up, using base model.',
 	AI_MANUAL_TRIGGER_HINT: 'Press Ctrl+Shift+Space to trigger AI suggestion',
 });

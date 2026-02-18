@@ -978,7 +978,6 @@ window.languageManager.loadMessages('tr', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab kabul · Alt+]/[ geçiş · Esc yoksay',
 	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot kullanılamıyor. Uzantıyı yükleyin ve giriş yapın.',
 	AI_QUOTA_EXHAUSTED: 'Copilot kotası tükendi. Gelecek ay sıfırlanır veya planınızı yükseltin.',
-	AI_AUTO_TRIGGER_WARNING: 'Otomatik tetikleme, paylaşılan ücretsiz Copilot kotanızı tüketir.',
 	AI_DOWNGRADED_MODEL: 'Premium kota tükendi, temel model kullanılıyor.',
 	AI_MANUAL_TRIGGER_HINT: "AI önerisi tetiklemek için Ctrl+Shift+Space'e basın",
 });

@@ -71,7 +71,6 @@ suite('ShadowSuggestionService Tests', () => {
 	function disabledConfig(): TierConfig {
 		return {
 			enabled: false,
-			autoTrigger: false,
 			triggerDelay: 0,
 			maxPerMinute: 0,
 			contextDepth: 'none',
@@ -86,7 +85,6 @@ suite('ShadowSuggestionService Tests', () => {
 	function enabledConfig(): TierConfig {
 		return {
 			enabled: true,
-			autoTrigger: true,
 			triggerDelay: 1500,
 			maxPerMinute: 10,
 			contextDepth: 'standard',

@@ -160,5 +160,6 @@
 		init: init,
 		dispose: dispose,
 		updateConfig: updateConfig,
+		getConfig: function () { return config; },
 	};
 })();

@@ -982,7 +982,6 @@ window.languageManager.loadMessages('bg', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab приемане · Alt+]/[ превключване · Esc отхвърляне',
 	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot не е наличен. Инсталирайте разширението и влезте.',
 	AI_QUOTA_EXHAUSTED: 'Квотата на Copilot е изчерпана. Нулира се следващия месец или надградете плана.',
-	AI_AUTO_TRIGGER_WARNING: 'Автоматичното задействане изразходва споделената безплатна квота на Copilot.',
 	AI_DOWNGRADED_MODEL: 'Премиум квотата е изчерпана, използва се базов модел.',
 	AI_MANUAL_TRIGGER_HINT: 'Натиснете Ctrl+Shift+Space за AI предложение',
 });

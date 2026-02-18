@@ -63,11 +63,6 @@
 				"category": "Singular Blockly"
 			},
 			{
-				"command": "singular-blockly.toggleAutoTrigger",
-				"title": "Singular Blockly: Toggle AI Auto-Trigger",
-				"category": "Singular Blockly"
-			},
-			{
 				"command": "singular-blockly.selectAIModel",
 				"title": "Singular Blockly: Select AI Model",
 				"category": "Singular Blockly"
@@ -86,8 +81,8 @@
 		"keybindings": [
 			{
 				"command": "singular-blockly.triggerAISuggestion",
-				"key": "ctrl+shift+.",
-				"mac": "cmd+shift+.",
+				"key": "ctrl+shift+space",
+				"mac": "cmd+shift+space",
 				"when": "activeWebviewPanelId == 'blocklyEdit'"
 			}
 		],
@@ -133,11 +128,6 @@
 					"type": "boolean",
 					"default": false,
 					"markdownDescription": "Enable/disable AI shadow block suggestions. Requires GitHub Copilot extension."
-				},
-				"singularBlockly.ai.autoTrigger": {
-					"type": "boolean",
-					"default": true,
-					"markdownDescription": "Automatically trigger AI suggestions when editing blocks. Suggestions are throttled to conserve Copilot quota."
 				},
 				"singularBlockly.ai.model": {
 					"type": "string",

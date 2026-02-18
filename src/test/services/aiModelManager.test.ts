@@ -271,7 +271,6 @@ suite('AIModelManager Tests', () => {
 			const config = manager.getEffectiveConfig();
 
 			assert.strictEqual(config.enabled, TIER_DEFAULTS.free.enabled);
-			assert.strictEqual(config.autoTrigger, TIER_DEFAULTS.free.autoTrigger);
 			assert.strictEqual(config.contextDepth, TIER_DEFAULTS.free.contextDepth);
 			assert.strictEqual(config.maxSuggestions, TIER_DEFAULTS.free.maxSuggestions);
 		});

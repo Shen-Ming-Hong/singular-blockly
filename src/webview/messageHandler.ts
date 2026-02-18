@@ -1650,7 +1650,7 @@ export class WebViewMessageHandler {
 			const config = this.aiModelManager.getEffectiveConfig();
 			const tier = this.aiModelManager.getTier();
 
-			log(`Sending AI config to WebView: tier=${tier}, enabled=${config.enabled}, autoTrigger=${config.autoTrigger}`, 'info');
+			log(`Sending AI config to WebView: tier=${tier}, enabled=${config.enabled}`, 'info');
 
 			this.panel.webview.postMessage({
 				command: 'updateAIConfig',

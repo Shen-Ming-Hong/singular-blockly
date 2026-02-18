@@ -980,7 +980,6 @@ window.languageManager.loadMessages('hu', {
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab elfogad · Alt+]/[ váltás · Esc elvet',
 	AI_COPILOT_NOT_AVAILABLE: 'A GitHub Copilot nem érhető el. Telepítse a bővítményt és jelentkezzen be.',
 	AI_QUOTA_EXHAUSTED: 'A Copilot kvóta kimerült. Jövő hónapban újraindul vagy frissítse a csomagot.',
-	AI_AUTO_TRIGGER_WARNING: 'Az automatikus kiváltás a megosztott ingyenes Copilot kvótát használja.',
 	AI_DOWNGRADED_MODEL: 'A prémium kvóta kimerült, alapmodell használatban.',
 	AI_MANUAL_TRIGGER_HINT: 'Nyomja meg a Ctrl+Shift+Space-t az AI javaslat kiváltásához',
 });
