@@ -3,7 +3,7 @@ name: pr-review-release
 description: PR Code Review 評估與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。包含評估 Copilot/人工 review 建議、程式碼修正、Git 合併、語意化版本更新、CHANGELOG、打包發布的完整工作流程。PR review evaluation and release workflow for processing code review comments, merging PRs, semantic versioning, and publishing releases.
 metadata:
     author: singular-blockly
-    version: '1.5.0'
+    version: '1.6.0'
     category: release
 license: Apache-2.0
 ---
@@ -362,10 +362,18 @@ gh release edit v{VERSION} -F release-notes.md
 
 #### 5.6 清理 Cleanup
 
-```bash
+```powershell
+# 移除 VSIX 安裝包（必須執行！）
+Remove-Item -Force singular-blockly-{VERSION}.vsix
+
+# 移除暫時發布說明檔（若未在 5.5 步驟中移除）
+Remove-Item -Force release-notes.md -ErrorAction SilentlyContinue
+
 # 驗證發布連結可存取
 gh release view v{VERSION} --web
 ```
+
+> ⚠️ **必須移除 VSIX**：VSIX 是建置產物，不應留在工作目錄中。GitHub Release 已附加此檔案，本地保留無意義且會造成混亂。
 
 ## 檢查清單 Checklist
 
@@ -415,6 +423,8 @@ gh release view v{VERSION} --web
 - [ ] **Release 含雙語說明與 VSIX 附件**
 - [ ] **Release 版面檢核完成（必要時已修正）**
 - [ ] 發布連結可存取（使用 `gh release view` 驗證）
+- [ ] **本地 VSIX 已移除**（`Remove-Item singular-blockly-{VERSION}.vsix`）
+- [ ] **release-notes.md 已移除**（若有使用）
 
 ## 輸出格式 Output Format
 
