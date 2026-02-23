@@ -1,5 +1,19 @@
 {
 	"command.checkMcpStatus.title": "MCP-Status prüfen",
+	"command.showAIStatusMenu.title": "Singular Blockly: KI-Vorschlag-Einstellungen",
+	"command.toggleAIEnabled.title": "Singular Blockly: KI-Vorschläge umschalten",
+	"command.selectAIModel.title": "Singular Blockly: KI-Modell auswählen",
+	"command.openAISettings.title": "Singular Blockly: KI-Einstellungen öffnen",
+	"command.triggerAISuggestion.title": "Singular Blockly: KI-Block-Vorschlag auslösen",
 	"config.mcp.nodePath.description": "Pfad zur Node.js-Executable für MCP Server. Standard 'node' verwendet den System-PATH. Für nvm/fnm-Benutzer den vollständigen absoluten Pfad angeben.",
-	"config.mcp.showStartupWarning.description": "Warnmeldung beim Start anzeigen, wenn Node.js nicht verfügbar ist oder die Version zu niedrig ist. Deaktivieren Sie dies, wenn Sie keine MCP AI-Funktionen benötigen."
+	"config.mcp.showStartupWarning.description": "Warnmeldung beim Start anzeigen, wenn Node.js nicht verfügbar ist oder die Version zu niedrig ist. Deaktivieren Sie dies, wenn Sie keine MCP AI-Funktionen benötigen.",
+	"singularBlockly.ai.enabled.markdownDescription": "KI-Schattenblock-Vorschläge aktivieren/deaktivieren. Erfordert die GitHub Copilot-Erweiterung.",
+	"singularBlockly.ai.model.markdownDescription": "Sprachmodell für KI-Vorschläge. Nur leichte Modelle, die für schnelle Vorschläge geeignet sind, werden aufgelistet. Verfügbare Modelle hängen von Ihrem Copilot-Plan ab.",
+	"singularBlockly.ai.triggerDelay.markdownDescription": "Verzögerung in Millisekunden vor dem Auslösen des KI-Vorschlags nach einer Arbeitsbereichsänderung.",
+	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Maximale Anzahl von KI-Vorschlagsanfragen pro Minute.",
+	"singularBlockly.ai.reasoningEffort.description": "Steuert die Denktiefe für KI-Block-Vorschläge. 'low' priorisiert Geschwindigkeit, 'high' priorisiert Qualität.",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "Steuert die Denktiefe für KI-Block-Vorschläge.\n\n- **low**: Schnellste Antwort, minimales Denken (empfohlen für Inline-Vorschläge)\n- **medium**: Ausgewogenes Verhältnis von Geschwindigkeit und Qualität\n- **high**: Tiefstes Denken, langsamste Antwort",
+	"singularBlockly.ai.reasoningEffort.low.description": "Schnellste, minimales Denken (empfohlen)",
+	"singularBlockly.ai.reasoningEffort.medium.description": "Ausgewogenes Verhältnis von Geschwindigkeit und Qualität",
+	"singularBlockly.ai.reasoningEffort.high.description": "Tiefstes Denken, langsamste Antwort"
 }

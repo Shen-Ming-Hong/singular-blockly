@@ -967,4 +967,8 @@ window.languageManager.loadMessages('en', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'This block must be placed inside setup(), loop(), or a function to generate code.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'This block must be placed inside main() or a function to generate code.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab to accept · Esc to dismiss',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab accept · Alt+]/[ switch · Esc dismiss',
+	AI_QUOTA_EXHAUSTED: 'Copilot quota exhausted. Resets next month or upgrade your plan.',
 });

@@ -1,5 +1,19 @@
 {
 	"command.checkMcpStatus.title": "Проверка на MCP статус",
+	"command.showAIStatusMenu.title": "Singular Blockly: Настройки за предложения на ИИ",
+	"command.toggleAIEnabled.title": "Singular Blockly: Превключване на предложенията на ИИ",
+	"command.selectAIModel.title": "Singular Blockly: Избор на модел на ИИ",
+	"command.openAISettings.title": "Singular Blockly: Отваряне на настройките на ИИ",
+	"command.triggerAISuggestion.title": "Singular Blockly: Задействане на предложение за блок на ИИ",
 	"config.mcp.nodePath.description": "Път до изпълнимия файл Node.js за MCP сървъра. По подразбиране 'node' използва системния PATH. За потребители на nvm/fnm посочете пълния абсолютен път.",
-	"config.mcp.showStartupWarning.description": "Показване на предупредително съобщение при стартиране, когато Node.js не е наличен или версията е твърде ниска. Деактивирайте, ако не се нуждаете от MCP AI функции."
+	"config.mcp.showStartupWarning.description": "Показване на предупредително съобщение при стартиране, когато Node.js не е наличен или версията е твърде ниска. Деактивирайте, ако не се нуждаете от MCP AI функции.",
+	"singularBlockly.ai.enabled.markdownDescription": "Включване/изключване на предложения за сенчести блокове на ИИ. Изисква разширението GitHub Copilot.",
+	"singularBlockly.ai.model.markdownDescription": "Езиков модел за предложения на ИИ. Изброени са само леки модели, подходящи за бързи предложения. Наличните модели зависят от вашия план Copilot.",
+	"singularBlockly.ai.triggerDelay.markdownDescription": "Закъснение в милисекунди преди задействане на предложението на ИИ след промяна в работното пространство.",
+	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Максимален брой заявки за предложения на ИИ в минута.",
+	"singularBlockly.ai.reasoningEffort.description": "Управлява дълбочината на разсъждение за AI предложения на блокове. 'low' приоритизира скоростта, 'high' приоритизира качеството.",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "Управлява дълбочината на разсъждение за AI предложения на блокове.\n\n- **low**: Най-бърз отговор, минимално разсъждение (препоръчително за вградени предложения)\n- **medium**: Баланс между скорост и качество\n- **high**: Най-дълбоко разсъждение, по-бавен отговор",
+	"singularBlockly.ai.reasoningEffort.low.description": "Най-бърз, минимално разсъждение (препоръчително)",
+	"singularBlockly.ai.reasoningEffort.medium.description": "Баланс между скорост и качество",
+	"singularBlockly.ai.reasoningEffort.high.description": "Най-дълбоко разсъждение, най-бавен отговор"
 }

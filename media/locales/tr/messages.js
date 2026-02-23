@@ -228,10 +228,12 @@ window.languageManager.loadMessages('tr', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly Düzenleyici Aç',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 veya üzeri algılanmadı. MCP özellikleri kullanılamayacak, ancak Blockly düzenleme özellikleri normal çalışacaktır.\n\nHata: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 veya üzeri algılanmadı. MCP özellikleri kullanılamayacak, ancak Blockly düzenleme özellikleri normal çalışacaktır.\n\nHata: {0}',
 	BUTTON_INSTALL_GUIDE: 'Kurulum Kılavuzu',
 	BUTTON_REMIND_LATER: 'Daha sonra hatırlat',
-	WARNING_INVALID_NODE_PATH: 'Belirtilen Node.js yolu geçersiz: {0}. Hata: {1}. Lütfen yolu düzeltin veya varsayılan "node" komutunu kullanmak için ayarı temizleyin.',
+	WARNING_INVALID_NODE_PATH:
+		'Belirtilen Node.js yolu geçersiz: {0}. Hata: {1}. Lütfen yolu düzeltin veya varsayılan "node" komutunu kullanmak için ayarı temizleyin.',
 	INFO_NODE_PATH_VALID: 'Node.js yolu geçerli: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Node.js yolu doğrulanıyor...',
 	PROGRESS_CHECKING_MCP: 'MCP sunucu durumu kontrol ediliyor...',
@@ -273,9 +275,9 @@ window.languageManager.loadMessages('tr', {
 	DIAG_UNAVAILABLE_SHORT: 'Kullanılamıyor',
 	REC_INSTALL_NODEJS: 'Node.js 22.16.0 veya üstünü yükleyin',
 	REC_SET_NODEJS_PATH: 'Zaten yüklüyse, ayarlarda Node.js yolunu belirtin (singularBlockly.mcp.nodePath)',
-	REC_UPGRADE_NODEJS: 'Node.js\'i 22.16.0 veya üstüne yükseltin (mevcut: {0})',
+	REC_UPGRADE_NODEJS: "Node.js'i 22.16.0 veya üstüne yükseltin (mevcut: {0})",
 	REC_RUN_COMPILE: '`npm run compile` komutunu çalıştırın veya uzantıyı yeniden yükleyin',
-	REC_UPGRADE_VSCODE: 'VSCode\'u 1.105.0 veya üstüne yükseltin',
+	REC_UPGRADE_VSCODE: "VSCode'u 1.105.0 veya üstüne yükseltin",
 	REC_OPEN_PROJECT: 'Tüm özellikleri kullanmak için bir proje klasörü açın',
 
 	// Error Messages
@@ -973,4 +975,8 @@ window.languageManager.loadMessages('tr', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Bu blok, kod üretmek için setup(), loop() veya bir fonksiyonun içine yerleştirilmelidir.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Bu blok, kod üretmek için main() veya bir fonksiyonun içine yerleştirilmelidir.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Kabul etmek için Tab · Yoksaymak için Esc',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab kabul · Alt+]/[ geçiş · Esc yoksay',
+	AI_QUOTA_EXHAUSTED: 'Copilot kotası tükendi. Gelecek ay sıfırlanır veya planınızı yükseltin.',
 });

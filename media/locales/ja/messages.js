@@ -968,4 +968,8 @@ window.languageManager.loadMessages('ja', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'このブロックはsetup()、loop()、または関数の中に配置する必要があります。',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'このブロックはmain()または関数の中に配置する必要があります。',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab で適用 · Esc で無視',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 適用 · Alt+]/[ 切替 · Esc 無視',
+	AI_QUOTA_EXHAUSTED: 'Copilot のクォータが上限に達しました。来月リセットされるか、プランをアップグレードしてください。',
 });

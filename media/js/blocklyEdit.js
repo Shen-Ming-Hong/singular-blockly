@@ -1938,6 +1938,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return !state || !state.blocks || !state.blocks.blocks || state.blocks.blocks.length === 0;
 	};
 
+	/**
+	 * Check if a serialized block state represents a shadow suggestion block.
+	 * Uses workspace.getBlockById to check the live block's isShadowSuggestion_ flag.
+	 */
+	const isShadowSuggestionState = blockState => {
+		if (!blockState || !blockState.id) {
+			return false;
+		}
+		const block = workspace.getBlockById(blockState.id);
+		return block && block.isShadowSuggestion_;
+	};
+
+	/**
+	 * Recursively remove shadow suggestion blocks from a serialized block state.
+	 * Handles next-chain connections and statement input children.
+	 */
+	const cleanShadowFromBlockState = blockState => {
+		if (!blockState) {
+			return blockState;
+		}
+		// Clean next chain
+		if (blockState.next && blockState.next.block) {
+			if (isShadowSuggestionState(blockState.next.block)) {
+				delete blockState.next;
+			} else {
+				blockState.next.block = cleanShadowFromBlockState(blockState.next.block);
+			}
+		}
+		// Clean inputs (statement children and value inputs)
+		if (blockState.inputs) {
+			for (const key of Object.keys(blockState.inputs)) {
+				const input = blockState.inputs[key];
+				if (input && input.block) {
+					if (isShadowSuggestionState(input.block)) {
+						delete input.block;
+					} else {
+						input.block = cleanShadowFromBlockState(input.block);
+					}
+				}
+			}
+		}
+		return blockState;
+	};
+
 	// 保存工作區狀態的函數
 	const saveWorkspaceState = () => {
 		// T014: 使用整合的 shouldSkipSave() 守衛條件
@@ -1947,6 +1991,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		try {
 			const state = Blockly.serialization.workspaces.save(workspace);
+
+			// Recursively remove shadow suggestion blocks from serialized state
+			if (state && state.blocks && state.blocks.blocks) {
+				state.blocks.blocks = state.blocks.blocks.filter(b => !isShadowSuggestionState(b)).map(b => cleanShadowFromBlockState(b));
+			}
 
 			// 空狀態檢查 - 防止意外覆寫有效資料
 			if (isWorkspaceStateEmpty(state)) {
@@ -2474,6 +2523,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 			}, 800); // 延長等待時間，確保所有積木已完全載入和初始化
 		}
+		// 積木變動時取消正在進行的 AI 提示請求，並清除目前顯示的 shadow block。
+		// Shadow block 的建立/移除都使用 Blockly.Events.disable() 抑制事件，
+		// 因此這裡收到的 isBlockChangeEvent 一定是真實的使用者操作。
+		if (isBlockChangeEvent(event)) {
+			if (window.shadowBlockManager && window.shadowBlockManager.isActive()) {
+				window.shadowBlockManager.clearSuggestion(false);
+			}
+			vscode.postMessage({ command: 'cancelShadowSuggestion' });
+		}
+
 		// 監聽函數定義變更，自動刷新工具箱
 		if (isBlockChangeEvent(event)) {
 			// 檢查是否是函數積木的變更
@@ -3067,6 +3126,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 			case 'monitorError':
 				handleMonitorError(message);
 				break;
+			case 'showShadowSuggestion':
+				if (window.shadowBlockManager) {
+					window.shadowBlockManager.setSuggestions(message.suggestions);
+				} else {
+					console.error('[SB] window.shadowBlockManager is not available!');
+				}
+				break;
+			case 'updateAIConfig':
+				if (window.shadowKeyboardHandler) {
+					window.shadowKeyboardHandler.updateConfig(message.config);
+				}
+				break;
+			case 'triggerAISuggestion':
+				// Manual trigger via VS Code keybinding (Ctrl+Shift+Space)
+				// Requires enabled=true; checked via shadowKeyboardHandler config
+				{
+					var triggerConfig =
+						window.shadowKeyboardHandler && window.shadowKeyboardHandler.getConfig
+							? window.shadowKeyboardHandler.getConfig()
+							: null;
+					// Manual trigger requires AI to be enabled
+					if (triggerConfig && triggerConfig.enabled === false) {
+						break;
+					}
+					var triggerWorkspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+					if (triggerWorkspace && window.contextExtractor) {
+						var triggerDepth = (triggerConfig && triggerConfig.contextDepth) || 'minimal';
+						var triggerContext = window.contextExtractor.extractContext(triggerDepth, triggerWorkspace);
+						if (triggerContext) {
+							if (window.shadowBlockManager) {
+								window.shadowBlockManager.clearSuggestion(false);
+							}
+							vscode.postMessage({
+								command: 'requestShadowSuggestion',
+								context: triggerContext,
+							});
+						}
+					}
+				}
+				break;
 		}
 	});
 
@@ -3074,6 +3173,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 	vscode.postMessage({
 		command: 'requestInitialState',
 	});
+
+	// 初始化 AI 影子建議模組
+	if (window.shadowBlockManager) {
+		window.shadowBlockManager.init(vscode);
+	}
+	if (window.shadowKeyboardHandler) {
+		window.shadowKeyboardHandler.init(vscode);
+	}
 
 	// handleResize 的定義
 	const handleResize = () => {

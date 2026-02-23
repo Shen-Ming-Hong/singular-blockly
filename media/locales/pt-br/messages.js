@@ -228,10 +228,12 @@ window.languageManager.loadMessages('pt-br', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Abrir Editor Blockly',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 ou superior não detectado. Os recursos do MCP não estarão disponíveis, mas os recursos de edição do Blockly funcionarão normalmente.\n\nErro: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 ou superior não detectado. Os recursos do MCP não estarão disponíveis, mas os recursos de edição do Blockly funcionarão normalmente.\n\nErro: {0}',
 	BUTTON_INSTALL_GUIDE: 'Guia de instalação',
 	BUTTON_REMIND_LATER: 'Lembrar mais tarde',
-	WARNING_INVALID_NODE_PATH: 'O caminho do Node.js especificado é inválido: {0}. Erro: {1}. Por favor, corrija o caminho ou limpe a configuração para usar o comando "node" padrão.',
+	WARNING_INVALID_NODE_PATH:
+		'O caminho do Node.js especificado é inválido: {0}. Erro: {1}. Por favor, corrija o caminho ou limpe a configuração para usar o comando "node" padrão.',
 	INFO_NODE_PATH_VALID: 'Caminho do Node.js válido: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Validando caminho do Node.js...',
 	PROGRESS_CHECKING_MCP: 'Verificando status do servidor MCP...',
@@ -966,4 +968,8 @@ window.languageManager.loadMessages('pt-br', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Este bloco deve ser colocado dentro de setup(), loop() ou uma função para gerar código.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Este bloco deve ser colocado dentro de main() ou uma função para gerar código.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab para aceitar · Esc para ignorar',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab aceitar · Alt+]/[ alternar · Esc ignorar',
+	AI_QUOTA_EXHAUSTED: 'Cota do Copilot esgotada. Reseta no próximo mês ou atualize seu plano.',
 });

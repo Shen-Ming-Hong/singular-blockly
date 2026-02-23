@@ -13,6 +13,8 @@ import { WorkspaceValidator } from '../services/workspaceValidator';
 import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
 import { BoardConfigKey, SetBoardMessage } from '../types/previewMessages';
+import { AIModelManager } from '../services/aiModelManager';
+import { AIStatusBar } from '../services/aiStatusBar';
 
 /**
  * 開發板值映射表
@@ -98,6 +100,8 @@ export class WebViewManager {
 	private fileWatcherDebounceTimer: NodeJS.Timeout | undefined;
 	// T024: 改用計數器機制，支援巢狀保存操作
 	private internalUpdateCount: number = 0; // 避免內部更新觸發 FileWatcher
+	private aiModelManager?: AIModelManager;
+	private aiStatusBar?: AIStatusBar;
 
 	/**
 	 * 建立 WebView 管理器實例
@@ -115,6 +119,18 @@ export class WebViewManager {
 		this.localeService = localeService || new LocaleService(context.extensionPath);
 		this.extensionFileService = extensionFileService || new FileService(context.extensionPath);
 		this.fileService = workspaceFileService; // 在測試中可以預先注入
+	}
+
+	/**
+	 * Set AI model manager for shadow suggestion features
+	 */
+	setAIModelManager(aiModelManager: AIModelManager, aiStatusBar?: AIStatusBar): void {
+		this.aiModelManager = aiModelManager;
+		this.aiStatusBar = aiStatusBar;
+		// If message handler already exists, initialize AI services
+		if (this.messageHandler) {
+			this.messageHandler.initAIServices(aiModelManager, aiStatusBar);
+		}
 	}
 
 	/**
@@ -216,7 +232,12 @@ export class WebViewManager {
 		// 建立訊息處理器
 		this.messageHandler = new WebViewMessageHandler(this.context, this.panel, this.localeService);
 
-		// 監聯 WebView 訊息
+		// Initialize AI services if available
+		if (this.aiModelManager) {
+			this.messageHandler.initAIServices(this.aiModelManager, this.aiStatusBar);
+		}
+
+		// 監聽 WebView 訊息
 		this.panel.webview.onDidReceiveMessage(async message => {
 			// 攔截 saveWorkspace 命令，設置內部更新標記以避免 FileWatcher 觸發重載
 			if (message.command === 'saveWorkspace') {
@@ -450,6 +471,22 @@ export class WebViewManager {
 				webview
 					.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/experimentalBlockMarker.js')))
 					.toString()
+			);
+			htmlContent = htmlContent.replace(
+				'{shadowBlockCssUri}',
+				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/shadowBlock.css'))).toString()
+			);
+			htmlContent = htmlContent.replace(
+				'{contextExtractorUri}',
+				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/contextExtractor.js'))).toString()
+			);
+			htmlContent = htmlContent.replace(
+				'{shadowBlockManagerUri}',
+				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/shadowBlockManager.js'))).toString()
+			);
+			htmlContent = htmlContent.replace(
+				'{shadowKeyboardHandlerUri}',
+				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/shadowKeyboardHandler.js'))).toString()
 			);
 			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());

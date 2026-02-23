@@ -958,4 +958,8 @@ window.languageManager.loadMessages('zh-hant', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: '此積木必須放在 setup()、loop() 或函式內才能產生程式碼。',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: '此積木必須放在 main() 或函式內才能產生程式碼。',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: '按 Tab 接受 · Esc 忽略',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 接受 · Alt+]/[ 切換 · Esc 忽略',
+	AI_QUOTA_EXHAUSTED: 'Copilot 額度已用完，下月重置或升級方案。',
 });

@@ -1,5 +1,19 @@
 {
 	"command.checkMcpStatus.title": "Verificar Status do MCP",
+	"command.showAIStatusMenu.title": "Singular Blockly: Configurações de sugestões IA",
+	"command.toggleAIEnabled.title": "Singular Blockly: Alternar sugestões IA",
+	"command.selectAIModel.title": "Singular Blockly: Selecionar modelo IA",
+	"command.openAISettings.title": "Singular Blockly: Abrir configurações IA",
+	"command.triggerAISuggestion.title": "Singular Blockly: Acionar sugestão de bloco IA",
 	"config.mcp.nodePath.description": "Caminho para o executável Node.js do servidor MCP. O padrão 'node' usa o PATH do sistema. Para usuários nvm/fnm, especifique o caminho absoluto completo.",
-	"config.mcp.showStartupWarning.description": "Mostrar mensagem de aviso na inicialização quando o Node.js não estiver disponível ou a versão for muito baixa. Desative isso se você não precisar dos recursos de IA do MCP."
+	"config.mcp.showStartupWarning.description": "Mostrar mensagem de aviso na inicialização quando o Node.js não estiver disponível ou a versão for muito baixa. Desative isso se você não precisar dos recursos de IA do MCP.",
+	"singularBlockly.ai.enabled.markdownDescription": "Habilitar/desabilitar sugestões de blocos IA. Requer a extensão GitHub Copilot.",
+	"singularBlockly.ai.model.markdownDescription": "Modelo de linguagem para sugestões IA. Apenas modelos leves adequados para sugestões rápidas são listados. Os modelos disponíveis dependem do seu plano Copilot.",
+	"singularBlockly.ai.triggerDelay.markdownDescription": "Atraso em milissegundos antes de acionar a sugestão IA após uma mudança no espaço de trabalho.",
+	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Número máximo de solicitações de sugestão IA por minuto.",
+	"singularBlockly.ai.reasoningEffort.description": "Controla a profundidade de raciocínio para sugestões de blocos de IA. 'low' prioriza a velocidade, 'high' prioriza a qualidade.",
+	"singularBlockly.ai.reasoningEffort.markdownDescription": "Controla a profundidade de raciocínio para sugestões de blocos de IA.\n\n- **low**: Resposta mais rápida, raciocínio mínimo (recomendado para sugestões em linha)\n- **medium**: Equilíbrio entre velocidade e qualidade\n- **high**: Raciocínio mais profundo, resposta mais lenta",
+	"singularBlockly.ai.reasoningEffort.low.description": "Mais rápido, raciocínio mínimo (recomendado)",
+	"singularBlockly.ai.reasoningEffort.medium.description": "Equilíbrio entre velocidade e qualidade",
+	"singularBlockly.ai.reasoningEffort.high.description": "Raciocínio mais profundo, resposta mais lenta"
 }

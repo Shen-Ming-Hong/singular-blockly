@@ -51,6 +51,39 @@
 				"command": "singular-blockly.checkMcpStatus",
 				"title": "%command.checkMcpStatus.title%",
 				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.showAIStatusMenu",
+				"title": "%command.showAIStatusMenu.title%",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.toggleAIEnabled",
+				"title": "%command.toggleAIEnabled.title%",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.selectAIModel",
+				"title": "%command.selectAIModel.title%",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.openAISettings",
+				"title": "%command.openAISettings.title%",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.triggerAISuggestion",
+				"title": "%command.triggerAISuggestion.title%",
+				"category": "Singular Blockly"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "singular-blockly.triggerAISuggestion",
+				"key": "ctrl+shift+space",
+				"mac": "cmd+shift+space",
+				"when": "activeWebviewPanelId == 'blocklyEdit'"
 			}
 		],
 		"viewsContainers": {
@@ -90,6 +123,46 @@
 					"default": true,
 					"markdownDescription": "%config.mcp.showStartupWarning.description%",
 					"scope": "machine-overridable"
+				},
+				"singularBlockly.ai.enabled": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "%singularBlockly.ai.enabled.markdownDescription%"
+				},
+				"singularBlockly.ai.model": {
+					"type": "string",
+					"default": "gpt-4o-mini",
+					"markdownDescription": "%singularBlockly.ai.model.markdownDescription%"
+				},
+				"singularBlockly.ai.triggerDelay": {
+					"type": "number",
+					"default": 1500,
+					"minimum": 500,
+					"maximum": 10000,
+					"markdownDescription": "%singularBlockly.ai.triggerDelay.markdownDescription%"
+				},
+				"singularBlockly.ai.maxSuggestionsPerMinute": {
+					"type": "number",
+					"default": 5,
+					"minimum": 1,
+					"maximum": 30,
+					"markdownDescription": "%singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription%"
+				},
+				"singularBlockly.ai.reasoningEffort": {
+					"type": "string",
+					"default": "low",
+					"enum": [
+						"low",
+						"medium",
+						"high"
+					],
+					"enumDescriptions": [
+						"%singularBlockly.ai.reasoningEffort.low.description%",
+						"%singularBlockly.ai.reasoningEffort.medium.description%",
+						"%singularBlockly.ai.reasoningEffort.high.description%"
+					],
+					"description": "%singularBlockly.ai.reasoningEffort.description%",
+					"markdownDescription": "%singularBlockly.ai.reasoningEffort.markdownDescription%"
 				}
 			}
 		}
@@ -119,7 +192,8 @@
 		"detect:i18n:lang": "node scripts/i18n/detect-patterns.js",
 		"stats:i18n": "node scripts/i18n/translation-stats.js --format markdown",
 		"stats:i18n:json": "node scripts/i18n/translation-stats.js --format json",
-		"test": "vscode-test"
+		"test": "vscode-test --label unit",
+		"test:integration": "vscode-test --label integration"
 	},
 	"devDependencies": {
 		"@types/mocha": "^10.0.10",
@@ -132,6 +206,7 @@
 		"@vscode/test-electron": "^2.5.2",
 		"ajv": "^8.17.1",
 		"blockly": "^12.3.1",
+		"copy-webpack-plugin": "^13.0.1",
 		"eslint": "^9.38.0",
 		"fs-extra": "^11.3.2",
 		"glob": "^11.1.0",

@@ -15,6 +15,9 @@ import { ArduinoUploader } from '../services/arduinoUploader';
 import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStopReason } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
+import { AIModelManager } from '../services/aiModelManager';
+import { AIStatusBar } from '../services/aiStatusBar';
+import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSuggestionService';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -60,6 +63,10 @@ export class WebViewMessageHandler {
 	private settingsManager: SettingsManager;
 	private serialMonitorService: SerialMonitorService | null = null;
 	private arduinoMonitorService: ArduinoMonitorService | null = null;
+	private aiModelManager?: AIModelManager;
+	private shadowSuggestionService?: ShadowSuggestionService;
+	private aiStatusBar?: AIStatusBar;
+	private _shadowRequestSeq = 0;
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -203,6 +210,16 @@ export class WebViewMessageHandler {
 					break;
 				case 'deletePlatformioIni':
 					await this.handleDeletePlatformioIni();
+					break;
+				// AI Shadow Suggestion 功能
+				case 'requestShadowSuggestion':
+					await this.handleRequestShadowSuggestion(message);
+					break;
+				case 'cancelShadowSuggestion':
+					this.handleCancelShadowSuggestion();
+					break;
+				case 'acceptShadowSuggestion':
+					this.handleAcceptShadowSuggestion(message);
 					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
@@ -784,6 +801,11 @@ export class WebViewMessageHandler {
 				});
 			} catch (error) {
 				log('Failed to get auto backup settings:', 'error', error);
+			}
+
+			// Send AI config after WebView is ready (modules are initialized)
+			if (this.aiModelManager) {
+				this.sendAIConfig();
 			}
 		} catch (error) {
 			log('Failed to read workspace state:', 'error', error);
@@ -1584,5 +1606,139 @@ export class WebViewMessageHandler {
 		} catch (error) {
 			log('Failed to show error message:', 'error', error);
 		}
+	}
+
+	// ── AI Shadow Suggestion 功能 ──
+
+	/**
+	 * Initialize AI suggestion services
+	 */
+	initAIServices(aiModelManager: AIModelManager, aiStatusBar?: AIStatusBar): void {
+		this.aiModelManager = aiModelManager;
+		this.aiStatusBar = aiStatusBar;
+		this.shadowSuggestionService = new ShadowSuggestionService(aiModelManager, this.context.extensionPath);
+
+		log(`AI services initialized in MessageHandler (tier: ${aiModelManager.getTier()})`, 'info');
+
+		// Send initial AI config to WebView
+		this.sendAIConfig();
+
+		// Update WebView when tier changes
+		aiModelManager.onTierChanged(() => this.sendAIConfig());
+
+		// Update WebView when user changes AI settings
+		this.context.subscriptions.push(
+			vscode.workspace.onDidChangeConfiguration(e => {
+				if (e.affectsConfiguration('singularBlockly.ai')) {
+					this.sendAIConfig();
+				}
+			})
+		);
+	}
+
+	/**
+	 * Send current AI configuration to WebView
+	 */
+	private sendAIConfig(): void {
+		if (!this.aiModelManager) {
+			return;
+		}
+		if (!this.panel || !this.panel.webview) {
+			return;
+		}
+
+		try {
+			const config = this.aiModelManager.getEffectiveConfig();
+			const tier = this.aiModelManager.getTier();
+
+			log(`Sending AI config to WebView: tier=${tier}, enabled=${config.enabled}`, 'info');
+
+			this.panel.webview.postMessage({
+				command: 'updateAIConfig',
+				config,
+				tier,
+			});
+		} catch {
+			// Panel may have been disposed; ignore
+			log('sendAIConfig: panel may have been disposed', 'debug');
+		}
+	}
+
+	/**
+	 * Handle shadow suggestion request from WebView
+	 */
+	private async handleRequestShadowSuggestion(message: any): Promise<void> {
+		if (!this.shadowSuggestionService || !this.aiModelManager) {
+			log('Shadow suggestion skipped: service not initialized', 'debug');
+			return;
+		}
+
+		const context: WorkspaceContext = message.context;
+		if (!context) {
+			log('Shadow suggestion request missing context', 'warn');
+			return;
+		}
+
+		log(
+			`Shadow suggestion requested (board: ${context.board}, depth: ${context.depth}, selected: ${context.selectedBlock?.type || 'none'})`,
+			'info'
+		);
+
+		const t0 = performance.now();
+		log(`[AI Perf] Shadow suggestion request started (board: ${context.board}, depth: ${context.depth})`, 'info');
+
+		// Increment request sequence; captures current value for this closure
+		const requestSeq = ++this._shadowRequestSeq;
+
+		this.aiStatusBar?.showLoading();
+		try {
+			const result = await this.shadowSuggestionService.requestSuggestion(context);
+			const elapsed = (performance.now() - t0).toFixed(0);
+
+			// Discard stale results if a newer request was started while awaiting
+			if (requestSeq !== this._shadowRequestSeq) {
+				log(`[AI Perf] Discarding stale result (seq ${requestSeq} < ${this._shadowRequestSeq})`, 'debug');
+				return;
+			}
+
+			if (result && result.suggestions.length > 0) {
+				log(`[AI Perf] Full round-trip: ${elapsed}ms → ${result.suggestions.map(s => s.blockType).join(', ')}`, 'info');
+				log(`Shadow suggestion received: ${result.suggestions.map(s => s.blockType).join(', ')}`, 'info');
+				this.panel.webview.postMessage({
+					command: 'showShadowSuggestion',
+					suggestions: result.suggestions,
+					modelUsed: result.modelUsed,
+				});
+			} else {
+				log(`[AI Perf] Full round-trip: ${elapsed}ms → no suggestions`, 'info');
+				log('Shadow suggestion: no suggestions returned', 'debug');
+			}
+		} catch (error) {
+			log(`[AI Perf] Full round-trip failed after ${(performance.now() - t0).toFixed(0)}ms: ${error}`, 'error');
+			log(`Shadow suggestion request failed: ${error}`, 'error');
+		} finally {
+			this.aiStatusBar?.hideLoading();
+		}
+	}
+
+	/**
+	 * Handle accepted shadow suggestion (for analytics)
+	 */
+	private handleAcceptShadowSuggestion(message: any): void {
+		log(`Shadow suggestion accepted: ${message.blockType}`, 'info');
+	}
+
+	/**
+	 * Cancel any in-flight suggestion request triggered by a workspace change.
+	 * Bumps the sequence counter so stale results arriving later are discarded,
+	 * and aborts the streaming request immediately.
+	 */
+	private handleCancelShadowSuggestion(): void {
+		this._shadowRequestSeq++;
+		if (this.shadowSuggestionService) {
+			this.shadowSuggestionService.cancelCurrentRequest();
+		}
+		this.aiStatusBar?.hideLoading();
+		log('Shadow suggestion cancelled due to workspace change', 'debug');
 	}
 }

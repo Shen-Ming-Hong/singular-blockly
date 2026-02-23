@@ -1,0 +1,205 @@
+/**
+ * @license
+ * Copyright 2025 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Shadow Block AI Suggestion Styles
+ * Styles for semi-transparent ghost blocks that show AI suggestions
+ */
+
+/* ===== Main shadow block styles ===== */
+/* Applied to block SVG root via block.getSvgRoot() */
+.blockly-shadow-suggestion {
+	opacity: 0.4;
+	pointer-events: none;
+	filter: drop-shadow(0 0 1px rgba(128, 128, 128, 0.5));
+	stroke-dasharray: 4, 3 !important;
+	stroke-width: 1.5px !important;
+	transition: opacity 0.2s ease;
+}
+
+/* ===== Fade-in animation ===== */
+.blockly-shadow-suggestion-enter {
+	animation: shadow-suggestion-fade-in 300ms ease-in forwards;
+}
+
+@keyframes shadow-suggestion-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 0.4;
+	}
+}
+
+/* ===== Fade-out animation ===== */
+.blockly-shadow-suggestion-exit {
+	animation: shadow-suggestion-fade-out 200ms ease-out forwards;
+}
+
+@keyframes shadow-suggestion-fade-out {
+	from {
+		opacity: 0.4;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+/* ===== Accept animation (flash + scale pulse) ===== */
+.blockly-shadow-suggestion-accept {
+	animation: shadow-suggestion-accept 200ms ease-out forwards;
+}
+
+@keyframes shadow-suggestion-accept {
+	0% {
+		opacity: 0.4;
+		transform: scale(1.0);
+	}
+	50% {
+		opacity: 1.0;
+		transform: scale(1.02);
+	}
+	100% {
+		opacity: 1.0;
+		transform: scale(1.0);
+	}
+}
+
+/* ===== Tab hint overlay ===== */
+/* Positioned absolutely at top-right of the shadow block via JS */
+.shadow-suggestion-hint {
+	position: absolute;
+	z-index: 100;
+	pointer-events: none;
+	background-color: rgba(60, 60, 60, 0.75);
+	color: #ffffff;
+	font-family: var(--vscode-editor-font-family, 'Consolas, Monaco, monospace');
+	font-size: 10px;
+	line-height: 1.2;
+	padding: 2px 6px;
+	border-radius: 3px;
+	white-space: nowrap;
+	opacity: 0;
+	animation: shadow-hint-fade-in 300ms ease-in forwards;
+}
+
+.shadow-hint-arrow {
+	pointer-events: auto;
+	cursor: pointer;
+	opacity: 0.7;
+	transition: opacity 0.15s;
+	user-select: none;
+}
+
+.shadow-hint-arrow:hover {
+	opacity: 1;
+}
+
+.shadow-hint-tab {
+	opacity: 0.8;
+}
+
+.shadow-hint-counter {
+	font-size: 9px;
+	opacity: 0.7;
+}
+
+@keyframes shadow-hint-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/* ===== Dark theme support ===== */
+body.vscode-dark .blockly-shadow-suggestion {
+	opacity: 0.45;
+	filter: drop-shadow(0 0 1px rgba(200, 200, 200, 0.4));
+}
+
+body.vscode-dark .blockly-shadow-suggestion-enter {
+	animation: shadow-suggestion-fade-in-dark 300ms ease-in forwards;
+}
+
+@keyframes shadow-suggestion-fade-in-dark {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 0.45;
+	}
+}
+
+body.vscode-dark .blockly-shadow-suggestion-exit {
+	animation: shadow-suggestion-fade-out-dark 200ms ease-out forwards;
+}
+
+@keyframes shadow-suggestion-fade-out-dark {
+	from {
+		opacity: 0.45;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+body.vscode-dark .shadow-suggestion-hint {
+	background-color: rgba(200, 200, 200, 0.2);
+	color: #e0e0e0;
+}
+
+/* ===== Light theme support ===== */
+body.vscode-light .blockly-shadow-suggestion {
+	opacity: 0.4;
+	filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.3));
+}
+
+body.vscode-light .shadow-suggestion-hint {
+	background-color: rgba(40, 40, 40, 0.8);
+	color: #ffffff;
+}
+
+/* ===== High contrast theme support ===== */
+body.vscode-high-contrast .blockly-shadow-suggestion {
+	opacity: 0.6;
+	stroke-dasharray: 6, 3 !important;
+	stroke-width: 2px !important;
+	filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
+}
+
+body.vscode-high-contrast .blockly-shadow-suggestion-enter {
+	animation: shadow-suggestion-fade-in-hc 300ms ease-in forwards;
+}
+
+@keyframes shadow-suggestion-fade-in-hc {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 0.6;
+	}
+}
+
+body.vscode-high-contrast .blockly-shadow-suggestion-exit {
+	animation: shadow-suggestion-fade-out-hc 200ms ease-out forwards;
+}
+
+@keyframes shadow-suggestion-fade-out-hc {
+	from {
+		opacity: 0.6;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+body.vscode-high-contrast .shadow-suggestion-hint {
+	background-color: rgba(0, 0, 0, 0.9);
+	color: #ffffff;
+	border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+

@@ -973,4 +973,8 @@ window.languageManager.loadMessages('de', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Dieser Block muss in setup(), loop() oder einer Funktion platziert werden, um Code zu erzeugen.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Dieser Block muss in main() oder einer Funktion platziert werden, um Code zu erzeugen.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab zum Akzeptieren · Esc zum Ignorieren',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab akzeptieren · Alt+]/[ wechseln · Esc ignorieren',
+	AI_QUOTA_EXHAUSTED: 'Copilot-Kontingent aufgebraucht. Wird nächsten Monat zurückgesetzt oder Plan upgraden.',
 });

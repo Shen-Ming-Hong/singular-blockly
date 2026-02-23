@@ -228,10 +228,12 @@ window.languageManager.loadMessages('ko', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly 편집기 열기',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 이상이 감지되지 않았습니다. MCP 기능을 사용할 수 없지만 Blockly 편집 기능은 정상적으로 작동합니다.\n\n오류: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Node.js 22.16.0 이상이 감지되지 않았습니다. MCP 기능을 사용할 수 없지만 Blockly 편집 기능은 정상적으로 작동합니다.\n\n오류: {0}',
 	BUTTON_INSTALL_GUIDE: '설치 가이드',
 	BUTTON_REMIND_LATER: '나중에 알림',
-	WARNING_INVALID_NODE_PATH: '지정된 Node.js 경로가 유효하지 않습니다: {0}. 오류: {1}. 경로를 수정하거나 설정을 지워 기본 "node" 명령을 사용하세요.',
+	WARNING_INVALID_NODE_PATH:
+		'지정된 Node.js 경로가 유효하지 않습니다: {0}. 오류: {1}. 경로를 수정하거나 설정을 지워 기본 "node" 명령을 사용하세요.',
 	INFO_NODE_PATH_VALID: 'Node.js 경로가 유효합니다: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Node.js 경로 확인 중...',
 	PROGRESS_CHECKING_MCP: 'MCP 서버 상태 확인 중...',
@@ -966,4 +968,8 @@ window.languageManager.loadMessages('ko', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: '이 블록은 setup(), loop() 또는 함수 안에 배치해야 코드가 생성됩니다.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: '이 블록은 main() 또는 함수 안에 배치해야 코드가 생성됩니다.',
+	// === AI Shadow Suggestions ===
+	AI_SUGGESTION_TAB_HINT: 'Tab으로 수락 · Esc로 무시',
+	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 수락 · Alt+]/[ 전환 · Esc 무시',
+	AI_QUOTA_EXHAUSTED: 'Copilot 할당량이 소진되었습니다. 다음 달에 재설정되거나 플랜을 업그레이드하세요.',
 });
