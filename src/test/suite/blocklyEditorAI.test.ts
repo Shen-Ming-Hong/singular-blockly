@@ -140,9 +140,7 @@ suite('Blockly Editor AI Suggestion E2E', function () {
 				const logFiles = findFiles(logsBase, 'Singular Blockly.log');
 				for (const f of logFiles) {
 					const content = fs.readFileSync(f, 'utf-8');
-					const aiLines = content.split('\n').filter(
-						l => l.includes('[AI Perf]') || l.includes('[AI Debug]')
-					);
+					const aiLines = content.split('\n').filter(l => l.includes('[AI Perf]') || l.includes('[AI Debug]'));
 					if (aiLines.length > 0) {
 						logResult(`--- Extension logs (${aiLines.length} AI entries) ---`);
 						for (const l of aiLines.slice(-20)) {
@@ -165,9 +163,14 @@ function findFiles(dir: string, filename: string): string[] {
 	try {
 		for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
 			const p = path.join(dir, e.name);
-			if (e.isDirectory()) { results.push(...findFiles(p, filename)); }
-			else if (e.name === filename) { results.push(p); }
+			if (e.isDirectory()) {
+				results.push(...findFiles(p, filename));
+			} else if (e.name === filename) {
+				results.push(p);
+			}
 		}
-	} catch { /* ignore */ }
+	} catch {
+		/* ignore */
+	}
 	return results;
 }
