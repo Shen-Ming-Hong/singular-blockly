@@ -10,6 +10,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.66.0] - 2026-02-24
+
+### ✨ New Features | 新功能
+
+- **AI 影子積木建議（Copilot LM API）** (AI Shadow Block Suggestions powered by Copilot LM API)
+    - 使用者編輯積木時，系統自動分析工作區脈絡，透過 Copilot LM API（GPT-4o / o4-mini）建議下一個邏輯積木
+      When editing blocks, the system analyzes workspace context via Copilot LM API and suggests the next logical block as a semi-transparent shadow block
+    - 以半透明「影子積木」方式呈現建議；Tab 鍵接受、Esc 鍵取消、方向鍵切換備選
+      Suggestions appear as semi-transparent shadow blocks; Tab to accept, Esc to dismiss, arrow keys to cycle alternatives
+    - 新增 `AIModelManager`：管理 Copilot 模型等級（GPT-4o/o4-mini/降級模式），含配額追蹤與自動重試
+      New `AIModelManager` handles Copilot model tiers (GPT-4o / o4-mini / degraded mode) with quota tracking and auto-retry
+    - 新增 `AIStatusBar`：狀態列顯示目前 AI 模型層級、使用量與啟用狀態
+      New `AIStatusBar` shows current AI model tier, usage, and activation status in the status bar
+    - 新增 `ShadowSuggestionService`：協調 AI 請求、快取建議、管理節流與取消
+      New `ShadowSuggestionService` orchestrates AI requests, caches suggestions, and manages throttling and cancellation
+    - 新增 WebView 模組（contextExtractor.js、shadowBlockManager.js、shadowKeyboardHandler.js）
+      New WebView modules for context extraction, shadow block rendering, and keyboard handling
+    - 擴充 `block-dictionary.json` 至 159 個積木定義（含輸入、欄位、描述）
+      Extended `block-dictionary.json` to 159 block definitions with inputs, fields, and descriptions
+    - 新增 5 個 AI 相關指令：觸發建議、接受/拒絕、手動觸發、設定開關
+      5 new AI commands: trigger, accept/reject, manual trigger, settings toggle
+    - 全 15 語言 i18n 支援（8 個 AI 金鑰）
+      Full 15-language i18n support (8 AI keys per locale)
+    - 關閉 PR #62
+      Closes PR #62
+
 ## [0.65.3] - 2026-02-12
 
 ### 🐛 Bug Fixes | 修復
