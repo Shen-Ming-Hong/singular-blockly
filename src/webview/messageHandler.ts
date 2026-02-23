@@ -221,9 +221,6 @@ export class WebViewMessageHandler {
 				case 'acceptShadowSuggestion':
 					this.handleAcceptShadowSuggestion(message);
 					break;
-				case 'dismissShadowSuggestion':
-					this.handleDismissShadowSuggestion(message);
-					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
 					break;
@@ -1646,6 +1643,9 @@ export class WebViewMessageHandler {
 		if (!this.aiModelManager) {
 			return;
 		}
+		if (!this.panel || !this.panel.webview) {
+			return;
+		}
 
 		try {
 			const config = this.aiModelManager.getEffectiveConfig();
@@ -1739,12 +1739,5 @@ export class WebViewMessageHandler {
 		}
 		this.aiStatusBar?.hideLoading();
 		log('Shadow suggestion cancelled due to workspace change', 'debug');
-	}
-
-	/**
-	 * Handle dismissed shadow suggestion (for analytics)
-	 */
-	private handleDismissShadowSuggestion(message: any): void {
-		log(`Shadow suggestion dismissed: ${message.blockType || 'unknown'}`, 'debug');
 	}
 }

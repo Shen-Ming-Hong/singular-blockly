@@ -100,7 +100,7 @@ export class AIStatusBar implements vscode.Disposable {
 
 		// Quota exhaustion notice
 		if (this.quotaExhausted) {
-			tooltip.appendMarkdown('$(warning) Quota exhausted — suggestions paused\n\n');
+			tooltip.appendMarkdown(`$(warning) ${vscode.l10n.t('Copilot quota exhausted. Resets next month or upgrade your plan.')}\n\n`);
 		}
 
 		tooltip.appendMarkdown('---\n\n');

@@ -846,7 +846,10 @@ export class ShadowSuggestionService {
 					.filter(Boolean);
 				const fieldsSummary = dropdownFields.length ? ' | fields: ' + dropdownFields.join(', ') : '';
 
-				byCategory.get(cat)!.push(`${block.type}${inputsSummary}${stmtsSummary}${fieldsSummary}`);
+				const arr = byCategory.get(cat);
+				if (arr) {
+					arr.push(`${block.type}${inputsSummary}${stmtsSummary}${fieldsSummary}`);
+				}
 			}
 
 			const lines: string[] = [];
