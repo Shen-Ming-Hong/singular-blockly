@@ -10,7 +10,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.66.0] - 2026-02-24
+## [0.66.1] - 2026-02-23
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 ajv ReDoS 漏洞（Dependabot Alert #28）** (Fix ajv ReDoS vulnerability)
+    - 升級 `ajv` 從 `8.17.1` 至 `8.18.0`
+      Upgraded `ajv` from `8.17.1` to `8.18.0`
+    - 嚴重程度 Severity: Medium (ReDoS with `$data` option)
+    - 關閉 Dependabot Alert #28
+      Closes Dependabot Alert #28
+
+- **修復 hono 計時比較漏洞（Dependabot Alert #26）** (Fix hono timing comparison hardening)
+    - 透過 npm overrides 強制 `hono` 升級至 `4.12.2`（間接依賴 via `@modelcontextprotocol/sdk`）
+      Forced `hono` to `4.12.2` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk`)
+    - 嚴重程度 Severity: Low (timing comparison in basicAuth/bearerAuth)
+    - 關閉 Dependabot Alert #26
+      Closes Dependabot Alert #26
+
+- **修復 qs DoS 漏洞（Dependabot Alert #24）** (Fix qs denial of service vulnerability)
+    - 透過 npm overrides 強制 `qs` 升級至 `6.14.2`（間接依賴 via `@modelcontextprotocol/sdk → express`）
+      Forced `qs` to `6.14.2` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk → express`)
+    - 嚴重程度 Severity: Low (arrayLimit bypass in comma parsing)
+    - 關閉 Dependabot Alert #24
+      Closes Dependabot Alert #24
+
+- **升級 `@modelcontextprotocol/sdk` 至 `1.27.0`**
+    - 從 `1.26.0` 升級至 `1.27.0`
+      Upgraded from `1.26.0` to `1.27.0`
+
+
 
 ### ✨ New Features | 新功能
 

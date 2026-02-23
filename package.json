@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support (Uno, Nano, Mega, ESP32, CyberBrick), WiFi/MQTT IoT blocks, AI camera integration (Pixetto, HuskyLens), MCP server for GitHub Copilot, PlatformIO integration, and 15 languages with 99% coverage.",
-	"version": "0.66.0",
+	"version": "0.66.1",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.105.0"
@@ -204,7 +204,7 @@
 		"@typescript-eslint/parser": "^8.46.1",
 		"@vscode/test-cli": "^0.0.12",
 		"@vscode/test-electron": "^2.5.2",
-		"ajv": "^8.17.1",
+		"ajv": "^8.18.0",
 		"blockly": "^12.3.1",
 		"copy-webpack-plugin": "^13.0.1",
 		"eslint": "^9.38.0",
@@ -218,11 +218,15 @@
 	},
 	"dependencies": {
 		"@blockly/theme-modern": "^7.0.1",
-		"@modelcontextprotocol/sdk": "^1.26.0",
+		"@modelcontextprotocol/sdk": "^1.27.0",
 		"form-data": "^4.0.4",
 		"zod": "^4.1.13"
 	},
 	"extensionDependencies": [
 		"platformio.platformio-ide"
-	]
+	],
+	"overrides": {
+		"hono": "^4.12.2",
+		"qs": "^6.14.2"
+	}
 }
