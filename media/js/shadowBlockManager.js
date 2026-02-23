@@ -36,6 +36,8 @@
 	var hintUpdateScheduled = false;
 	/** @type {Function|null} Workspace change listener reference for cleanup */
 	var workspaceChangeListener = null;
+	/** @type {*} Block currently in exit-animation, not yet disposed */
+	var pendingDisposeBlock = null;
 
 	/**
 	 * Set field values on a block, resolving variable names to IDs for FieldVariable fields.
@@ -44,7 +46,9 @@
 	 * @param {*} workspace - Blockly workspace
 	 */
 	function setBlockFields(block, fields, workspace) {
-		if (!fields) { return; }
+		if (!fields) {
+			return;
+		}
 		var fieldNames = Object.keys(fields);
 		for (var i = 0; i < fieldNames.length; i++) {
 			var name = fieldNames[i];
@@ -71,6 +75,11 @@
 						}
 					}
 				} else {
+					// Guard: skip non-string values (e.g. objects accidentally placed in fields by AI)
+					if (typeof value !== 'string') {
+						console.warn('[SB] setBlockFields: skipping non-string value for field', name, '(type:', typeof value, ')');
+						continue;
+					}
 					block.setFieldValue(value, name);
 				}
 			} catch (e) {
@@ -172,10 +181,7 @@
 		if (!focusBlock) {
 			// No blocks at all — place at center
 			var metrics = workspace.getMetrics();
-			block.moveBy(
-				metrics.viewLeft + metrics.viewWidth / 2,
-				metrics.viewTop + metrics.viewHeight / 2
-			);
+			block.moveBy(metrics.viewLeft + metrics.viewWidth / 2, metrics.viewTop + metrics.viewHeight / 2);
 			return false;
 		}
 
@@ -272,7 +278,9 @@
 			// Walk UP to find root of chain
 			while (chainBlock.previousConnection && chainBlock.previousConnection.isConnected()) {
 				chainBlock = chainBlock.previousConnection.targetBlock();
-				if (!chainBlock || chainBlock.isShadowSuggestion_) { break; }
+				if (!chainBlock || chainBlock.isShadowSuggestion_) {
+					break;
+				}
 			}
 			// Now walk DOWN from root collecting all blocks
 			var scanBlock = chainBlock;
@@ -303,7 +311,9 @@
 			// Search all collected blocks for empty value inputs
 			for (var vbi = 0; vbi < valueScanBlocks.length; vbi++) {
 				var vb = valueScanBlocks[vbi];
-				if (!vb.inputList) { continue; }
+				if (!vb.inputList) {
+					continue;
+				}
 				for (var vi = 0; vi < vb.inputList.length; vi++) {
 					var vInp = vb.inputList[vi];
 					// Value input: connection type INPUT_VALUE (1)
@@ -356,8 +366,8 @@
 		var blockRect = svgRoot.getBoundingClientRect();
 		var containerRect = injectionDiv.getBoundingClientRect();
 		// Position at bottom-right corner of the shadow block, offset slightly outside
-		hintElement.style.left = (blockRect.right - containerRect.left + 4) + 'px';
-		hintElement.style.top = (blockRect.bottom - containerRect.top + 4) + 'px';
+		hintElement.style.left = blockRect.right - containerRect.left + 4 + 'px';
+		hintElement.style.top = blockRect.bottom - containerRect.top + 4 + 'px';
 	}
 
 	/**
@@ -368,9 +378,7 @@
 	function onWorkspaceChangeForHint(event) {
 		if (!currentSuggestion || !hintElement) return;
 		var type = event.type;
-		if (type === Blockly.Events.VIEWPORT_CHANGE ||
-			type === Blockly.Events.BLOCK_MOVE ||
-			type === Blockly.Events.BLOCK_DRAG) {
+		if (type === Blockly.Events.VIEWPORT_CHANGE || type === Blockly.Events.BLOCK_MOVE || type === Blockly.Events.BLOCK_DRAG) {
 			if (!hintUpdateScheduled) {
 				hintUpdateScheduled = true;
 				requestAnimationFrame(function () {
@@ -405,7 +413,11 @@
 		if (isMulti) {
 			hintElement.innerHTML =
 				'<span class="shadow-hint-arrow" data-action="prev">◁</span>' +
-				' <span class="shadow-hint-counter">' + (currentIndex + 1) + '/' + allSuggestions.length + '</span> ' +
+				' <span class="shadow-hint-counter">' +
+				(currentIndex + 1) +
+				'/' +
+				allSuggestions.length +
+				'</span> ' +
 				'<span class="shadow-hint-arrow" data-action="next">▷</span>' +
 				' <span class="shadow-hint-tab">⇥</span>';
 		} else {
@@ -414,7 +426,7 @@
 		// Attach click handlers to arrows
 		var arrows = hintElement.querySelectorAll('.shadow-hint-arrow');
 		for (var i = 0; i < arrows.length; i++) {
-			arrows[i].addEventListener('click', function(e) {
+			arrows[i].addEventListener('click', function (e) {
 				e.stopPropagation();
 				var action = this.getAttribute('data-action');
 				if (action === 'prev' && window.shadowBlockManager) {
@@ -452,18 +464,32 @@
 	 * @param {*} workspace - Blockly workspace
 	 */
 	function createChildBlocks(parentBlock, inputs, workspace) {
-		if (!inputs || typeof inputs !== 'object') { return; }
+		if (!inputs || typeof inputs !== 'object') {
+			return;
+		}
 		var inputNames = Object.keys(inputs);
 		for (var i = 0; i < inputNames.length; i++) {
 			var inputName = inputNames[i];
 			var childSpec = inputs[inputName];
-			if (!childSpec || !childSpec.blockType) { continue; }
+			if (!childSpec || !childSpec.blockType) {
+				continue;
+			}
 
 			// Verify parent has this input with a connection
 			var parentInput = parentBlock.getInput(inputName);
 			if (!parentInput || !parentInput.connection) {
-				console.warn('[SB] Parent', parentBlock.type, 'has no input:', inputName,
-					'available:', parentBlock.inputList ? parentBlock.inputList.map(function(inp) { return inp.name; }) : []);
+				console.warn(
+					'[SB] Parent',
+					parentBlock.type,
+					'has no input:',
+					inputName,
+					'available:',
+					parentBlock.inputList
+						? parentBlock.inputList.map(function (inp) {
+								return inp.name;
+							})
+						: []
+				);
 				continue;
 			}
 
@@ -482,7 +508,11 @@
 					} else {
 						// Different type: disconnect shadow, create AI's block
 						parentInput.connection.disconnect();
-						try { existingBlock.dispose(false); } catch (_) { /* ignore */ }
+						try {
+							existingBlock.dispose(false);
+						} catch (_) {
+							/* ignore */
+						}
 						try {
 							var childBlock = workspace.newBlock(childSpec.blockType);
 							childBlock.isShadowSuggestion_ = true;
@@ -552,7 +582,9 @@
 	 * @param {*} workspace - Blockly workspace
 	 */
 	function connectNextChain(currentBlock, nextSpec, workspace) {
-		if (!nextSpec || !nextSpec.blockType) { return; }
+		if (!nextSpec || !nextSpec.blockType) {
+			return;
+		}
 		if (!currentBlock.nextConnection) {
 			console.warn('[SB] Block', currentBlock.type, 'has no nextConnection for chain');
 			return;
@@ -586,7 +618,9 @@
 	 * @param {*} block - Parent block to scan
 	 */
 	function addShadowClassToChildren(block) {
-		if (!block || !block.inputList) { return; }
+		if (!block || !block.inputList) {
+			return;
+		}
 		for (var i = 0; i < block.inputList.length; i++) {
 			var input = block.inputList[i];
 			if (input.connection && input.connection.isConnected()) {
@@ -618,7 +652,9 @@
 	 * @param {*} block - Parent block to scan
 	 */
 	function acceptChildBlocks(block) {
-		if (!block || !block.inputList) { return; }
+		if (!block || !block.inputList) {
+			return;
+		}
 		for (var i = 0; i < block.inputList.length; i++) {
 			var input = block.inputList[i];
 			if (input.connection && input.connection.isConnected()) {
@@ -680,6 +716,15 @@
 		if (typeof Blockly !== 'undefined' && Blockly.Blocks && !Blockly.Blocks[suggestion.blockType]) {
 			console.warn('[SB] Unknown block type: ' + suggestion.blockType);
 			return null;
+		}
+
+		// Flush any block still in exit-animation before creating the new one.
+		// clearSuggestion(true) sets currentSuggestion=null immediately but defers
+		// the actual dispose by 200 ms, leaving the block connected and occupying
+		// the connection point. Disposing it now frees the slot for the new block.
+		if (pendingDisposeBlock) {
+			disposeBlock(pendingDisposeBlock);
+			pendingDisposeBlock = null;
 		}
 
 		// Clear any existing suggestion first
@@ -800,7 +845,11 @@
 				if (svgRoot) {
 					svgRoot.classList.add('blockly-shadow-suggestion-exit');
 				}
+				pendingDisposeBlock = block;
 				setTimeout(function () {
+					if (pendingDisposeBlock === block) {
+						pendingDisposeBlock = null;
+					}
 					disposeBlock(block);
 				}, 200);
 			} else {
@@ -913,7 +962,9 @@
 
 				// Fire events for child blocks (also created with events disabled)
 				function fireChildEvents(parentBlock) {
-					if (!parentBlock) { return; }
+					if (!parentBlock) {
+						return;
+					}
 					// Traverse input children
 					if (parentBlock.inputList) {
 						for (var ci = 0; ci < parentBlock.inputList.length; ci++) {
@@ -982,7 +1033,9 @@
 		// Try to render the first suggestion, removing failures
 		while (allSuggestions.length > 0) {
 			var result = showSuggestion(allSuggestions[currentIndex]);
-			if (result) { return; }
+			if (result) {
+				return;
+			}
 			// Remove failed suggestion
 			allSuggestions.splice(currentIndex, 1);
 			if (currentIndex >= allSuggestions.length) {
@@ -999,7 +1052,9 @@
 	 * Show the next suggestion (wraps around, skips failed ones).
 	 */
 	function nextSuggestion() {
-		if (allSuggestions.length <= 1) { return; }
+		if (allSuggestions.length <= 1) {
+			return;
+		}
 		clearSuggestion(false);
 		var startIndex = currentIndex;
 		var nextIdx = (currentIndex + 1) % allSuggestions.length;
@@ -1012,11 +1067,17 @@
 			}
 			// Remove failed suggestion
 			allSuggestions.splice(nextIdx, 1);
-			if (allSuggestions.length <= 1) { return; }
+			if (allSuggestions.length <= 1) {
+				return;
+			}
 			// Adjust startIndex if it was after the removed element
-			if (startIndex > nextIdx) { startIndex--; }
+			if (startIndex > nextIdx) {
+				startIndex--;
+			}
 			// nextIdx now points to the next element (or wraps)
-			if (nextIdx >= allSuggestions.length) { nextIdx = 0; }
+			if (nextIdx >= allSuggestions.length) {
+				nextIdx = 0;
+			}
 		}
 	}
 
@@ -1024,7 +1085,9 @@
 	 * Show the previous suggestion (wraps around, skips failed ones).
 	 */
 	function prevSuggestion() {
-		if (allSuggestions.length <= 1) { return; }
+		if (allSuggestions.length <= 1) {
+			return;
+		}
 		clearSuggestion(false);
 		var startIndex = currentIndex;
 		var prevIdx = (currentIndex - 1 + allSuggestions.length) % allSuggestions.length;
@@ -1037,12 +1100,18 @@
 			}
 			// Remove failed suggestion
 			allSuggestions.splice(prevIdx, 1);
-			if (allSuggestions.length <= 1) { return; }
+			if (allSuggestions.length <= 1) {
+				return;
+			}
 			// Adjust startIndex if it was after the removed element
-			if (startIndex > prevIdx) { startIndex--; }
+			if (startIndex > prevIdx) {
+				startIndex--;
+			}
 			// Recalculate prevIdx
 			prevIdx = (prevIdx - 1 + allSuggestions.length) % allSuggestions.length;
-			if (prevIdx === startIndex) { break; }
+			if (prevIdx === startIndex) {
+				break;
+			}
 		}
 	}
 

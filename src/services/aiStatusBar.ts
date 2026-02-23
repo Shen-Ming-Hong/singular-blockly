@@ -106,7 +106,9 @@ export class AIStatusBar implements vscode.Disposable {
 		tooltip.appendMarkdown('---\n\n');
 
 		// Shadow Block Suggestions section header with action icons
-		tooltip.appendMarkdown('**Shadow Block Suggestions** &nbsp; [$(settings-gear)](command:singular-blockly.openAISettings "Open settings") [$(refresh)](command:singular-blockly.triggerAISuggestion "Trigger suggestion")\n\n');
+		tooltip.appendMarkdown(
+			'**Shadow Block Suggestions** &nbsp; [$(settings-gear)](command:singular-blockly.openAISettings "Open settings") [$(refresh)](command:singular-blockly.triggerAISuggestion "Trigger suggestion")\n\n'
+		);
 
 		// AI Suggestions enabled toggle
 		if (config.enabled) {
@@ -214,7 +216,9 @@ export class AIStatusBar implements vscode.Disposable {
 
 	/** Show loading state in status bar during AI request */
 	showLoading(): void {
-		this._previousText = this.statusBarItem.text;
+		if (this._previousText === undefined) {
+			this._previousText = this.statusBarItem.text;
+		}
 		this.statusBarItem.text = '$(loading~spin)';
 		this.statusBarItem.tooltip = 'AI suggestion in progress...';
 		this.statusBarItem.show();
@@ -222,11 +226,11 @@ export class AIStatusBar implements vscode.Disposable {
 
 	/** Restore status bar to normal state */
 	hideLoading(): void {
-		if (this._previousText !== undefined) {
-			this.statusBarItem.text = this._previousText;
-			this._previousText = undefined;
-			this.updateTooltip();
-		}
+		// Always restore to the sparkle icon, regardless of _previousText.
+		// Guards against stale loading state caused by overlapping requests.
+		this.statusBarItem.text = this._previousText ?? '$(sparkle)';
+		this._previousText = undefined;
+		this.updateTooltip();
 	}
 
 	dispose(): void {

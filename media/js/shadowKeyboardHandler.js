@@ -28,9 +28,7 @@
 	 */
 	function isSuggestionActive() {
 		return (
-			window.shadowBlockManager &&
-			typeof window.shadowBlockManager.isActive === 'function' &&
-			window.shadowBlockManager.isActive()
+			window.shadowBlockManager && typeof window.shadowBlockManager.isActive === 'function' && window.shadowBlockManager.isActive()
 		);
 	}
 
@@ -62,7 +60,13 @@
 		if (e.key === 'Escape') {
 			if (isSuggestionActive()) {
 				e.preventDefault();
+				console.log('[SB] AI suggestion cancelled by user (Escape key)');
 				window.shadowBlockManager.clearSuggestion(true);
+				// Notify Extension Host to stop the loading spinner and cancel
+				// any still-in-flight request.
+				if (vsCodeApi) {
+					vsCodeApi.postMessage({ command: 'cancelShadowSuggestion' });
+				}
 				return;
 			}
 			// Not active — let Escape propagate to other handlers
@@ -109,10 +113,7 @@
 		var depth = (config && config.contextDepth) || 'minimal';
 		var context = null;
 
-		if (
-			window.contextExtractor &&
-			typeof window.contextExtractor.extractContext === 'function'
-		) {
+		if (window.contextExtractor && typeof window.contextExtractor.extractContext === 'function') {
 			context = window.contextExtractor.extractContext(depth, workspace);
 		}
 
@@ -160,6 +161,8 @@
 		init: init,
 		dispose: dispose,
 		updateConfig: updateConfig,
-		getConfig: function () { return config; },
+		getConfig: function () {
+			return config;
+		},
 	};
 })();

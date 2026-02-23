@@ -66,6 +66,7 @@ export class WebViewMessageHandler {
 	private aiModelManager?: AIModelManager;
 	private shadowSuggestionService?: ShadowSuggestionService;
 	private aiStatusBar?: AIStatusBar;
+	private _shadowRequestSeq = 0;
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -213,6 +214,9 @@ export class WebViewMessageHandler {
 				// AI Shadow Suggestion 功能
 				case 'requestShadowSuggestion':
 					await this.handleRequestShadowSuggestion(message);
+					break;
+				case 'cancelShadowSuggestion':
+					this.handleCancelShadowSuggestion();
 					break;
 				case 'acceptShadowSuggestion':
 					this.handleAcceptShadowSuggestion(message);
@@ -1615,10 +1619,7 @@ export class WebViewMessageHandler {
 	initAIServices(aiModelManager: AIModelManager, aiStatusBar?: AIStatusBar): void {
 		this.aiModelManager = aiModelManager;
 		this.aiStatusBar = aiStatusBar;
-		this.shadowSuggestionService = new ShadowSuggestionService(
-			aiModelManager,
-			this.context.extensionPath
-		);
+		this.shadowSuggestionService = new ShadowSuggestionService(aiModelManager, this.context.extensionPath);
 
 		log(`AI services initialized in MessageHandler (tier: ${aiModelManager.getTier()})`, 'info');
 
@@ -1677,15 +1678,28 @@ export class WebViewMessageHandler {
 			return;
 		}
 
-		log(`Shadow suggestion requested (board: ${context.board}, depth: ${context.depth}, selected: ${context.selectedBlock?.type || 'none'})`, 'info');
+		log(
+			`Shadow suggestion requested (board: ${context.board}, depth: ${context.depth}, selected: ${context.selectedBlock?.type || 'none'})`,
+			'info'
+		);
 
 		const t0 = performance.now();
 		log(`[AI Perf] Shadow suggestion request started (board: ${context.board}, depth: ${context.depth})`, 'info');
+
+		// Increment request sequence; captures current value for this closure
+		const requestSeq = ++this._shadowRequestSeq;
 
 		this.aiStatusBar?.showLoading();
 		try {
 			const result = await this.shadowSuggestionService.requestSuggestion(context);
 			const elapsed = (performance.now() - t0).toFixed(0);
+
+			// Discard stale results if a newer request was started while awaiting
+			if (requestSeq !== this._shadowRequestSeq) {
+				log(`[AI Perf] Discarding stale result (seq ${requestSeq} < ${this._shadowRequestSeq})`, 'debug');
+				return;
+			}
+
 			if (result && result.suggestions.length > 0) {
 				log(`[AI Perf] Full round-trip: ${elapsed}ms → ${result.suggestions.map(s => s.blockType).join(', ')}`, 'info');
 				log(`Shadow suggestion received: ${result.suggestions.map(s => s.blockType).join(', ')}`, 'info');
@@ -1711,6 +1725,20 @@ export class WebViewMessageHandler {
 	 */
 	private handleAcceptShadowSuggestion(message: any): void {
 		log(`Shadow suggestion accepted: ${message.blockType}`, 'info');
+	}
+
+	/**
+	 * Cancel any in-flight suggestion request triggered by a workspace change.
+	 * Bumps the sequence counter so stale results arriving later are discarded,
+	 * and aborts the streaming request immediately.
+	 */
+	private handleCancelShadowSuggestion(): void {
+		this._shadowRequestSeq++;
+		if (this.shadowSuggestionService) {
+			this.shadowSuggestionService.cancelCurrentRequest();
+		}
+		this.aiStatusBar?.hideLoading();
+		log('Shadow suggestion cancelled due to workspace change', 'debug');
 	}
 
 	/**
