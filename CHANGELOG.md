@@ -39,8 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - 從 `1.26.0` 升級至 `1.27.0`
       Upgraded from `1.26.0` to `1.27.0`
 
-
-
 ### ✨ New Features | 新功能
 
 - **AI 影子積木建議（Copilot LM API）** (AI Shadow Block Suggestions powered by Copilot LM API)
