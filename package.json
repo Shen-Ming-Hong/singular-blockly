@@ -54,27 +54,27 @@
 			},
 			{
 				"command": "singular-blockly.showAIStatusMenu",
-				"title": "Singular Blockly: AI Suggestions Settings",
+				"title": "%command.showAIStatusMenu.title%",
 				"category": "Singular Blockly"
 			},
 			{
 				"command": "singular-blockly.toggleAIEnabled",
-				"title": "Singular Blockly: Toggle AI Suggestions",
+				"title": "%command.toggleAIEnabled.title%",
 				"category": "Singular Blockly"
 			},
 			{
 				"command": "singular-blockly.selectAIModel",
-				"title": "Singular Blockly: Select AI Model",
+				"title": "%command.selectAIModel.title%",
 				"category": "Singular Blockly"
 			},
 			{
 				"command": "singular-blockly.openAISettings",
-				"title": "Singular Blockly: Open AI Settings",
+				"title": "%command.openAISettings.title%",
 				"category": "Singular Blockly"
 			},
 			{
 				"command": "singular-blockly.triggerAISuggestion",
-				"title": "Singular Blockly: Trigger AI Block Suggestion",
+				"title": "%command.triggerAISuggestion.title%",
 				"category": "Singular Blockly"
 			}
 		],
@@ -127,31 +127,35 @@
 				"singularBlockly.ai.enabled": {
 					"type": "boolean",
 					"default": false,
-					"markdownDescription": "Enable/disable AI shadow block suggestions. Requires GitHub Copilot extension."
+					"markdownDescription": "%singularBlockly.ai.enabled.markdownDescription%"
 				},
 				"singularBlockly.ai.model": {
 					"type": "string",
 					"default": "gpt-4o-mini",
-					"markdownDescription": "Language model to use for AI suggestions. Only lightweight models suitable for fast suggestions are listed. Available models depend on your Copilot plan."
+					"markdownDescription": "%singularBlockly.ai.model.markdownDescription%"
 				},
 				"singularBlockly.ai.triggerDelay": {
 					"type": "number",
 					"default": 1500,
 					"minimum": 500,
 					"maximum": 10000,
-					"markdownDescription": "Delay in milliseconds before triggering AI suggestion after a workspace change."
+					"markdownDescription": "%singularBlockly.ai.triggerDelay.markdownDescription%"
 				},
 				"singularBlockly.ai.maxSuggestionsPerMinute": {
 					"type": "number",
 					"default": 5,
 					"minimum": 1,
 					"maximum": 30,
-					"markdownDescription": "Maximum number of AI suggestion requests per minute."
+					"markdownDescription": "%singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription%"
 				},
 				"singularBlockly.ai.reasoningEffort": {
 					"type": "string",
 					"default": "low",
-					"enum": ["low", "medium", "high"],
+					"enum": [
+						"low",
+						"medium",
+						"high"
+					],
 					"enumDescriptions": [
 						"%singularBlockly.ai.reasoningEffort.low.description%",
 						"%singularBlockly.ai.reasoningEffort.medium.description%",
