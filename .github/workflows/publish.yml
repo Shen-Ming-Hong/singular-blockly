@@ -1,47 +1,54 @@
 name: Publish VS Code Extension
 
 on:
-    push:
-        tags:
-            - "v[0-9]+.[0-9]+.[0-9]+"
-    workflow_dispatch:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
 
 jobs:
-    publish:
-        runs-on: ubuntu-latest
-        # 設定明確的權限,遵循最小權限原則
-        permissions:
-            contents: read # 讀取儲存庫內容
-            id-token: write # 用於身份驗證
-        steps:
-            - name: Dump GitHub context
-              env:
-                  GITHUB_CONTEXT: ${{ toJSON(github) }}
-              run: echo "$GITHUB_CONTEXT"
+  publish:
+    runs-on: ubuntu-latest
+    # 設定明確的權限,遵循最小權限原則
+    permissions:
+      contents: read # 讀取儲存庫內容
+      id-token: write # 用於身份驗證
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
 
-            - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-            - name: Get version from tag
-              id: version
-              run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: "22"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Package extension
-              run: npm run package
+      - name: Package extension
+        run: npm run package
 
-            - name: Publish to VS Code Marketplace
-              if: success()
-              run: |
-                  npm install -g @vscode/vsce
-                  vsce publish -p ${{ secrets.VSCE_PAT }}
-              env:
-                  VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish to VS Code Marketplace
+        if: success()
+        # VSCE_PAT 為 Azure DevOps Personal Access Token
+        # 若發布失敗並出現 "Access Denied / expired PAT"，請至以下網址更新：
+        # 1. 建立新 PAT：https://dev.azure.com/SingularMaker/_usersSettings/tokens
+        #    - Organization: All accessible organizations
+        #    - Scopes: Marketplace > Manage
+        # 2. 更新 GitHub Secret：https://github.com/Shen-Ming-Hong/singular-blockly/settings/secrets/actions
+        #    找 VSCE_PAT > Update secret
+        run: |
+          npm install -g @vscode/vsce
+          vsce publish -p ${{ secrets.VSCE_PAT }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
