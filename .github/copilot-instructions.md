@@ -54,8 +54,28 @@ Extension Host (Node.js)              WebView (Browser)
 │   └── shadowSuggestionService.ts # AI block suggestions via Copilot LM API
 └── src/types/
     ├── board.ts               # BoardLanguage, UploadMethod types
-    └── arduino.ts             # getBoardLanguage(), board configs
+    ├── arduino.ts             # getBoardLanguage(), board configs
+    └── nodeDetection.ts       # Node.js detection types & MIN_NODE_VERSION
 ```
+
+**Complete services inventory** (`src/services/`):
+| Service | Role |
+|---|---|
+| `fileService.ts` | ALL file I/O — inject `FileSystem` for tests |
+| `logging.ts` | ALL logging — never use `console.log` |
+| `settingsManager.ts` | PlatformIO config, theme, auto-backup |
+| `arduinoUploader.ts` | PlatformIO CLI upload |
+| `micropythonUploader.ts` | mpremote upload for CyberBrick |
+| `arduinoMonitorService.ts` | Arduino PlatformIO serial monitor |
+| `serialMonitorService.ts` | CyberBrick MicroPython serial monitor (mpremote) |
+| `workspaceValidator.ts` | Workspace state integrity checks |
+| `projectTypeDetector.ts` | Non-Blockly project safety guard |
+| `shadowSuggestionService.ts` | AI block suggestions via Copilot LM API |
+| `aiModelManager.ts` | Copilot tier detection & per-tier AI config |
+| `aiStatusBar.ts` | Status bar indicator for AI suggestion state |
+| `localeService.ts` | Runtime locale/UI messages loader |
+| `nodeDetectionService.ts` | Node.js availability & version validation |
+| `diagnosticService.ts` | VS Code Diagnostic collection management |
 
 **Data Flow**: WebView `saveWorkspace` → `messageHandler.ts` → `FileService` → `blockly/main.json`
 
@@ -81,6 +101,7 @@ case 'newCommand': await this.handleNewCommand(message); break;
 Each block needs both an Arduino and MicroPython generator. They use different patterns:
 
 **Arduino** (`media/blockly/generators/arduino/*.js`):
+
 ```javascript
 arduinoGenerator.forBlock['servo_setup'] = function (block) {
 	const currentBoard = window.getCurrentBoard(); // 'uno' | 'esp32' | 'mega'
@@ -94,6 +115,7 @@ arduinoGenerator.forBlock['servo_setup'] = function (block) {
 ```
 
 **MicroPython** (`media/blockly/generators/micropython/*.js`):
+
 ```javascript
 micropythonGenerator.forBlock['cyberbrick_led_set_color'] = function (block) {
 	generator.addImport('from machine import Pin');
@@ -171,6 +193,19 @@ Adding tools:
 ## Specs-Driven Development
 
 Features are documented in `/specs/{NNN}-feature-name/` with `spec.md`, `plan.md`, `tasks.md`. Check existing specs before implementing new features.
+
+**SpecKit Agents**: Use `.github/agents/speckit.*.agent.md` (or equivalent prompts in `.github/prompts/`) for a structured spec → implementation pipeline:
+
+| Agent                   | Purpose                                   |
+| ----------------------- | ----------------------------------------- |
+| `speckit.clarify`       | Elicit requirements from user description |
+| `speckit.specify`       | Generate formal `spec.md`                 |
+| `speckit.plan`          | Produce `plan.md` implementation plan     |
+| `speckit.tasks`         | Break plan into `tasks.md` checklist      |
+| `speckit.analyze`       | Analyze existing codebase for spec impact |
+| `speckit.implement`     | Implement tasks from `tasks.md`           |
+| `speckit.checklist`     | Verify implementation against spec        |
+| `speckit.taskstoissues` | Convert tasks to GitHub Issues            |
 
 ## Commit Conventions
 
