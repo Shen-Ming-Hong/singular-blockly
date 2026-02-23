@@ -38,6 +38,8 @@
 	var workspaceChangeListener = null;
 	/** @type {*} Block currently in exit-animation, not yet disposed */
 	var pendingDisposeBlock = null;
+	/** @type {ReturnType<typeof setTimeout>|null} Timer for deferred dispose */
+	var pendingDisposeTimer = null;
 
 	/**
 	 * Set field values on a block, resolving variable names to IDs for FieldVariable fields.
@@ -411,6 +413,8 @@
 		}
 		var isMulti = allSuggestions.length > 1;
 		if (isMulti) {
+			var multiHintText =
+				window.MSG && window.MSG['AI_SUGGESTION_TAB_HINT_MULTI'] ? ' ' + window.MSG['AI_SUGGESTION_TAB_HINT_MULTI'] : '';
 			hintElement.innerHTML =
 				'<span class="shadow-hint-arrow" data-action="prev">◁</span>' +
 				' <span class="shadow-hint-counter">' +
@@ -419,9 +423,13 @@
 				allSuggestions.length +
 				'</span> ' +
 				'<span class="shadow-hint-arrow" data-action="next">▷</span>' +
-				' <span class="shadow-hint-tab">⇥</span>';
+				' <span class="shadow-hint-tab">⇥</span>' +
+				'<span class="shadow-hint-text">' +
+				multiHintText +
+				'</span>';
 		} else {
-			hintElement.innerHTML = '<span class="shadow-hint-tab">⇥</span>';
+			var tabHintText = window.MSG && window.MSG['AI_SUGGESTION_TAB_HINT'] ? ' ' + window.MSG['AI_SUGGESTION_TAB_HINT'] : '';
+			hintElement.innerHTML = '<span class="shadow-hint-tab">⇥</span>' + '<span class="shadow-hint-text">' + tabHintText + '</span>';
 		}
 		// Attach click handlers to arrows
 		var arrows = hintElement.querySelectorAll('.shadow-hint-arrow');
@@ -845,8 +853,10 @@
 				if (svgRoot) {
 					svgRoot.classList.add('blockly-shadow-suggestion-exit');
 				}
+				clearTimeout(pendingDisposeTimer);
 				pendingDisposeBlock = block;
-				setTimeout(function () {
+				pendingDisposeTimer = setTimeout(function () {
+					pendingDisposeTimer = null;
 					if (pendingDisposeBlock === block) {
 						pendingDisposeBlock = null;
 					}
