@@ -2528,10 +2528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// 因此這裡收到的 isBlockChangeEvent 一定是真實的使用者操作。
 		if (isBlockChangeEvent(event)) {
 			if (window.shadowBlockManager && window.shadowBlockManager.isActive()) {
-				console.log('[SB] AI suggestion cancelled: workspace changed (event:', event.type, ')');
 				window.shadowBlockManager.clearSuggestion(false);
-			} else {
-				console.log('[SB] Workspace changed, cancelling any in-flight AI request (event:', event.type, ')');
 			}
 			vscode.postMessage({ command: 'cancelShadowSuggestion' });
 		}
@@ -3130,7 +3127,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 				handleMonitorError(message);
 				break;
 			case 'showShadowSuggestion':
-				console.log('[SB] showShadowSuggestion received:', message.suggestions ? message.suggestions.length : 0, 'suggestions');
 				if (window.shadowBlockManager) {
 					window.shadowBlockManager.setSuggestions(message.suggestions);
 				} else {
