@@ -228,10 +228,12 @@ window.languageManager.loadMessages('hu', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Blockly szerkesztő megnyitása',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'A Node.js 22.16.0 vagy újabb nem található. Az MCP funkciók nem lesznek elérhetők, de a Blockly szerkesztési funkciók normálisan működnek.\n\nHiba: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'A Node.js 22.16.0 vagy újabb nem található. Az MCP funkciók nem lesznek elérhetők, de a Blockly szerkesztési funkciók normálisan működnek.\n\nHiba: {0}',
 	BUTTON_INSTALL_GUIDE: 'Telepítési útmutató',
 	BUTTON_REMIND_LATER: 'Emlékeztess később',
-	WARNING_INVALID_NODE_PATH: 'A megadott Node.js útvonal érvénytelen: {0}. Hiba: {1}. Kérjük, javítsa ki az útvonalat, vagy törölje a beállítást az alapértelmezett "node" parancs használatához.',
+	WARNING_INVALID_NODE_PATH:
+		'A megadott Node.js útvonal érvénytelen: {0}. Hiba: {1}. Kérjük, javítsa ki az útvonalat, vagy törölje a beállítást az alapértelmezett "node" parancs használatához.',
 	INFO_NODE_PATH_VALID: 'A Node.js útvonal érvényes: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Node.js útvonal ellenőrzése...',
 	PROGRESS_CHECKING_MCP: 'MCP szerver állapotának ellenőrzése...',
@@ -978,8 +980,5 @@ window.languageManager.loadMessages('hu', {
 	// === AI Shadow Suggestions ===
 	AI_SUGGESTION_TAB_HINT: 'Tab az elfogadáshoz · Esc az elvetéshez',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab elfogad · Alt+]/[ váltás · Esc elvet',
-	AI_COPILOT_NOT_AVAILABLE: 'A GitHub Copilot nem érhető el. Telepítse a bővítményt és jelentkezzen be.',
-	AI_QUOTA_EXHAUSTED: 'A Copilot kvóta kimerült. Jövő hónapban újraindul vagy frissítse a csomagot.',
-	AI_DOWNGRADED_MODEL: 'A prémium kvóta kimerült, alapmodell használatban.',
-	AI_MANUAL_TRIGGER_HINT: 'Nyomja meg a Ctrl+Shift+Space-t az AI javaslat kiváltásához',
+	AI_QUOTA_EXHAUSTED: 'A Copilot kvóta kimürlt. Jövő hónapban újraindul vagy frísítse a csomagot.',
 });

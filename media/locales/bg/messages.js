@@ -980,8 +980,5 @@ window.languageManager.loadMessages('bg', {
 	// === AI Shadow Suggestions ===
 	AI_SUGGESTION_TAB_HINT: 'Tab за приемане · Esc за отхвърляне',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab приемане · Alt+]/[ превключване · Esc отхвърляне',
-	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot не е наличен. Инсталирайте разширението и влезте.',
-	AI_QUOTA_EXHAUSTED: 'Квотата на Copilot е изчерпана. Нулира се следващия месец или надградете плана.',
-	AI_DOWNGRADED_MODEL: 'Премиум квотата е изчерпана, използва се базов модел.',
-	AI_MANUAL_TRIGGER_HINT: 'Натиснете Ctrl+Shift+Space за AI предложение',
+	AI_QUOTA_EXHAUSTED: 'Квотата на Copilot е изчерпана. Нулира се следващия месец или надградете плана.
 });

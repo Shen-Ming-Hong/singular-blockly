@@ -972,8 +972,5 @@ window.languageManager.loadMessages('it', {
 	// === AI Shadow Suggestions ===
 	AI_SUGGESTION_TAB_HINT: 'Tab per accettare · Esc per ignorare',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab accetta · Alt+]/[ cambia · Esc ignora',
-	AI_COPILOT_NOT_AVAILABLE: "GitHub Copilot non è disponibile. Installa l'estensione e accedi.",
 	AI_QUOTA_EXHAUSTED: 'Quota Copilot esaurita. Si reimposta il prossimo mese o aggiorna il piano.',
-	AI_DOWNGRADED_MODEL: 'Quota premium esaurita, utilizzo del modello base.',
-	AI_MANUAL_TRIGGER_HINT: 'Premi Ctrl+Shift+Space per attivare il suggerimento IA',
 });

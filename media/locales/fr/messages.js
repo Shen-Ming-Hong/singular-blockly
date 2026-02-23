@@ -229,13 +229,15 @@ window.languageManager.loadMessages('fr', {
 	VSCODE_CANCEL: 'Annuler',
 	VSCODE_OPEN_BLOCKLY_EDITOR: "Ouvrir l'éditeur Blockly",
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Node.js 22.16.0 ou supérieur non détecté. Les fonctionnalités MCP ne seront pas disponibles, mais les fonctionnalités d\'édition Blockly fonctionneront normalement.\n\nErreur : {0}',
-	BUTTON_INSTALL_GUIDE: 'Guide d\'installation',
+	WARNING_NODE_NOT_AVAILABLE:
+		"Node.js 22.16.0 ou supérieur non détecté. Les fonctionnalités MCP ne seront pas disponibles, mais les fonctionnalités d'édition Blockly fonctionneront normalement.\n\nErreur : {0}",
+	BUTTON_INSTALL_GUIDE: "Guide d'installation",
 	BUTTON_REMIND_LATER: 'Rappeler plus tard',
-	WARNING_INVALID_NODE_PATH: 'Le chemin Node.js spécifié n\'est pas valide : {0}. Erreur : {1}. Veuillez corriger le chemin ou effacer le paramètre pour utiliser la commande "node" par défaut.',
+	WARNING_INVALID_NODE_PATH:
+		'Le chemin Node.js spécifié n\'est pas valide : {0}. Erreur : {1}. Veuillez corriger le chemin ou effacer le paramètre pour utiliser la commande "node" par défaut.',
 	INFO_NODE_PATH_VALID: 'Chemin Node.js valide : {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Validation du chemin Node.js...',
-	PROGRESS_CHECKING_MCP: 'Vérification de l\'état du serveur MCP...',
+	PROGRESS_CHECKING_MCP: "Vérification de l'état du serveur MCP...",
 	BUTTON_COPY_DIAGNOSTICS: 'Copier le diagnostic',
 	INFO_COPIED_TO_CLIPBOARD: 'Copié dans le presse-papiers',
 	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'La commande de diagnostic MCP a échoué : {0}',
@@ -247,16 +249,16 @@ window.languageManager.loadMessages('fr', {
 	DIAG_MCP_BUNDLE: 'MCP Server Bundle',
 	DIAG_EXISTS: 'Existe',
 	DIAG_FILE_NOT_FOUND: 'Fichier non trouvé',
-	DIAG_VSCODE_API_VERSION: 'Version de l\'API VSCode',
+	DIAG_VSCODE_API_VERSION: "Version de l'API VSCode",
 	DIAG_REQUIRES_VERSION: 'requiert >= {0}',
-	DIAG_WORKSPACE_PATH: 'Chemin de l\'espace de travail',
+	DIAG_WORKSPACE_PATH: "Chemin de l'espace de travail",
 	DIAG_NONE: 'Aucun',
 	DIAG_NODEJS_PATH: 'Chemin de Node.js',
 	DIAG_SYSTEM_PATH: 'PATH système',
 	DIAG_STATUS: 'Statut',
 	DIAG_STATUS_OPERATIONAL: 'MCP Server est opérationnel',
 	DIAG_STATUS_PARTIAL: 'MCP Server est partiellement disponible',
-	DIAG_STATUS_UNAVAILABLE: 'MCP Server n\'est pas disponible',
+	DIAG_STATUS_UNAVAILABLE: "MCP Server n'est pas disponible",
 	DIAG_RECOMMENDATIONS: 'Recommandations',
 	DIAG_GENERATED_AT: 'Généré le',
 	DIAG_NODEJS_STATUS: 'Statut de Node.js',
@@ -275,7 +277,7 @@ window.languageManager.loadMessages('fr', {
 	REC_INSTALL_NODEJS: 'Installez Node.js 22.16.0 ou ultérieur',
 	REC_SET_NODEJS_PATH: 'Si déjà installé, spécifiez le chemin de Node.js dans les paramètres (singularBlockly.mcp.nodePath)',
 	REC_UPGRADE_NODEJS: 'Mettez à niveau Node.js vers 22.16.0 ou ultérieur (actuel : {0})',
-	REC_RUN_COMPILE: 'Exécutez `npm run compile` ou réinstallez l\'extension',
+	REC_RUN_COMPILE: "Exécutez `npm run compile` ou réinstallez l'extension",
 	REC_UPGRADE_VSCODE: 'Mettez à niveau VSCode vers 1.105.0 ou ultérieur',
 	REC_OPEN_PROJECT: 'Ouvrez un dossier de projet pour utiliser toutes les fonctionnalités',
 
@@ -953,7 +955,7 @@ window.languageManager.loadMessages('fr', {
 	MONITOR_STOPPED: 'Moniteur arrêté',
 	MONITOR_DEVICE_NOT_FOUND: 'Appareil CyberBrick introuvable',
 	MONITOR_DEVICE_DISCONNECTED: 'Appareil CyberBrick déconnecté',
-	MONITOR_CONNECTION_FAILED: 'Échec de connexion à l\'appareil',
+	MONITOR_CONNECTION_FAILED: "Échec de connexion à l'appareil",
 	MONITOR_CLOSED_FOR_UPLOAD: 'Moniteur mis en pause pour le téléchargement',
 
 	// Orphan Block Warnings
@@ -962,8 +964,5 @@ window.languageManager.loadMessages('fr', {
 	// === AI Shadow Suggestions ===
 	AI_SUGGESTION_TAB_HINT: 'Tab pour accepter · Esc pour ignorer',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab accepter · Alt+]/[ changer · Esc ignorer',
-	AI_COPILOT_NOT_AVAILABLE: "GitHub Copilot n'est pas disponible. Installez l'extension et connectez-vous.",
 	AI_QUOTA_EXHAUSTED: 'Quota Copilot épuisé. Réinitialisation le mois prochain ou mettez à niveau.',
-	AI_DOWNGRADED_MODEL: 'Quota premium épuisé, utilisation du modèle de base.',
-	AI_MANUAL_TRIGGER_HINT: 'Appuyez sur Ctrl+Shift+Space pour déclencher la suggestion IA',
 });

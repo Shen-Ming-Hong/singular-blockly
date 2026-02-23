@@ -976,8 +976,5 @@ window.languageManager.loadMessages('cs', {
 	// === AI Shadow Suggestions ===
 	AI_SUGGESTION_TAB_HINT: 'Tab pro přijetí · Esc pro odmítnutí',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab přijmout · Alt+]/[ přepnout · Esc odmítnout',
-	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot není dostupný. Nainstalujte rozšíření a přihlaste se.',
-	AI_QUOTA_EXHAUSTED: 'Kvóta Copilot vyčerpána. Reset příští měsíc nebo upgradujte plán.',
-	AI_DOWNGRADED_MODEL: 'Prémiová kvóta vyčerpána, používám základní model.',
-	AI_MANUAL_TRIGGER_HINT: 'Stiskněte Ctrl+Shift+Space pro vyvolání AI návrhu',
+	AI_QUOTA_EXHAUSTED: 'Kvóta Copilot vyčerpna. Reset příští měsíc nebo upgradujte plán.',
 });

@@ -228,10 +228,12 @@ window.languageManager.loadMessages('pl', {
 	VSCODE_OPEN_BLOCKLY_EDITOR: 'Otwórz edytor Blockly',
 
 	// MCP Graceful Degradation Messages
-	WARNING_NODE_NOT_AVAILABLE: 'Nie wykryto Node.js 22.16.0 lub nowszego. Funkcje MCP będą niedostępne, ale funkcje edycji Blockly będą działać normalnie.\n\nBłąd: {0}',
+	WARNING_NODE_NOT_AVAILABLE:
+		'Nie wykryto Node.js 22.16.0 lub nowszego. Funkcje MCP będą niedostępne, ale funkcje edycji Blockly będą działać normalnie.\n\nBłąd: {0}',
 	BUTTON_INSTALL_GUIDE: 'Przewodnik instalacji',
 	BUTTON_REMIND_LATER: 'Przypomnij później',
-	WARNING_INVALID_NODE_PATH: 'Podana ścieżka Node.js jest nieprawidłowa: {0}. Błąd: {1}. Popraw ścieżkę lub wyczyść ustawienie, aby użyć domyślnego polecenia "node".',
+	WARNING_INVALID_NODE_PATH:
+		'Podana ścieżka Node.js jest nieprawidłowa: {0}. Błąd: {1}. Popraw ścieżkę lub wyczyść ustawienie, aby użyć domyślnego polecenia "node".',
 	INFO_NODE_PATH_VALID: 'Ścieżka Node.js jest prawidłowa: {0}',
 	PROGRESS_VALIDATING_NODE_PATH: 'Sprawdzanie ścieżki Node.js...',
 	PROGRESS_CHECKING_MCP: 'Sprawdzanie stanu serwera MCP...',
@@ -977,8 +979,5 @@ window.languageManager.loadMessages('pl', {
 	// === AI Shadow Suggestions ===
 	AI_SUGGESTION_TAB_HINT: 'Tab aby zaakceptować · Esc aby odrzucić',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab akceptuj · Alt+]/[ przełącz · Esc odrzuć',
-	AI_COPILOT_NOT_AVAILABLE: 'GitHub Copilot nie jest dostępny. Zainstaluj rozszerzenie i zaloguj się.',
 	AI_QUOTA_EXHAUSTED: 'Limit Copilot wyczerpany. Reset w przyszłym miesiącu lub zaktualizuj plan.',
-	AI_DOWNGRADED_MODEL: 'Limit premium wyczerpany, używam modelu podstawowego.',
-	AI_MANUAL_TRIGGER_HINT: 'Naciśnij Ctrl+Shift+Space aby wywołać sugestię AI',
 });
