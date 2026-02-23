@@ -22,7 +22,7 @@ import { AIModelManager } from '../../services/aiModelManager';
 suite('Blockly Editor AI Suggestion E2E', function () {
 	this.timeout(180_000);
 
-	const resultDir = path.join('E:\\singular-blockly', 'test-results');
+	const resultDir = path.join(__dirname, '..', '..', '..', 'test-results');
 	const logLines: string[] = [];
 
 	function logResult(msg: string) {

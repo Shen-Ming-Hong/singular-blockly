@@ -1660,6 +1660,7 @@ export class WebViewMessageHandler {
 			});
 		} catch {
 			// Panel may have been disposed; ignore
+			log('sendAIConfig: panel may have been disposed', 'debug');
 		}
 	}
 

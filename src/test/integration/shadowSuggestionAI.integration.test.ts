@@ -26,7 +26,7 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 	let modelManager: AIModelManager;
 	let copilotAvailable = false;
 	const logLines: string[] = [];
-	const resultDir = path.join('E:\\singular-blockly', 'test-results');
+	const resultDir = path.join(__dirname, '..', '..', '..', 'test-results');
 
 	function logResult(msg: string) {
 		const line = `[${new Date().toISOString()}] ${msg}`;

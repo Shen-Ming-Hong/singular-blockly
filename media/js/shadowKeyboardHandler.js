@@ -60,7 +60,6 @@
 		if (e.key === 'Escape') {
 			if (isSuggestionActive()) {
 				e.preventDefault();
-				console.log('[SB] AI suggestion cancelled by user (Escape key)');
 				window.shadowBlockManager.clearSuggestion(true);
 				// Notify Extension Host to stop the loading spinner and cancel
 				// any still-in-flight request.
