@@ -237,7 +237,7 @@ export class WebViewManager {
 			this.messageHandler.initAIServices(this.aiModelManager, this.aiStatusBar);
 		}
 
-		// 監聯 WebView 訊息
+		// 監聽 WebView 訊息
 		this.panel.webview.onDidReceiveMessage(async message => {
 			// 攔截 saveWorkspace 命令，設置內部更新標記以避免 FileWatcher 觸發重載
 			if (message.command === 'saveWorkspace') {

@@ -106,7 +106,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		// 註冊 MCP Provider（VSCode 1.105.0+ 支援，需要 Node.js 22.16.0+）
 		await registerMcpProviderIfAvailable(context, nodeDetectionService, localeService);
 
-		// 設定配置變更監聯器（監聽 Node.js 路徑設定變更）
+		// 設定配置變更監聽器（監聽 Node.js 路徑設定變更）
 		setupConfigurationListener(context, nodeDetectionService, localeService);
 
 		log('Singular Blockly extension fully activated!', 'info');
