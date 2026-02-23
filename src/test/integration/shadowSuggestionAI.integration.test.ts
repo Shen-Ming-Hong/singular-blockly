@@ -52,14 +52,18 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 				const models = await vscode.lm.selectChatModels({ family: 'gpt-5-mini' });
 				if (models.length > 0) {
 					copilotAvailable = true;
-					logResult(`Copilot GPT-5-mini available after ${Date.now() - startTime}ms: ${models.map(m => `${m.name} (${m.id})`).join(', ')}`);
+					logResult(
+						`Copilot GPT-5-mini available after ${Date.now() - startTime}ms: ${models.map(m => `${m.name} (${m.id})`).join(', ')}`
+					);
 					break;
 				}
 				// Try all models as fallback
 				const allModels = await vscode.lm.selectChatModels({});
 				if (allModels.length > 0) {
 					copilotAvailable = true;
-					logResult(`Copilot available after ${Date.now() - startTime}ms with ${allModels.length} models: ${allModels.map(m => m.name).join(', ')}`);
+					logResult(
+						`Copilot available after ${Date.now() - startTime}ms with ${allModels.length} models: ${allModels.map(m => m.name).join(', ')}`
+					);
 					break;
 				}
 			} catch {
@@ -141,12 +145,14 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 	}
 
 	test('CyberBrick: Should get valid AI suggestions', async function () {
-		if (!copilotAvailable) { this.skip(); return; }
+		if (!copilotAvailable) {
+			this.skip();
+			return;
+		}
 
 		logResult('--- CyberBrick Test ---');
 		const t0 = performance.now();
 
-		service.clearCache();
 		const result = await service.requestSuggestion(createCyberbrickContext());
 
 		const elapsed = performance.now() - t0;
@@ -174,12 +180,14 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 	});
 
 	test('Arduino: Should get valid AI suggestions', async function () {
-		if (!copilotAvailable) { this.skip(); return; }
+		if (!copilotAvailable) {
+			this.skip();
+			return;
+		}
 
 		logResult('--- Arduino Test ---');
 		const t0 = performance.now();
 
-		service.clearCache();
 		const result = await service.requestSuggestion(createArduinoContext());
 
 		const elapsed = performance.now() - t0;
@@ -200,18 +208,18 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 	});
 
 	test('Parse regression: Response should not silently fail', async function () {
-		if (!copilotAvailable) { this.skip(); return; }
+		if (!copilotAvailable) {
+			this.skip();
+			return;
+		}
 
 		logResult('--- Parse Regression Test ---');
 
-		service.clearCache();
 		const result = await service.requestSuggestion(createCyberbrickContext());
 
 		if (result === null) {
 			logResult('❌ REGRESSION: Parse returned null');
-			assert.fail(
-				'Parse returned no suggestions. Check test-results/ai-integration.log and Output Channel.'
-			);
+			assert.fail('Parse returned no suggestions. Check test-results/ai-integration.log and Output Channel.');
 		}
 
 		logResult(`✅ Parse OK: ${result.suggestions.length} suggestions`);

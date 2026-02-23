@@ -107,10 +107,19 @@ export class AIModelManager implements vscode.Disposable {
 	readonly onQuotaExhausted: vscode.Event<void> = this._onQuotaExhausted.event;
 
 	/**
-	 * Initialize the manager: detect tier and start periodic re-detection
+	 * Initialize the manager: detect tier, restore saved model preference,
+	 * and start periodic re-detection.
 	 */
 	async initialize(): Promise<void> {
 		await this.detectCopilotTier();
+
+		if (this._tier !== 'none') {
+			// Restore the user's saved model preference so _cachedModel is ready
+			// before the first sendPrompt() call.
+			const savedFamily = vscode.workspace.getConfiguration('singularBlockly.ai').get<string>('model');
+			await this.selectModel(savedFamily || undefined);
+		}
+
 		this._redetectTimer = setInterval(async () => {
 			try {
 				await this.detectCopilotTier();
@@ -165,6 +174,11 @@ export class AIModelManager implements vscode.Disposable {
 	/** Return the current detected tier */
 	getTier(): CopilotTier {
 		return this._tier;
+	}
+
+	/** Return the currently cached model instance */
+	getCachedModel(): vscode.LanguageModelChat | undefined {
+		return this._cachedModel;
 	}
 
 	/**
@@ -239,7 +253,9 @@ export class AIModelManager implements vscode.Disposable {
 		token: vscode.CancellationToken
 	): Promise<vscode.LanguageModelChatResponse | null> {
 		if (!this._cachedModel) {
-			const model = await this.selectModel();
+			// Re-read saved preference so we never silently fall through to gpt-5-mini
+			const savedFamily = vscode.workspace.getConfiguration('singularBlockly.ai').get<string>('model');
+			const model = await this.selectModel(savedFamily || undefined);
 			if (!model) {
 				log('No model available for sendPrompt', 'warn');
 				return null;
@@ -329,11 +345,10 @@ export class AIModelManager implements vscode.Disposable {
 
 		try {
 			const models = await vscode.lm.selectChatModels({ vendor: 'copilot' });
-			return (models || [])
-				.filter(m => {
-					const familyLower = m.family.toLowerCase();
-					return !EXCLUDED_MODEL_PATTERNS.some(p => familyLower.includes(p));
-				});
+			return (models || []).filter(m => {
+				const familyLower = m.family.toLowerCase();
+				return !EXCLUDED_MODEL_PATTERNS.some(p => familyLower.includes(p));
+			});
 		} catch (err) {
 			log(`Failed to list raw models: ${err}`, 'warn');
 			return [];
@@ -371,7 +386,10 @@ export class AIModelManager implements vscode.Disposable {
 	 * Note: `modelOptions` is a pass-through bag; unsupported keys are silently ignored by the provider.
 	 * The Copilot backend may also override these values entirely (known issue: vscode-copilot-release#1352).
 	 */
-	private buildModelOptions(model: vscode.LanguageModelChat, reasoningEffort: 'low' | 'medium' | 'high' = 'low'): Record<string, unknown> {
+	private buildModelOptions(
+		model: vscode.LanguageModelChat,
+		reasoningEffort: 'low' | 'medium' | 'high' = 'low'
+	): Record<string, unknown> {
 		const maxTokens = getModelMaxOutputTokens(model);
 		const opts: Record<string, unknown> = {
 			max_output_tokens: maxTokens,
