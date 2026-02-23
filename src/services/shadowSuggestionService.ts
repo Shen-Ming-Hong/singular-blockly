@@ -67,12 +67,6 @@ const BARE_ARRAY_RE = /\[[\s\S]*\]/;
 /** Default timeout for AI requests (ms) */
 const REQUEST_TIMEOUT_MS = 25_000;
 
-/** Maximum number of cached suggestion results */
-const CACHE_MAX_ENTRIES = 20;
-
-/** Cache entry time-to-live (ms) */
-const CACHE_TTL_MS = 5 * 60 * 1000;
-
 /** Map WebView board IDs to block-dictionary.json board names */
 const BOARD_NAME_MAP: Record<string, string> = {
 	uno: 'arduino_uno',
@@ -86,12 +80,6 @@ const BOARD_NAME_MAP: Record<string, string> = {
 /** Categories that are universal across all boards — skip board filtering */
 const UNIVERSAL_CATEGORIES = new Set(['logic', 'loops', 'math', 'text', 'lists', 'variables', 'functions']);
 
-/** Cached suggestion entry */
-interface CacheEntry {
-	result: SuggestionResult;
-	timestamp: number;
-}
-
 /**
  * Shadow Block 建議服務
  * 接收工作區上下文，透過 AIModelManager 呼叫 LLM 產生積木建議
@@ -100,10 +88,10 @@ export class ShadowSuggestionService {
 	private _blockDictionaryCache = new Map<string, string>();
 	private _blockTypeSet: Set<string> | undefined;
 	private _blockTypeCategoryMap: Map<string, string> | undefined;
-	private _blockInputsMap: Map<string, Array<{name: string, check?: string | string[]}>> = new Map();
+	private _blockInputsMap: Map<string, Array<{ name: string; check?: string | string[] }>> = new Map();
+	private _blockStatementInputsMap: Map<string, string[]> = new Map();
 	private readonly _extensionPath: string;
 	private _activeCancellationSource: vscode.CancellationTokenSource | undefined;
-	private readonly _cache = new Map<string, CacheEntry>();
 
 	constructor(
 		private readonly _modelManager: AIModelManager,
@@ -113,59 +101,16 @@ export class ShadowSuggestionService {
 	}
 
 	/**
-	 * Build a cache key from the context fields that affect the suggestion.
-	 */
-	private buildCacheKey(context: WorkspaceContext): string {
-		const selectedKey = context.selectedBlock ? JSON.stringify(context.selectedBlock) : 'none';
-		const treeKey = context.workspaceTree ? JSON.stringify(context.workspaceTree.map(b => b.type)) : '';
-		return context.board + '|' + context.language + '|' + selectedKey + '|' + treeKey;
-	}
-
-	/**
-	 * Clear the suggestion result cache.
-	 */
-	clearCache(): void {
-		this._cache.clear();
-	}
-
-	/**
-	 * Evict stale and excess entries from the cache.
-	 */
-	private evictCache(): void {
-		const now = Date.now();
-		for (const [key, entry] of this._cache) {
-			if (now - entry.timestamp > CACHE_TTL_MS) {
-				this._cache.delete(key);
-			}
-		}
-		// If still over limit, remove oldest entries
-		while (this._cache.size > CACHE_MAX_ENTRIES) {
-			const firstKey = this._cache.keys().next().value;
-			if (firstKey !== undefined) {
-				this._cache.delete(firstKey);
-			}
-		}
-	}
-
-	/**
 	 * Request AI-generated block suggestions for the current workspace context
 	 */
 	async requestSuggestion(context: WorkspaceContext): Promise<SuggestionResult | null> {
 		const config = this._modelManager.getEffectiveConfig();
 
-		const hasBlocks = (context.workspaceTree && context.workspaceTree.length > 0) ||
-			(context.blockTree && context.blockTree.length > 0);
+		const hasBlocks =
+			(context.workspaceTree && context.workspaceTree.length > 0) || (context.blockTree && context.blockTree.length > 0);
 		if (!context.selectedBlock && !hasBlocks) {
 			log('No selected block and empty workspace, skipping suggestion', 'debug');
 			return null;
-		}
-
-		// Check cache first
-		const cacheKey = this.buildCacheKey(context);
-		const cached = this._cache.get(cacheKey);
-		if (cached && (Date.now() - cached.timestamp) < CACHE_TTL_MS) {
-			log('Returning cached suggestion result', 'debug');
-			return cached.result;
 		}
 
 		// Cancel any in-flight request
@@ -206,22 +151,34 @@ export class ShadowSuggestionService {
 			let text = '';
 
 			for await (const fragment of response.text) {
+				if (cts.token.isCancellationRequested) {
+					break;
+				}
 				text += fragment;
 			}
 			const t3 = performance.now();
 			log(`[AI Perf] Streaming collected in ${(t3 - t2).toFixed(0)}ms (${text.length} chars)`, 'info');
+
+			// If this request was superseded by a newer one, discard the result
+			if (cts.token.isCancellationRequested) {
+				cts.dispose();
+				return null;
+			}
+
 			cts.dispose();
 			this._activeCancellationSource = undefined;
 
 			log(`[AI Debug] Raw response (first 500 chars): ${text.substring(0, 500)}`, 'debug');
-		if (text.length > 500) {
-			log(`[AI Debug] Raw response (last 100 chars): ...${text.substring(text.length - 100)}`, 'debug');
-		}
-		let suggestions = this.parseResponse(text);
+			if (text.length > 500) {
+				log(`[AI Debug] Raw response (last 100 chars): ...${text.substring(text.length - 100)}`, 'debug');
+			}
+			let suggestions = this.parseResponse(text);
 			const t4 = performance.now();
 			log(`[AI Perf] Parsed ${suggestions.length} suggestions in ${(t4 - t3).toFixed(0)}ms`, 'info');
 			log(`Parsed ${suggestions.length} suggestions from AI response (${text.length} chars)`, 'debug');
 			this.ensureRequiredInputs(suggestions);
+			this.normalizeEmptyFields(suggestions);
+			this.ensureStatementInputs(suggestions);
 			if (suggestions.length > 0 && context.existingBlockTypes) {
 				const beforeCount = suggestions.length;
 				suggestions = this.filterForDiversity(suggestions, context.existingBlockTypes, context.selectedBlock?.type);
@@ -239,10 +196,6 @@ export class ShadowSuggestionService {
 				modelUsed: this._modelManager.getTier(),
 			};
 
-			// Store in cache
-			this._cache.set(cacheKey, { result, timestamp: Date.now() });
-			this.evictCache();
-
 			log(`[AI Perf] Total pipeline: ${(performance.now() - t0).toFixed(0)}ms`, 'info');
 			return result;
 		} catch (err) {
@@ -254,6 +207,18 @@ export class ShadowSuggestionService {
 			}
 			log(`Shadow suggestion request failed: ${err}`, 'error');
 			return null;
+		}
+	}
+
+	/**
+	 * Cancel the currently in-flight suggestion request, if any.
+	 * Called when the workspace changes so stale results are never delivered.
+	 */
+	cancelCurrentRequest(): void {
+		if (this._activeCancellationSource) {
+			this._activeCancellationSource.cancel();
+			this._activeCancellationSource.dispose();
+			this._activeCancellationSource = undefined;
 		}
 	}
 
@@ -274,24 +239,29 @@ export class ShadowSuggestionService {
 			'# Instructions',
 			'',
 			'## Output Format',
-			'Respond ONLY with a minified JSON array. No markdown, no explanation.',
-			'Each element: `{"blockType":"name","fields":{...},"inputs":{...}}`',
+			'Respond ONLY with a single-element minified JSON array. No markdown, no explanation.',
+			'The array MUST contain EXACTLY ONE element: `[{"blockType":"name","fields":{...},"inputs":{...}}]`',
 			'fields/inputs optional. No whitespace between tokens.',
 			'CRITICAL: Always close all braces/brackets. Response MUST end with `]`.',
+			'CRITICAL: Output EXACTLY ONE element in the array. Never split into multiple separate top-level blocks.',
 			'',
 			'## Pattern Analysis',
-			'1. Identify repeating patterns — loops, sequences with varying parameters',
-			'2. Predict intent — infer the overall goal from existing code',
+			"1. Identify the user's behavior pattern from existing code",
+			'2. Predict intent — infer the overall goal from the pattern',
 			'3. Complete the pattern — if R→G and G→B exist, suggest B→R',
 			'4. Focus on the `← INSERT NEW BLOCK HERE` marker position',
 			'',
 			'## Rules',
-			'Suggest 1-3 blocks. First = most natural next step.',
-			'Include value inputs (FROM/TO/BY, colors, delays) with concrete values.',
-			'Include statement children (DO/ELSE) with their inner blocks when continuing a pattern.',
+			'Output EXACTLY ONE deeply-nested block chain. Never output multiple separate top-level blocks.',
+			'MANDATORY: ALL statement slots (DO/ELSE/DO0/BODY/THEN) MUST contain at least one inner block — never leave a statement slot empty.',
+			'ALL value inputs MUST have concrete contextual values derived from the pattern — not arbitrary zeros unless context suggests zero.',
 			'Use variable names from User Variables.',
-			'Dropdown fields: values MUST be from listed options.',
-			'DON\'T suggest: arduino_setup_loop, micropython_main, or unlisted blocks.',
+			'Dropdown fields: values MUST exactly match the listed options.',
+			"DON'T suggest: arduino_setup_loop, micropython_main, or unlisted blocks.",
+			'CRITICAL: `inputs` MUST be a top-level key of the block object — NEVER nest `inputs` inside `fields`.',
+			'CRITICAL: ALL field values MUST be plain strings. Never place a block object inside fields.',
+			'WRONG: {"blockType":"math_arithmetic","fields":{"OP":"ADD","inputs":{"A":{...},"B":{...}}}}',
+			'RIGHT: {"blockType":"math_arithmetic","fields":{"OP":"ADD"},"inputs":{"A":{...},"B":{...}}}',
 			'',
 			'# Examples',
 			'',
@@ -301,7 +271,7 @@ export class ShadowSuggestionService {
 			'Used: arduino_setup_loop,text_print,text',
 			'</user_code>',
 			'<response id="ex1">',
-			'[{"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"3"}}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"5"}}}}]',
+			'[{"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"3"}}}}]',
 			'</response>',
 			'',
 			'<user_code id="ex2">',
@@ -312,6 +282,16 @@ export class ShadowSuggestionService {
 			'</user_code>',
 			'<response id="ex2">',
 			'[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"0"}},"TO":{"blockType":"math_number","fields":{"NUM":"255"}},"BY":{"blockType":"math_number","fields":{"NUM":"1"}},"DO":{"blockType":"cyberbrick_led_set_color","inputs":{"RED":{"blockType":"variables_get","fields":{"VAR":"i"}},"GREEN":{"blockType":"math_number","fields":{"NUM":"0"}},"BLUE":{"blockType":"math_arithmetic","fields":{"OP":"MINUS"},"inputs":{"A":{"blockType":"math_number","fields":{"NUM":"255"}},"B":{"blockType":"variables_get","fields":{"VAR":"i"}}}}}}}}]',
+			'</response>',
+			'',
+			'<user_code id="ex3">',
+			'Board: uno (Arduino C++)',
+			'Code: int val = analogRead(A0); Serial.println(val);',
+			'Pattern: read sensor → next step is to branch on value',
+			'Used: arduino_setup_loop,variables_set,text_print,variables_get,math_number',
+			'</user_code>',
+			'<response id="ex3">',
+			'[{"blockType":"controls_if","inputs":{"IF0":{"blockType":"logic_compare","fields":{"OP":"GT"},"inputs":{"A":{"blockType":"variables_get","fields":{"VAR":"val"}},"B":{"blockType":"math_number","fields":{"NUM":"512"}}}},"DO0":{"blockType":"text_print","inputs":{"TEXT":{"blockType":"text","fields":{"TEXT":"HIGH"}}}}}}]',
 			'</response>',
 		];
 
@@ -355,7 +335,11 @@ export class ShadowSuggestionService {
 
 		// Focus block
 		if (context.selectedBlock) {
-			contextParts.push('', '## Focus Block', `Last edited: \`${context.selectedBlock.type}\` — new blocks will be inserted after this block.`);
+			contextParts.push(
+				'',
+				'## Focus Block',
+				`Last edited: \`${context.selectedBlock.type}\` — new blocks will be inserted after this block.`
+			);
 			if (context.selectedBlock.parentType) {
 				contextParts.push(`Parent: \`${context.selectedBlock.parentType}\``);
 			}
@@ -363,25 +347,27 @@ export class ShadowSuggestionService {
 
 		// User-defined variables — helps LLM suggest variable-related blocks
 		if (context.variables && context.variables.length > 0) {
-			contextParts.push('', '## User Variables',
-				context.variables.map(v => `- ${v.name} (${v.type || 'any'})`).join('\n'));
+			contextParts.push('', '## User Variables', context.variables.map(v => `- ${v.name} (${v.type || 'any'})`).join('\n'));
 		}
 
 		// User-defined functions — helps LLM suggest function call blocks
 		if (context.functions && context.functions.length > 0) {
-			contextParts.push('', '## User Functions',
-				context.functions.map(f => `- ${f.name}`).join('\n'));
+			contextParts.push('', '## User Functions', context.functions.map(f => `- ${f.name}`).join('\n'));
 		}
 
 		// Connection type constraint — tells LLM what block types fit the insertion point
 		if (context.selectedBlock?.connectionType) {
-			const connDesc = context.selectedBlock.connectionType === 'next'
-				? 'statement blocks (blocks that connect vertically via previous/next connections)'
-				: context.selectedBlock.connectionType === 'input'
-					? 'value blocks (blocks that plug into input slots)'
-					: context.selectedBlock.connectionType;
-			contextParts.push('', '## Connection Constraint',
-				`The insertion point accepts: ${connDesc}. Only suggest compatible block types.`);
+			const connDesc =
+				context.selectedBlock.connectionType === 'next'
+					? 'statement blocks (blocks that connect vertically via previous/next connections)'
+					: context.selectedBlock.connectionType === 'input'
+						? 'value blocks (blocks that plug into input slots)'
+						: context.selectedBlock.connectionType;
+			contextParts.push(
+				'',
+				'## Connection Constraint',
+				`The insertion point accepts: ${connDesc}. Only suggest compatible block types.`
+			);
 		}
 
 		// Already used blocks
@@ -393,7 +379,7 @@ export class ShadowSuggestionService {
 		contextParts.push('', '## Available Block Types', blockList);
 
 		// Final instruction
-		contextParts.push('', `Suggest 1 to ${config.maxSuggestions} blocks as a JSON array.`);
+		contextParts.push('', 'Output exactly 1 complete and deeply-nested block chain as a single-element JSON array.');
 
 		// Token budget control: estimate total prompt size
 		// Rough estimate: 1 token ≈ 4 chars for English/code
@@ -402,8 +388,11 @@ export class ShadowSuggestionService {
 		const totalChars = staticLength + dynamicLength;
 		const estimatedTokens = Math.ceil(totalChars / 4);
 
-		// If estimated tokens > 12000, apply priority-based truncation
-		if (estimatedTokens > 12000) {
+		// Dynamic truncation threshold: use 85% of the model's actual maxInputTokens
+		// (reserves ~15% headroom for output tokens), falling back to 64000 if no model is cached yet.
+		const cachedModel = this._modelManager.getCachedModel();
+		const safeInputLimit = cachedModel ? Math.floor(cachedModel.maxInputTokens * 0.85) : 64000;
+		if (estimatedTokens > safeInputLimit) {
 			// Strategy 1: Truncate codeSnippet to ±15 lines around INSERT marker
 			if (context.codeSnippet) {
 				const lines = context.codeSnippet.split('\n');
@@ -479,11 +468,22 @@ export class ShadowSuggestionService {
 						let inStr = false;
 						for (let ci = 0; ci < jsonStr.length; ci++) {
 							const c = jsonStr[ci];
-							if (c === '\\' && inStr) { ci++; continue; }
-							if (c === '"') { inStr = !inStr; continue; }
-							if (inStr) { continue; }
-							if (c === '{') { opens++; }
-							else if (c === '}') { closes++; }
+							if (c === '\\' && inStr) {
+								ci++;
+								continue;
+							}
+							if (c === '"') {
+								inStr = !inStr;
+								continue;
+							}
+							if (inStr) {
+								continue;
+							}
+							if (c === '{') {
+								opens++;
+							} else if (c === '}') {
+								closes++;
+							}
 						}
 						const missing = opens - closes;
 						if (missing > 0 && missing <= 5) {
@@ -506,14 +506,18 @@ export class ShadowSuggestionService {
 			// top-level object and close the array
 			if (!parsed) {
 				parsed = this.repairTruncatedJson(text);
-				if (parsed) { strategyUsed = 'truncation-repair'; }
+				if (parsed) {
+					strategyUsed = 'truncation-repair';
+				}
 			}
 
 			// Strategy 5: greedy extraction — find individual top-level JSON objects
 			// Handles cases where the response looks like valid JSON but has internal syntax errors
 			if (!parsed) {
 				parsed = this.extractIndividualObjects(text);
-				if (parsed) { strategyUsed = 'greedy-extraction'; }
+				if (parsed) {
+					strategyUsed = 'greedy-extraction';
+				}
 			}
 
 			// Strategy 6: regex fallback — extract blockType names from broken JSON
@@ -546,6 +550,7 @@ export class ShadowSuggestionService {
 		}
 
 		log(`[AI Debug] Parsed array with ${parsed.length} items via ${strategyUsed}, validating...`, 'info');
+		this.repairMisplacedInputs(parsed);
 		const validated = parsed.filter((item: any) => this.validateSuggestion(item));
 		if (validated.length < parsed.length) {
 			log(`[AI Debug] Validation rejected ${parsed.length - validated.length} of ${parsed.length} suggestions`, 'debug');
@@ -560,7 +565,9 @@ export class ShadowSuggestionService {
 	private repairTruncatedJson(text: string): unknown | null {
 		// Find the start of the JSON array
 		const arrayStart = text.indexOf('[');
-		if (arrayStart === -1) { return null; }
+		if (arrayStart === -1) {
+			return null;
+		}
 
 		const jsonPart = text.substring(arrayStart);
 
@@ -588,7 +595,9 @@ export class ShadowSuggestionService {
 				continue;
 			}
 
-			if (inString) { continue; }
+			if (inString) {
+				continue;
+			}
 
 			if (ch === '[' || ch === '{') {
 				depth++;
@@ -619,7 +628,10 @@ export class ShadowSuggestionService {
 		const repaired = jsonPart.substring(0, lastCompleteObjectEnd + 1) + ']';
 		try {
 			const result = JSON.parse(repaired);
-			log(`[AI Debug] Truncated JSON repaired: extracted ${Array.isArray(result) ? result.length : 0} items from ${jsonPart.length} chars`, 'debug');
+			log(
+				`[AI Debug] Truncated JSON repaired: extracted ${Array.isArray(result) ? result.length : 0} items from ${jsonPart.length} chars`,
+				'debug'
+			);
 			return result;
 		} catch {
 			return null;
@@ -633,7 +645,9 @@ export class ShadowSuggestionService {
 	 */
 	private extractIndividualObjects(text: string): unknown[] | null {
 		const arrayStart = text.indexOf('[');
-		if (arrayStart === -1) { return null; }
+		if (arrayStart === -1) {
+			return null;
+		}
 
 		const jsonPart = text.substring(arrayStart);
 		const objects: unknown[] = [];
@@ -657,7 +671,9 @@ export class ShadowSuggestionService {
 				inString = !inString;
 				continue;
 			}
-			if (inString) { continue; }
+			if (inString) {
+				continue;
+			}
 
 			if (ch === '{') {
 				if (depth === 1) {
@@ -777,11 +793,22 @@ export class ShadowSuggestionService {
 			// Build blockType → category map and inputs map
 			this._blockTypeCategoryMap = new Map<string, string>();
 			this._blockInputsMap.clear();
+			this._blockStatementInputsMap.clear();
 			for (const block of filtered) {
 				this._blockTypeCategoryMap.set(block.type, block.category);
 				const valueInputs = block.inputs?.filter(i => i.type === 'value');
 				if (valueInputs && valueInputs.length > 0) {
-					this._blockInputsMap.set(block.type, valueInputs.map(i => ({ name: i.name, check: i.check })));
+					this._blockInputsMap.set(
+						block.type,
+						valueInputs.map(i => ({ name: i.name, check: i.check }))
+					);
+				}
+				const stmtInputs = block.inputs?.filter(i => i.type === 'statement');
+				if (stmtInputs && stmtInputs.length > 0) {
+					this._blockStatementInputsMap.set(
+						block.type,
+						stmtInputs.map(i => i.name)
+					);
 				}
 			}
 
@@ -794,12 +821,11 @@ export class ShadowSuggestionService {
 				}
 				const valueInputs = block.inputs?.filter(i => i.type === 'value') ?? [];
 				const inputsSummary = valueInputs.length
-					? ' | inputs: ' + valueInputs.map(i => `${i.name}(${Array.isArray(i.check) ? i.check.join('|') : i.check || 'Any'})`).join(', ')
+					? ' | inputs: ' +
+						valueInputs.map(i => `${i.name}(${Array.isArray(i.check) ? i.check.join('|') : i.check || 'Any'})`).join(', ')
 					: '';
 				const stmtInputs = block.inputs?.filter(i => i.type === 'statement') ?? [];
-				const stmtsSummary = stmtInputs.length
-					? ' | stmts: ' + stmtInputs.map(i => i.name).join(', ')
-					: '';
+				const stmtsSummary = stmtInputs.length ? ' | stmts: ' + stmtInputs.map(i => i.name).join(', ') : '';
 
 				// Build field dropdown summary
 				const dropdownFields = (block.fields ?? [])
@@ -818,9 +844,7 @@ export class ShadowSuggestionService {
 						return null;
 					})
 					.filter(Boolean);
-				const fieldsSummary = dropdownFields.length
-					? ' | fields: ' + dropdownFields.join(', ')
-					: '';
+				const fieldsSummary = dropdownFields.length ? ' | fields: ' + dropdownFields.join(', ') : '';
 
 				byCategory.get(cat)!.push(`${block.type}${inputsSummary}${stmtsSummary}${fieldsSummary}`);
 			}
@@ -848,7 +872,9 @@ export class ShadowSuggestionService {
 	 * Convert workspaceTree JSON into a concise AST-like indented text for the LLM prompt.
 	 */
 	private formatWorkspaceTree(tree: WorkspaceContext['workspaceTree']): string {
-		if (!tree || tree.length === 0) { return ''; }
+		if (!tree || tree.length === 0) {
+			return '';
+		}
 
 		const MAX_LINES = 40;
 		const MAX_DEPTH = 4;
@@ -856,23 +882,34 @@ export class ShadowSuggestionService {
 		let totalNodes = 0;
 
 		const opMap: Record<string, string> = {
-			ADD: '+', MINUS: '-', MULTIPLY: '×', DIVIDE: '÷', POWER: '^'
+			ADD: '+',
+			MINUS: '-',
+			MULTIPLY: '×',
+			DIVIDE: '÷',
+			POWER: '^',
 		};
 
 		const resolveValue = (node: any): string => {
-			if (!node || !node.type) { return '?'; }
+			if (!node || !node.type) {
+				return '?';
+			}
 			switch (node.type) {
-				case 'math_number': return node.fields?.NUM ?? '0';
-				case 'variables_get': return node.fields?.VAR ?? '?';
-				case 'text': return `"${node.fields?.TEXT ?? ''}"`;
-				case 'logic_boolean': return node.fields?.BOOL ?? 'TRUE';
+				case 'math_number':
+					return node.fields?.NUM ?? '0';
+				case 'variables_get':
+					return node.fields?.VAR ?? '?';
+				case 'text':
+					return `"${node.fields?.TEXT ?? ''}"`;
+				case 'logic_boolean':
+					return node.fields?.BOOL ?? 'TRUE';
 				case 'math_arithmetic': {
 					const op = opMap[node.fields?.OP] ?? node.fields?.OP ?? '?';
 					const a = node.inputs?.A ? resolveValue(node.inputs.A) : '?';
 					const b = node.inputs?.B ? resolveValue(node.inputs.B) : '?';
 					return `${a} ${op} ${b}`;
 				}
-				default: return node.type;
+				default:
+					return node.type;
 			}
 		};
 
@@ -895,7 +932,9 @@ export class ShadowSuggestionService {
 
 		const walk = (nodes: any[], depth: number): boolean => {
 			for (const node of nodes) {
-				if (lines.length >= MAX_LINES) { return false; }
+				if (lines.length >= MAX_LINES) {
+					return false;
+				}
 				totalNodes++;
 
 				if (depth >= MAX_DEPTH) {
@@ -907,7 +946,9 @@ export class ShadowSuggestionService {
 				lines.push(`${indent}${node.type}${buildParams(node)}`);
 
 				if (node.children && node.children.length > 0) {
-					if (!walk(node.children, depth + 1)) { return false; }
+					if (!walk(node.children, depth + 1)) {
+						return false;
+					}
 				}
 			}
 			return true;
@@ -928,9 +969,13 @@ export class ShadowSuggestionService {
 	private ensureRequiredInputs(suggestions: BlockSuggestion[]): void {
 		for (const suggestion of suggestions) {
 			const requiredInputs = this._blockInputsMap.get(suggestion.blockType);
-			if (!requiredInputs) { continue; }
+			if (!requiredInputs) {
+				continue;
+			}
 
-			if (!suggestion.inputs) { suggestion.inputs = {}; }
+			if (!suggestion.inputs) {
+				suggestion.inputs = {};
+			}
 
 			for (const input of requiredInputs) {
 				if (suggestion.inputs[input.name] !== undefined) {
@@ -964,64 +1009,207 @@ export class ShadowSuggestionService {
 	}
 
 	/**
-	 * Filter suggestions to ensure diversity across categories
-	 * and avoid duplicating blocks the user already has.
+	 * Auto-fill missing statement inputs with a placeholder text_print block.
+	 * Prevents empty statement slots (DO, ELSE, DO0, etc.) in container blocks like
+	 * controls_for and controls_if after the AI generates a deeply-nested suggestion.
+	 * Recursively processes nested inputs and next-chain blocks.
 	 */
-	private filterForDiversity(
-		suggestions: BlockSuggestion[],
-		existingBlockTypes: string[],
-		focusBlockType?: string
-	): BlockSuggestion[] {
+	private ensureStatementInputs(suggestions: BlockSuggestion[]): void {
+		for (const suggestion of suggestions) {
+			const statementSlots = this._blockStatementInputsMap.get(suggestion.blockType) ?? [];
+
+			if (statementSlots.length > 0) {
+				if (!suggestion.inputs) {
+					suggestion.inputs = {};
+				}
+				for (const slotName of statementSlots) {
+					if (suggestion.inputs[slotName] !== undefined) {
+						// Already filled — recurse into it
+						this.ensureStatementInputs([suggestion.inputs[slotName]]);
+					} else {
+						// Insert placeholder — gives user a visible slot to replace
+						suggestion.inputs[slotName] = {
+							blockType: 'text_print',
+							inputs: { TEXT: { blockType: 'text', fields: { TEXT: '' } } },
+						};
+					}
+				}
+			}
+
+			// Recurse into value inputs (non-statement child blocks)
+			if (suggestion.inputs) {
+				const stmtSlotSet = new Set(statementSlots);
+				for (const [slotName, child] of Object.entries(suggestion.inputs)) {
+					if (!stmtSlotSet.has(slotName) && child?.blockType) {
+						this.ensureStatementInputs([child]);
+					}
+				}
+			}
+
+			// Recurse into next chain
+			if (suggestion.next?.blockType) {
+				this.ensureStatementInputs([suggestion.next]);
+			}
+		}
+	}
+
+	/**
+	 * Find the first suggestion not duplicating an existing non-reusable block type.
+	 * Since the AI now outputs exactly one deeply-nested block chain, category quota
+	 * filtering is no longer applicable — we just need the deduplication guard.
+	 */
+	private filterForDiversity(suggestions: BlockSuggestion[], existingBlockTypes: string[], _focusBlockType?: string): BlockSuggestion[] {
 		const existingSet = new Set(existingBlockTypes);
-		const categoryCounts = new Map<string, number>();
-		const filtered: BlockSuggestion[] = [];
 		const utilityBlocks = new Set([
-			'text', 'math_number', 'math_arithmetic', 'logic_boolean', 'text_print',
-			'cyberbrick_delay_ms', 'cyberbrick_delay_s', 'delay_ms', 'arduino_delay'
+			'text',
+			'math_number',
+			'math_arithmetic',
+			'logic_boolean',
+			'text_print',
+			'cyberbrick_delay_ms',
+			'cyberbrick_delay_s',
+			'delay_ms',
+			'arduino_delay',
 		]);
 		// Control/flow blocks are inherently reusable — don't filter by existence
 		const reusableBlocks = new Set([
-			'controls_repeat_ext', 'controls_repeat', 'controls_whileUntil',
-			'controls_for', 'controls_forEach', 'controls_if', 'controls_ifelse',
-			'controls_flow_statements', 'controls_duration',
+			'controls_repeat_ext',
+			'controls_repeat',
+			'controls_whileUntil',
+			'controls_for',
+			'controls_forEach',
+			'controls_if',
+			'controls_ifelse',
+			'controls_flow_statements',
+			'controls_duration',
 		]);
 
-		// Determine focus block's category for relaxed filtering
-		const focusCategory = focusBlockType ? this._blockTypeCategoryMap?.get(focusBlockType) : undefined;
-
 		for (const suggestion of suggestions) {
-			// Skip if user already has this exact block type
-			// Exempt: utility blocks, reusable control blocks, and composite blocks with statement children
-			const hasStatementChildren = suggestion.inputs && Object.values(suggestion.inputs).some(
-				(v: any) => v && typeof v === 'object' && v.blockType
-			);
-			if (existingSet.has(suggestion.blockType)
-				&& !utilityBlocks.has(suggestion.blockType)
-				&& !reusableBlocks.has(suggestion.blockType)
-				&& !hasStatementChildren) {
+			const hasStatementChildren =
+				suggestion.inputs && Object.values(suggestion.inputs).some((v: any) => v && typeof v === 'object' && v.blockType);
+			if (
+				existingSet.has(suggestion.blockType) &&
+				!utilityBlocks.has(suggestion.blockType) &&
+				!reusableBlocks.has(suggestion.blockType) &&
+				!hasStatementChildren
+			) {
+				continue;
+			}
+			return [suggestion];
+		}
+
+		// Fallback: if everything filtered out, return first suggestion unchanged
+		return suggestions.length > 0 ? [suggestions[0]] : [];
+	}
+
+	/**
+	 * Default field values for common blocks when the AI returns empty or missing field values.
+	 */
+	private static readonly FIELD_DEFAULTS: Record<string, Record<string, string>> = {
+		math_number: { NUM: '0' },
+		math_arithmetic: { OP: 'ADD' },
+		logic_boolean: { BOOL: 'TRUE' },
+		logic_compare: { OP: 'EQ' },
+		logic_operation: { OP: 'AND' },
+		math_single: { OP: 'ROOT' },
+	};
+
+	/**
+	 * Repair the common gpt-4o-mini mistake of nesting `inputs` (or block specs) inside `fields`.
+	 *
+	 * Bad output:  {"fields": {"OP": "ADD", "inputs": {"A": {...}, "B": {...}}}}
+	 * Fixed:       {"fields": {"OP": "ADD"}, "inputs": {"A": {...}, "B": {...}}}
+	 *
+	 * Also moves any other non-string field value (object with blockType) to inputs.
+	 * Applied before validateSuggestion so the structure is correct before validation.
+	 */
+	private repairMisplacedInputs(suggestions: any[]): void {
+		for (const suggestion of suggestions) {
+			if (!suggestion || typeof suggestion !== 'object') {
 				continue;
 			}
 
-			// Category limit: max 2 per category (3 if same category as focus block)
-			const category = this._blockTypeCategoryMap?.get(suggestion.blockType);
-			if (category) {
-				const currentCount = categoryCounts.get(category) || 0;
-				const maxForCategory = (category === focusCategory) ? 3 : 2;
-				if (currentCount >= maxForCategory) {
-					continue;
+			if (suggestion.fields && typeof suggestion.fields === 'object') {
+				const fieldsToRemove: string[] = [];
+				const inputsToAdd: Record<string, unknown> = {};
+
+				for (const [key, value] of Object.entries(suggestion.fields)) {
+					if (typeof value === 'string') {
+						continue; // normal field — leave it
+					}
+					fieldsToRemove.push(key);
+					if (key === 'inputs' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+						// The entire `inputs` map was accidentally placed inside fields — merge it out
+						Object.assign(inputsToAdd, value);
+					} else if (typeof value === 'object' && value !== null && (value as any).blockType) {
+						// A block spec was placed in fields under its input slot name — move to inputs
+						inputsToAdd[key] = value;
+					}
 				}
-				categoryCounts.set(category, currentCount + 1);
+
+				for (const key of fieldsToRemove) {
+					delete suggestion.fields[key];
+				}
+
+				if (Object.keys(inputsToAdd).length > 0) {
+					if (!suggestion.inputs) {
+						suggestion.inputs = {};
+					}
+					Object.assign(suggestion.inputs, inputsToAdd);
+					log(
+						`[AI Debug] repairMisplacedInputs: rescued ${Object.keys(inputsToAdd).join(', ')} from fields.inputs on "${suggestion.blockType}"`,
+						'info'
+					);
+				}
+
+				if (Object.keys(suggestion.fields).length === 0) {
+					delete suggestion.fields;
+				}
 			}
 
-			filtered.push(suggestion);
-		}
+			// Recurse into inputs
+			if (suggestion.inputs && typeof suggestion.inputs === 'object') {
+				this.repairMisplacedInputs(Object.values(suggestion.inputs).filter(v => v && typeof v === 'object'));
+			}
 
-		// Fallback: if everything filtered out, return first suggestion
-		if (filtered.length === 0 && suggestions.length > 0) {
-			return [suggestions[0]];
+			// Recurse into next chain
+			if (suggestion.next && typeof suggestion.next === 'object') {
+				this.repairMisplacedInputs([suggestion.next]);
+			}
 		}
+	}
 
-		return filtered;
+	/**
+	 * Normalize missing or empty field values to sensible defaults.
+	 * Handles the case where gpt-4o-mini outputs {"fields": {}} (empty fields object)
+	 * or omits required dropdown fields entirely.
+	 * Called after ensureRequiredInputs so inputs are already populated.
+	 */
+	private normalizeEmptyFields(suggestions: BlockSuggestion[]): void {
+		for (const suggestion of suggestions) {
+			const defaults = ShadowSuggestionService.FIELD_DEFAULTS[suggestion.blockType];
+			if (defaults) {
+				if (!suggestion.fields) {
+					suggestion.fields = {};
+				}
+				for (const [field, defaultValue] of Object.entries(defaults)) {
+					const current = suggestion.fields[field];
+					if (current === undefined || current === '') {
+						suggestion.fields[field] = defaultValue;
+					}
+				}
+			}
+
+			// Recurse into inputs
+			if (suggestion.inputs) {
+				this.normalizeEmptyFields(Object.values(suggestion.inputs).filter((v): v is BlockSuggestion => !!v?.blockType));
+			}
+
+			// Recurse into next chain
+			if (suggestion.next?.blockType) {
+				this.normalizeEmptyFields([suggestion.next]);
+			}
+		}
 	}
 
 	/**

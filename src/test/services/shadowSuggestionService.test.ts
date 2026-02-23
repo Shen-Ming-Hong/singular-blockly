@@ -36,7 +36,7 @@ suite('ShadowSuggestionService Tests', () => {
 			{ type: 'controls_repeat_ext', category: 'loops', descriptions: { en: 'Repeat block' } },
 			{ type: 'math_number', category: 'math', descriptions: { en: 'Number' } },
 			{ type: 'text_print', category: 'text', descriptions: { en: 'Print text' } },
-		{ type: 'controls_for', category: 'loops', descriptions: { en: 'For loop' } },
+			{ type: 'controls_for', category: 'loops', descriptions: { en: 'For loop' } },
 		],
 	};
 
@@ -149,9 +149,7 @@ suite('ShadowSuggestionService Tests', () => {
 		});
 
 		test('Should return suggestions on successful AI response', async () => {
-			const suggestionsJson = JSON.stringify([
-				{ blockType: 'math_number', connectionType: 'input', fields: { NUM: '10' } },
-			]);
+			const suggestionsJson = JSON.stringify([{ blockType: 'math_number', connectionType: 'input', fields: { NUM: '10' } }]);
 			mockModelManager.sendPrompt.resolves(createMockResponse(suggestionsJson));
 
 			const result = await service.requestSuggestion(createContext());
@@ -170,33 +168,9 @@ suite('ShadowSuggestionService Tests', () => {
 			assert.strictEqual(result, null, 'Should silently return null on error');
 		});
 
-		test('Should return cached result for same context', async () => {
-			const suggestionsJson = JSON.stringify([
-				{ blockType: 'controls_repeat_ext', connectionType: 'next' },
-			]);
-			mockModelManager.sendPrompt.resolves(createMockResponse(suggestionsJson));
-
-			const context = createContext();
-
-			// First call: should call sendPrompt
-			const result1 = await service.requestSuggestion(context);
-			assert.ok(result1);
-
-			// Second call: should use cache (sendPrompt not called again)
-			const sendPromptCallCount = mockModelManager.sendPrompt.callCount;
-			const result2 = await service.requestSuggestion(context);
-
-			assert.ok(result2);
-			assert.deepStrictEqual(result1!.suggestions, result2!.suggestions);
-			assert.strictEqual(mockModelManager.sendPrompt.callCount, sendPromptCallCount,
-				'Should not call sendPrompt again for cached context');
-		});
-
 		test('Should return null when response has no valid suggestions', async () => {
 			// Response with unknown block types
-			const suggestionsJson = JSON.stringify([
-				{ blockType: 'nonexistent_block', connectionType: 'next' },
-			]);
+			const suggestionsJson = JSON.stringify([{ blockType: 'nonexistent_block', connectionType: 'next' }]);
 			mockModelManager.sendPrompt.resolves(createMockResponse(suggestionsJson));
 
 			const result = await service.requestSuggestion(createContext());
@@ -207,9 +181,7 @@ suite('ShadowSuggestionService Tests', () => {
 
 	suite('parseResponse() (tested via requestSuggestion)', () => {
 		test('Should parse valid JSON array', async () => {
-			const json = JSON.stringify([
-				{ blockType: 'controls_if', connectionType: 'next' },
-			]);
+			const json = JSON.stringify([{ blockType: 'controls_if', connectionType: 'next' }]);
 			mockModelManager.sendPrompt.resolves(createMockResponse(json));
 
 			const result = await service.requestSuggestion(createContext());
@@ -260,10 +232,7 @@ suite('ShadowSuggestionService Tests', () => {
 		});
 
 		test('Should filter out suggestions with missing blockType', async () => {
-			const json = JSON.stringify([
-				{ connectionType: 'next' },
-				{ blockType: 'math_number', connectionType: 'input' },
-			]);
+			const json = JSON.stringify([{ connectionType: 'next' }, { blockType: 'math_number', connectionType: 'input' }]);
 			mockModelManager.sendPrompt.resolves(createMockResponse(json));
 
 			const result = await service.requestSuggestion(createContext());
@@ -290,17 +259,11 @@ suite('ShadowSuggestionService Tests', () => {
 
 	suite('Block dictionary loading', () => {
 		test('Should load and cache dictionary', async () => {
-			const json = JSON.stringify([
-				{ blockType: 'controls_if', connectionType: 'next' },
-			]);
+			const json = JSON.stringify([{ blockType: 'controls_if', connectionType: 'next' }]);
 			mockModelManager.sendPrompt.resolves(createMockResponse(json));
 
 			// First request triggers dictionary load
 			await service.requestSuggestion(createContext());
-
-			// Clear suggestion cache so it calls sendPrompt again
-			service.clearCache();
-			mockModelManager.sendPrompt.resolves(createMockResponse(json));
 
 			// Second request should use cached dictionary (internal cache in service)
 			const result = await service.requestSuggestion(createContext());
@@ -313,37 +276,13 @@ suite('ShadowSuggestionService Tests', () => {
 			const freshService = new ShadowSuggestionService(mockModelManager as any, '/nonexistent/path');
 
 			// Response with suggestions — won't be validated against dictionary since load failed
-			const json = JSON.stringify([
-				{ blockType: 'any_block', connectionType: 'next' },
-			]);
+			const json = JSON.stringify([{ blockType: 'any_block', connectionType: 'next' }]);
 			mockModelManager.sendPrompt.resolves(createMockResponse(json));
 
 			const result = await freshService.requestSuggestion(createContext());
 
 			// When dictionary fails, blockTypeSet is undefined and validation passes
 			assert.ok(result, 'Should still work when dictionary fails to load');
-		});
-	});
-
-	suite('clearCache()', () => {
-		test('Should clear all cached suggestions', async () => {
-			const json = JSON.stringify([
-				{ blockType: 'controls_if', connectionType: 'next' },
-			]);
-			mockModelManager.sendPrompt.resolves(createMockResponse(json));
-
-			await service.requestSuggestion(createContext());
-
-			service.clearCache();
-
-			// After clearing, next call should trigger sendPrompt again
-			mockModelManager.sendPrompt.resolves(createMockResponse(json));
-			const callCountBefore = mockModelManager.sendPrompt.callCount;
-
-			await service.requestSuggestion(createContext());
-
-			assert.ok(mockModelManager.sendPrompt.callCount > callCountBefore,
-				'Should call sendPrompt after cache clear');
 		});
 	});
 
@@ -427,7 +366,8 @@ suite('ShadowSuggestionService Tests', () => {
 
 		test('Should handle deeply nested broken JSON', async () => {
 			// Simulates AI generating deep nesting that breaks mid-way but closes with ]
-			const deepBroken = '[{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"5"}},"DO":{"blockType":"text_print","inputs":{"TEXT":{"blockType":"ma}}}}}]';
+			const deepBroken =
+				'[{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"5"}},"DO":{"blockType":"text_print","inputs":{"TEXT":{"blockType":"ma}}}}}]';
 			mockModelManager.sendPrompt.resolves(createMockResponse(deepBroken));
 
 			const result = await service.requestSuggestion(createContext());
@@ -446,7 +386,8 @@ suite('ShadowSuggestionService Tests', () => {
 			// The response has valid JSON structure but internal syntax error around position 692.
 			// First object is a deeply nested controls_for with cyberbrick blocks.
 			// We reconstruct a simplified version of the real response.
-			const realLikeResponse = '[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"1"}},"TO":{"blockType":"math_number","fields":{"NUM":"255"}},"BY":{"blockType":"math_number","fields":{"NUM":"1"}},"DO":{"blockType":"controls_if"}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"10"}}}}]';
+			const realLikeResponse =
+				'[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"1"}},"TO":{"blockType":"math_number","fields":{"NUM":"255"}},"BY":{"blockType":"math_number","fields":{"NUM":"1"}},"DO":{"blockType":"controls_if"}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_number","fields":{"NUM":"10"}}}}]';
 			mockModelManager.sendPrompt.resolves(createMockResponse(realLikeResponse));
 
 			const result = await service.requestSuggestion(createContext());
@@ -459,7 +400,8 @@ suite('ShadowSuggestionService Tests', () => {
 
 		test('Should recover from real truncated response with incomplete last object', async () => {
 			// Simulates the exact pattern: first big nested object, then truncated second object
-			const truncatedReal = '[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"1"}},"TO":{"blockType":"math_number","fields":{"NUM":"255"}},"BY":{"blockType":"math_number","fields":{"NUM":"1"}}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_numb';
+			const truncatedReal =
+				'[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"1"}},"TO":{"blockType":"math_number","fields":{"NUM":"255"}},"BY":{"blockType":"math_number","fields":{"NUM":"1"}}}},{"blockType":"controls_repeat_ext","inputs":{"TIMES":{"blockType":"math_numb';
 			mockModelManager.sendPrompt.resolves(createMockResponse(truncatedReal));
 
 			const result = await service.requestSuggestion(createContext());
@@ -472,7 +414,8 @@ suite('ShadowSuggestionService Tests', () => {
 		test('Should repair bracket-imbalanced JSON by adding missing closing braces', async () => {
 			// Simulates real AI output where JSON ends with ] but is missing one }
 			// This is the exact pattern seen in E2E testing: 26 opens, 25 closes + ]
-			const imbalancedJson = '[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"0"}},"DO":{"blockType":"cyberbrick_led_set_color","inputs":{"RED":{"blockType":"variables_get","fields":{"VAR":"i"}}}}}}]';
+			const imbalancedJson =
+				'[{"blockType":"controls_for","fields":{"VAR":"i"},"inputs":{"FROM":{"blockType":"math_number","fields":{"NUM":"0"}},"DO":{"blockType":"cyberbrick_led_set_color","inputs":{"RED":{"blockType":"variables_get","fields":{"VAR":"i"}}}}}}]';
 			// Remove one } to create imbalance
 			const broken = imbalancedJson.replace('}}}]', '}}]');
 			mockModelManager.sendPrompt.resolves(createMockResponse(broken));
@@ -487,7 +430,8 @@ suite('ShadowSuggestionService Tests', () => {
 		test('Should handle response that is valid JSON with nested inputs stripped by validation', async () => {
 			// Valid JSON but with unknown child block types — validation should strip invalid children
 			// but keep the parent
-			const validButStripped = '[{"blockType":"controls_if","inputs":{"DO":{"blockType":"fake_block_abc"}}},{"blockType":"math_number","fields":{"NUM":"42"}}]';
+			const validButStripped =
+				'[{"blockType":"controls_if","inputs":{"DO":{"blockType":"fake_block_abc"}}},{"blockType":"math_number","fields":{"NUM":"42"}}]';
 			mockModelManager.sendPrompt.resolves(createMockResponse(validButStripped));
 
 			const result = await service.requestSuggestion(createContext());
@@ -498,6 +442,122 @@ suite('ShadowSuggestionService Tests', () => {
 			const types = result!.suggestions.map((s: any) => s.blockType);
 			assert.ok(types.includes('controls_if'), 'controls_if should survive with stripped child');
 			assert.ok(types.includes('math_number'), 'math_number should be valid');
+		});
+	});
+
+	suite('repairMisplacedInputs + normalizeEmptyFields (gpt-4o-mini regressions)', () => {
+		test('Should rescue inputs accidentally nested inside fields', async () => {
+			// gpt-4o-mini bug: places "inputs": {...} as a key inside the "fields" object
+			const badJson = JSON.stringify([
+				{
+					blockType: 'controls_for',
+					fields: { VAR: 'i' },
+					inputs: {
+						FROM: { blockType: 'math_number', fields: { NUM: '1' } },
+						TO: { blockType: 'math_number', fields: { NUM: '255' } },
+						BY: { blockType: 'math_number', fields: { NUM: '1' } },
+						DO: {
+							blockType: 'math_arithmetic',
+							fields: {
+								OP: 'ADD',
+								inputs: {
+									A: { blockType: 'math_number', fields: {} },
+									B: { blockType: 'variables_get', fields: { VAR: 'i' } },
+								},
+							},
+						},
+					},
+				},
+			]);
+
+			// Need math_arithmetic and variables_get in mock dictionary
+			const extendedDict = {
+				blocks: [
+					...mockDictionary.blocks,
+					{ type: 'math_arithmetic', category: 'math', descriptions: { en: 'Arithmetic' } },
+					{ type: 'variables_get', category: 'variables', descriptions: { en: 'Get variable' } },
+				],
+			};
+			const dictDir = path.join(tempDir, 'src', 'mcp');
+			fs.writeFileSync(path.join(dictDir, 'block-dictionary.json'), JSON.stringify(extendedDict));
+			// Re-create service so it picks up the new dictionary
+			service = new ShadowSuggestionService(mockModelManager as any, tempDir);
+			mockModelManager.sendPrompt.resolves(createMockResponse(badJson));
+
+			const result = await service.requestSuggestion(createContext());
+
+			assert.ok(result, 'Should parse repaired suggestion');
+			const forBlock = result!.suggestions[0];
+			assert.strictEqual(forBlock.blockType, 'controls_for');
+			const doBlock = forBlock.inputs?.DO;
+			assert.ok(doBlock, 'DO slot should exist');
+			assert.strictEqual(doBlock!.blockType, 'math_arithmetic');
+			// After repair, math_arithmetic should have inputs.A and inputs.B (moved from fields.inputs)
+			assert.ok(doBlock!.inputs?.A, 'inputs.A should be rescued from fields.inputs');
+			assert.ok(doBlock!.inputs?.B, 'inputs.B should be rescued from fields.inputs');
+			// fields.inputs key should be gone
+			assert.ok(!doBlock!.fields?.['inputs'], 'fields.inputs should be removed after repair');
+		});
+
+		test('Should normalize empty NUM field on math_number to "0"', async () => {
+			const json = JSON.stringify([
+				{
+					blockType: 'controls_for',
+					fields: { VAR: 'i' },
+					inputs: {
+						FROM: { blockType: 'math_number', fields: { NUM: '1' } },
+						TO: { blockType: 'math_number', fields: { NUM: '255' } },
+						BY: { blockType: 'math_number', fields: { NUM: '1' } },
+						DO: {
+							blockType: 'text_print',
+							inputs: {
+								TEXT: {
+									blockType: 'math_number',
+									fields: {}, // empty — should be normalized to "0"
+								},
+							},
+						},
+					},
+				},
+			]);
+			mockModelManager.sendPrompt.resolves(createMockResponse(json));
+
+			const result = await service.requestSuggestion(createContext());
+
+			assert.ok(result, 'Should parse suggestion');
+			const forBlock = result!.suggestions[0];
+			const printBlock = forBlock.inputs?.DO;
+			const numBlock = printBlock?.inputs?.TEXT;
+			assert.ok(numBlock, 'TEXT input should exist');
+			assert.strictEqual(numBlock!.blockType, 'math_number');
+			assert.strictEqual(numBlock!.fields?.NUM, '0', 'Empty NUM should be normalized to "0"');
+		});
+
+		test('Should normalize missing OP field on math_arithmetic to "ADD"', async () => {
+			const extendedDict = {
+				blocks: [...mockDictionary.blocks, { type: 'math_arithmetic', category: 'math', descriptions: { en: '' } }],
+			};
+			const dictDir = path.join(tempDir, 'src', 'mcp');
+			fs.writeFileSync(path.join(dictDir, 'block-dictionary.json'), JSON.stringify(extendedDict));
+			service = new ShadowSuggestionService(mockModelManager as any, tempDir);
+
+			const json = JSON.stringify([
+				{
+					blockType: 'math_arithmetic',
+					fields: {}, // OP missing — should default to "ADD"
+					inputs: {
+						A: { blockType: 'math_number', fields: { NUM: '1' } },
+						B: { blockType: 'math_number', fields: { NUM: '2' } },
+					},
+				},
+			]);
+			mockModelManager.sendPrompt.resolves(createMockResponse(json));
+
+			const result = await service.requestSuggestion(createContext());
+
+			assert.ok(result, 'Should parse suggestion');
+			assert.strictEqual(result!.suggestions[0].blockType, 'math_arithmetic');
+			assert.strictEqual(result!.suggestions[0].fields?.OP, 'ADD', 'Missing OP should default to "ADD"');
 		});
 	});
 });
