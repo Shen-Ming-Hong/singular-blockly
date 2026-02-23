@@ -55,16 +55,16 @@
 
 ### Core 積木 (cyberbrick_core)
 
-| 積木                       | 用途         | 生成程式碼                                        |
-| -------------------------- | ------------ | ------------------------------------------------- |
-| `cyberbrick_main`          | 主程式進入點 | `async def main(): ...`                           |
-| `cyberbrick_led_set_color` | 設定板載 LED | `onboard_led[0] = (r, g, b); onboard_led.write()` |
-| `cyberbrick_led_off`       | 關閉板載 LED | `onboard_led[0] = (0, 0, 0); onboard_led.write()` |
-| `cyberbrick_delay_ms`      | 毫秒延遲     | `await asyncio.sleep_ms(ms)`                      |
-| `cyberbrick_delay_s`       | 秒延遲       | `await asyncio.sleep(s)`                          |
+| 積木                       | 用途           | 生成程式碼                                        |
+| -------------------------- | -------------- | ------------------------------------------------- |
+| `cyberbrick_main`          | 主程式進入點   | `async def main(): ...`                           |
+| `cyberbrick_led_set_color` | 設定板載 LED   | `onboard_led[0] = (r, g, b); onboard_led.write()` |
+| `cyberbrick_led_off`       | 關閉板載 LED   | `onboard_led[0] = (0, 0, 0); onboard_led.write()` |
+| `cyberbrick_delay_ms`      | 毫秒延遲       | `await asyncio.sleep_ms(ms)`                      |
+| `cyberbrick_delay_s`       | 秒延遲         | `await asyncio.sleep(s)`                          |
 | `cyberbrick_ticks_ms`      | 取得目前毫秒數 | `time.ticks_ms()`                                 |
-| `cyberbrick_ticks_diff`    | 計算時間差   | `time.ticks_diff(now, start)`                     |
-| `cyberbrick_print`         | 序列埠輸出   | `print(msg)`                                      |
+| `cyberbrick_ticks_diff`    | 計算時間差     | `time.ticks_diff(now, start)`                     |
+| `cyberbrick_print`         | 序列埠輸出     | `print(msg)`                                      |
 
 ### WiFi 積木 (cyberbrick_wifi)
 
@@ -99,6 +99,63 @@ micropythonGenerator.forBlock['arduino_function'] = function (block) {
 ```
 
 **相關檔案**：`media/blockly/generators/micropython/functions.js`
+
+---
+
+## 計時積木穩定版（032、033）
+
+> 來源：spec/032-cyberbrick-time-blocks（2025-12）、spec/033-remove-timer-experimental（2026-01）
+
+### 新增積木
+
+| 積木類型                | 生成碼                  | 說明                                       |
+| ----------------------- | ----------------------- | ------------------------------------------ |
+| `cyberbrick_ticks_ms`   | `time.ticks_ms()`       | 回傳毫秒級時間戳（由啟動時計起的累計毫秒） |
+| `cyberbrick_ticks_diff` | `time.ticks_diff(a, b)` | 計算兩時間戳的差量（處理溢位回繞）         |
+
+兩個積木均需 `import time`，已透過 `generator.addImport()` 自動注入。
+
+### Experimental 標記移除
+
+`cyberbrick_ticks_ms` 和 `cyberbrick_ticks_diff` 從實驗標記（黃色高亮）增为穩定特性：
+
+- `media/css/experimentalBlocks.css` 不再對這兩積木進行樣式覆寫
+- `experimentalBlockMarker.js` 不再將其標記為實驗
+- 工具箱中顯示檣式渣設計（移除標記樣式）
+
+---
+
+## MicroPython 全域變數提升（034）
+
+> 來源：spec/034-micropython-global-vars（2026-01）
+
+### 問題背景
+
+MicroPython 在函式內無法直接變更全域變數，必須加入 `global var_name` 宣告。Blockly 自動生成器從未微處理此區別。
+
+### 設計導則
+
+| 情境                                         | 處理                                  |
+| -------------------------------------------- | ------------------------------------- |
+| 在自訂函式內**賭値**全域變數                 | 加入 `global var_name`                |
+| 在自訂函式內**只讀取**全域變數               | 不加 `global`（Python 對只讀不需要）  |
+| `controls_for` / `controls_forEach` 迴圈變數 | 不加 `global`（迴圈變數不是全域變數） |
+| 函式參數與全域變數同名                       | 參數陰藏全域，不加 `global`           |
+| 反覆呼叫的函式（async def）                  | 同樣容對全域變數                      |
+
+### 實現方式
+
+```python
+# 生成範例：在 my_func() 中賭値 counter
+x = 0
+counter = 0
+
+async def my_func():
+  global counter  # 自動注入，x 未賭値則不加
+  counter = counter + 1
+```
+
+**源碼位置**：`media/blockly/generators/micropython/micropython.js` 中 `workspaceToCode` 後處理階段，掌變數使用图分析函式中的賭値操作。
 
 ---
 

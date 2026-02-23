@@ -177,5 +177,63 @@ build_flags =
 
 ## 相關文件
 
--   積木定義：`media/blockly/blocks/vision_sensors.js`
--   程式碼生成：`media/blockly/generators/arduino/huskylens.js`
+- 積木定義：`media/blockly/blocks/vision_sensors.js`
+- 程式碼生成：`media/blockly/generators/arduino/huskylens.js`
+
+---
+
+## INDEX 動態數値輸入（035）
+
+> 來源：spec/035-huskylens-dynamic-index（2026-01）
+
+### 變更
+
+`huskylens_get_block_info` 和 `huskylens_get_arrow_info` 的 `INDEX` 欄位從固定數字輸入（dropdown）改為接受 Number 類型積木連接：
+
+- **前**：`FIELD_NUMBER`，只能指定固定索引
+- **後**：`INPUT_VALUE`，可連接任意 Number 積木（包括迴圈變數、其他函式回傳値）
+- **shadow block**：預設陰影積木 `math_number`，預設値 0
+
+### 應用情境
+
+支援使用迴圈變數湃次前往後掃描所有至今辨別的對象：
+
+```c
+for (int i = 0; i < huskylens.countBlocks(); i++) {
+  HUSKYLENSResult result = huskylens.getBlock(i);  // INDEX 用迴圈變數
+  // ...
+}
+```
+
+### 向下相容
+
+經 shadow block 設計，时财中未連接外部積木的工作區行為及可讓導入索引=0預設，與更新前劯一致。
+
+---
+
+## HuskyLens ID 導向積木（036）
+
+> 來源：spec/036-huskylens-id-blocks（2026-01）
+
+### 新增積木
+
+三個新增積木，允許透過訓練 ID 存取 HuskyLens 確認的特定對象，不需要迴圈遊歷：
+
+| 積木類型                          | 生成碼                                 | 說明                              |
+| --------------------------------- | -------------------------------------- | --------------------------------- |
+| `huskylens_request_by_id`         | `huskylens.requestBlocksLearned({ID})` | 道 HuskyLens 小说資料舉 ID 對象   |
+| `huskylens_get_block_by_id`       | `huskylens.getBlock(index, {ID})`      | 取得該 ID 稍未下第 n 個辨別長方形 |
+| `huskylens_get_block_count_by_id` | `huskylens.countBlocks({ID})`          | 查詢該 ID 目前對應几個辨別結果    |
+
+### 支援對象屬性
+
+`huskylens_get_block_by_id` 支援以下屬性查詢（與 `huskylens_get_block_info` 一致）：
+
+- `xCenter`、`yCenter`：物件中心座標
+- `width`、`height`：物件寬高
+- `ID`：訓練 ID
+
+### 限制
+
+- **Arduino only**：目前 HuskyLens 庁含庫僅支援 Arduino C++，沒有 MicroPython 版本
+- 與現有索引導向積木完全向下相容

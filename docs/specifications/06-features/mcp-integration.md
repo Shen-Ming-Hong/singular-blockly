@@ -119,12 +119,12 @@ void setup() {
 
 共 55 個自訂積木，分類包括：
 
--   Arduino 基礎
--   馬達控制
--   感測器
--   視覺鏡頭（HuskyLens、Pixetto）
--   通訊（Serial、WiFi、MQTT）
--   邏輯與迴圈
+- Arduino 基礎
+- 馬達控制
+- 感測器
+- 視覺鏡頭（HuskyLens、Pixetto）
+- 通訊（Serial、WiFi、MQTT）
+- 邏輯與迴圈
 
 ---
 
@@ -240,7 +240,7 @@ export function registerMcpProvider(context: vscode.ExtensionContext) {
 
 ### 需求版本
 
--   VSCode 1.105.0+（`registerMcpServerDefinitionProvider` API）
+- VSCode 1.105.0+（`registerMcpServerDefinitionProvider` API）
 
 ---
 
@@ -289,9 +289,87 @@ export function registerMcpProvider(context: vscode.ExtensionContext) {
 
 ---
 
+---
+
+## MCP 優雅降級與 Node.js 依賴處理（040）
+
+> 來源：spec/040-mcp-graceful-degradation（2026-02）
+
+### 問題背景
+
+Node.js 未安裝或不在 PATH 中時，MCP Server 啟動失敗。原本靜默失敗，使用者不知道原因，也不影響核心 Blockly 功能。
+
+**設計原則**：MCP 為增強功能，失敗不阻擋 Blockly 核心功能（積木拖放、程式碼生成、硬體上傳）。
+
+### 優雅降級流程
+
+```
+Extension 啟動 → 偵測 Node.js
+  ├── 找到 Node.js → 正常啟動 MCP Server
+  └── 找不到 Node.js → 顯示警告訊息（含安裝連結）→ Blockly 正常運作（MCP 功能不可用）
+```
+
+### 警告訊息行為
+
+- **「安裝 Node.js」**：開啟 `https://nodejs.org/` 下載頁面
+- **「稍後提醒」**：永久停用（設定 `singularBlockly.mcp.showStartupWarning: false`）
+- **再次啟動**：若 `showStartupWarning: false` 則不再顯示警告
+
+### 自訂 Node.js 路徑（進階使用者）
+
+支援 nvm/fnm 使用者透過 `singularBlockly.mcp.nodePath` 設定自訂路徑。設定變更時立即驗證並顯示警告（若路徑無效）。
+
+### 診斷命令
+
+`Singular Blockly: MCP 診斷` 命令透過 `vscode.window.showInformationMessage` 顯示：
+
+- 偵測到的 Node.js 路徑與版本
+- MCP Server 啟動狀態與錯誤原因
+
+**Node.js 偵測頻率**：Extension 啟動時偵測一次，結果快取於同一 session 中。
+
+---
+
+## MCP SDK 打包修復（041）
+
+> 來源：spec/041-fix-mcp-bundling（2026-02）
+
+### 問題描述
+
+**症狀**：從 Marketplace 安裝後出現 `Cannot find module '@modelcontextprotocol/sdk/server/mcp.js'` 錯誤，MCP Server 完全無法啟動。
+
+**根本原因**：`mcpServerConfig` 的 webpack 設定將 `@modelcontextprotocol/sdk` 和 `zod` 列為 `externals`，導致這些模組未被打包進 `dist/mcp-server.js`。安裝後的擴展環境沒有 `node_modules`，因此找不到這些模組。
+
+### 修復策略
+
+將 `@modelcontextprotocol/sdk` 和 `zod` 從 `externals` 移除，確保完整打包進 bundle：
+
+```javascript
+// webpack.config.js - mcpServerConfig
+module.exports = {
+	// ...
+	externals: {
+		vscode: 'commonjs vscode', // 只保留 vscode（由 VS Code 提供）
+		// 移除 @modelcontextprotocol/sdk 和 zod
+	},
+};
+```
+
+**打包體積影響**：`dist/mcp-server.js` 增加數百 KB（應低於 5 MB），`.vsix` 總大小增幅低於 20%。
+
+### 驗收標準
+
+1. ✅ `npm run compile` exit code 為 0，`dist/mcp-server.js` 正確生成
+2. ✅ `dist/mcp-server.js` 不包含對 `@modelcontextprotocol/sdk` 或 `zod` 的外部 `require()` 呼叫
+3. ✅ 從 `.vsix` 安裝後，MCP Server 正常啟動，不出現 `MODULE_NOT_FOUND` 錯誤
+4. ✅ 開發環境（`npm run watch`）與生產環境行為一致
+
+---
+
 ## 相關文件
 
--   MCP Provider：`src/mcp/mcpProvider.ts`
--   MCP Server：`src/mcp/mcpServer.ts`
--   工具實作：`src/mcp/tools/`
--   積木字典：`src/mcp/blockDictionary.ts`
+- MCP Provider：`src/mcp/mcpProvider.ts`
+- MCP Server：`src/mcp/mcpServer.ts`
+- 工具實作：`src/mcp/tools/`
+- 積木字典：`src/mcp/blockDictionary.ts`
+- 打包設定：`webpack.config.js`（`mcpServerConfig`）
