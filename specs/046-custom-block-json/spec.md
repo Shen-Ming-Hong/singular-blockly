@@ -186,7 +186,7 @@
 ### Key Entities
 
 - **CustomBlockDefinition**: 一份自訂積木的完整定義，包含積木類型識別碼、顯示文字、顏色、形狀、輸入欄位列表、Arduino 程式碼模板（含選填的 `arduinoIncludes` 標頭檔列表和 `arduinoLibDeps` 函式庫依賴列表）、MicroPython 程式碼模板（含選填的 `micropythonImports` 標準函式庫 import 列表和 `micropythonHardwareInit` 硬體初始化鍵值對）、提示文字
-- **CustomBlockInput**: 積木的一個輸入欄位，包含名稱、模式（值輸入/文字欄位/數字欄位/下拉選單）、標籤、預設值、檢查型別、下拉選項
+- **CustomBlockInput**: 積木的一個輸入欄位，包含名稱、模式（值輸入/文字欄位/數字欄位/下拉選單/角度/顏色）、標籤、預設值、檢查型別、下拉選項、數字範圍設定
 - **PlaceholderBlock**: JSON 遺失或損壞時的替代積木，記錄原始積木類型名稱與形狀（Statement 或 Value），用於保護工作區結構
 - **BlockCreationWizard**: 精靈介面的狀態物件，追蹤目前步驟、模式（新增/編輯）、所有表單欄位
 
