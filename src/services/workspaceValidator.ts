@@ -176,8 +176,8 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 			// i18n 診斷 log（info 層級，可在 Output 面板直接檢視）
 			const envLang = vscode.env.language;
 			const langSetting = await this.settingsManager.getLanguage();
-			const resolvedLang = this.localeService.getCurrentLanguage();
 			const keySource = await this.localeService.getMessageSource(messageKey);
+			const resolvedLang = this.localeService.getCurrentLanguage();
 			log(`[SafetyGuard i18n] env.language="${envLang}" setting="${langSetting}" resolved="${resolvedLang}" key="${messageKey}" source=${keySource}`, 'info');
 
 			// 取得訊息內容 (await 非同步呼叫，帶英文 fallback)
