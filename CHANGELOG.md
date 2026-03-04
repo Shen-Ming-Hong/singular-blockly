@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.0] - 2026-03-04
+
+### ✨ 新功能 New Features
+
+- **非 Blockly 專案安全防護訊息 i18n 與孩子友善文案** (Safety Guard i18n & kid-friendly messages)
+    - 新增 `getLocalizedMessage()` API，支援佔位符替換 `{0}`, `{1}`
+      Added `getLocalizedMessage()` API with placeholder substitution `{0}`, `{1}`
+    - 所有 15 個語系的安全防護對話框文案重寫為孩子友善、正向引導語氣
+      Rewrote Safety Guard dialog messages in all 15 locales with kid-friendly, positive guidance tone
+    - `workspaceValidator.ts` 硬編碼英文訊息改為透過 `localeService` 取得 i18n 文案
+      Replaced hardcoded English messages in `workspaceValidator.ts` with i18n via `localeService`
+    - 新增 `safetyGuardI18n.test.ts` (322 行) 覆蓋所有語系與佔位符邏輯
+      Added `safetyGuardI18n.test.ts` (322 lines) covering all locales and placeholder logic
+    - 關聯 PR #63
+      Related PR #63
+
 ## [0.66.2] - 2026-03-04
 
 ### 🔒 安全性修復 Security Fixes
