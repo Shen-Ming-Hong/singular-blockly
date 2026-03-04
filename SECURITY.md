@@ -5,7 +5,7 @@
 | Version | Supported          |
 | ------- | ------------------ |
 | 0.66.x  | :white_check_mark: |
-| < 0.65  | :x:                |
+| < 0.66  | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -13,4 +13,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-02-23_
+_Last updated: 2026-03-04_

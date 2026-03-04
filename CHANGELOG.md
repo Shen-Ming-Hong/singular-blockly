@@ -10,6 +10,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🔒 安全性修復 Security Fixes
+
+- **修復 serialize-javascript RCE 漏洞（Dependabot Alert #39）** (Fix serialize-javascript RCE vulnerability)
+    - 升級 `copy-webpack-plugin` 從 `^13.0.1` 至 `^14.0.0`（解決間接依賴 `serialize-javascript` ≤ 7.0.2 的 RCE 問題）
+      Upgraded `copy-webpack-plugin` from `^13.0.1` to `^14.0.0` (resolves transitive `serialize-javascript` ≤ 7.0.2 RCE)
+    - 嚴重程度 Severity: High (RCE via RegExp.flags and Date.prototype.toISOString)
+    - 關閉 Dependabot Alert #39
+      Closes Dependabot Alert #39
+
+- **修復 minimatch ReDoS 漏洞（Dependabot Alerts #31, #35, #37, #38）** (Fix minimatch ReDoS vulnerabilities)
+    - 透過 `npm audit fix` 升級 eslint 間接依賴 `minimatch` 至已修補版本
+      Upgraded transitive `minimatch` via eslint dependency tree to patched versions via `npm audit fix`
+    - 嚴重程度 Severity: High (ReDoS via combinatorial backtracking)
+    - 關閉 Dependabot Alerts #31, #35, #37, #38
+      Closes Dependabot Alerts #31, #35, #37, #38
+
+- **修復 @isaacs/brace-expansion 資源消耗漏洞（Dependabot Alert #20）** (Fix @isaacs/brace-expansion uncontrolled resource consumption)
+    - 透過 `npm audit fix` 升級 `@isaacs/brace-expansion` 從 `5.0.0` 至 `5.0.1`
+      Upgraded `@isaacs/brace-expansion` from `5.0.0` to `5.0.1` via `npm audit fix`
+    - 嚴重程度 Severity: High (Uncontrolled Resource Consumption)
+    - 關閉 Dependabot Alert #20
+      Closes Dependabot Alert #20
+
+- **修復 ajv ReDoS 漏洞（Dependabot Alert #29）** (Fix ajv ReDoS vulnerability in eslint transitive)
+    - 透過 `npm audit fix` 升級 eslint 間接依賴 `ajv` 至已修補版本
+      Upgraded transitive `ajv` in eslint dependency tree via `npm audit fix`
+    - 嚴重程度 Severity: Moderate (ReDoS with `$data` option)
+    - 關閉 Dependabot Alert #29
+      Closes Dependabot Alert #29
+
+### ⚠️ 已知未修復漏洞 Known Unfixed Vulnerabilities
+
+- `diff` (低風險 Low) 與 `serialize-javascript` (高風險 High，僅存於 mocha 間接依賴)：
+  影響 `@vscode/test-cli` → `mocha` 測試工具鏈，修復需降級 `@vscode/test-cli` 至 `0.0.11`（破壞性變更），
+  屬開發依賴，不影響終端使用者。待上游釋出相容修補後再行升級。
+  `diff` (Low) and `serialize-javascript` (High, only in mocha transitive): affects `@vscode/test-cli` → `mocha`
+  test toolchain only. Fix requires downgrading `@vscode/test-cli` to `0.0.11` (breaking change).
+  Dev-only dependency; no end-user impact. Will upgrade when upstream releases a compatible fix.
+
 ## [0.66.1] - 2026-02-23
 
 ### 🔒 安全性修復 Security Fixes
