@@ -84,6 +84,7 @@ describe('Locale Service', () => {
 		// 測試語言代碼映射
 		assert.strictEqual(localeService.mapVSCodeLangToBlockly('en-us'), 'en');
 		assert.strictEqual(localeService.mapVSCodeLangToBlockly('zh-tw'), 'zh-hant');
+		assert.strictEqual(localeService.mapVSCodeLangToBlockly('zh-hant'), 'zh-hant');
 		assert.strictEqual(localeService.mapVSCodeLangToBlockly('fr'), 'fr');
 
 		// 測試未知語言代碼回退到英文
@@ -129,7 +130,7 @@ describe('Locale Service', () => {
 
 	it('should extract messages from JS file content', () => {
 		// 使用反射機制訪問私有方法
-		const extractMethod = (localeService as any).extractMessagesFromJs;
+		const extractMethod = (localeService as any).extractMessagesFromJs.bind(localeService);
 
 		// 測試從 JS 檔案提取訊息
 		const messages = extractMethod(enMessagesContent);
@@ -138,6 +139,25 @@ describe('Locale Service', () => {
 		assert.strictEqual(messages['VSCODE_PLEASE_OPEN_PROJECT'], 'Please open a folder first.');
 		assert.strictEqual(messages['VSCODE_OPEN_FOLDER'], 'Open Folder');
 		assert.strictEqual(messages['VSCODE_FAILED_SAVE_FILE'], 'Failed to save file: {0}');
+	});
+
+	it('should extract safety keys past embedded }) in loadMessages content', () => {
+		// 模擬含有 {0}) 提前截斷風險的 loadMessages 內容
+		const contentWithEmbeddedBrace = `
+window.languageManager.loadMessages('en', {
+	SOME_EARLY_KEY: 'Value with (current: {0})',
+	SAFETY_WARNING_BODY_NO_TYPE: "This place doesn't have blocks yet.",
+	BUTTON_CONTINUE: "Yes, let's go!",
+	BUTTON_CANCEL: 'Cancel',
+});`;
+		const extractMethod = (localeService as any).extractMessagesFromJs.bind(localeService);
+		const messages = extractMethod(contentWithEmbeddedBrace);
+
+		// 確認 {0}) 後的 key 仍可提取
+		assert.strictEqual(messages['SOME_EARLY_KEY'], 'Value with (current: {0})');
+		assert.strictEqual(messages['SAFETY_WARNING_BODY_NO_TYPE'], "This place doesn't have blocks yet.");
+		assert.strictEqual(messages['BUTTON_CONTINUE'], "Yes, let's go!");
+		assert.strictEqual(messages['BUTTON_CANCEL'], 'Cancel');
 	});
 
 	it('should use file cache for repeated loads', async () => {

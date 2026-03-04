@@ -618,14 +618,14 @@ window.languageManager.loadMessages('it', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bits (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Questo progetto non ha ancora blocchi Blockly. Se continui, verranno creati cartella e file blockly qui. Vuoi continuare?',
+		'Qui non ci sono ancora blocchi di costruzione. Vuoi preparare tutto per iniziare a creare? Prepariamo tutto noi per te!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Rilevato progetto {0}. Questo progetto non ha ancora blocchi Blockly. Se continui, verranno creati cartella e file blockly qui. Vuoi continuare?',
-	BUTTON_CONTINUE: 'Continua',
+		'Qui ci sono già contenuti {0}. Vuoi aggiungere anche i blocchi di costruzione? Prepariamo tutto noi per te!',
+	BUTTON_CONTINUE: 'Sì, andiamo!',
 	BUTTON_CANCEL: 'Annulla',
-	BUTTON_SUPPRESS: 'Non ricordarmelo più',
-	SAFETY_GUARD_CANCELLED: "Apertura dell'editor Blockly annullata",
-	SAFETY_GUARD_SUPPRESSED: 'Preferenza salvata, questo avviso non verrà più visualizzato',
+	BUTTON_SUPPRESS: 'Non chiedere',
+	SAFETY_GUARD_CANCELLED: 'Nessun problema! Non abbiamo cambiato nulla.',
+	SAFETY_GUARD_SUPPRESSED: 'Capito! Non te lo chiederemo più.',
 
 	// Communication Category (WiFi/MQTT)
 	CATEGORY_COMMUNICATION: 'Comunicazione',

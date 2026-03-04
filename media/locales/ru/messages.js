@@ -620,14 +620,14 @@ window.languageManager.loadMessages('ru', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'В этом проекте еще нет блоков Blockly. Если вы продолжите, папка и файлы blockly будут созданы здесь. Вы хотите продолжить?',
+		'Здесь пока нет блоков для конструирования. Хочешь всё подготовить, чтобы начать создавать? Мы всё для тебя настроим!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Обнаружен проект {0}. В этом проекте еще нет блоков Blockly. Если вы продолжите, папка и файлы blockly будут созданы здесь. Вы хотите продолжить?',
-	BUTTON_CONTINUE: 'Продолжить',
+		'Здесь уже есть содержимое {0}. Хочешь добавить сюда блоки тоже? Мы всё для тебя настроим!',
+	BUTTON_CONTINUE: 'Да, начнём!',
 	BUTTON_CANCEL: 'Отмена',
-	BUTTON_SUPPRESS: 'Больше не напоминать',
-	SAFETY_GUARD_CANCELLED: 'Открытие редактора Blockly отменено',
-	SAFETY_GUARD_SUPPRESSED: 'Настройки сохранены, это предупреждение больше не будет отображаться',
+	BUTTON_SUPPRESS: 'Не спрашивай',
+	SAFETY_GUARD_CANCELLED: 'Не переживай! Мы ничего не изменили.',
+	SAFETY_GUARD_SUPPRESSED: 'Понятно! Мы больше не будем спрашивать об этом.',
 
 	// Communication Category (WiFi/MQTT)
 	CATEGORY_COMMUNICATION: 'Связь',

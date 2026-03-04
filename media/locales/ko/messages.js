@@ -618,14 +618,14 @@ window.languageManager.loadMessages('ko', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'이 프로젝트에는 아직 Blockly 블록이 없습니다. 계속하면 여기에 blockly 폴더와 파일이 생성됩니다. 계속하시겠습니까?',
+		'여기에는 아직 블록이 없어요. 만들기를 시작할 수 있도록 준비해 줄까요? 모든 걸 준비해 놓을게요!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'{0} 프로젝트가 감지되었습니다. 이 프로젝트에는 아직 Blockly 블록이 없습니다. 계속하면 여기에 blockly 폴더와 파일이 생성됩니다. 계속하시겠습니까?',
-	BUTTON_CONTINUE: '계속',
+		'여기에 이미 {0} 내용이 있어요. 여기에 블록 기능도 추가할까요? 모든 걸 준비해 놓을게요!',
+	BUTTON_CONTINUE: '네, 시작해요!',
 	BUTTON_CANCEL: '취소',
-	BUTTON_SUPPRESS: '다시 보지 않기',
-	SAFETY_GUARD_CANCELLED: 'Blockly 편집기 열기를 취소했습니다',
-	SAFETY_GUARD_SUPPRESSED: '설정을 저장했습니다. 앞으로 이 경고가 표시되지 않습니다',
+	BUTTON_SUPPRESS: '다시 안 물어봐요',
+	SAFETY_GUARD_CANCELLED: '괜찮아요! 아무것도 바꾸지 않았어요.',
+	SAFETY_GUARD_SUPPRESSED: '알겠어요! 이 질문은 더 이상 하지 않을게요.',
 
 	// Communication Category (WiFi/MQTT)
 	CATEGORY_COMMUNICATION: '통신',

@@ -616,14 +616,14 @@ window.languageManager.loadMessages('tr', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bits (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Bu projede henüz Blockly blokları yok. Devam ederseniz, burada blockly klasörü ve dosyaları oluşturulacak. Devam etmek istiyor musunuz?',
+		'Burada henüz yapı taşları yok. Her şeyi hazırlayalım mı, böylece oluşturmaya başlayabilirsin? Senin için her şeyi hazırlayacağız!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'{0} projesi algılandı. Bu projede henüz Blockly blokları yok. Devam ederseniz, burada blockly klasörü ve dosyaları oluşturulacak. Devam etmek istiyor musunuz?',
-	BUTTON_CONTINUE: 'Devam',
+		'Burada zaten {0} içeriği var. Buraya da yapı taşları eklemek ister misin? Senin için her şeyi hazırlayacağız!',
+	BUTTON_CONTINUE: 'Evet, başla!',
 	BUTTON_CANCEL: 'İptal',
-	BUTTON_SUPPRESS: 'Hatırlatma',
-	SAFETY_GUARD_CANCELLED: 'Blockly editörünü açma iptal edildi',
-	SAFETY_GUARD_SUPPRESSED: 'Tercih kaydedildi, bu uyarı bir daha gösterilmeyecek',
+	BUTTON_SUPPRESS: 'Bir daha sorma',
+	SAFETY_GUARD_CANCELLED: 'Sorun değil! Hiçbir şeyi değiştirmedik.',
+	SAFETY_GUARD_SUPPRESSED: 'Anlaşıldı! Bu konuda sana bir daha sormayacağız.',
 
 	// Communication Category
 	CATEGORY_COMMUNICATION: 'İletişim',

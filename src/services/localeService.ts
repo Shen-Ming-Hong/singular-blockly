@@ -55,8 +55,9 @@ export class LocaleService {
 	constructor(private extensionPath: string, fileSystem?: FileSystem, vscodeAPI?: VSCodeAPI) {
 		this.fs = fileSystem || fs;
 		this.vscodeApi = vscodeAPI || vscode;
-		this.currentLanguage = this.mapVSCodeLangToBlockly(this.vscodeApi.env.language);
-		log(`初始化多語言服務, 語言: ${this.currentLanguage}`, 'info');
+		const rawLang = this.vscodeApi.env.language;
+		this.currentLanguage = this.mapVSCodeLangToBlockly(rawLang);
+		log(`[i18n] init: env.language="${rawLang}" → mapped="${this.currentLanguage}"`, 'debug');
 	}
 
 	/**
@@ -108,17 +109,24 @@ export class LocaleService {
 		// 1. 嘗試當前語言
 		const messages = await this.loadUIMessages();
 		let message = messages[key];
+		let source = message ? this.currentLanguage : '';
 
 		// 2. 回退到英文（如果當前語言不是英文）
 		if (!message && this.currentLanguage !== 'en') {
 			const enMessages = await this.loadEnglishMessages();
 			message = enMessages[key];
+			if (message) {
+				source = 'en(fallback)';
+			}
 		}
 
 		// 3. 使用 fallback 參數
 		if (!message) {
 			message = fallback || key;
+			source = fallback ? 'hardcoded-fallback' : 'key-as-fallback';
 		}
+
+		log(`[i18n] key="${key}" source=${source} lang="${this.currentLanguage}"`, 'debug');
 
 		// 4. 替換參數 {0}, {1}, 等
 		actualArgs.forEach((arg, index) => {
@@ -226,20 +234,24 @@ export class LocaleService {
 
 		// 處理所有其他訊息
 		// 使用正則表達式尋找 loadMessages 函數中的所有鍵值對
-		const messageBlockRegex = /loadMessages\s*\(\s*['"][^'"]+['"]\s*,\s*\{([\s\S]*?)\}\s*\)/g;
+		// 使用 greedy ([\s\S]*) 避免被值內嵌的 }) (例如 "{0})" ) 提前截斷
+		const messageBlockRegex = /loadMessages\s*\(\s*['"][^'"]+['"]\s*,\s*\{([\s\S]*)\}\s*\)/g;
 		let blockMatch;
 		while ((blockMatch = messageBlockRegex.exec(content)) !== null) {
 			const messageBlock = blockMatch[1];
-			// 匹配鍵值對
-			const keyValueRegex = /\s*(\w+):\s*['"](.+?)['"]/g;
+			// 分別匹配單引號與雙引號值，避免值中的撇號/引號導致截斷
+			const singleQuoteKV = /\s*(\w+):\s*'([^']*)'/g;
+			const doubleQuoteKV = /\s*(\w+):\s*"([^"]*)"/g;
 			let keyValueMatch;
-			while ((keyValueMatch = keyValueRegex.exec(messageBlock)) !== null) {
-				const key = keyValueMatch[1];
-				const value = keyValueMatch[2];
-				messages[key] = value;
+			while ((keyValueMatch = singleQuoteKV.exec(messageBlock)) !== null) {
+				messages[keyValueMatch[1]] = keyValueMatch[2];
+			}
+			while ((keyValueMatch = doubleQuoteKV.exec(messageBlock)) !== null) {
+				messages[keyValueMatch[1]] = keyValueMatch[2];
 			}
 		}
 
+		log(`[i18n] extractMessagesFromJs: ${Object.keys(messages).length} keys extracted`, 'debug');
 		return messages;
 	}
 
@@ -252,6 +264,7 @@ export class LocaleService {
 		// 語言映射表
 		const languageMap: { [key: string]: string } = {
 			'zh-tw': 'zh-hant',
+			'zh-hant': 'zh-hant',
 			en: 'en',
 			'en-us': 'en',
 			ja: 'ja',
@@ -302,6 +315,26 @@ export class LocaleService {
 			log('Unable to read language file directory:', 'error', error);
 			return ['en']; // 若發生錯誤，至少返回英文
 		}
+	}
+
+	/**
+	 * 取得指定鍵名的解析來源（診斷用途）
+	 *
+	 * @param key 訊息鍵名
+	 * @returns 來源字串: 當前語言代碼 | 'en(fallback)' | 'hardcoded-fallback'
+	 */
+	async getMessageSource(key: string): Promise<string> {
+		const messages = await this.loadUIMessages();
+		if (messages[key]) {
+			return this.currentLanguage;
+		}
+		if (this.currentLanguage !== 'en') {
+			const enMessages = await this.loadEnglishMessages();
+			if (enMessages[key]) {
+				return 'en(fallback)';
+			}
+		}
+		return 'hardcoded-fallback';
 	}
 
 	/**

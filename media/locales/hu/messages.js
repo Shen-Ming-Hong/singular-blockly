@@ -619,14 +619,14 @@ window.languageManager.loadMessages('hu', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Ez a projekt még nem rendelkezik Blockly blokkokkal. Ha folytatja, blockly mappa és fájlok jönnek létre itt. Folytatja?',
+		'Ezen a helyen még nincsenek építőkockák. Szeretnéd, ha mindent előkészítenénk, hogy elkezdhess alkotni? Mindent beállítunk neked!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'{0} projekt észlelve. Ez a projekt még nem rendelkezik Blockly blokkokkal. Ha folytatja, blockly mappa és fájlok jönnek létre itt. Folytatja?',
-	BUTTON_CONTINUE: 'Folytatás',
+		'Ezen a helyen már van {0} tartalom. Szeretnél ide is építőkockákat hozzáadni? Mindent beállítunk neked!',
+	BUTTON_CONTINUE: 'Igen, rajta!',
 	BUTTON_CANCEL: 'Mégse',
-	BUTTON_SUPPRESS: 'Ne emlékeztessen többé',
-	SAFETY_GUARD_CANCELLED: 'A Blockly szerkesztő megnyitása megszakítva',
-	SAFETY_GUARD_SUPPRESSED: 'Beállítás mentve, ez a figyelmeztetés nem fog újra megjelenni',
+	BUTTON_SUPPRESS: 'Ne kérdezd újra',
+	SAFETY_GUARD_CANCELLED: 'Semmi gond! Nem változtattunk semmit.',
+	SAFETY_GUARD_SUPPRESSED: 'Megvan! Többet nem kérdezünk erről.',
 
 	// Communication Category
 	CATEGORY_COMMUNICATION: 'Kommunikáció',

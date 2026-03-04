@@ -615,14 +615,14 @@ window.languageManager.loadMessages('cs', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bitů (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Tento projekt ještě nemá bloky Blockly. Pokud budete pokračovat, bude zde vytvořena složka a soubory blockly. Chcete pokračovat?',
+		'Toto místo zatím nemá žádné stavební bloky. Chceš vše připravit, abys mohl/a začít tvořit? Vše pro tebe připravíme!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Detekován projekt {0}. Tento projekt ještě nemá bloky Blockly. Pokud budete pokračovat, bude zde vytvořena složka a soubory blockly. Chcete pokračovat?',
-	BUTTON_CONTINUE: 'Pokračovat',
+		'Na tomto místě už je {0} obsah. Chceš sem přidat i stavební bloky? Vše pro tebe připravíme!',
+	BUTTON_CONTINUE: 'Ano, pojďme!',
 	BUTTON_CANCEL: 'Zrušit',
-	BUTTON_SUPPRESS: 'Již nepřipomínat',
-	SAFETY_GUARD_CANCELLED: 'Otevření editoru Blockly bylo zrušeno',
-	SAFETY_GUARD_SUPPRESSED: 'Nastavení uloženo, toto upozornění již nebude zobrazeno',
+	BUTTON_SUPPRESS: 'Už se neptat',
+	SAFETY_GUARD_CANCELLED: 'Žádný problém! Nic jsme neměnili.',
+	SAFETY_GUARD_SUPPRESSED: 'Jasně! Už se tě na to nebudeme ptát.',
 
 	// Communication Category
 	CATEGORY_COMMUNICATION: 'Komunikace',

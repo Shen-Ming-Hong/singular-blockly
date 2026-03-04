@@ -362,7 +362,8 @@ export class WebViewMessageHandler {
 
 			await this.settingsManager.syncPlatformIOSettings(libDeps, buildFlags, libLdfMode);
 		} catch (error) {
-			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_SAVE_FILE', (error as Error).message);
+			const errText = (error as Error).message;
+			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_SAVE_FILE', `Failed to save file: ${errText}`, errText);
 
 			vscodeApi.window.showErrorMessage(errorMsg);
 			log(errorMsg, 'error', error);
@@ -508,7 +509,8 @@ export class WebViewMessageHandler {
 			await this.fileService.writeJsonFile(mainJsonPath, saveData);
 		} catch (error) {
 			log('Failed to save workspace state:', 'error', error);
-			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_UNABLE_SAVE_WORKSPACE', (error as Error).message);
+			const errText = (error as Error).message;
+			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_UNABLE_SAVE_WORKSPACE', `Unable to save workspace state: ${errText}`, errText);
 
 			vscodeApi.window.showErrorMessage(errorMsg);
 		}

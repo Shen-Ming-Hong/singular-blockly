@@ -618,14 +618,14 @@ window.languageManager.loadMessages('bg', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Този проект все още няма Blockly блокове. Ако продължите, тук ще бъдат създадени blockly папка и файлове. Искате ли да продължите?',
+		'Тук все още няма блокчета. Искаш ли да подготвим всичко, за да може да започнеш да създаваш? Ще приготвим всичко за теб!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Открит е проект {0}. Този проект все още няма Blockly блокове. Ако продължите, тук ще бъдат създадени blockly папка и файлове. Искате ли да продължите?',
-	BUTTON_CONTINUE: 'Продължи',
+		'Тук вече има {0} съдържание. Искаш ли да добавим блокчета тук също? Ще подготвим всичко за теб!',
+	BUTTON_CONTINUE: 'Да, започваме!',
 	BUTTON_CANCEL: 'Отказ',
-	BUTTON_SUPPRESS: 'Не напомняй',
-	SAFETY_GUARD_CANCELLED: 'Отворянето на редактора Blockly е отменено',
-	SAFETY_GUARD_SUPPRESSED: 'Предпочитанието е запазено, това предупреждение няма да се показва отново',
+	BUTTON_SUPPRESS: 'Не питай пак',
+	SAFETY_GUARD_CANCELLED: 'Няма проблем! Не направихме никакви промени.',
+	SAFETY_GUARD_SUPPRESSED: 'Разбрано! Няма да те питаме отново за това.',
 
 	// Communication Category
 	CATEGORY_COMMUNICATION: 'Комуникация',
@@ -980,5 +980,5 @@ window.languageManager.loadMessages('bg', {
 	// === AI Shadow Suggestions ===
 	AI_SUGGESTION_TAB_HINT: 'Tab за приемане · Esc за отхвърляне',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab приемане · Alt+]/[ превключване · Esc отхвърляне',
-	AI_QUOTA_EXHAUSTED: 'Квотата на Copilot е изчерпана. Нулира се следващия месец или надградете плана.
+	AI_QUOTA_EXHAUSTED: 'Квотата на Copilot е изчерпана. Нулира се следващия месец или надградете плана.',
 });

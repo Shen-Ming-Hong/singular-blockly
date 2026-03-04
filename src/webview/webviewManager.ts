@@ -184,7 +184,7 @@ export class WebViewManager {
 				if (userChoice === 'cancel') {
 					// 使用者取消操作
 					log('User cancelled opening Blockly editor', 'info');
-					const cancelMsg = await this.localeService.getLocalizedMessage('SAFETY_GUARD_CANCELLED', '已取消開啟 Blockly 編輯器');
+					const cancelMsg = await this.localeService.getLocalizedMessage('SAFETY_GUARD_CANCELLED', "No worries! We didn't make any changes.");
 					vscodeApi.window.showInformationMessage(cancelMsg);
 					return; // 中止開啟編輯器
 				} else if (userChoice === 'suppress') {
@@ -193,7 +193,7 @@ export class WebViewManager {
 					await validator.saveUserPreference(true);
 					const suppressMsg = await this.localeService.getLocalizedMessage(
 						'SAFETY_GUARD_SUPPRESSED',
-						'已儲存偏好設定,未來不再顯示此警告'
+						"Got it! We won't ask you about this again."
 					);
 					vscodeApi.window.showInformationMessage(suppressMsg);
 					// 繼續開啟編輯器

@@ -215,6 +215,7 @@ export class SettingsManager {
 	private mapVSCodeLangToBlockly(vscodeLanguage: string): SupportedLanguageCode {
 		const languageMap: Record<string, SupportedLanguageCode> = {
 			'zh-tw': 'zh-hant',
+			'zh-hant': 'zh-hant',
 			en: 'en',
 			'en-us': 'en',
 			ja: 'ja',
