@@ -621,14 +621,14 @@ window.languageManager.loadMessages('en', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
+		"This place doesn't have building blocks yet. Want to set things up so you can start creating? We'll get everything ready for you!",
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Detected {0} project. This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
-	BUTTON_CONTINUE: 'Continue',
+		"This place already has {0} stuff in it. Want to add building blocks here too? We'll set everything up for you!",
+	BUTTON_CONTINUE: "Yes, let's go!",
 	BUTTON_CANCEL: 'Cancel',
-	BUTTON_SUPPRESS: 'Do Not Remind',
-	SAFETY_GUARD_CANCELLED: 'Cancelled opening Blockly editor',
-	SAFETY_GUARD_SUPPRESSED: 'Preference saved, this warning will not be shown again',
+	BUTTON_SUPPRESS: "Don't ask again",
+	SAFETY_GUARD_CANCELLED: "No worries! We didn't make any changes.",
+	SAFETY_GUARD_SUPPRESSED: "Got it! We won't ask you about this again.",
 
 	// Communication Category
 	CATEGORY_COMMUNICATION: 'Communication',

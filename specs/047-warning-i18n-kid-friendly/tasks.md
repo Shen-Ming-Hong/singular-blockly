@@ -30,8 +30,8 @@
 
 **Purpose**: 確認開發環境正常運作，建立修改基準
 
-- [ ] T001 執行 `npm run compile && npm test` 驗證現有程式碼編譯通過且所有測試成功
-- [ ] T002 檢視 `media/locales/en/messages.js` 中現有 7 個安全守衛訊息鍵值（`SAFETY_WARNING_BODY_NO_TYPE`、`SAFETY_WARNING_BODY_WITH_TYPE`、`BUTTON_CONTINUE`、`BUTTON_CANCEL`、`BUTTON_SUPPRESS`、`SAFETY_GUARD_CANCELLED`、`SAFETY_GUARD_SUPPRESSED`），記錄目前文案作為修改前基準
+- [X] T001 執行 `npm run compile && npm test` 驗證現有程式碼編譯通過且所有測試成功
+- [X] T002 檢視 `media/locales/en/messages.js` 中現有 7 個安全守衛訊息鍵值（`SAFETY_WARNING_BODY_NO_TYPE`、`SAFETY_WARNING_BODY_WITH_TYPE`、`BUTTON_CONTINUE`、`BUTTON_CANCEL`、`BUTTON_SUPPRESS`、`SAFETY_GUARD_CANCELLED`、`SAFETY_GUARD_SUPPRESSED`），記錄目前文案作為修改前基準
 
 ---
 
@@ -41,9 +41,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T003 更新 `media/locales/en/messages.js` 中 7 個安全守衛訊息鍵值為孩子友善英文版本。依 research.md 英文基準版本草稿：`SAFETY_WARNING_BODY_NO_TYPE` → "This place doesn't have building blocks yet. Want to set things up so you can start creating? We'll get everything ready for you!"；`SAFETY_WARNING_BODY_WITH_TYPE` → "This place already has {0} stuff in it. Want to add building blocks here too? We'll set everything up for you!"；`BUTTON_CONTINUE` → "Yes, let's go!"；`BUTTON_SUPPRESS` → "Don't ask again"；`BUTTON_CANCEL` → "Cancel"；`SAFETY_GUARD_CANCELLED` → "No worries! We didn't make any changes."；`SAFETY_GUARD_SUPPRESSED` → "Got it! We won't ask you about this again."
-- [ ] T004 [P] 更新 `src/services/workspaceValidator.ts` 中所有 fallback 訊息（三處），使措辭與 `en/messages.js` 孩子友善版本一致：(1) `getFallbackMessage()` 方法（約 L279-291）：將 `SAFETY_WARNING_BODY_NO_TYPE` fallback 從 "This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here..." 改為與 en/messages.js 一致的孩子友善英文；將 `SAFETY_WARNING_BODY_WITH_TYPE` fallback 同步更新；將 `BUTTON_CONTINUE` 從 `'Continue'` 改為 `"Yes, let's go!"`；將 `BUTTON_SUPPRESS` 從 `'Do Not Remind'` 改為 `"Don't ask again"`；(2) 行內 fallback 參數（約 L188-189）：`getLocalizedMessage(MESSAGE_KEYS.BUTTON_CONTINUE, 'Continue')` 的第二參數改為 `"Yes, let's go!"`，`getLocalizedMessage(MESSAGE_KEYS.BUTTON_SUPPRESS, 'Do Not Remind')` 的第二參數改為 `"Don't ask again"`；(3) catch block（約 L206-227）：`fallbackMessage` no-type/with-type 改為孩子友善英文（移除 "may cause file loss" 等警示性用語），按鈕參數從 `'Continue'`, `'Do Not Remind'` 改為 `"Yes, let's go!"`, `"Don't ask again"`，同步更新 selection 比對字串
-- [ ] T005 [P] 更新 `src/webview/webviewManager.ts` 中 2 個回饋訊息的 fallback 參數（約 L187 和 L194-196）：(1) `SAFETY_GUARD_CANCELLED` 的 fallback 從中文 `'已取消開啟 Blockly 編輯器'` 改為 `"No worries! We didn't make any changes."`，(2) `SAFETY_GUARD_SUPPRESSED` 的 fallback 從中文 `'已儲存偏好設定,未來不再顯示此警告'` 改為 `"Got it! We won't ask you about this again."`
+- [X] T003 更新 `media/locales/en/messages.js` 中 7 個安全守衛訊息鍵值為孩子友善英文版本。依 research.md 英文基準版本草稿：`SAFETY_WARNING_BODY_NO_TYPE` → "This place doesn't have building blocks yet. Want to set things up so you can start creating? We'll get everything ready for you!"；`SAFETY_WARNING_BODY_WITH_TYPE` → "This place already has {0} stuff in it. Want to add building blocks here too? We'll set everything up for you!"；`BUTTON_CONTINUE` → "Yes, let's go!"；`BUTTON_SUPPRESS` → "Don't ask again"；`BUTTON_CANCEL` → "Cancel"；`SAFETY_GUARD_CANCELLED` → "No worries! We didn't make any changes."；`SAFETY_GUARD_SUPPRESSED` → "Got it! We won't ask you about this again."
+- [X] T004 [P] 更新 `src/services/workspaceValidator.ts` 中所有 fallback 訊息（三處），使措辭與 `en/messages.js` 孩子友善版本一致：(1) `getFallbackMessage()` 方法（約 L279-291）：將 `SAFETY_WARNING_BODY_NO_TYPE` fallback 從 "This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here..." 改為與 en/messages.js 一致的孩子友善英文；將 `SAFETY_WARNING_BODY_WITH_TYPE` fallback 同步更新；將 `BUTTON_CONTINUE` 從 `'Continue'` 改為 `"Yes, let's go!"`；將 `BUTTON_SUPPRESS` 從 `'Do Not Remind'` 改為 `"Don't ask again"`；(2) 行內 fallback 參數（約 L188-189）：`getLocalizedMessage(MESSAGE_KEYS.BUTTON_CONTINUE, 'Continue')` 的第二參數改為 `"Yes, let's go!"`，`getLocalizedMessage(MESSAGE_KEYS.BUTTON_SUPPRESS, 'Do Not Remind')` 的第二參數改為 `"Don't ask again"`；(3) catch block（約 L206-227）：`fallbackMessage` no-type/with-type 改為孩子友善英文（移除 "may cause file loss" 等警示性用語），按鈕參數從 `'Continue'`, `'Do Not Remind'` 改為 `"Yes, let's go!"`, `"Don't ask again"`，同步更新 selection 比對字串
+- [X] T005 [P] 更新 `src/webview/webviewManager.ts` 中 2 個回饋訊息的 fallback 參數（約 L187 和 L194-196）：(1) `SAFETY_GUARD_CANCELLED` 的 fallback 從中文 `'已取消開啟 Blockly 編輯器'` 改為 `"No worries! We didn't make any changes."`，(2) `SAFETY_GUARD_SUPPRESSED` 的 fallback 從中文 `'已儲存偏好設定,未來不再顯示此警告'` 改為 `"Got it! We won't ask you about this again."`
 
 **Checkpoint**: 英文基準語系與 TypeScript fallback 已更新。後續 User Story 可開始進行。
 
@@ -57,8 +57,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T006 [US1] 更新 `media/locales/zh-hant/messages.js` 中 7 個安全守衛訊息鍵值為孩子友善繁體中文版本。文案須遵循 research.md R1 文案轉換指引（用「這個地方」取代「專案」、用「積木內容」取代「Blockly blocks」、按鈕描述按下後的結果）與 R2 翻譯品質清單。字元長度須符合 data-model.md 驗證規則：本文 ≤ 200 字元、按鈕 ≤ 15 字元、回饋 ≤ 100 字元
-- [ ] T007 [US1] 驗證空白資料夾情境：(1) 語系設為英文（en）時觸發安全守衛，確認訊息使用孩子友善英文，(2) 語系設為繁體中文（zh-hant）時觸發安全守衛，確認訊息使用孩子友善繁中，(3) 確認兩個按鈕文字皆清楚表達按下後的結果，(4) 確認點擊各按鈕後的回饋訊息正確顯示
+- [X] T006 [US1] 更新 `media/locales/zh-hant/messages.js` 中 7 個安全守衛訊息鍵值為孩子友善繁體中文版本。文案須遵循 research.md R1 文案轉換指引（用「這個地方」取代「專案」、用「積木內容」取代「Blockly blocks」、按鈕描述按下後的結果）與 R2 翻譯品質清單。字元長度須符合 data-model.md 驗證規則：本文 ≤ 200 字元、按鈕 ≤ 15 字元、回饋 ≤ 100 字元
+- [X] T007 [US1] 驗證空白資料夾情境：(1) 語系設為英文（en）時觸發安全守衛，確認訊息使用孩子友善英文，(2) 語系設為繁體中文（zh-hant）時觸發安全守衛，確認訊息使用孩子友善繁中，(3) 確認兩個按鈕文字皆清楚表達按下後的結果，(4) 確認點擊各按鈕後的回饋訊息正確顯示
 
 **Checkpoint**: User Story 1 完成。空白資料夾情境在英文與繁中語系中已可獨立測試。
 
@@ -74,19 +74,19 @@
 
 > **NOTE**: 以下 13 個語系檔更新任務互相獨立（不同檔案），皆標記 [P] 可平行執行。每個語系須遵循 research.md R2 翻譯品質清單：不使用專業開發術語、使用適合 8-14 歲語彙、語氣親切不具威脅性、按鈕文字描述結果而非動作、保留技術專有名詞不翻譯、`{0}` 占位符位置正確、符合字元長度限制。
 
-- [ ] T008 [P] [US2] 更新 `media/locales/bg/messages.js` 中 7 個安全守衛鍵值為孩子友善保加利亞文版本
-- [ ] T009 [P] [US2] 更新 `media/locales/cs/messages.js` 中 7 個安全守衛鍵值為孩子友善捷克文版本
-- [ ] T010 [P] [US2] 更新 `media/locales/de/messages.js` 中 7 個安全守衛鍵值為孩子友善德文版本（注意：現有 BUTTON_SUPPRESS "Nicht mehr erinnern" 已 20 字元超過 15 字元上限，須縮短）
-- [ ] T011 [P] [US2] 更新 `media/locales/es/messages.js` 中 7 個安全守衛鍵值為孩子友善西班牙文版本
-- [ ] T012 [P] [US2] 更新 `media/locales/fr/messages.js` 中 7 個安全守衛鍵值為孩子友善法文版本
-- [ ] T013 [P] [US2] 更新 `media/locales/hu/messages.js` 中 7 個安全守衛鍵值為孩子友善匈牙利文版本
-- [ ] T014 [P] [US2] 更新 `media/locales/it/messages.js` 中 7 個安全守衛鍵值為孩子友善義大利文版本
-- [ ] T015 [P] [US2] 更新 `media/locales/ja/messages.js` 中 7 個安全守衛鍵值為孩子友善日文版本（使用「です・ます」敬語體，適合兒童閱讀）
-- [ ] T016 [P] [US2] 更新 `media/locales/ko/messages.js` 中 7 個安全守衛鍵值為孩子友善韓文版本（使用「해요」體，適合兒童閱讀）
-- [ ] T017 [P] [US2] 更新 `media/locales/pl/messages.js` 中 7 個安全守衛鍵值為孩子友善波蘭文版本
-- [ ] T018 [P] [US2] 更新 `media/locales/pt-br/messages.js` 中 7 個安全守衛鍵值為孩子友善巴西葡萄牙文版本
-- [ ] T019 [P] [US2] 更新 `media/locales/ru/messages.js` 中 7 個安全守衛鍵值為孩子友善俄文版本
-- [ ] T020 [P] [US2] 更新 `media/locales/tr/messages.js` 中 7 個安全守衛鍵值為孩子友善土耳其文版本
+- [X] T008 [P] [US2] 更新 `media/locales/bg/messages.js` 中 7 個安全守衛鍵值為孩子友善保加利亞文版本
+- [X] T009 [P] [US2] 更新 `media/locales/cs/messages.js` 中 7 個安全守衛鍵值為孩子友善捷克文版本
+- [X] T010 [P] [US2] 更新 `media/locales/de/messages.js` 中 7 個安全守衛鍵值為孩子友善德文版本（注意：現有 BUTTON_SUPPRESS "Nicht mehr erinnern" 已 20 字元超過 15 字元上限，須縮短）
+- [X] T011 [P] [US2] 更新 `media/locales/es/messages.js` 中 7 個安全守衛鍵值為孩子友善西班牙文版本
+- [X] T012 [P] [US2] 更新 `media/locales/fr/messages.js` 中 7 個安全守衛鍵值為孩子友善法文版本
+- [X] T013 [P] [US2] 更新 `media/locales/hu/messages.js` 中 7 個安全守衛鍵值為孩子友善匈牙利文版本
+- [X] T014 [P] [US2] 更新 `media/locales/it/messages.js` 中 7 個安全守衛鍵值為孩子友善義大利文版本
+- [X] T015 [P] [US2] 更新 `media/locales/ja/messages.js` 中 7 個安全守衛鍵值為孩子友善日文版本（使用「です・ます」敬語體，適合兒童閱讀）
+- [X] T016 [P] [US2] 更新 `media/locales/ko/messages.js` 中 7 個安全守衛鍵值為孩子友善韓文版本（使用「해요」體，適合兒童閱讀）
+- [X] T017 [P] [US2] 更新 `media/locales/pl/messages.js` 中 7 個安全守衛鍵值為孩子友善波蘭文版本
+- [X] T018 [P] [US2] 更新 `media/locales/pt-br/messages.js` 中 7 個安全守衛鍵值為孩子友善巴西葡萄牙文版本
+- [X] T019 [P] [US2] 更新 `media/locales/ru/messages.js` 中 7 個安全守衛鍵值為孩子友善俄文版本
+- [X] T020 [P] [US2] 更新 `media/locales/tr/messages.js` 中 7 個安全守衛鍵值為孩子友善土耳其文版本
 
 **Checkpoint**: 全部 15 個語系的安全守衛訊息已更新為孩子友善版本。可透過切換語系驗證一致性。
 
@@ -100,7 +100,7 @@
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] 驗證 `.vscode`-only 資料夾情境：(1) 確認安全守衛觸發時使用 `SAFETY_WARNING_BODY_NO_TYPE`（與空白資料夾相同的訊息鍵值），(2) 確認訊息中不出現「.vscode」等技術用語，(3) 在英文與繁中語系各驗證一次，(4) 確認按鈕行為（繼續建立積木專案、不再提醒、取消）與空白資料夾情境完全一致
+- [X] T021 [US3] 驗證 `.vscode`-only 資料夾情境：(1) 確認安全守衛觸發時使用 `SAFETY_WARNING_BODY_NO_TYPE`（與空白資料夾相同的訊息鍵值），(2) 確認訊息中不出現「.vscode」等技術用語，(3) 在英文與繁中語系各驗證一次，(4) 確認按鈕行為（繼續建立積木專案、不再提醒、取消）與空白資料夾情境完全一致
 
 **Checkpoint**: User Story 3 驗證通過。`.vscode`-only 資料夾情境與空白資料夾情境使用相同的友善文案。
 
@@ -114,7 +114,7 @@
 
 ### Implementation for User Story 4
 
-- [ ] T022 [US4] 驗證偵測到專案類型情境：(1) 在含 `package.json` 的資料夾觸發安全守衛，確認使用 `SAFETY_WARNING_BODY_WITH_TYPE` 且 `{0}` 替換為 "Node.js"，(2) 在含 `requirements.txt` 的資料夾觸發安全守衛，確認 `{0}` 替換為 "Python"，(3) 確認訊息使用孩子友善用語，專案類型名稱保持原文，(4) 在非英文語系（如韓文）驗證專案類型 "Python" 保持原文但周圍說明為韓文，(5) 確認 `workspaceValidator.ts` catch block fallback 的 with-type 變體也正確替換 `${projectType}`
+- [X] T022 [US4] 驗證偵測到專案類型情境：(1) 在含 `package.json` 的資料夾觸發安全守衛，確認使用 `SAFETY_WARNING_BODY_WITH_TYPE` 且 `{0}` 替換為 "Node.js"，(2) 在含 `requirements.txt` 的資料夾觸發安全守衛，確認 `{0}` 替換為 "Python"，(3) 確認訊息使用孩子友善用語，專案類型名稱保持原文，(4) 在非英文語系（如韓文）驗證專案類型 "Python" 保持原文但周圍說明為韓文，(5) 確認 `workspaceValidator.ts` catch block fallback 的 with-type 變體也正確替換 `${projectType}`
 
 **Checkpoint**: User Story 4 驗證通過。偵測到專案類型時的訊息在所有語系中使用孩子友善用語且正確顯示技術名稱。
 
@@ -128,17 +128,17 @@
 
 > **NOTE**: T023–T026 皆寫入同一測試檔 `src/test/safetyGuardI18n.test.ts`，因此 **不可平行執行**。須依序完成：T023 建立檔案 → T024 追加 → T025 追加 → T026 追加。
 
-- [ ] T023 新增訊息鍵值一致性測試於 `src/test/safetyGuardI18n.test.ts`：建立測試檔並加入第一個 `describe` 區塊。讀取全部 15 個語系的 `media/locales/{lang}/messages.js`，驗證每個語系都包含完整的 7 個安全守衛訊息鍵值（`SAFETY_WARNING_BODY_NO_TYPE`、`SAFETY_WARNING_BODY_WITH_TYPE`、`BUTTON_CONTINUE`、`BUTTON_CANCEL`、`BUTTON_SUPPRESS`、`SAFETY_GUARD_CANCELLED`、`SAFETY_GUARD_SUPPRESSED`），且無未翻譯的英文殘留（與 en 版本不同）
-- [ ] T024 新增占位符驗證測試於 `src/test/safetyGuardI18n.test.ts`：在既有測試檔追加 `describe` 區塊。驗證 (1) 所有語系的 `SAFETY_WARNING_BODY_WITH_TYPE` 包含恰好一個 `{0}` 占位符，(2) 所有語系的 `SAFETY_WARNING_BODY_NO_TYPE` 不包含 `{0}` 占位符
-- [ ] T025 新增字元長度限制測試於 `src/test/safetyGuardI18n.test.ts`：在既有測試檔追加 `describe` 區塊。驗證所有 15 語系的文案長度符合上限（警告本文 ≤ 200 字元、按鈕文字 ≤ 15 字元、回饋訊息 ≤ 100 字元）
-- [ ] T026 新增 fallback 一致性測試於 `src/test/safetyGuardI18n.test.ts`：在既有測試檔追加 `describe` 區塊。驗證 `src/services/workspaceValidator.ts` 三處 fallback 皆與 `media/locales/en/messages.js` 一致——(a) `getFallbackMessage()` 方法中的 5 個鍵值、(b) 行內 fallback 參數（L188-189 的 BUTTON_CONTINUE、BUTTON_SUPPRESS）、(c) catch block 中的 fallbackMessage 和按鈕字串；另驗證 `src/webview/webviewManager.ts` 中 `SAFETY_GUARD_CANCELLED` 和 `SAFETY_GUARD_SUPPRESSED` 的 fallback 參數與 en 版本一致
+- [X] T023 新增訊息鍵值一致性測試於 `src/test/safetyGuardI18n.test.ts`：建立測試檔並加入第一個 `describe` 區塊。讀取全部 15 個語系的 `media/locales/{lang}/messages.js`，驗證每個語系都包含完整的 7 個安全守衛訊息鍵值（`SAFETY_WARNING_BODY_NO_TYPE`、`SAFETY_WARNING_BODY_WITH_TYPE`、`BUTTON_CONTINUE`、`BUTTON_CANCEL`、`BUTTON_SUPPRESS`、`SAFETY_GUARD_CANCELLED`、`SAFETY_GUARD_SUPPRESSED`），且無未翻譯的英文殘留（與 en 版本不同）
+- [X] T024 新增占位符驗證測試於 `src/test/safetyGuardI18n.test.ts`：在既有測試檔追加 `describe` 區塊。驗證 (1) 所有語系的 `SAFETY_WARNING_BODY_WITH_TYPE` 包含恰好一個 `{0}` 占位符，(2) 所有語系的 `SAFETY_WARNING_BODY_NO_TYPE` 不包含 `{0}` 占位符
+- [X] T025 新增字元長度限制測試於 `src/test/safetyGuardI18n.test.ts`：在既有測試檔追加 `describe` 區塊。驗證所有 15 語系的文案長度符合上限（警告本文 ≤ 200 字元、按鈕文字 ≤ 15 字元、回饋訊息 ≤ 100 字元）
+- [X] T026 新增 fallback 一致性測試於 `src/test/safetyGuardI18n.test.ts`：在既有測試檔追加 `describe` 區塊。驗證 `src/services/workspaceValidator.ts` 三處 fallback 皆與 `media/locales/en/messages.js` 一致——(a) `getFallbackMessage()` 方法中的 5 個鍵值、(b) 行內 fallback 參數（L188-189 的 BUTTON_CONTINUE、BUTTON_SUPPRESS）、(c) catch block 中的 fallbackMessage 和按鈕字串；另驗證 `src/webview/webviewManager.ts` 中 `SAFETY_GUARD_CANCELLED` 和 `SAFETY_GUARD_SUPPRESSED` 的 fallback 參數與 en 版本一致
 
 ### Final Validation
 
-- [ ] T027 執行 `npm run validate:i18n` 驗證全部 15 語系翻譯品質：確認占位符保留正確、無空白翻譯、UTF-8 編碼正常、翻譯長度比例合理（英文 50%-150% 範圍）。若有錯誤須回頭修正對應語系檔後重新執行直到通過
-- [ ] T028 執行完整測試套件 `npm run compile && npm test`，確認所有既有測試與新增測試皆通過
-- [ ] T029 執行 quickstart.md 驗證場景：依 `specs/047-warning-i18n-kid-friendly/quickstart.md` 第 5 節手動測試方法，在 VS Code 開發主機中驗證空白資料夾、.vscode-only 資料夾、Node.js 專案資料夾各一次，確認對話框訊息、按鈕文字、回饋訊息皆符合孩子友善標準
-- [ ] T030 邊界情境驗證：(1) 確認先前已選擇「不再提醒」的使用者偏好不受文案更新影響（FR-008），(2) 確認 VS Code 語系不在 15 種支援語言中時以英文孩子友善版本顯示
+- [X] T027 執行 `npm run validate:i18n` 驗證全部 15 語系翻譯品質：確認占位符保留正確、無空白翻譯、UTF-8 編碼正常、翻譯長度比例合理（英文 50%-150% 範圍）。若有錯誤須回頭修正對應語系檔後重新執行直到通過
+- [X] T028 執行完整測試套件 `npm run compile && npm test`，確認所有既有測試與新增測試皆通過
+- [X] T029 執行 quickstart.md 驗證場景：依 `specs/047-warning-i18n-kid-friendly/quickstart.md` 第 5 節手動測試方法，在 VS Code 開發主機中驗證空白資料夾、.vscode-only 資料夾、Node.js 專案資料夾各一次，確認對話框訊息、按鈕文字、回饋訊息皆符合孩子友善標準
+- [X] T030 邊界情境驗證：(1) 確認先前已選擇「不再提醒」的使用者偏好不受文案更新影響（FR-008），(2) 確認 VS Code 語系不在 15 種支援語言中時以英文孩子友善版本顯示
 
 ---
 

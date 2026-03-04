@@ -622,14 +622,14 @@ window.languageManager.loadMessages('de', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Dieses Projekt hat noch keine Blockly-Blöcke. Wenn Sie fortfahren, werden hier blockly-Ordner und -Dateien erstellt. Möchten Sie fortfahren?',
+		'Hier gibt es noch keine Bausteine. Möchtest du alles einrichten, damit du loslegen kannst? Wir machen alles für dich bereit!',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'{0}-Projekt erkannt. Dieses Projekt hat noch keine Blockly-Blöcke. Wenn Sie fortfahren, werden hier blockly-Ordner und -Dateien erstellt. Möchten Sie fortfahren?',
-	BUTTON_CONTINUE: 'Fortfahren',
+		'Hier gibt es schon {0}-Inhalte. Möchtest du hier auch Bausteine hinzufügen? Wir richten alles für dich ein!',
+	BUTTON_CONTINUE: 'Ja, los gehts!',
 	BUTTON_CANCEL: 'Abbrechen',
-	BUTTON_SUPPRESS: 'Nicht mehr erinnern',
-	SAFETY_GUARD_CANCELLED: 'Öffnen des Blockly-Editors abgebrochen',
-	SAFETY_GUARD_SUPPRESSED: 'Einstellung gespeichert, diese Warnung wird nicht mehr angezeigt',
+	BUTTON_SUPPRESS: 'Frag nicht mehr',
+	SAFETY_GUARD_CANCELLED: 'Kein Problem! Wir haben nichts verändert.',
+	SAFETY_GUARD_SUPPRESSED: 'Verstanden! Wir fragen dich dazu nicht mehr.',
 
 	// Communication Category (WiFi/MQTT)
 	CATEGORY_COMMUNICATION: 'Kommunikation',

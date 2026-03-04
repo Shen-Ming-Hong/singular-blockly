@@ -169,11 +169,16 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 	 * ```
 	 */
 	async showSafetyWarning(projectType?: string): Promise<SafetyGuardDialogResult> {
-		log('Showing safety warning dialog', 'debug', { projectType });
-
 		try {
 			// 根據是否有專案類型選擇訊息模板
 			const messageKey = projectType ? MESSAGE_KEYS.SAFETY_WARNING_BODY_WITH_TYPE : MESSAGE_KEYS.SAFETY_WARNING_BODY_NO_TYPE;
+
+			// i18n 診斷 log（info 層級，可在 Output 面板直接檢視）
+			const envLang = vscode.env.language;
+			const langSetting = await this.settingsManager.getLanguage();
+			const resolvedLang = this.localeService.getCurrentLanguage();
+			const keySource = await this.localeService.getMessageSource(messageKey);
+			log(`[SafetyGuard i18n] env.language="${envLang}" setting="${langSetting}" resolved="${resolvedLang}" key="${messageKey}" source=${keySource}`, 'info');
 
 			// 取得訊息內容 (await 非同步呼叫，帶英文 fallback)
 			let message = await this.localeService.getLocalizedMessage(messageKey, this.getFallbackMessage(messageKey));
@@ -185,8 +190,8 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 
 			// 按鈕文字 (await 非同步呼叫，帶英文 fallback)
 			// 注意: modal 對話框會自動提供預設的取消按鈕,不需要額外添加
-			const continueButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_CONTINUE, 'Continue');
-			const suppressButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_SUPPRESS, 'Do Not Remind');
+			const continueButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_CONTINUE, "Yes, let's go!");
+			const suppressButton = await this.localeService.getLocalizedMessage(MESSAGE_KEYS.BUTTON_SUPPRESS, "Don't ask again");
 
 			// 顯示模態對話框 (使用者按 ESC 或關閉視窗會返回 undefined,視為取消)
 			const selection = await vscode.window.showWarningMessage(message, { modal: true }, continueButton, suppressButton);
@@ -204,24 +209,24 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 				return 'cancel';
 			}
 		} catch (error) {
-			// LocaleService 失敗時使用硬編碼的後備訊息（英文）
+			// LocaleService 失敗時使用 getFallbackMessage（避免重複硬編碼字串）
 			log('Error loading localized messages, using fallback', 'warn', { error });
 
-			// 後備訊息（英文）
-			const fallbackMessage = projectType
-				? `Detected ${projectType} project. Opening the editor in a non-Blockly project may cause file loss. Do you want to continue?`
-				: 'This may not be a Blockly project. Opening the editor in a non-Blockly project may cause file loss. Do you want to continue?';
+			const fbKey = projectType ? MESSAGE_KEYS.SAFETY_WARNING_BODY_WITH_TYPE : MESSAGE_KEYS.SAFETY_WARNING_BODY_NO_TYPE;
+			let fallbackMessage = this.getFallbackMessage(fbKey);
+			if (projectType) {
+				fallbackMessage = fallbackMessage.replace('{0}', projectType);
+			}
 
-			// 注意: modal 對話框會自動提供預設的取消按鈕,不需要額外添加
-			const selection = await vscode.window.showWarningMessage(fallbackMessage, { modal: true }, 'Continue', 'Do Not Remind');
+			const continueBtn = this.getFallbackMessage(MESSAGE_KEYS.BUTTON_CONTINUE);
+			const suppressBtn = this.getFallbackMessage(MESSAGE_KEYS.BUTTON_SUPPRESS);
+			const selection = await vscode.window.showWarningMessage(fallbackMessage, { modal: true }, continueBtn, suppressBtn);
 
-			// 解析使用者選擇 (硬編碼比對)
-			if (selection === 'Continue') {
+			if (selection === continueBtn) {
 				return 'continue';
-			} else if (selection === 'Do Not Remind') {
+			} else if (selection === suppressBtn) {
 				return 'suppress';
 			} else {
-				// undefined: 使用者點擊預設取消按鈕或按 ESC
 				return 'cancel';
 			}
 		}
@@ -266,7 +271,7 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 	 */
 	private getExtensionPath(): string {
 		// 在測試環境中可能無法取得擴充功能實例,返回預設路徑
-		const extension = vscode.extensions.getExtension('singularBlockly.singular-blockly');
+		const extension = vscode.extensions.getExtension('Singular-Ray.singular-blockly');
 		return extension?.extensionPath || process.cwd();
 	}
 
@@ -280,12 +285,12 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 		// 使用英文作為後備語言，符合 i18n 最佳實踐
 		const fallbackMessages: Record<string, string> = {
 			[MESSAGE_KEYS.SAFETY_WARNING_BODY_NO_TYPE]:
-				'This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
+				"This place doesn't have building blocks yet. Want to set things up so you can start creating? We'll get everything ready for you!",
 			[MESSAGE_KEYS.SAFETY_WARNING_BODY_WITH_TYPE]:
-				'Detected {0} project. This project does not have Blockly blocks yet. If you continue, blockly folder and files will be created here. Do you want to continue?',
-			[MESSAGE_KEYS.BUTTON_CONTINUE]: 'Continue',
+				"This place already has {0} stuff in it. Want to add building blocks here too? We'll set everything up for you!",
+			[MESSAGE_KEYS.BUTTON_CONTINUE]: "Yes, let's go!",
 			[MESSAGE_KEYS.BUTTON_CANCEL]: 'Cancel',
-			[MESSAGE_KEYS.BUTTON_SUPPRESS]: 'Do Not Remind',
+			[MESSAGE_KEYS.BUTTON_SUPPRESS]: "Don't ask again",
 		};
 		return fallbackMessages[key] || key;
 	}
