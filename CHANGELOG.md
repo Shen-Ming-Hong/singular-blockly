@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.2] - 2026-03-07
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 serialize-javascript RCE 漏洞（Dependabot Alert #39）** (Fix serialize-javascript RCE vulnerability)
+    - 透過 npm overrides 將 `serialize-javascript` 從 `6.0.2` 升級至 `^7.0.4`（間接依賴 via `@vscode/test-cli` → `mocha`）
+      Upgraded `serialize-javascript` from `6.0.2` to `^7.0.4` via npm overrides (transitive dependency via `@vscode/test-cli` → `mocha`)
+    - 嚴重程度 Severity: High (RCE via `RegExp.flags` and `Date.prototype.toISOString`)
+    - GHSA-3wgr-x9jc-gx36 — Arbitrary Code Execution in serialize-javascript
+    - 關閉 Dependabot Alert #39
+      Closes Dependabot Alert #39
+
 ## [0.67.1] - 2026-03-06
 
 ### 🔒 安全性修復 Security Fixes
@@ -28,12 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ⚠️ 已知未修復漏洞 Known Unfixed Vulnerabilities
 
-- `diff` (低風險 Low) 與 `serialize-javascript` (高風險 High，僅存於 mocha 間接依賴)：
-  影響 `@vscode/test-cli` → `mocha` 測試工具鏈，修復需降級 `@vscode/test-cli` 至 `0.0.11`（破壞性變更），
-  屬開發依賴，不影響終端使用者。待上游釋出相容修補後再行升級。
-  `diff` (Low) and `serialize-javascript` (High, only in mocha transitive): affects `@vscode/test-cli` → `mocha`
-  test toolchain only. Fix requires downgrading `@vscode/test-cli` to `0.0.11` (breaking change).
-  Dev-only dependency; no end-user impact. Will upgrade when upstream releases a compatible fix.
+- `diff` (低風險 Low)：影響 `@vscode/test-cli` → `mocha` 測試工具鏈，屬開發依賴，不影響終端使用者。
+  `diff` (Low): affects `@vscode/test-cli` → `mocha` test toolchain only. Dev-only dependency; no end-user impact.
 
 ## [0.67.0] - 2026-03-04
 
