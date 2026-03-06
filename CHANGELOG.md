@@ -8,6 +8,33 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.1] - 2026-03-06
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 hono Cookie/SSE 注入與路徑遍歷漏洞** (Fix hono cookie injection, SSE injection & path traversal vulnerabilities)
+    - 透過 npm overrides 升級 `hono` 從 `^4.12.2` 至 `^4.12.4`（間接依賴 via `@modelcontextprotocol/sdk`）
+      Upgraded `hono` from `^4.12.2` to `^4.12.4` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk`)
+    - 嚴重程度 Severity: High
+    - GHSA-5pq2-9x2x-5p6w — Cookie Attribute Injection via unsanitized domain/path in `setCookie()`
+    - GHSA-p6xx-57qc-3wxr — SSE Control Field Injection via CR/LF in `writeSSE()`
+    - GHSA-q5qw-h33p-qvwr — Arbitrary file access via `serveStatic` vulnerability
+
+- **修復 @hono/node-server 靜態路徑授權繞過漏洞** (Fix @hono/node-server static path authorization bypass)
+    - 透過 npm overrides 升級 `@hono/node-server` 至 `^1.19.10`（間接依賴 via `@modelcontextprotocol/sdk`）
+      Upgraded `@hono/node-server` to `^1.19.10` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk`)
+    - 嚴重程度 Severity: High
+    - GHSA-wc8c-qw6v-h7f6 — Authorization bypass for protected static paths via encoded slashes in Serve Static Middleware
+
+### ⚠️ 已知未修復漏洞 Known Unfixed Vulnerabilities
+
+- `diff` (低風險 Low) 與 `serialize-javascript` (高風險 High，僅存於 mocha 間接依賴)：
+  影響 `@vscode/test-cli` → `mocha` 測試工具鏈，修復需降級 `@vscode/test-cli` 至 `0.0.11`（破壞性變更），
+  屬開發依賴，不影響終端使用者。待上游釋出相容修補後再行升級。
+  `diff` (Low) and `serialize-javascript` (High, only in mocha transitive): affects `@vscode/test-cli` → `mocha`
+  test toolchain only. Fix requires downgrading `@vscode/test-cli` to `0.0.11` (breaking change).
+  Dev-only dependency; no end-user impact. Will upgrade when upstream releases a compatible fix.
+
 ## [0.67.0] - 2026-03-04
 
 ### ✨ 新功能 New Features
