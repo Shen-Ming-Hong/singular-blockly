@@ -8,6 +8,23 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.3] - 2026-03-08
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 express-rate-limit IPv4-mapped IPv6 速率限制繞過漏洞（Dependabot Alert #44）** (Fix express-rate-limit IPv4-mapped IPv6 rate-limit bypass)
+    - 透過 npm overrides 將 `express-rate-limit` 從 `8.2.1` 升級至 `8.3.0`（間接依賴 via `@modelcontextprotocol/sdk`）
+      Upgraded `express-rate-limit` from `8.2.1` to `8.3.0` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk`)
+    - 嚴重程度 Severity: High (CVSS 7.5)
+    - CVE-2026-30827 / GHSA-46wh-pxpv-q5gq — IPv4-mapped IPv6 addresses bypass per-client rate limiting on servers with dual-stack network
+    - 關閉 Dependabot Alert #44
+      Closes Dependabot Alert #44
+
+### ℹ️ 已知暫緩修復 Known Deferred Fixes
+
+- `diff` (GHSA-73rr-hh4g-fpgx, low) via `@vscode/test-cli` → `mocha` → `diff`：修復需降級 `@vscode/test-cli` 至 `0.0.11`，為破壞性變更，暫不處理
+  `diff` (GHSA-73rr-hh4g-fpgx, low) via `@vscode/test-cli` → `mocha` → `diff`: fix requires downgrading `@vscode/test-cli` to `0.0.11` (breaking change), deferred
+
 ## [0.67.2] - 2026-03-07
 
 ### 🔒 安全性修復 Security Fixes
