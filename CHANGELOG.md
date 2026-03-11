@@ -8,6 +8,26 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.4] - 2026-03-11
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 hono 請求走私漏洞（Dependabot Alert）** (Fix hono request smuggling vulnerability)
+    - 透過 npm overrides 將 `hono` 從 `^4.12.4` 升級至 `^4.12.7`（間接依賴 via `@modelcontextprotocol/sdk`）
+      Upgraded `hono` from `^4.12.4` to `^4.12.7` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk`)
+    - 嚴重程度 Severity: Moderate
+    - GHSA-v8w9-8mx6-g223 — Request smuggling via crafted `Transfer-Encoding` header in hono
+    - 關閉相關 Dependabot Alert
+      Closes related Dependabot Alert
+
+- **修復 diff ReDoS 漏洞** (Fix diff Regular Expression Denial of Service vulnerability)
+    - 透過 npm overrides 將 `diff` 鎖定至 `>=8.0.3`（間接依賴 via `@vscode/test-cli` → `mocha` → `diff`）
+      Pinned `diff` to `>=8.0.3` via npm overrides (transitive dependency via `@vscode/test-cli` → `mocha` → `diff`)
+    - 嚴重程度 Severity: Low
+    - GHSA-73rr-hh4g-fpgx — Regular Expression Denial of Service in `diff` package
+    - 此項原列為已知暫緩修復，現已透過 override 方式解決
+      Previously listed as known deferred fix, now resolved via npm override
+
 ## [0.67.3] - 2026-03-08
 
 ### 🔒 安全性修復 Security Fixes
@@ -22,8 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### ℹ️ 已知暫緩修復 Known Deferred Fixes
 
-- `diff` (GHSA-73rr-hh4g-fpgx, low) via `@vscode/test-cli` → `mocha` → `diff`：修復需降級 `@vscode/test-cli` 至 `0.0.11`，為破壞性變更，暫不處理
-  `diff` (GHSA-73rr-hh4g-fpgx, low) via `@vscode/test-cli` → `mocha` → `diff`: fix requires downgrading `@vscode/test-cli` to `0.0.11` (breaking change), deferred
+- ~~`diff` (GHSA-73rr-hh4g-fpgx, low) via `@vscode/test-cli` → `mocha` → `diff`：修復需降級 `@vscode/test-cli` 至 `0.0.11`，為破壞性變更，暫不處理~~ → **已於 0.67.4 透過 npm override 修復**
+  ~~`diff` (GHSA-73rr-hh4g-fpgx, low) via `@vscode/test-cli` → `mocha` → `diff`: fix requires downgrading `@vscode/test-cli` to `0.0.11` (breaking change), deferred~~ → **Fixed in 0.67.4 via npm override**
 
 ## [0.67.2] - 2026-03-07
 

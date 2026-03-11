@@ -15,8 +15,11 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package | Severity | Advisory | Reason |
 | ------- | -------- | -------- | ------ |
-| `diff` (via `@vscode/test-cli` → `mocha`) | Low | [GHSA-73rr-hh4g-fpgx](https://github.com/advisories/GHSA-73rr-hh4g-fpgx) | Fix requires downgrading `@vscode/test-cli` to `0.0.11` (breaking change); dev-only dependency, not shipped to users |
+| _(none)_ | — | — | All known vulnerabilities have been resolved as of 0.67.4 |
+
+> **0.67.4 更新 Update**: `diff` (GHSA-73rr-hh4g-fpgx) 已透過 npm override 修復，不再列為暫緩項目。
+> `diff` (GHSA-73rr-hh4g-fpgx) has been fixed via npm override and is no longer deferred.
 
 ---
 
-_Last updated: 2026-03-08_
+_Last updated: 2026-03-11_
