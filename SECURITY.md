@@ -15,11 +15,11 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package | Severity | Advisory | Reason |
 | ------- | -------- | -------- | ------ |
-| _(none)_ | — | — | All known vulnerabilities have been resolved as of 0.67.4 |
+| _(none)_ | — | — | All known vulnerabilities have been resolved as of 0.67.5 |
 
-> **0.67.4 更新 Update**: `diff` (GHSA-73rr-hh4g-fpgx) 已透過 npm override 修復，不再列為暫緩項目。
-> `diff` (GHSA-73rr-hh4g-fpgx) has been fixed via npm override and is no longer deferred.
+> **0.67.5 更新 Update**: `flatted` (CVE-2026-32141) 已透過 npm override 修復。
+> `flatted` (CVE-2026-32141) has been fixed via npm override.
 
 ---
 
-_Last updated: 2026-03-11_
+_Last updated: 2026-03-18_

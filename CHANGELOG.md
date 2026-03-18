@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.5] - 2026-03-18
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 flatted 無限遞迴 DoS 漏洞 (CVE-2026-32141)** (Fix flatted unbounded recursion DoS in parse())
+    - 透過 npm overrides 將 `flatted` 從 3.3.3 升級至 >=3.4.0（間接依賴 via `eslint` → `file-entry-cache` → `flat-cache` → `flatted`）
+      Upgraded `flatted` from 3.3.3 to >=3.4.0 via npm overrides (transitive dependency via `eslint` → `file-entry-cache` → `flat-cache` → `flatted`)
+    - 嚴重程度 Severity: High (CVSS: 7.5)
+    - GHSA-25h7-pfq9-p65f — Unbounded recursion in `flatted.parse()` revive phase
+    - 關閉 Dependabot Alert #46
+      Closes Dependabot Alert #46
+
 ## [0.67.4] - 2026-03-11
 
 ### 🔒 安全性修復 Security Fixes
