@@ -8,6 +8,37 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.6] - 2026-03-28
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 picomatch 方法注入漏洞 (CVE-2026-33672)** (Fix picomatch Method Injection in POSIX Character Classes)
+    - 透過 npm overrides 將 `picomatch` 從 2.3.1 升級至 2.3.2（間接依賴 via `@vscode/test-cli` → `chokidar` 及 `ts-loader` → `micromatch`），以及從 4.0.3 升級至 4.0.4（間接依賴 via `copy-webpack-plugin` → `tinyglobby`/`fdir`）
+      Upgraded `picomatch` from 2.3.1 to 2.3.2 (transitive via `@vscode/test-cli` → `chokidar` and `ts-loader` → `micromatch`) and from 4.0.3 to 4.0.4 (transitive via `copy-webpack-plugin` → `tinyglobby`/`fdir`) via npm overrides
+    - 嚴重程度 Severity: Medium (CVSS: 5.3)
+    - CVE-2026-33672 / GHSA-3v7f-55p6-f55p — Method injection allowing incorrect glob matching via crafted POSIX bracket expressions
+    - 關閉 Dependabot Alert #49
+      Closes Dependabot Alert #49
+
+- **修復 path-to-regexp ReDoS 漏洞** (Fix path-to-regexp Regular Expression Denial of Service)
+    - 透過 npm overrides 將 `path-to-regexp` 從 8.3.0 升級至 8.4.0（間接依賴 via `@modelcontextprotocol/sdk` → `express` → `router`）
+      Upgraded `path-to-regexp` from 8.3.0 to 8.4.0 via npm overrides (transitive dependency via `@modelcontextprotocol/sdk` → `express` → `router`)
+    - 嚴重程度 Severity: High
+    - GHSA-j3q9-mxjg-w52f — DoS via sequential optional groups; GHSA-27v5-c462-wpq7 — ReDoS via multiple wildcards
+
+- **修復 brace-expansion DoS 漏洞 (GHSA-f886-m6hf-6m8v)** (Fix brace-expansion Zero-step sequence Denial of Service)
+    - 透過 npm overrides 升級三條依賴路徑中的 `brace-expansion`（間接依賴 via `eslint`/`@vscode/test-cli`/`glob` → `minimatch`）
+      Upgraded `brace-expansion` in three transitive paths via npm overrides (via `eslint`/`@vscode/test-cli`/`glob` → `minimatch`)：
+      1.1.12 → 1.1.13（via `eslint` → `minimatch@3.1.5`）；2.0.2 → 2.0.3（via `@vscode/test-cli` → `minimatch@9.0.9`）；5.0.4 → 5.0.5（via `glob` → `minimatch@10.2.4`）
+    - 嚴重程度 Severity: Moderate
+
+- **修復 serialize-javascript CPU Exhaustion DoS 漏洞 (GHSA-qj8w-gfj5-8c6v)** (Fix serialize-javascript CPU Exhaustion via crafted array-like objects)
+    - 透過 npm overrides 將 `serialize-javascript` 從 7.0.4 升級至 7.0.5（間接依賴 via `copy-webpack-plugin` 及 `@vscode/test-cli` → `mocha`）
+      Upgraded `serialize-javascript` from 7.0.4 to 7.0.5 via npm overrides (transitive via `copy-webpack-plugin` and `@vscode/test-cli` → `mocha`)
+    - 嚴重程度 Severity: Moderate
+    - 注：`mocha@11.7.5` 本身的套件宣告範圍仍包含 < 7.0.5，故 `npm audit` 可能仍回報此路徑；但實際安裝版本已受 override 固定至 7.0.5，執行期風險已消除
+      Note: `mocha@11.7.5` package.json still declares a range covering < 7.0.5, so `npm audit` may still report this path; the actually-installed version is pinned to 7.0.5 via override, eliminating the runtime risk
+
 ## [0.67.5] - 2026-03-18
 
 ### 🔒 安全性修復 Security Fixes
