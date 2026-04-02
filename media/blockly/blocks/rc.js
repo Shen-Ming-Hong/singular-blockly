@@ -38,10 +38,11 @@
 		init: function () {
 			this.appendDummyInput()
 				.appendField(getMessage('RC_MASTER_INIT', '初始化 RC 發射端'))
-				.appendField(getMessage('RC_MASTER_INIT_PAIR_ID', '配對ID'))
-				.appendField(new Blockly.FieldNumber(1, 1, 255, 1), 'PAIR_ID')
-				.appendField(getMessage('RC_MASTER_INIT_CHANNEL', '頻道'))
-				.appendField(new Blockly.FieldNumber(1, 1, 11, 1), 'CHANNEL');
+				.appendField(getMessage('RC_MASTER_INIT_PAIR_ID', '配對ID'));
+			this.appendValueInput('PAIR_ID').setCheck('Number');
+			this.appendDummyInput().appendField(getMessage('RC_MASTER_INIT_CHANNEL', '頻道'));
+			this.appendValueInput('CHANNEL').setCheck('Number');
+			this.setInputsInline(true);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
 			this.setColour(160);
@@ -67,10 +68,11 @@
 		init: function () {
 			this.appendDummyInput()
 				.appendField(getMessage('RC_SLAVE_INIT', '初始化 RC 接收端'))
-				.appendField(getMessage('RC_SLAVE_INIT_PAIR_ID', '配對ID'))
-				.appendField(new Blockly.FieldNumber(1, 1, 255, 1), 'PAIR_ID')
-				.appendField(getMessage('RC_SLAVE_INIT_CHANNEL', '頻道'))
-				.appendField(new Blockly.FieldNumber(1, 1, 11, 1), 'CHANNEL');
+				.appendField(getMessage('RC_SLAVE_INIT_PAIR_ID', '配對ID'));
+			this.appendValueInput('PAIR_ID').setCheck('Number');
+			this.appendDummyInput().appendField(getMessage('RC_SLAVE_INIT_CHANNEL', '頻道'));
+			this.appendValueInput('CHANNEL').setCheck('Number');
+			this.setInputsInline(true);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
 			this.setColour(160);
