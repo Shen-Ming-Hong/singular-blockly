@@ -8,6 +8,39 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.8] - 2026-04-03
+
+### 🐛 修復 Bug Fixes
+
+- **RC `_rc_pair_id` 變數順序修正** (Fix RC `_rc_pair_id` used before assigned)
+    - `_rc_pair_id` 賦值從 `addHardwareInit`（模組層級）移到 `main()` 函式內，修正當 PAIR_ID 使用變數時變數尚未初始化的問題
+      Moved `_rc_pair_id` assignment from `addHardwareInit` (module level) to `main()` return code, fixing crash when PAIR_ID uses a variable
+- **RC CHANNEL 改為 FieldNumber** (Change RC CHANNEL from ValueInput to FieldNumber)
+    - CHANNEL 從 ValueInput 改為 `FieldNumber(1, 1, 11, 1)`，防止使用者拖入變數積木造成相同的變數順序問題
+      Changed CHANNEL from ValueInput to FieldNumber(1, 1, 11, 1) to prevent variable blocks causing the same ordering issue
+    - Generator 加入防禦性 int 轉型和 1-11 範圍夾取
+      Added defensive parseInt + 1-11 clamping in generators
+    - 新增向後相容遷移：舊 `inputs.CHANNEL` 自動轉換為 `fields.CHANNEL`
+      Added backward-compatible migration in `migrateWorkspaceState()`
+
+### ✨ 新功能 New Features
+
+- **RC 發射端/接收端衝突偵測** (RC master/slave conflict detection)
+    - Block 層：`rc_master_init` 和 `rc_slave_init` 新增 `onchange` handler，同時啟用時顯示警告
+      Block layer: Added `onchange` handlers on init blocks showing warnings when both are enabled
+    - Generator 層：所有 9 個 RC generator 加入 `_hasRcConflict()` 防護，衝突時跳過產碼或回傳安全預設值
+      Generator layer: All 9 RC generators include `_hasRcConflict()` guard, skipping code or returning safe defaults on conflict
+    - 支援祖先鏈檢查：`isEffectivelyEnabled()` 正確處理父層函式被停用的情況
+      Supports ancestor chain check via `isEffectivelyEnabled()` for correctly handling disabled parent blocks
+- **MicroPython 中文變數命名** (Chinese variable names for MicroPython)
+    - 依據 PEP 3131 為 MicroPython 開發板啟用中文字元變數名，Arduino 模式不受影響
+      Enabled Chinese character variable names for MicroPython boards per PEP 3131; Arduino mode unchanged
+
+### 🌐 國際化 i18n
+
+- 新增 `RC_WARNING_CONFLICT` 和 `VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON` 翻譯 key（15 語系）
+  Added `RC_WARNING_CONFLICT` and `VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON` translation keys (15 locales)
+
 ## [0.67.7] - 2026-04-02
 
 ### ✨ 新功能 New Features
