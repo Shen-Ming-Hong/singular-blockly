@@ -8,6 +8,16 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.9] - 2026-04-03
+
+### ✨ 新功能 New Features
+
+- **函式呼叫積木參數自動附加 Shadow Block** (Auto shadow blocks for function call parameters)
+    - 自訂函式呼叫積木（`arduino_function_call`）的參數輸入現在會根據型別自動附加對應的預設值 shadow block（`int`→`0`、`float`→`0.0`、`bool`→`TRUE`、`String`→空字串），使用者不再需要手動從工具箱尋找對應型態積木
+      Custom function call block parameters now auto-attach type-appropriate shadow blocks as defaults, eliminating the need to manually find matching type blocks from the toolbox
+    - 涵蓋三個場景：動態參數更新、儲存/載入還原、工具箱拖出
+      Covers three scenarios: live parameter updates, save/load restoration, and toolbox drag-out
+
 ## [0.67.8] - 2026-04-03
 
 ### 🐛 修復 Bug Fixes
