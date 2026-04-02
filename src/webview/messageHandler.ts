@@ -612,7 +612,7 @@ export class WebViewMessageHandler {
 					);
 
 			// MicroPython (Python 3) supports Unicode identifiers (PEP 3131),
-			// so allow CJK characters in variable names for MicroPython boards.
+			// so allow Chinese characters in variable names for MicroPython boards.
 			const variableNamePattern = isMicroPython
 				? /^[A-Za-z_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff][A-Za-z0-9_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]*$/
 				: /^[A-Za-z_][A-Za-z0-9_]*$/;

@@ -43,7 +43,8 @@
 
 		// 取得參數 (PAIR_ID 支援變數輸入，CHANNEL 僅支援數字字面量)
 		const pairId = generator.valueToCode(block, 'PAIR_ID', generator.ORDER_NONE) || '1';
-		const channel = block.getFieldValue('CHANNEL') || '1';
+		const rawChannel = parseInt(block.getFieldValue('CHANNEL'), 10);
+		const channel = String(Math.max(1, Math.min(11, isNaN(rawChannel) ? 1 : rawChannel)));
 
 		// 添加 import
 		generator.addImport('import network');
@@ -142,7 +143,8 @@ _rc_led.write()
 
 		// 取得參數 (PAIR_ID 支援變數輸入，CHANNEL 僅支援數字字面量)
 		const pairId = generator.valueToCode(block, 'PAIR_ID', generator.ORDER_NONE) || '1';
-		const channel = block.getFieldValue('CHANNEL') || '1';
+		const rawChannel = parseInt(block.getFieldValue('CHANNEL'), 10);
+		const channel = String(Math.max(1, Math.min(11, isNaN(rawChannel) ? 1 : rawChannel)));
 
 		// 添加 import
 		generator.addImport('import network');
