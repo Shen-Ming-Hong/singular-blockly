@@ -33,6 +33,33 @@
 		['K4', '3'],
 	];
 
+	// === 衝突偵測：同一 workspace 不能同時啟用發射端和接收端 ===
+	function isEffectivelyEnabled(block) {
+		let b = block;
+		while (b) {
+			if (!b.isEnabled()) return false;
+			b = b.getParent();
+		}
+		return true;
+	}
+
+	function checkRcConflict(block, conflictType) {
+		if (!block.workspace) return;
+		// 自己（含祖先）被停用 → 不需要警告
+		if (!isEffectivelyEnabled(block)) {
+			block.setWarningText(null);
+			return;
+		}
+		const hasConflict = block.workspace
+			.getAllBlocks(false)
+			.some(b => b.type === conflictType && !b.isInsertionMarker() && isEffectivelyEnabled(b));
+		if (hasConflict) {
+			block.setWarningText(getMessage('RC_WARNING_CONFLICT', '⚠ 發射端和接收端不能同時啟用，請停用其中一個（右鍵 → 停用積木）'));
+		} else {
+			block.setWarningText(null);
+		}
+	}
+
 	// === 發射端初始化 ===
 	Blockly.Blocks['rc_master_init'] = {
 		init: function () {
@@ -40,14 +67,18 @@
 				.appendField(getMessage('RC_MASTER_INIT', '初始化 RC 發射端'))
 				.appendField(getMessage('RC_MASTER_INIT_PAIR_ID', '配對ID'));
 			this.appendValueInput('PAIR_ID').setCheck('Number');
-			this.appendDummyInput().appendField(getMessage('RC_MASTER_INIT_CHANNEL', '頻道'));
-			this.appendValueInput('CHANNEL').setCheck('Number');
+			this.appendDummyInput()
+				.appendField(getMessage('RC_MASTER_INIT_CHANNEL', '頻道'))
+				.appendField(new Blockly.FieldNumber(1, 1, 11, 1), 'CHANNEL');
 			this.setInputsInline(true);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
 			this.setColour(160);
 			this.setTooltip(getMessage('RC_MASTER_INIT_TOOLTIP', '初始化遙控發射端，設定配對 ID (1-255) 和頻道 (1-11)'));
 			this.setHelpUrl('');
+		},
+		onchange: function () {
+			checkRcConflict(this, 'rc_slave_init');
 		},
 	};
 
@@ -70,14 +101,18 @@
 				.appendField(getMessage('RC_SLAVE_INIT', '初始化 RC 接收端'))
 				.appendField(getMessage('RC_SLAVE_INIT_PAIR_ID', '配對ID'));
 			this.appendValueInput('PAIR_ID').setCheck('Number');
-			this.appendDummyInput().appendField(getMessage('RC_SLAVE_INIT_CHANNEL', '頻道'));
-			this.appendValueInput('CHANNEL').setCheck('Number');
+			this.appendDummyInput()
+				.appendField(getMessage('RC_SLAVE_INIT_CHANNEL', '頻道'))
+				.appendField(new Blockly.FieldNumber(1, 1, 11, 1), 'CHANNEL');
 			this.setInputsInline(true);
 			this.setPreviousStatement(true, null);
 			this.setNextStatement(true, null);
 			this.setColour(160);
 			this.setTooltip(getMessage('RC_SLAVE_INIT_TOOLTIP', '初始化遙控接收端，設定配對 ID (1-255) 和頻道 (1-11)'));
 			this.setHelpUrl('');
+		},
+		onchange: function () {
+			checkRcConflict(this, 'rc_master_init');
 		},
 	};
 

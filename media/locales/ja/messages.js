@@ -222,6 +222,7 @@ window.languageManager.loadMessages('ja', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: '新しい変数名を入力してください (現在: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: '変数名は空にできません',
 	VSCODE_VARIABLE_NAME_INVALID: '変数名には文字、数字、アンダースコアのみ使用でき、数字で始めることはできません',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON: '変数名には中国語文字、英字、数字、アンダースコアのみ使用でき、数字で始めることはできません',
 	VSCODE_RELOAD: '再読み込み',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'キャンセル',
@@ -617,10 +618,8 @@ window.languageManager.loadMessages('ja', {
 	ESP32_PWM_RESOLUTION_15BIT: '15ビット (0-32767)',
 	ESP32_PWM_RESOLUTION_16BIT: '16ビット (0-65535)',
 	// Safety Guard (Project Safety Protection)
-	SAFETY_WARNING_BODY_NO_TYPE:
-		'ここにはまだブロックがありません。準備をして、つくり始められるようにしますか？全部準備しておきますね！',
-	SAFETY_WARNING_BODY_WITH_TYPE:
-		'ここにはすでに {0} の内容があります。ここにもブロック機能を追加しますか？全部準備しておきますね！',
+	SAFETY_WARNING_BODY_NO_TYPE: 'ここにはまだブロックがありません。準備をして、つくり始められるようにしますか？全部準備しておきますね！',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'ここにはすでに {0} の内容があります。ここにもブロック機能を追加しますか？全部準備しておきますね！',
 	BUTTON_CONTINUE: 'はい、始めよう！',
 	BUTTON_CANCEL: 'キャンセル',
 	BUTTON_SUPPRESS: 'もう聞かない',
@@ -938,6 +937,7 @@ window.languageManager.loadMessages('ja', {
 	RC_WAIT_TOOLTIP: '送信機の接続を待機、LEDが青く点滅、タイムアウト後に続行',
 	RC_IS_CONNECTED: 'RC接続中?',
 	RC_IS_CONNECTED_TOOLTIP: '500ms以内にデータを受信したか確認',
+	RC_WARNING_CONFLICT: '⚠ 送信機と受信機を同時に有効にできません。どちらかを無効にしてください（右クリック → ブロックを無効化）',
 
 	// RC データ読取ブロック
 	RC_GET_JOYSTICK_PREFIX: 'RC ジョイスティック',

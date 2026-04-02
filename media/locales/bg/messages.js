@@ -222,6 +222,8 @@ window.languageManager.loadMessages('bg', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Въведете ново име на променливата (текущо: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Името на променливата не може да бъде празно',
 	VSCODE_VARIABLE_NAME_INVALID: 'Името на променливата може да съдържа само букви, цифри и подчертаване, и не може да започва с цифра',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'Името на променливата може да съдържа само китайски йероглифи, букви, цифри и подчертаване, и не може да започва с цифра',
 	VSCODE_RELOAD: 'Презареждане',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Отказ',
@@ -619,8 +621,7 @@ window.languageManager.loadMessages('bg', {
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Тук все още няма блокчета. Искаш ли да подготвим всичко, за да може да започнеш да създаваш? Ще приготвим всичко за теб!',
-	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Тук вече има {0} съдържание. Искаш ли да добавим блокчета тук също? Ще подготвим всичко за теб!',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'Тук вече има {0} съдържание. Искаш ли да добавим блокчета тук също? Ще подготвим всичко за теб!',
 	BUTTON_CONTINUE: 'Да, започваме!',
 	BUTTON_CANCEL: 'Отказ',
 	BUTTON_SUPPRESS: 'Не питай пак',
@@ -961,6 +962,8 @@ window.languageManager.loadMessages('bg', {
 	// Блокове статус RC
 	RC_IS_CONNECTED: 'RC свързан?',
 	RC_IS_CONNECTED_TOOLTIP: 'Провери дали са получени данни за 500мс',
+	RC_WARNING_CONFLICT:
+		'⚠ Предавателят и приемникът не могат да бъдат активирани едновременно. Деактивирайте единия (десен клик → Деактивиране на блок)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Отвори монитор',

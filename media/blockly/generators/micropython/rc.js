@@ -16,11 +16,35 @@
 		return;
 	}
 
+	// === 衝突檢測 helper ===
+	function _isEffectivelyEnabled(block) {
+		// 檢查積木本身及所有祖先是否都啟用
+		let b = block;
+		while (b) {
+			if (!b.isEnabled()) return false;
+			b = b.getParent();
+		}
+		return true;
+	}
+
+	function _hasRcConflict(workspace) {
+		const blocks = workspace.getAllBlocks(false).filter(b => !b.isInsertionMarker() && _isEffectivelyEnabled(b));
+		const hasMaster = blocks.some(b => b.type === 'rc_master_init');
+		const hasSlave = blocks.some(b => b.type === 'rc_slave_init');
+		return hasMaster && hasSlave;
+	}
+
 	// === 發射端初始化 ===
 	generator.forBlock['rc_master_init'] = function (block) {
-		// 取得參數 (支援變數積木輸入)
+		// 衝突檢測：如果接收端也啟用，跳過產生程式碼
+		if (_hasRcConflict(block.workspace)) {
+			return '# [Skipped] RC 發射端與接收端不能同時啟用\n';
+		}
+
+		// 取得參數 (PAIR_ID 支援變數輸入，CHANNEL 僅支援數字字面量)
 		const pairId = generator.valueToCode(block, 'PAIR_ID', generator.ORDER_NONE) || '1';
-		const channel = generator.valueToCode(block, 'CHANNEL', generator.ORDER_NONE) || '1';
+		const rawChannel = parseInt(block.getFieldValue('CHANNEL'), 10);
+		const channel = String(Math.max(1, Math.min(11, isNaN(rawChannel) ? 1 : rawChannel)));
 
 		// 添加 import
 		generator.addImport('import network');
@@ -33,9 +57,10 @@
 		// 添加硬體初始化 (使用廣播模式，配對 ID 內嵌於資料封包)
 		// 關鍵：必須先 disconnect() 再設定 channel
 		// 最佳實踐：增加 rxbuf 大小以避免 NO_MEM 錯誤
+		// 注意：_rc_pair_id 預設為 1，若使用變數輸入則在 main() 中更新
 		generator.addHardwareInit(
 			'espnow_master',
-			`_rc_pair_id = max(1, min(255, int(${pairId})))
+			`_rc_pair_id = 1
 _rc_broadcast = b'\\xff\\xff\\xff\\xff\\xff\\xff'
 _rc_led = NeoPixel(Pin(8), 1)
 _rc_send_fail_count = 0
@@ -44,18 +69,23 @@ _wlan.active(True)
 _wlan.disconnect()
 _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
 time.sleep_ms(100)
-_wlan.config(channel=max(1, min(11, int(${channel}))))
+_wlan.config(channel=${channel})
 _espnow = espnow.ESPNow()
 _espnow.active(True)
 _espnow.config(rxbuf=1024)
 _espnow.add_peer(_rc_broadcast)`
 		);
 
-		return '';
+		// 配對 ID 在 main() 中設定，確保變數已初始化
+		return `global _rc_pair_id\n_rc_pair_id = max(1, min(255, int(${pairId})))\n`;
 	};
 
 	// === 發送資料 ===
 	generator.forBlock['rc_send'] = function (block) {
+		// 衝突檢測：發射端依賴積木
+		if (_hasRcConflict(block.workspace)) {
+			return '# [Skipped] RC 衝突：發射端與接收端不能同時啟用\n';
+		}
 		// 使用 X12 直接硬體存取（不使用 rc_module，與 ESP-NOW 完全相容）
 		generator.addImport('from machine import Pin, ADC');
 
@@ -106,9 +136,15 @@ _rc_led.write()
 
 	// === 接收端初始化 ===
 	generator.forBlock['rc_slave_init'] = function (block) {
-		// 取得參數 (支援變數積木輸入)
+		// 衝突檢測：如果發射端也啟用，跳過產生程式碼
+		if (_hasRcConflict(block.workspace)) {
+			return '# [Skipped] RC 接收端與發射端不能同時啟用\n';
+		}
+
+		// 取得參數 (PAIR_ID 支援變數輸入，CHANNEL 僅支援數字字面量)
 		const pairId = generator.valueToCode(block, 'PAIR_ID', generator.ORDER_NONE) || '1';
-		const channel = generator.valueToCode(block, 'CHANNEL', generator.ORDER_NONE) || '1';
+		const rawChannel = parseInt(block.getFieldValue('CHANNEL'), 10);
+		const channel = String(Math.max(1, Math.min(11, isNaN(rawChannel) ? 1 : rawChannel)));
 
 		// 添加 import
 		generator.addImport('import network');
@@ -129,8 +165,8 @@ _rc_led.write()
 		// 4. 長時間斷線後自動重新初始化 ESP-NOW
 		generator.addHardwareInit(
 			'espnow_slave',
-			`_rc_pair_id = max(1, min(255, int(${pairId})))
-_rc_channel = max(1, min(11, int(${channel})))
+			`_rc_pair_id = 1
+_rc_channel = ${channel}
 _rc_data = (2048, 2048, 2048, 2048, 2048, 2048, 1, 1, 1, 1)
 _rc_connected = False
 _rc_last_recv = 0
@@ -188,11 +224,16 @@ _espnow.irq(_rc_recv_cb)
 _rc_last_gc = time.ticks_ms()`
 		);
 
-		return '';
+		// 配對 ID 在 main() 中設定，確保變數已初始化
+		return `global _rc_pair_id\n_rc_pair_id = max(1, min(255, int(${pairId})))\n`;
 	};
 
 	// === 等待配對 ===
 	generator.forBlock['rc_wait_connection'] = function (block) {
+		// 衝突檢測：接收端依賴積木
+		if (_hasRcConflict(block.workspace)) {
+			return '# [Skipped] RC 衝突：發射端與接收端不能同時啟用\n';
+		}
 		// 取得參數
 		const timeout = Math.max(1, Math.min(60, Number(block.getFieldValue('TIMEOUT')) || 30));
 		const timeoutMs = timeout * 1000;
@@ -215,6 +256,10 @@ _led_wait.write()
 
 	// === 是否已連線 ===
 	generator.forBlock['rc_is_connected'] = function (block) {
+		// 衝突檢測：接收端依賴積木
+		if (_hasRcConflict(block.workspace)) {
+			return ['False', generator.ORDER_ATOMIC];
+		}
 		// 生成程式碼：檢查連線狀態 (500ms 超時)
 		// _rc_maintenance() 會自動執行垃圾回收和斷線重連，並回傳連線狀態
 		const code = '_rc_maintenance()';
@@ -223,6 +268,10 @@ _led_wait.write()
 
 	// === 讀取遠端搖桿值 ===
 	generator.forBlock['rc_get_joystick'] = function (block) {
+		// 衝突檢測：接收端依賴積木
+		if (_hasRcConflict(block.workspace)) {
+			return ['2048', generator.ORDER_ATOMIC];
+		}
 		// 取得參數
 		const channel = block.getFieldValue('CHANNEL');
 
@@ -233,6 +282,10 @@ _led_wait.write()
 
 	// === 讀取並映射遠端搖桿值 ===
 	generator.forBlock['rc_get_joystick_mapped'] = function (block) {
+		// 衝突檢測：接收端依賴積木
+		if (_hasRcConflict(block.workspace)) {
+			return ['0', generator.ORDER_ATOMIC];
+		}
 		// 取得參數
 		const channel = block.getFieldValue('CHANNEL');
 		const min = generator.valueToCode(block, 'MIN', generator.ORDER_NONE) || '-100';
@@ -246,6 +299,10 @@ _led_wait.write()
 
 	// === 檢查遠端按鈕是否按下 ===
 	generator.forBlock['rc_is_button_pressed'] = function (block) {
+		// 衝突檢測：接收端依賴積木
+		if (_hasRcConflict(block.workspace)) {
+			return ['False', generator.ORDER_ATOMIC];
+		}
 		// 取得參數 (按鈕 index: 0-3 對應 K1-K4，資料 index 為 6-9)
 		const buttonIndex = Number(block.getFieldValue('BUTTON'));
 		const dataIndex = 6 + buttonIndex;
@@ -257,6 +314,10 @@ _led_wait.write()
 
 	// === 讀取遠端按鈕狀態 ===
 	generator.forBlock['rc_get_button'] = function (block) {
+		// 衝突檢測：接收端依賴積木
+		if (_hasRcConflict(block.workspace)) {
+			return ['1', generator.ORDER_ATOMIC];
+		}
 		// 取得參數 (按鈕 index: 0-3 對應 K1-K4，資料 index 為 6-9)
 		const buttonIndex = Number(block.getFieldValue('BUTTON'));
 		const dataIndex = 6 + buttonIndex;

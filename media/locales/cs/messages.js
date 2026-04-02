@@ -221,6 +221,8 @@ window.languageManager.loadMessages('cs', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Zadejte nový název proměnné (aktuální: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Název proměnné nemůže být prázdný',
 	VSCODE_VARIABLE_NAME_INVALID: 'Název proměnné může obsahovat pouze písmena, číslice a podtržítka a nemůže začínat číslicí',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'Název proměnné může obsahovat pouze čínské znaky, písmena, číslice a podtržítka a nemůže začínat číslicí',
 	VSCODE_RELOAD: 'Znovu načíst',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Zrušit',
@@ -616,8 +618,7 @@ window.languageManager.loadMessages('cs', {
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Toto místo zatím nemá žádné stavební bloky. Chceš vše připravit, abys mohl/a začít tvořit? Vše pro tebe připravíme!',
-	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Na tomto místě už je {0} obsah. Chceš sem přidat i stavební bloky? Vše pro tebe připravíme!',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'Na tomto místě už je {0} obsah. Chceš sem přidat i stavební bloky? Vše pro tebe připravíme!',
 	BUTTON_CONTINUE: 'Ano, pojďme!',
 	BUTTON_CANCEL: 'Zrušit',
 	BUTTON_SUPPRESS: 'Už se neptat',
@@ -957,6 +958,7 @@ window.languageManager.loadMessages('cs', {
 	// Bloky stavu RC
 	RC_IS_CONNECTED: 'RC připojeno?',
 	RC_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda byla přijata data za 500ms',
+	RC_WARNING_CONFLICT: '⚠ Vysílač a přijímač nemohou být aktivovány současně. Deaktivujte jeden z nich (pravý klik → Deaktivovat blok)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Otevřít monitor',

@@ -222,6 +222,8 @@ window.languageManager.loadMessages('hu', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Adja meg az új változó nevét (jelenlegi: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'A változó neve nem lehet üres',
 	VSCODE_VARIABLE_NAME_INVALID: 'A változó neve csak betűket, számokat és aláhúzásjeleket tartalmazhat, és nem kezdődhet számmal',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'A változó neve csak kínai karaktereket, betűket, számokat és aláhúzásjeleket tartalmazhat, és nem kezdődhet számmal',
 	VSCODE_RELOAD: 'Újratöltés',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Mégse',
@@ -961,6 +963,7 @@ window.languageManager.loadMessages('hu', {
 	// Állapot RC blokkok
 	RC_IS_CONNECTED: 'RC csatlakoztatva?',
 	RC_IS_CONNECTED_TOOLTIP: 'Ellenőrizd az adatok érkezését 500ms-on belül',
+	RC_WARNING_CONFLICT: '⚠ Az adó és a vevő nem lehet egyszerre aktív. Kérjük, tiltsa le az egyiket (jobb klikk → Blokk letiltása)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Monitor megnyitása',

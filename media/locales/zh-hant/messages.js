@@ -218,6 +218,7 @@ window.languageManager.loadMessages('zh-hant', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: '輸入新的變數名稱（目前：{0}）',
 	VSCODE_VARIABLE_NAME_EMPTY: '變數名稱不能為空',
 	VSCODE_VARIABLE_NAME_INVALID: '變數名稱只能包含字母、數字和底線，且不能以數字開頭',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON: '變數名稱只能包含中文、字母、數字和底線，且不能以數字開頭',
 	VSCODE_RELOAD: '重新載入',
 	VSCODE_OK: '確定',
 	VSCODE_CANCEL: '取消',
@@ -928,6 +929,7 @@ window.languageManager.loadMessages('zh-hant', {
 	RC_WAIT_TOOLTIP: '等待發射端連線，LED 藍色閃爍，超時後繼續執行',
 	RC_IS_CONNECTED: 'RC 已連線?',
 	RC_IS_CONNECTED_TOOLTIP: '檢查是否在 500ms 內收到資料',
+	RC_WARNING_CONFLICT: '⚠ 發射端和接收端不能同時啟用，請停用其中一個（右鍵 → 停用積木）',
 
 	// RC 資料讀取積木
 	RC_GET_JOYSTICK_PREFIX: 'RC 搖桿',

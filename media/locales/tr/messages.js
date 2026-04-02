@@ -222,6 +222,8 @@ window.languageManager.loadMessages('tr', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Yeni değişken adını girin (mevcut: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Değişken adı boş olamaz',
 	VSCODE_VARIABLE_NAME_INVALID: 'Değişken adı yalnızca harf, rakam ve alt çizgi içerebilir ve bir rakamla başlayamaz',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'Değişken adı yalnızca Çince karakterler, harfler, rakamlar ve alt çizgi içerebilir ve bir rakamla başlayamaz',
 	VSCODE_RELOAD: 'Yeniden Yükle',
 	VSCODE_OK: 'Tamam',
 	VSCODE_CANCEL: 'İptal',
@@ -959,6 +961,7 @@ window.languageManager.loadMessages('tr', {
 	// Durum RC blokları
 	RC_IS_CONNECTED: 'RC bağlı mı?',
 	RC_IS_CONNECTED_TOOLTIP: '500ms içinde veri alınıp alınmadığını kontrol et',
+	RC_WARNING_CONFLICT: '⚠ Verici ve alıcı aynı anda etkinleştirilemez. Birini devre dışı bırakın (sağ tıklama → Bloğu devre dışı bırak)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Monitörü aç',

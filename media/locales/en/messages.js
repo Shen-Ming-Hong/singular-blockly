@@ -221,6 +221,8 @@ window.languageManager.loadMessages('en', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Enter new variable name (current: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Variable name cannot be empty',
 	VSCODE_VARIABLE_NAME_INVALID: 'Variable name can only contain letters, numbers and underscore, and cannot start with a number',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'Variable name can only contain Chinese characters, letters, numbers, and underscores, and cannot start with a number',
 	VSCODE_RELOAD: 'Reload',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Cancel',
@@ -937,6 +939,7 @@ window.languageManager.loadMessages('en', {
 	RC_WAIT_TOOLTIP: 'Wait for transmitter connection, LED flashes blue, continues after timeout',
 	RC_IS_CONNECTED: 'RC connected?',
 	RC_IS_CONNECTED_TOOLTIP: 'Check if data received within 500ms',
+	RC_WARNING_CONFLICT: '⚠ Transmitter and receiver cannot be enabled at the same time. Please disable one (right-click → Disable Block)',
 
 	// RC Data Reading Blocks
 	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
