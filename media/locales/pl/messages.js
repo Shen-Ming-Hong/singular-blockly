@@ -222,6 +222,8 @@ window.languageManager.loadMessages('pl', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Wprowadź nową nazwę zmiennej (obecna: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Nazwa zmiennej nie może być pusta',
 	VSCODE_VARIABLE_NAME_INVALID: 'Nazwa zmiennej może zawierać tylko litery, cyfry i podkreślenia, i nie może zaczynać się od cyfry',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'Nazwa zmiennej może zawierać tylko znaki chińskie, litery, cyfry i podkreślenia, i nie może zaczynać się od cyfry',
 	VSCODE_RELOAD: 'Przeładuj',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Anuluj',
@@ -619,8 +621,7 @@ window.languageManager.loadMessages('pl', {
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'To miejsce nie ma jeszcze klocków. Chcesz wszystko przygotować, żebyś mógł/mogła zacząć tworzyć? Przygotujemy wszystko dla ciebie!',
-	SAFETY_WARNING_BODY_WITH_TYPE:
-		'To miejsce ma już zawartość {0}. Chcesz tu też dodać klocki? Przygotujemy wszystko dla ciebie!',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'To miejsce ma już zawartość {0}. Chcesz tu też dodać klocki? Przygotujemy wszystko dla ciebie!',
 	BUTTON_CONTINUE: 'Tak, zaczynamy!',
 	BUTTON_CANCEL: 'Anuluj',
 	BUTTON_SUPPRESS: 'Nie pytaj',
@@ -960,6 +961,7 @@ window.languageManager.loadMessages('pl', {
 	// Bloki statusu RC
 	RC_IS_CONNECTED: 'RC połączony?',
 	RC_IS_CONNECTED_TOOLTIP: 'Sprawdź czy dane odebrane w ciągu 500ms',
+	RC_WARNING_CONFLICT: '⚠ Nadajnik i odbiornik nie mogą być aktywne jednocześnie. Wyłącz jeden z nich (prawy przycisk → Wyłącz blok)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Otwórz monitor',

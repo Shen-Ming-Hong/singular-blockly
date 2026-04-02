@@ -363,7 +363,11 @@ export class WebViewMessageHandler {
 			await this.settingsManager.syncPlatformIOSettings(libDeps, buildFlags, libLdfMode);
 		} catch (error) {
 			const errText = (error as Error).message;
-			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_FAILED_SAVE_FILE', `Failed to save file: ${errText}`, errText);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'VSCODE_FAILED_SAVE_FILE',
+				`Failed to save file: ${errText}`,
+				errText
+			);
 
 			vscodeApi.window.showErrorMessage(errorMsg);
 			log(errorMsg, 'error', error);
@@ -510,7 +514,11 @@ export class WebViewMessageHandler {
 		} catch (error) {
 			log('Failed to save workspace state:', 'error', error);
 			const errText = (error as Error).message;
-			const errorMsg = await this.localeService.getLocalizedMessage('VSCODE_UNABLE_SAVE_WORKSPACE', `Unable to save workspace state: ${errText}`, errText);
+			const errorMsg = await this.localeService.getLocalizedMessage(
+				'VSCODE_UNABLE_SAVE_WORKSPACE',
+				`Unable to save workspace state: ${errText}`,
+				errText
+			);
 
 			vscodeApi.window.showErrorMessage(errorMsg);
 		}
@@ -580,6 +588,8 @@ export class WebViewMessageHandler {
 		try {
 			const isRename = Boolean(message?.isRename);
 			const currentName = typeof message?.currentName === 'string' ? message.currentName : '';
+			const boardLanguage = getBoardLanguage(message?.board ?? '');
+			const isMicroPython = boardLanguage === 'micropython';
 
 			const prompt =
 				isRename && currentName
@@ -591,10 +601,21 @@ export class WebViewMessageHandler {
 					: await this.localeService.getLocalizedMessage('VSCODE_ENTER_VARIABLE_NAME', 'Enter variable name');
 
 			const emptyError = await this.localeService.getLocalizedMessage('VSCODE_VARIABLE_NAME_EMPTY', 'Variable name cannot be empty');
-			const invalidError = await this.localeService.getLocalizedMessage(
-				'VSCODE_VARIABLE_NAME_INVALID',
-				'Variable name can only contain letters, numbers, and underscores, and cannot start with a number'
-			);
+			const invalidError = isMicroPython
+				? await this.localeService.getLocalizedMessage(
+						'VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON',
+						'Variable name can only contain Chinese characters, letters, numbers, and underscores, and cannot start with a number'
+					)
+				: await this.localeService.getLocalizedMessage(
+						'VSCODE_VARIABLE_NAME_INVALID',
+						'Variable name can only contain letters, numbers, and underscores, and cannot start with a number'
+					);
+
+			// MicroPython (Python 3) supports Unicode identifiers (PEP 3131),
+			// so allow CJK characters in variable names for MicroPython boards.
+			const variableNamePattern = isMicroPython
+				? /^[A-Za-z_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff][A-Za-z0-9_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]*$/
+				: /^[A-Za-z_][A-Za-z0-9_]*$/;
 
 			const input = await vscodeApi.window.showInputBox({
 				prompt: prompt,
@@ -605,7 +626,7 @@ export class WebViewMessageHandler {
 						return emptyError;
 					}
 
-					if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(trimmed)) {
+					if (!variableNamePattern.test(trimmed)) {
 						return invalidError;
 					}
 

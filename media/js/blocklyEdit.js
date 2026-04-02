@@ -1880,6 +1880,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			command: 'promptNewVariable',
 			currentName: '',
 			isRename: false,
+			board: window.currentBoard,
 		});
 	});
 
@@ -3243,6 +3244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			vscode.postMessage({
 				command: 'promptNewVariable',
 				currentName: '',
+				board: window.currentBoard,
 			});
 		} else if (value === Blockly.Msg['RENAME_VARIABLE']) {
 			const id = this.getValue();
@@ -3253,6 +3255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					command: 'promptNewVariable',
 					currentName: variable.name,
 					isRename: true,
+					board: window.currentBoard,
 				});
 			}
 		} else if (value === Blockly.Msg['DELETE_VARIABLE']) {
@@ -3278,6 +3281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			command: 'promptNewVariable',
 			currentName: '',
 			type: opt_type || '',
+			board: window.currentBoard,
 		});
 	};
 });
@@ -3339,6 +3343,23 @@ function migrateWorkspaceState(state) {
 			}
 		}
 
+		// 遷移 rc_master_init / rc_slave_init: inputs.CHANNEL → fields.CHANNEL
+		// CHANNEL 從 ValueInput 改為 FieldNumber，需要保留舊的頻道值
+		if ((block.type === 'rc_master_init' || block.type === 'rc_slave_init') && block.inputs && block.inputs.CHANNEL) {
+			const channelInput = block.inputs.CHANNEL;
+			// 嘗試從 shadow 或 block 取得頻道值
+			let channelValue = 1;
+			const source = channelInput.shadow || channelInput.block;
+			if (source && source.type === 'math_number' && source.fields && source.fields.NUM != null) {
+				channelValue = Math.max(1, Math.min(11, Number(source.fields.NUM) || 1));
+			}
+			delete block.inputs.CHANNEL;
+			if (!block.fields) block.fields = {};
+			block.fields.CHANNEL = channelValue;
+			migrationCount++;
+			log.info(`migrateWorkspaceState: 遷移 ${block.type} 頻道 ${channelValue} 從 ValueInput 到 FieldNumber`);
+		}
+
 		// 遞迴處理 next 積木
 		if (block.next && block.next.block) {
 			migrateBlock(block.next.block);
@@ -3359,7 +3380,7 @@ function migrateWorkspaceState(state) {
 	state.blocks.blocks.forEach(block => migrateBlock(block));
 
 	if (migrationCount > 0) {
-		log.info(`migrateWorkspaceState: 共遷移 ${migrationCount} 個 servo_move 積木`);
+		log.info(`migrateWorkspaceState: 共遷移 ${migrationCount} 個積木`);
 	}
 
 	return state;

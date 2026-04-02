@@ -223,6 +223,8 @@ window.languageManager.loadMessages('ru', {
 	VSCODE_VARIABLE_NAME_EMPTY: 'Имя переменной не может быть пустым',
 	VSCODE_VARIABLE_NAME_INVALID:
 		'Имя переменной может содержать только буквы, цифры и символы подчеркивания, и не может начинаться с цифры',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'Имя переменной может содержать только китайские иероглифы, буквы, цифры и символы подчеркивания, и не может начинаться с цифры',
 	VSCODE_RELOAD: 'Перезагрузить',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Отмена',
@@ -621,8 +623,7 @@ window.languageManager.loadMessages('ru', {
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
 		'Здесь пока нет блоков для конструирования. Хочешь всё подготовить, чтобы начать создавать? Мы всё для тебя настроим!',
-	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Здесь уже есть содержимое {0}. Хочешь добавить сюда блоки тоже? Мы всё для тебя настроим!',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'Здесь уже есть содержимое {0}. Хочешь добавить сюда блоки тоже? Мы всё для тебя настроим!',
 	BUTTON_CONTINUE: 'Да, начнём!',
 	BUTTON_CANCEL: 'Отмена',
 	BUTTON_SUPPRESS: 'Не спрашивай',
@@ -956,6 +957,7 @@ window.languageManager.loadMessages('ru', {
 	// Блоки статуса RC
 	RC_IS_CONNECTED: 'RC подключён?',
 	RC_IS_CONNECTED_TOOLTIP: 'Проверить получены ли данные за 500мс',
+	RC_WARNING_CONFLICT: '⚠ Передатчик и приёмник не могут быть активны одновременно. Отключите один (правый клик → Отключить блок)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Открыть монитор',

@@ -222,6 +222,7 @@ window.languageManager.loadMessages('ko', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: '새 변수 이름 입력 (현재: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: '변수 이름은 비워둘 수 없습니다',
 	VSCODE_VARIABLE_NAME_INVALID: '변수 이름은 문자, 숫자, 밑줄만 포함할 수 있으며 숫자로 시작할 수 없습니다',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON: '변수 이름은 중국어, 문자, 숫자, 밑줄만 포함할 수 있으며 숫자로 시작할 수 없습니다',
 	VSCODE_RELOAD: '다시 로드',
 	VSCODE_OK: '확인',
 	VSCODE_CANCEL: '취소',
@@ -617,10 +618,8 @@ window.languageManager.loadMessages('ko', {
 	ESP32_PWM_RESOLUTION_16BIT: '16비트 (0-65535)',
 
 	// Safety Guard (Project Safety Protection)
-	SAFETY_WARNING_BODY_NO_TYPE:
-		'여기에는 아직 블록이 없어요. 만들기를 시작할 수 있도록 준비해 줄까요? 모든 걸 준비해 놓을게요!',
-	SAFETY_WARNING_BODY_WITH_TYPE:
-		'여기에 이미 {0} 내용이 있어요. 여기에 블록 기능도 추가할까요? 모든 걸 준비해 놓을게요!',
+	SAFETY_WARNING_BODY_NO_TYPE: '여기에는 아직 블록이 없어요. 만들기를 시작할 수 있도록 준비해 줄까요? 모든 걸 준비해 놓을게요!',
+	SAFETY_WARNING_BODY_WITH_TYPE: '여기에 이미 {0} 내용이 있어요. 여기에 블록 기능도 추가할까요? 모든 걸 준비해 놓을게요!',
 	BUTTON_CONTINUE: '네, 시작해요!',
 	BUTTON_CANCEL: '취소',
 	BUTTON_SUPPRESS: '다시 안 물어봐요',
@@ -938,6 +937,7 @@ window.languageManager.loadMessages('ko', {
 	RC_WAIT_TOOLTIP: '송신기 연결 대기, LED가 파란색으로 깜빡임, 타임아웃 후 계속',
 	RC_IS_CONNECTED: 'RC 연결됨?',
 	RC_IS_CONNECTED_TOOLTIP: '500ms 내 데이터 수신 여부 확인',
+	RC_WARNING_CONFLICT: '⚠ 송신기와 수신기를 동시에 활성화할 수 없습니다. 하나를 비활성화하세요 (우클릭 → 블록 비활성화)',
 
 	// RC 데이터 읽기 블록
 	RC_GET_JOYSTICK_PREFIX: 'RC 조이스틱',

@@ -18,15 +18,10 @@
                             "NUM": 1
                         }
                     }
-                },
-                "CHANNEL": {
-                    "shadow": {
-                        "type": "math_number",
-                        "fields": {
-                            "NUM": 1
-                        }
-                    }
                 }
+            },
+            "fields": {
+                "CHANNEL": 1
             }
         },
         {
@@ -48,15 +43,10 @@
                             "NUM": 1
                         }
                     }
-                },
-                "CHANNEL": {
-                    "shadow": {
-                        "type": "math_number",
-                        "fields": {
-                            "NUM": 1
-                        }
-                    }
                 }
+            },
+            "fields": {
+                "CHANNEL": 1
             }
         },
         {

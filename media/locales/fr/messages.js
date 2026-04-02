@@ -224,6 +224,8 @@ window.languageManager.loadMessages('fr', {
 	VSCODE_VARIABLE_NAME_EMPTY: 'Le nom de la variable ne peut pas être vide',
 	VSCODE_VARIABLE_NAME_INVALID:
 		'Le nom de la variable ne peut contenir que des lettres, des chiffres et des tirets bas, et ne peut pas commencer par un chiffre',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'Le nom de la variable ne peut contenir que des caractères chinois, des lettres, des chiffres et des tirets bas, et ne peut pas commencer par un chiffre',
 	VSCODE_RELOAD: 'Recharger',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Annuler',
@@ -628,7 +630,7 @@ window.languageManager.loadMessages('fr', {
 	BUTTON_CANCEL: 'Annuler',
 	BUTTON_SUPPRESS: 'Plus demander',
 	SAFETY_GUARD_CANCELLED: "Pas de souci ! On n'a rien changé.",
-	SAFETY_GUARD_SUPPRESSED: "Compris ! On ne te posera plus cette question.",
+	SAFETY_GUARD_SUPPRESSED: 'Compris ! On ne te posera plus cette question.',
 
 	// Communication Category (WiFi/MQTT)
 	CATEGORY_COMMUNICATION: 'Communication',
@@ -931,6 +933,8 @@ window.languageManager.loadMessages('fr', {
 	RC_WAIT_TOOLTIP: 'Attendre connexion émetteur, LED clignote bleu, continue après délai',
 	RC_IS_CONNECTED: 'RC connecté?',
 	RC_IS_CONNECTED_TOOLTIP: 'Vérifier si données reçues dans 500ms',
+	RC_WARNING_CONFLICT:
+		"⚠ L'émetteur et le récepteur ne peuvent pas être activés en même temps. Désactivez l'un d'eux (clic droit → Désactiver le bloc)",
 
 	// Blocs Lecture de données RC
 	RC_GET_JOYSTICK_PREFIX: 'RC joystick',

@@ -222,6 +222,8 @@ window.languageManager.loadMessages('pt-br', {
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Digite o novo nome da variável (atual: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'O nome da variável não pode estar vazio',
 	VSCODE_VARIABLE_NAME_INVALID: 'O nome da variável só pode conter letras, números e sublinhados, e não pode começar com um número',
+	VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON:
+		'O nome da variável só pode conter caracteres chineses, letras, números e sublinhados, e não pode começar com um número',
 	VSCODE_RELOAD: 'Recarregar',
 	VSCODE_OK: 'OK',
 	VSCODE_CANCEL: 'Cancelar',
@@ -952,6 +954,8 @@ window.languageManager.loadMessages('pt-br', {
 	// Blocos status RC
 	RC_IS_CONNECTED: 'RC conectado?',
 	RC_IS_CONNECTED_TOOLTIP: 'Verificar se dados recebidos em 500ms',
+	RC_WARNING_CONFLICT:
+		'⚠ Transmissor e receptor não podem estar ativados ao mesmo tempo. Desative um deles (clique direito → Desativar bloco)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Abrir monitor',
