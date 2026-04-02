@@ -1920,12 +1920,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					callBlockXml += '</mutation>';
 
 					// 為每個參數加入帶有 shadow block 的 value 元素
-					const shadowMap = {
-						int: '<shadow type="math_number"><field name="NUM">0</field></shadow>',
-						float: '<shadow type="math_number"><field name="NUM">0.0</field></shadow>',
-						bool: '<shadow type="logic_boolean"><field name="BOOL">TRUE</field></shadow>',
-						String: '<shadow type="text"><field name="TEXT"></field></shadow>',
-					};
+					const shadowMap = window.PARAM_SHADOW_XML_MAP || {};
 					for (const arg of argShadows) {
 						const shadowXml = shadowMap[arg.type] || '';
 						if (shadowXml) {

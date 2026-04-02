@@ -6,6 +6,16 @@
  */
 
 // 函式積木的 Mutator 定義
+
+// 參數型別對應的 shadow block XML 對應表（共享給 blocklyEdit.js flyout callback 使用）
+const PARAM_SHADOW_XML_MAP = {
+	int: '<shadow type="math_number"><field name="NUM">0</field></shadow>',
+	float: '<shadow type="math_number"><field name="NUM">0.0</field></shadow>',
+	bool: '<shadow type="logic_boolean"><field name="BOOL">TRUE</field></shadow>',
+	String: '<shadow type="text"><field name="TEXT"></field></shadow>',
+};
+window.PARAM_SHADOW_XML_MAP = PARAM_SHADOW_XML_MAP;
+
 const functionMutator = {
 	mutationToDom: function () {
 		if (!this.arguments_ || !this.argumentTypes_) {
@@ -1094,13 +1104,7 @@ Blockly.Blocks['arduino_function_call'] = {
 
 	// 根據參數型別回傳對應的 shadow DOM 元素
 	_getShadowDomForType: function (argType) {
-		const shadowMap = {
-			int: '<shadow type="math_number"><field name="NUM">0</field></shadow>',
-			float: '<shadow type="math_number"><field name="NUM">0.0</field></shadow>',
-			bool: '<shadow type="logic_boolean"><field name="BOOL">TRUE</field></shadow>',
-			String: '<shadow type="text"><field name="TEXT"></field></shadow>',
-		};
-		const shadowXml = shadowMap[argType];
+		const shadowXml = PARAM_SHADOW_XML_MAP[argType];
 		if (shadowXml) {
 			return Blockly.utils.xml.textToDom(shadowXml);
 		}
