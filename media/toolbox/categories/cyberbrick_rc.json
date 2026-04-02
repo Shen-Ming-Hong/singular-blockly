@@ -10,9 +10,23 @@
         {
             "kind": "block",
             "type": "rc_master_init",
-            "fields": {
-                "PAIR_ID": 1,
-                "CHANNEL": 1
+            "inputs": {
+                "PAIR_ID": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                },
+                "CHANNEL": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                }
             }
         },
         {
@@ -26,9 +40,23 @@
         {
             "kind": "block",
             "type": "rc_slave_init",
-            "fields": {
-                "PAIR_ID": 1,
-                "CHANNEL": 1
+            "inputs": {
+                "PAIR_ID": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                },
+                "CHANNEL": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1
+                        }
+                    }
+                }
             }
         },
         {

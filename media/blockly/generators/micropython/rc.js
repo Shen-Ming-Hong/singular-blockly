@@ -18,9 +18,9 @@
 
 	// === 發射端初始化 ===
 	generator.forBlock['rc_master_init'] = function (block) {
-		// 取得參數
-		const pairId = Math.max(1, Math.min(255, Number(block.getFieldValue('PAIR_ID')) || 1));
-		const channel = Math.max(1, Math.min(11, Number(block.getFieldValue('CHANNEL')) || 1));
+		// 取得參數 (支援變數積木輸入)
+		const pairId = generator.valueToCode(block, 'PAIR_ID', generator.ORDER_NONE) || '1';
+		const channel = generator.valueToCode(block, 'CHANNEL', generator.ORDER_NONE) || '1';
 
 		// 添加 import
 		generator.addImport('import network');
@@ -35,7 +35,7 @@
 		// 最佳實踐：增加 rxbuf 大小以避免 NO_MEM 錯誤
 		generator.addHardwareInit(
 			'espnow_master',
-			`_rc_pair_id = ${pairId}
+			`_rc_pair_id = max(1, min(255, int(${pairId})))
 _rc_broadcast = b'\\xff\\xff\\xff\\xff\\xff\\xff'
 _rc_led = NeoPixel(Pin(8), 1)
 _rc_send_fail_count = 0
@@ -44,7 +44,7 @@ _wlan.active(True)
 _wlan.disconnect()
 _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
 time.sleep_ms(100)
-_wlan.config(channel=${channel})
+_wlan.config(channel=max(1, min(11, int(${channel}))))
 _espnow = espnow.ESPNow()
 _espnow.active(True)
 _espnow.config(rxbuf=1024)
@@ -106,9 +106,9 @@ _rc_led.write()
 
 	// === 接收端初始化 ===
 	generator.forBlock['rc_slave_init'] = function (block) {
-		// 取得參數
-		const pairId = Math.max(1, Math.min(255, Number(block.getFieldValue('PAIR_ID')) || 1));
-		const channel = Math.max(1, Math.min(11, Number(block.getFieldValue('CHANNEL')) || 1));
+		// 取得參數 (支援變數積木輸入)
+		const pairId = generator.valueToCode(block, 'PAIR_ID', generator.ORDER_NONE) || '1';
+		const channel = generator.valueToCode(block, 'CHANNEL', generator.ORDER_NONE) || '1';
 
 		// 添加 import
 		generator.addImport('import network');
@@ -129,8 +129,8 @@ _rc_led.write()
 		// 4. 長時間斷線後自動重新初始化 ESP-NOW
 		generator.addHardwareInit(
 			'espnow_slave',
-			`_rc_pair_id = ${pairId}
-_rc_channel = ${channel}
+			`_rc_pair_id = max(1, min(255, int(${pairId})))
+_rc_channel = max(1, min(11, int(${channel})))
 _rc_data = (2048, 2048, 2048, 2048, 2048, 2048, 1, 1, 1, 1)
 _rc_connected = False
 _rc_last_recv = 0
@@ -180,7 +180,7 @@ _wlan.active(True)
 _wlan.disconnect()
 _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
 time.sleep_ms(100)
-_wlan.config(channel=${channel})
+_wlan.config(channel=_rc_channel)
 _espnow = espnow.ESPNow()
 _espnow.active(True)
 _espnow.config(rxbuf=1024)
