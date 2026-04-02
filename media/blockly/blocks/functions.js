@@ -6,6 +6,16 @@
  */
 
 // 函式積木的 Mutator 定義
+
+// 參數型別對應的 shadow block XML 對應表（共享給 blocklyEdit.js flyout callback 使用）
+const PARAM_SHADOW_XML_MAP = {
+	int: '<shadow type="math_number"><field name="NUM">0</field></shadow>',
+	float: '<shadow type="math_number"><field name="NUM">0.0</field></shadow>',
+	bool: '<shadow type="logic_boolean"><field name="BOOL">TRUE</field></shadow>',
+	String: '<shadow type="text"><field name="TEXT"></field></shadow>',
+};
+window.PARAM_SHADOW_XML_MAP = PARAM_SHADOW_XML_MAP;
+
 const functionMutator = {
 	mutationToDom: function () {
 		if (!this.arguments_ || !this.argumentTypes_) {
@@ -728,10 +738,16 @@ Blockly.Blocks['arduino_function_call'] = {
 			const argType = this.argumentTypes_[i] || 'int';
 
 			// 參數輸入使用 null 檢查類型，允許連接任何類型的積木
-			this.appendValueInput('ARG' + i)
+			const input = this.appendValueInput('ARG' + i)
 				.setAlign(Blockly.ALIGN_RIGHT)
 				.appendField(`${argName} (${argType}):`)
 				.setCheck(null);
+
+			// 根據參數型別附加對應的 shadow block 作為預設值
+			const shadowDom = this._getShadowDomForType(argType);
+			if (shadowDom) {
+				input.setShadowDom(shadowDom);
+			}
 		}
 
 		// 設定提示
@@ -1086,6 +1102,15 @@ Blockly.Blocks['arduino_function_call'] = {
 		}
 	},
 
+	// 根據參數型別回傳對應的 shadow DOM 元素
+	_getShadowDomForType: function (argType) {
+		const shadowXml = PARAM_SHADOW_XML_MAP[argType];
+		if (shadowXml) {
+			return Blockly.utils.xml.textToDom(shadowXml);
+		}
+		return null;
+	},
+
 	// 建立參數輸入
 	_createParameterInputs: function () {
 		// 為每個參數建立輸入
@@ -1094,10 +1119,16 @@ Blockly.Blocks['arduino_function_call'] = {
 			const argType = this.argumentTypes_[i] || 'int';
 
 			// 參數輸入使用 null 檢查類型，允許最大兼容性
-			this.appendValueInput('ARG' + i)
+			const input = this.appendValueInput('ARG' + i)
 				.setAlign(Blockly.ALIGN_RIGHT)
 				.appendField(`${argName} (${argType}):`)
 				.setCheck(null);
+
+			// 根據參數型別附加對應的 shadow block 作為預設值
+			const shadowDom = this._getShadowDomForType(argType);
+			if (shadowDom) {
+				input.setShadowDom(shadowDom);
+			}
 		}
 	},
 
