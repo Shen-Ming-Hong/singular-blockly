@@ -180,7 +180,7 @@ _wlan.active(True)
 _wlan.disconnect()
 _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
 time.sleep_ms(100)
-_wlan.config(channel=max(1, min(11, int(${channel}))))
+_wlan.config(channel=_rc_channel)
 _espnow = espnow.ESPNow()
 _espnow.active(True)
 _espnow.config(rxbuf=1024)
