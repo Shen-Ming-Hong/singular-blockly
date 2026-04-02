@@ -8,6 +8,16 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.7] - 2026-04-02
+
+### ✨ 新功能 New Features
+
+- **RC 積木配對 ID 與頻道支援變數輸入** (RC init blocks accept variable inputs for pair ID and channel)
+    - `rc_master_init` 和 `rc_slave_init` 的配對 ID / 頻道欄位從固定數字改為 ValueInput，可連接變數積木、數學運算積木等動態值
+      Changed PAIR_ID/CHANNEL fields from FieldNumber to ValueInput with math_number shadow blocks (default: 1)
+    - MicroPython 生成器加入 Python runtime clamping 保護（配對 ID: 1-255，頻道: 1-11）
+      MicroPython generator uses valueToCode with runtime clamping (pair ID: 1-255, channel: 1-11)
+
 ## [0.67.6] - 2026-03-28
 
 ### 🔒 安全性修復 Security Fixes
