@@ -1906,16 +1906,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 					`;
 
 					// 添加函數參數資訊（作為 mutation 的子元素）
+					const argShadows = [];
 					if (functionBlock.arguments_ && functionBlock.arguments_.length > 0) {
 						for (let i = 0; i < functionBlock.arguments_.length; i++) {
 							const argName = functionBlock.arguments_[i] || '';
 							const argType = functionBlock.argumentTypes_[i] || 'int';
 							callBlockXml += `<arg name="${argName}" type="${argType}"></arg>`;
+							argShadows.push({ index: i, type: argType });
 						}
 					}
 
-					// 關閉 mutation 和 block 標籤
-					callBlockXml += '</mutation></block>';
+					// 關閉 mutation 標籤
+					callBlockXml += '</mutation>';
+
+					// 為每個參數加入帶有 shadow block 的 value 元素
+					const shadowMap = {
+						int: '<shadow type="math_number"><field name="NUM">0</field></shadow>',
+						float: '<shadow type="math_number"><field name="NUM">0.0</field></shadow>',
+						bool: '<shadow type="logic_boolean"><field name="BOOL">TRUE</field></shadow>',
+						String: '<shadow type="text"><field name="TEXT"></field></shadow>',
+					};
+					for (const arg of argShadows) {
+						const shadowXml = shadowMap[arg.type] || '';
+						if (shadowXml) {
+							callBlockXml += `<value name="ARG${arg.index}">${shadowXml}</value>`;
+						}
+					}
+
+					// 關閉 block 標籤
+					callBlockXml += '</block>';
 
 					// 轉換為 DOM 元素並添加到積木列表
 					const callBlockDom = blocklyUtils.textToDom(callBlockXml);
