@@ -25,7 +25,7 @@
 
 **⚠️ CRITICAL**: 所有 User Story 的 Extension Host 實作均依賴此 service 存在。
 
-- [ ] T002 建立 `src/services/sampleBrowserService.ts`，包含：TypeScript 型別介面（`SampleIndex`、`SampleEntry`、`LocalizedText`、`SampleWorkspace`、`FetchResult<T>`）、`fetchWithTimeout(url, ms)` 工具函式（含 `AbortController`）、`fetchSampleIndex(extensionPath)` 函式（雲端優先 + 10s timeout + 本機 fallback，回傳 `FetchResult<SampleIndex>`）、`fetchSampleWorkspace(filename, extensionPath)` 函式（雲端優先 + 10s timeout + 本機 fallback，回傳 `FetchResult<SampleWorkspace>`）、`validateSampleWorkspace(json)` 函式（確認 `workspace` 欄位存在且 `board === 'cyberbrick'`）
+- [ ] T002 建立 `src/services/sampleBrowserService.ts`，包含：TypeScript 型別介面（`SampleIndex`、`SampleEntry`、`LocalizedText`、`SampleWorkspace`、`FetchResult<T>`）、`fetchWithTimeout(url, ms)` 工具函式（含 `AbortController`）、`fetchSampleIndex(extensionPath)` 函式（雲端優先 + 10s timeout + 本機 fallback，回傳 `FetchResult<SampleIndex>`）、`fetchSampleWorkspace(filename, extensionPath)` 函式（雲端優先 + 10s timeout + 本機 fallback，回傳 `FetchResult<SampleWorkspace>`）、`validateSampleWorkspace(json)` 函式（確認 `workspace` 欄位存在且 `board === 'cyberbrick'`）；所有 fallback 觸發、timeout 事件、驗證失敗均呼叫 `log()` from `src/services/logging.ts`（Constitution VI 結構化日誌要求）
 
 **Checkpoint**: SampleBrowserService 建立完成，可開始所有 User Story 實作
 
@@ -42,12 +42,12 @@
 - [ ] T003 [P] [US1] 在所有 15 個 `media/locales/*/messages.js` 新增 10 個 SAMPLE*BROWSER*\* i18n 鍵值（`SAMPLE_BROWSER_BUTTON_TITLE`、`SAMPLE_BROWSER_TITLE`、`SAMPLE_BROWSER_LOADING`、`SAMPLE_BROWSER_OFFLINE_NOTICE`、`SAMPLE_BROWSER_LOAD_BUTTON`、`SAMPLE_BROWSER_EMPTY`、`SAMPLE_BROWSER_CONFIRM_LOAD`、`SAMPLE_BROWSER_CONFIRM_YES`、`SAMPLE_BROWSER_CONFIRM_NO`、`SAMPLE_BROWSER_ERROR_INVALID`）
 - [ ] T004 [US1] 在 `media/html/blocklyEdit.html` 工具列區域新增：`<div class="sample-switch" id="sampleContainer" style="display:none">` 包含 book-open SVG 圖示按鈕（`id="sampleButton"`），以及 `<div id="sampleModal">` 模態結構（含標題列、loading spinner `id="sampleSpinner"`、離線提示橫幅 `id="sampleOfflineNotice"` 預設隱藏、卡片容器 `id="sampleCardContainer"`、空清單提示 `id="sampleEmptyNotice"` 預設隱藏、關閉按鈕）
 - [ ] T005 [P] [US1] 在 `media/css/blocklyEdit.css` 新增：`.sample-switch` 按鈕容器樣式（對齊工具列 `.backup-switch` 模式）、`#sampleModal` 覆層 + 卡片格線樣式、`.sample-card` 卡片樣式（標題、描述、載入按鈕）、`@keyframes` spinner 旋轉動畫、`#sampleOfflineNotice` 離線提示橫幅樣式
-- [ ] T006 [US1] 在 `media/js/blocklyEdit.js` 的 `DOMContentLoaded` 事件處理段落新增：取得 `sampleButton` 元素，綁定 click 事件 → 計算 `hasBlocks`（`Blockly.getMainWorkspace().getAllBlocks(false).length > 0`）→ `vscode.postMessage({ command: 'openSampleBrowserRequest', hasBlocks })`，並在按下時顯示模態骨架（spinner 可見）
+- [ ] T006 [US1] 在 `media/js/blocklyEdit.js` 的 `DOMContentLoaded` 事件處理段落新增：取得 `sampleButton` 元素，設定 `sampleButton.title` 為 `window.languageManager.getMessage('SAMPLE_BROWSER_BUTTON_TITLE')`（語言管理器初始化後執行，與其他工具列按鈕相同時機）；綁定 click 事件 → 若 `#sampleModal` 已可見則直接 return（模態單例保護，防止重複開啟）→ 計算 `hasBlocks`（`Blockly.getMainWorkspace().getAllBlocks(false).length > 0`）→ `vscode.postMessage({ command: 'openSampleBrowserRequest', hasBlocks })`，並在按下時顯示模態骨架（spinner 可見）；另綁定 `#sampleModal` 關閉按鈕的 click → 將模態設為隱藏（`sampleModal.style.display = 'none'`；可選：點擊模態背景遮罩亦觸發相同關閉邏輯）
 - [ ] T007 [US1] 在 `media/js/blocklyEdit.js` `window.addEventListener('message')` switch/case 新增 `showSampleBrowser` case：隱藏 spinner、依 `samples` 陣列動態建立 `.sample-card` DOM 元素（含本地化 title/description 解析：`entry.title[language] ?? entry.title['en']`）、若 `samples` 為空則顯示 `#sampleEmptyNotice`
 - [ ] T008 [US1] 在 `media/js/blocklyEdit.js` 卡片容器委派事件（或每張卡片個別綁定）：偵測「載入」按鈕點擊 → `vscode.postMessage({ command: 'loadSelectedSampleRequest', filename, hasBlocks })`
 - [ ] T009 [US1] 在 `media/js/blocklyEdit.js` `window.addEventListener('message')` switch/case 新增 `loadSampleWorkspace` case：關閉 `#sampleModal`、呼叫 `handleWorkspaceLoadMessage(message)` 載入工作區（與現有 loadWorkspace 相同處理路徑）
 - [ ] T010 [P] [US1] 在 `src/webview/messageHandler.ts` `handleMessage()` switch 中新增 `case 'openSampleBrowserRequest'`，呼叫 `await this.handleOpenSampleBrowser(message)`
-- [ ] T011 [US1] 在 `src/webview/messageHandler.ts` 新增 `private async handleOpenSampleBrowser(message)` 方法：呼叫 `fetchSampleIndex(this.extensionPath)`，取得 language（從 `settingsManager` 或 vscode.env.language），post `showSampleBrowser` 訊息（`samples`, `isOffline`, `language`）至 WebView
+- [ ] T011 [US1] 在 `src/webview/messageHandler.ts` 新增 `private async handleOpenSampleBrowser(message)` 方法：呼叫 `fetchSampleIndex(this.extensionPath)`，取得 language（優先使用 `settingsManager` 中已儲存的語系設定；若未設定則 fallback 至 `vscode.env.language`，再 fallback 至 `'en'`），post `showSampleBrowser` 訊息（`samples`, `isOffline`, `language`）至 WebView
 - [ ] T012 [US1] 在 `src/webview/messageHandler.ts` `handleMessage()` switch 中新增 `case 'loadSelectedSampleRequest'`，呼叫 `await this.handleLoadSelectedSample(message)`
 - [ ] T013 [US1] 在 `src/webview/messageHandler.ts` 新增 `private async handleLoadSelectedSample(message)` 方法：若 `message.hasBlocks` 則顯示 `vscode.window.showWarningMessage()` 確認（使用者取消則返回）、呼叫 `fetchSampleWorkspace(filename, this.extensionPath)`、呼叫 `validateSampleWorkspace(data)`（失敗顯示 `showErrorMessage()` 並返回）、post `loadSampleWorkspace` 訊息至 WebView
 
@@ -63,7 +63,7 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [US2] 在 `media/js/blocklyEdit.js` `showSampleBrowser` case 中，依 `message.isOffline` 旗標切換 `#sampleOfflineNotice` 的 `display` 屬性（`true` 時顯示，`false` 時隱藏）；離線文字內容取自 `window.languageManager` 解析 `SAMPLE_BROWSER_OFFLINE_NOTICE` i18n 鍵值
+- [ ] T014 [US2] 在 T007 建立的 `showSampleBrowser` case handler 中，補充依 `message.isOffline` 旗標切換 `#sampleOfflineNotice` 的 `display` 屬性（`true` 時顯示，`false` 時隱藏）；離線文字內容取自 `window.languageManager` 解析 `SAMPLE_BROWSER_OFFLINE_NOTICE` i18n 鍵值
 
 **Checkpoint**: User Stories 1 & 2 均可獨立驗證——有網路時正常載入、無網路時自動 fallback 並顯示提示
 
@@ -101,7 +101,7 @@
 
 **Purpose**: 測試覆蓋、i18n 驗證與手動驗收測試。
 
-- [ ] T017 建立 `src/test/suite/services/sampleBrowserService.test.ts`：測試 `fetchWithTimeout` timeout 觸發後回傳錯誤、`fetchSampleIndex` 在 HTTP 失敗時 `isOffline === true` 且回傳本機資料、`validateSampleWorkspace` 傳入有效資料回傳 `true`、傳入缺少 `workspace` 欄位回傳 `false`、傳入 `board !== 'cyberbrick'` 回傳 `false`
+- [ ] T017 建立 `src/test/suite/services/sampleBrowserService.test.ts`：測試 `fetchWithTimeout` timeout 觸發後回傳錯誤、`fetchSampleIndex` 在 HTTP 失敗時 `isOffline === true` 且回傳本機資料、`fetchSampleWorkspace` 在 HTTP 失敗時 `isOffline === true` 且回傳本機對應檔案、本機 fallback 讀取失敗時拋出包含錯誤訊息的 Error、`validateSampleWorkspace` 傳入有效資料回傳 `true`、傳入缺少 `workspace` 欄位回傳 `false`、傳入 `board !== 'cyberbrick'` 回傳 `false`
 - [ ] T018 [P] 執行 `npm run validate:i18n` 確認 15 個語系的 SAMPLE*BROWSER*\* 鍵值均完整，無遺漏
 - [ ] T019 依據 `specs/048-cyberbrick-sample-browser/quickstart.md` 手動測試清單執行 P1–P4 所有驗收場景（有網路 / 無網路 / Arduino 板 / 空白工作區 / 有積木工作區）
 
