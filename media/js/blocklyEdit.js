@@ -2267,11 +2267,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 					build_flags: generator.build_flags_ || [],
 					lib_ldf_mode: generator.lib_ldf_mode_ || null,
 				});
-				saveWorkspaceState();
-				pendingCodeUpdate = false;
 			} catch (err) {
-				log.info('代碼生成暫時性錯誤（可能是積木正在拖動）:', err);
+				log.warn('代碼生成錯誤（積木設定有問題，仍繼續儲存工作區）:', err);
 			}
+			// 無論代碼生成是否成功，都執行儲存和標記完成
+			saveWorkspaceState();
+			pendingCodeUpdate = false;
 		}, 300); // T015: 300ms 延遲，配合剪貼簿操作鎖定機制
 	};
 

@@ -318,10 +318,10 @@
 	 */
 	generator.forBlock['math_map'] = function (block) {
 		const value = generator.valueToCode(block, 'VALUE', generator.ORDER_NONE) || '0';
-		const fromLow = generator.valueToCode(block, 'FROMLOW', generator.ORDER_NONE) || '0';
-		const fromHigh = generator.valueToCode(block, 'FROMHIGH', generator.ORDER_NONE) || '1023';
-		const toLow = generator.valueToCode(block, 'TOLOW', generator.ORDER_NONE) || '0';
-		const toHigh = generator.valueToCode(block, 'TOHIGH', generator.ORDER_NONE) || '255';
+		const fromLow = generator.valueToCode(block, 'FROM_LOW', generator.ORDER_NONE) || '0';
+		const fromHigh = generator.valueToCode(block, 'FROM_HIGH', generator.ORDER_NONE) || '1023';
+		const toLow = generator.valueToCode(block, 'TO_LOW', generator.ORDER_NONE) || '0';
+		const toHigh = generator.valueToCode(block, 'TO_HIGH', generator.ORDER_NONE) || '255';
 
 		// 定義 map 函數
 		generator.addFunction(

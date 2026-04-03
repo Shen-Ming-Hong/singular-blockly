@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.10] - 2026-04-03
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick MicroPython 積木關閉後狀態回退問題** (Fix block state revert on panel close in CyberBrick MicroPython mode)
+    - 修正 `math_map` 的 MicroPython 生成器中 4 個輸入名稱錯誤（`FROMLOW/FROMHIGH/TOLOW/TOHIGH` → `FROM_LOW/FROM_HIGH/TO_LOW/TO_HIGH`），這些名稱與積木定義不符導致 Blockly 12.x 的 `valueToCode()` 拋出 `ReferenceError`，例外被靜默吞掉後 `saveWorkspaceState()` 從未被呼叫，造成關閉/重開面板後積木回退
+      Fixed 4 wrong input names in the `math_map` MicroPython generator; mismatched names caused Blockly 12.x `valueToCode()` to throw a `ReferenceError` which was silently swallowed, preventing `saveWorkspaceState()` from running and causing state revert on panel close/reopen
+    - **防禦性修復**：將 `saveWorkspaceState()` 移至 `debouncedCodeUpdate` 的 try/catch **外部**，確保無論代碼生成是否拋出例外，工作區狀態一律儲存
+      **Defensive fix**: Moved `saveWorkspaceState()` outside the try/catch in `debouncedCodeUpdate` so workspace is always saved regardless of code generation errors
+
+### ✨ 新功能 New Features
+
+- **`controls_duration` MicroPython 生成器** (Add MicroPython generator for `controls_duration` block)
+    - 新增「計時重複」積木的 MicroPython 生成器，使用 `time.ticks_ms()` / `time.ticks_diff()` 實作（正確處理 32-bit 計時器溢位），並使用 `getDistinctName` 確保巢狀使用時不會有變數衝突
+      Added MicroPython generator for the duration-loop block using `time.ticks_ms()` / `time.ticks_diff()` for 32-bit overflow-safe timing, with `getDistinctName` to prevent variable conflicts in nested usage
+
 ## [0.67.9] - 2026-04-03
 
 ### ✨ 新功能 New Features

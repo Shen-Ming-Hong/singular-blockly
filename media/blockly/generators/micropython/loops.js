@@ -129,6 +129,30 @@
 	};
 
 	/**
+	 * 計時重複（在指定毫秒內持續執行）
+	 */
+	generator.forBlock['controls_duration'] = function (block) {
+		// 深層防護：孤立積木不生成程式碼
+		if (!generator.isInAllowedContext(block)) {
+			return '';
+		}
+
+		generator.addImport('import time');
+
+		const duration = generator.valueToCode(block, 'DURATION', generator.ORDER_NONE) || '0';
+		let branch = generator.statementToCode(block, 'DO');
+		branch = branch || generator.INDENT + 'pass\n';
+
+		// 使用唯一變數名避免巢狀使用時衝突
+		const timeVar = generator.nameDB_.getDistinctName('start_ms', Blockly.VARIABLE_CATEGORY_NAME);
+
+		// time.ticks_diff 可正確處理 32-bit 計時器溢位
+		const code =
+			timeVar + ' = time.ticks_ms()\n' + 'while time.ticks_diff(time.ticks_ms(), ' + timeVar + ') < ' + duration + ':\n' + branch;
+		return code;
+	};
+
+	/**
 	 * 迴圈流程控制（break/continue）
 	 */
 	generator.forBlock['singular_flow_statements'] = function (block) {
