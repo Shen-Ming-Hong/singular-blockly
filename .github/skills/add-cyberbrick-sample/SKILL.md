@@ -1,22 +1,22 @@
 ---
 name: add-cyberbrick-sample
-description: 新增 CyberBrick MicroPython 範例工作區的完整工作流程。當使用者提到新增範例、add sample、建立範例積木、新增 CyberBrick 示範程式、sample workspace、範例工作區 時自動啟用。包含從 Blockly 工作區匯出 JSON、建立範例檔、更新索引、15 語系翻譯填寫、本機驗證到推送上線的完整流程。Full workflow for adding a new CyberBrick MicroPython sample workspace: export Blockly JSON, create sample file, update index, fill 15-language translations, local validation, and push to production.
+description: 新增或更新 CyberBrick MicroPython 範例工作區的完整工作流程。當使用者提到新增範例、更新範例、add sample、update sample、修改範例積木、建立範例積木、新增 CyberBrick 示範程式、sample workspace、範例工作區 時自動啟用。包含從 Blockly 工作區匯出 JSON、建立或覆蓋範例檔、更新索引、15 語系翻譯填寫、本機驗證到推送上線的完整流程。Full workflow for adding or updating a CyberBrick MicroPython sample workspace: export Blockly JSON, create or overwrite sample file, update index, fill 15-language translations, local validation, and push to production.
 metadata:
     author: singular-blockly
-    version: '1.0.0'
+    version: '1.1.0'
     category: content
-argument-hint: '範例名稱（英文 kebab-case），例如 cyberbrick-line-follower'
+argument-hint: 'add | update，以及範例名稱（英文 kebab-case），例如 update cyberbrick-soccer-robot'
 license: Apache-2.0
 ---
 
-# 新增 CyberBrick 範例工作區技能 Add CyberBrick Sample Skill
+# 新增或更新 CyberBrick 範例工作區技能 Add / Update CyberBrick Sample Skill
 
-在 `media/samples/` 新增一個合規的 CyberBrick MicroPython 範例工作區，並更新雲端索引 `index.json`，完成 15 語系本地化描述。
+在 `media/samples/` 新增或更新一個合規的 CyberBrick MicroPython 範例工作區，並同步雲端索引 `index.json`，完成 15 語系本地化描述。
 
 ## 適用情境 When to Use
 
-- 想新增 CyberBrick 專題範例（如巡線機器人、避障機器人）
-- 更新現有範例的積木內容
+- 想**新增** CyberBrick 專題範例（如巡線機器人、避障機器人）
+- 想**更新**現有範例的積木內容或翻譯描述
 - 驗證範例能被範例瀏覽器正確載入
 
 ## 架構背景 Architecture Context
@@ -107,9 +107,28 @@ Copy-Item media/samples/cyberbrick-soccer-robot.json media/samples/{new-filename
 
 若使用者提供的 `main.json` 已是完整的工作區 JSON（含 `blocks`、`variables` 等），則整個物件作為 `workspace` 的值。
 
-### Phase 3: 更新索引 Update index.json
+### Phase 3: 同步索引 Sync index.json
 
-在 `media/samples/index.json` 的 `samples` 陣列**末尾**新增條目：
+**依照 Phase 0 判斷的模式執行：**
+
+#### ADD 模式：在 `samples` 陣列末尾新增條目
+
+#### UPDATE metadata 模式：找到對應 `id` 的條目，只更新 `title` / `description` 欄位，**保留其他欄位不變**
+
+```powershell
+# 確認目標 id 存在
+$index = Get-Content media/samples/index.json | ConvertFrom-Json
+$entry = $index.samples | Where-Object { $_.id -eq "{id}" }
+if (-not $entry) { Write-Error "id '{id}' not found in index.json" }
+```
+
+#### UPDATE workspace 模式：**直接跳過此步驟**（index.json 無需異動）
+
+---
+
+**ADD / UPDATE metadata 使用的完整條目格式：**
+
+在 `media/samples/index.json` 的 `samples` 陣列**末尾**新增條目（ADD），或直接更新對應條目的 title/description（UPDATE metadata）：
 
 ```json
 {
@@ -196,9 +215,25 @@ npm run compile
 
 ### Phase 5: 提交與推送 Commit & Push
 
-```bash
+**依據模式選擇對應的 commit message 與 staged 檔案：**
+
+```powershell
+# ADD 模式（新增範例）
 git add media/samples/{filename}.json media/samples/index.json
 git commit -m "feat(samples): add {id} sample workspace"
+
+# UPDATE workspace 模式（只更新積木內容）
+git add media/samples/{filename}.json
+git commit -m "fix(samples): update {id} workspace content"
+
+# UPDATE metadata 模式（只更新翻譯/描述）
+git add media/samples/index.json
+git commit -m "i18n(samples): update {id} title/description"
+
+# UPDATE both 模式
+git add media/samples/{filename}.json media/samples/index.json
+git commit -m "feat(samples): update {id} workspace and metadata"
+
 git push origin master
 ```
 
@@ -243,10 +278,29 @@ description: "{英文描述}"
 
 ## 完成檢核 Completion Checklist
 
+### ADD 模式
+
 - [ ] `media/samples/{filename}.json` 已建立，結構合規（有 `workspace` 物件、`board: "cyberbrick"`）
-- [ ] `media/samples/index.json` 已更新，含新條目（`id` 唯一、`title.en` 和 `description.en` 非空）
+- [ ] `media/samples/index.json` 已新增條目（`id` 唯一、`title.en` 和 `description.en` 非空）
 - [ ] 15 語系 title/description 已填寫（或至少 `en` + `zh-hant` 已填寫）
 - [ ] 本機 JSON 格式驗證通過
-- [ ] Extension 本機測試時卡片顯示正確、積木可載入
-- [ ] 變更已 commit 並推送至 master
+- [ ] Extension 本機測試時**新卡片**顯示正確、積木可載入
+- [ ] `git commit -m "feat(samples): add {id}..."` 已推送至 master
+
+### UPDATE workspace 模式
+
+- [ ] `media/samples/{filename}.json` 已覆蓋，結構合規
+- [ ] `media/samples/index.json` **未被異動**
+- [ ] 本機測試時載入範例確認積木內容為最新版本
+- [ ] `git commit -m "fix(samples): update {id} workspace content"` 已推送至 master
+
+### UPDATE metadata 模式
+
+- [ ] `media/samples/index.json` 中對應條目的 title/description 已更新
+- [ ] `media/samples/{filename}.json` **未被異動**
+- [ ] 本機測試時卡片顯示更新後的 title/description
+- [ ] `git commit -m "i18n(samples): update {id} title/description"` 已推送至 master
+
+### 通用
+
 - [ ] 推送後 30 秒確認雲端可存取
