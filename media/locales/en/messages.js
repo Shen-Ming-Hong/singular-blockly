@@ -974,4 +974,16 @@ window.languageManager.loadMessages('en', {
 	AI_SUGGESTION_TAB_HINT: 'Tab to accept · Esc to dismiss',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab accept · Alt+]/[ switch · Esc dismiss',
 	AI_QUOTA_EXHAUSTED: 'Copilot quota exhausted. Resets next month or upgrade your plan.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'Load Sample',
+	SAMPLE_BROWSER_TITLE: 'CyberBrick Samples',
+	SAMPLE_BROWSER_LOADING: 'Loading samples...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: 'Using built-in samples (offline)',
+	SAMPLE_BROWSER_LOAD_BUTTON: 'Load',
+	SAMPLE_BROWSER_EMPTY: 'No samples available',
+	SAMPLE_BROWSER_CONFIRM_LOAD: 'This will replace your current workspace. Continue?',
+	SAMPLE_BROWSER_CONFIRM_YES: 'Load Sample',
+	SAMPLE_BROWSER_CONFIRM_NO: 'Cancel',
+	SAMPLE_BROWSER_ERROR_INVALID: 'Invalid sample format, cannot load',
 });

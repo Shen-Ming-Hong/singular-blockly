@@ -972,4 +972,16 @@ window.languageManager.loadMessages('ja', {
 	AI_SUGGESTION_TAB_HINT: 'Tab で適用 · Esc で無視',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 適用 · Alt+]/[ 切替 · Esc 無視',
 	AI_QUOTA_EXHAUSTED: 'Copilot のクォータが上限に達しました。来月リセットされるか、プランをアップグレードしてください。',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'サンプルを読み込む',
+	SAMPLE_BROWSER_TITLE: 'CyberBrick サンプル',
+	SAMPLE_BROWSER_LOADING: 'サンプルを読み込み中...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: '内蔵バージョンを使用中（オフライン）',
+	SAMPLE_BROWSER_LOAD_BUTTON: '読み込む',
+	SAMPLE_BROWSER_EMPTY: '利用可能なサンプルがありません',
+	SAMPLE_BROWSER_CONFIRM_LOAD: '現在のワークスペースを上書きします。続けますか？',
+	SAMPLE_BROWSER_CONFIRM_YES: 'サンプルを読み込む',
+	SAMPLE_BROWSER_CONFIRM_NO: 'キャンセル',
+	SAMPLE_BROWSER_ERROR_INVALID: 'サンプル形式が無効で、読み込めません',
 });

@@ -984,4 +984,16 @@ window.languageManager.loadMessages('hu', {
 	AI_SUGGESTION_TAB_HINT: 'Tab az elfogadáshoz · Esc az elvetéshez',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab elfogad · Alt+]/[ váltás · Esc elvet',
 	AI_QUOTA_EXHAUSTED: 'A Copilot kvóta kimürlt. Jövő hónapban újraindul vagy frísítse a csomagot.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'Példa betöltése',
+	SAMPLE_BROWSER_TITLE: 'CyberBrick példák',
+	SAMPLE_BROWSER_LOADING: 'Példák betöltése...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: 'Beépített verzió használata (offline)',
+	SAMPLE_BROWSER_LOAD_BUTTON: 'Betöltés',
+	SAMPLE_BROWSER_EMPTY: 'Nincs elérhető példa',
+	SAMPLE_BROWSER_CONFIRM_LOAD: 'Ez felülírja a jelenlegi munkaterületet. Folytatja?',
+	SAMPLE_BROWSER_CONFIRM_YES: 'Példa betöltése',
+	SAMPLE_BROWSER_CONFIRM_NO: 'Mégse',
+	SAMPLE_BROWSER_ERROR_INVALID: 'Érvénytelen példaformátum, nem tölthető be',
 });

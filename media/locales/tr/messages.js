@@ -982,4 +982,16 @@ window.languageManager.loadMessages('tr', {
 	AI_SUGGESTION_TAB_HINT: 'Kabul etmek için Tab · Yoksaymak için Esc',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab kabul · Alt+]/[ geçiş · Esc yoksay',
 	AI_QUOTA_EXHAUSTED: 'Copilot kotası tükendi. Gelecek ay sıfırlanır veya planınızı yükseltin.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'Örnek yükle',
+	SAMPLE_BROWSER_TITLE: 'CyberBrick Örnekleri',
+	SAMPLE_BROWSER_LOADING: 'Örnekler yükleniyor...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: 'Yerleşik sürüm kullanılıyor (çevrimdışı)',
+	SAMPLE_BROWSER_LOAD_BUTTON: 'Yükle',
+	SAMPLE_BROWSER_EMPTY: 'Kullanılabilir örnek yok',
+	SAMPLE_BROWSER_CONFIRM_LOAD: 'Bu, mevcut çalışma alanını değiştirecektir. Devam edilsin mi?',
+	SAMPLE_BROWSER_CONFIRM_YES: 'Örnek yükle',
+	SAMPLE_BROWSER_CONFIRM_NO: 'İptal',
+	SAMPLE_BROWSER_ERROR_INVALID: 'Geçersiz örnek biçimi, yüklenemiyor',
 });

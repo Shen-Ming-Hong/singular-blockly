@@ -979,4 +979,16 @@ window.languageManager.loadMessages('es', {
 	AI_SUGGESTION_TAB_HINT: 'Tab para aceptar · Esc para ignorar',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab aceptar · Alt+]/[ cambiar · Esc ignorar',
 	AI_QUOTA_EXHAUSTED: 'Cuota de Copilot agotada. Se restablece el próximo mes o actualice su plan.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'Cargar ejemplo',
+	SAMPLE_BROWSER_TITLE: 'Ejemplos de CyberBrick',
+	SAMPLE_BROWSER_LOADING: 'Cargando ejemplos...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: 'Usando la versión incorporada (sin conexión)',
+	SAMPLE_BROWSER_LOAD_BUTTON: 'Cargar',
+	SAMPLE_BROWSER_EMPTY: 'No hay ejemplos disponibles',
+	SAMPLE_BROWSER_CONFIRM_LOAD: '¿Esto reemplazará el espacio de trabajo actual. Continuar?',
+	SAMPLE_BROWSER_CONFIRM_YES: 'Cargar ejemplo',
+	SAMPLE_BROWSER_CONFIRM_NO: 'Cancelar',
+	SAMPLE_BROWSER_ERROR_INVALID: 'Formato de ejemplo inválido, no se puede cargar',
 });
