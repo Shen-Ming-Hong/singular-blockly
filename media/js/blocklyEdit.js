@@ -3245,13 +3245,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 							const desc = (entry.description && (entry.description[lang] || entry.description['en'])) || '';
 							const card = document.createElement('div');
 							card.className = 'sample-card';
-							card.innerHTML = `
-								<div class="sample-card-title">${title}</div>
-								<div class="sample-card-description">${desc}</div>
-								<button class="primary-btn sample-card-load-btn" data-filename="${entry.filename}">${loadBtnText}</button>
-							`;
+
+							const titleElement = document.createElement('div');
+							titleElement.className = 'sample-card-title';
+							titleElement.textContent = title;
+
+							const descriptionElement = document.createElement('div');
+							descriptionElement.className = 'sample-card-description';
+							descriptionElement.textContent = desc;
+
+							const btn = document.createElement('button');
+							btn.className = 'primary-btn sample-card-load-btn';
+							btn.textContent = loadBtnText;
+							btn.dataset.filename = String(entry.filename || '');
+
+							card.appendChild(titleElement);
+							card.appendChild(descriptionElement);
+							card.appendChild(btn);
+
 							// T008: 卡片載入按鈕事件
-							const btn = card.querySelector('.sample-card-load-btn');
 							btn.addEventListener('click', () => {
 								const hasBlocks = Blockly.getMainWorkspace().getAllBlocks(false).length > 0;
 								vscode.postMessage({

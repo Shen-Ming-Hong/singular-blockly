@@ -118,6 +118,24 @@ export async function fetchSampleIndex(
 // ─── Sample Workspace ────────────────────────────────────────────────────────
 
 /**
+ * Validate that a sample filename is a safe basename with .json extension.
+ * Throws if the filename contains path separators or is not a .json file.
+ */
+function validateSampleFilename(filename: string): string {
+	if (
+		filename.length === 0 ||
+		filename !== path.basename(filename) ||
+		filename.includes('/') ||
+		filename.includes('\\') ||
+		path.extname(filename) !== '.json'
+	) {
+		log(`Rejected invalid sample filename '${filename}'`, 'warn');
+		throw new Error(`Invalid sample filename '${filename}'`);
+	}
+	return filename;
+}
+
+/**
  * Fetch a specific sample workspace JSON, with cloud-first strategy and local fallback.
  */
 export async function fetchSampleWorkspace(
@@ -125,36 +143,38 @@ export async function fetchSampleWorkspace(
 	extensionPath: string,
 	readFileSyncFn: typeof fs.readFileSync = fs.readFileSync
 ): Promise<FetchResult<SampleWorkspace>> {
+	const safeFilename = validateSampleFilename(filename);
+
 	// 1. Try cloud
 	try {
-		const url = SAMPLE_BASE_URL + filename;
+		const url = SAMPLE_BASE_URL + safeFilename;
 		const response = await fetchWithTimeout(url, FETCH_TIMEOUT_MS);
 		if (!response.ok) {
 			throw new Error(`HTTP ${response.status}`);
 		}
 		const data = (await response.json()) as SampleWorkspace;
-		log(`Sample workspace '${filename}' fetched from cloud`, 'info');
+		log(`Sample workspace '${safeFilename}' fetched from cloud`, 'info');
 		return { data, isOffline: false };
 	} catch (err: unknown) {
 		const isTimeout = err instanceof Error && err.name === 'AbortError';
 		log(
 			isTimeout
-				? `Sample workspace '${filename}' fetch timed out after ${FETCH_TIMEOUT_MS}ms, falling back to local copy`
-				: `Sample workspace '${filename}' fetch failed: ${String(err)}, falling back to local copy`,
+				? `Sample workspace '${safeFilename}' fetch timed out after ${FETCH_TIMEOUT_MS}ms, falling back to local copy`
+				: `Sample workspace '${safeFilename}' fetch failed: ${String(err)}, falling back to local copy`,
 			'warn'
 		);
 	}
 
 	// 2. Fallback to local bundled copy
-	const localPath = path.join(extensionPath, 'media', 'samples', filename);
+	const localPath = path.join(extensionPath, 'media', 'samples', safeFilename);
 	try {
 		const raw = readFileSyncFn(localPath, 'utf-8') as string;
 		const data = JSON.parse(raw) as SampleWorkspace;
-		log(`Sample workspace '${filename}' loaded from local copy`, 'info');
+		log(`Sample workspace '${safeFilename}' loaded from local copy`, 'info');
 		return { data, isOffline: true };
 	} catch (err) {
-		log(`Sample workspace '${filename}' local fallback failed: ${String(err)}`, 'error');
-		throw new Error(`Cannot load sample workspace '${filename}': ${String(err)}`);
+		log(`Sample workspace '${safeFilename}' local fallback failed: ${String(err)}`, 'error');
+		throw new Error(`Cannot load sample workspace '${safeFilename}': ${String(err)}`);
 	}
 }
 

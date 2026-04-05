@@ -1813,7 +1813,20 @@ export class WebViewMessageHandler {
 			await this.createBackupBeforeSave(mainJsonPath);
 		}
 
-		const result = await fetchSampleWorkspace(message.filename, extensionPath);
+		let result;
+		try {
+			result = await fetchSampleWorkspace(message.filename, extensionPath);
+		} catch (err) {
+			const errMsg = await this.localeService.getLocalizedMessage(
+				'SAMPLE_BROWSER_ERROR_INVALID',
+				'Failed to load sample: {0}',
+				message.filename
+			);
+			this.showErrorMessage(errMsg);
+			log(`fetchSampleWorkspace failed for '${String(message.filename)}': ${String(err)}`, 'error');
+			return;
+		}
+
 		if (!result.data || !validateSampleWorkspace(result.data)) {
 			const errMsg = await this.localeService.getLocalizedMessage(
 				'SAMPLE_BROWSER_ERROR_INVALID',
