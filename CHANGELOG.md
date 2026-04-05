@@ -8,7 +8,23 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.67.10] - 2026-04-03
+## [0.68.0] - 2026-04-05
+
+### ✨ 新功能 New Features
+
+- **CyberBrick 範例工作區瀏覽器** (CyberBrick Sample Workspace Browser)
+    - 在 CyberBrick 板子模式下工具列新增書本圖示按鈕，點擊開啟範例瀏覽模態視窗
+      Added book icon button in CyberBrick board mode toolbar to open sample browser modal
+    - 雲端優先策略（GitHub Raw + 10 秒 timeout），網路不可用時自動 fallback 至 extension bundle 內的本機副本，並顯示離線橫幅
+      Cloud-first strategy (GitHub Raw + 10s timeout) with automatic fallback to local bundled copy when offline, showing an offline notice banner
+    - 範例卡片自動依語系顯示本地化 title/description（支援全部 15 種語言）
+      Sample cards display localized title/description in all 15 supported languages
+    - 載入範例前若工作區已有積木，彈出確認對話框並自動備份 `main.json` → `main.json.bak`
+      If workspace has blocks, prompts confirmation and auto-backs up `main.json` before overwriting
+    - 安全強化：以 DOM `textContent` 取代 `innerHTML` 防止 XSS；`validateSampleFilename` 白名單驗證防止路徑穿越攻擊
+      Security hardening: replaced `innerHTML` with DOM `textContent` (XSS prevention); added `validateSampleFilename` whitelist to block path traversal attacks
+
+
 
 ### 🐛 修復 Bug Fixes
 
