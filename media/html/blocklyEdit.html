@@ -287,6 +287,26 @@
                     </svg>
                 </button>
             </div>
+            <!-- CyberBrick 範例按鈕（僅在選擇 CyberBrick 時顯示） -->
+            <div class="sample-switch" id="sampleContainer" style="display: none;">
+                <button id="sampleButton" title="">
+                    <svg class="sample-svg" viewBox="0 0 24 24" width="16" height="16">
+                        <style>
+                            .sample-path {
+                                stroke: currentColor;
+                                stroke-width: 2;
+                                stroke-linecap: round;
+                                stroke-linejoin: round;
+                                fill: none;
+                            }
+                        </style>
+                        <g class="sample-icon">
+                            <path class="sample-path" d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                            <path class="sample-path" d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                        </g>
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- 實驗積木提示容器 -->
@@ -379,6 +399,28 @@
                     <span id="resultCounter">0/0</span>
                     <button id="nextResultBtn" class="secondary-btn">下一個</button>
                 </div>
+            </div>
+        </div>
+    </div>
+    <!-- CyberBrick 範例瀏覽器對話框 -->
+    <div id="sampleModal" class="modal" style="display: none;">
+        <div class="modal-content sample-modal-content">
+            <div class="modal-header">
+                <h2 id="sampleModalTitle"></h2>
+                <span class="modal-close" id="sampleModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- 離線提示橫幅 -->
+                <div id="sampleOfflineNotice" class="sample-offline-notice" style="display: none;"></div>
+                <!-- Loading Spinner -->
+                <div id="sampleSpinner" class="sample-spinner">
+                    <div class="spinner-circle"></div>
+                    <p id="sampleLoadingText"></p>
+                </div>
+                <!-- 卡片容器 -->
+                <div id="sampleCardContainer" class="sample-card-container"></div>
+                <!-- 空清單提示 -->
+                <div id="sampleEmptyNotice" class="sample-empty-notice" style="display: none;"></div>
             </div>
         </div>
     </div>
