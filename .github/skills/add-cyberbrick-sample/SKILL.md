@@ -274,11 +274,13 @@ while ($elapsed -lt $maxWaitSec) {
 if ($elapsed -ge $maxWaitSec) { Write-Warning "❌ 超時：CDN 在 $maxWaitSec 秒內未生效，請手動確認。" }
 ```
 
-#### UPDATE workspace 模式：比對 CDN 檔案大小與本機一致
+#### UPDATE workspace 模式：比對 CDN 內容大小與本機一致
+
+> ⚠️ 請勿使用 `RawContentLength`，它回傳的是 gzip **壓縮後**大小，永遠不會等於本機未壓縮大小。
+> 應使用 `$response.Content.Length` 取得解壓縮後的實際內容長度。
 
 ```powershell
 $filename = "{filename}"
-$fileUrl = "https://raw.githubusercontent.com/Shen-Ming-Hong/singular-blockly/master/media/samples/$filename"
 $localSize = (Get-Item "media/samples/$filename").Length
 $maxWaitSec = 180
 $intervalSec = 10
@@ -287,13 +289,15 @@ $elapsed = 0
 Write-Host "⏳ 等待 CDN 生效（本機大小：$localSize bytes）..."
 while ($elapsed -lt $maxWaitSec) {
     try {
-        $response = Invoke-WebRequest -Uri "$fileUrl?t=$(Get-Date -Format 'yyyyMMddHHmmss')" -ErrorAction Stop
-        $cdnSize = $response.RawContentLength
+        $ts = Get-Date -Format 'yyyyMMddHHmmss'
+        $url = "https://raw.githubusercontent.com/Shen-Ming-Hong/singular-blockly/master/media/samples/" + $filename + "?t=" + $ts
+        $response = Invoke-WebRequest -Uri $url -ErrorAction Stop
+        $cdnSize = $response.Content.Length  # 解壓縮後的實際大小
         if ($cdnSize -eq $localSize) {
-            Write-Host "✅ CDN 已生效！檔案大小吻合：$cdnSize bytes"
+            Write-Host "✅ CDN 已生效！內容大小吻合：$cdnSize bytes"
             break
         }
-        Write-Host "  [$elapsed s] CDN 大小 $cdnSize ≠ 本機 $localSize，等待..."
+        Write-Host "  [$elapsed s] CDN 內容 $cdnSize ≠ 本機 $localSize，等待..."
     } catch {
         Write-Host "  ⚠️  請求失敗：$($_.Exception.Message)"
     }
