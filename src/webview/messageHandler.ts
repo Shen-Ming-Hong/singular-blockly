@@ -1814,17 +1814,7 @@ export class WebViewMessageHandler {
 		}
 
 		const result = await fetchSampleWorkspace(message.filename, extensionPath);
-		if (!result.data) {
-			const errMsg = await this.localeService.getLocalizedMessage(
-				'SAMPLE_BROWSER_ERROR_INVALID',
-				'Failed to load sample: {0}',
-				message.filename
-			);
-			this.showErrorMessage(errMsg);
-			return;
-		}
-
-		if (!validateSampleWorkspace(result.data)) {
+		if (!result.data || !validateSampleWorkspace(result.data)) {
 			const errMsg = await this.localeService.getLocalizedMessage(
 				'SAMPLE_BROWSER_ERROR_INVALID',
 				'Failed to load sample: {0}',
