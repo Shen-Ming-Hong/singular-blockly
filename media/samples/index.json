@@ -1,0 +1,44 @@
+{
+    "version": 1,
+    "samples": [
+        {
+            "id": "cyberbrick-soccer-robot",
+            "filename": "cyberbrick-soccer-robot.json",
+            "board": "cyberbrick",
+            "title": {
+                "en": "Soccer Robot",
+                "zh-hant": "足球機器人",
+                "ja": "サッカーロボット",
+                "ko": "축구 로봇",
+                "de": "Fußballroboter",
+                "fr": "Robot de football",
+                "es": "Robot de fútbol",
+                "it": "Robot da calcio",
+                "pt-br": "Robô de futebol",
+                "ru": "Футбольный робот",
+                "pl": "Robot piłkarski",
+                "cs": "Fotbalový robot",
+                "hu": "Focis robot",
+                "bg": "Футболен робот",
+                "tr": "Futbol robotu"
+            },
+            "description": {
+                "en": "A complete starter workspace for a CyberBrick soccer robot.",
+                "zh-hant": "CyberBrick 足球機器人的完整起始工作區。",
+                "ja": "CyberBrick サッカーロボットの完全なスターターワークスペース。",
+                "ko": "CyberBrick 축구 로봇을 위한 완전한 시작 작업공간.",
+                "de": "Ein vollständiger Starter-Arbeitsbereich für einen CyberBrick-Fußballroboter.",
+                "fr": "Un espace de travail de démarrage complet pour un robot de football CyberBrick.",
+                "es": "Un espacio de trabajo inicial completo para un robot de fútbol CyberBrick.",
+                "it": "Uno spazio di lavoro iniziale completo per un robot da calcio CyberBrick.",
+                "pt-br": "Um espaço de trabalho inicial completo para um robô de futebol CyberBrick.",
+                "ru": "Полное стартовое рабочее пространство для футбольного робота CyberBrick.",
+                "pl": "Kompletne startowe środowisko pracy dla robota piłkarskiego CyberBrick.",
+                "cs": "Kompletní startovací pracovní prostor pro fotbalového robota CyberBrick.",
+                "hu": "Teljes kezdő munkaterület CyberBrick focis robothoz.",
+                "bg": "Пълно начално работно пространство за футболен робот CyberBrick.",
+                "tr": "CyberBrick futbol robotu için eksiksiz bir başlangıç çalışma alanı."
+            }
+        }
+    ]
+}

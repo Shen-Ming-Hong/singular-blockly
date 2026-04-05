@@ -1,6 +1,6 @@
 # singular-blockly Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2025-11-21
+Auto-generated from all feature plans. Last updated: 2026-04-04
 
 ## Active Technologies
 - TypeScript 5.9.3 (Extension) + JavaScript (Blockly blocks/generators) + Blockly 12.3.1, VSCode API 1.105.0+, MicroPython `rc_module` API (028-x12-rc-blocks)
@@ -92,7 +92,6 @@ TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standa
 ## Recent Changes
 - 047-warning-i18n-kid-friendly: Added TypeScript 5.9.3, Target ES2023 + VS Code Extension API ^1.105.0, Blockly ^12.3.1, 自建 `LocaleService` i18n 服務
 - 042-upload-error-clarity: Added TypeScript 5.9.3 + Blockly 12.3.1 | VSCode Extension API 1.105.0+ | PlatformIO CLI
-- 041-fix-mcp-bundling: Added TypeScript 5.9.3 (ES2023 target, Node16 module) + webpack 5.102.1, ts-loader 9.5.4, @modelcontextprotocol/sdk ^1.26.0, zod ^4.1.13
 
 
 <!-- MANUAL ADDITIONS START -->

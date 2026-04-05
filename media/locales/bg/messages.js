@@ -984,4 +984,16 @@ window.languageManager.loadMessages('bg', {
 	AI_SUGGESTION_TAB_HINT: 'Tab за приемане · Esc за отхвърляне',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab приемане · Alt+]/[ превключване · Esc отхвърляне',
 	AI_QUOTA_EXHAUSTED: 'Квотата на Copilot е изчерпана. Нулира се следващия месец или надградете плана.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'Зареди пример',
+	SAMPLE_BROWSER_TITLE: 'Примери CyberBrick',
+	SAMPLE_BROWSER_LOADING: 'Зареждане на примери...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: 'Използва се вградена версия (офлайн)',
+	SAMPLE_BROWSER_LOAD_BUTTON: 'Зареди',
+	SAMPLE_BROWSER_EMPTY: 'Няма налични примери',
+	SAMPLE_BROWSER_CONFIRM_LOAD: 'Това ще замени текущото работно пространство. Продължи?',
+	SAMPLE_BROWSER_CONFIRM_YES: 'Зареди пример',
+	SAMPLE_BROWSER_CONFIRM_NO: 'Отказ',
+	SAMPLE_BROWSER_ERROR_INVALID: 'Невалиден формат на примера, не може да се зареди',
 });

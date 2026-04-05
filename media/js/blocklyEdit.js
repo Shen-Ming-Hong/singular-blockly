@@ -1702,6 +1702,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 初始化快速備份功能 (Ctrl+S / Cmd+S)
 	quickBackup.init();
 
+	// 初始化範例瀏覽器功能
+	initSampleBrowser();
+
 	// T015: 初始化剪貼簿操作監聽器 (Ctrl+C/V/X)
 	// 監聽複製、貼上、剪下操作以鎖定保存
 	document.addEventListener('keydown', e => {
@@ -3182,6 +3185,107 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}
 				break;
+
+			// T007: 範例瀏覽器 — 顯示範例卡片
+			case 'showSampleBrowser': {
+				const sampleModal = document.getElementById('sampleModal');
+				const sampleSpinner = document.getElementById('sampleSpinner');
+				const sampleCardContainer = document.getElementById('sampleCardContainer');
+				const sampleEmptyNotice = document.getElementById('sampleEmptyNotice');
+				const sampleModalTitle = document.getElementById('sampleModalTitle');
+				const sampleLoadingText = document.getElementById('sampleLoadingText');
+				const sampleOfflineNotice = document.getElementById('sampleOfflineNotice');
+				if (!sampleModal) break;
+
+				// 設定模態標題
+				if (sampleModalTitle && window.languageManager) {
+					sampleModalTitle.textContent = window.languageManager.getMessage('SAMPLE_BROWSER_TITLE', 'CyberBrick Samples');
+				}
+				if (sampleLoadingText && window.languageManager) {
+					sampleLoadingText.textContent = window.languageManager.getMessage('SAMPLE_BROWSER_LOADING', 'Loading samples...');
+				}
+
+				// 隱藏 spinner
+				if (sampleSpinner) sampleSpinner.style.display = 'none';
+
+				// T014 (US2): 離線提示
+				if (sampleOfflineNotice) {
+					if (message.isOffline) {
+						const offlineText = window.languageManager
+							? window.languageManager.getMessage('SAMPLE_BROWSER_OFFLINE_NOTICE', 'Using built-in samples (offline)')
+							: 'Using built-in samples (offline)';
+						sampleOfflineNotice.textContent = offlineText;
+						sampleOfflineNotice.style.display = 'block';
+					} else {
+						sampleOfflineNotice.style.display = 'none';
+					}
+				}
+
+				// 清空、選染卡片
+				if (sampleCardContainer) {
+					sampleCardContainer.innerHTML = '';
+					const samples = message.samples || [];
+					const lang = message.language || 'en';
+					const loadBtnText = window.languageManager
+						? window.languageManager.getMessage('SAMPLE_BROWSER_LOAD_BUTTON', 'Load')
+						: 'Load';
+
+					if (samples.length === 0) {
+						if (sampleEmptyNotice) {
+							const emptyText = window.languageManager
+								? window.languageManager.getMessage('SAMPLE_BROWSER_EMPTY', 'No samples available')
+								: 'No samples available';
+							sampleEmptyNotice.textContent = emptyText;
+							sampleEmptyNotice.style.display = 'block';
+						}
+					} else {
+						if (sampleEmptyNotice) sampleEmptyNotice.style.display = 'none';
+						samples.forEach(entry => {
+							const title = (entry.title && (entry.title[lang] || entry.title['en'])) || entry.id;
+							const desc = (entry.description && (entry.description[lang] || entry.description['en'])) || '';
+							const card = document.createElement('div');
+							card.className = 'sample-card';
+
+							const titleElement = document.createElement('div');
+							titleElement.className = 'sample-card-title';
+							titleElement.textContent = title;
+
+							const descriptionElement = document.createElement('div');
+							descriptionElement.className = 'sample-card-description';
+							descriptionElement.textContent = desc;
+
+							const btn = document.createElement('button');
+							btn.className = 'primary-btn sample-card-load-btn';
+							btn.textContent = loadBtnText;
+							btn.dataset.filename = String(entry.filename || '');
+
+							card.appendChild(titleElement);
+							card.appendChild(descriptionElement);
+							card.appendChild(btn);
+
+							// T008: 卡片載入按鈕事件
+							btn.addEventListener('click', () => {
+								const hasBlocks = Blockly.getMainWorkspace().getAllBlocks(false).length > 0;
+								vscode.postMessage({
+									command: 'loadSelectedSampleRequest',
+									filename: entry.filename,
+									hasBlocks: hasBlocks,
+								});
+							});
+							sampleCardContainer.appendChild(card);
+						});
+					}
+				}
+				break;
+			}
+
+			// T009: 載入工作區
+			case 'loadSampleWorkspace': {
+				const sampleModalEl = document.getElementById('sampleModal');
+				if (sampleModalEl) sampleModalEl.style.display = 'none';
+				await handleWorkspaceLoadMessage(message);
+				break;
+			}
 		}
 	});
 
@@ -3559,6 +3663,12 @@ function updateUIForBoard(boardId, isCyberBrick) {
 	// 初始化 Monitor 按鈕事件並更新可見性
 	initMonitorButton();
 	updateMonitorButtonVisibility();
+
+	// T015: 根據板子類型顯示/隱藏範例瀏覽器按鈕（僅 CyberBrick 顯示）
+	const sampleContainer = document.getElementById('sampleContainer');
+	if (sampleContainer) {
+		sampleContainer.style.display = isCyberBrick ? 'flex' : 'none';
+	}
 }
 
 // ===== CyberBrick MicroPython 上傳功能 =====
@@ -4002,6 +4112,68 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 
 	// 取得本地化訊息
 	return window.languageManager?.getMessage(errorKey, defaultFallbacks[errorKey]) || fallbackMessage || 'Unknown error';
+}
+
+/**
+ * 初始化範例瀏覽器按鈕與模態事件（T006）
+ */
+function initSampleBrowser() {
+	const sampleButton = document.getElementById('sampleButton');
+	const sampleModal = document.getElementById('sampleModal');
+	const sampleModalClose = document.getElementById('sampleModalClose');
+
+	if (sampleButton && window.languageManager) {
+		sampleButton.title = window.languageManager.getMessage('SAMPLE_BROWSER_BUTTON_TITLE', 'Browse CyberBrick Samples');
+	}
+
+	if (sampleButton && sampleModal) {
+		sampleButton.addEventListener('click', () => {
+			// 若 modal 已開啟則略過
+			if (sampleModal.style.display !== 'none') return;
+
+			// 顯示模態並啟動 spinner
+			const sampleSpinner = document.getElementById('sampleSpinner');
+			const sampleCardContainer = document.getElementById('sampleCardContainer');
+			const sampleEmptyNotice = document.getElementById('sampleEmptyNotice');
+			const sampleOfflineNotice = document.getElementById('sampleOfflineNotice');
+			const sampleModalTitle = document.getElementById('sampleModalTitle');
+			const sampleLoadingText = document.getElementById('sampleLoadingText');
+
+			if (sampleModalTitle && window.languageManager) {
+				sampleModalTitle.textContent = window.languageManager.getMessage('SAMPLE_BROWSER_TITLE', 'CyberBrick Samples');
+			}
+			if (sampleLoadingText && window.languageManager) {
+				sampleLoadingText.textContent = window.languageManager.getMessage('SAMPLE_BROWSER_LOADING', 'Loading samples...');
+			}
+			if (sampleSpinner) sampleSpinner.style.display = 'flex';
+			if (sampleCardContainer) sampleCardContainer.innerHTML = '';
+			if (sampleEmptyNotice) sampleEmptyNotice.style.display = 'none';
+			if (sampleOfflineNotice) sampleOfflineNotice.style.display = 'none';
+
+			sampleModal.style.display = 'flex';
+
+			const hasBlocks = Blockly.getMainWorkspace().getAllBlocks(false).length > 0;
+			vscode.postMessage({
+				command: 'openSampleBrowserRequest',
+				hasBlocks: hasBlocks,
+			});
+		});
+	}
+
+	if (sampleModalClose && sampleModal) {
+		sampleModalClose.addEventListener('click', () => {
+			sampleModal.style.display = 'none';
+		});
+	}
+
+	// 點擊模態背景關閉
+	if (sampleModal) {
+		sampleModal.addEventListener('click', event => {
+			if (event.target === sampleModal) {
+				sampleModal.style.display = 'none';
+			}
+		});
+	}
 }
 
 /**

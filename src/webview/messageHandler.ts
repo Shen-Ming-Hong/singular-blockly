@@ -18,6 +18,7 @@ import { ArduinoMonitorService } from '../services/arduinoMonitorService';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
 import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSuggestionService';
+import { fetchSampleIndex, fetchSampleWorkspace, validateSampleWorkspace } from '../services/sampleBrowserService';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -220,6 +221,14 @@ export class WebViewMessageHandler {
 					break;
 				case 'acceptShadowSuggestion':
 					this.handleAcceptShadowSuggestion(message);
+					break;
+				// T010: 範例瀏覽器
+				case 'openSampleBrowserRequest':
+					await this.handleOpenSampleBrowser();
+					break;
+				// T012: 載入選定範例
+				case 'loadSelectedSampleRequest':
+					await this.handleLoadSelectedSample(message);
 					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
@@ -1763,5 +1772,75 @@ export class WebViewMessageHandler {
 		}
 		this.aiStatusBar?.hideLoading();
 		log('Shadow suggestion cancelled due to workspace change', 'debug');
+	}
+
+	// ===== 範例瀏覽器（T011 / T013） =====
+
+	/** T011: 取得範例索引並回傳 WebView */
+	private async handleOpenSampleBrowser(): Promise<void> {
+		const extensionPath = this.context.extensionPath;
+		const result = await fetchSampleIndex(extensionPath);
+
+		const language = this.settingsManager.resolveLanguage(await this.settingsManager.getLanguage());
+
+		this.panel.webview.postMessage({
+			command: 'showSampleBrowser',
+			samples: result.data?.samples ?? [],
+			language,
+			isOffline: result.isOffline,
+		});
+	}
+
+	/** T013: 取得並驗證選定範例，回傳 WebView 以載入工作區 */
+	private async handleLoadSelectedSample(message: any): Promise<void> {
+		const extensionPath = this.context.extensionPath;
+
+		// 若工作區已有積木，顯示確認對話框
+		if (message.hasBlocks) {
+			const confirmMsg = await this.localeService.getLocalizedMessage(
+				'SAMPLE_BROWSER_CONFIRM_LOAD',
+				'Loading this sample will replace the current workspace. Continue?'
+			);
+			const yesLabel = await this.localeService.getLocalizedMessage('SAMPLE_BROWSER_CONFIRM_YES', 'Yes');
+			const noLabel = await this.localeService.getLocalizedMessage('SAMPLE_BROWSER_CONFIRM_NO', 'No');
+			const answer = await vscodeApi.window.showWarningMessage(confirmMsg, yesLabel, noLabel);
+			if (answer !== yesLabel) {
+				return;
+			}
+
+			// 使用者確認後，自動備份目前工作區再覆蓋
+			const mainJsonPath = path.join('blockly', 'main.json');
+			await this.createBackupBeforeSave(mainJsonPath);
+		}
+
+		let result;
+		try {
+			result = await fetchSampleWorkspace(message.filename, extensionPath);
+		} catch (err) {
+			const errMsg = await this.localeService.getLocalizedMessage(
+				'SAMPLE_BROWSER_ERROR_INVALID',
+				'Failed to load sample: {0}',
+				message.filename
+			);
+			this.showErrorMessage(errMsg);
+			log(`fetchSampleWorkspace failed for '${String(message.filename)}': ${String(err)}`, 'error');
+			return;
+		}
+
+		if (!result.data || !validateSampleWorkspace(result.data)) {
+			const errMsg = await this.localeService.getLocalizedMessage(
+				'SAMPLE_BROWSER_ERROR_INVALID',
+				'Failed to load sample: {0}',
+				message.filename
+			);
+			this.showErrorMessage(errMsg);
+			return;
+		}
+
+		this.panel.webview.postMessage({
+			command: 'loadSampleWorkspace',
+			state: result.data.workspace,
+			board: result.data.board,
+		});
 	}
 }

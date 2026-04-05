@@ -964,4 +964,16 @@ window.languageManager.loadMessages('zh-hant', {
 	AI_SUGGESTION_TAB_HINT: '按 Tab 接受 · Esc 忽略',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 接受 · Alt+]/[ 切換 · Esc 忽略',
 	AI_QUOTA_EXHAUSTED: 'Copilot 額度已用完，下月重置或升級方案。',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: '載入範例',
+	SAMPLE_BROWSER_TITLE: 'CyberBrick 範例',
+	SAMPLE_BROWSER_LOADING: '正在載入範例...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: '目前使用內建版本（離線）',
+	SAMPLE_BROWSER_LOAD_BUTTON: '載入',
+	SAMPLE_BROWSER_EMPTY: '目前沒有可用範例',
+	SAMPLE_BROWSER_CONFIRM_LOAD: '此操作將覆蓋目前工作區，是否繼續？',
+	SAMPLE_BROWSER_CONFIRM_YES: '載入範例',
+	SAMPLE_BROWSER_CONFIRM_NO: '取消',
+	SAMPLE_BROWSER_ERROR_INVALID: '範本格式無效，無法載入',
 });

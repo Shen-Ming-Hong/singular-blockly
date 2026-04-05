@@ -972,4 +972,16 @@ window.languageManager.loadMessages('ko', {
 	AI_SUGGESTION_TAB_HINT: 'Tab으로 수락 · Esc로 무시',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab 수락 · Alt+]/[ 전환 · Esc 무시',
 	AI_QUOTA_EXHAUSTED: 'Copilot 할당량이 소진되었습니다. 다음 달에 재설정되거나 플랜을 업그레이드하세요.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: '샘플 불러오기',
+	SAMPLE_BROWSER_TITLE: 'CyberBrick 샘플',
+	SAMPLE_BROWSER_LOADING: '샘플 불러오는 중...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: '내장 버전을 사용 중 (오프라인)',
+	SAMPLE_BROWSER_LOAD_BUTTON: '불러오기',
+	SAMPLE_BROWSER_EMPTY: '사용 가능한 샘플이 없습니다',
+	SAMPLE_BROWSER_CONFIRM_LOAD: '현재 작업공간을 덮어씁니다. 계속하시겠습니까?',
+	SAMPLE_BROWSER_CONFIRM_YES: '샘플 불러오기',
+	SAMPLE_BROWSER_CONFIRM_NO: '취소',
+	SAMPLE_BROWSER_ERROR_INVALID: '잘못된 샘플 형식으로 불러올 수 없습니다',
 });

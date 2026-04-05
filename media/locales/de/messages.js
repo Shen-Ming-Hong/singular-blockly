@@ -981,4 +981,16 @@ window.languageManager.loadMessages('de', {
 	AI_SUGGESTION_TAB_HINT: 'Tab zum Akzeptieren · Esc zum Ignorieren',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab akzeptieren · Alt+]/[ wechseln · Esc ignorieren',
 	AI_QUOTA_EXHAUSTED: 'Copilot-Kontingent aufgebraucht. Wird nächsten Monat zurückgesetzt oder Plan upgraden.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'Beispiel laden',
+	SAMPLE_BROWSER_TITLE: 'CyberBrick-Beispiele',
+	SAMPLE_BROWSER_LOADING: 'Beispiele werden geladen...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: 'Integrierte Version wird verwendet (offline)',
+	SAMPLE_BROWSER_LOAD_BUTTON: 'Laden',
+	SAMPLE_BROWSER_EMPTY: 'Keine Beispiele verfügbar',
+	SAMPLE_BROWSER_CONFIRM_LOAD: 'Der aktuelle Arbeitsbereich wird überschrieben. Fortfahren?',
+	SAMPLE_BROWSER_CONFIRM_YES: 'Beispiel laden',
+	SAMPLE_BROWSER_CONFIRM_NO: 'Abbrechen',
+	SAMPLE_BROWSER_ERROR_INVALID: 'Ungültiges Beispielformat, kann nicht geladen werden',
 });

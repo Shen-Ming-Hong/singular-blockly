@@ -979,4 +979,16 @@ window.languageManager.loadMessages('cs', {
 	AI_SUGGESTION_TAB_HINT: 'Tab pro přijetí · Esc pro odmítnutí',
 	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab přijmout · Alt+]/[ přepnout · Esc odmítnout',
 	AI_QUOTA_EXHAUSTED: 'Kvóta Copilot vyčerpna. Reset příští měsíc nebo upgradujte plán.',
+
+	// === Sample Browser ===
+	SAMPLE_BROWSER_BUTTON_TITLE: 'Načíst příklad',
+	SAMPLE_BROWSER_TITLE: 'Příklady CyberBrick',
+	SAMPLE_BROWSER_LOADING: 'Načítání příkladů...',
+	SAMPLE_BROWSER_OFFLINE_NOTICE: 'Použití vestavěné verze (offline)',
+	SAMPLE_BROWSER_LOAD_BUTTON: 'Načíst',
+	SAMPLE_BROWSER_EMPTY: 'Žádné příklady nejsou k dispozici',
+	SAMPLE_BROWSER_CONFIRM_LOAD: 'Toto nahradí aktuální pracovní plochu. Pokračovat?',
+	SAMPLE_BROWSER_CONFIRM_YES: 'Načíst příklad',
+	SAMPLE_BROWSER_CONFIRM_NO: 'Zrušit',
+	SAMPLE_BROWSER_ERROR_INVALID: 'Neplatný formát příkladu, nelze načíst',
 });
