@@ -240,6 +240,101 @@ git push origin master
 > **⚠️ 直接推送 master**：範例內容更新屬於內容性變更，不需 PR 流程。
 > 推送後約 30 秒 GitHub CDN 生效，使用者不需重新安裝 extension 即可看到新範例。
 
+### Phase 6: CDN 生效驗證 CDN Verification Loop
+
+推送後執行輪詢迴圈，直到 GitHub raw CDN 回傳最新內容為止。
+
+**根據模式選擇對應的驗證指令：**
+
+#### ADD 模式：確認新 id 出現在 CDN index.json
+
+```powershell
+$id = "{id}"
+$indexUrl = "https://raw.githubusercontent.com/Shen-Ming-Hong/singular-blockly/master/media/samples/index.json"
+$maxWaitSec = 180
+$intervalSec = 10
+$elapsed = 0
+
+Write-Host "⏳ 等待 CDN 生效（最多 $maxWaitSec 秒）..."
+while ($elapsed -lt $maxWaitSec) {
+    try {
+        $index = Invoke-RestMethod -Uri "$indexUrl?t=$(Get-Date -Format 'yyyyMMddHHmmss')" -ErrorAction Stop
+        $found = $index.samples | Where-Object { $_.id -eq $id }
+        if ($found) {
+            Write-Host "✅ CDN 已生效！找到 id='$id'，title.en='$($found.title.en)'"
+            break
+        }
+    } catch {
+        Write-Host "  ⚠️  請求失敗：$($_.Exception.Message)"
+    }
+    Write-Host "  [$elapsed s] 尚未找到 '$id'，等待 $intervalSec 秒..."
+    Start-Sleep -Seconds $intervalSec
+    $elapsed += $intervalSec
+}
+if ($elapsed -ge $maxWaitSec) { Write-Warning "❌ 超時：CDN 在 $maxWaitSec 秒內未生效，請手動確認。" }
+```
+
+#### UPDATE workspace 模式：比對 CDN 檔案大小與本機一致
+
+```powershell
+$filename = "{filename}"
+$fileUrl = "https://raw.githubusercontent.com/Shen-Ming-Hong/singular-blockly/master/media/samples/$filename"
+$localSize = (Get-Item "media/samples/$filename").Length
+$maxWaitSec = 180
+$intervalSec = 10
+$elapsed = 0
+
+Write-Host "⏳ 等待 CDN 生效（本機大小：$localSize bytes）..."
+while ($elapsed -lt $maxWaitSec) {
+    try {
+        $response = Invoke-WebRequest -Uri "$fileUrl?t=$(Get-Date -Format 'yyyyMMddHHmmss')" -ErrorAction Stop
+        $cdnSize = $response.RawContentLength
+        if ($cdnSize -eq $localSize) {
+            Write-Host "✅ CDN 已生效！檔案大小吻合：$cdnSize bytes"
+            break
+        }
+        Write-Host "  [$elapsed s] CDN 大小 $cdnSize ≠ 本機 $localSize，等待..."
+    } catch {
+        Write-Host "  ⚠️  請求失敗：$($_.Exception.Message)"
+    }
+    Start-Sleep -Seconds $intervalSec
+    $elapsed += $intervalSec
+}
+if ($elapsed -ge $maxWaitSec) { Write-Warning "❌ 超時：CDN 在 $maxWaitSec 秒內未生效，請手動確認。" }
+```
+
+#### UPDATE metadata 模式：比對 CDN index.json 的 title.en 是否為預期值
+
+```powershell
+$id = "{id}"
+$expectedTitle = "{英文標題}"
+$indexUrl = "https://raw.githubusercontent.com/Shen-Ming-Hong/singular-blockly/master/media/samples/index.json"
+$maxWaitSec = 180
+$intervalSec = 10
+$elapsed = 0
+
+Write-Host "⏳ 等待 CDN 生效（期望 title.en='$expectedTitle'）..."
+while ($elapsed -lt $maxWaitSec) {
+    try {
+        $index = Invoke-RestMethod -Uri "$indexUrl?t=$(Get-Date -Format 'yyyyMMddHHmmss')" -ErrorAction Stop
+        $entry = $index.samples | Where-Object { $_.id -eq $id }
+        if ($entry -and $entry.title.en -eq $expectedTitle) {
+            Write-Host "✅ CDN 已生效！id='$id' title.en='$($entry.title.en)'"
+            break
+        }
+        Write-Host "  [$elapsed s] 目前 title.en='$($entry.title.en)'，等待..."
+    } catch {
+        Write-Host "  ⚠️  請求失敗：$($_.Exception.Message)"
+    }
+    Start-Sleep -Seconds $intervalSec
+    $elapsed += $intervalSec
+}
+if ($elapsed -ge $maxWaitSec) { Write-Warning "❌ 超時：CDN 在 $maxWaitSec 秒內未生效，請手動確認。" }
+```
+
+> 💡 迴圈使用 `?t=<timestamp>` query string 防止 CDN 快取干擾。
+> 若在受管理的公司網路後方，可改用 `curl -H "Cache-Control: no-cache"` 替代。
+
 ---
 
 ## 翻譯輔助 Translation Helper
@@ -286,6 +381,7 @@ description: "{英文描述}"
 - [ ] 本機 JSON 格式驗證通過
 - [ ] Extension 本機測試時**新卡片**顯示正確、積木可載入
 - [ ] `git commit -m "feat(samples): add {id}..."` 已推送至 master
+- [ ] Phase 6 CDN 驗證迴圈確認新 `id` 出現在 CDN index.json
 
 ### UPDATE workspace 模式
 
@@ -293,6 +389,7 @@ description: "{英文描述}"
 - [ ] `media/samples/index.json` **未被異動**
 - [ ] 本機測試時載入範例確認積木內容為最新版本
 - [ ] `git commit -m "fix(samples): update {id} workspace content"` 已推送至 master
+- [ ] Phase 6 CDN 驗證迴圈確認 CDN 檔案大小與本機一致
 
 ### UPDATE metadata 模式
 
@@ -300,7 +397,8 @@ description: "{英文描述}"
 - [ ] `media/samples/{filename}.json` **未被異動**
 - [ ] 本機測試時卡片顯示更新後的 title/description
 - [ ] `git commit -m "i18n(samples): update {id} title/description"` 已推送至 master
+- [ ] Phase 6 CDN 驗證迴圈確認 CDN index.json 的 `title.en` 為預期值
 
 ### 通用
 
-- [ ] 推送後 30 秒確認雲端可存取
+- [ ] Phase 6 輪詢迴圈在 180 秒內收到 ✅ 成功訊息
