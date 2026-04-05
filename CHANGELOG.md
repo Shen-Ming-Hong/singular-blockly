@@ -24,8 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - 安全強化：以 DOM `textContent` 取代 `innerHTML` 防止 XSS；`validateSampleFilename` 白名單驗證防止路徑穿越攻擊
       Security hardening: replaced `innerHTML` with DOM `textContent` (XSS prevention); added `validateSampleFilename` whitelist to block path traversal attacks
 
-
-
 ### 🐛 修復 Bug Fixes
 
 - **CyberBrick MicroPython 積木關閉後狀態回退問題** (Fix block state revert on panel close in CyberBrick MicroPython mode)
