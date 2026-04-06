@@ -107,6 +107,142 @@ Copy-Item media/samples/cyberbrick-soccer-robot.json media/samples/{new-filename
 
 若使用者提供的 `main.json` 已是完整的工作區 JSON（含 `blocks`、`variables` 等），則整個物件作為 `workspace` 的值。
 
+### Phase 2.5: Generate Name Translations 生成名稱翻譯映射
+
+若範例工作區的**積木中包含中文（繁體中文）函式名稱或變數名稱**，必須在 `{filename}.json` 頂層加入 `nameTranslations` 欄位，讓非中文使用者載入範本時自動看到可讀的識別字（FR-003/FR-008）。
+
+#### 掃描策略 Scan Strategy
+
+掃描範圍：**全量掃描，不設排除規則**
+
+1. **變數名稱**：`workspace.variables[].name` ── 涵蓋全域變數與函式參數名稱
+2. **函式名稱**：遞迴遍歷所有積木，找出 `type === "arduino_function"` 的 `fields.NAME`
+
+```javascript
+// 掃描積木樹（Node 腳本範例）
+function scanBlocks(blocks) {
+	if (!Array.isArray(blocks)) {
+		return;
+	}
+	for (const b of blocks) {
+		if (!b) {
+			continue;
+		}
+		if (b.type === 'arduino_function' && b.fields?.NAME) {
+			funcs.add(b.fields.NAME);
+		}
+		if (b.inputs) {
+			for (const k of Object.keys(b.inputs)) {
+				const inp = b.inputs[k];
+				if (inp?.block) {
+					scanBlocks([inp.block]);
+				}
+				if (inp?.shadow) {
+					scanBlocks([inp.shadow]);
+				}
+			}
+		}
+		if (b.next?.block) {
+			scanBlocks([b.next.block]);
+		}
+	}
+}
+scanBlocks(workspace.blocks.blocks);
+```
+
+#### 14 個非 zh-hant 語系清單與翻譯格式
+
+翻譯映射放在 `nameTranslations.variables` 與 `nameTranslations.functions`，
+key 為原始中文名稱，value 為含以下 14 個語系的物件：
+
+| 語系代碼 | 語言                   | 語系代碼 | 語言             |
+| -------- | ---------------------- | -------- | ---------------- |
+| `en`     | 英文（必填，作為回退） | `ru`     | 俄文             |
+| `ja`     | 日文                   | `pl`     | 波蘭文           |
+| `ko`     | 韓文                   | `cs`     | 捷克文           |
+| `de`     | 德文                   | `hu`     | 匈牙利文         |
+| `fr`     | 法文                   | `bg`     | 保加利亞文       |
+| `es`     | 西班牙文               | `tr`     | 土耳其文         |
+| `it`     | 義大利文               | `pt-br`  | 葡萄牙文（巴西） |
+
+**完整格式範例：**
+
+```json
+"nameTranslations": {
+  "variables": {
+    "前後搖桿數值": {
+      "en": "joystick_forward_back",
+      "ja": "joystick_forward_back",
+      "ko": "joystick_forward_back",
+      "de": "joystick_vorwaerts_zurueck",
+      "fr": "joystick_avant_arriere",
+      "es": "joystick_adelante_atras",
+      "it": "joystick_avanti_indietro",
+      "pt-br": "joystick_frente_tras",
+      "ru": "joystick_vpered_nazad",
+      "pl": "joystick_przod_tyl",
+      "cs": "joystick_dopredu_dozadu",
+      "hu": "joystick_elore_hatra",
+      "bg": "joystick_napreed_nazad",
+      "tr": "joystick_ileri_geri"
+    }
+  },
+  "functions": {
+    "遙控器": {
+      "en": "controller",
+      "ja": "controller",
+      "ko": "controller",
+      "de": "fernsteuerung",
+      "fr": "telecommande",
+      "es": "controlador",
+      "it": "telecomando",
+      "pt-br": "controle",
+      "ru": "pult",
+      "pl": "kontroler",
+      "cs": "ovladac",
+      "hu": "taviranyito",
+      "bg": "distantsionno",
+      "tr": "uzaktan_kumanda"
+    }
+  }
+}
+```
+
+#### 識別字合法性規則 Identifier Validity Rules
+
+每個翻譯值必須是合法的程式識別字，規則與 Python 3 PEP 3131 相同：
+
+- ✅ 以字母（`a-z`、`A-Z`）或底線（`_`）開頭
+- ✅ 後接字母、數字（`0-9`）、底線
+- ❌ **不含**空格、連字號（`-`）、標點符號（`.`、`!`、`'`…）
+- ❌ **不以數字開頭**
+- ❌ **不含**重音字母（`é`、`ó`、`ü`、`ñ`…），請用 ASCII 等效（`e`、`o`、`u`、`n`）
+- ❌ **不含** CJK 字元（中日韓文字），即使 Unicode 合法也不使用，確保跨平台相容性
+
+**驗證腳本：**
+
+```javascript
+const identRe = /^[^\d\W]\w*$/u;
+for (const [key, entry] of Object.entries(nameTranslations.variables ?? {})) {
+	for (const [locale, val] of Object.entries(entry)) {
+		if (!identRe.test(val)) {
+			console.error(`INVALID variables["${key}"]["${locale}"] = "${val}"`);
+		}
+	}
+}
+```
+
+#### Phase 2.5 驗證清單
+
+- [ ] 所有 `workspace.variables[].name` 均有對應的 `variables` 映射
+- [ ] 所有 `arduino_function.fields.NAME` 均有對應的 `functions` 映射
+- [ ] 所有翻譯值通過 `/^[^\d\W]\w*$/u` 識別字合法性驗證
+- [ ] `en` 欄位已填（不允許空字串）
+- [ ] 若名稱為純 ASCII 英文（已是合法識別字），仍需填入 `nameTranslations`，以確保結構完整
+- [ ] 若工作區**完全無中文名稱**：可省略 `nameTranslations` 欄位（向後相容）
+
+---
+
 ### Phase 3: 同步索引 Sync index.json
 
 **依照 Phase 0 判斷的模式執行：**

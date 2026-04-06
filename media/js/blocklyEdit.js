@@ -3270,6 +3270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 									command: 'loadSelectedSampleRequest',
 									filename: entry.filename,
 									hasBlocks: hasBlocks,
+									language: currentResolvedLanguage,
 								});
 							});
 							sampleCardContainer.appendChild(card);
