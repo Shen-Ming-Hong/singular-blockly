@@ -8,6 +8,24 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.69.0] - 2026-04-07
+
+### ✨ 新功能 New Features
+
+- **範本名稱多國語言化 `nameTranslations`** (Sample Name Internationalization)
+    - 工作區 JSON 新增 `nameTranslations` 欄位，支援為變數名稱與函式名稱分別提供 14 種語言的翻譯對照
+      Added `nameTranslations` field to workspace JSON supporting per-variable and per-function translations across 14 languages
+    - 新增 `applyNameTranslations()` 服務函式，使用三層回退策略：目標語系 → English → 原始名稱，確保任何語言都能正常載入
+      Added `applyNameTranslations()` service with 3-tier fallback: target language → English → original name
+    - `translateMutationName()` 精準鎖定 `<mutation>` 標籤的 `name` 屬性，避免誤匹配 `<arg name>` 子元素
+      `translateMutationName()` correctly scopes to `<mutation>` tag's `name` attribute, preventing false matches on `<arg name>` children
+    - Cricket Soccer Robot 範本附帶完整 14 語系 `nameTranslations`（20 個變數 × 14 語言、15 個函式 × 14 語言）
+      Soccer Robot sample ships with full 14-locale `nameTranslations` (20 variables × 14 locales, 15 functions × 14 locales)
+    - 語言來源跟隨 Blockly 編輯器選擇的語言（而非 VS Code UI 語言），確保積木顯示語言與生成程式碼一致
+      Language source follows the Blockly editor's selected language (not VS Code UI language) for consistent block display and generated code
+    - `add-cyberbrick-sample` SKILL.md 新增 Phase 2.5 指南，說明掃描策略、14 語系格式與識別字合法性規則
+      Added Phase 2.5 guide to `add-cyberbrick-sample` SKILL.md covering scan strategy, 14-locale format, and identifier validity rules
+
 ## [0.68.0] - 2026-04-05
 
 ### ✨ 新功能 New Features
