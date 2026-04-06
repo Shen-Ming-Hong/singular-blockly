@@ -15,7 +15,7 @@
 
 **目的**：在 `sampleBrowserService.ts` 建立 TypeScript 型別——所有後續階段的前提
 
-- [ ] T001 在 `src/services/sampleBrowserService.ts` 新增 `NameTranslationEntry` 介面（14 個語系選填欄位 + 索引簽章）、`NameTranslations` 介面（`variables?` / `functions?`），並更新 `SampleWorkspace` 加入 `nameTranslations?: NameTranslations` 選填欄位，依據 [contracts/typescript-interfaces.md](contracts/typescript-interfaces.md)
+- [x] T001 在 `src/services/sampleBrowserService.ts` 新增 `NameTranslationEntry` 介面（14 個語系選填欄位 + 索引簽章）、`NameTranslations` 介面（`variables?` / `functions?`），並更新 `SampleWorkspace` 加入 `nameTranslations?: NameTranslations` 選填欄位，依據 [contracts/typescript-interfaces.md](contracts/typescript-interfaces.md)
 
 **Checkpoint**：型別定義就位——Phase 2 兩條平行路徑可以同時開始
 
@@ -27,9 +27,9 @@
 
 **⚠️ 重要**：T002 / T003 可平行執行（不同檔案）；T004 需等 T002 + T003 都完成
 
-- [ ] T002 [P] 在 `src/services/sampleBrowserService.ts` 實作 `isValidIdentifier(name: string): boolean`（不匯出），使用 `/^[^\d\W]\w*$/u` 正規表達式，符合 Python 3 PEP 3131 識別字規則（FR-005）
-- [ ] T003 [P] 在 `src/test/services/sampleBrowserService.test.ts` 新增 `applyNameTranslations` 測試 suite，寫入 SC-004 全部 6 個情境的**失敗測試**（依 TDD）：SC1 變數名稱替換、SC2 函式定義替換、SC3 函式呼叫 extraState XML 替換（**需同時斷言**：翻譯後所有 `arduino_function_call` extraState 的 `name=` 值，必須與同 workspace 中對應 `arduino_function` `fields.NAME` 完全一致，無懸空參照——對應 SC-002）、SC4 深層巢狀積木遞迴、SC5 無效翻譯識別字回退、SC6 語系三層回退策略
-- [ ] T004 在 `src/services/sampleBrowserService.ts` 實作並匯出 `applyNameTranslations(workspace, nameTranslations, language): object` 純函式，覆蓋 FR-003 全部四個替換目標：(a) `variables[].name`、(b) `arduino_function.fields.NAME`、(c) `arduino_function_call` extraState `mutation name="..."` 屬性、(d) `<arg name="...">` 屬性；使用 `JSON.parse(JSON.stringify())` 深層複製，實作三層回退（目標語系 → en → 原始名稱），確認 T003 全部測試通過
+- [x] T002 [P] 在 `src/services/sampleBrowserService.ts` 實作 `isValidIdentifier(name: string): boolean`（不匯出），使用 `/^[^\d\W]\w*$/u` 正規表達式，符合 Python 3 PEP 3131 識別字規則（FR-005）
+- [x] T003 [P] 在 `src/test/services/sampleBrowserService.test.ts` 新增 `applyNameTranslations` 測試 suite，寫入 SC-004 全部 6 個情境的**失敗測試**（依 TDD）：SC1 變數名稱替換、SC2 函式定義替換、SC3 函式呼叫 extraState XML 替換（**需同時斷言**：翻譯後所有 `arduino_function_call` extraState 的 `name=` 值，必須與同 workspace 中對應 `arduino_function` `fields.NAME` 完全一致，無懸空參照——對應 SC-002）、SC4 深層巢狀積木遞迴、SC5 無效翻譯識別字回退、SC6 語系三層回退策略
+- [x] T004 在 `src/services/sampleBrowserService.ts` 實作並匯出 `applyNameTranslations(workspace, nameTranslations, language): object` 純函式，覆蓋 FR-003 全部四個替換目標：(a) `variables[].name`、(b) `arduino_function.fields.NAME`、(c) `arduino_function_call` extraState `mutation name="..."` 屬性、(d) `<arg name="...">` 屬性；使用 `JSON.parse(JSON.stringify())` 深層複製，實作三層回退（目標語系 → en → 原始名稱），確認 T003 全部測試通過
 
 **Checkpoint**：執行 `npm test`——`applyNameTranslations` 6 個情境全數通過；Phase 3 / 4 / 5 現在可同時開工（有需要時）
 
@@ -41,8 +41,8 @@
 
 **Independent Test**：將 VS Code UI 語言設為 `en`，從範例瀏覽器載入 Soccer Robot 範本，Blockly 工作區中所有積木顯示英文名稱（例如 `controller`、`joystick_forward_back`），MicroPython 程式碼輸出 `def controller():` 而非 `def 遙控器():`
 
-- [ ] T005 [US1] 在 `src/webview/messageHandler.ts` 的 `handleLoadSelectedSample()` 中整合翻譯呼叫：在 `fetchSampleWorkspace()` 成功後、`postMessage` 前，呼叫 `applyNameTranslations(result.workspace, result.nameTranslations, resolvedLanguage)`；若 `nameTranslations` 未定義則略過（FR-006 向後相容）
-- [ ] T006 [US1] 在 `media/samples/cyberbrick-soccer-robot.json` 頂層新增 `nameTranslations` 區塊，填入 **en 翻譯**——`variables` 映射：全部 15 個工作區變數名稱及 5 個函式參數名稱（共 20 個 key）；`functions` 映射：全部 12 個函式名稱，依 [data-model.md](data-model.md) 完整清單與 [quickstart.md](quickstart.md) 命名規則
+- [x] T005 [US1] 在 `src/webview/messageHandler.ts` 的 `handleLoadSelectedSample()` 中整合翻譯呼叫：在 `fetchSampleWorkspace()` 成功後、`postMessage` 前，呼叫 `applyNameTranslations(result.workspace, result.nameTranslations, resolvedLanguage)`；若 `nameTranslations` 未定義則略過（FR-006 向後相容）
+- [x] T006 [US1] 在 `media/samples/cyberbrick-soccer-robot.json` 頂層新增 `nameTranslations` 區塊，填入 **en 翻譯**——`variables` 映射：全部 15 個工作區變數名稱及 5 個函式參數名稱（共 20 個 key）；`functions` 映射：全部 12 個函式名稱，依 [data-model.md](data-model.md) 完整清單與 [quickstart.md](quickstart.md) 命名規則
 
 **Checkpoint**：User Story 1 獨立可驗證——英文 UI 載入 Soccer Robot 後積木與程式碼均顯示英文識別字
 
@@ -54,8 +54,8 @@
 
 **Independent Test**：將 VS Code UI 語言設為 `ja`，載入 Soccer Robot 範本後確認積木顯示日文識別字（例如 `コントローラー`）且 MicroPython 程式碼使用相同日文識別字（`def コントローラー():`)
 
-- [ ] T007 [US2] 在 `media/samples/cyberbrick-soccer-robot.json` 的 `nameTranslations` 中，為所有 20 個名稱新增 `ja`、`ko` 翻譯，確保翻譯值皆為合法 Unicode 識別字（無空格、連字號、標點）
-- [ ] T008 [US2] 在 `media/samples/cyberbrick-soccer-robot.json` 的 `nameTranslations` 中，為所有 20 個名稱補全剩餘 11 個語系翻譯：`de`、`fr`、`es`、`it`、`pt-br`、`ru`、`pl`、`cs`、`hu`、`bg`、`tr`，完成 FR-008 全部 14 個非 `zh-hant` 語系
+- [x] T007 [US2] 在 `media/samples/cyberbrick-soccer-robot.json` 的 `nameTranslations` 中，為所有 20 個名稱新增 `ja`、`ko` 翻譯，確保翻譯值皆為合法 Unicode 識別字（無空格、連字號、標點）
+- [x] T008 [US2] 在 `media/samples/cyberbrick-soccer-robot.json` 的 `nameTranslations` 中，為所有 20 個名稱補全剩餘 11 個語系翻譯：`de`、`fr`、`es`、`it`、`pt-br`、`ru`、`pl`、`cs`、`hu`、`bg`、`tr`，完成 FR-008 全部 14 個非 `zh-hant` 語系
 
 **Checkpoint**：User Story 2 獨立可驗證——Soccer Robot 範本已具備全部 14 個語系的翻譯映射
 
@@ -67,7 +67,7 @@
 
 **Independent Test**：跟隨更新後的 SKILL.md 新增一個測試範本，Copilot Agent 在 Phase 2.5 步驟中輸出符合格式的 `nameTranslations` 區塊，最終 JSON 通過格式驗證
 
-- [ ] T009 [US3] 更新 `.github/skills/add-cyberbrick-sample/SKILL.md`，在現有 Phase 2（積木截圖）與 Phase 3（建立 JSON 檔）之間插入 **Phase 2.5: Generate Name Translations**，內容包含：(a) 掃描策略——全量 `workspace.variables[].name` 與 `arduino_function.fields.NAME` 不設排除規則；(b) 14 個非 `zh-hant` 語系清單與翻譯對應表格式；(c) 識別字合法性規則（無空格、無連字號、不以數字開頭）；(d) 驗證 checklist
+- [x] T009 [US3] 更新 `.github/skills/add-cyberbrick-sample/SKILL.md`，在現有 Phase 2（積木截圖）與 Phase 3（建立 JSON 檔）之間插入 **Phase 2.5: Generate Name Translations**，內容包含：(a) 掃描策略——全量 `workspace.variables[].name` 與 `arduino_function.fields.NAME` 不設排除規則；(b) 14 個非 `zh-hant` 語系清單與翻譯對應表格式；(c) 識別字合法性規則（無空格、無連字號、不以數字開頭）；(d) 驗證 checklist
 
 **Checkpoint**：User Story 3 獨立可驗證——新增範本流程包含 nameTranslations 自動生成步驟
 
@@ -77,7 +77,7 @@
 
 **目的**：確認整體品質，排除回歸
 
-- [ ] T010 [P] 執行 `npm run compile` 確認 TypeScript 無編譯錯誤；執行 `npm test` 確認 SC-003（舊版不含 `nameTranslations` 的範本載入成功率 100%，零回歸）與 SC-004（6 個情境全數通過）；確認 `package.json` 的 `dependencies` 與 `devDependencies` 與實作前相比**無新增項目**（NFR-A 零依賴約束）
+- [x] T010 [P] 執行 `npm run compile` 確認 TypeScript 無編譯錯誤；執行 `npm test` 確認 SC-003（舊版不含 `nameTranslations` 的範本載入成功率 100%，零回歸）與 SC-004（6 個情境全數通過）；確認 `package.json` 的 `dependencies` 與 `devDependencies` 與實作前相比**無新增項目**（NFR-A 零依賴約束）
 
 ---
 

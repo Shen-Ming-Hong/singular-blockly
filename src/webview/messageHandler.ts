@@ -18,7 +18,7 @@ import { ArduinoMonitorService } from '../services/arduinoMonitorService';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
 import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSuggestionService';
-import { fetchSampleIndex, fetchSampleWorkspace, validateSampleWorkspace } from '../services/sampleBrowserService';
+import { fetchSampleIndex, fetchSampleWorkspace, validateSampleWorkspace, applyNameTranslations } from '../services/sampleBrowserService';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -1837,9 +1837,19 @@ export class WebViewMessageHandler {
 			return;
 		}
 
+		// 套用名稱翻譯（FR-002 / FR-003）：在工作區傳送至 WebView 前翻譯識別字
+		// 優先使用 WebView 傳來的已解析語言（使用者在編輯器中選定）；fallback 到 settingsManager
+		const resolvedLanguage =
+			typeof message.language === 'string' && message.language
+				? message.language
+				: this.settingsManager.resolveLanguage(await this.settingsManager.getLanguage());
+		const workspace = result.data.nameTranslations
+			? applyNameTranslations(result.data.workspace, result.data.nameTranslations, resolvedLanguage)
+			: result.data.workspace;
+
 		this.panel.webview.postMessage({
 			command: 'loadSampleWorkspace',
-			state: result.data.workspace,
+			state: workspace,
 			board: result.data.board,
 		});
 	}
