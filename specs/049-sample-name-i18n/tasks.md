@@ -28,7 +28,7 @@
 **⚠️ 重要**：T002 / T003 可平行執行（不同檔案）；T004 需等 T002 + T003 都完成
 
 - [ ] T002 [P] 在 `src/services/sampleBrowserService.ts` 實作 `isValidIdentifier(name: string): boolean`（不匯出），使用 `/^[^\d\W]\w*$/u` 正規表達式，符合 Python 3 PEP 3131 識別字規則（FR-005）
-- [ ] T003 [P] 在 `src/test/services/sampleBrowserService.test.ts` 新增 `applyNameTranslations` 測試 suite，寫入 SC-004 全部 6 個情境的**失敗測試**（依 TDD）：SC1 變數名稱替換、SC2 函式定義替換、SC3 函式呼叫 extraState XML 替換、SC4 深層巢狀積木遞迴、SC5 無效翻譯識別字回退、SC6 語系三層回退策略
+- [ ] T003 [P] 在 `src/test/services/sampleBrowserService.test.ts` 新增 `applyNameTranslations` 測試 suite，寫入 SC-004 全部 6 個情境的**失敗測試**（依 TDD）：SC1 變數名稱替換、SC2 函式定義替換、SC3 函式呼叫 extraState XML 替換（**需同時斷言**：翻譯後所有 `arduino_function_call` extraState 的 `name=` 值，必須與同 workspace 中對應 `arduino_function` `fields.NAME` 完全一致，無懸空參照——對應 SC-002）、SC4 深層巢狀積木遞迴、SC5 無效翻譯識別字回退、SC6 語系三層回退策略
 - [ ] T004 在 `src/services/sampleBrowserService.ts` 實作並匯出 `applyNameTranslations(workspace, nameTranslations, language): object` 純函式，覆蓋 FR-003 全部四個替換目標：(a) `variables[].name`、(b) `arduino_function.fields.NAME`、(c) `arduino_function_call` extraState `mutation name="..."` 屬性、(d) `<arg name="...">` 屬性；使用 `JSON.parse(JSON.stringify())` 深層複製，實作三層回退（目標語系 → en → 原始名稱），確認 T003 全部測試通過
 
 **Checkpoint**：執行 `npm test`——`applyNameTranslations` 6 個情境全數通過；Phase 3 / 4 / 5 現在可同時開工（有需要時）
@@ -77,7 +77,7 @@
 
 **目的**：確認整體品質，排除回歸
 
-- [ ] T010 [P] 執行 `npm run compile` 確認 TypeScript 無編譯錯誤，執行 `npm test` 確認 SC-003（舊版不含 `nameTranslations` 的範本載入成功率 100%，零回歸）與 SC-004（6 個情境全數通過）
+- [ ] T010 [P] 執行 `npm run compile` 確認 TypeScript 無編譯錯誤；執行 `npm test` 確認 SC-003（舊版不含 `nameTranslations` 的範本載入成功率 100%，零回歸）與 SC-004（6 個情境全數通過）；確認 `package.json` 的 `dependencies` 與 `devDependencies` 與實作前相比**無新增項目**（NFR-A 零依賴約束）
 
 ---
 

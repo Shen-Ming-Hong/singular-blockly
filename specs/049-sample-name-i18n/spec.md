@@ -57,7 +57,7 @@
 **Acceptance Scenarios**:
 
 1. **Given** 範本作者提供包含中文變數與函式名稱的工作區 JSON，**When** 執行 `add-cyberbrick-sample` skill，**Then** Agent 在 Phase 2.5 步驟中輸出 `nameTranslations` 對應表，涵蓋所有 14 個非 `zh-hant` 語系。
-2. **Given** Agent 生成翻譯，**When** 翻譯名稱含有非法識別字字元（空格、連字號等），**Then** Agent 自動改用底線替代，確保翻譯後的名稱符合規則。
+2. **Given** Agent 生成翻譯，**When** 翻譯名稱含有非法識別字字元（空格、連字號等），**Then** Agent 自動改用底線替代，確保翻譯後的名稱符合規則。（此行為屬 Agent 端的翻譯**生成**規範，由 T009 實作；Extension Host 的 `applyNameTranslations()` 不自動替換——只做跳過並保留原始名稱，見 FR-004 與 Edge Cases。）
 
 ---
 
@@ -73,7 +73,7 @@
 
 ### Functional Requirements
 
-- **FR-001**: 範本 JSON 必須支援選填的 `nameTranslations` 區塊，結構包含 `variables` 與 `functions` 兩個子物件，每個子物件的 key 為中文原始名稱，value 為各語系翻譯的對應表（`LocalizedText`）。
+- **FR-001**: 範本 JSON 必須支援選填的 `nameTranslations` 區塊，結構包含 `variables` 與 `functions` 兩個子物件，每個子物件的 key 為中文原始名稱，value 為各語系翻譯的對應表（`NameTranslationEntry`——新增型別，所有語系選填，不含 `zh-hant` 欄位；與現有 `LocalizedText` 不同，`en` 非必填）。
 - **FR-002**: 系統在載入範本時，必須使用 `settingsManager.resolveLanguage()` 的解析結果作為目標語系，從 `nameTranslations` 中取得翻譯，並在工作區傳送到 WebView 前套用到 workspace 物件。
 - **FR-003**: 翻譯套用必須覆蓋以下四處：(a) 工作區變數列表中的 `name` 欄位、(b) 函式定義積木上的函式名稱欄位、(c) 函式呼叫積木中嵌入的 XML `name` 屬性字串、(d) 函式定義與呼叫積木 `extraState` 中 `<arg name="...">` 參數名稱。
 - **FR-004**: 翻譯名稱查找遵循三層回退策略：(1) 優先使用目標語系的翻譯；(2) 若目標語系無翻譯，嘗試使用 `en`（英文）翻譯；(3) 若 `en` 也無翻譯，保留原始中文名稱。若翻譯名稱包含非法識別字字元（空格、連字號、標點、數字開頭），跳過該翻譯並進入下一層回退，不中斷載入流程。
