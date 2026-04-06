@@ -39,6 +39,45 @@
                 "bg": "Пълно начално работно пространство за футболен робот CyberBrick.",
                 "tr": "CyberBrick futbol robotu için eksiksiz bir başlangıç çalışma alanı."
             }
+        },
+        {
+            "id": "cyberbrick-joystick-test",
+            "filename": "cyberbrick-joystick-test.json",
+            "board": "cyberbrick",
+            "title": {
+                "en": "RC Controller Test",
+                "zh-hant": "RC 搖桿控制器測試",
+                "ja": "RCコントローラーテスト",
+                "ko": "RC 컨트롤러 테스트",
+                "de": "RC-Controller-Test",
+                "fr": "Test du contrôleur RC",
+                "es": "Prueba del controlador RC",
+                "it": "Test del controller RC",
+                "pt-br": "Teste do controle RC",
+                "ru": "Тест RC-контроллера",
+                "pl": "Test kontrolera RC",
+                "cs": "Test RC ovladače",
+                "hu": "RC vezérlő teszt",
+                "bg": "Тест на RC контролер",
+                "tr": "RC Denetleyici Testi"
+            },
+            "description": {
+                "en": "Tests RC controller input values and displays them on the serial terminal.",
+                "zh-hant": "測試搖桿控制器的輸入數值並顯示在終端機上。",
+                "ja": "RCコントローラーの入力値をシリアルターミナルに表示します。",
+                "ko": "RC 컨트롤러 입력 값을 시리얼 터미널에 표시합니다.",
+                "de": "Testet die Eingabewerte des RC-Controllers und zeigt sie im seriellen Terminal an.",
+                "fr": "Teste les valeurs d'entrée du contrôleur RC et les affiche dans le terminal série.",
+                "es": "Prueba los valores de entrada del controlador RC y los muestra en el terminal serie.",
+                "it": "Testa i valori di input del controller RC e li visualizza nel terminale seriale.",
+                "pt-br": "Testa os valores de entrada do controle RC e os exibe no terminal serial.",
+                "ru": "Тестирует значения ввода RC-контроллера и отображает их в серийном терминале.",
+                "pl": "Testuje wartości wejściowe kontrolera RC i wyświetla je w terminalu szeregowym.",
+                "cs": "Testuje vstupní hodnoty RC ovladače a zobrazuje je na sériovém terminálu.",
+                "hu": "Teszteli az RC vezérlő bemeneti értékeit és megjeleníti őket a soros terminálban.",
+                "bg": "Тества входните стойности на RC контролера и ги показва на серийния терминал.",
+                "tr": "RC denetleyici giriş değerlerini test eder ve seri terminalde görüntüler."
+            }
         }
     ]
 }
