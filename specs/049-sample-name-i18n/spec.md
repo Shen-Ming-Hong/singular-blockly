@@ -9,7 +9,7 @@
 
 ### Session 2026-04-06
 
-- Q: FR-003(c) 的 extraState XML 注入是否需要額外 XML encode？ → A: FR-005 識別字驗證規則（僅允許 Unicode 字母、數字、底線）本身排除所有 XML 不安全字元（`<`、`>`、`"`、`&`），該規則即為 extraState XML 注入的安全防線，不需額外 XML 編碼。
+- Q: FR-003(c) 的 extraState XML 注入是否需要額外 XML encode？ → A: FR-005 識別字驗證規則（僅允許 ASCII 字母、數字、底線，跨平台相容性設計）本身排除所有 XML 不安全字元（`<`、`>`、`"`、`&`），該規則即為 extraState XML 注入的安全防線，不需額外 XML 編碼。
 - Q: `auto` 語系解析結果落在無翻譯的語系時應如何回退？ → A: 使用英文（`en`）作為中間回退層——若目標語系無翻譯，先嘗試 `en` 翻譯；若 `en` 翻譯也不存在，才保留原始中文名稱。理由：非支援語系的使用者通常比較看得懂英文而非中文。- Q: FR-003 是否需要覆蓋函式參數名稱（`<arg name="...">`）的翻譯？ → A: 是。實際範本檔中已大量使用帶參數函式（如 `車燈(紅色, 綠色, 藍色)`、`馬達移動(左輪速度, 右輪速度)`），參數名稱同時出現於函式定義與函式呼叫的 extraState `<arg name="...">`中，必須一並翻譯。`nameTranslations.variables` 映射表同時涵蓋工作區變數與函式參數名稱。
 
 ## User Scenarios & Testing _(mandatory)_
@@ -77,7 +77,7 @@
 - **FR-002**: 系統在載入範本時，必須使用 `settingsManager.resolveLanguage()` 的解析結果作為目標語系，從 `nameTranslations` 中取得翻譯，並在工作區傳送到 WebView 前套用到 workspace 物件。
 - **FR-003**: 翻譯套用必須覆蓋以下四處：(a) 工作區變數列表中的 `name` 欄位、(b) 函式定義積木上的函式名稱欄位、(c) 函式呼叫積木中嵌入的 XML `name` 屬性字串、(d) 函式定義與呼叫積木 `extraState` 中 `<arg name="...">` 參數名稱。
 - **FR-004**: 翻譯名稱查找遵循三層回退策略：(1) 優先使用目標語系的翻譯；(2) 若目標語系無翻譯，嘗試使用 `en`（英文）翻譯；(3) 若 `en` 也無翻譯，保留原始中文名稱。若翻譯名稱包含非法識別字字元（空格、連字號、標點、數字開頭），跳過該翻譯並進入下一層回退，不中斷載入流程。
-- **FR-005**: 翻譯名稱合法性規則：僅允許 Unicode 字母、數字、底線組成，且不得以數字開頭（與 Python 3 識別字規則一致）。此規則同時作為 FR-003(c) extraState XML 注入的安全防線——凡符合此規則的名稱必然不含 XML 特殊字元（`<`、`>`、`"`、`&`），因此無需額外 XML encode。
+- **FR-005**: 翻譯名稱合法性規則：僅允許 **ASCII** 字母（`[A-Za-z_]` 起始，後接 `[A-Za-z0-9_]`），不得含空格、連字號、重音字母或 CJK 字元（跨平台相容性設計）。此規則同時作為 FR-003(c) extraState XML 注入的安全防線——凡符合此規則的名稱必然不含 XML 特殊字元（`<`、`>`、`"`、`&`），因此無需額外 XML encode。
 - **FR-006**: 不含 `nameTranslations` 區塊的舊版範本 JSON 必須完全向後相容，載入行為與目前相同。
 - **FR-007**: `add-cyberbrick-sample` SKILL.md 必須加入「Phase 2.5: Generate Name Translations」步驟。該步驟必須包含：(a) 揃取策略——掃描 `workspace.variables[].name` 和所有 `arduino_function` 積木的 `fields.NAME` 的全量唯一值，不設排除規則；(b) 14 個非 `zh-hant` 語系清單及翻譯對應表格式；(c) 識別字合法性規則（無空格、無連字號、不以數字開頭）；(d) 驗證 checklist。
 - **FR-008**: 現有的 `cyberbrick-soccer-robot.json` 範本必須更新，加入涵蓋所有 14 個非 `zh-hant` 語系的 `nameTranslations` 區塊。

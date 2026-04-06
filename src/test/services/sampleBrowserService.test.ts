@@ -299,7 +299,8 @@ suite('sampleBrowserService', () => {
 			assert.strictEqual(callNameMatch![1], defFields['NAME'], '函式呼叫的 name= 必須與函式定義 fields.NAME 完全一致（SC-002）');
 
 			// 參數名稱也已翻譯
-			assert.ok(defBlock['extraState'] as string, '<arg name="red"');
+			const defExtraState = defBlock['extraState'] as string;
+			assert.ok(defExtraState.includes('<arg name="red"'), `defExtraState 應含 <arg name="red"，實際: ${defExtraState}`);
 			assert.ok(callExtraState.includes('<arg name="red"'), `callExtraState 應含 <arg name="red"，實際: ${callExtraState}`);
 		});
 

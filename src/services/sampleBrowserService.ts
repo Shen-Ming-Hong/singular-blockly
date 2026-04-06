@@ -240,15 +240,15 @@ export function validateSampleWorkspace(json: unknown): json is SampleWorkspace 
 // ─── Name Translation ────────────────────────────────────────────────────────
 
 /**
- * 驗證字串是否為合法的 Python 3 / MicroPython 識別字。
- * 使用 Unicode-aware 正規表達式，符合 PEP 3131 規則：
- * 以 Unicode 字母或底線開頭，後接字母、數字、底線，不含空格或符號。
+ * 驗證字串是否為合法的 ASCII 識別字（本專案刻意限制 ASCII）。
+ * 首字元為 `[A-Za-z_]`，後接 `[A-Za-z0-9_]`，不含空格、連字號、重音或 CJK 字元。
+ * 此約束確保跨平台相容性，同時排除所有 XML 特殊字元（FR-005 安全防線）。
  */
 function isValidIdentifier(name: string): boolean {
 	if (!name || name.length === 0) {
 		return false;
 	}
-	return /^[^\d\W]\w*$/u.test(name);
+	return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name);
 }
 
 /**
@@ -366,16 +366,18 @@ function translateBlocks(blocks: unknown, nameTranslations: NameTranslations, la
 
 /**
  * 替換 extraState XML 字串中的 mutation name="originalName" 屬性。
- * 僅匹配 mutation 層級的 name 屬性（前置空白，區分 <arg name=>）。
+ * 僅匹配 <mutation ...> 標籤上的 name 屬性，避免誤匹配 <arg name=>。
  */
 function translateMutationName(extraState: string, functionsMap: Record<string, NameTranslationEntry>, language: string): string {
-	return extraState.replace(/ name="([^"]+)"/g, (match, original: string) => {
-		const entry = functionsMap[original];
-		if (!entry) {
-			return match;
-		}
-		const translated = resolveTranslatedName(original, entry, language);
-		return ` name="${translated}"`;
+	return extraState.replace(/<mutation\b[^>]*>/g, (mutationTag) => {
+		return mutationTag.replace(/\bname="([^"]+)"/, (match, original: string) => {
+			const entry = functionsMap[original];
+			if (!entry) {
+				return match;
+			}
+			const translated = resolveTranslatedName(original, entry, language);
+			return `name="${translated}"`;
+		});
 	});
 }
 
