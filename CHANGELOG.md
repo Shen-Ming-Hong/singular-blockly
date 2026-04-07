@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.70.1] - 2026-04-07
+
+### 🐛 修復 Bug Fixes
+
+- **範例瀏覽器分類標題無障礙與 i18n 修正** (Sample Browser Category Header Accessibility & i18n Fix)
+    - 分類標題由 `<div>` 改為 `<button>`，補齊 `aria-expanded` / `aria-controls` 屬性，支援鍵盤導覽與螢幕閱讀器
+      Changed category header element from `<div>` to `<button>` with `aria-expanded` / `aria-controls` for keyboard navigation and screen reader support
+    - 移除 `text-transform: uppercase` 避免土耳其語（i/İ）、德語（ß→SS）等語系顯示異常
+      Removed `text-transform: uppercase` to prevent display issues in Turkish (i/İ), German (ß→SS), and other locales
+    - 預先建立 `Map` 分組，將分類渲染從 O(C×N) 降為 O(N)
+      Pre-build category `Map` in single pass, reducing rendering from O(C×N) to O(N)
+
 ## [0.70.0] - 2026-04-07
 
 ### ✨ 新功能 New Features
