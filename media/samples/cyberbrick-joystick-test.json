@@ -35,7 +35,7 @@
                       "next": {
                         "block": {
                           "type": "text_print",
-                          "id": "gsJVNsGqtQ%!|Wb1.=_$",
+                          "id": "xWL(bD/YGi|h7#]Zovr[",
                           "fields": {
                             "NEW_LINE": false
                           },
@@ -43,18 +43,9 @@
                             "TEXT": {
                               "shadow": {
                                 "type": "text",
-                                "id": "17wi;P!t*MM(I@E4(3N#",
+                                "id": "g1tbtFJo3M7zPa|.]RI%",
                                 "fields": {
-                                  "TEXT": "abc"
-                                }
-                              },
-                              "block": {
-                                "type": "variables_get",
-                                "id": "9o:eU0n:C]P]cT8y](lt",
-                                "fields": {
-                                  "VAR": {
-                                    "id": "b?u~}EtD+oO@3sN6_Ka#"
-                                  }
+                                  "TEXT": "前:"
                                 }
                               }
                             }
@@ -62,7 +53,7 @@
                           "next": {
                             "block": {
                               "type": "text_print",
-                              "id": "5/L!OVw[I;sFu8tdW{!E",
+                              "id": "gsJVNsGqtQ%!|Wb1.=_$",
                               "fields": {
                                 "NEW_LINE": false
                               },
@@ -70,9 +61,18 @@
                                 "TEXT": {
                                   "shadow": {
                                     "type": "text",
-                                    "id": "/G-zq%ORPdVQX^2Y!urG",
+                                    "id": "17wi;P!t*MM(I@E4(3N#",
                                     "fields": {
-                                      "TEXT": "/"
+                                      "TEXT": "abc"
+                                    }
+                                  },
+                                  "block": {
+                                    "type": "variables_get",
+                                    "id": "9o:eU0n:C]P]cT8y](lt",
+                                    "fields": {
+                                      "VAR": {
+                                        "id": "b?u~}EtD+oO@3sN6_Ka#"
+                                      }
                                     }
                                   }
                                 }
@@ -80,7 +80,7 @@
                               "next": {
                                 "block": {
                                   "type": "text_print",
-                                  "id": "w/Y)nL;qQLxRPkd2U]N1",
+                                  "id": "5/L!OVw[I;sFu8tdW{!E",
                                   "fields": {
                                     "NEW_LINE": false
                                   },
@@ -88,18 +88,9 @@
                                     "TEXT": {
                                       "shadow": {
                                         "type": "text",
-                                        "id": "@`F5p}f/~Wi//NqC{q*(",
+                                        "id": "/G-zq%ORPdVQX^2Y!urG",
                                         "fields": {
-                                          "TEXT": "abc"
-                                        }
-                                      },
-                                      "block": {
-                                        "type": "variables_get",
-                                        "id": "YfxQK$yd+EJI,n.;vlR{",
-                                        "fields": {
-                                          "VAR": {
-                                            "id": "$v((cyAo%H1AEKMcP#91"
-                                          }
+                                          "TEXT": "/"
                                         }
                                       }
                                     }
@@ -107,7 +98,7 @@
                                   "next": {
                                     "block": {
                                       "type": "text_print",
-                                      "id": "U%b1f:YeEyfv+.DWqDjX",
+                                      "id": "hbG6b*wN#k3pcQ@q=em7",
                                       "fields": {
                                         "NEW_LINE": false
                                       },
@@ -115,9 +106,9 @@
                                         "TEXT": {
                                           "shadow": {
                                             "type": "text",
-                                            "id": "17wi;P!t*MM(I@E4(3N#",
+                                            "id": "@%atbPBC:E6ht,+r,WH,",
                                             "fields": {
-                                              "TEXT": ":"
+                                              "TEXT": "後:"
                                             }
                                           }
                                         }
@@ -125,7 +116,7 @@
                                       "next": {
                                         "block": {
                                           "type": "text_print",
-                                          "id": "#LbO(=TXjah-FU(m2J,i",
+                                          "id": "w/Y)nL;qQLxRPkd2U]N1",
                                           "fields": {
                                             "NEW_LINE": false
                                           },
@@ -133,17 +124,17 @@
                                             "TEXT": {
                                               "shadow": {
                                                 "type": "text",
-                                                "id": "T/?k]Nv(i30~5;bt^?.[",
+                                                "id": "@`F5p}f/~Wi//NqC{q*(",
                                                 "fields": {
                                                   "TEXT": "abc"
                                                 }
                                               },
                                               "block": {
                                                 "type": "variables_get",
-                                                "id": "WO*+P1$Ne@sl^2PS6-MV",
+                                                "id": "YfxQK$yd+EJI,n.;vlR{",
                                                 "fields": {
                                                   "VAR": {
-                                                    "id": "@EvI#XmiI`d[EriM+QVj"
+                                                    "id": "$v((cyAo%H1AEKMcP#91"
                                                   }
                                                 }
                                               }
@@ -152,7 +143,7 @@
                                           "next": {
                                             "block": {
                                               "type": "text_print",
-                                              "id": "l*g8_H9Iqfeag+_rC{AZ",
+                                              "id": "U%b1f:YeEyfv+.DWqDjX",
                                               "fields": {
                                                 "NEW_LINE": false
                                               },
@@ -160,9 +151,9 @@
                                                 "TEXT": {
                                                   "shadow": {
                                                     "type": "text",
-                                                    "id": "T/?k]Nv(i30~5;bt^?.[",
+                                                    "id": "17wi;P!t*MM(I@E4(3N#",
                                                     "fields": {
-                                                      "TEXT": " "
+                                                      "TEXT": ":"
                                                     }
                                                   }
                                                 }
@@ -170,7 +161,7 @@
                                               "next": {
                                                 "block": {
                                                   "type": "text_print",
-                                                  "id": "`N.{P^JS4YdnW)MtUpwC",
+                                                  "id": "#LbO(=TXjah-FU(m2J,i",
                                                   "fields": {
                                                     "NEW_LINE": false
                                                   },
@@ -178,17 +169,17 @@
                                                     "TEXT": {
                                                       "shadow": {
                                                         "type": "text",
-                                                        "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                        "id": "T/?k]Nv(i30~5;bt^?.[",
                                                         "fields": {
                                                           "TEXT": "abc"
                                                         }
                                                       },
                                                       "block": {
                                                         "type": "variables_get",
-                                                        "id": "3G.7$0fBB@-^X4c0mk^/",
+                                                        "id": "WO*+P1$Ne@sl^2PS6-MV",
                                                         "fields": {
                                                           "VAR": {
-                                                            "id": "s]:H$6K^]Y*-UKQe%]^m"
+                                                            "id": "@EvI#XmiI`d[EriM+QVj"
                                                           }
                                                         }
                                                       }
@@ -197,7 +188,7 @@
                                                   "next": {
                                                     "block": {
                                                       "type": "text_print",
-                                                      "id": "OqSXh=GaL)[T[q,QkOC+",
+                                                      "id": "l*g8_H9Iqfeag+_rC{AZ",
                                                       "fields": {
                                                         "NEW_LINE": false
                                                       },
@@ -205,9 +196,9 @@
                                                         "TEXT": {
                                                           "shadow": {
                                                             "type": "text",
-                                                            "id": "mXny/Bcca*l2Toa,W,:I",
+                                                            "id": "T/?k]Nv(i30~5;bt^?.[",
                                                             "fields": {
-                                                              "TEXT": "/"
+                                                              "TEXT": " "
                                                             }
                                                           }
                                                         }
@@ -215,7 +206,7 @@
                                                       "next": {
                                                         "block": {
                                                           "type": "text_print",
-                                                          "id": "?X[.x?gL%soa9jhtoAmZ",
+                                                          "id": "a@l|HT8Gh2@VdGP{j9PR",
                                                           "fields": {
                                                             "NEW_LINE": false
                                                           },
@@ -223,18 +214,9 @@
                                                             "TEXT": {
                                                               "shadow": {
                                                                 "type": "text",
-                                                                "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                "id": "qi[p(vzE?A4,N:X8HNlz",
                                                                 "fields": {
-                                                                  "TEXT": "abc"
-                                                                }
-                                                              },
-                                                              "block": {
-                                                                "type": "variables_get",
-                                                                "id": "GqHC]Ye?Q~.q6=9oC;lR",
-                                                                "fields": {
-                                                                  "VAR": {
-                                                                    "id": "t(/+mvI$C-^1K]*:Pi%M"
-                                                                  }
+                                                                  "TEXT": "左:"
                                                                 }
                                                               }
                                                             }
@@ -242,7 +224,7 @@
                                                           "next": {
                                                             "block": {
                                                               "type": "text_print",
-                                                              "id": "(px+3xt~RtFujs}BbGC%",
+                                                              "id": "`N.{P^JS4YdnW)MtUpwC",
                                                               "fields": {
                                                                 "NEW_LINE": false
                                                               },
@@ -250,9 +232,18 @@
                                                                 "TEXT": {
                                                                   "shadow": {
                                                                     "type": "text",
-                                                                    "id": "#}+#$5K4:`r0!R)fV-Br",
+                                                                    "id": "@`F5p}f/~Wi//NqC{q*(",
                                                                     "fields": {
-                                                                      "TEXT": ":"
+                                                                      "TEXT": "abc"
+                                                                    }
+                                                                  },
+                                                                  "block": {
+                                                                    "type": "variables_get",
+                                                                    "id": "3G.7$0fBB@-^X4c0mk^/",
+                                                                    "fields": {
+                                                                      "VAR": {
+                                                                        "id": "s]:H$6K^]Y*-UKQe%]^m"
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
@@ -260,7 +251,7 @@
                                                               "next": {
                                                                 "block": {
                                                                   "type": "text_print",
-                                                                  "id": "muHxgDR.KA2WbZq+jE3#",
+                                                                  "id": "OqSXh=GaL)[T[q,QkOC+",
                                                                   "fields": {
                                                                     "NEW_LINE": false
                                                                   },
@@ -268,18 +259,9 @@
                                                                     "TEXT": {
                                                                       "shadow": {
                                                                         "type": "text",
-                                                                        "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                        "id": "mXny/Bcca*l2Toa,W,:I",
                                                                         "fields": {
-                                                                          "TEXT": "abc"
-                                                                        }
-                                                                      },
-                                                                      "block": {
-                                                                        "type": "variables_get",
-                                                                        "id": "eOM`X+Wij@@*^50CxJ_6",
-                                                                        "fields": {
-                                                                          "VAR": {
-                                                                            "id": "?bqG3z^zPO3|K%K(aD`7"
-                                                                          }
+                                                                          "TEXT": "/"
                                                                         }
                                                                       }
                                                                     }
@@ -287,7 +269,7 @@
                                                                   "next": {
                                                                     "block": {
                                                                       "type": "text_print",
-                                                                      "id": "^;DGG9%D0hXp=.[5E$JY",
+                                                                      "id": "GG)d.-62I]tPk@l}Dx$n",
                                                                       "fields": {
                                                                         "NEW_LINE": false
                                                                       },
@@ -295,9 +277,9 @@
                                                                         "TEXT": {
                                                                           "shadow": {
                                                                             "type": "text",
-                                                                            "id": "[=@eusTi+7!S#0-EoW7P",
+                                                                            "id": "4j%n/]v/92Naac*NyL.J",
                                                                             "fields": {
-                                                                              "TEXT": " "
+                                                                              "TEXT": "右:"
                                                                             }
                                                                           }
                                                                         }
@@ -305,7 +287,7 @@
                                                                       "next": {
                                                                         "block": {
                                                                           "type": "text_print",
-                                                                          "id": "v9.7C}*XqbVvDa~XDO5%",
+                                                                          "id": "?X[.x?gL%soa9jhtoAmZ",
                                                                           "fields": {
                                                                             "NEW_LINE": false
                                                                           },
@@ -320,10 +302,10 @@
                                                                               },
                                                                               "block": {
                                                                                 "type": "variables_get",
-                                                                                "id": "J77iNIY?^_j`3G/VoukI",
+                                                                                "id": "GqHC]Ye?Q~.q6=9oC;lR",
                                                                                 "fields": {
                                                                                   "VAR": {
-                                                                                    "id": "@9=]QkZ(}gfvAQbU(!I7"
+                                                                                    "id": "t(/+mvI$C-^1K]*:Pi%M"
                                                                                   }
                                                                                 }
                                                                               }
@@ -332,7 +314,7 @@
                                                                           "next": {
                                                                             "block": {
                                                                               "type": "text_print",
-                                                                              "id": "|w$Q-LdT)n:9u4LkFC|C",
+                                                                              "id": "(px+3xt~RtFujs}BbGC%",
                                                                               "fields": {
                                                                                 "NEW_LINE": false
                                                                               },
@@ -340,9 +322,9 @@
                                                                                 "TEXT": {
                                                                                   "shadow": {
                                                                                     "type": "text",
-                                                                                    "id": "vd9cSn^@=o%YWD0C}-^*",
+                                                                                    "id": "#}+#$5K4:`r0!R)fV-Br",
                                                                                     "fields": {
-                                                                                      "TEXT": "/"
+                                                                                      "TEXT": ":"
                                                                                     }
                                                                                   }
                                                                                 }
@@ -350,7 +332,7 @@
                                                                               "next": {
                                                                                 "block": {
                                                                                   "type": "text_print",
-                                                                                  "id": "lewiTb!nU`GVuLs`PWA5",
+                                                                                  "id": "muHxgDR.KA2WbZq+jE3#",
                                                                                   "fields": {
                                                                                     "NEW_LINE": false
                                                                                   },
@@ -358,17 +340,17 @@
                                                                                     "TEXT": {
                                                                                       "shadow": {
                                                                                         "type": "text",
-                                                                                        "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                                        "id": "Lr{$.+_$,gy0ScK74aEb",
                                                                                         "fields": {
                                                                                           "TEXT": "abc"
                                                                                         }
                                                                                       },
                                                                                       "block": {
                                                                                         "type": "variables_get",
-                                                                                        "id": "m1u*~3=P5f^D^44BiqNf",
+                                                                                        "id": "eOM`X+Wij@@*^50CxJ_6",
                                                                                         "fields": {
                                                                                           "VAR": {
-                                                                                            "id": "pPfwVLk?FBewj?-]uB+n"
+                                                                                            "id": "?bqG3z^zPO3|K%K(aD`7"
                                                                                           }
                                                                                         }
                                                                                       }
@@ -377,7 +359,7 @@
                                                                                   "next": {
                                                                                     "block": {
                                                                                       "type": "text_print",
-                                                                                      "id": "t~5$3n[vYB]S-U[MBD(7",
+                                                                                      "id": "^;DGG9%D0hXp=.[5E$JY",
                                                                                       "fields": {
                                                                                         "NEW_LINE": false
                                                                                       },
@@ -385,9 +367,9 @@
                                                                                         "TEXT": {
                                                                                           "shadow": {
                                                                                             "type": "text",
-                                                                                            "id": "ZcF2A)MNTT1kHEDq36DJ",
+                                                                                            "id": "[=@eusTi+7!S#0-EoW7P",
                                                                                             "fields": {
-                                                                                              "TEXT": ":"
+                                                                                              "TEXT": " "
                                                                                             }
                                                                                           }
                                                                                         }
@@ -395,7 +377,7 @@
                                                                                       "next": {
                                                                                         "block": {
                                                                                           "type": "text_print",
-                                                                                          "id": "i~jK7y`~iA?cjrCp#T^`",
+                                                                                          "id": "iAYp3OCNCN2D}.7~Ef|]",
                                                                                           "fields": {
                                                                                             "NEW_LINE": false
                                                                                           },
@@ -403,18 +385,9 @@
                                                                                             "TEXT": {
                                                                                               "shadow": {
                                                                                                 "type": "text",
-                                                                                                "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                                                "id": "0cJFt^p{9Xk/3-1e;O]b",
                                                                                                 "fields": {
-                                                                                                  "TEXT": "abc"
-                                                                                                }
-                                                                                              },
-                                                                                              "block": {
-                                                                                                "type": "variables_get",
-                                                                                                "id": "Hv5EQ]NeI:aAXkPGYo-1",
-                                                                                                "fields": {
-                                                                                                  "VAR": {
-                                                                                                    "id": "cMY5*e@XCk$BW*BfqNJX"
-                                                                                                  }
+                                                                                                  "TEXT": "上:"
                                                                                                 }
                                                                                               }
                                                                                             }
@@ -422,7 +395,7 @@
                                                                                           "next": {
                                                                                             "block": {
                                                                                               "type": "text_print",
-                                                                                              "id": "d|^~g#qee?htGdpOE+!7",
+                                                                                              "id": "v9.7C}*XqbVvDa~XDO5%",
                                                                                               "fields": {
                                                                                                 "NEW_LINE": false
                                                                                               },
@@ -430,9 +403,18 @@
                                                                                                 "TEXT": {
                                                                                                   "shadow": {
                                                                                                     "type": "text",
-                                                                                                    "id": "#%mN/E{%s#%[45NAaU|J",
+                                                                                                    "id": "@`F5p}f/~Wi//NqC{q*(",
                                                                                                     "fields": {
-                                                                                                      "TEXT": " "
+                                                                                                      "TEXT": "abc"
+                                                                                                    }
+                                                                                                  },
+                                                                                                  "block": {
+                                                                                                    "type": "variables_get",
+                                                                                                    "id": "J77iNIY?^_j`3G/VoukI",
+                                                                                                    "fields": {
+                                                                                                      "VAR": {
+                                                                                                        "id": "@9=]QkZ(}gfvAQbU(!I7"
+                                                                                                      }
                                                                                                     }
                                                                                                   }
                                                                                                 }
@@ -440,25 +422,183 @@
                                                                                               "next": {
                                                                                                 "block": {
                                                                                                   "type": "text_print",
-                                                                                                  "id": ":a?e}yD$yzUaNA|ak~G;",
+                                                                                                  "id": "|w$Q-LdT)n:9u4LkFC|C",
                                                                                                   "fields": {
-                                                                                                    "NEW_LINE": true
+                                                                                                    "NEW_LINE": false
                                                                                                   },
                                                                                                   "inputs": {
                                                                                                     "TEXT": {
                                                                                                       "shadow": {
                                                                                                         "type": "text",
-                                                                                                        "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                                                        "id": "vd9cSn^@=o%YWD0C}-^*",
                                                                                                         "fields": {
-                                                                                                          "TEXT": "abc"
+                                                                                                          "TEXT": "/"
+                                                                                                        }
+                                                                                                      }
+                                                                                                    }
+                                                                                                  },
+                                                                                                  "next": {
+                                                                                                    "block": {
+                                                                                                      "type": "text_print",
+                                                                                                      "id": "qnS!T5h.)8$|eE5L/XI_",
+                                                                                                      "fields": {
+                                                                                                        "NEW_LINE": false
+                                                                                                      },
+                                                                                                      "inputs": {
+                                                                                                        "TEXT": {
+                                                                                                          "shadow": {
+                                                                                                            "type": "text",
+                                                                                                            "id": "=%B[[p]*.ZSjyMijY?2F",
+                                                                                                            "fields": {
+                                                                                                              "TEXT": "下:"
+                                                                                                            }
+                                                                                                          }
                                                                                                         }
                                                                                                       },
-                                                                                                      "block": {
-                                                                                                        "type": "variables_get",
-                                                                                                        "id": "tq^VQ4$xjUL|jrN?%[_7",
-                                                                                                        "fields": {
-                                                                                                          "VAR": {
-                                                                                                            "id": "LkI?6El^Rqu_U#hw7B?Y"
+                                                                                                      "next": {
+                                                                                                        "block": {
+                                                                                                          "type": "text_print",
+                                                                                                          "id": "lewiTb!nU`GVuLs`PWA5",
+                                                                                                          "fields": {
+                                                                                                            "NEW_LINE": false
+                                                                                                          },
+                                                                                                          "inputs": {
+                                                                                                            "TEXT": {
+                                                                                                              "shadow": {
+                                                                                                                "type": "text",
+                                                                                                                "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                                                                "fields": {
+                                                                                                                  "TEXT": "abc"
+                                                                                                                }
+                                                                                                              },
+                                                                                                              "block": {
+                                                                                                                "type": "variables_get",
+                                                                                                                "id": "m1u*~3=P5f^D^44BiqNf",
+                                                                                                                "fields": {
+                                                                                                                  "VAR": {
+                                                                                                                    "id": "pPfwVLk?FBewj?-]uB+n"
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
+                                                                                                          },
+                                                                                                          "next": {
+                                                                                                            "block": {
+                                                                                                              "type": "text_print",
+                                                                                                              "id": "t~5$3n[vYB]S-U[MBD(7",
+                                                                                                              "fields": {
+                                                                                                                "NEW_LINE": false
+                                                                                                              },
+                                                                                                              "inputs": {
+                                                                                                                "TEXT": {
+                                                                                                                  "shadow": {
+                                                                                                                    "type": "text",
+                                                                                                                    "id": "ZcF2A)MNTT1kHEDq36DJ",
+                                                                                                                    "fields": {
+                                                                                                                      "TEXT": ":"
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              },
+                                                                                                              "next": {
+                                                                                                                "block": {
+                                                                                                                  "type": "text_print",
+                                                                                                                  "id": "i~jK7y`~iA?cjrCp#T^`",
+                                                                                                                  "fields": {
+                                                                                                                    "NEW_LINE": false
+                                                                                                                  },
+                                                                                                                  "inputs": {
+                                                                                                                    "TEXT": {
+                                                                                                                      "shadow": {
+                                                                                                                        "type": "text",
+                                                                                                                        "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                                                                        "fields": {
+                                                                                                                          "TEXT": "abc"
+                                                                                                                        }
+                                                                                                                      },
+                                                                                                                      "block": {
+                                                                                                                        "type": "variables_get",
+                                                                                                                        "id": "Hv5EQ]NeI:aAXkPGYo-1",
+                                                                                                                        "fields": {
+                                                                                                                          "VAR": {
+                                                                                                                            "id": "cMY5*e@XCk$BW*BfqNJX"
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                  },
+                                                                                                                  "next": {
+                                                                                                                    "block": {
+                                                                                                                      "type": "text_print",
+                                                                                                                      "id": "d|^~g#qee?htGdpOE+!7",
+                                                                                                                      "fields": {
+                                                                                                                        "NEW_LINE": false
+                                                                                                                      },
+                                                                                                                      "inputs": {
+                                                                                                                        "TEXT": {
+                                                                                                                          "shadow": {
+                                                                                                                            "type": "text",
+                                                                                                                            "id": "#%mN/E{%s#%[45NAaU|J",
+                                                                                                                            "fields": {
+                                                                                                                              "TEXT": " "
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      },
+                                                                                                                      "next": {
+                                                                                                                        "block": {
+                                                                                                                          "type": "text_print",
+                                                                                                                          "id": "/%BS(+diWpAm`=hgLvvc",
+                                                                                                                          "fields": {
+                                                                                                                            "NEW_LINE": false
+                                                                                                                          },
+                                                                                                                          "inputs": {
+                                                                                                                            "TEXT": {
+                                                                                                                              "shadow": {
+                                                                                                                                "type": "text",
+                                                                                                                                "id": "*dr~6ljZEAk_A,Mf}]Np",
+                                                                                                                                "fields": {
+                                                                                                                                  "TEXT": "按鈕:"
+                                                                                                                                }
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          },
+                                                                                                                          "next": {
+                                                                                                                            "block": {
+                                                                                                                              "type": "text_print",
+                                                                                                                              "id": ":a?e}yD$yzUaNA|ak~G;",
+                                                                                                                              "fields": {
+                                                                                                                                "NEW_LINE": true
+                                                                                                                              },
+                                                                                                                              "inputs": {
+                                                                                                                                "TEXT": {
+                                                                                                                                  "shadow": {
+                                                                                                                                    "type": "text",
+                                                                                                                                    "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                                                                                    "fields": {
+                                                                                                                                      "TEXT": "abc"
+                                                                                                                                    }
+                                                                                                                                  },
+                                                                                                                                  "block": {
+                                                                                                                                    "type": "variables_get",
+                                                                                                                                    "id": "tq^VQ4$xjUL|jrN?%[_7",
+                                                                                                                                    "fields": {
+                                                                                                                                      "VAR": {
+                                                                                                                                        "id": "LkI?6El^Rqu_U#hw7B?Y"
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              }
+                                                                                                                            }
+                                                                                                                          }
+                                                                                                                        }
+                                                                                                                      }
+                                                                                                                    }
+                                                                                                                  }
+                                                                                                                }
+                                                                                                              }
+                                                                                                            }
                                                                                                           }
                                                                                                         }
                                                                                                       }
@@ -513,7 +653,7 @@
           "type": "arduino_function",
           "id": "csOp71p0QI|)Y8JSU#UO",
           "x": 0,
-          "y": 942,
+          "y": 1243,
           "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
           "fields": {
             "NAME": "讀取搖控器數值"
@@ -1959,6 +2099,120 @@
         "de": "tritt_joystick",
         "hu": "joystick_rug"
       }
+    }
+  },
+  "stringTranslations": {
+    "前:": {
+      "en": "Fwd:",
+      "ja": "前:",
+      "ko": "전:",
+      "de": "Vor:",
+      "fr": "Av:",
+      "es": "Adel:",
+      "it": "Avanti:",
+      "pt-br": "Frt:",
+      "ru": "Вп:",
+      "pl": "Prz:",
+      "cs": "Vpr:",
+      "hu": "Előre:",
+      "bg": "Напр:",
+      "tr": "İleri:"
+    },
+    "後:": {
+      "en": "Bwd:",
+      "ja": "後:",
+      "ko": "후:",
+      "de": "Rüc:",
+      "fr": "Arr:",
+      "es": "Atrás:",
+      "it": "Indie:",
+      "pt-br": "Ré:",
+      "ru": "Наз:",
+      "pl": "Wst:",
+      "cs": "Vzad:",
+      "hu": "Hátra:",
+      "bg": "Назад:",
+      "tr": "Geri:"
+    },
+    "左:": {
+      "en": "L:",
+      "ja": "左:",
+      "ko": "좌:",
+      "de": "Links:",
+      "fr": "G:",
+      "es": "Izq:",
+      "it": "Sin:",
+      "pt-br": "Esq:",
+      "ru": "Л:",
+      "pl": "L:",
+      "cs": "Vlevo:",
+      "hu": "Bal:",
+      "bg": "Ляво:",
+      "tr": "Sol:"
+    },
+    "右:": {
+      "en": "R:",
+      "ja": "右:",
+      "ko": "우:",
+      "de": "Rechts:",
+      "fr": "D:",
+      "es": "Der:",
+      "it": "Des:",
+      "pt-br": "Dir:",
+      "ru": "П:",
+      "pl": "P:",
+      "cs": "Vpravo:",
+      "hu": "Jobb:",
+      "bg": "Дясно:",
+      "tr": "Sağ:"
+    },
+    "上:": {
+      "en": "Up:",
+      "ja": "上:",
+      "ko": "위:",
+      "de": "Oben:",
+      "fr": "Haut:",
+      "es": "Arriba:",
+      "it": "Su:",
+      "pt-br": "Cima:",
+      "ru": "Вверх:",
+      "pl": "Góra:",
+      "cs": "Nahor:",
+      "hu": "Fel:",
+      "bg": "Горе:",
+      "tr": "Yukarı:"
+    },
+    "下:": {
+      "en": "Dn:",
+      "ja": "下:",
+      "ko": "아래:",
+      "de": "Unten:",
+      "fr": "Bas:",
+      "es": "Abajo:",
+      "it": "Giù:",
+      "pt-br": "Baixo:",
+      "ru": "Вниз:",
+      "pl": "Dół:",
+      "cs": "Dolů:",
+      "hu": "Le:",
+      "bg": "Долу:",
+      "tr": "Aşağı:"
+    },
+    "按鈕:": {
+      "en": "Btn:",
+      "ja": "ボタン:",
+      "ko": "버튼:",
+      "de": "Taste:",
+      "fr": "Btn:",
+      "es": "Btn:",
+      "it": "Btn:",
+      "pt-br": "Btn:",
+      "ru": "Кнп:",
+      "pl": "Przc:",
+      "cs": "Tl:",
+      "hu": "Gomb:",
+      "bg": "Копче:",
+      "tr": "Btn:"
     }
   }
 }
