@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.70.0] - 2026-04-07
+
+### ✨ 新功能 New Features
+
+- **範例瀏覽器分類群組** (Sample Browser Category Grouping)
+    - `media/samples/index.json` 頂層新增 `categories` 陣列，支援以資料驅動方式定義分類，每個分類標題涵蓋全部 15 種語言
+      Added top-level `categories` array to `media/samples/index.json`, supporting data-driven category definitions with titles in all 15 languages
+    - 現有三個 CyberBrick 範例（足球機器人、RC 搖桿測試、馬達與 LED 測試）歸入「足球機器人 (Soccer Robot)」分類
+      Existing three CyberBrick samples (Soccer Robot, RC Controller Test, Motor & LED Test) assigned to the "Soccer Robot" category
+    - 範例瀏覽器 Modal 依分類順序渲染可折疊 section header，點擊標題行即可展開/折疊（含 `▾` 旋轉動畫）
+      Sample browser modal renders collapsible section headers in category order; clicking the header toggles expand/collapse with a `▾` rotation animation
+    - 無 `category` 欄位的舊範例自動排末尾；`categories` 為空時退化為原本平鋪顯示（向下相容）
+      Legacy samples without a `category` field fall to the end; empty `categories` gracefully degrades to flat list (backward compatible)
+    - 修正 Modal 超出視窗問題：`sample-modal-content` 設定 `max-height: 80vh` + `overflow-y: auto`
+      Fixed modal overflow: `sample-modal-content` now uses `max-height: 80vh` with `overflow-y: auto`
+
 ## [0.69.0] - 2026-04-07
 
 ### ✨ 新功能 New Features
