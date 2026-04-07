@@ -3286,29 +3286,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 							sampleCardContainer.appendChild(grid);
 						} else {
 							// 依 categories 順序渲染可折疊分類群組
-							const categorisedIds = new Set();
+							// 預先建立 Map 分組，單次掃描避免 O(C×N) 重複 filter
+							const categoryMap = new Map();
+							const uncategorised = [];
+							samples.forEach(entry => {
+								if (entry.category) {
+									if (!categoryMap.has(entry.category)) categoryMap.set(entry.category, []);
+									categoryMap.get(entry.category).push(entry);
+								} else {
+									uncategorised.push(entry);
+								}
+							});
 
 							categories.forEach(cat => {
-								const catSamples = samples.filter(s => s.category === cat.id);
-								if (catSamples.length === 0) return;
+								const catSamples = categoryMap.get(cat.id);
+								if (!catSamples || catSamples.length === 0) return;
 
 								const group = document.createElement('div');
 								group.className = 'sample-category-group';
 
-								const header = document.createElement('div');
-								header.className = 'sample-category-header';
-								header.textContent = (cat.title && (cat.title[lang] || cat.title['en'])) || cat.id;
-								header.addEventListener('click', () => {
-									group.classList.toggle('sample-category-collapsed');
-								});
-
+								const gridId = `sample-category-cards-${cat.id}`;
 								const grid = document.createElement('div');
 								grid.className = 'sample-category-cards';
+								grid.id = gridId;
 
-								catSamples.forEach(entry => {
-									categorisedIds.add(entry.id);
-									appendSampleCard(entry, grid);
+								const header = document.createElement('button');
+								header.className = 'sample-category-header';
+								header.type = 'button';
+								header.textContent = (cat.title && (cat.title[lang] || cat.title['en'])) || cat.id;
+								header.setAttribute('aria-expanded', 'true');
+								header.setAttribute('aria-controls', gridId);
+								header.addEventListener('click', () => {
+									const willCollapse = !group.classList.contains('sample-category-collapsed');
+									group.classList.toggle('sample-category-collapsed', willCollapse);
+									header.setAttribute('aria-expanded', willCollapse ? 'false' : 'true');
 								});
+
+								catSamples.forEach(entry => appendSampleCard(entry, grid));
 
 								group.appendChild(header);
 								group.appendChild(grid);
@@ -3316,7 +3330,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 							});
 
 							// 無分類的 sample 排末尾
-							const uncategorised = samples.filter(s => !categorisedIds.has(s.id));
 							if (uncategorised.length > 0) {
 								const grid = document.createElement('div');
 								grid.className = 'sample-category-cards';
