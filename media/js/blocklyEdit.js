@@ -3225,6 +3225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				if (sampleCardContainer) {
 					sampleCardContainer.innerHTML = '';
 					const samples = message.samples || [];
+					const categories = message.categories || [];
 					const lang = message.language || 'en';
 					const loadBtnText = window.languageManager
 						? window.languageManager.getMessage('SAMPLE_BROWSER_LOAD_BUTTON', 'Load')
@@ -3240,7 +3241,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 						}
 					} else {
 						if (sampleEmptyNotice) sampleEmptyNotice.style.display = 'none';
-						samples.forEach(entry => {
+
+						const appendSampleCard = (entry, container) => {
 							const title = (entry.title && (entry.title[lang] || entry.title['en'])) || entry.id;
 							const desc = (entry.description && (entry.description[lang] || entry.description['en'])) || '';
 							const card = document.createElement('div');
@@ -3273,8 +3275,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 									language: currentResolvedLanguage,
 								});
 							});
-							sampleCardContainer.appendChild(card);
-						});
+							container.appendChild(card);
+						};
+
+						if (categories.length === 0) {
+							// 無分類資料：退化為原本平鋪顯示
+							const grid = document.createElement('div');
+							grid.className = 'sample-category-cards';
+							samples.forEach(entry => appendSampleCard(entry, grid));
+							sampleCardContainer.appendChild(grid);
+						} else {
+							// 依 categories 順序渲染可折疊分類群組
+							const categorisedIds = new Set();
+
+							categories.forEach(cat => {
+								const catSamples = samples.filter(s => s.category === cat.id);
+								if (catSamples.length === 0) return;
+
+								const group = document.createElement('div');
+								group.className = 'sample-category-group';
+
+								const header = document.createElement('div');
+								header.className = 'sample-category-header';
+								header.textContent = (cat.title && (cat.title[lang] || cat.title['en'])) || cat.id;
+								header.addEventListener('click', () => {
+									group.classList.toggle('sample-category-collapsed');
+								});
+
+								const grid = document.createElement('div');
+								grid.className = 'sample-category-cards';
+
+								catSamples.forEach(entry => {
+									categorisedIds.add(entry.id);
+									appendSampleCard(entry, grid);
+								});
+
+								group.appendChild(header);
+								group.appendChild(grid);
+								sampleCardContainer.appendChild(group);
+							});
+
+							// 無分類的 sample 排末尾
+							const uncategorised = samples.filter(s => !categorisedIds.has(s.id));
+							if (uncategorised.length > 0) {
+								const grid = document.createElement('div');
+								grid.className = 'sample-category-cards';
+								uncategorised.forEach(entry => appendSampleCard(entry, grid));
+								sampleCardContainer.appendChild(grid);
+							}
+						}
 					}
 				}
 				break;

@@ -1,10 +1,33 @@
 {
     "version": 1,
+    "categories": [
+        {
+            "id": "soccer-robot",
+            "title": {
+                "en": "Soccer Robot",
+                "zh-hant": "足球機器人",
+                "ja": "サッカーロボット",
+                "ko": "축구 로봇",
+                "de": "Fußballroboter",
+                "fr": "Robot de football",
+                "es": "Robot de fútbol",
+                "it": "Robot da calcio",
+                "pt-br": "Robô de futebol",
+                "ru": "Футбольный робот",
+                "pl": "Robot piłkarski",
+                "cs": "Fotbalový robot",
+                "hu": "Focis robot",
+                "bg": "Футболен робот",
+                "tr": "Futbol robotu"
+            }
+        }
+    ],
     "samples": [
         {
             "id": "cyberbrick-soccer-robot",
             "filename": "cyberbrick-soccer-robot.json",
             "board": "cyberbrick",
+            "category": "soccer-robot",
             "title": {
                 "en": "Soccer Robot",
                 "zh-hant": "足球機器人",
@@ -44,6 +67,7 @@
             "id": "cyberbrick-joystick-test",
             "filename": "cyberbrick-joystick-test.json",
             "board": "cyberbrick",
+            "category": "soccer-robot",
             "title": {
                 "en": "RC Controller Test",
                 "zh-hant": "RC 搖桿控制器測試",
@@ -83,6 +107,7 @@
             "id": "cyberbrick-motor-led-test",
             "filename": "cyberbrick-motor-led-test.json",
             "board": "cyberbrick",
+            "category": "soccer-robot",
             "title": {
                 "en": "Motor & LED Test",
                 "zh-hant": "馬達與 LED 測試",
