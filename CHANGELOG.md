@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.71.0] - 2026-04-07
+
+### ✨ 新功能 New Features
+
+- **範例 text 積木字串國際化支援** (Sample Text Block String i18n via `stringTranslations`)
+    - `SampleIndex` 新增 `stringTranslations` 欄位（`Record<string, Partial<Record<string, string>>>`），讓範例工作區的 `text` 積木 `fields.TEXT` 值可依目標語系替換
+      Added `stringTranslations` field to `SampleIndex` so `text` block `fields.TEXT` values can be substituted per target locale
+    - 目標語系缺值時自動回退至 `en`，`en` 亦缺值時保留原始字串；`zh-hant`（來源語系）直接保留不替換
+      Falls back to `en` if target locale is missing; preserves original string if `en` is also absent; `zh-hant` (source locale) is always preserved unchanged
+    - `cyberbrick-joystick-test.json` 已加入搖桿測試範例所有中文 label 的 `stringTranslations`（14 語系各自翻譯）
+      Added `stringTranslations` for all Chinese labels in `cyberbrick-joystick-test.json` covering 14 locales
+    - `applyNameTranslations()` 擴展以支援 text 積木字串翻譯，並新增 6 個單元測試涵蓋翻譯、回退、防禦性場景
+      Extended `applyNameTranslations()` to handle text block string translation, with 6 new unit tests covering translation, fallback, and defensive scenarios
+    - `add-cyberbrick-sample` SKILL.md 更新至 v1.3.0，補充 `stringTranslations` 完整工作流程說明
+      Updated `add-cyberbrick-sample` SKILL.md to v1.3.0 with full `stringTranslations` workflow documentation
+
 ## [0.70.1] - 2026-04-07
 
 ### 🐛 修復 Bug Fixes
