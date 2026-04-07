@@ -54,10 +54,18 @@ export interface SampleIndex {
 	samples: SampleEntry[];
 }
 
+/**
+ * 範本 JSON 頂層的字串翻譯表。
+ * key 為原始 zh-hant 字串（如 "前:"），value 為語系代碼到翻譯字串的映射。
+ * 無識別字格式限制，任何非空字串皆合法（供 text 積木的 fields.TEXT 使用）。
+ */
+export type StringTranslations = Record<string, Record<string, string>>;
+
 export interface SampleWorkspace {
 	workspace: object;
 	board: string;
 	nameTranslations?: NameTranslations;
+	stringTranslations?: StringTranslations;
 }
 
 /**
@@ -296,10 +304,44 @@ function resolveTranslatedName(original: string, entry: NameTranslationEntry, la
 }
 
 /**
- * 遞迴遍歷積木樹並套用名稱翻譯。
- * 處理 arduino_function（函式定義）與 arduino_function_call（函式呼叫）。
+ * 從字串翻譯映射中解析目標語系的字串，實作三層回退策略，無識別字格式限制。
+ * (1) 目標語系翻譯 → (2) en 翻譯 → (3) 原始字串
  */
-function translateBlocks(blocks: unknown, nameTranslations: NameTranslations, language: string): void {
+function resolveTranslatedString(original: string, translations: Record<string, string>, language: string): string {
+	// zh-hant 為基準語言，直接回傳原始字串
+	if (language === 'zh-hant') {
+		return original;
+	}
+
+	// 第一層：目標語系
+	const target = translations[language];
+	if (target !== undefined && target.length > 0) {
+		return target;
+	}
+
+	// 第二層：en 回退
+	if (language !== 'en') {
+		const en = translations['en'];
+		if (en !== undefined && en.length > 0) {
+			return en;
+		}
+	}
+
+	// 第三層：保留原始字串
+	return original;
+}
+
+/**
+ * 遞迴遍歷積木樹並套用名稱翻譯與字串翻譯。
+ * 處理 arduino_function（函式定義）、arduino_function_call（函式呼叫），
+ * 以及 text 積木的 fields.TEXT（字串標籤）。
+ */
+function translateBlocks(
+	blocks: unknown,
+	nameTranslations: NameTranslations,
+	language: string,
+	stringTranslations?: StringTranslations
+): void {
 	if (!Array.isArray(blocks)) {
 		return;
 	}
@@ -346,6 +388,17 @@ function translateBlocks(blocks: unknown, nameTranslations: NameTranslations, la
 			}
 		}
 
+		// text 積木：替換 fields.TEXT 字串標籤
+		if (blockType === 'text' && fields && stringTranslations) {
+			const text = fields['TEXT'] as string | undefined;
+			if (text !== undefined) {
+				const entry = stringTranslations[text];
+				if (entry) {
+					fields['TEXT'] = resolveTranslatedString(text, entry, language);
+				}
+			}
+		}
+
 		// 遞迴處理巢狀積木（inputs 中的每個輸入）
 		if (inputs) {
 			for (const inputKey of Object.keys(inputs)) {
@@ -354,10 +407,10 @@ function translateBlocks(blocks: unknown, nameTranslations: NameTranslations, la
 					const innerBlock = input['block'];
 					const shadowBlock = input['shadow'];
 					if (innerBlock) {
-						translateBlocks([innerBlock], nameTranslations, language);
+						translateBlocks([innerBlock], nameTranslations, language, stringTranslations);
 					}
 					if (shadowBlock) {
-						translateBlocks([shadowBlock], nameTranslations, language);
+						translateBlocks([shadowBlock], nameTranslations, language, stringTranslations);
 					}
 				}
 			}
@@ -366,7 +419,7 @@ function translateBlocks(blocks: unknown, nameTranslations: NameTranslations, la
 		// 遞迴處理 next 連接的積木
 		const next = b['next'] as Record<string, unknown> | undefined;
 		if (next?.['block']) {
-			translateBlocks([next['block']], nameTranslations, language);
+			translateBlocks([next['block']], nameTranslations, language, stringTranslations);
 		}
 	}
 }
@@ -407,12 +460,18 @@ function translateArgNames(extraState: string, variablesMap: Record<string, Name
  * 純函式：不修改輸入物件，回傳深層複製的新物件。
  * 無法翻譯的名稱（無翻譯映射或翻譯值不合法）保留原始名稱。
  *
- * @param workspace        Blockly workspace state 物件
- * @param nameTranslations 翻譯映射表（來自 SampleWorkspace.nameTranslations）
- * @param language         目標語系代碼（如 'en'、'ja'）
- * @returns                翻譯後的 workspace 物件（深層複製）
+ * @param workspace          Blockly workspace state 物件
+ * @param nameTranslations   名稱翻譯映射表（來自 SampleWorkspace.nameTranslations）
+ * @param language           目標語系代碼（如 'en'、'ja'）
+ * @param stringTranslations 字串翻譯映射表（來自 SampleWorkspace.stringTranslations，選用）
+ * @returns                  翻譯後的 workspace 物件（深層複製）
  */
-export function applyNameTranslations(workspace: object, nameTranslations: NameTranslations, language: string): object {
+export function applyNameTranslations(
+	workspace: object,
+	nameTranslations: NameTranslations,
+	language: string,
+	stringTranslations?: StringTranslations
+): object {
 	// 深層複製，確保純函式特性
 	const cloned = JSON.parse(JSON.stringify(workspace)) as Record<string, unknown>;
 
@@ -435,7 +494,7 @@ export function applyNameTranslations(workspace: object, nameTranslations: NameT
 	if (blocksWrapper) {
 		const topBlocks = blocksWrapper['blocks'] as unknown[] | undefined;
 		if (Array.isArray(topBlocks)) {
-			translateBlocks(topBlocks, nameTranslations, language);
+			translateBlocks(topBlocks, nameTranslations, language, stringTranslations);
 		}
 	}
 
