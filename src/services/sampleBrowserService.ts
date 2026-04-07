@@ -58,8 +58,9 @@ export interface SampleIndex {
  * 範本 JSON 頂層的字串翻譯表。
  * key 為原始 zh-hant 字串（如 "前:"），value 為語系代碼到翻譯字串的映射。
  * 無識別字格式限制，任何非空字串皆合法（供 text 積木的 fields.TEXT 使用）。
+ * 內層使用 Partial 以反映只需填部分語系（至少 en）的實際資料形態。
  */
-export type StringTranslations = Record<string, Record<string, string>>;
+export type StringTranslations = Record<string, Partial<Record<string, string>>>;
 
 export interface SampleWorkspace {
 	workspace: object;
@@ -307,22 +308,22 @@ function resolveTranslatedName(original: string, entry: NameTranslationEntry, la
  * 從字串翻譯映射中解析目標語系的字串，實作三層回退策略，無識別字格式限制。
  * (1) 目標語系翻譯 → (2) en 翻譯 → (3) 原始字串
  */
-function resolveTranslatedString(original: string, translations: Record<string, string>, language: string): string {
+function resolveTranslatedString(original: string, translations: Partial<Record<string, string>>, language: string): string {
 	// zh-hant 為基準語言，直接回傳原始字串
 	if (language === 'zh-hant') {
 		return original;
 	}
 
-	// 第一層：目標語系
+	// 第一層：目標語系（防禦非字串值）
 	const target = translations[language];
-	if (target !== undefined && target.length > 0) {
+	if (typeof target === 'string' && target.length > 0) {
 		return target;
 	}
 
 	// 第二層：en 回退
 	if (language !== 'en') {
 		const en = translations['en'];
-		if (en !== undefined && en.length > 0) {
+		if (typeof en === 'string' && en.length > 0) {
 			return en;
 		}
 	}
@@ -390,8 +391,8 @@ function translateBlocks(
 
 		// text 積木：替換 fields.TEXT 字串標籤
 		if (blockType === 'text' && fields && stringTranslations) {
-			const text = fields['TEXT'] as string | undefined;
-			if (text !== undefined) {
+			const text = fields['TEXT'];
+			if (typeof text === 'string') {
 				const entry = stringTranslations[text];
 				if (entry) {
 					fields['TEXT'] = resolveTranslatedString(text, entry, language);
@@ -456,7 +457,7 @@ function translateArgNames(extraState: string, variablesMap: Record<string, Name
 }
 
 /**
- * 將 workspace 中的函式名稱和變數名稱翻譯為目標語系。
+ * 將 workspace 中的函式名稱、變數名稱與 text 積木字串翻譯為目標語系。
  * 純函式：不修改輸入物件，回傳深層複製的新物件。
  * 無法翻譯的名稱（無翻譯映射或翻譯值不合法）保留原始名稱。
  *
