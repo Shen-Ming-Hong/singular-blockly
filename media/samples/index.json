@@ -78,6 +78,45 @@
                 "bg": "Тества входните стойности на RC контролера и ги показва на серийния терминал.",
                 "tr": "RC denetleyici giriş değerlerini test eder ve seri terminalde görüntüler."
             }
+        },
+        {
+            "id": "cyberbrick-motor-led-test",
+            "filename": "cyberbrick-motor-led-test.json",
+            "board": "cyberbrick",
+            "title": {
+                "en": "Motor & LED Test",
+                "zh-hant": "馬達與 LED 測試",
+                "ja": "モーター＆LEDテスト",
+                "ko": "모터 & LED 테스트",
+                "de": "Motor & LED Test",
+                "fr": "Test Moteur & LED",
+                "es": "Prueba de Motor y LED",
+                "it": "Test Motore e LED",
+                "pt-br": "Teste de Motor e LED",
+                "ru": "Тест мотора и светодиода",
+                "pl": "Test silnika i LED",
+                "cs": "Test motoru a LED",
+                "hu": "Motor és LED teszt",
+                "bg": "Тест на мотор и LED",
+                "tr": "Motor ve LED Testi"
+            },
+            "description": {
+                "en": "A complete motor movement and RGB LED test workspace for CyberBrick robots, featuring forward, backward, turn functions with colorful light effects.",
+                "zh-hant": "CyberBrick 機器人的完整馬達移動與 RGB LED 測試工作區，包含前進、後退、轉向函式及彩色燈光效果。",
+                "ja": "CyberBrick ロボット向けのモーター動作と RGB LED テストワークスペース。前進・後退・旋回機能とカラフルな光エフェクトを含みます。",
+                "ko": "CyberBrick 로봇을 위한 완전한 모터 움직임과 RGB LED 테스트 작업공간으로, 전진·후진·회전 기능과 화려한 빛 효과가 포함됩니다.",
+                "de": "Ein vollständiger Motor- und RGB-LED-Testarbeitsbereich für CyberBrick-Roboter mit Vorwärts-, Rückwärts- und Drehfunktionen sowie bunten Lichteffekten.",
+                "fr": "Un espace de travail de test complet pour les moteurs et LED RGB des robots CyberBrick, avec des fonctions d'avance, retraite, rotation et effets lumineux colorés.",
+                "es": "Un espacio de trabajo de prueba completo de motor y LED RGB para robots CyberBrick, con funciones de avance, retroceso, giro y efectos de luz coloridos.",
+                "it": "Uno spazio di lavoro di test completo per motori e LED RGB per robot CyberBrick, con funzioni di avanzamento, retromarcia, rotazione ed effetti luminosi colorati.",
+                "pt-br": "Um espaço de trabalho de teste completo de motor e LED RGB para robôs CyberBrick, com funções de avançar, recuar, girar e efeitos de luz coloridos.",
+                "ru": "Полное рабочее пространство для тестирования двигателей и RGB-светодиодов роботов CyberBrick с функциями движения вперед, назад, поворота и светодиодными эффектами.",
+                "pl": "Kompletne środowisko testowe silnika i LED RGB dla robotów CyberBrick z funkcjami jazdy do przodu, tyłu, skrętów i kolorowymi efektami świetlnymi.",
+                "cs": "Kompletní testovací pracovní prostor pro motorky a RGB LED pro roboty CyberBrick s funkcemi jízdy vpřed, vzad, otáčení a barevnými světelnými efekty.",
+                "hu": "Teljes motor- és RGB LED-tesztelési munkaterület CyberBrick robotokhoz, előre-, hátra- és fordulási funkciókkal, valamint színes fényeffektekkel.",
+                "bg": "Пълно работно пространство за тест на мотор и RGB LED за роботи CyberBrick с функции за движение напред, назад, завиване и цветни светлинни ефекти.",
+                "tr": "CyberBrick robotları için ileri, geri, dönüş fonksiyonları ve renkli ışık efektleri içeren tam motor ve RGB LED test çalışma alanı."
+            }
         }
     ]
 }

@@ -1,0 +1,1817 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "micropython_main",
+          "id": ";l_AQjeA+q;zF?!`WMdO",
+          "x": 0,
+          "y": 0,
+          "deletable": false,
+          "inputs": {
+            "MAIN": {
+              "block": {
+                "type": "arduino_function_call",
+                "id": "Y.@+Ct#^fo_;!w_`)jMv",
+                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"車燈測試\" has_return=\"false\" return_type=\"void\"></mutation>",
+                "next": {
+                  "block": {
+                    "type": "arduino_function_call",
+                    "id": "RrGTNOD?bZ/Sb]I}_(0V",
+                    "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"前進\" has_return=\"false\" return_type=\"void\"><arg name=\"前進速度\" type=\"int\"></arg></mutation>",
+                    "inputs": {
+                      "ARG0": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "^}}+/n8B,3JL:``oN^Am",
+                          "fields": {
+                            "NUM": 100
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "cyberbrick_delay_ms",
+                        "id": "Vjd,3Pbh|E`A@bQxX)jO",
+                        "inputs": {
+                          "TIME": {
+                            "shadow": {
+                              "type": "math_number",
+                              "id": "8P-}=rxsob?NE4CohV9h",
+                              "fields": {
+                                "NUM": 500
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "arduino_function_call",
+                            "id": "BU=Pb7RmTt$RFmEt+b8.",
+                            "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"後退\" has_return=\"false\" return_type=\"void\"><arg name=\"後退速度\" type=\"int\"></arg></mutation>",
+                            "inputs": {
+                              "ARG0": {
+                                "shadow": {
+                                  "type": "math_number",
+                                  "id": "0A2@,rwqqToE9M8q|m}:",
+                                  "fields": {
+                                    "NUM": 100
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "cyberbrick_delay_ms",
+                                "id": "(Q4z%g#|o[ZHKtt?src0",
+                                "inputs": {
+                                  "TIME": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "id": "fD$J^Qpq]}^WDAVnrNp$",
+                                      "fields": {
+                                        "NUM": 500
+                                      }
+                                    }
+                                  }
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "arduino_function_call",
+                                    "id": "Jo,`9CJb=E]!wqV--$DH",
+                                    "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"原地左轉\" has_return=\"false\" return_type=\"void\"><arg name=\"左轉速度\" type=\"int\"></arg></mutation>",
+                                    "inputs": {
+                                      "ARG0": {
+                                        "shadow": {
+                                          "type": "math_number",
+                                          "id": "wWRGx|vLBUt9HIH=sQNE",
+                                          "fields": {
+                                            "NUM": 100
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "cyberbrick_delay_ms",
+                                        "id": "3Gf/vMI_33P[_K;gduK9",
+                                        "inputs": {
+                                          "TIME": {
+                                            "shadow": {
+                                              "type": "math_number",
+                                              "id": "vH*?~ot)faz=+4E{F)#^",
+                                              "fields": {
+                                                "NUM": 500
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "arduino_function_call",
+                                            "id": "YT$x%XuEU/1,(aMdl6=g",
+                                            "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"原地右轉\" has_return=\"false\" return_type=\"void\"><arg name=\"右轉速度\" type=\"int\"></arg></mutation>",
+                                            "inputs": {
+                                              "ARG0": {
+                                                "shadow": {
+                                                  "type": "math_number",
+                                                  "id": "m.~ANL!4$Yok-~cu!M`3",
+                                                  "fields": {
+                                                    "NUM": 100
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "cyberbrick_delay_ms",
+                                                "id": "^3+f_gAVJ5)m9M/9:+s7",
+                                                "inputs": {
+                                                  "TIME": {
+                                                    "shadow": {
+                                                      "type": "math_number",
+                                                      "id": "mkuFyASE}HQ(T}6?AdnD",
+                                                      "fields": {
+                                                        "NUM": 500
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "arduino_function_call",
+                                                    "id": "OZ$c.GcmFgbYWK+QF`_R",
+                                                    "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"停止移動\" has_return=\"false\" return_type=\"void\"></mutation>",
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "arduino_function_call",
+                                                        "id": "nBRc}1PX/Q7_p=s`=GQO",
+                                                        "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"踢球\" has_return=\"false\" return_type=\"void\"></mutation>",
+                                                        "next": {
+                                                          "block": {
+                                                            "type": "cyberbrick_delay_ms",
+                                                            "id": "ApUPY7f2wSVi_ke^DsO9",
+                                                            "inputs": {
+                                                              "TIME": {
+                                                                "shadow": {
+                                                                  "type": "math_number",
+                                                                  "id": "YNGtXJvA1T3(!3SkRe0z",
+                                                                  "fields": {
+                                                                    "NUM": 500
+                                                                  }
+                                                                }
+                                                              }
+                                                            },
+                                                            "next": {
+                                                              "block": {
+                                                                "type": "arduino_function_call",
+                                                                "id": "uD/]K6=oipMl(l-1`7-h",
+                                                                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"抬球\" has_return=\"false\" return_type=\"void\"></mutation>",
+                                                                "next": {
+                                                                  "block": {
+                                                                    "type": "cyberbrick_delay_ms",
+                                                                    "id": "UKQB$-3SMKqi)gx|]_%.",
+                                                                    "inputs": {
+                                                                      "TIME": {
+                                                                        "shadow": {
+                                                                          "type": "math_number",
+                                                                          "id": "g!7M!lX+|y8@;|;SVKJa",
+                                                                          "fields": {
+                                                                            "NUM": 500
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    },
+                                                                    "next": {
+                                                                      "block": {
+                                                                        "type": "arduino_function_call",
+                                                                        "id": "{O:DT#ct-d1WOsE%)a[1",
+                                                                        "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"腳不動\" has_return=\"false\" return_type=\"void\"></mutation>"
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "#oVWv3T+fe{_5BQqVUkk",
+          "x": 0,
+          "y": 2038,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"紅色\" type=\"int\"></arg><arg name=\"綠色\" type=\"int\"></arg><arg name=\"藍色\" type=\"int\"></arg></mutation>",
+          "fields": {
+            "NAME": "車燈"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "x11_led_set_color",
+                "id": "WUv{pp#t(2TKs$EAC9Yp",
+                "fields": {
+                  "PORT": "20",
+                  "INDEX": "0"
+                },
+                "inputs": {
+                  "RED": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "JjRO_KtSTWm[i#:lTD[H",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    },
+                    "block": {
+                      "type": "variables_get",
+                      "id": "*ac37!6226;_G[O{Yz|o",
+                      "fields": {
+                        "VAR": {
+                          "id": "104+Jxq~Cu/Hlab:YS5G"
+                        }
+                      }
+                    }
+                  },
+                  "GREEN": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "}0ad8SO_vs6;vO@#)){0",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    },
+                    "block": {
+                      "type": "variables_get",
+                      "id": "@Ou]d8jczVR2VwzhzGp/",
+                      "fields": {
+                        "VAR": {
+                          "id": "v2bqP`c1$@L)Dt$bfd1J"
+                        }
+                      }
+                    }
+                  },
+                  "BLUE": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "G*7V!ZQCYk6FS`=8[#)O",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    },
+                    "block": {
+                      "type": "variables_get",
+                      "id": "mMKpP3@Kgo~pClg45]f~",
+                      "fields": {
+                        "VAR": {
+                          "id": "Yo0x9qb2car?Fed^]f##"
+                        }
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "x11_led_set_color",
+                    "id": "}TDOh,C32*zSN`l{L~1c",
+                    "fields": {
+                      "PORT": "20",
+                      "INDEX": "1"
+                    },
+                    "inputs": {
+                      "RED": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "%cohmhIH=d5mOCv`|R/V",
+                          "fields": {
+                            "NUM": 0
+                          }
+                        },
+                        "block": {
+                          "type": "variables_get",
+                          "id": "K^[`E#LAq5I-2`ZM:eO)",
+                          "fields": {
+                            "VAR": {
+                              "id": "104+Jxq~Cu/Hlab:YS5G"
+                            }
+                          }
+                        }
+                      },
+                      "GREEN": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "cHd|r[-Ae6HJ@-Pyv{uI",
+                          "fields": {
+                            "NUM": 0
+                          }
+                        },
+                        "block": {
+                          "type": "variables_get",
+                          "id": ";[KfwQK7vS)nngs5L;HD",
+                          "fields": {
+                            "VAR": {
+                              "id": "v2bqP`c1$@L)Dt$bfd1J"
+                            }
+                          }
+                        }
+                      },
+                      "BLUE": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "`GG4~a-F2tH/pY5c:Q7O",
+                          "fields": {
+                            "NUM": 0
+                          }
+                        },
+                        "block": {
+                          "type": "variables_get",
+                          "id": "mf7)cr_LoQd!S,2hoRhK",
+                          "fields": {
+                            "VAR": {
+                              "id": "Yo0x9qb2car?Fed^]f##"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "#Qg2@{0B/,m6rbMFX+T7",
+          "x": 0,
+          "y": 965,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "fields": {
+            "NAME": "停止移動"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "arduino_function_call",
+                "id": "s,I#DKy@_|RJmBWAvfUc",
+                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
+                "inputs": {
+                  "ARG0": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "az!Rqm@_S2-0SdaXg#5v",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  },
+                  "ARG1": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "Ms*XKgnq+=[FBB}=%7eq",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": ")m=Y%~$/S7g.U2o*`:wA",
+          "x": 0,
+          "y": 1861,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
+          "fields": {
+            "NAME": "馬達移動"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "x11_motor_speed",
+                "id": ":m6caov-QmF:(Fo6dLBP",
+                "fields": {
+                  "PORT": "1"
+                },
+                "inputs": {
+                  "SPEED": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "i_JEQ3lqHpfj@5_}i]Xd",
+                      "fields": {
+                        "NUM": 2048
+                      }
+                    },
+                    "block": {
+                      "type": "math_map",
+                      "id": "JmPI=O+.4uYh1Tm/YSs^",
+                      "inputs": {
+                        "VALUE": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "f9ocnQo{6S6~Ni`%-K|;",
+                            "fields": {
+                              "NUM": 512
+                            }
+                          },
+                          "block": {
+                            "type": "variables_get",
+                            "id": "qwF{.sE=a[z~Q.,=$Kd_",
+                            "fields": {
+                              "VAR": {
+                                "id": "x^lnjFop]IbtAz#x_MP_"
+                              }
+                            }
+                          }
+                        },
+                        "FROM_LOW": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": ".{#hn,qF.bj@6oJ)_0vz",
+                            "fields": {
+                              "NUM": -100
+                            }
+                          }
+                        },
+                        "FROM_HIGH": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "VZ9d8(y1.mxe^$~giJaM",
+                            "fields": {
+                              "NUM": 100
+                            }
+                          }
+                        },
+                        "TO_LOW": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "(j}{]1ktQl5$Br*N0PRo",
+                            "fields": {
+                              "NUM": 2048
+                            }
+                          }
+                        },
+                        "TO_HIGH": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "iAK9ERFl8%2W][6.uO^$",
+                            "fields": {
+                              "NUM": -2048
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "x11_motor_speed",
+                    "id": "r%{rdT5tpN:P)R182-eW",
+                    "fields": {
+                      "PORT": "2"
+                    },
+                    "inputs": {
+                      "SPEED": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "ZSF(qo-mW5u#]^l$i5,]",
+                          "fields": {
+                            "NUM": 2048
+                          }
+                        },
+                        "block": {
+                          "type": "math_map",
+                          "id": "FhCUI;qN(9]_d-XFn.9A",
+                          "inputs": {
+                            "VALUE": {
+                              "shadow": {
+                                "type": "math_number",
+                                "id": "f9ocnQo{6S6~Ni`%-K|;",
+                                "fields": {
+                                  "NUM": 512
+                                }
+                              },
+                              "block": {
+                                "type": "variables_get",
+                                "id": "L=S*uOZC1Ppz)et,HHCS",
+                                "fields": {
+                                  "VAR": {
+                                    "id": "ebSH7#95bmdA8H7{(q!#"
+                                  }
+                                }
+                              }
+                            },
+                            "FROM_LOW": {
+                              "shadow": {
+                                "type": "math_number",
+                                "id": "=EywO=Ldxdo-q)8~a*N6",
+                                "fields": {
+                                  "NUM": -100
+                                }
+                              }
+                            },
+                            "FROM_HIGH": {
+                              "shadow": {
+                                "type": "math_number",
+                                "id": "1Jc0#]CEc5%!D+}`f]KX",
+                                "fields": {
+                                  "NUM": 100
+                                }
+                              }
+                            },
+                            "TO_LOW": {
+                              "shadow": {
+                                "type": "math_number",
+                                "id": "Q*}N-N/!%om`Up|fNJ|L",
+                                "fields": {
+                                  "NUM": -2048
+                                }
+                              }
+                            },
+                            "TO_HIGH": {
+                              "shadow": {
+                                "type": "math_number",
+                                "id": "xe_03)XLGUTqQV6oX})#",
+                                "fields": {
+                                  "NUM": 2048
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "AAO07^xj|-sHyXq[gKF0",
+          "x": 0,
+          "y": 1189,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"後退速度\" type=\"int\"></arg></mutation>",
+          "fields": {
+            "NAME": "後退"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "arduino_function_call",
+                "id": "CF6D0JY;)!eFH?6p9wI1",
+                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
+                "inputs": {
+                  "ARG0": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "p?4{(%Es-zGt0gOJ^Ydx",
+                      "fields": {
+                        "NUM": -100
+                      }
+                    },
+                    "block": {
+                      "type": "math_single",
+                      "id": "mu):3)#wHypiQ}g2ax-s",
+                      "fields": {
+                        "OP": "NEG"
+                      },
+                      "inputs": {
+                        "NUM": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "dwBDuyOhjmnE~!Szt9xd",
+                            "fields": {
+                              "NUM": 9
+                            }
+                          },
+                          "block": {
+                            "type": "variables_get",
+                            "id": "hzy0`M8w!ikYRjxfPVX|",
+                            "fields": {
+                              "VAR": {
+                                "id": "!sY(}rFf.%31uX.:-164"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "ARG1": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "6lrU3lB$fFp?f3W#4Y9%",
+                      "fields": {
+                        "NUM": -100
+                      }
+                    },
+                    "block": {
+                      "type": "math_single",
+                      "id": "3h0YMn:/K%Ut*#x_QAEN",
+                      "fields": {
+                        "OP": "NEG"
+                      },
+                      "inputs": {
+                        "NUM": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "dwBDuyOhjmnE~!Szt9xd",
+                            "fields": {
+                              "NUM": 9
+                            }
+                          },
+                          "block": {
+                            "type": "variables_get",
+                            "id": "Vyyn9vRQ:WEER8/pP}Yj",
+                            "fields": {
+                              "VAR": {
+                                "id": "!sY(}rFf.%31uX.:-164"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "7xt}?b?pC=xr.f5R1)#7",
+          "x": 0,
+          "y": 1301,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"左轉速度\" type=\"int\"></arg></mutation>",
+          "fields": {
+            "NAME": "原地左轉"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "arduino_function_call",
+                "id": "l7k^SLu0Tv=6[dU7v^_9",
+                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
+                "inputs": {
+                  "ARG0": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "9e3k.2N]`hGPwL}rCaei",
+                      "fields": {
+                        "NUM": -100
+                      }
+                    },
+                    "block": {
+                      "type": "math_single",
+                      "id": "E(Nw8OSq*$@in)Xi$l@?",
+                      "fields": {
+                        "OP": "NEG"
+                      },
+                      "inputs": {
+                        "NUM": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "dwBDuyOhjmnE~!Szt9xd",
+                            "fields": {
+                              "NUM": 9
+                            }
+                          },
+                          "block": {
+                            "type": "variables_get",
+                            "id": "h+KCV?DH1^4^_^:#W5v~",
+                            "fields": {
+                              "VAR": {
+                                "id": "WNEzZ@J8DF[rWDfIFEnZ"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "ARG1": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "mq[B@.2~R:d$a$Aju*32",
+                      "fields": {
+                        "NUM": 100
+                      }
+                    },
+                    "block": {
+                      "type": "variables_get",
+                      "id": "{t~S{T3}0yt0Y-n:,oly",
+                      "fields": {
+                        "VAR": {
+                          "id": "WNEzZ@J8DF[rWDfIFEnZ"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "8j@18,q2@ugKI[d0*=)P",
+          "x": 0,
+          "y": 1413,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"右轉速度\" type=\"int\"></arg></mutation>",
+          "fields": {
+            "NAME": "原地右轉"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "arduino_function_call",
+                "id": "FF^xLNbu~YF`ent,_$QW",
+                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
+                "inputs": {
+                  "ARG0": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "iV3eOY-9~F8p=V/[U.:P",
+                      "fields": {
+                        "NUM": 100
+                      }
+                    },
+                    "block": {
+                      "type": "variables_get",
+                      "id": "b{*U7zM)KGli@CnGC9#7",
+                      "fields": {
+                        "VAR": {
+                          "id": "($d2v@Eq[ov,*-o!)tYq"
+                        }
+                      }
+                    }
+                  },
+                  "ARG1": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": ")_v#LMLwR]}$R_uUM@FZ",
+                      "fields": {
+                        "NUM": -100
+                      }
+                    },
+                    "block": {
+                      "type": "math_single",
+                      "id": "Lozl8G^eB]uc_scTG46a",
+                      "fields": {
+                        "OP": "NEG"
+                      },
+                      "inputs": {
+                        "NUM": {
+                          "shadow": {
+                            "type": "math_number",
+                            "id": "dwBDuyOhjmnE~!Szt9xd",
+                            "fields": {
+                              "NUM": 9
+                            }
+                          },
+                          "block": {
+                            "type": "variables_get",
+                            "id": "5~qd(]P[GH#_)i7QGa+/",
+                            "fields": {
+                              "VAR": {
+                                "id": "($d2v@Eq[ov,*-o!)tYq"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "LUw8xF%n,q#^V^b_*H(2",
+          "x": 0,
+          "y": 1637,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "fields": {
+            "NAME": "踢球"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "x11_servo_360_speed",
+                "id": "gKEzut/6~c|wx1o}glQ(",
+                "fields": {
+                  "PORT": "1"
+                },
+                "inputs": {
+                  "SPEED": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "lz5eZCGoQJ.]qG/vgz;4",
+                      "fields": {
+                        "NUM": 100
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "Y=(WIG(P#B7m?f5%zOTK",
+          "x": 0,
+          "y": 1525,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "fields": {
+            "NAME": "抬球"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "x11_servo_360_speed",
+                "id": "`u](*Aq}M4jc+77;~jJg",
+                "fields": {
+                  "PORT": "1"
+                },
+                "inputs": {
+                  "SPEED": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "m%Qa,r[CW}33/=SD`(gl",
+                      "fields": {
+                        "NUM": -100
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "kU;,7n]`(EOo1g|?R741",
+          "x": 0,
+          "y": 638,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "fields": {
+            "NAME": "車燈測試"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "arduino_function_call",
+                "id": "ma.3dle.Z;4)fH|!H,)5",
+                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"車燈\" has_return=\"false\" return_type=\"void\"><arg name=\"紅色\" type=\"int\"></arg><arg name=\"綠色\" type=\"int\"></arg><arg name=\"藍色\" type=\"int\"></arg></mutation>",
+                "inputs": {
+                  "ARG0": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "{VaF60j9Fq9gbY;_FaXs",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    },
+                    "block": {
+                      "type": "math_number",
+                      "id": "|bM0!s=mt%jM`e$J5jo2",
+                      "fields": {
+                        "NUM": 255
+                      }
+                    }
+                  },
+                  "ARG1": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "}So+}cA#dU%FfAfOE~Yh",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    },
+                    "block": {
+                      "type": "math_number",
+                      "id": "_tO|0m$az[X7x`PJ9_M_",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  },
+                  "ARG2": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "N4~c|Qzh^~{6d=o.VE##",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    },
+                    "block": {
+                      "type": "math_number",
+                      "id": "RtDWc`L$_0af(OKsj?gA",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "cyberbrick_delay_ms",
+                    "id": "u3+ufeoOc}xPTkqA,wE:",
+                    "inputs": {
+                      "TIME": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "1]T=1aAvS9FRMvJePY_J",
+                          "fields": {
+                            "NUM": 500
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "arduino_function_call",
+                        "id": "S=?oh+n-V`b=r`(lD5(y",
+                        "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"車燈\" has_return=\"false\" return_type=\"void\"><arg name=\"紅色\" type=\"int\"></arg><arg name=\"綠色\" type=\"int\"></arg><arg name=\"藍色\" type=\"int\"></arg></mutation>",
+                        "inputs": {
+                          "ARG0": {
+                            "shadow": {
+                              "type": "math_number",
+                              "id": ")`liTjjgTTv;CFzSD0@a",
+                              "fields": {
+                                "NUM": 0
+                              }
+                            },
+                            "block": {
+                              "type": "math_number",
+                              "id": "565aso-|b/K?D^$eZ%o#",
+                              "fields": {
+                                "NUM": 0
+                              }
+                            }
+                          },
+                          "ARG1": {
+                            "shadow": {
+                              "type": "math_number",
+                              "id": "zw]#JPWYjjp:oktnD9hH",
+                              "fields": {
+                                "NUM": 0
+                              }
+                            },
+                            "block": {
+                              "type": "math_number",
+                              "id": "C-Wn-6Yti7}7M|7@50G?",
+                              "fields": {
+                                "NUM": 255
+                              }
+                            }
+                          },
+                          "ARG2": {
+                            "shadow": {
+                              "type": "math_number",
+                              "id": "Z8}{+Uau-aKJ^k5~lkNS",
+                              "fields": {
+                                "NUM": 0
+                              }
+                            },
+                            "block": {
+                              "type": "math_number",
+                              "id": "^pReTm#Ku2W?JrryT`o2",
+                              "fields": {
+                                "NUM": 0
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "cyberbrick_delay_ms",
+                            "id": "$-2pKR;QjWN7,u:.)LXh",
+                            "inputs": {
+                              "TIME": {
+                                "shadow": {
+                                  "type": "math_number",
+                                  "id": "B*=EB[xBSJZjDNc:9a$J",
+                                  "fields": {
+                                    "NUM": 500
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "arduino_function_call",
+                                "id": ",sm`Y|,55QVwCD#9EP0(",
+                                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"車燈\" has_return=\"false\" return_type=\"void\"><arg name=\"紅色\" type=\"int\"></arg><arg name=\"綠色\" type=\"int\"></arg><arg name=\"藍色\" type=\"int\"></arg></mutation>",
+                                "inputs": {
+                                  "ARG0": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "id": "$y0f/xWty`Y~:?~DD!20",
+                                      "fields": {
+                                        "NUM": 0
+                                      }
+                                    },
+                                    "block": {
+                                      "type": "math_number",
+                                      "id": "_xx^sNw47Ov@c15F|N1W",
+                                      "fields": {
+                                        "NUM": 0
+                                      }
+                                    }
+                                  },
+                                  "ARG1": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "id": "d)O9#4MbQAO![VG7oSFA",
+                                      "fields": {
+                                        "NUM": 0
+                                      }
+                                    },
+                                    "block": {
+                                      "type": "math_number",
+                                      "id": "9T8@Z7k[]G`*hptyk33#",
+                                      "fields": {
+                                        "NUM": 0
+                                      }
+                                    }
+                                  },
+                                  "ARG2": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "id": "dwM5Clty`2}]4F6}%k2}",
+                                      "fields": {
+                                        "NUM": 0
+                                      }
+                                    },
+                                    "block": {
+                                      "type": "math_number",
+                                      "id": "rDo1bPrd+s/A5E9BQ(`%",
+                                      "fields": {
+                                        "NUM": 255
+                                      }
+                                    }
+                                  }
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "cyberbrick_delay_ms",
+                                    "id": ";,~Cr,z.6P,Ue?XfF3{a",
+                                    "inputs": {
+                                      "TIME": {
+                                        "shadow": {
+                                          "type": "math_number",
+                                          "id": "-r$fgJF^cW{tekqO(wN.",
+                                          "fields": {
+                                            "NUM": 500
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "6mUF]oH2WGfq!;5/?$O7",
+          "x": 0,
+          "y": 1077,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"前進速度\" type=\"int\"></arg></mutation>",
+          "fields": {
+            "NAME": "前進"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "arduino_function_call",
+                "id": "wD2,jnbK5`[m2o]0xzql",
+                "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
+                "inputs": {
+                  "ARG0": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "h:N9a[OLU#U*ummV@3VW",
+                      "fields": {
+                        "NUM": 100
+                      }
+                    },
+                    "block": {
+                      "type": "variables_get",
+                      "id": "xJ8^`c@U*ul[f-dj5f4P",
+                      "fields": {
+                        "VAR": {
+                          "id": "hZD268A[]`j0ew)$KctO"
+                        }
+                      }
+                    }
+                  },
+                  "ARG1": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "5t%-@/X9b*H#QaImgk@D",
+                      "fields": {
+                        "NUM": 100
+                      }
+                    },
+                    "block": {
+                      "type": "variables_get",
+                      "id": "{Oss-lG%-LIW4(e$?Qg]",
+                      "fields": {
+                        "VAR": {
+                          "id": "hZD268A[]`j0ew)$KctO"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "^F|0cKCF2y2[0d}b4zk+",
+          "x": 0,
+          "y": 1749,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "fields": {
+            "NAME": "腳不動"
+          },
+          "inputs": {
+            "STACK": {
+              "block": {
+                "type": "x11_servo_360_speed",
+                "id": "!%hqTYPY*(ev|F0y:yDz",
+                "fields": {
+                  "PORT": "1"
+                },
+                "inputs": {
+                  "SPEED": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "Q.~rhiy9Z3:._6RvRrzk",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "前後搖桿數值",
+        "id": "@EvI#XmiI`d[EriM+QVj"
+      },
+      {
+        "name": "左右搖桿數值",
+        "id": "?bqG3z^zPO3|K%K(aD`7"
+      },
+      {
+        "name": "踢球搖桿數值",
+        "id": "cMY5*e@XCk$BW*BfqNJX"
+      },
+      {
+        "name": "左輪速度",
+        "id": "x^lnjFop]IbtAz#x_MP_"
+      },
+      {
+        "name": "右輪速度",
+        "id": "ebSH7#95bmdA8H7{(q!#"
+      },
+      {
+        "name": "連線編號",
+        "id": "sJV.b.!e-]Qcm0(@e7X1"
+      },
+      {
+        "name": "搖桿_前推",
+        "id": "b?u~}EtD+oO@3sN6_Ka#"
+      },
+      {
+        "name": "搖桿_後推",
+        "id": "$v((cyAo%H1AEKMcP#91"
+      },
+      {
+        "name": "搖桿_左推",
+        "id": "s]:H$6K^]Y*-UKQe%]^m"
+      },
+      {
+        "name": "搖桿_右推",
+        "id": "t(/+mvI$C-^1K]*:Pi%M"
+      },
+      {
+        "name": "紅色",
+        "id": "104+Jxq~Cu/Hlab:YS5G"
+      },
+      {
+        "name": "綠色",
+        "id": "v2bqP`c1$@L)Dt$bfd1J"
+      },
+      {
+        "name": "藍色",
+        "id": "Yo0x9qb2car?Fed^]f##"
+      },
+      {
+        "name": "按鈕被按下",
+        "id": "LkI?6El^Rqu_U#hw7B?Y"
+      },
+      {
+        "name": "上下撥動搖桿_往下撥",
+        "id": "pPfwVLk?FBewj?-]uB+n"
+      },
+      {
+        "name": "上下撥動搖桿_往上撥",
+        "id": "@9=]QkZ(}gfvAQbU(!I7"
+      },
+      {
+        "name": "前進速度",
+        "id": "hZD268A[]`j0ew)$KctO"
+      },
+      {
+        "name": "後退速度",
+        "id": "!sY(}rFf.%31uX.:-164"
+      },
+      {
+        "name": "左轉速度",
+        "id": "WNEzZ@J8DF[rWDfIFEnZ"
+      },
+      {
+        "name": "右轉速度",
+        "id": "($d2v@Eq[ov,*-o!)tYq"
+      },
+      {
+        "name": "校正參數",
+        "id": "78(Jj/9[`/ND#llRq+;x"
+      }
+    ]
+  },
+  "board": "cyberbrick",
+  "nameTranslations": {
+    "variables": {
+      "前後搖桿數值": {
+        "en": "joystick_forward_back_value",
+        "ja": "joystick_forward_back_value",
+        "ko": "joystick_forward_back_value",
+        "de": "joystick_vorwaerts_zurueck_wert",
+        "fr": "joystick_avant_arriere_valeur",
+        "es": "joystick_adelante_atras_valor",
+        "it": "joystick_avanti_indietro_valore",
+        "pt-br": "joystick_frente_tras_valor",
+        "ru": "joystick_vpered_nazad_znachenie",
+        "pl": "joystick_przod_tyl_wartosc",
+        "cs": "joystick_dopredu_dozadu_hodnota",
+        "hu": "joystick_elore_hatra_ertek",
+        "bg": "joystick_napreed_nazad_stoinost",
+        "tr": "joystick_ileri_geri_deger"
+      },
+      "左右搖桿數值": {
+        "en": "joystick_left_right_value",
+        "ja": "joystick_left_right_value",
+        "ko": "joystick_left_right_value",
+        "de": "joystick_links_rechts_wert",
+        "fr": "joystick_gauche_droite_valeur",
+        "es": "joystick_izquierda_derecha_valor",
+        "it": "joystick_sinistra_destra_valore",
+        "pt-br": "joystick_esquerda_direita_valor",
+        "ru": "joystick_vlevo_vpravo_znachenie",
+        "pl": "joystick_lewo_prawo_wartosc",
+        "cs": "joystick_doleva_doprava_hodnota",
+        "hu": "joystick_bal_jobb_ertek",
+        "bg": "joystick_lyavo_dyasno_stoinost",
+        "tr": "joystick_sol_sag_deger"
+      },
+      "踢球搖桿數值": {
+        "en": "kick_joystick_value",
+        "ja": "kick_joystick_value",
+        "ko": "kick_joystick_value",
+        "de": "kick_joystick_wert",
+        "fr": "kick_joystick_valeur",
+        "es": "kick_joystick_valor",
+        "it": "kick_joystick_valore",
+        "pt-br": "kick_joystick_valor",
+        "ru": "kick_joystick_znachenie",
+        "pl": "kick_joystick_wartosc",
+        "cs": "kick_joystick_hodnota",
+        "hu": "rugo_joystick_ertek",
+        "bg": "kick_joystick_stoinost",
+        "tr": "kick_joystick_deger"
+      },
+      "左輪速度": {
+        "en": "left_wheel_speed",
+        "ja": "left_wheel_speed",
+        "ko": "left_wheel_speed",
+        "de": "linkes_rad_geschwindigkeit",
+        "fr": "vitesse_roue_gauche",
+        "es": "velocidad_rueda_izquierda",
+        "it": "velocita_ruota_sinistra",
+        "pt-br": "velocidade_roda_esquerda",
+        "ru": "skorost_levogo_kolesa",
+        "pl": "predkosc_lewego_kola",
+        "cs": "rychlost_leveho_kola",
+        "hu": "bal_kerek_sebesseg",
+        "bg": "skorost_lyavo_kolo",
+        "tr": "sol_teker_hizi"
+      },
+      "右輪速度": {
+        "en": "right_wheel_speed",
+        "ja": "right_wheel_speed",
+        "ko": "right_wheel_speed",
+        "de": "rechtes_rad_geschwindigkeit",
+        "fr": "vitesse_roue_droite",
+        "es": "velocidad_rueda_derecha",
+        "it": "velocita_ruota_destra",
+        "pt-br": "velocidade_roda_direita",
+        "ru": "skorost_pravogo_kolesa",
+        "pl": "predkosc_prawego_kola",
+        "cs": "rychlost_praveho_kola",
+        "hu": "jobb_kerek_sebesseg",
+        "bg": "skorost_dyasno_kolo",
+        "tr": "sag_teker_hizi"
+      },
+      "連線編號": {
+        "en": "connection_id",
+        "ja": "connection_id",
+        "ko": "connection_id",
+        "de": "verbindungs_id",
+        "fr": "identifiant_connexion",
+        "es": "id_conexion",
+        "it": "id_connessione",
+        "pt-br": "id_conexao",
+        "ru": "id_soedineniya",
+        "pl": "id_polaczenia",
+        "cs": "id_pripojeni",
+        "hu": "kapcsolat_id",
+        "bg": "id_vruzka",
+        "tr": "baglanti_id"
+      },
+      "搖桿_前推": {
+        "en": "joystick_forward",
+        "ja": "joystick_forward",
+        "ko": "joystick_forward",
+        "de": "joystick_vorwaerts",
+        "fr": "joystick_avant",
+        "es": "joystick_adelante",
+        "it": "joystick_avanti",
+        "pt-br": "joystick_frente",
+        "ru": "joystick_vpered",
+        "pl": "joystick_do_przodu",
+        "cs": "joystick_dopredu",
+        "hu": "joystick_elore",
+        "bg": "joystick_napreed",
+        "tr": "joystick_ileri"
+      },
+      "搖桿_後推": {
+        "en": "joystick_backward",
+        "ja": "joystick_backward",
+        "ko": "joystick_backward",
+        "de": "joystick_rueckwaerts",
+        "fr": "joystick_arriere",
+        "es": "joystick_atras",
+        "it": "joystick_indietro",
+        "pt-br": "joystick_atras",
+        "ru": "joystick_nazad",
+        "pl": "joystick_do_tylu",
+        "cs": "joystick_dozadu",
+        "hu": "joystick_hatra",
+        "bg": "joystick_nazad",
+        "tr": "joystick_geri"
+      },
+      "搖桿_左推": {
+        "en": "joystick_left",
+        "ja": "joystick_left",
+        "ko": "joystick_left",
+        "de": "joystick_links",
+        "fr": "joystick_gauche",
+        "es": "joystick_izquierda",
+        "it": "joystick_sinistra",
+        "pt-br": "joystick_esquerda",
+        "ru": "joystick_vlevo",
+        "pl": "joystick_lewo",
+        "cs": "joystick_doleva",
+        "hu": "joystick_bal",
+        "bg": "joystick_lyavo",
+        "tr": "joystick_sol"
+      },
+      "搖桿_右推": {
+        "en": "joystick_right",
+        "ja": "joystick_right",
+        "ko": "joystick_right",
+        "de": "joystick_rechts",
+        "fr": "joystick_droite",
+        "es": "joystick_derecha",
+        "it": "joystick_destra",
+        "pt-br": "joystick_direita",
+        "ru": "joystick_vpravo",
+        "pl": "joystick_prawo",
+        "cs": "joystick_doprava",
+        "hu": "joystick_jobb",
+        "bg": "joystick_dyasno",
+        "tr": "joystick_sag"
+      },
+      "紅色": {
+        "en": "red",
+        "ja": "red",
+        "ko": "red",
+        "de": "rot",
+        "fr": "rouge",
+        "es": "rojo",
+        "it": "rosso",
+        "pt-br": "vermelho",
+        "ru": "krasny",
+        "pl": "czerwony",
+        "cs": "cervena",
+        "hu": "piros",
+        "bg": "cherveno",
+        "tr": "kirmizi"
+      },
+      "綠色": {
+        "en": "green",
+        "ja": "green",
+        "ko": "green",
+        "de": "gruen",
+        "fr": "vert",
+        "es": "verde",
+        "it": "verde",
+        "pt-br": "verde",
+        "ru": "zeleny",
+        "pl": "zielony",
+        "cs": "zelena",
+        "hu": "zold",
+        "bg": "zeleno",
+        "tr": "yesil"
+      },
+      "藍色": {
+        "en": "blue",
+        "ja": "blue",
+        "ko": "blue",
+        "de": "blau",
+        "fr": "bleu",
+        "es": "azul",
+        "it": "azzurro",
+        "pt-br": "azul",
+        "ru": "siny",
+        "pl": "niebieski",
+        "cs": "modra",
+        "hu": "kek",
+        "bg": "sino",
+        "tr": "mavi"
+      },
+      "按鈕被按下": {
+        "en": "button_pressed",
+        "ja": "button_pressed",
+        "ko": "button_pressed",
+        "de": "taste_gedrueckt",
+        "fr": "bouton_appuye",
+        "es": "boton_presionado",
+        "it": "pulsante_premuto",
+        "pt-br": "botao_pressionado",
+        "ru": "knopka_nazata",
+        "pl": "przycisk_wcisniety",
+        "cs": "tlacitko_stisknuto",
+        "hu": "gomb_lenyomva",
+        "bg": "buton_natisnat",
+        "tr": "dugme_basildi"
+      },
+      "上下撥動搖桿_往下撥": {
+        "en": "toggle_joystick_down",
+        "ja": "toggle_joystick_down",
+        "ko": "toggle_joystick_down",
+        "de": "kippschalter_joystick_unten",
+        "fr": "joystick_bascule_bas",
+        "es": "joystick_palanca_abajo",
+        "it": "joystick_leva_giu",
+        "pt-br": "joystick_alavanca_baixo",
+        "ru": "joystick_pereklyuchatel_vniz",
+        "pl": "joystick_przelacznik_dol",
+        "cs": "joystick_prepinac_dolu",
+        "hu": "joystick_kapcsolo_le",
+        "bg": "joystick_prevklyuchvatel_dolu",
+        "tr": "joystick_sivama_asagi"
+      },
+      "上下撥動搖桿_往上撥": {
+        "en": "toggle_joystick_up",
+        "ja": "toggle_joystick_up",
+        "ko": "toggle_joystick_up",
+        "de": "kippschalter_joystick_oben",
+        "fr": "joystick_bascule_haut",
+        "es": "joystick_palanca_arriba",
+        "it": "joystick_leva_su",
+        "pt-br": "joystick_alavanca_cima",
+        "ru": "joystick_pereklyuchatel_vverh",
+        "pl": "joystick_przelacznik_gora",
+        "cs": "joystick_prepinac_nahoru",
+        "hu": "joystick_kapcsolo_fel",
+        "bg": "joystick_prevklyuchvatel_nagore",
+        "tr": "joystick_sivama_yukari"
+      },
+      "前進速度": {
+        "en": "forward_speed",
+        "ja": "forward_speed",
+        "ko": "forward_speed",
+        "de": "vorwaerts_geschwindigkeit",
+        "fr": "vitesse_avant",
+        "es": "velocidad_adelante",
+        "it": "velocita_avanti",
+        "pt-br": "velocidade_frente",
+        "ru": "skorost_vpered",
+        "pl": "predkosc_do_przodu",
+        "cs": "rychlost_dopredu",
+        "hu": "elore_sebesseg",
+        "bg": "skorost_napreed",
+        "tr": "ileri_hizi"
+      },
+      "後退速度": {
+        "en": "backward_speed",
+        "ja": "backward_speed",
+        "ko": "backward_speed",
+        "de": "rueckwaerts_geschwindigkeit",
+        "fr": "vitesse_arriere",
+        "es": "velocidad_atras",
+        "it": "velocita_indietro",
+        "pt-br": "velocidade_atras",
+        "ru": "skorost_nazad",
+        "pl": "predkosc_do_tylu",
+        "cs": "rychlost_dozadu",
+        "hu": "hatra_sebesseg",
+        "bg": "skorost_nazad",
+        "tr": "geri_hizi"
+      },
+      "左轉速度": {
+        "en": "turn_left_speed",
+        "ja": "turn_left_speed",
+        "ko": "turn_left_speed",
+        "de": "links_wende_geschwindigkeit",
+        "fr": "vitesse_virage_gauche",
+        "es": "velocidad_giro_izquierda",
+        "it": "velocita_svolta_sinistra",
+        "pt-br": "velocidade_curva_esquerda",
+        "ru": "skorost_povorota_vlevo",
+        "pl": "predkosc_skretu_lewo",
+        "cs": "rychlost_odboceni_vlevo",
+        "hu": "bal_fordulat_sebesseg",
+        "bg": "skorost_zavivaneto_lyavo",
+        "tr": "sol_donus_hizi"
+      },
+      "右轉速度": {
+        "en": "turn_right_speed",
+        "ja": "turn_right_speed",
+        "ko": "turn_right_speed",
+        "de": "rechts_wende_geschwindigkeit",
+        "fr": "vitesse_virage_droit",
+        "es": "velocidad_giro_derecha",
+        "it": "velocita_svolta_destra",
+        "pt-br": "velocidade_curva_direita",
+        "ru": "skorost_povorota_vpravo",
+        "pl": "predkosc_skretu_prawo",
+        "cs": "rychlost_odboceni_vpravo",
+        "hu": "jobb_fordulat_sebesseg",
+        "bg": "skorost_zavivaneto_dyasno",
+        "tr": "sag_donus_hizi"
+      },
+      "校正參數": {
+        "en": "calibration_param",
+        "ja": "calibration_param",
+        "ko": "calibration_param",
+        "de": "kalibrierungs_parameter",
+        "fr": "parametre_calibration",
+        "es": "parametro_calibracion",
+        "it": "parametro_calibrazione",
+        "pt-br": "parametro_calibracao",
+        "ru": "parametr_kalibrovki",
+        "pl": "parametr_kalibracji",
+        "cs": "parametr_kalibrace",
+        "hu": "kalibracios_parameter",
+        "bg": "parametar_kalibrirane",
+        "tr": "kalibrasyon_parametresi"
+      }
+    },
+    "functions": {
+      "車燈": {
+        "en": "car_lights",
+        "ja": "car_lights",
+        "ko": "car_lights",
+        "de": "auto_licht",
+        "fr": "lumieres_voiture",
+        "es": "luces_coche",
+        "it": "luci_auto",
+        "pt-br": "luzes_carro",
+        "ru": "fary_avtomobilya",
+        "pl": "swiatla_samochodu",
+        "cs": "svetla_auta",
+        "hu": "auto_lampak",
+        "bg": "svetlini_kola",
+        "tr": "araba_isiklari"
+      },
+      "停止移動": {
+        "en": "stop_movement",
+        "ja": "stop_movement",
+        "ko": "stop_movement",
+        "de": "bewegung_stoppen",
+        "fr": "arreter_mouvement",
+        "es": "detener_movimiento",
+        "it": "fermare_movimento",
+        "pt-br": "parar_movimento",
+        "ru": "ostanovit_dvizhenie",
+        "pl": "zatrzymac_ruch",
+        "cs": "zastavit_pohyb",
+        "hu": "mozgas_megallitas",
+        "bg": "spirane_dvizhenieto",
+        "tr": "hareketi_durdur"
+      },
+      "馬達移動": {
+        "en": "motor_move",
+        "ja": "motor_move",
+        "ko": "motor_move",
+        "de": "motor_bewegen",
+        "fr": "deplacer_moteur",
+        "es": "mover_motor",
+        "it": "muovere_motore",
+        "pt-br": "mover_motor",
+        "ru": "dvizheniye_motora",
+        "pl": "ruch_silnika",
+        "cs": "pohyb_motoru",
+        "hu": "motor_mozgas",
+        "bg": "motor_dvizhenie",
+        "tr": "motor_hareket"
+      },
+      "後退": {
+        "en": "backward",
+        "ja": "backward",
+        "ko": "backward",
+        "de": "rueckwaerts",
+        "fr": "reculer",
+        "es": "retroceder",
+        "it": "indietro",
+        "pt-br": "recuar",
+        "ru": "nazad",
+        "pl": "wstecz",
+        "cs": "dozadu",
+        "hu": "visszafele",
+        "bg": "nazad",
+        "tr": "geri"
+      },
+      "原地左轉": {
+        "en": "turn_left_in_place",
+        "ja": "turn_left_in_place",
+        "ko": "turn_left_in_place",
+        "de": "linksdrehung_am_ort",
+        "fr": "rotation_gauche_sur_place",
+        "es": "giro_izquierda_en_lugar",
+        "it": "rotazione_sinistra_sul_posto",
+        "pt-br": "giro_esquerda_no_lugar",
+        "ru": "povorot_vlevo_na_meste",
+        "pl": "skretu_lewo_w_miejscu",
+        "cs": "otoceni_vlevo_na_miste",
+        "hu": "bal_fordulat_helyben",
+        "bg": "zavivaneto_lyavo_na_myasto",
+        "tr": "yerinde_sol_donus"
+      },
+      "原地右轉": {
+        "en": "turn_right_in_place",
+        "ja": "turn_right_in_place",
+        "ko": "turn_right_in_place",
+        "de": "rechtsdrehung_am_ort",
+        "fr": "rotation_droite_sur_place",
+        "es": "giro_derecha_en_lugar",
+        "it": "rotazione_destra_sul_posto",
+        "pt-br": "giro_direita_no_lugar",
+        "ru": "povorot_vpravo_na_meste",
+        "pl": "skretu_prawo_w_miejscu",
+        "cs": "otoceni_vpravo_na_miste",
+        "hu": "jobb_fordulat_helyben",
+        "bg": "zavivaneto_dyasno_na_myasto",
+        "tr": "yerinde_sag_donus"
+      },
+      "踢球": {
+        "en": "kick_ball",
+        "ja": "kick_ball",
+        "ko": "kick_ball",
+        "de": "ball_treten",
+        "fr": "frapper_balle",
+        "es": "patear_pelota",
+        "it": "calciare_palla",
+        "pt-br": "chutar_bola",
+        "ru": "udarit_myach",
+        "pl": "kopnac_pilke",
+        "cs": "kopnout_mic",
+        "hu": "labda_rugasa",
+        "bg": "udar_topka",
+        "tr": "topa_vur"
+      },
+      "抬球": {
+        "en": "lift_ball",
+        "ja": "lift_ball",
+        "ko": "lift_ball",
+        "de": "ball_heben",
+        "fr": "soulever_balle",
+        "es": "levantar_pelota",
+        "it": "sollevare_palla",
+        "pt-br": "levantar_bola",
+        "ru": "podnyat_myach",
+        "pl": "podniesc_pilke",
+        "cs": "zvednout_mic",
+        "hu": "labda_emelese",
+        "bg": "povdigane_topka",
+        "tr": "topu_kaldir"
+      },
+      "車燈測試": {
+        "en": "car_light_test",
+        "ja": "car_light_test",
+        "ko": "car_light_test",
+        "de": "auto_licht_test",
+        "fr": "test_lumieres_voiture",
+        "es": "test_luces_coche",
+        "it": "test_luci_auto",
+        "pt-br": "teste_luzes_carro",
+        "ru": "test_far_avtomobilya",
+        "pl": "test_swiatel_samochodu",
+        "cs": "test_svetel_auta",
+        "hu": "auto_lampak_teszt",
+        "bg": "test_svetlini_kola",
+        "tr": "araba_isik_testi"
+      },
+      "前進": {
+        "en": "forward",
+        "ja": "forward",
+        "ko": "forward",
+        "de": "vorwaerts",
+        "fr": "avancer",
+        "es": "avanzar",
+        "it": "avanzare",
+        "pt-br": "avancar",
+        "ru": "vpered",
+        "pl": "do_przodu",
+        "cs": "dopredu",
+        "hu": "elore",
+        "bg": "napreed",
+        "tr": "ileri"
+      },
+      "腳不動": {
+        "en": "foot_stop",
+        "ja": "foot_stop",
+        "ko": "foot_stop",
+        "de": "bein_stopp",
+        "fr": "pied_arrete",
+        "es": "pie_detenido",
+        "it": "piede_fermo",
+        "pt-br": "pe_parado",
+        "ru": "noga_ostanovlena",
+        "pl": "noga_zatrzymana",
+        "cs": "noha_zastavena",
+        "hu": "lab_megall",
+        "bg": "krak_spiran",
+        "tr": "ayak_dur"
+      }
+    }
+  }
+}
