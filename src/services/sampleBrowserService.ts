@@ -34,16 +34,23 @@ export interface LocalizedText {
 	[key: string]: string | undefined;
 }
 
+export interface CategoryEntry {
+	id: string;
+	title: LocalizedText;
+}
+
 export interface SampleEntry {
 	id: string;
 	filename: string;
 	board: string;
+	category?: string;
 	title: LocalizedText;
 	description: LocalizedText;
 }
 
 export interface SampleIndex {
 	version: number;
+	categories?: CategoryEntry[];
 	samples: SampleEntry[];
 }
 
@@ -369,7 +376,7 @@ function translateBlocks(blocks: unknown, nameTranslations: NameTranslations, la
  * 僅匹配 <mutation ...> 標籤上的 name 屬性，避免誤匹配 <arg name=>。
  */
 function translateMutationName(extraState: string, functionsMap: Record<string, NameTranslationEntry>, language: string): string {
-	return extraState.replace(/<mutation\b[^>]*>/g, (mutationTag) => {
+	return extraState.replace(/<mutation\b[^>]*>/g, mutationTag => {
 		return mutationTag.replace(/\bname="([^"]+)"/, (match, original: string) => {
 			const entry = functionsMap[original];
 			if (!entry) {

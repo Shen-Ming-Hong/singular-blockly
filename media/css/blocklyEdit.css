@@ -668,10 +668,47 @@ body.theme-dark .preview-controls .theme-icon {
 }
 
 .sample-card-container {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	padding: 8px 0;
+}
+
+.sample-category-header {
+	font-size: 0.85em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	opacity: 0.6;
+	padding: 12px 0 8px;
+	border-bottom: 1px solid var(--vscode-panel-border, #454545);
+	margin-bottom: 12px;
+	cursor: pointer;
+	user-select: none;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.sample-category-header::after {
+	content: '▾';
+	font-size: 1.1em;
+	transition: transform 0.2s;
+}
+
+.sample-category-group.sample-category-collapsed .sample-category-header::after {
+	transform: rotate(-90deg);
+}
+
+.sample-category-cards {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 	gap: 16px;
-	padding: 8px 0;
+	padding-bottom: 16px;
+}
+
+.sample-category-group.sample-category-collapsed .sample-category-cards {
+	display: none;
 }
 
 .sample-card {
@@ -783,6 +820,17 @@ body.theme-dark .preview-controls .theme-icon {
 
 .modal-body {
 	padding: 20px;
+}
+
+.sample-modal-content {
+	display: flex;
+	flex-direction: column;
+	max-height: 80vh;
+}
+
+.sample-modal-content .modal-body {
+	overflow-y: auto;
+	flex: 1;
 }
 
 /* 搜尋對話框額外樣式 */

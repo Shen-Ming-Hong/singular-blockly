@@ -1786,6 +1786,7 @@ export class WebViewMessageHandler {
 		this.panel.webview.postMessage({
 			command: 'showSampleBrowser',
 			samples: result.data?.samples ?? [],
+			categories: result.data?.categories ?? [],
 			language,
 			isOffline: result.isOffline,
 		});
