@@ -1,9 +1,9 @@
 ---
 name: add-cyberbrick-sample
-description: 新增或更新 CyberBrick MicroPython 範例工作區的完整工作流程。當使用者提到新增範例、更新範例、add sample、update sample、修改範例積木、建立範例積木、新增 CyberBrick 示範程式、sample workspace、範例工作區 時自動啟用。包含從 Blockly 工作區匯出 JSON、建立或覆蓋範例檔、更新索引、15 語系翻譯填寫、本機驗證到推送上線的完整流程。Full workflow for adding or updating a CyberBrick MicroPython sample workspace: export Blockly JSON, create or overwrite sample file, update index, fill 15-language translations, local validation, and push to production.
+description: 新增或更新 CyberBrick MicroPython 範例工作區的完整工作流程。當使用者提到新增範例、更新範例、add sample、update sample、修改範例積木、建立範例積木、新增 CyberBrick 示範程式、sample workspace、範例工作區、更新翻譯、stringTranslations、nameTranslations、字串翻譯、標籤翻譯 時自動啟用。包含從 Blockly 工作區匯出 JSON、建立或覆蓋範例檔、更新索引、15 語系翻譯填寫（含識別字名稱翻譯 nameTranslations 與 text 積木字串翻譯 stringTranslations）、本機驗證到推送上線的完整流程。Full workflow for adding or updating a CyberBrick MicroPython sample workspace: export Blockly JSON, create or overwrite sample file, update index, fill 15-language translations (nameTranslations for identifiers, stringTranslations for text labels), local validation, and push to production.
 metadata:
     author: singular-blockly
-    version: '1.2.0'
+    version: '1.3.0'
     category: content
 argument-hint: 'add | update，以及範例名稱（英文 kebab-case），例如 update cyberbrick-soccer-robot'
 license: Apache-2.0
@@ -243,6 +243,105 @@ for (const [key, entry] of Object.entries(nameTranslations.variables ?? {})) {
 
 ---
 
+### Phase 2.6: Generate String Translations 生成字串翻譯映射
+
+若積木中有 **`text` 類型積木**（`type === "text"`）的 `fields.TEXT` 包含中文字串（如 `"前:"`, `"按鈕:"`），可加入 `stringTranslations` 欄位讓這些標籤在載入時自動顯示目標語系文字。
+
+> **與 `nameTranslations` 的差異：** `stringTranslations` 翻譯的是任意顯示字串，**無識別字格式限制**，值可包含冒號、空格、標點等任何字元，只要非空字串即合規。
+
+#### 掃描策略 Scan Strategy
+
+遞迴遍歷所有積木，找出 `type === "text"` 且 `fields.TEXT` 為中文字串的積木：
+
+```javascript
+// 掃描 text 積木（Node 腳本範例）
+const textStrings = new Set();
+function scanTextBlocks(blocks) {
+	if (!Array.isArray(blocks)) return;
+	for (const b of blocks) {
+		if (!b) continue;
+		if (b.type === 'text' && b.fields?.TEXT) {
+			const text = b.fields.TEXT;
+			// 只收集含有非 ASCII 字元（如中文）的字串
+			if (/[^\x00-\x7F]/.test(text)) {
+				textStrings.add(text);
+			}
+		}
+		if (b.inputs) {
+			for (const k of Object.keys(b.inputs)) {
+				const inp = b.inputs[k];
+				if (inp?.block) scanTextBlocks([inp.block]);
+				if (inp?.shadow) scanTextBlocks([inp.shadow]);
+			}
+		}
+		if (b.next?.block) scanTextBlocks([b.next.block]);
+	}
+}
+scanTextBlocks(workspace.blocks.blocks);
+```
+
+#### 格式規則 Format Rules
+
+- `stringTranslations` 為 `Record<string, Record<string, string>>`
+- **外層 key**：原始中文字串（zh-hant 基準，完整比對）
+- **內層 key**：14 個非 zh-hant 語系代碼
+- **內層 value**：任意非空字串，無識別字格式限制（可含冒號、空格等）
+- zh-hant 不填入（載入時原始字串即為 zh-hant 顯示值）
+
+**完整格式範例：**
+
+```json
+"stringTranslations": {
+  "前:": {
+    "en": "Fwd:",
+    "ja": "前:",
+    "ko": "전:",
+    "de": "Vor:",
+    "fr": "Av:",
+    "es": "Adel:",
+    "it": "Avanti:",
+    "pt-br": "Frt:",
+    "ru": "Вп:",
+    "pl": "Prz:",
+    "cs": "Vpr:",
+    "hu": "Előre:",
+    "bg": "Напр:",
+    "tr": "İleri:"
+  },
+  "按鈕:": {
+    "en": "Btn:",
+    "ja": "ボタン:",
+    "ko": "버튼:",
+    "de": "Taste:",
+    "fr": "Btn:",
+    "es": "Btn:",
+    "it": "Btn:",
+    "pt-br": "Btn:",
+    "ru": "Кнп:",
+    "pl": "Przc:",
+    "cs": "Tl:",
+    "hu": "Gomb:",
+    "bg": "Копче:",
+    "tr": "Btn:"
+  }
+}
+```
+
+#### 三層回退策略 Fallback
+
+1. **目標語系**的翻譯值（若非空字串）
+2. → **`en`** 翻譯值（若非空字串且目標非 en）
+3. → **保留原始中文字串**（向後相容）
+
+#### Phase 2.6 驗證清單
+
+- [ ] 所有中文 `text` 積木字串均有對應的 `stringTranslations` 映射
+- [ ] 所有 14 個非 zh-hant 語系均已填入（或至少 `en` 已填）
+- [ ] 翻譯值為非空字串（可包含冒號、空格等，無識別字限制）
+- [ ] 若工作區**完全無中文 text 字串**：可省略 `stringTranslations` 欄位（向後相容）
+
+---
+
 ### Phase 3: 同步索引 Sync index.json
 
 **依照 Phase 0 判斷的模式執行：**
@@ -361,7 +460,9 @@ git commit -m "feat(samples): add {id} sample workspace"
 # UPDATE workspace 模式（只更新積木內容）
 git add media/samples/{filename}.json
 git commit -m "fix(samples): update {id} workspace content"
-
+# UPDATE translations 模式（只更新翻譯映射）
+git add media/samples/{filename}.json
+git commit -m "i18n(samples): update {id} translations"
 # UPDATE metadata 模式（只更新翻譯/描述）
 git add media/samples/index.json
 git commit -m "i18n(samples): update {id} title/description"
@@ -419,16 +520,28 @@ description: "{英文描述}"
 - [ ] `media/samples/{filename}.json` 已建立，結構合規（有 `workspace` 物件、`board: "cyberbrick"`）
 - [ ] `media/samples/index.json` 已新增條目（`id` 唯一、`title.en` 和 `description.en` 非空）
 - [ ] 15 語系 title/description 已填寫（或至少 `en` + `zh-hant` 已填寫）
+- [ ] 若含中文變數/函式名稱：`nameTranslations` 已填寫並通過識別字驗證
+- [ ] 若含中文 text 積木字串：`stringTranslations` 已填寫（14 語系，`en` 必填）
 - [ ] 本機 JSON 格式驗證通過
 - [ ] Extension 本機測試時**新卡片**顯示正確、積木可載入
+- [ ] 切換不同語系測試：中文標籤/變數名稱正確顯示對應語言
 - [ ] `git commit -m "feat(samples): add {id}..."` 已推送至 master
 
 ### UPDATE workspace 模式
 
 - [ ] `media/samples/{filename}.json` 已覆蓋，結構合規
+- [ ] 若積木有新增/修改中文 text 字串：`stringTranslations` 已同步更新
+- [ ] 若積木有新增/修改中文變數或函式名稱：`nameTranslations` 已同步更新
 - [ ] `media/samples/index.json` **未被異動**
 - [ ] 本機測試時載入範例確認積木內容為最新版本
 - [ ] `git commit -m "fix(samples): update {id} workspace content"` 已推送至 master
+
+### UPDATE translations 模式
+
+- [ ] `media/samples/{filename}.json` 已更新 `nameTranslations` 或 `stringTranslations`
+- [ ] `media/samples/index.json` **未被異動**
+- [ ] 切換 3 種以上語系測試翻譯結果正確
+- [ ] `git commit -m "i18n(samples): update {id} translations"` 已推送至 master
 
 ### UPDATE metadata 模式
 
