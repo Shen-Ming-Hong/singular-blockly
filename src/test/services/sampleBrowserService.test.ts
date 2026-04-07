@@ -402,4 +402,73 @@ suite('sampleBrowserService', () => {
 			assert.strictEqual(JSON.stringify(workspace), original, '輸入 workspace 不應被修改');
 		});
 	});
+
+	// ── applyNameTranslations with stringTranslations ──────────────────────
+	suite('applyNameTranslations - stringTranslations', () => {
+		function makeTextWorkspace(textValue: unknown) {
+			return {
+				blocks: {
+					blocks: [
+						{
+							type: 'text',
+							fields: { TEXT: textValue },
+						},
+					],
+				},
+			};
+		}
+
+		test('text 積木字串依目標語系翻譯', () => {
+			const workspace = makeTextWorkspace('前:');
+			const stringTranslations = { '前:': { en: 'Fwd:', ja: '前:' } };
+			const result = applyNameTranslations(workspace, {}, 'en', stringTranslations) as Record<string, unknown>;
+			const blocks = (result['blocks'] as Record<string, unknown>)['blocks'] as Array<Record<string, unknown>>;
+			const fields = blocks[0]['fields'] as Record<string, unknown>;
+			assert.strictEqual(fields['TEXT'], 'Fwd:', '應翻譯為英文');
+		});
+
+		test('目標語系缺值時回退到 en', () => {
+			const workspace = makeTextWorkspace('前:');
+			const stringTranslations = { '前:': { en: 'Fwd:' } };
+			const result = applyNameTranslations(workspace, {}, 'de', stringTranslations) as Record<string, unknown>;
+			const blocks = (result['blocks'] as Record<string, unknown>)['blocks'] as Array<Record<string, unknown>>;
+			const fields = blocks[0]['fields'] as Record<string, unknown>;
+			assert.strictEqual(fields['TEXT'], 'Fwd:', 'de 缺值應回退到 en');
+		});
+
+		test('en 也缺值時保留原始字串', () => {
+			const workspace = makeTextWorkspace('前:');
+			const stringTranslations = { '前:': {} };
+			const result = applyNameTranslations(workspace, {}, 'de', stringTranslations) as Record<string, unknown>;
+			const blocks = (result['blocks'] as Record<string, unknown>)['blocks'] as Array<Record<string, unknown>>;
+			const fields = blocks[0]['fields'] as Record<string, unknown>;
+			assert.strictEqual(fields['TEXT'], '前:', 'en 也缺值應保留原始字串');
+		});
+
+		test('zh-hant 語系不替換（保留原始字串）', () => {
+			const workspace = makeTextWorkspace('前:');
+			const stringTranslations = { '前:': { en: 'Fwd:' } };
+			const result = applyNameTranslations(workspace, {}, 'zh-hant', stringTranslations) as Record<string, unknown>;
+			const blocks = (result['blocks'] as Record<string, unknown>)['blocks'] as Array<Record<string, unknown>>;
+			const fields = blocks[0]['fields'] as Record<string, unknown>;
+			assert.strictEqual(fields['TEXT'], '前:', 'zh-hant 應保留原始字串');
+		});
+
+		test('無 stringTranslations 時不影響 text 積木', () => {
+			const workspace = makeTextWorkspace('前:');
+			const result = applyNameTranslations(workspace, {}, 'en') as Record<string, unknown>;
+			const blocks = (result['blocks'] as Record<string, unknown>)['blocks'] as Array<Record<string, unknown>>;
+			const fields = blocks[0]['fields'] as Record<string, unknown>;
+			assert.strictEqual(fields['TEXT'], '前:', '未提供 stringTranslations 應保留原始字串');
+		});
+
+		test('非字串的 fields.TEXT 不做翻譯（防禦型）', () => {
+			const workspace = makeTextWorkspace(null);
+			const stringTranslations = { '前:': { en: 'Fwd:' } };
+			const result = applyNameTranslations(workspace, {}, 'en', stringTranslations) as Record<string, unknown>;
+			const blocks = (result['blocks'] as Record<string, unknown>)['blocks'] as Array<Record<string, unknown>>;
+			const fields = blocks[0]['fields'] as Record<string, unknown>;
+			assert.strictEqual(fields['TEXT'], null, 'null 值不應被翻譯');
+		});
+	});
 });

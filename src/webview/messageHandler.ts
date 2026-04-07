@@ -1844,9 +1844,15 @@ export class WebViewMessageHandler {
 			typeof message.language === 'string' && message.language
 				? message.language
 				: this.settingsManager.resolveLanguage(await this.settingsManager.getLanguage());
-		const workspace = result.data.nameTranslations
-			? applyNameTranslations(result.data.workspace, result.data.nameTranslations, resolvedLanguage)
-			: result.data.workspace;
+		const workspace =
+			result.data.nameTranslations || result.data.stringTranslations
+				? applyNameTranslations(
+						result.data.workspace,
+						result.data.nameTranslations ?? {},
+						resolvedLanguage,
+						result.data.stringTranslations
+					)
+				: result.data.workspace;
 
 		this.panel.webview.postMessage({
 			command: 'loadSampleWorkspace',
