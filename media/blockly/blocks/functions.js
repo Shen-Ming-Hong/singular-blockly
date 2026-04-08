@@ -360,35 +360,7 @@ Blockly.Blocks['arduino_function'] = {
 	},
 	// 套用鎖定狀態：視覺 + 刪除保護 + 重命名保護 + STACK 子積木保護
 	applyLockState_: function (locked) {
-		// 1. 刪除保護（函式定義積木本身）
-		this.setDeletable(!locked);
-		// 2. 重新命名保護
-		const nameField = this.getField('NAME');
-		if (nameField) nameField.setEnabled(!locked);
-		// 3. 視覺更新（主題色 + 🔒 圖示）
-		if (locked) {
-			this.setStyle('locked_procedure_blocks');
-			if (!this.getField('LOCK_ICON')) {
-				const mainInput = this.getInput('MAIN') || this.getInput('');
-				if (mainInput) mainInput.insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON');
-			}
-		} else {
-			this.setStyle('procedure_blocks');
-			if (this.getField('LOCK_ICON')) {
-				const mainInput = this.getInput('MAIN') || this.getInput('');
-				if (mainInput) mainInput.removeField('LOCK_ICON');
-			}
-		}
-		// 4. STACK 子積木刪除保護 + 禁止拖移 + 禁止編輯欄位（FR-006）
-		const stackConn = this.getInput('STACK') && this.getInput('STACK').connection;
-		const firstStackChild = stackConn ? stackConn.targetBlock() : null;
-		if (firstStackChild) {
-			firstStackChild.getDescendants(false).forEach(block => {
-				block.setDeletable(!locked);
-				block.setMovable(!locked);
-				block.setEditable(!locked);
-			});
-		}
+		applyLockStateImpl(this, locked);
 	},
 	// 添加 onchange 事件處理器
 	onchange: function (e) {
@@ -1230,10 +1202,47 @@ Blockly.Blocks['arduino_function_call'] = {
 };
 
 // ─── Phase 6: MicroPython 函式鎖定包裹（T014） ─────────────────────────────────
+
+/**
+ * applyLockStateImpl(block, locked)
+ * 套用鎖定狀態的共用實作，供 arduino_function 與 MicroPython procedures 共享。
+ */
+function applyLockStateImpl(block, locked) {
+	// 1. 刪除保護（函式定義積木本身）
+	block.setDeletable(!locked);
+	// 2. 重新命名保護
+	const nameField = block.getField('NAME');
+	if (nameField) nameField.setEnabled(!locked);
+	// 3. 視覺更新（主題色 + 🔒 圖示）
+	if (locked) {
+		block.setStyle('locked_procedure_blocks');
+		if (!block.getField('LOCK_ICON')) {
+			const mainInput = block.getInput('MAIN') || block.getInput('');
+			if (mainInput) mainInput.insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON');
+		}
+	} else {
+		block.setStyle('procedure_blocks');
+		if (block.getField('LOCK_ICON')) {
+			const mainInput = block.getInput('MAIN') || block.getInput('');
+			if (mainInput) mainInput.removeField('LOCK_ICON');
+		}
+	}
+	// 4. STACK 子積木刪除保護 + 禁止拖移 + 禁止編輯欄位（FR-006）
+	const stackConn = block.getInput('STACK') && block.getInput('STACK').connection;
+	const firstStackChild = stackConn ? stackConn.targetBlock() : null;
+	if (firstStackChild) {
+		firstStackChild.getDescendants(false).forEach(desc => {
+			desc.setDeletable(!locked);
+			desc.setMovable(!locked);
+			desc.setEditable(!locked);
+		});
+	}
+}
+
 /**
  * wrapMicropythonLock(blockType)
  * 為 Blockly 內建 MicroPython 函式積木注入鎖定能力（FR-002）。
- * 共用方法直接借用 applyLockState_（功能等同 arduino_function 的版本）。
+ * 共用 applyLockStateImpl 與 arduino_function 共享鎖定邏輯。
  */
 function wrapMicropythonLock(blockType) {
 	const origDef = Blockly.Blocks[blockType];
@@ -1278,31 +1287,7 @@ function wrapMicropythonLock(blockType) {
 	};
 
 	origDef.applyLockState_ = function (locked) {
-		this.setDeletable(!locked);
-		const nameField = this.getField('NAME');
-		if (nameField) nameField.setEnabled(!locked);
-		if (locked) {
-			this.setStyle('locked_procedure_blocks');
-			if (!this.getField('LOCK_ICON')) {
-				const mainInput = this.getInput('MAIN') || this.getInput('');
-				if (mainInput) mainInput.insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON');
-			}
-		} else {
-			this.setStyle('procedure_blocks');
-			if (this.getField('LOCK_ICON')) {
-				const mainInput = this.getInput('MAIN') || this.getInput('');
-				if (mainInput) mainInput.removeField('LOCK_ICON');
-			}
-		}
-		const stackConn = this.getInput('STACK') && this.getInput('STACK').connection;
-		const firstStackChild = stackConn ? stackConn.targetBlock() : null;
-		if (firstStackChild) {
-			firstStackChild.getDescendants(false).forEach(block => {
-				block.setDeletable(!locked);
-				block.setMovable(!locked);
-				block.setEditable(!locked);
-			});
-		}
+		applyLockStateImpl(this, locked);
 	};
 
 	// 鎖定時阻止齒輪 UI 修改參數（FR-004）
