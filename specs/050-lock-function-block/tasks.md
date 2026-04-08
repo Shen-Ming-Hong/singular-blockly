@@ -51,7 +51,11 @@
 
 - [ ] T004 在 `media/blockly/blocks/functions.js` 的 `arduino_function.init()` 函式末尾，初始化 `this.isLocked_ = false`（緊接現有 `this.oldName_ = 'myFunction'` 之後）
 - [ ] T005 在 `media/blockly/blocks/functions.js` 的 `arduino_function` 積木物件中（緊接 `updateRelatedFunctionCalls` 方法之後），新增 `setLocked_()` 方法：包裹在 `Blockly.Events.disable()` / `Blockly.Events.enable()` 之間，設定 `this.isLocked_`，並呼叫 `applyLockState_()`（FR-014）
-- [ ] T006 在 T005 的 `setLocked_()` 之後，新增 `applyLockState_()` 方法，執行：`this.setDeletable(!locked)`、`this.getField('NAME').setEnabled(!locked)`、根據 locked 狀態呼叫 `this.setStyle('locked_procedure_blocks')` 或 `this.setStyle('procedure_blocks')`，並在標題行插入或移除 🔒 圖示（作為額外 FieldLabel）
+- [ ] T006 在 T005 的 `setLocked_()` 之後，新增 `applyLockState_()` 方法，按順序執行下列四個步驟：
+  1. `this.setDeletable(!locked)` — 函式定義積木本身刪除保護
+  2. `this.getField('NAME').setEnabled(!locked)` — 重新命名保護
+  3. 當 locked=true：`this.setStyle('locked_procedure_blocks')` + `this.getInput('').insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON')`（需先檢查 `getField('LOCK_ICON')` 不存在才插入）；當 locked=false：`this.setStyle('procedure_blocks')` + `this.getInput('').removeField('LOCK_ICON')`（需先檢查 `getField('LOCK_ICON')` 存在才移除）
+  4. 迭代 STACK 内子積木，對每個子積木呼叫 `child.setDeletable(!locked)`（FR-006：保護子積木不被 Delete 鍵直接刪除）：`const stackConn = this.getInput('STACK')?.connection; let child = stackConn?.targetBlock(); while (child) { child.setDeletable(!locked); child = child.getNextBlock(); }`
 - [ ] T007 修改 `media/blockly/blocks/functions.js` 中的 `functionMutator.mutationToDom()`：在現有 `arg` 參數序列化之後、`return container` 之前，加入 `if (this.isLocked_) container.setAttribute('locked', '1');`
 - [ ] T008 修改 `media/blockly/blocks/functions.js` 中的 `functionMutator.domToMutation()`：在現有參數反序列化完成（`this.updateShape_()` 呼叫）之後，加入讀取 `locked` 屬性的邏輯：`if (xmlElement.getAttribute('locked') === '1') { this.isLocked_ = true; setTimeout(() => this.applyLockState_(true), 0); }` 以確保 SVG 初始化完成後再套用（FR-009、FR-013 向下相容）
 - [ ] T009 修改 `media/blockly/blocks/functions.js` 中的 `functionMutator.compose()`：在函式最開頭加入 `if (this.isLocked_) return;` 的 early return，防止鎖定時 mutator UI 修改套用（FR-004）
@@ -69,7 +73,7 @@
 ### US1 實作
 
 - [ ] T010 [US1] 在 `media/blockly/blocks/functions.js` 底部（所有積木定義結束後），新增 `registerFunctionLockMenu()` 函式並立即呼叫：使用 `Blockly.ContextMenuRegistry.registry.register()` 注冊 id 為 `'lock_function_block'`、`scopeType` 為 `Blockly.ContextMenuRegistry.ScopeType.BLOCK` 的選單項目；`preconditionFn` 針對三種積木類型（`arduino_function`、`procedures_defnoreturn`、`procedures_defreturn`）返回 `'enabled'`，其他返回 `'hidden'`；`displayText` 依 `scope.block.isLocked_` 切換顯示 `FUNCTION_LOCK_BLOCK` 或 `FUNCTION_UNLOCK_BLOCK`；`callback` 呼叫 `scope.block.setLocked_(!scope.block.isLocked_)` (FR-001、FR-010)
-- [ ] T011 [US1] 在 `media/blockly/blocks/functions.js` 底部，新增全域 workspace STACK 保護監聽器函式 `setupFunctionStackProtection(workspace)`，監聽 `Blockly.Events.BLOCK_MOVE` 事件：若移動目標的父積木為已鎖定的函式積木的 STACK 輸入，則以 `Blockly.Events.disable()/enable()` 包裹，執行 `block.unplug()` 並位移到游標附近（FR-005、FR-006）；在工作區已存在時於 `functions.js` 末尾呼叫此函式（`if (window.workspace) setupFunctionStackProtection(window.workspace)`）
+- [ ] T011 [US1] 在 `media/blockly/blocks/functions.js` 底部，新增全域 workspace STACK 保護監聽器函式 `setupFunctionStackProtection(workspace)`，監聽 `Blockly.Events.BLOCK_MOVE` 事件，必須處理兩個案例：**案例 A 移入**（FR-005）：檢查 `e.newParentId` 指向鎖定積木且 `e.newInputName === 'STACK'` → `Events.disable()/enable()` 包裹執行 `block.unplug()`；**案例 B 移出**（FR-006）：檢查 `e.oldParentId` 指向鎖定積木且 `e.oldInputName === 'STACK'` → `Events.disable()/enable()` 包裹將積木重新連接回 STACK 末尾。執行時機：`functions.js` 底部先嘗試 `if (typeof window !== 'undefined' && window.workspace) { setupFunctionStackProtection(window.workspace); }`；同時必須在 `blocklyEdit.js` 的工作區建立完成後（`workspace` 賦值後）呼叫 `setupFunctionStackProtection(workspace)`，以確保不會漏掉保護。若需防止重複注冊，可用 `window._functionStackProtectionRegistered` flag 作為防重複旗標
 
 **Checkpoint**: US1 完整可測：右鍵鎖定 → 四種操作被阻止 → 呼叫積木正常使用
 
@@ -111,7 +115,7 @@
 
 ### US4 實作
 
-- [ ] T014 [US4] 在 `media/blockly/blocks/functions.js` 底部（`registerFunctionLockMenu()` 之前），新增 `wrapMicropythonLock(blockType)` 函式：包裹目標積木的 `init()` 以注入 `isLocked_ = false`、`setLocked_()` 與 `applyLockState_()` 方法（可提取為模組層級共用函式）；同時包裹 `saveExtraState`（加入 `if (this.isLocked_) state.locked = true`）與 `loadExtraState`（讀取 `state?.locked` 並以 `setTimeout` 呼叫 `applyLockState_(true)`）（FR-002、FR-009）
+- [ ] T014 [US4] 在 `media/blockly/blocks/functions.js` 底部（`registerFunctionLockMenu()` 之前），新增 `wrapMicropythonLock(blockType)` 函式：包裹目標積木的 `init()` 以注入 `isLocked_ = false`、`setLocked_()` 與 `applyLockState_()` 方法（可提取為模組層級共用函式）；同時包裹 `saveExtraState`（加入 `if (this.isLocked_) state.locked = true`）與 `loadExtraState`（讀取 `state?.locked` 並以 `setTimeout` 呼叫 `applyLockState_(true)`）（FR-002、FR-009）。**FR-015 注意**：`saveExtraState`/`loadExtraState` 同時就是 Blockly 12.x 複製貼上的序列化路徑，確保在複製貼上時 `locked: true` 輸出正確，副本才能保持鎖定狀態
 - [ ] T015 [US4] 在 `wrapMicropythonLock()` 定義之後，立即對 `'procedures_defnoreturn'` 和 `'procedures_defreturn'` 各呼叫一次 `wrapMicropythonLock()`（FR-002）
 - [ ] T016 [US4] 確認 T011 的 STACK 保護監聽器也適用於 MicroPython 積木（`procedures_defnoreturn`、`procedures_defreturn` 有 STACK 輸入）；若監聽器已透過鎖定積木的通用 `isLocked_` 屬性判斷，則無需額外修改
 
@@ -140,10 +144,12 @@
 
 - [ ] T019 執行 `npm run validate:i18n` 確認 15 個語系的 `FUNCTION_LOCK_BLOCK` 與 `FUNCTION_UNLOCK_BLOCK` 鍵均通過驗證（SC-005）
 - [ ] T020 [P] 執行手動測試矩陣 C（Ctrl+Z 無法復原鎖定）：鎖定積木 → 按 Ctrl+Z → 確認積木仍為鎖定狀態，驗證 T005 的 `Events.disable/enable` 包裹有效（FR-014）
-- [ ] T021 [P] 執行手動測試矩陣 D（複製貼上保持鎖定）：鎖定積木 → Ctrl+C/V → 確認副本為鎖定狀態，驗證序列化路徑（FR-015）
+- [ ] T021 [P] 執行手動測試矩陣 D（複製貼上保持鎖定）：**必須分別驗證兩種積木類型**：① `arduino_function`：鎖定積木 → Ctrl+C/V → 確認副本為鎖定狀態（XML mutation 包含 `locked="1"`）；② `procedures_defnoreturn`：鎖定 MicroPython 函式 → Ctrl+C/V → 確認副本為鎖定狀態（JSON extra state 包含 `locked: true`）—驗證 Blockly 12.x 複製貼上使用 `saveExtraState`/`loadExtraState` 路徑，確保 FR-015 對 MicroPython 積木同樣生效（FR-015）
 - [ ] T022 [P] 執行手動測試矩陣 G（右鍵選單只在函式積木顯示）：對非函式積木右鍵 → 確認無「鎖定積木」選項（FR-001、FR-002 的 `preconditionFn` 返回 `'hidden'`）
 - [ ] T023 [P] 執行手動測試矩陣 H（多積木獨立鎖定）：新增 3 個函式積木，只鎖定第 2 個 → 確認第 1、3 個正常可編輯
-- [ ] T024 執行手動測試矩陣 A（完整鎖定/解鎖流程）、B（持久化）、E（MicroPython）、F（向下相容）的完整測試矩陣（SC-001 至 SC-006）
+- [ ] T024 執行手動測試矩陣 A（完整鎖定/解鎖流程）、B（持久化）、E（MicroPython）、F（向下相容）的完整測試矩陣，並明確驗證 SC-001–SC-006：其中 **SC-001** 需記錄錄影或計時，確認右鍵鎖定操作完整流程（右鍵選單出現→選擇鎖定）可在 **30 秒內**完成，更新 quickstart.md 測試矩陣 A 平均時間記錄
+- [ ] T025 [P] 執行 FR-016 驗證（非破壞性 STACK 右鍵操作）：鎖定函式積木 → 對 STACK 內子積木右鍵 → 確認【說明】、【折疊】、【展開】、【複製】等非修改性操作仍然可用；應被限制的選項（刪除、拖出 STACK）應被置灰或隱藏，驗證 FR-016：確認所有非破壞性操作仍可使用，結構性操作受到限制（FR-016）
+- [ ] T026 [P] 執行 Edge Case 驗證（全選後刪除）：鎖定函式積木 → Ctrl+A 全選工作區所有積木 → 按 Delete → 確認鎖定的函式定義積木不被刪除，其餘可刪除積木正常刪除，驗證 `setDeletable(false)` 對 Blockly 全選刪除流程生效（spec Edge Cases）
 
 ---
 
@@ -194,7 +200,7 @@ T014 → T015 → T016 （需順序）
 4. Phase 4–5（T012–T013）：US2 持久化驗證 + US3 解鎖驗證（低成本）
 5. Phase 6（T014–T016）：US4 MicroPython 支援
 6. Phase 7（T017–T018）：US5 向下相容驗證
-7. Final Phase（T019–T024）：整合驗證
+7. Final Phase（T019–T026）：整合驗證
 
 ---
 
@@ -209,5 +215,5 @@ T014 → T015 → T016 （需順序）
 | Phase 5 | T013 (1) | US3 | P2 |
 | Phase 6 | T014–T016 (3) | US4 | P3 |
 | Phase 7 | T017–T018 (2) | US5 | P1 |
-| Final Phase | T019–T024 (6) | 整合 | — |
-| **合計** | **24 tasks** | | |
+| Final Phase | T019–T026 (8) | 整合 | — |
+| **合計** | **26 tasks** | | |

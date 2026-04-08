@@ -24,9 +24,8 @@
 **Project Type**: VS Code Extension — WebView 積木編輯器功能擴充  
 **Performance Goals**: 鎖定/解鎖切換視覺更新 < 500ms（SC-006）  
 **Constraints**: 不可修改 Extension Host（`src/`）TypeScript 程式碼；所有實作均在 `media/blockly/` 中；不可使用 `console.log`（WebView 使用 `log.info`）  
-**Scale/Scope**: 3 種積木類型 × 15 語系；主要影響單一檔案 `media/blockly/blocks/functions.js`
-
-## Constitution Check
+**Scale/Scope**: 3 種積木類型 × 15 語系；主要影響單一檔案 `media/blockly/blocks/functions.js`  
+**Interface Contracts**: 本功能不建立 `contracts/` 目錄。理由：所有實作均在 WebView JavaScript 內（`media/blockly/`），不新增任何 Extension Host ↔ WebView `postMessage` 指令、不呼叫 VS Code API、不新增 `src/` TypeScript 型別介面。`data-model.md`（方法簽名、序列化格式）扮演等效的內部介面合約角色。
 
 ## Constitution Check
 
@@ -42,6 +41,9 @@
 | VII. Test Coverage | WebView 互動採手動測試矩陣（quickstart.md），i18n 使用自動驗證 | ✅ Pass（含例外說明）|
 | VIII. Pure Functions | `applyLockState_()` 為純副作用方法，`setLocked_()` 為外圍控制層 | ✅ Pass |
 | IX. Traditional Chinese Docs | 所有規格文件均為繁體中文 | ✅ Pass |
+| V. Research-Driven | 使用已知的 Blockly 12.3.1 ContextMenuRegistry API；ContextMenuRegistry 在 research.md Phase 0 已驗證 | N/A（無外部 API 版本不確定性）|
+| X. Release Management | 本功能為 WebView 積木邏輯實作，不涉及版本發布操作 | N/A（發布由獨立 PR 流程處理）|
+| XI. Agent Skills | 本功能未建立新 Agent Skill，使用現有 speckit 技能流程 | N/A（現有技能已足夠）|
 
 **Gates after Phase 1 design**: 全部通過，無違規。
 
@@ -108,18 +110,31 @@ setLocked_: function(locked) {
 #### `applyLockState_(locked: boolean)`
 ```javascript
 applyLockState_: function(locked) {
-    // 1. 刪除保護
+    // 1. 刪除保護（函式定義積木本身）
     this.setDeletable(!locked);
     // 2. 重新命名保護
     const nameField = this.getField('NAME');
     if (nameField) nameField.setEnabled(!locked);
-    // 3. 視覺更新
+    // 3. 視覺更新（主題色 + 🔒 圖示）
     if (locked) {
         this.setStyle('locked_procedure_blocks');
-        // 在第一個 FieldLabel 插入 🔒（或更新 FieldLabel 文字）
+        // 在標題輸入的第一個位置插入 🔒 FieldLabel（若尚未存在）
+        if (!this.getField('LOCK_ICON')) {
+            this.getInput('').insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON');
+        }
     } else {
         this.setStyle('procedure_blocks');
-        // 移除 🔒
+        // 移除 🔒 FieldLabel
+        if (this.getField('LOCK_ICON')) {
+            this.getInput('').removeField('LOCK_ICON');
+        }
+    }
+    // 4. STACK 子積木刪除保護（FR-006：防止子積木被 Delete 鍵直接刪除）
+    const stackConn = this.getInput('STACK')?.connection;
+    let child = stackConn?.targetBlock();
+    while (child) {
+        child.setDeletable(!locked);
+        child = child.getNextBlock();
     }
 },
 ```
@@ -134,18 +149,54 @@ compose: function(containerBlock) {
 ```
 
 #### STACK 保護（workspace onchange 監聽器）
-在積木載入完成後（`blocklyEdit.js` 或 `functions.js` 底部）注冊全域監聽器：
+在積木載入完成後（`functions.js` 底部）注冊全域監聽器，**需處理兩個案例**：
 
 ```javascript
-function setupStackProtection(workspace) {
+function setupFunctionStackProtection(workspace) {
     workspace.addChangeListener((e) => {
         if (e.type !== Blockly.Events.BLOCK_MOVE) return;
-        // 檢查是否嘗試移入鎖定積木的 STACK
-        // 檢查是否嘗試從鎖定積木的 STACK 移出
-        // 若是，還原移動（Events.disable 包裹）
+        const block = workspace.getBlockById(e.blockId);
+        if (!block) return;
+
+        // 案例 A：積木被拖入鎖定函式的 STACK（FR-005）
+        if (e.newParentId) {
+            const newParent = workspace.getBlockById(e.newParentId);
+            if (newParent?.isLocked_ && e.newInputName === 'STACK') {
+                Blockly.Events.disable();
+                try {
+                    block.unplug();
+                } finally {
+                    Blockly.Events.enable();
+                }
+                return;
+            }
+        }
+
+        // 案例 B：積木被從鎖定函式的 STACK 拖出（FR-006）
+        if (e.oldParentId && e.oldInputName === 'STACK') {
+            const oldParent = workspace.getBlockById(e.oldParentId);
+            if (oldParent?.isLocked_) {
+                Blockly.Events.disable();
+                try {
+                    // 重新連接回原 STACK 的末尾
+                    const stackConn = oldParent.getInput('STACK').connection;
+                    let lastConn = stackConn;
+                    let cur = stackConn.targetBlock();
+                    while (cur) { lastConn = cur.nextConnection; cur = cur.getNextBlock(); }
+                    lastConn?.connect(block.previousConnection);
+                } finally {
+                    Blockly.Events.enable();
+                }
+            }
+        }
     });
 }
 ```
+
+**工作區初始化注意事項**：`functions.js` 在 WebView 載入時執行，而 `window.workspace` 可能在稍後的 `blocklyEdit.js` 初始化後才建立。正確做法：
+- 在 `functions.js` 底部嘗試立即注冊：`if (typeof window !== 'undefined' && window.workspace) { setupFunctionStackProtection(window.workspace); }`
+- 同時在 `blocklyEdit.js` 的工作區建立完成後（`workspace` 賦值後）呼叫 `setupFunctionStackProtection(workspace)`
+- 確保函式只注冊一次（可設 flag 或用 `workspace.hasChangeListener` 檢查）
 
 #### `registerFunctionLockMenu()` ContextMenuRegistry 注冊
 ```javascript
@@ -268,4 +319,18 @@ function wrapMicropythonLock(blockType) {
 ### 階段 7 — 驗證
 - `npm run validate:i18n`
 - 手動測試矩陣（quickstart.md 中的測試 A–I）
+
+### 對應 tasks.md 階段映射
+
+> tasks.md 依使用者故事重新分組，階段編號與本計畫不同，對應關係如下：
+
+| plan.md 階段 | 內容 | tasks.md Phase |
+|---|---|---|
+| 階段 1 | 主題樣式 | Phase 1: Setup (T001–T002) |
+| 階段 2 | i18n | Phase 1: Setup (T003) |
+| 階段 3 | arduino_function 核心邏輯 | Phase 2: Foundational (T004–T009) |
+| 階段 4 | MicroPython 包裹 | Phase 6: US4 (T014–T016) |
+| 階段 5 | STACK 保護 | Phase 3: US1 (T011) |
+| 階段 6 | ContextMenuRegistry 注冊 | Phase 3: US1 (T010) |
+| 階段 7 | 驗證 | Phase 3–7 + Final Phase (T012–T026) |
 
