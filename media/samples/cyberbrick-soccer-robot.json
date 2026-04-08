@@ -79,7 +79,8 @@
           "id": "#oVWv3T+fe{_5BQqVUkk",
           "x": 0,
           "y": 2932,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"紅色\" type=\"int\"></arg><arg name=\"綠色\" type=\"int\"></arg><arg name=\"藍色\" type=\"int\"></arg></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"><arg name=\"紅色\" type=\"int\"></arg><arg name=\"綠色\" type=\"int\"></arg><arg name=\"藍色\" type=\"int\"></arg></mutation>",
           "fields": {
             "NAME": "車燈"
           },
@@ -88,6 +89,9 @@
               "block": {
                 "type": "x11_led_set_color",
                 "id": "WUv{pp#t(2TKs$EAC9Yp",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "PORT": "20",
                   "INDEX": "0"
@@ -104,6 +108,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "*ac37!6226;_G[O{Yz|o",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "104+Jxq~Cu/Hlab:YS5G"
@@ -122,6 +129,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "@Ou]d8jczVR2VwzhzGp/",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "v2bqP`c1$@L)Dt$bfd1J"
@@ -140,6 +150,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "mMKpP3@Kgo~pClg45]f~",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "Yo0x9qb2car?Fed^]f##"
@@ -152,6 +165,9 @@
                   "block": {
                     "type": "x11_led_set_color",
                     "id": "}TDOh,C32*zSN`l{L~1c",
+                    "deletable": false,
+                    "movable": false,
+                    "editable": false,
                     "fields": {
                       "PORT": "20",
                       "INDEX": "1"
@@ -168,6 +184,9 @@
                         "block": {
                           "type": "variables_get",
                           "id": "K^[`E#LAq5I-2`ZM:eO)",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "fields": {
                             "VAR": {
                               "id": "104+Jxq~Cu/Hlab:YS5G"
@@ -186,6 +205,9 @@
                         "block": {
                           "type": "variables_get",
                           "id": ";[KfwQK7vS)nngs5L;HD",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "fields": {
                             "VAR": {
                               "id": "v2bqP`c1$@L)Dt$bfd1J"
@@ -204,6 +226,9 @@
                         "block": {
                           "type": "variables_get",
                           "id": "mf7)cr_LoQd!S,2hoRhK",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "fields": {
                             "VAR": {
                               "id": "Yo0x9qb2car?Fed^]f##"
@@ -223,7 +248,8 @@
           "id": "Ocx6kqikaQ{.bQWI=-wq",
           "x": 0,
           "y": 112,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
             "NAME": "遙控器"
           },
@@ -232,6 +258,9 @@
               "block": {
                 "type": "rc_master_init",
                 "id": "2kr~;c0$Pp(2n]PMlPmb",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "CHANNEL": 1
                 },
@@ -247,6 +276,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "wt5B=R[N;d(!_6h^*5ho",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "sJV.b.!e-]Qcm0(@e7X1"
@@ -259,6 +291,9 @@
                   "block": {
                     "type": "controls_whileUntil",
                     "id": "-tWZ],CY5qjPVa$$e)I]",
+                    "deletable": false,
+                    "movable": false,
+                    "editable": false,
                     "fields": {
                       "MODE": "WHILE"
                     },
@@ -267,6 +302,9 @@
                         "block": {
                           "type": "logic_boolean",
                           "id": "WbC[QcSAs4x^r2Nmz6AZ",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "fields": {
                             "BOOL": "TRUE"
                           }
@@ -275,7 +313,10 @@
                       "DO": {
                         "block": {
                           "type": "rc_send",
-                          "id": "o32wvI$v#`exPY%|I@@}"
+                          "id": "o32wvI$v#`exPY%|I@@}",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false
                         }
                       }
                     }
@@ -293,7 +334,8 @@
           "disabledReasons": [
             "MANUALLY_DISABLED"
           ],
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
             "NAME": "車子"
           },
@@ -302,6 +344,9 @@
               "block": {
                 "type": "rc_slave_init",
                 "id": "z@%bIn[@p@?*0Qgf4RvC",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "CHANNEL": 1
                 },
@@ -317,6 +362,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "9DY:h=0XRSh!Gb^d)h7c",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "sJV.b.!e-]Qcm0(@e7X1"
@@ -329,6 +377,9 @@
                   "block": {
                     "type": "rc_wait_connection",
                     "id": "4j,QyxRf*rdutNn?ST%c",
+                    "deletable": false,
+                    "movable": false,
+                    "editable": false,
                     "fields": {
                       "TIMEOUT": 30
                     },
@@ -336,6 +387,9 @@
                       "block": {
                         "type": "controls_whileUntil",
                         "id": "k=[i+3~x*SddKyW_;qs3",
+                        "deletable": false,
+                        "movable": false,
+                        "editable": false,
                         "fields": {
                           "MODE": "WHILE"
                         },
@@ -344,6 +398,9 @@
                             "block": {
                               "type": "logic_boolean",
                               "id": "7.swAcx}_G|^N^cjj7At",
+                              "deletable": false,
+                              "movable": false,
+                              "editable": false,
                               "fields": {
                                 "BOOL": "TRUE"
                               }
@@ -353,6 +410,9 @@
                             "block": {
                               "type": "controls_if",
                               "id": "RcNlj-cSA_R)`9Cg)xb`",
+                              "deletable": false,
+                              "movable": false,
+                              "editable": false,
                               "extraState": {
                                 "hasElse": true
                               },
@@ -360,18 +420,27 @@
                                 "IF0": {
                                   "block": {
                                     "type": "rc_is_connected",
-                                    "id": "Q%4PB!en#jK9ektltx$W"
+                                    "id": "Q%4PB!en#jK9ektltx$W",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false
                                   }
                                 },
                                 "DO0": {
                                   "block": {
                                     "type": "cyberbrick_led_set_color",
                                     "id": "ywzz~)J^{WURV[@}IdpG",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
                                     "inputs": {
                                       "RED": {
                                         "shadow": {
                                           "type": "math_number",
                                           "id": "-n?dHG3fWKT+YndPSK^[",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": 0
                                           }
@@ -381,6 +450,9 @@
                                         "shadow": {
                                           "type": "math_number",
                                           "id": ".1|`!GSoy_9{N7HocH-.",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": 255
                                           }
@@ -390,6 +462,9 @@
                                         "shadow": {
                                           "type": "math_number",
                                           "id": "d]x*T+LhyllsF!z~dICY",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": 255
                                           }
@@ -400,6 +475,9 @@
                                       "block": {
                                         "type": "arduino_function_call",
                                         "id": "H^TVmi6[Djn38HPU_A]a",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
                                         "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"連線完成後要做的事情\" has_return=\"false\" return_type=\"void\"></mutation>"
                                       }
                                     }
@@ -409,11 +487,17 @@
                                   "block": {
                                     "type": "cyberbrick_led_set_color",
                                     "id": "ZxAo={8R:29/)2eOq|Q%",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
                                     "inputs": {
                                       "RED": {
                                         "shadow": {
                                           "type": "math_number",
                                           "id": "(~~2,ul04.8ROUTlYXQr",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": 255
                                           }
@@ -423,6 +507,9 @@
                                         "shadow": {
                                           "type": "math_number",
                                           "id": "~ozA{?X29ozuUQ{hQVSv",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": 0
                                           }
@@ -432,6 +519,9 @@
                                         "shadow": {
                                           "type": "math_number",
                                           "id": "f$WRKE@488U#b*uba$ZJ",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": 0
                                           }
@@ -442,6 +532,9 @@
                                       "block": {
                                         "type": "arduino_function_call",
                                         "id": "JZJLg~FJj|s+;zvyuIG+",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
                                         "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"停止移動\" has_return=\"false\" return_type=\"void\"></mutation>"
                                       }
                                     }
@@ -464,7 +557,8 @@
           "id": "#Qg2@{0B/,m6rbMFX+T7",
           "x": 0,
           "y": 1859,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
             "NAME": "停止移動"
           },
@@ -473,12 +567,18 @@
               "block": {
                 "type": "arduino_function_call",
                 "id": "s,I#DKy@_|RJmBWAvfUc",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
                 "inputs": {
                   "ARG0": {
                     "shadow": {
                       "type": "math_number",
                       "id": "az!Rqm@_S2-0SdaXg#5v",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "NUM": 0
                       }
@@ -488,6 +588,9 @@
                     "shadow": {
                       "type": "math_number",
                       "id": "Ms*XKgnq+=[FBB}=%7eq",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "NUM": 0
                       }
@@ -503,7 +606,8 @@
           "id": ")m=Y%~$/S7g.U2o*`:wA",
           "x": 0,
           "y": 2755,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
           "fields": {
             "NAME": "馬達移動"
           },
@@ -512,6 +616,9 @@
               "block": {
                 "type": "x11_motor_speed",
                 "id": ":m6caov-QmF:(Fo6dLBP",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "PORT": "1"
                 },
@@ -527,6 +634,9 @@
                     "block": {
                       "type": "math_map",
                       "id": "JmPI=O+.4uYh1Tm/YSs^",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "inputs": {
                         "VALUE": {
                           "shadow": {
@@ -539,6 +649,9 @@
                           "block": {
                             "type": "variables_get",
                             "id": "qwF{.sE=a[z~Q.,=$Kd_",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "VAR": {
                                 "id": "x^lnjFop]IbtAz#x_MP_"
@@ -550,6 +663,9 @@
                           "shadow": {
                             "type": "math_number",
                             "id": ".{#hn,qF.bj@6oJ)_0vz",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "NUM": -100
                             }
@@ -559,6 +675,9 @@
                           "shadow": {
                             "type": "math_number",
                             "id": "VZ9d8(y1.mxe^$~giJaM",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "NUM": 100
                             }
@@ -568,6 +687,9 @@
                           "shadow": {
                             "type": "math_number",
                             "id": "(j}{]1ktQl5$Br*N0PRo",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "NUM": 2048
                             }
@@ -577,6 +699,9 @@
                           "shadow": {
                             "type": "math_number",
                             "id": "iAK9ERFl8%2W][6.uO^$",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "NUM": -2048
                             }
@@ -590,6 +715,9 @@
                   "block": {
                     "type": "x11_motor_speed",
                     "id": "r%{rdT5tpN:P)R182-eW",
+                    "deletable": false,
+                    "movable": false,
+                    "editable": false,
                     "fields": {
                       "PORT": "2"
                     },
@@ -605,6 +733,9 @@
                         "block": {
                           "type": "math_map",
                           "id": "FhCUI;qN(9]_d-XFn.9A",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "inputs": {
                             "VALUE": {
                               "shadow": {
@@ -617,6 +748,9 @@
                               "block": {
                                 "type": "variables_get",
                                 "id": "L=S*uOZC1Ppz)et,HHCS",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "VAR": {
                                     "id": "ebSH7#95bmdA8H7{(q!#"
@@ -628,6 +762,9 @@
                               "shadow": {
                                 "type": "math_number",
                                 "id": "=EywO=Ldxdo-q)8~a*N6",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "NUM": -100
                                 }
@@ -637,6 +774,9 @@
                               "shadow": {
                                 "type": "math_number",
                                 "id": "1Jc0#]CEc5%!D+}`f]KX",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "NUM": 100
                                 }
@@ -646,6 +786,9 @@
                               "shadow": {
                                 "type": "math_number",
                                 "id": "Q*}N-N/!%om`Up|fNJ|L",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "NUM": -2048
                                 }
@@ -655,6 +798,9 @@
                               "shadow": {
                                 "type": "math_number",
                                 "id": "xe_03)XLGUTqQV6oX})#",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "NUM": 2048
                                 }
@@ -675,7 +821,8 @@
           "id": "AAO07^xj|-sHyXq[gKF0",
           "x": 0,
           "y": 2083,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"後退速度\" type=\"int\"></arg></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"><arg name=\"後退速度\" type=\"int\"></arg></mutation>",
           "fields": {
             "NAME": "後退"
           },
@@ -684,6 +831,9 @@
               "block": {
                 "type": "arduino_function_call",
                 "id": "CF6D0JY;)!eFH?6p9wI1",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
                 "inputs": {
                   "ARG0": {
@@ -697,6 +847,9 @@
                     "block": {
                       "type": "math_single",
                       "id": "mu):3)#wHypiQ}g2ax-s",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "OP": "NEG"
                       },
@@ -712,6 +865,9 @@
                           "block": {
                             "type": "variables_get",
                             "id": "hzy0`M8w!ikYRjxfPVX|",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "VAR": {
                                 "id": "!sY(}rFf.%31uX.:-164"
@@ -733,6 +889,9 @@
                     "block": {
                       "type": "math_single",
                       "id": "3h0YMn:/K%Ut*#x_QAEN",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "OP": "NEG"
                       },
@@ -748,6 +907,9 @@
                           "block": {
                             "type": "variables_get",
                             "id": "Vyyn9vRQ:WEER8/pP}Yj",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "VAR": {
                                 "id": "!sY(}rFf.%31uX.:-164"
@@ -768,7 +930,8 @@
           "id": "7xt}?b?pC=xr.f5R1)#7",
           "x": 0,
           "y": 2195,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"左轉速度\" type=\"int\"></arg></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"><arg name=\"左轉速度\" type=\"int\"></arg></mutation>",
           "fields": {
             "NAME": "原地左轉"
           },
@@ -777,6 +940,9 @@
               "block": {
                 "type": "arduino_function_call",
                 "id": "l7k^SLu0Tv=6[dU7v^_9",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
                 "inputs": {
                   "ARG0": {
@@ -790,6 +956,9 @@
                     "block": {
                       "type": "math_single",
                       "id": "E(Nw8OSq*$@in)Xi$l@?",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "OP": "NEG"
                       },
@@ -805,6 +974,9 @@
                           "block": {
                             "type": "variables_get",
                             "id": "h+KCV?DH1^4^_^:#W5v~",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "VAR": {
                                 "id": "WNEzZ@J8DF[rWDfIFEnZ"
@@ -826,6 +998,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "{t~S{T3}0yt0Y-n:,oly",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "WNEzZ@J8DF[rWDfIFEnZ"
@@ -843,7 +1018,8 @@
           "id": "8j@18,q2@ugKI[d0*=)P",
           "x": 0,
           "y": 2307,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"右轉速度\" type=\"int\"></arg></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"><arg name=\"右轉速度\" type=\"int\"></arg></mutation>",
           "fields": {
             "NAME": "原地右轉"
           },
@@ -852,6 +1028,9 @@
               "block": {
                 "type": "arduino_function_call",
                 "id": "FF^xLNbu~YF`ent,_$QW",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
                 "inputs": {
                   "ARG0": {
@@ -865,6 +1044,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "b{*U7zM)KGli@CnGC9#7",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "($d2v@Eq[ov,*-o!)tYq"
@@ -883,6 +1065,9 @@
                     "block": {
                       "type": "math_single",
                       "id": "Lozl8G^eB]uc_scTG46a",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "OP": "NEG"
                       },
@@ -898,6 +1083,9 @@
                           "block": {
                             "type": "variables_get",
                             "id": "5~qd(]P[GH#_)i7QGa+/",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "fields": {
                               "VAR": {
                                 "id": "($d2v@Eq[ov,*-o!)tYq"
@@ -918,7 +1106,8 @@
           "id": "LUw8xF%n,q#^V^b_*H(2",
           "x": 0,
           "y": 2531,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
             "NAME": "踢球"
           },
@@ -927,6 +1116,9 @@
               "block": {
                 "type": "x11_servo_360_speed",
                 "id": "gKEzut/6~c|wx1o}glQ(",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "PORT": "1"
                 },
@@ -935,6 +1127,9 @@
                     "shadow": {
                       "type": "math_number",
                       "id": "lz5eZCGoQJ.]qG/vgz;4",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "NUM": 100
                       }
@@ -950,7 +1145,8 @@
           "id": "Y=(WIG(P#B7m?f5%zOTK",
           "x": 0,
           "y": 2419,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
             "NAME": "抬球"
           },
@@ -959,6 +1155,9 @@
               "block": {
                 "type": "x11_servo_360_speed",
                 "id": "`u](*Aq}M4jc+77;~jJg",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "PORT": "1"
                 },
@@ -967,6 +1166,9 @@
                     "shadow": {
                       "type": "math_number",
                       "id": "m%Qa,r[CW}33/=SD`(gl",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "NUM": -100
                       }
@@ -982,7 +1184,8 @@
           "id": "csOp71p0QI|)Y8JSU#UO",
           "x": 0,
           "y": 3105,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
             "NAME": "讀取搖控器數值"
           },
@@ -991,6 +1194,9 @@
               "block": {
                 "type": "variables_set",
                 "id": "jiplOuR?%aE$ulAfTIcP",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "VAR": {
                     "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1001,6 +1207,9 @@
                     "block": {
                       "type": "math_number",
                       "id": "[}]Eg5=2H(mC.dZt*#As",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "NUM": 15
                       }
@@ -1011,6 +1220,9 @@
                   "block": {
                     "type": "controls_if",
                     "id": "Xv53qAbaU`m(i}VVu~N,",
+                    "deletable": false,
+                    "movable": false,
+                    "editable": false,
                     "extraState": {
                       "hasElse": true
                     },
@@ -1019,6 +1231,9 @@
                         "block": {
                           "type": "logic_operation",
                           "id": "%(AE49~*p]wxe|1LpSod",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "fields": {
                             "OP": "OR"
                           },
@@ -1027,6 +1242,9 @@
                               "block": {
                                 "type": "logic_compare",
                                 "id": "Wma`fHJ`lkc[0s^%rn}^",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "OP": "GTE"
                                 },
@@ -1035,6 +1253,9 @@
                                     "block": {
                                       "type": "rc_get_joystick_mapped",
                                       "id": "zBkA;Aqkm]-OX=ey!F(T",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
                                       "fields": {
                                         "CHANNEL": "2"
                                       },
@@ -1043,6 +1264,9 @@
                                           "shadow": {
                                             "type": "math_number",
                                             "id": "xN`+$Tx2O9jY~i^.4X@$",
+                                            "deletable": false,
+                                            "movable": false,
+                                            "editable": false,
                                             "fields": {
                                               "NUM": -100
                                             }
@@ -1052,6 +1276,9 @@
                                           "shadow": {
                                             "type": "math_number",
                                             "id": "Vng,bRsgv@Khfw]us-Sp",
+                                            "deletable": false,
+                                            "movable": false,
+                                            "editable": false,
                                             "fields": {
                                               "NUM": 100
                                             }
@@ -1064,6 +1291,9 @@
                                     "block": {
                                       "type": "variables_get",
                                       "id": "2r`%8O5QOZq`vK/1ldYe",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
                                       "fields": {
                                         "VAR": {
                                           "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1078,6 +1308,9 @@
                               "block": {
                                 "type": "logic_compare",
                                 "id": "8Z(pe`S16ME(l)ZbL~=m",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "OP": "LTE"
                                 },
@@ -1086,6 +1319,9 @@
                                     "block": {
                                       "type": "rc_get_joystick_mapped",
                                       "id": "@zX*fv[IKT9XLZ4S3O@Q",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
                                       "fields": {
                                         "CHANNEL": "2"
                                       },
@@ -1094,6 +1330,9 @@
                                           "shadow": {
                                             "type": "math_number",
                                             "id": "SZHA7oQPG%609:Bm`]T#",
+                                            "deletable": false,
+                                            "movable": false,
+                                            "editable": false,
                                             "fields": {
                                               "NUM": -100
                                             }
@@ -1103,6 +1342,9 @@
                                           "shadow": {
                                             "type": "math_number",
                                             "id": "k-{a=lHBHb]9NEvAH{8O",
+                                            "deletable": false,
+                                            "movable": false,
+                                            "editable": false,
                                             "fields": {
                                               "NUM": 100
                                             }
@@ -1115,6 +1357,9 @@
                                     "block": {
                                       "type": "math_single",
                                       "id": "0xf{,T!:Qu/3$7(km7q3",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
                                       "fields": {
                                         "OP": "NEG"
                                       },
@@ -1130,6 +1375,9 @@
                                           "block": {
                                             "type": "variables_get",
                                             "id": "BFAj7=%.MN)K?^qXAxO5",
+                                            "deletable": false,
+                                            "movable": false,
+                                            "editable": false,
                                             "fields": {
                                               "VAR": {
                                                 "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1150,6 +1398,9 @@
                         "block": {
                           "type": "variables_set",
                           "id": ".o`moDb4@MH=ud!V.(QW",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "fields": {
                             "VAR": {
                               "id": "@EvI#XmiI`d[EriM+QVj"
@@ -1160,6 +1411,9 @@
                               "block": {
                                 "type": "rc_get_joystick_mapped",
                                 "id": "PL+j!!?s+uqxe];0O6L,",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "CHANNEL": "2"
                                 },
@@ -1168,6 +1422,9 @@
                                     "shadow": {
                                       "type": "math_number",
                                       "id": "MQS90Z3TG6=Q~HCZ6?sj",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
                                       "fields": {
                                         "NUM": -100
                                       }
@@ -1177,6 +1434,9 @@
                                     "shadow": {
                                       "type": "math_number",
                                       "id": "b:J~rboR_.*R!Y5895/^",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
                                       "fields": {
                                         "NUM": 100
                                       }
@@ -1192,6 +1452,9 @@
                         "block": {
                           "type": "variables_set",
                           "id": "S/Oy?Rbk|M*Xcsr6Z2mu",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
                           "fields": {
                             "VAR": {
                               "id": "@EvI#XmiI`d[EriM+QVj"
@@ -1202,6 +1465,9 @@
                               "block": {
                                 "type": "math_number",
                                 "id": "Z=h+Lr;bL5y@jEKM#P.?",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "NUM": 0
                                 }
@@ -1215,6 +1481,9 @@
                       "block": {
                         "type": "controls_if",
                         "id": "rn#_a8~QAT.iJl2fXd|Z",
+                        "deletable": false,
+                        "movable": false,
+                        "editable": false,
                         "extraState": {
                           "hasElse": true
                         },
@@ -1223,6 +1492,9 @@
                             "block": {
                               "type": "logic_operation",
                               "id": "kX$mfb3txMLOmfO*El*(",
+                              "deletable": false,
+                              "movable": false,
+                              "editable": false,
                               "fields": {
                                 "OP": "OR"
                               },
@@ -1231,6 +1503,9 @@
                                   "block": {
                                     "type": "logic_compare",
                                     "id": "=6s)i0.C:w22w;aHbY||",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
                                     "fields": {
                                       "OP": "GTE"
                                     },
@@ -1239,6 +1514,9 @@
                                         "block": {
                                           "type": "rc_get_joystick_mapped",
                                           "id": "}38)8o.^Zl.YBxL]K2)o",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "CHANNEL": "4"
                                           },
@@ -1247,6 +1525,9 @@
                                               "shadow": {
                                                 "type": "math_number",
                                                 "id": "4C,~8zE%1l`)Qv`|L*r[",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "NUM": -100
                                                 }
@@ -1256,6 +1537,9 @@
                                               "shadow": {
                                                 "type": "math_number",
                                                 "id": "g6({Ds`]C9Iv9LaX2dq,",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "NUM": 100
                                                 }
@@ -1268,6 +1552,9 @@
                                         "block": {
                                           "type": "variables_get",
                                           "id": "A%#IPg|wD1aA2mks#X,N",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "VAR": {
                                               "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1282,6 +1569,9 @@
                                   "block": {
                                     "type": "logic_compare",
                                     "id": "^tBj9f+YFyf#I0h(joua",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
                                     "fields": {
                                       "OP": "LTE"
                                     },
@@ -1290,6 +1580,9 @@
                                         "block": {
                                           "type": "rc_get_joystick_mapped",
                                           "id": "aa^vV82!_B}99XTH:uS(",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "CHANNEL": "4"
                                           },
@@ -1298,6 +1591,9 @@
                                               "shadow": {
                                                 "type": "math_number",
                                                 "id": "!s4m#}l+TwzuyldZ(gOj",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "NUM": -100
                                                 }
@@ -1307,6 +1603,9 @@
                                               "shadow": {
                                                 "type": "math_number",
                                                 "id": "$:o+f5Td[.}Z3~(AWMVm",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "NUM": 100
                                                 }
@@ -1319,6 +1618,9 @@
                                         "block": {
                                           "type": "math_single",
                                           "id": "z9G:?4wTw@IVJAq][OK-",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "OP": "NEG"
                                           },
@@ -1334,6 +1636,9 @@
                                               "block": {
                                                 "type": "variables_get",
                                                 "id": "cL+2xow2%;xRj,c.r9]W",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "VAR": {
                                                     "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1354,6 +1659,9 @@
                             "block": {
                               "type": "variables_set",
                               "id": "ND$=NbySw;M6*W%tJ]ca",
+                              "deletable": false,
+                              "movable": false,
+                              "editable": false,
                               "fields": {
                                 "VAR": {
                                   "id": "?bqG3z^zPO3|K%K(aD`7"
@@ -1364,6 +1672,9 @@
                                   "block": {
                                     "type": "rc_get_joystick_mapped",
                                     "id": "gUW$=)zf~=F4_@EP~^SQ",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
                                     "fields": {
                                       "CHANNEL": "4"
                                     },
@@ -1372,6 +1683,9 @@
                                         "shadow": {
                                           "type": "math_number",
                                           "id": "QTc3qXHz+ueDogbY~mbb",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": -100
                                           }
@@ -1381,6 +1695,9 @@
                                         "shadow": {
                                           "type": "math_number",
                                           "id": "oBW*LZ`JzlnXxS%W4G2=",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "NUM": 100
                                           }
@@ -1396,6 +1713,9 @@
                             "block": {
                               "type": "variables_set",
                               "id": "Rv7cTFj8`F8SRC~QZ`e,",
+                              "deletable": false,
+                              "movable": false,
+                              "editable": false,
                               "fields": {
                                 "VAR": {
                                   "id": "?bqG3z^zPO3|K%K(aD`7"
@@ -1406,6 +1726,9 @@
                                   "block": {
                                     "type": "math_number",
                                     "id": "M;o|j3ZvNi,+bU0Id~~N",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
                                     "fields": {
                                       "NUM": 0
                                     }
@@ -1419,6 +1742,9 @@
                           "block": {
                             "type": "controls_if",
                             "id": "y)NW^o$5uu`^BY)imo4L",
+                            "deletable": false,
+                            "movable": false,
+                            "editable": false,
                             "extraState": {
                               "hasElse": true
                             },
@@ -1427,6 +1753,9 @@
                                 "block": {
                                   "type": "logic_operation",
                                   "id": "e}^:wk9z0cb[${q,vWJr",
+                                  "deletable": false,
+                                  "movable": false,
+                                  "editable": false,
                                   "fields": {
                                     "OP": "OR"
                                   },
@@ -1435,6 +1764,9 @@
                                       "block": {
                                         "type": "logic_compare",
                                         "id": "MZN?pa2HUagS@#=i._dc",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
                                         "fields": {
                                           "OP": "GTE"
                                         },
@@ -1443,6 +1775,9 @@
                                             "block": {
                                               "type": "rc_get_joystick_mapped",
                                               "id": "CzM0tr4gT8/d21,z]YQ}",
+                                              "deletable": false,
+                                              "movable": false,
+                                              "editable": false,
                                               "fields": {
                                                 "CHANNEL": "3"
                                               },
@@ -1451,6 +1786,9 @@
                                                   "shadow": {
                                                     "type": "math_number",
                                                     "id": "W4zLugN*6VGy^1!X4xY+",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "NUM": -100
                                                     }
@@ -1460,6 +1798,9 @@
                                                   "shadow": {
                                                     "type": "math_number",
                                                     "id": "Kza@_Pk@3wrwF2|(v|;+",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "NUM": 100
                                                     }
@@ -1472,6 +1813,9 @@
                                             "block": {
                                               "type": "variables_get",
                                               "id": ";g}*6gp.R0bkDtVvo!D1",
+                                              "deletable": false,
+                                              "movable": false,
+                                              "editable": false,
                                               "fields": {
                                                 "VAR": {
                                                   "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1486,6 +1830,9 @@
                                       "block": {
                                         "type": "logic_compare",
                                         "id": "A8}vs){_YZUjN`!+mFg+",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
                                         "fields": {
                                           "OP": "LTE"
                                         },
@@ -1494,6 +1841,9 @@
                                             "block": {
                                               "type": "rc_get_joystick_mapped",
                                               "id": "=~J/F/@=-3L2ieVP]Q0g",
+                                              "deletable": false,
+                                              "movable": false,
+                                              "editable": false,
                                               "fields": {
                                                 "CHANNEL": "3"
                                               },
@@ -1502,6 +1852,9 @@
                                                   "shadow": {
                                                     "type": "math_number",
                                                     "id": "h]nD`/dW?8N)!W:T;R`i",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "NUM": -100
                                                     }
@@ -1511,6 +1864,9 @@
                                                   "shadow": {
                                                     "type": "math_number",
                                                     "id": "pDcL/3/DozrcJau8lh9P",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "NUM": 100
                                                     }
@@ -1523,6 +1879,9 @@
                                             "block": {
                                               "type": "math_single",
                                               "id": ",@.WIZzr;XCvDZQK@iHL",
+                                              "deletable": false,
+                                              "movable": false,
+                                              "editable": false,
                                               "fields": {
                                                 "OP": "NEG"
                                               },
@@ -1538,6 +1897,9 @@
                                                   "block": {
                                                     "type": "variables_get",
                                                     "id": "129]?#zEi}MU~.~`p%!3",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "VAR": {
                                                         "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1558,6 +1920,9 @@
                                 "block": {
                                   "type": "variables_set",
                                   "id": "Xo|x~013}ms]O^/gpM_=",
+                                  "deletable": false,
+                                  "movable": false,
+                                  "editable": false,
                                   "fields": {
                                     "VAR": {
                                       "id": "cMY5*e@XCk$BW*BfqNJX"
@@ -1568,6 +1933,9 @@
                                       "block": {
                                         "type": "rc_get_joystick_mapped",
                                         "id": "-?@$lF(,k3$tVA++(7I.",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
                                         "fields": {
                                           "CHANNEL": "3"
                                         },
@@ -1576,6 +1944,9 @@
                                             "shadow": {
                                               "type": "math_number",
                                               "id": "g/imKa|VdPR#ZDwor]KL",
+                                              "deletable": false,
+                                              "movable": false,
+                                              "editable": false,
                                               "fields": {
                                                 "NUM": -100
                                               }
@@ -1585,6 +1956,9 @@
                                             "shadow": {
                                               "type": "math_number",
                                               "id": "^^6pbEtgd3Uk?-;nlY9Q",
+                                              "deletable": false,
+                                              "movable": false,
+                                              "editable": false,
                                               "fields": {
                                                 "NUM": 100
                                               }
@@ -1600,6 +1974,9 @@
                                 "block": {
                                   "type": "variables_set",
                                   "id": "Dki:YIo9DPx%JZG_*L$6",
+                                  "deletable": false,
+                                  "movable": false,
+                                  "editable": false,
                                   "fields": {
                                     "VAR": {
                                       "id": "cMY5*e@XCk$BW*BfqNJX"
@@ -1610,6 +1987,9 @@
                                       "block": {
                                         "type": "math_number",
                                         "id": "TD$[k2ZIqp__t^tr^tf2",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
                                         "fields": {
                                           "NUM": 0
                                         }
@@ -1623,6 +2003,9 @@
                               "block": {
                                 "type": "variables_set",
                                 "id": ",FoS-y1TP_@y/ma*}$6n",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
                                 "fields": {
                                   "VAR": {
                                     "id": "LkI?6El^Rqu_U#hw7B?Y"
@@ -1633,6 +2016,9 @@
                                     "block": {
                                       "type": "rc_is_button_pressed",
                                       "id": "?DsEP%Iop8=[zmWSFPKO",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
                                       "fields": {
                                         "BUTTON": "0"
                                       }
@@ -1643,6 +2029,9 @@
                                   "block": {
                                     "type": "variables_set",
                                     "id": "[7d;ZicZk018h*EW21ah",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
                                     "fields": {
                                       "VAR": {
                                         "id": "b?u~}EtD+oO@3sN6_Ka#"
@@ -1653,6 +2042,9 @@
                                         "block": {
                                           "type": "logic_compare",
                                           "id": "z[thU*pWL/KeyUJE.0dB",
+                                          "deletable": false,
+                                          "movable": false,
+                                          "editable": false,
                                           "fields": {
                                             "OP": "LTE"
                                           },
@@ -1661,6 +2053,9 @@
                                               "block": {
                                                 "type": "variables_get",
                                                 "id": "CpQf8LGLSJ|xgxd7WZB)",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "VAR": {
                                                     "id": "@EvI#XmiI`d[EriM+QVj"
@@ -1672,6 +2067,9 @@
                                               "block": {
                                                 "type": "math_single",
                                                 "id": "^L59W0|=dcX2mMKY]x^6",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "OP": "NEG"
                                                 },
@@ -1687,6 +2085,9 @@
                                                     "block": {
                                                       "type": "variables_get",
                                                       "id": "$r.pc=}T703QpW;40y8I",
+                                                      "deletable": false,
+                                                      "movable": false,
+                                                      "editable": false,
                                                       "fields": {
                                                         "VAR": {
                                                           "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1705,6 +2106,9 @@
                                       "block": {
                                         "type": "variables_set",
                                         "id": "jOKG0/f1:)Pi`au)Q._]",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
                                         "fields": {
                                           "VAR": {
                                             "id": "$v((cyAo%H1AEKMcP#91"
@@ -1715,6 +2119,9 @@
                                             "block": {
                                               "type": "logic_compare",
                                               "id": ".@@JSi|QuAaO!}e=NBzA",
+                                              "deletable": false,
+                                              "movable": false,
+                                              "editable": false,
                                               "fields": {
                                                 "OP": "GTE"
                                               },
@@ -1723,6 +2130,9 @@
                                                   "block": {
                                                     "type": "variables_get",
                                                     "id": "+aKeDcHNKN51IIj{4I[0",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "VAR": {
                                                         "id": "@EvI#XmiI`d[EriM+QVj"
@@ -1734,6 +2144,9 @@
                                                   "block": {
                                                     "type": "variables_get",
                                                     "id": "5YK]qB@)Y^PBdE4r,xP/",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "VAR": {
                                                         "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1749,6 +2162,9 @@
                                           "block": {
                                             "type": "variables_set",
                                             "id": "L@DdjJqaIfL!@Le[_4GY",
+                                            "deletable": false,
+                                            "movable": false,
+                                            "editable": false,
                                             "fields": {
                                               "VAR": {
                                                 "id": "t(/+mvI$C-^1K]*:Pi%M"
@@ -1759,6 +2175,9 @@
                                                 "block": {
                                                   "type": "logic_compare",
                                                   "id": "YQ/nbfu0qq:f?}B-i/uj",
+                                                  "deletable": false,
+                                                  "movable": false,
+                                                  "editable": false,
                                                   "fields": {
                                                     "OP": "LTE"
                                                   },
@@ -1767,6 +2186,9 @@
                                                       "block": {
                                                         "type": "variables_get",
                                                         "id": "|}.MbV{ea|W#J5WEILMv",
+                                                        "deletable": false,
+                                                        "movable": false,
+                                                        "editable": false,
                                                         "fields": {
                                                           "VAR": {
                                                             "id": "?bqG3z^zPO3|K%K(aD`7"
@@ -1778,6 +2200,9 @@
                                                       "block": {
                                                         "type": "math_single",
                                                         "id": "nA7v|3}yTT6)*NK8?qm=",
+                                                        "deletable": false,
+                                                        "movable": false,
+                                                        "editable": false,
                                                         "fields": {
                                                           "OP": "NEG"
                                                         },
@@ -1793,6 +2218,9 @@
                                                             "block": {
                                                               "type": "variables_get",
                                                               "id": "+z!)O7}u3NmW;PUa^A^z",
+                                                              "deletable": false,
+                                                              "movable": false,
+                                                              "editable": false,
                                                               "fields": {
                                                                 "VAR": {
                                                                   "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1811,6 +2239,9 @@
                                               "block": {
                                                 "type": "variables_set",
                                                 "id": "[SL`Q~VId_bGS3epDnlz",
+                                                "deletable": false,
+                                                "movable": false,
+                                                "editable": false,
                                                 "fields": {
                                                   "VAR": {
                                                     "id": "s]:H$6K^]Y*-UKQe%]^m"
@@ -1821,6 +2252,9 @@
                                                     "block": {
                                                       "type": "logic_compare",
                                                       "id": "5:*iDlSZo^Hlk*_v6RRd",
+                                                      "deletable": false,
+                                                      "movable": false,
+                                                      "editable": false,
                                                       "fields": {
                                                         "OP": "GTE"
                                                       },
@@ -1829,6 +2263,9 @@
                                                           "block": {
                                                             "type": "variables_get",
                                                             "id": "]fAwEf+cuQw-Ia:_9+11",
+                                                            "deletable": false,
+                                                            "movable": false,
+                                                            "editable": false,
                                                             "fields": {
                                                               "VAR": {
                                                                 "id": "?bqG3z^zPO3|K%K(aD`7"
@@ -1840,6 +2277,9 @@
                                                           "block": {
                                                             "type": "variables_get",
                                                             "id": "{L;g4ELj9hjJbD1~$RO9",
+                                                            "deletable": false,
+                                                            "movable": false,
+                                                            "editable": false,
                                                             "fields": {
                                                               "VAR": {
                                                                 "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1855,6 +2295,9 @@
                                                   "block": {
                                                     "type": "variables_set",
                                                     "id": "D}1Y?_A}}IEgFWz0CfJ_",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
                                                     "fields": {
                                                       "VAR": {
                                                         "id": "pPfwVLk?FBewj?-]uB+n"
@@ -1865,6 +2308,9 @@
                                                         "block": {
                                                           "type": "logic_compare",
                                                           "id": "RA4m$kimUhnb,xekz_Ty",
+                                                          "deletable": false,
+                                                          "movable": false,
+                                                          "editable": false,
                                                           "fields": {
                                                             "OP": "LTE"
                                                           },
@@ -1873,6 +2319,9 @@
                                                               "block": {
                                                                 "type": "variables_get",
                                                                 "id": "n6].mwF-A1_AT{KWCp{7",
+                                                                "deletable": false,
+                                                                "movable": false,
+                                                                "editable": false,
                                                                 "fields": {
                                                                   "VAR": {
                                                                     "id": "cMY5*e@XCk$BW*BfqNJX"
@@ -1884,6 +2333,9 @@
                                                               "block": {
                                                                 "type": "math_single",
                                                                 "id": "H2O$a8NJ}zZ7KJfQww/2",
+                                                                "deletable": false,
+                                                                "movable": false,
+                                                                "editable": false,
                                                                 "fields": {
                                                                   "OP": "NEG"
                                                                 },
@@ -1899,6 +2351,9 @@
                                                                     "block": {
                                                                       "type": "variables_get",
                                                                       "id": ";UQ4j3S[iMEvP.rMD?j1",
+                                                                      "deletable": false,
+                                                                      "movable": false,
+                                                                      "editable": false,
                                                                       "fields": {
                                                                         "VAR": {
                                                                           "id": "78(Jj/9[`/ND#llRq+;x"
@@ -1917,6 +2372,9 @@
                                                       "block": {
                                                         "type": "variables_set",
                                                         "id": "ReI#RF`k)-ij8pkYR[`L",
+                                                        "deletable": false,
+                                                        "movable": false,
+                                                        "editable": false,
                                                         "fields": {
                                                           "VAR": {
                                                             "id": "@9=]QkZ(}gfvAQbU(!I7"
@@ -1927,6 +2385,9 @@
                                                             "block": {
                                                               "type": "logic_compare",
                                                               "id": "%gdQJ5Y0#j,/H04nCFiK",
+                                                              "deletable": false,
+                                                              "movable": false,
+                                                              "editable": false,
                                                               "fields": {
                                                                 "OP": "GTE"
                                                               },
@@ -1935,6 +2396,9 @@
                                                                   "block": {
                                                                     "type": "variables_get",
                                                                     "id": "fuetVJeD%Vop|Inxqlq/",
+                                                                    "deletable": false,
+                                                                    "movable": false,
+                                                                    "editable": false,
                                                                     "fields": {
                                                                       "VAR": {
                                                                         "id": "cMY5*e@XCk$BW*BfqNJX"
@@ -1946,6 +2410,9 @@
                                                                   "block": {
                                                                     "type": "variables_get",
                                                                     "id": ";S!]L/00xD|;HX(gQZ*C",
+                                                                    "deletable": false,
+                                                                    "movable": false,
+                                                                    "editable": false,
                                                                     "fields": {
                                                                       "VAR": {
                                                                         "id": "78(Jj/9[`/ND#llRq+;x"
@@ -2287,7 +2754,8 @@
           "id": "6mUF]oH2WGfq!;5/?$O7",
           "x": 0,
           "y": 1971,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"><arg name=\"前進速度\" type=\"int\"></arg></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"><arg name=\"前進速度\" type=\"int\"></arg></mutation>",
           "fields": {
             "NAME": "前進"
           },
@@ -2296,6 +2764,9 @@
               "block": {
                 "type": "arduino_function_call",
                 "id": "wD2,jnbK5`[m2o]0xzql",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"馬達移動\" has_return=\"false\" return_type=\"void\"><arg name=\"左輪速度\" type=\"int\"></arg><arg name=\"右輪速度\" type=\"int\"></arg></mutation>",
                 "inputs": {
                   "ARG0": {
@@ -2309,6 +2780,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "xJ8^`c@U*ul[f-dj5f4P",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "hZD268A[]`j0ew)$KctO"
@@ -2327,6 +2801,9 @@
                     "block": {
                       "type": "variables_get",
                       "id": "{Oss-lG%-LIW4(e$?Qg]",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "VAR": {
                           "id": "hZD268A[]`j0ew)$KctO"
@@ -2344,7 +2821,8 @@
           "id": "^F|0cKCF2y2[0d}b4zk+",
           "x": 0,
           "y": 2643,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
             "NAME": "腳不動"
           },
@@ -2353,6 +2831,9 @@
               "block": {
                 "type": "x11_servo_360_speed",
                 "id": "!%hqTYPY*(ev|F0y:yDz",
+                "deletable": false,
+                "movable": false,
+                "editable": false,
                 "fields": {
                   "PORT": "1"
                 },
@@ -2361,6 +2842,9 @@
                     "shadow": {
                       "type": "math_number",
                       "id": "Q.~rhiy9Z3:._6RvRrzk",
+                      "deletable": false,
+                      "movable": false,
+                      "editable": false,
                       "fields": {
                         "NUM": 0
                       }
