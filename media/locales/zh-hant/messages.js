@@ -976,4 +976,25 @@ window.languageManager.loadMessages('zh-hant', {
 	SAMPLE_BROWSER_CONFIRM_YES: '載入範例',
 	SAMPLE_BROWSER_CONFIRM_NO: '取消',
 	SAMPLE_BROWSER_ERROR_INVALID: '範本格式無效，無法載入',
+
+	// X11 SoccerBot
+	FOOTBOT_LABEL: '⚽ 足球車',
+	FOOTBOT_MOTOR_MOVE: '馬達移動',
+	FOOTBOT_LEFT_SPEED: '左輪速度(%)',
+	FOOTBOT_RIGHT_SPEED: '右輪速度(%)',
+	FOOTBOT_MOTOR_MOVE_TOOLTIP: '設定雙輪移動速度',
+	FOOTBOT_STOP: '停止移動',
+	FOOTBOT_STOP_TOOLTIP: '停止足球車雙輪和所有動作',
+	FOOTBOT_BACKWARD_PREFIX: '後退',
+	FOOTBOT_BACKWARD_SPEED: '速度(%)',
+	FOOTBOT_BACKWARD_TOOLTIP: '足球車後退',
+	FOOTBOT_SPIN_LEFT_PREFIX: '原地左轉',
+	FOOTBOT_SPIN_RIGHT_PREFIX: '原地右轉',
+	FOOTBOT_SPIN_SPEED: '速度(%)',
+	FOOTBOT_SPIN_LEFT_TOOLTIP: '足球車原地左轉',
+	FOOTBOT_SPIN_RIGHT_TOOLTIP: '足球車原地右轉',
+	FOOTBOT_KICK: '踢球',
+	FOOTBOT_KICK_TOOLTIP: '足球車踢球動作',
+	FOOTBOT_LIFT: '抬球',
+	FOOTBOT_LIFT_TOOLTIP: '足球車抬球動作'
 });

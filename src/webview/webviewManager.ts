@@ -380,6 +380,10 @@ export class WebViewManager {
 			const x12BlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/x12.js'));
 			const x12BlocksUri = webview.asWebviewUri(x12BlocksPath);
 
+			// Singular FootBot 擴展板積木定義
+			const singularFootbotBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/singular-footbot.js'));
+			const singularFootbotBlocksUri = webview.asWebviewUri(singularFootbotBlocksPath);
+
 			// RC 遙控通訊積木定義
 			const rcBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/rc.js'));
 			const rcBlocksUri = webview.asWebviewUri(rcBlocksPath);
@@ -509,6 +513,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
 			htmlContent = htmlContent.replace('{x11BlocksUri}', x11BlocksUri.toString());
 			htmlContent = htmlContent.replace('{x12BlocksUri}', x12BlocksUri.toString());
+			htmlContent = htmlContent.replace('{singularFootbotBlocksUri}', singularFootbotBlocksUri.toString());
 			htmlContent = htmlContent.replace('{rcBlocksUri}', rcBlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
