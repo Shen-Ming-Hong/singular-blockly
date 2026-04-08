@@ -691,7 +691,7 @@
                             "movable": false,
                             "editable": false,
                             "fields": {
-                              "NUM": 2048
+                              "NUM": -2048
                             }
                           }
                         },
@@ -703,7 +703,7 @@
                             "movable": false,
                             "editable": false,
                             "fields": {
-                              "NUM": -2048
+                              "NUM": 2048
                             }
                           }
                         }
@@ -790,7 +790,7 @@
                                 "movable": false,
                                 "editable": false,
                                 "fields": {
-                                  "NUM": -2048
+                                  "NUM": 2048
                                 }
                               }
                             },
@@ -802,7 +802,7 @@
                                 "movable": false,
                                 "editable": false,
                                 "fields": {
-                                  "NUM": 2048
+                                  "NUM": -2048
                                 }
                               }
                             }
