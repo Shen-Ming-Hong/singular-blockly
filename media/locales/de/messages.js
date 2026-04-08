@@ -173,6 +173,8 @@ window.languageManager.loadMessages('de', {
 	FUNCTION_PARAMS: 'Parameter',
 	FUNCTION_RETURN: 'Rückgabe',
 	FUNCTION_CALL: 'Aufruf',
+	FUNCTION_LOCK_BLOCK: 'Block sperren',
+	FUNCTION_UNLOCK_BLOCK: 'Block entsperren',
 
 	// Logic Block Labels
 	LOGIC_IF: 'wenn',

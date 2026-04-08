@@ -164,6 +164,8 @@ window.languageManager.loadMessages('pt-br', {
 	FUNCTION_PARAMS: 'Parâmetros',
 	FUNCTION_RETURN: 'Retornar',
 	FUNCTION_CALL: 'Chamar',
+	FUNCTION_LOCK_BLOCK: 'Bloquear bloco',
+	FUNCTION_UNLOCK_BLOCK: 'Desbloquear bloco',
 
 	// Logic Block Labels
 	LOGIC_IF: 'se',

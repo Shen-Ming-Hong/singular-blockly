@@ -172,6 +172,8 @@ window.languageManager.loadMessages('es', {
 	FUNCTION_PARAMS: 'Parámetros',
 	FUNCTION_RETURN: 'Retorno',
 	FUNCTION_CALL: 'Llamar',
+	FUNCTION_LOCK_BLOCK: 'Bloquear bloque',
+	FUNCTION_UNLOCK_BLOCK: 'Desbloquear bloque',
 
 	// Logic Block Labels
 	LOGIC_IF: 'si',

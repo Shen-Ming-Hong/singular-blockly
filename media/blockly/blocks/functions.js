@@ -29,6 +29,10 @@ const functionMutator = {
 			parameter.setAttribute('type', this.argumentTypes_[i] || 'int');
 			container.appendChild(parameter);
 		}
+		// 鎖定狀態序列化（FR-009）
+		if (this.isLocked_) {
+			container.setAttribute('locked', '1');
+		}
 		// 移除回傳值屬性設定
 		return container;
 	},
@@ -44,6 +48,12 @@ const functionMutator = {
 		}
 		// 移除回傳值相關設定
 		this.updateShape_();
+		// 鎖定狀態反序列化（FR-009、FR-013 向下相容）
+		if (xmlElement.getAttribute('locked') === '1') {
+			this.isLocked_ = true;
+			// 延遲套用：等 SVG 初始化完成後再執行
+			setTimeout(() => this.applyLockState_(true), 0);
+		}
 	},
 	decompose: function (workspace) {
 		const containerBlock = workspace.newBlock('arduino_function_mutator');
@@ -66,6 +76,8 @@ const functionMutator = {
 		return containerBlock;
 	},
 	compose: function (containerBlock) {
+		// 🔒 鎖定狀態下不套用 mutator 修改（FR-004）
+		if (this.isLocked_) return;
 		this.arguments_ = [];
 		this.argumentTypes_ = [];
 		let paramBlock = containerBlock.getInputTargetBlock('STACK');
@@ -267,6 +279,8 @@ Blockly.Blocks['arduino_function'] = {
 
 		// 追蹤函式名稱變更
 		this.oldName_ = 'myFunction';
+		// 鎖定狀態初始化
+		this.isLocked_ = false;
 	},
 	updateShape_: function () {
 		const mainInput = this.getInput('MAIN');
@@ -333,6 +347,48 @@ Blockly.Blocks['arduino_function'] = {
 		callBlocks.forEach(callBlock => {
 			callBlock.updateFromFunctionBlock_();
 		});
+	},
+	// 鎖定控制入口：包裹 Events.disable/enable 以避免進入 undo 佇列（FR-014）
+	setLocked_: function (locked) {
+		Blockly.Events.disable();
+		try {
+			this.isLocked_ = locked;
+			this.applyLockState_(locked);
+		} finally {
+			Blockly.Events.enable();
+		}
+	},
+	// 套用鎖定狀態：視覚 + 删除保護 + 重命名保護 + STACK 子積木保護
+	applyLockState_: function (locked) {
+		// 1. 删除保護（函式定義積木本身）
+		this.setDeletable(!locked);
+		// 2. 重新命名保護
+		const nameField = this.getField('NAME');
+		if (nameField) nameField.setEnabled(!locked);
+		// 3. 視覚更新（主題色 + 🔒 圖示）
+		if (locked) {
+			this.setStyle('locked_procedure_blocks');
+			if (!this.getField('LOCK_ICON')) {
+				const mainInput = this.getInput('MAIN') || this.getInput('');
+				if (mainInput) mainInput.insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON');
+			}
+		} else {
+			this.setStyle('procedure_blocks');
+			if (this.getField('LOCK_ICON')) {
+				const mainInput = this.getInput('MAIN') || this.getInput('');
+				if (mainInput) mainInput.removeField('LOCK_ICON');
+			}
+		}
+		// 4. STACK 子積木删除保護 + 禁止拖移 + 禁止編輯欄位（FR-006）
+		const stackConn = this.getInput('STACK') && this.getInput('STACK').connection;
+		const firstStackChild = stackConn ? stackConn.targetBlock() : null;
+		if (firstStackChild) {
+			firstStackChild.getDescendants(false).forEach(block => {
+				block.setDeletable(!locked);
+				block.setMovable(!locked);
+				block.setEditable(!locked);
+			});
+		}
 	},
 	// 添加 onchange 事件處理器
 	onchange: function (e) {
@@ -1172,3 +1228,183 @@ Blockly.Blocks['arduino_function_call'] = {
 		this.setTooltip(tooltip);
 	},
 };
+
+// ─── Phase 6: MicroPython 函式鎖定包裹（T014） ─────────────────────────────────
+/**
+ * wrapMicropythonLock(blockType)
+ * 為 Blockly 內建 MicroPython 函式積木注入鎖定能力（FR-002）。
+ * 共用方法直接借用 applyLockState_（功能等同 arduino_function 的版本）。
+ */
+function wrapMicropythonLock(blockType) {
+	const origDef = Blockly.Blocks[blockType];
+	if (!origDef) {
+		return; // 積木尚未定義，靜默略過
+	}
+
+	const origInit = origDef.init;
+	const origSave = origDef.saveExtraState;
+	const origLoad = origDef.loadExtraState;
+
+	origDef.init = function () {
+		if (origInit) origInit.call(this);
+		this.isLocked_ = false;
+	};
+
+	// FR-015：saveExtraState / loadExtraState 同時是 Blockly 12.x 複製貼上路徑
+	origDef.saveExtraState = function () {
+		const state = origSave ? origSave.call(this) : {};
+		if (this.isLocked_) state.locked = true;
+		return state;
+	};
+
+	origDef.loadExtraState = function (state) {
+		if (origLoad) origLoad.call(this, state);
+		if (state && state.locked) {
+			this.isLocked_ = true;
+			setTimeout(() => this.applyLockState_(true), 0);
+		}
+	};
+
+	// 注入共用鎖定方法（函式內容與 arduino_function 相同）
+	origDef.setLocked_ = function (locked) {
+		Blockly.Events.disable();
+		try {
+			this.isLocked_ = locked;
+			this.applyLockState_(locked);
+		} finally {
+			Blockly.Events.enable();
+		}
+	};
+
+	origDef.applyLockState_ = function (locked) {
+		this.setDeletable(!locked);
+		const nameField = this.getField('NAME');
+		if (nameField) nameField.setEnabled(!locked);
+		if (locked) {
+			this.setStyle('locked_procedure_blocks');
+			if (!this.getField('LOCK_ICON')) {
+				const mainInput = this.getInput('MAIN') || this.getInput('');
+				if (mainInput) mainInput.insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON');
+			}
+		} else {
+			this.setStyle('procedure_blocks');
+			if (this.getField('LOCK_ICON')) {
+				const mainInput = this.getInput('MAIN') || this.getInput('');
+				if (mainInput) mainInput.removeField('LOCK_ICON');
+			}
+		}
+		const stackConn = this.getInput('STACK') && this.getInput('STACK').connection;
+		const firstStackChild = stackConn ? stackConn.targetBlock() : null;
+		if (firstStackChild) {
+			firstStackChild.getDescendants(false).forEach(block => {
+				block.setDeletable(!locked);
+				block.setMovable(!locked);
+				block.setEditable(!locked);
+			});
+		}
+	};
+}
+
+// T015：立即對 MicroPython 函式積木套用包裹（FR-002）
+wrapMicropythonLock('procedures_defnoreturn');
+wrapMicropythonLock('procedures_defreturn');
+
+// ─── Phase 3: 右鍵選單 + STACK 保護（T010、T011） ────────────────────────────
+/**
+ * registerFunctionLockMenu()
+ * 在三種函式積木上注冊「鎖定 / 解鎖」右鍵選單項目（FR-001、FR-010）。
+ */
+function registerFunctionLockMenu() {
+	const LOCKABLE_TYPES = new Set(['arduino_function', 'procedures_defnoreturn', 'procedures_defreturn']);
+
+	Blockly.ContextMenuRegistry.registry.register({
+		id: 'lock_function_block',
+		scopeType: Blockly.ContextMenuRegistry.ScopeType.BLOCK,
+		displayText: function (scope) {
+			return scope.block.isLocked_
+				? (window.languageManager ? window.languageManager.getMessage('FUNCTION_UNLOCK_BLOCK') : 'Unlock Block')
+				: (window.languageManager ? window.languageManager.getMessage('FUNCTION_LOCK_BLOCK') : 'Lock Block');
+		},
+		preconditionFn: function (scope) {
+			return LOCKABLE_TYPES.has(scope.block.type) ? 'enabled' : 'hidden';
+		},
+		callback: function (scope) {
+			scope.block.setLocked_(!scope.block.isLocked_);
+		},
+		weight: 6,
+	});
+}
+registerFunctionLockMenu();
+
+/**
+ * setupFunctionStackProtection(workspace)
+ * 監聽 BLOCK_MOVE 事件，阻止鎖定函式積木的 STACK 內容被拖入或拖出（FR-005、FR-006）。
+ *
+ * - 案例 A（移入）：積木被拖入鎖定 STACK → unplug
+ * - 案例 B（移出）：積木從鎖定 STACK 被拖出 → 重新連回 STACK 末尾
+ */
+function setupFunctionStackProtection(workspace) {
+	if (!workspace || workspace._functionStackProtectionRegistered) return;
+	workspace._functionStackProtectionRegistered = true;
+
+	workspace.addChangeListener(function (e) {
+		if (e.type !== Blockly.Events.BLOCK_MOVE) return;
+
+		// 案例 A：有人把積木拖「進」鎖定積木的 STACK
+		if (e.newParentId && e.newInputName === 'STACK') {
+			const parentBlock = workspace.getBlockById(e.newParentId);
+			if (parentBlock && parentBlock.isLocked_) {
+				const movedBlock = workspace.getBlockById(e.blockId);
+				if (movedBlock) {
+					Blockly.Events.disable();
+					try {
+						movedBlock.unplug(true);
+					} finally {
+						Blockly.Events.enable();
+					}
+				}
+			}
+		}
+
+		// 案例 B：有人把積木從鎖定積木的 STACK 拖「出」
+		if (e.oldParentId && e.oldInputName === 'STACK') {
+			const parentBlock = workspace.getBlockById(e.oldParentId);
+			if (parentBlock && parentBlock.isLocked_) {
+				const movedBlock = workspace.getBlockById(e.blockId);
+				if (movedBlock) {
+					// 找 STACK 末尾，把積木接回去
+					const stackConn = parentBlock.getInput('STACK') && parentBlock.getInput('STACK').connection;
+					if (stackConn) {
+						let tail = stackConn;
+						while (tail.targetBlock() && tail.targetBlock().nextConnection) {
+							tail = tail.targetBlock().nextConnection;
+						}
+						const insertAfter = tail.targetBlock();
+						Blockly.Events.disable();
+						try {
+							if (insertAfter) {
+								if (!insertAfter.nextConnection.isConnected()) {
+									insertAfter.nextConnection.connect(movedBlock.previousConnection);
+								}
+							} else {
+								// STACK 空，直接接到 STACK 連結點
+								if (stackConn && movedBlock.previousConnection) {
+									stackConn.connect(movedBlock.previousConnection);
+								}
+							}
+						} finally {
+							Blockly.Events.enable();
+						}
+					}
+				}
+			}
+		}
+	});
+}
+
+// T011b 預先嘗試：若 blocklyEdit.js 已建立 workspace，直接保護（備援路徑）
+if (typeof window !== 'undefined' && window.workspace) {
+	setupFunctionStackProtection(window.workspace);
+}
+// 同時掛到全域以供 blocklyEdit.js 在 workspace 建立後呼叫
+window.setupFunctionStackProtection = setupFunctionStackProtection;

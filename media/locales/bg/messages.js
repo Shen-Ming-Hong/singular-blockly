@@ -173,6 +173,8 @@ window.languageManager.loadMessages('bg', {
 	FUNCTION_PARAMS: 'Параметри',
 	FUNCTION_RETURN: 'Връщане',
 	FUNCTION_CALL: 'Извикване',
+	FUNCTION_LOCK_BLOCK: 'Заключване на блок',
+	FUNCTION_UNLOCK_BLOCK: 'Отключване на блок',
 
 	// Logic Block Labels
 	LOGIC_IF: 'ако',

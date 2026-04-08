@@ -173,6 +173,8 @@ window.languageManager.loadMessages('ru', {
 	FUNCTION_PARAMS: 'Параметры',
 	FUNCTION_RETURN: 'Возврат',
 	FUNCTION_CALL: 'Вызов',
+	FUNCTION_LOCK_BLOCK: 'Заблокировать блок',
+	FUNCTION_UNLOCK_BLOCK: 'Разблокировать блок',
 
 	// Logic Block Labels
 	LOGIC_IF: 'если',

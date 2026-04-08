@@ -1944,6 +1944,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return blocks;
 	});
 
+	// T011b：設定函式積木 STACK 保護監聽（在 workspace 完整初始化後呼叫）
+	if (typeof window.setupFunctionStackProtection === 'function') {
+		window.setupFunctionStackProtection(workspace);
+	}
+
 	// 載入鎖定標記，防止 FileWatcher 觸發的 loadWorkspace 立即保存導致無限循環
 	let isLoadingFromFileWatcher = false;
 

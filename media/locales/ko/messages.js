@@ -173,6 +173,8 @@ window.languageManager.loadMessages('ko', {
 	FUNCTION_PARAMS: '매개변수',
 	FUNCTION_RETURN: '반환',
 	FUNCTION_CALL: '호출',
+	FUNCTION_LOCK_BLOCK: '블록 잠금',
+	FUNCTION_UNLOCK_BLOCK: '블록 잠금 해제',
 
 	// Logic Block Labels
 	LOGIC_IF: '만약',

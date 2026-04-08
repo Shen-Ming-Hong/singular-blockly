@@ -61,6 +61,11 @@ const singularDarkTheme = Blockly.Theme.defineTheme('singularDark', {
 			colourSecondary: '#7E8ACE',
 			colourTertiary: '#838ED1',
 		},
+		locked_procedure_blocks: {
+			colourPrimary: '#757575',
+			colourSecondary: '#7A7A7A',
+			colourTertiary: '#808080',
+		},
 		arduino_blocks: {
 			colourPrimary: '#00979C', // Arduino 標準藍色
 			colourSecondary: '#00A0A0',

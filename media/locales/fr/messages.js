@@ -174,6 +174,8 @@ window.languageManager.loadMessages('fr', {
 	FUNCTION_PARAMS: 'Paramètres',
 	FUNCTION_RETURN: 'Retour',
 	FUNCTION_CALL: 'Appel',
+	FUNCTION_LOCK_BLOCK: 'Verrouiller le bloc',
+	FUNCTION_UNLOCK_BLOCK: 'Déverrouiller le bloc',
 
 	// Logic Block Labels
 	LOGIC_IF: 'si',
