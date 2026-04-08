@@ -358,14 +358,14 @@ Blockly.Blocks['arduino_function'] = {
 			Blockly.Events.enable();
 		}
 	},
-	// 套用鎖定狀態：視覚 + 删除保護 + 重命名保護 + STACK 子積木保護
+	// 套用鎖定狀態：視覺 + 刪除保護 + 重命名保護 + STACK 子積木保護
 	applyLockState_: function (locked) {
-		// 1. 删除保護（函式定義積木本身）
+		// 1. 刪除保護（函式定義積木本身）
 		this.setDeletable(!locked);
 		// 2. 重新命名保護
 		const nameField = this.getField('NAME');
 		if (nameField) nameField.setEnabled(!locked);
-		// 3. 視覚更新（主題色 + 🔒 圖示）
+		// 3. 視覺更新（主題色 + 🔒 圖示）
 		if (locked) {
 			this.setStyle('locked_procedure_blocks');
 			if (!this.getField('LOCK_ICON')) {
@@ -379,7 +379,7 @@ Blockly.Blocks['arduino_function'] = {
 				if (mainInput) mainInput.removeField('LOCK_ICON');
 			}
 		}
-		// 4. STACK 子積木删除保護 + 禁止拖移 + 禁止編輯欄位（FR-006）
+		// 4. STACK 子積木刪除保護 + 禁止拖移 + 禁止編輯欄位（FR-006）
 		const stackConn = this.getInput('STACK') && this.getInput('STACK').connection;
 		const firstStackChild = stackConn ? stackConn.targetBlock() : null;
 		if (firstStackChild) {
@@ -1244,6 +1244,7 @@ function wrapMicropythonLock(blockType) {
 	const origInit = origDef.init;
 	const origSave = origDef.saveExtraState;
 	const origLoad = origDef.loadExtraState;
+	const origCompose = origDef.compose;
 
 	origDef.init = function () {
 		if (origInit) origInit.call(this);
@@ -1303,6 +1304,12 @@ function wrapMicropythonLock(blockType) {
 			});
 		}
 	};
+
+	// 鎖定時阻止齒輪 UI 修改參數（FR-004）
+	origDef.compose = function (containerBlock) {
+		if (this.isLocked_) return;
+		if (origCompose) origCompose.call(this, containerBlock);
+	};
 }
 
 // T015：立即對 MicroPython 函式積木套用包裹（FR-002）
@@ -1347,57 +1354,65 @@ function setupFunctionStackProtection(workspace) {
 	if (!workspace || workspace._functionStackProtectionRegistered) return;
 	workspace._functionStackProtectionRegistered = true;
 
+	// 沿 parent chain 往上找到鎖定的函式積木（若不在任何鎖定 STACK 中則回傳 null）
+	function getLockedStackOwner(blockId) {
+		let block = blockId ? workspace.getBlockById(blockId) : null;
+		while (block) {
+			if (block.isLocked_) return block;
+			block = block.getParent();
+		}
+		return null;
+	}
+
+	// 把 movedBlock 重新接回 ownerBlock 的 STACK 末尾
+	function reattachBlockToLockedStackTail(ownerBlock, movedBlock) {
+		if (!ownerBlock || !movedBlock || !movedBlock.previousConnection) return;
+		const stackInput = ownerBlock.getInput('STACK');
+		const stackConn = stackInput && stackInput.connection;
+		if (!stackConn) return;
+
+		// 找出 STACK 末尾的最後一個子積木
+		let tailBlock = stackConn.targetBlock();
+		while (tailBlock && tailBlock.nextConnection && tailBlock.nextConnection.targetBlock()) {
+			tailBlock = tailBlock.nextConnection.targetBlock();
+		}
+
+		Blockly.Events.disable();
+		try {
+			if (tailBlock && tailBlock.nextConnection && !tailBlock.nextConnection.isConnected()) {
+				tailBlock.nextConnection.connect(movedBlock.previousConnection);
+			} else if (!tailBlock && !stackConn.isConnected()) {
+				// STACK 空，直接接到 STACK 連結點
+				stackConn.connect(movedBlock.previousConnection);
+			}
+		} finally {
+			Blockly.Events.enable();
+		}
+	}
+
 	workspace.addChangeListener(function (e) {
 		if (e.type !== Blockly.Events.BLOCK_MOVE) return;
 
-		// 案例 A：有人把積木拖「進」鎖定積木的 STACK
-		if (e.newParentId && e.newInputName === 'STACK') {
-			const parentBlock = workspace.getBlockById(e.newParentId);
-			if (parentBlock && parentBlock.isLocked_) {
-				const movedBlock = workspace.getBlockById(e.blockId);
-				if (movedBlock) {
-					Blockly.Events.disable();
-					try {
-						movedBlock.unplug(true);
-					} finally {
-						Blockly.Events.enable();
-					}
-				}
+		const movedBlock = workspace.getBlockById(e.blockId);
+		if (!movedBlock) return;
+
+		const oldLockedOwner = getLockedStackOwner(e.oldParentId);
+		const newLockedOwner = getLockedStackOwner(e.newParentId);
+
+		// 案例 A：積木被拖「進」鎖定積木的 STACK（或其子樹任意層）
+		if (newLockedOwner && newLockedOwner !== oldLockedOwner) {
+			Blockly.Events.disable();
+			try {
+				movedBlock.unplug(true);
+			} finally {
+				Blockly.Events.enable();
 			}
+			return;
 		}
 
-		// 案例 B：有人把積木從鎖定積木的 STACK 拖「出」
-		if (e.oldParentId && e.oldInputName === 'STACK') {
-			const parentBlock = workspace.getBlockById(e.oldParentId);
-			if (parentBlock && parentBlock.isLocked_) {
-				const movedBlock = workspace.getBlockById(e.blockId);
-				if (movedBlock) {
-					// 找 STACK 末尾，把積木接回去
-					const stackConn = parentBlock.getInput('STACK') && parentBlock.getInput('STACK').connection;
-					if (stackConn) {
-						let tail = stackConn;
-						while (tail.targetBlock() && tail.targetBlock().nextConnection) {
-							tail = tail.targetBlock().nextConnection;
-						}
-						const insertAfter = tail.targetBlock();
-						Blockly.Events.disable();
-						try {
-							if (insertAfter) {
-								if (!insertAfter.nextConnection.isConnected()) {
-									insertAfter.nextConnection.connect(movedBlock.previousConnection);
-								}
-							} else {
-								// STACK 空，直接接到 STACK 連結點
-								if (stackConn && movedBlock.previousConnection) {
-									stackConn.connect(movedBlock.previousConnection);
-								}
-							}
-						} finally {
-							Blockly.Events.enable();
-						}
-					}
-				}
-			}
+		// 案例 B：積木從鎖定積木的 STACK（或其子樹任意層）被拖「出」
+		if (oldLockedOwner && oldLockedOwner !== newLockedOwner) {
+			reattachBlockToLockedStackTail(oldLockedOwner, movedBlock);
 		}
 	});
 }
