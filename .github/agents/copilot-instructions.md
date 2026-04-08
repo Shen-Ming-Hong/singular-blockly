@@ -1,6 +1,6 @@
 # singular-blockly Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-06
+Auto-generated from all feature plans. Last updated: 2026-04-08
 
 ## Active Technologies
 - TypeScript 5.9.3 (Extension) + JavaScript (Blockly blocks/generators) + Blockly 12.3.1, VSCode API 1.105.0+, MicroPython `rc_module` API (028-x12-rc-blocks)
@@ -32,6 +32,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-06
 - VS Code workspace settings（`singularBlockly.safetyGuard.suppressWarning`）；語系訊息檔 `media/locales/{lang}/messages.js` (047-warning-i18n-kid-friendly)
 - TypeScript 5.9.3（VS Code Extension Host，Node.js runtime） + VS Code API（已有）、Blockly workspace JSON（已有） (049-sample-name-i18n)
 - `media/samples/*.json`（file-based，Extension Host 透過 `readFileSync` 讀取） (049-sample-name-i18n)
+- JavaScript ES2023（WebView browser context）+ TypeScript 5.9.3（Extension Host） + Blockly 12.3.1、`Blockly.ContextMenuRegistry`、`Blockly.Events` (050-lock-function-block)
+- Blockly JSON workspace 序列化（`.json` 專案檔） (050-lock-function-block)
 
 -   JavaScript (ES6+) - WebView 環境 + Blockly 12.3.1, arduinoGenerator (自訂程式碼生成器) (012-esp32-pixetto-fix)
 -   JavaScript (ES2022) / TypeScript 5.9.3 + Blockly 12.3.1, VS Code Extension API 1.96.0+ (014-block-serialization-fix)
@@ -92,9 +94,9 @@ npm test; npm run lint
 TypeScript 5.9.3 (Extension), JavaScript ES2020 (WebView/Blockly): Follow standard conventions
 
 ## Recent Changes
+- 050-lock-function-block: Added JavaScript ES2023（WebView browser context）+ TypeScript 5.9.3（Extension Host） + Blockly 12.3.1、`Blockly.ContextMenuRegistry`、`Blockly.Events`
 - 049-sample-name-i18n: Added TypeScript 5.9.3（VS Code Extension Host，Node.js runtime） + VS Code API（已有）、Blockly workspace JSON（已有）
 - 047-warning-i18n-kid-friendly: Added TypeScript 5.9.3, Target ES2023 + VS Code Extension API ^1.105.0, Blockly ^12.3.1, 自建 `LocaleService` i18n 服務
-- 042-upload-error-clarity: Added TypeScript 5.9.3 + Blockly 12.3.1 | VSCode Extension API 1.105.0+ | PlatformIO CLI
 
 
 <!-- MANUAL ADDITIONS START -->
