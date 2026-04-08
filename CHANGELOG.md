@@ -8,6 +8,26 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.72.0] - 2026-04-08
+
+### ✨ 新功能 New Features
+
+- **函式積木鎖定功能** (Lock Function Block)
+    - 右鍵選單可鎖定/解鎖 `arduino_function`、`procedures_defnoreturn`、`procedures_defreturn` 三種函式積木，支援全部 15 種語系的 `FUNCTION_LOCK_BLOCK` / `FUNCTION_UNLOCK_BLOCK` i18n 鍵
+      Right-click context menu to lock/unlock `arduino_function`, `procedures_defnoreturn`, `procedures_defreturn` blocks, with i18n keys in all 15 locales
+    - 鎖定後提供四重保護：禁止刪除積木、禁止重新命名函式、禁止拖移 / 編輯欄位，以及 STACK 內所有子積木同步保護（`getDescendants()` 遞迴套用）
+      Four-layer protection when locked: block deletion disabled, function renaming disabled, movable/editable on all STACK descendants disabled (via `getDescendants()`)
+    - `mutationToDom`/`domToMutation`（Arduino）與 `saveExtraState`/`loadExtraState`（MicroPython）序列化鎖定狀態，存檔重開後自動恢復
+      Lock state serialized via `mutationToDom`/`domToMutation` (Arduino) and `saveExtraState`/`loadExtraState` (MicroPython), restoring automatically on reload
+    - `compose()` 鎖定時 early return，防止齒輪 UI 修改函式參數（FR-004）
+      `compose()` early return when locked prevents gear UI from modifying function parameters
+    - `setupFunctionStackProtection()` 以 parent chain 偵測阻止積木拖入或拖出鎖定 STACK 的任意子層（含案例 B 重新接回末尾）
+      `setupFunctionStackProtection()` uses parent chain traversal to block insertion/removal from locked STACK at any depth, with Case B re-attachment to tail
+    - 新增 `locked_procedure_blocks` 主題樣式（淺色 `singular.js` 及深色 `singularDark.js`主題均支援）
+      Added `locked_procedure_blocks` theme style for both light (`singular.js`) and dark (`singularDark.js`) themes
+    - 提取 `applyLockStateImpl` 共用函式，`arduino_function` 與 `wrapMicropythonLock` 共享鎖定邏輯（DRY 原則）
+      Extracted `applyLockStateImpl` shared helper so `arduino_function` and `wrapMicropythonLock` share identical lock logic
+
 ## [0.71.0] - 2026-04-07
 
 ### ✨ 新功能 New Features
