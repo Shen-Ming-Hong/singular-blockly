@@ -173,6 +173,8 @@ window.languageManager.loadMessages('tr', {
 	FUNCTION_PARAMS: 'Parametreler',
 	FUNCTION_RETURN: 'Dönüş',
 	FUNCTION_CALL: 'Çağrı',
+	FUNCTION_LOCK_BLOCK: 'Bloğu kilitle',
+	FUNCTION_UNLOCK_BLOCK: 'Bloğun kilidini aç',
 
 	// Logic Block Labels
 	LOGIC_IF: 'eğer',

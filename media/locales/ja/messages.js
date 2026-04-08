@@ -174,6 +174,8 @@ window.languageManager.loadMessages('ja', {
 	FUNCTION_PARAMS: 'パラメータ',
 	FUNCTION_RETURN: '戻り値',
 	FUNCTION_CALL: '呼び出し',
+	FUNCTION_LOCK_BLOCK: 'ブロックをロック',
+	FUNCTION_UNLOCK_BLOCK: 'ブロックのロック解除',
 
 	// Logic Block Labels
 	LOGIC_IF: 'もし',

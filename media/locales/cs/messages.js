@@ -172,6 +172,8 @@ window.languageManager.loadMessages('cs', {
 	FUNCTION_PARAMS: 'Parametry',
 	FUNCTION_RETURN: 'Návrat',
 	FUNCTION_CALL: 'Volání',
+	FUNCTION_LOCK_BLOCK: 'Zamknout blok',
+	FUNCTION_UNLOCK_BLOCK: 'Odemknout blok',
 
 	// Logic Block Labels
 	LOGIC_IF: 'když',

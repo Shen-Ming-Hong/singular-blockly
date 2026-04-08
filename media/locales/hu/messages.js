@@ -173,6 +173,8 @@ window.languageManager.loadMessages('hu', {
 	FUNCTION_PARAMS: 'Paraméterek',
 	FUNCTION_RETURN: 'Visszatérés',
 	FUNCTION_CALL: 'Hívás',
+	FUNCTION_LOCK_BLOCK: 'Blokk zárolása',
+	FUNCTION_UNLOCK_BLOCK: 'Blokk zárolásának feloldása',
 
 	// Logic Block Labels
 	LOGIC_IF: 'ha',

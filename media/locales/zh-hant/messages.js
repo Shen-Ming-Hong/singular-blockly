@@ -170,6 +170,8 @@ window.languageManager.loadMessages('zh-hant', {
 	FUNCTION_PARAMS: '參數',
 	FUNCTION_RETURN: '返回',
 	FUNCTION_CALL: '呼叫',
+	FUNCTION_LOCK_BLOCK: '鎖定積木',
+	FUNCTION_UNLOCK_BLOCK: '解鎖積木',
 
 	// Logic Block Labels
 	LOGIC_IF: '如果',

@@ -173,6 +173,8 @@ window.languageManager.loadMessages('it', {
 	FUNCTION_PARAMS: 'Parametri',
 	FUNCTION_RETURN: 'Ritorna',
 	FUNCTION_CALL: 'Chiama',
+	FUNCTION_LOCK_BLOCK: 'Blocca il blocco',
+	FUNCTION_UNLOCK_BLOCK: 'Sblocca il blocco',
 
 	// Logic Block Labels
 	LOGIC_IF: 'se',
