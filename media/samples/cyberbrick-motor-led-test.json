@@ -447,7 +447,7 @@
                             "id": "qwF{.sE=a[z~Q.,=$Kd_",
                             "fields": {
                               "VAR": {
-                                "id": "x^lnjFop]IbtAz#x_MP_"
+                                "id": "ebSH7#95bmdA8H7{(q!#"
                               }
                             }
                           }
@@ -475,7 +475,7 @@
                             "type": "math_number",
                             "id": "(j}{]1ktQl5$Br*N0PRo",
                             "fields": {
-                              "NUM": 2048
+                              "NUM": -2048
                             }
                           }
                         },
@@ -484,7 +484,7 @@
                             "type": "math_number",
                             "id": "iAK9ERFl8%2W][6.uO^$",
                             "fields": {
-                              "NUM": -2048
+                              "NUM": 2048
                             }
                           }
                         }
@@ -525,7 +525,7 @@
                                 "id": "L=S*uOZC1Ppz)et,HHCS",
                                 "fields": {
                                   "VAR": {
-                                    "id": "ebSH7#95bmdA8H7{(q!#"
+                                    "id": "x^lnjFop]IbtAz#x_MP_"
                                   }
                                 }
                               }
@@ -553,7 +553,7 @@
                                 "type": "math_number",
                                 "id": "Q*}N-N/!%om`Up|fNJ|L",
                                 "fields": {
-                                  "NUM": -2048
+                                  "NUM": 2048
                                 }
                               }
                             },
@@ -562,7 +562,7 @@
                                 "type": "math_number",
                                 "id": "xe_03)XLGUTqQV6oX})#",
                                 "fields": {
-                                  "NUM": 2048
+                                  "NUM": -2048
                                 }
                               }
                             }
