@@ -12,579 +12,682 @@
           "inputs": {
             "MAIN": {
               "block": {
-                "type": "controls_whileUntil",
-                "id": "`RefZp#0`;aYaz?h(/h.",
+                "type": "variables_set",
+                "id": "hMpKD(mhSXgRY=E*ywX=",
                 "fields": {
-                  "MODE": "WHILE"
+                  "VAR": {
+                    "id": "sJV.b.!e-]Qcm0(@e7X1"
+                  }
                 },
                 "inputs": {
-                  "BOOL": {
+                  "VALUE": {
                     "block": {
-                      "type": "logic_boolean",
-                      "id": "`(zE+Z`z?uQU/r:!,WEZ",
+                      "type": "math_number",
+                      "id": "1b5k)+%K2FYQW]#)VPlz",
                       "fields": {
-                        "BOOL": "TRUE"
+                        "NUM": 1
                       }
                     }
-                  },
-                  "DO": {
-                    "block": {
-                      "type": "arduino_function_call",
-                      "id": "zKqqeMYRAfqSn)f]T~O}",
-                      "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"讀取搖控器數值\" has_return=\"false\" return_type=\"void\"></mutation>",
-                      "next": {
-                        "block": {
-                          "type": "text_print",
-                          "id": "xWL(bD/YGi|h7#]Zovr[",
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "rc_slave_init",
+                    "id": "ld)iMGf(95$ti[1p{=y`",
+                    "fields": {
+                      "CHANNEL": 1
+                    },
+                    "inputs": {
+                      "PAIR_ID": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "{P}zjZCp=|OY(Zu+:#Vn",
                           "fields": {
-                            "NEW_LINE": false
-                          },
-                          "inputs": {
-                            "TEXT": {
-                              "shadow": {
-                                "type": "text",
-                                "id": "g1tbtFJo3M7zPa|.]RI%",
-                                "fields": {
-                                  "TEXT": "前:"
-                                }
+                            "NUM": 1
+                          }
+                        },
+                        "block": {
+                          "type": "variables_get",
+                          "id": "?(-:x~9qq|n.Ku/Yw:Xh",
+                          "fields": {
+                            "VAR": {
+                              "id": "sJV.b.!e-]Qcm0(@e7X1"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "controls_whileUntil",
+                        "id": "c90aDGWvx^gWl)csU(s?",
+                        "fields": {
+                          "MODE": "WHILE"
+                        },
+                        "inputs": {
+                          "BOOL": {
+                            "block": {
+                              "type": "logic_boolean",
+                              "id": "j4xjaNY#qw2;B4_9xG;c",
+                              "fields": {
+                                "BOOL": "TRUE"
                               }
                             }
                           },
-                          "next": {
+                          "DO": {
                             "block": {
-                              "type": "text_print",
-                              "id": "gsJVNsGqtQ%!|Wb1.=_$",
-                              "fields": {
-                                "NEW_LINE": false
+                              "type": "controls_if",
+                              "id": "P8AkrkSv-U:WJXnJI!h@",
+                              "extraState": {
+                                "hasElse": true
                               },
                               "inputs": {
-                                "TEXT": {
-                                  "shadow": {
-                                    "type": "text",
-                                    "id": "17wi;P!t*MM(I@E4(3N#",
-                                    "fields": {
-                                      "TEXT": "abc"
-                                    }
-                                  },
+                                "IF0": {
                                   "block": {
-                                    "type": "variables_get",
-                                    "id": "9o:eU0n:C]P]cT8y](lt",
-                                    "fields": {
-                                      "VAR": {
-                                        "id": "b?u~}EtD+oO@3sN6_Ka#"
-                                      }
-                                    }
+                                    "type": "rc_is_connected",
+                                    "id": "k73t^4UY_p^|J~b~hzNH"
                                   }
-                                }
-                              },
-                              "next": {
-                                "block": {
-                                  "type": "text_print",
-                                  "id": "5/L!OVw[I;sFu8tdW{!E",
-                                  "fields": {
-                                    "NEW_LINE": false
-                                  },
-                                  "inputs": {
-                                    "TEXT": {
-                                      "shadow": {
-                                        "type": "text",
-                                        "id": "/G-zq%ORPdVQX^2Y!urG",
-                                        "fields": {
-                                          "TEXT": "/"
-                                        }
-                                      }
-                                    }
-                                  },
-                                  "next": {
-                                    "block": {
-                                      "type": "text_print",
-                                      "id": "hbG6b*wN#k3pcQ@q=em7",
-                                      "fields": {
-                                        "NEW_LINE": false
-                                      },
-                                      "inputs": {
-                                        "TEXT": {
-                                          "shadow": {
-                                            "type": "text",
-                                            "id": "@%atbPBC:E6ht,+r,WH,",
-                                            "fields": {
-                                              "TEXT": "後:"
-                                            }
+                                },
+                                "DO0": {
+                                  "block": {
+                                    "type": "cyberbrick_led_set_color",
+                                    "id": "~S.Yli!}oTNT%91ZOps~",
+                                    "inputs": {
+                                      "RED": {
+                                        "shadow": {
+                                          "type": "math_number",
+                                          "id": "E?af*`o6nZ$YWct!^?NE",
+                                          "fields": {
+                                            "NUM": 0
                                           }
                                         }
                                       },
-                                      "next": {
-                                        "block": {
-                                          "type": "text_print",
-                                          "id": "w/Y)nL;qQLxRPkd2U]N1",
+                                      "GREEN": {
+                                        "shadow": {
+                                          "type": "math_number",
+                                          "id": "356/kO6nC)a]?+hV:^{q",
                                           "fields": {
-                                            "NEW_LINE": false
-                                          },
-                                          "inputs": {
-                                            "TEXT": {
-                                              "shadow": {
-                                                "type": "text",
-                                                "id": "@`F5p}f/~Wi//NqC{q*(",
-                                                "fields": {
-                                                  "TEXT": "abc"
-                                                }
-                                              },
-                                              "block": {
-                                                "type": "variables_get",
-                                                "id": "YfxQK$yd+EJI,n.;vlR{",
-                                                "fields": {
-                                                  "VAR": {
-                                                    "id": "$v((cyAo%H1AEKMcP#91"
+                                            "NUM": 255
+                                          }
+                                        }
+                                      },
+                                      "BLUE": {
+                                        "shadow": {
+                                          "type": "math_number",
+                                          "id": "`-~m3TQUMzXkq@wBPUzm",
+                                          "fields": {
+                                            "NUM": 255
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "arduino_function_call",
+                                        "id": "zKqqeMYRAfqSn)f]T~O}",
+                                        "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"讀取搖控器數值\" has_return=\"false\" return_type=\"void\"></mutation>",
+                                        "next": {
+                                          "block": {
+                                            "type": "text_print",
+                                            "id": "xWL(bD/YGi|h7#]Zovr[",
+                                            "fields": {
+                                              "NEW_LINE": false
+                                            },
+                                            "inputs": {
+                                              "TEXT": {
+                                                "shadow": {
+                                                  "type": "text",
+                                                  "id": "g1tbtFJo3M7zPa|.]RI%",
+                                                  "fields": {
+                                                    "TEXT": "前:"
                                                   }
                                                 }
                                               }
-                                            }
-                                          },
-                                          "next": {
-                                            "block": {
-                                              "type": "text_print",
-                                              "id": "U%b1f:YeEyfv+.DWqDjX",
-                                              "fields": {
-                                                "NEW_LINE": false
-                                              },
-                                              "inputs": {
-                                                "TEXT": {
-                                                  "shadow": {
-                                                    "type": "text",
-                                                    "id": "17wi;P!t*MM(I@E4(3N#",
-                                                    "fields": {
-                                                      "TEXT": ":"
-                                                    }
-                                                  }
-                                                }
-                                              },
-                                              "next": {
-                                                "block": {
-                                                  "type": "text_print",
-                                                  "id": "#LbO(=TXjah-FU(m2J,i",
-                                                  "fields": {
-                                                    "NEW_LINE": false
-                                                  },
-                                                  "inputs": {
-                                                    "TEXT": {
-                                                      "shadow": {
-                                                        "type": "text",
-                                                        "id": "T/?k]Nv(i30~5;bt^?.[",
-                                                        "fields": {
-                                                          "TEXT": "abc"
-                                                        }
-                                                      },
-                                                      "block": {
-                                                        "type": "variables_get",
-                                                        "id": "WO*+P1$Ne@sl^2PS6-MV",
-                                                        "fields": {
-                                                          "VAR": {
-                                                            "id": "@EvI#XmiI`d[EriM+QVj"
-                                                          }
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "text_print",
+                                                "id": "gsJVNsGqtQ%!|Wb1.=_$",
+                                                "fields": {
+                                                  "NEW_LINE": false
+                                                },
+                                                "inputs": {
+                                                  "TEXT": {
+                                                    "shadow": {
+                                                      "type": "text",
+                                                      "id": "17wi;P!t*MM(I@E4(3N#",
+                                                      "fields": {
+                                                        "TEXT": "abc"
+                                                      }
+                                                    },
+                                                    "block": {
+                                                      "type": "variables_get",
+                                                      "id": "9o:eU0n:C]P]cT8y](lt",
+                                                      "fields": {
+                                                        "VAR": {
+                                                          "id": "b?u~}EtD+oO@3sN6_Ka#"
                                                         }
                                                       }
                                                     }
-                                                  },
-                                                  "next": {
-                                                    "block": {
-                                                      "type": "text_print",
-                                                      "id": "l*g8_H9Iqfeag+_rC{AZ",
-                                                      "fields": {
-                                                        "NEW_LINE": false
-                                                      },
-                                                      "inputs": {
-                                                        "TEXT": {
-                                                          "shadow": {
-                                                            "type": "text",
-                                                            "id": "T/?k]Nv(i30~5;bt^?.[",
-                                                            "fields": {
-                                                              "TEXT": " "
-                                                            }
+                                                  }
+                                                },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "text_print",
+                                                    "id": "5/L!OVw[I;sFu8tdW{!E",
+                                                    "fields": {
+                                                      "NEW_LINE": false
+                                                    },
+                                                    "inputs": {
+                                                      "TEXT": {
+                                                        "shadow": {
+                                                          "type": "text",
+                                                          "id": "/G-zq%ORPdVQX^2Y!urG",
+                                                          "fields": {
+                                                            "TEXT": "/"
                                                           }
                                                         }
-                                                      },
-                                                      "next": {
-                                                        "block": {
-                                                          "type": "text_print",
-                                                          "id": "a@l|HT8Gh2@VdGP{j9PR",
-                                                          "fields": {
-                                                            "NEW_LINE": false
-                                                          },
-                                                          "inputs": {
-                                                            "TEXT": {
-                                                              "shadow": {
-                                                                "type": "text",
-                                                                "id": "qi[p(vzE?A4,N:X8HNlz",
-                                                                "fields": {
-                                                                  "TEXT": "左:"
-                                                                }
+                                                      }
+                                                    },
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "text_print",
+                                                        "id": "hbG6b*wN#k3pcQ@q=em7",
+                                                        "fields": {
+                                                          "NEW_LINE": false
+                                                        },
+                                                        "inputs": {
+                                                          "TEXT": {
+                                                            "shadow": {
+                                                              "type": "text",
+                                                              "id": "@%atbPBC:E6ht,+r,WH,",
+                                                              "fields": {
+                                                                "TEXT": "後:"
                                                               }
                                                             }
-                                                          },
-                                                          "next": {
-                                                            "block": {
-                                                              "type": "text_print",
-                                                              "id": "`N.{P^JS4YdnW)MtUpwC",
-                                                              "fields": {
-                                                                "NEW_LINE": false
-                                                              },
-                                                              "inputs": {
-                                                                "TEXT": {
-                                                                  "shadow": {
-                                                                    "type": "text",
-                                                                    "id": "@`F5p}f/~Wi//NqC{q*(",
-                                                                    "fields": {
-                                                                      "TEXT": "abc"
-                                                                    }
-                                                                  },
-                                                                  "block": {
-                                                                    "type": "variables_get",
-                                                                    "id": "3G.7$0fBB@-^X4c0mk^/",
-                                                                    "fields": {
-                                                                      "VAR": {
-                                                                        "id": "s]:H$6K^]Y*-UKQe%]^m"
-                                                                      }
+                                                          }
+                                                        },
+                                                        "next": {
+                                                          "block": {
+                                                            "type": "text_print",
+                                                            "id": "w/Y)nL;qQLxRPkd2U]N1",
+                                                            "fields": {
+                                                              "NEW_LINE": false
+                                                            },
+                                                            "inputs": {
+                                                              "TEXT": {
+                                                                "shadow": {
+                                                                  "type": "text",
+                                                                  "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                  "fields": {
+                                                                    "TEXT": "abc"
+                                                                  }
+                                                                },
+                                                                "block": {
+                                                                  "type": "variables_get",
+                                                                  "id": "YfxQK$yd+EJI,n.;vlR{",
+                                                                  "fields": {
+                                                                    "VAR": {
+                                                                      "id": "$v((cyAo%H1AEKMcP#91"
                                                                     }
                                                                   }
                                                                 }
-                                                              },
-                                                              "next": {
-                                                                "block": {
-                                                                  "type": "text_print",
-                                                                  "id": "OqSXh=GaL)[T[q,QkOC+",
-                                                                  "fields": {
-                                                                    "NEW_LINE": false
-                                                                  },
-                                                                  "inputs": {
-                                                                    "TEXT": {
-                                                                      "shadow": {
-                                                                        "type": "text",
-                                                                        "id": "mXny/Bcca*l2Toa,W,:I",
-                                                                        "fields": {
-                                                                          "TEXT": "/"
-                                                                        }
+                                                              }
+                                                            },
+                                                            "next": {
+                                                              "block": {
+                                                                "type": "text_print",
+                                                                "id": "U%b1f:YeEyfv+.DWqDjX",
+                                                                "fields": {
+                                                                  "NEW_LINE": false
+                                                                },
+                                                                "inputs": {
+                                                                  "TEXT": {
+                                                                    "shadow": {
+                                                                      "type": "text",
+                                                                      "id": "17wi;P!t*MM(I@E4(3N#",
+                                                                      "fields": {
+                                                                        "TEXT": ":"
                                                                       }
                                                                     }
-                                                                  },
-                                                                  "next": {
-                                                                    "block": {
-                                                                      "type": "text_print",
-                                                                      "id": "GG)d.-62I]tPk@l}Dx$n",
-                                                                      "fields": {
-                                                                        "NEW_LINE": false
-                                                                      },
-                                                                      "inputs": {
-                                                                        "TEXT": {
-                                                                          "shadow": {
-                                                                            "type": "text",
-                                                                            "id": "4j%n/]v/92Naac*NyL.J",
-                                                                            "fields": {
-                                                                              "TEXT": "右:"
+                                                                  }
+                                                                },
+                                                                "next": {
+                                                                  "block": {
+                                                                    "type": "text_print",
+                                                                    "id": "#LbO(=TXjah-FU(m2J,i",
+                                                                    "fields": {
+                                                                      "NEW_LINE": false
+                                                                    },
+                                                                    "inputs": {
+                                                                      "TEXT": {
+                                                                        "shadow": {
+                                                                          "type": "text",
+                                                                          "id": "T/?k]Nv(i30~5;bt^?.[",
+                                                                          "fields": {
+                                                                            "TEXT": "abc"
+                                                                          }
+                                                                        },
+                                                                        "block": {
+                                                                          "type": "variables_get",
+                                                                          "id": "WO*+P1$Ne@sl^2PS6-MV",
+                                                                          "fields": {
+                                                                            "VAR": {
+                                                                              "id": "@EvI#XmiI`d[EriM+QVj"
                                                                             }
                                                                           }
                                                                         }
-                                                                      },
-                                                                      "next": {
-                                                                        "block": {
-                                                                          "type": "text_print",
-                                                                          "id": "?X[.x?gL%soa9jhtoAmZ",
-                                                                          "fields": {
-                                                                            "NEW_LINE": false
-                                                                          },
-                                                                          "inputs": {
-                                                                            "TEXT": {
-                                                                              "shadow": {
-                                                                                "type": "text",
-                                                                                "id": "@`F5p}f/~Wi//NqC{q*(",
-                                                                                "fields": {
-                                                                                  "TEXT": "abc"
-                                                                                }
-                                                                              },
-                                                                              "block": {
-                                                                                "type": "variables_get",
-                                                                                "id": "GqHC]Ye?Q~.q6=9oC;lR",
-                                                                                "fields": {
-                                                                                  "VAR": {
-                                                                                    "id": "t(/+mvI$C-^1K]*:Pi%M"
+                                                                      }
+                                                                    },
+                                                                    "next": {
+                                                                      "block": {
+                                                                        "type": "text_print",
+                                                                        "id": "l*g8_H9Iqfeag+_rC{AZ",
+                                                                        "fields": {
+                                                                          "NEW_LINE": false
+                                                                        },
+                                                                        "inputs": {
+                                                                          "TEXT": {
+                                                                            "shadow": {
+                                                                              "type": "text",
+                                                                              "id": "T/?k]Nv(i30~5;bt^?.[",
+                                                                              "fields": {
+                                                                                "TEXT": " "
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        },
+                                                                        "next": {
+                                                                          "block": {
+                                                                            "type": "text_print",
+                                                                            "id": "a@l|HT8Gh2@VdGP{j9PR",
+                                                                            "fields": {
+                                                                              "NEW_LINE": false
+                                                                            },
+                                                                            "inputs": {
+                                                                              "TEXT": {
+                                                                                "shadow": {
+                                                                                  "type": "text",
+                                                                                  "id": "qi[p(vzE?A4,N:X8HNlz",
+                                                                                  "fields": {
+                                                                                    "TEXT": "左:"
                                                                                   }
                                                                                 }
                                                                               }
-                                                                            }
-                                                                          },
-                                                                          "next": {
-                                                                            "block": {
-                                                                              "type": "text_print",
-                                                                              "id": "(px+3xt~RtFujs}BbGC%",
-                                                                              "fields": {
-                                                                                "NEW_LINE": false
-                                                                              },
-                                                                              "inputs": {
-                                                                                "TEXT": {
-                                                                                  "shadow": {
-                                                                                    "type": "text",
-                                                                                    "id": "#}+#$5K4:`r0!R)fV-Br",
-                                                                                    "fields": {
-                                                                                      "TEXT": ":"
-                                                                                    }
-                                                                                  }
-                                                                                }
-                                                                              },
-                                                                              "next": {
-                                                                                "block": {
-                                                                                  "type": "text_print",
-                                                                                  "id": "muHxgDR.KA2WbZq+jE3#",
-                                                                                  "fields": {
-                                                                                    "NEW_LINE": false
-                                                                                  },
-                                                                                  "inputs": {
-                                                                                    "TEXT": {
-                                                                                      "shadow": {
-                                                                                        "type": "text",
-                                                                                        "id": "Lr{$.+_$,gy0ScK74aEb",
-                                                                                        "fields": {
-                                                                                          "TEXT": "abc"
-                                                                                        }
-                                                                                      },
-                                                                                      "block": {
-                                                                                        "type": "variables_get",
-                                                                                        "id": "eOM`X+Wij@@*^50CxJ_6",
-                                                                                        "fields": {
-                                                                                          "VAR": {
-                                                                                            "id": "?bqG3z^zPO3|K%K(aD`7"
-                                                                                          }
+                                                                            },
+                                                                            "next": {
+                                                                              "block": {
+                                                                                "type": "text_print",
+                                                                                "id": "`N.{P^JS4YdnW)MtUpwC",
+                                                                                "fields": {
+                                                                                  "NEW_LINE": false
+                                                                                },
+                                                                                "inputs": {
+                                                                                  "TEXT": {
+                                                                                    "shadow": {
+                                                                                      "type": "text",
+                                                                                      "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                                      "fields": {
+                                                                                        "TEXT": "abc"
+                                                                                      }
+                                                                                    },
+                                                                                    "block": {
+                                                                                      "type": "variables_get",
+                                                                                      "id": "3G.7$0fBB@-^X4c0mk^/",
+                                                                                      "fields": {
+                                                                                        "VAR": {
+                                                                                          "id": "s]:H$6K^]Y*-UKQe%]^m"
                                                                                         }
                                                                                       }
                                                                                     }
-                                                                                  },
-                                                                                  "next": {
-                                                                                    "block": {
-                                                                                      "type": "text_print",
-                                                                                      "id": "^;DGG9%D0hXp=.[5E$JY",
-                                                                                      "fields": {
-                                                                                        "NEW_LINE": false
-                                                                                      },
-                                                                                      "inputs": {
-                                                                                        "TEXT": {
-                                                                                          "shadow": {
-                                                                                            "type": "text",
-                                                                                            "id": "[=@eusTi+7!S#0-EoW7P",
-                                                                                            "fields": {
-                                                                                              "TEXT": " "
-                                                                                            }
+                                                                                  }
+                                                                                },
+                                                                                "next": {
+                                                                                  "block": {
+                                                                                    "type": "text_print",
+                                                                                    "id": "OqSXh=GaL)[T[q,QkOC+",
+                                                                                    "fields": {
+                                                                                      "NEW_LINE": false
+                                                                                    },
+                                                                                    "inputs": {
+                                                                                      "TEXT": {
+                                                                                        "shadow": {
+                                                                                          "type": "text",
+                                                                                          "id": "mXny/Bcca*l2Toa,W,:I",
+                                                                                          "fields": {
+                                                                                            "TEXT": "/"
                                                                                           }
                                                                                         }
-                                                                                      },
-                                                                                      "next": {
-                                                                                        "block": {
-                                                                                          "type": "text_print",
-                                                                                          "id": "iAYp3OCNCN2D}.7~Ef|]",
-                                                                                          "fields": {
-                                                                                            "NEW_LINE": false
-                                                                                          },
-                                                                                          "inputs": {
-                                                                                            "TEXT": {
-                                                                                              "shadow": {
-                                                                                                "type": "text",
-                                                                                                "id": "0cJFt^p{9Xk/3-1e;O]b",
-                                                                                                "fields": {
-                                                                                                  "TEXT": "上:"
-                                                                                                }
+                                                                                      }
+                                                                                    },
+                                                                                    "next": {
+                                                                                      "block": {
+                                                                                        "type": "text_print",
+                                                                                        "id": "GG)d.-62I]tPk@l}Dx$n",
+                                                                                        "fields": {
+                                                                                          "NEW_LINE": false
+                                                                                        },
+                                                                                        "inputs": {
+                                                                                          "TEXT": {
+                                                                                            "shadow": {
+                                                                                              "type": "text",
+                                                                                              "id": "4j%n/]v/92Naac*NyL.J",
+                                                                                              "fields": {
+                                                                                                "TEXT": "右:"
                                                                                               }
                                                                                             }
-                                                                                          },
-                                                                                          "next": {
-                                                                                            "block": {
-                                                                                              "type": "text_print",
-                                                                                              "id": "v9.7C}*XqbVvDa~XDO5%",
-                                                                                              "fields": {
-                                                                                                "NEW_LINE": false
-                                                                                              },
-                                                                                              "inputs": {
-                                                                                                "TEXT": {
-                                                                                                  "shadow": {
-                                                                                                    "type": "text",
-                                                                                                    "id": "@`F5p}f/~Wi//NqC{q*(",
-                                                                                                    "fields": {
-                                                                                                      "TEXT": "abc"
-                                                                                                    }
-                                                                                                  },
-                                                                                                  "block": {
-                                                                                                    "type": "variables_get",
-                                                                                                    "id": "J77iNIY?^_j`3G/VoukI",
-                                                                                                    "fields": {
-                                                                                                      "VAR": {
-                                                                                                        "id": "@9=]QkZ(}gfvAQbU(!I7"
-                                                                                                      }
+                                                                                          }
+                                                                                        },
+                                                                                        "next": {
+                                                                                          "block": {
+                                                                                            "type": "text_print",
+                                                                                            "id": "?X[.x?gL%soa9jhtoAmZ",
+                                                                                            "fields": {
+                                                                                              "NEW_LINE": false
+                                                                                            },
+                                                                                            "inputs": {
+                                                                                              "TEXT": {
+                                                                                                "shadow": {
+                                                                                                  "type": "text",
+                                                                                                  "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                                                  "fields": {
+                                                                                                    "TEXT": "abc"
+                                                                                                  }
+                                                                                                },
+                                                                                                "block": {
+                                                                                                  "type": "variables_get",
+                                                                                                  "id": "GqHC]Ye?Q~.q6=9oC;lR",
+                                                                                                  "fields": {
+                                                                                                    "VAR": {
+                                                                                                      "id": "t(/+mvI$C-^1K]*:Pi%M"
                                                                                                     }
                                                                                                   }
                                                                                                 }
-                                                                                              },
-                                                                                              "next": {
-                                                                                                "block": {
-                                                                                                  "type": "text_print",
-                                                                                                  "id": "|w$Q-LdT)n:9u4LkFC|C",
-                                                                                                  "fields": {
-                                                                                                    "NEW_LINE": false
-                                                                                                  },
-                                                                                                  "inputs": {
-                                                                                                    "TEXT": {
-                                                                                                      "shadow": {
-                                                                                                        "type": "text",
-                                                                                                        "id": "vd9cSn^@=o%YWD0C}-^*",
-                                                                                                        "fields": {
-                                                                                                          "TEXT": "/"
-                                                                                                        }
+                                                                                              }
+                                                                                            },
+                                                                                            "next": {
+                                                                                              "block": {
+                                                                                                "type": "text_print",
+                                                                                                "id": "(px+3xt~RtFujs}BbGC%",
+                                                                                                "fields": {
+                                                                                                  "NEW_LINE": false
+                                                                                                },
+                                                                                                "inputs": {
+                                                                                                  "TEXT": {
+                                                                                                    "shadow": {
+                                                                                                      "type": "text",
+                                                                                                      "id": "#}+#$5K4:`r0!R)fV-Br",
+                                                                                                      "fields": {
+                                                                                                        "TEXT": ":"
                                                                                                       }
                                                                                                     }
-                                                                                                  },
-                                                                                                  "next": {
-                                                                                                    "block": {
-                                                                                                      "type": "text_print",
-                                                                                                      "id": "qnS!T5h.)8$|eE5L/XI_",
-                                                                                                      "fields": {
-                                                                                                        "NEW_LINE": false
-                                                                                                      },
-                                                                                                      "inputs": {
-                                                                                                        "TEXT": {
-                                                                                                          "shadow": {
-                                                                                                            "type": "text",
-                                                                                                            "id": "=%B[[p]*.ZSjyMijY?2F",
-                                                                                                            "fields": {
-                                                                                                              "TEXT": "下:"
+                                                                                                  }
+                                                                                                },
+                                                                                                "next": {
+                                                                                                  "block": {
+                                                                                                    "type": "text_print",
+                                                                                                    "id": "muHxgDR.KA2WbZq+jE3#",
+                                                                                                    "fields": {
+                                                                                                      "NEW_LINE": false
+                                                                                                    },
+                                                                                                    "inputs": {
+                                                                                                      "TEXT": {
+                                                                                                        "shadow": {
+                                                                                                          "type": "text",
+                                                                                                          "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                                                          "fields": {
+                                                                                                            "TEXT": "abc"
+                                                                                                          }
+                                                                                                        },
+                                                                                                        "block": {
+                                                                                                          "type": "variables_get",
+                                                                                                          "id": "eOM`X+Wij@@*^50CxJ_6",
+                                                                                                          "fields": {
+                                                                                                            "VAR": {
+                                                                                                              "id": "?bqG3z^zPO3|K%K(aD`7"
                                                                                                             }
                                                                                                           }
                                                                                                         }
-                                                                                                      },
-                                                                                                      "next": {
-                                                                                                        "block": {
-                                                                                                          "type": "text_print",
-                                                                                                          "id": "lewiTb!nU`GVuLs`PWA5",
-                                                                                                          "fields": {
-                                                                                                            "NEW_LINE": false
-                                                                                                          },
-                                                                                                          "inputs": {
-                                                                                                            "TEXT": {
-                                                                                                              "shadow": {
-                                                                                                                "type": "text",
-                                                                                                                "id": "@`F5p}f/~Wi//NqC{q*(",
-                                                                                                                "fields": {
-                                                                                                                  "TEXT": "abc"
-                                                                                                                }
-                                                                                                              },
-                                                                                                              "block": {
-                                                                                                                "type": "variables_get",
-                                                                                                                "id": "m1u*~3=P5f^D^44BiqNf",
-                                                                                                                "fields": {
-                                                                                                                  "VAR": {
-                                                                                                                    "id": "pPfwVLk?FBewj?-]uB+n"
+                                                                                                      }
+                                                                                                    },
+                                                                                                    "next": {
+                                                                                                      "block": {
+                                                                                                        "type": "text_print",
+                                                                                                        "id": "^;DGG9%D0hXp=.[5E$JY",
+                                                                                                        "fields": {
+                                                                                                          "NEW_LINE": false
+                                                                                                        },
+                                                                                                        "inputs": {
+                                                                                                          "TEXT": {
+                                                                                                            "shadow": {
+                                                                                                              "type": "text",
+                                                                                                              "id": "[=@eusTi+7!S#0-EoW7P",
+                                                                                                              "fields": {
+                                                                                                                "TEXT": " "
+                                                                                                              }
+                                                                                                            }
+                                                                                                          }
+                                                                                                        },
+                                                                                                        "next": {
+                                                                                                          "block": {
+                                                                                                            "type": "text_print",
+                                                                                                            "id": "iAYp3OCNCN2D}.7~Ef|]",
+                                                                                                            "fields": {
+                                                                                                              "NEW_LINE": false
+                                                                                                            },
+                                                                                                            "inputs": {
+                                                                                                              "TEXT": {
+                                                                                                                "shadow": {
+                                                                                                                  "type": "text",
+                                                                                                                  "id": "0cJFt^p{9Xk/3-1e;O]b",
+                                                                                                                  "fields": {
+                                                                                                                    "TEXT": "上:"
                                                                                                                   }
                                                                                                                 }
                                                                                                               }
-                                                                                                            }
-                                                                                                          },
-                                                                                                          "next": {
-                                                                                                            "block": {
-                                                                                                              "type": "text_print",
-                                                                                                              "id": "t~5$3n[vYB]S-U[MBD(7",
-                                                                                                              "fields": {
-                                                                                                                "NEW_LINE": false
-                                                                                                              },
-                                                                                                              "inputs": {
-                                                                                                                "TEXT": {
-                                                                                                                  "shadow": {
-                                                                                                                    "type": "text",
-                                                                                                                    "id": "ZcF2A)MNTT1kHEDq36DJ",
-                                                                                                                    "fields": {
-                                                                                                                      "TEXT": ":"
-                                                                                                                    }
-                                                                                                                  }
-                                                                                                                }
-                                                                                                              },
-                                                                                                              "next": {
-                                                                                                                "block": {
-                                                                                                                  "type": "text_print",
-                                                                                                                  "id": "i~jK7y`~iA?cjrCp#T^`",
-                                                                                                                  "fields": {
-                                                                                                                    "NEW_LINE": false
-                                                                                                                  },
-                                                                                                                  "inputs": {
-                                                                                                                    "TEXT": {
-                                                                                                                      "shadow": {
-                                                                                                                        "type": "text",
-                                                                                                                        "id": "Lr{$.+_$,gy0ScK74aEb",
-                                                                                                                        "fields": {
-                                                                                                                          "TEXT": "abc"
-                                                                                                                        }
-                                                                                                                      },
-                                                                                                                      "block": {
-                                                                                                                        "type": "variables_get",
-                                                                                                                        "id": "Hv5EQ]NeI:aAXkPGYo-1",
-                                                                                                                        "fields": {
-                                                                                                                          "VAR": {
-                                                                                                                            "id": "cMY5*e@XCk$BW*BfqNJX"
-                                                                                                                          }
+                                                                                                            },
+                                                                                                            "next": {
+                                                                                                              "block": {
+                                                                                                                "type": "text_print",
+                                                                                                                "id": "v9.7C}*XqbVvDa~XDO5%",
+                                                                                                                "fields": {
+                                                                                                                  "NEW_LINE": false
+                                                                                                                },
+                                                                                                                "inputs": {
+                                                                                                                  "TEXT": {
+                                                                                                                    "shadow": {
+                                                                                                                      "type": "text",
+                                                                                                                      "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                                                                      "fields": {
+                                                                                                                        "TEXT": "abc"
+                                                                                                                      }
+                                                                                                                    },
+                                                                                                                    "block": {
+                                                                                                                      "type": "variables_get",
+                                                                                                                      "id": "J77iNIY?^_j`3G/VoukI",
+                                                                                                                      "fields": {
+                                                                                                                        "VAR": {
+                                                                                                                          "id": "@9=]QkZ(}gfvAQbU(!I7"
                                                                                                                         }
                                                                                                                       }
                                                                                                                     }
-                                                                                                                  },
-                                                                                                                  "next": {
-                                                                                                                    "block": {
-                                                                                                                      "type": "text_print",
-                                                                                                                      "id": "d|^~g#qee?htGdpOE+!7",
-                                                                                                                      "fields": {
-                                                                                                                        "NEW_LINE": false
-                                                                                                                      },
-                                                                                                                      "inputs": {
-                                                                                                                        "TEXT": {
-                                                                                                                          "shadow": {
-                                                                                                                            "type": "text",
-                                                                                                                            "id": "#%mN/E{%s#%[45NAaU|J",
-                                                                                                                            "fields": {
-                                                                                                                              "TEXT": " "
-                                                                                                                            }
+                                                                                                                  }
+                                                                                                                },
+                                                                                                                "next": {
+                                                                                                                  "block": {
+                                                                                                                    "type": "text_print",
+                                                                                                                    "id": "|w$Q-LdT)n:9u4LkFC|C",
+                                                                                                                    "fields": {
+                                                                                                                      "NEW_LINE": false
+                                                                                                                    },
+                                                                                                                    "inputs": {
+                                                                                                                      "TEXT": {
+                                                                                                                        "shadow": {
+                                                                                                                          "type": "text",
+                                                                                                                          "id": "vd9cSn^@=o%YWD0C}-^*",
+                                                                                                                          "fields": {
+                                                                                                                            "TEXT": "/"
                                                                                                                           }
                                                                                                                         }
-                                                                                                                      },
-                                                                                                                      "next": {
-                                                                                                                        "block": {
-                                                                                                                          "type": "text_print",
-                                                                                                                          "id": "/%BS(+diWpAm`=hgLvvc",
-                                                                                                                          "fields": {
-                                                                                                                            "NEW_LINE": false
-                                                                                                                          },
-                                                                                                                          "inputs": {
-                                                                                                                            "TEXT": {
-                                                                                                                              "shadow": {
-                                                                                                                                "type": "text",
-                                                                                                                                "id": "*dr~6ljZEAk_A,Mf}]Np",
-                                                                                                                                "fields": {
-                                                                                                                                  "TEXT": "按鈕:"
-                                                                                                                                }
+                                                                                                                      }
+                                                                                                                    },
+                                                                                                                    "next": {
+                                                                                                                      "block": {
+                                                                                                                        "type": "text_print",
+                                                                                                                        "id": "qnS!T5h.)8$|eE5L/XI_",
+                                                                                                                        "fields": {
+                                                                                                                          "NEW_LINE": false
+                                                                                                                        },
+                                                                                                                        "inputs": {
+                                                                                                                          "TEXT": {
+                                                                                                                            "shadow": {
+                                                                                                                              "type": "text",
+                                                                                                                              "id": "=%B[[p]*.ZSjyMijY?2F",
+                                                                                                                              "fields": {
+                                                                                                                                "TEXT": "下:"
                                                                                                                               }
                                                                                                                             }
-                                                                                                                          },
-                                                                                                                          "next": {
-                                                                                                                            "block": {
-                                                                                                                              "type": "text_print",
-                                                                                                                              "id": ":a?e}yD$yzUaNA|ak~G;",
-                                                                                                                              "fields": {
-                                                                                                                                "NEW_LINE": true
-                                                                                                                              },
-                                                                                                                              "inputs": {
-                                                                                                                                "TEXT": {
-                                                                                                                                  "shadow": {
-                                                                                                                                    "type": "text",
-                                                                                                                                    "id": "Lr{$.+_$,gy0ScK74aEb",
-                                                                                                                                    "fields": {
-                                                                                                                                      "TEXT": "abc"
+                                                                                                                          }
+                                                                                                                        },
+                                                                                                                        "next": {
+                                                                                                                          "block": {
+                                                                                                                            "type": "text_print",
+                                                                                                                            "id": "lewiTb!nU`GVuLs`PWA5",
+                                                                                                                            "fields": {
+                                                                                                                              "NEW_LINE": false
+                                                                                                                            },
+                                                                                                                            "inputs": {
+                                                                                                                              "TEXT": {
+                                                                                                                                "shadow": {
+                                                                                                                                  "type": "text",
+                                                                                                                                  "id": "@`F5p}f/~Wi//NqC{q*(",
+                                                                                                                                  "fields": {
+                                                                                                                                    "TEXT": "abc"
+                                                                                                                                  }
+                                                                                                                                },
+                                                                                                                                "block": {
+                                                                                                                                  "type": "variables_get",
+                                                                                                                                  "id": "m1u*~3=P5f^D^44BiqNf",
+                                                                                                                                  "fields": {
+                                                                                                                                    "VAR": {
+                                                                                                                                      "id": "pPfwVLk?FBewj?-]uB+n"
                                                                                                                                     }
-                                                                                                                                  },
+                                                                                                                                  }
+                                                                                                                                }
+                                                                                                                              }
+                                                                                                                            },
+                                                                                                                            "next": {
+                                                                                                                              "block": {
+                                                                                                                                "type": "text_print",
+                                                                                                                                "id": "t~5$3n[vYB]S-U[MBD(7",
+                                                                                                                                "fields": {
+                                                                                                                                  "NEW_LINE": false
+                                                                                                                                },
+                                                                                                                                "inputs": {
+                                                                                                                                  "TEXT": {
+                                                                                                                                    "shadow": {
+                                                                                                                                      "type": "text",
+                                                                                                                                      "id": "ZcF2A)MNTT1kHEDq36DJ",
+                                                                                                                                      "fields": {
+                                                                                                                                        "TEXT": ":"
+                                                                                                                                      }
+                                                                                                                                    }
+                                                                                                                                  }
+                                                                                                                                },
+                                                                                                                                "next": {
                                                                                                                                   "block": {
-                                                                                                                                    "type": "variables_get",
-                                                                                                                                    "id": "tq^VQ4$xjUL|jrN?%[_7",
+                                                                                                                                    "type": "text_print",
+                                                                                                                                    "id": "i~jK7y`~iA?cjrCp#T^`",
                                                                                                                                     "fields": {
-                                                                                                                                      "VAR": {
-                                                                                                                                        "id": "LkI?6El^Rqu_U#hw7B?Y"
+                                                                                                                                      "NEW_LINE": false
+                                                                                                                                    },
+                                                                                                                                    "inputs": {
+                                                                                                                                      "TEXT": {
+                                                                                                                                        "shadow": {
+                                                                                                                                          "type": "text",
+                                                                                                                                          "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                                                                                          "fields": {
+                                                                                                                                            "TEXT": "abc"
+                                                                                                                                          }
+                                                                                                                                        },
+                                                                                                                                        "block": {
+                                                                                                                                          "type": "variables_get",
+                                                                                                                                          "id": "Hv5EQ]NeI:aAXkPGYo-1",
+                                                                                                                                          "fields": {
+                                                                                                                                            "VAR": {
+                                                                                                                                              "id": "cMY5*e@XCk$BW*BfqNJX"
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    },
+                                                                                                                                    "next": {
+                                                                                                                                      "block": {
+                                                                                                                                        "type": "text_print",
+                                                                                                                                        "id": "d|^~g#qee?htGdpOE+!7",
+                                                                                                                                        "fields": {
+                                                                                                                                          "NEW_LINE": false
+                                                                                                                                        },
+                                                                                                                                        "inputs": {
+                                                                                                                                          "TEXT": {
+                                                                                                                                            "shadow": {
+                                                                                                                                              "type": "text",
+                                                                                                                                              "id": "#%mN/E{%s#%[45NAaU|J",
+                                                                                                                                              "fields": {
+                                                                                                                                                "TEXT": " "
+                                                                                                                                              }
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        },
+                                                                                                                                        "next": {
+                                                                                                                                          "block": {
+                                                                                                                                            "type": "text_print",
+                                                                                                                                            "id": "/%BS(+diWpAm`=hgLvvc",
+                                                                                                                                            "fields": {
+                                                                                                                                              "NEW_LINE": false
+                                                                                                                                            },
+                                                                                                                                            "inputs": {
+                                                                                                                                              "TEXT": {
+                                                                                                                                                "shadow": {
+                                                                                                                                                  "type": "text",
+                                                                                                                                                  "id": "*dr~6ljZEAk_A,Mf}]Np",
+                                                                                                                                                  "fields": {
+                                                                                                                                                    "TEXT": "按鈕:"
+                                                                                                                                                  }
+                                                                                                                                                }
+                                                                                                                                              }
+                                                                                                                                            },
+                                                                                                                                            "next": {
+                                                                                                                                              "block": {
+                                                                                                                                                "type": "text_print",
+                                                                                                                                                "id": ":a?e}yD$yzUaNA|ak~G;",
+                                                                                                                                                "fields": {
+                                                                                                                                                  "NEW_LINE": true
+                                                                                                                                                },
+                                                                                                                                                "inputs": {
+                                                                                                                                                  "TEXT": {
+                                                                                                                                                    "shadow": {
+                                                                                                                                                      "type": "text",
+                                                                                                                                                      "id": "Lr{$.+_$,gy0ScK74aEb",
+                                                                                                                                                      "fields": {
+                                                                                                                                                        "TEXT": "abc"
+                                                                                                                                                      }
+                                                                                                                                                    },
+                                                                                                                                                    "block": {
+                                                                                                                                                      "type": "variables_get",
+                                                                                                                                                      "id": "tq^VQ4$xjUL|jrN?%[_7",
+                                                                                                                                                      "fields": {
+                                                                                                                                                        "VAR": {
+                                                                                                                                                          "id": "LkI?6El^Rqu_U#hw7B?Y"
+                                                                                                                                                        }
+                                                                                                                                                      }
+                                                                                                                                                    }
+                                                                                                                                                  }
+                                                                                                                                                }
+                                                                                                                                              }
+                                                                                                                                            }
+                                                                                                                                          }
+                                                                                                                                        }
                                                                                                                                       }
                                                                                                                                     }
                                                                                                                                   }
@@ -636,6 +739,50 @@
                                       }
                                     }
                                   }
+                                },
+                                "ELSE": {
+                                  "block": {
+                                    "type": "rc_wait_connection",
+                                    "id": "Y,kGTuvU^M7Yn95%D!zD",
+                                    "fields": {
+                                      "TIMEOUT": 1
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "cyberbrick_led_set_color",
+                                        "id": "15Y1ksoCT-[h~u5=8vkE",
+                                        "inputs": {
+                                          "RED": {
+                                            "shadow": {
+                                              "type": "math_number",
+                                              "id": "fMj;~S|/Pn2d~V~!0[kM",
+                                              "fields": {
+                                                "NUM": 255
+                                              }
+                                            }
+                                          },
+                                          "GREEN": {
+                                            "shadow": {
+                                              "type": "math_number",
+                                              "id": "q8E~2v9tJ`Rlg/3^e@q3",
+                                              "fields": {
+                                                "NUM": 0
+                                              }
+                                            }
+                                          },
+                                          "BLUE": {
+                                            "shadow": {
+                                              "type": "math_number",
+                                              "id": ")WdNo}A%7pdVp?RcA#]U",
+                                              "fields": {
+                                                "NUM": 0
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
                                 }
                               }
                             }
@@ -653,7 +800,7 @@
           "type": "arduino_function",
           "id": "csOp71p0QI|)Y8JSU#UO",
           "x": 0,
-          "y": 1243,
+          "y": 1494,
           "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
           "fields": {
             "NAME": "讀取搖控器數值"
@@ -674,7 +821,7 @@
                       "type": "math_number",
                       "id": "[)!4.y3X/F{v{fUP%T;E",
                       "fields": {
-                        "NUM": 15
+                        "NUM": 50
                       }
                     }
                   }
@@ -705,8 +852,8 @@
                                 "inputs": {
                                   "A": {
                                     "block": {
-                                      "type": "x12_get_joystick_mapped",
-                                      "id": "t%Ni2n$#1e,_mF.3IU0c",
+                                      "type": "rc_get_joystick_mapped",
+                                      "id": "n4lPzRf57HxJqhRxw.9;",
                                       "fields": {
                                         "CHANNEL": "2"
                                       },
@@ -714,7 +861,7 @@
                                         "MIN": {
                                           "shadow": {
                                             "type": "math_number",
-                                            "id": "@OC+Xemz.Q?y2dyG[iTo",
+                                            "id": "kjO]0AR.?8Pl@[cJn1(^",
                                             "fields": {
                                               "NUM": -100
                                             }
@@ -723,7 +870,7 @@
                                         "MAX": {
                                           "shadow": {
                                             "type": "math_number",
-                                            "id": "e+TST3(G,O(${hAYe{];",
+                                            "id": "0IOoj*YJ*ThStrB[|8Vq",
                                             "fields": {
                                               "NUM": 100
                                             }
@@ -756,8 +903,8 @@
                                 "inputs": {
                                   "A": {
                                     "block": {
-                                      "type": "x12_get_joystick_mapped",
-                                      "id": "fcU%A!:UYQ)YXvqqnI7%",
+                                      "type": "rc_get_joystick_mapped",
+                                      "id": "xN^Ak1]j8}o|mG%b;])e",
                                       "fields": {
                                         "CHANNEL": "2"
                                       },
@@ -765,7 +912,7 @@
                                         "MIN": {
                                           "shadow": {
                                             "type": "math_number",
-                                            "id": "[j!?F`C;7p+#X@qr8}%z",
+                                            "id": "KZJf^rX5Kjj]X}j,2+,3",
                                             "fields": {
                                               "NUM": -100
                                             }
@@ -774,7 +921,7 @@
                                         "MAX": {
                                           "shadow": {
                                             "type": "math_number",
-                                            "id": "*Qr}4+kxO1YQ%oB-f!qW",
+                                            "id": "WzQ?p745{|5IJ{e1)G~6",
                                             "fields": {
                                               "NUM": 100
                                             }
@@ -830,8 +977,8 @@
                           "inputs": {
                             "VALUE": {
                               "block": {
-                                "type": "x12_get_joystick_mapped",
-                                "id": "MH1$n8gpYC@AAZEtzAGO",
+                                "type": "rc_get_joystick_mapped",
+                                "id": "fu_m^P|*p]v;Mgx?AVpT",
                                 "fields": {
                                   "CHANNEL": "2"
                                 },
@@ -839,7 +986,7 @@
                                   "MIN": {
                                     "shadow": {
                                       "type": "math_number",
-                                      "id": "d:w^cmw3h+(~6)*55AJu",
+                                      "id": "y1;1ZMO@T.3,hN]OU|rg",
                                       "fields": {
                                         "NUM": -100
                                       }
@@ -848,7 +995,7 @@
                                   "MAX": {
                                     "shadow": {
                                       "type": "math_number",
-                                      "id": "SgBtl!8fPT]qJT4/nQ08",
+                                      "id": "3ExEY++k5W/0`;f$2[n|",
                                       "fields": {
                                         "NUM": 100
                                       }
@@ -909,8 +1056,8 @@
                                     "inputs": {
                                       "A": {
                                         "block": {
-                                          "type": "x12_get_joystick_mapped",
-                                          "id": "8+O~)?pq=UXeOShf*v9~",
+                                          "type": "rc_get_joystick_mapped",
+                                          "id": "J+[.rJ:grxD)m$-MT[t^",
                                           "fields": {
                                             "CHANNEL": "4"
                                           },
@@ -918,7 +1065,7 @@
                                             "MIN": {
                                               "shadow": {
                                                 "type": "math_number",
-                                                "id": "C(#ql$;9SgaK%gU}4?GG",
+                                                "id": "19mor/=gF:U]xwhRWlAO",
                                                 "fields": {
                                                   "NUM": -100
                                                 }
@@ -927,7 +1074,7 @@
                                             "MAX": {
                                               "shadow": {
                                                 "type": "math_number",
-                                                "id": "64m*@45|8n}gHHdB.t${",
+                                                "id": "6ju|RP/*1x}@Paid0ViS",
                                                 "fields": {
                                                   "NUM": 100
                                                 }
@@ -960,8 +1107,8 @@
                                     "inputs": {
                                       "A": {
                                         "block": {
-                                          "type": "x12_get_joystick_mapped",
-                                          "id": "O(~]Z|+~]8=g{p3rt3X2",
+                                          "type": "rc_get_joystick_mapped",
+                                          "id": "gE0/6kd3(`.:}iPy-BgX",
                                           "fields": {
                                             "CHANNEL": "4"
                                           },
@@ -969,7 +1116,7 @@
                                             "MIN": {
                                               "shadow": {
                                                 "type": "math_number",
-                                                "id": "Q0]Jm-3+9!pa^$Y)@-j=",
+                                                "id": "kE@;/c7DE`Ylr(?{@:DZ",
                                                 "fields": {
                                                   "NUM": -100
                                                 }
@@ -978,7 +1125,7 @@
                                             "MAX": {
                                               "shadow": {
                                                 "type": "math_number",
-                                                "id": "^9A](-eAj5oKxWYo;c%$",
+                                                "id": "uWrICvnk/|-BddSqV,i9",
                                                 "fields": {
                                                   "NUM": 100
                                                 }
@@ -1034,8 +1181,8 @@
                               "inputs": {
                                 "VALUE": {
                                   "block": {
-                                    "type": "x12_get_joystick_mapped",
-                                    "id": "P8!ptZz,d.s!-3`=LRWf",
+                                    "type": "rc_get_joystick_mapped",
+                                    "id": "1y(SIjEdp1vJN]{|q:W{",
                                     "fields": {
                                       "CHANNEL": "4"
                                     },
@@ -1043,7 +1190,7 @@
                                       "MIN": {
                                         "shadow": {
                                           "type": "math_number",
-                                          "id": "-uJ*Kji3:r~Lg*tZTsJ^",
+                                          "id": "1w0JD`9C2o`n6Sdg~7qx",
                                           "fields": {
                                             "NUM": -100
                                           }
@@ -1052,7 +1199,7 @@
                                       "MAX": {
                                         "shadow": {
                                           "type": "math_number",
-                                          "id": "Yr(}B%]D~D9Ow}9_8w_N",
+                                          "id": "==Q(b8S`ZA5}nZ`Zc@9:",
                                           "fields": {
                                             "NUM": 100
                                           }
@@ -1113,8 +1260,8 @@
                                         "inputs": {
                                           "A": {
                                             "block": {
-                                              "type": "x12_get_joystick_mapped",
-                                              "id": "R|UZLGS?ObiZD|n(^y$v",
+                                              "type": "rc_get_joystick_mapped",
+                                              "id": "$~1d|*`./SQ5]e@p8%T.",
                                               "fields": {
                                                 "CHANNEL": "3"
                                               },
@@ -1122,7 +1269,7 @@
                                                 "MIN": {
                                                   "shadow": {
                                                     "type": "math_number",
-                                                    "id": "Z3)9mf8fMmv1S);fd6Uv",
+                                                    "id": "%=o%JIRVaLNpQkch0y17",
                                                     "fields": {
                                                       "NUM": -100
                                                     }
@@ -1131,7 +1278,7 @@
                                                 "MAX": {
                                                   "shadow": {
                                                     "type": "math_number",
-                                                    "id": "#.%RoPQ5g6)R02=C6@?[",
+                                                    "id": "KEEo;RJ9=ZSxhA~zL:?r",
                                                     "fields": {
                                                       "NUM": 100
                                                     }
@@ -1164,8 +1311,8 @@
                                         "inputs": {
                                           "A": {
                                             "block": {
-                                              "type": "x12_get_joystick_mapped",
-                                              "id": "VF=NXVxS-icWg#.`YDl`",
+                                              "type": "rc_get_joystick_mapped",
+                                              "id": "Ue]72H6a:5k[lQB*U9FY",
                                               "fields": {
                                                 "CHANNEL": "3"
                                               },
@@ -1173,7 +1320,7 @@
                                                 "MIN": {
                                                   "shadow": {
                                                     "type": "math_number",
-                                                    "id": "lzaHJxgf)~1ycd*v0UZl",
+                                                    "id": "OJ%G/b=j}hwPwFGTzhOX",
                                                     "fields": {
                                                       "NUM": -100
                                                     }
@@ -1182,7 +1329,7 @@
                                                 "MAX": {
                                                   "shadow": {
                                                     "type": "math_number",
-                                                    "id": "f8RuCg6opVd-*{lpy?.0",
+                                                    "id": "N*Qov?}Ld*^qq61i7,@@",
                                                     "fields": {
                                                       "NUM": 100
                                                     }
@@ -1238,8 +1385,8 @@
                                   "inputs": {
                                     "VALUE": {
                                       "block": {
-                                        "type": "x12_get_joystick_mapped",
-                                        "id": "i?pCbR[[32s6im#,X}04",
+                                        "type": "rc_get_joystick_mapped",
+                                        "id": "tKK[Xm+1l[aR2EN.eI|8",
                                         "fields": {
                                           "CHANNEL": "3"
                                         },
@@ -1247,7 +1394,7 @@
                                           "MIN": {
                                             "shadow": {
                                               "type": "math_number",
-                                              "id": "BbsB-j)}f{|6_0$}fFs(",
+                                              "id": ",pI3uwMgJtP5.cDxcYpp",
                                               "fields": {
                                                 "NUM": -100
                                               }
@@ -1256,7 +1403,7 @@
                                           "MAX": {
                                             "shadow": {
                                               "type": "math_number",
-                                              "id": "6KVM9+hooull+u+jC[r{",
+                                              "id": "__N9,}*MuS[16OfgvtrE",
                                               "fields": {
                                                 "NUM": 100
                                               }
@@ -1303,10 +1450,10 @@
                                 "inputs": {
                                   "VALUE": {
                                     "block": {
-                                      "type": "x12_is_button_pressed",
-                                      "id": "F+XE_,h~M;)9W09I@|$L",
+                                      "type": "rc_is_button_pressed",
+                                      "id": "#e@E.y%ru9S!M3-te5K3",
                                       "fields": {
-                                        "BUTTON": "6"
+                                        "BUTTON": "0"
                                       }
                                     }
                                   }
