@@ -964,7 +964,7 @@ window.languageManager.loadMessages('hu', {
 
 	// Állapot RC blokkok
 	RC_IS_CONNECTED: 'RC csatlakoztatva?',
-	RC_IS_CONNECTED_TOOLTIP: 'Ellenőrizd az adatok érkezését 500ms-on belül',
+	RC_IS_CONNECTED_TOOLTIP: 'Ellenőrizd az adatok érkezését 1500ms-on belül',
 	RC_WARNING_CONFLICT: '⚠ Az adó és a vevő nem lehet egyszerre aktív. Kérjük, tiltsa le az egyiket (jobb klikk → Blokk letiltása)',
 
 	// === Serial Monitor ===

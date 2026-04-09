@@ -940,7 +940,7 @@ window.languageManager.loadMessages('en', {
 	RC_WAIT_SECONDS: 'seconds',
 	RC_WAIT_TOOLTIP: 'Wait for transmitter connection, LED flashes blue, continues after timeout',
 	RC_IS_CONNECTED: 'RC connected?',
-	RC_IS_CONNECTED_TOOLTIP: 'Check if data received within 500ms',
+	RC_IS_CONNECTED_TOOLTIP: 'Check if data received within 1500ms',
 	RC_WARNING_CONFLICT: '⚠ Transmitter and receiver cannot be enabled at the same time. Please disable one (right-click → Disable Block)',
 
 	// RC Data Reading Blocks

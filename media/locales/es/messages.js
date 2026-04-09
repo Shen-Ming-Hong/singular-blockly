@@ -944,7 +944,7 @@ window.languageManager.loadMessages('es', {
 	RC_WAIT_SECONDS: 'segundos',
 	RC_WAIT_TOOLTIP: 'Esperar conexión transmisor, LED parpadea azul, continúa después del tiempo',
 	RC_IS_CONNECTED: '¿RC conectado?',
-	RC_IS_CONNECTED_TOOLTIP: 'Verificar si datos recibidos en 500ms',
+	RC_IS_CONNECTED_TOOLTIP: 'Verificar si datos recibidos en 1500ms',
 	RC_WARNING_CONFLICT:
 		'⚠ El transmisor y el receptor no pueden estar activados al mismo tiempo. Desactive uno (clic derecho → Desactivar bloque)',
 

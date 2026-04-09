@@ -938,7 +938,7 @@ window.languageManager.loadMessages('ja', {
 	RC_WAIT_SECONDS: '秒',
 	RC_WAIT_TOOLTIP: '送信機の接続を待機、LEDが青く点滅、タイムアウト後に続行',
 	RC_IS_CONNECTED: 'RC接続中?',
-	RC_IS_CONNECTED_TOOLTIP: '500ms以内にデータを受信したか確認',
+	RC_IS_CONNECTED_TOOLTIP: '1500ms以内にデータを受信したか確認',
 	RC_WARNING_CONFLICT: '⚠ 送信機と受信機を同時に有効にできません。どちらかを無効にしてください（右クリック → ブロックを無効化）',
 
 	// RC データ読取ブロック

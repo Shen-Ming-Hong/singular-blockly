@@ -959,7 +959,7 @@ window.languageManager.loadMessages('cs', {
 
 	// Bloky stavu RC
 	RC_IS_CONNECTED: 'RC připojeno?',
-	RC_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda byla přijata data za 500ms',
+	RC_IS_CONNECTED_TOOLTIP: 'Zkontrolovat zda byla přijata data za 1500ms',
 	RC_WARNING_CONFLICT: '⚠ Vysílač a přijímač nemohou být aktivovány současně. Deaktivujte jeden z nich (pravý klik → Deaktivovat blok)',
 
 	// === Serial Monitor ===

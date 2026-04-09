@@ -955,7 +955,7 @@ window.languageManager.loadMessages('pt-br', {
 
 	// Blocos status RC
 	RC_IS_CONNECTED: 'RC conectado?',
-	RC_IS_CONNECTED_TOOLTIP: 'Verificar se dados recebidos em 500ms',
+	RC_IS_CONNECTED_TOOLTIP: 'Verificar se dados recebidos em 1500ms',
 	RC_WARNING_CONFLICT:
 		'⚠ Transmissor e receptor não podem estar ativados ao mesmo tempo. Desative um deles (clique direito → Desativar bloco)',
 

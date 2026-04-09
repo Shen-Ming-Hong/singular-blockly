@@ -963,7 +963,7 @@ window.languageManager.loadMessages('bg', {
 
 	// Блокове статус RC
 	RC_IS_CONNECTED: 'RC свързан?',
-	RC_IS_CONNECTED_TOOLTIP: 'Провери дали са получени данни за 500мс',
+	RC_IS_CONNECTED_TOOLTIP: 'Провери дали са получени данни за 1500мс',
 	RC_WARNING_CONFLICT:
 		'⚠ Предавателят и приемникът не могат да бъдат активирани едновременно. Деактивирайте единия (десен клик → Деактивиране на блок)',
 

@@ -946,7 +946,7 @@ window.languageManager.loadMessages('de', {
 	RC_WAIT_SECONDS: 'Sekunden',
 	RC_WAIT_TOOLTIP: 'Auf Sender-Verbindung warten, LED blinkt blau, fährt nach Timeout fort',
 	RC_IS_CONNECTED: 'RC verbunden?',
-	RC_IS_CONNECTED_TOOLTIP: 'Prüfen ob Daten innerhalb 500ms empfangen',
+	RC_IS_CONNECTED_TOOLTIP: 'Prüfen ob Daten innerhalb 1500ms empfangen',
 	RC_WARNING_CONFLICT:
 		'⚠ Sender und Empfänger können nicht gleichzeitig aktiviert sein. Bitte einen deaktivieren (Rechtsklick → Block deaktivieren)',
 

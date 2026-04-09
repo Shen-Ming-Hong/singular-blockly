@@ -930,7 +930,7 @@ window.languageManager.loadMessages('zh-hant', {
 	RC_WAIT_SECONDS: '秒',
 	RC_WAIT_TOOLTIP: '等待發射端連線，LED 藍色閃爍，超時後繼續執行',
 	RC_IS_CONNECTED: 'RC 已連線?',
-	RC_IS_CONNECTED_TOOLTIP: '檢查是否在 500ms 內收到資料',
+	RC_IS_CONNECTED_TOOLTIP: '檢查是否在 1500ms 內收到資料',
 	RC_WARNING_CONFLICT: '⚠ 發射端和接收端不能同時啟用，請停用其中一個（右鍵 → 停用積木）',
 
 	// RC 資料讀取積木

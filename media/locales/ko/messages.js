@@ -938,7 +938,7 @@ window.languageManager.loadMessages('ko', {
 	RC_WAIT_SECONDS: '초',
 	RC_WAIT_TOOLTIP: '송신기 연결 대기, LED가 파란색으로 깜빡임, 타임아웃 후 계속',
 	RC_IS_CONNECTED: 'RC 연결됨?',
-	RC_IS_CONNECTED_TOOLTIP: '500ms 내 데이터 수신 여부 확인',
+	RC_IS_CONNECTED_TOOLTIP: '1500ms 내 데이터 수신 여부 확인',
 	RC_WARNING_CONFLICT: '⚠ 송신기와 수신기를 동시에 활성화할 수 없습니다. 하나를 비활성화하세요 (우클릭 → 블록 비활성화)',
 
 	// RC 데이터 읽기 블록

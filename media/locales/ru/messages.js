@@ -958,7 +958,7 @@ window.languageManager.loadMessages('ru', {
 
 	// Блоки статуса RC
 	RC_IS_CONNECTED: 'RC подключён?',
-	RC_IS_CONNECTED_TOOLTIP: 'Проверить получены ли данные за 500мс',
+	RC_IS_CONNECTED_TOOLTIP: 'Проверить получены ли данные за 1500мс',
 	RC_WARNING_CONFLICT: '⚠ Передатчик и приёмник не могут быть активны одновременно. Отключите один (правый клик → Отключить блок)',
 
 	// === Serial Monitor ===

@@ -172,6 +172,7 @@ _rc_connected = False
 _rc_last_recv = 0
 _rc_recv_count = 0
 _rc_last_gc = 0
+_rc_last_reinit = 0
 
 def _rc_recv_cb(e):
     global _rc_data, _rc_connected, _rc_last_recv, _rc_recv_count
@@ -189,27 +190,42 @@ def _rc_recv_cb(e):
     except Exception:
         pass  # 防止 irq 異常導致系統卡死
 
+def _reinit_espnow():
+    global _rc_connected
+    try:
+        _espnow.active(False)
+        _wlan.active(False)
+        time.sleep_ms(300)
+        _wlan.active(True)
+        _wlan.disconnect()
+        _wlan.config(reconnects=0)
+        time.sleep_ms(100)
+        _wlan.config(channel=_rc_channel)
+        _espnow.active(True)
+        _espnow.config(rxbuf=1024)
+        _espnow.irq(_rc_recv_cb)
+        _rc_connected = False
+    except Exception:
+        pass
+
 def _rc_maintenance():
     """定期維護：垃圾回收 + 斷線重連，回傳連線狀態"""
-    global _rc_last_gc, _rc_connected, _espnow
+    global _rc_last_gc, _rc_connected, _rc_last_reinit
     now = time.ticks_ms()
     # 每 30 秒執行一次垃圾回收
     if time.ticks_diff(now, _rc_last_gc) > 30000:
         gc.collect()
         _rc_last_gc = now
-    # 斷線超過 5 秒，嘗試重新初始化 ESP-NOW
-    if _rc_connected and time.ticks_diff(now, _rc_last_recv) > 5000:
-        try:
-            _espnow.active(False)
-            time.sleep_ms(100)
-            _espnow.active(True)
-            _espnow.config(rxbuf=1024)
-            _espnow.irq(_rc_recv_cb)
-            _rc_connected = False
-        except Exception:
-            pass
-    # 回傳連線狀態 (1000ms 內有收到資料，避免偶發延遲誤判)
-    return _rc_connected and time.ticks_diff(now, _rc_last_recv) < 1000
+    # 條件 A：曾連線但超過 3 秒沒封包；條件 B：從未連線且距上次重試超過 10 秒
+    need_reinit = (
+        (_rc_connected and time.ticks_diff(now, _rc_last_recv) > 3000) or
+        (not _rc_connected and time.ticks_diff(now, _rc_last_reinit) > 10000)
+    )
+    if need_reinit and time.ticks_diff(now, _rc_last_reinit) > 5000:
+        _reinit_espnow()
+        _rc_last_reinit = time.ticks_ms()
+    # 回傳連線狀態 (1500ms 內有收到資料，容許偶發封包延遲)
+    return _rc_connected and time.ticks_diff(now, _rc_last_recv) < 1500
 
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
@@ -223,6 +239,7 @@ _espnow.config(rxbuf=1024)
 _espnow.irq(_rc_recv_cb)
 _rc_last_gc = time.ticks_ms()`
 		);
+		generator.addHardwareInit('onboard_led', 'onboard_led = NeoPixel(Pin(8), 1)');
 
 		// 配對 ID 在 main() 中設定，確保變數已初始化
 		return `global _rc_pair_id\n_rc_pair_id = max(1, min(255, int(${pairId})))\n`;
@@ -238,18 +255,18 @@ _rc_last_gc = time.ticks_ms()`
 		const timeout = Math.max(1, Math.min(60, Number(block.getFieldValue('TIMEOUT')) || 30));
 		const timeoutMs = timeout * 1000;
 
-		// 生成程式碼：LED 閃爍等待
-		const code = `_led_wait = NeoPixel(Pin(8), 1)
-_wait_start = time.ticks_ms()
+		// 生成程式碼：使用 onboard_led (Pin 8) 閃爍等待，在每輪觸發 maintenance 確保能自動重連
+		const code = `_wait_start = time.ticks_ms()
 while not _rc_connected and time.ticks_diff(time.ticks_ms(), _wait_start) < ${timeoutMs}:
-    _led_wait[0] = (0, 0, 50)
-    _led_wait.write()
+    _rc_maintenance()
+    onboard_led[0] = (0, 0, 50)
+    onboard_led.write()
     time.sleep_ms(250)
-    _led_wait[0] = (0, 0, 0)
-    _led_wait.write()
+    onboard_led[0] = (0, 0, 0)
+    onboard_led.write()
     time.sleep_ms(250)
-_led_wait[0] = (0, 0, 0)
-_led_wait.write()
+onboard_led[0] = (0, 0, 0)
+onboard_led.write()
 `;
 		return code;
 	};
@@ -260,7 +277,7 @@ _led_wait.write()
 		if (_hasRcConflict(block.workspace)) {
 			return ['False', generator.ORDER_ATOMIC];
 		}
-		// 生成程式碼：檢查連線狀態 (500ms 超時)
+		// 生成程式碼：檢查連線狀態 (1500ms 超時)
 		// _rc_maintenance() 會自動執行垃圾回收和斷線重連，並回傳連線狀態
 		const code = '_rc_maintenance()';
 		return [code, generator.ORDER_FUNCTION_CALL];

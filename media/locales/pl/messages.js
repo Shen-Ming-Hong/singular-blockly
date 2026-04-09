@@ -962,7 +962,7 @@ window.languageManager.loadMessages('pl', {
 
 	// Bloki statusu RC
 	RC_IS_CONNECTED: 'RC połączony?',
-	RC_IS_CONNECTED_TOOLTIP: 'Sprawdź czy dane odebrane w ciągu 500ms',
+	RC_IS_CONNECTED_TOOLTIP: 'Sprawdź czy dane odebrane w ciągu 1500ms',
 	RC_WARNING_CONFLICT: '⚠ Nadajnik i odbiornik nie mogą być aktywne jednocześnie. Wyłącz jeden z nich (prawy przycisk → Wyłącz blok)',
 
 	// === Serial Monitor ===

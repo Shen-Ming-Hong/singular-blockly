@@ -942,7 +942,7 @@ window.languageManager.loadMessages('it', {
 	RC_WAIT_SECONDS: 'secondi',
 	RC_WAIT_TOOLTIP: 'Attendi connessione trasmettitore, LED lampeggia blu, continua dopo timeout',
 	RC_IS_CONNECTED: 'RC connesso?',
-	RC_IS_CONNECTED_TOOLTIP: 'Controlla se dati ricevuti entro 500ms',
+	RC_IS_CONNECTED_TOOLTIP: 'Controlla se dati ricevuti entro 1500ms',
 	RC_WARNING_CONFLICT:
 		'⚠ Trasmettitore e ricevitore non possono essere attivi contemporaneamente. Disattivane uno (clic destro → Disattiva blocco)',
 

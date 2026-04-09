@@ -934,7 +934,7 @@ window.languageManager.loadMessages('fr', {
 	RC_WAIT_SECONDS: 'secondes',
 	RC_WAIT_TOOLTIP: 'Attendre connexion émetteur, LED clignote bleu, continue après délai',
 	RC_IS_CONNECTED: 'RC connecté?',
-	RC_IS_CONNECTED_TOOLTIP: 'Vérifier si données reçues dans 500ms',
+	RC_IS_CONNECTED_TOOLTIP: 'Vérifier si données reçues dans 1500ms',
 	RC_WARNING_CONFLICT:
 		"⚠ L'émetteur et le récepteur ne peuvent pas être activés en même temps. Désactivez l'un d'eux (clic droit → Désactiver le bloc)",
 
