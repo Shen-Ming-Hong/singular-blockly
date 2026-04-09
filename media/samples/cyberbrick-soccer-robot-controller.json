@@ -1,0 +1,175 @@
+{
+    "workspace": {
+        "blocks": {
+            "languageVersion": 0,
+            "blocks": [
+                {
+                    "type": "micropython_main",
+                    "id": ";l_AQjeA+q;zF?!`WMdO",
+                    "x": 0,
+                    "y": 0,
+                    "deletable": false,
+                    "inputs": {
+                        "MAIN": {
+                            "block": {
+                                "type": "variables_set",
+                                "id": "MhG86uoOb8d+-/pQVGI*",
+                                "fields": {
+                                    "VAR": {
+                                        "id": "sJV.b.!e-]Qcm0(@e7X1"
+                                    }
+                                },
+                                "inputs": {
+                                    "VALUE": {
+                                        "block": {
+                                            "type": "math_number",
+                                            "id": "A0!,6v=YAs4Ilta(4rl1",
+                                            "fields": {
+                                                "NUM": 1
+                                            }
+                                        }
+                                    }
+                                },
+                                "next": {
+                                    "block": {
+                                        "type": "arduino_function_call",
+                                        "id": "8{W8Om2_ljP;e;DvH;lk",
+                                        "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"遙控器\" has_return=\"false\" return_type=\"void\"></mutation>"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "arduino_function",
+                    "id": "Ocx6kqikaQ{.bQWI=-wq",
+                    "x": 0,
+                    "y": 112,
+                    "deletable": false,
+                    "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
+                    "fields": {
+                        "NAME": "遙控器"
+                    },
+                    "inputs": {
+                        "STACK": {
+                            "block": {
+                                "type": "rc_master_init",
+                                "id": "2kr~;c0$Pp(2n]PMlPmb",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
+                                "fields": {
+                                    "CHANNEL": 1
+                                },
+                                "inputs": {
+                                    "PAIR_ID": {
+                                        "shadow": {
+                                            "type": "math_number",
+                                            "id": ";zA6%S`X95lZzu5M%B*|",
+                                            "fields": {
+                                                "NUM": 1
+                                            }
+                                        },
+                                        "block": {
+                                            "type": "variables_get",
+                                            "id": "wt5B=R[N;d(!_6h^*5ho",
+                                            "deletable": false,
+                                            "movable": false,
+                                            "editable": false,
+                                            "fields": {
+                                                "VAR": {
+                                                    "id": "sJV.b.!e-]Qcm0(@e7X1"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "next": {
+                                    "block": {
+                                        "type": "controls_whileUntil",
+                                        "id": "-tWZ],CY5qjPVa$$e)I]",
+                                        "deletable": false,
+                                        "movable": false,
+                                        "editable": false,
+                                        "fields": {
+                                            "MODE": "WHILE"
+                                        },
+                                        "inputs": {
+                                            "BOOL": {
+                                                "block": {
+                                                    "type": "logic_boolean",
+                                                    "id": "WbC[QcSAs4x^r2Nmz6AZ",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false,
+                                                    "fields": {
+                                                        "BOOL": "TRUE"
+                                                    }
+                                                }
+                                            },
+                                            "DO": {
+                                                "block": {
+                                                    "type": "rc_send",
+                                                    "id": "o32wvI$v#`exPY%|I@@}",
+                                                    "deletable": false,
+                                                    "movable": false,
+                                                    "editable": false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "variables": [
+            {
+                "name": "連線編號",
+                "id": "sJV.b.!e-]Qcm0(@e7X1"
+            }
+        ]
+    },
+    "board": "cyberbrick",
+    "nameTranslations": {
+        "variables": {
+            "連線編號": {
+                "en": "channel_id",
+                "ja": "channel_id",
+                "ko": "channel_id",
+                "de": "kanal_id",
+                "fr": "id_canal",
+                "es": "id_canal",
+                "it": "id_canale",
+                "pt-br": "id_canal",
+                "ru": "nomer_kanala",
+                "pl": "id_kanalu",
+                "cs": "id_kanalu",
+                "hu": "csatorna_id",
+                "bg": "id_kanal",
+                "tr": "kanal_id"
+            }
+        },
+        "functions": {
+            "遙控器": {
+                "en": "controller",
+                "ja": "controller",
+                "ko": "controller",
+                "de": "fernsteuerung",
+                "fr": "telecommande",
+                "es": "controlador",
+                "it": "telecomando",
+                "pt-br": "controle",
+                "ru": "pult",
+                "pl": "kontroler",
+                "cs": "ovladac",
+                "hu": "taviranyito",
+                "bg": "distantsionno",
+                "tr": "uzaktan_kumanda"
+            }
+        }
+    }
+}

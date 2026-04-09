@@ -33,8 +33,8 @@
                 "next": {
                   "block": {
                     "type": "arduino_function_call",
-                    "id": "8{W8Om2_ljP;e;DvH;lk",
-                    "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"遙控器\" has_return=\"false\" return_type=\"void\"></mutation>"
+                    "id": "!lhP)x2zWWnGf4gavgX~",
+                    "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"車子\" has_return=\"false\" return_type=\"void\"></mutation>"
                   }
                 }
               }
@@ -44,8 +44,8 @@
         {
           "type": "arduino_function",
           "id": "jBj:0bB3P;WyYVtiORWZ",
-          "x": 864,
-          "y": 32,
+          "x": 690,
+          "y": -6,
           "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
           "fields": {
             "NAME": "連線完成後要做的事情"
@@ -245,95 +245,9 @@
         },
         {
           "type": "arduino_function",
-          "id": "Ocx6kqikaQ{.bQWI=-wq",
-          "x": 0,
-          "y": 112,
-          "deletable": false,
-          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
-          "fields": {
-            "NAME": "遙控器"
-          },
-          "inputs": {
-            "STACK": {
-              "block": {
-                "type": "rc_master_init",
-                "id": "2kr~;c0$Pp(2n]PMlPmb",
-                "deletable": false,
-                "movable": false,
-                "editable": false,
-                "fields": {
-                  "CHANNEL": 1
-                },
-                "inputs": {
-                  "PAIR_ID": {
-                    "shadow": {
-                      "type": "math_number",
-                      "id": ";zA6%S`X95lZzu5M%B*|",
-                      "fields": {
-                        "NUM": 1
-                      }
-                    },
-                    "block": {
-                      "type": "variables_get",
-                      "id": "wt5B=R[N;d(!_6h^*5ho",
-                      "deletable": false,
-                      "movable": false,
-                      "editable": false,
-                      "fields": {
-                        "VAR": {
-                          "id": "sJV.b.!e-]Qcm0(@e7X1"
-                        }
-                      }
-                    }
-                  }
-                },
-                "next": {
-                  "block": {
-                    "type": "controls_whileUntil",
-                    "id": "-tWZ],CY5qjPVa$$e)I]",
-                    "deletable": false,
-                    "movable": false,
-                    "editable": false,
-                    "fields": {
-                      "MODE": "WHILE"
-                    },
-                    "inputs": {
-                      "BOOL": {
-                        "block": {
-                          "type": "logic_boolean",
-                          "id": "WbC[QcSAs4x^r2Nmz6AZ",
-                          "deletable": false,
-                          "movable": false,
-                          "editable": false,
-                          "fields": {
-                            "BOOL": "TRUE"
-                          }
-                        }
-                      },
-                      "DO": {
-                        "block": {
-                          "type": "rc_send",
-                          "id": "o32wvI$v#`exPY%|I@@}",
-                          "deletable": false,
-                          "movable": false,
-                          "editable": false
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        {
-          "type": "arduino_function",
           "id": "^b5uZk)tJKQXj`ny,D;*",
-          "x": 0,
-          "y": 301,
-          "disabledReasons": [
-            "MANUALLY_DISABLED"
-          ],
+          "x": 1,
+          "y": 1465,
           "deletable": false,
           "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"></mutation>",
           "fields": {
@@ -2451,8 +2365,8 @@
         {
           "type": "arduino_function",
           "id": "kU;,7n]`(EOo1g|?R741",
-          "x": 5,
-          "y": 715,
+          "x": -1,
+          "y": 121,
           "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\"></mutation>",
           "fields": {
             "NAME": "車燈閃爍"
