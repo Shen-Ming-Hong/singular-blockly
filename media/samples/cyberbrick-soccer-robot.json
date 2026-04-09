@@ -289,115 +289,115 @@
                 },
                 "next": {
                   "block": {
-                    "type": "rc_wait_connection",
-                    "id": "4j,QyxRf*rdutNn?ST%c",
+                    "type": "controls_whileUntil",
+                    "id": "k=[i+3~x*SddKyW_;qs3",
                     "deletable": false,
                     "movable": false,
                     "editable": false,
                     "fields": {
-                      "TIMEOUT": 30
+                      "MODE": "WHILE"
                     },
-                    "next": {
-                      "block": {
-                        "type": "controls_whileUntil",
-                        "id": "k=[i+3~x*SddKyW_;qs3",
-                        "deletable": false,
-                        "movable": false,
-                        "editable": false,
-                        "fields": {
-                          "MODE": "WHILE"
-                        },
-                        "inputs": {
-                          "BOOL": {
-                            "block": {
-                              "type": "logic_boolean",
-                              "id": "7.swAcx}_G|^N^cjj7At",
-                              "deletable": false,
-                              "movable": false,
-                              "editable": false,
-                              "fields": {
-                                "BOOL": "TRUE"
-                              }
-                            }
+                    "inputs": {
+                      "BOOL": {
+                        "block": {
+                          "type": "logic_boolean",
+                          "id": "7.swAcx}_G|^N^cjj7At",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
+                          "fields": {
+                            "BOOL": "TRUE"
+                          }
+                        }
+                      },
+                      "DO": {
+                        "block": {
+                          "type": "controls_if",
+                          "id": "RcNlj-cSA_R)`9Cg)xb`",
+                          "deletable": false,
+                          "movable": false,
+                          "editable": false,
+                          "extraState": {
+                            "hasElse": true
                           },
-                          "DO": {
-                            "block": {
-                              "type": "controls_if",
-                              "id": "RcNlj-cSA_R)`9Cg)xb`",
-                              "deletable": false,
-                              "movable": false,
-                              "editable": false,
-                              "extraState": {
-                                "hasElse": true
-                              },
-                              "inputs": {
-                                "IF0": {
-                                  "block": {
-                                    "type": "rc_is_connected",
-                                    "id": "Q%4PB!en#jK9ektltx$W",
-                                    "deletable": false,
-                                    "movable": false,
-                                    "editable": false
-                                  }
-                                },
-                                "DO0": {
-                                  "block": {
-                                    "type": "cyberbrick_led_set_color",
-                                    "id": "ywzz~)J^{WURV[@}IdpG",
-                                    "deletable": false,
-                                    "movable": false,
-                                    "editable": false,
-                                    "inputs": {
-                                      "RED": {
-                                        "shadow": {
-                                          "type": "math_number",
-                                          "id": "-n?dHG3fWKT+YndPSK^[",
-                                          "deletable": false,
-                                          "movable": false,
-                                          "editable": false,
-                                          "fields": {
-                                            "NUM": 0
-                                          }
-                                        }
-                                      },
-                                      "GREEN": {
-                                        "shadow": {
-                                          "type": "math_number",
-                                          "id": ".1|`!GSoy_9{N7HocH-.",
-                                          "deletable": false,
-                                          "movable": false,
-                                          "editable": false,
-                                          "fields": {
-                                            "NUM": 255
-                                          }
-                                        }
-                                      },
-                                      "BLUE": {
-                                        "shadow": {
-                                          "type": "math_number",
-                                          "id": "d]x*T+LhyllsF!z~dICY",
-                                          "deletable": false,
-                                          "movable": false,
-                                          "editable": false,
-                                          "fields": {
-                                            "NUM": 255
-                                          }
-                                        }
+                          "inputs": {
+                            "IF0": {
+                              "block": {
+                                "type": "rc_is_connected",
+                                "id": "Q%4PB!en#jK9ektltx$W",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false
+                              }
+                            },
+                            "DO0": {
+                              "block": {
+                                "type": "cyberbrick_led_set_color",
+                                "id": "ywzz~)J^{WURV[@}IdpG",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
+                                "inputs": {
+                                  "RED": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "id": "-n?dHG3fWKT+YndPSK^[",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
+                                      "fields": {
+                                        "NUM": 0
                                       }
-                                    },
-                                    "next": {
-                                      "block": {
-                                        "type": "arduino_function_call",
-                                        "id": "H^TVmi6[Djn38HPU_A]a",
-                                        "deletable": false,
-                                        "movable": false,
-                                        "editable": false,
-                                        "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"連線完成後要做的事情\" has_return=\"false\" return_type=\"void\"></mutation>"
+                                    }
+                                  },
+                                  "GREEN": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "id": ".1|`!GSoy_9{N7HocH-.",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
+                                      "fields": {
+                                        "NUM": 255
+                                      }
+                                    }
+                                  },
+                                  "BLUE": {
+                                    "shadow": {
+                                      "type": "math_number",
+                                      "id": "d]x*T+LhyllsF!z~dICY",
+                                      "deletable": false,
+                                      "movable": false,
+                                      "editable": false,
+                                      "fields": {
+                                        "NUM": 255
                                       }
                                     }
                                   }
                                 },
-                                "ELSE": {
+                                "next": {
+                                  "block": {
+                                    "type": "arduino_function_call",
+                                    "id": "H^TVmi6[Djn38HPU_A]a",
+                                    "deletable": false,
+                                    "movable": false,
+                                    "editable": false,
+                                    "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" version=\"1\" name=\"連線完成後要做的事情\" has_return=\"false\" return_type=\"void\"></mutation>"
+                                  }
+                                }
+                              }
+                            },
+                            "ELSE": {
+                              "block": {
+                                "type": "rc_wait_connection",
+                                "id": "3Dc)[_95DM%%63;cFFCC",
+                                "deletable": false,
+                                "movable": false,
+                                "editable": false,
+                                "fields": {
+                                  "TIMEOUT": 1
+                                },
+                                "next": {
                                   "block": {
                                     "type": "cyberbrick_led_set_color",
                                     "id": "ZxAo={8R:29/)2eOq|Q%",
