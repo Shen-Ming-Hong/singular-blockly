@@ -8,6 +8,27 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.72.2] - 2026-04-09
+
+### 🐛 修復 Bug Fixes
+
+- **改善 RC 接收端斷線重連可靠性 (Improve RC slave reconnect reliability)**
+    - 新增 `_reinit_espnow()` 完整重初始化函式：重啟 WLAN 後重設 channel，修復因頻道漂移導致無法恢復的問題
+      Added `_reinit_espnow()` for full WLAN+ESP-NOW restart, fixing channel drift that prevented recovery
+    - 修復從未連線時永遠不重試的問題（條件 B：啟動後 10 秒未收到資料則自動重試）
+      Fixed never-retry issue when never connected (Condition B: retry after 10s without any data)
+    - 新增 `_rc_last_reinit` 冷卻機制（5 秒），防止高頻重啟 ESP-NOW 造成系統不穩
+      Added `_rc_last_reinit` cooldown (5s) to prevent rapid ESP-NOW restart instability
+    - 連線超時判斷從 1000ms 放寬至 1500ms，容許 GC 或偶發封包延遲不誤判為斷線
+      Relaxed connection timeout from 1000ms to 1500ms to tolerate GC and transient packet delays
+    - 修復 `rc_wait_connection` 積木重複建立 `NeoPixel(Pin(8), 1)` 物件，改為重用 `onboard_led`
+      Fixed `rc_wait_connection` block creating new `NeoPixel(Pin(8), 1)` each loop; now reuses `onboard_led`
+    - `rc_wait_connection` 等待中每輪呼叫 `_rc_maintenance()`，等待期間也能觸發斷線重連
+      `rc_wait_connection` now calls `_rc_maintenance()` each loop iteration to enable reconnect during wait
+    - 更新 `rc_slave_init` 保證 `onboard_led` 初始化，確保接收端程式始終有此物件可用
+      `rc_slave_init` now guarantees `onboard_led` initialization via `addHardwareInit`
+    - 更新 15 個語系的 `RC_IS_CONNECTED_TOOLTIP` 說明從 500ms 改為 1500ms
+
 ## [0.72.1] - 2026-04-09
 
 ### 🔒 安全性修復 Security Fixes
