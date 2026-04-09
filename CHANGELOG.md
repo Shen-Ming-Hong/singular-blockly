@@ -8,6 +8,33 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.72.1] - 2026-04-09
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 hono 多項安全漏洞 (Fix multiple hono security vulnerabilities)**
+    - 升級 `hono` 從 4.12.7 至 4.12.12
+      Upgraded `hono` from 4.12.7 to 4.12.12
+    - 嚴重程度 Severity: Medium
+    - Cookie 名稱寫入路徑缺少驗證 (GHSA-26pp-8wgv-hjvm, CVSS: 5.3)
+      Missing validation of cookie name on write path in `setCookie()`
+    - 非換行空格前綴繞過 Cookie 讀取 (CVE-2026-39410 / GHSA-r5rp-j6wh-rvv4, CVSS: 4.8)
+      Non-breaking space prefix bypass in cookie name handling in `getCookie()`
+    - IPv4-mapped IPv6 位址 IP 限制錯誤匹配 (CVE-2026-39409 / GHSA-xpcf-pg52-r92g)
+      Incorrect IP matching in `ipRestriction()` for IPv4-mapped IPv6 addresses
+    - serveStatic 重複斜線中介軟體繞過 (CVE-2026-39407 / GHSA-wmmm-f939-6g9c, CVSS: 5.3)
+      Middleware bypass via repeated slashes in `serveStatic`
+    - toSSG() 路徑遍歷寫入輸出目錄外部 (CVE-2026-39408 / GHSA-xf4j-xp2r-rqqx)
+      Path traversal in `toSSG()` allows writing files outside the output directory
+    - 關閉 Closes Dependabot Alerts #54, #55, #56, #57, #58
+- **修復 @hono/node-server 中介軟體繞過漏洞 (Fix @hono/node-server middleware bypass)**
+    - 升級 `@hono/node-server` 從 1.19.10 至 1.19.13
+      Upgraded `@hono/node-server` from 1.19.10 to 1.19.13
+    - 嚴重程度 Severity: Medium (CVE-2026-39406 / GHSA-92pp-h63x-v22m, CVSS: 5.3)
+    - serveStatic 重複斜線中介軟體繞過
+      Middleware bypass via repeated slashes in `serveStatic`
+    - 關閉 Closes Dependabot Alert #53
+
 ## [0.72.0] - 2026-04-08
 
 ### ✨ 新功能 New Features
