@@ -8,6 +8,19 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.72.3] - 2026-04-20
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 hono JSX SSR HTML 注入漏洞** (Fix hono JSX SSR HTML injection vulnerability)
+    - 透過 npm overrides 將 `hono` 從 `4.12.12` 升級至 `4.12.14`（間接依賴 via `@modelcontextprotocol/sdk` 與 `@hono/node-server`）
+      Upgraded `hono` from `4.12.12` to `4.12.14` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk` and `@hono/node-server`)
+    - 嚴重程度 Severity: Medium (CVSS: 4.3)
+    - GHSA-458j-xx4x-4375 — hono/jsx SSR 對不受信任的 JSX 屬性名稱處理不當，可能導致 HTML 注入
+      GHSA-458j-xx4x-4375 — Improper handling of untrusted JSX attribute names in hono/jsx SSR may lead to HTML injection
+    - 關閉 Dependabot Alert #59
+      Closes Dependabot Alert #59
+
 ## [0.72.2] - 2026-04-09
 
 ### 🐛 修復 Bug Fixes
