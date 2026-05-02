@@ -260,7 +260,8 @@ suite('ShadowSuggestionService Tests', () => {
 	suite('Block dictionary loading', () => {
 		test('Should load and cache dictionary', async () => {
 			const json = JSON.stringify([{ blockType: 'controls_if', connectionType: 'next' }]);
-			mockModelManager.sendPrompt.resolves(createMockResponse(json));
+			// Use callsFake so each call creates a fresh async generator (resolves shares one exhausted instance)
+			mockModelManager.sendPrompt.callsFake(() => Promise.resolve(createMockResponse(json)));
 
 			// First request triggers dictionary load
 			await service.requestSuggestion(createContext());

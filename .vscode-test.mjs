@@ -2,7 +2,7 @@ import { defineConfig } from '@vscode/test-cli';
 import path from 'path';
 import os from 'os';
 
-const testWorkspace = process.env.VSCODE_TEST_WORKSPACE || 'E:\\test\\debug_extension';
+const testWorkspace = process.env.VSCODE_TEST_WORKSPACE || path.join(os.homedir(), 'test', 'debug_extension');
 const extensionsDir = process.env.VSCODE_EXTENSIONS_DIR || path.join(os.homedir(), '.vscode', 'extensions');
 
 export default defineConfig([

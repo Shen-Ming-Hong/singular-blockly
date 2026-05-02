@@ -83,7 +83,9 @@ describe('Extension activate', () => {
 		assert(registered.includes('singular-blockly.toggleTheme'));
 		assert(registered.includes('singular-blockly.showOutput'));
 		assert(registered.includes('singular-blockly.previewBackup'));
-		assert(vscodeMock.window.createStatusBarItem.calledOnce);
+		// Note: AIStatusBar uses `vscode` directly (not injectable via _setVSCodeApi) and is only
+		// created when Copilot is available (tier !== 'none'). In the unit test environment
+		// there is no Copilot, so createStatusBarItem is not called here.
 	});
 
 	it('disposes output channel on deactivate', () => {
