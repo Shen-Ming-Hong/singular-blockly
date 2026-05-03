@@ -158,7 +158,7 @@
 ## Assumptions
 
 - **目標硬體**：舊版 fischertechnik TXT Controller（非 TXT 4.0），運行 ftCommunity 社群韌體，SD 卡開機，不覆蓋原廠韌體
-- **TXT 端環境**：ftCommunity firmware 已安裝；Python 3 可執行；ftrobopy 已安裝（`pip install ftrobopy`）；SSH 服務已啟用（ftCommunity 預設開啟）
+- **TXT 端環境**：ftCommunity firmware 已安裝；Python 3 可執行；ftrobopy 已安裝（`pip install ftrobopy`）；SSH 服務已啟用（ftCommunity 預設開啟）；**預設 SSH 帳號為 `ftc`**（ftCommunity 固定帳號，`singular-blockly.txt.username` 預設值應填入此值）
 - **連線方式**：底層統一視為 IP + SSH 連線。**預設採用 USB 網路介面**（ftCommunity 韌體透過 USB CDC-ECM 在傳輸線上模擬乙太網路，TXT 端固定 IP `192.168.7.2`，Host 端為 `192.168.7.1`）；學生只需接上 USB 傳輸線即可連線，無需輸入任何設定。Wi-Fi 或有線 LAN 亦支援（使用者修改 host IP 設定即可）。USB 連線在 macOS/Linux 免驅動；Windows 10 1903+ 內建 CDC-ECM 驅動，一般教學環境免手動安裝。USB 自動掃描（mDNS/Bonjour 探索）屬後續版本範圍
 - **TXT 4.0 不在範圍內**：TXT 4.0 使用完全不同的 API（ROBO Pro Coding），若未來支援需作為獨立 board 類型
 - **I/O Test Server**：Test Panel 需要 TXT 端執行一個 Python HTTP server（`txt-runtime/io_server.py`）；Extension 提供「安裝 TXT Runtime」命令（VS Code Command Palette），一次性透過 SCP 上傳 server 腳本並以 SSH 在背景啟動，使用者首次使用前執行一次即可

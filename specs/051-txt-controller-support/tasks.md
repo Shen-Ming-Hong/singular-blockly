@@ -36,9 +36,9 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
 - [ ] T006 建立 `src/types/txt.ts`，定義以下型別（詳見 data-model.md）：`TxtConnectionConfig`、`TxtDeviceState`（union type）、`TxtIoSnapshot`、`TxtUploadStage`、`TxtUploadProgress`、`TxtUploadResult`、`TxtUploadRequest`
   - **M2**：`TxtDeviceState` 的唯一擁有者為 `TxtConnectionService`（singleton，由 extension.ts 建立後注入 `TxtUploader` 與 `TxtTestService` 建構函式）；任何狀態轉換均透過 `TxtConnectionService.setState()` 進行，避免兩個 Service 各自維護獨立狀態造成衝突
 - [ ] T007 [P] 建立 `media/blockly/blocks/txt.js`，定義 7 個 TXT 積木（HSV 200 色彩）：`txt_init`、`txt_motor_speed`（含 MOTOR 下拉/SPEED 數字/DIRECTION 下拉）、`txt_motor_stop`、`txt_output`（含 STATE ON/OFF）、`txt_input_read`（Value 輸出）、`txt_wait`（MS 欄位）、`txt_stop_all`（詳見 contracts/txt-blocks-api.md）
-- [ ] T008 [P] 建立 `media/blockly/generators/txt/txt.js`，實作全部 7 個積木的 Python generator（ftrobopy API；addImport() 去重；connectionHost_ 注入；DIRECTION BACKWARD → 負速度值；詳見 contracts/txt-blocks-api.md）
+- [ ] T008 [P] 建立 `media/blockly/generators/txt/txt.js`，實作全部 7 個積木的 Python generator（ftrobopy API；addImport() 去重；`txt_init` generator 透過 `window.txtConnectionHost_`（由 T015 在 `txtLoadConfig` 回應時寫入）取得 host，生成 `ftrobopy.ftrobopy('{host}', 65000)` 呼叫；DIRECTION BACKWARD → 負速度值；詳見 contracts/txt-blocks-api.md）
 - [ ] T009 [P] 建立 `media/toolbox/categories/txt.json`，定義「TXT 控制器」工具箱類別，包含全部 7 個積木的 toolbox XML entry
-- [ ] T010 更新 `media/toolbox/index.json` 加入 txt 類別；在 `media/html/blocklyEdit.html` 加入 `<script>` 引用 `txt.js` blocks 和 generators（僅當 board=TXT 時載入）
+- [ ] T010 更新 `media/toolbox/index.json` 加入 txt 類別；在 `media/html/blocklyEdit.html` 加入 `<script>` 引用 `txt.js` blocks 和 generators（僅當 board=TXT 時載入）；同步在 blocklyEdit.html 的開發板下拉選單 `<select>` 中新增 `<option value="txt">TXT Controller</option>`（FR-001）
 
 **Checkpoint**：型別系統與積木框架就緒，可開始 User Story 實作
 
@@ -56,12 +56,13 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
   - `storePassword(password: string): Promise<void>`（`context.secrets`，key = `singular-blockly.txt.password`）
   - `getPassword(): Promise<string | undefined>`
   - `testConnection(): Promise<{success: boolean; error?: string}>`（node-ssh connect → 執行 `echo ok` → dispose，5 秒 timeout）
+  - `setState(newState: TxtDeviceState): void`（唯一的狀態轉換入口，供 TxtUploader 與 TxtTestService 呼叫；呼叫方需注入此 service 實例）
   - 注意：任何 log 語句不得包含密碼欄位
 - [ ] T012 [P] 建立 `src/test/suite/txtConnectionService.test.ts`：mock `vscode.SecretStorage`、mock `node-ssh`（connect 成功/失敗）、測試 testConnection 成功路徑、連線失敗路徑（timeout、auth error）、saveConfig/loadConfig 往返
 - [ ] T013 更新 `src/webview/messageHandler.ts`，在 switch-case 新增：`txtSaveConfig`（呼叫 TxtConnectionService.saveConfig + storePassword）、`txtLoadConfig`（載入並回傳設定，不含密碼）、`txtTestConnection`（呼叫 testConnection，postMessage 回傳結果）
 - [ ] T014 [P] 在 `media/html/blocklyEdit.html` 新增 TXT 連線設定區塊（預設折疊；僅選 TXT 板時顯示；欄位：Host IP、Username、Password 輸入框、「儲存設定」按鈕、「測試連線」按鈕、狀態文字區）
-- [ ] T015 在 `media/js/blocklyEdit.js` 新增 TXT 連線設定 UI 邏輯：board 切換時顯示/隱藏連線設定區、點擊儲存→ `vscode.postMessage({command:'txtSaveConfig',...})`、點擊測試→ postMessage + 顯示 spinner + 接收成功/失敗回應
-- [ ] T016 [P] 在 `package.json` contributes.configuration 新增 4 個 TXT 設定鍵：`singular-blockly.txt.host`（預設值 `"192.168.7.2"`，對應 USB CDC-ECM 固定 IP）、`singular-blockly.txt.username`、`singular-blockly.txt.remotePath`、`singular-blockly.txt.runtimePort`
+- [ ] T015 在 `media/js/blocklyEdit.js` 新增 TXT 連線設定 UI 邏輯：board 切換時顯示/隱藏連線設定區、點擊儲存→ `vscode.postMessage({command:'txtSaveConfig',...})`、點擊測試→ postMessage + 顯示 spinner + 接收成功/失敗回應；`txtLoadConfig` 回應到達時將 host 值存入模組變數 `window.txtConnectionHost_`（供 T008 generator 讀取）
+- [ ] T016 [P] 在 `package.json` contributes.configuration 新增 4 個 TXT 設定鍵：`singular-blockly.txt.host`（預設值 `"192.168.7.2"`，對應 USB CDC-ECM 固定 IP）、`singular-blockly.txt.username`（預設值 `"ftc"`，ftCommunity 預設 SSH 帳號）、`singular-blockly.txt.remotePath`、`singular-blockly.txt.runtimePort`（預設值 `8080`，io_server.py 監聽埠）
 
 **Checkpoint**：US2 完整可測試——填入設定並驗證連線，不需上傳程式
 
@@ -126,8 +127,8 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
 - [ ] T028 建立 `src/services/txtTestService.ts`，實作 `TxtTestService` 類別：
   - `installRuntime(): Promise<void>`（SSH SCP 上傳 `io_server.py` 到 TXT，設定執行權限）
   - `startServer(): Promise<void>` / `stopServer(): Promise<void>`（SSH execCommand）
-  - `pollIo(): Promise<TxtIoSnapshot>`（HTTP GET `http://{host}:8080/io`，< 400ms）
-  - `setMotor(motor, speed)` / `setOutput(output, level)` / `stopAll()`（HTTP POST）
+  - `pollIo(): Promise<TxtIoSnapshot>`（HTTP GET `http://{host}:{runtimePort}/io`，port 從 `singular-blockly.txt.runtimePort` 設定讀取，預設 `8080`，< 400ms）
+  - `setMotor(motor, speed)` / `setOutput(output, level)` / `stopAll()`（HTTP POST，同樣使用 `runtimePort`）
 - [ ] T029 [P] 建立 `src/test/suite/txtTestService.test.ts`：mock HTTP fetch（pollIo 成功/失敗）、mock node-ssh（installRuntime SCP）、測試 stopAll 發出正確 HTTP payload
 - [ ] T030 更新 `src/webview/messageHandler.ts`，新增 Test Panel routes：`txtTestInstallRuntime`、`txtOpenTestPanel`（呼叫 webviewManager）、`txtTestSetMotor`、`txtTestSetOutput`、`txtTestStopAll`、`txtTestPollIo`（回傳 TxtIoSnapshot 給 Test Panel）
 - [ ] T031 在 `src/extension.ts` 註冊命令 `singular-blockly.txt.installRuntime`、`singular-blockly.txt.openTestPanel`；在 `package.json` contributes.commands 加入（含 i18n title）
