@@ -1,11 +1,9 @@
 {
   "ai": "copilot",
-  "ai_commands_dir": null,
-  "ai_skills": false,
   "branch_numbering": "sequential",
+  "context_file": ".github/copilot-instructions.md",
   "here": true,
-  "offline": false,
-  "preset": null,
-  "script": "ps",
-  "speckit_version": "0.4.0"
+  "integration": "copilot",
+  "script": "sh",
+  "speckit_version": "0.8.5.dev0"
 }

@@ -225,3 +225,8 @@ Conventional Commits with scopes: `feat(blocks)`, `fix(webview)`, `i18n(ja)`, `c
 4. **i18n placeholders**: Use `{0}`, `{1}` format in `messages.js`, not `%s`
 5. **`alwaysGenerateBlocks_`**: These are scanned by container blocks — do not skip them in `workspaceToCode`
 6. **ESLint scope**: Only `src/` TypeScript is linted; `media/js/` and `media/blockly/` are excluded (browser context)
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
