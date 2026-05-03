@@ -191,6 +191,61 @@ await context.secrets.delete('singular-blockly.txt.password');
 
 ---
 
+## 研究議題七：USB 網路介面（教學場域連線方式分析）
+
+**決策**：USB CDC-ECM 為教學場域**首選**連線方式；Wi-Fi 保留為可選備用。Extension 預設將 `singular-blockly.txt.host` 帶入 `192.168.7.2`，學生接上 USB 線即可使用，無需手動輸入 IP。
+
+**背景**
+
+ftCommunity 韌體透過 Linux USB Ethernet Gadget（`g_ether`）在 USB 傳輸線上模擬乙太網路介面。原始協定為 RNDIS；因 Linux kernel 準備移除 RNDIS 支援，ftCommunity 社群已計畫遷移至 CDC-ECM（issue #245 "Rework USB-PC-Connection"，已於 v1.1 合併 PR #246）。
+
+**USB vs Wi-Fi 教學場域比較**
+
+| 比較項目 | Wi-Fi | USB CDC-ECM |
+|----------|-------|-------------|
+| 需要事前網路設定 | ✅ 需設定 SSID/密碼 | ❌ 無需任何設定 |
+| IP 位址 | DHCP 分配，每次可能不同 | 固定（`192.168.7.2`），永不變動 |
+| 佔用學校網路頻寬/資源 | ✅ 是 | ❌ 點對點，完全不佔用 |
+| 多台裝置互相干擾 | 可能（同一 Wi-Fi 下） | 不可能（每條 USB 線獨立） |
+| 學生設定負擔 | 高（每台都要輸入） | **零**（接線即用） |
+| Windows 驅動需求 | 無 | CDC-ECM：Windows 10 1903+ 內建驅動免手動安裝 |
+| macOS / Linux | 無需設定 | 自動辨識，免驅動 |
+
+**固定 IP 依據**
+
+ftCommunity issue #222 說明 USB g_ether 比照 Raspberry Pi Zero USB 網路模式（同一 Raspberry Pi 論壇 workaround），Pi Zero 標準 IP 分配為：
+- Device（TXT）端：`192.168.7.2`
+- Host（PC）端：`192.168.7.1`
+
+原廠 fischertechnik 韌體的 `S98usb_g_ether` 初始化腳本同樣遵循此 IP 範圍；ftCommunity 韌體相容原廠設計。
+
+**Windows 驅動狀況**
+
+- **RNDIS（舊版）**：Windows 需手動安裝驅動，且 Linux 正在移除 RNDIS 支援（Linux Security 2023 資訊）
+- **CDC-ECM（v1.1 後）**：Windows 10 version 1903（2019 年 5 月）後內建驅動，現代 Windows 環境（10/11）通常免手動安裝
+- **結論**：使用 Windows 10 1903+ 的教學環境接上 USB 後應自動辨識
+
+**教學場域建議**
+
+1. USB 連線 + 固定 IP `192.168.7.2` 為**零設定**方案：接上 USB 線，直接點擊上傳
+2. Wi-Fi 連線保留為**進階/備用**選項（使用者可手動修改 host IP）
+3. Extension 將 `singular-blockly.txt.host` 的預設值設為 `192.168.7.2`
+
+**ftCommunity issue 查證**
+
+| Issue | 狀態 | 說明 |
+|-------|------|------|
+| #222 "make g_ether usable under windows" | Not planned（已改由 #245 處理） | 指出 RNDIS 問題根源，指向遷移 CDC-ECM |
+| #245 "Rework USB-PC-Connection" | Completed（v1.1，PR #246） | 正式遷移至 CDC-ECM，支援 IP/DHCP 設定選項 |
+| #233 "Random Kernel Panics when using usb to PC" | Not planned | 已知偶發問題，v1.1 後改善 |
+
+**被拒絕的替代方案**
+
+- **mDNS / Bonjour 探索**：TXT 端需安裝 avahi；不在第一版範圍（列為 Assumptions）
+- **USB 序列埠 (ttyUSB)**：需另外的 Python REPL server；複雜度遠高於 SSH over USB 網路
+
+---
+
 ## 研究摘要表
 
 | 議題 | 決策 | 信心度 |
@@ -201,5 +256,6 @@ await context.secrets.delete('singular-blockly.txt.password');
 | SecretStorage | VS Code 內建 context.secrets API | 高（官方文件） |
 | TxtDeviceState 狀態機 | Union type + 狀態轉換函式 | 高 |
 | Blockly Generator 模式 | 獨立 txtGenerator，反轉用負值 | 高 |
+| USB CDC-ECM 連線方式 | 固定 IP `192.168.7.2`，預設帶入；Wi-Fi 為備用 | 中高（github issues 查證，IP 比照 Pi Zero 標準） |
 | Webpack 相容性 | node-ssh 需 externals 設定 | 中（待 Phase A 實際驗證） |
 | ftCommunity Python 版本 | 推測 3.6+，避免新語法 | 中（待實機確認） |

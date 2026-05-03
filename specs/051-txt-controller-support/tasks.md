@@ -61,7 +61,7 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
 - [ ] T013 更新 `src/webview/messageHandler.ts`，在 switch-case 新增：`txtSaveConfig`（呼叫 TxtConnectionService.saveConfig + storePassword）、`txtLoadConfig`（載入並回傳設定，不含密碼）、`txtTestConnection`（呼叫 testConnection，postMessage 回傳結果）
 - [ ] T014 [P] 在 `media/html/blocklyEdit.html` 新增 TXT 連線設定區塊（預設折疊；僅選 TXT 板時顯示；欄位：Host IP、Username、Password 輸入框、「儲存設定」按鈕、「測試連線」按鈕、狀態文字區）
 - [ ] T015 在 `media/js/blocklyEdit.js` 新增 TXT 連線設定 UI 邏輯：board 切換時顯示/隱藏連線設定區、點擊儲存→ `vscode.postMessage({command:'txtSaveConfig',...})`、點擊測試→ postMessage + 顯示 spinner + 接收成功/失敗回應
-- [ ] T016 [P] 在 `package.json` contributes.configuration 新增 4 個 TXT 設定鍵（`singular-blockly.txt.host`、`singular-blockly.txt.username`、`singular-blockly.txt.remotePath`、`singular-blockly.txt.runtimePort`）
+- [ ] T016 [P] 在 `package.json` contributes.configuration 新增 4 個 TXT 設定鍵：`singular-blockly.txt.host`（預設值 `"192.168.7.2"`，對應 USB CDC-ECM 固定 IP）、`singular-blockly.txt.username`、`singular-blockly.txt.remotePath`、`singular-blockly.txt.runtimePort`
 
 **Checkpoint**：US2 完整可測試——填入設定並驗證連線，不需上傳程式
 
