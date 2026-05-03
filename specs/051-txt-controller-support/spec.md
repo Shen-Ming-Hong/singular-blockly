@@ -164,6 +164,6 @@
 - **I/O Test Server**：Test Panel 需要 TXT 端執行一個 Python HTTP server（`txt-runtime/io_server.py`）；Extension 提供「安裝 TXT Runtime」命令（VS Code Command Palette），一次性透過 SCP 上傳 server 腳本並以 SSH 在背景啟動，使用者首次使用前執行一次即可
 - **BoardLanguage 擴展**：新增 `'txt'` 作為第三個 BoardLanguage，獨立於 `'arduino'` 和 `'micropython'`，因 ftrobopy API 與 MicroPython machine API 語意完全不同
 - **SSH 函式庫**：使用 `node-ssh` npm 套件提供 SSH/SCP 功能；此為 extension 的新 npm dependency
-- **積木集範圍**：第一版僅支援 M1-M4 馬達（速度 0~8 步，正/反轉）、O1-O8 輸出、I1-I8 **數位**輸入（state() 回傳 0 或 1）、等待、全部停止；encoder、類比感測器、counter、servo 馬達為後續版本
+- **積木集範圍**：第一版僅支援 M1-M4 馬達（速度 0~512，正/反轉）、O1-O8 輸出、I1-I8 **數位**輸入（state() 回傳 0 或 1）、等待、全部停止；encoder、類比感測器、counter、servo 馬達為後續版本
 - **速度範圍**：ftrobopy `motor(N).setSpeed(v)` 已查證：v 為 -512~512（正數正轉、負數反轉、0 停止）；**無** `Motor.left`/`Motor.right` 常數參數。Blockly UI 採 0~512 + 方向選項，generator 將反轉時轉成 `-v` 傳入 `setSpeed()`
 - **程式執行模式**：產生單一 `main.py`，透過 SSH 執行；不支援多檔案或模組化程式結構
