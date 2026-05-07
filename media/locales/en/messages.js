@@ -1010,6 +1010,9 @@ window.languageManager.loadMessages('en', {
 	TXT_UPLOAD_STAGE_EXECUTING: 'Executing program...',
 	TXT_UPLOAD_STAGE_COMPLETED: 'Completed',
 	TXT_UPLOAD_STAGE_FAILED: 'Upload failed',
+	TXT_RUN_SUCCESS: 'Program finished',
+	TXT_RUN_FAILED: 'Failed to run program: {0}',
+	TXT_STOP_SUCCESS: 'Program stopped',
 	// Block labels
 	TXT_INIT: 'Initialize TXT Controller',
 	TXT_INIT_TOOLTIP: 'Connect to the fischertechnik TXT Controller',

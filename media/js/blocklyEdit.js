@@ -3157,6 +3157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			case 'txtExecutionStopped':
 				setUploadButtonState('txt-ready');
+				toast.show(window.languageManager?.getMessage('TXT_STOP_SUCCESS', 'Program stopped') || 'Program stopped', 'info');
 				break;
 
 			// TXT Controller 連線設定回應
@@ -4444,11 +4445,11 @@ function handleTxtUploadResult(message) {
 	setUploadButtonState('txt-ready');
 	if (message.success) {
 		const elapsed = message.duration ? (message.duration / 1000).toFixed(1) : '';
-		let msg = window.languageManager?.getMessage('UPLOAD_SUCCESS', 'Upload successful!');
+		let msg = window.languageManager?.getMessage('TXT_RUN_SUCCESS', 'Program finished');
 		if (elapsed) msg += ` (${elapsed}s)`;
 		toast.show(msg, 'success');
 	} else {
-		const failedTemplate = window.languageManager?.getMessage('UPLOAD_FAILED', 'Upload failed: {0}') || 'Upload failed: {0}';
+		const failedTemplate = window.languageManager?.getMessage('TXT_RUN_FAILED', 'Failed to run program: {0}') || 'Failed to run program: {0}';
 		const errDetail = message.error || 'unknown error';
 		toast.show(failedTemplate.replace('{0}', errDetail), 'error', 5000);
 	}
