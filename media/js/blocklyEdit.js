@@ -4772,6 +4772,7 @@ const TXT_POLL_INTERVAL_MS = 0;
 
 const txtTestState = {
 	pollTimer: null,
+	reconnectTimer: null,
 	polling: false,
 	failureCount: 0,
 	motorDir: [1, 1, 1, 1],   // 1=Forward, -1=Backward
@@ -4885,16 +4886,6 @@ function initTxtTestDialog() {
 		closeBtn.addEventListener('click', closeTxtTestDialog);
 	}
 
-	// Retry button
-	const retryBtn = document.getElementById('txtTestRetryBtn');
-	if (retryBtn) {
-		retryBtn.addEventListener('click', () => {
-			retryBtn.style.display = 'none';
-			txtTestState.failureCount = 0;
-			updateTxtTestStatus('connected');
-			startTxtTestPolling();
-		});
-	}
 
 	// Close on backdrop click
 	dialog.addEventListener('click', (e) => {
@@ -4978,6 +4969,10 @@ function stopTxtTestPolling() {
 		clearTimeout(txtTestState.pollTimer);
 		txtTestState.pollTimer = null;
 	}
+	if (txtTestState.reconnectTimer !== null) {
+		clearTimeout(txtTestState.reconnectTimer);
+		txtTestState.reconnectTimer = null;
+	}
 }
 
 function pauseTxtTestPolling() {
@@ -4997,18 +4992,14 @@ function resumeTxtTestPolling() {
 function updateTxtTestStatus(status) {
 	const dot = document.getElementById('txtTestStatusDot');
 	const text = document.getElementById('txtTestStatusText');
-	const retryBtn = document.getElementById('txtTestRetryBtn');
 	if (!dot || !text) return;
 	dot.className = 'txt-test-status-dot';
-	retryBtn.style.display = 'none';
 	if (status === 'connected') {
 		dot.classList.add('connected');
 		text.textContent = 'Connected';
 	} else if (status === 'disconnected') {
 		dot.classList.add('disconnected');
 		text.textContent = 'Disconnected';
-		retryBtn.style.display = '';
-		retryBtn.textContent = 'Retry';
 	} else if (status === 'paused') {
 		dot.classList.add('paused');
 		text.textContent = 'Paused';
@@ -5039,8 +5030,18 @@ function handleTxtTestIoUpdate(snapshot) {
 function handleTxtTestPollFailure() {
 	txtTestState.failureCount++;
 	if (txtTestState.failureCount >= 3) {
+		// 連續失敗 3 次：停止輪詢，3 秒後自動重連
 		stopTxtTestPolling();
 		updateTxtTestStatus('disconnected');
+		txtTestState.reconnectTimer = setTimeout(() => {
+			txtTestState.reconnectTimer = null;
+			const dialog = document.getElementById('txtTestPanelDialog');
+			if (dialog && dialog.open) {
+				txtTestState.failureCount = 0;
+				updateTxtTestStatus('connecting');
+				vscode.postMessage({ command: 'txtTestDialogOpen' });
+			}
+		}, 3000);
 	} else {
 		// 短暫失敗時仍繼續輪詢
 		schedulePoll();
