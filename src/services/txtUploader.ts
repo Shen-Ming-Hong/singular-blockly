@@ -10,7 +10,7 @@ import { log } from './logging';
 import { TxtConnectionService } from './txtConnectionService';
 import { TxtUploadProgress, TxtUploadResult, TxtUploadStage } from '../types/txt';
 
-const WATCHDOG_TIMEOUT_MS = 30000;
+const WATCHDOG_TIMEOUT_MS = 3_600_000; // 1 hour — user programs run until Stop is pressed
 const REMOTE_DIR = '/tmp/singular_blockly';
 
 /**
@@ -114,6 +114,14 @@ export class TxtUploader {
 			return fail('Upload cancelled by user', 'cancelled');
 		}
 
+		let watchdogTimer: ReturnType<typeof setTimeout> | null = null;
+		const clearWatchdog = () => {
+			if (watchdogTimer) {
+				clearTimeout(watchdogTimer);
+				watchdogTimer = null;
+			}
+		};
+
 		try {
 			// --- Stage: uploading ---
 			report('uploading', 40, `Uploading program to ${config.remotePath}...`);
@@ -137,10 +145,20 @@ export class TxtUploader {
 			report('uploading', 60, 'Program uploaded successfully.');
 
 			if (this.stopRequested) {
-				ssh.dispose();
-				this.currentSsh = null;
+				report('completed', 100, 'Program execution completed.');
 				this.txtConnectionService.setState('Idle');
-				return fail('Upload cancelled by user', 'cancelled');
+				return { success: true, timestamp: new Date().toISOString(), duration: Date.now() - startTime };
+			}
+
+			// 若 io_server.py 正在背景執行（Test Panel 遺留），先停止以釋放 ftrobopy 序列埠
+			// 只有 io_server.py 確實存在時才 sleep 1，讓序列埠完整釋放後再啟動
+			await ssh.execCommand('if pkill -f io_server.py; then sleep 1; fi');
+
+			// 若 Stop 在 io_server pkill / sleep 期間被觸發，提早返回，不啟動 python3
+			if (this.stopRequested) {
+				report('completed', 100, 'Program execution completed.');
+				this.txtConnectionService.setState('Idle');
+				return { success: true, timestamp: new Date().toISOString(), duration: Date.now() - startTime };
 			}
 
 			// --- Stage: executing ---
@@ -149,17 +167,10 @@ export class TxtUploader {
 			this.outputChannel.show(true);
 			this.outputChannel.appendLine('--- Program Output ---');
 
-			let watchdogTimer: ReturnType<typeof setTimeout> | null = setTimeout(() => {
+			watchdogTimer = setTimeout(() => {
 				log('[TXT] Watchdog timeout triggered', 'warn');
 				this.stopExecution().catch(() => {});
 			}, WATCHDOG_TIMEOUT_MS);
-
-			const clearWatchdog = () => {
-				if (watchdogTimer) {
-					clearTimeout(watchdogTimer);
-					watchdogTimer = null;
-				}
-			};
 
 			try {
 				const result = await ssh.execCommand(`python3 ${config.remotePath}`, {
@@ -196,6 +207,16 @@ export class TxtUploader {
 				timestamp: new Date().toISOString(),
 				duration: Date.now() - startTime,
 			};
+		} catch (outerErr) {
+			// SSH 連線在 upload 執行中被 stopExecution().dispose() 切斷時的處理
+			clearWatchdog();
+			if (this.stopRequested) {
+				report('completed', 100, 'Program execution completed.');
+				this.txtConnectionService.setState('Idle');
+				return { success: true, timestamp: new Date().toISOString(), duration: Date.now() - startTime };
+			}
+			const msg = outerErr instanceof Error ? outerErr.message : String(outerErr);
+			return fail(`Upload error: ${msg}`, msg);
 		} finally {
 			ssh.dispose();
 			this.currentSsh = null;
@@ -210,21 +231,28 @@ export class TxtUploader {
 		log('[TXT] stopExecution requested', 'info');
 		this.outputChannel.appendLine('[TXT] Stopping execution...');
 
-		const config = this.txtConnectionService.loadConfig();
-		const password = await this.txtConnectionService.getPassword();
-
-		if (!password) {
-			return;
+		// 立即切斷目前的 SSH 連線：
+		// main.py 為一般 SSH exec（非 nohup），SSH 斷線後收到 SIGHUP 就會結束
+		// 同時也會解除 io_server pkill sleep 的阻塞（若正好在那個視窗期）
+		const runningSession = this.currentSsh;
+		if (runningSession) {
+			try { runningSession.dispose(); } catch { /* 已切斷，忽略 */ }
+			this.currentSsh = null;
 		}
+
+		// 備用 pkill：處理 main.py 在 dispose 後才啟動的競態條件
+		// 使用 getPasswordOrDefault() 確保不需使用者互動（預設密碼為 ftc）
+		const config = this.txtConnectionService.loadConfig();
+		const password = await this.txtConnectionService.getPasswordOrDefault();
 
 		try {
 			const ssh = await this.sshClientFactory();
-			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 30000 });
+			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 10000 });
 			await ssh.execCommand('pkill -f main.py || true');
 			ssh.dispose();
 			this.outputChannel.appendLine('[TXT] Program stopped.');
 		} catch (err) {
-			log(`[TXT] stopExecution error: ${err}`, 'warn');
+			log(`[TXT] stopExecution pkill error: ${err}`, 'warn');
 		} finally {
 			this.txtConnectionService.setState('Idle');
 		}

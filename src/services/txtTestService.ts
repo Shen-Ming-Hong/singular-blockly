@@ -107,6 +107,31 @@ export class TxtTestService {
 	}
 
 	/**
+	 * 透過單一 SSH 會話完成「安裝 + 啟動」，省去第二次 SSH 握手開銷。
+	 */
+	async installAndStartServer(): Promise<void> {
+		const config = this.connectionService.loadConfig();
+		const password = await this.connectionService.getPasswordOrDefault();
+		const localPath = vscode.Uri.joinPath(this.extensionUri, 'txt-runtime', RUNTIME_REMOTE_FILENAME).fsPath;
+
+		log(`[TxtTestService] installAndStartServer: connecting to ${config.host}`, 'info');
+		const ssh = await this.sshClientFactory();
+		try {
+			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 30000 });
+			await ssh.execCommand(`mkdir -p ${RUNTIME_REMOTE_DIR}`);
+			await ssh.putFile(localPath, RUNTIME_REMOTE_PATH);
+			await ssh.execCommand(`chmod +x ${RUNTIME_REMOTE_PATH}`);
+			// 先停掉用戶程式和舊的 io_server 實例，確保 ftrobopy 連線可用
+			await ssh.execCommand('pkill -f main.py || true; pkill -f io_server.py || true; sleep 1');
+			// nohup 後接 sleep 3，讓 execCommand 等待 Python 真正進入 serve_forever() 再返回
+			await ssh.execCommand(`nohup python3 ${RUNTIME_REMOTE_PATH} ${config.runtimePort} > ${RUNTIME_REMOTE_DIR}/io_server.log 2>&1 & sleep 3`);
+			log('[TxtTestService] installAndStartServer: completed', 'info');
+		} finally {
+			ssh.dispose();
+		}
+	}
+
+	/**
 	 * 透過 SSH 在背景啟動 io_server.py
 	 */
 	async startServer(): Promise<void> {
@@ -117,7 +142,10 @@ export class TxtTestService {
 		const ssh = await this.sshClientFactory();
 		try {
 			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 30000 });
-			await ssh.execCommand(`python3 ${RUNTIME_REMOTE_PATH} ${config.runtimePort} &`);
+			// pkill 先停掉舊的實例，再用 nohup 確保 SSH 斷線後程序持續執行
+			await ssh.execCommand('pkill -f main.py || true; pkill -f io_server.py || true; sleep 1');
+			// nohup 後接 sleep 3，讓 execCommand 等待 Python 真正進入 serve_forever() 再返回
+			await ssh.execCommand(`nohup python3 ${RUNTIME_REMOTE_PATH} ${config.runtimePort} > ${RUNTIME_REMOTE_DIR}/io_server.log 2>&1 & sleep 3`);
 			log('[TxtTestService] startServer: io_server.py started', 'info');
 		} finally {
 			ssh.dispose();
@@ -189,5 +217,21 @@ export class TxtTestService {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({}),
 		});
+	}
+
+	/**
+	 * 設定輸入感測器類型（HTTP POST /sensor_config）
+	 * @param sensorTypes 長度 8 的陣列，每個元素為 'BUTTON'、'GATE'、'SWITCH' 或 'ULTRASONIC'
+	 */
+	async configureSensors(sensorTypes: string[]): Promise<void> {
+		const response = await this.fetchFn(`${this.baseUrl()}/sensor_config`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ sensors: sensorTypes }),
+		});
+		if (!response.ok) {
+			const body = (await response.json().catch(() => ({}))) as { error?: string };
+			throw new Error(`configureSensors failed: HTTP ${response.status}${body.error ? ' – ' + body.error : ''}`);
+		}
 	}
 }

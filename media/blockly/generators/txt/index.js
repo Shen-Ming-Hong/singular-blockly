@@ -43,11 +43,17 @@ window.txtGenerator.imports_ = new Set();
 window.txtGenerator.functions_ = new Map();
 
 /**
+ * 輸入感測器配置追蹤（port → sensorType）
+ */
+window.txtGenerator.inputConfigs_ = new Map();
+
+/**
  * 重置生成器狀態
  */
 window.txtGenerator.reset = function () {
 	this.imports_.clear();
 	this.functions_.clear();
+	this.inputConfigs_.clear();
 };
 
 /**
@@ -56,6 +62,33 @@ window.txtGenerator.reset = function () {
  */
 window.txtGenerator.addImport = function (importStatement) {
 	this.imports_.add(importStatement);
+};
+
+/**
+ * 記錄輸入感測器配置，供 txt_main 生成 setConfig()
+ * @param {number} port 輸入埠號（1~8）
+ * @param {string} sensorType 感測器類型 'BUTTON' | 'GATE' | 'ULTRASONIC'
+ */
+window.txtGenerator.addInputConfig = function (port, sensorType) {
+	this.inputConfigs_.set(port, sensorType);
+};
+
+/**
+ * 根據已記錄的感測器配置，生成 setConfig() + updateConfig() 程式碼
+ * 只有在使用非預設感測器（如超音波）時才生成
+ * @returns {string} setConfig 程式碼，或空字串
+ */
+window.txtGenerator.buildSetConfig = function () {
+	const needsConfig = [...this.inputConfigs_.values()].some(t => t === 'ULTRASONIC');
+	if (!needsConfig) return '';
+	const inputConfigs = [];
+	for (let i = 1; i <= 8; i++) {
+		const t = this.inputConfigs_.get(i);
+		inputConfigs.push(t === 'ULTRASONIC' ? '(txt.C_ULTRASONIC, txt.C_ANALOG)' : '(txt.C_SWITCH, txt.C_DIGITAL)');
+	}
+	return `M, I = txt.getConfig()\n` +
+		`I = [${inputConfigs.join(', ')}]\n` +
+		`txt.setConfig(M, I)\ntxt.updateConfig()`;
 };
 
 /**
@@ -138,6 +171,11 @@ window.txtGenerator.finish = function (code) {
 
 	let fullCode = '# === TXT Controller Python ===\n';
 	fullCode += `# Generated: ${new Date().toISOString()}\n\n`;
+
+	// 抑制 SIGTERM 時 ftrobopy Thread-1 印出的 SerialException 雜訊
+	// sys._is_finalizing() 為 True 代表 Python 正在關閉，此時的 thread exception 可安全忽略
+	fullCode += 'import threading as _t, sys as _s\n';
+	fullCode += '_t.excepthook = lambda a: None if _s._is_finalizing() else _t.__excepthook__(a)\n\n';
 
 	if (imports) {
 		fullCode += '# [1] Imports\n';

@@ -3156,7 +3156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 
 			case 'txtExecutionStopped':
-				setUploadButtonState('ready');
+				setUploadButtonState('txt-ready');
 				break;
 
 			// TXT Controller 連線設定回應
@@ -3177,6 +3177,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 				handleTxtTestPollFailure();
 				break;
 
+			case 'txtTestSensorConfigFailed':
+				// 感測器設定失敗：UI 反映錯誤但不中斷連線
+				handleTxtTestSensorConfigFailed(message.error);
+				break;
+
 			case 'txtTestPause':
 				pauseTxtTestPolling();
 				break;
@@ -3192,6 +3197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			case 'txtInstallRuntimeDone':
 				if (message.success) {
 					updateTxtTestStatus('connected');
+					startTxtTestPolling();
 				} else {
 					updateTxtTestStatus('disconnected');
 				}
@@ -3784,10 +3790,14 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 	if (uploadButton && window.languageManager) {
 		if (isCyberBrick) {
 			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE', 'Upload to CyberBrick');
+			uploadButton.classList.remove('txt-mode', 'txt-running');
 		} else if (isTxt) {
 			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE_TXT', 'Upload to TXT Controller');
+			uploadButton.classList.add('txt-mode');
+			uploadButton.classList.remove('txt-running');
 		} else {
 			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE_ARDUINO', 'Compile and Upload');
+			uploadButton.classList.remove('txt-mode', 'txt-running');
 		}
 	}
 
@@ -3924,6 +3934,7 @@ function initTxtConnectionPanel() {
  */
 const uploadState = {
 	isUploading: false,
+	txtRunning: false, // TXT 模式：程式正在執行中
 	selectedPort: null,
 	startTime: 0, // 上傳開始時間戳記
 };
@@ -3946,6 +3957,14 @@ function initUploadButton() {
  * 處理上傳按鈕點擊
  */
 async function handleUploadClick() {
+	// TXT 模式：若程式正在執行，點擊按鈕發送停止請求
+	if (window.currentProgrammingLanguage === 'txt' && uploadState.txtRunning) {
+		console.log('[blockly] TXT 執行中，發送停止請求');
+		vscode.postMessage({ command: 'txtStopExecution' });
+		setUploadButtonState('txt-uploading'); // 暫時停用按鈕（等待停止確認）
+		return;
+	}
+
 	if (uploadState.isUploading) {
 		console.log('[blockly] 上傳中，忽略點擊');
 		return;
@@ -3984,9 +4003,6 @@ async function handleUploadClick() {
 	// 紀錄上傳開始時間
 	uploadState.startTime = Date.now();
 
-	// 設置上傳狀態
-	setUploadButtonState('uploading');
-
 	// 根據程式語言類型發送不同的上傳請求
 	const isMicroPython = window.currentProgrammingLanguage === 'micropython';
 	const isTxt = window.currentProgrammingLanguage === 'txt';
@@ -3994,6 +4010,7 @@ async function handleUploadClick() {
 	if (isMicroPython) {
 		// CyberBrick MicroPython 上傳請求
 		console.log('[blockly] 發送 MicroPython 上傳請求');
+		setUploadButtonState('uploading');
 		vscode.postMessage({
 			command: 'requestUpload',
 			code: code,
@@ -4003,6 +4020,7 @@ async function handleUploadClick() {
 	} else if (isTxt) {
 		// fischertechnik TXT Controller SSH 上傳請求
 		console.log('[blockly] 發送 TXT 上傳請求');
+		setUploadButtonState('txt-uploading');
 		vscode.postMessage({
 			command: 'txtUpload',
 			code: code,
@@ -4011,6 +4029,7 @@ async function handleUploadClick() {
 	} else {
 		// T018: Arduino C++ 上傳請求（包含 lib_deps, build_flags）
 		console.log('[blockly] 發送 Arduino 上傳請求');
+		setUploadButtonState('uploading');
 		const generator = getCurrentGenerator();
 		vscode.postMessage({
 			command: 'requestUpload',
@@ -4036,15 +4055,47 @@ function setUploadButtonState(state) {
 	switch (state) {
 		case 'uploading':
 			uploadState.isUploading = true;
+			uploadState.txtRunning = false;
 			uploadButton.disabled = true;
 			uploadButton.classList.add('spinning');
+			uploadButton.classList.remove('txt-mode', 'txt-running');
+			break;
+		case 'txt-uploading':
+			// TXT 模式：連線/上傳中（顯示上傳箭頭旋轉，停用按鈕）
+			uploadState.isUploading = true;
+			uploadState.txtRunning = false;
+			uploadButton.disabled = true;
+			uploadButton.classList.add('txt-uploading');
+			uploadButton.classList.remove('txt-mode', 'txt-running');
+			break;
+		case 'txt-running':
+			// TXT 模式：程式執行中（顯示停止圖示，啟用按鈕）
+			uploadState.isUploading = false;
+			uploadState.txtRunning = true;
+			uploadButton.disabled = false;
+			uploadButton.classList.add('txt-running');
+			uploadButton.classList.remove('txt-mode', 'txt-uploading');
+			uploadButton.title =
+				window.languageManager?.getMessage('TXT_STOP_PROGRAM_TITLE', 'Stop Program') || 'Stop Program';
+			break;
+		case 'txt-ready':
+			// TXT 模式：就緒（顯示播放圖示，啟用按鈕）
+			uploadState.isUploading = false;
+			uploadState.txtRunning = false;
+			uploadButton.disabled = false;
+			uploadButton.classList.add('txt-mode');
+			uploadButton.classList.remove('txt-running', 'txt-uploading');
+			uploadButton.title =
+				window.languageManager?.getMessage('UPLOAD_BUTTON_TITLE_TXT', 'Run on TXT Controller') ||
+				'Run on TXT Controller';
 			break;
 		case 'ready':
 		case 'success':
 		case 'error':
 			uploadState.isUploading = false;
+			uploadState.txtRunning = false;
 			uploadButton.disabled = false;
-			uploadButton.classList.remove('spinning');
+			uploadButton.classList.remove('spinning', 'txt-mode', 'txt-running', 'txt-uploading');
 			break;
 	}
 }
@@ -4375,6 +4426,10 @@ function getLocalizedUploadError(stage, fallbackMessage) {
  */
 function handleTxtUploadProgress(message) {
 	console.log('[TXT] 上傳進度:', message.stage, message.progress + '%', message.message);
+	// 進入執行階段：切換為停止按鈕
+	if (message.stage === 'executing') {
+		setUploadButtonState('txt-running');
+	}
 }
 
 /**
@@ -4383,7 +4438,8 @@ function handleTxtUploadProgress(message) {
  */
 function handleTxtUploadResult(message) {
 	console.log('[TXT] 上傳結果:', message);
-	setUploadButtonState(message.success ? 'success' : 'error');
+	// TXT 模式統一恢復為播放圖示（就緒狀態）
+	setUploadButtonState('txt-ready');
 	if (message.success) {
 		const elapsed = message.duration ? (message.duration / 1000).toFixed(1) : '';
 		let msg = window.languageManager?.getMessage('UPLOAD_SUCCESS', 'Upload successful!');
@@ -4437,6 +4493,14 @@ function handleTxtConnectionTestResult(message) {
 	if (statusEl) {
 		statusEl.textContent = message.message;
 		statusEl.className = message.success ? 'txt-status-ok' : 'txt-status-error';
+	}
+	// 若首次設定完成，更新 SSH 提示以反映最新狀態
+	if (message.sshSetupDone) {
+		const sshHint = document.getElementById('txtSshHint');
+		if (sshHint) {
+			sshHint.textContent = window.languageManager?.getMessage('TXT_SSH_SETUP_DONE', '✓ SSH 免確認設定完成，之後連線不需在 TXT 按 OK。');
+			sshHint.style.color = 'var(--vscode-testing-iconPassed, #73c991)';
+		}
 	}
 	const toastType = message.success ? 'success' : 'error';
 	toast.show(message.message, toastType);
@@ -4699,12 +4763,17 @@ function updateMonitorButtonState() {
 
 // ── TXT I/O Test Panel Dialog ──────────────────────────────────────────────
 
+/** 上一筆回應結束後等待這麼久再發下一筆 I/O 輪詢請求（ms）。設為 0 讓輪詢速率取決於網路來回時間 */
+const TXT_POLL_INTERVAL_MS = 0;
+
 const txtTestState = {
 	pollTimer: null,
+	polling: false,
 	failureCount: 0,
 	motorDir: [1, 1, 1, 1],   // 1=Forward, -1=Backward
 	motorSpeed: [0, 0, 0, 0], // absolute 0-512
 	outputOn: [false, false, false, false, false, false, false, false],
+	sensorTypes: ['BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON'],
 };
 
 function initTxtTestDialog() {
@@ -4767,11 +4836,22 @@ function initTxtTestDialog() {
 	const inputsEl = document.getElementById('txtTestInputs');
 	if (inputsEl) {
 		inputsEl.innerHTML = '';
+		const sensorOptions = [
+			{ value: 'BUTTON', label: window.languageManager?.getMessage('TXT_SENSOR_BUTTON', '按鈕') || '按鈕' },
+			{ value: 'GATE', label: window.languageManager?.getMessage('TXT_SENSOR_GATE', '光柵') || '光柵' },
+			{ value: 'ULTRASONIC', label: window.languageManager?.getMessage('TXT_SENSOR_ULTRASONIC', '超音波') || '超音波' },
+		];
+		const optionsHtml = sensorOptions.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
 		for (let i = 1; i <= 8; i++) {
 			const box = document.createElement('div');
 			box.className = 'txt-input-box';
-			box.innerHTML = `<span>I${i}</span><div class="txt-input-value" id="txtInputVal${i}">—</div>`;
+			box.innerHTML = `<span>I${i}</span><select class="txt-input-sensor-select" id="txtInputSensorSelect${i}">${optionsHtml}</select><div class="txt-input-value" id="txtInputVal${i}">—</div>`;
 			inputsEl.appendChild(box);
+			const select = document.getElementById(`txtInputSensorSelect${i}`);
+			select.addEventListener('change', () => {
+				txtTestState.sensorTypes[i - 1] = select.value;
+				vscode.postMessage({ command: 'txtTestSetSensorConfig', sensorTypes: [...txtTestState.sensorTypes] });
+			});
 		}
 	}
 
@@ -4822,14 +4902,27 @@ function openTxtTestDialog() {
 	const dialog = document.getElementById('txtTestPanelDialog');
 	if (!dialog) return;
 	if (dialog.open) { dialog.focus(); return; } // singleton guard
+	// 若使用者程式正在 TXT 上執行，先停止它，讓 Test Panel 取得控制權
+	if (uploadState.txtRunning) {
+		console.log('[TXT] 開啟 Test Panel，停止執行中的程式');
+		vscode.postMessage({ command: 'txtStopExecution' });
+		setUploadButtonState('txt-ready');
+	}
 	txtTestState.failureCount = 0;
 	txtTestState.motorSpeed = [0, 0, 0, 0];
 	txtTestState.motorDir = [1, 1, 1, 1];
 	txtTestState.outputOn = [false, false, false, false, false, false, false, false];
+	txtTestState.sensorTypes = ['BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON'];
+	// Reset sensor selects to BUTTON (matches fresh io_server.py startup state)
+	for (let i = 1; i <= 8; i++) {
+		const sel = document.getElementById(`txtInputSensorSelect${i}`);
+		if (sel) sel.value = 'BUTTON';
+	}
 	updateTxtTestStatus('connecting');
 	dialog.showModal();
 	vscode.postMessage({ command: 'txtTestDialogOpen' });
-	startTxtTestPolling();
+	// 不在此處立即開始 polling；等 txtInstallRuntimeDone success 後再啟動，
+	// 避免 io_server.py 尚未啟動時 poll 失敗導致 failureCount 耗盡。
 }
 
 function closeTxtTestDialog() {
@@ -4861,14 +4954,28 @@ function updateMotorDisplay(motor) {
 
 function startTxtTestPolling() {
 	stopTxtTestPolling();
-	txtTestState.pollTimer = setInterval(() => {
-		vscode.postMessage({ command: 'txtTestPollIo' });
-	}, 400);
+	txtTestState.polling = true;
+	schedulePoll();
+}
+
+/**
+ * 排程下一次 I/O 輪詢。只在上一筆回應（txtTestIoUpdate / txtTestPollFailed）
+ * 收到後才呼叫，確保不會同時發出多筆請求。
+ */
+function schedulePoll() {
+	if (!txtTestState.polling) return;
+	txtTestState.pollTimer = setTimeout(() => {
+		txtTestState.pollTimer = null;
+		if (txtTestState.polling) {
+			vscode.postMessage({ command: 'txtTestPollIo' });
+		}
+	}, TXT_POLL_INTERVAL_MS);
 }
 
 function stopTxtTestPolling() {
+	txtTestState.polling = false;
 	if (txtTestState.pollTimer !== null) {
-		clearInterval(txtTestState.pollTimer);
+		clearTimeout(txtTestState.pollTimer);
 		txtTestState.pollTimer = null;
 	}
 }
@@ -4914,32 +5021,19 @@ function handleTxtTestIoUpdate(snapshot) {
 	if (!snapshot) return;
 	txtTestState.failureCount = 0;
 	updateTxtTestStatus('connected');
-	// Inputs
+	// 只更新輸入感測器（I1–I8）；馬達與輸出由使用者操作直接控制，
+	// 不從伺服器快照覆蓋，避免因 poll 早於 command 回應而閃跳。
 	if (Array.isArray(snapshot.inputs)) {
 		snapshot.inputs.forEach((val, idx) => {
 			const el = document.getElementById(`txtInputVal${idx + 1}`);
-			if (el) el.textContent = val;
+			if (el) {
+				const sType = Array.isArray(txtTestState.sensorTypes) ? txtTestState.sensorTypes[idx] : 'BUTTON';
+				el.textContent = sType === 'ULTRASONIC' ? val + ' cm' : String(val);
+			}
 		});
 	}
-	// Motors (reflect server state)
-	if (Array.isArray(snapshot.motors)) {
-		snapshot.motors.forEach((speed, idx) => {
-			const motor = idx + 1;
-			const absSpeed = Math.abs(speed);
-			const dir = speed >= 0 ? 1 : -1;
-			txtTestState.motorSpeed[idx] = absSpeed;
-			txtTestState.motorDir[idx] = dir;
-			updateMotorDisplay(motor);
-		});
-	}
-	// Outputs (reflect server state)
-	if (Array.isArray(snapshot.outputs)) {
-		snapshot.outputs.forEach((val, idx) => {
-			txtTestState.outputOn[idx] = val > 0;
-			const btn = document.getElementById(`txtOutputBtn${idx + 1}`);
-			if (btn) btn.classList.toggle('active', val > 0);
-		});
-	}
+	// 收到回應後才排程下一次輪詢（sequential polling）
+	schedulePoll();
 }
 
 function handleTxtTestPollFailure() {
@@ -4947,6 +5041,24 @@ function handleTxtTestPollFailure() {
 	if (txtTestState.failureCount >= 3) {
 		stopTxtTestPolling();
 		updateTxtTestStatus('disconnected');
+	} else {
+		// 短暫失敗時仍繼續輪詢
+		schedulePoll();
+	}
+}
+
+/**
+ * 感測器設定 POST 失敗時：在對應的值欄位顯示錯誤標記，不中斷連線。
+ * @param {string} errorMsg
+ */
+function handleTxtTestSensorConfigFailed(errorMsg) {
+	console.warn('[TXT] sensor_config failed:', errorMsg);
+	// 找出所有切換成 ULTRASONIC 的 port，在值欄位顯示 '!' 提示設定未生效
+	for (let i = 1; i <= 8; i++) {
+		if (txtTestState.sensorTypes[i - 1] === 'ULTRASONIC') {
+			const el = document.getElementById(`txtInputVal${i}`);
+			if (el) el.textContent = '!';
+		}
 	}
 }
 

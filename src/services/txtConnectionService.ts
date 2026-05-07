@@ -111,9 +111,12 @@ export class TxtConnectionService {
 	}
 
 	/**
-	 * 測試 SSH 連線（5 秒逾時）
+	 * 測試 SSH 連線，並自動完成一次性的 SSH 免確認設定（若尚未設定）。
+	 *
+	 * ftCommunity 的 PAM 設定：當 ftc 使用者無密碼時，SSH 登入會觸發 TXT 螢幕確認畫面。
+	 * 測試連線成功後，若偵測到 ftc 無密碼，會自動設定密碼以繞過該確認流程。
 	 */
-	async testConnection(): Promise<{ success: boolean; message: string }> {
+	async testConnection(): Promise<{ success: boolean; message: string; sshSetupDone?: boolean }> {
 		const config = this.loadConfig();
 		const password = await this.getPasswordOrDefault();
 
@@ -126,13 +129,28 @@ export class TxtConnectionService {
 				readyTimeout: 30000,
 			});
 			const result = await ssh.execCommand('echo ok');
-			const success = result.stdout.trim() === 'ok';
-			log(`TXT connection test: ${success ? 'success' : 'failed'}`, 'info');
+			if (result.stdout.trim() !== 'ok') {
+				log('TXT connection test: unexpected response', 'warn');
+				return { success: false, message: `Unexpected response from ${config.host}` };
+			}
+
+			// 檢查 ftc 是否已設定密碼；若無則自動設定，以繞過 TXT 觸控螢幕確認流程
+			let sshSetupDone = false;
+			const shadowResult = await ssh.execCommand('sudo cat /etc/shadow');
+			const ftcLine = shadowResult.stdout.split('\n').find(line => line.startsWith('ftc:'));
+			if (ftcLine && !ftcLine.split(':')[1]) {
+				// 使用 printf 傳入密碼兩次（確認密碼），單引號內的單引號以 '\'' 跳脫
+				const escaped = password.replace(/'/g, "'\\''");
+				await ssh.execCommand(`printf '${escaped}\\n${escaped}\\n' | sudo passwd ftc`);
+				sshSetupDone = true;
+				log('TXT: SSH password set to bypass touchscreen confirmation', 'info');
+			}
+
+			log(`TXT connection test: success${sshSetupDone ? ' (SSH setup done)' : ''}`, 'info');
 			return {
-				success,
-				message: success
-					? `Connected to ${config.host} as ${config.username}`
-					: `Unexpected response from ${config.host}`,
+				success: true,
+				message: `Connected to ${config.host} as ${config.username}`,
+				sshSetupDone,
 			};
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);

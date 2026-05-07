@@ -16,11 +16,25 @@
  */
 window.txtGenerator.forBlock['txt_main'] = function (block) {
 	window.txtGenerator.addImport('import ftrobopy');
+	window.txtGenerator.addImport('import time');
 	const childCode = window.txtGenerator.statementToCode(block, 'DO');
 	let code = "txt = ftrobopy.ftrobopy('auto')\n\n";
+	// 若使用了需要特殊配置的感測器（如超音波），動態生成 setConfig() + updateConfig()
+	// statementToCode 已觸發所有子積木的 generator，inputConfigs_ 此時已填好
+	const setConfigCode = window.txtGenerator.buildSetConfig();
+	if (setConfigCode) {
+		code += setConfigCode + '\n\n';
+	}
+	// 所有使用者積木都放在 while True 迴圈內，以支援持續輸入偵測
+	// （例如：按鈕→馬達/燈光這類需要不斷輪詢的程式）。
+	// ftrobopy 在 process 退出時會送 reset 給控制器（馬達/輸出歸零），
+	// 因此必須保持程式不退出。time.sleep(0.05) 讓 CPU 不過熱並以 ~20Hz 輪詢輸入。
+	code += 'while True:\n';
 	if (childCode) {
+		// statementToCode() 每行已加一層 INDENT（4 空格），剛好符合 while True 的縮排需求。
 		code += childCode;
 	}
+	code += '    time.sleep(0.05)  # ~20 Hz polling\n';
 	return code;
 };
 
@@ -78,10 +92,27 @@ window.txtGenerator.forBlock['txt_output'] = function (block) {
 // === 輸入積木 ===
 
 /**
- * txt_input_read: 讀取數位輸入 (value block)
+ * txt_input_read: 讀取數位輸入 (value block) — 保留供向下相容
  */
 window.txtGenerator.forBlock['txt_input_read'] = function (block) {
 	const input = block.getFieldValue('INPUT');
+	return [`txt.input(${input}).state()`, window.txtGenerator.ORDER_FUNCTION_CALL];
+};
+
+/**
+ * txt_input_sensor: 感測器輸入積木（按鈕 / 光柵 / 超音波）
+ * 按鈕/光柵 → .state()，回傳 0 或 1
+ * 超音波   → .distance()，回傳距離 cm；並自動記錄 setConfig 需求
+ */
+window.txtGenerator.forBlock['txt_input_sensor'] = function (block) {
+	const sensorType = block.getFieldValue('SENSOR_TYPE');
+	const input = block.getFieldValue('INPUT');
+	// 記錄感測器配置；txt_main 在 statementToCode 完成後呼叫 buildSetConfig()
+	window.txtGenerator.addInputConfig(parseInt(input), sensorType);
+	if (sensorType === 'ULTRASONIC') {
+		return [`txt.input(${input}).distance()`, window.txtGenerator.ORDER_FUNCTION_CALL];
+	}
+	// BUTTON（按鈕）和 GATE（光柵）都使用 .state()，回傳 0 或 1
 	return [`txt.input(${input}).state()`, window.txtGenerator.ORDER_FUNCTION_CALL];
 };
 

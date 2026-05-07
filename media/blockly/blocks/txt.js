@@ -23,7 +23,7 @@ Blockly.Blocks['txt_main'] = {
 			.setCheck(null)
 			.appendField(window.languageManager.getMessage('TXT_MAIN', 'TXT 主程式'));
 		this.setStyle('procedure_blocks');
-		this.setTooltip(window.languageManager.getMessage('TXT_MAIN_TOOLTIP', 'TXT Controller 程式入口點。所有積木必須放在這裡。'));
+		this.setTooltip(window.languageManager.getMessage('TXT_MAIN_TOOLTIP', 'TXT Controller 程式入口點。所有積木會在 while True 迴圈中持續執行（每 50ms 輪詢一次），可即時回應按鈕與輸入訊號。'));
 		this.setHelpUrl('');
 		this.setDeletable(false);
 		this.setMovable(true);
@@ -147,7 +147,43 @@ Blockly.Blocks['txt_output'] = {
 // === 輸入積木 ===
 
 /**
- * 讀取數位輸入 (value block)
+ * 感測器輸入積木 — 支援按鈕、光柵、超音波
+ * 下拉選感測器類型；生成 Python 程式碼時自動處理 setConfig 差異
+ */
+Blockly.Blocks['txt_input_sensor'] = {
+	init: function () {
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('TXT_INPUT_SENSOR_PREFIX', '讀取'))
+			.appendField(
+				new Blockly.FieldDropdown([
+					[window.languageManager.getMessage('TXT_SENSOR_BUTTON', '按鈕'), 'BUTTON'],
+					[window.languageManager.getMessage('TXT_SENSOR_GATE', '光柵'), 'GATE'],
+					[window.languageManager.getMessage('TXT_SENSOR_ULTRASONIC', '超音波'), 'ULTRASONIC'],
+				]),
+				'SENSOR_TYPE'
+			)
+			.appendField(
+				new Blockly.FieldDropdown([
+					['I1', '1'],
+					['I2', '2'],
+					['I3', '3'],
+					['I4', '4'],
+					['I5', '5'],
+					['I6', '6'],
+					['I7', '7'],
+					['I8', '8'],
+				]),
+				'INPUT'
+			);
+		this.setOutput(true, 'Number');
+		this.setColour(TXT_COLOR);
+		this.setTooltip(window.languageManager.getMessage('TXT_INPUT_SENSOR_TOOLTIP', '選擇感測器類型並讀取輸入值（按鈕/光柵回傳 0 或 1，超音波回傳距離 cm）'));
+		this.setHelpUrl('');
+	},
+};
+
+/**
+ * 讀取數位輸入 (value block) — 保留供向下相容
  */
 Blockly.Blocks['txt_input_read'] = {
 	init: function () {
@@ -241,7 +277,9 @@ function txtOrphanOnchange(e) {
 	}
 });
 
-// txt_input_read 是 value block（有輸出），也加入孤立警告
-if (Blockly.Blocks['txt_input_read']) {
-	Blockly.Blocks['txt_input_read'].onchange = txtOrphanOnchange;
-}
+// value blocks（有輸出）也加入孤立警告
+['txt_input_read', 'txt_input_sensor'].forEach(function (blockType) {
+	if (Blockly.Blocks[blockType]) {
+		Blockly.Blocks[blockType].onchange = txtOrphanOnchange;
+	}
+});

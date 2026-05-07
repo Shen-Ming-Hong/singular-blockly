@@ -30,6 +30,7 @@ except Exception as _e:
 # Mirror state for /io snapshot (tracks last commanded values)
 _motor_speeds = [0, 0, 0, 0]  # M1-M4, index 0 = M1
 _output_on = [False] * 8  # O1-O8, index 0 = O1
+_sensor_types = ["SWITCH"] * 8  # I1-I8, index 0 = I1; 'SWITCH' or 'ULTRASONIC'
 
 
 class _IoHandler(http.server.BaseHTTPRequestHandler):
@@ -66,7 +67,12 @@ class _IoHandler(http.server.BaseHTTPRequestHandler):
             return
 
         try:
-            inputs = [_txt.input(i).state() for i in range(1, 9)]
+            inputs = []
+            for i in range(1, 9):
+                if _sensor_types[i - 1] == "ULTRASONIC":
+                    inputs.append(_txt.ultrasonic(i).distance())
+                else:
+                    inputs.append(_txt.input(i).state())
             self._send_json(
                 200,
                 {
@@ -95,10 +101,13 @@ class _IoHandler(http.server.BaseHTTPRequestHandler):
             ):
                 self._send_json(400, {"error": "invalid motor or speed value"})
                 return
-            if _TXT_OK:
-                _txt.motor(motor).setSpeed(speed)
-            _motor_speeds[motor - 1] = speed
-            self._send_json(200, {"ok": True})
+            try:
+                if _TXT_OK:
+                    _txt.motor(motor).setSpeed(speed)
+                _motor_speeds[motor - 1] = speed
+                self._send_json(200, {"ok": True})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
 
         elif self.path == "/output":
             output = data.get("output")
@@ -111,21 +120,50 @@ class _IoHandler(http.server.BaseHTTPRequestHandler):
             ):
                 self._send_json(400, {"error": "invalid output or level value"})
                 return
-            if _TXT_OK:
-                _txt.output(output).setLevel(level)
-            _output_on[output - 1] = level == 512
-            self._send_json(200, {"ok": True})
+            try:
+                if _TXT_OK:
+                    _txt.output(output).setLevel(level)
+                _output_on[output - 1] = level == 512
+                self._send_json(200, {"ok": True})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
 
         elif self.path == "/stop_all":
-            for i in range(1, 5):
+            try:
+                for i in range(1, 5):
+                    if _TXT_OK:
+                        _txt.motor(i).setSpeed(0)
+                    _motor_speeds[i - 1] = 0
+                for i in range(1, 9):
+                    if _TXT_OK:
+                        _txt.output(i).setLevel(0)
+                    _output_on[i - 1] = False
+                self._send_json(200, {"ok": True, "stopped": {"motors": 4, "outputs": 8}})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+
+        elif self.path == "/sensor_config":
+            sensors = data.get("sensors")
+            valid = {"BUTTON", "GATE", "SWITCH", "ULTRASONIC"}
+            if not isinstance(sensors, list) or len(sensors) != 8 or not all(s in valid for s in sensors):
+                self._send_json(400, {"error": "sensors must be a list of 8 valid types"})
+                return
+            _ft_map = {"BUTTON": "SWITCH", "GATE": "SWITCH", "SWITCH": "SWITCH", "ULTRASONIC": "ULTRASONIC"}
+            for idx, s in enumerate(sensors):
+                _sensor_types[idx] = _ft_map[s]
+            try:
                 if _TXT_OK:
-                    _txt.motor(i).setSpeed(0)
-                _motor_speeds[i - 1] = 0
-            for i in range(1, 9):
-                if _TXT_OK:
-                    _txt.output(i).setLevel(0)
-                _output_on[i - 1] = False
-            self._send_json(200, {"ok": True, "stopped": {"motors": 4, "outputs": 8}})
+                    M, I = _txt.getConfig()
+                    for idx, t in enumerate(_sensor_types):
+                        if t == "ULTRASONIC":
+                            I[idx] = (_txt.C_ULTRASONIC, _txt.C_ANALOG)
+                        else:
+                            I[idx] = (_txt.C_SWITCH, _txt.C_DIGITAL)
+                    _txt.setConfig(M, I)
+                    _txt.updateConfig()
+                self._send_json(200, {"ok": True})
+            except Exception as e:
+                self._send_json(500, {"error": "setConfig failed: " + str(e)})
 
         else:
             self._send_json(404, {"error": "not found"})

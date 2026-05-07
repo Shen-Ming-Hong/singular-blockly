@@ -226,10 +226,6 @@
                                 animation-play-state: paused;
                             }
 
-                            .upload-svg.spinning {
-                                animation-play-state: running;
-                            }
-
                             @keyframes rotate {
                                 from {
                                     transform: rotate(0deg);
@@ -252,6 +248,14 @@
                             <path class="upload-path" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline class="upload-path" points="17 8 12 3 7 8" />
                             <line class="upload-path" x1="12" y1="3" x2="12" y2="15" />
+                        </g>
+                        <!-- TXT 播放圖示（三角形） -->
+                        <g class="play-icon">
+                            <polygon fill="currentColor" points="6,3 20,12 6,21" />
+                        </g>
+                        <!-- TXT 停止圖示（方形） -->
+                        <g class="stop-icon">
+                            <rect fill="currentColor" x="4" y="4" width="16" height="16" rx="2" />
                         </g>
                     </svg>
                 </button>

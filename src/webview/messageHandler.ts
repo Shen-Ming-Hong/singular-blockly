@@ -277,6 +277,18 @@ export class WebViewMessageHandler {
 				case 'txtTestStopAll':
 					await this.txtTestService?.stopAll();
 					break;
+				case 'txtTestSetSensorConfig':
+					try {
+						await this.txtTestService?.configureSensors(message.sensorTypes as string[]);
+					} catch (sensorErr) {
+						// 感測器設定失敗：記錄錯誤但不中斷 polling，讓使用者知道設定未生效
+						log(`configureSensors failed: ${sensorErr}`, 'warn');
+						this.panel.webview.postMessage({
+							command: 'txtTestSensorConfigFailed',
+							error: String(sensorErr),
+						});
+					}
+					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
 					break;
@@ -1968,6 +1980,7 @@ export class WebViewMessageHandler {
 			command: 'txtConnectionTestResult',
 			success: result.success,
 			message: result.message,
+			sshSetupDone: result.sshSetupDone ?? false,
 		});
 	}
 
@@ -2025,8 +2038,7 @@ export class WebViewMessageHandler {
                 }
                 try {
                         this.panel.webview.postMessage({ command: 'txtInstallRuntimeStart' });
-                        await this.txtTestService.installRuntime();
-                        await this.txtTestService.startServer();
+                        await this.txtTestService.installAndStartServer();
                         this.panel.webview.postMessage({ command: 'txtInstallRuntimeDone', success: true });
                 } catch (error) {
                         log('Failed to open TXT test dialog', 'error', error);

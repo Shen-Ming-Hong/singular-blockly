@@ -31,7 +31,7 @@
         },
         {
             "kind": "block",
-            "type": "txt_input_read"
+            "type": "txt_input_sensor"
         },
         {
             "kind": "block",

@@ -537,6 +537,7 @@ body.theme-dark .preview-controls .theme-icon {
 	border-radius: 50%;
 	border: none;
 	background-color: #4caf50;
+	color: white;
 	cursor: pointer;
 	transition: background-color 0.3s;
 }
@@ -550,8 +551,57 @@ body.theme-dark .preview-controls .theme-icon {
 	cursor: not-allowed;
 }
 
-.upload-path {
-	color: white;
+/* TXT Controller 按鈕圖示切換 */
+#uploadButton .play-icon,
+#uploadButton .stop-icon {
+	display: none;
+}
+
+/* txt-uploading：連線/上傳中，顯示播放三角（靜態，按鈕停用） */
+#uploadButton.txt-uploading .upload-icon {
+	display: none;
+}
+
+#uploadButton.txt-uploading .play-icon {
+	display: inline;
+}
+
+#uploadButton.txt-uploading .upload-svg,
+#uploadButton.txt-mode .upload-svg,
+#uploadButton.txt-running .upload-svg {
+	animation: none;
+}
+
+/* txt-mode 就緒：顯示播放三角，隱藏上傳箭頭 */
+#uploadButton.txt-mode .upload-icon {
+	display: none;
+}
+
+#uploadButton.txt-mode .play-icon {
+	display: inline;
+}
+
+/* txt-running 執行中：顯示停止方塊，紅色背景 */
+#uploadButton.txt-running .upload-icon,
+#uploadButton.txt-running .play-icon {
+	display: none;
+}
+
+#uploadButton.txt-running .stop-icon {
+	display: inline;
+}
+
+#uploadButton.txt-running {
+	background-color: #e53935;
+}
+
+#uploadButton.txt-running:hover {
+	background-color: #c62828;
+}
+
+/* 非 TXT 模式：上傳箭頭旋轉動畫（spinning class 在 button 上） */
+#uploadButton.spinning .upload-svg {
+	animation-play-state: running;
 }
 
 /* Monitor 按鈕樣式（CyberBrick 專用） */
@@ -639,15 +689,27 @@ body.theme-dark .preview-controls .theme-icon {
         height: 32px;
         border-radius: 50%;
         border: none;
-        background-color: #455a64;
         cursor: pointer;
         transition: background-color 0.3s;
         color: white;
 }
 
-#txtConfigButton:hover,
+/* 齒輪（連線設定）：亮藍 */
+#txtConfigButton {
+	background-color: #0288d1;
+}
+
+#txtConfigButton:hover {
+	background-color: #0277bd;
+}
+
+/* 板手（I/O 測試）：琥珀橙 */
+#txtTestPanelButton {
+	background-color: #ff8f00;
+}
+
 #txtTestPanelButton:hover {
-	background-color: #37474f;
+	background-color: #e65100;
 }
 
 /* 範例瀏覽器模態樣式 */
@@ -887,6 +949,18 @@ body.theme-dark .preview-controls .theme-icon {
 
 .txt-input-value {
 	font-weight: 600;
+}
+
+.txt-input-sensor-select {
+	width: 100%;
+	font-size: 0.75rem;
+	margin-bottom: 3px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	background: #fff;
+	color: #333;
+	padding: 1px 2px;
+	cursor: pointer;
 }
 
 @keyframes sample-spin {
@@ -1492,6 +1566,30 @@ body.theme-dark #uploadButton:disabled {
 	background-color: #555555;
 }
 
+body.theme-dark #uploadButton.txt-running {
+	background-color: #c62828;
+}
+
+body.theme-dark #uploadButton.txt-running:hover {
+	background-color: #b71c1c;
+}
+
+body.theme-dark #txtConfigButton {
+	background-color: #0277bd;
+}
+
+body.theme-dark #txtConfigButton:hover {
+	background-color: #01579b;
+}
+
+body.theme-dark #txtTestPanelButton {
+	background-color: #f57c00;
+}
+
+body.theme-dark #txtTestPanelButton:hover {
+	background-color: #e65100;
+}
+
 body.theme-dark select {
 	background-color: #444444;
 	color: #e0e0e0;
@@ -1567,6 +1665,12 @@ body.theme-dark .txt-input-box {
 
 body.theme-dark .txt-input-box span {
 	color: #aaaaaa;
+}
+
+body.theme-dark .txt-input-sensor-select {
+	background: #444444;
+	border-color: #666666;
+	color: #e0e0e0;
 }
 
 /* 備份創建表單 */
