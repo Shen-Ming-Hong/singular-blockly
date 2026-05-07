@@ -30,7 +30,16 @@ except Exception as _e:
 # Mirror state for /io snapshot (tracks last commanded values)
 _motor_speeds = [0, 0, 0, 0]  # M1-M4, index 0 = M1
 _output_on = [False] * 8  # O1-O8, index 0 = O1
-_sensor_types = ["SWITCH"] * 8  # I1-I8, index 0 = I1; 'SWITCH' or 'ULTRASONIC'
+_sensor_types = ["SWITCH"] * 8  # I1-I8, index 0 = I1
+
+# Dispatch table: sensor type → reader function (lambda txt, i → value)
+# Add new sensor types here without touching the /io endpoint logic.
+_INPUT_READERS = {
+    "SWITCH": lambda txt, i: txt.input(i).state(),
+    "BUTTON": lambda txt, i: txt.input(i).state(),
+    "GATE": lambda txt, i: txt.input(i).state(),
+    "ULTRASONIC": lambda txt, i: txt.ultrasonic(i).distance(),
+}
 
 
 class _IoHandler(http.server.BaseHTTPRequestHandler):
@@ -69,10 +78,8 @@ class _IoHandler(http.server.BaseHTTPRequestHandler):
         try:
             inputs = []
             for i in range(1, 9):
-                if _sensor_types[i - 1] == "ULTRASONIC":
-                    inputs.append(_txt.ultrasonic(i).distance())
-                else:
-                    inputs.append(_txt.input(i).state())
+                reader = _INPUT_READERS.get(_sensor_types[i - 1], _INPUT_READERS["SWITCH"])
+                inputs.append(reader(_txt, i))
             self._send_json(
                 200,
                 {

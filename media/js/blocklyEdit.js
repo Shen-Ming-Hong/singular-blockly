@@ -3198,6 +3198,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 				if (message.success) {
 					updateTxtTestStatus('connected');
 					startTxtTestPolling();
+					// io_server.py 每次重啟都從 SWITCH 初始化；把 UI 目前的感測器選擇同步過去
+					vscode.postMessage({ command: 'txtTestSetSensorConfig', sensorTypes: [...txtTestState.sensorTypes] });
 				} else {
 					updateTxtTestStatus('disconnected');
 				}
@@ -4912,12 +4914,8 @@ function openTxtTestDialog() {
 	txtTestState.motorSpeed = [0, 0, 0, 0];
 	txtTestState.motorDir = [1, 1, 1, 1];
 	txtTestState.outputOn = [false, false, false, false, false, false, false, false];
-	txtTestState.sensorTypes = ['BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON', 'BUTTON'];
-	// Reset sensor selects to BUTTON (matches fresh io_server.py startup state)
-	for (let i = 1; i <= 8; i++) {
-		const sel = document.getElementById(`txtInputSensorSelect${i}`);
-		if (sel) sel.value = 'BUTTON';
-	}
+	// sensorTypes 不在此重置——Extension 重啟時 txtTestState 初始值即為全 BUTTON，
+	// 同一 session 中重開 dialog 則保留使用者先前的選擇。
 	updateTxtTestStatus('connecting');
 	dialog.showModal();
 	vscode.postMessage({ command: 'txtTestDialogOpen' });
