@@ -61,12 +61,15 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
 
 	let speedCode;
 	if (direction === 'BACKWARD') {
-		speedCode = `-${speed}`;
+		speedCode = `-(${speed})`;
 	} else {
 		speedCode = speed;
 	}
 
-	return `txt.motor(${motor}).setSpeed(${speedCode})\n`;
+	// ftrobopy setSpeed() 需要整數，且內部以 int(pwm/2) 縮放至 ubyte(0-255)；
+	// 超過 512 的值（如搖桿超出預期範圍）會讓 int(val/2)>255 觸發 struct.error。
+	// 用 max(-512, min(512, int(...))) 夾鉗確保永遠在合法範圍內。
+	return `txt.motor(${motor}).setSpeed(max(-512, min(512, int(${speedCode}))))\n`;
 };
 
 /**
@@ -110,7 +113,7 @@ window.txtGenerator.forBlock['txt_input_sensor'] = function (block) {
 	// 記錄感測器配置；txt_main 在 statementToCode 完成後呼叫 buildSetConfig()
 	window.txtGenerator.addInputConfig(parseInt(input), sensorType);
 	if (sensorType === 'ULTRASONIC') {
-		return [`txt.input(${input}).distance()`, window.txtGenerator.ORDER_FUNCTION_CALL];
+		return [`txt.ultrasonic(${input}).distance()`, window.txtGenerator.ORDER_FUNCTION_CALL];
 	}
 	// BUTTON（按鈕）和 GATE（光柵）都使用 .state()，回傳 0 或 1
 	return [`txt.input(${input}).state()`, window.txtGenerator.ORDER_FUNCTION_CALL];
