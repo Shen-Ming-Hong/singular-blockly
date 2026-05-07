@@ -60,8 +60,10 @@
 	// ── Math ─────────────────────────────────────────────────────────────────
 
 	g.forBlock['math_number'] = function (block) {
-		const code = Number(block.getFieldValue('NUM'));
-		const order = code >= 0 ? g.ORDER_ATOMIC : g.ORDER_UNARY_SIGN;
+		const num = Number(block.getFieldValue('NUM'));
+		// 必須回傳字串，否則 0 為 falsy，呼叫端 `|| 'default'` 會誤用預設值
+		const code = String(num);
+		const order = num >= 0 ? g.ORDER_ATOMIC : g.ORDER_UNARY_SIGN;
 		return [code, order];
 	};
 
