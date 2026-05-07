@@ -225,6 +225,21 @@
 		return ['math.atan2(' + y + ', ' + x + ') / math.pi * 180', g.ORDER_FUNCTION_CALL];
 	};
 
+	g.forBlock['math_map'] = function (block) {
+		const value = g.valueToCode(block, 'VALUE', g.ORDER_NONE) || '0';
+		const fromLow = g.valueToCode(block, 'FROM_LOW', g.ORDER_NONE) || '0';
+		const fromHigh = g.valueToCode(block, 'FROM_HIGH', g.ORDER_NONE) || '1023';
+		const toLow = g.valueToCode(block, 'TO_LOW', g.ORDER_NONE) || '0';
+		const toHigh = g.valueToCode(block, 'TO_HIGH', g.ORDER_NONE) || '255';
+		g.addFunction(
+			'map_value',
+			`def map_value(x, in_min, in_max, out_min, out_max):
+    return int((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)`
+		);
+		const code = `map_value(${value}, ${fromLow}, ${fromHigh}, ${toLow}, ${toHigh})`;
+		return [code, g.ORDER_FUNCTION_CALL];
+	};
+
 	// ── Logic ─────────────────────────────────────────────────────────────────
 
 	g.forBlock['controls_if'] = function (block) {
@@ -287,8 +302,16 @@
 		if (!g.isInAllowedContext(block)) return '';
 		const until = block.getFieldValue('MODE') === 'UNTIL';
 		let cond = g.valueToCode(block, 'BOOL', until ? g.ORDER_LOGICAL_NOT : g.ORDER_NONE) || 'False';
-		const branch = g.statementToCode(block, 'DO') || g.INDENT + 'pass\n';
+		let branch = g.statementToCode(block, 'DO') || g.INDENT + 'pass\n';
 		if (until) cond = 'not ' + cond;
+		// 無限迴圈（while True）若迴圈內有使用超音波感測器，且使用者沒有自行加入 delay，
+		// 自動補上最低限度的 50ms 延遲（20 Hz）。
+		// 超音波感測器需要足夠的發射/接收間隔；過度輪詢會產生刺耳高頻雜訊。
+		const hasUltrasonic = [...g.inputConfigs_.values()].some(t => t === 'ULTRASONIC');
+		if (!until && cond === 'True' && hasUltrasonic && !branch.includes('time.sleep')) {
+			g.addImport('import time');
+			branch += g.INDENT + 'time.sleep(0.05)  # 20 Hz polling, required for ultrasonic sensor\n';
+		}
 		return 'while ' + cond + ':\n' + branch;
 	};
 
