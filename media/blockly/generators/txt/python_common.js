@@ -311,7 +311,17 @@
 		// 注意：ftrobopy exchange thread 預設以 100 Hz 執行（update_interval=0.01），
 		// 此 sleep 並非超音波感測所必須，而是防止使用者空間迴圈無限速運轉消耗 CPU。
 		const hasUltrasonic = [...g.inputConfigs_.values()].some(t => t === 'ULTRASONIC');
-		if (!until && cond === 'True' && hasUltrasonic && !branch.includes('time.sleep')) {
+		// 雙重檢查：直接掃描 DO 序列的積木樹，以及已生成的字串
+		// 只要使用者有放 txt_wait 積木，或生成碼中已有 time.sleep，就不自動插入 50ms
+		const hasTxtWaitBlock = (function () {
+			let cur = block.getInputTargetBlock('DO');
+			while (cur) {
+				if (cur.type === 'txt_wait') return true;
+				cur = cur.getNextBlock();
+			}
+			return false;
+		})();
+		if (!until && cond === 'True' && hasUltrasonic && !hasTxtWaitBlock && !branch.includes('time.sleep')) {
 			g.addImport('import time');
 			branch += g.INDENT + 'time.sleep(0.05)  # 50 ms loop delay to reduce CPU load (~20 Hz loop rate)\n';
 		}
