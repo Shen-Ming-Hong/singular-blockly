@@ -4429,9 +4429,10 @@ function getLocalizedUploadError(stage, fallbackMessage) {
  */
 function handleTxtUploadProgress(message) {
 	console.log('[TXT] 上傳進度:', message.stage, message.progress + '%', message.message);
-	// 進入執行階段：切換為停止按鈕
+	// 進入執行階段：切換為停止按鈕並顯示通知
 	if (message.stage === 'executing') {
 		setUploadButtonState('txt-running');
+		toast.show(window.languageManager?.getMessage('TXT_UPLOAD_STAGE_EXECUTING', 'Executing program...') || 'Executing program...', 'info');
 	}
 }
 
