@@ -849,6 +849,28 @@ function updateFunctionSearchModalTexts() {
 	setTitle('functionSearchToggle', `${buttonTitle} ${shortcutTip}`);
 }
 
+/**
+ * 更新 TXT I/O 測試面板的文字為多語言版本
+ */
+function updateTxtTestPanelTexts() {
+	const lm = window.languageManager;
+	if (!lm) return;
+	const setText = (id, value) => {
+		const el = document.getElementById(id);
+		if (el) el.textContent = value;
+	};
+	const setTitle = (id, value) => {
+		const el = document.getElementById(id);
+		if (el) el.title = value;
+	};
+	setText('txtTestPanelTitle', lm.getMessage('TXT_TEST_PANEL_TITLE', 'TXT I/O Test Panel'));
+	setText('txtTestMotorsTitle', lm.getMessage('TXT_TEST_MOTORS_TITLE', 'Motors'));
+	setText('txtTestOutputsTitle', lm.getMessage('TXT_TEST_OUTPUTS_TITLE', 'Outputs'));
+	setText('txtTestInputsTitle', lm.getMessage('TXT_TEST_INPUTS_TITLE', 'Inputs'));
+	setText('txtTestStopAllBtn', lm.getMessage('TXT_TEST_STOP_ALL', 'STOP ALL'));
+	setTitle('txtTestPanelButton', lm.getMessage('TXT_TEST_PANEL_BUTTON_TITLE', 'TXT I/O Test Panel'));
+}
+
 // 註冊工具箱元件
 Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCategory.registrationName, Blockly.ToolboxCategory);
 
@@ -1619,6 +1641,8 @@ window.addEventListener('languageChanged', function (event) {
 	updateBackupModalTexts();
 	// 更新函式積木搜尋視窗的文字
 	updateFunctionSearchModalTexts();
+	// 更新 TXT I/O 測試面板的文字
+	updateTxtTestPanelTexts();
 	// 更新語言選單文字（例如 Auto 標籤）
 	populateLanguageDropdown();
 
@@ -4863,7 +4887,6 @@ function initTxtTestDialog() {
 	// Stop All button
 	const stopAllBtn = document.getElementById('txtTestStopAllBtn');
 	if (stopAllBtn) {
-		stopAllBtn.textContent = 'STOP ALL';
 		stopAllBtn.addEventListener('click', () => {
 			txtTestState.motorSpeed = [0, 0, 0, 0];
 			txtTestState.outputOn = [false, false, false, false, false, false, false, false];
@@ -4891,6 +4914,9 @@ function initTxtTestDialog() {
 	dialog.addEventListener('click', (e) => {
 		if (e.target === dialog) closeTxtTestDialog();
 	});
+
+	// 套用目前語言到面板文字
+	updateTxtTestPanelTexts();
 }
 
 function openTxtTestDialog() {
@@ -4936,7 +4962,9 @@ function updateMotorDisplay(motor) {
 	const valEl = document.getElementById(`txtMotorVal${motor}`);
 	const slider = document.getElementById(`txtMotorSlider${motor}`);
 	if (dirBtn) {
-		dirBtn.textContent = dir > 0 ? '▶ Fwd' : '◀ Bwd';
+		dirBtn.textContent = dir > 0
+			? (window.languageManager?.getMessage('TXT_TEST_MOTOR_FWD', '▶ Fwd') || '▶ Fwd')
+			: (window.languageManager?.getMessage('TXT_TEST_MOTOR_BWD', '◀ Bwd') || '◀ Bwd');
 		dirBtn.classList.toggle('backward', dir < 0);
 	}
 	if (valEl) valEl.textContent = speed;
@@ -4996,15 +5024,15 @@ function updateTxtTestStatus(status) {
 	dot.className = 'txt-test-status-dot';
 	if (status === 'connected') {
 		dot.classList.add('connected');
-		text.textContent = 'Connected';
+		text.textContent = window.languageManager?.getMessage('TXT_TEST_STATUS_CONNECTED', 'Connected') || 'Connected';
 	} else if (status === 'disconnected') {
 		dot.classList.add('disconnected');
-		text.textContent = 'Disconnected';
+		text.textContent = window.languageManager?.getMessage('TXT_TEST_STATUS_DISCONNECTED', 'Disconnected') || 'Disconnected';
 	} else if (status === 'paused') {
 		dot.classList.add('paused');
-		text.textContent = 'Paused';
+		text.textContent = window.languageManager?.getMessage('TXT_TEST_STATUS_PAUSED', 'Paused') || 'Paused';
 	} else {
-		text.textContent = 'Connecting…';
+		text.textContent = window.languageManager?.getMessage('TXT_TEST_STATUS_CONNECTING', 'Connecting…') || 'Connecting…';
 	}
 }
 
