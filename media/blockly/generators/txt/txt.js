@@ -111,7 +111,19 @@ window.txtGenerator.forBlock['txt_input_sensor'] = function (block) {
 	// 記錄感測器配置；txt_main 在 statementToCode 完成後呼叫 buildSetConfig()
 	window.txtGenerator.addInputConfig(parseInt(input), sensorType);
 	if (sensorType === 'ULTRASONIC') {
-		return [`txt.ultrasonic(${input}).distance()`, window.txtGenerator.ORDER_FUNCTION_CALL];
+		// 超音波量測失敗時（無回波、距離太近/太遠），ftrobopy 回傳 0。
+		// 若直接使用 0 作為速度/輸出值，會瞬間讓馬達或燈泡停止，造成可見閃爍。
+		// 使用 _read_ultrasonic() helper 保留最後一次有效讀值，過濾掉 0。
+		window.txtGenerator.addFunction(
+			'_read_ultrasonic',
+			`_ultrasonic_last_ = {}\n` +
+				`def _read_ultrasonic(port):\n` +
+				`    v = txt.ultrasonic(port).distance()\n` +
+				`    if v > 0:\n` +
+				`        _ultrasonic_last_[port] = v\n` +
+				`    return _ultrasonic_last_.get(port, 0)`
+		);
+		return [`_read_ultrasonic(${input})`, window.txtGenerator.ORDER_FUNCTION_CALL];
 	}
 	// BUTTON（按鈕）和 GATE（光柵）都使用 .state()，回傳 0 或 1
 	return [`txt.input(${input}).state()`, window.txtGenerator.ORDER_FUNCTION_CALL];
