@@ -138,7 +138,7 @@ export type ArduinoProgressCallback = (progress: ArduinoUploadProgress) => void;
  * 板子語言類型
  * 決定使用哪個上傳服務
  */
-export type BoardLanguage = 'arduino' | 'micropython';
+export type BoardLanguage = 'arduino' | 'micropython' | 'txt';
 
 /**
  * 板子語言映射表
@@ -155,6 +155,9 @@ export const BOARD_LANGUAGE_MAP: Record<string, BoardLanguage> = {
 
 	// MicroPython 類型
 	cyberbrick: 'micropython',
+
+	// TXT Controller 類型
+	txt: 'txt',
 };
 
 /**

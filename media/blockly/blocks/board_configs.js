@@ -574,6 +574,19 @@ framework = arduino`,
 		// ESP32-C3 硬體同時最多支援 6 個 PWM 輸出
 		maxPwmOutputs: 6,
 	},
+
+	// === fischertechnik TXT Controller 配置 ===
+	txt: {
+		name: 'TXT Controller',
+		language: 'txt',
+		toolbox: 'txt.json',
+		uploadMethod: 'ssh',
+		digitalPins: [],
+		analogPins: [],
+		interruptPins: [],
+		analogOutputRange: { min: 0, max: 512, defaultValue: 0 },
+		pullupPins: {},
+	},
 };
 
 // 預設值，設為全局變數

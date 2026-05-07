@@ -988,4 +988,54 @@ window.languageManager.loadMessages('en', {
 	SAMPLE_BROWSER_CONFIRM_YES: 'Load Sample',
 	SAMPLE_BROWSER_CONFIRM_NO: 'Cancel',
 	SAMPLE_BROWSER_ERROR_INVALID: 'Invalid sample format, cannot load',
+
+	// === TXT Controller ===
+	// Upload
+	UPLOAD_BUTTON_TITLE_TXT: 'Upload to TXT Controller',
+	// Connection Panel
+	TXT_CONNECTION_PANEL_TITLE: 'TXT Controller Connection Settings',
+	TXT_HOST_LABEL: 'Host IP',
+	TXT_USERNAME_LABEL: 'Username',
+	TXT_PASSWORD_LABEL: 'Password',
+	TXT_REMOTE_PATH_LABEL: 'Remote Path',
+	TXT_SAVE_CONFIG_BTN: 'Save Settings',
+	TXT_TEST_CONNECTION_BTN: 'Test Connection',
+	TXT_TESTING: 'Connecting...',
+	TXT_SSH_CONFIRM_HINT: 'Tip: If the TXT screen shows a confirmation prompt, press OK on the device to allow SSH access.',
+	TXT_CONFIG_SAVED: 'Settings saved',
+	// Upload stages
+	TXT_UPLOAD_STAGE_CONNECTING: 'Connecting to TXT Controller...',
+	TXT_UPLOAD_STAGE_UPLOADING: 'Uploading program...',
+	TXT_UPLOAD_STAGE_EXECUTING: 'Executing program...',
+	TXT_UPLOAD_STAGE_COMPLETED: 'Completed',
+	TXT_UPLOAD_STAGE_FAILED: 'Upload failed',
+	// Block labels
+	TXT_INIT: 'Initialize TXT Controller',
+	TXT_INIT_TOOLTIP: 'Connect to the fischertechnik TXT Controller',
+	TXT_MOTOR_SPEED: 'Motor',
+	TXT_MOTOR_SPEED_SET: 'set speed',
+	TXT_MOTOR_SPEED_TOOLTIP: 'Set motor speed (-512 to 512)',
+	TXT_MOTOR_STOP: 'Stop motor',
+	TXT_MOTOR_STOP_TOOLTIP: 'Stop the specified motor',
+	TXT_OUTPUT: 'Output',
+	TXT_OUTPUT_SET: 'set',
+	TXT_OUTPUT_TOOLTIP: 'Set output on or off',
+	TXT_INPUT_READ: 'Read input',
+	TXT_INPUT_READ_TOOLTIP: 'Read digital input value',
+	TXT_WAIT: 'Wait',
+	TXT_WAIT_UNIT: 'ms',
+	TXT_WAIT_TOOLTIP: 'Wait for the specified number of milliseconds',
+	TXT_STOP_ALL: 'Stop all motors and outputs',
+	TXT_STOP_ALL_TOOLTIP: 'Stop all motors and turn off all outputs',
+	// Dropdown options
+	TXT_DIRECTION_FORWARD: 'forward',
+	TXT_DIRECTION_BACKWARD: 'backward',
+	TXT_STATE_ON: 'ON',
+	TXT_STATE_OFF: 'OFF',
+	// Orphan warning
+		TXT_MAIN: 'TXT Main Program',
+	TXT_MAIN_TOOLTIP: 'The main entry point for TXT Controller. All blocks must be placed here.',
+	TXT_ORPHAN_WARNING: 'This block must be placed inside the "TXT Main" block',
+	// Category
+	CATEGORY_TXT: 'TXT Controller',
 });

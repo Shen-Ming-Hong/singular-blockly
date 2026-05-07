@@ -102,6 +102,7 @@ export class WebViewManager {
 	private internalUpdateCount: number = 0; // 避免內部更新觸發 FileWatcher
 	private aiModelManager?: AIModelManager;
 	private aiStatusBar?: AIStatusBar;
+	/** TXT Controller I/O Test Panel — T034 */
 
 	/**
 	 * 建立 WebView 管理器實例
@@ -368,9 +369,19 @@ export class WebViewManager {
 			);
 			const micropythonGeneratorUri = webview.asWebviewUri(micropythonGeneratorPath);
 
+			// TXT Controller 生成器
+			const txtGeneratorPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/blockly/generators/txt/index.js')
+			);
+			const txtGeneratorUri = webview.asWebviewUri(txtGeneratorPath);
+
 			// CyberBrick 積木定義
 			const cyberbrickBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/cyberbrick.js'));
 			const cyberbrickBlocksUri = webview.asWebviewUri(cyberbrickBlocksPath);
+
+			// TXT Controller 積木定義
+			const txtBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/txt.js'));
+			const txtBlocksUri = webview.asWebviewUri(txtBlocksPath);
 
 			// X11 擴展板積木定義
 			const x11BlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/x11.js'));
@@ -401,6 +412,16 @@ export class WebViewManager {
 					const modulePath = vscode.Uri.file(
 						path.join(this.context.extensionPath, `media/blockly/generators/micropython/${file}`)
 					);
+					const moduleUri = webview.asWebviewUri(modulePath);
+					return `<script src="${moduleUri}"></script>`;
+				})
+				.join('\n    ');
+
+			// TXT Controller 生成器模組（動態發現）
+			const discoveredTxtModules = await this.discoverTxtModules();
+			const txtModules = discoveredTxtModules
+				.map(file => {
+					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/txt/${file}`));
 					const moduleUri = webview.asWebviewUri(modulePath);
 					return `<script src="${moduleUri}"></script>`;
 				})
@@ -445,6 +466,17 @@ export class WebViewManager {
 			await this.extensionFileService.writeJsonFile(this.currentCyberbrickTempToolboxFile, resolvedCyberbrickToolbox, true);
 			const tempCyberbrickToolboxUri = webview.asWebviewUri(
 				vscode.Uri.file(path.join(this.context.extensionPath, this.currentCyberbrickTempToolboxFile))
+			);
+
+			// 讀取並處理 TXT Controller 工具箱配置
+			const txtToolboxJson = await this.extensionFileService.readJsonFile('media/toolbox/txt.json', {});
+			const resolvedTxtToolbox = await this.resolveToolboxIncludes(txtToolboxJson);
+
+			// 寫入 TXT 工具箱臨時檔案
+			const currentTxtTempToolboxFile = this.generateTempToolboxPath();
+			await this.extensionFileService.writeJsonFile(currentTxtTempToolboxFile, resolvedTxtToolbox, true);
+			const tempTxtToolboxUri = webview.asWebviewUri(
+				vscode.Uri.file(path.join(this.context.extensionPath, currentTxtTempToolboxFile))
 			);
 
 			// 替換所有預留位置
@@ -506,14 +538,18 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
+			htmlContent = htmlContent.replace('{txtGeneratorUri}', txtGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
+			htmlContent = htmlContent.replace('{txtBlocksUri}', txtBlocksUri.toString());
 			htmlContent = htmlContent.replace('{x11BlocksUri}', x11BlocksUri.toString());
 			htmlContent = htmlContent.replace('{x12BlocksUri}', x12BlocksUri.toString());
 			htmlContent = htmlContent.replace('{rcBlocksUri}', rcBlocksUri.toString());
 			htmlContent = htmlContent.replace('{arduinoModules}', arduinoModules);
 			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
+			htmlContent = htmlContent.replace('{txtModules}', txtModules);
 			htmlContent = htmlContent.replace('{toolboxUri}', tempToolboxUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickToolboxUri}', tempCyberbrickToolboxUri.toString());
+			htmlContent = htmlContent.replace('{txtToolboxUri}', tempTxtToolboxUri.toString());
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);
@@ -639,6 +675,26 @@ export class WebViewManager {
 			// Fallback to hardcoded list with warning
 			log('Warning: Failed to scan MicroPython generators directory, using fallback list', 'warn', error);
 			return ['cyberbrick.js', 'functions.js', 'lists.js', 'logic.js', 'loops.js', 'math.js', 'text.js', 'variables.js'];
+		}
+	}
+
+	/**
+	 * 自動發現 TXT 生成器模組
+	 * @returns 模組檔案名稱列表（已排序）
+	 */
+	private async discoverTxtModules(): Promise<string[]> {
+		try {
+			const generatorsPath = 'media/blockly/generators/txt';
+			const files = await this.extensionFileService.listFiles(generatorsPath);
+
+			// 過濾 .js 檔案，排除 index.js
+			const modules = files.filter(f => f.endsWith('.js') && f !== 'index.js').sort();
+
+			log(`Discovered ${modules.length} TXT generator modules`, 'info', modules);
+			return modules;
+		} catch (error) {
+			log('Warning: Failed to scan TXT generators directory, using fallback list', 'warn', error);
+			return ['txt.js'];
 		}
 	}
 
@@ -1450,4 +1506,7 @@ export class WebViewManager {
 			}
 		}, 2000);
 	}
+
+	// ── T034: TXT Controller I/O Test Panel ──────────────────────────────────
+
 }

@@ -9,12 +9,12 @@
 /**
  * 程式語言類型
  */
-export type BoardLanguage = 'arduino' | 'micropython';
+export type BoardLanguage = 'arduino' | 'micropython' | 'txt';
 
 /**
  * 上傳方式
  */
-export type UploadMethod = 'platformio' | 'mpremote';
+export type UploadMethod = 'platformio' | 'mpremote' | 'ssh';
 
 /**
  * USB 識別資訊

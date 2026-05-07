@@ -20,6 +20,7 @@ const ALLOWED_CONTAINERS = [
 	'procedures_defnoreturn',
 	'procedures_defreturn',
 	'micropython_main',
+	'txt_main',
 ];
 
 /**

@@ -187,7 +187,7 @@ const toast = {
 
 /**
  * 當前程式語言（用於決定使用哪個生成器）
- * @type {'arduino' | 'micropython'}
+ * @type {'arduino' | 'micropython' | 'txt'}
  */
 window.currentProgrammingLanguage = 'arduino';
 
@@ -202,6 +202,10 @@ function generateCode(workspace) {
 		console.log('[blockly] 使用 MicroPython 生成器生成程式碼');
 		return window.micropythonGenerator.workspaceToCode(workspace);
 	}
+	if (lang === 'txt' && window.txtGenerator) {
+		console.log('[blockly] 使用 TXT 生成器生成程式碼');
+		return window.txtGenerator.workspaceToCode(workspace);
+	}
 	console.log('[blockly] 使用 Arduino 生成器生成程式碼');
 	return window.arduinoGenerator.workspaceToCode(workspace);
 }
@@ -215,6 +219,10 @@ function getCurrentGenerator() {
 	if (lang === 'micropython' && window.micropythonGenerator) {
 		console.log('[blockly] 取得 MicroPython 生成器');
 		return window.micropythonGenerator;
+	}
+	if (lang === 'txt' && window.txtGenerator) {
+		console.log('[blockly] 取得 TXT 生成器');
+		return window.txtGenerator;
 	}
 	console.log('[blockly] 取得 Arduino 生成器');
 	return window.arduinoGenerator;
@@ -2755,11 +2763,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 			});
 
-			// CyberBrick 專用邏輯
+			// 非 Arduino 主板專用邏輯（MicroPython 及 TXT）
 			const boardConfig = window.BOARD_CONFIGS[selectedBoard];
-			if (boardConfig?.language === 'micropython') {
-				// 切換到 MicroPython 主板時，刪除 platformio.ini 避免與 PlatformIO 衝突
-				log.info('[blockly] 切換到 MicroPython 主板，發送刪除 platformio.ini 請求');
+			if (boardConfig?.language === 'micropython' || boardConfig?.language === 'txt') {
+				// 切換到非 Arduino 主板時，刪除 platformio.ini 避免與 PlatformIO 衝突
+				log.info(`[blockly] 切換到 ${boardConfig.language} 主板，發送刪除 platformio.ini 請求`);
 				vscode.postMessage({ command: 'deletePlatformioIni' });
 			}
 
@@ -2833,10 +2841,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 					});
 				}
 
-				// CyberBrick 專案載入時，確保刪除 platformio.ini 避免衝突
+				// 非 Arduino 專案載入時，確保刪除 platformio.ini 避免衝突
 				const boardConfig = window.BOARD_CONFIGS[message.board];
-				if (boardConfig?.language === 'micropython') {
-					log.info('[blockly] 載入 MicroPython 專案，檢查並刪除 platformio.ini');
+				if (boardConfig?.language === 'micropython' || boardConfig?.language === 'txt') {
+					log.info(`[blockly] 載入 ${boardConfig.language} 專案，檢查並刪除 platformio.ini`);
 					vscode.postMessage({ command: 'deletePlatformioIni' });
 				}
 			}
@@ -3136,6 +3144,57 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			case 'portListResponse':
 				handlePortListResponse(message);
+				break;
+
+			// TXT Controller SSH 上傳功能
+			case 'txtUploadProgress':
+				handleTxtUploadProgress(message);
+				break;
+
+			case 'txtUploadResult':
+				handleTxtUploadResult(message);
+				break;
+
+			case 'txtExecutionStopped':
+				setUploadButtonState('ready');
+				break;
+
+			// TXT Controller 連線設定回應
+			case 'txtConfigSaved':
+			case 'txtConfigLoaded':
+				handleTxtConfigLoaded(message);
+				break;
+
+			case 'txtConnectionTestResult':
+				handleTxtConnectionTestResult(message);
+				break;
+
+			case 'txtTestIoUpdate':
+				handleTxtTestIoUpdate(message.snapshot);
+				break;
+
+			case 'txtTestPollFailed':
+				handleTxtTestPollFailure();
+				break;
+
+			case 'txtTestPause':
+				pauseTxtTestPolling();
+				break;
+
+			case 'txtTestResume':
+				resumeTxtTestPolling();
+				break;
+
+			case 'txtInstallRuntimeStart':
+				updateTxtTestStatus('connecting');
+				break;
+
+			case 'txtInstallRuntimeDone':
+				if (message.success) {
+					updateTxtTestStatus('connected');
+				} else {
+					updateTxtTestStatus('disconnected');
+				}
 				break;
 
 			// Serial Monitor 功能
@@ -3607,9 +3666,18 @@ async function updateToolboxForBoard(workspace, boardId) {
 	try {
 		// 檢查是否為 CyberBrick（MicroPython）
 		const isCyberBrick = boardId === 'cyberbrick';
+		// 檢查是否為 TXT Controller
+		const isTxt = window.BOARD_CONFIGS && window.BOARD_CONFIGS[boardId] && window.BOARD_CONFIGS[boardId].language === 'txt';
 
 		// 根據開發板類型選擇工具箱 URL
-		const toolboxUrl = isCyberBrick ? window.CYBERBRICK_TOOLBOX_URL : window.TOOLBOX_URL;
+		let toolboxUrl;
+		if (isCyberBrick) {
+			toolboxUrl = window.CYBERBRICK_TOOLBOX_URL;
+		} else if (isTxt) {
+			toolboxUrl = window.TXT_TOOLBOX_URL;
+		} else {
+			toolboxUrl = window.TOOLBOX_URL;
+		}
 
 		// 重新載入對應的 toolbox 配置
 		const response = await fetch(toolboxUrl);
@@ -3618,8 +3686,8 @@ async function updateToolboxForBoard(workspace, boardId) {
 		// 檢查是否為 ESP32 系列開發板（包括 CyberBrick 的某些功能）
 		const isESP32Board = boardId === 'esp32' || boardId === 'esp32_super_mini';
 
-		// 如果不是 CyberBrick，才需要過濾 ESP32 專屬積木
-		if (!isCyberBrick) {
+		// 如果不是 CyberBrick 也不是 TXT，才需要過濾 ESP32 專屬積木
+		if (!isCyberBrick && !isTxt) {
 			// 遞迴過濾 toolbox 中的積木和分類
 			const filterToolboxContents = contents => {
 				if (!contents || !Array.isArray(contents)) return contents;
@@ -3682,13 +3750,13 @@ async function updateToolboxForBoard(workspace, boardId) {
 
 		// 更新 workspace 的 toolbox
 		workspace.updateToolbox(toolboxConfig);
-		console.log(`[blockly] 已根據開發板 ${boardId} 更新工具箱 (CyberBrick: ${isCyberBrick}, ESP32: ${isESP32Board})`);
+		console.log(`[blockly] 已根據開發板 ${boardId} 更新工具箱 (CyberBrick: ${isCyberBrick}, TXT: ${isTxt}, ESP32: ${isESP32Board})`);
 
 		// 更新 UI 元素（上傳按鈕、生成器切換等）
-		updateUIForBoard(boardId, isCyberBrick);
+		updateUIForBoard(boardId, isCyberBrick, isTxt);
 
 		// 更新工作區中已存在的 ESP32 專屬積木警告（僅針對 Arduino 板）
-		if (!isCyberBrick) {
+		if (!isCyberBrick && !isTxt) {
 			updateEsp32BlockWarnings(workspace, isESP32Board);
 		}
 	} catch (error) {
@@ -3700,8 +3768,9 @@ async function updateToolboxForBoard(workspace, boardId) {
  * 根據開發板更新 UI 元素（上傳按鈕、生成器等）
  * @param {string} boardId - 開發板 ID
  * @param {boolean} isCyberBrick - 是否為 CyberBrick
+ * @param {boolean} isTxt - 是否為 TXT Controller
  */
-function updateUIForBoard(boardId, isCyberBrick) {
+function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 	// 更新上傳按鈕顯示（所有板子都顯示上傳按鈕，但 'none' 時按鈕需要特殊處理）
 	const uploadContainer = document.getElementById('uploadContainer');
 	const uploadButton = document.getElementById('uploadButton');
@@ -3715,13 +3784,21 @@ function updateUIForBoard(boardId, isCyberBrick) {
 	if (uploadButton && window.languageManager) {
 		if (isCyberBrick) {
 			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE', 'Upload to CyberBrick');
+		} else if (isTxt) {
+			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE_TXT', 'Upload to TXT Controller');
 		} else {
 			uploadButton.title = window.languageManager.getMessage('UPLOAD_BUTTON_TITLE_ARDUINO', 'Compile and Upload');
 		}
 	}
 
 	// T019: 記錄當前使用的程式語言
-	window.currentProgrammingLanguage = isCyberBrick ? 'micropython' : 'arduino';
+	if (isCyberBrick) {
+		window.currentProgrammingLanguage = 'micropython';
+	} else if (isTxt) {
+		window.currentProgrammingLanguage = 'txt';
+	} else {
+		window.currentProgrammingLanguage = 'arduino';
+	}
 
 	console.log(`[blockly] UI 已更新: 開發板=${boardId}, 語言=${window.currentProgrammingLanguage}, 上傳按鈕=顯示`);
 
@@ -3737,9 +3814,110 @@ function updateUIForBoard(boardId, isCyberBrick) {
 	if (sampleContainer) {
 		sampleContainer.style.display = isCyberBrick ? 'flex' : 'none';
 	}
+
+	// T015: 根據板子類型顯示/隱藏 TXT 設定按鈕
+	const txtConfigContainer = document.getElementById('txtConfigContainer');
+	if (txtConfigContainer) {
+		txtConfigContainer.style.display = isTxt ? 'flex' : 'none';
+	}
+
+	// 切換到 TXT 時自動開啟設定對話框
+	if (isTxt) {
+		const txtModal = document.getElementById('txtConnectionModal');
+		if (txtModal) {
+			txtModal.style.display = 'block';
+		}
+		// 載入已儲存的 TXT 設定
+		vscode.postMessage({ command: 'txtLoadConfig' });
+		// 初始化 TXT 連線面板按鈕事件（每次切換時重新綁定）
+		initTxtConnectionPanel();
+	}
 }
 
 // ===== CyberBrick MicroPython 上傳功能 =====
+
+/**
+ * 初始化 TXT 連線設定面板的按鈕事件
+ */
+function initTxtConnectionPanel() {
+	// 關閉 modal 的輔助函式
+	function closeTxtModal() {
+		const modal = document.getElementById('txtConnectionModal');
+		if (modal) modal.style.display = 'none';
+	}
+
+	// 綁定 modal close 按鈕（X）
+	const closeBtn = document.getElementById('txtModalClose');
+	if (closeBtn) {
+		const newCloseBtn = closeBtn.cloneNode(true);
+		closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+		newCloseBtn.addEventListener('click', closeTxtModal);
+	}
+
+	// 點擊 modal 背景（外部）關閉
+	const modal = document.getElementById('txtConnectionModal');
+	if (modal) {
+		modal.addEventListener('click', (e) => {
+			if (e.target === modal) closeTxtModal();
+		});
+	}
+
+	// 綁定工具列 TXT 設定按鈕（重新開啟 modal）
+	const txtConfigButton = document.getElementById('txtConfigButton');
+	if (txtConfigButton) {
+		const newBtn = txtConfigButton.cloneNode(true);
+		txtConfigButton.parentNode.replaceChild(newBtn, txtConfigButton);
+		newBtn.addEventListener('click', () => {
+			const m = document.getElementById('txtConnectionModal');
+			if (m) m.style.display = 'block';
+		});
+	}
+
+	// 儲存設定按鈕
+	const saveBtn = document.getElementById('txtSaveConfigBtn');
+	if (saveBtn) {
+		const newSaveBtn = saveBtn.cloneNode(true);
+		saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+		newSaveBtn.addEventListener('click', () => {
+			const host = document.getElementById('txtHostInput')?.value?.trim() || '';
+			const username = document.getElementById('txtUsernameInput')?.value?.trim() || '';
+			const rawPassword = document.getElementById('txtPasswordInput')?.value || '';
+			const remotePath = document.getElementById('txtRemotePathInput')?.value?.trim() || '';
+			// 若使用者未修改密碼欄位（哨兵值），傳空字串讓後端保留舊密碼
+			const password = rawPassword === TXT_PASSWORD_SENTINEL ? '' : rawPassword;
+			vscode.postMessage({
+				command: 'txtSaveConfig',
+				host,
+				username,
+				password,
+				remotePath,
+			});
+			// 儲存後關閉 modal
+			closeTxtModal();
+		});
+	}
+
+	// 測試連線按鈕
+	const testBtn = document.getElementById('txtTestConnectionBtn');
+	if (testBtn) {
+		const newTestBtn = testBtn.cloneNode(true);
+		testBtn.parentNode.replaceChild(newTestBtn, testBtn);
+		newTestBtn.addEventListener('click', () => {
+			const statusEl = document.getElementById('txtConnectionStatus');
+			if (statusEl) {
+				statusEl.textContent = window.languageManager?.getMessage('TXT_TESTING', '連線中...');
+				statusEl.className = '';
+			}
+			vscode.postMessage({ command: 'txtTestConnection' });
+		});
+	}
+
+	// SSH 確認提示
+	const sshHint = document.getElementById('txtSshHint');
+	if (sshHint) {
+		sshHint.textContent = window.languageManager?.getMessage('TXT_SSH_CONFIRM_HINT', '提示：連線時若 TXT 螢幕出現確認畫面，請按 OK 允許 SSH 存取。');
+	}
+}
 
 /**
  * 上傳按鈕狀態
@@ -3811,6 +3989,7 @@ async function handleUploadClick() {
 
 	// 根據程式語言類型發送不同的上傳請求
 	const isMicroPython = window.currentProgrammingLanguage === 'micropython';
+	const isTxt = window.currentProgrammingLanguage === 'txt';
 
 	if (isMicroPython) {
 		// CyberBrick MicroPython 上傳請求
@@ -3820,6 +3999,14 @@ async function handleUploadClick() {
 			code: code,
 			board: currentBoard,
 			port: uploadState.selectedPort,
+		});
+	} else if (isTxt) {
+		// fischertechnik TXT Controller SSH 上傳請求
+		console.log('[blockly] 發送 TXT 上傳請求');
+		vscode.postMessage({
+			command: 'txtUpload',
+			code: code,
+			board: currentBoard,
 		});
 	} else {
 		// T018: Arduino C++ 上傳請求（包含 lib_deps, build_flags）
@@ -4183,6 +4370,79 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 }
 
 /**
+ * 處理 TXT 上傳進度訊息
+ * @param {Object} message - 進度訊息
+ */
+function handleTxtUploadProgress(message) {
+	console.log('[TXT] 上傳進度:', message.stage, message.progress + '%', message.message);
+}
+
+/**
+ * 處理 TXT 上傳結果訊息
+ * @param {Object} message - 結果訊息
+ */
+function handleTxtUploadResult(message) {
+	console.log('[TXT] 上傳結果:', message);
+	setUploadButtonState(message.success ? 'success' : 'error');
+	if (message.success) {
+		const elapsed = message.duration ? (message.duration / 1000).toFixed(1) : '';
+		let msg = window.languageManager?.getMessage('UPLOAD_SUCCESS', 'Upload successful!');
+		if (elapsed) msg += ` (${elapsed}s)`;
+		toast.show(msg, 'success');
+	} else {
+		const failedTemplate = window.languageManager?.getMessage('UPLOAD_FAILED', 'Upload failed: {0}') || 'Upload failed: {0}';
+		const errDetail = message.error || 'unknown error';
+		toast.show(failedTemplate.replace('{0}', errDetail), 'error', 5000);
+	}
+}
+
+/**
+ * 處理 TXT 連線設定載入回應
+ * @param {Object} message - 設定訊息
+ */
+/** 密碼欄位哨兵值：表示後端已有儲存密碼，使用者未修改 */
+const TXT_PASSWORD_SENTINEL = '••••••••';
+
+function handleTxtConfigLoaded(message) {
+	if (message.host) {
+		window.txtConnectionHost_ = message.host;
+	}
+	// 填入 UI 表單（如果存在）
+	const hostInput = document.getElementById('txtHostInput');
+	const usernameInput = document.getElementById('txtUsernameInput');
+	const passwordInput = document.getElementById('txtPasswordInput');
+	const remotePathInput = document.getElementById('txtRemotePathInput');
+	if (hostInput && message.host) hostInput.value = message.host;
+	if (usernameInput && message.username) usernameInput.value = message.username;
+	// 若後端已有密碼，填入哨兵值讓使用者知道密碼已儲存（不傳回真實密碼）
+	if (passwordInput) {
+		if (message.customPasswordSet) {
+			// 使用者已自訂密碼：顯示哨兵值，讓使用者知道密碼已儲存
+			passwordInput.value = TXT_PASSWORD_SENTINEL;
+		} else {
+			// 尚未自訂，使用預設密碼（ftc）—— 密碼欄留空，placeholder 說明即可
+			passwordInput.value = '';
+			passwordInput.placeholder = '預設: ftc（留空即使用預設值）';
+		}
+	}
+	if (remotePathInput && message.remotePath) remotePathInput.value = message.remotePath;
+}
+
+/**
+ * 處理 TXT 連線測試結果
+ * @param {Object} message - 測試結果訊息
+ */
+function handleTxtConnectionTestResult(message) {
+	const statusEl = document.getElementById('txtConnectionStatus');
+	if (statusEl) {
+		statusEl.textContent = message.message;
+		statusEl.className = message.success ? 'txt-status-ok' : 'txt-status-error';
+	}
+	const toastType = message.success ? 'success' : 'error';
+	toast.show(message.message, toastType);
+}
+
+/**
  * 初始化範例瀏覽器按鈕與模態事件（T006）
  */
 function initSampleBrowser() {
@@ -4436,3 +4696,263 @@ function updateMonitorButtonState() {
 		monitorBtn.title = window.languageManager?.getMessage('MONITOR_BUTTON_TITLE', '開啟 Monitor') || 'Open Monitor';
 	}
 }
+
+// ── TXT I/O Test Panel Dialog ──────────────────────────────────────────────
+
+const txtTestState = {
+	pollTimer: null,
+	failureCount: 0,
+	motorDir: [1, 1, 1, 1],   // 1=Forward, -1=Backward
+	motorSpeed: [0, 0, 0, 0], // absolute 0-512
+	outputOn: [false, false, false, false, false, false, false, false],
+};
+
+function initTxtTestDialog() {
+	const dialog = document.getElementById('txtTestPanelDialog');
+	if (!dialog) return;
+
+	// Build Motors UI (M1–M4)
+	const motorsEl = document.getElementById('txtTestMotors');
+	if (motorsEl) {
+		motorsEl.innerHTML = '';
+		for (let i = 1; i <= 4; i++) {
+			const row = document.createElement('div');
+			row.className = 'txt-motor-row';
+			row.innerHTML = `<span class="txt-motor-label">M${i}</span>
+<input type="range" class="txt-motor-slider" id="txtMotorSlider${i}" min="0" max="512" value="0">
+<button class="txt-motor-dir" id="txtMotorDir${i}" data-motor="${i}"></button>
+<span class="txt-motor-value" id="txtMotorVal${i}">0</span>`;
+			motorsEl.appendChild(row);
+
+			const slider = document.getElementById(`txtMotorSlider${i}`);
+			const dirBtn = document.getElementById(`txtMotorDir${i}`);
+
+			slider.addEventListener('change', () => {
+				txtTestState.motorSpeed[i - 1] = parseInt(slider.value, 10);
+				sendMotor(i);
+				updateMotorDisplay(i);
+			});
+			slider.addEventListener('input', () => {
+				document.getElementById(`txtMotorVal${i}`).textContent = slider.value;
+			});
+			dirBtn.addEventListener('click', () => {
+				txtTestState.motorDir[i - 1] *= -1;
+				sendMotor(i);
+				updateMotorDisplay(i);
+			});
+			updateMotorDisplay(i);
+		}
+	}
+
+	// Build Outputs UI (O1–O8)
+	const outputsEl = document.getElementById('txtTestOutputs');
+	if (outputsEl) {
+		outputsEl.innerHTML = '';
+		for (let i = 1; i <= 8; i++) {
+			const btn = document.createElement('button');
+			btn.className = 'txt-output-btn';
+			btn.id = `txtOutputBtn${i}`;
+			btn.dataset.output = i;
+			btn.textContent = `O${i}`;
+			btn.addEventListener('click', () => {
+				txtTestState.outputOn[i - 1] = !txtTestState.outputOn[i - 1];
+				btn.classList.toggle('active', txtTestState.outputOn[i - 1]);
+				vscode.postMessage({ command: 'txtTestSetOutput', output: i, level: txtTestState.outputOn[i - 1] ? 512 : 0 });
+			});
+			outputsEl.appendChild(btn);
+		}
+	}
+
+	// Build Inputs UI (I1–I8)
+	const inputsEl = document.getElementById('txtTestInputs');
+	if (inputsEl) {
+		inputsEl.innerHTML = '';
+		for (let i = 1; i <= 8; i++) {
+			const box = document.createElement('div');
+			box.className = 'txt-input-box';
+			box.innerHTML = `<span>I${i}</span><div class="txt-input-value" id="txtInputVal${i}">—</div>`;
+			inputsEl.appendChild(box);
+		}
+	}
+
+	// Stop All button
+	const stopAllBtn = document.getElementById('txtTestStopAllBtn');
+	if (stopAllBtn) {
+		stopAllBtn.textContent = 'STOP ALL';
+		stopAllBtn.addEventListener('click', () => {
+			txtTestState.motorSpeed = [0, 0, 0, 0];
+			txtTestState.outputOn = [false, false, false, false, false, false, false, false];
+			for (let i = 1; i <= 4; i++) {
+				const slider = document.getElementById(`txtMotorSlider${i}`);
+				if (slider) slider.value = 0;
+				updateMotorDisplay(i);
+			}
+			for (let i = 1; i <= 8; i++) {
+				const btn = document.getElementById(`txtOutputBtn${i}`);
+				if (btn) btn.classList.remove('active');
+			}
+			vscode.postMessage({ command: 'txtTestStopAll' });
+		});
+	}
+
+	// Close button
+	const closeBtn = document.getElementById('txtTestCloseBtn');
+	if (closeBtn) {
+		closeBtn.addEventListener('click', closeTxtTestDialog);
+	}
+
+	// Retry button
+	const retryBtn = document.getElementById('txtTestRetryBtn');
+	if (retryBtn) {
+		retryBtn.addEventListener('click', () => {
+			retryBtn.style.display = 'none';
+			txtTestState.failureCount = 0;
+			updateTxtTestStatus('connected');
+			startTxtTestPolling();
+		});
+	}
+
+	// Close on backdrop click
+	dialog.addEventListener('click', (e) => {
+		if (e.target === dialog) closeTxtTestDialog();
+	});
+}
+
+function openTxtTestDialog() {
+	const dialog = document.getElementById('txtTestPanelDialog');
+	if (!dialog) return;
+	if (dialog.open) { dialog.focus(); return; } // singleton guard
+	txtTestState.failureCount = 0;
+	txtTestState.motorSpeed = [0, 0, 0, 0];
+	txtTestState.motorDir = [1, 1, 1, 1];
+	txtTestState.outputOn = [false, false, false, false, false, false, false, false];
+	updateTxtTestStatus('connecting');
+	dialog.showModal();
+	vscode.postMessage({ command: 'txtTestDialogOpen' });
+	startTxtTestPolling();
+}
+
+function closeTxtTestDialog() {
+	const dialog = document.getElementById('txtTestPanelDialog');
+	if (!dialog || !dialog.open) return;
+	stopTxtTestPolling();
+	vscode.postMessage({ command: 'txtTestDialogClose' });
+	dialog.close();
+}
+
+function sendMotor(motor) {
+	const speed = txtTestState.motorSpeed[motor - 1] * txtTestState.motorDir[motor - 1];
+	vscode.postMessage({ command: 'txtTestSetMotor', motor, speed });
+}
+
+function updateMotorDisplay(motor) {
+	const dir = txtTestState.motorDir[motor - 1];
+	const speed = txtTestState.motorSpeed[motor - 1];
+	const dirBtn = document.getElementById(`txtMotorDir${motor}`);
+	const valEl = document.getElementById(`txtMotorVal${motor}`);
+	const slider = document.getElementById(`txtMotorSlider${motor}`);
+	if (dirBtn) {
+		dirBtn.textContent = dir > 0 ? '▶ Fwd' : '◀ Bwd';
+		dirBtn.classList.toggle('backward', dir < 0);
+	}
+	if (valEl) valEl.textContent = speed;
+	if (slider) slider.value = speed;
+}
+
+function startTxtTestPolling() {
+	stopTxtTestPolling();
+	txtTestState.pollTimer = setInterval(() => {
+		vscode.postMessage({ command: 'txtTestPollIo' });
+	}, 400);
+}
+
+function stopTxtTestPolling() {
+	if (txtTestState.pollTimer !== null) {
+		clearInterval(txtTestState.pollTimer);
+		txtTestState.pollTimer = null;
+	}
+}
+
+function pauseTxtTestPolling() {
+	stopTxtTestPolling();
+	updateTxtTestStatus('paused');
+}
+
+function resumeTxtTestPolling() {
+	const dialog = document.getElementById('txtTestPanelDialog');
+	if (dialog && dialog.open) {
+		txtTestState.failureCount = 0;
+		updateTxtTestStatus('connected');
+		startTxtTestPolling();
+	}
+}
+
+function updateTxtTestStatus(status) {
+	const dot = document.getElementById('txtTestStatusDot');
+	const text = document.getElementById('txtTestStatusText');
+	const retryBtn = document.getElementById('txtTestRetryBtn');
+	if (!dot || !text) return;
+	dot.className = 'txt-test-status-dot';
+	retryBtn.style.display = 'none';
+	if (status === 'connected') {
+		dot.classList.add('connected');
+		text.textContent = 'Connected';
+	} else if (status === 'disconnected') {
+		dot.classList.add('disconnected');
+		text.textContent = 'Disconnected';
+		retryBtn.style.display = '';
+		retryBtn.textContent = 'Retry';
+	} else if (status === 'paused') {
+		dot.classList.add('paused');
+		text.textContent = 'Paused';
+	} else {
+		text.textContent = 'Connecting…';
+	}
+}
+
+function handleTxtTestIoUpdate(snapshot) {
+	if (!snapshot) return;
+	txtTestState.failureCount = 0;
+	updateTxtTestStatus('connected');
+	// Inputs
+	if (Array.isArray(snapshot.inputs)) {
+		snapshot.inputs.forEach((val, idx) => {
+			const el = document.getElementById(`txtInputVal${idx + 1}`);
+			if (el) el.textContent = val;
+		});
+	}
+	// Motors (reflect server state)
+	if (Array.isArray(snapshot.motors)) {
+		snapshot.motors.forEach((speed, idx) => {
+			const motor = idx + 1;
+			const absSpeed = Math.abs(speed);
+			const dir = speed >= 0 ? 1 : -1;
+			txtTestState.motorSpeed[idx] = absSpeed;
+			txtTestState.motorDir[idx] = dir;
+			updateMotorDisplay(motor);
+		});
+	}
+	// Outputs (reflect server state)
+	if (Array.isArray(snapshot.outputs)) {
+		snapshot.outputs.forEach((val, idx) => {
+			txtTestState.outputOn[idx] = val > 0;
+			const btn = document.getElementById(`txtOutputBtn${idx + 1}`);
+			if (btn) btn.classList.toggle('active', val > 0);
+		});
+	}
+}
+
+function handleTxtTestPollFailure() {
+	txtTestState.failureCount++;
+	if (txtTestState.failureCount >= 3) {
+		stopTxtTestPolling();
+		updateTxtTestStatus('disconnected');
+	}
+}
+
+// Bind txtTestPanelButton after DOM ready (may be called before initTxtConnectionPanel)
+document.addEventListener('DOMContentLoaded', () => {
+	initTxtTestDialog();
+	const panelBtn = document.getElementById('txtTestPanelButton');
+	if (panelBtn) panelBtn.addEventListener('click', openTxtTestDialog);
+});
