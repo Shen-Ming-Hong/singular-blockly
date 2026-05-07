@@ -28,6 +28,13 @@ window.txtGenerator.forBlock['txt_main'] = function (block) {
 	if (setConfigCode) {
 		code += setConfigCode + '\n\n';
 	}
+	// 預先建立馬達物件（_m1 = txt.motor(1) 等）
+	// 避免在迴圈中反覆呼叫 txt.motor(N) 造成 setConfig() 累加 config_id，
+	// 進而觸發 exchange thread 在每次迴圈都送出 CONFIG_IO 指令，造成馬達/燈光閃爍
+	const preCreationsCode = window.txtGenerator.buildPreCreations();
+	if (preCreationsCode) {
+		code += preCreationsCode + '\n\n';
+	}
 	// 直接輸出子積木程式碼，不加外層 while True。
 	// 使用者若需要持續輪詢，應自行在容器內加入「重複當 真」迴圈積木。
 	if (childCode) {
@@ -57,6 +64,9 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
 	const direction = block.getFieldValue('DIRECTION');
 	const speed = window.txtGenerator.valueToCode(block, 'SPEED', window.txtGenerator.ORDER_NONE) || '0';
 
+	// 記錄此馬達埠號，供 txt_main 預先建立 mot 物件
+	window.txtGenerator.addMotorPort(motor);
+
 	let speedCode;
 	if (direction === 'BACKWARD') {
 		speedCode = `-(${speed})`;
@@ -64,10 +74,12 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
 		speedCode = speed;
 	}
 
+	// 使用預先建立的 _m{N} 物件（在 txt_main 初始化時建立一次），
+	// 避免在迴圈中反覆呼叫 txt.motor(N)（會累加 config_id 造成 CONFIG_IO 風暴）。
 	// ftrobopy setSpeed() 需要整數，且內部以 int(pwm/2) 縮放至 ubyte(0-255)；
-	// 超過 512 的值（如搖桿超出預期範圍）會讓 int(val/2)>255 觸發 struct.error。
-	// 用 max(-512, min(512, int(...))) 夾鉗確保永遠在合法範圍內。
-	return `txt.motor(${motor}).setSpeed(max(-512, min(512, int(${speedCode}))))\n`;
+	// 超過 512 的値（如搖桿超出預期範圍）會讓 int(val/2)>255 觸發 struct.error。
+	// 用 max(-512, min(512, int(...))) 夾錢確保永遠在合法範圍內。
+	return `_m${motor}.setSpeed(max(-512, min(512, int(${speedCode}))))\n`;
 };
 
 /**
@@ -75,7 +87,9 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
  */
 window.txtGenerator.forBlock['txt_motor_stop'] = function (block) {
 	const motor = block.getFieldValue('MOTOR');
-	return `txt.motor(${motor}).setSpeed(0)\n`;
+	// 記錄此馬達埠號，供 txt_main 預先建立 mot 物件
+	window.txtGenerator.addMotorPort(motor);
+	return `_m${motor}.setSpeed(0)\n`;
 };
 
 // === 輸出積木 ===
@@ -113,12 +127,16 @@ window.txtGenerator.forBlock['txt_input_sensor'] = function (block) {
 	if (sensorType === 'ULTRASONIC') {
 		// 超音波量測失敗時（無回波、距離太近/太遠），ftrobopy 回傳 0。
 		// 若直接使用 0 作為速度/輸出值，會瞬間讓馬達或燈泡停止，造成可見閃爍。
-		// 使用 _read_ultrasonic() helper 保留最後一次有效讀值，過濾掉 0。
+		// _read_ultrasonic() 使用懶性初始化（每埠只呼叫一次 txt.ultrasonic()），
+		// 後續迴圈只呼叫 .distance() 讀取緩衝區，不會累加 config_id 造成 CONFIG_IO 閃爍。
 		window.txtGenerator.addFunction(
 			'_read_ultrasonic',
-			`_ultrasonic_last_ = {}\n` +
+			`_ultrasonic_cache_ = {}\n` +
+				`_ultrasonic_last_ = {}\n` +
 				`def _read_ultrasonic(port):\n` +
-				`    v = txt.ultrasonic(port).distance()\n` +
+				`    if port not in _ultrasonic_cache_:\n` +
+				`        _ultrasonic_cache_[port] = txt.ultrasonic(port)\n` +
+				`    v = _ultrasonic_cache_[port].distance()\n` +
 				`    if v > 0:\n` +
 				`        _ultrasonic_last_[port] = v\n` +
 				`    return _ultrasonic_last_.get(port, 0)`

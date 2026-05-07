@@ -307,12 +307,13 @@
 		let branch = g.statementToCode(block, 'DO') || g.INDENT + 'pass\n';
 		if (until) cond = 'not ' + cond;
 		// 無限迴圈（while True）若迴圈內有使用超音波感測器，且使用者沒有自行加入 delay，
-		// 自動補上最低限度的 50ms 延遲（20 Hz）。
-		// 超音波感測器需要足夠的發射/接收間隔；過度輪詢會產生刺耳高頻雜訊。
+		// 自動補上 50ms 延遲以降低 CPU 使用率（迴圈約 20 Hz）。
+		// 注意：ftrobopy exchange thread 預設以 100 Hz 執行（update_interval=0.01），
+		// 此 sleep 並非超音波感測所必須，而是防止使用者空間迴圈無限速運轉消耗 CPU。
 		const hasUltrasonic = [...g.inputConfigs_.values()].some(t => t === 'ULTRASONIC');
 		if (!until && cond === 'True' && hasUltrasonic && !branch.includes('time.sleep')) {
 			g.addImport('import time');
-			branch += g.INDENT + 'time.sleep(0.05)  # 20 Hz polling, required for ultrasonic sensor\n';
+			branch += g.INDENT + 'time.sleep(0.05)  # 50 ms loop delay to reduce CPU load (~20 Hz loop rate)\n';
 		}
 		return 'while ' + cond + ':\n' + branch;
 	};

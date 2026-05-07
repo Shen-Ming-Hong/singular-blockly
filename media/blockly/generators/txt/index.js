@@ -48,12 +48,20 @@ window.txtGenerator.functions_ = new Map();
 window.txtGenerator.inputConfigs_ = new Map();
 
 /**
+ * 馬達埠號追蹤（供 txt_main 預先建立 mot 物件，避免在迴圈中反覆呼叫 txt.motor(N)）
+ * 每次呼叫 txt.motor(N) 都會執行 setConfig() 累加 config_id，
+ * 導致 exchange thread 在每次迴圈都送出 CONFIG_IO 指令，可能造成馬達/燈光閃爍。
+ */
+window.txtGenerator.motorPorts_ = new Set();
+
+/**
  * 重置生成器狀態
  */
 window.txtGenerator.reset = function () {
 	this.imports_.clear();
 	this.functions_.clear();
 	this.inputConfigs_.clear();
+	this.motorPorts_.clear();
 };
 
 /**
@@ -71,6 +79,27 @@ window.txtGenerator.addImport = function (importStatement) {
  */
 window.txtGenerator.addInputConfig = function (port, sensorType) {
 	this.inputConfigs_.set(port, sensorType);
+};
+
+/**
+ * 記錄使用中的馬達埠號，供 txt_main 生成預先建立的 mot 物件
+ * @param {number|string} port 馬達埠號（1~4）
+ */
+window.txtGenerator.addMotorPort = function (port) {
+	this.motorPorts_.add(Number(port));
+};
+
+/**
+ * 生成馬達物件預先建立程式碼：_m1 = txt.motor(1) 等
+ * 在 while 迴圈外只建立一次，避免迴圈中反覆 setConfig() 累加 config_id 造成閃爍
+ * @returns {string} 預建程式碼，或空字串
+ */
+window.txtGenerator.buildPreCreations = function () {
+	const lines = [];
+	for (const port of [...this.motorPorts_].sort((a, b) => a - b)) {
+		lines.push(`_m${port} = txt.motor(${port})`);
+	}
+	return lines.join('\n');
 };
 
 /**
@@ -173,9 +202,10 @@ window.txtGenerator.finish = function (code) {
 	fullCode += `# Generated: ${new Date().toISOString()}\n\n`;
 
 	// 抑制 SIGTERM 時 ftrobopy Thread-1 印出的 SerialException 雜訊
-	// sys._is_finalizing() 為 True 代表 Python 正在關閉，此時的 thread exception 可安全忽略
+	// sys.is_finalizing() 為 True 代表 Python 正在關閉，此時的 thread exception 可安全忽略
+	// 注意：Python 3.9+ 使用 sys.is_finalizing()，舊版私有 API _is_finalizing() 已移除
 	fullCode += 'import threading as _t, sys as _s\n';
-	fullCode += '_t.excepthook = lambda a: None if _s._is_finalizing() else _t.__excepthook__(a)\n\n';
+	fullCode += '_t.excepthook = lambda a: None if _s.is_finalizing() else _t.__excepthook__(a)\n\n';
 
 	if (imports) {
 		fullCode += '# [1] Imports\n';
