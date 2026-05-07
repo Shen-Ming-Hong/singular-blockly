@@ -16,8 +16,11 @@
  */
 window.txtGenerator.forBlock['txt_main'] = function (block) {
 	window.txtGenerator.addImport('import ftrobopy');
-	window.txtGenerator.addImport('import time');
-	const childCode = window.txtGenerator.statementToCode(block, 'DO');
+	// statementToCode 回傳的程式碼每行都有一層 INDENT（4 空格），
+	// 以前放進 while True: 裡剛好正確，現在 txt_main 沒有外層容器，
+	// 必須去除這一層多餘縮排，否則頂層的 while/def 等會產生 IndentationError。
+	const rawChildCode = window.txtGenerator.statementToCode(block, 'DO');
+	const childCode = rawChildCode.replace(/^    /gm, '');
 	let code = "txt = ftrobopy.ftrobopy('auto')\n\n";
 	// 若使用了需要特殊配置的感測器（如超音波），動態生成 setConfig() + updateConfig()
 	// statementToCode 已觸發所有子積木的 generator，inputConfigs_ 此時已填好
@@ -25,16 +28,11 @@ window.txtGenerator.forBlock['txt_main'] = function (block) {
 	if (setConfigCode) {
 		code += setConfigCode + '\n\n';
 	}
-	// 所有使用者積木都放在 while True 迴圈內，以支援持續輸入偵測
-	// （例如：按鈕→馬達/燈光這類需要不斷輪詢的程式）。
-	// ftrobopy 在 process 退出時會送 reset 給控制器（馬達/輸出歸零），
-	// 因此必須保持程式不退出。time.sleep(0.05) 讓 CPU 不過熱並以 ~20Hz 輪詢輸入。
-	code += 'while True:\n';
+	// 直接輸出子積木程式碼，不加外層 while True。
+	// 使用者若需要持續輪詢，應自行在容器內加入「重複當 真」迴圈積木。
 	if (childCode) {
-		// statementToCode() 每行已加一層 INDENT（4 空格），剛好符合 while True 的縮排需求。
 		code += childCode;
 	}
-	code += '    time.sleep(0.05)  # ~20 Hz polling\n';
 	return code;
 };
 
