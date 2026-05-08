@@ -130,19 +130,20 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
   - `pollIo(): Promise<TxtIoSnapshot>`（HTTP GET `http://{host}:{runtimePort}/io`，port 從 `singular-blockly.txt.runtimePort` 設定讀取，預設 `8080`，< 400ms）
   - `setMotor(motor, speed)` / `setOutput(output, level)` / `stopAll()`（HTTP POST，同樣使用 `runtimePort`）
 - [X] T029 [P] 建立 `src/test/suite/txtTestService.test.ts`：mock HTTP fetch（pollIo 成功/失敗）、mock node-ssh（installRuntime SCP）、測試 stopAll 發出正確 HTTP payload
-- [X] T030 更新 `src/webview/messageHandler.ts`，新增 Test Panel routes：`txtTestInstallRuntime`、`txtOpenTestPanel`（呼叫 webviewManager）、`txtTestSetMotor`、`txtTestSetOutput`、`txtTestStopAll`、`txtTestPollIo`（回傳 TxtIoSnapshot 給 Test Panel）
-- [X] T031 在 `src/extension.ts` 註冊命令 `singular-blockly.txt.installRuntime`、`singular-blockly.txt.openTestPanel`；在 `package.json` contributes.commands 加入（含 i18n title）
-- [X] T032 建立 `media/html/txtTestPanel.html`，佈局：M1-M4 速度滑桿（range 0-512）+ 方向切換、O1-O8 開關按鈕、I1-I8 唯讀數字指示燈、「全部停止」顯眼按鈕、狀態列（Connected/Testing/Paused）
-- [X] T033 建立 `media/js/txtTestPanel.js`：
-  - 400ms polling 迴圈（`setInterval`，呼叫 `txtTestPollIo` postMessage，更新 I1-I8 顯示）
-  - **M1**：追蹤連續 polling 失敗次數；連續失敗 ≥ 3 次 → 狀態列顯示「連線中斷」警告，顯示「重試」按鈕（點擊後重置失敗計數並立即重試一次 pollIo）
-  - 滑桿 `mouseup` 事件保持速度值（不歸零）→ postMessage `txtTestSetMotor`
+- [X] T030 更新 `src/webview/messageHandler.ts`，新增 Test Panel routes：`txtTestDialogOpen`、`txtTestDialogClose`、`txtTestSetMotor`、`txtTestSetOutput`、`txtTestStopAll`、`txtTestPollIo`，並在 dialog 開啟時協調 runtime 自動安裝/啟動、回傳 TxtIoSnapshot 給 WebView
+- [X] T031 在 `src/extension.ts` 保留並註冊 `singular-blockly.txt.installRuntime` 維護命令；正常使用流程以開啟 Test Panel 時自動安裝/啟動為主
+- [X] T032 更新 `media/html/blocklyEdit.html`，在主 Blockly WebView 內新增 TXT Test Panel `<dialog>`，佈局包含 M1-M4 速度滑桿（range 0-512）+ 方向切換、O1-O8 開關按鈕、I1-I8 唯讀數字指示燈、「全部停止」顯眼按鈕、狀態列（Connected/Testing/Paused）
+- [X] T033 更新 `media/js/blocklyEdit.js`：
+  - 以 dialog 生命週期處理 Test Panel 開關，開啟時送出 `txtTestDialogOpen`
+  - 採 sequential polling（上一筆回應完成後再排下一筆 `txtTestPollIo`），更新 I1-I8 顯示
+  - 連續 polling 失敗 ≥ 3 次 → 狀態列顯示斷線並於短暫延遲後自動重連
+  - 滑桿 change 事件保持速度值（不歸零）→ postMessage `txtTestSetMotor`
   - 開關點擊 → postMessage `txtTestSetOutput`
   - 「全部停止」按鈕 → postMessage `txtTestStopAll`
-  - WebView `onbeforeunload` 觸發 stop_all（關閉自動停止）
-- [X] T034 在 `src/webview/webviewManager.ts` 新增 `createTxtTestPanel()` 方法（建立新 WebviewPanel、載入 `txtTestPanel.html` 與 `txtTestPanel.js`、設定 message routing、dispose 時通知 TxtTestService）
+  - 關閉 dialog 時送出 `txtTestDialogClose`，由 Extension 側停止輸出與 server
+- [X] T034 更新 `media/css/blocklyEdit.css`，新增 TXT Test Panel dialog 樣式、響應式排列與深色主題支援
 - [X] T035 在 `TxtUploader` 和 `TxtTestService` 加入衝突防護：上傳前檢查 Test Panel 是否開啟（TxtDeviceState 為 Testing），若是則 Test Panel 進入 Paused 模式；程式執行結束後 Test Panel 恢復 Testing 模式
-- [ ] T036 [P] 手動測試清單驗收（需 TXT 硬體）：Test Panel M1 滑桿拖動馬達轉動、I1 讀值 500ms 內更新、滑桿鬆手速度保持、關閉 Test Panel 馬達自動停止、Test Panel 開啟中點擊上傳進入暫停模式
+- [X] T036 [P] 手動測試清單驗收（需 TXT 硬體）：Test Panel M1 滑桿拖動馬達轉動、I1 讀值 500ms 內更新、滑桿鬆手速度保持、關閉 Test Panel 馬達自動停止、Test Panel 開啟中點擊上傳進入暫停模式
 
 **Checkpoint**：US3 完整可測試——Test Panel 即時 I/O 控制、衝突防護
 

@@ -100,7 +100,7 @@ ssh.dispose();
 
 - 零外部依賴（不使用 Flask、FastAPI）
 - 支援 ftCommunity 韌體可能附帶的 Python 3.6+（避免 walrus operator、match-case 等新語法）
-- 執行方式：`python3 io_server.py &`（背景執行），Extension 在「安裝 TXT Runtime」命令中一次性啟動
+- 執行方式：`python3 io_server.py &`（背景執行），正常流程由 Extension 在開啟 Test Panel 時自動上傳並啟動；「安裝 TXT Runtime」命令僅保留作維護用途
 
 **端點設計**：
 

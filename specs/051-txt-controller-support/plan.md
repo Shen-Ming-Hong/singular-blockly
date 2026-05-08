@@ -5,7 +5,7 @@
 
 ## 摘要
 
-為 Singular Blockly 新增 fischertechnik TXT Controller（舊版，ftCommunity 韌體）作為第三類開發板。使用者透過視覺化積木生成 ftrobopy Python 程式，Extension 透過 node-ssh 以 SSH/SCP 將程式上傳到 TXT 並執行；同時提供與 ROBO Pro 對齊的 I/O 即時測試面板（HTTP polling `io_server.py`）。技術核心為三層架構擴展：(1) BoardLanguage/UploadMethod 型別新增 `'txt'`/`'ssh'`；(2) 新增 `TxtUploader`、`TxtConnectionService`、`TxtTestService` 三個 Service；(3) 新增 `txt.js` 積木及 Generator，以及 Test Panel WebView。對於未自行放置 delay 的 TXT 硬體輪詢/控制 `while` 迴圈，現行實作會由共通 generator 以 path-sensitive 方式自動補 `txt.updateWait(0.01)`，避免 busy loop 搶占 ftrobopy exchange thread。
+為 Singular Blockly 新增 fischertechnik TXT Controller（舊版，ftCommunity 韌體）作為第三類開發板。使用者透過視覺化積木生成 ftrobopy Python 程式，Extension 透過 node-ssh 以 SSH/SCP 將程式上傳到 TXT 並執行；同時提供與 ROBO Pro 對齊的 I/O 即時測試面板（HTTP polling `io_server.py`），並整合在 Blockly Editor 同一個 WebView 的 dialog 中。技術核心為三層架構擴展：(1) BoardLanguage/UploadMethod 型別新增 `'txt'`/`'ssh'`；(2) 新增 `TxtUploader`、`TxtConnectionService`、`TxtTestService` 三個 Service；(3) 新增 `txt.js` 積木及 Generator，並在 `blocklyEdit.html` / `blocklyEdit.js` 內整合 TXT 設定與 Test Panel dialog。對於未自行放置 delay 的 TXT 硬體輪詢/控制 `while` 迴圈，現行實作會由共通 generator 以 path-sensitive 方式自動補 `txt.updateWait(0.01)`，避免 busy loop 搶占 ftrobopy exchange thread。
 
 ---
 
@@ -88,11 +88,9 @@ media/
 │           ├── txt.js           # 新增 - TXT Python Generator（ftrobopy API）
 │           └── python_common.js # 修改 - 共通流程控制與 while 自動 pacing 規則
 ├── html/
-│   ├── blocklyEdit.html         # 現有 - 新增 TXT 連線設定 UI 區塊
-│   └── txtTestPanel.html        # 新增 - TXT I/O Test Panel WebView
+│   └── blocklyEdit.html         # 現有 - 新增 TXT 連線設定 modal 與 TXT I/O Test Panel dialog
 ├── js/
-│   ├── blocklyEdit.js           # 現有 - 新增 TXT 連線設定 UI 互動邏輯
-│   └── txtTestPanel.js          # 新增 - Test Panel 滑桿、開關、polling 邏輯
+│   └── blocklyEdit.js           # 現有 - 新增 TXT 連線設定、Test Panel dialog、polling 與語言切換邏輯
 ├── toolbox/
 │   └── categories/
 │       └── txt.json             # 新增 - TXT 工具箱類別定義
@@ -197,17 +195,15 @@ package.json                     # 現有 - 新增 node-ssh dependency、TXT 板
 
 ### Phase C：WebView UI 層
 
-**目標**：在 Blockly Editor 內新增連線設定區；建立獨立 Test Panel。
+**目標**：在 Blockly Editor 內新增連線設定對話框與整合式 Test Panel dialog。
 
 | 子任務 | 檔案 | 說明 |
 |--------|------|------|
-| C-1 | `media/html/blocklyEdit.html` | 新增 TXT 連線設定區塊（預設折疊，選 TXT 板才顯示） |
-| C-2 | `media/js/blocklyEdit.js` | 連線設定 UI 互動；postMessage 整合 |
-| C-3 | `media/html/txtTestPanel.html` | Test Panel：M1-M4 滑桿、O1-O8 開關、I1-I8 讀值 |
-| C-4 | `media/js/txtTestPanel.js` | polling（400ms）、滑桿（鬆手保持）、關閉自動停止 |
-| C-5 | `src/webview/webviewManager.ts` | 新增 `createTxtTestPanel()` |
+| C-1 | `media/html/blocklyEdit.html` | 新增 TXT 連線設定 modal、TXT Test Panel dialog、工具列按鈕 |
+| C-2 | `media/js/blocklyEdit.js` | 連線設定 UI、Test Panel dialog 開關、polling、語言切換刷新與 postMessage 整合 |
+| C-3 | `src/webview/messageHandler.ts` | 新增 `txtTestDialogOpen/Close`、polling/control routes，並協調 runtime 自動安裝/啟動 |
 
-**驗收標準**：手動測試（需 TXT 硬體）：測試連線成功；Test Panel 滑桿拖動馬達轉動；I1 讀值即時更新。
+**驗收標準**：手動測試（需 TXT 硬體）：測試連線成功；開啟 Test Panel dialog 時 runtime 自動啟動；滑桿拖動馬達轉動；I1 讀值即時更新。
 
 ---
 

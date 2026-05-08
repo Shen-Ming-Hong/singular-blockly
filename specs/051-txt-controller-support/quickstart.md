@@ -75,7 +75,7 @@ npm install node-ssh
 | [spec.md](./spec.md) FR-014 ~ FR-020 | Test Panel 需求 |
 | [contracts/io-server-api.md](./contracts/io-server-api.md) | Test Panel ↔ io_server.py HTTP API |
 
-**參考 WebView**：`media/html/blocklyEdit.html`（照此結構新增 TXT 連線設定區塊）
+**參考 WebView**：`media/html/blocklyEdit.html`（TXT 連線設定與 TXT Test Panel 都整合在同一個 WebView，透過 modal / dialog 呈現）
 
 ### Phase D（TXT Runtime）優先讀取
 
@@ -137,14 +137,15 @@ for i in range(1, 9):
 
 ### Test Panel 驗證（需要 TXT 硬體 + io_server.py）
 
-1. 執行「安裝 TXT Runtime」命令
-2. 執行「開啟 TXT Test Panel」命令
-3. 拖動 M1 滑桿至 200
-4. **預期**：M1 馬達開始旋轉（速度 200）
-5. 鬆開滑桿
-6. **預期**：M1 馬達**維持**速度 200（不自動歸零）
-7. 點擊「全部停止」
-8. **預期**：M1 停止，1 秒內完成
+1. 在 Extension Development Host 中開啟 Blockly Editor，選擇 `TXT Controller` 開發板
+2. 點擊工具列上的 `TXT I/O Test Panel` 按鈕
+3. 等待系統自動安裝並啟動 `io_server.py`（若 TXT 端尚未準備好）
+4. 拖動 M1 滑桿至 200
+5. **預期**：M1 馬達開始旋轉（速度 200）
+6. 鬆開滑桿
+7. **預期**：M1 馬達**維持**速度 200（不自動歸零）
+8. 點擊「全部停止」
+9. **預期**：M1 停止，1 秒內完成
 
 ---
 
@@ -173,11 +174,8 @@ Phase B:
 □ src/test/suite/txtTestService.test.ts     （新增）
 
 Phase C:
-□ media/html/blocklyEdit.html               （修改：新增 TXT 連線設定區塊）
-□ media/js/blocklyEdit.js                   （修改：新增 UI 互動邏輯）
-□ media/html/txtTestPanel.html              （新增）
-□ media/js/txtTestPanel.js                  （新增）
-□ src/webview/webviewManager.ts             （修改：新增 createTxtTestPanel）
+□ media/html/blocklyEdit.html               （修改：新增 TXT 連線設定 modal 與 TXT Test Panel dialog）
+□ media/js/blocklyEdit.js                   （修改：新增 UI 互動、Test Panel polling、語言切換刷新邏輯）
 
 Phase D:
 □ txt-runtime/io_server.py                  （新增）
@@ -192,3 +190,4 @@ Phase D:
 3. **node-ssh webpack**：`node-ssh` 是 Node.js 模組，在 `webpack.config.js` 的 `externals` 中加入（Extension Host 不打包 node_modules）
 4. **i18n 驗證**：每次修改 `messages.js` 後執行 `npm run validate:i18n`，確保 15 個語系的鍵值完整
 5. **密碼安全**：任何地方都不得將密碼 log 出來（logging.ts 或 console.log），確認 `TxtConnectionService` 的 log 語句排除密碼欄位
+6. **Test Panel 架構**：TXT Test Panel 目前整合於 `media/html/blocklyEdit.html` / `media/js/blocklyEdit.js`，不是獨立 `txtTestPanel.html` / `txtTestPanel.js`；後續修改請以單一 WebView 架構為準

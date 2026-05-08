@@ -26,7 +26,7 @@
 
 ### User Story 2 - 設定 TXT 連線參數 (Priority: P1)
 
-教師或學生在首次使用前，在 **Blockly Editor WebView 內的連線設定區**（側欄或頂部）填入 TXT Controller 的 IP 位址、使用者名稱，並輸入密碼（安全儲存）。提供「測試連線」按鈕驗證設定是否正確，連線成功後設定持久保存於工作區。此設定 UI 與積木編輯器整合，使用者不需切換視窗。
+教師或學生在首次使用前，點擊 Blockly Editor 工具列上的 **TXT 連線設定** 按鈕，於同一個 WebView 內開啟連線設定對話框，填入 TXT Controller 的 IP 位址、使用者名稱，並輸入密碼（安全儲存）。提供「測試連線」按鈕以 **目前表單值** 驗證設定是否正確，連線成功後設定持久保存於工作區。此設定 UI 與積木編輯器整合，使用者不需切換視窗。
 
 **Why this priority**: 連線設定是 Program Mode 與 Test Mode 的前提條件，P1 與 User Story 1 並列。
 
@@ -35,15 +35,15 @@
 **Acceptance Scenarios**:
 
 1. **Given** 使用者開啟連線設定面板，**When** 填入 host, username 後點擊儲存，**Then** host 和 username 儲存至工作區設定，密碼安全儲存（不寫入任何文字檔案）
-2. **Given** 連線設定已填入，**When** 點擊「測試連線」，**Then** 5 秒內回報連線成功或失敗原因
-3. **Given** 曾設定連線資訊，**When** 重新開啟 VS Code，**Then** 自動載入上次的連線設定（密碼除外需重新輸入，或由安全儲存自動填入）
+2. **Given** 使用者已在表單中填入或修改連線資訊，**When** 不先儲存而直接點擊「測試連線」，**Then** 系統以目前表單值在 5 秒內回報連線成功或失敗原因
+3. **Given** 曾設定連線資訊，**When** 重新開啟 VS Code，**Then** 自動載入上次的連線設定；若曾儲存自訂密碼，則可由安全儲存自動沿用
 4. **Given** 密碼錯誤，**When** 點擊「測試連線」，**Then** 顯示「驗證失敗，請確認密碼」而非原始錯誤堆疊
 
 ---
 
 ### User Story 3 - I/O 即時測試面板（替代 ROBO Pro Test） (Priority: P2)
 
-學生在接線後，開啟 TXT I/O Test Panel，看到 M1-M4 馬達滑桿、O1-O8 輸出開關、I1-I8 輸入狀態即時更新。可手動控制馬達轉速和輸出，驗證接線正確再進 Blockly 編程。面板上有顯眼的「全部停止」按鈕。
+學生在接線後，點擊 Blockly Editor 工具列上的 TXT I/O Test Panel 按鈕，在同一個 WebView 內開啟測試對話框，看到 M1-M4 馬達滑桿、O1-O8 輸出開關、I1-I8 輸入狀態即時更新。可手動控制馬達轉速和輸出，驗證接線正確再進 Blockly 編程。面板上有顯眼的「全部停止」按鈕。
 
 **Why this priority**: 教學場景中，接線驗證是學生在開始撰寫程式前的必要步驟。沒有 Test Panel，學生無法區分接線錯誤和程式錯誤，大幅增加困擾。
 
@@ -51,7 +51,7 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** TXT 連線已設定，**When** 執行「開啟 TXT Test Panel」命令，**Then** 獨立視窗顯示 M1-M4 馬達控制、O1-O8 輸出開關、I1-I8 輸入讀值
+1. **Given** TXT 連線已設定，**When** 點擊 Blockly Editor 工具列上的「TXT I/O Test Panel」按鈕，**Then** 在同一個 WebView 內的對話框顯示 M1-M4 馬達控制、O1-O8 輸出開關、I1-I8 輸入讀值
 2. **Given** Test Panel 已開啟，**When** 感測器 I1 有物體通過，**Then** I1 的讀值在 500ms 內更新顯示
 3. **Given** 馬達正在運轉，**When** 點擊「全部停止」，**Then** 所有馬達立即停止，所有輸出關閉
 4. **Given** Test Panel 開啟中，**When** 程式上傳並執行，**Then** Test Panel 自動進入「程式執行中」暫停模式，避免衝突；程式結束後恢復 Test 模式
@@ -78,7 +78,7 @@
 ### Edge Cases
 
 - 若 TXT 執行程式時掉線，上傳服務應偵測到連線中斷並回報錯誤，不無限等待
-- Test Panel 的 HTTP polling 失敗超過 3 次連續時，應顯示連線中斷提示，並提供「重試」選項
+- Test Panel 的 HTTP polling 失敗超過 3 次連續時，應顯示連線中斷提示，並自動嘗試重新建立連線
 - 若使用者在 Test Panel 開啟時直接關閉視窗，應自動發送全部停止命令後再關閉
 - 生成的 Python 程式若語法正確但 ftrobopy 呼叫失敗（如埠號不符），stdout/stderr 應完整顯示在 VS Code Output Channel
 - 積木工作區為空（僅有初始化積木）時，應能正常生成最小可執行程式，不崩潰
@@ -102,21 +102,21 @@
 
 **連線設定**
 
-- **FR-010**: 使用者 MUST 能在 **Blockly Editor WebView 內的連線設定區**設定 TXT 的 IP/hostname、SSH 使用者名稱（不需開啟獨立視窗）
+- **FR-010**: 使用者 MUST 能透過 Blockly Editor 工具列按鈕，在同一個 WebView 內開啟 TXT 連線設定對話框，設定 TXT 的 IP/hostname、SSH 使用者名稱（不需開啟獨立視窗）
 - **FR-011**: 密碼 MUST 使用 VS Code 安全儲存機制（SecretStorage），不得寫入任何文字檔案或 settings.json
-- **FR-012**: 系統 MUST 提供「測試連線」功能，在 5 秒內回報 SSH 連線成功或失敗原因
+- **FR-012**: 系統 MUST 提供「測試連線」功能，並以目前表單值進行測試，在 5 秒內回報 SSH 連線成功或失敗原因
 - **FR-013**: 連線設定（IP、使用者名稱）MUST 持久保存至工作區設定，跨 VS Code 重啟後仍有效；`singular-blockly.txt.host` 的預設值 MUST 為 `192.168.7.2`（對應 USB 網路介面固定 IP，使用者可覆寫）
 
 **Test Mode**
 
-- **FR-014**: 系統 MUST 提供獨立的 TXT I/O Test Panel（透過命令或按鈕開啟）
+- **FR-014**: 系統 MUST 提供整合於 Blockly Editor WebView 內的 TXT I/O Test Panel 對話框（透過工具列按鈕開啟）
 - **FR-015**: Test Panel MUST 顯示 M1-M4 馬達速度控制滑桿（範圍 0~512，ftrobopy 原始值，含正/反轉選擇；generator 將反轉轉成負數傳入 `setSpeed(-v)`）；**滑桿鬆手後保持最後速度**（對齊 ROBO Pro Test 行為），需手動歸零或按「全部停止」
 - **FR-016**: Test Panel MUST 顯示 O1-O8 輸出狀態開關（開/關）
 - **FR-017**: Test Panel MUST 顯示 I1-I8 輸入即時讀值，更新頻率不低於每 500ms 一次
 - **FR-018**: Test Panel MUST 提供顯眼的「全部停止」按鈕，點擊後立即停止所有馬達和輸出
 - **FR-019**: Test Panel MUST 在程式執行期間自動進入暫停模式，結束後恢復
 - **FR-020**: Test Panel 關閉時 MUST 自動發送全部停止命令
-- **FR-023**: 系統 MUST 提供「安裝 TXT Runtime」VS Code 命令，一次性將 `txt-runtime/io_server.py` 以 SCP 上傳至 TXT 並透過 SSH 在背景啟動，執行結果顯示於 Output Channel
+- **FR-023**: 系統 MUST 在開啟 TXT I/O Test Panel 時，自動將 `txt-runtime/io_server.py` 以 SCP 上傳至 TXT（若需要）並透過 SSH 啟動；執行結果顯示於 Output Channel。手動命令可保留作為維護用途，但不作為主要教學流程
 
 **安全性**
 
@@ -151,10 +151,18 @@
 
 ### Session 2026-05-03
 
-- Q: 連線設定（IP、使用者名稱、密碼）的 UI 入口形式？ → A: 整合在 Blockly Editor WebView 內（側欄或頂部設定區）
-- Q: I/O Test Server（`io_server.py`）的安裝與啟動方式？ → A: Extension 提供「安裝 TXT Runtime」命令，一次性上傳 server 腳本並遠端啟動（Option A）
+- Q: 連線設定（IP、使用者名稱、密碼）的 UI 入口形式？ → A: 整合在 Blockly Editor WebView 內；現行採工具列按鈕開啟對話框，不再使用側欄或頂部設定區
+- Q: I/O Test Server（`io_server.py`）的安裝與啟動方式？ → A: 初期採命令式安裝流程評估；目前以開啟 Test Panel 時自動上傳並啟動為主，手動命令僅保留作維護用途
 - Q: Test Panel 馬達滑桿鬆手後行為？ → A: 保持最後速度，需手動歸零或按「全部停止」（Option B，對齊 ROBO Pro Test 行為）；速度範圍保持 ftrobopy 原始值 0~512，方向另設選項
 - Q: TxtDeviceState 從 Running 切回 Idle 的觸發條件？ → A: `ssh.execCommand('python3 main.py')` Promise resolve 後即代表程式結束，exit code 作為成功/失敗判斷（Option A）
+
+### Session 2026-05-08
+
+- Q: TXT 連線設定 UI 的主要入口是側欄/頂部設定區，還是工具列按鈕開啟對話框？ → A: 以 Blockly Editor 工具列按鈕開啟同一個 WebView 內的對話框為準
+- Q: 「測試連線」應使用已儲存設定，還是目前表單值？ → A: 使用目前表單值，允許先測試再儲存
+- Q: TXT Test Panel 是獨立 WebView，還是整合在 Blockly Editor？ → A: 整合在 Blockly Editor 內，以 `<dialog>` 對話框呈現
+- Q: TXT Runtime 的安裝/啟動流程是手動命令還是自動？ → A: 以開啟 Test Panel 時自動安裝並啟動為主要流程，手動命令僅保留作維護用途
+- Q: TXT 連線設定應存在哪個範圍？ → A: 存於工作區設定（project/workspace scoped），不得使用 global scope
 
 ## Assumptions
 
@@ -162,7 +170,7 @@
 - **TXT 端環境**：ftCommunity firmware 已安裝；Python 3 可執行；ftrobopy 已安裝（`pip install ftrobopy`）；SSH 服務已啟用（ftCommunity 預設開啟）；**預設 SSH 帳號為 `ftc`**（ftCommunity 固定帳號，`singular-blockly.txt.username` 預設值應填入此值）
 - **連線方式**：底層統一視為 IP + SSH 連線。**預設採用 USB 網路介面**（ftCommunity 韌體透過 USB CDC-ECM 在傳輸線上模擬乙太網路，TXT 端固定 IP `192.168.7.2`，Host 端為 `192.168.7.1`）；學生只需接上 USB 傳輸線即可連線，無需輸入任何設定。Wi-Fi 或有線 LAN 亦支援（使用者修改 host IP 設定即可）。USB 連線在 macOS/Linux 免驅動；Windows 10 1903+ 內建 CDC-ECM 驅動，一般教學環境免手動安裝。USB 自動掃描（mDNS/Bonjour 探索）屬後續版本範圍
 - **TXT 4.0 不在範圍內**：TXT 4.0 使用完全不同的 API（ROBO Pro Coding），若未來支援需作為獨立 board 類型
-- **I/O Test Server**：Test Panel 需要 TXT 端執行一個 Python HTTP server（`txt-runtime/io_server.py`）；Extension 提供「安裝 TXT Runtime」命令（VS Code Command Palette），一次性透過 SCP 上傳 server 腳本並以 SSH 在背景啟動，使用者首次使用前執行一次即可
+- **I/O Test Server**：Test Panel 需要 TXT 端執行一個 Python HTTP server（`txt-runtime/io_server.py`）；正常教學流程下由 Extension 在開啟 Test Panel 時自動透過 SCP 上傳並以 SSH 啟動，使用者不需先手動執行額外命令
 - **BoardLanguage 擴展**：新增 `'txt'` 作為第三個 BoardLanguage，獨立於 `'arduino'` 和 `'micropython'`，因 ftrobopy API 與 MicroPython machine API 語意完全不同
 - **SSH 函式庫**：使用 `node-ssh` npm 套件提供 SSH/SCP 功能；此為 extension 的新 npm dependency
 - **積木集範圍**：第一版僅支援 M1-M4 馬達（速度 0~512，正/反轉）、O1-O8 輸出、I1-I8 **數位**輸入（state() 回傳 0 或 1）、等待、全部停止；encoder、類比感測器、counter、servo 馬達為後續版本
