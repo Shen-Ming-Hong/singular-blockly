@@ -1001,6 +1001,7 @@ window.languageManager.loadMessages('it', {
 	TXT_REMOTE_PATH_LABEL: 'Percorso remoto',
 	TXT_SAVE_CONFIG_BTN: 'Salva impostazioni',
 	TXT_TEST_CONNECTION_BTN: 'Testa connessione',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Predefinito: ftc (lascia vuoto per usare il valore predefinito)',
 	TXT_TESTING: 'Connessione in corso...',
 	TXT_SSH_SETUP_DONE: '✓ Configurazione SSH completata. Le connessioni future non richiederanno conferma sullo schermo TXT.',
 	TXT_SSH_CONFIRM_HINT: 'Suggerimento: se il display TXT mostra una conferma, premi OK sul dispositivo per consentire l\'accesso SSH.',

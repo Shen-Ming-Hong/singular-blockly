@@ -1006,6 +1006,7 @@ window.languageManager.loadMessages('tr', {
 	TXT_REMOTE_PATH_LABEL: 'Uzak Yol',
 	TXT_SAVE_CONFIG_BTN: 'Ayarları Kaydet',
 	TXT_TEST_CONNECTION_BTN: 'Bağlantıyı Test Et',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Varsayılan: ftc (varsayılanı kullanmak için boş bırakın)',
 	TXT_TESTING: 'Bağlanıyor...',
 	TXT_SSH_SETUP_DONE: '✓ SSH kurulumu tamamlandı. Gelecekteki bağlantılar TXT ekranında onay gerektirmeyecek.',
 	TXT_SSH_CONFIRM_HINT: 'İpucu: TXT ekranında bir onay istemi görünürse SSH erişimine izin vermek için cihazda OK tuşuna basın.',

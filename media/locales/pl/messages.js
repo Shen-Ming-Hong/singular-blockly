@@ -1006,6 +1006,7 @@ window.languageManager.loadMessages('pl', {
 	TXT_REMOTE_PATH_LABEL: 'Ścieżka zdalna',
 	TXT_SAVE_CONFIG_BTN: 'Zapisz ustawienia',
 	TXT_TEST_CONNECTION_BTN: 'Testuj połączenie',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Domyślnie: ftc (pozostaw puste, aby użyć wartości domyślnej)',
 	TXT_TESTING: 'Łączenie...',
 	TXT_SSH_SETUP_DONE: '✓ Konfiguracja SSH zakończona. Przyszłe połączenia nie będą wymagać potwierdzenia na ekranie TXT.',
 	TXT_SSH_CONFIRM_HINT: 'Wskazówka: Jeśli ekran TXT wyświetla potwierdzenie, naciśnij OK na urządzeniu, aby zezwolić na dostęp SSH.',

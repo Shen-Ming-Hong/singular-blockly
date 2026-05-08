@@ -101,6 +101,7 @@ let isLanguageDropdownOpen = false;
 let isBoardDropdownOpen = false;
 let isLanguageSwitchReloading = false;
 let pendingLanguageReloadTimer = null;
+let txtSshSetupDone = false;
 
 const LANGUAGE_OPTIONS = [
 	{ code: 'auto', nativeName: '', isAuto: true },
@@ -869,6 +870,100 @@ function updateTxtTestPanelTexts() {
 	setText('txtTestInputsTitle', lm.getMessage('TXT_TEST_INPUTS_TITLE', 'Inputs'));
 	setText('txtTestStopAllBtn', lm.getMessage('TXT_TEST_STOP_ALL', 'STOP ALL'));
 	setTitle('txtTestPanelButton', lm.getMessage('TXT_TEST_PANEL_BUTTON_TITLE', 'TXT I/O Test Panel'));
+	for (let i = 1; i <= 4; i++) {
+		updateMotorDisplay(i);
+	}
+}
+
+function getTxtPasswordPlaceholder() {
+	return (
+		window.languageManager?.getMessage('TXT_PASSWORD_DEFAULT_PLACEHOLDER', 'Default: ftc (leave empty to use default)') ||
+		'Default: ftc (leave empty to use default)'
+	);
+}
+
+function getTxtSensorOptions() {
+	return [
+		{ value: 'BUTTON', label: window.languageManager?.getMessage('TXT_SENSOR_BUTTON', 'Button') || 'Button' },
+		{ value: 'GATE', label: window.languageManager?.getMessage('TXT_SENSOR_GATE', 'Light Gate') || 'Light Gate' },
+		{ value: 'ULTRASONIC', label: window.languageManager?.getMessage('TXT_SENSOR_ULTRASONIC', 'Ultrasonic') || 'Ultrasonic' },
+	];
+}
+
+function refreshTxtSensorSelectOptions() {
+	for (let i = 1; i <= 8; i++) {
+		const select = document.getElementById(`txtInputSensorSelect${i}`);
+		if (!select) {
+			continue;
+		}
+
+		const currentValue = select.value || txtTestState.sensorTypes[i - 1] || 'BUTTON';
+		const options = getTxtSensorOptions();
+		select.innerHTML = '';
+
+		options.forEach(option => {
+			const optionEl = document.createElement('option');
+			optionEl.value = option.value;
+			optionEl.textContent = option.label;
+			select.appendChild(optionEl);
+		});
+
+		select.value = options.some(option => option.value === currentValue) ? currentValue : 'BUTTON';
+		txtTestState.sensorTypes[i - 1] = select.value;
+	}
+}
+
+function updateTxtConnectionPanelTexts() {
+	const languageManager = window.languageManager;
+	if (!languageManager) {
+		log.warn('語言管理器尚未載入，無法更新 TXT 連線設定文字');
+		return;
+	}
+
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.textContent = value;
+		}
+	};
+
+	const setTitle = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.title = value;
+		}
+	};
+
+	setText('txtConnectionPanelTitle', languageManager.getMessage('TXT_CONNECTION_PANEL_TITLE', 'TXT Controller Connection Settings'));
+	setText('txtHostLabel', languageManager.getMessage('TXT_HOST_LABEL', 'Host IP'));
+	setText('txtUsernameLabel', languageManager.getMessage('TXT_USERNAME_LABEL', 'Username'));
+	setText('txtPasswordLabel', languageManager.getMessage('TXT_PASSWORD_LABEL', 'Password'));
+	setText('txtRemotePathLabel', languageManager.getMessage('TXT_REMOTE_PATH_LABEL', 'Remote Path'));
+	setText('txtSaveConfigBtn', languageManager.getMessage('TXT_SAVE_CONFIG_BTN', 'Save Settings'));
+	setText('txtTestConnectionBtn', languageManager.getMessage('TXT_TEST_CONNECTION_BTN', 'Test Connection'));
+	setTitle('txtConfigButton', languageManager.getMessage('TXT_CONNECTION_PANEL_TITLE', 'TXT Controller Connection Settings'));
+
+	const passwordInput = document.getElementById('txtPasswordInput');
+	if (passwordInput && passwordInput.value !== TXT_PASSWORD_SENTINEL) {
+		passwordInput.placeholder = getTxtPasswordPlaceholder();
+	}
+
+	const sshHint = document.getElementById('txtSshHint');
+	if (sshHint) {
+		if (txtSshSetupDone) {
+			sshHint.textContent = languageManager.getMessage(
+				'TXT_SSH_SETUP_DONE',
+				'✓ SSH setup complete. Future connections will not require confirmation on the TXT screen.'
+			);
+			sshHint.style.color = 'var(--vscode-testing-iconPassed, #73c991)';
+		} else {
+			sshHint.textContent = languageManager.getMessage(
+				'TXT_SSH_CONFIRM_HINT',
+				'Tip: If the TXT screen shows a confirmation prompt, press OK on the device to allow SSH access.'
+			);
+			sshHint.style.color = '';
+		}
+	}
 }
 
 // 註冊工具箱元件
@@ -1641,8 +1736,12 @@ window.addEventListener('languageChanged', function (event) {
 	updateBackupModalTexts();
 	// 更新函式積木搜尋視窗的文字
 	updateFunctionSearchModalTexts();
+	// 更新 TXT 連線設定視窗的文字
+	updateTxtConnectionPanelTexts();
 	// 更新 TXT I/O 測試面板的文字
 	updateTxtTestPanelTexts();
+	// 更新 TXT 感測器下拉選單文字
+	refreshTxtSensorSelectOptions();
 	// 更新語言選單文字（例如 Auto 標籤）
 	populateLanguageDropdown();
 
@@ -1675,6 +1774,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 更新主編輯視窗UI文字的多語言支援
 	updateEditorUITexts();
+	// 更新 TXT 連線設定視窗的多語言支援
+	updateTxtConnectionPanelTexts();
 
 	// 動態生成開發板選項
 	populateBoardOptions();
@@ -3186,6 +3287,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			// TXT Controller 連線設定回應
 			case 'txtConfigSaved':
+				toast.show(window.languageManager?.getMessage('TXT_CONFIG_SAVED', 'Settings saved') || 'Settings saved', 'success');
+				break;
+
 			case 'txtConfigLoaded':
 				handleTxtConfigLoaded(message);
 				break;
@@ -3971,10 +4075,7 @@ function initTxtConnectionPanel() {
 	}
 
 	// SSH 確認提示
-	const sshHint = document.getElementById('txtSshHint');
-	if (sshHint) {
-		sshHint.textContent = window.languageManager?.getMessage('TXT_SSH_CONFIRM_HINT', '提示：連線時若 TXT 螢幕出現確認畫面，請按 OK 允許 SSH 存取。');
-	}
+	updateTxtConnectionPanelTexts();
 }
 
 /**
@@ -4509,6 +4610,7 @@ function handleTxtUploadResult(message) {
 const TXT_PASSWORD_SENTINEL = '••••••••';
 
 function handleTxtConfigLoaded(message) {
+	txtSshSetupDone = false;
 	if (message.host) {
 		window.txtConnectionHost_ = message.host;
 	}
@@ -4527,10 +4629,11 @@ function handleTxtConfigLoaded(message) {
 		} else {
 			// 尚未自訂，使用預設密碼（ftc）—— 密碼欄留空，placeholder 說明即可
 			passwordInput.value = '';
-			passwordInput.placeholder = '預設: ftc（留空即使用預設值）';
+			passwordInput.placeholder = getTxtPasswordPlaceholder();
 		}
 	}
 	if (remotePathInput && message.remotePath) remotePathInput.value = message.remotePath;
+	updateTxtConnectionPanelTexts();
 }
 
 /**
@@ -4543,14 +4646,10 @@ function handleTxtConnectionTestResult(message) {
 		statusEl.textContent = message.message;
 		statusEl.className = message.success ? 'txt-status-ok' : 'txt-status-error';
 	}
-	// 若首次設定完成，更新 SSH 提示以反映最新狀態
 	if (message.sshSetupDone) {
-		const sshHint = document.getElementById('txtSshHint');
-		if (sshHint) {
-			sshHint.textContent = window.languageManager?.getMessage('TXT_SSH_SETUP_DONE', '✓ SSH 免確認設定完成，之後連線不需在 TXT 按 OK。');
-			sshHint.style.color = 'var(--vscode-testing-iconPassed, #73c991)';
-		}
+		txtSshSetupDone = true;
 	}
+	updateTxtConnectionPanelTexts();
 	const toastType = message.success ? 'success' : 'error';
 	toast.show(message.message, toastType);
 }
@@ -4886,11 +4985,7 @@ function initTxtTestDialog() {
 	const inputsEl = document.getElementById('txtTestInputs');
 	if (inputsEl) {
 		inputsEl.innerHTML = '';
-		const sensorOptions = [
-			{ value: 'BUTTON', label: window.languageManager?.getMessage('TXT_SENSOR_BUTTON', '按鈕') || '按鈕' },
-			{ value: 'GATE', label: window.languageManager?.getMessage('TXT_SENSOR_GATE', '光柵') || '光柵' },
-			{ value: 'ULTRASONIC', label: window.languageManager?.getMessage('TXT_SENSOR_ULTRASONIC', '超音波') || '超音波' },
-		];
+		const sensorOptions = getTxtSensorOptions();
 		const optionsHtml = sensorOptions.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
 		for (let i = 1; i <= 8; i++) {
 			const box = document.createElement('div');
@@ -4898,6 +4993,7 @@ function initTxtTestDialog() {
 			box.innerHTML = `<span>I${i}</span><select class="txt-input-sensor-select" id="txtInputSensorSelect${i}">${optionsHtml}</select><div class="txt-input-value" id="txtInputVal${i}">—</div>`;
 			inputsEl.appendChild(box);
 			const select = document.getElementById(`txtInputSensorSelect${i}`);
+			select.value = txtTestState.sensorTypes[i - 1] || 'BUTTON';
 			select.addEventListener('change', () => {
 				txtTestState.sensorTypes[i - 1] = select.value;
 				vscode.postMessage({ command: 'txtTestSetSensorConfig', sensorTypes: [...txtTestState.sensorTypes] });

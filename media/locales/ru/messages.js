@@ -1002,6 +1002,7 @@ window.languageManager.loadMessages('ru', {
 	TXT_REMOTE_PATH_LABEL: 'Удалённый путь',
 	TXT_SAVE_CONFIG_BTN: 'Сохранить настройки',
 	TXT_TEST_CONNECTION_BTN: 'Тест подключения',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'По умолчанию: ftc (оставьте пустым, чтобы использовать значение по умолчанию)',
 	TXT_TESTING: 'Подключение...',
 	TXT_SSH_SETUP_DONE: '✓ Настройка SSH завершена. Последующие подключения не потребуют подтверждения на экране TXT.',
 	TXT_SSH_CONFIRM_HINT: 'Подсказка: если на экране TXT появится запрос подтверждения, нажмите OK на устройстве, чтобы разрешить SSH-доступ.',

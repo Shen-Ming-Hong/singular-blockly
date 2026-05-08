@@ -1005,6 +1005,7 @@ window.languageManager.loadMessages('de', {
 	TXT_REMOTE_PATH_LABEL: 'Remote-Pfad',
 	TXT_SAVE_CONFIG_BTN: 'Einstellungen speichern',
 	TXT_TEST_CONNECTION_BTN: 'Verbindung testen',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Standard: ftc (leer lassen für Standardwert)',
 	TXT_TESTING: 'Verbinde...',
 	TXT_SSH_SETUP_DONE: '✓ SSH-Einrichtung abgeschlossen. Zukünftige Verbindungen erfordern keine Bestätigung am TXT-Display.',
 	TXT_SSH_CONFIRM_HINT: 'Hinweis: Falls das TXT-Display eine Bestätigung anfordert, bitte OK auf dem Gerät drücken, um SSH-Zugriff zu erlauben.',

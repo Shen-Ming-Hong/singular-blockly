@@ -1008,6 +1008,7 @@ window.languageManager.loadMessages('bg', {
 	TXT_REMOTE_PATH_LABEL: 'Отдалечен път',
 	TXT_SAVE_CONFIG_BTN: 'Запази настройките',
 	TXT_TEST_CONNECTION_BTN: 'Тест на връзка',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'По подразбиране: ftc (оставете празно за стойността по подразбиране)',
 	TXT_TESTING: 'Свързване...',
 	TXT_SSH_SETUP_DONE: '✓ SSH настройката е завършена. Бъдещите връзки няма да изискват потвърждение на екрана на TXT.',
 	TXT_SSH_CONFIRM_HINT: 'Съвет: Ако на екрана на TXT се появи заявка за потвърждение, натиснете OK на устройството, за да разрешите SSH достъп.',

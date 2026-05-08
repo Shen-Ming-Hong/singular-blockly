@@ -1003,6 +1003,7 @@ window.languageManager.loadMessages('cs', {
 	TXT_REMOTE_PATH_LABEL: 'Vzdálená cesta',
 	TXT_SAVE_CONFIG_BTN: 'Uložit nastavení',
 	TXT_TEST_CONNECTION_BTN: 'Testovat připojení',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Výchozí: ftc (ponechte prázdné pro použití výchozí hodnoty)',
 	TXT_TESTING: 'Připojování...',
 	TXT_SSH_SETUP_DONE: '✓ Nastavení SSH dokončeno. Budoucí připojení nevyžadují potvrzení na obrazovce TXT.',
 	TXT_SSH_CONFIRM_HINT: 'Tip: Pokud se na obrazovce TXT zobrazí výzva k potvrzení, stiskněte na zařízení OK pro povolení SSH přístupu.',

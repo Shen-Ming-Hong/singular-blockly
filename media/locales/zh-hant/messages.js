@@ -988,6 +988,7 @@ window.languageManager.loadMessages('zh-hant', {
 	TXT_REMOTE_PATH_LABEL: '遠端路徑',
 	TXT_SAVE_CONFIG_BTN: '儲存設定',
 	TXT_TEST_CONNECTION_BTN: '測試連線',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: '預設: ftc（留空即使用預設值）',
 	TXT_TESTING: '連線中...',
 	TXT_SSH_CONFIRM_HINT: '提示：連線時若 TXT 螢幕出現確認畫面，請按 OK 允許 SSH 存取。',
 	TXT_SSH_SETUP_DONE: '✓ SSH 免確認設定完成，之後連線不需在 TXT 按 OK。',

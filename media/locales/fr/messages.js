@@ -993,6 +993,7 @@ window.languageManager.loadMessages('fr', {
 	TXT_REMOTE_PATH_LABEL: 'Chemin distant',
 	TXT_SAVE_CONFIG_BTN: 'Enregistrer les paramètres',
 	TXT_TEST_CONNECTION_BTN: 'Tester la connexion',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Par défaut : ftc (laisser vide pour utiliser la valeur par défaut)',
 	TXT_TESTING: 'Connexion en cours...',
 	TXT_SSH_SETUP_DONE: "✓ Configuration SSH terminée. Les connexions futures ne nécessiteront pas de confirmation sur l'écran TXT.",
 	TXT_SSH_CONFIRM_HINT: 'Astuce : Si l\'écran TXT affiche une confirmation, appuyez sur OK sur l\'appareil pour autoriser l\'accès SSH.',

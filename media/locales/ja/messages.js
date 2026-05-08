@@ -996,6 +996,7 @@ window.languageManager.loadMessages('ja', {
 	TXT_REMOTE_PATH_LABEL: 'リモートパス',
 	TXT_SAVE_CONFIG_BTN: '設定を保存',
 	TXT_TEST_CONNECTION_BTN: '接続テスト',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: '既定値: ftc（空欄で既定値を使用）',
 	TXT_TESTING: '接続中...',
 	TXT_SSH_SETUP_DONE: '✓ SSH設定完了。以降はTXT画面での確認は不要になります。',
 	TXT_SSH_CONFIRM_HINT: 'ヒント：TXT画面に確認ダイアログが表示されたら、デバイスのOKを押してSSH接続を許可してください。',

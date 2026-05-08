@@ -1000,6 +1000,7 @@ window.languageManager.loadMessages('en', {
 	TXT_REMOTE_PATH_LABEL: 'Remote Path',
 	TXT_SAVE_CONFIG_BTN: 'Save Settings',
 	TXT_TEST_CONNECTION_BTN: 'Test Connection',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Default: ftc (leave empty to use default)',
 	TXT_TESTING: 'Connecting...',
 	TXT_SSH_SETUP_DONE: '✓ SSH setup complete. Future connections will not require confirmation on the TXT screen.',
 	TXT_SSH_CONFIRM_HINT: 'Tip: If the TXT screen shows a confirmation prompt, press OK on the device to allow SSH access.',

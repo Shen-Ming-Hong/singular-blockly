@@ -996,6 +996,7 @@ window.languageManager.loadMessages('ko', {
 	TXT_REMOTE_PATH_LABEL: '원격 경로',
 	TXT_SAVE_CONFIG_BTN: '설정 저장',
 	TXT_TEST_CONNECTION_BTN: '연결 테스트',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: '기본값: ftc (비워 두면 기본값 사용)',
 	TXT_TESTING: '연결 중...',
 	TXT_SSH_SETUP_DONE: '✓ SSH 설정 완료. 이후 TXT 화면에서 확인이 필요 없습니다.',
 	TXT_SSH_CONFIRM_HINT: '팁: TXT 화면에 확인 메시지가 표시되면 장치에서 OK를 눌러 SSH 접속을 허용하세요.',

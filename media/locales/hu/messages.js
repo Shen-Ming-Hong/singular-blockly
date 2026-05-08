@@ -1008,6 +1008,7 @@ window.languageManager.loadMessages('hu', {
 	TXT_REMOTE_PATH_LABEL: 'Távoli útvonal',
 	TXT_SAVE_CONFIG_BTN: 'Beállítások mentése',
 	TXT_TEST_CONNECTION_BTN: 'Kapcsolat tesztelése',
+	TXT_PASSWORD_DEFAULT_PLACEHOLDER: 'Alapértelmezett: ftc (hagyd üresen az alapértelmezett érték használatához)',
 	TXT_TESTING: 'Csatlakozás...',
 	TXT_SSH_SETUP_DONE: '✓ SSH beállítás kész. A jövőbeli kapcsolatok nem igényelnek megerősítést a TXT képernyőn.',
 	TXT_SSH_CONFIRM_HINT: 'Tipp: Ha a TXT képernyőn megerősítési kérés jelenik meg, nyomja meg az OK gombot az eszközön az SSH-hozzáférés engedélyezéséhez.',
