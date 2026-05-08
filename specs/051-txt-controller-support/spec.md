@@ -82,6 +82,7 @@
 - 若使用者在 Test Panel 開啟時直接關閉視窗，應自動發送全部停止命令後再關閉
 - 生成的 Python 程式若語法正確但 ftrobopy 呼叫失敗（如埠號不符），stdout/stderr 應完整顯示在 VS Code Output Channel
 - 積木工作區為空（僅有初始化積木）時，應能正常生成最小可執行程式，不崩潰
+- 對於持續輪詢或控制 TXT 硬體的 `while` 迴圈，若某條可抵達迴圈尾端的路徑沒有明確 `txt_wait` / `controls_duration` 等 pacing，generator 應自動補上節流；反之若該路徑已延遲、以 `break` / `continue` 終止，或進入明確不返回的內層 `while True`，則不得重複插入多餘 pacing
 
 ## Requirements *(mandatory)*
 
@@ -91,8 +92,8 @@
 
 - **FR-001**: 系統 MUST 提供「TXT Controller」作為可選開發板，在積木編輯器的開發板下拉選單中顯示
 - **FR-002**: 選擇 TXT Controller 後，工具箱 MUST 切換顯示 TXT 專屬積木類別（隱藏 Arduino/CyberBrick 專屬積木）
-- **FR-003**: Blockly 工作區的積木 MUST 能生成語法正確、可在 ftrobopy 環境下執行的 Python 程式
-- **FR-004**: 生成的 Python 程式 MUST 使用 ftrobopy 的標準 API：`ftrobopy.ftrobopy(host, port)` 建立連線，`motor(N).setSpeed(v)` 其中 v 為 -512~512（正數為正轉、負數為反轉、0 為停止），`input(N).state()` 回傳 0/1 數位狀態；Blockly 積木使用 0~512 速度 + 正/反轉選項，generator 將反轉轉成負數傳入
+- **FR-003**: Blockly 工作區的積木 MUST 能生成語法正確、可在 ftrobopy 環境下執行的 Python 程式；對於持續輪詢或控制 TXT 硬體的 `while` 迴圈，若可抵達迴圈尾端的路徑未包含明確 pacing，generator MUST 自動補上符合 ftrobopy exchange cycle 的節流語句
+- **FR-004**: 生成的 Python 程式 MUST 使用 ftrobopy 的標準 API：主程式目前以 `ftrobopy.ftrobopy('auto')` 在 TXT 本機建立連線，馬達控制使用 `motor(N).setSpeed(v)`（v 為 -512~512，正數為正轉、負數為反轉、0 為停止），一般數位輸入可用 `input(N).state()` 讀取；Blockly 積木使用 0~512 速度 + 正/反轉選項，generator 將反轉轉成負數傳入
 - **FR-005**: 系統 MUST 透過 SSH/SCP 將生成的 `main.py` 上傳至 TXT 的指定遠端路徑
 - **FR-006**: 上傳成功後，系統 MUST 透過 SSH 在 TXT 上執行 `python3 main.py`
 - **FR-007**: 執行期間的 stdout/stderr MUST 即時顯示在 VS Code Output Channel
@@ -132,7 +133,7 @@
 - **TxtDeviceState**: TXT 裝置的目前狀態枚舉（Idle、Testing、Running、Stopping、Disconnected、Error）；防止 Program Mode 與 Test Mode 衝突
 - **TxtIoSnapshot**: 某一時刻 TXT 的完整 I/O 狀態（M1-M4 速度、O1-O8 輸出、I1-I8 輸入）；由 Test Panel polling 取得
 - **TxtUploadRequest**: 程式上傳請求（Python 程式碼、目標開發板、連線設定引用）
-- **TxtBlock（最小積木集）**: `txt_init`、`txt_motor_speed`、`txt_motor_stop`、`txt_output`、`txt_input_read`、`txt_wait`、`txt_stop_all`
+- **TxtBlock（核心積木集）**: 現行實作包含 `txt_main`、`txt_init`、`txt_motor_speed`、`txt_motor_stop`、`txt_output`、`txt_input_sensor`、`txt_input_read`、`txt_wait`、`txt_stop_all`；其中 `txt_init` 與 `txt_input_read` 保留向下相容
 
 ## Success Criteria *(mandatory)*
 

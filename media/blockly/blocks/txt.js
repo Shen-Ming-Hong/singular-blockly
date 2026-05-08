@@ -54,7 +54,7 @@ Blockly.Blocks['txt_init'] = {
 Blockly.Blocks['txt_motor_speed'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_MOTOR_SPEED_PREFIX', '設定馬達'))
+			.appendField(window.languageManager.getMessage('TXT_MOTOR_SPEED', '馬達'))
 			.appendField(
 				new Blockly.FieldDropdown([
 					['M1', '1'],
@@ -64,15 +64,14 @@ Blockly.Blocks['txt_motor_speed'] = {
 				]),
 				'MOTOR'
 			)
-			.appendField(window.languageManager.getMessage('TXT_MOTOR_DIRECTION', '方向'))
 			.appendField(
 				new Blockly.FieldDropdown([
-					[window.languageManager.getMessage('TXT_MOTOR_FORWARD', '正轉'), 'FORWARD'],
-					[window.languageManager.getMessage('TXT_MOTOR_BACKWARD', '反轉'), 'BACKWARD'],
+					[window.languageManager.getMessage('TXT_DIRECTION_FORWARD', '正轉'), 'FORWARD'],
+					[window.languageManager.getMessage('TXT_DIRECTION_BACKWARD', '反轉'), 'BACKWARD'],
 				]),
 				'DIRECTION'
 			)
-			.appendField(window.languageManager.getMessage('TXT_MOTOR_SPEED_LABEL', '速度'));
+			.appendField(window.languageManager.getMessage('TXT_MOTOR_SPEED_SET', '設定速度'));
 		this.appendValueInput('SPEED').setCheck('Number');
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
@@ -89,7 +88,7 @@ Blockly.Blocks['txt_motor_speed'] = {
 Blockly.Blocks['txt_motor_stop'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_MOTOR_STOP_PREFIX', '停止馬達'))
+			.appendField(window.languageManager.getMessage('TXT_MOTOR_STOP', '停止馬達'))
 			.appendField(
 				new Blockly.FieldDropdown([
 					['M1', '1'],
@@ -115,7 +114,7 @@ Blockly.Blocks['txt_motor_stop'] = {
 Blockly.Blocks['txt_output'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_OUTPUT_PREFIX', '設定輸出'))
+			.appendField(window.languageManager.getMessage('TXT_OUTPUT', '輸出'))
 			.appendField(
 				new Blockly.FieldDropdown([
 					['O1', '1'],
@@ -129,10 +128,11 @@ Blockly.Blocks['txt_output'] = {
 				]),
 				'OUTPUT'
 			)
+			.appendField(window.languageManager.getMessage('TXT_OUTPUT_SET', '設為'))
 			.appendField(
 				new Blockly.FieldDropdown([
-					[window.languageManager.getMessage('TXT_OUTPUT_ON', '開啟'), 'ON'],
-					[window.languageManager.getMessage('TXT_OUTPUT_OFF', '關閉'), 'OFF'],
+					[window.languageManager.getMessage('TXT_STATE_ON', '開'), 'ON'],
+					[window.languageManager.getMessage('TXT_STATE_OFF', '關'), 'OFF'],
 				]),
 				'STATE'
 			);
@@ -188,7 +188,7 @@ Blockly.Blocks['txt_input_sensor'] = {
 Blockly.Blocks['txt_input_read'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_INPUT_READ_PREFIX', '讀取輸入'))
+			.appendField(window.languageManager.getMessage('TXT_INPUT_READ', '讀取輸入'))
 			.appendField(
 				new Blockly.FieldDropdown([
 					['I1', '1'],
@@ -217,9 +217,9 @@ Blockly.Blocks['txt_input_read'] = {
 Blockly.Blocks['txt_wait'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_WAIT_PREFIX', '等待'));
+			.appendField(window.languageManager.getMessage('TXT_WAIT', '等待'));
 		this.appendValueInput('MS').setCheck('Number');
-		this.appendDummyInput().appendField(window.languageManager.getMessage('TXT_WAIT_SUFFIX', '毫秒'));
+		this.appendDummyInput().appendField(window.languageManager.getMessage('TXT_WAIT_UNIT', '毫秒'));
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);

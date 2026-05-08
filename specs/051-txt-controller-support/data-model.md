@@ -15,7 +15,7 @@ TXT 裝置的連線參數。IP 與 username 存於工作區設定（`vscode.work
 export interface TxtConnectionConfig {
     /** TXT 裝置的 IP 位址或 hostname */
     host: string;
-    /** SSH 使用者名稱（ftCommunity 預設：'ft'） */
+    /** SSH 使用者名稱（ftCommunity 預設：'ftc'） */
     username: string;
     /** 遠端程式存放路徑（預設：'/tmp/singular_blockly/main.py'） */
     remotePath: string;
@@ -174,13 +174,25 @@ export interface TxtUploadRequest {
 
 | 積木型別 | 輸入欄位 | 輸出型別 | Generator 摘要輸出 |
 |---------|---------|---------|------------------|
-| `txt_init` | （無可編輯欄位，host 從設定讀取） | statement | `import ftrobopy\ntxt = ftrobopy.ftrobopy('{host}', 65000)\n` |
+| `txt_main` | DO: statements | statement / container | `import ftrobopy\ntxt = ftrobopy.ftrobopy('auto')\n...` |
+| `txt_init` | （無可編輯欄位；向下相容） | statement | `import ftrobopy\ntxt = ftrobopy.ftrobopy('auto')\n` |
 | `txt_motor_speed` | MOTOR: 下拉（M1-M4）、SPEED: 數字（0-512）、DIRECTION: 下拉（正轉/反轉） | statement | `txt.motor({N}).setSpeed({±speed})\n` |
 | `txt_motor_stop` | MOTOR: 下拉（M1-M4） | statement | `txt.motor({N}).setSpeed(0)\n` |
 | `txt_output` | OUTPUT: 下拉（O1-O8）、STATE: 下拉（開/關） | statement | `txt.output({N}).setLevel({512\|0})\n` |
 | `txt_input_read` | INPUT: 下拉（I1-I8） | value（數值） | `txt.input({N}).state()` |
+| `txt_input_sensor` | SENSOR_TYPE: BUTTON / GATE / ULTRASONIC、INPUT: I1-I8 | value（數值） | BUTTON / GATE → `txt.input({N}).state()`；ULTRASONIC → `_read_ultrasonic({N})` |
 | `txt_wait` | MS: 數字（毫秒） | statement | `import time\ntime.sleep({ms}/1000)\n` |
 | `txt_stop_all` | （無欄位） | statement | `for i in range(1,5): txt.motor(i).setSpeed(0)\nfor i in range(1,9): txt.output(i).setLevel(0)\n` |
+
+> 補充：現況實作以 `txt_main` 作為主程式容器，`txt_init` 與 `txt_input_read` 主要保留向下相容；新工作區建議使用 `txt_main` 與 `txt_input_sensor`。
+
+### TXT while 迴圈自動 pacing 規則（`media/blockly/generators/txt/python_common.js`）
+
+`controls_whileUntil` 的共通 generator 會對 `while` 進行路徑敏感分析，規則如下：
+
+- 若 `while` 條件式或會抵達 loop 尾端的 body 路徑存取 TXT 硬體（如 `txt_input_sensor`、`txt_input_read`、`txt_motor_speed`、`txt_motor_stop`、`txt_output`、`txt_stop_all`），且該路徑先前沒有 `txt_wait` / `controls_duration` 等明確 pacing，則在尾端自動補 `txt.updateWait(0.01)`。
+- 若某條路徑已自行 delay，或進入明確不返回的內層 `while True`（無 `break`），外層 loop 不再重複補 pacing。
+- 巢狀 loop 各自獨立判斷；自動 pacing 不由 value block 注入，因此 `txt_wait` 與感測器 value 積木可保持純表達式語意。
 
 ---
 
@@ -188,8 +200,8 @@ export interface TxtUploadRequest {
 
 | 設定鍵 | 型別 | 預設值 | 說明 |
 |-------|------|--------|------|
-| `singular-blockly.txt.host` | string | `""` | TXT IP 或 hostname |
-| `singular-blockly.txt.username` | string | `"ft"` | SSH 使用者名稱 |
+| `singular-blockly.txt.host` | string | `"192.168.7.2"` | TXT IP 或 hostname |
+| `singular-blockly.txt.username` | string | `"ftc"` | SSH 使用者名稱 |
 | `singular-blockly.txt.remotePath` | string | `"/tmp/singular_blockly/main.py"` | 遠端程式路徑 |
 | `singular-blockly.txt.runtimePort` | number | `8080` | io_server.py HTTP port |
 

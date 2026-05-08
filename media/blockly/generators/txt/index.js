@@ -121,6 +121,20 @@ window.txtGenerator.buildSetConfig = function () {
 };
 
 /**
+ * 串接下一個積木的程式碼
+ * Blockly 12 的 base Generator.scrub_() 不追蹤 nextConnection，必須覆寫才能正確生成連續 statement 積木的程式碼
+ * @param {!Blockly.Block} block 目前積木
+ * @param {string} code 目前積木已生成的程式碼
+ * @param {boolean=} opt_thisOnly 若為 true 則不追蹤 next 連接
+ * @returns {string} 串接後的完整程式碼
+ */
+window.txtGenerator.scrub_ = function (block, code, opt_thisOnly) {
+	const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
+	const nextCode = opt_thisOnly ? '' : this.blockToCode(nextBlock);
+	return code + nextCode;
+};
+
+/**
  * 允許的頂層積木類型
  */
 window.txtGenerator.allowedTopLevelBlocks_ = ['txt_main', 'procedures_defnoreturn', 'procedures_defreturn', 'arduino_function'];

@@ -92,32 +92,45 @@ npm install node-ssh
 
 1. 在 Extension Development Host 中選擇「TXT Controller」開發板
 2. 從工具箱拖入以下積木並排列：
-   - `txt_init`
-   - `txt_motor_speed`（M1，速度 200，反轉）
-   - `txt_wait`（2000ms）
-   - `txt_stop_all`
+    - `txt_main`
+    - 在容器內依序放入 `txt_motor_speed`（M1，速度 200，反轉）
+    - `txt_wait`（2000ms）
+    - `txt_stop_all`
 3. 點擊「生成程式碼」
 
-**預期輸出**：
+**預期輸出至少包含以下片段**：
 
 ```python
 import ftrobopy
 import time
 
-txt = ftrobopy.ftrobopy('192.168.0.100', 65000)
-txt.motor(1).setSpeed(-200)
+txt = ftrobopy.ftrobopy('auto')
+_m1 = txt.motor(1)
+_m1.setSpeed(
 time.sleep(2.0)
-for i in range(1, 5):
-    txt.motor(i).setSpeed(0)
+_m1.setSpeed(0)
 for i in range(1, 9):
     txt.output(i).setLevel(0)
 ```
+
+### 自動 pacing 驗證（無需硬體）
+
+1. 在 `txt_main` 容器內加入一個 `while True` 迴圈
+2. 讓迴圈條件式或內容讀取 `txt_input_sensor`
+3. **不要** 放入 `txt_wait`
+4. 點擊「生成程式碼」
+
+**預期**：
+
+- 若該 loop 存在未節流且可抵達尾端的 TXT 硬體輪詢/控制路徑，尾端會自動補 `txt.updateWait(0.01)`
+- 若某條路徑已明確 `txt_wait`，或進入不返回的內層 `while True`，外層不應再多補一個多餘的 `txt.updateWait(0.01)`
+- `txt_wait` 積木本身仍生成 `time.sleep(...)`，不會被改寫成 `txt.updateWait()`
 
 ### SSH 連線驗證（需要 TXT 硬體）
 
 1. 在 Blockly Editor 的 TXT 連線設定區填入：
    - Host: `192.168.x.x`（TXT 的 IP）
-   - Username: `ft`
+    - Username: `ftc`
    - Password: ftCommunity 預設密碼
 2. 點擊「測試連線」
 3. **預期**：5 秒內顯示「連線成功」
@@ -144,6 +157,7 @@ Phase A:
 □ src/types/arduino.ts                      （修改：getBoardLanguage 支援 'txt'）
 □ media/blockly/blocks/txt.js               （新增）
 □ media/blockly/generators/txt/txt.js       （新增）
+□ media/blockly/generators/txt/python_common.js（修改：TXT 共通流程控制與 while 自動 pacing）
 □ media/toolbox/categories/txt.json         （新增）
 □ media/locales/{15語系}/messages.js        （修改：新增 TXT i18n 鍵值）
 □ package.json                              （修改：新增 node-ssh、TXT board、命令）
@@ -174,7 +188,7 @@ Phase D:
 ## 注意事項
 
 1. **BoardLanguage 擴展**：修改 `getBoardLanguage()` 時，確認所有 `switch` 語句有 `'txt'` 的 case，避免 fallthrough 到 Arduino 邏輯
-2. **Generator 隔離**：`txt.js` Generator 必須使用獨立的 `txtGenerator` 物件，不能共用 `arduinoGenerator` 或 `micropythonGenerator`
+2. **Generator 隔離**：TXT 積木專屬 generator 使用獨立的 `txtGenerator`；積木本體在 `txt.js`，共通流程控制與 while 自動 pacing 在 `python_common.js`，不能共用 `arduinoGenerator` 或 `micropythonGenerator`
 3. **node-ssh webpack**：`node-ssh` 是 Node.js 模組，在 `webpack.config.js` 的 `externals` 中加入（Extension Host 不打包 node_modules）
 4. **i18n 驗證**：每次修改 `messages.js` 後執行 `npm run validate:i18n`，確保 15 個語系的鍵值完整
 5. **密碼安全**：任何地方都不得將密碼 log 出來（logging.ts 或 console.log），確認 `TxtConnectionService` 的 log 語句排除密碼欄位

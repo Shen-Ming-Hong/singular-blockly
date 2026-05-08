@@ -123,6 +123,22 @@ export class TxtUploader {
 		};
 
 		try {
+			// --- Stage: stopping old process (before upload) ---
+			// 上傳前先終止殘留的舊程序，原因：
+			// 1. main.py 無限迴圈若無 delay 會跑滿 CPU，SSH 上傳期間 TXT 負載過高。
+			//    先 kill 可讓 CPU 降回正常水位，後續 SSH 操作更穩定。
+			// 2. 網路中斷時 SIGHUP 不一定能終止 main.py（取決於 TXT sshd HUP 設定），
+			//    殘留的 main.py 佔用 ftrobopy 序列埠，新程式呼叫 ftrobopy('auto') 會失敗。
+			// 3. io_server.py（Test Panel 遺留）同樣可能佔用 ftrobopy 連線，一併清除。
+			// 任一程序被 kill 後等 1s，讓 ftrobopy 完成序列埠清理再繼續後續步驟。
+			await ssh.execCommand('if pkill -f main.py; then sleep 1; fi; if pkill -f io_server.py; then sleep 1; fi');
+
+			if (this.stopRequested) {
+				report('completed', 100, 'Program execution completed.');
+				this.txtConnectionService.setState('Idle');
+				return { success: true, timestamp: new Date().toISOString(), duration: Date.now() - startTime };
+			}
+
 			// --- Stage: uploading ---
 			report('uploading', 40, `Uploading program to ${config.remotePath}...`);
 
@@ -144,17 +160,6 @@ export class TxtUploader {
 
 			report('uploading', 60, 'Program uploaded successfully.');
 
-			if (this.stopRequested) {
-				report('completed', 100, 'Program execution completed.');
-				this.txtConnectionService.setState('Idle');
-				return { success: true, timestamp: new Date().toISOString(), duration: Date.now() - startTime };
-			}
-
-			// 若 io_server.py 正在背景執行（Test Panel 遺留），先停止以釋放 ftrobopy 序列埠
-			// 只有 io_server.py 確實存在時才 sleep 1，讓序列埠完整釋放後再啟動
-			await ssh.execCommand('if pkill -f io_server.py; then sleep 1; fi');
-
-			// 若 Stop 在 io_server pkill / sleep 期間被觸發，提早返回，不啟動 python3
 			if (this.stopRequested) {
 				report('completed', 100, 'Program execution completed.');
 				this.txtConnectionService.setState('Idle');

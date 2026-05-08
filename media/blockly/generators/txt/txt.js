@@ -162,7 +162,15 @@ window.txtGenerator.forBlock['txt_wait'] = function (block) {
 
 /**
  * txt_stop_all: 停止所有馬達與輸出
+ * 使用 addMotorPort 登記 M1-M4，讓 txt_main 預先建立 _mN 物件，
+ * 避免在此處直接呼叫 txt.motor(i) 累加 config_id（CONFIG_IO 風暴）。
  */
 window.txtGenerator.forBlock['txt_stop_all'] = function (_block) {
-	return 'for i in range(1, 5):\n    txt.motor(i).setSpeed(0)\nfor i in range(1, 9):\n    txt.output(i).setLevel(0)\n';
+	// 登記所有馬達埠號，確保 txt_main 預先建立 _m1~_m4 物件
+	window.txtGenerator.addMotorPort(1);
+	window.txtGenerator.addMotorPort(2);
+	window.txtGenerator.addMotorPort(3);
+	window.txtGenerator.addMotorPort(4);
+	return '_m1.setSpeed(0)\n_m2.setSpeed(0)\n_m3.setSpeed(0)\n_m4.setSpeed(0)\n' +
+		'for i in range(1, 9):\n    txt.output(i).setLevel(0)\n';
 };

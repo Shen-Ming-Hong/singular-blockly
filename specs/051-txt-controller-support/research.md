@@ -246,6 +246,32 @@ ftCommunity issue #222 說明 USB g_ether 比照 Raspberry Pi Zero USB 網路模
 
 ---
 
+## 研究議題八：TXT 輪詢迴圈 pacing（`txt.updateWait()` vs `time.sleep()`）
+
+**決策**：對「會持續輪詢/控制 TXT 硬體，且存在未節流就抵達 `while` 尾端路徑」的 loop，由 generator 自動補 `txt.updateWait(0.01)`；使用者明確放置的 `txt_wait` 仍維持 `time.sleep(...)`，不改寫為 `updateWait()`。
+
+**依據**（已從 ftrobopy 原始碼、官方範例與 issue 查證）：
+
+- `ftrobopy.ftrobopy(..., update_interval=0.01)` 的預設 exchange interval 為 10ms
+- `updateWait()` docstring 明確指出以 `pass` 取代會導致顯著較高的 CPU 負載
+- 官方範例在感測器/控制 loop 常使用 `time.sleep(0.02)` 節流
+- 社群 issue #26 中，作者建議在高速控制 loop 內插入 `txt.updateWait(0.01)`
+
+**設計含義**：
+
+1. `updateWait()` 是通用的 TXT exchange-cycle 同步 API，不是超音波專用。
+2. `txt_wait` 是「使用者語意上的等待 N 毫秒」，因此應保留 `time.sleep(...)`。
+3. 自動 pacing 應放在 loop generator（`controls_whileUntil`），不能塞進 `txt_input_sensor` 之類 value block，避免把副作用綁進表達式。
+4. 判斷需採路徑敏感（path-sensitive）分析：若某分支已 `txt_wait`，另一分支則進入不返回的內層 `while True`，外層 loop 不應再多補一個尾端 `txt.updateWait(0.01)`。
+
+**被拒絕的替代方案**：
+
+- 固定插入 `time.sleep(0.05)`：與 ftrobopy exchange cycle 不對齊，且屬任意常數
+- 將 `txt_wait` 改生 `txt.updateWait()`：會改變使用者指定的等待語意
+- 僅以「是否用到超音波」決定插入：會漏掉按鈕、光柵、一般輸入、輸出/馬達控制等 TXT 硬體 loop
+
+---
+
 ## 研究摘要表
 
 | 議題 | 決策 | 信心度 |
@@ -256,6 +282,7 @@ ftCommunity issue #222 說明 USB g_ether 比照 Raspberry Pi Zero USB 網路模
 | SecretStorage | VS Code 內建 context.secrets API | 高（官方文件） |
 | TxtDeviceState 狀態機 | Union type + 狀態轉換函式 | 高 |
 | Blockly Generator 模式 | 獨立 txtGenerator，反轉用負值 | 高 |
+| TXT 輪詢迴圈 pacing | 自動節流採 path-sensitive `txt.updateWait(0.01)`；`txt_wait` 維持 `time.sleep(...)` | 高（原始碼 + 範例 + issue） |
 | USB CDC-ECM 連線方式 | 固定 IP `192.168.7.2`，預設帶入；Wi-Fi 為備用 | 中高（github issues 查證，IP 比照 Pi Zero 標準） |
 | Webpack 相容性 | node-ssh 需 externals 設定 | 中（待 Phase A 實際驗證） |
 | ftCommunity Python 版本 | 推測 3.6+，避免新語法 | 中（待實機確認） |
