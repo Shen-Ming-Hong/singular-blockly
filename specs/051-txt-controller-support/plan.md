@@ -5,7 +5,7 @@
 
 ## 摘要
 
-為 Singular Blockly 新增 fischertechnik TXT Controller（舊版，ftCommunity 韌體）作為第三類開發板。使用者透過視覺化積木生成 ftrobopy Python 程式，Extension 透過 node-ssh 以 SSH/SCP 將程式上傳到 TXT 並執行；同時提供與 ROBO Pro 對齊的 I/O 即時測試面板（HTTP polling `io_server.py`），並整合在 Blockly Editor 同一個 WebView 的 dialog 中。技術核心為三層架構擴展：(1) BoardLanguage/UploadMethod 型別新增 `'txt'`/`'ssh'`；(2) 新增 `TxtUploader`、`TxtConnectionService`、`TxtTestService` 三個 Service；(3) 新增 `txt.js` 積木及 Generator，並在 `blocklyEdit.html` / `blocklyEdit.js` 內整合 TXT 設定與 Test Panel dialog。對於未自行放置 delay 的 TXT 硬體輪詢/控制 `while` 迴圈，現行實作會由共通 generator 以 path-sensitive 方式自動補 `txt.updateWait(0.01)`，避免 busy loop 搶占 ftrobopy exchange thread。
+為 Singular Blockly 新增 fischertechnik TXT Controller（舊版，ftCommunity 韌體）作為第三類開發板。使用者透過視覺化積木生成 ftrobopy Python 程式，Extension 透過 node-ssh 以 SSH/SCP 將程式上傳到 TXT 並執行；同時提供與 ROBO Pro 對齊的 I/O 即時測試面板（HTTP polling `io_server.py`），並整合在 Blockly Editor 同一個 WebView 的 dialog 中。技術核心為三層架構擴展：(1) BoardLanguage/UploadMethod 型別新增 `'txt'`/`'ssh'`；(2) 新增 `TxtUploader`、`TxtConnectionService`、`TxtTestService` 三個 Service；(3) 新增 `txt.js` 積木及 Generator，並在 `blocklyEdit.html` / `blocklyEdit.js` 內整合 TXT 設定與 Test Panel dialog；(4) 在 loops 類別補上一顆兒童友善的無限循環積木，讓學生更容易找到 `while true` 的用法。對於未自行放置 delay 的 TXT 硬體輪詢/控制 `while` 迴圈，現行實作會由共通 generator 以 path-sensitive 方式自動補 `txt.updateWait(0.01)`，避免 busy loop 搶占 ftrobopy exchange thread。
 
 ---
 
@@ -82,7 +82,8 @@ src/
 media/
 ├── blockly/
 │   ├── blocks/
-│   │   └── txt.js               # 新增 - 7 個 TXT 積木定義
+│   │   ├── txt.js               # 新增 - 7 個 TXT 積木定義
+│   │   └── loops.js             # 修改 - 新增兒童友善 infinite loop 積木 `controls_forever`
 │   └── generators/
 │       └── txt/
 │           ├── txt.js           # 新增 - TXT Python Generator（ftrobopy API）
@@ -93,10 +94,11 @@ media/
 │   └── blocklyEdit.js           # 現有 - 新增 TXT 連線設定、Test Panel dialog、polling 與語言切換邏輯
 ├── toolbox/
 │   └── categories/
-│       └── txt.json             # 新增 - TXT 工具箱類別定義
+│       ├── txt.json             # 新增 - TXT 工具箱類別定義
+│       └── loops.json           # 修改 - 在 loops 類別加入 `controls_forever`
 └── locales/
     └── {15 語系}/
-        └── messages.js          # 現有 - 新增 TXT 積木 i18n 鍵值
+        └── messages.js          # 現有 - 新增 TXT 積木與 `controls_forever` i18n 鍵值
 
 txt-runtime/
 └── io_server.py                 # 新增 - TXT 端 HTTP I/O Server（Python 標準函式庫）

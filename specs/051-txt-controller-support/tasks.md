@@ -209,6 +209,14 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
   **修復**：改以靜態路徑分析收集「未節流且可抵達目前 while 尾端」的狀態集合：會把 while 條件式的硬體讀取、`if/else` 各分支的條件與內容、頂層 delay、`break`/`continue`、以及「明確不返回」的內層 `while True`（無 `break`）一起納入分析。只有當存在至少一條 TXT 硬體存取路徑會真的落到 loop 尾端且此前沒有任何 pacing 時，才在尾端補 `txt.updateWait(0.01)`  
   **檔案**：`media/blockly/generators/txt/python_common.js`
 
+## 迭代後補強（兒童友善無限循環積木）
+
+- [X] T049 在 `media/blockly/blocks/loops.js`、`media/toolbox/categories/loops.json` 新增兒童友善的無限循環積木 `controls_forever`，並將 `break` / `continue` 的循環偵測與孤立積木警告納入同一套保護機制
+- [X] T050 在 `media/blockly/generators/arduino/loops.js`、`media/blockly/generators/micropython/loops.js`、`media/blockly/generators/txt/python_common.js` 實作 `controls_forever` generator；MicroPython 與 TXT 共用既有的無限迴圈節流保護邏輯
+- [X] T051 在 15 個 `media/locales/{lang}/messages.js` 新增 `CONTROLS_FOREVER_TITLE` / `CONTROLS_FOREVER_TOOLTIP`，並同步更新 `scripts/generate-block-dictionary.js` / `src/mcp/block-dictionary.json` 讓 MCP 搜尋與字典描述可辨識新積木
+- [X] T052 更新 `spec.md`、`plan.md`、`data-model.md`、`research.md`、`quickstart.md`、`contracts/txt-blocks-api.md` 反映新的兒童友善無限循環積木與其 pacing 規則
+- [X] T053 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n` 與相關測試，確認新積木不影響既有 Arduino / MicroPython / TXT 行為
+
 ---
 
 ## 依賴圖（User Story 完成順序）

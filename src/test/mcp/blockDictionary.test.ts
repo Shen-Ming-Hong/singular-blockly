@@ -228,7 +228,7 @@ suite('Block Dictionary Tests', () => {
 		});
 
 		test('should have all essential loop blocks', () => {
-			const essentialLoopBlocks = ['controls_repeat_ext', 'controls_whileUntil', 'controls_for'];
+			const essentialLoopBlocks = ['controls_repeat_ext', 'controls_forever', 'controls_whileUntil', 'controls_for'];
 
 			for (const blockType of essentialLoopBlocks) {
 				const block = dictionary.blocks.find((b: BlockDefinition) => b.type === blockType);

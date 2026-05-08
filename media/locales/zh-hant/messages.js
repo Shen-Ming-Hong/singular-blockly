@@ -345,6 +345,8 @@ window.languageManager.loadMessages('zh-hant', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '重複 %1 次',
 	CONTROLS_REPEAT_INPUT_DO: '執行',
+	CONTROLS_FOREVER_TITLE: '一直重複做',
+	CONTROLS_FOREVER_TOOLTIP: '會一直重複執行裡面的指令，直到程式停止。',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: '重複當',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: '重複直到',
 	CONTROLS_FOR_TITLE: '使用 %1 從 %2 計數到 %3 每次遞增 %4',

@@ -352,6 +352,8 @@ window.languageManager.loadMessages('tr', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '%1 kez tekrarla',
 	CONTROLS_REPEAT_INPUT_DO: 'yap',
+	CONTROLS_FOREVER_TITLE: 'sürekli tekrarla',
+	CONTROLS_FOREVER_TOOLTIP: 'Program durana kadar içindeki komutları sürekli tekrarlar.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'olduğu sürece tekrarla',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'olana kadar tekrarla',
 	CONTROLS_FOR_TITLE: '%1 ile %2 den %3 e %4 artışla say',

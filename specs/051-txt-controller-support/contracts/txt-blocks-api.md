@@ -37,7 +37,7 @@ txt = ftrobopy.ftrobopy('auto')
 
 **補充**：
 - 會先掃描子積木，視需要建立 `setConfig()` / 馬達預先建立等輔助程式碼
-- 目前不再自動包一層外部 `while True`；若需要持續輪詢，應由使用者明確放入迴圈積木
+- 目前不再自動包一層外部 `while True`；若需要持續輪詢，應由使用者明確放入 `controls_forever` 或其他迴圈積木
 
 ### txt_init — TXT 初始化
 
@@ -238,6 +238,7 @@ for i in range(1, 9):
 ## Generator 補充規則：TXT `while` 迴圈 pacing
 
 - `txt_wait` 的語意是使用者明確等待毫秒，因此 **MUST** 生成 `time.sleep(ms / 1000.0)`，**MUST NOT** 自動改寫為 `txt.updateWait()`。
+- `controls_forever` 直接生成 `while True`，其 pacing 規則與 `controls_whileUntil` 產生的無限迴圈完全一致。
 - `controls_whileUntil` 由 `media/blockly/generators/txt/python_common.js` 實作；當 `while` 條件式或可抵達 loop 尾端的路徑含 TXT 硬體存取，且此前沒有 pacing 時，generator **MAY** 在尾端追加 `txt.updateWait(0.01)`。
 - 這個判斷 **MUST** 為 path-sensitive：需考慮 `if/else`、`break` / `continue`、頂層 `txt_wait` / `controls_duration`，以及明確不返回的內層 `while True`。
 - `txt_input_sensor` / `txt_input_read` 這類 value block **MUST NOT** 自行插入 `txt.updateWait()`；pacing 屬於 loop generator 的責任。

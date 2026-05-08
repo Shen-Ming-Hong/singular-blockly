@@ -263,6 +263,7 @@ ftCommunity issue #222 說明 USB g_ether 比照 Raspberry Pi Zero USB 網路模
 2. `txt_wait` 是「使用者語意上的等待 N 毫秒」，因此應保留 `time.sleep(...)`。
 3. 自動 pacing 應放在 loop generator（`controls_whileUntil`），不能塞進 `txt_input_sensor` 之類 value block，避免把副作用綁進表達式。
 4. 判斷需採路徑敏感（path-sensitive）分析：若某分支已 `txt_wait`，另一分支則進入不返回的內層 `while True`，外層 loop 不應再多補一個尾端 `txt.updateWait(0.01)`。
+5. 為了讓國小學生更容易找到無限循環，新增兒童友善的 `controls_forever` 積木作為 `while True` 的語意化包裝；其 pacing 規則與 `controls_whileUntil` 生成的無限迴圈完全一致。
 
 **被拒絕的替代方案**：
 

@@ -353,6 +353,8 @@ window.languageManager.loadMessages('ru', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'повторить %1 раз',
 	CONTROLS_REPEAT_INPUT_DO: 'выполнить',
+	CONTROLS_FOREVER_TITLE: 'повторять без конца',
+	CONTROLS_FOREVER_TOOLTIP: 'Повторяет команды внутри снова и снова, пока программа не остановится.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'повторять, пока',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'повторять, до тех пор пока не',
 	CONTROLS_FOR_TITLE: 'считать с %1 от %2 до %3 шагом %4',

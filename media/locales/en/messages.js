@@ -351,6 +351,8 @@ window.languageManager.loadMessages('en', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'repeat %1 times',
 	CONTROLS_REPEAT_INPUT_DO: 'do',
+	CONTROLS_FOREVER_TITLE: 'repeat forever',
+	CONTROLS_FOREVER_TOOLTIP: 'Keep repeating the blocks inside until the program stops.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'repeat while',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'repeat until',
 	CONTROLS_FOR_TITLE: 'count with %1 from %2 to %3 by %4',

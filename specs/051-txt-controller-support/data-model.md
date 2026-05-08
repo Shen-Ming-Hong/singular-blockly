@@ -188,6 +188,8 @@ export interface TxtUploadRequest {
 
 ### TXT while 迴圈自動 pacing 規則（`media/blockly/generators/txt/python_common.js`）
 
+`controls_forever` 是迴圈類別中的兒童友善無限循環積木，直接生成 `while True`；其 pacing 與 `controls_whileUntil` 生成的無限迴圈共用同一套規則。
+
 `controls_whileUntil` 的共通 generator 會對 `while` 進行路徑敏感分析，規則如下：
 
 - 若 `while` 條件式或會抵達 loop 尾端的 body 路徑存取 TXT 硬體（如 `txt_input_sensor`、`txt_input_read`、`txt_motor_speed`、`txt_motor_stop`、`txt_output`、`txt_stop_all`），且該路徑先前沒有 `txt_wait` / `controls_duration` 等明確 pacing，則在尾端自動補 `txt.updateWait(0.01)`。

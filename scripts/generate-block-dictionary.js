@@ -1016,6 +1016,21 @@ const BLOCK_DEFINITIONS = [
 		tags: ['loop', 'repeat', 'times', '迴圈', '重複', '次數'],
 	},
 	{
+		type: 'controls_forever',
+		category: 'loops',
+		names: { 'zh-hant': '一直重複做', en: 'Repeat Forever' },
+		descriptions: {
+			'zh-hant': '持續重複執行裡面的程式，直到程式停止',
+			en: 'Keep repeating the enclosed statements until the program stops',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'DO', type: 'statement', label: { 'zh-hant': '執行', en: 'do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'forever', 'infinite', 'while true', '迴圈', '一直重複', '無限循環'],
+	},
+	{
 		type: 'controls_whileUntil',
 		category: 'loops',
 		names: { 'zh-hant': '條件迴圈', en: 'While/Until' },

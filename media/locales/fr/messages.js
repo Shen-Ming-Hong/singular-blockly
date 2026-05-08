@@ -353,6 +353,8 @@ window.languageManager.loadMessages('fr', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'répéter %1 fois',
 	CONTROLS_REPEAT_INPUT_DO: 'faire',
+	CONTROLS_FOREVER_TITLE: 'répéter sans fin',
+	CONTROLS_FOREVER_TOOLTIP: 'Répète sans arrêt les instructions à l’intérieur jusqu’à l’arrêt du programme.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'répéter tant que',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: "répéter jusqu'à",
 	CONTROLS_FOR_TITLE: 'compter avec %1 de %2 à %3 par %4',

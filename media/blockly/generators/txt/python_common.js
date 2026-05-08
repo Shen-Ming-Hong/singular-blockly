@@ -300,104 +300,125 @@
 
 	// ── Loops ─────────────────────────────────────────────────────────────────
 
+	const txtHardwareBlockTypes = new Set([
+		'txt_motor_speed',
+		'txt_motor_stop',
+		'txt_output',
+		'txt_stop_all',
+		'txt_input_sensor',
+		'txt_input_read',
+	]);
+	const nestedLoopBlockTypes = new Set([
+		'controls_whileUntil',
+		'controls_forever',
+		'controls_repeat_ext',
+		'controls_repeat',
+		'controls_for',
+		'controls_forEach',
+	]);
+
+	function hasTxtHardwareInSubtree(b, includeNextBlock) {
+		if (!b) return false;
+		if (txtHardwareBlockTypes.has(b.type)) return true;
+		for (const inp of b.inputList || []) {
+			const t = inp.connection && inp.connection.targetBlock();
+			if (t && hasTxtHardwareInSubtree(t, true)) return true;
+		}
+		return includeNextBlock ? hasTxtHardwareInSubtree(b.getNextBlock(), true) : false;
+	}
+
+	function orHardwareStates(states, hasHardware) {
+		return hasHardware ? new Set([true]) : new Set(states);
+	}
+
+	function mergeStateSets(...sets) {
+		const result = new Set();
+		for (const set of sets) {
+			for (const value of set) result.add(value);
+		}
+		return result;
+	}
+
+	function hasBreakInSubtree(b) {
+		if (!b) return false;
+		if (b.type === 'singular_flow_statements' && b.getFieldValue('FLOW') === 'BREAK') return true;
+		for (const inp of b.inputList || []) {
+			const t = inp.connection && inp.connection.targetBlock();
+			if (t && hasBreakInSubtree(t)) return true;
+		}
+		return hasBreakInSubtree(b.getNextBlock());
+	}
+
+	function isDefinitelyNonReturningLoop(b) {
+		if (!b) return false;
+		if (b.type === 'controls_forever') {
+			return !hasBreakInSubtree(b.getInputTargetBlock('DO'));
+		}
+		if (b.type !== 'controls_whileUntil') return false;
+		const boolBlock = b.getInputTargetBlock('BOOL');
+		if (!boolBlock || boolBlock.type !== 'logic_boolean') return false;
+		const isTrueLiteral = boolBlock.getFieldValue('BOOL') === 'TRUE';
+		const loopsForever = b.getFieldValue('MODE') === 'WHILE' ? isTrueLiteral : !isTrueLiteral;
+		return loopsForever && !hasBreakInSubtree(b.getInputTargetBlock('DO'));
+	}
+
+	function collectUnpacedEndStates(b, states, afterBlock) {
+		if (states.size === 0) return new Set();
+		if (!b) return afterBlock ? collectUnpacedEndStates(afterBlock, states, null) : new Set(states);
+		if (b.type === 'txt_wait' || b.type === 'controls_duration') return new Set();
+		if (b.type === 'singular_flow_statements') {
+			const flow = b.getFieldValue('FLOW');
+			if (flow === 'BREAK' || flow === 'CONTINUE') return new Set();
+		}
+		if (b.type === 'controls_if') {
+			const afterIf = b.getNextBlock() || afterBlock;
+			let result = new Set();
+			let cumulativeStates = new Set(states);
+			for (let i = 0; i <= (b.elseifCount_ || 0); i++) {
+				cumulativeStates = orHardwareStates(cumulativeStates, hasTxtHardwareInSubtree(b.getInputTargetBlock('IF' + i), true));
+				result = mergeStateSets(result, collectUnpacedEndStates(b.getInputTargetBlock('DO' + i), cumulativeStates, afterIf));
+			}
+			if (b.elseCount_) {
+				result = mergeStateSets(result, collectUnpacedEndStates(b.getInputTargetBlock('ELSE'), cumulativeStates, afterIf));
+			} else {
+				result = mergeStateSets(result, collectUnpacedEndStates(afterIf, cumulativeStates, null));
+			}
+			return result;
+		}
+		if (isDefinitelyNonReturningLoop(b)) return new Set();
+		if (nestedLoopBlockTypes.has(b.type)) {
+			return collectUnpacedEndStates(b.getNextBlock(), new Set(states), afterBlock);
+		}
+		const nextStates = orHardwareStates(new Set(states), hasTxtHardwareInSubtree(b, false));
+		return collectUnpacedEndStates(b.getNextBlock(), nextStates, afterBlock);
+	}
+
+	function buildTxtWhileLoop(block, condition, conditionHasHardware) {
+		let branch = g.statementToCode(block, 'DO') || g.INDENT + 'pass\n';
+		const initialStates = new Set([conditionHasHardware]);
+		const unpacedEndStates = collectUnpacedEndStates(block.getInputTargetBlock('DO'), initialStates, null);
+		if (unpacedEndStates.has(true)) {
+			branch += g.INDENT + 'txt.updateWait(0.01)  # Pace tight TXT hardware polling/control loops\n';
+		}
+		return 'while ' + condition + ':\n' + branch;
+	}
+
 	g.forBlock['controls_whileUntil'] = function (block) {
 		if (!g.isInAllowedContext(block)) return '';
 		const until = block.getFieldValue('MODE') === 'UNTIL';
 		let cond = g.valueToCode(block, 'BOOL', until ? g.ORDER_LOGICAL_NOT : g.ORDER_NONE) || 'False';
-		let branch = g.statementToCode(block, 'DO') || g.INDENT + 'pass\n';
 		if (until) cond = 'not ' + cond;
 		// ftrobopy 官方原始碼將 updateWait() 定位為「等待下一個 exchange cycle」的同步 API，
 		// 不是超音波專用；官方範例中的感測器/控制 loop 常以 20ms sleep 節流，
 		// 而作者在 issue #26 亦建議對高速控制 loop 插入 txt.updateWait(0.01)。
 		// 因此自動插入規則應以「目前 while 是否存在未節流、且真的能走到 loop 尾端的
 		// TXT 硬體輪詢/控制路徑」判斷，而不是只看超音波感測器或整棵子樹曾出現硬體積木。
-		const txtHardwareBlockTypes = new Set([
-			'txt_motor_speed',
-			'txt_motor_stop',
-			'txt_output',
-			'txt_stop_all',
-			'txt_input_sensor',
-			'txt_input_read',
-		]);
-		const nestedLoopBlockTypes = new Set([
-			'controls_whileUntil',
-			'controls_repeat_ext',
-			'controls_repeat',
-			'controls_for',
-			'controls_forEach',
-		]);
-		function hasTxtHardwareInSubtree(b, includeNextBlock) {
-			if (!b) return false;
-			if (txtHardwareBlockTypes.has(b.type)) return true;
-			for (const inp of b.inputList || []) {
-				const t = inp.connection && inp.connection.targetBlock();
-				if (t && hasTxtHardwareInSubtree(t, true)) return true;
-			}
-			return includeNextBlock ? hasTxtHardwareInSubtree(b.getNextBlock(), true) : false;
-		}
-		function orHardwareStates(states, hasHardware) {
-			return hasHardware ? new Set([true]) : new Set(states);
-		}
-		function mergeStateSets(...sets) {
-			const result = new Set();
-			for (const set of sets) {
-				for (const value of set) result.add(value);
-			}
-			return result;
-		}
-		function hasBreakInSubtree(b) {
-			if (!b) return false;
-			if (b.type === 'singular_flow_statements' && b.getFieldValue('FLOW') === 'BREAK') return true;
-			for (const inp of b.inputList || []) {
-				const t = inp.connection && inp.connection.targetBlock();
-				if (t && hasBreakInSubtree(t)) return true;
-			}
-			return hasBreakInSubtree(b.getNextBlock());
-		}
-		function isDefinitelyNonReturningLoop(b) {
-			if (!b || b.type !== 'controls_whileUntil') return false;
-			const boolBlock = b.getInputTargetBlock('BOOL');
-			if (!boolBlock || boolBlock.type !== 'logic_boolean') return false;
-			const isTrueLiteral = boolBlock.getFieldValue('BOOL') === 'TRUE';
-			const loopsForever = b.getFieldValue('MODE') === 'WHILE' ? isTrueLiteral : !isTrueLiteral;
-			return loopsForever && !hasBreakInSubtree(b.getInputTargetBlock('DO'));
-		}
-		function collectUnpacedEndStates(b, states, afterBlock) {
-			if (states.size === 0) return new Set();
-			if (!b) return afterBlock ? collectUnpacedEndStates(afterBlock, states, null) : new Set(states);
-			if (b.type === 'txt_wait' || b.type === 'controls_duration') return new Set();
-			if (b.type === 'singular_flow_statements') {
-				const flow = b.getFieldValue('FLOW');
-				if (flow === 'BREAK' || flow === 'CONTINUE') return new Set();
-			}
-			if (b.type === 'controls_if') {
-				const afterIf = b.getNextBlock() || afterBlock;
-				let result = new Set();
-				let cumulativeStates = new Set(states);
-				for (let i = 0; i <= (b.elseifCount_ || 0); i++) {
-					cumulativeStates = orHardwareStates(cumulativeStates, hasTxtHardwareInSubtree(b.getInputTargetBlock('IF' + i), true));
-					result = mergeStateSets(result, collectUnpacedEndStates(b.getInputTargetBlock('DO' + i), cumulativeStates, afterIf));
-				}
-				if (b.elseCount_) {
-					result = mergeStateSets(result, collectUnpacedEndStates(b.getInputTargetBlock('ELSE'), cumulativeStates, afterIf));
-				} else {
-					result = mergeStateSets(result, collectUnpacedEndStates(afterIf, cumulativeStates, null));
-				}
-				return result;
-			}
-			if (isDefinitelyNonReturningLoop(b)) return new Set();
-			if (nestedLoopBlockTypes.has(b.type)) {
-				return collectUnpacedEndStates(b.getNextBlock(), new Set(states), afterBlock);
-			}
-			const nextStates = orHardwareStates(new Set(states), hasTxtHardwareInSubtree(b, false));
-			return collectUnpacedEndStates(b.getNextBlock(), nextStates, afterBlock);
-		}
-		const initialStates = new Set([hasTxtHardwareInSubtree(block.getInputTargetBlock('BOOL'), true)]);
-		const unpacedEndStates = collectUnpacedEndStates(block.getInputTargetBlock('DO'), initialStates, null);
-		if (unpacedEndStates.has(true)) {
-			branch += g.INDENT + 'txt.updateWait(0.01)  # Pace tight TXT hardware polling/control loops\n';
-		}
-		return 'while ' + cond + ':\n' + branch;
+		return buildTxtWhileLoop(block, cond, hasTxtHardwareInSubtree(block.getInputTargetBlock('BOOL'), true));
+	};
+
+	g.forBlock['controls_forever'] = function (block) {
+		if (!g.isInAllowedContext(block)) return '';
+		return buildTxtWhileLoop(block, 'True', false);
 	};
 
 	g.forBlock['controls_repeat_ext'] = function (block) {

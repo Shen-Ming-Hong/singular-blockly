@@ -352,6 +352,8 @@ window.languageManager.loadMessages('hu', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'ismételd %1 alkalommal',
 	CONTROLS_REPEAT_INPUT_DO: 'csinald',
+	CONTROLS_FOREVER_TITLE: 'ismételd örökké',
+	CONTROLS_FOREVER_TOOLTIP: 'Folyamatosan ismétli a benne lévő utasításokat, amíg a program le nem áll.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'ismételd amíg',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'ismételd amíg nem',
 	CONTROLS_FOR_TITLE: 'számláló %1 értéke %2 és %3 között, lépésköz %4',

@@ -350,6 +350,8 @@ window.languageManager.loadMessages('ja', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '%1 回繰り返す',
 	CONTROLS_REPEAT_INPUT_DO: '実行',
+	CONTROLS_FOREVER_TITLE: 'ずっとくり返す',
+	CONTROLS_FOREVER_TOOLTIP: 'プログラムが止まるまで、中の命令をずっとくり返します。',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: '条件が真の間、繰り返す',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: '条件が真になるまで繰り返す',
 	CONTROLS_FOR_TITLE: 'カウンタ %1 を %2 から %3 まで %4 ずつ増加させながら繰り返す',

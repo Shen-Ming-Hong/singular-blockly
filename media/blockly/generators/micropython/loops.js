@@ -38,7 +38,25 @@
 	}
 
 	/**
-	 * 無限迴圈
+	 * 建立 while 迴圈程式碼，並在無限迴圈需要時自動補最小延遲。
+	 * @param {!Blockly.Block} block - 來源積木
+	 * @param {string} condition - while 條件
+	 * @returns {string} 生成的程式碼
+	 */
+	function buildWhileLoopCode(block, condition) {
+		let branch = generator.statementToCode(block, 'DO');
+		branch = branch || generator.INDENT + 'pass\n';
+
+		if (condition === 'True' && !hasDelayAtTopLevel(branch)) {
+			generator.addImport('import time');
+			branch += generator.INDENT + 'time.sleep_ms(10)  # 確保可中斷\n';
+		}
+
+		return 'while ' + condition + ':\n' + branch;
+	}
+
+	/**
+	 * 條件迴圈
 	 */
 	generator.forBlock['controls_whileUntil'] = function (block) {
 		// 深層防護：孤立積木不生成程式碼
@@ -48,22 +66,22 @@
 
 		const until = block.getFieldValue('MODE') === 'UNTIL';
 		let argument0 = generator.valueToCode(block, 'BOOL', until ? generator.ORDER_LOGICAL_NOT : generator.ORDER_NONE) || 'False';
-		let branch = generator.statementToCode(block, 'DO');
-		branch = branch || generator.INDENT + 'pass\n';
 		if (until) {
 			argument0 = 'not ' + argument0;
 		}
 
-		// 如果是無限迴圈 (while True) 且最外層沒有延遲，加入最小延遲避免無法中斷
-		// 只檢查第一層，if/else 內的延遲不算（因為條件不成立時不會執行）
-		const isInfiniteLoop = argument0 === 'True';
-		if (isInfiniteLoop && !hasDelayAtTopLevel(branch)) {
-			generator.addImport('import time');
-			// 在迴圈結尾加入 10ms 延遲，確保 CPU 有機會處理中斷
-			branch += generator.INDENT + 'time.sleep_ms(10)  # 確保可中斷\n';
+		return buildWhileLoopCode(block, argument0);
+	};
+
+	/**
+	 * 兒童友善的無限迴圈
+	 */
+	generator.forBlock['controls_forever'] = function (block) {
+		if (!generator.isInAllowedContext(block)) {
+			return '';
 		}
 
-		return 'while ' + argument0 + ':\n' + branch;
+		return buildWhileLoopCode(block, 'True');
 	};
 
 	/**

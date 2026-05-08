@@ -352,6 +352,8 @@ window.languageManager.loadMessages('de', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'wiederhole %1 mal',
 	CONTROLS_REPEAT_INPUT_DO: 'mache',
+	CONTROLS_FOREVER_TITLE: 'immer wiederholen',
+	CONTROLS_FOREVER_TOOLTIP: 'Wiederholt die Anweisungen im Inneren immer weiter, bis das Programm stoppt.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'wiederhole solange',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'wiederhole bis',
 	CONTROLS_FOR_TITLE: 'zähle mit %1 von %2 bis %3 mit Schritt %4',

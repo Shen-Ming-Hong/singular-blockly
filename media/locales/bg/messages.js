@@ -352,6 +352,8 @@ window.languageManager.loadMessages('bg', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'повтори %1 пъти',
 	CONTROLS_REPEAT_INPUT_DO: 'изпълни',
+	CONTROLS_FOREVER_TITLE: 'повтаряй завинаги',
+	CONTROLS_FOREVER_TOOLTIP: 'Повтаря командите вътре отново и отново, докато програмата не спре.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'повтаряй докато',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'повтаряй докато не',
 	CONTROLS_FOR_TITLE: 'брой с %1 от %2 до %3 със стъпка %4',

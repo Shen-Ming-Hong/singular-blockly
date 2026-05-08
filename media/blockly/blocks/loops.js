@@ -57,6 +57,22 @@ Blockly.Blocks['controls_duration'] = {
 	}
 };
 
+Blockly.Blocks['controls_forever'] = {
+	init: function () {
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('CONTROLS_FOREVER_TITLE') || '一直重複做');
+		this.appendStatementInput('DO').setCheck(null);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setStyle('loop_blocks');
+		this.setTooltip(
+			window.languageManager.getMessage('CONTROLS_FOREVER_TOOLTIP') ||
+			'會一直重複執行裡面的指令，直到程式停止。'
+		);
+		this.setHelpUrl('');
+	},
+};
+
 Blockly.Blocks['singular_flow_statements'] = {
 	init: function () {
 		this.jsonInit({
@@ -95,7 +111,7 @@ Blockly.Blocks['singular_flow_statements'] = {
 			block = block.getSurroundParent();
 			if (!block) break;
 			if (['controls_duration', 'controls_repeat', 'controls_repeat_ext',
-				'controls_forEach', 'controls_for', 'controls_whileUntil'].includes(block.type)) {
+				'controls_forEach', 'controls_for', 'controls_whileUntil', 'controls_forever'].includes(block.type)) {
 				inLoop = true;
 				break;
 			}
@@ -169,7 +185,7 @@ function wrapOnchange(blockDef, newHandler) {
 }
 
 // T031-T037: 循環類與條件判斷內建積木
-['controls_repeat_ext', 'controls_whileUntil', 'controls_for', 'controls_forEach', 'controls_if'].forEach(function (blockType) {
+['controls_repeat_ext', 'controls_whileUntil', 'controls_forever', 'controls_for', 'controls_forEach', 'controls_if'].forEach(function (blockType) {
 	if (Blockly.Blocks[blockType]) {
 		wrapOnchange(Blockly.Blocks[blockType], orphanWarningOnchange);
 	}

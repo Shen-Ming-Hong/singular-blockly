@@ -351,6 +351,8 @@ window.languageManager.loadMessages('ko', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: '%1 번 반복',
 	CONTROLS_REPEAT_INPUT_DO: '하기',
+	CONTROLS_FOREVER_TITLE: '계속 반복하기',
+	CONTROLS_FOREVER_TOOLTIP: '프로그램이 멈출 때까지 안에 있는 명령을 계속 반복합니다.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: '다음 동안 반복:',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: '다음까지 반복:',
 	CONTROLS_FOR_TITLE: '%1을(를) %2에서 %3까지 %4 단계로 세기',

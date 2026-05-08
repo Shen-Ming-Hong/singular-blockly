@@ -115,7 +115,7 @@ for i in range(1, 9):
 
 ### 自動 pacing 驗證（無需硬體）
 
-1. 在 `txt_main` 容器內加入一個 `while True` 迴圈
+1. 在 `txt_main` 容器內加入一個 `controls_forever`（顯示為「一直重複做」）積木，或一個 `while True` 迴圈
 2. 讓迴圈條件式或內容讀取 `txt_input_sensor`
 3. **不要** 放入 `txt_wait`
 4. 點擊「生成程式碼」

@@ -351,6 +351,8 @@ window.languageManager.loadMessages('cs', {
 	// Loop block messages
 	CONTROLS_REPEAT_TITLE: 'opakuj %1 krát',
 	CONTROLS_REPEAT_INPUT_DO: 'delej',
+	CONTROLS_FOREVER_TITLE: 'opakuj pořád',
+	CONTROLS_FOREVER_TOOLTIP: 'Opakuje příkazy uvnitř stále dokola, dokud se program nezastaví.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'opakuj dokud',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'opakuj dokud ne',
 	CONTROLS_FOR_TITLE: 'počítej s %1 od %2 do %3 po %4',
