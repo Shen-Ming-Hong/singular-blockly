@@ -3940,12 +3940,33 @@ function initTxtConnectionPanel() {
 		const newTestBtn = testBtn.cloneNode(true);
 		testBtn.parentNode.replaceChild(newTestBtn, testBtn);
 		newTestBtn.addEventListener('click', () => {
+			const host = document.getElementById('txtHostInput')?.value?.trim() || '';
+			const username = document.getElementById('txtUsernameInput')?.value?.trim() || '';
+			const rawPassword = document.getElementById('txtPasswordInput')?.value || '';
+			const remotePath = document.getElementById('txtRemotePathInput')?.value?.trim() || '';
+			let passwordMode = 'stored';
+			let password;
+			if (rawPassword === TXT_PASSWORD_SENTINEL) {
+				passwordMode = 'stored';
+			} else if (rawPassword.length > 0) {
+				passwordMode = 'custom';
+				password = rawPassword;
+			} else {
+				passwordMode = 'default';
+			}
 			const statusEl = document.getElementById('txtConnectionStatus');
 			if (statusEl) {
 				statusEl.textContent = window.languageManager?.getMessage('TXT_TESTING', '連線中...');
 				statusEl.className = '';
 			}
-			vscode.postMessage({ command: 'txtTestConnection' });
+			vscode.postMessage({
+				command: 'txtTestConnection',
+				host,
+				username,
+				remotePath,
+				password,
+				passwordMode,
+			});
 		});
 	}
 

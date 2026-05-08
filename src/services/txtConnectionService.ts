@@ -22,6 +22,13 @@ export interface SshClientInterface {
 	dispose(): void;
 }
 
+export type TxtPasswordMode = 'stored' | 'default' | 'custom';
+
+export interface TxtConnectionTestOptions extends Partial<TxtConnectionConfig> {
+	password?: string;
+	passwordMode?: TxtPasswordMode;
+}
+
 /**
  * fischertechnik TXT Controller 連線服務
  * 負責管理連線設定、密碼儲存、連線測試與裝置狀態
@@ -49,20 +56,22 @@ export class TxtConnectionService {
 	/**
 	 * 儲存 TXT 連線設定（不含密碼）
 	 */
-	saveConfig(config: Partial<TxtConnectionConfig>): void {
+	async saveConfig(config: Partial<TxtConnectionConfig>): Promise<void> {
 		const cfg = vscode.workspace.getConfiguration(CONFIG_SECTION);
+		const updates: Array<Thenable<void>> = [];
 		if (config.host !== undefined) {
-			cfg.update('txt.host', config.host, vscode.ConfigurationTarget.Global);
+			updates.push(cfg.update('txt.host', config.host, vscode.ConfigurationTarget.Workspace));
 		}
 		if (config.username !== undefined) {
-			cfg.update('txt.username', config.username, vscode.ConfigurationTarget.Global);
+			updates.push(cfg.update('txt.username', config.username, vscode.ConfigurationTarget.Workspace));
 		}
 		if (config.remotePath !== undefined) {
-			cfg.update('txt.remotePath', config.remotePath, vscode.ConfigurationTarget.Global);
+			updates.push(cfg.update('txt.remotePath', config.remotePath, vscode.ConfigurationTarget.Workspace));
 		}
 		if (config.runtimePort !== undefined) {
-			cfg.update('txt.runtimePort', config.runtimePort, vscode.ConfigurationTarget.Global);
+			updates.push(cfg.update('txt.runtimePort', config.runtimePort, vscode.ConfigurationTarget.Workspace));
 		}
+		await Promise.all(updates);
 		log('TXT connection config saved', 'info');
 	}
 
@@ -110,15 +119,41 @@ export class TxtConnectionService {
 		log('TXT password deleted', 'info');
 	}
 
+	private resolveConfig(overrides?: Partial<TxtConnectionConfig>): TxtConnectionConfig {
+		const baseConfig = this.loadConfig();
+		return {
+			host: overrides?.host?.trim() || baseConfig.host,
+			username: overrides?.username?.trim() || baseConfig.username,
+			remotePath: overrides?.remotePath?.trim() || baseConfig.remotePath,
+			runtimePort: overrides?.runtimePort ?? baseConfig.runtimePort,
+		};
+	}
+
+	private async resolvePassword(options?: TxtConnectionTestOptions): Promise<string> {
+		switch (options?.passwordMode) {
+			case 'custom':
+				return options.password ?? '';
+			case 'stored':
+				return (await this.getPassword()) ?? DEFAULT_TXT_PASSWORD;
+			case 'default':
+				return DEFAULT_TXT_PASSWORD;
+			default:
+				if (typeof options?.password === 'string' && options.password.length > 0) {
+					return options.password;
+				}
+				return this.getPasswordOrDefault();
+		}
+	}
+
 	/**
 	 * 測試 SSH 連線，並自動完成一次性的 SSH 免確認設定（若尚未設定）。
 	 *
 	 * ftCommunity 的 PAM 設定：當 ftc 使用者無密碼時，SSH 登入會觸發 TXT 螢幕確認畫面。
 	 * 測試連線成功後，若偵測到 ftc 無密碼，會自動設定密碼以繞過該確認流程。
 	 */
-	async testConnection(): Promise<{ success: boolean; message: string; sshSetupDone?: boolean }> {
-		const config = this.loadConfig();
-		const password = await this.getPasswordOrDefault();
+	async testConnection(options?: TxtConnectionTestOptions): Promise<{ success: boolean; message: string; sshSetupDone?: boolean }> {
+		const config = this.resolveConfig(options);
+		const password = await this.resolvePassword(options);
 
 		const ssh = await this.sshClientFactory();
 		try {

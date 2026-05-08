@@ -249,7 +249,7 @@ export class WebViewMessageHandler {
 					await this.handleTxtLoadConfig();
 					break;
 				case 'txtTestConnection':
-					await this.handleTxtTestConnection();
+					await this.handleTxtTestConnection(message);
 					break;
 				// TXT Controller 上傳功能
 				case 'txtUpload':
@@ -1937,7 +1937,7 @@ export class WebViewMessageHandler {
 			return;
 		}
 		const { host, username, remotePath, runtimePort, password } = message;
-		this.txtConnectionService.saveConfig({ host, username, remotePath, runtimePort });
+		await this.txtConnectionService.saveConfig({ host, username, remotePath, runtimePort });
 		if (typeof password === 'string' && password.length > 0) {
 			await this.txtConnectionService.storePassword(password);
 		}
@@ -1970,12 +1970,20 @@ export class WebViewMessageHandler {
 	/**
 	 * 處理 TXT 測試連線指令
 	 */
-	private async handleTxtTestConnection(): Promise<void> {
+	private async handleTxtTestConnection(message: any): Promise<void> {
 		if (!this.txtConnectionService) {
 			log('TxtConnectionService not initialized', 'warn');
 			return;
 		}
-		const result = await this.txtConnectionService.testConnection();
+		const { host, username, remotePath, runtimePort, password, passwordMode } = message ?? {};
+		const result = await this.txtConnectionService.testConnection({
+			host,
+			username,
+			remotePath,
+			runtimePort,
+			password,
+			passwordMode,
+		});
 		this.panel.webview.postMessage({
 			command: 'txtConnectionTestResult',
 			success: result.success,

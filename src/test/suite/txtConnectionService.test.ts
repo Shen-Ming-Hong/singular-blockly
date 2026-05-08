@@ -12,6 +12,7 @@ import { TxtConnectionService, SshClientInterface } from '../../services/txtConn
 suite('TxtConnectionService Test Suite', () => {
 	let sandbox: sinon.SinonSandbox;
 	let mockContext: vscode.ExtensionContext;
+	let mockConfigUpdate: sinon.SinonStub;
 	let mockSecrets: {
 		store: sinon.SinonStub;
 		get: sinon.SinonStub;
@@ -31,6 +32,8 @@ suite('TxtConnectionService Test Suite', () => {
 			secrets: mockSecrets as unknown as vscode.SecretStorage,
 		} as unknown as vscode.ExtensionContext;
 
+		mockConfigUpdate = sandbox.stub().resolves();
+
 		// Stub vscode.workspace.getConfiguration
 		sandbox.stub(vscode.workspace, 'getConfiguration').returns({
 			get: (key: string, defaultValue?: unknown) => {
@@ -42,7 +45,7 @@ suite('TxtConnectionService Test Suite', () => {
 				};
 				return key in defaults ? defaults[key] : defaultValue;
 			},
-			update: sandbox.stub().resolves(),
+			update: mockConfigUpdate,
 		} as unknown as vscode.WorkspaceConfiguration);
 	});
 
@@ -59,6 +62,22 @@ suite('TxtConnectionService Test Suite', () => {
 			assert.strictEqual(config.username, 'ftc');
 			assert.strictEqual(config.remotePath, '/tmp/singular_blockly/main.py');
 			assert.strictEqual(config.runtimePort, 8080);
+		});
+	});
+
+	suite('saveConfig()', () => {
+		test('should save connection settings to workspace scope', async () => {
+			const service = new TxtConnectionService(mockContext);
+
+			await service.saveConfig({
+				host: '192.168.7.99',
+				username: 'student',
+				remotePath: '/tmp/student.py',
+				runtimePort: 9090,
+			});
+
+			assert.strictEqual(mockConfigUpdate.callCount, 4);
+			assert.ok(mockConfigUpdate.alwaysCalledWithMatch(sinon.match.string, sinon.match.any, vscode.ConfigurationTarget.Workspace));
 		});
 	});
 
@@ -98,6 +117,30 @@ suite('TxtConnectionService Test Suite', () => {
 	});
 
 	suite('testConnection()', () => {
+		test('should use explicit form values when provided', async () => {
+			const mockSsh: SshClientInterface = {
+				connect: sandbox.stub().resolves(),
+				execCommand: sandbox.stub().onFirstCall().resolves({ stdout: 'ok', stderr: '', code: 0 }).onSecondCall().resolves({ stdout: 'ftc:$6$hash:19000:0:99999:7:::\n', stderr: '', code: 0 }),
+				dispose: sandbox.stub(),
+			};
+
+			const service = new TxtConnectionService(mockContext, () => Promise.resolve(mockSsh));
+			const result = await service.testConnection({
+				host: '192.168.7.88',
+				username: 'tester',
+				password: 'form-password',
+				passwordMode: 'custom',
+			});
+
+			assert.strictEqual(result.success, true);
+			assert.ok((mockSsh.connect as sinon.SinonStub).calledOnceWithExactly({
+				host: '192.168.7.88',
+				username: 'tester',
+				password: 'form-password',
+				readyTimeout: 30000,
+			}));
+		});
+
 		test('should use default password ftc when no custom password stored', async () => {
 			mockSecrets.get.resolves(undefined); // 無自訂密碼
 
