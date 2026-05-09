@@ -537,6 +537,7 @@ body.theme-dark .preview-controls .theme-icon {
 	border-radius: 50%;
 	border: none;
 	background-color: #4caf50;
+	color: white;
 	cursor: pointer;
 	transition: background-color 0.3s;
 }
@@ -550,8 +551,57 @@ body.theme-dark .preview-controls .theme-icon {
 	cursor: not-allowed;
 }
 
-.upload-path {
-	color: white;
+/* TXT Controller 按鈕圖示切換 */
+#uploadButton .play-icon,
+#uploadButton .stop-icon {
+	display: none;
+}
+
+/* txt-uploading：連線/上傳中，顯示播放三角（靜態，按鈕停用） */
+#uploadButton.txt-uploading .upload-icon {
+	display: none;
+}
+
+#uploadButton.txt-uploading .play-icon {
+	display: inline;
+}
+
+#uploadButton.txt-uploading .upload-svg,
+#uploadButton.txt-mode .upload-svg,
+#uploadButton.txt-running .upload-svg {
+	animation: none;
+}
+
+/* txt-mode 就緒：顯示播放三角，隱藏上傳箭頭 */
+#uploadButton.txt-mode .upload-icon {
+	display: none;
+}
+
+#uploadButton.txt-mode .play-icon {
+	display: inline;
+}
+
+/* txt-running 執行中：顯示停止方塊，紅色背景 */
+#uploadButton.txt-running .upload-icon,
+#uploadButton.txt-running .play-icon {
+	display: none;
+}
+
+#uploadButton.txt-running .stop-icon {
+	display: inline;
+}
+
+#uploadButton.txt-running {
+	background-color: #e53935;
+}
+
+#uploadButton.txt-running:hover {
+	background-color: #c62828;
+}
+
+/* 非 TXT 模式：上傳箭頭旋轉動畫（spinning class 在 button 上） */
+#uploadButton.spinning .upload-svg {
+	animation-play-state: running;
 }
 
 /* Monitor 按鈕樣式（CyberBrick 專用） */
@@ -622,6 +672,46 @@ body.theme-dark .preview-controls .theme-icon {
 	color: white;
 }
 
+/* TXT 連線設定按鈕樣式 */
+.txt-config-switch {
+	margin-left: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+}
+
+#txtConfigButton,
+#txtTestPanelButton {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        color: white;
+}
+
+/* 齒輪（連線設定）：亮藍 */
+#txtConfigButton {
+	background-color: #0288d1;
+}
+
+#txtConfigButton:hover {
+	background-color: #0277bd;
+}
+
+/* 板手（I/O 測試）：琥珀橙 */
+#txtTestPanelButton {
+	background-color: #ff8f00;
+}
+
+#txtTestPanelButton:hover {
+	background-color: #e65100;
+}
+
 /* 範例瀏覽器模態樣式 */
 .sample-modal-content {
 	max-width: 720px;
@@ -646,13 +736,231 @@ body.theme-dark .preview-controls .theme-icon {
 	padding: 32px 0;
 }
 
-.spinner-circle {
-	width: 36px;
-	height: 36px;
-	border: 3px solid var(--vscode-focusBorder, #007acc44);
-	border-top-color: var(--vscode-focusBorder, #007acc);
+/* TXT Controller 連線狀態樣式 */
+.txt-status-ok {
+	color: var(--vscode-terminal-ansiGreen, #4ec9b0);
+}
+
+.txt-status-error {
+	color: var(--vscode-inputValidation-errorForeground, #f48771);
+}
+
+/* ── TXT I/O Test Panel Dialog ─────────────────────────────────────────── */
+
+/* dialog 元素定位：置中，使用 backdrop */
+#txtTestPanelDialog {
+	border: none;
+	padding: 0;
+	background: transparent;
+	max-width: 560px;
+	width: 90vw;
+	max-height: 88vh;
+	overflow: visible;
+}
+
+#txtTestPanelDialog::backdrop {
+	background: rgba(0, 0, 0, 0.5);
+}
+
+/* dialog 內容沿用 .modal-content 視覺語言 */
+#txtTestPanelDialog .modal-content {
+	margin: 0;
+	width: 100%;
+	max-height: 88vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+#txtTestPanelDialog .modal-body {
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* 標題列中的狀態指示器 */
+.txt-test-status {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 0.85rem;
+	margin-right: 8px;
+}
+
+.txt-test-status-dot {
+	width: 8px;
+	height: 8px;
 	border-radius: 50%;
-	animation: sample-spin 0.8s linear infinite;
+	background: #4caf50;
+	flex-shrink: 0;
+}
+
+.txt-test-status-dot.disconnected {
+	background: #e53935;
+}
+
+.txt-test-status-dot.paused {
+	background: #f9a825;
+}
+
+#txtTestRetryBtn {
+	padding: 1px 8px;
+	font-size: 0.85rem;
+	border: 1px solid #ccc;
+	background: #f0f0f0;
+	color: #333;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+/* Stop All 按鈕 */
+.txt-test-stop-all {
+	width: 100%;
+	padding: 8px;
+	background: #d32f2f;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	font-size: 0.95rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.txt-test-stop-all:hover {
+	background: #b71c1c;
+}
+
+/* Section 標題 */
+.txt-test-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.txt-test-section-title {
+	margin: 0;
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: #666;
+	padding-bottom: 4px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+/* Motors */
+.txt-test-motors {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.txt-motor-row {
+	display: grid;
+	grid-template-columns: 28px 1fr auto 52px;
+	align-items: center;
+	gap: 8px;
+}
+
+.txt-motor-label {
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.txt-motor-slider {
+	width: 100%;
+	accent-color: #2196f3;
+}
+
+.txt-motor-dir {
+	padding: 3px 10px;
+	font-size: 0.85rem;
+	border: 1px solid #ccc;
+	background: #f0f0f0;
+	color: #333;
+	border-radius: 3px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.txt-motor-dir.backward {
+	background: #2196f3;
+	border-color: #2196f3;
+	color: #fff;
+}
+
+.txt-motor-value {
+	font-size: 0.85rem;
+	text-align: right;
+	min-width: 44px;
+	color: #888;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Outputs */
+.txt-test-outputs {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 6px;
+}
+
+.txt-output-btn {
+	padding: 7px 4px;
+	font-size: 0.9rem;
+	border: 1px solid #ccc;
+	background: #f0f0f0;
+	color: #333;
+	border-radius: 4px;
+	cursor: pointer;
+	text-align: center;
+	transition: background 0.15s;
+}
+
+.txt-output-btn.active {
+	background: #2196f3;
+	border-color: #2196f3;
+	color: #fff;
+}
+
+/* Inputs */
+.txt-test-inputs {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 6px;
+}
+
+.txt-input-box {
+	padding: 7px 4px;
+	font-size: 0.9rem;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	background: #f5f5f5;
+	text-align: center;
+}
+
+.txt-input-box span {
+	display: block;
+	font-size: 0.8rem;
+	color: #888;
+	margin-bottom: 2px;
+}
+
+.txt-input-value {
+	font-weight: 600;
+}
+
+.txt-input-sensor-select {
+	width: 100%;
+	font-size: 0.75rem;
+	margin-bottom: 3px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	background: #fff;
+	color: #333;
+	padding: 1px 2px;
+	cursor: pointer;
 }
 
 @keyframes sample-spin {
@@ -1258,6 +1566,30 @@ body.theme-dark #uploadButton:disabled {
 	background-color: #555555;
 }
 
+body.theme-dark #uploadButton.txt-running {
+	background-color: #c62828;
+}
+
+body.theme-dark #uploadButton.txt-running:hover {
+	background-color: #b71c1c;
+}
+
+body.theme-dark #txtConfigButton {
+	background-color: #0277bd;
+}
+
+body.theme-dark #txtConfigButton:hover {
+	background-color: #01579b;
+}
+
+body.theme-dark #txtTestPanelButton {
+	background-color: #f57c00;
+}
+
+body.theme-dark #txtTestPanelButton:hover {
+	background-color: #e65100;
+}
+
 body.theme-dark select {
 	background-color: #444444;
 	color: #e0e0e0;
@@ -1283,6 +1615,62 @@ body.theme-dark .modal-close {
 
 body.theme-dark .modal-close:hover {
 	color: #ffffff;
+}
+
+/* ── TXT I/O Test Panel 深色模式覆蓋 ───────────────────────────────────── */
+body.theme-dark #txtTestRetryBtn {
+	background: #444444;
+	color: #e0e0e0;
+	border-color: #555555;
+}
+
+body.theme-dark .txt-test-section-title {
+	color: #aaaaaa;
+	border-bottom-color: #555555;
+}
+
+body.theme-dark .txt-motor-dir {
+	background: #444444;
+	color: #e0e0e0;
+	border-color: #555555;
+}
+
+body.theme-dark .txt-motor-dir.backward {
+	background: #1976d2;
+	border-color: #1976d2;
+	color: #ffffff;
+}
+
+body.theme-dark .txt-motor-value {
+	color: #aaaaaa;
+}
+
+body.theme-dark .txt-output-btn {
+	background: #444444;
+	color: #e0e0e0;
+	border-color: #555555;
+}
+
+body.theme-dark .txt-output-btn.active {
+	background: #1976d2;
+	border-color: #1976d2;
+	color: #ffffff;
+}
+
+body.theme-dark .txt-input-box {
+	background: #333333;
+	border-color: #555555;
+	color: #e0e0e0;
+}
+
+body.theme-dark .txt-input-box span {
+	color: #aaaaaa;
+}
+
+body.theme-dark .txt-input-sensor-select {
+	background: #444444;
+	border-color: #666666;
+	color: #e0e0e0;
 }
 
 /* 備份創建表單 */

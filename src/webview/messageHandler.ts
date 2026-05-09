@@ -19,6 +19,9 @@ import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
 import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSuggestionService';
 import { fetchSampleIndex, fetchSampleWorkspace, validateSampleWorkspace, applyNameTranslations } from '../services/sampleBrowserService';
+import { TxtConnectionService } from '../services/txtConnectionService';
+import { TxtUploader } from '../services/txtUploader';
+import { TxtTestService } from '../services/txtTestService';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -68,6 +71,9 @@ export class WebViewMessageHandler {
 	private shadowSuggestionService?: ShadowSuggestionService;
 	private aiStatusBar?: AIStatusBar;
 	private _shadowRequestSeq = 0;
+	private txtConnectionService: TxtConnectionService | null = null;
+	private txtUploader: TxtUploader | null = null;
+	private txtTestService: TxtTestService | null = null;
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -124,6 +130,11 @@ export class WebViewMessageHandler {
 					reason,
 				});
 			});
+
+			// 初始化 TXT Controller 連線服務
+			this.txtConnectionService = new TxtConnectionService(this.context);
+			this.txtUploader = new TxtUploader(this.txtConnectionService);
+			this.txtTestService = new TxtTestService(this.txtConnectionService, this.context.extensionUri);
 		}
 	}
 
@@ -230,6 +241,54 @@ export class WebViewMessageHandler {
 				case 'loadSelectedSampleRequest':
 					await this.handleLoadSelectedSample(message);
 					break;
+				// TXT Controller 連線功能
+				case 'txtSaveConfig':
+					await this.handleTxtSaveConfig(message);
+					break;
+				case 'txtLoadConfig':
+					await this.handleTxtLoadConfig();
+					break;
+				case 'txtTestConnection':
+					await this.handleTxtTestConnection(message);
+					break;
+				// TXT Controller 上傳功能
+				case 'txtUpload':
+					await this.handleTxtUpload(message);
+					break;
+				case 'txtStopExecution':
+					await this.handleTxtStopExecution();
+					break;
+				// TXT Controller Test Panel (dialog)
+				case 'txtTestDialogOpen':
+					await this.handleTxtTestDialogOpen();
+					break;
+				case 'txtTestDialogClose':
+					await this.handleTxtTestDialogClose();
+					break;
+				case 'txtTestPollIo':
+					await this.handleTxtTestPollIo();
+					break;
+				case 'txtTestSetMotor':
+					await this.txtTestService?.setMotor(message.motor as number, message.speed as number);
+					break;
+				case 'txtTestSetOutput':
+					await this.txtTestService?.setOutput(message.output as number, message.level as number);
+					break;
+				case 'txtTestStopAll':
+					await this.txtTestService?.stopAll();
+					break;
+				case 'txtTestSetSensorConfig':
+					try {
+						await this.txtTestService?.configureSensors(message.sensorTypes as string[]);
+					} catch (sensorErr) {
+						// 感測器設定失敗：記錄錯誤但不中斷 polling，讓使用者知道設定未生效
+						log(`configureSensors failed: ${sensorErr}`, 'warn');
+						this.panel.webview.postMessage({
+							command: 'txtTestSensorConfigFailed',
+							error: String(sensorErr),
+						});
+					}
+					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
 					break;
@@ -243,6 +302,24 @@ export class WebViewMessageHandler {
 			);
 			this.showErrorMessage(errorMsg);
 		}
+	}
+
+	async stopTxtExecutionFromExtension(): Promise<void> {
+		if (!this.txtUploader) {
+			log('TxtUploader not initialized', 'warn');
+			throw new Error('TxtUploader not initialized');
+		}
+
+		await this.handleTxtStopExecution();
+	}
+
+	async installTxtRuntimeFromExtension(): Promise<void> {
+		if (!this.txtTestService) {
+			log('TxtTestService not initialized', 'warn');
+			throw new Error('TxtTestService not initialized');
+		}
+
+		await this.txtTestService.installRuntime();
 	}
 
 	/**
@@ -344,14 +421,22 @@ export class WebViewMessageHandler {
 
 			// 根據語言類型決定檔案名稱
 			const isMicroPython = message.language === 'micropython';
-			const fileName = isMicroPython ? 'src/rc_main.py' : 'src/main.cpp';
+			const isTxt = message.language === 'txt';
+			let fileName: string;
+			if (isMicroPython) {
+				fileName = 'src/rc_main.py';
+			} else if (isTxt) {
+				fileName = 'src/main.py';
+			} else {
+				fileName = 'src/main.cpp';
+			}
 
 			// 寫入程式碼
 			await this.fileService.writeFile(fileName, message.code);
 			log(`[blockly] 已寫入程式碼到 ${fileName}`, 'info');
 
-			// MicroPython 模式不需要處理 PlatformIO 設定
-			if (isMicroPython) {
+			// MicroPython / TXT 模式不需要處理 PlatformIO 設定
+			if (isMicroPython || isTxt) {
 				return;
 			}
 
@@ -404,10 +489,10 @@ export class WebViewMessageHandler {
 			const workspaceRoot = workspaceFolders[0].uri.fsPath;
 			const platformioIni = 'platformio.ini';
 
-			// CyberBrick 和 none 都不需要 platformio.ini
-			const isMicroPythonBoard = message.board === 'cyberbrick';
+			// CyberBrick、TXT 和 none 都不需要 platformio.ini
+			const isNonArduinoBoard = message.board === 'cyberbrick' || message.board === 'txt';
 
-			if (message.board === 'none' || isMicroPythonBoard) {
+			if (message.board === 'none' || isNonArduinoBoard) {
 				// 刪除 platformio.ini（如果存在）
 				if (this.fileService.fileExists(platformioIni)) {
 					await this.fileService.deleteFile(platformioIni);
@@ -1859,5 +1944,164 @@ export class WebViewMessageHandler {
 			state: workspace,
 			board: result.data.board,
 		});
+	}
+
+	/**
+	 * 處理 TXT 儲存設定指令
+	 */
+	private async handleTxtSaveConfig(message: any): Promise<void> {
+		if (!this.txtConnectionService) {
+			log('TxtConnectionService not initialized', 'warn');
+			return;
+		}
+		const { host, username, remotePath, runtimePort, password } = message;
+		await this.txtConnectionService.saveConfig({ host, username, remotePath, runtimePort });
+		if (typeof password === 'string' && password.length > 0) {
+			await this.txtConnectionService.storePassword(password);
+		}
+		this.panel.webview.postMessage({ command: 'txtConfigSaved' });
+	}
+
+	/**
+	 * 處理 TXT 載入設定指令
+	 */
+	private async handleTxtLoadConfig(): Promise<void> {
+		if (!this.txtConnectionService) {
+			log('TxtConnectionService not initialized', 'warn');
+			return;
+		}
+		const config = this.txtConnectionService.loadConfig();
+		const storedPassword = await this.txtConnectionService.getPassword();
+		this.panel.webview.postMessage({
+			command: 'txtConfigLoaded',
+			host: config.host,
+			username: config.username,
+			remotePath: config.remotePath,
+			runtimePort: config.runtimePort,
+			// 永遠為 true：未儲存時 fallback 預設密碼，使用者不需輸入即可連線
+			hasPassword: true,
+			// 若使用者已自訂密碼才顯示哨兵值；尚未設定則留空讓 placeholder 說明
+			customPasswordSet: typeof storedPassword === 'string' && storedPassword.length > 0,
+		});
+	}
+
+	/**
+	 * 處理 TXT 測試連線指令
+	 */
+	private async handleTxtTestConnection(message: any): Promise<void> {
+		if (!this.txtConnectionService) {
+			log('TxtConnectionService not initialized', 'warn');
+			return;
+		}
+		const { host, username, remotePath, runtimePort, password, passwordMode } = message ?? {};
+		const result = await this.txtConnectionService.testConnection({
+			host,
+			username,
+			remotePath,
+			runtimePort,
+			password,
+			passwordMode,
+		});
+		this.panel.webview.postMessage({
+			command: 'txtConnectionTestResult',
+			success: result.success,
+			message: result.message,
+			sshSetupDone: result.sshSetupDone ?? false,
+		});
+	}
+
+	/**
+	 * 處理 TXT 上傳程式指令（T035：上傳前暫停 Test Panel，完成後恢復）
+	 */
+	private async handleTxtUpload(message: any): Promise<void> {
+		if (!this.txtUploader) {
+			log('TxtUploader not initialized', 'warn');
+			return;
+		}
+		// T035: 上傳前暫停 Test Panel polling
+		this.panel.webview.postMessage({ command: 'txtTestPause' });
+		const code: string = message.code ?? '';
+		try {
+			const result = await this.txtUploader.upload(code, progress => {
+				this.panel.webview.postMessage({
+					command: 'txtUploadProgress',
+					stage: progress.stage,
+					progress: progress.progress,
+					message: progress.message,
+				});
+			});
+			this.panel.webview.postMessage({
+				command: 'txtUploadResult',
+				success: result.success,
+				error: result.error,
+				duration: result.duration,
+			});
+		} finally {
+			// T035: 上傳結束後恢復 Test Panel polling
+			this.panel.webview.postMessage({ command: 'txtTestResume' });
+		}
+	}
+
+	/**
+	 * 處理 TXT 停止執行指令
+	 */
+	private async handleTxtStopExecution(): Promise<void> {
+		if (!this.txtUploader) {
+			log('TxtUploader not initialized', 'warn');
+			return;
+		}
+		await this.txtUploader.stopExecution();
+		this.panel.webview.postMessage({ command: 'txtExecutionStopped' });
+	}
+
+	/**
+	 * 處理 TXT Test Panel dialog 開啟：安裝 runtime 並啟動 HTTP server
+	 */
+	private async handleTxtTestDialogOpen(): Promise<void> {
+		if (!this.txtTestService) {
+			log('TxtTestService not initialized', 'warn');
+			return;
+		}
+
+		try {
+			this.panel.webview.postMessage({ command: 'txtInstallRuntimeStart' });
+			await this.txtTestService.installAndStartServer();
+			this.panel.webview.postMessage({ command: 'txtInstallRuntimeDone', success: true });
+		} catch (error) {
+			log('Failed to open TXT test dialog', 'error', error);
+			this.panel.webview.postMessage({ command: 'txtInstallRuntimeDone', success: false, error: (error as Error).message });
+		}
+	}
+
+	/**
+	 * 處理 TXT Test Panel dialog 關閉：停止所有輸出並停止 HTTP server
+	 */
+	private async handleTxtTestDialogClose(): Promise<void> {
+		if (!this.txtTestService) {
+			return;
+		}
+
+		try {
+			await this.txtTestService.stopAll();
+			await this.txtTestService.stopServer();
+		} catch (error) {
+			log('Error closing TXT test dialog', 'error', error);
+		}
+	}
+
+	/**
+	 * 處理 TXT I/O 輪詢：取得快照並回傳給 WebView
+	 */
+	private async handleTxtTestPollIo(): Promise<void> {
+		if (!this.txtTestService) {
+			return;
+		}
+
+		try {
+			const snapshot = await this.txtTestService.pollIo();
+			this.panel.webview.postMessage({ command: 'txtTestIoUpdate', snapshot });
+		} catch {
+			this.panel.webview.postMessage({ command: 'txtTestPollFailed' });
+		}
 	}
 }

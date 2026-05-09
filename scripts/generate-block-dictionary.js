@@ -12,6 +12,22 @@
 const fs = require('fs');
 const path = require('path');
 
+const PROJECT_ROOT = path.join(__dirname, '..');
+const GENERATOR_SCAN_DIRS = [
+	path.join(PROJECT_ROOT, 'media', 'blockly', 'generators', 'arduino'),
+	path.join(PROJECT_ROOT, 'media', 'blockly', 'generators', 'micropython'),
+	path.join(PROJECT_ROOT, 'media', 'blockly', 'generators', 'txt'),
+];
+const INTERNAL_GENERATOR_BLOCKS = new Set([
+	'procedures_defnoreturn',
+	'procedures_defreturn',
+	'procedures_callnoreturn',
+	'procedures_callreturn',
+	'procedures_ifreturn',
+	'arduino_setup',
+	'arduino_loop',
+]);
+
 // 支援的板卡
 const SUPPORTED_BOARDS = ['arduino_uno', 'arduino_nano', 'arduino_mega', 'esp32', 'esp32_supermini'];
 
@@ -29,6 +45,7 @@ const CATEGORIES = [
 	{ id: 'math', name: { 'zh-hant': '數學', en: 'Math' }, colour: '#5B67A5' },
 	{ id: 'text', name: { 'zh-hant': '文字', en: 'Text' }, colour: '#5BA58C' },
 	{ id: 'lists', name: { 'zh-hant': '清單', en: 'Lists' }, colour: '#745BA5' },
+	{ id: 'txt', name: { 'zh-hant': 'TXT 控制器', en: 'TXT Controller' }, colour: '#33A0D0' },
 	{ id: 'cyberbrick', name: { 'zh-hant': 'CyberBrick', en: 'CyberBrick' }, colour: '#00A0A0' },
 	{ id: 'x11', name: { 'zh-hant': 'X11 擴展板', en: 'X11 Extension' }, colour: '#34B4B4' },
 	{ id: 'x12', name: { 'zh-hant': 'X12 擴展板', en: 'X12 Extension' }, colour: '#34B434' },
@@ -40,6 +57,34 @@ const CATEGORIES = [
  * 由於積木定義使用動態 JS，這裡採用手動維護的方式確保準確性
  */
 const BLOCK_DEFINITIONS = [
+	// === TXT Controller 基礎積木 ===
+	{
+		type: 'txt_setup',
+		category: 'txt',
+		names: { 'zh-hant': 'TXT 初始化', en: 'TXT Setup' },
+		descriptions: {
+			'zh-hant': '建立 TXT Controller 的共享初始化區塊，負責一次性連線與硬體預備。',
+			en: 'Top-level shared setup block for the TXT Controller. Initializes the controller once and prepares shared hardware resources.',
+		},
+		fields: [],
+		inputs: [{ name: 'DO', type: 'statement', label: { 'zh-hant': '初始化', en: 'Setup' } }],
+		boards: ['txt'],
+		tags: ['txt', 'setup', 'initialize', 'controller', '初始化'],
+	},
+	{
+		type: 'txt_process',
+		category: 'txt',
+		names: { 'zh-hant': 'TXT 流程', en: 'TXT Process' },
+		descriptions: {
+			'zh-hant': '建立一個 TXT 流程區塊，供主程式以共享 txt 連線啟動獨立流程。',
+			en: 'Top-level TXT process block. Defines one managed process that runs with the shared TXT connection.',
+		},
+		fields: [{ name: 'NAME', type: 'text', label: { 'zh-hant': '名稱', en: 'Name' }, default: '' }],
+		inputs: [{ name: 'DO', type: 'statement', label: { 'zh-hant': '流程', en: 'Process' } }],
+		boards: ['txt'],
+		tags: ['txt', 'process', 'flow', 'thread', '流程'],
+	},
+
 	// === Arduino 基礎積木 ===
 	{
 		type: 'arduino_setup',
@@ -1014,6 +1059,21 @@ const BLOCK_DEFINITIONS = [
 		],
 		boards: SUPPORTED_BOARDS,
 		tags: ['loop', 'repeat', 'times', '迴圈', '重複', '次數'],
+	},
+	{
+		type: 'controls_forever',
+		category: 'loops',
+		names: { 'zh-hant': '一直重複做', en: 'Repeat Forever' },
+		descriptions: {
+			'zh-hant': '持續重複執行裡面的程式，直到程式停止',
+			en: 'Keep repeating the enclosed statements until the program stops',
+		},
+		fields: [],
+		inputs: [
+			{ name: 'DO', type: 'statement', label: { 'zh-hant': '執行', en: 'do' } },
+		],
+		boards: SUPPORTED_BOARDS,
+		tags: ['loop', 'forever', 'infinite', 'while true', '迴圈', '一直重複', '無限循環'],
 	},
 	{
 		type: 'controls_whileUntil',
@@ -2982,17 +3042,129 @@ function generateSearchIndex(blocks) {
 	return searchIndex;
 }
 
+function collectGeneratorBlockTypes() {
+	const blockTypes = new Set();
+	const forBlockPattern = /forBlock\['([^']+)'\]/g;
+
+	for (const dir of GENERATOR_SCAN_DIRS) {
+		if (!fs.existsSync(dir)) {
+			continue;
+		}
+
+		const files = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
+		for (const file of files) {
+			const content = fs.readFileSync(path.join(dir, file), 'utf8');
+			forBlockPattern.lastIndex = 0;
+			let match;
+			while ((match = forBlockPattern.exec(content)) !== null) {
+				blockTypes.add(match[1]);
+			}
+		}
+	}
+
+	return [...blockTypes].sort();
+}
+
+function humanizeBlockType(blockType) {
+	const specialWords = {
+		txt: 'TXT',
+		esp32: 'ESP32',
+		cyberbrick: 'CyberBrick',
+		rc: 'RC',
+		x11: 'X11',
+		x12: 'X12',
+		wifi: 'WiFi',
+		mqtt: 'MQTT',
+		i2c: 'I2C',
+		uart: 'UART',
+		micropython: 'MicroPython',
+	};
+
+	return blockType
+		.split('_')
+		.map(part => specialWords[part] || part.charAt(0).toUpperCase() + part.slice(1))
+		.join(' ');
+}
+
+function guessCategory(blockType) {
+	if (blockType === 'micropython_main' || blockType.startsWith('cyberbrick_')) return 'cyberbrick';
+	if (blockType.startsWith('txt_')) return 'txt';
+	if (blockType.startsWith('x11_')) return 'x11';
+	if (blockType.startsWith('x12_')) return 'x12';
+	if (blockType.startsWith('rc_')) return 'rc';
+	if (blockType === 'controls_if' || blockType.startsWith('logic_')) return 'logic';
+	if (blockType.startsWith('controls_') || blockType === 'singular_flow_statements') return 'loops';
+	if (blockType.startsWith('math_')) return 'math';
+	if (blockType.startsWith('text_')) return 'text';
+	if (blockType.startsWith('lists_')) return 'lists';
+	if (blockType.startsWith('procedures_') || blockType.startsWith('variables_') || blockType.startsWith('arduino_function')) return 'functions';
+	if (blockType.startsWith('servo_') || blockType.startsWith('encoder_')) return 'motors';
+	if (blockType.startsWith('ultrasonic_')) return 'sensors';
+	if (blockType.startsWith('huskylens_') || blockType.startsWith('pixetto_')) return 'vision';
+	if (blockType.startsWith('seven_segment_')) return 'displays';
+	if (blockType.startsWith('esp32_wifi_') || blockType.startsWith('esp32_mqtt_')) return 'communication';
+	return 'arduino';
+}
+
+function guessBoards(blockType) {
+	if (blockType === 'micropython_main' || blockType.startsWith('cyberbrick_') || blockType.startsWith('x11_') || blockType.startsWith('x12_') || blockType.startsWith('rc_')) {
+		return ['cyberbrick'];
+	}
+	if (blockType.startsWith('txt_')) {
+		return ['txt'];
+	}
+	if (blockType.startsWith('esp32_')) {
+		return ['esp32', 'esp32_supermini'];
+	}
+	return SUPPORTED_BOARDS;
+}
+
+function buildFallbackBlockDefinition(blockType) {
+	const humanizedName = humanizeBlockType(blockType);
+	const tags = [...new Set(blockType.split('_').filter(Boolean).concat([blockType]))];
+
+	return {
+		type: blockType,
+		category: guessCategory(blockType),
+		names: { 'zh-hant': humanizedName, en: humanizedName },
+		descriptions: {
+			'zh-hant': `自動補齊的積木字典條目：${humanizedName}`,
+			en: `Auto-generated block dictionary entry for ${humanizedName}.`,
+		},
+		fields: [],
+		inputs: [],
+		boards: guessBoards(blockType),
+		tags,
+		autoGenerated: true,
+	};
+}
+
+function buildCompleteBlockDefinitions() {
+	const existingTypes = new Set(BLOCK_DEFINITIONS.map(block => block.type));
+	const fallbackBlocks = [];
+
+	for (const blockType of collectGeneratorBlockTypes()) {
+		if (existingTypes.has(blockType) || INTERNAL_GENERATOR_BLOCKS.has(blockType)) {
+			continue;
+		}
+		fallbackBlocks.push(buildFallbackBlockDefinition(blockType));
+	}
+
+	return [...BLOCK_DEFINITIONS, ...fallbackBlocks];
+}
+
 /**
  * 生成完整字典
  */
 function generateDictionary() {
 	const packageJson = require('../package.json');
+	const completeBlockDefinitions = buildCompleteBlockDefinitions();
 
 	// 建立索引
 	const byType = {};
 	const byCategory = {};
 
-	BLOCK_DEFINITIONS.forEach((block, index) => {
+	completeBlockDefinitions.forEach((block, index) => {
 		byType[block.type] = index;
 
 		if (!byCategory[block.category]) {
@@ -3004,12 +3176,12 @@ function generateDictionary() {
 	const dictionary = {
 		version: packageJson.version,
 		generatedAt: new Date().toISOString(),
-		blocks: BLOCK_DEFINITIONS,
+		blocks: completeBlockDefinitions,
 		categories: CATEGORIES,
 		indices: {
 			byType,
 			byCategory,
-			searchIndex: generateSearchIndex(BLOCK_DEFINITIONS),
+			searchIndex: generateSearchIndex(completeBlockDefinitions),
 		},
 	};
 

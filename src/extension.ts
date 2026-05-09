@@ -356,6 +356,32 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 		}
 	});
 
+	const stopTxtExecutionCommand = vscodeApi.commands.registerCommand('singular-blockly.stopTxtExecution', async () => {
+		if (!webViewManager || !webViewManager.isPanelCreated()) {
+			return;
+		}
+
+		try {
+			await webViewManager.stopTxtExecutionFromExtension();
+		} catch (error) {
+			log('Error stopping TXT execution:', 'error', error);
+		}
+	});
+
+	// TXT Test Panel 命令
+	const installTxtRuntimeCommand = vscodeApi.commands.registerCommand('singular-blockly.txt.installRuntime', async () => {
+		if (!webViewManager || !webViewManager.isPanelCreated()) {
+			return;
+		}
+
+		try {
+			await webViewManager.installTxtRuntimeFromExtension();
+		} catch (error) {
+			log('Error installing TXT runtime:', 'error', error);
+		}
+	});
+
+
 	// 添加到訂閱清單
 	context.subscriptions.push(openBlocklyEdit);
 	context.subscriptions.push(toggleThemeCommand);
@@ -363,6 +389,8 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 	context.subscriptions.push(previewBackupCommand);
 	context.subscriptions.push(checkMcpStatusCommand);
 	context.subscriptions.push(triggerAISuggestionCommand);
+	context.subscriptions.push(stopTxtExecutionCommand);
+	context.subscriptions.push(installTxtRuntimeCommand);
 }
 
 /**

@@ -36,6 +36,16 @@ window.arduinoGenerator.forBlock['controls_whileUntil'] = function (block) {
 	}
 };
 
+window.arduinoGenerator.forBlock['controls_forever'] = function (block) {
+	// 深層防護：孤立積木不生成程式碼
+	if (!window.arduinoGenerator.isInAllowedContext(block)) {
+		return '';
+	}
+
+	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
+	return `while (true) {\n${branch}}\n`;
+};
+
 window.arduinoGenerator.forBlock['controls_for'] = function (block) {
 	// 深層防護：孤立積木不生成程式碼
 	if (!window.arduinoGenerator.isInAllowedContext(block)) {

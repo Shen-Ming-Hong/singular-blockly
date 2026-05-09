@@ -76,6 +76,16 @@
 				"command": "singular-blockly.triggerAISuggestion",
 				"title": "%command.triggerAISuggestion.title%",
 				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.stopTxtExecution",
+				"title": "Singular Blockly: Stop TXT Execution",
+				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.txt.installRuntime",
+				"title": "Singular Blockly: Install TXT Runtime",
+				"category": "Singular Blockly"
 			}
 		],
 		"keybindings": [
@@ -163,6 +173,26 @@
 					],
 					"description": "%singularBlockly.ai.reasoningEffort.description%",
 					"markdownDescription": "%singularBlockly.ai.reasoningEffort.markdownDescription%"
+				},
+				"singular-blockly.txt.host": {
+					"type": "string",
+					"default": "192.168.7.2",
+					"description": "fischertechnik TXT Controller IP address"
+				},
+				"singular-blockly.txt.username": {
+					"type": "string",
+					"default": "ftc",
+					"description": "SSH username for TXT Controller"
+				},
+				"singular-blockly.txt.remotePath": {
+					"type": "string",
+					"default": "/tmp/singular_blockly/main.py",
+					"description": "Remote path on TXT Controller where the program is uploaded"
+				},
+				"singular-blockly.txt.runtimePort": {
+					"type": "number",
+					"default": 8080,
+					"description": "TXT Controller runtime port"
 				}
 			}
 		}
@@ -220,6 +250,7 @@
 		"@blockly/theme-modern": "^7.0.1",
 		"@modelcontextprotocol/sdk": "^1.27.0",
 		"form-data": "^4.0.4",
+		"node-ssh": "^13.2.1",
 		"zod": "^4.1.13"
 	},
 	"extensionDependencies": [

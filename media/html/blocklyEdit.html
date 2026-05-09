@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{shadowBlockCssUri}">
     <script>window.TOOLBOX_URL = '{toolboxUri}';</script>
     <script>window.CYBERBRICK_TOOLBOX_URL = '{cyberbrickToolboxUri}';</script>
+    <script>window.TXT_TOOLBOX_URL = '{txtToolboxUri}';</script>
     <script>
         // 設定初始主題
         window.initialTheme = '{theme}' || 'light';
@@ -225,10 +226,6 @@
                                 animation-play-state: paused;
                             }
 
-                            .upload-svg.spinning {
-                                animation-play-state: running;
-                            }
-
                             @keyframes rotate {
                                 from {
                                     transform: rotate(0deg);
@@ -251,6 +248,14 @@
                             <path class="upload-path" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                             <polyline class="upload-path" points="17 8 12 3 7 8" />
                             <line class="upload-path" x1="12" y1="3" x2="12" y2="15" />
+                        </g>
+                        <!-- TXT 播放圖示（三角形） -->
+                        <g class="play-icon">
+                            <polygon fill="currentColor" points="6,3 20,12 6,21" />
+                        </g>
+                        <!-- TXT 停止圖示（方形） -->
+                        <g class="stop-icon">
+                            <rect fill="currentColor" x="4" y="4" width="16" height="16" rx="2" />
                         </g>
                     </svg>
                 </button>
@@ -304,6 +309,21 @@
                             <path class="sample-path" d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                             <path class="sample-path" d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                         </g>
+                    </svg>
+                </button>
+            </div>
+            <!-- TXT 連線設定按鈕（僅在選擇 TXT Controller 時顯示） -->
+            <div class="txt-config-switch" id="txtConfigContainer" style="display: none;">
+                <button id="txtConfigButton" title="TXT 連線設定">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor"
+                            d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
+                    </svg>
+                </button>
+                <button id="txtTestPanelButton" title="TXT I/O Test Panel">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                        <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
                     </svg>
                 </button>
             </div>
@@ -402,6 +422,39 @@
             </div>
         </div>
     </div>
+    <!-- TXT 連線設定對話框 -->
+    <div id="txtConnectionModal" class="modal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h2 id="txtConnectionPanelTitle">TXT Controller 連線設定</h2>
+                <span class="modal-close" id="txtModalClose">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div
+                    style="display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; margin-bottom: 12px;">
+                    <label for="txtHostInput" id="txtHostLabel">Host IP</label>
+                    <input type="text" id="txtHostInput" placeholder="192.168.7.2"
+                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                    <label for="txtUsernameInput" id="txtUsernameLabel">Username</label>
+                    <input type="text" id="txtUsernameInput" placeholder="ftc"
+                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                    <label for="txtPasswordInput" id="txtPasswordLabel">Password</label>
+                    <input type="password" id="txtPasswordInput" placeholder="••••••••"
+                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                    <label for="txtRemotePathInput" id="txtRemotePathLabel">Remote Path</label>
+                    <input type="text" id="txtRemotePathInput" placeholder="/tmp/singular_blockly/main.py"
+                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button id="txtSaveConfigBtn" class="primary-btn" style="padding: 4px 12px;">儲存設定</button>
+                    <button id="txtTestConnectionBtn" class="secondary-btn" style="padding: 4px 12px;">測試連線</button>
+                    <span id="txtConnectionStatus" style="font-size: 0.85em;"></span>
+                </div>
+                <p id="txtSshHint" style="margin: 8px 0 0; font-size: 0.8rem; color: #888;"></p>
+            </div>
+        </div>
+    </div>
+
     <!-- CyberBrick 範例瀏覽器對話框 -->
     <div id="sampleModal" class="modal" style="display: none;">
         <div class="modal-content sample-modal-content">
@@ -435,9 +488,11 @@
     <script src="{themesUri}/singularDark.js"></script>
     <script src="{arduinoGeneratorUri}"></script>
     <script src="{micropythonGeneratorUri}"></script>
+    <script src="{txtGeneratorUri}"></script>
     <script src="{boardConfigsUri}"></script>
     <script src="{arduinoBlocksUri}"></script>
     <script src="{cyberbrickBlocksUri}"></script>
+    <script src="{txtBlocksUri}"></script>
     <script src="{x11BlocksUri}"></script>
     <script src="{x12BlocksUri}"></script>
     <script src="{rcBlocksUri}"></script>
@@ -450,11 +505,42 @@
     <script src="{esp32WifiMqttBlocksUri}"></script>
     {arduinoModules}
     {micropythonModules}
+    {txtModules}
     <script src="{jsUri}"></script>
     <script src="{experimentalMarkerUri}"></script>
     <script src="{contextExtractorUri}"></script>
     <script src="{shadowBlockManagerUri}"></script>
     <script src="{shadowKeyboardHandlerUri}"></script>
+
+    <!-- TXT I/O Test Panel Dialog -->
+    <dialog id="txtTestPanelDialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="txtTestPanelTitle">TXT I/O Test Panel</h2>
+                <div class="txt-test-status">
+                    <span class="txt-test-status-dot" id="txtTestStatusDot"></span>
+                    <span id="txtTestStatusText"></span>
+
+                </div>
+                <span class="modal-close" id="txtTestCloseBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <button class="txt-test-stop-all" id="txtTestStopAllBtn"></button>
+                <section class="txt-test-section">
+                    <h3 class="txt-test-section-title" id="txtTestMotorsTitle">Motors</h3>
+                    <div class="txt-test-motors" id="txtTestMotors"></div>
+                </section>
+                <section class="txt-test-section">
+                    <h3 class="txt-test-section-title" id="txtTestOutputsTitle">Outputs</h3>
+                    <div class="txt-test-outputs" id="txtTestOutputs"></div>
+                </section>
+                <section class="txt-test-section">
+                    <h3 class="txt-test-section-title" id="txtTestInputsTitle">Inputs</h3>
+                    <div class="txt-test-inputs" id="txtTestInputs"></div>
+                </section>
+            </div>
+        </div>
+    </dialog>
 </body>
 
 </html>

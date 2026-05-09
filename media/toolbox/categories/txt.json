@@ -1,0 +1,59 @@
+{
+    "kind": "category",
+    "name": "%{CATEGORY_TXT}",
+    "categorystyle": "procedure_category",
+    "contents": [
+        {
+            "kind": "block",
+            "type": "txt_setup"
+        },
+        {
+            "kind": "block",
+            "type": "txt_process"
+        },
+        {
+            "kind": "block",
+            "type": "txt_motor_speed",
+            "inputs": {
+                "SPEED": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 512
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "txt_motor_stop"
+        },
+        {
+            "kind": "block",
+            "type": "txt_output"
+        },
+        {
+            "kind": "block",
+            "type": "txt_input_sensor"
+        },
+        {
+            "kind": "block",
+            "type": "txt_wait",
+            "inputs": {
+                "MS": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": {
+                            "NUM": 1000
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "kind": "block",
+            "type": "txt_stop_all"
+        }
+    ]
+}

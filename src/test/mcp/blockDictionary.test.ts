@@ -228,7 +228,7 @@ suite('Block Dictionary Tests', () => {
 		});
 
 		test('should have all essential loop blocks', () => {
-			const essentialLoopBlocks = ['controls_repeat_ext', 'controls_whileUntil', 'controls_for'];
+			const essentialLoopBlocks = ['controls_repeat_ext', 'controls_forever', 'controls_whileUntil', 'controls_for'];
 
 			for (const blockType of essentialLoopBlocks) {
 				const block = dictionary.blocks.find((b: BlockDefinition) => b.type === blockType);
@@ -254,7 +254,7 @@ suite('Block Dictionary Tests', () => {
 
 	suite('Board Support Validation', () => {
 		test('blocks with boards array should have valid board types', () => {
-			const validBoards = ['arduino_uno', 'arduino_nano', 'arduino_mega', 'esp32', 'esp32_supermini', 'cyberbrick'];
+			const validBoards = ['arduino_uno', 'arduino_nano', 'arduino_mega', 'esp32', 'esp32_supermini', 'cyberbrick', 'txt'];
 
 			for (const block of dictionary.blocks) {
 				if (!block.boards || !Array.isArray(block.boards)) {

@@ -20,6 +20,10 @@
 		},
 		{
 			"kind": "block",
+			"type": "controls_forever"
+		},
+		{
+			"kind": "block",
 			"type": "controls_whileUntil"
 		},
 		{

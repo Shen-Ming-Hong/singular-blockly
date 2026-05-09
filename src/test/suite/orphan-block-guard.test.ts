@@ -201,6 +201,7 @@ suite('Orphan Block Guard Tests', () => {
 		test('guard returns empty string for all control block types', () => {
 			const blockTypes = [
 				'controls_whileUntil',
+				'controls_forever',
 				'controls_for',
 				'controls_forEach',
 				'controls_repeat_ext',
@@ -276,7 +277,7 @@ suite('Orphan Block Guard Tests', () => {
 			];
 
 			// Verify orphan types are NOT in allowed list
-			const orphanTypes = ['controls_whileUntil', 'controls_for', 'controls_if'];
+			const orphanTypes = ['controls_whileUntil', 'controls_forever', 'controls_for', 'controls_if'];
 			for (const orphanType of orphanTypes) {
 				assert.strictEqual(
 					allowedTopLevel.includes(orphanType),
@@ -361,6 +362,7 @@ suite('Orphan Block Guard Tests', () => {
 		test('skip comment format is consistent for all guarded block types', () => {
 			const guardedTypes = [
 				'controls_whileUntil',
+				'controls_forever',
 				'controls_for',
 				'controls_forEach',
 				'controls_repeat_ext',

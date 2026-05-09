@@ -27,7 +27,7 @@ export type SupportedLocale =
 	| 'bg'
 	| 'cs';
 
-export type BoardType = 'arduino_uno' | 'arduino_nano' | 'arduino_mega' | 'esp32' | 'esp32_supermini';
+export type BoardType = 'arduino_uno' | 'arduino_nano' | 'arduino_mega' | 'esp32' | 'esp32_supermini' | 'cyberbrick' | 'txt';
 
 export type FieldType = 'text' | 'number' | 'dropdown' | 'checkbox' | 'angle' | 'colour';
 

@@ -197,6 +197,52 @@ describe('Extension activate', () => {
 		assert(showOutputStub.calledOnce, 'showOutputChannel should be called');
 	});
 
+	it('should route stopTxtExecution command through WebViewManager', async () => {
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+		sinon.stub(WebViewManager.prototype, 'isPanelCreated').returns(true);
+		const stopTxtExecutionStub = sinon.stub(WebViewManager.prototype, 'stopTxtExecutionFromExtension').resolves(true);
+
+		await activate(context as any);
+
+		const openBlocklyEditCall = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((c: any) => c.args[0] === 'singular-blockly.openBlocklyEdit');
+		const stopTxtExecutionCall = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((c: any) => c.args[0] === 'singular-blockly.stopTxtExecution');
+
+		assert(openBlocklyEditCall, 'openBlocklyEdit command should be registered');
+		assert(stopTxtExecutionCall, 'stopTxtExecution command should be registered');
+
+		await openBlocklyEditCall.args[1]();
+		await stopTxtExecutionCall.args[1]();
+
+		assert(stopTxtExecutionStub.calledOnce, 'stopTxtExecution should be delegated to WebViewManager');
+	});
+
+	it('should route txt.installRuntime command through WebViewManager', async () => {
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+		sinon.stub(WebViewManager.prototype, 'isPanelCreated').returns(true);
+		const installTxtRuntimeStub = sinon.stub(WebViewManager.prototype, 'installTxtRuntimeFromExtension').resolves(true);
+
+		await activate(context as any);
+
+		const openBlocklyEditCall = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((c: any) => c.args[0] === 'singular-blockly.openBlocklyEdit');
+		const installTxtRuntimeCall = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((c: any) => c.args[0] === 'singular-blockly.txt.installRuntime');
+
+		assert(openBlocklyEditCall, 'openBlocklyEdit command should be registered');
+		assert(installTxtRuntimeCall, 'txt.installRuntime command should be registered');
+
+		await openBlocklyEditCall.args[1]();
+		await installTxtRuntimeCall.args[1]();
+
+		assert(installTxtRuntimeStub.calledOnce, 'txt.installRuntime should be delegated to WebViewManager');
+	});
+
 	it('should handle previewBackup command with no workspace', async () => {
 		vscodeMock.workspace.workspaceFolders = undefined;
 
