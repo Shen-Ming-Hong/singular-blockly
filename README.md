@@ -8,7 +8,7 @@
 [![Rating](https://vsmarketplacebadges.dev/rating-star/Singular-Ray.singular-blockly.svg?color=E05D44&style=flat)](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support (Uno, Nano, Mega, ESP32, CyberBrick), WiFi/MQTT IoT blocks, AI camera integration (Pixetto, HuskyLens), MCP server for GitHub Copilot, PlatformIO integration, and 15 languages with 99% coverage.
+Singular Blockly is a VS Code extension for Blockly-based visual programming across Arduino, CyberBrick MicroPython, and fischertechnik TXT Controller projects. It generates `src/main.cpp`, `src/rc_main.py`, or `src/main.py` for the selected board, supports PlatformIO, `mpremote`, and SSH-based TXT workflows, and includes MCP tooling for GitHub Copilot plus a 15-language UI.
 
 ---
 
@@ -19,12 +19,12 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [Quick Start](#quick-start)
-- [Examples & Projects](#-examples--projects)
 - [Usage](#usage)
+- [TXT Controller Support](#txt-controller-support)
+- [Examples & Projects](#-examples--projects)
 - [Block Categories](#block-categories)
 - [Supported Boards and Platforms](#supported-boards-and-platforms)
 - [Extension Settings](#extension-settings)
-- [Known Issues](#known-issues)
 - [License](#license)
 - [Contributing](#contributing)
 
@@ -44,7 +44,8 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 - Arduino Uno, Nano, Mega
 - ESP32 Dev Module
 - Super Mini (Lolin C3 Mini)
-- **🆕 CyberBrick** (ESP32-C3, MicroPython)
+- **🆕 CyberBrick** (ESP32-C3, MicroPython via `mpremote`)
+- **🆕 fischertechnik TXT Controller** (Python via SSH + `ftrobopy`)
 
 ### 🌐 Internationalization
 
@@ -100,9 +101,11 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 
 - Automatic state saving and project persistence
 - Board configuration management
-- Arduino code generation (.cpp files)
-- **🆕 MicroPython code generation** (CyberBrick)
-- Automatic PlatformIO configuration
+- Arduino code generation (`src/main.cpp`)
+- **🆕 CyberBrick MicroPython code generation** (`src/rc_main.py`)
+- **🆕 TXT Controller Python code generation** (`src/main.py`)
+- Automatic `platformio.ini` configuration for Arduino boards
+- Automatic `platformio.ini` cleanup for CyberBrick and TXT workflows
 - **Project Safety Guard** 🛡️
     - Smart project type detection (Node.js, Python, Java, etc.)
     - Warning dialog to prevent accidental modifications
@@ -118,6 +121,10 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
 - Real-time code generation with manual refresh
 - Visual drag-and-drop block interface
 - Integrated board configuration
+- **TXT Controller Tools**
+    - In-editor connection settings dialog
+    - SSH upload / run / stop workflow
+    - Integrated I/O Test Panel for motors, outputs, and inputs
 - **Block Search** 🔍
     - Search by name or parameter (Ctrl+F)
     - Highlight and navigate results
@@ -127,7 +134,7 @@ VS Code extension for visual Arduino & MicroPython programming with Blockly. Mul
     - Notification system
 - Theme support (light/dark with toggle)
 - Touch device support (pinch-to-zoom)
-- PlatformIO integration for hardware upload
+- PlatformIO integration for Arduino hardware upload
 - **Pin Mode Tracking**
     - Auto-track modes (INPUT, OUTPUT, INPUT_PULLUP)
     - Conflict detection and warnings
@@ -202,13 +209,18 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 
 - Visual Studio Code 1.105.0 or higher
 - Node.js 22.16.0 or higher
-- Basic understanding of Arduino programming concepts
-- Required Extensions:
+- Basic understanding of visual programming and your target board workflow
+- **For Arduino / ESP32 boards:**
     - PlatformIO IDE Extension
-    - C/C++ Extension (ms-vscode.cpptools)
+    - C/C++ Extension (`ms-vscode.cpptools`)
 - **For CyberBrick (MicroPython):**
     - Python 3.x installed
     - `mpremote` tool (`pip install mpremote`)
+- **For fischertechnik TXT Controller:**
+    - Network access to the TXT Controller over SSH
+    - Python 3 and `ftrobopy` available on the controller
+    - Default connection values: host `192.168.7.2`, username `ftc`
+    - Runtime port `8080` available for the integrated I/O Test Panel
 
 ---
 
@@ -219,10 +231,11 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 1. **Install** the extension from VS Code Marketplace
 2. **Open a folder** (File → Open Folder)
 3. **Click the wand icon** 🪄 in the status bar
-4. **Select your Arduino board** from the dropdown
-5. **Drag blocks** from the toolbox and start coding!
+4. **Select your target board** from the dropdown (`uno`, `esp32`, `cyberbrick`, or `txt`)
+5. If you selected **TXT Controller**, open the TXT connection dialog in the editor toolbar and click **Test Connection**
+6. **Drag blocks** from the toolbox, generate code, and upload with the workflow for your board
 
-> 💡 **First time?** The extension will auto-generate `platformio.ini` and `src/main.cpp` for you.
+> 💡 The extension keeps `blockly/main.json` as the source of truth and generates `src/main.cpp` for Arduino boards, `src/rc_main.py` for CyberBrick, and `src/main.py` for TXT Controller projects.
 
 ---
 
@@ -239,7 +252,8 @@ code --install-extension singular-blockly-X.Y.Z.vsix
     - Click the Singular Blockly icon in the activity bar
 
 3. Select your target board from the dropdown menu:
-    - The extension will automatically create and configure `platformio.ini`
+    - Arduino boards automatically create and configure `platformio.ini`
+    - CyberBrick and TXT Controller use Python workflows and do not keep `platformio.ini`
     - First-time board selection requires a workspace reload
 
 4. Create your program using the visual blocks:
@@ -249,10 +263,52 @@ code --install-extension singular-blockly-X.Y.Z.vsix
     - Changes are auto-saved and persist between sessions
 
 5. The extension will automatically:
-    - Generate Arduino code in `src/main.cpp`
+    - Generate Arduino code in `src/main.cpp` for Arduino boards
+    - Generate MicroPython code in `src/rc_main.py` for CyberBrick
+    - Generate TXT Python code in `src/main.py` for TXT Controller
     - Save workspace state in `blockly/main.json`
-    - Update PlatformIO configuration
-    - Provide real-time code(.cpp) generation
+    - Update `platformio.ini` only for Arduino boards
+    - Provide real-time generated code for the active board workflow
+
+---
+
+## TXT Controller Support
+
+Singular Blockly includes a dedicated SSH-based workflow for the fischertechnik TXT Controller, so TXT projects can be created in the same Blockly editor as Arduino and CyberBrick projects without forcing them through a PlatformIO-shaped doorway.
+
+### Current TXT workflow
+
+- Board selector entry: `txt`
+- Blockly authoring model: one `TXT Setup` block plus one or more `TXT Process` blocks
+- Generated file: `src/main.py`
+- Runtime model: shared `ftrobopy.ftrobopy('auto')` connection with multiple TXT processes
+- Upload path: default `/tmp/singular_blockly/main.py`
+- Execution method: SSH upload + `python3` on the controller
+- Stop command available from the extension
+- TXT projects do **not** use `platformio.ini`
+
+### Connection & testing
+
+- In-editor TXT connection settings dialog
+- Workspace-scoped settings for host, username, remote path, and runtime port
+- Password stored securely via VS Code SecretStorage
+- `Test Connection` uses the current form values before you save them
+- Default connection values:
+    - Host: `192.168.7.2`
+    - Username: `ftc`
+    - Remote path: `/tmp/singular_blockly/main.py`
+    - Runtime port: `8080`
+
+### I/O Test Panel
+
+- Automatically uploads and starts `txt-runtime/io_server.py` when needed
+- Motor control for `M1`–`M4`
+- Output control for `O1`–`O8`
+- Input polling for `I1`–`I8`
+- Sensor configuration for button, light gate, and ultrasonic inputs
+- `STOP ALL` action to stop motors and outputs from the panel
+
+> 💡 If the TXT screen shows an SSH confirmation prompt on first connection, confirm it on the device. After a successful setup, the extension tries to make later SSH connections smoother.
 
 ---
 
@@ -417,6 +473,17 @@ Explore real-world projects built with Singular Blockly:
 
 > ⚠️ **Compatibility Note**: This tool uses the officially supported `mpremote` method to upload code—**it does not modify or damage the official firmware**. You can switch back to the official CyberBrick editor anytime by simply uploading from it, which will overwrite the program directly (tested and verified).
 
+### 🧱 TXT Controller Blocks
+
+**SSH-based Blockly workflow for the fischertechnik TXT Controller:**
+
+- Top-level `TXT Setup` block for shared initialization
+- Multiple `TXT Process` blocks for flow-style concurrent programs
+- Motor speed / motor stop blocks for `M1`–`M4`
+- Output control blocks for `O1`–`O8`
+- Input sensor blocks for button, light gate, and ultrasonic sensors on `I1`–`I8`
+- Wait and stop-all blocks for pacing and safe shutdown
+
 ### 🧮 Programming Constructs
 
 **Functions**
@@ -451,22 +518,51 @@ Explore real-world projects built with Singular Blockly:
 
 ## Supported Boards and Platforms
 
-Each board is configured with optimized PlatformIO settings:
+Each board is wired to the appropriate code generation and upload workflow:
 
-| Board                          | Platform    | Board ID       | Architecture |
-| ------------------------------ | ----------- | -------------- | ------------ |
-| **Arduino Uno**                | atmelavr    | uno            | AVR          |
-| **Arduino Nano**               | atmelavr    | nanoatmega328  | AVR          |
-| **Arduino Mega**               | atmelavr    | megaatmega2560 | AVR          |
-| **ESP32 Dev Module**           | espressif32 | esp32dev       | ESP32        |
-| **Super Mini (Lolin C3 Mini)** | espressif32 | lolin_c3_mini  | ESP32-C3     |
-| **🆕 CyberBrick**              | MicroPython | esp32c3        | ESP32-C3     |
+| Board                          | Code generation  | Selector ID   | Upload / runtime workflow                    |
+| ------------------------------ | ---------------- | ------------- | -------------------------------------------- |
+| **Arduino Uno**                | Arduino C++      | `uno`         | PlatformIO                                   |
+| **Arduino Nano**               | Arduino C++      | `nano`        | PlatformIO                                   |
+| **Arduino Mega**               | Arduino C++      | `mega`        | PlatformIO                                   |
+| **ESP32 Dev Module**           | Arduino C++      | `esp32`       | PlatformIO                                   |
+| **Super Mini (Lolin C3 Mini)** | Arduino C++      | `supermini`   | PlatformIO                                   |
+| **🆕 CyberBrick**              | MicroPython      | `cyberbrick`  | `mpremote` → `/app/rc_main.py`               |
+| **🆕 TXT Controller**          | Python (`ftrobopy`) | `txt`      | SSH + `python3` → `/tmp/singular_blockly/main.py` |
 
-> 💡 The extension auto-generates `platformio.ini` with correct settings for hardware upload (Arduino boards), or uses `mpremote` for MicroPython upload (CyberBrick).
+> 💡 Arduino boards keep `platformio.ini`; CyberBrick and TXT use Python workflows and remove `platformio.ini` when it is not needed.
 
 ---
 
 ## Extension Settings
+
+### TXT Controller connection settings
+
+- **`singular-blockly.txt.host`**
+    - **Type**: `string`
+    - **Default**: `192.168.7.2`
+    - **Scope**: Workspace-level
+    - **Description**: TXT Controller host/IP used for SSH upload and the I/O Test Panel
+
+- **`singular-blockly.txt.username`**
+    - **Type**: `string`
+    - **Default**: `ftc`
+    - **Scope**: Workspace-level
+    - **Description**: SSH username for the TXT Controller
+
+- **`singular-blockly.txt.remotePath`**
+    - **Type**: `string`
+    - **Default**: `/tmp/singular_blockly/main.py`
+    - **Scope**: Workspace-level
+    - **Description**: Remote path where the generated TXT Python program is uploaded
+
+- **`singular-blockly.txt.runtimePort`**
+    - **Type**: `number`
+    - **Default**: `8080`
+    - **Scope**: Workspace-level
+    - **Description**: Runtime port used by the integrated TXT I/O Test Panel
+
+> 💡 TXT passwords are configured from the editor connection dialog and stored in VS Code SecretStorage, not in plain-text settings files.
 
 - **`singularBlockly.safetyGuard.suppressWarning`**
     - **Type**: `boolean`
@@ -489,8 +585,6 @@ The extension detects non-Blockly projects (Node.js, Python, Java, etc.) and sho
 	"singularBlockly.safetyGuard.suppressWarning": false
 }
 ```
-
----
 
 ---
 
