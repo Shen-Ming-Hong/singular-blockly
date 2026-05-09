@@ -177,6 +177,9 @@ suite('TXT Multi-flow Code Generation Tests', () => {
 			assert.ok(txtWaitMatch, 'TXT generator 應定義 txt_wait generator');
 
 			const txtWaitSource = txtWaitMatch[0];
+			const txtWaitExecutableSource = txtWaitSource
+				.replace(/\/\*[\s\S]*?\*\//g, '')
+				.replace(/^\s*\/\/.*$/gm, '');
 
 			assert.match(
 				txtWaitSource,
@@ -189,7 +192,7 @@ suite('TXT Multi-flow Code Generation Tests', () => {
 				'txt_wait 應使用 wall-clock delay 只暫停目前流程'
 			);
 			assert.doesNotMatch(
-				txtWaitSource,
+				txtWaitExecutableSource,
 				/txt\.updateWait\(/,
 				'txt_wait 不應再直接呼叫 txt.updateWait()，避免多流程延遲互相干擾'
 			);
