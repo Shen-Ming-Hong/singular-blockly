@@ -59,16 +59,19 @@
 
 ## 研究議題四：`txt_wait` 在多流程模型中的語意
 
-**結論**：`txt_wait` 必須只暫停 **當前流程**，不能阻塞整個程式。
+**結論**：`txt_wait` 必須只暫停 **當前流程**，不能阻塞整個程式；在 shared-`txt` 的多流程模型下，其實作應優先使用 wall-clock delay（例如 `time.sleep(...)`），而不是 `txt.updateWait(...)`。
 
 **依據**：
 
 - 這是多流程作者模型能否成立的核心差異；若 `txt_wait` 仍凍結整個程式，學生會感受到「其實只有一條主流程」
-- 既有 TXT generator 已經把 `txt_wait` 生為 `time.sleep(...)`；若每個流程被包裝成受管理的獨立 flow runner，便能保留這個使用者熟悉的等待語意，而不必把所有等待改寫成新的 block
+- ftrobopy 官方原始碼將 `updateWait()` 定位為通用的 exchange-cycle 同步 API，適合拿來取代緊密 busy loop；但它透過 shared `_update_status` 與 exchange thread 同步，不是為了在多執行緒共用同一個 `txt` 時做精準可見延遲
+- `time.sleep(...)` 只阻塞目前 Python thread，不會讓其他流程一起停住，也不會與 shared `txt` 的 `_update_status` 競爭
+- `updateWait()` 以 shared exchange-thread 狀態等待下一個成功的資料交換週期；這正適合作為 loop auto-pacing，但不適合作為多流程下的使用者可見延遲語意
 
 **補充**：
 
-- `controls_duration` 與 `txt_wait` 的 pacing 語意應與目前 path-sensitive `txt.updateWait(0.01)` 自動節流機制並存
+- `controls_duration` 與 `txt_wait` 的使用者語意應與目前 path-sensitive `txt.updateWait(0.01)` 自動節流機制並存，但 `txt_wait` 本身應改用 wall-clock delay，避免把「精準延遲」與「exchange-cycle pacing」混成同一件事
+- 主執行緒在等待多個流程 thread 結束時，不應再呼叫 `txt.updateWait(0.01)`；它只需要一般 thread wait 維持程式存活，否則會與各流程共享的 `_update_status` 互相干擾
 - 對緊密輪詢硬體的 loop，仍需保留自動 pacing 判斷，不因導入多流程而退化為 busy loop
 
 ---
@@ -126,7 +129,7 @@
 
 ## 研究議題八：既有 `updateWait()` 與 pacing 規則是否需要推翻？
 
-**結論**：不需要。原先 path-sensitive `txt.updateWait(0.01)` 決策仍成立。
+**結論**：不需要推翻 loop pacing 規則，但需要把用途拆開：緊密 TXT 硬體輪詢 loop 仍保留 path-sensitive `txt.updateWait(0.01)`；`txt_wait` 改用 wall-clock delay；多流程主執行緒 keep-alive 則改用一般 thread wait，避免干擾共享 `_update_status`。
 
 **依據**：
 

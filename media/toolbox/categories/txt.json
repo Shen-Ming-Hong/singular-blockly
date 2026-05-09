@@ -5,7 +5,11 @@
     "contents": [
         {
             "kind": "block",
-            "type": "txt_main"
+            "type": "txt_setup"
+        },
+        {
+            "kind": "block",
+            "type": "txt_process"
         },
         {
             "kind": "block",

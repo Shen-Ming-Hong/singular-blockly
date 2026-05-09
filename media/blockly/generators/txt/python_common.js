@@ -46,7 +46,7 @@
 		}
 	};
 
-	/** 檢查積木是否在合法的容器積木（txt_main / 函數定義）內 */
+	/** 檢查積木是否在合法的容器積木（txt_setup / txt_process / 函數定義）內 */
 	g.isInAllowedContext = function (block) {
 		let current = block;
 		while (current) {
@@ -306,7 +306,6 @@
 		'txt_output',
 		'txt_stop_all',
 		'txt_input_sensor',
-		'txt_input_read',
 	]);
 	const nestedLoopBlockTypes = new Set([
 		'controls_whileUntil',

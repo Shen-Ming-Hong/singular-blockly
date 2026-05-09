@@ -122,7 +122,7 @@ src/
 | 流程名稱 | 可選，不強制編號或唯一 | 高 |
 | codebase 收斂策略 | 直接重做 `txt_main` 路徑，將舊假設從 blocks / generator / workspace 驗證 / fixture 一次清掉 | 高 |
 | runtime 選型 | 第一版以單一 `main.py` + shared `txt` + managed flow runners 為主 | 中高 |
-| pacing | 保留現有 `txt.updateWait(0.01)` path-sensitive 自動節流規則 | 高 |
+| pacing | 保留現有 `txt.updateWait(0.01)` path-sensitive 自動節流規則；`txt_wait` 改用 wall-clock delay，主執行緒 keep-alive 改用一般 thread wait，三者需分開處理 | 高 |
 | 公開模型策略 | 正式產品面只保留 `txt_setup` + `txt_process`，不維護未發布 legacy surface | 高 |
 
 ---
@@ -175,8 +175,8 @@ src/
 | B-1 | `media/blockly/generators/txt/index.js` | 調整 `allowedTopLevelBlocks_` 與 workspace root 聚合邏輯 |
 | B-2 | `media/blockly/generators/txt/txt.js` | 實作 `txt_setup` / `txt_process` 的生成器，並移除對公開 `txt_main` 的依賴 |
 | B-3 | `media/blockly/generators/txt/python_common.js` | 確保流程包裝後 loops / variables / functions 仍能正確生成 |
-| B-4 | `media/blockly/generators/txt/txt.js` | 生成 shared `txt`、shared motor pre-creation、流程 runner 啟動程式碼 |
-| B-5 | `media/blockly/generators/txt/txt.js` | 流程名稱僅用於人類可讀 diagnostics，不作為強制語意鍵 |
+| B-4 | `media/blockly/generators/txt/txt.js` | 生成 shared `txt`、shared motor pre-creation、流程 runner 啟動程式碼，並讓 `txt_wait` 使用只影響當前流程的 wall-clock delay |
+| B-5 | `media/blockly/generators/txt/index.js` | 主執行緒等待活躍流程結束時，以一般 thread wait（如 `join(timeout)`）維持程式存活，避免干擾 shared `txt` |
 
 **驗收標準**：單一 `main.py` 能同時執行多個流程；`txt_wait` 在某流程中等待時，其餘流程不被整體阻塞。
 

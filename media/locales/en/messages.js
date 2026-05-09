@@ -1029,6 +1029,10 @@ window.languageManager.loadMessages('en', {
 	TXT_TEST_STATUS_DISCONNECTED: 'Disconnected',
 	TXT_TEST_STATUS_PAUSED: 'Paused',
 	TXT_TEST_STATUS_CONNECTING: 'Connecting…',
+	TXT_SETUP: 'TXT Setup',
+	TXT_SETUP_TOOLTIP: 'Initialize the TXT Controller once and prepare shared hardware resources for all TXT processes.',
+	TXT_PROCESS_PREFIX: 'TXT Process:',
+	TXT_PROCESS_TOOLTIP: 'Define one TXT process. The name is optional and only used for display or diagnostics.',
 	// Block labels
 	TXT_INIT: 'Initialize TXT Controller',
 	TXT_INIT_TOOLTIP: 'Connect to the fischertechnik TXT Controller',
@@ -1061,6 +1065,10 @@ window.languageManager.loadMessages('en', {
 		TXT_MAIN: 'TXT Main Program',
 	TXT_MAIN_TOOLTIP: 'The main entry point for TXT Controller. All blocks must be placed here.',
 	TXT_ORPHAN_WARNING: 'This block must be placed inside the "TXT Main" block',
+	TXT_ORPHAN_WARNING_MULTI: 'This block must be placed inside a "TXT Setup" or "TXT Process" block',
+	TXT_SETUP_DUPLICATE_WARNING: 'Detected multiple "TXT Setup" blocks. Please delete the extra blocks.',
+	TXT_SETUP_REQUIRED_WARNING: 'TXT workspace requires one "TXT Setup" block.',
+	TXT_PROCESS_REQUIRED_WARNING: 'TXT workspace requires at least one "TXT Process" block.',
 	// Category
 	CATEGORY_TXT: 'TXT Controller',
 });

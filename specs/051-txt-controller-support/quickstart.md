@@ -79,6 +79,8 @@ npm run validate:i18n
 - 單一 `ftrobopy.ftrobopy('auto')`
 - 一段初始化程式
 - 多個流程 runner 定義與啟動邏輯
+- 流程內的 `txt_wait(1000)` / `txt_wait(200)` 會分別生成 `time.sleep(...)` 形式的 wall-clock delay（例如 `time.sleep(1.0)` / `time.sleep(0.2)`）
+- 主執行緒以 `while any(...): join(timeout)` 等待所有流程 thread 結束，但不呼叫 `txt.updateWait(...)`
 
 ---
 
@@ -155,5 +157,5 @@ npm run validate:i18n
 2. **不要新增「4 個流程」硬限制**：這與使用者最新決策相衝突
 3. **名稱欄位是可選的**：任何驗證都不能把流程名稱當必填
 4. **保留單一 shared `txt`**：這是 FT API 與既有設計評估後的核心限制
-5. **`txt_wait` 的使用者語意要保住**：它仍應被理解為「當前流程等待」
+5. **`txt_wait` 的使用者語意要保住**：它仍應被理解為「當前流程等待」，但 generator 應落到 `time.sleep(...)` 等 wall-clock delay；`txt.updateWait(...)` 只留給 loop auto-pacing
 6. **更新 block dictionary**：新的 `txt_setup` / `txt_process` 不可漏掉 MCP 字典同步

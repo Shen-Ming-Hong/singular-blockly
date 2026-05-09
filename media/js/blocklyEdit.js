@@ -1935,6 +1935,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		trashcan: true, // 添加垃圾桶
 		maxInstances: {
 			micropython_main: 1,
+			txt_setup: 1,
 			arduino_setup_loop: 1,
 		},
 		move: {
@@ -2183,6 +2184,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (!boardId) {
 			return 'arduino_setup_loop';
 		}
+		if (boardId === 'txt') {
+			return 'txt_setup';
+		}
 		if (boardId === 'cyberbrick') {
 			return 'micropython_main';
 		}
@@ -2193,9 +2197,79 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return 'arduino_setup_loop';
 	};
 
+	const isTxtBoardId = boardId => {
+		if (!boardId) {
+			return false;
+		}
+		if (boardId === 'txt') {
+			return true;
+		}
+		const boardConfig = window.BOARD_CONFIGS ? window.BOARD_CONFIGS[boardId] : null;
+		return boardConfig?.language === 'txt';
+	};
+
 	const mainBlockCountState = {
 		blockType: null,
 		count: 0,
+	};
+
+	const txtWorkspaceValidationState = {
+		signature: null,
+	};
+
+	const updateTxtWorkspaceValidation = workspace => {
+		if (!workspace) {
+			return;
+		}
+
+		const boardId = window.currentBoard || (boardSelect ? boardSelect.value : 'arduino_uno');
+		if (!isTxtBoardId(boardId)) {
+			txtWorkspaceValidationState.signature = null;
+			return;
+		}
+
+		const topBlocks = workspace.getTopBlocks(false).filter(block => block && !block.isInsertionMarker_);
+		const setupBlocks = workspace.getBlocksByType('txt_setup', false);
+		const processBlocks = workspace.getBlocksByType('txt_process', false);
+		const hasTopLevelContent = topBlocks.length > 0;
+
+		let warningMessage = '';
+		if (setupBlocks.length > 1) {
+			warningMessage =
+				window.languageManager?.getMessage(
+					'TXT_SETUP_DUPLICATE_WARNING',
+					'Detected multiple "TXT Setup" blocks. Please delete the extra blocks.'
+				) || 'Detected multiple "TXT Setup" blocks. Please delete the extra blocks.';
+		} else if (hasTopLevelContent && setupBlocks.length === 0) {
+			warningMessage =
+				window.languageManager?.getMessage(
+					'TXT_SETUP_REQUIRED_WARNING',
+					'TXT workspace requires one "TXT Setup" block.'
+				) || 'TXT workspace requires one "TXT Setup" block.';
+		} else if (hasTopLevelContent && processBlocks.length === 0) {
+			warningMessage =
+				window.languageManager?.getMessage(
+					'TXT_PROCESS_REQUIRED_WARNING',
+					'TXT workspace requires at least one "TXT Process" block.'
+				) || 'TXT workspace requires at least one "TXT Process" block.';
+		}
+
+		const signature = `${setupBlocks.length}:${processBlocks.length}:${hasTopLevelContent ? 1 : 0}:${warningMessage}`;
+		if (!warningMessage) {
+			txtWorkspaceValidationState.signature = signature;
+			return;
+		}
+
+		if (txtWorkspaceValidationState.signature === signature) {
+			return;
+		}
+
+		txtWorkspaceValidationState.signature = signature;
+		vscode.postMessage({
+			command: 'showToast',
+			type: 'warning',
+			message: warningMessage,
+		});
 	};
 
 	const updateMainBlockDeletable = workspace => {
@@ -2206,10 +2280,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const boardId = window.currentBoard || (boardSelect ? boardSelect.value : 'arduino_uno');
 		const blockType = getMainBlockType(boardId);
 		const blocks = workspace.getBlocksByType(blockType, false);
+		const isTxtBoard = isTxtBoardId(boardId);
 
 		if (!blocks || blocks.length === 0) {
 			mainBlockCountState.blockType = blockType;
 			mainBlockCountState.count = 0;
+			if (isTxtBoard) {
+				updateTxtWorkspaceValidation(workspace);
+			}
 			return;
 		}
 
@@ -2225,8 +2303,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		if (shouldWarn) {
 			const warningMessage =
-				window.languageManager?.getMessage('MAIN_BLOCK_DUPLICATE_WARNING', '偵測到多個主程式積木，請刪除多餘的積木') ||
-				'偵測到多個主程式積木，請刪除多餘的積木';
+				(isTxtBoard
+					? window.languageManager?.getMessage(
+						'TXT_SETUP_DUPLICATE_WARNING',
+						'Detected multiple "TXT Setup" blocks. Please delete the extra blocks.'
+					)
+					: window.languageManager?.getMessage('MAIN_BLOCK_DUPLICATE_WARNING', '偵測到多個主程式積木，請刪除多餘的積木')) ||
+				(isTxtBoard
+					? 'Detected multiple "TXT Setup" blocks. Please delete the extra blocks.'
+					: '偵測到多個主程式積木，請刪除多餘的積木');
 
 			vscode.postMessage({
 				command: 'showToast',
@@ -2237,6 +2322,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		mainBlockCountState.blockType = blockType;
 		mainBlockCountState.count = blocks.length;
+		if (isTxtBoard) {
+			updateTxtWorkspaceValidation(workspace);
+		}
 	};
 
 	// 拖動狀態追蹤：避免在拖動過程中執行昂貴的操作
@@ -2881,6 +2969,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			window.setCurrentBoard(selectedBoard);
 			// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
 			await updateToolboxForBoard(workspace, selectedBoard);
+			updateMainBlockDeletable(workspace);
 			// 觸發工作區更新以重新整理積木
 			workspace.getAllBlocks().forEach(block => {
 				if (block.type.startsWith('arduino_')) {
@@ -2956,6 +3045,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				window.setCurrentBoard(message.board);
 				// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
 				await updateToolboxForBoard(workspace, message.board);
+				updateMainBlockDeletable(workspace);
 				// 只有當板子實際變更時才發送 updateBoard 訊息
 				// 避免載入工作區時誤觸發 PlatformIO 重新檢查
 				if (previousBoard !== message.board) {
@@ -3699,13 +3789,66 @@ function migrateWorkspaceState(state) {
 	}
 
 	let migrationCount = 0;
+	const topBlocks = Array.isArray(state.blocks.blocks) ? state.blocks.blocks : [];
+
+	function migrateTxtLegacyBlock(block) {
+		if (!block) {
+			return null;
+		}
+
+		if (block.type === 'txt_init') {
+			migrationCount++;
+			log.info('migrateWorkspaceState: 移除 legacy txt_init 積木');
+			return migrateTxtLegacyBlock(block.next && block.next.block ? block.next.block : null);
+		}
+
+		if (block.type === 'txt_input_read') {
+			const existingFields = block.fields || {};
+			block.type = 'txt_input_sensor';
+			block.fields = {
+				...existingFields,
+				SENSOR_TYPE: existingFields.SENSOR_TYPE || 'BUTTON',
+				INPUT: existingFields.INPUT || '1',
+			};
+			migrationCount++;
+			log.info(`migrateWorkspaceState: 遷移 txt_input_read 到 txt_input_sensor (I${block.fields.INPUT})`);
+		}
+
+		if (block.inputs) {
+			for (const inputName in block.inputs) {
+				const input = block.inputs[inputName];
+				if (input && input.block) {
+					const migratedChild = migrateTxtLegacyBlock(input.block);
+					if (migratedChild) {
+						input.block = migratedChild;
+					} else {
+						delete input.block;
+					}
+				}
+			}
+		}
+
+		if (block.next && block.next.block) {
+			const migratedNext = migrateTxtLegacyBlock(block.next.block);
+			if (migratedNext) {
+				block.next.block = migratedNext;
+			} else {
+				delete block.next;
+			}
+		}
+
+		return block;
+	}
 
 	/**
 	 * 遞迴遍歷所有積木，執行遷移
 	 * @param {Object} block - Blockly block JSON
 	 */
 	function migrateBlock(block) {
-		if (!block) return;
+		if (!block) return null;
+
+		block = migrateTxtLegacyBlock(block);
+		if (!block) return null;
 
 		// 遷移 servo_move: fields.ANGLE → inputs.ANGLE (shadow block)
 		if (block.type === 'servo_move' && block.fields && 'ANGLE' in block.fields) {
@@ -3745,7 +3888,12 @@ function migrateWorkspaceState(state) {
 
 		// 遞迴處理 next 積木
 		if (block.next && block.next.block) {
-			migrateBlock(block.next.block);
+			const migratedNext = migrateBlock(block.next.block);
+			if (migratedNext) {
+				block.next.block = migratedNext;
+			} else {
+				delete block.next;
+			}
 		}
 
 		// 遞迴處理 inputs 中的積木
@@ -3753,14 +3901,86 @@ function migrateWorkspaceState(state) {
 			for (const inputName in block.inputs) {
 				const input = block.inputs[inputName];
 				if (input && input.block) {
-					migrateBlock(input.block);
+					const migratedInputBlock = migrateBlock(input.block);
+					if (migratedInputBlock) {
+						input.block = migratedInputBlock;
+					} else {
+						delete input.block;
+					}
 				}
 			}
 		}
+
+		return block;
 	}
 
-	// 遍歷所有頂層積木
-	state.blocks.blocks.forEach(block => migrateBlock(block));
+	const migratedTopBlocks = [];
+	const legacyTxtMainBlocks = [];
+
+	for (const topBlock of topBlocks) {
+		if (!topBlock) {
+			continue;
+		}
+
+		if (topBlock.type === 'txt_main') {
+			legacyTxtMainBlocks.push(topBlock);
+			continue;
+		}
+
+		if (topBlock.type === 'txt_init') {
+			migrationCount++;
+			log.info('migrateWorkspaceState: 移除頂層 legacy txt_init 積木');
+			continue;
+		}
+
+		const migratedTopBlock = migrateBlock(topBlock);
+		if (migratedTopBlock) {
+			migratedTopBlocks.push(migratedTopBlock);
+		}
+	}
+
+	if (legacyTxtMainBlocks.length > 0) {
+		let setupBlock = migratedTopBlocks.find(block => block && block.type === 'txt_setup');
+		if (!setupBlock) {
+			const anchorBlock = legacyTxtMainBlocks[0];
+			setupBlock = {
+				type: 'txt_setup',
+				id: `migrated_txt_setup_${anchorBlock.id || migrationCount}`,
+				x: typeof anchorBlock.x === 'number' ? anchorBlock.x : 96,
+				y: typeof anchorBlock.y === 'number' ? anchorBlock.y : 96,
+			};
+			migratedTopBlocks.unshift(setupBlock);
+			migrationCount++;
+			log.info('migrateWorkspaceState: 建立 txt_setup 以取代 legacy txt_main');
+		}
+
+		legacyTxtMainBlocks.forEach((legacyBlock, index) => {
+			const migratedProcessBranch = migrateBlock(legacyBlock.inputs && legacyBlock.inputs.DO ? legacyBlock.inputs.DO.block : null);
+			const migratedProcessBlock = {
+				type: 'txt_process',
+				id: `migrated_txt_process_${index + 1}_${legacyBlock.id || migrationCount}`,
+				x: typeof legacyBlock.x === 'number' ? legacyBlock.x + 320 : 416,
+				y: typeof legacyBlock.y === 'number' ? legacyBlock.y : 96,
+				fields: {
+					NAME: '',
+				},
+			};
+
+			if (migratedProcessBranch) {
+				migratedProcessBlock.inputs = {
+					DO: {
+						block: migratedProcessBranch,
+					},
+				};
+			}
+
+			migratedTopBlocks.push(migratedProcessBlock);
+			migrationCount++;
+			log.info(`migrateWorkspaceState: 遷移 txt_main 到 txt_process (${index + 1})`);
+		});
+	}
+
+	state.blocks.blocks = migratedTopBlocks.map(block => migrateBlock(block)).filter(Boolean);
 
 	if (migrationCount > 0) {
 		log.info(`migrateWorkspaceState: 共遷移 ${migrationCount} 個積木`);

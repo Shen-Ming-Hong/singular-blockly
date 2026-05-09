@@ -35,7 +35,6 @@
 ```python
 import ftrobopy
 import threading
-import time
 
 txt = ftrobopy.ftrobopy('auto')
 _txt_threads = []
@@ -140,13 +139,13 @@ _read_ultrasonic(3)
 **Generator 輸出**：
 
 ```python
-import time
 time.sleep(2.0)
 ```
 
 **多流程語意要求**：
 
 - 在多流程模型下，`txt_wait` 只應暫停目前流程，不應凍結整個程式
+- generator SHOULD 以 wall-clock delay（例如 `time.sleep(max(0.0, ms / 1000.0))`）實作等待，避免多個流程透過 shared `txt` 的 `_update_status` 互相干擾
 
 ---
 
@@ -181,6 +180,8 @@ for i in range(1, 9):
 ## 多流程下的 pacing 與輪詢規則
 
 - `txt_wait` MUST 保持使用者可理解的「等待 N 毫秒」語意
+- `txt_wait` SHOULD 使用 wall-clock delay，而非 `txt.updateWait(...)`；`txt.updateWait(...)` 僅保留給緊密 TXT 硬體輪詢 loop 的 pacing
+- 多流程主執行緒等待活躍流程結束時，SHOULD 使用一般 thread wait（例如 `join(timeout)`）維持程式存活，MUST NOT 再呼叫 `txt.updateWait(...)` 干擾 shared `txt` 的 exchange-cycle 狀態
 - `controls_forever` / `controls_whileUntil` 對緊密 TXT 硬體輪詢 loop 的 path-sensitive `txt.updateWait(0.01)` 規則 MUST 保留
 - 自動 pacing 仍屬 loop generator 的責任，MUST NOT 被塞進 `txt_input_sensor` 這類 value block
 

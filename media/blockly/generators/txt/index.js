@@ -48,11 +48,16 @@ window.txtGenerator.functions_ = new Map();
 window.txtGenerator.inputConfigs_ = new Map();
 
 /**
- * 馬達埠號追蹤（供 txt_main 預先建立 mot 物件，避免在迴圈中反覆呼叫 txt.motor(N)）
+ * 馬達埠號追蹤（供 txt_setup 預先建立 mot 物件，避免在迴圈中反覆呼叫 txt.motor(N)）
  * 每次呼叫 txt.motor(N) 都會執行 setConfig() 累加 config_id，
  * 導致 exchange thread 在每次迴圈都送出 CONFIG_IO 指令，可能造成馬達/燈光閃爍。
  */
 window.txtGenerator.motorPorts_ = new Set();
+
+/**
+ * TXT 流程描述（函式名稱 / 顯示名稱）
+ */
+window.txtGenerator.processDescriptors_ = [];
 
 /**
  * 重置生成器狀態
@@ -62,6 +67,7 @@ window.txtGenerator.reset = function () {
 	this.functions_.clear();
 	this.inputConfigs_.clear();
 	this.motorPorts_.clear();
+	this.processDescriptors_ = [];
 };
 
 /**
@@ -73,7 +79,7 @@ window.txtGenerator.addImport = function (importStatement) {
 };
 
 /**
- * 記錄輸入感測器配置，供 txt_main 生成 setConfig()
+ * 記錄輸入感測器配置，供 txt_setup 生成 setConfig()
  * @param {number} port 輸入埠號（1~8）
  * @param {string} sensorType 感測器類型 'BUTTON' | 'GATE' | 'ULTRASONIC'
  */
@@ -82,11 +88,19 @@ window.txtGenerator.addInputConfig = function (port, sensorType) {
 };
 
 /**
- * 記錄使用中的馬達埠號，供 txt_main 生成預先建立的 mot 物件
+ * 記錄使用中的馬達埠號，供 txt_setup 生成預先建立的 mot 物件
  * @param {number|string} port 馬達埠號（1~4）
  */
 window.txtGenerator.addMotorPort = function (port) {
 	this.motorPorts_.add(Number(port));
+};
+
+/**
+ * 記錄 TXT 流程描述，供主程式統一啟動 threads
+ * @param {{functionName: string, threadNameLiteral: string}} descriptor 流程描述
+ */
+window.txtGenerator.addProcessDescriptor = function (descriptor) {
+	this.processDescriptors_.push(descriptor);
 };
 
 /**
@@ -121,6 +135,37 @@ window.txtGenerator.buildSetConfig = function () {
 };
 
 /**
+ * 根據已註冊的 TXT 流程，生成 thread 啟動與主執行緒 keep-alive 程式碼
+ * @returns {string} 啟動流程的主程式碼，或空字串
+ */
+window.txtGenerator.buildProcessStartCode = function () {
+	if (!this.processDescriptors_.length) {
+		return '';
+	}
+
+	this.addImport('import threading');
+
+	const lines = ['_txt_threads = []'];
+	for (const descriptor of this.processDescriptors_) {
+		lines.push(
+			`_txt_threads.append(threading.Thread(target=${descriptor.functionName}, name=${descriptor.threadNameLiteral}, daemon=True))`
+		);
+	}
+
+	lines.push('');
+	lines.push('for _txt_thread in _txt_threads:');
+	lines.push(`${this.INDENT}_txt_thread.start()`);
+	lines.push('');
+	// 主執行緒只需要等待 worker threads 結束，不應再呼叫 txt.updateWait() 參與
+	// shared txt 的 exchange-cycle 同步；否則會干擾各流程內部的 txt_wait / pacing。
+	lines.push('while any(_txt_thread.is_alive() for _txt_thread in _txt_threads):');
+	lines.push(`${this.INDENT}for _txt_thread in _txt_threads:`);
+	lines.push(`${this.INDENT}${this.INDENT}_txt_thread.join(0.05)`);
+
+	return lines.join('\n');
+};
+
+/**
  * 串接下一個積木的程式碼
  * Blockly 12 的 base Generator.scrub_() 不追蹤 nextConnection，必須覆寫才能正確生成連續 statement 積木的程式碼
  * @param {!Blockly.Block} block 目前積木
@@ -135,9 +180,37 @@ window.txtGenerator.scrub_ = function (block, code, opt_thisOnly) {
 };
 
 /**
+ * 引用文字
+ * 與 MicroPython generator 保持一致，供 txt_process thread name 與 text 類積木使用。
+ * @param {string} text 原始文字
+ * @returns {string} 帶引號的文字
+ */
+window.txtGenerator.quote_ = function (text) {
+	text = String(text ?? '')
+		.replace(/\\/g, '\\\\')
+		.replace(/'/g, "\\'")
+		.replace(/\n/g, '\\n')
+		.replace(/\r/g, '\\r');
+	return "'" + text + "'";
+};
+
+/**
+ * 多行引用文字
+ * 與 MicroPython generator 保持一致，供未來 TXT text_multiline 類積木重用。
+ * @param {string} text 原始文字
+ * @returns {string} 帶三重引號的文字
+ */
+window.txtGenerator.multiline_quote_ = function (text) {
+	const lines = String(text ?? '')
+		.split(/\n/g)
+		.map(line => line.replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+	return "'''" + lines.join('\n') + "'''";
+};
+
+/**
  * 允許的頂層積木類型
  */
-window.txtGenerator.allowedTopLevelBlocks_ = ['txt_main', 'procedures_defnoreturn', 'procedures_defreturn', 'arduino_function'];
+window.txtGenerator.allowedTopLevelBlocks_ = ['txt_setup', 'txt_process', 'procedures_defnoreturn', 'procedures_defreturn', 'arduino_function'];
 
 /**
  * 自訂 workspaceToCode 方法
@@ -154,6 +227,10 @@ window.txtGenerator.workspaceToCode = function (workspace) {
 	this.init(workspace);
 
 	const blocks = workspace.getTopBlocks(true);
+	const setupBlocks = [];
+	const processBlocks = [];
+	const functionBlocks = [];
+	const orphanBlocks = [];
 	let code = '';
 
 	for (const block of blocks) {
@@ -161,13 +238,63 @@ window.txtGenerator.workspaceToCode = function (workspace) {
 			continue;
 		}
 
-		if (this.allowedTopLevelBlocks_.includes(block.type)) {
-			const blockCode = this.blockToCode(block);
-			if (typeof blockCode === 'string') {
-				code += blockCode;
+		switch (block.type) {
+			case 'txt_setup':
+				setupBlocks.push(block);
+				break;
+			case 'txt_process':
+				processBlocks.push(block);
+				break;
+			case 'procedures_defnoreturn':
+			case 'procedures_defreturn':
+			case 'arduino_function':
+				functionBlocks.push(block);
+				break;
+			default:
+				orphanBlocks.push(block);
+		}
+	}
+
+	const primarySetupBlock = setupBlocks[0] || null;
+	const skippedSetupBlocks = primarySetupBlock ? setupBlocks.slice(1) : [];
+
+	for (const block of functionBlocks) {
+		this.blockToCode(block);
+	}
+
+	for (const block of processBlocks) {
+		this.blockToCode(block);
+	}
+
+	if (primarySetupBlock) {
+		const setupCode = this.blockToCode(primarySetupBlock);
+		if (typeof setupCode === 'string') {
+			code += setupCode;
+		}
+	}
+
+	for (const block of skippedSetupBlocks) {
+		code += `# [Skipped] Duplicate TXT setup block: ${block.id}\n`;
+	}
+
+	for (const block of orphanBlocks) {
+		code += `# [Skipped] Orphan block: ${block.type} (not in TXT setup/process or function)\n`;
+	}
+
+	if (this.processDescriptors_.length > 0) {
+		if (primarySetupBlock) {
+			const processStartCode = this.buildProcessStartCode();
+			if (processStartCode) {
+				if (code && !code.endsWith('\n')) {
+					code += '\n';
+				}
+				if (code && !code.endsWith('\n\n')) {
+					code += '\n';
+				}
+				code += processStartCode + '\n';
 			}
 		} else {
-			code += `# [Skipped] Orphan block: ${block.type} (not in main/function)\n`;
+			code += '# [Skipped] TXT process blocks require a TXT Setup block\n';
 		}
 	}
 

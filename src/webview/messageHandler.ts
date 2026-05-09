@@ -2037,46 +2037,53 @@ export class WebViewMessageHandler {
 	}
 
 	/**
-         * 處理 TXT Test Panel dialog 開啟：安裝 runtime 並啟動 HTTP server
-         */
-        private async handleTxtTestDialogOpen(): Promise<void> {
-                if (!this.txtTestService) {
-                        log('TxtTestService not initialized', 'warn');
-                        return;
-                }
-                try {
-                        this.panel.webview.postMessage({ command: 'txtInstallRuntimeStart' });
-                        await this.txtTestService.installAndStartServer();
-                        this.panel.webview.postMessage({ command: 'txtInstallRuntimeDone', success: true });
-                } catch (error) {
-                        log('Failed to open TXT test dialog', 'error', error);
-                        this.panel.webview.postMessage({ command: 'txtInstallRuntimeDone', success: false, error: (error as Error).message });
-                }
-        }
+	 * 處理 TXT Test Panel dialog 開啟：安裝 runtime 並啟動 HTTP server
+	 */
+	private async handleTxtTestDialogOpen(): Promise<void> {
+		if (!this.txtTestService) {
+			log('TxtTestService not initialized', 'warn');
+			return;
+		}
 
-        /**
-         * 處理 TXT Test Panel dialog 關閉：停止所有輸出並停止 HTTP server
-         */
-        private async handleTxtTestDialogClose(): Promise<void> {
-                if (!this.txtTestService) return;
-                try {
-                        await this.txtTestService.stopAll();
-                        await this.txtTestService.stopServer();
-                } catch (error) {
-                        log('Error closing TXT test dialog', 'error', error);
-                }
-        }
+		try {
+			this.panel.webview.postMessage({ command: 'txtInstallRuntimeStart' });
+			await this.txtTestService.installAndStartServer();
+			this.panel.webview.postMessage({ command: 'txtInstallRuntimeDone', success: true });
+		} catch (error) {
+			log('Failed to open TXT test dialog', 'error', error);
+			this.panel.webview.postMessage({ command: 'txtInstallRuntimeDone', success: false, error: (error as Error).message });
+		}
+	}
 
-        /**
-         * 處理 TXT I/O 輪詢：取得快照並回傳給 WebView
-         */
-        private async handleTxtTestPollIo(): Promise<void> {
-                if (!this.txtTestService) return;
-                try {
-                        const snapshot = await this.txtTestService.pollIo();
-                        this.panel.webview.postMessage({ command: 'txtTestIoUpdate', snapshot });
-                } catch {
-                        this.panel.webview.postMessage({ command: 'txtTestPollFailed' });
-                }
-        }
+	/**
+	 * 處理 TXT Test Panel dialog 關閉：停止所有輸出並停止 HTTP server
+	 */
+	private async handleTxtTestDialogClose(): Promise<void> {
+		if (!this.txtTestService) {
+			return;
+		}
+
+		try {
+			await this.txtTestService.stopAll();
+			await this.txtTestService.stopServer();
+		} catch (error) {
+			log('Error closing TXT test dialog', 'error', error);
+		}
+	}
+
+	/**
+	 * 處理 TXT I/O 輪詢：取得快照並回傳給 WebView
+	 */
+	private async handleTxtTestPollIo(): Promise<void> {
+		if (!this.txtTestService) {
+			return;
+		}
+
+		try {
+			const snapshot = await this.txtTestService.pollIo();
+			this.panel.webview.postMessage({ command: 'txtTestIoUpdate', snapshot });
+		} catch {
+			this.panel.webview.postMessage({ command: 'txtTestPollFailed' });
+		}
+	}
 }

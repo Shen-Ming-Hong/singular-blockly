@@ -171,7 +171,7 @@ export interface TxtWorkspaceTopology {
 | `txt_motor_stop` | MOTOR | statement | `_mN.setSpeed(0)` |
 | `txt_output` | OUTPUT, STATE | statement | `txt.output(N).setLevel(0/512)` |
 | `txt_input_sensor` | SENSOR_TYPE, INPUT | value | `txt.input(...).state()` 或 `_read_ultrasonic(port)` |
-| `txt_wait` | MS | statement | `time.sleep(...)`；在多流程模型下只暫停當前流程 |
+| `txt_wait` | MS | statement | `time.sleep(max(0.0, ... / 1000.0))`；在多流程模型下只暫停當前流程，不干擾 shared `txt` 的 exchange-cycle 狀態 |
 | `txt_stop_all` | 無 | statement | 關閉所有馬達與輸出 |
 
 ---
@@ -189,6 +189,7 @@ export interface TxtWorkspaceTopology {
 - 每個 `TXT 流程` 都有自己的 `TxtFlowDescriptor`
 - 流程可以是有限流程，也可以是長時間運行流程
 - 一個流程完成時，不影響其他流程繼續執行
+- 主執行緒以一般 thread wait（如 `join(timeout)`）等待仍存活的流程 thread，避免 busy loop，同時不干擾 shared `txt` 的 exchange-cycle 狀態
 
 ### 衝突控制原則
 

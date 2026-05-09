@@ -11,38 +11,48 @@
 /** TXT Controller 積木色相 (200 = 青藍色) */
 const TXT_COLOR = 200;
 
-// === 主程式容器積木 ===
+// === 頂層容器積木 ===
 
 /**
- * TXT 主程式積木 — 頂層容器，自動建立 ftrobopy 連線
- * 所有 TXT 程式碼必須放在此容器內
+ * TXT 初始化積木 — 頂層初始化容器
+ * 負責建立 shared ftrobopy 連線與一次性初始化程式碼
  */
-Blockly.Blocks['txt_main'] = {
+Blockly.Blocks['txt_setup'] = {
 	init: function () {
 		this.appendStatementInput('DO')
 			.setCheck(null)
-			.appendField(window.languageManager.getMessage('TXT_MAIN', 'TXT 主程式'));
+			.appendField(window.languageManager.getMessage('TXT_SETUP', 'TXT Setup'));
 		this.setStyle('procedure_blocks');
-		this.setTooltip(window.languageManager.getMessage('TXT_MAIN_TOOLTIP', 'TXT Controller 程式入口點。所有積木會在 while True 迴圈中持續執行（每 50ms 輪詢一次），可即時回應按鈕與輸入訊號。'));
+		this.setTooltip(
+			window.languageManager.getMessage(
+				'TXT_SETUP_TOOLTIP',
+				'Initialize the TXT Controller once and prepare shared hardware resources for all TXT processes.'
+			)
+		);
 		this.setHelpUrl('');
-		this.setDeletable(false);
 		this.setMovable(true);
 	},
 };
 
-// === 初始化積木 ===
-
 /**
- * TXT 初始化積木 — 建立 ftrobopy 連線
+ * TXT 流程積木 — 頂層流程容器
+ * 可選名稱欄位僅供顯示與診斷用途
  */
-Blockly.Blocks['txt_init'] = {
+Blockly.Blocks['txt_process'] = {
 	init: function () {
-		this.appendDummyInput().appendField(window.languageManager.getMessage('TXT_INIT', '連接 TXT Controller'));
-		this.setPreviousStatement(true, null);
-		this.setNextStatement(true, null);
-		this.setColour(TXT_COLOR);
-		this.setTooltip(window.languageManager.getMessage('TXT_INIT_TOOLTIP', '初始化與 TXT Controller 的 ftrobopy 連線'));
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('TXT_PROCESS_PREFIX', 'TXT Process:'))
+			.appendField(new Blockly.FieldTextInput(''), 'NAME');
+		this.appendStatementInput('DO').setCheck(null);
+		this.setStyle('procedure_blocks');
+		this.setTooltip(
+			window.languageManager.getMessage(
+				'TXT_PROCESS_TOOLTIP',
+				'Define one TXT process. The name is optional and only used for display or diagnostics.'
+			)
+		);
 		this.setHelpUrl('');
+		this.setMovable(true);
 	},
 };
 
@@ -182,33 +192,6 @@ Blockly.Blocks['txt_input_sensor'] = {
 	},
 };
 
-/**
- * 讀取數位輸入 (value block) — 保留供向下相容
- */
-Blockly.Blocks['txt_input_read'] = {
-	init: function () {
-		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_INPUT_READ', '讀取輸入'))
-			.appendField(
-				new Blockly.FieldDropdown([
-					['I1', '1'],
-					['I2', '2'],
-					['I3', '3'],
-					['I4', '4'],
-					['I5', '5'],
-					['I6', '6'],
-					['I7', '7'],
-					['I8', '8'],
-				]),
-				'INPUT'
-			);
-		this.setOutput(true, 'Number');
-		this.setColour(TXT_COLOR);
-		this.setTooltip(window.languageManager.getMessage('TXT_INPUT_READ_TOOLTIP', '讀取數位輸入腳位 I1~I8 的狀態 (0 或 1)'));
-		this.setHelpUrl('');
-	},
-};
-
 // === 延遲積木 ===
 
 /**
@@ -246,12 +229,12 @@ Blockly.Blocks['txt_stop_all'] = {
 };
 
 // ============================================================
-// 孤立積木保護 — 所有 TXT 積木（除 txt_init、txt_input_read 本身）
+// 孤立積木保護 — 所有 TXT 積木
 // ============================================================
 
 /**
  * TXT 孤立積木警告回呼
- * 積木移動或建立時檢查是否在 txt_main 或函式容器內
+ * 積木移動或建立時檢查是否在 TXT 合法容器或函式容器內
  */
 function txtOrphanOnchange(e) {
 	if (!this.workspace || this.workspace.isFlyout) { return; }
@@ -264,21 +247,21 @@ function txtOrphanOnchange(e) {
 		this.setWarningText(null);
 	} else {
 		this.setWarningText(
-			window.languageManager.getMessage('TXT_ORPHAN_WARNING') ||
-			'This block must be placed inside the "TXT Main" block'
+			window.languageManager.getMessage('TXT_ORPHAN_WARNING_MULTI') ||
+			'This block must be placed inside a "TXT Setup" or "TXT Process" block'
 		);
 	}
 }
 
 // 為所有 TXT statement 積木加入孤立警告
-['txt_init', 'txt_motor_speed', 'txt_motor_stop', 'txt_output', 'txt_wait', 'txt_stop_all'].forEach(function (blockType) {
+['txt_motor_speed', 'txt_motor_stop', 'txt_output', 'txt_wait', 'txt_stop_all'].forEach(function (blockType) {
 	if (Blockly.Blocks[blockType]) {
 		Blockly.Blocks[blockType].onchange = txtOrphanOnchange;
 	}
 });
 
 // value blocks（有輸出）也加入孤立警告
-['txt_input_read', 'txt_input_sensor'].forEach(function (blockType) {
+['txt_input_sensor'].forEach(function (blockType) {
 	if (Blockly.Blocks[blockType]) {
 		Blockly.Blocks[blockType].onchange = txtOrphanOnchange;
 	}

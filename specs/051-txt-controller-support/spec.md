@@ -119,7 +119,7 @@
 - **FR-009**: 系統 MUST 對缺少初始化容器、重複初始化容器或沒有任何流程容器的工作區提供明確警告或驗證回饋
 - **FR-010**: 系統 MUST 以 `txt_setup` + `txt_process` 作為唯一正式支援的 TXT 頂層作者模型；未發布的 `txt_main` 不列入使用者相容需求
 - **FR-011**: 所有新建、儲存、重新載入後的 TXT 工作區，以及正式工具箱、文件與範例 MUST 持續使用新頂層模型，且 MUST NOT 暴露 `txt_main`、`txt_init` 或 `txt_input_read`
-- **FR-012**: Blockly 工作區的積木 MUST 能生成語法正確、可在 ftrobopy 環境下執行的 Python 程式；對於持續輪詢或控制 TXT 硬體的 `while` 迴圈，若可抵達迴圈尾端的路徑未包含明確 pacing，generator MUST 自動補上符合 ftrobopy exchange cycle 的節流語句
+- **FR-012**: Blockly 工作區的積木 MUST 能生成語法正確、可在 ftrobopy 環境下執行的 Python 程式；對於持續輪詢或控制 TXT 硬體的 `while` 迴圈，若可抵達迴圈尾端的路徑未包含明確 pacing，generator MUST 自動補上符合 ftrobopy exchange cycle 的節流語句；`txt_wait` 類延遲積木 MUST 保持只暫停當前流程，並 SHOULD 以 wall-clock delay 實作，而非重用 ftrobopy 的 exchange-cycle wait API
 - **FR-013**: 生成的 Python 程式 MUST 使用 ftrobopy 的標準 API：主程式以 `ftrobopy.ftrobopy('auto')` 建立連線，馬達控制使用 `motor(N).setSpeed(v)`（v 為 -512~512，正數為正轉、負數為反轉、0 為停止），一般數位輸入可用 `input(N).state()` 讀取；Blockly 積木使用 0~512 速度 + 正/反轉選項，generator 將反轉轉成負數傳入
 
 **Program Mode**

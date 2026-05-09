@@ -8,50 +8,70 @@
 
 'use strict';
 
-// === 主程式容器積木 ===
+function getTxtProcessFunctionName(block) {
+	const safeBlockId = (block.id || 'process').replace(/[^A-Za-z0-9_]+/g, '_');
+	return `_txt_process_${safeBlockId}`;
+}
 
-/**
- * txt_main: TXT 主程式容器
- * 自動匯入 ftrobopy 並建立連線 (使用 'auto' 模式，程式在 TXT 上執行)
- */
-window.txtGenerator.forBlock['txt_main'] = function (block) {
+// === 頂層容器積木 ===
+
+function generateTxtSetupCode(block) {
 	window.txtGenerator.addImport('import ftrobopy');
-	// statementToCode 回傳的程式碼每行都有一層 INDENT（4 空格），
-	// 以前放進 while True: 裡剛好正確，現在 txt_main 沒有外層容器，
-	// 必須去除這一層多餘縮排，否則頂層的 while/def 等會產生 IndentationError。
 	const rawChildCode = window.txtGenerator.statementToCode(block, 'DO');
 	const childCode = rawChildCode.replace(/^    /gm, '');
 	let code = "txt = ftrobopy.ftrobopy('auto')\n\n";
-	// 若使用了需要特殊配置的感測器（如超音波），動態生成 setConfig() + updateConfig()
-	// statementToCode 已觸發所有子積木的 generator，inputConfigs_ 此時已填好
 	const setConfigCode = window.txtGenerator.buildSetConfig();
 	if (setConfigCode) {
 		code += setConfigCode + '\n\n';
 	}
-	// 預先建立馬達物件（_m1 = txt.motor(1) 等）
-	// 避免在迴圈中反覆呼叫 txt.motor(N) 造成 setConfig() 累加 config_id，
-	// 進而觸發 exchange thread 在每次迴圈都送出 CONFIG_IO 指令，造成馬達/燈光閃爍
 	const preCreationsCode = window.txtGenerator.buildPreCreations();
 	if (preCreationsCode) {
 		code += preCreationsCode + '\n\n';
 	}
-	// 直接輸出子積木程式碼，不加外層 while True。
-	// 使用者若需要持續輪詢，應自行在容器內加入「重複當 真」迴圈積木。
 	if (childCode) {
 		code += childCode;
 	}
 	return code;
+}
+
+window.txtGenerator.forBlock['txt_setup'] = function (block) {
+	return generateTxtSetupCode(block);
 };
 
-// === 初始化積木 ===
+window.txtGenerator.forBlock['txt_process'] = function (block) {
+	const processName = (block.getFieldValue('NAME') || '').replace(/[\r\n]+/g, ' ').trim();
+	const functionName = getTxtProcessFunctionName(block);
 
-/**
- * txt_init: 建立 ftrobopy 連線 (保留供向下相容)
- * 注意：建議改用 txt_main 容器積木，連線已自動處理
- */
-window.txtGenerator.forBlock['txt_init'] = function (_block) {
-	window.txtGenerator.addImport('import ftrobopy');
-	return "txt = ftrobopy.ftrobopy('auto')\n";
+	const previousFunction = window.txtGenerator.currentFunction_;
+	window.txtGenerator.currentFunction_ = functionName;
+	if (!window.txtGenerator.functionGlobals_.has(functionName)) {
+		window.txtGenerator.functionGlobals_.set(functionName, new Set());
+	}
+
+	const rawChildCode = window.txtGenerator.statementToCode(block, 'DO');
+	const branch = rawChildCode || `${window.txtGenerator.INDENT}pass\n`;
+
+	window.txtGenerator.currentFunction_ = previousFunction;
+
+	const globals = window.txtGenerator.functionGlobals_.get(functionName);
+	const filteredGlobals = globals ? Array.from(globals).sort() : [];
+	const globalDecl = filteredGlobals.length > 0 ? window.txtGenerator.INDENT + 'global ' + filteredGlobals.join(', ') + '\n' : '';
+
+	let functionCode = '';
+	if (processName) {
+		functionCode += `# TXT Process: ${processName}\n`;
+	}
+	functionCode += `def ${functionName}():\n`;
+	functionCode += globalDecl;
+	functionCode += branch;
+
+	window.txtGenerator.addFunction(functionName, functionCode);
+	window.txtGenerator.addProcessDescriptor({
+		functionName,
+		threadNameLiteral: window.txtGenerator.quote_(processName || functionName),
+	});
+
+	return '';
 };
 
 // === 馬達積木 ===
@@ -64,7 +84,7 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
 	const direction = block.getFieldValue('DIRECTION');
 	const speed = window.txtGenerator.valueToCode(block, 'SPEED', window.txtGenerator.ORDER_NONE) || '0';
 
-	// 記錄此馬達埠號，供 txt_main 預先建立 mot 物件
+	// 記錄此馬達埠號，供 txt_setup 預先建立 mot 物件
 	window.txtGenerator.addMotorPort(motor);
 
 	let speedCode;
@@ -74,7 +94,7 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
 		speedCode = speed;
 	}
 
-	// 使用預先建立的 _m{N} 物件（在 txt_main 初始化時建立一次），
+	// 使用預先建立的 _m{N} 物件（在 txt_setup 初始化時建立一次），
 	// 避免在迴圈中反覆呼叫 txt.motor(N)（會累加 config_id 造成 CONFIG_IO 風暴）。
 	// ftrobopy setSpeed() 需要整數，且內部以 int(pwm/2) 縮放至 ubyte(0-255)；
 	// 超過 512 的値（如搖桿超出預期範圍）會讓 int(val/2)>255 觸發 struct.error。
@@ -87,7 +107,7 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
  */
 window.txtGenerator.forBlock['txt_motor_stop'] = function (block) {
 	const motor = block.getFieldValue('MOTOR');
-	// 記錄此馬達埠號，供 txt_main 預先建立 mot 物件
+	// 記錄此馬達埠號，供 txt_setup 預先建立 mot 物件
 	window.txtGenerator.addMotorPort(motor);
 	return `_m${motor}.setSpeed(0)\n`;
 };
@@ -107,14 +127,6 @@ window.txtGenerator.forBlock['txt_output'] = function (block) {
 // === 輸入積木 ===
 
 /**
- * txt_input_read: 讀取數位輸入 (value block) — 保留供向下相容
- */
-window.txtGenerator.forBlock['txt_input_read'] = function (block) {
-	const input = block.getFieldValue('INPUT');
-	return [`txt.input(${input}).state()`, window.txtGenerator.ORDER_FUNCTION_CALL];
-};
-
-/**
  * txt_input_sensor: 感測器輸入積木（按鈕 / 光柵 / 超音波）
  * 按鈕/光柵 → .state()，回傳 0 或 1
  * 超音波   → .distance()，回傳距離 cm；並自動記錄 setConfig 需求
@@ -122,7 +134,7 @@ window.txtGenerator.forBlock['txt_input_read'] = function (block) {
 window.txtGenerator.forBlock['txt_input_sensor'] = function (block) {
 	const sensorType = block.getFieldValue('SENSOR_TYPE');
 	const input = block.getFieldValue('INPUT');
-	// 記錄感測器配置；txt_main 在 statementToCode 完成後呼叫 buildSetConfig()
+	// 記錄感測器配置；txt_setup 在 statementToCode 完成後呼叫 buildSetConfig()
 	window.txtGenerator.addInputConfig(parseInt(input), sensorType);
 	if (sensorType === 'ULTRASONIC') {
 		// 超音波量測失敗時（無回波、距離太近/太遠），ftrobopy 回傳 0。
@@ -153,20 +165,23 @@ window.txtGenerator.forBlock['txt_input_sensor'] = function (block) {
  * txt_wait: 等待毫秒
  */
 window.txtGenerator.forBlock['txt_wait'] = function (block) {
-	window.txtGenerator.addImport('import time');
 	const ms = window.txtGenerator.valueToCode(block, 'MS', window.txtGenerator.ORDER_NONE) || '0';
-	return `time.sleep(${ms} / 1000.0)\n`;
+	// txt_wait 是「使用者可感知的延遲」，在 shared-txt 多流程模型下應只暫停目前流程。
+	// 若改用 txt.updateWait()，會與其他流程共用 ftrobopy 內部的 _update_status，造成延遲互相干擾。
+	// time.sleep() 只阻塞目前 Python thread，而 ftrobopy 的 exchange thread 仍可持續維護硬體狀態。
+	window.txtGenerator.addImport('import time');
+	return `time.sleep(max(0.0, (${ms}) / 1000.0))\n`;
 };
 
 // === 全部停止積木 ===
 
 /**
  * txt_stop_all: 停止所有馬達與輸出
- * 使用 addMotorPort 登記 M1-M4，讓 txt_main 預先建立 _mN 物件，
+ * 使用 addMotorPort 登記 M1-M4，讓 txt_setup 預先建立 _mN 物件，
  * 避免在此處直接呼叫 txt.motor(i) 累加 config_id（CONFIG_IO 風暴）。
  */
 window.txtGenerator.forBlock['txt_stop_all'] = function (_block) {
-	// 登記所有馬達埠號，確保 txt_main 預先建立 _m1~_m4 物件
+	// 登記所有馬達埠號，確保 txt_setup 預先建立 _m1~_m4 物件
 	window.txtGenerator.addMotorPort(1);
 	window.txtGenerator.addMotorPort(2);
 	window.txtGenerator.addMotorPort(3);

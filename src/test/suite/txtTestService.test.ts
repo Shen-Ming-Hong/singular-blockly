@@ -183,9 +183,13 @@ suite('TxtTestService Test Suite', () => {
 			const execCalls = (mockSsh.execCommand as sinon.SinonStub).getCalls();
 			const startCall = execCalls.find(c => (c.args[0] as string).includes('python3'));
 			assert.ok(startCall, 'should call python3 to start server');
-			assert.ok((startCall.args[0] as string).includes('io_server.py'));
-			assert.ok((startCall.args[0] as string).includes('8080'), 'should pass port 8080');
-			assert.ok((startCall.args[0] as string).endsWith('&'), 'should run in background with &');
+			const startCommand = startCall.args[0] as string;
+			assert.ok(startCommand.includes('io_server.py'));
+			assert.ok(startCommand.includes('8080'), 'should pass port 8080');
+			assert.ok(
+				startCommand.endsWith('&') || startCommand.includes('& sleep '),
+				'should run in background and optionally wait for server startup'
+			);
 		});
 
 		test('should dispose SSH after starting server', async () => {
