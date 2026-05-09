@@ -1,7 +1,7 @@
-# 快速啟動指南：TXT Controller 支援開發
+# 快速啟動指南：TXT Controller 多流程擴充
 
 **功能分支**：`051-txt-controller-support`  
-**適用對象**：接手本功能實作的開發者
+**適用對象**：接手本次多流程擴充實作的開發者
 
 ---
 
@@ -14,8 +14,6 @@ cd /path/to/singular-blockly
 npm install
 ```
 
-> 實作 Phase B 後，`node-ssh` 會出現在 `package.json`，需重新執行 `npm install`。
-
 ### 2. 啟動開發模式
 
 ```bash
@@ -27,167 +25,135 @@ npm run watch
 ### 3. 驗證建置
 
 ```bash
-npm run compile   # TypeScript + webpack 建置
-npm run lint      # ESLint 檢查
-npm test          # 完整測試套件
-npm run validate:i18n  # 15 語系 i18n 驗證
+npm run compile
+npm run lint
+npm test
+npm run validate:i18n
 ```
 
 ---
 
-## 實作入口點
+## 本次擴充優先閱讀入口
 
-### Phase A（型別 + 積木）優先讀取
-
-| 參考文件 | 說明 |
-|---------|------|
-| [data-model.md](./data-model.md) | 所有 TypeScript 型別定義 |
-| [contracts/txt-blocks-api.md](./contracts/txt-blocks-api.md) | 積木 + Generator 合約 |
-| [spec.md](./spec.md) FR-001 ~ FR-004 | 功能需求 |
-
-**第一個要修改的檔案**：`src/types/board.ts`
-
-```typescript
-// 在此處新增
-export type BoardLanguage = 'arduino' | 'micropython' | 'txt';
-export type UploadMethod = 'platformio' | 'mpremote' | 'ssh';
-```
-
-### Phase B（後端 Service）優先讀取
-
-| 參考文件 | 說明 |
-|---------|------|
-| [research.md](./research.md) | node-ssh API 用法、SecretStorage 模式 |
-| [data-model.md](./data-model.md) | TxtConnectionConfig、TxtUploadStage 等型別 |
-| `src/services/micropythonUploader.ts` | Service 模式參考（照此模式實作 TxtUploader） |
-
-**node-ssh 安裝**：
-
-```bash
-npm install node-ssh
-```
-
-### Phase C（WebView UI）優先讀取
-
-| 參考文件 | 說明 |
-|---------|------|
-| [spec.md](./spec.md) FR-010 ~ FR-013 | 連線設定 UI 需求 |
-| [spec.md](./spec.md) FR-014 ~ FR-020 | Test Panel 需求 |
-| [contracts/io-server-api.md](./contracts/io-server-api.md) | Test Panel ↔ io_server.py HTTP API |
-
-**參考 WebView**：`media/html/blocklyEdit.html`（TXT 連線設定與 TXT Test Panel 都整合在同一個 WebView，透過 modal / dialog 呈現）
-
-### Phase D（TXT Runtime）優先讀取
-
-| 參考文件 | 說明 |
-|---------|------|
-| [contracts/io-server-api.md](./contracts/io-server-api.md) | io_server.py 的完整 HTTP API 規格 |
-| [research.md](./research.md) 研究議題三 | Python 架構設計決策 |
+| 類型 | 檔案 | 用途 |
+|------|------|------|
+| 規格 | [spec.md](./spec.md) | 使用者行為、首發模型一致性、成功標準 |
+| 計畫 | [plan.md](./plan.md) | 多流程落地範圍與風險 |
+| 研究 | [research.md](./research.md) | FT API、直接重做策略與可行性重評 |
+| 模型 | [data-model.md](./data-model.md) | `TxtFlowDescriptor`、`TxtWorkspaceTopology` |
+| 契約 | [contracts/txt-blocks-api.md](./contracts/txt-blocks-api.md) | `txt_setup` / `txt_process` block 合約 |
 
 ---
 
-## 關鍵測試場景
+## 第一個應做的程式碼盤點
 
-### 積木生成驗證（無需硬體）
+1. `media/blockly/blocks/txt.js`
+2. `media/blockly/generators/txt/index.js`
+3. `media/blockly/generators/txt/txt.js`
+4. `media/blockly/generators/txt/python_common.js`
+5. `media/js/blocklyEdit.js`
+6. `media/toolbox/categories/txt.json`
 
-1. 在 Extension Development Host 中選擇「TXT Controller」開發板
-2. 從工具箱拖入以下積木並排列：
-    - `txt_main`
-    - 在容器內依序放入 `txt_motor_speed`（M1，速度 200，反轉）
-    - `txt_wait`（2000ms）
-    - `txt_stop_all`
-3. 點擊「生成程式碼」
+> 這六個檔案決定了新的 TXT 頂層模型是否能成立，也決定單主程式舊路徑是否真的被清乾淨。
 
-**預期輸出至少包含以下片段**：
+---
 
-```python
-import ftrobopy
-import time
+## 目標工作區範例
 
-txt = ftrobopy.ftrobopy('auto')
-_m1 = txt.motor(1)
-_m1.setSpeed(
-time.sleep(2.0)
-_m1.setSpeed(0)
-for i in range(1, 9):
-    txt.output(i).setLevel(0)
-```
+### 新模型（預期作者體驗）
 
-### 自動 pacing 驗證（無需硬體）
+建立以下工作區：
 
-1. 在 `txt_main` 容器內加入一個 `controls_forever`（顯示為「一直重複做」）積木，或一個 `while True` 迴圈
-2. 讓迴圈條件式或內容讀取 `txt_input_sensor`
-3. **不要** 放入 `txt_wait`
-4. 點擊「生成程式碼」
+1. 一個 `TXT 初始化`
+2. 流程 A：`TXT 流程：馬達`
+    - `txt_motor_speed(M1, 200, 正轉)`
+    - `txt_wait(1000)`
+    - `txt_motor_stop(M1)`
+3. 流程 B：`TXT 流程：燈號`
+    - `controls_forever`
+    - 內部切換 `txt_output(O1)` 與 `txt_wait(200)`
+
+**預期生成方向**：
+
+- 單一 `main.py`
+- 單一 `ftrobopy.ftrobopy('auto')`
+- 一段初始化程式
+- 多個流程 runner 定義與啟動邏輯
+
+---
+
+## 重要驗證情境
+
+### 1. 多流程不互相阻塞
+
+**步驟**：
+
+1. 讓流程 A 執行 `txt_wait(1000)`
+2. 讓流程 B 每 200ms 切換輸出
 
 **預期**：
 
-- 若該 loop 存在未節流且可抵達尾端的 TXT 硬體輪詢/控制路徑，尾端會自動補 `txt.updateWait(0.01)`
-- 若某條路徑已明確 `txt_wait`，或進入不返回的內層 `while True`，外層不應再多補一個多餘的 `txt.updateWait(0.01)`
-- `txt_wait` 積木本身仍生成 `time.sleep(...)`，不會被改寫成 `txt.updateWait()`
+- 流程 A 等待時，流程 B 仍持續運作
 
-### SSH 連線驗證（需要 TXT 硬體）
+### 2. 正式產品面不殘留單主程式模型
 
-1. 在 Blockly Editor 的 TXT 連線設定區填入：
-   - Host: `192.168.x.x`（TXT 的 IP）
-    - Username: `ftc`
-   - Password: ftCommunity 預設密碼
-2. 點擊「測試連線」
-3. **預期**：5 秒內顯示「連線成功」
+**步驟**：
 
-### Test Panel 驗證（需要 TXT 硬體 + io_server.py）
+1. 新建或開啟 TXT workspace
+2. 檢查 toolbox、預設工作區與相關 fixture
 
-1. 在 Extension Development Host 中開啟 Blockly Editor，選擇 `TXT Controller` 開發板
-2. 點擊工具列上的 `TXT I/O Test Panel` 按鈕
-3. 等待系統自動安裝並啟動 `io_server.py`（若 TXT 端尚未準備好）
-4. 拖動 M1 滑桿至 200
-5. **預期**：M1 馬達開始旋轉（速度 200）
-6. 鬆開滑桿
-7. **預期**：M1 馬達**維持**速度 200（不自動歸零）
-8. 點擊「全部停止」
-9. **預期**：M1 停止，1 秒內完成
+**預期**：
+
+- 只出現 `TXT 初始化` + `TXT 流程`
+- `txt_main`、`txt_init`、`txt_input_read` 不出現在正式 UI、文件與範例
+
+### 3. pacing 規則不回歸
+
+**步驟**：
+
+1. 在某個 `TXT 流程` 內建立緊密硬體輪詢 `while`
+2. 不放 `txt_wait`
+
+**預期**：
+
+- 仍由 `python_common.js` 自動補上 path-sensitive `txt.updateWait(0.01)`
+
+### 4. 初始化驗證
+
+**步驟**：
+
+1. 建立兩個 `TXT 初始化`
+2. 或建立零個 `TXT 初始化`
+
+**預期**：
+
+- UI 給出明確警告，不靜默產生模糊結果
 
 ---
 
-## 檔案創建清單（照順序執行）
+## 實作檔案清單（延伸部分）
 
-```
-Phase A:
-□ src/types/txt.ts                          （新增）
-□ src/types/board.ts                        （修改：新增 'txt', 'ssh'）
-□ src/types/arduino.ts                      （修改：getBoardLanguage 支援 'txt'）
-□ media/blockly/blocks/txt.js               （新增）
-□ media/blockly/generators/txt/txt.js       （新增）
-□ media/blockly/generators/txt/python_common.js（修改：TXT 共通流程控制與 while 自動 pacing）
-□ media/toolbox/categories/txt.json         （新增）
-□ media/locales/{15語系}/messages.js        （修改：新增 TXT i18n 鍵值）
-□ package.json                              （修改：新增 node-ssh、TXT board、命令）
-
-Phase B:
-□ src/services/txtConnectionService.ts      （新增）
-□ src/services/txtUploader.ts               （新增）
-□ src/services/txtTestService.ts            （新增）
-□ src/webview/messageHandler.ts             （修改：新增 TXT case）
-□ src/extension.ts                          （修改：新增命令註冊）
-□ src/test/suite/txtConnectionService.test.ts（新增）
-□ src/test/suite/txtUploader.test.ts        （新增）
-□ src/test/suite/txtTestService.test.ts     （新增）
-
-Phase C:
-□ media/html/blocklyEdit.html               （修改：新增 TXT 連線設定 modal 與 TXT Test Panel dialog）
-□ media/js/blocklyEdit.js                   （修改：新增 UI 互動、Test Panel polling、語言切換刷新邏輯）
-
-Phase D:
-□ txt-runtime/io_server.py                  （新增）
+```text
+□ media/blockly/blocks/txt.js
+□ media/blockly/generators/txt/index.js
+□ media/blockly/generators/txt/txt.js
+□ media/blockly/generators/txt/python_common.js
+□ media/toolbox/categories/txt.json
+□ media/js/blocklyEdit.js
+□ media/blockly/blocks/loops.js
+□ media/locales/{15語系}/messages.js
+□ scripts/generate-block-dictionary.js
+□ src/mcp/block-dictionary.json
+□ specs/051-txt-controller-support/*.md
 ```
 
 ---
 
 ## 注意事項
 
-1. **BoardLanguage 擴展**：修改 `getBoardLanguage()` 時，確認所有 `switch` 語句有 `'txt'` 的 case，避免 fallthrough 到 Arduino 邏輯
-2. **Generator 隔離**：TXT 積木專屬 generator 使用獨立的 `txtGenerator`；積木本體在 `txt.js`，共通流程控制與 while 自動 pacing 在 `python_common.js`，不能共用 `arduinoGenerator` 或 `micropythonGenerator`
-3. **node-ssh webpack**：`node-ssh` 是 Node.js 模組，在 `webpack.config.js` 的 `externals` 中加入（Extension Host 不打包 node_modules）
-4. **i18n 驗證**：每次修改 `messages.js` 後執行 `npm run validate:i18n`，確保 15 個語系的鍵值完整
-5. **密碼安全**：任何地方都不得將密碼 log 出來（logging.ts 或 console.log），確認 `TxtConnectionService` 的 log 語句排除密碼欄位
-6. **Test Panel 架構**：TXT Test Panel 目前整合於 `media/html/blocklyEdit.html` / `media/js/blocklyEdit.js`，不是獨立 `txtTestPanel.html` / `txtTestPanel.js`；後續修改請以單一 WebView 架構為準
+1. **可以直接重做 `txt_main`**：它尚未發布，不需要 load-time migration；但要同步更新 blocks、generator、toolbox、workspace 驗證與 tests
+2. **不要新增「4 個流程」硬限制**：這與使用者最新決策相衝突
+3. **名稱欄位是可選的**：任何驗證都不能把流程名稱當必填
+4. **保留單一 shared `txt`**：這是 FT API 與既有設計評估後的核心限制
+5. **`txt_wait` 的使用者語意要保住**：它仍應被理解為「當前流程等待」
+6. **更新 block dictionary**：新的 `txt_setup` / `txt_process` 不可漏掉 MCP 字典同步

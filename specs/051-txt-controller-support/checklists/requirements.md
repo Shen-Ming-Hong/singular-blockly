@@ -7,7 +7,7 @@
 ## Content Quality
 
 - [x] No implementation details (languages, frameworks, APIs)
-- [ ] Focused on user value and business needs
+- [x] Focused on user value and business needs
 - [x] Written for non-technical stakeholders
 - [x] All mandatory sections completed
 
@@ -33,7 +33,7 @@
 
 ## Notes
 
-- 規格覆蓋 Program Mode（P1）、連線設定（P1）、Test Panel（P2）、積木集（P2）共 4 個 User Story，優先序清楚
-- Assumptions 明確界定 TXT 4.0、USB 自動偵測、進階感測器不在第一版範圍
-- SC-007 確保新功能不破壞現有 Arduino/CyberBrick 功能（向後相容保障）
-- 下一步：可直接進行 `/speckit.plan` 產生實作計畫
+- 規格現已改為以「學生如何使用多流程作者模型」為中心，包含初始化容器、流程容器、首發模型一致性與教學 UX
+- Assumptions 明確界定 TXT 4.0、USB 自動偵測、共享硬體競爭與未發布前可直接重做的邊界
+- Success Criteria 明確要求多流程等待不互相阻塞，且正式產品面只保留新模型
+- 下一步：可直接依更新後的 `plan.md` / `tasks.md` 進入實作

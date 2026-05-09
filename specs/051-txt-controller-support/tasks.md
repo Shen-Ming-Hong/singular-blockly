@@ -7,6 +7,8 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
 **Input**: `specs/051-txt-controller-support/`
 **Prerequisites**: plan.md ✅ | spec.md ✅ | research.md ✅ | data-model.md ✅ | contracts/ ✅ | quickstart.md ✅
 
+> 備註：`T001`–`T053` 為單主程式版 TXT 支援已完成任務；`T054+` 為本次多流程擴充待辦。
+
 ## 格式說明
 
 - **[P]**: 可與同 Phase 其他任務並行（不同檔案，無未完成的依賴）
@@ -219,56 +221,97 @@ description: "fischertechnik TXT Controller 支援功能實作任務清單"
 
 ---
 
+## Phase 8: 多流程作者模型與 UX 擴充
+
+**目標**：把 TXT Blockly 作者模型從單一 `txt_main` 轉成「TXT 初始化 + 多個 TXT 流程」。
+
+- [ ] T054 在 `media/blockly/blocks/txt.js` 新增可見頂層積木 `txt_setup`（UI 顯示「TXT 初始化」）與 `txt_process`（UI 顯示「TXT 流程」），並以新模型取代 `txt_main` 作為正式 TXT 作者入口
+- [ ] T055 [P] 更新 `media/toolbox/categories/txt.json` 與 `media/toolbox/index.json`，讓新工作區顯示 `txt_setup` / `txt_process`，並移除 `txt_main` 的標準入口
+- [ ] T056 [P] 在全部 15 個 `media/locales/{lang}/messages.js` 新增 `TXT_SETUP*`、`TXT_PROCESS*`、流程命名與 workspace validation warning 文案
+- [ ] T057 更新 `media/blockly/blocks/loops.js`、`media/blockly/generators/txt/index.js`、`media/blockly/generators/txt/python_common.js` 的合法容器判定，讓 orphan guard 與 in-loop 邏輯支援 `txt_setup` / `txt_process`
+- [ ] T058 更新 `media/js/blocklyEdit.js` 的 TXT workspace 驗證與提示，處理「缺少初始化」、「重複初始化」、「沒有流程」等多頂層規則；移除對單一 `txt_main` UX 的硬依賴
+
+**Checkpoint**：使用者可以在工作區中建立「1 個初始化 + 多個流程」的頂層模型。
+
+---
+
+## Phase 9: TXT Generator 與流程執行模型
+
+**目標**：在單一 `main.py` 中建立 shared `txt`，並讓多個流程同時運作。
+
+- [ ] T059 在 `media/blockly/generators/txt/index.js` 重構 workspace root 聚合邏輯，改由 `txt_setup` + `txt_process` 共同驅動 codegen，而不是假設單一 `txt_main`
+- [ ] T060 在 `media/blockly/generators/txt/txt.js` 實作 `txt_setup` generator，產生 shared `ftrobopy.ftrobopy('auto')`、shared imports、shared motor pre-creations 與流程啟動骨架
+- [ ] T061 在 `media/blockly/generators/txt/txt.js` 實作 `txt_process` generator，將流程內容包裝為可受主程式管理的 flow runner，並保留流程名稱為可選 metadata
+- [ ] T062 更新 `media/blockly/generators/txt/txt.js`、`media/blockly/generators/txt/python_common.js`，確保 `variables_set`、`controls_if`、`controls_forever`、`txt_wait` 等既有 statement 在流程包裝後仍能生成正確 Python
+- [ ] T063 確認 `txt_wait` 在多流程模型下只暫停當前流程，同時保留 `controls_whileUntil` / `controls_forever` 對硬體輪詢 loop 的 path-sensitive `txt.updateWait(0.01)` 自動節流規則
+
+**Checkpoint**：生成的 `main.py` 可同時執行多個流程，且等待中的流程不會凍結其他流程。
+
+---
+
+## Phase 10: 單主程式舊路徑清理與收斂
+
+**目標**：既有未發布的 `txt_main` 內部實作不再成為正式產品面，相關殘留一次清乾淨。
+
+- [ ] T064 更新 `media/js/blocklyEdit.js` 與任何 TXT workspace bootstrap / 預設載入邏輯，讓新建與重新載入後的 TXT 工作區只使用 `txt_setup` + `txt_process`，並移除不再需要的 `txt_main` 假設
+- [ ] T065 清理 `media/blockly/blocks/txt.js`、`media/blockly/generators/txt/txt.js` 與相關註冊路徑中僅為單主程式 `txt_main` / `txt_init` / `txt_input_read` 保留的公開 code path，避免正式工具箱與 codegen 暴露舊模型
+- [ ] T066 更新 `extension_test/blockly/` fixture、相關測試資料與任何 TXT 範例/假資料，使其全面採用新模型，不再維護 `txt_main` 為核心的 fixture
+
+**Checkpoint**：正式產品面、fixture 與 regression 驗證都只使用新模型。
+
+---
+
+## Phase 11: 驗證、字典與文件同步
+
+**目標**：補齊 regression 驗證，避免新模型破壞既有功能。
+
+- [ ] T067 [P] 新增多流程 regression 驗證（建議包含 `extension_test/blockly/` fixture 與 `src/test/` 相關整合測試），覆蓋「一流程等待、另一流程繼續運作」與「新建 / 重新載入 workspace 仍維持新模型」兩個核心案例
+- [ ] T068 [P] 更新 `scripts/generate-block-dictionary.js` 與 `src/mcp/block-dictionary.json`，讓 MCP 與搜尋索引辨識 `txt_setup` / `txt_process`
+- [X] T069 更新 `spec.md`、`plan.md`、`research.md`、`data-model.md`、`quickstart.md`、`contracts/txt-blocks-api.md`，同步記錄多流程模型與直接重做策略
+- [ ] T070 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n` 與相關測試，確認多流程擴充不影響既有 Arduino / MicroPython / TXT 功能
+
+---
+
 ## 依賴圖（User Story 完成順序）
 
 ```
-Phase 1 (Setup)
-    ↓
-Phase 2 (Foundational：型別 + 積木)
-    ├──→ Phase 3 (US2：連線設定)
-    │         ↓
-    │    Phase 4 (US1：上傳部署) ← 依賴 US2 連線設定
-    │
-    ├──→ Phase 5 (US4：積木 i18n + 孤立保護)  ← 可與 Phase 3/4 並行
-    │
-    └──→ Phase 6 (US3：Test Panel)             ← 依賴 US2 連線設定
-              ↓
-         Phase 7 (Polish)
+Baseline Phase 1-7（已完成）
+  ↓
+Phase 8（多流程作者模型 / UX）
+  ↓
+Phase 9（generator / flow runners）
+  ↓
+Phase 10（舊路徑清理）
+  ↓
+Phase 11（regression / validation）
 ```
 
 **並行機會**：
-- Phase 2：T007、T008、T009 可並行（不同檔案）
-- Phase 3：T012（測試）、T014（HTML）可與 T011（Service）並行
-- Phase 4：T018（測試）可與 T017（Service）並行
-- Phase 5：T023（i18n）、T026（toolbox）可並行
-- Phase 6：T029（測試）可與 T028 並行；T032（HTML）、T033（JS）可並行
+- Phase 8：T055、T056 可並行（toolbox 與 locale 分離）
+- Phase 9：T060、T061 需在 T059 後串行；T062、T063 依賴 T060/T061
+- Phase 10：T064、T065 可在 Phase 9 穩定後併行驗證，T066 最後更新 fixture / 測試資料
+- Phase 11：T067、T068 可並行；T070 依賴前面所有程式碼任務完成
 
 ---
 
 ## 實作策略
 
-**MVP 範圍（建議先交付）**：Phase 1 + Phase 2 + Phase 3 (US2) + Phase 4 (US1) = T001-T022（22 個任務）
+**基礎 TXT 功能**：`T001`–`T053` 已完成，包含單主程式版 TXT 支援、Test Panel 與 pacing 規則。
+
+**本輪多流程 MVP（建議先交付）**：`T054`–`T066`
 
 這讓學生可以：
-1. 在工作區排列 TXT 積木
-2. 設定 SSH 連線參數
-3. 上傳程式並在 TXT 上執行
+1. 使用「TXT 初始化 + 多個 TXT 流程」建立工作區
+2. 生成單一 `main.py` 並保留 shared `txt` 連線
+3. 在正式產品面只保留新模型，不需理解 `txt_main`
 
-**後續交付**：Phase 5 (US4) + Phase 6 (US3) = T023-T036（補齊 i18n 和 Test Panel）
+**收尾交付**：`T067`–`T070`（regression 驗證、字典同步、最終編譯/測試）
 
 ---
 
 ## 任務統計
 
-| | |
-|--|--|
-| 總任務數 | 39 |
-| Phase 1 Setup | 3 |
-| Phase 2 Foundational | 7 |
-| Phase 3 US2 | 6 |
-| Phase 4 US1 | 6 |
-| Phase 5 US4 | 4 |
-| Phase 6 US3 | 10 |
-| Phase 7 Polish | 3 |
-| 可並行任務 | 17 |
-| MVP 範圍（T001-T022） | 22 |
+- 已完成基礎任務：`T001`–`T053`
+- 新增多流程擴充任務：`T054`–`T070`（17 項，其中 `T069` 已完成）
+- 目前累計任務數：70
+- 本次優先交付範圍：`T054`–`T066`（作者模型、generator、舊路徑清理）

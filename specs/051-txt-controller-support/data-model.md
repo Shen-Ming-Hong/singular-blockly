@@ -1,210 +1,212 @@
-# 資料模型：fischertechnik TXT Controller 支援
+# 資料模型：fischertechnik TXT Controller 支援（多流程擴充）
 
 **功能分支**：`051-txt-controller-support`  
-**日期**：2026-05-03
+**日期**：2026-05-09
 
 ---
 
-## 核心型別（src/types/txt.ts）
+## 核心型別（既有 TXT 服務型別）
 
 ### TxtConnectionConfig
 
-TXT 裝置的連線參數。IP 與 username 存於工作區設定（`vscode.workspace.getConfiguration`）；密碼存於 VS Code SecretStorage，不得出現在任何文字檔案中。
+TXT 裝置的連線參數。IP 與 username 存於工作區設定；密碼存於 VS Code SecretStorage。
 
 ```typescript
 export interface TxtConnectionConfig {
-    /** TXT 裝置的 IP 位址或 hostname */
     host: string;
-    /** SSH 使用者名稱（ftCommunity 預設：'ftc'） */
     username: string;
-    /** 遠端程式存放路徑（預設：'/tmp/singular_blockly/main.py'） */
     remotePath: string;
-    /** io_server.py 的 HTTP port（預設：8080） */
     runtimePort: number;
 }
 ```
-
-**驗證規則**：
-
-- `host`：非空字串，允許 IP（如 `192.168.0.100`）或 hostname
-- `username`：非空字串，不允許空白
-- `remotePath`：絕對路徑（以 `/` 開頭），預設 `/tmp/singular_blockly/main.py`
-- `runtimePort`：1024-65535 範圍整數，預設 8080
 
 ---
 
 ### TxtDeviceState
 
-TXT 裝置的當前狀態枚舉。由 `TxtUploader` 擁有，防止 Program Mode 與 Test Mode 衝突。
+TXT 裝置的目前狀態。由現有 `TxtConnectionService` / `TxtUploader` / `TxtTestService` 協調，避免 Program Mode 與 Test Mode 衝突。
 
 ```typescript
 export type TxtDeviceState =
-    | 'Idle'          // 空閒，可進行任何操作
-    | 'Testing'       // Test Panel 使用中（I/O 控制由 Test Panel 負責）
-    | 'Running'       // 程式執行中（I/O 控制由 SSH execCommand 負責）
-    | 'Stopping'      // 停止命令發出，等待確認
-    | 'Disconnected'  // 連線中斷（偵測到網路錯誤）
-    | 'Error';        // 發生錯誤（exit code 非 0 或 SSH 例外）
+    | 'Idle'
+    | 'Testing'
+    | 'Running'
+    | 'Stopping'
+    | 'Disconnected'
+    | 'Error';
 ```
-
-**狀態轉換規則**：
-
-| 當前狀態 | 觸發事件 | 下一狀態 |
-|---------|---------|---------|
-| Idle | 開啟 Test Panel | Testing |
-| Idle | 點擊上傳 | Running |
-| Testing | 關閉 Test Panel | Idle |
-| Running | execCommand resolve（exit code 0） | Idle |
-| Running | execCommand resolve（exit code ≠ 0） | Error |
-| Running / Testing | 點擊停止 | Stopping |
-| Stopping | 停止完成 | Idle |
-| 任何狀態 | 偵測到連線中斷 | Disconnected |
-| Disconnected / Error | 使用者確認/重試 | Idle |
-
-**防衝突規則**：
-
-- `Testing` 狀態下，上傳操作被拒絕（回傳錯誤訊息給 WebView）
-- `Running` 狀態下，Test Panel 自動進入暫停模式，顯示「程式執行中，Test Panel 暫停」
-- `Stopping` 狀態下，所有操作鎖定（防止重複停止命令）
 
 ---
 
 ### TxtIoSnapshot
 
-某一時刻 TXT 的完整 I/O 狀態快照。由 `io_server.py` 回傳，`TxtTestService` polling 後透過 postMessage 送至 WebView。
+某一時刻 TXT 的完整 I/O 狀態快照，供 Test Panel 使用。
 
 ```typescript
 export interface TxtIoSnapshot {
-    /** M1-M4 馬達速度（index 0-3 對應 M1-M4），範圍 -512~512 */
     motors: [number, number, number, number];
-    /** O1-O8 輸出狀態（index 0-7 對應 O1-O8），true=開，false=關 */
     outputs: [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean];
-    /** I1-I8 輸入讀值（index 0-7 對應 I1-I8），0 或 1 */
     inputs: [number, number, number, number, number, number, number, number];
-    /** 快照時間戳（Unix ms） */
     timestamp: number;
 }
 ```
 
 ---
 
+## 既有上傳型別（延續）
+
 ### TxtUploadStage
 
-上傳流程的各個階段，用於進度顯示。
+沿用既有 TXT uploader 的進度階段。
 
 ```typescript
 export type TxtUploadStage =
-    | 'connecting'   // 建立 SSH 連線
-    | 'uploading'    // SCP 上傳 main.py
-    | 'executing'    // SSH 執行 python3 main.py
-    | 'stopping'     // 發送停止命令
-    | 'completed'    // 成功完成
-    | 'failed';      // 失敗
+    | 'connecting'
+    | 'uploading'
+    | 'executing'
+    | 'stopping'
+    | 'completed'
+    | 'failed';
 ```
-
----
 
 ### TxtUploadProgress
 
-上傳進度介面，用於 WebView ↔ Extension 間的進度通訊（postMessage payload）。
+WebView 與 Extension 間顯示上傳 / 執行進度時使用。
 
 ```typescript
 export interface TxtUploadProgress {
     stage: TxtUploadStage;
-    /** 總進度百分比 0-100 */
     progress: number;
-    /** 顯示訊息（已 i18n） */
     message: string;
-    /** 錯誤訊息（僅 failed 時有值） */
     error?: string;
 }
 ```
 
-**各 stage 對應進度值**：
-
-| stage | progress |
-|-------|---------|
-| connecting | 10 |
-| uploading | 40 |
-| executing | 60 |
-| stopping | 80 |
-| completed | 100 |
-| failed | 維持失敗時的進度 |
-
----
-
 ### TxtUploadResult
 
-上傳操作的最終結果。
+上傳與遠端執行完成後的結果摘要。
 
 ```typescript
 export interface TxtUploadResult {
     success: boolean;
-    timestamp: string;       // ISO 8601
-    duration: number;        // 毫秒
-    exitCode?: number;       // Python 程式 exit code
+    timestamp: string;
+    duration: number;
+    exitCode?: number;
     error?: {
         stage: TxtUploadStage;
         message: string;
-        details?: string;   // 技術細節（僅供開發者 log）
+        details?: string;
     };
 }
 ```
 
----
-
 ### TxtUploadRequest
 
-上傳請求，由 WebView 發出（透過 postMessage），由 `TxtUploader` 消費。
+由 WebView 發出、交給 `TxtUploader` 消費的請求。多流程擴充不改變此介面形狀。
 
 ```typescript
 export interface TxtUploadRequest {
-    /** 生成的 Python 程式碼 */
     code: string;
-    /** 固定為 'txt' */
     board: 'txt';
 }
 ```
 
-> 連線設定由 `TxtConnectionService` 從 workspace settings + SecretStorage 讀取，不需由 WebView 傳入。
+---
+
+## 多流程擴充型別（本次新增）
+
+### TxtFlowDescriptor
+
+單一「TXT 流程」的內部描述。使用 hidden ID 作為穩定識別鍵，不要求顯示名稱唯一。
+
+```typescript
+export interface TxtFlowDescriptor {
+    /** 穩定識別碼，用於 codegen、workspace 驗證與診斷 */
+    id: string;
+    /** 可選顯示名稱；留空也合法 */
+    displayName?: string;
+    /** 啟動順序（以工作區頂層順序決定） */
+    order: number;
+}
+```
 
 ---
 
-## 積木型別（media/blockly/blocks/txt.js）
+### TxtWorkspaceTopology
 
-| 積木型別 | 輸入欄位 | 輸出型別 | Generator 摘要輸出 |
-|---------|---------|---------|------------------|
-| `txt_main` | DO: statements | statement / container | `import ftrobopy\ntxt = ftrobopy.ftrobopy('auto')\n...` |
-| `txt_init` | （無可編輯欄位；向下相容） | statement | `import ftrobopy\ntxt = ftrobopy.ftrobopy('auto')\n` |
-| `txt_motor_speed` | MOTOR: 下拉（M1-M4）、SPEED: 數字（0-512）、DIRECTION: 下拉（正轉/反轉） | statement | `txt.motor({N}).setSpeed({±speed})\n` |
-| `txt_motor_stop` | MOTOR: 下拉（M1-M4） | statement | `txt.motor({N}).setSpeed(0)\n` |
-| `txt_output` | OUTPUT: 下拉（O1-O8）、STATE: 下拉（開/關） | statement | `txt.output({N}).setLevel({512\|0})\n` |
-| `txt_input_read` | INPUT: 下拉（I1-I8） | value（數值） | `txt.input({N}).state()` |
-| `txt_input_sensor` | SENSOR_TYPE: BUTTON / GATE / ULTRASONIC、INPUT: I1-I8 | value（數值） | BUTTON / GATE → `txt.input({N}).state()`；ULTRASONIC → `_read_ultrasonic({N})` |
-| `txt_wait` | MS: 數字（毫秒） | statement | `import time\ntime.sleep({ms}/1000)\n` |
-| `txt_stop_all` | （無欄位） | statement | `for i in range(1,5): txt.motor(i).setSpeed(0)\nfor i in range(1,9): txt.output(i).setLevel(0)\n` |
+描述目前工作區頂層 TXT 模型的摘要，供 workspace 驗證與診斷使用。
 
-> 補充：現況實作以 `txt_main` 作為主程式容器，`txt_init` 與 `txt_input_read` 主要保留向下相容；新工作區建議使用 `txt_main` 與 `txt_input_sensor`。
-
-### TXT while 迴圈自動 pacing 規則（`media/blockly/generators/txt/python_common.js`）
-
-`controls_forever` 是迴圈類別中的兒童友善無限循環積木，直接生成 `while True`；其 pacing 與 `controls_whileUntil` 生成的無限迴圈共用同一套規則。
-
-`controls_whileUntil` 的共通 generator 會對 `while` 進行路徑敏感分析，規則如下：
-
-- 若 `while` 條件式或會抵達 loop 尾端的 body 路徑存取 TXT 硬體（如 `txt_input_sensor`、`txt_input_read`、`txt_motor_speed`、`txt_motor_stop`、`txt_output`、`txt_stop_all`），且該路徑先前沒有 `txt_wait` / `controls_duration` 等明確 pacing，則在尾端自動補 `txt.updateWait(0.01)`。
-- 若某條路徑已自行 delay，或進入明確不返回的內層 `while True`（無 `break`），外層 loop 不再重複補 pacing。
-- 巢狀 loop 各自獨立判斷；自動 pacing 不由 value block 注入，因此 `txt_wait` 與感測器 value 積木可保持純表達式語意。
+```typescript
+export interface TxtWorkspaceTopology {
+    setupBlockIds: string[];
+    processIds: string[];
+    executableProcessCount: number;
+}
+```
 
 ---
 
-## 工作區設定鍵值（package.json contributes.configuration）
+## Blockly 頂層模型
 
-| 設定鍵 | 型別 | 預設值 | 說明 |
-|-------|------|--------|------|
-| `singular-blockly.txt.host` | string | `"192.168.7.2"` | TXT IP 或 hostname |
-| `singular-blockly.txt.username` | string | `"ftc"` | SSH 使用者名稱 |
-| `singular-blockly.txt.remotePath` | string | `"/tmp/singular_blockly/main.py"` | 遠端程式路徑 |
-| `singular-blockly.txt.runtimePort` | number | `8080` | io_server.py HTTP port |
+### 新可見頂層積木
 
-> 密碼使用 SecretStorage key：`singular-blockly.txt.password`
+| 積木型別 | 使用者可見名稱 | 角色 | 主要輸出 |
+|---------|----------------|------|----------|
+| `txt_setup` | TXT 初始化 | 單次初始化容器 | 建立 shared `txt`、執行一次性初始化程式碼 |
+| `txt_process` | TXT 流程 | 可重複頂層流程容器 | 產生單一流程 runner，供主程式統一啟動 |
+
+### 預發布舊模型清理原則
+
+`txt_main`、`txt_init`、`txt_input_read` 僅屬目前分支內部尚未發布的單主程式遺留，不納入正式資料模型；實作時可直接清理或重構。
+
+---
+
+## 核心積木集摘要
+
+| 積木型別 | 輸入欄位 | 輸出型別 | Generator 摘要 |
+|---------|---------|---------|----------------|
+| `txt_setup` | DO: statements | top-level container | `import ftrobopy`, 建立 shared `txt`、預建 `_mN` 等 |
+| `txt_process` | NAME（可選）、DO: statements | top-level container | 產生 `_txt_flow_*` runner 並註冊到主程式啟動清單 |
+| `txt_motor_speed` | MOTOR, SPEED, DIRECTION | statement | `_mN.setSpeed(±speed)` |
+| `txt_motor_stop` | MOTOR | statement | `_mN.setSpeed(0)` |
+| `txt_output` | OUTPUT, STATE | statement | `txt.output(N).setLevel(0/512)` |
+| `txt_input_sensor` | SENSOR_TYPE, INPUT | value | `txt.input(...).state()` 或 `_read_ultrasonic(port)` |
+| `txt_wait` | MS | statement | `time.sleep(...)`；在多流程模型下只暫停當前流程 |
+| `txt_stop_all` | 無 | statement | 關閉所有馬達與輸出 |
+
+---
+
+## 多流程 runtime 模型（規格層）
+
+### 單一程式 / 單一 shared `txt`
+
+- 產出物仍為單一 `main.py`
+- `TXT 初始化` 只執行一次
+- 所有流程共享同一個 `txt` 物件與同一組硬體資源
+
+### 流程生命週期
+
+- 每個 `TXT 流程` 都有自己的 `TxtFlowDescriptor`
+- 流程可以是有限流程，也可以是長時間運行流程
+- 一個流程完成時，不影響其他流程繼續執行
+
+### 衝突控制原則
+
+- 多流程同時寫同一馬達 / 輸出不是推薦教學模式
+- 本次規格以文件化與 UX 提示為主，不要求建立完整資源仲裁器
+
+---
+
+## 正式工作區一致性規則
+
+1. 頂層必須恰有一個 `txt_setup`
+2. 頂層必須至少有一個 `txt_process`
+3. `TxtWorkspaceTopology` 用於檢查缺少初始化、重複初始化與沒有可執行流程等情況
+4. 正式工具箱、範例與預設工作區只使用新模型，不規劃 migration layer
+
+---
+
+## 與現有 service 型別的關係
+
+- `TxtConnectionConfig`、`TxtDeviceState`、`TxtIoSnapshot`、`TxtUploadProgress` 等既有 service 型別仍然有效
+- 多流程擴充主要影響 Blockly 作者模型、generator root 聚合與 workspace 驗證，不改變 SSH/Test Panel 的基本 service 介面
