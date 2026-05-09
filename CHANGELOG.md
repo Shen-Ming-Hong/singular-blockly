@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.73.1] - 2026-05-09
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 hono、fast-uri 與 ip-address / express-rate-limit 轉移依賴漏洞** (Fix transitive dependency vulnerabilities in hono, fast-uri, and ip-address / express-rate-limit)
+    - 直接依賴更新：`@modelcontextprotocol/sdk` 由 `^1.27.0` 升級至 `^1.29.0`，`ajv` 由 `^8.18.0` 升級至 `^8.20.0`，讓鎖檔能取得修補後的依賴基線
+      Direct dependency refresh: upgraded `@modelcontextprotocol/sdk` from `^1.27.0` to `^1.29.0` and `ajv` from `^8.18.0` to `^8.20.0` so the lockfile can resolve to patched dependency baselines
+    - 透過 npm overrides 將 `hono` 從 `4.12.14` 升級至 `4.12.18`，修復 `GHSA-9vqf-7f2p-gf9v` / `CVE-2026-44456`、`GHSA-69xw-7hcm-h432` / `CVE-2026-44455`、`GHSA-p77w-8qqv-26rm` / `CVE-2026-44457`、`GHSA-hm8q-7f3q-5f36` / `CVE-2026-44459` 與 `GHSA-qp7p-654g-cw7p` / `CVE-2026-44458`
+      Upgraded `hono` from `4.12.14` to `4.12.18` via npm overrides, fixing `GHSA-9vqf-7f2p-gf9v` / `CVE-2026-44456`, `GHSA-69xw-7hcm-h432` / `CVE-2026-44455`, `GHSA-p77w-8qqv-26rm` / `CVE-2026-44457`, `GHSA-hm8q-7f3q-5f36` / `CVE-2026-44459`, and `GHSA-qp7p-654g-cw7p` / `CVE-2026-44458`
+    - 透過 npm overrides 將 `fast-uri` 從 `3.1.0` 升級至 `3.1.2`，修復 `GHSA-q3j6-qgpj-74h6` / `CVE-2026-6321` 與 `GHSA-v39h-62p7-jpjc` / `CVE-2026-6322` 的路徑穿越與主機混淆問題；最高嚴重度為 High（CVSS 7.5）
+      Upgraded `fast-uri` from `3.1.0` to `3.1.2` via npm overrides, fixing `GHSA-q3j6-qgpj-74h6` / `CVE-2026-6321` and `GHSA-v39h-62p7-jpjc` / `CVE-2026-6322` for path traversal and host-confusion issues; highest severity is High (CVSS 7.5)
+    - 透過 npm overrides 將 `express-rate-limit` 從 `8.3.0` 升級至 `8.5.1`，並將 `ip-address` 從 `10.1.0` 升級至 `10.2.0`，修復 `GHSA-v2v4-37r5-5v8g` / `CVE-2026-42338` 的 `Address6` HTML 輸出 XSS，並清除 `npm audit` 對該依賴鏈的中度風險回報
+      Upgraded `express-rate-limit` from `8.3.0` to `8.5.1` and `ip-address` from `10.1.0` to `10.2.0` via npm overrides, fixing `GHSA-v2v4-37r5-5v8g` / `CVE-2026-42338` for the `Address6` HTML-emission XSS issue and clearing the moderate `npm audit` findings on that dependency chain
+    - 關閉 Dependabot Alerts #60, #61, #62, #63, #64, #65, #66, #67
+      Closes Dependabot Alerts #60, #61, #62, #63, #64, #65, #66, #67
+
 ## [0.73.0] - 2026-05-09
 
 ### ✨ 新功能 New Features
