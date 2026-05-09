@@ -15,9 +15,16 @@ suite('TxtUploader Test Suite', () => {
 	let mockContext: vscode.ExtensionContext;
 	let mockSecrets: { store: sinon.SinonStub; get: sinon.SinonStub; delete: sinon.SinonStub };
 	let mockOutputChannel: vscode.OutputChannel;
+	let configValues: Record<string, unknown>;
 
 	setup(() => {
 		sandbox = sinon.createSandbox();
+		configValues = {
+			'txt.host': '192.168.7.2',
+			'txt.username': 'ftc',
+			'txt.remotePath': '/tmp/singular_blockly/main.py',
+			'txt.runtimePort': 8080,
+		};
 
 		mockSecrets = {
 			store: sandbox.stub().resolves(),
@@ -42,13 +49,7 @@ suite('TxtUploader Test Suite', () => {
 
 		sandbox.stub(vscode.workspace, 'getConfiguration').returns({
 			get: (key: string, defaultValue?: unknown) => {
-				const defaults: Record<string, unknown> = {
-					'txt.host': '192.168.7.2',
-					'txt.username': 'ftc',
-					'txt.remotePath': '/tmp/singular_blockly/main.py',
-					'txt.runtimePort': 8080,
-				};
-				return key in defaults ? defaults[key] : defaultValue;
+				return key in configValues ? configValues[key] : defaultValue;
 			},
 			update: sandbox.stub().resolves(),
 		} as unknown as vscode.WorkspaceConfiguration);
@@ -161,6 +162,46 @@ suite('TxtUploader Test Suite', () => {
 
 			assert.strictEqual(result.success, false);
 			assert.strictEqual(result.exitCode, 1);
+		});
+
+			test('should derive remote directory and quote configured remote path', async () => {
+				configValues['txt.remotePath'] = '/tmp/custom dir/main script.py';
+				const mockSsh = makeMockSsh({
+					execCommand: sandbox.stub().callsFake((cmd: string) => {
+						if (cmd.startsWith('python3')) {return Promise.resolve({ stdout: '', stderr: '', code: 0 });}
+						return Promise.resolve({ stdout: '', stderr: '', code: 0 });
+					}),
+				});
+
+				const connectionService = new TxtConnectionService(mockContext);
+				const uploader = new TxtUploader(connectionService, mockOutputChannel, () => Promise.resolve(mockSsh));
+
+				const result = await uploader.upload('print("hello")');
+
+				assert.strictEqual(result.success, true);
+				const execCalls = (mockSsh.execCommand as sinon.SinonStub).getCalls().map(call => call.args[0] as string);
+				const stopCall = execCalls.find(command => command.includes('pkill -f --'));
+				const mkdirCall = execCalls.find(command => command.startsWith('mkdir -p'));
+				const pythonCall = execCalls.find(command => command.startsWith('python3 '));
+
+				assert.ok(stopCall?.includes('python3[[:space:]]+/tmp/custom dir/main script\\.py'));
+				assert.strictEqual(mkdirCall, "mkdir -p '/tmp/custom dir'");
+				assert.strictEqual(pythonCall, "python3 '/tmp/custom dir/main script.py'");
+			});
+	});
+
+	suite('stopExecution()', () => {
+		test('should use configured remote path when issuing fallback pkill', async () => {
+			configValues['txt.remotePath'] = '/tmp/custom dir/main script.py';
+			const mockSsh = makeMockSsh();
+
+			const connectionService = new TxtConnectionService(mockContext);
+			const uploader = new TxtUploader(connectionService, mockOutputChannel, () => Promise.resolve(mockSsh));
+
+			await uploader.stopExecution();
+
+			const pkillCommand = (mockSsh.execCommand as sinon.SinonStub).firstCall.args[0] as string;
+			assert.ok(pkillCommand.includes('python3[[:space:]]+/tmp/custom dir/main script\\.py'));
 		});
 	});
 });

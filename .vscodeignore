@@ -27,6 +27,16 @@ vsc-extension-quickstart.md
 
 !node_modules/blockly/**
 !node_modules/@blockly/**
+!node_modules/node-ssh/**
+!node_modules/ssh2/**
+!node_modules/asn1/**
+!node_modules/bcrypt-pbkdf/**
+!node_modules/is-stream/**
+!node_modules/make-dir/**
+!node_modules/sb-promise-queue/**
+!node_modules/sb-scandir/**
+!node_modules/shell-escape/**
+!node_modules/semver/**
 
 # 排除發布不需的內部資料
 **/.agent/**
@@ -46,3 +56,13 @@ vsc-extension-quickstart.md
 **/.editorconfig
 **/.prettierrc
 **/*.test.js
+**/extension_test/**
+**/test-results/**
+**/RC_FM/**
+media/toolbox/temp_toolbox*.json
+**/media/toolbox/temp_toolbox*.json
+**/temp_toolbox*.json
+AGENTS.md
+.npmignore
+.prettierignore
+package-lock.json

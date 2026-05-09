@@ -20,9 +20,16 @@ suite('TxtTestService Test Suite', () => {
 		delete: sinon.SinonStub;
 	};
 	let mockExtensionUri: vscode.Uri;
+	let configValues: Record<string, unknown>;
 
 	setup(() => {
 		sandbox = sinon.createSandbox();
+		configValues = {
+			'txt.host': '192.168.7.2',
+			'txt.username': 'ftc',
+			'txt.remotePath': '/tmp/singular_blockly/main.py',
+			'txt.runtimePort': 8080,
+		};
 
 		mockSecrets = {
 			store: sandbox.stub().resolves(),
@@ -38,13 +45,7 @@ suite('TxtTestService Test Suite', () => {
 
 		sandbox.stub(vscode.workspace, 'getConfiguration').returns({
 			get: (key: string, defaultValue?: unknown) => {
-				const defaults: Record<string, unknown> = {
-					'txt.host': '192.168.7.2',
-					'txt.username': 'ftc',
-					'txt.remotePath': '/tmp/singular_blockly/main.py',
-					'txt.runtimePort': 8080,
-				};
-				return key in defaults ? defaults[key] : defaultValue;
+				return key in configValues ? configValues[key] : defaultValue;
 			},
 			update: sandbox.stub().resolves(),
 		} as unknown as vscode.WorkspaceConfiguration);
@@ -181,10 +182,10 @@ suite('TxtTestService Test Suite', () => {
 			await service.startServer();
 
 			const execCalls = (mockSsh.execCommand as sinon.SinonStub).getCalls();
-			const startCall = execCalls.find(c => (c.args[0] as string).includes('python3'));
+			const startCall = execCalls.find(c => (c.args[0] as string).includes('nohup python3'));
 			assert.ok(startCall, 'should call python3 to start server');
 			const startCommand = startCall.args[0] as string;
-			assert.ok(startCommand.includes('io_server.py'));
+			assert.ok(/io_server(?:\.)?py/.test(startCommand));
 			assert.ok(startCommand.includes('8080'), 'should pass port 8080');
 			assert.ok(
 				startCommand.endsWith('&') || startCommand.includes('& sleep '),
@@ -205,6 +206,23 @@ suite('TxtTestService Test Suite', () => {
 
 			assert.ok((mockSsh.dispose as sinon.SinonStub).calledOnce);
 		});
+
+		test('should stop configured user program path before starting server', async () => {
+			configValues['txt.remotePath'] = '/opt/txt/main loop.py';
+			const mockSsh = makeMockSsh();
+			const connectionService = new TxtConnectionService(mockContext);
+			const service = new TxtTestService(
+				connectionService,
+				mockExtensionUri,
+				() => Promise.resolve(mockSsh)
+			);
+
+			await service.startServer();
+
+			const execCalls = (mockSsh.execCommand as sinon.SinonStub).getCalls().map(call => call.args[0] as string);
+			const stopCall = execCalls.find(command => command.includes('pkill -f --'));
+			assert.ok(stopCall?.includes('python3[[:space:]]+/opt/txt/main loop\\.py'));
+		});
 	});
 
 	// ─── stopServer() ───────────────────────────────────────────────────────────
@@ -224,7 +242,7 @@ suite('TxtTestService Test Suite', () => {
 			const execCalls = (mockSsh.execCommand as sinon.SinonStub).getCalls();
 			const pkillCall = execCalls.find(c => (c.args[0] as string).startsWith('pkill'));
 			assert.ok(pkillCall, 'should call pkill');
-			assert.ok((pkillCall.args[0] as string).includes('io_server.py'));
+			assert.ok(/io_server(?:\\\.)?py/.test(pkillCall.args[0] as string));
 		});
 
 		test('should dispose SSH after stopping server', async () => {
@@ -313,6 +331,14 @@ suite('TxtTestService Test Suite', () => {
 			const body = JSON.parse(init.body) as { motor: number; speed: number };
 			assert.strictEqual(body.speed, -512);
 		});
+
+		test('should throw when POST /motor returns non-ok status', async () => {
+			const mockFetch = makeMockFetch({ error: 'motor jam' }, false, 500);
+			const connectionService = new TxtConnectionService(mockContext);
+			const service = new TxtTestService(connectionService, mockExtensionUri, undefined, mockFetch);
+
+			await assert.rejects(() => service.setMotor(1, 100), /setMotor failed: HTTP 500 – motor jam/);
+		});
 	});
 
 	// ─── setOutput() ────────────────────────────────────────────────────────────
@@ -345,6 +371,14 @@ suite('TxtTestService Test Suite', () => {
 			const body = JSON.parse(init.body) as { output: number; level: number };
 			assert.strictEqual(body.level, 0);
 		});
+
+		test('should throw when POST /output returns non-ok status', async () => {
+			const mockFetch = makeMockFetch({ error: 'output blocked' }, false, 502);
+			const connectionService = new TxtConnectionService(mockContext);
+			const service = new TxtTestService(connectionService, mockExtensionUri, undefined, mockFetch);
+
+			await assert.rejects(() => service.setOutput(2, 512), /setOutput failed: HTTP 502 – output blocked/);
+		});
 	});
 
 	// ─── stopAll() ──────────────────────────────────────────────────────────────
@@ -367,30 +401,7 @@ suite('TxtTestService Test Suite', () => {
 		});
 
 		test('should use custom runtimePort from config', async () => {
-			// 覆蓋 runtimePort 為 9090
-			sandbox.restore();
-			sandbox = sinon.createSandbox();
-			mockSecrets = {
-				store: sandbox.stub().resolves(),
-				get: sandbox.stub().resolves('ftc'),
-				delete: sandbox.stub().resolves(),
-			};
-			mockContext = {
-				secrets: mockSecrets as unknown as vscode.SecretStorage,
-			} as unknown as vscode.ExtensionContext;
-
-			sandbox.stub(vscode.workspace, 'getConfiguration').returns({
-				get: (key: string, defaultValue?: unknown) => {
-					const overrides: Record<string, unknown> = {
-						'txt.host': '192.168.7.2',
-						'txt.username': 'ftc',
-						'txt.remotePath': '/tmp/singular_blockly/main.py',
-						'txt.runtimePort': 9090,
-					};
-					return key in overrides ? overrides[key] : defaultValue;
-				},
-				update: sandbox.stub().resolves(),
-			} as unknown as vscode.WorkspaceConfiguration);
+			configValues['txt.runtimePort'] = 9090;
 
 			const mockFetch = makeMockFetch({ ok: true });
 			const connectionService = new TxtConnectionService(mockContext);
@@ -400,6 +411,14 @@ suite('TxtTestService Test Suite', () => {
 
 			const [url] = (mockFetch as sinon.SinonStub).firstCall.args as [string];
 			assert.ok(url.includes(':9090/'), `URL should use custom port 9090, got: ${url}`);
+		});
+
+		test('should throw when POST /stop_all returns non-ok status', async () => {
+			const mockFetch = makeMockFetch({ error: 'stop failed' }, false, 503);
+			const connectionService = new TxtConnectionService(mockContext);
+			const service = new TxtTestService(connectionService, mockExtensionUri, undefined, mockFetch);
+
+			await assert.rejects(() => service.stopAll(), /stopAll failed: HTTP 503 – stop failed/);
 		});
 	});
 });

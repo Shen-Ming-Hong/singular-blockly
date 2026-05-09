@@ -13,6 +13,23 @@ import { TxtUploadProgress, TxtUploadResult, TxtUploadStage } from '../types/txt
 const WATCHDOG_TIMEOUT_MS = 3_600_000; // 1 hour — user programs run until Stop is pressed
 const REMOTE_DIR = '/tmp/singular_blockly';
 
+function quoteShellArg(value: string): string {
+	return `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
+function escapePkillPattern(value: string): string {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function getRemoteProgramPattern(remotePath: string): string {
+	return `python3[[:space:]]+${escapePkillPattern(remotePath)}`;
+}
+
+function getRemoteProgramDir(remotePath: string): string {
+	const remoteDir = path.posix.dirname(remotePath);
+	return remoteDir && remoteDir !== '.' ? remoteDir : REMOTE_DIR;
+}
+
 /**
  * SSH 執行結果介面（供測試注入使用）
  */
@@ -91,6 +108,8 @@ export class TxtUploader {
 
 		const config = this.txtConnectionService.loadConfig();
 		const password = await this.txtConnectionService.getPasswordOrDefault();
+		const remoteDir = getRemoteProgramDir(config.remotePath);
+		const remoteProgramPattern = getRemoteProgramPattern(config.remotePath);
 
 		// --- Stage: connecting ---
 		report('connecting', 10, `Connecting to ${config.host} as ${config.username}...`);
@@ -131,7 +150,9 @@ export class TxtUploader {
 			//    殘留的 main.py 佔用 ftrobopy 序列埠，新程式呼叫 ftrobopy('auto') 會失敗。
 			// 3. io_server.py（Test Panel 遺留）同樣可能佔用 ftrobopy 連線，一併清除。
 			// 任一程序被 kill 後等 1s，讓 ftrobopy 完成序列埠清理再繼續後續步驟。
-			await ssh.execCommand('if pkill -f main.py; then sleep 1; fi; if pkill -f io_server.py; then sleep 1; fi');
+			await ssh.execCommand(
+				`if pkill -f -- ${quoteShellArg(remoteProgramPattern)}; then sleep 1; fi; if pkill -f -- 'io_server\\.py'; then sleep 1; fi`
+			);
 
 			if (this.stopRequested) {
 				report('completed', 100, 'Program execution completed.');
@@ -143,7 +164,7 @@ export class TxtUploader {
 			report('uploading', 40, `Uploading program to ${config.remotePath}...`);
 
 			// 建立遠端目錄
-			await ssh.execCommand(`mkdir -p ${REMOTE_DIR}`);
+			await ssh.execCommand(`mkdir -p ${quoteShellArg(remoteDir)}`);
 
 			// 寫入臨時本地檔案然後 SCP 到遠端
 			const tmpLocalPath = path.join(
@@ -178,7 +199,7 @@ export class TxtUploader {
 			}, WATCHDOG_TIMEOUT_MS);
 
 			try {
-				const result = await ssh.execCommand(`python3 ${config.remotePath}`, {
+				const result = await ssh.execCommand(`python3 ${quoteShellArg(config.remotePath)}`, {
 					onStdout: (chunk: Buffer) => {
 						this.outputChannel.append(chunk.toString());
 					},
@@ -249,11 +270,12 @@ export class TxtUploader {
 		// 使用 getPasswordOrDefault() 確保不需使用者互動（預設密碼為 ftc）
 		const config = this.txtConnectionService.loadConfig();
 		const password = await this.txtConnectionService.getPasswordOrDefault();
+		const remoteProgramPattern = getRemoteProgramPattern(config.remotePath);
 
 		try {
 			const ssh = await this.sshClientFactory();
 			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 10000 });
-			await ssh.execCommand('pkill -f main.py || true');
+			await ssh.execCommand(`pkill -f -- ${quoteShellArg(remoteProgramPattern)} || true`);
 			ssh.dispose();
 			this.outputChannel.appendLine('[TXT] Program stopped.');
 		} catch (err) {

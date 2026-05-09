@@ -18,9 +18,16 @@ suite('TxtConnectionService Test Suite', () => {
 		get: sinon.SinonStub;
 		delete: sinon.SinonStub;
 	};
+	let configValues: Record<string, unknown>;
 
 	setup(() => {
 		sandbox = sinon.createSandbox();
+		configValues = {
+			'txt.host': '192.168.7.2',
+			'txt.username': 'ftc',
+			'txt.remotePath': '/tmp/singular_blockly/main.py',
+			'txt.runtimePort': 8080,
+		};
 
 		mockSecrets = {
 			store: sandbox.stub().resolves(),
@@ -37,13 +44,7 @@ suite('TxtConnectionService Test Suite', () => {
 		// Stub vscode.workspace.getConfiguration
 		sandbox.stub(vscode.workspace, 'getConfiguration').returns({
 			get: (key: string, defaultValue?: unknown) => {
-				const defaults: Record<string, unknown> = {
-					'txt.host': '192.168.7.2',
-					'txt.username': 'ftc',
-					'txt.remotePath': '/tmp/singular_blockly/main.py',
-					'txt.runtimePort': 8080,
-				};
-				return key in defaults ? defaults[key] : defaultValue;
+				return key in configValues ? configValues[key] : defaultValue;
 			},
 			update: mockConfigUpdate,
 		} as unknown as vscode.WorkspaceConfiguration);
@@ -206,6 +207,42 @@ suite('TxtConnectionService Test Suite', () => {
 			const result = await service.testConnection();
 
 			assert.strictEqual(result.success, false);
+		});
+
+		test('should use non-interactive sudo when auto-configuring SSH password', async () => {
+			const mockSsh: SshClientInterface = {
+				connect: sandbox.stub().resolves(),
+				execCommand: sandbox.stub()
+					.onFirstCall().resolves({ stdout: 'ok', stderr: '', code: 0 })
+					.onSecondCall().resolves({ stdout: 'ftc::19000:0:99999:7:::\n', stderr: '', code: 0 })
+					.onThirdCall().resolves({ stdout: 'passwd updated', stderr: '', code: 0 }),
+				dispose: sandbox.stub(),
+			};
+
+			const service = new TxtConnectionService(mockContext, () => Promise.resolve(mockSsh));
+			const result = await service.testConnection({ password: 'pw', passwordMode: 'custom' });
+
+			assert.strictEqual(result.success, true);
+			assert.strictEqual(result.sshSetupDone, true);
+			assert.strictEqual((mockSsh.execCommand as sinon.SinonStub).secondCall.args[0], 'sudo -n cat /etc/shadow');
+			assert.ok(((mockSsh.execCommand as sinon.SinonStub).thirdCall.args[0] as string).includes('sudo -n passwd ftc'));
+		});
+
+		test('should skip SSH auto-setup when non-interactive sudo is unavailable', async () => {
+			const mockSsh: SshClientInterface = {
+				connect: sandbox.stub().resolves(),
+				execCommand: sandbox.stub()
+					.onFirstCall().resolves({ stdout: 'ok', stderr: '', code: 0 })
+					.onSecondCall().resolves({ stdout: '', stderr: 'sudo: a password is required', code: 1 }),
+				dispose: sandbox.stub(),
+			};
+
+			const service = new TxtConnectionService(mockContext, () => Promise.resolve(mockSsh));
+			const result = await service.testConnection();
+
+			assert.strictEqual(result.success, true);
+			assert.strictEqual(result.sshSetupDone, false);
+			assert.strictEqual((mockSsh.execCommand as sinon.SinonStub).secondCall.args[0], 'sudo -n cat /etc/shadow');
 		});
 	});
 

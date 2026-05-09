@@ -13,6 +13,19 @@ const RUNTIME_REMOTE_DIR = '/tmp/singular_blockly';
 const RUNTIME_REMOTE_FILENAME = 'io_server.py';
 const RUNTIME_REMOTE_PATH = `${RUNTIME_REMOTE_DIR}/${RUNTIME_REMOTE_FILENAME}`;
 
+function quoteShellArg(value: string): string {
+	return `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
+function escapePkillPattern(value: string): string {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildUserProgramStopCommand(remotePath: string): string {
+	const remoteProgramPattern = `python3[[:space:]]+${escapePkillPattern(remotePath)}`;
+	return `pkill -f -- ${quoteShellArg(remoteProgramPattern)} || true`;
+}
+
 /**
  * SSH 客戶端介面（供 TxtTestService 注入測試使用）
  */
@@ -85,6 +98,24 @@ export class TxtTestService {
 		return `http://${config.host}:${config.runtimePort}`;
 	}
 
+	private async ensureResponseOk(response: JsonResponse, action: string): Promise<void> {
+		if (response.ok) {
+			return;
+		}
+
+		const body = (await response.json().catch(() => ({}))) as { error?: string };
+		throw new Error(`${action} failed: HTTP ${response.status}${body.error ? ' – ' + body.error : ''}`);
+	}
+
+	private async postJson(endpoint: string, body: Record<string, unknown>, action: string): Promise<void> {
+		const response = await this.fetchFn(`${this.baseUrl()}${endpoint}`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+		});
+		await this.ensureResponseOk(response, action);
+	}
+
 	/**
 	 * 透過 SSH 上傳 io_server.py 到 TXT，並設定執行權限
 	 */
@@ -97,9 +128,9 @@ export class TxtTestService {
 		const ssh = await this.sshClientFactory();
 		try {
 			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 30000 });
-			await ssh.execCommand(`mkdir -p ${RUNTIME_REMOTE_DIR}`);
+			await ssh.execCommand(`mkdir -p ${quoteShellArg(RUNTIME_REMOTE_DIR)}`);
 			await ssh.putFile(localPath, RUNTIME_REMOTE_PATH);
-			await ssh.execCommand(`chmod +x ${RUNTIME_REMOTE_PATH}`);
+			await ssh.execCommand(`chmod +x ${quoteShellArg(RUNTIME_REMOTE_PATH)}`);
 			log('[TxtTestService] installRuntime: completed', 'info');
 		} finally {
 			ssh.dispose();
@@ -118,13 +149,15 @@ export class TxtTestService {
 		const ssh = await this.sshClientFactory();
 		try {
 			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 30000 });
-			await ssh.execCommand(`mkdir -p ${RUNTIME_REMOTE_DIR}`);
+			await ssh.execCommand(`mkdir -p ${quoteShellArg(RUNTIME_REMOTE_DIR)}`);
 			await ssh.putFile(localPath, RUNTIME_REMOTE_PATH);
-			await ssh.execCommand(`chmod +x ${RUNTIME_REMOTE_PATH}`);
+			await ssh.execCommand(`chmod +x ${quoteShellArg(RUNTIME_REMOTE_PATH)}`);
 			// 先停掉用戶程式和舊的 io_server 實例，確保 ftrobopy 連線可用
-			await ssh.execCommand('pkill -f main.py || true; pkill -f io_server.py || true; sleep 1');
+			await ssh.execCommand(`${buildUserProgramStopCommand(config.remotePath)}; pkill -f -- 'io_server\\.py' || true; sleep 1`);
 			// nohup 後接 sleep 3，讓 execCommand 等待 Python 真正進入 serve_forever() 再返回
-			await ssh.execCommand(`nohup python3 ${RUNTIME_REMOTE_PATH} ${config.runtimePort} > ${RUNTIME_REMOTE_DIR}/io_server.log 2>&1 & sleep 3`);
+			await ssh.execCommand(
+				`nohup python3 ${quoteShellArg(RUNTIME_REMOTE_PATH)} ${config.runtimePort} > ${quoteShellArg(`${RUNTIME_REMOTE_DIR}/io_server.log`)} 2>&1 & sleep 3`
+			);
 			log('[TxtTestService] installAndStartServer: completed', 'info');
 		} finally {
 			ssh.dispose();
@@ -143,9 +176,11 @@ export class TxtTestService {
 		try {
 			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 30000 });
 			// pkill 先停掉舊的實例，再用 nohup 確保 SSH 斷線後程序持續執行
-			await ssh.execCommand('pkill -f main.py || true; pkill -f io_server.py || true; sleep 1');
+			await ssh.execCommand(`${buildUserProgramStopCommand(config.remotePath)}; pkill -f -- 'io_server\\.py' || true; sleep 1`);
 			// nohup 後接 sleep 3，讓 execCommand 等待 Python 真正進入 serve_forever() 再返回
-			await ssh.execCommand(`nohup python3 ${RUNTIME_REMOTE_PATH} ${config.runtimePort} > ${RUNTIME_REMOTE_DIR}/io_server.log 2>&1 & sleep 3`);
+			await ssh.execCommand(
+				`nohup python3 ${quoteShellArg(RUNTIME_REMOTE_PATH)} ${config.runtimePort} > ${quoteShellArg(`${RUNTIME_REMOTE_DIR}/io_server.log`)} 2>&1 & sleep 3`
+			);
 			log('[TxtTestService] startServer: io_server.py started', 'info');
 		} finally {
 			ssh.dispose();
@@ -163,7 +198,7 @@ export class TxtTestService {
 		const ssh = await this.sshClientFactory();
 		try {
 			await ssh.connect({ host: config.host, username: config.username, password, readyTimeout: 30000 });
-			await ssh.execCommand('pkill -f io_server.py');
+			await ssh.execCommand("pkill -f -- 'io_server\\.py' || true");
 			log('[TxtTestService] stopServer: stopped', 'info');
 		} finally {
 			ssh.dispose();
@@ -176,9 +211,7 @@ export class TxtTestService {
 	async pollIo(): Promise<TxtIoSnapshot> {
 		const url = `${this.baseUrl()}/io`;
 		const response = await this.fetchFn(url);
-		if (!response.ok) {
-			throw new Error(`pollIo failed: HTTP ${response.status}`);
-		}
+		await this.ensureResponseOk(response, 'pollIo');
 		return response.json() as Promise<TxtIoSnapshot>;
 	}
 
@@ -188,11 +221,7 @@ export class TxtTestService {
 	 * @param speed 速度 -512~512
 	 */
 	async setMotor(motor: number, speed: number): Promise<void> {
-		await this.fetchFn(`${this.baseUrl()}/motor`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ motor, speed }),
-		});
+		await this.postJson('/motor', { motor, speed }, 'setMotor');
 	}
 
 	/**
@@ -201,22 +230,14 @@ export class TxtTestService {
 	 * @param level 0=關閉, 512=最大輸出
 	 */
 	async setOutput(output: number, level: number): Promise<void> {
-		await this.fetchFn(`${this.baseUrl()}/output`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ output, level }),
-		});
+		await this.postJson('/output', { output, level }, 'setOutput');
 	}
 
 	/**
 	 * 停止所有馬達與輸出（HTTP POST /stop_all）
 	 */
 	async stopAll(): Promise<void> {
-		await this.fetchFn(`${this.baseUrl()}/stop_all`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({}),
-		});
+		await this.postJson('/stop_all', {}, 'stopAll');
 	}
 
 	/**
@@ -224,14 +245,6 @@ export class TxtTestService {
 	 * @param sensorTypes 長度 8 的陣列，每個元素為 'BUTTON'、'GATE'、'SWITCH' 或 'ULTRASONIC'
 	 */
 	async configureSensors(sensorTypes: string[]): Promise<void> {
-		const response = await this.fetchFn(`${this.baseUrl()}/sensor_config`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ sensors: sensorTypes }),
-		});
-		if (!response.ok) {
-			const body = (await response.json().catch(() => ({}))) as { error?: string };
-			throw new Error(`configureSensors failed: HTTP ${response.status}${body.error ? ' – ' + body.error : ''}`);
-		}
+		await this.postJson('/sensor_config', { sensors: sensorTypes }, 'configureSensors');
 	}
 }

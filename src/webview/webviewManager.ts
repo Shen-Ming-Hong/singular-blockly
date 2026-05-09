@@ -791,6 +791,24 @@ export class WebViewManager {
 		return this.panel;
 	}
 
+	async stopTxtExecutionFromExtension(): Promise<boolean> {
+		if (!this.panel || !this.messageHandler) {
+			return false;
+		}
+
+		await this.messageHandler.stopTxtExecutionFromExtension();
+		return true;
+	}
+
+	async installTxtRuntimeFromExtension(): Promise<boolean> {
+		if (!this.panel || !this.messageHandler) {
+			return false;
+		}
+
+		await this.messageHandler.installTxtRuntimeFromExtension();
+		return true;
+	}
+
 	/**
 	 * 預覽備份內容
 	 * @param backupPath 備份檔案的完整路徑

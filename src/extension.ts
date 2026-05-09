@@ -356,18 +356,28 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 		}
 	});
 
-	const stopTxtExecutionCommand = vscodeApi.commands.registerCommand('singular-blockly.stopTxtExecution', () => {
-		if (webViewManager && webViewManager.isPanelCreated()) {
-			const panel = webViewManager.getPanel();
-			panel?.webview.postMessage({ command: 'txtStopExecution' });
+	const stopTxtExecutionCommand = vscodeApi.commands.registerCommand('singular-blockly.stopTxtExecution', async () => {
+		if (!webViewManager || !webViewManager.isPanelCreated()) {
+			return;
+		}
+
+		try {
+			await webViewManager.stopTxtExecutionFromExtension();
+		} catch (error) {
+			log('Error stopping TXT execution:', 'error', error);
 		}
 	});
 
 	// TXT Test Panel 命令
-	const installTxtRuntimeCommand = vscodeApi.commands.registerCommand('singular-blockly.txt.installRuntime', () => {
-		if (webViewManager && webViewManager.isPanelCreated()) {
-			const panel = webViewManager.getPanel();
-			panel?.webview.postMessage({ command: 'txtInstallRuntime' });
+	const installTxtRuntimeCommand = vscodeApi.commands.registerCommand('singular-blockly.txt.installRuntime', async () => {
+		if (!webViewManager || !webViewManager.isPanelCreated()) {
+			return;
+		}
+
+		try {
+			await webViewManager.installTxtRuntimeFromExtension();
+		} catch (error) {
+			log('Error installing TXT runtime:', 'error', error);
 		}
 	});
 

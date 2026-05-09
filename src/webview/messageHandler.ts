@@ -304,6 +304,24 @@ export class WebViewMessageHandler {
 		}
 	}
 
+	async stopTxtExecutionFromExtension(): Promise<void> {
+		if (!this.txtUploader) {
+			log('TxtUploader not initialized', 'warn');
+			throw new Error('TxtUploader not initialized');
+		}
+
+		await this.handleTxtStopExecution();
+	}
+
+	async installTxtRuntimeFromExtension(): Promise<void> {
+		if (!this.txtTestService) {
+			log('TxtTestService not initialized', 'warn');
+			throw new Error('TxtTestService not initialized');
+		}
+
+		await this.txtTestService.installRuntime();
+	}
+
 	/**
 	 * 處理日誌訊息
 	 * @param message 日誌訊息物件

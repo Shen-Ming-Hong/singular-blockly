@@ -13,6 +13,10 @@ const SECRET_KEY = 'singular-blockly.txt.password';
 /** ftCommunity 韌體預設 SSH 密碼，讓小朋友插上 USB 不需設定即可連線 */
 const DEFAULT_TXT_PASSWORD = 'ftc';
 
+function quoteShellArg(value: string): string {
+	return `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
 /**
  * SSH 客戶端介面（用於依賴注入測試）
  */
@@ -171,14 +175,29 @@ export class TxtConnectionService {
 
 			// 檢查 ftc 是否已設定密碼；若無則自動設定，以繞過 TXT 觸控螢幕確認流程
 			let sshSetupDone = false;
-			const shadowResult = await ssh.execCommand('sudo cat /etc/shadow');
-			const ftcLine = shadowResult.stdout.split('\n').find(line => line.startsWith('ftc:'));
-			if (ftcLine && !ftcLine.split(':')[1]) {
-				// 使用 printf 傳入密碼兩次（確認密碼），單引號內的單引號以 '\'' 跳脫
-				const escaped = password.replace(/'/g, "'\\''");
-				await ssh.execCommand(`printf '${escaped}\\n${escaped}\\n' | sudo passwd ftc`);
-				sshSetupDone = true;
-				log('TXT: SSH password set to bypass touchscreen confirmation', 'info');
+			const shadowResult = await ssh.execCommand('sudo -n cat /etc/shadow');
+			if (shadowResult.code === 0) {
+				const ftcLine = shadowResult.stdout.split('\n').find(line => line.startsWith('ftc:'));
+				if (ftcLine && !ftcLine.split(':')[1]) {
+					const quotedPassword = quoteShellArg(password);
+					const passwdResult = await ssh.execCommand(
+						`printf '%s\\n%s\\n' ${quotedPassword} ${quotedPassword} | sudo -n passwd ftc`
+					);
+					if (passwdResult.code === 0) {
+						sshSetupDone = true;
+						log('TXT: SSH password set to bypass touchscreen confirmation', 'info');
+					} else {
+						log('TXT: failed to set SSH password in non-interactive mode', 'warn', {
+							code: passwdResult.code,
+							stderr: passwdResult.stderr,
+						});
+					}
+				}
+			} else {
+				log('TXT: automatic SSH password setup skipped because sudo -n is unavailable', 'warn', {
+					code: shadowResult.code,
+					stderr: shadowResult.stderr,
+				});
 			}
 
 			log(`TXT connection test: success${sshSetupDone ? ' (SSH setup done)' : ''}`, 'info');
