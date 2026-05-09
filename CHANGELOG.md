@@ -8,6 +8,32 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.73.0] - 2026-05-09
+
+### ✨ 新功能 New Features
+
+- **TXT 多流程控制器工作流** (TXT multi-flow controller workflow)
+    - 以 `txt_setup` + 多個 `txt_process` 取代公開的單一 `txt_main` 作者模型，讓 Blockly 以更接近 ROBO Pro 的多流程方式組裝 TXT 程式
+      Replaced the public single-entry `txt_main` authoring model with `txt_setup` + multiple `txt_process` blocks, enabling a more ROBO Pro-like multi-flow TXT programming experience in Blockly
+    - 新增 TXT 積木、生成器、工具箱與 15 語系文案，支援 `txt_motor_speed`、`txt_motor_stop`、`txt_output`、`txt_input_sensor`、`txt_wait`、`txt_stop_all` 等多流程控制場景
+      Added TXT blocks, generators, toolbox entries, and 15-locale messages for multi-flow control scenarios including `txt_motor_speed`, `txt_motor_stop`, `txt_output`, `txt_input_sensor`, `txt_wait`, and `txt_stop_all`
+    - 產生器改為共享單一 `ftrobopy.ftrobopy('auto')` 連線，依流程名稱輸出獨立函式與主迴圈排程，`txt_wait` 使用 wall-clock `time.sleep(...)`
+      The generator now shares a single `ftrobopy.ftrobopy('auto')` connection, emits per-process functions with main-loop scheduling, and uses wall-clock `time.sleep(...)` for `txt_wait`
+    - 新增 TXT 連線、上傳與 Test Panel 服務，以及對應的單元測試與 contract tests，支援從 extension 端安裝 runtime、停止執行與控制遠端 I/O
+      Added TXT connection, upload, and Test Panel services plus corresponding unit/contract tests, enabling runtime installation, stop execution, and remote I/O control from the extension side
+
+### 🐛 修復 Bug Fixes
+
+- **TXT runtime 與封裝可靠性修正** (TXT runtime and packaging reliability fixes)
+    - `txt.remotePath` 現在一致用於上傳、執行、停止與 runtime server 啟停，避免硬編碼 `main.py` 導致錯誤目錄或錯殺程序
+      `txt.remotePath` is now used consistently for upload, execution, stopping, and runtime-server lifecycle, avoiding hardcoded `main.py` assumptions that could target the wrong path or process
+    - TXT extension commands 直接路由到 `WebViewManager` / `WebViewMessageHandler`，不再依賴 WebView 先送回訊息才能執行
+      TXT extension commands now route directly through `WebViewManager` / `WebViewMessageHandler` instead of depending on a round-trip message from the WebView first
+    - HTTP Test Panel mutation API 失敗時會檢查 `response.ok` 並拋出錯誤；`sudo` 探測改為 `sudo -n`，避免互動式密碼提示造成流程卡住
+      HTTP Test Panel mutation APIs now enforce `response.ok`, and sudo probing uses `sudo -n` to avoid hangs caused by interactive password prompts
+    - VSIX 打包明確保留 `node-ssh` 與執行期依賴，同時排除 `extension_test`、`test-results`、`RC_FM` 與 `temp_toolbox_*` 等非發佈檔案
+      VSIX packaging now explicitly preserves `node-ssh` and runtime dependencies while excluding non-release artifacts such as `extension_test`, `test-results`, `RC_FM`, and `temp_toolbox_*`
+
 ## [0.72.3] - 2026-04-20
 
 ### 🔒 安全性修復 Security Fixes
