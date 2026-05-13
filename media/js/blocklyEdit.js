@@ -4426,15 +4426,15 @@ function setUploadButtonState(state) {
 			uploadState.isUploading = true;
 			uploadState.txtRunning = false;
 			uploadButton.disabled = true;
-				uploadButton.classList.remove('txt-mode', 'txt-running', 'txt-uploading');
+			uploadButton.classList.remove('txt-mode', 'txt-running', 'txt-uploading');
 			break;
 		case 'txt-uploading':
-			// TXT 模式：連線/上傳中（顯示上傳箭頭旋轉，停用按鈕）
+			// TXT 模式：連線/上傳中（顯示上傳箭頭，停用按鈕，不播放旋轉動畫）
 			uploadState.isUploading = true;
 			uploadState.txtRunning = false;
 			uploadButton.disabled = true;
 			uploadButton.classList.add('txt-uploading');
-				uploadButton.classList.remove('spinning', 'txt-mode', 'txt-running');
+			uploadButton.classList.remove('spinning', 'txt-mode', 'txt-running');
 			break;
 		case 'txt-running':
 			// TXT 模式：程式執行中（顯示停止圖示，啟用按鈕）
@@ -4442,7 +4442,7 @@ function setUploadButtonState(state) {
 			uploadState.txtRunning = true;
 			uploadButton.disabled = false;
 			uploadButton.classList.add('txt-running');
-				uploadButton.classList.remove('spinning', 'txt-mode', 'txt-uploading');
+			uploadButton.classList.remove('spinning', 'txt-mode', 'txt-uploading');
 			uploadButton.title =
 				window.languageManager?.getMessage('TXT_STOP_PROGRAM_TITLE', 'Stop Program') || 'Stop Program';
 			break;
@@ -4452,7 +4452,7 @@ function setUploadButtonState(state) {
 			uploadState.txtRunning = false;
 			uploadButton.disabled = false;
 			uploadButton.classList.add('txt-mode');
-				uploadButton.classList.remove('spinning', 'txt-running', 'txt-uploading');
+			uploadButton.classList.remove('spinning', 'txt-running', 'txt-uploading');
 			uploadButton.title =
 				window.languageManager?.getMessage('UPLOAD_BUTTON_TITLE_TXT', 'Run on TXT Controller') ||
 				'Run on TXT Controller';

@@ -104,7 +104,8 @@ function renderError() {
 	setButtonsDisabled(false, true);
 	elements.stateSurface.classList.remove('hidden');
 	elements.loadingSpinner.classList.add('hidden');
-	elements.contentRoot.classList.add('hidden');	elements.stateTitle.textContent = state.strings.errorTitle;
+	elements.contentRoot.classList.add('hidden');
+	elements.stateTitle.textContent = state.strings.errorTitle;
 	elements.stateDescription.textContent = state.panelState?.topLevelError || state.strings.copyUnavailableMessage;
 }
 
@@ -155,14 +156,8 @@ function renderToolCard(item) {
 		: item.isFromDetectedPenv
 			? state.strings.fromDetectedPenvYes
 			: state.strings.fromDetectedPenvNo;
-	const nextStepBlock = item.nextStep
-		? `
-			<div class="detail-block">
-				<dt>${escapeHtml(state.strings.nextStepLabel)}</dt>
-				<dd>${escapeHtml(item.nextStep)}</dd>
-			</div>
-		`
-		: '';
+	const nextStepBlock = item.nextStep ? renderDetailBlock(state.strings.nextStepLabel, item.nextStep) : '';
+	const reasonBlock = renderDetailBlock(state.strings.reasonLabel, item.reason);
 
 	return `
 		<article class="tool-card">
@@ -191,12 +186,18 @@ function renderToolCard(item) {
 					<dd>${escapeHtml(fromDetectedPenv)}</dd>
 				</div>
 			</dl>
-			<div class="detail-block">
-				<dt>${escapeHtml(state.strings.reasonLabel)}</dt>
-				<dd>${escapeHtml(item.reason)}</dd>
-			</div>
+			${reasonBlock}
 			${nextStepBlock}
 		</article>
+	`;
+}
+
+function renderDetailBlock(label, value) {
+	return `
+		<div class="detail-block">
+			<p class="detail-label">${escapeHtml(label)}</p>
+			<p class="detail-value">${escapeHtml(value)}</p>
+		</div>
 	`;
 }
 

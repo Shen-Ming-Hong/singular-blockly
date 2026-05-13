@@ -56,6 +56,16 @@ interface ResolvedDiagnosticTarget {
 	isFromDetectedPenv: boolean | null;
 }
 
+type PenvRootStatus = 'unresolved' | 'missing' | 'invalid' | 'valid';
+
+interface PenvRootResolution {
+	candidatePath: string | null;
+	resolvedPath: string | null;
+	source: DiagnosticSource;
+	exists: boolean;
+	status: PenvRootStatus;
+}
+
 type MessageDefinitionRecord<TKey extends string> = Record<TKey, [messageKey: string, fallback: string]>;
 
 const DEFAULT_ACTIONS: PanelActionId[] = ['retest', 'copySummary'];
@@ -172,16 +182,16 @@ export class PlatformioDiagnosticService {
 		const searchDirectories = getExecutableSearchDirectories(this.env, this.platform);
 		const pioResolution = this.resolvePio(searchDirectories);
 		const pioDirectory = getExecutableDirectory(pioResolution.resolvedPath);
-		const penvRootPath = pioDirectory ? path.dirname(pioDirectory) : null;
-		const penvResolution = this.resolvePenvRoot(penvRootPath, !!pioResolution.resolvedPath);
+		const penvResolution = this.resolvePenvRoot(pioResolution.resolvedPath);
+		const validatedPenvRootPath = penvResolution.status === 'valid' ? penvResolution.resolvedPath : null;
 		const toolSearchDirectories = unique([pioDirectory, ...searchDirectories]);
 
 		const pioItem = await this.buildExecutableItem('pio', pioResolution, ['--version']);
 		const penvRootItem = await this.buildPenvRootItem(penvResolution, pioResolution.resolvedPath);
 		const [pythonItem, pipItem, mpremoteItem] = await Promise.all([
-			this.buildToolItem('python', ['python3', 'python'], ['--version'], toolSearchDirectories, penvRootPath),
-			this.buildToolItem('pip', ['pip3', 'pip'], ['--version'], toolSearchDirectories, penvRootPath),
-			this.buildToolItem('mpremote', ['mpremote'], ['version'], toolSearchDirectories, penvRootPath),
+			this.buildToolItem('python', ['python3', 'python'], ['--version'], toolSearchDirectories, validatedPenvRootPath),
+			this.buildToolItem('pip', ['pip3', 'pip'], ['--version'], toolSearchDirectories, validatedPenvRootPath),
+			this.buildToolItem('mpremote', ['mpremote'], ['version'], toolSearchDirectories, validatedPenvRootPath),
 		]);
 
 		const items: PlatformioDiagnosticSession['items'] = [pioItem, penvRootItem, pythonItem, pipItem, mpremoteItem];
@@ -289,41 +299,57 @@ export class PlatformioDiagnosticService {
 		};
 	}
 
-	private resolvePenvRoot(penvRootPath: string | null, hasResolvedPio: boolean): ResolvedDiagnosticTarget {
-		if (!penvRootPath) {
+	private resolvePenvRoot(resolvedPioPath: string | null): PenvRootResolution {
+		const pioDirectory = getExecutableDirectory(resolvedPioPath);
+		if (!resolvedPioPath || !pioDirectory) {
 			return {
+				candidatePath: null,
 				resolvedPath: null,
 				source: 'unresolved',
 				exists: false,
-				isFromDetectedPenv: null,
+				status: 'unresolved',
+			};
+		}
+
+		const candidatePath = path.dirname(pioDirectory);
+		const exists = this.existsSync(candidatePath);
+		if (!exists) {
+			return {
+				candidatePath,
+				resolvedPath: null,
+				source: 'resolved-pio-sibling',
+				exists: false,
+				status: 'missing',
+			};
+		}
+
+		if (!this.isValidatedPenvRoot(candidatePath, resolvedPioPath)) {
+			return {
+				candidatePath,
+				resolvedPath: null,
+				source: 'resolved-pio-sibling',
+				exists: true,
+				status: 'invalid',
 			};
 		}
 
 		return {
-			resolvedPath: penvRootPath,
-			source: hasResolvedPio ? 'resolved-pio-sibling' : 'unresolved',
-			exists: this.existsSync(penvRootPath),
-			isFromDetectedPenv: null,
+			candidatePath,
+			resolvedPath: candidatePath,
+			source: 'resolved-pio-sibling',
+			exists: true,
+			status: 'valid',
 		};
 	}
 
 	private async buildPenvRootItem(
-		resolution: ResolvedDiagnosticTarget,
+		resolution: PenvRootResolution,
 		resolvedPioPath: string | null
 	): Promise<PlatformioDiagnosticItem> {
 		const toolLabel = await this.getToolLabel('penvRoot');
-		const unresolvedReason = resolvedPioPath
-			? await this.message(
-				'PLATFORMIO_DIAGNOSTIC_REASON_PENV_MISSING',
-				'A penv root was derived from the resolved pio path, but the directory does not exist: {0}',
-				resolution.resolvedPath ?? ''
-			)
-			: await this.message(
-				'PLATFORMIO_DIAGNOSTIC_REASON_PENV_UNRESOLVED',
-				'No penv root could be derived because the PlatformIO CLI path is not resolved yet.'
-			);
+		const displayPath = resolution.resolvedPath ?? resolution.candidatePath;
 
-		if (!resolution.resolvedPath) {
+		if (!resolvedPioPath || resolution.status === 'unresolved') {
 			return {
 				id: 'penvRoot',
 				kind: 'derived-directory',
@@ -332,7 +358,10 @@ export class PlatformioDiagnosticService {
 				source: 'unresolved',
 				exists: false,
 				isFromDetectedPenv: null,
-				reason: unresolvedReason,
+				reason: await this.message(
+				'PLATFORMIO_DIAGNOSTIC_REASON_PENV_UNRESOLVED',
+				'No penv root could be derived because the PlatformIO CLI path is not resolved yet.'
+				),
 				nextStep: await this.message(
 					'PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PLATFORMIO_INSTALL',
 					'Confirm PlatformIO CLI is installed and reachable from the VS Code extension runtime, then run diagnostics again.'
@@ -340,16 +369,41 @@ export class PlatformioDiagnosticService {
 			};
 		}
 
-		if (!resolution.exists) {
+		if (resolution.status === 'missing') {
 			return {
 				id: 'penvRoot',
 				kind: 'derived-directory',
 				status: 'warning',
-				resolvedPath: resolution.resolvedPath,
+				resolvedPath: displayPath,
 				source: resolution.source,
 				exists: false,
 				isFromDetectedPenv: null,
-				reason: unresolvedReason,
+				reason: await this.message(
+					'PLATFORMIO_DIAGNOSTIC_REASON_PENV_MISSING',
+					'A penv root was derived from the resolved pio path, but the directory does not exist: {0}',
+					displayPath ?? ''
+				),
+				nextStep: await this.message(
+					'PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PENV_LAYOUT',
+					'Check whether the detected PlatformIO penv directory layout is intact, then run diagnostics again.'
+				),
+			};
+		}
+
+		if (resolution.status === 'invalid') {
+			return {
+				id: 'penvRoot',
+				kind: 'derived-directory',
+				status: 'warning',
+				resolvedPath: displayPath,
+				source: resolution.source,
+				exists: true,
+				isFromDetectedPenv: null,
+				reason: await this.message(
+					'PLATFORMIO_DIAGNOSTIC_REASON_PENV_INVALID_LAYOUT',
+					'A sibling directory was derived from the resolved pio path, but it does not look like a PlatformIO penv root: {0}',
+					displayPath ?? ''
+				),
 				nextStep: await this.message(
 					'PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PENV_LAYOUT',
 					'Check whether the detected PlatformIO penv directory layout is intact, then run diagnostics again.'
@@ -437,7 +491,7 @@ export class PlatformioDiagnosticService {
 				resolvedPath: null,
 				source: 'unresolved',
 				exists: false,
-				isFromDetectedPenv: penvScriptsDirectory ? false : null,
+				isFromDetectedPenv: false,
 			},
 			probeArgs
 		);
@@ -569,6 +623,22 @@ export class PlatformioDiagnosticService {
 
 	private getPenvScriptsDirectory(penvRootPath: string): string {
 		return this.platform === 'win32' ? path.join(penvRootPath, 'Scripts') : path.join(penvRootPath, 'bin');
+	}
+
+	private isValidatedPenvRoot(penvRootPath: string, resolvedPioPath: string): boolean {
+		if (path.basename(penvRootPath).toLowerCase() !== 'penv') {
+			return false;
+		}
+
+		const scriptsDirectory = this.getPenvScriptsDirectory(penvRootPath);
+		const expectedPioName = this.platform === 'win32' ? 'pio.exe' : 'pio';
+		const pythonCandidates = this.platform === 'win32' ? ['python.exe'] : ['python3', 'python'];
+
+		return (
+			this.isPathWithin(resolvedPioPath, scriptsDirectory) &&
+			this.existsSync(path.join(scriptsDirectory, expectedPioName)) &&
+			pythonCandidates.some(executableName => this.existsSync(path.join(scriptsDirectory, executableName)))
+		);
 	}
 
 	private getDefaultExecutableName(id: Exclude<DiagnosticItemId, 'penvRoot'>): 'pio' | 'python' | 'pip' | 'mpremote' {

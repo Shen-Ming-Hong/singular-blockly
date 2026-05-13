@@ -135,7 +135,7 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 				await this.postCurrentState();
 				return;
 			case 'platformioDiagnostic:retest':
-				void this.runDiagnostics(true);
+				void this.runDiagnostics();
 				return;
 			case 'platformioDiagnostic:copySummary':
 				await this.copySummary();
@@ -145,7 +145,7 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		}
 	}
 
-	private async runDiagnostics(force = false): Promise<void> {
+	private async runDiagnostics(): Promise<void> {
 		if (this.runningDiagnostics) {
 			return this.runningDiagnostics;
 		}

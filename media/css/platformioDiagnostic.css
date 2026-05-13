@@ -267,7 +267,7 @@ body {
 
 .summary-grid dt,
 .detail-grid dt,
-.detail-block dt {
+.detail-label {
 	font-size: 12px;
 	text-transform: uppercase;
 	letter-spacing: 0.06em;
@@ -277,10 +277,17 @@ body {
 
 .summary-grid dd,
 .detail-grid dd,
-.detail-block dd {
+.detail-value {
 	margin: 0;
 	line-height: 1.6;
 	word-break: break-word;
+}
+
+.detail-label,
+.detail-value {
+	margin-top: 0;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .tool-list {

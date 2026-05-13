@@ -43,13 +43,13 @@ suite('PlatformioDiagnosticService Tests', () => {
 	});
 
 	test('returns fixed item order and resolves tools via PATH fallback', async () => {
-		const pathEntries = ['/custom/bin'];
+		const pathEntries = ['/custom/penv/bin'];
 		const availablePaths = new Set([
-			'/custom/bin/pio',
-			'/custom',
-			'/custom/bin/python3',
-			'/custom/bin/pip3',
-			'/custom/bin/mpremote',
+			'/custom/penv/bin/pio',
+			'/custom/penv',
+			'/custom/penv/bin/python3',
+			'/custom/penv/bin/pip3',
+			'/custom/penv/bin/mpremote',
 		]);
 
 		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
@@ -76,13 +76,49 @@ suite('PlatformioDiagnosticService Tests', () => {
 		);
 		assert.strictEqual(session.requestedAt, now.toISOString());
 		assert.strictEqual(session.overallStatus, 'operational');
-		assert.strictEqual(session.items[0].resolvedPath, '/custom/bin/pio');
+		assert.strictEqual(session.items[0].resolvedPath, '/custom/penv/bin/pio');
 		assert.strictEqual(session.items[0].source, 'path-search');
-		assert.strictEqual(session.items[1].resolvedPath, '/custom');
+		assert.strictEqual(session.items[1].resolvedPath, '/custom/penv');
 		assert.strictEqual(session.items[1].source, 'resolved-pio-sibling');
 		assert.strictEqual(session.items[2].source, 'derived-from-penv');
+		assert.strictEqual(session.items[2].isFromDetectedPenv, true);
 		assert.strictEqual(session.items[4].status, 'ok');
 		assert.strictEqual(execFileStub.callCount, 4, 'Should probe the four executable items');
+	});
+
+	test('does not treat a generic PATH pio location as a detected penv', async () => {
+		const availablePaths = new Set([
+			'/usr/local/bin/pio',
+			'/usr/local',
+			'/usr/local/bin/python3',
+			'/usr/local/bin/pip3',
+			'/usr/local/bin/mpremote',
+		]);
+
+		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
+		execFileStub.callsFake(async (filePath: string) => {
+			return { stdout: `${filePath} version`, stderr: '' };
+		});
+
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub,
+			execFile: execFileStub,
+			env: { PATH: '/usr/local/bin' },
+			platform: 'darwin',
+			homeDir: '/Users/tester',
+			now: () => now,
+			localeService,
+		});
+
+		const session = await service.collectDiagnostics('/workspace/demo');
+
+		assert.strictEqual(session.overallStatus, 'degraded');
+		assert.strictEqual(session.items[1].status, 'warning');
+		assert.strictEqual(session.items[1].resolvedPath, '/usr/local');
+		assert.strictEqual(session.items[2].source, 'path-search');
+		assert.strictEqual(session.items[2].isFromDetectedPenv, false);
+		assert.strictEqual(session.items[3].isFromDetectedPenv, false);
+		assert.strictEqual(session.items[4].isFromDetectedPenv, false);
 	});
 
 	test('reports unavailable when pio cannot be resolved', async () => {
@@ -108,11 +144,11 @@ suite('PlatformioDiagnosticService Tests', () => {
 
 	test('marks session degraded when a resolved executable fails its version probe', async () => {
 		const availablePaths = new Set([
-			'/custom/bin/pio',
-			'/custom',
-			'/custom/bin/python3',
-			'/custom/bin/pip3',
-			'/custom/bin/mpremote',
+			'/custom/penv/bin/pio',
+			'/custom/penv',
+			'/custom/penv/bin/python3',
+			'/custom/penv/bin/pip3',
+			'/custom/penv/bin/mpremote',
 		]);
 
 		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
@@ -128,7 +164,7 @@ suite('PlatformioDiagnosticService Tests', () => {
 		const service = new PlatformioDiagnosticService({
 			existsSync: existsSyncStub,
 			execFile: execFileStub,
-			env: { PATH: '/custom/bin' },
+			env: { PATH: '/custom/penv/bin' },
 			platform: 'darwin',
 			homeDir: '/Users/tester',
 			now: () => now,
@@ -140,18 +176,18 @@ suite('PlatformioDiagnosticService Tests', () => {
 
 		assert.strictEqual(session.overallStatus, 'degraded');
 		assert.strictEqual(mpremoteItem.status, 'warning');
-		assert.ok(mpremoteItem.reason.includes('/custom/bin/mpremote'));
+		assert.ok(mpremoteItem.reason.includes('/custom/penv/bin/mpremote'));
 		assert.ok(mpremoteItem.nextStep, 'Probe failures should include a remediation step');
 		assert.strictEqual(mpremoteItem.versionProbe?.succeeded, false);
 	});
 
 	test('buildClipboardSummary includes key diagnostic details', async () => {
 		const availablePaths = new Set([
-			'/custom/bin/pio',
-			'/custom',
-			'/custom/bin/python3',
-			'/custom/bin/pip3',
-			'/custom/bin/mpremote',
+			'/custom/penv/bin/pio',
+			'/custom/penv',
+			'/custom/penv/bin/python3',
+			'/custom/penv/bin/pip3',
+			'/custom/penv/bin/mpremote',
 		]);
 
 		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
@@ -160,7 +196,7 @@ suite('PlatformioDiagnosticService Tests', () => {
 		const service = new PlatformioDiagnosticService({
 			existsSync: existsSyncStub,
 			execFile: execFileStub,
-			env: { PATH: '/custom/bin' },
+			env: { PATH: '/custom/penv/bin' },
 			platform: 'darwin',
 			homeDir: '/Users/tester',
 			now: () => now,
@@ -173,7 +209,7 @@ suite('PlatformioDiagnosticService Tests', () => {
 		assert.strictEqual(summary.generatedAt, now.toISOString());
 		assert.strictEqual(summary.overallStatus, 'operational');
 		assert.ok(summary.plainText.includes('PlatformIO Diagnostic'));
-		assert.ok(summary.plainText.includes('/custom/bin/pio'));
+		assert.ok(summary.plainText.includes('/custom/penv/bin/pio'));
 		assert.ok(summary.plainText.includes('Overall status: Operational'));
 	});
 });
