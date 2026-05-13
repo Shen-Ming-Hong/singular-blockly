@@ -94,6 +94,12 @@ const OVERALL_STATUS_LABEL_DEFINITIONS: MessageDefinitionRecord<PlatformioOveral
 	degraded: ['PLATFORMIO_DIAGNOSTIC_OVERALL_DEGRADED', 'Degraded'],
 	unavailable: ['PLATFORMIO_DIAGNOSTIC_OVERALL_UNAVAILABLE', 'Unavailable'],
 };
+const DEFAULT_EXECUTABLE_NAMES: Record<Exclude<DiagnosticItemId, 'penvRoot'>, 'pio' | 'python' | 'pip' | 'mpremote'> = {
+	pio: 'pio',
+	python: 'python',
+	pip: 'pip',
+	mpremote: 'mpremote',
+};
 
 function createExecFilePromise(filePath: string, args: string[], options: { timeout: number }): Promise<PlatformioDiagnosticExecResult> {
 	return new Promise((resolve, reject) => {
@@ -236,14 +242,16 @@ export class PlatformioDiagnosticService {
 			'='.repeat(panelTitle.length),
 			`${requestedAtLabel}: ${session.requestedAt}`,
 			`${workspaceLabel}: ${session.workspacePath ?? '-'}`,
-			`${overallStatusLabel}: ${await this.getOverallStatusLabel(session.overallStatus)}`,
+			`${overallStatusLabel}: ${await this.getMessageFromRecord(session.overallStatus, OVERALL_STATUS_LABEL_DEFINITIONS)}`,
 			'',
 		];
 
 		for (const item of session.items) {
-			lines.push(`- ${await this.getToolLabel(item.id)} [${await this.getItemStatusLabel(item.status)}]`);
+			lines.push(
+				`- ${await this.getMessageFromRecord(item.id, TOOL_LABEL_DEFINITIONS)} [${await this.getMessageFromRecord(item.status, ITEM_STATUS_LABEL_DEFINITIONS)}]`
+			);
 			lines.push(`  ${pathLabel}: ${item.resolvedPath ?? unresolvedPathLabel}`);
-			lines.push(`  ${sourceLabel}: ${await this.getSourceLabel(item.source)}`);
+			lines.push(`  ${sourceLabel}: ${await this.getMessageFromRecord(item.source, SOURCE_LABEL_DEFINITIONS)}`);
 			lines.push(`  ${reasonLabel}: ${item.reason}`);
 			if (item.versionProbe?.output) {
 				lines.push(`  ${versionLabel}: ${item.versionProbe.output}`);
@@ -346,7 +354,7 @@ export class PlatformioDiagnosticService {
 		resolution: PenvRootResolution,
 		resolvedPioPath: string | null
 	): Promise<PlatformioDiagnosticItem> {
-		const toolLabel = await this.getToolLabel('penvRoot');
+		const toolLabel = await this.getMessageFromRecord('penvRoot', TOOL_LABEL_DEFINITIONS);
 		const displayPath = resolution.resolvedPath ?? resolution.candidatePath;
 
 		if (!resolvedPioPath || resolution.status === 'unresolved') {
@@ -502,7 +510,7 @@ export class PlatformioDiagnosticService {
 		resolution: ResolvedDiagnosticTarget,
 		probeArgs: string[]
 	): Promise<PlatformioDiagnosticItem> {
-		const toolLabel = await this.getToolLabel(id);
+		const toolLabel = await this.getMessageFromRecord(id, TOOL_LABEL_DEFINITIONS);
 
 		if (!resolution.resolvedPath) {
 			return {
@@ -642,33 +650,7 @@ export class PlatformioDiagnosticService {
 	}
 
 	private getDefaultExecutableName(id: Exclude<DiagnosticItemId, 'penvRoot'>): 'pio' | 'python' | 'pip' | 'mpremote' {
-		switch (id) {
-			case 'python':
-				return 'python';
-			case 'pip':
-				return 'pip';
-			case 'mpremote':
-				return 'mpremote';
-			case 'pio':
-			default:
-				return 'pio';
-		}
-	}
-
-	private async getToolLabel(id: DiagnosticItemId): Promise<string> {
-		return this.getMessageFromRecord(id, TOOL_LABEL_DEFINITIONS);
-	}
-
-	private async getSourceLabel(source: DiagnosticSource): Promise<string> {
-		return this.getMessageFromRecord(source, SOURCE_LABEL_DEFINITIONS);
-	}
-
-	private async getItemStatusLabel(status: DiagnosticItemStatus): Promise<string> {
-		return this.getMessageFromRecord(status, ITEM_STATUS_LABEL_DEFINITIONS);
-	}
-
-	private async getOverallStatusLabel(status: PlatformioOverallStatus): Promise<string> {
-		return this.getMessageFromRecord(status, OVERALL_STATUS_LABEL_DEFINITIONS);
+		return DEFAULT_EXECUTABLE_NAMES[id];
 	}
 
 	private async getMessageFromRecord<TKey extends string>(
