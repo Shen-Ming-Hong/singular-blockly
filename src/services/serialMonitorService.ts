@@ -189,11 +189,8 @@ export class SerialMonitorService {
 	 * @param mpremotePath mpremote 路徑（未使用，保留參數相容性）
 	 */
 	private async resetAndStartMonitor(port: string, _mpremotePath: string): Promise<void> {
-		const homeDir = os.homedir();
+		const pythonPath = this.uploader.getPlatformioPythonPath();
 		const isWindows = process.platform === 'win32';
-		const pythonPath = isWindows
-			? path.join(homeDir, '.platformio', 'penv', 'Scripts', 'python.exe')
-			: path.join(homeDir, '.platformio', 'penv', 'bin', 'python');
 
 		const tempDir = os.tmpdir();
 		const scriptFile = path.join(tempDir, 'blockly_monitor.py');

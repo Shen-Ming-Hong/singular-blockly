@@ -7,6 +7,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import { log } from './logging';
+import { getDefaultPlatformioExecutablePath, getExecutableDirectory, getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
 import * as vscode from 'vscode';
 
 /**
@@ -130,19 +131,29 @@ export class MicropythonUploader {
 		};
 	}
 
+	private getPlatformioSearchDirectories(): string[] {
+		const searchDirectories = getExecutableSearchDirectories();
+		const resolvedPioPath = resolveExecutable({
+			candidatePaths: [getDefaultPlatformioExecutablePath('pio')],
+			searchDirectories,
+			executableNames: ['pio'],
+		});
+		const pioDirectory = getExecutableDirectory(resolvedPioPath);
+
+		return [...new Set([...(pioDirectory ? [pioDirectory] : []), ...searchDirectories])];
+	}
+
 	/**
 	 * 取得 PlatformIO Python 環境路徑
 	 * @returns Python 執行檔路徑
 	 */
 	getPlatformioPythonPath(): string {
-		const homeDir = os.homedir();
-		const isWindows = process.platform === 'win32';
-
-		if (isWindows) {
-			return path.join(homeDir, '.platformio', 'penv', 'Scripts', 'python.exe');
-		} else {
-			return path.join(homeDir, '.platformio', 'penv', 'bin', 'python');
-		}
+		const defaultPath = getDefaultPlatformioExecutablePath('python');
+		return resolveExecutable({
+			candidatePaths: [defaultPath],
+			searchDirectories: this.getPlatformioSearchDirectories(),
+			executableNames: ['python3', 'python'],
+		}) ?? defaultPath;
 	}
 
 	/**
@@ -150,14 +161,12 @@ export class MicropythonUploader {
 	 * @returns mpremote 執行檔路徑
 	 */
 	getMpremotePath(): string {
-		const homeDir = os.homedir();
-		const isWindows = process.platform === 'win32';
-
-		if (isWindows) {
-			return path.join(homeDir, '.platformio', 'penv', 'Scripts', 'mpremote.exe');
-		} else {
-			return path.join(homeDir, '.platformio', 'penv', 'bin', 'mpremote');
-		}
+		const defaultPath = getDefaultPlatformioExecutablePath('mpremote');
+		return resolveExecutable({
+			candidatePaths: [defaultPath],
+			searchDirectories: this.getPlatformioSearchDirectories(),
+			executableNames: ['mpremote'],
+		}) ?? defaultPath;
 	}
 
 	/**
@@ -253,14 +262,12 @@ export class MicropythonUploader {
 	 * @returns pip 執行檔路徑
 	 */
 	private getPipPath(): string {
-		const homeDir = os.homedir();
-		const isWindows = process.platform === 'win32';
-
-		if (isWindows) {
-			return path.join(homeDir, '.platformio', 'penv', 'Scripts', 'pip.exe');
-		} else {
-			return path.join(homeDir, '.platformio', 'penv', 'bin', 'pip');
-		}
+		const defaultPath = getDefaultPlatformioExecutablePath('pip');
+		return resolveExecutable({
+			candidatePaths: [defaultPath],
+			searchDirectories: this.getPlatformioSearchDirectories(),
+			executableNames: ['pip3', 'pip'],
+		}) ?? defaultPath;
 	}
 
 	/**
@@ -558,12 +565,7 @@ except Exception as e:
 	 * 取得 Python 執行檔路徑
 	 */
 	private getPythonPath(): string {
-		const homeDir = os.homedir();
-		const isWindows = os.platform() === 'win32';
-		if (isWindows) {
-			return path.join(homeDir, '.platformio', 'penv', 'Scripts', 'python.exe');
-		}
-		return path.join(homeDir, '.platformio', 'penv', 'bin', 'python');
+		return this.pythonPath ?? this.getPlatformioPythonPath();
 	}
 
 	/**
