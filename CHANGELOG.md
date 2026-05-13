@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.74.0] - 2026-05-13
+
+### ✨ 新功能 New Features
+
+- **PlatformIO 診斷面板** (PlatformIO diagnostic panel)
+    - 新增獨立的 `Check PlatformIO Status` 命令與 WebView 診斷面板，可在不上傳程式的情況下檢查 `pio`、`penv`、`python`、`pip`、`mpremote` 狀態
+      Added a standalone `Check PlatformIO Status` command and WebView diagnostic panel to inspect `pio`, `penv`, `python`, `pip`, and `mpremote` without starting an upload flow
+    - 診斷結果會顯示實際解析路徑、來源、版本探測、失敗原因與下一步建議，並支援一鍵重新檢測與複製摘要
+      Diagnostic results now show the resolved path, source, version probe, failure reason, and suggested next steps, with one-click retest and copy-summary actions
+    - 診斷流程與 Arduino / MicroPython 上傳共用 executable resolution 邏輯，讓面板看到的工具路徑更貼近 extension 執行時真正使用的環境
+      The diagnostic flow now shares executable resolution logic with the Arduino / MicroPython upload services, so the reported tool paths more closely match the actual extension runtime environment
+    - 新增 15 語系文案、診斷服務與面板測試，並補強錯誤呈現與 UI semantics
+      Added 15-locale copy, diagnostic service and panel tests, plus UI/error-rendering refinements for a more robust diagnostic experience
+
 ## [0.73.1] - 2026-05-09
 
 ### 🔒 安全性修復 Security Fixes
