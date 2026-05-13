@@ -1,5 +1,6 @@
 {
 	"command.checkMcpStatus.title": "MCP Durumunu Kontrol Et",
+	"command.checkPlatformioStatus.title": "PlatformIO Durumunu Kontrol Et",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI Öneri Ayarları",
 	"command.toggleAIEnabled.title": "Singular Blockly: AI Önerilerini Aç/Kapat",
 	"command.selectAIModel.title": "Singular Blockly: AI Modeli Seç",

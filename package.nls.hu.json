@@ -1,5 +1,6 @@
 {
 	"command.checkMcpStatus.title": "MCP állapot ellenőrzése",
+	"command.checkPlatformioStatus.title": "PlatformIO állapot ellenőrzése",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI javaslat beállítások",
 	"command.toggleAIEnabled.title": "Singular Blockly: AI javaslatok be/kikapcsolása",
 	"command.selectAIModel.title": "Singular Blockly: AI modell kiválasztása",

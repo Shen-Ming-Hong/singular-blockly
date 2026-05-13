@@ -1,5 +1,6 @@
 {
 	"command.checkMcpStatus.title": "MCPステータスを確認",
+	"command.checkPlatformioStatus.title": "PlatformIO ステータスを確認",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI提案設定",
 	"command.toggleAIEnabled.title": "Singular Blockly: AI提案の切り替え",
 	"command.selectAIModel.title": "Singular Blockly: AIモデルの選択",

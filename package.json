@@ -53,6 +53,11 @@
 				"category": "Singular Blockly"
 			},
 			{
+				"command": "singular-blockly.checkPlatformioStatus",
+				"title": "%command.checkPlatformioStatus.title%",
+				"category": "Singular Blockly"
+			},
+			{
 				"command": "singular-blockly.showAIStatusMenu",
 				"title": "%command.showAIStatusMenu.title%",
 				"category": "Singular Blockly"

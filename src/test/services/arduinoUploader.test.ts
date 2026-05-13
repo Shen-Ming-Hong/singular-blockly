@@ -5,6 +5,7 @@
  */
 
 import * as assert from 'assert';
+import * as path from 'path';
 import * as sinon from 'sinon';
 import { ArduinoUploader, CommandExecutor, FileSystemInterface, StreamingCommandExecutor } from '../../services/arduinoUploader';
 import { SettingsManager } from '../../services/settingsManager';
@@ -124,6 +125,30 @@ suite('ArduinoUploader Tests', () => {
 			const result = await uploader.checkPioInstalled();
 
 			assert.strictEqual(result, false, 'Should return false');
+		});
+
+		test('Should fall back to PATH when default PlatformIO path is missing', async () => {
+			const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+			const originalPath = process.env.PATH;
+			Object.defineProperty(process, 'platform', { value: 'darwin' });
+			process.env.PATH = '/custom/bin';
+
+			const pathPio = path.join('/custom/bin', 'pio');
+			(mockFileSystem.existsSync as sinon.SinonStub).callsFake(filePath => filePath === pathPio);
+			(mockExecutor.exec as sinon.SinonStub).resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+
+			try {
+				const uploader = new ArduinoUploader(testWorkspacePath, mockExecutor, mockFileSystem, mockSettingsManager);
+				const result = await uploader.checkPioInstalled();
+
+				assert.strictEqual(result, true, 'Should return true when PATH fallback exists');
+				sinon.assert.calledWith(mockExecutor.exec as sinon.SinonStub, `"${pathPio}" --version`);
+			} finally {
+				process.env.PATH = originalPath;
+				if (originalPlatform) {
+					Object.defineProperty(process, 'platform', originalPlatform);
+				}
+			}
 		});
 	});
 

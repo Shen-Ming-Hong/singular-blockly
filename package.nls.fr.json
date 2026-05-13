@@ -1,5 +1,6 @@
 {
 	"command.checkMcpStatus.title": "Vérifier l'état MCP",
+	"command.checkPlatformioStatus.title": "Vérifier l'état de PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Paramètres de suggestions IA",
 	"command.toggleAIEnabled.title": "Singular Blockly: Activer/désactiver les suggestions IA",
 	"command.selectAIModel.title": "Singular Blockly: Sélectionner le modèle IA",

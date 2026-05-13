@@ -246,6 +246,74 @@ window.languageManager.loadMessages('ru', {
 	INFO_COPIED_TO_CLIPBOARD: 'Скопировано в буфер обмена',
 	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'Сбой диагностической команды MCP: {0}',
 
+	// PlatformIO Diagnostic Panel
+	PLATFORMIO_DIAGNOSTIC_PANEL_TITLE: 'PlatformIO Diagnostic',
+	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
+		'Check whether the extension can resolve PlatformIO CLI, penv, and the CyberBrick helper tools.',
+	PLATFORMIO_DIAGNOSTIC_LOADING_TITLE: 'Checking PlatformIO environment...',
+	PLATFORMIO_DIAGNOSTIC_LOADING_DESCRIPTION:
+		'This usually finishes in a few seconds. If a tool is slow, the panel falls back to a partial result instead of waiting forever.',
+	PLATFORMIO_DIAGNOSTIC_ERROR_TITLE: 'Diagnostic error',
+	PLATFORMIO_DIAGNOSTIC_SUMMARY_TITLE: 'Summary',
+	PLATFORMIO_DIAGNOSTIC_TOOLS_TITLE: 'Resolved tools',
+	PLATFORMIO_DIAGNOSTIC_SCOPE_TITLE: 'Scope',
+	PLATFORMIO_DIAGNOSTIC_WORKSPACE: 'Workspace',
+	PLATFORMIO_DIAGNOSTIC_REQUESTED_AT: 'Generated at',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_STATUS: 'Overall status',
+	PLATFORMIO_DIAGNOSTIC_PATH: 'Path',
+	PLATFORMIO_DIAGNOSTIC_PATH_UNRESOLVED: 'Not resolved',
+	PLATFORMIO_DIAGNOSTIC_SOURCE: 'Source',
+	PLATFORMIO_DIAGNOSTIC_REASON: 'Reason',
+	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: 'Next step',
+	PLATFORMIO_DIAGNOSTIC_VERSION: 'Version probe',
+	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: 'From detected penv',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: 'No data yet',
+	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: 'Run the diagnostic once to see resolved paths and tool details.',
+	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: 'Retest',
+	PLATFORMIO_DIAGNOSTIC_ACTION_COPY_SUMMARY: 'Copy summary',
+	PLATFORMIO_DIAGNOSTIC_COPY_UNAVAILABLE: 'No diagnostic summary is available yet.',
+	PLATFORMIO_DIAGNOSTIC_COPY_SUCCESS: 'Diagnostic summary copied to the clipboard.',
+	PLATFORMIO_DIAGNOSTIC_COPY_FAILED: 'Unable to copy the diagnostic summary: {0}',
+	PLATFORMIO_DIAGNOSTIC_TOP_LEVEL_ERROR: 'Unable to complete PlatformIO diagnostics: {0}',
+	PLATFORMIO_DIAGNOSTIC_STATUS_OK: 'OK',
+	PLATFORMIO_DIAGNOSTIC_STATUS_WARNING: 'Warning',
+	PLATFORMIO_DIAGNOSTIC_STATUS_ERROR: 'Error',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_OPERATIONAL: 'Operational',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_DEGRADED: 'Degraded',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_UNAVAILABLE: 'Unavailable',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_DEFAULT_PLATFORMIO_PATH: 'Default PlatformIO path',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_PATH_SEARCH: 'PATH search',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_RESOLVED_PIO_SIBLING: 'Derived from resolved pio sibling',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_DERIVED_FROM_PENV: 'Derived from detected penv',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_UNRESOLVED: 'Unresolved',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PIO: 'PlatformIO CLI (pio)',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PENV_ROOT: 'PlatformIO penv root',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PYTHON: 'PlatformIO Python',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PIP: 'PlatformIO pip',
+	PLATFORMIO_DIAGNOSTIC_TOOL_MPREMOTE: 'mpremote',
+	PLATFORMIO_DIAGNOSTIC_SCOPE_NOTICE:
+		'This report reflects the VS Code extension runtime on this machine. It may differ from the shell environment you use in an external terminal.',
+	PLATFORMIO_DIAGNOSTIC_REASON_EXECUTABLE_MISSING:
+		'{0} was not found in the default PlatformIO location or the current PATH visible to the VS Code extension runtime.',
+	PLATFORMIO_DIAGNOSTIC_REASON_EXECUTABLE_READY: '{0} was resolved successfully and the version probe completed.',
+	PLATFORMIO_DIAGNOSTIC_REASON_VERSION_PROBE_FAILED:
+		'{0} was found at {1}, but the version probe did not complete successfully: {2}',
+	PLATFORMIO_DIAGNOSTIC_REASON_PENV_DERIVED: '{0} was derived from the resolved PlatformIO CLI location.',
+	PLATFORMIO_DIAGNOSTIC_REASON_PENV_MISSING:
+		'A penv root was derived from the resolved pio path, but the directory does not exist: {0}',
+	PLATFORMIO_DIAGNOSTIC_REASON_PENV_UNRESOLVED:
+		'No penv root could be derived because the PlatformIO CLI path is not resolved yet.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PLATFORMIO_INSTALL:
+		'Confirm PlatformIO CLI is installed and reachable from the VS Code extension runtime, then run diagnostics again.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_TOOL_IN_PENV:
+		'Check whether {0} exists inside the detected PlatformIO penv or PATH, then run diagnostics again.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PENV_LAYOUT:
+		'Check whether the detected PlatformIO penv directory layout is intact, then run diagnostics again.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_RETRY_AFTER_FIX:
+		'Verify the executable can run from this path, fix the environment if needed, and then run diagnostics again.',
+
 	// MCP Diagnostic Report Labels
 	DIAG_REPORT_TITLE: 'Диагностический отчет MCP Server',
 	DIAG_NODEJS_VERSION: 'Версия Node.js',

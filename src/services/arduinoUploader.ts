@@ -9,6 +9,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { spawn } from 'child_process';
 import { log } from './logging';
+import { getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
 import { SettingsManager } from './settingsManager';
 import { ArduinoUploadStage, ArduinoUploadResult, ArduinoUploadRequest, ArduinoPortInfo, ArduinoProgressCallback } from '../types/arduino';
 
@@ -80,11 +81,11 @@ export class ArduinoUploader {
 		settingsManager?: SettingsManager,
 		streamingExecutor?: StreamingCommandExecutor
 	) {
-		this.pioPath = this.getPioPath();
-		this.compileTimeout = DEFAULT_COMPILE_TIMEOUT;
-		this.uploadTimeout = DEFAULT_UPLOAD_TIMEOUT;
 		this.settingsManager = settingsManager || new SettingsManager(workspacePath);
 		this.fileSystem = fileSystem || fs;
+		this.pioPath = this.resolvePioPath();
+		this.compileTimeout = DEFAULT_COMPILE_TIMEOUT;
+		this.uploadTimeout = DEFAULT_UPLOAD_TIMEOUT;
 
 		// 使用預設的 child_process 執行器或注入的執行器
 		this.executor = executor || {
@@ -172,6 +173,18 @@ export class ArduinoUploader {
 		};
 	}
 
+	private resolvePioPath(): string {
+		const defaultPath = this.getPioPath();
+		const resolvedPath = resolveExecutable({
+			candidatePaths: [defaultPath],
+			searchDirectories: getExecutableSearchDirectories(),
+			executableNames: ['pio'],
+			existsSync: filePath => this.fileSystem.existsSync(filePath),
+		});
+
+		return resolvedPath ?? defaultPath;
+	}
+
 	/**
 	 * 取得 PlatformIO CLI 路徑
 	 * @returns PlatformIO CLI 執行檔路徑
@@ -192,6 +205,8 @@ export class ArduinoUploader {
 	 * @returns 是否已安裝
 	 */
 	async checkPioInstalled(): Promise<boolean> {
+		this.pioPath = this.resolvePioPath();
+
 		if (!this.fileSystem.existsSync(this.pioPath)) {
 			log('[arduino] PlatformIO CLI 未安裝', 'warn', { path: this.pioPath });
 			return false;
@@ -212,6 +227,8 @@ export class ArduinoUploader {
 	 * @returns 偵測結果，包含是否有裝置、連接埠資訊及指令是否失敗
 	 */
 	async detectDevices(): Promise<{ hasDevice: boolean; port?: string; devices: ArduinoPortInfo[]; commandFailed: boolean }> {
+		this.pioPath = this.resolvePioPath();
+
 		try {
 			const result = await this.executor.exec(`"${this.pioPath}" device list --json-output`);
 			const deviceList = JSON.parse(result.stdout);

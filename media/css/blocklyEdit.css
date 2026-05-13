@@ -599,11 +599,6 @@ body.theme-dark .preview-controls .theme-icon {
 	background-color: #c62828;
 }
 
-/* 非 TXT 模式：上傳箭頭旋轉動畫（spinning class 在 button 上） */
-#uploadButton.spinning .upload-svg {
-	animation-play-state: running;
-}
-
 /* Monitor 按鈕樣式（CyberBrick 專用） */
 .monitor-switch {
 	margin-left: 10px;

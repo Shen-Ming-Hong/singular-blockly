@@ -245,6 +245,74 @@ window.languageManager.loadMessages('tr', {
 	INFO_COPIED_TO_CLIPBOARD: 'Panoya kopyalandı',
 	ERROR_DIAGNOSTIC_COMMAND_FAILED: 'MCP tanılama komutu başarısız oldu: {0}',
 
+	// PlatformIO Diagnostic Panel
+	PLATFORMIO_DIAGNOSTIC_PANEL_TITLE: 'PlatformIO Tanılama',
+	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
+		'Uzantının PlatformIO CLI, penv ve CyberBrick yardımcı araçlarını çözümleyip çözümleyemediğini denetleyin.',
+	PLATFORMIO_DIAGNOSTIC_LOADING_TITLE: 'PlatformIO ortamı denetleniyor...',
+	PLATFORMIO_DIAGNOSTIC_LOADING_DESCRIPTION:
+		'Bu işlem genellikle birkaç saniyede tamamlanır. Bir araç yavaşsa panel sonsuza kadar beklemek yerine kısmi bir sonuç gösterir.',
+	PLATFORMIO_DIAGNOSTIC_ERROR_TITLE: 'Tanılama hatası',
+	PLATFORMIO_DIAGNOSTIC_SUMMARY_TITLE: 'Özet',
+	PLATFORMIO_DIAGNOSTIC_TOOLS_TITLE: 'Çözümlenen araçlar',
+	PLATFORMIO_DIAGNOSTIC_SCOPE_TITLE: 'Kapsam',
+	PLATFORMIO_DIAGNOSTIC_WORKSPACE: 'Çalışma alanı',
+	PLATFORMIO_DIAGNOSTIC_REQUESTED_AT: 'Oluşturulma zamanı',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_STATUS: 'Genel durum',
+	PLATFORMIO_DIAGNOSTIC_PATH: 'Yol',
+	PLATFORMIO_DIAGNOSTIC_PATH_UNRESOLVED: 'Çözümlenmedi',
+	PLATFORMIO_DIAGNOSTIC_SOURCE: 'Kaynak',
+	PLATFORMIO_DIAGNOSTIC_REASON: 'Neden',
+	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: 'Sonraki adım',
+	PLATFORMIO_DIAGNOSTIC_VERSION: 'Sürüm yoklaması',
+	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: 'Algılanan penv içinden',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Evet',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Hayır',
+	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: 'Henüz veri yok',
+	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: 'Çözümlenen yolları ve araç ayrıntılarını görmek için tanılamayı bir kez çalıştırın.',
+	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: 'Yeniden test et',
+	PLATFORMIO_DIAGNOSTIC_ACTION_COPY_SUMMARY: 'Özeti kopyala',
+	PLATFORMIO_DIAGNOSTIC_COPY_UNAVAILABLE: 'Henüz kullanılabilir bir tanılama özeti yok.',
+	PLATFORMIO_DIAGNOSTIC_COPY_SUCCESS: 'Tanılama özeti panoya kopyalandı.',
+	PLATFORMIO_DIAGNOSTIC_COPY_FAILED: 'Tanılama özeti kopyalanamadı: {0}',
+	PLATFORMIO_DIAGNOSTIC_TOP_LEVEL_ERROR: 'PlatformIO tanılaması tamamlanamadı: {0}',
+	PLATFORMIO_DIAGNOSTIC_STATUS_OK: 'OK',
+	PLATFORMIO_DIAGNOSTIC_STATUS_WARNING: 'Uyarı',
+	PLATFORMIO_DIAGNOSTIC_STATUS_ERROR: 'Hata',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_OPERATIONAL: 'Çalışır durumda',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_DEGRADED: 'Sınırlı',
+	PLATFORMIO_DIAGNOSTIC_OVERALL_UNAVAILABLE: 'Kullanılamıyor',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_DEFAULT_PLATFORMIO_PATH: 'Varsayılan PlatformIO yolu',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_PATH_SEARCH: 'PATH araması',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_RESOLVED_PIO_SIBLING: 'Çözümlenen pio komşu dizininden türetildi',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_DERIVED_FROM_PENV: 'Algılanan penv içinden türetildi',
+	PLATFORMIO_DIAGNOSTIC_SOURCE_UNRESOLVED: 'Çözümlenmedi',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PIO: 'PlatformIO CLI (pio)',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PENV_ROOT: 'PlatformIO penv kök dizini',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PYTHON: 'PlatformIO Python',
+	PLATFORMIO_DIAGNOSTIC_TOOL_PIP: 'PlatformIO pip',
+	PLATFORMIO_DIAGNOSTIC_TOOL_MPREMOTE: 'mpremote',
+	PLATFORMIO_DIAGNOSTIC_SCOPE_NOTICE:
+		'Bu rapor, bu makinedeki VS Code uzantısı çalışma zamanını yansıtır. Harici bir terminalde kullandığınız kabuk ortamından farklı olabilir.',
+	PLATFORMIO_DIAGNOSTIC_REASON_EXECUTABLE_MISSING:
+		'{0}, varsayılan PlatformIO konumunda veya VS Code uzantısı çalışma zamanına görünen mevcut PATH içinde bulunamadı.',
+	PLATFORMIO_DIAGNOSTIC_REASON_EXECUTABLE_READY: '{0} başarıyla çözümlendi ve sürüm yoklaması tamamlandı.',
+	PLATFORMIO_DIAGNOSTIC_REASON_VERSION_PROBE_FAILED:
+		'{0}, {1} konumunda bulundu; ancak sürüm yoklaması başarıyla tamamlanmadı: {2}',
+	PLATFORMIO_DIAGNOSTIC_REASON_PENV_DERIVED: '{0}, çözümlenen PlatformIO CLI konumundan türetildi.',
+	PLATFORMIO_DIAGNOSTIC_REASON_PENV_MISSING:
+		'Çözümlenen pio yolundan bir penv kökü türetildi, ancak dizin mevcut değil: {0}',
+	PLATFORMIO_DIAGNOSTIC_REASON_PENV_UNRESOLVED:
+		'PlatformIO CLI yolu henüz çözümlenmediği için bir penv kökü türetilemedi.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PLATFORMIO_INSTALL:
+		'PlatformIO CLI\'nin kurulu olduğunu ve VS Code uzantısı çalışma zamanından erişilebilir olduğunu doğrulayın, sonra tanılamayı yeniden çalıştırın.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_TOOL_IN_PENV:
+		'{0} öğesinin algılanan PlatformIO penv içinde veya PATH\'te bulunup bulunmadığını kontrol edin, ardından tanılamayı yeniden çalıştırın.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PENV_LAYOUT:
+		'Algılanan PlatformIO penv dizin yapısının sağlam olup olmadığını kontrol edin, ardından tanılamayı yeniden çalıştırın.',
+	PLATFORMIO_DIAGNOSTIC_NEXTSTEP_RETRY_AFTER_FIX:
+		'Yürütülebilir dosyanın bu yoldan çalışabildiğini doğrulayın, gerekirse ortamı düzeltin ve sonra tanılamayı yeniden çalıştırın.',
+
 	// MCP Diagnostic Report Labels
 	DIAG_REPORT_TITLE: 'MCP Server Tanılama Raporu',
 	DIAG_NODEJS_VERSION: 'Node.js Sürümü',
