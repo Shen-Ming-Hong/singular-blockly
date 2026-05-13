@@ -1,7 +1,8 @@
 # 快速啟動指南：PlatformIO 診斷 UI
 
 **功能分支**：`052-platformio-diagnostic-ui`  
-**適用對象**：接手本次 PlatformIO 診斷 panel 實作的開發者
+**適用對象**：接手本次 PlatformIO 診斷 panel 驗收、維護與手動 smoke test 的開發者  
+**目前狀態**：核心功能、文件同步與自動化驗證已完成；僅剩 `T024` Extension Development Host 手動 smoke test 待執行
 
 ---
 
@@ -99,7 +100,7 @@ npm run validate:i18n
 
 ---
 
-## 第一個應完成的使用者情境
+## 第一個應驗收的使用者情境
 
 ### 情境：從 Command Palette 開啟獨立 PlatformIO 診斷 panel
 
@@ -210,17 +211,14 @@ npm run validate:i18n
 
 ---
 
-## 建議實作順序
+## 建議驗收 / 維護順序
 
 ```text
-1. 新增 types/data model（src/types/platformioDiagnostic.ts）
-2. 新增 PlatformioDiagnosticService
-3. 新增 src/webview/platformioDiagnosticPanel.ts
-4. 建立 media/html|css|js/platformioDiagnostic.*
-5. 在 extension.ts 註冊 command 並接到 open / reveal panel
-6. 補 package.nls.* 與 runtime i18n 文案
-7. 補 service / panel / extension 測試
-8. 跑 compile / lint / validate:i18n / targeted tests / 手動 smoke test
+1. 先讀 `spec.md`、`plan.md`、`contracts/`，確認目前只剩 `T024` 手動 smoke test
+2. 盤點已落地結構：`src/types/platformioDiagnostic.ts`、`src/services/platformioDiagnosticService.ts`、`src/webview/platformioDiagnosticPanel.ts`
+3. 檢查 `media/html|css|js/platformioDiagnostic.*` 與 `extension.ts` / `package.nls.*` 的 command、i18n、panel wiring
+4. 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test`，確認自動化驗證維持綠燈
+5. 依 `T024` 在 Extension Development Host 做手動 smoke test，重點驗證 loading、reveal、retest、copy summary、theme parity 與 upload icon regression guard
 ```
 
 ---

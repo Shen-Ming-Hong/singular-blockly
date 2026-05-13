@@ -83,6 +83,7 @@ describe('Extension activate', () => {
 		assert(registered.includes('singular-blockly.toggleTheme'));
 		assert(registered.includes('singular-blockly.showOutput'));
 		assert(registered.includes('singular-blockly.previewBackup'));
+		assert(registered.includes('singular-blockly.checkPlatformioStatus'));
 		// Note: AIStatusBar uses `vscode` directly (not injectable via _setVSCodeApi) and is only
 		// created when Copilot is available (tier !== 'none'). In the unit test environment
 		// there is no Copilot, so createStatusBarItem is not called here.
@@ -128,6 +129,40 @@ describe('Extension activate', () => {
 			// 如果執行失敗,至少驗證命令已註冊
 			assert(true, 'Command is registered and can be called');
 		}
+	});
+
+	it('should execute checkPlatformioStatus command', async () => {
+		const { PlatformioDiagnosticPanel } = require('../webview/platformioDiagnosticPanel');
+		const showStub = sinon.stub(PlatformioDiagnosticPanel.prototype, 'show').resolves();
+
+		await activate(context as any);
+
+		const commandCall = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((c: any) => c.args[0] === 'singular-blockly.checkPlatformioStatus');
+
+		assert(commandCall, 'checkPlatformioStatus command should be registered');
+
+		await commandCall.args[1]();
+
+		assert(showStub.calledOnce, 'PlatformIO diagnostic panel should be shown');
+	});
+
+	it('should show error when checkPlatformioStatus command fails', async () => {
+		const { PlatformioDiagnosticPanel } = require('../webview/platformioDiagnosticPanel');
+		sinon.stub(PlatformioDiagnosticPanel.prototype, 'show').rejects(new Error('panel failed'));
+
+		await activate(context as any);
+
+		const commandCall = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((c: any) => c.args[0] === 'singular-blockly.checkPlatformioStatus');
+
+		assert(commandCall, 'checkPlatformioStatus command should be registered');
+
+		await commandCall.args[1]();
+
+		assert(vscodeMock.window.showErrorMessage.called, 'Should surface panel launch failures');
 	});
 
 	it('should handle toggleTheme command when workspace exists', async () => {

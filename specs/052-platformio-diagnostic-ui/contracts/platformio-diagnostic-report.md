@@ -34,6 +34,12 @@
 | 工作區路徑 | 否 | 若可取得則顯示 |
 | 操作列 | 是 | 僅包含 `重新測試`、`複製診斷摘要` |
 
+### Loading / timeout 呈現契約
+
+- MUST 在第一次開啟 panel 或按下 `重新測試` 後約 1 秒內顯示可見的 loading UI
+- MUST 在單次診斷開始後 10 秒內離開 loading，並呈現 `operational`、`degraded`、`unavailable` 或頂層 `error` 對應畫面
+- 若個別工具 probe timeout，MUST 以可理解的 `reason` / `nextStep` 呈現 timeout 影響，而不是讓整個 panel 持續停留在 loading
+
 ### 工具清單區必備特性
 
 - MUST 以固定順序顯示五個項目

@@ -16,6 +16,8 @@ import { NodeDetectionService } from './services/nodeDetectionService';
 import { DiagnosticService } from './services/diagnosticService';
 import { AIModelManager } from './services/aiModelManager';
 import { AIStatusBar } from './services/aiStatusBar';
+import { PlatformioDiagnosticService } from './services/platformioDiagnosticService';
+import { PlatformioDiagnosticPanel } from './webview/platformioDiagnosticPanel';
 
 // AI model manager (initialized when Copilot is available)
 let aiModelManager: AIModelManager | undefined;
@@ -51,6 +53,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		const localeService = new LocaleService(context.extensionPath);
 		const nodeDetectionService = new NodeDetectionService();
 		const diagnosticService = new DiagnosticService(nodeDetectionService, localeService);
+		const platformioDiagnosticService = PlatformioDiagnosticService.fromLocaleService(localeService);
 
 		// 【最優先】檢查是否為 CyberBrick/MicroPython 專案，若是則刪除 platformio.ini
 		// 必須在 PlatformIO 擴充功能偵測到 ini 檔案之前執行
@@ -101,7 +104,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		});
 
 		// 註冊命令
-		registerCommands(context, localeService, diagnosticService);
+		registerCommands(context, localeService, diagnosticService, platformioDiagnosticService);
 
 		// 註冊 MCP Provider（VSCode 1.105.0+ 支援，需要 Node.js 22.16.0+）
 		await registerMcpProviderIfAvailable(context, nodeDetectionService, localeService);
@@ -150,11 +153,17 @@ function registerActivityBarView(context: vscode.ExtensionContext) {
  * @param localeService 多語言服務
  * @param diagnosticService 診斷服務
  */
-function registerCommands(context: vscode.ExtensionContext, localeService: LocaleService, diagnosticService: DiagnosticService) {
+function registerCommands(
+	context: vscode.ExtensionContext,
+	localeService: LocaleService,
+	diagnosticService: DiagnosticService,
+	platformioDiagnosticService: PlatformioDiagnosticService
+) {
 	log('Registering commands...', 'info');
 
 	// WebView 管理器（單例）
 	let webViewManager: WebViewManager | undefined;
+	const platformioDiagnosticPanel = new PlatformioDiagnosticPanel(context, localeService, platformioDiagnosticService);
 
 	// 註冊開啟 Blockly 編輯器命令
 	const openBlocklyEdit = vscodeApi.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
@@ -348,6 +357,20 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 		}
 	});
 
+	const checkPlatformioStatusCommand = vscodeApi.commands.registerCommand('singular-blockly.checkPlatformioStatus', async () => {
+		try {
+			await platformioDiagnosticPanel.show();
+		} catch (error) {
+			log('Error opening PlatformIO diagnostic panel:', 'error', error);
+			const errorMsg = await localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_TOP_LEVEL_ERROR',
+				'Unable to complete PlatformIO diagnostics: {0}',
+				String(error)
+			);
+			vscodeApi.window.showErrorMessage(errorMsg);
+		}
+	});
+
 	// 註冊手動觸發 AI 積木建議命令（透過 keybinding Ctrl+Shift+. 觸發）
 	const triggerAISuggestionCommand = vscodeApi.commands.registerCommand('singular-blockly.triggerAISuggestion', () => {
 		if (webViewManager && webViewManager.isPanelCreated()) {
@@ -383,11 +406,13 @@ function registerCommands(context: vscode.ExtensionContext, localeService: Local
 
 
 	// 添加到訂閱清單
+	context.subscriptions.push(platformioDiagnosticPanel);
 	context.subscriptions.push(openBlocklyEdit);
 	context.subscriptions.push(toggleThemeCommand);
 	context.subscriptions.push(showOutputCommand);
 	context.subscriptions.push(previewBackupCommand);
 	context.subscriptions.push(checkMcpStatusCommand);
+	context.subscriptions.push(checkPlatformioStatusCommand);
 	context.subscriptions.push(triggerAISuggestionCommand);
 	context.subscriptions.push(stopTxtExecutionCommand);
 	context.subscriptions.push(installTxtRuntimeCommand);

@@ -50,7 +50,10 @@ export class VSCodeMock {
 				webview: {
 					html: '',
 					options: options?.enableScripts ? { enableScripts: true } : {},
-					onDidReceiveMessage: sinon.stub().returns({ dispose: sinon.stub() }),
+					onDidReceiveMessage: sinon.stub().callsFake((callback: any) => {
+						panel.webview._onDidReceiveMessage = callback;
+						return { dispose: sinon.stub() };
+					}),
 					postMessage: sinon.stub().returns(Promise.resolve(true)),
 					asWebviewUri: sinon.stub().callsFake((uri: any) => {
 						// 模擬將本地路徑轉換為 webview URI
@@ -64,6 +67,12 @@ export class VSCodeMock {
 						return uri;
 					}),
 					cspSource: 'vscode-webview:',
+					_onDidReceiveMessage: null as any,
+					dispatchMessage: async (message: any) => {
+						if (panel.webview._onDidReceiveMessage) {
+							await panel.webview._onDidReceiveMessage(message);
+						}
+					},
 				},
 				title,
 				viewType,
@@ -119,6 +128,10 @@ export class VSCodeMock {
 
 	public env: any = {
 		language: 'en',
+		clipboard: {
+			writeText: sinon.stub().resolves(),
+			readText: sinon.stub().resolves(''),
+		},
 	};
 
 	public Uri: any = {

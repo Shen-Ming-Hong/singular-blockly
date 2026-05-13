@@ -3,8 +3,9 @@
 **版本**：v1（獨立 WebView Editor Panel 診斷 UI）  
 **命令註冊**：`src/extension.ts`  
 **命令貢獻**：`package.json` + `package.nls*.json`  
-**panel host**：`src/webview/platformioDiagnosticPanel.ts`（規劃新增）  
-**診斷服務**：`src/services/platformioDiagnosticService.ts`（規劃新增）
+**panel host**：`src/webview/platformioDiagnosticPanel.ts`  
+**診斷服務**：`src/services/platformioDiagnosticService.ts`  
+**實作狀態**：已落地，僅剩手動 smoke test 驗證未完成
 
 ---
 
@@ -65,7 +66,7 @@ command.checkPlatformioStatus.title
 
 1. 建立單一 `WebviewPanel`
 2. 以 Editor Panel 形式顯示診斷介面
-3. 先呈現 loading 狀態
+3. 在約 1 秒內呈現可見的 loading 狀態
 4. 啟動一輪新的診斷收集流程
 
 ### 2. 再次執行命令
@@ -124,6 +125,11 @@ command.checkPlatformioStatus.title
 
 panel 在**第一次建立**或使用者按下 `重新測試` 後 MUST 呈現 loading 狀態，讓使用者知道系統正在進行新的檢查；單純重複執行 command 只負責 reveal 既有 panel，不自動重設為 loading。
 
+此外：
+
+- MUST 讓 loading UI 於使用者觸發診斷後約 1 秒內可見，避免長時間無回饋
+- MUST 於 10 秒內離開 loading，並進入 `platformioDiagnostic:render` 或 `platformioDiagnostic:error`；其中部分失敗 / timeout 應收斂為 `render` + `degraded` / `unavailable` 結果，只有無法建立 session 的頂層例外才進入 `error`
+
 ### Step 3：收集診斷 session
 
 命令 MUST 呼叫 `PlatformioDiagnosticService` 產生一份 `PlatformioDiagnosticSession`。
@@ -150,6 +156,8 @@ panel MUST 在診斷完成後顯示：
 - 每個項目的原因與必要時的下一步建議
 - 範圍提醒
 - `重新測試`、`複製診斷摘要` 兩個操作
+
+若單一 probe timeout 或部分工具失敗，panel 仍 MUST 在 10 秒內以 `platformioDiagnostic:render` + `degraded` / `unavailable` 對應結果離開 loading，並保留可讀的原因說明；只有無法建立 session 的頂層例外才可使用 `platformioDiagnostic:error`。
 
 ---
 

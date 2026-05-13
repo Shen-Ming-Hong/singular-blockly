@@ -1,0 +1,87 @@
+<!--
+  @license
+  Copyright 2025 Singular Blockly Contributors
+  SPDX-License-Identifier: Apache-2.0
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{panelTitle}</title>
+    <link rel="stylesheet" href="{cssUri}">
+</head>
+
+<body>
+    <div class="diagnostic-shell">
+        <header class="card panel-header">
+            <div class="panel-header-copy">
+                <p class="eyebrow">PlatformIO</p>
+                <h1 id="panelTitle">{panelTitle}</h1>
+                <p id="panelSubtitle" class="panel-subtitle">Checking PlatformIO environment…</p>
+            </div>
+            <div class="panel-actions">
+                <button id="retestButton" class="primary-btn" type="button">Retest</button>
+                <button id="copySummaryButton" class="secondary-btn" type="button">Copy summary</button>
+            </div>
+        </header>
+
+        <div id="feedbackBanner" class="feedback-banner hidden" role="status" aria-live="polite"></div>
+
+        <section id="stateSurface" class="card state-surface" aria-live="polite">
+            <div id="loadingSpinner" class="loading-spinner" aria-hidden="true"></div>
+            <div class="state-copy">
+                <h2 id="stateTitle">Checking PlatformIO environment…</h2>
+                <p id="stateDescription">The panel will show resolved PlatformIO paths and tool details as soon as the
+                    scan completes.</p>
+            </div>
+        </section>
+
+        <main id="contentRoot" class="content-root hidden">
+            <section class="card summary-card">
+                <div class="section-header">
+                    <h2 id="summaryTitle">Summary</h2>
+                </div>
+                <div class="summary-layout">
+                    <div class="summary-hero">
+                        <span id="overallStatusBadge" class="status-pill status-pill-operational">Operational</span>
+                        <div class="summary-statements">
+                            <p class="summary-label" id="overallStatusLabel">Overall status</p>
+                            <p id="overallStatusValue" class="summary-value">Operational</p>
+                        </div>
+                    </div>
+                    <dl class="summary-grid">
+                        <div>
+                            <dt id="workspaceLabel">Workspace</dt>
+                            <dd id="workspaceValue">-</dd>
+                        </div>
+                        <div>
+                            <dt id="requestedAtLabel">Generated at</dt>
+                            <dd id="requestedAtValue">-</dd>
+                        </div>
+                    </dl>
+                </div>
+            </section>
+
+            <section class="card tools-card">
+                <div class="section-header">
+                    <h2 id="toolsTitle">Resolved tools</h2>
+                </div>
+                <div id="toolList" class="tool-list"></div>
+            </section>
+
+            <section class="card scope-card">
+                <div class="section-header">
+                    <h2 id="scopeTitle">Scope</h2>
+                </div>
+                <p id="scopeNotice" class="scope-text">This report reflects the VS Code extension runtime on this
+                    machine.</p>
+            </section>
+        </main>
+    </div>
+
+    <script src="{jsUri}"></script>
+</body>
+
+</html>

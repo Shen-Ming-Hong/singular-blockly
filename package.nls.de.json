@@ -1,5 +1,6 @@
 {
 	"command.checkMcpStatus.title": "MCP-Status prüfen",
+	"command.checkPlatformioStatus.title": "PlatformIO-Status prüfen",
 	"command.showAIStatusMenu.title": "Singular Blockly: KI-Vorschlag-Einstellungen",
 	"command.toggleAIEnabled.title": "Singular Blockly: KI-Vorschläge umschalten",
 	"command.selectAIModel.title": "Singular Blockly: KI-Modell auswählen",

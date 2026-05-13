@@ -1,7 +1,8 @@
 # 實作計劃：PlatformIO 診斷 UI
 
 **分支**：`052-platformio-diagnostic-ui` | **日期**：2026-05-13 | **規格**：[spec.md](./spec.md)  
-**輸入**：[specs/052-platformio-diagnostic-ui/spec.md](./spec.md)
+**輸入**：[specs/052-platformio-diagnostic-ui/spec.md](./spec.md)  
+**實作狀態**：核心功能、文件同步與自動化驗證已完成；僅剩 `T024` Extension Development Host 手動 smoke test 待執行
 
 ## 摘要
 
@@ -47,7 +48,7 @@
 | III. 避免過度開發 | 明確不把手動 override、自動修復、PlatformIO extension 狀態、upload 綁定納入 v1 | ✅ 通過 |
 | V. 研究驅動開發 | 已比對既有 `blocklyEdit` / modal / TXT test panel UI 語言、`LocaleService`、`executableResolver.ts`、uploaders 與測試樣板 | ✅ 通過 |
 | VI. 結構化日誌 | 診斷 service、panel host 與命令層延續 `log()` 模式，不新增 ad-hoc console 輸出 | ✅ 通過 |
-| VII. 完整測試覆蓋率 | 將補 service、panel lifecycle / message flow、command registration 與手動 smoke test | ✅ 通過（待實作） |
+| VII. 完整測試覆蓋率 | 已補 service、panel lifecycle / message flow、command registration 測試並完成自動化驗證；仍保留手動 smoke test 作為最後 UX 回歸檢查 | ✅ 通過（手動 smoke test 待執行） |
 | VIII. 純函式與模組化 | 路徑解析、summary builder 與 reason / nextStep 格式化盡量維持純函式；副作用限於 probe command、panel message、clipboard | ✅ 通過 |
 | IX. 繁體中文文件標準 | 本 `plan.md`、`research.md`、`data-model.md`、`quickstart.md`、contracts 皆以繁體中文撰寫 | ✅ 通過 |
 
@@ -165,7 +166,7 @@ src/test/services/arduinoUploader.test.ts
 
 | 實體 | 位置 | 說明 |
 |------|------|------|
-| `PlatformioDiagnosticSession` | `specs/.../data-model.md`（待對應 `src/types/platformioDiagnostic.ts`） | 一次完整診斷的整體狀態與五個固定項目結果 |
+| `PlatformioDiagnosticSession` | `specs/.../data-model.md`（已對應 `src/types/platformioDiagnostic.ts`） | 一次完整診斷的整體狀態與五個固定項目結果 |
 | `PlatformioDiagnosticItem` | 同上 | 單一診斷項目的可用性、來源、path、`penv` 關聯、`reason` 與 `nextStep` |
 | `PlatformioDiagnosticPanelState` | 同上 | WebView panel 所需的 loading / ready / error render state |
 | `ClipboardSummary` | 同上 | 提供 `複製診斷摘要` 的純文字摘要 |
@@ -302,3 +303,4 @@ E 階段（測試 / 回歸 / 文件同步）
 | SC-003：診斷結果能指出「找不到 PlatformIO」的主要原因 | panel / clipboard summary 檢查：`pio` 缺失、`mpremote` 缺失、version probe 失敗、無系統 Python 但 `penv` 可用 |
 | SC-004：使用者能在同一 panel 內完成 retest 與 copy | panel lifecycle / message flow tests + 手動 smoke test |
 | SC-005：支援往返次數下降 | 釋出後以 issue / support 樣本觀察；實作階段先確保 clipboard summary 足以支援遠端協助 |
+| SC-006：診斷應在約 1 秒內顯示 loading，並在 10 秒內完成或以 timeout / degraded 離開 loading | panel lifecycle / service timeout tests（`T014`）+ 手動 smoke test（`T024`） |

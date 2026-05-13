@@ -154,8 +154,10 @@ export interface PlatformioDiagnosticItem {
 2. `penvRoot` 不應帶 `versionProbe`
 3. `python` / `pip` / `mpremote` 必須明確指出 `isFromDetectedPenv`
 4. `source === 'unresolved'` 時，`resolvedPath` 應為 `null`
-5. `status === 'ok'` 不等於只看 `exists`；若版本探測失敗，應降為 `warning` 或 `error`
-6. `status === 'warning'` 或 `status === 'error'` 時，`nextStep` 必須存在且具體可執行
+5. `kind === 'executable'` 且已找到可探測的 executable 時，`versionProbe` 必須存在；若探測失敗，仍需回傳 `succeeded: false` 的 `VersionProbeResult`
+6. 只有 `penvRoot` 或 `resolvedPath === null`、根本沒有可執行檔可探測時，才可省略 `versionProbe`
+7. `status === 'ok'` 不等於只看 `exists`；若版本探測失敗，應降為 `warning` 或 `error`
+8. `status === 'warning'` 或 `status === 'error'` 時，`nextStep` 必須存在且具體可執行
 
 ---
 
@@ -266,7 +268,7 @@ error
 PlatformioDiagnosticPanelState
 ├── 0..1 x PlatformioDiagnosticSession
 │   ├── 5 x PlatformioDiagnosticItem (固定順序)
-│   │   └── 0..1 x VersionProbeResult
+│   │   └── executable 且可探測時 1 x VersionProbeResult；否則 0 x
 │   └── 1 x scopeNotice
 └── 1 x ClipboardSummary（由 session 派生）
 ```

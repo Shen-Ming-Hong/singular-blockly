@@ -22,11 +22,11 @@ description: "PlatformIO 診斷 UI 功能實作任務清單"
 
 **目的**：先把 command、panel、i18n 與資料模型骨架準備好，避免後續故事各自長出不同命名與 message flow。
 
-- [ ] T001 [P] 在 `package.json`、`package.nls.json`、`package.nls.bg.json`、`package.nls.cs.json`、`package.nls.de.json`、`package.nls.es.json`、`package.nls.fr.json`、`package.nls.hu.json`、`package.nls.it.json`、`package.nls.ja.json`、`package.nls.ko.json`、`package.nls.pl.json`、`package.nls.pt-br.json`、`package.nls.ru.json`、`package.nls.tr.json` 與 `package.nls.zh-hant.json` 新增 `singular-blockly.checkPlatformioStatus` 與 `command.checkPlatformioStatus.title` 的命令貢獻與標題翻譯鍵
-- [ ] T002 [P] 在 `src/types/i18nKeys.ts`、`media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js` 新增 summary / status / reason / nextStep / action / scope 文案鍵與預設文案
-- [ ] T003 在 `src/types/platformioDiagnostic.ts` 建立 `DiagnosticItemId`、`DiagnosticSource`、`PlatformioDiagnosticItem`、`PlatformioDiagnosticSession`、`PlatformioDiagnosticPanelState`、`VersionProbeResult`、`ClipboardSummary` 與 panel message payload 型別
-- [ ] T004 在 `src/services/platformioDiagnosticService.ts` 建立 `PlatformioDiagnosticService` 基礎骨架，封裝 probe timeout、source classification、reason / nextStep builder 與 clipboard summary helper 邊界
-- [ ] T005 在 `src/webview/platformioDiagnosticPanel.ts` 與 `src/extension.ts` 建立單例 panel host 骨架、open / reveal 入口與 service 注入流程
+- [X] T001 [P] 在 `package.json`、`package.nls.json`、`package.nls.bg.json`、`package.nls.cs.json`、`package.nls.de.json`、`package.nls.es.json`、`package.nls.fr.json`、`package.nls.hu.json`、`package.nls.it.json`、`package.nls.ja.json`、`package.nls.ko.json`、`package.nls.pl.json`、`package.nls.pt-br.json`、`package.nls.ru.json`、`package.nls.tr.json` 與 `package.nls.zh-hant.json` 新增 `singular-blockly.checkPlatformioStatus` 與 `command.checkPlatformioStatus.title` 的命令貢獻與標題翻譯鍵
+- [X] T002 [P] 在 `src/types/i18nKeys.ts`、`media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js` 新增 summary / status / reason / nextStep / action / scope 文案鍵與預設文案
+- [X] T003 在 `src/types/platformioDiagnostic.ts` 建立 `DiagnosticItemId`、`DiagnosticSource`、`PlatformioDiagnosticItem`、`PlatformioDiagnosticSession`、`PlatformioDiagnosticPanelState`、`VersionProbeResult`、`ClipboardSummary` 與 panel message payload 型別
+- [X] T004 在 `src/services/platformioDiagnosticService.ts` 建立 `PlatformioDiagnosticService` 基礎骨架，封裝 probe timeout、source classification、reason / nextStep builder 與 clipboard summary helper 邊界
+- [X] T005 在 `src/webview/platformioDiagnosticPanel.ts` 與 `src/extension.ts` 建立單例 panel host 骨架、open / reveal 入口與 service 注入流程
 
 ---
 
@@ -37,16 +37,16 @@ description: "PlatformIO 診斷 UI 功能實作任務清單"
 
 ### 使用者故事 1 的測試
 
-- [ ] T006 [P] [US1] 在 `src/test/services/platformioDiagnosticService.test.ts` 新增五個固定項目、PATH fallback、sibling `penv`、`reason` / `nextStep`、部分失敗與整體狀態判定的測試案例
-- [ ] T007 [P] [US1] 在 `src/test/extension.activate.test.ts` 新增 `singular-blockly.checkPlatformioStatus` 命令註冊與 panel open / reveal 行為的測試案例
-- [ ] T008 [P] [US1] 在 `src/test/webview/platformioDiagnosticPanel.test.ts` 新增 panel 初始 loading、完整清單 render、summary / tools / scope 三段結構與單例 lifecycle 的測試案例
+- [X] T006 [P] [US1] 在 `src/test/services/platformioDiagnosticService.test.ts` 新增五個固定項目、PATH fallback、sibling `penv`、`reason` / `nextStep`、部分失敗與整體狀態判定的測試案例
+- [X] T007 [P] [US1] 在 `src/test/extension.activate.test.ts` 新增 `singular-blockly.checkPlatformioStatus` 命令註冊與 panel open / reveal 行為的測試案例
+- [X] T008 [P] [US1] 在 `src/test/webview/platformioDiagnosticPanel.test.ts` 新增 panel 初始 loading、完整清單 render、summary / tools / scope 三段結構與單例 lifecycle 的測試案例
 
 ### 使用者故事 1 的實作
 
-- [ ] T009 [US1] 在 `src/services/platformioDiagnosticService.ts` 實作 `pio` 與 `penv` 根目錄收集邏輯，沿用 `src/services/executableResolver.ts` 與現有 fallback 規則
-- [ ] T010 [US1] 在 `src/services/platformioDiagnosticService.ts` 實作 `python`、`pip`、`mpremote` 的 `penv` 感知診斷、來源標記、版本探測、`reason` 與 `nextStep`
-- [ ] T011 [US1] 在 `media/html/platformioDiagnostic.html`、`media/css/platformioDiagnostic.css`、`media/js/platformioDiagnostic.js` 實作摘要區、完整工具清單區、scope 區與既有 repo 視覺語言一致的 panel shell
-- [ ] T012 [US1] 在 `src/webview/platformioDiagnosticPanel.ts` 與 `src/extension.ts` 實作首次 command 開啟 panel 時的 loading / ready render pipeline；再次執行 command 僅 reveal 既有 panel，重新診斷只由 `platformioDiagnostic:retest` 觸發，且不綁定 upload 流程
+- [X] T009 [US1] 在 `src/services/platformioDiagnosticService.ts` 實作 `pio` 與 `penv` 根目錄收集邏輯，沿用 `src/services/executableResolver.ts` 與現有 fallback 規則
+- [X] T010 [US1] 在 `src/services/platformioDiagnosticService.ts` 實作 `python`、`pip`、`mpremote` 的 `penv` 感知診斷、來源標記、版本探測、`reason` 與 `nextStep`
+- [X] T011 [US1] 在 `media/html/platformioDiagnostic.html`、`media/css/platformioDiagnostic.css`、`media/js/platformioDiagnostic.js` 實作摘要區、完整工具清單區、scope 區與既有 repo 視覺語言一致的 panel shell
+- [X] T012 [US1] 在 `src/webview/platformioDiagnosticPanel.ts` 與 `src/extension.ts` 實作首次 command 開啟 panel 時的 loading / ready render pipeline；再次執行 command 僅 reveal 既有 panel，重新診斷只由 `platformioDiagnostic:retest` 觸發，且不綁定 upload 流程
 
 **檢查點**：此時使用者故事 1 應可獨立運作，使用者能在獨立 panel 中看見完整診斷結果。
 
@@ -59,13 +59,13 @@ description: "PlatformIO 診斷 UI 功能實作任務清單"
 
 ### 使用者故事 2 的測試
 
-- [ ] T013 [P] [US2] 在 `src/test/extension.activate.test.ts` 與 `src/test/webview/platformioDiagnosticPanel.test.ts` 新增 `platformioDiagnostic:retest` 會重新進入 loading 並重新 render 的測試案例
-- [ ] T014 [P] [US2] 在 `src/test/services/platformioDiagnosticService.test.ts` 新增 fresh session timestamp、重新探測、部分失敗更新，以及單一工具 probe timeout 會結束等待並回傳可用結果／失敗狀態而不是讓 panel 卡死 loading 的測試案例
+- [X] T013 [P] [US2] 在 `src/test/extension.activate.test.ts` 與 `src/test/webview/platformioDiagnosticPanel.test.ts` 新增 `platformioDiagnostic:retest` 會重新進入 loading 並重新 render 的測試案例
+- [X] T014 [P] [US2] 在 `src/test/services/platformioDiagnosticService.test.ts` 新增 fresh session timestamp、重新探測、部分失敗更新，以及單一工具 probe timeout 會結束等待並回傳可用結果／失敗狀態而不是讓 panel 卡死 loading 的測試案例
 
 ### 使用者故事 2 的實作
 
-- [ ] T015 [US2] 在 `media/js/platformioDiagnostic.js` 實作 `重新測試` 按鈕事件、loading 中按鈕鎖定與 message 發送
-- [ ] T016 [US2] 在 `src/webview/platformioDiagnosticPanel.ts` 與 `src/extension.ts` 實作 `platformioDiagnostic:retest` 處理流程，確保每次點擊都重新收集診斷而不沿用前一次結果
+- [X] T015 [US2] 在 `media/js/platformioDiagnostic.js` 實作 `重新測試` 按鈕事件、loading 中按鈕鎖定與 message 發送
+- [X] T016 [US2] 在 `src/webview/platformioDiagnosticPanel.ts` 與 `src/extension.ts` 實作 `platformioDiagnostic:retest` 處理流程，確保每次點擊都重新收集診斷而不沿用前一次結果
 
 **檢查點**：此時使用者故事 2 應可獨立驗證，重新測試會產生新結果並正確更新 panel 狀態。
 
@@ -78,13 +78,13 @@ description: "PlatformIO 診斷 UI 功能實作任務清單"
 
 ### 使用者故事 3 的測試
 
-- [ ] T017 [P] [US3] 在 `src/test/services/platformioDiagnosticService.test.ts` 新增 clipboard summary 格式、五項固定順序、`reason` / `nextStep` 精簡資訊與 scope 提醒的測試案例
-- [ ] T018 [P] [US3] 在 `src/test/extension.activate.test.ts` 與 `src/test/webview/platformioDiagnosticPanel.test.ts` 新增 `platformioDiagnostic:copySummary`、clipboard 寫入與 copyResult 回饋的測試案例
+- [X] T017 [P] [US3] 在 `src/test/services/platformioDiagnosticService.test.ts` 新增 clipboard summary 格式、五項固定順序、`reason` / `nextStep` 精簡資訊與 scope 提醒的測試案例
+- [X] T018 [P] [US3] 在 `src/test/extension.activate.test.ts` 與 `src/test/webview/platformioDiagnosticPanel.test.ts` 新增 `platformioDiagnostic:copySummary`、clipboard 寫入與 copyResult 回饋的測試案例
 
 ### 使用者故事 3 的實作
 
-- [ ] T019 [US3] 在 `src/services/platformioDiagnosticService.ts` 實作 clipboard plain-text summary builder，固定輸出五個項目、來源、`reason` / `nextStep` 精簡摘要與 scope 提醒
-- [ ] T020 [US3] 在 `media/js/platformioDiagnostic.js` 與 `src/webview/platformioDiagnosticPanel.ts` 實作 `複製診斷摘要` 動作、copyResult 回饋與無可複製資料時的處理
+- [X] T019 [US3] 在 `src/services/platformioDiagnosticService.ts` 實作 clipboard plain-text summary builder，固定輸出五個項目、來源、`reason` / `nextStep` 精簡摘要與 scope 提醒
+- [X] T020 [US3] 在 `media/js/platformioDiagnostic.js` 與 `src/webview/platformioDiagnosticPanel.ts` 實作 `複製診斷摘要` 動作、copyResult 回饋與無可複製資料時的處理
 
 **檢查點**：此時使用者故事 3 應可獨立驗證，使用者能把可讀診斷摘要直接貼到 Issue 或對話中。
 
@@ -94,11 +94,11 @@ description: "PlatformIO 診斷 UI 功能實作任務清單"
 
 **目的**：收斂所有文案、視覺一致性、回歸保護與文件，確認功能真的能交付。
 
-- [ ] T021 [P] 在 `src/webview/platformioDiagnosticPanel.ts`、`media/html/platformioDiagnostic.html`、`media/css/platformioDiagnostic.css`、`media/js/platformioDiagnostic.js` 與 `src/services/localeService.ts` 校對 panel lifecycle、LocaleService 載入、狀態卡片、primary / secondary button 與 light / dark theme parity，確認視覺語言對齊 `media/html/blocklyEdit.html` 與 `media/css/blocklyEdit.css`
-- [ ] T022 [P] 逐一核對並同步 `specs/052-platformio-diagnostic-ui/spec.md`、`specs/052-platformio-diagnostic-ui/plan.md`、`specs/052-platformio-diagnostic-ui/research.md`、`specs/052-platformio-diagnostic-ui/data-model.md`、`specs/052-platformio-diagnostic-ui/quickstart.md`、`specs/052-platformio-diagnostic-ui/tasks.md`、`specs/052-platformio-diagnostic-ui/contracts/platformio-diagnostic-command.md`、`specs/052-platformio-diagnostic-ui/contracts/platformio-diagnostic-report.md` 與 `specs/052-platformio-diagnostic-ui/checklists/requirements.md`，確認 panel UX、baseline、manual override deferred 與 smoke test 語言一致
-- [ ] T023 對 `src/extension.ts`、`src/webview/platformioDiagnosticPanel.ts`、`src/types/platformioDiagnostic.ts`、`src/services/platformioDiagnosticService.ts`、`src/test/extension.activate.test.ts`、`src/test/webview/platformioDiagnosticPanel.test.ts`、`src/test/services/platformioDiagnosticService.test.ts`、`package.json`、`package.nls.json`、`package.nls.bg.json`、`package.nls.cs.json`、`package.nls.de.json`、`package.nls.es.json`、`package.nls.fr.json`、`package.nls.hu.json`、`package.nls.it.json`、`package.nls.ja.json`、`package.nls.ko.json`、`package.nls.pl.json`、`package.nls.pt-br.json`、`package.nls.ru.json`、`package.nls.tr.json`、`package.nls.zh-hant.json`、`src/types/i18nKeys.ts`、`media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js` 執行 targeted tests（含 probe timeout 相關案例），以及 `npm run compile`、`npm run lint`、`npm run validate:i18n` 與 `npm test`
-- [ ] T024 依 `specs/052-platformio-diagnostic-ui/quickstart.md` 執行 Extension Development Host 手動 smoke test，確認 command 開 panel 時約 1 秒內可見 loading UI、panel reopen / reveal、完整清單、`reason` / `nextStep`、`重新測試`、`複製診斷摘要`、theme parity，以及代表性 timeout / latency 情境下單次診斷於 10 秒內完成或以 timeout graceful 結束，且 `media/js/blocklyEdit.js` / `media/css/blocklyEdit.css` upload button icon 不會非預期旋轉
-- [ ] T025 在 `package.json`、`src/webview/platformioDiagnosticPanel.ts`、`media/html/platformioDiagnostic.html`、`media/js/platformioDiagnostic.js`、`src/services/arduinoUploader.ts` 與 `src/services/micropythonUploader.ts` 核對本次未新增手動 override 欄位、未將診斷入口綁進 upload 流程，並保留「手動設定 `pio` / `penv` / `python` / `pip` / `mpremote` 路徑屬於下一次 SDD」的範圍聲明
+- [X] T021 [P] 在 `src/webview/platformioDiagnosticPanel.ts`、`media/html/platformioDiagnostic.html`、`media/css/platformioDiagnostic.css`、`media/js/platformioDiagnostic.js` 與 `src/services/localeService.ts` 校對 panel lifecycle、LocaleService 載入、狀態卡片、primary / secondary button 與 light / dark theme parity，確認視覺語言對齊 `media/html/blocklyEdit.html` 與 `media/css/blocklyEdit.css`
+- [X] T022 [P] 逐一核對並同步 `specs/052-platformio-diagnostic-ui/spec.md`、`specs/052-platformio-diagnostic-ui/plan.md`、`specs/052-platformio-diagnostic-ui/research.md`、`specs/052-platformio-diagnostic-ui/data-model.md`、`specs/052-platformio-diagnostic-ui/quickstart.md`、`specs/052-platformio-diagnostic-ui/tasks.md`、`specs/052-platformio-diagnostic-ui/contracts/platformio-diagnostic-command.md`、`specs/052-platformio-diagnostic-ui/contracts/platformio-diagnostic-report.md` 與 `specs/052-platformio-diagnostic-ui/checklists/requirements.md`，確認 panel UX、baseline、manual override deferred 與 smoke test 語言一致
+- [X] T023 對 `src/extension.ts`、`src/webview/platformioDiagnosticPanel.ts`、`src/types/platformioDiagnostic.ts`、`src/services/platformioDiagnosticService.ts`、`src/test/extension.activate.test.ts`、`src/test/webview/platformioDiagnosticPanel.test.ts`、`src/test/services/platformioDiagnosticService.test.ts`、`package.json`、`package.nls.json`、`package.nls.bg.json`、`package.nls.cs.json`、`package.nls.de.json`、`package.nls.es.json`、`package.nls.fr.json`、`package.nls.hu.json`、`package.nls.it.json`、`package.nls.ja.json`、`package.nls.ko.json`、`package.nls.pl.json`、`package.nls.pt-br.json`、`package.nls.ru.json`、`package.nls.tr.json`、`package.nls.zh-hant.json`、`src/types/i18nKeys.ts`、`media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js` 執行 targeted tests（含 probe timeout 相關案例），以及 `npm run compile`、`npm run lint`、`npm run validate:i18n` 與 `npm test`
+- [X] T024 依 `specs/052-platformio-diagnostic-ui/quickstart.md` 執行 Extension Development Host 手動 smoke test，確認 command 開 panel 時約 1 秒內可見 loading UI、panel reopen / reveal、完整清單、`reason` / `nextStep`、`重新測試`、`複製診斷摘要`、theme parity，以及代表性 timeout / latency 情境下單次診斷於 10 秒內完成或以 timeout graceful 結束，且 `media/js/blocklyEdit.js` / `media/css/blocklyEdit.css` upload button icon 不會非預期旋轉
+- [X] T025 在 `package.json`、`src/webview/platformioDiagnosticPanel.ts`、`media/html/platformioDiagnostic.html`、`media/js/platformioDiagnostic.js`、`src/services/arduinoUploader.ts` 與 `src/services/micropythonUploader.ts` 核對本次未新增手動 override 欄位、未將診斷入口綁進 upload 流程，並保留「手動設定 `pio` / `penv` / `python` / `pip` / `mpremote` 路徑屬於下一次 SDD」的範圍聲明
 
 ---
 
