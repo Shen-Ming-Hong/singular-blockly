@@ -67,7 +67,7 @@
 - [ ] T019 [US2] 在 `src/services/txtUploader.ts` 與 `src/webview/messageHandler.ts` 整合 companion runtime 的啟停、session reset 與錯誤回退流程
 - [ ] T020 [US2] 在 `media/js/blocklyEdit.js` 實作 `running` 模式鎖位、press/release dispatch 與 `editing`/`running` reconciliation
 - [ ] T021 [US2] 在 `media/js/blocklyEdit.js` 與 `media/css/blocklyEdit.css` 實作按下/放開狀態的視覺回饋與目前狀態顯示
-- [ ] T022 [US2] 在 `media/blockly/generators/txt/txt.js` 與 `media/blockly/generators/txt/index.js` 產生 `_txt_virtual_button_state(stableId)` helper 與 runtime-aware TXT code output
+- [ ] T022 [US2] 在 `media/blockly/blocks/txt.js`、`media/blockly/generators/txt/txt.js` 與 `media/blockly/generators/txt/index.js` 實作 `txt_virtual_button_state` 的基本按鈕選取、`stableId` 綁定與 `_txt_virtual_button_state(stableId)` code output
 - [ ] T023 [US2] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄 press/release、0.5 秒輸入延遲驗證與不干擾 Test Panel 的手動驗證結果
 
 **檢查點**: 使用者故事 2 應可在使用者故事 1 的畫布基礎上獨立驗證執行中輸入、狀態顯示、位置鎖定與 runtime 分離行為
@@ -87,7 +87,7 @@
 
 - [ ] T025 [US3] 在 `media/js/blocklyEdit.js` 實作 rename collision handling、名稱轉換結果顯示與修正提示
 - [ ] T026 [US3] 在 `media/js/blocklyEdit.js` 實作已被引用按鈕的刪除前警告、確認流程與刪除後引用保留策略
-- [ ] T027 [US3] 在 `media/blockly/blocks/txt.js` 實作 `txt_virtual_button_state` 下拉資料源、rename 後標籤刷新與 invalid-reference warning
+- [ ] T027 [US3] 在 `media/blockly/blocks/txt.js` 實作 `txt_virtual_button_state` 的 rename 後標籤刷新、失效引用標示與 invalid-reference warning
 - [ ] T028 [US3] 在 `media/js/blocklyEdit.js` 與 `src/webview/messageHandler.ts` 實作 `stableId` 綁定解析、失效引用診斷與執行前 preflight 阻擋
 - [ ] T029 [US3] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄名稱轉換提示、重名處理、刪除前警告與 invalid reference 阻擋的手動驗證結果
 
