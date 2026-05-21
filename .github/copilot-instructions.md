@@ -228,6 +228,5 @@ Conventional Commits with scopes: `feat(blocks)`, `fix(webview)`, `i18n(ja)`, `c
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan at
-`specs/052-platformio-diagnostic-ui/plan.md`
+shell commands, and other important information, read the current plan
 <!-- SPECKIT END -->
