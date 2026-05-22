@@ -8,6 +8,28 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.75.0] - 2026-05-22
+
+### ✨ 新功能 New Features
+
+- **TXT 虛擬控制畫布** (TXT virtual controls canvas)
+    - 在既有 Blockly WebView 內新增 TXT 虛擬控制畫布，支援建立、命名、拖曳與自由排列多顆虛擬按鈕；按鈕尺寸會依名稱動態調整，並可即時預覽文字色與背景色
+      Added a TXT virtual controls canvas inside the existing Blockly WebView, allowing users to create, name, drag, and freely arrange multiple virtual buttons with auto-resizing labels and live text/background color previews
+    - `txtVirtualControls` 會持久化到 `blockly/main.json` 根層級，重新開啟專案後可還原按鈕名稱、位置、顏色與 stableId/identifier 綁定關係
+      Persisted `txtVirtualControls` at the root of `blockly/main.json`, restoring button names, positions, colors, and stableId/identifier bindings when the project is reopened
+    - 新增 `txt_virtual_button_state` 積木、TXT 生成器與 companion runtime session 流程，讓執行中的 TXT 程式可讀取瞬時 press / release 狀態，停止後自動回到可編輯模式
+      Added the `txt_virtual_button_state` block, TXT generator support, and companion runtime session flow so running TXT programs can read momentary press/release state and automatically return to editable mode when execution stops
+    - 已刪除按鈕若仍被積木引用，系統會保留積木並顯示 invalid reference 警告，且在執行前阻止啟動直到引用修正
+      Blocks now retain deleted-button references with invalid-reference warnings, and TXT execution is blocked until those references are repaired
+
+### 🐛 修復 Bug Fixes
+
+- **TXT 虛擬控制 runtime 安全性與穩定性修正** (TXT virtual controls runtime hardening and stability fixes)
+    - 為 companion runtime 的 mutation endpoints 加入 `X-Singular-Blockly-Token` 共用 token 驗證，避免未授權請求覆寫虛擬控制狀態；若 token 不一致，extension 端會自動重啟 runtime 並重試 session 建立
+      Added `X-Singular-Blockly-Token` shared-token protection to companion runtime mutation endpoints to prevent unauthorized state updates; when the token mismatches, the extension automatically restarts the runtime and retries session creation
+    - 修正 TXT Python helper 的縮排輸出，並補上 dedicated workspace fixtures 與回歸測試，確保 generator 與新 TXT wrapper 結構穩定
+      Fixed TXT Python helper indentation output and added dedicated workspace fixtures plus regression tests to keep the generator and new TXT wrapper structure stable
+
 ## [0.74.0] - 2026-05-13
 
 ### ✨ 新功能 New Features

@@ -57,7 +57,7 @@ npm run generate:dictionary
 - ✅ `npm run generate:dictionary`
   - `src/mcp/block-dictionary.json` 已重建，包含最新 TXT 積木索引
 - ✅ `npm test`
-  - 2026-05-22 PR 前複驗：686 passing, 1 pending
+  - 2026-05-22 PR 前複驗：687 passing, 1 pending
 - ✅ 2026-05-22 目標回歸測試
   - `txtVirtualControlsIdentity.test.ts`
   - `txtVirtualControlsPersistence.test.ts`
