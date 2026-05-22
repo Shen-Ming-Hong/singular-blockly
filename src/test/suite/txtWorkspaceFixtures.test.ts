@@ -18,8 +18,8 @@ type SerializedBlock = {
 suite('TXT Workspace Fixture Tests', () => {
 	const PROJECT_ROOT = path.join(__dirname, '..', '..', '..');
 	const fixturePaths = [
-		path.join(PROJECT_ROOT, 'extension_test', 'blockly', 'main.json'),
-		path.join(PROJECT_ROOT, 'extension_test', 'blockly', 'main.json.bak'),
+			path.join(PROJECT_ROOT, 'src', 'test', 'fixtures', 'txt-workspace-main.json'),
+			path.join(PROJECT_ROOT, 'src', 'test', 'fixtures', 'txt-workspace-main.bak.json'),
 	];
 
 	function collectBlockTypes(block: SerializedBlock | undefined, blockTypes: string[]): void {

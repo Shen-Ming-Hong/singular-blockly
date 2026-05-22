@@ -169,22 +169,22 @@ window.txtGenerator.forBlock['txt_virtual_button_state'] = function (block) {
 	window.txtGenerator.addImport('import os');
 	window.txtGenerator.addFunction(
 		'_txt_virtual_button_state',
-		`_txt_virtual_button_cache_ = {'mtime': None, 'controls': {}}
-def _txt_virtual_button_state(stable_id):
-	state_path = '/tmp/singular_blockly/virtual_controls_state.json'
-	try:
-		mtime = os.path.getmtime(state_path)
-		if _txt_virtual_button_cache_['mtime'] != mtime:
-			with open(state_path, 'r', encoding='utf-8') as handle:
-				payload = json.load(handle)
-			_txt_virtual_button_cache_['mtime'] = mtime
-			_txt_virtual_button_cache_['controls'] = payload.get('controls', {})
-		entry = _txt_virtual_button_cache_['controls'].get(stable_id)
-		return 1 if entry and entry.get('pressed') else 0
-	except Exception:
-		_txt_virtual_button_cache_['mtime'] = None
-		_txt_virtual_button_cache_['controls'] = {}
-		return 0`
+		"_txt_virtual_button_cache_ = {'mtime': None, 'controls': {}}\n" +
+			'def _txt_virtual_button_state(stable_id):\n' +
+			"    state_path = '/tmp/singular_blockly/virtual_controls_state.json'\n" +
+			'    try:\n' +
+			'        mtime = os.path.getmtime(state_path)\n' +
+			"        if _txt_virtual_button_cache_['mtime'] != mtime:\n" +
+			"            with open(state_path, 'r', encoding='utf-8') as handle:\n" +
+			'                payload = json.load(handle)\n' +
+			"            _txt_virtual_button_cache_['mtime'] = mtime\n" +
+			"            _txt_virtual_button_cache_['controls'] = payload.get('controls', {})\n" +
+			"        entry = _txt_virtual_button_cache_['controls'].get(stable_id)\n" +
+			"        return 1 if entry and entry.get('pressed') else 0\n" +
+			'    except Exception:\n' +
+			"        _txt_virtual_button_cache_['mtime'] = None\n" +
+			"        _txt_virtual_button_cache_['controls'] = {}\n" +
+			'        return 0'
 	);
 
 	return [`_txt_virtual_button_state(${window.txtGenerator.quote_(stableId)})`, window.txtGenerator.ORDER_FUNCTION_CALL];

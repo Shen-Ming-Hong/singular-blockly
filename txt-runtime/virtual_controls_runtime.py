@@ -21,6 +21,8 @@ from typing import Any, Dict
 RUNTIME_DIR = "/tmp/singular_blockly"
 STATE_FILE = os.path.join(RUNTIME_DIR, "virtual_controls_state.json")
 _STATE_LOCK = threading.RLock()
+AUTH_HEADER = "X-Singular-Blockly-Token"
+_AUTH_TOKEN = None
 _STATE: Dict[str, Any] = {
     "sessionId": None,
     "updatedAt": 0,
@@ -30,6 +32,14 @@ _STATE: Dict[str, Any] = {
 
 def now_ms() -> int:
     return int(time.time() * 1000)
+
+
+def set_auth_token(token: Any) -> None:
+    global _AUTH_TOKEN
+    if isinstance(token, str) and token.strip():
+        _AUTH_TOKEN = token.strip()
+        return
+    _AUTH_TOKEN = None
 
 
 def ensure_runtime_dir() -> None:
@@ -129,6 +139,12 @@ def apply_snapshot(payload: Dict[str, Any]) -> None:
         write_state_file()
 
 
+def is_request_authorized(handler: BaseHTTPRequestHandler) -> bool:
+    if not _AUTH_TOKEN:
+        return True
+    return handler.headers.get(AUTH_HEADER) == _AUTH_TOKEN
+
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     daemon_threads = True
     allow_reuse_address = True
@@ -148,6 +164,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def require_auth(self) -> bool:
+        if is_request_authorized(self):
+            return True
+        self.respond(401, {"ok": False, "error": "Unauthorized"})
+        return False
+
     def do_GET(self) -> None:  # noqa: N802
         if self.path != "/health":
             self.respond(404, {"ok": False, "error": "Not found"})
@@ -165,6 +187,8 @@ class RequestHandler(BaseHTTPRequestHandler):
     def do_PUT(self) -> None:  # noqa: N802
         if self.path != "/session":
             self.respond(404, {"ok": False, "error": "Not found"})
+            return
+        if not self.require_auth():
             return
 
         try:
@@ -193,6 +217,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path != "/snapshot":
             self.respond(404, {"ok": False, "error": "Not found"})
             return
+        if not self.require_auth():
+            return
 
         try:
             payload = read_json_body(self)
@@ -220,6 +246,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path != "/session":
             self.respond(404, {"ok": False, "error": "Not found"})
             return
+        if not self.require_auth():
+            return
 
         with _STATE_LOCK:
             reset_state()
@@ -229,12 +257,16 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 def main(argv: Any) -> int:
     port = 8081
+    auth_token = None
     if len(argv) > 1:
         port = int(argv[1])
+    if len(argv) > 2:
+        auth_token = argv[2]
 
     ensure_runtime_dir()
     reset_state()
     clear_state_file()
+    set_auth_token(auth_token)
 
     server = ThreadedHTTPServer(("0.0.0.0", port), RequestHandler)
     try:

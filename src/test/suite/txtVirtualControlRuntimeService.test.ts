@@ -118,16 +118,41 @@ suite('TxtVirtualControlRuntimeService Test Suite', () => {
 		assert.strictEqual(installClient.putFile.firstCall.args[1], '/tmp/singular_blockly/virtual_controls_runtime.py');
 		assert.strictEqual(startClient.execCommand.callCount, 2);
 		assert.match(startClient.execCommand.firstCall.args[0], /pkill -f 'virtual_controls_runtime\.py'/);
-		assert.match(startClient.execCommand.secondCall.args[0], /nohup python3 \/tmp\/singular_blockly\/virtual_controls_runtime\.py 8081/);
+		assert.match(
+			startClient.execCommand.secondCall.args[0],
+			/nohup python3 \/tmp\/singular_blockly\/virtual_controls_runtime\.py 8081 [a-f0-9]{32}/
+		);
 		assert.match(startClient.execCommand.secondCall.args[0], /sleep 3/);
 
 		assert.strictEqual(fetchStub.callCount, 3);
 		assert.strictEqual(fetchStub.getCall(0).args[0], 'http://192.168.7.2:8081/health');
 		assert.strictEqual(fetchStub.getCall(1).args[0], 'http://192.168.7.2:8081/health');
 		assert.strictEqual(fetchStub.getCall(2).args[0], 'http://192.168.7.2:8081/session');
+		assert.strictEqual(fetchStub.getCall(1).args[1].headers['X-Singular-Blockly-Token'].length, 32);
+		assert.strictEqual(fetchStub.getCall(2).args[1].headers['X-Singular-Blockly-Token'].length, 32);
 		assert.deepStrictEqual(JSON.parse(fetchStub.getCall(2).args[1].body as string).controls, [
 			{ stableId: 'btn-1', identifier: 'start' },
 		]);
+	});
+
+	test('createSession should restart the runtime when an existing process rejects the auth token', async () => {
+		fetchStub.onCall(0).resolves(jsonResponse({ ok: true, sessionId: null, updatedAt: Date.now() }));
+		fetchStub.onCall(1).resolves(jsonResponse({ error: 'Unauthorized' }, false, 401));
+		fetchStub.onCall(2).resolves(jsonResponse({ ok: true, sessionId: null, updatedAt: Date.now() }));
+		fetchStub.onCall(3).resolves(jsonResponse({ ok: true, updatedAt: 123456 }));
+
+		const session = await service.createSession(document);
+
+		assert.strictEqual(session.mode, 'running');
+		assert.strictEqual(sshClients.length, 2, 'auth mismatch should reinstall/restart the runtime before retrying');
+		assert.strictEqual(fetchStub.callCount, 4);
+		assert.strictEqual(fetchStub.getCall(1).args[0], 'http://192.168.7.2:8081/session');
+		assert.strictEqual(fetchStub.getCall(3).args[0], 'http://192.168.7.2:8081/session');
+		assert.notStrictEqual(
+			fetchStub.getCall(1).args[1].headers['X-Singular-Blockly-Token'],
+			fetchStub.getCall(3).args[1].headers['X-Singular-Blockly-Token'],
+			'restarting the runtime should rotate the shared token'
+		);
 	});
 
 	test('syncSnapshot should post pressed states for each control', async () => {
@@ -155,5 +180,6 @@ suite('TxtVirtualControlRuntimeService Test Suite', () => {
 			!runtimeSource.includes('from __future__ import annotations'),
 			'TXT runtime must avoid Python 3.7+ future imports because the controller still runs Python 3.6'
 		);
+		assert.ok(runtimeSource.includes('X-Singular-Blockly-Token'), 'runtime should validate a shared auth token for state mutation requests');
 	});
 });

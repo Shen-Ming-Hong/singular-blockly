@@ -75,6 +75,20 @@ virtualControlPort = runtimePort + 1
 
 ## HTTP 端點
 
+### 驗證標頭 Authentication Header
+
+除 `GET /health` 外，Extension Host 對 companion runtime 的請求都必須攜帶：
+
+```text
+X-Singular-Blockly-Token: {runtimeAuthToken}
+```
+
+### 規則
+
+- `runtimeAuthToken` 由 Extension Host 在啟動 runtime 時隨機產生，並以命令列參數傳入 runtime。
+- `PUT /session`、`POST /snapshot` 與 `DELETE /session` 若缺少或提供錯誤 token，必須回傳 `401 Unauthorized`。
+- `GET /health` 保持可匿名呼叫，讓 Host 可以偵測舊 runtime 並在 token 不匹配時主動重啟。
+
 ### 1. `GET /health`
 
 確認 runtime 是否已啟動。
@@ -184,6 +198,7 @@ virtualControlPort = runtimePort + 1
 | HTTP 狀態 | 情境 |
 |-----------|------|
 | 200 | 操作成功 |
+| 401 | 缺少或提供錯誤的 `X-Singular-Blockly-Token` |
 | 400 | Body 缺欄位、格式錯誤、非法 `stableId` |
 | 409 | `sessionId` 與 active session 不符 |
 | 500 | runtime 內部錯誤（檔案寫入、JSON 編碼、未預期例外） |

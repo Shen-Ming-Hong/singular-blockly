@@ -41,6 +41,7 @@ interface RuntimeMutationResponse {
 export class TxtVirtualControlRuntimeService {
 	private readonly runtimeScriptRemotePath = '/tmp/singular_blockly/virtual_controls_runtime.py';
 	private readonly runtimeLogPath = '/tmp/singular_blockly/virtual_controls_runtime.log';
+	private runtimeAuthToken: string | null = null;
 
 	constructor(
 		private readonly connectionService: TxtConnectionService,
@@ -104,6 +105,7 @@ export class TxtVirtualControlRuntimeService {
 		const password = await this.connectionService.getPasswordOrDefault();
 		const ssh = this.sshFactory();
 		const runtimePort = this.getRuntimePort();
+		this.runtimeAuthToken = this.createRuntimeAuthToken();
 
 		try {
 			await this.installRuntime();
@@ -118,7 +120,7 @@ export class TxtVirtualControlRuntimeService {
 			// Run nohup as a standalone command (matching txtTestService pattern) so the
 			// shell correctly detaches the background process and creates the log file.
 			const startResult = await ssh.execCommand(
-				`nohup python3 ${this.runtimeScriptRemotePath} ${runtimePort} > ${this.runtimeLogPath} 2>&1 & sleep 3`
+				`nohup python3 ${this.runtimeScriptRemotePath} ${runtimePort} ${this.runtimeAuthToken} > ${this.runtimeLogPath} 2>&1 & sleep 3`
 			);
 			log(
 				`TXT virtual control runtime start: code=${startResult.code} stdout="${startResult.stdout}" stderr="${startResult.stderr}"`,
@@ -149,13 +151,31 @@ export class TxtVirtualControlRuntimeService {
 	public async createSession(document: TxtVirtualControlsDocument): Promise<VirtualControlRuntimeSession> {
 		const sessionId = crypto.randomUUID();
 		await this.ensureRuntimeRunning();
-		const response = await this.requestJson<RuntimeMutationResponse>('/session', {
-			method: 'PUT',
-			body: JSON.stringify({
-				sessionId,
-				controls: buildTxtVirtualControlSessionControls(document),
-			}),
-		});
+		let response: RuntimeMutationResponse;
+		try {
+			response = await this.requestJson<RuntimeMutationResponse>('/session', {
+				method: 'PUT',
+				body: JSON.stringify({
+					sessionId,
+					controls: buildTxtVirtualControlSessionControls(document),
+				}),
+			});
+		} catch (error) {
+			if (!this.isUnauthorizedRuntimeError(error)) {
+				throw error;
+			}
+
+			log('TXT virtual control runtime auth mismatch detected; restarting runtime', 'warn');
+			await this.startRuntime();
+			await this.waitForRuntimeHealth();
+			response = await this.requestJson<RuntimeMutationResponse>('/session', {
+				method: 'PUT',
+				body: JSON.stringify({
+					sessionId,
+					controls: buildTxtVirtualControlSessionControls(document),
+				}),
+			});
+		}
 		if (!response.ok) {
 			throw new Error(response.error || 'TXT virtual control runtime rejected the session request.');
 		}
@@ -217,6 +237,7 @@ export class TxtVirtualControlRuntimeService {
 		try {
 			const response = await this.fetchImpl(this.getRuntimeUrl('/health'), {
 				method: 'GET',
+				headers: this.getRuntimeAuthHeaders(),
 				signal: controller.signal,
 			});
 			if (!response.ok) {
@@ -286,6 +307,7 @@ export class TxtVirtualControlRuntimeService {
 			...init,
 			headers: {
 				'Content-Type': 'application/json',
+				...this.getRuntimeAuthHeaders(),
 				...(init.headers || {}),
 			},
 		});
@@ -303,6 +325,24 @@ export class TxtVirtualControlRuntimeService {
 		const port = this.getRuntimePort();
 		const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 		return `http://${host}:${port}${normalizedEndpoint}`;
+	}
+
+	private createRuntimeAuthToken(): string {
+		return crypto.randomUUID().replace(/-/g, '');
+	}
+
+	private getRuntimeAuthHeaders(): Record<string, string> {
+		if (!this.runtimeAuthToken) {
+			return {};
+		}
+
+		return {
+			'X-Singular-Blockly-Token': this.runtimeAuthToken,
+		};
+	}
+
+	private isUnauthorizedRuntimeError(error: unknown): boolean {
+		return error instanceof Error && /unauthorized/i.test(error.message);
 	}
 }
 
