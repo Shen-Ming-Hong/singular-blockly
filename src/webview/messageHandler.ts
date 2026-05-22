@@ -22,6 +22,18 @@ import { fetchSampleIndex, fetchSampleWorkspace, validateSampleWorkspace, applyN
 import { TxtConnectionService } from '../services/txtConnectionService';
 import { TxtUploader } from '../services/txtUploader';
 import { TxtTestService } from '../services/txtTestService';
+import {
+	createTxtVirtualControlRuntimeService,
+	TxtVirtualControlRuntimeService,
+} from '../services/txtVirtualControlRuntimeService';
+import {
+	createEmptyTxtVirtualControlsDocument,
+	InvalidVirtualControlReference,
+	normalizeTxtVirtualControlsForSave,
+	TxtVirtualControlPreflight,
+	TxtVirtualControlsDocument,
+	VirtualControlRuntimeSession,
+} from '../types/txtVirtualControls';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -74,6 +86,10 @@ export class WebViewMessageHandler {
 	private txtConnectionService: TxtConnectionService | null = null;
 	private txtUploader: TxtUploader | null = null;
 	private txtTestService: TxtTestService | null = null;
+	private txtVirtualControlRuntimeService: TxtVirtualControlRuntimeService | null = null;
+	private txtVirtualControlsDocument: TxtVirtualControlsDocument = createEmptyTxtVirtualControlsDocument();
+	private txtVirtualControlSession: VirtualControlRuntimeSession | null = null;
+	private txtVirtualControlPressedStates: Record<string, boolean> = {};
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -135,6 +151,10 @@ export class WebViewMessageHandler {
 			this.txtConnectionService = new TxtConnectionService(this.context);
 			this.txtUploader = new TxtUploader(this.txtConnectionService);
 			this.txtTestService = new TxtTestService(this.txtConnectionService, this.context.extensionUri);
+			this.txtVirtualControlRuntimeService = createTxtVirtualControlRuntimeService(
+				this.txtConnectionService,
+				this.context.extensionUri
+			);
 		}
 	}
 
@@ -254,6 +274,9 @@ export class WebViewMessageHandler {
 				// TXT Controller 上傳功能
 				case 'txtUpload':
 					await this.handleTxtUpload(message);
+					break;
+				case 'txtVirtualControlStateChanged':
+					await this.handleTxtVirtualControlStateChanged(message);
 					break;
 				case 'txtStopExecution':
 					await this.handleTxtStopExecution();
@@ -578,8 +601,11 @@ export class WebViewMessageHandler {
 	 */
 	private async handleSaveWorkspace(message: any): Promise<void> {
 		try {
+			const board = message.board || 'none';
+			const txtVirtualControls = this.getNormalizedTxtVirtualControlsDocument(board, message.txtVirtualControls);
+
 			// 空狀態驗證 - 防止意外覆寫有效資料
-			if (this.isEmptyWorkspaceState(message.state)) {
+			if (!message.forceSave && !this.hasSaveDataContent(message.state, txtVirtualControls)) {
 				log('Rejected empty workspace save request', 'warn');
 				return;
 			}
@@ -597,8 +623,10 @@ export class WebViewMessageHandler {
 			const cleanState = message.state ? JSON.parse(JSON.stringify(message.state)) : {};
 			const saveData = {
 				workspace: cleanState,
-				board: message.board || 'none',
+				board,
+				...(board === 'txt' ? { txtVirtualControls } : {}),
 			};
+			this.txtVirtualControlsDocument = board === 'txt' ? txtVirtualControls : createEmptyTxtVirtualControlsDocument();
 
 			// 驗證 JSON 是否可序列化
 			JSON.parse(JSON.stringify(saveData));
@@ -647,6 +675,102 @@ export class WebViewMessageHandler {
 		return false;
 	}
 
+	private hasSaveDataContent(state: any, txtVirtualControls?: TxtVirtualControlsDocument): boolean {
+		return !this.isEmptyWorkspaceState(state) || Boolean(txtVirtualControls && txtVirtualControls.controls.length > 0);
+	}
+
+	private getNormalizedTxtVirtualControlsDocument(board: string, value: unknown): TxtVirtualControlsDocument {
+		if (board !== 'txt') {
+			return createEmptyTxtVirtualControlsDocument();
+		}
+
+		return normalizeTxtVirtualControlsForSave(value);
+	}
+
+	private postTxtVirtualControlsExecutionState(mode: 'editing' | 'running', sessionId?: string): void {
+		this.panel.webview.postMessage({
+			command: 'txtVirtualControlsExecutionStateChanged',
+			mode,
+			...(sessionId ? { sessionId } : {}),
+		});
+	}
+
+	private async cleanupTxtVirtualControlSession(options?: { notifyWebview?: boolean }): Promise<void> {
+		const hadSession = Boolean(this.txtVirtualControlSession);
+		this.txtVirtualControlSession = null;
+		this.txtVirtualControlPressedStates = {};
+
+		if (hadSession && this.txtVirtualControlRuntimeService) {
+			await this.txtVirtualControlRuntimeService.clearSession();
+		}
+
+		if (options?.notifyWebview) {
+			this.postTxtVirtualControlsExecutionState('editing');
+		}
+	}
+
+	private async prepareTxtVirtualControlSession(
+		document: TxtVirtualControlsDocument,
+		options?: { requiresRuntime?: boolean }
+	): Promise<void> {
+		this.txtVirtualControlsDocument = document;
+		await this.cleanupTxtVirtualControlSession();
+
+		if (document.controls.length === 0 || options?.requiresRuntime === false) {
+			return;
+		}
+
+		if (!this.txtVirtualControlRuntimeService) {
+			throw new Error('TXT virtual control runtime service not initialized');
+		}
+
+		this.txtVirtualControlPressedStates = Object.fromEntries(document.controls.map(control => [control.stableId, false]));
+		this.txtVirtualControlSession = await this.txtVirtualControlRuntimeService.createSession(document);
+		await this.txtVirtualControlRuntimeService.syncSnapshot(
+			this.txtVirtualControlSession.sessionId,
+			document,
+			this.txtVirtualControlPressedStates
+		);
+	}
+
+	private buildTxtVirtualControlPreflight(message: any, document: TxtVirtualControlsDocument): TxtVirtualControlPreflight {
+		const incomingInvalidReferences = Array.isArray(message?.virtualControlPreflight?.invalidReferences)
+			? (message.virtualControlPreflight.invalidReferences as InvalidVirtualControlReference[])
+			: [];
+		const invalidReferences = new Map<string, InvalidVirtualControlReference>();
+		for (const reference of incomingInvalidReferences) {
+			if (!reference || typeof reference.stableId !== 'string' || !reference.stableId.trim()) {
+				continue;
+			}
+			const blockId = typeof reference.blockId === 'string' ? reference.blockId : '';
+			invalidReferences.set(`${blockId}::${reference.stableId}`, {
+				blockId,
+				stableId: reference.stableId,
+				lastKnownDisplayName:
+					typeof reference.lastKnownDisplayName === 'string' ? reference.lastKnownDisplayName : undefined,
+				reason: 'missing-control',
+			});
+		}
+
+		const availableControlIds = new Set(document.controls.map(control => control.stableId));
+		for (const stableId of TxtVirtualControlRuntimeService.extractReferencedStableIds(message?.code ?? '')) {
+			if (!availableControlIds.has(stableId)) {
+				invalidReferences.set(`::${stableId}`, {
+					blockId: '',
+					stableId,
+					lastKnownDisplayName: incomingInvalidReferences.find(reference => reference?.stableId === stableId)?.lastKnownDisplayName,
+					reason: 'missing-control',
+				});
+			}
+		}
+
+		const resolvedInvalidReferences = [...invalidReferences.values()];
+		return {
+			valid: message?.virtualControlPreflight?.valid !== false && resolvedInvalidReferences.length === 0,
+			invalidReferences: resolvedInvalidReferences,
+		};
+	}
+
 	/**
 	 * 覆寫前備份 main.json 到 main.json.bak
 	 * @param mainJsonPath main.json 的路徑
@@ -660,7 +784,7 @@ export class WebViewMessageHandler {
 
 			// 讀取現有檔案內容，檢查是否為空
 			const existingData = await this.fileService.readJsonFile<any>(mainJsonPath, null);
-			if (!existingData || this.isEmptyWorkspaceState(existingData.workspace)) {
+			if (!existingData || !this.hasSaveDataContent(existingData.workspace, this.getNormalizedTxtVirtualControlsDocument(existingData.board, existingData.txtVirtualControls))) {
 				return; // 現有檔案為空，跳過備份
 			}
 
@@ -851,9 +975,10 @@ export class WebViewMessageHandler {
 	private async handleRequestInitialState(): Promise<void> {
 		try {
 			const mainJsonPath = path.join('blockly', 'main.json');
-			let saveData: { workspace: any; board: string } = {
+			let saveData: { workspace: any; board: string; txtVirtualControls?: TxtVirtualControlsDocument } = {
 				workspace: {},
 				board: 'none',
+				txtVirtualControls: createEmptyTxtVirtualControlsDocument(),
 			};
 
 			await this.migrateThemeFromMainJson(mainJsonPath);
@@ -874,6 +999,10 @@ export class WebViewMessageHandler {
 						saveData = {
 							workspace: existingData.workspace,
 							board: existingData.board || 'none',
+							txtVirtualControls: this.getNormalizedTxtVirtualControlsDocument(
+								existingData.board || 'none',
+								existingData.txtVirtualControls
+							),
 						};
 					} else {
 						throw new Error('Invalid workspace state format');
@@ -884,6 +1013,9 @@ export class WebViewMessageHandler {
 					await this.fileService.writeJsonFile(mainJsonPath, saveData);
 				}
 			}
+
+			this.txtVirtualControlsDocument =
+				saveData.board === 'txt' ? saveData.txtVirtualControls || createEmptyTxtVirtualControlsDocument() : createEmptyTxtVirtualControlsDocument();
 
 			// 如果是 MicroPython 專案，提前刪除 platformio.ini 避免 PlatformIO 擴充功能鎖定檔案
 			if (saveData.board === 'cyberbrick') {
@@ -905,6 +1037,7 @@ export class WebViewMessageHandler {
 				theme: theme,
 				board: saveData.board || 'none',
 				workspace: saveData.workspace || {},
+				txtVirtualControls: this.txtVirtualControlsDocument,
 				languagePreference: languagePreference,
 				resolvedLanguage: resolvedLanguage,
 			});
@@ -1003,9 +1136,13 @@ export class WebViewMessageHandler {
 			const backupPath = path.join(backupDir, `${backupName}.json`);
 
 			if (message?.state) {
+				const board = message.board || 'none';
 				const saveData = {
 					workspace: message.state,
-					board: message.board || 'none',
+					board,
+					...(board === 'txt'
+						? { txtVirtualControls: this.getNormalizedTxtVirtualControlsDocument(board, message.txtVirtualControls) }
+						: {}),
 				};
 				await this.fileService.writeJsonFile(backupPath, saveData);
 			} else {
@@ -1260,10 +1397,14 @@ export class WebViewMessageHandler {
 			const saveData = await this.fileService.readJsonFile<any>(mainJsonPath, null);
 
 			if (saveData) {
+				const normalizedTxtVirtualControls = this.getNormalizedTxtVirtualControlsDocument(saveData.board, saveData.txtVirtualControls);
+				this.txtVirtualControlsDocument =
+					saveData.board === 'txt' ? normalizedTxtVirtualControls : createEmptyTxtVirtualControlsDocument();
 				this.panel.webview.postMessage({
 					command: 'loadWorkspace',
-					state: saveData,
+					state: saveData.workspace || {},
 					board: saveData.board,
+					txtVirtualControls: normalizedTxtVirtualControls,
 				});
 			}
 
@@ -1386,11 +1527,15 @@ export class WebViewMessageHandler {
 
 			const content = await this.fileService.readFile(mainJsonPath);
 			const state = JSON.parse(content);
+			const normalizedTxtVirtualControls = this.getNormalizedTxtVirtualControlsDocument(state.board, state.txtVirtualControls);
+			this.txtVirtualControlsDocument = state.board === 'txt' ? normalizedTxtVirtualControls : createEmptyTxtVirtualControlsDocument();
 
 			// 發送工作區狀態給 WebView
 			this.panel.webview.postMessage({
 				command: 'loadWorkspace',
-				state: state,
+				state: state.workspace || {},
+				board: state.board || 'none',
+				txtVirtualControls: normalizedTxtVirtualControls,
 				source: 'mcpReload',
 			});
 
@@ -1943,6 +2088,7 @@ export class WebViewMessageHandler {
 			command: 'loadSampleWorkspace',
 			state: workspace,
 			board: result.data.board,
+			txtVirtualControls: createEmptyTxtVirtualControlsDocument(),
 		});
 	}
 
@@ -2021,7 +2167,49 @@ export class WebViewMessageHandler {
 		// T035: 上傳前暫停 Test Panel polling
 		this.panel.webview.postMessage({ command: 'txtTestPause' });
 		const code: string = message.code ?? '';
+		const document = this.getNormalizedTxtVirtualControlsDocument('txt', message.txtVirtualControls);
+		const preflight = this.buildTxtVirtualControlPreflight(message, document);
+		const referencedStableIds = TxtVirtualControlRuntimeService.extractReferencedStableIds(code);
+		const shouldStartVirtualControlRuntime = referencedStableIds.length > 0;
+		const shouldEnterVirtualControlRunningMode = document.controls.length > 0;
+		let executionStatePosted = false;
 		try {
+			if (!preflight.valid) {
+				this.panel.webview.postMessage({
+					command: 'txtVirtualControlsExecutionBlocked',
+					invalidReferences: preflight.invalidReferences,
+				});
+				this.panel.webview.postMessage({
+					command: 'txtUploadResult',
+					success: false,
+					error: 'TXT virtual controls contain invalid references.',
+					duration: 0,
+				});
+				return;
+			}
+
+			try {
+				await this.prepareTxtVirtualControlSession(document, { requiresRuntime: shouldStartVirtualControlRuntime });
+			} catch (runtimeError) {
+				await this.cleanupTxtVirtualControlSession({ notifyWebview: true });
+				this.panel.webview.postMessage({
+					command: 'txtVirtualControlsRuntimeError',
+					error: runtimeError instanceof Error ? runtimeError.message : String(runtimeError),
+				});
+				this.panel.webview.postMessage({
+					command: 'txtUploadResult',
+					success: false,
+					error: runtimeError instanceof Error ? runtimeError.message : String(runtimeError),
+					duration: 0,
+				});
+				return;
+			}
+
+			if (shouldEnterVirtualControlRunningMode && !executionStatePosted) {
+				executionStatePosted = true;
+				this.postTxtVirtualControlsExecutionState('running', this.txtVirtualControlSession?.sessionId);
+			}
+
 			const result = await this.txtUploader.upload(code, progress => {
 				this.panel.webview.postMessage({
 					command: 'txtUploadProgress',
@@ -2029,16 +2217,64 @@ export class WebViewMessageHandler {
 					progress: progress.progress,
 					message: progress.message,
 				});
+				if (progress.stage === 'executing' && shouldEnterVirtualControlRunningMode && !executionStatePosted) {
+					executionStatePosted = true;
+					this.postTxtVirtualControlsExecutionState('running', this.txtVirtualControlSession?.sessionId);
+				}
 			});
+			await this.cleanupTxtVirtualControlSession({ notifyWebview: executionStatePosted || document.controls.length > 0 });
 			this.panel.webview.postMessage({
 				command: 'txtUploadResult',
 				success: result.success,
 				error: result.error,
 				duration: result.duration,
 			});
+		} catch (error) {
+			await this.cleanupTxtVirtualControlSession({ notifyWebview: executionStatePosted || document.controls.length > 0 });
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			log('TXT upload failed', 'error', error);
+			this.panel.webview.postMessage({
+				command: 'txtUploadResult',
+				success: false,
+				error: errorMessage,
+				duration: 0,
+			});
 		} finally {
 			// T035: 上傳結束後恢復 Test Panel polling
 			this.panel.webview.postMessage({ command: 'txtTestResume' });
+		}
+	}
+
+	/**
+	 * 處理 WebView 送出的虛擬控制狀態變更
+	 */
+	private async handleTxtVirtualControlStateChanged(message: any): Promise<void> {
+		if (!this.txtVirtualControlRuntimeService || !this.txtVirtualControlSession) {
+			return;
+		}
+
+		const stableId = typeof message?.stableId === 'string' ? message.stableId.trim() : '';
+		if (message?.sessionId && message.sessionId !== this.txtVirtualControlSession.sessionId) {
+			return;
+		}
+		if (!stableId || !(stableId in this.txtVirtualControlPressedStates)) {
+			return;
+		}
+
+		this.txtVirtualControlPressedStates[stableId] = Boolean(message?.pressed);
+
+		try {
+			await this.txtVirtualControlRuntimeService.syncSnapshot(
+				this.txtVirtualControlSession.sessionId,
+				this.txtVirtualControlsDocument,
+				this.txtVirtualControlPressedStates
+			);
+		} catch (error) {
+			await this.cleanupTxtVirtualControlSession({ notifyWebview: true });
+			this.panel.webview.postMessage({
+				command: 'txtVirtualControlsRuntimeError',
+				error: error instanceof Error ? error.message : String(error),
+			});
 		}
 	}
 
@@ -2051,6 +2287,7 @@ export class WebViewMessageHandler {
 			return;
 		}
 		await this.txtUploader.stopExecution();
+		await this.cleanupTxtVirtualControlSession({ notifyWebview: true });
 		this.panel.webview.postMessage({ command: 'txtExecutionStopped' });
 	}
 

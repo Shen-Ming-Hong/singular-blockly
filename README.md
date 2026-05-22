@@ -287,6 +287,15 @@ Singular Blockly includes a dedicated SSH-based workflow for the fischertechnik 
 - Stop command available from the extension
 - TXT projects do **not** use `platformio.ini`
 
+### TXT virtual controls canvas
+
+- Runs inside the same Blockly editor panel; no second TXT control window is created
+- Lets you add, rename, recolor, and drag virtual buttons during editing mode
+- Button bindings use `stableId` internally so Blockly references survive rename operations
+- The `txt_virtual_button_state` block reads button state through `_txt_virtual_button_state(stableId)`
+- Invalid or deleted button references block TXT execution until the user re-selects a valid button
+- Virtual-control runtime traffic uses `singular-blockly.txt.runtimePort + 1`, keeping it separate from the existing I/O Test Panel runtime
+
 ### Connection & testing
 
 - In-editor TXT connection settings dialog
@@ -560,7 +569,7 @@ Each board is wired to the appropriate code generation and upload workflow:
     - **Type**: `number`
     - **Default**: `8080`
     - **Scope**: Workspace-level
-    - **Description**: Runtime port used by the integrated TXT I/O Test Panel
+    - **Description**: Base runtime port used by the integrated TXT I/O Test Panel; TXT virtual controls use the next port (`runtimePort + 1`)
 
 > 💡 TXT passwords are configured from the editor connection dialog and stored in VS Code SecretStorage, not in plain-text settings files.
 

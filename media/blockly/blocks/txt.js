@@ -192,6 +192,54 @@ Blockly.Blocks['txt_input_sensor'] = {
 	},
 };
 
+/**
+ * 讀取虛擬按鈕狀態
+ */
+Blockly.Blocks['txt_virtual_button_state'] = {
+	init: function () {
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('TXT_VIRTUAL_BUTTON_STATE_PREFIX', 'read virtual button'))
+			.appendField(
+				new Blockly.FieldDropdown(() => {
+					if (typeof window.getTxtVirtualButtonDropdownOptions === 'function') {
+						return window.getTxtVirtualButtonDropdownOptions(this);
+					}
+					return [[window.languageManager.getMessage('TXT_VIRTUAL_CONTROLS_EMPTY_OPTION', 'Create a button first'), '__none__']];
+				}),
+				'BUTTON_ID'
+			);
+		this.setOutput(true, 'Number');
+		this.setColour(TXT_COLOR);
+		this.setTooltip(
+			window.languageManager.getMessage(
+				'TXT_VIRTUAL_BUTTON_STATE_TOOLTIP',
+				'Returns 1 while the selected virtual button is pressed, otherwise 0.'
+			)
+		);
+		this.setHelpUrl('');
+		if (typeof window.setTxtVirtualButtonReferenceState === 'function') {
+			window.setTxtVirtualButtonReferenceState(this, {});
+		}
+	},
+	saveExtraState: function () {
+		if (typeof window.getTxtVirtualButtonReferenceState === 'function') {
+			return window.getTxtVirtualButtonReferenceState(this);
+		}
+		return null;
+	},
+	loadExtraState: function (state) {
+		if (typeof window.setTxtVirtualButtonReferenceState === 'function') {
+			window.setTxtVirtualButtonReferenceState(this, state || {});
+		}
+	},
+	onchange: function (e) {
+		txtOrphanOnchange.call(this, e);
+		if (typeof window.refreshTxtVirtualButtonReferenceForBlock === 'function') {
+			window.refreshTxtVirtualButtonReferenceForBlock(this);
+		}
+	},
+};
+
 // === 延遲積木 ===
 
 /**

@@ -327,6 +327,15 @@
                     </svg>
                 </button>
             </div>
+            <div class="txt-virtual-controls-switch" id="txtVirtualControlsToggleContainer" style="display: none;">
+                <button id="txtVirtualControlsToggle" title="TXT Virtual Controls" aria-expanded="false"
+                    aria-controls="txtVirtualControlsPanel">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                        <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 5h16v14H4zm11 0v14M8 9.5l3 2.5-3 2.5" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- 實驗積木提示容器 -->
@@ -348,6 +357,46 @@
         <div id="blocklyArea">
             <div id="blocklyDiv"></div>
         </div>
+        <div id="txtVirtualControlsSplitter" class="txt-virtual-controls-splitter" role="separator"
+            aria-controls="txtVirtualControlsPanel" aria-orientation="vertical" aria-hidden="true"></div>
+        <aside id="txtVirtualControlsPanel" class="txt-virtual-controls-panel" aria-live="polite">
+            <div class="txt-virtual-controls-panel-header">
+                <div class="txt-virtual-controls-title-group">
+                    <h2 id="txtVirtualControlsPanelTitle">TXT Virtual Controls</h2>
+                    <span id="txtVirtualControlsModeBadge" class="txt-virtual-controls-mode-badge">Editing</span>
+                </div>
+                <button id="txtVirtualControlsAddButton" class="primary-btn" type="button">Add Button</button>
+            </div>
+            <p id="txtVirtualControlsCanvasHint" class="txt-virtual-controls-canvas-hint"></p>
+            <div id="txtVirtualControlsEmptyState" class="txt-virtual-controls-empty-state"></div>
+            <div id="txtVirtualControlsCanvas" class="txt-virtual-controls-canvas"></div>
+            <div id="txtVirtualControlsInspectorEmpty" class="txt-virtual-controls-inspector-empty"></div>
+            <div id="txtVirtualControlsInspector" class="txt-virtual-controls-inspector hidden">
+                <div class="txt-virtual-controls-name-row">
+                    <label for="txtVirtualControlNameInput" id="txtVirtualControlNameLabel"></label>
+                    <div class="txt-virtual-controls-identifier-badge">
+                        <span id="txtVirtualControlIdentifierLabel"
+                            class="txt-virtual-controls-identifier-badge-label"></span>
+                        <span id="txtVirtualControlIdentifierValue"
+                            class="txt-virtual-controls-identifier-value"></span>
+                    </div>
+                </div>
+                <input id="txtVirtualControlNameInput" type="text"
+                    style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 6px 8px; border-radius: 4px;">
+                <div class="txt-virtual-controls-color-grid">
+                    <div class="txt-virtual-controls-color-field">
+                        <label for="txtVirtualControlBackgroundInput" id="txtVirtualControlBackgroundLabel"></label>
+                        <input id="txtVirtualControlBackgroundInput" type="color">
+                    </div>
+                    <div class="txt-virtual-controls-color-field">
+                        <label for="txtVirtualControlTextInput" id="txtVirtualControlTextLabel"></label>
+                        <input id="txtVirtualControlTextInput" type="color">
+                    </div>
+                </div>
+                <button id="txtVirtualControlDeleteButton" class="secondary-btn txt-virtual-controls-delete-button"
+                    type="button">Delete Button</button>
+            </div>
+        </aside>
     </div> <!-- 備份管理對話框 -->
     <div id="backupModal" class="modal">
         <div class="modal-content">

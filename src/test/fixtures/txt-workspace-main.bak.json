@@ -1,0 +1,45 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "txt_setup",
+          "id": "txt-setup-backup-1",
+          "x": 24,
+          "y": 24,
+          "deletable": false
+        },
+        {
+          "type": "txt_process",
+          "id": "txt-process-backup-1",
+          "x": 24,
+          "y": 160,
+          "fields": {
+            "NAME": "備份流程"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "txt_wait",
+                "id": "txt-wait-backup-1",
+                "inputs": {
+                  "MS": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "txt-wait-backup-ms-1",
+                      "fields": {
+                        "NUM": 50
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "board": "txt"
+}

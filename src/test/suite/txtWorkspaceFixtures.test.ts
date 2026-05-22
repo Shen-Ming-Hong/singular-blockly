@@ -7,6 +7,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
+import { normalizeTxtVirtualControlsDocument } from '../../types/txtVirtualControls';
 
 type SerializedBlock = {
 	type?: string;
@@ -17,8 +18,8 @@ type SerializedBlock = {
 suite('TXT Workspace Fixture Tests', () => {
 	const PROJECT_ROOT = path.join(__dirname, '..', '..', '..');
 	const fixturePaths = [
-		path.join(PROJECT_ROOT, 'extension_test', 'blockly', 'main.json'),
-		path.join(PROJECT_ROOT, 'extension_test', 'blockly', 'main.json.bak'),
+			path.join(PROJECT_ROOT, 'src', 'test', 'fixtures', 'txt-workspace-main.json'),
+			path.join(PROJECT_ROOT, 'src', 'test', 'fixtures', 'txt-workspace-main.bak.json'),
 	];
 
 	function collectBlockTypes(block: SerializedBlock | undefined, blockTypes: string[]): void {
@@ -62,6 +63,22 @@ suite('TXT Workspace Fixture Tests', () => {
 				[],
 				`${path.basename(fixturePath)} should not contain legacy TXT block types: ${legacyTypes.join(', ')}`
 			);
+		}
+	});
+
+	test('TXT fixtures 應維持與可選 txtVirtualControls 欄位相容的 wrapper 結構', () => {
+		for (const fixturePath of fixturePaths) {
+			const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8')) as {
+				board?: string;
+				workspace?: unknown;
+				txtVirtualControls?: unknown;
+			};
+
+			assert.ok(fixture.workspace, `${path.basename(fixturePath)} should keep the workspace wrapper shape`);
+			const normalizedDocument = normalizeTxtVirtualControlsDocument(fixture.txtVirtualControls);
+			assert.strictEqual(normalizedDocument.schemaVersion, 1);
+			assert.strictEqual(normalizedDocument.canvas.mode, 'editing');
+			assert.ok(Array.isArray(normalizedDocument.controls), 'txtVirtualControls should normalize to a controls array');
 		}
 	});
 });

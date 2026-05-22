@@ -127,10 +127,18 @@ body.theme-dark .preview-controls .theme-icon {
 	width: 100%;
 	height: 100vh;
 	overflow: hidden;
+	--txt-virtual-controls-panel-width: 0px;
+	--txt-virtual-controls-toolbar-offset: 0px;
+	--txt-virtual-controls-splitter-width: 10px;
+}
+
+.hidden {
+	display: none !important;
 }
 
 #blocklyArea {
 	flex: 1;
+	min-width: 0;
 	position: relative;
 	transition: flex 0.3s ease;
 }
@@ -144,11 +152,238 @@ body.theme-dark .preview-controls .theme-icon {
 	transition: width 0.3s ease;
 }
 
+.txt-virtual-controls-panel {
+	width: 0;
+	flex-basis: 0;
+	opacity: 0;
+	padding: 0;
+	gap: 12px;
+	display: flex;
+	flex-direction: column;
+	background: var(--vscode-sideBar-background, #ffffff);
+	color: var(--vscode-sideBar-foreground, #1e1e1e);
+	border-left: 1px solid var(--vscode-sideBar-border, rgba(0, 0, 0, 0.08));
+	overflow: hidden auto;
+	transition:
+		flex-basis 0.25s ease,
+		width 0.25s ease,
+		opacity 0.25s ease,
+		padding 0.25s ease;
+	box-sizing: border-box;
+	flex-shrink: 0;
+}
+
+.txt-virtual-controls-panel.open {
+	width: var(--txt-virtual-controls-panel-width, 340px);
+	flex-basis: var(--txt-virtual-controls-panel-width, 340px);
+	opacity: 1;
+	padding: 16px;
+}
+
+.txt-virtual-controls-splitter {
+	width: 0;
+	flex-basis: 0;
+	opacity: 0;
+	flex-shrink: 0;
+	background: transparent;
+	cursor: col-resize;
+	touch-action: none;
+	transition:
+		flex-basis 0.25s ease,
+		width 0.25s ease,
+		opacity 0.25s ease,
+		background-color 0.2s ease;
+}
+
+.txt-virtual-controls-splitter.open {
+	width: var(--txt-virtual-controls-splitter-width, 10px);
+	flex-basis: var(--txt-virtual-controls-splitter-width, 10px);
+	opacity: 1;
+	background: linear-gradient(
+		90deg,
+		transparent 0,
+		transparent 3px,
+		var(--vscode-panel-border, rgba(0, 0, 0, 0.14)) 3px,
+		var(--vscode-panel-border, rgba(0, 0, 0, 0.14)) 7px,
+		transparent 7px,
+		transparent 100%
+	);
+}
+
+.txt-virtual-controls-splitter.open:hover,
+body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
+	background-color: var(--vscode-list-hoverBackground, rgba(0, 122, 204, 0.08));
+}
+
+.txt-virtual-controls-panel.has-invalid-references {
+	box-shadow: inset 3px 0 0 var(--vscode-inputValidation-warningBorder, #f5a623);
+}
+
+.txt-virtual-controls-panel-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.txt-virtual-controls-title-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.txt-virtual-controls-title-group h2 {
+	margin: 0;
+	font-size: 1rem;
+	line-height: 1.3;
+}
+
+.txt-virtual-controls-mode-badge {
+	align-self: flex-start;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	background: var(--vscode-badge-background, rgba(0, 0, 0, 0.08));
+	color: var(--vscode-badge-foreground, inherit);
+}
+
+.txt-virtual-controls-canvas-hint,
+.txt-virtual-controls-empty-state,
+.txt-virtual-controls-inspector-empty {
+	margin: 0;
+	font-size: 0.84rem;
+	line-height: 1.45;
+	color: var(--vscode-descriptionForeground, #666666);
+}
+
+.txt-virtual-controls-canvas {
+	position: relative;
+	min-height: 280px;
+	border: 1px dashed var(--vscode-panel-border, rgba(0, 0, 0, 0.15));
+	border-radius: 12px;
+	background:
+		linear-gradient(90deg, rgba(127, 127, 127, 0.06) 1px, transparent 1px),
+		linear-gradient(rgba(127, 127, 127, 0.06) 1px, transparent 1px),
+		var(--vscode-editor-background, #f8f8f8);
+	background-size: 20px 20px, 20px 20px, auto;
+	overflow: hidden;
+	box-sizing: border-box;
+}
+
+.txt-virtual-control-button {
+	position: absolute;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 12px;
+	border: none;
+	border-radius: 14px;
+	font-size: 0.92rem;
+	font-weight: 600;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+	cursor: grab;
+	user-select: none;
+	transition:
+		transform 0.12s ease,
+		box-shadow 0.12s ease,
+		filter 0.12s ease;
+	}
+
+.txt-virtual-control-button.selected {
+	box-shadow:
+		0 0 0 2px var(--vscode-focusBorder, #007acc),
+		0 10px 22px rgba(0, 0, 0, 0.18);
+	}
+
+.txt-virtual-control-button.running {
+	cursor: pointer;
+	}
+
+.txt-virtual-control-button.pressed {
+	transform: translateY(1px) scale(0.98);
+	filter: brightness(0.92);
+	}
+
+.txt-virtual-controls-inspector {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding-top: 8px;
+	border-top: 1px solid var(--vscode-panel-border, rgba(0, 0, 0, 0.08));
+}
+
+.txt-virtual-controls-inspector label {
+	font-size: 0.8rem;
+	font-weight: 600;
+}
+
+.txt-virtual-controls-name-row {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.txt-virtual-controls-identifier-badge {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+	max-width: 55%;
+}
+
+.txt-virtual-controls-identifier-badge-label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--vscode-descriptionForeground, #666);
+	white-space: nowrap;
+}
+
+.txt-virtual-controls-identifier-value {
+	font-family: var(--vscode-editor-font-family, 'SFMono-Regular', Consolas, monospace);
+	font-size: 0.78rem;
+	background: var(--vscode-textCodeBlock-background, rgba(127, 127, 127, 0.12));
+	padding: 2px 6px;
+	border-radius: 4px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.txt-virtual-controls-color-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.txt-virtual-controls-color-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.txt-virtual-controls-color-field input[type='color'] {
+	width: 100%;
+	height: 38px;
+	padding: 2px;
+	border-radius: 8px;
+	border: 1px solid var(--vscode-input-border, rgba(0, 0, 0, 0.15));
+	background: var(--vscode-input-background, #ffffff);
+	cursor: pointer;
+}
+
+.txt-virtual-controls-delete-button {
+	align-self: flex-start;
+	margin-top: 4px;
+}
+
 /* 控制區容器 */
 .controls-container {
 	position: absolute;
 	top: 10px;
-	right: 10px;
+	right: calc(10px + var(--txt-virtual-controls-toolbar-offset, 0px));
 	left: auto;
 	z-index: 1000;
 	display: flex;
@@ -157,6 +392,7 @@ body.theme-dark .preview-controls .theme-icon {
 	padding: 8px;
 	border-radius: 4px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: right 0.25s ease;
 }
 
 .board-select {
@@ -675,18 +911,55 @@ body.theme-dark .preview-controls .theme-icon {
         gap: 6px;
 }
 
+.txt-virtual-controls-switch {
+	margin-left: 10px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+#txtVirtualControlsToggle {
+	background-color: #2e7d32;
+	transition:
+		background-color 0.3s,
+		box-shadow 0.2s ease;
+}
+
+#txtVirtualControlsToggle:hover {
+	background-color: #27692b;
+}
+
+#txtVirtualControlsToggle.active {
+	box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.28);
+	background-color: #245b27;
+	}
+
+#txtVirtualControlsToggle.has-invalid-references {
+	background-color: var(--vscode-inputValidation-warningBackground, #f5a623);
+	color: var(--vscode-inputValidation-warningForeground, #1e1e1e);
+	}
+
 #txtConfigButton,
-#txtTestPanelButton {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        color: white;
+#txtTestPanelButton,
+#txtVirtualControlsToggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	transition:
+		background-color 0.3s,
+		box-shadow 0.2s ease;
+	color: white;
+	cursor: pointer;
+}
+
+body.txt-virtual-controls-resizing,
+body.txt-virtual-controls-resizing * {
+	user-select: none !important;
+	cursor: col-resize !important;
 }
 
 /* 齒輪（連線設定）：亮藍 */
