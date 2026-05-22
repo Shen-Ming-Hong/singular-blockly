@@ -59,6 +59,10 @@ vsc-extension-quickstart.md
 **/extension_test/**
 **/test-results/**
 **/RC_FM/**
+
+# 排除發佈暫存說明檔
+release-notes*.md
+
 media/toolbox/temp_toolbox*.json
 **/media/toolbox/temp_toolbox*.json
 **/temp_toolbox*.json
