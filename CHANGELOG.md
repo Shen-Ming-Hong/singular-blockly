@@ -8,6 +8,28 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.76.0] - 2026-05-22
+
+### ✨ 新功能 New Features
+
+- **TXT 虛擬控制預覽** (TXT virtual controls preview)
+    - 在 Blockly 備份預覽視窗新增 TXT 虛擬控制畫布唯讀面板，讓 TXT 備份可同時顯示 Blockly 工作區與保存時的虛擬控制畫布
+      Added a readonly TXT virtual controls panel to Blockly backup preview, so TXT backups can show both the Blockly workspace and the saved virtual controls canvas
+    - 支援保留虛擬按鈕的名稱、位置、尺寸、文字色與背景色，並提供左右比例 splitter 與唯讀捲動檢視
+      Preserves virtual button names, positions, sizes, text colors, and background colors, with a splitter and readonly scrollable viewing area
+    - 新增舊備份、空控制清單、部分損壞控制項與缺失引用的非阻斷警示，preview 可降級顯示而不崩潰
+      Added non-blocking warnings for legacy backups, empty control lists, partially damaged controls, and missing references so preview can degrade gracefully instead of failing
+    - 補齊 15 語系 TXT preview 文案、唯讀提示、空狀態與 warning 訊息
+      Added 15-locale copy for TXT preview readonly hints, empty state, and warning messages
+
+### 🐛 修復 Bug Fixes
+
+- **TXT 備份還原後虛擬控制消失修復** (TXT virtual controls restore reload fix)
+    - 修正積木編輯區開啟時還原 TXT 備份後，FileWatcher 第二次重載未帶入 `txtVirtualControls` 而讓虛擬控制按鈕暫時消失的問題
+      Fixed an issue where restoring a TXT backup while the editor was open could make virtual control buttons disappear because the FileWatcher reload omitted `txtVirtualControls`
+    - FileWatcher 觸發的 editor reload 現在會在 TXT board 時帶入正規化後的虛擬控制資料，無需關閉重開編輯器即可保持畫布正確
+      FileWatcher-triggered editor reloads now include normalized TXT virtual controls for TXT boards, keeping the canvas correct without reopening the editor
+
 ## [0.75.0] - 2026-05-22
 
 ### ✨ 新功能 New Features
