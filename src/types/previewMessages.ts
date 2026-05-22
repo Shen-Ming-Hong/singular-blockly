@@ -4,15 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { TxtVirtualControlsDocument } from './txtVirtualControls';
+
 /**
  * 開發板配置鍵值 - 對應 BOARD_CONFIGS 物件的 key
  */
-export type BoardConfigKey = 'uno' | 'nano' | 'mega' | 'esp32' | 'supermini' | 'cyberbrick';
+export type BoardConfigKey = 'uno' | 'nano' | 'mega' | 'esp32' | 'supermini' | 'cyberbrick' | 'txt';
 
 /**
  * 開發板類型 - 備份檔案中儲存的格式
  */
-export type BoardType = 'arduino_uno' | 'arduino_nano' | 'arduino_mega' | 'esp32' | 'esp32_super_mini' | 'cyberbrick';
+export type BoardType = 'arduino_uno' | 'arduino_nano' | 'arduino_mega' | 'esp32' | 'esp32_super_mini' | 'cyberbrick' | 'txt';
 
 /**
  * 設定開發板訊息
@@ -21,7 +23,7 @@ export type BoardType = 'arduino_uno' | 'arduino_nano' | 'arduino_mega' | 'esp32
  */
 export interface SetBoardMessage {
 	command: 'setBoard';
-	/** BOARD_CONFIGS 的 key: 'uno' | 'nano' | 'mega' | 'esp32' | 'supermini' */
+	/** BOARD_CONFIGS 的 key: 'uno' | 'nano' | 'mega' | 'esp32' | 'supermini' | 'cyberbrick' | 'txt' */
 	board: BoardConfigKey;
 	/** 原始備份中的 board 值 (用於除錯) */
 	originalBoard?: string;
@@ -31,6 +33,25 @@ export interface SetBoardMessage {
 	warning?: string;
 }
 
+export type PreviewWarningCode =
+	| 'legacy-missing-document'
+	| 'empty-controls'
+	| 'invalid-control-shape'
+	| 'missing-control-reference';
+
+export type PreviewWarningSeverity = 'info' | 'warning';
+
+export type PreviewWarningScope = 'canvas' | 'control' | 'reference';
+
+export interface PreviewWarning {
+	code: PreviewWarningCode;
+	severity: PreviewWarningSeverity;
+	scope: PreviewWarningScope;
+	stableId?: string;
+	blockId?: string;
+	fallbackText?: string;
+}
+
 /**
  * 載入工作區狀態訊息 (現有)
  */
@@ -38,6 +59,10 @@ export interface LoadWorkspaceStateMessage {
 	command: 'loadWorkspaceState';
 	/** Blockly.serialization.workspaces.save() 輸出 */
 	workspaceState: object;
+	/** TXT Controller preview 專用：唯讀虛擬控制畫布資料 */
+	txtVirtualControls?: TxtVirtualControlsDocument;
+	/** TXT Controller preview 專用：Host 正規化後的非阻斷警示 */
+	previewWarnings?: PreviewWarning[];
 }
 
 /**

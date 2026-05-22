@@ -61,6 +61,15 @@
 - `previewWarnings` 為結構化資料，供 preview 自行依目前語言顯示訊息。
 - `previewWarnings` 不可阻止 preview 顯示；它們只負責揭露狀態。
 
+#### v1 warning codes
+
+| Code | Severity | Scope | 用途 |
+|------|----------|-------|------|
+| `legacy-missing-document` | `info` | `canvas` | 舊備份缺少 `txtVirtualControls` 根文件 |
+| `empty-controls` | `info` | `canvas` | TXT 虛擬控制文件存在但沒有任何控制項 |
+| `invalid-control-shape` | `warning` | `control` | 部分控制項資料不完整，已以安全預設值恢復可顯示內容 |
+| `missing-control-reference` | `warning` | `control` | Blockly 積木參照了備份中不存在的虛擬控制 stableId |
+
 ---
 
 ### 3. `updateTheme`（沿用）
@@ -170,6 +179,7 @@
 3. `txtVirtualControls` 缺失時，必須保留面板並顯示空狀態訊息。
 4. `previewWarnings` 只影響呈現，不可阻止預覽顯示。
 5. theme / language 更新不得改動任何 backup 內容。
+6. Host 端收到 `saveWorkspace`、`txtUpload`、`txtVirtualControlStateChanged` 等 preview 禁止訊息時，必須保持無作用，避免錯誤觸發保存或 runtime 流程。
 
 ---
 

@@ -12,7 +12,8 @@ import { LocaleService } from '../services/localeService';
 import { WorkspaceValidator } from '../services/workspaceValidator';
 import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
-import { BoardConfigKey, SetBoardMessage } from '../types/previewMessages';
+import { BoardConfigKey, PreviewWarning, SetBoardMessage } from '../types/previewMessages';
+import { TxtVirtualControlsDocument, normalizeTxtVirtualControlsDocument } from '../types/txtVirtualControls';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
 
@@ -28,6 +29,7 @@ const BOARD_MAPPING: Record<string, BoardConfigKey> = {
 	esp32: 'esp32',
 	esp32_super_mini: 'supermini',
 	cyberbrick: 'cyberbrick',
+	txt: 'txt',
 	// 相容簡短格式（直接使用 BOARD_CONFIGS key）
 	// 注意：esp32, cyberbrick 已在標準格式區段定義，無需重複
 	uno: 'uno',
@@ -35,6 +37,11 @@ const BOARD_MAPPING: Record<string, BoardConfigKey> = {
 	mega: 'mega',
 	supermini: 'supermini',
 };
+
+interface TxtPreviewPayload {
+	txtVirtualControls?: TxtVirtualControlsDocument;
+	previewWarnings: PreviewWarning[];
+}
 
 /**
  * 映射備份檔案的 board 值到 BOARD_CONFIGS key
@@ -58,6 +65,157 @@ function mapBoardValue(backupBoard: string | undefined): { board: BoardConfigKey
 		board: 'uno',
 		isDefault: true,
 		warning: backupBoard, // 回傳原始無效值，讓呼叫端生成翻譯後的警告訊息
+	};
+}
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+	return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function getStringValue(value: unknown): string {
+	return typeof value === 'string' ? value.trim() : '';
+}
+
+function hasFiniteNumber(value: unknown): value is number {
+	return typeof value === 'number' && Number.isFinite(value);
+}
+
+function controlNeedsRecovery(control: Record<string, unknown>): boolean {
+	const position = isObjectRecord(control.position) ? control.position : undefined;
+	const size = isObjectRecord(control.size) ? control.size : undefined;
+	const style = isObjectRecord(control.style) ? control.style : undefined;
+
+	return (
+		!getStringValue(control.displayName) ||
+		!getStringValue(control.identifier) ||
+		!position ||
+		!hasFiniteNumber(position.x) ||
+		!hasFiniteNumber(position.y) ||
+		!size ||
+		!hasFiniteNumber(size.width) ||
+		!hasFiniteNumber(size.height) ||
+		!style ||
+		!getStringValue(style.backgroundColor) ||
+		!getStringValue(style.textColor)
+	);
+}
+
+function collectReferencedTxtVirtualControlIds(workspaceState: unknown): Map<string, { blockId?: string; fallbackText?: string }> {
+	const references = new Map<string, { blockId?: string; fallbackText?: string }>();
+
+	const visitBlock = (blockState: unknown) => {
+		if (!isObjectRecord(blockState)) {
+			return;
+		}
+
+		if (blockState.type === 'txt_virtual_button_state') {
+			const fields = isObjectRecord(blockState.fields) ? blockState.fields : undefined;
+			const stableId = getStringValue(fields?.BUTTON_ID);
+			if (stableId && stableId !== '__none__' && !references.has(stableId)) {
+				const extraState = isObjectRecord(blockState.extraState) ? blockState.extraState : undefined;
+				references.set(stableId, {
+					blockId: getStringValue(blockState.id) || undefined,
+					fallbackText: getStringValue(extraState?.displayNameSnapshot) || stableId,
+				});
+			}
+		}
+
+		const inputs = isObjectRecord(blockState.inputs) ? blockState.inputs : undefined;
+		if (inputs) {
+			for (const inputState of Object.values(inputs)) {
+				if (isObjectRecord(inputState) && inputState.block) {
+					visitBlock(inputState.block);
+				}
+			}
+		}
+
+		const next = isObjectRecord(blockState.next) ? blockState.next : undefined;
+		if (next?.block) {
+			visitBlock(next.block);
+		}
+	};
+
+	const workspace = isObjectRecord(workspaceState) ? workspaceState : undefined;
+	const blocksContainer = isObjectRecord(workspace?.blocks) ? workspace.blocks : undefined;
+	const topBlocks = Array.isArray(blocksContainer?.blocks) ? blocksContainer.blocks : [];
+	for (const block of topBlocks) {
+		visitBlock(block);
+	}
+
+	return references;
+}
+
+function buildTxtPreviewPayload(rawDocument: unknown, workspaceState: unknown): TxtPreviewPayload {
+	const previewWarnings: PreviewWarning[] = [];
+	const hasDocument = isObjectRecord(rawDocument);
+	const rawControls = hasDocument && Array.isArray(rawDocument.controls) ? rawDocument.controls : [];
+
+	if (!hasDocument) {
+		previewWarnings.push({
+			code: 'legacy-missing-document',
+			severity: 'info',
+			scope: 'canvas',
+		});
+	} else if (rawControls.length === 0) {
+		previewWarnings.push({
+			code: 'empty-controls',
+			severity: 'info',
+			scope: 'canvas',
+		});
+	}
+
+	for (const [index, control] of rawControls.entries()) {
+		if (!isObjectRecord(control)) {
+			previewWarnings.push({
+				code: 'invalid-control-shape',
+				severity: 'warning',
+				scope: 'control',
+				fallbackText: `Control #${index + 1}`,
+			});
+			continue;
+		}
+
+		const stableId = getStringValue(control.stableId);
+		if (!stableId) {
+			previewWarnings.push({
+				code: 'invalid-control-shape',
+				severity: 'warning',
+				scope: 'control',
+				fallbackText: getStringValue(control.displayName) || `Control #${index + 1}`,
+			});
+			continue;
+		}
+
+		if (controlNeedsRecovery(control)) {
+			previewWarnings.push({
+				code: 'invalid-control-shape',
+				severity: 'warning',
+				scope: 'control',
+				stableId,
+				fallbackText: getStringValue(control.displayName) || stableId,
+			});
+		}
+	}
+
+	const txtVirtualControls = normalizeTxtVirtualControlsDocument(rawDocument, { forceEditingMode: true });
+	const validControlIds = new Set(txtVirtualControls.controls.map(control => control.stableId));
+	const references = collectReferencedTxtVirtualControlIds(workspaceState);
+	for (const [stableId, reference] of references.entries()) {
+		if (!validControlIds.has(stableId)) {
+			previewWarnings.push({
+				code: 'missing-control-reference',
+				severity: 'warning',
+				scope: 'reference',
+				stableId,
+				blockId: reference.blockId,
+				fallbackText: reference.fallbackText,
+			});
+		}
+	}
+
+	return {
+		txtVirtualControls,
+		previewWarnings,
 	};
 }
 
@@ -1067,6 +1225,9 @@ export class WebViewManager {
 					log(`Board value mapped: ${backupData.board} -> ${boardResult.board}`, 'info');
 				}
 
+				const txtPreviewPayload =
+					boardResult.board === 'txt' ? buildTxtPreviewPayload(backupData.txtVirtualControls, blocklyState) : { previewWarnings: [] };
+
 				// T008: 先發送 setBoard 訊息，再發送 loadWorkspaceState
 				panel.webview.postMessage(setBoardMessage);
 
@@ -1074,6 +1235,7 @@ export class WebViewManager {
 				panel.webview.postMessage({
 					command: 'loadWorkspaceState',
 					workspaceState: blocklyState,
+					...txtPreviewPayload,
 				});
 
 				log('備份 workspace 狀態已成功載入到預覽窗口', 'info');
@@ -1196,9 +1358,19 @@ export class WebViewManager {
 			);
 			const micropythonGeneratorUri = tempWebview.asWebviewUri(micropythonGeneratorPath);
 
+			// TXT Controller 生成器
+			const txtGeneratorPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/blockly/generators/txt/index.js')
+			);
+			const txtGeneratorUri = tempWebview.asWebviewUri(txtGeneratorPath);
+
 			// CyberBrick 積木定義
 			const cyberbrickBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/cyberbrick.js'));
 			const cyberbrickBlocksUri = tempWebview.asWebviewUri(cyberbrickBlocksPath);
+
+			// TXT Controller 積木定義
+			const txtBlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/txt.js'));
+			const txtBlocksUri = tempWebview.asWebviewUri(txtBlocksPath);
 
 			// X11 擴展板積木定義
 			const x11BlocksPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/x11.js'));
@@ -1229,6 +1401,16 @@ export class WebViewManager {
 					const modulePath = vscode.Uri.file(
 						path.join(this.context.extensionPath, `media/blockly/generators/micropython/${file}`)
 					);
+					const moduleUri = tempWebview.asWebviewUri(modulePath);
+					return `<script src="${moduleUri}"></script>`;
+				})
+				.join('\n    ');
+
+			// TXT Controller 生成器模組（動態發現）
+			const discoveredTxtModules = await this.discoverTxtModules();
+			const txtModules = discoveredTxtModules
+				.map(file => {
+					const modulePath = vscode.Uri.file(path.join(this.context.extensionPath, `media/blockly/generators/txt/${file}`));
 					const moduleUri = tempWebview.asWebviewUri(modulePath);
 					return `<script src="${moduleUri}"></script>`;
 				})
@@ -1302,11 +1484,14 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
+			htmlContent = htmlContent.replace('{txtGeneratorUri}', txtGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
+			htmlContent = htmlContent.replace('{txtBlocksUri}', txtBlocksUri.toString());
 			htmlContent = htmlContent.replace('{x11BlocksUri}', x11BlocksUri.toString());
 			htmlContent = htmlContent.replace('{x12BlocksUri}', x12BlocksUri.toString());
 			htmlContent = htmlContent.replace('{rcBlocksUri}', rcBlocksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonModules}', micropythonModules);
+			htmlContent = htmlContent.replace('{txtModules}', txtModules);
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);
@@ -1454,12 +1639,17 @@ export class WebViewManager {
 					log('Failed to read theme during FileWatcher reload, using default', 'warn', { error });
 				}
 
+				const board = saveData.board || 'none';
+				const txtVirtualControls =
+					board === 'txt' ? normalizeTxtVirtualControlsDocument(saveData.txtVirtualControls, { forceEditingMode: true }) : undefined;
+
 				await this.panel.webview.postMessage({
 					command: 'loadWorkspace',
 					state: saveData.workspace,
-					board: saveData.board || 'none',
+					board,
 					theme: theme,
 					source: 'fileWatcher', // 標記來源，讓 WebView 知道這是外部觸發的重載
+					...(txtVirtualControls ? { txtVirtualControls } : {}),
 				});
 				log('Workspace reload triggered via FileWatcher with loadWorkspace', 'info');
 			} else {

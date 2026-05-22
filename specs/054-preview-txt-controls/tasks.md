@@ -19,9 +19,9 @@
 
 **Purpose**: 建立實作共同理解，確認現有 preview pipeline 與新設計契約對齊。
 
-- [ ] T001 審閱 feature 需求與規劃範圍於 `specs/054-preview-txt-controls/spec.md`、`specs/054-preview-txt-controls/plan.md`
-- [ ] T002 [P] 盤點 Host preview 入口與型別邊界於 `src/webview/webviewManager.ts`、`src/types/previewMessages.ts`
-- [ ] T003 [P] 盤點 Preview WebView 既有 DOM/JS/CSS 結構於 `media/html/blocklyPreview.html`、`media/js/blocklyPreview.js`、`media/css/blocklyEdit.css`
+- [X] T001 審閱 feature 需求與規劃範圍於 `specs/054-preview-txt-controls/spec.md`、`specs/054-preview-txt-controls/plan.md`
+- [X] T002 [P] 盤點 Host preview 入口與型別邊界於 `src/webview/webviewManager.ts`、`src/types/previewMessages.ts`
+- [X] T003 [P] 盤點 Preview WebView 既有 DOM/JS/CSS 結構於 `media/html/blocklyPreview.html`、`media/js/blocklyPreview.js`、`media/css/blocklyEdit.css`
 
 ---
 
@@ -31,10 +31,10 @@
 
 **⚠️ CRITICAL**: 此階段完成前，不應開始任何使用者故事實作。
 
-- [ ] T004 擴充 preview board/message 型別以支援 `txt`、`txtVirtualControls`、`previewWarnings` 於 `src/types/previewMessages.ts`
-- [ ] T005 在 preview board mapping 中新增 TXT 對應並保留既有 fallback 行為於 `src/webview/webviewManager.ts`
-- [ ] T006 建立 TXT preview payload 正規化 helper 與 `PreviewWarning` 建立流程於 `src/webview/webviewManager.ts`
-- [ ] T007 [P] 建立 TXT preview 備份測試 fixture 與 postMessage assertion helper 於 `src/test/webviewPreview.test.ts`
+- [X] T004 擴充 preview board/message 型別以支援 `txt`、`txtVirtualControls`、`previewWarnings` 於 `src/types/previewMessages.ts`
+- [X] T005 在 preview board mapping 中新增 TXT 對應並保留既有 fallback 行為於 `src/webview/webviewManager.ts`
+- [X] T006 建立 TXT preview payload 正規化 helper 與 `PreviewWarning` 建立流程於 `src/webview/webviewManager.ts`
+- [X] T007 [P] 建立 TXT preview 備份測試 fixture 與 postMessage assertion helper 於 `src/test/webviewPreview.test.ts`
 
 **Checkpoint**: Preview contract、TXT board mapping 與測試 fixture 已可供三個使用者故事共用。
 
@@ -48,14 +48,14 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [US1] 在備份載入成功時把 `txtVirtualControls` 與空的 `previewWarnings` 傳入 `loadWorkspaceState` 訊息於 `src/webview/webviewManager.ts`
-- [ ] T009 [US1] 在 preview HTML 產生流程注入 TXT blocks/generator 與必要 modules URI 於 `src/webview/webviewManager.ts`
-- [ ] T010 [P] [US1] 新增 TXT preview panel、canvas、warning list、empty state、splitter 與基本 ARIA 屬性的 DOM 結構於 `media/html/blocklyPreview.html`
-- [ ] T011 [P] [US1] 新增 TXT preview panel、canvas overflow scroll 與基礎版面樣式於 `media/css/blocklyEdit.css`
-- [ ] T012 [US1] 在 Preview WebView 訊息處理中接收 `txtVirtualControls` 並呼叫 readonly presenter 入口於 `media/js/blocklyPreview.js`
-- [ ] T013 [US1] 實作 readonly control rendering，保留 `displayName`、`position`、`size`、`style` 於 `media/js/blocklyPreview.js`
-- [ ] T014 [US1] 新增有效 TXT 備份會傳送 `txtVirtualControls` 並維持 `setBoard` → `loadWorkspaceState` 順序的覆蓋於 `src/test/webviewPreview.test.ts`
-- [ ] T015 [US1] 記錄有效 TXT 備份 preview 的手動驗證結果欄位於 `specs/054-preview-txt-controls/quickstart.md`
+- [X] T008 [US1] 在備份載入成功時把 `txtVirtualControls` 與空的 `previewWarnings` 傳入 `loadWorkspaceState` 訊息於 `src/webview/webviewManager.ts`
+- [X] T009 [US1] 在 preview HTML 產生流程注入 TXT blocks/generator 與必要 modules URI 於 `src/webview/webviewManager.ts`
+- [X] T010 [P] [US1] 新增 TXT preview panel、canvas、warning list、empty state、splitter 與基本 ARIA 屬性的 DOM 結構於 `media/html/blocklyPreview.html`
+- [X] T011 [P] [US1] 新增 TXT preview panel、canvas overflow scroll 與基礎版面樣式於 `media/css/blocklyEdit.css`
+- [X] T012 [US1] 在 Preview WebView 訊息處理中接收 `txtVirtualControls` 並呼叫 readonly presenter 入口於 `media/js/blocklyPreview.js`
+- [X] T013 [US1] 實作 readonly control rendering，保留 `displayName`、`position`、`size`、`style` 於 `media/js/blocklyPreview.js`
+- [X] T014 [US1] 新增有效 TXT 備份會傳送 `txtVirtualControls` 並維持 `setBoard` → `loadWorkspaceState` 順序的覆蓋於 `src/test/webviewPreview.test.ts`
+- [X] T015 [US1] 記錄有效 TXT 備份 preview 的手動驗證結果欄位於 `specs/054-preview-txt-controls/quickstart.md`
 
 **Checkpoint**: User Story 1 可作為 MVP 獨立展示：TXT preview 能顯示完整保存畫布，但尚未要求完整唯讀防守與降級 UX。
 
@@ -69,12 +69,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] 實作左右佔比 splitter 與 canvas scroll 的 session-local 狀態與預設比例回復於 `media/js/blocklyPreview.js`
-- [ ] T017 [US2] 加入 pointer、keyboard、contextmenu 的 readonly guard，阻止虛擬控制內容編輯於 `media/js/blocklyPreview.js`
-- [ ] T018 [P] [US2] 新增 `.preview-mode` 下 readonly button、panel、splitter、cursor、hover 覆蓋樣式於 `media/css/blocklyEdit.css`
-- [ ] T019 [US2] 確保 TXT preview 虛擬控制互動不會送出 `saveWorkspace`、`txtUpload`、`txtVirtualControlStateChanged` 於 `media/js/blocklyPreview.js`
-- [ ] T020 [US2] 補上 preview 不持久化左右佔比與禁止保存/runtime 訊息的覆蓋測試於 `src/test/webviewPreview.test.ts`
-- [ ] T021 [US2] 記錄 readonly、splitter、canvas scroll、重開回預設比例與唯讀辨識 checklist 的手動驗證結果欄位於 `specs/054-preview-txt-controls/quickstart.md`
+- [X] T016 [US2] 實作左右佔比 splitter 與 canvas scroll 的 session-local 狀態與預設比例回復於 `media/js/blocklyPreview.js`
+- [X] T017 [US2] 加入 pointer、keyboard、contextmenu 的 readonly guard，阻止虛擬控制內容編輯於 `media/js/blocklyPreview.js`
+- [X] T018 [P] [US2] 新增 `.preview-mode` 下 readonly button、panel、splitter、cursor、hover 覆蓋樣式於 `media/css/blocklyEdit.css`
+- [X] T019 [US2] 確保 TXT preview 虛擬控制互動不會送出 `saveWorkspace`、`txtUpload`、`txtVirtualControlStateChanged` 於 `media/js/blocklyPreview.js`
+- [X] T020 [US2] 補上 preview 不持久化左右佔比與禁止保存/runtime 訊息的覆蓋測試於 `src/test/webviewPreview.test.ts`
+- [X] T021 [US2] 記錄 readonly、splitter、canvas scroll、重開回預設比例與唯讀辨識 checklist 的手動驗證結果欄位於 `specs/054-preview-txt-controls/quickstart.md`
 
 **Checkpoint**: User Story 1 + User Story 2 可獨立驗證：preview 是可檢視、可調整檢視比例，但不可編輯的唯讀投影。
 
@@ -88,13 +88,13 @@
 
 ### Implementation for User Story 3
 
-- [ ] T022 [US3] 在 Host 正規化中處理缺少 `txtVirtualControls` 與空 `controls` 的 warning 產生於 `src/webview/webviewManager.ts`
-- [ ] T023 [US3] 在 Host 正規化中處理部分損壞控制項、無法還原項目與可恢復項目分流於 `src/webview/webviewManager.ts`
-- [ ] T024 [US3] 實作 TXT preview 空狀態顯示與 legacy-missing / empty-controls 狀態切換於 `media/js/blocklyPreview.js`
-- [ ] T025 [US3] 實作 `previewWarnings` 的可被螢幕閱讀器讀取 warning list、placeholder 或 recovered 標示呈現於 `media/js/blocklyPreview.js`
-- [ ] T026 [P] [US3] 新增 empty state、warning list、recovered/invalid placeholder 視覺樣式於 `media/css/blocklyEdit.css`
-- [ ] T027 [P] [US3] 新增空狀態、唯讀提示、warning 文案到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js`、`media/locales/zh-hant/messages.js`
-- [ ] T028 [US3] 補上舊備份、空 controls、部分損壞資料的 Host payload 與 warning 覆蓋於 `src/test/webviewPreview.test.ts`
+- [X] T022 [US3] 在 Host 正規化中處理缺少 `txtVirtualControls` 與空 `controls` 的 warning 產生於 `src/webview/webviewManager.ts`
+- [X] T023 [US3] 在 Host 正規化中處理部分損壞控制項、無法還原項目與可恢復項目分流於 `src/webview/webviewManager.ts`
+- [X] T024 [US3] 實作 TXT preview 空狀態顯示與 legacy-missing / empty-controls 狀態切換於 `media/js/blocklyPreview.js`
+- [X] T025 [US3] 實作 `previewWarnings` 的可被螢幕閱讀器讀取 warning list、placeholder 或 recovered 標示呈現於 `media/js/blocklyPreview.js`
+- [X] T026 [P] [US3] 新增 empty state、warning list、recovered/invalid placeholder 視覺樣式於 `media/css/blocklyEdit.css`
+- [X] T027 [P] [US3] 新增空狀態、唯讀提示、warning 文案到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js`、`media/locales/zh-hant/messages.js`
+- [X] T028 [US3] 補上舊備份、空 controls、部分損壞資料的 Host payload 與 warning 覆蓋於 `src/test/webviewPreview.test.ts`
 
 **Checkpoint**: 所有使用者故事皆可獨立驗證，且 TXT preview 對舊資料與壞資料具備降級能力。
 
@@ -104,12 +104,12 @@
 
 **Purpose**: 補齊跨故事品質、文件、i18n 與回歸驗證。
 
-- [ ] T029 [P] 新增非 TXT preview 不顯示、不啟用、不佔用 TXT panel 版面且既有載入流程不變的回歸覆蓋於 `src/test/webviewPreview.test.ts`
-- [ ] T030 [P] 檢查 postMessage 安全邊界與禁止訊息清單是否與契約一致於 `src/webview/webviewManager.ts`、`media/js/blocklyPreview.js`
-- [ ] T031 [P] 對齊任務完成後的設計文件與實作差異於 `specs/054-preview-txt-controls/plan.md`、`specs/054-preview-txt-controls/contracts/txt-preview-postmessage.md`、`specs/054-preview-txt-controls/contracts/txt-preview-readonly-rendering.md`
-- [ ] T032 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test` 並將結果記錄於 `specs/054-preview-txt-controls/quickstart.md`
-- [ ] T033 [P] 依 quickstart 完成有效 TXT、舊備份、部分損壞、readonly、canvas scroll、splitter、可近性、唯讀辨識、效能 smoke、非 TXT 回歸手動驗證並記錄於 `specs/054-preview-txt-controls/quickstart.md`
-- [ ] T034 確認 `.github/copilot-instructions.md` 仍指向 `specs/054-preview-txt-controls/plan.md` 並更新必要後續註記於 `.github/copilot-instructions.md`
+- [X] T029 [P] 新增非 TXT preview 不顯示、不啟用、不佔用 TXT panel 版面且既有載入流程不變的回歸覆蓋於 `src/test/webviewPreview.test.ts`
+- [X] T030 [P] 檢查 postMessage 安全邊界與禁止訊息清單是否與契約一致於 `src/webview/webviewManager.ts`、`media/js/blocklyPreview.js`
+- [X] T031 [P] 對齊任務完成後的設計文件與實作差異於 `specs/054-preview-txt-controls/plan.md`、`specs/054-preview-txt-controls/contracts/txt-preview-postmessage.md`、`specs/054-preview-txt-controls/contracts/txt-preview-readonly-rendering.md`
+- [X] T032 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test` 並將結果記錄於 `specs/054-preview-txt-controls/quickstart.md`
+- [X] T033 [P] 依 quickstart 完成有效 TXT、舊備份、部分損壞、readonly、canvas scroll、splitter、可近性、唯讀辨識、效能 smoke、非 TXT 回歸手動驗證並記錄於 `specs/054-preview-txt-controls/quickstart.md`
+- [X] T034 確認 `.github/copilot-instructions.md` 仍指向 `specs/054-preview-txt-controls/plan.md` 並更新必要後續註記於 `.github/copilot-instructions.md`
 
 ---
 

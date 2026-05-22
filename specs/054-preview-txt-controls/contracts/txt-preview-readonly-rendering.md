@@ -23,14 +23,16 @@ TXT preview 啟用時，畫面至少需包含：
 
 ```text
 preview-container/
-├── txtVirtualControlsPanel
-│   ├── txtVirtualControlsHeader
+├── blocklyArea
+│   └── blocklyDiv
+├── txtVirtualControlsSplitter
+└── txtVirtualControlsPanel
+    ├── txtVirtualControlsPanelTitle
+    ├── txtVirtualControlsModeBadge
+    ├── txtVirtualControlsCanvasHint
 │   ├── txtVirtualControlsWarningList
 │   ├── txtVirtualControlsEmptyState
 │   └── txtVirtualControlsCanvas
-├── txtVirtualControlsSplitter
-└── blocklyArea
-    └── blocklyDiv
 ```
 
 ### 規則

@@ -98,6 +98,29 @@ const log = {
 
 // 儲存當前主題設定
 let currentTheme = window.initialTheme || 'light';
+let currentPreviewBoard = 'uno';
+
+const TXT_PREVIEW_PANEL_DEFAULT_WIDTH = 340;
+const TXT_PREVIEW_PANEL_MIN_WIDTH = 280;
+const TXT_PREVIEW_PANEL_MAX_WIDTH = 560;
+const TXT_PREVIEW_MIN_BLOCKLY_WIDTH = 360;
+const TXT_PREVIEW_SPLITTER_WIDTH = 10;
+const TXT_PREVIEW_TOOLBAR_GAP = 12;
+const TXT_PREVIEW_MIN_BUTTON_WIDTH = 72;
+const TXT_PREVIEW_MIN_BUTTON_HEIGHT = 40;
+const TXT_PREVIEW_DEFAULT_BUTTON_STYLE = {
+	backgroundColor: '#0288d1',
+	textColor: '#ffffff',
+};
+
+const txtPreviewState = {
+	document: createEmptyTxtPreviewControlsDocument(),
+	previewWarnings: [],
+	panelOpen: false,
+	panelWidth: TXT_PREVIEW_PANEL_DEFAULT_WIDTH,
+	panelResize: null,
+	readonlyGuardsInitialized: false,
+};
 
 /**
  * 更新介面文字的多國語言支援
@@ -142,7 +165,407 @@ function updateUITexts() {
 				previewTitleEl.appendChild(badgeEl);
 			}
 		}
+
+		updateTxtPreviewTexts();
 	}
+}
+
+function formatTxtPreviewMessage(key, fallback, ...args) {
+	let message = window.languageManager?.getMessage(key, fallback) || fallback;
+	args.forEach((arg, index) => {
+		message = message.replace(new RegExp(`\\{${index}\\}`, 'g'), String(arg));
+	});
+	return message;
+}
+
+function createEmptyTxtPreviewControlsDocument() {
+	return {
+		schemaVersion: 1,
+		canvas: { mode: 'editing' },
+		controls: [],
+	};
+}
+
+function getTxtPreviewElements() {
+	return {
+		container: document.querySelector('.container'),
+		blocklyArea: document.getElementById('blocklyArea'),
+		splitter: document.getElementById('txtVirtualControlsSplitter'),
+		panel: document.getElementById('txtVirtualControlsPanel'),
+		title: document.getElementById('txtVirtualControlsPanelTitle'),
+		modeBadge: document.getElementById('txtVirtualControlsModeBadge'),
+		canvasHint: document.getElementById('txtVirtualControlsCanvasHint'),
+		warningList: document.getElementById('txtVirtualControlsWarningList'),
+		emptyState: document.getElementById('txtVirtualControlsEmptyState'),
+		canvas: document.getElementById('txtVirtualControlsCanvas'),
+	};
+}
+
+function sanitizePreviewNumber(value, fallback) {
+	return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function sanitizePreviewString(value, fallback = '') {
+	return typeof value === 'string' ? value : fallback;
+}
+
+function sanitizePreviewColor(value, fallback) {
+	const color = sanitizePreviewString(value, fallback).trim();
+	return /^#[0-9a-f]{3,8}$/i.test(color) ? color : fallback;
+}
+
+function normalizeTxtPreviewControlsDocument(document) {
+	if (!document || typeof document !== 'object') {
+		return createEmptyTxtPreviewControlsDocument();
+	}
+
+	const controlsInput = Array.isArray(document.controls) ? document.controls : [];
+	return {
+		schemaVersion: 1,
+		canvas: { mode: 'editing' },
+		controls: controlsInput
+			.map(control => {
+				if (!control || typeof control !== 'object') {
+					return null;
+				}
+
+				const stableId = sanitizePreviewString(control.stableId).trim();
+				if (!stableId) {
+					return null;
+				}
+
+				const displayName = sanitizePreviewString(control.displayName, stableId).trim() || stableId;
+				const identifier = sanitizePreviewString(control.identifier, stableId).trim() || stableId;
+				const position = control.position || {};
+				const size = control.size || {};
+				const style = control.style || {};
+
+				return {
+					stableId,
+					displayName,
+					identifier,
+					kind: 'button',
+					position: {
+						x: Math.max(0, sanitizePreviewNumber(position.x, 24)),
+						y: Math.max(0, sanitizePreviewNumber(position.y, 24)),
+					},
+					size: {
+						width: Math.max(TXT_PREVIEW_MIN_BUTTON_WIDTH, sanitizePreviewNumber(size.width, 120)),
+						height: Math.max(TXT_PREVIEW_MIN_BUTTON_HEIGHT, sanitizePreviewNumber(size.height, 48)),
+					},
+					style: {
+						backgroundColor: sanitizePreviewColor(style.backgroundColor, TXT_PREVIEW_DEFAULT_BUTTON_STYLE.backgroundColor),
+						textColor: sanitizePreviewColor(style.textColor, TXT_PREVIEW_DEFAULT_BUTTON_STYLE.textColor),
+					},
+				};
+			})
+			.filter(Boolean),
+	};
+}
+
+function scheduleTxtPreviewBlocklyResize() {
+	requestAnimationFrame(() => {
+		if (workspace) {
+			Blockly.svgResize(workspace);
+		}
+	});
+}
+
+function clampTxtPreviewPanelWidth(nextWidth, containerWidth = window.innerWidth) {
+	const numericWidth = Number.isFinite(nextWidth) ? nextWidth : TXT_PREVIEW_PANEL_DEFAULT_WIDTH;
+	const maxWidth = Math.max(
+		TXT_PREVIEW_PANEL_MIN_WIDTH,
+		Math.min(
+			TXT_PREVIEW_PANEL_MAX_WIDTH,
+			(containerWidth || window.innerWidth) - TXT_PREVIEW_MIN_BLOCKLY_WIDTH - TXT_PREVIEW_SPLITTER_WIDTH - 24
+		)
+	);
+	return Math.max(TXT_PREVIEW_PANEL_MIN_WIDTH, Math.min(maxWidth, Math.round(numericWidth)));
+}
+
+function applyTxtPreviewPanelLayout() {
+	const elements = getTxtPreviewElements();
+	if (!elements.container) {
+		return;
+	}
+
+	if (txtPreviewState.panelOpen) {
+		txtPreviewState.panelWidth = clampTxtPreviewPanelWidth(txtPreviewState.panelWidth, elements.container.clientWidth);
+	}
+
+	const openWidth = txtPreviewState.panelOpen ? txtPreviewState.panelWidth : 0;
+	elements.container.style.setProperty('--txt-virtual-controls-panel-width', `${openWidth}px`);
+	elements.container.style.setProperty(
+		'--txt-virtual-controls-toolbar-offset',
+		txtPreviewState.panelOpen ? `${openWidth + TXT_PREVIEW_SPLITTER_WIDTH + TXT_PREVIEW_TOOLBAR_GAP}px` : '0px'
+	);
+
+	if (elements.panel) {
+		elements.panel.classList.toggle('open', txtPreviewState.panelOpen);
+	}
+	if (elements.splitter) {
+		elements.splitter.classList.toggle('open', txtPreviewState.panelOpen);
+	}
+}
+
+function setTxtPreviewPanelVisible(isVisible) {
+	const elements = getTxtPreviewElements();
+	txtPreviewState.panelOpen = Boolean(isVisible);
+
+	for (const element of [elements.panel, elements.splitter]) {
+		if (!element) {
+			continue;
+		}
+		element.hidden = !txtPreviewState.panelOpen;
+		element.setAttribute('aria-hidden', txtPreviewState.panelOpen ? 'false' : 'true');
+	}
+
+	if (elements.panel) {
+		if (txtPreviewState.panelOpen) {
+			elements.panel.removeAttribute('inert');
+			elements.panel.inert = false;
+		} else {
+			elements.panel.setAttribute('inert', '');
+			elements.panel.inert = true;
+		}
+	}
+
+	applyTxtPreviewPanelLayout();
+	scheduleTxtPreviewBlocklyResize();
+}
+
+function updateTxtPreviewTexts() {
+	const elements = getTxtPreviewElements();
+	if (!elements.panel) {
+		return;
+	}
+
+	if (elements.title) {
+		elements.title.textContent = formatTxtPreviewMessage('TXT_VIRTUAL_CONTROLS_TITLE', 'TXT Virtual Controls');
+	}
+	if (elements.modeBadge) {
+		elements.modeBadge.textContent = formatTxtPreviewMessage('TXT_PREVIEW_READONLY_BADGE', 'Preview only');
+	}
+	if (elements.canvasHint) {
+		elements.canvasHint.textContent = formatTxtPreviewMessage(
+			'TXT_PREVIEW_READONLY_HINT',
+			'Preview only. You can scroll this canvas and resize the preview panels, but buttons cannot be edited or pressed.'
+		);
+	}
+	if (elements.emptyState) {
+		elements.emptyState.textContent = formatTxtPreviewMessage('TXT_PREVIEW_EMPTY_STATE', 'No TXT virtual buttons are stored in this backup.');
+	}
+	if (elements.splitter) {
+		elements.splitter.setAttribute(
+			'aria-label',
+			formatTxtPreviewMessage('TXT_PREVIEW_SPLITTER_LABEL', 'Resize Blockly preview and TXT virtual controls preview')
+		);
+	}
+	if (elements.warningList) {
+		elements.warningList.setAttribute('aria-label', formatTxtPreviewMessage('TXT_PREVIEW_WARNING_LIST_LABEL', 'TXT preview warnings'));
+	}
+
+	renderTxtPreviewWarnings();
+}
+
+function getTxtPreviewWarningText(warning) {
+	const fallbackText = warning?.fallbackText ? ` (${warning.fallbackText})` : '';
+	switch (warning?.code) {
+		case 'legacy-missing-document':
+			return formatTxtPreviewMessage(
+				'TXT_PREVIEW_WARNING_LEGACY_MISSING_DOCUMENT',
+				'This older backup has no TXT virtual controls data yet.'
+			);
+		case 'empty-controls':
+			return formatTxtPreviewMessage('TXT_PREVIEW_WARNING_EMPTY_CONTROLS', 'This backup has no TXT virtual buttons.');
+		case 'invalid-control-shape':
+			return formatTxtPreviewMessage(
+				'TXT_PREVIEW_WARNING_INVALID_CONTROL_SHAPE',
+				'Some virtual button data was incomplete; recoverable values are shown with safe defaults.'
+			) + fallbackText;
+		case 'missing-control-reference':
+			return formatTxtPreviewMessage(
+				'TXT_PREVIEW_WARNING_MISSING_CONTROL_REFERENCE',
+				'A Blockly block references a virtual button that is missing from this backup.'
+			) + fallbackText;
+		default:
+			return formatTxtPreviewMessage('TXT_PREVIEW_WARNING_GENERIC', 'TXT preview data was partially recovered.') + fallbackText;
+	}
+}
+
+function renderTxtPreviewWarnings() {
+	const elements = getTxtPreviewElements();
+	if (!elements.warningList) {
+		return;
+	}
+
+	elements.warningList.replaceChildren();
+	const warnings = Array.isArray(txtPreviewState.previewWarnings) ? txtPreviewState.previewWarnings : [];
+	elements.warningList.classList.toggle('hidden', warnings.length === 0);
+
+	warnings.forEach(warning => {
+		const item = document.createElement('li');
+		item.className = `txt-preview-warning-item ${warning?.severity === 'info' ? 'info' : 'warning'}`;
+		item.textContent = getTxtPreviewWarningText(warning);
+		elements.warningList.appendChild(item);
+	});
+}
+
+function getRecoveredControlIds() {
+	return new Set(
+		(txtPreviewState.previewWarnings || [])
+			.filter(warning => warning?.code === 'invalid-control-shape' && warning.stableId)
+			.map(warning => warning.stableId)
+	);
+}
+
+function preventTxtPreviewEdit(event) {
+	event.preventDefault();
+	event.stopPropagation();
+}
+
+function handleTxtPreviewReadonlyGuard(event) {
+	const target = event.target;
+	if (target && typeof target.closest === 'function' && target.closest('.txt-virtual-control-button')) {
+		preventTxtPreviewEdit(event);
+	}
+}
+
+function initTxtPreviewReadonlyGuards() {
+	if (txtPreviewState.readonlyGuardsInitialized) {
+		return;
+	}
+
+	const elements = getTxtPreviewElements();
+	if (!elements.canvas) {
+		return;
+	}
+
+	['pointerdown', 'click', 'dblclick', 'contextmenu', 'keydown', 'dragstart'].forEach(eventName => {
+		elements.canvas.addEventListener(eventName, handleTxtPreviewReadonlyGuard, true);
+	});
+	txtPreviewState.readonlyGuardsInitialized = true;
+}
+
+function renderTxtPreviewControls() {
+	const elements = getTxtPreviewElements();
+	if (!elements.canvas || !elements.emptyState) {
+		return;
+	}
+
+	const controls = txtPreviewState.document.controls || [];
+	const recoveredControlIds = getRecoveredControlIds();
+	const surface = document.createElement('div');
+	surface.className = 'txt-preview-canvas-surface';
+
+	let maxRight = elements.canvas.clientWidth || 0;
+	let maxBottom = elements.canvas.clientHeight || 0;
+
+	controls.forEach(control => {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'txt-virtual-control-button';
+		button.dataset.stableId = control.stableId;
+		button.textContent = control.displayName;
+		button.setAttribute('aria-disabled', 'true');
+		button.setAttribute(
+			'title',
+			formatTxtPreviewMessage('TXT_PREVIEW_BUTTON_READONLY_TITLE', 'Preview only: this virtual button cannot be edited or pressed here.')
+		);
+		button.tabIndex = -1;
+		button.style.left = `${control.position.x}px`;
+		button.style.top = `${control.position.y}px`;
+		button.style.width = `${control.size.width}px`;
+		button.style.height = `${control.size.height}px`;
+		button.style.backgroundColor = control.style.backgroundColor;
+		button.style.color = control.style.textColor;
+		button.classList.toggle('recovered', recoveredControlIds.has(control.stableId));
+		surface.appendChild(button);
+
+		maxRight = Math.max(maxRight, control.position.x + control.size.width + 32);
+		maxBottom = Math.max(maxBottom, control.position.y + control.size.height + 32);
+	});
+
+	surface.style.width = `${maxRight}px`;
+	surface.style.height = `${maxBottom}px`;
+	elements.canvas.replaceChildren(surface);
+	elements.canvas.scrollTo({ left: 0, top: 0 });
+	elements.emptyState.classList.toggle('hidden', controls.length > 0);
+}
+
+function renderTxtVirtualControlsPreview(txtVirtualControls, previewWarnings = []) {
+	txtPreviewState.document = normalizeTxtPreviewControlsDocument(txtVirtualControls);
+	txtPreviewState.previewWarnings = Array.isArray(previewWarnings) ? previewWarnings : [];
+	txtPreviewState.panelWidth = TXT_PREVIEW_PANEL_DEFAULT_WIDTH;
+
+	setTxtPreviewPanelVisible(currentPreviewBoard === 'txt');
+	if (currentPreviewBoard !== 'txt') {
+		return;
+	}
+
+	updateTxtPreviewTexts();
+	renderTxtPreviewControls();
+	initTxtPreviewReadonlyGuards();
+}
+
+function hideTxtVirtualControlsPreview() {
+	txtPreviewState.document = createEmptyTxtPreviewControlsDocument();
+	txtPreviewState.previewWarnings = [];
+	const elements = getTxtPreviewElements();
+	if (elements.canvas) {
+		elements.canvas.replaceChildren();
+	}
+	if (elements.warningList) {
+		elements.warningList.replaceChildren();
+		elements.warningList.classList.add('hidden');
+	}
+	if (elements.emptyState) {
+		elements.emptyState.classList.add('hidden');
+	}
+	setTxtPreviewPanelVisible(false);
+}
+
+function handleTxtPreviewSplitterPointerDown(event) {
+	const elements = getTxtPreviewElements();
+	if (!txtPreviewState.panelOpen || !elements.container || !elements.splitter) {
+		return;
+	}
+
+	event.preventDefault();
+	elements.splitter.setPointerCapture?.(event.pointerId);
+	txtPreviewState.panelResize = {
+		pointerId: event.pointerId,
+		containerWidth: elements.container.clientWidth,
+		containerRight: elements.container.getBoundingClientRect().right,
+	};
+	document.body.classList.add('txt-virtual-controls-resizing');
+	window.addEventListener('pointermove', handleTxtPreviewSplitterPointerMove);
+	window.addEventListener('pointerup', handleTxtPreviewSplitterPointerUp, { once: true });
+	window.addEventListener('pointercancel', handleTxtPreviewSplitterPointerUp, { once: true });
+}
+
+function handleTxtPreviewSplitterPointerMove(event) {
+	if (!txtPreviewState.panelResize) {
+		return;
+	}
+
+	txtPreviewState.panelWidth = clampTxtPreviewPanelWidth(
+		txtPreviewState.panelResize.containerRight - event.clientX,
+		txtPreviewState.panelResize.containerWidth
+	);
+	applyTxtPreviewPanelLayout();
+	scheduleTxtPreviewBlocklyResize();
+}
+
+function handleTxtPreviewSplitterPointerUp() {
+	window.removeEventListener('pointermove', handleTxtPreviewSplitterPointerMove);
+	const elements = getTxtPreviewElements();
+	if (elements.splitter && txtPreviewState.panelResize?.pointerId !== undefined) {
+		elements.splitter.releasePointerCapture?.(txtPreviewState.panelResize.pointerId);
+	}
+	txtPreviewState.panelResize = null;
+	document.body.classList.remove('txt-virtual-controls-resizing');
+	scheduleTxtPreviewBlocklyResize();
 }
 
 /**
@@ -410,12 +833,16 @@ window.addEventListener('message', event => {
 	switch (message.command) {
 		case 'setBoard':
 			// T010: 設定開發板類型（必須在 loadWorkspaceState 之前處理）
+			currentPreviewBoard = message.board || 'uno';
 			if (message.board && window.setCurrentBoard) {
 				window.setCurrentBoard(message.board);
 				log.info(`預覽模式開發板已設定為: ${message.board}`, {
 					originalBoard: message.originalBoard,
 					isDefault: message.isDefault,
 				});
+			}
+			if (currentPreviewBoard !== 'txt') {
+				hideTxtVirtualControlsPreview();
 			}
 
 			// T011: 顯示警告（如果有）
@@ -427,6 +854,11 @@ window.addEventListener('message', event => {
 		case 'loadWorkspaceState':
 			if (message.workspaceState) {
 				loadWorkspaceFromState(message.workspaceState);
+			}
+			if (currentPreviewBoard === 'txt') {
+				renderTxtVirtualControlsPreview(message.txtVirtualControls, message.previewWarnings || []);
+			} else {
+				hideTxtVirtualControlsPreview();
 			}
 			break;
 		case 'updateTheme':
@@ -473,6 +905,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 設定主題切換按鈕事件
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+	document.getElementById('txtVirtualControlsSplitter')?.addEventListener('pointerdown', handleTxtPreviewSplitterPointerDown);
 
 	// 初始化 Blockly 工作區
 	initBlocklyWorkspace();

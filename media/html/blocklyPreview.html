@@ -126,6 +126,25 @@
         <div id="blocklyArea" class="preview-blockly-area">
             <div id="blocklyDiv"></div>
         </div>
+        <div id="txtVirtualControlsSplitter" class="txt-virtual-controls-splitter txt-preview-readonly-splitter"
+            role="separator" aria-controls="txtVirtualControlsPanel" aria-orientation="vertical" aria-hidden="true"
+            aria-label="TXT preview panel splitter" hidden></div>
+        <aside id="txtVirtualControlsPanel" class="txt-virtual-controls-panel txt-preview-readonly-panel"
+            aria-labelledby="txtVirtualControlsPanelTitle" aria-describedby="txtVirtualControlsCanvasHint"
+            aria-hidden="true" inert hidden>
+            <div class="txt-virtual-controls-panel-header">
+                <div class="txt-virtual-controls-title-group">
+                    <h2 id="txtVirtualControlsPanelTitle">TXT Virtual Controls</h2>
+                    <span id="txtVirtualControlsModeBadge" class="txt-virtual-controls-mode-badge">Preview only</span>
+                </div>
+            </div>
+            <p id="txtVirtualControlsCanvasHint" class="txt-virtual-controls-canvas-hint"></p>
+            <ul id="txtVirtualControlsWarningList" class="txt-preview-warning-list hidden" role="list"
+                aria-live="polite" aria-label="TXT preview warnings"></ul>
+            <div id="txtVirtualControlsEmptyState" class="txt-virtual-controls-empty-state hidden" role="status"></div>
+            <div id="txtVirtualControlsCanvas" class="txt-virtual-controls-canvas txt-preview-canvas" tabindex="0"
+                aria-describedby="txtVirtualControlsCanvasHint txtVirtualControlsWarningList"></div>
+        </aside>
     </div>
 
     <script src="{blocklyCompressedJsUri}"></script>
@@ -138,9 +157,11 @@
     <script src="{themesUri}/singularDark.js"></script>
     <script src="{arduinoGeneratorUri}"></script>
     <script src="{micropythonGeneratorUri}"></script>
+    <script src="{txtGeneratorUri}"></script>
     <script src="{boardConfigsUri}"></script>
     <script src="{arduinoBlocksUri}"></script>
     <script src="{cyberbrickBlocksUri}"></script>
+    <script src="{txtBlocksUri}"></script>
     <script src="{x11BlocksUri}"></script>
     <script src="{x12BlocksUri}"></script>
     <script src="{rcBlocksUri}"></script>
@@ -153,6 +174,7 @@
     <script src="{esp32WifiMqttBlocksUri}"></script>
     {arduinoModules}
     {micropythonModules}
+    {txtModules}
     <script src="{experimentalMarkerUri}"></script>
     <script src="{previewJsUri}"></script>
 </body>

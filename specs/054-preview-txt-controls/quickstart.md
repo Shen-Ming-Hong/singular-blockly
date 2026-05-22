@@ -58,6 +58,16 @@ npm test
 
 > 本 quickstart 只列出建議驗證步驟；以上命令是否已執行，以實際工作階段紀錄為準。
 
+### 本次實作驗證紀錄
+
+| 項目 | 結果 | 備註 |
+|------|------|------|
+| `npm run compile` | PASS | Webpack extension 與 MCP server 皆 compiled successfully |
+| `npm run lint` | PASS | `eslint src` 無錯誤輸出 |
+| `npm run validate:i18n` | PASS | 14/14 非英文語系 0 errors；既有 warnings 保留 |
+| `npm test` | PASS | 695 passing, 1 pending；新增 WebView Preview 與 FileWatcher TXT restore 回歸測試通過 |
+| Manual WebView QA | PASS | 2026-05-22 使用者回報已完成 quickstart 手動驗證；效能 smoke 未記載估測秒數 |
+
 ---
 
 ## 最小功能驗證流程
@@ -75,6 +85,8 @@ npm test
 - 可看到已保存的按鈕名稱、位置、尺寸與顏色
 - Preview 不會變成第二個 editor
 
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：有效 TXT 備份 preview 可同時顯示 Blockly 唯讀工作區與 TXT 虛擬控制唯讀畫布。
+
 ---
 
 ### 2. 驗證唯讀邊界
@@ -89,6 +101,8 @@ npm test
 - 不會送出保存或執行相關訊息
 - Blockly 工作區仍維持既有 preview 的平移 / 縮放能力
 - 畫面有明確 preview badge、唯讀文案或不可編輯游標 / 提示，讓 reviewer 能判斷這不是編輯模式
+
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：虛擬控制內容維持唯讀，未產生保存或 runtime 相關操作。
 
 ---
 
@@ -105,6 +119,8 @@ npm test
 - 畫布捲動只改變檢視範圍，不改變控制項位置或保存內容
 - 重開 preview 後回到預設比例與預設捲動位置
 
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：splitter 與 canvas scroll 僅改變檢視，不改變控制項位置或保存內容。
+
 ---
 
 ### 4. 驗證舊備份降級
@@ -116,6 +132,8 @@ npm test
 - Preview 仍成功開啟
 - 保留虛擬控制面板
 - 畫布顯示明確空狀態訊息
+
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：舊版或缺少 `txtVirtualControls` 的 TXT 備份可正常 preview 並顯示空狀態。
 
 ---
 
@@ -130,6 +148,8 @@ npm test
 - 無法還原的部分會出現 warning 或 placeholder
 - Preview 不會整體失效
 
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：部分損壞資料可降級處理，可恢復內容仍能顯示並提供 warning。
+
 ---
 
 ### 6. 驗證非 TXT 預覽無回歸
@@ -141,6 +161,8 @@ npm test
 - 既有 preview 行為不改變
 - 不會錯誤顯示、啟用或佔用 TXT 虛擬控制面板版面
 - 若 HTML template 靜態包含 TXT panel DOM，非 TXT preview 中該 DOM 應維持 hidden / inert / `aria-hidden`
+
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：非 TXT 備份 preview 未顯示或啟用 TXT 虛擬控制面板。
 
 ---
 
@@ -157,6 +179,8 @@ npm test
 - Splitter 的用途是調整檢視比例，而不是改變保存內容
 - Warning / 空狀態訊息具備可讀語意，不只依賴顏色或圖示
 
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：唯讀辨識與可近性檢查已完成，preview 可被辨識為不可編輯檢視。
+
 ---
 
 ### 8. 驗證效能 smoke
@@ -170,6 +194,8 @@ npm test
 - 目標是在 1 秒內看到虛擬控制畫布
 - 若目前環境無法可靠計時，需記錄作業系統、硬體 / VS Code 環境與觀察結果
 - 效能驗證不得要求寫回任何 workspace、backup 或使用者設定
+
+**手動驗證紀錄**：PASS（2026-05-22 使用者回報已完成）：代表性 TXT 備份效能 smoke 已完成；未提供精確載入時間，因此不記載估測數字。
 
 ---
 

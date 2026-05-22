@@ -690,6 +690,92 @@ body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
 	margin-left: 0;
 }
 
+body.preview-mode .txt-preview-readonly-panel[hidden],
+body.preview-mode .txt-preview-readonly-splitter[hidden] {
+	display: none !important;
+}
+
+body.preview-mode .txt-preview-readonly-panel.open {
+	padding: 16px;
+	gap: 12px;
+	overflow: hidden;
+}
+
+body.preview-mode .txt-preview-readonly-panel .txt-virtual-controls-panel-header {
+	align-items: flex-start;
+}
+
+body.preview-mode .txt-preview-readonly-panel .txt-virtual-controls-mode-badge {
+	background: var(--vscode-badge-background, #3f51b5);
+	color: var(--vscode-badge-foreground, #ffffff);
+}
+
+body.preview-mode .txt-preview-canvas {
+	flex: 1 1 auto;
+	min-height: 320px;
+	overflow: auto;
+	cursor: default;
+	scrollbar-width: thin;
+}
+
+body.preview-mode .txt-preview-canvas:focus-visible {
+	outline: 2px solid var(--vscode-focusBorder, #007acc);
+	outline-offset: 2px;
+}
+
+.txt-preview-canvas-surface {
+	position: relative;
+	min-width: 100%;
+	min-height: 100%;
+}
+
+body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button {
+	cursor: not-allowed;
+	user-select: none;
+	pointer-events: auto;
+	filter: saturate(0.96);
+}
+
+body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button:hover,
+body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button:focus-visible {
+	box-shadow:
+		0 0 0 2px var(--vscode-focusBorder, #007acc),
+		0 8px 18px rgba(0, 0, 0, 0.16);
+}
+
+body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button.recovered {
+	outline: 2px dashed var(--vscode-inputValidation-warningBorder, #f5a623);
+	outline-offset: 2px;
+}
+
+.txt-preview-warning-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.txt-preview-warning-item {
+	padding: 8px 10px;
+	border-radius: 8px;
+	font-size: 0.84rem;
+	line-height: 1.4;
+	background: var(--vscode-inputValidation-warningBackground, rgba(245, 166, 35, 0.16));
+	color: var(--vscode-inputValidation-warningForeground, inherit);
+	border: 1px solid var(--vscode-inputValidation-warningBorder, rgba(245, 166, 35, 0.55));
+}
+
+.txt-preview-warning-item.info {
+	background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.12));
+	border-color: var(--vscode-panel-border, rgba(0, 0, 0, 0.14));
+}
+
+body.preview-mode .txt-preview-readonly-splitter.open {
+	cursor: col-resize;
+}
+
 #themeToggle {
 	display: flex;
 	align-items: center;
