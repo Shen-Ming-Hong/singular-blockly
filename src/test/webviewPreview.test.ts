@@ -27,6 +27,53 @@ describe('WebView Preview', () => {
 	const backupRelPath = path.join('blockly', 'backup', 'test.json');
 	const backupFullPath = path.join(workspacePath, backupRelPath);
 
+	function createWorkspaceState(blocks: any[] = []): any {
+		return { blocks: { blocks } };
+	}
+
+	function createTxtVirtualControlsDocument(controls: any[] = []): any {
+		return {
+			schemaVersion: 1,
+			canvas: { mode: 'editing' },
+			controls,
+		};
+	}
+
+	function createVirtualButton(overrides: any = {}): any {
+		return {
+			stableId: 'btn-1',
+			displayName: 'Start',
+			identifier: 'start',
+			kind: 'button',
+			position: { x: 16, y: 24 },
+			size: { width: 120, height: 48 },
+			style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+			...overrides,
+		};
+	}
+
+	function addBackupFile(content: any): void {
+		const backupContent = typeof content === 'string' ? content : JSON.stringify(content);
+		const actualFullPath = path.join(workspacePath, backupRelPath);
+		fsMock.addFile(backupFullPath, backupContent);
+		fsMock.addFile(actualFullPath, backupContent);
+		fsMock.addFile(backupRelPath, backupContent);
+	}
+
+	async function loadBackupMessages(backupData: any): Promise<any[]> {
+		addBackupFile(backupData);
+		(webViewManager as any).fileService = new FileService(workspacePath, fsServiceMock as any);
+		const panel: any = { webview: { postMessage: sinon.stub().resolves() } };
+
+		await (webViewManager as any).loadBackupContent(backupFullPath, panel);
+
+		return panel.webview.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0]);
+	}
+
+	function getPostedMessage(messages: any[], command: string): any {
+		return messages.find(message => message.command === command);
+	}
+
 	// 在測試套件開始前保存原始的 fs 模組
 	before(() => {
 		const fsModule = require.cache[require.resolve('fs')];
@@ -145,6 +192,18 @@ describe('WebView Preview', () => {
 		assert(loadStub.calledOnceWith(backupFullPath, panelSender));
 	});
 
+	it('should ignore forbidden TXT preview mutation/runtime messages', async () => {
+		const panel: any = { webview: { postMessage: sinon.stub().resolves() } };
+		const loadStub = sinon.stub(webViewManager as any, 'loadBackupContent').resolves();
+
+		for (const command of ['saveWorkspace', 'txtUpload', 'txtVirtualControlStateChanged']) {
+			await (webViewManager as any).handlePreviewMessage({ command }, backupFullPath, panel);
+		}
+
+		assert.strictEqual(loadStub.called, false);
+		assert.strictEqual(panel.webview.postMessage.called, false);
+	});
+
 	it('should sync language updates to preview panels', async () => {
 		const panelA: any = { webview: { postMessage: sinon.stub().resolves() } };
 		const panelB: any = { webview: { postMessage: sinon.stub().resolves() } };
@@ -168,17 +227,8 @@ describe('WebView Preview', () => {
 	});
 
 	it('loadBackupContent should post workspace state on success', async () => {
-		const backupData = { workspace: { blocks: [] } };
-		const backupContent = JSON.stringify(backupData);
-
-		// 使用 path.join 計算的實際完整路徑
-		const actualFullPath = path.join(workspacePath, backupRelPath);
-
-		// 添加多個可能的路徑變體(確保 Windows/Unix 路徑兼容性)
-		fsMock.addFile(backupFullPath, backupContent);
-		fsMock.addFile(actualFullPath, backupContent);
-		fsMock.addFile(backupRelPath, backupContent);
-
+		const backupData = { workspace: createWorkspaceState() };
+		addBackupFile(backupData);
 		(webViewManager as any).fileService = new FileService(workspacePath, fsServiceMock as any);
 		const panel: any = { webview: { postMessage: sinon.stub().resolves() } };
 
@@ -194,5 +244,104 @@ describe('WebView Preview', () => {
 		await (webViewManager as any).loadBackupContent(backupFullPath, panel);
 
 		assert(panel.webview.postMessage.calledWithMatch({ command: 'loadError' }));
+	});
+
+	it('loadBackupContent should map txt board and send virtual controls after setBoard', async () => {
+		const txtVirtualControls = createTxtVirtualControlsDocument([createVirtualButton()]);
+		const messages = await loadBackupMessages({
+			board: 'txt',
+			workspace: createWorkspaceState(),
+			txtVirtualControls,
+		});
+
+		assert.strictEqual(messages[0].command, 'setBoard');
+		assert.strictEqual(messages[0].board, 'txt');
+		assert.strictEqual(messages[1].command, 'loadWorkspaceState');
+		assert.deepStrictEqual(messages[1].txtVirtualControls.controls, txtVirtualControls.controls);
+		assert.deepStrictEqual(messages[1].previewWarnings, []);
+	});
+
+	it('loadBackupContent should downgrade legacy txt backups with a warning', async () => {
+		const messages = await loadBackupMessages({
+			board: 'txt',
+			workspace: createWorkspaceState(),
+		});
+
+		const loadMessage = getPostedMessage(messages, 'loadWorkspaceState');
+		assert.strictEqual(loadMessage.txtVirtualControls.controls.length, 0);
+		assert(loadMessage.previewWarnings.some((warning: any) => warning.code === 'legacy-missing-document'));
+	});
+
+	it('loadBackupContent should report empty txt controls without failing preview', async () => {
+		const messages = await loadBackupMessages({
+			board: 'txt',
+			workspace: createWorkspaceState(),
+			txtVirtualControls: createTxtVirtualControlsDocument([]),
+		});
+
+		const loadMessage = getPostedMessage(messages, 'loadWorkspaceState');
+		assert.strictEqual(loadMessage.txtVirtualControls.controls.length, 0);
+		assert(loadMessage.previewWarnings.some((warning: any) => warning.code === 'empty-controls'));
+	});
+
+	it('loadBackupContent should recover partial txt controls and report missing references', async () => {
+		const workspace = createWorkspaceState([
+			{
+				id: 'block-1',
+				type: 'txt_virtual_button_state',
+				fields: { BUTTON_ID: 'missing-button' },
+				extraState: { displayNameSnapshot: 'Missing Button' },
+			},
+		]);
+		const messages = await loadBackupMessages({
+			board: 'txt',
+			workspace,
+			txtVirtualControls: createTxtVirtualControlsDocument([
+				createVirtualButton(),
+				{ displayName: 'No Stable ID' },
+				{ stableId: 'recoverable-button' },
+			]),
+		});
+
+		const loadMessage = getPostedMessage(messages, 'loadWorkspaceState');
+		assert.strictEqual(loadMessage.txtVirtualControls.controls.length, 2);
+		assert(loadMessage.txtVirtualControls.controls.some((control: any) => control.stableId === 'recoverable-button'));
+		assert(loadMessage.previewWarnings.some((warning: any) => warning.code === 'invalid-control-shape'));
+		assert(loadMessage.previewWarnings.some((warning: any) => warning.code === 'missing-control-reference'));
+	});
+
+	it('loadBackupContent should not attach txt controls to non-TXT previews', async () => {
+		const messages = await loadBackupMessages({
+			board: 'cyberbrick',
+			workspace: createWorkspaceState(),
+			txtVirtualControls: createTxtVirtualControlsDocument([createVirtualButton()]),
+		});
+
+		const setBoardMessage = getPostedMessage(messages, 'setBoard');
+		const loadMessage = getPostedMessage(messages, 'loadWorkspaceState');
+		assert.strictEqual(setBoardMessage.board, 'cyberbrick');
+		assert.strictEqual('txtVirtualControls' in loadMessage, false);
+		assert.deepStrictEqual(loadMessage.previewWarnings, []);
+	});
+
+	it('getPreviewContent should inject TXT preview resources', async () => {
+		const htmlTemplate = `<!DOCTYPE html><html><head><title>{fileName}</title></head><body>
+			<div class="preview-title">{fileName}</div>
+			<script src="{blocklyCompressedJsUri}"></script>
+			<script src="{txtGeneratorUri}"></script>
+			<script src="{txtBlocksUri}"></script>
+			{txtModules}
+		</body></html>`;
+		fsMock.addFile(path.join(extensionPath, 'media/html/blocklyPreview.html'), htmlTemplate);
+		sinon.stub(webViewManager as any, 'loadLocaleScripts').resolves('');
+		sinon.stub(webViewManager as any, 'discoverArduinoModules').resolves([]);
+		sinon.stub(webViewManager as any, 'discoverMicroPythonModules').resolves([]);
+		sinon.stub(webViewManager as any, 'discoverTxtModules').resolves(['txt.js']);
+
+		const html = await (webViewManager as any).getPreviewContent('test.json');
+
+		assert(html.includes('media/blockly/generators/txt/index.js'));
+		assert(html.includes('media/blockly/blocks/txt.js'));
+		assert(html.includes('media/blockly/generators/txt/txt.js'));
 	});
 });

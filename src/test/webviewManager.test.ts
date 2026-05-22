@@ -310,6 +310,57 @@ describe('WebView Manager', () => {
 		assert(webViewManager.getPanel() !== undefined);
 	});
 
+	it('should include TXT virtual controls when reloading from file watcher', async () => {
+		const clock = sinon.useFakeTimers();
+		try {
+			const panel = {
+				webview: {
+					postMessage: sinon.stub().resolves(),
+				},
+			};
+			const txtVirtualControls = {
+				schemaVersion: 1,
+				canvas: { mode: 'editing' },
+				controls: [
+					{
+						stableId: 'button-1',
+						displayName: 'Start',
+						identifier: 'start',
+						kind: 'button',
+						position: { x: 32, y: 48 },
+						size: { width: 120, height: 48 },
+						style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+					},
+				],
+			};
+
+			(webViewManager as any).panel = panel;
+			(webViewManager as any).messageHandler = {};
+			fsMock.addDirectory('/mock/workspace/blockly');
+			fsMock.addFile(
+				'/mock/workspace/blockly/main.json',
+				JSON.stringify({
+					workspace: { blocks: { blocks: [] } },
+					board: 'txt',
+					txtVirtualControls,
+				})
+			);
+
+			await (webViewManager as any).triggerWorkspaceReload({ fsPath: '/mock/workspace/blockly/main.json' });
+
+			assert(panel.webview.postMessage.calledOnce);
+			const loadMessage = panel.webview.postMessage.getCall(0).args[0];
+			assert.strictEqual(loadMessage.command, 'loadWorkspace');
+			assert.strictEqual(loadMessage.source, 'fileWatcher');
+			assert.strictEqual(loadMessage.board, 'txt');
+			assert.deepStrictEqual(loadMessage.txtVirtualControls.controls, txtVirtualControls.controls);
+
+			clock.tick(2000);
+		} finally {
+			clock.restore();
+		}
+	});
+
 	it('should dispose panel when closePanel is called', async () => {
 		// 設定 VS Code 工作區
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
