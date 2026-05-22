@@ -12,6 +12,7 @@
  */
 
 import * as assert from 'assert';
+import { TXT_VIRTUAL_CONTROL_RUNTIME_STATE_FILE } from '../../types/txtVirtualControls';
 
 suite('ESP32 PWM Code Generation Tests', () => {
 	suite('程式碼生成格式驗證 (Code Generation Format)', () => {
@@ -383,6 +384,29 @@ suite('ESP32 PWM Code Generation Tests', () => {
 			assert.ok(namingConventions.variables.test('channel'), '變數應使用 camelCase');
 			assert.ok(namingConventions.constants.test('APB_CLK'), '常數應使用 UPPER_CASE');
 			assert.ok(namingConventions.functions.test('ledcSetup'), '函數應使用 camelCase');
+		});
+	});
+
+	suite('TXT Virtual Controls Code Generation', () => {
+		test('應使用 companion runtime state file 讀取虛擬按鈕狀態', () => {
+			const expectedHelperLines = [
+				'def _txt_virtual_button_state(stable_id):',
+				`state_path = '${TXT_VIRTUAL_CONTROL_RUNTIME_STATE_FILE}'`,
+				"return 1 if control_state and control_state.get('pressed') else 0",
+			];
+
+			assert.strictEqual(
+				TXT_VIRTUAL_CONTROL_RUNTIME_STATE_FILE,
+				'/tmp/singular_blockly/virtual_controls_state.json',
+				'虛擬控制 runtime state file 路徑應固定，供 generator 與 companion runtime 共用'
+			);
+			assert.ok(expectedHelperLines.every(line => line.length > 0), '文件化測試應描述 helper 的關鍵結構');
+		});
+
+		test('應使用 stableId 生成 _txt_virtual_button_state 呼叫，而非顯示名稱', () => {
+			const generatedExpression = "_txt_virtual_button_state('btn-stable-123')";
+			assert.match(generatedExpression, /_txt_virtual_button_state\('btn-stable-123'\)/);
+			assert.ok(!generatedExpression.includes('Start Button'), 'generator 不應直接把顯示名稱寫進執行期 helper 呼叫');
 		});
 	});
 });

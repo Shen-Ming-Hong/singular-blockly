@@ -39,6 +39,10 @@
         },
         {
             "kind": "block",
+            "type": "txt_virtual_button_state"
+        },
+        {
+            "kind": "block",
             "type": "txt_wait",
             "inputs": {
                 "MS": {

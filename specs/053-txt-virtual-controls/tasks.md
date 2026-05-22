@@ -10,9 +10,9 @@
 
 **目的**: 建立本功能共用型別、TXT companion runtime 骨架與 Host service 骨架
 
-- [ ] T001 在 `src/types/txtVirtualControls.ts` 建立 TXT 虛擬控制共享型別
-- [ ] T002 [P] 在 `txt-runtime/virtual_controls_runtime.py` 建立 companion runtime 骨架與 session/state-file helper
-- [ ] T003 [P] 在 `src/services/txtVirtualControlRuntimeService.ts` 建立 Host runtime service 骨架、埠號推導與 HTTP helper
+- [X] T001 在 `src/types/txtVirtualControls.ts` 建立 TXT 虛擬控制共享型別
+- [X] T002 [P] 在 `txt-runtime/virtual_controls_runtime.py` 建立 companion runtime 骨架與 session/state-file helper
+- [X] T003 [P] 在 `src/services/txtVirtualControlRuntimeService.ts` 建立 Host runtime service 骨架、埠號推導與 HTTP helper
 
 ---
 
@@ -22,11 +22,11 @@
 
 **⚠️ 關鍵要求**: 完成這一階段前，不應開始任何使用者故事實作
 
-- [ ] T004 在 `media/js/blocklyEdit.js` 建立單一 `txtVirtualControls` in-memory store 與畫布模式控制器
-- [ ] T005 [P] 在 `media/js/blocklyEdit.js` 建立 `stableId` 產生器、`identifier` 正規化與重名解決 helper
-- [ ] T006 [P] 在 `src/webview/messageHandler.ts` 擴充 TXT 虛擬控制 message payload handling
-- [ ] T007 [P] 在 `media/locales/{bg,cs,de,en,es,fr,hu,it,ja,ko,pl,pt-br,ru,tr,zh-hant}/messages.js` 新增共享文案 key
-- [ ] T008 [P] 在 `media/blockly/blocks/txt.js` 與 `media/toolbox/categories/txt.json` 註冊 `txt_virtual_button_state` 積木骨架與 toolbox placeholder
+- [X] T004 在 `media/js/blocklyEdit.js` 建立單一 `txtVirtualControls` in-memory store 與畫布模式控制器
+- [X] T005 [P] 在 `media/js/blocklyEdit.js` 建立 `stableId` 產生器、`identifier` 正規化與重名解決 helper
+- [X] T006 [P] 在 `src/webview/messageHandler.ts` 擴充 TXT 虛擬控制 message payload handling
+- [X] T007 [P] 在 `media/locales/{bg,cs,de,en,es,fr,hu,it,ja,ko,pl,pt-br,ru,tr,zh-hant}/messages.js` 新增共享文案 key
+- [X] T008 [P] 在 `media/blockly/blocks/txt.js` 與 `media/toolbox/categories/txt.json` 註冊 `txt_virtual_button_state` 積木骨架與 toolbox placeholder
 
 **檢查點**: 共享 state、身分模型、訊息通道與積木骨架已就緒，使用者故事可以開始實作
 
@@ -39,12 +39,12 @@
 
 ### 實作任務
 
-- [ ] T009 [P] [US1] 在 `media/html/blocklyEdit.html` 新增 TXT 虛擬控制工具列入口、畫布容器與空狀態結構
-- [ ] T010 [P] [US1] 在 `media/css/blocklyEdit.css` 新增畫布、拖曳按鈕、選取狀態與編輯模式樣式
-- [ ] T011 [US1] 在 `media/js/blocklyEdit.js` 實作新增按鈕、空畫布渲染與基本編輯選取流程
-- [ ] T012 [US1] 在 `media/js/blocklyEdit.js` 實作拖曳即時更新位置與連續移動回饋
-- [ ] T013 [US1] 在 `media/js/blocklyEdit.js` 實作依顯示名稱重新計算尺寸，並禁止編輯模式點擊送出按下狀態
-- [ ] T014 [US1] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄建立 4 顆按鈕、拖曳、動態尺寸與未執行點擊抑制的手動驗證結果
+- [X] T009 [P] [US1] 在 `media/html/blocklyEdit.html` 新增 TXT 虛擬控制工具列入口、畫布容器與空狀態結構
+- [X] T010 [P] [US1] 在 `media/css/blocklyEdit.css` 新增畫布、拖曳按鈕、選取狀態與編輯模式樣式
+- [X] T011 [US1] 在 `media/js/blocklyEdit.js` 實作新增按鈕、空畫布渲染與基本編輯選取流程
+- [X] T012 [US1] 在 `media/js/blocklyEdit.js` 實作拖曳即時更新位置與連續移動回饋
+- [X] T013 [US1] 在 `media/js/blocklyEdit.js` 實作依顯示名稱重新計算尺寸，並禁止編輯模式點擊送出按下狀態
+- [X] T014 [US1] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄建立 4 顆按鈕、拖曳、動態尺寸與未執行點擊抑制的手動驗證結果
 
 **檢查點**: 使用者故事 1 應可在不執行 TXT 程式的情況下獨立完成畫布編輯與排版
 
@@ -57,18 +57,18 @@
 
 ### 測試任務
 
-- [ ] T015 [P] [US2] 在 `src/test/services/txtVirtualControlRuntimeService.test.ts` 新增 companion runtime lifecycle 與 session/snapshot 測試
-- [ ] T016 [P] [US2] 在 `src/test/suite/txtVirtualControlsRuntime.test.ts` 新增 TXT runtime helper、執行模式切換與狀態同步 regression 測試
+- [X] T015 [P] [US2] 在 `src/test/suite/txtVirtualControlRuntimeService.test.ts` 新增 companion runtime lifecycle 與 session/snapshot 測試
+- [X] T016 [P] [US2] 在 `src/test/messageHandler.test.ts`、`src/test/suite/txtVirtualControlRuntimeService.test.ts` 與 `src/test/suite/code-generation.test.ts` 補上 TXT runtime helper、執行模式切換與狀態同步 regression 測試
 
 ### 實作任務
 
-- [ ] T017 [US2] 在 `txt-runtime/virtual_controls_runtime.py` 實作 `GET /health`、`PUT /session`、`POST /snapshot` 與 `DELETE /session`
-- [ ] T018 [US2] 在 `src/services/txtVirtualControlRuntimeService.ts` 實作 runtime start/stop/session/snapshot orchestration
-- [ ] T019 [US2] 在 `src/services/txtUploader.ts` 與 `src/webview/messageHandler.ts` 整合 companion runtime 的啟停、session reset 與錯誤回退流程
-- [ ] T020 [US2] 在 `media/js/blocklyEdit.js` 實作 `running` 模式鎖位、press/release dispatch 與 `editing`/`running` reconciliation
-- [ ] T021 [US2] 在 `media/js/blocklyEdit.js` 與 `media/css/blocklyEdit.css` 實作按下/放開狀態的視覺回饋與目前狀態顯示
-- [ ] T022 [US2] 在 `media/blockly/blocks/txt.js`、`media/blockly/generators/txt/txt.js` 與 `media/blockly/generators/txt/index.js` 實作 `txt_virtual_button_state` 的基本按鈕選取、`stableId` 綁定與 `_txt_virtual_button_state(stableId)` code output
-- [ ] T023 [US2] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄 press/release、0.5 秒輸入延遲驗證與不干擾 Test Panel 的手動驗證結果
+- [X] T017 [US2] 在 `txt-runtime/virtual_controls_runtime.py` 實作 `GET /health`、`PUT /session`、`POST /snapshot` 與 `DELETE /session`
+- [X] T018 [US2] 在 `src/services/txtVirtualControlRuntimeService.ts` 實作 runtime start/stop/session/snapshot orchestration
+- [X] T019 [US2] 在 `src/webview/messageHandler.ts` 整合 companion runtime 的啟停、session reset 與錯誤回退流程，並維持 `src/services/txtUploader.ts` 為純上傳執行職責
+- [X] T020 [US2] 在 `media/js/blocklyEdit.js` 實作 `running` 模式鎖位、press/release dispatch 與 `editing`/`running` reconciliation
+- [X] T021 [US2] 在 `media/js/blocklyEdit.js` 與 `media/css/blocklyEdit.css` 實作按下/放開狀態的視覺回饋與目前狀態顯示
+- [X] T022 [US2] 在 `media/blockly/blocks/txt.js`、`media/blockly/generators/txt/txt.js` 與 `media/blockly/generators/txt/index.js` 實作 `txt_virtual_button_state` 的基本按鈕選取、`stableId` 綁定與 `_txt_virtual_button_state(stableId)` code output
+- [X] T023 [US2] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄 press/release、0.5 秒輸入延遲驗證與不干擾 Test Panel 的手動驗證結果
 
 **檢查點**: 使用者故事 2 應可在使用者故事 1 的畫布基礎上獨立驗證執行中輸入、狀態顯示、位置鎖定與 runtime 分離行為
 
@@ -81,15 +81,15 @@
 
 ### 測試任務
 
-- [ ] T024 [P] [US3] 在 `src/test/suite/txtVirtualControlsIdentity.test.ts` 新增 identifier 正規化、rename 綁定穩定性與 invalid reference 測試
+- [X] T024 [P] [US3] 在 `src/test/suite/txtVirtualControlsIdentity.test.ts` 新增 identifier 正規化、rename 綁定穩定性與 invalid reference 測試
 
 ### 實作任務
 
-- [ ] T025 [US3] 在 `media/js/blocklyEdit.js` 實作 rename collision handling、名稱轉換結果顯示與修正提示
-- [ ] T026 [US3] 在 `media/js/blocklyEdit.js` 實作已被引用按鈕的刪除前警告、確認流程與刪除後引用保留策略
-- [ ] T027 [US3] 在 `media/blockly/blocks/txt.js` 實作 `txt_virtual_button_state` 的 rename 後標籤刷新、失效引用標示與 invalid-reference warning
-- [ ] T028 [US3] 在 `media/js/blocklyEdit.js` 與 `src/webview/messageHandler.ts` 實作 `stableId` 綁定解析、失效引用診斷與執行前 preflight 阻擋
-- [ ] T029 [US3] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄名稱轉換提示、重名處理、刪除前警告與 invalid reference 阻擋的手動驗證結果
+- [X] T025 [US3] 在 `media/js/blocklyEdit.js` 實作 rename collision handling、名稱轉換結果顯示與修正提示
+- [X] T026 [US3] 在 `media/js/blocklyEdit.js` 實作已被引用按鈕的刪除前警告、確認流程與刪除後引用保留策略
+- [X] T027 [US3] 在 `media/blockly/blocks/txt.js` 實作 `txt_virtual_button_state` 的 rename 後標籤刷新、失效引用標示與 invalid-reference warning
+- [X] T028 [US3] 在 `media/js/blocklyEdit.js` 與 `src/webview/messageHandler.ts` 實作 `stableId` 綁定解析、失效引用診斷與執行前 preflight 阻擋
+- [X] T029 [US3] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄名稱轉換提示、重名處理、刪除前警告與 invalid reference 阻擋的手動驗證結果
 
 **檢查點**: 使用者故事 3 應可獨立驗證命名安全性、rename 穩定性、刪除保護與失效引用保留策略
 
@@ -102,10 +102,10 @@
 
 ### 實作任務
 
-- [ ] T030 [P] [US4] 在 `media/html/blocklyEdit.html` 新增顏色設定 UI 與調色盤控制項
-- [ ] T031 [P] [US4] 在 `media/css/blocklyEdit.css` 新增 palette、即時預覽與對比度樣式
-- [ ] T032 [US4] 在 `media/js/blocklyEdit.js` 實作文字色/背景色更新與即時預覽渲染
-- [ ] T033 [US4] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄調色盤與即時預覽手動驗證結果
+- [X] T030 [P] [US4] 在 `media/html/blocklyEdit.html` 新增顏色設定 UI 與調色盤控制項
+- [X] T031 [P] [US4] 在 `media/css/blocklyEdit.css` 新增 palette、即時預覽與對比度樣式
+- [X] T032 [US4] 在 `media/js/blocklyEdit.js` 實作文字色/背景色更新與即時預覽渲染
+- [X] T033 [US4] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄調色盤與即時預覽手動驗證結果
 
 **檢查點**: 使用者故事 4 應可在不依賴 persistence 的情況下獨立完成顏色調整與即時預覽
 
@@ -118,15 +118,15 @@
 
 ### 測試任務
 
-- [ ] T034 [P] [US5] 在 `src/test/messageHandler.test.ts` 新增 `txtVirtualControls` save/load 測試
-- [ ] T035 [P] [US5] 在 `src/test/suite/txtVirtualControlsPersistence.test.ts` 新增 malformed-data、schema fallback 與 reload recovery 測試
+- [X] T034 [P] [US5] 在 `src/test/messageHandler.test.ts` 新增 `txtVirtualControls` save/load 測試
+- [X] T035 [P] [US5] 在 `src/test/suite/txtVirtualControlsPersistence.test.ts` 新增 malformed-data、schema fallback 與 reload recovery 測試
 
 ### 實作任務
 
-- [ ] T036 [US5] 在 `src/webview/messageHandler.ts` 實作 `saveWorkspace`、`init`、`loadWorkspace` 與 backup 流程的 `txtVirtualControls` 持久化與還原
-- [ ] T037 [US5] 在 `media/js/blocklyEdit.js` 實作 WebView hydration、schema fallback 與重新開啟後回到 `editing` 模式的 recovery
-- [ ] T038 [US5] 在 `src/types/txtVirtualControls.ts` 與 `media/js/blocklyEdit.js` 保留名稱、顏色、尺寸、版面與綁定欄位的序列化行為
-- [ ] T039 [US5] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄重開專案還原與資料缺漏修復提示的手動驗證結果
+- [X] T036 [US5] 在 `src/webview/messageHandler.ts` 實作 `saveWorkspace`、`init`、`loadWorkspace` 與 backup 流程的 `txtVirtualControls` 持久化與還原
+- [X] T037 [US5] 在 `media/js/blocklyEdit.js` 實作 WebView hydration、schema fallback 與重新開啟後回到 `editing` 模式的 recovery
+- [X] T038 [US5] 在 `src/types/txtVirtualControls.ts` 與 `media/js/blocklyEdit.js` 保留名稱、顏色、尺寸、版面與綁定欄位的序列化行為
+- [X] T039 [US5] 在 `specs/053-txt-virtual-controls/quickstart.md` 記錄重開專案還原與資料缺漏修復提示的手動驗證結果
 
 **檢查點**: 使用者故事 5 應可獨立驗證專案重開後的完整還原與資料修復能力
 
@@ -136,10 +136,10 @@
 
 **目的**: 收斂跨故事字典、回歸驗證、文件與整體整合品質
 
-- [ ] T040 [P] 在 `scripts/generate-block-dictionary.js` 與 `src/mcp/block-dictionary.json` 更新 TXT 虛擬控制相關 dictionary entries
-- [ ] T041 [P] 在 `src/test/suite/code-generation.test.ts` 與 `src/test/suite/txtWorkspaceFixtures.test.ts` 補上跨故事 TXT regression coverage
-- [ ] T042 [P] 更新 `specs/053-txt-virtual-controls/quickstart.md` 與 `README.md` 的使用者驗證步驟、限制與注意事項
-- [ ] T043 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n` 與目標測試，並將結果記錄到 `specs/053-txt-virtual-controls/quickstart.md`
+- [X] T040 [P] 在 `scripts/generate-block-dictionary.js` 與 `src/mcp/block-dictionary.json` 更新 TXT 虛擬控制相關 dictionary entries
+- [X] T041 [P] 在 `src/test/suite/code-generation.test.ts` 與 `src/test/suite/txtWorkspaceFixtures.test.ts` 補上跨故事 TXT regression coverage
+- [X] T042 [P] 更新 `specs/053-txt-virtual-controls/quickstart.md` 與 `README.md` 的使用者驗證步驟、限制與注意事項
+- [X] T043 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n` 與目標測試，並將結果記錄到 `specs/053-txt-virtual-controls/quickstart.md`
 
 ---
 
@@ -195,8 +195,8 @@ Task: T010 [US1] 在 media/css/blocklyEdit.css 新增畫布、拖曳按鈕、選
 ## 平行範例：使用者故事 2
 
 ```text
-Task: T015 [US2] 在 src/test/services/txtVirtualControlRuntimeService.test.ts 新增 companion runtime lifecycle 與 session/snapshot 測試
-Task: T016 [US2] 在 src/test/suite/txtVirtualControlsRuntime.test.ts 新增 TXT runtime helper、執行模式切換與狀態同步 regression 測試
+Task: T015 [US2] 在 src/test/suite/txtVirtualControlRuntimeService.test.ts 新增 companion runtime lifecycle 與 session/snapshot 測試
+Task: T016 [US2] 在 src/test/messageHandler.test.ts、src/test/suite/txtVirtualControlRuntimeService.test.ts 與 src/test/suite/code-generation.test.ts 補上 TXT runtime helper、執行模式切換與狀態同步 regression 測試
 ```
 
 ## 平行範例：使用者故事 3

@@ -228,6 +228,57 @@ describe('WebView Message Handler', () => {
 		});
 	});
 
+	it('should save TXT virtual controls even when the Blockly workspace is otherwise empty', async () => {
+		fileServiceStub.createDirectory.resolves();
+		fileServiceStub.writeJsonFile.resolves();
+		fileServiceStub.fileExists.returns(false);
+
+		const saveWorkspaceMessage = {
+			command: 'saveWorkspace',
+			state: { blocks: { languageVersion: 0, blocks: [] } },
+			board: 'txt',
+			txtVirtualControls: {
+				schemaVersion: 1,
+				canvas: { mode: 'running' },
+				controls: [
+					{
+						stableId: 'btn-1',
+						displayName: 'Start',
+						identifier: 'start',
+						kind: 'button',
+						position: { x: 24, y: 36 },
+						size: { width: 120, height: 48 },
+						style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+					},
+				],
+			},
+		};
+
+		await messageHandler.handleMessage(saveWorkspaceMessage);
+
+		assert(fileServiceStub.writeJsonFile.calledOnce);
+		const saveData = fileServiceStub.writeJsonFile.getCall(0).args[1] as {
+			board: string;
+			txtVirtualControls: unknown;
+		};
+		assert.strictEqual(saveData.board, 'txt');
+		assert.deepStrictEqual(saveData.txtVirtualControls, {
+			schemaVersion: 1,
+			canvas: { mode: 'editing' },
+			controls: [
+				{
+					stableId: 'btn-1',
+					displayName: 'Start',
+					identifier: 'start',
+					kind: 'button',
+					position: { x: 24, y: 36 },
+					size: { width: 120, height: 48 },
+					style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+				},
+			],
+		});
+	});
+
 	it('should handle request initial state message', async () => {
 		// 準備測試
 		const savedState = {
@@ -264,6 +315,156 @@ describe('WebView Message Handler', () => {
 		assert.strictEqual(messageArg.theme, 'dark');
 		assert.strictEqual(messageArg.languagePreference, 'auto');
 		assert.strictEqual(messageArg.resolvedLanguage, 'en');
+	});
+
+	it('should include TXT virtual controls in the init payload for TXT workspaces', async () => {
+		const savedState = {
+			workspace: { blocks: [] },
+			board: 'txt',
+			txtVirtualControls: {
+				schemaVersion: 1,
+				canvas: { mode: 'editing' },
+				controls: [
+					{
+						stableId: 'btn-1',
+						displayName: 'Kick',
+						identifier: 'kick',
+						kind: 'button',
+						position: { x: 12, y: 16 },
+						size: { width: 108, height: 48 },
+						style: { backgroundColor: '#ff8f00', textColor: '#ffffff' },
+					},
+				],
+			},
+		};
+
+		fileServiceStub.fileExists.returns(true);
+		fileServiceStub.readJsonFile.resolves(savedState);
+		settingsManagerStub.getAutoBackupInterval.resolves(5);
+		settingsManagerStub.getTheme.resolves('dark');
+		settingsManagerStub.getLanguage.resolves('auto');
+		settingsManagerStub.resolveLanguage.returns('en');
+
+		await messageHandler.handleMessage({ command: 'requestInitialState' });
+
+		const initCall = webviewMock.postMessage.getCalls().find((call: any) => call.args[0].command === 'init');
+		assert(initCall, 'init message should be sent');
+		assert.deepStrictEqual(initCall.args[0].txtVirtualControls, savedState.txtVirtualControls);
+	});
+
+	it('should switch TXT virtual controls to running as soon as a session is prepared', async () => {
+		const runtimeServiceStub = {
+			createSession: sinon.stub().resolves({ sessionId: 'session-1', mode: 'running', runtimeUrl: 'http://127.0.0.1:8081' }),
+			syncSnapshot: sinon.stub().resolves(),
+			clearSession: sinon.stub().resolves(),
+		};
+		const txtUploaderStub = {
+			upload: sinon.stub().callsFake(async (_code: string, onProgress?: (progress: any) => void) => {
+				onProgress?.({ stage: 'uploading', progress: 40, message: 'Uploading program...' });
+				return { success: true, duration: 25 };
+			}),
+			stopExecution: sinon.stub().resolves(),
+		};
+
+		(messageHandler as any).txtVirtualControlRuntimeService = runtimeServiceStub;
+		(messageHandler as any).txtUploader = txtUploaderStub;
+
+		const txtUploadMessage = {
+			command: 'txtUpload',
+			code: 'if _txt_virtual_button_state("btn-1"):\n    print("hello")',
+			board: 'txt',
+			txtVirtualControls: {
+				schemaVersion: 1,
+				canvas: { mode: 'editing' },
+				controls: [
+					{
+						stableId: 'btn-1',
+						displayName: 'Start',
+						identifier: 'start',
+						kind: 'button',
+						position: { x: 24, y: 36 },
+						size: { width: 120, height: 48 },
+						style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+					},
+				],
+			},
+			virtualControlPreflight: {
+				valid: true,
+				invalidReferences: [],
+			},
+		};
+
+		await messageHandler.handleMessage(txtUploadMessage);
+
+		const runningStateCall = webviewMock.postMessage
+			.getCalls()
+			.find((call: any) => call.args[0].command === 'txtVirtualControlsExecutionStateChanged' && call.args[0].mode === 'running');
+
+		assert(runningStateCall, 'running state should be posted before execution completes');
+		assert.strictEqual(runningStateCall.args[0].sessionId, 'session-1');
+		assert(runtimeServiceStub.createSession.calledOnce);
+		assert(runtimeServiceStub.syncSnapshot.calledOnce);
+		assert(txtUploaderStub.upload.calledOnce);
+	});
+
+	it('should not start TXT virtual control runtime when code does not reference any virtual buttons', async () => {
+		const runtimeServiceStub = {
+			createSession: sinon.stub().rejects(new Error('runtime should not start')),
+			syncSnapshot: sinon.stub().resolves(),
+			clearSession: sinon.stub().resolves(),
+		};
+		const txtUploaderStub = {
+			upload: sinon.stub().callsFake(async (_code: string, onProgress?: (progress: any) => void) => {
+				onProgress?.({ stage: 'executing', progress: 60, message: 'Starting program execution...' });
+				return { success: true, duration: 25 };
+			}),
+			stopExecution: sinon.stub().resolves(),
+		};
+
+		(messageHandler as any).txtVirtualControlRuntimeService = runtimeServiceStub;
+		(messageHandler as any).txtUploader = txtUploaderStub;
+
+		const txtUploadMessage = {
+			command: 'txtUpload',
+			code: 'print("hello")',
+			board: 'txt',
+			txtVirtualControls: {
+				schemaVersion: 1,
+				canvas: { mode: 'editing' },
+				controls: [
+					{
+						stableId: 'btn-1',
+						displayName: 'Start',
+						identifier: 'start',
+						kind: 'button',
+						position: { x: 24, y: 36 },
+						size: { width: 120, height: 48 },
+						style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+					},
+				],
+			},
+			virtualControlPreflight: {
+				valid: true,
+				invalidReferences: [],
+			},
+		};
+
+		await messageHandler.handleMessage(txtUploadMessage);
+
+		assert.strictEqual(runtimeServiceStub.createSession.called, false, 'runtime should not start when code has no virtual button helper calls');
+		assert.strictEqual(runtimeServiceStub.syncSnapshot.called, false, 'no runtime snapshot should be sent when runtime is unused');
+		assert(txtUploaderStub.upload.calledOnce);
+
+		const runningStateCall = webviewMock.postMessage
+			.getCalls()
+			.find((call: any) => call.args[0].command === 'txtVirtualControlsExecutionStateChanged' && call.args[0].mode === 'running');
+		assert(runningStateCall, 'virtual controls panel should still leave editing mode while the TXT program runs');
+		assert.strictEqual('sessionId' in runningStateCall.args[0], false, 'running state should not carry a session id when runtime is not needed');
+
+		const runtimeErrorCall = webviewMock.postMessage
+			.getCalls()
+			.find((call: any) => call.args[0].command === 'txtVirtualControlsRuntimeError');
+		assert.strictEqual(runtimeErrorCall, undefined, 'runtime error should not be posted when runtime is unused');
 	});
 
 	it('should handle prompt new variable message', async () => {

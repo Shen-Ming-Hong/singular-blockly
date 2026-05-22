@@ -36,6 +36,49 @@ npm run compile
 npm run validate:i18n
 ```
 
+若有新增 TXT 積木或 MCP 查詢能力，建議同步重建字典：
+
+```text
+npm run generate:dictionary
+```
+
+---
+
+## 本次自動化驗證紀錄
+
+> 執行日期：2026-05-21（macOS, 本工作區）
+
+- ✅ `npm run compile`
+  - 2026-05-22 PR 前複驗，exit code 0
+- ✅ `npm run lint`
+  - 2026-05-22 PR 前複驗，exit code 0
+- ✅ `npm run validate:i18n`
+  - 14/14 locale bundles 通過
+- ✅ `npm run generate:dictionary`
+  - `src/mcp/block-dictionary.json` 已重建，包含最新 TXT 積木索引
+- ✅ `npm test`
+  - 2026-05-22 PR 前複驗：686 passing, 1 pending
+- ✅ 2026-05-22 目標回歸測試
+  - `txtVirtualControlsIdentity.test.ts`
+  - `txtVirtualControlsPersistence.test.ts`
+  - `messageHandler.test.ts`
+  - `txtVirtualControlRuntimeService.test.ts`
+  - `code-generation.test.ts`
+  - `txtWorkspaceFixtures.test.ts`
+  - 結果：30 passing, 0 failed
+
+### 手動 / 真機驗證紀錄
+
+> 驗證日期：2026-05-22（依使用者手動測試回報整理）
+
+- ✅ 建立 4 顆按鈕、拖曳重排、名稱變更後尺寸自適應正常
+- ✅ 編輯模式點擊不會送出 pressed state，僅保留選取 / 編輯用途
+- ✅ 執行模式可觀察 press / release，停止後可回到 `editing` 模式
+- ✅ Companion runtime 健康檢查、啟動流程與既有 I/O Test Panel 流程可分離運作
+- ✅ 已引用按鈕 rename 後，block 綁定維持 `stableId`，下拉選單與積木標籤會同步更新最新顯示名稱
+- ✅ 名稱轉換、識別字顯示、重名處理與顏色即時預覽已完成手動確認
+- ✅ 專案重新開啟後可還原虛擬控制版面，並維持 TXT 虛擬控制資料封裝
+
 ---
 
 ## 最小功能驗證流程
@@ -127,6 +170,7 @@ npm run validate:i18n
 - 滑鼠按下時程式可觀察到 pressed=true
 - 滑鼠放開時程式可觀察到 pressed=false
 - 停止後回到 `editing` 模式
+- companion runtime 使用 `singular-blockly.txt.runtimePort + 1`，不應干擾 I/O Test Panel 使用的 `io_server.py`
 
 ---
 

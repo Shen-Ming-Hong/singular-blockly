@@ -159,6 +159,37 @@ window.txtGenerator.forBlock['txt_input_sensor'] = function (block) {
 	return [`txt.input(${input}).state()`, window.txtGenerator.ORDER_FUNCTION_CALL];
 };
 
+window.txtGenerator.forBlock['txt_virtual_button_state'] = function (block) {
+	const stableId = block.getFieldValue('BUTTON_ID');
+	if (!stableId || stableId === '__none__') {
+		return ['0', window.txtGenerator.ORDER_ATOMIC];
+	}
+
+	window.txtGenerator.addImport('import json');
+	window.txtGenerator.addImport('import os');
+	window.txtGenerator.addFunction(
+		'_txt_virtual_button_state',
+		`_txt_virtual_button_cache_ = {'mtime': None, 'controls': {}}
+def _txt_virtual_button_state(stable_id):
+	state_path = '/tmp/singular_blockly/virtual_controls_state.json'
+	try:
+		mtime = os.path.getmtime(state_path)
+		if _txt_virtual_button_cache_['mtime'] != mtime:
+			with open(state_path, 'r', encoding='utf-8') as handle:
+				payload = json.load(handle)
+			_txt_virtual_button_cache_['mtime'] = mtime
+			_txt_virtual_button_cache_['controls'] = payload.get('controls', {})
+		entry = _txt_virtual_button_cache_['controls'].get(stable_id)
+		return 1 if entry and entry.get('pressed') else 0
+	except Exception:
+		_txt_virtual_button_cache_['mtime'] = None
+		_txt_virtual_button_cache_['controls'] = {}
+		return 0`
+	);
+
+	return [`_txt_virtual_button_state(${window.txtGenerator.quote_(stableId)})`, window.txtGenerator.ORDER_FUNCTION_CALL];
+};
+
 // === 延遲積木 ===
 
 /**

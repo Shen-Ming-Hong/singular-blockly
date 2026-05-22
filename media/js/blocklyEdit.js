@@ -192,6 +192,1135 @@ const toast = {
  */
 window.currentProgrammingLanguage = 'arduino';
 
+const TXT_VIRTUAL_CONTROL_DEFAULT_STYLE = {
+	backgroundColor: '#0288d1',
+	textColor: '#ffffff',
+};
+const TXT_VIRTUAL_CONTROLS_PANEL_DEFAULT_WIDTH = 340;
+const TXT_VIRTUAL_CONTROLS_PANEL_MIN_WIDTH = 280;
+const TXT_VIRTUAL_CONTROLS_PANEL_MAX_WIDTH = 560;
+const TXT_VIRTUAL_CONTROLS_SPLITTER_WIDTH = 10;
+const TXT_VIRTUAL_CONTROLS_MIN_BLOCKLY_WIDTH = 360;
+const TXT_VIRTUAL_CONTROLS_TOOLBAR_GAP = 12;
+const TXT_VIRTUAL_CONTROL_MIN_WIDTH = 96;
+const TXT_VIRTUAL_CONTROL_MIN_HEIGHT = 48;
+const TXT_VIRTUAL_CONTROL_HORIZONTAL_PADDING = 32;
+const TXT_VIRTUAL_CONTROL_CANVAS_PADDING = 20;
+const TXT_VIRTUAL_CONTROL_RESERVED_IDENTIFIERS = new Set([
+	'false',
+	'none',
+	'true',
+	'and',
+	'as',
+	'assert',
+	'async',
+	'await',
+	'break',
+	'class',
+	'continue',
+	'def',
+	'del',
+	'elif',
+	'else',
+	'except',
+	'finally',
+	'for',
+	'from',
+	'global',
+	'if',
+	'import',
+	'in',
+	'is',
+	'lambda',
+	'nonlocal',
+	'not',
+	'or',
+	'pass',
+	'raise',
+	'return',
+	'try',
+	'while',
+	'with',
+	'yield',
+]);
+
+const txtVirtualControlsState = {
+	document: createEmptyTxtVirtualControlsDocument(),
+	panelOpen: false,
+	panelWidth: TXT_VIRTUAL_CONTROLS_PANEL_DEFAULT_WIDTH,
+	selectedStableId: null,
+	sessionId: null,
+	invalidReferences: [],
+	pendingLoadButtonReferences: new Map(),
+	pressedStates: {},
+	drag: null,
+	panelResize: null,
+	nameInputComposing: false,
+	resizeObserver: null,
+	resizeFrame: 0,
+	activePressStableId: null,
+	initialized: false,
+};
+
+function createEmptyTxtVirtualControlsDocument() {
+	return {
+		schemaVersion: 1,
+		canvas: {
+			mode: 'editing',
+		},
+		controls: [],
+	};
+}
+
+function cloneTxtVirtualControlsDocument(document, options = {}) {
+	if (!document || typeof document !== 'object') {
+		return createEmptyTxtVirtualControlsDocument();
+	}
+
+	const controls = Array.isArray(document.controls) ? document.controls : [];
+	return {
+		schemaVersion: 1,
+		canvas: {
+			mode: options.forceEditingMode ? 'editing' : document.canvas?.mode === 'running' ? 'running' : 'editing',
+			...(document.canvas?.lastViewport
+				? {
+					lastViewport: {
+						scrollX: Number.isFinite(document.canvas.lastViewport.scrollX) ? document.canvas.lastViewport.scrollX : 0,
+						scrollY: Number.isFinite(document.canvas.lastViewport.scrollY) ? document.canvas.lastViewport.scrollY : 0,
+						zoom: Number.isFinite(document.canvas.lastViewport.zoom) ? document.canvas.lastViewport.zoom : 1,
+					},
+				}
+				: {}),
+		},
+		controls: controls
+			.map(control => {
+				if (!control || typeof control !== 'object' || !control.stableId) {
+					return null;
+				}
+
+				const displayName = String(control.displayName || control.stableId).trim() || String(control.stableId);
+				const stableId = String(control.stableId).trim();
+				const identifier = String(control.identifier || stableId).trim() || stableId;
+				const measuredSize = measureTxtVirtualControlSize(displayName);
+
+				return {
+					stableId,
+					displayName,
+					identifier,
+					kind: 'button',
+					position: {
+						x: Number.isFinite(control.position?.x) ? control.position.x : 24,
+						y: Number.isFinite(control.position?.y) ? control.position.y : 24,
+					},
+					size: {
+						width: Math.max(measuredSize.width, Number.isFinite(control.size?.width) ? control.size.width : measuredSize.width),
+						height: Math.max(measuredSize.height, Number.isFinite(control.size?.height) ? control.size.height : measuredSize.height),
+					},
+					style: {
+						backgroundColor: String(control.style?.backgroundColor || TXT_VIRTUAL_CONTROL_DEFAULT_STYLE.backgroundColor),
+						textColor: String(control.style?.textColor || TXT_VIRTUAL_CONTROL_DEFAULT_STYLE.textColor),
+					},
+				};
+			})
+			.filter(Boolean),
+	};
+}
+
+function formatVirtualControlMessage(key, fallback, ...args) {
+	let message = window.languageManager?.getMessage(key, fallback) || fallback;
+	args.forEach((arg, index) => {
+		message = message.replace(new RegExp(`\\{${index}\\}`, 'g'), String(arg));
+	});
+	return message;
+}
+
+function isTxtVirtualBoard(boardId) {
+	if (!boardId || boardId === 'none') {
+		return false;
+	}
+	if (boardId === 'txt') {
+		return true;
+	}
+	return Boolean(window.BOARD_CONFIGS?.[boardId]?.language === 'txt');
+}
+
+function getCurrentBoardId() {
+	return window.currentBoard || document.getElementById('boardSelect')?.value || 'none';
+}
+
+function hasTxtVirtualControlsData() {
+	return Array.isArray(txtVirtualControlsState.document.controls) && txtVirtualControlsState.document.controls.length > 0;
+}
+
+function appendTxtVirtualControlsPayload(payload, boardId) {
+	if (!isTxtVirtualBoard(boardId)) {
+		return payload;
+	}
+
+	return {
+		...payload,
+		txtVirtualControls: cloneTxtVirtualControlsDocument(txtVirtualControlsState.document, { forceEditingMode: true }),
+	};
+}
+
+function getTxtVirtualControlsElements() {
+	return {
+		container: document.querySelector('.container'),
+		blocklyArea: document.getElementById('blocklyArea'),
+		toggleContainer: document.getElementById('txtVirtualControlsToggleContainer'),
+		toggleButton: document.getElementById('txtVirtualControlsToggle'),
+		splitter: document.getElementById('txtVirtualControlsSplitter'),
+		panel: document.getElementById('txtVirtualControlsPanel'),
+		title: document.getElementById('txtVirtualControlsPanelTitle'),
+		modeBadge: document.getElementById('txtVirtualControlsModeBadge'),
+		addButton: document.getElementById('txtVirtualControlsAddButton'),
+		emptyState: document.getElementById('txtVirtualControlsEmptyState'),
+		canvas: document.getElementById('txtVirtualControlsCanvas'),
+		canvasHint: document.getElementById('txtVirtualControlsCanvasHint'),
+		inspector: document.getElementById('txtVirtualControlsInspector'),
+		inspectorEmpty: document.getElementById('txtVirtualControlsInspectorEmpty'),
+		nameLabel: document.getElementById('txtVirtualControlNameLabel'),
+		nameInput: document.getElementById('txtVirtualControlNameInput'),
+		identifierLabel: document.getElementById('txtVirtualControlIdentifierLabel'),
+		identifierValue: document.getElementById('txtVirtualControlIdentifierValue'),
+		backgroundLabel: document.getElementById('txtVirtualControlBackgroundLabel'),
+		backgroundInput: document.getElementById('txtVirtualControlBackgroundInput'),
+		textLabel: document.getElementById('txtVirtualControlTextLabel'),
+		textInput: document.getElementById('txtVirtualControlTextInput'),
+		deleteButton: document.getElementById('txtVirtualControlDeleteButton'),
+	};
+}
+
+function measureTxtVirtualControlSize(displayName) {
+	const canvas = measureTxtVirtualControlSize.canvas || (measureTxtVirtualControlSize.canvas = document.createElement('canvas'));
+	const context = canvas.getContext('2d');
+	if (context) {
+		context.font = "600 14px var(--vscode-font-family, 'Segoe WPC', 'Segoe UI', sans-serif)";
+	}
+	const textWidth = context ? Math.ceil(context.measureText(displayName || '').width) : 0;
+	return {
+		width: Math.max(TXT_VIRTUAL_CONTROL_MIN_WIDTH, textWidth + TXT_VIRTUAL_CONTROL_HORIZONTAL_PADDING),
+		height: TXT_VIRTUAL_CONTROL_MIN_HEIGHT,
+	};
+}
+
+function getNextTxtVirtualControlPosition(index) {
+	const column = index % 2;
+	const row = Math.floor(index / 2);
+	return {
+		x: TXT_VIRTUAL_CONTROL_CANVAS_PADDING + column * 156,
+		y: TXT_VIRTUAL_CONTROL_CANVAS_PADDING + row * 88,
+	};
+}
+
+function buildTxtVirtualControlIdentifier(displayName, stableId) {
+	const normalized = (displayName || '')
+		.normalize('NFKD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase()
+		.replace(/[^a-z0-9_]+/g, '_')
+		.replace(/^_+|_+$/g, '');
+
+	let baseIdentifier = normalized || 'button';
+	if (/^[0-9]/.test(baseIdentifier)) {
+		baseIdentifier = `button_${baseIdentifier}`;
+	}
+	if (TXT_VIRTUAL_CONTROL_RESERVED_IDENTIFIERS.has(baseIdentifier)) {
+		baseIdentifier = `${baseIdentifier}_button`;
+	}
+
+	const existingIdentifiers = new Set(
+		txtVirtualControlsState.document.controls.filter(control => control.stableId !== stableId).map(control => control.identifier)
+	);
+	let identifier = baseIdentifier;
+	let suffix = 2;
+	while (existingIdentifiers.has(identifier)) {
+		identifier = `${baseIdentifier}_${suffix}`;
+		suffix += 1;
+	}
+
+	return identifier;
+}
+
+function generateTxtVirtualControlStableId() {
+	if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+		return window.crypto.randomUUID();
+	}
+	return `txt-virtual-${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+}
+
+function getSelectedTxtVirtualControl() {
+	return txtVirtualControlsState.document.controls.find(control => control.stableId === txtVirtualControlsState.selectedStableId) || null;
+}
+
+function getTxtVirtualControlByStableId(stableId) {
+	return txtVirtualControlsState.document.controls.find(control => control.stableId === stableId) || null;
+}
+
+function setTxtVirtualControlPendingLoadOptions(workspaceState) {
+	const pendingReferences = new Map();
+
+	const visitBlockState = blockState => {
+		if (!blockState || typeof blockState !== 'object') {
+			return;
+		}
+
+		if (blockState.type === 'txt_virtual_button_state') {
+			const stableId = typeof blockState.fields?.BUTTON_ID === 'string' ? blockState.fields.BUTTON_ID.trim() : '';
+			if (stableId && stableId !== '__none__') {
+				const displayNameSnapshot =
+					typeof blockState.extraState?.displayNameSnapshot === 'string'
+						? blockState.extraState.displayNameSnapshot.trim()
+						: '';
+				pendingReferences.set(stableId, displayNameSnapshot || stableId);
+			}
+		}
+
+		if (blockState.inputs && typeof blockState.inputs === 'object') {
+			Object.values(blockState.inputs).forEach(inputState => {
+				if (inputState?.block) {
+					visitBlockState(inputState.block);
+				}
+			});
+		}
+
+		if (blockState.next?.block) {
+			visitBlockState(blockState.next.block);
+		}
+	};
+
+	const topBlocks = workspaceState?.blocks?.blocks;
+	if (Array.isArray(topBlocks)) {
+		topBlocks.forEach(visitBlockState);
+	}
+
+	txtVirtualControlsState.pendingLoadButtonReferences = pendingReferences;
+}
+
+function clearTxtVirtualControlPendingLoadOptions() {
+	txtVirtualControlsState.pendingLoadButtonReferences = new Map();
+}
+
+function scheduleBlocklyResize() {
+	if (txtVirtualControlsState.resizeFrame) {
+		cancelAnimationFrame(txtVirtualControlsState.resizeFrame);
+	}
+	txtVirtualControlsState.resizeFrame = requestAnimationFrame(() => {
+		txtVirtualControlsState.resizeFrame = 0;
+		const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+		if (workspace) {
+			Blockly.svgResize(workspace);
+		}
+	});
+}
+
+function clampTxtVirtualControlsPanelWidth(nextWidth, containerWidth = window.innerWidth) {
+	const numericWidth = Number.isFinite(nextWidth) ? nextWidth : TXT_VIRTUAL_CONTROLS_PANEL_DEFAULT_WIDTH;
+	const maxWidth = Math.max(
+		TXT_VIRTUAL_CONTROLS_PANEL_MIN_WIDTH,
+		Math.min(
+			TXT_VIRTUAL_CONTROLS_PANEL_MAX_WIDTH,
+			(containerWidth || window.innerWidth) - TXT_VIRTUAL_CONTROLS_MIN_BLOCKLY_WIDTH - TXT_VIRTUAL_CONTROLS_SPLITTER_WIDTH - 24
+		)
+	);
+	return Math.max(TXT_VIRTUAL_CONTROLS_PANEL_MIN_WIDTH, Math.min(maxWidth, Math.round(numericWidth)));
+}
+
+function applyTxtVirtualControlsPanelLayout() {
+	const elements = getTxtVirtualControlsElements();
+	if (!elements.container) {
+		return;
+	}
+
+	if (txtVirtualControlsState.panelOpen) {
+		txtVirtualControlsState.panelWidth = clampTxtVirtualControlsPanelWidth(
+			txtVirtualControlsState.panelWidth,
+			elements.container.clientWidth
+		);
+	}
+
+	const openWidth = txtVirtualControlsState.panelOpen ? txtVirtualControlsState.panelWidth : 0;
+	elements.container.style.setProperty('--txt-virtual-controls-panel-width', `${openWidth}px`);
+	elements.container.style.setProperty(
+		'--txt-virtual-controls-toolbar-offset',
+		txtVirtualControlsState.panelOpen ? `${openWidth + TXT_VIRTUAL_CONTROLS_SPLITTER_WIDTH + TXT_VIRTUAL_CONTROLS_TOOLBAR_GAP}px` : '0px'
+	);
+
+	if (elements.panel) {
+		elements.panel.classList.toggle('open', txtVirtualControlsState.panelOpen);
+	}
+	if (elements.splitter) {
+		elements.splitter.classList.toggle('open', txtVirtualControlsState.panelOpen);
+		elements.splitter.setAttribute('aria-hidden', txtVirtualControlsState.panelOpen ? 'false' : 'true');
+	}
+}
+
+function initTxtVirtualControlsResizeObserver() {
+	if (txtVirtualControlsState.resizeObserver || typeof ResizeObserver === 'undefined') {
+		return;
+	}
+
+	const elements = getTxtVirtualControlsElements();
+	if (!elements.blocklyArea) {
+		return;
+	}
+
+	txtVirtualControlsState.resizeObserver = new ResizeObserver(() => {
+		scheduleBlocklyResize();
+	});
+	txtVirtualControlsState.resizeObserver.observe(elements.blocklyArea);
+}
+
+function handleTxtVirtualControlsSplitterPointerDown(event) {
+	const elements = getTxtVirtualControlsElements();
+	if (!txtVirtualControlsState.panelOpen || !elements.container || !elements.splitter) {
+		return;
+	}
+
+	event.preventDefault();
+	elements.splitter.setPointerCapture?.(event.pointerId);
+	txtVirtualControlsState.panelResize = {
+		pointerId: event.pointerId,
+		containerWidth: elements.container.clientWidth,
+		containerRight: elements.container.getBoundingClientRect().right,
+	};
+	document.body.classList.add('txt-virtual-controls-resizing');
+	window.addEventListener('pointermove', handleTxtVirtualControlsSplitterPointerMove);
+	window.addEventListener('pointerup', handleTxtVirtualControlsSplitterPointerUp, { once: true });
+	window.addEventListener('pointercancel', handleTxtVirtualControlsSplitterPointerUp, { once: true });
+}
+
+function handleTxtVirtualControlsSplitterPointerMove(event) {
+	if (!txtVirtualControlsState.panelResize) {
+		return;
+	}
+
+	txtVirtualControlsState.panelWidth = clampTxtVirtualControlsPanelWidth(
+		txtVirtualControlsState.panelResize.containerRight - event.clientX,
+		txtVirtualControlsState.panelResize.containerWidth
+	);
+	applyTxtVirtualControlsPanelLayout();
+	scheduleBlocklyResize();
+}
+
+function handleTxtVirtualControlsSplitterPointerUp() {
+	window.removeEventListener('pointermove', handleTxtVirtualControlsSplitterPointerMove);
+	const elements = getTxtVirtualControlsElements();
+	if (elements.splitter && txtVirtualControlsState.panelResize?.pointerId !== undefined) {
+		elements.splitter.releasePointerCapture?.(txtVirtualControlsState.panelResize.pointerId);
+	}
+	txtVirtualControlsState.panelResize = null;
+	document.body.classList.remove('txt-virtual-controls-resizing');
+	scheduleBlocklyResize();
+}
+
+function setTxtVirtualControlsPanelOpen(isOpen) {
+	txtVirtualControlsState.panelOpen = Boolean(isOpen && isTxtVirtualBoard(getCurrentBoardId()));
+	const elements = getTxtVirtualControlsElements();
+	applyTxtVirtualControlsPanelLayout();
+	if (elements.toggleButton) {
+		elements.toggleButton.classList.toggle('active', txtVirtualControlsState.panelOpen);
+		elements.toggleButton.setAttribute('aria-expanded', txtVirtualControlsState.panelOpen ? 'true' : 'false');
+	}
+	scheduleBlocklyResize();
+}
+
+function updateTxtVirtualControlsTexts() {
+	const elements = getTxtVirtualControlsElements();
+	if (!elements.panel) {
+		return;
+	}
+
+	if (elements.toggleButton) {
+		elements.toggleButton.title = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_TOGGLE_TITLE', 'Toggle TXT virtual controls');
+	}
+	if (elements.title) {
+		elements.title.textContent = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_TITLE', 'TXT Virtual Controls');
+	}
+	if (elements.modeBadge) {
+		elements.modeBadge.textContent =
+			txtVirtualControlsState.document.canvas.mode === 'running'
+				? formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_MODE_RUNNING', 'Running')
+				: formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_MODE_EDITING', 'Editing');
+	}
+	if (elements.addButton) {
+		elements.addButton.textContent = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_ADD_BUTTON', 'Add Button');
+	}
+	if (elements.emptyState) {
+		elements.emptyState.textContent = formatVirtualControlMessage(
+			'TXT_VIRTUAL_CONTROLS_EMPTY_STATE',
+			'Create a virtual button here, then read it from Blockly blocks.'
+		);
+	}
+	if (elements.canvasHint) {
+		elements.canvasHint.textContent =
+			txtVirtualControlsState.document.canvas.mode === 'running'
+				? formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_RUNNING_HINT', 'Buttons are locked in place while the TXT program is running.')
+				: formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_EDITING_HINT', 'Drag buttons to reposition them. Button size follows the display name.');
+	}
+	if (elements.inspectorEmpty) {
+		elements.inspectorEmpty.textContent = formatVirtualControlMessage(
+			'TXT_VIRTUAL_CONTROLS_SELECT_PROMPT',
+			'Select a virtual button to edit its name and colors.'
+		);
+	}
+	if (elements.nameLabel) {
+		elements.nameLabel.textContent = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_NAME_LABEL', 'Display name');
+	}
+	if (elements.identifierLabel) {
+		elements.identifierLabel.textContent = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_IDENTIFIER_LABEL', 'Identifier');
+	}
+	if (elements.backgroundLabel) {
+		elements.backgroundLabel.textContent = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_BACKGROUND_LABEL', 'Button color');
+	}
+	if (elements.textLabel) {
+		elements.textLabel.textContent = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_TEXT_LABEL', 'Text color');
+	}
+	if (elements.deleteButton) {
+		elements.deleteButton.textContent = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_DELETE_BUTTON', 'Delete Button');
+	}
+}
+
+function renderTxtVirtualControlsInspector() {
+	const elements = getTxtVirtualControlsElements();
+	const selectedControl = getSelectedTxtVirtualControl();
+	const isRunning = txtVirtualControlsState.document.canvas.mode === 'running';
+
+	if (!elements.inspector || !elements.inspectorEmpty) {
+		return;
+	}
+
+	elements.inspector.classList.toggle('hidden', !selectedControl);
+	elements.inspectorEmpty.classList.toggle('hidden', Boolean(selectedControl));
+
+	if (!selectedControl) {
+		return;
+	}
+
+	if (elements.nameInput) {
+		elements.nameInput.value = selectedControl.displayName;
+		elements.nameInput.disabled = isRunning;
+	}
+	if (elements.backgroundInput) {
+		elements.backgroundInput.value = selectedControl.style.backgroundColor;
+		elements.backgroundInput.disabled = isRunning;
+	}
+	if (elements.textInput) {
+		elements.textInput.value = selectedControl.style.textColor;
+		elements.textInput.disabled = isRunning;
+	}
+	if (elements.identifierValue) {
+		elements.identifierValue.textContent = selectedControl.identifier;
+	}
+	if (elements.deleteButton) {
+		elements.deleteButton.disabled = isRunning;
+	}
+}
+
+function renderTxtVirtualControlsCanvas() {
+	const elements = getTxtVirtualControlsElements();
+	if (!elements.canvas || !elements.emptyState) {
+		return;
+	}
+
+	const controls = txtVirtualControlsState.document.controls;
+	elements.canvas.innerHTML = '';
+	elements.emptyState.classList.toggle('hidden', controls.length > 0);
+
+	controls.forEach(control => {
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'txt-virtual-control-button';
+		button.dataset.stableId = control.stableId;
+		button.textContent = control.displayName;
+		button.style.left = `${control.position.x}px`;
+		button.style.top = `${control.position.y}px`;
+		button.style.width = `${control.size.width}px`;
+		button.style.height = `${control.size.height}px`;
+		button.style.backgroundColor = control.style.backgroundColor;
+		button.style.color = control.style.textColor;
+		button.classList.toggle('selected', txtVirtualControlsState.selectedStableId === control.stableId);
+		button.classList.toggle('running', txtVirtualControlsState.document.canvas.mode === 'running');
+		button.classList.toggle('pressed', Boolean(txtVirtualControlsState.pressedStates[control.stableId]));
+		button.addEventListener('pointerdown', event => handleTxtVirtualControlPointerDown(event, control.stableId));
+		elements.canvas.appendChild(button);
+	});
+}
+
+function renderTxtVirtualControlsPanel() {
+	const elements = getTxtVirtualControlsElements();
+	if (!elements.panel) {
+		return;
+	}
+
+	const isTxtBoard = isTxtVirtualBoard(getCurrentBoardId());
+	if (elements.toggleContainer) {
+		elements.toggleContainer.style.display = isTxtBoard ? 'flex' : 'none';
+	}
+	if (!isTxtBoard) {
+		setTxtVirtualControlsPanelOpen(false);
+		return;
+	}
+
+	applyTxtVirtualControlsPanelLayout();
+	updateTxtVirtualControlsTexts();
+	if (elements.addButton) {
+		elements.addButton.disabled = txtVirtualControlsState.document.canvas.mode === 'running';
+	}
+	renderTxtVirtualControlsCanvas();
+	renderTxtVirtualControlsInspector();
+	const hasInvalidReferences = txtVirtualControlsState.invalidReferences.length > 0;
+	elements.panel.classList.toggle('has-invalid-references', hasInvalidReferences);
+	if (elements.toggleButton) {
+		elements.toggleButton.classList.toggle('has-invalid-references', hasInvalidReferences);
+	}
+}
+
+function refreshTxtVirtualControlsUI() {
+	if (!txtVirtualControlsState.initialized) {
+		return;
+	}
+	renderTxtVirtualControlsPanel();
+}
+
+function selectTxtVirtualControl(stableId) {
+	txtVirtualControlsState.selectedStableId = stableId || null;
+	renderTxtVirtualControlsPanel();
+}
+
+function createTxtVirtualButtonControl() {
+	const nextIndex = txtVirtualControlsState.document.controls.length + 1;
+	const displayName = formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_DEFAULT_BUTTON_NAME', 'Button {0}', nextIndex);
+	const stableId = generateTxtVirtualControlStableId();
+	const identifier = buildTxtVirtualControlIdentifier(displayName, stableId);
+	const position = getNextTxtVirtualControlPosition(txtVirtualControlsState.document.controls.length);
+	const size = measureTxtVirtualControlSize(displayName);
+
+	txtVirtualControlsState.document.controls.push({
+		stableId,
+		displayName,
+		identifier,
+		kind: 'button',
+		position,
+		size,
+		style: { ...TXT_VIRTUAL_CONTROL_DEFAULT_STYLE },
+	});
+	selectTxtVirtualControl(stableId);
+	refreshTxtVirtualButtonReferences();
+	window.saveBlocklyWorkspaceState?.();
+}
+
+function deleteSelectedTxtVirtualControl() {
+	const selectedControl = getSelectedTxtVirtualControl();
+	if (!selectedControl || txtVirtualControlsState.document.canvas.mode === 'running') {
+		return;
+	}
+
+	const referencedBlocks = getTxtVirtualControlReferenceBlocks(selectedControl.stableId);
+	const confirmMessage = referencedBlocks.length > 0
+		? formatVirtualControlMessage(
+			'TXT_VIRTUAL_CONTROLS_DELETE_CONFIRM_REFERENCED',
+			'Delete "{0}"? {1} Blockly block references will become invalid until you choose another button.',
+			selectedControl.displayName,
+			referencedBlocks.length
+		)
+		: formatVirtualControlMessage(
+			'TXT_VIRTUAL_CONTROLS_DELETE_CONFIRM',
+			'Delete virtual button "{0}"?',
+			selectedControl.displayName
+		);
+
+	showAsyncConfirm(confirmMessage).then(confirmed => {
+		if (!confirmed) {
+			return;
+		}
+
+		txtVirtualControlsState.document.controls = txtVirtualControlsState.document.controls.filter(
+			control => control.stableId !== selectedControl.stableId
+		);
+		txtVirtualControlsState.selectedStableId = null;
+		delete txtVirtualControlsState.pressedStates[selectedControl.stableId];
+		refreshTxtVirtualButtonReferences();
+		window.saveBlocklyWorkspaceState?.();
+		renderTxtVirtualControlsPanel();
+	});
+}
+
+function updateSelectedTxtVirtualControl(patch) {
+	const selectedControl = getSelectedTxtVirtualControl();
+	if (!selectedControl || txtVirtualControlsState.document.canvas.mode === 'running') {
+		return;
+	}
+
+	Object.assign(selectedControl, patch);
+	selectedControl.size = measureTxtVirtualControlSize(selectedControl.displayName);
+	refreshTxtVirtualButtonReferences();
+	window.saveBlocklyWorkspaceState?.();
+	renderTxtVirtualControlsPanel();
+}
+
+function commitSelectedTxtVirtualControlName(rawValue, options = {}) {
+	const selectedControl = getSelectedTxtVirtualControl();
+	if (!selectedControl || txtVirtualControlsState.document.canvas.mode === 'running') {
+		return;
+	}
+
+	const nextRawDisplayName = typeof rawValue === 'string' ? rawValue : '';
+	const hasVisibleText = nextRawDisplayName.trim().length > 0;
+	if (!hasVisibleText && options.allowEmptyDraft) {
+		return;
+	}
+
+	const nextDisplayName = hasVisibleText
+		? nextRawDisplayName
+		: formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_UNNAMED', 'Button');
+	const nextIdentifier = buildTxtVirtualControlIdentifier(nextDisplayName, selectedControl.stableId);
+	if (nextDisplayName === selectedControl.displayName && nextIdentifier === selectedControl.identifier) {
+		return;
+	}
+
+	updateSelectedTxtVirtualControl({
+		displayName: nextDisplayName,
+		identifier: nextIdentifier,
+	});
+}
+
+function getTxtVirtualControlReferenceBlocks(stableId) {
+	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+	if (!workspace) {
+		return [];
+	}
+
+	return workspace.getBlocksByType('txt_virtual_button_state', false).filter(block => {
+		const fieldValue = block.getFieldValue('BUTTON_ID');
+		return fieldValue === stableId;
+	});
+}
+
+function setTxtVirtualButtonReferenceState(block, state) {
+	block.txtVirtualButtonReference_ = {
+		stableId: state?.stableId || '',
+		displayNameSnapshot: state?.displayNameSnapshot || '',
+		identifierSnapshot: state?.identifierSnapshot || '',
+		status: state?.status === 'valid' ? 'valid' : 'invalid',
+	};
+	return block.txtVirtualButtonReference_;
+}
+
+function getTxtVirtualButtonReferenceState(block) {
+	return block.txtVirtualButtonReference_ || setTxtVirtualButtonReferenceState(block, {});
+}
+
+function getTxtVirtualButtonDropdownOptions(block) {
+	const controls = txtVirtualControlsState.document.controls;
+	const pendingLoadReferences = txtVirtualControlsState.pendingLoadButtonReferences || new Map();
+	const options = controls.map(control => [control.displayName, control.stableId]);
+	const optionValues = new Set(options.map(option => option[1]));
+
+	pendingLoadReferences.forEach((displayNameSnapshot, stableId) => {
+		if (!stableId || stableId === '__none__' || optionValues.has(stableId)) {
+			return;
+		}
+
+		options.unshift([
+			formatVirtualControlMessage(
+				'TXT_VIRTUAL_CONTROLS_MISSING_OPTION',
+				'{0} (missing)',
+				displayNameSnapshot || stableId
+			),
+			stableId,
+		]);
+		optionValues.add(stableId);
+	});
+
+	const currentValue = block?.getFieldValue ? block.getFieldValue('BUTTON_ID') : '';
+	if (currentValue && currentValue !== '__none__' && !optionValues.has(currentValue)) {
+		const referenceState = getTxtVirtualButtonReferenceState(block);
+		options.unshift([
+			formatVirtualControlMessage(
+				'TXT_VIRTUAL_CONTROLS_MISSING_OPTION',
+				'{0} (missing)',
+				referenceState.displayNameSnapshot || pendingLoadReferences.get(currentValue) || currentValue
+			),
+			currentValue,
+		]);
+		optionValues.add(currentValue);
+	}
+	if (!optionValues.has('__none__')) {
+		options.push([
+			formatVirtualControlMessage(
+				options.length === 0 ? 'TXT_VIRTUAL_CONTROLS_EMPTY_OPTION' : 'TXT_VIRTUAL_CONTROLS_UNSELECTED_WARNING',
+				options.length === 0 ? 'Create a button first' : 'Select a virtual button first.'
+			),
+			'__none__',
+		]);
+	}
+	return options;
+}
+
+function applyTxtVirtualButtonWarning(block, referenceMessage) {
+	const orphanMessage =
+		typeof window.isInAllowedContext === 'function' && !window.isInAllowedContext(block)
+			? window.languageManager?.getMessage('TXT_ORPHAN_WARNING_MULTI') ||
+				'This block must be placed inside a "TXT Setup" or "TXT Process" block'
+			: '';
+	const warnings = [referenceMessage, orphanMessage].filter(Boolean);
+	block.setWarningText(warnings.length > 0 ? warnings.join('\n') : null);
+}
+
+function refreshTxtVirtualButtonReferenceForBlock(block) {
+	if (!block || block.type !== 'txt_virtual_button_state') {
+		return null;
+	}
+
+	const stableId = block.getFieldValue('BUTTON_ID') === '__none__' ? '' : block.getFieldValue('BUTTON_ID');
+	const referencedControl = stableId ? getTxtVirtualControlByStableId(stableId) : null;
+	const referenceState = getTxtVirtualButtonReferenceState(block);
+
+	if (!stableId) {
+		setTxtVirtualButtonReferenceState(block, {
+			...referenceState,
+			stableId: '',
+			status: 'invalid',
+		});
+		applyTxtVirtualButtonWarning(
+			block,
+			formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_UNSELECTED_WARNING', 'Select a virtual button first.')
+		);
+		return {
+			blockId: block.id,
+			stableId: '',
+			lastKnownDisplayName: referenceState.displayNameSnapshot || undefined,
+			reason: 'missing-control',
+		};
+	}
+
+	if (referencedControl) {
+		setTxtVirtualButtonReferenceState(block, {
+			stableId,
+			displayNameSnapshot: referencedControl.displayName,
+			identifierSnapshot: referencedControl.identifier,
+			status: 'valid',
+		});
+		applyTxtVirtualButtonWarning(block, '');
+		// stableId 在 rename 前後不變，setValue(stableId) 會直接略過，
+		// 因此要直接更新 FieldDropdown 內部值並強制重繪欄位文字。
+		const field = block.getField('BUTTON_ID');
+		if (field) {
+			let matchedOption = null;
+			if (typeof field.getOptions === 'function') {
+				const opts = field.getOptions(false);
+				matchedOption = Array.isArray(opts) ? opts.find(o => o[1] === stableId) : null;
+			}
+
+			if (typeof field.doValueUpdate_ === 'function') {
+				field.doValueUpdate_(stableId);
+			}
+
+			if (matchedOption) {
+				field.selectedOption_ = matchedOption;
+				field.isDirty_ = true;
+			} else if (typeof field.getOptions === 'function') {
+				const opts = field.getOptions(false);
+				const fallbackMatch = Array.isArray(opts) ? opts.find(o => o[1] === stableId) : null;
+				if (fallbackMatch) {
+					field.selectedOption_ = fallbackMatch;
+					field.isDirty_ = true;
+				}
+			}
+
+			if (typeof field.forceRerender === 'function') {
+				field.forceRerender();
+			} else if (block.rendered) {
+				block.render();
+			}
+		} else if (block.rendered) {
+			block.render();
+		}
+		return null;
+	}
+
+	setTxtVirtualButtonReferenceState(block, {
+		...referenceState,
+		stableId,
+		status: 'invalid',
+	});
+	applyTxtVirtualButtonWarning(
+		block,
+		formatVirtualControlMessage(
+			'TXT_VIRTUAL_CONTROLS_INVALID_WARNING',
+			'Virtual button "{0}" no longer exists. Choose another button before running.',
+			referenceState.displayNameSnapshot || stableId
+		)
+	);
+	if (block.rendered) {
+		block.render();
+	}
+	return {
+		blockId: block.id,
+		stableId,
+		lastKnownDisplayName: referenceState.displayNameSnapshot || undefined,
+		reason: 'missing-control',
+	};
+}
+
+function refreshTxtVirtualButtonReferences() {
+	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+	if (!workspace) {
+		txtVirtualControlsState.invalidReferences = [];
+		refreshTxtVirtualControlsUI();
+		return [];
+	}
+
+	txtVirtualControlsState.invalidReferences = workspace
+		.getBlocksByType('txt_virtual_button_state', false)
+		.map(block => refreshTxtVirtualButtonReferenceForBlock(block))
+		.filter(Boolean);
+	refreshTxtVirtualControlsUI();
+	return txtVirtualControlsState.invalidReferences;
+}
+
+function collectTxtVirtualControlPreflight() {
+	const invalidReferences = refreshTxtVirtualButtonReferences();
+	return {
+		valid: invalidReferences.length === 0,
+		invalidReferences,
+	};
+}
+
+function applyTxtVirtualControlsDocument(document) {
+	txtVirtualControlsState.document = cloneTxtVirtualControlsDocument(document, { forceEditingMode: true });
+	txtVirtualControlsState.sessionId = null;
+	txtVirtualControlsState.pressedStates = {};
+	txtVirtualControlsState.activePressStableId = null;
+	if (!txtVirtualControlsState.document.controls.some(control => control.stableId === txtVirtualControlsState.selectedStableId)) {
+		txtVirtualControlsState.selectedStableId = txtVirtualControlsState.document.controls[0]?.stableId || null;
+	}
+	refreshTxtVirtualButtonReferences();
+	renderTxtVirtualControlsPanel();
+}
+
+function setTxtVirtualControlsExecutionState(mode, sessionId) {
+	txtVirtualControlsState.document.canvas.mode = mode === 'running' ? 'running' : 'editing';
+	txtVirtualControlsState.sessionId = mode === 'running' ? sessionId || null : null;
+	if (mode !== 'running') {
+		txtVirtualControlsState.activePressStableId = null;
+		txtVirtualControlsState.pressedStates = {};
+	} else {
+		txtVirtualControlsState.pressedStates = Object.fromEntries(
+			txtVirtualControlsState.document.controls.map(control => [control.stableId, false])
+		);
+	}
+	renderTxtVirtualControlsPanel();
+}
+
+function handleTxtVirtualControlsExecutionBlocked(invalidReferences) {
+	txtVirtualControlsState.invalidReferences = Array.isArray(invalidReferences) ? invalidReferences : [];
+	refreshTxtVirtualButtonReferences();
+	toast.show(
+		formatVirtualControlMessage(
+			'TXT_VIRTUAL_CONTROLS_BLOCKED_TOAST',
+			'Cannot run until every virtual button block points to an existing button.'
+		),
+		'warning',
+		4500
+	);
+}
+
+function handleTxtVirtualControlsRuntimeError(message) {
+	setTxtVirtualControlsExecutionState('editing');
+	toast.show(
+		formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_RUNTIME_ERROR', 'Virtual controls stopped: {0}', message || 'runtime error'),
+		'error',
+		5000
+	);
+}
+
+function handleTxtVirtualControlPointerDown(event, stableId) {
+	const control = getTxtVirtualControlByStableId(stableId);
+	if (!control) {
+		return;
+	}
+
+	selectTxtVirtualControl(stableId);
+	if (txtVirtualControlsState.document.canvas.mode === 'running') {
+		event.preventDefault();
+		if (txtVirtualControlsState.activePressStableId !== stableId) {
+			txtVirtualControlsState.activePressStableId = stableId;
+			txtVirtualControlsState.pressedStates[stableId] = true;
+			renderTxtVirtualControlsCanvas();
+			vscode.postMessage({
+				command: 'txtVirtualControlStateChanged',
+				stableId,
+				pressed: true,
+				sessionId: txtVirtualControlsState.sessionId,
+			});
+		}
+		window.addEventListener('pointerup', releaseActiveTxtVirtualControlPress, { once: true });
+		window.addEventListener('pointercancel', releaseActiveTxtVirtualControlPress, { once: true });
+		return;
+	}
+
+	const elements = getTxtVirtualControlsElements();
+	if (!elements.canvas) {
+		return;
+	}
+
+	txtVirtualControlsState.drag = {
+		stableId,
+		startX: event.clientX,
+		startY: event.clientY,
+		originX: control.position.x,
+		originY: control.position.y,
+		canvasWidth: elements.canvas.clientWidth,
+		canvasHeight: elements.canvas.clientHeight,
+		moved: false,
+	};
+	window.addEventListener('pointermove', handleTxtVirtualControlPointerMove);
+	window.addEventListener('pointerup', handleTxtVirtualControlPointerUp, { once: true });
+	window.addEventListener('pointercancel', handleTxtVirtualControlPointerUp, { once: true });
+}
+
+function releaseActiveTxtVirtualControlPress() {
+	const stableId = txtVirtualControlsState.activePressStableId;
+	if (!stableId) {
+		return;
+	}
+	txtVirtualControlsState.activePressStableId = null;
+	txtVirtualControlsState.pressedStates[stableId] = false;
+	renderTxtVirtualControlsCanvas();
+	vscode.postMessage({
+		command: 'txtVirtualControlStateChanged',
+		stableId,
+		pressed: false,
+		sessionId: txtVirtualControlsState.sessionId,
+	});
+}
+
+function handleTxtVirtualControlPointerMove(event) {
+	if (!txtVirtualControlsState.drag) {
+		return;
+	}
+
+	const control = getTxtVirtualControlByStableId(txtVirtualControlsState.drag.stableId);
+	if (!control) {
+		return;
+	}
+
+	const deltaX = event.clientX - txtVirtualControlsState.drag.startX;
+	const deltaY = event.clientY - txtVirtualControlsState.drag.startY;
+	txtVirtualControlsState.drag.moved = txtVirtualControlsState.drag.moved || Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2;
+	control.position.x = Math.max(
+		0,
+		Math.min(txtVirtualControlsState.drag.canvasWidth - control.size.width, txtVirtualControlsState.drag.originX + deltaX)
+	);
+	control.position.y = Math.max(
+		0,
+		Math.min(txtVirtualControlsState.drag.canvasHeight - control.size.height, txtVirtualControlsState.drag.originY + deltaY)
+	);
+	renderTxtVirtualControlsCanvas();
+}
+
+function handleTxtVirtualControlPointerUp() {
+	window.removeEventListener('pointermove', handleTxtVirtualControlPointerMove);
+	if (txtVirtualControlsState.drag?.moved) {
+		window.saveBlocklyWorkspaceState?.();
+	}
+	txtVirtualControlsState.drag = null;
+	renderTxtVirtualControlsInspector();
+}
+
+function initTxtVirtualControlsUI() {
+	if (txtVirtualControlsState.initialized) {
+		refreshTxtVirtualControlsUI();
+		return;
+	}
+
+	txtVirtualControlsState.initialized = true;
+	const elements = getTxtVirtualControlsElements();
+	applyTxtVirtualControlsPanelLayout();
+	if (elements.toggleButton) {
+		elements.toggleButton.addEventListener('click', () => setTxtVirtualControlsPanelOpen(!txtVirtualControlsState.panelOpen));
+	}
+	if (elements.splitter) {
+		elements.splitter.addEventListener('pointerdown', handleTxtVirtualControlsSplitterPointerDown);
+	}
+	if (elements.panel) {
+		elements.panel.addEventListener('transitionend', event => {
+			if (event.propertyName === 'width' || event.propertyName === 'flex-basis') {
+				scheduleBlocklyResize();
+			}
+		});
+	}
+	initTxtVirtualControlsResizeObserver();
+	if (elements.addButton) {
+		elements.addButton.addEventListener('click', createTxtVirtualButtonControl);
+	}
+	if (elements.nameInput) {
+		elements.nameInput.addEventListener('compositionstart', () => {
+			txtVirtualControlsState.nameInputComposing = true;
+		});
+		elements.nameInput.addEventListener('compositionend', () => {
+			txtVirtualControlsState.nameInputComposing = false;
+		});
+		elements.nameInput.addEventListener('input', event => {
+			if (event.isComposing || txtVirtualControlsState.nameInputComposing) {
+				return;
+			}
+			commitSelectedTxtVirtualControlName(event.target.value, { allowEmptyDraft: true });
+		});
+		elements.nameInput.addEventListener('blur', event => {
+			txtVirtualControlsState.nameInputComposing = false;
+			commitSelectedTxtVirtualControlName(event.target.value);
+		});
+	}
+	if (elements.backgroundInput) {
+		elements.backgroundInput.addEventListener('input', event => {
+			const selectedControl = getSelectedTxtVirtualControl();
+			if (!selectedControl) {
+				return;
+			}
+			updateSelectedTxtVirtualControl({
+				style: {
+					...selectedControl.style,
+					backgroundColor: event.target.value,
+				},
+			});
+		});
+	}
+	if (elements.textInput) {
+		elements.textInput.addEventListener('input', event => {
+			const selectedControl = getSelectedTxtVirtualControl();
+			if (!selectedControl) {
+				return;
+			}
+			updateSelectedTxtVirtualControl({
+				style: {
+					...selectedControl.style,
+					textColor: event.target.value,
+				},
+			});
+		});
+	}
+	if (elements.deleteButton) {
+		elements.deleteButton.addEventListener('click', deleteSelectedTxtVirtualControl);
+	}
+
+	window.getTxtVirtualButtonDropdownOptions = getTxtVirtualButtonDropdownOptions;
+	window.setTxtVirtualButtonReferenceState = setTxtVirtualButtonReferenceState;
+	window.getTxtVirtualButtonReferenceState = getTxtVirtualButtonReferenceState;
+	window.refreshTxtVirtualButtonReferenceForBlock = refreshTxtVirtualButtonReferenceForBlock;
+	window.refreshTxtVirtualButtonReferences = refreshTxtVirtualButtonReferences;
+	window.collectTxtVirtualControlPreflight = collectTxtVirtualControlPreflight;
+	window.getTxtVirtualControlsForSave = () => cloneTxtVirtualControlsDocument(txtVirtualControlsState.document, { forceEditingMode: true });
+	window.applyTxtVirtualControlsDocument = applyTxtVirtualControlsDocument;
+	window.setTxtVirtualControlsExecutionState = setTxtVirtualControlsExecutionState;
+	window.handleTxtVirtualControlsExecutionBlocked = handleTxtVirtualControlsExecutionBlocked;
+	window.handleTxtVirtualControlsRuntimeError = handleTxtVirtualControlsRuntimeError;
+
+	renderTxtVirtualControlsPanel();
+}
+
 /**
  * 根據當前程式語言生成程式碼
  * @param {Blockly.Workspace} workspace - Blockly 工作區
@@ -304,7 +1433,8 @@ const quickBackup = {
 		}
 
 		const state = Blockly.serialization.workspaces.save(workspace);
-		if (!state || !state.blocks || !state.blocks.blocks || state.blocks.blocks.length === 0) {
+		const boardId = document.getElementById('boardSelect')?.value || 'arduino_uno';
+		if ((!state || !state.blocks || !state.blocks.blocks || state.blocks.blocks.length === 0) && !hasTxtVirtualControlsData()) {
 			const message = window.languageManager
 				? window.languageManager.getMessage('BACKUP_QUICK_SAVE_EMPTY', '工作區為空，不需要備份')
 				: '工作區為空，不需要備份';
@@ -317,15 +1447,16 @@ const quickBackup = {
 		const backupName = this.generateBackupName();
 
 		// 4. 發送備份請求
-		const boardSelect = document.getElementById('boardSelect');
-		vscode.postMessage({
+		vscode.postMessage(
+			appendTxtVirtualControlsPayload({
 			command: 'createBackup',
 			name: backupName,
 			state: state,
-			board: boardSelect ? boardSelect.value : 'arduino_uno',
+			board: boardId,
 			theme: currentTheme,
 			isQuickBackup: true,
-		});
+			}, boardId)
+		);
 
 		// 5. 更新節流狀態
 		this.recordSave();
@@ -1107,11 +2238,13 @@ const backupManager = {
 
 			// 發送建立備份請求到 VSCode 擴展
 			vscode.postMessage({
+				...appendTxtVirtualControlsPayload({
 				command: 'createBackup',
 				name: backupName,
 				state: state,
 				board: boardSelect.value,
 				theme: currentTheme,
+				}, boardSelect.value),
 			});
 
 			// 隱藏表單
@@ -1326,7 +2459,7 @@ const backupManager = {
 			}
 
 			const state = Blockly.serialization.workspaces.save(workspace);
-			if (!state || !state.blocks || state.blocks.blocks.length === 0) {
+			if ((!state || !state.blocks || state.blocks.blocks.length === 0) && !hasTxtVirtualControlsData()) {
 				log.info('工作區為空，不建立自動備份');
 				return;
 			}
@@ -1346,14 +2479,16 @@ const backupManager = {
 			const backupName = `${autoBackupPrefix}${year}${month}${day}_${hours}${minutes}${seconds}`;
 
 			// 發送建立備份請求到 VSCode 擴展
-			vscode.postMessage({
+			vscode.postMessage(
+				appendTxtVirtualControlsPayload({
 				command: 'createBackup',
 				name: backupName,
 				state: state,
 				board: boardSelect.value,
 				theme: currentTheme,
 				isAutoBackup: true,
-			});
+				}, boardSelect.value)
+			);
 
 			log.info(`已建立自動備份: ${backupName}`);
 		} catch (error) {
@@ -1742,6 +2877,7 @@ window.addEventListener('languageChanged', function (event) {
 	updateTxtTestPanelTexts();
 	// 更新 TXT 感測器下拉選單文字
 	refreshTxtSensorSelectOptions();
+	refreshTxtVirtualControlsUI();
 	// 更新語言選單文字（例如 Auto 標籤）
 	populateLanguageDropdown();
 
@@ -1955,6 +3091,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	});
 	// 根據初始主題設定更新 UI
 	updateTheme(currentTheme);
+	initTxtVirtualControlsUI();
 
 	// 創建預設變數 i
 	if (!workspace.getVariableMap().getVariable('i')) {
@@ -2154,21 +3291,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 				state.blocks.blocks = state.blocks.blocks.filter(b => !isShadowSuggestionState(b)).map(b => cleanShadowFromBlockState(b));
 			}
 
+			txtVirtualControlsState.document.canvas.lastViewport = {
+				scrollX: workspace.scrollX,
+				scrollY: workspace.scrollY,
+				zoom: workspace.getScale(),
+			};
+
 			// 空狀態檢查 - 防止意外覆寫有效資料
-			if (isWorkspaceStateEmpty(state)) {
+			if (isWorkspaceStateEmpty(state) && !hasTxtVirtualControlsData()) {
 				log.warn('跳過保存：工作區為空');
 				return;
 			}
 
-			vscode.postMessage({
+			vscode.postMessage(
+				appendTxtVirtualControlsPayload({
 				command: 'saveWorkspace',
 				state: state,
 				board: boardSelect.value,
-			});
+				}, boardSelect.value)
+			);
 		} catch (error) {
 			log.error('保存工作區狀態失敗:', error);
 		}
 	};
+	window.saveBlocklyWorkspaceState = saveWorkspaceState;
 	// 檢查是否為積木相關事件的輔助函數
 	const isBlockChangeEvent = event => {
 		return (
@@ -2414,6 +3560,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					rebuildPwmConfig(workspace);
 					updateMainBlockDeletable(workspace);
 				}
+				applyTxtVirtualControlsDocument(pendingMessage.txtVirtualControls);
 			} catch (error) {
 				log.error('執行待處理的 FileWatcher 重載失敗:', error);
 			}
@@ -2772,6 +3919,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// Shadow block 的建立/移除都使用 Blockly.Events.disable() 抑制事件，
 		// 因此這裡收到的 isBlockChangeEvent 一定是真實的使用者操作。
 		if (isBlockChangeEvent(event)) {
+			refreshTxtVirtualButtonReferences();
 			if (window.shadowBlockManager && window.shadowBlockManager.isActive()) {
 				window.shadowBlockManager.clearSuggestion(false);
 			}
@@ -2906,12 +4054,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 檢查工作區是否為空
 			const workspaceState = Blockly.serialization.workspaces.save(workspace);
 			const hasBlocks = workspaceState?.blocks?.blocks && workspaceState.blocks.blocks.length > 0;
+			const hasWorkspaceContent = Boolean(hasBlocks || (isTxtVirtualBoard(previousBoard) && hasTxtVirtualControlsData()));
 
 			// 標記是否需要強制儲存（當工作區被清空後）
 			let forceEmptySave = false;
 
 			// 如果語言變更且工作區非空，顯示確認對話框
-			if (isLanguageChanging && hasBlocks) {
+			if (isLanguageChanging && hasWorkspaceContent) {
 				log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區非空，顯示確認對話框`);
 
 				// 構建確認訊息
@@ -2939,14 +4088,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 				// 用戶確認，執行自動備份
 				log.info('[blockly] 用戶確認切換，執行自動備份');
 				const backupName = quickBackup.generateBackupName();
-				vscode.postMessage({
+				vscode.postMessage(
+					appendTxtVirtualControlsPayload({
 					command: 'createBackup',
 					name: backupName,
 					state: workspaceState,
 					board: previousBoard,
 					theme: currentTheme,
 					isQuickBackup: true,
-				});
+					}, previousBoard)
+				);
 
 				// 顯示備份成功 Toast
 				const backupSuccessTemplate = window.languageManager
@@ -2958,10 +4109,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 				// 清空工作區
 				log.info('[blockly] 清空工作區');
 				workspace.clear();
+				applyTxtVirtualControlsDocument(createEmptyTxtVirtualControlsDocument());
 
 				// 標記需要強制儲存空工作區
 				forceEmptySave = true;
-			} else if (isLanguageChanging && !hasBlocks) {
+			} else if (isLanguageChanging && !hasWorkspaceContent) {
 				log.info(`[blockly] 偵測到語言變更 (${previousLanguage} → ${newLanguage})，工作區為空，跳過確認對話框`);
 			}
 
@@ -2997,11 +4149,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 			if (forceEmptySave) {
 				log.info('[blockly] 強制儲存空工作區狀態與新板子設定');
 				const emptyState = Blockly.serialization.workspaces.save(workspace);
-				vscode.postMessage({
+				vscode.postMessage(
+					appendTxtVirtualControlsPayload({
 					command: 'saveWorkspace',
 					state: emptyState,
 					board: selectedBoard,
-				});
+					forceSave: true,
+					}, selectedBoard)
+				);
 			} else {
 				saveWorkspaceState();
 			}
@@ -3018,7 +4173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		try {
 			// 如果是 FileWatcher 觸發的重載，設置鎖定標記防止無限循環
 			const isFromFileWatcher = message.source === 'fileWatcher';
-			const workspaceState = message.state || message.workspace;
+			const workspaceState = message.state?.workspace || message.state || message.workspace;
+			const txtVirtualControls = message.txtVirtualControls || message.state?.txtVirtualControls;
 
 			// T008: 如果是 FileWatcher 觸發且正在拖曳，延遲執行重載
 			if (isFromFileWatcher && isCurrentlyDragging()) {
@@ -3027,8 +4183,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 					state: workspaceState,
 					board: message.board,
 					theme: message.theme,
+					txtVirtualControls,
 				};
 				return; // 提前返回，等待拖曳結束後執行
+			}
+
+			setTxtVirtualControlPendingLoadOptions(workspaceState);
+			txtVirtualControlsState.document = cloneTxtVirtualControlsDocument(txtVirtualControls, { forceEditingMode: true });
+			if (!txtVirtualControlsState.document.controls.some(control => control.stableId === txtVirtualControlsState.selectedStableId)) {
+				txtVirtualControlsState.selectedStableId = txtVirtualControlsState.document.controls[0]?.stableId || null;
 			}
 
 			if (isFromFileWatcher) {
@@ -3088,10 +4251,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 				// 遷移舊版格式後再載入工作區內容
 				migrateWorkspaceState(workspaceState);
 				Blockly.serialization.workspaces.load(workspaceState, workspace);
+				applyTxtVirtualControlsDocument(txtVirtualControls);
+				clearTxtVirtualControlPendingLoadOptions();
 
 				// 重建 ESP32 PWM 配置
 				rebuildPwmConfig(workspace);
 				updateMainBlockDeletable(workspace);
+				refreshTxtVirtualButtonReferences();
+				if (txtVirtualControls?.canvas?.lastViewport) {
+					requestAnimationFrame(() => {
+						workspace.scroll(txtVirtualControls.canvas.lastViewport.scrollX || 0, txtVirtualControls.canvas.lastViewport.scrollY || 0);
+						if (Number.isFinite(txtVirtualControls.canvas.lastViewport.zoom)) {
+							workspace.setScale(txtVirtualControls.canvas.lastViewport.zoom);
+						}
+					});
+				}
 
 				// 工作區載入後，立即修復函數名稱關聯
 				setTimeout(() => {
@@ -3156,6 +4330,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 					}
 				}, 300);
 			}
+			if (!workspaceState) {
+				applyTxtVirtualControlsDocument(txtVirtualControls);
+				clearTxtVirtualControlPendingLoadOptions();
+			}
 
 			// 如果是 FileWatcher 觸發的重載，延遲後重置鎖定標記
 			if (isFromFileWatcher) {
@@ -3168,6 +4346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			log.error('載入工作區狀態失敗:', error);
 			// 發生錯誤時也要重置鎖定標記
 			isLoadingFromFileWatcher = false;
+			clearTxtVirtualControlPendingLoadOptions();
 		}
 	};
 
@@ -3370,7 +4549,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 				handleTxtUploadResult(message);
 				break;
 
+			case 'txtVirtualControlsExecutionStateChanged':
+				setTxtVirtualControlsExecutionState(message.mode, message.sessionId);
+				break;
+
+			case 'txtVirtualControlsExecutionBlocked':
+				handleTxtVirtualControlsExecutionBlocked(message.invalidReferences);
+				break;
+
+			case 'txtVirtualControlsRuntimeError':
+				handleTxtVirtualControlsRuntimeError(message.error);
+				break;
+
 			case 'txtExecutionStopped':
+				setTxtVirtualControlsExecutionState('editing');
 				setUploadButtonState('txt-ready');
 				toast.show(window.languageManager?.getMessage('TXT_STOP_SUCCESS', 'Program stopped') || 'Program stopped', 'info');
 				break;
@@ -3658,7 +4850,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// handleResize 的定義
 	const handleResize = () => {
-		Blockly.svgResize(workspace);
+		applyTxtVirtualControlsPanelLayout();
+		scheduleBlocklyResize();
+		renderTxtVirtualControlsCanvas();
 	};
 
 	// 註冊到 window 的 resize 事件
@@ -3678,11 +4872,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// 這確保了「整理方塊」操作後座標變更會被正確儲存
 			setTimeout(() => {
 				const state = Blockly.serialization.workspaces.save(this);
-				vscode.postMessage({
+				vscode.postMessage(
+					appendTxtVirtualControlsPayload({
 					command: 'saveWorkspace',
 					state: state,
 					board: boardSelect.value,
-				});
+					}, boardSelect.value)
+				);
 				log.info('方塊整理完成，已儲存工作區狀態');
 			}, 300);
 		};
@@ -4157,6 +5353,7 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 		window.currentProgrammingLanguage = 'micropython';
 	} else if (isTxt) {
 		window.currentProgrammingLanguage = 'txt';
+		setUploadButtonState('txt-ready');
 	} else {
 		window.currentProgrammingLanguage = 'arduino';
 	}
@@ -4180,6 +5377,11 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 	const txtConfigContainer = document.getElementById('txtConfigContainer');
 	if (txtConfigContainer) {
 		txtConfigContainer.style.display = isTxt ? 'flex' : 'none';
+	}
+	refreshTxtVirtualControlsUI();
+	if (!isTxt) {
+		setTxtVirtualControlsPanelOpen(false);
+		setTxtVirtualControlsExecutionState('editing');
 	}
 
 	// 切換到 TXT 時自動開啟設定對話框
@@ -4389,11 +5591,14 @@ async function handleUploadClick() {
 	} else if (isTxt) {
 		// fischertechnik TXT Controller SSH 上傳請求
 		console.log('[blockly] 發送 TXT 上傳請求');
+		const virtualControlPreflight = collectTxtVirtualControlPreflight();
 		setUploadButtonState('txt-uploading');
 		vscode.postMessage({
 			command: 'txtUpload',
 			code: code,
 			board: currentBoard,
+			txtVirtualControls: cloneTxtVirtualControlsDocument(txtVirtualControlsState.document, { forceEditingMode: true }),
+			virtualControlPreflight,
 		});
 	} else {
 		// T018: Arduino C++ 上傳請求（包含 lib_deps, build_flags）
@@ -4808,6 +6013,7 @@ function handleTxtUploadProgress(message) {
 function handleTxtUploadResult(message) {
 	console.log('[TXT] 上傳結果:', message);
 	// TXT 模式統一恢復為播放圖示（就緒狀態）
+	setTxtVirtualControlsExecutionState('editing');
 	setUploadButtonState('txt-ready');
 	if (message.success) {
 		const elapsed = message.duration ? (message.duration / 1000).toFixed(1) : '';
