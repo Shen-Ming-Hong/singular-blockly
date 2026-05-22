@@ -8,6 +8,24 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.76.1] - 2026-05-22
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 `ws` 與 `brace-expansion` 轉移依賴漏洞** (Fix transitive dependency vulnerabilities in `ws` and `brace-expansion`)
+    - 透過 npm overrides 將 `ws` 從 `8.18.3` 升級至 `8.20.1`（間接依賴 via `blockly` → `jsdom`），修復 `GHSA-58qx-3vcg-4xpx` / `CVE-2026-45736` 的未初始化記憶體洩漏問題；嚴重程度為 Moderate（CVSS 4.4）
+      Upgraded `ws` from `8.18.3` to `8.20.1` via npm overrides (transitive dependency via `blockly` → `jsdom`), fixing `GHSA-58qx-3vcg-4xpx` / `CVE-2026-45736` for uninitialized memory disclosure; severity is Moderate (CVSS 4.4)
+    - 透過 npm overrides 將 `glob` → `minimatch@10.2.4` 路徑下的 `brace-expansion` 從 `5.0.5` 升級至 `5.0.6`，修復 `GHSA-jxxr-4gwj-5jf2` 的大型數值範圍 DoS 風險；嚴重程度為 Moderate（CVSS 6.5）
+      Upgraded `brace-expansion` from `5.0.5` to `5.0.6` on the `glob` → `minimatch@10.2.4` path via npm overrides, fixing `GHSA-jxxr-4gwj-5jf2` for large numeric range DoS risk; severity is Moderate (CVSS 6.5)
+    - 關閉 Dependabot Alert #69，並清除本地 `npm audit` 的 2 個 moderate 漏洞
+      Closes Dependabot Alert #69 and clears the 2 moderate findings reported by local `npm audit`
+
+### 🐛 修復 Bug Fixes
+
+- **VSIX 打包前自動清理暫存 toolbox 檔案** (Clean temporary toolbox files before VSIX packaging)
+    - `vscode:prepublish` 現在會先清除 `media/toolbox/temp_toolbox_*.json`，避免測試或多視窗編輯留下的暫存工具箱檔案被誤包進發佈用 VSIX
+      `vscode:prepublish` now removes `media/toolbox/temp_toolbox_*.json` before packaging so temporary toolbox files left by tests or multi-window editing are not accidentally included in release VSIX artifacts
+
 ## [0.76.0] - 2026-05-22
 
 ### ✨ 新功能 New Features
