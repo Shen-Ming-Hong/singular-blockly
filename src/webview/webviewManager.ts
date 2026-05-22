@@ -12,7 +12,7 @@ import { LocaleService } from '../services/localeService';
 import { WorkspaceValidator } from '../services/workspaceValidator';
 import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
-import { BoardConfigKey, PreviewWarning, SetBoardMessage } from '../types/previewMessages';
+import { BoardConfigKey, LoadWorkspaceStateMessage, PreviewWarning, SetBoardMessage } from '../types/previewMessages';
 import { TxtVirtualControlsDocument, normalizeTxtVirtualControlsDocument } from '../types/txtVirtualControls';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
@@ -1225,18 +1225,19 @@ export class WebViewManager {
 					log(`Board value mapped: ${backupData.board} -> ${boardResult.board}`, 'info');
 				}
 
-				const txtPreviewPayload =
+				const txtPreviewPayload: TxtPreviewPayload =
 					boardResult.board === 'txt' ? buildTxtPreviewPayload(backupData.txtVirtualControls, blocklyState) : { previewWarnings: [] };
 
 				// T008: 先發送 setBoard 訊息，再發送 loadWorkspaceState
 				panel.webview.postMessage(setBoardMessage);
 
 				// 將 workspace 對象直接傳送到視窗，讓視窗端負責解析和顯示
-				panel.webview.postMessage({
+				const loadWorkspaceMessage: LoadWorkspaceStateMessage = {
 					command: 'loadWorkspaceState',
 					workspaceState: blocklyState,
 					...txtPreviewPayload,
-				});
+				};
+				panel.webview.postMessage(loadWorkspaceMessage);
 
 				log('備份 workspace 狀態已成功載入到預覽窗口', 'info');
 			} catch (parseError) {

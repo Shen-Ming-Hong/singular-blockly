@@ -122,6 +122,7 @@ export interface PreviewWarning {
     severity: 'info' | 'warning';
     scope: 'canvas' | 'control' | 'reference';
     stableId?: string;
+    blockId?: string;
     fallbackText?: string;
 }
 ```
@@ -130,6 +131,7 @@ export interface PreviewWarning {
 
 - `code` 讓 preview 可依語系決定顯示文字。
 - `stableId` 只在 warning 能對應到單一控制項時使用。
+- `blockId` 用於缺失引用警示，協助對應到引用該虛擬控制的 Blockly block。
 - `fallbackText` 用於極端情況下的保底顯示，不應作為主要 i18n 機制。
 
 ### 典型情境

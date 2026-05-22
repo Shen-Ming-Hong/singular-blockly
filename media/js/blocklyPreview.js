@@ -211,7 +211,7 @@ function sanitizePreviewString(value, fallback = '') {
 
 function sanitizePreviewColor(value, fallback) {
 	const color = sanitizePreviewString(value, fallback).trim();
-	return /^#[0-9a-f]{3,8}$/i.test(color) ? color : fallback;
+	return /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(color) ? color : fallback;
 }
 
 function normalizeTxtPreviewControlsDocument(document) {

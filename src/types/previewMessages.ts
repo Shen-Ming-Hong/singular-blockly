@@ -62,7 +62,7 @@ export interface LoadWorkspaceStateMessage {
 	/** TXT Controller preview 專用：唯讀虛擬控制畫布資料 */
 	txtVirtualControls?: TxtVirtualControlsDocument;
 	/** TXT Controller preview 專用：Host 正規化後的非阻斷警示 */
-	previewWarnings?: PreviewWarning[];
+	previewWarnings: PreviewWarning[];
 }
 
 /**

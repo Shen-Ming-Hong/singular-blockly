@@ -1,3 +1,4 @@
+| `missing-control-reference` | `warning` | `reference` | Blockly 積木參照了備份中不存在的虛擬控制 stableId |
 # TXT 預覽虛擬控制畫布 PostMessage 合約
 
 **版本**：v1  
@@ -68,7 +69,7 @@
 | `legacy-missing-document` | `info` | `canvas` | 舊備份缺少 `txtVirtualControls` 根文件 |
 | `empty-controls` | `info` | `canvas` | TXT 虛擬控制文件存在但沒有任何控制項 |
 | `invalid-control-shape` | `warning` | `control` | 部分控制項資料不完整，已以安全預設值恢復可顯示內容 |
-| `missing-control-reference` | `warning` | `control` | Blockly 積木參照了備份中不存在的虛擬控制 stableId |
+| `missing-control-reference` | `warning` | `reference` | Blockly 積木參照了備份中不存在的虛擬控制 stableId |
 
 ---
 
