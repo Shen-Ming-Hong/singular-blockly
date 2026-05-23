@@ -192,10 +192,17 @@ const toast = {
  */
 window.currentProgrammingLanguage = 'arduino';
 
-const TXT_VIRTUAL_CONTROL_DEFAULT_STYLE = {
-	backgroundColor: '#0288d1',
-	textColor: '#ffffff',
+const TXT_VIRTUAL_CONTROL_DEFAULT_STYLES = {
+	light: {
+		backgroundColor: '#005a9e',
+		textColor: '#ffffff',
+	},
+	dark: {
+		backgroundColor: '#ffca28',
+		textColor: '#1f1f1f',
+	},
 };
+const TXT_VIRTUAL_CONTROL_DEFAULT_STYLE = TXT_VIRTUAL_CONTROL_DEFAULT_STYLES.light;
 const TXT_VIRTUAL_CONTROLS_PANEL_DEFAULT_WIDTH = 340;
 const TXT_VIRTUAL_CONTROLS_PANEL_MIN_WIDTH = 280;
 const TXT_VIRTUAL_CONTROLS_PANEL_MAX_WIDTH = 560;
@@ -316,10 +323,7 @@ function cloneTxtVirtualControlsDocument(document, options = {}) {
 						width: Math.max(measuredSize.width, Number.isFinite(control.size?.width) ? control.size.width : measuredSize.width),
 						height: Math.max(measuredSize.height, Number.isFinite(control.size?.height) ? control.size.height : measuredSize.height),
 					},
-					style: {
-						backgroundColor: String(control.style?.backgroundColor || TXT_VIRTUAL_CONTROL_DEFAULT_STYLE.backgroundColor),
-						textColor: String(control.style?.textColor || TXT_VIRTUAL_CONTROL_DEFAULT_STYLE.textColor),
-					},
+					style: normalizeTxtVirtualControlStyle(control.style),
 				};
 			})
 			.filter(Boolean),
@@ -455,6 +459,174 @@ function getSelectedTxtVirtualControl() {
 
 function getTxtVirtualControlByStableId(stableId) {
 	return txtVirtualControlsState.document.controls.find(control => control.stableId === stableId) || null;
+}
+
+function getTxtVirtualControlsStyleApi() {
+	return window.txtVirtualControlsContrast || null;
+}
+
+function getTxtVirtualControlThemeMode(theme = currentTheme) {
+	const styleApi = getTxtVirtualControlsStyleApi();
+	if (styleApi && typeof styleApi.normalizeThemeMode === 'function') {
+		return styleApi.normalizeThemeMode(theme);
+	}
+	return theme === 'dark' ? 'dark' : 'light';
+}
+
+function getTxtVirtualControlDefaultStyle(theme = currentTheme) {
+	const styleApi = getTxtVirtualControlsStyleApi();
+	if (styleApi && typeof styleApi.getDefaultButtonStyle === 'function') {
+		return styleApi.getDefaultButtonStyle(theme);
+	}
+	const mode = getTxtVirtualControlThemeMode(theme);
+	return { ...(TXT_VIRTUAL_CONTROL_DEFAULT_STYLES[mode] || TXT_VIRTUAL_CONTROL_DEFAULT_STYLE) };
+}
+
+function normalizeTxtVirtualControlColor(value, fallback) {
+	const styleApi = getTxtVirtualControlsStyleApi();
+	if (styleApi && typeof styleApi.normalizeHexColor === 'function') {
+		return styleApi.normalizeHexColor(value, fallback);
+	}
+	const color = String(value || '').trim();
+	return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : fallback;
+}
+
+
+function normalizeTxtVirtualControlThemeEntry(value, theme) {
+	if (!value || typeof value !== 'object') {
+		return null;
+	}
+
+	const fallback = getTxtVirtualControlDefaultStyle(theme);
+	return {
+		backgroundColor: normalizeTxtVirtualControlColor(value.backgroundColor, fallback.backgroundColor),
+		textColor: normalizeTxtVirtualControlColor(value.textColor, fallback.textColor),
+		customized: value.customized !== false,
+	};
+}
+
+function normalizeTxtVirtualControlThemeStyles(style, legacyStyle) {
+	const rawThemeStyles = style && typeof style === 'object' && style.themeStyles && typeof style.themeStyles === 'object'
+		? style.themeStyles
+		: null;
+	const themeStyles = {};
+
+	if (rawThemeStyles) {
+		['light', 'dark'].forEach(theme => {
+			const normalized = normalizeTxtVirtualControlThemeEntry(rawThemeStyles[theme], theme);
+			if (normalized) {
+				themeStyles[theme] = normalized;
+			}
+		});
+		return themeStyles;
+	}
+
+	const lightDefault = getTxtVirtualControlDefaultStyle('light');
+	const isLegacyCustomized =
+		legacyStyle.backgroundColor !== lightDefault.backgroundColor || legacyStyle.textColor !== lightDefault.textColor;
+	if (isLegacyCustomized) {
+		themeStyles[getTxtVirtualControlThemeMode(currentTheme)] = {
+			...legacyStyle,
+			customized: true,
+		};
+	}
+
+	return themeStyles;
+}
+
+function getTxtVirtualControlEffectiveStyle(style, theme = currentTheme) {
+	const styleApi = getTxtVirtualControlsStyleApi();
+	if (styleApi && typeof styleApi.getEffectiveButtonStyle === 'function') {
+		return styleApi.getEffectiveButtonStyle(style, theme);
+	}
+
+	const mode = getTxtVirtualControlThemeMode(theme);
+	const fallback = getTxtVirtualControlDefaultStyle(mode);
+	const themeStyle = normalizeTxtVirtualControlThemeEntry(style?.themeStyles?.[mode], mode);
+	return themeStyle || fallback;
+}
+
+function normalizeTxtVirtualControlStyle(style) {
+	const rawStyle = style && typeof style === 'object' ? style : {};
+	const lightDefault = getTxtVirtualControlDefaultStyle('light');
+	const legacyStyle = {
+		backgroundColor: normalizeTxtVirtualControlColor(rawStyle.backgroundColor, lightDefault.backgroundColor),
+		textColor: normalizeTxtVirtualControlColor(rawStyle.textColor, lightDefault.textColor),
+	};
+	const themeStyles = normalizeTxtVirtualControlThemeStyles(rawStyle, legacyStyle);
+	const effectiveStyle = getTxtVirtualControlEffectiveStyle({ ...legacyStyle, themeStyles }, currentTheme);
+
+	return {
+		...effectiveStyle,
+		themeStyles,
+	};
+}
+
+function syncTxtVirtualControlStyleToTheme(control, theme = currentTheme) {
+	if (!control || typeof control !== 'object') {
+		return TXT_VIRTUAL_CONTROL_DEFAULT_STYLE;
+	}
+	if (!control.style || typeof control.style !== 'object') {
+		control.style = normalizeTxtVirtualControlStyle({});
+	}
+	const effectiveStyle = getTxtVirtualControlEffectiveStyle(control.style, theme);
+	control.style.backgroundColor = effectiveStyle.backgroundColor;
+	control.style.textColor = effectiveStyle.textColor;
+	return effectiveStyle;
+}
+
+function syncTxtVirtualControlsDocumentToTheme(theme = currentTheme) {
+	(txtVirtualControlsState.document.controls || []).forEach(control => syncTxtVirtualControlStyleToTheme(control, theme));
+}
+
+function setTxtVirtualControlThemeStyle(control, patch) {
+	const mode = getTxtVirtualControlThemeMode(currentTheme);
+	const currentStyle = getTxtVirtualControlEffectiveStyle(control.style, mode);
+	const nextStyle = {
+		backgroundColor: normalizeTxtVirtualControlColor(
+			patch.backgroundColor ?? currentStyle.backgroundColor,
+			currentStyle.backgroundColor
+		),
+		textColor: normalizeTxtVirtualControlColor(patch.textColor ?? currentStyle.textColor, currentStyle.textColor),
+		customized: true,
+	};
+	const themeStyles = {
+		...(control.style?.themeStyles || {}),
+		[mode]: nextStyle,
+	};
+	control.style = {
+		...(control.style || {}),
+		backgroundColor: nextStyle.backgroundColor,
+		textColor: nextStyle.textColor,
+		themeStyles,
+	};
+}
+
+function getTxtVirtualControlButtonTitle(control) {
+	return `${control.displayName} — ${control.identifier}`;
+}
+
+function buildTxtVirtualControlButtonAriaLabel(control) {
+	const states = [];
+	if (txtVirtualControlsState.selectedStableId === control.stableId) {
+		states.push(formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_STATE_SELECTED', 'selected'));
+	}
+	if (txtVirtualControlsState.document.canvas.mode === 'running') {
+		states.push(formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_STATE_RUNNING', 'running'));
+	} else {
+		states.push(formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_STATE_EDITABLE', 'editable'));
+	}
+	if (txtVirtualControlsState.pressedStates[control.stableId]) {
+		states.push(formatVirtualControlMessage('TXT_VIRTUAL_CONTROLS_STATE_PRESSED', 'pressed'));
+	}
+
+	return formatVirtualControlMessage(
+		'TXT_VIRTUAL_CONTROLS_BUTTON_ARIA_LABEL',
+		'{0}. Identifier {1}. State: {2}.',
+		control.displayName,
+		control.identifier,
+		states.join(', ')
+	);
 }
 
 function setTxtVirtualControlPendingLoadOptions(workspaceState) {
@@ -702,11 +874,13 @@ function renderTxtVirtualControlsInspector() {
 		elements.nameInput.disabled = isRunning;
 	}
 	if (elements.backgroundInput) {
-		elements.backgroundInput.value = selectedControl.style.backgroundColor;
+		const selectedStyle = syncTxtVirtualControlStyleToTheme(selectedControl);
+		elements.backgroundInput.value = selectedStyle.backgroundColor;
 		elements.backgroundInput.disabled = isRunning;
 	}
 	if (elements.textInput) {
-		elements.textInput.value = selectedControl.style.textColor;
+		const selectedStyle = syncTxtVirtualControlStyleToTheme(selectedControl);
+		elements.textInput.value = selectedStyle.textColor;
 		elements.textInput.disabled = isRunning;
 	}
 	if (elements.identifierValue) {
@@ -724,24 +898,28 @@ function renderTxtVirtualControlsCanvas() {
 	}
 
 	const controls = txtVirtualControlsState.document.controls;
-	elements.canvas.innerHTML = '';
+	elements.canvas.replaceChildren();
 	elements.emptyState.classList.toggle('hidden', controls.length > 0);
 
 	controls.forEach(control => {
+		const effectiveStyle = syncTxtVirtualControlStyleToTheme(control);
 		const button = document.createElement('button');
 		button.type = 'button';
 		button.className = 'txt-virtual-control-button';
 		button.dataset.stableId = control.stableId;
+		button.dataset.identifier = control.identifier;
 		button.textContent = control.displayName;
 		button.style.left = `${control.position.x}px`;
 		button.style.top = `${control.position.y}px`;
 		button.style.width = `${control.size.width}px`;
 		button.style.height = `${control.size.height}px`;
-		button.style.backgroundColor = control.style.backgroundColor;
-		button.style.color = control.style.textColor;
+		button.style.backgroundColor = effectiveStyle.backgroundColor;
+		button.style.color = effectiveStyle.textColor;
 		button.classList.toggle('selected', txtVirtualControlsState.selectedStableId === control.stableId);
 		button.classList.toggle('running', txtVirtualControlsState.document.canvas.mode === 'running');
 		button.classList.toggle('pressed', Boolean(txtVirtualControlsState.pressedStates[control.stableId]));
+		button.setAttribute('aria-label', buildTxtVirtualControlButtonAriaLabel(control));
+		button.title = getTxtVirtualControlButtonTitle(control);
 		button.addEventListener('pointerdown', event => handleTxtVirtualControlPointerDown(event, control.stableId));
 		elements.canvas.appendChild(button);
 	});
@@ -803,7 +981,7 @@ function createTxtVirtualButtonControl() {
 		kind: 'button',
 		position,
 		size,
-		style: { ...TXT_VIRTUAL_CONTROL_DEFAULT_STYLE },
+		style: normalizeTxtVirtualControlStyle({ themeStyles: {} }),
 	});
 	selectTxtVirtualControl(stableId);
 	refreshTxtVirtualButtonReferences();
@@ -1090,6 +1268,7 @@ function collectTxtVirtualControlPreflight() {
 
 function applyTxtVirtualControlsDocument(document) {
 	txtVirtualControlsState.document = cloneTxtVirtualControlsDocument(document, { forceEditingMode: true });
+	syncTxtVirtualControlsDocumentToTheme();
 	txtVirtualControlsState.sessionId = null;
 	txtVirtualControlsState.pressedStates = {};
 	txtVirtualControlsState.activePressStableId = null;
@@ -1280,11 +1459,11 @@ function initTxtVirtualControlsUI() {
 			if (!selectedControl) {
 				return;
 			}
+			setTxtVirtualControlThemeStyle(selectedControl, {
+				backgroundColor: event.target.value,
+			});
 			updateSelectedTxtVirtualControl({
-				style: {
-					...selectedControl.style,
-					backgroundColor: event.target.value,
-				},
+				style: selectedControl.style,
 			});
 		});
 	}
@@ -1294,11 +1473,11 @@ function initTxtVirtualControlsUI() {
 			if (!selectedControl) {
 				return;
 			}
+			setTxtVirtualControlThemeStyle(selectedControl, {
+				textColor: event.target.value,
+			});
 			updateSelectedTxtVirtualControl({
-				style: {
-					...selectedControl.style,
-					textColor: event.target.value,
-				},
+				style: selectedControl.style,
 			});
 		});
 	}
@@ -2658,10 +2837,16 @@ const functionSearch = {
 				? window.languageManager.getMessage('FUNCTION_RESULT_PREFIX', '函式: ')
 				: '函式: ';
 
-			resultItem.innerHTML = `
-        <div class="result-title">${functionPrefix}${blockName}</div>
-        <div class="result-preview">${previewText}</div>
-      `;
+			const titleElement = document.createElement('div');
+			titleElement.className = 'result-title';
+			titleElement.textContent = `${functionPrefix}${blockName}`;
+
+			const previewElement = document.createElement('div');
+			previewElement.className = 'result-preview';
+			previewElement.textContent = previewText;
+
+			resultItem.appendChild(titleElement);
+			resultItem.appendChild(previewElement);
 
 			// 點擊結果項時聚焦到積木
 			resultItem.addEventListener('click', () => {
@@ -2860,6 +3045,9 @@ function updateTheme(theme) {
 			Blockly.getMainWorkspace().setTheme(window.SingularBlocklyTheme);
 		}
 	}
+
+	syncTxtVirtualControlsDocumentToTheme(theme);
+	refreshTxtVirtualControlsUI();
 }
 
 // 監聽語言變更事件

@@ -11,6 +11,7 @@ export const TXT_VIRTUAL_CONTROL_RUNTIME_STATE_FILE =
 
 export type TxtVirtualControlMode = 'editing' | 'running';
 export type TxtVirtualControlKind = 'button';
+export type TxtVirtualControlStyleTheme = 'light' | 'dark';
 
 export interface TxtVirtualControlViewport {
 	scrollX: number;
@@ -36,6 +37,13 @@ export interface TxtVirtualControlSize {
 export interface TxtVirtualButtonStyle {
 	textColor: string;
 	backgroundColor: string;
+	themeStyles?: Partial<Record<TxtVirtualControlStyleTheme, TxtVirtualButtonThemeStyle>>;
+}
+
+export interface TxtVirtualButtonThemeStyle {
+	textColor: string;
+	backgroundColor: string;
+	customized: boolean;
 }
 
 export interface TxtVirtualButton {
@@ -118,10 +126,18 @@ export interface TxtVirtualControlPreflight {
 	invalidReferences: InvalidVirtualControlReference[];
 }
 
-export const DEFAULT_TXT_VIRTUAL_BUTTON_STYLE: TxtVirtualButtonStyle = {
-	textColor: '#ffffff',
-	backgroundColor: '#0288d1',
+export const DEFAULT_TXT_VIRTUAL_BUTTON_THEME_STYLES: Record<TxtVirtualControlStyleTheme, TxtVirtualButtonStyle> = {
+	light: {
+		textColor: '#ffffff',
+		backgroundColor: '#005a9e',
+	},
+	dark: {
+		textColor: '#1f1f1f',
+		backgroundColor: '#ffca28',
+	},
 };
+
+export const DEFAULT_TXT_VIRTUAL_BUTTON_STYLE: TxtVirtualButtonStyle = DEFAULT_TXT_VIRTUAL_BUTTON_THEME_STYLES.light;
 
 function sanitizeNumber(value: unknown, fallback: number): number {
 	return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
@@ -129,6 +145,36 @@ function sanitizeNumber(value: unknown, fallback: number): number {
 
 function sanitizeString(value: unknown, fallback = ''): string {
 	return typeof value === 'string' ? value : fallback;
+}
+
+function normalizeThemeStyle(value: unknown, theme: TxtVirtualControlStyleTheme): TxtVirtualButtonThemeStyle | null {
+	if (!value || typeof value !== 'object') {
+		return null;
+	}
+
+	const style = value as Partial<TxtVirtualButtonThemeStyle>;
+	const fallback = DEFAULT_TXT_VIRTUAL_BUTTON_THEME_STYLES[theme];
+	return {
+		textColor: sanitizeString(style.textColor, fallback.textColor),
+		backgroundColor: sanitizeString(style.backgroundColor, fallback.backgroundColor),
+		customized: style.customized !== false,
+	};
+}
+
+function normalizeThemeStyles(value: unknown): Partial<Record<TxtVirtualControlStyleTheme, TxtVirtualButtonThemeStyle>> {
+	if (!value || typeof value !== 'object') {
+		return {};
+	}
+
+	const source = value as Partial<Record<TxtVirtualControlStyleTheme, unknown>>;
+	const themeStyles: Partial<Record<TxtVirtualControlStyleTheme, TxtVirtualButtonThemeStyle>> = {};
+	for (const theme of ['light', 'dark'] as const) {
+		const normalized = normalizeThemeStyle(source[theme], theme);
+		if (normalized) {
+			themeStyles[theme] = normalized;
+		}
+	}
+	return themeStyles;
 }
 
 function sanitizeMode(value: unknown, fallback: TxtVirtualControlMode = 'editing'): TxtVirtualControlMode {
@@ -164,6 +210,17 @@ function normalizeButton(control: unknown): TxtVirtualButton | null {
 	const position = candidate.position ?? {};
 	const size = candidate.size ?? {};
 	const style = candidate.style ?? {};
+	const rawThemeStyles = (style as Partial<TxtVirtualButtonStyle>).themeStyles;
+	const themeStyles = normalizeThemeStyles(rawThemeStyles);
+	const hasThemeStylesProperty = Boolean(style && typeof style === 'object' && 'themeStyles' in style);
+	const normalizedStyle: TxtVirtualButtonStyle = {
+		textColor: sanitizeString((style as Partial<TxtVirtualButtonStyle>).textColor, DEFAULT_TXT_VIRTUAL_BUTTON_STYLE.textColor),
+		backgroundColor: sanitizeString(
+			(style as Partial<TxtVirtualButtonStyle>).backgroundColor,
+			DEFAULT_TXT_VIRTUAL_BUTTON_STYLE.backgroundColor
+		),
+		...(hasThemeStylesProperty || Object.keys(themeStyles).length > 0 ? { themeStyles } : {}),
+	};
 
 	return {
 		stableId,
@@ -178,13 +235,7 @@ function normalizeButton(control: unknown): TxtVirtualButton | null {
 			width: Math.max(72, sanitizeNumber((size as Partial<TxtVirtualControlSize>).width, 120)),
 			height: Math.max(40, sanitizeNumber((size as Partial<TxtVirtualControlSize>).height, 48)),
 		},
-		style: {
-			textColor: sanitizeString((style as Partial<TxtVirtualButtonStyle>).textColor, DEFAULT_TXT_VIRTUAL_BUTTON_STYLE.textColor),
-			backgroundColor: sanitizeString(
-				(style as Partial<TxtVirtualButtonStyle>).backgroundColor,
-				DEFAULT_TXT_VIRTUAL_BUTTON_STYLE.backgroundColor
-			),
-		},
+		style: normalizedStyle,
 	};
 }
 

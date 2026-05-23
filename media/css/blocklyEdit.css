@@ -13,6 +13,113 @@ body {
 	overflow: hidden;
 }
 
+:root {
+	--txt-virtual-controls-panel-bg: #ffffff;
+	--txt-virtual-controls-panel-fg: #1e1e1e;
+	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
+	--txt-virtual-controls-canvas-surface: #f8f8f8;
+	--txt-virtual-controls-description-fg: #666666;
+	--txt-virtual-controls-field-bg: #ffffff;
+	--txt-virtual-controls-field-fg: #1e1e1e;
+	--txt-virtual-controls-field-border: rgba(0, 0, 0, 0.2);
+	--txt-virtual-controls-code-bg: rgba(0, 0, 0, 0.07);
+	--txt-virtual-controls-code-fg: #1e1e1e;
+	--txt-virtual-controls-code-border: rgba(0, 0, 0, 0.12);
+	--txt-virtual-controls-grid-line: rgba(127, 127, 127, 0.08);
+	--txt-virtual-control-button-border: rgba(0, 0, 0, 0.28);
+	--txt-virtual-control-button-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+	--txt-virtual-control-state-ring: var(--vscode-focusBorder, #007acc);
+	--txt-virtual-controls-warning-bg: var(--vscode-inputValidation-warningBackground, rgba(245, 166, 35, 0.16));
+	--txt-virtual-controls-warning-fg: var(--vscode-inputValidation-warningForeground, var(--vscode-editorWarning-foreground, inherit));
+	--txt-virtual-controls-warning-border: var(--vscode-inputValidation-warningBorder, #f5a623);
+}
+
+body.vscode-light {
+	--txt-virtual-controls-panel-bg: var(--vscode-sideBar-background, #ffffff);
+	--txt-virtual-controls-panel-fg: var(--vscode-sideBar-foreground, #1e1e1e);
+	--txt-virtual-controls-panel-border: var(--vscode-sideBar-border, rgba(0, 0, 0, 0.12));
+	--txt-virtual-controls-canvas-surface: var(--vscode-editor-background, #f8f8f8);
+	--txt-virtual-controls-description-fg: var(--vscode-descriptionForeground, #666666);
+	--txt-virtual-controls-field-bg: var(--vscode-input-background, #ffffff);
+	--txt-virtual-controls-field-fg: var(--vscode-input-foreground, #1e1e1e);
+	--txt-virtual-controls-field-border: var(--vscode-input-border, rgba(0, 0, 0, 0.2));
+	--txt-virtual-controls-code-bg: var(--vscode-textCodeBlock-background, rgba(0, 0, 0, 0.07));
+	--txt-virtual-controls-code-fg: var(--vscode-editor-foreground, #1e1e1e);
+	--txt-virtual-controls-code-border: var(--vscode-panel-border, rgba(0, 0, 0, 0.12));
+	--txt-virtual-control-button-border: var(--vscode-contrastBorder, rgba(0, 0, 0, 0.28));
+}
+
+body.vscode-dark {
+	--txt-virtual-controls-panel-bg: var(--vscode-sideBar-background, #252526);
+	--txt-virtual-controls-panel-fg: var(--vscode-sideBar-foreground, #cccccc);
+	--txt-virtual-controls-panel-border: var(--vscode-sideBar-border, rgba(255, 255, 255, 0.16));
+	--txt-virtual-controls-canvas-surface: var(--vscode-editor-background, #1e1e1e);
+	--txt-virtual-controls-description-fg: var(--vscode-descriptionForeground, #a6a6a6);
+	--txt-virtual-controls-field-bg: var(--vscode-input-background, #313131);
+	--txt-virtual-controls-field-fg: var(--vscode-input-foreground, #f0f0f0);
+	--txt-virtual-controls-field-border: var(--vscode-input-border, rgba(255, 255, 255, 0.24));
+	--txt-virtual-controls-code-bg: var(--vscode-textCodeBlock-background, rgba(255, 255, 255, 0.12));
+	--txt-virtual-controls-code-fg: var(--vscode-editor-foreground, #f0f0f0);
+	--txt-virtual-controls-code-border: var(--vscode-panel-border, rgba(255, 255, 255, 0.2));
+	--txt-virtual-controls-grid-line: rgba(255, 255, 255, 0.08);
+	--txt-virtual-control-button-border: var(--vscode-contrastBorder, rgba(255, 255, 255, 0.36));
+	--txt-virtual-control-button-shadow: 0 4px 12px rgba(0, 0, 0, 0.38);
+}
+
+body.theme-light {
+	--txt-virtual-controls-panel-bg: #ffffff;
+	--txt-virtual-controls-panel-fg: #1e1e1e;
+	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
+	--txt-virtual-controls-canvas-surface: #f8f8f8;
+	--txt-virtual-controls-description-fg: #666666;
+	--txt-virtual-controls-field-bg: #ffffff;
+	--txt-virtual-controls-field-fg: #1e1e1e;
+	--txt-virtual-controls-field-border: rgba(0, 0, 0, 0.2);
+	--txt-virtual-controls-code-bg: rgba(0, 0, 0, 0.07);
+	--txt-virtual-controls-code-fg: #1e1e1e;
+	--txt-virtual-controls-code-border: rgba(0, 0, 0, 0.12);
+	--txt-virtual-controls-grid-line: rgba(127, 127, 127, 0.08);
+	--txt-virtual-control-button-border: rgba(0, 0, 0, 0.28);
+	--txt-virtual-control-button-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+}
+
+body.theme-dark {
+	--txt-virtual-controls-panel-bg: #252526;
+	--txt-virtual-controls-panel-fg: #cccccc;
+	--txt-virtual-controls-panel-border: rgba(255, 255, 255, 0.16);
+	--txt-virtual-controls-canvas-surface: #1e1e1e;
+	--txt-virtual-controls-description-fg: #a6a6a6;
+	--txt-virtual-controls-field-bg: #313131;
+	--txt-virtual-controls-field-fg: #f0f0f0;
+	--txt-virtual-controls-field-border: rgba(255, 255, 255, 0.24);
+	--txt-virtual-controls-code-bg: rgba(255, 255, 255, 0.12);
+	--txt-virtual-controls-code-fg: #f0f0f0;
+	--txt-virtual-controls-code-border: rgba(255, 255, 255, 0.2);
+	--txt-virtual-controls-grid-line: rgba(255, 255, 255, 0.08);
+	--txt-virtual-control-button-border: rgba(255, 255, 255, 0.36);
+	--txt-virtual-control-button-shadow: 0 4px 12px rgba(0, 0, 0, 0.38);
+}
+
+body.vscode-high-contrast,
+body.vscode-high-contrast-light {
+	--txt-virtual-controls-panel-bg: var(--vscode-sideBar-background, Canvas);
+	--txt-virtual-controls-panel-fg: var(--vscode-sideBar-foreground, CanvasText);
+	--txt-virtual-controls-panel-border: var(--vscode-contrastBorder, CanvasText);
+	--txt-virtual-controls-canvas-surface: var(--vscode-editor-background, Canvas);
+	--txt-virtual-controls-description-fg: CanvasText;
+	--txt-virtual-controls-field-bg: Field;
+	--txt-virtual-controls-field-fg: FieldText;
+	--txt-virtual-controls-field-border: CanvasText;
+	--txt-virtual-controls-code-bg: Canvas;
+	--txt-virtual-controls-code-fg: CanvasText;
+	--txt-virtual-controls-code-border: CanvasText;
+	--txt-virtual-controls-grid-line: transparent;
+	--txt-virtual-control-button-border: var(--vscode-contrastBorder, CanvasText);
+	--txt-virtual-control-button-shadow: none;
+	--txt-virtual-control-state-ring: var(--vscode-contrastActiveBorder, Highlight);
+	--txt-virtual-controls-warning-border: var(--vscode-contrastActiveBorder, Highlight);
+}
+
 html {
 	width: 100%;
 	height: 100%;
@@ -160,9 +267,9 @@ body.theme-dark .preview-controls .theme-icon {
 	gap: 12px;
 	display: flex;
 	flex-direction: column;
-	background: var(--vscode-sideBar-background, #ffffff);
-	color: var(--vscode-sideBar-foreground, #1e1e1e);
-	border-left: 1px solid var(--vscode-sideBar-border, rgba(0, 0, 0, 0.08));
+	background: var(--txt-virtual-controls-panel-bg);
+	color: var(--txt-virtual-controls-panel-fg);
+	border-left: 1px solid var(--txt-virtual-controls-panel-border);
 	overflow: hidden auto;
 	transition:
 		flex-basis 0.25s ease,
@@ -255,18 +362,18 @@ body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
 	margin: 0;
 	font-size: 0.84rem;
 	line-height: 1.45;
-	color: var(--vscode-descriptionForeground, #666666);
+	color: var(--txt-virtual-controls-description-fg);
 }
 
 .txt-virtual-controls-canvas {
 	position: relative;
 	min-height: 280px;
-	border: 1px dashed var(--vscode-panel-border, rgba(0, 0, 0, 0.15));
+	border: 1px dashed var(--txt-virtual-controls-panel-border);
 	border-radius: 12px;
 	background:
-		linear-gradient(90deg, rgba(127, 127, 127, 0.06) 1px, transparent 1px),
-		linear-gradient(rgba(127, 127, 127, 0.06) 1px, transparent 1px),
-		var(--vscode-editor-background, #f8f8f8);
+		linear-gradient(90deg, var(--txt-virtual-controls-grid-line) 1px, transparent 1px),
+		linear-gradient(var(--txt-virtual-controls-grid-line) 1px, transparent 1px),
+		var(--txt-virtual-controls-canvas-surface);
 	background-size: 20px 20px, 20px 20px, auto;
 	overflow: hidden;
 	box-sizing: border-box;
@@ -278,40 +385,53 @@ body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
 	align-items: center;
 	justify-content: center;
 	padding: 0 12px;
-	border: none;
+	border: 2px solid var(--txt-virtual-control-button-border);
 	border-radius: 14px;
 	font-size: 0.92rem;
 	font-weight: 600;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+	box-shadow: var(--txt-virtual-control-button-shadow);
 	cursor: grab;
 	user-select: none;
 	transition:
 		transform 0.12s ease,
 		box-shadow 0.12s ease,
+		border-color 0.12s ease,
 		filter 0.12s ease;
-	}
+}
+
+.txt-virtual-control-button:focus-visible {
+	outline: 3px solid var(--txt-virtual-control-state-ring);
+	outline-offset: 3px;
+}
 
 .txt-virtual-control-button.selected {
+	outline: 2px solid var(--txt-virtual-control-state-ring);
+	outline-offset: 3px;
+	border-style: double;
 	box-shadow:
-		0 0 0 2px var(--vscode-focusBorder, #007acc),
-		0 10px 22px rgba(0, 0, 0, 0.18);
-	}
+		0 0 0 2px var(--txt-virtual-control-state-ring),
+		var(--txt-virtual-control-button-shadow);
+}
 
 .txt-virtual-control-button.running {
 	cursor: pointer;
-	}
+	box-shadow:
+		inset 0 0 0 2px currentColor,
+		var(--txt-virtual-control-button-shadow);
+}
 
 .txt-virtual-control-button.pressed {
 	transform: translateY(1px) scale(0.98);
 	filter: brightness(0.92);
-	}
+	border-style: inset;
+}
 
 .txt-virtual-controls-inspector {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 	padding-top: 8px;
-	border-top: 1px solid var(--vscode-panel-border, rgba(0, 0, 0, 0.08));
+	border-top: 1px solid var(--txt-virtual-controls-panel-border);
 }
 
 .txt-virtual-controls-inspector label {
@@ -337,19 +457,34 @@ body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
 .txt-virtual-controls-identifier-badge-label {
 	font-size: 0.75rem;
 	font-weight: 600;
-	color: var(--vscode-descriptionForeground, #666);
+	color: var(--txt-virtual-controls-panel-fg);
 	white-space: nowrap;
 }
 
 .txt-virtual-controls-identifier-value {
 	font-family: var(--vscode-editor-font-family, 'SFMono-Regular', Consolas, monospace);
 	font-size: 0.78rem;
-	background: var(--vscode-textCodeBlock-background, rgba(127, 127, 127, 0.12));
+	background: var(--txt-virtual-controls-code-bg);
+	color: var(--txt-virtual-controls-code-fg);
+	border: 1px solid var(--txt-virtual-controls-code-border);
 	padding: 2px 6px;
 	border-radius: 4px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+#txtVirtualControlNameInput {
+	background: var(--txt-virtual-controls-field-bg);
+	color: var(--txt-virtual-controls-field-fg);
+	border: 1px solid var(--txt-virtual-controls-field-border);
+	padding: 6px 8px;
+	border-radius: 4px;
+}
+
+#txtVirtualControlNameInput:focus-visible {
+	outline: 2px solid var(--txt-virtual-control-state-ring);
+	outline-offset: 2px;
 }
 
 .txt-virtual-controls-color-grid {
@@ -369,8 +504,8 @@ body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
 	height: 38px;
 	padding: 2px;
 	border-radius: 8px;
-	border: 1px solid var(--vscode-input-border, rgba(0, 0, 0, 0.15));
-	background: var(--vscode-input-background, #ffffff);
+	border: 1px solid var(--txt-virtual-controls-field-border);
+	background: var(--txt-virtual-controls-field-bg);
 	cursor: pointer;
 }
 
@@ -739,8 +874,8 @@ body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button {
 body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button:hover,
 body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button:focus-visible {
 	box-shadow:
-		0 0 0 2px var(--vscode-focusBorder, #007acc),
-		0 8px 18px rgba(0, 0, 0, 0.16);
+		0 0 0 2px var(--txt-virtual-control-state-ring),
+		var(--txt-virtual-control-button-shadow);
 }
 
 body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button.recovered {
@@ -762,9 +897,9 @@ body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button.recove
 	border-radius: 8px;
 	font-size: 0.84rem;
 	line-height: 1.4;
-	background: var(--vscode-inputValidation-warningBackground, rgba(245, 166, 35, 0.16));
-	color: var(--vscode-inputValidation-warningForeground, inherit);
-	border: 1px solid var(--vscode-inputValidation-warningBorder, rgba(245, 166, 35, 0.55));
+	background: var(--txt-virtual-controls-warning-bg);
+	color: var(--txt-virtual-controls-warning-fg);
+	border: 1px solid var(--txt-virtual-controls-warning-border);
 }
 
 .txt-preview-warning-item.info {
@@ -774,6 +909,22 @@ body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button.recove
 
 body.preview-mode .txt-preview-readonly-splitter.open {
 	cursor: col-resize;
+}
+
+@media (forced-colors: active) {
+	.txt-virtual-controls-panel,
+	.txt-virtual-controls-canvas,
+	.txt-preview-warning-item,
+	.txt-virtual-control-button {
+		forced-color-adjust: auto;
+		border-color: CanvasText;
+		box-shadow: none;
+	}
+
+	.txt-virtual-control-button:focus-visible,
+	.txt-virtual-control-button.selected {
+		outline-color: Highlight;
+	}
 }
 
 #themeToggle {

@@ -7,6 +7,7 @@
 import assert = require('assert');
 import * as sinon from 'sinon';
 import * as path from 'path';
+import * as fs from 'fs';
 import { describe, it, before, beforeEach, after, afterEach } from 'mocha';
 import { WebViewManager, _setVSCodeApi as setWebViewManagerVSCodeApi, _reset as resetWebViewManager } from '../webview/webviewManager';
 import { _setVSCodeApi as setMessageHandlerVSCodeApi, _reset as resetMessageHandler } from '../webview/messageHandler';
@@ -204,6 +205,18 @@ describe('WebView Preview', () => {
 		assert.strictEqual(panel.webview.postMessage.called, false);
 	});
 
+	it('TXT preview readonly controls should keep keyboard activation guarded', () => {
+		const source = fs.readFileSync(path.join(process.cwd(), 'media/js/blocklyPreview.js'), 'utf8');
+
+		assert(
+			source.includes("['pointerdown', 'click', 'dblclick', 'contextmenu', 'keydown', 'dragstart']"),
+			'preview guard should capture keyboard and pointer activation events'
+		);
+		assert(source.includes('preventTxtPreviewEdit(event);'), 'preview guard should prevent guarded activation events');
+		assert(source.includes("button.setAttribute('aria-disabled', 'true');"), 'readonly buttons should expose disabled semantics');
+		assert(source.includes('button.tabIndex = -1;'), 'readonly buttons should stay out of the tab order');
+	});
+
 	it('should sync language updates to preview panels', async () => {
 		const panelA: any = { webview: { postMessage: sinon.stub().resolves() } };
 		const panelB: any = { webview: { postMessage: sinon.stub().resolves() } };
@@ -331,6 +344,8 @@ describe('WebView Preview', () => {
 			<script src="{txtGeneratorUri}"></script>
 			<script src="{txtBlocksUri}"></script>
 			{txtModules}
+			<script src="{txtVirtualControlsContrastUri}"></script>
+			<script src="{previewJsUri}"></script>
 		</body></html>`;
 		fsMock.addFile(path.join(extensionPath, 'media/html/blocklyPreview.html'), htmlTemplate);
 		sinon.stub(webViewManager as any, 'loadLocaleScripts').resolves('');
@@ -343,5 +358,10 @@ describe('WebView Preview', () => {
 		assert(html.includes('media/blockly/generators/txt/index.js'));
 		assert(html.includes('media/blockly/blocks/txt.js'));
 		assert(html.includes('media/blockly/generators/txt/txt.js'));
+		assert(html.includes('media/js/txtVirtualControlsContrast.js'));
+		assert(
+			html.indexOf('media/js/txtVirtualControlsContrast.js') < html.indexOf('media/js/blocklyPreview.js'),
+			'TXT contrast helper should load before blocklyPreview.js'
+		);
 	});
 });

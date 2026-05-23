@@ -109,8 +109,15 @@ const TXT_PREVIEW_TOOLBAR_GAP = 12;
 const TXT_PREVIEW_MIN_BUTTON_WIDTH = 72;
 const TXT_PREVIEW_MIN_BUTTON_HEIGHT = 40;
 const TXT_PREVIEW_DEFAULT_BUTTON_STYLE = {
-	backgroundColor: '#0288d1',
+	backgroundColor: '#005a9e',
 	textColor: '#ffffff',
+};
+const TXT_PREVIEW_DEFAULT_BUTTON_STYLES = {
+	light: TXT_PREVIEW_DEFAULT_BUTTON_STYLE,
+	dark: {
+		backgroundColor: '#ffca28',
+		textColor: '#1f1f1f',
+	},
 };
 
 const txtPreviewState = {
@@ -214,6 +221,104 @@ function sanitizePreviewColor(value, fallback) {
 	return /^#(?:[0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(color) ? color : fallback;
 }
 
+function getTxtPreviewStyleApi() {
+	return window.txtVirtualControlsContrast || null;
+}
+
+function getTxtPreviewThemeMode(theme = currentTheme) {
+	const styleApi = getTxtPreviewStyleApi();
+	if (styleApi && typeof styleApi.normalizeThemeMode === 'function') {
+		return styleApi.normalizeThemeMode(theme);
+	}
+	return theme === 'dark' ? 'dark' : 'light';
+}
+
+function getTxtPreviewDefaultButtonStyle(theme = currentTheme) {
+	const styleApi = getTxtPreviewStyleApi();
+	if (styleApi && typeof styleApi.getDefaultButtonStyle === 'function') {
+		return styleApi.getDefaultButtonStyle(theme);
+	}
+	const mode = getTxtPreviewThemeMode(theme);
+	return { ...(TXT_PREVIEW_DEFAULT_BUTTON_STYLES[mode] || TXT_PREVIEW_DEFAULT_BUTTON_STYLE) };
+}
+
+function sanitizePreviewThemeColor(value, fallback) {
+	const styleApi = getTxtPreviewStyleApi();
+	if (styleApi && typeof styleApi.normalizeHexColor === 'function') {
+		return styleApi.normalizeHexColor(value, fallback);
+	}
+	return sanitizePreviewColor(value, fallback);
+}
+
+function normalizeTxtPreviewThemeStyle(value, theme) {
+	if (!value || typeof value !== 'object') {
+		return null;
+	}
+
+	const fallback = getTxtPreviewDefaultButtonStyle(theme);
+	return {
+		backgroundColor: sanitizePreviewThemeColor(value.backgroundColor, fallback.backgroundColor),
+		textColor: sanitizePreviewThemeColor(value.textColor, fallback.textColor),
+		customized: value.customized !== false,
+	};
+}
+
+function normalizeTxtPreviewThemeStyles(style, legacyStyle) {
+	const rawThemeStyles = style && typeof style === 'object' && style.themeStyles && typeof style.themeStyles === 'object'
+		? style.themeStyles
+		: null;
+	const themeStyles = {};
+
+	if (rawThemeStyles) {
+		['light', 'dark'].forEach(theme => {
+			const normalized = normalizeTxtPreviewThemeStyle(rawThemeStyles[theme], theme);
+			if (normalized) {
+				themeStyles[theme] = normalized;
+			}
+		});
+		return themeStyles;
+	}
+
+	const lightDefault = getTxtPreviewDefaultButtonStyle('light');
+	const isLegacyCustomized =
+		legacyStyle.backgroundColor !== lightDefault.backgroundColor || legacyStyle.textColor !== lightDefault.textColor;
+	if (isLegacyCustomized) {
+		themeStyles[getTxtPreviewThemeMode(currentTheme)] = {
+			...legacyStyle,
+			customized: true,
+		};
+	}
+
+	return themeStyles;
+}
+
+function getTxtPreviewEffectiveButtonStyle(style, theme = currentTheme) {
+	const styleApi = getTxtPreviewStyleApi();
+	if (styleApi && typeof styleApi.getEffectiveButtonStyle === 'function') {
+		return styleApi.getEffectiveButtonStyle(style, theme);
+	}
+
+	const mode = getTxtPreviewThemeMode(theme);
+	const fallback = getTxtPreviewDefaultButtonStyle(mode);
+	return normalizeTxtPreviewThemeStyle(style?.themeStyles?.[mode], mode) || fallback;
+}
+
+function normalizeTxtPreviewButtonStyle(style) {
+	const rawStyle = style && typeof style === 'object' ? style : {};
+	const lightDefault = getTxtPreviewDefaultButtonStyle('light');
+	const legacyStyle = {
+		backgroundColor: sanitizePreviewThemeColor(rawStyle.backgroundColor, lightDefault.backgroundColor),
+		textColor: sanitizePreviewThemeColor(rawStyle.textColor, lightDefault.textColor),
+	};
+	const themeStyles = normalizeTxtPreviewThemeStyles(rawStyle, legacyStyle);
+	const effectiveStyle = getTxtPreviewEffectiveButtonStyle({ ...legacyStyle, themeStyles }, currentTheme);
+
+	return {
+		...effectiveStyle,
+		themeStyles,
+	};
+}
+
 function normalizeTxtPreviewControlsDocument(document) {
 	if (!document || typeof document !== 'object') {
 		return createEmptyTxtPreviewControlsDocument();
@@ -253,10 +358,7 @@ function normalizeTxtPreviewControlsDocument(document) {
 						width: Math.max(TXT_PREVIEW_MIN_BUTTON_WIDTH, sanitizePreviewNumber(size.width, 120)),
 						height: Math.max(TXT_PREVIEW_MIN_BUTTON_HEIGHT, sanitizePreviewNumber(size.height, 48)),
 					},
-					style: {
-						backgroundColor: sanitizePreviewColor(style.backgroundColor, TXT_PREVIEW_DEFAULT_BUTTON_STYLE.backgroundColor),
-						textColor: sanitizePreviewColor(style.textColor, TXT_PREVIEW_DEFAULT_BUTTON_STYLE.textColor),
-					},
+					style: normalizeTxtPreviewButtonStyle(style),
 				};
 			})
 			.filter(Boolean),
@@ -462,12 +564,23 @@ function renderTxtPreviewControls() {
 	let maxBottom = elements.canvas.clientHeight || 0;
 
 	controls.forEach(control => {
+		const effectiveStyle = getTxtPreviewEffectiveButtonStyle(control.style, currentTheme);
 		const button = document.createElement('button');
 		button.type = 'button';
 		button.className = 'txt-virtual-control-button';
 		button.dataset.stableId = control.stableId;
+		button.dataset.identifier = control.identifier;
 		button.textContent = control.displayName;
 		button.setAttribute('aria-disabled', 'true');
+		button.setAttribute(
+			'aria-label',
+			formatTxtPreviewMessage(
+				'TXT_PREVIEW_BUTTON_ARIA_LABEL',
+				'{0}. Identifier {1}. Preview only, cannot be edited or pressed.',
+				control.displayName,
+				control.identifier
+			)
+		);
 		button.setAttribute(
 			'title',
 			formatTxtPreviewMessage('TXT_PREVIEW_BUTTON_READONLY_TITLE', 'Preview only: this virtual button cannot be edited or pressed here.')
@@ -477,8 +590,8 @@ function renderTxtPreviewControls() {
 		button.style.top = `${control.position.y}px`;
 		button.style.width = `${control.size.width}px`;
 		button.style.height = `${control.size.height}px`;
-		button.style.backgroundColor = control.style.backgroundColor;
-		button.style.color = control.style.textColor;
+		button.style.backgroundColor = effectiveStyle.backgroundColor;
+		button.style.color = effectiveStyle.textColor;
 		button.classList.toggle('recovered', recoveredControlIds.has(control.stableId));
 		surface.appendChild(button);
 
@@ -491,6 +604,7 @@ function renderTxtPreviewControls() {
 	elements.canvas.replaceChildren(surface);
 	elements.canvas.scrollTo({ left: 0, top: 0 });
 	elements.emptyState.classList.toggle('hidden', controls.length > 0);
+	renderTxtPreviewWarnings();
 }
 
 function renderTxtVirtualControlsPreview(txtVirtualControls, previewWarnings = []) {
@@ -704,6 +818,9 @@ function updateTheme(theme, notifyExtension = true) {
 	}
 
 	log.info(`主題已更新為: ${theme}`);
+	if (currentPreviewBoard === 'txt' && txtPreviewState.panelOpen) {
+		renderTxtPreviewControls();
+	}
 }
 
 /**
@@ -888,6 +1005,9 @@ window.addEventListener('languageChanged', function (event) {
 	log.info(`語言已變更為: ${event.detail.language}`);
 	// 更新 UI 文字
 	updateUITexts();
+	if (currentPreviewBoard === 'txt' && txtPreviewState.panelOpen) {
+		renderTxtPreviewControls();
+	}
 	// 重新載入工作區以刷新積木文字
 	refreshWorkspaceForLanguage();
 });
@@ -897,6 +1017,9 @@ window.addEventListener('messageLoaded', function (event) {
 	log.info(`語言檔案已載入: ${event.detail.locale}`);
 	// 更新 UI 文字
 	updateUITexts();
+	if (currentPreviewBoard === 'txt' && txtPreviewState.panelOpen) {
+		renderTxtPreviewControls();
+	}
 });
 
 // 初始化

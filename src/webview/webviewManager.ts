@@ -466,12 +466,16 @@ export class WebViewManager {
 			// 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyEdit.js'));
+			const txtVirtualControlsContrastPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/js/txtVirtualControlsContrast.js')
+			);
 			const boardConfigsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/board_configs.js'));
 
 			// 轉換為 WebView 可用的 URI
 			const webview = this.panel!.webview;
 			const cssUri = webview.asWebviewUri(cssPath);
 			const jsUri = webview.asWebviewUri(jsPath);
+			const txtVirtualControlsContrastUri = webview.asWebviewUri(txtVirtualControlsContrastPath);
 			const boardConfigsUri = webview.asWebviewUri(boardConfigsPath);
 
 			// Blockly 核心庫
@@ -655,6 +659,7 @@ export class WebViewManager {
 				'{experimentalCssUri}',
 				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/experimentalBlocks.css'))).toString()
 			);
+			htmlContent = htmlContent.replace('{txtVirtualControlsContrastUri}', txtVirtualControlsContrastUri.toString());
 			htmlContent = htmlContent.replace('{jsUri}', jsUri.toString());
 			htmlContent = htmlContent.replace(
 				'{experimentalMarkerUri}',
@@ -1293,6 +1298,9 @@ export class WebViewManager {
 			// 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyPreview.js'));
+			const txtVirtualControlsContrastPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/js/txtVirtualControlsContrast.js')
+			);
 			const boardConfigsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/board_configs.js'));
 
 			// 實驗性 CSS 和標記器
@@ -1302,6 +1310,7 @@ export class WebViewManager {
 			// 轉換為 WebView 可用的 URI
 			const cssUri = tempWebview.asWebviewUri(cssPath);
 			const jsUri = tempWebview.asWebviewUri(jsPath);
+			const txtVirtualControlsContrastUri = tempWebview.asWebviewUri(txtVirtualControlsContrastPath);
 			const boardConfigsUri = tempWebview.asWebviewUri(boardConfigsPath);
 			const experimentalCssUri = tempWebview.asWebviewUri(experimentalCssPath);
 			const experimentalMarkerUri = tempWebview.asWebviewUri(experimentalMarkerPath);
@@ -1465,6 +1474,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{cssUri}', cssUri.toString());
 			htmlContent = htmlContent.replace('{experimentalCssUri}', experimentalCssUri.toString());
 			htmlContent = htmlContent.replace('{experimentalMarkerUri}', experimentalMarkerUri.toString());
+			htmlContent = htmlContent.replace('{txtVirtualControlsContrastUri}', txtVirtualControlsContrastUri.toString());
 			htmlContent = htmlContent.replace('{previewJsUri}', jsUri.toString());
 			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
