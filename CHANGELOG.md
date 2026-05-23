@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.78.2] - 2026-05-24
+
+### 🐛 修復 Bug Fixes
+
+- **編輯器內部 surface 主題隔離修復** (Editor-owned surface theme isolation fixes)
+    - 修正 VS Code host 深色/淺色主題與 Blockly editor 主題交錯時，TXT connection modal、Sample Browser、TXT virtual controls 與備份預覽 chrome 可能被 host theme 顏色滲漏影響的問題；這些 editor-owned surfaces 現在統一跟隨 `body.theme-light` / `body.theme-dark` 與 editor-owned CSS tokens
+      Fixed host-theme color leakage when the VS Code host theme and Blockly editor theme differ; TXT connection modal, Sample Browser, TXT virtual controls, and backup preview chrome now consistently follow `body.theme-light` / `body.theme-dark` and editor-owned CSS tokens
+    - 補強備份預覽主題一致性，包含 preview toolbar、theme toggle focus ring、board warning、TXT virtual controls preview scrollbar 與 forced-colors / high-contrast readable states
+      Strengthened backup preview theme consistency, including preview toolbar, theme toggle focus ring, board warning, TXT virtual controls preview scrollbar, and forced-colors / high-contrast readable states
+    - 新增 source-contract tests 與手動驗證紀錄，鎖定 runtime `updateTheme(theme)` 不重載 WebView、避免 host token regression，並覆蓋 high-contrast running badge 可讀性
+      Added source-contract tests and validation notes to guard runtime `updateTheme(theme)` against WebView reload assumptions, prevent host-token regressions, and cover high-contrast running badge readability
+
 ## [0.78.1] - 2026-05-23
 
 ### 🔒 安全性修復 Security Fixes
