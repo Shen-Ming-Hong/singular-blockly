@@ -13,6 +13,33 @@ function getTxtProcessFunctionName(block) {
 	return `_txt_process_${safeBlockId}`;
 }
 
+function getTxtMOutputValidation() {
+	return window.txtMOutputValidation || null;
+}
+
+function normalizeTxtMOutputComponent(componentValue) {
+	const validation = getTxtMOutputValidation();
+	if (validation && typeof validation.normalizeComponent === 'function') {
+		return validation.normalizeComponent(componentValue);
+	}
+
+	const normalized = String(componentValue || '').trim().toUpperCase();
+	return normalized === 'LAMP' ? 'LAMP' : 'MOTOR';
+}
+
+function getTxtMOutputComponentMetadata(componentValue) {
+	const component = normalizeTxtMOutputComponent(componentValue);
+	const validation = getTxtMOutputValidation();
+	const metadata = validation && typeof validation.getComponentMetadata === 'function'
+		? validation.getComponentMetadata(component)
+		: null;
+
+	return metadata || {
+		key: component,
+		generatorMode: component === 'LAMP' ? 'unsigned-level' : 'signed-speed',
+	};
+}
+
 // === 頂層容器積木 ===
 
 function generateTxtSetupCode(block) {
@@ -81,11 +108,20 @@ window.txtGenerator.forBlock['txt_process'] = function (block) {
  */
 window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
 	const motor = block.getFieldValue('MOTOR');
+	const component = normalizeTxtMOutputComponent(block.getFieldValue('COMPONENT'));
+	const metadata = getTxtMOutputComponentMetadata(component);
 	const direction = block.getFieldValue('DIRECTION');
 	const speed = window.txtGenerator.valueToCode(block, 'SPEED', window.txtGenerator.ORDER_NONE) || '0';
 
 	// 記錄此馬達埠號，供 txt_setup 預先建立 mot 物件
 	window.txtGenerator.addMotorPort(motor);
+	if (typeof window.txtGenerator.addMOutputUsage === 'function') {
+		window.txtGenerator.addMOutputUsage(motor, component, block.id);
+	}
+
+	if (metadata.generatorMode === 'unsigned-level') {
+		return `_m${motor}.setSpeed(max(0, min(512, int(${speed}))))\n`;
+	}
 
 	let speedCode;
 	if (direction === 'BACKWARD') {
@@ -98,7 +134,7 @@ window.txtGenerator.forBlock['txt_motor_speed'] = function (block) {
 	// 避免在迴圈中反覆呼叫 txt.motor(N)（會累加 config_id 造成 CONFIG_IO 風暴）。
 	// ftrobopy setSpeed() 需要整數，且內部以 int(pwm/2) 縮放至 ubyte(0-255)；
 	// 超過 512 的値（如搖桿超出預期範圍）會讓 int(val/2)>255 觸發 struct.error。
-	// 用 max(-512, min(512, int(...))) 夾錢確保永遠在合法範圍內。
+	// 用 max(-512, min(512, int(...))) 夾制確保永遠在合法範圍內。
 	return `_m${motor}.setSpeed(max(-512, min(512, int(${speedCode}))))\n`;
 };
 
@@ -109,6 +145,9 @@ window.txtGenerator.forBlock['txt_motor_stop'] = function (block) {
 	const motor = block.getFieldValue('MOTOR');
 	// 記錄此馬達埠號，供 txt_setup 預先建立 mot 物件
 	window.txtGenerator.addMotorPort(motor);
+	if (typeof window.txtGenerator.addMStopUsage === 'function') {
+		window.txtGenerator.addMStopUsage(motor, block.id);
+	}
 	return `_m${motor}.setSpeed(0)\n`;
 };
 
@@ -121,6 +160,9 @@ window.txtGenerator.forBlock['txt_output'] = function (block) {
 	const output = block.getFieldValue('OUTPUT');
 	const state = block.getFieldValue('STATE');
 	const level = state === 'ON' ? '512' : '0';
+	if (typeof window.txtGenerator.addOOutputUsage === 'function') {
+		window.txtGenerator.addOOutputUsage(output, block.id);
+	}
 	return `txt.output(${output}).setLevel(${level})\n`;
 };
 
@@ -212,11 +254,14 @@ window.txtGenerator.forBlock['txt_wait'] = function (block) {
  * 避免在此處直接呼叫 txt.motor(i) 累加 config_id（CONFIG_IO 風暴）。
  */
 window.txtGenerator.forBlock['txt_stop_all'] = function (_block) {
+	const lines = [];
 	// 登記所有馬達埠號，確保 txt_setup 預先建立 _m1~_m4 物件
-	window.txtGenerator.addMotorPort(1);
-	window.txtGenerator.addMotorPort(2);
-	window.txtGenerator.addMotorPort(3);
-	window.txtGenerator.addMotorPort(4);
-	return '_m1.setSpeed(0)\n_m2.setSpeed(0)\n_m3.setSpeed(0)\n_m4.setSpeed(0)\n' +
-		'for i in range(1, 9):\n    txt.output(i).setLevel(0)\n';
+	for (let i = 1; i <= 4; i++) {
+		window.txtGenerator.addMotorPort(i);
+		lines.push(`_m${i}.setSpeed(0)`);
+	}
+	for (let i = 1; i <= 8; i++) {
+		lines.push(`txt.output(${i}).setLevel(0)`);
+	}
+	return `${lines.join('\n')}\n`;
 };

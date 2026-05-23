@@ -204,6 +204,61 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 		);
 	});
 
+	test('blocklyEdit should preserve running mode during file watcher reloads', () => {
+		const source = fs.readFileSync(path.join(process.cwd(), 'media/js/blocklyEdit.js'), 'utf8');
+
+		assert.ok(
+			source.includes('function replaceTxtVirtualControlsDocument(document, options = {})'),
+			'WebView should centralize virtual controls document replacement'
+		);
+		assert.ok(
+			source.includes("options.preserveExecutionMode && txtVirtualControlsState.document.canvas.mode === 'running'"),
+			'file watcher reloads should be able to preserve an active running mode'
+		);
+		assert.ok(
+			source.includes("const preserveTxtVirtualControlExecutionMode = isFromFileWatcher && txtVirtualControlsState.document.canvas.mode === 'running'"),
+			'loadWorkspace should only preserve execution state for file watcher reloads'
+		);
+		assert.ok(
+			source.includes('applyTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode })'),
+			'workspace reload should pass the preservation flag when applying TXT virtual controls'
+		);
+		assert.ok(
+			source.includes('applyTxtVirtualControlsDocument(pendingMessage.txtVirtualControls, { preserveExecutionMode: true })'),
+			'deferred file watcher reloads should also preserve running mode'
+		);
+	});
+
+	test('blocklyEdit CSS should expose a dark-theme running mode cue', () => {
+		const css = fs.readFileSync(path.join(process.cwd(), 'media/css/blocklyEdit.css'), 'utf8');
+
+		assert.ok(css.includes('.txt-virtual-controls-mode-badge.running'), 'running mode badge should have a dedicated style');
+		assert.ok(
+			css.includes('body.theme-dark .txt-virtual-controls-mode-badge.running'),
+			'dark mode should override the running badge colors explicitly'
+		);
+		assert.ok(css.includes('.txt-virtual-controls-canvas.running'), 'running canvas should have a non-color-only border cue');
+	});
+
+	test('blocklyEdit should ignore stale TXT stop and upload completion messages', () => {
+		const source = fs.readFileSync(path.join(process.cwd(), 'media/js/blocklyEdit.js'), 'utf8');
+
+		assert.ok(source.includes('activeTxtOperationId'), 'WebView should track the active TXT operation');
+		assert.ok(source.includes('stoppingTxtOperationId'), 'WebView should track the TXT operation currently being stopped');
+		assert.ok(
+			source.includes('function shouldApplyTxtUploadResult(message)'),
+			'TXT upload results should pass through an operation guard'
+		);
+		assert.ok(
+			source.includes('operationId === uploadState.activeTxtOperationId && operationId !== uploadState.stoppingTxtOperationId'),
+			'stop-pending upload results should not reset the running UI before stop completion'
+		);
+		assert.ok(
+			source.includes('if (shouldApplyTxtStoppedMessage(message))'),
+			'TXT stopped notifications should be ignored when they belong to a stale operation'
+		);
+	});
+
 	test('requestInitialState should recover malformed txtVirtualControls and send a normalized init payload', async () => {
 		const { handler, webviewPostMessage, fileServiceStub } = createMessageHandlerHarness();
 		const mainJsonPath = path.join('blockly', 'main.json');

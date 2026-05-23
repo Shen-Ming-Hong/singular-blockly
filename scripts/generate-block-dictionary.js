@@ -84,6 +84,66 @@ const BLOCK_DEFINITIONS = [
 		boards: ['txt'],
 		tags: ['txt', 'process', 'flow', 'thread', '流程'],
 	},
+	{
+		type: 'txt_motor_speed',
+		category: 'txt',
+		names: { 'zh-hant': '輸出 M 元件', en: 'Output M Component' },
+		descriptions: {
+			'zh-hant': '選擇 M1~M4 與元件類型，設定馬達速度或燈泡亮度。舊工作區缺少 COMPONENT 時會以馬達模式載入。',
+			en: 'Select M1-M4 and a component type, then set motor speed or lamp brightness. Legacy workspaces without COMPONENT load as motor mode.',
+		},
+		fields: [
+			{
+				name: 'MOTOR',
+				type: 'dropdown',
+				label: { 'zh-hant': 'M 埠', en: 'M port' },
+				options: ['M1', 'M2', 'M3', 'M4'].map((label, index) => ({ value: String(index + 1), label: { 'zh-hant': label, en: label } })),
+			},
+			{
+				name: 'COMPONENT',
+				type: 'dropdown',
+				label: { 'zh-hant': '元件', en: 'Component' },
+				options: [
+					{ value: 'MOTOR', label: { 'zh-hant': '馬達', en: 'Motor' } },
+					{ value: 'LAMP', label: { 'zh-hant': '燈泡', en: 'Lamp' } },
+				],
+			},
+			{
+				name: 'DIRECTION',
+				type: 'dropdown',
+				label: { 'zh-hant': '方向', en: 'Direction' },
+				options: [
+					{ value: 'FORWARD', label: { 'zh-hant': '正轉', en: 'Forward' } },
+					{ value: 'BACKWARD', label: { 'zh-hant': '反轉', en: 'Backward' } },
+				],
+			},
+		],
+		inputs: [{ name: 'SPEED', type: 'value', label: { 'zh-hant': '速度／亮度', en: 'Speed / brightness' }, check: 'Number', default: 512 }],
+		boards: ['txt'],
+		tags: ['txt', 'm-output', 'motor', 'lamp', 'brightness', 'speed', '輸出', '馬達', '燈泡'],
+		relatedBlocks: ['txt_motor_stop', 'txt_output', 'txt_stop_all'],
+	},
+	{
+		type: 'txt_motor_stop',
+		category: 'txt',
+		names: { 'zh-hant': '停止輸出 M', en: 'Stop M Output' },
+		descriptions: {
+			'zh-hant': '停止指定 M 埠的輸出，不推論元件類型。',
+			en: 'Stop the selected M port output without inferring a component type.',
+		},
+		fields: [
+			{
+				name: 'MOTOR',
+				type: 'dropdown',
+				label: { 'zh-hant': 'M 埠', en: 'M port' },
+				options: ['M1', 'M2', 'M3', 'M4'].map((label, index) => ({ value: String(index + 1), label: { 'zh-hant': label, en: label } })),
+			},
+		],
+		inputs: [],
+		boards: ['txt'],
+		tags: ['txt', 'm-output', 'stop', 'motor', 'lamp', '停止輸出'],
+		relatedBlocks: ['txt_motor_speed', 'txt_stop_all'],
+	},
 
 	// === Arduino 基礎積木 ===
 	{

@@ -28,6 +28,16 @@ describe('WebView Message Handler', () => {
 	const extensionPath = '/mock/extension';
 	const workspacePath = '/mock/workspace';
 
+	function createDeferred<T>() {
+		let resolve!: (value: T | PromiseLike<T>) => void;
+		let reject!: (reason?: unknown) => void;
+		const promise = new Promise<T>((res, rej) => {
+			resolve = res;
+			reject = rej;
+		});
+		return { promise, resolve, reject };
+	}
+
 	// 在測試套件開始前保存原始的 fs 模組
 	before(() => {
 		const fsModule = require.cache[require.resolve('fs')];
@@ -465,6 +475,181 @@ describe('WebView Message Handler', () => {
 			.getCalls()
 			.find((call: any) => call.args[0].command === 'txtVirtualControlsRuntimeError');
 		assert.strictEqual(runtimeErrorCall, undefined, 'runtime error should not be posted when runtime is unused');
+	});
+
+	it('should ignore stale TXT stop completion after a new upload operation starts', async () => {
+		const firstUpload = createDeferred<{ success: boolean; duration: number }>();
+		const secondUpload = createDeferred<{ success: boolean; duration: number }>();
+		const firstUploadStarted = createDeferred<void>();
+		const secondUploadStarted = createDeferred<void>();
+		const stopExecution = createDeferred<void>();
+		const runtimeServiceStub = {
+			createSession: sinon.stub(),
+			syncSnapshot: sinon.stub().resolves(),
+			clearSession: sinon.stub().resolves(),
+		};
+		runtimeServiceStub.createSession
+			.onFirstCall().resolves({ sessionId: 'session-old', mode: 'running', runtimeUrl: 'http://127.0.0.1:8081' })
+			.onSecondCall().resolves({ sessionId: 'session-new', mode: 'running', runtimeUrl: 'http://127.0.0.1:8081' });
+
+		const txtUploaderStub = {
+			upload: sinon.stub(),
+			stopExecution: sinon.stub().callsFake(async () => stopExecution.promise),
+		};
+		txtUploaderStub.upload
+			.onFirstCall()
+			.callsFake(async (_code: string, onProgress?: (progress: any) => void) => {
+				onProgress?.({ stage: 'executing', progress: 60, message: 'Starting old program execution...' });
+				firstUploadStarted.resolve();
+				return firstUpload.promise;
+			})
+			.onSecondCall()
+			.callsFake(async (_code: string, onProgress?: (progress: any) => void) => {
+				onProgress?.({ stage: 'executing', progress: 60, message: 'Starting new program execution...' });
+				secondUploadStarted.resolve();
+				return secondUpload.promise;
+			});
+
+		(messageHandler as any).txtVirtualControlRuntimeService = runtimeServiceStub;
+		(messageHandler as any).txtUploader = txtUploaderStub;
+
+		const createUploadMessage = (operationId: string) => ({
+			command: 'txtUpload',
+			operationId,
+			code: 'if _txt_virtual_button_state("btn-1"):\n    print("hello")',
+			board: 'txt',
+			txtVirtualControls: {
+				schemaVersion: 1,
+				canvas: { mode: 'editing' },
+				controls: [
+					{
+						stableId: 'btn-1',
+						displayName: 'Start',
+						identifier: 'start',
+						kind: 'button',
+						position: { x: 24, y: 36 },
+						size: { width: 120, height: 48 },
+						style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+					},
+				],
+			},
+			virtualControlPreflight: {
+				valid: true,
+				invalidReferences: [],
+			},
+		});
+
+		const firstUploadPromise = messageHandler.handleMessage(createUploadMessage('op-old'));
+		await firstUploadStarted.promise;
+
+		const stopPromise = messageHandler.handleMessage({ command: 'txtStopExecution', operationId: 'op-old' });
+		assert(txtUploaderStub.stopExecution.calledOnce, 'stop request should be in flight before the old upload resolves');
+
+		firstUpload.resolve({ success: true, duration: 12 });
+		await firstUploadPromise;
+
+		const oldUploadResult = webviewMock.postMessage
+			.getCalls()
+			.find((call: any) => call.args[0].command === 'txtUploadResult' && call.args[0].operationId === 'op-old');
+		assert.strictEqual(oldUploadResult, undefined, 'old upload completion should wait for the stop flow instead of resetting the UI');
+
+		const secondUploadPromise = messageHandler.handleMessage(createUploadMessage('op-new'));
+		await secondUploadStarted.promise;
+
+		const newRunningIndex = webviewMock.postMessage
+			.getCalls()
+			.findIndex((call: any) =>
+				call.args[0].command === 'txtVirtualControlsExecutionStateChanged' &&
+				call.args[0].mode === 'running' &&
+				call.args[0].operationId === 'op-new'
+			);
+		assert(newRunningIndex >= 0, 'new upload should enter running mode');
+
+		stopExecution.resolve();
+		await stopPromise;
+
+		const messagesAfterNewRun = webviewMock.postMessage.getCalls().slice(newRunningIndex + 1).map((call: any) => call.args[0]);
+		assert.strictEqual(
+			messagesAfterNewRun.some((message: any) =>
+				message.command === 'txtVirtualControlsExecutionStateChanged' &&
+				message.mode === 'editing' &&
+				message.operationId === 'op-old'
+			),
+			false,
+			'old stop completion must not switch virtual controls back to editing after a new run starts'
+		);
+		assert.strictEqual(
+			messagesAfterNewRun.some((message: any) => message.command === 'txtExecutionStopped' && message.operationId === 'op-old'),
+			false,
+			'old stop completion must not publish a stopped event after a new run starts'
+		);
+
+		secondUpload.resolve({ success: true, duration: 34 });
+		await secondUploadPromise;
+
+		const newUploadResult = webviewMock.postMessage
+			.getCalls()
+			.find((call: any) => call.args[0].command === 'txtUploadResult' && call.args[0].operationId === 'op-new');
+		assert(newUploadResult, 'new upload result should still be delivered normally');
+	});
+
+	it('should clear TXT stopping operation when stopExecution rejects', async () => {
+		const upload = createDeferred<{ success: boolean; duration: number }>();
+		const uploadStarted = createDeferred<void>();
+		const txtUploaderStub = {
+			upload: sinon.stub().callsFake(async (_code: string, onProgress?: (progress: any) => void) => {
+				onProgress?.({ stage: 'executing', progress: 60, message: 'Starting program execution...' });
+				uploadStarted.resolve();
+				return upload.promise;
+			}),
+			stopExecution: sinon.stub().rejects(new Error('password lookup failed')),
+		};
+		(messageHandler as any).txtUploader = txtUploaderStub;
+
+		const uploadPromise = messageHandler.handleMessage({
+			command: 'txtUpload',
+			operationId: 'op-stop-fails',
+			code: 'print("hello")',
+			board: 'txt',
+			txtVirtualControls: {
+				schemaVersion: 1,
+				canvas: { mode: 'editing' },
+				controls: [],
+			},
+			virtualControlPreflight: {
+				valid: true,
+				invalidReferences: [],
+			},
+		});
+		await uploadStarted.promise;
+
+		await messageHandler.handleMessage({ command: 'txtStopExecution', operationId: 'op-stop-fails' });
+
+		assert.strictEqual(
+			(messageHandler as any).stoppingTxtExecutionOperationIds.has('op-stop-fails'),
+			false,
+			'stopping operation id should be cleared even when stopExecution rejects'
+		);
+		assert(
+			webviewMock.postMessage
+				.getCalls()
+				.some((call: any) => call.args[0].command === 'txtExecutionStopped' && call.args[0].operationId === 'op-stop-fails'),
+			'WebView should still receive a stopped notification so the TXT UI can reset'
+		);
+		assert(
+			webviewMock.postMessage
+				.getCalls()
+				.some((call: any) => call.args[0].command === 'txtTestResume' && call.args[0].operationId === 'op-stop-fails'),
+			'Test Panel polling should resume after a failed stop attempt'
+		);
+
+		upload.resolve({ success: true, duration: 12 });
+		await uploadPromise;
+
+		const staleUploadResult = webviewMock.postMessage
+			.getCalls()
+			.find((call: any) => call.args[0].command === 'txtUploadResult' && call.args[0].operationId === 'op-stop-fails');
+		assert.strictEqual(staleUploadResult, undefined, 'stopped upload completion should remain ignored after stop failure cleanup');
 	});
 
 	it('should handle prompt new variable message', async () => {

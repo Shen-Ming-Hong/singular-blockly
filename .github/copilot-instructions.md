@@ -228,5 +228,5 @@ Conventional Commits with scopes: `feat(blocks)`, `fix(webview)`, `i18n(ja)`, `c
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read `specs/055-txt-virtual-controls-theming/plan.md`
+shell commands, and other important information, read `specs/056-txt-m-output-redesign/plan.md`
 <!-- SPECKIT END -->

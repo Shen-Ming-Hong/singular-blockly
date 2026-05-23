@@ -10,6 +10,164 @@
 
 /** TXT Controller 積木色相 (200 = 青藍色) */
 const TXT_COLOR = 200;
+const TXT_M_OUTPUT_DEFAULT_VALUE = 512;
+
+const TXT_WARNING_KEYS = Object.freeze({
+	ORPHAN: 'txt-orphan',
+	M_OUTPUT_CONFLICT: 'txt-m-output-conflict',
+	VIRTUAL_CONTROL: 'txt-virtual-control',
+});
+
+function getTxtMessage(key, fallback) {
+	if (window.languageManager && typeof window.languageManager.getMessage === 'function') {
+		return window.languageManager.getMessage(key, fallback);
+	}
+	return fallback;
+}
+
+function setTxtBlockWarning(block, key, message) {
+	if (!block || typeof block.setWarningText !== 'function') {
+		return;
+	}
+
+	block.txtWarningMessages_ = block.txtWarningMessages_ || {};
+	if (message) {
+		block.txtWarningMessages_[key] = message;
+	} else {
+		delete block.txtWarningMessages_[key];
+	}
+
+	const warningText = Object.values(block.txtWarningMessages_).filter(Boolean).join('\n');
+	block.setWarningText(warningText || null);
+}
+
+window.TXT_WARNING_KEYS = window.TXT_WARNING_KEYS || TXT_WARNING_KEYS;
+window.setTxtBlockWarning = window.setTxtBlockWarning || setTxtBlockWarning;
+
+function getTxtMOutputValidation() {
+	return window.txtMOutputValidation || null;
+}
+
+function getTxtMOutputComponents() {
+	const validation = getTxtMOutputValidation();
+	return validation?.M_COMPONENTS || {
+		MOTOR: {
+			key: 'MOTOR',
+			displayMessageKey: 'TXT_COMPONENT_MOTOR',
+			requiresDirection: true,
+			valueLabelMessageKey: 'TXT_MOTOR_SPEED_SET',
+			generatorMode: 'signed-speed',
+		},
+		LAMP: {
+			key: 'LAMP',
+			displayMessageKey: 'TXT_COMPONENT_LAMP',
+			requiresDirection: false,
+			valueLabelMessageKey: 'TXT_LAMP_BRIGHTNESS',
+			generatorMode: 'unsigned-level',
+		},
+	};
+}
+
+function normalizeTxtMOutputComponent(componentValue) {
+	const validation = getTxtMOutputValidation();
+	if (validation && typeof validation.normalizeComponent === 'function') {
+		return validation.normalizeComponent(componentValue);
+	}
+
+	const rawValue = String(componentValue || '').trim().toUpperCase();
+	return Object.prototype.hasOwnProperty.call(getTxtMOutputComponents(), rawValue) ? rawValue : 'MOTOR';
+}
+
+function getTxtMOutputComponentMetadata(componentValue) {
+	const normalizedComponent = normalizeTxtMOutputComponent(componentValue);
+	return getTxtMOutputComponents()[normalizedComponent] || getTxtMOutputComponents().MOTOR;
+}
+
+function getTxtMOutputComponentOptions() {
+	return Object.values(getTxtMOutputComponents()).map(component => [
+		getTxtMessage(component.displayMessageKey, component.key),
+		component.key,
+	]);
+}
+
+function normalizeTxtMOutputDefaultNumber(value) {
+	const numericValue = Number(value);
+	return Number.isFinite(numericValue) ? numericValue : TXT_M_OUTPUT_DEFAULT_VALUE;
+}
+
+function getTxtMOutputShadowValue(block) {
+	if (!block || block.type !== 'math_number' || typeof block.getFieldValue !== 'function') {
+		return TXT_M_OUTPUT_DEFAULT_VALUE;
+	}
+	return normalizeTxtMOutputDefaultNumber(block.getFieldValue('NUM'));
+}
+
+function createTxtMOutputDefaultNumberShadow(value = TXT_M_OUTPUT_DEFAULT_VALUE) {
+	const numericValue = normalizeTxtMOutputDefaultNumber(value);
+	return Blockly.utils.xml.textToDom(`<shadow type="math_number"><field name="NUM">${numericValue}</field></shadow>`);
+}
+
+function setTxtMOutputDefaultNumberShadow(valueInput, value = TXT_M_OUTPUT_DEFAULT_VALUE) {
+	if (!valueInput || typeof valueInput.setShadowDom !== 'function') {
+		return;
+	}
+	valueInput.setShadowDom(createTxtMOutputDefaultNumberShadow(value));
+}
+
+function updateTxtMOutputShape(block, componentValue) {
+	const metadata = getTxtMOutputComponentMetadata(componentValue || block.getFieldValue('COMPONENT'));
+	const component = metadata.key;
+	const componentField = block.getField('COMPONENT');
+	if (componentField && block.getFieldValue('COMPONENT') !== component) {
+		componentField.setValue(component);
+	}
+
+	const directionValue = block.getFieldValue('DIRECTION') || 'FORWARD';
+	const speedInput = block.getInput('SPEED');
+	const targetBlock = speedInput?.connection?.targetBlock?.() || null;
+	const targetConnection = targetBlock && !targetBlock.isShadow() ? targetBlock.outputConnection : null;
+	const shadowValue = targetBlock && targetBlock.isShadow() ? getTxtMOutputShadowValue(targetBlock) : TXT_M_OUTPUT_DEFAULT_VALUE;
+
+	if (block.getInput('DIRECTION_ROW')) {
+		block.removeInput('DIRECTION_ROW', true);
+	}
+	if (block.getInput('SPEED')) {
+		block.removeInput('SPEED', true);
+	}
+
+	if (metadata.requiresDirection) {
+		block.appendDummyInput('DIRECTION_ROW')
+			.appendField(
+				new Blockly.FieldDropdown([
+					[getTxtMessage('TXT_DIRECTION_FORWARD', '正轉'), 'FORWARD'],
+					[getTxtMessage('TXT_DIRECTION_BACKWARD', '反轉'), 'BACKWARD'],
+				]),
+				'DIRECTION'
+			);
+		block.setFieldValue(directionValue, 'DIRECTION');
+	}
+
+	const valueInput = block.appendValueInput('SPEED')
+		.setCheck('Number')
+		.appendField(getTxtMessage(metadata.valueLabelMessageKey, metadata.requiresDirection ? '設定速度' : '亮度'));
+	setTxtMOutputDefaultNumberShadow(valueInput, shadowValue);
+	if (targetConnection) {
+		try {
+			valueInput.connection.connect(targetConnection);
+		} catch (error) {
+			// 若舊連線已不存在或不相容，Blockly 會自行保留積木為未連接狀態。
+		}
+	}
+}
+
+function txtMOutputOnchange(e) {
+	if (!this.workspace || this.workspace.isFlyout) { return; }
+	if (!e ||
+		e.type === Blockly.Events.FINISHED_LOADING ||
+		(e.type === Blockly.Events.BLOCK_CHANGE && e.blockId === this.id && e.name === 'COMPONENT')) {
+		this.updateShape_(this.getFieldValue('COMPONENT'));
+	}
+}
 
 // === 頂層容器積木 ===
 
@@ -63,8 +221,20 @@ Blockly.Blocks['txt_process'] = {
  */
 Blockly.Blocks['txt_motor_speed'] = {
 	init: function () {
-		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_MOTOR_SPEED', '馬達'))
+		const componentField = new Blockly.FieldDropdown(getTxtMOutputComponentOptions, function (componentValue) {
+			const normalizedComponent = normalizeTxtMOutputComponent(componentValue);
+			const sourceBlock = typeof this.getSourceBlock === 'function' ? this.getSourceBlock() : this.sourceBlock_;
+			if (sourceBlock?.workspace?.isFlyout) {
+				return normalizedComponent;
+			}
+			if (sourceBlock && typeof sourceBlock.updateShape_ === 'function') {
+				setTimeout(() => sourceBlock.updateShape_(normalizedComponent), 0);
+			}
+			return normalizedComponent;
+		});
+
+		this.appendDummyInput('MAIN')
+			.appendField(getTxtMessage('TXT_M_OUTPUT_PREFIX', '輸出'))
 			.appendField(
 				new Blockly.FieldDropdown([
 					['M1', '1'],
@@ -74,21 +244,17 @@ Blockly.Blocks['txt_motor_speed'] = {
 				]),
 				'MOTOR'
 			)
-			.appendField(
-				new Blockly.FieldDropdown([
-					[window.languageManager.getMessage('TXT_DIRECTION_FORWARD', '正轉'), 'FORWARD'],
-					[window.languageManager.getMessage('TXT_DIRECTION_BACKWARD', '反轉'), 'BACKWARD'],
-				]),
-				'DIRECTION'
-			)
-			.appendField(window.languageManager.getMessage('TXT_MOTOR_SPEED_SET', '設定速度'));
-		this.appendValueInput('SPEED').setCheck('Number');
+			.appendField(componentField, 'COMPONENT');
+		this.updateShape_('MOTOR');
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(TXT_COLOR);
-		this.setTooltip(window.languageManager.getMessage('TXT_MOTOR_SPEED_TOOLTIP', '設定指定馬達的速度 (0~512) 與方向'));
+		this.setTooltip(getTxtMessage('TXT_M_OUTPUT_TOOLTIP', '選擇 M 埠與元件類型，設定馬達速度或燈泡亮度（0~512）'));
 		this.setHelpUrl('');
+	},
+	updateShape_: function (componentValue) {
+		updateTxtMOutputShape(this, componentValue);
 	},
 };
 
@@ -98,7 +264,7 @@ Blockly.Blocks['txt_motor_speed'] = {
 Blockly.Blocks['txt_motor_stop'] = {
 	init: function () {
 		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('TXT_MOTOR_STOP', '停止馬達'))
+			.appendField(getTxtMessage('TXT_M_OUTPUT_STOP', '停止輸出'))
 			.appendField(
 				new Blockly.FieldDropdown([
 					['M1', '1'],
@@ -111,7 +277,7 @@ Blockly.Blocks['txt_motor_stop'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setColour(TXT_COLOR);
-		this.setTooltip(window.languageManager.getMessage('TXT_MOTOR_STOP_TOOLTIP', '停止指定馬達（速度設為 0）'));
+		this.setTooltip(getTxtMessage('TXT_M_OUTPUT_STOP_TOOLTIP', '停止指定 M 埠輸出（輸出值設為 0）'));
 		this.setHelpUrl('');
 	},
 };
@@ -292,19 +458,27 @@ function txtOrphanOnchange(e) {
 
 	const isInContext = window.isInAllowedContext(this);
 	if (isInContext) {
-		this.setWarningText(null);
+		window.setTxtBlockWarning(this, TXT_WARNING_KEYS.ORPHAN, null);
 	} else {
-		this.setWarningText(
-			window.languageManager.getMessage('TXT_ORPHAN_WARNING_MULTI') ||
-			'This block must be placed inside a "TXT Setup" or "TXT Process" block'
+		window.setTxtBlockWarning(
+			this,
+			TXT_WARNING_KEYS.ORPHAN,
+			getTxtMessage('TXT_ORPHAN_WARNING_MULTI', 'This block must be placed inside a "TXT Setup" or "TXT Process" block')
 		);
+	}
+}
+
+function txtStatementOnchange(e) {
+	txtOrphanOnchange.call(this, e);
+	if (this.type === 'txt_motor_speed') {
+		txtMOutputOnchange.call(this, e);
 	}
 }
 
 // 為所有 TXT statement 積木加入孤立警告
 ['txt_motor_speed', 'txt_motor_stop', 'txt_output', 'txt_wait', 'txt_stop_all'].forEach(function (blockType) {
 	if (Blockly.Blocks[blockType]) {
-		Blockly.Blocks[blockType].onchange = txtOrphanOnchange;
+		Blockly.Blocks[blockType].onchange = txtStatementOnchange;
 	}
 });
 

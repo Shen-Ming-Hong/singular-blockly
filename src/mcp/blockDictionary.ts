@@ -59,6 +59,7 @@ export interface BlockInput {
 	type: InputType;
 	label?: LocalizedStrings;
 	check?: string | string[];
+	default?: string | number | boolean;
 }
 
 export interface BlockOutput {
@@ -268,6 +269,7 @@ export interface FormattedBlockUsage {
 		type: InputType;
 		label?: string;
 		check?: string | string[];
+		default?: string | number | boolean;
 	}>;
 	output?: { type: string | string[] | null };
 	boards: string[];
@@ -306,6 +308,7 @@ export function formatBlockUsage(block: BlockDefinition, language: SupportedLoca
 			type: input.type,
 			label: input.label ? input.label[language] || input.label['en'] : undefined,
 			check: input.check,
+			default: input.default,
 		})),
 		output: block.output,
 		boards: block.boards,
@@ -628,6 +631,14 @@ export function generateBlockJsonTemplate(block: BlockDefinition, context: Block
 					}
 					const valueBlock = createValueBlock(contextValue);
 					if (valueBlock) {
+						template.inputs[input.name] = { block: valueBlock };
+					}
+				} else if (input.default !== undefined) {
+					const valueBlock = createValueBlock(input.default);
+					if (valueBlock) {
+						if (!template.inputs) {
+							template.inputs = {};
+						}
 						template.inputs[input.name] = { block: valueBlock };
 					}
 				} else {
