@@ -35,10 +35,6 @@ export function stripCssComments(source: string): string {
 	return source.replace(/\/\*[\s\S]*?\*\//g, '');
 }
 
-export function stripHtmlComments(source: string): string {
-	return source.replace(/<!--[\s\S]*?-->/g, '');
-}
-
 export function normalizeWhitespace(source: string): string {
 	return source.replace(/\s+/g, ' ').trim();
 }
@@ -49,7 +45,7 @@ export function escapeRegExp(value: string): string {
 
 export function getHtmlElementTag(source: string, id: string): string {
 	const pattern = new RegExp(`<[^>]+\\bid=["']${escapeRegExp(id)}["'][^>]*>`, 'i');
-	const match = stripHtmlComments(source).match(pattern);
+	const match = source.match(pattern);
 	if (!match) {
 		throw new Error(`找不到 HTML element id: ${id}`);
 	}
