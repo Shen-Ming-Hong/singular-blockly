@@ -8,6 +8,34 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.77.0] - 2026-05-23
+
+### ✨ 新功能 New Features
+
+- **TXT 虛擬控制主題一致性** (TXT virtual controls theme consistency)
+    - TXT 虛擬控制在亮色、暗色與高對比主題下，現在會同步更新 edit 與 preview 的 panel、canvas、button、inspector 與 readonly 狀態樣式，避免主題切換後仍殘留不一致的背景或低對比文字
+      TXT virtual controls now synchronize edit and preview panel, canvas, button, inspector, and readonly state styling across light, dark, and high-contrast themes, avoiding stale surfaces or low-contrast text after theme changes
+    - 新增亮色與暗色各自的可讀按鈕初始配色；當使用者尚未在目前主題手動調整時，按鈕會自動使用該主題的可讀預設外觀
+      Added readable light/dark default button styles; buttons now use the current theme's readable default appearance until the user customizes that theme
+    - 支援亮色與暗色主題各自保存手動按鈕背景色與文字色，切換主題不會覆蓋另一個主題的使用者設定
+      Supports separate manual button background/text colors for light and dark themes, so switching themes no longer overwrites the user's colors for the other theme
+
+### 🐛 修復 Bug Fixes
+
+- **TXT 虛擬控制暗色主題可讀性修正** (TXT virtual controls dark-theme readability fixes)
+    - 修正已開啟 TXT 虛擬控制面板時切換暗色主題，panel、canvas、識別字值與 inspector 輸入欄仍可能顯示亮色底或淡色文字的問題
+      Fixed cases where an already-open TXT virtual controls panel could keep light surfaces or faint text on the panel, canvas, identifier value, and inspector inputs after switching to dark theme
+    - 移除額外低對比／配色提示 UI，改以主題可讀初始色、主題別手動配色記錄與既有狀態/焦點 cue 維持可辨識性
+      Removed extra low-contrast/color-warning UI in favor of readable theme defaults, per-theme manual color records, and existing state/focus cues
+    - 修正 WebView 搜尋結果以 `innerHTML` 插入使用者可控文字的風險，改用安全的文字節點更新
+      Replaced a WebView search-result `innerHTML` insertion path with safe text-node updates for user-controlled text
+
+### 📝 文件 Documentation
+
+- **新增 TXT 虛擬控制主題 SDD 文件** (Add TXT virtual controls theming SDD)
+    - 新增 `specs/055-txt-virtual-controls-theming/` 的規格、計畫、研究紀錄、資料模型、契約、快速驗證與任務清單，並記錄手動驗收通過
+      Added the `specs/055-txt-virtual-controls-theming/` specification, plan, research notes, data model, contracts, quickstart, and tasks, including the completed manual validation record
+
 ## [0.76.1] - 2026-05-22
 
 ### 🔒 安全性修復 Security Fixes
