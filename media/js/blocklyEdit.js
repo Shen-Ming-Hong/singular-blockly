@@ -554,29 +554,21 @@ function normalizeTxtVirtualControlStyle(style) {
 		textColor: normalizeTxtVirtualControlColor(rawStyle.textColor, lightDefault.textColor),
 	};
 	const themeStyles = normalizeTxtVirtualControlThemeStyles(rawStyle, legacyStyle);
-	const effectiveStyle = getTxtVirtualControlEffectiveStyle({ ...legacyStyle, themeStyles }, currentTheme);
 
 	return {
-		...effectiveStyle,
+		...legacyStyle,
 		themeStyles,
 	};
 }
 
-function syncTxtVirtualControlStyleToTheme(control, theme = currentTheme) {
+function getTxtVirtualControlEffectiveStyleForControl(control, theme = currentTheme) {
 	if (!control || typeof control !== 'object') {
 		return TXT_VIRTUAL_CONTROL_DEFAULT_STYLE;
 	}
-	if (!control.style || typeof control.style !== 'object') {
-		control.style = normalizeTxtVirtualControlStyle({});
-	}
-	const effectiveStyle = getTxtVirtualControlEffectiveStyle(control.style, theme);
-	control.style.backgroundColor = effectiveStyle.backgroundColor;
-	control.style.textColor = effectiveStyle.textColor;
-	return effectiveStyle;
-}
-
-function syncTxtVirtualControlsDocumentToTheme(theme = currentTheme) {
-	(txtVirtualControlsState.document.controls || []).forEach(control => syncTxtVirtualControlStyleToTheme(control, theme));
+	const style = control.style && typeof control.style === 'object'
+		? control.style
+		: normalizeTxtVirtualControlStyle({});
+	return getTxtVirtualControlEffectiveStyle(style, theme);
 }
 
 function setTxtVirtualControlThemeStyle(control, patch) {
@@ -874,12 +866,12 @@ function renderTxtVirtualControlsInspector() {
 		elements.nameInput.disabled = isRunning;
 	}
 	if (elements.backgroundInput) {
-		const selectedStyle = syncTxtVirtualControlStyleToTheme(selectedControl);
+		const selectedStyle = getTxtVirtualControlEffectiveStyleForControl(selectedControl);
 		elements.backgroundInput.value = selectedStyle.backgroundColor;
 		elements.backgroundInput.disabled = isRunning;
 	}
 	if (elements.textInput) {
-		const selectedStyle = syncTxtVirtualControlStyleToTheme(selectedControl);
+		const selectedStyle = getTxtVirtualControlEffectiveStyleForControl(selectedControl);
 		elements.textInput.value = selectedStyle.textColor;
 		elements.textInput.disabled = isRunning;
 	}
@@ -902,7 +894,7 @@ function renderTxtVirtualControlsCanvas() {
 	elements.emptyState.classList.toggle('hidden', controls.length > 0);
 
 	controls.forEach(control => {
-		const effectiveStyle = syncTxtVirtualControlStyleToTheme(control);
+		const effectiveStyle = getTxtVirtualControlEffectiveStyleForControl(control);
 		const button = document.createElement('button');
 		button.type = 'button';
 		button.className = 'txt-virtual-control-button';
@@ -1268,7 +1260,6 @@ function collectTxtVirtualControlPreflight() {
 
 function applyTxtVirtualControlsDocument(document) {
 	txtVirtualControlsState.document = cloneTxtVirtualControlsDocument(document, { forceEditingMode: true });
-	syncTxtVirtualControlsDocumentToTheme();
 	txtVirtualControlsState.sessionId = null;
 	txtVirtualControlsState.pressedStates = {};
 	txtVirtualControlsState.activePressStableId = null;
@@ -3046,7 +3037,6 @@ function updateTheme(theme) {
 		}
 	}
 
-	syncTxtVirtualControlsDocumentToTheme(theme);
 	refreshTxtVirtualControlsUI();
 }
 

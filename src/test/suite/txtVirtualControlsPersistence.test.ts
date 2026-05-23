@@ -5,6 +5,7 @@
  */
 
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { WebViewMessageHandler } from '../../webview/messageHandler';
@@ -180,6 +181,27 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 		});
 		assert.strictEqual('obsoleteUiWarning' in normalizedDocument.controls[0], false);
 		assert.strictEqual('previewWarnings' in normalizedDocument.controls[0], false);
+	});
+
+	test('blocklyEdit should not write theme effective styles back during render', () => {
+		const source = fs.readFileSync(path.join(process.cwd(), 'media/js/blocklyEdit.js'), 'utf8');
+
+		assert.ok(
+			source.includes('function getTxtVirtualControlEffectiveStyleForControl'),
+			'edit renderer should resolve effective styles with a read-only helper'
+		);
+		assert.ok(
+			!source.includes('function syncTxtVirtualControlStyleToTheme'),
+			'edit renderer should not expose a sync helper that mutates persisted style fields'
+		);
+		assert.ok(
+			!source.includes('control.style.backgroundColor = effectiveStyle.backgroundColor'),
+			'theme rendering must not rewrite persisted backgroundColor'
+		);
+		assert.ok(
+			!source.includes('control.style.textColor = effectiveStyle.textColor'),
+			'theme rendering must not rewrite persisted textColor'
+		);
 	});
 
 	test('requestInitialState should recover malformed txtVirtualControls and send a normalized init payload', async () => {
