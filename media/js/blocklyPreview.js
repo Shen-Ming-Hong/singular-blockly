@@ -919,14 +919,6 @@ function showBoardWarning(message) {
 	// 建立警告元素
 	const warningEl = document.createElement('div');
 	warningEl.className = 'board-warning';
-	warningEl.style.cssText = `
-		background-color: #ffc107;
-		color: #212529;
-		padding: 8px 16px;
-		font-size: 13px;
-		text-align: center;
-		border-bottom: 1px solid #e0a800;
-	`;
 	warningEl.textContent = message;
 
 	// 插入到 preview-info 後面

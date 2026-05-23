@@ -14,6 +14,31 @@ body {
 }
 
 :root {
+	--editor-surface-bg: #ffffff;
+	--editor-surface-fg: #1e1e1e;
+	--editor-surface-border: rgba(0, 0, 0, 0.12);
+	--editor-modal-backdrop: rgba(0, 0, 0, 0.5);
+	--editor-field-bg: #ffffff;
+	--editor-field-fg: #1e1e1e;
+	--editor-field-border: rgba(0, 0, 0, 0.2);
+	--editor-field-placeholder-fg: #6a6a6a;
+	--editor-card-bg: #ffffff;
+	--editor-card-fg: #1e1e1e;
+	--editor-card-border: rgba(0, 0, 0, 0.14);
+	--editor-card-hover-border: #1976d2;
+	--editor-description-fg: #666666;
+	--editor-notice-bg: rgba(25, 118, 210, 0.1);
+	--editor-notice-fg: #174a7c;
+	--editor-notice-border: rgba(25, 118, 210, 0.28);
+	--editor-warning-bg: rgba(245, 166, 35, 0.16);
+	--editor-warning-fg: #4d3200;
+	--editor-warning-border: #c27a00;
+	--editor-status-ok-fg: #2e7d32;
+	--editor-status-error-fg: #c62828;
+	--editor-focus-ring: var(--vscode-focusBorder, #007acc);
+	--editor-scrollbar-track: #f1f1f1;
+	--editor-scrollbar-thumb: #c1c1c1;
+	--editor-scrollbar-thumb-hover: #a8a8a8;
 	--txt-virtual-controls-panel-bg: #ffffff;
 	--txt-virtual-controls-panel-fg: #1e1e1e;
 	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
@@ -29,44 +54,37 @@ body {
 	--txt-virtual-control-button-border: rgba(0, 0, 0, 0.28);
 	--txt-virtual-control-button-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
 	--txt-virtual-control-state-ring: var(--vscode-focusBorder, #007acc);
-	--txt-virtual-controls-warning-bg: var(--vscode-inputValidation-warningBackground, rgba(245, 166, 35, 0.16));
-	--txt-virtual-controls-warning-fg: var(--vscode-inputValidation-warningForeground, var(--vscode-editorWarning-foreground, inherit));
-	--txt-virtual-controls-warning-border: var(--vscode-inputValidation-warningBorder, #f5a623);
-}
-
-body.vscode-light {
-	--txt-virtual-controls-panel-bg: var(--vscode-sideBar-background, #ffffff);
-	--txt-virtual-controls-panel-fg: var(--vscode-sideBar-foreground, #1e1e1e);
-	--txt-virtual-controls-panel-border: var(--vscode-sideBar-border, rgba(0, 0, 0, 0.12));
-	--txt-virtual-controls-canvas-surface: var(--vscode-editor-background, #f8f8f8);
-	--txt-virtual-controls-description-fg: var(--vscode-descriptionForeground, #666666);
-	--txt-virtual-controls-field-bg: var(--vscode-input-background, #ffffff);
-	--txt-virtual-controls-field-fg: var(--vscode-input-foreground, #1e1e1e);
-	--txt-virtual-controls-field-border: var(--vscode-input-border, rgba(0, 0, 0, 0.2));
-	--txt-virtual-controls-code-bg: var(--vscode-textCodeBlock-background, rgba(0, 0, 0, 0.07));
-	--txt-virtual-controls-code-fg: var(--vscode-editor-foreground, #1e1e1e);
-	--txt-virtual-controls-code-border: var(--vscode-panel-border, rgba(0, 0, 0, 0.12));
-	--txt-virtual-control-button-border: var(--vscode-contrastBorder, rgba(0, 0, 0, 0.28));
-}
-
-body.vscode-dark {
-	--txt-virtual-controls-panel-bg: var(--vscode-sideBar-background, #252526);
-	--txt-virtual-controls-panel-fg: var(--vscode-sideBar-foreground, #cccccc);
-	--txt-virtual-controls-panel-border: var(--vscode-sideBar-border, rgba(255, 255, 255, 0.16));
-	--txt-virtual-controls-canvas-surface: var(--vscode-editor-background, #1e1e1e);
-	--txt-virtual-controls-description-fg: var(--vscode-descriptionForeground, #a6a6a6);
-	--txt-virtual-controls-field-bg: var(--vscode-input-background, #313131);
-	--txt-virtual-controls-field-fg: var(--vscode-input-foreground, #f0f0f0);
-	--txt-virtual-controls-field-border: var(--vscode-input-border, rgba(255, 255, 255, 0.24));
-	--txt-virtual-controls-code-bg: var(--vscode-textCodeBlock-background, rgba(255, 255, 255, 0.12));
-	--txt-virtual-controls-code-fg: var(--vscode-editor-foreground, #f0f0f0);
-	--txt-virtual-controls-code-border: var(--vscode-panel-border, rgba(255, 255, 255, 0.2));
-	--txt-virtual-controls-grid-line: rgba(255, 255, 255, 0.08);
-	--txt-virtual-control-button-border: var(--vscode-contrastBorder, rgba(255, 255, 255, 0.36));
-	--txt-virtual-control-button-shadow: 0 4px 12px rgba(0, 0, 0, 0.38);
+	--txt-virtual-controls-warning-bg: var(--editor-warning-bg);
+	--txt-virtual-controls-warning-fg: var(--editor-warning-fg);
+	--txt-virtual-controls-warning-border: var(--editor-warning-border);
 }
 
 body.theme-light {
+	color-scheme: light;
+	--editor-surface-bg: #ffffff;
+	--editor-surface-fg: #1e1e1e;
+	--editor-surface-border: rgba(0, 0, 0, 0.12);
+	--editor-modal-backdrop: rgba(0, 0, 0, 0.5);
+	--editor-field-bg: #ffffff;
+	--editor-field-fg: #1e1e1e;
+	--editor-field-border: rgba(0, 0, 0, 0.2);
+	--editor-field-placeholder-fg: #6a6a6a;
+	--editor-card-bg: #ffffff;
+	--editor-card-fg: #1e1e1e;
+	--editor-card-border: rgba(0, 0, 0, 0.14);
+	--editor-card-hover-border: #1976d2;
+	--editor-description-fg: #666666;
+	--editor-notice-bg: rgba(25, 118, 210, 0.1);
+	--editor-notice-fg: #174a7c;
+	--editor-notice-border: rgba(25, 118, 210, 0.28);
+	--editor-warning-bg: rgba(245, 166, 35, 0.16);
+	--editor-warning-fg: #4d3200;
+	--editor-warning-border: #c27a00;
+	--editor-status-ok-fg: #2e7d32;
+	--editor-status-error-fg: #c62828;
+	--editor-scrollbar-track: #f1f1f1;
+	--editor-scrollbar-thumb: #c1c1c1;
+	--editor-scrollbar-thumb-hover: #a8a8a8;
 	--txt-virtual-controls-panel-bg: #ffffff;
 	--txt-virtual-controls-panel-fg: #1e1e1e;
 	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
@@ -84,6 +102,31 @@ body.theme-light {
 }
 
 body.theme-dark {
+	color-scheme: dark;
+	--editor-surface-bg: #333333;
+	--editor-surface-fg: #e0e0e0;
+	--editor-surface-border: #555555;
+	--editor-modal-backdrop: rgba(0, 0, 0, 0.62);
+	--editor-field-bg: #333333;
+	--editor-field-fg: #e0e0e0;
+	--editor-field-border: #555555;
+	--editor-field-placeholder-fg: #aaaaaa;
+	--editor-card-bg: #252526;
+	--editor-card-fg: #e0e0e0;
+	--editor-card-border: #555555;
+	--editor-card-hover-border: #8ab4f8;
+	--editor-description-fg: #b8b8b8;
+	--editor-notice-bg: rgba(138, 180, 248, 0.14);
+	--editor-notice-fg: #d8e6ff;
+	--editor-notice-border: rgba(138, 180, 248, 0.34);
+	--editor-warning-bg: rgba(255, 202, 40, 0.16);
+	--editor-warning-fg: #ffe9a8;
+	--editor-warning-border: #ffca28;
+	--editor-status-ok-fg: #81c784;
+	--editor-status-error-fg: #ff8a80;
+	--editor-scrollbar-track: #333333;
+	--editor-scrollbar-thumb: #666666;
+	--editor-scrollbar-thumb-hover: #888888;
 	--txt-virtual-controls-panel-bg: #252526;
 	--txt-virtual-controls-panel-fg: #cccccc;
 	--txt-virtual-controls-panel-border: rgba(255, 255, 255, 0.16);
@@ -102,10 +145,35 @@ body.theme-dark {
 
 body.vscode-high-contrast,
 body.vscode-high-contrast-light {
-	--txt-virtual-controls-panel-bg: var(--vscode-sideBar-background, Canvas);
-	--txt-virtual-controls-panel-fg: var(--vscode-sideBar-foreground, CanvasText);
+	--editor-surface-bg: Canvas;
+	--editor-surface-fg: CanvasText;
+	--editor-surface-border: CanvasText;
+	--editor-modal-backdrop: rgba(0, 0, 0, 0.75);
+	--editor-field-bg: Field;
+	--editor-field-fg: FieldText;
+	--editor-field-border: CanvasText;
+	--editor-field-placeholder-fg: GrayText;
+	--editor-card-bg: Canvas;
+	--editor-card-fg: CanvasText;
+	--editor-card-border: CanvasText;
+	--editor-card-hover-border: Highlight;
+	--editor-description-fg: CanvasText;
+	--editor-notice-bg: Canvas;
+	--editor-notice-fg: CanvasText;
+	--editor-notice-border: CanvasText;
+	--editor-warning-bg: Canvas;
+	--editor-warning-fg: CanvasText;
+	--editor-warning-border: Highlight;
+	--editor-status-ok-fg: CanvasText;
+	--editor-status-error-fg: CanvasText;
+	--editor-focus-ring: var(--vscode-contrastActiveBorder, Highlight);
+	--editor-scrollbar-track: Canvas;
+	--editor-scrollbar-thumb: CanvasText;
+	--editor-scrollbar-thumb-hover: Highlight;
+	--txt-virtual-controls-panel-bg: Canvas;
+	--txt-virtual-controls-panel-fg: CanvasText;
 	--txt-virtual-controls-panel-border: var(--vscode-contrastBorder, CanvasText);
-	--txt-virtual-controls-canvas-surface: var(--vscode-editor-background, Canvas);
+	--txt-virtual-controls-canvas-surface: Canvas;
 	--txt-virtual-controls-description-fg: CanvasText;
 	--txt-virtual-controls-field-bg: Field;
 	--txt-virtual-controls-field-fg: FieldText;
@@ -117,6 +185,8 @@ body.vscode-high-contrast-light {
 	--txt-virtual-control-button-border: var(--vscode-contrastBorder, CanvasText);
 	--txt-virtual-control-button-shadow: none;
 	--txt-virtual-control-state-ring: var(--vscode-contrastActiveBorder, Highlight);
+	--txt-virtual-controls-warning-bg: Canvas;
+	--txt-virtual-controls-warning-fg: CanvasText;
 	--txt-virtual-controls-warning-border: var(--vscode-contrastActiveBorder, Highlight);
 }
 
@@ -135,8 +205,9 @@ body.preview-mode {
 	position: fixed;
 	top: 15px;
 	left: 15px;
-	background-color: rgba(255, 255, 255, 0.9);
-	color: #333;
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+	border: 1px solid var(--editor-card-border);
 	padding: 12px 18px;
 	border-radius: 8px;
 	z-index: 2000;
@@ -153,11 +224,6 @@ body.preview-mode {
 	opacity: 1;
 }
 
-body.theme-dark .preview-info {
-	background-color: rgba(50, 50, 50, 0.9);
-	color: #f0f0f0;
-}
-
 .preview-info-content {
 	display: flex;
 	flex-direction: column;
@@ -172,16 +238,13 @@ body.theme-dark .preview-info {
 }
 
 .preview-badge {
-	background-color: #3f51b5;
-	color: white;
+	background-color: var(--editor-notice-bg);
+	color: var(--editor-notice-fg);
+	border: 1px solid var(--editor-notice-border);
 	font-size: 12px;
 	padding: 2px 8px;
 	border-radius: 4px;
 	margin-left: 8px;
-}
-
-body.theme-dark .preview-badge {
-	background-color: #5c6bc0;
 }
 
 .preview-subtitle {
@@ -194,39 +257,51 @@ body.theme-dark .preview-badge {
 }
 
 .preview-blockly-area {
+	background-color: var(--editor-surface-bg);
 	border-top: none;
 }
 
 /* 預覽模式控制容器樣式 */
-.preview-controls {
+body.preview-mode .preview-controls {
 	display: flex;
 	justify-content: center; /* 水平置中 */
 	align-items: center;
 	padding: 6px;
 	width: auto;
 	min-width: 60px;
-	background-color: rgba(255, 255, 255, 0.9);
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+	border: 1px solid var(--editor-card-border);
 	backdrop-filter: blur(5px);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 深色模式下的預覽控制容器和按鈕 */
-body.theme-dark .preview-controls {
-	background-color: rgba(50, 50, 50, 0.9);
-	color: #e0e0e0;
+body.preview-mode .preview-controls #themeToggle {
+	background-color: var(--editor-field-bg);
+	color: var(--editor-field-fg);
+	border: 1px solid var(--editor-field-border);
 }
 
-body.theme-dark .preview-controls #themeToggle {
-	background-color: #444444;
-	color: #e0e0e0;
+body.preview-mode .preview-controls #themeToggle:hover {
+	background-color: var(--editor-notice-bg);
 }
 
-body.theme-dark .preview-controls #themeToggle:hover {
-	background-color: #555555;
+body.preview-mode .preview-controls #themeToggle:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
 }
 
-body.theme-dark .preview-controls .theme-icon {
-	color: #e0e0e0;
+body.preview-mode .preview-controls .theme-icon {
+	color: currentColor;
+}
+
+.board-warning {
+	background-color: var(--editor-warning-bg);
+	color: var(--editor-warning-fg);
+	border-bottom: 1px solid var(--editor-warning-border);
+	padding: 8px 16px;
+	font-size: 13px;
+	text-align: center;
 }
 
 .container {
@@ -310,8 +385,8 @@ body.theme-dark .preview-controls .theme-icon {
 		90deg,
 		transparent 0,
 		transparent 3px,
-		var(--vscode-panel-border, rgba(0, 0, 0, 0.14)) 3px,
-		var(--vscode-panel-border, rgba(0, 0, 0, 0.14)) 7px,
+		var(--txt-virtual-controls-panel-border) 3px,
+		var(--txt-virtual-controls-panel-border) 7px,
 		transparent 7px,
 		transparent 100%
 	);
@@ -319,11 +394,11 @@ body.theme-dark .preview-controls .theme-icon {
 
 .txt-virtual-controls-splitter.open:hover,
 body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
-	background-color: var(--vscode-list-hoverBackground, rgba(0, 122, 204, 0.08));
+	background-color: var(--editor-notice-bg);
 }
 
 .txt-virtual-controls-panel.has-invalid-references {
-	box-shadow: inset 3px 0 0 var(--vscode-inputValidation-warningBorder, #f5a623);
+	box-shadow: inset 3px 0 0 var(--txt-virtual-controls-warning-border);
 }
 
 .txt-virtual-controls-panel-header {
@@ -352,20 +427,29 @@ body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
 	border-radius: 999px;
 	font-size: 0.75rem;
 	font-weight: 600;
-	background: var(--vscode-badge-background, rgba(0, 0, 0, 0.08));
-	color: var(--vscode-badge-foreground, inherit);
+	background: var(--editor-notice-bg);
+	color: var(--editor-notice-fg);
+	border: 1px solid var(--editor-notice-border);
 }
 
 .txt-virtual-controls-mode-badge.running {
-	background: var(--vscode-debugIcon-startForeground, #2e7d32);
+	background: var(--editor-status-ok-fg);
 	color: #ffffff;
+	border-color: var(--editor-status-ok-fg);
 	box-shadow: 0 0 0 1px var(--txt-virtual-control-state-ring);
 }
 
-body.theme-dark .txt-virtual-controls-mode-badge.running,
-body.vscode-dark .txt-virtual-controls-mode-badge.running {
+body.theme-dark .txt-virtual-controls-mode-badge.running {
 	background: #ffca28;
 	color: #1f1f1f;
+	border-color: #ffca28;
+}
+
+body.vscode-high-contrast .txt-virtual-controls-mode-badge.running,
+body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
+	background: Highlight;
+	color: HighlightText;
+	border-color: Highlight;
 }
 
 .txt-virtual-controls-canvas.running {
@@ -858,8 +942,8 @@ body.preview-mode .txt-preview-readonly-panel .txt-virtual-controls-panel-header
 }
 
 body.preview-mode .txt-preview-readonly-panel .txt-virtual-controls-mode-badge {
-	background: var(--vscode-badge-background, #3f51b5);
-	color: var(--vscode-badge-foreground, #ffffff);
+	background: var(--editor-notice-bg);
+	color: var(--editor-notice-fg);
 }
 
 body.preview-mode .txt-preview-canvas {
@@ -868,6 +952,30 @@ body.preview-mode .txt-preview-canvas {
 	overflow: auto;
 	cursor: default;
 	scrollbar-width: thin;
+	scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track);
+}
+
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar {
+	width: 12px;
+	height: 12px;
+}
+
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track {
+	background: var(--editor-scrollbar-track);
+}
+
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb {
+	background: var(--editor-scrollbar-thumb);
+	border: 2px solid var(--editor-scrollbar-track);
+	border-radius: 6px;
+}
+
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover {
+	background: var(--editor-scrollbar-thumb-hover);
+}
+
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner {
+	background: var(--editor-scrollbar-track);
 }
 
 body.preview-mode .txt-preview-canvas:focus-visible {
@@ -896,7 +1004,7 @@ body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button:focus-
 }
 
 body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button.recovered {
-	outline: 2px dashed var(--vscode-inputValidation-warningBorder, #f5a623);
+	outline: 2px dashed var(--txt-virtual-controls-warning-border);
 	outline-offset: 2px;
 }
 
@@ -920,8 +1028,9 @@ body.preview-mode .txt-preview-readonly-panel .txt-virtual-control-button.recove
 }
 
 .txt-preview-warning-item.info {
-	background: var(--vscode-textBlockQuote-background, rgba(127, 127, 127, 0.12));
-	border-color: var(--vscode-panel-border, rgba(0, 0, 0, 0.14));
+	background: var(--editor-notice-bg);
+	color: var(--editor-notice-fg);
+	border-color: var(--editor-notice-border);
 }
 
 body.preview-mode .txt-preview-readonly-splitter.open {
@@ -929,8 +1038,20 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 }
 
 @media (forced-colors: active) {
+	.txt-connection-modal-content,
+	.txt-connection-input,
+	.preview-info,
+	.preview-controls,
+	.preview-controls #themeToggle,
+	.preview-badge,
+	.board-warning,
+	.sample-card,
+	.sample-offline-notice,
+	.sample-empty-notice,
 	.txt-virtual-controls-panel,
+	.txt-preview-canvas,
 	.txt-virtual-controls-canvas,
+	.txt-virtual-controls-mode-badge,
 	.txt-preview-warning-item,
 	.txt-virtual-control-button {
 		forced-color-adjust: auto;
@@ -938,6 +1059,8 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 		box-shadow: none;
 	}
 
+	.txt-connection-input:focus-visible,
+	.preview-controls #themeToggle:focus-visible,
 	.txt-virtual-control-button:focus-visible,
 	.txt-virtual-control-button.selected {
 		outline-color: Highlight;
@@ -1189,8 +1312,9 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	}
 
 #txtVirtualControlsToggle.has-invalid-references {
-	background-color: var(--vscode-inputValidation-warningBackground, #f5a623);
-	color: var(--vscode-inputValidation-warningForeground, #1e1e1e);
+	background-color: var(--editor-warning-bg);
+	color: var(--editor-warning-fg);
+	box-shadow: 0 0 0 2px var(--editor-warning-border);
 	}
 
 #txtConfigButton,
@@ -1234,6 +1358,68 @@ body.txt-virtual-controls-resizing * {
 	background-color: #e65100;
 }
 
+.txt-connection-modal-content {
+	max-width: 520px;
+}
+
+.txt-connection-form-grid {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 8px 12px;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.txt-connection-form-grid label {
+	color: var(--editor-surface-fg);
+	font-weight: 600;
+}
+
+.txt-connection-input {
+	background: var(--editor-field-bg);
+	color: var(--editor-field-fg);
+	border: 1px solid var(--editor-field-border);
+	padding: 4px 8px;
+	border-radius: 4px;
+	min-width: 0;
+}
+
+.txt-connection-input::placeholder {
+	color: var(--editor-field-placeholder-fg);
+}
+
+.txt-connection-input:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.txt-connection-actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.txt-connection-action-button {
+	padding: 4px 12px;
+}
+
+.txt-connection-status {
+	font-size: 0.85em;
+	color: var(--editor-description-fg);
+}
+
+.txt-connection-hint {
+	margin: 8px 0 0;
+	font-size: 0.8rem;
+	line-height: 1.45;
+	color: var(--editor-description-fg);
+}
+
+.txt-connection-hint-success {
+	color: var(--editor-status-ok-fg);
+}
+
 /* 範例瀏覽器模態樣式 */
 .sample-modal-content {
 	max-width: 720px;
@@ -1242,8 +1428,9 @@ body.txt-virtual-controls-resizing * {
 }
 
 .sample-offline-notice {
-	background-color: var(--vscode-inputValidation-warningBackground, #f5a623);
-	color: var(--vscode-inputValidation-warningForeground, #1e1e1e);
+	background-color: var(--editor-warning-bg);
+	color: var(--editor-warning-fg);
+	border: 1px solid var(--editor-warning-border);
 	padding: 8px 14px;
 	border-radius: 4px;
 	margin-bottom: 12px;
@@ -1256,15 +1443,16 @@ body.txt-virtual-controls-resizing * {
 	align-items: center;
 	justify-content: center;
 	padding: 32px 0;
+	color: var(--editor-description-fg);
 }
 
 /* TXT Controller 連線狀態樣式 */
 .txt-status-ok {
-	color: var(--vscode-terminal-ansiGreen, #4ec9b0);
+	color: var(--editor-status-ok-fg);
 }
 
 .txt-status-error {
-	color: var(--vscode-inputValidation-errorForeground, #f48771);
+	color: var(--editor-status-error-fg);
 }
 
 /* ── TXT I/O Test Panel Dialog ─────────────────────────────────────────── */
@@ -1508,10 +1696,9 @@ body.txt-virtual-controls-resizing * {
 	font-size: 0.85em;
 	font-weight: 700;
 	letter-spacing: 0.04em;
-	opacity: 0.7;
 	padding: 12px 0 8px;
 	border: none;
-	border-bottom: 1px solid var(--vscode-panel-border, #454545);
+	border-bottom: 1px solid var(--editor-card-border);
 	margin-bottom: 12px;
 	cursor: pointer;
 	user-select: none;
@@ -1520,7 +1707,7 @@ body.txt-virtual-controls-resizing * {
 	justify-content: space-between;
 	width: 100%;
 	background: transparent;
-	color: inherit;
+	color: var(--editor-description-fg);
 	text-align: left;
 }
 
@@ -1546,18 +1733,22 @@ body.txt-virtual-controls-resizing * {
 }
 
 .sample-card {
-	border: 1px solid var(--vscode-panel-border, #454545);
+	border: 1px solid var(--editor-card-border);
 	border-radius: 8px;
 	padding: 16px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	background-color: var(--vscode-editor-background, #1e1e1e);
-	transition: border-color 0.2s;
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+	transition:
+		border-color 0.2s,
+		box-shadow 0.2s;
 }
 
 .sample-card:hover {
-	border-color: var(--vscode-focusBorder, #007acc);
+	border-color: var(--editor-card-hover-border);
+	box-shadow: 0 0 0 1px var(--editor-card-hover-border);
 }
 
 .sample-card-title {
@@ -1567,7 +1758,7 @@ body.txt-virtual-controls-resizing * {
 
 .sample-card-description {
 	font-size: 0.82em;
-	opacity: 0.75;
+	color: var(--editor-description-fg);
 	flex: 1;
 }
 
@@ -1579,7 +1770,7 @@ body.txt-virtual-controls-resizing * {
 .sample-empty-notice {
 	text-align: center;
 	padding: 32px 0;
-	opacity: 0.6;
+	color: var(--editor-description-fg);
 	font-size: 0.9em;
 }
 
@@ -1591,7 +1782,7 @@ body.txt-virtual-controls-resizing * {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: var(--editor-modal-backdrop);
 	z-index: 2000;
 	overflow-y: auto;
 }
@@ -1601,7 +1792,9 @@ body.txt-virtual-controls-resizing * {
 	margin: 10% auto;
 	width: 80%;
 	max-width: 600px;
-	background-color: white;
+	background-color: var(--editor-surface-bg);
+	color: var(--editor-surface-fg);
+	border: 1px solid var(--editor-surface-border);
 	border-radius: 8px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 	animation: modal-appear 0.3s ease;
@@ -1631,25 +1824,25 @@ body.txt-virtual-controls-resizing * {
 	justify-content: space-between;
 	align-items: center;
 	padding: 15px 20px;
-	border-bottom: 1px solid #e0e0e0;
+	border-bottom: 1px solid var(--editor-surface-border);
 }
 
 .modal-header h2 {
 	margin: 0;
 	font-size: 1.5rem;
-	color: #333;
+	color: var(--editor-surface-fg);
 }
 
 .modal-close {
 	font-size: 1.8rem;
 	font-weight: bold;
-	color: #888;
+	color: var(--editor-description-fg);
 	cursor: pointer;
 	transition: color 0.2s;
 }
 
 .modal-close:hover {
-	color: #333;
+	color: var(--editor-surface-fg);
 }
 
 .modal-body {

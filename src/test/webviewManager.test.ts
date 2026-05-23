@@ -268,6 +268,32 @@ describe('WebView Manager', () => {
 		);
 	});
 
+	(skipInCoverage ? it.skip : it)('should inject stored editor theme into initial theme and body class', async () => {
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
+		fsMock.addFile('/mock/workspace/.vscode/settings.json', JSON.stringify({ 'singular-blockly.theme': 'dark' }));
+
+		const webviewMock = {
+			html: '',
+			onDidReceiveMessage: sinon.stub(),
+			postMessage: sinon.stub().resolves(),
+			asWebviewUri: sinon.stub().callsFake((uri: any) => {
+				return `https://mock-webview/${uri.fsPath.replace(/\\/g, '/')}`;
+			}),
+		};
+
+		vscodeMock.window.createWebviewPanel = sinon.stub().returns({
+			webview: webviewMock,
+			onDidDispose: sinon.stub(),
+			reveal: sinon.stub(),
+		});
+
+		await webViewManager.createAndShowWebView();
+
+		assert(webviewMock.html.includes("window.initialTheme = 'dark'"));
+		assert(webviewMock.html.includes('class="theme-dark"'));
+		assert(!webviewMock.html.includes('class="theme-light"'));
+	});
+
 	it('should handle panel disposal', async () => {
 		// 設定 VS Code 工作區
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
