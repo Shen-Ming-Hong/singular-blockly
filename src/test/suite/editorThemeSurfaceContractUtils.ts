@@ -75,6 +75,35 @@ export function collectCssRuleBlocks(source: string, selectorPatterns: RegExp[])
 	return selectorPatterns.flatMap(pattern => getCssRuleBlocks(source, pattern)).join('\n');
 }
 
+export function extractBalancedCssBlock(source: string, startPattern: RegExp, context: string): string {
+	const css = stripCssComments(source);
+	startPattern.lastIndex = 0;
+	const match = startPattern.exec(css);
+	if (!match) {
+		throw new Error(`${context} 找不到 CSS block 起始 pattern: ${startPattern}`);
+	}
+
+	const openBraceIndex = css.indexOf('{', match.index);
+	if (openBraceIndex < 0) {
+		throw new Error(`${context} 找不到 CSS block 起始大括號`);
+	}
+
+	let depth = 0;
+	for (let index = openBraceIndex; index < css.length; index++) {
+		const character = css[index];
+		if (character === '{') {
+			depth++;
+		} else if (character === '}') {
+			depth--;
+			if (depth === 0) {
+				return css.slice(match.index, index + 1);
+			}
+		}
+	}
+
+	throw new Error(`${context} 找不到 CSS block 結束大括號`);
+}
+
 export function assertNoPatterns(source: string, forbiddenPatterns: RegExp[], context: string): void {
 	for (const pattern of forbiddenPatterns) {
 		pattern.lastIndex = 0;

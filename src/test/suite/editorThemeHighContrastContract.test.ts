@@ -7,6 +7,8 @@
 import assert = require('assert');
 import { describe, it } from 'mocha';
 import {
+	collectCssRuleBlocks,
+	extractBalancedCssBlock,
 	findDisallowedHostTokens,
 	readWorkspaceFile,
 	stripCssComments,
@@ -49,11 +51,11 @@ describe('Editor theme high contrast contract', () => {
 	});
 
 	it('covers P1 editor-owned surfaces in forced-colors overrides', () => {
-		const css = stripCssComments(readWorkspaceFile('media/css/blocklyEdit.css'));
-		const forcedColorsStart = css.indexOf('@media (forced-colors: active)');
-		const forcedColorsEnd = css.indexOf('\n#themeToggle', forcedColorsStart);
-		assert(forcedColorsStart >= 0 && forcedColorsEnd > forcedColorsStart, 'forced-colors override block must exist before toolbar styles');
-		const forcedColorsBlock = css.slice(forcedColorsStart, forcedColorsEnd);
+		const forcedColorsBlock = extractBalancedCssBlock(
+			readWorkspaceFile('media/css/blocklyEdit.css'),
+			/@media\s*\(\s*forced-colors\s*:\s*active\s*\)/,
+			'forced-colors override block'
+		);
 
 		for (const selector of REQUIRED_FORCED_COLORS_SELECTORS) {
 			assert(
@@ -61,5 +63,16 @@ describe('Editor theme high contrast contract', () => {
 				`forced-colors overrides must include ${selector}`
 			);
 		}
+	});
+
+	it('keeps TXT virtual controls running badge readable in VS Code high contrast themes', () => {
+		const css = readWorkspaceFile('media/css/blocklyEdit.css');
+		const runningBadgeBlocks = collectCssRuleBlocks(css, [
+			/body\.vscode-high-contrast(?:-light)?\s+\.txt-virtual-controls-mode-badge\.running/,
+		]);
+
+		assert.match(runningBadgeBlocks, /background\s*:\s*Highlight\b/);
+		assert.match(runningBadgeBlocks, /color\s*:\s*HighlightText\b/);
+		assert.match(runningBadgeBlocks, /border-color\s*:\s*Highlight\b/);
 	});
 });

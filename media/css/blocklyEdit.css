@@ -445,6 +445,13 @@ body.theme-dark .txt-virtual-controls-mode-badge.running {
 	border-color: #ffca28;
 }
 
+body.vscode-high-contrast .txt-virtual-controls-mode-badge.running,
+body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
+	background: Highlight;
+	color: HighlightText;
+	border-color: Highlight;
+}
+
 .txt-virtual-controls-canvas.running {
 	border-style: solid;
 	border-color: var(--txt-virtual-control-state-ring);

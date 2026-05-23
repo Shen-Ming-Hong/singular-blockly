@@ -26,7 +26,7 @@
 | npm run lint | PASS | `eslint src`；exit 0 |
 | npm test | PASS | 765 passing、1 pending；exit 0 |
 | WebViewManager target test | PASS | `npx vscode-test --label unit --run out/test/webviewManager.test.js --grep "inject stored editor theme"`；exit 0（WebView Manager suite 28 passing） |
-| source-contract tests | PASS | `npm run compile-tests && npx mocha ...editorTheme*.test.js`；18 passing，exit 0；包含備份預覽 body theme ownership、preview chrome tokens、theme toggle focus ring、board warning class styling、TXT virtual controls scrollbar editor-owned token regression、高對比 forced-colors selectors |
+| source-contract tests | PASS | `npm run compile-tests && npx mocha ...editorTheme*.test.js`；19 passing，exit 0；包含備份預覽 body theme ownership、preview chrome tokens、theme toggle focus ring、board warning class styling、TXT virtual controls scrollbar editor-owned token regression、高對比 forced-colors selectors 與 TXT virtual controls running badge 可讀性 |
 | WebView preview target test | PASS | `npx vscode-test --label unit --run out/test/webviewPreview.test.js`；13 passing，exit 0；確認備份預覽載入與 TXT readonly preview flow 未受影響 |
 | npm run validate:i18n | PASS | 14/14 languages passed；0 errors，既有 length warnings 保留；本輪未變更 visible text |
 
