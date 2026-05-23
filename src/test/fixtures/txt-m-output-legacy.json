@@ -1,0 +1,49 @@
+{
+    "workspace": {
+        "blocks": {
+            "languageVersion": 0,
+            "blocks": [
+                {
+                    "type": "txt_setup",
+                    "id": "txt-setup-legacy",
+                    "x": 24,
+                    "y": 24,
+                    "deletable": false
+                },
+                {
+                    "type": "txt_process",
+                    "id": "txt-process-legacy",
+                    "x": 24,
+                    "y": 160,
+                    "fields": {
+                        "NAME": "legacy motor"
+                    },
+                    "inputs": {
+                        "DO": {
+                            "block": {
+                                "type": "txt_motor_speed",
+                                "id": "txt-motor-legacy-no-component",
+                                "fields": {
+                                    "MOTOR": "1",
+                                    "DIRECTION": "FORWARD"
+                                },
+                                "inputs": {
+                                    "SPEED": {
+                                        "shadow": {
+                                            "type": "math_number",
+                                            "id": "txt-motor-legacy-speed",
+                                            "fields": {
+                                                "NUM": 512
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "board": "txt"
+}

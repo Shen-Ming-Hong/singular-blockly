@@ -84,7 +84,40 @@ npm test
 3. 確認它的公開文案與行為沒有因本功能被重新命名或拆分。
 4. 若產生程式碼，確認 `txt_stop_all` 仍同時關閉所有 M 與 O。
 
+## 手動驗證 7：未來 M 元件 metadata 檢查
+
+1. 檢查 `media/js/txtMOutputValidation.js` 中的 `M_COMPONENTS` metadata。
+2. 確認每個 component 都宣告：顯示文字 key、是否需要方向欄位、數值文案、generator mode 與 shared-pin policy。
+3. 若未來新增 M 元件，應先新增 metadata 與測試，再決定是否需要新的 generator mode。
+4. 不應為新元件建立新的公開設定／停止 block type；應沿用 `txt_motor_speed` 與 `txt_motor_stop` 的 M 埠句型。
+5. 新元件若仍使用同一個 M 埠硬體腳位，應沿用既有同 M 埠 component conflict 與 M/O shared-pin conflict 規則。
+
 ## 自動化驗證重點
+
+### 本次 focused tests 執行紀錄
+
+- 2026-05-23：`npm run compile-tests && npx mocha --ui tdd out/test/suite/txtMOutputValidation.test.js out/test/suite/txtMOutputSharedPins.test.js out/test/suite/txtMOutputPreflight.test.js out/test/suite/txtMOutputBlockUi.test.js out/test/suite/txtMOutputMetadata.test.js out/test/suite/txtMOutputI18n.test.js out/test/suite/txtToolbox.test.js out/test/suite/txtWorkspaceFixtures.test.js out/test/suite/txt-multi-flow-generation.test.js`
+- 結果：40 passing（涵蓋 validation、shared-pin、preflight、UI、metadata、i18n、toolbox、fixtures 與 generator regression）。
+- 2026-05-23：`npm run compile-tests && npx mocha --ui tdd out/test/suite/txtToolbox.test.js out/test/suite/txtMOutputMetadata.test.js`
+- 結果：6 passing（補驗 toolbox 與 MCP block dictionary template 會為 `txt_motor_speed` 的 `SPEED` 放入預設數字 512）。
+- 2026-05-23：`npm run compile-tests && npx mocha --ui tdd out/test/suite/txtMOutputBlockUi.test.js out/test/suite/txtToolbox.test.js`
+- 結果：7 passing（補驗 `txt_motor_speed` dynamic shape 會為 `SPEED` 放入可替換的 `math_number(512)` shadow）。
+- 2026-05-23：headless Blockly 建立 `txt_motor_speed`，確認 `SPEED` 會自動接上 `math_number` shadow，`NUM = 512`，且 input check 維持 `Number`。
+- 2026-05-23：`npm run compile-tests && npx mocha --ui tdd out/test/suite/txtMOutputBlockUi.test.js out/test/suite/txtToolbox.test.js`
+- 結果：9 passing（補驗 dynamic shape 重建時不會把 toolbox/flyout 的 shadow 數字當成真實積木重接，且 flyout dropdown validator 不再排程延遲重建，避免輸出 M 積木在 toolbox 中變成空槽）。
+
+### 本次收尾驗證紀錄
+
+- 2026-05-23：`npm run validate:i18n` → PASS，14/14 非英文語系 0 errors（既有 length warnings 保留）。
+- 2026-05-23：`npm run generate:dictionary` → PASS，`src/mcp/block-dictionary.json` 已包含 `txt_motor_speed` 的 `COMPONENT` metadata 與 `txt_motor_stop` 的 generic stop metadata。
+- 2026-05-23：`npm run compile` → PASS。
+- 2026-05-23：`npm run lint` → PASS。
+- 2026-05-23：`npm test` → PASS，741 passing / 1 pending。
+
+### Manual matrix review note
+
+- 2026-05-23：本次在 headless 測試環境完成 manual matrix 的 source/contract 對照；未連接實體 TXT Controller，也未在 VS Code WebView 進行人工點擊流程。
+- 手動驗證 1~7 的步驟已對應到 focused tests 與 source contracts，未發現需要修正文案或步驟的不準確處。
 
 完成 implementation 後，至少應有以下測試覆蓋：
 
@@ -95,6 +128,7 @@ npm test
 - 只有實際共腳位的 M/O 組合才會觸發 blocking conflict
 - `txt_motor_stop` 維持「停止輸出」且不依賴元件推論
 - 15 語系新增 key 通過 `npm run validate:i18n`
+- metadata-driven 設計可支援未來 M 元件，不需要新增 lamp-specific 或其他元件專用 public block type
 
 ## 驗收完成條件
 

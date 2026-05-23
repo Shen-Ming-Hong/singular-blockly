@@ -30,6 +30,7 @@ desktop.ini
 
 # 暫存檔案
 *.log
+*.tmp
 .cache/
 media/toolbox/temp_toolbox.json
 media/toolbox/temp_toolbox_*.json

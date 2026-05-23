@@ -1,0 +1,72 @@
+{
+    "workspace": {
+        "blocks": {
+            "languageVersion": 0,
+            "blocks": [
+                {
+                    "type": "txt_setup",
+                    "id": "txt-setup-m-output",
+                    "x": 24,
+                    "y": 24,
+                    "deletable": false
+                },
+                {
+                    "type": "txt_process",
+                    "id": "txt-process-motor-lamp",
+                    "x": 24,
+                    "y": 160,
+                    "fields": {
+                        "NAME": "motor and lamp"
+                    },
+                    "inputs": {
+                        "DO": {
+                            "block": {
+                                "type": "txt_motor_speed",
+                                "id": "txt-motor-m1",
+                                "fields": {
+                                    "MOTOR": "1",
+                                    "COMPONENT": "MOTOR",
+                                    "DIRECTION": "FORWARD"
+                                },
+                                "inputs": {
+                                    "SPEED": {
+                                        "shadow": {
+                                            "type": "math_number",
+                                            "id": "txt-motor-m1-speed",
+                                            "fields": {
+                                                "NUM": 512
+                                            }
+                                        }
+                                    }
+                                },
+                                "next": {
+                                    "block": {
+                                        "type": "txt_motor_speed",
+                                        "id": "txt-lamp-m2",
+                                        "fields": {
+                                            "MOTOR": "2",
+                                            "COMPONENT": "LAMP",
+                                            "DIRECTION": "FORWARD"
+                                        },
+                                        "inputs": {
+                                            "SPEED": {
+                                                "shadow": {
+                                                    "type": "math_number",
+                                                    "id": "txt-lamp-m2-brightness",
+                                                    "fields": {
+                                                        "NUM": 256
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "board": "txt"
+}

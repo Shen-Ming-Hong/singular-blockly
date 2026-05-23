@@ -55,6 +55,12 @@ window.txtGenerator.inputConfigs_ = new Map();
 window.txtGenerator.motorPorts_ = new Set();
 
 /**
+ * M/O 輸出 usage metadata（供 generated-code diagnostics 與 validation summary 使用）
+ */
+window.txtGenerator.mOutputUsages_ = [];
+window.txtGenerator.oOutputUsages_ = [];
+
+/**
  * TXT 流程描述（函式名稱 / 顯示名稱）
  */
 window.txtGenerator.processDescriptors_ = [];
@@ -67,6 +73,8 @@ window.txtGenerator.reset = function () {
 	this.functions_.clear();
 	this.inputConfigs_.clear();
 	this.motorPorts_.clear();
+	this.mOutputUsages_ = [];
+	this.oOutputUsages_ = [];
 	this.processDescriptors_ = [];
 };
 
@@ -93,6 +101,59 @@ window.txtGenerator.addInputConfig = function (port, sensorType) {
  */
 window.txtGenerator.addMotorPort = function (port) {
 	this.motorPorts_.add(Number(port));
+};
+
+/**
+ * 記錄 M 輸出設定 usage。
+ * @param {number|string} port M 埠號（1~4）
+ * @param {string} component component key（MOTOR/LAMP）
+ * @param {string} blockId Blockly block id
+ */
+window.txtGenerator.addMOutputUsage = function (port, component, blockId) {
+	this.mOutputUsages_.push({
+		kind: 'm-output',
+		port: `M${Number(port)}`,
+		component: component || 'MOTOR',
+		blockId: blockId || '',
+	});
+};
+
+/**
+ * 記錄 M 停止 usage。
+ * @param {number|string} port M 埠號（1~4）
+ * @param {string} blockId Blockly block id
+ */
+window.txtGenerator.addMStopUsage = function (port, blockId) {
+	this.mOutputUsages_.push({
+		kind: 'm-stop',
+		port: `M${Number(port)}`,
+		component: null,
+		blockId: blockId || '',
+	});
+};
+
+/**
+ * 記錄 O 輸出 usage。
+ * @param {number|string} port O 埠號（1~8）
+ * @param {string} blockId Blockly block id
+ */
+window.txtGenerator.addOOutputUsage = function (port, blockId) {
+	this.oOutputUsages_.push({
+		kind: 'o-output',
+		oPort: `O${Number(port)}`,
+		blockId: blockId || '',
+	});
+};
+
+/**
+ * 取得目前 code generation 收集到的 M/O usage metadata。
+ * @returns {{mRecords: Array, oRecords: Array}}
+ */
+window.txtGenerator.getMOutputUsageMetadata = function () {
+	return {
+		mRecords: [...this.mOutputUsages_],
+		oRecords: [...this.oOutputUsages_],
+	};
 };
 
 /**

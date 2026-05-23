@@ -924,6 +924,7 @@ function renderTxtVirtualControlsPanel() {
 	}
 
 	const isTxtBoard = isTxtVirtualBoard(getCurrentBoardId());
+	const isRunning = txtVirtualControlsState.document.canvas.mode === 'running';
 	if (elements.toggleContainer) {
 		elements.toggleContainer.style.display = isTxtBoard ? 'flex' : 'none';
 	}
@@ -931,11 +932,21 @@ function renderTxtVirtualControlsPanel() {
 		setTxtVirtualControlsPanelOpen(false);
 		return;
 	}
+	elements.panel.classList.toggle('running', isRunning);
+	elements.panel.classList.toggle('editing', !isRunning);
+	if (elements.modeBadge) {
+		elements.modeBadge.classList.toggle('running', isRunning);
+		elements.modeBadge.classList.toggle('editing', !isRunning);
+	}
+	if (elements.canvas) {
+		elements.canvas.classList.toggle('running', isRunning);
+		elements.canvas.classList.toggle('editing', !isRunning);
+	}
 
 	applyTxtVirtualControlsPanelLayout();
 	updateTxtVirtualControlsTexts();
 	if (elements.addButton) {
-		elements.addButton.disabled = txtVirtualControlsState.document.canvas.mode === 'running';
+		elements.addButton.disabled = isRunning;
 	}
 	renderTxtVirtualControlsCanvas();
 	renderTxtVirtualControlsInspector();
@@ -1134,8 +1145,86 @@ function applyTxtVirtualButtonWarning(block, referenceMessage) {
 			? window.languageManager?.getMessage('TXT_ORPHAN_WARNING_MULTI') ||
 				'This block must be placed inside a "TXT Setup" or "TXT Process" block'
 			: '';
+	if (typeof window.setTxtBlockWarning === 'function') {
+		const warningKeys = window.TXT_WARNING_KEYS || {};
+		window.setTxtBlockWarning(block, warningKeys.VIRTUAL_CONTROL || 'txt-virtual-control', referenceMessage || null);
+		window.setTxtBlockWarning(block, warningKeys.ORPHAN || 'txt-orphan', orphanMessage || null);
+		return;
+	}
 	const warnings = [referenceMessage, orphanMessage].filter(Boolean);
 	block.setWarningText(warnings.length > 0 ? warnings.join('\n') : null);
+}
+
+function isTxtProgrammingLanguageActive() {
+	return window.currentProgrammingLanguage === 'txt' || window.currentBoard === 'txt';
+}
+
+function getTxtMOutputValidationApi() {
+	return window.txtMOutputValidation || null;
+}
+
+function buildTxtMOutputPreflightSummary(workspace) {
+	const validation = getTxtMOutputValidationApi();
+	if (!validation || typeof validation.buildPreflightSummary !== 'function') {
+		return {
+			conflicts: [],
+			warnings: [],
+			blockWarnings: {},
+			canGenerate: true,
+			canExport: true,
+			canUpload: true,
+		};
+	}
+
+	return validation.buildPreflightSummary(workspace, { messageProvider: window.languageManager });
+}
+
+function applyTxtMOutputConflictWarnings(workspace, mOutputValidation) {
+	if (!workspace || typeof window.setTxtBlockWarning !== 'function') {
+		return;
+	}
+
+	const warningKey = window.TXT_WARNING_KEYS?.M_OUTPUT_CONFLICT || 'txt-m-output-conflict';
+	const blocks = workspace.getAllBlocks(false);
+	const blockWarnings = mOutputValidation?.blockWarnings || {};
+	blocks.forEach(block => {
+		if (!block || !['txt_motor_speed', 'txt_motor_stop', 'txt_output'].includes(block.type)) {
+			return;
+		}
+		const warnings = blockWarnings[block.id] || [];
+		window.setTxtBlockWarning(block, warningKey, warnings.length > 0 ? warnings.join('\n') : null);
+	});
+}
+
+function getTxtMOutputBlockedMessage(mOutputValidation, fallbackKey, fallbackMessage) {
+	const warningText = (mOutputValidation?.warnings || []).filter(Boolean).join('\n');
+	if (warningText) {
+		return warningText;
+	}
+	return window.languageManager?.getMessage(fallbackKey, fallbackMessage) || fallbackMessage;
+}
+
+function validateTxtMOutputPreflight(workspace, action, options = {}) {
+	const mOutputValidation = buildTxtMOutputPreflightSummary(workspace);
+	applyTxtMOutputConflictWarnings(workspace, mOutputValidation);
+
+	if (!isTxtProgrammingLanguageActive()) {
+		return mOutputValidation;
+	}
+
+	const allowed = action === 'upload' ? mOutputValidation.canUpload : mOutputValidation.canExport && mOutputValidation.canGenerate;
+	if (!allowed && options.showToast !== false) {
+		const message = getTxtMOutputBlockedMessage(
+			mOutputValidation,
+			action === 'upload' ? 'TXT_M_OUTPUT_UPLOAD_BLOCKED' : 'TXT_M_OUTPUT_CODE_OUTPUT_BLOCKED',
+			action === 'upload'
+				? 'TXT M output conflict detected. Fix the highlighted M/O output blocks before running.'
+				: 'TXT M output conflict detected. Fix the highlighted M/O output blocks before generating code.'
+		);
+		toast.show(message, 'warning');
+	}
+
+	return mOutputValidation;
 }
 
 function refreshTxtVirtualButtonReferenceForBlock(block) {
@@ -1258,11 +1347,36 @@ function collectTxtVirtualControlPreflight() {
 	};
 }
 
-function applyTxtVirtualControlsDocument(document) {
+function replaceTxtVirtualControlsDocument(document, options = {}) {
+	const shouldPreserveExecutionMode = Boolean(
+		options.preserveExecutionMode && txtVirtualControlsState.document.canvas.mode === 'running'
+	);
+	const previousSessionId = txtVirtualControlsState.sessionId;
+	const previousPressedStates = { ...(txtVirtualControlsState.pressedStates || {}) };
+	const previousActivePressStableId = txtVirtualControlsState.activePressStableId;
+
 	txtVirtualControlsState.document = cloneTxtVirtualControlsDocument(document, { forceEditingMode: true });
-	txtVirtualControlsState.sessionId = null;
-	txtVirtualControlsState.pressedStates = {};
-	txtVirtualControlsState.activePressStableId = null;
+	const stableIds = new Set(txtVirtualControlsState.document.controls.map(control => control.stableId));
+
+	if (shouldPreserveExecutionMode && stableIds.size > 0) {
+		txtVirtualControlsState.document.canvas.mode = 'running';
+		txtVirtualControlsState.sessionId = previousSessionId;
+		txtVirtualControlsState.pressedStates = Object.fromEntries(
+			txtVirtualControlsState.document.controls.map(control => [control.stableId, Boolean(previousPressedStates[control.stableId])])
+		);
+		txtVirtualControlsState.activePressStableId =
+			previousActivePressStableId && stableIds.has(previousActivePressStableId) && previousPressedStates[previousActivePressStableId]
+				? previousActivePressStableId
+				: null;
+	} else {
+		txtVirtualControlsState.sessionId = null;
+		txtVirtualControlsState.pressedStates = {};
+		txtVirtualControlsState.activePressStableId = null;
+	}
+}
+
+function applyTxtVirtualControlsDocument(document, options = {}) {
+	replaceTxtVirtualControlsDocument(document, options);
 	if (!txtVirtualControlsState.document.controls.some(control => control.stableId === txtVirtualControlsState.selectedStableId)) {
 		txtVirtualControlsState.selectedStableId = txtVirtualControlsState.document.controls[0]?.stableId || null;
 	}
@@ -1270,7 +1384,11 @@ function applyTxtVirtualControlsDocument(document) {
 	renderTxtVirtualControlsPanel();
 }
 
-function setTxtVirtualControlsExecutionState(mode, sessionId) {
+function setTxtVirtualControlsExecutionState(mode, sessionId, operationId = null) {
+	if (mode === 'running' && operationId) {
+		uploadState.activeTxtOperationId = operationId;
+		uploadState.stoppingTxtOperationId = null;
+	}
 	txtVirtualControlsState.document.canvas.mode = mode === 'running' ? 'running' : 'editing';
 	txtVirtualControlsState.sessionId = mode === 'running' ? sessionId || null : null;
 	if (mode !== 'running') {
@@ -2980,6 +3098,13 @@ function handleRefreshCode() {
 			return;
 		}
 
+		const mOutputValidation = validateTxtMOutputPreflight(workspace, 'code-output', { showToast: true });
+		if (isTxtProgrammingLanguageActive() && (!mOutputValidation.canExport || !mOutputValidation.canGenerate)) {
+			refreshSvg.classList.remove('spinning');
+			log.warn('TXT M output validation blocked refresh code output');
+			return;
+		}
+
 		// 根據當前程式語言生成程式碼
 		const code = generateCode(workspace);
 		const generator = getCurrentGenerator();
@@ -2989,6 +3114,7 @@ function handleRefreshCode() {
 			command: 'updateCode',
 			code: code,
 			language: window.currentProgrammingLanguage,
+			mOutputValidation,
 			lib_deps: generator.lib_deps_ || [],
 			build_flags: generator.build_flags_ || [],
 			lib_ldf_mode: generator.lib_ldf_mode_ || null,
@@ -3556,6 +3682,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const setupBlocks = workspace.getBlocksByType('txt_setup', false);
 		const processBlocks = workspace.getBlocksByType('txt_process', false);
 		const hasTopLevelContent = topBlocks.length > 0;
+		const mOutputValidation = buildTxtMOutputPreflightSummary(workspace);
+		applyTxtMOutputConflictWarnings(workspace, mOutputValidation);
+		const mOutputWarningMessage = (mOutputValidation.warnings || []).join('\n');
 
 		let warningMessage = '';
 		if (setupBlocks.length > 1) {
@@ -3576,9 +3705,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 					'TXT_PROCESS_REQUIRED_WARNING',
 					'TXT workspace requires at least one "TXT Process" block.'
 				) || 'TXT workspace requires at least one "TXT Process" block.';
+		} else if (mOutputWarningMessage) {
+			warningMessage = mOutputWarningMessage;
 		}
 
-		const signature = `${setupBlocks.length}:${processBlocks.length}:${hasTopLevelContent ? 1 : 0}:${warningMessage}`;
+		const signature = `${setupBlocks.length}:${processBlocks.length}:${hasTopLevelContent ? 1 : 0}:${mOutputWarningMessage}:${warningMessage}`;
 		if (!warningMessage) {
 			txtWorkspaceValidationState.signature = signature;
 			return;
@@ -3738,7 +3869,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					rebuildPwmConfig(workspace);
 					updateMainBlockDeletable(workspace);
 				}
-				applyTxtVirtualControlsDocument(pendingMessage.txtVirtualControls);
+				applyTxtVirtualControlsDocument(pendingMessage.txtVirtualControls, { preserveExecutionMode: true });
 			} catch (error) {
 				log.error('執行待處理的 FileWatcher 重載失敗:', error);
 			}
@@ -3811,12 +3942,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 		codeUpdateDebounceTimer = setTimeout(() => {
 			try {
+				const mOutputValidation = validateTxtMOutputPreflight(workspace, 'code-output', { showToast: false });
+				if (isTxtProgrammingLanguageActive() && (!mOutputValidation.canExport || !mOutputValidation.canGenerate)) {
+					log.warn('TXT M output validation blocked automatic code output');
+					return;
+				}
 				const code = generateCode(workspace);
 				const generator = getCurrentGenerator();
 				vscode.postMessage({
 					command: 'updateCode',
 					code: code,
 					language: window.currentProgrammingLanguage,
+					mOutputValidation,
 					lib_deps: generator.lib_deps_ || [],
 					build_flags: generator.build_flags_ || [],
 					lib_ldf_mode: generator.lib_ldf_mode_ || null,
@@ -4353,6 +4490,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			const isFromFileWatcher = message.source === 'fileWatcher';
 			const workspaceState = message.state?.workspace || message.state || message.workspace;
 			const txtVirtualControls = message.txtVirtualControls || message.state?.txtVirtualControls;
+			const preserveTxtVirtualControlExecutionMode = isFromFileWatcher && txtVirtualControlsState.document.canvas.mode === 'running';
 
 			// T008: 如果是 FileWatcher 觸發且正在拖曳，延遲執行重載
 			if (isFromFileWatcher && isCurrentlyDragging()) {
@@ -4367,7 +4505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			}
 
 			setTxtVirtualControlPendingLoadOptions(workspaceState);
-			txtVirtualControlsState.document = cloneTxtVirtualControlsDocument(txtVirtualControls, { forceEditingMode: true });
+			replaceTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode });
 			if (!txtVirtualControlsState.document.controls.some(control => control.stableId === txtVirtualControlsState.selectedStableId)) {
 				txtVirtualControlsState.selectedStableId = txtVirtualControlsState.document.controls[0]?.stableId || null;
 			}
@@ -4429,7 +4567,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				// 遷移舊版格式後再載入工作區內容
 				migrateWorkspaceState(workspaceState);
 				Blockly.serialization.workspaces.load(workspaceState, workspace);
-				applyTxtVirtualControlsDocument(txtVirtualControls);
+				applyTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode });
 				clearTxtVirtualControlPendingLoadOptions();
 
 				// 重建 ESP32 PWM 配置
@@ -4509,7 +4647,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}, 300);
 			}
 			if (!workspaceState) {
-				applyTxtVirtualControlsDocument(txtVirtualControls);
+				applyTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode });
 				clearTxtVirtualControlPendingLoadOptions();
 			}
 
@@ -4720,29 +4858,42 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 			// TXT Controller SSH 上傳功能
 			case 'txtUploadProgress':
-				handleTxtUploadProgress(message);
+				if (shouldApplyTxtUploadProgress(message)) {
+					handleTxtUploadProgress(message);
+				}
 				break;
 
 			case 'txtUploadResult':
-				handleTxtUploadResult(message);
+				if (shouldApplyTxtUploadResult(message)) {
+					handleTxtUploadResult(message);
+				}
 				break;
 
 			case 'txtVirtualControlsExecutionStateChanged':
-				setTxtVirtualControlsExecutionState(message.mode, message.sessionId);
+				if (!isStaleTxtOperationMessage(message)) {
+					setTxtVirtualControlsExecutionState(message.mode, message.sessionId, message.operationId);
+				}
 				break;
 
 			case 'txtVirtualControlsExecutionBlocked':
-				handleTxtVirtualControlsExecutionBlocked(message.invalidReferences);
+				if (!isStaleTxtOperationMessage(message)) {
+					handleTxtVirtualControlsExecutionBlocked(message.invalidReferences);
+				}
 				break;
 
 			case 'txtVirtualControlsRuntimeError':
-				handleTxtVirtualControlsRuntimeError(message.error);
+				if (!isStaleTxtOperationMessage(message)) {
+					handleTxtVirtualControlsRuntimeError(message.error);
+				}
 				break;
 
 			case 'txtExecutionStopped':
-				setTxtVirtualControlsExecutionState('editing');
-				setUploadButtonState('txt-ready');
-				toast.show(window.languageManager?.getMessage('TXT_STOP_SUCCESS', 'Program stopped') || 'Program stopped', 'info');
+				if (shouldApplyTxtStoppedMessage(message)) {
+					setTxtVirtualControlsExecutionState('editing', null, message.operationId);
+					setUploadButtonState('txt-ready');
+					completeTxtOperation(getTxtOperationId(message));
+					toast.show(window.languageManager?.getMessage('TXT_STOP_SUCCESS', 'Program stopped') || 'Program stopped', 'info');
+				}
 				break;
 
 			// TXT Controller 連線設定回應
@@ -5686,7 +5837,73 @@ const uploadState = {
 	txtRunning: false, // TXT 模式：程式正在執行中
 	selectedPort: null,
 	startTime: 0, // 上傳開始時間戳記
+	txtOperationSeq: 0,
+	activeTxtOperationId: null,
+	stoppingTxtOperationId: null,
 };
+
+function getTxtOperationId(message) {
+	if (typeof message?.operationId !== 'string') {
+		return null;
+	}
+	const operationId = message.operationId.trim();
+	return operationId || null;
+}
+
+function beginTxtOperation() {
+	uploadState.txtOperationSeq += 1;
+	const operationId = `txt-${Date.now()}-${uploadState.txtOperationSeq}`;
+	uploadState.activeTxtOperationId = operationId;
+	uploadState.stoppingTxtOperationId = null;
+	return operationId;
+}
+
+function isStaleTxtOperationMessage(message) {
+	const operationId = getTxtOperationId(message);
+	if (!operationId) {
+		return false;
+	}
+	return operationId !== uploadState.activeTxtOperationId && operationId !== uploadState.stoppingTxtOperationId;
+}
+
+function shouldApplyTxtUploadProgress(message) {
+	const operationId = getTxtOperationId(message);
+	if (!operationId) {
+		return true;
+	}
+	return operationId === uploadState.activeTxtOperationId && operationId !== uploadState.stoppingTxtOperationId;
+}
+
+function shouldApplyTxtUploadResult(message) {
+	const operationId = getTxtOperationId(message);
+	if (!operationId) {
+		return true;
+	}
+	return operationId === uploadState.activeTxtOperationId && operationId !== uploadState.stoppingTxtOperationId;
+}
+
+function shouldApplyTxtStoppedMessage(message) {
+	const operationId = getTxtOperationId(message);
+	if (!operationId) {
+		return true;
+	}
+	if (uploadState.activeTxtOperationId && uploadState.activeTxtOperationId !== operationId) {
+		return false;
+	}
+	if (uploadState.stoppingTxtOperationId && uploadState.stoppingTxtOperationId !== operationId) {
+		return false;
+	}
+	return true;
+}
+
+function completeTxtOperation(operationId) {
+	if (!operationId || uploadState.activeTxtOperationId === operationId) {
+		uploadState.activeTxtOperationId = null;
+	}
+	if (!operationId || uploadState.stoppingTxtOperationId === operationId) {
+		uploadState.stoppingTxtOperationId = null;
+	}
+}
 
 /**
  * 初始化上傳按鈕事件
@@ -5709,7 +5926,9 @@ async function handleUploadClick() {
 	// TXT 模式：若程式正在執行，點擊按鈕發送停止請求
 	if (window.currentProgrammingLanguage === 'txt' && uploadState.txtRunning) {
 		console.log('[blockly] TXT 執行中，發送停止請求');
-		vscode.postMessage({ command: 'txtStopExecution' });
+		const operationId = uploadState.activeTxtOperationId;
+		uploadState.stoppingTxtOperationId = operationId;
+		vscode.postMessage({ command: 'txtStopExecution', operationId });
 		setUploadButtonState('txt-uploading'); // 暫時停用按鈕（等待停止確認）
 		return;
 	}
@@ -5731,11 +5950,18 @@ async function handleUploadClick() {
 		toast.show(window.languageManager?.getMessage('UPLOAD_FAILED', '上傳失敗') + ': 工作區未初始化', 'error');
 		return;
 	}
+	const isTxt = window.currentProgrammingLanguage === 'txt';
 
 	// 檢查工作區是否有積木
 	const blocks = workspace.getAllBlocks(false);
 	if (blocks.length === 0) {
 		toast.show(window.languageManager?.getMessage('UPLOAD_EMPTY_WORKSPACE', '工作區為空，請先添加積木'), 'warning');
+		return;
+	}
+
+	const mOutputValidation = isTxt ? validateTxtMOutputPreflight(workspace, 'upload', { showToast: true }) : null;
+	if (isTxt && mOutputValidation && !mOutputValidation.canUpload) {
+		log.warn('TXT M output validation blocked TXT upload');
 		return;
 	}
 
@@ -5754,7 +5980,6 @@ async function handleUploadClick() {
 
 	// 根據程式語言類型發送不同的上傳請求
 	const isMicroPython = window.currentProgrammingLanguage === 'micropython';
-	const isTxt = window.currentProgrammingLanguage === 'txt';
 
 	if (isMicroPython) {
 		// CyberBrick MicroPython 上傳請求
@@ -5769,14 +5994,17 @@ async function handleUploadClick() {
 	} else if (isTxt) {
 		// fischertechnik TXT Controller SSH 上傳請求
 		console.log('[blockly] 發送 TXT 上傳請求');
+		const operationId = beginTxtOperation();
 		const virtualControlPreflight = collectTxtVirtualControlPreflight();
 		setUploadButtonState('txt-uploading');
 		vscode.postMessage({
 			command: 'txtUpload',
+			operationId,
 			code: code,
 			board: currentBoard,
 			txtVirtualControls: cloneTxtVirtualControlsDocument(txtVirtualControlsState.document, { forceEditingMode: true }),
 			virtualControlPreflight,
+			mOutputValidation,
 		});
 	} else {
 		// T018: Arduino C++ 上傳請求（包含 lib_deps, build_flags）
@@ -6191,8 +6419,10 @@ function handleTxtUploadProgress(message) {
 function handleTxtUploadResult(message) {
 	console.log('[TXT] 上傳結果:', message);
 	// TXT 模式統一恢復為播放圖示（就緒狀態）
-	setTxtVirtualControlsExecutionState('editing');
+	const operationId = getTxtOperationId(message);
+	setTxtVirtualControlsExecutionState('editing', null, operationId);
 	setUploadButtonState('txt-ready');
+	completeTxtOperation(operationId);
 	if (message.success) {
 		const elapsed = message.duration ? (message.duration / 1000).toFixed(1) : '';
 		let msg = window.languageManager?.getMessage('TXT_RUN_SUCCESS', 'Program finished');
@@ -6646,7 +6876,9 @@ function openTxtTestDialog() {
 	// 若使用者程式正在 TXT 上執行，先停止它，讓 Test Panel 取得控制權
 	if (uploadState.txtRunning) {
 		console.log('[TXT] 開啟 Test Panel，停止執行中的程式');
-		vscode.postMessage({ command: 'txtStopExecution' });
+		const operationId = uploadState.activeTxtOperationId;
+		uploadState.stoppingTxtOperationId = operationId;
+		vscode.postMessage({ command: 'txtStopExecution', operationId });
 		setUploadButtonState('txt-ready');
 	}
 	txtTestState.failureCount = 0;

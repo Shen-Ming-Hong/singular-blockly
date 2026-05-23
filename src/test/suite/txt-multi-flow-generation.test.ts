@@ -197,5 +197,98 @@ suite('TXT Multi-flow Code Generation Tests', () => {
 				'txt_wait 不應再直接呼叫 txt.updateWait()，避免多流程延遲互相干擾'
 			);
 		});
+
+		test('txt_motor_speed 應支援 MOTOR/LAMP/legacy component generator modes', () => {
+			const generatorTxtPath = path.join(
+				__dirname,
+				'..',
+				'..',
+				'..',
+				'media',
+				'blockly',
+				'generators',
+				'txt',
+				'txt.js'
+			);
+			const generatorTxtSource = fs.readFileSync(generatorTxtPath, 'utf8');
+			const txtMotorSpeedMatch = generatorTxtSource.match(
+				/window\.txtGenerator\.forBlock\['txt_motor_speed'\]\s*=\s*function\s*\(block\)\s*{[\s\S]*?};/
+			);
+
+			assert.ok(txtMotorSpeedMatch, 'TXT generator 應定義 txt_motor_speed generator');
+			const txtMotorSpeedSource = `${txtMotorSpeedMatch[0]}\n${generatorTxtSource}`;
+
+			assert.match(txtMotorSpeedSource, /normalizeTxtMOutputComponent|normalizeComponent/, 'generator 應對缺失、空字串或未知 COMPONENT 做 MOTOR fallback');
+			assert.match(txtMotorSpeedSource, /generatorMode/, 'generator 分支應消費 component metadata');
+			assert.match(txtMotorSpeedSource, /signed-speed/, 'MOTOR 應保留 signed speed mode');
+			assert.match(txtMotorSpeedSource, /unsigned-level/, 'LAMP 應使用 unsigned 0..512 output level mode');
+			assert.match(txtMotorSpeedSource, /DIRECTION/, 'MOTOR mode 應保留方向欄位');
+			assert.match(txtMotorSpeedSource, /max\(0, min\(512, int\(/, 'LAMP mode 應限制為非負 0..512');
+		});
+
+		test('txt_motor_stop 與 txt_stop_all 應維持 M/O 停止語意', () => {
+			const generatorTxtPath = path.join(
+				__dirname,
+				'..',
+				'..',
+				'..',
+				'media',
+				'blockly',
+				'generators',
+				'txt',
+				'txt.js'
+			);
+			const generatorTxtSource = fs.readFileSync(generatorTxtPath, 'utf8');
+			const stopSource = generatorTxtSource.match(
+				/window\.txtGenerator\.forBlock\['txt_motor_stop'\]\s*=\s*function\s*\(block\)\s*{[\s\S]*?};/
+			)?.[0] ?? '';
+			const stopAllSource = generatorTxtSource.match(
+				/window\.txtGenerator\.forBlock\['txt_stop_all'\]\s*=\s*function\s*\([^)]*\)\s*{[\s\S]*?};/
+			)?.[0] ?? '';
+
+			assert.match(stopSource, /setSpeed\(0\)/, 'txt_motor_stop 應只將選取 M 埠歸零');
+			assert.doesNotMatch(stopSource, /COMPONENT|component/i, 'txt_motor_stop 不應推論 component');
+			assert.match(stopAllSource, /for \(let i = 1; i <= 4; i\+\+\)/, 'txt_stop_all 應停止 M1-M4');
+			assert.match(stopAllSource, /for \(let i = 1; i <= 8; i\+\+\)/, 'txt_stop_all 應關閉 O1-O8');
+		});
+
+		test('TXT generator 應記錄 M/O usage metadata 且保留 setup 前掃描流程', () => {
+			const generatorIndexPath = path.join(
+				__dirname,
+				'..',
+				'..',
+				'..',
+				'media',
+				'blockly',
+				'generators',
+				'txt',
+				'index.js'
+			);
+			const generatorTxtPath = path.join(
+				__dirname,
+				'..',
+				'..',
+				'..',
+				'media',
+				'blockly',
+				'generators',
+				'txt',
+				'txt.js'
+			);
+			const generatorIndexSource = fs.readFileSync(generatorIndexPath, 'utf8');
+			const generatorTxtSource = fs.readFileSync(generatorTxtPath, 'utf8');
+
+			assert.match(generatorIndexSource, /mOutputUsages_\s*=\s*\[\]/, 'generator 應初始化 M usage metadata');
+			assert.match(generatorIndexSource, /oOutputUsages_\s*=\s*\[\]/, 'generator 應初始化 O usage metadata');
+			assert.match(generatorIndexSource, /addMOutputUsage/, 'generator 應提供 M output usage recorder');
+			assert.match(generatorIndexSource, /addOOutputUsage/, 'generator 應提供 O output usage recorder');
+			assert.match(generatorTxtSource, /addMOutputUsage\(motor, component, block\.id\)/, 'txt_motor_speed 應記錄 M/component usage');
+			assert.match(generatorTxtSource, /addOOutputUsage\(output, block\.id\)/, 'txt_output 應記錄 O usage');
+			assert.match(
+				generatorIndexSource,
+				/for \(const block of processBlocks\) \{\s*this\.blockToCode\(block\);\s*\}[\s\S]*if \(primarySetupBlock\)/,
+				'process blocks 應仍在 txt_setup 前先掃描，確保 buildPreCreations 可取得硬體 usage'
+			);
+		});
 	});
 });

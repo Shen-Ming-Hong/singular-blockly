@@ -356,6 +356,23 @@ body.txt-virtual-controls-resizing .txt-virtual-controls-splitter.open {
 	color: var(--vscode-badge-foreground, inherit);
 }
 
+.txt-virtual-controls-mode-badge.running {
+	background: var(--vscode-debugIcon-startForeground, #2e7d32);
+	color: #ffffff;
+	box-shadow: 0 0 0 1px var(--txt-virtual-control-state-ring);
+}
+
+body.theme-dark .txt-virtual-controls-mode-badge.running,
+body.vscode-dark .txt-virtual-controls-mode-badge.running {
+	background: #ffca28;
+	color: #1f1f1f;
+}
+
+.txt-virtual-controls-canvas.running {
+	border-style: solid;
+	border-color: var(--txt-virtual-control-state-ring);
+}
+
 .txt-virtual-controls-canvas-hint,
 .txt-virtual-controls-empty-state,
 .txt-virtual-controls-inspector-empty {

@@ -90,6 +90,9 @@ export class WebViewMessageHandler {
 	private txtVirtualControlsDocument: TxtVirtualControlsDocument = createEmptyTxtVirtualControlsDocument();
 	private txtVirtualControlSession: VirtualControlRuntimeSession | null = null;
 	private txtVirtualControlPressedStates: Record<string, boolean> = {};
+	private txtExecutionOperationSeq = 0;
+	private activeTxtExecutionOperationId: string | null = null;
+	private stoppingTxtExecutionOperationIds = new Set<string>();
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -279,7 +282,7 @@ export class WebViewMessageHandler {
 					await this.handleTxtVirtualControlStateChanged(message);
 					break;
 				case 'txtStopExecution':
-					await this.handleTxtStopExecution();
+					await this.handleTxtStopExecution(message);
 					break;
 				// TXT Controller Test Panel (dialog)
 				case 'txtTestDialogOpen':
@@ -333,7 +336,7 @@ export class WebViewMessageHandler {
 			throw new Error('TxtUploader not initialized');
 		}
 
-		await this.handleTxtStopExecution();
+		await this.handleTxtStopExecution({ operationId: this.activeTxtExecutionOperationId });
 	}
 
 	async installTxtRuntimeFromExtension(): Promise<void> {
@@ -445,6 +448,11 @@ export class WebViewMessageHandler {
 			// 根據語言類型決定檔案名稱
 			const isMicroPython = message.language === 'micropython';
 			const isTxt = message.language === 'txt';
+			const mOutputValidation = message.mOutputValidation;
+			if (isTxt && mOutputValidation && mOutputValidation.canExport === false) {
+				log('TXT M output validation blocked code output update', 'warn', { mOutputValidation });
+				return;
+			}
 			let fileName: string;
 			if (isMicroPython) {
 				fileName = 'src/rc_main.py';
@@ -687,15 +695,61 @@ export class WebViewMessageHandler {
 		return normalizeTxtVirtualControlsForSave(value);
 	}
 
-	private postTxtVirtualControlsExecutionState(mode: 'editing' | 'running', sessionId?: string): void {
+	private normalizeTxtExecutionOperationId(value: unknown): string | undefined {
+		if (typeof value !== 'string') {
+			return undefined;
+		}
+		const operationId = value.trim();
+		return operationId || undefined;
+	}
+
+	private createTxtExecutionOperationId(): string {
+		this.txtExecutionOperationSeq += 1;
+		return `txt-${Date.now()}-${this.txtExecutionOperationSeq}`;
+	}
+
+	private beginTxtExecutionOperation(incomingOperationId: unknown): string {
+		const operationId = this.normalizeTxtExecutionOperationId(incomingOperationId) ?? this.createTxtExecutionOperationId();
+		this.activeTxtExecutionOperationId = operationId;
+		this.stoppingTxtExecutionOperationIds.delete(operationId);
+		return operationId;
+	}
+
+	private isActiveTxtExecutionOperation(operationId: string): boolean {
+		return this.activeTxtExecutionOperationId === operationId;
+	}
+
+	private isStoppingTxtExecutionOperation(operationId: string): boolean {
+		return this.stoppingTxtExecutionOperationIds.has(operationId);
+	}
+
+	private completeTxtExecutionOperation(operationId: string): boolean {
+		if (!this.isActiveTxtExecutionOperation(operationId)) {
+			return false;
+		}
+		this.activeTxtExecutionOperationId = null;
+		this.stoppingTxtExecutionOperationIds.delete(operationId);
+		return true;
+	}
+
+	private postTxtVirtualControlsExecutionState(mode: 'editing' | 'running', sessionId?: string, operationId?: string): void {
 		this.panel.webview.postMessage({
 			command: 'txtVirtualControlsExecutionStateChanged',
 			mode,
+			...(operationId ? { operationId } : {}),
 			...(sessionId ? { sessionId } : {}),
 		});
 	}
 
-	private async cleanupTxtVirtualControlSession(options?: { notifyWebview?: boolean }): Promise<void> {
+	private async cleanupTxtVirtualControlSession(options?: { notifyWebview?: boolean; operationId?: string }): Promise<boolean> {
+		if (options?.operationId && this.activeTxtExecutionOperationId && !this.isActiveTxtExecutionOperation(options.operationId)) {
+			log('Skipping stale TXT virtual control session cleanup', 'info', {
+				operationId: options.operationId,
+				activeOperationId: this.activeTxtExecutionOperationId,
+			});
+			return false;
+		}
+
 		const hadSession = Boolean(this.txtVirtualControlSession);
 		this.txtVirtualControlSession = null;
 		this.txtVirtualControlPressedStates = {};
@@ -705,8 +759,10 @@ export class WebViewMessageHandler {
 		}
 
 		if (options?.notifyWebview) {
-			this.postTxtVirtualControlsExecutionState('editing');
+			this.postTxtVirtualControlsExecutionState('editing', undefined, options.operationId);
 		}
+
+		return true;
 	}
 
 	private async prepareTxtVirtualControlSession(
@@ -2164,8 +2220,29 @@ export class WebViewMessageHandler {
 			log('TxtUploader not initialized', 'warn');
 			return;
 		}
+		const operationId = this.beginTxtExecutionOperation(message?.operationId);
+		const mOutputValidation = message?.mOutputValidation;
+		if (mOutputValidation && mOutputValidation.canUpload === false) {
+			const warningText = Array.isArray(mOutputValidation.warnings)
+				? mOutputValidation.warnings.filter((warning: unknown) => typeof warning === 'string' && warning.trim()).join('\n')
+				: '';
+			const errorMessage = warningText || await this.localeService.getLocalizedMessage(
+				'TXT_M_OUTPUT_UPLOAD_BLOCKED',
+				'M output conflict detected. Fix the highlighted M/O output blocks before running.'
+			);
+			log('TXT M output validation blocked TXT upload', 'warn', { mOutputValidation });
+			this.panel.webview.postMessage({
+				command: 'txtUploadResult',
+				operationId,
+				success: false,
+				error: errorMessage,
+				duration: 0,
+			});
+			this.completeTxtExecutionOperation(operationId);
+			return;
+		}
 		// T035: 上傳前暫停 Test Panel polling
-		this.panel.webview.postMessage({ command: 'txtTestPause' });
+		this.panel.webview.postMessage({ command: 'txtTestPause', operationId });
 		const code: string = message.code ?? '';
 		const document = this.getNormalizedTxtVirtualControlsDocument('txt', message.txtVirtualControls);
 		const preflight = this.buildTxtVirtualControlPreflight(message, document);
@@ -2173,75 +2250,120 @@ export class WebViewMessageHandler {
 		const shouldStartVirtualControlRuntime = referencedStableIds.length > 0;
 		const shouldEnterVirtualControlRunningMode = document.controls.length > 0;
 		let executionStatePosted = false;
+		let shouldResumeTxtTestPanel = false;
 		try {
 			if (!preflight.valid) {
 				this.panel.webview.postMessage({
 					command: 'txtVirtualControlsExecutionBlocked',
+					operationId,
 					invalidReferences: preflight.invalidReferences,
 				});
 				this.panel.webview.postMessage({
 					command: 'txtUploadResult',
+					operationId,
 					success: false,
 					error: 'TXT virtual controls contain invalid references.',
 					duration: 0,
 				});
+				this.completeTxtExecutionOperation(operationId);
+				shouldResumeTxtTestPanel = true;
 				return;
 			}
 
 			try {
 				await this.prepareTxtVirtualControlSession(document, { requiresRuntime: shouldStartVirtualControlRuntime });
 			} catch (runtimeError) {
-				await this.cleanupTxtVirtualControlSession({ notifyWebview: true });
+				await this.cleanupTxtVirtualControlSession({ notifyWebview: true, operationId });
+				this.completeTxtExecutionOperation(operationId);
 				this.panel.webview.postMessage({
 					command: 'txtVirtualControlsRuntimeError',
+					operationId,
 					error: runtimeError instanceof Error ? runtimeError.message : String(runtimeError),
 				});
 				this.panel.webview.postMessage({
 					command: 'txtUploadResult',
+					operationId,
 					success: false,
 					error: runtimeError instanceof Error ? runtimeError.message : String(runtimeError),
 					duration: 0,
 				});
+				shouldResumeTxtTestPanel = true;
 				return;
 			}
 
 			if (shouldEnterVirtualControlRunningMode && !executionStatePosted) {
 				executionStatePosted = true;
-				this.postTxtVirtualControlsExecutionState('running', this.txtVirtualControlSession?.sessionId);
+				this.postTxtVirtualControlsExecutionState('running', this.txtVirtualControlSession?.sessionId, operationId);
 			}
 
 			const result = await this.txtUploader.upload(code, progress => {
+				if (!this.isActiveTxtExecutionOperation(operationId) || this.isStoppingTxtExecutionOperation(operationId)) {
+					return;
+				}
 				this.panel.webview.postMessage({
 					command: 'txtUploadProgress',
+					operationId,
 					stage: progress.stage,
 					progress: progress.progress,
 					message: progress.message,
 				});
 				if (progress.stage === 'executing' && shouldEnterVirtualControlRunningMode && !executionStatePosted) {
 					executionStatePosted = true;
-					this.postTxtVirtualControlsExecutionState('running', this.txtVirtualControlSession?.sessionId);
+					this.postTxtVirtualControlsExecutionState('running', this.txtVirtualControlSession?.sessionId, operationId);
 				}
 			});
-			await this.cleanupTxtVirtualControlSession({ notifyWebview: executionStatePosted || document.controls.length > 0 });
+			if (this.isStoppingTxtExecutionOperation(operationId)) {
+				log('TXT upload result ignored because stop is still completing', 'info', { operationId });
+				return;
+			}
+			if (!this.isActiveTxtExecutionOperation(operationId)) {
+				log('TXT upload result ignored for stale operation', 'info', { operationId, activeOperationId: this.activeTxtExecutionOperationId });
+				return;
+			}
+
+			const cleanedUp = await this.cleanupTxtVirtualControlSession({
+				notifyWebview: executionStatePosted || document.controls.length > 0,
+				operationId,
+			});
+			if (!cleanedUp) {
+				return;
+			}
+			this.completeTxtExecutionOperation(operationId);
+			shouldResumeTxtTestPanel = true;
 			this.panel.webview.postMessage({
 				command: 'txtUploadResult',
+				operationId,
 				success: result.success,
 				error: result.error,
 				duration: result.duration,
 			});
 		} catch (error) {
-			await this.cleanupTxtVirtualControlSession({ notifyWebview: executionStatePosted || document.controls.length > 0 });
+			if (this.isStoppingTxtExecutionOperation(operationId)) {
+				log('TXT upload error ignored because stop is still completing', 'info', { operationId, error });
+				return;
+			}
+			if (!this.isActiveTxtExecutionOperation(operationId)) {
+				log('TXT upload error ignored for stale operation', 'info', { operationId, activeOperationId: this.activeTxtExecutionOperationId, error });
+				return;
+			}
+
+			await this.cleanupTxtVirtualControlSession({ notifyWebview: executionStatePosted || document.controls.length > 0, operationId });
+			this.completeTxtExecutionOperation(operationId);
+			shouldResumeTxtTestPanel = true;
 			const errorMessage = error instanceof Error ? error.message : String(error);
 			log('TXT upload failed', 'error', error);
 			this.panel.webview.postMessage({
 				command: 'txtUploadResult',
+				operationId,
 				success: false,
 				error: errorMessage,
 				duration: 0,
 			});
 		} finally {
 			// T035: 上傳結束後恢復 Test Panel polling
-			this.panel.webview.postMessage({ command: 'txtTestResume' });
+			if (shouldResumeTxtTestPanel) {
+				this.panel.webview.postMessage({ command: 'txtTestResume', operationId });
+			}
 		}
 	}
 
@@ -2281,14 +2403,39 @@ export class WebViewMessageHandler {
 	/**
 	 * 處理 TXT 停止執行指令
 	 */
-	private async handleTxtStopExecution(): Promise<void> {
+	private async handleTxtStopExecution(message?: any): Promise<void> {
 		if (!this.txtUploader) {
 			log('TxtUploader not initialized', 'warn');
 			return;
 		}
+		const operationId =
+			this.normalizeTxtExecutionOperationId(message?.operationId) ??
+			this.activeTxtExecutionOperationId ??
+			this.createTxtExecutionOperationId();
+
+		if (this.activeTxtExecutionOperationId && !this.isActiveTxtExecutionOperation(operationId)) {
+			log('Ignoring stale TXT stop request', 'info', {
+				operationId,
+				activeOperationId: this.activeTxtExecutionOperationId,
+			});
+			return;
+		}
+
+		this.stoppingTxtExecutionOperationIds.add(operationId);
 		await this.txtUploader.stopExecution();
-		await this.cleanupTxtVirtualControlSession({ notifyWebview: true });
-		this.panel.webview.postMessage({ command: 'txtExecutionStopped' });
+		const cleanedUp = await this.cleanupTxtVirtualControlSession({ notifyWebview: true, operationId });
+		this.stoppingTxtExecutionOperationIds.delete(operationId);
+		if (!cleanedUp) {
+			log('Skipping TXT stopped notification for stale operation', 'info', {
+				operationId,
+				activeOperationId: this.activeTxtExecutionOperationId,
+			});
+			return;
+		}
+
+		this.completeTxtExecutionOperation(operationId);
+		this.panel.webview.postMessage({ command: 'txtExecutionStopped', operationId });
+		this.panel.webview.postMessage({ command: 'txtTestResume', operationId });
 	}
 
 	/**
