@@ -1,35 +1,35 @@
-# Specification Quality Checklist: TXT M 系列輸出重設計
+# 規格品質檢查清單：TXT M 系列輸出重設計
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning  
-**Created**: 2026-05-23  
-**Feature**: [spec.md](../spec.md)
+**目的**：在進入 planning 前，驗證規格完整性與品質  
+**建立日期**：2026-05-23  
+**功能規格**：[spec.md](../spec.md)
 
-## Content Quality
+## 內容品質
 
-- [x] No implementation details (languages, frameworks, APIs)
-- [x] Focused on user value and business needs
-- [x] Written for non-technical stakeholders
-- [x] All mandatory sections completed
+- [x] 未包含實作細節（語言、框架、API）
+- [x] 聚焦使用者價值與業務需求
+- [x] 以非技術利害關係人可理解的方式撰寫
+- [x] 所有必填章節皆已完成
 
-## Requirement Completeness
+## 需求完整性
 
-- [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous
-- [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic (no implementation details)
-- [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
-- [x] Dependencies and assumptions identified
+- [x] 沒有殘留 [NEEDS CLARIFICATION] 標記
+- [x] 需求可測試且沒有歧義
+- [x] 成功標準可衡量
+- [x] 成功標準不綁定特定技術（不包含實作細節）
+- [x] 所有 acceptance scenarios 皆已定義
+- [x] Edge cases 皆已識別
+- [x] 範圍邊界清楚
+- [x] 已識別相依關係與假設
 
-## Feature Readiness
+## 功能就緒度
 
-- [x] All functional requirements have clear acceptance criteria
-- [x] User scenarios cover primary flows
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] No implementation details leak into specification
+- [x] 所有功能需求都有清楚的 acceptance criteria
+- [x] User scenarios 已覆蓋主要流程
+- [x] 功能符合 Success Criteria 中定義的可衡量成果
+- [x] 規格未洩漏實作細節
 
-## Notes
+## 備註
 
 - 已檢查本規格未引用內部 block type、檔案路徑、程式語言或 API 名稱。
 - 範圍明確限定於 TXT 的 M 系列輸出作者模型；O 系列僅保留並加入衝突警告，不納入本次重設計。
