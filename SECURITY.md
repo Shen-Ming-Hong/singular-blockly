@@ -4,8 +4,8 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.76.x  | :white_check_mark: |
-| < 0.76  | :x:                |
+| 0.78.x  | :white_check_mark: |
+| < 0.78  | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.76.1 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.78.1 |
+
+> **0.78.1 更新 Update**: `qs` (`GHSA-q8mj-m7cp-5q26`, `CVE-2026-8723`) 已透過 npm override 升級至 `6.15.2` 修復，清除本地 `npm audit` 的 moderate 風險。
+> `qs` (`GHSA-q8mj-m7cp-5q26`, `CVE-2026-8723`) has been fixed by upgrading the npm override to `6.15.2`, clearing the moderate finding from local `npm audit`.
 
 > **0.76.1 更新 Update**: `ws` (`GHSA-58qx-3vcg-4xpx`, `CVE-2026-45736`) 已透過 npm override 升級至 `8.20.1` 修復；`brace-expansion` (`GHSA-jxxr-4gwj-5jf2`) 已在 `glob` → `minimatch@10.2.4` 路徑下升級至 `5.0.6`，清除本地 `npm audit` 的 moderate 風險。
 > `ws` (`GHSA-58qx-3vcg-4xpx`, `CVE-2026-45736`) has been fixed by upgrading the npm override to `8.20.1`; `brace-expansion` (`GHSA-jxxr-4gwj-5jf2`) has been upgraded to `5.0.6` on the `glob` → `minimatch@10.2.4` path, clearing the moderate findings from local `npm audit`.
@@ -31,4 +34,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-05-22_
+_Last updated: 2026-05-23_

@@ -8,6 +8,16 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.78.1] - 2026-05-23
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 `qs` 轉移依賴 DoS 漏洞** (Fix transitive dependency DoS vulnerability in `qs`)
+    - 透過 npm overrides 將 `qs` 從 `6.15.1` 升級至 `6.15.2`（間接依賴 via `@modelcontextprotocol/sdk` → `express` / `body-parser`），修復 `GHSA-q8mj-m7cp-5q26` / `CVE-2026-8723`：當 `encodeValuesOnly` 搭配 comma-format arrays 且輸入包含 `null` / `undefined` entry 時，`qs.stringify` 可能因 `TypeError` 崩潰造成 DoS；嚴重程度為 Moderate（CVSS 5.3）
+      Upgraded `qs` from `6.15.1` to `6.15.2` via npm overrides (transitive dependency via `@modelcontextprotocol/sdk` → `express` / `body-parser`), fixing `GHSA-q8mj-m7cp-5q26` / `CVE-2026-8723`, where `qs.stringify` can crash with `TypeError` when `encodeValuesOnly` is used with comma-format arrays containing `null` / `undefined` entries; severity is Moderate (CVSS 5.3)
+    - 關閉 Dependabot Alert #70，並清除本地 `npm audit` 的 1 個 moderate 漏洞
+      Closes Dependabot Alert #70 and clears the 1 moderate finding reported by local `npm audit`
+
 ## [0.78.0] - 2026-05-23
 
 ### ✨ 新功能 New Features
