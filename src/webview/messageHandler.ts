@@ -2422,20 +2422,32 @@ export class WebViewMessageHandler {
 		}
 
 		this.stoppingTxtExecutionOperationIds.add(operationId);
-		await this.txtUploader.stopExecution();
-		const cleanedUp = await this.cleanupTxtVirtualControlSession({ notifyWebview: true, operationId });
-		this.stoppingTxtExecutionOperationIds.delete(operationId);
-		if (!cleanedUp) {
-			log('Skipping TXT stopped notification for stale operation', 'info', {
-				operationId,
-				activeOperationId: this.activeTxtExecutionOperationId,
-			});
-			return;
-		}
+		let shouldResumeTxtTestPanel = false;
+		try {
+			try {
+				await this.txtUploader.stopExecution();
+			} catch (error) {
+				log('TXT stop execution failed; continuing UI cleanup', 'warn', { operationId, error });
+			}
 
-		this.completeTxtExecutionOperation(operationId);
-		this.panel.webview.postMessage({ command: 'txtExecutionStopped', operationId });
-		this.panel.webview.postMessage({ command: 'txtTestResume', operationId });
+			const cleanedUp = await this.cleanupTxtVirtualControlSession({ notifyWebview: true, operationId });
+			if (!cleanedUp) {
+				log('Skipping TXT stopped notification for stale operation', 'info', {
+					operationId,
+					activeOperationId: this.activeTxtExecutionOperationId,
+				});
+				return;
+			}
+
+			this.completeTxtExecutionOperation(operationId);
+			shouldResumeTxtTestPanel = true;
+			this.panel.webview.postMessage({ command: 'txtExecutionStopped', operationId });
+		} finally {
+			this.stoppingTxtExecutionOperationIds.delete(operationId);
+			if (shouldResumeTxtTestPanel) {
+				this.panel.webview.postMessage({ command: 'txtTestResume', operationId });
+			}
+		}
 	}
 
 	/**

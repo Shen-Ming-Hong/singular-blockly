@@ -28,6 +28,16 @@ describe('WebView Message Handler', () => {
 	const extensionPath = '/mock/extension';
 	const workspacePath = '/mock/workspace';
 
+	function createDeferred<T>() {
+		let resolve!: (value: T | PromiseLike<T>) => void;
+		let reject!: (reason?: unknown) => void;
+		const promise = new Promise<T>((res, rej) => {
+			resolve = res;
+			reject = rej;
+		});
+		return { promise, resolve, reject };
+	}
+
 	// 在測試套件開始前保存原始的 fs 模組
 	before(() => {
 		const fsModule = require.cache[require.resolve('fs')];
@@ -468,16 +478,6 @@ describe('WebView Message Handler', () => {
 	});
 
 	it('should ignore stale TXT stop completion after a new upload operation starts', async () => {
-		function createDeferred<T>() {
-			let resolve!: (value: T | PromiseLike<T>) => void;
-			let reject!: (reason?: unknown) => void;
-			const promise = new Promise<T>((res, rej) => {
-				resolve = res;
-				reject = rej;
-			});
-			return { promise, resolve, reject };
-		}
-
 		const firstUpload = createDeferred<{ success: boolean; duration: number }>();
 		const secondUpload = createDeferred<{ success: boolean; duration: number }>();
 		const firstUploadStarted = createDeferred<void>();
@@ -591,6 +591,65 @@ describe('WebView Message Handler', () => {
 			.getCalls()
 			.find((call: any) => call.args[0].command === 'txtUploadResult' && call.args[0].operationId === 'op-new');
 		assert(newUploadResult, 'new upload result should still be delivered normally');
+	});
+
+	it('should clear TXT stopping operation when stopExecution rejects', async () => {
+		const upload = createDeferred<{ success: boolean; duration: number }>();
+		const uploadStarted = createDeferred<void>();
+		const txtUploaderStub = {
+			upload: sinon.stub().callsFake(async (_code: string, onProgress?: (progress: any) => void) => {
+				onProgress?.({ stage: 'executing', progress: 60, message: 'Starting program execution...' });
+				uploadStarted.resolve();
+				return upload.promise;
+			}),
+			stopExecution: sinon.stub().rejects(new Error('password lookup failed')),
+		};
+		(messageHandler as any).txtUploader = txtUploaderStub;
+
+		const uploadPromise = messageHandler.handleMessage({
+			command: 'txtUpload',
+			operationId: 'op-stop-fails',
+			code: 'print("hello")',
+			board: 'txt',
+			txtVirtualControls: {
+				schemaVersion: 1,
+				canvas: { mode: 'editing' },
+				controls: [],
+			},
+			virtualControlPreflight: {
+				valid: true,
+				invalidReferences: [],
+			},
+		});
+		await uploadStarted.promise;
+
+		await messageHandler.handleMessage({ command: 'txtStopExecution', operationId: 'op-stop-fails' });
+
+		assert.strictEqual(
+			(messageHandler as any).stoppingTxtExecutionOperationIds.has('op-stop-fails'),
+			false,
+			'stopping operation id should be cleared even when stopExecution rejects'
+		);
+		assert(
+			webviewMock.postMessage
+				.getCalls()
+				.some((call: any) => call.args[0].command === 'txtExecutionStopped' && call.args[0].operationId === 'op-stop-fails'),
+			'WebView should still receive a stopped notification so the TXT UI can reset'
+		);
+		assert(
+			webviewMock.postMessage
+				.getCalls()
+				.some((call: any) => call.args[0].command === 'txtTestResume' && call.args[0].operationId === 'op-stop-fails'),
+			'Test Panel polling should resume after a failed stop attempt'
+		);
+
+		upload.resolve({ success: true, duration: 12 });
+		await uploadPromise;
+
+		const staleUploadResult = webviewMock.postMessage
+			.getCalls()
+			.find((call: any) => call.args[0].command === 'txtUploadResult' && call.args[0].operationId === 'op-stop-fails');
+		assert.strictEqual(staleUploadResult, undefined, 'stopped upload completion should remain ignored after stop failure cleanup');
 	});
 
 	it('should handle prompt new variable message', async () => {
