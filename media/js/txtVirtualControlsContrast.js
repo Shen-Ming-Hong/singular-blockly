@@ -289,7 +289,13 @@
 		if (classList?.contains('vscode-high-contrast')) {
 			return 'high-contrast';
 		}
-		if (classList?.contains('theme-dark') || classList?.contains('vscode-dark')) {
+		if (classList?.contains('theme-dark')) {
+			return 'dark';
+		}
+		if (classList?.contains('theme-light')) {
+			return 'light';
+		}
+		if (classList?.contains('vscode-dark')) {
 			return 'dark';
 		}
 		return 'light';

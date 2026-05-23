@@ -473,33 +473,29 @@
     </div>
     <!-- TXT 連線設定對話框 -->
     <div id="txtConnectionModal" class="modal">
-        <div class="modal-content" style="max-width: 520px;">
+        <div class="modal-content txt-connection-modal-content">
             <div class="modal-header">
                 <h2 id="txtConnectionPanelTitle">TXT Controller 連線設定</h2>
                 <span class="modal-close" id="txtModalClose">&times;</span>
             </div>
             <div class="modal-body">
-                <div
-                    style="display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; margin-bottom: 12px;">
+                <div class="txt-connection-form-grid">
                     <label for="txtHostInput" id="txtHostLabel">Host IP</label>
-                    <input type="text" id="txtHostInput" placeholder="192.168.7.2"
-                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                    <input type="text" id="txtHostInput" class="txt-connection-input" placeholder="192.168.7.2">
                     <label for="txtUsernameInput" id="txtUsernameLabel">Username</label>
-                    <input type="text" id="txtUsernameInput" placeholder="ftc"
-                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                    <input type="text" id="txtUsernameInput" class="txt-connection-input" placeholder="ftc">
                     <label for="txtPasswordInput" id="txtPasswordLabel">Password</label>
-                    <input type="password" id="txtPasswordInput" placeholder="••••••••"
-                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                    <input type="password" id="txtPasswordInput" class="txt-connection-input" placeholder="••••••••">
                     <label for="txtRemotePathInput" id="txtRemotePathLabel">Remote Path</label>
                     <input type="text" id="txtRemotePathInput" placeholder="/tmp/singular_blockly/main.py"
-                        style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 4px 8px; border-radius: 2px;">
+                        class="txt-connection-input">
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <button id="txtSaveConfigBtn" class="primary-btn" style="padding: 4px 12px;">儲存設定</button>
-                    <button id="txtTestConnectionBtn" class="secondary-btn" style="padding: 4px 12px;">測試連線</button>
-                    <span id="txtConnectionStatus" style="font-size: 0.85em;"></span>
+                <div class="txt-connection-actions">
+                    <button id="txtSaveConfigBtn" class="primary-btn txt-connection-action-button">儲存設定</button>
+                    <button id="txtTestConnectionBtn" class="secondary-btn txt-connection-action-button">測試連線</button>
+                    <span id="txtConnectionStatus" class="txt-connection-status"></span>
                 </div>
-                <p id="txtSshHint" style="margin: 8px 0 0; font-size: 0.8rem; color: #888;"></p>
+                <p id="txtSshHint" class="txt-connection-hint"></p>
             </div>
         </div>
     </div>

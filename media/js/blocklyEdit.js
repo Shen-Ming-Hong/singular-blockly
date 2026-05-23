@@ -2374,13 +2374,13 @@ function updateTxtConnectionPanelTexts() {
 				'TXT_SSH_SETUP_DONE',
 				'✓ SSH setup complete. Future connections will not require confirmation on the TXT screen.'
 			);
-			sshHint.style.color = 'var(--vscode-testing-iconPassed, #73c991)';
+			sshHint.classList.add('txt-connection-hint-success');
 		} else {
 			sshHint.textContent = languageManager.getMessage(
 				'TXT_SSH_CONFIRM_HINT',
 				'Tip: If the TXT screen shows a confirmation prompt, press OK on the device to allow SSH access.'
 			);
-			sshHint.style.color = '';
+			sshHint.classList.remove('txt-connection-hint-success');
 		}
 	}
 }
@@ -4803,6 +4803,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			case 'loadWorkspace':
 				await handleWorkspaceLoadMessage(message);
 				break;
+			case 'updateTheme':
 			case 'setTheme':
 				// 直接從 VSCode 設定主題
 				currentTheme = message.theme || 'light';
@@ -5812,7 +5813,7 @@ function initTxtConnectionPanel() {
 			const statusEl = document.getElementById('txtConnectionStatus');
 			if (statusEl) {
 				statusEl.textContent = window.languageManager?.getMessage('TXT_TESTING', '連線中...');
-				statusEl.className = '';
+				statusEl.className = 'txt-connection-status';
 			}
 			vscode.postMessage({
 				command: 'txtTestConnection',
@@ -6477,7 +6478,8 @@ function handleTxtConnectionTestResult(message) {
 	const statusEl = document.getElementById('txtConnectionStatus');
 	if (statusEl) {
 		statusEl.textContent = message.message;
-		statusEl.className = message.success ? 'txt-status-ok' : 'txt-status-error';
+		statusEl.className = 'txt-connection-status';
+		statusEl.classList.add(message.success ? 'txt-status-ok' : 'txt-status-error');
 	}
 	if (message.sshSetupDone) {
 		txtSshSetupDone = true;
