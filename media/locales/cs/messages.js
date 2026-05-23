@@ -1122,6 +1122,12 @@ window.languageManager.loadMessages('cs', {
 	TXT_VIRTUAL_CONTROLS_INVALID_WARNING: 'Virtual button "{0}" no longer exists. Choose another button before running.',
 	TXT_VIRTUAL_CONTROLS_BLOCKED_TOAST: 'Cannot run until every virtual button block points to an existing button.',
 	TXT_VIRTUAL_CONTROLS_RUNTIME_ERROR: 'Virtual controls stopped: {0}',
+	TXT_VIRTUAL_CONTROLS_BUTTON_ARIA_LABEL: '{0}. Identifier {1}. State: {2}.',
+	TXT_VIRTUAL_CONTROLS_STATE_SELECTED: 'selected',
+	TXT_VIRTUAL_CONTROLS_STATE_RUNNING: 'running',
+	TXT_VIRTUAL_CONTROLS_STATE_EDITABLE: 'editable',
+	TXT_VIRTUAL_CONTROLS_STATE_PRESSED: 'pressed',
+	TXT_PREVIEW_BUTTON_ARIA_LABEL: '{0}. Identifier {1}. Preview only, cannot be edited or pressed.',
 	TXT_VIRTUAL_BUTTON_STATE_PREFIX: 'read virtual button',
 	TXT_VIRTUAL_BUTTON_STATE_TOOLTIP: 'Returns 1 while the selected virtual button is pressed, otherwise 0.',
 	// Test Panel UI

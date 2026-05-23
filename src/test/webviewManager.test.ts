@@ -70,6 +70,7 @@ describe('WebView Manager', () => {
         </head>
         <body class="theme-{theme}">
             <div id="blocklyDiv"></div>
+			<script src="{txtVirtualControlsContrastUri}"></script>
             <script src="{jsUri}"></script>
         </body>
         </html>
@@ -257,6 +258,14 @@ describe('WebView Manager', () => {
 		assert(htmlContent.includes("window.initialTheme = 'light'"));
 		assert(htmlContent.includes('class="theme-light"'));
 		assert(htmlContent.includes('https://mock-webview/'));
+		assert(
+			htmlContent.includes('https://mock-webview//mock/extension/media/js/txtVirtualControlsContrast.js'),
+			'TXT contrast helper script should be injected before the main editor script'
+		);
+		assert(
+			htmlContent.indexOf('txtVirtualControlsContrast.js') < htmlContent.indexOf('blocklyEdit.js'),
+			'TXT contrast helper should load before blocklyEdit.js'
+		);
 	});
 
 	it('should handle panel disposal', async () => {

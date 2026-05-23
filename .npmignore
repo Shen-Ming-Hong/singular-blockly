@@ -7,6 +7,7 @@ docs/
 coverage/
 dist/
 out/
+build/
 media/toolbox/temp_toolbox.json
 media/toolbox/temp_toolbox_*.json
 node_modules/
@@ -14,5 +15,8 @@ node_modules/
 .github/
 .nyc_output/
 *.log
+*.tmp
+.DS_Store
+Thumbs.db
 .env
 .env.*

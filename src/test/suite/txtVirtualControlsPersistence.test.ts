@@ -5,6 +5,7 @@
  */
 
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { WebViewMessageHandler } from '../../webview/messageHandler';
@@ -95,7 +96,7 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 					kind: 'button',
 					position: { x: 24, y: 48 },
 					size: { width: 72, height: 40 },
-					style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+					style: { backgroundColor: '#005a9e', textColor: '#ffffff' },
 				},
 			],
 		});
@@ -131,6 +132,76 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 				style: { backgroundColor: '#ff8f00', textColor: '#ffffff' },
 			},
 		]);
+	});
+
+	test('normalizeTxtVirtualControlsForSave should preserve theme color records without obsolete warning metadata', () => {
+		const normalizedDocument = normalizeTxtVirtualControlsForSave({
+			schemaVersion: 1,
+			canvas: { mode: 'editing' },
+			controls: [
+				{
+					stableId: 'btn-theme-style',
+					displayName: 'Theme Style',
+					identifier: 'theme_style',
+					kind: 'button',
+					position: { x: 10, y: 20 },
+					size: { width: 120, height: 48 },
+					style: {
+						backgroundColor: '#f57c00',
+						textColor: '#1f1f1f',
+						themeStyles: {
+							light: { backgroundColor: '#f57c00', textColor: '#1f1f1f', customized: true },
+							dark: { backgroundColor: '#ffca28', textColor: '#1f1f1f', customized: true },
+						},
+					},
+					obsoleteUiWarning: {
+						code: 'obsolete-warning',
+						reason: 'transient-ui-state',
+					},
+					previewWarnings: [{ code: 'obsolete-warning' }],
+				},
+			],
+		} as any);
+
+		assert.deepStrictEqual(normalizedDocument.controls[0], {
+			stableId: 'btn-theme-style',
+			displayName: 'Theme Style',
+			identifier: 'theme_style',
+			kind: 'button',
+			position: { x: 10, y: 20 },
+			size: { width: 120, height: 48 },
+			style: {
+				backgroundColor: '#f57c00',
+				textColor: '#1f1f1f',
+				themeStyles: {
+					light: { backgroundColor: '#f57c00', textColor: '#1f1f1f', customized: true },
+					dark: { backgroundColor: '#ffca28', textColor: '#1f1f1f', customized: true },
+				},
+			},
+		});
+		assert.strictEqual('obsoleteUiWarning' in normalizedDocument.controls[0], false);
+		assert.strictEqual('previewWarnings' in normalizedDocument.controls[0], false);
+	});
+
+	test('blocklyEdit should not write theme effective styles back during render', () => {
+		const source = fs.readFileSync(path.join(process.cwd(), 'media/js/blocklyEdit.js'), 'utf8');
+
+		assert.ok(
+			source.includes('function getTxtVirtualControlEffectiveStyleForControl'),
+			'edit renderer should resolve effective styles with a read-only helper'
+		);
+		assert.ok(
+			!source.includes('function syncTxtVirtualControlStyleToTheme'),
+			'edit renderer should not expose a sync helper that mutates persisted style fields'
+		);
+		assert.ok(
+			!source.includes('control.style.backgroundColor = effectiveStyle.backgroundColor'),
+			'theme rendering must not rewrite persisted backgroundColor'
+		);
+		assert.ok(
+			!source.includes('control.style.textColor = effectiveStyle.textColor'),
+			'theme rendering must not rewrite persisted textColor'
+		);
 	});
 
 	test('requestInitialState should recover malformed txtVirtualControls and send a normalized init payload', async () => {
@@ -200,7 +271,7 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 					kind: 'button',
 					position: { x: 24, y: 60 },
 					size: { width: 72, height: 40 },
-					style: { backgroundColor: '#0288d1', textColor: '#ffffff' },
+					style: { backgroundColor: '#005a9e', textColor: '#ffffff' },
 				},
 			],
 		});

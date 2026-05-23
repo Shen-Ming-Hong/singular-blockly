@@ -369,7 +369,8 @@
             </div>
             <p id="txtVirtualControlsCanvasHint" class="txt-virtual-controls-canvas-hint"></p>
             <div id="txtVirtualControlsEmptyState" class="txt-virtual-controls-empty-state"></div>
-            <div id="txtVirtualControlsCanvas" class="txt-virtual-controls-canvas"></div>
+            <div id="txtVirtualControlsCanvas" class="txt-virtual-controls-canvas"
+                aria-describedby="txtVirtualControlsCanvasHint"></div>
             <div id="txtVirtualControlsInspectorEmpty" class="txt-virtual-controls-inspector-empty"></div>
             <div id="txtVirtualControlsInspector" class="txt-virtual-controls-inspector hidden">
                 <div class="txt-virtual-controls-name-row">
@@ -381,8 +382,7 @@
                             class="txt-virtual-controls-identifier-value"></span>
                     </div>
                 </div>
-                <input id="txtVirtualControlNameInput" type="text"
-                    style="background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); padding: 6px 8px; border-radius: 4px;">
+                <input id="txtVirtualControlNameInput" type="text">
                 <div class="txt-virtual-controls-color-grid">
                     <div class="txt-virtual-controls-color-field">
                         <label for="txtVirtualControlBackgroundInput" id="txtVirtualControlBackgroundLabel"></label>
@@ -555,6 +555,7 @@
     {arduinoModules}
     {micropythonModules}
     {txtModules}
+    <script src="{txtVirtualControlsContrastUri}"></script>
     <script src="{jsUri}"></script>
     <script src="{experimentalMarkerUri}"></script>
     <script src="{contextExtractorUri}"></script>
