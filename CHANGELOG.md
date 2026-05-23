@@ -8,6 +8,40 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.78.0] - 2026-05-23
+
+### ✨ 新功能 New Features
+
+- **TXT M 系列輸出元件模型** (TXT M-series output component model)
+    - TXT `txt_motor_speed` 現在改為「M 埠 + 元件類型」模型，首版支援 `MOTOR` 與 `LAMP`，讓同一個 M 系列積木可依元件類型顯示馬達方向/速度或燈泡亮度欄位
+      TXT `txt_motor_speed` now uses an "M port + component type" model with initial `MOTOR` and `LAMP` support, so the same M-series block can show motor direction/speed fields or lamp brightness fields based on the selected component
+    - 保留既有 `txt_motor_speed` / `txt_motor_stop` public block type，舊工作區缺少 `COMPONENT` 欄位時會自動以 `MOTOR` 載入，避免破壞既有教材與專案
+      Preserves the existing `txt_motor_speed` / `txt_motor_stop` public block types; legacy workspaces without `COMPONENT` load as `MOTOR` to avoid breaking existing lessons and projects
+    - Toolbox 中的 M 輸出積木現在預設帶入 `math_number(512)` shadow，學生拖出積木即可直接執行，也仍可替換為變數或其他數值輸出積木
+      The toolbox M-output block now includes a default `math_number(512)` shadow so students can run it immediately while still being able to replace it with variables or other numeric output blocks
+
+### 🐛 修復 Bug Fixes
+
+- **TXT M/O 輸出衝突阻擋** (TXT M/O output conflict blocking)
+    - 新增同一 M 埠不同元件類型與 M/O shared-pin 衝突檢查，會在積木上顯示 warning，並阻擋上傳、執行與程式碼輸出，避免實體 TXT 控制器腳位互相衝突
+      Added conflict checks for different component types on the same M port and for M/O shared pins; warnings are shown on affected blocks and upload/execution/code output are blocked to prevent physical TXT controller pin conflicts
+    - 新增共用 validation helper、MCP block dictionary metadata、fixtures 與 contract tests，確保未來擴充新 M 元件時可沿用相同驗證規則
+      Added a shared validation helper, MCP block dictionary metadata, fixtures, and contract tests so future M components can reuse the same validation rules
+
+- **TXT 虛擬操控區執行狀態穩定性** (TXT virtual controls execution-state stability)
+    - 修正暗色模式與 fileWatcher reload 時，TXT 虛擬操控區可能在程式執行後被重載資料切回編輯模式的問題；執行中的 transient running 狀態現在會被保留
+      Fixed cases where TXT virtual controls could be switched back to editing mode by reload data during execution, especially around dark-theme/fileWatcher timing; transient running state is now preserved while the program is active
+    - 為 TXT upload/stop 訊息加入 `operationId` guard，避免停止後立刻重新執行時，舊的 completed/stopped 訊息把新的執行狀態切回編輯模式
+      Added an `operationId` guard to TXT upload/stop messages so stale completed/stopped events from a previous run no longer switch a new execution back to editing mode
+    - 即使 TXT stop 流程中的 `stopExecution()` 發生例外，也會清除 stopping marker 並恢復 UI/Test Panel polling，避免按鈕或虛擬操控區卡住
+      Even if `stopExecution()` throws during TXT stop handling, the stopping marker is cleared and the UI/Test Panel polling are resumed to avoid stuck buttons or virtual controls
+
+### 📝 文件 Documentation
+
+- **新增 TXT M output redesign SDD 文件** (Add TXT M output redesign SDD)
+    - 新增 `specs/056-txt-m-output-redesign/` 的規格、計畫、研究紀錄、資料模型、契約、快速驗證、requirements checklist 與任務清單
+      Added the `specs/056-txt-m-output-redesign/` specification, plan, research notes, data model, contracts, quickstart, requirements checklist, and tasks
+
 ## [0.77.0] - 2026-05-23
 
 ### ✨ 新功能 New Features
