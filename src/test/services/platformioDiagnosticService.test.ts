@@ -212,4 +212,111 @@ suite('PlatformioDiagnosticService Tests', () => {
 		assert.ok(summary.plainText.includes('/custom/penv/bin/pio'));
 		assert.ok(summary.plainText.includes('Overall status: Operational'));
 	});
+
+	test('uses platformio-ide.customPATH as an official settings path candidate', async () => {
+		const availablePaths = new Set([
+			'/official/penv/bin/pio',
+			'/official/penv',
+			'/official/penv/bin/python3',
+			'/official/penv/bin/pip3',
+			'/official/penv/bin/mpremote',
+		]);
+
+		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
+		execFileStub.callsFake(async (filePath: string) => {
+			return { stdout: `${filePath} version`, stderr: '' };
+		});
+
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub,
+			execFile: execFileStub,
+			env: { PATH: '/missing/bin' },
+			platform: 'darwin',
+			homeDir: '/Users/tester',
+			now: () => now,
+			localeService,
+			configuration: {
+				get(section: string, key: string) {
+					return section === 'platformio-ide' && key === 'customPATH' ? '/official/penv/bin' : undefined;
+				},
+			},
+		});
+
+		const session = await service.collectDiagnostics('/workspace/demo');
+
+		assert.strictEqual(session.items[0].resolvedPath, '/official/penv/bin/pio');
+		assert.strictEqual(session.items[0].source, 'official-platformio-custom-path');
+		assert.deepStrictEqual(session.settingsEvidence?.candidatePathEntries, ['/official/penv/bin']);
+	});
+
+	test('collects official PlatformIO and proxy settings evidence without failing when settings are absent', async () => {
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub,
+			execFile: execFileStub,
+			env: { PATH: '' },
+			platform: 'darwin',
+			homeDir: '/Users/tester',
+			now: () => now,
+			localeService,
+			configuration: {
+				get(section: string, key: string) {
+					const values: Record<string, unknown> = {
+						'platformio-ide.useBuiltinPIOCore': false,
+						'platformio-ide.useBuiltinPython': true,
+						'platformio-ide.useDevelopmentPIOCore': false,
+						'platformio-ide.customPyPiIndexUrl': 'https://pypi.example/simple',
+						'http.proxy': 'http://user:secret@proxy.example:8080',
+						'http.proxyStrictSSL': false,
+					};
+					return values[`${section}.${key}`];
+				},
+			},
+		});
+
+		const session = await service.collectDiagnostics('/workspace/demo');
+
+		assert.strictEqual(session.settingsEvidence?.useBuiltinPIOCore, false);
+		assert.strictEqual(session.settingsEvidence?.useBuiltinPython, true);
+		assert.strictEqual(session.settingsEvidence?.useDevelopmentPIOCore, false);
+		assert.strictEqual(session.settingsEvidence?.customPyPiIndexUrl, 'https://pypi.example/simple');
+		assert.strictEqual(session.settingsEvidence?.httpProxyConfigured, true);
+		assert.strictEqual(session.settingsEvidence?.proxyStrictSsl, false);
+		assert.ok(!session.settingsEvidence?.summary.includes('user:secret'), 'Proxy credentials must not appear in evidence summary');
+	});
+
+	test('splits Windows platformio-ide.customPATH entries with semicolon separators', async () => {
+		const availablePaths = new Set([
+			'C:\\tools\\penv\\Scripts\\pio.exe',
+			'C:\\tools\\penv',
+			'C:\\tools\\penv\\Scripts\\python.exe',
+		]);
+
+		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
+		execFileStub.callsFake(async (filePath: string) => {
+			return { stdout: `${filePath} version`, stderr: '' };
+		});
+
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub,
+			execFile: execFileStub,
+			env: { PATH: 'C:\\missing' },
+			platform: 'win32',
+			homeDir: 'C:\\Users\\Tester',
+			now: () => now,
+			localeService,
+			configuration: {
+				get(section: string, key: string) {
+					return section === 'platformio-ide' && key === 'customPATH'
+						? 'C:\\first;C:\\tools\\penv\\Scripts'
+						: undefined;
+				},
+			},
+		});
+
+		const session = await service.collectDiagnostics('C:\\workspace\\demo');
+
+		assert.deepStrictEqual(session.settingsEvidence?.candidatePathEntries, ['C:\\first', 'C:\\tools\\penv\\Scripts']);
+		assert.strictEqual(session.items[0].resolvedPath, 'C:\\tools\\penv\\Scripts\\pio.exe');
+		assert.strictEqual(session.items[0].source, 'official-platformio-custom-path');
+	});
 });

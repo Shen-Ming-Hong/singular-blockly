@@ -20,6 +20,19 @@ npm test
 npm run validate:i18n
 ```
 
+## 實作後驗證紀錄（2026-05-25）
+
+本輪實作後已完成下列自動化驗證：
+
+| 檢查 | 結果 | 備註 |
+|---|---:|---|
+| `npm run compile` | 通過 | `extension.js` 與 `mcp-server.js` 皆由 webpack 成功編譯。 |
+| `npm run lint` | 通過 | `src/` TypeScript ESLint 無錯誤。 |
+| `npm test` | 通過 | 801 passing、1 pending；涵蓋 guided repair planning/execution、history/fingerprint、redaction、AI packet、issue draft 與 panel clipboard/action flows。 |
+| `npm run validate:i18n` | 通過 | 14/14 非英文語系通過；僅保留既有 length warnings。 |
+
+本輪為 headless/自動化驗證環境，未連接實際 CyberBrick 硬體，也未以人工操作開啟 VS Code UI。下方 manual matrix 仍保留作為 release 前人工驗證清單；本輪已透過 contract/unit/panel tests 覆蓋下列等價行為：official `customPATH` 偵測、CyberBrick `mpremote` 修復流程、active repair run 防重測、workspace-scoped history、stale fingerprint/history 標記、AI repair packet redaction、issue draft local-only governance，以及 WebView escaping。
+
 建議新增/更新的測試檔：
 
 - `src/test/services/platformioDiagnosticService.test.ts`

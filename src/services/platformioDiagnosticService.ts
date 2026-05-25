@@ -7,9 +7,10 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { execFile as nodeExecFile } from 'child_process';
 import { LocaleService } from './localeService';
 import { log } from './logging';
+import { createPlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
+import { createExecFilePromise } from './platformioProcess';
 import {
 	getDefaultPlatformioExecutablePath,
 	getExecutableDirectory,
@@ -21,6 +22,7 @@ import {
 	DiagnosticItemId,
 	DiagnosticItemStatus,
 	DiagnosticSource,
+	OfficialPlatformioSettingsEvidence,
 	PanelActionId,
 	PlatformioDiagnosticItem,
 	PlatformioDiagnosticPanelState,
@@ -38,9 +40,14 @@ export interface PlatformioDiagnosticExecResult {
 	stderr: string;
 }
 
+export interface PlatformioConfigurationReader {
+	get(section: string, key: string): unknown;
+}
+
 export interface PlatformioDiagnosticServiceOptions {
 	existsSync?: (filePath: string) => boolean;
 	execFile?: (filePath: string, args: string[], options: { timeout: number }) => Promise<PlatformioDiagnosticExecResult>;
+	configuration?: PlatformioConfigurationReader;
 	env?: NodeJS.ProcessEnv;
 	platform?: NodeJS.Platform;
 	homeDir?: string;
@@ -69,7 +76,7 @@ interface PenvRootResolution {
 type MessageDefinitionRecord<TKey extends string> = Record<TKey, [messageKey: string, fallback: string]>;
 
 const DEFAULT_ACTIONS: PanelActionId[] = ['retest', 'copySummary'];
-const DEFAULT_SECTION_ORDER: ['summary', 'tools', 'scope'] = ['summary', 'tools', 'scope'];
+const DEFAULT_SECTION_ORDER: PlatformioDiagnosticPanelState['sectionOrder'] = ['summary', 'tools', 'repair', 'exports', 'scope'];
 const TOOL_LABEL_DEFINITIONS: MessageDefinitionRecord<DiagnosticItemId> = {
 	pio: ['PLATFORMIO_DIAGNOSTIC_TOOL_PIO', 'PlatformIO CLI (pio)'],
 	penvRoot: ['PLATFORMIO_DIAGNOSTIC_TOOL_PENV_ROOT', 'PlatformIO penv root'],
@@ -80,8 +87,12 @@ const TOOL_LABEL_DEFINITIONS: MessageDefinitionRecord<DiagnosticItemId> = {
 const SOURCE_LABEL_DEFINITIONS: MessageDefinitionRecord<DiagnosticSource> = {
 	'default-platformio-path': ['PLATFORMIO_DIAGNOSTIC_SOURCE_DEFAULT_PLATFORMIO_PATH', 'Default PlatformIO path'],
 	'path-search': ['PLATFORMIO_DIAGNOSTIC_SOURCE_PATH_SEARCH', 'PATH search'],
+	'official-platformio-custom-path': ['PLATFORMIO_DIAGNOSTIC_SOURCE_OFFICIAL_PLATFORMIO_CUSTOM_PATH', 'PlatformIO customPATH setting'],
+	'official-platformio-settings': ['PLATFORMIO_DIAGNOSTIC_SOURCE_OFFICIAL_PLATFORMIO_SETTINGS', 'Official PlatformIO settings'],
+	'common-dir': ['PLATFORMIO_DIAGNOSTIC_SOURCE_COMMON_DIR', 'Common tool directory'],
 	'resolved-pio-sibling': ['PLATFORMIO_DIAGNOSTIC_SOURCE_RESOLVED_PIO_SIBLING', 'Derived from resolved pio sibling'],
 	'derived-from-penv': ['PLATFORMIO_DIAGNOSTIC_SOURCE_DERIVED_FROM_PENV', 'Derived from detected penv'],
+	'repair-history': ['PLATFORMIO_DIAGNOSTIC_SOURCE_REPAIR_HISTORY', 'Repair history'],
 	unresolved: ['PLATFORMIO_DIAGNOSTIC_SOURCE_UNRESOLVED', 'Unresolved'],
 };
 const ITEM_STATUS_LABEL_DEFINITIONS: MessageDefinitionRecord<DiagnosticItemStatus> = {
@@ -100,19 +111,6 @@ const DEFAULT_EXECUTABLE_NAMES: Record<Exclude<DiagnosticItemId, 'penvRoot'>, 'p
 	pip: 'pip',
 	mpremote: 'mpremote',
 };
-
-function createExecFilePromise(filePath: string, args: string[], options: { timeout: number }): Promise<PlatformioDiagnosticExecResult> {
-	return new Promise((resolve, reject) => {
-		nodeExecFile(filePath, args, { encoding: 'utf8', timeout: options.timeout }, (error, stdout, stderr) => {
-			if (error) {
-				reject({ error, stdout, stderr });
-				return;
-			}
-
-			resolve({ stdout, stderr });
-		});
-	});
-}
 
 function firstNonEmpty(...values: Array<string | undefined>): string | undefined {
 	return values.find(value => !!value && value.trim().length > 0)?.trim();
@@ -133,6 +131,7 @@ function unique(values: Array<string | null | undefined>): string[] {
 export class PlatformioDiagnosticService {
 	private readonly existsSync: (filePath: string) => boolean;
 	private readonly execFile: (filePath: string, args: string[], options: { timeout: number }) => Promise<PlatformioDiagnosticExecResult>;
+	private readonly configuration?: PlatformioConfigurationReader;
 	private readonly env: NodeJS.ProcessEnv;
 	private readonly platform: NodeJS.Platform;
 	private readonly homeDir: string;
@@ -143,6 +142,7 @@ export class PlatformioDiagnosticService {
 	constructor(options: PlatformioDiagnosticServiceOptions = {}) {
 		this.existsSync = options.existsSync ?? fs.existsSync;
 		this.execFile = options.execFile ?? createExecFilePromise;
+		this.configuration = options.configuration;
 		this.env = options.env ?? process.env;
 		this.platform = options.platform ?? process.platform;
 		this.homeDir = options.homeDir ?? os.homedir();
@@ -185,12 +185,13 @@ export class PlatformioDiagnosticService {
 		log('[platformio-diagnostic] starting diagnostic collection', 'info', { workspacePath });
 
 		const requestedAt = this.now().toISOString();
+		const settingsEvidence = this.collectOfficialSettingsEvidence();
 		const searchDirectories = getExecutableSearchDirectories(this.env, this.platform);
-		const pioResolution = this.resolvePio(searchDirectories);
+		const pioResolution = this.resolvePio(settingsEvidence.candidatePathEntries, searchDirectories);
 		const pioDirectory = getExecutableDirectory(pioResolution.resolvedPath);
 		const penvResolution = this.resolvePenvRoot(pioResolution.resolvedPath);
 		const validatedPenvRootPath = penvResolution.status === 'valid' ? penvResolution.resolvedPath : null;
-		const toolSearchDirectories = unique([pioDirectory, ...searchDirectories]);
+		const toolSearchDirectories = unique([pioDirectory, ...settingsEvidence.candidatePathEntries, ...searchDirectories]);
 
 		const pioItem = await this.buildExecutableItem('pio', pioResolution, ['--version']);
 		const penvRootItem = await this.buildPenvRootItem(penvResolution, pioResolution.resolvedPath);
@@ -208,11 +209,18 @@ export class PlatformioDiagnosticService {
 		);
 
 		const session: PlatformioDiagnosticSession = {
+			sessionId: requestedAt,
 			requestedAt,
 			workspacePath,
 			overallStatus,
 			items,
 			scopeNotice,
+			settingsEvidence,
+			environment: {
+				platform: this.platform,
+				arch: process.arch,
+				pathSeparator: this.platform === 'win32' ? ';' : ':',
+			},
 		};
 
 		log('[platformio-diagnostic] diagnostic collection completed', 'info', {
@@ -236,6 +244,7 @@ export class PlatformioDiagnosticService {
 		const versionLabel = await this.message('PLATFORMIO_DIAGNOSTIC_VERSION', 'Version probe');
 		const scopeTitle = await this.message('PLATFORMIO_DIAGNOSTIC_SCOPE_TITLE', 'Scope');
 		const unresolvedPathLabel = await this.message('PLATFORMIO_DIAGNOSTIC_PATH_UNRESOLVED', 'Not resolved');
+		const settingsTitle = await this.message('PLATFORMIO_DIAGNOSTIC_SETTINGS_EVIDENCE', 'PlatformIO settings evidence');
 
 		const lines: string[] = [
 			panelTitle,
@@ -262,16 +271,38 @@ export class PlatformioDiagnosticService {
 			lines.push('');
 		}
 
+		if (session.settingsEvidence) {
+			lines.push(`${settingsTitle}: ${session.settingsEvidence.summary}`);
+			if (session.settingsEvidence.customPath) {
+				lines.push(`  customPATH: ${session.settingsEvidence.customPath}`);
+			}
+			lines.push('');
+		}
+
 		lines.push(`${scopeTitle}: ${session.scopeNotice}`);
+		const redactor = createPlatformioPrivacyRedactor({
+			homeDir: this.homeDir,
+			workspacePath: session.workspacePath,
+		});
 
 		return {
-			plainText: lines.join('\n').trim(),
+			plainText: redactor.redact(lines.join('\n').trim()),
 			generatedAt: session.requestedAt,
 			overallStatus: session.overallStatus,
 		};
 	}
 
-	private resolvePio(searchDirectories: string[]): ResolvedDiagnosticTarget {
+	private resolvePio(customPathEntries: string[], searchDirectories: string[]): ResolvedDiagnosticTarget {
+		const resolvedFromSettings = this.resolveExecutableFromEntries(customPathEntries, ['pio']);
+		if (resolvedFromSettings) {
+			return {
+				resolvedPath: resolvedFromSettings,
+				source: 'official-platformio-custom-path',
+				exists: true,
+				isFromDetectedPenv: null,
+			};
+		}
+
 		const defaultPath = getDefaultPlatformioExecutablePath('pio', this.platform, this.homeDir);
 		if (this.existsSync(defaultPath)) {
 			return {
@@ -305,6 +336,107 @@ export class PlatformioDiagnosticService {
 			exists: false,
 			isFromDetectedPenv: null,
 		};
+	}
+
+	private collectOfficialSettingsEvidence(): OfficialPlatformioSettingsEvidence {
+		const customPath = this.readStringSetting('platformio-ide', 'customPATH');
+		const useBuiltinPython = this.readBooleanSetting('platformio-ide', 'useBuiltinPython');
+		const useBuiltinPIOCore = this.readBooleanSetting('platformio-ide', 'useBuiltinPIOCore');
+		const useDevelopmentPIOCore = this.readBooleanSetting('platformio-ide', 'useDevelopmentPIOCore');
+		const customPyPiIndexUrl = this.readStringSetting('platformio-ide', 'customPyPiIndexUrl');
+		const httpProxy = this.readStringSetting('http', 'proxy');
+		const proxyStrictSsl = this.readBooleanSetting('http', 'proxyStrictSSL');
+		const candidatePathEntries = this.parsePathSetting(customPath);
+
+		const summaryParts = [
+			`customPATH entries=${candidatePathEntries.length}`,
+			`useBuiltinPython=${this.formatOptionalBoolean(useBuiltinPython)}`,
+			`useBuiltinPIOCore=${this.formatOptionalBoolean(useBuiltinPIOCore)}`,
+			`useDevelopmentPIOCore=${this.formatOptionalBoolean(useDevelopmentPIOCore)}`,
+			`customPyPiIndexUrl=${customPyPiIndexUrl ? 'configured' : 'not-configured'}`,
+			`http.proxy=${httpProxy ? 'configured' : 'not-configured'}`,
+			`http.proxyStrictSSL=${this.formatOptionalBoolean(proxyStrictSsl)}`,
+		];
+
+		return {
+			customPath,
+			useBuiltinPython,
+			useBuiltinPIOCore,
+			useDevelopmentPIOCore,
+			customPyPiIndexUrl,
+			httpProxyConfigured: !!httpProxy,
+			proxyStrictSsl,
+			candidatePathEntries,
+			summary: summaryParts.join('; '),
+		};
+	}
+
+	private readStringSetting(section: string, key: string): string | null {
+		const value = this.configuration?.get(section, key);
+		return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+	}
+
+	private readBooleanSetting(section: string, key: string): boolean | undefined {
+		const value = this.configuration?.get(section, key);
+		return typeof value === 'boolean' ? value : undefined;
+	}
+
+	private parsePathSetting(value: string | null): string[] {
+		if (!value) {
+			return [];
+		}
+
+		const separator = this.platform === 'win32' ? ';' : ':';
+		return unique(
+			value
+				.split(separator)
+				.map(entry => entry.trim())
+				.filter(Boolean)
+		);
+	}
+
+	private resolveExecutableFromEntries(entries: string[], executableNames: string[]): string | null {
+		const executableCandidates = this.createExecutableCandidates(entries, executableNames);
+		return executableCandidates.find(candidate => this.existsSync(candidate)) ?? null;
+	}
+
+	private createExecutableCandidates(entries: string[], executableNames: string[]): string[] {
+		const expandedNames = executableNames.flatMap(name => this.expandExecutableName(name));
+		const candidates: string[] = [];
+
+		for (const entry of entries) {
+			const entryBaseName = this.getPlatformBasename(entry).toLowerCase();
+			if (expandedNames.map(name => name.toLowerCase()).includes(entryBaseName)) {
+				candidates.push(entry);
+				continue;
+			}
+
+			for (const executableName of expandedNames) {
+				candidates.push(this.joinPlatformPath(entry, executableName));
+			}
+		}
+
+		return unique(candidates);
+	}
+
+	private expandExecutableName(name: string): string[] {
+		if (this.platform !== 'win32' || path.extname(name)) {
+			return [name];
+		}
+
+		return [`${name}.exe`, `${name}.cmd`, `${name}.bat`, name];
+	}
+
+	private getPlatformBasename(filePath: string): string {
+		return this.platform === 'win32' ? path.win32.basename(filePath) : path.basename(filePath);
+	}
+
+	private joinPlatformPath(directoryPath: string, fileName: string): string {
+		return this.platform === 'win32' ? path.win32.join(directoryPath, fileName) : path.join(directoryPath, fileName);
+	}
+
+	private formatOptionalBoolean(value: boolean | undefined): string {
+		return typeof value === 'boolean' ? String(value) : 'unset';
 	}
 
 	private resolvePenvRoot(resolvedPioPath: string | null): PenvRootResolution {
@@ -367,8 +499,8 @@ export class PlatformioDiagnosticService {
 				exists: false,
 				isFromDetectedPenv: null,
 				reason: await this.message(
-				'PLATFORMIO_DIAGNOSTIC_REASON_PENV_UNRESOLVED',
-				'No penv root could be derived because the PlatformIO CLI path is not resolved yet.'
+					'PLATFORMIO_DIAGNOSTIC_REASON_PENV_UNRESOLVED',
+					'No penv root could be derived because the PlatformIO CLI path is not resolved yet.'
 				),
 				nextStep: await this.message(
 					'PLATFORMIO_DIAGNOSTIC_NEXTSTEP_CHECK_PLATFORMIO_INSTALL',

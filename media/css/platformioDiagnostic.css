@@ -90,6 +90,7 @@ body {
 	gap: 10px;
 	flex-wrap: wrap;
 	justify-content: flex-end;
+	max-width: 560px;
 }
 
 .primary-btn,
@@ -123,6 +124,11 @@ body {
 
 .secondary-btn:hover:not(:disabled) {
 	background: color-mix(in srgb, var(--panel-surface-muted) 82%, var(--vscode-list-hoverBackground, #ececec) 18%);
+}
+
+.compact-btn {
+	padding: 6px 10px;
+	font-size: 12px;
 }
 
 .primary-btn:disabled,
@@ -216,8 +222,17 @@ body {
 
 .summary-card,
 .tools-card,
+.repair-card,
+.exports-card,
 .scope-card {
 	padding: 20px;
+}
+
+.section-header-with-action {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
 }
 
 .summary-layout {
@@ -295,11 +310,91 @@ body {
 	gap: 14px;
 }
 
-.tool-card {
+.repair-content {
+	display: grid;
+	gap: 14px;
+}
+
+.tool-card,
+.repair-flow-card,
+.repair-progress-card,
+.repair-confirmation,
+.repair-history {
 	padding: 18px;
 	border-radius: 12px;
 	background: var(--panel-surface-muted);
 	border: 1px solid color-mix(in srgb, var(--panel-border) 75%, transparent);
+}
+
+.repair-confirmation {
+	border-color: color-mix(in srgb, var(--vscode-textLink-foreground, #2563eb) 42%, transparent);
+	box-shadow: inset 4px 0 0 var(--vscode-textLink-foreground, #2563eb);
+}
+
+.repair-confirmation h3,
+.repair-progress-card h3,
+.repair-history h3 {
+	margin-top: 0;
+}
+
+.repair-summary {
+	margin: 0 0 14px;
+	line-height: 1.6;
+	color: var(--panel-text-muted);
+}
+
+.repair-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.repair-step-list {
+	margin: 14px 0 0;
+	padding-left: 22px;
+	display: grid;
+	gap: 10px;
+}
+
+.repair-step-list li {
+	padding: 12px;
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--panel-surface) 86%, transparent);
+}
+
+.repair-step-list p {
+	margin: 6px 0;
+	line-height: 1.5;
+	color: var(--panel-text-muted);
+}
+
+.repair-step-list code {
+	display: block;
+	white-space: pre-wrap;
+	word-break: break-word;
+	padding: 8px;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--vscode-editor-background, #ffffff) 72%, var(--vscode-textCodeBlock-background, #f3f3f3) 28%);
+}
+
+.repair-confirmation-actions {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-top: 16px;
+}
+
+.repair-history-list {
+	margin: 12px 0 0;
+	padding-left: 20px;
+	display: grid;
+	gap: 8px;
+	line-height: 1.5;
+}
+
+.repair-history-list span {
+	color: var(--panel-text-muted);
 }
 
 .tool-card-header {
@@ -374,6 +469,16 @@ body {
 .status-pill-error {
 	background: var(--status-error-bg);
 	color: var(--status-error-text);
+}
+
+.status-pill-low {
+	background: var(--status-operational-bg);
+	color: var(--status-operational-text);
+}
+
+.status-pill-medium {
+	background: var(--status-degraded-bg);
+	color: var(--status-degraded-text);
 }
 
 .source-pill {

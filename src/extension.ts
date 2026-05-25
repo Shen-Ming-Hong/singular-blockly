@@ -53,7 +53,13 @@ export async function activate(context: vscode.ExtensionContext) {
 		const localeService = new LocaleService(context.extensionPath);
 		const nodeDetectionService = new NodeDetectionService();
 		const diagnosticService = new DiagnosticService(nodeDetectionService, localeService);
-		const platformioDiagnosticService = PlatformioDiagnosticService.fromLocaleService(localeService);
+		const platformioDiagnosticService = PlatformioDiagnosticService.fromLocaleService(localeService, {
+			configuration: {
+				get(section: string, key: string) {
+					return vscodeApi.workspace.getConfiguration(section).get(key);
+				},
+			},
+		});
 
 		// 【最優先】檢查是否為 CyberBrick/MicroPython 專案，若是則刪除 platformio.ini
 		// 必須在 PlatformIO 擴充功能偵測到 ini 檔案之前執行
