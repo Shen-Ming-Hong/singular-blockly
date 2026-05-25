@@ -537,6 +537,8 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		assert.ok(script.includes('${escapeHtml(flow.title)}'), 'Repair flow titles must be escaped before HTML insertion');
 		assert.ok(script.includes('${escapeHtml(flow.summary)}'), 'Repair summaries must be escaped before HTML insertion');
 		assert.ok(script.includes('${escapeHtml(step.commandPreview)}'), 'Repair command previews must be escaped before HTML insertion');
+		assert.ok(script.includes('findActionTarget(event)'), 'Repair action clicks must guard non-Element event targets');
+		assert.ok(script.includes('event.target instanceof Element'), 'Repair action clicks must not call closest on text nodes');
 		assert.ok(script.includes('elements.feedbackBanner.textContent = message;'), 'Feedback messages must use textContent');
 		assert.ok(script.includes('elements.exportNotice.textContent = notice;'), 'Export notices must use textContent');
 	});

@@ -129,7 +129,7 @@ function bindEvents() {
 	});
 
 	elements.repairContent.addEventListener('click', event => {
-		const target = event.target.closest('[data-action]');
+		const target = findActionTarget(event);
 		if (!target) {
 			return;
 		}
@@ -145,6 +145,20 @@ function bindEvents() {
 			vscode.postMessage({ command: 'platformioDiagnostic:cancelAutoRepair' });
 		}
 	});
+}
+
+function findActionTarget(event) {
+	const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+	for (const item of path) {
+		if (item instanceof Element) {
+			const target = item.closest('[data-action]');
+			if (target) {
+				return target;
+			}
+		}
+	}
+
+	return event.target instanceof Element ? event.target.closest('[data-action]') : null;
 }
 
 function renderLoading() {

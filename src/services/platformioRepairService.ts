@@ -43,7 +43,7 @@ export interface ExecuteRepairFlowOptions {
 	isCancelled?: () => boolean;
 }
 
-const MAX_REPAIR_STEPS = 3;
+const MAX_REPAIR_FLOWS = 3;
 
 export class PlatformioRepairService {
 	private readonly execFile: (filePath: string, args: string[], options: { timeout: number }) => Promise<PlatformioRepairExecResult>;
@@ -71,7 +71,7 @@ export class PlatformioRepairService {
 			this.createMpremoteRepairFlow(session, history, redactor),
 		].filter((flow): flow is RepairFlow => !!flow);
 
-		return flows.slice(0, MAX_REPAIR_STEPS);
+		return flows.slice(0, MAX_REPAIR_FLOWS);
 	}
 
 	async executeRepairFlow(flow: RepairFlow, options: ExecuteRepairFlowOptions): Promise<AutoRepairRun> {
@@ -285,15 +285,25 @@ export class PlatformioRepairService {
 				{ executable: redactor.redact(step.executable) }
 			);
 		} catch (error: any) {
+			const nestedError = error?.error;
 			const stdout = typeof error?.stdout === 'string' ? error.stdout : '';
 			const stderr = typeof error?.stderr === 'string' ? error.stderr : '';
-			const message = typeof error?.message === 'string' ? error.message : String(error?.error ?? error);
-			const timedOut = /timed out|timeout/i.test(message) || error?.error?.killed === true;
+			const message = typeof error?.message === 'string'
+				? error.message
+				: typeof nestedError?.message === 'string'
+					? nestedError.message
+					: this.combineOutput(stderr, stdout) || String(nestedError ?? error);
+			const timedOut = /timed out|timeout/i.test(message) || error?.killed === true || nestedError?.killed === true;
+			const exitCode = typeof error?.code === 'number'
+				? error.code
+				: typeof nestedError?.code === 'number'
+					? nestedError.code
+					: null;
 			return this.createStepResult(
 				step,
 				startedAtDate,
 				timedOut ? 'timed-out' : 'failed',
-				typeof error?.code === 'number' ? error.code : null,
+				exitCode,
 				this.combineOutput(stdout, stderr, message),
 				true,
 				redactor,

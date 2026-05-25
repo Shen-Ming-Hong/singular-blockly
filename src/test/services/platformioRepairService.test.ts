@@ -179,10 +179,9 @@ suite('PlatformioRepairService Tests', () => {
 
 	test('stops on timed-out blocking failures with sanitized output', async () => {
 		const execFile = sinon.stub().rejects({
-			error: { killed: true },
+			error: { code: 124, killed: true, message: 'Command timed out' },
 			stdout: 'downloading into /Users/alice/secret',
 			stderr: 'timeout token ghp_abcdefghijklmnopqrstuvwxyz1234567890ABCD',
-			message: 'Command timed out',
 		});
 		const service = new PlatformioRepairService({
 			execFile,
@@ -212,6 +211,7 @@ suite('PlatformioRepairService Tests', () => {
 
 		assert.strictEqual(run.status, 'failed');
 		assert.strictEqual(run.stepResults[0].status, 'timed-out');
+		assert.strictEqual(run.stepResults[0].exitCode, 124);
 		assert.ok(!run.stepResults[0].sanitizedOutput.includes('/Users/alice'));
 		assert.ok(!run.stepResults[0].sanitizedOutput.includes('ghp_'));
 		assert.strictEqual(execFile.callCount, 1);
