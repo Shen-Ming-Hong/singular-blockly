@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.79.0] - 2026-05-25
+
+### ✨ 新功能 New Features
+
+- **PlatformIO Guided Repair 診斷流程** (PlatformIO guided repair diagnostics)
+    - 將 guided repair 整合進既有 `Check PlatformIO Status` 面板，診斷會讀取官方 PlatformIO VS Code extension 的公開設定證據（包含 `platformio-ide.customPATH`、內建 PIO/Python 選項、PyPI/proxy 相關設定），降低 VS Code extension runtime 與官方 PlatformIO 設定不一致造成的誤判
+      Integrated guided repair into the existing `Check PlatformIO Status` panel; diagnostics now read public settings from the official PlatformIO VS Code extension, including `platformio-ide.customPATH`, built-in PIO/Python options, and PyPI/proxy-related settings, reducing false negatives caused by runtime/configuration mismatches
+    - 新增需使用者確認的低風險自動修復流程、workspace-scoped 修復歷程與 active run 狀態；自動命令僅允許以偵測到的 Python 執行 `python -m pip install --user --upgrade mpremote`，不使用 shell、`sudo`、系統套件管理器或 PATH/profile/registry 修改
+      Added confirmation-gated low-risk auto repair flows, workspace-scoped repair history, and active-run state; automatic commands are limited to running `python -m pip install --user --upgrade mpremote` with the detected Python, without shell execution, `sudo`, system package managers, or PATH/profile/registry mutation
+    - 新增 AI repair packet 與本機 issue draft 產生器，協助使用者把「這次如何排查與修復」交給 AI 或人工 issue triage；輸出會遮蔽 home/workspace path、proxy credentials 與 token-like 字串，且 issue draft 只會複製到剪貼簿、不會自動發布
+      Added AI repair packet and local issue draft generators to help users hand off the current troubleshooting context to AI assistance or human issue triage; exports redact home/workspace paths, proxy credentials, and token-like strings, and issue drafts are copied locally instead of being published automatically
+    - 補齊 PlatformIO guided repair UI、15 語系文案、SpecKit 文件與服務/面板回歸測試；此版本已通過 compile、lint、test、i18n validation 與 CodeQL/Translation CI
+      Added PlatformIO guided repair UI, 15-locale copy, SpecKit documentation, and service/panel regression tests; this release passed compile, lint, test, i18n validation, and CodeQL/Translation CI
+
 ## [0.78.2] - 2026-05-24
 
 ### 🐛 修復 Bug Fixes
