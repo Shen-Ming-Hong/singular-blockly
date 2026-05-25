@@ -9,17 +9,31 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { LocaleService } from '../services/localeService';
 import { log } from '../services/logging';
+import { PlatformioAiRepairPacketService } from '../services/platformioAiRepairPacketService';
 import { PlatformioDiagnosticService } from '../services/platformioDiagnosticService';
+import { PlatformioIssueDraftService } from '../services/platformioIssueDraftService';
+import { PlatformioRepairHistoryStore } from '../services/platformioRepairHistoryStore';
+import { PlatformioRepairService } from '../services/platformioRepairService';
 import {
+	AiRepairPacket,
+	AutoRepairRun,
 	DiagnosticItemId,
 	DiagnosticItemStatus,
 	DiagnosticSource,
+	EnvironmentFingerprint,
+	IssueDraftProposal,
 	PanelActionId,
+	PanelRepairState,
 	PlatformioDiagnosticExtensionToWebviewMessage,
 	PlatformioDiagnosticLocalizedStrings,
 	PlatformioDiagnosticPanelState,
+	PlatformioDiagnosticSession,
 	PlatformioDiagnosticWebviewToExtensionMessage,
 	PlatformioOverallStatus,
+	RepairConfirmationModel,
+	RepairFlow,
+	RepairHistorySnapshot,
+	RepairHistorySummary,
 } from '../types/platformioDiagnostic';
 
 const PANEL_COMMAND_BY_STATE: Record<
@@ -36,6 +50,38 @@ interface FileSystemLike {
 	promises: {
 		readFile(path: string, encoding?: BufferEncoding): Promise<string | Buffer>;
 	};
+}
+
+interface RepairServiceLike {
+	planRepairFlows(session: PlatformioDiagnosticSession, history?: RepairHistorySummary | null): RepairFlow[];
+	executeRepairFlow(flow: RepairFlow, options: Parameters<PlatformioRepairService['executeRepairFlow']>[1]): Promise<AutoRepairRun>;
+}
+
+interface RepairHistoryStoreLike {
+	createEnvironmentFingerprint(session: PlatformioDiagnosticSession): EnvironmentFingerprint;
+	createEmptySnapshot(fingerprint: EnvironmentFingerprint): RepairHistorySnapshot;
+	loadSnapshot(fingerprint?: EnvironmentFingerprint): Promise<RepairHistorySnapshot | null>;
+	appendRun(fingerprint: EnvironmentFingerprint, run: AutoRepairRun): Promise<RepairHistorySnapshot>;
+	clear(fingerprint: EnvironmentFingerprint): Promise<RepairHistorySnapshot>;
+}
+
+interface AiRepairPacketServiceLike {
+	buildPacket(input: { session: PlatformioDiagnosticSession; historySummary?: RepairHistorySummary | null }): AiRepairPacket;
+}
+
+interface IssueDraftServiceLike {
+	buildDraft(input: {
+		session: PlatformioDiagnosticSession;
+		historySummary?: RepairHistorySummary | null;
+		source: 'ai-assisted' | 'human-confirmed';
+	}): IssueDraftProposal;
+}
+
+interface PlatformioDiagnosticPanelRepairOptions {
+	repairService?: RepairServiceLike;
+	historyStore?: RepairHistoryStoreLike;
+	aiPacketService?: AiRepairPacketServiceLike;
+	issueDraftService?: IssueDraftServiceLike;
 }
 
 // VSCode API 引用（可在測試中注入）
@@ -62,14 +108,26 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 	private currentState: PlatformioDiagnosticPanelState;
 	private localizedStringsPromise: Promise<PlatformioDiagnosticLocalizedStrings> | null = null;
 	private runningDiagnostics: Promise<void> | null = null;
+	private activeRepairPromise: Promise<void> | null = null;
+	private cancellationRequested = false;
+	private currentFingerprint: EnvironmentFingerprint | null = null;
+	private readonly repairService: RepairServiceLike;
+	private readonly historyStore: RepairHistoryStoreLike;
+	private readonly aiPacketService: AiRepairPacketServiceLike;
+	private readonly issueDraftService: IssueDraftServiceLike;
 
 	constructor(
 		private readonly context: vscode.ExtensionContext,
 		private readonly localeService: LocaleService,
 		private readonly diagnosticService: PlatformioDiagnosticService,
 		private readonly fileSystem: FileSystemLike = fs,
+		repairOptions: PlatformioDiagnosticPanelRepairOptions = {},
 	) {
 		this.currentState = this.diagnosticService.createLoadingState();
+		this.repairService = repairOptions.repairService ?? new PlatformioRepairService();
+		this.historyStore = repairOptions.historyStore ?? new PlatformioRepairHistoryStore(context.workspaceState);
+		this.aiPacketService = repairOptions.aiPacketService ?? new PlatformioAiRepairPacketService();
+		this.issueDraftService = repairOptions.issueDraftService ?? new PlatformioIssueDraftService();
 	}
 
 	async show(): Promise<void> {
@@ -106,6 +164,9 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			this.webviewReady = false;
 			this.hasInitialized = false;
 			this.runningDiagnostics = null;
+			this.activeRepairPromise = null;
+			this.cancellationRequested = false;
+			this.currentFingerprint = null;
 			this.currentState = this.diagnosticService.createLoadingState();
 			this.localizedStringsPromise = null;
 			log('[platformio-diagnostic] panel disposed', 'info');
@@ -124,9 +185,10 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 	}
 
 	private async handleMessage(message: PlatformioDiagnosticWebviewToExtensionMessage): Promise<void> {
+		this.webviewReady = true;
+
 		switch (message.command) {
 			case 'platformioDiagnostic:ready':
-				this.webviewReady = true;
 				if (!this.hasInitialized) {
 					this.hasInitialized = true;
 					void this.runDiagnostics();
@@ -135,13 +197,109 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 				await this.postCurrentState();
 				return;
 			case 'platformioDiagnostic:retest':
+				if (this.activeRepairPromise) {
+					await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+						'PLATFORMIO_REPAIR_RETEST_BLOCKED_ACTIVE_RUN',
+						'Repair is currently running. Wait for it to finish before retesting.'
+					));
+					return;
+				}
 				void this.runDiagnostics();
 				return;
 			case 'platformioDiagnostic:copySummary':
 				await this.copySummary();
 				return;
+			case 'platformioDiagnostic:startAutoRepair':
+				await this.startAutoRepair(message.flowId);
+				return;
+			case 'platformioDiagnostic:confirmAutoRepair':
+				void this.confirmAutoRepair(message.flowId);
+				return;
+			case 'platformioDiagnostic:cancelAutoRepair':
+				await this.cancelAutoRepair();
+				return;
+			case 'platformioDiagnostic:clearRepairHistory':
+				await this.clearRepairHistory();
+				return;
+			case 'platformioDiagnostic:copyAiRepairPacket':
+				await this.copyAiRepairPacket();
+				return;
+			case 'platformioDiagnostic:createIssueDraft':
+				await this.createIssueDraft();
+				return;
 			default:
 				return;
+		}
+	}
+
+	private async createIssueDraft(): Promise<void> {
+		if (!this.currentState.session) {
+			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_ISSUE_DRAFT_UNAVAILABLE',
+				'No diagnostic data is available for an issue draft yet.'
+			));
+			return;
+		}
+
+		try {
+			const draft = this.issueDraftService.buildDraft({
+				session: this.currentState.session,
+				historySummary: this.currentState.repairState?.historySummary ?? null,
+				source: 'human-confirmed',
+			});
+
+			if (draft.candidacy === 'not-recommended') {
+				await this.postCopyResult('warning', draft.noDraftReason ?? await this.localeService.getLocalizedMessage(
+					'PLATFORMIO_REPAIR_ISSUE_DRAFT_NOT_RECOMMENDED',
+					'No issue draft is recommended for the current diagnostics.'
+				));
+				return;
+			}
+
+			await vscodeApi.env.clipboard.writeText(draft.body);
+			await this.postCopyResult('success', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_ISSUE_DRAFT_COPY_SUCCESS',
+				'Issue draft copied locally. Review privacy and duplicate-search checklist before posting.'
+			));
+		} catch (error) {
+			log('[platformio-diagnostic] failed to create issue draft', 'error', error);
+			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_ISSUE_DRAFT_COPY_FAILED',
+				'Unable to create the issue draft: {0}',
+				String(error)
+			));
+		}
+	}
+
+	private async copyAiRepairPacket(): Promise<void> {
+		if (!this.currentState.session) {
+			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_AI_PACKET_UNAVAILABLE',
+				'No diagnostic data is available for an AI repair packet yet.'
+			));
+			return;
+		}
+
+		try {
+			const packet = this.aiPacketService.buildPacket({
+				session: this.currentState.session,
+				historySummary: this.currentState.repairState?.historySummary ?? null,
+			});
+			await vscodeApi.env.clipboard.writeText(packet.plainText);
+			const messageKey = packet.staleHistory
+				? 'PLATFORMIO_REPAIR_AI_PACKET_COPY_SUCCESS_STALE'
+				: 'PLATFORMIO_REPAIR_AI_PACKET_COPY_SUCCESS';
+			const fallback = packet.staleHistory
+				? 'AI repair packet copied. Some included repair history may be stale; review before sharing.'
+				: 'AI repair packet copied with sensitive details redacted.';
+			await this.postCopyResult('success', await this.localeService.getLocalizedMessage(messageKey, fallback));
+		} catch (error) {
+			log('[platformio-diagnostic] failed to copy AI repair packet', 'error', error);
+			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_AI_PACKET_COPY_FAILED',
+				'Unable to copy the AI repair packet: {0}',
+				String(error)
+			));
 		}
 	}
 
@@ -158,6 +316,7 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 				const workspacePath = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath ?? null;
 				const session = await this.diagnosticService.collectDiagnostics(workspacePath);
 				this.currentState = this.diagnosticService.createReadyState(session);
+				this.currentState.repairState = await this.composeRepairState(session);
 				await this.postState('platformioDiagnostic:render');
 			} catch (error) {
 				log('[platformio-diagnostic] failed to collect diagnostics', 'error', error);
@@ -178,42 +337,241 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		}
 	}
 
+	private async startAutoRepair(flowId: string): Promise<void> {
+		if (this.activeRepairPromise) {
+			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_ALREADY_RUNNING',
+				'A repair run is already in progress.'
+			));
+			return;
+		}
+
+		const flow = this.findRepairFlow(flowId);
+		if (!flow) {
+			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_FLOW_NOT_AVAILABLE',
+				'The selected repair flow is no longer available.'
+			));
+			return;
+		}
+
+		this.currentState = {
+			...this.currentState,
+			repairState: {
+				...this.ensureRepairState(),
+				confirmation: this.toConfirmationModel(flow),
+			},
+		};
+		await this.postState('platformioDiagnostic:render');
+	}
+
+	private async confirmAutoRepair(flowId: string): Promise<void> {
+		if (this.activeRepairPromise || !this.currentState.session) {
+			return;
+		}
+
+		const flow = this.findRepairFlow(flowId);
+		if (!flow) {
+			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_FLOW_NOT_AVAILABLE',
+				'The selected repair flow is no longer available.'
+			));
+			return;
+		}
+
+		const session = this.currentState.session;
+		const fingerprint = this.currentFingerprint ?? this.historyStore.createEnvironmentFingerprint(session);
+		const activeRun = this.createActiveRun(flow, fingerprint, session);
+		this.currentFingerprint = fingerprint;
+		this.cancellationRequested = false;
+		this.currentState = {
+			...this.currentState,
+			repairState: {
+				...this.ensureRepairState(),
+				activeRun,
+				confirmation: null,
+			},
+		};
+		await this.postState('platformioDiagnostic:render');
+
+		this.activeRepairPromise = (async () => {
+			try {
+				const run = await this.repairService.executeRepairFlow(flow, {
+					environmentFingerprint: fingerprint,
+					initialSessionId: session.sessionId ?? session.requestedAt,
+					workspacePath: session.workspacePath,
+					isCancelled: () => this.cancellationRequested,
+					retest: async () => {
+						const workspacePath = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath ?? null;
+						return this.diagnosticService.collectDiagnostics(workspacePath);
+					},
+				});
+				await this.historyStore.appendRun(fingerprint, run);
+				await this.runDiagnostics();
+			} catch (error) {
+				log('[platformio-diagnostic] auto repair failed', 'error', error);
+				await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
+					'PLATFORMIO_REPAIR_FAILED',
+					'Automatic repair failed: {0}',
+					String(error)
+				));
+			} finally {
+				this.activeRepairPromise = null;
+				this.cancellationRequested = false;
+			}
+		})();
+	}
+
+	private async cancelAutoRepair(): Promise<void> {
+		if (this.activeRepairPromise) {
+			this.cancellationRequested = true;
+			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_CANCEL_REQUESTED',
+				'Cancellation requested. The current safe step will finish before stopping.'
+			));
+			return;
+		}
+
+		this.currentState = {
+			...this.currentState,
+			repairState: {
+				...this.ensureRepairState(),
+				confirmation: null,
+			},
+		};
+		await this.postState('platformioDiagnostic:render');
+	}
+
+	private async clearRepairHistory(): Promise<void> {
+		if (!this.currentState.session) {
+			return;
+		}
+
+		const fingerprint = this.currentFingerprint ?? this.historyStore.createEnvironmentFingerprint(this.currentState.session);
+		const snapshot = await this.historyStore.clear(fingerprint);
+		this.currentState = {
+			...this.currentState,
+			repairState: await this.composeRepairState(this.currentState.session, snapshot),
+		};
+		await this.postState('platformioDiagnostic:render');
+	}
+
 	private async copySummary(): Promise<void> {
 		if (!this.currentState.session) {
-			await this.postMessage({
-				command: 'platformioDiagnostic:copyResult',
-				status: 'warning',
-				message: await this.localeService.getLocalizedMessage(
-					'PLATFORMIO_DIAGNOSTIC_COPY_UNAVAILABLE',
-					'No diagnostic summary is available yet.'
-				),
-			});
+			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_COPY_UNAVAILABLE',
+				'No diagnostic summary is available yet.'
+			));
 			return;
 		}
 
 		try {
 			const summary = await this.diagnosticService.buildClipboardSummary(this.currentState.session);
 			await vscodeApi.env.clipboard.writeText(summary.plainText);
-			await this.postMessage({
-				command: 'platformioDiagnostic:copyResult',
-				status: 'success',
-				message: await this.localeService.getLocalizedMessage(
-					'PLATFORMIO_DIAGNOSTIC_COPY_SUCCESS',
-					'Diagnostic summary copied to the clipboard.'
-				),
-			});
+			await this.postCopyResult('success', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_COPY_SUCCESS',
+				'Diagnostic summary copied to the clipboard.'
+			));
 		} catch (error) {
 			log('[platformio-diagnostic] failed to copy summary', 'error', error);
-			await this.postMessage({
-				command: 'platformioDiagnostic:copyResult',
-				status: 'error',
-				message: await this.localeService.getLocalizedMessage(
-					'PLATFORMIO_DIAGNOSTIC_COPY_FAILED',
-					'Unable to copy the diagnostic summary: {0}',
-					String(error)
-				),
-			});
+			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_COPY_FAILED',
+				'Unable to copy the diagnostic summary: {0}',
+				String(error)
+			));
 		}
+	}
+
+	private async composeRepairState(
+		session: PlatformioDiagnosticSession,
+		snapshotOverride?: RepairHistorySnapshot | null
+	): Promise<PanelRepairState> {
+		const fingerprint = this.historyStore.createEnvironmentFingerprint(session);
+		this.currentFingerprint = fingerprint;
+		const snapshot = snapshotOverride ?? await this.historyStore.loadSnapshot(fingerprint);
+		const effectiveSnapshot = snapshot ?? this.historyStore.createEmptySnapshot(fingerprint);
+		const historySummary = this.toHistorySummary(effectiveSnapshot);
+		const availableRepairFlows = this.repairService.planRepairFlows(session, historySummary);
+
+		return {
+			availableRepairFlows,
+			activeRun: null,
+			historySummary,
+			fingerprintStatus: historySummary.status,
+			exportActions: ['copyAiPacket', 'copyIssueDraft', 'clearHistory'],
+			confirmation: null,
+			redactionNotice: await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_REDACTION_NOTICE',
+				'Exports redact local paths, proxy credentials, and token-like strings by default.'
+			),
+		};
+	}
+
+	private toHistorySummary(snapshot: RepairHistorySnapshot): RepairHistorySummary {
+		return {
+			status: snapshot.staleReason ? 'stale' : 'current',
+			runs: snapshot.runs,
+			lastRun: snapshot.runs.at(-1) ?? null,
+			lastClearedAt: snapshot.lastClearedAt,
+			staleReason: snapshot.staleReason,
+			maxRuns: 20,
+		};
+	}
+
+	private ensureRepairState(): PanelRepairState {
+		return this.currentState.repairState ?? {
+			availableRepairFlows: [],
+			activeRun: null,
+			historySummary: null,
+			fingerprintStatus: 'unknown',
+			exportActions: [],
+			confirmation: null,
+		};
+	}
+
+	private findRepairFlow(flowId: string): RepairFlow | undefined {
+		return this.currentState.repairState?.availableRepairFlows.find(flow => flow.id === flowId);
+	}
+
+	private toConfirmationModel(flow: RepairFlow): RepairConfirmationModel {
+		return {
+			flowId: flow.id,
+			title: flow.title,
+			summary: flow.summary,
+			primaryFix: flow.primaryFix,
+			fallbackFix: flow.fallbackFix,
+			verification: flow.verification,
+			steps: flow.steps,
+			riskLevel: flow.riskLevel,
+		};
+	}
+
+	private createActiveRun(
+		flow: RepairFlow,
+		fingerprint: EnvironmentFingerprint,
+		session: PlatformioDiagnosticSession
+	): AutoRepairRun {
+		const startedAt = new Date().toISOString();
+		return {
+			runId: `active-${startedAt}`,
+			flowId: flow.id,
+			startedAt,
+			finishedAt: null,
+			status: 'running',
+			environmentFingerprint: fingerprint,
+			initialSessionId: session.sessionId ?? session.requestedAt,
+			finalSessionId: null,
+			stepResults: [],
+			userFacingSummary: `${flow.title}: running`,
+		};
+	}
+
+	private async postCopyResult(status: 'success' | 'warning' | 'error', message: string): Promise<void> {
+		await this.postMessage({
+			command: 'platformioDiagnostic:copyResult',
+			status,
+			message,
+		});
 	}
 
 	private async postCurrentState(): Promise<void> {
@@ -268,7 +626,17 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 
 	private async buildLocalizedStrings(): Promise<PlatformioDiagnosticLocalizedStrings> {
 		const actionLabel = async (action: PanelActionId, fallback: string) => {
-			const key = action === 'retest' ? 'PLATFORMIO_DIAGNOSTIC_ACTION_RETEST' : 'PLATFORMIO_DIAGNOSTIC_ACTION_COPY_SUMMARY';
+			const keyByAction: Record<PanelActionId, string> = {
+				retest: 'PLATFORMIO_DIAGNOSTIC_ACTION_RETEST',
+				copySummary: 'PLATFORMIO_DIAGNOSTIC_ACTION_COPY_SUMMARY',
+				startAutoRepair: 'PLATFORMIO_REPAIR_ACTION_START_AUTO_REPAIR',
+				confirmAutoRepair: 'PLATFORMIO_REPAIR_ACTION_CONFIRM_AUTO_REPAIR',
+				cancelAutoRepair: 'PLATFORMIO_REPAIR_ACTION_CANCEL_AUTO_REPAIR',
+				clearRepairHistory: 'PLATFORMIO_REPAIR_ACTION_CLEAR_HISTORY',
+				copyAiRepairPacket: 'PLATFORMIO_REPAIR_ACTION_COPY_AI_PACKET',
+				createIssueDraft: 'PLATFORMIO_REPAIR_ACTION_CREATE_ISSUE_DRAFT',
+			};
+			const key = keyByAction[action];
 			return this.localeService.getLocalizedMessage(key, fallback);
 		};
 
@@ -287,8 +655,18 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		const sources = await this.createRecord<DiagnosticSource>({
 			'default-platformio-path': ['PLATFORMIO_DIAGNOSTIC_SOURCE_DEFAULT_PLATFORMIO_PATH', 'Default PlatformIO path'],
 			'path-search': ['PLATFORMIO_DIAGNOSTIC_SOURCE_PATH_SEARCH', 'PATH search'],
+			'official-platformio-custom-path': [
+				'PLATFORMIO_DIAGNOSTIC_SOURCE_OFFICIAL_PLATFORMIO_CUSTOM_PATH',
+				'PlatformIO customPATH setting',
+			],
+			'official-platformio-settings': [
+				'PLATFORMIO_DIAGNOSTIC_SOURCE_OFFICIAL_PLATFORMIO_SETTINGS',
+				'Official PlatformIO settings',
+			],
+			'common-dir': ['PLATFORMIO_DIAGNOSTIC_SOURCE_COMMON_DIR', 'Common tool directory'],
 			'resolved-pio-sibling': ['PLATFORMIO_DIAGNOSTIC_SOURCE_RESOLVED_PIO_SIBLING', 'Derived from resolved pio sibling'],
 			'derived-from-penv': ['PLATFORMIO_DIAGNOSTIC_SOURCE_DERIVED_FROM_PENV', 'Derived from detected penv'],
+			'repair-history': ['PLATFORMIO_DIAGNOSTIC_SOURCE_REPAIR_HISTORY', 'Repair history'],
 			unresolved: ['PLATFORMIO_DIAGNOSTIC_SOURCE_UNRESOLVED', 'Unresolved'],
 		});
 
@@ -349,9 +727,55 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 				'PLATFORMIO_DIAGNOSTIC_COPY_SUCCESS',
 				'Diagnostic summary copied to the clipboard.'
 			),
+			repairTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_SECTION_TITLE', 'Guided repair'),
+			exportsTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_EXPORTS_TITLE', 'Support exports'),
+			repairRecommendationTitle: await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_RECOMMENDATION_TITLE',
+				'Recommended repair flow'
+			),
+			repairHistoryTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_HISTORY_TITLE', 'Repair history'),
+			repairPrimaryFixLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_PRIMARY_FIX', 'Primary fix'),
+			repairFallbackFixLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_FALLBACK_FIX', 'Fallback fix'),
+			repairVerificationLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_VERIFICATION', 'Verification after repair'),
+			repairApplicabilityLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_APPLICABILITY', 'Applicability'),
+			repairNotApplicableLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_NOT_APPLICABLE', 'Not applicable'),
+			repairManualAlternativeLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_MANUAL_ALTERNATIVE', 'Manual alternative'),
+			repairManualStepsLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_MANUAL_STEPS', 'Manual steps still required'),
+			repairConfirmationTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_CONFIRMATION_TITLE', 'Confirm automatic repair'),
+			repairProgressTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_PROGRESS_TITLE', 'Repair progress'),
+			repairNoRecommendation: await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_NO_RECOMMENDATION',
+				'No automatic repair is recommended for the current status.'
+			),
+			fingerprintCurrent: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_FINGERPRINT_CURRENT', 'Environment matches stored history'),
+			fingerprintStale: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_FINGERPRINT_STALE', 'Some repair history may be stale'),
+			fingerprintUnknown: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_FINGERPRINT_UNKNOWN', 'Environment fingerprint unavailable'),
+			aiPacketRedactionNotice: await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_AI_PACKET_REDACTION_NOTICE',
+				'The copied repair packet masks local paths, proxy credentials, and token-like strings.'
+			),
+			aiPacketStaleHistoryNotice: await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_AI_PACKET_STALE_HISTORY_NOTICE',
+				'Some included repair history may be stale because the environment changed.'
+			),
+			issueDraftPrivacyNotice: await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_ISSUE_DRAFT_PRIVACY_NOTICE',
+				'Review the privacy checklist before posting this draft publicly.'
+			),
+			issueDraftDuplicateSearchNotice: await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_REPAIR_ISSUE_DRAFT_DUPLICATE_NOTICE',
+				'Search existing issues with the suggested keywords before opening a new issue.'
+			),
+			issueDraftNoDraftTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_REPAIR_ISSUE_DRAFT_NO_DRAFT', 'No issue draft recommended'),
 			actions: {
 				retest: await actionLabel('retest', 'Retest'),
 				copySummary: await actionLabel('copySummary', 'Copy summary'),
+				startAutoRepair: await actionLabel('startAutoRepair', 'Auto repair'),
+				confirmAutoRepair: await actionLabel('confirmAutoRepair', 'Confirm repair'),
+				cancelAutoRepair: await actionLabel('cancelAutoRepair', 'Cancel'),
+				clearRepairHistory: await actionLabel('clearRepairHistory', 'Clear history'),
+				copyAiRepairPacket: await actionLabel('copyAiRepairPacket', 'Copy AI repair summary'),
+				createIssueDraft: await actionLabel('createIssueDraft', 'Create issue draft'),
 			},
 			toolNames,
 			itemStatuses,

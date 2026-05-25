@@ -24,6 +24,10 @@
             <div class="panel-actions">
                 <button id="retestButton" class="primary-btn" type="button">Retest</button>
                 <button id="copySummaryButton" class="secondary-btn" type="button">Copy summary</button>
+                <button id="autoRepairButton" class="secondary-btn" type="button">Auto repair</button>
+                <button id="copyAiRepairPacketButton" class="secondary-btn" type="button">Copy AI repair
+                    summary</button>
+                <button id="createIssueDraftButton" class="secondary-btn" type="button">Create issue draft</button>
             </div>
         </header>
 
@@ -69,6 +73,23 @@
                     <h2 id="toolsTitle">Resolved tools</h2>
                 </div>
                 <div id="toolList" class="tool-list"></div>
+            </section>
+
+            <section class="card repair-card">
+                <div class="section-header section-header-with-action">
+                    <h2 id="repairTitle">Guided repair</h2>
+                    <button id="clearRepairHistoryButton" class="secondary-btn compact-btn" type="button">Clear
+                        history</button>
+                </div>
+                <div id="repairContent" class="repair-content"></div>
+            </section>
+
+            <section class="card exports-card">
+                <div class="section-header">
+                    <h2 id="exportsTitle">Support exports</h2>
+                </div>
+                <p id="exportNotice" class="scope-text">Exports redact local paths, proxy credentials, and token-like
+                    strings by default.</p>
             </section>
 
             <section class="card scope-card">
