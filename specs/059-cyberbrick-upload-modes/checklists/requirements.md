@@ -1,36 +1,36 @@
-# Specification Quality Checklist: CyberBrick 上傳模式設定
+# 規格品質檢查清單：CyberBrick 上傳模式設定
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning
-**Created**: 2026-05-27
-**Feature**: [Link to spec.md](../spec.md)
+**目的**：在進入規劃前確認規格完整性與品質
+**建立日期**：2026-05-27
+**功能**：[連結到 spec.md](../spec.md)
 
-## Content Quality
+## 內容品質
 
-- [x] No implementation details (languages, frameworks, APIs)
-- [x] Focused on user value and business needs
-- [x] Written for non-technical stakeholders
-- [x] All mandatory sections completed
+- [x] 沒有實作細節（語言、框架、API）。
+- [x] 聚焦使用者價值與業務需求。
+- [x] 文字適合非技術利害關係人閱讀。
+- [x] 所有必要章節皆已完成。
 
-## Requirement Completeness
+## 需求完整性
 
-- [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous
-- [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic (no implementation details)
-- [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
-- [x] Dependencies and assumptions identified
+- [x] 沒有未解決的釐清標記。
+- [x] 需求可測試且不含模糊描述。
+- [x] 成功標準可量測。
+- [x] 成功標準不依賴特定技術實作細節。
+- [x] 所有驗收情境皆已定義。
+- [x] 已列出邊界情境。
+- [x] 範圍界線清楚。
+- [x] 已辨識相依性與假設。
 
-## Feature Readiness
+## 功能就緒度
 
-- [x] All functional requirements have clear acceptance criteria
-- [x] User scenarios cover primary flows
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] No implementation details leak into specification
+- [x] 所有功能需求都有明確驗收條件。
+- [x] 使用者情境涵蓋主要流程。
+- [x] 功能符合成功標準中定義的可量測結果。
+- [x] 規格中沒有洩漏不必要的實作細節。
 
-## Notes
+## 備註
 
-- Validation completed in one pass.
-- No [NEEDS CLARIFICATION] markers remain.
-- Scope for v1 is explicitly limited to `USB` and `OTA`; automatic smart switching is intentionally out of scope.
+- 驗證已一次完成。
+- 沒有未解決的釐清標記。
+- v1 範圍明確限制為 `USB` 與 `OTA`；自動智慧切換刻意不列入範圍。

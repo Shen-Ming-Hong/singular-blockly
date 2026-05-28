@@ -228,5 +228,5 @@ Conventional Commits with scopes: `feat(blocks)`, `fix(webview)`, `i18n(ja)`, `c
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read `specs/058-platformio-guided-repair/plan.md`
+shell commands, and other important information, read `specs/059-cyberbrick-upload-modes/plan.md`
 <!-- SPECKIT END -->
