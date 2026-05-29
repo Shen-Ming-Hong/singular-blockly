@@ -1951,37 +1951,14 @@ export class WebViewMessageHandler {
 				return;
 			}
 
-			// 無 USB — 嘗試 OTA（若已配對主要裝置）
+			// 無 USB — 提示使用者手動切換到 OTA 模式（不自動 fallback，避免多裝置誤上傳）
+			let hasPrimary = false;
 			if (this.cyberBrickUploadSettingsService) {
 				const settings = await this.cyberBrickUploadSettingsService.loadSettings();
-				const hasPrimary = settings.primaryDeviceId &&
-					settings.pairedDevices.some(d => d.deviceId === settings.primaryDeviceId);
-				if (hasPrimary) {
-					// OTA 路徑：呼叫 OTA uploader，進度與結果統一用 uploadProgress/uploadResult
-					const otaUploader = this.getCyberBrickOtaUploader();
-					const run = await otaUploader.upload(
-						{ board: message.board as 'cyberbrick', code: message.code },
-						(otaRun) => {
-							this.sendUploadProgress({
-								stage: (otaRun.status === 'succeeded' ? 'completed' :
-									   otaRun.status === 'failed' ? 'failed' : 'uploading') as any,
-								progress: otaRun.progress,
-								message: otaRun.stageMessage,
-							});
-						}
-					);
-					this.sendUploadResult({
-						success: run.status === 'succeeded',
-						timestamp: run.startedAt,
-						port: 'ota',
-						duration: run.duration ?? 0,
-						...(run.error ? { error: { stage: 'uploading', message: run.error.message, errorCode: run.errorCode } } : {}),
-					});
-					return;
-				}
+				hasPrimary = !!(settings.primaryDeviceId && settings.pairedDevices.some(d => d.deviceId === settings.primaryDeviceId));
 			}
 
-			// 無 USB 且無已配對 OTA 裝置
+			// 無論是否有配對 OTA 裝置，USB 上傳失敗一律回報錯誤，讓使用者明確切換到 OTA 模式
 			this.sendUploadResult({
 				success: false,
 				timestamp: new Date().toISOString(),
@@ -1989,7 +1966,9 @@ export class WebViewMessageHandler {
 				duration: 0,
 				error: {
 					stage: 'connecting',
-					message: 'CyberBrick device not found. Please connect via USB or set up OTA pairing.',
+					message: hasPrimary
+						? 'CyberBrick device not found via USB. Use the OTA upload option in the CyberBrick settings to upload wirelessly.'
+						: 'CyberBrick device not found. Please connect via USB or set up OTA pairing.',
 				},
 			});
 		} catch (error) {

@@ -206,7 +206,7 @@
 						"schemaVersion": 2,
 						"pairedDevices": []
 					},
-					"description": "CyberBrick upload mode and paired OTA device registry. Sensitive values such as Wi-Fi passwords and OTA tokens are stored separately in VS Code SecretStorage.",
+					"description": "CyberBrick paired OTA device registry and upload settings. Sensitive values such as Wi-Fi passwords and OTA tokens are stored separately in VS Code SecretStorage.",
 					"properties": {
 						"schemaVersion": {
 							"type": "number",

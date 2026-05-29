@@ -78,7 +78,7 @@ export interface PairedCyberBrickDevice {
 	createdAt: string;
 	updatedAt: string;
 	otaPort: number;
-	protocolVersion: 1;
+	protocolVersion: 1 | 2;
 	lastKnownIp?: string;
 	lastSeenAt?: string;
 	lastSuccessfulUploadAt?: string;

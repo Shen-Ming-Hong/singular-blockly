@@ -12,6 +12,7 @@ import { buildCyberBrickOtaAgentSource } from './cyberbrickOtaAgentSource';
 import { createCyberBrickUploadError, classifyCyberBrickUploadError } from './cyberbrickUploadErrors';
 import {
 	CYBERBRICK_OTA_DEFAULT_PORT,
+	CYBERBRICK_OTA_PROTOCOL_VERSION,
 	CyberBrickOtaCleanupRequest,
 	CyberBrickOtaCleanupResult,
 	CyberBrickUploadPanelState,
@@ -175,7 +176,7 @@ export class CyberBrickOtaProvisioningService {
 				createdAt: existingSettings.pairedDevices.find(item => item.deviceId === deviceId)?.createdAt || now,
 				updatedAt: now,
 				otaPort: CYBERBRICK_OTA_DEFAULT_PORT,
-				protocolVersion: 1,
+				protocolVersion: CYBERBRICK_OTA_PROTOCOL_VERSION,
 				...(configureResult.ipAddress ? { lastKnownIp: configureResult.ipAddress, lastSeenAt: now } : {}),
 				statusSummary: configureResult.ipAddress ? 'ready' : 'needs setup',
 				...(configureResult.agentVersion ? { agentVersion: configureResult.agentVersion } : {}),

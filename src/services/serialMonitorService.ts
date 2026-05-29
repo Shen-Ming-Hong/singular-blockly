@@ -209,7 +209,7 @@ try:
     s.write(b'\\x03\\x03')
     time.sleep(0.1)
     
-	# 發送 Ctrl+D 觸發軟重置，重新執行裝置啟動流程（CyberBrick 會進入 /app/rc_main.py）
+    # 發送 Ctrl+D 觸發軟重置，重新執行裝置啟動流程（CyberBrick 會進入 /app/rc_main.py）
     s.write(b'\\x04')
     
     print(f"Connected to {port}")

@@ -83,7 +83,7 @@ OTA v1 使用區域網路 HTTP API：
 - 驗證 headers：
 	- `Authorization: Bearer <ota-token>`
 	- `X-CyberBrick-Device-Id: <deviceId>`
-	- `X-CyberBrick-Protocol-Version: 1`
+	- `X-CyberBrick-Protocol-Version: 2`
 
 上傳前會檢查主要目標裝置、token、最後 IP、agent health、`deviceId` 是否相符與 protocol version。OTA 失敗時只提供下一步（例如重新掃描、重新 provisioning、手動切回 USB），**不會自動 fallback 到 USB**，避免程式被送到錯誤裝置或造成教室多裝置混淆。
 

@@ -149,7 +149,7 @@ export class CyberBrickOtaUploader {
 			return this.failRun(run, 'code-empty', 'Generated code is empty.');
 		}
 
-		const readiness = await this.checkReadiness();
+		const readiness = await this.checkReadiness(request.deviceId);
 		if (!readiness.ready || !readiness.device) {
 			const code = readiness.blockingReasons[0] || 'invalid-settings';
 			return this.failRun(run, code, readiness.checks.find(check => !check.ok)?.message || 'CyberBrick OTA readiness failed.');

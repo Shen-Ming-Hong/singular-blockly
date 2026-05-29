@@ -10,6 +10,7 @@ import { log } from './logging';
 import { createCyberBrickUploadError } from './cyberbrickUploadErrors';
 import {
 	CYBERBRICK_OTA_DEFAULT_PORT,
+	CYBERBRICK_OTA_PROTOCOL_VERSION,
 	CYBERBRICK_UPLOAD_SETTINGS_KEY,
 	CYBERBRICK_UPLOAD_SETTINGS_SCHEMA_VERSION,
 	CyberBrickSecretKind,
@@ -293,7 +294,7 @@ export class CyberBrickUploadSettingsService {
 			createdAt: this.normalizeIsoDate(rawDevice.createdAt) || now,
 			updatedAt: this.normalizeIsoDate(rawDevice.updatedAt) || now,
 			otaPort,
-			protocolVersion: 1,
+			protocolVersion: CYBERBRICK_OTA_PROTOCOL_VERSION,
 			...(this.normalizeOptionalString(rawDevice.lastKnownIp) ? { lastKnownIp: this.normalizeOptionalString(rawDevice.lastKnownIp) } : {}),
 			...(this.normalizeIsoDate(rawDevice.lastSeenAt) ? { lastSeenAt: this.normalizeIsoDate(rawDevice.lastSeenAt) } : {}),
 			...(this.normalizeIsoDate(rawDevice.lastSuccessfulUploadAt)
