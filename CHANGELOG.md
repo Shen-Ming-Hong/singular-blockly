@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.81.0] - 2026-05-29
+
+### ✨ 新功能 New Features
+
+- **CyberBrick LED 數位控制積木** (CyberBrick LED digital control blocks)
+    - 新增 `cyberbrick_led_digital` 積木：以 ON/OFF 下拉選單分別控制 CyberBrick 主板 NeoPixel LED 的 R/G/B 通道狀態，適合入門教學場景，避免學習者接觸 0-255 數值
+      Added `cyberbrick_led_digital` block: controls each R/G/B channel of the CyberBrick onboard NeoPixel LED via ON/OFF dropdown, ideal for beginner teaching scenarios without exposing 0-255 numeric values
+    - 新增 `x11_led_digital` 積木：以 ON/OFF 下拉選單控制 X11 擴展板 LED 燈條的指定埠（21/22）與 LED 編號（0-3 或全部）的各通道狀態
+      Added `x11_led_digital` block: controls individual LED channels (R/G/B as ON/OFF) on the X11 expansion board LED strip, with port selection (21/22) and index selection (0–3 or all)
+    - 兩個積木均支援 15 語系 i18n，提示文字使用對應語言，工具箱已更新
+      Both blocks support 15-locale i18n with localized tooltips; toolboxes updated
+    - 修正 `x11_led_digital` 中 `X11_LED_SET_COLOR_INDEX_SUFFIX` 已含紅色通道標籤，移除多餘的 literal `R` 欄位，避免英文顯示為「set color R R」
+      Fixed `x11_led_digital`: removed the redundant literal `R` field because `X11_LED_SET_COLOR_INDEX_SUFFIX` already contains the red-channel label, preventing "set color R R" duplication in English
+
 ## [0.80.1] - 2026-05-29
 
 ### 🐛 修復 Bug Fixes
