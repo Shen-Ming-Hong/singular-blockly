@@ -5,7 +5,7 @@
 
 ## 摘要
 
-本功能為 CyberBrick 新增明確的上傳模式設定：新專案預設 `USB`，使用者可在 Blockly 編輯畫面右上角 CyberBrick 專用齒輪中手動切換到 `OTA`。OTA 不作為學生可拖曳積木，也不把 Wi‑Fi provisioning 寫入生成的 MicroPython 程式；首次 OTA 配對必須透過 USB 完成，並由 CyberBrick 裝置本身掃描 SSID。多裝置情境以 `deviceId` 為主鍵，`friendlyName` 僅供顯示。Extension 端持久化的敏感資料（Wi‑Fi 密碼、OTA token、pairing secret）只存 VS Code `ExtensionContext.secrets`；非敏感模式與裝置 registry 以專案工作區範圍（workspace folder scoped）的 VS Code 設定保存。
+本功能為 CyberBrick 新增明確的上傳模式設定：新專案預設 `USB`，使用者可在 Blockly 編輯畫面右上角 CyberBrick 專用齒輪中手動切換到 `OTA`。OTA 不作為學生可拖曳積木，也不把 Wi‑Fi provisioning、密碼或 token 寫入生成的 MicroPython 程式；因 CyberBrick 會自動進入 `/app/rc_main.py`，Extension Host 會在 `rc_main.py` 開頭維護不含秘密的 OTA agent 啟動呼叫。為維持官方出廠狀態與相容性，裝置端變更只允許新增 Singular Blockly 自有檔案（v1：`/cyberbrick_ota_agent.py`、`/cyberbrick_ota_config.py`）與修改 `/app/rc_main.py`；不得修改 `/boot.py`、韌體/出廠設定、WebREPL 設定或其他官方 runtime 檔案。首次 OTA 配對必須透過 USB 完成，並由 CyberBrick 裝置本身掃描 SSID。多裝置情境以 `deviceId` 為主鍵，`friendlyName` 僅供顯示。Extension 端持久化的敏感資料（Wi‑Fi 密碼、OTA token、pairing secret）只存 VS Code `ExtensionContext.secrets`；非敏感模式與裝置 registry 以專案工作區範圍（workspace folder scoped）的 VS Code 設定保存。
 
 技術上沿用既有上傳按鈕與 `MicropythonUploader` USB 流程，新增 mode-aware routing、CyberBrick 設定 modal、`CyberBrickUploadSettingsService`、USB-first provisioning service 與 `CyberBrickOtaUploader`。OTA v1 僅支援將目前產生的 MicroPython 單檔寫入 `/app/rc_main.py`；失敗時不自動 fallback 到 USB，只提供明確修正步驟。裝置端 OTA agent 需實作版本化 v1 LAN protocol，包含 health check、authenticated upload、`deviceId` 驗證、token proof、SHA-256 檢查與版本協商。
 
@@ -13,12 +13,12 @@
 
 **語言/版本**：TypeScript 5.9.3（Extension Host）、browser JavaScript/HTML/CSS（WebView）、MicroPython（CyberBrick device runtime/OTA agent）。
 **主要依賴**：VS Code API `^1.105.0`、Blockly 12.3.1、既有 `mpremote` USB 工具、既有 `MicropythonUploader`、VS Code `SecretStorage` / workspace configuration、WebView `postMessage`、Mocha + Sinon + `@vscode/test-electron`。不新增 npm runtime dependency，除非後續任務證明 Node 內建 HTTP/fetch 不足。
-**儲存**：非敏感設定使用專案工作區範圍（workspace folder scoped）的 VS Code configuration key `singular-blockly.cyberbrick.uploadSettings` 或等效設定；Extension 端敏感資料只使用 `ExtensionContext.secrets`；WebView `setState()` 僅保存未提交 UI 暫態；CyberBrick 裝置端可保存重新連線與 OTA agent 驗證所需的最小必要設定，但不得回寫到專案工作區設定、學生作品、WebView payload 或日誌。
+**儲存**：非敏感設定使用專案工作區範圍（workspace folder scoped）的 VS Code configuration key `singular-blockly.cyberbrick.uploadSettings` 或等效設定；Extension 端敏感資料只使用 `ExtensionContext.secrets`；WebView `setState()` 僅保存未提交 UI 暫態；CyberBrick 裝置端可保存重新連線與 OTA agent 驗證所需的最小必要設定，但只能保存於 Singular Blockly 自有檔案，不得回寫到專案工作區設定、學生作品、WebView payload、日誌或官方出廠檔案。
 **測試**：`npm run compile`、`npm run lint`、`npm test`；新增或修改 UI 字串時執行 `npm run validate:i18n`。核心 service 使用 mockable interfaces 測試；WebView 互動以 contract-style tests + quickstart manual/usability validation 覆蓋。
 **目標平台**：VS Code desktop extension（macOS / Windows / Linux）；CyberBrick ESP32-C3 MicroPython 裝置；教室同一 Wi‑Fi 內可能存在多台 CyberBrick。
 **專案類型**：VS Code extension + browser WebView + Blockly code generator ecosystem。
 **效能目標**：不做背景輪詢；SSID scan、readiness check、OTA upload 只在使用者明確開啟設定、重新掃描或按上傳時執行；WebView UI 不因 scan/upload 阻塞。
-**限制條件**：不新增 OTA Blockly 積木；不自動 OTA↔USB fallback；不把秘密寫入 project files/logs/WebView render payload；Extension Host 與 WebView 只能用 `postMessage` 溝通；WebView 不做檔案、程序或敏感網路操作；OTA v1 固定 `/app/rc_main.py` 單檔；OTA token 不得出現在 URL/query string。
+**限制條件**：不新增 OTA Blockly 積木；不自動 OTA↔USB fallback；不把秘密寫入 project files/logs/WebView render payload 或 `rc_main.py` bootstrap；Extension Host 與 WebView 只能用 `postMessage` 溝通；WebView 不做檔案、程序或敏感網路操作；OTA v1 固定 `/app/rc_main.py` 單檔；OTA token 不得出現在 URL/query string；裝置端檔案變更白名單固定為新增 `/cyberbrick_ota_agent.py`、新增/更新 `/cyberbrick_ota_config.py`、修改 `/app/rc_main.py`，不得碰 `/boot.py` 或其他官方出廠檔案。
 **規模/範圍**：v1 僅支援 CyberBrick `USB` / `OTA` 兩種明確模式；每個 workspace folder 可配對多台 CyberBrick；同名 `friendlyName` 必須可共存並以 `deviceId` 區分。
 
 ## 憲法檢查
@@ -68,6 +68,7 @@
 7. OTA 失敗不自動 fallback 到 USB。
 8. OTA transport 封裝於 `CyberBrickOtaUploader`，v1 單檔 `/app/rc_main.py`，並遵守 `ota-upload.md` 的 v1 LAN protocol。
 9. WebView state 只保存暫時 UI；跨 session 狀態由 Extension Host 提供。
+10. 裝置端 OTA 變更採白名單：只新增 Singular Blockly 自有檔案與修改 `/app/rc_main.py`，其餘官方出廠狀態保持不變。
 
 ## Phase 1：設計與契約輸出
 
@@ -90,7 +91,7 @@
 - `specs/059-cyberbrick-upload-modes/contracts/webview-extension-messages.md`：WebView ↔ Extension Host message schema。
 - `specs/059-cyberbrick-upload-modes/contracts/storage-and-secrets.md`：專案工作區設定、SecretStorage、Extension 端與裝置端秘密邊界。
 - `specs/059-cyberbrick-upload-modes/contracts/ota-provisioning.md`：USB-first pairing/provisioning 流程。
-- `specs/059-cyberbrick-upload-modes/contracts/ota-upload.md`：readiness gate、OTA upload、v1 LAN protocol、錯誤分類與無 fallback 契約。
+- `specs/059-cyberbrick-upload-modes/contracts/ota-upload.md`：readiness gate、OTA upload、v2 raw binary streaming LAN protocol、自動 machine.reset()、錯誤分類與無 fallback 契約。
 - `specs/059-cyberbrick-upload-modes/contracts/ui-settings-modal.md`：CyberBrick 齒輪/modal UX 契約。
 
 **快速驗證**：`specs/059-cyberbrick-upload-modes/quickstart.md`
@@ -176,7 +177,7 @@ src/test/
 2. **設定與 secrets service**：實作專案工作區設定與 `context.secrets` lifecycle；先完成單元測試。
 3. **WebView message routing**：在 `messageHandler.ts` 新增 load/save/settings/readiness/provisioning/upload cases，使用 mock service 驗證。
 4. **UI modal**：新增 CyberBrick 齒輪/modal、mode selector、paired devices、SSID scan/provisioning form，補 i18n。
-5. **USB-first provisioning**：重用/擴充 `MicropythonUploader` 的 mpremote 能力，完成 deviceId、Wi‑Fi scan、agent install/configure、secret store。
+5. **USB-first provisioning**：重用/擴充 `MicropythonUploader` 的 mpremote 能力，完成 deviceId、Wi‑Fi scan、agent install/configure、secret store；裝置端寫入必須受白名單限制，只新增 OTA agent/config 檔並修改 `/app/rc_main.py`。
 6. **OTA agent protocol**：依 `contracts/ota-upload.md` 實作 health check、authenticated upload、SHA-256 驗證、agent version negotiation 與錯誤分類。
 7. **OTA uploader**：封裝 authenticated LAN upload，v1 寫入 `/app/rc_main.py`，分類 timeout/offline/token/device mismatch 等錯誤。
 8. **回歸與手動驗證**：執行 quickstart 自動命令、manual matrix 與使用性驗證計畫，特別確認 USB 上傳、TXT UI、Arduino 上傳不受影響。
@@ -184,3 +185,27 @@ src/test/
 ## 複雜度追蹤
 
 無 constitution violation，無需額外複雜度例外。
+
+## 實作後記（Phase 6 完成後更新）
+
+### OTA LAN Protocol v2 升版（streaming binary）
+
+**原因**：v1 以 JSON+base64 格式傳送檔案內容，MicroPython 端需在記憶體中持有 base64 解碼暫存區，但 CyberBrick ESP32-C3 heap 僅 ~59KB 且高度碎片化，導致 HTTP 500 write-failed。
+
+**決策**：升版至 Protocol v2，改以 `Content-Type: application/octet-stream` 直接串流原始二進位資料，裝置端以 1024B chunks 逐段寫入並增量計算 SHA-256，peak memory 降至 ~1KB。TypeScript 端送出 `Buffer` body，SHA-256 放 header `X-Singular-Content-Sha256`，operation ID 放 header `X-Singular-Operation-Id`。
+
+**Agent 版本歷史**：
+
+| Agent 版本 | Protocol | 主要異動 |
+|---|---|---|
+| v1.0.0 | v1 | 初始 JSON+base64；health check、upload、SHA-256 驗證 |
+| v1.1.0 | v2 | 改 raw binary streaming（HTTP 500 修正）；cleanup 串流清除演算法 |
+| v1.2.0 | v2 | 寫入成功後自動 `machine.reset()`（`_reset_pending` 旗標，在 `client.close()` 後觸發） |
+
+**當前版本**：`CYBERBRICK_OTA_AGENT_VERSION = '1.2.0'`，`CYBERBRICK_OTA_PROTOCOL_VERSION = 2`。
+
+### OTA 上傳後自動 machine.reset()
+
+**原因**：OTA 上傳後使用者需手動按 RST 按鈕才能執行新程式，體驗不佳。
+
+**決策**：在 agent v1.2.0 導入 `_reset_pending = [False]` 旗標（MicroPython mutable list）。`_upload_raw` 成功路徑設旗標；`serve_forever` 主迴圈在 `client.close()` 後檢查旗標，確保 HTTP response 已送出且 socket 已關閉後再呼叫 `machine.reset()`。TypeScript 端已有 `written-restart-failed` 狀態處理，`validateUploadResponse()` 只驗 `operationId`、`deviceId`、`remotePath`、`contentSha256`，不驗 `restarted`。

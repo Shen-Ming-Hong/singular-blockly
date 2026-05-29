@@ -302,8 +302,47 @@ interface CyberBrickUserFacingError {
 **驗收規則**
 
 - Extension Host 必須從專案工作區設定讀取 `primaryDeviceId`，WebView 不應直接指定任意裝置覆蓋主要目標。
-- `code` 寫入路徑 v1 固定 `/app/rc_main.py`。
+- WebView 不得指定遠端檔案路徑；`code` 寫入路徑 v1 固定 `/app/rc_main.py`，且裝置端檔案變更白名單由 Extension Host service 與 OTA agent 契約控制。
 - 失敗 response 不得觸發 `requestUpload` USB 流程；WebView 只顯示錯誤與下一步。
+
+## 訊息：完整清除 OTA（USB-only）
+
+### Request
+
+```ts
+{
+  command: 'cyberbrickOtaCleanupRequest',
+  requestId: string,
+  payload: {
+    usbPort: string,
+    deviceId?: string
+  }
+}
+```
+
+### Response
+
+```ts
+{
+  command: 'cyberbrickOtaCleanupResult',
+  requestId: string,
+  success: boolean,
+  payload: CyberBrickOtaCleanupResult & {
+    panelState: CyberBrickUploadPanelState
+  },
+  error?: CyberBrickUserFacingError
+}
+```
+
+**驗收規則**
+
+- Cleanup 必須要求 USB port；不得使用 OTA API 刪除 OTA agent/config。
+- Cleanup 不必要求本機已有 paired device；USB 物理連線是清除裝置端 Singular Blockly OTA 檔案的信任起點。
+- 若 request 包含 `deviceId`，Extension Host 必須先透過 USB 讀取裝置端身分並比對；不相符時回報 `identity-mismatch` 並不得執行清除 helper。
+- 若 request 未包含 `deviceId`，Extension Host 可 best-effort 讀取 USB 連線裝置身分；讀不到身分時仍可清除裝置端 OTA 檔案，但不得刪除任何本機 paired device/secrets。
+- 裝置端允許刪除路徑僅限 `/cyberbrick_ota_agent.py` 與 `/cyberbrick_ota_config.py`；允許寫入路徑僅限 `/app/rc_main.py`，且只能移除 Singular Blockly OTA bootstrap marker 區塊。
+- 成功後 Extension Host 必須將 upload mode 設為 `usb`；只有在讀到的 `deviceId` 對應本機 paired device/secrets 時，才刪除該本機 pairing/secrets，並回傳更新後 panel state。
+- Response 不得包含 Wi‑Fi 密碼、OTA token、pairing secret、raw stdout/stderr 或 request 中可能夾帶的 secret 欄位。
 
 ## 與既有 `requestUpload` 的相容契約
 

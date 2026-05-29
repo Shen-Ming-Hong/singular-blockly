@@ -77,8 +77,9 @@ workspaceHash = sha256(workspaceFolderUri.toString()).slice(0, 16)
 ## Extension 端與裝置端秘密邊界
 
 - Extension 端持久化的 Wi‑Fi 密碼、OTA token、pairing secret 只能存在 `context.secrets`。
-- 首次 USB provisioning 可透過可信任 USB 通道把 CyberBrick 重新連線與 OTA agent 驗證所需的最小必要設定寫入裝置端。
-- 裝置端設定屬於 CyberBrick runtime/agent state，不得被序列化到 `singular-blockly.cyberbrick.uploadSettings`、學生作品、WebView render payload、diagnostics 或 log。
+- 首次 USB provisioning 可透過可信任 USB 通道把 CyberBrick 重新連線與 OTA agent 驗證所需的最小必要設定寫入裝置端，但只能寫入 Singular Blockly 自有檔案（v1：`/cyberbrick_ota_config.py`）。
+- 裝置端秘密設定屬於 CyberBrick runtime/agent state，不得被序列化到 `singular-blockly.cyberbrick.uploadSettings`、`rc_main.py` bootstrap、WebView render payload、diagnostics 或 log；`rc_main.py` 只可包含不含秘密的 agent 啟動呼叫。
+- Secret/config 寫入不得修改 `/boot.py`、WebREPL 設定、韌體/出廠設定或官方 runtime 檔案；其他官方出廠狀態必須保持不變。
 - 若未來改為不在裝置端保存 Wi‑Fi/OTA 設定，必須同步更新 provisioning 與 reconnect 流程；目前 v1 以「裝置端可保存最小必要設定」為實作前提。
 
 ## Secret lifecycle
@@ -89,7 +90,7 @@ workspaceHash = sha256(workspaceFolderUri.toString()).slice(0, 16)
 2. Extension Host 立即驗證 request。
 3. Extension Host 將 `wifiPassword` 與新產生/裝置回報的 OTA token 寫入 `context.secrets`。
 4. Extension Host 回傳 panel state，只包含 `hasValue: true`，不得回傳明文。
-5. 若 provisioning 需要裝置端保存連線設定，寫入必須只經 USB trusted channel 執行，且所有 stdout/stderr 都要遮罩後才能進 UI 或 log。
+5. 若 provisioning 需要裝置端保存連線設定，寫入必須只經 USB trusted channel 執行、只落在 `/cyberbrick_ota_config.py`，且所有 stdout/stderr 都要遮罩後才能進 UI 或 log。
 
 ### 讀取
 
@@ -124,3 +125,4 @@ workspaceHash = sha256(workspaceFolderUri.toString()).slice(0, 16)
 - 刪除 paired device 會刪除 secrets。
 - 保存設定時即使 payload 內含 password 欄位也不得進入專案工作區設定。
 - 同一 `friendlyName` 的兩台裝置可共存，因為 key 使用 `deviceId`。
+- 裝置端 secret/config helper 不得包含 `/boot.py` 或其他非白名單寫入路徑。

@@ -7,6 +7,8 @@
 1. **專案工作區範圍非敏感設定**：目前上傳模式、主要 OTA 目標、已配對裝置非敏感描述。
 2. **本機安全儲存敏感資料**：Wi‑Fi 密碼、OTA token、pairing secret。
 3. **WebView 暫態 UI**：modal 表單輸入、目前掃描中的狀態、尚未保存的欄位。
+4. **CyberBrick 裝置端自有檔案**：只允許新增/更新 Singular Blockly 自有 OTA 檔案，以及修改 `/app/rc_main.py` 的不含秘密 bootstrap；其他官方出廠檔案不屬於本功能資料模型。
+5. **OTA 清除作業**：透過 USB 移除 Singular Blockly OTA 自有檔案、移除 `/app/rc_main.py` bootstrap，並清除本機 pairing/secrets 與上傳模式。
 
 ## Entity：CyberBrickUploadSettings
 
@@ -144,6 +146,78 @@ running -> cancelled
 - 開放網路可允許空密碼；加密網路若沒有既有 secret 則需 password。
 - WebView submit 後 Extension Host 應立即將密碼轉存 `context.secrets`，不把值放入專案工作區設定；若需讓 CyberBrick 離線後重新連線，只能透過 USB trusted channel 寫入裝置端最小必要設定。
 
+## Entity：CyberBrickDeviceSideOtaArtifacts
+
+**用途**：描述 OTA provisioning 允許在 CyberBrick 裝置端新增或修改的檔案集合，作為相容性白名單。
+
+**允許項目**
+
+- `/cyberbrick_ota_agent.py`：Singular Blockly 自有 OTA agent 檔案，可新增或更新。
+- `/cyberbrick_ota_config.py`：Singular Blockly 自有 OTA config 檔案，可新增或更新；可包含裝置端重新連線與 token 驗證所需的最小必要設定。
+- `/app/rc_main.py`：CyberBrick app 入口，可加入或更新不含秘密的 OTA bootstrap，且後續 USB/OTA 上傳會重寫目前學生程式內容。
+
+**禁止項目**
+
+- `/boot.py`。
+- WebREPL、韌體、系統網路、官方 runtime 或出廠設定檔。
+- 任意刪除、重新命名或覆蓋非 Singular Blockly 管理的既有檔案。
+
+**驗證規則**
+
+- provisioning helper 的 write/open path 必須可用測試鎖定在允許項目內。
+- OTA agent 的 `REMOTE_PATH` 必須固定為 `/app/rc_main.py`。
+- `rc_main.py` bootstrap 不得包含 Wi‑Fi 密碼、OTA token 或 pairing secret。
+
+## Entity：CyberBrickOtaCleanupRequest
+
+**用途**：WebView 要求 Extension Host 透過 USB 完整停用目前 USB 連線 CyberBrick 的 OTA 支援；若該裝置同時是本機 paired device，則同步清除本機 pairing/secrets。
+
+**欄位**
+
+- `usbPort`: string；執行 cleanup 的 USB port，必填。
+- `deviceId`: string 或 `null`；選填。若 UI 目前有選定 paired device，應附上其穩定身分供 Extension Host 做 mismatch 防呆；若未提供，cleanup 仍可針對 USB 連線裝置執行。
+
+**驗證規則**
+
+- 沒有 USB port 時不得執行，需回報 `usb-port-missing`。
+- 提供 `deviceId` 時，USB 連線裝置讀不到身分需回報 `device-id-read-failed`；讀到但不相符需回報 `identity-mismatch`。
+- 未提供 `deviceId` 時，Extension Host 可 best-effort 讀取裝置端身分；若讀不到，仍可清除 USB 連線裝置上的 Singular Blockly OTA 檔案，但不得刪除任何本機 pairing/secrets。
+- Cleanup 必須走 USB；不得透過 OTA 刪除 OTA agent 本身。
+
+## Entity：CyberBrickOtaCleanupResult
+
+**用途**：描述一次 OTA cleanup 的安全結果，供 WebView 顯示與更新 modal state。
+
+**欄位**
+
+- `success`: boolean。
+- `deviceId`: string 或 `null`。
+- `removedAgent`: boolean；是否刪除 `/cyberbrick_ota_agent.py`。
+- `removedConfig`: boolean；是否刪除 `/cyberbrick_ota_config.py`。
+- `rcMainPatched`: boolean；是否寫回已移除 bootstrap 的 `/app/rc_main.py`。
+- `rcMainHadBootstrap`: boolean；清除前是否找到 Singular Blockly OTA bootstrap marker。
+- `localPairingRemoved`: boolean；是否找到並刪除相符的本機 paired device 或相關 secrets。
+- `uploadMode`: `'usb'`；成功或失敗回報都應明確讓 UI 顯示 USB-only cleanup 的目標模式。
+- `error`: `CyberBrickUploadUserError` 或 `null`。
+
+**允許移除項目**
+
+- `/cyberbrick_ota_agent.py`。
+- `/cyberbrick_ota_config.py`。
+- `/app/rc_main.py` 中由 `CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START` 與 `CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END` 包住的區塊。
+- Extension Host 本機該 `deviceId` 對應的 paired device 與 SecretStorage secrets（僅在可判定相符時）。
+
+**禁止項目**
+
+- `/boot.py`、WebREPL、韌體、系統網路、官方 runtime 或任何非 Singular Blockly 管理的檔案。
+- 使用 `friendlyName` 作為 cleanup 身分判斷。
+
+**驗證規則**
+
+- 裝置端 helper 的 write path 必須只包含 `/app/rc_main.py`，delete path 必須只包含 `/cyberbrick_ota_agent.py` 與 `/cyberbrick_ota_config.py`。
+- 若 `/app/rc_main.py` bootstrap 無法移除，cleanup 必須回報失敗，避免半清除被誤認為成功。
+- 成功後 Extension Host 必須把專案 `uploadMode` 設為 `usb`。
+
 ## Entity：OtaProvisioningResult
 
 **用途**：描述一次 USB-first OTA provisioning 的結果。
@@ -235,7 +309,7 @@ running -> cancelled
 
 **驗證規則**
 
-- `code` 來自現有 WebView code generation/save flow；OTA 不改寫生成內容。
+- `code` 來自現有 WebView code generation/save flow；Extension Host 寫入 `/app/rc_main.py` 前可加入不含秘密的 OTA agent bootstrap，以符合 CyberBrick 自動進入 `rc_main.py` 的執行模型。
 - `remotePath` v1 固定，不允許任意使用者輸入 remote path。
 - 啟動前必須有 `OtaReadinessStatus.ready = true`。
 

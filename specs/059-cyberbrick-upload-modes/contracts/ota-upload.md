@@ -59,7 +59,8 @@ interface CyberBrickOtaUploadRequest {
 
 - WebView 不可指定任意 `deviceId` 覆蓋 project primary target。
 - `code` 必須是目前 Blockly workspace 生成的 MicroPython 程式。
-- Extension Host 負責將 `code` 寫入 v1 固定 remote path `/app/rc_main.py`。
+- Extension Host 負責將 `code` 包裝上不含秘密的 OTA agent bootstrap 後，寫入 v1 固定 remote path `/app/rc_main.py`。
+- OTA upload 的裝置端寫入只能修改 `/app/rc_main.py`；不得寫入、刪除或修改任何其他裝置端檔案。
 
 ## v1 LAN protocol contract
 
@@ -78,7 +79,7 @@ http://{lastKnownIp}:{otaPort}/api/v1
 ```text
 Authorization: Bearer <ota-token>
 X-CyberBrick-Device-Id: <deviceId>
-X-CyberBrick-Protocol-Version: 1
+X-CyberBrick-Protocol-Version: 2
 ```
 
 **規則**
@@ -97,36 +98,30 @@ Response：
 ```ts
 interface CyberBrickOtaHealthResponse {
   deviceId: string;
-  agentVersion: string;
-  protocolVersion: 1;
-  supportedProtocolVersions: number[];
+  agentVersion: string;           // e.g. "1.2.0"
+  protocolVersion: 2;
+  supportedProtocolVersions: number[];  // e.g. [2]
   appPath: '/app/rc_main.py';
   ipAddress?: string;
   status: 'ready' | 'busy' | 'needs-provisioning';
 }
 ```
 
-Readiness validation 必須確認 `deviceId` 相符、`protocolVersion` 支援 v1、`appPath` 為 `/app/rc_main.py`，且 `status = 'ready'`。
+Readiness validation 必須確認 `deviceId` 相符、`protocolVersion` 支援 v2、`appPath` 為 `/app/rc_main.py`，且 `status = 'ready'`。
 
-### Upload single file
+### Upload single file（v2：raw binary streaming）
+
+v2 以 `Content-Type: application/octet-stream` 直接串流原始二進位資料，取代 v1 的 JSON+base64 格式。此設計避免 MicroPython 小記憶體環境在 base64 解碼時的 heap fragmentation 問題。
 
 ```http
 POST /api/v1/upload
-Content-Type: application/json
+Content-Type: application/octet-stream
+Content-Length: <size-in-bytes>
+X-Singular-Content-Sha256: <sha256-hex>
+X-Singular-Operation-Id: <operationId>
 ```
 
-Request：
-
-```ts
-interface CyberBrickOtaUploadPayload {
-  operationId: string;
-  deviceId: string;
-  remotePath: '/app/rc_main.py';
-  contentBase64: string;
-  contentSha256: string;
-  restartAfterWrite: boolean;
-}
-```
+Request body：原始二進位檔案內容（已包含 OTA bootstrap 的 `rc_main.py`）。
 
 Response：
 
@@ -137,27 +132,29 @@ interface CyberBrickOtaUploadResponse {
   remotePath: '/app/rc_main.py';
   bytesWritten: number;
   contentSha256: string;
-  restarted: boolean;
+  restarted: boolean;    // v1.2.0+ agent 寫入成功後自動 machine.reset()，固定 true
   status: 'written' | 'written-restart-failed';
 }
 ```
 
 **規則**
 
-- `remotePath` v1 固定 `/app/rc_main.py`；任何其他 path 必須被 Extension Host 拒絕。
+- `remotePath` 固定 `/app/rc_main.py`；任何其他 path 必須被 Extension Host 拒絕。
+- 裝置端 OTA agent 寫入檔案時必須只使用固定 `REMOTE_PATH = '/app/rc_main.py'`；不得接受 request 內任意 path 造成其他官方檔案被修改。
 - Extension Host 必須比對 response `deviceId`、`operationId`、`contentSha256`。
+- v1.2.0+ agent 在 `client.close()` 後立即呼叫 `machine.reset()`，使新程式立即生效；response 的 `restarted` 欄位固定為 `true`。
 - `status = 'written-restart-failed'` 需分類為 `restart-failed`，但不得回滾到 USB。
 
 ### Timeout 與重試
 
 - Health check timeout 建議不超過 5 秒。
-- Upload timeout 建議依檔案大小設定，但 v1 預設不超過 30 秒。
+- Upload timeout 建議依檔案大小設定，v2 預設不超過 30 秒。
 - Extension Host 可允許使用者手動重試；不得在背景無限重試，也不得因 timeout 自動 fallback USB。
 
 ### Version negotiation
 
-- 若 agent 回報不支援 protocol v1，readiness 必須回傳 `agent-outdated`。
-- 若未來新增 v2，必須保留 v1 相容測試或提供明確 migration。
+- 若 agent 回報不支援 protocol v2，readiness 必須回傳 `agent-outdated`。
+- v2 為當前版本；v1（JSON+base64）已廢棄，不再支援。
 
 ## Progress contract
 
@@ -211,6 +208,7 @@ OTA upload 成功後，Extension Host 必須更新：
 - `uploadMode = 'usb'`：完全走既有 `MicropythonUploader`，不做 OTA readiness。
 - `uploadMode = 'ota'`：不開 USB port picker、不嘗試 USB fallback。
 - OTA 失敗時 UI 可顯示「你可以手動切回 USB」按鈕/提示，但實際切換必須由使用者觸發並保存。
+- 不論成功或失敗，OTA upload 都不得修改 `/boot.py`、WebREPL 設定、韌體/出廠設定或其他官方 runtime 檔案。
 
 ## 測試契約
 
@@ -220,3 +218,4 @@ OTA upload 成功後，Extension Host 必須更新：
 - 上傳失敗不會呼叫既有 USB upload handler。
 - Progress stage 順序與錯誤分類可用 mock uploader 驗證。
 - `code` 內容不因 OTA 模式被注入 Wi‑Fi 連線邏輯。
+- OTA payload 與裝置端 agent source 需測試確認 remote path 固定為 `/app/rc_main.py`，且不含 `/boot.py` 或其他非白名單寫入路徑。

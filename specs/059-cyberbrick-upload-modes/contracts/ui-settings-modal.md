@@ -70,6 +70,23 @@
 - 不顯示「自動改用 USB」或等價文案。
 - 可顯示「你可以手動切回 USB」作為使用者可選行動。
 
+### 5. 進階 OTA 清除
+
+必須包含：
+
+- 進階/警示區塊，清楚說明此動作會透過 USB 移除 Singular Blockly OTA 檔案並回到 USB-only。
+- 「從裝置移除 OTA」按鈕。
+- 清除進行中與結果訊息區。
+- 二次確認對話，列出不會碰 `/boot.py` 或出廠檔案。
+
+**規則**
+
+- Cleanup 必須要求已選 USB port，但不必要求已選 paired device。
+- 若目前有已選 paired device，Cleanup 使用 `deviceId` 驗證 USB 連線裝置，不可用 `friendlyName`；若未選 paired device，則清除目前 USB 連線裝置上的 Singular Blockly OTA 檔案，且不刪除任何本機 pairing/secrets，除非 Extension Host 能讀到相符 `deviceId`。
+- WebView 只送出使用者意圖；實際刪檔、`rc_main.py` patch、SecretStorage 刪除與 upload mode 切回 USB 必須在 Extension Host 執行。
+- 不得使用 `window.confirm` 或 Blockly 刪除工作區的 confirm purpose；需使用 CyberBrick 專用的非阻塞確認流程。
+- Cleanup 失敗時只顯示錯誤與下一步，不自動切到 OTA 或改走其他隱藏流程。
+
 ## Accessibility / i18n
 
 - 所有使用者可見文字需走現有 locale messages，新增 key 要補 15 語系。
@@ -95,3 +112,4 @@
 6. 手動切到 OTA 後，按上傳直接走 OTA。
 7. 兩台裝置同名時仍能分辨 deviceId 摘要。
 8. OTA 失敗時只顯示下一步，不自動 USB fallback。
+9. 已完成 OTA 後，透過進階清除用 USB 移除 OTA 檔案，確認本機 paired device/secrets 被刪除、模式回到 USB，且不碰 `/boot.py`。

@@ -9,10 +9,10 @@
 
 **目的**：建立 CyberBrick 上傳設定所需的共用型別、測試替身與 fixtures，避免後續故事各自重複定義資料結構。
 
-- [ ] T001 建立 CyberBrick upload 共用型別與 message payload 介面於 `src/types/cyberbrickUpload.ts`
-- [ ] T002 [P] 建立 workspace configuration 與 SecretStorage 測試替身於 `src/test/helpers/cyberbrickUploadMocks.ts`
-- [ ] T003 [P] 建立可重用的 CyberBrick upload 測試 fixtures 於 `src/test/fixtures/cyberbrickUploadFixtures.ts`
-- [ ] T004 [P] 建立 WebView contract 測試工具，用於 HTML/JS 結構斷言於 `src/test/webview/cyberbrickUploadTestUtils.ts`
+- [X] T001 建立 CyberBrick upload 共用型別與 message payload 介面於 `src/types/cyberbrickUpload.ts`
+- [X] T002 [P] 建立 workspace configuration 與 SecretStorage 測試替身於 `src/test/helpers/cyberbrickUploadMocks.ts`
+- [X] T003 [P] 建立可重用的 CyberBrick upload 測試 fixtures 於 `src/test/fixtures/cyberbrickUploadFixtures.ts`
+- [X] T004 [P] 建立 WebView contract 測試工具，用於 HTML/JS 結構斷言於 `src/test/webview/cyberbrickUploadTestUtils.ts`
 
 ---
 
@@ -22,10 +22,10 @@
 
 **⚠️ 重要**：這個階段完成前，不應開始任何使用者故事的 UI、provisioning 或 OTA upload 實作。
 
-- [ ] T005 新增 CyberBrick upload settings service 測試，涵蓋預設值、schema migration、重複 `friendlyName`、secret key 產生與 sanitized state 於 `src/test/services/cyberbrickUploadSettingsService.test.ts`
-- [ ] T006 實作 `CyberBrickUploadSettingsService`，支援專案工作區範圍非敏感設定、SecretStorage lifecycle、schema migration、重複裝置處理與 sanitized panel state 於 `src/services/cyberbrickUploadSettingsService.ts`
-- [ ] T007 [P] 實作 CyberBrick upload 錯誤分類與 user-facing next-action helper 於 `src/services/cyberbrickUploadErrors.ts`
-- [ ] T008 在 extension message layer 註冊 CyberBrick upload service dependencies 於 `src/extension.ts` 與 `src/webview/messageHandler.ts`
+- [X] T005 新增 CyberBrick upload settings service 測試，涵蓋預設值、schema migration、重複 `friendlyName`、secret key 產生與 sanitized state 於 `src/test/services/cyberbrickUploadSettingsService.test.ts`
+- [X] T006 實作 `CyberBrickUploadSettingsService`，支援專案工作區範圍非敏感設定、SecretStorage lifecycle、schema migration、重複裝置處理與 sanitized panel state 於 `src/services/cyberbrickUploadSettingsService.ts`
+- [X] T007 [P] 實作 CyberBrick upload 錯誤分類與 user-facing next-action helper 於 `src/services/cyberbrickUploadErrors.ts`
+- [X] T008 在 extension message layer 註冊 CyberBrick upload service dependencies 於 `src/extension.ts` 與 `src/webview/messageHandler.ts`
 
 **檢查點**：基礎建設完成後，使用者故事可依優先級或由不同貢獻者平行開始。
 
@@ -41,17 +41,17 @@
 
 > **注意**：先寫測試並確認在實作前失敗。
 
-- [ ] T009 [US1] 新增 message handler 測試，涵蓋 `cyberbrickUploadSettingsLoad`、`cyberbrickUploadSettingsSave`、預設 USB mode 與 USB flow preservation 於 `src/test/messageHandler.test.ts`
-- [ ] T010 [P] [US1] 新增 WebView contract 測試，涵蓋 CyberBrick settings gear visibility、modal structure、mode selector 與 mode-aware upload branching 於 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`
+- [X] T009 [US1] 新增 message handler 測試，涵蓋 `cyberbrickUploadSettingsLoad`、`cyberbrickUploadSettingsSave`、預設 USB mode 與 USB flow preservation 於 `src/test/messageHandler.test.ts`
+- [X] T010 [P] [US1] 新增 WebView contract 測試，涵蓋 CyberBrick settings gear visibility、modal structure、mode selector 與 mode-aware upload branching 於 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`
 
 ### 使用者故事 1 實作
 
-- [ ] T011 [US1] 實作 `cyberbrickUploadSettingsLoad` 與 `cyberbrickUploadSettingsSave` handlers 於 `src/webview/messageHandler.ts`
-- [ ] T012 [P] [US1] 新增 CyberBrick upload settings gear button 與 base modal markup 於 `media/html/blocklyEdit.html`
-- [ ] T013 [US1] 實作 CyberBrick upload settings modal state loading、saving、rendering 與 mode-aware `handleUploadClick()` branching 於 `media/js/blocklyEdit.js`
-- [ ] T014 [P] [US1] 新增 CyberBrick upload modal 與 toolbar styles，避免使用 TXT-specific classes 於 `media/css/blocklyEdit.css`
-- [ ] T015 [US1] 對非 CyberBrick boards 隱藏或停用 CyberBrick upload settings entry 於 `media/js/blocklyEdit.js`
-- [ ] T016 [US1] 新增 upload mode、gear、modal、USB default、save 與 basic readiness i18n keys 到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js`
+- [X] T011 [US1] 實作 `cyberbrickUploadSettingsLoad` 與 `cyberbrickUploadSettingsSave` handlers 於 `src/webview/messageHandler.ts`
+- [X] T012 [P] [US1] 新增 CyberBrick upload settings gear button 與 base modal markup 於 `media/html/blocklyEdit.html`
+- [X] T013 [US1] 實作 CyberBrick upload settings modal state loading、saving、rendering 與 mode-aware `handleUploadClick()` branching 於 `media/js/blocklyEdit.js`
+- [X] T014 [P] [US1] 新增 CyberBrick upload modal 與 toolbar styles，避免使用 TXT-specific classes 於 `media/css/blocklyEdit.css`
+- [X] T015 [US1] 對非 CyberBrick boards 隱藏或停用 CyberBrick upload settings entry 於 `media/js/blocklyEdit.js`
+- [X] T016 [US1] 新增 upload mode、gear、modal、USB default、save 與 basic readiness i18n keys 到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js`
 
 **檢查點**：使用者故事 1 完成後，MVP 可驗證「預設 USB、保存模式、按上傳不重複詢問」。
 
@@ -67,20 +67,20 @@
 
 > **注意**：先寫測試並確認在實作前失敗。
 
-- [ ] T017 [P] [US2] 新增 provisioning service 測試，涵蓋 USB port missing/multiple devices、deviceId creation、Wi‑Fi scan success/empty/timeout/failure、manual SSID fallback、secret storage 與 `nextUploadMode = 'usb'` 於 `src/test/services/cyberbrickOtaProvisioningService.test.ts`
-- [ ] T018 [US2] 新增 message handler 測試，涵蓋 `cyberbrickUsbPortsRequest`、`cyberbrickWifiScanRequest`、`cyberbrickOtaProvisionRequest`、provisioning progress 與 responses 不含 secret values 於 `src/test/messageHandler.test.ts`
+- [X] T017 [P] [US2] 新增 provisioning service 測試，涵蓋 USB port missing/multiple devices、deviceId creation、Wi‑Fi scan success/empty/timeout/failure、manual SSID fallback、secret storage、device-side write path whitelist 與 `nextUploadMode = 'usb'` 於 `src/test/services/cyberbrickOtaProvisioningService.test.ts` / `src/test/services/micropythonUploaderCyberBrickHelpers.test.ts`
+- [X] T018 [US2] 新增 message handler 測試，涵蓋 `cyberbrickUsbPortsRequest`、`cyberbrickWifiScanRequest`、`cyberbrickOtaProvisionRequest`、provisioning progress 與 responses 不含 secret values 於 `src/test/messageHandler.test.ts`
 
 ### 使用者故事 2 實作
 
-- [ ] T019 [US2] 新增可重用 mpremote helper methods，用於 CyberBrick deviceId read/write、device-side Wi‑Fi scan 與 OTA agent deployment hooks 於 `src/services/micropythonUploader.ts`
-- [ ] T020 [P] [US2] 建立最小 CyberBrick OTA agent MicroPython source/template，支援 deviceId/token proof、health check、v1 LAN protocol 與 `/app/rc_main.py` write support 於 `src/services/cyberbrickOtaAgentSource.ts`
-- [ ] T021 [US2] 實作 `CyberBrickOtaProvisioningService`，支援 USB detection、deviceId provisioning、Wi‑Fi scan、agent install/configure、Extension 端 SecretStorage、裝置端最小必要設定、sanitized progress 與 no automatic OTA mode switch 於 `src/services/cyberbrickOtaProvisioningService.ts`
-- [ ] T022 [US2] 實作 USB port list、Wi‑Fi scan、provisioning progress 與 provisioning result message handlers 於 `src/webview/messageHandler.ts`
-- [ ] T023 [US2] 新增 provisioning form controls，包含 USB port、friendly name、SSID combobox、rescan button、password field 與 provisioning progress 於 `media/html/blocklyEdit.html`
-- [ ] T024 [US2] 實作 provisioning form behavior、device-side SSID rescan、manual SSID fallback、password one-way submit 與 no password re-rendering 於 `media/js/blocklyEdit.js`
-- [ ] T025 [US2] 新增 provisioning、USB setup、SSID scan、manual SSID、secret presence 與 provisioning error i18n keys 到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js`
+- [X] T019 [US2] 新增可重用 mpremote helper methods，用於 CyberBrick deviceId read/write、device-side Wi‑Fi scan 與 OTA agent deployment hooks；裝置端寫入限制為新增 OTA 自有檔案與修改 `/app/rc_main.py` 於 `src/services/micropythonUploader.ts`
+- [X] T020 [P] [US2] 建立最小 CyberBrick OTA agent MicroPython source/template，支援 deviceId/token proof、health check、v2 raw binary streaming LAN protocol（1024B chunks、增量 SHA-256）與 `/app/rc_main.py` write support 於 `src/services/cyberbrickOtaAgentSource.ts`
+- [X] T021 [US2] 實作 `CyberBrickOtaProvisioningService`，支援 USB detection、deviceId provisioning、Wi‑Fi scan、agent install/configure、Extension 端 SecretStorage、裝置端最小必要設定、sanitized progress 與 no automatic OTA mode switch 於 `src/services/cyberbrickOtaProvisioningService.ts`
+- [X] T022 [US2] 實作 USB port list、Wi‑Fi scan、provisioning progress 與 provisioning result message handlers 於 `src/webview/messageHandler.ts`
+- [X] T023 [US2] 新增 provisioning form controls，包含 USB port、friendly name、SSID combobox、rescan button、password field 與 provisioning progress 於 `media/html/blocklyEdit.html`
+- [X] T024 [US2] 實作 provisioning form behavior、device-side SSID rescan、manual SSID fallback、password one-way submit 與 no password re-rendering 於 `media/js/blocklyEdit.js`
+- [X] T025 [US2] 新增 provisioning、USB setup、SSID scan、manual SSID、secret presence 與 provisioning error i18n keys 到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js`
 
-**檢查點**：使用者故事 2 完成後，第一次 OTA 設定可透過 USB 完成，且不污染學生作品或專案 secrets。
+**檢查點**：使用者故事 2 完成後，第一次 OTA 設定可透過 USB 完成，且不把 Wi‑Fi 密碼、OTA token 或 provisioning 邏輯污染到學生作品或專案 secrets；裝置端只新增 Singular Blockly 自有檔案並修改 `/app/rc_main.py`，`rc_main.py` 僅可包含不含秘密的 OTA agent bootstrap。
 
 ---
 
@@ -94,19 +94,19 @@
 
 > **注意**：先寫測試並確認在實作前失敗。
 
-- [ ] T026 [P] [US3] 新增 OTA uploader 測試，涵蓋 readiness failure、offline target、token rejected、identity mismatch、timeout、v1 `/health`、v1 `/upload`、successful `/app/rc_main.py` upload、metadata update 與 no USB fallback 於 `src/test/services/cyberbrickOtaUploader.test.ts`
-- [ ] T027 [US3] 新增 message handler 測試，涵蓋 `cyberbrickOtaReadinessRequest`、`cyberbrickOtaUploadRequest`、progress/result forwarding、primary device lookup 與 no fallback to existing USB upload 於 `src/test/messageHandler.test.ts`
-- [ ] T028 [P] [US3] 新增 WebView contract 測試，涵蓋 duplicate `friendlyName`、`deviceId` summary display、primary target selection、offline readiness message 與 OTA progress/result UI 於 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`
+- [X] T026 [P] [US3] 新增 OTA uploader 測試，涵蓋 readiness failure、offline target、token rejected、identity mismatch、timeout、v1 `/health`、v1 `/upload`、successful `/app/rc_main.py` upload、device-side remote path whitelist、metadata update 與 no USB fallback 於 `src/test/services/cyberbrickOtaUploader.test.ts`
+- [X] T027 [US3] 新增 message handler 測試，涵蓋 `cyberbrickOtaReadinessRequest`、`cyberbrickOtaUploadRequest`、progress/result forwarding、primary device lookup 與 no fallback to existing USB upload 於 `src/test/messageHandler.test.ts`
+- [X] T028 [P] [US3] 新增 WebView contract 測試，涵蓋 duplicate `friendlyName`、`deviceId` summary display、primary target selection、offline readiness message 與 OTA progress/result UI 於 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`
 
 ### 使用者故事 3 實作
 
-- [ ] T029 [US3] 實作 OTA readiness builder，涵蓋 selected `primaryDeviceId`、secret presence、last-known address、agent health、identity match、blocking reasons 與 recommended actions 於 `src/services/cyberbrickUploadSettingsService.ts`
-- [ ] T030 [US3] 實作 `CyberBrickOtaUploader`，支援 authenticated v1 LAN upload、`/health` validation、`/upload` request/response validation、`/app/rc_main.py` remote path enforcement、progress stages、timeout handling、identity/token validation、SHA-256 比對、agent version negotiation 與 sanitized errors 於 `src/services/cyberbrickOtaUploader.ts`
-- [ ] T031 [US3] 實作 OTA readiness 與 OTA upload message handlers，包含 progress/result forwarding 與 explicit no-USB-fallback behavior 於 `src/webview/messageHandler.ts`
-- [ ] T032 [US3] 新增 paired-device list、duplicate-name `deviceId` labels、status badges、delete confirmation 與 primary target selection markup 於 `media/html/blocklyEdit.html`
-- [ ] T033 [US3] 實作 paired-device rendering、target selection save、duplicate-name disambiguation、offline readiness display、OTA progress/result handling 與 no-fallback next-action UI 於 `media/js/blocklyEdit.js`
-- [ ] T034 [US3] 更新 successful OTA upload metadata，包含 `lastSeenAt`、`lastSuccessfulUploadAt`、`lastKnownIp` 與 `statusSummary` 於 `src/services/cyberbrickUploadSettingsService.ts` 與 `src/services/cyberbrickOtaUploader.ts`
-- [ ] T035 [US3] 新增 paired-device list、duplicate-name、status badge、readiness、OTA progress、OTA error 與 no-fallback i18n keys 到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js`
+- [X] T029 [US3] 實作 OTA readiness builder，涵蓋 selected `primaryDeviceId`、secret presence、last-known address、agent health、identity match、blocking reasons 與 recommended actions 於 `src/services/cyberbrickUploadSettingsService.ts`
+- [X] T030 [US3] 實作 `CyberBrickOtaUploader`，支援 authenticated v2 raw binary streaming LAN upload（`Content-Type: application/octet-stream`、SHA-256 header）、`/health` validation（protocolVersion=2）、`/upload` response validation、`/app/rc_main.py` remote path enforcement、progress stages、timeout handling、identity/token validation、SHA-256 比對、agent version negotiation 與 sanitized errors 於 `src/services/cyberbrickOtaUploader.ts`
+- [X] T031 [US3] 實作 OTA readiness 與 OTA upload message handlers，包含 progress/result forwarding 與 explicit no-USB-fallback behavior 於 `src/webview/messageHandler.ts`
+- [X] T032 [US3] 新增 paired-device list、duplicate-name `deviceId` labels、status badges、delete confirmation 與 primary target selection markup 於 `media/html/blocklyEdit.html`
+- [X] T033 [US3] 實作 paired-device rendering、target selection save、duplicate-name disambiguation、offline readiness display、OTA progress/result handling 與 no-fallback next-action UI 於 `media/js/blocklyEdit.js`
+- [X] T034 [US3] 更新 successful OTA upload metadata，包含 `lastSeenAt`、`lastSuccessfulUploadAt`、`lastKnownIp` 與 `statusSummary` 於 `src/services/cyberbrickUploadSettingsService.ts` 與 `src/services/cyberbrickOtaUploader.ts`
+- [X] T035 [US3] 新增 paired-device list、duplicate-name、status badge、readiness、OTA progress、OTA error 與 no-fallback i18n keys 到 `media/locales/bg/messages.js`、`media/locales/cs/messages.js`、`media/locales/de/messages.js`、`media/locales/en/messages.js`、`media/locales/es/messages.js`、`media/locales/fr/messages.js`、`media/locales/hu/messages.js`、`media/locales/it/messages.js`、`media/locales/ja/messages.js`、`media/locales/ko/messages.js`、`media/locales/pl/messages.js`、`media/locales/pt-br/messages.js`、`media/locales/ru/messages.js`、`media/locales/tr/messages.js` 與 `media/locales/zh-hant/messages.js`
 
 **檢查點**：使用者故事 3 完成後，多裝置 OTA 目標選擇、readiness、上傳與失敗處理都可獨立驗證。
 
@@ -116,11 +116,27 @@
 
 **目的**：完成跨故事文件、驗證、安全檢查、i18n 與回歸清理。
 
-- [ ] T036 [P] 更新 CyberBrick MicroPython 文件，補充 USB/OTA mode behavior、`/app/rc_main.py`、USB-first provisioning、v1 OTA protocol 與 no-fallback guidance 於 `docs/specifications/03-hardware-support/cyberbrick-micropython.md`
-- [ ] T037 [P] 依 `quickstart.md` 的 manual matrix 與使用性驗證計畫記錄驗證證據，包含 SC-001/SC-003/SC-004/SC-005 的樣本數、通過數與失敗原因於 `specs/059-cyberbrick-upload-modes/quickstart.md`
-- [ ] T038 執行 `specs/059-cyberbrick-upload-modes/quickstart.md` 列出的 compile、lint、unit tests 與 i18n validation
-- [ ] T039 檢查並強化 secret redaction、postMessage payload sanitization 與 no `console.log` usage 於 `src/services/cyberbrickUploadSettingsService.ts`、`src/services/cyberbrickOtaProvisioningService.ts`、`src/services/cyberbrickOtaUploader.ts`、`src/webview/messageHandler.ts` 與 `media/js/blocklyEdit.js`
-- [ ] T040 重構重複的 modal/render helper code，同時保留既有 upload button 與 TXT UI behavior 於 `media/js/blocklyEdit.js`、`media/html/blocklyEdit.html` 與 `media/css/blocklyEdit.css`
+- [X] T036 [P] 更新 CyberBrick MicroPython 文件，補充 USB/OTA mode behavior、`/app/rc_main.py`、USB-first provisioning、v2 OTA protocol（raw binary streaming）、auto-reset 與 no-fallback guidance 於 `docs/specifications/03-hardware-support/cyberbrick-micropython.md`
+- [X] T037 [P] 依 `quickstart.md` 的 manual matrix 與使用性驗證計畫記錄驗證證據，包含 SC-001/SC-003/SC-004/SC-005 的樣本數、通過數與失敗原因於 `specs/059-cyberbrick-upload-modes/quickstart.md`
+- [X] T038 執行 `specs/059-cyberbrick-upload-modes/quickstart.md` 列出的 compile、lint、unit tests 與 i18n validation
+- [X] T039 檢查並強化 secret redaction、postMessage payload sanitization 與 no `console.log` usage 於 `src/services/cyberbrickUploadSettingsService.ts`、`src/services/cyberbrickOtaProvisioningService.ts`、`src/services/cyberbrickOtaUploader.ts`、`src/webview/messageHandler.ts` 與 `media/js/blocklyEdit.js`
+- [X] T040 重構重複的 modal/render helper code，同時保留既有 upload button 與 TXT UI behavior 於 `media/js/blocklyEdit.js`、`media/html/blocklyEdit.html` 與 `media/css/blocklyEdit.css`
+- [X] T051 升版 OTA agent v1.1.0 → v1.2.0：導入 `_reset_pending = [False]` 旗標，`_upload_raw` 成功路徑設旗標，`serve_forever` 於 `client.close()` 後呼叫 `machine.reset()`，確保 HTTP response 已送出後才觸發自動重啟；同步升版 `CYBERBRICK_OTA_AGENT_VERSION` 與 Protocol v2 常數於 `src/services/cyberbrickOtaAgentSource.ts`
+
+## Phase 7：進階 OTA 完整清除（USB-only 後路）
+
+**目的**：提供一鍵完整停用 OTA 的安全後路，透過 USB 驗證目標裝置後只移除 Singular Blockly 自有 OTA 檔案與 bootstrap，並清除本機 pairing/secrets、回到 USB-only。
+
+- [X] T041 [P] 新增 OTA cleanup 共用型別與 user-facing error code 於 `src/types/cyberbrickUpload.ts` 與 `src/services/cyberbrickUploadErrors.ts`
+- [X] T042 [P] 新增 cleanup helper contract 測試，鎖定 delete/write path 白名單與 no `/boot.py` 於 `src/test/services/micropythonUploaderCyberBrickHelpers.test.ts`
+- [X] T043 新增 provisioning service cleanup 測試，涵蓋成功清除、SecretStorage/pairing 刪除、upload mode 回 USB 與 identity mismatch refusal 於 `src/test/services/cyberbrickOtaProvisioningService.test.ts`
+- [X] T044 實作 `MicropythonUploader.removeCyberBrickOtaArtifacts()`，刪除 `/cyberbrick_ota_agent.py`、`/cyberbrick_ota_config.py`，並從 `/app/rc_main.py` 移除 OTA bootstrap marker 於 `src/services/micropythonUploader.ts`
+- [X] T045 實作 `CyberBrickOtaProvisioningService.removeOtaArtifacts()`，透過 USB 驗證 `deviceId`、呼叫 cleanup helper、刪除本機 pairing/secrets 並設定 upload mode 為 `usb` 於 `src/services/cyberbrickOtaProvisioningService.ts`
+- [X] T046 新增 `cyberbrickOtaCleanupRequest` / `cyberbrickOtaCleanupResult` message handler 與 no-secret response 測試於 `src/webview/messageHandler.ts` 與 `src/test/messageHandler.test.ts`
+- [X] T047 新增 WebView 進階 OTA 清除 UI、確認流程、status rendering 與 contract 測試於 `media/html/blocklyEdit.html`、`media/js/blocklyEdit.js`、`media/css/blocklyEdit.css` 與 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`
+- [X] T048 新增 OTA cleanup i18n keys 到 15 個 `media/locales/*/messages.js`
+- [X] T049 更新規格、data model、message/UI contracts、quickstart 與 CyberBrick MicroPython 文件，記錄 USB-only cleanup 白名單與手動驗證流程
+- [X] T050 執行 cleanup 相關 compile/test、完整 compile/lint/i18n validation，確認無 regression
 
 ---
 
@@ -134,6 +150,7 @@
 - **Phase 4 US2 (P2)**：依賴 Phase 2；可在 US1 完成基礎 UI 後整合 provisioning UI，若多人開發可與 US1 部分並行但需協調 `media/html/blocklyEdit.html`、`media/js/blocklyEdit.js`。
 - **Phase 5 US3 (P3)**：依賴 Phase 2；建議在 US1/US2 後整合完整 OTA target 與 upload UX。
 - **Phase 6 修整**：依賴欲交付的 user stories 完成。
+- **Phase 7 進階 OTA 完整清除**：依賴 Phase 4/5 的 pairing、SecretStorage、OTA bootstrap marker 與 message/UI 基礎；需在交付前完成安全白名單測試。
 
 ### 使用者故事相依性
 
@@ -151,6 +168,7 @@
 | FR-019 | T017, T021, T024 |
 | FR-020 | T021, T026, T030, T039 |
 | FR-021 | T009, T013, T038, T040 |
+| FR-025 | T041–T050 |
 | SC-001 | T017–T025, T037 |
 | SC-002 | T009, T013, T038 |
 | SC-003 | T028, T032, T033, T037 |
@@ -237,5 +255,6 @@
 - `[US1]`、`[US2]`、`[US3]` 對應 `spec.md` 中的三個使用者故事。
 - 每個 user story 的測試任務都應先完成並確認失敗，再進行實作。
 - 不得新增 OTA Blockly 積木，也不得修改 MicroPython generator 讓作品自動注入 Wi‑Fi/OTA 上傳邏輯。
+- 裝置端只允許新增/更新 Singular Blockly 自有 OTA 檔案（v1：`/cyberbrick_ota_agent.py`、`/cyberbrick_ota_config.py`）與修改 `/app/rc_main.py`；不得修改 `/boot.py`、WebREPL、韌體/出廠設定或其他官方 runtime 檔案。
 - OTA 失敗只能提供下一步，不得自動 fallback 到 USB。
 - 敏感資料不得出現在專案工作區設定、WebView render payload、log、diagnostics 或測試 fixture snapshot 中。

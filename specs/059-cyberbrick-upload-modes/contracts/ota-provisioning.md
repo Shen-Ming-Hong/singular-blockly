@@ -2,7 +2,7 @@
 
 ## 目的
 
-定義首次 OTA 設定流程：使用者必須先以 USB 連接 CyberBrick，由 Extension Host 透過既有 MicroPython/`mpremote` 能力建立信任關係、取得裝置端 Wi‑Fi 掃描結果、部署/驗證 OTA agent，並把敏感憑證存入本機 SecretStorage。
+定義首次 OTA 設定流程：使用者必須先以 USB 連接 CyberBrick，由 Extension Host 透過既有 MicroPython/`mpremote` 能力建立信任關係、取得裝置端 Wi‑Fi 掃描結果、部署/驗證 OTA agent，並把敏感憑證存入本機 SecretStorage。裝置端變更必須維持最高相容性：只新增 Singular Blockly 自有檔案並修改 `/app/rc_main.py`，其餘官方出廠狀態保持不變。
 
 ## Provisioning 流程
 
@@ -26,8 +26,9 @@ sequenceDiagram
     U->>W: 輸入 friendlyName / SSID / password
     W->>E: cyberbrickOtaProvisionRequest
     E->>USB: read/create deviceId
-    E->>USB: install/update OTA agent
-    E->>USB: configure Wi‑Fi / token proof
+    E->>USB: add/update /cyberbrick_ota_agent.py
+    E->>USB: add/update /cyberbrick_ota_config.py
+    E->>USB: patch /app/rc_main.py bootstrap
     E->>S: store wifi-password / ota-token
     E->>P: save non-sensitive paired device
     E->>W: cyberbrickOtaProvisionResult（nextUploadMode=usb）
@@ -54,10 +55,20 @@ sequenceDiagram
 - 失敗不阻擋手動 SSID 輸入；若 provisioning submit 已有 SSID，可略過 scan。
 - 失敗 error code：`wifi-scan-timeout`、`wifi-scan-failed`。
 
+### 裝置端檔案變更白名單
+
+Provisioning 與後續 OTA upload 只能對 CyberBrick 檔案系統做以下變更：
+
+- 新增或更新 `/cyberbrick_ota_agent.py`。
+- 新增或更新 `/cyberbrick_ota_config.py`。
+- 修改 `/app/rc_main.py`，加入或更新不含秘密的 OTA bootstrap，並作為學生程式入口。
+
+禁止修改 `/boot.py`、WebREPL 設定、韌體/出廠設定、官方 runtime 檔案，也禁止刪除或重新命名非 Singular Blockly 管理的既有檔案。
+
 ### 4. `install-agent`
 
-- 將最小 OTA agent/runtime helper 部署到 CyberBrick。
-- v1 agent 職責：實作 `ota-upload.md` 定義的 v1 LAN protocol、驗證 deviceId/token、接收單檔 `/app/rc_main.py`、寫入檔案、回報版本與健康狀態、必要時重啟 student app。
+- 將最小 OTA agent/runtime helper 部署到 CyberBrick 的 `/cyberbrick_ota_agent.py`，並在 `/app/rc_main.py` 安裝或更新不含秘密的 agent bootstrap 呼叫。
+- v1.2.0+ agent 職責：實作 `ota-upload.md` 定義的 v2 LAN protocol（raw binary streaming）、驗證 deviceId/token、以 1024B 串流 chunks 接收單檔 `/app/rc_main.py`、增量 SHA-256 驗證、寫入檔案、回報版本與健康狀態、寫入成功後呼叫 `machine.reset()` 重啟 student app。
 - agent 不應將 Wi‑Fi 密碼或 token 印到 stdout。
 - 失敗 error code：`agent-install-failed`、`agent-version-unsupported`。
 
@@ -65,7 +76,7 @@ sequenceDiagram
 
 - 使用使用者選定或手動輸入的 SSID 與密碼設定裝置網路。
 - Wi‑Fi 密碼只在 Extension Host memory 與 SecretStorage 中短暫存在，不寫入專案工作區設定。
-- agent/device 可保存重新連線與 OTA 驗證所需的最小必要設定；Extension Host 專案工作區設定只保存 SSID hint 與非敏感狀態。
+- agent/device 可在 `/cyberbrick_ota_config.py` 保存重新連線與 OTA 驗證所需的最小必要設定；Extension Host 專案工作區設定只保存 SSID hint 與非敏感狀態。
 - 裝置端保存的任何秘密不得透過 WebView response、diagnostics、stdout/stderr 或 log 回傳。
 - 失敗 error code：`wifi-connect-failed`、`wifi-auth-failed`、`wifi-timeout`。
 
@@ -111,5 +122,6 @@ interface OtaProvisioningResult {
 - USB port 偵測可用 mock 測試多台/無裝置/非 CyberBrick。
 - Wi‑Fi scan 成功、空結果、timeout、失敗都需測試。
 - `wifiPassword` 不會出現在 provisioning result、settings snapshot 或 log payload。
+- device-side write paths 需被測試鎖定在 `/cyberbrick_ota_agent.py`、`/cyberbrick_ota_config.py` 與 `/app/rc_main.py`；不得出現 `/boot.py`。
 - Provisioning 成功後 `uploadMode` 仍為 `usb`。
 - `friendlyName` 重複時仍能新增兩筆不同 `deviceId`。

@@ -15,7 +15,7 @@
 
 **Decision**: v1 將 OTA 做成 CyberBrick 專用上傳模式設定，入口放在 Blockly 編輯畫面右上工具列的設定齒輪；不新增學生可拖曳的「OTA 上傳」或「為上傳而連 Wi‑Fi」積木。
 
-**Rationale**: OTA 屬於傳輸/部署行為，不是學生作品的教學邏輯。若把 Wi‑Fi 憑證或 OTA 行為放進積木，會污染生成的 MicroPython 程式，並讓小朋友以為作品本身必須負責上傳。既有架構已經把上傳集中在 WebView 上傳按鈕與 Extension Host uploader service，最適合在此新增 mode-aware routing。
+**Rationale**: OTA 屬於傳輸/部署行為，不是學生作品的教學邏輯。若把 Wi‑Fi 憑證或 OTA 設定行為放進積木，會污染生成的 MicroPython 程式，並讓小朋友以為作品本身必須負責上傳。CyberBrick 韌體會自動進入 `/app/rc_main.py`，因此 Extension Host 可以在寫入 `rc_main.py` 前加入不含秘密的 agent 啟動 bootstrap；既有架構已經把上傳集中在 WebView 上傳按鈕與 Extension Host uploader service，最適合在此新增 mode-aware routing。
 
 **Alternatives considered**:
 - 新增 `cyberbrick_ota_upload` 積木：被拒絕，因為會把部署動作放進學生程式，違反 FR-020。
@@ -46,13 +46,13 @@
 
 ## 決策 4：首次 OTA 配對與 Wi‑Fi provisioning 只能經 USB 完成
 
-**Decision**: v1 要求使用者先以 USB 連接 CyberBrick，透過既有 `mpremote` 能力取得/建立 `deviceId`、部署或更新最小 OTA agent、執行裝置端 Wi‑Fi scan、把裝置連線所需的最小 Wi‑Fi/OTA 設定寫入 CyberBrick 裝置端，成功後才允許日常 OTA 上傳。Extension 端的敏感資料仍只持久化在 `SecretStorage`。
+**Decision**: v1 要求使用者先以 USB 連接 CyberBrick，透過既有 `mpremote` 能力取得/建立 `deviceId`、部署或更新最小 OTA agent、執行裝置端 Wi‑Fi scan、把裝置連線所需的最小 Wi‑Fi/OTA 設定寫入 Singular Blockly 自有裝置端檔案，成功後才允許日常 OTA 上傳。Extension 端的敏感資料仍只持久化在 `SecretStorage`。
 
 **Rationale**: MicroPython 官方文件指出 WebREPL 的初始密碼/啟用流程需透過 wired connection 以提高安全性；`mpremote connect auto` 也只自動偵測 USB serial。USB-first 能建立可信任通道，避免未配對裝置在同一 Wi‑Fi 中被任意上傳。這也符合 clarification：第一次 OTA 配對只能透過 USB 完成。
 
 **Alternatives considered**:
 - 第一次就透過 Wi‑Fi 配對：被拒絕，缺少可信任起點，且教室多台裝置時容易誤連。
-- 要求學生先放 Wi‑Fi 積木讓作品連網：被拒絕，會污染學生作品且違反 FR-020。
+- 要求學生先放 Wi‑Fi 積木讓作品連網：被拒絕，會污染教學程式邏輯且違反 FR-020。
 - 使用 host 電腦掃描 SSID：被拒絕，電腦看到的 Wi‑Fi 不等於 CyberBrick 裝置能看到的 Wi‑Fi。
 
 ## 決策 5：SSID 建議由 CyberBrick 裝置本身掃描，且只在使用者要求時更新
@@ -109,3 +109,61 @@
 - 開啟 `retainContextWhenHidden` 保住 modal：被拒絕，資源成本高，也不能解決重啟 VS Code 後的保存。
 - WebView 用 `localStorage` 保存設定：被拒絕，scope/安全/清除語意不清楚。
 - 每次重新開 modal 都從空白開始：被拒絕，違反 FR-005 與首次設定後回來可看到狀態的需求。
+
+## 決策 10：裝置端變更只新增自有檔案並修改 `/app/rc_main.py`
+
+**Decision**: v1 的裝置端檔案變更採白名單：可新增或更新 `/cyberbrick_ota_agent.py` 與 `/cyberbrick_ota_config.py`，並可在 `/app/rc_main.py` 加入或更新不含秘密的 OTA bootstrap。不得修改 `/boot.py`、WebREPL 設定、韌體/出廠設定、官方 runtime 檔案，也不得刪除或重新命名裝置上既有非 Singular Blockly 管理的檔案。
+
+**Rationale**: CyberBrick 會自動進入 `/app/rc_main.py`，因此 OTA 啟動點放在 `rc_main.py` 最符合實際執行模型。只新增自有檔案並修改應用入口可最大化與官方出廠狀態的相容性，降低日後韌體更新、出廠還原、WebREPL 或其他官方功能互相干擾的風險。
+
+**Alternatives considered**:
+- 修改 `/boot.py`：被拒絕，CyberBrick 啟動模型以 `/app/rc_main.py` 為入口，且改動 boot 檔會增加與官方韌體/出廠流程衝突的風險。
+- 寫入 WebREPL 或系統網路設定：被拒絕，這會改變官方出廠狀態並可能影響其他工具。
+- 同步整個檔案樹或清理既有檔案：被拒絕，超出 v1 需求且破壞相容性。
+
+## 決策 11：RC/ESP‑NOW generated code 必須保留已配對 OTA 的 Wi‑Fi STA 連線
+
+**Decision**: CyberBrick RC/ESP‑NOW MicroPython 生成碼在偵測到裝置端 `cyberbrick_ota_config` 具備 SSID 與 OTA token 時，不得無條件呼叫 `_wlan.disconnect()` 或 `_wlan.config(reconnects=0)`；只有未配對 OTA 的純 ESP‑NOW 情境才維持原本 disconnect + 固定 channel 初始化。
+
+**Rationale**: 實機診斷顯示 OTA bootstrap 與 agent/config 都存在時，RC/ESP‑NOW 初始化若立刻斷開 STA Wi‑Fi，Extension Host 的 `/api/v1/health` readiness check 會在 5 秒後 timeout。保留 STA Wi‑Fi 可讓 OTA agent 持續可達；若使用者未設定 OTA，原本的 ESP‑NOW 頻道控制行為不受影響。
+
+**Alternatives considered**:
+- 讓 OTA upload 失敗時要求使用者每次改回 USB：被拒絕，這會讓 OTA 對常見 RC/ESP‑NOW 範例失去可用性。
+- 在 device agent 內強制背景重連但允許學生程式繼續 disconnect：被拒絕，會造成 agent 與 generated code 互相拉扯 Wi‑Fi 狀態，timeout 仍可能不穩定。
+
+---
+
+## 未來功能討論：無線 Log 串流（v1 不實作）
+
+> 以下為設計討論紀錄，供未來 AI 或貢獻者回頭參考。v1 不實作，不屬於本 spec 交付範圍。
+
+### 背景
+
+v1 的 `SerialMonitorService` 使用 `mpremote connect <port> repl` 連接 CyberBrick，只能透過 USB 讀取 `print()` 輸出。使用者期望：OTA 部署後不接 USB 也能查看程式 log。
+
+### 目前可行嗎？
+
+**否，v1 不可行。** 有兩條路被封鎖：
+
+1. **WebREPL**：MicroPython 官方無線 REPL，但本 spec FR-023 明確禁止修改 `/boot.py`（CyberBrick 出廠韌體不啟用 WebREPL），因此這條路在白名單規則下無法採用。
+2. **`mpremote` 無線模式**：`mpremote` 底層無線連線最終也需要 WebREPL，排除同上。
+
+### 未來可行路徑
+
+**OTA agent 新增 `GET /api/v1/logs` endpoint（不需修改 `/boot.py`）**
+
+架構要點：
+- 在裝置端 `cyberbrick_ota_agent.py` 新增一個 log streaming endpoint，例如 `GET /api/v1/logs`
+- 使用 HTTP chunked transfer encoding（`Transfer-Encoding: chunked`）將 `sys.stdout` 的輸出串流回 Extension Host
+- Extension Host 的 `SerialMonitorService` 新增無線模式，當裝置已 OTA 配對時切換為 HTTP polling 或 streaming
+- 完全不碰 `/boot.py`、WebREPL 或出廠設定，符合 FR-023 白名單原則
+
+教學建議（若未來實作）：
+- **迭代開發流程**：USB 連接開發與測試 → OTA 部署 → 無線 log 監控驗證 → 循環
+- 確保 log endpoint 也受 OTA token 保護，避免同一網路內的非授權讀取
+
+### 為何 v1 不先做
+
+- 本 spec 核心交付是 OTA 上傳功能本身；無線 log 屬於進一步的教學體驗改善
+- log streaming 需要 OTA agent 升版（新增 endpoint、chunked transfer、stdout 重導向），複雜度與測試量足以構成獨立 spec
+- 優先確保 upload 流程穩定，再在後續版本擴充 agent capability
