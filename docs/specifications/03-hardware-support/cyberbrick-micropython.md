@@ -41,6 +41,68 @@
 
 **實作**：`src/services/micropythonUploader.ts`
 
+### 2.1 USB / OTA 上傳模式（059）
+
+CyberBrick 支援固定的上傳模式設定，但 **OTA 是上傳工具功能，不是 Blockly 積木**。學生不需要拖曳 Wi‑Fi 或 OTA 積木；上傳工具會在 `/app/rc_main.py` 開頭加入一段很小的 OTA agent 啟動呼叫，內容只會 `import cyberbrick_ota_agent` 並呼叫背景啟動函式，不包含 Wi‑Fi 密碼、OTA token 或 provisioning 邏輯。
+
+為維持官方出廠狀態與最高相容性，OTA provisioning 只允許新增/更新 Singular Blockly 自有檔案（`/cyberbrick_ota_agent.py`、`/cyberbrick_ota_config.py`）並修改 `/app/rc_main.py`；不得修改 `/boot.py`、WebREPL 設定、韌體/出廠設定或其他官方 runtime 檔案。
+
+| 模式 | 行為 | 適用情境 |
+| ---- | ---- | -------- |
+| `USB` | 預設模式，沿用 `mpremote` 上傳到 `/app/rc_main.py` | 新專案、第一次設定、網路不穩時 |
+| `OTA` | 透過同一區域網路上的已配對 CyberBrick OTA agent 寫入 `/app/rc_main.py` | 裝置已完成 USB-first provisioning 並連上 Wi-Fi |
+
+右上角 CyberBrick 設定齒輪可保存上傳模式。按下既有上傳按鈕時會直接依保存模式執行，不會每次詢問小朋友要用 USB 還是 OTA。
+
+#### USB-first provisioning
+
+首次使用 OTA 前，必須先以 USB 連接 CyberBrick，由 Extension Host 透過 `mpremote` 完成：
+
+1. 讀取或建立 `deviceId`。
+2. 由 CyberBrick 裝置端掃描 Wi-Fi SSID（不是掃描電腦的 Wi-Fi）。
+3. 部署最小 OTA agent 到 `/cyberbrick_ota_agent.py`。
+4. 將 Wi‑Fi 與 OTA 驗證 token 的最小必要設定寫入 `/cyberbrick_ota_config.py`。
+5. 在 `/app/rc_main.py` 安裝或更新帶標記的 OTA 啟動呼叫，確保 CyberBrick 自動進入 `rc_main.py` 時會啟動 agent。
+6. 將 Wi-Fi 密碼、OTA token、pairing secret 存在 VS Code `SecretStorage`。
+7. 將非敏感資料（例如 `deviceId`、顯示名稱、最後 IP、狀態）存在工作區設定。
+
+之後不論 USB 或 OTA 寫入 `/app/rc_main.py`，Extension Host 都會重新包裝同一段啟動呼叫，避免後續上傳覆蓋掉 OTA 啟動點。這段 bootstrap 以 start/end marker 管理，重複上傳不會累積多份。
+
+RC/ESP‑NOW 生成碼需要與 OTA agent 共存：如果裝置端已有 `/cyberbrick_ota_config.py` 且具備 OTA 設定，RC 初始化不得無條件呼叫 `_wlan.disconnect()` 或停用 reconnects，否則學生程式啟動後會把 OTA agent 的 STA Wi‑Fi 斷開，造成 `/api/v1/health` readiness timeout。未配對 OTA 的純 ESP‑NOW 情境仍可保留原本固定頻道初始化。
+
+Provisioning 完成後仍維持 `USB` 模式，必須由使用者明確切換到 `OTA`。
+
+#### OTA v1 protocol
+
+OTA v1 使用區域網路 HTTP API：
+
+- Base URL：`http://{lastKnownIp}:{otaPort}/api/v1`
+- Health：`GET /api/v1/health`
+- Upload：`POST /api/v1/upload`
+- 固定遠端路徑：`/app/rc_main.py`
+- 驗證 headers：
+	- `Authorization: Bearer <ota-token>`
+	- `X-CyberBrick-Device-Id: <deviceId>`
+	- `X-CyberBrick-Protocol-Version: 2`
+
+上傳前會檢查主要目標裝置、token、最後 IP、agent health、`deviceId` 是否相符與 protocol version。OTA 失敗時只提供下一步（例如重新掃描、重新 provisioning、手動切回 USB），**不會自動 fallback 到 USB**，避免程式被送到錯誤裝置或造成教室多裝置混淆。
+
+#### 完整清除 OTA / 回到 USB-only
+
+CyberBrick 設定 modal 提供進階清除動作，讓老師或使用者可透過 USB 把 Singular Blockly OTA 安裝內容完整移除。這是有線、明確確認的動作，不會透過 OTA 刪除 OTA agent 本身。
+
+清除流程會：
+
+1. 要求選定 USB port；不要求該裝置已經是本機 paired device。
+2. 若 UI 目前選定 paired CyberBrick，透過 USB 讀取裝置端 `deviceId` 並確認相符；若未選定 paired device，則以目前 USB 連線裝置為清除目標。
+3. 刪除 `/cyberbrick_ota_agent.py`。
+4. 刪除 `/cyberbrick_ota_config.py`。
+5. 從 `/app/rc_main.py` 移除 Singular Blockly OTA bootstrap marker 區塊。
+6. 若讀到的 `deviceId` 對應 Extension Host 本機 paired device 或 secrets，刪除該本機 pairing/secrets；若沒有對應，則不誤刪本機其他裝置資料。
+7. 將專案上傳模式切回 `USB`。
+
+清除流程不會修改 `/boot.py`、WebREPL 設定、韌體/出廠設定、官方 runtime 或其他非 Singular Blockly 管理的檔案。如果 UI 已指定 paired device，但 USB 連到不同 `deviceId` 的 CyberBrick，cleanup 會拒絕執行，避免把隔壁同學的裝置清掉；若沒有指定 paired device，則允許清除目前 USB 連線裝置上的 Singular Blockly OTA 殘留。小心，這把「清除 OTA」的小掃把只掃 Singular Blockly 自己留下的灰塵，不掃別人的房間。
+
 ### 3. 主板切換保護
 
 從 Arduino 切換到 CyberBrick（或反向）時：

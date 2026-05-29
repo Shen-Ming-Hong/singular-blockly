@@ -35,7 +35,7 @@ body {
 	--editor-warning-border: #c27a00;
 	--editor-status-ok-fg: #2e7d32;
 	--editor-status-error-fg: #c62828;
-	--editor-focus-ring: var(--vscode-focusBorder, #007acc);
+	--editor-focus-ring: #007acc;
 	--editor-scrollbar-track: #f1f1f1;
 	--editor-scrollbar-thumb: #c1c1c1;
 	--editor-scrollbar-thumb-hover: #a8a8a8;
@@ -53,7 +53,7 @@ body {
 	--txt-virtual-controls-grid-line: rgba(127, 127, 127, 0.08);
 	--txt-virtual-control-button-border: rgba(0, 0, 0, 0.28);
 	--txt-virtual-control-button-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
-	--txt-virtual-control-state-ring: var(--vscode-focusBorder, #007acc);
+	--txt-virtual-control-state-ring: var(--editor-focus-ring);
 	--txt-virtual-controls-warning-bg: var(--editor-warning-bg);
 	--txt-virtual-controls-warning-fg: var(--editor-warning-fg);
 	--txt-virtual-controls-warning-border: var(--editor-warning-border);
@@ -85,6 +85,7 @@ body.theme-light {
 	--editor-scrollbar-track: #f1f1f1;
 	--editor-scrollbar-thumb: #c1c1c1;
 	--editor-scrollbar-thumb-hover: #a8a8a8;
+	--editor-focus-ring: #007acc;
 	--txt-virtual-controls-panel-bg: #ffffff;
 	--txt-virtual-controls-panel-fg: #1e1e1e;
 	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
@@ -127,6 +128,7 @@ body.theme-dark {
 	--editor-scrollbar-track: #333333;
 	--editor-scrollbar-thumb: #666666;
 	--editor-scrollbar-thumb-hover: #888888;
+	--editor-focus-ring: #8ab4f8;
 	--txt-virtual-controls-panel-bg: #252526;
 	--txt-virtual-controls-panel-fg: #cccccc;
 	--txt-virtual-controls-panel-border: rgba(255, 255, 255, 0.16);
@@ -563,7 +565,7 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 }
 
 .txt-virtual-controls-identifier-value {
-	font-family: var(--vscode-editor-font-family, 'SFMono-Regular', Consolas, monospace);
+	font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Courier, monospace;
 	font-size: 0.78rem;
 	background: var(--txt-virtual-controls-code-bg);
 	color: var(--txt-virtual-controls-code-fg);
@@ -979,7 +981,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner {
 }
 
 body.preview-mode .txt-preview-canvas:focus-visible {
-	outline: 2px solid var(--vscode-focusBorder, #007acc);
+	outline: 2px solid var(--editor-focus-ring);
 	outline-offset: 2px;
 }
 
@@ -1278,6 +1280,359 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 
 .sample-path {
 	color: white;
+}
+
+/* CyberBrick 上傳設定按鈕與對話框 */
+.cyberbrick-upload-settings-switch {
+	margin-left: 10px;
+}
+
+#cyberbrickUploadSettingsButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	background-color: #00897b;
+	color: #ffffff;
+	cursor: pointer;
+	transition:
+		background-color 0.3s,
+		box-shadow 0.2s ease;
+}
+
+#cyberbrickUploadSettingsButton:hover {
+	background-color: #00695c;
+}
+
+#cyberbrickUploadSettingsButton:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.cyberbrick-upload-modal-content {
+	max-width: 560px;
+}
+
+.cyberbrick-upload-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.cyberbrick-accordion-section {
+	gap: 0;
+}
+
+.cyberbrick-upload-section h3 {
+	margin: 0;
+	font-size: 0.95rem;
+}
+
+.cyberbrick-upload-section label {
+	font-weight: 600;
+	color: var(--editor-surface-fg);
+}
+
+.cyberbrick-upload-input {
+	background: var(--editor-field-bg);
+	color: var(--editor-field-fg);
+	border: 1px solid var(--editor-field-border);
+	padding: 6px 8px;
+	border-radius: 4px;
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.cyberbrick-upload-input:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.cyberbrick-upload-help {
+	margin: 0;
+	font-size: 0.84rem;
+	line-height: 1.45;
+	color: var(--editor-description-fg);
+}
+
+.cyberbrick-upload-readiness {
+	padding: 10px 12px;
+	border-radius: 8px;
+	border: 1px solid var(--editor-notice-border);
+	background: var(--editor-notice-bg);
+	color: var(--editor-notice-fg);
+	font-size: 0.86rem;
+	line-height: 1.45;
+}
+
+.cyberbrick-upload-readiness.warning {
+	background: var(--editor-warning-bg);
+	color: var(--editor-warning-fg);
+	border-color: var(--editor-warning-border);
+}
+
+.cyberbrick-upload-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.cyberbrick-upload-grid {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	gap: 10px 12px;
+	align-items: center;
+}
+
+.cyberbrick-upload-inline-field {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	min-width: 0;
+}
+
+.cyberbrick-upload-inline-field .cyberbrick-upload-input {
+	flex: 1;
+}
+
+.cyberbrick-wifi-ssid-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+}
+
+.cyberbrick-wifi-manual-input {
+	width: 100%;
+}
+
+.cyberbrick-password-field {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.cyberbrick-password-field .cyberbrick-upload-input {
+	flex: 1;
+}
+
+.cyberbrick-password-toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 32px;
+	padding: 0 8px;
+	flex: 0 0 auto;
+}
+
+.cyberbrick-password-toggle-icon {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.cyberbrick-password-toggle .cyberbrick-password-eye-closed {
+	display: none;
+}
+
+.cyberbrick-password-toggle.revealed .cyberbrick-password-eye-open {
+	display: none;
+}
+
+.cyberbrick-password-toggle.revealed .cyberbrick-password-eye-closed {
+	display: block;
+}
+
+.cyberbrick-paired-device-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.cyberbrick-paired-device-card {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 8px;
+	align-items: start;
+	padding: 10px 12px;
+	border: 1px solid var(--editor-card-border);
+	border-radius: 8px;
+	background: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+}
+
+.cyberbrick-paired-device-card.primary {
+	border-color: var(--editor-card-hover-border);
+	box-shadow: 0 0 0 1px var(--editor-card-hover-border);
+}
+
+.cyberbrick-paired-device-title {
+	font-weight: 600;
+	margin-bottom: 3px;
+}
+
+.cyberbrick-paired-device-meta {
+	font-size: 0.8rem;
+	line-height: 1.45;
+	color: var(--editor-description-fg);
+}
+
+.cyberbrick-status-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	background: var(--editor-notice-bg);
+	color: var(--editor-notice-fg);
+	border: 1px solid var(--editor-notice-border);
+}
+
+.cyberbrick-status-badge.warning {
+	background: var(--editor-warning-bg);
+	color: var(--editor-warning-fg);
+	border-color: var(--editor-warning-border);
+}
+
+.cyberbrick-paired-device-actions {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+
+.cyberbrick-provisioning-progress {
+	min-height: 20px;
+	font-size: 0.84rem;
+	line-height: 1.45;
+	color: var(--editor-description-fg);
+}
+
+.cyberbrick-provisioning-progress .failed {
+	color: var(--editor-status-error-fg);
+}
+
+.cyberbrick-provisioning-progress .succeeded {
+	color: var(--editor-status-ok-fg);
+}
+
+.cyberbrick-accordion-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	text-align: left;
+	background: none;
+	border: 1px solid var(--editor-card-border);
+	border-radius: 6px;
+	padding: 10px 14px;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: 0.92rem;
+	color: var(--editor-surface-fg);
+	gap: 8px;
+}
+
+.cyberbrick-accordion-toggle:hover {
+	background: var(--editor-card-bg);
+	border-color: var(--editor-card-hover-border);
+}
+
+.cyberbrick-accordion-arrow {
+	font-size: 0.7rem;
+	transition: transform 0.18s ease;
+	flex: 0 0 auto;
+	opacity: 0.7;
+}
+
+.cyberbrick-accordion-section.is-open > .cyberbrick-accordion-toggle .cyberbrick-accordion-arrow {
+	transform: rotate(180deg);
+}
+
+.cyberbrick-accordion-section.is-open > .cyberbrick-accordion-toggle {
+	border-radius: 6px 6px 0 0;
+	border-bottom-color: transparent;
+}
+
+.cyberbrick-accordion-body {
+	padding-top: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.cyberbrick-accordion-body.hidden {
+	display: none;
+}
+
+.cyberbrick-provisioning-section .cyberbrick-accordion-body {
+	border: 1px solid var(--editor-card-border);
+	border-top: none;
+	border-radius: 0 0 6px 6px;
+	padding: 12px 14px 0;
+}
+
+.cyberbrick-provisioning-section .cyberbrick-accordion-body #cyberbrickProvisionButton {
+	margin: 4px -14px 0;
+	border-radius: 0 0 5px 5px;
+	padding: 12px;
+	width: calc(100% + 28px);
+}
+
+.cyberbrick-ota-cleanup-section {
+	border-radius: 8px;
+}
+
+.cyberbrick-ota-cleanup-section .cyberbrick-accordion-toggle {
+	border-color: var(--editor-warning-border);
+	color: var(--editor-warning-fg);
+	background: var(--editor-warning-bg);
+}
+
+.cyberbrick-ota-cleanup-section .cyberbrick-accordion-toggle:hover {
+	filter: brightness(0.95);
+}
+
+.cyberbrick-ota-cleanup-section .cyberbrick-accordion-body {
+	padding: 10px 12px;
+	border: 1px solid var(--editor-warning-border);
+	border-top: none;
+	border-radius: 0 0 8px 8px;
+	background: var(--editor-warning-bg);
+	color: var(--editor-warning-fg);
+}
+
+.cyberbrick-ota-cleanup-section .cyberbrick-upload-help {
+	color: currentColor;
+}
+
+.cyberbrick-ota-cleanup-status {
+	min-height: 20px;
+	font-size: 0.84rem;
+	line-height: 1.45;
+}
+
+.cyberbrick-ota-cleanup-status.running {
+	font-weight: 600;
+}
+
+.cyberbrick-danger-btn {
+	align-self: flex-start;
+	border-color: var(--editor-warning-border);
+	color: var(--editor-warning-fg);
 }
 
 /* TXT 連線設定按鈕樣式 */

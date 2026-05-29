@@ -9,6 +9,13 @@ import * as path from 'path';
 import { log } from './logging';
 import { getDefaultPlatformioExecutablePath, getExecutableDirectory, getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
 import * as vscode from 'vscode';
+import { WifiNetworkSuggestion } from '../types/cyberbrickUpload';
+import {
+	buildCyberBrickRcMainOtaBootstrap,
+	CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END,
+	CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START,
+	withCyberBrickRcMainOtaBootstrap,
+} from './cyberbrickOtaAgentSource';
 
 /**
  * 上傳階段類型
@@ -47,6 +54,7 @@ export interface UploadResult {
 		stage: UploadStage;
 		message: string;
 		details?: string;
+		errorCode?: string | null;
 	};
 	backup?: {
 		created: boolean;
@@ -313,6 +321,357 @@ export class MicropythonUploader {
 	}
 
 	/**
+	 * 在指定 CyberBrick USB 連線上執行一段短 MicroPython 程式。
+	 * 注意：script 可能包含 provisioning secret，呼叫端與本方法都不可把 script 內容寫入 log。
+	 */
+	async runCyberBrickPython(port: string, script: string, timeoutMs = 15000): Promise<{ stdout: string; stderr: string }> {
+		await this.ensureMpremoteReady();
+		const fs = require('fs');
+		const tempDir = os.tmpdir();
+		const scriptFile = path.join(tempDir, `cyberbrick_exec_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
+		fs.writeFileSync(scriptFile, script, 'utf8');
+
+		try {
+			// CyberBrick 上通常會自動執行 /app/rc_main.py；直接 `mpremote run` 會先 soft-reset，
+			// 學生程式重新啟動後可能讓 mpremote 無法進入 raw REPL。
+			// 沿用 USB 上傳流程：先中斷程式進入正常 REPL，再用 resume + run 避免額外 soft-reset。
+			await this.interruptDevice(port);
+			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(port)} resume + run ${this.quoteShellArg(scriptFile)}`;
+			log('[blockly] 執行 CyberBrick mpremote helper', 'debug', { port, timeoutMs, mode: 'resume-run' });
+			return await this.execWithTimeout(command, timeoutMs);
+		} catch (error) {
+			throw new Error(`CyberBrick helper failed: ${this.formatCommandError(error)}`);
+		} finally {
+			try {
+				fs.unlinkSync(scriptFile);
+			} catch {
+				// 忽略清理錯誤
+			}
+		}
+	}
+
+	async readCyberBrickDeviceId(port: string): Promise<string | undefined> {
+		const script = `import json
+try:
+    import cyberbrick_ota_config as cfg
+    device_id = getattr(cfg, 'DEVICE_ID', '')
+except Exception:
+    device_id = ''
+print(json.dumps({'deviceId': device_id}))
+`;
+		const result = await this.runCyberBrickPython(port, script, 10000);
+		return this.parseJsonLine<{ deviceId?: string }>(result.stdout)?.deviceId?.trim() || undefined;
+	}
+
+	async writeCyberBrickDeviceId(port: string, deviceId: string): Promise<void> {
+		const script = `DEVICE_ID = ${JSON.stringify(deviceId)}
+with open('/cyberbrick_ota_config.py', 'w') as f:
+    f.write('DEVICE_ID = ' + repr(DEVICE_ID) + '\\n')
+print('OK')
+`;
+		await this.runCyberBrickPython(port, script, 10000);
+	}
+
+	async scanCyberBrickWifi(port: string): Promise<WifiNetworkSuggestion[]> {
+		const script = [
+			'import json',
+			'import time',
+			'try:',
+			'    import network',
+			'    wlan = network.WLAN(network.STA_IF)',
+			'    try:',
+			'        wlan.active(False)',
+			'        time.sleep(0.3)',
+			'    except Exception:',
+			'        pass',
+			'    wlan.active(True)',
+			'    time.sleep(1.0)',
+			'    rows = wlan.scan()',
+			'    networks = []',
+			'    for row in rows:',
+			"        ssid = row[0].decode() if isinstance(row[0], bytes) else str(row[0])",
+			"        networks.append({'ssid': ssid, 'rssi': row[3], 'security': str(row[4]), 'channel': row[2], 'hidden': not bool(ssid)})",
+			"    print(json.dumps({'networks': networks}))",
+			'except Exception as exc:',
+			"    print(json.dumps({'error': str(exc), 'networks': []}))",
+			'',
+		].join('\n');
+		const result = await this.runCyberBrickPython(port, script, 20000);
+		const payload = this.parseJsonLine<{ networks?: WifiNetworkSuggestion[]; error?: string }>(result.stdout);
+		if (!payload) {
+			throw new Error('Unable to parse CyberBrick Wi-Fi scan result');
+		}
+		if (payload.error) {
+			throw new Error(payload.error);
+		}
+		return Array.isArray(payload.networks) ? payload.networks.filter(network => typeof network.ssid === 'string') : [];
+	}
+
+	async deployCyberBrickOtaAgent(port: string, agentSource: string): Promise<void> {
+		await this.ensureMpremoteReady();
+		const fs = require('fs');
+		const tempDir = os.tmpdir();
+		const sourceFile = path.join(tempDir, `cyberbrick_ota_agent_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
+		fs.writeFileSync(sourceFile, agentSource, 'utf8');
+
+		try {
+			await this.interruptDevice(port);
+			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(port)} resume + fs cp ${this.quoteShellArg(sourceFile)} :/cyberbrick_ota_agent.py`;
+			log('[blockly] 部署 CyberBrick OTA agent', 'info', { port });
+			await this.execWithTimeout(command, 20000);
+		} catch (error) {
+			throw new Error(`CyberBrick OTA agent deploy failed: ${this.formatCommandError(error)}`);
+		} finally {
+			try {
+				fs.unlinkSync(sourceFile);
+			} catch {
+				// 忽略清理錯誤
+			}
+		}
+	}
+
+	async configureCyberBrickOtaAgent(
+		port: string,
+		config: { deviceId: string; ssid: string; wifiPassword?: string; otaToken: string; pairingSecret: string; otaPort: number }
+	): Promise<{ ipAddress?: string; agentVersion?: string; agentStarted?: boolean; agentMode?: string; agentError?: string; rcMainPatched?: boolean; rcMainError?: string }> {
+		const configJson = JSON.stringify(config);
+		const rcMainBootstrap = buildCyberBrickRcMainOtaBootstrap();
+		// Build the script as an array of lines to guarantee spaces-only indentation
+		// (template literals with TypeScript indentation mix tabs into the MicroPython source)
+		const script = [
+			'import json',
+			'import gc',
+			'import os',
+			`config = json.loads(${JSON.stringify(configJson)})`,
+			"with open('/cyberbrick_ota_config.py', 'w') as f:",
+			"    f.write('DEVICE_ID = ' + repr(config['deviceId']) + '\\n')",
+			"    f.write('SSID = ' + repr(config['ssid']) + '\\n')",
+			"    f.write('WIFI_PASSWORD = ' + repr(config.get('wifiPassword') or '') + '\\n')",
+			"    f.write('OTA_TOKEN = ' + repr(config['otaToken']) + '\\n')",
+			"    f.write('PAIRING_SECRET = ' + repr(config['pairingSecret']) + '\\n')",
+			"    f.write('OTA_PORT = ' + repr(config['otaPort']) + '\\n')",
+			'# Save credentials and token before freeing config to reclaim heap for large file I/O',
+			"_ssid = config.get('ssid') or ''",
+			"_wifi_password = config.get('wifiPassword') or ''",
+			"_ota_token = config.get('otaToken') or ''",
+			'del config',
+			'gc.collect()',
+			'rc_main_patched = False',
+			"rc_main_error = ''",
+			'try:',
+			`    start_marker = ${JSON.stringify(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START)}`,
+			`    end_marker = ${JSON.stringify(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END)}`,
+			'    def _ensure_dir(path):',
+			'        try:',
+			'            os.stat(path)',
+			'        except OSError:',
+			'            os.mkdir(path)',
+			'    # Peek at the first 256 bytes to detect if bootstrap is already at the top.',
+			'    try:',
+			"        with open('/app/rc_main.py', 'rb') as _f:",
+			'            _head = _f.read(256).decode()',
+			'    except Exception:',
+			"        _head = ''",
+			'    if start_marker in _head:',
+			'        # Bootstrap already at start of file; skip patching to conserve heap.',
+			'        rc_main_patched = True',
+			'    else:',
+			'        # Bootstrap absent from file head; allocate bootstrap string and patch.',
+			'        gc.collect()',
+			`        rc_bootstrap = ${JSON.stringify(rcMainBootstrap)}`,
+			'        try:',
+			"            with open('/app/rc_main.py', 'r') as f:",
+			'                rc_main_source = f.read()',
+			'        except (OSError, MemoryError):',
+			"            rc_main_source = ''",
+			'        if start_marker in rc_main_source and end_marker in rc_main_source:',
+			'            before, rest = rc_main_source.split(start_marker, 1)',
+			'            _old, after = rest.split(end_marker, 1)',
+			"            rc_main_source = before.rstrip() + '\\n\\n' + rc_bootstrap + '\\n\\n' + after.lstrip('\\n')",
+			'        else:',
+			"            rc_main_source = rc_bootstrap + '\\n\\n' + rc_main_source.lstrip('\\n')",
+			"        _ensure_dir('/app')",
+			"        with open('/app/rc_main.py', 'w') as f:",
+			'            f.write(rc_main_source)',
+			'        rc_main_patched = True',
+			'except Exception as exc:',
+			'    rc_main_error = str(exc)',
+			'try:',
+			'    import network, time',
+			'    wlan = network.WLAN(network.STA_IF)',
+			'    wlan.active(True)',
+			'    if _ssid:',
+			'        wlan.connect(_ssid, _wifi_password)',
+			'        for _ in range(80):',
+			'            if wlan.isconnected():',
+			'                break',
+			'            time.sleep(0.25)',
+			"    ip = wlan.ifconfig()[0] if wlan.isconnected() else ''",
+			'except Exception:',
+			"    ip = ''",
+			'agent_started = False',
+			"agent_mode = ''",
+			"agent_error = ''",
+			'try:',
+			'    import sys',
+			"    if 'cyberbrick_ota_agent' in sys.modules:",
+			'        try:',
+			"            sys.modules['cyberbrick_ota_agent'].OTA_TOKEN = _ota_token",
+			'        except Exception:',
+			'            pass',
+			'    import cyberbrick_ota_agent as ota_agent',
+			'    start_result = ota_agent.start_background()',
+			"    agent_started = bool(start_result.get('started'))",
+			"    agent_mode = start_result.get('mode') or ''",
+			"    ip = start_result.get('ipAddress') or ip",
+			"    agent_error = start_result.get('error') or ''",
+			'except Exception as exc:',
+			'    agent_error = str(exc)',
+			"print(json.dumps({'ipAddress': ip, 'agentVersion': '1.0.0', 'agentStarted': agent_started, 'agentMode': agent_mode, 'agentError': agent_error, 'rcMainPatched': rc_main_patched, 'rcMainError': rc_main_error}))",
+			'',
+		].join('\n');
+		try {
+			const result = await this.runCyberBrickPython(port, script, 30000);
+			return this.parseJsonLine<{ ipAddress?: string; agentVersion?: string; agentStarted?: boolean; agentMode?: string; agentError?: string; rcMainPatched?: boolean; rcMainError?: string }>(result.stdout) || {};
+		} catch (error) {
+			log(`CyberBrick OTA configuration error: ${this.formatCommandError(error)}`, 'error');
+			throw new Error('CyberBrick OTA configuration failed.');
+		}
+	}
+
+	async removeCyberBrickOtaArtifacts(
+		port: string
+	): Promise<{
+		removedAgent: boolean;
+		removedConfig: boolean;
+		rcMainPatched: boolean;
+		rcMainHadBootstrap: boolean;
+		rcMainError?: string;
+		agentRemoveError?: string;
+		configRemoveError?: string;
+	}> {
+		const script = `import json
+import os
+import gc
+start_marker = ${JSON.stringify(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START)}
+end_marker = ${JSON.stringify(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END)}
+result = {'removedAgent': False, 'removedConfig': False, 'rcMainPatched': False, 'rcMainHadBootstrap': False}
+
+def _exists(path):
+    try:
+        os.stat(path)
+        return True
+    except OSError:
+        return False
+
+def _unlink(path):
+    fn = getattr(os, 'remove', None) or getattr(os, 'unlink', None)
+    if not fn:
+        raise OSError('no remove')
+    fn(path)
+
+try:
+    if _exists('/app/rc_main.py'):
+        with open('/app/rc_main.py', 'rb') as f:
+            header = f.read(256)
+        has_start = start_marker.encode() in header
+        del header
+        gc.collect()
+        if has_start:
+            result['rcMainHadBootstrap'] = True
+            end_tag = end_marker.encode()
+            found_after = -1
+            with open('/app/rc_main.py', 'rb') as f:
+                buf = b''
+                file_pos = 0
+                while True:
+                    chunk = f.read(256)
+                    if not chunk:
+                        break
+                    buf += chunk
+                    idx = buf.find(end_tag)
+                    if idx >= 0:
+                        skip = idx + len(end_tag)
+                        while skip < len(buf) and buf[skip] in (10, 13):
+                            skip += 1
+                        found_after = file_pos + skip
+                        break
+                    keep = len(end_tag) - 1
+                    file_pos += len(buf) - keep
+                    buf = buf[-keep:] if keep > 0 else b''
+            del buf
+            del end_tag
+            gc.collect()
+            if found_after >= 0:
+                tmp = '/app/_rc_tmp.py'
+                skip_nl = True
+                with open('/app/rc_main.py', 'rb') as src:
+                    src.seek(found_after)
+                    with open(tmp, 'wb') as dst:
+                        while True:
+                            chunk = src.read(512)
+                            if not chunk:
+                                break
+                            if skip_nl:
+                                i = 0
+                                while i < len(chunk) and chunk[i] in (10, 13):
+                                    i += 1
+                                chunk = chunk[i:]
+                                if chunk:
+                                    skip_nl = False
+                            if chunk:
+                                dst.write(chunk)
+                gc.collect()
+                with open(tmp, 'rb') as src2:
+                    with open('/app/rc_main.py', 'w') as f:
+                        while True:
+                            chunk = src2.read(512)
+                            if not chunk:
+                                break
+                            f.write(chunk.decode('utf-8'))
+                _unlink(tmp)
+                result['rcMainPatched'] = True
+except Exception as exc:
+    result['rcMainError'] = str(exc)
+
+def _remove(path, key, error_key):
+    if not _exists(path):
+        result[key] = False
+        return
+    try:
+        _unlink(path)
+        result[key] = True
+    except Exception as exc:
+        result[key] = False
+        result[error_key] = str(exc)
+
+_remove('/cyberbrick_ota_agent.py', 'removedAgent', 'agentRemoveError')
+_remove('/cyberbrick_ota_config.py', 'removedConfig', 'configRemoveError')
+print(json.dumps(result))
+`;
+		const normalizedScript = script.replace(/\t/g, '    ');
+		try {
+			const result = await this.runCyberBrickPython(port, normalizedScript, 20000);
+			return this.parseJsonLine<{
+				removedAgent: boolean;
+				removedConfig: boolean;
+				rcMainPatched: boolean;
+				rcMainHadBootstrap: boolean;
+				rcMainError?: string;
+				agentRemoveError?: string;
+				configRemoveError?: string;
+			}>(result.stdout) || {
+				removedAgent: false,
+				removedConfig: false,
+				rcMainPatched: false,
+				rcMainHadBootstrap: false,
+			};
+		} catch (error) {
+			throw new Error(`CyberBrick OTA cleanup failed: ${this.formatCommandError(error)}`);
+		}
+	}
+
+	/**
 	 * 解析 mpremote connect list 輸出
 	 * @param output mpremote 輸出
 	 * @returns COM 埠清單
@@ -343,6 +702,62 @@ export class MicropythonUploader {
 		}
 
 		return ports;
+	}
+
+	private parseJsonLine<T>(output: string): T | undefined {
+		const lines = output
+			.split(/\r?\n/)
+			.map(line => line.trim())
+			.filter(Boolean);
+		for (let index = lines.length - 1; index >= 0; index--) {
+			try {
+				return JSON.parse(lines[index]) as T;
+			} catch {
+				// 嘗試上一行
+			}
+		}
+		return undefined;
+	}
+
+	private async ensureMpremoteReady(): Promise<void> {
+		if (!this.mpremotePath) {
+			const installed = await this.checkMpremoteInstalled();
+			if (!installed) {
+				throw new Error('mpremote is not available');
+			}
+		}
+	}
+
+	private quoteShellArg(value: string): string {
+		return `'${value.replace(/'/g, `'\\''`)}'`;
+	}
+
+	private formatCommandError(error: unknown): string {
+		if (error instanceof Error) {
+			return error.message;
+		}
+		if (error && typeof error === 'object') {
+			const errorRecord = error as { error?: unknown; stdout?: unknown; stderr?: unknown };
+			const parts: string[] = [];
+			if (errorRecord.error instanceof Error) {
+				parts.push(errorRecord.error.message);
+			} else if (typeof errorRecord.error === 'string') {
+				parts.push(errorRecord.error);
+			}
+			if (typeof errorRecord.stderr === 'string' && errorRecord.stderr.trim()) {
+				parts.push(`stderr: ${this.truncateCommandOutput(errorRecord.stderr)}`);
+			}
+			if (typeof errorRecord.stdout === 'string' && errorRecord.stdout.trim()) {
+				parts.push(`stdout: ${this.truncateCommandOutput(errorRecord.stdout)}`);
+			}
+			return parts.length > 0 ? parts.join(' | ') : 'unknown command error';
+		}
+		return String(error);
+	}
+
+	private truncateCommandOutput(output: string): string {
+		const normalized = output.replace(/\s+/g, ' ').trim();
+		return normalized.length > 500 ? `${normalized.slice(0, 500)}…` : normalized;
 	}
 
 	/**
@@ -509,22 +924,24 @@ export class MicropythonUploader {
 		const scriptFile = path.join(tempDir, 'blockly_interrupt.py');
 
 		// 寫入 Python 腳本到臨時檔案（避免命令行轉義問題）
-		const serialScript = `import serial
-import time
-try:
-    s = serial.Serial('${port}', 115200, timeout=2)
-    # 發送雙重 Ctrl+C 中斷正在運行的程式
-    s.write(b'\\x03\\x03')
-    time.sleep(0.3)
-    # 發送 Ctrl+B 進入正常 REPL 模式
-    s.write(b'\\x02')
-    time.sleep(1)
-    s.close()
-    print('OK')
-except Exception as e:
-    print(f'ERROR: {e}')
-    exit(1)
-`;
+		const serialScript = [
+			'import serial',
+			'import time',
+			'try:',
+			`    s = serial.Serial(${JSON.stringify(port)}, 115200, timeout=2)`,
+			'    # 發送雙重 Ctrl+C 中斷正在運行的程式',
+			"    s.write(b'\\x03\\x03')",
+			'    time.sleep(0.3)',
+			'    # 發送 Ctrl+B 進入正常 REPL 模式',
+			"    s.write(b'\\x02')",
+			'    time.sleep(1)',
+			'    s.close()',
+			"    print('OK')",
+			'except Exception as e:',
+			"    print(f'ERROR: {e}')",
+			'    exit(1)',
+			'',
+		].join('\n');
 		fs.writeFileSync(scriptFile, serialScript, 'utf8');
 
 		try {
@@ -615,14 +1032,16 @@ except Exception as e:
 		const tempDir = os.tmpdir();
 		const tempFile = path.join(tempDir, 'blockly_upload.py');
 
-		// 寫入暫存檔
-		fs.writeFileSync(tempFile, code, 'utf8');
+		// CyberBrick 韌體會自動進入 /app/rc_main.py，因此 OTA 常駐啟動點必須在 rc_main.py。
+		// 這段只呼叫裝置端 agent，不包含 Wi-Fi 密碼或 OTA token。
+		const uploadCode = withCyberBrickRcMainOtaBootstrap(code);
+		fs.writeFileSync(tempFile, uploadCode, 'utf8');
 		log('[blockly] 暫存檔已建立', 'debug', { path: tempFile });
 
 		try {
 			// 使用 resume + 避免觸發 soft-reset（這會導致程式重新執行）
 			// 在 interruptDevice 之後，裝置已經在正常 REPL 模式
-			const command = `"${this.mpremotePath}" connect ${port} resume + fs cp "${tempFile}" :${DEVICE_PATH}`;
+			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(port)} resume + fs cp ${this.quoteShellArg(tempFile)} :${DEVICE_PATH}`;
 			log('[blockly] 執行上傳指令', 'debug', { command });
 			await this.executor.exec(command);
 		} finally {

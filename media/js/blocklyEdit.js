@@ -5,6 +5,36 @@
  */
 const vscode = acquireVsCodeApi();
 
+const SENSITIVE_LOG_KEY_PATTERN = /(password|token|secret|authorization|auth)/i;
+const CYBERBRICK_WIFI_MANUAL_VALUE = '__manual__';
+
+function sanitizeLogValue(value, depth = 0) {
+	if (value === null || value === undefined) {
+		return value;
+	}
+	if (typeof value !== 'object') {
+		return value;
+	}
+	if (depth > 3) {
+		return '[MaxDepth]';
+	}
+	if (Array.isArray(value)) {
+		return value.map(item => sanitizeLogValue(item, depth + 1));
+	}
+	const sanitized = {};
+	Object.keys(value).forEach(key => {
+		sanitized[key] = SENSITIVE_LOG_KEY_PATTERN.test(key) ? '[REDACTED]' : sanitizeLogValue(value[key], depth + 1);
+	});
+	return sanitized;
+}
+
+function formatLogArgs(args) {
+	return args.map(arg => {
+		const sanitized = sanitizeLogValue(arg);
+		return typeof sanitized === 'object' ? JSON.stringify(sanitized) : String(sanitized);
+	});
+}
+
 // 日誌系統
 const log = {
 	/**
@@ -13,10 +43,8 @@ const log = {
 	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
 	 */
 	debug: function (message, ...args) {
-		console.debug(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
-
 		// 格式化額外參數
-		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+		const formattedArgs = formatLogArgs(args);
 
 		vscode.postMessage({
 			command: 'log',
@@ -34,10 +62,8 @@ const log = {
 	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
 	 */
 	info: function (message, ...args) {
-		console.log(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
-
 		// 格式化額外參數
-		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+		const formattedArgs = formatLogArgs(args);
 
 		vscode.postMessage({
 			command: 'log',
@@ -55,10 +81,8 @@ const log = {
 	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
 	 */
 	warn: function (message, ...args) {
-		console.warn(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
-
 		// 格式化額外參數
-		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+		const formattedArgs = formatLogArgs(args);
 
 		vscode.postMessage({
 			command: 'log',
@@ -76,10 +100,8 @@ const log = {
 	 * @param {...any} args - 額外參數，會被轉換為字串或JSON
 	 */
 	error: function (message, ...args) {
-		console.error(message, ...args); // 保留在開發者工具中顯示（偵錯使用）
-
 		// 格式化額外參數
-		const formattedArgs = args.map(arg => (typeof arg === 'object' ? JSON.stringify(arg) : String(arg)));
+		const formattedArgs = formatLogArgs(args);
 
 		vscode.postMessage({
 			command: 'log',
@@ -102,6 +124,25 @@ let isBoardDropdownOpen = false;
 let isLanguageSwitchReloading = false;
 let pendingLanguageReloadTimer = null;
 let txtSshSetupDone = false;
+
+const cyberBrickUploadSettingsState = {
+	loaded: false,
+	saving: false,
+	requestSeq: 0,
+	settings: {
+		schemaVersion: 1,
+		uploadMode: 'usb',
+		pairedDevices: [],
+	},
+	secretPresence: {},
+	readiness: null,
+	usbPorts: [],
+	autoDetectedUsbPort: '',
+	wifiNetworks: [],
+	provisioningSteps: [],
+	cleanupRunning: false,
+	cleanupStatus: '',
+};
 
 const LANGUAGE_OPTIONS = [
 	{ code: 'auto', nativeName: '', isAuto: true },
@@ -1617,14 +1658,14 @@ function initTxtVirtualControlsUI() {
 function generateCode(workspace) {
 	const lang = window.currentProgrammingLanguage;
 	if (lang === 'micropython' && window.micropythonGenerator) {
-		console.log('[blockly] 使用 MicroPython 生成器生成程式碼');
+		log.info('[blockly] 使用 MicroPython 生成器生成程式碼');
 		return window.micropythonGenerator.workspaceToCode(workspace);
 	}
 	if (lang === 'txt' && window.txtGenerator) {
-		console.log('[blockly] 使用 TXT 生成器生成程式碼');
+		log.info('[blockly] 使用 TXT 生成器生成程式碼');
 		return window.txtGenerator.workspaceToCode(workspace);
 	}
-	console.log('[blockly] 使用 Arduino 生成器生成程式碼');
+	log.info('[blockly] 使用 Arduino 生成器生成程式碼');
 	return window.arduinoGenerator.workspaceToCode(workspace);
 }
 
@@ -1635,14 +1676,14 @@ function generateCode(workspace) {
 function getCurrentGenerator() {
 	const lang = window.currentProgrammingLanguage;
 	if (lang === 'micropython' && window.micropythonGenerator) {
-		console.log('[blockly] 取得 MicroPython 生成器');
+		log.info('[blockly] 取得 MicroPython 生成器');
 		return window.micropythonGenerator;
 	}
 	if (lang === 'txt' && window.txtGenerator) {
-		console.log('[blockly] 取得 TXT 生成器');
+		log.info('[blockly] 取得 TXT 生成器');
 		return window.txtGenerator;
 	}
-	console.log('[blockly] 取得 Arduino 生成器');
+	log.info('[blockly] 取得 Arduino 生成器');
 	return window.arduinoGenerator;
 }
 
@@ -2155,6 +2196,9 @@ function updateEditorUITexts() {
 	if (boardSelectLabel) {
 		boardSelectLabel.textContent = languageManager.getMessage('BOARD_SELECT_LABEL', '選擇開發板：');
 	}
+
+	updateCyberBrickUploadSettingsTexts();
+
 	// 更新實驗積木提示文字
 	if (window.experimentalBlocksNotice) {
 		try {
@@ -3277,6 +3321,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始化範例瀏覽器功能
 	initSampleBrowser();
+	// 初始化 CyberBrick 上傳設定齒輪與對話框
+	initCyberBrickUploadSettingsPanel();
 
 	// T015: 初始化剪貼簿操作監聽器 (Ctrl+C/V/X)
 	// 監聽複製、貼上、剪下操作以鎖定保存
@@ -4081,7 +4127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				const resolution = parseInt(block.getFieldValue('RESOLUTION')) || 8;
 				window.esp32PwmFrequency = frequency;
 				window.esp32PwmResolution = resolution;
-				console.log(`[PWM Config] 即時更新: ${frequency}Hz @ ${resolution}bit`);
+				log.debug(`[PWM Config] 即時更新: ${frequency}Hz @ ${resolution}bit`);
 			}
 		}
 
@@ -4120,7 +4166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 				// 如果是 esp32_pwm_setup 積木的新增/刪除，立即觸發程式碼更新
 				if (isEsp32PwmBlock) {
-					console.log('[PWM Config] PWM 設定積木變動，觸發程式碼更新');
+					log.debug('[PWM Config] PWM 設定積木變動，觸發程式碼更新');
 					try {
 						const code = generateCode(workspace);
 						const generator = getCurrentGenerator();
@@ -4132,7 +4178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 							buildFlags: generator.build_flags_ || [],
 						});
 					} catch (error) {
-						console.error('[PWM Config] 程式碼生成失敗:', error);
+						log.error('[PWM Config] 程式碼生成失敗:', error);
 					}
 				}
 			}, 100);
@@ -4845,6 +4891,54 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 
 			// CyberBrick MicroPython 上傳功能
+			case 'cyberbrickUploadSettingsLoaded':
+				handleCyberBrickUploadSettingsLoaded(message);
+				break;
+
+			case 'cyberbrickUploadSettingsSaved':
+				handleCyberBrickUploadSettingsSaved(message);
+				break;
+
+			case 'cyberbrickUsbPortsResult':
+				handleCyberBrickUsbPortsResult(message);
+				break;
+
+			case 'cyberbrickWifiScanProgress':
+				handleCyberBrickWifiScanProgress(message);
+				break;
+
+			case 'cyberbrickWifiScanResult':
+				handleCyberBrickWifiScanResult(message);
+				break;
+
+			case 'cyberbrickOtaProvisionProgress':
+				handleCyberBrickOtaProvisionProgress(message);
+				break;
+
+			case 'cyberbrickOtaProvisionResult':
+				handleCyberBrickOtaProvisionResult(message);
+				break;
+
+			case 'cyberbrickOtaReadinessResult':
+				handleCyberBrickOtaReadinessResult(message);
+				break;
+
+			case 'cyberbrickOtaUploadProgress':
+				handleCyberBrickOtaUploadProgress(message);
+				break;
+
+			case 'cyberbrickOtaUploadResult':
+				handleCyberBrickOtaUploadResult(message);
+				break;
+
+			case 'cyberbrickOtaCleanupResult':
+				handleCyberBrickOtaCleanupResult(message);
+				break;
+
+			case 'cyberbrickPairedDeviceDeleteResult':
+				handleCyberBrickPairedDeviceDeleteResult(message);
+				break;
+
 			case 'uploadProgress':
 				handleUploadProgress(message);
 				break;
@@ -4962,7 +5056,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				if (window.shadowBlockManager) {
 					window.shadowBlockManager.setSuggestions(message.suggestions);
 				} else {
-					console.error('[SB] window.shadowBlockManager is not available!');
+					log.error('[SB] window.shadowBlockManager is not available!');
 				}
 				break;
 			case 'updateAIConfig':
@@ -5524,15 +5618,15 @@ function rebuildPwmConfig(workspace) {
 			const lastBlock = pwmBlocks[pwmBlocks.length - 1];
 			window.esp32PwmFrequency = parseInt(lastBlock.getFieldValue('FREQUENCY')) || 75000;
 			window.esp32PwmResolution = parseInt(lastBlock.getFieldValue('RESOLUTION')) || 8;
-			console.log(`[PWM Config] 從積木重建: ${window.esp32PwmFrequency}Hz @ ${window.esp32PwmResolution}bit`);
+			log.debug(`[PWM Config] 從積木重建: ${window.esp32PwmFrequency}Hz @ ${window.esp32PwmResolution}bit`);
 		} else {
 			// 無 PWM 設定積木,使用預設值
 			window.esp32PwmFrequency = 75000;
 			window.esp32PwmResolution = 8;
-			console.log('[PWM Config] 使用預設值: 75000Hz @ 8bit');
+			log.debug('[PWM Config] 使用預設值: 75000Hz @ 8bit');
 		}
 	} catch (error) {
-		console.error('[PWM Config] 重建失敗:', error);
+		log.error('[PWM Config] 重建失敗:', error);
 		// 容錯:設定預設值
 		window.esp32PwmFrequency = 75000;
 		window.esp32PwmResolution = 8;
@@ -5633,7 +5727,7 @@ async function updateToolboxForBoard(workspace, boardId) {
 
 		// 更新 workspace 的 toolbox
 		workspace.updateToolbox(toolboxConfig);
-		console.log(`[blockly] 已根據開發板 ${boardId} 更新工具箱 (CyberBrick: ${isCyberBrick}, TXT: ${isTxt}, ESP32: ${isESP32Board})`);
+		log.info(`[blockly] 已根據開發板 ${boardId} 更新工具箱 (CyberBrick: ${isCyberBrick}, TXT: ${isTxt}, ESP32: ${isESP32Board})`);
 
 		// 更新 UI 元素（上傳按鈕、生成器切換等）
 		updateUIForBoard(boardId, isCyberBrick, isTxt);
@@ -5643,7 +5737,7 @@ async function updateToolboxForBoard(workspace, boardId) {
 			updateEsp32BlockWarnings(workspace, isESP32Board);
 		}
 	} catch (error) {
-		console.error('[blockly] 工具箱更新失敗:', error);
+		log.error('[blockly] 工具箱更新失敗:', error);
 	}
 }
 
@@ -5688,7 +5782,7 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 		window.currentProgrammingLanguage = 'arduino';
 	}
 
-	console.log(`[blockly] UI 已更新: 開發板=${boardId}, 語言=${window.currentProgrammingLanguage}, 上傳按鈕=顯示`);
+	log.info(`[blockly] UI 已更新: 開發板=${boardId}, 語言=${window.currentProgrammingLanguage}, 上傳按鈕=顯示`);
 
 	// 初始化上傳按鈕事件
 	initUploadButton();
@@ -5701,6 +5795,10 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 	const sampleContainer = document.getElementById('sampleContainer');
 	if (sampleContainer) {
 		sampleContainer.style.display = isCyberBrick ? 'flex' : 'none';
+	}
+	updateCyberBrickUploadSettingsVisibility(boardId);
+	if (isCyberBrick) {
+		requestCyberBrickUploadSettingsLoad();
 	}
 
 	// T015: 根據板子類型顯示/隱藏 TXT 設定按鈕
@@ -5830,6 +5928,802 @@ function initTxtConnectionPanel() {
 	updateTxtConnectionPanelTexts();
 }
 
+function createCyberBrickUploadRequestId(prefix) {
+	cyberBrickUploadSettingsState.requestSeq += 1;
+	return `${prefix}-${Date.now()}-${cyberBrickUploadSettingsState.requestSeq}`;
+}
+
+function isCyberBrickUploadBoard(boardId) {
+	return boardId === 'cyberbrick';
+}
+
+function updateCyberBrickUploadSettingsTexts() {
+	const languageManager = window.languageManager;
+	if (!languageManager) {
+		return;
+	}
+
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.textContent = value;
+		}
+	};
+	const setTitle = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.title = value;
+		}
+	};
+	const setPlaceholder = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.placeholder = value;
+		}
+	};
+
+	setTitle('cyberbrickUploadSettingsButton', languageManager.getMessage('CYBERBRICK_UPLOAD_SETTINGS_BUTTON_TITLE', 'CyberBrick upload settings'));
+	setText('cyberbrickUploadSettingsTitle', languageManager.getMessage('CYBERBRICK_UPLOAD_SETTINGS_TITLE', 'CyberBrick Upload Settings'));
+	setText('cyberbrickPairedDevicesTitle', languageManager.getMessage('CYBERBRICK_PAIRED_DEVICES_TITLE', 'My CyberBricks'));
+	setText('cyberbrickProvisioningTitle', languageManager.getMessage('CYBERBRICK_PROVISIONING_TITLE', 'Add CyberBrick Wireless Upload'));
+	setText('cyberbrickUsbPortLabel', languageManager.getMessage('CYBERBRICK_USB_PORT_LABEL', 'USB Port'));
+	setText('cyberbrickRefreshUsbPorts', languageManager.getMessage('CYBERBRICK_USB_PORT_REFRESH', 'Refresh'));
+	setText('cyberbrickFriendlyNameLabel', languageManager.getMessage('CYBERBRICK_FRIENDLY_NAME_LABEL', 'Device Name'));
+	setText('cyberbrickWifiSsidLabel', languageManager.getMessage('CYBERBRICK_WIFI_SSID_LABEL', 'Wi-Fi SSID'));
+	setPlaceholder('cyberbrickWifiSsidInput', getCyberBrickManualWifiSsidText());
+	setText('cyberbrickWifiScanButton', languageManager.getMessage('CYBERBRICK_WIFI_SCAN_BUTTON', 'Rescan'));
+	setText('cyberbrickWifiPasswordLabel', languageManager.getMessage('CYBERBRICK_WIFI_PASSWORD_LABEL', 'Wi-Fi Password'));
+	updateCyberBrickWifiPasswordToggleState();
+	setText('cyberbrickProvisionButton', languageManager.getMessage('CYBERBRICK_PROVISION_BUTTON', 'Set Up Wireless Upload'));
+	setText('cyberbrickOtaCleanupTitle', languageManager.getMessage('CYBERBRICK_OTA_CLEANUP_TITLE', 'Advanced Settings'));
+	setText(
+		'cyberbrickOtaCleanupDescription',
+		languageManager.getMessage(
+			'CYBERBRICK_OTA_CLEANUP_DESCRIPTION',
+			'Remove Singular Blockly OTA files from the USB-connected CyberBrick and return this project to USB-only upload.'
+		)
+	);
+	setText('cyberbrickOtaCleanupButton', languageManager.getMessage('CYBERBRICK_OTA_CLEANUP_BUTTON', 'Remove OTA from Device'));
+	renderCyberBrickUploadSettings();
+}
+
+function initCyberBrickUploadSettingsPanel() {
+	const button = document.getElementById('cyberbrickUploadSettingsButton');
+	const closeBtn = document.getElementById('cyberbrickUploadSettingsClose');
+	const refreshPortsBtn = document.getElementById('cyberbrickRefreshUsbPorts');
+	const scanWifiBtn = document.getElementById('cyberbrickWifiScanButton');
+	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
+	const passwordToggleBtn = document.getElementById('cyberbrickWifiPasswordToggle');
+	const provisionBtn = document.getElementById('cyberbrickProvisionButton');
+	const cleanupBtn = document.getElementById('cyberbrickOtaCleanupButton');
+	const modal = document.getElementById('cyberbrickUploadSettingsModal');
+
+	if (button) {
+		button.addEventListener('click', openCyberBrickUploadSettingsModal);
+	}
+	if (closeBtn) {
+		closeBtn.addEventListener('click', closeCyberBrickUploadSettingsModal);
+	}
+	if (refreshPortsBtn) {
+		refreshPortsBtn.addEventListener('click', requestCyberBrickUsbPorts);
+	}
+	if (scanWifiBtn) {
+		scanWifiBtn.addEventListener('click', requestCyberBrickWifiScan);
+	}
+	if (ssidSelect) {
+		ssidSelect.addEventListener('change', handleCyberBrickWifiSsidSelectionChange);
+	}
+	if (passwordToggleBtn) {
+		passwordToggleBtn.addEventListener('click', toggleCyberBrickWifiPasswordVisibility);
+	}
+	if (provisionBtn) {
+		provisionBtn.addEventListener('click', requestCyberBrickOtaProvisioning);
+	}
+	if (cleanupBtn) {
+		cleanupBtn.addEventListener('click', () => {
+			void requestCyberBrickOtaCleanup();
+		});
+	}
+	const provisioningToggle = document.getElementById('cyberbrickProvisioningToggle');
+	if (provisioningToggle) {
+		provisioningToggle.addEventListener('click', () => {
+			toggleCyberBrickAccordion('cyberbrickProvisioningToggle', 'cyberbrickProvisioningBody', 'cyberbrickProvisioningToggle');
+		});
+	}
+	const advancedToggle = document.getElementById('cyberbrickAdvancedToggle');
+	if (advancedToggle) {
+		advancedToggle.addEventListener('click', () => {
+			toggleCyberBrickAccordion('cyberbrickAdvancedToggle', 'cyberbrickAdvancedBody', 'cyberbrickAdvancedToggle');
+		});
+	}
+	if (modal) {
+		modal.addEventListener('click', event => {
+			if (event.target === modal) {
+				closeCyberBrickUploadSettingsModal();
+			}
+		});
+	}
+
+	updateCyberBrickUploadSettingsTexts();
+	renderCyberBrickUploadSettings();
+}
+
+function openCyberBrickUploadSettingsModal() {
+	const modal = document.getElementById('cyberbrickUploadSettingsModal');
+	if (modal) {
+		modal.style.display = 'block';
+	}
+	requestCyberBrickUploadSettingsLoad();
+	requestCyberBrickUsbPorts();
+}
+
+function closeCyberBrickUploadSettingsModal() {
+	const modal = document.getElementById('cyberbrickUploadSettingsModal');
+	if (modal) {
+		modal.style.display = 'none';
+	}
+	const passwordInput = document.getElementById('cyberbrickWifiPasswordInput');
+	if (passwordInput) {
+		passwordInput.type = 'password';
+		updateCyberBrickWifiPasswordToggleState();
+	}
+}
+
+function requestCyberBrickUploadSettingsLoad() {
+	vscode.postMessage({
+		command: 'cyberbrickUploadSettingsLoad',
+		requestId: createCyberBrickUploadRequestId('cyberbrick-settings-load'),
+		payload: {
+			board: window.currentBoard || 'none',
+		},
+	});
+}
+
+function requestCyberBrickUsbPorts() {
+	vscode.postMessage({
+		command: 'cyberbrickUsbPortsRequest',
+		requestId: createCyberBrickUploadRequestId('cyberbrick-usb-ports'),
+		payload: { filter: 'cyberbrick' },
+	});
+}
+
+function getSelectedCyberBrickUsbPort() {
+	const portSelect = document.getElementById('cyberbrickUsbPortSelect');
+	return portSelect && typeof portSelect.value === 'string' ? portSelect.value : '';
+}
+
+function requestCyberBrickWifiScan() {
+	const usbPort = getSelectedCyberBrickUsbPort();
+	if (!usbPort) {
+		toast.show(window.languageManager?.getMessage('CYBERBRICK_USB_PORT_REQUIRED', 'Choose a CyberBrick USB port first.'), 'warning', 4000);
+		return;
+	}
+	vscode.postMessage({
+		command: 'cyberbrickWifiScanRequest',
+		requestId: createCyberBrickUploadRequestId('cyberbrick-wifi-scan'),
+		payload: { usbPort },
+	});
+}
+
+function requestCyberBrickOtaProvisioning() {
+	const usbPort = getSelectedCyberBrickUsbPort();
+	const friendlyNameInput = document.getElementById('cyberbrickFriendlyNameInput');
+	const passwordInput = document.getElementById('cyberbrickWifiPasswordInput');
+	const friendlyName = friendlyNameInput && typeof friendlyNameInput.value === 'string' ? friendlyNameInput.value.trim() : '';
+	const ssid = getSelectedCyberBrickWifiSsid();
+	const wifiPassword = passwordInput && typeof passwordInput.value === 'string' ? passwordInput.value : '';
+
+	if (!usbPort || !ssid) {
+		toast.show(
+			window.languageManager?.getMessage('CYBERBRICK_PROVISION_REQUIRED_FIELDS', 'Choose a USB port and Wi-Fi SSID first.'),
+			'warning',
+			5000
+		);
+		return;
+	}
+
+	cyberBrickUploadSettingsState.provisioningSteps = [];
+	renderCyberBrickProvisioningProgress();
+	vscode.postMessage({
+		command: 'cyberbrickOtaProvisionRequest',
+		requestId: createCyberBrickUploadRequestId('cyberbrick-provision'),
+		payload: {
+			usbPort,
+			friendlyName,
+			ssid,
+			wifiPassword,
+		},
+	});
+	if (passwordInput) {
+		passwordInput.value = '';
+		passwordInput.type = 'password';
+		updateCyberBrickWifiPasswordToggleState();
+	}
+}
+
+function applyCyberBrickUploadPanelState(panelState) {
+	if (!panelState || typeof panelState !== 'object') {
+		return;
+	}
+	const incomingSettings = panelState.settings && typeof panelState.settings === 'object' ? panelState.settings : {};
+	cyberBrickUploadSettingsState.loaded = true;
+	cyberBrickUploadSettingsState.settings = {
+		schemaVersion: 2,
+		primaryDeviceId: typeof incomingSettings.primaryDeviceId === 'string' ? incomingSettings.primaryDeviceId : undefined,
+		pairedDevices: Array.isArray(incomingSettings.pairedDevices) ? incomingSettings.pairedDevices : [],
+	};
+	cyberBrickUploadSettingsState.secretPresence =
+		panelState.secretPresence && typeof panelState.secretPresence === 'object' ? panelState.secretPresence : {};
+	cyberBrickUploadSettingsState.readiness = panelState.readiness || null;
+	renderCyberBrickUploadSettings();
+}
+
+function renderCyberBrickUploadSettings() {
+	renderCyberBrickUsbPorts();
+	renderCyberBrickWifiNetworks();
+	renderCyberBrickPairedDevices();
+	renderCyberBrickSecretPresenceHint();
+	renderCyberBrickProvisioningProgress();
+	renderCyberBrickOtaCleanupStatus();
+}
+
+function toggleCyberBrickAccordion(sectionId, bodyId, toggleId) {
+	const toggle = document.getElementById(toggleId);
+	const section = toggle?.closest('.cyberbrick-accordion-section');
+	const body = document.getElementById(bodyId);
+	if (!section || !body || !toggle) {
+		return;
+	}
+	const isOpen = section.classList.toggle('is-open');
+	body.classList.toggle('hidden', !isOpen);
+	toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+function openCyberBrickProvisioningAccordion() {
+	const section = document.getElementById('cyberbrickProvisioningToggle')?.closest('.cyberbrick-accordion-section');
+	const body = document.getElementById('cyberbrickProvisioningBody');
+	const toggle = document.getElementById('cyberbrickProvisioningToggle');
+	if (!section || !body || !toggle || section.classList.contains('is-open')) {
+		return;
+	}
+	section.classList.add('is-open');
+	body.classList.remove('hidden');
+	toggle.setAttribute('aria-expanded', 'true');
+}
+
+function closeCyberBrickProvisioningAccordion() {
+	const section = document.getElementById('cyberbrickProvisioningToggle')?.closest('.cyberbrick-accordion-section');
+	const body = document.getElementById('cyberbrickProvisioningBody');
+	const toggle = document.getElementById('cyberbrickProvisioningToggle');
+	if (!section || !body || !toggle || !section.classList.contains('is-open')) {
+		return;
+	}
+	section.classList.remove('is-open');
+	body.classList.add('hidden');
+	toggle.setAttribute('aria-expanded', 'false');
+}
+
+function renderCyberBrickUsbPorts() {
+	const portSelect = document.getElementById('cyberbrickUsbPortSelect');
+	if (!portSelect) {
+		return;
+	}
+	const previousValue = portSelect.value;
+	portSelect.textContent = '';
+	const placeholder = document.createElement('option');
+	placeholder.value = '';
+	placeholder.textContent = window.languageManager?.getMessage('CYBERBRICK_USB_PORT_PLACEHOLDER', 'Select USB port') || 'Select USB port';
+	portSelect.appendChild(placeholder);
+	for (const port of cyberBrickUploadSettingsState.usbPorts) {
+		const option = document.createElement('option');
+		option.value = port.path;
+		option.textContent = port.displayName || port.path;
+		portSelect.appendChild(option);
+	}
+	if (previousValue && cyberBrickUploadSettingsState.usbPorts.some(port => port.path === previousValue)) {
+		portSelect.value = previousValue;
+		return;
+	}
+	const autoDetected = cyberBrickUploadSettingsState.autoDetectedUsbPort;
+	if (autoDetected && cyberBrickUploadSettingsState.usbPorts.some(port => port.path === autoDetected)) {
+		portSelect.value = autoDetected;
+		return;
+	}
+	if (cyberBrickUploadSettingsState.usbPorts.length === 1) {
+		portSelect.value = cyberBrickUploadSettingsState.usbPorts[0].path;
+	}
+}
+
+function getCyberBrickManualWifiSsidText() {
+	return window.languageManager?.getMessage('CYBERBRICK_WIFI_SSID_MANUAL_OPTION', 'Enter SSID manually') || 'Enter SSID manually';
+}
+
+function renderCyberBrickWifiNetworks() {
+	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
+	if (!ssidSelect) {
+		return;
+	}
+	const previousValue = ssidSelect.value;
+	const seenSsids = new Set();
+	const networks = Array.isArray(cyberBrickUploadSettingsState.wifiNetworks) ? cyberBrickUploadSettingsState.wifiNetworks : [];
+	const visibleNetworks = networks.filter(network => {
+		if (!network || typeof network.ssid !== 'string') {
+			return false;
+		}
+		const ssid = network.ssid.trim();
+		if (!ssid || seenSsids.has(ssid)) {
+			return false;
+		}
+		seenSsids.add(ssid);
+		return true;
+	});
+
+	ssidSelect.textContent = '';
+	for (const network of visibleNetworks) {
+		const option = document.createElement('option');
+		option.value = network.ssid.trim();
+		const hasRssi = typeof network.rssi === 'number';
+		option.textContent = hasRssi ? `${network.ssid.trim()} (${network.rssi} dBm)` : network.ssid.trim();
+		ssidSelect.appendChild(option);
+	}
+
+	const manualOption = document.createElement('option');
+	manualOption.value = CYBERBRICK_WIFI_MANUAL_VALUE;
+	manualOption.textContent = getCyberBrickManualWifiSsidText();
+	ssidSelect.appendChild(manualOption);
+
+	if (previousValue && Array.from(ssidSelect.options).some(option => option.value === previousValue)) {
+		ssidSelect.value = previousValue;
+	} else if (visibleNetworks.length > 0) {
+		ssidSelect.value = visibleNetworks[0].ssid.trim();
+	} else {
+		ssidSelect.value = CYBERBRICK_WIFI_MANUAL_VALUE;
+	}
+	syncCyberBrickWifiSsidManualInput();
+}
+
+function syncCyberBrickWifiSsidManualInput() {
+	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
+	const ssidInput = document.getElementById('cyberbrickWifiSsidInput');
+	if (!ssidInput) {
+		return null;
+	}
+	const isManual = !ssidSelect || ssidSelect.value === CYBERBRICK_WIFI_MANUAL_VALUE;
+	ssidInput.classList.toggle('hidden', !isManual);
+	ssidInput.disabled = !isManual;
+	ssidInput.placeholder = getCyberBrickManualWifiSsidText();
+	return isManual ? ssidInput : null;
+}
+
+function handleCyberBrickWifiSsidSelectionChange() {
+	const manualInput = syncCyberBrickWifiSsidManualInput();
+	if (manualInput) {
+		manualInput.focus();
+	}
+}
+
+function getSelectedCyberBrickWifiSsid() {
+	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
+	if (ssidSelect && typeof ssidSelect.value === 'string' && ssidSelect.value !== CYBERBRICK_WIFI_MANUAL_VALUE) {
+		return ssidSelect.value.trim();
+	}
+	const ssidInput = document.getElementById('cyberbrickWifiSsidInput');
+	return ssidInput && typeof ssidInput.value === 'string' ? ssidInput.value.trim() : '';
+}
+
+function getCyberBrickWifiPasswordToggleLabel(isVisible) {
+	return isVisible
+		? window.languageManager?.getMessage('CYBERBRICK_WIFI_PASSWORD_HIDE', 'Hide Wi-Fi password') || 'Hide Wi-Fi password'
+		: window.languageManager?.getMessage('CYBERBRICK_WIFI_PASSWORD_SHOW', 'Show Wi-Fi password') || 'Show Wi-Fi password';
+}
+
+function updateCyberBrickWifiPasswordToggleState() {
+	const passwordInput = document.getElementById('cyberbrickWifiPasswordInput');
+	const passwordToggle = document.getElementById('cyberbrickWifiPasswordToggle');
+	if (!passwordInput || !passwordToggle) {
+		return;
+	}
+	const isVisible = passwordInput.type === 'text';
+	const label = getCyberBrickWifiPasswordToggleLabel(isVisible);
+	passwordToggle.classList.toggle('revealed', isVisible);
+	passwordToggle.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+	passwordToggle.setAttribute('aria-label', label);
+	passwordToggle.title = label;
+}
+
+function toggleCyberBrickWifiPasswordVisibility() {
+	const passwordInput = document.getElementById('cyberbrickWifiPasswordInput');
+	if (!passwordInput) {
+		return;
+	}
+	passwordInput.type = passwordInput.type === 'text' ? 'password' : 'text';
+	updateCyberBrickWifiPasswordToggleState();
+	passwordInput.focus();
+}
+
+function getFirstCyberBrickWifiSsid(networks) {
+	if (!Array.isArray(networks)) {
+		return '';
+	}
+	const firstNetwork = networks.find(network => network && typeof network.ssid === 'string' && network.ssid.trim());
+	return firstNetwork ? firstNetwork.ssid.trim() : '';
+}
+
+function selectFirstCyberBrickWifiSsidFromScan(networks) {
+	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
+	const firstSsid = getFirstCyberBrickWifiSsid(networks);
+	if (ssidSelect && firstSsid) {
+		ssidSelect.value = firstSsid;
+		syncCyberBrickWifiSsidManualInput();
+	}
+}
+
+function renderCyberBrickPairedDevices() {
+	const list = document.getElementById('cyberbrickPairedDevicesList');
+	if (!list) {
+		return;
+	}
+	list.textContent = '';
+	const devices = cyberBrickUploadSettingsState.settings.pairedDevices || [];
+	if (devices.length === 0) {
+		const empty = document.createElement('div');
+		empty.className = 'cyberbrick-upload-help';
+		empty.textContent =
+			window.languageManager?.getMessage('CYBERBRICK_PAIRED_DEVICES_EMPTY', 'No CyberBrick added yet. Expand \'Add CyberBrick Wireless Upload\' below to get started.') ||
+			"No CyberBrick added yet. Expand 'Add CyberBrick Wireless Upload' below to get started.";
+		list.appendChild(empty);
+		openCyberBrickProvisioningAccordion();
+		return;
+	}
+
+	closeCyberBrickProvisioningAccordion();
+	for (const device of devices) {
+		const card = document.createElement('div');
+		card.className = 'cyberbrick-paired-device-card';
+		if (device.deviceId === cyberBrickUploadSettingsState.settings.primaryDeviceId) {
+			card.classList.add('primary');
+		}
+
+		const body = document.createElement('div');
+		const title = document.createElement('div');
+		title.className = 'cyberbrick-paired-device-title';
+		title.textContent = device.friendlyName || 'CyberBrick';
+		const meta = document.createElement('div');
+		meta.className = 'cyberbrick-paired-device-meta';
+		meta.textContent = `${getCyberBrickShortDeviceLabel(device.deviceId)} · ${device.lastKnownIp || (window.languageManager?.getMessage('CYBERBRICK_DEVICE_IP_UNKNOWN', 'IP not known') || 'IP not known')}`;
+		const status = document.createElement('span');
+		status.className = 'cyberbrick-status-badge';
+		if (!device.lastKnownIp) {
+			status.classList.add('warning');
+		}
+		status.textContent = device.statusSummary || (device.lastKnownIp ? 'ready' : 'needs setup');
+		body.appendChild(title);
+		body.appendChild(meta);
+		body.appendChild(status);
+
+		const actions = document.createElement('div');
+		actions.className = 'cyberbrick-paired-device-actions';
+		const selectButton = document.createElement('button');
+		selectButton.type = 'button';
+		selectButton.className = 'secondary-btn';
+		selectButton.textContent = window.languageManager?.getMessage('CYBERBRICK_SET_PRIMARY_BUTTON', 'Use') || 'Use';
+		selectButton.addEventListener('click', event => {
+			event.preventDefault();
+			event.stopPropagation();
+			saveCyberBrickPrimaryDevice(device.deviceId);
+		});
+		const deleteButton = document.createElement('button');
+		deleteButton.type = 'button';
+		deleteButton.className = 'secondary-btn';
+		deleteButton.textContent = window.languageManager?.getMessage('CYBERBRICK_DELETE_DEVICE_BUTTON', 'Delete') || 'Delete';
+		deleteButton.addEventListener('click', event => {
+			event.preventDefault();
+			event.stopPropagation();
+			void confirmCyberBrickDeviceDelete(device);
+		});
+		actions.appendChild(selectButton);
+		actions.appendChild(deleteButton);
+
+		card.appendChild(body);
+		card.appendChild(actions);
+		list.appendChild(card);
+	}
+}
+
+function renderCyberBrickSecretPresenceHint() {
+	const hint = document.getElementById('cyberbrickSecretPresenceHint');
+	if (!hint) {
+		return;
+	}
+	const primaryId = cyberBrickUploadSettingsState.settings.primaryDeviceId;
+	const presence = primaryId ? cyberBrickUploadSettingsState.secretPresence[primaryId] : undefined;
+	hint.textContent = presence?.wifiPasswordSet
+		? window.languageManager?.getMessage('CYBERBRICK_WIFI_PASSWORD_STORED', 'A Wi-Fi password is stored securely for the selected device.') || 'A Wi-Fi password is stored securely for the selected device.'
+		: window.languageManager?.getMessage('CYBERBRICK_WIFI_PASSWORD_NOT_STORED', 'Wi-Fi password will be stored securely only after OTA setup via USB.') ||
+			'Wi-Fi password will be stored securely only after OTA setup via USB.';
+}
+
+function renderCyberBrickProvisioningProgress() {
+	const progress = document.getElementById('cyberbrickProvisioningProgress');
+	if (!progress) {
+		return;
+	}
+	progress.textContent = '';
+	for (const step of cyberBrickUploadSettingsState.provisioningSteps) {
+		const item = document.createElement('div');
+		const isCreatingDeviceId = step.step === 'read-device-id' && !step.success && !step.error;
+		item.className = step.success || isCreatingDeviceId ? 'succeeded' : 'failed';
+		item.textContent = getCyberBrickProvisioningStepMessage(step);
+		progress.appendChild(item);
+	}
+}
+
+function getCyberBrickProvisioningStepMessage(step) {
+	const languageManager = window.languageManager;
+	if (!step || typeof step.step !== 'string') {
+		return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_UNKNOWN', 'OTA setup step updated.') || 'OTA setup step updated.';
+	}
+	if (step.step === 'detect-usb') {
+		return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_DETECT_USB', 'CyberBrick USB port selected.') || 'CyberBrick USB port selected.';
+	}
+	if (step.step === 'read-device-id') {
+		if (!step.success) {
+			return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_READ_DEVICE_ID_CREATING', 'Creating device identity.') || 'Creating device identity.';
+		}
+		return step.deviceId
+			? languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_READ_DEVICE_ID_CREATED', 'Device identity created.') || 'Device identity created.'
+			: languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_READ_DEVICE_ID_FOUND', 'Device identity found.') || 'Device identity found.';
+	}
+	if (step.step === 'install-agent') {
+		return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_INSTALL_AGENT', 'OTA agent installed.') || 'OTA agent installed.';
+	}
+	if (step.step === 'configure-wifi') {
+		return step.ipAddress
+			? languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI', 'Wi-Fi configured.') || 'Wi-Fi configured.'
+			: languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI_NO_IP', 'Wi-Fi configuration saved; IP not reported yet.') ||
+				'Wi-Fi configuration saved; IP not reported yet.';
+	}
+	if (step.step === 'store-secrets') {
+		return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_STORE_SECRETS', 'Secrets stored securely.') || 'Secrets stored securely.';
+	}
+	if (step.step === 'scan-wifi') {
+		return languageManager?.getMessage('CYBERBRICK_WIFI_SCAN_RUNNING', 'Scanning Wi-Fi from CyberBrick...') || 'Scanning Wi-Fi from CyberBrick...';
+	}
+	if (step.step === 'verify-agent') {
+		return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_VERIFY_AGENT', 'Checking OTA agent.') || 'Checking OTA agent.';
+	}
+	return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_UNKNOWN', 'OTA setup step updated.') || 'OTA setup step updated.';
+}
+
+function getCyberBrickShortDeviceLabel(deviceId) {
+	if (!deviceId) {
+		return 'device: unknown';
+	}
+	return `id: …${deviceId.slice(-6)}`;
+}
+
+function getCyberBrickPrimaryDevice() {
+	const primaryId = cyberBrickUploadSettingsState.settings.primaryDeviceId;
+	const devices = cyberBrickUploadSettingsState.settings.pairedDevices || [];
+	return devices.find(device => device.deviceId === primaryId) || null;
+}
+
+function saveCyberBrickPrimaryDevice(deviceId) {
+	vscode.postMessage({
+		command: 'cyberbrickUploadSettingsSave',
+		requestId: createCyberBrickUploadRequestId('cyberbrick-primary-save'),
+		payload: {
+			primaryDeviceId: deviceId,
+		},
+	});
+}
+
+async function confirmCyberBrickDeviceDelete(device) {
+	const message = window.languageManager?.getMessage(
+		'CYBERBRICK_DELETE_DEVICE_CONFIRM',
+		'Delete this paired CyberBrick and its local secrets?'
+	) || 'Delete this paired CyberBrick and its local secrets?';
+	const confirmed = await showAsyncConfirm(`${message}\n${device.friendlyName || device.deviceId}`);
+	if (!confirmed) {
+		return;
+	}
+	vscode.postMessage({
+		command: 'cyberbrickPairedDeviceDeleteRequest',
+		requestId: createCyberBrickUploadRequestId('cyberbrick-device-delete'),
+		payload: { deviceId: device.deviceId },
+	});
+}
+
+async function requestCyberBrickOtaCleanup() {
+	const usbPort = getSelectedCyberBrickUsbPort();
+	const device = getCyberBrickPrimaryDevice();
+	if (!usbPort) {
+		toast.show(window.languageManager?.getMessage('CYBERBRICK_USB_PORT_REQUIRED', 'Choose a CyberBrick USB port first.'), 'warning', 4000);
+		return;
+	}
+
+	const confirmMessage =
+		window.languageManager?.getMessage(
+			'CYBERBRICK_OTA_CLEANUP_CONFIRM',
+			'This will remove Singular Blockly OTA files from the USB-connected CyberBrick, strip the OTA startup block from /app/rc_main.py, delete matching local pairing secrets if found, and switch this project back to USB. It will not touch /boot.py or factory files. Continue?'
+		) ||
+		'This will remove Singular Blockly OTA files from the USB-connected CyberBrick, strip the OTA startup block from /app/rc_main.py, delete matching local pairing secrets if found, and switch this project back to USB. It will not touch /boot.py or factory files. Continue?';
+	const targetLabel = device ? `${device.friendlyName || device.deviceId} (${getCyberBrickShortDeviceLabel(device.deviceId)})` : usbPort;
+	const confirmed = await showAsyncConfirm(`${confirmMessage}\n${targetLabel}`);
+	if (!confirmed) {
+		return;
+	}
+
+	cyberBrickUploadSettingsState.cleanupRunning = true;
+	cyberBrickUploadSettingsState.cleanupStatus =
+		window.languageManager?.getMessage('CYBERBRICK_OTA_CLEANUP_RUNNING', 'Removing OTA files over USB...') || 'Removing OTA files over USB...';
+	renderCyberBrickOtaCleanupStatus();
+	vscode.postMessage({
+		command: 'cyberbrickOtaCleanupRequest',
+		requestId: createCyberBrickUploadRequestId('cyberbrick-ota-cleanup'),
+		payload: {
+			usbPort,
+			...(device?.deviceId ? { deviceId: device.deviceId } : {}),
+		},
+	});
+}
+
+function renderCyberBrickOtaCleanupStatus() {
+	const status = document.getElementById('cyberbrickOtaCleanupStatus');
+	const cleanupButton = document.getElementById('cyberbrickOtaCleanupButton');
+	if (status) {
+		status.textContent = cyberBrickUploadSettingsState.cleanupStatus || '';
+		status.classList.toggle('running', cyberBrickUploadSettingsState.cleanupRunning);
+	}
+	if (cleanupButton) {
+		cleanupButton.disabled = cyberBrickUploadSettingsState.cleanupRunning;
+	}
+}
+
+function handleCyberBrickUploadSettingsLoaded(message) {
+	if (!message.success) {
+		const errorMessage = message.error?.message || window.languageManager?.getMessage('CYBERBRICK_UPLOAD_SETTINGS_LOAD_FAILED', 'Could not load CyberBrick upload settings.');
+		toast.show(errorMessage, 'error', 5000);
+		return;
+	}
+	applyCyberBrickUploadPanelState(message.payload);
+}
+
+function handleCyberBrickUploadSettingsSaved(message) {
+	cyberBrickUploadSettingsState.saving = false;
+	if (!message.success) {
+		const errorMessage = message.error?.message || window.languageManager?.getMessage('CYBERBRICK_UPLOAD_SETTINGS_SAVE_FAILED', 'Could not save CyberBrick upload settings.');
+		toast.show(errorMessage, 'error', 5000);
+		return;
+	}
+	applyCyberBrickUploadPanelState(message.payload);
+	toast.show(window.languageManager?.getMessage('CYBERBRICK_UPLOAD_SETTINGS_SAVED', 'CyberBrick upload settings saved.'), 'success');
+	closeCyberBrickUploadSettingsModal();
+}
+
+function handleCyberBrickUsbPortsResult(message) {
+	if (!message.success) {
+		toast.show(message.error?.message || window.languageManager?.getMessage('CYBERBRICK_USB_PORTS_FAILED', 'Could not list CyberBrick USB ports.'), 'error', 5000);
+		return;
+	}
+	cyberBrickUploadSettingsState.usbPorts = Array.isArray(message.payload?.ports) ? message.payload.ports : [];
+	cyberBrickUploadSettingsState.autoDetectedUsbPort = typeof message.payload?.autoDetected === 'string' ? message.payload.autoDetected : '';
+	renderCyberBrickUsbPorts();
+}
+
+function handleCyberBrickWifiScanProgress(message) {
+	const progress = document.getElementById('cyberbrickProvisioningProgress');
+	if (progress) {
+		progress.textContent = window.languageManager?.getMessage('CYBERBRICK_WIFI_SCAN_RUNNING', 'Scanning Wi-Fi from CyberBrick...') || 'Scanning Wi-Fi from CyberBrick...';
+	}
+}
+
+function handleCyberBrickWifiScanResult(message) {
+	if (!message.success && message.error) {
+		toast.show(message.error.message, 'warning', 6000);
+	}
+	cyberBrickUploadSettingsState.wifiNetworks = Array.isArray(message.payload?.networks) ? message.payload.networks : [];
+	renderCyberBrickWifiNetworks();
+	if (message.success) {
+		selectFirstCyberBrickWifiSsidFromScan(cyberBrickUploadSettingsState.wifiNetworks);
+	}
+}
+
+function handleCyberBrickOtaProvisionProgress(message) {
+	if (message.payload) {
+		cyberBrickUploadSettingsState.provisioningSteps.push(message.payload);
+		renderCyberBrickProvisioningProgress();
+	}
+}
+
+function handleCyberBrickOtaProvisionResult(message) {
+	if (message.payload?.panelState) {
+		applyCyberBrickUploadPanelState(message.payload.panelState);
+	}
+	if (message.success) {
+		const successMessage =
+			window.languageManager?.getMessage('CYBERBRICK_PROVISION_SUCCEEDED', 'CyberBrick OTA setup completed. Upload mode remains USB.') ||
+			'CyberBrick OTA setup completed. Upload mode remains USB.';
+		toast.show(successMessage, 'success', 6000);
+		requestCyberBrickUploadSettingsLoad();
+	} else {
+		const errorMessage =
+			window.languageManager?.getMessage('CYBERBRICK_PROVISION_FAILED', 'CyberBrick OTA setup failed.') || 'CyberBrick OTA setup failed.';
+		toast.show(errorMessage, 'error', 7000);
+	}
+}
+
+function handleCyberBrickOtaReadinessResult(message) {
+	if (message.success) {
+		cyberBrickUploadSettingsState.readiness = message.payload;
+		renderCyberBrickUploadSettings();
+	} else if (message.error) {
+		toast.show(message.error.message, 'warning', 5000);
+	}
+}
+
+function handleCyberBrickOtaUploadProgress(message) {
+	if (message.payload?.stageMessage) {
+		setUploadButtonState('uploading');
+		toast.show(message.payload.stageMessage, 'success', 1500);
+	}
+}
+
+function handleCyberBrickOtaUploadResult(message) {
+	setUploadButtonState('ready');
+	if (message.success) {
+		toast.show(message.payload?.userFacingSummary || window.languageManager?.getMessage('CYBERBRICK_OTA_UPLOAD_SUCCEEDED', 'CyberBrick OTA upload complete.'), 'success', 5000);
+		requestCyberBrickUploadSettingsLoad();
+		return;
+	}
+	toast.show(
+		message.error?.message || message.payload?.userFacingSummary || window.languageManager?.getMessage('CYBERBRICK_OTA_UPLOAD_FAILED', 'CyberBrick OTA upload failed. USB fallback is manual only.'),
+		'error',
+		8000
+	);
+}
+
+function handleCyberBrickPairedDeviceDeleteResult(message) {
+	if (message.success) {
+		applyCyberBrickUploadPanelState(message.payload);
+		toast.show(window.languageManager?.getMessage('CYBERBRICK_DEVICE_DELETED', 'Paired CyberBrick deleted.'), 'success');
+	} else {
+		toast.show(message.error?.message || window.languageManager?.getMessage('CYBERBRICK_DEVICE_DELETE_FAILED', 'Could not delete paired CyberBrick.'), 'error', 5000);
+	}
+}
+
+function handleCyberBrickOtaCleanupResult(message) {
+	cyberBrickUploadSettingsState.cleanupRunning = false;
+	if (message.payload?.panelState) {
+		applyCyberBrickUploadPanelState(message.payload.panelState);
+	}
+	if (message.success) {
+		cyberBrickUploadSettingsState.cleanupStatus =
+			window.languageManager?.getMessage(
+				'CYBERBRICK_OTA_CLEANUP_SUCCEEDED',
+				'OTA files removed. Matching local pairing was cleared if found. Upload mode is now USB.'
+			) || 'OTA files removed. Matching local pairing was cleared if found. Upload mode is now USB.';
+		renderCyberBrickOtaCleanupStatus();
+		toast.show(cyberBrickUploadSettingsState.cleanupStatus, 'success', 6000);
+		requestCyberBrickUploadSettingsLoad();
+		return;
+	}
+	cyberBrickUploadSettingsState.cleanupStatus =
+		message.error?.message ||
+		window.languageManager?.getMessage('CYBERBRICK_OTA_CLEANUP_FAILED', 'Could not remove OTA files from CyberBrick.') ||
+		'Could not remove OTA files from CyberBrick.';
+	renderCyberBrickOtaCleanupStatus();
+	toast.show(cyberBrickUploadSettingsState.cleanupStatus, 'error', 7000);
+}
+
+function updateCyberBrickUploadSettingsVisibility(boardId) {
+	const container = document.getElementById('cyberbrickUploadSettingsContainer');
+	if (!container) {
+		return;
+	}
+	container.style.display = isCyberBrickUploadBoard(boardId) ? 'flex' : 'none';
+}
+
 /**
  * 上傳按鈕狀態
  */
@@ -5926,7 +6820,7 @@ function initUploadButton() {
 async function handleUploadClick() {
 	// TXT 模式：若程式正在執行，點擊按鈕發送停止請求
 	if (window.currentProgrammingLanguage === 'txt' && uploadState.txtRunning) {
-		console.log('[blockly] TXT 執行中，發送停止請求');
+		log.info('[blockly] TXT 執行中，發送停止請求');
 		const operationId = uploadState.activeTxtOperationId;
 		uploadState.stoppingTxtOperationId = operationId;
 		vscode.postMessage({ command: 'txtStopExecution', operationId });
@@ -5935,7 +6829,7 @@ async function handleUploadClick() {
 	}
 
 	if (uploadState.isUploading) {
-		console.log('[blockly] 上傳中，忽略點擊');
+		log.info('[blockly] 上傳中，忽略點擊');
 		return;
 	}
 
@@ -5983,8 +6877,8 @@ async function handleUploadClick() {
 	const isMicroPython = window.currentProgrammingLanguage === 'micropython';
 
 	if (isMicroPython) {
-		// CyberBrick MicroPython 上傳請求
-		console.log('[blockly] 發送 MicroPython 上傳請求');
+		// CyberBrick MicroPython 上傳請求（自動偵測 USB，無 USB 時自動嘗試 OTA）
+		log.info('[blockly] 發送 MicroPython 上傳請求');
 		setUploadButtonState('uploading');
 		vscode.postMessage({
 			command: 'requestUpload',
@@ -5994,7 +6888,7 @@ async function handleUploadClick() {
 		});
 	} else if (isTxt) {
 		// fischertechnik TXT Controller SSH 上傳請求
-		console.log('[blockly] 發送 TXT 上傳請求');
+		log.info('[blockly] 發送 TXT 上傳請求');
 		const operationId = beginTxtOperation();
 		const virtualControlPreflight = collectTxtVirtualControlPreflight();
 		setUploadButtonState('txt-uploading');
@@ -6009,7 +6903,7 @@ async function handleUploadClick() {
 		});
 	} else {
 		// T018: Arduino C++ 上傳請求（包含 lib_deps, build_flags）
-		console.log('[blockly] 發送 Arduino 上傳請求');
+		log.info('[blockly] 發送 Arduino 上傳請求');
 		setUploadButtonState('uploading');
 		const generator = getCurrentGenerator();
 		vscode.postMessage({
@@ -6189,8 +7083,7 @@ const uploadProgressFilter = {
  * @param {Object} message - 進度訊息
  */
 function handleUploadProgress(message) {
-	// Security fix: Use %s format specifier to prevent format string injection (CWE-134)
-	console.log('[blockly] 上傳進度: %s (%s%%) - %s %o', message.stage, message.progress, message.message, message);
+	log.info('[blockly] 上傳進度', { stage: message.stage, progress: message.progress, message: message.message });
 
 	// T041: 階段訊息對應（支援 MicroPython 與 Arduino）
 	const stageMessages = {
@@ -6254,7 +7147,7 @@ function handleUploadProgress(message) {
  * @param {Object} message - 結果訊息
  */
 function handleUploadResult(message) {
-	console.log('[blockly] 上傳結果:', message);
+	log.info('[blockly] 上傳結果', { success: message.success, hasError: Boolean(message.error), mode: message.mode });
 
 	// 重置按鈕狀態
 	setUploadButtonState(message.success ? 'success' : 'error');
@@ -6286,7 +7179,10 @@ function handleUploadResult(message) {
 		let failedMsg = failedTemplate.replace('{0}', errorMsg);
 		// 附加技術細節與耗時資訊（合併為同一組括號）
 		const infoParts = [];
-		if (message.error?.details && message.error.details.trim()) {
+		const otaDetail = message.error?.errorCode ? getLocalizedOtaErrorDetail(message.error.errorCode) : null;
+		if (otaDetail) {
+			infoParts.push(otaDetail);
+		} else if (message.error?.details && message.error.details.trim()) {
 			infoParts.push(message.error.details.slice(0, 200));
 		}
 		if (uploadState.startTime > 0) {
@@ -6401,11 +7297,39 @@ function getLocalizedUploadError(stage, fallbackMessage) {
 }
 
 /**
+ * 根據 OTA 錯誤碼取得本地化的詳細錯誤說明
+ * @param {string} errorCode - CyberBrick OTA 錯誤碼
+ * @returns {string|null} 本地化錯誤說明，若無對應則回傳 null
+ */
+function getLocalizedOtaErrorDetail(errorCode) {
+	const otaErrorKeyMap = {
+		'agent-unreachable': 'CYBERBRICK_ERROR_AGENT_UNREACHABLE',
+		'offline': 'CYBERBRICK_ERROR_OFFLINE',
+		'agent-health-failed': 'CYBERBRICK_ERROR_AGENT_HEALTH',
+		'missing-primary-device': 'CYBERBRICK_ERROR_MISSING_PRIMARY',
+		'device-not-paired': 'CYBERBRICK_ERROR_NOT_PAIRED',
+		'missing-address': 'CYBERBRICK_ERROR_MISSING_ADDRESS',
+		'missing-ota-token': 'CYBERBRICK_ERROR_MISSING_TOKEN',
+		'token-rejected': 'CYBERBRICK_ERROR_TOKEN_REJECTED',
+		'identity-mismatch': 'CYBERBRICK_ERROR_IDENTITY_MISMATCH',
+		'write-failed': 'CYBERBRICK_ERROR_WRITE_FAILED',
+		'network-error': 'CYBERBRICK_ERROR_NETWORK',
+		'timeout': 'CYBERBRICK_ERROR_TIMEOUT',
+		'upload-timeout': 'CYBERBRICK_ERROR_TIMEOUT',
+		'ota-upload-failed': 'CYBERBRICK_ERROR_OTA_FAILED',
+		'rc-main-patch-failed': 'CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED',
+	};
+	const key = otaErrorKeyMap[errorCode];
+	if (!key) { return null; }
+	return window.languageManager?.getMessage(key) || null;
+}
+
+/**
  * 處理 TXT 上傳進度訊息
  * @param {Object} message - 進度訊息
  */
 function handleTxtUploadProgress(message) {
-	console.log('[TXT] 上傳進度:', message.stage, message.progress + '%', message.message);
+	log.info('[TXT] 上傳進度', { stage: message.stage, progress: message.progress, message: message.message });
 	// 進入執行階段：切換為停止按鈕並顯示通知
 	if (message.stage === 'executing') {
 		setUploadButtonState('txt-running');
@@ -6418,7 +7342,7 @@ function handleTxtUploadProgress(message) {
  * @param {Object} message - 結果訊息
  */
 function handleTxtUploadResult(message) {
-	console.log('[TXT] 上傳結果:', message);
+	log.info('[TXT] 上傳結果', { success: message.success, hasError: Boolean(message.error) });
 	// TXT 模式統一恢復為播放圖示（就緒狀態）
 	const operationId = getTxtOperationId(message);
 	setTxtVirtualControlsExecutionState('editing', null, operationId);
@@ -6556,11 +7480,11 @@ function initSampleBrowser() {
  * @param {Object} message - 連接埠清單訊息
  */
 function handlePortListResponse(message) {
-	console.log('[blockly] 連接埠清單:', message);
+	log.info('[blockly] 連接埠清單', { portCount: Array.isArray(message.ports) ? message.ports.length : 0, autoDetected: message.autoDetected });
 
 	if (message.autoDetected) {
 		uploadState.selectedPort = message.autoDetected;
-		console.log(`[blockly] 自動偵測到 CyberBrick: ${message.autoDetected}`);
+		log.info(`[blockly] 自動偵測到 CyberBrick: ${message.autoDetected}`);
 	}
 
 	// TODO: 未來可以顯示連接埠選擇 UI
@@ -6877,7 +7801,7 @@ function openTxtTestDialog() {
 	if (dialog.open) { dialog.focus(); return; } // singleton guard
 	// 若使用者程式正在 TXT 上執行，先停止它，讓 Test Panel 取得控制權
 	if (uploadState.txtRunning) {
-		console.log('[TXT] 開啟 Test Panel，停止執行中的程式');
+		log.info('[TXT] 開啟 Test Panel，停止執行中的程式');
 		const operationId = uploadState.activeTxtOperationId;
 		uploadState.stoppingTxtOperationId = operationId;
 		vscode.postMessage({ command: 'txtStopExecution', operationId });
@@ -7035,7 +7959,7 @@ function handleTxtTestPollFailure() {
  * @param {string} errorMsg
  */
 function handleTxtTestSensorConfigFailed(errorMsg) {
-	console.warn('[TXT] sensor_config failed:', errorMsg);
+	log.warn('[TXT] sensor_config failed:', errorMsg);
 	// 找出所有切換成 ULTRASONIC 的 port，在值欄位顯示 '!' 提示設定未生效
 	for (let i = 1; i <= 8; i++) {
 		if (txtTestState.sensorTypes[i - 1] === 'ULTRASONIC') {

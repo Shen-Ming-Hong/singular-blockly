@@ -532,6 +532,10 @@ function setupConfigurationListener(
 	localeService: LocaleService
 ) {
 	const disposable = vscodeApi.workspace.onDidChangeConfiguration(async event => {
+		if (event.affectsConfiguration('singular-blockly.cyberbrick.uploadSettings')) {
+			log('CyberBrick upload settings configuration changed', 'debug');
+		}
+
 		// Check if singularBlockly.mcp.nodePath setting changed
 		if (!event.affectsConfiguration('singularBlockly.mcp.nodePath')) {
 			return;

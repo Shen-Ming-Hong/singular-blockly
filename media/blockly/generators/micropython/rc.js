@@ -34,6 +34,15 @@
 		return hasMaster && hasSlave;
 	}
 
+	function _buildOtaWifiGuard() {
+		return `def _rc_should_keep_wifi_for_ota():
+    try:
+        import cyberbrick_ota_config as _ota_cfg
+        return bool(getattr(_ota_cfg, 'SSID', '') and getattr(_ota_cfg, 'OTA_TOKEN', ''))
+    except Exception:
+        return False`;
+	}
+
 	// === 發射端初始化 ===
 	generator.forBlock['rc_master_init'] = function (block) {
 		// 衝突檢測：如果接收端也啟用，跳過產生程式碼
@@ -64,16 +73,19 @@
 _rc_broadcast = b'\\xff\\xff\\xff\\xff\\xff\\xff'
 _rc_led = NeoPixel(Pin(8), 1)
 _rc_send_fail_count = 0
+${_buildOtaWifiGuard()}
+_rc_keep_wifi_for_ota = _rc_should_keep_wifi_for_ota()
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
-_wlan.disconnect()
-_wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
-time.sleep_ms(100)
-_wlan.config(channel=${channel})
+if not _rc_keep_wifi_for_ota:
+    _wlan.disconnect()
+    _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
+    time.sleep_ms(100)
+    _wlan.config(channel=${channel})
 _espnow = espnow.ESPNow()
 _espnow.active(True)
 _espnow.config(rxbuf=1024)
-_espnow.add_peer(_rc_broadcast)`
+_espnow.add_peer(_rc_broadcast)`.replace(/\t/g, '    ')
 		);
 
 		// 配對 ID 在 main() 中設定，確保變數已初始化
@@ -173,6 +185,8 @@ _rc_last_recv = 0
 _rc_recv_count = 0
 _rc_last_gc = 0
 _rc_last_reinit = 0
+${_buildOtaWifiGuard()}
+_rc_keep_wifi_for_ota = _rc_should_keep_wifi_for_ota()
 
 def _rc_recv_cb(e):
     global _rc_data, _rc_connected, _rc_last_recv, _rc_recv_count
@@ -191,22 +205,25 @@ def _rc_recv_cb(e):
         pass  # 防止 irq 異常導致系統卡死
 
 def _reinit_espnow():
-    global _rc_connected
-    try:
-        _espnow.active(False)
-        _wlan.active(False)
-        time.sleep_ms(300)
-        _wlan.active(True)
-        _wlan.disconnect()
-        _wlan.config(reconnects=0)
-        time.sleep_ms(100)
-        _wlan.config(channel=_rc_channel)
-        _espnow.active(True)
-        _espnow.config(rxbuf=1024)
-        _espnow.irq(_rc_recv_cb)
-        _rc_connected = False
-    except Exception:
-        pass
+	global _rc_connected
+	try:
+		_espnow.active(False)
+		if not _rc_keep_wifi_for_ota:
+			_wlan.active(False)
+			time.sleep_ms(300)
+			_wlan.active(True)
+			_wlan.disconnect()
+			_wlan.config(reconnects=0)
+			time.sleep_ms(100)
+			_wlan.config(channel=_rc_channel)
+		else:
+			time.sleep_ms(50)
+		_espnow.active(True)
+		_espnow.config(rxbuf=1024)
+		_espnow.irq(_rc_recv_cb)
+		_rc_connected = False
+	except Exception:
+		pass
 
 def _rc_maintenance():
     """定期維護：垃圾回收 + 斷線重連，回傳連線狀態"""
@@ -229,15 +246,16 @@ def _rc_maintenance():
 
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
-_wlan.disconnect()
-_wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
-time.sleep_ms(100)
-_wlan.config(channel=_rc_channel)
+if not _rc_keep_wifi_for_ota:
+    _wlan.disconnect()
+    _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
+    time.sleep_ms(100)
+    _wlan.config(channel=_rc_channel)
 _espnow = espnow.ESPNow()
 _espnow.active(True)
 _espnow.config(rxbuf=1024)
 _espnow.irq(_rc_recv_cb)
-_rc_last_gc = time.ticks_ms()`
+_rc_last_gc = time.ticks_ms()`.replace(/\t/g, '    ')
 		);
 		generator.addHardwareInit('onboard_led', 'onboard_led = NeoPixel(Pin(8), 1)');
 
