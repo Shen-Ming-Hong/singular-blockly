@@ -198,6 +198,31 @@
 					"type": "number",
 					"default": 8080,
 					"description": "TXT Controller runtime port"
+				},
+				"singular-blockly.cyberbrick.uploadSettings": {
+					"type": "object",
+					"scope": "resource",
+					"default": {
+						"schemaVersion": 2,
+						"pairedDevices": []
+					},
+					"description": "CyberBrick upload mode and paired OTA device registry. Sensitive values such as Wi-Fi passwords and OTA tokens are stored separately in VS Code SecretStorage.",
+					"properties": {
+						"schemaVersion": {
+							"type": "number",
+							"default": 2
+						},
+						"primaryDeviceId": {
+							"type": "string"
+						},
+						"pairedDevices": {
+							"type": "array",
+							"default": [],
+							"items": {
+								"type": "object"
+							}
+						}
+					}
 				}
 			}
 		}
