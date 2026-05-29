@@ -7,12 +7,17 @@
 import assert = require('assert');
 import * as sinon from 'sinon';
 import * as path from 'path';
+import * as vscode from 'vscode';
 import { describe, it, before, beforeEach, after, afterEach } from 'mocha';
 import { WebViewMessageHandler, _setVSCodeApi, _reset } from '../webview/messageHandler';
 import { LocaleService } from '../services/localeService';
 import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
 import { VSCodeMock, FSMock } from './helpers/mocks';
+import { CyberBrickUploadSettingsService } from '../services/cyberbrickUploadSettingsService';
+import { MockSecretStorage, MockWorkspaceConfiguration, createCyberBrickMockContext } from './helpers/cyberbrickUploadMocks';
+import { CYBERBRICK_UPLOAD_SETTINGS_KEY } from '../types/cyberbrickUpload';
+import { createCyberBrickDevice, createCyberBrickUploadSettings, createReadyOtaStatus } from './fixtures/cyberbrickUploadFixtures';
 
 describe('WebView Message Handler', () => {
 	let fsServiceMock: any;
@@ -773,6 +778,202 @@ describe('WebView Message Handler', () => {
 
 		await messageHandler.handleMessage({ ...baseMessage });
 		assert(vscodeMock.window.showInformationMessage.calledOnceWith('Hello'));
+	});
+
+	describe('CyberBrick upload settings messages', () => {
+		function createCyberBrickMessageHandler(initialSettings?: unknown, extras?: { provisioningService?: any; otaUploader?: any }) {
+			const secrets = new MockSecretStorage();
+			const configuration = new MockWorkspaceConfiguration();
+			if (initialSettings !== undefined) {
+				configuration.values.set(CYBERBRICK_UPLOAD_SETTINGS_KEY, initialSettings);
+			}
+			const context = createCyberBrickMockContext(secrets);
+			const service = new CyberBrickUploadSettingsService(context, vscode.Uri.file(workspacePath), {
+				configuration,
+				now: () => new Date('2026-01-20T12:00:00.000Z'),
+			});
+			messageHandler = new WebViewMessageHandler(
+				context,
+				panelMock,
+				localeServiceStub as any,
+				fileServiceStub as any,
+				settingsManagerStub as any,
+				service,
+				extras?.provisioningService,
+				extras?.otaUploader
+			);
+			webviewMock.postMessage.resetHistory();
+			return { configuration, secrets };
+		}
+
+		it('loads default USB mode for a new CyberBrick project', async () => {
+			createCyberBrickMessageHandler();
+
+			await messageHandler.handleMessage({
+				command: 'cyberbrickUploadSettingsLoad',
+				requestId: 'settings-load-1',
+				payload: { board: 'cyberbrick' },
+			});
+
+			const response = webviewMock.postMessage.firstCall.args[0];
+			assert.strictEqual(response.command, 'cyberbrickUploadSettingsLoaded');
+			assert.strictEqual(response.requestId, 'settings-load-1');
+			assert.strictEqual(response.success, true);
+			assert.strictEqual(response.payload.settings.schemaVersion, 2);
+			assert.deepStrictEqual(response.payload.settings.pairedDevices, []);
+		});
+
+		it('saves upload mode without exposing secrets in the response', async () => {
+			const device = createCyberBrickDevice();
+			const { secrets } = createCyberBrickMessageHandler(
+				createCyberBrickUploadSettings({ pairedDevices: [device], primaryDeviceId: device.deviceId })
+			);
+			await secrets.store('unrelated-secret-key', 'super-secret-token');
+
+			await messageHandler.handleMessage({
+				command: 'cyberbrickUploadSettingsSave',
+				requestId: 'settings-save-1',
+				payload: { primaryDeviceId: device.deviceId },
+			});
+
+			const response = webviewMock.postMessage.firstCall.args[0];
+			assert.strictEqual(response.command, 'cyberbrickUploadSettingsSaved');
+			assert.strictEqual(response.success, true);
+			assert.strictEqual(JSON.stringify(response).includes('super-secret-token'), false);
+		});
+
+		it('preserves USB mode as the default branch for existing requestUpload flow', async () => {
+			const { configuration } = createCyberBrickMessageHandler();
+
+			await messageHandler.handleMessage({ command: 'cyberbrickUploadSettingsLoad', payload: { board: 'cyberbrick' } });
+
+			assert.strictEqual(configuration.update.called, false);
+			const response = webviewMock.postMessage.firstCall.args[0];
+			assert.strictEqual(response.payload.settings.schemaVersion, 2);
+		});
+
+		it('lists USB ports and scans Wi-Fi without returning password fields', async () => {
+			const provisioningService = {
+				listUsbPorts: sinon.stub().resolves({
+					ports: [{ path: '/dev/cu.usbmodem1', displayName: 'CyberBrick USB' }],
+					autoDetected: '/dev/cu.usbmodem1',
+				}),
+				scanWifi: sinon.stub().resolves({
+					port: '/dev/cu.usbmodem1',
+					startedAt: '2026-01-20T12:00:00.000Z',
+					completedAt: '2026-01-20T12:00:01.000Z',
+					networks: [{ ssid: 'Classroom', rssi: -40 }],
+				}),
+			};
+			createCyberBrickMessageHandler(undefined, { provisioningService });
+
+			await messageHandler.handleMessage({ command: 'cyberbrickUsbPortsRequest', requestId: 'ports-1', payload: { filter: 'cyberbrick' } });
+			await messageHandler.handleMessage({
+				command: 'cyberbrickWifiScanRequest',
+				requestId: 'scan-1',
+				payload: { usbPort: '/dev/cu.usbmodem1' },
+			});
+
+			const messages = webviewMock.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0] as { command?: string });
+			const portsResult = messages.find((message: { command?: string }) => message.command === 'cyberbrickUsbPortsResult') as any;
+			assert.ok(portsResult);
+			assert.strictEqual(portsResult.payload.autoDetected, '/dev/cu.usbmodem1');
+			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickWifiScanResult'));
+			assert.strictEqual(JSON.stringify(messages).includes('wifiPassword'), false);
+		});
+
+		it('forwards provisioning progress and sanitized result', async () => {
+			const device = createCyberBrickDevice();
+			const provisioningService = {
+				provision: sinon.stub().callsFake(async (_payload: unknown, onProgress: Function) => {
+					onProgress({ step: 'detect-usb', success: true, message: 'USB selected' });
+					return {
+						result: { success: true, status: 'succeeded', device, nextUploadMode: 'usb', steps: [], userFacingSummary: 'done' },
+						panelState: { settings: createCyberBrickUploadSettings({ pairedDevices: [device], primaryDeviceId: device.deviceId }), secretPresence: {}, readiness: undefined },
+					};
+				}),
+			};
+			createCyberBrickMessageHandler(undefined, { provisioningService });
+
+			await messageHandler.handleMessage({
+				command: 'cyberbrickOtaProvisionRequest',
+				requestId: 'provision-1',
+				payload: { usbPort: '/dev/cu.usbmodem1', friendlyName: 'Alpha', ssid: 'Classroom', wifiPassword: 'do-not-return' },
+			});
+
+			const messages = webviewMock.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0] as { command?: string });
+			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickOtaProvisionProgress'));
+			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickOtaProvisionResult'));
+			assert.strictEqual(JSON.stringify(messages).includes('do-not-return'), false);
+		});
+
+		it('checks OTA readiness and uploads without falling back to USB', async () => {
+			const device = createCyberBrickDevice({ lastKnownIp: '192.168.1.50' });
+			const otaUploader = {
+				checkReadiness: sinon.stub().resolves(createReadyOtaStatus(device)),
+				upload: sinon.stub().callsFake(async (_payload: unknown, onProgress: Function) => {
+					onProgress({ operationId: 'op1', status: 'transferring', progress: 50, stageMessage: 'Uploading', remotePath: '/app/rc_main.py' });
+					return {
+						operationId: 'op1',
+						deviceId: device.deviceId,
+						friendlyName: device.friendlyName,
+						startedAt: '2026-01-20T12:00:00.000Z',
+						finishedAt: '2026-01-20T12:00:02.000Z',
+						status: 'succeeded',
+						progress: 100,
+						stageMessage: 'Done',
+						errorCode: null,
+						userFacingSummary: 'Done',
+						remotePath: '/app/rc_main.py',
+					};
+				}),
+			};
+			createCyberBrickMessageHandler(createCyberBrickUploadSettings({ pairedDevices: [device], primaryDeviceId: device.deviceId }), {
+				otaUploader,
+			});
+
+			await messageHandler.handleMessage({ command: 'cyberbrickOtaReadinessRequest', requestId: 'ready-1', payload: {} });
+			await messageHandler.handleMessage({ command: 'cyberbrickOtaUploadRequest', requestId: 'ota-1', payload: { board: 'cyberbrick', code: 'print(1)' } });
+
+			const messages = webviewMock.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0] as { command?: string });
+			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickOtaReadinessResult'));
+			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickOtaUploadProgress'));
+			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickOtaUploadResult'));
+		});
+
+		it('cleans OTA artifacts over USB without exposing secrets', async () => {
+			const device = createCyberBrickDevice({ lastKnownIp: '192.168.1.50' });
+			const provisioningService = {
+				removeOtaArtifacts: sinon.stub().resolves({
+					result: {
+						success: true,
+						deviceId: device.deviceId,
+						removedAgent: true,
+						removedConfig: true,
+						rcMainPatched: true,
+						rcMainHadBootstrap: true,
+						localPairingRemoved: true,
+						userFacingSummary: 'done',
+					},
+					panelState: { settings: createCyberBrickUploadSettings({ pairedDevices: [] }), secretPresence: {}, readiness: undefined },
+				}),
+			};
+			createCyberBrickMessageHandler(createCyberBrickUploadSettings({ pairedDevices: [device], primaryDeviceId: device.deviceId }), {
+				provisioningService,
+			});
+
+			await messageHandler.handleMessage({
+				command: 'cyberbrickOtaCleanupRequest',
+				requestId: 'cleanup-1',
+				payload: { usbPort: '/dev/cu.usbmodem1', deviceId: device.deviceId, wifiPassword: 'do-not-return' },
+			});
+
+			const response = webviewMock.postMessage.firstCall.args[0];
+			assert.strictEqual(response.command, 'cyberbrickOtaCleanupResult');
+			assert.strictEqual(response.requestId, 'cleanup-1');
+			assert.strictEqual(response.success, true);
+			assert.strictEqual(JSON.stringify(response).includes('do-not-return'), false);
+		});
 	});
 
 	it('should handle create backup message', async () => {
