@@ -10,7 +10,7 @@ import { log, handleWebViewLog } from '../services/logging';
 import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
-import { MicropythonUploader, UploadProgress, UploadResult, ComPortInfo } from '../services/micropythonUploader';
+import { MicropythonUploader, UploadProgress, UploadResult, UploadStage, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
 import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStopReason } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
@@ -1951,14 +1951,44 @@ export class WebViewMessageHandler {
 				return;
 			}
 
-			// 無 USB — 提示使用者手動切換到 OTA 模式（不自動 fallback，避免多裝置誤上傳）
-			let hasPrimary = false;
+			// 無 USB — 若有配對的主要 OTA 裝置，自動切換到 OTA 上傳
 			if (this.cyberBrickUploadSettingsService) {
 				const settings = await this.cyberBrickUploadSettingsService.loadSettings();
-				hasPrimary = !!(settings.primaryDeviceId && settings.pairedDevices.some(d => d.deviceId === settings.primaryDeviceId));
+				const primaryDeviceId = settings.primaryDeviceId;
+				const hasPrimary = !!(primaryDeviceId && settings.pairedDevices.some(d => d.deviceId === primaryDeviceId));
+
+				if (hasPrimary && primaryDeviceId) {
+					log('[blockly] USB 未找到，自動切換到 OTA 上傳（主要裝置）', 'info', { deviceId: primaryDeviceId });
+					const otaStageMap = (status: string): UploadStage => {
+						if (status === 'connecting') { return 'connecting'; }
+						if (status === 'transferring' || status === 'verifying') { return 'uploading'; }
+						if (status === 'restarting') { return 'restarting'; }
+						if (status === 'succeeded') { return 'completed'; }
+						if (status === 'pending' || status === 'validating') { return 'preparing'; }
+						return 'failed';
+					};
+					const run = await this.getCyberBrickOtaUploader().upload(
+						{ code: message.code, board: 'cyberbrick', deviceId: primaryDeviceId },
+						(progress) => {
+							this.sendUploadProgress({
+								stage: otaStageMap(progress.status),
+								progress: progress.progress,
+								message: progress.stageMessage,
+							});
+						}
+					);
+					this.sendUploadResult({
+						success: run.status === 'succeeded',
+						timestamp: run.startedAt,
+						port: `ota:${primaryDeviceId}`,
+						duration: run.duration ?? 0,
+						...(run.error ? { error: { stage: 'failed' as UploadStage, message: run.error.message, errorCode: run.errorCode } } : {}),
+					});
+					return;
+				}
 			}
 
-			// 無論是否有配對 OTA 裝置，USB 上傳失敗一律回報錯誤，讓使用者明確切換到 OTA 模式
+			// 無 USB 且無配對 OTA 裝置
 			this.sendUploadResult({
 				success: false,
 				timestamp: new Date().toISOString(),
@@ -1966,9 +1996,7 @@ export class WebViewMessageHandler {
 				duration: 0,
 				error: {
 					stage: 'connecting',
-					message: hasPrimary
-						? 'CyberBrick device not found via USB. Use the OTA upload option in the CyberBrick settings to upload wirelessly.'
-						: 'CyberBrick device not found. Please connect via USB or set up OTA pairing.',
+					message: 'CyberBrick device not found. Please connect via USB or set up OTA pairing.',
 				},
 			});
 		} catch (error) {
