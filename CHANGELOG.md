@@ -8,6 +8,16 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.80.1] - 2026-05-29
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick OTA 自動切換修復** (CyberBrick OTA auto-fallback fix)
+    - 修正 v0.80.0 中 OTA 無線上傳用戶點擊上傳按鈕時無法上傳的問題：當 USB 未插入且已設定主要 OTA 裝置（Primary Device）時，主上傳按鈕現在會自動切換至 OTA 無線上傳，不再顯示「裝置未找到」錯誤
+      Fixed an issue in v0.80.0 where OTA wireless upload users could not upload via the main upload button: when no USB is connected and a Primary Device is configured, the upload button now automatically falls back to OTA wireless upload instead of showing a "device not found" error
+    - 此修復同時保留多裝置教室安全性：僅當明確指定主要裝置（`primaryDeviceId`）時才啟用自動切換，避免誤上傳至非預期裝置
+      This fix preserves multi-device classroom safety: auto-fallback only triggers when a Primary Device (`primaryDeviceId`) is explicitly configured, preventing accidental uploads to unintended devices
+
 ## [0.80.0] - 2026-05-27
 
 ### ✨ 新功能 New Features
