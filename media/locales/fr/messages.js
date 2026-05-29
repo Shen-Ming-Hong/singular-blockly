@@ -920,6 +920,10 @@ window.languageManager.loadMessages('fr', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Définir la couleur de la LED intégrée (GPIO8) avec valeurs RVB (0-255)',
 	CYBERBRICK_LED_OFF: 'Éteindre LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Éteindre la LED intégrée',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Définir LED intégrée (numérique)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Activer ou désactiver les canaux de la LED intégrée',
+	CYBERBRICK_LED_DIGITAL_ON: 'ACTIVÉ',
+	CYBERBRICK_LED_DIGITAL_OFF: 'DÉSACTIVÉ',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'Définir GPIO',
@@ -1083,6 +1087,7 @@ window.languageManager.loadMessages('fr', {
 	X11_LED_SET_COLOR_INDEX: 'index',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'définir couleur R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Définir la couleur du pixel de la bande LED (index 0=premier pixel, ou tous)',
+	X11_LED_DIGITAL_TOOLTIP: 'Activer ou désactiver les canaux de la bande LED X11',
 	X11_LED_INDEX_ALL: 'Tous',
 
 	// === Carte d'extension X12 Émetteur ===

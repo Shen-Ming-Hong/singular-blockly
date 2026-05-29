@@ -915,6 +915,10 @@ window.languageManager.loadMessages('pt-br', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Definir cor do LED integrado (GPIO8) usando valores RGB (0-255)',
 	CYBERBRICK_LED_OFF: 'Desligar LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Desligar o LED integrado',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Definir LED integrado (digital)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Ativar ou desativar os canais do LED integrado',
+	CYBERBRICK_LED_DIGITAL_ON: 'LIGADO',
+	CYBERBRICK_LED_DIGITAL_OFF: 'DESLIGADO',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'Definir GPIO',
@@ -1078,6 +1082,7 @@ window.languageManager.loadMessages('pt-br', {
 	X11_LED_SET_COLOR_INDEX: 'índice',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'definir cor R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Definir cor do pixel da fita LED (índice 0=primeiro pixel, ou todos)',
+	X11_LED_DIGITAL_TOOLTIP: 'Definir estados dos canais da fita LED X11 como LIGADO ou DESLIGADO',
 	X11_LED_INDEX_ALL: 'Todos',
 
 	// === Placa de extensão X12 Transmissor ===

@@ -46,6 +46,10 @@
             "type": "cyberbrick_led_off"
         },
         {
+            "kind": "block",
+            "type": "cyberbrick_led_digital"
+        },
+        {
             "kind": "label",
             "text": "%{CATEGORY_CYBERBRICK_GPIO}"
         },

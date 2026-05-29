@@ -919,6 +919,10 @@ window.languageManager.loadMessages('cs', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Nastavit barvu vestavěné LED (GPIO8) pomocí hodnot RGB (0-255)',
 	CYBERBRICK_LED_OFF: 'Vypnout LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Vypnout vestavěnou LED',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Nastavit vestavěnou LED (digitálně)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Zapnout nebo vypnout kanály vestavěné LED',
+	CYBERBRICK_LED_DIGITAL_ON: 'ZAP',
+	CYBERBRICK_LED_DIGITAL_OFF: 'VYP',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'Nastavit GPIO',
@@ -1082,6 +1086,7 @@ window.languageManager.loadMessages('cs', {
 	X11_LED_SET_COLOR_INDEX: 'index',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'nastav barvu R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Nastav barvu pixelu LED pásku (index 0=první pixel, nebo všechny)',
+	X11_LED_DIGITAL_TOOLTIP: 'Nastavit stavy kanálů LED pásku X11 na ZAP nebo VYP',
 	X11_LED_INDEX_ALL: 'Všechny',
 
 	// === X12 Rozšiřující deska Vysílač ===

@@ -921,6 +921,10 @@ window.languageManager.loadMessages('de', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Onboard-LED (GPIO8) Farbe mit RGB-Werten (0-255) einstellen',
 	CYBERBRICK_LED_OFF: 'LED ausschalten',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Onboard-LED ausschalten',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Onboard-LED setzen (digital)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Onboard-LED-Kanäle Ein oder Aus schalten',
+	CYBERBRICK_LED_DIGITAL_ON: 'EIN',
+	CYBERBRICK_LED_DIGITAL_OFF: 'AUS',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'GPIO einstellen',
@@ -1085,6 +1089,7 @@ window.languageManager.loadMessages('de', {
 	X11_LED_SET_COLOR_INDEX: 'Index',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'setze Farbe R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Setze LED-Streifen Pixel-Farbe (Index 0=erstes Pixel, oder alle)',
+	X11_LED_DIGITAL_TOOLTIP: 'X11-LED-Streifen-Kanalzustände Ein oder Aus schalten',
 	X11_LED_INDEX_ALL: 'Alle',
 
 	// === X12 Sender Erweiterungsplatine ===

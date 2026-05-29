@@ -926,6 +926,10 @@ window.languageManager.loadMessages('en', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Set the onboard LED (GPIO8) color using RGB values (0-255)',
 	CYBERBRICK_LED_OFF: 'Turn Off LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Turn off the onboard LED',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Set onboard LED (digital)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Set the onboard LED channels ON or OFF',
+	CYBERBRICK_LED_DIGITAL_ON: 'ON',
+	CYBERBRICK_LED_DIGITAL_OFF: 'OFF',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'Set GPIO',
@@ -1089,6 +1093,7 @@ window.languageManager.loadMessages('en', {
 	X11_LED_SET_COLOR_INDEX: 'index',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'set color R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Set LED strip pixel color (index 0=first pixel, or all)',
+	X11_LED_DIGITAL_TOOLTIP: 'Set X11 LED strip channel states ON or OFF',
 	X11_LED_INDEX_ALL: 'All',
 
 	// === X12 Extension Board ===

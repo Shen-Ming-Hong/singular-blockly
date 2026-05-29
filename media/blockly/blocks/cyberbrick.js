@@ -54,6 +54,35 @@ Blockly.Blocks['cyberbrick_led_off'] = {
 	},
 };
 
+function getDigitalStateOptions() {
+	return [
+		[window.languageManager.getMessage('CYBERBRICK_LED_DIGITAL_ON', 'ON'), 'ON'],
+		[window.languageManager.getMessage('CYBERBRICK_LED_DIGITAL_OFF', 'OFF'), 'OFF'],
+	];
+}
+
+/**
+ * 設定板載 LED (數位)
+ */
+Blockly.Blocks['cyberbrick_led_digital'] = {
+	init: function () {
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('CYBERBRICK_LED_DIGITAL_PREFIX', '設定板載 LED (數位)'))
+			.appendField('R')
+			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'R_STATE')
+			.appendField('G')
+			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'G_STATE')
+			.appendField('B')
+			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'B_STATE');
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour(160);
+		this.setTooltip(window.languageManager.getMessage('CYBERBRICK_LED_DIGITAL_TOOLTIP', '設定板載 LED 各通道為開或關'));
+		this.setHelpUrl('');
+	},
+};
+
 // === GPIO 積木 ===
 
 /**

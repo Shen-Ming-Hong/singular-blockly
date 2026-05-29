@@ -922,6 +922,10 @@ window.languageManager.loadMessages('pl', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Ustaw kolor wbudowanego LED (GPIO8) używając wartości RGB (0-255)',
 	CYBERBRICK_LED_OFF: 'Wyłącz LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Wyłącz wbudowany LED',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Ustaw wbudowany LED (cyfrowy)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Włącz lub wyłącz kanały wbudowanego LED',
+	CYBERBRICK_LED_DIGITAL_ON: 'WŁ',
+	CYBERBRICK_LED_DIGITAL_OFF: 'WYŁ',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'Ustaw GPIO',
@@ -1085,6 +1089,7 @@ window.languageManager.loadMessages('pl', {
 	X11_LED_SET_COLOR_INDEX: 'indeks',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'ustaw kolor R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Ustaw kolor piksela taśmy LED (indeks 0=pierwszy piksel, lub wszystkie)',
+	X11_LED_DIGITAL_TOOLTIP: 'Ustaw stany kanałów taśmy LED X11 na WŁ lub WYŁ',
 	X11_LED_INDEX_ALL: 'Wszystkie',
 
 	// === Płytka rozszerzeń X12 Nadajnik ===

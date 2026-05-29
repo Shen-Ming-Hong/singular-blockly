@@ -910,6 +910,10 @@ window.languageManager.loadMessages('zh-hant', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: '使用 RGB 值 (0-255) 設定板載 LED (GPIO8) 顏色',
 	CYBERBRICK_LED_OFF: '關閉 LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: '關閉板載 LED',
+	CYBERBRICK_LED_DIGITAL_PREFIX: '設定板載 LED (數位)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: '設定板載 LED 各通道為開或關',
+	CYBERBRICK_LED_DIGITAL_ON: '開',
+	CYBERBRICK_LED_DIGITAL_OFF: '關',
 
 	// CyberBrick GPIO 積木
 	CYBERBRICK_GPIO_SET: '設定 GPIO',
@@ -1073,6 +1077,7 @@ window.languageManager.loadMessages('zh-hant', {
 	X11_LED_SET_COLOR_INDEX: '第',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: '顆設定顏色 紅',
 	X11_LED_SET_COLOR_TOOLTIP: '設定 LED 燈條像素顏色 (索引 0=第一顆，或全部)',
+	X11_LED_DIGITAL_TOOLTIP: '設定 X11 LED 燈條各通道狀態為開或關',
 	X11_LED_INDEX_ALL: '全部',
 
 	// === X12 擴展板 ===
