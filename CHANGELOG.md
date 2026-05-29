@@ -8,6 +8,36 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.80.0] - 2026-05-27
+
+### ✨ 新功能 New Features
+
+- **CyberBrick OTA 無線上傳模式** (CyberBrick OTA wireless upload mode)
+    - 新增 OTA（Over-the-Air）無線上傳模式，讓已完成 USB 配對的 CyberBrick 裝置可透過 Wi-Fi 上傳 MicroPython 程式碼，無需重新連接 USB 線
+      Added OTA (Over-the-Air) wireless upload mode; once a CyberBrick is paired via USB, subsequent uploads can be made wirelessly over Wi-Fi without reconnecting the USB cable
+    - 採用 USB 優先配對流程：首次需以 USB 連接 CyberBrick，部署 OTA agent、掃描 Wi-Fi、設定 SSID/密碼，完成後自動儲存裝置配對資訊（deviceId、IP、OTA token）；後續即可完全無線上傳
+      Uses a USB-first provisioning flow: on first setup, USB connects to the CyberBrick, deploys the OTA agent, scans for Wi-Fi, configures SSID/password, and saves the device pairing record (deviceId, IP, OTA token); subsequent uploads are fully wireless
+    - 支援多裝置管理：可在設定面板新增多台已配對的 CyberBrick，指定主要裝置（Primary Device）後，OTA 上傳會自動選擇主要裝置為目標
+      Supports multi-device management: multiple paired CyberBricks can be added in the settings panel; the designated Primary Device is automatically selected as the OTA upload target
+    - 新增 CyberBrick 上傳設定 WebView 面板，提供配對裝置清單、連線狀態、OTA readiness 檢查、USB 配對與裝置清理入口
+      Added a CyberBrick upload settings WebView panel with a paired device list, connection status, OTA readiness checks, USB provisioning, and device cleanup controls
+    - 新增 CyberBrick MicroPython Serial Monitor，透過 mpremote 即時串流執行輸出；OTA 上傳完成後自動啟動，支援 Ctrl+D 軟重啟
+      Added a CyberBrick MicroPython serial monitor that streams execution output via mpremote in real time; auto-launches after OTA upload completes, with Ctrl+D soft-reset support
+    - 補齊 OTA 服務、型別定義、15 語系 i18n 文案、SpecKit 文件、服務/契約回歸測試與 MCP block-dictionary 更新；此版本已通過 compile、lint、test、i18n validation 與 CodeQL/Translation CI
+      Added OTA services, type definitions, 15-locale i18n copy, SpecKit documentation, service/contract regression tests, and MCP block-dictionary updates; this release passed compile, lint, test, i18n validation, and CodeQL/Translation CI
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick OTA Copilot Review 修正** (CyberBrick OTA Copilot review fixes)
+    - 修正 `serialMonitorService` 中 Python monitorScript 模板字串的 tab 縮排問題，改為 4 spaces，避免 `IndentationError`
+      Fixed a tab indentation issue in the Python monitorScript template string in `serialMonitorService`; changed to 4 spaces to prevent `IndentationError`
+    - 移除 USB 上傳失敗時自動切換至 OTA 模式的 fallback 邏輯，改為明確提示使用者手動切換，避免多裝置教室環境中誤上傳至非預期裝置
+      Removed the automatic USB-to-OTA fallback when USB upload fails; the user is now prompted to manually switch to OTA mode to prevent accidental uploads to unintended devices in multi-device classroom environments
+    - 修正 `cyberbrickOtaUploader.upload()` 未將 `request.deviceId` 傳入 `checkReadiness()`，導致多裝置環境目標選擇失準的問題
+      Fixed `cyberbrickOtaUploader.upload()` not passing `request.deviceId` to `checkReadiness()`, which caused incorrect target selection in multi-device environments
+    - 修正 `PairedCyberBrickDevice.protocolVersion` 型別從 literal `1` 改為 `1 | 2`，使其與常數 `CYBERBRICK_OTA_PROTOCOL_VERSION = 2` 一致
+      Fixed `PairedCyberBrickDevice.protocolVersion` type from literal `1` to `1 | 2` to be consistent with the constant `CYBERBRICK_OTA_PROTOCOL_VERSION = 2`
+
 ## [0.79.0] - 2026-05-25
 
 ### ✨ 新功能 New Features
