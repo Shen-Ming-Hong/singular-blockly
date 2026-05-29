@@ -922,6 +922,10 @@ window.languageManager.loadMessages('bg', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Задаване на цвят на вградения LED (GPIO8) с RGB стойности (0-255)',
 	CYBERBRICK_LED_OFF: 'Изключване на LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Изключване на вградения LED',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Задай вградения LED (цифров)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Задай каналите на вградения LED на ВКЛ или ИЗКЛ',
+	CYBERBRICK_LED_DIGITAL_ON: 'ВКЛ',
+	CYBERBRICK_LED_DIGITAL_OFF: 'ИЗКЛ',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'Задаване на GPIO',
@@ -1086,6 +1090,7 @@ window.languageManager.loadMessages('bg', {
 	X11_LED_SET_COLOR_INDEX: 'индекс',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'задай цвят R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Задай цвят на пиксел на LED лента (индекс 0=първи пиксел, или всички)',
+	X11_LED_DIGITAL_TOOLTIP: 'Задай каналните състояния на LED лентата X11 на ВКЛ или ИЗКЛ',
 	X11_LED_INDEX_ALL: 'Всички',
 
 	// === X12 Разширителна плочка Предавател ===

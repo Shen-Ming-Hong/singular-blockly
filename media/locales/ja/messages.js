@@ -914,6 +914,10 @@ window.languageManager.loadMessages('ja', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'オンボードLED（GPIO8）の色をRGB値（0-255）で設定',
 	CYBERBRICK_LED_OFF: 'LEDをオフ',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'オンボードLEDをオフにする',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'ボードLEDを設定（デジタル）',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'オンボードLEDのチャンネルをON/OFFに設定する',
+	CYBERBRICK_LED_DIGITAL_ON: 'オン',
+	CYBERBRICK_LED_DIGITAL_OFF: 'オフ',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'GPIO設定',
@@ -1077,6 +1081,7 @@ window.languageManager.loadMessages('ja', {
 	X11_LED_SET_COLOR_INDEX: 'インデックス',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'の色を設定 R',
 	X11_LED_SET_COLOR_TOOLTIP: 'LEDテープのピクセル色を設定 (インデックス 0=最初、または全て)',
+	X11_LED_DIGITAL_TOOLTIP: 'X11 LEDテープのチャンネル状態をON/OFFに設定する',
 	X11_LED_INDEX_ALL: '全て',
 
 	// === X12 送信機拡張ボード ===

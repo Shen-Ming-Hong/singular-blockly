@@ -19,8 +19,8 @@
 
 **Purpose**: Add all 5 new i18n keys to every locale file. This is a prerequisite for both user stories because `getMessage()` calls in block definitions depend on these keys.
 
-- [ ] T001 Add 5 new i18n keys to all 15 locale files in `media/locales/*/messages.js`: `CYBERBRICK_LED_DIGITAL_PREFIX`, `CYBERBRICK_LED_DIGITAL_TOOLTIP`, `CYBERBRICK_LED_DIGITAL_ON`, `CYBERBRICK_LED_DIGITAL_OFF` (after `CYBERBRICK_LED_OFF_TOOLTIP`), and `X11_LED_DIGITAL_TOOLTIP` (after `X11_LED_SET_COLOR_TOOLTIP`)
-- [ ] T002 Run `npm run validate:i18n` to confirm all 15 locales pass after T001
+- [X] T001 Add 5 new i18n keys to all 15 locale files in `media/locales/*/messages.js`: `CYBERBRICK_LED_DIGITAL_PREFIX`, `CYBERBRICK_LED_DIGITAL_TOOLTIP`, `CYBERBRICK_LED_DIGITAL_ON`, `CYBERBRICK_LED_DIGITAL_OFF` (after `CYBERBRICK_LED_OFF_TOOLTIP`), and `X11_LED_DIGITAL_TOOLTIP` (after `X11_LED_SET_COLOR_TOOLTIP`)
+- [X] T002 Run `npm run validate:i18n` to confirm all 15 locales pass after T001
 
 **Checkpoint**: All 5 keys present in all 15 locales — ready for block and generator work.
 
@@ -34,9 +34,9 @@
 
 ### Implementation for User Story 1
 
-- [ ] T003 [P] [US1] Add `cyberbrick_led_digital` block definition to `media/blockly/blocks/cyberbrick.js` after the `cyberbrick_led_off` block: single `appendDummyInput` with prefix label + R/G/B FieldDropdown closures using `CYBERBRICK_LED_DIGITAL_*` keys, `setInputsInline(true)`, `setColour(160)`, `setPreviousStatement(true, null)`, `setNextStatement(true, null)`, default ON for all three channels
-- [ ] T004 [P] [US1] Add `cyberbrick_led_digital` MicroPython generator to `media/blockly/generators/micropython/cyberbrick.js` after `cyberbrick_led_set_color` generator: `addImport('from machine import Pin')`, `addImport('from neopixel import NeoPixel')`, `addHardwareInit('onboard_led', 'onboard_led = NeoPixel(Pin(8), 1)')`, map `getFieldValue('R_STATE') === 'ON' ? 255 : 0` for each channel, return `onboard_led[0] = (r, g, b)\nonboard_led.write()\n`
-- [ ] T005 [P] [US1] Add `cyberbrick_led_digital` toolbox entry to `media/toolbox/categories/cyberbrick_core.json` after the `cyberbrick_led_off` block entry: `{"kind": "block", "type": "cyberbrick_led_digital"}`
+- [X] T003 [P] [US1] Add `cyberbrick_led_digital` block definition to `media/blockly/blocks/cyberbrick.js` after the `cyberbrick_led_off` block: single `appendDummyInput` with prefix label + R/G/B FieldDropdown closures using `CYBERBRICK_LED_DIGITAL_*` keys, `setInputsInline(true)`, `setColour(160)`, `setPreviousStatement(true, null)`, `setNextStatement(true, null)`, default ON for all three channels
+- [X] T004 [P] [US1] Add `cyberbrick_led_digital` MicroPython generator to `media/blockly/generators/micropython/cyberbrick.js` after `cyberbrick_led_set_color` generator: `addImport('from machine import Pin')`, `addImport('from neopixel import NeoPixel')`, `addHardwareInit('onboard_led', 'onboard_led = NeoPixel(Pin(8), 1)')`, map `getFieldValue('R_STATE') === 'ON' ? 255 : 0` for each channel, return `onboard_led[0] = (r, g, b)\nonboard_led.write()\n`
+- [X] T005 [P] [US1] Add `cyberbrick_led_digital` toolbox entry to `media/toolbox/categories/cyberbrick_core.json` after the `cyberbrick_led_off` block entry: `{"kind": "block", "type": "cyberbrick_led_digital"}`
 
 **Checkpoint**: US1 independently functional — `cyberbrick_led_digital` block generates correct ON=255/OFF=0 code, appears in toolbox under CyberBrick board only.
 
@@ -50,10 +50,10 @@
 
 ### Implementation for User Story 2
 
-- [ ] T006 [US2] Add `getDigitalStateOptions()` helper function to `media/blockly/blocks/x11.js` following the same pattern as `getX11LedIndexOptions()`: returns `[[getMessage('CYBERBRICK_LED_DIGITAL_ON', 'ON'), 'ON'], [getMessage('CYBERBRICK_LED_DIGITAL_OFF', 'OFF'), 'OFF']]`
-- [ ] T007 [US2] Add `x11_led_digital` block definition to `media/blockly/blocks/x11.js` after `x11_led_set_color` block (depends on T006): single `appendDummyInput` reusing `X11_LED_PORT_OPTIONS` for PORT (default `'21'`), `getX11LedIndexOptions()` for INDEX (default `'0'`), `X11_LED_SET_COLOR_PREFIX` / `X11_LED_SET_COLOR_INDEX` / `X11_LED_SET_COLOR_INDEX_SUFFIX` labels, `getDigitalStateOptions()` for R_STATE/G_STATE/B_STATE, `setInputsInline(true)`, `setColour(180)`, `setPreviousStatement(true, null)`, `setNextStatement(true, null)`
-- [ ] T008 [P] [US2] Add `x11_led_digital` MicroPython generator to `media/blockly/generators/micropython/x11.js` after `x11_led_set_color` generator: read PORT/INDEX/R_STATE/G_STATE/B_STATE fields; `addImport` for Pin and NeoPixel; `addHardwareInit` for `np_d1` or `np_d2` based on PORT value; map state → `255`/`0`; emit `for i in range(4): np_<port>[i] = (r, g, b)` when INDEX=`'all'`, else `np_<port>[<index>] = (r, g, b)`; always emit `np_<port>.write()`
-- [ ] T009 [P] [US2] Add `x11_led_digital` toolbox entry to `media/toolbox/categories/cyberbrick_x11.json` after the `x11_led_set_color` block entry: `{"kind": "block", "type": "x11_led_digital"}`
+- [X] T006 [US2] Add `getDigitalStateOptions()` helper function to `media/blockly/blocks/x11.js` following the same pattern as `getX11LedIndexOptions()`: returns `[[getMessage('CYBERBRICK_LED_DIGITAL_ON', 'ON'), 'ON'], [getMessage('CYBERBRICK_LED_DIGITAL_OFF', 'OFF'), 'OFF']]`
+- [X] T007 [US2] Add `x11_led_digital` block definition to `media/blockly/blocks/x11.js` after `x11_led_set_color` block (depends on T006): single `appendDummyInput` reusing `X11_LED_PORT_OPTIONS` for PORT (default `'21'`), `getX11LedIndexOptions()` for INDEX (default `'0'`), `X11_LED_SET_COLOR_PREFIX` / `X11_LED_SET_COLOR_INDEX` / `X11_LED_SET_COLOR_INDEX_SUFFIX` labels, `getDigitalStateOptions()` for R_STATE/G_STATE/B_STATE, `setInputsInline(true)`, `setColour(180)`, `setPreviousStatement(true, null)`, `setNextStatement(true, null)`
+- [X] T008 [P] [US2] Add `x11_led_digital` MicroPython generator to `media/blockly/generators/micropython/x11.js` after `x11_led_set_color` generator: read PORT/INDEX/R_STATE/G_STATE/B_STATE fields; `addImport` for Pin and NeoPixel; `addHardwareInit` for `np_d1` or `np_d2` based on PORT value; map state → `255`/`0`; emit `for i in range(4): np_<port>[i] = (r, g, b)` when INDEX=`'all'`, else `np_<port>[<index>] = (r, g, b)`; always emit `np_<port>.write()`
+- [X] T009 [P] [US2] Add `x11_led_digital` toolbox entry to `media/toolbox/categories/cyberbrick_x11.json` after the `x11_led_set_color` block entry: `{"kind": "block", "type": "x11_led_digital"}`
 
 **Checkpoint**: US2 independently functional — `x11_led_digital` generates correct single-pixel and for-loop code for both D1 and D2.
 
@@ -74,10 +74,10 @@ US3 manual verification is included in the Polish phase (T012/T013).
 
 **Purpose**: Final validation across all acceptance scenarios and toolbox filtering.
 
-- [ ] T010 Run `npm run validate:i18n` (final confirmation — all 15 locales × 5 new keys pass)
-- [ ] T011 [P] Manual WebView test — `cyberbrick_led_digital` scenarios per [quickstart.md](quickstart.md) checklist items 1–6: toolbox visibility, R=ON/G=OFF/B=OFF → `(255, 0, 0)`, all ON → `(255, 255, 255)`, all OFF → `(0, 0, 0)` (spec SC-001, SC-003)
-- [ ] T012 [P] Manual WebView test — `x11_led_digital` scenarios per [quickstart.md](quickstart.md) checklist items 7–11: D1/INDEX=0 (displayed as "1")/all ON → single-pixel code `np_d1[0] = (255, 255, 255)`; INDEX=All → for-loop; D2 → np_d2 variable; toolbox visibility under X11 board (spec SC-001, SC-003, SC-004)
-- [ ] T013 Manual WebView test — teaching contrast and board switching per [quickstart.md](quickstart.md) item 12: both blocks coexist in workspace with correct 0/255 vs analogue values; switch to Arduino board → both blocks disappear from toolbox (spec SC-003, SC-005, US3)
+- [X] T010 Run `npm run validate:i18n` (final confirmation — all 15 locales × 5 new keys pass)
+- [X] T011 [P] Manual WebView test — `cyberbrick_led_digital` scenarios per [quickstart.md](quickstart.md) checklist items 1–6: toolbox visibility, R=ON/G=OFF/B=OFF → `(255, 0, 0)`, all ON → `(255, 255, 255)`, all OFF → `(0, 0, 0)` (spec SC-001, SC-003)
+- [X] T012 [P] Manual WebView test — `x11_led_digital` scenarios per [quickstart.md](quickstart.md) checklist items 7–11: D1/INDEX=0 (displayed as "1")/all ON → single-pixel code `np_d1[0] = (255, 255, 255)`; INDEX=All → for-loop; D2 → np_d2 variable; toolbox visibility under X11 board (spec SC-001, SC-003, SC-004)
+- [X] T013 Manual WebView test — teaching contrast and board switching per [quickstart.md](quickstart.md) item 12: both blocks coexist in workspace with correct 0/255 vs analogue values; switch to Arduino board → both blocks disappear from toolbox (spec SC-003, SC-005, US3)
 
 ---
 

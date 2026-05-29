@@ -921,6 +921,10 @@ window.languageManager.loadMessages('tr', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Dahili LED (GPIO8) rengini RGB değerleri (0-255) kullanarak ayarla',
 	CYBERBRICK_LED_OFF: "LED'i kapat",
 	CYBERBRICK_LED_OFF_TOOLTIP: "Dahili LED'i kapat",
+	CYBERBRICK_LED_DIGITAL_PREFIX: "Dahili LED'i ayarla (dijital)",
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Dahili LED kanallarını AÇIK veya KAPALI olarak ayarla',
+	CYBERBRICK_LED_DIGITAL_ON: 'AÇIK',
+	CYBERBRICK_LED_DIGITAL_OFF: 'KAPALI',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: "GPIO'yu ayarla",
@@ -1085,6 +1089,7 @@ window.languageManager.loadMessages('tr', {
 	X11_LED_SET_COLOR_INDEX: 'indeks',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'renk ayarla R',
 	X11_LED_SET_COLOR_TOOLTIP: 'LED şerit piksel rengini ayarla (indeks 0=ilk piksel veya tümü)',
+	X11_LED_DIGITAL_TOOLTIP: 'X11 LED şerit kanal durumlarını AÇIK veya KAPALI olarak ayarla',
 	X11_LED_INDEX_ALL: 'Tümü',
 
 	// === X12 Genişletme Kartı Verici ===

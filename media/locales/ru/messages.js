@@ -918,6 +918,10 @@ window.languageManager.loadMessages('ru', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'Установить цвет встроенного LED (GPIO8) используя значения RGB (0-255)',
 	CYBERBRICK_LED_OFF: 'Выключить LED',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'Выключить встроенный LED',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Установить встроенный LED (цифровой)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'Включить или выключить каналы встроенного LED',
+	CYBERBRICK_LED_DIGITAL_ON: 'ВКЛ',
+	CYBERBRICK_LED_DIGITAL_OFF: 'ВЫКЛ',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'Установить GPIO',
@@ -1081,6 +1085,7 @@ window.languageManager.loadMessages('ru', {
 	X11_LED_SET_COLOR_INDEX: 'индекс',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'установить цвет R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Установить цвет пикселя LED ленты (индекс 0=первый пиксель, или все)',
+	X11_LED_DIGITAL_TOOLTIP: 'Установить состояния каналов LED ленты X11 ВКЛ или ВЫКЛ',
 	X11_LED_INDEX_ALL: 'Все',
 
 	// === Плата расширения X12 Передатчик ===

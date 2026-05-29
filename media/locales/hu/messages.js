@@ -924,6 +924,10 @@ window.languageManager.loadMessages('hu', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: 'A beépített LED (GPIO8) színének beállítása RGB értékekkel (0-255)',
 	CYBERBRICK_LED_OFF: 'LED kikapcsolása',
 	CYBERBRICK_LED_OFF_TOOLTIP: 'A beépített LED kikapcsolása',
+	CYBERBRICK_LED_DIGITAL_PREFIX: 'Beépített LED beállítása (digitális)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: 'A beépített LED csatornáinak BE/KI kapcsolása',
+	CYBERBRICK_LED_DIGITAL_ON: 'BE',
+	CYBERBRICK_LED_DIGITAL_OFF: 'KI',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'GPIO beállítása',
@@ -1087,6 +1091,7 @@ window.languageManager.loadMessages('hu', {
 	X11_LED_SET_COLOR_INDEX: 'index',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'állítsd színre R',
 	X11_LED_SET_COLOR_TOOLTIP: 'Állítsd be a LED szalag pixel színét (index 0=első pixel, vagy mind)',
+	X11_LED_DIGITAL_TOOLTIP: 'X11 LED szalag csatorna állapotainak beállítása BE/KI',
 	X11_LED_INDEX_ALL: 'Mind',
 
 	// === X12 Bővítőkártya Adó ===

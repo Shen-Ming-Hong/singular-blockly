@@ -125,6 +125,32 @@
 		return code;
 	};
 
+	// === LED 燈條數位控制 ===
+	generator.forBlock['x11_led_digital'] = function (block) {
+		generator.addImport('from machine import Pin');
+		generator.addImport('from neopixel import NeoPixel');
+
+		const port = block.getFieldValue('PORT');
+		const index = block.getFieldValue('INDEX');
+		const r = block.getFieldValue('R_STATE') === 'ON' ? 255 : 0;
+		const g = block.getFieldValue('G_STATE') === 'ON' ? 255 : 0;
+		const b = block.getFieldValue('B_STATE') === 'ON' ? 255 : 0;
+
+		const portName = port === '21' ? 'd1' : 'd2';
+		generator.addHardwareInit(`np_${portName}`, `np_${portName} = NeoPixel(Pin(${port}), 4)`);
+
+		let code = '';
+		if (index === 'all') {
+			code += `for i in range(4):\n`;
+			code += `    np_${portName}[i] = (${r}, ${g}, ${b})\n`;
+		} else {
+			code += `np_${portName}[${index}] = (${r}, ${g}, ${b})\n`;
+		}
+		code += `np_${portName}.write()\n`;
+
+		return code;
+	};
+
 	// 記錄載入訊息
 	console.log('[blockly] X11 MicroPython 生成器已載入');
 })();

@@ -72,6 +72,21 @@
 		return code;
 	};
 
+	/**
+	 * 設定板載 LED (數位)
+	 */
+	generator.forBlock['cyberbrick_led_digital'] = function (block) {
+		generator.addImport('from machine import Pin');
+		generator.addImport('from neopixel import NeoPixel');
+		generator.addHardwareInit('onboard_led', 'onboard_led = NeoPixel(Pin(8), 1)');
+
+		const r = block.getFieldValue('R_STATE') === 'ON' ? 255 : 0;
+		const g = block.getFieldValue('G_STATE') === 'ON' ? 255 : 0;
+		const b = block.getFieldValue('B_STATE') === 'ON' ? 255 : 0;
+
+		return `onboard_led[0] = (${r}, ${g}, ${b})\nonboard_led.write()\n`;
+	};
+
 	// === GPIO 積木 ===
 
 	/**

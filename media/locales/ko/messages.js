@@ -914,6 +914,10 @@ window.languageManager.loadMessages('ko', {
 	CYBERBRICK_LED_SET_COLOR_TOOLTIP: '온보드 LED(GPIO8) 색상을 RGB 값(0-255)으로 설정',
 	CYBERBRICK_LED_OFF: 'LED 끄기',
 	CYBERBRICK_LED_OFF_TOOLTIP: '온보드 LED 끄기',
+	CYBERBRICK_LED_DIGITAL_PREFIX: '온보드 LED 설정 (디지털)',
+	CYBERBRICK_LED_DIGITAL_TOOLTIP: '온보드 LED 채널을 ON 또는 OFF로 설정',
+	CYBERBRICK_LED_DIGITAL_ON: '켜짐',
+	CYBERBRICK_LED_DIGITAL_OFF: '꺼짐',
 
 	// CyberBrick GPIO Blocks
 	CYBERBRICK_GPIO_SET: 'GPIO 설정',
@@ -1077,6 +1081,7 @@ window.languageManager.loadMessages('ko', {
 	X11_LED_SET_COLOR_INDEX: '인덱스',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: '색상 설정 R',
 	X11_LED_SET_COLOR_TOOLTIP: 'LED 스트립 픽셀 색상 설정 (인덱스 0=첫 번째, 또는 전체)',
+	X11_LED_DIGITAL_TOOLTIP: 'X11 LED 스트립 채널 상태를 ON 또는 OFF로 설정',
 	X11_LED_INDEX_ALL: '전체',
 
 	// === X12 송신기 확장 보드 ===

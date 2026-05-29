@@ -123,7 +123,13 @@ function getX11LedIndexOptions() {
 		[window.languageManager.getMessage('X11_LED_INDEX_ALL', '全部'), 'all'],
 	];
 }
-
+// === LED 燈條數位控制選項 ===
+function getDigitalStateOptions() {
+	return [
+		[window.languageManager.getMessage('CYBERBRICK_LED_DIGITAL_ON', 'ON'), 'ON'],
+		[window.languageManager.getMessage('CYBERBRICK_LED_DIGITAL_OFF', 'OFF'), 'OFF'],
+	];
+}
 // === LED 燈條設定顏色 ===
 Blockly.Blocks['x11_led_set_color'] = {
 	init: function () {
@@ -146,6 +152,30 @@ Blockly.Blocks['x11_led_set_color'] = {
 		this.setNextStatement(true, null);
 		this.setColour(180);
 		this.setTooltip(window.languageManager.getMessage('X11_LED_SET_COLOR_TOOLTIP', '設定 WS2812 LED 燈條顏色，R/G/B 範圍 0-255'));
+		this.setHelpUrl('');
+	},
+};
+
+// === LED 燈條數位控制 ===
+Blockly.Blocks['x11_led_digital'] = {
+	init: function () {
+		this.appendDummyInput()
+			.appendField(window.languageManager.getMessage('X11_LED_SET_COLOR_PREFIX', 'LED 燈條'))
+			.appendField(new Blockly.FieldDropdown(X11_LED_PORT_OPTIONS), 'PORT')
+			.appendField(window.languageManager.getMessage('X11_LED_SET_COLOR_INDEX', '第'))
+			.appendField(new Blockly.FieldDropdown(getX11LedIndexOptions), 'INDEX')
+			.appendField(window.languageManager.getMessage('X11_LED_SET_COLOR_INDEX_SUFFIX', '顏'))
+			.appendField('R')
+			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'R_STATE')
+			.appendField('G')
+			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'G_STATE')
+			.appendField('B')
+			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'B_STATE');
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour(180);
+		this.setTooltip(window.languageManager.getMessage('X11_LED_DIGITAL_TOOLTIP', '設定 X11 LED 燈條各通道狀態為開或關'));
 		this.setHelpUrl('');
 	},
 };
