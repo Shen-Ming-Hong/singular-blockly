@@ -69,6 +69,8 @@ export interface UploadError {
 	message: string;
 	/** 技術細節 */
 	details?: string;
+	/** 錯誤碼（OTA 路徑使用） */
+	errorCode?: string | null;
 }
 
 /**

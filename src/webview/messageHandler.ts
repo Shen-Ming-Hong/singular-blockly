@@ -22,6 +22,11 @@ import { fetchSampleIndex, fetchSampleWorkspace, validateSampleWorkspace, applyN
 import { TxtConnectionService } from '../services/txtConnectionService';
 import { TxtUploader } from '../services/txtUploader';
 import { TxtTestService } from '../services/txtTestService';
+import { CyberBrickUploadSettingsService } from '../services/cyberbrickUploadSettingsService';
+import { CyberBrickOtaProvisioningService } from '../services/cyberbrickOtaProvisioningService';
+import { CyberBrickOtaUploader } from '../services/cyberbrickOtaUploader';
+import { createCyberBrickUploadError, classifyCyberBrickUploadError } from '../services/cyberbrickUploadErrors';
+import { PairedCyberBrickDevice } from '../types/cyberbrickUpload';
 import {
 	createTxtVirtualControlRuntimeService,
 	TxtVirtualControlRuntimeService,
@@ -91,6 +96,9 @@ export class WebViewMessageHandler {
 	private txtVirtualControlSession: VirtualControlRuntimeSession | null = null;
 	private txtVirtualControlPressedStates: Record<string, boolean> = {};
 	private txtExecutionOperationSeq = 0;
+	private cyberBrickUploadSettingsService: CyberBrickUploadSettingsService | null = null;
+	private cyberBrickOtaProvisioningService: CyberBrickOtaProvisioningService | null = null;
+	private cyberBrickOtaUploader: CyberBrickOtaUploader | null = null;
 	private activeTxtExecutionOperationId: string | null = null;
 	private stoppingTxtExecutionOperationIds = new Set<string>();
 	private pendingBoardConfigRequests = new Map<
@@ -115,8 +123,15 @@ export class WebViewMessageHandler {
 		private panel: vscode.WebviewPanel,
 		private localeService: LocaleService,
 		fileService?: FileService,
-		settingsManager?: SettingsManager
+		settingsManager?: SettingsManager,
+		cyberBrickUploadSettingsService?: CyberBrickUploadSettingsService,
+		cyberBrickOtaProvisioningService?: CyberBrickOtaProvisioningService,
+		cyberBrickOtaUploader?: CyberBrickOtaUploader
 	) {
+		this.cyberBrickUploadSettingsService = cyberBrickUploadSettingsService ?? null;
+		this.cyberBrickOtaProvisioningService = cyberBrickOtaProvisioningService ?? null;
+		this.cyberBrickOtaUploader = cyberBrickOtaUploader ?? null;
+
 		if (fileService && settingsManager) {
 			// 測試環境：使用注入的 services
 			this.fileService = fileService;
@@ -131,6 +146,13 @@ export class WebViewMessageHandler {
 			const workspaceRoot = workspaceFolders[0].uri.fsPath;
 			this.fileService = new FileService(workspaceRoot);
 			this.settingsManager = new SettingsManager(workspaceRoot);
+			this.cyberBrickUploadSettingsService = new CyberBrickUploadSettingsService(this.context, workspaceFolders[0].uri);
+			const micropythonUploader = new MicropythonUploader(workspaceRoot);
+			this.cyberBrickOtaProvisioningService = new CyberBrickOtaProvisioningService(
+				this.cyberBrickUploadSettingsService,
+				micropythonUploader
+			);
+			this.cyberBrickOtaUploader = new CyberBrickOtaUploader(this.cyberBrickUploadSettingsService);
 
 			// 初始化 Serial Monitor 服務
 			this.serialMonitorService = new SerialMonitorService(workspaceRoot);
@@ -158,6 +180,22 @@ export class WebViewMessageHandler {
 				this.txtConnectionService,
 				this.context.extensionUri
 			);
+		}
+
+		if (!this.cyberBrickUploadSettingsService && this.context?.secrets && vscodeApi.workspace.workspaceFolders?.[0]) {
+			this.cyberBrickUploadSettingsService = new CyberBrickUploadSettingsService(
+				this.context,
+				vscodeApi.workspace.workspaceFolders[0].uri
+			);
+		}
+		if (this.cyberBrickUploadSettingsService && !this.cyberBrickOtaProvisioningService && vscodeApi.workspace.workspaceFolders?.[0]) {
+			this.cyberBrickOtaProvisioningService = new CyberBrickOtaProvisioningService(
+				this.cyberBrickUploadSettingsService,
+				new MicropythonUploader(vscodeApi.workspace.workspaceFolders[0].uri.fsPath)
+			);
+		}
+		if (this.cyberBrickUploadSettingsService && !this.cyberBrickOtaUploader) {
+			this.cyberBrickOtaUploader = new CyberBrickOtaUploader(this.cyberBrickUploadSettingsService);
 		}
 	}
 
@@ -235,6 +273,33 @@ export class WebViewMessageHandler {
 					break;
 				case 'requestPortList':
 					await this.handleRequestPortList(message);
+					break;
+				case 'cyberbrickUploadSettingsLoad':
+					await this.handleCyberBrickUploadSettingsLoad(message);
+					break;
+				case 'cyberbrickUploadSettingsSave':
+					await this.handleCyberBrickUploadSettingsSave(message);
+					break;
+				case 'cyberbrickUsbPortsRequest':
+					await this.handleCyberBrickUsbPortsRequest(message);
+					break;
+				case 'cyberbrickWifiScanRequest':
+					await this.handleCyberBrickWifiScanRequest(message);
+					break;
+				case 'cyberbrickOtaProvisionRequest':
+					await this.handleCyberBrickOtaProvisionRequest(message);
+					break;
+				case 'cyberbrickOtaReadinessRequest':
+					await this.handleCyberBrickOtaReadinessRequest(message);
+					break;
+				case 'cyberbrickOtaUploadRequest':
+					await this.handleCyberBrickOtaUploadRequest(message);
+					break;
+				case 'cyberbrickOtaCleanupRequest':
+					await this.handleCyberBrickOtaCleanupRequest(message);
+					break;
+				case 'cyberbrickPairedDeviceDeleteRequest':
+					await this.handleCyberBrickPairedDeviceDeleteRequest(message);
 					break;
 				// Serial Monitor 功能
 				case 'startMonitor':
@@ -1609,6 +1674,199 @@ export class WebViewMessageHandler {
 
 	// ===== 統一上傳功能 - CyberBrick MicroPython & Arduino C++ =====
 
+	private getCyberBrickUploadSettingsService(): CyberBrickUploadSettingsService {
+		if (!this.cyberBrickUploadSettingsService) {
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+			if (!workspaceFolders?.[0] || !this.context?.secrets) {
+				throw createCyberBrickUploadError('workspace-missing');
+			}
+			this.cyberBrickUploadSettingsService = new CyberBrickUploadSettingsService(this.context, workspaceFolders[0].uri);
+		}
+		return this.cyberBrickUploadSettingsService;
+	}
+
+	private getCyberBrickOtaProvisioningService(): CyberBrickOtaProvisioningService {
+		if (!this.cyberBrickOtaProvisioningService) {
+			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
+			if (!workspaceFolders?.[0]) {
+				throw createCyberBrickUploadError('workspace-missing');
+			}
+			this.cyberBrickOtaProvisioningService = new CyberBrickOtaProvisioningService(
+				this.getCyberBrickUploadSettingsService(),
+				new MicropythonUploader(workspaceFolders[0].uri.fsPath)
+			);
+		}
+		return this.cyberBrickOtaProvisioningService;
+	}
+
+	private getCyberBrickOtaUploader(): CyberBrickOtaUploader {
+		if (!this.cyberBrickOtaUploader) {
+			this.cyberBrickOtaUploader = new CyberBrickOtaUploader(this.getCyberBrickUploadSettingsService());
+		}
+		return this.cyberBrickOtaUploader;
+	}
+
+	private async handleCyberBrickUploadSettingsLoad(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || {};
+			if (payload.board && payload.board !== 'cyberbrick') {
+				this.postCyberBrickResponse('cyberbrickUploadSettingsLoaded', message, false, undefined, createCyberBrickUploadError('invalid-settings'));
+				return;
+			}
+
+			const service = this.getCyberBrickUploadSettingsService();
+			const panelState = await service.buildPanelState();
+			panelState.readiness = await service.buildOtaReadinessStatus();
+			this.postCyberBrickResponse('cyberbrickUploadSettingsLoaded', message, true, panelState);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickUploadSettingsLoaded', message, false, undefined, classifyCyberBrickUploadError(error));
+		}
+	}
+
+	private async handleCyberBrickUploadSettingsSave(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || message || {};
+			const service = this.getCyberBrickUploadSettingsService();
+			const current = await service.loadSettings();
+			const primaryDeviceId = typeof payload.primaryDeviceId === 'string' && payload.primaryDeviceId.trim()
+				? payload.primaryDeviceId.trim()
+				: undefined;
+			const friendlyNameUpdates = new Map<string, string>();
+			if (Array.isArray(payload.pairedDeviceUpdates)) {
+				for (const update of payload.pairedDeviceUpdates) {
+					if (!update || typeof update !== 'object') {
+						continue;
+					}
+					const deviceId = typeof update.deviceId === 'string' ? update.deviceId.trim() : '';
+					const friendlyName = typeof update.friendlyName === 'string' ? update.friendlyName.trim() : '';
+					if (deviceId && friendlyName) {
+						friendlyNameUpdates.set(deviceId, friendlyName);
+					}
+				}
+			}
+
+			const pairedDevices: PairedCyberBrickDevice[] = current.pairedDevices.map(device => ({
+				...device,
+				...(friendlyNameUpdates.has(device.deviceId) ? { friendlyName: friendlyNameUpdates.get(device.deviceId)! } : {}),
+			}));
+
+			await service.saveSettings({
+				primaryDeviceId,
+				pairedDevices,
+			});
+			const panelState = await service.buildPanelState();
+			panelState.readiness = await service.buildOtaReadinessStatus();
+			this.postCyberBrickResponse('cyberbrickUploadSettingsSaved', message, true, panelState);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickUploadSettingsSaved', message, false, undefined, classifyCyberBrickUploadError(error));
+		}
+	}
+
+	private async handleCyberBrickUsbPortsRequest(message: any): Promise<void> {
+		try {
+			const service = this.getCyberBrickOtaProvisioningService();
+			const result = await service.listUsbPorts();
+			this.postCyberBrickResponse('cyberbrickUsbPortsResult', message, true, result);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickUsbPortsResult', message, false, undefined, classifyCyberBrickUploadError(error));
+		}
+	}
+
+	private async handleCyberBrickWifiScanRequest(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || message || {};
+			const usbPort = typeof payload.usbPort === 'string' ? payload.usbPort : typeof payload.port === 'string' ? payload.port : '';
+			if (!usbPort.trim()) {
+				this.postCyberBrickResponse('cyberbrickWifiScanResult', message, false, undefined, createCyberBrickUploadError('usb-port-missing'));
+				return;
+			}
+			this.postCyberBrickResponse('cyberbrickWifiScanProgress', message, true, {
+				port: usbPort,
+				startedAt: new Date().toISOString(),
+				networks: [],
+			});
+			const session = await this.getCyberBrickOtaProvisioningService().scanWifi(usbPort);
+			this.postCyberBrickResponse('cyberbrickWifiScanResult', message, !session.error, session, session.error);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickWifiScanResult', message, false, undefined, classifyCyberBrickUploadError(error, 'wifi-scan-failed'));
+		}
+	}
+
+	private async handleCyberBrickOtaProvisionRequest(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || message || {};
+			const { result, panelState } = await this.getCyberBrickOtaProvisioningService().provision(payload, step => {
+				this.postCyberBrickResponse('cyberbrickOtaProvisionProgress', message, true, step);
+			});
+			panelState.readiness = await this.getCyberBrickUploadSettingsService().buildOtaReadinessStatus();
+			this.postCyberBrickResponse('cyberbrickOtaProvisionResult', message, result.success, { ...result, panelState }, result.error);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickOtaProvisionResult', message, false, undefined, classifyCyberBrickUploadError(error, 'provisioning-failed'));
+		}
+	}
+
+	private async handleCyberBrickOtaReadinessRequest(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || message || {};
+			const deviceId = typeof payload.deviceId === 'string' ? payload.deviceId : undefined;
+			const readiness = await this.getCyberBrickOtaUploader().checkReadiness(deviceId);
+			this.postCyberBrickResponse('cyberbrickOtaReadinessResult', message, true, readiness);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickOtaReadinessResult', message, false, undefined, classifyCyberBrickUploadError(error));
+		}
+	}
+
+	private async handleCyberBrickOtaUploadRequest(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || message || {};
+			const run = await this.getCyberBrickOtaUploader().upload(payload, progress => {
+				this.postCyberBrickResponse('cyberbrickOtaUploadProgress', message, true, progress);
+			});
+			this.postCyberBrickResponse('cyberbrickOtaUploadResult', message, run.status === 'succeeded', run, run.error);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickOtaUploadResult', message, false, undefined, classifyCyberBrickUploadError(error, 'ota-upload-failed'));
+		}
+	}
+
+	private async handleCyberBrickOtaCleanupRequest(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || message || {};
+			const { result, panelState } = await this.getCyberBrickOtaProvisioningService().removeOtaArtifacts(payload);
+			panelState.readiness = await this.getCyberBrickUploadSettingsService().buildOtaReadinessStatus();
+			this.postCyberBrickResponse('cyberbrickOtaCleanupResult', message, result.success, { ...result, panelState }, result.error);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickOtaCleanupResult', message, false, undefined, classifyCyberBrickUploadError(error, 'ota-cleanup-failed'));
+		}
+	}
+
+	private async handleCyberBrickPairedDeviceDeleteRequest(message: any): Promise<void> {
+		try {
+			const payload = message?.payload || message || {};
+			const deviceId = typeof payload.deviceId === 'string' ? payload.deviceId.trim() : '';
+			if (!deviceId) {
+				this.postCyberBrickResponse('cyberbrickPairedDeviceDeleteResult', message, false, undefined, createCyberBrickUploadError('device-not-paired'));
+				return;
+			}
+			const service = this.getCyberBrickUploadSettingsService();
+			await service.deletePairedDevice(deviceId);
+			const panelState = await service.buildPanelState();
+			panelState.readiness = await service.buildOtaReadinessStatus();
+			this.postCyberBrickResponse('cyberbrickPairedDeviceDeleteResult', message, true, panelState);
+		} catch (error) {
+			this.postCyberBrickResponse('cyberbrickPairedDeviceDeleteResult', message, false, undefined, classifyCyberBrickUploadError(error));
+		}
+	}
+
+	private postCyberBrickResponse(command: string, originalMessage: any, success: boolean, payload?: unknown, error?: unknown): void {
+		this.panel.webview.postMessage({
+			command,
+			requestId: originalMessage?.requestId,
+			success,
+			...(payload !== undefined ? { payload } : {}),
+			...(error ? { error } : {}),
+		});
+	}
+
 	/**
 	 * 處理上傳請求
 	 * 根據板子類型路由到對應的上傳服務
@@ -1668,6 +1926,7 @@ export class WebViewMessageHandler {
 
 	/**
 	 * 處理 MicroPython 上傳（CyberBrick）
+	 * 先偵測 USB，若無 USB 裝置則嘗試 OTA（需有配對主要裝置），否則回報找不到裝置。
 	 * @param workspaceRoot 工作區根目錄
 	 * @param message 上傳請求訊息
 	 */
@@ -1675,18 +1934,64 @@ export class WebViewMessageHandler {
 		const uploader = new MicropythonUploader(workspaceRoot);
 
 		try {
-			const result = await uploader.upload(
-				{
-					code: message.code,
-					board: message.board,
-					port: message.port,
-				},
-				(progress: UploadProgress) => {
-					this.sendUploadProgress(progress);
-				}
-			);
+			// 先偵測 USB 連線（若已明確指定 port 則直接使用）
+			let usbPort: string | undefined = message.port;
+			if (!usbPort) {
+				const { autoDetected } = await uploader.listPorts('cyberbrick');
+				usbPort = autoDetected;
+			}
 
-			this.sendUploadResult(result);
+			if (usbPort) {
+				// USB 路徑：直接上傳
+				const result = await uploader.upload(
+					{ code: message.code, board: message.board, port: usbPort },
+					(progress: UploadProgress) => { this.sendUploadProgress(progress); }
+				);
+				this.sendUploadResult(result);
+				return;
+			}
+
+			// 無 USB — 嘗試 OTA（若已配對主要裝置）
+			if (this.cyberBrickUploadSettingsService) {
+				const settings = await this.cyberBrickUploadSettingsService.loadSettings();
+				const hasPrimary = settings.primaryDeviceId &&
+					settings.pairedDevices.some(d => d.deviceId === settings.primaryDeviceId);
+				if (hasPrimary) {
+					// OTA 路徑：呼叫 OTA uploader，進度與結果統一用 uploadProgress/uploadResult
+					const otaUploader = this.getCyberBrickOtaUploader();
+					const run = await otaUploader.upload(
+						{ board: message.board as 'cyberbrick', code: message.code },
+						(otaRun) => {
+							this.sendUploadProgress({
+								stage: (otaRun.status === 'succeeded' ? 'completed' :
+									   otaRun.status === 'failed' ? 'failed' : 'uploading') as any,
+								progress: otaRun.progress,
+								message: otaRun.stageMessage,
+							});
+						}
+					);
+					this.sendUploadResult({
+						success: run.status === 'succeeded',
+						timestamp: run.startedAt,
+						port: 'ota',
+						duration: run.duration ?? 0,
+						...(run.error ? { error: { stage: 'uploading', message: run.error.message, errorCode: run.errorCode } } : {}),
+					});
+					return;
+				}
+			}
+
+			// 無 USB 且無已配對 OTA 裝置
+			this.sendUploadResult({
+				success: false,
+				timestamp: new Date().toISOString(),
+				port: 'unknown',
+				duration: 0,
+				error: {
+					stage: 'connecting',
+					message: 'CyberBrick device not found. Please connect via USB or set up OTA pairing.',
+				},
+			});
 		} catch (error) {
 			log('[blockly] MicroPython 上傳過程發生未預期錯誤', 'error', error);
 			this.sendUploadResult({
