@@ -8,10 +8,13 @@ import * as crypto from 'crypto';
 import { log } from './logging';
 import { CyberBrickUploadSettingsService } from './cyberbrickUploadSettingsService';
 import { createCyberBrickUploadError, classifyCyberBrickUploadError } from './cyberbrickUploadErrors';
-import { withCyberBrickRcMainOtaBootstrap } from './cyberbrickOtaAgentSource';
+import { withCyberBrickRcMainOtaBootstrap, buildCyberBrickOtaAgentSource, CyberBrickOtaAgentConfig } from './cyberbrickOtaAgentSource';
 import {
 	CYBERBRICK_OTA_PROTOCOL_VERSION,
 	CYBERBRICK_OTA_REMOTE_PATH,
+	CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+	CYBERBRICK_OTA_RESET_MIN_VERSION,
+	CYBERBRICK_OTA_UPLOAD_AGENT_MIN_VERSION,
 	CyberBrickReadinessCode,
 	CyberBrickUploadErrorCode,
 	OtaReadinessCheck,
@@ -21,6 +24,47 @@ import {
 	PairedCyberBrickDevice,
 } from '../types/cyberbrickUpload';
 
+	export { CYBERBRICK_OTA_AGENT_TARGET_VERSION, CYBERBRICK_OTA_RESET_MIN_VERSION, CYBERBRICK_OTA_UPLOAD_AGENT_MIN_VERSION };
+
+const PRE_UPLOAD_RESET_RECOVERY_TIMEOUT_MS = 8000;
+const PRE_UPLOAD_RESET_INITIAL_DELAY_MS = 250;
+const PRE_UPLOAD_RESET_RETRY_INTERVAL_MS = 100;
+const PRE_UPLOAD_RESET_HEALTH_TIMEOUT_MS = 500;
+const PREFLIGHT_RESPONSE_WINDOW_MIN_TIMEOUT_MS = 250;
+const PREFLIGHT_RESPONSE_WINDOW_MAX_TIMEOUT_MS = 1500;
+const PREFLIGHT_RESPONSE_WINDOW_MIN_RETRY_INTERVAL_MS = 50;
+const PREFLIGHT_RESPONSE_WINDOW_MAX_RETRY_INTERVAL_MS = 100;
+const PREFLIGHT_RESPONSE_WINDOW_MAX_REQUEST_TIMEOUT_MS = 400;
+const DIRECT_UPLOAD_WINDOW_TIMEOUT_MS = 2000;
+
+/**
+ * Parses a semver string into a [major, minor, patch] tuple.
+ * Returns [0, 0, 0] for undefined or invalid input.
+ */
+export function parseAgentVersion(version: string | undefined): [number, number, number] {
+	if (!version) {
+		return [0, 0, 0];
+	}
+	const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version);
+	if (!match) {
+		return [0, 0, 0];
+	}
+	return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+}
+
+/**
+ * Compares two agent version strings.
+ * Returns negative if a < b, 0 if equal, positive if a > b.
+ * Undefined or invalid versions are treated as "0.0.0".
+ */
+export function compareAgentVersion(a: string | undefined, b: string): number {
+	const [aMaj, aMin, aPatch] = parseAgentVersion(a);
+	const [bMaj, bMin, bPatch] = parseAgentVersion(b);
+	if (aMaj !== bMaj) { return aMaj - bMaj; }
+	if (aMin !== bMin) { return aMin - bMin; }
+	return aPatch - bPatch;
+}
+
 export interface CyberBrickHttpResponse {
 	ok: boolean;
 	status: number;
@@ -28,13 +72,15 @@ export interface CyberBrickHttpResponse {
 	text(): Promise<string>;
 }
 
-export type CyberBrickFetch = (url: string, init?: { method?: string; headers?: Record<string, string>; body?: string | Buffer | Uint8Array }) => Promise<CyberBrickHttpResponse>;
+export type CyberBrickFetch = (url: string, init?: { method?: string; headers?: Record<string, string>; body?: string | Buffer | Uint8Array; signal?: AbortSignal }) => Promise<CyberBrickHttpResponse>;
 
 export interface CyberBrickOtaUploaderOptions {
 	now?: () => Date;
 	fetch?: CyberBrickFetch;
 	healthTimeoutMs?: number;
 	uploadTimeoutMs?: number;
+	retryIntervalMs?: number;
+	postUpgradeRecoveryTimeoutMs?: number;
 	operationIdFactory?: () => string;
 }
 
@@ -63,6 +109,8 @@ export class CyberBrickOtaUploader {
 	private readonly fetchImpl: CyberBrickFetch;
 	private readonly healthTimeoutMs: number;
 	private readonly uploadTimeoutMs: number;
+	private readonly retryIntervalMs: number;
+	private readonly postUpgradeRecoveryTimeoutMs: number;
 	private readonly operationIdFactory: () => string;
 
 	constructor(private readonly settingsService: CyberBrickUploadSettingsService, options: CyberBrickOtaUploaderOptions = {}) {
@@ -70,6 +118,8 @@ export class CyberBrickOtaUploader {
 		this.fetchImpl = options.fetch ?? this.getGlobalFetch();
 		this.healthTimeoutMs = options.healthTimeoutMs ?? 5000;
 		this.uploadTimeoutMs = options.uploadTimeoutMs ?? 30000;
+		this.retryIntervalMs = options.retryIntervalMs ?? 1000;
+		this.postUpgradeRecoveryTimeoutMs = options.postUpgradeRecoveryTimeoutMs ?? 15000;
 		this.operationIdFactory = options.operationIdFactory ?? (() => `cyberbrick-ota-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`);
 	}
 
@@ -91,41 +141,13 @@ export class CyberBrickOtaUploader {
 
 		try {
 			const health = await this.fetchHealth(baseline.device, token);
-			const checks = [...baseline.checks.filter(check => check.code !== 'ok')];
-			if (health.deviceId !== baseline.device.deviceId) {
-				checks.push({
-					code: 'identity-mismatch',
-					ok: false,
-					message: 'The responding CyberBrick identity does not match the selected target.',
-					nextActions: ['Choose the correct CyberBrick target or run USB-first setup again.'],
-				});
-			}
-			if (health.protocolVersion !== CYBERBRICK_OTA_PROTOCOL_VERSION || health.appPath !== CYBERBRICK_OTA_REMOTE_PATH) {
-				checks.push({
-					code: 'agent-outdated',
-					ok: false,
-					message: 'The CyberBrick OTA agent does not support the required protocol.',
-					nextActions: ['Run USB-first OTA setup again to update the agent.'],
-				});
-			}
-			if (health.status && health.status !== 'ready') {
-				checks.push({
-					code: 'agent-health-failed',
-					ok: false,
-					message: `CyberBrick OTA agent status is ${health.status}.`,
-					nextActions: ['Retry after the device is ready, or manually switch to USB.'],
-				});
-			}
+			const checks = this.buildChecksFromHealth(baseline.device, baseline.checks, health);
+			const liveDevice = checks.length === 0 ? this.withHealthMetadata(baseline.device, health, 'ready') : baseline.device;
 			if (checks.length === 0) {
 				checks.push({ code: 'ok', ok: true, message: 'CyberBrick is ready for OTA upload.', nextActions: [] });
-				await this.settingsService.updateDeviceMetadata(baseline.device.deviceId, {
-					lastSeenAt: this.nowIso(),
-					...(health.ipAddress ? { lastKnownIp: health.ipAddress } : {}),
-					...(health.agentVersion ? { agentVersion: health.agentVersion } : {}),
-					statusSummary: 'ready',
-				});
+				await this.settingsService.updateDeviceMetadata(baseline.device.deviceId, this.metadataFromLiveDevice(liveDevice));
 			}
-			return this.toReadinessStatus(baseline.device, checks);
+			return this.toReadinessStatus(liveDevice, checks);
 		} catch (error) {
 			return this.withAdditionalCheck(baseline, {
 				code: this.classifyNetworkCode(error),
@@ -149,13 +171,67 @@ export class CyberBrickOtaUploader {
 			return this.failRun(run, 'code-empty', 'Generated code is empty.');
 		}
 
-		const readiness = await this.checkReadiness(request.deviceId);
+		let readiness = await this.checkReadiness(request.deviceId);
+		let recoveredHealth: HealthResponse | null = null;
+		if ((!readiness.ready || !readiness.device) && readiness.device) {
+			const recoveryToken = await this.settingsService.getDeviceSecret(readiness.device.deviceId, 'otaToken');
+			if (recoveryToken && this.shouldAttemptPreflightRecovery(readiness)) {
+				const preflightRecoveryTimeoutMs = Math.min(Math.max(this.healthTimeoutMs, PREFLIGHT_RESPONSE_WINDOW_MIN_TIMEOUT_MS), PREFLIGHT_RESPONSE_WINDOW_MAX_TIMEOUT_MS);
+				const preflightRecoveryIntervalMs = Math.min(Math.max(this.retryIntervalMs, PREFLIGHT_RESPONSE_WINDOW_MIN_RETRY_INTERVAL_MS), PREFLIGHT_RESPONSE_WINDOW_MAX_RETRY_INTERVAL_MS);
+				const preflightRequestTimeoutMs = Math.min(this.healthTimeoutMs, PREFLIGHT_RESPONSE_WINDOW_MAX_REQUEST_TIMEOUT_MS);
+				run = this.createRun(
+					operationId,
+					startedAt,
+					'connecting',
+					12,
+					'CyberBrick OTA agent is busy; briefly checking for a response window...',
+					readiness.device,
+				);
+				onProgress?.(run);
+				recoveredHealth = await this.waitForAgentHealth(
+					readiness.device,
+					recoveryToken,
+					preflightRecoveryTimeoutMs,
+					preflightRecoveryIntervalMs,
+					0,
+					preflightRequestTimeoutMs,
+				);
+				if (recoveredHealth) {
+					const recoveredChecks = this.buildChecksFromHealth(
+						readiness.device,
+						this.clearTransientPreflightChecks(readiness.checks),
+						recoveredHealth,
+					);
+					const recoveredDevice = recoveredChecks.length === 0 ? this.withHealthMetadata(readiness.device, recoveredHealth, 'ready') : readiness.device;
+					if (recoveredChecks.length === 0) {
+						await this.settingsService.updateDeviceMetadata(recoveredDevice.deviceId, this.metadataFromLiveDevice(recoveredDevice));
+					}
+					readiness = this.toReadinessStatus(
+						recoveredDevice,
+						recoveredChecks.length > 0 ? recoveredChecks : [{ code: 'ok', ok: true, message: 'CyberBrick is ready for OTA upload.', nextActions: [] }],
+					);
+				} else if (this.shouldContinueWithOptimisticUpload(readiness)) {
+					log('CyberBrick OTA preflight health probe missed the current response window; continuing with an optimistic upload attempt', 'info', {
+						deviceId: readiness.device.deviceId,
+						lastKnownIp: readiness.device.lastKnownIp,
+						storedAgentVersion: readiness.device.agentVersion ?? 'unknown',
+						timeoutMs: preflightRecoveryTimeoutMs,
+					});
+					readiness = this.toReadinessStatus(readiness.device, [{
+						code: 'ok',
+						ok: true,
+						message: 'Proceeding with the last known CyberBrick OTA endpoint after a transient health timeout.',
+						nextActions: [],
+					}]);
+				}
+			}
+		}
 		if (!readiness.ready || !readiness.device) {
 			const code = readiness.blockingReasons[0] || 'invalid-settings';
 			return this.failRun(run, code, readiness.checks.find(check => !check.ok)?.message || 'CyberBrick OTA readiness failed.');
 		}
 
-		const device = readiness.device;
+		let device = readiness.device;
 		const token = await this.settingsService.getDeviceSecret(device.deviceId, 'otaToken');
 		if (!token) {
 			return this.failRun(run, 'missing-ota-token', 'The selected CyberBrick is missing its OTA token.', device);
@@ -164,8 +240,69 @@ export class CyberBrickOtaUploader {
 		run = this.createRun(operationId, startedAt, 'connecting', 20, 'Connecting to CyberBrick OTA agent...', device);
 		onProgress?.(run);
 
+		let finalAgentVersion: string | undefined;
 		try {
-			await this.fetchHealth(device, token);
+			const liveAgentVersion = device.agentVersion;
+			finalAgentVersion = liveAgentVersion;
+			const belowMinimum = compareAgentVersion(liveAgentVersion, CYBERBRICK_OTA_UPLOAD_AGENT_MIN_VERSION) < 0;
+			const needsUpgrade = compareAgentVersion(liveAgentVersion, CYBERBRICK_OTA_AGENT_TARGET_VERSION) < 0;
+			log('CyberBrick OTA agent version decision', 'info', {
+				deviceId: device.deviceId,
+				liveAgentVersion: liveAgentVersion ?? 'unknown',
+				minVersion: CYBERBRICK_OTA_UPLOAD_AGENT_MIN_VERSION,
+				targetVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+				belowMinimum,
+				decision: needsUpgrade ? 'upgrade' : 'skip',
+			});
+
+			// 優先嘗試升級 OTA agent；不論目前版本是否低於 MIN，失敗都不阻擋主程式上傳。
+			if (needsUpgrade) {
+				const agentUpgradeRun = this.createRun(
+					operationId,
+					startedAt,
+					'upgrading_agent',
+					30,
+					`Upgrading CyberBrick OTA agent ${liveAgentVersion ?? 'unknown'} → ${CYBERBRICK_OTA_AGENT_TARGET_VERSION}...`,
+					device,
+				);
+				onProgress?.(agentUpgradeRun);
+				const agentConfig: CyberBrickOtaAgentConfig = {
+					deviceId: device.deviceId,
+					otaToken: token,
+					otaPort: device.otaPort ?? 8266,
+				};
+				const upgradeResult = await this.upgradeAgentOverWifi(device, token, agentConfig);
+				if (upgradeResult === 'upgraded') {
+					finalAgentVersion = CYBERBRICK_OTA_AGENT_TARGET_VERSION;
+					const agentUpgradedRun = this.createRun(
+						operationId,
+						startedAt,
+						'agent_upgraded',
+						45,
+						`CyberBrick OTA agent upgraded to ${CYBERBRICK_OTA_AGENT_TARGET_VERSION}.`,
+						device,
+					);
+					onProgress?.(agentUpgradedRun);
+				} else {
+					// FR-007a: upgrade failure → warn and continue upload
+					log('OTA agent upgrade failed, continuing with upload', 'warn', {
+						deviceId: device.deviceId,
+						liveAgentVersion: liveAgentVersion ?? 'unknown',
+						belowMinimum,
+					});
+					const warningRun = this.createRun(
+						operationId,
+						startedAt,
+						'agent_upgrade_needed',
+						45,
+						`CyberBrick OTA agent upgrade ${liveAgentVersion ?? 'unknown'} → ${CYBERBRICK_OTA_AGENT_TARGET_VERSION} failed; continuing with program upload.`,
+						device,
+					);
+					warningRun.errorCode = 'agent-upgrade-failed';
+					onProgress?.(warningRun);
+				}
+			}
+
 			const codeToUpload = withCyberBrickRcMainOtaBootstrap(request.code);
 			const codeBytes = Buffer.from(codeToUpload, 'utf8');
 			const contentSha256 = crypto.createHash('sha256').update(codeBytes).digest('hex');
@@ -173,25 +310,66 @@ export class CyberBrickOtaUploader {
 			run = this.createRun(operationId, startedAt, 'transferring', 55, 'Uploading /app/rc_main.py over Wi-Fi...', device, contentSha256);
 			onProgress?.(run);
 
-			const response = await this.withTimeout(
-				this.fetchImpl(`${this.getBaseUrl(device)}/upload`, {
-					method: 'POST',
-					headers: this.buildHeaders(device.deviceId, token, {
-						'Content-Type': 'application/octet-stream',
-						'Content-Length': String(codeBytes.length),
-						'X-Singular-Content-Sha256': contentSha256,
-						'X-Singular-Operation-Id': operationId,
-					}),
-					body: codeBytes,
-				}),
-				this.uploadTimeoutMs,
-				'upload-timeout'
-			);
+			const resetCapableForUpload = compareAgentVersion(finalAgentVersion ?? liveAgentVersion, CYBERBRICK_OTA_RESET_MIN_VERSION) >= 0;
+			let response: CyberBrickHttpResponse;
+			try {
+				response = await this.uploadProgram(device, token, codeBytes, contentSha256, operationId, resetCapableForUpload ? Math.min(this.uploadTimeoutMs, DIRECT_UPLOAD_WINDOW_TIMEOUT_MS) : this.uploadTimeoutMs);
+				if (!response.ok && resetCapableForUpload && this.shouldRetryUploadWithFreshWindow(undefined, response.status)) {
+					throw createCyberBrickUploadError('upload-timeout', `CyberBrick OTA upload window was missed (HTTP ${response.status}).`);
+				}
+			} catch (error) {
+				const errorCode = this.getErrorCode(error);
+				if (!resetCapableForUpload || !this.shouldRetryUploadWithFreshWindow(errorCode)) {
+					throw error;
+				}
+
+				run = this.createRun(
+					operationId,
+					startedAt,
+					'connecting',
+					50,
+					'Waiting for CyberBrick OTA agent to be ready before retrying upload...',
+					device,
+				);
+				onProgress?.(run);
+				const postResetHealth = await this.reopenUploadWindow(device, token);
+				if (postResetHealth) {
+					device = this.withHealthMetadata(device, postResetHealth, 'ready');
+					finalAgentVersion = postResetHealth.agentVersion ?? finalAgentVersion;
+					await this.settingsService.updateDeviceMetadata(device.deviceId, this.metadataFromLiveDevice(device));
+					log('CyberBrick OTA upload acquired a fresh upload window after the direct attempt missed the busy runtime', 'info', {
+						deviceId: device.deviceId,
+						liveAgentVersion: postResetHealth.agentVersion ?? 'unknown',
+						errorCode,
+					});
+				} else {
+					log('CyberBrick OTA upload could not confirm a fresh upload window after the direct attempt missed the current runtime', 'warn', {
+						deviceId: device.deviceId,
+						liveAgentVersion: finalAgentVersion ?? liveAgentVersion ?? 'unknown',
+						errorCode,
+					});
+				}
+
+				run = this.createRun(operationId, startedAt, 'transferring', 55, 'Uploading /app/rc_main.py over Wi-Fi...', device, contentSha256);
+				onProgress?.(run);
+				response = await this.uploadProgram(device, token, codeBytes, contentSha256, operationId, this.uploadTimeoutMs);
+			}
 
 			if (response.status === 401 || response.status === 403) {
 				return this.failRun(run, response.status === 401 ? 'token-rejected' : 'identity-mismatch', 'CyberBrick rejected the OTA upload request.', device);
 			}
 			if (!response.ok) {
+				let responseBody: string | undefined;
+				try {
+					responseBody = await response.text();
+				} catch {
+					responseBody = undefined;
+				}
+				log('CyberBrick OTA upload returned a non-OK response', 'warn', {
+					deviceId: device.deviceId,
+					status: response.status,
+					body: responseBody,
+				});
 				return this.failRun(run, 'write-failed', `CyberBrick OTA upload failed with HTTP ${response.status}.`, device);
 			}
 
@@ -208,6 +386,7 @@ export class CyberBrickOtaUploader {
 				lastSeenAt: finishedAt,
 				lastSuccessfulUploadAt: status === 'succeeded' ? finishedAt : undefined,
 				statusSummary: status === 'succeeded' ? 'ready' : 'restart failed',
+				...(finalAgentVersion ? { agentVersion: finalAgentVersion } : {}),
 			});
 
 			return {
@@ -222,7 +401,7 @@ export class CyberBrickOtaUploader {
 		} catch (error) {
 			const userError = classifyCyberBrickUploadError(error, 'ota-upload-failed');
 			if (userError.code === 'upload-timeout') {
-				const recovered = await this.tryRecoverFromUploadTimeout(run, device, token, startedAt, operationId, onProgress);
+				const recovered = await this.tryRecoverFromUploadTimeout(run, device, token, startedAt, operationId, onProgress, finalAgentVersion);
 				if (recovered) { return recovered; }
 			}
 			return this.failRun(run, userError.code, userError.message, device, userError);
@@ -318,7 +497,7 @@ export class CyberBrickOtaUploader {
 		device?: PairedCyberBrickDevice,
 		error = createCyberBrickUploadError(code, message)
 	): OtaUploadRun {
-		log('CyberBrick OTA upload failed', 'warn', { code, deviceId: device?.deviceId || run.deviceId });
+		log('CyberBrick OTA upload failed', 'warn', { code, deviceId: device?.deviceId || run.deviceId, message });
 		return {
 			...run,
 			...(device ? { deviceId: device.deviceId, friendlyName: device.friendlyName } : {}),
@@ -369,8 +548,265 @@ export class CyberBrickOtaUploader {
 		return this.now().toISOString();
 	}
 
+	private buildChecksFromHealth(device: PairedCyberBrickDevice, baselineChecks: OtaReadinessCheck[], health: HealthResponse): OtaReadinessCheck[] {
+		const checks = [...baselineChecks.filter(check => check.code !== 'ok')];
+		if (health.deviceId !== device.deviceId) {
+			checks.push({
+				code: 'identity-mismatch',
+				ok: false,
+				message: 'The responding CyberBrick identity does not match the selected target.',
+				nextActions: ['Choose the correct CyberBrick target or run USB-first setup again.'],
+			});
+		}
+		if (health.protocolVersion !== CYBERBRICK_OTA_PROTOCOL_VERSION || health.appPath !== CYBERBRICK_OTA_REMOTE_PATH) {
+			checks.push({
+				code: 'agent-outdated',
+				ok: false,
+				message: 'The CyberBrick OTA agent does not support the required protocol.',
+				nextActions: ['Run USB-first OTA setup again to update the agent.'],
+			});
+		}
+		if (health.status && health.status !== 'ready') {
+			checks.push({
+				code: 'agent-health-failed',
+				ok: false,
+				message: `CyberBrick OTA agent status is ${health.status}.`,
+				nextActions: ['Retry after the device is ready, or manually switch to USB.'],
+			});
+		}
+		return checks;
+	}
+
+	private withHealthMetadata(device: PairedCyberBrickDevice, health: HealthResponse, statusSummary?: string): PairedCyberBrickDevice {
+		return {
+			...device,
+			...(health.ipAddress ? { lastKnownIp: health.ipAddress } : {}),
+			...(health.agentVersion ? { agentVersion: health.agentVersion } : {}),
+			lastSeenAt: this.nowIso(),
+			...(statusSummary ? { statusSummary } : {}),
+		};
+	}
+
+	private metadataFromLiveDevice(device: PairedCyberBrickDevice): Partial<Pick<PairedCyberBrickDevice, 'lastKnownIp' | 'lastSeenAt' | 'statusSummary' | 'agentVersion'>> {
+		return {
+			lastSeenAt: device.lastSeenAt,
+			...(device.lastKnownIp ? { lastKnownIp: device.lastKnownIp } : {}),
+			...(device.agentVersion ? { agentVersion: device.agentVersion } : {}),
+			...(device.statusSummary ? { statusSummary: device.statusSummary } : {}),
+		};
+	}
+
 	private delay(ms: number): Promise<void> {
 		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	private shouldAttemptPreflightRecovery(readiness: OtaReadinessStatus): boolean {
+		return readiness.blockingReasons.length > 0
+			&& readiness.blockingReasons.every(code => code === 'offline' || code === 'timeout' || code === 'agent-health-failed');
+	}
+
+	private shouldContinueWithOptimisticUpload(readiness: OtaReadinessStatus): boolean {
+		return Boolean(readiness.device?.lastKnownIp) && this.shouldAttemptPreflightRecovery(readiness);
+	}
+
+	private clearTransientPreflightChecks(checks: OtaReadinessCheck[]): OtaReadinessCheck[] {
+		return checks.filter(check => check.code !== 'offline' && check.code !== 'timeout' && check.code !== 'agent-health-failed');
+	}
+
+	private getErrorCode(error: unknown): string | undefined {
+		if (!error || typeof error !== 'object' || !('code' in error)) {
+			return undefined;
+		}
+		const code = (error as { code?: unknown }).code;
+		return typeof code === 'string' ? code : undefined;
+	}
+
+	private async waitForAgentHealth(
+		device: PairedCyberBrickDevice,
+		token: string,
+		timeoutMs = 30000,
+		intervalMs = 1000,
+		initialDelayMs = intervalMs,
+		requestTimeoutMs = this.healthTimeoutMs,
+	): Promise<HealthResponse | null> {
+		if (initialDelayMs > 0) {
+			await this.delay(initialDelayMs);
+		}
+		const deadline = Date.now() + timeoutMs;
+		while (Date.now() < deadline) {
+			try {
+				const health = await this.withTimeout(this.fetchHealth(device, token), requestTimeoutMs, 'timeout');
+				if (health.deviceId === device.deviceId) {
+					return health;
+				}
+				log('waitForAgentHealth: identity mismatch', 'warn', {
+					deviceId: device.deviceId,
+					respondedDeviceId: health.deviceId,
+				});
+			} catch (error) {
+				const code = this.getErrorCode(error);
+				if (code !== 'ECONNREFUSED' && code !== 'timeout' && code !== 'upload-timeout' && code !== 'network-error') {
+					log('waitForAgentHealth: unexpected error', 'warn', { deviceId: device.deviceId, code });
+				}
+			}
+			await this.delay(intervalMs);
+		}
+		return null;
+	}
+
+
+	private async reopenUploadWindow(device: PairedCyberBrickDevice, token: string): Promise<HealthResponse | null> {
+		// The agent may be rebooting after a previous upload; wait for it to recover.
+		const recoveredHealth = await this.waitForAgentHealth(
+			device,
+			token,
+			PRE_UPLOAD_RESET_RECOVERY_TIMEOUT_MS,
+			PRE_UPLOAD_RESET_RETRY_INTERVAL_MS,
+			PRE_UPLOAD_RESET_INITIAL_DELAY_MS,
+			PRE_UPLOAD_RESET_HEALTH_TIMEOUT_MS,
+		);
+		if (!recoveredHealth) {
+			log('CyberBrick OTA upload window did not recover in time for retry', 'warn', {
+				deviceId: device.deviceId,
+				timeoutMs: PRE_UPLOAD_RESET_RECOVERY_TIMEOUT_MS,
+			});
+		}
+		return recoveredHealth;
+	}
+
+	private async uploadProgram(
+		device: PairedCyberBrickDevice,
+		token: string,
+		codeBytes: Buffer,
+		contentSha256: string,
+		operationId: string,
+		timeoutMs: number,
+	): Promise<CyberBrickHttpResponse> {
+		return await this.withTimeout(
+			this.fetchImpl(`${this.getBaseUrl(device)}/upload`, {
+				method: 'POST',
+				headers: this.buildHeaders(device.deviceId, token, {
+					'Content-Type': 'application/octet-stream',
+					'Content-Length': String(codeBytes.length),
+					'X-Singular-Content-Sha256': contentSha256,
+					'X-Singular-Operation-Id': operationId,
+				}),
+				body: codeBytes,
+			}),
+			timeoutMs,
+			'upload-timeout',
+		);
+	}
+
+	private shouldRetryUploadWithFreshWindow(errorCode?: string, responseStatus?: number): boolean {
+		if (typeof responseStatus === 'number') {
+			return responseStatus >= 500;
+		}
+
+		return errorCode === 'upload-timeout'
+			|| errorCode === 'timeout'
+			|| errorCode === 'network-error'
+			|| errorCode === 'ECONNREFUSED';
+	}
+
+	/**
+	 * Polls `GET /api/v1/health` until the agent responds or the timeout elapses.
+	 * ECONNREFUSED is treated as an expected "still rebooting" condition.
+	 */
+	async waitForAgentReady(device: PairedCyberBrickDevice, token: string, timeoutMs = 30000, intervalMs = 1000): Promise<boolean> {
+		return Boolean(await this.waitForAgentHealth(device, token, timeoutMs, intervalMs));
+	}
+
+	/**
+	 * Uploads a new OTA agent over WiFi to the device.
+	 * Never logs the body (contains device credentials).
+	 */
+	async upgradeAgentOverWifi(
+		device: PairedCyberBrickDevice,
+		token: string,
+		agentConfig: CyberBrickOtaAgentConfig
+	): Promise<'upgraded' | 'failed'> {
+		const agentSource = buildCyberBrickOtaAgentSource(agentConfig);
+		const agentBytes = Buffer.from(agentSource, 'utf8');
+		const contentSha256 = crypto.createHash('sha256').update(agentBytes).digest('hex');
+		log('upgradeAgentOverWifi: starting OTA agent upload', 'info', {
+			deviceId: device.deviceId,
+			bytes: agentBytes.length,
+			targetVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+		});
+		try {
+			const response = await this.withTimeout(
+				this.fetchImpl(`${this.getBaseUrl(device)}/upload-agent`, {
+					method: 'POST',
+					headers: this.buildHeaders(device.deviceId, token, {
+						'Content-Type': 'application/octet-stream',
+						'Content-Length': String(agentBytes.length),
+						'X-Singular-Content-Sha256': contentSha256,
+					}),
+					body: agentBytes,
+				}),
+				this.uploadTimeoutMs,
+				'upload-timeout'
+			);
+			if (!response.ok) {
+				let responseBody: string | undefined;
+				try { responseBody = await response.text(); } catch { /* ignore */ }
+				log('upgradeAgentOverWifi: upload-agent returned a non-OK response', 'warn', {
+					status: response.status,
+					deviceId: device.deviceId,
+					body: responseBody,
+				});
+				const recoveredHealth = await this.waitForAgentHealth(device, token, this.postUpgradeRecoveryTimeoutMs, this.retryIntervalMs);
+				if (recoveredHealth && compareAgentVersion(recoveredHealth.agentVersion, CYBERBRICK_OTA_AGENT_TARGET_VERSION) >= 0) {
+					log('upgradeAgentOverWifi: recovered after non-OK response and observed upgraded agent', 'info', {
+						deviceId: device.deviceId,
+						liveAgentVersion: recoveredHealth.agentVersion ?? 'unknown',
+					});
+					return 'upgraded';
+				}
+				if (recoveredHealth) {
+					log('upgradeAgentOverWifi: device recovered after non-OK response but target version was not observed', 'warn', {
+						deviceId: device.deviceId,
+						liveAgentVersion: recoveredHealth.agentVersion ?? 'unknown',
+					});
+				}
+				return 'failed';
+			}
+			const readyHealth = await this.waitForAgentHealth(device, token, 30000, this.retryIntervalMs);
+			if (readyHealth && compareAgentVersion(readyHealth.agentVersion, CYBERBRICK_OTA_AGENT_TARGET_VERSION) >= 0) {
+				return 'upgraded';
+			}
+			if (readyHealth) {
+				log('upgradeAgentOverWifi: device came back but target version was not observed', 'warn', {
+					deviceId: device.deviceId,
+					liveAgentVersion: readyHealth.agentVersion ?? 'unknown',
+					targetVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+				});
+			} else {
+				log('upgradeAgentOverWifi: device did not report ready after agent upload attempt', 'warn', {
+					deviceId: device.deviceId,
+					targetVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+				});
+			}
+			return 'failed';
+		} catch (error) {
+			const recoveredHealth = await this.waitForAgentHealth(device, token, this.postUpgradeRecoveryTimeoutMs, this.retryIntervalMs);
+			if (recoveredHealth && compareAgentVersion(recoveredHealth.agentVersion, CYBERBRICK_OTA_AGENT_TARGET_VERSION) >= 0) {
+				log('upgradeAgentOverWifi: recovered after transport error and observed upgraded agent', 'info', {
+					deviceId: device.deviceId,
+					liveAgentVersion: recoveredHealth.agentVersion ?? 'unknown',
+					errorCode: this.getErrorCode(error),
+				});
+				return 'upgraded';
+			}
+			log('upgradeAgentOverWifi: error', 'warn', {
+				error: String(error),
+				errorCode: this.getErrorCode(error),
+				deviceId: device.deviceId,
+				recoveredAgentVersion: recoveredHealth?.agentVersion ?? 'unknown',
+			});
+			return 'failed';
+		}
 	}
 
 	private async tryRecoverFromUploadTimeout(
@@ -379,7 +815,8 @@ export class CyberBrickOtaUploader {
 		token: string,
 		startedAt: string,
 		operationId: string,
-		onProgress?: (run: OtaUploadRun) => void
+		onProgress?: (run: OtaUploadRun) => void,
+		agentVersion?: string
 	): Promise<OtaUploadRun | null> {
 		// The device may have written the file and called machine.reset() before the TCP
 		// response was flushed. Wait for it to reboot, then verify it is back online.
@@ -394,6 +831,7 @@ export class CyberBrickOtaUploader {
 					lastSeenAt: finishedAt,
 					lastSuccessfulUploadAt: finishedAt,
 					statusSummary: 'ready',
+					...(agentVersion ? { agentVersion } : {}),
 				});
 				log('CyberBrick OTA upload recovered after device reset', 'info', { deviceId: device.deviceId });
 				return {

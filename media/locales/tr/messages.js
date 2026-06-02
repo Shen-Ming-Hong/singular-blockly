@@ -90,6 +90,9 @@ window.languageManager.loadMessages('tr', {
 	CYBERBRICK_ERROR_TIMEOUT: 'CyberBrick OTA yüklemesi zaman aşımına uğradı.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'CyberBrick OTA yüklemesi başarısız oldu.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'CyberBrick OTA yaması başarısız oldu.',
+	OTA_AGENT_UPGRADING: 'OTA Agent {0} → {1} sürümüne yükseltiliyor...',
+	OTA_AGENT_UPGRADED: 'OTA Agent {0} sürümüne yükseltildi. Yükleme devam ediyor...',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} güncel değil. Otomatik güncellemeyi etkinleştirmek için CyberBrick\'i yeniden eşleştirin.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Deneysel Bloklar Tespit Edildi',

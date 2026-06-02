@@ -90,6 +90,9 @@ window.languageManager.loadMessages('es', {
 	CYBERBRICK_ERROR_TIMEOUT: 'La carga OTA de CyberBrick agotó el tiempo.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'La carga OTA de CyberBrick falló.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'El parche OTA de CyberBrick falló.',
+	OTA_AGENT_UPGRADING: 'Actualizando agente OTA {0} → {1}...',
+	OTA_AGENT_UPGRADED: 'Agente OTA actualizado a {0}. Reanudando carga...',
+	OTA_AGENT_UPGRADE_NEEDED: 'El agente OTA {0} está desactualizado. Vuelva a emparejar el CyberBrick para habilitar la actualización automática.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Bloques experimentales detectados',

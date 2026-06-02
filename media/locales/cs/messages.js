@@ -90,6 +90,9 @@ window.languageManager.loadMessages('cs', {
 	CYBERBRICK_ERROR_TIMEOUT: 'OTA nahrávání CyberBrick vypršelo.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'OTA nahrávání CyberBrick selhalo.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'OTA záplata CyberBrick selhala.',
+	OTA_AGENT_UPGRADING: 'Aktualizace OTA Agent {0} → {1}...',
+	OTA_AGENT_UPGRADED: 'OTA Agent aktualizován na {0}. Pokračování nahrávání...',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} je zastaralý. Znovu spárujte CyberBrick pro povolení automatické aktualizace.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Nalezeny experimentální bloky',

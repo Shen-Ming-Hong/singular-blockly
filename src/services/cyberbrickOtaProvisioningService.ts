@@ -145,7 +145,8 @@ export class CyberBrickOtaProvisioningService {
 				ipAddress: configureResult.ipAddress,
 			});
 			if (configureResult.agentStarted === false) {
-				const error = createCyberBrickUploadError('agent-unreachable', 'CyberBrick OTA agent did not start.');
+				const agentDetail = configureResult.agentError ? `: ${configureResult.agentError}` : '';
+				const error = createCyberBrickUploadError('agent-unreachable', `CyberBrick OTA agent did not start${agentDetail}`);
 				emit({ step: 'verify-agent', success: false, message: error.message, deviceId, ipAddress: configureResult.ipAddress, error });
 				throw error;
 			}
