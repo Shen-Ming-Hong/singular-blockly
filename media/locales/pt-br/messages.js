@@ -90,6 +90,9 @@ window.languageManager.loadMessages('pt-br', {
 	CYBERBRICK_ERROR_TIMEOUT: 'O upload OTA do CyberBrick expirou.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'O upload OTA do CyberBrick falhou.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'O patch OTA do CyberBrick falhou.',
+	OTA_AGENT_UPGRADING: 'Atualizando Agente OTA {0} → {1}...',
+	OTA_AGENT_UPGRADED: 'Agente OTA atualizado para {0}. Retomando envio...',
+	OTA_AGENT_UPGRADE_NEEDED: 'O Agente OTA {0} está desatualizado. Emparelhe novamente o CyberBrick para habilitar a atualização automática.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Blocos experimentais detectados',

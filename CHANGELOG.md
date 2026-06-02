@@ -8,6 +8,38 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.0] - 2026-06-02
+
+### ✨ 新功能 New Features
+
+- **CyberBrick OTA Agent 自動升級** (CyberBrick OTA Agent auto-upgrade)
+    - 每次 OTA 無線上傳前，系統自動偵測裝置 OTA agent 版本；若版本 ≥ 1.4.0 且低於當前目標版本（1.5.9），系統靜默無線升級 agent，升級完成後繼續上傳程式碼，使用者無需手動介入
+      Before each OTA wireless upload, the system automatically detects the device OTA agent version; if ≥ 1.4.0 but below the current target (1.5.9), the agent is silently upgraded over Wi-Fi before the upload continues — no user action required
+    - 上傳 UI 新增「正在更新 OTA Agent」與「Agent 更新完成」進度提示（含版本號：舊版 → 新版）；若 agent 升級失敗，顯示警告後仍繼續本次上傳，不中止整個流程
+      Upload UI now shows "Upgrading OTA Agent" and "Agent upgraded" progress messages (with version numbers: old → new); if the upgrade fails, a warning is shown and the upload still proceeds
+    - 若 agent 版本過舊（< 1.4.0），顯示需重新配對提示，但不阻擋本次上傳；OTA 成功率零退化
+      If the agent version is too old (< 1.4.0), a re-pairing prompt is shown but the upload is not blocked; OTA success rate remains unaffected
+
+- **CyberBrick OTA rc_main.py 啟動標記** (OTA rc_main.py startup marker)
+    - OTA 上傳的 rc_main.py 現在包含啟動 marker 與使用者程式碼異常捕捉包裝，協助識別裝置重啟成功與排查執行階段問題
+      The OTA-uploaded rc_main.py now includes a startup marker and a user-code exception wrapper, enabling detection of successful device restart and runtime error diagnosis
+
+### 🔧 改進 Improvements
+
+- **CyberBrick Monitor 路由優化** (CyberBrick Monitor routing improvement)
+    - Monitor 按鈕現在優先使用 USB serial monitor（當 CyberBrick 透過 USB 連接時）；無 USB 時維持原 mpremote 行為，提升多裝置場景下的連接穩定性
+      The Monitor button now prefers USB serial monitor when a CyberBrick is connected via USB; falls back to mpremote when USB is unavailable, improving connection reliability in multi-device setups
+
+- **OTA Agent 版本升至 1.5.9** (OTA Agent version bumped to 1.5.9)
+    - agent source 移除舊的 log capture dead code（`_LogCapture` class、`/api/v1/logs`、`/api/v1/reset` endpoints），保持精簡；已升級至 1.5.8 的裝置將在下次 OTA 上傳時自動更新至 1.5.9
+      Agent source removes stale log-capture code (`_LogCapture`, `/api/v1/logs`, `/api/v1/reset`); devices already on 1.5.8 will automatically receive 1.5.9 on their next OTA upload
+    - 新配對裝置（Provisioning）直接安裝最新 agent（1.5.9），開箱即支援 OTA 自動升級流程
+      Newly provisioned devices install agent 1.5.9 directly; out-of-the-box support for the OTA auto-upgrade flow
+
+- **IME 輸入法相容性修正** (IME input compatibility fix)
+    - 修正 Blockly 文字輸入欄位在中文等 IME 輸入法模式下與全域鍵盤快捷鍵衝突的問題，讓使用 IME 輸入時文字能正確輸入
+      Fixed a conflict between Blockly text input fields and global keyboard shortcuts that caused incorrect input when using IME (e.g., Traditional Chinese)
+
 ## [0.81.0] - 2026-05-29
 
 ### ✨ 新功能 New Features

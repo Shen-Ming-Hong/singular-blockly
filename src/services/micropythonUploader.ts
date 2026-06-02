@@ -9,7 +9,7 @@ import * as path from 'path';
 import { log } from './logging';
 import { getDefaultPlatformioExecutablePath, getExecutableDirectory, getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
 import * as vscode from 'vscode';
-import { WifiNetworkSuggestion } from '../types/cyberbrickUpload';
+import { CYBERBRICK_OTA_AGENT_TARGET_VERSION, WifiNetworkSuggestion } from '../types/cyberbrickUpload';
 import {
 	buildCyberBrickRcMainOtaBootstrap,
 	CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END,
@@ -71,6 +71,7 @@ export interface ComPortInfo {
 	productId: string;
 	manufacturer?: string;
 	description?: string;
+	serialNumber?: string;
 }
 
 /**
@@ -295,28 +296,73 @@ export class MicropythonUploader {
 		try {
 			const result = await this.executor.exec(`"${this.mpremotePath}" connect list`);
 			const ports = this.parsePortList(result.stdout);
-
-			let filteredPorts = ports;
-			let autoDetected: string | undefined;
-
-			if (filter === 'cyberbrick') {
-				filteredPorts = ports.filter(
-					p => p.vendorId.toUpperCase() === CYBERBRICK_USB.vid && p.productId.toUpperCase() === CYBERBRICK_USB.pid
-				);
-				autoDetected = filteredPorts.length > 0 ? filteredPorts[0].path : undefined;
-			} else {
-				// 自動偵測 CyberBrick
-				const cyberbrick = ports.find(
-					p => p.vendorId.toUpperCase() === CYBERBRICK_USB.vid && p.productId.toUpperCase() === CYBERBRICK_USB.pid
-				);
-				autoDetected = cyberbrick?.path;
-			}
+			const { filteredPorts, autoDetected } = this.filterPorts(ports, filter);
 
 			log('[blockly] 已列出 COM 埠', 'info', { count: filteredPorts.length, autoDetected });
 			return { ports: filteredPorts, autoDetected };
 		} catch (error) {
 			log('[blockly] 列出 COM 埠失敗', 'error', error);
 			return { ports: [] };
+		}
+	}
+
+	/**
+	 * 使用 PlatformIO Python + pyserial 列出本機序列埠。
+	 * 供 USB monitor 偵測使用，避免把 Wi‑Fi fallback 綁死在 mpremote 狀態上。
+	 */
+	async listSerialPorts(filter?: 'all' | 'cyberbrick'): Promise<{ ports: ComPortInfo[]; autoDetected?: string }> {
+		const fs = require('fs');
+		const tempDir = os.tmpdir();
+		const scriptFile = path.join(tempDir, `cyberbrick_serial_ports_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
+		const pythonPath = this.getPythonPath();
+		const script = [
+			'import json',
+			'try:',
+			'    from serial.tools import list_ports',
+			'except Exception as exc:',
+			"    print(json.dumps({'error': str(exc), 'ports': []}))",
+			'else:',
+			'    ports = []',
+			'    for info in list_ports.comports():',
+			"        vid = ('%04X' % info.vid) if getattr(info, 'vid', None) is not None else ''",
+			"        pid = ('%04X' % info.pid) if getattr(info, 'pid', None) is not None else ''",
+			"        ports.append({'path': getattr(info, 'device', '') or '', 'vendorId': vid, 'productId': pid, 'manufacturer': getattr(info, 'manufacturer', None), 'description': getattr(info, 'description', None), 'serialNumber': getattr(info, 'serial_number', None)})",
+			"    print(json.dumps({'ports': ports}))",
+			'',
+		].join('\n');
+		fs.writeFileSync(scriptFile, script, 'utf8');
+
+		try {
+			const result = await this.execWithTimeout(`"${pythonPath}" "${scriptFile}"`, 10000);
+			const payload = this.parseJsonLine<{ ports?: Array<Partial<ComPortInfo>>; error?: string }>(result.stdout);
+			if (payload?.error) {
+				log('[blockly] 列出本機序列埠失敗', 'warn', { error: payload.error });
+				return { ports: [] };
+			}
+
+			const ports = (Array.isArray(payload?.ports) ? payload.ports : [])
+				.map(port => ({
+					path: typeof port.path === 'string' ? port.path.trim() : '',
+					vendorId: typeof port.vendorId === 'string' ? port.vendorId.trim().toUpperCase() : '',
+					productId: typeof port.productId === 'string' ? port.productId.trim().toUpperCase() : '',
+					manufacturer: typeof port.manufacturer === 'string' && port.manufacturer.trim() ? port.manufacturer.trim() : undefined,
+					description: typeof port.description === 'string' && port.description.trim() ? port.description.trim() : undefined,
+					serialNumber: typeof port.serialNumber === 'string' && port.serialNumber.trim() ? port.serialNumber.trim() : undefined,
+				}))
+				.filter(port => port.path.length > 0);
+			const { filteredPorts, autoDetected } = this.filterPorts(ports, filter);
+
+			log('[blockly] 已列出本機序列埠', 'info', { count: filteredPorts.length, autoDetected });
+			return { ports: filteredPorts, autoDetected };
+		} catch (error) {
+			log('[blockly] 本機序列埠偵測失敗', 'error', error);
+			return { ports: [] };
+		} finally {
+			try {
+				fs.unlinkSync(scriptFile);
+			} catch {
+				// 忽略清理錯誤
+			}
 		}
 	}
 
@@ -527,7 +573,7 @@ print('OK')
 			"    agent_error = start_result.get('error') or ''",
 			'except Exception as exc:',
 			'    agent_error = str(exc)',
-			"print(json.dumps({'ipAddress': ip, 'agentVersion': '1.0.0', 'agentStarted': agent_started, 'agentMode': agent_mode, 'agentError': agent_error, 'rcMainPatched': rc_main_patched, 'rcMainError': rc_main_error}))",
+			`print(json.dumps({'ipAddress': ip, 'agentVersion': ${JSON.stringify(CYBERBRICK_OTA_AGENT_TARGET_VERSION)}, 'agentStarted': agent_started, 'agentMode': agent_mode, 'agentError': agent_error, 'rcMainPatched': rc_main_patched, 'rcMainError': rc_main_error}))`,
 			'',
 		].join('\n');
 		try {
@@ -702,6 +748,25 @@ print(json.dumps(result))
 		}
 
 		return ports;
+	}
+
+	private filterPorts(ports: ComPortInfo[], filter?: 'all' | 'cyberbrick'): { filteredPorts: ComPortInfo[]; autoDetected?: string } {
+		let filteredPorts = ports;
+		let autoDetected: string | undefined;
+
+		if (filter === 'cyberbrick') {
+			filteredPorts = ports.filter(
+				p => p.vendorId.toUpperCase() === CYBERBRICK_USB.vid && p.productId.toUpperCase() === CYBERBRICK_USB.pid
+			);
+			autoDetected = filteredPorts.length > 0 ? filteredPorts[0].path : undefined;
+		} else {
+			const cyberbrick = ports.find(
+				p => p.vendorId.toUpperCase() === CYBERBRICK_USB.vid && p.productId.toUpperCase() === CYBERBRICK_USB.pid
+			);
+			autoDetected = cyberbrick?.path;
+		}
+
+		return { filteredPorts, autoDetected };
 	}
 
 	private parseJsonLine<T>(output: string): T | undefined {

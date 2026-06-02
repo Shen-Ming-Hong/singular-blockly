@@ -2,7 +2,7 @@ import assert = require('assert');
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
 import { suite, test, beforeEach } from 'mocha';
-import { CyberBrickOtaUploader, CyberBrickFetch } from '../../services/cyberbrickOtaUploader';
+import { CyberBrickOtaUploader, CyberBrickFetch, CYBERBRICK_OTA_AGENT_TARGET_VERSION } from '../../services/cyberbrickOtaUploader';
 import { CyberBrickUploadSettingsService } from '../../services/cyberbrickUploadSettingsService';
 import { MockSecretStorage, MockWorkspaceConfiguration, createCyberBrickMockContext } from '../helpers/cyberbrickUploadMocks';
 import { CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START } from '../../services/cyberbrickOtaAgentSource';
@@ -82,21 +82,13 @@ suite('CyberBrickOtaUploader', () => {
 		const device = await seedReadyDevice();
 		fetchStub.onFirstCall().resolves(jsonResponse(200, {
 			deviceId: device.deviceId,
-			agentVersion: '1.1.0',
+			agentVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
 			protocolVersion: 2,
 			supportedProtocolVersions: [2],
 			appPath: CYBERBRICK_OTA_REMOTE_PATH,
 			status: 'ready',
 		}));
-		fetchStub.onSecondCall().resolves(jsonResponse(200, {
-			deviceId: device.deviceId,
-			agentVersion: '1.1.0',
-			protocolVersion: 2,
-			supportedProtocolVersions: [2],
-			appPath: CYBERBRICK_OTA_REMOTE_PATH,
-			status: 'ready',
-		}));
-		fetchStub.onThirdCall().callsFake(async (_url: string, init: any) => {
+		fetchStub.onSecondCall().callsFake(async (_url: string, init: any) => {
 			const sha256 = init.headers['X-Singular-Content-Sha256'];
 			const opId = init.headers['X-Singular-Operation-Id'];
 			return jsonResponse(200, {
@@ -118,13 +110,15 @@ suite('CyberBrickOtaUploader', () => {
 
 		assert.strictEqual(result.status, 'succeeded');
 		assert.strictEqual(result.remotePath, CYBERBRICK_OTA_REMOTE_PATH);
-		assert.strictEqual(fetchStub.thirdCall.args[0], 'http://192.168.1.50:8266/api/v1/upload');
-		assert.strictEqual(fetchStub.thirdCall.args[1].headers.Authorization.includes(CYBERBRICK_TEST_TOKEN), true);
-		assert.strictEqual(fetchStub.thirdCall.args[1].headers['Content-Type'], 'application/octet-stream');
-		const uploadedCode = Buffer.from(fetchStub.thirdCall.args[1].body).toString('utf8');
+		assert.strictEqual(fetchStub.callCount, 2, 'fast-path upload should reuse the successful readiness health check instead of resetting first');
+		assert.strictEqual(fetchStub.secondCall.args[0], 'http://192.168.1.50:8266/api/v1/upload');
+		assert.strictEqual(fetchStub.secondCall.args[1].headers.Authorization.includes(CYBERBRICK_TEST_TOKEN), true);
+		assert.strictEqual(fetchStub.secondCall.args[1].headers['Content-Type'], 'application/octet-stream');
+		const uploadedCode = Buffer.from(fetchStub.secondCall.args[1].body).toString('utf8');
 		assert.ok(uploadedCode.startsWith(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START));
 		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'));
-		assert.ok(uploadedCode.endsWith('print(1)'));
+		assert.ok(uploadedCode.includes('try:\n    print(1)\n'));
+		assert.ok(uploadedCode.includes('_singular_blockly_ota_sys.print_exception(_singular_blockly_ota_exc)'));
 	});
 
 	test('does not fall back to USB on token rejection', async () => {
@@ -136,5 +130,158 @@ suite('CyberBrickOtaUploader', () => {
 
 		assert.strictEqual(result.status, 'failed');
 		assert.strictEqual(result.errorCode, 'token-rejected');
+	});
+
+	test('recovers preflight health probing when the device is briefly too busy to answer the first readiness check', async () => {
+		const device = await seedReadyDevice();
+		fetchStub.onFirstCall().rejects(new Error('socket hang up'));
+		fetchStub.onSecondCall().resolves(jsonResponse(200, {
+			deviceId: device.deviceId,
+			agentVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+			protocolVersion: 2,
+			supportedProtocolVersions: [2],
+			appPath: CYBERBRICK_OTA_REMOTE_PATH,
+			status: 'ready',
+		}));
+		fetchStub.onThirdCall().callsFake(async (_url: string, init: any) => {
+			const sha256 = init.headers['X-Singular-Content-Sha256'];
+			const opId = init.headers['X-Singular-Operation-Id'];
+			return jsonResponse(200, {
+				operationId: opId,
+				deviceId: device.deviceId,
+				remotePath: CYBERBRICK_OTA_REMOTE_PATH,
+				bytesWritten: init.body.length,
+				contentSha256: sha256,
+				restarted: false,
+				status: 'written',
+			});
+		});
+		const uploader = new CyberBrickOtaUploader(settingsService, {
+			fetch: fetchStub as unknown as CyberBrickFetch,
+			operationIdFactory: () => 'op-recover',
+			retryIntervalMs: 0,
+		});
+
+		const result = await uploader.upload({ board: 'cyberbrick', code: 'print(1)' });
+
+		assert.strictEqual(result.status, 'succeeded');
+		assert.strictEqual(fetchStub.callCount, 3, 'upload should retry readiness once before the final /upload call');
+		assert.strictEqual(fetchStub.thirdCall.args[0], 'http://192.168.1.50:8266/api/v1/upload');
+	});
+
+	test('continues with the main upload when transient preflight health probing never catches the response window', async () => {
+		const device = await seedReadyDevice();
+		const requestedUrls: string[] = [];
+		fetchStub.callsFake(async (url: string, init?: any) => {
+			requestedUrls.push(url);
+			if (url.endsWith('/health')) {
+				throw Object.assign(new Error('socket hang up'), { code: 'network-error' });
+			}
+			const sha256 = init.headers['X-Singular-Content-Sha256'];
+			const opId = init.headers['X-Singular-Operation-Id'];
+			return jsonResponse(200, {
+				operationId: opId,
+				deviceId: device.deviceId,
+				remotePath: CYBERBRICK_OTA_REMOTE_PATH,
+				bytesWritten: init.body.length,
+				contentSha256: sha256,
+				restarted: false,
+				status: 'written',
+			});
+		});
+		const uploader = new CyberBrickOtaUploader(settingsService, {
+			fetch: fetchStub as unknown as CyberBrickFetch,
+			operationIdFactory: () => 'op-optimistic-window',
+			healthTimeoutMs: 20,
+			retryIntervalMs: 0,
+		});
+
+		const result = await uploader.upload({ board: 'cyberbrick', code: 'print(1)' });
+
+		assert.strictEqual(result.status, 'succeeded');
+		assert.ok(requestedUrls.filter(url => url.endsWith('/health')).length >= 2, 'preflight should still probe health briefly before falling back to the optimistic upload path');
+		assert.ok(requestedUrls.some(url => url.endsWith('/upload')), 'uploader should continue into the main /upload call even if health keeps missing the response window');
+		assert.ok(!requestedUrls.some(url => url.endsWith('/reset')), 'optimistic preflight fallback should not pay a reset cost before the first direct upload attempt');
+	});
+
+	test('reuses the successful readiness window instead of requiring a second immediate health fetch before upload', async () => {
+		const device = await seedReadyDevice();
+		fetchStub.onFirstCall().resolves(jsonResponse(200, {
+			deviceId: device.deviceId,
+			agentVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+			protocolVersion: 2,
+			supportedProtocolVersions: [2],
+			appPath: CYBERBRICK_OTA_REMOTE_PATH,
+			status: 'ready',
+		}));
+		fetchStub.onSecondCall().callsFake(async (_url: string, init: any) => {
+			const sha256 = init.headers['X-Singular-Content-Sha256'];
+			const opId = init.headers['X-Singular-Operation-Id'];
+			return jsonResponse(200, {
+				operationId: opId,
+				deviceId: device.deviceId,
+				remotePath: CYBERBRICK_OTA_REMOTE_PATH,
+				bytesWritten: init.body.length,
+				contentSha256: sha256,
+				restarted: false,
+				status: 'written',
+			});
+		});
+		const uploader = new CyberBrickOtaUploader(settingsService, {
+			fetch: fetchStub as unknown as CyberBrickFetch,
+			operationIdFactory: () => 'op-single-window',
+		});
+
+		const result = await uploader.upload({ board: 'cyberbrick', code: 'print(1)' });
+
+		assert.strictEqual(result.status, 'succeeded');
+		assert.strictEqual(fetchStub.callCount, 2, 'upload should proceed once the first readiness window succeeds');
+	});
+
+	test('retries after direct upload window times out by polling agent recovery', async () => {
+		const device = await seedReadyDevice();
+		fetchStub.onFirstCall().resolves(jsonResponse(200, {
+			deviceId: device.deviceId,
+			agentVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+			protocolVersion: 2,
+			supportedProtocolVersions: [2],
+			appPath: CYBERBRICK_OTA_REMOTE_PATH,
+			status: 'ready',
+		}));
+		fetchStub.onSecondCall().returns(new Promise(() => undefined));
+		fetchStub.onThirdCall().resolves(jsonResponse(200, { restarting: true }));
+		fetchStub.onCall(3).resolves(jsonResponse(200, {
+			deviceId: device.deviceId,
+			agentVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
+			protocolVersion: 2,
+			supportedProtocolVersions: [2],
+			appPath: CYBERBRICK_OTA_REMOTE_PATH,
+			status: 'ready',
+		}));
+		fetchStub.onCall(4).callsFake(async (_url: string, init: any) => {
+			const sha256 = init.headers['X-Singular-Content-Sha256'];
+			const opId = init.headers['X-Singular-Operation-Id'];
+			return jsonResponse(200, {
+				operationId: opId,
+				deviceId: device.deviceId,
+				remotePath: CYBERBRICK_OTA_REMOTE_PATH,
+				bytesWritten: init.body.length,
+				contentSha256: sha256,
+				restarted: false,
+				status: 'written',
+			});
+		});
+		const uploader = new CyberBrickOtaUploader(settingsService, {
+			fetch: fetchStub as unknown as CyberBrickFetch,
+			operationIdFactory: () => 'op-reset-retry',
+			uploadTimeoutMs: 10,
+		});
+
+		const result = await uploader.upload({ board: 'cyberbrick', code: 'print(1)' });
+
+		assert.strictEqual(result.status, 'succeeded');
+		assert.strictEqual(fetchStub.callCount, 5, 'upload should retry once after agent recovery polling when the direct attempt times out');
+		assert.strictEqual(fetchStub.getCall(2).args[0], 'http://192.168.1.50:8266/api/v1/health');
+		assert.strictEqual(fetchStub.getCall(4).args[0], 'http://192.168.1.50:8266/api/v1/upload');
 	});
 });

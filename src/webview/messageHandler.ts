@@ -12,7 +12,7 @@ import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, UploadStage, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
-import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStopReason } from '../types/arduino';
+import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStartResult, MonitorStopReason } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
 import { AIModelManager } from '../services/aiModelManager';
@@ -1823,8 +1823,30 @@ export class WebViewMessageHandler {
 				this.postCyberBrickResponse('cyberbrickOtaUploadProgress', message, true, progress);
 			});
 			this.postCyberBrickResponse('cyberbrickOtaUploadResult', message, run.status === 'succeeded', run, run.error);
+			await this.pushLatestCyberBrickPanelState();
 		} catch (error) {
 			this.postCyberBrickResponse('cyberbrickOtaUploadResult', message, false, undefined, classifyCyberBrickUploadError(error, 'ota-upload-failed'));
+		}
+	}
+
+	private async pushLatestCyberBrickPanelState(): Promise<void> {
+		// 上傳完成後（無論成功或失敗）主動推送最新裝置狀態，確保 agentVersion 顯示不過時
+		try {
+			const service = this.getCyberBrickUploadSettingsService();
+			const settings = await service.loadSettings();
+			const selectedDeviceId = settings.primaryDeviceId;
+			let readiness;
+			try {
+				readiness = await this.getCyberBrickOtaUploader().checkReadiness(selectedDeviceId);
+			} catch (error) {
+				log('[blockly] 無法刷新最新 CyberBrick live readiness，改用本地快取', 'warn', error);
+				readiness = await service.buildOtaReadinessStatus(selectedDeviceId);
+			}
+			const panelState = await service.buildPanelState();
+			panelState.readiness = readiness;
+			this.panel.webview.postMessage({ command: 'cyberbrickUploadSettingsLoaded', success: true, payload: panelState });
+		} catch {
+			// 非致命錯誤：上傳結果已送出，UI 刷新失敗不影響上傳
 		}
 	}
 
@@ -1893,14 +1915,13 @@ export class WebViewMessageHandler {
 		const workspaceRoot = workspaceFolders[0].uri.fsPath;
 		const boardLanguage = getBoardLanguage(message.board);
 
-		// 上傳前關閉 Monitor（釋放 COM 埠）
+		// 上傳前關閉 Monitor（釋放連線資源）
 		if (this.serialMonitorService?.isRunning()) {
 			await this.serialMonitorService.stopForUpload();
 		}
 		if (this.arduinoMonitorService?.isRunning()) {
 			await this.arduinoMonitorService.stopForUpload();
 		}
-
 		// 根據板子語言類型路由到對應的上傳服務
 		if (boardLanguage === 'micropython') {
 			// MicroPython 上傳流程（CyberBrick）
@@ -1961,6 +1982,7 @@ export class WebViewMessageHandler {
 					log('[blockly] USB 未找到，自動切換到 OTA 上傳（主要裝置）', 'info', { deviceId: primaryDeviceId });
 					const otaStageMap = (status: string): UploadStage => {
 						if (status === 'connecting') { return 'connecting'; }
+						if (status === 'upgrading_agent' || status === 'agent_upgraded' || status === 'agent_upgrade_needed') { return 'preparing'; }
 						if (status === 'transferring' || status === 'verifying') { return 'uploading'; }
 						if (status === 'restarting') { return 'restarting'; }
 						if (status === 'succeeded') { return 'completed'; }
@@ -1975,7 +1997,7 @@ export class WebViewMessageHandler {
 								progress: progress.progress,
 								message: progress.stageMessage,
 							});
-						}
+						},
 					);
 					this.sendUploadResult({
 						success: run.status === 'succeeded',
@@ -1984,6 +2006,7 @@ export class WebViewMessageHandler {
 						duration: run.duration ?? 0,
 						...(run.error ? { error: { stage: 'failed' as UploadStage, message: run.error.message, errorCode: run.errorCode } } : {}),
 					});
+					await this.pushLatestCyberBrickPanelState();
 					return;
 				}
 			}
@@ -2158,25 +2181,7 @@ export class WebViewMessageHandler {
 		const language = getBoardLanguage(board);
 
 		if (language === 'micropython') {
-			// MicroPython 上傳流程（CyberBrick）
-			if (!this.serialMonitorService) {
-				log('[blockly] SerialMonitorService 未初始化', 'error');
-				return;
-			}
-
-			const result = await this.serialMonitorService.start();
-
-			if (result.success) {
-				this.panel.webview.postMessage({
-					command: 'monitorStarted',
-					port: result.port,
-				});
-			} else {
-				this.panel.webview.postMessage({
-					command: 'monitorError',
-					error: result.error,
-				});
-			}
+			await this.startUsbSerialMonitor();
 		} else if (language === 'arduino') {
 			// Arduino C++ Monitor
 			if (!this.arduinoMonitorService) {
@@ -2209,12 +2214,32 @@ export class WebViewMessageHandler {
 		}
 	}
 
+	/** USB serial monitor fallback for CyberBrick */
+	private async startUsbSerialMonitor(
+		options: { suppressErrorCodes?: Array<NonNullable<MonitorStartResult['error']>['code']> } = {}
+	): Promise<MonitorStartResult | null> {
+		if (!this.serialMonitorService) {
+			log('[blockly] SerialMonitorService 未初始化', 'error');
+			return null;
+		}
+		const result = await this.serialMonitorService.start();
+		if (result.success) {
+			this.panel.webview.postMessage({ command: 'monitorStarted', port: result.port });
+		} else {
+			const shouldSuppress = Boolean(result.error?.code && options.suppressErrorCodes?.includes(result.error.code));
+			if (!shouldSuppress) {
+				this.panel.webview.postMessage({ command: 'monitorError', error: result.error });
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * 處理停止 Monitor 請求
 	 * 會停止所有正在運行的 Monitor 服務
 	 */
 	private async handleStopMonitor(): Promise<void> {
-		// 停止 MicroPython Monitor（如果正在運行）
+		// 停止 Serial Monitor（如果正在運行）
 		if (this.serialMonitorService?.isRunning()) {
 			await this.serialMonitorService.stop();
 		}

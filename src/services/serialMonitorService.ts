@@ -52,24 +52,15 @@ export class SerialMonitorService {
 			return { success: true, port: this.currentPort! };
 		}
 
-		// 檢查 mpremote
-		const hasMpremote = await this.uploader.checkMpremoteInstalled();
-		if (!hasMpremote) {
-			const installed = await this.uploader.installMpremote();
-			if (!installed) {
-				return {
-					success: false,
-					port: '',
-					error: {
-						code: 'MPREMOTE_NOT_INSTALLED',
-						message: 'mpremote 工具安裝失敗',
-					},
-				};
+		// 偵測裝置
+		let { autoDetected } = await this.uploader.listSerialPorts('cyberbrick');
+		if (!autoDetected) {
+			const fallbackDetection = await this.uploader.listPorts('cyberbrick');
+			autoDetected = fallbackDetection.autoDetected;
+			if (autoDetected) {
+				log('[blockly] pyserial 序列埠偵測無結果，改用 mpremote connect list 偵測 USB 裝置', 'info', { port: autoDetected });
 			}
 		}
-
-		// 偵測裝置
-		const { autoDetected } = await this.uploader.listPorts('cyberbrick');
 		if (!autoDetected) {
 			return {
 				success: false,
@@ -82,7 +73,6 @@ export class SerialMonitorService {
 		}
 
 		// 建立終端機
-		const mpremotePath = this.uploader.getMpremotePath();
 		this.terminal = vscode.window.createTerminal({
 			name: 'CyberBrick Monitor',
 			hideFromUser: false,
@@ -94,13 +84,32 @@ export class SerialMonitorService {
 		// 先用 pyserial 發送 Ctrl+C + Ctrl+D 來中斷程式並觸發軟重置
 		// 然後再進入 repl 終端模式查看輸出
 		try {
-			await this.resetAndStartMonitor(autoDetected, mpremotePath);
+			await this.resetAndStartMonitor(autoDetected);
 		} catch (error) {
-			log('[blockly] 無法重置裝置，直接進入 repl', 'warn', error);
-			// 備用方案：直接進入 repl
+			log('[blockly] 無法使用 pyserial 啟動 Monitor，嘗試 mpremote repl 備援', 'warn', error);
+			const hasMpremote = await this.uploader.checkMpremoteInstalled();
+			if (!hasMpremote) {
+				const terminal = this.terminal;
+				this.terminal = null;
+				this.currentPort = null;
+				terminal?.dispose();
+				return {
+					success: false,
+					port: '',
+					error: {
+						code: 'MPREMOTE_NOT_INSTALLED',
+						message: 'mpremote 工具未安裝，無法啟動 CyberBrick USB Monitor。',
+					},
+				};
+			}
+
+			const mpremotePath = this.uploader.getMpremotePath();
+			const fallbackCommand = process.platform === 'win32'
+				? `& "${mpremotePath}" connect "${autoDetected}" repl`
+				: `"${mpremotePath}" connect "${autoDetected}" repl`;
 			setTimeout(() => {
 				if (this.terminal) {
-					this.terminal.sendText(`& "${mpremotePath}" connect ${autoDetected} repl`, true);
+					this.terminal.sendText(fallbackCommand, true);
 				}
 			}, 500);
 		}
@@ -186,9 +195,8 @@ export class SerialMonitorService {
 	 * 重置裝置並啟動 Monitor
 	 * 使用 pyserial 發送重置命令並持續監控輸出
 	 * @param port 連接埠
-	 * @param mpremotePath mpremote 路徑（未使用，保留參數相容性）
 	 */
-	private async resetAndStartMonitor(port: string, _mpremotePath: string): Promise<void> {
+	private async resetAndStartMonitor(port: string): Promise<void> {
 		const pythonPath = this.uploader.getPlatformioPythonPath();
 		const isWindows = process.platform === 'win32';
 

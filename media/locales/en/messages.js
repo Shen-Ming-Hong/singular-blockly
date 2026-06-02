@@ -90,6 +90,9 @@ window.languageManager.loadMessages('en', {
 	CYBERBRICK_ERROR_TIMEOUT: 'CyberBrick OTA upload timed out.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'CyberBrick OTA upload failed.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'CyberBrick OTA patch failed.',
+	OTA_AGENT_UPGRADING: 'Upgrading OTA Agent {0} → {1}...',
+	OTA_AGENT_UPGRADED: 'OTA Agent upgraded to {0}. Resuming upload...',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} is outdated. Re-pair CyberBrick to enable auto-upgrade.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Experimental Blocks Detected',
