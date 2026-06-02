@@ -9,6 +9,9 @@ export const CYBERBRICK_UPLOAD_SETTINGS_KEY = 'singular-blockly.cyberbrick.uploa
 export const CYBERBRICK_OTA_REMOTE_PATH = '/app/rc_main.py';
 export const CYBERBRICK_OTA_PROTOCOL_VERSION = 2;
 export const CYBERBRICK_OTA_DEFAULT_PORT = 8266;
+export const CYBERBRICK_OTA_AGENT_TARGET_VERSION = '1.5.9';
+export const CYBERBRICK_OTA_UPLOAD_AGENT_MIN_VERSION = '1.4.0';
+export const CYBERBRICK_OTA_RESET_MIN_VERSION = '1.5.0';
 
 export type CyberBrickSecretKind = 'wifiPassword' | 'otaToken' | 'pairingSecret';
 export type CyberBrickProvisioningStep =
@@ -61,7 +64,8 @@ export type CyberBrickUploadErrorCode =
 	| 'write-failed'
 	| 'restart-failed'
 	| 'network-error'
-	| 'unknown';
+	| 'unknown'
+	| 'agent-upgrade-failed';
 export type CyberBrickUploadProgressStage =
 	| 'preparing'
 	| 'checking_settings'
@@ -70,7 +74,10 @@ export type CyberBrickUploadProgressStage =
 	| 'uploading'
 	| 'verifying'
 	| 'completed'
-	| 'failed';
+	| 'failed'
+	| 'upgrading_agent'
+	| 'agent_upgraded'
+	| 'agent_upgrade_needed';
 
 export interface PairedCyberBrickDevice {
 	deviceId: string;
@@ -203,6 +210,9 @@ export interface OtaUploadRun {
 		| 'pending'
 		| 'validating'
 		| 'connecting'
+		| 'upgrading_agent'
+		| 'agent_upgraded'
+		| 'agent_upgrade_needed'
 		| 'transferring'
 		| 'verifying'
 		| 'restarting'

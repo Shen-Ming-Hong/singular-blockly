@@ -90,6 +90,9 @@ window.languageManager.loadMessages('pl', {
 	CYBERBRICK_ERROR_TIMEOUT: 'Przesyłanie OTA CyberBrick przekroczyło limit czasu.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'Przesyłanie OTA CyberBrick nie powiodło się.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'Łatka OTA CyberBrick nie powiodła się.',
+	OTA_AGENT_UPGRADING: 'Aktualizacja OTA Agent {0} → {1}...',
+	OTA_AGENT_UPGRADED: 'OTA Agent zaktualizowany do {0}. Wznawianie wysyłania...',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} jest przestarzały. Sparuj ponownie CyberBrick, aby włączyć automatyczną aktualizację.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Wykryto bloki eksperymentalne',

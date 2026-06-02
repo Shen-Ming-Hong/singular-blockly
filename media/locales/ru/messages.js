@@ -90,6 +90,9 @@ window.languageManager.loadMessages('ru', {
 	CYBERBRICK_ERROR_TIMEOUT: 'Время загрузки OTA CyberBrick истекло.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'Загрузка OTA CyberBrick не удалась.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'Патч OTA CyberBrick не удался.',
+	OTA_AGENT_UPGRADING: 'Обновление OTA-агента {0} → {1}…',
+	OTA_AGENT_UPGRADED: 'OTA-агент обновлён до {0}. Загрузка продолжается…',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA-агент {0} устарел. Выполните повторное сопряжение CyberBrick для автоматического обновления.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Обнаружены экспериментальные блоки',

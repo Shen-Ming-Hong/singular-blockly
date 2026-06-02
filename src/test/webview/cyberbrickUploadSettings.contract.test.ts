@@ -174,8 +174,13 @@ describe('CyberBrick upload settings WebView contract', () => {
 		);
 		assertContainsAll(
 			extractFunctionBody(script, 'requestCyberBrickOtaCleanup'),
-			['await showAsyncConfirm', "command: 'cyberbrickOtaCleanupRequest'", '...(device?.deviceId ? { deviceId: device.deviceId } : {})'],
-			'OTA cleanup should require confirmation and only attach a paired device identity when one is selected'
+			['await showAsyncConfirm', "command: 'cyberbrickOtaCleanupRequest'", 'payload: { usbPort }'],
+			'OTA cleanup should require confirmation and send only the USB port (USB physical connection is the trust anchor, not settings primary device)'
+		);
+		assertDoesNotContainAny(
+			extractFunctionBody(script, 'requestCyberBrickOtaCleanup'),
+			['deviceId: device.deviceId', 'device?.deviceId'],
+			'OTA cleanup must not pass primary device ID — cleanup targets whatever is physically connected via USB'
 		);
 		assertDoesNotContainAny(
 			extractFunctionBody(script, 'requestCyberBrickOtaCleanup'),

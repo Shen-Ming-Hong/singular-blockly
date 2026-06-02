@@ -90,6 +90,9 @@ window.languageManager.loadMessages('hu', {
 	CYBERBRICK_ERROR_TIMEOUT: 'A CyberBrick OTA feltöltése lejárt.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'A CyberBrick OTA feltöltése sikertelen.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'A CyberBrick OTA javítás sikertelen.',
+	OTA_AGENT_UPGRADING: 'OTA Agent frissítése {0} → {1}...',
+	OTA_AGENT_UPGRADED: 'OTA Agent frissítve: {0}. Feltöltés folytatása...',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} elavult. Az automatikus frissítés engedélyezéséhez párosítsa újra a CyberBricket.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Kísérleti blokkok észlelve',

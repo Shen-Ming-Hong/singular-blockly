@@ -1247,6 +1247,16 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	background-color: #45a049;
 }
 
+#monitorBtn.connecting {
+	background-color: #ffb300;
+	box-shadow: 0 0 8px rgba(255, 179, 0, 0.55);
+	cursor: progress;
+}
+
+#monitorBtn.connecting:hover {
+	background-color: #ffb300;
+}
+
 #monitorBtn:disabled {
 	background-color: #cccccc;
 	cursor: not-allowed;
