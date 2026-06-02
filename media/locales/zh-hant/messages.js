@@ -90,6 +90,9 @@ window.languageManager.loadMessages('zh-hant', {
 	CYBERBRICK_ERROR_TIMEOUT: 'CyberBrick OTA 上傳逾時。',
 	CYBERBRICK_ERROR_OTA_FAILED: 'CyberBrick OTA 上傳失敗。',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'CyberBrick OTA 修補失敗。',
+	OTA_AGENT_UPGRADING: '正在升級 OTA Agent {0} → {1}…',
+	OTA_AGENT_UPGRADED: 'OTA Agent 已升級至 {0}，正在繼續上傳…',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} 已過舊，請重新配對 CyberBrick 以啟用自動升級。',
 
 	// 實驗積木提示
 	EXPERIMENTAL_BLOCKS_TITLE: '發現實驗性積木',

@@ -124,6 +124,95 @@ let isBoardDropdownOpen = false;
 let isLanguageSwitchReloading = false;
 let pendingLanguageReloadTimer = null;
 let txtSshSetupDone = false;
+let isBlocklyTextInputComposing = false;
+
+function isTextEditableElement(element) {
+	if (element instanceof HTMLTextAreaElement) {
+		return true;
+	}
+	if (element instanceof HTMLInputElement) {
+		const nonTextInputTypes = new Set(['button', 'checkbox', 'color', 'file', 'hidden', 'image', 'radio', 'range', 'reset', 'submit']);
+		return !nonTextInputTypes.has((element.type || 'text').toLowerCase());
+	}
+	return element instanceof HTMLElement ? element.isContentEditable : false;
+}
+
+function isBlocklyWidgetTextInput(element) {
+	return element instanceof Element && isTextEditableElement(element) && Boolean(element.closest('.blocklyWidgetDiv'));
+}
+
+function isBlocklyTextInputCompositionEvent(event) {
+	return Boolean(
+		event &&
+			(event.isComposing ||
+				event.key === 'Process' ||
+				event.keyCode === 229 ||
+				event.which === 229 ||
+				(isBlocklyTextInputComposing && isBlocklyWidgetTextInput(event.target)))
+	);
+}
+
+function shouldBypassGlobalKeyboardShortcut(event) {
+	if (isBlocklyTextInputCompositionEvent(event)) {
+		return true;
+	}
+	const target = event && event.target instanceof Element ? event.target : null;
+	const activeElement = document.activeElement instanceof Element ? document.activeElement : null;
+	return isTextEditableElement(target) || isTextEditableElement(activeElement);
+}
+
+function installBlocklyTextInputImePatch() {
+	const fieldTextInputPrototype = Blockly && Blockly.FieldTextInput ? Blockly.FieldTextInput.prototype : null;
+	const fieldInputPrototype = fieldTextInputPrototype ? Object.getPrototypeOf(fieldTextInputPrototype) : null;
+	if (!fieldInputPrototype || typeof fieldInputPrototype.onHtmlInputKeyDown_ !== 'function') {
+		return;
+	}
+	if (fieldInputPrototype.onHtmlInputKeyDown_.__singularImeGuardInstalled) {
+		return;
+	}
+	const originalOnHtmlInputKeyDown = fieldInputPrototype.onHtmlInputKeyDown_;
+	fieldInputPrototype.onHtmlInputKeyDown_ = function (event) {
+		if (isBlocklyTextInputCompositionEvent(event)) {
+			return;
+		}
+		return originalOnHtmlInputKeyDown.call(this, event);
+	};
+	fieldInputPrototype.onHtmlInputKeyDown_.__singularImeGuardInstalled = true;
+}
+
+document.addEventListener(
+	'compositionstart',
+	event => {
+		if (isBlocklyWidgetTextInput(event.target)) {
+			isBlocklyTextInputComposing = true;
+		}
+	},
+	true
+);
+
+document.addEventListener(
+	'compositionend',
+	event => {
+		if (isBlocklyWidgetTextInput(event.target)) {
+			setTimeout(() => {
+				isBlocklyTextInputComposing = false;
+			}, 0);
+		}
+	},
+	true
+);
+
+document.addEventListener(
+	'focusout',
+	event => {
+		if (isBlocklyWidgetTextInput(event.target)) {
+			isBlocklyTextInputComposing = false;
+		}
+	},
+	true
+);
+
+window.shouldBypassBlocklyGlobalShortcut = shouldBypassGlobalKeyboardShortcut;
 
 const cyberBrickUploadSettingsState = {
 	loaded: false,
@@ -1704,6 +1793,9 @@ const quickBackup = {
 	 */
 	init: function () {
 		document.addEventListener('keydown', e => {
+			if (shouldBypassGlobalKeyboardShortcut(e)) {
+				return;
+			}
 			if ((e.ctrlKey || e.metaKey) && e.key === 's') {
 				e.preventDefault(); // 阻止瀏覽器預設的「儲存網頁」對話框
 				this.performQuickSave();
@@ -2862,6 +2954,9 @@ const functionSearch = {
 
 		// 設置快捷鍵 (Ctrl+F)
 		document.addEventListener('keydown', e => {
+			if (shouldBypassGlobalKeyboardShortcut(e)) {
+				return;
+			}
 			if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
 				e.preventDefault(); // 阻止瀏覽器默認搜尋
 				this.openModal();
@@ -3300,6 +3395,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 	});
 	// Esc 鍵關閉語言選單
 	document.addEventListener('keydown', event => {
+		if (shouldBypassGlobalKeyboardShortcut(event)) {
+			return;
+		}
 		if (event.key === 'Escape') {
 			if (isLanguageDropdownOpen) {
 				closeLanguageDropdown();
@@ -3327,12 +3425,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// T015: 初始化剪貼簿操作監聽器 (Ctrl+C/V/X)
 	// 監聽複製、貼上、剪下操作以鎖定保存
 	document.addEventListener('keydown', e => {
+		if (shouldBypassGlobalKeyboardShortcut(e)) {
+			return;
+		}
 		if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x'].includes(e.key.toLowerCase())) {
 			// 開始剪貼簿操作鎖定
 			startClipboardLock();
 		}
 	});
 	document.addEventListener('keyup', e => {
+		if (shouldBypassGlobalKeyboardShortcut(e)) {
+			return;
+		}
 		if (['c', 'v', 'x'].includes(e.key.toLowerCase())) {
 			// 延遲結束剪貼簿操作鎖定（確保事件處理完成）
 			setTimeout(() => {
@@ -3412,6 +3516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 處理翻譯
 	processTranslations(toolboxConfig);
+	installBlocklyTextInputImePatch();
 
 	// 根據當前主題設定選擇初始主題
 	const theme = currentTheme === 'dark' ? window.SingularBlocklyDarkTheme : window.SingularBlocklyTheme;
@@ -5041,6 +5146,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 
 			// Serial Monitor 功能
+			case 'monitorConnecting':
+				handleMonitorConnecting(message);
+				break;
+
 			case 'monitorStarted':
 				handleMonitorStarted(message);
 				break;
@@ -6390,7 +6499,11 @@ function renderCyberBrickPairedDevices() {
 		title.textContent = device.friendlyName || 'CyberBrick';
 		const meta = document.createElement('div');
 		meta.className = 'cyberbrick-paired-device-meta';
-		meta.textContent = `${getCyberBrickShortDeviceLabel(device.deviceId)} · ${device.lastKnownIp || (window.languageManager?.getMessage('CYBERBRICK_DEVICE_IP_UNKNOWN', 'IP not known') || 'IP not known')}`;
+		let metaText = `${getCyberBrickShortDeviceLabel(device.deviceId)} · ${device.lastKnownIp || (window.languageManager?.getMessage('CYBERBRICK_DEVICE_IP_UNKNOWN', 'IP not known') || 'IP not known')}`;
+		if (device.agentVersion) {
+			metaText += ` · Agent v${device.agentVersion}`;
+		}
+		meta.textContent = metaText;
 		const status = document.createElement('span');
 		status.className = 'cyberbrick-status-badge';
 		if (!device.lastKnownIp) {
@@ -6536,7 +6649,6 @@ async function confirmCyberBrickDeviceDelete(device) {
 
 async function requestCyberBrickOtaCleanup() {
 	const usbPort = getSelectedCyberBrickUsbPort();
-	const device = getCyberBrickPrimaryDevice();
 	if (!usbPort) {
 		toast.show(window.languageManager?.getMessage('CYBERBRICK_USB_PORT_REQUIRED', 'Choose a CyberBrick USB port first.'), 'warning', 4000);
 		return;
@@ -6548,8 +6660,7 @@ async function requestCyberBrickOtaCleanup() {
 			'This will remove Singular Blockly OTA files from the USB-connected CyberBrick, strip the OTA startup block from /app/rc_main.py, delete matching local pairing secrets if found, and switch this project back to USB. It will not touch /boot.py or factory files. Continue?'
 		) ||
 		'This will remove Singular Blockly OTA files from the USB-connected CyberBrick, strip the OTA startup block from /app/rc_main.py, delete matching local pairing secrets if found, and switch this project back to USB. It will not touch /boot.py or factory files. Continue?';
-	const targetLabel = device ? `${device.friendlyName || device.deviceId} (${getCyberBrickShortDeviceLabel(device.deviceId)})` : usbPort;
-	const confirmed = await showAsyncConfirm(`${confirmMessage}\n${targetLabel}`);
+	const confirmed = await showAsyncConfirm(`${confirmMessage}\n${usbPort}`);
 	if (!confirmed) {
 		return;
 	}
@@ -6561,10 +6672,7 @@ async function requestCyberBrickOtaCleanup() {
 	vscode.postMessage({
 		command: 'cyberbrickOtaCleanupRequest',
 		requestId: createCyberBrickUploadRequestId('cyberbrick-ota-cleanup'),
-		payload: {
-			usbPort,
-			...(device?.deviceId ? { deviceId: device.deviceId } : {}),
-		},
+		payload: { usbPort },
 	});
 }
 
@@ -7103,6 +7211,10 @@ function handleUploadProgress(message) {
 		checking_pio: window.languageManager?.getMessage('ARDUINO_STAGE_CHECKING', 'Checking build tools'),
 		detecting: window.languageManager?.getMessage('ARDUINO_STAGE_DETECTING', 'Detecting board'),
 		compiling: window.languageManager?.getMessage('ARDUINO_STAGE_COMPILING', 'Compiling'),
+		// T012: OTA agent upgrade stages
+		upgrading_agent: window.languageManager?.getMessage('OTA_AGENT_UPGRADING', 'Upgrading OTA agent...'),
+		agent_upgraded: window.languageManager?.getMessage('OTA_AGENT_UPGRADED', 'OTA agent upgraded'),
+		agent_upgrade_needed: window.languageManager?.getMessage('OTA_AGENT_UPGRADE_NEEDED', 'Agent upgrade needed'),
 	};
 
 	const stageText = stageMessages[message.stage] || message.stage;
@@ -7318,6 +7430,7 @@ function getLocalizedOtaErrorDetail(errorCode) {
 		'upload-timeout': 'CYBERBRICK_ERROR_TIMEOUT',
 		'ota-upload-failed': 'CYBERBRICK_ERROR_OTA_FAILED',
 		'rc-main-patch-failed': 'CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED',
+		'agent-upgrade-failed': 'OTA_AGENT_UPGRADE_NEEDED',
 	};
 	const key = otaErrorKeyMap[errorCode];
 	if (!key) { return null; }
@@ -7541,7 +7654,9 @@ function updateEsp32BlockWarnings(workspace, isESP32Board) {
  */
 const monitorState = {
 	isRunning: false,
+	isConnecting: false,
 	currentPort: null,
+	mode: /** @type {'usb'|'wifi'|null} */ (null),
 };
 
 /**
@@ -7585,6 +7700,9 @@ function updateMonitorButtonVisibility() {
  */
 function toggleMonitor() {
 	const currentBoard = window.currentBoard || 'none';
+	if (monitorState.isConnecting) {
+		return;
+	}
 
 	if (monitorState.isRunning) {
 		vscode.postMessage({ command: 'stopMonitor' });
@@ -7594,19 +7712,35 @@ function toggleMonitor() {
 }
 
 /**
+ * 處理 Monitor 連線中訊息
+ * @param {Object} message - 訊息物件
+ */
+function handleMonitorConnecting(message) {
+	monitorState.isConnecting = true;
+	monitorState.isRunning = false;
+	monitorState.currentPort = message.port || null;
+	monitorState.mode = null;
+	updateMonitorButtonState();
+
+	log.info('[blockly] Monitor 連線中', { port: message.port, mode: monitorState.mode });
+}
+
+/**
  * 處理 Monitor 已啟動訊息
  * @param {Object} message - 訊息物件
  */
 function handleMonitorStarted(message) {
+	monitorState.isConnecting = false;
 	monitorState.isRunning = true;
 	monitorState.currentPort = message.port;
+	monitorState.mode = 'usb';
 	updateMonitorButtonState();
 
 	const connectedMsg = window.languageManager?.getMessage('MONITOR_CONNECTED', '已連接到 {0}');
 	const displayMsg = connectedMsg ? connectedMsg.replace('{0}', message.port) : `Connected to ${message.port}`;
 	toast.show(displayMsg, 'success');
 
-	log.info('[blockly] Monitor 已啟動', { port: message.port });
+	log.info('[blockly] Monitor 已啟動', { port: message.port, mode: monitorState.mode });
 }
 
 /**
@@ -7614,8 +7748,10 @@ function handleMonitorStarted(message) {
  * @param {Object} message - 訊息物件
  */
 function handleMonitorStopped(message) {
+	monitorState.isConnecting = false;
 	monitorState.isRunning = false;
 	monitorState.currentPort = null;
+	monitorState.mode = null;
 	updateMonitorButtonState();
 
 	if (message.reason === 'upload_started') {
@@ -7634,13 +7770,17 @@ function handleMonitorStopped(message) {
  * @param {Object} message - 訊息物件
  */
 function handleMonitorError(message) {
+	monitorState.isConnecting = false;
 	monitorState.isRunning = false;
 	monitorState.currentPort = null;
+	monitorState.mode = null;
 	updateMonitorButtonState();
 
 	// 根據錯誤代碼取得本地化訊息
 	let errorMsg;
-	if (message.error?.code === 'DEVICE_NOT_FOUND') {
+	if (typeof message.error === 'string' && message.error.trim()) {
+		errorMsg = message.error;
+	} else if (message.error?.code === 'DEVICE_NOT_FOUND') {
 		errorMsg = window.languageManager?.getMessage('MONITOR_DEVICE_NOT_FOUND', '找不到 CyberBrick 裝置');
 	} else if (message.error?.code === 'MPREMOTE_NOT_INSTALLED') {
 		errorMsg = message.error?.message || 'mpremote not installed';
@@ -7658,6 +7798,15 @@ function handleMonitorError(message) {
 function updateMonitorButtonState() {
 	const monitorBtn = document.getElementById('monitorBtn');
 	if (!monitorBtn) return;
+
+	monitorBtn.classList.remove('active', 'connecting');
+	monitorBtn.setAttribute('aria-busy', monitorState.isConnecting ? 'true' : 'false');
+	monitorBtn.setAttribute('aria-disabled', monitorState.isConnecting ? 'true' : 'false');
+
+	if (monitorState.isConnecting) {
+		monitorBtn.classList.add('connecting');
+		return;
+	}
 
 	if (monitorState.isRunning) {
 		monitorBtn.classList.add('active');

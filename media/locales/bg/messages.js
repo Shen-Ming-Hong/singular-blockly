@@ -90,6 +90,9 @@ window.languageManager.loadMessages('bg', {
 	CYBERBRICK_ERROR_TIMEOUT: 'OTA качването на CyberBrick изтече.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'OTA качването на CyberBrick не успя.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'OTA пачът на CyberBrick не успя.',
+	OTA_AGENT_UPGRADING: 'Обновяване на OTA Agent {0} → {1}...',
+	OTA_AGENT_UPGRADED: 'OTA Agent обновен до {0}. Продължаване на качването...',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} е остарял. Сдвоете отново CyberBrick, за да активирате автоматичното обновяване.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Открити са експериментални блокове',

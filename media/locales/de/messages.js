@@ -90,6 +90,9 @@ window.languageManager.loadMessages('de', {
 	CYBERBRICK_ERROR_TIMEOUT: 'CyberBrick OTA-Upload hat das Zeitlimit überschritten.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'CyberBrick OTA-Upload fehlgeschlagen.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'CyberBrick OTA-Patch fehlgeschlagen.',
+	OTA_AGENT_UPGRADING: 'OTA-Agent wird von {0} auf {1} aktualisiert…',
+	OTA_AGENT_UPGRADED: 'OTA-Agent auf {0} aktualisiert. Upload wird fortgesetzt…',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA-Agent {0} ist veraltet. CyberBrick erneut koppeln, um automatische Aktualisierung zu aktivieren.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Experimentelle Blöcke erkannt',

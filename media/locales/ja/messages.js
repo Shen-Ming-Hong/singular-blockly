@@ -90,6 +90,9 @@ window.languageManager.loadMessages('ja', {
 	CYBERBRICK_ERROR_TIMEOUT: 'CyberBrick OTA アップロードがタイムアウトしました。',
 	CYBERBRICK_ERROR_OTA_FAILED: 'CyberBrick OTA アップロードに失敗しました。',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'CyberBrick OTA パッチに失敗しました。',
+	OTA_AGENT_UPGRADING: 'OTA Agent を {0} → {1} にアップグレード中…',
+	OTA_AGENT_UPGRADED: 'OTA Agent が {0} にアップグレードされました。アップロードを再開します…',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0} は古すぎます。自動アップグレードを有効にするには CyberBrick を再ペアリングしてください。',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: '実験的ブロックが検出されました',

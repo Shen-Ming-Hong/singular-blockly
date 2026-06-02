@@ -90,6 +90,9 @@ window.languageManager.loadMessages('ko', {
 	CYBERBRICK_ERROR_TIMEOUT: 'CyberBrick OTA 업로드 시간이 초과되었습니다.',
 	CYBERBRICK_ERROR_OTA_FAILED: 'CyberBrick OTA 업로드에 실패했습니다.',
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'CyberBrick OTA 패치에 실패했습니다.',
+	OTA_AGENT_UPGRADING: 'OTA Agent를 {0} → {1}로 업그레이드 중...',
+	OTA_AGENT_UPGRADED: 'OTA Agent가 {0}으로 업그레이드되었습니다. 업로드를 재개합니다...',
+	OTA_AGENT_UPGRADE_NEEDED: 'OTA Agent {0}이(가) 오래되었습니다. 자동 업그레이드를 사용하려면 CyberBrick을 다시 페어링하세요.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: '실험적 블록 감지됨',

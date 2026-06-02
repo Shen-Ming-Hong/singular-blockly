@@ -7,13 +7,38 @@ import {
 	withCyberBrickRcMainOtaBootstrap,
 } from '../../services/cyberbrickOtaAgentSource';
 import { MicropythonUploader, CommandExecutor } from '../../services/micropythonUploader';
+import { CYBERBRICK_OTA_AGENT_TARGET_VERSION, CYBERBRICK_OTA_REMOTE_PATH } from '../../types/cyberbrickUpload';
 
 suite('MicropythonUploader CyberBrick helper commands', () => {
 	function createUploader(executor: CommandExecutor): MicropythonUploader {
 		const uploader = new MicropythonUploader('/workspace', executor);
+		(uploader as unknown as { pythonPath: string }).pythonPath = '/mock/python';
 		(uploader as unknown as { mpremotePath: string }).mpremotePath = '/mock/mpremote';
 		return uploader;
 	}
+
+	test('lists CyberBrick USB ports via PlatformIO Python without depending on mpremote', async () => {
+		let helperScript = '';
+		const uploader = createUploader({
+			exec: async command => {
+				const scriptPath = command.match(/"([^"]*cyberbrick_serial_ports_[^"]*\.py)"$/)?.[1] || command.match(/"([^"]*cyberbrick_serial_ports_[^"]*\.py)"/)?.[1];
+				assert.ok(scriptPath, 'serial port probe should run a temporary Python helper script');
+				helperScript = fs.readFileSync(scriptPath, 'utf8');
+				return {
+					stdout: '{"ports":[{"path":"/dev/cu.usbmodem1201","vendorId":"303A","productId":"1001","manufacturer":"CyberBrick","description":"USB Serial","serialNumber":"ABC123"}]}\n',
+					stderr: '',
+				};
+			},
+		});
+
+		const result = await uploader.listSerialPorts('cyberbrick');
+
+		assert.strictEqual(result.autoDetected, '/dev/cu.usbmodem1201');
+		assert.strictEqual(result.ports.length, 1);
+		assert.strictEqual(result.ports[0].serialNumber, 'ABC123');
+		assert.ok(helperScript.includes('from serial.tools import list_ports'));
+		assert.ok(helperScript.includes("getattr(info, 'serial_number', None)"));
+	});
 
 	test('interrupts the running program and runs temporary helper scripts with mpremote resume + run', async () => {
 		const commands: string[] = [];
@@ -115,12 +140,38 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.strictEqual(source.includes('\n+'), false, 'generated MicroPython source must not contain patch artifact lines');
 		assert.ok(source.includes('def start_background(wait_for_wifi=True):'), 'OTA agent should expose background startup for USB provisioning');
 		assert.ok(source.includes("import _thread"), 'OTA agent should start its HTTP server without blocking student code');
-		assert.ok(source.includes("WIFI_PASSWORD = _cfg('WIFI_PASSWORD', '')"), 'OTA agent should read device-side Wi-Fi credentials');
-		assert.match(source, /REMOTE_PATH = ['"]\/app\/rc_main\.py['"]/, 'OTA agent must only write the CyberBrick app entrypoint');
+		assert.ok(source.includes("X=[0];Y=[0]"), 'OTA agent should track background startup state and avoid duplicate launches');
+		assert.ok(source.includes("Z=lambda ip:{'started':True,'ipAddress':ip or I(),'mode':'thread'}"), 'OTA agent should centralize the background-start success payload to stay compact on low-memory devices');
+		assert.ok(source.includes("if Y[0]:return Z(ip)"), 'OTA agent should avoid launching duplicate background servers');
+		assert.ok(source.includes("z.listen(1);Y[0]=2"), 'OTA agent should mark the background HTTP thread as ready after binding the socket');
+		assert.ok(source.includes("W=_cfg('WIFI_PASSWORD','')"), 'OTA agent should read device-side Wi-Fi credentials');
+		assert.ok(source.includes(`R=${JSON.stringify(CYBERBRICK_OTA_REMOTE_PATH)}`), 'OTA agent must only write the CyberBrick app entrypoint');
 		assert.strictEqual(source.includes('/boot.py'), false, 'OTA agent must not modify CyberBrick boot files');
-		assert.ok(source.includes('def _recv_headers(client):'), 'OTA agent should stream-read HTTP headers before binary upload');
-		assert.ok(source.includes('def _upload_raw(client, headers, leftover):'), 'OTA agent should use streaming binary upload');
+		assert.ok(source.includes('def H(c):'), 'OTA agent should stream-read HTTP headers before binary upload');
+		assert.ok(source.includes('def U(c,d,l):'), 'OTA agent should use streaming binary upload');
+		assert.ok(source.includes('def F(c,l,n,p):'), 'OTA agent should share a streaming file writer for OTA uploads');
+		assert.strictEqual(source.includes('data += chunk'), false, 'OTA agent upgrade route must not buffer the whole agent in memory');
 		assert.ok(source.includes("content-length"), 'OTA agent should honor Content-Length for streaming upload');
+		assert.ok(
+			source.includes("('HTTP/1.1 %s\\r\\nContent-Length:%d\\r\\n\\r\\n'%(n,len(p))).encode()+p"),
+			'OTA agent should encode HTTP responses as bytes and compute Content-Length from byte length',
+		);
+		assert.ok(source.includes('def T(c,b):'), 'OTA agent should centralize socket response writes through a full-buffer send helper');
+		assert.ok(source.includes('while o<len(b):'), 'OTA agent should retry socket.send until the whole response body is written');
+		assert.ok(source.includes("if not n:raise OSError('short-send')"), 'OTA agent should fail loudly if the socket stops sending bytes mid-response');
+		assert.ok(
+			source.includes("while b'\\r\\n\\r\\n' not in r:"),
+			'OTA agent should keep header parsing delimiters escaped in generated Python source',
+		);
+		assert.strictEqual(source.includes('uzlib'), false, 'OTA agent must not depend on uzlib because the target MicroPython build does not provide it');
+		assert.ok(source.length < 4500, `OTA agent source should stay compact enough for low-memory devices (got ${source.length} bytes)`);
+		const longSource = buildCyberBrickOtaAgentSource({
+			deviceId: `cyberbrick-${'d'.repeat(48)}`,
+			otaToken: 't'.repeat(96),
+			otaPort: 8266,
+		});
+		assert.strictEqual(longSource.includes('uzlib'), false, 'OTA agent must not reintroduce uzlib for longer credentials either');
+		assert.ok(longSource.length < 4500, `OTA agent source should stay compact even with longer credentials (got ${longSource.length} bytes)`);
 		assert.ok(source.includes("if __name__ == '__main__':"), 'OTA agent should still support direct foreground execution for diagnostics');
 	});
 
@@ -131,7 +182,15 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.ok(wrapped.startsWith(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START));
 		assert.ok(wrapped.includes('import cyberbrick_ota_agent as _singular_blockly_ota_agent'));
 		assert.ok(wrapped.includes('_singular_blockly_ota_agent.start_background(False)'));
-		assert.ok(wrapped.endsWith('print("hello")\n'));
+		assert.ok(wrapped.includes('def _singular_blockly_ota_yield(ms=1):'), 'bootstrap should provide a tiny yield helper for OTA thread fairness');
+		assert.ok(wrapped.includes('for _singular_blockly_ota_wait_idx in range(50):'), 'bootstrap should wait briefly for the OTA background thread to bind before user code begins');
+		assert.ok(wrapped.includes('getattr(_singular_blockly_ota_agent, "Y", [0])[0] > 1'), 'bootstrap should detect when the OTA background thread has reached the socket-listening state');
+		assert.ok(wrapped.includes('_singular_blockly_ota_yield(10)'), 'bootstrap should poll for OTA thread readiness in short 10ms steps');
+		assert.ok(wrapped.includes('_singular_blockly_ota_yield(500)'), 'bootstrap should retain a conservative fallback wait if the readiness probe itself fails');
+		assert.ok(wrapped.includes('_singular_blockly_ota_yield(300)'), 'bootstrap should keep a short OTA-only head start after the background thread is ready');
+		assert.ok(wrapped.includes('try:\n    print("hello")\n'));
+		assert.ok(wrapped.includes('except Exception as _singular_blockly_ota_exc:'));
+		assert.ok(wrapped.includes('_singular_blockly_ota_sys.print_exception(_singular_blockly_ota_exc)'));
 		assert.strictEqual(wrappedAgain.split(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START).length - 1, 1);
 		assert.strictEqual(wrapped.includes('WIFI_PASSWORD'), false);
 		assert.strictEqual(wrapped.includes('OTA_TOKEN'), false);
@@ -165,6 +224,7 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.strictEqual(result.agentStarted, true);
 		assert.strictEqual(result.agentMode, 'thread');
 		assert.strictEqual(result.rcMainPatched, true);
+		assert.ok(helperScript.includes(CYBERBRICK_OTA_AGENT_TARGET_VERSION), 'configure helper should report the OTA target version it just installed');
 		assert.strictEqual(helperScript.includes('\t'), false, 'configure helper script should use spaces only');
 		assert.ok(helperScript.includes('import os'), 'configure helper should be able to create /app before writing rc_main.py');
 		assert.ok(helperScript.includes('os.mkdir(path)'), 'configure helper should create missing directories for /app/rc_main.py');
@@ -296,6 +356,6 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 
 		assert.ok(uploadedCode.startsWith(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START));
 		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'));
-		assert.ok(uploadedCode.endsWith('print("student")\n'));
+		assert.ok(uploadedCode.includes('try:\n    print("student")\n'));
 	});
 });

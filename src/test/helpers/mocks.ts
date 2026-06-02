@@ -16,6 +16,7 @@ import { afterEach, beforeEach } from 'mocha';
  */
 export class VSCodeMock {
 	private _outputChannel: any = null;
+	private _configurationStore = new Map<string, Map<string, any>>();
 
 	public window: any = {
 		createOutputChannel: sinon.stub().callsFake((name: string, options?: any) => {
@@ -111,6 +112,22 @@ export class VSCodeMock {
 
 	public workspace: any = {
 		workspaceFolders: [{ uri: { fsPath: '/mock/workspace' } }],
+		getConfiguration: sinon.stub().callsFake((section?: string) => {
+			const sectionKey = section || '';
+			if (!this._configurationStore.has(sectionKey)) {
+				this._configurationStore.set(sectionKey, new Map());
+			}
+			const sectionStore = this._configurationStore.get(sectionKey)!;
+			return {
+				get: sinon.stub().callsFake((key: string, defaultValue?: any) => {
+					return sectionStore.has(key) ? sectionStore.get(key) : defaultValue;
+				}),
+				update: sinon.stub().callsFake((key: string, value: any) => {
+					sectionStore.set(key, value);
+					return Promise.resolve();
+				}),
+			};
+		}),
 		createFileSystemWatcher: sinon.stub().callsFake(() => {
 			return {
 				onDidChange: sinon.stub().returns({ dispose: sinon.stub() }),

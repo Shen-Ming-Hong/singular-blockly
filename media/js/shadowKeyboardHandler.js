@@ -33,10 +33,33 @@
 	}
 
 	/**
+	 * Avoid stealing keystrokes while the user is editing text or using an IME.
+	 * @param {KeyboardEvent} event
+	 * @returns {boolean}
+	 */
+	function shouldIgnoreShortcut(event) {
+		if (typeof window.shouldBypassBlocklyGlobalShortcut === 'function') {
+			return window.shouldBypassBlocklyGlobalShortcut(event);
+		}
+		var target = event && event.target instanceof Element ? event.target : null;
+		return Boolean(
+			event &&
+				(event.isComposing || event.key === 'Process' || event.keyCode === 229 || event.which === 229 ||
+					(target &&
+						(target.matches('input, textarea') ||
+							(target instanceof HTMLElement && target.isContentEditable))))
+		);
+	}
+
+	/**
 	 * Main keydown handler for shadow suggestion shortcuts.
 	 * @param {KeyboardEvent} e
 	 */
 	function handleKeyDown(e) {
+		if (shouldIgnoreShortcut(e)) {
+			return;
+		}
+
 		// --- Ctrl+Shift+Space: manually trigger suggestion ---
 		if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === ' ') {
 			e.preventDefault();
