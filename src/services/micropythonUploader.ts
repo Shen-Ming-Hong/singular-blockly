@@ -1236,17 +1236,17 @@ print(json.dumps(result))
 	}
 
 	/**
-	 * 上傳程式碼到裝置（純 USB 燒錄，不注入 OTA bootstrap）
+	 * 上傳程式碼到裝置
 	 * 
-	 * USB 上傳採用直接燒錄策略，不管裝置是否已配置 OTA，都使用純淨程式碼。
-	 * 這樣可以：
-	 * 1. 提升上傳速度（省略 OTA 配置檢查）
-	 * 2. 提高穩定性（減少裝置通訊次數）
-	 * 3. 符合使用者預期（USB = 傳統直接燒錄）
+	 * USB 上傳會先檢查裝置是否已設定 OTA（`cyberbrick_ota_config` 模組存在）：
+	 * - 已設定 OTA → 注入 OTA bootstrap，確保裝置重啟後 OTA 功能持續運作
+	 * - 未設定 OTA → 使用純淨程式碼，符合傳統 USB 燒錄語義
+	 * - 檢查失敗（逾時、port busy 等）→ 保守策略：注入 bootstrap，避免已設定 OTA 的裝置失去 bootstrap
+	 *   （bootstrap 含 try/except，對未設定 OTA 的裝置安全）
 	 * 
 	 * 對 OTA 功能的影響：
 	 * - 裝置上的 OTA 配置檔和 agent 檔案不受影響
-	 * - 下次透過 OTA 上傳時會自動注入 bootstrap，OTA 功能恢復
+	 * - 若 USB 上傳前 OTA 已配置，bootstrap 會保留，OTA 繼續有效
 	 * 
 	 * @param code 程式碼
 	 * @param port 連接埠
@@ -1257,15 +1257,18 @@ print(json.dumps(result))
 		const tempFile = path.join(tempDir, 'blockly_upload.py');
 
 		// 檢查裝置是否已設定 OTA（檢查 /cyberbrick_ota_config.py 是否存在）
-		let hasOtaConfig = false;
+		// 失敗時採保守策略：注入 bootstrap。
+		// 理由：bootstrap 已包含 try/except，對無 OTA 的裝置安全（靜默跳過）；
+		// 反之若裝置有 OTA 卻因逾時/port busy 導致誤判為無 OTA，bootstrap 將被移除，OTA 功能損壞。
+		let hasOtaConfig = true; // 預設保守：注入 bootstrap
 		try {
 			const checkScript = "try:\n    import cyberbrick_ota_config\n    print('YES')\nexcept:\n    print('NO')";
 			const result = await this.runCyberBrickPython(port, checkScript, 5000);
 			hasOtaConfig = result.stdout.trim().includes('YES');
 			log('[blockly] OTA 設定檢查', 'debug', { hasOtaConfig });
 		} catch {
-			// 檢查失敗時假設沒有 OTA 設定
-			hasOtaConfig = false;
+			// 檢查失敗（逾時、port busy 等）→ 維持保守預設（hasOtaConfig = true）
+			log('[blockly] OTA 設定檢查失敗，採保守策略：注入 bootstrap', 'warn');
 		}
 
 		// 如果已設定 OTA，則在程式碼中注入 OTA bootstrap；否則使用純淨程式碼
