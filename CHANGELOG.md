@@ -8,6 +8,32 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.5] - 2026-06-03
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick Windows USB-Serial 相容性修復** (CyberBrick Windows USB-Serial compatibility fix)
+    - `quoteShellArg()` 改為平台感知：Windows 使用雙引號策略，Unix 維持 single-quote；修正 Windows CMD 無法處理 Unix single-quote 導致含空格路徑的命令失敗
+      `quoteShellArg()` is now platform-aware: double-quote on Windows, single-quote on Unix; fixes commands failing on Windows CMD when paths contain spaces
+    - 新增 `getWindowsShortPath()`：透過 `for %I in (...) do @echo %~sI` 取得 Windows 8.3 短路徑，避免含中文/特殊字元的使用者名稱導致 mpremote 路徑解析失敗；`deployOtaAgent`、`interruptDevice`、`uploadCode` 均已統一使用此 helper
+      Added `getWindowsShortPath()`: uses Windows `for %I ... @echo %~sI` to get 8.3 short paths, preventing mpremote path failures for user names with Chinese characters or special chars; unified across `deployOtaAgent`, `interruptDevice`, and `uploadCode`
+    - 新增 `normalizeCOMPort()`：強制 COM 埠大寫（`com3` → `COM3`），避免 Windows 大小寫變體導致 pyserial 連線失敗
+      Added `normalizeCOMPort()`: forces uppercase COM port names (`com3` → `COM3`), preventing pyserial connection failures from case variants on Windows
+    - `runCyberBrickPython()` 加入 Windows COM 埠重試機制：port busy 時最多重試 3 次（間隔 10s），並在 `interruptDevice` 後等待 1.5s（原 1.0s），讓 COM port 驅動完全釋放
+      `runCyberBrickPython()` now retries up to 3 times on Windows when port is busy (10s intervals), and waits 1.5s (was 1.0s) after `interruptDevice` for the COM port driver to fully release
+    - 新增 `enhanceWindowsErrorMessage()`：針對 `PermissionError` (Errno 13) 與找不到 COM 埠加入中文提示，幫助 Windows 使用者排查常見問題
+      Added `enhanceWindowsErrorMessage()`: adds Chinese hints for `PermissionError` (Errno 13) and missing COM port errors to help Windows users diagnose common issues
+
+- **CyberBrick USB 上傳：條件式 OTA bootstrap 注入** (Conditional OTA bootstrap injection on USB upload)
+    - `uploadCode()` 上傳前先對裝置執行 `import cyberbrick_ota_config` 探測：確認已設定 OTA → 注入 bootstrap；確認未設定 → 純淨程式碼；探測失敗（port busy / 逾時）→ 保守策略注入 bootstrap（bootstrap 含 `try/except`，對無 OTA 裝置靜默跳過，安全）
+      Before uploading, `uploadCode()` probes the device with `import cyberbrick_ota_config`: OTA configured → inject bootstrap; not configured → clean code; probe fails (port busy/timeout) → conservative: inject bootstrap (bootstrap has `try/except`, silently skipped on non-OTA devices)
+
+- **CyberBrick OTA WiFi 上傳：Buffer → Uint8Array 修復** (OTA WiFi upload: Buffer → Uint8Array fix)
+    - `uploadCodeBytes()` 與 `uploadAgent()` 改用 `new Uint8Array(codeBytes)` 取代 Node.js `Buffer`，修正 VS Code Extension Host 的 `fetch` 在 macOS 不接受 Buffer 作為 body 導致 OTA 無線上傳失敗；同時移除手動 `Content-Length` header
+      `uploadCodeBytes()` and `uploadAgent()` now use `new Uint8Array(codeBytes)` instead of Node.js `Buffer`, fixing OTA WiFi upload failures on macOS where VS Code Extension Host's `fetch` does not accept Buffer as body; also removed manual `Content-Length` header
+    - OTA 回復端點從 `/api/v1/health` 改為 `/api/v1/reset`，與 agent v1.5.9 的端點規格一致
+      OTA recovery endpoint changed from `/api/v1/health` to `/api/v1/reset`, aligned with agent v1.5.9 endpoint spec
+
 ## [0.82.1] - 2026-06-03
 
 ### 🐛 修復 Bug Fixes
