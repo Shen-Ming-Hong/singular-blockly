@@ -400,6 +400,15 @@ export class CyberBrickOtaUploader {
 			};
 		} catch (error) {
 			const userError = classifyCyberBrickUploadError(error, 'ota-upload-failed');
+			// Log the full error chain so network-level causes (ECONNREFUSED, ETIMEDOUT, etc.)
+			// are visible in the "Singular Blockly" output channel for remote debugging.
+			log('CyberBrick OTA upload threw an exception', 'debug', {
+				classifiedCode: userError.code,
+				rawErrorMessage: error instanceof Error ? error.message : String(error),
+				rawErrorName: error instanceof Error ? error.name : undefined,
+				causeCode: this.getErrorCode(error),
+				causeMessage: (error instanceof Error && error.cause instanceof Error) ? error.cause.message : undefined,
+			});
 			if (userError.code === 'upload-timeout') {
 				const recovered = await this.tryRecoverFromUploadTimeout(run, device, token, startedAt, operationId, onProgress, finalAgentVersion);
 				if (recovered) { return recovered; }
@@ -614,11 +623,26 @@ export class CyberBrickOtaUploader {
 	}
 
 	private getErrorCode(error: unknown): string | undefined {
-		if (!error || typeof error !== 'object' || !('code' in error)) {
+		if (!error || typeof error !== 'object') {
 			return undefined;
 		}
-		const code = (error as { code?: unknown }).code;
-		return typeof code === 'string' ? code : undefined;
+		// Check top-level .code first (CyberBrickUploadUserError and most Node.js errors)
+		if ('code' in error) {
+			const code = (error as { code?: unknown }).code;
+			if (typeof code === 'string') {
+				return code;
+			}
+		}
+		// Node.js 18+ built-in fetch wraps network errors (ECONNREFUSED, ENETUNREACH, etc.)
+		// inside a TypeError: the actual code lives on error.cause.code, not on the TypeError itself.
+		const cause = (error as { cause?: unknown }).cause;
+		if (cause && typeof cause === 'object' && 'code' in cause) {
+			const causeCode = (cause as { code?: unknown }).code;
+			if (typeof causeCode === 'string') {
+				return causeCode;
+			}
+		}
+		return undefined;
 	}
 
 	private async waitForAgentHealth(
@@ -656,7 +680,22 @@ export class CyberBrickOtaUploader {
 
 
 	private async reopenUploadWindow(device: PairedCyberBrickDevice, token: string): Promise<HealthResponse | null> {
-		// The agent may be rebooting after a previous upload; wait for it to recover.
+		// Trigger a device reboot via POST /api/v1/reset so the OTA agent re-opens
+		// the upload window, then wait for the health endpoint to confirm readiness.
+		try {
+			await this.withTimeout(
+				this.fetchImpl(`${this.getBaseUrl(device)}/reset`, {
+					method: 'POST',
+					headers: this.buildHeaders(device.deviceId, token),
+				}),
+				PRE_UPLOAD_RESET_HEALTH_TIMEOUT_MS,
+				'timeout',
+			);
+		} catch {
+			// Reset call can fail or hang (device drops off immediately on reboot);
+			// continue to poll health regardless.
+		}
+
 		const recoveredHealth = await this.waitForAgentHealth(
 			device,
 			token,
@@ -706,7 +745,10 @@ export class CyberBrickOtaUploader {
 		return errorCode === 'upload-timeout'
 			|| errorCode === 'timeout'
 			|| errorCode === 'network-error'
-			|| errorCode === 'ECONNREFUSED';
+			|| errorCode === 'ECONNREFUSED'
+			|| errorCode === 'ENETUNREACH'
+			|| errorCode === 'ECONNRESET'
+			|| errorCode === 'ETIMEDOUT';
 	}
 
 	/**
