@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.1] - 2026-06-03
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick OTA 無線上傳 reset-capable 裝置失敗修復** (CyberBrick OTA upload failure fix for reset-capable devices)
+    - 修正 OTA agent 版本 ≥ 1.5.0 的裝置（reset-capable）在第一次上傳嘗試失敗後，reset-and-retry 機制從未觸發的問題：Node.js 18+ 的 `fetch()` 在網路錯誤時拋出 `TypeError`，實際錯誤碼（`ECONNRESET` 等）包在 `error.cause.code` 而非頂層 `.code`，導致 `getErrorCode()` 回傳 `undefined`，`shouldRetryUploadWithFreshWindow()` 判斷為不需重試
+      Fixed an issue where the reset-and-retry mechanism never triggered for reset-capable devices (OTA agent ≥ 1.5.0): Node.js 18+ `fetch()` throws a `TypeError` for network errors, with the actual code (`ECONNRESET`, etc.) in `error.cause.code` rather than the top-level `.code`, causing `getErrorCode()` to return `undefined` and `shouldRetryUploadWithFreshWindow()` to skip the retry
+    - `getErrorCode()` 現在會往 `error.cause.code` 查找，正確提取 Node.js 18+ fetch 錯誤的網路層錯誤碼
+      `getErrorCode()` now falls back to `error.cause.code` to correctly extract the network-level error code from Node.js 18+ fetch errors
+    - `shouldRetryUploadWithFreshWindow()` 新增 `ENETUNREACH`、`ECONNRESET`、`ETIMEDOUT` 錯誤碼，確保這些典型的 busy-runtime 失敗也能觸發 reset-and-retry
+      `shouldRetryUploadWithFreshWindow()` now handles `ENETUNREACH`, `ECONNRESET`, `ETIMEDOUT` so typical busy-runtime failures correctly trigger the reset-and-retry path
+    - `reopenUploadWindow()` 現在在輪詢 `/health` 之前先發送 `POST /api/v1/reset`，確保裝置重開機並重新打開 OTA 上傳視窗
+      `reopenUploadWindow()` now sends `POST /api/v1/reset` before polling `/health`, ensuring the device reboots and re-opens its OTA upload window
+    - 強化 upload() outer catch 的 debug logging，將完整 error chain（classifiedCode、causeCode、causeMessage）輸出至「Singular Blockly」輸出頻道，方便遠端除錯
+      Enhanced debug logging in the `upload()` outer catch block to output the full error chain (classifiedCode, causeCode, causeMessage) to the "Singular Blockly" output channel for remote debugging
+
 ## [0.82.0] - 2026-06-02
 
 ### ✨ 新功能 New Features
