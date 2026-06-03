@@ -281,7 +281,8 @@ suite('CyberBrickOtaUploader', () => {
 
 		assert.strictEqual(result.status, 'succeeded');
 		assert.strictEqual(fetchStub.callCount, 5, 'upload should retry once after agent recovery polling when the direct attempt times out');
-		assert.strictEqual(fetchStub.getCall(2).args[0], 'http://192.168.1.50:8266/api/v1/health');
+		// Agent recovery uses /reset endpoint to trigger device reboot, then polls /health for readiness
+		assert.strictEqual(fetchStub.getCall(2).args[0], 'http://192.168.1.50:8266/api/v1/reset', 'should call reset to trigger recovery');
 		assert.strictEqual(fetchStub.getCall(4).args[0], 'http://192.168.1.50:8266/api/v1/upload');
 	});
 });

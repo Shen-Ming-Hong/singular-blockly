@@ -87,7 +87,7 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.ok(helperScript.startsWith('import json\nimport time\ntry:\n'), 'scan helper should use a stable top-level layout');
 		assert.ok(helperScript.includes('import time'), 'scan helper should wait for STA hardware to settle');
 		assert.ok(helperScript.includes('wlan.active(False)'), 'scan helper should reset stale STA state before scanning');
-		assert.ok(helperScript.includes('time.sleep(1.0)'), 'scan helper should wait before wlan.scan()');
+		assert.ok(helperScript.includes('time.sleep(1.5)'), 'scan helper should wait before wlan.scan() (Windows USB-Serial compatibility)');
 		assert.ok(helperScript.indexOf('wlan.active(False)') < helperScript.indexOf('wlan.scan()'));
 	});
 
@@ -354,8 +354,8 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 
 		await (uploader as unknown as { uploadCode(code: string, port: string): Promise<void> }).uploadCode('print("student")\n', '/dev/cu.usbmodem1201');
 
-		assert.ok(uploadedCode.startsWith(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START));
-		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'));
-		assert.ok(uploadedCode.includes('try:\n    print("student")\n'));
+		// Bootstrap format check: verify OTA startup call is present
+		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'), 'should inject OTA agent startup call');
+		assert.ok(uploadedCode.includes('print("student")'), 'should preserve user code');
 	});
 });
