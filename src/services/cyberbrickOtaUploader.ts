@@ -721,16 +721,19 @@ export class CyberBrickOtaUploader {
 		operationId: string,
 		timeoutMs: number,
 	): Promise<CyberBrickHttpResponse> {
+		// Convert Buffer to Uint8Array for cross-platform fetch compatibility
+		// (macOS VS Code Extension Host fetch doesn't support Node.js Buffer)
+		const bodyBytes = new Uint8Array(codeBytes);
 		return await this.withTimeout(
 			this.fetchImpl(`${this.getBaseUrl(device)}/upload`, {
 				method: 'POST',
 				headers: this.buildHeaders(device.deviceId, token, {
 					'Content-Type': 'application/octet-stream',
-					'Content-Length': String(codeBytes.length),
+					// Content-Length is automatically set by fetch implementation
 					'X-Singular-Content-Sha256': contentSha256,
 					'X-Singular-Operation-Id': operationId,
 				}),
-				body: codeBytes,
+				body: bodyBytes,
 			}),
 			timeoutMs,
 			'upload-timeout',
@@ -777,15 +780,18 @@ export class CyberBrickOtaUploader {
 			targetVersion: CYBERBRICK_OTA_AGENT_TARGET_VERSION,
 		});
 		try {
+			// Convert Buffer to Uint8Array for cross-platform fetch compatibility
+			// (macOS VS Code Extension Host fetch doesn't support Node.js Buffer)
+			const bodyBytes = new Uint8Array(agentBytes);
 			const response = await this.withTimeout(
 				this.fetchImpl(`${this.getBaseUrl(device)}/upload-agent`, {
 					method: 'POST',
 					headers: this.buildHeaders(device.deviceId, token, {
 						'Content-Type': 'application/octet-stream',
-						'Content-Length': String(agentBytes.length),
+						// Content-Length is automatically set by fetch implementation
 						'X-Singular-Content-Sha256': contentSha256,
 					}),
-					body: agentBytes,
+					body: bodyBytes,
 				}),
 				this.uploadTimeoutMs,
 				'upload-timeout'

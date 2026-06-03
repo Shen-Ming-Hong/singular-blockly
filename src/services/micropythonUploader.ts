@@ -333,7 +333,10 @@ export class MicropythonUploader {
 		fs.writeFileSync(scriptFile, script, 'utf8');
 
 		try {
-			const result = await this.execWithTimeout(`"${pythonPath}" "${scriptFile}"`, 10000);
+			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
+			const finalScriptFile = this.getWindowsShortPath(scriptFile);
+			
+			const result = await this.execWithTimeout(`"${pythonPath}" "${finalScriptFile}"`, 10000);
 			const payload = this.parseJsonLine<{ ports?: Array<Partial<ComPortInfo>>; error?: string }>(result.stdout);
 			if (payload?.error) {
 				log('[blockly] 列出本機序列埠失敗', 'warn', { error: payload.error });
@@ -382,11 +385,49 @@ export class MicropythonUploader {
 			// 學生程式重新啟動後可能讓 mpremote 無法進入 raw REPL。
 			// 沿用 USB 上傳流程：先中斷程式進入正常 REPL，再用 resume + run 避免額外 soft-reset。
 			await this.interruptDevice(port);
-			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(port)} resume + run ${this.quoteShellArg(scriptFile)}`;
-			log('[blockly] 執行 CyberBrick mpremote helper', 'debug', { port, timeoutMs, mode: 'resume-run' });
-			return await this.execWithTimeout(command, timeoutMs);
-		} catch (error) {
-			throw new Error(`CyberBrick helper failed: ${this.formatCommandError(error)}`);
+			
+			// Windows 平台需要額外時間讓 COM port 驅動完全釋放
+			if (process.platform === 'win32') {
+				await this.delay(1500);
+			}
+			
+			const normalizedPort = this.normalizeCOMPort(port);
+			
+			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
+			const finalScriptFile = this.getWindowsShortPath(scriptFile);
+			
+			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + run ${this.quoteShellArg(finalScriptFile)}`;
+			log('[blockly] 執行 CyberBrick mpremote helper', 'debug', { port, normalizedPort, timeoutMs, mode: 'resume-run' });
+			
+			// Windows 平台重試機制：偵測 port busy 錯誤
+			const maxRetries = process.platform === 'win32' ? 3 : 1;
+			let lastError: unknown;
+			
+			for (let attempt = 1; attempt <= maxRetries; attempt++) {
+				try {
+					return await this.execWithTimeout(command, timeoutMs);
+				} catch (error) {
+					lastError = error;
+					const errorMsg = this.formatCommandError(error).toLowerCase();
+					
+					// 僅針對 "port busy" 類錯誤重試
+					const isPortBusy = errorMsg.includes('in use') || 
+					                   errorMsg.includes('access is denied') || 
+					                   errorMsg.includes('permissionerror') ||
+					                   errorMsg.includes('cannot access');
+					
+					if (isPortBusy && attempt < maxRetries) {
+						log(`[blockly] COM port 忙碌，等待後重試 (${attempt}/${maxRetries})`, 'warn', { port: normalizedPort });
+						await this.delay(500);
+						continue;
+					}
+					
+					// 其他錯誤或已達重試上限，立即拋出
+					break;
+				}
+			}
+			
+			throw new Error(`CyberBrick helper failed: ${this.formatCommandError(lastError)}`);
 		} finally {
 			try {
 				fs.unlinkSync(scriptFile);
@@ -431,7 +472,8 @@ print('OK')
 			'    except Exception:',
 			'        pass',
 			'    wlan.active(True)',
-			'    time.sleep(1.0)',
+			'    # Windows USB-Serial 延遲較高，增加初始化等待時間',
+			'    time.sleep(1.5)',
 			'    rows = wlan.scan()',
 			'    networks = []',
 			'    for row in rows:',
@@ -460,9 +502,12 @@ print('OK')
 		const sourceFile = path.join(tempDir, `cyberbrick_ota_agent_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
 		fs.writeFileSync(sourceFile, agentSource, 'utf8');
 
+		const normalizedPort = this.normalizeCOMPort(port);
 		try {
-			await this.interruptDevice(port);
-			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(port)} resume + fs cp ${this.quoteShellArg(sourceFile)} :/cyberbrick_ota_agent.py`;
+			await this.interruptDevice(normalizedPort);
+			
+			const finalSourceFile = this.getWindowsShortPath(sourceFile);
+			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + fs cp ${this.quoteShellArg(finalSourceFile)} :/cyberbrick_ota_agent.py`;
 			log('[blockly] 部署 CyberBrick OTA agent', 'info', { port });
 			await this.execWithTimeout(command, 20000);
 		} catch (error) {
@@ -793,21 +838,67 @@ print(json.dumps(result))
 		}
 	}
 
+	/**
+	 * 跨平台 shell 參數引號處理
+	 * Windows 使用雙引號，Unix 使用單引號
+	 */
 	private quoteShellArg(value: string): string {
-		return `'${value.replace(/'/g, `'\\''`)}'`;
+		if (process.platform === 'win32') {
+			// Windows cmd.exe 和 PowerShell: 使用雙引號，內部雙引號轉義為 \"
+			return `"${value.replace(/"/g, '\\"')}"`;
+		} else {
+			// Unix shells: 使用單引號，內部單引號轉義為 '\\'
+			return `'${value.replace(/'/g, `'\\''`)}'`;
+		}
+	}
+
+	/**
+	 * 標準化 COM port 路徑格式
+	 * mpremote 和 pyserial 可以直接處理標準的 COM{N} 格式
+	 * 不使用 \\\\.\\COM{N} 前綴，避免被誤解為正則表達式轉義序列
+	 */
+	private normalizeCOMPort(port: string): string {
+		if (process.platform !== 'win32') {
+			return port;
+		}
+		// Windows: 確保 COM port 格式統一為大寫 COM{N}
+		const comMatch = port.match(/^COM(\d+)$/i);
+		if (comMatch) {
+			const portNumber = parseInt(comMatch[1], 10);
+			return `COM${portNumber}`;
+		}
+		return port;
+	}
+
+	/**
+	 * Windows 平台取得檔案短路徑格式，避免特殊字符問題
+	 * 如果無法取得短路徑或非 Windows 平台，則返回原路徑
+	 */
+	private getWindowsShortPath(filePath: string): string {
+		if (process.platform !== 'win32') {
+			return filePath;
+		}
+		try {
+			const { execSync } = require('child_process');
+			const shortPath = execSync(`for %I in ("${filePath}") do @echo %~sI`, { encoding: 'utf8' }).trim();
+			return (shortPath && shortPath !== filePath) ? shortPath : filePath;
+		} catch {
+			// 取得短路徑失敗時使用原路徑
+			return filePath;
+		}
 	}
 
 	private formatCommandError(error: unknown): string {
 		if (error instanceof Error) {
-			return error.message;
+			return this.enhanceWindowsErrorMessage(error.message);
 		}
 		if (error && typeof error === 'object') {
 			const errorRecord = error as { error?: unknown; stdout?: unknown; stderr?: unknown };
 			const parts: string[] = [];
 			if (errorRecord.error instanceof Error) {
-				parts.push(errorRecord.error.message);
+				parts.push(this.enhanceWindowsErrorMessage(errorRecord.error.message));
 			} else if (typeof errorRecord.error === 'string') {
-				parts.push(errorRecord.error);
+				parts.push(this.enhanceWindowsErrorMessage(errorRecord.error));
 			}
 			if (typeof errorRecord.stderr === 'string' && errorRecord.stderr.trim()) {
 				parts.push(`stderr: ${this.truncateCommandOutput(errorRecord.stderr)}`);
@@ -823,6 +914,32 @@ print(json.dumps(result))
 	private truncateCommandOutput(output: string): string {
 		const normalized = output.replace(/\s+/g, ' ').trim();
 		return normalized.length > 500 ? `${normalized.slice(0, 500)}…` : normalized;
+	}
+
+	/**
+	 * 增強 Windows 特定錯誤訊息，提供更明確的使用者提示
+	 */
+	private enhanceWindowsErrorMessage(message: string): string {
+		if (process.platform !== 'win32') {
+			return message;
+		}
+		
+		const lowerMsg = message.toLowerCase();
+		
+		// Windows COM port 佔用錯誤
+		if (lowerMsg.includes('permissionerror') || 
+		    lowerMsg.includes('access is denied') || 
+		    lowerMsg.includes('cannot access')) {
+			return `${message}\n提示：COM port 可能被其他程式佔用。請關閉 Serial Monitor 或其他序列埠工具後重試。`;
+		}
+		
+		// COM port 不存在
+		if (lowerMsg.includes('could not open port') || 
+		    lowerMsg.includes('no such file or directory')) {
+			return `${message}\n提示：找不到指定的 COM port。請確認裝置已連接並在裝置管理員中顯示正確的 COM 編號。`;
+		}
+		
+		return message;
 	}
 
 	/**
@@ -989,11 +1106,12 @@ print(json.dumps(result))
 		const scriptFile = path.join(tempDir, 'blockly_interrupt.py');
 
 		// 寫入 Python 腳本到臨時檔案（避免命令行轉義問題）
+		const normalizedPort = this.normalizeCOMPort(port);
 		const serialScript = [
 			'import serial',
 			'import time',
 			'try:',
-			`    s = serial.Serial(${JSON.stringify(port)}, 115200, timeout=2)`,
+			`    s = serial.Serial(${JSON.stringify(normalizedPort)}, 115200, timeout=2)`,
 			'    # 發送雙重 Ctrl+C 中斷正在運行的程式',
 			"    s.write(b'\\x03\\x03')",
 			'    time.sleep(0.3)',
@@ -1010,7 +1128,8 @@ print(json.dumps(result))
 		fs.writeFileSync(scriptFile, serialScript, 'utf8');
 
 		try {
-			const command = `"${pythonPath}" "${scriptFile}"`;
+			const finalScriptFile = this.getWindowsShortPath(scriptFile);
+			const command = `"${pythonPath}" "${finalScriptFile}"`;
 			log('[blockly] 使用 pyserial 發送中斷信號', 'debug', { port, scriptFile });
 			const result = await this.execWithTimeout(command, 8000);
 
@@ -1083,12 +1202,27 @@ print(json.dumps(result))
 		log('[blockly] 中斷裝置上正在運行的程式...', 'info');
 		await this.interruptDevice(port);
 
-		// 等待裝置穩定
-		await this.delay(500);
+		// Windows 需要額外時間讓 COM port 驅動完全釋放
+		if (process.platform === 'win32') {
+			await this.delay(1500);
+		} else {
+			await this.delay(500);
+		}
 	}
 
 	/**
 	 * 上傳程式碼到裝置
+	 * 
+	 * USB 上傳會先檢查裝置是否已設定 OTA（`cyberbrick_ota_config` 模組存在）：
+	 * - 已設定 OTA → 注入 OTA bootstrap，確保裝置重啟後 OTA 功能持續運作
+	 * - 未設定 OTA → 使用純淨程式碼，符合傳統 USB 燒錄語義
+	 * - 檢查失敗（逾時、port busy 等）→ 保守策略：注入 bootstrap，避免已設定 OTA 的裝置失去 bootstrap
+	 *   （bootstrap 含 try/except，對未設定 OTA 的裝置安全）
+	 * 
+	 * 對 OTA 功能的影響：
+	 * - 裝置上的 OTA 配置檔和 agent 檔案不受影響
+	 * - 若 USB 上傳前 OTA 已配置，bootstrap 會保留，OTA 繼續有效
+	 * 
 	 * @param code 程式碼
 	 * @param port 連接埠
 	 */
@@ -1097,18 +1231,64 @@ print(json.dumps(result))
 		const tempDir = os.tmpdir();
 		const tempFile = path.join(tempDir, 'blockly_upload.py');
 
-		// CyberBrick 韌體會自動進入 /app/rc_main.py，因此 OTA 常駐啟動點必須在 rc_main.py。
-		// 這段只呼叫裝置端 agent，不包含 Wi-Fi 密碼或 OTA token。
-		const uploadCode = withCyberBrickRcMainOtaBootstrap(code);
-		fs.writeFileSync(tempFile, uploadCode, 'utf8');
-		log('[blockly] 暫存檔已建立', 'debug', { path: tempFile });
+		// 檢查裝置是否已設定 OTA（檢查 /cyberbrick_ota_config.py 是否存在）
+		// 失敗時採保守策略：注入 bootstrap。
+		// 理由：bootstrap 已包含 try/except，對無 OTA 的裝置安全（靜默跳過）；
+		// 反之若裝置有 OTA 卻因逾時/port busy 導致誤判為無 OTA，bootstrap 將被移除，OTA 功能損壞。
+		let hasOtaConfig = true; // 預設保守：注入 bootstrap
+		try {
+			const checkScript = "try:\n    import cyberbrick_ota_config\n    print('YES')\nexcept:\n    print('NO')";
+			const result = await this.runCyberBrickPython(port, checkScript, 5000);
+			hasOtaConfig = result.stdout.trim().includes('YES');
+			log('[blockly] OTA 設定檢查', 'debug', { hasOtaConfig });
+		} catch {
+			// 檢查失敗（逾時、port busy 等）→ 維持保守預設（hasOtaConfig = true）
+			log('[blockly] OTA 設定檢查失敗，採保守策略：注入 bootstrap', 'warn');
+		}
+
+		// 如果已設定 OTA，則在程式碼中注入 OTA bootstrap；否則使用純淨程式碼
+		const finalCode = hasOtaConfig ? withCyberBrickRcMainOtaBootstrap(code) : code;
+		fs.writeFileSync(tempFile, finalCode, 'utf8');
+		log('[blockly] 暫存檔已建立', 'debug', { path: tempFile, hasOtaBootstrap: hasOtaConfig });
 
 		try {
 			// 使用 resume + 避免觸發 soft-reset（這會導致程式重新執行）
 			// 在 interruptDevice 之後，裝置已經在正常 REPL 模式
-			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(port)} resume + fs cp ${this.quoteShellArg(tempFile)} :${DEVICE_PATH}`;
-			log('[blockly] 執行上傳指令', 'debug', { command });
-			await this.executor.exec(command);
+			const normalizedPort = this.normalizeCOMPort(port);
+			const finalTempFile = this.getWindowsShortPath(tempFile);
+			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + fs cp ${this.quoteShellArg(finalTempFile)} :${DEVICE_PATH}`;
+			log('[blockly] 執行上傳指令', 'debug', { port, normalizedPort, command });
+			
+			// Windows 平台重試機制：偵測 port busy 錯誤
+			const maxRetries = process.platform === 'win32' ? 3 : 1;
+			let lastError: unknown;
+			
+			for (let attempt = 1; attempt <= maxRetries; attempt++) {
+				try {
+					await this.executor.exec(command);
+					return; // 成功上傳
+				} catch (error) {
+					lastError = error;
+					const errorMsg = this.formatCommandError(error).toLowerCase();
+					
+					// 僅針對 "port busy" 類錯誤重試
+					const isPortBusy = errorMsg.includes('in use') || 
+					                   errorMsg.includes('access is denied') || 
+					                   errorMsg.includes('permissionerror') ||
+					                   errorMsg.includes('cannot access');
+					
+					if (isPortBusy && attempt < maxRetries) {
+						log(`[blockly] COM port 忙碌，等待後重試 (${attempt}/${maxRetries})`, 'warn', { port: normalizedPort });
+						await this.delay(500);
+						continue;
+					}
+					
+					// 其他錯誤或已達重試上限，立即拋出
+					break;
+				}
+			}
+			
+			throw lastError;
 		} finally {
 			// 清理暫存檔
 			try {
@@ -1125,8 +1305,9 @@ print(json.dumps(result))
 	 */
 	private async restartDevice(port: string): Promise<void> {
 		// 使用 resume + 確保不會觸發額外的 soft-reset
-		const command = `"${this.mpremotePath}" connect ${port} resume + reset`;
-		log('[blockly] 執行重啟指令', 'debug', { command });
+		const normalizedPort = this.normalizeCOMPort(port);
+		const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + reset`;
+		log('[blockly] 執行重啟指令', 'debug', { port, normalizedPort, command });
 		await this.executor.exec(command);
 	}
 

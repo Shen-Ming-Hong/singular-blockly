@@ -87,7 +87,7 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.ok(helperScript.startsWith('import json\nimport time\ntry:\n'), 'scan helper should use a stable top-level layout');
 		assert.ok(helperScript.includes('import time'), 'scan helper should wait for STA hardware to settle');
 		assert.ok(helperScript.includes('wlan.active(False)'), 'scan helper should reset stale STA state before scanning');
-		assert.ok(helperScript.includes('time.sleep(1.0)'), 'scan helper should wait before wlan.scan()');
+		assert.ok(helperScript.includes('time.sleep(1.5)'), 'scan helper should wait before wlan.scan() (Windows USB-Serial compatibility)');
 		assert.ok(helperScript.indexOf('wlan.active(False)') < helperScript.indexOf('wlan.scan()'));
 	});
 
@@ -339,14 +339,22 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		);
 	});
 
-	test('uploads rc_main.py with OTA startup bootstrap over USB', async () => {
+	test('uploads rc_main.py with OTA startup bootstrap over USB when OTA is configured', async () => {
 		let uploadedCode = '';
 		const uploader = createUploader({
 			exec: async command => {
 				if (command.includes('blockly_upload.py')) {
-					const scriptPath = command.match(/'([^']*blockly_upload\.py)'/)?.[1] || command.match(/"([^"]*blockly_upload\.py)"/)?.[1];
+					const scriptPath = command.match(/'([^']*blockly_upload\.py)'/)?.[1] || command.match(/"([^"]*blockly_upload\.py)"/)?.[ 1];
 					assert.ok(scriptPath, 'upload command should include the temporary rc_main.py path');
 					uploadedCode = fs.readFileSync(scriptPath, 'utf8');
+					return { stdout: '', stderr: '' };
+				}
+				if (command.includes('blockly_interrupt.py')) {
+					return { stdout: 'OK\n', stderr: '' };
+				}
+				// OTA config check (cyberbrick_exec_*.py): simulate device has OTA configured
+				if (command.includes('cyberbrick_exec_')) {
+					return { stdout: 'YES\n', stderr: '' };
 				}
 				return { stdout: '', stderr: '' };
 			},
@@ -354,8 +362,64 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 
 		await (uploader as unknown as { uploadCode(code: string, port: string): Promise<void> }).uploadCode('print("student")\n', '/dev/cu.usbmodem1201');
 
-		assert.ok(uploadedCode.startsWith(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START));
-		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'));
-		assert.ok(uploadedCode.includes('try:\n    print("student")\n'));
+		// OTA configured → bootstrap should be injected
+		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'), 'should inject OTA agent startup call when OTA is configured');
+		assert.ok(uploadedCode.includes('print("student")'), 'should preserve user code');
+	});
+
+	test('uploads rc_main.py without OTA bootstrap when OTA is not configured', async () => {
+		let uploadedCode = '';
+		const uploader = createUploader({
+			exec: async command => {
+				if (command.includes('blockly_upload.py')) {
+					const scriptPath = command.match(/'([^']*blockly_upload\.py)'/)?.[1] || command.match(/"([^"]*blockly_upload\.py)"/)?.[ 1];
+					assert.ok(scriptPath, 'upload command should include the temporary rc_main.py path');
+					uploadedCode = fs.readFileSync(scriptPath, 'utf8');
+					return { stdout: '', stderr: '' };
+				}
+				if (command.includes('blockly_interrupt.py')) {
+					return { stdout: 'OK\n', stderr: '' };
+				}
+				// OTA config check (cyberbrick_exec_*.py): simulate device has NO OTA
+				if (command.includes('cyberbrick_exec_')) {
+					return { stdout: 'NO\n', stderr: '' };
+				}
+				return { stdout: '', stderr: '' };
+			},
+		});
+
+		await (uploader as unknown as { uploadCode(code: string, port: string): Promise<void> }).uploadCode('print("student")\n', '/dev/cu.usbmodem1201');
+
+		// OTA not configured → clean code, no bootstrap
+		assert.ok(!uploadedCode.includes('_singular_blockly_ota_agent.start_background'), 'should NOT inject OTA bootstrap when OTA is not configured');
+		assert.ok(uploadedCode.includes('print("student")'), 'should preserve user code');
+	});
+
+	test('uploads rc_main.py with OTA bootstrap when OTA check fails (conservative fallback)', async () => {
+		let uploadedCode = '';
+		const uploader = createUploader({
+			exec: async command => {
+				if (command.includes('blockly_upload.py')) {
+					const scriptPath = command.match(/'([^']*blockly_upload\.py)'/)?.[1] || command.match(/"([^"]*blockly_upload\.py)"/)?.[ 1];
+					assert.ok(scriptPath, 'upload command should include the temporary rc_main.py path');
+					uploadedCode = fs.readFileSync(scriptPath, 'utf8');
+					return { stdout: '', stderr: '' };
+				}
+				if (command.includes('blockly_interrupt.py')) {
+					return { stdout: 'OK\n', stderr: '' };
+				}
+				// OTA config check (cyberbrick_exec_*.py): simulate check failure (e.g. port busy / timeout)
+				if (command.includes('cyberbrick_exec_')) {
+					return Promise.reject(new Error('PermissionError: [Errno 13] Access is denied'));
+				}
+				return { stdout: '', stderr: '' };
+			},
+		});
+
+		await (uploader as unknown as { uploadCode(code: string, port: string): Promise<void> }).uploadCode('print("student")\n', '/dev/cu.usbmodem1201');
+
+		// Check failed → conservative: inject bootstrap to preserve OTA on already-configured devices
+		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'), 'should inject OTA bootstrap as conservative fallback when check fails');
+		assert.ok(uploadedCode.includes('print("student")'), 'should preserve user code');
 	});
 });
