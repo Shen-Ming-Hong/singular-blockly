@@ -502,24 +502,12 @@ print('OK')
 		const sourceFile = path.join(tempDir, `cyberbrick_ota_agent_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
 		fs.writeFileSync(sourceFile, agentSource, 'utf8');
 
+		const normalizedPort = this.normalizeCOMPort(port);
 		try {
-			await this.interruptDevice(port);
+			await this.interruptDevice(normalizedPort);
 			
-			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
-			let finalSourceFile = sourceFile;
-			if (process.platform === 'win32') {
-				try {
-					const { execSync } = require('child_process');
-					const shortPath = execSync(`for %I in ("${sourceFile}") do @echo %~sI`, { encoding: 'utf8' }).trim();
-					if (shortPath && shortPath !== sourceFile) {
-						finalSourceFile = shortPath;
-					}
-				} catch {
-					// 取得短路徑失敗時使用原路徑
-				}
-			}
-			
-			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(port)} resume + fs cp ${this.quoteShellArg(finalSourceFile)} :/cyberbrick_ota_agent.py`;
+			const finalSourceFile = this.getWindowsShortPath(sourceFile);
+			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + fs cp ${this.quoteShellArg(finalSourceFile)} :/cyberbrick_ota_agent.py`;
 			log('[blockly] 部署 CyberBrick OTA agent', 'info', { port });
 			await this.execWithTimeout(command, 20000);
 		} catch (error) {
@@ -1132,7 +1120,7 @@ print(json.dumps(result))
 			'    time.sleep(1)',
 			'    s.close()',
 			"    print('OK')",
-		'except Exception as e:',
+			'except Exception as e:',
 			"    print(f'ERROR: {e}')",
 			'    exit(1)',
 			'',
@@ -1140,20 +1128,7 @@ print(json.dumps(result))
 		fs.writeFileSync(scriptFile, serialScript, 'utf8');
 
 		try {
-			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
-			let finalScriptFile = scriptFile;
-			if (process.platform === 'win32') {
-				try {
-					const { execSync } = require('child_process');
-					const shortPath = execSync(`for %I in ("${scriptFile}") do @echo %~sI`, { encoding: 'utf8' }).trim();
-					if (shortPath && shortPath !== scriptFile) {
-						finalScriptFile = shortPath;
-					}
-				} catch {
-					// 取得短路徑失敗時使用原路徑
-				}
-			}
-			
+			const finalScriptFile = this.getWindowsShortPath(scriptFile);
 			const command = `"${pythonPath}" "${finalScriptFile}"`;
 			log('[blockly] 使用 pyserial 發送中斷信號', 'debug', { port, scriptFile });
 			const result = await this.execWithTimeout(command, 8000);
@@ -1280,22 +1255,7 @@ print(json.dumps(result))
 			// 使用 resume + 避免觸發 soft-reset（這會導致程式重新執行）
 			// 在 interruptDevice 之後，裝置已經在正常 REPL 模式
 			const normalizedPort = this.normalizeCOMPort(port);
-			
-			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
-			let finalTempFile = tempFile;
-			if (process.platform === 'win32') {
-				try {
-					const { execSync } = require('child_process');
-					const shortPath = execSync(`for %I in ("${tempFile}") do @echo %~sI`, { encoding: 'utf8' }).trim();
-					if (shortPath && shortPath !== tempFile) {
-						finalTempFile = shortPath;
-						log('[blockly] 使用 Windows 短路徑', 'debug', { original: tempFile, short: shortPath });
-					}
-				} catch {
-					// 取得短路徑失敗時使用原路徑
-				}
-			}
-			
+			const finalTempFile = this.getWindowsShortPath(tempFile);
 			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + fs cp ${this.quoteShellArg(finalTempFile)} :${DEVICE_PATH}`;
 			log('[blockly] 執行上傳指令', 'debug', { port, normalizedPort, command });
 			
