@@ -51,6 +51,7 @@ export class CyberBrickOtaProvisioningService {
 		private readonly uploader: Pick<
 			MicropythonUploader,
 			| 'listPorts'
+			| 'ensureMpremoteAvailable'
 			| 'readCyberBrickDeviceId'
 			| 'writeCyberBrickDeviceId'
 			| 'scanCyberBrickWifi'
@@ -65,6 +66,11 @@ export class CyberBrickOtaProvisioningService {
 	}
 
 	async listUsbPorts(): Promise<CyberBrickUsbPortList> {
+		const mpremoteReady = await this.uploader.ensureMpremoteAvailable();
+		if (!mpremoteReady.success) {
+			throw createCyberBrickUploadError('mpremote-unavailable', mpremoteReady.message, { details: mpremoteReady.details });
+		}
+
 		const result = await this.uploader.listPorts('cyberbrick');
 		return {
 			ports: result.ports.map(port => this.toPortSummary(port)),

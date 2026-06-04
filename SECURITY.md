@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.10 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.11 |
+
+> **0.82.11 更新 Update**: CyberBrick USB port 預掃描與 OTA 設定頁 USB port 清單會先沿用 PlatformIO `penv` 的 `mpremote` 自動安裝流程；缺少 `mpremote` 不再被靜默誤判成找不到 COM port，且未改動 v0.82.10 已驗證的 Windows `fs cp` / `resume + run` 命令分流。
+> CyberBrick USB port pre-detection and the OTA settings USB port list now reuse the PlatformIO `penv`-based `mpremote` auto-install flow first; missing `mpremote` is no longer silently treated as no COM port found, and the Windows `fs cp` / `resume + run` command split verified in v0.82.10 is unchanged.
 
 > **0.82.10 更新 Update**: Windows `mpremote ... fs cp` USB 上傳改用 `execFile` argv 執行，避免 shell 解析本機暫存路徑造成「檔案名稱、目錄名稱或磁碟區標籤語法錯誤」；Windows `resume + run` helper 維持前次驗證過的 shell 相容路徑。
 > Windows `mpremote ... fs cp` USB uploads now run through `execFile` argv to avoid shell parsing failures for local temporary paths; Windows `resume + run` helpers keep the previously verified shell-compatible path.

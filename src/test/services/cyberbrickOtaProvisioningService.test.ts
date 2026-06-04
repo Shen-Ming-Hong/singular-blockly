@@ -27,6 +27,7 @@ suite('CyberBrickOtaProvisioningService', () => {
 			now: () => new Date('2026-01-20T12:00:00.000Z'),
 		});
 		uploader = {
+			ensureMpremoteAvailable: sinon.stub().resolves({ success: true }),
 			listPorts: sinon.stub().resolves({ ports: [] }),
 			readCyberBrickDeviceId: sinon.stub().resolves(CYBERBRICK_TEST_DEVICE_ID),
 			writeCyberBrickDeviceId: sinon.stub().resolves(),
@@ -51,6 +52,7 @@ suite('CyberBrickOtaProvisioningService', () => {
 		assert.strictEqual(ports.ports.length, 2);
 		assert.strictEqual(ports.ports[0].path, '/dev/cu.usbmodem1');
 		assert.strictEqual(ports.autoDetected, undefined);
+		assert.strictEqual(uploader.ensureMpremoteAvailable.calledOnce, true);
 	});
 
 	test('returns auto-detected CyberBrick USB port for settings dropdown preselection', async () => {
@@ -64,6 +66,28 @@ suite('CyberBrickOtaProvisioningService', () => {
 
 		assert.strictEqual(result.autoDetected, '/dev/cu.usbmodem1');
 		assert.strictEqual(result.ports[0].displayName.includes('/dev/cu.usbmodem1'), true);
+	});
+
+	test('reports mpremote setup failures before listing CyberBrick USB ports', async () => {
+		uploader.ensureMpremoteAvailable.resolves({
+			success: false,
+			stage: 'installing_tool',
+			message: 'mpremote installation failed',
+			details: 'Please run manually: pip install mpremote',
+		});
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
+
+		await assert.rejects(
+			() => service.listUsbPorts(),
+			error => {
+				const candidate = error as { code?: string; message?: string; details?: string };
+				assert.strictEqual(candidate.code, 'mpremote-unavailable');
+				assert.strictEqual(candidate.message, 'mpremote installation failed');
+				assert.strictEqual(candidate.details, 'Please run manually: pip install mpremote');
+				return true;
+			}
+		);
+		assert.strictEqual(uploader.listPorts.called, false);
 	});
 
 	test('returns device-side Wi-Fi scan results and supports empty lists', async () => {

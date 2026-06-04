@@ -1958,6 +1958,30 @@ export class WebViewMessageHandler {
 			// 先偵測 USB 連線（若已明確指定 port 則直接使用）
 			let usbPort: string | undefined = message.port;
 			if (!usbPort) {
+				const mpremoteReady = await uploader.ensureMpremoteAvailable((progress: UploadProgress) => {
+					this.sendUploadProgress(progress);
+				});
+				if (!mpremoteReady.success) {
+					this.sendUploadResult({
+						success: false,
+						timestamp: new Date().toISOString(),
+						port: 'unknown',
+						duration: 0,
+						error: {
+							stage: mpremoteReady.stage,
+							message: mpremoteReady.message,
+							details: mpremoteReady.details,
+						},
+					});
+					return;
+				}
+
+				this.sendUploadProgress({
+					stage: 'connecting',
+					progress: 40,
+					message: 'Detecting CyberBrick...',
+				});
+
 				const { autoDetected } = await uploader.listPorts('cyberbrick');
 				usbPort = autoDetected;
 			}

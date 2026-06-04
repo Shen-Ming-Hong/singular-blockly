@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.11] - 2026-06-04
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick mpremote 自動安裝與 USB port 預掃描修復** (CyberBrick mpremote auto-install and USB port pre-detect fix)
+    - CyberBrick USB 上傳在未指定 port 時，會先沿用 PlatformIO `penv` 的 `mpremote` 自動安裝流程，再執行 USB port 預掃描；避免新環境尚未安裝 `mpremote` 時被誤判成找不到 COM port 並導致上傳失敗
+      CyberBrick USB upload now reuses the PlatformIO `penv`-based `mpremote` auto-install flow before USB port pre-detection when no port is specified; this avoids treating a fresh environment without `mpremote` as "no COM port found" and failing upload.
+    - OTA 設定頁的 USB port 清單同樣會先確認 `mpremote` 可用；若安裝失敗，會回報明確的 `mpremote-unavailable` 錯誤，而不是靜默顯示空 port 清單
+      The OTA settings USB port list also ensures `mpremote` is available first; installation failures now report an explicit `mpremote-unavailable` error instead of silently showing an empty port list.
+    - 保留 v0.82.10 已驗證的 Windows `fs cp` argv 分流與 `resume + run` shell 相容路徑，避免影響已通過 Windows/macOS 手動測試的上傳與 Wi-Fi 掃描行為
+      Preserves the Windows `fs cp` argv split and `resume + run` shell-compatible path verified in v0.82.10 to avoid regressing the manually tested Windows/macOS upload and Wi-Fi scan behavior.
+
 ## [0.82.10] - 2026-06-04
 
 ### 🐛 修復 Bug Fixes
