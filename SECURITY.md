@@ -4,8 +4,8 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.78.x  | :white_check_mark: |
-| < 0.78  | :x:                |
+| 0.82.x  | :white_check_mark: |
+| < 0.82  | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -15,7 +15,19 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.78.1 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.9 |
+
+> **0.82.9 更新 Update**: Windows Python / pyserial helper 改用 `execFile` argv 直接執行，避免暫存腳本路徑被 short path helper 轉成 `C:\"C:\...\"` 這類無效路徑；short path helper 也會驗證輸出並在格式異常時回退原路徑。
+> Windows Python / pyserial helpers now run directly through `execFile` argv, preventing temporary script paths from being converted into malformed values such as `C:\"C:\...\"`; the short path helper also validates output and falls back to the original path when malformed.
+
+> **0.82.8 更新 Update**: Windows `mpremote` helper 命令恢復相容格式：只 quote executable、COM port 與本機檔案路徑，mpremote command tokens 不加引號，修復 v0.82.7 在 Windows 造成 Wi-Fi 掃描與 USB 上傳失敗的回歸；仍未重新引入 incomplete backslash quote。
+> Windows `mpremote` helper commands now use the compatible format again: only the executable, COM port, and local file paths are quoted while mpremote command tokens remain unquoted, fixing the v0.82.7 Windows Wi-Fi scan and USB upload regression without reintroducing incomplete backslash quoting.
+
+> **0.82.7 更新 Update**: GitHub Code scanning Alert #11 (`js/incomplete-sanitization`) 已在本地修復：CyberBrick MicroPython 上傳相關命令避免不完整 backslash quote；Windows `mpremote` helper 命令維持相容的 shell command 執行路徑，避免 Wi-Fi 掃描回歸。
+> GitHub Code scanning Alert #11 (`js/incomplete-sanitization`) has been fixed locally: CyberBrick MicroPython upload commands avoid incomplete backslash quoting; Windows `mpremote` helper commands keep the compatible shell-command path to avoid Wi-Fi scan regressions.
+
+> **0.82.6 更新 Update**: 本地 `npm audit` 顯示 0 vulnerabilities，GitHub Dependabot open alerts 為 0；目前沒有已知待處理漏洞。
+> Local `npm audit` reports 0 vulnerabilities, and GitHub Dependabot has 0 open alerts; there are no known pending vulnerabilities.
 
 > **0.78.1 更新 Update**: `qs` (`GHSA-q8mj-m7cp-5q26`, `CVE-2026-8723`) 已透過 npm override 升級至 `6.15.2` 修復，清除本地 `npm audit` 的 moderate 風險。
 > `qs` (`GHSA-q8mj-m7cp-5q26`, `CVE-2026-8723`) has been fixed by upgrading the npm override to `6.15.2`, clearing the moderate finding from local `npm audit`.
@@ -34,4 +46,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-05-23_
+_Last updated: 2026-06-04_

@@ -8,6 +8,38 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.9] - 2026-06-04
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick Windows pyserial helper 路徑修復** (CyberBrick Windows pyserial helper path fix)
+    - Python / pyserial 暫存 helper 改用 `execFile` argv 直接執行，不再套用 Windows short path；修正 short path 可能產生 `C:\"C:\...\"` 無效路徑，導致 Windows 上中斷裝置失敗、USB 上傳失敗與 Wi-Fi 掃描失敗的問題
+      Python / pyserial temporary helpers now run directly through `execFile` argv without Windows short path conversion; fixes malformed `C:\"C:\...\"` paths that caused device interrupt, USB upload, and Wi-Fi scan failures on Windows
+    - Windows short path helper 移除 `cmd /s` 並驗證輸出格式；若輸出含 quote 或格式異常，會回退使用原始路徑
+      Windows short path helper no longer uses `cmd /s` and now validates output; malformed paths containing quotes fall back to the original path
+
+## [0.82.8] - 2026-06-04
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick Windows mpremote 命令相容性修復** (CyberBrick Windows mpremote command compatibility fix)
+    - Windows 上 `mpremote` helper 命令恢復為接近 v0.82.5 的格式：只 quote executable、COM port 與本機檔案路徑，`connect` / `resume` / `+` / `run` / `fs cp` 等 mpremote token 不再加引號；修正 v0.82.7 在 Windows 造成 Wi-Fi 掃描與 USB 上傳失敗的回歸
+      Windows `mpremote` helper commands now use a format close to v0.82.5: only the executable, COM port, and local file paths are quoted, while `connect` / `resume` / `+` / `run` / `fs cp` tokens remain unquoted; fixes the v0.82.7 regression that broke Wi-Fi scan and USB upload on Windows
+    - 保留 CodeQL Alert #11 的修復方向：不再使用 incomplete backslash quote，避免重新引入 `js/incomplete-sanitization`
+      Keeps the CodeQL Alert #11 fix: incomplete backslash quoting is not reintroduced, avoiding `js/incomplete-sanitization`
+
+## [0.82.7] - 2026-06-04
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 CyberBrick MicroPython 上傳命令參數跳脫風險** (Fix CyberBrick MicroPython upload command argument escaping risk)
+    - 將實際 `python` / `mpremote` 執行路徑改為 `execFile` + argv 陣列，避免依賴 shell 字串跳脫，修復 GitHub Code scanning Alert #11 (`js/incomplete-sanitization`)
+      Changed actual `python` / `mpremote` execution to `execFile` with argv arrays instead of relying on shell string escaping, fixing GitHub Code scanning Alert #11 (`js/incomplete-sanitization`)
+    - Windows fallback command 字串不再使用 backslash quote 形式，避免破壞含反斜線路徑；Windows short path helper 也改用 `execFileSync` + 環境變數傳遞目標路徑
+      Windows fallback command strings no longer use backslash-quote escaping, avoiding corruption of backslash-heavy paths; the Windows short path helper now uses `execFileSync` plus an environment variable for the target path
+    - Windows 上 `mpremote ... resume + run` helper 命令維持 shell command 執行路徑，修正 argv 執行在部分 Windows 環境下造成 CyberBrick Wi-Fi 掃描失敗的相容性回歸
+      On Windows, `mpremote ... resume + run` helper commands keep the shell-command execution path, fixing a compatibility regression where argv execution could break CyberBrick Wi-Fi scanning in some Windows environments
+
 ## [0.82.6] - 2026-06-04
 
 ### 🐛 修復 Bug Fixes

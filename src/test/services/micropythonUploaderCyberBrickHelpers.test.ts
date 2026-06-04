@@ -17,11 +17,91 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		return uploader;
 	}
 
-	test('lists CyberBrick USB ports via PlatformIO Python without depending on mpremote', async () => {
-		let helperScript = '';
+	function withPlatform<T>(platform: NodeJS.Platform, callback: () => T): T {
+		const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+		Object.defineProperty(process, 'platform', { value: platform });
+		try {
+			return callback();
+		} finally {
+			if (originalPlatform) {
+				Object.defineProperty(process, 'platform', originalPlatform);
+			}
+		}
+	}
+
+	test('builds Windows fallback shell commands without corrupting backslash paths', () => {
+		const uploader = createUploader({
+			exec: async () => ({ stdout: '', stderr: '' }),
+		});
+		const buildWindowsMpremoteCommand = (uploader as unknown as { buildWindowsMpremoteCommand(executable: string, args: string[]): string }).buildWindowsMpremoteCommand.bind(uploader);
+		const quoteShellArg = (uploader as unknown as { quoteShellArg(value: string): string }).quoteShellArg.bind(uploader);
+
+		withPlatform('win32', () => {
+			assert.strictEqual(
+				buildWindowsMpremoteCommand(
+					'C:\\Users\\Alice Test\\.platformio\\penv\\Scripts\\mpremote.exe',
+					['connect', 'com3', 'resume', '+', 'run', 'C:\\Users\\Alice Test\\AppData\\Local\\Temp\\helper.py']
+				),
+				'"C:\\Users\\Alice Test\\.platformio\\penv\\Scripts\\mpremote.exe" connect "com3" resume + run "C:\\Users\\Alice Test\\AppData\\Local\\Temp\\helper.py"'
+			);
+			assert.throws(() => quoteShellArg('C:\\Temp\\a"b.py'), /unsupported characters/);
+		});
+	});
+
+	test('uses Windows shell execution for mpremote helper commands', async () => {
+		const commands: string[] = [];
+		const execFileCalls: Array<{ file: string; args: string[] }> = [];
 		const uploader = createUploader({
 			exec: async command => {
-				const scriptPath = command.match(/"([^"]*cyberbrick_serial_ports_[^"]*\.py)"$/)?.[1] || command.match(/"([^"]*cyberbrick_serial_ports_[^"]*\.py)"/)?.[1];
+				commands.push(command);
+				return { stdout: 'OK\n', stderr: '' };
+			},
+			execFile: async (file, args) => {
+				execFileCalls.push({ file, args });
+				return { stdout: 'execFile\n', stderr: '' };
+			},
+		});
+		const execMpremote = (uploader as unknown as { execMpremote(args: string[], timeoutMs?: number): Promise<{ stdout: string; stderr: string }> }).execMpremote.bind(uploader);
+
+		await withPlatform('win32', () =>
+			execMpremote(['connect', 'COM3', 'resume', '+', 'run', 'C:\\Users\\Alice Test\\AppData\\Local\\Temp\\helper.py'], 10000)
+		);
+
+		assert.strictEqual(execFileCalls.length, 0, 'Windows mpremote commands should avoid execFile for compatibility with resume + run parsing');
+		assert.strictEqual(commands.length, 1);
+		assert.ok(commands[0].includes('connect "COM3" resume + run'));
+		assert.ok(commands[0].includes('"C:\\Users\\Alice Test\\AppData\\Local\\Temp\\helper.py"'));
+	});
+
+	test('falls back when Windows short path output is malformed', () => {
+		const uploader = createUploader({
+			exec: async () => ({ stdout: '', stderr: '' }),
+		});
+		const getWindowsShortPath = (uploader as unknown as { getWindowsShortPath(filePath: string): string }).getWindowsShortPath.bind(uploader);
+		const childProcess = require('child_process') as { execFileSync: (...args: unknown[]) => string };
+		const originalExecFileSync = childProcess.execFileSync;
+		const originalPath = 'C:\\Users\\Alice Test\\AppData\\Local\\Temp\\blockly_interrupt.py';
+
+		childProcess.execFileSync = () => 'C:\\"C:\\Users\\ALICE~1\\AppData\\Local\\Temp\\blockly_interrupt.py\\""';
+		try {
+			withPlatform('win32', () => {
+				assert.strictEqual(getWindowsShortPath(originalPath), originalPath);
+			});
+		} finally {
+			childProcess.execFileSync = originalExecFileSync;
+		}
+	});
+
+	test('lists CyberBrick USB ports via PlatformIO Python without depending on mpremote', async () => {
+		let helperScript = '';
+		const execFileCalls: Array<{ file: string; args: string[] }> = [];
+		const uploader = createUploader({
+			exec: async command => {
+				throw new Error(`serial port probe should use execFile when available: ${command}`);
+			},
+			execFile: async (file, args) => {
+				execFileCalls.push({ file, args });
+				const scriptPath = args[0];
 				assert.ok(scriptPath, 'serial port probe should run a temporary Python helper script');
 				helperScript = fs.readFileSync(scriptPath, 'utf8');
 				return {
@@ -36,8 +116,37 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.strictEqual(result.autoDetected, '/dev/cu.usbmodem1201');
 		assert.strictEqual(result.ports.length, 1);
 		assert.strictEqual(result.ports[0].serialNumber, 'ABC123');
+		assert.deepStrictEqual(execFileCalls.map(call => call.file), ['/mock/python']);
 		assert.ok(helperScript.includes('from serial.tools import list_ports'));
 		assert.ok(helperScript.includes("getattr(info, 'serial_number', None)"));
+	});
+
+	test('runs Windows pyserial interrupt helper through execFile argv', async () => {
+		const commands: string[] = [];
+		const execFileCalls: Array<{ file: string; args: string[] }> = [];
+		const uploader = createUploader({
+			exec: async command => {
+				commands.push(command);
+				return { stdout: '', stderr: '' };
+			},
+			execFile: async (file, args) => {
+				execFileCalls.push({ file, args });
+				const scriptPath = args[0];
+				assert.ok(scriptPath.endsWith('blockly_interrupt.py'), 'interrupt helper should pass the script path as argv');
+				assert.strictEqual(scriptPath.includes('"'), false);
+				assert.strictEqual(scriptPath.includes('C:\\"'), false);
+				const script = fs.readFileSync(scriptPath, 'utf8');
+				assert.ok(script.includes('serial.Serial("COM48", 115200, timeout=2)'));
+				return { stdout: 'OK\n', stderr: '' };
+			},
+		});
+		const interruptApi = uploader as unknown as { interruptDevice(port: string): Promise<void>; delay(ms: number): Promise<void> };
+		interruptApi.delay = async () => undefined;
+
+		await withPlatform('win32', () => interruptApi.interruptDevice('com48'));
+
+		assert.strictEqual(commands.length, 0, 'pyserial interrupt should not use shell commands when execFile is available');
+		assert.deepStrictEqual(execFileCalls.map(call => call.file), ['/mock/python']);
 	});
 
 	test('interrupts the running program and runs temporary helper scripts with mpremote resume + run', async () => {
@@ -46,7 +155,7 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 			exec: async command => {
 				commands.push(command);
 				if (command.includes('blockly_interrupt.py')) {
-					const scriptPath = command.match(/"([^"]*blockly_interrupt\.py)"/)?.[1];
+					const scriptPath = command.match(/["']([^"']*blockly_interrupt\.py)["']/)?.[1];
 					assert.ok(scriptPath, 'interrupt command should include the temporary script path');
 					const script = fs.readFileSync(scriptPath, 'utf8');
 					assert.ok(script.includes('try:\n    s = serial.Serial("/dev/cu.usbmodem1201", 115200, timeout=2)'));
@@ -63,7 +172,7 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.strictEqual(commands.length, 2);
 		assert.ok(commands[1].includes('cyberbrick_exec_'), 'Wi-Fi scan should run through a temporary helper script');
 		assert.ok(commands[0].includes('blockly_interrupt.py'));
-		assert.ok(commands[1].includes(" connect '/dev/cu.usbmodem1201' resume + run "));
+		assert.ok(commands[1].includes("'connect' '/dev/cu.usbmodem1201' 'resume' '+' 'run' "));
 		assert.strictEqual(commands[1].includes(' exec '), false);
 	});
 
@@ -129,9 +238,9 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 
 		assert.strictEqual(commands.length, 2);
 		assert.ok(commands[0].includes('blockly_interrupt.py'));
-		assert.ok(commands[1].includes(" connect '/dev/cu.usbmodem1201' resume + fs cp "));
+		assert.ok(commands[1].includes("'connect' '/dev/cu.usbmodem1201' 'resume' '+' 'fs' 'cp' "));
 		assert.ok(commands[1].includes(':/cyberbrick_ota_agent.py'));
-		assert.deepStrictEqual(commands[1].match(/:\/[^\s]+/g), [':/cyberbrick_ota_agent.py']);
+		assert.deepStrictEqual(commands[1].match(/:\/[^\s']+/g), [':/cyberbrick_ota_agent.py']);
 	});
 
 	test('builds OTA agent source without patch artifacts and with background startup', () => {
