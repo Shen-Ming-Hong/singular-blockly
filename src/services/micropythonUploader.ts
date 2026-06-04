@@ -88,6 +88,10 @@ export interface UploadRequest {
  */
 export type ProgressCallback = (progress: UploadProgress) => void;
 
+export type MpremoteAvailabilityResult =
+	| { success: true }
+	| { success: false; stage: UploadStage; message: string; details?: string };
+
 /**
  * 指令執行介面（用於依賴注入）
  */
@@ -277,6 +281,53 @@ export class MicropythonUploader {
 			log('[blockly] mpremote 安裝失敗', 'error', error);
 			return false;
 		}
+	}
+
+	/**
+	 * 確認 PlatformIO Python 環境可用，並在需要時透過同一個 penv 安裝 mpremote。
+	 *
+	 * 成功時只代表 mpremote 已可被呼叫，不會執行連接埠偵測或裝置通訊。
+	 * 失敗時回傳可直接呈現在上傳結果中的 stage/message/details。
+	 * 若提供 onProgress，會回報 checking_tool 與 installing_tool 階段；呼叫端應避免和後續 upload() 進度重複顯示。
+	 */
+	async ensureMpremoteAvailable(onProgress?: ProgressCallback): Promise<MpremoteAvailabilityResult> {
+		onProgress?.({
+			stage: 'checking_tool',
+			progress: 10,
+			message: 'Checking mpremote tool...',
+		});
+
+		const hasPython = await this.checkPythonEnvironment();
+		if (!hasPython) {
+			return {
+				success: false,
+				stage: 'checking_tool',
+				message: 'PlatformIO Python environment not found. Please install PlatformIO first.',
+			};
+		}
+
+		const hasMpremote = await this.checkMpremoteInstalled();
+		if (hasMpremote) {
+			return { success: true };
+		}
+
+		onProgress?.({
+			stage: 'installing_tool',
+			progress: 20,
+			message: 'Installing mpremote...',
+		});
+
+		const installed = await this.installMpremote(onProgress);
+		if (!installed) {
+			return {
+				success: false,
+				stage: 'installing_tool',
+				message: 'mpremote installation failed',
+				details: 'Please run manually: pip install mpremote',
+			};
+		}
+
+		return { success: true };
 	}
 
 	/**
@@ -1020,42 +1071,15 @@ print(json.dumps(result))
 			return this.createFailureResult(startTime, port || 'unknown', 'preparing', 'Code cannot be empty');
 		}
 
-		// 階段 2: 檢查工具
-		onProgress?.({
-			stage: 'checking_tool',
-			progress: 10,
-			message: 'Checking mpremote tool...',
-		});
-
-		const hasPython = await this.checkPythonEnvironment();
-		if (!hasPython) {
+		const mpremoteReady = await this.ensureMpremoteAvailable(onProgress);
+		if (!mpremoteReady.success) {
 			return this.createFailureResult(
 				startTime,
 				port || 'unknown',
-				'checking_tool',
-				'PlatformIO Python environment not found. Please install PlatformIO first.'
+				mpremoteReady.stage,
+				mpremoteReady.message,
+				mpremoteReady.details
 			);
-		}
-
-		const hasMpremote = await this.checkMpremoteInstalled();
-		if (!hasMpremote) {
-			// 階段 3: 安裝工具
-			onProgress?.({
-				stage: 'installing_tool',
-				progress: 20,
-				message: 'Installing mpremote...',
-			});
-
-			const installed = await this.installMpremote(onProgress);
-			if (!installed) {
-				return this.createFailureResult(
-					startTime,
-					port || 'unknown',
-					'installing_tool',
-					'mpremote installation failed',
-					'Please run manually: pip install mpremote'
-				);
-			}
 		}
 
 		// 階段 4: 連接裝置

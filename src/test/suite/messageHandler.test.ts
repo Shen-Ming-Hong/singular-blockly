@@ -159,6 +159,7 @@ suite('MessageHandler – generic requestUpload OTA fallback', () => {
 			nextActions: [],
 		});
 
+		sandbox.stub(MicropythonUploader.prototype, 'ensureMpremoteAvailable').resolves({ success: true });
 		sandbox.stub(MicropythonUploader.prototype, 'listPorts').resolves({ ports: [], autoDetected: undefined });
 
 		(handler as any).cyberBrickOtaUploader = {
@@ -199,5 +200,62 @@ suite('MessageHandler – generic requestUpload OTA fallback', () => {
 		assert.ok(panelRefresh, 'generic OTA fallback should refresh CyberBrick panel state after upload');
 		assert.strictEqual(panelRefresh.payload.settings.pairedDevices[0].agentVersion, CYBERBRICK_OTA_AGENT_TARGET_VERSION);
 			assert.ok((handler as any).cyberBrickOtaUploader.checkReadiness.calledOnce, 'generic OTA fallback should refresh panel state from live readiness');
+	});
+
+	test('requestUpload prepares mpremote before CyberBrick USB pre-detect', async () => {
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
+		const ensureMpremote = sandbox.stub(MicropythonUploader.prototype, 'ensureMpremoteAvailable').callsFake(async onProgress => {
+			onProgress?.({ stage: 'installing_tool', progress: 20, message: 'Installing mpremote...' });
+			return { success: true };
+		});
+		const listPorts = sandbox.stub(MicropythonUploader.prototype, 'listPorts').resolves({
+			ports: [{ path: 'COM7', vendorId: '303A', productId: '1001' }],
+			autoDetected: 'COM7',
+		});
+		const upload = sandbox.stub(MicropythonUploader.prototype, 'upload').resolves({
+			success: true,
+			timestamp: '2026-06-04T00:00:00.000Z',
+			port: 'COM7',
+			duration: 1,
+		});
+
+		await handler.handleMessage({
+			command: 'requestUpload',
+			board: 'cyberbrick',
+			code: 'print(1)',
+		});
+
+		sinon.assert.callOrder(ensureMpremote, listPorts, upload);
+		assert.deepStrictEqual(upload.firstCall.args[0], { code: 'print(1)', board: 'cyberbrick', port: 'COM7' });
+		const messages = webviewPostMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0]);
+		assert.ok(messages.some((message: { command?: string; stage?: string }) => message.command === 'uploadProgress' && message.stage === 'installing_tool'));
+		assert.ok(messages.some((message: { command?: string; success?: boolean; port?: string }) => message.command === 'uploadResult' && message.success === true && message.port === 'COM7'));
+	});
+
+	test('requestUpload reports mpremote setup failure before falling back to OTA', async () => {
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
+		sandbox.stub(MicropythonUploader.prototype, 'ensureMpremoteAvailable').resolves({
+			success: false,
+			stage: 'installing_tool',
+			message: 'mpremote installation failed',
+			details: 'Please run manually: pip install mpremote',
+		});
+		const listPorts = sandbox.stub(MicropythonUploader.prototype, 'listPorts').resolves({ ports: [], autoDetected: undefined });
+		const otaUpload = sandbox.stub().resolves({ status: 'succeeded' });
+		(handler as any).cyberBrickOtaUploader = { upload: otaUpload };
+
+		await handler.handleMessage({
+			command: 'requestUpload',
+			board: 'cyberbrick',
+			code: 'print(1)',
+		});
+
+		assert.strictEqual(listPorts.called, false);
+		assert.strictEqual(otaUpload.called, false);
+		const result = webviewPostMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0]).find((message: { command?: string }) => message.command === 'uploadResult');
+		assert.strictEqual(result.success, false);
+		assert.strictEqual(result.error.stage, 'installing_tool');
+		assert.strictEqual(result.error.message, 'mpremote installation failed');
+		assert.strictEqual(result.error.details, 'Please run manually: pip install mpremote');
 	});
 });
