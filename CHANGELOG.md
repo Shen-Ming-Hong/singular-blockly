@@ -8,6 +8,18 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.10] - 2026-06-04
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick Windows USB 上傳 fs cp argv 分流** (CyberBrick Windows USB upload fs cp argv split)
+    - Windows 上 `mpremote ... fs cp` 上傳本機暫存檔時改用 `execFile` argv 執行，避免 shell 解析含空格或反斜線的暫存路徑時產生 `檔案名稱、目錄名稱或磁碟區標籤語法錯誤。`
+      On Windows, `mpremote ... fs cp` now uploads local temporary files through `execFile` argv to avoid shell parsing failures for paths with spaces or backslashes, including "filename, directory name, or volume label syntax is incorrect."
+    - 保留前次修復驗證過的 Windows `resume + run` helper shell 執行路徑，避免再次破壞 Wi-Fi 掃描與 OTA 設定檢查
+      Keeps the previously verified Windows `resume + run` helper shell path to avoid regressing Wi-Fi scan and OTA configuration checks.
+    - 新增 Windows 分流測試，鎖定 helper run 仍走 shell、USB `fs cp` 上傳走 argv
+      Added Windows split-path tests to lock helper run on shell while USB `fs cp` upload uses argv.
+
 ## [0.82.9] - 2026-06-04
 
 ### 🐛 修復 Bug Fixes

@@ -29,6 +29,18 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		}
 	}
 
+	async function withPlatformAsync<T>(platform: NodeJS.Platform, callback: () => Promise<T>): Promise<T> {
+		const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+		Object.defineProperty(process, 'platform', { value: platform });
+		try {
+			return await callback();
+		} finally {
+			if (originalPlatform) {
+				Object.defineProperty(process, 'platform', originalPlatform);
+			}
+		}
+	}
+
 	test('builds Windows fallback shell commands without corrupting backslash paths', () => {
 		const uploader = createUploader({
 			exec: async () => ({ stdout: '', stderr: '' }),
@@ -71,6 +83,40 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.strictEqual(commands.length, 1);
 		assert.ok(commands[0].includes('connect "COM3" resume + run'));
 		assert.ok(commands[0].includes('"C:\\Users\\Alice Test\\AppData\\Local\\Temp\\helper.py"'));
+	});
+
+	test('uses Windows argv execution for mpremote fs cp commands', async () => {
+		const commands: string[] = [];
+		const execFileCalls: Array<{ file: string; args: string[] }> = [];
+		const uploader = createUploader({
+			exec: async command => {
+				commands.push(command);
+				return { stdout: 'shell\n', stderr: '' };
+			},
+			execFile: async (file, args) => {
+				execFileCalls.push({ file, args });
+				return { stdout: 'argv\n', stderr: '' };
+			},
+		});
+		const execMpremote = (uploader as unknown as {
+			execMpremote(args: string[], timeoutMs?: number, windowsExecution?: 'shell' | 'argv'): Promise<{ stdout: string; stderr: string }>;
+		}).execMpremote.bind(uploader);
+		const args = [
+			'connect',
+			'COM7',
+			'resume',
+			'+',
+			'fs',
+			'cp',
+			'C:\\Users\\Alice Test\\AppData\\Local\\Temp\\blockly_upload.py',
+			':/app/rc_main.py',
+		];
+
+		const result = await withPlatformAsync('win32', () => execMpremote(args, undefined, 'argv'));
+
+		assert.strictEqual(result.stdout, 'argv\n');
+		assert.strictEqual(commands.length, 0, 'Windows fs cp uploads should avoid shell parsing of local paths');
+		assert.deepStrictEqual(execFileCalls, [{ file: '/mock/mpremote', args }]);
 	});
 
 	test('falls back when Windows short path output is malformed', () => {
@@ -355,6 +401,57 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 			'configure helper should update cached agent OTA_TOKEN to prevent token mismatch after re-provisioning'
 		);
 		assert.strictEqual(commands.length, 2);
+	});
+
+	test('keeps Windows helper run on shell but uploads rc_main.py through argv fs cp', async () => {
+		const commands: string[] = [];
+		const mpremoteExecFileCalls: string[][] = [];
+		let uploadedCode = '';
+		const uploader = createUploader({
+			exec: async command => {
+				commands.push(command);
+				if (command.includes('cyberbrick_exec_')) {
+					return { stdout: 'NO\n', stderr: '' };
+				}
+				return { stdout: '', stderr: '' };
+			},
+			execFile: async (file, args) => {
+				if (file === '/mock/python') {
+					const scriptPath = args[0];
+					assert.ok(scriptPath.endsWith('blockly_interrupt.py'), 'interrupt helper should still run through Python argv');
+					return { stdout: 'OK\n', stderr: '' };
+				}
+				if (file === '/mock/mpremote') {
+					mpremoteExecFileCalls.push(args);
+					if (args.includes('fs') && args.includes('cp')) {
+						const scriptPath = args[6];
+						assert.strictEqual(scriptPath.includes('"'), false, 'fs cp local path should be passed as a raw argv value');
+						uploadedCode = fs.readFileSync(scriptPath, 'utf8');
+					}
+					return { stdout: '', stderr: '' };
+				}
+				throw new Error(`unexpected execFile: ${file}`);
+			},
+		});
+		const uploadApi = uploader as unknown as { uploadCode(code: string, port: string): Promise<void>; delay(ms: number): Promise<void> };
+		uploadApi.delay = async () => undefined;
+
+		await withPlatformAsync('win32', () => uploadApi.uploadCode('print("student")\n', 'com7'));
+
+		assert.ok(commands.some(command => command.includes('connect "COM7" resume + run')), 'OTA check helper should keep the Windows shell resume + run path');
+		assert.strictEqual(commands.some(command => command.includes(' fs cp ')), false, 'USB fs cp upload should not be executed through a shell command on Windows');
+		assert.deepStrictEqual(mpremoteExecFileCalls, [[
+			'connect',
+			'COM7',
+			'resume',
+			'+',
+			'fs',
+			'cp',
+			mpremoteExecFileCalls[0][6],
+			':/app/rc_main.py',
+		]]);
+		assert.ok(uploadedCode.includes('print("student")'), 'should preserve user code in the uploaded file');
+		assert.strictEqual(uploadedCode.includes('_singular_blockly_ota_agent.start_background'), false, 'NO OTA config should keep the upload clean');
 	});
 
 	test('redacts secret-bearing OTA configuration helper failures', async () => {

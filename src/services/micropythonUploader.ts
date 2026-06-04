@@ -402,9 +402,9 @@ export class MicropythonUploader {
 			}
 			
 			const normalizedPort = this.normalizeCOMPort(port);
-			
-			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
-			const finalScriptFile = this.getWindowsShortPath(scriptFile);
+
+			// Windows shell-mode mpremote helper uses short paths for compatibility.
+			const finalScriptFile = this.getMpremoteLocalPath(scriptFile, 'shell');
 
 			const args = ['connect', normalizedPort, 'resume', '+', 'run', finalScriptFile];
 			log('[blockly] 執行 CyberBrick mpremote helper', 'debug', { port, normalizedPort, timeoutMs, mode: 'resume-run' });
@@ -515,11 +515,11 @@ print('OK')
 		const normalizedPort = this.normalizeCOMPort(port);
 		try {
 			await this.interruptDevice(normalizedPort);
-			
-			const finalSourceFile = this.getWindowsShortPath(sourceFile);
+
+			const finalSourceFile = this.getMpremoteLocalPath(sourceFile, 'argv');
 			const args = ['connect', normalizedPort, 'resume', '+', 'fs', 'cp', finalSourceFile, ':/cyberbrick_ota_agent.py'];
 			log('[blockly] 部署 CyberBrick OTA agent', 'info', { port });
-			await this.execMpremote(args, 20000);
+			await this.execMpremote(args, 20000, 'argv');
 		} catch (error) {
 			throw new Error(`CyberBrick OTA agent deploy failed: ${this.formatCommandError(error)}`);
 		} finally {
@@ -850,8 +850,8 @@ print(json.dumps(result))
 
 	/**
 	 * 跨平台 shell 參數引號處理
-	 * Python helpers and non-Windows mpremote use execFile argv when available;
-	 * Windows mpremote still uses shell commands for resume + run / fs cp compatibility.
+	 * Python helpers, non-Windows mpremote, and Windows fs cp uploads use execFile argv when available;
+	 * Windows resume + run helpers still use shell commands for compatibility.
 	 */
 	private quoteShellArg(value: string): string {
 		if (process.platform === 'win32') {
@@ -883,6 +883,10 @@ print(json.dumps(result))
 		return process.platform === 'win32'
 			? this.buildWindowsMpremoteCommand(executable, args)
 			: this.buildShellCommand(executable, args);
+	}
+
+	private getMpremoteLocalPath(filePath: string, windowsExecution: 'shell' | 'argv'): string {
+		return process.platform === 'win32' && windowsExecution === 'argv' ? filePath : this.getWindowsShortPath(filePath);
 	}
 
 	/**
@@ -1259,9 +1263,13 @@ print(json.dumps(result))
 		});
 	}
 
-	private async execMpremote(args: string[], timeoutMs?: number): Promise<{ stdout: string; stderr: string }> {
+	private async execMpremote(
+		args: string[],
+		timeoutMs?: number,
+		windowsExecution: 'shell' | 'argv' = 'shell'
+	): Promise<{ stdout: string; stderr: string }> {
 		const mpremotePath = this.mpremotePath || this.getMpremotePath();
-		if (process.platform === 'win32') {
+		if (process.platform === 'win32' && windowsExecution === 'shell') {
 			const command = this.buildMpremoteCommand(mpremotePath, args);
 			return timeoutMs === undefined ? this.executor.exec(command) : this.execWithTimeout(command, timeoutMs);
 		}
@@ -1330,11 +1338,11 @@ print(json.dumps(result))
 			// 使用 resume + 避免觸發 soft-reset（這會導致程式重新執行）
 			// 在 interruptDevice 之後，裝置已經在正常 REPL 模式
 			const normalizedPort = this.normalizeCOMPort(port);
-			const finalTempFile = this.getWindowsShortPath(tempFile);
+			const finalTempFile = this.getMpremoteLocalPath(tempFile, 'argv');
 			const args = ['connect', normalizedPort, 'resume', '+', 'fs', 'cp', finalTempFile, `:${DEVICE_PATH}`];
 			const mpremotePath = this.mpremotePath || this.getMpremotePath();
 			const command = this.buildMpremoteCommand(mpremotePath, args);
-			log('[blockly] 執行上傳指令', 'debug', { port, normalizedPort, command });
+			log('[blockly] 執行上傳指令', 'debug', { port, normalizedPort, command, mode: 'argv-fs-cp' });
 
 			// Windows 平台重試機制：偵測 port busy 錯誤
 			const maxRetries = process.platform === 'win32' ? 3 : 1;
@@ -1342,7 +1350,7 @@ print(json.dumps(result))
 
 			for (let attempt = 1; attempt <= maxRetries; attempt++) {
 				try {
-					await this.execMpremote(args);
+					await this.execMpremote(args, undefined, 'argv');
 					return; // 成功上傳
 				} catch (error) {
 					lastError = error;
