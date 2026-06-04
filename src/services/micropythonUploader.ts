@@ -93,6 +93,7 @@ export type ProgressCallback = (progress: UploadProgress) => void;
  */
 export interface CommandExecutor {
 	exec(command: string): Promise<{ stdout: string; stderr: string }>;
+	execFile?(file: string, args: string[]): Promise<{ stdout: string; stderr: string }>;
 }
 
 /**
@@ -129,6 +130,18 @@ export class MicropythonUploader {
 				const { exec } = require('child_process');
 				return new Promise((resolve, reject) => {
 					exec(command, { encoding: 'utf8' }, (error: Error | null, stdout: string, stderr: string) => {
+						if (error) {
+							reject({ error, stdout, stderr });
+						} else {
+							resolve({ stdout, stderr });
+						}
+					});
+				});
+			},
+			execFile: (file: string, args: string[]) => {
+				const { execFile } = require('child_process');
+				return new Promise((resolve, reject) => {
+					execFile(file, args, { encoding: 'utf8' }, (error: Error | null, stdout: string, stderr: string) => {
 						if (error) {
 							reject({ error, stdout, stderr });
 						} else {
@@ -192,7 +205,7 @@ export class MicropythonUploader {
 		}
 
 		try {
-			const result = await this.executor.exec(`"${pythonPath}" --version`);
+			const result = await this.execExecutable(pythonPath, ['--version']);
 			log('[blockly] PlatformIO Python 環境檢查成功', 'info', { version: result.stdout.trim() });
 			this.pythonPath = pythonPath;
 			return true;
@@ -216,7 +229,7 @@ export class MicropythonUploader {
 		}
 
 		try {
-			const result = await this.executor.exec(`"${mpremotePath}" version`);
+			const result = await this.execExecutable(mpremotePath, ['version']);
 			log('[blockly] mpremote 已安裝', 'info', { version: result.stdout.trim() });
 			this.mpremotePath = mpremotePath;
 			return true;
@@ -249,7 +262,7 @@ export class MicropythonUploader {
 			const pipPath = this.getPipPath();
 			log('[blockly] 開始安裝 mpremote', 'info', { pip: pipPath });
 
-			await this.executor.exec(`"${pipPath}" install mpremote`);
+			await this.execExecutable(pipPath, ['install', 'mpremote']);
 
 			// 驗證安裝
 			const installed = await this.checkMpremoteInstalled();
@@ -294,7 +307,7 @@ export class MicropythonUploader {
 		}
 
 		try {
-			const result = await this.executor.exec(`"${this.mpremotePath}" connect list`);
+			const result = await this.execMpremote(['connect', 'list']);
 			const ports = this.parsePortList(result.stdout);
 			const { filteredPorts, autoDetected } = this.filterPorts(ports, filter);
 
@@ -333,10 +346,7 @@ export class MicropythonUploader {
 		fs.writeFileSync(scriptFile, script, 'utf8');
 
 		try {
-			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
-			const finalScriptFile = this.getWindowsShortPath(scriptFile);
-			
-			const result = await this.execWithTimeout(`"${pythonPath}" "${finalScriptFile}"`, 10000);
+			const result = await this.execExecutable(pythonPath, [scriptFile], 10000);
 			const payload = this.parseJsonLine<{ ports?: Array<Partial<ComPortInfo>>; error?: string }>(result.stdout);
 			if (payload?.error) {
 				log('[blockly] 列出本機序列埠失敗', 'warn', { error: payload.error });
@@ -395,8 +405,8 @@ export class MicropythonUploader {
 			
 			// Windows 路徑相容性：使用短路徑格式避免特殊字符問題
 			const finalScriptFile = this.getWindowsShortPath(scriptFile);
-			
-			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + run ${this.quoteShellArg(finalScriptFile)}`;
+
+			const args = ['connect', normalizedPort, 'resume', '+', 'run', finalScriptFile];
 			log('[blockly] 執行 CyberBrick mpremote helper', 'debug', { port, normalizedPort, timeoutMs, mode: 'resume-run' });
 			
 			// Windows 平台重試機制：偵測 port busy 錯誤
@@ -405,7 +415,7 @@ export class MicropythonUploader {
 			
 			for (let attempt = 1; attempt <= maxRetries; attempt++) {
 				try {
-					return await this.execWithTimeout(command, timeoutMs);
+					return await this.execMpremote(args, timeoutMs);
 				} catch (error) {
 					lastError = error;
 					const errorMsg = this.formatCommandError(error).toLowerCase();
@@ -507,9 +517,9 @@ print('OK')
 			await this.interruptDevice(normalizedPort);
 			
 			const finalSourceFile = this.getWindowsShortPath(sourceFile);
-			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + fs cp ${this.quoteShellArg(finalSourceFile)} :/cyberbrick_ota_agent.py`;
+			const args = ['connect', normalizedPort, 'resume', '+', 'fs', 'cp', finalSourceFile, ':/cyberbrick_ota_agent.py'];
 			log('[blockly] 部署 CyberBrick OTA agent', 'info', { port });
-			await this.execWithTimeout(command, 20000);
+			await this.execMpremote(args, 20000);
 		} catch (error) {
 			throw new Error(`CyberBrick OTA agent deploy failed: ${this.formatCommandError(error)}`);
 		} finally {
@@ -840,16 +850,39 @@ print(json.dumps(result))
 
 	/**
 	 * 跨平台 shell 參數引號處理
-	 * Windows 使用雙引號，Unix 使用單引號
+	 * Production path uses execFile argv; this is kept for injected test executors
+	 * and debug command strings.
 	 */
 	private quoteShellArg(value: string): string {
 		if (process.platform === 'win32') {
-			// Windows cmd.exe 和 PowerShell: 使用雙引號，內部雙引號轉義為 \"
-			return `"${value.replace(/"/g, '\\"')}"`;
+			// Windows paths cannot contain double quotes; reject them instead of trying to
+			// escape a value that cmd.exe may parse differently across versions.
+			if (/["\r\n]/.test(value)) {
+				throw new Error('Windows shell argument contains unsupported characters');
+			}
+			return `"${value}"`;
 		} else {
 			// Unix shells: 使用單引號，內部單引號轉義為 '\\'
 			return `'${value.replace(/'/g, `'\\''`)}'`;
 		}
+	}
+
+	private buildShellCommand(executable: string, args: string[]): string {
+		return [executable, ...args].map(value => this.quoteShellArg(value)).join(' ');
+	}
+
+	private buildWindowsMpremoteCommand(executable: string, args: string[]): string {
+		const literalArgs = new Set(['connect', 'list', 'resume', '+', 'run', 'fs', 'cp', 'cat', 'reset']);
+		return [
+			this.quoteShellArg(executable),
+			...args.map(arg => literalArgs.has(arg) || arg.startsWith(':/') ? arg : this.quoteShellArg(arg)),
+		].join(' ');
+	}
+
+	private buildMpremoteCommand(executable: string, args: string[]): string {
+		return process.platform === 'win32'
+			? this.buildWindowsMpremoteCommand(executable, args)
+			: this.buildShellCommand(executable, args);
 	}
 
 	/**
@@ -879,13 +912,27 @@ print(json.dumps(result))
 			return filePath;
 		}
 		try {
-			const { execSync } = require('child_process');
-			const shortPath = execSync(`for %I in ("${filePath}") do @echo %~sI`, { encoding: 'utf8' }).trim();
-			return (shortPath && shortPath !== filePath) ? shortPath : filePath;
+			const { execFileSync } = require('child_process');
+			const shortPath = execFileSync(
+				process.env.ComSpec || 'cmd.exe',
+				['/d', '/c', 'for %I in ("%SINGULAR_BLOCKLY_SHORT_PATH_TARGET%") do @echo %~sI'],
+				{
+					encoding: 'utf8',
+					env: {
+						...process.env,
+						SINGULAR_BLOCKLY_SHORT_PATH_TARGET: filePath,
+					},
+				}
+			).trim();
+			return this.isUsableWindowsPath(shortPath) && shortPath !== filePath ? shortPath : filePath;
 		} catch {
 			// 取得短路徑失敗時使用原路徑
 			return filePath;
 		}
+	}
+
+	private isUsableWindowsPath(filePath: string): boolean {
+		return /^[A-Za-z]:\\[^"]+$/.test(filePath) || /^\\\\[^"]+$/.test(filePath);
 	}
 
 	private formatCommandError(error: unknown): string {
@@ -1128,10 +1175,8 @@ print(json.dumps(result))
 		fs.writeFileSync(scriptFile, serialScript, 'utf8');
 
 		try {
-			const finalScriptFile = this.getWindowsShortPath(scriptFile);
-			const command = `"${pythonPath}" "${finalScriptFile}"`;
 			log('[blockly] 使用 pyserial 發送中斷信號', 'debug', { port, scriptFile });
-			const result = await this.execWithTimeout(command, 8000);
+			const result = await this.execExecutable(pythonPath, [scriptFile], 8000);
 
 			if (result.stdout.includes('OK')) {
 				log('[blockly] 程式已中斷，REPL 準備就緒', 'info');
@@ -1145,8 +1190,8 @@ print(json.dumps(result))
 			log('[blockly] pyserial 中斷失敗，嘗試硬體重置', 'warn', error);
 			// 備用方案：使用 mpremote 硬體重置
 			try {
-				const resetCommand = `"${this.mpremotePath}" connect ${port} reset`;
-				await this.execWithTimeout(resetCommand, 5000);
+				const normalizedPort = this.normalizeCOMPort(port);
+				await this.execMpremote(['connect', normalizedPort, 'reset'], 5000);
 				await this.delay(2000);
 			} catch (resetError) {
 				log('[blockly] 硬體重置也失敗', 'error', resetError);
@@ -1175,13 +1220,34 @@ print(json.dumps(result))
 	 * @param timeoutMs 超時毫秒數
 	 */
 	private async execWithTimeout(command: string, timeoutMs: number): Promise<{ stdout: string; stderr: string }> {
+		return this.runWithTimeout(() => this.executor.exec(command), timeoutMs);
+	}
+
+	private async execExecutable(executable: string, args: string[], timeoutMs?: number): Promise<{ stdout: string; stderr: string }> {
+		const run = () => {
+			if (this.executor.execFile) {
+				return this.executor.execFile(executable, args);
+			}
+			return this.executor.exec(this.buildShellCommand(executable, args));
+		};
+
+		if (timeoutMs === undefined) {
+			return run();
+		}
+
+		return this.runWithTimeout(run, timeoutMs);
+	}
+
+	private async runWithTimeout(
+		run: () => Promise<{ stdout: string; stderr: string }>,
+		timeoutMs: number
+	): Promise<{ stdout: string; stderr: string }> {
 		return new Promise((resolve, reject) => {
 			const timeoutId = setTimeout(() => {
 				reject(new Error(`指令執行超時 (${timeoutMs}ms)`));
 			}, timeoutMs);
 
-			this.executor
-				.exec(command)
+			run()
 				.then(result => {
 					clearTimeout(timeoutId);
 					resolve(result);
@@ -1191,6 +1257,15 @@ print(json.dumps(result))
 					reject(error);
 				});
 		});
+	}
+
+	private async execMpremote(args: string[], timeoutMs?: number): Promise<{ stdout: string; stderr: string }> {
+		const mpremotePath = this.mpremotePath || this.getMpremotePath();
+		if (process.platform === 'win32') {
+			const command = this.buildMpremoteCommand(mpremotePath, args);
+			return timeoutMs === undefined ? this.executor.exec(command) : this.execWithTimeout(command, timeoutMs);
+		}
+		return this.execExecutable(mpremotePath, args, timeoutMs);
 	}
 
 	/**
@@ -1256,16 +1331,18 @@ print(json.dumps(result))
 			// 在 interruptDevice 之後，裝置已經在正常 REPL 模式
 			const normalizedPort = this.normalizeCOMPort(port);
 			const finalTempFile = this.getWindowsShortPath(tempFile);
-			const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + fs cp ${this.quoteShellArg(finalTempFile)} :${DEVICE_PATH}`;
+			const args = ['connect', normalizedPort, 'resume', '+', 'fs', 'cp', finalTempFile, `:${DEVICE_PATH}`];
+			const mpremotePath = this.mpremotePath || this.getMpremotePath();
+			const command = this.buildMpremoteCommand(mpremotePath, args);
 			log('[blockly] 執行上傳指令', 'debug', { port, normalizedPort, command });
-			
+
 			// Windows 平台重試機制：偵測 port busy 錯誤
 			const maxRetries = process.platform === 'win32' ? 3 : 1;
 			let lastError: unknown;
-			
+
 			for (let attempt = 1; attempt <= maxRetries; attempt++) {
 				try {
-					await this.executor.exec(command);
+					await this.execMpremote(args);
 					return; // 成功上傳
 				} catch (error) {
 					lastError = error;
@@ -1306,9 +1383,11 @@ print(json.dumps(result))
 	private async restartDevice(port: string): Promise<void> {
 		// 使用 resume + 確保不會觸發額外的 soft-reset
 		const normalizedPort = this.normalizeCOMPort(port);
-		const command = `${this.quoteShellArg(this.mpremotePath || this.getMpremotePath())} connect ${this.quoteShellArg(normalizedPort)} resume + reset`;
+		const args = ['connect', normalizedPort, 'resume', '+', 'reset'];
+		const mpremotePath = this.mpremotePath || this.getMpremotePath();
+		const command = this.buildMpremoteCommand(mpremotePath, args);
 		log('[blockly] 執行重啟指令', 'debug', { port, normalizedPort, command });
-		await this.executor.exec(command);
+		await this.execMpremote(args);
 	}
 
 	/**
@@ -1325,9 +1404,12 @@ print(json.dumps(result))
 		}
 
 		try {
-			const command = `"${this.mpremotePath}" connect ${port} fs cat :${DEVICE_PATH}`;
+			const normalizedPort = this.normalizeCOMPort(port);
+			const args = ['connect', normalizedPort, 'fs', 'cat', `:${DEVICE_PATH}`];
+			const mpremotePath = this.mpremotePath || this.getMpremotePath();
+			const command = this.buildMpremoteCommand(mpremotePath, args);
 			log('[blockly] 讀取裝置程式', 'debug', { command });
-			const result = await this.executor.exec(command);
+			const result = await this.execMpremote(args);
 			return result.stdout;
 		} catch (error) {
 			log('[blockly] 讀取裝置程式失敗', 'warn', error);
