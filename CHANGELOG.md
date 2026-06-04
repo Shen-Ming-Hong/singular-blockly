@@ -8,6 +8,16 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.6] - 2026-06-04
+
+### 🐛 修復 Bug Fixes
+
+- **X11 LED R 標籤重複修復** (X11 LED duplicate R label fix)
+    - 修正 X11 擴展板 `x11_led_set_color` 與 `x11_led_digital` 積木在 15 個語系中可能顯示重複 `R` / `紅` 通道標籤的問題；`X11_LED_SET_COLOR_INDEX_SUFFIX` 現在只保留燈珠單位/序位文字，R/G/B 通道標籤由積木本體明確顯示
+      Fixed duplicate `R` / red-channel labels in the X11 extension `x11_led_set_color` and `x11_led_digital` blocks across all 15 locales; `X11_LED_SET_COLOR_INDEX_SUFFIX` now only contains the LED pixel/unit label, while R/G/B channel labels are rendered by the block itself
+    - 新增 X11 LED i18n contract test，鎖定 15 語系 suffix 核准值並防止 `R` / `紅` 回歸
+      Added an X11 LED i18n contract test to lock approved suffix values for all 15 locales and prevent `R` / red-channel regressions
+
 ## [0.82.5] - 2026-06-03
 
 ### 🐛 修復 Bug Fixes
