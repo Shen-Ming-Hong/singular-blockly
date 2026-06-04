@@ -850,7 +850,7 @@ print(json.dumps(result))
 
 	/**
 	 * 跨平台 shell 參數引號處理
-	 * Python helpers and Windows fs cp uploads use execFile argv when available;
+	 * Python helpers, non-Windows mpremote, and Windows fs cp uploads use execFile argv when available;
 	 * Windows resume + run helpers still use shell commands for compatibility.
 	 */
 	private quoteShellArg(value: string): string {
