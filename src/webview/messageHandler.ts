@@ -1976,12 +1976,6 @@ export class WebViewMessageHandler {
 					return;
 				}
 
-				this.sendUploadProgress({
-					stage: 'connecting',
-					progress: 40,
-					message: 'Detecting CyberBrick...',
-				});
-
 				const { autoDetected } = await uploader.listPorts('cyberbrick');
 				usbPort = autoDetected;
 			}

@@ -283,6 +283,13 @@ export class MicropythonUploader {
 		}
 	}
 
+	/**
+	 * 確認 PlatformIO Python 環境可用，並在需要時透過同一個 penv 安裝 mpremote。
+	 *
+	 * 成功時只代表 mpremote 已可被呼叫，不會執行連接埠偵測或裝置通訊。
+	 * 失敗時回傳可直接呈現在上傳結果中的 stage/message/details。
+	 * 若提供 onProgress，會回報 checking_tool 與 installing_tool 階段；呼叫端應避免和後續 upload() 進度重複顯示。
+	 */
 	async ensureMpremoteAvailable(onProgress?: ProgressCallback): Promise<MpremoteAvailabilityResult> {
 		onProgress?.({
 			stage: 'checking_tool',
