@@ -1090,7 +1090,7 @@ window.languageManager.loadMessages('tr', {
 	// X11 LED blokları
 	X11_LED_SET_COLOR_PREFIX: 'LED şerit',
 	X11_LED_SET_COLOR_INDEX: 'indeks',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'renk ayarla R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'piksel',
 	X11_LED_SET_COLOR_TOOLTIP: 'LED şerit piksel rengini ayarla (indeks 0=ilk piksel veya tümü)',
 	X11_LED_DIGITAL_TOOLTIP: 'X11 LED şerit kanal durumlarını AÇIK veya KAPALI olarak ayarla',
 	X11_LED_INDEX_ALL: 'Tümü',

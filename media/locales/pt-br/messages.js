@@ -1083,7 +1083,7 @@ window.languageManager.loadMessages('pt-br', {
 	// Blocos de LED X11
 	X11_LED_SET_COLOR_PREFIX: 'Fita LED',
 	X11_LED_SET_COLOR_INDEX: 'índice',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'definir cor R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Definir cor do pixel da fita LED (índice 0=primeiro pixel, ou todos)',
 	X11_LED_DIGITAL_TOOLTIP: 'Definir estados dos canais da fita LED X11 como LIGADO ou DESLIGADO',
 	X11_LED_INDEX_ALL: 'Todos',

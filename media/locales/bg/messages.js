@@ -1091,7 +1091,7 @@ window.languageManager.loadMessages('bg', {
 	// X11 LED блокове
 	X11_LED_SET_COLOR_PREFIX: 'LED лента',
 	X11_LED_SET_COLOR_INDEX: 'индекс',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'задай цвят R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'пиксел',
 	X11_LED_SET_COLOR_TOOLTIP: 'Задай цвят на пиксел на LED лента (индекс 0=първи пиксел, или всички)',
 	X11_LED_DIGITAL_TOOLTIP: 'Задай каналните състояния на LED лентата X11 на ВКЛ или ИЗКЛ',
 	X11_LED_INDEX_ALL: 'Всички',

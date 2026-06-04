@@ -165,6 +165,7 @@ Blockly.Blocks['x11_led_digital'] = {
 			.appendField(window.languageManager.getMessage('X11_LED_SET_COLOR_INDEX', '第'))
 			.appendField(new Blockly.FieldDropdown(getX11LedIndexOptions), 'INDEX')
 			.appendField(window.languageManager.getMessage('X11_LED_SET_COLOR_INDEX_SUFFIX', '顆'))
+			.appendField('R')
 			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'R_STATE')
 			.appendField('G')
 			.appendField(new Blockly.FieldDropdown(getDigitalStateOptions), 'G_STATE')

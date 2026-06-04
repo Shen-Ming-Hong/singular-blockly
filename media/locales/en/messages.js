@@ -1094,7 +1094,7 @@ window.languageManager.loadMessages('en', {
 	// X11 LED Blocks
 	X11_LED_SET_COLOR_PREFIX: 'LED strip',
 	X11_LED_SET_COLOR_INDEX: 'index',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'set color R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Set LED strip pixel color (index 0=first pixel, or all)',
 	X11_LED_DIGITAL_TOOLTIP: 'Set X11 LED strip channel states ON or OFF',
 	X11_LED_INDEX_ALL: 'All',

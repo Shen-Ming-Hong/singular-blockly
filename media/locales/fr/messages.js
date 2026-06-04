@@ -1088,7 +1088,7 @@ window.languageManager.loadMessages('fr', {
 	// Blocs LED X11
 	X11_LED_SET_COLOR_PREFIX: 'Bande LED',
 	X11_LED_SET_COLOR_INDEX: 'index',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'définir couleur R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Définir la couleur du pixel de la bande LED (index 0=premier pixel, ou tous)',
 	X11_LED_DIGITAL_TOOLTIP: 'Activer ou désactiver les canaux de la bande LED X11',
 	X11_LED_INDEX_ALL: 'Tous',

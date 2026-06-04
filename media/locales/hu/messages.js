@@ -1092,7 +1092,7 @@ window.languageManager.loadMessages('hu', {
 	// X11 LED blokkok
 	X11_LED_SET_COLOR_PREFIX: 'LED szalag',
 	X11_LED_SET_COLOR_INDEX: 'index',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'állítsd színre R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Állítsd be a LED szalag pixel színét (index 0=első pixel, vagy mind)',
 	X11_LED_DIGITAL_TOOLTIP: 'X11 LED szalag csatorna állapotainak beállítása BE/KI',
 	X11_LED_INDEX_ALL: 'Mind',

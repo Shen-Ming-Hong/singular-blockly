@@ -1090,7 +1090,7 @@ window.languageManager.loadMessages('pl', {
 	// X11 LED bloki
 	X11_LED_SET_COLOR_PREFIX: 'Taśma LED',
 	X11_LED_SET_COLOR_INDEX: 'indeks',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'ustaw kolor R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'piksel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Ustaw kolor piksela taśmy LED (indeks 0=pierwszy piksel, lub wszystkie)',
 	X11_LED_DIGITAL_TOOLTIP: 'Ustaw stany kanałów taśmy LED X11 na WŁ lub WYŁ',
 	X11_LED_INDEX_ALL: 'Wszystkie',

@@ -1088,7 +1088,7 @@ window.languageManager.loadMessages('es', {
 	// Bloques de LED X11
 	X11_LED_SET_COLOR_PREFIX: 'Tira LED',
 	X11_LED_SET_COLOR_INDEX: 'índice',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'establecer color R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'píxel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Establecer color de píxel de tira LED (índice 0=primer píxel, o todos)',
 	X11_LED_DIGITAL_TOOLTIP: 'Establecer los estados de los canales de la tira LED X11 en ON u OFF',
 	X11_LED_INDEX_ALL: 'Todos',

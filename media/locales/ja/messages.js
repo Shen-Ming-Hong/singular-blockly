@@ -1082,7 +1082,7 @@ window.languageManager.loadMessages('ja', {
 	// X11 LED ブロック
 	X11_LED_SET_COLOR_PREFIX: 'LEDテープ',
 	X11_LED_SET_COLOR_INDEX: 'インデックス',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'の色を設定 R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: '番目',
 	X11_LED_SET_COLOR_TOOLTIP: 'LEDテープのピクセル色を設定 (インデックス 0=最初、または全て)',
 	X11_LED_DIGITAL_TOOLTIP: 'X11 LEDテープのチャンネル状態をON/OFFに設定する',
 	X11_LED_INDEX_ALL: '全て',

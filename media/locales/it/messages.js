@@ -1086,7 +1086,7 @@ window.languageManager.loadMessages('it', {
 	// Blocchi LED X11
 	X11_LED_SET_COLOR_PREFIX: 'Striscia LED',
 	X11_LED_SET_COLOR_INDEX: 'indice',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'imposta colore R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Imposta il colore del pixel della striscia LED (indice 0=primo pixel, o tutti)',
 	X11_LED_DIGITAL_TOOLTIP: 'Imposta gli stati dei canali della striscia LED X11 su ON o OFF',
 	X11_LED_INDEX_ALL: 'Tutti',
