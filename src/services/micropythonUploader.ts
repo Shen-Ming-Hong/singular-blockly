@@ -850,8 +850,8 @@ print(json.dumps(result))
 
 	/**
 	 * 跨平台 shell 參數引號處理
-	 * Production path uses execFile argv; this is kept for injected test executors
-	 * and debug command strings.
+	 * Python helpers and non-Windows mpremote use execFile argv when available;
+	 * Windows mpremote still uses shell commands for resume + run / fs cp compatibility.
 	 */
 	private quoteShellArg(value: string): string {
 		if (process.platform === 'win32') {
