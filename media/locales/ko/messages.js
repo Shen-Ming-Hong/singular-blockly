@@ -1082,7 +1082,7 @@ window.languageManager.loadMessages('ko', {
 	// X11 LED 블록
 	X11_LED_SET_COLOR_PREFIX: 'LED 스트립',
 	X11_LED_SET_COLOR_INDEX: '인덱스',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: '색상 설정 R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: '픽셀',
 	X11_LED_SET_COLOR_TOOLTIP: 'LED 스트립 픽셀 색상 설정 (인덱스 0=첫 번째, 또는 전체)',
 	X11_LED_DIGITAL_TOOLTIP: 'X11 LED 스트립 채널 상태를 ON 또는 OFF로 설정',
 	X11_LED_INDEX_ALL: '전체',

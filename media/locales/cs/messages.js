@@ -1087,7 +1087,7 @@ window.languageManager.loadMessages('cs', {
 	// X11 LED bloky
 	X11_LED_SET_COLOR_PREFIX: 'LED pásek',
 	X11_LED_SET_COLOR_INDEX: 'index',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'nastav barvu R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Nastav barvu pixelu LED pásku (index 0=první pixel, nebo všechny)',
 	X11_LED_DIGITAL_TOOLTIP: 'Nastavit stavy kanálů LED pásku X11 na ZAP nebo VYP',
 	X11_LED_INDEX_ALL: 'Všechny',

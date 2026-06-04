@@ -1090,7 +1090,7 @@ window.languageManager.loadMessages('de', {
 	// X11 LED Blöcke
 	X11_LED_SET_COLOR_PREFIX: 'LED-Streifen',
 	X11_LED_SET_COLOR_INDEX: 'Index',
-	X11_LED_SET_COLOR_INDEX_SUFFIX: 'setze Farbe R',
+	X11_LED_SET_COLOR_INDEX_SUFFIX: 'Pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Setze LED-Streifen Pixel-Farbe (Index 0=erstes Pixel, oder alle)',
 	X11_LED_DIGITAL_TOOLTIP: 'X11-LED-Streifen-Kanalzustände Ein oder Aus schalten',
 	X11_LED_INDEX_ALL: 'Alle',

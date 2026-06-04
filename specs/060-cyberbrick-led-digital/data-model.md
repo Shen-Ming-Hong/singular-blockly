@@ -67,10 +67,10 @@
 ### Visual Layout (inline)
 
 ```
-[ LED strip [D1▾]  index [1▾]  set color R  R [ON▾]  G [ON▾]  B [ON▾] ]
+[ LED strip [D1▾]  index [1▾]  pixel  R [ON▾]  G [ON▾]  B [ON▾] ]
 ```
 
-> Note: "set color R" is the value of `X11_LED_SET_COLOR_INDEX_SUFFIX` in English locale.
+> Note: "pixel" is the English value of `X11_LED_SET_COLOR_INDEX_SUFFIX`; the channel label `R` is appended by the block itself.
 
 ### Hardware Mapping
 
