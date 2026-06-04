@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.9 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.10 |
+
+> **0.82.10 更新 Update**: Windows `mpremote ... fs cp` USB 上傳改用 `execFile` argv 執行，避免 shell 解析本機暫存路徑造成「檔案名稱、目錄名稱或磁碟區標籤語法錯誤」；Windows `resume + run` helper 維持前次驗證過的 shell 相容路徑。
+> Windows `mpremote ... fs cp` USB uploads now run through `execFile` argv to avoid shell parsing failures for local temporary paths; Windows `resume + run` helpers keep the previously verified shell-compatible path.
 
 > **0.82.9 更新 Update**: Windows Python / pyserial helper 改用 `execFile` argv 直接執行，避免暫存腳本路徑被 short path helper 轉成 `C:\"C:\...\"` 這類無效路徑；short path helper 也會驗證輸出並在格式異常時回退原路徑。
 > Windows Python / pyserial helpers now run directly through `execFile` argv, preventing temporary script paths from being converted into malformed values such as `C:\"C:\...\"`; the short path helper also validates output and falls back to the original path when malformed.
