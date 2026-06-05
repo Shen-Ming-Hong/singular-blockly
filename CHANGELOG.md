@@ -8,6 +8,26 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.14] - 2026-06-05
+
+### 🐛 修復 Bug Fixes
+
+- **CyberBrick OTA Wi-Fi 設定與 Windows 持久化修復** (CyberBrick OTA Wi-Fi setup and Windows persistence fixes)
+    - CyberBrick OTA 設定頁移除手動 Wi-Fi SSID 輸入欄位，只保留裝置掃描到的 Wi-Fi 下拉選單；掃描空結果或失敗時顯示不可選的「找不到 Wi-Fi 網路」提示
+      The CyberBrick OTA setup view now removes the manual Wi-Fi SSID input and keeps only the device-scanned Wi-Fi dropdown; empty or failed scans show a disabled "No Wi-Fi networks found" placeholder.
+    - Wi-Fi 密碼現在只會在 provisioning 成功後清除；失敗時保留在目前 WebView input，方便使用者修正密碼後重試，且仍不寫入設定、不回傳 panel state、不記錄 log
+      Wi-Fi passwords are now cleared only after successful provisioning; failed attempts keep the value in the current WebView input for correction and retry, while still avoiding settings, panel state, and log exposure.
+    - 修正 Windows 上 VS Code 可能拒絕寫入 CyberBrick workspace settings 的問題：改用已註冊的 section/property 寫入，失敗時使用 sanitized `workspaceState` fallback；若 secrets 已寫入但兩種持久化都失敗，會清除剛寫入的本機 secrets
+      Fixed Windows cases where VS Code could reject CyberBrick workspace settings writes by using the registered section/property path and a sanitized `workspaceState` fallback; if secrets were written but both persistence paths fail, the newly written local secrets are cleaned up.
+    - `workspaceState` fallback 現在以 fallback key 是否存在判斷權威性，即使內容是合法空設定也會覆蓋 stale workspace settings，避免刪除最後一台 CyberBrick 後舊配對復活
+      `workspaceState` fallback is now authoritative when its fallback key exists, even for a valid empty settings object, preventing stale workspace settings from reviving a deleted final CyberBrick pairing.
+
+- **Blockly 編輯器 scrollbar 主題一致性** (Blockly editor scrollbar theme consistency)
+    - 將 Blockly editor 內的自訂 scrollbar 統一改為跟隨 editor 自身的 `theme-light` / `theme-dark` tokens，而不是 VS Code host theme
+      Custom scrollbars inside the Blockly editor now follow the editor-owned `theme-light` / `theme-dark` tokens instead of the VS Code host theme.
+    - 補齊 Blockly 12 左側 toolbox category column、legacy toolbox div、flyout SVG scrollbar、dropdown、modal、preview、search 與 backup surfaces 的共用 scrollbar 規則
+      Added shared scrollbar coverage for the Blockly 12 left toolbox category column, legacy toolbox div, flyout SVG scrollbars, dropdowns, modals, preview, search, and backup surfaces.
+
 ## [0.82.11] - 2026-06-04
 
 ### 🐛 修復 Bug Fixes
