@@ -33,7 +33,7 @@ window.languageManager.loadMessages('pl', {
 	CYBERBRICK_USB_PORT_REFRESH: 'Refresh',
 	CYBERBRICK_FRIENDLY_NAME_LABEL: 'Nadaj nazwę swojemu CyberBrick',
 	CYBERBRICK_WIFI_SSID_LABEL: 'Nazwa Wi-Fi',
-	CYBERBRICK_WIFI_SSID_MANUAL_OPTION: 'Wpisz nazwę Wi-Fi ręcznie',
+	CYBERBRICK_WIFI_SSID_EMPTY_PLACEHOLDER: 'Nie znaleziono sieci Wi-Fi',
 	CYBERBRICK_WIFI_SCAN_BUTTON: 'Rescan',
 	CYBERBRICK_WIFI_PASSWORD_LABEL: 'Wi-Fi Password',
 	CYBERBRICK_WIFI_PASSWORD_SHOW: 'Pokaż hasło Wi-Fi',

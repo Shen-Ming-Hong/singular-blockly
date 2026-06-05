@@ -5,7 +5,9 @@
  */
 
 export const CYBERBRICK_UPLOAD_SETTINGS_SCHEMA_VERSION = 2;
-export const CYBERBRICK_UPLOAD_SETTINGS_KEY = 'singular-blockly.cyberbrick.uploadSettings';
+export const CYBERBRICK_UPLOAD_SETTINGS_SECTION = 'singular-blockly';
+export const CYBERBRICK_UPLOAD_SETTINGS_PROPERTY = 'cyberbrick.uploadSettings';
+export const CYBERBRICK_UPLOAD_SETTINGS_KEY = `${CYBERBRICK_UPLOAD_SETTINGS_SECTION}.${CYBERBRICK_UPLOAD_SETTINGS_PROPERTY}`;
 export const CYBERBRICK_OTA_REMOTE_PATH = '/app/rc_main.py';
 export const CYBERBRICK_OTA_PROTOCOL_VERSION = 2;
 export const CYBERBRICK_OTA_DEFAULT_PORT = 8266;
@@ -136,7 +138,6 @@ export interface OtaProvisioningRequest {
 	wifiPassword?: string;
 	reuseExistingWifiSecret?: boolean;
 	targetDeviceId?: string;
-	manualSsid?: boolean;
 }
 
 export interface OtaProvisioningStepResult {

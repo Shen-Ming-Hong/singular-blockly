@@ -34,11 +34,26 @@ export class MockWorkspaceConfiguration implements Pick<vscode.WorkspaceConfigur
 	);
 }
 
-export function createCyberBrickMockContext(secrets = new MockSecretStorage()): vscode.ExtensionContext {
+export class MockMemento implements Pick<vscode.Memento, 'get' | 'update'> {
+	readonly values = new Map<string, unknown>();
+	readonly get = sinon.stub<[string, unknown?], unknown>().callsFake((key, defaultValue) => {
+		return this.values.has(key) ? this.values.get(key) : defaultValue;
+	});
+	readonly update = sinon.stub<[string, unknown], Thenable<void>>().callsFake(async (key, value) => {
+		if (value === undefined) {
+			this.values.delete(key);
+		} else {
+			this.values.set(key, value);
+		}
+	});
+}
+
+export function createCyberBrickMockContext(secrets = new MockSecretStorage(), workspaceState = new MockMemento()): vscode.ExtensionContext {
 	return {
 		extensionPath: '/mock/extension',
 		extensionUri: vscode.Uri.file('/mock/extension'),
 		secrets: secrets as unknown as vscode.SecretStorage,
+		workspaceState: workspaceState as unknown as vscode.Memento,
 		subscriptions: [],
 	} as unknown as vscode.ExtensionContext;
 }

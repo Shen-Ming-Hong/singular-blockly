@@ -104,6 +104,9 @@ export class CyberBrickOtaProvisioningService {
 			onProgress?.(step);
 		};
 
+		let provisionedDeviceId = '';
+		let localSecretsStored = false;
+		let settingsStored = false;
 		const port = (request.usbPort || request.port || '').trim();
 		if (!port) {
 			const error = createCyberBrickUploadError('usb-port-missing');
@@ -128,6 +131,7 @@ export class CyberBrickOtaProvisioningService {
 				await this.uploader.writeCyberBrickDeviceId(port, deviceId);
 				emit({ step: 'read-device-id', success: true, message: 'Device identity created.', deviceId });
 			}
+			provisionedDeviceId = deviceId;
 
 			const otaToken = this.randomToken(24);
 			const pairingSecret = this.randomToken(24);
@@ -173,6 +177,7 @@ export class CyberBrickOtaProvisioningService {
 				secretWrites.push(this.settingsService.storeDeviceSecret(deviceId, 'wifiPassword', request.wifiPassword));
 			}
 			await Promise.all(secretWrites);
+			localSecretsStored = true;
 			emit({ step: 'store-secrets', success: true, message: 'Secrets stored securely.', deviceId });
 
 			const now = this.nowIso();
@@ -190,6 +195,7 @@ export class CyberBrickOtaProvisioningService {
 			};
 
 			await this.settingsService.upsertPairedDevice(device, { makePrimary: !existingSettings.primaryDeviceId });
+			settingsStored = true;
 
 			const panelState = await this.settingsService.buildPanelState();
 			const result: OtaProvisioningResult = {
@@ -208,6 +214,16 @@ export class CyberBrickOtaProvisioningService {
 			log('CyberBrick OTA provisioning completed', 'info', { deviceId, hasIp: Boolean(device.lastKnownIp) });
 			return { result, panelState };
 		} catch (error) {
+			if (localSecretsStored && !settingsStored && provisionedDeviceId) {
+				try {
+					await this.settingsService.deleteDeviceSecrets(provisionedDeviceId);
+				} catch (cleanupError) {
+					log('CyberBrick OTA provisioning could not clean up local secrets after settings save failure', 'warn', {
+						deviceId: provisionedDeviceId,
+						error: cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+					});
+				}
+			}
 			const userError = classifyCyberBrickUploadError(error, 'provisioning-failed');
 			const result: OtaProvisioningResult = {
 				success: false,

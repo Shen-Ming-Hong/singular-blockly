@@ -76,7 +76,6 @@ describe('CyberBrick upload settings WebView contract', () => {
 				'id="cyberbrickPairedDevicesList"',
 				'id="cyberbrickUsbPortSelect"',
 				'id="cyberbrickWifiSsidSelect"',
-				'id="cyberbrickWifiSsidInput"',
 				'id="cyberbrickWifiPasswordInput"',
 				'id="cyberbrickWifiPasswordToggle"',
 				'aria-pressed="false"',
@@ -90,9 +89,26 @@ describe('CyberBrick upload settings WebView contract', () => {
 			],
 			'CyberBrick provisioning markup'
 		);
-		assertDoesNotContainAny(html, ['Start USB Setup', 'list="cyberbrickWifiSsidOptions"', '<datalist id="cyberbrickWifiSsidOptions"'], 'CyberBrick provisioning fallback text');
+		assertDoesNotContainAny(
+			html,
+			['Start USB Setup', 'list="cyberbrickWifiSsidOptions"', '<datalist id="cyberbrickWifiSsidOptions"', 'id="cyberbrickWifiSsidInput"'],
+			'CyberBrick provisioning fallback text'
+		);
 		assertContainsAll(script, ['Set Up Wireless Upload', 'CYBERBRICK_PROVISION_BUTTON'], 'CyberBrick provisioning fallback labels');
-		assertDoesNotContainAny(script, ['Start USB Setup', 'Use USB setup below', 'after USB setup'], 'CyberBrick provisioning runtime fallback text');
+		assertDoesNotContainAny(
+			script,
+			[
+				'Start USB Setup',
+				'Use USB setup below',
+				'after USB setup',
+				'CYBERBRICK_WIFI_MANUAL_VALUE',
+				'CYBERBRICK_WIFI_SSID_MANUAL_OPTION',
+				'cyberbrickWifiSsidInput',
+				'getCyberBrickManualWifiSsidText',
+				'syncCyberBrickWifiSsidManualInput',
+			],
+			'CyberBrick provisioning runtime fallback text'
+		);
 		assertContainsAll(
 			script,
 			[
@@ -102,11 +118,11 @@ describe('CyberBrick upload settings WebView contract', () => {
 				"command: 'cyberbrickOtaCleanupRequest'",
 				"case 'cyberbrickOtaCleanupResult'",
 				'cyberbrickWifiSsidSelect',
-				'CYBERBRICK_WIFI_SSID_MANUAL_OPTION',
+				'CYBERBRICK_WIFI_SSID_EMPTY_PLACEHOLDER',
 				'getSelectedCyberBrickWifiSsid',
-				'syncCyberBrickWifiSsidManualInput',
 				'toggleCyberBrickWifiPasswordVisibility',
 				'updateCyberBrickWifiPasswordToggleState',
+				'clearCyberBrickWifiPasswordInput',
 				'CYBERBRICK_WIFI_PASSWORD_SHOW',
 				'CYBERBRICK_WIFI_PASSWORD_HIDE',
 				'selectFirstCyberBrickWifiSsidFromScan',
@@ -119,6 +135,11 @@ describe('CyberBrick upload settings WebView contract', () => {
 			extractFunctionBody(script, 'handleCyberBrickWifiScanResult'),
 			['selectFirstCyberBrickWifiSsidFromScan', 'message.success'],
 			'Wi-Fi scan result should preselect the first scanned SSID after successful scans'
+		);
+		assertContainsAll(
+			extractFunctionBody(script, 'renderCyberBrickWifiNetworks'),
+			['getCyberBrickWifiEmptyPlaceholderText()', 'placeholder.disabled = true', "placeholder.value = ''"],
+			'Wi-Fi SSID dropdown should show a disabled empty-scan placeholder instead of manual fallback'
 		);
 		const provisionProgressBody = extractFunctionBody(script, 'renderCyberBrickProvisioningProgress');
 		assertContainsAll(
@@ -150,6 +171,23 @@ describe('CyberBrick upload settings WebView contract', () => {
 			provisionResultBody,
 			['CYBERBRICK_PROVISION_SUCCEEDED', 'CYBERBRICK_PROVISION_FAILED', 'toast.show(successMessage', 'toast.show(errorMessage'],
 			'OTA setup result toasts should use localized messages'
+		);
+		const clearPasswordIndex = provisionResultBody.indexOf('clearCyberBrickWifiPasswordInput();');
+		const successBranchIndex = provisionResultBody.indexOf('if (message.success)');
+		const failureBranchIndex = provisionResultBody.indexOf('} else {', successBranchIndex);
+		assert.ok(
+			clearPasswordIndex > successBranchIndex && clearPasswordIndex < failureBranchIndex,
+			'Wi-Fi password should be cleared only after successful OTA setup'
+		);
+		assertDoesNotContainAny(
+			extractFunctionBody(script, 'requestCyberBrickOtaProvisioning'),
+			["passwordInput.value = ''", "passwordInput.type = 'password'", 'clearCyberBrickWifiPasswordInput'],
+			'OTA setup submit should keep the Wi-Fi password available until the result succeeds'
+		);
+		assertContainsAll(
+			extractFunctionBody(script, 'clearCyberBrickWifiPasswordInput'),
+			["passwordInput.value = ''", "passwordInput.type = 'password'", 'updateCyberBrickWifiPasswordToggleState()'],
+			'successful OTA setup should clear the password and hide the password field again'
 		);
 		assertDoesNotContainAny(
 			provisionResultBody,

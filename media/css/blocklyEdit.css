@@ -39,6 +39,9 @@ body {
 	--editor-scrollbar-track: #f1f1f1;
 	--editor-scrollbar-thumb: #c1c1c1;
 	--editor-scrollbar-thumb-hover: #a8a8a8;
+	--editor-scrollbar-size: 12px;
+	--editor-scrollbar-radius: 6px;
+	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
 	--txt-virtual-controls-panel-bg: #ffffff;
 	--txt-virtual-controls-panel-fg: #1e1e1e;
 	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
@@ -85,6 +88,7 @@ body.theme-light {
 	--editor-scrollbar-track: #f1f1f1;
 	--editor-scrollbar-thumb: #c1c1c1;
 	--editor-scrollbar-thumb-hover: #a8a8a8;
+	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
 	--editor-focus-ring: #007acc;
 	--txt-virtual-controls-panel-bg: #ffffff;
 	--txt-virtual-controls-panel-fg: #1e1e1e;
@@ -128,6 +132,7 @@ body.theme-dark {
 	--editor-scrollbar-track: #333333;
 	--editor-scrollbar-thumb: #666666;
 	--editor-scrollbar-thumb-hover: #888888;
+	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
 	--editor-focus-ring: #8ab4f8;
 	--txt-virtual-controls-panel-bg: #252526;
 	--txt-virtual-controls-panel-fg: #cccccc;
@@ -172,6 +177,7 @@ body.vscode-high-contrast-light {
 	--editor-scrollbar-track: Canvas;
 	--editor-scrollbar-thumb: CanvasText;
 	--editor-scrollbar-thumb-hover: Highlight;
+	--editor-scrollbar-track-shadow: none;
 	--txt-virtual-controls-panel-bg: Canvas;
 	--txt-virtual-controls-panel-fg: CanvasText;
 	--txt-virtual-controls-panel-border: var(--vscode-contrastBorder, CanvasText);
@@ -727,34 +733,6 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 		opacity 0.2s ease,
 		transform 0.2s ease;
 	z-index: 1100;
-	scrollbar-width: thin; /* Firefox */
-	scrollbar-color: #c1c1c1 #f1f1f1; /* Firefox */
-}
-
-.board-dropdown::-webkit-scrollbar {
-	width: 12px;
-	height: 12px;
-}
-
-.board-dropdown::-webkit-scrollbar-track {
-	background: #f1f1f1;
-	border-radius: 5px;
-	margin: 3px 0;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
-}
-
-.board-dropdown::-webkit-scrollbar-thumb {
-	background-color: #c1c1c1;
-	border-radius: 5px;
-	border: 2px solid #f1f1f1;
-}
-
-.board-dropdown::-webkit-scrollbar-thumb:hover {
-	background-color: #a8a8a8;
-}
-
-.board-dropdown::-webkit-scrollbar-corner {
-	background-color: #f1f1f1;
 }
 
 .board-dropdown.open {
@@ -836,34 +814,6 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 		opacity 0.2s ease,
 		transform 0.2s ease;
 	z-index: 1100;
-	scrollbar-width: thin; /* Firefox */
-	scrollbar-color: #c1c1c1 #f1f1f1; /* Firefox */
-}
-
-.language-dropdown::-webkit-scrollbar {
-	width: 12px;
-	height: 12px;
-}
-
-.language-dropdown::-webkit-scrollbar-track {
-	background: #f1f1f1;
-	border-radius: 5px;
-	margin: 3px 0;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
-}
-
-.language-dropdown::-webkit-scrollbar-thumb {
-	background-color: #c1c1c1;
-	border-radius: 5px;
-	border: 2px solid #f1f1f1;
-}
-
-.language-dropdown::-webkit-scrollbar-thumb:hover {
-	background-color: #a8a8a8;
-}
-
-.language-dropdown::-webkit-scrollbar-corner {
-	background-color: #f1f1f1;
 }
 
 .language-dropdown.open {
@@ -953,31 +903,6 @@ body.preview-mode .txt-preview-canvas {
 	min-height: 320px;
 	overflow: auto;
 	cursor: default;
-	scrollbar-width: thin;
-	scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track);
-}
-
-body.preview-mode .txt-preview-canvas::-webkit-scrollbar {
-	width: 12px;
-	height: 12px;
-}
-
-body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track {
-	background: var(--editor-scrollbar-track);
-}
-
-body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb {
-	background: var(--editor-scrollbar-thumb);
-	border: 2px solid var(--editor-scrollbar-track);
-	border-radius: 6px;
-}
-
-body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover {
-	background: var(--editor-scrollbar-thumb-hover);
-}
-
-body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner {
-	background: var(--editor-scrollbar-track);
 }
 
 body.preview-mode .txt-preview-canvas:focus-visible {
@@ -1053,6 +978,7 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	.txt-virtual-controls-panel,
 	.txt-preview-canvas,
 	.txt-virtual-controls-canvas,
+	.blocklyToolboxDiv,
 	.txt-virtual-controls-mode-badge,
 	.txt-preview-warning-item,
 	.txt-virtual-control-button {
@@ -1416,10 +1342,6 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	flex-direction: column;
 	gap: 8px;
 	min-width: 0;
-}
-
-.cyberbrick-wifi-manual-input {
-	width: 100%;
 }
 
 .cyberbrick-password-field {
@@ -2541,49 +2463,11 @@ body.theme-dark .language-icon {
 body.theme-dark .language-dropdown {
 	background-color: #333333;
 	border-color: #555555;
-	scrollbar-color: #666 #333; /* Firefox */
 }
 
 body.theme-dark .board-dropdown {
 	background-color: #333333;
 	border-color: #555555;
-	scrollbar-color: #666 #333; /* Firefox */
-}
-
-body.theme-dark .language-dropdown::-webkit-scrollbar-track {
-	background-color: #333333;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
-}
-
-body.theme-dark .language-dropdown::-webkit-scrollbar-thumb {
-	background-color: #666666;
-	border: 2px solid #333333;
-}
-
-body.theme-dark .language-dropdown::-webkit-scrollbar-thumb:hover {
-	background-color: #888888;
-}
-
-body.theme-dark .language-dropdown::-webkit-scrollbar-corner {
-	background-color: #333333;
-}
-
-body.theme-dark .board-dropdown::-webkit-scrollbar-track {
-	background-color: #333333;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
-}
-
-body.theme-dark .board-dropdown::-webkit-scrollbar-thumb {
-	background-color: #666666;
-	border: 2px solid #333333;
-}
-
-body.theme-dark .board-dropdown::-webkit-scrollbar-thumb:hover {
-	background-color: #888888;
-}
-
-body.theme-dark .board-dropdown::-webkit-scrollbar-corner {
-	background-color: #333333;
 }
 
 body.theme-dark .language-option {
@@ -2954,133 +2838,15 @@ body.theme-dark .backup-name {
 	color: #e0e0e0;
 }
 
-/* 自定義捲軸樣式 - 提高選擇器特異性，強制套用樣式 */
-/* 首先定義基本捲軸樣式 */
-.modal-content .backup-list-container {
-	scrollbar-width: thin !important; /* Firefox */
-	scrollbar-color: #c1c1c1 #f1f1f1 !important; /* Firefox */
-}
-
-/* 整體捲軸 - WebKit/Blink */
-.modal-content .backup-list-container::-webkit-scrollbar {
-	width: 12px !important;
-	height: 12px !important;
-}
-
-/* 捲軸軌道 */
-.modal-content .backup-list-container::-webkit-scrollbar-track {
-	background: #f1f1f1 !important;
-	border-radius: 5px !important;
-	margin: 3px 0 !important;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* 捲軸滑塊 */
-.modal-content .backup-list-container::-webkit-scrollbar-thumb {
-	background-color: #c1c1c1 !important;
-	border-radius: 5px !important;
-	border: 2px solid #f1f1f1 !important;
-}
-
-/* 滑鼠懸停在捲軸上時 */
-.modal-content .backup-list-container::-webkit-scrollbar-thumb:hover {
-	background-color: #a8a8a8 !important;
-}
-
-/* 捲軸角落 */
-.modal-content .backup-list-container::-webkit-scrollbar-corner {
-	background-color: #f1f1f1 !important;
-}
-
-/* 暗色主題下的捲軸樣式 - 提高選擇器特異性 */
-body.theme-dark .modal-content .backup-list-container {
-	scrollbar-color: #666 #333 !important; /* Firefox */
-}
-
-body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-track {
-	background-color: #333 !important;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3) !important;
-}
-
-body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-thumb {
-	background-color: #666 !important;
-	border: 2px solid #333 !important;
-}
-
-body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-thumb:hover {
-	background-color: #888 !important;
-}
-
-body.theme-dark .modal-content .backup-list-container::-webkit-scrollbar-corner {
-	background-color: #333 !important;
-}
-
 body.theme-dark .empty-backup-list {
 	color: #999;
 }
 
-/* 為搜尋結果容器添加與備份管理相同風格的捲軸樣式 */
 .modal-content .search-results-container {
-	scrollbar-width: thin !important; /* Firefox */
-	scrollbar-color: #c1c1c1 #f1f1f1 !important; /* Firefox */
 	max-height: 300px;
 	overflow-y: auto;
 	-ms-overflow-style: -ms-autohiding-scrollbar; /* Edge 和 IE 的自動隱藏捲軸 */
 	will-change: scroll-position; /* 提示瀏覽器將滾動操作視為重要的渲染優化目標 */
-}
-
-/* 整體捲軸 - WebKit/Blink */
-.modal-content .search-results-container::-webkit-scrollbar {
-	width: 12px !important;
-	height: 12px !important;
-}
-
-/* 捲軸軌道 */
-.modal-content .search-results-container::-webkit-scrollbar-track {
-	background: #f1f1f1 !important;
-	border-radius: 5px !important;
-	margin: 3px 0 !important;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* 捲軸滑塊 */
-.modal-content .search-results-container::-webkit-scrollbar-thumb {
-	background-color: #c1c1c1 !important;
-	border-radius: 5px !important;
-	border: 2px solid #f1f1f1 !important;
-}
-
-/* 滑鼠懸停在捲軸上時 */
-.modal-content .search-results-container::-webkit-scrollbar-thumb:hover {
-	background-color: #a8a8a8 !important;
-}
-
-/* 捲軸角落 */
-.modal-content .search-results-container::-webkit-scrollbar-corner {
-	background-color: #f1f1f1 !important;
-}
-
-/* 暗色主題下的搜尋結果捲軸樣式 */
-body.theme-dark .modal-content .search-results-container {
-	scrollbar-color: #666 #333 !important; /* Firefox */
-}
-
-body.theme-dark .modal-content .search-results-container::-webkit-scrollbar-track {
-	background-color: #333 !important;
-	box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3) !important;
-}
-
-body.theme-dark .modal-content .search-results-container::-webkit-scrollbar-thumb {
-	background-color: #666 !important;
-	border: 2px solid #333 !important;
-}
-
-body.theme-dark .modal-content .search-results-container::-webkit-scrollbar-thumb:hover {
-	background-color: #888 !important;
-}
-
-body.theme-dark .modal-content .search-results-container::-webkit-scrollbar-corner {
-	background-color: #333 !important;
 }
 
 /* 直接針對備份列表元素設定捲軸樣式，以增加選擇器特異性 */
@@ -3089,7 +2855,7 @@ body.theme-dark .modal-content .search-results-container::-webkit-scrollbar-corn
 	will-change: scroll-position; /* 提示瀏覽器將滾動操作視為重要的渲染優化目標 */
 }
 
-/* 全局捲軸重置樣式 - 放在頂部確保優先應用 */
+/* 全局捲軸重置樣式，後續 editor-owned 規則會覆蓋需要自訂的捲軸 */
 ::-webkit-scrollbar {
 	width: initial;
 	height: initial;
@@ -3104,6 +2870,147 @@ body.theme-dark .modal-content .search-results-container::-webkit-scrollbar-corn
 	background: initial;
 	border-radius: initial;
 	border: initial;
+}
+
+.board-dropdown,
+.language-dropdown,
+body.preview-mode .txt-preview-canvas,
+#txtTestPanelDialog .modal-body,
+.modal,
+.sample-modal-content .modal-body,
+#functionSearchModal,
+.search-history-container,
+.blocklyToolbox,
+.blocklyToolboxCategoryGroup,
+.blocklyToolboxDiv {
+	scrollbar-width: thin;
+	scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track);
+}
+
+.backup-list-container,
+.modal-content .search-results-container {
+	scrollbar-width: thin !important;
+	scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track) !important;
+}
+
+.board-dropdown::-webkit-scrollbar,
+.language-dropdown::-webkit-scrollbar,
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
+#txtTestPanelDialog .modal-body::-webkit-scrollbar,
+.modal::-webkit-scrollbar,
+.sample-modal-content .modal-body::-webkit-scrollbar,
+#functionSearchModal::-webkit-scrollbar,
+.search-history-container::-webkit-scrollbar,
+.blocklyToolbox::-webkit-scrollbar,
+.blocklyToolboxCategoryGroup::-webkit-scrollbar,
+.blocklyToolboxDiv::-webkit-scrollbar {
+	width: var(--editor-scrollbar-size);
+	height: var(--editor-scrollbar-size);
+}
+
+.backup-list-container::-webkit-scrollbar,
+.modal-content .search-results-container::-webkit-scrollbar {
+	width: var(--editor-scrollbar-size) !important;
+	height: var(--editor-scrollbar-size) !important;
+}
+
+.board-dropdown::-webkit-scrollbar-track,
+.language-dropdown::-webkit-scrollbar-track,
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
+#txtTestPanelDialog .modal-body::-webkit-scrollbar-track,
+.modal::-webkit-scrollbar-track,
+.sample-modal-content .modal-body::-webkit-scrollbar-track,
+#functionSearchModal::-webkit-scrollbar-track,
+.search-history-container::-webkit-scrollbar-track,
+.blocklyToolbox::-webkit-scrollbar-track,
+.blocklyToolboxCategoryGroup::-webkit-scrollbar-track,
+.blocklyToolboxDiv::-webkit-scrollbar-track {
+	background: var(--editor-scrollbar-track);
+	border-radius: var(--editor-scrollbar-radius);
+	box-shadow: var(--editor-scrollbar-track-shadow);
+}
+
+.backup-list-container::-webkit-scrollbar-track,
+.modal-content .search-results-container::-webkit-scrollbar-track {
+	background: var(--editor-scrollbar-track) !important;
+	border-radius: var(--editor-scrollbar-radius) !important;
+	box-shadow: var(--editor-scrollbar-track-shadow) !important;
+}
+
+.board-dropdown::-webkit-scrollbar-thumb,
+.language-dropdown::-webkit-scrollbar-thumb,
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
+#txtTestPanelDialog .modal-body::-webkit-scrollbar-thumb,
+.modal::-webkit-scrollbar-thumb,
+.sample-modal-content .modal-body::-webkit-scrollbar-thumb,
+#functionSearchModal::-webkit-scrollbar-thumb,
+.search-history-container::-webkit-scrollbar-thumb,
+.blocklyToolbox::-webkit-scrollbar-thumb,
+.blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb,
+.blocklyToolboxDiv::-webkit-scrollbar-thumb {
+	background: var(--editor-scrollbar-thumb);
+	border: 2px solid var(--editor-scrollbar-track);
+	border-radius: var(--editor-scrollbar-radius);
+}
+
+.backup-list-container::-webkit-scrollbar-thumb,
+.modal-content .search-results-container::-webkit-scrollbar-thumb {
+	background: var(--editor-scrollbar-thumb) !important;
+	border: 2px solid var(--editor-scrollbar-track) !important;
+	border-radius: var(--editor-scrollbar-radius) !important;
+}
+
+.board-dropdown::-webkit-scrollbar-thumb:hover,
+.language-dropdown::-webkit-scrollbar-thumb:hover,
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
+#txtTestPanelDialog .modal-body::-webkit-scrollbar-thumb:hover,
+.modal::-webkit-scrollbar-thumb:hover,
+.sample-modal-content .modal-body::-webkit-scrollbar-thumb:hover,
+#functionSearchModal::-webkit-scrollbar-thumb:hover,
+.search-history-container::-webkit-scrollbar-thumb:hover,
+.blocklyToolbox::-webkit-scrollbar-thumb:hover,
+.blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb:hover,
+.blocklyToolboxDiv::-webkit-scrollbar-thumb:hover {
+	background: var(--editor-scrollbar-thumb-hover);
+}
+
+.backup-list-container::-webkit-scrollbar-thumb:hover,
+.modal-content .search-results-container::-webkit-scrollbar-thumb:hover {
+	background: var(--editor-scrollbar-thumb-hover) !important;
+}
+
+.board-dropdown::-webkit-scrollbar-corner,
+.language-dropdown::-webkit-scrollbar-corner,
+body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
+#txtTestPanelDialog .modal-body::-webkit-scrollbar-corner,
+.modal::-webkit-scrollbar-corner,
+.sample-modal-content .modal-body::-webkit-scrollbar-corner,
+#functionSearchModal::-webkit-scrollbar-corner,
+.search-history-container::-webkit-scrollbar-corner,
+.blocklyToolbox::-webkit-scrollbar-corner,
+.blocklyToolboxCategoryGroup::-webkit-scrollbar-corner,
+.blocklyToolboxDiv::-webkit-scrollbar-corner {
+	background: var(--editor-scrollbar-track);
+}
+
+.backup-list-container::-webkit-scrollbar-corner,
+.modal-content .search-results-container::-webkit-scrollbar-corner {
+	background: var(--editor-scrollbar-track) !important;
+}
+
+.blocklyFlyout .blocklyScrollbarBackground {
+	fill: var(--editor-scrollbar-track);
+	opacity: 0.35;
+}
+
+.blocklyFlyout .blocklyScrollbarHandle {
+	fill: var(--editor-scrollbar-thumb);
+	fill-opacity: 1;
+}
+
+.blocklyFlyout .blocklyScrollbarBackground:hover + .blocklyScrollbarHandle,
+.blocklyFlyout .blocklyScrollbarHandle:hover {
+	fill: var(--editor-scrollbar-thumb-hover);
 }
 
 /* 函式積木搜尋功能樣式 */

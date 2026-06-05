@@ -33,7 +33,7 @@ window.languageManager.loadMessages('cs', {
 	CYBERBRICK_USB_PORT_REFRESH: 'Refresh',
 	CYBERBRICK_FRIENDLY_NAME_LABEL: 'Pojmenujte svůj CyberBrick',
 	CYBERBRICK_WIFI_SSID_LABEL: 'Název Wi-Fi',
-	CYBERBRICK_WIFI_SSID_MANUAL_OPTION: 'Zadat název Wi-Fi ručně',
+	CYBERBRICK_WIFI_SSID_EMPTY_PLACEHOLDER: 'Nebyly nalezeny žádné sítě Wi-Fi',
 	CYBERBRICK_WIFI_SCAN_BUTTON: 'Rescan',
 	CYBERBRICK_WIFI_PASSWORD_LABEL: 'Wi-Fi Password',
 	CYBERBRICK_WIFI_PASSWORD_SHOW: 'Zobrazit heslo Wi-Fi',
