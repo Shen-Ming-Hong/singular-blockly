@@ -75,7 +75,7 @@ export class CyberBrickUploadSettingsService {
 			configuration.get<unknown>(CYBERBRICK_UPLOAD_SETTINGS_KEY, undefined);
 		const settings = this.normalizeSettings(raw);
 		const fallbackSettings = this.loadFallbackSettings();
-		if (this.hasPersistedSettings(fallbackSettings)) {
+		if (fallbackSettings) {
 			return fallbackSettings;
 		}
 		return settings;
@@ -302,8 +302,11 @@ export class CyberBrickUploadSettingsService {
 		return this.context.workspaceState as WorkspaceStateStore | undefined;
 	}
 
-	private loadFallbackSettings(): CyberBrickUploadSettings {
+	private loadFallbackSettings(): CyberBrickUploadSettings | undefined {
 		const raw = this.getWorkspaceState()?.get<unknown>(this.getFallbackSettingsKey(), undefined);
+		if (raw === undefined) {
+			return undefined;
+		}
 		return this.normalizeSettings(raw);
 	}
 
@@ -329,10 +332,6 @@ export class CyberBrickUploadSettingsService {
 
 	private getFallbackSettingsKey(): string {
 		return `${CYBERBRICK_UPLOAD_SETTINGS_FALLBACK_STATE_KEY_PREFIX}.${this.getWorkspaceHash()}`;
-	}
-
-	private hasPersistedSettings(settings: CyberBrickUploadSettings): boolean {
-		return Boolean(settings.primaryDeviceId) || settings.pairedDevices.length > 0;
 	}
 
 	private normalizeDevices(rawDevices: unknown[]): PairedCyberBrickDevice[] {

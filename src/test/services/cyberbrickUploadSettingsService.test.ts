@@ -126,6 +126,33 @@ suite('CyberBrickUploadSettingsService Test Suite', () => {
 		assert.deepStrictEqual(loaded.pairedDevices.map(device => device.friendlyName), ['Fallback Brick']);
 	});
 
+	test('keeps empty workspaceState fallback over stale workspace settings after deleting the last device', async () => {
+		configuration.update.rejects(new Error('workspace settings rejected'));
+		const fallbackKey = `singular-blockly.cyberbrick.uploadSettings.fallback.${service.getWorkspaceHash()}`;
+		const device = createCyberBrickDevice({ friendlyName: 'Fallback Brick' });
+		configuration.values.set(
+			CYBERBRICK_UPLOAD_SETTINGS_PROPERTY,
+			createCyberBrickUploadSettings({
+				primaryDeviceId: device.deviceId,
+				pairedDevices: [createCyberBrickDevice({ friendlyName: 'Stale Brick' })],
+			})
+		);
+		workspaceState.values.set(
+			fallbackKey,
+			createCyberBrickUploadSettings({
+				primaryDeviceId: device.deviceId,
+				pairedDevices: [device],
+			})
+		);
+
+		const saved = await service.deletePairedDevice(device.deviceId);
+		const reloaded = await service.loadSettings();
+
+		assert.deepStrictEqual(saved, createCyberBrickUploadSettings());
+		assert.deepStrictEqual(workspaceState.values.get(fallbackKey), createCyberBrickUploadSettings());
+		assert.deepStrictEqual(reloaded, createCyberBrickUploadSettings());
+	});
+
 	test('generates workspace-scoped secret keys and stores secrets only in SecretStorage', async () => {
 		const expectedHash = crypto.createHash('sha256').update(workspaceUri.toString()).digest('hex').slice(0, 16);
 		const expectedKey = `singular-blockly.cyberbrick.${expectedHash}.${CYBERBRICK_TEST_DEVICE_ID}.otaToken`;
