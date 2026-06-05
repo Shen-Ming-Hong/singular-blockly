@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.11 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.15 |
+
+> **0.82.15 更新 Update**: `hono` (`GHSA-f577-qrjj-4474` / `CVE-2026-47673`, `GHSA-xrhx-7g5j-rcj5` / `CVE-2026-47674`, `GHSA-3hrh-pfw6-9m5x` / `CVE-2026-47675`, `GHSA-2gcr-mfcq-wcc3` / `CVE-2026-47676`) 已透過 npm override 升級至 `^4.12.21`，lockfile 安裝版本為 `4.12.23`，修復 Dependabot Alerts #71-#74 並清除本地 `npm audit` 的 medium 風險。
+> `hono` (`GHSA-f577-qrjj-4474` / `CVE-2026-47673`, `GHSA-xrhx-7g5j-rcj5` / `CVE-2026-47674`, `GHSA-3hrh-pfw6-9m5x` / `CVE-2026-47675`, `GHSA-2gcr-mfcq-wcc3` / `CVE-2026-47676`) has been upgraded via npm override to `^4.12.21`, with `4.12.23` installed in the lockfile, fixing Dependabot Alerts #71-#74 and clearing the local `npm audit` medium finding.
 
 > **0.82.11 更新 Update**: CyberBrick USB port 預掃描與 OTA 設定頁 USB port 清單會先沿用 PlatformIO `penv` 的 `mpremote` 自動安裝流程；缺少 `mpremote` 不再被靜默誤判成找不到 COM port，且未改動 v0.82.10 已驗證的 Windows `fs cp` / `resume + run` 命令分流。
 > CyberBrick USB port pre-detection and the OTA settings USB port list now reuse the PlatformIO `penv`-based `mpremote` auto-install flow first; missing `mpremote` is no longer silently treated as no COM port found, and the Windows `fs cp` / `resume + run` command split verified in v0.82.10 is unchanged.
@@ -52,4 +55,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-06-04_
+_Last updated: 2026-06-06_

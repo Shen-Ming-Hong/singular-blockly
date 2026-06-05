@@ -8,6 +8,19 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.15] - 2026-06-06
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 `hono` 多項 medium 風險 (CVE-2026-47673, CVE-2026-47674, CVE-2026-47675, CVE-2026-47676)** (Fix multiple medium-risk `hono` vulnerabilities)
+    - 升級 `hono` override 從 `^4.12.18` 至 `^4.12.21`，lockfile 安裝版本更新至 `4.12.23`
+      Upgraded the `hono` override from `^4.12.18` to `^4.12.21`, with the lockfile installation updated to `4.12.23`.
+    - 修復 JWT middleware Authorization scheme 驗證、IP Restriction 非 canonical IPv6 deny rule、`app.mount()` percent-encoded path routing、Cookie helper `Set-Cookie` injection 相關風險
+      Fixed risks related to JWT middleware Authorization scheme validation, IP Restriction non-canonical IPv6 deny rules, `app.mount()` percent-encoded path routing, and Cookie helper `Set-Cookie` injection.
+    - 嚴重程度 Severity: medium (CVSS: 4.3-5.3)
+    - 關閉 Dependabot Alerts #71, #72, #73, #74
+      Closes Dependabot Alerts #71, #72, #73, #74
+
 ## [0.82.14] - 2026-06-05
 
 ### 🐛 修復 Bug Fixes
