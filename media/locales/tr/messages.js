@@ -33,7 +33,7 @@ window.languageManager.loadMessages('tr', {
 	CYBERBRICK_USB_PORT_REFRESH: 'Refresh',
 	CYBERBRICK_FRIENDLY_NAME_LABEL: 'CyberBrick\'e bir isim ver',
 	CYBERBRICK_WIFI_SSID_LABEL: 'Wi-Fi adı',
-	CYBERBRICK_WIFI_SSID_MANUAL_OPTION: 'SSID’yi elle gir',
+	CYBERBRICK_WIFI_SSID_EMPTY_PLACEHOLDER: 'Wi-Fi ağı bulunamadı',
 	CYBERBRICK_WIFI_SCAN_BUTTON: 'Rescan',
 	CYBERBRICK_WIFI_PASSWORD_LABEL: 'Wi-Fi Password',
 	CYBERBRICK_WIFI_PASSWORD_SHOW: 'Wi-Fi parolasını göster',

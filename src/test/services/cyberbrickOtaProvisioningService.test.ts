@@ -4,8 +4,8 @@ import * as vscode from 'vscode';
 import { suite, test, beforeEach } from 'mocha';
 import { CyberBrickOtaProvisioningService } from '../../services/cyberbrickOtaProvisioningService';
 import { CyberBrickUploadSettingsService } from '../../services/cyberbrickUploadSettingsService';
-import { MockSecretStorage, MockWorkspaceConfiguration, createCyberBrickMockContext } from '../helpers/cyberbrickUploadMocks';
-import { CYBERBRICK_UPLOAD_SETTINGS_KEY } from '../../types/cyberbrickUpload';
+import { MockMemento, MockSecretStorage, MockWorkspaceConfiguration, createCyberBrickMockContext } from '../helpers/cyberbrickUploadMocks';
+import { CYBERBRICK_UPLOAD_SETTINGS_PROPERTY } from '../../types/cyberbrickUpload';
 import {
 	CYBERBRICK_TEST_DEVICE_ID,
 	CYBERBRICK_TEST_WIFI_PASSWORD,
@@ -16,13 +16,15 @@ import {
 suite('CyberBrickOtaProvisioningService', () => {
 	let secrets: MockSecretStorage;
 	let configuration: MockWorkspaceConfiguration;
+	let workspaceState: MockMemento;
 	let settingsService: CyberBrickUploadSettingsService;
 	let uploader: any;
 
 	beforeEach(() => {
 		secrets = new MockSecretStorage();
 		configuration = new MockWorkspaceConfiguration();
-		settingsService = new CyberBrickUploadSettingsService(createCyberBrickMockContext(secrets), vscode.Uri.file('/workspace'), {
+		workspaceState = new MockMemento();
+		settingsService = new CyberBrickUploadSettingsService(createCyberBrickMockContext(secrets, workspaceState), vscode.Uri.file('/workspace'), {
 			configuration,
 			now: () => new Date('2026-01-20T12:00:00.000Z'),
 		});
@@ -100,7 +102,7 @@ suite('CyberBrickOtaProvisioningService', () => {
 		assert.deepStrictEqual(emptyScan.networks, []);
 	});
 
-	test('keeps manual SSID fallback available when Wi-Fi scan fails', async () => {
+	test('returns empty Wi-Fi scan results with an error when scanning fails', async () => {
 		uploader.scanCyberBrickWifi.rejects(new Error('scan failed'));
 		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
 
@@ -123,9 +125,45 @@ suite('CyberBrickOtaProvisioningService', () => {
 		assert.strictEqual(result.success, true);
 		assert.strictEqual(result.nextUploadMode, 'usb');
 		assert.strictEqual(panelState.settings.pairedDevices[0].friendlyName, 'Classroom Brick');
-		assert.strictEqual(JSON.stringify(configuration.values.get(CYBERBRICK_UPLOAD_SETTINGS_KEY)).includes(CYBERBRICK_TEST_WIFI_PASSWORD), false);
+		assert.strictEqual(JSON.stringify(configuration.values.get(CYBERBRICK_UPLOAD_SETTINGS_PROPERTY)).includes(CYBERBRICK_TEST_WIFI_PASSWORD), false);
 		assert.strictEqual(JSON.stringify(result).includes(CYBERBRICK_TEST_WIFI_PASSWORD), false);
 		assert(secrets.values.size >= 3);
+	});
+
+	test('succeeds provisioning through workspaceState fallback when VS Code rejects the CyberBrick workspace setting', async () => {
+		configuration.update.rejects(new Error('因為 singular-blockly.cyberbrick.uploadSettings 非已註冊的組態，所以無法寫入至 工作區設定。'));
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader, { randomBytes: size => Buffer.alloc(size, 3) });
+
+		const { result, panelState } = await service.provision({
+			usbPort: '/dev/cu.usbmodem1',
+			friendlyName: 'Windows Brick',
+			ssid: 'Classroom',
+			wifiPassword: CYBERBRICK_TEST_WIFI_PASSWORD,
+		});
+		const serializedFallback = JSON.stringify([...workspaceState.values.values()]);
+
+		assert.strictEqual(result.success, true);
+		assert.strictEqual(panelState.settings.pairedDevices[0].friendlyName, 'Windows Brick');
+		assert.strictEqual(serializedFallback.includes(CYBERBRICK_TEST_WIFI_PASSWORD), false);
+		assert.strictEqual(JSON.stringify(result).includes(CYBERBRICK_TEST_WIFI_PASSWORD), false);
+		assert(secrets.values.size >= 3);
+	});
+
+	test('cleans local secrets if both workspace settings and fallback storage fail after USB provisioning', async () => {
+		configuration.update.rejects(new Error('unregistered configuration'));
+		workspaceState.update.rejects(new Error('workspaceState unavailable'));
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
+
+		const { result } = await service.provision({
+			usbPort: '/dev/cu.usbmodem1',
+			friendlyName: 'Windows Brick',
+			ssid: 'Classroom',
+			wifiPassword: CYBERBRICK_TEST_WIFI_PASSWORD,
+		});
+
+		assert.strictEqual(result.success, false);
+		assert.strictEqual(result.error?.code, 'provisioning-failed');
+		assert.strictEqual(secrets.values.size, 0, 'local secrets should be removed when no local pairing can be saved');
 	});
 
 	test('creates and writes a deviceId when the board has none', async () => {
@@ -181,7 +219,7 @@ suite('CyberBrickOtaProvisioningService', () => {
 	test('removes OTA artifacts over USB, deletes local pairing secrets, and returns to USB mode', async () => {
 		const device = createCyberBrickDevice({ lastKnownIp: '192.168.1.50' });
 		configuration.values.set(
-			CYBERBRICK_UPLOAD_SETTINGS_KEY,
+			CYBERBRICK_UPLOAD_SETTINGS_PROPERTY,
 			createCyberBrickUploadSettings({ pairedDevices: [device], primaryDeviceId: device.deviceId })
 		);
 		await settingsService.storeDeviceSecret(device.deviceId, 'wifiPassword', CYBERBRICK_TEST_WIFI_PASSWORD);
@@ -205,7 +243,7 @@ suite('CyberBrickOtaProvisioningService', () => {
 	test('removes OTA artifacts from the USB-connected CyberBrick even when it is not paired locally', async () => {
 		const pairedDevice = createCyberBrickDevice({ deviceId: 'cyberbrick-paired-local', lastKnownIp: '192.168.1.50' });
 		configuration.values.set(
-			CYBERBRICK_UPLOAD_SETTINGS_KEY,
+			CYBERBRICK_UPLOAD_SETTINGS_PROPERTY,
 			createCyberBrickUploadSettings({ pairedDevices: [pairedDevice], primaryDeviceId: pairedDevice.deviceId })
 		);
 		uploader.readCyberBrickDeviceId.resolves('cyberbrick-unpaired-usb');
@@ -253,7 +291,7 @@ suite('CyberBrickOtaProvisioningService', () => {
 	test('refuses OTA cleanup when the USB-connected device identity does not match', async () => {
 		const device = createCyberBrickDevice({ lastKnownIp: '192.168.1.50' });
 		configuration.values.set(
-			CYBERBRICK_UPLOAD_SETTINGS_KEY,
+			CYBERBRICK_UPLOAD_SETTINGS_PROPERTY,
 			createCyberBrickUploadSettings({ pairedDevices: [device], primaryDeviceId: device.deviceId })
 		);
 		uploader.readCyberBrickDeviceId.resolves('cyberbrick-other');

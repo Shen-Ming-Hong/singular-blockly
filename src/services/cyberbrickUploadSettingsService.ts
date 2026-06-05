@@ -12,7 +12,9 @@ import {
 	CYBERBRICK_OTA_DEFAULT_PORT,
 	CYBERBRICK_OTA_PROTOCOL_VERSION,
 	CYBERBRICK_UPLOAD_SETTINGS_KEY,
+	CYBERBRICK_UPLOAD_SETTINGS_PROPERTY,
 	CYBERBRICK_UPLOAD_SETTINGS_SCHEMA_VERSION,
+	CYBERBRICK_UPLOAD_SETTINGS_SECTION,
 	CyberBrickSecretKind,
 	CyberBrickSecretPresence,
 	CyberBrickUploadPanelState,
@@ -28,6 +30,9 @@ export interface CyberBrickUploadSettingsServiceOptions {
 }
 
 type WorkspaceIdentity = vscode.WorkspaceFolder | vscode.Uri | string | { uri?: { fsPath?: string; toString?: () => string }; fsPath?: string };
+type WorkspaceStateStore = Pick<vscode.Memento, 'get' | 'update'>;
+
+const CYBERBRICK_UPLOAD_SETTINGS_FALLBACK_STATE_KEY_PREFIX = 'singular-blockly.cyberbrick.uploadSettings.fallback';
 
 interface LegacySettingsShape {
 	schemaVersion?: unknown;
@@ -65,14 +70,40 @@ export class CyberBrickUploadSettingsService {
 	}
 
 	async loadSettings(): Promise<CyberBrickUploadSettings> {
-		const raw = this.getConfiguration().get<unknown>(CYBERBRICK_UPLOAD_SETTINGS_KEY, undefined);
-		return this.normalizeSettings(raw);
+		const configuration = this.getConfiguration();
+		const raw = configuration.get<unknown>(CYBERBRICK_UPLOAD_SETTINGS_PROPERTY, undefined) ??
+			configuration.get<unknown>(CYBERBRICK_UPLOAD_SETTINGS_KEY, undefined);
+		const settings = this.normalizeSettings(raw);
+		const fallbackSettings = this.loadFallbackSettings();
+		if (this.hasPersistedSettings(fallbackSettings)) {
+			return fallbackSettings;
+		}
+		return settings;
 	}
 
 	async saveSettings(update: Partial<CyberBrickUploadSettings>): Promise<CyberBrickUploadSettings> {
 		const current = await this.loadSettings();
 		const next = this.normalizeSettings({ ...current, ...update });
-		await this.getConfiguration().update(CYBERBRICK_UPLOAD_SETTINGS_KEY, next, vscode.ConfigurationTarget.Workspace);
+		try {
+			await this.getConfiguration().update(CYBERBRICK_UPLOAD_SETTINGS_PROPERTY, next, vscode.ConfigurationTarget.Workspace);
+		} catch (error) {
+			log('CyberBrick workspace settings save failed; using workspaceState fallback', 'warn', {
+				message: error instanceof Error ? error.message : String(error),
+			});
+			await this.saveFallbackSettings(next);
+			log('CyberBrick upload settings saved', 'info', {
+				pairedDeviceCount: next.pairedDevices.length,
+				primaryDeviceId: next.primaryDeviceId,
+			});
+			return next;
+		}
+		try {
+			await this.clearFallbackSettings();
+		} catch (error) {
+			log('CyberBrick upload settings fallback cleanup failed after workspace save', 'warn', {
+				message: error instanceof Error ? error.message : String(error),
+			});
+		}
 		log('CyberBrick upload settings saved', 'info', {
 			pairedDeviceCount: next.pairedDevices.length,
 			primaryDeviceId: next.primaryDeviceId,
@@ -264,7 +295,44 @@ export class CyberBrickUploadSettingsService {
 	}
 
 	private getConfiguration(): Pick<vscode.WorkspaceConfiguration, 'get' | 'update'> {
-		return this.configuration ?? vscode.workspace.getConfiguration();
+		return this.configuration ?? vscode.workspace.getConfiguration(CYBERBRICK_UPLOAD_SETTINGS_SECTION, this.getWorkspaceUri());
+	}
+
+	private getWorkspaceState(): WorkspaceStateStore | undefined {
+		return this.context.workspaceState as WorkspaceStateStore | undefined;
+	}
+
+	private loadFallbackSettings(): CyberBrickUploadSettings {
+		const raw = this.getWorkspaceState()?.get<unknown>(this.getFallbackSettingsKey(), undefined);
+		return this.normalizeSettings(raw);
+	}
+
+	private async saveFallbackSettings(settings: CyberBrickUploadSettings): Promise<void> {
+		const workspaceState = this.getWorkspaceState();
+		if (!workspaceState) {
+			throw new Error('CyberBrick upload settings fallback storage is unavailable.');
+		}
+		await workspaceState.update(this.getFallbackSettingsKey(), settings);
+		log('CyberBrick upload settings saved to workspaceState fallback', 'info', {
+			pairedDeviceCount: settings.pairedDevices.length,
+			primaryDeviceId: settings.primaryDeviceId,
+		});
+	}
+
+	private async clearFallbackSettings(): Promise<void> {
+		const workspaceState = this.getWorkspaceState();
+		if (!workspaceState) {
+			return;
+		}
+		await workspaceState.update(this.getFallbackSettingsKey(), undefined);
+	}
+
+	private getFallbackSettingsKey(): string {
+		return `${CYBERBRICK_UPLOAD_SETTINGS_FALLBACK_STATE_KEY_PREFIX}.${this.getWorkspaceHash()}`;
+	}
+
+	private hasPersistedSettings(settings: CyberBrickUploadSettings): boolean {
+		return Boolean(settings.primaryDeviceId) || settings.pairedDevices.length > 0;
 	}
 
 	private normalizeDevices(rawDevices: unknown[]): PairedCyberBrickDevice[] {
@@ -348,6 +416,19 @@ export class CyberBrickUploadSettingsService {
 			return `file://${candidate.fsPath}`;
 		}
 		return String(candidate);
+	}
+
+	private getWorkspaceUri(): vscode.Uri | undefined {
+		if (typeof this.workspaceIdentity === 'string') {
+			return undefined;
+		}
+		if ('uri' in this.workspaceIdentity && this.workspaceIdentity.uri) {
+			return this.workspaceIdentity.uri as vscode.Uri;
+		}
+		if ('fsPath' in this.workspaceIdentity && typeof this.workspaceIdentity.fsPath === 'string') {
+			return this.workspaceIdentity as vscode.Uri;
+		}
+		return undefined;
 	}
 
 	private toReadinessStatus(device: PairedCyberBrickDevice | undefined, checks: OtaReadinessCheck[]): OtaReadinessStatus {

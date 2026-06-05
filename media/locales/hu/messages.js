@@ -33,7 +33,7 @@ window.languageManager.loadMessages('hu', {
 	CYBERBRICK_USB_PORT_REFRESH: 'Refresh',
 	CYBERBRICK_FRIENDLY_NAME_LABEL: 'Adj nevet a CyberBrick-nek',
 	CYBERBRICK_WIFI_SSID_LABEL: 'Wi-Fi neve',
-	CYBERBRICK_WIFI_SSID_MANUAL_OPTION: 'Wi-Fi neve kézzel',
+	CYBERBRICK_WIFI_SSID_EMPTY_PLACEHOLDER: 'Nem található Wi-Fi hálózat',
 	CYBERBRICK_WIFI_SCAN_BUTTON: 'Rescan',
 	CYBERBRICK_WIFI_PASSWORD_LABEL: 'Wi-Fi Password',
 	CYBERBRICK_WIFI_PASSWORD_SHOW: 'Wi-Fi-jelszó megjelenítése',

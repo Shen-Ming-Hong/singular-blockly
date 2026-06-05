@@ -6,7 +6,6 @@
 const vscode = acquireVsCodeApi();
 
 const SENSITIVE_LOG_KEY_PATTERN = /(password|token|secret|authorization|auth)/i;
-const CYBERBRICK_WIFI_MANUAL_VALUE = '__manual__';
 
 function sanitizeLogValue(value, depth = 0) {
 	if (value === null || value === undefined) {
@@ -6064,13 +6063,6 @@ function updateCyberBrickUploadSettingsTexts() {
 			element.title = value;
 		}
 	};
-	const setPlaceholder = (id, value) => {
-		const element = document.getElementById(id);
-		if (element) {
-			element.placeholder = value;
-		}
-	};
-
 	setTitle('cyberbrickUploadSettingsButton', languageManager.getMessage('CYBERBRICK_UPLOAD_SETTINGS_BUTTON_TITLE', 'CyberBrick upload settings'));
 	setText('cyberbrickUploadSettingsTitle', languageManager.getMessage('CYBERBRICK_UPLOAD_SETTINGS_TITLE', 'CyberBrick Upload Settings'));
 	setText('cyberbrickPairedDevicesTitle', languageManager.getMessage('CYBERBRICK_PAIRED_DEVICES_TITLE', 'My CyberBricks'));
@@ -6079,7 +6071,6 @@ function updateCyberBrickUploadSettingsTexts() {
 	setText('cyberbrickRefreshUsbPorts', languageManager.getMessage('CYBERBRICK_USB_PORT_REFRESH', 'Refresh'));
 	setText('cyberbrickFriendlyNameLabel', languageManager.getMessage('CYBERBRICK_FRIENDLY_NAME_LABEL', 'Device Name'));
 	setText('cyberbrickWifiSsidLabel', languageManager.getMessage('CYBERBRICK_WIFI_SSID_LABEL', 'Wi-Fi SSID'));
-	setPlaceholder('cyberbrickWifiSsidInput', getCyberBrickManualWifiSsidText());
 	setText('cyberbrickWifiScanButton', languageManager.getMessage('CYBERBRICK_WIFI_SCAN_BUTTON', 'Rescan'));
 	setText('cyberbrickWifiPasswordLabel', languageManager.getMessage('CYBERBRICK_WIFI_PASSWORD_LABEL', 'Wi-Fi Password'));
 	updateCyberBrickWifiPasswordToggleState();
@@ -6101,7 +6092,6 @@ function initCyberBrickUploadSettingsPanel() {
 	const closeBtn = document.getElementById('cyberbrickUploadSettingsClose');
 	const refreshPortsBtn = document.getElementById('cyberbrickRefreshUsbPorts');
 	const scanWifiBtn = document.getElementById('cyberbrickWifiScanButton');
-	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
 	const passwordToggleBtn = document.getElementById('cyberbrickWifiPasswordToggle');
 	const provisionBtn = document.getElementById('cyberbrickProvisionButton');
 	const cleanupBtn = document.getElementById('cyberbrickOtaCleanupButton');
@@ -6118,9 +6108,6 @@ function initCyberBrickUploadSettingsPanel() {
 	}
 	if (scanWifiBtn) {
 		scanWifiBtn.addEventListener('click', requestCyberBrickWifiScan);
-	}
-	if (ssidSelect) {
-		ssidSelect.addEventListener('change', handleCyberBrickWifiSsidSelectionChange);
 	}
 	if (passwordToggleBtn) {
 		passwordToggleBtn.addEventListener('click', toggleCyberBrickWifiPasswordVisibility);
@@ -6243,11 +6230,6 @@ function requestCyberBrickOtaProvisioning() {
 			wifiPassword,
 		},
 	});
-	if (passwordInput) {
-		passwordInput.value = '';
-		passwordInput.type = 'password';
-		updateCyberBrickWifiPasswordToggleState();
-	}
 }
 
 function applyCyberBrickUploadPanelState(panelState) {
@@ -6343,8 +6325,8 @@ function renderCyberBrickUsbPorts() {
 	}
 }
 
-function getCyberBrickManualWifiSsidText() {
-	return window.languageManager?.getMessage('CYBERBRICK_WIFI_SSID_MANUAL_OPTION', 'Enter SSID manually') || 'Enter SSID manually';
+function getCyberBrickWifiEmptyPlaceholderText() {
+	return window.languageManager?.getMessage('CYBERBRICK_WIFI_SSID_EMPTY_PLACEHOLDER', 'No Wi-Fi networks found') || 'No Wi-Fi networks found';
 }
 
 function renderCyberBrickWifiNetworks() {
@@ -6368,6 +6350,17 @@ function renderCyberBrickWifiNetworks() {
 	});
 
 	ssidSelect.textContent = '';
+	if (visibleNetworks.length === 0) {
+		const placeholder = document.createElement('option');
+		placeholder.value = '';
+		placeholder.textContent = getCyberBrickWifiEmptyPlaceholderText();
+		placeholder.disabled = true;
+		placeholder.selected = true;
+		ssidSelect.appendChild(placeholder);
+		ssidSelect.value = '';
+		return;
+	}
+
 	for (const network of visibleNetworks) {
 		const option = document.createElement('option');
 		option.value = network.ssid.trim();
@@ -6376,48 +6369,16 @@ function renderCyberBrickWifiNetworks() {
 		ssidSelect.appendChild(option);
 	}
 
-	const manualOption = document.createElement('option');
-	manualOption.value = CYBERBRICK_WIFI_MANUAL_VALUE;
-	manualOption.textContent = getCyberBrickManualWifiSsidText();
-	ssidSelect.appendChild(manualOption);
-
 	if (previousValue && Array.from(ssidSelect.options).some(option => option.value === previousValue)) {
 		ssidSelect.value = previousValue;
-	} else if (visibleNetworks.length > 0) {
-		ssidSelect.value = visibleNetworks[0].ssid.trim();
 	} else {
-		ssidSelect.value = CYBERBRICK_WIFI_MANUAL_VALUE;
-	}
-	syncCyberBrickWifiSsidManualInput();
-}
-
-function syncCyberBrickWifiSsidManualInput() {
-	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
-	const ssidInput = document.getElementById('cyberbrickWifiSsidInput');
-	if (!ssidInput) {
-		return null;
-	}
-	const isManual = !ssidSelect || ssidSelect.value === CYBERBRICK_WIFI_MANUAL_VALUE;
-	ssidInput.classList.toggle('hidden', !isManual);
-	ssidInput.disabled = !isManual;
-	ssidInput.placeholder = getCyberBrickManualWifiSsidText();
-	return isManual ? ssidInput : null;
-}
-
-function handleCyberBrickWifiSsidSelectionChange() {
-	const manualInput = syncCyberBrickWifiSsidManualInput();
-	if (manualInput) {
-		manualInput.focus();
+		ssidSelect.value = visibleNetworks[0].ssid.trim();
 	}
 }
 
 function getSelectedCyberBrickWifiSsid() {
 	const ssidSelect = document.getElementById('cyberbrickWifiSsidSelect');
-	if (ssidSelect && typeof ssidSelect.value === 'string' && ssidSelect.value !== CYBERBRICK_WIFI_MANUAL_VALUE) {
-		return ssidSelect.value.trim();
-	}
-	const ssidInput = document.getElementById('cyberbrickWifiSsidInput');
-	return ssidInput && typeof ssidInput.value === 'string' ? ssidInput.value.trim() : '';
+	return ssidSelect && typeof ssidSelect.value === 'string' ? ssidSelect.value.trim() : '';
 }
 
 function getCyberBrickWifiPasswordToggleLabel(isVisible) {
@@ -6463,8 +6424,17 @@ function selectFirstCyberBrickWifiSsidFromScan(networks) {
 	const firstSsid = getFirstCyberBrickWifiSsid(networks);
 	if (ssidSelect && firstSsid) {
 		ssidSelect.value = firstSsid;
-		syncCyberBrickWifiSsidManualInput();
 	}
+}
+
+function clearCyberBrickWifiPasswordInput() {
+	const passwordInput = document.getElementById('cyberbrickWifiPasswordInput');
+	if (!passwordInput) {
+		return;
+	}
+	passwordInput.value = '';
+	passwordInput.type = 'password';
+	updateCyberBrickWifiPasswordToggleState();
 }
 
 function renderCyberBrickPairedDevices() {
@@ -6752,6 +6722,7 @@ function handleCyberBrickOtaProvisionResult(message) {
 		const successMessage =
 			window.languageManager?.getMessage('CYBERBRICK_PROVISION_SUCCEEDED', 'CyberBrick OTA setup completed. Upload mode remains USB.') ||
 			'CyberBrick OTA setup completed. Upload mode remains USB.';
+		clearCyberBrickWifiPasswordInput();
 		toast.show(successMessage, 'success', 6000);
 		requestCyberBrickUploadSettingsLoad();
 	} else {

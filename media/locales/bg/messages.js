@@ -33,7 +33,7 @@ window.languageManager.loadMessages('bg', {
 	CYBERBRICK_USB_PORT_REFRESH: 'Refresh',
 	CYBERBRICK_FRIENDLY_NAME_LABEL: 'Дайте име на CyberBrick',
 	CYBERBRICK_WIFI_SSID_LABEL: 'Wi-Fi мрежа',
-	CYBERBRICK_WIFI_SSID_MANUAL_OPTION: 'Въведете Wi-Fi мрежа ръчно',
+	CYBERBRICK_WIFI_SSID_EMPTY_PLACEHOLDER: 'Няма намерени Wi-Fi мрежи',
 	CYBERBRICK_WIFI_SCAN_BUTTON: 'Rescan',
 	CYBERBRICK_WIFI_PASSWORD_LABEL: 'Wi-Fi Password',
 	CYBERBRICK_WIFI_PASSWORD_SHOW: 'Показване на Wi-Fi паролата',
