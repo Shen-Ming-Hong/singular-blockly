@@ -8,6 +8,36 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.16] - 2026-06-23
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 `form-data` CRLF 注入漏洞 (CVE-2026-12143 / GHSA-hmw2-7cc7-3qxx)** (Fix `form-data` CRLF injection vulnerability)
+    - 升級 `form-data` 從 `4.0.4` 至 `4.0.6`（直接依賴）
+      Upgraded `form-data` from `4.0.4` to `4.0.6` (direct dependency)
+    - 嚴重程度 Severity: high (CVSS: 7.5)
+    - 關閉 Dependabot Alert #80
+      Closes Dependabot Alert #80
+
+- **修復 `hono` 多項漏洞 (CVE-2026-54286 ~ CVE-2026-54290)** (Fix multiple `hono` vulnerabilities)
+    - 升級 `hono` override 從 `^4.12.21` 至 `^4.12.25`，lockfile 安裝版本更新至 `4.12.27`
+      Upgraded the `hono` override from `^4.12.21` to `^4.12.25`, with lockfile installing `4.12.27`
+    - 修復 CORS Middleware 反射任意 Origin 憑證（GHSA-88fw-hqm2-52qc）、serve-static Windows 路徑穿越（GHSA-wwfh-h76j-fc44）、AWS Lambda Set-Cookie 合併（GHSA-j6c9-x7qj-28xf）、Lambda@Edge 重複 Header 丟棄（GHSA-wgpf-jwqj-8h8p）、Body Limit 繞過（GHSA-rv63-4mwf-qqc2）
+      Fixed CORS wildcard Origin reflection (GHSA-88fw-hqm2-52qc), serve-static Windows path traversal (GHSA-wwfh-h76j-fc44), AWS Lambda Set-Cookie merging (GHSA-j6c9-x7qj-28xf), Lambda@Edge header dropping (GHSA-wgpf-jwqj-8h8p), Body Limit bypass (GHSA-rv63-4mwf-qqc2)
+    - 嚴重程度 Severity: high / medium (CVSS: 4.8–7.1)
+    - 關閉 Dependabot Alerts #75, #76, #77, #78, #79
+      Closes Dependabot Alerts #75, #76, #77, #78, #79
+
+- **修復 `ws` 記憶體耗盡 DoS 漏洞 (GHSA-96hv-2xvq-fx4p)** (Fix `ws` memory exhaustion DoS)
+    - 升級 `ws` override 從 `^8.20.1` 至 `^8.21.0`
+      Upgraded the `ws` override from `^8.20.1` to `^8.21.0`
+    - 嚴重程度 Severity: high
+
+- **修復 `js-yaml` merge key 處理 DoS 漏洞 (GHSA-h67p-54hq-rp68)** (Fix `js-yaml` merge key DoS)
+    - 新增 `js-yaml` override `>=4.2.0`，npm 解析安裝 `5.1.0`（間接依賴：mocha、@eslint/eslintrc）
+      Added `js-yaml` override `>=4.2.0`, resolved to `5.1.0` by npm (transitive via mocha and @eslint/eslintrc)
+    - 嚴重程度 Severity: moderate
+
 ## [0.82.15] - 2026-06-06
 
 ### 🔒 安全性修復 Security Fixes
