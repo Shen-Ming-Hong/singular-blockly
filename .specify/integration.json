@@ -1,15 +1,15 @@
 {
-  "version": "0.8.13.dev0",
+  "version": "0.11.3",
   "integration_state_schema": 1,
   "installed_integrations": [
-    "copilot"
+    "codex"
   ],
   "integration_settings": {
-    "copilot": {
+    "codex": {
       "script": "sh",
-      "invoke_separator": "."
+      "invoke_separator": "-"
     }
   },
-  "integration": "copilot",
-  "default_integration": "copilot"
+  "integration": "codex",
+  "default_integration": "codex"
 }
