@@ -17,8 +17,8 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 | -------- | -------- | -------- | --------------------------------------------------------- |
 | _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.16 |
 
-> **0.82.16 更新 Update**: `form-data` (`GHSA-hmw2-7cc7-3qxx` / `CVE-2026-12143`) 升級至 `4.0.6`，修復 CRLF 注入；`hono` (`GHSA-88fw-hqm2-52qc` / `CVE-2026-54290`, `GHSA-wwfh-h76j-fc44` / `CVE-2026-54286`, `GHSA-j6c9-x7qj-28xf` / `CVE-2026-54287`, `GHSA-wgpf-jwqj-8h8p` / `CVE-2026-54289`, `GHSA-rv63-4mwf-qqc2` / `CVE-2026-54288`) override 升級至 `^4.12.25`，lockfile 安裝 `4.12.27`，修復 Dependabot Alerts #75-#80；`ws` override 升級至 `^8.21.0`，修復記憶體耗盡 DoS；新增 `js-yaml` override `>=4.2.0` 修復 merge key DoS。本地 `npm audit` 顯示 0 vulnerabilities。
-> `form-data` (`GHSA-hmw2-7cc7-3qxx` / `CVE-2026-12143`) upgraded to `4.0.6`, fixing CRLF injection; `hono` override upgraded to `^4.12.25` (lockfile `4.12.27`), fixing Dependabot Alerts #75–#80; `ws` override upgraded to `^8.21.0`, fixing memory exhaustion DoS; added `js-yaml` override `>=4.2.0`, fixing merge key DoS. Local `npm audit` reports 0 vulnerabilities.
+> **0.82.16 更新 Update**: `form-data` (`GHSA-hmw2-7cc7-3qxx` / `CVE-2026-12143`) 升級至 `4.0.6`，修復 CRLF 注入；`hono` (`GHSA-88fw-hqm2-52qc` / `CVE-2026-54290`, `GHSA-wwfh-h76j-fc44` / `CVE-2026-54286`, `GHSA-j6c9-x7qj-28xf` / `CVE-2026-54287`, `GHSA-wgpf-jwqj-8h8p` / `CVE-2026-54289`, `GHSA-rv63-4mwf-qqc2` / `CVE-2026-54288`) override 升級至 `^4.12.25`，lockfile 安裝 `4.12.27`，修復 Dependabot Alerts #75-#80；`ws` (`GHSA-96hv-2xvq-fx4p` / `CVE-2026-48779`) override 升級至 `^8.21.0`，修復記憶體耗盡 DoS (Dependabot Alert #81)；新增 `js-yaml` override `>=4.2.0` 修復 merge key DoS。本地 `npm audit` 顯示 0 vulnerabilities。
+> `form-data` (`GHSA-hmw2-7cc7-3qxx` / `CVE-2026-12143`) upgraded to `4.0.6`, fixing CRLF injection; `hono` override upgraded to `^4.12.25` (lockfile `4.12.27`), fixing Dependabot Alerts #75–#80; `ws` (`GHSA-96hv-2xvq-fx4p` / `CVE-2026-48779`) override upgraded to `^8.21.0`, fixing memory exhaustion DoS (Dependabot Alert #81); added `js-yaml` override `>=4.2.0`, fixing merge key DoS. Local `npm audit` reports 0 vulnerabilities.
 
 > **0.82.15 更新 Update**: `hono` (`GHSA-f577-qrjj-4474` / `CVE-2026-47673`, `GHSA-xrhx-7g5j-rcj5` / `CVE-2026-47674`, `GHSA-3hrh-pfw6-9m5x` / `CVE-2026-47675`, `GHSA-2gcr-mfcq-wcc3` / `CVE-2026-47676`) 已透過 npm override 升級至 `^4.12.21`，lockfile 安裝版本為 `4.12.23`，修復 Dependabot Alerts #71-#74 並清除本地 `npm audit` 的 medium 風險。
 > `hono` (`GHSA-f577-qrjj-4474` / `CVE-2026-47673`, `GHSA-xrhx-7g5j-rcj5` / `CVE-2026-47674`, `GHSA-3hrh-pfw6-9m5x` / `CVE-2026-47675`, `GHSA-2gcr-mfcq-wcc3` / `CVE-2026-47676`) has been upgraded via npm override to `^4.12.21`, with `4.12.23` installed in the lockfile, fixing Dependabot Alerts #71-#74 and clearing the local `npm audit` medium finding.
@@ -58,4 +58,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-06-23_
+_Last updated: 2026-06-24_
