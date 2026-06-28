@@ -302,7 +302,9 @@ export class MicropythonUploader {
 			return {
 				success: false,
 				stage: 'checking_tool',
-				message: 'PlatformIO Python environment not found. Please install PlatformIO first.',
+				message: 'PlatformIO Python environment (~/.platformio/penv) not found.',
+				details:
+					'CyberBrick upload reuses the PlatformIO Python environment. Install the PlatformIO IDE extension — or the pioarduino fork (pioarduino.pioarduino-ide), which is available on Open VSX for VSCodium — then run a build once so the environment (penv) is initialized.',
 			};
 		}
 
