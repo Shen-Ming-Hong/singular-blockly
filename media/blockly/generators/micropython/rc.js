@@ -41,7 +41,7 @@
         if not (getattr(_ota_cfg, 'SSID', '') and getattr(_ota_cfg, 'OTA_TOKEN', '')):
             return False
         import network as _ota_net
-        return _ota_net.WLAN(_ota_net.WLAN.IF_STA).isconnected()
+        return _ota_net.WLAN(_ota_net.STA_IF).isconnected()
     except Exception:
         return False`;
 	}
@@ -139,7 +139,7 @@ except OSError:
         if _rc_keep_wifi_for_ota:
             try:
                 import network as _send_chk
-                if not _send_chk.WLAN(_send_chk.WLAN.IF_STA).isconnected():
+                if not _send_chk.WLAN(_send_chk.STA_IF).isconnected():
                     _wlan.disconnect()
                     _wlan.config(reconnects=0)
                     time.sleep_ms(100)
@@ -226,7 +226,7 @@ def _reinit_espnow():
 		if not _should_reset_channel:
 			try:
 				import network as _reinit_chk
-				_should_reset_channel = not _reinit_chk.WLAN(_reinit_chk.WLAN.IF_STA).isconnected()
+				_should_reset_channel = not _reinit_chk.WLAN(_reinit_chk.STA_IF).isconnected()
 			except Exception:
 				_should_reset_channel = True
 		if _should_reset_channel:
