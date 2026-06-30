@@ -128,11 +128,15 @@ export async function waitForPenvReady(
 	delayFn: (ms: number) => Promise<void> = ms => new Promise<void>(resolve => setTimeout(resolve, ms))
 ): Promise<boolean> {
 	for (let attempt = 1; attempt <= maxRetries; attempt++) {
-		log(`[PenvProviderService] Waiting for penv (attempt ${attempt}/${maxRetries})...`, 'info');
-		await delayFn(intervalMs);
+		// 先檢查，就緒則立即回傳，不浪費等待時間
 		if (checkPenvExistsFn()) {
 			log('[PenvProviderService] penv is now ready', 'info');
 			return true;
+		}
+		log(`[PenvProviderService] Waiting for penv (attempt ${attempt}/${maxRetries})...`, 'info');
+		// 最後一次不再等待，避免多等一個周期
+		if (attempt < maxRetries) {
+			await delayFn(intervalMs);
 		}
 	}
 	log(`[PenvProviderService] penv not ready after ${maxRetries} retries`, 'warn');
