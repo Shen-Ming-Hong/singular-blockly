@@ -52,3 +52,16 @@ jobs:
           vsce publish -p ${{ secrets.VSCE_PAT }}
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Publish to Open VSX Registry
+        if: success()
+        # OVSX_PAT 為 Open VSX Access Token
+        # 若發布失敗或 Token 過期，請至以下網址更新：
+        # 1. 建立新 Token：https://open-vsx.org/user-settings/tokens
+        # 2. 更新 GitHub Secret：https://github.com/Shen-Ming-Hong/singular-blockly/settings/secrets/actions
+        #    找 OVSX_PAT > Update secret
+        run: |
+          npm install -g ovsx
+          ovsx publish -p ${{ secrets.OVSX_PAT }}
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
