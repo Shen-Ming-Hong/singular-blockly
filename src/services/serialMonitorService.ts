@@ -204,7 +204,8 @@ export class SerialMonitorService {
 			void vscode.window.showWarningMessage(
 				'PlatformIO environment is not ready. Open the Blockly editor to trigger automatic setup.'
 			);
-			return;
+			// 丟出讓外層 start() 的 catch block 正確清理 terminal 並回傳失敗
+			throw new Error('penv not ready for Serial Monitor');
 		}
 
 		const pythonPath = this.uploader.getPlatformioPythonPath();

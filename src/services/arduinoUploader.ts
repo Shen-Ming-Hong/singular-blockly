@@ -1045,7 +1045,7 @@ export class ArduinoUploader {
 					? 'PlatformIO is still initializing. Please wait and try again.'
 					: 'PlatformIO environment not found. Open the Blockly editor to trigger automatic setup.';
 				sendProgress('failed', 15, notReady, undefined, 'PIO_NOT_FOUND');
-				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found');
+				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found', notReady);
 			}
 
 			// 階段 4: 編譯並上傳 (20-95%)
