@@ -1326,4 +1326,9 @@ window.languageManager.loadMessages('cs', {
 	TXT_SETUP_REQUIRED_WARNING: 'TXT workspace vyžaduje jeden blok „TXT Inicializace“.',
 	TXT_PROCESS_REQUIRED_WARNING: 'TXT workspace vyžaduje alespoň jeden blok „TXT Proces“.',
 	CATEGORY_TXT: 'TXT kontrolér',
+
+        PENV_PROVIDER_NOT_INSTALLED: 'Prostředí PlatformIO není nastaveno. Funkce nahrávání vyžadují PlatformIO IDE (VS Code Marketplace) nebo pioarduino (Open VSX pro VSCodium).',
+        PENV_PROVIDER_INSTALL_BUTTON: 'Nainstalovat prostředí rozšíření',
+        PENV_PROVIDER_INSTALL_FAILED: 'Automatická instalace se nezdařila. Nainstalujte "PlatformIO IDE" (VS Code Marketplace) nebo "pioarduino" (Open VSX pro VSCodium) z panelu rozšíření.',
+        PENV_PROVIDER_PENDING: 'Inicializace prostředí PlatformIO, čekejte prosím...',
 });

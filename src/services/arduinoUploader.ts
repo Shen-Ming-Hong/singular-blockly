@@ -11,6 +11,7 @@ import { spawn } from 'child_process';
 import { log } from './logging';
 import { getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
 import { SettingsManager } from './settingsManager';
+import { checkPenvExists } from './penvProviderService';
 import { ArduinoUploadStage, ArduinoUploadResult, ArduinoUploadRequest, ArduinoPortInfo, ArduinoProgressCallback } from '../types/arduino';
 
 /**
@@ -1039,8 +1040,12 @@ export class ArduinoUploader {
 			sendProgress('checking_pio', 15, 'Checking compiler...');
 			const hasPio = await this.checkPioInstalled();
 			if (!hasPio) {
-				sendProgress('failed', 15, 'PlatformIO not found', undefined, 'PIO_NOT_FOUND');
-				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found');
+				// penv provider 應已在積木編輯器開啟時自動安裝，此處只顯示简单提示
+				const notReady = checkPenvExists()
+					? 'PlatformIO is still initializing. Please wait and try again.'
+					: 'PlatformIO environment not found. Open the Blockly editor to trigger automatic setup.';
+				sendProgress('failed', 15, notReady, undefined, 'PIO_NOT_FOUND');
+				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found', notReady);
 			}
 
 			// 階段 4: 編譯並上傳 (20-95%)

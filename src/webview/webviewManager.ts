@@ -16,6 +16,7 @@ import { BoardConfigKey, LoadWorkspaceStateMessage, PreviewWarning, SetBoardMess
 import { TxtVirtualControlsDocument, normalizeTxtVirtualControlsDocument } from '../types/txtVirtualControls';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
+import { isProviderInstalled, showInstallNotification, createDefaultDeps } from '../services/penvProviderService';
 
 /**
  * 開發板值映射表
@@ -369,6 +370,13 @@ export class WebViewManager {
 		if (this.panel) {
 			this.panel.reveal(vscode.ViewColumn.One, true);
 			return;
+		}
+
+		// 每次開啟積木編輯器時，不論工作區板子類型，一律檢查 penv provider 是否已安裝
+		// 若未安裝，自動在背景觸發安裝（fire-and-forget，不阻擋編輯器開啟）
+		const penvDeps = createDefaultDeps(this.localeService);
+		if (!isProviderInstalled(penvDeps)) {
+			void showInstallNotification(penvDeps);
 		}
 
 		// 建立新的 WebView 面板

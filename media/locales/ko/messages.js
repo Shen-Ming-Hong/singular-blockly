@@ -1319,4 +1319,9 @@ window.languageManager.loadMessages('ko', {
 	TXT_SETUP_REQUIRED_WARNING: 'TXT 작업 공간에는 "TXT 초기화" 블록이 하나 필요합니다.',
 	TXT_PROCESS_REQUIRED_WARNING: 'TXT 작업 공간에는 "TXT 프로세스" 블록이 최소 하나 필요합니다.',
 	CATEGORY_TXT: 'TXT 컨트롤러',
+
+        PENV_PROVIDER_NOT_INSTALLED: 'PlatformIO 환경이 설정되지 않았습니다. 업로드 기능에는 PlatformIO IDE(VS Code Marketplace) 또는 pioarduino(VSCodium용 Open VSX)가 필요합니다.',
+        PENV_PROVIDER_INSTALL_BUTTON: '확장 환경 설치',
+        PENV_PROVIDER_INSTALL_FAILED: '자동 설치에 실패했습니다. 확장 프로그램 패널에서 "PlatformIO IDE"(VS Code Marketplace) 또는 "pioarduino"(VSCodium용 Open VSX)를 설치하세요.',
+        PENV_PROVIDER_PENDING: 'PlatformIO 환경 초기화 중입니다. 잠시 후 다시 시도하세요.',
 });

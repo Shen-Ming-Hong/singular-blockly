@@ -8,6 +8,33 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [未發布] Unreleased
+
+## [0.83.0] - 2026-06-30
+
+### ✨ 新增功能 Features
+
+- **支援 VSCodium / Open VSX 及引導安裝流程** (VSCodium / Open VSX support with guided installation)
+    - 移除 `package.json` 中對 `platformio.platformio-ide` 的硬性 `extensionDependencies`，使擴充功能可在 VSCodium、Firebase Studio、Google Antigravity 等 Open VSX 環境啟動
+      Removed hard `extensionDependencies` on `platformio.platformio-ide` from `package.json`, enabling the extension to activate in VSCodium, Firebase Studio, Google Antigravity and other Open VSX environments
+    - 新增 `PenvProviderService`（`src/services/penvProviderService.ts`），集中管理 penv provider 偵測、安裝引導通知、自動 fallback（platformio → pioarduino → Extensions 面板）及重試機制
+      Added `PenvProviderService` centralizing penv provider detection, guided install notification, auto-fallback (platformio → pioarduino → Extensions panel), and retry logic
+    - Arduino 工作區啟動時若未安裝任何 penv provider，自動顯示非阻擋式 VS Code 通知，提供「安裝擴充功能環境」按鈕一鍵引導安裝
+      Arduino workspaces now show a non-blocking VS Code notification on startup when no penv provider is installed, offering a one-click "Install Extension Environment" button
+    - 上傳路徑（Arduino、CyberBrick USB）及 Serial Monitor 加入 penv guard，在 provider 未安裝時顯示引導通知，provider 已安裝但 penv 尚在初始化時自動重試（最多 3 次，間隔 3 秒）
+      Upload paths (Arduino, CyberBrick USB) and Serial Monitor now include penv guards; shows guided notification when provider is absent, auto-retries up to 3×3s when provider is installed but penv is initializing
+    - `settingsManager.ts` 加入 provider 偵測保護，僅在 PlatformIO 或 pioarduino 已安裝時才寫入 `platformio-ide.*` 工作區設定
+      `settingsManager.ts` now guards `platformio-ide.*` workspace settings, only writing them when a penv provider is detected
+    - 全部 15 個語系（zh-hant、en、de、ja、ko、fr、es、pt-br、ru、it、pl、cs、hu、tr、bg）新增 4 個 i18n key：`PENV_PROVIDER_NOT_INSTALLED`、`PENV_PROVIDER_INSTALL_BUTTON`、`PENV_PROVIDER_INSTALL_FAILED`、`PENV_PROVIDER_PENDING`
+      Added 4 i18n keys across all 15 locales for notification messages
+
+### 🧪 測試 Tests
+
+- 新增 `penvProviderService.test.ts`（25 個測試案例）：涵蓋 provider 偵測、安裝 fallback、重試機制、activation 板子類型篩選、迴歸驗證
+  Added `penvProviderService.test.ts` (25 test cases) covering provider detection, install fallback, retry mechanism, activation board-type filter, and regression validation
+- 更新 `settingsManager.test.ts`：加入 provider 已安裝與未安裝兩種情境的 settings guard 測試
+  Updated `settingsManager.test.ts` with provider-installed and no-provider settings guard test cases
+
 ## [0.82.17] - 2026-06-30
 
 ### 🐛 修復 Bug Fixes

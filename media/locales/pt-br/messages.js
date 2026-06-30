@@ -1323,4 +1323,9 @@ window.languageManager.loadMessages('pt-br', {
 	TXT_SETUP_REQUIRED_WARNING: 'O workspace TXT requer um bloco "Inicialização TXT".',
 	TXT_PROCESS_REQUIRED_WARNING: 'O workspace TXT requer pelo menos um bloco "Processo TXT".',
 	CATEGORY_TXT: 'TXT Controller',
+
+        PENV_PROVIDER_NOT_INSTALLED: 'O ambiente PlatformIO não está configurado. As funções de upload requerem PlatformIO IDE (VS Code Marketplace) ou pioarduino (Open VSX para VSCodium).',
+        PENV_PROVIDER_INSTALL_BUTTON: 'Instalar ambiente da extensão',
+        PENV_PROVIDER_INSTALL_FAILED: 'Falha na instalação automática. Por favor, instale "PlatformIO IDE" (VS Code Marketplace) ou "pioarduino" (Open VSX para VSCodium) no painel de extensões.',
+        PENV_PROVIDER_PENDING: 'Ambiente PlatformIO inicializando, aguarde...',
 });

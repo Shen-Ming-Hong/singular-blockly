@@ -11,6 +11,7 @@ import * as fs from 'fs';
 import { log } from './logging';
 import { MicropythonUploader } from './micropythonUploader';
 import { MonitorStartResult } from '../types/arduino';
+import { checkPenvExists } from './penvProviderService';
 
 /**
  * Serial Monitor 服務
@@ -197,6 +198,16 @@ export class SerialMonitorService {
 	 * @param port 連接埠
 	 */
 	private async resetAndStartMonitor(port: string): Promise<void> {
+		// penv guard：確認 Python 環境已就緒
+		if (!checkPenvExists()) {
+			log('[SerialMonitor] penv not ready; cannot start monitor', 'warn');
+			void vscode.window.showWarningMessage(
+				'PlatformIO environment is not ready. Open the Blockly editor to trigger automatic setup.'
+			);
+			// 丟出讓外層 start() 的 catch block 正確清理 terminal 並回傳失敗
+			throw new Error('penv not ready for Serial Monitor');
+		}
+
 		const pythonPath = this.uploader.getPlatformioPythonPath();
 		const isWindows = process.platform === 'win32';
 
