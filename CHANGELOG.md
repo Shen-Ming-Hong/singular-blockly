@@ -8,6 +8,22 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.17] - 2026-06-30
+
+### 🐛 修復 Bug Fixes
+
+- **修正 CyberBrick RC/OTA Wi-Fi channel 衝突** (Fix CyberBrick RC/OTA Wi-Fi channel conflict)
+    - `_rc_should_keep_wifi_for_ota()` 改為同時確認 OTA config 存在 **與** Wi-Fi 實際已連線（`isconnected()`），避免僅憑設定檔存在就保留 Wi-Fi 導致頻道掃描干擾 ESP-NOW
+      `_rc_should_keep_wifi_for_ota()` now checks both OTA config existence **and** actual Wi-Fi connection (`isconnected()`), preventing channel scanning interference from holding Wi-Fi based solely on config file presence
+    - OTA bootstrap 加入最多 5 秒 Wi-Fi 穩定等待（100ms polling），超時且 AP 不在線時執行 `disconnect()` + `reconnects=0`，確保 `main()` 執行前頻道狀態穩定
+      OTA bootstrap adds up to 5-second Wi-Fi stability wait (100ms polling); on timeout with AP unavailable, calls `disconnect()` + `reconnects=0` to stabilize channel state before `main()` runs
+    - `_reinit_espnow()` 改為動態 re-check `isconnected()`，AP 中途斷線後約 3–8 秒自動恢復 RC 連線
+      `_reinit_espnow()` now dynamically re-checks `isconnected()`, automatically recovering RC connection within ~3–8 seconds after mid-session AP disconnect
+    - RC master init 加入 `_rc_channel` 變數；`rc_send` 故障恢復邏輯加入動態 `isconnected()` 判斷，AP 不在線時先停止 Wi-Fi 掃描再重啟 ESP-NOW
+      RC master init adds `_rc_channel` variable; `rc_send` failure recovery adds dynamic `isconnected()` check, stopping Wi-Fi scanning before restarting ESP-NOW when AP is unavailable
+    - 15 個語系的 RC 積木 tooltip 補充頻道配對說明；新增 `CYBERBRICK_OTA_RC_CHANNEL_NOTE` i18n key，OTA provisioning 完成後以 info toast 說明 RC channel 規則
+      RC block tooltips in 15 locales updated with channel pairing guidance; new `CYBERBRICK_OTA_RC_CHANNEL_NOTE` i18n key added, shown as info toast after OTA provisioning success explaining RC channel rules
+
 ## [0.82.16] - 2026-06-23
 
 ### 🔒 安全性修復 Security Fixes
