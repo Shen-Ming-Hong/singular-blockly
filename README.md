@@ -207,11 +207,11 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 
 ## Requirements
 
-- Visual Studio Code 1.105.0 or higher
+- Visual Studio Code 1.105.0 or higher, or a compatible build such as VSCodium
 - Node.js 22.16.0 or higher
 - Basic understanding of visual programming and your target board workflow
 - **For Arduino / ESP32 boards:**
-    - PlatformIO IDE Extension
+    - PlatformIO IDE Extension, installed separately (a compatible fork such as `pioarduino.pioarduino-ide` also works)
     - C/C++ Extension (`ms-vscode.cpptools`)
 - **For CyberBrick (MicroPython):**
     - Python 3.x installed

@@ -75,10 +75,14 @@ describe('Settings Manager', () => {
 		assert.strictEqual(updatedSettings['test.setting'], 'new-value');
 	});
 
-	it('should configure PlatformIO settings', async () => {
+	it('should configure PlatformIO settings when a provider is installed', async () => {
 		// 設定一個現有的設定檔
 		const existingSettings = { 'existing.setting': 'value' };
 		fsMock.addFile(settingsPath, JSON.stringify(existingSettings));
+
+		// 模擬已安裝 PlatformIO provider（官方擴充功能或 pioarduino 分支）
+		// @ts-ignore - 覆寫私有偵測器以進行測試
+		settingsManager.platformIOProviderDetector = () => true;
 
 		// 測試設定 PlatformIO
 		await settingsManager.configurePlatformIOSettings();
@@ -90,6 +94,28 @@ describe('Settings Manager', () => {
 		assert.strictEqual(updatedSettings['existing.setting'], 'value');
 		assert.strictEqual(updatedSettings['platformio-ide.autoOpenPlatformIOIniFile'], false);
 		assert.strictEqual(updatedSettings['platformio-ide.disablePIOHomeStartup'], true);
+		assert.strictEqual(updatedSettings['singular-blockly.theme'], 'light');
+	});
+
+	it('should not write platformio-ide settings when no provider is installed', async () => {
+		// 設定一個現有的設定檔
+		const existingSettings = { 'existing.setting': 'value' };
+		fsMock.addFile(settingsPath, JSON.stringify(existingSettings));
+
+		// 模擬未安裝任何 PlatformIO provider
+		// @ts-ignore - 覆寫私有偵測器以進行測試
+		settingsManager.platformIOProviderDetector = () => false;
+
+		// 測試設定 PlatformIO
+		await settingsManager.configurePlatformIOSettings();
+
+		// 驗證未污染 platformio-ide 設定，但仍保留主題預設值
+		const updatedContent = fsMock.files.get(settingsPath);
+		assert.ok(updatedContent);
+		const updatedSettings = JSON.parse(updatedContent);
+		assert.strictEqual(updatedSettings['existing.setting'], 'value');
+		assert.strictEqual(updatedSettings['platformio-ide.autoOpenPlatformIOIniFile'], undefined);
+		assert.strictEqual(updatedSettings['platformio-ide.disablePIOHomeStartup'], undefined);
 		assert.strictEqual(updatedSettings['singular-blockly.theme'], 'light');
 	});
 

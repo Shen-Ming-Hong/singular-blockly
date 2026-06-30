@@ -283,9 +283,6 @@
 		"node-ssh": "^13.2.1",
 		"zod": "^4.1.13"
 	},
-	"extensionDependencies": [
-		"platformio.platformio-ide"
-	],
 	"overrides": {
 		"hono": "^4.12.25",
 		"@hono/node-server": "^1.19.13",
