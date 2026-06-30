@@ -2,6 +2,7 @@ import assert = require('assert');
 import * as fs from 'fs';
 import * as path from 'path';
 import { suite, test } from 'mocha';
+import { buildCyberBrickRcMainOtaBootstrap } from '../../services/cyberbrickOtaAgentSource';
 
 suite('CyberBrick RC MicroPython OTA coexistence contract', () => {
 	const rcGeneratorPath = path.join(process.cwd(), 'media/blockly/generators/micropython/rc.js');
@@ -29,6 +30,31 @@ suite('CyberBrick RC MicroPython OTA coexistence contract', () => {
 			source.includes('_wlan.active(True)\n_wlan.config(reconnects=0)'),
 			false,
 			'RC initialization must not unconditionally disable Wi-Fi reconnects needed by OTA'
+		);
+		assert.ok(
+			source.includes('isconnected()'),
+			'RC OTA guard must check actual Wi-Fi connection state via isconnected(), not only config file existence'
+		);
+	});
+
+	test('OTA bootstrap waits for Wi-Fi stability and disables reconnect when AP is unavailable', () => {
+		const bootstrap = buildCyberBrickRcMainOtaBootstrap();
+
+		assert.ok(
+			bootstrap.includes('_singular_blockly_ota_yield(100)'),
+			'Bootstrap must poll every 100ms (5-second wait window) rather than only the original 10ms loop'
+		);
+		assert.ok(
+			bootstrap.includes('reconnects=0'),
+			'Bootstrap must disable Wi-Fi auto-reconnect when AP is not available, to stop channel scanning'
+		);
+		assert.ok(
+			bootstrap.includes('.disconnect()'),
+			'Bootstrap must call disconnect() to stop any in-progress Wi-Fi connection attempt when AP is unavailable'
+		);
+		assert.ok(
+			bootstrap.includes('isconnected()'),
+			'Bootstrap must check isconnected() to detect whether AP was reached before proceeding'
 		);
 	});
 });

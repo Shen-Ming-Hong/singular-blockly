@@ -6724,6 +6724,13 @@ function handleCyberBrickOtaProvisionResult(message) {
 			'CyberBrick OTA setup completed. Upload mode remains USB.';
 		clearCyberBrickWifiPasswordInput();
 		toast.show(successMessage, 'success', 6000);
+		const rcChannelNote = window.languageManager?.getMessage(
+			'CYBERBRICK_OTA_RC_CHANNEL_NOTE',
+			'RC channel note: Both devices on same Wi-Fi → use Wi-Fi channel, RC and OTA both work. Neither on Wi-Fi → use configured channel, RC works. One on Wi-Fi, other not → RC may fail to pair.'
+		);
+		if (rcChannelNote) {
+			setTimeout(() => toast.show(rcChannelNote, 'info', 8000), 500);
+		}
 		requestCyberBrickUploadSettingsLoad();
 	} else {
 		const errorMessage =

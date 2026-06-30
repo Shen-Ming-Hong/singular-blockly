@@ -38,7 +38,10 @@
 		return `def _rc_should_keep_wifi_for_ota():
     try:
         import cyberbrick_ota_config as _ota_cfg
-        return bool(getattr(_ota_cfg, 'SSID', '') and getattr(_ota_cfg, 'OTA_TOKEN', ''))
+        if not (getattr(_ota_cfg, 'SSID', '') and getattr(_ota_cfg, 'OTA_TOKEN', '')):
+            return False
+        import network as _ota_net
+        return _ota_net.WLAN(_ota_net.WLAN.IF_STA).isconnected()
     except Exception:
         return False`;
 	}
@@ -69,7 +72,8 @@
 		// 注意：_rc_pair_id 預設為 1，若使用變數輸入則在 main() 中更新
 		generator.addHardwareInit(
 			'espnow_master',
-			`_rc_pair_id = 1
+			`_rc_channel = ${channel}
+_rc_pair_id = 1
 _rc_broadcast = b'\\xff\\xff\\xff\\xff\\xff\\xff'
 _rc_led = NeoPixel(Pin(8), 1)
 _rc_send_fail_count = 0
@@ -132,6 +136,16 @@ except OSError:
     _rc_led[0] = (50, 0, 0)
     _rc_send_fail_count += 1
     if _rc_send_fail_count > 10:
+        if _rc_keep_wifi_for_ota:
+            try:
+                import network as _send_chk
+                if not _send_chk.WLAN(_send_chk.WLAN.IF_STA).isconnected():
+                    _wlan.disconnect()
+                    _wlan.config(reconnects=0)
+                    time.sleep_ms(100)
+                    _wlan.config(channel=_rc_channel)
+            except Exception:
+                pass
         _espnow.active(False)
         time.sleep_ms(50)
         _espnow.active(True)
@@ -208,7 +222,14 @@ def _reinit_espnow():
 	global _rc_connected
 	try:
 		_espnow.active(False)
-		if not _rc_keep_wifi_for_ota:
+		_should_reset_channel = not _rc_keep_wifi_for_ota
+		if not _should_reset_channel:
+			try:
+				import network as _reinit_chk
+				_should_reset_channel = not _reinit_chk.WLAN(_reinit_chk.WLAN.IF_STA).isconnected()
+			except Exception:
+				_should_reset_channel = True
+		if _should_reset_channel:
 			_wlan.active(False)
 			time.sleep_ms(300)
 			_wlan.active(True)
