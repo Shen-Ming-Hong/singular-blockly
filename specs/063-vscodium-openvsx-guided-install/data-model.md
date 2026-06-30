@@ -27,6 +27,7 @@ PenvProviderStatus
 | `executeCommand` | `(cmd: string, ...args: unknown[]) => Thenable<unknown>` | 對應 `vscode.commands.executeCommand` |
 | `showInformationMessage` | `(msg: string, ...items: string[]) => Thenable<string \| undefined>` | 對應 `vscode.window.showInformationMessage` |
 | `checkPenvExists` | `() => boolean` | 檢查 `~/.platformio/penv/` 路徑是否存在 |
+| `getMsg` | `(key: string, fallback: string) => Promise<string>` (**可選**) | i18n 訊息查找；由 `localeService.getLocalizedMessage` 提供，未傳入時退回英文 fallback |
 
 ---
 

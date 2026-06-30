@@ -8,6 +8,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { log } from './logging';
 import { getDefaultPlatformioExecutablePath, getExecutableDirectory, getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
+import { checkPenvExists } from './penvProviderService';
 import * as vscode from 'vscode';
 import { CYBERBRICK_OTA_AGENT_TARGET_VERSION, WifiNetworkSuggestion } from '../types/cyberbrickUpload';
 import {
@@ -299,10 +300,15 @@ export class MicropythonUploader {
 
 		const hasPython = await this.checkPythonEnvironment();
 		if (!hasPython) {
+			// penv provider 應已在積木編輯器開啟時自動安裝，此處只顯示簡單提示
+			const detail = checkPenvExists()
+				? 'PlatformIO is still initializing. Please wait and try again.'
+				: 'Open the Blockly editor to trigger automatic setup, or manually install PlatformIO IDE (VS Code Marketplace) or pioarduino (Open VSX for VSCodium).';
 			return {
 				success: false,
 				stage: 'checking_tool',
-				message: 'PlatformIO Python environment not found. Please install PlatformIO first.',
+				message: 'PlatformIO Python environment (~/.platformio/penv) not found.',
+				details: detail,
 			};
 		}
 
@@ -323,7 +329,8 @@ export class MicropythonUploader {
 				success: false,
 				stage: 'installing_tool',
 				message: 'mpremote installation failed',
-				details: 'Please run manually: pip install mpremote',
+				details:
+					'Please run manually: pip install mpremote (using the pip from ~/.platformio/penv). If using pioarduino on VSCodium, pip is at the same path.',
 			};
 		}
 

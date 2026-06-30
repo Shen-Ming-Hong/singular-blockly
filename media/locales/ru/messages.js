@@ -1325,4 +1325,9 @@ window.languageManager.loadMessages('ru', {
 	TXT_SETUP_REQUIRED_WARNING: 'Рабочая область TXT требует один блок «Инициализация TXT».',
 	TXT_PROCESS_REQUIRED_WARNING: 'Рабочая область TXT требует как минимум один блок «Процесс TXT».',
 	CATEGORY_TXT: 'TXT контроллер',
+
+        PENV_PROVIDER_NOT_INSTALLED: 'Среда PlatformIO не настроена. Функции загрузки требуют PlatformIO IDE (VS Code Marketplace) или pioarduino (Open VSX для VSCodium).',
+        PENV_PROVIDER_INSTALL_BUTTON: 'Установить среду расширения',
+        PENV_PROVIDER_INSTALL_FAILED: 'Автоматическая установка не удалась. Установите "PlatformIO IDE" (VS Code Marketplace) или "pioarduino" (Open VSX для VSCodium) из панели расширений.',
+        PENV_PROVIDER_PENDING: 'Среда PlatformIO инициализируется, пожалуйста подождите...',
 });
