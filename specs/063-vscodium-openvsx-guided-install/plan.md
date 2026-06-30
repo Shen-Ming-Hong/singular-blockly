@@ -95,28 +95,26 @@ media/locales/*/messages.js             ← 15 個語系：新增通知文字 i1
 
 **設計決策摘要**：
 
-### 雙層偵測架構
+### 單層偵測架構（簡化後）
 
 ```
-[Activation 層]
-extension.ts activate()
+[積木編輯器開啟層]
+webviewManager.createAndShowWebView()
   └── 讀取 mainJson.board
-      ├── board 為 Arduino 板（非 cyberbrick / txt / none）
-      │   └── PenvProviderService.checkAndNotify()
-      │       ├── getExtension('platformio.platformio-ide') 已安裝 → 不顯示通知
-      │       ├── getExtension('pioarduino.pioarduino-ide') 已安裝 → 不顯示通知
-      │       └── 都未安裝 → showInformationMessage + 按鈕
+      ├── needsPenvAtActivation(board) === true（Arduino 系列）
+      │   └── createDefaultDeps(localeService) → isProviderInstalled() ?
+      │       ├── 已安裝 → 不顯示通知
+      │       └── 未安裝 → showInstallNotification（自動安裝，fire-and-forget）
       └── 其他板子（cyberbrick / txt / none）→ 略過
 
-[Upload 層]
-arduinoUploader / micropythonUploader
-  └── checkPioInstalled() / checkPythonEnvironment() 失敗
-      ├── PenvProviderService.isProviderInstalled() === false
-      │   └── 顯示安裝引導通知
-      └── PenvProviderService.isProviderInstalled() === true（penv 正在初始化）
-          └── 重試最多 3 次（間隔 3 秒）
-              └── 仍失敗 → 顯示「環境初始化中，請稍候再試」
+[上傳路徑（簡化後）]
+arduinoUploader / micropythonUploader / serialMonitorService
+  └── checkPioInstalled() / checkPythonEnvironment() / checkPenvExists() 失敗
+      └── 顯示簡明提示訊息（引導學生開啟積木編輯器）
+          不再在上傳路徑重複觸發安裝 / 重試機制
 ```
+
+**專案簡化成果**：5 個觸發點（activation + 3 個上傳路徑 + serial monitor）將為 **1 個觸發點**（積木編輯器開啟）。
 
 ### PenvProviderService 介面
 
@@ -132,7 +130,12 @@ export interface PenvProviderServiceDeps {
   executeCommand: (cmd: string, ...args: unknown[]) => Thenable<unknown>;
   showInformationMessage: (msg: string, ...items: string[]) => Thenable<string | undefined>;
   checkPenvExists: () => boolean;
+  /** 可選：i18n 訊息查找函數，由 localeService.getLocalizedMessage 提供 */
+  getMsg?: (key: string, fallback: string) => Promise<string>;
 }
+
+/** 建立生產環境 deps，可傳入 LocaleService 提供 i18n */
+export function createDefaultDeps(localeService?: LocaleServiceLike): PenvProviderServiceDeps;
 ```
 
 ### i18n 新 Key

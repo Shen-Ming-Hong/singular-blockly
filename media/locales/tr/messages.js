@@ -1329,4 +1329,9 @@ window.languageManager.loadMessages('tr', {
 	TXT_SETUP_REQUIRED_WARNING: 'TXT çalışma alanı bir "TXT Başlatma" bloğu gerektirir.',
 	TXT_PROCESS_REQUIRED_WARNING: 'TXT çalışma alanı en az bir "TXT Süreci" bloğu gerektirir.',
 	CATEGORY_TXT: 'TXT Controller',
+
+        PENV_PROVIDER_NOT_INSTALLED: 'PlatformIO ortamı kurulmamış. Yükleme özellikleri PlatformIO IDE (VS Code Marketplace) veya pioarduino (VSCodium için Open VSX) gerektirir.',
+        PENV_PROVIDER_INSTALL_BUTTON: 'Uzantı ortamını yükle',
+        PENV_PROVIDER_INSTALL_FAILED: 'Otomatik kurulum başarısız oldu. Lütfen uzantılar panelinden "PlatformIO IDE" (VS Code Marketplace) veya "pioarduino" (VSCodium için Open VSX) kurun.',
+        PENV_PROVIDER_PENDING: 'PlatformIO ortamı başlatılıyor, lütfen bekleyin...',
 });

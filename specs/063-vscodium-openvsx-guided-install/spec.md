@@ -28,7 +28,7 @@
 
 **驗收情境**：
 
-1. **給定** 工作區板子為 Arduino 且未安裝任何 penv provider，**當** 擴充功能啟動，**則** 出現非阻擋式 VS Code 通知，說明 Python 環境尚未就緒，並提供「安裝擴充功能環境」按鈕。
+1. **給定** 工作區板子為 Arduino 且未安裝任何 penv provider，**當** 學生開啟積木編輯器，**則** 出現非阻擋式 VS Code 通知，說明 Python 環境尚未就緒，並自動在背景開始安裝。
 2. **給定** 通知已顯示，**當** 學生點擊「安裝擴充功能環境」，**則** 擴充功能在背景自動安裝 `platformio.platformio-ide`。
 3. **給定** 安裝完成，**當** VS Code 詢問是否重新載入，**則** VS Code 自動處理重新載入提示；penv 在 PlatformIO IDE 首次啟動時自動建立，無需手動步驟。
 4. **給定** PlatformIO IDE 已安裝，**當** 擴充功能啟動，**則** 不出現任何通知。
@@ -51,20 +51,20 @@
 
 ---
 
-### 使用者故事 3 - dismiss 通知後嘗試上傳（優先級：P2）
+### 使用者故事 3 - 上傳時 penv 不就緒的提示（優先級：P2）
 
-學生關閉了啟動通知，隨後嘗試上傳程式。擴充功能在上傳時再次顯示引導安裝通知，確保學生不會只看到難以理解的技術錯誤。
+學生於積木編輯器尚未安裝完成或 penv 尚在初始化時嘗試上傳。擴充功能在上傳路徑顯示簡明的提示訊息，引導學生回到積木編輯器（安裝已在編輯器開啟時自動觸發）。
 
-**優先此項的理由**：學生可能在未仔細閱讀的情況下關閉通知。上傳時才是學生最需要引導的時刻。
+**優先此項的理由**：安裝處理已在編輯器開啟時處理，上傳路徑不需要重複安裝邏輯，只需提示使用者狀態。
 
-**獨立測試方式**：關閉啟動通知後嘗試 Arduino 或 CyberBrick USB 上傳，確認通知再次出現。
+**獨立測試方式**：確認未安裝 provider 時 Arduino/CyberBrick 上傳顯示簡明提示，而非再次觸發安裝流程。
 
 **驗收情境**：
 
-1. **給定** 啟動通知已被 dismiss 且 provider 仍未安裝，**當** 學生嘗試 Arduino 上傳，**則** 安裝引導通知再次出現。
-2. **給定** 啟動通知已被 dismiss 且 provider 仍未安裝，**當** 學生嘗試 CyberBrick USB 上傳，**則** 安裝引導通知再次出現。
-3. **給定** provider 已安裝但 penv 仍在初始化中（race condition），**當** 學生嘗試上傳，**則** 系統自動重試最多 3 次（間隔 3 秒），仍失敗才顯示「環境初始化中，請稍候再試」訊息。
-4. **給定** 啟動通知已被 dismiss 且 provider 仍未安裝，**當** 學生開啟 Arduino Serial Monitor，**則** 顯示明確說明訊息，而非靜默失敗。
+1. **給定** provider 尚未安裝，**當** 學生嘗試 Arduino 上傳，**則** 顯示簡明提示訊息（例：「環境尚未安裝，請開啟積木編輯器自動設定」），而非再次觸發安裝流程。
+2. **給定** provider 尚未安裝，**當** 學生嘗試 CyberBrick USB 上傳，**則** 同上，顯示簡明提示訊息而非再次觸發安裝。
+3. **給定** provider 已安裝但 penv 尚在初始化中，**當** 學生嘗試上傳，**則** 顯示「環境初始化中，請稍候再試」訊息。
+4. **給定** provider 尚未安裝，**當** 學生開啟 Arduino Serial Monitor，**則** 顯示明確說明訊息，而非靜默失敗。
 
 ---
 
@@ -92,31 +92,31 @@
 
 **驗收情境**：
 
-1. **給定** 工作區板子為 TXT Controller 且未安裝任何 penv provider，**當** 擴充功能啟動，**則** 不出現安裝通知。
-2. **給定** 工作區板子為 CyberBrick OTA 且未安裝任何 penv provider，**當** 擴充功能啟動，**則** 不出現安裝通知。
+1. **給定** 工作區板子為 TXT Controller 且未安裝任何 penv provider，**當** 學生開啟積木編輯器，**則** 不出現安裝通知。
+2. **給定** 工作區板子為 CyberBrick OTA 且未安裝任何 penv provider，**當** 學生開啟積木編輯器，**則** 不出現安裝通知。
 
 ---
 
 ### 邊界情境
 
-- 學生安裝 extension 後立即關閉 VS Code，尚未等待 penv 初始化完成？ → 下次開啟時，provider 已安裝（不顯示安裝通知）；上傳時若 penv 仍未就緒，觸發重試機制。
+- 學生安裝 extension 後立即關閉 VS Code，尚未等待 penv 初始化完成？ → 下次開啟時，積木編輯器開啟會偵測到 provider 已安裝（不顯示安裝通知）；上傳時若 penv 仍未就緒，顯示「環境初始化中，請稍候再試」。
 - Windows 與 macOS 的 penv 路徑不同（`Scripts` vs `bin`）？ → 由現有 `executableResolver.ts` 的 `platform === 'win32'` 判斷處理，本功能不需額外處理。
-- 板子類型尚未設定（`none`）的工作區？ → 視為不需要 penv，不顯示通知。
-- 重新載入後 PlatformIO IDE 正在下載 PlatformIO Core，上傳被觸發？ → 由重試機制（最多 3 次）處理。
+- 板子類型尚未設定（`none`）的工作區？ → `needsPenvAtActivation('none')` 回傳 false，不顯示通知。
+- 積木編輯器尚未開啟就嘗試上傳？ → 上傳路徑只顯示簡明提示訊息，不重複觸發安裝。
 
 ## 需求 *(必填)*
 
 ### 功能需求
 
 - **FR-001**：擴充功能在啟動（activate）時，**不得**要求 `platformio.platformio-ide` 事先安裝（移除 `package.json` 中的 `extensionDependencies`）。
-- **FR-002**：啟動時，系統必須偵測工作區板子類型；僅當板子類型為 Arduino 系列（即 `mainJson.board` 不為 `'none'`、`'cyberbrick'`、`'txt'`）時，才於啟動時進行 provider 偵測並顯示安裝通知。CyberBrick USB 的 penv 偵測刻意延後至上傳時觸發（由 FR-009 涵蓋），因為 CyberBrick 工作區可能使用不需要 penv 的 OTA 上傳模式。TXT Controller、`none` 板子類型永遠跳過 provider 偵測。
-- **FR-003**：啟動時，對於需要 penv 的工作區，系統必須偵測是否已安裝 penv provider（`platformio.platformio-ide` 或 `pioarduino.pioarduino-ide`），**以 `vscode.extensions.getExtension()` 判斷，不檢查 penv 路徑是否存在**。
+- **FR-002**：積木編輯器面板建立時（`webviewManager.createAndShowWebView()` 建立新面板階段），系統必須偵測工作區板子類型；僅當板子類型為 Arduino 系列（`needsPenvAtActivation()` 回傳 true）時，才進行 provider 偵測。TXT Controller、`none`、CyberBrick 類則略過，不展示安裝通知。
+- **FR-003**：對於需要 penv 的工作區，積木編輯器開啟時必須偵測是否已安裝 penv provider（`platformio.platformio-ide` 或 `pioarduino.pioarduino-ide`），**以 `vscode.extensions.getExtension()` 判斷，不檢查 penv 路徑是否存在**。
 - **FR-004**：未偵測到任何 penv provider 時，系統必須顯示非阻擋式 VS Code 通知，告知使用者環境尚未就緒，並提供一個「安裝擴充功能環境」按鈕（需於全部 15 個語系 locale 檔案中提供對應翻譯）。
 - **FR-005**：使用者點擊「安裝擴充功能環境」後，系統必須先嘗試安裝 `platformio.platformio-ide`；若安裝失敗（表示當前 marketplace 不提供此 extension），則自動 fallback 安裝 `pioarduino.pioarduino-ide`。
 - **FR-006**：若兩個 provider 均安裝失敗，系統必須開啟 Extensions 面板搜尋「platformio」，並在通知訊息中明確提及 PlatformIO IDE 和 pioarduino 兩個選項，供使用者手動選擇。
 - **FR-007**：安裝完成後的重新載入步驟，由 VS Code 框架自動處理；系統不需要實作自訂 reload 按鈕或重啟邏輯。penv 將由 PlatformIO IDE 或 pioarduino 在首次啟動時自動建立。
-- **FR-008**：Arduino 上傳時，若 `checkPioInstalled()` 回傳 false（penv 不存在），系統必須先確認 provider 是否已安裝：若未安裝，觸發與啟動通知相同的安裝引導流程；若已安裝，自動重試最多 3 次（間隔 3 秒），仍失敗才顯示「環境初始化中，請稍候再試」訊息。
-- **FR-009**：CyberBrick USB 上傳時，若 `checkPythonEnvironment()` 回傳 false，同 FR-008 邏輯處理。
+- **FR-008**：Arduino 上傳時，若 `checkPioInstalled()` 回傳 false，顯示簡明提示訊息（引導學生開啟積木編輯器以自動安裝），不在上傳路徑重複觸發安裝流程。安裝已由積木編輯器開啟時處理。
+- **FR-009**：CyberBrick USB 上傳時，若 `checkPythonEnvironment()` 回傳 false，同 FR-008 處理方式（顯示簡明提示，不重複觸發安裝）。
 - **FR-010**：`micropythonUploader.ts` 中 `installMpremote()` 失敗時的 `details` 訊息，必須更新為同時提及 pioarduino 作為替代 provider，而非僅提及 PlatformIO。
 - **FR-011**：`serialMonitorService.ts` 在呼叫 `getPlatformioPythonPath()` 之前，必須先確認 penv 是否存在；若不存在，以明確的使用者可見訊息說明失敗原因，而非靜默失敗。
 - **FR-012**：`configurePlatformIOSettings()` 在 `settingsManager.ts` 中，必須僅在偵測到 provider（`platformio.platformio-ide` 或 `pioarduino.pioarduino-ide`）已安裝時，才寫入 `platformio-ide.*` 工作區設定。

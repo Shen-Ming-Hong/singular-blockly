@@ -27,33 +27,34 @@
 
 ---
 
-## 決策 3：板子類型篩選邏輯
+## 決策 3：觸發點設計
 
-**決策**：activation-time 通知僅對 Arduino 板子顯示（非 `cyberbrick`、非 `txt`、非 `none`）。CyberBrick 等待至 USB 上傳時才觸發。
+**決策**：將 provider 偵測錦定於「積木編輯器面板建立時（`webviewManager.createAndShowWebView()` 建立新面板）」。上傳路徑只顯示簡明提示訊息，不再重複觸發安裝流程。
 
-**依據**：
-- CyberBrick OTA 上傳完全不依賴 penv，若對 CyberBrick 工作區顯示通知是不必要的干擾。
-- `extension.ts` 的 `mainJson.board` 讀取邏輯已存在，可直接復用。
-- 已知板子類型值：`'none'`（無板子）、`'cyberbrick'`（CyberBrick USB 或 OTA）、`'txt'`（TXT Controller）、其他字串（Arduino 板名，如 `esp32dev`、`uno`）。
+**不同於原始設計**：原先公法是「activation-time + 多個上傳路徑」的雙層偵測。實作後改為單層結構：
 
-**實作判斷**：
+| 層次 | 原始 | 實作後 |
+|------|------|----------|
+| 主觸發 | activation (板子類型篩選) | **積木編輯器開啟**（板子類型篩選） |
+| Arduino 上傳 | 安裝 + 重試 | 簡明提示訊息 |
+| CyberBrick USB | 安裝 + 重試 | 簡明提示訊息 |
+| Serial Monitor | 安裝引導 | 簡明提示訊息 |
 
-```typescript
-function needsPenvAtActivation(board: string): boolean {
-  return board !== 'none' && board !== 'cyberbrick' && board !== 'txt';
-}
-```
+**成果**：5 個觸發點將為 1 個，積木編輯器開啟自然成為下載完成就使用的首個入口。
+
+**板子類型篩選**：`needsPenvAtActivation()` 仍然保留並在 `webviewManager` 中使用，避免 TXT / CyberBrick OTA 工作區收到不必要的安裝通知。
+
+**備選方案考慮**：「activation + 上傳路徑全部偵測」方案維護成本高，且上傳路徑的安裝重試逻輯難以測試；被拓絕。
 
 ---
 
-## 決策 4：PenvProviderService 依賴注入
+## 決策 4：PenvProviderService 依賴注入與 i18n 整合
 
-**決策**：`PenvProviderService` 接受 `PenvProviderServiceDeps` 介面進行依賴注入，所有 VS Code API 呼叫透過此介面傳入。
+**決策**：`PenvProviderService` 接受 `PenvProviderServiceDeps` 介面進行依賴注入，所有 VS Code API 呼叫透過此介面傳入。另新增可選的 `getMsg` 欄位，由呼叫方提供 `localeService.getLocalizedMessage` 以實現多語言通知。
 
-**依據**：
-- 符合憲章 Principle VIII（純函數/模組架構）。
-- 在測試中可 stub `getExtension`、`executeCommand`、`showInformationMessage` 而無需 VS Code 執行環境。
-- 現有 `settingsManager.ts` 的 `platformIOProviderDetector` 欄位採用類似的可測試設計（PR #91）。
+**i18n 整合方案**：`createDefaultDeps(localeService?)` 接受可選的 `LocaleService`，展入後通知文字使用當前 UI 語言顯示；未傳入時退回英文 fallback。呼叫方（`webviewManager`）傳入 `this.localeService`。
+
+**備選方案考慮**：將所有語言字串硬編碼到服務決不够，被拓絕。
 
 ---
 
