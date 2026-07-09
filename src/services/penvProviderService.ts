@@ -30,6 +30,8 @@ export interface PenvProviderServiceDeps {
 	checkPenvExists: () => boolean;
 	/** 可選：i18n 訊息查找函數，返回當前 UI 語言的翻譯字串 */
 	getMsg?: (key: string, fallback: string) => Promise<string>;
+	/** 可選：輪詢延遲函數（預設使用 setTimeout；測試時注入立即 resolve 版本）*/
+	pollingDelayFn?: (ms: number) => Promise<void>;
 }
 
 /** 支援的 penv provider extension ID */
@@ -80,37 +82,54 @@ export function detectStatus(deps: PenvProviderServiceDeps): PenvProviderStatus 
 // ─── T007: attemptInstall ──────────────────────────────────────────────────────
 
 /**
- * 安裝成功後依 penv 是否就緒決定行為：
- * - penv 已存在（重新安裝情境）→ 直接顯示「立即重新載入」按鈕
- * - penv 尚未建立（首次安裝，PlatformIO Core 正在下載）→ 告知使用者等待，
- *   由 VS Code 原生的「Reload Required」通知引導；避免在 Core 尚未就緒時
- *   讓使用者誤以為可以立即重新載入
+ * 顯示「立即重新載入」按鈕并在使用者點擊後呼叫 reloadWindow。
  */
-async function promptReload(
+async function showReloadButton(
 	deps: Pick<PenvProviderServiceDeps, 'executeCommand' | 'showInformationMessage' | 'getMsg'>
 ): Promise<void> {
-	if (checkPenvExists()) {
-		// penv 已就緒，可以安全重新載入
-		const reloadMsg = await t(
-			deps as PenvProviderServiceDeps,
-			'PENV_PROVIDER_RELOAD_REQUIRED',
-			'PlatformIO environment extension installed successfully. Reload VS Code now to activate it and complete the setup.'
-		);
-		const reloadBtn = await t(
-			deps as PenvProviderServiceDeps,
-			'PENV_PROVIDER_RELOAD_BUTTON',
-			'Reload Now'
-		);
-		const choice = await deps.showInformationMessage(reloadMsg, reloadBtn);
-		if (choice === reloadBtn) {
-			await deps.executeCommand('workbench.action.reloadWindow');
-		}
+	const reloadMsg = await t(
+		deps as PenvProviderServiceDeps,
+		'PENV_PROVIDER_RELOAD_REQUIRED',
+		'PlatformIO environment is ready. Reload VS Code now to complete setup.'
+	);
+	const reloadBtn = await t(
+		deps as PenvProviderServiceDeps,
+		'PENV_PROVIDER_RELOAD_BUTTON',
+		'Reload Now'
+	);
+	const choice = await deps.showInformationMessage(reloadMsg, reloadBtn);
+	if (choice === reloadBtn) {
+		await deps.executeCommand('workbench.action.reloadWindow');
+	}
+}
+
+/**
+ * 安裝完成後等待 PlatformIO Core 建立 penv，完成後顯示「立即重新載入」按鈕。
+ * - penv 已存在（重新安裝情境）→ 立即顯示按鈕
+ * - penv 尚不存在（首次安裝，Core 正在下載）→ 顯示等待訊息，輪詢到 penv 出現，
+ *   再顯示按鈕（最多等待 20 分鐘）
+ */
+async function waitAndShowReload(deps: PenvProviderServiceDeps): Promise<void> {
+	if (deps.checkPenvExists()) {
+		await showReloadButton(deps);
+		return;
+	}
+	// PlatformIO Core 正在下載，顯示等待訊息
+	log('[PenvProviderService] PlatformIO Core downloading; polling for penv (up to 20 min)...', 'info');
+	void deps.showInformationMessage(
+		"PlatformIO IDE is downloading its core components (this may take a few minutes). A 'Reload Now' button will appear automatically when ready."
+	);
+	// 輪詢，使用 deps.pollingDelayFn 以利測試
+	const pollingDelay =
+		deps.pollingDelayFn ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)));
+	const ready = await waitForPenvReady(deps.checkPenvExists, 120, 10000, pollingDelay);
+	if (ready) {
+		log('[PenvProviderService] penv ready after Core install; showing reload button', 'info');
+		await showReloadButton(deps);
 	} else {
-		// PlatformIO Core 正在背景下載（首次安裝通常需要數分鐘）
-		// 等 VS Code 本身跳出「Reload Required」後使用者再重新載入即可
-		log('[PenvProviderService] PlatformIO Core not yet ready; prompting user to wait for VS Code reload notification', 'info');
+		log('[PenvProviderService] Timed out waiting for penv after Core install', 'warn');
 		void deps.showInformationMessage(
-			"PlatformIO IDE is installing its core components. Please wait — VS Code will prompt you to reload when it's ready."
+			'PlatformIO Core setup is taking longer than expected. Please reload VS Code manually when the installation completes.'
 		);
 	}
 }
@@ -126,13 +145,13 @@ export async function attemptInstall(
 	try {
 		await deps.executeCommand('workbench.extensions.installExtension', 'platformio.platformio-ide');
 		log('[PenvProviderService] platformio.platformio-ide installed successfully', 'info');
-		await promptReload(deps);
+		// 重新載入處理由 showInstallNotification 呼叫 waitAndShowReload 統一處理
 	} catch {
 		log('[PenvProviderService] platformio.platformio-ide not available, trying pioarduino.pioarduino-ide...', 'info');
 		try {
 			await deps.executeCommand('workbench.extensions.installExtension', 'pioarduino.pioarduino-ide');
 			log('[PenvProviderService] pioarduino.pioarduino-ide installed successfully', 'info');
-			await promptReload(deps);
+			// 重新載入處理由 showInstallNotification 呼叫 waitAndShowReload 統一處理
 		} catch {
 			log('[PenvProviderService] Both providers failed to install; opening Extensions search', 'warn');
 			await deps.executeCommand('workbench.extensions.search', 'platformio');
@@ -192,8 +211,8 @@ export async function showInstallNotification(deps: PenvProviderServiceDeps): Pr
 	log('[PenvProviderService] Auto-installing penv provider — VS Code will show confirmation dialog', 'info');
 	// VS Code 的 workbench.extensions.installExtension 會自己顯示確認對話框
 	// 不需要在安裝前另外顯示我們自己的通知，避免混淆
-	await attemptInstall(deps);
-}
+	await attemptInstall(deps);	// 安裝完成後，輪詢等待 penv 建立，就緒後自動顯示「立即重新載入」按鈕
+	await waitAndShowReload(deps);}
 
 // ─── 生產環境預設 deps 工廠 ────────────────────────────────────────────────────
 

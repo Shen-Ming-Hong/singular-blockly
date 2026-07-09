@@ -24,7 +24,10 @@ function createMockDeps(overrides: Partial<PenvProviderServiceDeps> = {}): PenvP
 		getExtension: sinon.stub().returns(undefined),
 		executeCommand: sinon.stub().resolves(),
 		showInformationMessage: sinon.stub().resolves(undefined),
-		checkPenvExists: sinon.stub().returns(false),
+		// 測試中預設 penv 已就緒，走 showReloadButton 快速路徑，避免輪詢
+		checkPenvExists: sinon.stub().returns(true),
+		// 測試中注入立即 resolve 版本，避免 10s 真實等待
+		pollingDelayFn: () => Promise.resolve(),
 		...overrides,
 	};
 }
