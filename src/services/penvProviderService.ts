@@ -57,6 +57,9 @@ export function isProviderInstalled(deps: Pick<PenvProviderServiceDeps, 'getExte
 /**
  * 以 fs.existsSync 確認 ~/.platformio/penv/ 的 Python 執行檔是否存在。
  * Windows 使用 Scripts/python.exe；macOS/Linux 使用 bin/python。
+ *
+ * ⚠️ 注意：python 在 venv 建立初期就會出現（PlatformIO Core 安裝尚未完成）。
+ * 若需確認 Core 是否完全就緒，應使用 checkPioReady()。
  */
 export function checkPenvExists(): boolean {
 	const homeDir = os.homedir();
@@ -65,6 +68,20 @@ export function checkPenvExists(): boolean {
 			? path.join(homeDir, '.platformio', 'penv', 'Scripts', 'python.exe')
 			: path.join(homeDir, '.platformio', 'penv', 'bin', 'python');
 	return fs.existsSync(pythonPath);
+}
+
+/**
+ * 確認 PlatformIO CLI（pio）是否已安裝完成。
+ * pio 只有在 `pip install platformio` 完成後才會出現，比 python 更晚，
+ * 是判斷 PlatformIO Core 真正就緒的可靠指標。
+ */
+function checkPioReady(): boolean {
+	const homeDir = os.homedir();
+	const pioPath =
+		process.platform === 'win32'
+			? path.join(homeDir, '.platformio', 'penv', 'Scripts', 'pio.exe')
+			: path.join(homeDir, '.platformio', 'penv', 'bin', 'pio');
+	return fs.existsSync(pioPath);
 }
 
 // ─── T006: detectStatus ────────────────────────────────────────────────────────
@@ -110,24 +127,26 @@ async function showReloadButton(
  *   再顯示按鈕（最多等待 20 分鐘）
  */
 async function waitAndShowReload(deps: PenvProviderServiceDeps): Promise<void> {
-	if (deps.checkPenvExists()) {
+	// 使用 checkPioReady()（檢查 pio 執行檔），而非 checkPenvExists()（檢查 python）
+	// 原因：python 在 venv 建立初期就出現，pio 才是 pip install platformio 完成的標誌
+	if (checkPioReady()) {
 		await showReloadButton(deps);
 		return;
 	}
 	// PlatformIO Core 正在下載，顯示等待訊息
-	log('[PenvProviderService] PlatformIO Core downloading; polling for penv (up to 20 min)...', 'info');
+	log('[PenvProviderService] PlatformIO Core downloading; polling for pio executable (up to 20 min)...', 'info');
 	void deps.showInformationMessage(
 		"PlatformIO IDE is downloading its core components (this may take a few minutes). A 'Reload Now' button will appear automatically when ready."
 	);
-	// 輪詢，使用 deps.pollingDelayFn 以利測試
+	// 輪詢 pio 出現，使用 deps.pollingDelayFn 以利測試
 	const pollingDelay =
 		deps.pollingDelayFn ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)));
-	const ready = await waitForPenvReady(deps.checkPenvExists, 120, 10000, pollingDelay);
+	const ready = await waitForPenvReady(checkPioReady, 120, 10000, pollingDelay);
 	if (ready) {
-		log('[PenvProviderService] penv ready after Core install; showing reload button', 'info');
+		log('[PenvProviderService] pio ready after Core install; showing reload button', 'info');
 		await showReloadButton(deps);
 	} else {
-		log('[PenvProviderService] Timed out waiting for penv after Core install', 'warn');
+		log('[PenvProviderService] Timed out waiting for pio after Core install', 'warn');
 		void deps.showInformationMessage(
 			'PlatformIO Core setup is taking longer than expected. Please reload VS Code manually when the installation completes.'
 		);
