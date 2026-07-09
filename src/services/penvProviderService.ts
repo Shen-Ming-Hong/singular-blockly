@@ -80,6 +80,29 @@ export function detectStatus(deps: PenvProviderServiceDeps): PenvProviderStatus 
 // ─── T007: attemptInstall ──────────────────────────────────────────────────────
 
 /**
+ * 安裝成功後顯示重新載入提示，提供「立即重新載入」按鈕。
+ * pioarduino 與 platformio 兩者安裝完成後均需重新載入才能初始化 penv。
+ */
+async function promptReload(
+	deps: Pick<PenvProviderServiceDeps, 'executeCommand' | 'showInformationMessage' | 'getMsg'>
+): Promise<void> {
+	const reloadMsg = await t(
+		deps as PenvProviderServiceDeps,
+		'PENV_PROVIDER_RELOAD_REQUIRED',
+		'PlatformIO environment extension installed successfully. Reload VS Code now to activate it and complete the setup.'
+	);
+	const reloadBtn = await t(
+		deps as PenvProviderServiceDeps,
+		'PENV_PROVIDER_RELOAD_BUTTON',
+		'Reload Now'
+	);
+	const choice = await deps.showInformationMessage(reloadMsg, reloadBtn);
+	if (choice === reloadBtn) {
+		await deps.executeCommand('workbench.action.reloadWindow');
+	}
+}
+
+/**
  * 嘗試安裝 penv provider extension。
  * 安裝順序：platformio.platformio-ide → pioarduino.pioarduino-ide → 開啟 Extensions 面板。
  */
@@ -90,11 +113,13 @@ export async function attemptInstall(
 	try {
 		await deps.executeCommand('workbench.extensions.installExtension', 'platformio.platformio-ide');
 		log('[PenvProviderService] platformio.platformio-ide installed successfully', 'info');
+		await promptReload(deps);
 	} catch {
 		log('[PenvProviderService] platformio.platformio-ide not available, trying pioarduino.pioarduino-ide...', 'info');
 		try {
 			await deps.executeCommand('workbench.extensions.installExtension', 'pioarduino.pioarduino-ide');
 			log('[PenvProviderService] pioarduino.pioarduino-ide installed successfully', 'info');
+			await promptReload(deps);
 		} catch {
 			log('[PenvProviderService] Both providers failed to install; opening Extensions search', 'warn');
 			await deps.executeCommand('workbench.extensions.search', 'platformio');

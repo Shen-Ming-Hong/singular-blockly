@@ -1321,4 +1321,7 @@ window.languageManager.loadMessages('fr', {
         PENV_PROVIDER_INSTALL_BUTTON: 'Installer l\'environnement d\'extension',
         PENV_PROVIDER_INSTALL_FAILED: 'Échec de l\'installation automatique. Veuillez installer "PlatformIO IDE" (VS Code Marketplace) ou "pioarduino" (Open VSX pour VSCodium) depuis le panneau des extensions.',
         PENV_PROVIDER_PENDING: 'Initialisation de l\'environnement PlatformIO, veuillez patienter...',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'L\'extension d\'environnement PlatformIO a été installée. Rechargez VS Code maintenant pour finaliser la configuration.',
+        PENV_PROVIDER_RELOAD_BUTTON: 'Recharger maintenant',
 });

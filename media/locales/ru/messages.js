@@ -1330,4 +1330,7 @@ window.languageManager.loadMessages('ru', {
         PENV_PROVIDER_INSTALL_BUTTON: 'Установить среду расширения',
         PENV_PROVIDER_INSTALL_FAILED: 'Автоматическая установка не удалась. Установите "PlatformIO IDE" (VS Code Marketplace) или "pioarduino" (Open VSX для VSCodium) из панели расширений.',
         PENV_PROVIDER_PENDING: 'Среда PlatformIO инициализируется, пожалуйста подождите...',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'Расширение среды PlatformIO успешно установлено. Перезагрузите VS Code сейчас для завершения настройки.',
+        PENV_PROVIDER_RELOAD_BUTTON: 'Перезагрузить сейчас',
 });

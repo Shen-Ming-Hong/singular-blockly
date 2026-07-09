@@ -1334,4 +1334,7 @@ window.languageManager.loadMessages('tr', {
         PENV_PROVIDER_INSTALL_BUTTON: 'Uzantı ortamını yükle',
         PENV_PROVIDER_INSTALL_FAILED: 'Otomatik kurulum başarısız oldu. Lütfen uzantılar panelinden "PlatformIO IDE" (VS Code Marketplace) veya "pioarduino" (VSCodium için Open VSX) kurun.',
         PENV_PROVIDER_PENDING: 'PlatformIO ortamı başlatılıyor, lütfen bekleyin...',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'PlatformIO ortam uzantısı başarıyla yüklendi. Kurulumu tamamlamak için VS Code\'u şimdi yeniden yükleyin.',
+        PENV_PROVIDER_RELOAD_BUTTON: 'Şimdi yeniden yükle',
 });
