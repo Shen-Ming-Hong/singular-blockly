@@ -80,25 +80,38 @@ export function detectStatus(deps: PenvProviderServiceDeps): PenvProviderStatus 
 // ─── T007: attemptInstall ──────────────────────────────────────────────────────
 
 /**
- * 安裝成功後顯示重新載入提示，提供「立即重新載入」按鈕。
- * pioarduino 與 platformio 兩者安裝完成後均需重新載入才能初始化 penv。
+ * 安裝成功後依 penv 是否就緒決定行為：
+ * - penv 已存在（重新安裝情境）→ 直接顯示「立即重新載入」按鈕
+ * - penv 尚未建立（首次安裝，PlatformIO Core 正在下載）→ 告知使用者等待，
+ *   由 VS Code 原生的「Reload Required」通知引導；避免在 Core 尚未就緒時
+ *   讓使用者誤以為可以立即重新載入
  */
 async function promptReload(
 	deps: Pick<PenvProviderServiceDeps, 'executeCommand' | 'showInformationMessage' | 'getMsg'>
 ): Promise<void> {
-	const reloadMsg = await t(
-		deps as PenvProviderServiceDeps,
-		'PENV_PROVIDER_RELOAD_REQUIRED',
-		'PlatformIO environment extension installed successfully. Reload VS Code now to activate it and complete the setup.'
-	);
-	const reloadBtn = await t(
-		deps as PenvProviderServiceDeps,
-		'PENV_PROVIDER_RELOAD_BUTTON',
-		'Reload Now'
-	);
-	const choice = await deps.showInformationMessage(reloadMsg, reloadBtn);
-	if (choice === reloadBtn) {
-		await deps.executeCommand('workbench.action.reloadWindow');
+	if (checkPenvExists()) {
+		// penv 已就緒，可以安全重新載入
+		const reloadMsg = await t(
+			deps as PenvProviderServiceDeps,
+			'PENV_PROVIDER_RELOAD_REQUIRED',
+			'PlatformIO environment extension installed successfully. Reload VS Code now to activate it and complete the setup.'
+		);
+		const reloadBtn = await t(
+			deps as PenvProviderServiceDeps,
+			'PENV_PROVIDER_RELOAD_BUTTON',
+			'Reload Now'
+		);
+		const choice = await deps.showInformationMessage(reloadMsg, reloadBtn);
+		if (choice === reloadBtn) {
+			await deps.executeCommand('workbench.action.reloadWindow');
+		}
+	} else {
+		// PlatformIO Core 正在背景下載（首次安裝通常需要數分鐘）
+		// 等 VS Code 本身跳出「Reload Required」後使用者再重新載入即可
+		log('[PenvProviderService] PlatformIO Core not yet ready; prompting user to wait for VS Code reload notification', 'info');
+		void deps.showInformationMessage(
+			"PlatformIO IDE is installing its core components. Please wait — VS Code will prompt you to reload when it's ready."
+		);
 	}
 }
 
