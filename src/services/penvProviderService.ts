@@ -121,15 +121,12 @@ async function showReloadButton(
 }
 
 /**
- * 安裝完成後等待 PlatformIO Core 建立 penv，完成後顯示「立即重新載入」按鈕。
- * 處理兩種情境：
- * - Case A：PlatformIO extension 尚未 activate（需要 reload）
- *   → penv 目錄不存在，Core installer 未執行
- *   → 立即顯示 [Reload Now]，reload 後 PlatformIO 才會 activate 並安裝 Core
+ * 安裝完成後主動喚醒 PlatformIO，等待 Core 安裝，完成後顯示「立即重新載入」按鈕。
  *
- * - Case B：PlatformIO extension 已 activate（不需 reload）
- *   → penv 目錄已開始建立（python 存在，pio 尚未出現）
- *   → 繼續 poll pio executable，完成後顯示 [Reload Now]
+ * PlatformIO 的 activation event 是 onCommand:platformio-ide.*，
+ * 不是 onStartupFinished，所以 reload 不會自動觸發它。
+ * 需要執行 platformio-ide.showHome 指令來主動 activate extension，
+ * 才會啟動 Core installer。pioarduino 為直接 fork，使用相同指令 ID。
  */
 async function waitAndShowReload(deps: PenvProviderServiceDeps): Promise<void> {
 	// 快速路徑：pio 已存在（重新安裝或已就緒）
@@ -141,19 +138,28 @@ async function waitAndShowReload(deps: PenvProviderServiceDeps): Promise<void> {
 	const pollingDelay =
 		deps.pollingDelayFn ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)));
 
-	// 偵測 Case A vs Case B：等待最多 15 秒看 penv 目錄是否開始建立
-	// 若 penv 出現 → extension 已 activate (Case B)；否則 → 需要先 reload (Case A)
-	log('[PenvProviderService] Waiting to detect if PlatformIO activated (up to 15s)...', 'info');
+	// 主動執行 PlatformIO 指令以觸發 extension activation（onCommand 機制）
+	// 這比 reload 更可靠——PlatformIO 需要使用者互動或指令呼叫才會啟動
+	log('[PenvProviderService] Triggering PlatformIO activation via platformio-ide.showHome...', 'info');
+	try {
+		await deps.executeCommand('platformio-ide.showHome');
+		log('[PenvProviderService] platformio-ide.showHome executed; waiting for Core setup to start...', 'info');
+	} catch {
+		// 若指令尚不可用（extension 仍需 reload 才能執行），等待偵測 penv
+		log('[PenvProviderService] platformio-ide.showHome not available yet; will detect activation via penv', 'warn');
+	}
+
+	// 等待最多 15 秒看 penv 目錄是否開始建立（確認 activation 成功啟動 Core installer）
 	const penvStarted = await waitForPenvReady(checkPenvExists, 3, 5000, pollingDelay);
 
 	if (!penvStarted) {
-		// Case A：PlatformIO extension 尚未 activate，需要 reload 才能觸發 Core 安裝
-		log('[PenvProviderService] PlatformIO not yet activated; reload required to start Core setup', 'info');
+		// activation 未成功啟動（reload 仍是必要）
+		log('[PenvProviderService] penv not started; showing reload button', 'info');
 		await showReloadButton(deps);
 		return;
 	}
 
-	// Case B：PlatformIO 已 activate，Core 正在安裝中（python 存在，pio 尚未出現）
+	// PlatformIO 已 activate，Core 正在安裝中（python 存在，pio 尚未出現）
 	log('[PenvProviderService] PlatformIO activated; Core downloading, polling for pio...', 'info');
 	void deps.showInformationMessage(
 		"PlatformIO Core is being downloaded. A 'Reload Now' button will appear automatically when ready."
