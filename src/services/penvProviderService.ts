@@ -121,12 +121,13 @@ async function showReloadButton(
 }
 
 /**
- * 安裝完成後主動喚醒 PlatformIO，等待 Core 安裝，完成後顯示「立即重新載入」按鈕。
+ * 安裝完成後主動喚醒 PlatformIO，等待 Core 安裝完成後顯示「立即重新載入」按鈕。
  *
- * PlatformIO 的 activation event 是 onCommand:platformio-ide.*，
- * 不是 onStartupFinished，所以 reload 不會自動觸發它。
- * 需要執行 platformio-ide.showHome 指令來主動 activate extension，
- * 才會啟動 Core installer。pioarduino 為直接 fork，使用相同指令 ID。
+ * 不使用 penv（python）作為中間判斷——python 本身就是在 Core 安裝過程中建立的，
+ * 以它作為條件會造成誤判。改以 showHome 指令的成敗作為分支條件：
+ *
+ * - showHome 成功：extension 已 activate → 直接 poll pio（Core 安裝完成的唯一可靠指標）
+ * - showHome 失敗（指令不存在）：extension 需要 reload 才能執行指令 → 立即顯示 [Reload Now]
  */
 async function waitAndShowReload(deps: PenvProviderServiceDeps): Promise<void> {
 	// 快速路徑：pio 已存在（重新安裝或已就緒）
@@ -138,41 +139,31 @@ async function waitAndShowReload(deps: PenvProviderServiceDeps): Promise<void> {
 	const pollingDelay =
 		deps.pollingDelayFn ?? ((ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms)));
 
-	// 主動執行 PlatformIO 指令以觸發 extension activation（onCommand 機制）
-	// 這比 reload 更可靠——PlatformIO 需要使用者互動或指令呼叫才會啟動
-	log('[PenvProviderService] Triggering PlatformIO activation via platformio-ide.showHome...', 'info');
 	try {
+		// 主動執行 PlatformIO 指令以觸發 extension activation（onCommand 機制）
 		await deps.executeCommand('platformio-ide.showHome');
-		log('[PenvProviderService] platformio-ide.showHome executed; waiting for Core setup to start...', 'info');
-	} catch {
-		// 若指令尚不可用（extension 仍需 reload 才能執行），等待偵測 penv
-		log('[PenvProviderService] platformio-ide.showHome not available yet; will detect activation via penv', 'warn');
-	}
+		log('[PenvProviderService] platformio-ide.showHome executed; polling for pio...', 'info');
 
-	// 等待最多 15 秒看 penv 目錄是否開始建立（確認 activation 成功啟動 Core installer）
-	const penvStarted = await waitForPenvReady(checkPenvExists, 3, 5000, pollingDelay);
-
-	if (!penvStarted) {
-		// activation 未成功啟動（reload 仍是必要）
-		log('[PenvProviderService] penv not started; showing reload button', 'info');
-		await showReloadButton(deps);
-		return;
-	}
-
-	// PlatformIO 已 activate，Core 正在安裝中（python 存在，pio 尚未出現）
-	log('[PenvProviderService] PlatformIO activated; Core downloading, polling for pio...', 'info');
-	void deps.showInformationMessage(
-		"PlatformIO Core is being downloaded. A 'Reload Now' button will appear automatically when ready."
-	);
-	const ready = await waitForPenvReady(checkPioReady, 120, 10000, pollingDelay);
-	if (ready) {
-		log('[PenvProviderService] pio ready; showing reload button', 'info');
-		await showReloadButton(deps);
-	} else {
-		log('[PenvProviderService] Timed out waiting for pio', 'warn');
+		// showHome 成功 → Core installer 已啟動，直接 poll pio（最多 20 分鐘）
+		// 不用 checkPenvExists 做中間判斷，python 只是 Core 安裝過程的副產物
 		void deps.showInformationMessage(
-			'PlatformIO Core setup is taking longer than expected. Please reload VS Code manually when the installation completes.'
+			"PlatformIO Core is being downloaded. A 'Reload Now' button will appear automatically when ready."
 		);
+		const ready = await waitForPenvReady(checkPioReady, 120, 10000, pollingDelay);
+		if (ready) {
+			log('[PenvProviderService] pio ready; showing reload button', 'info');
+			await showReloadButton(deps);
+		} else {
+			log('[PenvProviderService] Timed out waiting for pio', 'warn');
+			void deps.showInformationMessage(
+				'PlatformIO Core setup is taking longer than expected. Please reload VS Code manually when the installation completes.'
+			);
+		}
+	} catch {
+		// showHome 指令不存在 → extension 尚需 reload 才能執行任何指令
+		// 告知使用者 reload，reload 後 PlatformIO 才能 activate 並安裝 Core
+		log('[PenvProviderService] platformio-ide.showHome not available; reload required to activate extension', 'info');
+		await showReloadButton(deps);
 	}
 }
 
