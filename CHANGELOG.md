@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.82.18] - 2026-07-11
+
+### 🐛 修復 Bug Fixes
+
+- **修正 Windows 上 CyberBrick USB 埠偵測失敗** (Fix CyberBrick USB port detection failure on Windows)
+    - `parsePortList()` 改用 `/\r?\n/` 分割行並對每行執行 `trim()`，解決 Windows `mpremote connect list` 輸出的 CRLF 行尾導致中間行殘留 `\r`、正則無法匹配的問題
+      `parsePortList()` now splits on `/\r?\n/` and trims each line, fixing CRLF line endings from Windows `mpremote connect list` output that left `\r` on intermediate lines causing the port regex to fail
+    - 裝置排在輸出最後一行以外的任何位置時均可正確偵測；非 Windows（LF-only）環境行為完全不變
+      Devices are now correctly detected regardless of their position in the output; behavior on non-Windows (LF-only) environments is unchanged
+    - 新增兩個回歸測試：Windows CRLF 輸出（CyberBrick 不在末行）與 Linux LF 輸出
+      Added two regression tests: Windows CRLF output (CyberBrick not last) and Linux LF output
+    - 關閉 Issue #94
+      Closes Issue #94
+
 ## [0.82.17] - 2026-06-30
 
 ### 🐛 修復 Bug Fixes
