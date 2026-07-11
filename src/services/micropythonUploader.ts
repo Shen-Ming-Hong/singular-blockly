@@ -830,7 +830,7 @@ print(json.dumps(result))
 	 */
 	private parsePortList(output: string): ComPortInfo[] {
 		const ports: ComPortInfo[] = [];
-		const lines = output.trim().split('\n');
+		const lines = output.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
 
 		for (const line of lines) {
 			// 格式：COM10 58:E6:C5:A7:76:54 303a:1001 Microsoft None

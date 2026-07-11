@@ -628,4 +628,39 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.ok(uploadedCode.includes('_singular_blockly_ota_agent.start_background(False)'), 'should inject OTA bootstrap as conservative fallback when check fails');
 		assert.ok(uploadedCode.includes('print("student")'), 'should preserve user code');
 	});
+
+	test('parsePortList correctly parses Windows CRLF output when CyberBrick is not the last line', () => {
+		const uploader = createUploader({ exec: async () => ({ stdout: '', stderr: '' }) });
+		const parsePortList = (uploader as unknown as { parsePortList(output: string): unknown[] }).parsePortList.bind(uploader);
+
+		// Simulate mpremote output on Windows with CRLF line endings; CyberBrick device is in the middle
+		const windowsOutput =
+			'COM3 None 0000:0000 Microsoft None\r\n' +
+			'COM4 None 0000:0000 Microsoft None\r\n' +
+			'COM9 58:E6:C5:A7:76:54 303a:1001 Microsoft None\r\n' +
+			'COM14 None 0000:0000 Microsoft None\r\n' +
+			'COM15 None 0000:0000 Microsoft None\r\n';
+
+		const ports = parsePortList(windowsOutput) as Array<{ path: string; vendorId: string; productId: string }>;
+		const cyberbrick = ports.find(p => p.vendorId === '303A' && p.productId === '1001');
+
+		assert.ok(cyberbrick, 'CyberBrick device should be detected even when it is not the last line in CRLF output');
+		assert.strictEqual(cyberbrick.path, 'COM9');
+	});
+
+	test('parsePortList correctly parses LF-only output (non-Windows)', () => {
+		const uploader = createUploader({ exec: async () => ({ stdout: '', stderr: '' }) });
+		const parsePortList = (uploader as unknown as { parsePortList(output: string): unknown[] }).parsePortList.bind(uploader);
+
+		const lfOutput =
+			'/dev/ttyUSB0 None 0000:0000 None None\n' +
+			'/dev/ttyACM0 58:E6:C5:A7:76:54 303a:1001 CyberBrick None\n' +
+			'/dev/ttyUSB1 None 0000:0000 None None\n';
+
+		const ports = parsePortList(lfOutput) as Array<{ path: string; vendorId: string; productId: string }>;
+		const cyberbrick = ports.find(p => p.vendorId === '303A' && p.productId === '1001');
+
+		assert.ok(cyberbrick, 'CyberBrick device should be detected from LF-only output');
+		assert.strictEqual(cyberbrick.path, '/dev/ttyACM0');
+	});
 });
