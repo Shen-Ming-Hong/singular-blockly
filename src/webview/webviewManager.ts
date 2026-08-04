@@ -477,6 +477,12 @@ export class WebViewManager {
 			// 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyEdit.js'));
+			const cyberbrickNameValidationPath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/js/cyberbrickNameValidation.js')
+			);
+			const cyberbrickOtaProvisioningStatePath = vscode.Uri.file(
+				path.join(this.context.extensionPath, 'media/js/cyberbrickOtaProvisioningState.js')
+			);
 			const txtMOutputValidationPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/txtMOutputValidation.js'));
 			const txtVirtualControlsContrastPath = vscode.Uri.file(
 				path.join(this.context.extensionPath, 'media/js/txtVirtualControlsContrast.js')
@@ -487,6 +493,8 @@ export class WebViewManager {
 			const webview = this.panel!.webview;
 			const cssUri = webview.asWebviewUri(cssPath);
 			const jsUri = webview.asWebviewUri(jsPath);
+			const cyberbrickNameValidationUri = webview.asWebviewUri(cyberbrickNameValidationPath);
+			const cyberbrickOtaProvisioningStateUri = webview.asWebviewUri(cyberbrickOtaProvisioningStatePath);
 			const txtMOutputValidationUri = webview.asWebviewUri(txtMOutputValidationPath);
 			const txtVirtualControlsContrastUri = webview.asWebviewUri(txtVirtualControlsContrastPath);
 			const boardConfigsUri = webview.asWebviewUri(boardConfigsPath);
@@ -674,6 +682,8 @@ export class WebViewManager {
 			);
 			htmlContent = htmlContent.replace('{txtMOutputValidationUri}', txtMOutputValidationUri.toString());
 			htmlContent = htmlContent.replace('{txtVirtualControlsContrastUri}', txtVirtualControlsContrastUri.toString());
+			htmlContent = htmlContent.replace('{cyberbrickNameValidationUri}', cyberbrickNameValidationUri.toString());
+			htmlContent = htmlContent.replace('{cyberbrickOtaProvisioningStateUri}', cyberbrickOtaProvisioningStateUri.toString());
 			htmlContent = htmlContent.replace('{jsUri}', jsUri.toString());
 			htmlContent = htmlContent.replace(
 				'{experimentalMarkerUri}',

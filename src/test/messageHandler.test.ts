@@ -681,6 +681,68 @@ describe('WebView Message Handler', () => {
 		assert.strictEqual(messageArg.isRename, false);
 	});
 
+	it('validates and trims CyberBrick variable names with explicit Error severity', async () => {
+		(vscodeMock as any).InputBoxValidationSeverity = { Info: 1, Warning: 2, Error: 3 };
+		vscodeMock.window.showInputBox.callsFake(async (options: any) => {
+			const invalid = await options.validateInput('1motor');
+			assert.deepStrictEqual(invalid, {
+				message: 'A name cannot start with a number.',
+				severity: 3,
+			});
+			return '  馬達2  ';
+		});
+
+		await messageHandler.handleMessage({ command: 'promptNewVariable', board: 'cyberbrick', isRename: false });
+
+		const response = webviewMock.postMessage.lastCall.args[0];
+		assert.strictEqual(response.command, 'createVariable');
+		assert.strictEqual(response.name, '馬達2');
+	});
+
+	it('uses non-blocking Warning severity for CyberBrick runtime and builtin names', async () => {
+		(vscodeMock as any).InputBoxValidationSeverity = { Info: 1, Warning: 2, Error: 3 };
+		vscodeMock.window.showInputBox.callsFake(async (options: any) => {
+			const warning = await options.validateInput('print');
+			assert.deepStrictEqual(warning, {
+				message: 'This name may hide a built-in Python function.',
+				severity: 2,
+			});
+			return 'print';
+		});
+
+		await messageHandler.handleMessage({ command: 'promptNewVariable', board: 'cyberbrick', isRename: false });
+
+		assert.strictEqual(webviewMock.postMessage.lastCall.args[0].name, 'print');
+	});
+
+	it('does not post a CyberBrick variable change when InputBox rejects an Error', async () => {
+		(vscodeMock as any).InputBoxValidationSeverity = { Info: 1, Warning: 2, Error: 3 };
+		vscodeMock.window.showInputBox.callsFake(async (options: any) => {
+			const validation = await options.validateInput('motor speed');
+			assert.strictEqual(validation.severity, 3);
+			return undefined;
+		});
+
+		await messageHandler.handleMessage({ command: 'promptNewVariable', board: 'cyberbrick', isRename: false });
+
+		assert.strictEqual(webviewMock.postMessage.called, false);
+	});
+
+	it('preserves existing Arduino and TXT variable validation behavior', async () => {
+		for (const board of ['uno', 'txt']) {
+			vscodeMock.window.showInputBox.reset();
+			webviewMock.postMessage.reset();
+			vscodeMock.window.showInputBox.callsFake(async (options: any) => {
+				assert.strictEqual(await options.validateInput('for'), null, board);
+				return 'for';
+			});
+
+			await messageHandler.handleMessage({ command: 'promptNewVariable', board, isRename: false });
+
+			assert.strictEqual(webviewMock.postMessage.lastCall.args[0].name, 'for', board);
+		}
+	});
+
 	it('should handle confirm delete variable message', async () => {
 		// 準備測試 - 設置本地化消息
 		localeServiceStub.getLocalizedMessage.withArgs('VSCODE_CONFIRM_DELETE_VARIABLE', 'testVar').resolves('確認刪除變數 testVar?');
@@ -882,13 +944,24 @@ describe('WebView Message Handler', () => {
 			assert.strictEqual(JSON.stringify(messages).includes('wifiPassword'), false);
 		});
 
-		it('forwards provisioning progress and sanitized result', async () => {
+		it('forwards all six provisioning milestones with request correlation and sanitized result', async () => {
 			const device = createCyberBrickDevice();
+			const steps = ['detect-usb', 'read-device-id', 'install-agent', 'configure-wifi', 'verify-agent', 'store-secrets'];
 			const provisioningService = {
 				provision: sinon.stub().callsFake(async (_payload: unknown, onProgress: Function) => {
-					onProgress({ step: 'detect-usb', success: true, message: 'USB selected' });
+					for (const step of steps) {
+						onProgress({ step, success: true, message: 'Host-only text', deviceId: device.deviceId, wifiPassword: 'do-not-return' });
+					}
 					return {
-						result: { success: true, status: 'succeeded', device, nextUploadMode: 'usb', steps: [], userFacingSummary: 'done' },
+						result: {
+							success: true,
+							status: 'succeeded',
+							device,
+							nextUploadMode: 'usb',
+							steps: [],
+							userFacingSummary: 'do-not-return',
+							otaToken: 'do-not-return',
+						},
 						panelState: { settings: createCyberBrickUploadSettings({ pairedDevices: [device], primaryDeviceId: device.deviceId }), secretPresence: {}, readiness: undefined },
 					};
 				}),
@@ -901,10 +974,72 @@ describe('WebView Message Handler', () => {
 				payload: { usbPort: '/dev/cu.usbmodem1', friendlyName: 'Alpha', ssid: 'Classroom', wifiPassword: 'do-not-return' },
 			});
 
-			const messages = webviewMock.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0] as { command?: string });
-			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickOtaProvisionProgress'));
-			assert.ok(messages.some((message: { command?: string }) => message.command === 'cyberbrickOtaProvisionResult'));
+			const messages = webviewMock.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0] as any);
+			const progressMessages = messages.filter((message: any) => message.command === 'cyberbrickOtaProvisionProgress');
+			assert.deepStrictEqual(progressMessages.map((message: any) => message.payload.step), steps);
+			assert(progressMessages.every((message: any) => message.requestId === 'provision-1'));
+			assert(progressMessages.every((message: any) => !('message' in message.payload)));
+			const resultMessage = messages.find((message: any) => message.command === 'cyberbrickOtaProvisionResult');
+			assert.strictEqual(resultMessage.requestId, 'provision-1');
+			assert.strictEqual(resultMessage.payload.status, 'succeeded');
+			assert.strictEqual('userFacingSummary' in resultMessage.payload, false);
 			assert.strictEqual(JSON.stringify(messages).includes('do-not-return'), false);
+		});
+
+		it('rejects malformed provisioning messages without calling the service', async () => {
+			const provisioningService = { provision: sinon.stub() };
+			createCyberBrickMessageHandler(undefined, { provisioningService });
+			const validPayload = { usbPort: '/dev/cu.usbmodem1', friendlyName: 'Alpha', ssid: 'Classroom', wifiPassword: '' };
+			const invalidMessages = [
+				{ command: 'cyberbrickOtaProvisionRequest', payload: validPayload },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: 'bad-top-level-key', payload: validPayload, unexpected: true },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: '', payload: validPayload },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: 'bad-null', payload: null },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: 'bad-array', payload: [] },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: 'bad-port', payload: { ...validPayload, usbPort: {} } },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: 'bad-name', payload: { ...validPayload, friendlyName: 1 } },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: 'bad-ssid', payload: { ...validPayload, ssid: '   ' } },
+				{ command: 'cyberbrickOtaProvisionRequest', requestId: 'bad-password', payload: { ...validPayload, wifiPassword: [] } },
+			];
+
+			for (const invalidMessage of invalidMessages) {
+				webviewMock.postMessage.resetHistory();
+				await messageHandler.handleMessage(invalidMessage);
+				const response = webviewMock.postMessage.lastCall.args[0];
+				assert.strictEqual(response.command, 'cyberbrickOtaProvisionResult');
+				assert.strictEqual(response.success, false);
+				assert.strictEqual(response.error.code, 'invalid-settings');
+			}
+			assert.strictEqual(provisioningService.provision.called, false);
+		});
+
+		it('correlates a duplicate in-progress result without exposing the original payload', async () => {
+			const provisioningService = {
+				provision: sinon.stub().resolves({
+					result: {
+						success: false,
+						status: 'failed',
+						nextUploadMode: 'usb',
+						steps: [],
+						error: { code: 'provisioning-in-progress', message: 'Already running.', nextActions: ['Wait.'], details: 'do-not-return' },
+					},
+					panelState: { settings: createCyberBrickUploadSettings(), secretPresence: {} },
+				}),
+			};
+			createCyberBrickMessageHandler(undefined, { provisioningService });
+
+			await messageHandler.handleMessage({
+				command: 'cyberbrickOtaProvisionRequest',
+				requestId: 'second-request',
+				payload: { usbPort: '/dev/cu.usbmodem1', friendlyName: 'Alpha', ssid: 'Classroom', wifiPassword: 'secret-value' },
+			});
+
+			const response = webviewMock.postMessage.lastCall.args[0];
+			assert.strictEqual(response.requestId, 'second-request');
+			assert.strictEqual(response.success, false);
+			assert.strictEqual(response.error.code, 'provisioning-in-progress');
+			assert.strictEqual(JSON.stringify(response).includes('secret-value'), false);
+			assert.strictEqual(JSON.stringify(response).includes('do-not-return'), false);
 		});
 
 		it('checks OTA readiness and uploads without falling back to USB', async () => {

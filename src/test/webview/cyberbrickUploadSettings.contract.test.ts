@@ -9,6 +9,94 @@ const cssPath = 'media/css/blocklyEdit.css';
 const manifestPath = 'package.json';
 
 describe('CyberBrick upload settings WebView contract', () => {
+	it('renders a child-friendly determinate progressbar without visible fractions or percentages', () => {
+		const html = readWorkspaceFile(htmlPath);
+		const css = readWorkspaceFile(cssPath);
+		assertContainsAll(
+			html,
+			[
+				'id="cyberbrickProvisioningStatus"',
+				'id="cyberbrickProvisioningProgressLabel"',
+				'id="cyberbrickProvisioningIcon"',
+				'id="cyberbrickProvisioningProgressbar"',
+				'role="progressbar"',
+				'aria-valuemin="0"',
+				'aria-valuemax="6"',
+				'aria-valuenow="0"',
+				'aria-labelledby="cyberbrickProvisioningProgressLabel"',
+				'id="cyberbrickProvisioningProgressFill"',
+				'id="cyberbrickProvisioningStage"',
+				'aria-live="polite"',
+				'id="cyberbrickProvisioningKeepConnected"',
+			],
+			'CyberBrick child-friendly progress markup'
+		);
+		assertContainsAll(
+			css,
+			[
+				'.cyberbrick-provisioning-progress-card',
+				'.cyberbrick-provisioning-progress-track',
+				'min-height: 22px',
+				'.cyberbrick-provisioning-progress-fill',
+				'.cyberbrick-provisioning-progress-card.running',
+				'.cyberbrick-provisioning-progress-card.succeeded',
+				'.cyberbrick-provisioning-progress-card.failed',
+				'.cyberbrick-provisioning-icon',
+			],
+			'CyberBrick progress styling'
+		);
+		const visibleProgressMarkup = html.slice(html.indexOf('id="cyberbrickProvisioningStatus"'), html.indexOf('id="cyberbrickProvisionButton"'));
+		assert(!/\d\s*\/\s*6/.test(visibleProgressMarkup), 'student-facing progress must not show n/6');
+		assert(!visibleProgressMarkup.includes('%'), 'student-facing progress must not show a percentage');
+	});
+
+	it('starts and preserves reducer state while disabling every conflicting provisioning control', () => {
+		const script = readWorkspaceFile(scriptPath);
+		assertContainsAll(
+			script,
+			[
+				'otaProvisioningState',
+				'createInitialState()',
+				"type: 'start'",
+				'setCyberBrickProvisioningControlsDisabled',
+				'cyberbrickUsbPortSelect',
+				'cyberbrickRefreshUsbPorts',
+				'cyberbrickFriendlyNameInput',
+				'cyberbrickWifiSsidSelect',
+				'cyberbrickWifiScanButton',
+				'cyberbrickWifiPasswordInput',
+				'cyberbrickWifiPasswordToggle',
+				'cyberbrickProvisionButton',
+				'cyberbrickOtaCleanupButton',
+				'.cyberbrick-paired-device-actions button',
+				"CYBERBRICK_PROVISION_RUNNING",
+				"CYBERBRICK_PROVISION_KEEP_CONNECTED",
+			],
+			'CyberBrick running state and control lock'
+		);
+		const requestBody = extractFunctionBody(script, 'requestCyberBrickOtaProvisioning');
+		assert(requestBody.indexOf("type: 'start'") < requestBody.indexOf("command: 'cyberbrickOtaProvisionRequest'"), 'empty progress must render before postMessage');
+	});
+
+	it('parses Host messages before reducing and clears the Wi-Fi password only after valid success', () => {
+		const script = readWorkspaceFile(scriptPath);
+		assertContainsAll(
+			extractFunctionBody(script, 'handleCyberBrickOtaProvisionProgress'),
+			['parseProgressMessage', 'reduceState', 'renderCyberBrickProvisioningProgress'],
+			'validated provisioning progress'
+		);
+		const resultBody = extractFunctionBody(script, 'handleCyberBrickOtaProvisionResult');
+		assertContainsAll(
+			resultBody,
+			['parseResultMessage', 'reduceState', 'clearCyberBrickWifiPasswordInput', 'setCyberBrickProvisioningControlsDisabled(false)'],
+			'validated provisioning result'
+		);
+		const successIndex = resultBody.indexOf('if (parsed.success)');
+		const clearIndex = resultBody.indexOf('clearCyberBrickWifiPasswordInput');
+		const failureIndex = resultBody.indexOf('CYBERBRICK_PROVISION_FAILED');
+		assert(successIndex >= 0 && clearIndex > successIndex && clearIndex < failureIndex, 'password clearing must stay in the valid success branch');
+	});
+
 	it('declares a CyberBrick-only gear button and upload mode modal', () => {
 		const html = readWorkspaceFile(htmlPath);
 
@@ -144,8 +232,8 @@ describe('CyberBrick upload settings WebView contract', () => {
 		const provisionProgressBody = extractFunctionBody(script, 'renderCyberBrickProvisioningProgress');
 		assertContainsAll(
 			provisionProgressBody,
-			['getCyberBrickProvisioningStepMessage(step)', 'isCreatingDeviceId'],
-			'OTA setup progress should use localized step messages and avoid marking identity creation as failed'
+			['currentStepState.messageKey', 'getCyberBrickProvisioningStepMessage(currentStepState)', "state.status === 'running'"],
+			'OTA setup progress should use reducer-provided localized step keys'
 		);
 		assertDoesNotContainAny(
 			provisionProgressBody,
@@ -173,7 +261,7 @@ describe('CyberBrick upload settings WebView contract', () => {
 			'OTA setup result toasts should use localized messages'
 		);
 		const clearPasswordIndex = provisionResultBody.indexOf('clearCyberBrickWifiPasswordInput();');
-		const successBranchIndex = provisionResultBody.indexOf('if (message.success)');
+		const successBranchIndex = provisionResultBody.indexOf('if (parsed.success)');
 		const failureBranchIndex = provisionResultBody.indexOf('} else {', successBranchIndex);
 		assert.ok(
 			clearPasswordIndex > successBranchIndex && clearPasswordIndex < failureBranchIndex,

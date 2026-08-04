@@ -45,6 +45,7 @@ export interface CyberBrickOtaProvisioningServiceOptions {
 export class CyberBrickOtaProvisioningService {
 	private readonly now: () => Date;
 	private readonly randomBytes: (size: number) => Buffer;
+	private provisioningInFlight = false;
 
 	constructor(
 		private readonly settingsService: CyberBrickUploadSettingsService,
@@ -95,6 +96,33 @@ export class CyberBrickOtaProvisioningService {
 	}
 
 	async provision(
+		request: OtaProvisioningRequest,
+		onProgress?: CyberBrickProvisioningProgressCallback
+	): Promise<{ result: OtaProvisioningResult; panelState: CyberBrickUploadPanelState }> {
+		if (this.provisioningInFlight) {
+			const error = createCyberBrickUploadError('provisioning-in-progress');
+			return {
+				result: {
+					success: false,
+					status: 'failed',
+					nextUploadMode: 'usb',
+					steps: [],
+					userFacingSummary: error.message,
+					error,
+				},
+				panelState: await this.settingsService.buildPanelState(),
+			};
+		}
+
+		this.provisioningInFlight = true;
+		try {
+			return await this.provisionOnce(request, onProgress);
+		} finally {
+			this.provisioningInFlight = false;
+		}
+	}
+
+	private async provisionOnce(
 		request: OtaProvisioningRequest,
 		onProgress?: CyberBrickProvisioningProgressCallback
 	): Promise<{ result: OtaProvisioningResult; panelState: CyberBrickUploadPanelState }> {
@@ -178,7 +206,6 @@ export class CyberBrickOtaProvisioningService {
 			}
 			await Promise.all(secretWrites);
 			localSecretsStored = true;
-			emit({ step: 'store-secrets', success: true, message: 'Secrets stored securely.', deviceId });
 
 			const now = this.nowIso();
 			const existingSettings = await this.settingsService.loadSettings();
@@ -198,6 +225,7 @@ export class CyberBrickOtaProvisioningService {
 			settingsStored = true;
 
 			const panelState = await this.settingsService.buildPanelState();
+			emit({ step: 'store-secrets', success: true, message: 'Secrets stored securely.', deviceId });
 			const result: OtaProvisioningResult = {
 				success: true,
 				status: 'succeeded',

@@ -80,6 +80,33 @@ const MICROPYTHON_CONTAINERS = [
 ];
 
 suite('Orphan Block Guard Tests', () => {
+	suite('CyberBrick 命名警告共存回歸', () => {
+		test('命名警告使用獨立 id，清除 orphan 預設警告不會一併清除', () => {
+			const warnings = new Map<string, string>();
+			const setWarningText = (message: string | null, id = '') => {
+				if (message === null) {
+					warnings.delete(id);
+				} else {
+					warnings.set(id, message);
+				}
+			};
+
+			setWarningText('必須放在 main() 內');
+			setWarningText('名稱不能以數字開頭', 'cyberbrick-naming');
+			setWarningText(null);
+
+			assert.strictEqual(warnings.has(''), false);
+			assert.strictEqual(warnings.get('cyberbrick-naming'), '名稱不能以數字開頭');
+		});
+
+		test('命名預檢不改變 orphan 三層產碼 guard 的容器判斷', () => {
+			const validBlock = createMockBlock('controls_if', [{ type: 'micropython_main' }]);
+			const orphanBlock = createMockBlock('controls_if', []);
+			assert.strictEqual(isInAllowedContext(validBlock, MICROPYTHON_CONTAINERS), true);
+			assert.strictEqual(isInAllowedContext(orphanBlock, MICROPYTHON_CONTAINERS), false);
+		});
+	});
+
 	// T008: isInAllowedContext returns true for block directly inside allowed container
 	suite('isInAllowedContext — 直接在合法容器內 (RN-006 T3)', () => {
 		test('Arduino: block inside arduino_setup_loop returns true', () => {

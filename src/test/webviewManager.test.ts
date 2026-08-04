@@ -64,6 +64,7 @@ describe('WebView Manager', () => {
             {arduinoModules}
             <script src="{arduinoBlocksUri}"></script>
             <script src="{boardConfigsUri}"></script>
+            <script src="{cyberbrickNameValidationUri}"></script>
             <script src="{functionBlocksUri}"></script>
             <script src="{themesUri}/singular.js"></script>
             <script src="{themesUri}/singularDark.js"></script>
@@ -71,6 +72,7 @@ describe('WebView Manager', () => {
         <body class="theme-{theme}">
             <div id="blocklyDiv"></div>
 			<script src="{txtVirtualControlsContrastUri}"></script>
+            <script src="{cyberbrickOtaProvisioningStateUri}"></script>
             <script src="{jsUri}"></script>
         </body>
         </html>
@@ -266,6 +268,19 @@ describe('WebView Manager', () => {
 			htmlContent.indexOf('txtVirtualControlsContrast.js') < htmlContent.indexOf('blocklyEdit.js'),
 			'TXT contrast helper should load before blocklyEdit.js'
 		);
+		assert(htmlContent.includes('https://mock-webview//mock/extension/media/js/cyberbrickNameValidation.js'));
+		assert(htmlContent.includes('https://mock-webview//mock/extension/media/js/cyberbrickOtaProvisioningState.js'));
+		assert(
+			htmlContent.indexOf('cyberbrickNameValidation.js') < htmlContent.indexOf('functions.js'),
+			'CyberBrick naming helper should load before function blocks'
+		);
+		assert(
+			htmlContent.indexOf('cyberbrickOtaProvisioningState.js') < htmlContent.indexOf('blocklyEdit.js'),
+			'CyberBrick OTA state helper should load before blocklyEdit.js'
+		);
+		const convertedPaths = webviewMock.asWebviewUri.getCalls().map((call: sinon.SinonSpyCall) => call.args[0].fsPath);
+		assert(convertedPaths.some((resourcePath: string) => resourcePath.endsWith('/media/js/cyberbrickNameValidation.js')));
+		assert(convertedPaths.some((resourcePath: string) => resourcePath.endsWith('/media/js/cyberbrickOtaProvisioningState.js')));
 	});
 
 	(skipInCoverage ? it.skip : it)('should inject stored editor theme into initial theme and body class', async () => {

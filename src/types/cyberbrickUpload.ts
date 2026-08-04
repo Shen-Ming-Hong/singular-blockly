@@ -24,6 +24,7 @@ export type CyberBrickProvisioningStep =
 	| 'configure-wifi'
 	| 'verify-agent'
 	| 'store-secrets';
+export type CyberBrickCountedProvisioningStep = Exclude<CyberBrickProvisioningStep, 'scan-wifi'>;
 export type CyberBrickReadinessCode =
 	| 'ok'
 	| 'missing-primary-device'
@@ -58,6 +59,7 @@ export type CyberBrickUploadErrorCode =
 	| 'wifi-timeout'
 	| 'agent-unreachable'
 	| 'secret-store-failed'
+	| 'provisioning-in-progress'
 	| 'provisioning-failed'
 	| 'ota-upload-failed'
 	| 'ota-cleanup-failed'
@@ -263,8 +265,37 @@ export interface CyberBrickWifiScanRequestMessage {
 	port?: string;
 }
 
-export interface CyberBrickOtaProvisionRequestMessage extends OtaProvisioningRequest {
+export interface CyberBrickOtaProvisionRequestMessage {
 	command: 'cyberbrickOtaProvisionRequest';
+	requestId: string;
+	payload: OtaProvisioningRequest;
+}
+
+export interface CyberBrickOtaProvisionProgressPayload {
+	step: CyberBrickCountedProvisioningStep;
+	success: boolean;
+	deviceId?: string;
+	ipAddress?: string;
+	error?: CyberBrickUploadUserError;
+}
+
+export interface CyberBrickOtaProvisionProgressMessage {
+	command: 'cyberbrickOtaProvisionProgress';
+	requestId: string;
+	success: true;
+	payload: CyberBrickOtaProvisionProgressPayload;
+}
+
+export interface CyberBrickOtaProvisionResultPayload extends OtaProvisioningResult {
+	panelState: CyberBrickUploadPanelState;
+}
+
+export interface CyberBrickOtaProvisionResultMessage {
+	command: 'cyberbrickOtaProvisionResult';
+	requestId: string;
+	success: boolean;
+	payload?: CyberBrickOtaProvisionResultPayload;
+	error?: CyberBrickUploadUserError;
 }
 
 export interface CyberBrickOtaReadinessRequestMessage {

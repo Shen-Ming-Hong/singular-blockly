@@ -14,7 +14,7 @@
 
 **目的**：在修改前建立可比較的專案品質基準。
 
-- [ ] T001 執行既有 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test` 並把基準結果記錄於 `specs/064-cyberbrick-naming-ota-progress/quickstart.md`
+- [X] T001 執行既有 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test` 並把基準結果記錄於 `specs/064-cyberbrick-naming-ota-progress/quickstart.md`
 
 ---
 
@@ -22,9 +22,9 @@
 
 **目的**：先建立兩個 WebView 純 helper 的載入邊界、共用訊息代碼與全部語系 key；完成前不得進入故事整合。
 
-- [ ] T002 [P] 先建立僅公開空 namespace／factory 的 `media/js/cyberbrickNameValidation.js`、`media/js/cyberbrickOtaProvisioningState.js` UMD 骨架，再於 `src/webview/webviewManager.ts` 與 `media/html/blocklyEdit.html` 註冊安全 WebView URI，並保證名稱 helper 早於 `media/blockly/blocks/functions.js`、OTA helper 早於 `media/js/blocklyEdit.js` 載入；功能邏輯留待各故事的測試先建立後實作
-- [ ] T003 [P] 先只在 `src/test/safetyGuardI18n.test.ts` 加入命名 error／warning、上傳阻擋、OTA running／目前階段／避免重複操作與拔除 USB／success／failed／retry／in-progress 必要 key 契約並確認失敗，再於全部 `media/locales/*/messages.js` 補齊文字使契約通過
-- [ ] T004 [P] 在 `src/types/cyberbrickUpload.ts` 與 `src/services/cyberbrickUploadErrors.ts` 定義 request-scoped OTA 訊息所需型別及 `provisioning-in-progress` 分類錯誤，不改變 settings schema version
+- [X] T002 [P] 先建立僅公開空 namespace／factory 的 `media/js/cyberbrickNameValidation.js`、`media/js/cyberbrickOtaProvisioningState.js` UMD 骨架，再於 `src/webview/webviewManager.ts` 與 `media/html/blocklyEdit.html` 註冊安全 WebView URI，並保證名稱 helper 早於 `media/blockly/blocks/functions.js`、OTA helper 早於 `media/js/blocklyEdit.js` 載入；功能邏輯留待各故事的測試先建立後實作
+- [X] T003 [P] 先只在 `src/test/safetyGuardI18n.test.ts` 加入命名 error／warning、上傳阻擋、OTA running／目前階段／避免重複操作與拔除 USB／success／failed／retry／in-progress 必要 key 契約並確認失敗，再於全部 `media/locales/*/messages.js` 補齊文字使契約通過
+- [X] T004 [P] 在 `src/types/cyberbrickUpload.ts` 與 `src/services/cyberbrickUploadErrors.ts` 定義 request-scoped OTA 訊息所需型別及 `provisioning-in-progress` 分類錯誤，不改變 settings schema version
 
 **Checkpoint**：WebView 資源邊界、訊息代碼與在地化字典已可供兩條功能切片使用。
 
@@ -38,17 +38,17 @@
 
 ### 測試（先撰寫並確認失敗）
 
-- [ ] T005 [P] [US1] 在 `src/test/services/cyberbrickNameValidation.test.ts` 建立 Extension Host 名稱正規化、合法文法、hard keywords 與錯誤優先順序測試
-- [ ] T006 [P] [US1] 在 `src/test/webview/cyberbrickNameValidation.test.ts` 以 Node 載入 UMD helper，建立與 T005 相同的 WebView 測試向量及函式／參數 duplicate context 測試
-- [ ] T007 [P] [US1] 在 `src/test/messageHandler.test.ts` 增加 CyberBrick 變數 InputBox 的 trim、Error 阻擋與非 CyberBrick 沿用既有行為測試
-- [ ] T008 [P] [US1] 在 `src/test/webview/cyberbrickNaming.contract.test.ts` 建立函式／參數 FieldTextInput validator、helper 載入順序、使用者輸入保留舊值與 hydration scope 內原樣接受反序列化值的 contract 測試
+- [X] T005 [P] [US1] 在 `src/test/services/cyberbrickNameValidation.test.ts` 建立 Extension Host 名稱正規化、合法文法、hard keywords 與錯誤優先順序測試
+- [X] T006 [P] [US1] 在 `src/test/webview/cyberbrickNameValidation.test.ts` 以 Node 載入 UMD helper，建立與 T005 相同的 WebView 測試向量及函式／參數 duplicate context 測試
+- [X] T007 [P] [US1] 在 `src/test/messageHandler.test.ts` 增加 CyberBrick 變數 InputBox 的 trim、Error 阻擋與非 CyberBrick 沿用既有行為測試
+- [X] T008 [P] [US1] 在 `src/test/webview/cyberbrickNaming.contract.test.ts` 建立函式／參數 FieldTextInput validator、helper 載入順序、使用者輸入保留舊值與 hydration scope 內原樣接受反序列化值的 contract 測試
 
 ### 實作
 
-- [ ] T009 [US1] 實作 Extension Host 純驗證器、hard keyword 集合與穩定結果代碼於 `src/services/cyberbrickNameValidation.ts`，使 T005 通過
-- [ ] T010 [US1] 實作可供瀏覽器與 Node 共用的 UMD 名稱驗證 API 於 `media/js/cyberbrickNameValidation.js`，使 T006 通過
-- [ ] T011 [US1] 在 `media/blockly/blocks/functions.js` 將共用 validator 接到函式與 mutator 參數欄位，阻擋使用者輸入的非法／重複值並以專用 warning ID 保留原因；hydration scope 期間原樣接受反序列化值
-- [ ] T012 [US1] 在 `src/webview/messageHandler.ts` 的變數輸入流程只對 `board === 'cyberbrick'` 使用 T009，送回整理後名稱並維持 Arduino／TXT 舊行為
+- [X] T009 [US1] 實作 Extension Host 純驗證器、hard keyword 集合與穩定結果代碼於 `src/services/cyberbrickNameValidation.ts`，使 T005 通過
+- [X] T010 [US1] 實作可供瀏覽器與 Node 共用的 UMD 名稱驗證 API 於 `media/js/cyberbrickNameValidation.js`，使 T006 通過
+- [X] T011 [US1] 在 `media/blockly/blocks/functions.js` 將共用 validator 接到函式與 mutator 參數欄位，阻擋使用者輸入的非法／重複值並以專用 warning ID 保留原因；hydration scope 期間原樣接受反序列化值
+- [X] T012 [US1] 在 `src/webview/messageHandler.ts` 的變數輸入流程只對 `board === 'cyberbrick'` 使用 T009，送回整理後名稱並維持 Arduino／TXT 舊行為
 
 **Checkpoint**：US1 可獨立展示，三種名稱入口都在提交前阻止會破壞 MicroPython 的名稱。
 
@@ -62,15 +62,15 @@
 
 ### 測試（先撰寫並確認失敗）
 
-- [ ] T013 [P] [US2] 擴充 `src/test/services/cyberbrickNameValidation.test.ts`，覆蓋 CJK U+3400／U+4DBF／U+4E00／U+9FFF／U+F900／U+FAFF 邊界與完整 runtime／builtin warning 清單
-- [ ] T014 [P] [US2] 擴充 `src/test/webview/cyberbrickNameValidation.test.ts`，使用相同 CJK 與 warning 向量驗證兩個執行環境結果一致
-- [ ] T015 [P] [US2] 在 `src/test/messageHandler.test.ts` 驗證 VS Code `InputBoxValidationSeverity.Warning` 不阻擋接受，Error 仍阻擋
+- [X] T013 [P] [US2] 擴充 `src/test/services/cyberbrickNameValidation.test.ts`，覆蓋 CJK U+3400／U+4DBF／U+4E00／U+9FFF／U+F900／U+FAFF 邊界與完整 runtime／builtin warning 清單
+- [X] T014 [P] [US2] 擴充 `src/test/webview/cyberbrickNameValidation.test.ts`，使用相同 CJK 與 warning 向量驗證兩個執行環境結果一致
+- [X] T015 [P] [US2] 在 `src/test/messageHandler.test.ts` 驗證 VS Code `InputBoxValidationSeverity.Warning` 不阻擋接受，Error 仍阻擋
 
 ### 實作
 
-- [ ] T016 [US2] 在 `src/services/cyberbrickNameValidation.ts` 加入既有 CJK 三區段、runtime names、builtin names 與 warning severity
-- [ ] T017 [US2] 在 `media/js/cyberbrickNameValidation.js` 同步 CJK 與 warning 規則，並讓完整向量測試防止規則漂移
-- [ ] T018 [US2] 在 `src/webview/messageHandler.ts` 與 `media/blockly/blocks/functions.js` 分別呈現可接受的在地化 Warning，確認提交值仍保持中文原文
+- [X] T016 [US2] 在 `src/services/cyberbrickNameValidation.ts` 加入既有 CJK 三區段、runtime names、builtin names 與 warning severity
+- [X] T017 [US2] 在 `media/js/cyberbrickNameValidation.js` 同步 CJK 與 warning 規則，並讓完整向量測試防止規則漂移
+- [X] T018 [US2] 在 `src/webview/messageHandler.ts` 與 `media/blockly/blocks/functions.js` 分別呈現可接受的在地化 Warning，確認提交值仍保持中文原文
 
 **Checkpoint**：US2 可獨立展示；中文體驗不退化，警告與阻擋明確分流。
 
@@ -84,15 +84,15 @@
 
 ### 測試（先撰寫並確認失敗）
 
-- [ ] T019 [P] [US3] 在 `src/test/webview/cyberbrickNameValidation.test.ts` 加入假 workspace 的 variable／function／parameter issue collector、blockIds、severity 與 canUpload 測試
-- [ ] T020 [P] [US3] 在 `src/test/webview/cyberbrickNaming.contract.test.ts` 加入一般載入、FileWatcher 與語言切換三種 `Blockly.serialization.workspaces.load()` 都由 `try/finally` hydration scope 包住、deserialize 不自動改名、載入後掃描、專用 warning ID、workspace change refresh 與 CyberBrick 上傳 preflight contract
-- [ ] T021 [P] [US3] 在 `src/test/suite/orphan-block-guard.test.ts` 增加命名 warning 與既有 orphan 三層 guard 可並存、不互相清除的回歸測試
+- [X] T019 [P] [US3] 在 `src/test/webview/cyberbrickNameValidation.test.ts` 加入假 workspace 的 variable／function／parameter issue collector、blockIds、severity 與 canUpload 測試
+- [X] T020 [P] [US3] 在 `src/test/webview/cyberbrickNaming.contract.test.ts` 加入一般載入、FileWatcher 與語言切換三種 `Blockly.serialization.workspaces.load()` 都由 `try/finally` hydration scope 包住、deserialize 不自動改名、載入後掃描、專用 warning ID、workspace change refresh 與 CyberBrick 上傳 preflight contract
+- [X] T021 [P] [US3] 在 `src/test/suite/orphan-block-guard.test.ts` 增加命名 warning 與既有 orphan 三層 guard 可並存、不互相清除的回歸測試
 
 ### 實作
 
-- [ ] T022 [US3] 在 `media/js/cyberbrickNameValidation.js` 實作可處理 Blockly workspace 或輕量測試物件的 issue collector，回傳相關 block IDs 與 `canUpload`
-- [ ] T023 [US3] 在 `media/js/blocklyEdit.js` 建立共用 hydration scope 並以 `try/finally` 包住一般載入、FileWatcher 與語言切換的所有 `Blockly.serialization.workspaces.load()`；scope 結束及建立、刪除、欄位變更、板子切換後套用／清除本功能專用 warning，且不改寫 serialization
-- [ ] T024 [US3] 在 `media/js/blocklyEdit.js` 的 `handleUploadClick()` 產碼前加入 CyberBrick naming preflight；error 顯示在地化摘要並導引第一個積木，warning 與非 CyberBrick 直接放行
+- [X] T022 [US3] 在 `media/js/cyberbrickNameValidation.js` 實作可處理 Blockly workspace 或輕量測試物件的 issue collector，回傳相關 block IDs 與 `canUpload`
+- [X] T023 [US3] 在 `media/js/blocklyEdit.js` 建立共用 hydration scope 並以 `try/finally` 包住一般載入、FileWatcher 與語言切換的所有 `Blockly.serialization.workspaces.load()`；scope 結束及建立、刪除、欄位變更、板子切換後套用／清除本功能專用 warning，且不改寫 serialization
+- [X] T024 [US3] 在 `media/js/blocklyEdit.js` 的 `handleUploadClick()` 產碼前加入 CyberBrick naming preflight；error 顯示在地化摘要並導引第一個積木，warning 與非 CyberBrick 直接放行
 
 **Checkpoint**：US3 可獨立展示；舊作品不被破壞且不會把已知非法程式送上 CyberBrick。
 
@@ -106,17 +106,17 @@
 
 ### 測試（先撰寫並確認失敗）
 
-- [ ] T025 [P] [US4] 在 `src/test/webview/cyberbrickOtaProvisioningState.test.ts` 建立 start=空進度條、固定順序、重複步驟去重、read-device-id 建立中文字更新與 scan-wifi 排除的 reducer 測試
-- [ ] T026 [P] [US4] 擴充 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`，驗證 progressbar 內部 ARIA 0–6、學生畫面無分數／百分比、大型進度條、執行中圖示與文字、非純顏色狀態及 running controls 清單
-- [ ] T027 [P] [US4] 在 `src/test/messageHandler.test.ts` 驗證每個 progress 都保留原 request ID、只傳安全步驟資料且六個 service step 均可轉送
+- [X] T025 [P] [US4] 在 `src/test/webview/cyberbrickOtaProvisioningState.test.ts` 建立 start=空進度條、固定順序、重複步驟去重、read-device-id 建立中文字更新與 scan-wifi 排除的 reducer 測試
+- [X] T026 [P] [US4] 擴充 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`，驗證 progressbar 內部 ARIA 0–6、學生畫面無分數／百分比、大型進度條、執行中圖示與文字、非純顏色狀態及 running controls 清單
+- [X] T027 [P] [US4] 在 `src/test/messageHandler.test.ts` 驗證每個 progress 都保留原 request ID、只傳安全步驟資料且六個 service step 均可轉送
 
 ### 實作
 
-- [ ] T028 [US4] 在 `media/js/cyberbrickOtaProvisioningState.js` 實作 UMD 純 allowlist parser 與 reducer、六步驟順序、completed Set 去重及 request ID 過濾，讓 Host→WebView 訊息在進入 reducer 前即可測試地拒絕錯型資料
-- [ ] T029 [US4] 在 `media/html/blocklyEdit.html` 與 `media/css/blocklyEdit.css` 建立醒目的大型 determinate progressbar、執行中／成功／失敗圖示、live stage status 與非純顏色樣式，學生可見區域不得顯示分數或百分比
-- [ ] T030 [US4] 在 `media/js/blocklyEdit.js` 啟動 provisioning 時先建立 request ID 並 dispatch start，使畫面在 postMessage 前顯示空進度條、執行中圖示、「正在設定無線上傳」與避免重複操作／拔除 USB 的提示
-- [ ] T031 [US4] 在 `media/js/blocklyEdit.js` 以 reducer 處理 progress，重複步驟只更新文字，並讓 modal 關閉／重開不清除 state
-- [ ] T032 [US4] 在 `media/js/blocklyEdit.js` 統一依 running 狀態禁用 USB、refresh、名稱、SSID、rescan、密碼與顯示切換、provision、cleanup、Use／Delete actions，結束後重新開放
+- [X] T028 [US4] 在 `media/js/cyberbrickOtaProvisioningState.js` 實作 UMD 純 allowlist parser 與 reducer、六步驟順序、completed Set 去重及 request ID 過濾，讓 Host→WebView 訊息在進入 reducer 前即可測試地拒絕錯型資料
+- [X] T029 [US4] 在 `media/html/blocklyEdit.html` 與 `media/css/blocklyEdit.css` 建立醒目的大型 determinate progressbar、執行中／成功／失敗圖示、live stage status 與非純顏色樣式，學生可見區域不得顯示分數或百分比
+- [X] T030 [US4] 在 `media/js/blocklyEdit.js` 啟動 provisioning 時先建立 request ID 並 dispatch start，使畫面在 postMessage 前顯示空進度條、執行中圖示、「正在設定無線上傳」與避免重複操作／拔除 USB 的提示
+- [X] T031 [US4] 在 `media/js/blocklyEdit.js` 以 reducer 處理 progress，重複步驟只更新文字，並讓 modal 關閉／重開不清除 state
+- [X] T032 [US4] 在 `media/js/blocklyEdit.js` 統一依 running 狀態禁用 USB、refresh、名稱、SSID、rescan、密碼與顯示切換、provision、cleanup、Use／Delete actions，結束後重新開放
 
 **Checkpoint**：US4 可獨立展示；學生始終知道目前進度且無法從 UI 重複啟動或衝突操作。
 
@@ -130,17 +130,17 @@
 
 ### 測試（先撰寫並確認失敗）
 
-- [ ] T033 [P] [US5] 擴充 `src/test/services/cyberbrickOtaProvisioningService.test.ts`，以 deferred promise 驗證並行第二請求不呼叫 uploader、回覆 `provisioning-in-progress`、success／failure／throw 後鎖都釋放，並驗證 `store-secrets` 只在秘密、paired-device 與 panel state 成功後發出且設定保存失敗時不會先完成進度條
-- [ ] T034 [P] [US5] 在 `src/test/messageHandler.test.ts` 增加非物件 payload、缺 requestId、非字串欄位、重複請求與 response request correlation 的邊界測試
-- [ ] T035 [P] [US5] 擴充 `src/test/webview/cyberbrickOtaProvisioningState.test.ts`，直接測試 UMD allowlist parser 與 reducer，覆蓋 success=完整進度條、各步驟 failure 停在正確位置、新 request 重設、stale 訊息，以及 progress／result 的 null、array、缺漏欄位、錯型 success、未知 step／status／error code 都完全忽略
-- [ ] T036 [P] [US5] 擴充 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`，驗證成功才清密碼、失敗保留密碼、失敗階段文字、結果後 controls 解鎖及 modal 重開最終狀態
+- [X] T033 [P] [US5] 擴充 `src/test/services/cyberbrickOtaProvisioningService.test.ts`，以 deferred promise 驗證並行第二請求不呼叫 uploader、回覆 `provisioning-in-progress`、success／failure／throw 後鎖都釋放，並驗證 `store-secrets` 只在秘密、paired-device 與 panel state 成功後發出且設定保存失敗時不會先完成進度條
+- [X] T034 [P] [US5] 在 `src/test/messageHandler.test.ts` 增加非物件 payload、缺 requestId、非字串欄位、重複請求與 response request correlation 的邊界測試
+- [X] T035 [P] [US5] 擴充 `src/test/webview/cyberbrickOtaProvisioningState.test.ts`，直接測試 UMD allowlist parser 與 reducer，覆蓋 success=完整進度條、各步驟 failure 停在正確位置、新 request 重設、stale 訊息，以及 progress／result 的 null、array、缺漏欄位、錯型 success、未知 step／status／error code 都完全忽略
+- [X] T036 [P] [US5] 擴充 `src/test/webview/cyberbrickUploadSettings.contract.test.ts`，驗證成功才清密碼、失敗保留密碼、失敗階段文字、結果後 controls 解鎖及 modal 重開最終狀態
 
 ### 實作
 
-- [ ] T037 [US5] 在 `src/services/cyberbrickOtaProvisioningService.ts` 於任何裝置 I/O 前加入單一 in-flight guard，重複請求立即分類失敗，以 `try/finally` 保證所有結束路徑釋放，並將 `store-secrets` 成功進度移到秘密、paired-device 與 panel state 完成之後且不再接續可失敗的 awaited persistence 操作
-- [ ] T038 [US5] 在 `src/webview/messageHandler.ts` 驗證 provisioning message、requestId 與 payload 型別，拒絕無效輸入且只回傳 sanitized progress／result
-- [ ] T039 [US5] 在 `media/js/blocklyEdit.js` 呼叫 T028 的 allowlist parser 驗證 Host→WebView progress／result，無效訊息不 dispatch；有效成功顯示完整進度條、勾勾與完成文字並清密碼，有效失敗讓進度條停在目前位置並保留密碼與失敗步驟，兩者都解除控制項且不顯示數字比例
-- [ ] T040 [US5] 在 `src/test/messageHandler.test.ts` 與 `src/test/webview/cyberbrickUploadSettings.contract.test.ts` 加強秘密回歸斷言，確保 progress、result、toast、ARIA 及 log 不含密碼、OTA token、pairing secret 或完整 payload
+- [X] T037 [US5] 在 `src/services/cyberbrickOtaProvisioningService.ts` 於任何裝置 I/O 前加入單一 in-flight guard，重複請求立即分類失敗，以 `try/finally` 保證所有結束路徑釋放，並將 `store-secrets` 成功進度移到秘密、paired-device 與 panel state 完成之後且不再接續可失敗的 awaited persistence 操作
+- [X] T038 [US5] 在 `src/webview/messageHandler.ts` 驗證 provisioning message、requestId 與 payload 型別，拒絕無效輸入且只回傳 sanitized progress／result
+- [X] T039 [US5] 在 `media/js/blocklyEdit.js` 呼叫 T028 的 allowlist parser 驗證 Host→WebView progress／result，無效訊息不 dispatch；有效成功顯示完整進度條、勾勾與完成文字並清密碼，有效失敗讓進度條停在目前位置並保留密碼與失敗步驟，兩者都解除控制項且不顯示數字比例
+- [X] T040 [US5] 在 `src/test/messageHandler.test.ts` 與 `src/test/webview/cyberbrickUploadSettings.contract.test.ts` 加強秘密回歸斷言，確保 progress、result、toast、ARIA 及 log 不含密碼、OTA token、pairing secret 或完整 payload
 
 **Checkpoint**：US5 可獨立展示；成功與失敗都可理解、可恢復，且裝置端不會同時執行兩個設定流程。
 
@@ -150,11 +150,11 @@
 
 **目的**：完成語系、安全、回歸與端到端驗收，不擴張功能範圍。
 
-- [ ] T041 [P] 更新 `src/test/webviewManager.test.ts`，驗證兩個新增 WebView helper 使用 `webview.asWebviewUri()` 且載入順序符合 `specs/064-cyberbrick-naming-ota-progress/plan.md`
-- [ ] T042 [P] 更新 `src/test/safetyGuardI18n.test.ts` 與所有 `media/locales/*/messages.js` 的一致性測試，執行 `npm run validate:i18n` 確認 15 語系無缺鍵或格式錯誤
-- [ ] T043 依 `security-checker` 檢查 `src/webview/messageHandler.ts`、`src/services/cyberbrickOtaProvisioningService.ts`、`media/js/blocklyEdit.js` 的 message validation、秘密處理、log 與 DOM 輸出，修正所有高風險問題
-- [ ] T044 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test`，將最終結果與任何環境限制記錄於 `specs/064-cyberbrick-naming-ota-progress/quickstart.md`
-- [ ] T045 依 `specs/064-cyberbrick-naming-ota-progress/quickstart.md` 完成繁中／英文、鍵盤／ARIA、舊工作區與 CyberBrick OTA 實機或等效 stub 驗收，並更新該檔完成條件
+- [x] T041 [P] 更新 `src/test/webviewManager.test.ts`，驗證兩個新增 WebView helper 使用 `webview.asWebviewUri()` 且載入順序符合 `specs/064-cyberbrick-naming-ota-progress/plan.md`
+- [x] T042 [P] 更新 `src/test/safetyGuardI18n.test.ts` 與所有 `media/locales/*/messages.js` 的一致性測試，執行 `npm run validate:i18n` 確認 15 語系無缺鍵或格式錯誤
+- [x] T043 依 `security-checker` 檢查 `src/webview/messageHandler.ts`、`src/services/cyberbrickOtaProvisioningService.ts`、`media/js/blocklyEdit.js` 的 message validation、秘密處理、log 與 DOM 輸出，修正所有高風險問題
+- [x] T044 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test`，將最終結果與任何環境限制記錄於 `specs/064-cyberbrick-naming-ota-progress/quickstart.md`
+- [x] T045 依 `specs/064-cyberbrick-naming-ota-progress/quickstart.md` 完成繁中／英文、鍵盤／ARIA、舊工作區與 CyberBrick OTA 實機或等效 stub 驗收，並更新該檔完成條件
 
 ---
 

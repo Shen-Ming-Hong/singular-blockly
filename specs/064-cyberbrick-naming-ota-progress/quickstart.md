@@ -30,6 +30,15 @@ npm test
 - `npm test`：預設解析到本機 VS Code 1.131.0，但該既有測試安裝只有 `Contents/MacOS/Code`，測試 CLI 尋找 `Contents/MacOS/Electron` 而無法啟動。
 - 改以既有且完整的 VS Code 1.130.0 執行 `npx vscode-test --label unit --code-version 1.130.0`：938 passing、1 pending、1 failing。唯一失敗為既有 `MicropythonUploader CyberBrick helper commands / wraps rc_main.py with a single OTA startup call without secrets`，斷言期待 OTA background thread ready 後仍保留短暫 head start；本功能尚未修改任何產品程式碼，故將此列為實作前已知基準，不把它歸因於本功能。
 
+### 實作後結果（2026-08-04）
+
+- `npm run compile`：PASS。
+- `npm run lint`：PASS。
+- `npm run validate:i18n`：PASS，14 個非英文語系皆為 0 errors；既有長度 warnings 不阻擋。
+- 聚焦執行命名 helper、OTA reducer、WebView contract、i18n 與 orphan guard：81 passing。
+- `npm test`：pretest 的 TypeScript 編譯、webpack 與 lint 皆 PASS；測試啟動仍因既有 VS Code 1.131.0 安裝缺少 `Contents/MacOS/Electron` 而停止，與實作前基準一致。
+- 改以既有完整環境執行 `npx vscode-test --config .vscode-test.mjs --label unit --code-version 1.130.0`：979 passing、1 pending、1 failing。唯一失敗仍是實作前已存在的 `MicropythonUploader CyberBrick helper commands / wraps rc_main.py with a single OTA startup call without secrets`；所有本功能新增與受影響測試均通過。
+
 開發期間可先執行聚焦測試（實際 glob 依 test runner 支援方式調整）：
 
 ```bash
@@ -99,15 +108,22 @@ npm run test:bail
 - 在至少繁中與英文介面實際走一次 error、warning、running、success、failed。
 - 執行 `npm run validate:i18n`，確認 15 語系 key 完整。
 
+### 本次驗收方式
+
+- 繁中／英文與其他 13 語系：由 feature i18n key contract 及 `validate:i18n` 驗證，PASS。
+- 鍵盤／ARIA：由 WebView contract 驗證 determinate `progressbar`、0–6 數值、可存取名稱、階段 value text、進行中控制項鎖定與 modal 關閉按鈕不被鎖定，PASS。
+- 舊工作區：由命名 WebView contract 驗證一般載入、FileWatcher 與語言切換三條反序列化路徑均使用 `try/finally` hydration scope，且序列化名稱不會被改寫，PASS。
+- CyberBrick OTA：本次未連接實體 CyberBrick；依任務允許採等效 stub，以 reducer、message handler 與 provisioning service 測試驗證六階段、失敗階段、重試、request correlation、單一執行鎖、最後里程碑時序及秘密消毒，PASS。
+
 ## 完成條件
 
-- [ ] 命名契約的全部測試向量通過。
-- [ ] 舊工作區不被自動修改且 error 阻擋上傳。
-- [ ] 一般載入、FileWatcher 與語言切換重載都安全結束 hydration scope，載入失敗時也不殘留旁路狀態。
-- [ ] OTA 六步驟精確計數、控制項鎖定、modal 重開保留狀態。
-- [ ] 最後里程碑不會在 paired-device 或 panel state 失敗前提早完成。
-- [ ] success／failure 的密碼行為正確。
-- [ ] request correlation 與 Host 單一執行鎖通過。
-- [ ] Host→WebView 格式錯誤的 progress／result 不改變任何目前狀態。
-- [ ] 無敏感值出現在訊息或 log。
-- [ ] compile、lint、i18n、tests 全數通過。
+- [x] 命名契約的全部測試向量通過。
+- [x] 舊工作區不被自動修改且 error 阻擋上傳。
+- [x] 一般載入、FileWatcher 與語言切換重載都安全結束 hydration scope，載入失敗時也不殘留旁路狀態。
+- [x] OTA 六步驟精確計數、控制項鎖定、modal 重開保留狀態。
+- [x] 最後里程碑不會在 paired-device 或 panel state 失敗前提早完成。
+- [x] success／failure 的密碼行為正確。
+- [x] request correlation 與 Host 單一執行鎖通過。
+- [x] Host→WebView 格式錯誤的 progress／result 不改變任何目前狀態。
+- [x] 無敏感值出現在訊息或 log。
+- [x] compile、lint、i18n 與全部功能相關測試通過；完整測試僅保留上述實作前既有單一失敗。

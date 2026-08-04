@@ -16,6 +16,61 @@ const PARAM_SHADOW_XML_MAP = {
 };
 window.PARAM_SHADOW_XML_MAP = PARAM_SHADOW_XML_MAP;
 
+const CYBERBRICK_NAMING_WARNING_ID = 'cyberbrick-naming';
+
+function getCyberBrickNameValidationApi() {
+	return window.cyberbrickNameValidation;
+}
+
+function getCyberBrickDuplicateNames(block, kind) {
+	if (!block?.workspace) {
+		return [];
+	}
+	if (kind === 'function') {
+		return block.workspace
+			.getBlocksByType('arduino_function', false)
+			.filter(candidate => candidate.id !== block.id)
+			.map(candidate => candidate.getFieldValue('NAME'))
+			.filter(Boolean);
+	}
+	if (kind === 'parameter') {
+		return block.workspace
+			.getBlocksByType('arduino_function_parameter', false)
+			.filter(candidate => candidate.id !== block.id)
+			.map(candidate => candidate.getFieldValue('NAME'))
+			.filter(Boolean);
+	}
+	return [];
+}
+
+function createCyberBrickNameFieldValidator(kind) {
+	return function (newValue) {
+		if (window.getCurrentBoard() !== 'cyberbrick') {
+			return newValue;
+		}
+		const api = getCyberBrickNameValidationApi();
+		if (!api || api.isHydrating()) {
+			return newValue;
+		}
+		const block = this.getSourceBlock();
+		const result = api.validateName({
+			name: newValue,
+			kind,
+			duplicateNames: getCyberBrickDuplicateNames(block, kind),
+		});
+		if (result.severity === 'valid') {
+			block?.setWarningText(null, CYBERBRICK_NAMING_WARNING_ID);
+			return result.normalizedName;
+		}
+		const message = window.languageManager?.getMessage(result.messageKey, result.code) || result.code;
+		block?.setWarningText(message, CYBERBRICK_NAMING_WARNING_ID);
+		if (result.severity === 'error') {
+			return null;
+		}
+		return result.normalizedName;
+	};
+}
+
 const functionMutator = {
 	mutationToDom: function () {
 		if (!this.arguments_ || !this.argumentTypes_) {
@@ -262,7 +317,7 @@ Blockly.Blocks['arduino_function'] = {
 	init: function () {
 		this.appendDummyInput('MAIN')
 			.appendField(window.languageManager.getMessage('FUNCTION_CREATE'))
-			.appendField(new Blockly.FieldTextInput('myFunction'), 'NAME')
+			.appendField(new Blockly.FieldTextInput('myFunction', createCyberBrickNameFieldValidator('function')), 'NAME')
 			.appendField(':', 'PARAM_LABEL');
 
 		this.appendStatementInput('STACK').setCheck(null);
@@ -364,6 +419,9 @@ Blockly.Blocks['arduino_function'] = {
 	},
 	// 添加 onchange 事件處理器
 	onchange: function (e) {
+		if (getCyberBrickNameValidationApi()?.isHydrating()) {
+			return;
+		}
 		// 檢查事件是否與此積木相關
 		if (e.blockId !== this.id) {
 			return;
@@ -577,7 +635,7 @@ Blockly.Blocks['arduino_function_parameter'] = {
 				]),
 				'TYPE'
 			)
-			.appendField(new Blockly.FieldTextInput('x'), 'NAME');
+			.appendField(new Blockly.FieldTextInput('x', createCyberBrickNameFieldValidator('parameter')), 'NAME');
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
 		this.setStyle('procedure_blocks'); // 修改這裡，使用主題中定義的顏色

@@ -27,6 +27,27 @@ const SAFETY_GUARD_KEYS = [
 	'SAFETY_GUARD_SUPPRESSED',
 ];
 
+const CYBERBRICK_NAMING_OTA_KEYS = [
+	'CYBERBRICK_NAME_ERROR_EMPTY',
+	'CYBERBRICK_NAME_ERROR_STARTS_WITH_NUMBER',
+	'CYBERBRICK_NAME_ERROR_CONTAINS_WHITESPACE',
+	'CYBERBRICK_NAME_ERROR_CONTAINS_HYPHEN',
+	'CYBERBRICK_NAME_ERROR_INVALID_CHARACTER',
+	'CYBERBRICK_NAME_ERROR_PYTHON_KEYWORD',
+	'CYBERBRICK_NAME_ERROR_DUPLICATE_FUNCTION',
+	'CYBERBRICK_NAME_ERROR_DUPLICATE_PARAMETER',
+	'CYBERBRICK_NAME_WARNING_RUNTIME',
+	'CYBERBRICK_NAME_WARNING_BUILTIN',
+	'CYBERBRICK_NAME_UPLOAD_BLOCKED',
+	'CYBERBRICK_PROVISION_RUNNING',
+	'CYBERBRICK_PROVISION_CURRENT_STAGE',
+	'CYBERBRICK_PROVISION_KEEP_CONNECTED',
+	'CYBERBRICK_PROVISION_SUCCEEDED',
+	'CYBERBRICK_PROVISION_FAILED',
+	'CYBERBRICK_PROVISION_RETRY',
+	'CYBERBRICK_PROVISION_IN_PROGRESS',
+];
+
 /** 從語系檔中提取指定鍵值的字串值 */
 function extractMessageValue(content: string, key: string): string | null {
 	// Try double-quoted strings first (handles apostrophes inside)
@@ -66,17 +87,30 @@ function readLocaleFile(locale: string): string {
 }
 
 /** 載入所有語系的安全守衛訊息 */
-function loadAllLocaleMessages(): Record<string, Record<string, string | null>> {
+function loadAllLocaleMessages(keys: string[] = SAFETY_GUARD_KEYS): Record<string, Record<string, string | null>> {
 	const result: Record<string, Record<string, string | null>> = {};
 	for (const locale of LOCALES) {
 		const content = readLocaleFile(locale);
 		result[locale] = {};
-		for (const key of SAFETY_GUARD_KEYS) {
+		for (const key of keys) {
 			result[locale][key] = extractMessageValue(content, key);
 		}
 	}
 	return result;
 }
+
+describe('CyberBrick naming and OTA i18n - Key Consistency', () => {
+	it('should provide every required child-facing message in all 15 locales', () => {
+		const allMessages = loadAllLocaleMessages(CYBERBRICK_NAMING_OTA_KEYS);
+		for (const locale of LOCALES) {
+			for (const key of CYBERBRICK_NAMING_OTA_KEYS) {
+				const value = allMessages[locale][key];
+				assert.ok(value !== null && value !== undefined, `${locale}: missing key '${key}'`);
+				assert.ok(value!.trim().length > 0, `${locale}: empty value for key '${key}'`);
+			}
+		}
+	});
+});
 
 // T023: 訊息鍵值一致性測試
 describe('Safety Guard i18n - Key Consistency', () => {
