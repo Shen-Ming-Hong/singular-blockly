@@ -39,6 +39,15 @@ npm test
 - `npm test`：pretest 的 TypeScript 編譯、webpack 與 lint 皆 PASS；測試啟動仍因既有 VS Code 1.131.0 安裝缺少 `Contents/MacOS/Electron` 而停止，與實作前基準一致。
 - 改以既有完整環境執行 `npx vscode-test --config .vscode-test.mjs --label unit --code-version 1.130.0`：979 passing、1 pending、1 failing。唯一失敗仍是實作前已存在的 `MicropythonUploader CyberBrick helper commands / wraps rc_main.py with a single OTA startup call without secrets`；所有本功能新增與受影響測試均通過。
 
+### 本地 Code Review 修正後結果（2026-08-04）
+
+- 已修正四項核准 findings：配對完成或失敗後保持進度區展開、terminal result 清除 active request 以拒絕同 ID 重複結果、成功 result 強制要求合法 panel state，以及六個失敗階段使用明確失敗文案。
+- OTA reducer、WebView contract 與 i18n 聚焦驗證：31 passing。
+- `npm run compile`、`npm run lint`、`npm run validate:i18n`：PASS；14 個非英文語系維持 0 errors。
+- 固定 VS Code 1.130.0 的完整測試：980 passing、1 pending、1 failing。唯一失敗仍為上述實作前既有 `MicropythonUploader` 測試；本次新增回歸測試全部通過。
+- 預設 `npm test` 的 pretest 仍全部 PASS，但測試啟動仍受本機不完整的 VS Code 1.131.0 安裝影響；此環境限制與實作前一致。
+- `security-checker` 未發現本次新增的 XSS、動態程式碼執行、命令注入或敏感資料外洩；`code-simplifier` re-review 未發現需要額外抽象或重構的項目。
+
 開發期間可先執行聚焦測試（實際 glob 依 test runner 支援方式調整）：
 
 ```bash

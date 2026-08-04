@@ -6557,10 +6557,10 @@ function renderCyberBrickPairedDevices() {
 		return;
 	}
 
-	if (cyberBrickUploadSettingsState.otaProvisioningState.status === 'running') {
-		openCyberBrickProvisioningAccordion();
-	} else {
+	if (cyberBrickUploadSettingsState.otaProvisioningState.status === 'idle') {
 		closeCyberBrickProvisioningAccordion();
+	} else {
+		openCyberBrickProvisioningAccordion();
 	}
 	for (const device of devices) {
 		const card = document.createElement('div');
@@ -6714,6 +6714,18 @@ function getCyberBrickProvisioningStepMessage(step) {
 	const languageManager = window.languageManager;
 	if (!step || typeof step.step !== 'string') {
 		return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_UNKNOWN', 'OTA setup step updated.') || 'OTA setup step updated.';
+	}
+	const failedMessages = {
+		'detect-usb': ['CYBERBRICK_PROVISION_STEP_DETECT_USB_FAILED', 'Could not use the CyberBrick USB connection.'],
+		'read-device-id': ['CYBERBRICK_PROVISION_STEP_READ_DEVICE_ID_FAILED', 'Could not read or create the device identity.'],
+		'install-agent': ['CYBERBRICK_PROVISION_STEP_INSTALL_AGENT_FAILED', 'Could not install the OTA agent.'],
+		'configure-wifi': ['CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI_FAILED', 'Could not finish the Wi-Fi setup.'],
+		'verify-agent': ['CYBERBRICK_PROVISION_STEP_VERIFY_AGENT_FAILED', 'Could not verify the OTA agent.'],
+		'store-secrets': ['CYBERBRICK_PROVISION_STEP_STORE_SECRETS_FAILED', 'Could not save pairing and security information.'],
+	};
+	const failedMessage = step.status === 'failed' ? failedMessages[step.step] : undefined;
+	if (failedMessage) {
+		return languageManager?.getMessage(failedMessage[0], failedMessage[1]) || failedMessage[1];
 	}
 	if (step.step === 'detect-usb') {
 		return languageManager?.getMessage('CYBERBRICK_PROVISION_STEP_DETECT_USB', 'CyberBrick USB port selected.') || 'CyberBrick USB port selected.';

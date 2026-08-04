@@ -47,6 +47,14 @@
 		'verify-agent': 'CYBERBRICK_PROVISION_STEP_VERIFY_AGENT',
 		'store-secrets': 'CYBERBRICK_PROVISION_STEP_STORE_SECRETS',
 	});
+	const FAILED_STEP_MESSAGE_KEYS = Object.freeze({
+		'detect-usb': 'CYBERBRICK_PROVISION_STEP_DETECT_USB_FAILED',
+		'read-device-id': 'CYBERBRICK_PROVISION_STEP_READ_DEVICE_ID_FAILED',
+		'install-agent': 'CYBERBRICK_PROVISION_STEP_INSTALL_AGENT_FAILED',
+		'configure-wifi': 'CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI_FAILED',
+		'verify-agent': 'CYBERBRICK_PROVISION_STEP_VERIFY_AGENT_FAILED',
+		'store-secrets': 'CYBERBRICK_PROVISION_STEP_STORE_SECRETS_FAILED',
+	});
 
 	function isPlainObject(value) {
 		if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -190,7 +198,7 @@
 			return null;
 		}
 		const panelState = value.panelState === undefined ? undefined : sanitizePanelState(value.panelState);
-		if (value.panelState !== undefined && !panelState) {
+		if ((success || value.panelState !== undefined) && !panelState) {
 			return null;
 		}
 		const steps = value.steps === undefined ? undefined : Array.isArray(value.steps) ? value.steps.map(sanitizeStep) : null;
@@ -266,6 +274,10 @@
 		return STEP_MESSAGE_KEYS[payload.step] || 'CYBERBRICK_PROVISION_STEP_UNKNOWN';
 	}
 
+	function getFailedStepMessageKey(step) {
+		return FAILED_STEP_MESSAGE_KEYS[step] || 'CYBERBRICK_PROVISION_STEP_UNKNOWN';
+	}
+
 	function reduceState(state, event) {
 		if (!state || !event || typeof event !== 'object') {
 			return state;
@@ -293,7 +305,7 @@
 			steps.set(payload.step, {
 				step: payload.step,
 				status: payload.success ? 'succeeded' : isFailed ? 'failed' : 'running',
-				messageKey: getStepMessageKey(payload),
+				messageKey: isFailed ? getFailedStepMessageKey(payload.step) : getStepMessageKey(payload),
 				...(payload.deviceId ? { deviceId: payload.deviceId } : {}),
 				...(payload.ipAddress ? { ipAddress: payload.ipAddress } : {}),
 				...(payload.error?.code ? { errorCode: payload.error.code } : {}),
@@ -309,7 +321,7 @@
 						steps.set(step, { step, status: 'succeeded', messageKey: getStepMessageKey({ step, success: true }) });
 					}
 				});
-				return { ...state, status: 'succeeded', completedSteps, steps, failedStep: null, summaryKey: 'CYBERBRICK_PROVISION_SUCCEEDED' };
+				return { ...state, status: 'succeeded', activeRequestId: null, completedSteps, steps, failedStep: null, summaryKey: 'CYBERBRICK_PROVISION_SUCCEEDED' };
 			}
 			if (!event.success && event.status === 'failed') {
 				const failedStep = state.failedStep || COUNTED_STEPS.find(step => !state.completedSteps.has(step)) || 'store-secrets';
@@ -318,10 +330,10 @@
 					steps.set(failedStep, {
 						step: failedStep,
 						status: 'failed',
-						messageKey: getStepMessageKey({ step: failedStep, success: false, error: {} }),
+						messageKey: getFailedStepMessageKey(failedStep),
 					});
 				}
-				return { ...state, status: 'failed', steps, failedStep, summaryKey: 'CYBERBRICK_PROVISION_FAILED' };
+				return { ...state, status: 'failed', activeRequestId: null, steps, failedStep, summaryKey: 'CYBERBRICK_PROVISION_FAILED' };
 			}
 		}
 		return state;

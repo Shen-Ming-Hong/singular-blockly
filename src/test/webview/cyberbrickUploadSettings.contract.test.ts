@@ -76,6 +76,16 @@ describe('CyberBrick upload settings WebView contract', () => {
 		);
 		const requestBody = extractFunctionBody(script, 'requestCyberBrickOtaProvisioning');
 		assert(requestBody.indexOf("type: 'start'") < requestBody.indexOf("command: 'cyberbrickOtaProvisionRequest'"), 'empty progress must render before postMessage');
+		const pairedDevicesBody = extractFunctionBody(script, 'renderCyberBrickPairedDevices');
+		assertContainsAll(
+			pairedDevicesBody,
+			["otaProvisioningState.status === 'idle'", 'closeCyberBrickProvisioningAccordion();', 'openCyberBrickProvisioningAccordion();'],
+			'CyberBrick terminal progress visibility'
+		);
+		assert(
+			pairedDevicesBody.indexOf("otaProvisioningState.status === 'idle'") < pairedDevicesBody.indexOf('closeCyberBrickProvisioningAccordion();'),
+			'paired devices should collapse provisioning only in the idle state'
+		);
 	});
 
 	it('parses Host messages before reducing and clears the Wi-Fi password only after valid success', () => {
@@ -251,6 +261,12 @@ describe('CyberBrick upload settings WebView contract', () => {
 				'CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI',
 				'CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI_NO_IP',
 				'CYBERBRICK_PROVISION_STEP_STORE_SECRETS',
+				'CYBERBRICK_PROVISION_STEP_DETECT_USB_FAILED',
+				'CYBERBRICK_PROVISION_STEP_READ_DEVICE_ID_FAILED',
+				'CYBERBRICK_PROVISION_STEP_INSTALL_AGENT_FAILED',
+				'CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI_FAILED',
+				'CYBERBRICK_PROVISION_STEP_VERIFY_AGENT_FAILED',
+				'CYBERBRICK_PROVISION_STEP_STORE_SECRETS_FAILED',
 			],
 			'OTA setup progress step messages should be localized by step code'
 		);

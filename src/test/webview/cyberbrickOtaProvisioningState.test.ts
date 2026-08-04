@@ -15,9 +15,18 @@ interface ProvisioningApi {
 	COUNTED_STEPS: readonly CountedStep[];
 	createInitialState(): ProvisioningState;
 	reduceState(state: ProvisioningState, event: any): ProvisioningState;
-	parseProgressMessage(message: unknown, activeRequestId: string): any | null;
-	parseResultMessage(message: unknown, activeRequestId: string): any | null;
+	parseProgressMessage(message: unknown, activeRequestId: string | null): any | null;
+	parseResultMessage(message: unknown, activeRequestId: string | null): any | null;
 }
+
+const FAILED_STEP_MESSAGE_KEYS: Record<CountedStep, string> = {
+	'detect-usb': 'CYBERBRICK_PROVISION_STEP_DETECT_USB_FAILED',
+	'read-device-id': 'CYBERBRICK_PROVISION_STEP_READ_DEVICE_ID_FAILED',
+	'install-agent': 'CYBERBRICK_PROVISION_STEP_INSTALL_AGENT_FAILED',
+	'configure-wifi': 'CYBERBRICK_PROVISION_STEP_CONFIGURE_WIFI_FAILED',
+	'verify-agent': 'CYBERBRICK_PROVISION_STEP_VERIFY_AGENT_FAILED',
+	'store-secrets': 'CYBERBRICK_PROVISION_STEP_STORE_SECRETS_FAILED',
+};
 
 const helperPath = path.resolve(__dirname, '../../../media/js/cyberbrickOtaProvisioningState.js');
 const api = require(helperPath) as ProvisioningApi;
@@ -71,6 +80,7 @@ describe('CyberBrick OTA provisioning state helper', () => {
 		}
 		succeeded = api.reduceState(succeeded, { type: 'result', requestId: 'request-1', success: true, status: 'succeeded' });
 		assert.strictEqual(succeeded.status, 'succeeded');
+		assert.strictEqual(succeeded.activeRequestId, null);
 		assert.strictEqual(succeeded.completedSteps.size, 6);
 		assert.strictEqual(succeeded.summaryKey, 'CYBERBRICK_PROVISION_SUCCEEDED');
 
@@ -79,8 +89,10 @@ describe('CyberBrick OTA provisioning state helper', () => {
 		failed = progress(failed, 'read-device-id', false, { error: { code: 'device-id-read-failed' } });
 		failed = api.reduceState(failed, { type: 'result', requestId: 'request-2', success: false, status: 'failed' });
 		assert.strictEqual(failed.status, 'failed');
+		assert.strictEqual(failed.activeRequestId, null);
 		assert.strictEqual(failed.completedSteps.size, 1);
 		assert.strictEqual(failed.failedStep, 'read-device-id');
+		assert.strictEqual(failed.steps.get('read-device-id')?.messageKey, FAILED_STEP_MESSAGE_KEYS['read-device-id']);
 		assert.strictEqual(failed.summaryKey, 'CYBERBRICK_PROVISION_FAILED');
 	});
 
@@ -99,7 +111,23 @@ describe('CyberBrick OTA provisioning state helper', () => {
 			assert.strictEqual(state.completedSteps.size, failedIndex);
 			assert.strictEqual(state.failedStep, expectedFailedStep);
 			assert.strictEqual(state.steps.get(expectedFailedStep)?.status, 'failed');
+			assert.strictEqual(state.steps.get(expectedFailedStep)?.messageKey, FAILED_STEP_MESSAGE_KEYS[expectedFailedStep]);
 		});
+	});
+
+	it('rejects duplicate terminal results after the active request has finished', () => {
+		const result = {
+			command: 'cyberbrickOtaProvisionResult',
+			requestId: 'active',
+			success: false,
+			error: { code: 'wifi-auth-failed', message: 'Check Wi-Fi.', nextActions: ['Try again.'] },
+		};
+		let state = start('active');
+		const parsed = api.parseResultMessage(result, state.activeRequestId);
+		assert.ok(parsed);
+		state = api.reduceState(state, parsed);
+		assert.strictEqual(state.activeRequestId, null);
+		assert.strictEqual(api.parseResultMessage(result, state.activeRequestId), null);
 	});
 
 	it('resets a finished state only when a new non-empty request starts', () => {
@@ -165,6 +193,7 @@ describe('CyberBrick OTA provisioning state helper', () => {
 			[],
 			{ ...success, requestId: 'stale' },
 			{ ...success, success: 'true' },
+			{ ...success, payload: { status: 'succeeded' } },
 			{ ...success, payload: { ...success.payload, status: 'unknown' } },
 			{ ...success, payload: { ...success.payload, wifiPassword: 'secret' } },
 			{ ...failure, error: null },

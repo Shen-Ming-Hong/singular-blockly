@@ -155,6 +155,7 @@
 - [x] T043 依 `security-checker` 檢查 `src/webview/messageHandler.ts`、`src/services/cyberbrickOtaProvisioningService.ts`、`media/js/blocklyEdit.js` 的 message validation、秘密處理、log 與 DOM 輸出，修正所有高風險問題
 - [x] T044 執行 `npm run compile`、`npm run lint`、`npm run validate:i18n`、`npm test`，將最終結果與任何環境限制記錄於 `specs/064-cyberbrick-naming-ota-progress/quickstart.md`
 - [x] T045 依 `specs/064-cyberbrick-naming-ota-progress/quickstart.md` 完成繁中／英文、鍵盤／ARIA、舊工作區與 CyberBrick OTA 實機或等效 stub 驗收，並更新該檔完成條件
+- [x] T046 依本地 Codex Code Review 核准結果補強 terminal request 失效、success panel state 必填、六階段失敗文案與完成／失敗進度保持展開的回歸測試及修正，並完成 re-review
 
 ---
 
