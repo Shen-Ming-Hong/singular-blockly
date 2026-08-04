@@ -16,7 +16,7 @@ const PARAM_SHADOW_XML_MAP = {
 };
 window.PARAM_SHADOW_XML_MAP = PARAM_SHADOW_XML_MAP;
 
-const CYBERBRICK_NAMING_WARNING_ID = 'cyberbrick-naming';
+const CYBERBRICK_FUNCTION_NAMING_WARNING_ID = 'cyberbrick-naming';
 
 function getCyberBrickNameValidationApi() {
 	return window.cyberbrickNameValidation;
@@ -59,11 +59,11 @@ function createCyberBrickNameFieldValidator(kind) {
 			duplicateNames: getCyberBrickDuplicateNames(block, kind),
 		});
 		if (result.severity === 'valid') {
-			block?.setWarningText(null, CYBERBRICK_NAMING_WARNING_ID);
+			block?.setWarningText(null, CYBERBRICK_FUNCTION_NAMING_WARNING_ID);
 			return result.normalizedName;
 		}
 		const message = window.languageManager?.getMessage(result.messageKey, result.code) || result.code;
-		block?.setWarningText(message, CYBERBRICK_NAMING_WARNING_ID);
+		block?.setWarningText(message, CYBERBRICK_FUNCTION_NAMING_WARNING_ID);
 		if (result.severity === 'error') {
 			return null;
 		}

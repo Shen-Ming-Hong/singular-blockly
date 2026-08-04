@@ -21,7 +21,7 @@ describe('CyberBrick naming WebView contract', () => {
 		assertContainsAll(
 			source,
 			[
-				"const CYBERBRICK_NAMING_WARNING_ID = 'cyberbrick-naming'",
+				"const CYBERBRICK_FUNCTION_NAMING_WARNING_ID = 'cyberbrick-naming'",
 				'createCyberBrickNameFieldValidator',
 				"window.getCurrentBoard() !== 'cyberbrick'",
 				"createCyberBrickNameFieldValidator('function')",
@@ -31,9 +31,25 @@ describe('CyberBrick naming WebView contract', () => {
 				"result.severity === 'error'",
 				'return null',
 				'result.normalizedName',
-				'setWarningText(message, CYBERBRICK_NAMING_WARNING_ID)',
+				'setWarningText(message, CYBERBRICK_FUNCTION_NAMING_WARNING_ID)',
 			],
 			'CyberBrick inline name validators'
+		);
+	});
+
+	it('does not redeclare the warning identifier across classic WebView scripts', () => {
+		const functionsSource = readWorkspaceFile(functionsPath);
+		const editorSource = readWorkspaceFile(editorPath);
+		const warningIdentifierPattern = /const\s+([A-Z0-9_]+)\s*=\s*'cyberbrick-naming'/;
+		const functionsIdentifier = functionsSource.match(warningIdentifierPattern)?.[1];
+		const editorIdentifier = editorSource.match(warningIdentifierPattern)?.[1];
+
+		assert(functionsIdentifier, 'function blocks should declare a dedicated warning identifier');
+		assert(editorIdentifier, 'editor should declare a dedicated warning identifier');
+		assert.notStrictEqual(
+			functionsIdentifier,
+			editorIdentifier,
+			'classic scripts share one global lexical scope and must not redeclare the same const'
 		);
 	});
 
