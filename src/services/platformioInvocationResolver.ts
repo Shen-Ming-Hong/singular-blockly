@@ -142,7 +142,9 @@ function getWindowsSystemDriveCoreDir(
 	homeDir: string,
 	env: NodeJS.ProcessEnv
 ): string | null {
-	const driveRoot = path.win32.parse(homeDir).root || (env['SystemDrive'] ? `${env['SystemDrive']}\\` : '');
+	const systemDrive = env['SystemDrive']?.trim();
+	const systemDriveRoot = systemDrive ? path.win32.parse(`${systemDrive}\\`).root : '';
+	const driveRoot = systemDriveRoot || path.win32.parse(homeDir).root;
 	return driveRoot ? path.win32.join(driveRoot, '.platformio') : null;
 }
 

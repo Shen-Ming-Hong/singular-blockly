@@ -65,6 +65,28 @@ suite('PlatformioInvocationResolver Tests', () => {
 		assert.strictEqual(result.invocation?.source, 'system-drive-core-dir');
 	});
 
+	test('prefers SystemDrive when the Windows user profile is on another drive', async () => {
+		const pythonPath = 'C:\\.platformio\\penv\\Scripts\\python.exe';
+		const probe = sinon.stub().resolves({
+			stdout: 'PlatformIO Core, version 6.1.19',
+			stderr: '',
+		});
+
+		const result = await resolvePlatformioInvocation({
+			existsSync: filePath => filePath === pythonPath,
+			probe,
+			platform: 'win32',
+			homeDir: 'D:\\Users\\student',
+			env: {
+				PATH: '',
+				SystemDrive: 'C:',
+			},
+		});
+
+		assert.strictEqual(result.invocation?.command, pythonPath);
+		assert.strictEqual(result.invocation?.source, 'system-drive-core-dir');
+	});
+
 	test('honors an executable from platformio-ide.customPATH', async () => {
 		const pioPath = '/official/penv/bin/pio';
 		const probe = sinon.stub().resolves({

@@ -11,6 +11,7 @@ import * as vscode from 'vscode';
 import { execFile, spawn } from 'child_process';
 import { log } from './logging';
 import { SettingsManager } from './settingsManager';
+import { isProviderInstalled } from './penvProviderService';
 import {
 	PlatformioInvocation,
 	PlatformioInvocationResolution,
@@ -76,6 +77,7 @@ export class ArduinoUploader {
 	private compileTimeout: number;
 	private uploadTimeout: number;
 	private settingsManager: SettingsManager;
+	private readonly providerInstalled: () => boolean;
 	private startTime: number = 0;
 
 	/**
@@ -85,16 +87,21 @@ export class ArduinoUploader {
 	 * @param fileSystem 檔案系統（可選，用於測試）
 	 * @param settingsManager 設定管理器（可選，用於測試）
 	 * @param streamingExecutor 串流執行器（可選，用於測試）
+	 * @param providerInstalled provider 偵測函式（可選，用於測試）
 	 */
 	constructor(
 		private workspacePath: string,
 		executor?: CommandExecutor,
 		fileSystem?: FileSystemInterface,
 		settingsManager?: SettingsManager,
-		streamingExecutor?: StreamingCommandExecutor
+		streamingExecutor?: StreamingCommandExecutor,
+		providerInstalled?: () => boolean
 	) {
 		this.settingsManager = settingsManager || new SettingsManager(workspacePath);
 		this.fileSystem = fileSystem || fs;
+		this.providerInstalled = providerInstalled ?? (() => isProviderInstalled({
+			getExtension: id => vscode.extensions.getExtension(id),
+		}));
 		this.compileTimeout = DEFAULT_COMPILE_TIMEOUT;
 		this.uploadTimeout = DEFAULT_UPLOAD_TIMEOUT;
 
@@ -230,6 +237,16 @@ export class ArduinoUploader {
 
 	private async ensurePlatformioInvocation(): Promise<PlatformioInvocation | null> {
 		return this.pioInvocation ?? (await this.resolveWorkingPlatformioInvocation()).invocation;
+	}
+
+	private getPlatformioUnavailableMessage(): string {
+		if ((this.lastPioResolution?.foundCandidates.length ?? 0) > 0) {
+			return 'PlatformIO Core was found but could not be started. Check the PlatformIO diagnostic panel for details.';
+		}
+		if (this.providerInstalled()) {
+			return 'PlatformIO provider is installed, but Core is not ready yet. Wait for initialization to finish, then try again.';
+		}
+		return 'PlatformIO environment not found. Open the Blockly editor to trigger automatic setup.';
 	}
 
 	private async executePlatformio(
@@ -1122,10 +1139,7 @@ export class ArduinoUploader {
 			sendProgress('checking_pio', 15, 'Checking compiler...');
 			const hasPio = await this.checkPioInstalled();
 			if (!hasPio) {
-				const foundButUnavailable = (this.lastPioResolution?.foundCandidates.length ?? 0) > 0;
-				const notReady = foundButUnavailable
-					? 'PlatformIO Core was found but could not be started. Check the PlatformIO diagnostic panel for details.'
-					: 'PlatformIO environment not found. Open the Blockly editor to trigger automatic setup.';
+				const notReady = this.getPlatformioUnavailableMessage();
 				sendProgress('failed', 15, notReady, undefined, 'PIO_NOT_FOUND');
 				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found', notReady);
 			}

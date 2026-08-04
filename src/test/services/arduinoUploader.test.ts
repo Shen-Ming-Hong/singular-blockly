@@ -388,6 +388,29 @@ suite('ArduinoUploader Tests', () => {
 
 			assert.strictEqual(result.success, false, 'Should fail');
 			assert.strictEqual(result.error?.stage, 'checking_pio', 'Should fail at checking_pio stage');
+			assert.ok(result.error?.details?.includes('Open the Blockly editor'));
+		});
+
+		test('Should report initialization when a provider exists without Core', async () => {
+			const request: ArduinoUploadRequest = {
+				code: 'void setup() {}',
+				board: 'uno',
+			};
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(false);
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				() => true
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.success, false);
+			assert.ok(result.error?.details?.includes('Core is not ready yet'));
+			assert.ok(!result.error?.details?.includes('Open the Blockly editor'));
 		});
 
 		test('Should fail on compilation error', async () => {

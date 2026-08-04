@@ -96,7 +96,7 @@ Phase 3 + Phase 4 + T018 → T019 → T020 → T021
 
 - [X] T018 [P] 在所有 15 個 `media/locales/*/messages.js` 檔案中加入 4 個新 i18n key：`PENV_PROVIDER_NOT_INSTALLED`、`PENV_PROVIDER_INSTALL_BUTTON`、`PENV_PROVIDER_INSTALL_FAILED`、`PENV_PROVIDER_PENDING`——以 `zh-hant`（繁體中文）為基準翻譯，其餘 14 個語系（`bg`、`cs`、`de`、`en`、`es`、`fr`、`hu`、`it`、`ja`、`ko`、`pl`、`pt-br`、`ru`、`tr`）以 AI 翻譯從 `zh-hant` 基準版本生成，翻譯風格應與各語系現有字串一致
 - [X] T019 執行 `npm run validate:i18n` 確認全部 15 個語系驗證通過，修正任何缺漏 key
-- [X] T020 執行 `npm test`：934 項通過、1 項略過；另有 1 項既有且與本 PR 無關的 MicroPython OTA 測試失敗，已明確記錄並交付測試 VSIX
+- [X] T020 執行 `npm test`：936 項通過、1 項略過；另有 1 項既有且與本 PR 無關的 MicroPython OTA 測試失敗，已明確記錄並交付測試 VSIX
 - [X] T021 minor 版本升級：更新 `package.json` 的 `version` 欄位，在 `CHANGELOG.md` 的「未發布」區段新增本功能條目（繁體中文 + English，含新功能說明與 VSCodium 相容性說明）
 - [ ] T022 手動驗收測試：依 `quickstart.md` Scenario 3 在 VSCodium + pioarduino 環境執行完整引導安裝流程（通知出現 → 安裝 → reload → penv 自動建立 → CyberBrick 上傳成功），對應 SC-001；記錄測試結果
 
