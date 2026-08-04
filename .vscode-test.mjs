@@ -12,6 +12,7 @@ export default defineConfig([
 		files: 'out/test/**/*.test.js',
 		workspaceFolder: testWorkspace,
 		launchArgs: [`--extensions-dir=${extensionsDir}`, '--disable-workspace-trust'],
+		env: { NODE_ENV: 'test' },
 		// Exclude integration tests from unit test run
 		mocha: {
 			grep: '^(?!.*Integration)',

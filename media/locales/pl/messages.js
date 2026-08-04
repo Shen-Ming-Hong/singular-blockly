@@ -1330,8 +1330,6 @@ window.languageManager.loadMessages('pl', {
 	TXT_PROCESS_REQUIRED_WARNING: 'Obszar roboczy TXT wymaga co najmniej jednego bloku „Proces TXT”.',
 	CATEGORY_TXT: 'TXT Controller',
 
-        PENV_PROVIDER_NOT_INSTALLED: 'Środowisko PlatformIO nie jest skonfigurowane. Funkcje przesyłania wymagają PlatformIO IDE (VS Code Marketplace) lub pioarduino (Open VSX dla VSCodium).',
-        PENV_PROVIDER_INSTALL_BUTTON: 'Zainstaluj środowisko rozszerzenia',
         PENV_PROVIDER_INSTALL_FAILED: 'Automatyczna instalacja nie powiodła się. Zainstaluj "PlatformIO IDE" (VS Code Marketplace) lub "pioarduino" (Open VSX dla VSCodium) z panelu rozszerzeń.',
         PENV_PROVIDER_PENDING: 'Inicjalizacja środowiska PlatformIO, proszę czekać...',
 

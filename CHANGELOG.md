@@ -19,8 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       Removed hard `extensionDependencies` on `platformio.platformio-ide` from `package.json`, enabling the extension to activate in VSCodium, Firebase Studio, Google Antigravity and other Open VSX environments
     - 新增 `PenvProviderService`（`src/services/penvProviderService.ts`），集中管理 penv provider 偵測、安裝結果與自動 fallback（platformio → pioarduino → Extensions 面板）
       Added `PenvProviderService` centralizing penv provider detection, explicit installation outcomes, and auto-fallback (platformio → pioarduino → Extensions panel)
-    - 所有板子工作區開啟積木編輯器時若未安裝任何 penv provider，觸發 VS Code 安裝確認，維持舊版共同前置環境
-      All board workspaces trigger the VS Code provider installation confirmation when opening Blockly, preserving the previous shared prerequisite
+    - 所有板子工作區開啟積木編輯器時若未安裝任何 penv provider，直接啟動自動安裝，不增加前置確認按鈕，維持舊版共同前置環境
+      All board workspaces start provider installation directly when opening Blockly, without an extra pre-install confirmation button, preserving the previous shared prerequisite
     - 新增可執行的 PlatformIO 啟動方式解析：支援 `platformio-ide.customPATH`、`PLATFORMIO_CORE_DIR`、Windows 系統磁碟與 PATH；`pio.exe` 無法執行時可改用 penv Python 的 `-m platformio`
       Added executable PlatformIO invocation resolution for customPATH, `PLATFORMIO_CORE_DIR`, Windows system-drive installs, and PATH, with penv Python `-m platformio` fallback when `pio.exe` cannot run
     - PlatformIO 診斷面板同步辨識自訂 Core 與 Python module fallback，區分 direct launcher 失敗與 Core 真正不可用
@@ -29,10 +29,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       Arduino build, upload, and Serial Monitor share the verified PlatformIO invocation; CyberBrick Monitor uses whichever Python or mpremote backend actually detected the device
     - provider 安裝失敗時不再顯示 reload 或「環境已就緒」，只開啟 Extensions 搜尋並提供手動安裝說明
       Failed provider installation no longer reports ready or offers reload; it opens Extensions search with manual installation guidance
+    - CyberBrick USB 上傳在 PlatformIO Python 不可用時，改以 provider extension 狀態區分「尚未安裝」與「仍在初始化」，不再以固定 `~/.platformio` 路徑誤判自訂 Core 位置
+      CyberBrick USB upload now distinguishes a missing provider from an initializing environment using provider extension state, avoiding fixed-`~/.platformio` misclassification for custom Core locations
     - `settingsManager.ts` 加入 provider 偵測保護，僅在 PlatformIO 或 pioarduino 已安裝時才寫入 `platformio-ide.*` 工作區設定
       `settingsManager.ts` now guards `platformio-ide.*` workspace settings, only writing them when a penv provider is detected
-    - 全部 15 個語系（zh-hant、en、de、ja、ko、fr、es、pt-br、ru、it、pl、cs、hu、tr、bg）新增 4 個 i18n key：`PENV_PROVIDER_NOT_INSTALLED`、`PENV_PROVIDER_INSTALL_BUTTON`、`PENV_PROVIDER_INSTALL_FAILED`、`PENV_PROVIDER_PENDING`
-      Added 4 i18n keys across all 15 locales for notification messages
+    - 全部 15 個語系（zh-hant、en、de、ja、ko、fr、es、pt-br、ru、it、pl、cs、hu、tr、bg）新增安裝失敗、初始化中與重新載入提示
+      Added localized installation-failure, initialization, and reload messages across all 15 locales
 
 ### 🧪 測試 Tests
 
@@ -40,6 +42,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Added regression coverage for provider install outcomes, PlatformIO invocation fallback, Windows Unicode paths, and Serial Monitor backend selection
 - 更新 `settingsManager.test.ts`：加入 provider 已安裝與未安裝兩種情境的 settings guard 測試
   Updated `settingsManager.test.ts` with provider-installed and no-provider settings guard test cases
+- 單元測試執行時明確設定 `NODE_ENV=test`，避免測試誤觸真實 extension 安裝流程
+  Unit tests now set `NODE_ENV=test` explicitly so they cannot trigger real extension installation
+
+### 🔧 維護 Maintenance
+
+- 發布工作流程先產生單一 VSIX，再由互相獨立的 Marketplace 與 Open VSX jobs 發布；任一 registry 失敗時可單獨重試，不會重複發布另一端
+  The release workflow now builds one VSIX and publishes it through independent Marketplace and Open VSX jobs, allowing failed-registry retries without republishing the successful registry
 
 ## [0.82.18] - 2026-07-11
 

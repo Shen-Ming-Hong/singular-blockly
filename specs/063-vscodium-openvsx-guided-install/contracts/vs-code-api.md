@@ -37,7 +37,7 @@ await vscode.commands.executeCommand(
 
 **回傳**：`Thenable<void>`（Promise）
 
-**成功**：安裝完成，VS Code 自動顯示「Reload Required」提示。
+**成功**：安裝完成後由 Singular Blockly 顯示「Reload Now」提示。
 
 **失敗情境**：
 - Extension ID 在當前 marketplace 不存在 → **rejected Promise**（實作時需以單元測試確認錯誤型別）
@@ -82,18 +82,16 @@ await vscode.commands.executeCommand('workbench.extensions.search', 'platformio'
 
 ## `vscode.window.showInformationMessage`
 
-**用途**：顯示非阻擋式通知。
+**用途**：只顯示安裝失敗說明或安裝成功後的重新載入提示；不作為安裝前確認。
 
 ```typescript
-const selected = await vscode.window.showInformationMessage(
-  message,    // 通知主訊息（使用 i18n key 翻譯後的字串）
-  buttonText  // 「安裝擴充功能環境」按鈕
-);
-// selected === buttonText → 使用者點擊按鈕
-// selected === undefined  → 使用者 dismiss
+const selected = await vscode.window.showInformationMessage(reloadMessage, reloadButton);
+if (selected === reloadButton) {
+  await vscode.commands.executeCommand('workbench.action.reloadWindow');
+}
 ```
 
-**行為**：非 modal，使用者可繼續操作 Blockly 同時看到通知。
+**行為**：provider 缺失時直接執行 `installExtension`，不先顯示自訂確認按鈕。兩個 provider 都失敗時則顯示不含按鈕的手動安裝說明。
 
 ---
 

@@ -23,7 +23,7 @@
 - 安裝腳本（`get-platformio.py`）在 extension activation 時由 `platformio-node-helpers` / `pioarduino-node-helpers` 自動呼叫。
 - pioarduino 原始碼確認使用相同的安裝腳本，產生相同的 `~/.platformio/penv/` 結構。
 
-**影響**：從規格中移除「需先執行 build」的說明；通知訊息不需要包含此步驟指引。
+**影響**：從規格中移除「需先執行 build」的說明；重新載入提示不需要包含此步驟指引。
 
 ---
 
@@ -48,11 +48,11 @@
 
 ---
 
-## 決策 4：PenvProviderService 依賴注入與 i18n 整合
+## 決策 4：直接安裝與 PenvProviderService 依賴注入
 
-**決策**：`PenvProviderService` 接受 `PenvProviderServiceDeps` 介面進行依賴注入，所有 VS Code API 呼叫透過此介面傳入。另新增可選的 `getMsg` 欄位，由呼叫方提供 `localeService.getLocalizedMessage` 以實現多語言通知。
+**決策**：未偵測到 provider 時直接呼叫 `installExtension`，不增加自訂的前置確認通知。`PenvProviderService` 接受 `PenvProviderServiceDeps` 介面進行依賴注入，所有 VS Code API 呼叫透過此介面傳入。另新增可選的 `getMsg` 欄位，由呼叫方提供 `localeService.getLocalizedMessage` 以實現多語言失敗與重新載入提示。
 
-**i18n 整合方案**：`createDefaultDeps(localeService?)` 接受可選的 `LocaleService`，展入後通知文字使用當前 UI 語言顯示；未傳入時退回英文 fallback。呼叫方（`webviewManager`）傳入 `this.localeService`。
+**i18n 整合方案**：`createDefaultDeps(localeService?)` 接受可選的 `LocaleService`，傳入後提示文字使用當前 UI 語言顯示；未傳入時退回英文 fallback。呼叫方（`webviewManager`）傳入 `this.localeService`。
 
 **備選方案考慮**：將所有語言字串硬編碼到服務決不够，被拓絕。
 
@@ -90,7 +90,7 @@
 
 | 方案 | 評估 |
 |------|------|
-| 兩個按鈕（使用者手選平台）| 對小學生不夠直覺；被拒絕 |
+| 安裝前顯示一個或兩個確認按鈕 | 增加不必要步驟；直接安裝並自動 fallback 較符合既有共同前置行為，因此拒絕 |
 | `uriScheme` 偵測平台 | 無法涵蓋所有 Open VSX 平台；被拒絕 |
 | 只在上傳時觸發（不在 activation）| 對新手太晚；積木編輯器開啟時對所有板子觸發被採納 |
 | 用 post-install wizard 引導 first build | 規格確認不需要（penv 自動建立）；超出範圍 |

@@ -8,7 +8,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { log } from './logging';
 import { getDefaultPlatformioExecutablePath, getExecutableDirectory, getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
-import { checkPenvExists } from './penvProviderService';
+import { isProviderInstalled } from './penvProviderService';
 import * as vscode from 'vscode';
 import { CYBERBRICK_OTA_AGENT_TARGET_VERSION, WifiNetworkSuggestion } from '../types/cyberbrickUpload';
 import {
@@ -127,8 +127,14 @@ export class MicropythonUploader {
 	 * 建立 MicropythonUploader 實例
 	 * @param workspacePath 工作區路徑
 	 * @param executor 指令執行器（可選，用於測試）
+	 * @param providerInstalled provider 安裝狀態探測（可選，用於測試）
 	 */
-	constructor(private workspacePath: string, executor?: CommandExecutor) {
+	constructor(
+		private workspacePath: string,
+		executor?: CommandExecutor,
+		private readonly providerInstalled: () => boolean = () =>
+			isProviderInstalled({ getExtension: id => vscode.extensions.getExtension(id) })
+	) {
 		// 使用預設的 child_process 執行器或注入的執行器
 		this.executor = executor || {
 			exec: (command: string) => {
@@ -300,14 +306,13 @@ export class MicropythonUploader {
 
 		const hasPython = await this.checkPythonEnvironment();
 		if (!hasPython) {
-			// penv provider 應已在積木編輯器開啟時自動安裝，此處只顯示簡單提示
-			const detail = checkPenvExists()
+			const detail = this.providerInstalled()
 				? 'PlatformIO is still initializing. Please wait and try again.'
 				: 'Open the Blockly editor to trigger automatic setup, or manually install PlatformIO IDE (VS Code Marketplace) or pioarduino (Open VSX for VSCodium).';
 			return {
 				success: false,
 				stage: 'checking_tool',
-				message: 'PlatformIO Python environment (~/.platformio/penv) not found.',
+				message: 'PlatformIO Python environment is not available.',
 				details: detail,
 			};
 		}

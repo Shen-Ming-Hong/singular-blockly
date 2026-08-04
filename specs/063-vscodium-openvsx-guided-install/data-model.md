@@ -50,7 +50,7 @@ ProviderInstallResult
 ```
 偵測 provider extension
   ├── 未安裝
-  │     └── VS Code 安裝確認
+  │     └── 直接啟動 provider 安裝
   │           ├── 安裝成功 → 顯示 reload（只代表 provider 已安裝）
   │           └── 安裝失敗 → [manual-required] → 開啟 Extensions 面板
   │
@@ -69,7 +69,7 @@ provider 安裝狀態與 Core 可執行狀態刻意分開，不再以 Python 檔
 
 | Key | 說明 | 範例（繁體中文）|
 |-----|------|----------------|
-| `PENV_PROVIDER_NOT_INSTALLED` | 通知主訊息 | `PlatformIO 環境尚未設定。點擊安裝以啟用上傳功能。` |
-| `PENV_PROVIDER_INSTALL_BUTTON` | 安裝按鈕文字 | `安裝擴充功能環境` |
 | `PENV_PROVIDER_INSTALL_FAILED` | 兩者均安裝失敗 | `自動安裝失敗。請在擴充功能市集搜尋 PlatformIO IDE 或 pioarduino 並手動安裝。` |
 | `PENV_PROVIDER_PENDING` | 已安裝但 penv 初始化中 | `PlatformIO 環境初始化中，請稍候再試。` |
+| `PENV_PROVIDER_RELOAD_REQUIRED` | provider 安裝成功後的重新載入提示 | `PlatformIO 擴充功能已安裝完成。請重新載入以完成設定。` |
+| `PENV_PROVIDER_RELOAD_BUTTON` | 重新載入按鈕文字 | `立即重新載入` |

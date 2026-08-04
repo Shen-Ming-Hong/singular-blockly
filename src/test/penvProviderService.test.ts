@@ -112,7 +112,6 @@ describe('PenvProviderService', () => {
 			const showInformationMessage = sinon.stub().resolves(undefined);
 			const deps = createMockDeps({ executeCommand, showInformationMessage });
 			await showInstallNotification(deps);
-			// VS Code 自己的確認對話框處理使用者互動，我們不再疊加通知
 			assert.ok(
 				executeCommand.calledWith('workbench.extensions.installExtension', 'platformio.platformio-ide'),
 				'should trigger installExtension directly'

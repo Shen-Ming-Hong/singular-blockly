@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as os from 'os';
-import * as path from 'path';
-import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { log } from './logging';
 
@@ -41,24 +38,6 @@ async function t(deps: PenvProviderServiceDeps, key: string, fallback: string): 
  */
 export function isProviderInstalled(deps: Pick<PenvProviderServiceDeps, 'getExtension'>): boolean {
 	return PROVIDER_IDS.some(id => deps.getExtension(id) !== undefined);
-}
-
-// ─── T005: checkPenvExists ─────────────────────────────────────────────────────
-
-/**
- * 以 fs.existsSync 確認 ~/.platformio/penv/ 的 Python 執行檔是否存在。
- * Windows 使用 Scripts/python.exe；macOS/Linux 使用 bin/python。
- *
- * ⚠️ 注意：python 在 venv 建立初期就會出現（PlatformIO Core 安裝尚未完成）。
- * 若需確認 Core 是否完全就緒，應使用 checkPioReady()。
- */
-export function checkPenvExists(): boolean {
-	const homeDir = os.homedir();
-	const pythonPath =
-		process.platform === 'win32'
-			? path.join(homeDir, '.platformio', 'penv', 'Scripts', 'python.exe')
-			: path.join(homeDir, '.platformio', 'penv', 'bin', 'python');
-	return fs.existsSync(pythonPath);
 }
 
 // ─── T007: attemptInstall ──────────────────────────────────────────────────────
@@ -120,14 +99,12 @@ export async function attemptInstall(
 // ─── T009: showInstallNotification ────────────────────────────────────────────
 
 /**
- * 自動安裝 penv provider extension，並以非阻擋式通知告知使用者進行中。
+ * 自動安裝 penv provider extension；安裝前不顯示自訂確認通知。
  * 不需要使用者點擊按鈕——直接在背景觸發安裝流程，讓初學者無需理解細節。
  * 安裝失敗時由 attemptInstall() 開啟 Extensions 面板供手動選擇。
  */
 export async function showInstallNotification(deps: PenvProviderServiceDeps): Promise<void> {
-	log('[PenvProviderService] Auto-installing penv provider — VS Code will show confirmation dialog', 'info');
-	// VS Code 的 workbench.extensions.installExtension 會自己顯示確認對話框
-	// 不需要在安裝前另外顯示我們自己的通知，避免混淆
+	log('[PenvProviderService] Auto-installing penv provider', 'info');
 	const result = await attemptInstall(deps);
 	if (result.status === 'installed') {
 		await showReloadButton(deps);

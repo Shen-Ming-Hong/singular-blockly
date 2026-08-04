@@ -20,7 +20,7 @@
 
 **專案類型**：VS Code Extension（extension host TypeScript）
 
-**效能目標**：積木編輯器開啟時立即觸發 provider 安裝確認；PlatformIO 候選版本探測每個最多 5 秒
+**效能目標**：積木編輯器開啟時立即觸發 provider 自動安裝；PlatformIO 候選版本探測每個最多 5 秒
 
 **限制**：不破壞現有測試；Windows（`Scripts/`）與 macOS/Linux（`bin/`）路徑差異、非 ASCII 使用者路徑與自訂 Core 位置必須涵蓋
 
@@ -32,7 +32,7 @@
 |------|------|------|
 | I — 簡潔可維護 | `PenvProviderService` 職責單一；重試邏輯封裝於服務層 | ✅ |
 | II — 模組化 | 新服務集中管理，避免在多個 uploader 重複實作通知邏輯 | ✅ |
-| III — 避免過度開發 | 僅實作規格所需功能；無 post-install wizard，無自訂 reload 按鈕 | ✅ |
+| III — 避免過度開發 | 僅實作規格所需功能；無前置確認步驟或 post-install wizard，安裝成功後只提供必要的 reload 按鈕 | ✅ |
 | VI — 結構化日誌 | 所有新偵測邏輯使用 `log()` 記錄，不使用 `console.log` | ✅ |
 | VII — 測試覆蓋率 | FR-014 明確要求新邏輯須有單元測試覆蓋 | ✅ |
 | VIII — 純函數/模組架構 | provider 安裝與 Core invocation 探測皆透過依賴注入，可在測試中覆寫 VS Code API、檔案系統與程序執行 | ✅ |
@@ -62,7 +62,7 @@ specs/063-vscodium-openvsx-guided-install/
 src/
 ├── webview/webviewManager.ts           ← 修改：所有板子開啟積木編輯器時檢查 provider
 ├── services/
-│   ├── penvProviderService.ts          ← 新增：集中化 provider 偵測、通知、安裝 fallback
+│   ├── penvProviderService.ts          ← 新增：集中化 provider 偵測、自動安裝與 fallback
 │   ├── platformioInvocationResolver.ts ← 新增：可執行啟動方式與 Python module fallback
 │   ├── arduinoUploader.ts              ← 修改：編譯與上傳沿用已驗證的啟動方式
 │   ├── micropythonUploader.ts          ← 修改：upload-time penv check + 重試 + 更新錯誤訊息
@@ -70,11 +70,11 @@ src/
 │   ├── arduinoMonitorService.ts        ← 修改：沿用已驗證的 PlatformIO 啟動方式
 │   └── settingsManager.ts              ← 已由 PR#91 更新（provider guard）
 └── test/
-    ├── penvProviderService.test.ts     ← 新增：provider 偵測、通知、安裝 fallback 的單元測試
+    ├── penvProviderService.test.ts     ← 新增：provider 偵測、自動安裝與 fallback 的單元測試
     └── settingsManager.test.ts         ← 已由 PR#91 更新
 
 package.json                            ← 移除 extensionDependencies
-media/locales/*/messages.js             ← 15 個語系：新增通知文字 i18n key
+media/locales/*/messages.js             ← 15 個語系：新增安裝失敗、初始化與重新載入提示
 ```
 
 **結構決策**：採用單一擴充套件架構（Option 1）。`PenvProviderService` 作為新服務，符合 Principle VIII（模組化）且在三個上傳路徑中可重複使用。
@@ -88,8 +88,8 @@ media/locales/*/messages.js             ← 15 個語系：新增通知文字 i1
 1. **installExtension 指令**：`workbench.extensions.installExtension` 為 VS Code 官方記載的內建指令。在 Open VSX 環境嘗試安裝不存在的 extension ID 時，預期會以 rejected Promise 回傳（需在實作階段以單元測試驗證確切錯誤類型）。
 2. **penv 自動建立**：PlatformIO IDE 與 pioarduino 在首次 activation 後**自動**執行安裝腳本建立 penv，無需使用者手動執行編譯。因此「需先執行 build」的說明已從規格移除。
 3. **板子類型值**：`mainJson.board` 的值為 `'none'`（預設）、`'cyberbrick'`、`'txt'`，或 Arduino 板名（例如 `esp32dev`、`uno` 等非以上三者的值）。
-4. **通知 API**：`vscode.window.showInformationMessage(message, ...items)` 回傳被選中的 item 字串或 `undefined`（使用者 dismiss），在 extension host 可直接呼叫。
-5. **VS Code 通知機制**：`vscode.window.showInformationMessage` 是非阻擋式，符合讓使用者可同時操作 Blockly 的需求。
+4. **提示 API**：`vscode.window.showInformationMessage(message, ...items)` 用於安裝失敗說明與成功後的 reload 按鈕；安裝前不另外呼叫。
+5. **直接安裝機制**：provider 缺失時立即呼叫 `workbench.extensions.installExtension`，避免增加前置確認步驟。
 
 ## Phase 1：設計
 
@@ -138,10 +138,10 @@ export function createDefaultDeps(localeService?: LocaleServiceLike): PenvProvid
 
 | Key | 用途 |
 |-----|------|
-| `PENV_PROVIDER_NOT_INSTALLED` | 通知主訊息 |
-| `PENV_PROVIDER_INSTALL_BUTTON` | 按鈕文字 |
 | `PENV_PROVIDER_INSTALL_FAILED` | 兩個 extension 都安裝失敗時的訊息 |
 | `PENV_PROVIDER_PENDING` | 已安裝但 penv 仍初始化中的訊息 |
+| `PENV_PROVIDER_RELOAD_REQUIRED` | provider 安裝成功後的重新載入訊息 |
+| `PENV_PROVIDER_RELOAD_BUTTON` | 重新載入按鈕文字 |
 
 ### Phase 1 後憲章重新確認
 

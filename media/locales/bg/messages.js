@@ -1332,8 +1332,6 @@ window.languageManager.loadMessages('bg', {
 	TXT_PROCESS_REQUIRED_WARNING: 'TXT работното пространство изисква поне един блок „TXT Процес“.',
 	CATEGORY_TXT: 'TXT контролер',
 
-        PENV_PROVIDER_NOT_INSTALLED: 'Средата PlatformIO не е конфигурирана. Функциите за качване изискват PlatformIO IDE (VS Code Marketplace) или pioarduino (Open VSX за VSCodium).',
-        PENV_PROVIDER_INSTALL_BUTTON: 'Инсталиране на средата на разширението',
         PENV_PROVIDER_INSTALL_FAILED: 'Автоматичната инсталация се провали. Моля инсталирайте "PlatformIO IDE" (VS Code Marketplace) или "pioarduino" (Open VSX за VSCodium) от панела с разширения.',
         PENV_PROVIDER_PENDING: 'Средата PlatformIO се инициализира, моля изчакайте...',
 

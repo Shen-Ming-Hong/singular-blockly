@@ -1329,8 +1329,6 @@ window.languageManager.loadMessages('en', {
 	// Category
 	CATEGORY_TXT: 'TXT Controller',
 
-        PENV_PROVIDER_NOT_INSTALLED: 'The PlatformIO environment is not set up. Upload features require PlatformIO IDE (VS Code Marketplace) or pioarduino (Open VSX for VSCodium).',
-        PENV_PROVIDER_INSTALL_BUTTON: 'Install Extension Environment',
         PENV_PROVIDER_INSTALL_FAILED: 'Automatic installation failed. Please install "PlatformIO IDE" (VS Code Marketplace) or "pioarduino" (Open VSX for VSCodium) from the Extensions panel.',
         PENV_PROVIDER_PENDING: 'PlatformIO environment initializing, please wait...',
 

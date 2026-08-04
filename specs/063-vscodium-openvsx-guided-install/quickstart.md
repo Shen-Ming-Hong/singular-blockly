@@ -12,32 +12,34 @@
 
 **設定步驟**：
 1. 確認 PlatformIO IDE 和 pioarduino 均未安裝
-2. 開啟任一 Singular Blockly 工作區與積木編輯器
+2. 開啟任一 Singular Blockly 工作區
 
-**執行**：重新開啟 VS Code 視窗（`Developer: Reload Window`）
+**執行**：開啟積木編輯器
 
 **預期結果**：
-- 右下角出現 VS Code 通知，包含「安裝擴充功能環境」按鈕
-- Blockly 編輯器仍可正常操作（通知非 modal）
+- 不顯示 Singular Blockly 自訂的安裝前確認按鈕
+- 直接啟動 PlatformIO provider 安裝
+- Blockly 編輯器仍可正常操作
 
 **驗證指令**：
 ```bash
-npm test  # 所有測試通過（908+ 筆）
+npm run compile-tests
+npm run lint
 ```
 
 ---
 
-## 情境 2：安裝按鈕觸發（VS Code Marketplace）
+## 情境 2：直接安裝（VS Code Marketplace）
 
 **目的**：驗證 platformio.platformio-ide 自動安裝
 
-**前置**：同情境 1 且已顯示通知
+**前置**：同情境 1
 
-**執行**：點擊「安裝擴充功能環境」按鈕
+**執行**：開啟積木編輯器
 
 **預期結果**：
 - PlatformIO IDE 開始安裝（Extensions 面板顯示安裝進度）
-- 安裝完成後 VS Code 自動顯示「Reload Required」
+- 安裝完成後 Singular Blockly 顯示「Reload Required」
 - Reload 後 PlatformIO 啟動並自動建立 `~/.platformio/penv/`
 
 ---
@@ -56,8 +58,8 @@ npm test  # 所有測試通過（908+ 筆）
 4. 開啟 Arduino 工作區
 
 **預期結果**：
-- 通知出現
-- 點擊按鈕後，嘗試安裝 `platformio.platformio-ide` 失敗（Open VSX 無此 extension）
+- 不顯示 Singular Blockly 自訂的安裝前確認按鈕
+- 嘗試安裝 `platformio.platformio-ide` 失敗（Open VSX 無此 extension）
 - 自動 fallback 安裝 `pioarduino.pioarduino-ide`
 - pioarduino 安裝成功，VS Code 顯示 Reload Required
 
@@ -76,7 +78,7 @@ rm -rf /tmp/vscodium-test
 1. 確認 PlatformIO IDE 和 pioarduino 均未安裝
 2. 開啟 TXT Controller 工作區（`mainJson.board === 'txt'`）
 
-**預期結果**：開啟積木編輯器後仍觸發 PlatformIO provider 安裝確認
+**預期結果**：開啟積木編輯器後仍直接觸發 PlatformIO provider 安裝
 
 ---
 
@@ -87,7 +89,7 @@ rm -rf /tmp/vscodium-test
 **設定步驟**：確認 PlatformIO IDE 已安裝
 
 **預期結果**：
-- 不出現安裝通知
+- 不重複觸發 provider 安裝
 - 所有現有上傳功能正常運作
 - `npm test` 全數通過
 
@@ -133,6 +135,12 @@ npm run validate:i18n
 ## 單元測試執行
 
 ```bash
+npm run compile-tests
+npx vscode-test --label unit \
+  --run out/test/penvProviderService.test.js \
+  --run out/test/services/micropythonUploaderAvailability.test.js
+# 預期：16 passing
+
 npm test
-# 預期輸出：908+ tests passing
+# 目前完整基線：938 passing、1 pending，另有 1 個與本功能無關且已記錄的 OTA bootstrap 既有失敗
 ```
