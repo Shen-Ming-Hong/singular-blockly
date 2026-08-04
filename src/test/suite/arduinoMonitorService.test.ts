@@ -26,7 +26,12 @@ suite('ArduinoMonitorService Test Suite', () => {
 		// Mock vscode.window.createTerminal
 		sandbox.stub(vscode.window, 'createTerminal').returns(mockTerminal);
 
-		service = new ArduinoMonitorService('e:\\test-workspace');
+		service = new ArduinoMonitorService('e:\\test-workspace', async () => ({
+			command: 'pio',
+			prefixArgs: [],
+			mode: 'direct',
+			source: 'path-search',
+		}));
 	});
 
 	teardown(() => {
@@ -93,6 +98,23 @@ suite('ArduinoMonitorService Test Suite', () => {
 			// Check that the command does not include exception decoder filter
 			const sentCommand = mockTerminal.sendText.firstCall.args[0];
 			assert.ok(!sentCommand.includes('esp32_exception_decoder'));
+		});
+
+		test('should use the resolved Python module fallback command', async () => {
+			const fallbackService = new ArduinoMonitorService('e:\\test-workspace', async () => ({
+				command: 'C:\\.platformio\\penv\\Scripts\\python.exe',
+				prefixArgs: ['-m', 'platformio'],
+				mode: 'python-module',
+				source: 'system-drive-core-dir',
+			}));
+
+			const result = await fallbackService.start('uno', 'e:\\test-workspace');
+
+			assert.strictEqual(result.success, true);
+			const sentCommand = mockTerminal.sendText.firstCall.args[0];
+			assert.ok(sentCommand.includes('python.exe'));
+			assert.ok(sentCommand.includes("'-m' 'platformio'"));
+			fallbackService.dispose();
 		});
 
 		test('should return success if already running', async () => {

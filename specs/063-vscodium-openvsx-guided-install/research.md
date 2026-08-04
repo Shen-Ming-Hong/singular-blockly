@@ -35,14 +35,14 @@
 
 | 層次 | 原始 | 實作後 |
 |------|------|----------|
-| 主觸發 | activation (板子類型篩選) | **積木編輯器開啟**（板子類型篩選） |
+| 主觸發 | activation（硬性 dependency） | **積木編輯器開啟**（所有板子） |
 | Arduino 上傳 | 安裝 + 重試 | 簡明提示訊息 |
 | CyberBrick USB | 安裝 + 重試 | 簡明提示訊息 |
 | Serial Monitor | 安裝引導 | 簡明提示訊息 |
 
 **成果**：5 個觸發點將為 1 個，積木編輯器開啟自然成為下載完成就使用的首個入口。
 
-**板子類型篩選**：`needsPenvAtActivation()` 仍然保留並在 `webviewManager` 中使用，避免 TXT / CyberBrick OTA 工作區收到不必要的安裝通知。
+**板子類型策略**：不做篩選。舊版 `extensionDependencies` 對所有板子建立相同前置環境；執行期安裝延續同一行為，只改變安裝時機。
 
 **備選方案考慮**：「activation + 上傳路徑全部偵測」方案維護成本高，且上傳路徑的安裝重試逻輯難以測試；被拓絕。
 
@@ -58,13 +58,31 @@
 
 ---
 
-## 決策 5：重試機制的放置層
+## 決策 5：不以固定路徑輪詢宣告 Core 就緒
 
-**決策**：重試邏輯（最多 3 次、間隔 3 秒）放在 `PenvProviderService.waitForPenvReady()` 而非個別 uploader 中。
+**決策**：provider 安裝成功後只提示重新載入，不輪詢固定路徑，也不宣告 Core 已就緒。實際使用時由 PlatformIO invocation resolver 執行 `--version` 判斷。
 
 **依據**：
-- 多個 uploader（arduino、micropython）都需要同樣的重試行為。
-- 集中於 service 層符合 DRY 原則，減少 uploader 的複雜度。
+- extension 安裝成功與 PlatformIO Core 可執行是兩個不同狀態。
+- 固定輪詢 `~/.platformio` 無法涵蓋 `PLATFORMIO_CORE_DIR`、Windows 非 ASCII 使用者路徑與 launcher 權限異常。
+
+---
+
+## 決策 6：PlatformIO 啟動 fallback
+
+**決策**：以 `{ command, prefixArgs }` 表示 PlatformIO 啟動方式，逐一實際執行 `--version`；Windows direct launcher 失敗後，改用同一 penv 的 `python.exe -m platformio`。
+
+**候選來源順序**：
+
+1. `platformio-ide.customPATH`
+2. `PLATFORMIO_CORE_DIR`
+3. Windows 系統磁碟根目錄（例如 `C:\.platformio`）
+4. 預設 `~/.platformio`
+5. `PATH`
+
+**安全性考量**：不把 `.cmd` / `.bat` 當主要 fallback，避免為了執行批次檔開啟 shell；`python -m platformio` 可使用 argv 直接啟動，並能涵蓋 `pio.exe` 被 Defender、AppLocker 或權限政策阻擋的情境。
+
+**一致性要求**：版本檢查成功後，編譯、上傳與 Arduino Serial Monitor 都沿用同一啟動描述，避免「偵測成功但實際操作仍呼叫失敗的 pio.exe」。
 
 ---
 
@@ -74,5 +92,5 @@
 |------|------|
 | 兩個按鈕（使用者手選平台）| 對小學生不夠直覺；被拒絕 |
 | `uriScheme` 偵測平台 | 無法涵蓋所有 Open VSX 平台；被拒絕 |
-| 只在上傳時觸發（不在 activation）| 對新手太晚；Arduino 板採 activation 觸發被採納 |
+| 只在上傳時觸發（不在 activation）| 對新手太晚；積木編輯器開啟時對所有板子觸發被採納 |
 | 用 post-install wizard 引導 first build | 規格確認不需要（penv 自動建立）；超出範圍 |

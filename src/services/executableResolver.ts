@@ -56,9 +56,11 @@ export function getExecutableSearchDirectories(
 ): string[] {
 	const searchDirectories: string[] = [];
 	const envPath = env['PATH'] ?? '';
+	const pathApi = platform === 'win32' ? path.win32 : path;
 
 	if (envPath) {
-		searchDirectories.push(...envPath.split(path.delimiter).filter(Boolean));
+		const delimiter = platform === 'win32' ? ';' : ':';
+		searchDirectories.push(...envPath.split(delimiter).filter(Boolean));
 	}
 
 	if (platform === 'darwin') {
@@ -71,28 +73,32 @@ export function getExecutableSearchDirectories(
 		const userProfile = env['USERPROFILE'];
 
 		if (localAppData) {
-			searchDirectories.push(path.join(localAppData, 'Programs', 'PlatformIO', 'penv', 'Scripts'));
+			searchDirectories.push(pathApi.join(localAppData, 'Programs', 'PlatformIO', 'penv', 'Scripts'));
 		}
 		if (programFiles) {
-			searchDirectories.push(path.join(programFiles, 'PlatformIO', 'penv', 'Scripts'));
+			searchDirectories.push(pathApi.join(programFiles, 'PlatformIO', 'penv', 'Scripts'));
 		}
 		if (userProfile) {
-			searchDirectories.push(path.join(userProfile, '.platformio', 'penv', 'Scripts'));
+			searchDirectories.push(pathApi.join(userProfile, '.platformio', 'penv', 'Scripts'));
 		}
 	}
 
 	return uniqueStrings(searchDirectories);
 }
 
-export function getExecutableDirectory(filePath: string | null | undefined): string | null {
+export function getExecutableDirectory(
+	filePath: string | null | undefined,
+	platform: NodeJS.Platform = process.platform
+): string | null {
 	if (!filePath) {
 		return null;
 	}
 
+	const pathApi = platform === 'win32' ? path.win32 : path;
 	try {
-		return path.dirname(fs.realpathSync(filePath));
+		return pathApi.dirname(fs.realpathSync(filePath));
 	} catch {
-		return path.dirname(filePath);
+		return pathApi.dirname(filePath);
 	}
 }
 
@@ -106,10 +112,11 @@ export function resolveExecutable({
 }: ResolveExecutableOptions): string | null {
 	const resolvedCandidates: string[] = [...candidatePaths];
 	const expandedExecutableNames = executableNames.flatMap(name => expandExecutableNames(name, platform, env));
+	const pathApi = platform === 'win32' ? path.win32 : path;
 
 	for (const directory of searchDirectories) {
 		for (const executableName of expandedExecutableNames) {
-			resolvedCandidates.push(path.join(directory, executableName));
+			resolvedCandidates.push(pathApi.join(directory, executableName));
 		}
 	}
 
@@ -127,13 +134,14 @@ export function getDefaultPlatformioExecutablePath(
 	platform: NodeJS.Platform = process.platform,
 	homeDir: string = os.homedir()
 ): string {
+	const pathApi = platform === 'win32' ? path.win32 : path;
 	const scriptsDir = platform === 'win32'
-		? path.join(homeDir, '.platformio', 'penv', 'Scripts')
-		: path.join(homeDir, '.platformio', 'penv', 'bin');
+		? pathApi.join(homeDir, '.platformio', 'penv', 'Scripts')
+		: pathApi.join(homeDir, '.platformio', 'penv', 'bin');
 
 	if (platform === 'win32') {
-		return path.join(scriptsDir, `${tool}.exe`);
+		return pathApi.join(scriptsDir, `${tool}.exe`);
 	}
 
-	return path.join(scriptsDir, tool);
+	return pathApi.join(scriptsDir, tool);
 }

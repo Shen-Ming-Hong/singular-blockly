@@ -6,13 +6,13 @@
 - `npm install` 完成
 - Git branch：`063-vscodium-openvsx-guided-install`
 
-## 情境 1：VS Code 初次設定（Arduino 板）
+## 情境 1：VS Code 初次設定（任一板子）
 
-**目的**：驗證 activation-time 通知出現
+**目的**：驗證積木編輯器開啟時維持原有共同 PlatformIO 前置
 
 **設定步驟**：
 1. 確認 PlatformIO IDE 和 pioarduino 均未安裝
-2. 開啟含 Arduino 板子設定（`mainJson.board` ≠ `'none'/'cyberbrick'/'txt'`）的 Singular Blockly 工作區
+2. 開啟任一 Singular Blockly 工作區與積木編輯器
 
 **執行**：重新開啟 VS Code 視窗（`Developer: Reload Window`）
 
@@ -68,15 +68,15 @@ rm -rf /tmp/vscodium-test
 
 ---
 
-## 情境 4：TXT 工作區不顯示通知
+## 情境 4：TXT 工作區維持共同前置環境
 
-**目的**：驗證非 penv 板子不受影響
+**目的**：驗證移除硬性 dependency 後仍與舊版行為一致
 
 **設定步驟**：
 1. 確認 PlatformIO IDE 和 pioarduino 均未安裝
 2. 開啟 TXT Controller 工作區（`mainJson.board === 'txt'`）
 
-**預期結果**：啟動後不出現任何安裝通知
+**預期結果**：開啟積木編輯器後仍觸發 PlatformIO provider 安裝確認
 
 ---
 
@@ -101,16 +101,23 @@ rm -rf /tmp/vscodium-test
 - mock `executeCommand` 的 `installExtension` 呼叫均 reject
 - 驗證 `workbench.extensions.search` 被呼叫且參數為 `'platformio'`
 - 驗證顯示 `PENV_PROVIDER_INSTALL_FAILED` 訊息
+- 驗證不顯示重新載入或「環境已就緒」訊息
 
 ---
 
-## 情境 7：penv 初始化中重試
+## 情境 7：Windows `pio.exe` 無法執行
 
-**目的**：驗證 race condition 的重試機制
+**目的**：驗證 Core 存在但 launcher 被拒絕時仍可使用
 
-**設定步驟**（單元測試中驗證）：
-- mock `checkPenvExists` 前 2 次回傳 `false`，第 3 次回傳 `true`
-- 驗證服務在第 3 次重試後成功
+**設定步驟**：
+1. 設定 `PLATFORMIO_CORE_DIR=C:\.platformio`
+2. 確認 `C:\.platformio\penv\Scripts\pio.exe --version` 失敗
+3. 確認 `C:\.platformio\penv\Scripts\python.exe -m platformio --version` 成功
+4. 執行 Singular Blockly 的編譯、上傳與 Arduino Serial Monitor
+
+**預期結果**：
+- PlatformIO 狀態為可用，日誌記錄 `python-module` fallback
+- 編譯、上傳與 Monitor 都使用相同的 Python module 啟動方式
 
 ---
 

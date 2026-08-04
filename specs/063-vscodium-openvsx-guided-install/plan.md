@@ -4,7 +4,7 @@
 
 ## 摘要
 
-從 `package.json` 移除硬性 `extensionDependencies`，使擴充功能可在 VSCodium / Open VSX 環境啟動。新增集中化的 `PenvProviderService`，統一管理 penv provider 偵測、引導安裝通知與自動 fallback（platformio → pioarduino → 手動搜尋）邏輯。在 Arduino 上傳路徑加入 activation-time 通知（板子類型篩選），在 CyberBrick USB 上傳、Serial Monitor 路徑加入 upload-time 重試偵測，並更新全部 15 個語系 locale 及補全單元測試。
+從 `package.json` 移除硬性 `extensionDependencies`，使擴充功能可在 VSCodium / Open VSX 環境啟動。新增集中化的 `PenvProviderService`，統一管理 provider 偵測與安裝 fallback（platformio → pioarduino → 手動搜尋），並在所有板子開啟積木編輯器時維持舊版共同前置環境。另以 `PlatformioInvocationResolver` 驗證實際可執行的 Core 啟動方式，支援 `PLATFORMIO_CORE_DIR` 與 `python -m platformio` fallback。
 
 ## 技術背景
 
@@ -20,9 +20,9 @@
 
 **專案類型**：VS Code Extension（extension host TypeScript）
 
-**效能目標**：通知在 `onStartupFinished` 啟動視窗內出現；penv 重試最多 9 秒完成（3 次 × 3 秒間隔）
+**效能目標**：積木編輯器開啟時立即觸發 provider 安裝確認；PlatformIO 候選版本探測每個最多 5 秒
 
-**限制**：不破壞現有 908 筆測試；Windows（`Scripts/`）與 macOS/Linux（`bin/`）路徑差異已由既有 `executableResolver.ts` 處理，無需額外適配
+**限制**：不破壞現有測試；Windows（`Scripts/`）與 macOS/Linux（`bin/`）路徑差異、非 ASCII 使用者路徑與自訂 Core 位置必須涵蓋
 
 ## 憲章檢查
 
@@ -35,7 +35,7 @@
 | III — 避免過度開發 | 僅實作規格所需功能；無 post-install wizard，無自訂 reload 按鈕 | ✅ |
 | VI — 結構化日誌 | 所有新偵測邏輯使用 `log()` 記錄，不使用 `console.log` | ✅ |
 | VII — 測試覆蓋率 | FR-014 明確要求新邏輯須有單元測試覆蓋 | ✅ |
-| VIII — 純函數/模組架構 | `detectPenvProviderStatus()` 設計為可注入依賴的純邏輯；`vscode.extensions.getExtension` 透過依賴注入可在測試中覆寫 | ✅ |
+| VIII — 純函數/模組架構 | provider 安裝與 Core invocation 探測皆透過依賴注入，可在測試中覆寫 VS Code API、檔案系統與程序執行 | ✅ |
 | IX — 繁體中文文件 | 本文件及所有規格文件以繁體中文撰寫 | ✅ |
 | X — 版本管理 | 新增使用者可見 UX 功能 → minor 版本升級，需更新 CHANGELOG | ✅ |
 
@@ -60,12 +60,14 @@ specs/063-vscodium-openvsx-guided-install/
 
 ```text
 src/
-├── extension.ts                        ← 修改：activation-time 板子類型篩選與通知觸發
+├── webview/webviewManager.ts           ← 修改：所有板子開啟積木編輯器時檢查 provider
 ├── services/
 │   ├── penvProviderService.ts          ← 新增：集中化 provider 偵測、通知、安裝 fallback
-│   ├── arduinoUploader.ts              ← 修改：upload-time penv check + 重試 + 通知
+│   ├── platformioInvocationResolver.ts ← 新增：可執行啟動方式與 Python module fallback
+│   ├── arduinoUploader.ts              ← 修改：編譯與上傳沿用已驗證的啟動方式
 │   ├── micropythonUploader.ts          ← 修改：upload-time penv check + 重試 + 更新錯誤訊息
-│   ├── serialMonitorService.ts         ← 修改：penv guard，失敗時有明確訊息
+│   ├── serialMonitorService.ts         ← 修改：依實際裝置偵測後端啟動 Monitor
+│   ├── arduinoMonitorService.ts        ← 修改：沿用已驗證的 PlatformIO 啟動方式
 │   └── settingsManager.ts              ← 已由 PR#91 更新（provider guard）
 └── test/
     ├── penvProviderService.test.ts     ← 新增：provider 偵測、通知、安裝 fallback 的單元測試
@@ -100,16 +102,16 @@ media/locales/*/messages.js             ← 15 個語系：新增通知文字 i1
 ```
 [積木編輯器開啟層]
 webviewManager.createAndShowWebView()
-  └── 讀取 mainJson.board
-      ├── needsPenvAtActivation(board) === true（Arduino 系列）
-      │   └── createDefaultDeps(localeService) → isProviderInstalled() ?
-      │       ├── 已安裝 → 不顯示通知
-      │       └── 未安裝 → showInstallNotification（自動安裝，fire-and-forget）
-      └── 其他板子（cyberbrick / txt / none）→ 略過
+  └── createDefaultDeps(localeService) → isProviderInstalled() ?
+      ├── 已安裝 → 不觸發安裝
+      └── 未安裝 → showInstallNotification（所有板子，fire-and-forget）
 
 [上傳路徑（簡化後）]
 arduinoUploader / micropythonUploader / serialMonitorService
-  └── checkPioInstalled() / checkPythonEnvironment() / checkPenvExists() 失敗
+  └── 實際探測可用的 PlatformIO / Python / mpremote 啟動方式
+      ├── direct launcher 可用 → 沿用 direct launcher
+      ├── pio.exe 失敗、python module 可用 → 沿用 python -m platformio
+      └── 全部失敗
       └── 顯示簡明提示訊息（引導學生開啟積木編輯器）
           不再在上傳路徑重複觸發安裝 / 重試機制
 ```
@@ -120,16 +122,10 @@ arduinoUploader / micropythonUploader / serialMonitorService
 
 ```typescript
 // src/services/penvProviderService.ts
-export type PenvProviderStatus =
-  | 'not-installed'    // 無任何 provider extension
-  | 'installed-ready'  // provider 已安裝且 penv 就緒
-  | 'installed-pending'; // provider 已安裝但 penv 尚未建立
-
 export interface PenvProviderServiceDeps {
   getExtension: (id: string) => { id: string } | undefined;
   executeCommand: (cmd: string, ...args: unknown[]) => Thenable<unknown>;
   showInformationMessage: (msg: string, ...items: string[]) => Thenable<string | undefined>;
-  checkPenvExists: () => boolean;
   /** 可選：i18n 訊息查找函數，由 localeService.getLocalizedMessage 提供 */
   getMsg?: (key: string, fallback: string) => Promise<string>;
 }

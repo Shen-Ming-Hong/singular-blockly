@@ -9,11 +9,8 @@ import * as sinon from 'sinon';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import {
 	PenvProviderServiceDeps,
-	PenvProviderStatus,
 	isProviderInstalled,
-	detectStatus,
 	attemptInstall,
-	waitForPenvReady,
 	showInstallNotification,
 } from '../services/penvProviderService';
 
@@ -24,10 +21,6 @@ function createMockDeps(overrides: Partial<PenvProviderServiceDeps> = {}): PenvP
 		getExtension: sinon.stub().returns(undefined),
 		executeCommand: sinon.stub().resolves(),
 		showInformationMessage: sinon.stub().resolves(undefined),
-		// 測試中預設 penv 已就緒，走 showReloadButton 快速路徑，避免輪詢
-		checkPenvExists: sinon.stub().returns(true),
-		// 測試中注入立即 resolve 版本，避免 10s 真實等待
-		pollingDelayFn: () => Promise.resolve(),
 		...overrides,
 	};
 }
@@ -35,9 +28,6 @@ function createMockDeps(overrides: Partial<PenvProviderServiceDeps> = {}): PenvP
 // ─── T010: 單元測試 ────────────────────────────────────────────────────────────
 
 describe('PenvProviderService', () => {
-	// 可注入的立即 delay 函數（避免 sinon fake timers 與 VS Code 內建計時器衝突）
-	const noDelay = (_ms: number) => Promise.resolve();
-
 	afterEach(() => {
 		sinon.restore();
 	});
@@ -67,42 +57,17 @@ describe('PenvProviderService', () => {
 		});
 	});
 
-	// ─── (b) detectStatus ──────────────────────────────────────────────────
-
-	describe('detectStatus', () => {
-		it('should return not-installed when no provider is installed', () => {
-			const deps = createMockDeps({
-				getExtension: sinon.stub().returns(undefined),
-				checkPenvExists: sinon.stub().returns(false),
-			});
-			const result: PenvProviderStatus = detectStatus(deps);
-			assert.strictEqual(result, 'not-installed');
-		});
-
-		it('should return installed-ready when provider installed and penv exists', () => {
-			const deps = createMockDeps({
-				getExtension: sinon.stub().returns({ id: 'platformio.platformio-ide' }),
-				checkPenvExists: sinon.stub().returns(true),
-			});
-			assert.strictEqual(detectStatus(deps), 'installed-ready');
-		});
-
-		it('should return installed-pending when provider installed but penv not yet ready', () => {
-			const deps = createMockDeps({
-				getExtension: sinon.stub().returns({ id: 'platformio.platformio-ide' }),
-				checkPenvExists: sinon.stub().returns(false),
-			});
-			assert.strictEqual(detectStatus(deps), 'installed-pending');
-		});
-	});
-
-	// ─── (c) attemptInstall ────────────────────────────────────────────────
+	// ─── (b) attemptInstall ────────────────────────────────────────────────
 
 	describe('attemptInstall', () => {
 		it('should install platformio.platformio-ide when available', async () => {
 			const executeCommand = sinon.stub().resolves();
 			const showInformationMessage = sinon.stub().resolves(undefined);
-			await attemptInstall({ executeCommand, showInformationMessage });
+			const result = await attemptInstall({ executeCommand, showInformationMessage });
+			assert.deepStrictEqual(result, {
+				status: 'installed',
+				providerId: 'platformio.platformio-ide',
+			});
 			assert.ok(
 				executeCommand.calledWith('workbench.extensions.installExtension', 'platformio.platformio-ide')
 			);
@@ -115,7 +80,11 @@ describe('PenvProviderService', () => {
 				.rejects(new Error('Not found'));
 			executeCommand.resolves();
 			const showInformationMessage = sinon.stub().resolves(undefined);
-			await attemptInstall({ executeCommand, showInformationMessage });
+			const result = await attemptInstall({ executeCommand, showInformationMessage });
+			assert.deepStrictEqual(result, {
+				status: 'installed',
+				providerId: 'pioarduino.pioarduino-ide',
+			});
 			assert.ok(
 				executeCommand.calledWith('workbench.extensions.installExtension', 'pioarduino.pioarduino-ide')
 			);
@@ -128,41 +97,14 @@ describe('PenvProviderService', () => {
 				.rejects(new Error('Not found'));
 			executeCommand.withArgs('workbench.extensions.search', 'platformio').resolves();
 			const showInformationMessage = sinon.stub().resolves(undefined);
-			await attemptInstall({ executeCommand, showInformationMessage });
+			const result = await attemptInstall({ executeCommand, showInformationMessage });
+			assert.deepStrictEqual(result, { status: 'manual-required' });
 			assert.ok(executeCommand.calledWith('workbench.extensions.search', 'platformio'));
 			assert.ok(showInformationMessage.calledOnce);
 		});
 	});
 
-	// ─── (d) waitForPenvReady ─────────────────────────────────────────────
-
-	describe('waitForPenvReady', () => {
-		it('should return true when penv is ready on the first retry', async () => {
-			const checkFn = sinon.stub().returns(true);
-			const result = await waitForPenvReady(checkFn, 3, 0, noDelay);
-			assert.strictEqual(result, true);
-			assert.strictEqual(checkFn.callCount, 1);
-		});
-
-		it('should succeed after 2 failed retries', async () => {
-			const checkFn = sinon.stub();
-			checkFn.onCall(0).returns(false);
-			checkFn.onCall(1).returns(false);
-			checkFn.onCall(2).returns(true);
-			const result = await waitForPenvReady(checkFn, 3, 0, noDelay);
-			assert.strictEqual(result, true);
-			assert.strictEqual(checkFn.callCount, 3);
-		});
-
-		it('should return false after exhausting all retries', async () => {
-			const checkFn = sinon.stub().returns(false);
-			const result = await waitForPenvReady(checkFn, 3, 0, noDelay);
-			assert.strictEqual(result, false);
-			assert.strictEqual(checkFn.callCount, 3);
-		});
-	});
-
-	// ─── (e) showInstallNotification ──────────────────────────────────────
+	// ─── (c) showInstallNotification ──────────────────────────────────────
 
 	describe('showInstallNotification', () => {
 		it('should auto-install without showing a pre-install notification', async () => {
@@ -190,6 +132,25 @@ describe('PenvProviderService', () => {
 				executeCommand.calledWith('workbench.extensions.installExtension', 'pioarduino.pioarduino-ide'),
 				'should auto-fallback to pioarduino'
 			);
+		});
+
+		it('should not report ready or reload when both provider installs fail', async () => {
+			const executeCommand = sinon.stub();
+			executeCommand
+				.withArgs('workbench.extensions.installExtension', sinon.match.string)
+				.rejects(new Error('Not available'));
+			executeCommand.withArgs('workbench.extensions.search', 'platformio').resolves();
+			const showInformationMessage = sinon.stub().resolves(undefined);
+			const deps = createMockDeps({ executeCommand, showInformationMessage });
+
+			await showInstallNotification(deps);
+
+			assert.ok(executeCommand.calledWith('workbench.extensions.search', 'platformio'));
+			assert.ok(
+				executeCommand.neverCalledWith('workbench.action.reloadWindow'),
+				'failed installation must not offer or trigger reload'
+			);
+			assert.strictEqual(showInformationMessage.callCount, 1, 'only the manual-install message should be shown');
 		});
 	});
 
@@ -245,20 +206,18 @@ describe('PenvProviderService', () => {
 	// ─── T017 (US4): 迴歸測試 ─────────────────────────────────────────
 
 	describe('regression: existing users unaffected', () => {
-		it('[US4] PlatformIO installed: detectStatus returns installed-ready', () => {
+		it('[US4] PlatformIO installed: provider is detected', () => {
 			const deps = createMockDeps({
 				getExtension: sinon.stub().returns({ id: 'platformio.platformio-ide' }),
-				checkPenvExists: sinon.stub().returns(true),
 			});
-			assert.strictEqual(detectStatus(deps), 'installed-ready');
+			assert.strictEqual(isProviderInstalled(deps), true);
 		});
 
-		it('[US4] pioarduino installed: detectStatus returns installed-ready', () => {
+		it('[US4] pioarduino installed: provider is detected', () => {
 			const deps = createMockDeps({
 				getExtension: sinon.stub().returns({ id: 'pioarduino.pioarduino-ide' }),
-				checkPenvExists: sinon.stub().returns(true),
 			});
-			assert.strictEqual(detectStatus(deps), 'installed-ready');
+			assert.strictEqual(isProviderInstalled(deps), true);
 		});
 	});
 });

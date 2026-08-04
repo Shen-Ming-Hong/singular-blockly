@@ -8,6 +8,13 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { log } from './logging';
+import { createExecFilePromise } from './platformioProcess';
+import {
+	PlatformioInvocation,
+	formatPlatformioTerminalCommand,
+	parsePlatformioCustomPath,
+	resolvePlatformioInvocation,
+} from './platformioInvocationResolver';
 import { MonitorStartResult, MonitorStopReason, isEsp32Board } from '../types/arduino';
 
 /**
@@ -29,12 +36,26 @@ export class ArduinoMonitorService {
 	private isStoppingForUpload = false;
 	private onStoppedCallback: ((reason: MonitorStopReason) => void) | null = null;
 	private disposables: vscode.Disposable[] = [];
+	private readonly resolvePlatformio: () => Promise<PlatformioInvocation | null>;
 
 	/**
 	 * 建立 ArduinoMonitorService 實例
 	 * @param workspacePath 工作區路徑
 	 */
-	constructor(private workspacePath: string) {
+	constructor(
+		private workspacePath: string,
+		resolvePlatformio?: () => Promise<PlatformioInvocation | null>
+	) {
+		this.resolvePlatformio = resolvePlatformio ?? (async () => {
+			const customPath = vscode.workspace.getConfiguration('platformio-ide').get<unknown>('customPATH');
+			const resolution = await resolvePlatformioInvocation({
+				existsSync: fs.existsSync,
+				probe: createExecFilePromise,
+				customPathEntries: parsePlatformioCustomPath(customPath),
+			});
+			return resolution.invocation;
+		});
+
 		// 監聽終端機關閉事件
 		this.disposables.push(
 			vscode.window.onDidCloseTerminal(closedTerminal => {
@@ -61,11 +82,23 @@ export class ArduinoMonitorService {
 		}
 
 		try {
+			const invocation = await this.resolvePlatformio();
+			if (!invocation) {
+				return {
+					success: false,
+					port: '',
+					error: {
+						code: 'PIO_NOT_FOUND',
+						message: 'PlatformIO Core is unavailable.',
+					},
+				};
+			}
+
 			// 取得 baud rate
 			const baudRate = this.getBaudRate(projectPath);
 
 			// 建構 pio device monitor 命令
-			const args = ['pio', 'device', 'monitor', '--baud', String(baudRate), '--project-dir', projectPath];
+			const args = ['device', 'monitor', '--baud', String(baudRate), '--project-dir', projectPath];
 
 			// ESP32 系列自動啟用 exception decoder
 			if (isEsp32Board(board)) {
@@ -77,9 +110,12 @@ export class ArduinoMonitorService {
 			this.terminal = vscode.window.createTerminal({
 				name: 'Serial Monitor',
 				cwd: projectPath,
+				...(process.platform === 'win32'
+					? { shellPath: 'powershell.exe', shellArgs: ['-NoLogo'] }
+					: {}),
 			});
 
-			this.terminal.sendText(args.join(' '));
+			this.terminal.sendText(formatPlatformioTerminalCommand(invocation, args));
 			this.terminal.show(true);
 
 			this.isRunningFlag = true;

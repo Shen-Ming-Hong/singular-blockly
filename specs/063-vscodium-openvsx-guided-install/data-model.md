@@ -2,21 +2,6 @@
 
 ## 新增型別
 
-### `PenvProviderStatus`
-
-provider extension 安裝狀態與 penv 就緒狀態的組合。
-
-```
-PenvProviderStatus
-├── 'not-installed'     provider extension 未安裝
-├── 'installed-ready'   provider 已安裝，penv 路徑存在且可執行
-└── 'installed-pending' provider 已安裝，但 penv 尚未完成初始化
-```
-
-**使用者**：`PenvProviderService`、`arduinoUploader`、`micropythonUploader`
-
----
-
 ### `PenvProviderServiceDeps`
 
 `PenvProviderService` 的依賴注入介面，使所有 VS Code API 呼叫可在測試中替換。
@@ -26,8 +11,30 @@ PenvProviderStatus
 | `getExtension` | `(id: string) => { id: string } \| undefined` | 對應 `vscode.extensions.getExtension` |
 | `executeCommand` | `(cmd: string, ...args: unknown[]) => Thenable<unknown>` | 對應 `vscode.commands.executeCommand` |
 | `showInformationMessage` | `(msg: string, ...items: string[]) => Thenable<string \| undefined>` | 對應 `vscode.window.showInformationMessage` |
-| `checkPenvExists` | `() => boolean` | 檢查 `~/.platformio/penv/` 路徑是否存在 |
 | `getMsg` | `(key: string, fallback: string) => Promise<string>` (**可選**) | i18n 訊息查找；由 `localeService.getLocalizedMessage` 提供，未傳入時退回英文 fallback |
+
+---
+
+### `ProviderInstallResult`
+
+provider 安裝動作的明確結果，避免安裝失敗後仍進入 reload / ready 路徑。
+
+```
+ProviderInstallResult
+├── { status: 'installed', providerId }
+└── { status: 'manual-required' }
+```
+
+### `PlatformioInvocation`
+
+已通過 `--version` 驗證、可供後續流程重複使用的 PlatformIO 啟動描述。
+
+| 欄位 | 說明 |
+|------|------|
+| `command` | 實際執行檔，例如 `pio.exe` 或 penv 的 `python.exe` |
+| `prefixArgs` | 固定前綴；Python fallback 為 `['-m', 'platformio']` |
+| `mode` | `direct` 或 `python-module` |
+| `source` | customPATH、`PLATFORMIO_CORE_DIR`、系統磁碟、預設 Core 或 PATH |
 
 ---
 
@@ -41,22 +48,20 @@ PenvProviderStatus
 ## 狀態轉移
 
 ```
-初始狀態
-  │
-  ▼
 偵測 provider extension
-  ├── 未安裝 → [not-installed]
-  │     └── 使用者點擊安裝按鈕
-  │           ├── 安裝成功 → VS Code reload → [installed-pending]
-  │           └── 安裝失敗 → 開啟 Extensions 面板 → 使用者手動安裝
+  ├── 未安裝
+  │     └── VS Code 安裝確認
+  │           ├── 安裝成功 → 顯示 reload（只代表 provider 已安裝）
+  │           └── 安裝失敗 → [manual-required] → 開啟 Extensions 面板
   │
-  └── 已安裝 → 偵測 penv 路徑
-        ├── 路徑存在 → [installed-ready] ← 正常上傳流程
-        └── 路徑不存在（初始化中）→ [installed-pending]
-              └── 重試（最多 3 次，間隔 3 秒）
-                    ├── 路徑出現 → [installed-ready]
-                    └── 仍不存在 → 顯示「環境初始化中，請稍候再試」
+  └── 已安裝
+        └── 實際執行所有可信候選的 `--version`
+              ├── direct 成功 → direct invocation
+              ├── direct 失敗、python module 成功 → python-module invocation
+              └── 全部失敗 → unavailable + 明確診斷
 ```
+
+provider 安裝狀態與 Core 可執行狀態刻意分開，不再以 Python 檔案存在推導「環境已就緒」。
 
 ## i18n Key 設計
 

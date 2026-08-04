@@ -50,7 +50,33 @@ suite('SerialMonitorService Test Suite', () => {
 		assert.strictEqual(result.port, '/dev/cu.usbmodem1201');
 		assert.ok(uploader.listSerialPorts.calledOnce, 'pyserial enumeration should still be tried first');
 		assert.ok(uploader.listPorts.calledOnce, 'mpremote port detection should be used as a fallback');
+		assert.ok((service as any).resetAndStartMonitor.notCalled, 'mpremote detection should use the mpremote backend');
+		assert.ok(uploader.checkMpremoteInstalled.notCalled, 'successful mpremote detection already proves availability');
+		await new Promise(resolve => setTimeout(resolve, 550));
+		assert.ok(mockTerminal.sendText.calledOnce);
+		assert.ok(mockTerminal.sendText.firstCall.args[0].includes('mpremote'));
+	});
+
+	test('uses the Python monitor backend when custom Python successfully detects the device', async () => {
+		const uploader = {
+			listSerialPorts: sandbox.stub().resolves({
+				ports: [{ path: '/dev/cu.usbmodem1201', vendorId: '303A', productId: '1001' }],
+				autoDetected: '/dev/cu.usbmodem1201',
+			}),
+			listPorts: sandbox.stub().resolves({ ports: [], autoDetected: undefined }),
+			checkMpremoteInstalled: sandbox.stub().resolves(false),
+			getMpremotePath: sandbox.stub().returns('/mock/mpremote'),
+			getPlatformioPythonPath: sandbox.stub().returns('/custom/python'),
+		};
+		(service as any).uploader = uploader;
+		sandbox.stub(service as any, 'resetAndStartMonitor').resolves();
+
+		const result = await service.start();
+
+		assert.strictEqual(result.success, true);
 		assert.ok((service as any).resetAndStartMonitor.calledOnceWith('/dev/cu.usbmodem1201'));
+		assert.ok(uploader.listPorts.notCalled);
+		assert.ok(uploader.checkMpremoteInstalled.notCalled);
 	});
 
 	test('returns MPREMOTE_NOT_INSTALLED when pyserial monitor bootstrap fails and mpremote is unavailable', async () => {

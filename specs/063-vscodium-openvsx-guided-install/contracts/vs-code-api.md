@@ -48,13 +48,16 @@ await vscode.commands.executeCommand(
 ```typescript
 try {
   await executeCommand('workbench.extensions.installExtension', 'platformio.platformio-ide');
+  return { status: 'installed', providerId: 'platformio.platformio-ide' };
 } catch {
   try {
     await executeCommand('workbench.extensions.installExtension', 'pioarduino.pioarduino-ide');
+    return { status: 'installed', providerId: 'pioarduino.pioarduino-ide' };
   } catch {
     // 兩者均失敗：開啟 Extensions 面板
     await executeCommand('workbench.extensions.search', 'platformio');
     showInformationMessage(/* PENV_PROVIDER_INSTALL_FAILED */);
+    return { status: 'manual-required' };
   }
 }
 ```
@@ -96,6 +99,8 @@ const selected = await vscode.window.showInformationMessage(
 
 ## 重新載入處理
 
-安裝完成後，VS Code 框架**自動**顯示「Reload Required」提示，本擴充功能無需額外實作。
+只有安裝指令成功後，擴充功能才顯示「Reload Now」提示並可呼叫 `workbench.action.reloadWindow`。兩個 provider 均失敗時不得進入此路徑。
 
 重新載入後 PlatformIO IDE / pioarduino 啟動，自動執行 `get-platformio.py` 建立 `~/.platformio/penv/`，無需使用者手動操作。
+
+重新載入提示只代表 provider 已安裝，**不代表 PlatformIO Core 已可用**。Core 狀態由實際 `--version` 探測決定。
