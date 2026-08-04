@@ -97,17 +97,26 @@ read_feature_json_feature_directory() {
     local fj="$repo_root/.specify/feature.json"
     [[ -f "$fj" ]] || { printf '%s' ''; return 0; }
 
+    # Try parsers in order (jq -> python3 -> grep/sed), falling through on
+    # failure. Selection is by *parse success*, not mere availability: on
+    # Windows `python3` commonly resolves to the Microsoft Store App Execution
+    # Alias stub, which passes `command -v` but fails at runtime (exit 49), so
+    # an availability-gated `elif` would pick python3, swallow its failure, and
+    # never reach the grep/sed fallback -- leaving feature.json unreadable even
+    # though it is valid (issue #3304).
     local _fd=''
     if command -v jq >/dev/null 2>&1; then
         if ! _fd=$(jq -r '.feature_directory // empty' "$fj" 2>/dev/null); then
             _fd=''
         fi
-    elif command -v python3 >/dev/null 2>&1; then
+    fi
+    if [[ -z "$_fd" ]] && command -v python3 >/dev/null 2>&1; then
         # Use Python so pretty-printed/multi-line JSON still parses correctly.
         if ! _fd=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); v=d.get('feature_directory'); print(v if v else '')" "$fj" 2>/dev/null); then
             _fd=''
         fi
-    else
+    fi
+    if [[ -z "$_fd" ]]; then
         # Last-resort single-line grep/sed fallback. The `|| true` guards against
         # grep returning 1 (no match) aborting under `set -e` / `pipefail`.
         _fd=$( { grep -E '"feature_directory"[[:space:]]*:' "$fj" 2>/dev/null || true; } \
@@ -152,6 +161,15 @@ _persist_feature_json() {
 }
 
 get_feature_paths() {
+    # Read-only callers (e.g. check-prerequisites.sh --paths-only) pass
+    # --no-persist so pure path resolution never writes .specify/feature.json,
+    # which would dirty the working tree or overwrite a pinned value (issue #3025).
+    local no_persist=false
+    if [[ "${1:-}" == "--no-persist" ]]; then
+        no_persist=true
+        shift
+    fi
+
     # Split decl/assignment so a SPECIFY_INIT_DIR validation failure in
     # get_repo_root propagates as a hard error instead of being masked by `local`.
     local repo_root
@@ -168,8 +186,11 @@ get_feature_paths() {
         feature_dir="$SPECIFY_FEATURE_DIRECTORY"
         # Normalize relative paths to absolute under repo root
         [[ "$feature_dir" != /* ]] && feature_dir="$repo_root/$feature_dir"
-        # Persist to feature.json so future sessions without the env var still work
-        _persist_feature_json "$repo_root" "$SPECIFY_FEATURE_DIRECTORY"
+        # Persist to feature.json so future sessions without the env var still
+        # work — unless the caller opted out for read-only resolution (#3025).
+        if [[ "$no_persist" != true ]]; then
+            _persist_feature_json "$repo_root" "$SPECIFY_FEATURE_DIRECTORY"
+        fi
     elif [[ -f "$repo_root/.specify/feature.json" ]]; then
         local _fd
         _fd=$(read_feature_json_feature_directory "$repo_root")
@@ -184,6 +205,15 @@ get_feature_paths() {
     else
         echo "ERROR: Feature directory not found. Set SPECIFY_FEATURE_DIRECTORY or run the specify command to create .specify/feature.json." >&2
         return 1
+    fi
+
+    # When no branch context exists (no SPECIFY_FEATURE, feature resolved via
+    # SPECIFY_FEATURE_DIRECTORY or feature.json), fall back to the feature
+    # directory basename so CURRENT_BRANCH is a usable identifier rather than
+    # an empty, misleading value (issue #3026).
+    if [[ -z "$current_branch" ]]; then
+        local feature_dir_trimmed="${feature_dir%/}"
+        current_branch="${feature_dir_trimmed##*/}"
     fi
 
     # Use printf '%q' to safely quote values, preventing shell injection
@@ -214,21 +244,29 @@ get_invoke_separator() {
 
     local integration_json="$repo_root/.specify/integration.json"
     local separator="."
-    local parsed_with_jq=0
+    local parsed=0
 
     if [[ -f "$integration_json" ]]; then
+        # Try parsers in order (jq -> python3 -> awk), falling through on
+        # failure. Selection is by *parse success*, not mere availability: on
+        # Windows `python3` commonly resolves to the Microsoft Store App
+        # Execution Alias stub, which passes `command -v` but fails at runtime
+        # (exit 49). An availability-gated branch would pick python3, swallow
+        # its failure, and — because this function historically had no text
+        # fallback — silently return "." even for `-`-separator integrations
+        # (e.g. forge, cline), yielding wrong command hints (issue #3304).
         if command -v jq >/dev/null 2>&1; then
             local jq_separator
             if jq_separator=$(jq -r '(.default_integration // .integration // "") as $k | if $k == "" then "." else (.integration_settings[$k].invoke_separator // ".") end' "$integration_json" 2>/dev/null); then
-                parsed_with_jq=1
                 case "$jq_separator" in
-                    "."|"-") separator="$jq_separator" ;;
+                    "."|"-") separator="$jq_separator"; parsed=1 ;;
                 esac
             fi
         fi
 
-        if [[ "$parsed_with_jq" -eq 0 ]] && command -v python3 >/dev/null 2>&1; then
-            if separator=$(python3 - "$integration_json" <<'PY' 2>/dev/null
+        if [[ "$parsed" -eq 0 ]] && command -v python3 >/dev/null 2>&1; then
+            local py_separator
+            if py_separator=$(python3 - "$integration_json" <<'PY' 2>/dev/null
 import json
 import sys
 
@@ -244,16 +282,63 @@ try:
             separator = entry["invoke_separator"]
     print(separator)
 except Exception:
-    print(".")
+    sys.exit(1)
 PY
 ); then
-                case "$separator" in
-                    "."|"-") ;;
-                    *) separator="." ;;
+                case "$py_separator" in
+                    "."|"-") separator="$py_separator"; parsed=1 ;;
                 esac
-            else
-                separator="."
             fi
+        fi
+
+        if [[ "$parsed" -eq 0 ]]; then
+            # Last-resort text fallback for environments with neither jq nor a
+            # working python3 (e.g. stock Windows + Git Bash). Reads the active
+            # integration key (default_integration, else integration) and its
+            # invoke_separator from within the integration_settings object.
+            # Handles both pretty-printed (the written form) and compact JSON.
+            # Accumulate all lines into one buffer in END rather than using
+            # gawk-only whole-file slurp (RS="^$"), so this stays portable to
+            # the BSD awk on macOS.
+            local awk_separator
+            awk_separator=$(awk '
+                function keyval(d, name,   v) {
+                    if (match(d, "\"" name "\"[ \t\r\n]*:[ \t\r\n]*\"[^\"]*\"")) {
+                        v=substr(d,RSTART,RLENGTH); sub(/^.*:[ \t\r\n]*"/,"",v); sub(/"$/,"",v); return v
+                    }
+                    return ""
+                }
+                { doc = doc $0 "\n" }
+                END {
+                    key=keyval(doc,"default_integration"); if (key=="") key=keyval(doc,"integration")
+                    sep="."
+                    if (key!="") {
+                        settings=doc
+                        if (match(doc, /"integration_settings"[ \t\r\n]*:[ \t\r\n]*[{]/)) {
+                            settings=substr(doc, RSTART+RLENGTH-1)
+                        }
+                        if (match(settings, "\"" key "\"[ \t\r\n]*:[ \t\r\n]*[{]")) {
+                            start=RSTART+RLENGTH-1
+                            depth=0
+                            obj=""
+                            for (i=start; i<=length(settings); i++) {
+                                c=substr(settings,i,1)
+                                obj=obj c
+                                if (c=="{") depth++
+                                else if (c=="}") { depth--; if (depth==0) break }
+                            }
+                            if (match(obj, /"invoke_separator"[ \t\r\n]*:[ \t\r\n]*"[-.]"/)) {
+                                tok=substr(obj,RSTART,RLENGTH); s=substr(tok,length(tok)-1,1)
+                                if (s=="." || s=="-") sep=s
+                            }
+                        }
+                    }
+                    print sep
+                }
+            ' "$integration_json" 2>/dev/null)
+            case "$awk_separator" in
+                "."|"-") separator="$awk_separator" ;;
+            esac
         fi
     fi
 
@@ -279,7 +364,7 @@ format_speckit_command() {
     command_name="${command_name#speckit-}"
     command_name="${command_name//./$separator}"
 
-    printf '/speckit%s%s\n' "$separator" "$command_name"
+    printf '$speckit%s%s\n' "$separator" "$command_name"
 }
 
 # Escape a string for safe embedding in a JSON value (fallback when jq is unavailable).
