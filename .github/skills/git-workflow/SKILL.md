@@ -1,9 +1,9 @@
 ---
 name: git-workflow
-description: Git 工作流程自動化技能，涵蓋從 commit 到發布的完整流程。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。包含自動生成 Conventional Commits 格式訊息、建立 PR、等待 Code Review、觸發發布流程等功能。Automates Git workflow from commit to release. Inspired by Anthropic's official commit-commands plugin.
+description: Git 工作流程自動化技能，涵蓋從 commit、本地 Codex Code Review、使用者發布核准到 PR 與發布的完整流程。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。Automates Git workflow from commit through local Codex review and explicit publish approval to PR and release. Inspired by Anthropic's official commit-commands plugin.
 metadata:
     author: singular-blockly
-    version: '1.3.0'
+    version: '1.4.0'
     category: productivity
     inspired-by: anthropics/claude-code/plugins/commit-commands
 license: Apache-2.0
@@ -16,8 +16,8 @@ Automates Git operations during development, from commit to PR creation.
 
 ## 核心原則 Core Principles
 
-> **端到端整合**：此技能現在涵蓋從「開發完成」到「版本發布」的完整流程。PR 建立後自動觸發 `pr-review-release` 技能，確保流程不中斷。
-> **End-to-End Integration**: This skill now covers the complete flow from "development complete" to "version release". After PR creation, it automatically triggers `pr-review-release` skill to ensure uninterrupted workflow.
+> **端到端整合**：此技能涵蓋從「開發完成」到「版本發布」的完整流程。推送前先觸發 `pr-review-release` 的本地 Codex review、修正核准與發布核准，核准後才建立 PR 並完成發布。
+> **End-to-End Integration**: This skill covers the complete flow from development to release. Before pushing, run the local Codex review, remediation approval, and publish approval gates from `pr-review-release`; create the PR and release only after approval.
 
 ## 適用情境 When to Use
 
@@ -27,11 +27,12 @@ Automates Git operations during development, from commit to PR creation.
 
 ## 與其他技能的分工 Skill Boundaries
 
-| 階段             | 技能                                   | 說明                             |
-| ---------------- | -------------------------------------- | -------------------------------- |
-| 開發中 → PR 建立 | **git-workflow** (本技能)              | commit, push, 建立 PR            |
-| PR 建立 → 發布   | **git-workflow** + `pr-review-release` | 本技能強制觸發 pr-review-release |
-| 程式碼簡化       | `code-simplifier`                      | PR 前必須執行（阻塞型）          |
+| 階段                   | 技能                                   | 說明                                     |
+| ---------------------- | -------------------------------------- | ---------------------------------------- |
+| 開發完成 → 本地提交    | **git-workflow**（本技能）             | commit 與變更範圍確認                    |
+| 本地審查 → 發布前核准  | `pr-review-release`                    | findings、修正、re-review 與兩次使用者 gate |
+| 發布核准 → PR／Release | **git-workflow** + `pr-review-release` | push、建立 PR、合併與發布                |
+| 程式碼簡化             | `code-simplifier`                      | push 前必須執行（阻塞型）                |
 
 ---
 
@@ -115,15 +116,9 @@ git commit -m "docs(toolbox): add WiFi blocks to communication category"
 
 ---
 
-### Phase 2: 推送分支 Push Branch
+### Phase 2: 保持本地分支 Local Branch Only
 
-```bash
-# 推送到遠端（首次推送功能分支）
-git push -u origin HEAD
-
-# 後續推送
-git push
-```
+此階段不得推送。先完成程式碼簡化、本地 Codex review、核准修正、驗證、re-review 與發布前核准；推送統一在 Phase 4 執行。
 
 **分支命名規範**（SDD 整合）：
 
@@ -168,32 +163,46 @@ Before creating a PR, you **must** use the `code-simplifier` skill to check and 
     - [ ] 無描述顯而易見程式碼的註解
     - [ ] 測試通過且功能不變
 
-4. **提交簡化變更**
+4. **提交簡化變更（保持本地）**
     ```bash
     git add .
     git commit -m "refactor: simplify code for PR readiness"
-    git push
     ```
 
 > 💡 **Agent 整合**：輸入「簡化程式碼」、「refactor」或 `@code-simplifier` 觸發技能。
 
-> ❌ **禁止跳過**：未完成程式碼簡化不得進入 Phase 3 建立 PR。
+> ❌ **禁止跳過**：未完成程式碼簡化不得進入 Phase 3 本地審查。
 
 ---
 
-### Phase 3: 建立 Pull Request Create PR
+### Phase 3: 本地 Code Review 與核准 Local Review and Approval
 
-#### 3.1 分析分支歷史
+**⚠️ 阻塞型步驟：必須完整執行 `pr-review-release` 的 Phase 0–3.5。**
+
+1. 以 base branch 為基準，本地審查已提交與未提交差異。
+2. 評估 findings，先取得使用者對修正方案的明確核准。
+3. 只修正已核准項目，完成測試、`code-simplifier` 與本地 re-review。
+4. 提交修正摘要、測試結果、殘餘風險與 re-review 結果。
+5. 取得使用者對 push、PR、merge 與 release 的另一次明確發布核准。
+
+> ❌ 修正核准不等同發布核准；Phase 3.5 核准前不得 push 或建立 PR。
+
+### Phase 4: 推送並建立 Pull Request Push and Create PR
+
+**前置條件：`pr-review-release` Phase 3.5 的發布核准已明確取得。**
+
+#### 4.1 推送分支
 
 ```bash
-# 查看此分支相對於 master 的所有 commits
-git log master..HEAD --oneline
-
-# 查看變更的檔案清單
-git diff master..HEAD --stat
+git push -u origin HEAD
 ```
 
-#### 3.2 生成 PR 描述
+#### 4.2 分析分支歷史並生成 PR 描述
+
+```bash
+git log master..HEAD --oneline
+git diff master..HEAD --stat
+```
 
 **PR 描述模板**：
 
@@ -232,7 +241,7 @@ git diff master..HEAD --stat
 {如有 UI 變更，附上截圖}
 ```
 
-#### 3.3 建立 PR
+#### 4.3 建立 PR
 
 ```bash
 # 使用 GitHub CLI 建立 PR
@@ -245,7 +254,7 @@ gh pr create
 gh pr create --reviewer username1,username2
 ```
 
-#### 3.4 檢查 PR 狀態
+#### 4.4 檢查 PR 狀態
 
 ```bash
 # 查看目前 PR
@@ -255,52 +264,11 @@ gh pr view
 gh pr checks
 ```
 
----
+### Phase 5: 合併與發布 Merge and Release
 
-### Phase 4: 等待 Code Review 並發布（強制）Wait for Review & Release (REQUIRED)
+PR 建立後沿用已核准範圍，執行 `pr-review-release` Phase 4–5：確認 CI、squash merge、同步與清理分支、更新版本與 CHANGELOG、建立 annotated tag、打包 VSIX，最後建立並驗證 GitHub Release。
 
-**⚠️ 阻塞型步驟：PR 建立後必須立即進入此階段，不可中斷流程。**
-
-PR 建立完成後，**必須**立即執行 `pr-review-release` 技能來監聽 Copilot Code Review 結果並完成後續發布流程。
-
-#### 4.1 請求 Copilot Review（若尚未配置）
-
-```bash
-# 請求 Copilot Code Review
-gh pr edit --add-reviewer copilot-pull-request-reviewer
-```
-
-#### 4.2 啟動 Review 監聽
-
-```powershell
-# 執行輪詢腳本等待 Copilot Review 完成
-.\.github\skills\pr-review-release\scripts\poll-review.ps1
-
-# 自訂參數（逾時 60 分鐘，每 30 秒查詢一次）
-.\.github\skills\pr-review-release\scripts\poll-review.ps1 -TimeoutMinutes 60 -PollIntervalSeconds 30
-```
-
-#### 4.3 根據 Review 結果執行後續流程
-
-| Review 狀態              | Exit Code | 後續動作                              |
-| ------------------------ | --------- | ------------------------------------- |
-| `COMMENTED` / `APPROVED` | 0         | 評估建議 → 修正（如需）→ Merge → 發布 |
-| `CHANGES_REQUESTED`      | 1         | 必須修正 → 重新推送 → 重新等待 Review |
-| 逾時                     | 2         | 手動檢查 PR 狀態                      |
-
-#### 4.4 執行 pr-review-release 技能
-
-Review 監聽完成後，**強制**進入 `pr-review-release` 技能的完整流程：
-
-1. **Phase 1**: 評估 Review 建議（採納/忽略）
-2. **Phase 2**: 程式碼修正（如有採納的建議）
-3. **Phase 3**: 程式碼簡化（阻塞型）
-4. **Phase 4**: Git 操作（Merge PR、清理分支）
-5. **Phase 5**: 發布流程（版本號、CHANGELOG、Tag、Release）
-
-> 💡 **Agent 整合**：輸入「處理 code review」、「merge PR」或 `@pr-review-release` 觸發技能。
-
-> ❌ **禁止中斷**：完成 PR 建立後不可中止流程，必須完成到發布為止。
+若 PR 或 CI 出現新的實質 findings，回到 `pr-review-release` 的評估與使用者核准 gate，不得自行擴大修正範圍。
 
 ---
 
@@ -321,9 +289,9 @@ Review 監聽完成後，**強制**進入 `pr-review-release` 技能的完整流
     git commit -m "feat(blocks): [T025] implement esp32_wifi_connect block"
     ```
 
-3. **開發完成**：使用本技能建立 PR（自動觸發 Review 監聽）
+3. **開發完成**：使用本技能執行本地 Codex review、修正與 re-review
 
-4. **Review 完成**：本技能自動執行 `pr-review-release` 處理 merge 和發布
+4. **發布核准**：使用者明確核准後才 push、建立 PR、merge 和發布
 
 ### Commit Message 與 Task 關聯
 
@@ -339,19 +307,17 @@ git commit -m "feat(i18n): [T072-T086] add translations for all 15 languages"
 
 ## 快速指令 Quick Commands
 
-### 一鍵 Commit + Push
+### 本地 Commit
 
 ```bash
-# 分析變更並提交
 git add .
-git commit -m "$(git diff --cached --stat | head -1 | sed 's/^ //')"
-git push
+git commit -m "feat(scope): 繁體中文變更摘要"
 ```
 
-### 一鍵建立 PR
+### 發布核准後推送並建立 PR
 
 ```bash
-# 從目前分支建立 PR 到 master
+git push -u origin HEAD
 gh pr create --fill --base master
 ```
 
@@ -376,12 +342,14 @@ gh pr create --fill --base master
 - [ ] 變數和函式命名清晰
 - [ ] 無描述顯而易見程式碼的註解
 - [ ] 測試通過且功能不變
-- [ ] 簡化變更已提交並推送
+- [ ] 簡化變更已提交於本地
 
 ### 建立 PR 前 Before PR Creation
 
 - [ ] **程式碼簡化已完成（必須）**
-- [ ] 分支已推送到遠端
+- [ ] 本地 Codex review、修正核准與 re-review 已完成
+- [ ] 使用者已明確核准 push、PR、merge 與 release
+- [ ] 分支已在發布核准後推送到遠端
 - [ ] PR 描述清楚說明變更內容
 - [ ] 已關聯相關 Spec（如適用）
 - [ ] 測試計劃已列出
@@ -389,13 +357,13 @@ gh pr create --fill --base master
 ### PR 建立後 After PR Creation
 
 - [ ] CI 檢查通過
-- [ ] 已請求 Copilot Code Review
-- [ ] Review 監聽腳本已啟動
-- [ ] **→ Review 完成後自動執行 `pr-review-release` 技能**
+- [ ] PR 差異與本地核准範圍一致
+- [ ] 若 CI／人工 review 出現新 findings，已回到使用者核准 gate
+- [ ] 已執行 `pr-review-release` Phase 4–5
 
 ### 發布階段 Release Phase
 
-- [ ] Review 建議已評估處理
+- [ ] 本地 findings 已評估、核准並處理
 - [ ] 程式碼修正已完成（如需）
 - [ ] 程式碼簡化已完成（阻塞型）
 - [ ] PR 已 Squash Merge
@@ -411,5 +379,5 @@ gh pr create --fill --base master
 - [Anthropic commit-commands plugin](https://github.com/anthropics/claude-code/tree/main/plugins/commit-commands) - 本技能靈感來源
 - [Conventional Commits 規範](https://www.conventionalcommits.org/zh-hant/)
 - [GitHub CLI 文件](https://cli.github.com/manual/)
-- [pr-review-release 技能](../pr-review-release/SKILL.md) - PR 審查後的下一步
+- [pr-review-release 技能](../pr-review-release/SKILL.md) - 本地審查、使用者核准與發布流程
 - [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（必須）
