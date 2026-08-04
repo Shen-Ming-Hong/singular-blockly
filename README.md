@@ -207,11 +207,14 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 
 ## Requirements
 
-- Visual Studio Code 1.105.0 or higher
+- Visual Studio Code 1.105.0 or higher, or a compatible Open VSX-based editor such as VSCodium
 - Node.js 22.16.0 or higher
 - Basic understanding of visual programming and your target board workflow
+- **PlatformIO environment provider (required for all boards):**
+    - Singular Blockly automatically starts installation when the Blockly editor is first opened.
+    - VS Code uses `platformio.platformio-ide`; Open VSX environments such as VSCodium automatically fall back to `pioarduino.pioarduino-ide`.
+    - If neither provider can be installed automatically, follow the prompt in the Extensions panel.
 - **For Arduino / ESP32 boards:**
-    - PlatformIO IDE Extension
     - C/C++ Extension (`ms-vscode.cpptools`)
 - **For CyberBrick (MicroPython):**
     - Python 3.x installed
