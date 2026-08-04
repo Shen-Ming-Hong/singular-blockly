@@ -49,6 +49,14 @@ export class SettingsManager {
 	private readonly DEFAULT_AUTO_BACKUP_INTERVAL = 30; // 預設 30 分鐘
 
 	/**
+	 * 偵測是否已安裝 PlatformIO provider 擴充功能（官方 platformio.platformio-ide
+	 * 或相容分支 pioarduino.pioarduino-ide）。以欄位形式提供，方便測試覆寫。
+	 */
+	public platformIOProviderDetector: () => boolean = () =>
+		vscode.extensions.getExtension('platformio.platformio-ide') !== undefined ||
+		vscode.extensions.getExtension('pioarduino.pioarduino-ide') !== undefined;
+
+	/**
 	 * 建立設定管理器實例
 	 * @param workspacePath 工作區路徑
 	 * @param fileService 可選的檔案服務實例（主要用於測試）
@@ -121,9 +129,14 @@ export class SettingsManager {
 			// 讀取現有設定
 			const settings = await this.fileService.readJsonFile<Record<string, any>>(this.settingsPath, {});
 
-			// 更新 PlatformIO 相關設定
-			settings['platformio-ide.autoOpenPlatformIOIniFile'] = false;
-			settings['platformio-ide.disablePIOHomeStartup'] = true;
+			// 僅在偵測到 PlatformIO provider（官方或 pioarduino 分支）時才寫入
+			// platformio-ide 設定，避免在未安裝任何 provider 時污染專案的 .vscode/settings.json
+			if (this.platformIOProviderDetector()) {
+				settings['platformio-ide.autoOpenPlatformIOIniFile'] = false;
+				settings['platformio-ide.disablePIOHomeStartup'] = true;
+			} else {
+				log('No PlatformIO provider detected (platformio.platformio-ide / pioarduino.pioarduino-ide); skipping platformio-ide settings', 'info');
+			}
 
 			// 確保 Singular Blockly 主題設定存在
 			if (!settings['singular-blockly.theme']) {

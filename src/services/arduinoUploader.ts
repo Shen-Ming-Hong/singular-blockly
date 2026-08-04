@@ -7,10 +7,17 @@
 import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
-import { spawn } from 'child_process';
+import * as vscode from 'vscode';
+import { execFile, spawn } from 'child_process';
 import { log } from './logging';
-import { getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
 import { SettingsManager } from './settingsManager';
+import { isProviderInstalled } from './penvProviderService';
+import {
+	PlatformioInvocation,
+	PlatformioInvocationResolution,
+	parsePlatformioCustomPath,
+	resolvePlatformioInvocation,
+} from './platformioInvocationResolver';
 import { ArduinoUploadStage, ArduinoUploadResult, ArduinoUploadRequest, ArduinoPortInfo, ArduinoProgressCallback } from '../types/arduino';
 
 /**
@@ -27,7 +34,12 @@ const DEFAULT_UPLOAD_TIMEOUT = 60000;
  * 指令執行介面（用於依賴注入）
  */
 export interface CommandExecutor {
-	exec(command: string, options?: { timeout?: number; cwd?: string }): Promise<{ stdout: string; stderr: string }>;
+	exec?(command: string, options?: { timeout?: number; cwd?: string }): Promise<{ stdout: string; stderr: string }>;
+	execFile?(
+		filePath: string,
+		args: string[],
+		options?: { timeout?: number; cwd?: string }
+	): Promise<{ stdout: string; stderr: string }>;
 }
 
 /**
@@ -57,13 +69,15 @@ export interface FileSystemInterface {
  * 負責 Arduino C++ 程式碼的編譯與上傳
  */
 export class ArduinoUploader {
-	private pioPath: string;
+	private pioInvocation: PlatformioInvocation | null = null;
+	private lastPioResolution: PlatformioInvocationResolution | null = null;
 	private executor: CommandExecutor;
 	private streamingExecutor: StreamingCommandExecutor;
 	private fileSystem: FileSystemInterface;
 	private compileTimeout: number;
 	private uploadTimeout: number;
 	private settingsManager: SettingsManager;
+	private readonly providerInstalled: () => boolean;
 	private startTime: number = 0;
 
 	/**
@@ -73,34 +87,42 @@ export class ArduinoUploader {
 	 * @param fileSystem 檔案系統（可選，用於測試）
 	 * @param settingsManager 設定管理器（可選，用於測試）
 	 * @param streamingExecutor 串流執行器（可選，用於測試）
+	 * @param providerInstalled provider 偵測函式（可選，用於測試）
 	 */
 	constructor(
 		private workspacePath: string,
 		executor?: CommandExecutor,
 		fileSystem?: FileSystemInterface,
 		settingsManager?: SettingsManager,
-		streamingExecutor?: StreamingCommandExecutor
+		streamingExecutor?: StreamingCommandExecutor,
+		providerInstalled?: () => boolean
 	) {
 		this.settingsManager = settingsManager || new SettingsManager(workspacePath);
 		this.fileSystem = fileSystem || fs;
-		this.pioPath = this.resolvePioPath();
+		this.providerInstalled = providerInstalled ?? (() => isProviderInstalled({
+			getExtension: id => vscode.extensions.getExtension(id),
+		}));
 		this.compileTimeout = DEFAULT_COMPILE_TIMEOUT;
 		this.uploadTimeout = DEFAULT_UPLOAD_TIMEOUT;
 
 		// 使用預設的 child_process 執行器或注入的執行器
 		this.executor = executor || {
-			exec: (command: string, options?: { timeout?: number; cwd?: string }) => {
-				const { exec } = require('child_process');
+			execFile: (
+				filePath: string,
+				args: string[],
+				options?: { timeout?: number; cwd?: string }
+			) => {
 				return new Promise((resolve, reject) => {
-					exec(
-						command,
+					execFile(
+						filePath,
+						args,
 						{
 							encoding: 'utf8',
 							timeout: options?.timeout || 0,
 							cwd: options?.cwd || this.workspacePath,
-							maxBuffer: 10 * 1024 * 1024, // 10MB buffer for large compile outputs
+							maxBuffer: 10 * 1024 * 1024,
 						},
-						(error: Error | null, stdout: string, stderr: string) => {
+						(error, stdout, stderr) => {
 							if (error) {
 								reject({ error, stdout, stderr });
 							} else {
@@ -128,7 +150,7 @@ export class ArduinoUploader {
 
 					const child = spawn(command, args, {
 						cwd: options.cwd || this.workspacePath,
-						shell: true,
+						shell: false,
 						stdio: ['ignore', 'pipe', 'pipe'],
 					});
 
@@ -173,16 +195,79 @@ export class ArduinoUploader {
 		};
 	}
 
-	private resolvePioPath(): string {
-		const defaultPath = this.getPioPath();
-		const resolvedPath = resolveExecutable({
-			candidatePaths: [defaultPath],
-			searchDirectories: getExecutableSearchDirectories(),
-			executableNames: ['pio'],
-			existsSync: filePath => this.fileSystem.existsSync(filePath),
-		});
+	private quoteInjectedExecutorArg(value: string): string {
+		if (/[\r\n]/.test(value)) {
+			throw new Error('Command argument contains unsupported newline characters');
+		}
+		return `"${value.replace(/(["\\$`])/g, '\\$1')}"`;
+	}
 
-		return resolvedPath ?? defaultPath;
+	private executeFile(
+		filePath: string,
+		args: string[],
+		options?: { timeout?: number; cwd?: string }
+	): Promise<{ stdout: string; stderr: string }> {
+		if (this.executor.execFile) {
+			return this.executor.execFile(filePath, args, options);
+		}
+		if (!this.executor.exec) {
+			throw new Error('No command executor is available');
+		}
+
+		// 向後相容測試注入的舊 executor；生產環境固定使用 shell-free execFile。
+		const command = [filePath, ...args].map(value => this.quoteInjectedExecutorArg(value)).join(' ');
+		return this.executor.exec(command, options);
+	}
+
+	private getPlatformioCustomPathEntries(): string[] {
+		const customPath = vscode.workspace.getConfiguration('platformio-ide').get<unknown>('customPATH');
+		return parsePlatformioCustomPath(customPath);
+	}
+
+	private async resolveWorkingPlatformioInvocation(): Promise<PlatformioInvocationResolution> {
+		const resolution = await resolvePlatformioInvocation({
+			existsSync: filePath => this.fileSystem.existsSync(filePath),
+			probe: (filePath, args, options) => this.executeFile(filePath, args, options),
+			customPathEntries: this.getPlatformioCustomPathEntries(),
+		});
+		this.lastPioResolution = resolution;
+		this.pioInvocation = resolution.invocation;
+		return resolution;
+	}
+
+	private async ensurePlatformioInvocation(): Promise<PlatformioInvocation | null> {
+		return this.pioInvocation ?? (await this.resolveWorkingPlatformioInvocation()).invocation;
+	}
+
+	private getPlatformioUnavailableMessage(): string {
+		if ((this.lastPioResolution?.foundCandidates.length ?? 0) > 0) {
+			return 'PlatformIO Core was found but could not be started. Check the PlatformIO diagnostic panel for details.';
+		}
+		if (this.providerInstalled()) {
+			return 'PlatformIO provider is installed, but Core is not ready yet. Wait for initialization to finish, then try again.';
+		}
+		return 'PlatformIO environment not found. Open the Blockly editor to trigger automatic setup.';
+	}
+
+	private async executePlatformio(
+		args: string[],
+		options?: { timeout?: number; cwd?: string }
+	): Promise<{ stdout: string; stderr: string }> {
+		const invocation = await this.ensurePlatformioInvocation();
+		if (!invocation) {
+			throw new Error('PlatformIO Core is unavailable');
+		}
+		return this.executeFile(invocation.command, [...invocation.prefixArgs, ...args], options);
+	}
+
+	private getPlatformioSpawnCommand(args: string[]): { command: string; args: string[] } {
+		if (!this.pioInvocation) {
+			throw new Error('PlatformIO Core is unavailable');
+		}
+		return {
+			command: this.pioInvocation.command,
+			args: [...this.pioInvocation.prefixArgs, ...args],
+		};
 	}
 
 	/**
@@ -205,21 +290,26 @@ export class ArduinoUploader {
 	 * @returns 是否已安裝
 	 */
 	async checkPioInstalled(): Promise<boolean> {
-		this.pioPath = this.resolvePioPath();
-
-		if (!this.fileSystem.existsSync(this.pioPath)) {
-			log('[arduino] PlatformIO CLI 未安裝', 'warn', { path: this.pioPath });
+		const resolution = await this.resolveWorkingPlatformioInvocation();
+		if (!resolution.invocation) {
+			const level = resolution.foundCandidates.length > 0 ? 'error' : 'warn';
+			log('[arduino] PlatformIO Core 無可用啟動方式', level, {
+				foundCandidates: resolution.foundCandidates.map(candidate => ({
+					path: candidate.command,
+					mode: candidate.mode,
+					source: candidate.source,
+				})),
+			});
 			return false;
 		}
 
-		try {
-			const result = await this.executor.exec(`"${this.pioPath}" --version`);
-			log('[arduino] PlatformIO CLI 檢查成功', 'info', { version: result.stdout.trim() });
-			return true;
-		} catch (error) {
-			log('[arduino] PlatformIO CLI 檢查失敗', 'error', error);
-			return false;
-		}
+		log('[arduino] PlatformIO Core 檢查成功', 'info', {
+			path: resolution.invocation.command,
+			mode: resolution.invocation.mode,
+			source: resolution.invocation.source,
+			fallbackCount: resolution.failures.length,
+		});
+		return true;
 	}
 
 	/**
@@ -227,10 +317,8 @@ export class ArduinoUploader {
 	 * @returns 偵測結果，包含是否有裝置、連接埠資訊及指令是否失敗
 	 */
 	async detectDevices(): Promise<{ hasDevice: boolean; port?: string; devices: ArduinoPortInfo[]; commandFailed: boolean }> {
-		this.pioPath = this.resolvePioPath();
-
 		try {
-			const result = await this.executor.exec(`"${this.pioPath}" device list --json-output`);
+			const result = await this.executePlatformio(['device', 'list', '--json-output']);
 			const deviceList = JSON.parse(result.stdout);
 
 			// 過濾有效的 Arduino 裝置（排除藍牙裝置）
@@ -574,10 +662,15 @@ export class ArduinoUploader {
 			let lastProgress = 0;
 			let lastMessage = 'Starting compilation...';
 			let stderrOutput = '';
+			const platformio = this.getPlatformioSpawnCommand([
+				'run',
+				'--project-dir',
+				this.workspacePath,
+			]);
 
 			const result = await this.streamingExecutor.spawn(
-				`"${this.pioPath}"`,
-				['run', '--project-dir', `"${this.workspacePath}"`],
+				platformio.command,
+				platformio.args,
 				{
 					timeout: this.compileTimeout,
 					cwd: this.workspacePath,
@@ -678,14 +771,15 @@ export class ArduinoUploader {
 
 			// 建構命令參數
 			// 如果 port 是 'auto'，不指定 --upload-port，讓 PlatformIO 自動偵測
-			const args = ['run', '--target', 'upload', '--project-dir', `"${this.workspacePath}"`];
+			const args = ['run', '--target', 'upload', '--project-dir', this.workspacePath];
 			if (port !== 'auto') {
-				args.splice(3, 0, '--upload-port', `"${port}"`);
+				args.splice(3, 0, '--upload-port', port);
 			}
+			const platformio = this.getPlatformioSpawnCommand(args);
 
 			const result = await this.streamingExecutor.spawn(
-				`"${this.pioPath}"`,
-				args,
+				platformio.command,
+				platformio.args,
 				{
 					timeout: combinedTimeout,
 					cwd: this.workspacePath,
@@ -832,7 +926,7 @@ export class ArduinoUploader {
 		try {
 			log('[arduino] 開始編譯', 'info');
 
-			await this.executor.exec(`"${this.pioPath}" run --project-dir "${this.workspacePath}"`, {
+			await this.executePlatformio(['run', '--project-dir', this.workspacePath], {
 				timeout: this.compileTimeout,
 				cwd: this.workspacePath,
 			});
@@ -859,9 +953,15 @@ export class ArduinoUploader {
 		try {
 			log('[arduino] 開始上傳到裝置', 'info', { port });
 
-			const command = `"${this.pioPath}" run --target upload --upload-port "${port}" --project-dir "${this.workspacePath}"`;
-
-			await this.executor.exec(command, {
+			await this.executePlatformio([
+				'run',
+				'--target',
+				'upload',
+				'--upload-port',
+				port,
+				'--project-dir',
+				this.workspacePath,
+			], {
 				timeout: this.uploadTimeout,
 				cwd: this.workspacePath,
 			});
@@ -1039,8 +1139,9 @@ export class ArduinoUploader {
 			sendProgress('checking_pio', 15, 'Checking compiler...');
 			const hasPio = await this.checkPioInstalled();
 			if (!hasPio) {
-				sendProgress('failed', 15, 'PlatformIO not found', undefined, 'PIO_NOT_FOUND');
-				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found');
+				const notReady = this.getPlatformioUnavailableMessage();
+				sendProgress('failed', 15, notReady, undefined, 'PIO_NOT_FOUND');
+				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found', notReady);
 			}
 
 			// 階段 4: 編譯並上傳 (20-95%)

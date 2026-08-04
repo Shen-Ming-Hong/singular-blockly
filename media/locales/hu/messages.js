@@ -1331,4 +1331,10 @@ window.languageManager.loadMessages('hu', {
 	TXT_SETUP_REQUIRED_WARNING: 'A TXT munkaterülethez egy „TXT inicializálás” blokk szükséges.',
 	TXT_PROCESS_REQUIRED_WARNING: 'A TXT munkaterülethez legalább egy „TXT folyamat” blokk szükséges.',
 	CATEGORY_TXT: 'TXT vezérlő',
+
+        PENV_PROVIDER_INSTALL_FAILED: 'Az automatikus telepítés sikertelen. Telepítse a "PlatformIO IDE" (VS Code Marketplace) vagy "pioarduino" (Open VSX a VSCodiumhoz) bővítményt a bővítmények panelről.',
+        PENV_PROVIDER_PENDING: 'A PlatformIO környezet inicializálódik, kérjük várjon...',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'A PlatformIO környezeti bővítmény sikeresen telepítve. Most töltse újra a VS Code-ot a beállítás befejezéséhez.',
+        PENV_PROVIDER_RELOAD_BUTTON: 'Újratöltés most',
 });

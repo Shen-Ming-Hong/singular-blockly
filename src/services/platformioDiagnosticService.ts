@@ -12,6 +12,11 @@ import { log } from './logging';
 import { createPlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
 import { createExecFilePromise } from './platformioProcess';
 import {
+	PlatformioInvocation,
+	createPlatformioInvocationCandidates,
+	resolvePlatformioInvocation,
+} from './platformioInvocationResolver';
+import {
 	getDefaultPlatformioExecutablePath,
 	getExecutableDirectory,
 	getExecutableSearchDirectories,
@@ -186,20 +191,47 @@ export class PlatformioDiagnosticService {
 
 		const requestedAt = this.now().toISOString();
 		const settingsEvidence = this.collectOfficialSettingsEvidence();
-		const searchDirectories = getExecutableSearchDirectories(this.env, this.platform);
+		const invocationCandidates = createPlatformioInvocationCandidates({
+			customPathEntries: settingsEvidence.candidatePathEntries,
+			env: this.env,
+			platform: this.platform,
+			homeDir: this.homeDir,
+		});
+		const invocationDirectories = invocationCandidates.map(candidate => this.getPlatformDirname(candidate.command));
+		const searchDirectories = unique([
+			...invocationDirectories,
+			...getExecutableSearchDirectories(this.env, this.platform),
+		]);
 		const pioResolution = this.resolvePio(settingsEvidence.candidatePathEntries, searchDirectories);
-		const pioDirectory = getExecutableDirectory(pioResolution.resolvedPath);
+		const pioDirectory = getExecutableDirectory(pioResolution.resolvedPath, this.platform);
 		const penvResolution = this.resolvePenvRoot(pioResolution.resolvedPath);
 		const validatedPenvRootPath = penvResolution.status === 'valid' ? penvResolution.resolvedPath : null;
 		const toolSearchDirectories = unique([pioDirectory, ...settingsEvidence.candidatePathEntries, ...searchDirectories]);
 
-		const pioItem = await this.buildExecutableItem('pio', pioResolution, ['--version']);
+		let pioItem = await this.buildExecutableItem('pio', pioResolution, ['--version']);
 		const penvRootItem = await this.buildPenvRootItem(penvResolution, pioResolution.resolvedPath);
 		const [pythonItem, pipItem, mpremoteItem] = await Promise.all([
 			this.buildToolItem('python', ['python3', 'python'], ['--version'], toolSearchDirectories, validatedPenvRootPath),
 			this.buildToolItem('pip', ['pip3', 'pip'], ['--version'], toolSearchDirectories, validatedPenvRootPath),
 			this.buildToolItem('mpremote', ['mpremote'], ['version'], toolSearchDirectories, validatedPenvRootPath),
 		]);
+		if (pioItem.status !== 'ok') {
+			const fallbackResolution = await resolvePlatformioInvocation({
+				existsSync: this.existsSync,
+				probe: this.execFile,
+				customPathEntries: settingsEvidence.candidatePathEntries,
+				env: this.env,
+				platform: this.platform,
+				homeDir: this.homeDir,
+				probeTimeoutMs: this.versionProbeTimeoutMs,
+			});
+			if (fallbackResolution.invocation && fallbackResolution.probeResult) {
+				pioItem = await this.buildFallbackPlatformioItem(
+					fallbackResolution.invocation,
+					fallbackResolution.probeResult
+				);
+			}
+		}
 
 		const items: PlatformioDiagnosticSession['items'] = [pioItem, penvRootItem, pythonItem, pipItem, mpremoteItem];
 		const overallStatus = this.getOverallStatus(items);
@@ -230,6 +262,53 @@ export class PlatformioDiagnosticService {
 		});
 
 		return session;
+	}
+
+	private async buildFallbackPlatformioItem(
+		invocation: PlatformioInvocation,
+		probeResult: PlatformioDiagnosticExecResult
+	): Promise<PlatformioDiagnosticItem> {
+		const toolLabel = await this.getMessageFromRecord('pio', TOOL_LABEL_DEFINITIONS);
+		const commandName = this.getPlatformBasename(invocation.command);
+		const command = [commandName, ...invocation.prefixArgs, '--version'].join(' ');
+		const output = normalizeVersionOutput(probeResult.stdout, probeResult.stderr);
+
+		return {
+			id: 'pio',
+			kind: 'executable',
+			status: 'ok',
+			resolvedPath: invocation.command,
+			source: this.mapInvocationSource(invocation),
+			exists: true,
+			isFromDetectedPenv: invocation.mode === 'python-module',
+			reason: await this.message(
+				'PLATFORMIO_DIAGNOSTIC_REASON_EXECUTABLE_READY',
+				'{0} was resolved successfully and the version probe completed.',
+				toolLabel
+			),
+			versionProbe: {
+				command,
+				succeeded: true,
+				output: invocation.mode === 'python-module' && output
+					? `python -m platformio: ${output}`
+					: output,
+				durationMs: 0,
+			},
+		};
+	}
+
+	private mapInvocationSource(invocation: PlatformioInvocation): DiagnosticSource {
+		if (invocation.source === 'official-custom-path') {
+			return 'official-platformio-custom-path';
+		}
+		if (invocation.source === 'default-core-dir') {
+			return 'default-platformio-path';
+		}
+		return 'path-search';
+	}
+
+	private getPlatformDirname(filePath: string): string {
+		return this.platform === 'win32' ? path.win32.dirname(filePath) : path.dirname(filePath);
 	}
 
 	async buildClipboardSummary(session: PlatformioDiagnosticSession): Promise<ClipboardSummary> {
@@ -440,7 +519,7 @@ export class PlatformioDiagnosticService {
 	}
 
 	private resolvePenvRoot(resolvedPioPath: string | null): PenvRootResolution {
-		const pioDirectory = getExecutableDirectory(resolvedPioPath);
+		const pioDirectory = getExecutableDirectory(resolvedPioPath, this.platform);
 		if (!resolvedPioPath || !pioDirectory) {
 			return {
 				candidatePath: null,
@@ -451,7 +530,7 @@ export class PlatformioDiagnosticService {
 			};
 		}
 
-		const candidatePath = path.dirname(pioDirectory);
+		const candidatePath = this.getPlatformDirname(pioDirectory);
 		const exists = this.existsSync(candidatePath);
 		if (!exists) {
 			return {
@@ -673,7 +752,7 @@ export class PlatformioDiagnosticService {
 		}
 
 		const versionProbe = await this.runVersionProbe(resolution.resolvedPath, probeArgs);
-		const probeCommand = [path.basename(resolution.resolvedPath), ...probeArgs].join(' ');
+		const probeCommand = [this.getPlatformBasename(resolution.resolvedPath), ...probeArgs].join(' ');
 		const normalizedProbe: VersionProbeResult = {
 			command: probeCommand,
 			succeeded: versionProbe.succeeded,
@@ -728,7 +807,7 @@ export class PlatformioDiagnosticService {
 		try {
 			const result = await this.execFile(executablePath, args, { timeout: this.versionProbeTimeoutMs });
 			return {
-				command: [path.basename(executablePath), ...args].join(' '),
+				command: [this.getPlatformBasename(executablePath), ...args].join(' '),
 				succeeded: true,
 				output: normalizeVersionOutput(result.stdout, result.stderr),
 				durationMs: Date.now() - startedAt,
@@ -740,7 +819,7 @@ export class PlatformioDiagnosticService {
 				firstNonEmpty(error?.message, stderr, stdout) ?? `Probe timed out or failed after ${this.versionProbeTimeoutMs}ms`;
 
 			return {
-				command: [path.basename(executablePath), ...args].join(' '),
+				command: [this.getPlatformBasename(executablePath), ...args].join(' '),
 				succeeded: false,
 				output: normalizeVersionOutput(stdout, stderr),
 				errorMessage,
@@ -762,11 +841,13 @@ export class PlatformioDiagnosticService {
 	}
 
 	private getPenvScriptsDirectory(penvRootPath: string): string {
-		return this.platform === 'win32' ? path.join(penvRootPath, 'Scripts') : path.join(penvRootPath, 'bin');
+		const pathApi = this.platform === 'win32' ? path.win32 : path;
+		return this.platform === 'win32' ? pathApi.join(penvRootPath, 'Scripts') : pathApi.join(penvRootPath, 'bin');
 	}
 
 	private isValidatedPenvRoot(penvRootPath: string, resolvedPioPath: string): boolean {
-		if (path.basename(penvRootPath).toLowerCase() !== 'penv') {
+		const pathApi = this.platform === 'win32' ? path.win32 : path;
+		if (pathApi.basename(penvRootPath).toLowerCase() !== 'penv') {
 			return false;
 		}
 
@@ -776,8 +857,8 @@ export class PlatformioDiagnosticService {
 
 		return (
 			this.isPathWithin(resolvedPioPath, scriptsDirectory) &&
-			this.existsSync(path.join(scriptsDirectory, expectedPioName)) &&
-			pythonCandidates.some(executableName => this.existsSync(path.join(scriptsDirectory, executableName)))
+			this.existsSync(pathApi.join(scriptsDirectory, expectedPioName)) &&
+			pythonCandidates.some(executableName => this.existsSync(pathApi.join(scriptsDirectory, executableName)))
 		);
 	}
 
@@ -794,9 +875,10 @@ export class PlatformioDiagnosticService {
 	}
 
 	private isPathWithin(candidatePath: string, directoryPath: string): boolean {
-		const normalizedCandidate = path.resolve(candidatePath);
-		const normalizedDirectory = path.resolve(directoryPath);
-		return normalizedCandidate === normalizedDirectory || normalizedCandidate.startsWith(`${normalizedDirectory}${path.sep}`);
+		const pathApi = this.platform === 'win32' ? path.win32 : path;
+		const normalizedCandidate = pathApi.resolve(candidatePath);
+		const normalizedDirectory = pathApi.resolve(directoryPath);
+		return normalizedCandidate === normalizedDirectory || normalizedCandidate.startsWith(`${normalizedDirectory}${pathApi.sep}`);
 	}
 
 	private async message(key: string, fallback: string, ...args: any[]): Promise<string> {

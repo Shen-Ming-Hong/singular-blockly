@@ -8,6 +8,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { log } from './logging';
 import { getDefaultPlatformioExecutablePath, getExecutableDirectory, getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
+import { isProviderInstalled } from './penvProviderService';
 import * as vscode from 'vscode';
 import { CYBERBRICK_OTA_AGENT_TARGET_VERSION, WifiNetworkSuggestion } from '../types/cyberbrickUpload';
 import {
@@ -126,8 +127,14 @@ export class MicropythonUploader {
 	 * 建立 MicropythonUploader 實例
 	 * @param workspacePath 工作區路徑
 	 * @param executor 指令執行器（可選，用於測試）
+	 * @param providerInstalled provider 安裝狀態探測（可選，用於測試）
 	 */
-	constructor(private workspacePath: string, executor?: CommandExecutor) {
+	constructor(
+		private workspacePath: string,
+		executor?: CommandExecutor,
+		private readonly providerInstalled: () => boolean = () =>
+			isProviderInstalled({ getExtension: id => vscode.extensions.getExtension(id) })
+	) {
 		// 使用預設的 child_process 執行器或注入的執行器
 		this.executor = executor || {
 			exec: (command: string) => {
@@ -299,10 +306,14 @@ export class MicropythonUploader {
 
 		const hasPython = await this.checkPythonEnvironment();
 		if (!hasPython) {
+			const detail = this.providerInstalled()
+				? 'PlatformIO is still initializing. Please wait and try again.'
+				: 'Open the Blockly editor to trigger automatic setup, or manually install PlatformIO IDE (VS Code Marketplace) or pioarduino (Open VSX for VSCodium).';
 			return {
 				success: false,
 				stage: 'checking_tool',
-				message: 'PlatformIO Python environment not found. Please install PlatformIO first.',
+				message: 'PlatformIO Python environment is not available.',
+				details: detail,
 			};
 		}
 
@@ -323,7 +334,8 @@ export class MicropythonUploader {
 				success: false,
 				stage: 'installing_tool',
 				message: 'mpremote installation failed',
-				details: 'Please run manually: pip install mpremote',
+				details:
+					'Please run manually: pip install mpremote (using the pip from ~/.platformio/penv). If using pioarduino on VSCodium, pip is at the same path.',
 			};
 		}
 

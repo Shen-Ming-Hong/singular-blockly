@@ -1323,4 +1323,10 @@ window.languageManager.loadMessages('pt-br', {
 	TXT_SETUP_REQUIRED_WARNING: 'O workspace TXT requer um bloco "Inicialização TXT".',
 	TXT_PROCESS_REQUIRED_WARNING: 'O workspace TXT requer pelo menos um bloco "Processo TXT".',
 	CATEGORY_TXT: 'TXT Controller',
+
+        PENV_PROVIDER_INSTALL_FAILED: 'Falha na instalação automática. Por favor, instale "PlatformIO IDE" (VS Code Marketplace) ou "pioarduino" (Open VSX para VSCodium) no painel de extensões.',
+        PENV_PROVIDER_PENDING: 'Ambiente PlatformIO inicializando, aguarde...',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'A extensão do ambiente PlatformIO foi instalada com sucesso. Recarregue o VS Code agora para concluir a configuração.',
+        PENV_PROVIDER_RELOAD_BUTTON: 'Recarregar agora',
 });

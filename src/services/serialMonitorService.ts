@@ -53,11 +53,13 @@ export class SerialMonitorService {
 		}
 
 		// 偵測裝置
+		let detectionBackend: 'python' | 'mpremote' = 'python';
 		let { autoDetected } = await this.uploader.listSerialPorts('cyberbrick');
 		if (!autoDetected) {
 			const fallbackDetection = await this.uploader.listPorts('cyberbrick');
 			autoDetected = fallbackDetection.autoDetected;
 			if (autoDetected) {
+				detectionBackend = 'mpremote';
 				log('[blockly] pyserial 序列埠偵測無結果，改用 mpremote connect list 偵測 USB 裝置', 'info', { port: autoDetected });
 			}
 		}
@@ -76,13 +78,21 @@ export class SerialMonitorService {
 		this.terminal = vscode.window.createTerminal({
 			name: 'CyberBrick Monitor',
 			hideFromUser: false,
+			...(process.platform === 'win32'
+				? { shellPath: 'powershell.exe', shellArgs: ['-NoLogo'] }
+				: {}),
 		});
 
 		this.currentPort = autoDetected;
 		this.terminal.show(false);
 
-		// 先用 pyserial 發送 Ctrl+C + Ctrl+D 來中斷程式並觸發軟重置
-		// 然後再進入 repl 終端模式查看輸出
+		if (detectionBackend === 'mpremote') {
+			this.startMpremoteMonitor(autoDetected);
+			log('[blockly] Monitor 已啟動', 'info', { port: autoDetected, backend: detectionBackend });
+			return { success: true, port: autoDetected };
+		}
+
+		// pyserial 已成功列出裝置，沿用同一個 Python 後端啟動 Monitor。
 		try {
 			await this.resetAndStartMonitor(autoDetected);
 		} catch (error) {
@@ -103,15 +113,7 @@ export class SerialMonitorService {
 				};
 			}
 
-			const mpremotePath = this.uploader.getMpremotePath();
-			const fallbackCommand = process.platform === 'win32'
-				? `& "${mpremotePath}" connect "${autoDetected}" repl`
-				: `"${mpremotePath}" connect "${autoDetected}" repl`;
-			setTimeout(() => {
-				if (this.terminal) {
-					this.terminal.sendText(fallbackCommand, true);
-				}
-			}, 500);
+			this.startMpremoteMonitor(autoDetected);
 		}
 
 		log('[blockly] Monitor 已啟動', 'info', { port: autoDetected });
@@ -209,7 +211,7 @@ export class SerialMonitorService {
 import sys
 import time
 
-port = '${port}'
+port = ${JSON.stringify(port)}
 try:
     s = serial.Serial(port, 115200, timeout=0.1)
     
@@ -267,6 +269,25 @@ except Exception as e:
 		}
 
 		log('[blockly] 使用 pyserial 啟動 Monitor', 'info', { port, scriptFile });
+	}
+
+	private quoteTerminalArgument(value: string): string {
+		if (process.platform === 'win32') {
+			if (/[\r\n]/.test(value)) {
+				throw new Error('Windows terminal argument contains unsupported characters');
+			}
+			return `'${value.replace(/'/g, "''")}'`;
+		}
+		return `'${value.replace(/'/g, `'\\''`)}'`;
+	}
+
+	private startMpremoteMonitor(port: string): void {
+		const values = [this.uploader.getMpremotePath(), 'connect', port, 'repl'];
+		const command = values.map(value => this.quoteTerminalArgument(value)).join(' ');
+		const terminalCommand = process.platform === 'win32' ? `& ${command}` : command;
+		setTimeout(() => {
+			this.terminal?.sendText(terminalCommand, true);
+		}, 500);
 	}
 
 	/**

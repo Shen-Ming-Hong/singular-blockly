@@ -1328,4 +1328,10 @@ window.languageManager.loadMessages('en', {
 	TXT_PROCESS_REQUIRED_WARNING: 'TXT workspace requires at least one "TXT Process" block.',
 	// Category
 	CATEGORY_TXT: 'TXT Controller',
+
+        PENV_PROVIDER_INSTALL_FAILED: 'Automatic installation failed. Please install "PlatformIO IDE" (VS Code Marketplace) or "pioarduino" (Open VSX for VSCodium) from the Extensions panel.',
+        PENV_PROVIDER_PENDING: 'PlatformIO environment initializing, please wait...',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'PlatformIO environment extension installed successfully. Reload VS Code now to activate it and complete the setup.',
+        PENV_PROVIDER_RELOAD_BUTTON: 'Reload Now',
 });

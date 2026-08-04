@@ -142,9 +142,56 @@ suite('ArduinoUploader Tests', () => {
 				const result = await uploader.checkPioInstalled();
 
 				assert.strictEqual(result, true, 'Should return true when PATH fallback exists');
-				sinon.assert.calledWith(mockExecutor.exec as sinon.SinonStub, `"${pathPio}" --version`);
+				sinon.assert.calledWithMatch(mockExecutor.exec as sinon.SinonStub, sinon.match(pathPio).and(sinon.match('--version')));
 			} finally {
 				process.env.PATH = originalPath;
+				if (originalPlatform) {
+					Object.defineProperty(process, 'platform', originalPlatform);
+				}
+			}
+		});
+
+		test('Should use python -m platformio after a blocked Windows pio.exe', async () => {
+			const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+			const originalCoreDir = process.env.PLATFORMIO_CORE_DIR;
+			Object.defineProperty(process, 'platform', { value: 'win32' });
+			process.env.PLATFORMIO_CORE_DIR = 'C:\\.platformio';
+
+			const scriptsDir = path.win32.join('C:\\.platformio', 'penv', 'Scripts');
+			const pioPath = path.win32.join(scriptsDir, 'pio.exe');
+			const pythonPath = path.win32.join(scriptsDir, 'python.exe');
+			(mockFileSystem.existsSync as sinon.SinonStub).callsFake(
+				filePath => filePath === pioPath || filePath === pythonPath
+			);
+			(mockExecutor.exec as sinon.SinonStub).callsFake((command: string) => {
+				if (command.includes('pio.exe')) {
+					return Promise.reject(new Error('Access denied'));
+				}
+				return Promise.resolve({ stdout: 'PlatformIO Core, version 6.1.19', stderr: '' });
+			});
+
+			try {
+				const uploader = new ArduinoUploader(
+					testWorkspacePath,
+					mockExecutor,
+					mockFileSystem,
+					mockSettingsManager,
+					mockStreamingExecutor
+				);
+
+				assert.strictEqual(await uploader.checkPioInstalled(), true);
+				assert.strictEqual((await (uploader as any).compileWithProgress()).success, true);
+				sinon.assert.calledWith(
+					mockStreamingExecutor.spawn as sinon.SinonStub,
+					pythonPath,
+					sinon.match(array => array[0] === '-m' && array[1] === 'platformio' && array[2] === 'run')
+				);
+			} finally {
+				if (originalCoreDir === undefined) {
+					delete process.env.PLATFORMIO_CORE_DIR;
+				} else {
+					process.env.PLATFORMIO_CORE_DIR = originalCoreDir;
+				}
 				if (originalPlatform) {
 					Object.defineProperty(process, 'platform', originalPlatform);
 				}
@@ -341,6 +388,29 @@ suite('ArduinoUploader Tests', () => {
 
 			assert.strictEqual(result.success, false, 'Should fail');
 			assert.strictEqual(result.error?.stage, 'checking_pio', 'Should fail at checking_pio stage');
+			assert.ok(result.error?.details?.includes('Open the Blockly editor'));
+		});
+
+		test('Should report initialization when a provider exists without Core', async () => {
+			const request: ArduinoUploadRequest = {
+				code: 'void setup() {}',
+				board: 'uno',
+			};
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(false);
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				() => true
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.success, false);
+			assert.ok(result.error?.details?.includes('Core is not ready yet'));
+			assert.ok(!result.error?.details?.includes('Open the Blockly editor'));
 		});
 
 		test('Should fail on compilation error', async () => {

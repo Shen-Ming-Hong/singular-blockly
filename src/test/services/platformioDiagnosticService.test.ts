@@ -319,4 +319,47 @@ suite('PlatformioDiagnosticService Tests', () => {
 		assert.strictEqual(session.items[0].resolvedPath, 'C:\\tools\\penv\\Scripts\\pio.exe');
 		assert.strictEqual(session.items[0].source, 'official-platformio-custom-path');
 	});
+
+	test('reports Core usable through PLATFORMIO_CORE_DIR Python fallback when pio.exe is blocked', async () => {
+		const pioPath = 'C:\\.platformio\\penv\\Scripts\\pio.exe';
+		const pythonPath = 'C:\\.platformio\\penv\\Scripts\\python.exe';
+		const availablePaths = new Set([
+			pioPath,
+			pythonPath,
+			'C:\\.platformio\\penv',
+		]);
+
+		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
+		execFileStub.callsFake(async (filePath: string, args: string[]) => {
+			if (filePath === pioPath) {
+				throw new Error('Access denied');
+			}
+			if (filePath === pythonPath && args.join(' ') === '-m platformio --version') {
+				return { stdout: 'PlatformIO Core, version 6.1.19', stderr: '' };
+			}
+			return { stdout: 'Python 3.11.7', stderr: '' };
+		});
+
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub,
+			execFile: execFileStub,
+			env: {
+				PATH: '',
+				PLATFORMIO_CORE_DIR: 'C:\\.platformio',
+			},
+			platform: 'win32',
+			homeDir: 'C:\\Users\\佑',
+			now: () => now,
+			localeService,
+		});
+
+		const session = await service.collectDiagnostics('C:\\workspace\\demo');
+		const pioItem = session.items[0];
+
+		assert.strictEqual(session.overallStatus, 'degraded');
+		assert.strictEqual(pioItem.status, 'ok');
+		assert.strictEqual(pioItem.resolvedPath, pythonPath);
+		assert.strictEqual(pioItem.versionProbe?.command, 'python.exe -m platformio --version');
+		assert.ok(pioItem.versionProbe?.output?.includes('python -m platformio'));
+	});
 });

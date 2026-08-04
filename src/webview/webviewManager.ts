@@ -16,6 +16,7 @@ import { BoardConfigKey, LoadWorkspaceStateMessage, PreviewWarning, SetBoardMess
 import { TxtVirtualControlsDocument, normalizeTxtVirtualControlsDocument } from '../types/txtVirtualControls';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
+import { isProviderInstalled, showInstallNotification, createDefaultDeps } from '../services/penvProviderService';
 
 /**
  * 開發板值映射表
@@ -296,6 +297,16 @@ export class WebViewManager {
 	 * 建立並顯示 WebView 面板
 	 */
 	async createAndShowWebView(): Promise<void> {
+		// 【最優先】偵測 penv provider，不論工作區是否已開啟都立即檢查
+		// 測試環境略過； fire-and-forget，不阻擋後續流程
+		const isTestEnvironmentPenv = process.env.NODE_ENV === 'test';
+		if (!isTestEnvironmentPenv) {
+			const penvDeps = createDefaultDeps(this.localeService);
+			if (!isProviderInstalled(penvDeps)) {
+				void showInstallNotification(penvDeps);
+			}
+		}
+
 		// 檢查工作區
 		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 		if (!workspaceFolders) {

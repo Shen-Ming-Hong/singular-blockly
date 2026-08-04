@@ -1319,4 +1319,10 @@ window.languageManager.loadMessages('ja', {
 	TXT_SETUP_REQUIRED_WARNING: 'TXT ワークスペースには「TXT 初期化」ブロックが 1 つ必要です。',
 	TXT_PROCESS_REQUIRED_WARNING: 'TXT ワークスペースには少なくとも 1 つの「TXT プロセス」ブロックが必要です。',
 	CATEGORY_TXT: 'TXT コントローラー',
+
+        PENV_PROVIDER_INSTALL_FAILED: '自動インストールに失敗しました。拡張機能パネルから「PlatformIO IDE」（VS Code Marketplace）または「pioarduino」（Open VSX、VSCodium用）をインストールしてください。',
+        PENV_PROVIDER_PENDING: 'PlatformIO環境を初期化中です。しばらくお待ちください...',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'PlatformIO環境拡張機能のインストールが完了しました。今すぐVS Codeを再読み込みして設定を完了してください。',
+        PENV_PROVIDER_RELOAD_BUTTON: '今すぐ再読み込み',
 });

@@ -1305,4 +1305,10 @@ window.languageManager.loadMessages('zh-hant', {
 	TXT_SETUP_REQUIRED_WARNING: 'TXT 工作區需要一個「TXT 初始化」積木',
 	TXT_PROCESS_REQUIRED_WARNING: 'TXT 工作區至少需要一個「TXT 流程」積木',
 	CATEGORY_TXT: 'TXT 控制器',
+
+        PENV_PROVIDER_INSTALL_FAILED: '自動安裝失敗。請在擴充功能市集中安裝「PlatformIO IDE」（VS Code Marketplace）或「pioarduino」（Open VSX，適用 VSCodium）。',
+        PENV_PROVIDER_PENDING: 'PlatformIO 環境初始化中，請稍候再試。',
+
+        PENV_PROVIDER_RELOAD_REQUIRED: 'PlatformIO 擴充功能已安裝完成。請立即重新載入 VS Code 以完成設定並啟用上傳環境。',
+        PENV_PROVIDER_RELOAD_BUTTON: '立即重新載入',
 });
