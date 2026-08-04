@@ -10,6 +10,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.84.0] - 2026-08-04
+
+### ✨ 新增功能 Features
+
+- **新增 CyberBrick MicroPython 命名防呆** (Add CyberBrick MicroPython naming safeguards)
+    - 變數、函式與參數在命名當下阻擋數字開頭、空白、連字號、非法符號、Python hard keyword，以及不合法的重複函式／參數名稱
+      Variables, functions, and parameters now reject leading digits, whitespace, hyphens, invalid symbols, Python hard keywords, and invalid duplicate function/parameter names as they are entered
+    - 保留中文與 CJK 混合命名；runtime／builtin 名稱顯示不阻擋的 warning
+      Preserves Chinese and mixed CJK identifiers while showing non-blocking warnings for runtime and builtin names
+    - 舊工作區名稱不會被自動改寫，但 CyberBrick 上傳前會阻擋尚未修正的命名錯誤
+      Legacy workspace names are never rewritten automatically, while unresolved naming errors block CyberBrick upload preflight
+
+- **新增適合學生理解的 OTA 設定進度** (Add student-friendly OTA setup progress)
+    - 設定開始時立即顯示大型水平進度條、執行中圖示與保持 USB 連線提示，不向學生顯示分數或百分比
+      Shows a large horizontal progress bar, running icon, and keep-USB-connected guidance immediately, without exposing fractions or percentages to students
+    - 六個 OTA 里程碑會去重推進；執行期間鎖定衝突控制項，modal 關閉再開仍保留狀態
+      Deduplicates six OTA milestones, locks conflicting controls while running, and preserves state when the modal is reopened
+    - 成功與失敗皆有明顯圖示、15 語系階段文字與安全重試行為
+      Provides clear success/failure icons, localized stage text across all 15 locales, and safe retry behavior
+
+### 🐛 修復 Bug Fixes
+
+- 修正經典 WebView scripts 重複宣告 CyberBrick naming warning 識別字造成的啟動語法錯誤
+  Fixed a startup syntax error caused by duplicate CyberBrick naming warning identifiers across classic WebView scripts
+- 修正 OTA 完成或失敗後進度區被配對裝置列表自動收合
+  Fixed the OTA progress section collapsing automatically after setup succeeded or failed
+- terminal result 現在會使 active request 失效，拒絕同 request ID 的延遲重複結果；成功結果也必須包含合法 panel state
+  Terminal results now invalidate the active request to reject delayed duplicates, and successful results must include a valid panel state
+- 六個失敗階段改用明確失敗文字，不再顯示成功語意的步驟訊息
+  All six failed stages now use explicit failure text instead of success-oriented step messages
+
+### 🔧 維護 Maintenance
+
+- 更新 Spec Kit／Specify 的 Codex 整合，同時保留既有 Copilot SDD 資源
+  Updated the Spec Kit/Specify Codex integration while preserving existing Copilot SDD resources
+- 發布流程改為 PR 前本地 Codex Code Review，並加入修正核准與發布核准兩個明確使用者 gate
+  Changed the release workflow to local Codex review before PR publication with explicit remediation and publish approval gates
+
+### 🧪 測試 Tests
+
+- 新增命名驗證、舊工作區 hydration、上傳 preflight、OTA reducer、request correlation、terminal duplicate、WebView contract、15 語系與秘密消毒回歸測試
+  Added regression coverage for naming validation, legacy hydration, upload preflight, OTA reducer state, request correlation, terminal duplicates, WebView contracts, all 15 locales, and secret sanitization
+
 ## [0.83.1] - 2026-08-04
 
 ### 🔒 安全性修復 Security Fixes
