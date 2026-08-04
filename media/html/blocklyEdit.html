@@ -577,8 +577,27 @@
                             </div>
                         </div>
                         <p id="cyberbrickSecretPresenceHint" class="cyberbrick-upload-help"></p>
-                        <div id="cyberbrickProvisioningProgress" class="cyberbrick-provisioning-progress"
-                            aria-live="polite"></div>
+                        <div id="cyberbrickProvisioningStatus"
+                            class="cyberbrick-provisioning-progress-card idle hidden">
+                            <div class="cyberbrick-provisioning-progress-heading">
+                                <span id="cyberbrickProvisioningIcon" class="cyberbrick-provisioning-icon"
+                                    aria-hidden="true"></span>
+                                <div>
+                                    <strong id="cyberbrickProvisioningProgressLabel"></strong>
+                                    <div id="cyberbrickProvisioningStage" class="cyberbrick-provisioning-stage"
+                                        aria-live="polite"></div>
+                                </div>
+                            </div>
+                            <div id="cyberbrickProvisioningProgressbar"
+                                class="cyberbrick-provisioning-progress-track" role="progressbar"
+                                aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" aria-valuetext=""
+                                aria-labelledby="cyberbrickProvisioningProgressLabel">
+                                <div id="cyberbrickProvisioningProgressFill"
+                                    class="cyberbrick-provisioning-progress-fill"></div>
+                            </div>
+                            <p id="cyberbrickProvisioningKeepConnected"
+                                class="cyberbrick-provisioning-keep-connected"></p>
+                        </div>
                         <button id="cyberbrickProvisionButton" class="primary-btn" type="button">Set Up Wireless
                             Upload</button>
                     </div>
@@ -643,6 +662,7 @@
     <script src="{x12BlocksUri}"></script>
     <script src="{rcBlocksUri}"></script>
     <script src="{loopsBlocksUri}"></script>
+    <script src="{cyberbrickNameValidationUri}"></script>
     <script src="{functionBlocksUri}"></script>
     <script src="{sensorsBlocksUri}"></script>
     <script src="{motorsBlocksUri}"></script>
@@ -654,6 +674,7 @@
     {txtModules}
     <script src="{txtMOutputValidationUri}"></script>
     <script src="{txtVirtualControlsContrastUri}"></script>
+    <script src="{cyberbrickOtaProvisioningStateUri}"></script>
     <script src="{jsUri}"></script>
     <script src="{experimentalMarkerUri}"></script>
     <script src="{contextExtractorUri}"></script>

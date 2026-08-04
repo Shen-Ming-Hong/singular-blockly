@@ -56,7 +56,7 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 ## Spec-Driven Development
 - Spec Kit is configured with Codex as the default integration. Use `.agents/skills` as the Codex skill root.
 - Copilot SDD support is intentionally kept alongside Codex through `.github/agents/speckit.*.agent.md` and `.github/prompts/speckit.*.prompt.md`.
-- Do not remove Copilot SDD files just because `default_integration` is `codex`; Spec Kit 0.11.3 marks Copilot as not multi-install safe, so `integration.json` stays Codex-only to keep `specify integration status` clean.
+- Do not remove Copilot SDD files just because `default_integration` is `codex`; Copilot remains not multi-install safe, so `integration.json` stays Codex-only to keep `specify integration status` clean.
 - In Codex, use the Spec Kit skills in this order when a feature needs full SDD: `$speckit-clarify`, `$speckit-specify`, `$speckit-plan`, `$speckit-tasks`, `$speckit-analyze`, `$speckit-implement`, `$speckit-checklist`.
 - In Copilot, use the matching `speckit.*` agents/prompts from `.github/agents` and `.github/prompts`.
 - Feature specs live in `specs/{NNN}-feature-name/`; check existing specs before creating a new one.

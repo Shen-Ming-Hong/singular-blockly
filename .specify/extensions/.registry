@@ -16,7 +16,13 @@
           "speckit.git.commit"
         ]
       },
-      "registered_skills": [],
+      "registered_skills": [
+        "speckit-git-feature",
+        "speckit-git-validate",
+        "speckit-git-remote",
+        "speckit-git-initialize",
+        "speckit-git-commit"
+      ],
       "installed_at": "2026-05-03T10:48:03.494834+00:00"
     }
   }

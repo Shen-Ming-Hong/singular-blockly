@@ -26,7 +26,21 @@ import { CyberBrickUploadSettingsService } from '../services/cyberbrickUploadSet
 import { CyberBrickOtaProvisioningService } from '../services/cyberbrickOtaProvisioningService';
 import { CyberBrickOtaUploader } from '../services/cyberbrickOtaUploader';
 import { createCyberBrickUploadError, classifyCyberBrickUploadError } from '../services/cyberbrickUploadErrors';
-import { PairedCyberBrickDevice } from '../types/cyberbrickUpload';
+import {
+	CYBERBRICK_NAME_FALLBACK_MESSAGES,
+	CYBERBRICK_NAME_MESSAGE_KEYS,
+	CyberBrickNameValidationCode,
+	validateCyberBrickName,
+} from '../services/cyberbrickNameValidation';
+import {
+	CyberBrickCountedProvisioningStep,
+	CyberBrickUploadPanelState,
+	CyberBrickUploadUserError,
+	OtaProvisioningRequest,
+	OtaProvisioningResult,
+	OtaProvisioningStepResult,
+	PairedCyberBrickDevice,
+} from '../types/cyberbrickUpload';
 import {
 	createTxtVirtualControlRuntimeService,
 	TxtVirtualControlRuntimeService,
@@ -44,6 +58,137 @@ import {
 const UI_MESSAGE_DELAY_MS = 100;
 const UI_REVEAL_DELAY_MS = 200;
 const BOARD_CONFIG_REQUEST_TIMEOUT_MS = 10000;
+const CYBERBRICK_COUNTED_PROVISIONING_STEPS = new Set<CyberBrickCountedProvisioningStep>([
+	'detect-usb',
+	'read-device-id',
+	'install-agent',
+	'configure-wifi',
+	'verify-agent',
+	'store-secrets',
+]);
+const CYBERBRICK_UPLOAD_ERROR_CODES = new Set([
+	'ok', 'missing-primary-device', 'device-not-paired', 'missing-ota-token', 'missing-address', 'offline', 'identity-mismatch',
+	'unsupported-agent', 'agent-outdated', 'agent-health-failed', 'timeout', 'token-rejected', 'invalid-settings', 'workspace-missing',
+	'code-empty', 'device-not-found', 'multiple-devices', 'usb-port-missing', 'usb-device-not-cyberbrick', 'mpremote-unavailable',
+	'device-id-read-failed', 'device-id-write-failed', 'wifi-scan-timeout', 'wifi-scan-failed', 'agent-install-failed',
+	'agent-version-unsupported', 'wifi-connect-failed', 'wifi-auth-failed', 'wifi-timeout', 'agent-unreachable', 'secret-store-failed',
+	'provisioning-in-progress', 'provisioning-failed', 'ota-upload-failed', 'ota-cleanup-failed', 'rc-main-patch-failed',
+	'upload-timeout', 'write-failed', 'restart-failed', 'network-error', 'unknown', 'agent-upgrade-failed',
+]);
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) {
+		return false;
+	}
+	const prototype = Object.getPrototypeOf(value);
+	return prototype === Object.prototype || prototype === null;
+}
+
+function hasOnlyKeys(value: Record<string, unknown>, allowedKeys: readonly string[]): boolean {
+	return Object.keys(value).every(key => allowedKeys.includes(key));
+}
+
+function parseCyberBrickOtaProvisioningRequest(message: unknown): { requestId: string; payload: OtaProvisioningRequest } | null {
+	if (
+		!isPlainRecord(message) ||
+		!hasOnlyKeys(message, ['command', 'requestId', 'payload']) ||
+		message.command !== 'cyberbrickOtaProvisionRequest' ||
+		typeof message.requestId !== 'string' ||
+		!message.requestId.trim() ||
+		!isPlainRecord(message.payload) ||
+		!hasOnlyKeys(message.payload, ['usbPort', 'friendlyName', 'ssid', 'wifiPassword'])
+	) {
+		return null;
+	}
+	const { usbPort, friendlyName, ssid, wifiPassword } = message.payload;
+	if (
+		typeof usbPort !== 'string' ||
+		!usbPort.trim() ||
+		typeof friendlyName !== 'string' ||
+		typeof ssid !== 'string' ||
+		!ssid.trim() ||
+		typeof wifiPassword !== 'string'
+	) {
+		return null;
+	}
+	return {
+		requestId: message.requestId,
+		payload: {
+			usbPort: usbPort.trim(),
+			friendlyName: friendlyName.trim(),
+			ssid: ssid.trim(),
+			wifiPassword,
+		},
+	};
+}
+
+function sanitizeCyberBrickUploadError(error: unknown): CyberBrickUploadUserError {
+	const candidate = classifyCyberBrickUploadError(error);
+	const code = CYBERBRICK_UPLOAD_ERROR_CODES.has(candidate.code) ? candidate.code : 'unknown';
+	const safeError = createCyberBrickUploadError(code);
+	return { code: safeError.code, message: safeError.message, nextActions: safeError.nextActions };
+}
+
+function sanitizeCyberBrickProvisioningStep(step: OtaProvisioningStepResult): Omit<OtaProvisioningStepResult, 'message' | 'networks'> | null {
+	if (!CYBERBRICK_COUNTED_PROVISIONING_STEPS.has(step.step as CyberBrickCountedProvisioningStep) || typeof step.success !== 'boolean') {
+		return null;
+	}
+	return {
+		step: step.step,
+		success: step.success,
+		...(typeof step.deviceId === 'string' ? { deviceId: step.deviceId } : {}),
+		...(typeof step.ipAddress === 'string' ? { ipAddress: step.ipAddress } : {}),
+		...(step.error ? { error: sanitizeCyberBrickUploadError(step.error) } : {}),
+	};
+}
+
+function sanitizeCyberBrickPairedDevice(device: PairedCyberBrickDevice): PairedCyberBrickDevice {
+	return {
+		deviceId: device.deviceId,
+		friendlyName: device.friendlyName,
+		createdAt: device.createdAt,
+		updatedAt: device.updatedAt,
+		otaPort: device.otaPort,
+		protocolVersion: device.protocolVersion,
+		...(device.lastKnownIp ? { lastKnownIp: device.lastKnownIp } : {}),
+		...(device.lastSeenAt ? { lastSeenAt: device.lastSeenAt } : {}),
+		...(device.lastSuccessfulUploadAt ? { lastSuccessfulUploadAt: device.lastSuccessfulUploadAt } : {}),
+		...(device.statusSummary ? { statusSummary: device.statusSummary } : {}),
+		...(device.agentVersion ? { agentVersion: device.agentVersion } : {}),
+	};
+}
+
+function sanitizeCyberBrickProvisioningPanelState(panelState: CyberBrickUploadPanelState): Omit<CyberBrickUploadPanelState, 'readiness'> {
+	const secretPresence = Object.fromEntries(
+		Object.entries(panelState.secretPresence).map(([deviceId, presence]) => [
+			deviceId,
+			{
+				deviceId: presence.deviceId,
+				wifiPasswordSet: presence.wifiPasswordSet,
+				otaTokenSet: presence.otaTokenSet,
+				pairingSecretSet: presence.pairingSecretSet,
+			},
+		])
+	);
+	return {
+		settings: {
+			schemaVersion: 2,
+			...(panelState.settings.primaryDeviceId ? { primaryDeviceId: panelState.settings.primaryDeviceId } : {}),
+			pairedDevices: panelState.settings.pairedDevices.map(sanitizeCyberBrickPairedDevice),
+		},
+		secretPresence,
+	};
+}
+
+function sanitizeCyberBrickProvisioningResult(result: OtaProvisioningResult, panelState: CyberBrickUploadPanelState) {
+	return {
+		status: result.success ? 'succeeded' as const : 'failed' as const,
+		panelState: sanitizeCyberBrickProvisioningPanelState(panelState),
+		steps: result.steps.map(sanitizeCyberBrickProvisioningStep).filter(step => step !== null),
+		...(result.device ? { device: sanitizeCyberBrickPairedDevice(result.device) } : {}),
+		nextUploadMode: 'usb' as const,
+	};
+}
 
 // VSCode API 引用（可在測試中注入）
 let vscodeApi: typeof vscode = vscode;
@@ -927,6 +1072,7 @@ export class WebViewMessageHandler {
 		try {
 			const isRename = Boolean(message?.isRename);
 			const currentName = typeof message?.currentName === 'string' ? message.currentName : '';
+			const isCyberBrick = message?.board === 'cyberbrick';
 			const boardLanguage = getBoardLanguage(message?.board ?? '');
 			const isMicroPython = boardLanguage === 'micropython';
 
@@ -955,11 +1101,42 @@ export class WebViewMessageHandler {
 			const variableNamePattern = isMicroPython
 				? /^[A-Za-z_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff][A-Za-z0-9_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]*$/
 				: /^[A-Za-z_][A-Za-z0-9_]*$/;
+			const cyberBrickValidationMessages = new Map<CyberBrickNameValidationCode, string>();
+			if (isCyberBrick) {
+				await Promise.all(
+					(Object.keys(CYBERBRICK_NAME_MESSAGE_KEYS) as CyberBrickNameValidationCode[])
+						.filter(code => code !== 'valid')
+						.map(async code => {
+							cyberBrickValidationMessages.set(
+								code,
+								await this.localeService.getLocalizedMessage(
+									CYBERBRICK_NAME_MESSAGE_KEYS[code],
+									CYBERBRICK_NAME_FALLBACK_MESSAGES[code]
+								)
+							);
+						})
+				);
+			}
 
 			const input = await vscodeApi.window.showInputBox({
 				prompt: prompt,
 				value: isRename ? currentName : undefined,
 				validateInput: (value: string) => {
+					if (isCyberBrick) {
+						const result = validateCyberBrickName({ name: value, kind: 'variable' });
+						if (result.severity === 'valid') {
+							return null;
+						}
+						const localizedMessage = cyberBrickValidationMessages.get(result.code) || CYBERBRICK_NAME_FALLBACK_MESSAGES[result.code];
+						return {
+							message: localizedMessage,
+							severity:
+								result.severity === 'warning'
+									? vscodeApi.InputBoxValidationSeverity.Warning
+									: vscodeApi.InputBoxValidationSeverity.Error,
+						};
+					}
+
 					const trimmed = value.trim();
 					if (!trimmed) {
 						return emptyError;
@@ -1793,15 +1970,42 @@ export class WebViewMessageHandler {
 	}
 
 	private async handleCyberBrickOtaProvisionRequest(message: any): Promise<void> {
-		try {
-			const payload = message?.payload || message || {};
-			const { result, panelState } = await this.getCyberBrickOtaProvisioningService().provision(payload, step => {
-				this.postCyberBrickResponse('cyberbrickOtaProvisionProgress', message, true, step);
+		const parsedRequest = parseCyberBrickOtaProvisioningRequest(message);
+		if (!parsedRequest) {
+			this.panel.webview.postMessage({
+				command: 'cyberbrickOtaProvisionResult',
+				...(typeof message?.requestId === 'string' ? { requestId: message.requestId } : {}),
+				success: false,
+				error: sanitizeCyberBrickUploadError(createCyberBrickUploadError('invalid-settings')),
 			});
-			panelState.readiness = await this.getCyberBrickUploadSettingsService().buildOtaReadinessStatus();
-			this.postCyberBrickResponse('cyberbrickOtaProvisionResult', message, result.success, { ...result, panelState }, result.error);
+			return;
+		}
+		try {
+			const { result, panelState } = await this.getCyberBrickOtaProvisioningService().provision(parsedRequest.payload, step => {
+				const sanitizedStep = sanitizeCyberBrickProvisioningStep(step);
+				if (sanitizedStep) {
+					this.panel.webview.postMessage({
+						command: 'cyberbrickOtaProvisionProgress',
+						requestId: parsedRequest.requestId,
+						success: true,
+						payload: sanitizedStep,
+					});
+				}
+			});
+			this.panel.webview.postMessage({
+				command: 'cyberbrickOtaProvisionResult',
+				requestId: parsedRequest.requestId,
+				success: result.success,
+				payload: sanitizeCyberBrickProvisioningResult(result, panelState),
+				...(result.error ? { error: sanitizeCyberBrickUploadError(result.error) } : {}),
+			});
 		} catch (error) {
-			this.postCyberBrickResponse('cyberbrickOtaProvisionResult', message, false, undefined, classifyCyberBrickUploadError(error, 'provisioning-failed'));
+			this.panel.webview.postMessage({
+				command: 'cyberbrickOtaProvisionResult',
+				requestId: parsedRequest.requestId,
+				success: false,
+				error: sanitizeCyberBrickUploadError(classifyCyberBrickUploadError(error, 'provisioning-failed')),
+			});
 		}
 	}
 

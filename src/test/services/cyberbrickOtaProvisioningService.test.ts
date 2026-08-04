@@ -20,6 +20,16 @@ suite('CyberBrickOtaProvisioningService', () => {
 	let settingsService: CyberBrickUploadSettingsService;
 	let uploader: any;
 
+	function createDeferred<T>() {
+		let resolve!: (value: T | PromiseLike<T>) => void;
+		let reject!: (reason?: unknown) => void;
+		const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+			resolve = resolvePromise;
+			reject = rejectPromise;
+		});
+		return { promise, resolve, reject };
+	}
+
 	beforeEach(() => {
 		secrets = new MockSecretStorage();
 		configuration = new MockWorkspaceConfiguration();
@@ -214,6 +224,83 @@ suite('CyberBrickOtaProvisioningService', () => {
 		assert.strictEqual(result.error?.details, 'write failed');
 		assert.deepStrictEqual(progress[progress.length - 1], { step: 'verify-agent', success: false });
 		assert.strictEqual(secrets.values.size, 0, 'secrets should not be stored when rc_main.py was not prepared');
+	});
+
+	test('rejects a concurrent provisioning request before any second device operation', async () => {
+		const identity = createDeferred<string>();
+		uploader.readCyberBrickDeviceId.returns(identity.promise);
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
+		const request = { usbPort: '/dev/cu.usbmodem1', friendlyName: 'Classroom Brick', ssid: 'Classroom' };
+
+		const first = service.provision(request);
+		await Promise.resolve();
+		const second = await service.provision(request);
+
+		assert.strictEqual(second.result.success, false);
+		assert.strictEqual(second.result.error?.code, 'provisioning-in-progress');
+		assert.strictEqual(uploader.readCyberBrickDeviceId.callCount, 1);
+		assert.strictEqual(uploader.deployCyberBrickOtaAgent.called, false);
+
+		identity.resolve(CYBERBRICK_TEST_DEVICE_ID);
+		assert.strictEqual((await first).result.success, true);
+	});
+
+	test('releases the in-flight guard after success and classified failure', async () => {
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
+		const request = { usbPort: '/dev/cu.usbmodem1', friendlyName: 'Classroom Brick', ssid: 'Classroom' };
+
+		assert.strictEqual((await service.provision(request)).result.success, true);
+		uploader.configureCyberBrickOtaAgent.resolves({ agentStarted: false, agentError: 'bind failed', rcMainPatched: true });
+		assert.strictEqual((await service.provision(request)).result.error?.code, 'agent-unreachable');
+		uploader.configureCyberBrickOtaAgent.resolves({ ipAddress: '192.168.1.50', agentVersion: '1.0.0', agentStarted: true, rcMainPatched: true });
+		assert.strictEqual((await service.provision(request)).result.success, true);
+		assert.strictEqual(uploader.readCyberBrickDeviceId.callCount, 3);
+	});
+
+	test('releases the in-flight guard when panel-state construction throws out of the provisioning method', async () => {
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
+		const request = { usbPort: '/dev/cu.usbmodem1', friendlyName: 'Classroom Brick', ssid: 'Classroom' };
+		const panelStateStub = sinon.stub(settingsService, 'buildPanelState').rejects(new Error('panel unavailable'));
+
+		await assert.rejects(() => service.provision(request), /panel unavailable/);
+		panelStateStub.restore();
+
+		assert.strictEqual((await service.provision(request)).result.success, true);
+	});
+
+	test('emits store-secrets only after secrets, paired device, and response panel state are persisted', async () => {
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
+		const secretSpy = sinon.spy(settingsService, 'storeDeviceSecret');
+		const upsertSpy = sinon.spy(settingsService, 'upsertPairedDevice');
+		const panelStateSpy = sinon.spy(settingsService, 'buildPanelState');
+		const storeSecretsProgress = sinon.spy();
+
+		const { result } = await service.provision(
+			{ usbPort: '/dev/cu.usbmodem1', friendlyName: 'Classroom Brick', ssid: 'Classroom', wifiPassword: CYBERBRICK_TEST_WIFI_PASSWORD },
+			step => {
+				if (step.step === 'store-secrets') {
+					storeSecretsProgress();
+				}
+			}
+		);
+
+		assert.strictEqual(result.success, true);
+		assert.strictEqual(secretSpy.callCount, 3);
+		sinon.assert.callOrder(secretSpy, upsertSpy, panelStateSpy, storeSecretsProgress);
+	});
+
+	test('does not emit store-secrets when paired-device persistence fails', async () => {
+		sinon.stub(settingsService, 'upsertPairedDevice').rejects(new Error('settings unavailable'));
+		const service = new CyberBrickOtaProvisioningService(settingsService, uploader);
+		const progress: string[] = [];
+
+		const { result } = await service.provision(
+			{ usbPort: '/dev/cu.usbmodem1', friendlyName: 'Classroom Brick', ssid: 'Classroom', wifiPassword: CYBERBRICK_TEST_WIFI_PASSWORD },
+			step => progress.push(step.step)
+		);
+
+		assert.strictEqual(result.success, false);
+		assert.strictEqual(progress.includes('store-secrets'), false);
 	});
 
 	test('removes OTA artifacts over USB, deletes local pairing secrets, and returns to USB mode', async () => {

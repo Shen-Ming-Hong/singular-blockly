@@ -4,8 +4,10 @@ description: Create a feature branch with sequential or timestamp numbering
 compatibility: Requires spec-kit project structure with .specify/ directory
 metadata:
   author: github-spec-kit
-  source: git:commands/speckit.git.feature.md
+  source: extension:git
 ---
+
+# Git Feature Skill
 
 # Create Feature Branch
 
