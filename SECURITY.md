@@ -4,8 +4,8 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.82.x  | :white_check_mark: |
-| < 0.82  | :x:                |
+| 0.83.x  | :white_check_mark: |
+| < 0.83  | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.82.16 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.83.1 |
+
+> **0.83.1 更新 Update**: `@modelcontextprotocol/sdk` 升級至 `1.30.0`，並透過 overrides 將 `hono`、`@hono/node-server`、`body-parser`、`fast-uri`、`ip-address`、`js-yaml` 與三條 `brace-expansion` 相容分支升級至安全版本，修復 Dependabot Alerts #83–#91、#95–#96、#98、#102–#104。本地 `npm audit` 顯示 0 vulnerabilities。
+> `@modelcontextprotocol/sdk` was upgraded to `1.30.0`, with overrides updating `hono`, `@hono/node-server`, `body-parser`, `fast-uri`, `ip-address`, `js-yaml`, and three compatible `brace-expansion` branches to safe versions, fixing Dependabot Alerts #83–#91, #95–#96, #98, and #102–#104. Local `npm audit` reports 0 vulnerabilities.
 
 > **0.82.16 更新 Update**: `form-data` (`GHSA-hmw2-7cc7-3qxx` / `CVE-2026-12143`) 升級至 `4.0.6`，修復 CRLF 注入；`hono` (`GHSA-88fw-hqm2-52qc` / `CVE-2026-54290`, `GHSA-wwfh-h76j-fc44` / `CVE-2026-54286`, `GHSA-j6c9-x7qj-28xf` / `CVE-2026-54287`, `GHSA-wgpf-jwqj-8h8p` / `CVE-2026-54289`, `GHSA-rv63-4mwf-qqc2` / `CVE-2026-54288`) override 升級至 `^4.12.25`，lockfile 安裝 `4.12.27`，修復 Dependabot Alerts #75-#80；`ws` (`GHSA-96hv-2xvq-fx4p` / `CVE-2026-48779`) override 升級至 `^8.21.0`，修復記憶體耗盡 DoS (Dependabot Alert #81)；新增 `js-yaml` override `>=4.2.0` 修復 merge key DoS。本地 `npm audit` 顯示 0 vulnerabilities。
 > `form-data` (`GHSA-hmw2-7cc7-3qxx` / `CVE-2026-12143`) upgraded to `4.0.6`, fixing CRLF injection; `hono` override upgraded to `^4.12.25` (lockfile `4.12.27`), fixing Dependabot Alerts #75–#80; `ws` (`GHSA-96hv-2xvq-fx4p` / `CVE-2026-48779`) override upgraded to `^8.21.0`, fixing memory exhaustion DoS (Dependabot Alert #81); added `js-yaml` override `>=4.2.0`, fixing merge key DoS. Local `npm audit` reports 0 vulnerabilities.
@@ -58,4 +61,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-06-24_
+_Last updated: 2026-08-04_

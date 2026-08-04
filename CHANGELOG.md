@@ -10,6 +10,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.83.1] - 2026-08-04
+
+### 🔒 安全性修復 Security Fixes
+
+- **修復 MCP HTTP 傳輸層的 Hono 生態系漏洞** (Fix Hono ecosystem vulnerabilities in the MCP HTTP transport)
+    - 升級直接依賴 `@modelcontextprotocol/sdk` 從 `1.29.0` 至 `1.30.0`，並將 `hono` override 升級至 `^4.12.34`、`@hono/node-server` override 升級至 `^2.0.5`
+      Upgraded the direct `@modelcontextprotocol/sdk` dependency from `1.29.0` to `1.30.0`, the `hono` override to `^4.12.34`, and the `@hono/node-server` override to `^2.0.5`
+    - 修復 Hono CORS middleware ReDoS（CVE-2026-69207，CVSS 5.3）與 Windows `serve-static` encoded-backslash 路徑穿越（GHSA-frvp-7c67-39w9，CVSS 5.9）
+      Fixed the Hono CORS middleware ReDoS (CVE-2026-69207, CVSS 5.3) and Windows `serve-static` encoded-backslash path traversal (GHSA-frvp-7c67-39w9, CVSS 5.9)
+    - 關閉 Dependabot Alerts #87、#104
+      Closes Dependabot Alerts #87 and #104
+
+- **修復 URI 與 IP 位址解析的信任邊界繞過** (Fix trust-boundary bypasses in URI and IP address parsing)
+    - 升級 `fast-uri` override 從 `^3.1.2` 至 `^3.1.5`，修復三項 host confusion 漏洞（CVE-2026-13676、CVE-2026-16221、CVE-2026-18446，CVSS 7.5）
+      Upgraded the `fast-uri` override from `^3.1.2` to `^3.1.5`, fixing three host-confusion vulnerabilities (CVE-2026-13676, CVE-2026-16221, CVE-2026-18446, CVSS 7.5)
+    - 升級 `ip-address` override 從 `^10.2.0` 至 `^10.3.1`，修復 IPv4 leading-zero、CIDR suffix 與 IPv4-mapped/NAT64 分類造成的 SSRF／信任邊界繞過（CVE-2026-69192、CVE-2026-69198、CVE-2026-54272；CVSS 尚未評定）
+      Upgraded the `ip-address` override from `^10.2.0` to `^10.3.1`, fixing SSRF/trust-boundary bypasses involving IPv4 leading-zero octets, CIDR suffixes, and IPv4-mapped/NAT64 classification (CVE-2026-69192, CVE-2026-69198, CVE-2026-54272; CVSS not yet assigned)
+    - 關閉 Dependabot Alerts #88、#89、#95、#96、#102、#103
+      Closes Dependabot Alerts #88, #89, #95, #96, #102, and #103
+
+- **修復開發工具鏈的資源耗盡漏洞** (Fix resource-exhaustion vulnerabilities in the development toolchain)
+    - 將 `js-yaml` override 從 `>=4.2.0` 收斂至 `^5.2.2`，修復 merge-key、`!!omap` 與 flow collection 解析 DoS（CVE-2026-59868、CVE-2026-59870、GHSA-pm4m-ph32-ghv5，CVSS 5.3–7.5）
+      Narrowed the `js-yaml` override from `>=4.2.0` to `^5.2.2`, fixing merge-key, `!!omap`, and flow-collection parsing DoS issues (CVE-2026-59868, CVE-2026-59870, GHSA-pm4m-ph32-ghv5, CVSS 5.3–7.5)
+    - 將三條 `brace-expansion` 相容分支分別升級至 `^1.1.18`、`^2.1.4`、`^5.0.9`，涵蓋 CVE-2026-13149 及 npm audit 後續揭露的記憶體耗盡修補（CVSS 5.3–7.5）
+      Upgraded the three compatible `brace-expansion` branches to `^1.1.18`, `^2.1.4`, and `^5.0.9`, covering CVE-2026-13149 and later npm audit memory-exhaustion fixes (CVSS 5.3–7.5)
+    - 關閉 Dependabot Alerts #83、#84、#85、#90、#91、#98
+      Closes Dependabot Alerts #83, #84, #85, #90, #91, and #98
+
+- **修復 `body-parser` 無效限制值造成的 DoS** (Fix `body-parser` DoS caused by invalid limit values)
+    - 新增 `body-parser` override `^2.3.0`，修復 CVE-2026-12590（low，CVSS 3.7）
+      Added the `body-parser` override `^2.3.0`, fixing CVE-2026-12590 (low, CVSS 3.7)
+    - 關閉 Dependabot Alert #86
+      Closes Dependabot Alert #86
+
 ## [0.83.0] - 2026-06-30
 
 ### ✨ 新增功能 Features
