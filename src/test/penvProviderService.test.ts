@@ -107,7 +107,7 @@ describe('PenvProviderService', () => {
 	// ─── (c) showInstallNotification ──────────────────────────────────────
 
 	describe('showInstallNotification', () => {
-		it('should auto-install without showing a pre-install notification', async () => {
+		it('should open PlatformIO Home after auto-install and before showing reload', async () => {
 			const executeCommand = sinon.stub().resolves();
 			const showInformationMessage = sinon.stub().resolves(undefined);
 			const deps = createMockDeps({ executeCommand, showInformationMessage });
@@ -115,6 +115,18 @@ describe('PenvProviderService', () => {
 			assert.ok(
 				executeCommand.calledWith('workbench.extensions.installExtension', 'platformio.platformio-ide'),
 				'should trigger installExtension directly'
+			);
+			assert.ok(
+				executeCommand.calledWith('platformio-ide.showHome'),
+				'should open PlatformIO Home after installation'
+			);
+			assert.ok(
+				executeCommand.getCall(0).calledBefore(executeCommand.getCall(1)),
+				'should install the provider before opening PlatformIO Home'
+			);
+			assert.ok(
+				executeCommand.getCall(1).calledBefore(showInformationMessage.getCall(0)),
+				'should open PlatformIO Home before showing the reload prompt'
 			);
 		});
 
@@ -131,6 +143,45 @@ describe('PenvProviderService', () => {
 				executeCommand.calledWith('workbench.extensions.installExtension', 'pioarduino.pioarduino-ide'),
 				'should auto-fallback to pioarduino'
 			);
+			assert.ok(
+				executeCommand.calledWith('platformio-ide.showHome'),
+				'should open PlatformIO Home after installing pioarduino'
+			);
+			const pioarduinoInstallCall = executeCommand
+				.getCalls()
+				.find(call => call.args[1] === 'pioarduino.pioarduino-ide');
+			const homeCall = executeCommand.getCalls().find(call => call.args[0] === 'platformio-ide.showHome');
+			assert.ok(
+				pioarduinoInstallCall && homeCall && pioarduinoInstallCall.calledBefore(homeCall),
+				'should finish installing pioarduino before opening PlatformIO Home'
+			);
+			assert.ok(
+				homeCall && homeCall.calledBefore(showInformationMessage.getCall(0)),
+				'should open PlatformIO Home before showing the reload prompt'
+			);
+		});
+
+		it('should still offer reload when opening PlatformIO Home fails', async () => {
+			const executeCommand = sinon.stub();
+			executeCommand.withArgs('platformio-ide.showHome').rejects(new Error('Command unavailable'));
+			executeCommand.resolves();
+			const showInformationMessage = sinon.stub().resolves('Reload Now');
+			const deps = createMockDeps({ executeCommand, showInformationMessage });
+
+			await showInstallNotification(deps);
+
+			assert.strictEqual(
+				executeCommand
+					.getCalls()
+					.filter(call => call.args[0] === 'workbench.extensions.installExtension').length,
+				1,
+				'Home failure must not trigger another provider installation'
+			);
+			assert.ok(showInformationMessage.calledOnce, 'should retain the existing reload prompt');
+			assert.ok(
+				executeCommand.calledWith('workbench.action.reloadWindow'),
+				'should still reload when the user confirms'
+			);
 		});
 
 		it('should not report ready or reload when both provider installs fail', async () => {
@@ -145,6 +196,10 @@ describe('PenvProviderService', () => {
 			await showInstallNotification(deps);
 
 			assert.ok(executeCommand.calledWith('workbench.extensions.search', 'platformio'));
+			assert.ok(
+				executeCommand.neverCalledWith('platformio-ide.showHome'),
+				'failed provider installation must not open PlatformIO Home'
+			);
 			assert.ok(
 				executeCommand.neverCalledWith('workbench.action.reloadWindow'),
 				'failed installation must not offer or trigger reload'
@@ -184,6 +239,10 @@ describe('PenvProviderService', () => {
 				await showInstallNotification(deps);
 			}
 			assert.ok(executeCommand.notCalled, 'no install when provider present');
+			assert.ok(
+				executeCommand.neverCalledWith('platformio-ide.showHome'),
+				'no automatic Home opening when provider was already present'
+			);
 		});
 
 		it('[US2] should fallback to pioarduino when platformio install fails', async () => {

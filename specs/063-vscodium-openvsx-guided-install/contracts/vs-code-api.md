@@ -37,7 +37,7 @@ await vscode.commands.executeCommand(
 
 **回傳**：`Thenable<void>`（Promise）
 
-**成功**：安裝完成後由 Singular Blockly 顯示「Reload Now」提示。
+**成功**：安裝完成後由 Singular Blockly 呼叫 `platformio-ide.showHome` 啟動 provider／Core 初始化，再顯示「Reload Now」提示。
 
 **失敗情境**：
 - Extension ID 在當前 marketplace 不存在 → **rejected Promise**（實作時需以單元測試確認錯誤型別）
@@ -80,6 +80,28 @@ await vscode.commands.executeCommand('workbench.extensions.search', 'platformio'
 
 ---
 
+## `platformio-ide.showHome`
+
+**用途**：provider 安裝成功後開啟 PlatformIO Home，並透過 contributed command 啟動 PlatformIO IDE 或 pioarduino extension，使其進入 Core 初始化流程。
+
+```typescript
+try {
+  await executeCommand('platformio-ide.showHome');
+} catch {
+  log('[PenvProviderService] Failed to open PlatformIO Home; continuing with reload prompt', 'warn');
+}
+```
+
+**呼叫時機**：僅限本次 `installExtension` 剛回傳成功；若積木編輯器開啟時 provider 已存在，不自動開啟 Home。
+
+**並行約束**：同一個 `WebViewManager` 在 provider setup settle 前保存 in-flight Promise；重複開啟積木編輯器不得再次呼叫安裝、Home 或 reload。settle 後清除狀態，下一次操作重新執行 provider 偵測。
+
+**跨 provider 行為**：`platformio.platformio-ide` 與 `pioarduino.pioarduino-ide` 共用相同命令 ID，不需要依 provider 分支命令。
+
+**失敗處理**：Home rejected 不改變已成功的 provider 安裝結果、不觸發另一個 provider fallback，也不記錄第三方例外內容；流程繼續顯示既有 reload 提示。
+
+---
+
 ## `vscode.window.showInformationMessage`
 
 **用途**：只顯示安裝失敗說明或安裝成功後的重新載入提示；不作為安裝前確認。
@@ -91,14 +113,14 @@ if (selected === reloadButton) {
 }
 ```
 
-**行為**：provider 缺失時直接執行 `installExtension`，不先顯示自訂確認按鈕。兩個 provider 都失敗時則顯示不含按鈕的手動安裝說明。
+**行為**：provider 缺失時直接執行 `installExtension`，不先顯示自訂確認按鈕。安裝成功時等待 Home 命令完成或失敗隔離後才顯示 reload；兩個 provider 都失敗時則顯示不含按鈕的手動安裝說明。
 
 ---
 
 ## 重新載入處理
 
-只有安裝指令成功後，擴充功能才顯示「Reload Now」提示並可呼叫 `workbench.action.reloadWindow`。兩個 provider 均失敗時不得進入此路徑。
+只有安裝指令成功後，擴充功能才呼叫 PlatformIO Home 並顯示「Reload Now」提示；使用者選擇後可呼叫 `workbench.action.reloadWindow`。兩個 provider 均失敗時不得進入 Home 或 reload 路徑。
 
-重新載入後 PlatformIO IDE / pioarduino 啟動，自動執行 `get-platformio.py` 建立 `~/.platformio/penv/`，無需使用者手動操作。
+Home 命令會啟動 PlatformIO IDE / pioarduino 並進入其 Core installer；重新載入提示仍作為後續完成設定的保底，無需使用者手動執行 build。
 
 重新載入提示只代表 provider 已安裝，**不代表 PlatformIO Core 已可用**。Core 狀態由實際 `--version` 探測決定。

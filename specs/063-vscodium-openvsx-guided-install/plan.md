@@ -4,7 +4,7 @@
 
 ## 摘要
 
-從 `package.json` 移除硬性 `extensionDependencies`，使擴充功能可在 VSCodium / Open VSX 環境啟動。新增集中化的 `PenvProviderService`，統一管理 provider 偵測與安裝 fallback（platformio → pioarduino → 手動搜尋），並在所有板子開啟積木編輯器時維持舊版共同前置環境。另以 `PlatformioInvocationResolver` 驗證實際可執行的 Core 啟動方式，支援 `PLATFORMIO_CORE_DIR` 與 `python -m platformio` fallback。
+從 `package.json` 移除硬性 `extensionDependencies`，使擴充功能可在 VSCodium / Open VSX 環境啟動。新增集中化的 `PenvProviderService`，統一管理 provider 偵測與安裝 fallback（platformio → pioarduino → 手動搜尋），並在所有板子開啟積木編輯器時維持舊版共同前置環境。任一 provider 安裝成功後會呼叫固定命令 `platformio-ide.showHome`，立即啟動 provider 與 Core 初始化，再保留既有重新載入提示。另以 `PlatformioInvocationResolver` 驗證實際可執行的 Core 啟動方式，支援 `PLATFORMIO_CORE_DIR` 與 `python -m platformio` fallback。
 
 ## 技術背景
 
@@ -32,7 +32,7 @@
 |------|------|------|
 | I — 簡潔可維護 | `PenvProviderService` 職責單一；重試邏輯封裝於服務層 | ✅ |
 | II — 模組化 | 新服務集中管理，避免在多個 uploader 重複實作通知邏輯 | ✅ |
-| III — 避免過度開發 | 僅實作規格所需功能；無前置確認步驟或 post-install wizard，安裝成功後只提供必要的 reload 按鈕 | ✅ |
+| III — 避免過度開發 | 僅實作規格所需功能；無前置確認步驟或自訂 wizard，安裝成功後只呼叫 provider 既有 Home 命令並保留 reload 按鈕 | ✅ |
 | VI — 結構化日誌 | 所有新偵測邏輯使用 `log()` 記錄，不使用 `console.log` | ✅ |
 | VII — 測試覆蓋率 | FR-014 明確要求新邏輯須有單元測試覆蓋 | ✅ |
 | VIII — 純函數/模組架構 | provider 安裝與 Core invocation 探測皆透過依賴注入，可在測試中覆寫 VS Code API、檔案系統與程序執行 | ✅ |
@@ -86,10 +86,12 @@ media/locales/*/messages.js             ← 15 個語系：新增安裝失敗、
 **關鍵發現摘要**：
 
 1. **installExtension 指令**：`workbench.extensions.installExtension` 為 VS Code 官方記載的內建指令。在 Open VSX 環境嘗試安裝不存在的 extension ID 時，預期會以 rejected Promise 回傳（需在實作階段以單元測試驗證確切錯誤類型）。
-2. **penv 自動建立**：PlatformIO IDE 與 pioarduino 在首次 activation 後**自動**執行安裝腳本建立 penv，無需使用者手動執行編譯。因此「需先執行 build」的說明已從規格移除。
+2. **penv 自動建立**：PlatformIO IDE 與 pioarduino 在首次 activation 後**自動**執行安裝腳本建立 penv，無需使用者手動執行編譯。安裝成功後呼叫 `platformio-ide.showHome`，明確觸發 activation 與 Core 初始化。
 3. **板子類型值**：`mainJson.board` 的值為 `'none'`（預設）、`'cyberbrick'`、`'txt'`，或 Arduino 板名（例如 `esp32dev`、`uno` 等非以上三者的值）。
 4. **提示 API**：`vscode.window.showInformationMessage(message, ...items)` 用於安裝失敗說明與成功後的 reload 按鈕；安裝前不另外呼叫。
 5. **直接安裝機制**：provider 缺失時立即呼叫 `workbench.extensions.installExtension`，避免增加前置確認步驟。
+6. **Home 失敗隔離**：`platformio-ide.showHome` 失敗不代表 provider 安裝失敗；只記錄不含第三方例外細節的警告，之後仍顯示 reload，不重新觸發 provider fallback。
+7. **並行 setup 合併**：`WebViewManager` 保存進行中的 provider setup Promise；重複開啟編輯器時不建立第二條流程，settle 後清除以保留重試能力。
 
 ## Phase 1：設計
 
@@ -104,7 +106,11 @@ media/locales/*/messages.js             ← 15 個語系：新增安裝失敗、
 webviewManager.createAndShowWebView()
   └── createDefaultDeps(localeService) → isProviderInstalled() ?
       ├── 已安裝 → 不觸發安裝
-      └── 未安裝 → showInstallNotification（所有板子，fire-and-forget）
+      └── 未安裝 → ensurePenvProviderSetup（所有板子，single-flight／fire-and-forget）
+            ├── provider 安裝成功 → await platformio-ide.showHome → reload 提示
+            ├── Home 失敗 → 記錄警告 → reload 提示
+            ├── setup 進行中再次觸發 → 共用既有 Promise，不重複副作用
+            └── provider 全部失敗 → Extensions 搜尋 + 手動安裝訊息
 
 [上傳路徑（簡化後）]
 arduinoUploader / micropythonUploader / serialMonitorService

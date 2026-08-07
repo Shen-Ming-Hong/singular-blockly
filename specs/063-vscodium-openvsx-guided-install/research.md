@@ -16,14 +16,14 @@
 
 ## 決策 2：penv 建立時機
 
-**決策**：penv 由 PlatformIO IDE 或 pioarduino 在首次 activation 後**自動建立**，不需要使用者手動執行編譯。
+**決策**：penv 由 PlatformIO IDE 或 pioarduino 在首次 activation 後**自動建立**，不需要使用者手動執行編譯。provider 安裝成功後主動呼叫 `platformio-ide.showHome`，以觸發 activation 與 Core 初始化。
 
 **依據**：
 - 官方文件：「PlatformIO Core (CLI) is built into PlatformIO IDE and you will be able to use it within PlatformIO IDE Terminal.」
 - 安裝腳本（`get-platformio.py`）在 extension activation 時由 `platformio-node-helpers` / `pioarduino-node-helpers` 自動呼叫。
 - pioarduino 原始碼確認使用相同的安裝腳本，產生相同的 `~/.platformio/penv/` 結構。
 
-**影響**：從規格中移除「需先執行 build」的說明；重新載入提示不需要包含此步驟指引。
+**影響**：從規格中移除「需先執行 build」的說明；安裝後依序執行 Home／Core 初始化與既有重新載入提示，不需要加入 build 指引。
 
 ---
 
@@ -58,9 +58,20 @@
 
 ---
 
-## 決策 5：不以固定路徑輪詢宣告 Core 就緒
+## 決策 5：Home 初始化與 reload 的錯誤邊界
 
-**決策**：provider 安裝成功後只提示重新載入，不輪詢固定路徑，也不宣告 Core 已就緒。實際使用時由 PlatformIO invocation resolver 執行 `--version` 判斷。
+**決策**：任一 provider 安裝成功後，等待固定命令 `platformio-ide.showHome` 完成，再顯示既有 reload 提示。Home 命令 rejected 時只記錄不含例外細節的警告，仍繼續 reload；不得將 Home 失敗當成 marketplace 安裝失敗而改裝另一個 provider。
+
+**依據**：
+- 官方 PlatformIO IDE 與 pioarduino 共用 `platformio-ide.showHome` 命令 ID。
+- 執行 contributed command 會啟動 provider extension，進而進入其 Core installer。
+- provider 已成功安裝時，Home 錯誤屬初始化階段，與 `installExtension` fallback 的責任不同。
+
+---
+
+## 決策 6：不以固定路徑輪詢宣告 Core 就緒
+
+**決策**：provider 安裝成功後觸發 Home／Core 初始化並提示重新載入，但不輪詢固定路徑，也不宣告 Core 已就緒。實際使用時仍由 PlatformIO invocation resolver 執行 `--version` 判斷。
 
 **依據**：
 - extension 安裝成功與 PlatformIO Core 可執行是兩個不同狀態。
@@ -68,7 +79,17 @@
 
 ---
 
-## 決策 6：PlatformIO 啟動 fallback
+## 決策 7：provider setup single-flight
+
+**決策**：`WebViewManager` 在 provider setup 期間保存同一個 Promise。重複開啟積木編輯器時不再次呼叫安裝流程；Promise fulfilled 或 rejected 後都清除狀態，讓暫時性失敗可於下次操作重試。
+
+**依據**：積木編輯器命令可在前一次非同步安裝完成前再次觸發，VS Code 不保證替擴充功能序列化命令。若沒有 in-flight guard，即使 marketplace 合併重複下載，後續 Home 與 reload 仍可能重複執行。
+
+**安全性考量**：unexpected rejection 只記錄固定警告，不輸出第三方例外內容或本機路徑。
+
+---
+
+## 決策 8：PlatformIO 啟動 fallback
 
 **決策**：以 `{ command, prefixArgs }` 表示 PlatformIO 啟動方式，逐一實際執行 `--version`；Windows direct launcher 失敗後，改用同一 penv 的 `python.exe -m platformio`。
 

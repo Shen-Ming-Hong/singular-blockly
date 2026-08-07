@@ -98,7 +98,7 @@ Phase 3 + Phase 4 + T018 → T019 → T020 → T021
 - [X] T019 執行 `npm run validate:i18n` 確認全部 15 個語系驗證通過，修正任何缺漏 key
 - [X] T020 執行 `npm test`：938 項通過、1 項略過；另有 1 項既有且與本 PR 無關的 MicroPython OTA 測試失敗，已明確記錄並交付測試 VSIX
 - [X] T021 minor 版本升級：更新 `package.json` 的 `version` 欄位，在 `CHANGELOG.md` 的「未發布」區段新增本功能條目（繁體中文 + English，含新功能說明與 VSCodium 相容性說明）
-- [ ] T022 手動驗收測試：依 `quickstart.md` Scenario 3 在 VSCodium + pioarduino 環境執行完整引導安裝流程（開啟積木編輯器 → 直接安裝 → reload → penv 自動建立 → CyberBrick 上傳成功），對應 SC-001；記錄測試結果
+- [ ] T022 手動驗收測試：依 `quickstart.md` Scenario 3 在 VSCodium + pioarduino 環境執行完整引導安裝流程（開啟積木編輯器 → 直接安裝 → PlatformIO Home／Core 初始化 → reload → CyberBrick 上傳成功），對應 SC-001；記錄測試結果
 
 ## Phase 7：Windows Core 啟動 fallback 與安裝狀態修正
 
@@ -108,6 +108,16 @@ Phase 3 + Phase 4 + T018 → T019 → T020 → T021
 - [X] T026 Arduino 編譯、上傳與 Serial Monitor 沿用 resolver 成功選出的啟動方式。
 - [X] T027 移除 CyberBrick Serial Monitor 的固定 penv guard，改用實際成功偵測裝置的後端。
 - [ ] T028 已產生 0.83.0 測試 VSIX；待在 Windows 非 ASCII 使用者路徑、`PLATFORMIO_CORE_DIR` 與被阻擋 `pio.exe` 情境完成手動驗收。
+
+## Phase 8：安裝後自動啟動 PlatformIO Home／Core 初始化
+
+- [X] T029 在 `src/services/penvProviderService.ts` 的 provider 安裝成功路徑依序等待 `platformio-ide.showHome` 與既有 reload 提示；Home 失敗只記錄一般性警告，不重新觸發 provider fallback。
+- [X] T030 在 `src/test/penvProviderService.test.ts` 覆蓋官方 provider、pioarduino fallback、Home rejected、manual-required 與既有 provider 不自動開啟 Home 的呼叫順序及錯誤隔離。
+- [X] T031 同步更新 feature 063 的規格、計畫、研究、資料模型、VS Code API 合約、quickstart，以及 `CHANGELOG.md` 未發布項目；不新增 i18n key 或版本發布。
+- [X] T032 執行 TypeScript 編譯、PenvProviderService 目標測試、ESLint 與完整 unit test：目標 15 項全數通過，完整 suite 為 982 passing、1 pending，另保留 1 項已記錄且與本功能無關的 OTA bootstrap 既有失敗；VS Code／VSCodium 乾淨環境手動驗收仍由 T022 追蹤。
+- [X] T033 在 `src/webview/webviewManager.ts` 以 in-flight Promise 合併並行 provider setup，settle 後清除狀態，unexpected rejection 僅記錄固定警告。
+- [X] T034 在 `src/test/webviewManager.test.ts` 驗證 pending 期間安裝、Home 與 reload 各只執行一次，且 settle 後可再次偵測。
+- [X] T035 同步文件並完成程式碼簡化與安全檢查；compile-tests、compile、lint 與 45 項聚焦測試通過，完整 suite 為 984 passing、1 pending，另保留 1 項已記錄且與本功能無關的 OTA bootstrap 既有失敗；本地 re-review 未發現新問題。
 
 ---
 
@@ -125,6 +135,13 @@ Phase 3 + Phase 4 + T018 → T019 → T020 → T021
 | T020 | T017、T019 |
 | T021 | T020 |
 | T022 | T020（需要可執行的 .vsix）|
+| T029 | T009 |
+| T030 | T029 |
+| T031 | T029、T030 |
+| T032 | T029–T031 |
+| T033 | T029 |
+| T034 | T033 |
+| T035 | T033、T034 |
 
 ## 平行執行範例
 
