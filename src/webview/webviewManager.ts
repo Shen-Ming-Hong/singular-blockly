@@ -16,7 +16,12 @@ import { BoardConfigKey, LoadWorkspaceStateMessage, PreviewWarning, SetBoardMess
 import { TxtVirtualControlsDocument, normalizeTxtVirtualControlsDocument } from '../types/txtVirtualControls';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
-import { isProviderInstalled, showInstallNotification, createDefaultDeps } from '../services/penvProviderService';
+import {
+	createDefaultDeps,
+	isProviderInstalled,
+	showInstallNotification,
+	type PenvProviderServiceDeps,
+} from '../services/penvProviderService';
 
 /**
  * 開發板值映射表
@@ -261,6 +266,7 @@ export class WebViewManager {
 	private internalUpdateCount: number = 0; // 避免內部更新觸發 FileWatcher
 	private aiModelManager?: AIModelManager;
 	private aiStatusBar?: AIStatusBar;
+	private penvProviderSetup?: Promise<void>;
 	/** TXT Controller I/O Test Panel — T034 */
 
 	/**
@@ -293,6 +299,23 @@ export class WebViewManager {
 		}
 	}
 
+	private ensurePenvProviderSetup(deps: PenvProviderServiceDeps): void {
+		if (this.penvProviderSetup || isProviderInstalled(deps)) {
+			return;
+		}
+
+		this.penvProviderSetup = showInstallNotification(deps);
+		void this.penvProviderSetup.then(
+			() => {
+				this.penvProviderSetup = undefined;
+			},
+			() => {
+				this.penvProviderSetup = undefined;
+				log('[WebViewManager] PlatformIO provider setup failed unexpectedly', 'warn');
+			}
+		);
+	}
+
 	/**
 	 * 建立並顯示 WebView 面板
 	 */
@@ -302,9 +325,7 @@ export class WebViewManager {
 		const isTestEnvironmentPenv = process.env.NODE_ENV === 'test';
 		if (!isTestEnvironmentPenv) {
 			const penvDeps = createDefaultDeps(this.localeService);
-			if (!isProviderInstalled(penvDeps)) {
-				void showInstallNotification(penvDeps);
-			}
+			this.ensurePenvProviderSetup(penvDeps);
 		}
 
 		// 檢查工作區

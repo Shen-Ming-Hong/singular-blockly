@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+### 🐛 修復 Bug Fixes
+
+- PlatformIO IDE 或 pioarduino provider 自動安裝成功後，現在會先開啟 PlatformIO Home 觸發 Core 初始化，再保留既有重新載入提示；Home 命令失敗不會誤觸另一個 provider 安裝，安裝期間重複開啟積木編輯器也不會產生重複流程
+  After successfully installing the PlatformIO IDE or pioarduino provider, Singular Blockly now opens PlatformIO Home to trigger Core initialization before retaining the existing reload prompt; Home command failures no longer trigger another provider installation, and reopening the Blockly editor during setup no longer starts duplicate flows
+
 ## [0.84.0] - 2026-08-04
 
 ### ✨ 新增功能 Features

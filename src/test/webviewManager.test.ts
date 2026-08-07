@@ -210,6 +210,84 @@ describe('WebView Manager', () => {
 		// 注意：我們不能驗證 reveal 的 calledOnce 屬性，因為它是真實方法而非 stub
 	});
 
+	it('should coalesce concurrent provider setup attempts and allow retry after completion', async () => {
+		let resolveInstall!: () => void;
+		const installPending = new Promise<void>(resolve => {
+			resolveInstall = resolve;
+		});
+		const executeCommand = sinon.stub();
+		executeCommand
+			.withArgs('workbench.extensions.installExtension', 'platformio.platformio-ide')
+			.returns(installPending);
+		executeCommand.resolves();
+		const showInformationMessage = sinon.stub().resolves(undefined);
+		const deps = {
+			getExtension: sinon.stub().returns(undefined),
+			executeCommand,
+			showInformationMessage,
+		};
+		const manager = webViewManager as any;
+
+		manager.ensurePenvProviderSetup(deps);
+		const firstSetup = manager.penvProviderSetup as Promise<void>;
+		manager.ensurePenvProviderSetup(deps);
+
+		assert.strictEqual(
+			executeCommand.withArgs('workbench.extensions.installExtension', 'platformio.platformio-ide').callCount,
+			1,
+			'concurrent attempts should share the in-flight provider setup'
+		);
+
+		resolveInstall();
+		await firstSetup;
+
+		assert.strictEqual(executeCommand.withArgs('platformio-ide.showHome').callCount, 1);
+		assert.strictEqual(showInformationMessage.callCount, 1);
+
+		manager.ensurePenvProviderSetup(deps);
+		await (manager.penvProviderSetup as Promise<void>);
+
+		assert.strictEqual(
+			executeCommand.withArgs('workbench.extensions.installExtension', 'platformio.platformio-ide').callCount,
+			2,
+			'a later attempt should be allowed after the previous setup completes'
+		);
+	});
+
+	it('should allow provider setup retry after an unexpected rejection', async () => {
+		const executeCommand = sinon.stub();
+		executeCommand
+			.withArgs('workbench.extensions.installExtension', sinon.match.string)
+			.rejects(new Error('Provider unavailable'));
+		executeCommand
+			.withArgs('workbench.extensions.search', 'platformio')
+			.rejects(new Error('Extensions search unavailable'));
+		const deps = {
+			getExtension: sinon.stub().returns(undefined),
+			executeCommand,
+			showInformationMessage: sinon.stub().resolves(undefined),
+		};
+		const manager = webViewManager as any;
+
+		manager.ensurePenvProviderSetup(deps);
+		await assert.rejects(manager.penvProviderSetup as Promise<void>);
+
+		manager.ensurePenvProviderSetup(deps);
+		await assert.rejects(manager.penvProviderSetup as Promise<void>);
+
+		assert.strictEqual(
+			executeCommand
+				.getCalls()
+				.filter(
+					call =>
+						call.args[0] === 'workbench.extensions.installExtension' &&
+						call.args[1] === 'platformio.platformio-ide'
+				).length,
+			2,
+			'an unexpected rejection should not permanently block later setup attempts'
+		);
+	});
+
 	it('should show error if no workspace folder open', async () => {
 		// 設定沒有開啟工作區
 		vscodeMock.workspace.workspaceFolders = undefined;

@@ -50,9 +50,14 @@ ProviderInstallResult
 ```
 偵測 provider extension
   ├── 未安裝
-  │     └── 直接啟動 provider 安裝
-  │           ├── 安裝成功 → 顯示 reload（只代表 provider 已安裝）
-  │           └── 安裝失敗 → [manual-required] → 開啟 Extensions 面板
+  │     └── 檢查 provider setup 狀態
+  │           ├── in-flight → 共用既有流程，不重複副作用
+  │           └── idle → 建立 setup Promise 並啟動 provider 安裝
+  │                 ├── 安裝成功 → await `platformio-ide.showHome`
+  │                 │                 ├── 成功 → 顯示 reload
+  │                 │                 └── 失敗 → 記錄警告 → 顯示 reload
+  │                 └── 安裝失敗 → [manual-required] → 開啟 Extensions 面板
+  │                       （setup settle 後回到 idle，允許下次重試）
   │
   └── 已安裝
         └── 實際執行所有可信候選的 `--version`

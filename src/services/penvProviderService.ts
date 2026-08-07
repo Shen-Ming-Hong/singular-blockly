@@ -107,6 +107,15 @@ export async function showInstallNotification(deps: PenvProviderServiceDeps): Pr
 	log('[PenvProviderService] Auto-installing penv provider', 'info');
 	const result = await attemptInstall(deps);
 	if (result.status === 'installed') {
+		try {
+			log(`[PenvProviderService] Opening PlatformIO Home for ${result.providerId}`, 'info');
+			await deps.executeCommand('platformio-ide.showHome');
+		} catch {
+			log(
+				`[PenvProviderService] Failed to open PlatformIO Home for ${result.providerId}; continuing with reload prompt`,
+				'warn'
+			);
+		}
 		await showReloadButton(deps);
 	}
 }

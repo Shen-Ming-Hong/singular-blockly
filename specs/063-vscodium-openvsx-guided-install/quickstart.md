@@ -19,6 +19,8 @@
 **預期結果**：
 - 不顯示 Singular Blockly 自訂的安裝前確認按鈕
 - 直接啟動 PlatformIO provider 安裝
+- provider 安裝成功後自動開啟 PlatformIO Home，開始 Core 初始化
+- Home 命令完成或失敗隔離後，顯示既有 Reload Required 提示
 - Blockly 編輯器仍可正常操作
 
 **驗證指令**：
@@ -39,8 +41,9 @@ npm run lint
 
 **預期結果**：
 - PlatformIO IDE 開始安裝（Extensions 面板顯示安裝進度）
-- 安裝完成後 Singular Blockly 顯示「Reload Required」
-- Reload 後 PlatformIO 啟動並自動建立 `~/.platformio/penv/`
+- 安裝完成後自動執行 `platformio-ide.showHome`
+- PlatformIO Home／Core installer 開始初始化環境
+- Home 命令完成或失敗隔離後，Singular Blockly 顯示「Reload Required」
 
 ---
 
@@ -61,7 +64,8 @@ npm run lint
 - 不顯示 Singular Blockly 自訂的安裝前確認按鈕
 - 嘗試安裝 `platformio.platformio-ide` 失敗（Open VSX 無此 extension）
 - 自動 fallback 安裝 `pioarduino.pioarduino-ide`
-- pioarduino 安裝成功，VS Code 顯示 Reload Required
+- pioarduino 安裝成功後自動執行相同的 `platformio-ide.showHome` 命令
+- pioarduino Home／Core 初始化流程啟動，之後顯示 Reload Required
 
 **清理**：
 ```bash
@@ -103,11 +107,43 @@ rm -rf /tmp/vscodium-test
 - mock `executeCommand` 的 `installExtension` 呼叫均 reject
 - 驗證 `workbench.extensions.search` 被呼叫且參數為 `'platformio'`
 - 驗證顯示 `PENV_PROVIDER_INSTALL_FAILED` 訊息
+- 驗證不呼叫 `platformio-ide.showHome`
 - 驗證不顯示重新載入或「環境已就緒」訊息
 
 ---
 
-## 情境 7：Windows `pio.exe` 無法執行
+## 情境 7：Home 命令失敗
+
+**目的**：驗證 provider 已安裝但 Home contributed command rejected 時的錯誤隔離
+
+**設定步驟**（單元測試中驗證）：
+- mock provider `installExtension` 成功
+- mock `platformio-ide.showHome` reject
+- mock 使用者選擇 Reload Now
+
+**預期結果**：
+- 不重新嘗試安裝官方 provider 或 pioarduino
+- 記錄不含第三方例外細節的警告
+- 仍顯示既有 Reload Required，確認後呼叫 `workbench.action.reloadWindow`
+
+---
+
+## 情境 8：安裝期間重複開啟積木編輯器
+
+**目的**：驗證並行觸發共用同一條 provider setup
+
+**設定步驟**（單元測試中驗證）：
+- 保持第一個 `installExtension` Promise pending
+- 連續觸發兩次 provider setup
+- 完成第一條流程後再次觸發一次
+
+**預期結果**：
+- pending 期間只呼叫一次 `installExtension`、Home 與 reload
+- setup settle 後清除 in-flight 狀態，後續操作可重新偵測與重試
+
+---
+
+## 情境 9：Windows `pio.exe` 無法執行
 
 **目的**：驗證 Core 存在但 launcher 被拒絕時仍可使用
 
@@ -139,8 +175,14 @@ npm run compile-tests
 npx vscode-test --label unit \
   --run out/test/penvProviderService.test.js \
   --run out/test/services/micropythonUploaderAvailability.test.js
-# 預期：16 passing
+# 預期：17 passing
+
+# provider setup 與並行回歸測試（使用可用的 VS Code／VSCodium test host）
+npx vscode-test --label unit \
+  --run out/test/penvProviderService.test.js \
+  --run out/test/webviewManager.test.js
+# 預期：45 passing
 
 npm test
-# 目前完整基線：938 passing、1 pending，另有 1 個與本功能無關且已記錄的 OTA bootstrap 既有失敗
+# 目前完整基線：984 passing、1 pending，另有 1 個與本功能無關且已記錄的 OTA bootstrap 既有失敗
 ```
