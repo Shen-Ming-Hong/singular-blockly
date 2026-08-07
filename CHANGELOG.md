@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.84.1] - 2026-08-07
+
 ### 🐛 修復 Bug Fixes
 
 - PlatformIO IDE 或 pioarduino provider 自動安裝成功後，現在會先開啟 PlatformIO Home 觸發 Core 初始化，再保留既有重新載入提示；Home 命令失敗不會誤觸另一個 provider 安裝，安裝期間重複開啟積木編輯器也不會產生重複流程
