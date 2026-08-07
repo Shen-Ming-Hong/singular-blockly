@@ -4,6 +4,7 @@
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-Scripts-orange.svg)](https://platformio.org/)
 [![CyberBrick](https://img.shields.io/badge/Supports-CyberBrick%20MicroPython-00979D?style=flat)](https://github.com/CyberBrick-Official/CyberBrick_Controller_Core)
 [![VS Code Marketplace](https://vsmarketplacebadges.dev/version-short/Singular-Ray.singular-blockly.svg?color=teal&style=flat)](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly&ssr=false#overview)
+[![Open VSX](https://img.shields.io/open-vsx/v/Singular-Ray/singular-blockly?style=flat&label=Open%20VSX)](https://open-vsx.org/extension/Singular-Ray/singular-blockly)
 [![Downloads](https://vsmarketplacebadges.dev/downloads-short/Singular-Ray.singular-blockly.svg?color=7A52B3&style=flat)](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly)
 [![Rating](https://vsmarketplacebadges.dev/rating-star/Singular-Ray.singular-blockly.svg?color=E05D44&style=flat)](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
