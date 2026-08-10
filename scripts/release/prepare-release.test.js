@@ -138,3 +138,15 @@ describe('publish workflow retry contract', () => {
 		assert.ok(retrySteps.every(step => step.includes('--skip-duplicate')));
 	});
 });
+
+describe('GitHub workflow context contract', () => {
+	for (const workflowName of ['ci.yml', 'i18n-audit.yml', 'publish.yml']) {
+		it(`${workflowName} does not evaluate runner.temp before a runner exists`, () => {
+			const workflow = fs.readFileSync(
+				path.join(__dirname, '..', '..', '.github', 'workflows', workflowName),
+				'utf8'
+			);
+			assert.ok(!workflow.includes('${{ runner.temp }}'));
+		});
+	}
+});

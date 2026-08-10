@@ -16,10 +16,6 @@ jobs:
     permissions:
       contents: read
       issues: write
-    env:
-      AUDIT_REPORT: ${{ runner.temp }}/translation-audit.json
-      AUDIT_SUMMARY: ${{ runner.temp }}/translation-audit-summary.txt
-      PATTERN_REPORT: ${{ runner.temp }}/translation-patterns.txt
     steps:
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -32,6 +28,13 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Configure audit report paths
+        shell: bash
+        run: |
+          echo "AUDIT_REPORT=$RUNNER_TEMP/translation-audit.json" >> "$GITHUB_ENV"
+          echo "AUDIT_SUMMARY=$RUNNER_TEMP/translation-audit-summary.txt" >> "$GITHUB_ENV"
+          echo "PATTERN_REPORT=$RUNNER_TEMP/translation-patterns.txt" >> "$GITHUB_ENV"
 
       - name: Detect translation patterns
         run: node scripts/i18n/detect-patterns.js --all > "$PATTERN_REPORT"

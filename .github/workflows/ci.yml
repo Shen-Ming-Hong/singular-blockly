@@ -75,7 +75,6 @@ jobs:
           - macos-latest
     env:
       CI: true
-      VSCODE_TEST_TEMP_DIR: ${{ runner.temp }}/singular-blockly-vscode-test
     steps:
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -88,6 +87,10 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Configure isolated VS Code test directories
+        shell: bash
+        run: echo "VSCODE_TEST_TEMP_DIR=$RUNNER_TEMP/singular-blockly-vscode-test" >> "$GITHUB_ENV"
 
       - name: Compile extension and tests
         run: npm run compile-tests && npm run compile
