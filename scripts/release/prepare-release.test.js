@@ -149,4 +149,13 @@ describe('GitHub workflow context contract', () => {
 			assert.ok(!workflow.includes('${{ runner.temp }}'));
 		});
 	}
+
+	it('archives coverage before upload so generated filenames remain portable', () => {
+		const workflow = fs.readFileSync(
+			path.join(__dirname, '..', '..', '.github', 'workflows', 'ci.yml'),
+			'utf8'
+		);
+		assert.match(workflow, /tar -czf coverage-linux\.tar\.gz coverage/);
+		assert.match(workflow, /path: coverage-linux\.tar\.gz/);
+	});
 });

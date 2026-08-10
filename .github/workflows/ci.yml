@@ -103,12 +103,20 @@ jobs:
         if: runner.os != 'Linux'
         run: npm run test:unit:ci
 
+      - name: Archive coverage report for cross-platform download
+        if: runner.os == 'Linux' && always()
+        shell: bash
+        run: |
+          if [[ -d coverage ]]; then
+            tar -czf coverage-linux.tar.gz coverage
+          fi
+
       - name: Upload coverage report
         if: runner.os == 'Linux' && always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: coverage-linux
-          path: coverage/
+          path: coverage-linux.tar.gz
           if-no-files-found: warn
           retention-days: 14
 
