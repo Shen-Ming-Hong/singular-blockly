@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.85.0] - 2026-08-10
+
 ### ✨ 新增功能 Features
 
 - 將 Blockly 升級至 13.2.1，editor 與 preview 採用 Thrasos renderer、Singular 明暗主題、套件內媒體，以及新版焦點、無效輸入與高對比樣式
