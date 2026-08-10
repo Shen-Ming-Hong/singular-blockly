@@ -3,7 +3,7 @@ name: git-workflow
 description: Git 工作流程自動化技能，涵蓋從 commit、本地 Codex Code Review、使用者發布核准到 PR 與發布的完整流程。當使用者提到 commit、push、建立 PR、pull request、提交程式碼、推送分支時自動啟用。Automates Git workflow from commit through local Codex review and explicit publish approval to PR and release. Inspired by Anthropic's official commit-commands plugin.
 metadata:
     author: singular-blockly
-    version: '1.4.0'
+    version: '2.0.0'
     category: productivity
     inspired-by: anthropics/claude-code/plugins/commit-commands
 license: Apache-2.0
@@ -16,8 +16,7 @@ Automates Git operations during development, from commit to PR creation.
 
 ## 核心原則 Core Principles
 
-> **端到端整合**：此技能涵蓋從「開發完成」到「版本發布」的完整流程。推送前先觸發 `pr-review-release` 的本地 Codex review、修正核准與發布核准，核准後才建立 PR 並完成發布。
-> **End-to-End Integration**: This skill covers the complete flow from development to release. Before pushing, run the local Codex review, remediation approval, and publish approval gates from `pr-review-release`; create the PR and release only after approval.
+> **端到端整合**：推送前先執行 `pr-review-release` 的本地 review、版本／雙語 CHANGELOG 準備、修正核准與發布核准。版本檔必須進入同一 PR；合併後只推送 annotated tag，由 Actions 發布唯一 VSIX。
 
 ## 適用情境 When to Use
 
@@ -93,10 +92,10 @@ git diff --cached  # 已 staged 的變更
 #### 1.3 執行 Commit
 
 ```bash
-# Stage 變更
-git add .
-# 或選擇性 stage
+# 先檢查範圍，再互動式或以明確檔案清單 stage
+git status --short
 git add -p
+# git add path/to/file1 path/to/file2
 
 # Commit
 git commit -m "feat(scope): description"
@@ -165,7 +164,8 @@ Before creating a PR, you **must** use the `code-simplifier` skill to check and 
 
 4. **提交簡化變更（保持本地）**
     ```bash
-    git add .
+    git status --short
+    git add -p
     git commit -m "refactor: simplify code for PR readiness"
     ```
 
@@ -183,7 +183,8 @@ Before creating a PR, you **must** use the `code-simplifier` skill to check and 
 2. 評估 findings，先取得使用者對修正方案的明確核准。
 3. 只修正已核准項目，完成測試、`code-simplifier` 與本地 re-review。
 4. 提交修正摘要、測試結果、殘餘風險與 re-review 結果。
-5. 取得使用者對 push、PR、merge 與 release 的另一次明確發布核准。
+5. 若要正式發布，先在分支完成核准的 SemVer、lockfile 與雙語 CHANGELOG，再通過本地 release 契約測試。
+6. 取得使用者對 push、PR、merge、annotated tag 與 Actions CD 的另一次明確發布核准。
 
 > ❌ 修正核准不等同發布核准；Phase 3.5 核准前不得 push 或建立 PR。
 
@@ -231,10 +232,14 @@ git diff master..HEAD --stat
 
 ## 測試計劃 Test Plan
 
-- [ ] `npm run test` 通過
-- [ ] `npm run lint` 通過
-- [ ] `npm run compile` 成功
+- [ ] `npm run ci:static` 通過
+- [ ] `npm run test:unit:ci` 通過
 - [ ] 手動測試：{測試項目}
+
+## 發布資訊 Release Metadata
+
+- Version: `v{VERSION}`
+- [ ] `package.json`、`package-lock.json` 與雙語 CHANGELOG 已包含在本 PR
 
 ## 螢幕截圖 Screenshots (if applicable)
 
@@ -266,7 +271,9 @@ gh pr checks
 
 ### Phase 5: 合併與發布 Merge and Release
 
-PR 建立後沿用已核准範圍，執行 `pr-review-release` Phase 4–5：確認 CI、squash merge、同步與清理分支、更新版本與 CHANGELOG、建立 annotated tag、打包 VSIX，最後建立並驗證 GitHub Release。
+PR 建立後沿用已核准範圍，執行 `pr-review-release` Phase 4–5：確認 `CI Gate`、CodeQL、發布擁有者在 Phase 3.5 的明確核准與對話已解決，squash merge 後推送 annotated tag，等待 Actions 發布並驗證 GitHub Release、VS Code Marketplace、Open VSX 與 SHA-256。
+
+不得在合併後直接修改 `master` 的版本或 CHANGELOG；不得本機建立正式 VSIX 或執行 `gh release create`。
 
 若 PR 或 CI 出現新的實質 findings，回到 `pr-review-release` 的評估與使用者核准 gate，不得自行擴大修正範圍。
 
@@ -291,7 +298,7 @@ PR 建立後沿用已核准範圍，執行 `pr-review-release` Phase 4–5：確
 
 3. **開發完成**：使用本技能執行本地 Codex review、修正與 re-review
 
-4. **發布核准**：使用者明確核准後才 push、建立 PR、merge 和發布
+4. **發布核准**：版本與雙語 CHANGELOG 已在分支後，使用者明確核准才 push、建立 PR、merge、建立 tag 和觸發 CD
 
 ### Commit Message 與 Task 關聯
 
@@ -310,7 +317,8 @@ git commit -m "feat(i18n): [T072-T086] add translations for all 15 languages"
 ### 本地 Commit
 
 ```bash
-git add .
+git status --short
+git add -p
 git commit -m "feat(scope): 繁體中文變更摘要"
 ```
 
@@ -348,7 +356,9 @@ gh pr create --fill --base master
 
 - [ ] **程式碼簡化已完成（必須）**
 - [ ] 本地 Codex review、修正核准與 re-review 已完成
-- [ ] 使用者已明確核准 push、PR、merge 與 release
+- [ ] 版本、lockfile 與雙語 CHANGELOG 已在分支內（若發布）
+- [ ] `npm run release:prepare` 已通過（若發布）
+- [ ] 使用者已明確核准 push、PR、merge、annotated tag 與 Actions CD
 - [ ] 分支已在發布核准後推送到遠端
 - [ ] PR 描述清楚說明變更內容
 - [ ] 已關聯相關 Spec（如適用）
@@ -356,7 +366,8 @@ gh pr create --fill --base master
 
 ### PR 建立後 After PR Creation
 
-- [ ] CI 檢查通過
+- [ ] `CI Gate` 與 CodeQL 通過
+- [ ] 發布擁有者已在 Phase 3.5 明確核准且 review 對話已解決
 - [ ] PR 差異與本地核准範圍一致
 - [ ] 若 CI／人工 review 出現新 findings，已回到使用者核准 gate
 - [ ] 已執行 `pr-review-release` Phase 4–5
@@ -366,11 +377,12 @@ gh pr create --fill --base master
 - [ ] 本地 findings 已評估、核准並處理
 - [ ] 程式碼修正已完成（如需）
 - [ ] 程式碼簡化已完成（阻塞型）
-- [ ] PR 已 Squash Merge
-- [ ] 版本號已更新
-- [ ] CHANGELOG 已更新
-- [ ] Git Tag 已建立
-- [ ] GitHub Release 已建立
+- [ ] 版本號與雙語 CHANGELOG 已在 PR 合併前更新
+- [ ] PR 已 Squash Merge，未直接提交 `master`
+- [ ] Annotated Git Tag 已建立並驗證為 `tag`
+- [ ] GitHub Actions 發布 workflow 已成功
+- [ ] GitHub Release、Marketplace 與 Open VSX 版本一致
+- [ ] Release VSIX 的 SHA-256 已驗證
 
 ---
 

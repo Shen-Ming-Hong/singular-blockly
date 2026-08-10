@@ -1,429 +1,218 @@
 ---
 name: pr-review-release
-description: 本地 Codex Code Review 評估、使用者核准與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。包含本地差異審查、findings 採納評估、使用者審核 gate、程式碼修正、Git 合併、語意化版本更新、CHANGELOG、打包發布的完整工作流程。Local Codex review, user approval, and release workflow for reviewing branch diffs, evaluating findings, merging PRs, semantic versioning, and publishing releases.
+description: 本地 Codex Code Review 評估、使用者核准與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
 metadata:
     author: singular-blockly
-    version: '1.8.0'
-    category: release
+    version: '2.0.0'
+    category: productivity
 license: Apache-2.0
 ---
 
 # PR Code Review 評估與發布流程 PR Review & Release Workflow
 
-以專案開發者角度評估 PR Code Review，並執行完整發布流程。
-Evaluate PR code reviews from a project developer's perspective and execute the complete release workflow.
+把本地審查、兩次使用者核准、受保護分支合併與 tag 驅動發布串成單一流程。不得在 `master` 合併後直接提交版本檔，也不得在本機建立正式 VSIX 或 GitHub Release。
 
-## 適用情境 When to Use
+## 核心契約 Release Contract
 
-- 需要處理 PR 上的 code review 建議
-- 執行本地 Codex code review 或評估人工審查意見
-- 合併 PR 後需要發布新版本
-- 執行完整的發布流程（版本號、CHANGELOG、標籤、Release）
-- 需要 squash merge 並清理已合併的分支
-- 定期清理已合併到 master 的舊本地分支
+- 正式發布輸入只能是 annotated `vX.Y.Z` tag。
+- `package.json`、`package-lock.json`、`CHANGELOG.md` 與 tag 必須是同一版本。
+- 版本與雙語 CHANGELOG 必須在功能分支完成，隨同一 PR 通過 `CI Gate` 與 CodeQL。
+- tag 推送後由 `.github/workflows/publish.yml` 重用 CI 產生的唯一 VSIX，發布到 GitHub Releases、VS Code Marketplace 與 Open VSX。
+- 未取得 Phase 3.5 明確發布核准，不得 push、建立／更新 PR、merge、建立 tag 或觸發 CD。
+- 若只要求 review 而未要求發布，完成 Phase 0–3 後停止；不得自行推定要建立 PR 或 release。
 
-## 工作流程 Workflow
+## Phase 0：本地 Codex Review（必須）
 
-### Phase 0: 本地 Codex Code Review（必須）Local Codex Review (REQUIRED)
-
-**⚠️ 阻塞型步驟：此步驟必須完成才能進入 Code Review 評估階段。**
-
-不發佈 PR、不等待遠端 reviewer，也不以遠端 review 是否完成作為流程條件。PR 已存在時仍審查本地 `HEAD`；PR 尚未建立時，先完成本地審查再進入推送或合併階段。
-
-1. **確認審查基準與範圍**
+1. 確認 base、HEAD、工作區與差異範圍：
 
     ```bash
-    git status -sb
-    git branch --show-current
+    git status --short
     git merge-base origin/master HEAD
     git diff --stat origin/master...HEAD
-    git diff --name-status origin/master...HEAD
+    git diff origin/master...HEAD
+    git diff
     ```
 
-    - 若 PR 明確指定其他 base，改用該 base。
-    - 若功能分支包含已知的前置文件 commit，可將實作前 commit 指定為 review base，並在摘要中說明。
-    - 納入尚未提交的工作區變更；不得因尚未建立 PR 而跳過 review。
+2. 對照目前 spec、測試與架構規則，審查正確性、回歸、邊界條件、安全性及測試覆蓋。
+3. 以 P0–P3 列出可執行 findings，包含檔案、行號、影響與建議；若沒有 finding，明確記錄殘餘風險。
+4. 不等待 Copilot 或其他遠端 reviewer；PR 已存在時仍以本地 `HEAD` 為準。
 
-2. **由 Codex 本地審查實際差異**
+## Phase 1：Finding 與版本方案評估
 
-    - 對照需求、spec、contract 與架構規則檢查正確性。
-    - 檢查錯誤、競態、狀態生命週期、邊界輸入、安全性、相容性及缺漏測試。
-    - 閱讀完整相關函式與呼叫端，不只檢查 diff 片段或測試是否綠燈。
-    - 執行與風險相稱的靜態檢查與聚焦測試；測試限制或既有失敗必須分開記錄。
+逐條分類 findings：
 
-3. **輸出本地 findings**
+- 採納：確實影響正確性、安全、相容性或必要維護性。
+- 調整後採納：方向正確，但需要縮小範圍。
+- 不採納：與專案契約衝突、屬偏好或會造成回歸。
+- 待決定：缺少產品決策，不得自行猜測。
 
-    - 依 `P0`、`P1`、`P2`、`P3` 嚴重度排序。
-    - 每條 finding 必須包含可定位的檔案／行號、可重現情境、實際影響與判斷理由。
-    - 沒有 finding 時明確寫「未發現阻擋問題」，並列出殘餘風險或未執行驗證。
-    - Code Review 預設只讀；除非使用者同時要求修正，否則先回報 findings，不直接修改產品程式碼。
+若本次範圍包含正式發布，同時提出：
 
----
+- SemVer 建議（patch／minor／major）及理由。
+- 預定的 `vX.Y.Z`。
+- 雙語 CHANGELOG 草稿；不得只提供中文或英文。
+- 會改動的 `package.json`、`package-lock.json` 與 `CHANGELOG.md`。
 
-### Phase 1: Code Review 評估 Review Evaluation
+## Phase 1.5：修正核准 Gate（必須）
 
-1. **讀取 Phase 0 的本地 findings**；若已有人工 PR review，合併納入評估，但不得等待或要求遠端自動 review。
+向使用者提交 finding ID、採納判斷、修改範圍、驗證方式，以及適用時的 SemVer／CHANGELOG 草稿。等待使用者明確核准全部方案或指定 finding ID。
 
-2. **評估每條 finding／建議**，以專業開發者角度判斷：
+修正核准只授權 Phase 2 的本地變更，不等同發布核准。不得把沉默、一般性的「繼續」或先前發布要求視為本次核准。
 
-    | 判斷結果 | 標準                         | 範例                               |
-    | -------- | ---------------------------- | ---------------------------------- |
-    | ✅ 採納  | 真正有價值、能改善程式碼品質 | 修復潛在 bug、改善效能、增強可讀性 |
-    | ❌ 忽略  | 基於錯誤理解或不符合專案架構 | 過度工程化、不了解上下文、風格偏好 |
+## Phase 2：只實作已核准內容
 
-3. **記錄評估結果**，清楚說明每條 finding／建議的採納或忽略理由。
-
-### Phase 1.5: 使用者審核（必須）User Approval Gate (REQUIRED)
-
-**⚠️ 阻塞型步驟：未取得使用者明確核准，不得修改產品程式碼或進入後續發布流程。**
-
-1. 以表格向使用者提交每條 finding 的嚴重度、採納／忽略判斷、理由、預計修改範圍及驗證方式。
-2. 明確標示建議核准的方案及仍待決定的項目；不得把沉默、一般性的「繼續」或先前的發布要求推定為本次核准。
-3. 等待使用者明確核准全部方案，或指定核准／拒絕的 finding ID。
-4. 只處理已核准項目；拒絕或未決項目保持不變並記錄理由。
-
-> ❌ **禁止跳過**：取得核准前，不得進入 Phase 2、push、建立／更新 PR、merge、更新版本、建立 tag 或發布 Release。
-
-### Phase 2: 程式碼修正 Code Fixes
-
-若有使用者核准採納的建議：
-
-1. **修正程式碼**
-    - 根據採納的建議進行修改
-    - 確保符合專案規範（參考 `copilot-instructions.md`）
-
-2. **驗證修正**
+1. 修正已核准 findings；拒絕或未決項目保持不變。
+2. 若已核准正式發布版本，在目前功能分支執行：
 
     ```bash
-    # 執行測試
-    npm test
-
-    # 執行 lint
-    npm run lint
+    npm version {VERSION} --no-git-tag-version
     ```
 
-### Phase 3: 程式碼簡化（必須）Code Simplification (REQUIRED)
-
-**⚠️ 阻塞型步驟：此步驟必須完成才能進入 Git 操作階段。**
-
-修正 Code Review 建議後，**必須**使用 `code-simplifier` 技能進行程式碼簡化：
-
-1. **執行程式碼簡化檢查**
+3. 把 `CHANGELOG.md` 的 `[未發布]` 內容整理成核准的 `## [{VERSION}] - YYYY-MM-DD` 雙語區段。
+4. 驗證版本契約：
 
     ```bash
-    # 取得本次變更的檔案
-    git diff --name-only origin/master | grep -E '\.(ts|js)$'
+    npm run release:prepare
     ```
 
-2. **強制簡化流程**
-    - 閱讀 `code-simplifier` 技能文件
-    - 對所有變更的 TypeScript/JavaScript 檔案執行簡化
-    - 確保遵循專案的 coding standards
-
-3. **簡化完成標準**
-    - [ ] 減少不必要的巢狀結構
-    - [ ] 移除冗餘程式碼和抽象
-    - [ ] 變數和函式命名清晰
-    - [ ] 無描述顯而易見程式碼的註解
-    - [ ] 測試通過且功能不變
-
-4. **提交簡化變更**
+5. 依變更範圍執行測試；至少執行：
 
     ```bash
-    git add .
-    git commit -m "refactor: simplify code before release"
+    npm run ci:static
+    npm run test:unit:ci
     ```
 
-> 💡 **Agent 整合**：輸入「簡化程式碼」、「refactor」或 `@code-simplifier` 觸發技能。
-
-> ❌ **禁止跳過**：未完成程式碼簡化不得進入 Phase 4。
-
-### Phase 3.5: 發布前核准（必須）Pre-Publish Approval (REQUIRED)
-
-修正與測試完成後，先向使用者提交變更摘要、測試結果、殘餘風險與本地 re-review 結果。只有使用者明確核准發布，才能 push、建立／更新 PR、merge 或進入 release；修正核准不自動等同發布核准。
-
-### Phase 4: Git 操作 Git Operations
-
-**前置條件：Phase 3.5 的發布核准已明確取得。**
-
-1. **提交變更**（若有修正）
-
-    ```bash
-    git add .
-    git commit -m "fix: address code review feedback"
-    ```
-
-2. **推送並合併**
-
-    ```bash
-    # 推送到功能分支
-    git push origin HEAD
-
-    # Squash merge PR（--delete-branch 會自動刪除遠端分支）
-    gh pr merge --squash --delete-branch
-    ```
-
-    **Agent 使用 MCP 工具合併時**：`mcp_github_merge_pull_request` 不會自動刪除遠端分支，必須在步驟 4 手動刪除。
-
-3. **同步主分支**
-
-    ```bash
-    git checkout master
-    git pull origin master
-    git status -sb
-    ```
-
-    確認主分支已同步且工作目錄乾淨，再進入發布流程。
-
-4. **清理已合併分支 Branch Cleanup**
-
-    ```bash
-    # 刪除遠端功能分支（若未被 --delete-branch 自動刪除）
-    git push origin --delete feature-branch-name
-
-    # 更新遠端分支資訊，移除已刪除的遠端分支
-    git fetch --prune
-
-    # 刪除本地功能分支（若尚未刪除）
-    git branch -d feature-branch-name
-
-    # 批次刪除所有已合併到 master 的本地分支
-    git branch --merged master | grep -v "master" | xargs -r git branch -d
-
-    # 列出並清理標記為 [gone] 的分支（遠端已刪除）
-    git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -d
-    ```
-
-5. **清理 Worktrees（如有使用）**
-
-    ```bash
-    # 列出所有 worktrees
-    git worktree list
-
-    # 移除關聯已刪除分支的 worktree
-    git worktree remove path/to/worktree
-    ```
-
-### Phase 5: 發布流程 Release Process
-
-按照專案憲法（constitution.md）或發布規範執行：
-
-#### 5.1 版本管理 Version Management
-
-1. **決定版本號**（遵循語意化版本）
-    - `patch`: Bug 修復、小改進 (0.0.X)
-    - `minor`: 新功能、向後相容 (0.X.0)
-    - `major`: 破壞性變更 (X.0.0)
-
-2. **更新版本號（避免自動建立輕量 tag）**
-
-    ```bash
-    npm version patch --no-git-tag-version  # 或 minor / major
-    ```
-
-3. **更新 CHANGELOG.md**
-    - 新增雙語條目（中英文）
-    - 格式遵循 Keep a Changelog
-
-4. **提交版本更新**
+6. 使用 Conventional Commits 與繁體中文描述提交。發布檔可使用：
 
     ```bash
     git add package.json package-lock.json CHANGELOG.md
-    git commit -m "chore(release): 發布版本 {VERSION}"
+    git commit -m "chore(release): 準備發布 {VERSION}"
     ```
 
-#### 5.2 品質驗證 Quality Verification
+## Phase 3：簡化與本地 Re-review（必須）
+
+1. 對本次改動的 TS／JS 檔執行 `code-simplifier` 技能。
+2. 重跑受影響測試與 `npm run ci:static`。
+3. 重新審查 `origin/master...HEAD` 全部差異，確認沒有新增 P0–P3 finding。
+4. 確認版本、lockfile 與雙語 CHANGELOG 已在 PR 差異內，不會留到合併後修改。
+
+## Phase 3.5：發布前核准 Gate（必須）
+
+向使用者提交最終變更摘要、完整測試結果、殘餘風險、本地 re-review、確切版本與 CHANGELOG 摘要。明確詢問是否核准後續的 push、PR、squash merge、annotated tag 與 GitHub Actions CD。
+
+只有使用者明確核准才可進入 Phase 4。若最終差異、版本或風險在核准後實質改變，回到此 gate 重新取得核准。
+
+## Phase 4：PR 與受保護主分支
+
+1. 推送功能分支並建立／更新 PR，不得直接 push `master`。
+2. PR 描述包含版本、雙語 CHANGELOG 摘要與測試結果。
+3. 等待並確認：
+   - `CI Gate` 通過。
+   - CodeQL 通過。
+   - 儲存庫發布擁有者在 Phase 3.5 的明確核准視為 maintainer approval；ruleset 將 required approvals 設為 0，允許發布擁有者直接完成 PR 發布。
+   - review 對話已解決、沒有 merge conflict。
+   - 單一 maintainer 直發仍必須走 PR、通過必要檢查並使用 squash merge；不得直接 push `master` 或略過 Phase 3.5。
+4. 若 CI 或人工 review 出現新的實質 finding，回到 Phase 1 評估；未核准不得擴大修正。
+5. 只使用 squash merge，並刪除遠端功能分支：
+
+    ```bash
+    gh pr merge --squash --delete-branch
+    ```
+
+6. 明確切換並同步本地 `master`，確認 squash commit 已包含版本與 CHANGELOG。不得在此時執行 `npm version` 或新增 release commit：
+
+    ```bash
+    git switch master
+    git fetch origin
+    git merge --ff-only origin/master
+    git status --short
+    git rev-parse HEAD
+    git rev-parse origin/master
+    ```
+
+    `git status --short` 必須沒有輸出，兩個 revision 必須完全相同；否則不得建立 tag。
+
+## Phase 5：Annotated Tag 與 Actions CD
+
+### 5.1 建立 tag 前檢查
+
+在最新 `origin/master` 上確認工作區乾淨、版本契約通過、目標 tag 不存在：
 
 ```bash
-# 完整測試
-npm test
-
-# Lint 檢查
-npm run lint
-
-# 建置驗證
-npm run compile
+git switch master
+git fetch origin
+git merge --ff-only origin/master
+git status --short
+git rev-parse HEAD
+git rev-parse origin/master
+npm ci
+npm run release:prepare
+git ls-remote --tags origin "refs/tags/v{VERSION}"
 ```
 
-#### 5.3 建置與打包 Build & Package
+工作區必須乾淨，且 `HEAD` 必須等於 `origin/master`。若不同或遠端已有 tag，停止並查明；不得刪除、覆寫或重建正式 tag。
+
+### 5.2 建立並推送 annotated tag
 
 ```bash
-# 生產建置
-npm run package
-
-# 打包 VSIX（若為 VS Code 擴充功能）
-npx @vscode/vsce package
-```
-
-#### 5.4 Git 標籤 Git Tagging
-
-**⚠️ 重要：所有版本標籤必須使用 Annotated Tags（`-a` 參數）**
-
-Annotated tags 包含建立者、日期、訊息等元資料，是正式發布的標準做法。
-
-```bash
-# 建立 Annotated Tag（必須使用 -a 參數）
 git tag -a v{VERSION} -m "Release v{VERSION}"
-
-# 推送標籤到遠端
-git push origin v{VERSION}
-
-# 驗證標籤類型（應顯示 tag 而非 commit）
 git cat-file -t v{VERSION}
+git push origin v{VERSION}
 ```
 
-**❌ 禁止使用 Lightweight Tags：**
+`git cat-file -t` 必須輸出 `tag`。禁止 `git tag v{VERSION}` 產生 lightweight tag。
+
+### 5.3 等待發布 workflow
+
+tag push 只負責觸發 `.github/workflows/publish.yml`。不得執行本機正式打包、全域安裝 `vsce`／`ovsx` 或 `gh release create`。
 
 ```bash
-# 錯誤示範 - 不要這樣做！
-git tag v{VERSION}  # 缺少 -a 參數，會建立 lightweight tag
+gh run list --workflow publish.yml --branch v{VERSION} --limit 1
+gh run watch {RUN_ID} --exit-status
+gh run view {RUN_ID} --json status,conclusion,jobs,url
 ```
 
-#### 5.5 GitHub Release（必要步驟 REQUIRED）
-
-**⚠️ 重要：此步驟不可省略！Git tag 不等於 GitHub Release。**
-
-> 注意：Release 公告容易因 CLI 字串轉義導致跑版，建議使用臨時檔（`release-notes.md`）輸入。
-
-```powershell
-@'
-## ✨ New Features | 新功能
-
-### Feature Name | 功能名稱
-- English description | 中文說明
-
-## 🐛 Bug Fixes | 修復
-- Fixed issue | 修正問題
-
-## 📦 Download | 下載
-- **VSIX**: singular-blockly-{VERSION}.vsix
-
----
-**Full Changelog | 完整變更日誌**: https://github.com/{owner}/{repo}/blob/master/CHANGELOG.md
-'@ | Set-Content -Path "release-notes.md" -Encoding UTF8
-
-gh release create v{VERSION} -t "v{VERSION}" -F release-notes.md ./singular-blockly-{VERSION}.vsix
-
-Remove-Item -Force release-notes.md
-```
-
-**Release 版面檢核與修正：**
+若任一發布端失敗，只重跑失敗 jobs：
 
 ```bash
-gh release view v{VERSION} --json body
-gh release view v{VERSION} --web
+gh run rerun {RUN_ID} --failed
+gh run watch {RUN_ID} --exit-status
+gh run view {RUN_ID} --json attempt,status,conclusion,jobs,url
 ```
 
-若格式跑掉，修正 `release-notes.md` 後重新更新：
+重跑後必須等待同一 run 的新 attempt 完成並再次確認 conclusion；若仍失敗就停止。不得重建 tag，也不得重發已成功的發布端。
 
-```bash
-gh release edit v{VERSION} -F release-notes.md
-```
+市集的第一次 publish 必須嚴格拒絕重複版本；只有 `github.run_attempt > 1` 的重跑 job 可使用 `--skip-duplicate`，以復原伺服器已接受但 runner 未取得成功回應的情況。
 
-#### 5.6 清理 Cleanup
+### 5.4 驗證三個發布端
 
-```powershell
-# 移除 VSIX 安裝包（必須執行！）
-Remove-Item -Force singular-blockly-{VERSION}.vsix
+1. GitHub Release 是 Latest 且含：
+   - `singular-blockly-{VERSION}.vsix`
+   - `singular-blockly-{VERSION}.vsix.sha256`
+   - 對應版本的雙語 CHANGELOG notes
+2. 下載 Release 的 VSIX 與 checksum 到經驗證的暫存目錄，執行 SHA-256 驗證。
+3. 確認 workflow 的 Marketplace 與 Open VSX jobs 都成功，並在兩個市集頁面確認版本為 `{VERSION}`。
+4. 確認三端來自 `quality` job 的同一 artifact；不得用本機重新建置品補發。
 
-# 移除暫時發布說明檔（若未在 5.5 步驟中移除）
-Remove-Item -Force release-notes.md -ErrorAction SilentlyContinue
+## Checklist
 
-# 驗證發布連結可存取
-gh release view v{VERSION} --web
-```
+- [ ] 本地 review findings 已評估並取得修正核准
+- [ ] 只實作已核准內容，測試與 re-review 通過
+- [ ] 版本、lockfile 與雙語 CHANGELOG 已在功能分支／同一 PR
+- [ ] 已取得 Phase 3.5 明確發布核准
+- [ ] `CI Gate`、CodeQL、發布擁有者的 Phase 3.5 明確核准與對話解決條件通過
+- [ ] PR 已 squash merge，未直接提交到 `master`
+- [ ] annotated tag 已驗證為 `tag` 並推送
+- [ ] Actions 使用同一 VSIX 完成 GitHub Release、Marketplace、Open VSX
+- [ ] Release assets 與 SHA-256 驗證通過
+- [ ] 發布失敗時只重跑失敗 jobs，未重建 tag
 
-> ⚠️ **必須移除 VSIX**：VSIX 是建置產物，不應留在工作目錄中。GitHub Release 已附加此檔案，本地保留無意義且會造成混亂。
+## 完成摘要
 
-## 檢查清單 Checklist
+回報 findings 採納數、使用者兩次核准、PR／CI 結果、版本、tag 類型、publish run URL、GitHub Release URL、兩個市集版本與 checksum 驗證結果。
 
-### 本地 Codex Review 階段（阻塞型）
+## 相關資源
 
-- [ ] 已確認 review base、HEAD、工作區狀態與完整差異範圍
-- [ ] 已對照 spec／contract／架構檢查所有變更的執行路徑
-- [ ] 已完成正確性、回歸、邊界、安全與測試覆蓋審查
-- [ ] findings 已依 P0–P3 排序並附檔案／行號；若無 finding，已記錄殘餘風險
-
-> ❌ **禁止跳過**：未完成本地 Codex review 不得進入 Phase 1；不需要等待 Copilot 或其他遠端 reviewer。
-
-### Code Review 階段
-
-- [ ] 讀取所有本地 findings 與現有人工 review 評論
-- [ ] 評估每條 finding／建議並記錄理由
-- [ ] 已向使用者提交採納判斷、修改範圍與驗證方式
-- [ ] 使用者已明確核准要處理的 finding ID
-- [ ] 完成採納建議的程式碼修正
-- [ ] 測試通過
-
-### 程式碼簡化階段（阻塞型）
-
-- [ ] 已識別所有變更的 TS/JS 檔案
-- [ ] 已執行 code-simplifier 技能
-- [ ] 無不必要的巢狀結構
-- [ ] 無冗餘程式碼和抽象
-- [ ] 變數和函式命名清晰
-- [ ] 無描述顯而易見程式碼的註解
-- [ ] 測試通過且功能不變
-- [ ] 簡化變更已提交
-
-### 發布前核准階段（阻塞型）
-
-- [ ] 已提交修正摘要、測試結果、殘餘風險與本地 re-review 結果
-- [ ] 使用者已明確核准 push、PR、merge 與 release 的後續範圍
-
-### Git 操作階段
-
-- [ ] 變更已提交並推送
-- [ ] PR 已 squash merge
-- [ ] 主分支已同步
-- [ ] **遠端功能分支已刪除**（`git push origin --delete` 或 `--delete-branch`）
-- [ ] 本地功能分支已刪除（`git branch -d`）
-- [ ] 已清理其他舊的已合併分支
-
-### 發布階段
-
-- [ ] 版本號已更新
-- [ ] CHANGELOG.md 已更新（雙語）
-- [ ] 所有測試通過
-- [ ] 成功建置打包 VSIX
-- [ ] Git Annotated Tag 已建立並推送（使用 `git tag -a`）
-- [ ] **GitHub Release 已建立**（使用 `gh release create`）
-- [ ] **Release 含雙語說明與 VSIX 附件**
-- [ ] **Release 版面檢核完成（必要時已修正）**
-- [ ] 發布連結可存取（使用 `gh release view` 驗證）
-- [ ] **本地 VSIX 已移除**（`Remove-Item singular-blockly-{VERSION}.vsix`）
-- [ ] **release-notes.md 已移除**（若有使用）
-
-## 輸出格式 Output Format
-
-完成後提供執行摘要：
-
-```markdown
-## 執行摘要 Execution Summary
-
-| 項目             | 狀態                            |
-| ---------------- | ------------------------------- |
-| Code Review 評估 | ✅ 完成（採納 X 條，忽略 Y 條） |
-| 使用者審核       | ✅ 已核准 findings：...          |
-| 程式碼修正       | ✅/⏭️ 完成/無需修正             |
-| PR 合併          | ✅ Squash merged                |
-| 版本更新         | ✅ vX.Y.Z                       |
-| 發布             | ✅ 完成                         |
-
-### 變更檔案 Changed Files
-
-- `package.json`
-- `CHANGELOG.md`
-- ...
-
-### 發布連結 Release Link
-
-https://github.com/{owner}/{repo}/releases/tag/v{VERSION}
-```
-
-## 相關資源 Related Resources
-
-- [語意化版本規範](https://semver.org/lang/zh-TW/)
-- [Keep a Changelog](https://keepachangelog.com/zh-TW/)
-- [git-workflow 技能](../git-workflow/SKILL.md) - 從 commit 到 PR 建立（自動觸發本技能）
-- [code-simplifier 技能](../code-simplifier/SKILL.md) - 程式碼簡化與重構（阻塞型）
+- [CI/CD 操作手冊](../../../docs/ci-cd.md)
+- [git-workflow 技能](../git-workflow/SKILL.md)
+- [code-simplifier 技能](../code-simplifier/SKILL.md)

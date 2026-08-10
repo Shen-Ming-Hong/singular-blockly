@@ -10,6 +10,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.85.1] - 2026-08-10
+
+### 🐛 修復 Bug Fixes
+
+- 移除翻譯 PR 必定產生的 pattern warning 留言；PR 現在只以缺鍵、空值、placeholder、schema 與編碼等確定性錯誤阻擋合併，完整 pattern audit 改為月度追蹤
+  Removed the unconditional translation pattern-warning PR comment; pull requests now block only on deterministic missing-key, empty-value, placeholder, schema, and encoding errors, while full pattern audits run monthly
+- 修正非法 UTF-8 位元只被替換而未阻擋 PR，並強化雙語 CHANGELOG 驗證，避免將只含英文產品名的中文說明誤判為雙語
+  Fixed invalid UTF-8 bytes being silently replaced instead of blocking pull requests, and hardened bilingual changelog checks against Chinese-only notes containing English product names
+
+### 🔧 維護 Maintenance
+
+- 新增可重用的三平台 CI、固定 `CI Gate`、隔離 VS Code 測試環境、coverage／VSIX artifacts、CodeQL、dependency review 與每週 Dependabot 更新
+  Added reusable three-platform CI, a stable `CI Gate`, isolated VS Code test state, coverage/VSIX artifacts, CodeQL, dependency review, and weekly Dependabot updates
+- 正式發布改由 annotated tag 觸發 Actions，驗證版本與雙語 CHANGELOG 後，以同一份 versioned VSIX 與 SHA-256 發布 GitHub Release、VS Code Marketplace 及 Open VSX
+  Changed production releases to annotated-tag-triggered Actions that verify version and bilingual changelog consistency before publishing one shared versioned VSIX and SHA-256 to GitHub Releases, VS Code Marketplace, and Open VSX
+- 市集首次發布維持嚴格的重複版本檢查；只有重跑失敗 job 時才容許跳過已存在版本，以復原伺服器已接受但 runner 回報失敗的情況
+  Kept first Marketplace and Open VSX publishes strict while allowing duplicate-version recovery only when rerunning failed jobs after an ambiguous completion
+- 單一 maintainer 儲存庫可由發布擁有者在明確核准後直接完成 PR 發布，同時保留 CI Gate、CodeQL、squash merge 與受保護標籤要求
+  Allowed the release owner of a single-maintainer repository to complete PR-based releases after explicit approval while retaining CI Gate, CodeQL, squash merge, and protected-tag requirements
+
 ## [0.85.0] - 2026-08-10
 
 ### ✨ 新增功能 Features

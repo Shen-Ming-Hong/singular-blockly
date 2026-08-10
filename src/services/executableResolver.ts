@@ -56,7 +56,7 @@ export function getExecutableSearchDirectories(
 ): string[] {
 	const searchDirectories: string[] = [];
 	const envPath = env['PATH'] ?? '';
-	const pathApi = platform === 'win32' ? path.win32 : path;
+	const pathApi = platform === 'win32' ? path.win32 : path.posix;
 
 	if (envPath) {
 		const delimiter = platform === 'win32' ? ';' : ':';
@@ -64,9 +64,9 @@ export function getExecutableSearchDirectories(
 	}
 
 	if (platform === 'darwin') {
-		searchDirectories.push('/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', '/bin', path.join(os.homedir(), '.local', 'bin'));
+		searchDirectories.push('/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', '/bin', pathApi.join(os.homedir(), '.local', 'bin'));
 	} else if (platform === 'linux') {
-		searchDirectories.push('/usr/local/bin', '/usr/bin', '/bin', path.join(os.homedir(), '.local', 'bin'));
+		searchDirectories.push('/usr/local/bin', '/usr/bin', '/bin', pathApi.join(os.homedir(), '.local', 'bin'));
 	} else if (platform === 'win32') {
 		const localAppData = env['LOCALAPPDATA'];
 		const programFiles = env['ProgramFiles'];
@@ -94,7 +94,7 @@ export function getExecutableDirectory(
 		return null;
 	}
 
-	const pathApi = platform === 'win32' ? path.win32 : path;
+	const pathApi = platform === 'win32' ? path.win32 : path.posix;
 	try {
 		return pathApi.dirname(fs.realpathSync(filePath));
 	} catch {
@@ -112,7 +112,7 @@ export function resolveExecutable({
 }: ResolveExecutableOptions): string | null {
 	const resolvedCandidates: string[] = [...candidatePaths];
 	const expandedExecutableNames = executableNames.flatMap(name => expandExecutableNames(name, platform, env));
-	const pathApi = platform === 'win32' ? path.win32 : path;
+	const pathApi = platform === 'win32' ? path.win32 : path.posix;
 
 	for (const directory of searchDirectories) {
 		for (const executableName of expandedExecutableNames) {
@@ -134,7 +134,7 @@ export function getDefaultPlatformioExecutablePath(
 	platform: NodeJS.Platform = process.platform,
 	homeDir: string = os.homedir()
 ): string {
-	const pathApi = platform === 'win32' ? path.win32 : path;
+	const pathApi = platform === 'win32' ? path.win32 : path.posix;
 	const scriptsDir = platform === 'win32'
 		? pathApi.join(homeDir, '.platformio', 'penv', 'Scripts')
 		: pathApi.join(homeDir, '.platformio', 'penv', 'bin');

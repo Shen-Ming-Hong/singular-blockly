@@ -5,6 +5,7 @@
  */
 
 import * as path from 'path';
+import * as os from 'os';
 import * as vscode from 'vscode';
 import { log } from './logging';
 import { TxtConnectionService } from './txtConnectionService';
@@ -167,10 +168,7 @@ export class TxtUploader {
 			await ssh.execCommand(`mkdir -p ${quoteShellArg(remoteDir)}`);
 
 			// 寫入臨時本地檔案然後 SCP 到遠端
-			const tmpLocalPath = path.join(
-				process.env['TMPDIR'] ?? '/tmp',
-				`singular_blockly_${Date.now()}.py`
-			);
+			const tmpLocalPath = path.join(os.tmpdir(), `singular_blockly_${Date.now()}.py`);
 			const fs = await import('fs/promises');
 			await fs.writeFile(tmpLocalPath, code, 'utf-8');
 			try {

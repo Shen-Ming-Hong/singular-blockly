@@ -387,7 +387,9 @@ describe('WebView Manager', () => {
 			htmlContent.indexOf('cyberbrickOtaProvisioningState.js') < htmlContent.indexOf('blocklyEdit.js'),
 			'CyberBrick OTA state helper should load before blocklyEdit.js'
 		);
-		const convertedPaths = webviewMock.asWebviewUri.getCalls().map((call: sinon.SinonSpyCall) => call.args[0].fsPath);
+		const convertedPaths = webviewMock.asWebviewUri
+			.getCalls()
+			.map((call: sinon.SinonSpyCall) => call.args[0].fsPath.replace(/\\/g, '/'));
 		assert(convertedPaths.some((resourcePath: string) => resourcePath.endsWith('/media/js/cyberbrickNameValidation.js')));
 		assert(convertedPaths.some((resourcePath: string) => resourcePath.endsWith('/media/js/cyberbrickOtaProvisioningState.js')));
 	});
