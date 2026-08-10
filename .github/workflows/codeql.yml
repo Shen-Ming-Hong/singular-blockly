@@ -1,0 +1,41 @@
+name: CodeQL
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "30 2 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    name: Analyze JavaScript and TypeScript
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@9e3211c9a3b9311dfe05da2ed48eea3386f042dd # v4.37.6
+        with:
+          languages: javascript-typescript
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@9e3211c9a3b9311dfe05da2ed48eea3386f042dd # v4.37.6
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@9e3211c9a3b9311dfe05da2ed48eea3386f042dd # v4.37.6
+        with:
+          category: /language:javascript-typescript

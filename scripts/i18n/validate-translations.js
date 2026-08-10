@@ -13,8 +13,9 @@
  * - Schema validation
  *
  * Usage:
- *   node scripts/i18n/validate-translations.js --language ja
+ *   node scripts/i18n/validate-translations.js --language=ja
  *   node scripts/i18n/validate-translations.js --all
+ *   node scripts/i18n/validate-translations.js --all --verbose
  *
  * Exit codes:
  *   0 = All checks passed
@@ -23,6 +24,7 @@
 
 const fs = require('fs-extra');
 const path = require('path');
+const { isUtf8 } = require('node:buffer');
 const translationReader = require('./lib/translation-reader.js');
 const { log } = require('./lib/logger.js');
 
@@ -30,15 +32,13 @@ const { log } = require('./lib/logger.js');
 const args = process.argv.slice(2);
 const languageArg = args.find(arg => arg.startsWith('--language='));
 const validateAll = args.includes('--all');
-
-if (!languageArg && !validateAll) {
-	console.error('Usage: node validate-translations.js --language=<lang> | --all');
-	process.exit(1);
-}
+const verboseWarnings = args.includes('--verbose');
 
 const targetLanguages = validateAll
 	? ['ja', 'ko', 'de', 'zh-hant', 'es', 'fr', 'it', 'pl', 'pt-br', 'ru', 'tr', 'cs', 'hu', 'bg']
-	: [languageArg.split('=')[1]];
+	: languageArg
+		? [languageArg.split('=')[1]]
+		: [];
 
 const REQUIRED_PROJECT_ARIA_KEYS = ['BLOCKLY_ARIA_CONFIGURATION_ICON', 'BLOCKLY_ARIA_LOCKED_ICON'];
 
@@ -131,32 +131,65 @@ function checkEmpty(key, translatedText) {
 }
 
 /**
+ * Check that the locale payload is a plain object containing only string values.
+ */
+function checkSchema(lang, messages) {
+	if (!messages || typeof messages !== 'object' || Array.isArray(messages)) {
+		return [{ type: 'schemaError', message: 'Locale messages must be an object', lang }];
+	}
+
+	return Object.entries(messages)
+		.filter(([, value]) => typeof value !== 'string')
+		.map(([key, value]) => ({
+			type: 'schemaError',
+			message: `Translation must be a string, received ${Array.isArray(value) ? 'array' : typeof value}`,
+			key,
+			lang,
+		}));
+}
+
+/**
  * Check if file is valid UTF-8
  */
 function checkEncoding(lang, filePath) {
-	const issues = [];
+	let content;
 	try {
-		const content = fs.readFileSync(filePath, 'utf-8');
-		// If we got here, UTF-8 decoding succeeded
-
-		// Check for BOM (should not be present)
-		if (content.charCodeAt(0) === 0xfeff) {
-			issues.push({
-				type: 'bomDetected',
-				message: 'UTF-8 BOM detected (should be removed)',
+		content = fs.readFileSync(filePath);
+	} catch (error) {
+		return [
+			{
+				type: 'encodingError',
+				message: `Unable to read locale file: ${error.message}`,
 				lang,
 				filePath,
-			});
-		}
-	} catch (error) {
-		issues.push({
-			type: 'encodingError',
-			message: `File is not valid UTF-8: ${error.message}`,
+			},
+		];
+	}
+
+	if (!isUtf8(content)) {
+		return [
+			{
+				type: 'encodingError',
+				message: 'File is not valid UTF-8',
+				lang,
+				filePath,
+			},
+		];
+	}
+
+	const hasBom = content.length >= 3 && content[0] === 0xef && content[1] === 0xbb && content[2] === 0xbf;
+	if (!hasBom) {
+		return [];
+	}
+
+	return [
+		{
+			type: 'bomDetected',
+			message: 'UTF-8 BOM detected (should be removed)',
 			lang,
 			filePath,
-		});
-	}
-	return issues;
+		},
+	];
 }
 
 /**
@@ -235,6 +268,25 @@ function validateLanguage(lang) {
 		};
 	}
 
+	const schemaIssues = checkSchema(lang, translatedMessages);
+	allIssues.push(...schemaIssues);
+	if (!englishMessages || typeof englishMessages !== 'object' || Array.isArray(englishMessages)) {
+		allIssues.push({
+			type: 'schemaError',
+			message: 'English baseline messages must be an object',
+			lang: 'en',
+		});
+	}
+	if (!englishMessages || !translatedMessages) {
+		return {
+			lang,
+			passed: false,
+			errors: allIssues,
+			warnings: [],
+			issues: allIssues,
+		};
+	}
+
 	for (const key of REQUIRED_PROJECT_ARIA_KEYS) {
 		if (typeof translatedMessages[key] !== 'string' || translatedMessages[key].trim().length === 0) {
 			allIssues.push({
@@ -257,7 +309,8 @@ function validateLanguage(lang) {
 
 	// Validate each translation key
 	for (const [key, englishText] of Object.entries(englishMessages)) {
-		const translatedText = translatedMessages[key] || '';
+		const rawTranslation = translatedMessages[key];
+		const translatedText = typeof rawTranslation === 'string' ? rawTranslation : '';
 
 		// Check 2: Empty translations
 		const emptyIssues = checkEmpty(key, translatedText);
@@ -298,6 +351,11 @@ function validateLanguage(lang) {
  * Main validation function
  */
 function main() {
+	if (targetLanguages.length === 0) {
+		console.error('Usage: node validate-translations.js --language=<lang> | --all [--verbose]');
+		process.exit(1);
+	}
+
 	log.info('Starting translation validation', { languages: targetLanguages });
 
 	const results = [];
@@ -321,17 +379,13 @@ function main() {
 		// Print errors
 		if (result.errors && result.errors.length > 0) {
 			console.log(`\n  Errors in ${result.lang}:`);
-			for (const error of result.errors.slice(0, 10)) {
-				// Show first 10
+			for (const error of result.errors) {
 				console.log(`    - [${error.type}] ${error.key || error.lang}: ${error.message}`);
-			}
-			if (result.errors.length > 10) {
-				console.log(`    ... and ${result.errors.length - 10} more errors`);
 			}
 		}
 
-		// Print warnings (first 5)
-		if (result.warnings && result.warnings.length > 0) {
+		// Length-ratio warnings remain available for audits without flooding normal CI logs.
+		if (verboseWarnings && result.warnings && result.warnings.length > 0) {
 			console.log(`\n  Warnings in ${result.lang} (first 5):`);
 			for (const warning of result.warnings.slice(0, 5)) {
 				console.log(`    - [${warning.type}] ${warning.key}: ${warning.message}`);
@@ -356,5 +410,8 @@ function main() {
 	}
 }
 
-// Run validation
-main();
+if (require.main === module) {
+	main();
+}
+
+module.exports = { checkEmpty, checkEncoding, checkPlaceholders, checkSchema };

@@ -4,90 +4,192 @@ on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
-  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  package:
-    runs-on: ubuntu-latest
+  quality:
+    name: Reuse verified CI artifact
+    uses: ./.github/workflows/ci.yml
     permissions:
       contents: read
+    with:
+      release_tag: ${{ github.ref_name }}
+
+  github-release:
+    name: Publish GitHub Release
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    permissions:
+      contents: write
+    env:
+      ARTIFACT_NAME: ${{ needs.quality.outputs['artifact-name'] }}
+      VSIX_NAME: ${{ needs.quality.outputs['vsix-name'] }}
+      CHECKSUM_NAME: ${{ needs.quality.outputs['checksum-name'] }}
+      RELEASE_TAG: ${{ github.ref_name }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download verified release artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          node-version: "22"
+          name: ${{ env.ARTIFACT_NAME }}
+          path: release-artifacts
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Package VSIX
+      - name: Publish release with VSIX and checksum
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          npm install -g @vscode/vsce
-          vsce package --out singular-blockly.vsix
-
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: singular-blockly-vsix
-          path: singular-blockly.vsix
-          if-no-files-found: error
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" \
+              "release-artifacts/$VSIX_NAME" \
+              "release-artifacts/$CHECKSUM_NAME" \
+              --clobber
+            gh release edit "$RELEASE_TAG" \
+              --title "Singular Blockly $RELEASE_TAG" \
+              --notes-file release-artifacts/release-notes.md \
+              --latest
+          else
+            gh release create "$RELEASE_TAG" \
+              "release-artifacts/$VSIX_NAME" \
+              "release-artifacts/$CHECKSUM_NAME" \
+              --verify-tag \
+              --title "Singular Blockly $RELEASE_TAG" \
+              --notes-file release-artifacts/release-notes.md \
+              --latest
+          fi
 
   publish-marketplace:
-    needs: package
+    name: Publish VS Code Marketplace
+    needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
     permissions:
       contents: read
+    env:
+      ARTIFACT_NAME: ${{ needs.quality.outputs['artifact-name'] }}
+      VSIX_NAME: ${{ needs.quality.outputs['vsix-name'] }}
     steps:
-      - name: Download VSIX artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: singular-blockly-vsix
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "22"
+          node-version: 22.16.0
+          cache: npm
 
-      - name: Publish to VS Code Marketplace
-        # VSCE_PAT 為 Azure DevOps Personal Access Token
-        # 若發布失敗並出現 "Access Denied / expired PAT"，請至以下網址更新：
-        # 1. 建立新 PAT：https://dev.azure.com/SingularMaker/_usersSettings/tokens
-        #    - Organization: All accessible organizations
-        #    - Scopes: Marketplace > Manage
-        # 2. 更新 GitHub Secret：https://github.com/Shen-Ming-Hong/singular-blockly/settings/secrets/actions
-        #    找 VSCE_PAT > Update secret
-        run: |
-          npm install -g @vscode/vsce
-          vsce publish --packagePath singular-blockly.vsix -p "$VSCE_PAT"
+      - name: Install pinned publishing tools
+        run: npm ci
+
+      - name: Download verified release artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: release-artifacts
+
+      - name: Publish the shared VSIX
+        if: github.run_attempt == 1
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npm exec -- vsce publish --packagePath "release-artifacts/$VSIX_NAME"
+
+      - name: Retry an ambiguously completed Marketplace publish
+        if: github.run_attempt > 1
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npm exec -- vsce publish --packagePath "release-artifacts/$VSIX_NAME" --skip-duplicate
 
   publish-open-vsx:
-    needs: package
+    name: Publish Open VSX
+    needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
     permissions:
       contents: read
+    env:
+      ARTIFACT_NAME: ${{ needs.quality.outputs['artifact-name'] }}
+      VSIX_NAME: ${{ needs.quality.outputs['vsix-name'] }}
     steps:
-      - name: Download VSIX artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: singular-blockly-vsix
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: "22"
+          node-version: 22.16.0
+          cache: npm
 
-      - name: Publish to Open VSX Registry
-        # OVSX_PAT 為 Open VSX Access Token
-        # 若發布失敗或 Token 過期，請至以下網址更新：
-        # 1. 建立新 Token：https://open-vsx.org/user-settings/tokens
-        # 2. 更新 GitHub Secret：https://github.com/Shen-Ming-Hong/singular-blockly/settings/secrets/actions
-        #    找 OVSX_PAT > Update secret
-        run: |
-          npm install -g ovsx
-          ovsx publish singular-blockly.vsix -p "$OVSX_PAT"
+      - name: Install pinned publishing tools
+        run: npm ci
+
+      - name: Download verified release artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: release-artifacts
+
+      - name: Publish the shared VSIX
+        if: github.run_attempt == 1
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npm exec -- ovsx publish "release-artifacts/$VSIX_NAME"
+
+      - name: Retry an ambiguously completed Open VSX publish
+        if: github.run_attempt > 1
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npm exec -- ovsx publish "release-artifacts/$VSIX_NAME" --skip-duplicate
+
+  verify:
+    name: Verify all release destinations
+    if: always()
+    needs:
+      - quality
+      - github-release
+      - publish-marketplace
+      - publish-open-vsx
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    env:
+      ARTIFACT_NAME: ${{ needs.quality.outputs['artifact-name'] }}
+      VSIX_NAME: ${{ needs.quality.outputs['vsix-name'] }}
+      CHECKSUM_NAME: ${{ needs.quality.outputs['checksum-name'] }}
+      RELEASE_TAG: ${{ github.ref_name }}
+      GITHUB_RELEASE_RESULT: ${{ needs.github-release.result }}
+      MARKETPLACE_RESULT: ${{ needs.publish-marketplace.result }}
+      OPEN_VSX_RESULT: ${{ needs.publish-open-vsx.result }}
+    steps:
+      - name: Confirm publishing jobs succeeded
+        run: |
+          test "$GITHUB_RELEASE_RESULT" = success
+          test "$MARKETPLACE_RESULT" = success
+          test "$OPEN_VSX_RESULT" = success
+
+      - name: Download shared artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: release-artifacts
+
+      - name: Verify checksum and GitHub Release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd release-artifacts
+          sha256sum --check "$CHECKSUM_NAME"
+          cd ..
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > release-assets.txt
+          grep -Fx "$VSIX_NAME" release-assets.txt
+          grep -Fx "$CHECKSUM_NAME" release-assets.txt

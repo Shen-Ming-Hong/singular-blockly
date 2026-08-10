@@ -36,6 +36,7 @@ media/toolbox/temp_toolbox.json
 media/toolbox/temp_toolbox_*.json
 coverage/
 .nyc_output/
+release-artifacts/
 
 # 升級過程記錄檔案 (應記錄在 specs/ 文件中)
 *-baseline.txt

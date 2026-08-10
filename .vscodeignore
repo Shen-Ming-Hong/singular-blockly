@@ -47,6 +47,7 @@ vsc-extension-quickstart.md
 **/docs/**
 **/scripts/**
 **/coverage/**
+**/release-artifacts/**
 **/RC_example/**
 
 # 排除額外開發檔案

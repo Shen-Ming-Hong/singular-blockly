@@ -1,0 +1,200 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_call:
+    inputs:
+      release_tag:
+        description: Annotated release tag to verify before packaging
+        required: false
+        type: string
+    outputs:
+      artifact-name:
+        description: Versioned artifact containing the VSIX and release metadata
+        value: ${{ jobs.package.outputs.artifact-name }}
+      version:
+        description: Verified package version
+        value: ${{ jobs.package.outputs.version }}
+      vsix-name:
+        description: Versioned VSIX filename
+        value: ${{ jobs.package.outputs.vsix-name }}
+      checksum-name:
+        description: SHA-256 filename
+        value: ${{ jobs.package.outputs.checksum-name }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  static:
+    name: Static and security checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.16.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Review dependency changes
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@24c7eb380a2dc368f2d129e4c65e51d172983a1e # v4
+        with:
+          fail-on-severity: high
+
+      - name: Run deterministic static checks
+        run: npm run ci:static
+
+      - name: Audit production and development dependencies
+        run: npm audit --audit-level=high
+
+  unit:
+    name: Unit tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+    env:
+      CI: true
+      VSCODE_TEST_TEMP_DIR: ${{ runner.temp }}/singular-blockly-vscode-test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.16.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compile extension and tests
+        run: npm run compile-tests && npm run compile
+
+      - name: Run unit tests with coverage
+        if: runner.os == 'Linux'
+        run: xvfb-run -a npm run test:coverage:ci
+
+      - name: Run unit tests
+        if: runner.os != 'Linux'
+        run: npm run test:unit:ci
+
+      - name: Upload coverage report
+        if: runner.os == 'Linux' && always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-linux
+          path: coverage/
+          if-no-files-found: warn
+          retention-days: 14
+
+  package:
+    name: Package VSIX smoke test
+    needs:
+      - static
+      - unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      artifact-name: ${{ steps.metadata.outputs.artifact-name }}
+      version: ${{ steps.metadata.outputs.version }}
+      vsix-name: ${{ steps.metadata.outputs.vsix-name }}
+      checksum-name: ${{ steps.metadata.outputs.checksum-name }}
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Checkout repository and tags
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.16.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify release metadata
+        id: metadata
+        shell: bash
+        run: |
+          if [[ -n "$RELEASE_TAG" ]]; then
+            npm run release:prepare -- --verify-tag
+          else
+            npm run release:prepare
+          fi
+
+      - name: Package versioned VSIX
+        env:
+          VSIX_PATH: release-artifacts/${{ steps.metadata.outputs.vsix-name }}
+        run: |
+          mkdir -p release-artifacts
+          npm exec -- vsce package --out "$VSIX_PATH"
+
+      - name: Smoke test and finalize release files
+        env:
+          VSIX_PATH: release-artifacts/${{ steps.metadata.outputs.vsix-name }}
+        shell: bash
+        run: |
+          unzip -tqq "$VSIX_PATH"
+          if [[ -n "$RELEASE_TAG" ]]; then
+            npm run release:prepare -- --verify-tag --finalize release-artifacts
+          else
+            npm run release:prepare -- --finalize release-artifacts
+          fi
+
+      - name: Upload versioned VSIX artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ steps.metadata.outputs.artifact-name }}
+          path: |
+            release-artifacts/${{ steps.metadata.outputs.vsix-name }}
+            release-artifacts/${{ steps.metadata.outputs.checksum-name }}
+            release-artifacts/release-notes.md
+            release-artifacts/release-metadata.json
+          if-no-files-found: error
+          retention-days: 14
+
+  gate:
+    name: CI Gate
+    if: always()
+    needs:
+      - static
+      - unit
+      - package
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Confirm every required job passed
+        env:
+          STATIC_RESULT: ${{ needs.static.result }}
+          UNIT_RESULT: ${{ needs.unit.result }}
+          PACKAGE_RESULT: ${{ needs.package.result }}
+        run: |
+          test "$STATIC_RESULT" = success
+          test "$UNIT_RESULT" = success
+          test "$PACKAGE_RESULT" = success

@@ -47,7 +47,6 @@ function loadMessagesFile(lang) {
 	// Use Function constructor to safely evaluate the object literal
 	// This is safer than eval and works without window object
 	try {
-		// eslint-disable-next-line no-new-func
 		const evalFunc = new Function('return ' + objText);
 		const messages = evalFunc();
 		return messages;
