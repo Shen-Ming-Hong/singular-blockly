@@ -126,6 +126,11 @@ describe('release preparation', () => {
 describe('publish workflow retry contract', () => {
 	const workflow = fs.readFileSync(path.join(__dirname, '..', '..', '.github', 'workflows', 'publish.yml'), 'utf8');
 
+	it('supports recovery from an existing immutable annotated tag', () => {
+		assert.match(workflow, /workflow_dispatch:[\s\S]*?release_tag:/);
+		assert.match(workflow, /release_tag: \$\{\{ inputs\.release_tag \|\| github\.ref_name \}\}/);
+	});
+
 	it('keeps first marketplace attempts strict', () => {
 		const strictSteps = workflow.match(/if: github\.run_attempt == 1[\s\S]*?run: [^\n]+/gu) || [];
 		assert.strictEqual(strictSteps.length, 2);
@@ -157,5 +162,15 @@ describe('GitHub workflow context contract', () => {
 		);
 		assert.match(workflow, /tar -czf coverage-linux\.tar\.gz coverage/);
 		assert.match(workflow, /path: coverage-linux\.tar\.gz/);
+	});
+
+	it('checks out release jobs at the requested tag and restores its annotated object', () => {
+		const workflow = fs.readFileSync(
+			path.join(__dirname, '..', '..', '.github', 'workflows', 'ci.yml'),
+			'utf8'
+		);
+		const releaseRefs = workflow.match(/ref: \$\{\{ inputs\.release_tag \|\| github\.sha \}\}/gu) || [];
+		assert.strictEqual(releaseRefs.length, 3);
+		assert.match(workflow, /git fetch --force --no-tags origin "refs\/tags\/\$\{RELEASE_TAG\}:refs\/tags\/\$\{RELEASE_TAG\}"/);
 	});
 });
