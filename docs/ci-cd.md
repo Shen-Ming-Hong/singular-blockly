@@ -63,6 +63,14 @@ gh run rerun RUN_ID --failed
 
 不得刪除／重建 tag，也不得重發已成功的市集。市集的第一次 publish 仍嚴格拒絕重複版本；只有 workflow 重跑時才使用 `--skip-duplicate`，用來復原「市集已接受、runner 卻回報失敗」的不明狀態。正式發布不在本機執行 `vsce package` 或 `gh release create`。
 
+若 tag 觸發的 run 在三個發布 job 開始前，因 workflow 缺陷於 `quality` 階段失敗，先以新 PR 修正 workflow。合併後從 `master` 對同一個既有 annotated tag 執行復原，不刪除或重建 tag：
+
+```bash
+gh workflow run publish.yml --ref master -f release_tag=vX.Y.Z
+```
+
+復原 run 仍會 checkout 該 tag、重新取得遠端 annotated tag object，並驗證 tag、checkout commit、版本檔及雙語 CHANGELOG 完全一致後才建置與發布。
+
 ## GitHub 管理設定
 
 下列設定是 repository 管理狀態，無法只靠提交檔案完成。人工發布核准固定由發布擁有者在 `pr-review-release` Phase 3.5 明確給予。

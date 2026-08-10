@@ -182,6 +182,14 @@ gh run view {RUN_ID} --json attempt,status,conclusion,jobs,url
 
 重跑後必須等待同一 run 的新 attempt 完成並再次確認 conclusion；若仍失敗就停止。不得重建 tag，也不得重發已成功的發布端。
 
+若 tag 觸發的 run 在任何發布 job 開始前，因 workflow 本身的缺陷於 `quality` 階段失敗，先用新 PR 修正 workflow；修正合併後可從 `master` 手動 dispatch 同一個既有 annotated tag。這是不可變 tag 的復原入口，不得用來改換 release commit：
+
+```bash
+gh workflow run publish.yml --ref master -f release_tag=v{VERSION}
+```
+
+手動 run 仍必須驗證 tag 格式、annotated object、tag 指向的 commit、版本檔與雙語 CHANGELOG，並從該 tag checkout 建置唯一 VSIX。
+
 市集的第一次 publish 必須嚴格拒絕重複版本；只有 `github.run_attempt > 1` 的重跑 job 可使用 `--skip-duplicate`，以復原伺服器已接受但 runner 未取得成功回應的情況。
 
 ### 5.4 驗證三個發布端

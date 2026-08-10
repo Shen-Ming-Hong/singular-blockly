@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+### 🐛 修復 Bug Fixes
+
+- 修正 GitHub Actions checkout 將 annotated tag 的本地 ref 展開成 commit，造成發布 metadata gate 誤判；並加入不重建既有 tag 的安全復原入口
+  Fixed GitHub Actions checkout peeling the local annotated-tag ref into a commit and triggering a false metadata-gate failure, and added safe recovery for an existing tag without recreating it
+
 ## [0.85.1] - 2026-08-10
 
 ### 🐛 修復 Bug Fixes
