@@ -109,8 +109,9 @@ license: Apache-2.0
 3. 等待並確認：
    - `CI Gate` 通過。
    - CodeQL 通過。
-   - 至少一位 maintainer 核准。
+   - 儲存庫發布擁有者在 Phase 3.5 的明確核准視為 maintainer approval；ruleset 將 required approvals 設為 0，允許發布擁有者直接完成 PR 發布。
    - review 對話已解決、沒有 merge conflict。
+   - 單一 maintainer 直發仍必須走 PR、通過必要檢查並使用 squash merge；不得直接 push `master` 或略過 Phase 3.5。
 4. 若 CI 或人工 review 出現新的實質 finding，回到 Phase 1 評估；未核准不得擴大修正。
 5. 只使用 squash merge，並刪除遠端功能分支：
 
@@ -199,7 +200,7 @@ gh run view {RUN_ID} --json attempt,status,conclusion,jobs,url
 - [ ] 只實作已核准內容，測試與 re-review 通過
 - [ ] 版本、lockfile 與雙語 CHANGELOG 已在功能分支／同一 PR
 - [ ] 已取得 Phase 3.5 明確發布核准
-- [ ] `CI Gate`、CodeQL、maintainer review 與對話解決條件通過
+- [ ] `CI Gate`、CodeQL、發布擁有者的 Phase 3.5 明確核准與對話解決條件通過
 - [ ] PR 已 squash merge，未直接提交到 `master`
 - [ ] annotated tag 已驗證為 `tag` 並推送
 - [ ] Actions 使用同一 VSIX 完成 GitHub Release、Marketplace、Open VSX

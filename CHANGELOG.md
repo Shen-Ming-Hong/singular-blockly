@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Changed production releases to annotated-tag-triggered Actions that verify version and bilingual changelog consistency before publishing one shared versioned VSIX and SHA-256 to GitHub Releases, VS Code Marketplace, and Open VSX
 - 市集首次發布維持嚴格的重複版本檢查；只有重跑失敗 job 時才容許跳過已存在版本，以復原伺服器已接受但 runner 回報失敗的情況
   Kept first Marketplace and Open VSX publishes strict while allowing duplicate-version recovery only when rerunning failed jobs after an ambiguous completion
+- 單一 maintainer 儲存庫可由發布擁有者在明確核准後直接完成 PR 發布，同時保留 CI Gate、CodeQL、squash merge 與受保護標籤要求
+  Allowed the release owner of a single-maintainer repository to complete PR-based releases after explicit approval while retaining CI Gate, CodeQL, squash merge, and protected-tag requirements
 
 ## [0.85.0] - 2026-08-10
 

@@ -271,7 +271,7 @@ gh pr checks
 
 ### Phase 5: 合併與發布 Merge and Release
 
-PR 建立後沿用已核准範圍，執行 `pr-review-release` Phase 4–5：確認 `CI Gate`、CodeQL、maintainer 核准與對話已解決，squash merge 後推送 annotated tag，等待 Actions 發布並驗證 GitHub Release、VS Code Marketplace、Open VSX 與 SHA-256。
+PR 建立後沿用已核准範圍，執行 `pr-review-release` Phase 4–5：確認 `CI Gate`、CodeQL、發布擁有者在 Phase 3.5 的明確核准與對話已解決，squash merge 後推送 annotated tag，等待 Actions 發布並驗證 GitHub Release、VS Code Marketplace、Open VSX 與 SHA-256。
 
 不得在合併後直接修改 `master` 的版本或 CHANGELOG；不得本機建立正式 VSIX 或執行 `gh release create`。
 
@@ -367,7 +367,7 @@ gh pr create --fill --base master
 ### PR 建立後 After PR Creation
 
 - [ ] `CI Gate` 與 CodeQL 通過
-- [ ] Maintainer 核准且 review 對話已解決
+- [ ] 發布擁有者已在 Phase 3.5 明確核准且 review 對話已解決
 - [ ] PR 差異與本地核准範圍一致
 - [ ] 若 CI／人工 review 出現新 findings，已回到使用者核准 gate
 - [ ] 已執行 `pr-review-release` Phase 4–5

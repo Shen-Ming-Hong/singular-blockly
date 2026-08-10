@@ -40,7 +40,7 @@ PR 只執行 `npm run validate:i18n`。缺鍵、空字串、placeholder、schema
 
 1. 在功能分支完成 SemVer、`package.json`、`package-lock.json` 與雙語 `CHANGELOG.md`。
 2. 執行 `npm run release:prepare`，確認四者契約完整。
-3. 依 `git-workflow` 與 `pr-review-release` 完成本地 review、兩次使用者 gate、PR、CI、maintainer review 與 squash merge。
+3. 依 `git-workflow` 與 `pr-review-release` 完成本地 review、兩次使用者 gate、PR、CI 與 squash merge；發布擁有者的 Phase 3.5 明確核准即為 maintainer approval，不要求作者無法完成的自我 GitHub review。
 4. 同步最新 `master`，建立 annotated tag：
 
     ```bash
@@ -65,9 +65,9 @@ gh run rerun RUN_ID --failed
 
 ## GitHub 管理設定
 
-下列設定是 repository 管理狀態，無法只靠提交檔案完成；設定後應由第二位 maintainer 複核。
+下列設定是 repository 管理狀態，無法只靠提交檔案完成。人工發布核准固定由發布擁有者在 `pr-review-release` Phase 3.5 明確給予。
 
-首次啟用後，確認第一個 PR 實際產生 `CI Gate` 與 `Analyze JavaScript and TypeScript`；若 job 名稱日後變更，required status checks 必須同步更新。
+首次啟用後，確認第一個 PR 實際產生 `CI Gate` 與 CodeQL 的 `Analyze (javascript-typescript)`；若 job 名稱日後變更，required status checks 必須同步更新。
 
 ### Release environment
 
@@ -79,9 +79,9 @@ gh run rerun RUN_ID --failed
 
 ### `master` ruleset
 
-- 只允許 Pull Request，至少一位 maintainer 核准。
+- 只允許 Pull Request，required approvals 設為 0，讓發布擁有者在 Phase 3.5 明確核准後可自行發布。
 - Require conversation resolution。
-- 必要檢查選擇 `CI Gate` 與 CodeQL 的 `Analyze JavaScript and TypeScript`。
+- 必要檢查選擇 `CI Gate` 與 CodeQL 的 `Analyze (javascript-typescript)`。
 - 禁止 force push 與 branch deletion。
 
 ### `v*` tag rulesets
