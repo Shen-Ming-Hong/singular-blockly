@@ -499,7 +499,8 @@ export class PlatformioDiagnosticService {
 	}
 
 	private expandExecutableName(name: string): string[] {
-		if (this.platform !== 'win32' || path.extname(name)) {
+		const pathApi = this.platform === 'win32' ? path.win32 : path.posix;
+		if (this.platform !== 'win32' || pathApi.extname(name)) {
 			return [name];
 		}
 
@@ -507,11 +508,11 @@ export class PlatformioDiagnosticService {
 	}
 
 	private getPlatformBasename(filePath: string): string {
-		return this.platform === 'win32' ? path.win32.basename(filePath) : path.basename(filePath);
+		return (this.platform === 'win32' ? path.win32 : path.posix).basename(filePath);
 	}
 
 	private joinPlatformPath(directoryPath: string, fileName: string): string {
-		return this.platform === 'win32' ? path.win32.join(directoryPath, fileName) : path.join(directoryPath, fileName);
+		return (this.platform === 'win32' ? path.win32 : path.posix).join(directoryPath, fileName);
 	}
 
 	private formatOptionalBoolean(value: boolean | undefined): string {

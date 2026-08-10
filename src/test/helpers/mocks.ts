@@ -59,8 +59,9 @@ export class VSCodeMock {
 					asWebviewUri: sinon.stub().callsFake((uri: any) => {
 						// 模擬將本地路徑轉換為 webview URI
 						if (uri.fsPath) {
+							const normalizedFsPath = uri.fsPath.replace(/\\/g, '/');
 							return {
-								toString: () => `vscode-resource:${uri.fsPath}`,
+								toString: () => `vscode-resource:${normalizedFsPath}`,
 								fsPath: uri.fsPath,
 								scheme: 'vscode-resource',
 							};

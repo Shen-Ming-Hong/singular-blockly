@@ -4,6 +4,7 @@ import path from 'path';
 import os from 'os';
 
 const ciTempRoot = process.env.VSCODE_TEST_TEMP_DIR;
+const extensionDevelopmentPath = process.cwd();
 const testWorkspace =
 	process.env.VSCODE_TEST_WORKSPACE ||
 	(ciTempRoot ? path.join(ciTempRoot, 'workspace') : path.join(os.homedir(), 'test', 'debug_extension'));
@@ -26,12 +27,14 @@ export default defineConfig([
 		label: 'unit',
 		version: '1.105.0',
 		files: 'out/test/**/*.test.js',
+		extensionDevelopmentPath,
 		workspaceFolder: testWorkspace,
 		launchArgs: [`--extensions-dir=${extensionsDir}`, `--user-data-dir=${userDataDir}`, '--disable-workspace-trust'],
-		env: { NODE_ENV: 'test' },
+		env: { NODE_ENV: 'test', SINGULAR_BLOCKLY_TEST_ROOT: extensionDevelopmentPath },
 		// Exclude integration tests from unit test run
 		mocha: {
 			grep: '^(?!.*Integration)',
+			require: './out/test/setup.js',
 			timeout: 180000,
 		},
 	},

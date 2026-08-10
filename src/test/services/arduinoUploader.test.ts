@@ -133,7 +133,7 @@ suite('ArduinoUploader Tests', () => {
 			Object.defineProperty(process, 'platform', { value: 'darwin' });
 			process.env.PATH = '/custom/bin';
 
-			const pathPio = path.join('/custom/bin', 'pio');
+			const pathPio = path.posix.join('/custom/bin', 'pio');
 			(mockFileSystem.existsSync as sinon.SinonStub).callsFake(filePath => filePath === pathPio);
 			(mockExecutor.exec as sinon.SinonStub).resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
 

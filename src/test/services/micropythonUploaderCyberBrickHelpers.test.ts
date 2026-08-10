@@ -212,7 +212,9 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 			},
 		});
 
-		const networks = await uploader.scanCyberBrickWifi('/dev/cu.usbmodem1201');
+		const networks = await withPlatformAsync('darwin', () =>
+			uploader.scanCyberBrickWifi('/dev/cu.usbmodem1201')
+		);
 
 		assert.strictEqual(networks[0].ssid, 'Classroom');
 		assert.strictEqual(commands.length, 2);
@@ -280,7 +282,9 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 			},
 		});
 
-		await uploader.deployCyberBrickOtaAgent('/dev/cu.usbmodem1201', 'print("agent")\n');
+		await withPlatformAsync('darwin', () =>
+			uploader.deployCyberBrickOtaAgent('/dev/cu.usbmodem1201', 'print("agent")\n')
+		);
 
 		assert.strictEqual(commands.length, 2);
 		assert.ok(commands[0].includes('blockly_interrupt.py'));
