@@ -71,6 +71,16 @@ gh workflow run publish.yml --ref master -f release_tag=vX.Y.Z
 
 復原 run 仍會 checkout 該 tag、重新取得遠端 annotated tag object，並驗證 tag、checkout commit、版本檔及雙語 CHANGELOG 完全一致後才建置與發布。
 
+若同一 run 的 Marketplace 與 Open VSX 已成功，但 GitHub Release 因 workflow 缺陷失敗，先用 PR 修正 workflow，再從原失敗 run 的 artifact 只補 GitHub Release：
+
+```bash
+gh workflow run recover-github-release.yml --ref master \
+  -f release_tag=vX.Y.Z \
+  -f source_run_id=FAILED_RUN_ID
+```
+
+復原 workflow 只接受失敗的 `Publish VS Code Extension` run，會重新驗證 annotated tag、release metadata、VSIX archive 與 SHA-256，且不含 VS Code Marketplace 或 Open VSX 發布步驟。
+
 ## GitHub 管理設定
 
 下列設定是 repository 管理狀態，無法只靠提交檔案完成。人工發布核准固定由發布擁有者在 `pr-review-release` Phase 3.5 明確給予。
@@ -82,7 +92,7 @@ gh workflow run publish.yml --ref master -f release_tag=vX.Y.Z
 - 建立名為 `release` 的 environment。
 - 既有 repository secrets `VSCE_PAT`、`OVSX_PAT` 可直接沿用；GitHub 不提供既有 secret 值的讀回或複製功能。
 - 日後輪替 PAT 時，可改存為同名 environment secrets；environment secrets 會覆蓋同名 repository secrets。
-- Deployment branches and tags 限制為 `v*` tags。
+- Deployment branches and tags 限制為 `v*` tags 與受保護的 `master` branch；`master` 僅供不可變 tag 與原 run artifact 的復原 workflow 使用。
 - 不新增 environment reviewer；人工發布核准由 `pr-review-release` Phase 3.5 負責。
 
 ### `master` ruleset

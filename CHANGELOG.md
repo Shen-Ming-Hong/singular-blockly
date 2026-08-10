@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 修正 GitHub Actions checkout 將 annotated tag 的本地 ref 展開成 commit，造成發布 metadata gate 誤判；並加入不重建既有 tag 的安全復原入口
   Fixed GitHub Actions checkout peeling the local annotated-tag ref into a commit and triggering a false metadata-gate failure, and added safe recovery for an existing tag without recreating it
+- 修正 GitHub Release job 缺少明確 repository context，並加入沿用原發布 run artifact、只補失敗 GitHub Release 的復原流程
+  Fixed missing repository context in the GitHub Release job and added recovery that reuses the original publish-run artifact to repair only a failed GitHub Release
 
 ## [0.85.1] - 2026-08-10
 

@@ -142,10 +142,39 @@ describe('publish workflow retry contract', () => {
 		assert.strictEqual(retrySteps.length, 2);
 		assert.ok(retrySteps.every(step => step.includes('--skip-duplicate')));
 	});
+
+	it('provides explicit repository context to GitHub CLI jobs', () => {
+		const repositoryContexts = workflow.match(/GH_REPO: \$\{\{ github\.repository \}\}/gu) || [];
+		assert.strictEqual(repositoryContexts.length, 2);
+	});
+});
+
+describe('GitHub Release recovery workflow contract', () => {
+	const workflow = fs.readFileSync(
+		path.join(__dirname, '..', '..', '.github', 'workflows', 'recover-github-release.yml'),
+		'utf8'
+	);
+
+	it('reuses a failed publish run artifact without republishing marketplaces', () => {
+		assert.match(workflow, /source_run_id:/);
+		assert.match(workflow, /actions: read/);
+		assert.match(workflow, /github-token: \$\{\{ github\.token \}\}/);
+		assert.match(workflow, /run-id: \$\{\{ inputs\.source_run_id \}\}/);
+		assert.match(workflow, /\.name == "Publish VS Code Extension" and \.conclusion == "failure"/);
+		assert.ok(!workflow.includes('vsce publish'));
+		assert.ok(!workflow.includes('ovsx publish'));
+	});
+
+	it('revalidates the tag, metadata, archive, and checksum before publishing', () => {
+		assert.match(workflow, /npm run release:prepare -- --verify-tag/);
+		assert.match(workflow, /unzip -tqq "\$VSIX_NAME"/);
+		assert.match(workflow, /sha256sum --check "\$CHECKSUM_NAME"/);
+		assert.match(workflow, /GH_REPO: \$\{\{ github\.repository \}\}/);
+	});
 });
 
 describe('GitHub workflow context contract', () => {
-	for (const workflowName of ['ci.yml', 'i18n-audit.yml', 'publish.yml']) {
+	for (const workflowName of ['ci.yml', 'i18n-audit.yml', 'publish.yml', 'recover-github-release.yml']) {
 		it(`${workflowName} does not evaluate runner.temp before a runner exists`, () => {
 			const workflow = fs.readFileSync(
 				path.join(__dirname, '..', '..', '.github', 'workflows', workflowName),
