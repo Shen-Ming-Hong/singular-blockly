@@ -2220,6 +2220,9 @@ async function refreshWorkspaceForLanguage() {
 
 	try {
 		isLanguageSwitchReloading = true;
+		if (window.shadowBlockManager?.isActive?.()) {
+			window.shadowBlockManager.clearSuggestion(false);
+		}
 		const state = Blockly.serialization.workspaces.save(workspace);
 		if (typeof window.rebuildEditorWorkspaceForLanguage === 'function') {
 			await window.rebuildEditorWorkspaceForLanguage(state);
@@ -2259,13 +2262,12 @@ async function handleLanguageSelection(languageCode) {
 		return;
 	}
 
-	if (languageCode === currentLanguagePreference) {
-		closeLanguageDropdown();
-		return;
-	}
-
 	if (languageCode !== 'auto') {
-		await applyLanguageUpdate(languageCode, languageCode);
+		const switched = await applyLanguageUpdate(languageCode, languageCode);
+		if (!switched) {
+			closeLanguageDropdown();
+			return;
+		}
 	} else {
 		currentLanguagePreference = 'auto';
 		updateLanguageSelectionUI();

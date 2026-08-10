@@ -7,6 +7,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as vm from 'vm';
 
 const PROJECT_ROOT = path.join(__dirname, '..', '..', '..');
 
@@ -27,6 +28,31 @@ suite('Blockly 13 UI contract', () => {
 		assert.match(preview, /readOnly:\s*true/);
 		assert.match(runtime, /renderer:\s*'thrasos'/);
 		assert.match(runtime, /String\(window\.BLOCKLY_MEDIA_URL/);
+	});
+
+	test('Singular themes inherit the packaged Blockly 13 Modern theme', () => {
+		for (const htmlPath of ['media/html/blocklyEdit.html', 'media/html/blocklyPreview.html']) {
+			const html = read(htmlPath);
+			const packageIndex = html.indexOf('<script src="{themeModernJsUri}"></script>');
+			const adapterIndex = html.indexOf('window.BlocklyModernTheme = window.default');
+			const singularIndex = html.indexOf('<script src="{themesUri}/singular.js"></script>');
+			assert.ok(packageIndex < adapterIndex && adapterIndex < singularIndex, htmlPath);
+		}
+
+		const Blockly = require('blockly/core');
+		const browserGlobal: Record<string, any> = { Blockly, console };
+		browserGlobal.window = browserGlobal;
+		const context = vm.createContext(browserGlobal);
+		vm.runInContext(read('node_modules/@blockly/theme-modern/dist/index.js'), context);
+		vm.runInContext('window.BlocklyModernTheme = window.default; delete window.default;', context);
+		vm.runInContext(read('media/blockly/themes/singular.js'), context);
+		vm.runInContext(read('media/blockly/themes/singularDark.js'), context);
+
+		assert.strictEqual(browserGlobal.BlocklyModernTheme.name, 'modern');
+		for (const theme of [browserGlobal.SingularBlocklyTheme, browserGlobal.SingularBlocklyDarkTheme]) {
+			assert.strictEqual(theme.blockStyles.colour_blocks.colourPrimary, '#a5745b');
+			assert.strictEqual(theme.blockStyles.variableDynamic_blocks.colourPrimary, '#a55b99');
+		}
 	});
 
 	test('Blockly 13 focus, invalid input, flyout, border-box, and forced-colors styles exist', () => {

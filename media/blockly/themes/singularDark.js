@@ -8,7 +8,7 @@
  * Singular Dark theme configuration
  */
 const singularDarkTheme = Blockly.Theme.defineTheme('singularDark', {
-	base: Blockly.Themes.Modern,
+	base: window.BlocklyModernTheme,
 	componentStyles: {
 		workspaceBackgroundColour: '#2D2D2D', // 深灰色背景
 		toolboxBackgroundColour: '#333333', // 較深的工具箱背景

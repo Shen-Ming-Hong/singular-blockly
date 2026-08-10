@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🐛 修復 Bug Fixes
 
+- 修正切換語系時可能將尚未接受的 AI 影子建議還原成正式積木；重建 workspace 前現在會先安全撤銷暫時建議
+  Fixed language-driven workspace recreation potentially restoring an unaccepted AI shadow suggestion as a real block; temporary suggestions are now safely cleared before recreation
+- 修正快速切換語系時舊失敗請求覆蓋新選擇，以及 WebView 已拒絕的語系仍被寫入偏好設定；語系切換現在採 latest-wins 佇列並只保存成功結果
+  Fixed stale failed locale requests overriding newer selections and rejected WebView locales still being persisted; locale switching now uses a latest-wins queue and saves only successful results
+- 修正 Singular 明暗主題未實際繼承 `@blockly/theme-modern` 13.2.0 瀏覽器匯出，確保未覆寫的官方積木樣式仍取得 Modern theme 基底
+  Fixed Singular light and dark themes not inheriting the browser export from `@blockly/theme-modern` 13.2.0, preserving Modern theme defaults for official block styles not overridden by the app
+- 修正 Blockly 右鍵選單捲軸誤用 VS Code host 外觀；現在會與 toolbox、flyout 一樣跟隨 Singular 編輯器明／暗主題的共用 scrollbar tokens
+  Fixed Blockly context-menu scrollbars inheriting the VS Code host appearance; they now use the same Singular editor-owned light/dark scrollbar tokens as the toolbox and flyout
 - 修正 Blockly 13 將舊 workspace 的函式 XML `extraState` 直接交給 JSON hook，造成自訂函式呼叫名稱、參數與 ARG shadow 連線遺失；載入時現在會安全轉換舊狀態，首次儲存後自動升級為 JSON
   Fixed Blockly 13 passing legacy function XML `extraState` directly to JSON hooks, which lost custom call names, parameters, and ARG shadow connections; legacy state is now safely migrated on load and saved back as JSON
 

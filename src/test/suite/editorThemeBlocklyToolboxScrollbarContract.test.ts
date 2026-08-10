@@ -25,6 +25,7 @@ const SCROLLABLE_EDITOR_SURFACES = [
 	'.backup-list-container',
 	'.modal-content .search-results-container',
 	'.search-history-container',
+	'.blocklyWidgetDiv .blocklyContextMenu',
 	'.blocklyToolbox',
 	'.blocklyToolboxCategoryGroup',
 	'.blocklyToolboxDiv',

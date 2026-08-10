@@ -24,8 +24,10 @@
 
         window.languageManager = {
             currentLanguage: '{vscodeLanguage}', // 將由 extension.ts 注入
+            appliedLanguage: '{vscodeLanguage}',
             messages: {},
             requestSequence: 0,
+            switchQueue: Promise.resolve(),
             loadMessages: function (locale, messages) {
                 this.messages[locale] = messages;
 
@@ -43,39 +45,67 @@
                 const messages = this.messages[this.currentLanguage] || this.messages['en'];
                 return messages[key] || defaultValue || key;
             },
-            setLanguage: async function (locale) {
-                // 檢查語言檔案是否已載入
+            setLanguage: function (locale) {
                 if (!this.messages[locale]) {
                     console.warn(`Language ${locale} not loaded yet`);
-                    return false;
-                }
-                if (locale === this.currentLanguage) {
-                    return true;
+                    return Promise.resolve(false);
                 }
                 const request = ++this.requestSequence;
-                const previousLanguage = this.currentLanguage;
-                try {
-                    const applied = await window.blocklyRuntime.applyLocale(locale, this.messages[locale]);
-                    if (!applied || request !== this.requestSequence) {
+                const runSwitch = async () => {
+                    if (request !== this.requestSequence) {
                         return false;
                     }
-                    this.currentLanguage = locale;
-                    if (typeof window.rebuildBlocklyForLanguage === 'function') {
-                        await window.rebuildBlocklyForLanguage();
+                    if (locale === this.currentLanguage && locale === this.appliedLanguage) {
+                        return true;
                     }
-                    window.dispatchEvent(new CustomEvent('languageChanged', {
-                        detail: { language: locale, previousLanguage: previousLanguage }
-                    }));
-                    return true;
-                } catch (error) {
-                    this.currentLanguage = previousLanguage;
-                    await window.blocklyRuntime.applyLocale(previousLanguage, this.messages[previousLanguage]);
-                    if (typeof window.rebuildBlocklyForLanguage === 'function') {
-                        await window.rebuildBlocklyForLanguage();
+                    const previousLanguage = this.currentLanguage;
+                    try {
+                        this.appliedLanguage = null;
+                        const applied = await window.blocklyRuntime.applyLocale(locale, this.messages[locale]);
+                        if (applied) {
+                            this.appliedLanguage = locale;
+                        }
+                        if (!applied || request !== this.requestSequence) {
+                            return false;
+                        }
+                        this.currentLanguage = locale;
+                        if (typeof window.rebuildBlocklyForLanguage === 'function') {
+                            await window.rebuildBlocklyForLanguage();
+                        }
+                        if (request !== this.requestSequence) {
+                            return false;
+                        }
+                        window.dispatchEvent(new CustomEvent('languageChanged', {
+                            detail: { language: locale, previousLanguage: previousLanguage }
+                        }));
+                        return true;
+                    } catch (error) {
+                        if (request !== this.requestSequence) {
+                            return false;
+                        }
+                        this.currentLanguage = previousLanguage;
+                        this.appliedLanguage = null;
+                        try {
+                            const restored = await window.blocklyRuntime.applyLocale(
+                                previousLanguage,
+                                this.messages[previousLanguage]
+                            );
+                            if (restored) {
+                                this.appliedLanguage = previousLanguage;
+                            }
+                            if (restored && request === this.requestSequence && typeof window.rebuildBlocklyForLanguage === 'function') {
+                                await window.rebuildBlocklyForLanguage();
+                            }
+                        } catch (rollbackError) {
+                            console.warn(`Language rollback to ${previousLanguage} failed`, rollbackError);
+                        }
+                        console.warn(`Language switch to ${locale} failed and was rolled back`, error);
+                        return false;
                     }
-                    console.warn(`Language switch to ${locale} failed and was rolled back`, error);
-                    return false;
-                }
+                };
+                const switchResult = this.switchQueue.then(runSwitch, runSwitch);
+                this.switchQueue = switchResult.catch(() => false);
+                return switchResult;
             },
             syncToBlocklyMsg: function (locale, messages) {
                 // 確保 Blockly 和 Blockly.Msg 已經定義
@@ -173,6 +203,7 @@
     <script nonce="{nonce}">window.BLOCKLY_INITIAL_CORE_MESSAGES = { ...Blockly.Msg };</script>
     <script src="{langJsUri}"></script>
     <script src="{themeModernJsUri}"></script>
+    <script nonce="{nonce}">window.BlocklyModernTheme = window.default; delete window.default;</script>
     <script src="{themesUri}/singular.js"></script>
     <script src="{themesUri}/singularDark.js"></script>
     <script src="{blocklyRuntimeUri}"></script>
