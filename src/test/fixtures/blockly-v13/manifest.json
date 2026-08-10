@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "baselineBlocklyVersion": "12.3.1",
+  "fixtures": [
+    {
+      "id": "arduino-v12-json",
+      "format": "json",
+      "board": "arduino_uno",
+      "input": "arduino.json",
+      "expectedCode": "expected/arduino.cpp",
+      "features": ["variables", "functions", "mutator", "shadow", "locked", "orphan"]
+    },
+    {
+      "id": "cyberbrick-v12-json",
+      "format": "json",
+      "board": "cyberbrick",
+      "input": "cyberbrick.json",
+      "expectedCode": "expected/cyberbrick.py",
+      "features": ["variables", "functions", "mutator", "shadow", "locked", "orphan"]
+    },
+    {
+      "id": "txt-v12-json",
+      "format": "json",
+      "board": "txt",
+      "input": "txt.json",
+      "expectedCode": "expected/txt.py",
+      "features": ["variables", "functions", "shadow", "locked", "orphan"]
+    },
+    {
+      "id": "legacy-v12-xml",
+      "format": "xml",
+      "board": "arduino_uno",
+      "input": "legacy.xml",
+      "expectedCode": "expected/legacy.cpp",
+      "features": ["variables", "functions", "mutator", "shadow", "locked", "orphan"]
+    }
+  ]
+}

@@ -681,6 +681,80 @@ describe('WebView Message Handler', () => {
 		assert.strictEqual(messageArg.isRename, false);
 	});
 
+	it('handles Blockly prompt request IDs and cancellation', async () => {
+		vscodeMock.window.showInputBox.resolves(undefined);
+
+		await messageHandler.handleMessage({
+			command: 'blocklyDialogPrompt',
+			requestId: 'dlg-prompt-1',
+			message: 'Variable name',
+			defaultValue: 'speed',
+			board: 'arduino_uno',
+		});
+
+		assert(vscodeMock.window.showInputBox.calledOnce);
+		assert.deepStrictEqual(webviewMock.postMessage.lastCall.args[0], {
+			command: 'blocklyDialogPromptResult',
+			requestId: 'dlg-prompt-1',
+			value: null,
+		});
+	});
+
+	it('applies board-aware validation to Blockly prompts', async () => {
+		(vscodeMock as any).InputBoxValidationSeverity = { Info: 1, Warning: 2, Error: 3 };
+		vscodeMock.window.showInputBox.callsFake(async (options: any) => {
+			const invalid = await options.validateInput('1motor');
+			assert.strictEqual(invalid.severity, 3);
+			return '  馬達  ';
+		});
+
+		await messageHandler.handleMessage({
+			command: 'blocklyDialogPrompt',
+			requestId: 'dlg-cyberbrick-1',
+			message: 'Variable name',
+			defaultValue: '',
+			board: 'cyberbrick',
+		});
+
+		assert.strictEqual(webviewMock.postMessage.lastCall.args[0].value, '馬達');
+	});
+
+	it('rejects malformed Blockly dialog payloads without opening host UI', async () => {
+		await messageHandler.handleMessage({
+			command: 'blocklyDialogPrompt',
+			requestId: '<script>',
+			message: 'Name',
+			defaultValue: '',
+			board: 'arduino_uno',
+			extra: true,
+		});
+		await messageHandler.handleMessage({
+			command: 'blocklyDialogConfirm',
+			requestId: 'dlg-confirm-invalid',
+			message: '',
+		});
+
+		assert.strictEqual(vscodeMock.window.showInputBox.called, false);
+		assert.strictEqual(vscodeMock.window.showWarningMessage.called, false);
+		assert.strictEqual(webviewMock.postMessage.called, false);
+	});
+
+	it('handles Blockly confirm cancellation with the matching request ID', async () => {
+		vscodeMock.window.showWarningMessage.resolves('Cancel');
+
+		await messageHandler.handleMessage({
+			command: 'blocklyDialogConfirm',
+			requestId: 'dlg-confirm-1',
+			message: 'Delete?',
+		});
+
+		assert.deepStrictEqual(webviewMock.postMessage.lastCall.args[0], {
+			command: 'blocklyDialogConfirmResult',
+			requestId: 'dlg-confirm-1',
+			confirmed: false,
+		});
+	});
+
 	it('validates and trims CyberBrick variable names with explicit Error severity', async () => {
 		(vscodeMock as any).InputBoxValidationSeverity = { Info: 1, Warning: 2, Error: 3 };
 		vscodeMock.window.showInputBox.callsFake(async (options: any) => {

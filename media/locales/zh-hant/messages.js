@@ -10,6 +10,8 @@
 
 // Define translations for Traditional Chinese
 window.languageManager.loadMessages('zh-hant', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: '設定',
+	BLOCKLY_ARIA_LOCKED_ICON: '已鎖定',
 	// UI Elements
 	BLOCKS_TAB: '積木',
 	CODE_TAB: '程式碼',

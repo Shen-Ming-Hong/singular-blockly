@@ -15,6 +15,13 @@
 		return;
 	}
 
+	function getProcedureVariableNames(block) {
+		if (!block || typeof block.getVarModels !== 'function') {
+			return [];
+		}
+		return block.getVarModels().map(variable => variable.name);
+	}
+
 	/**
 	 * 定義無回傳值的函數
 	 */
@@ -37,7 +44,7 @@
 		}
 
 		const args = [];
-		const variables = block.getVars();
+		const variables = getProcedureVariableNames(block);
 		for (let i = 0; i < variables.length; i++) {
 			args[i] = generator.nameDB_.getName(variables[i], Blockly.VARIABLE_CATEGORY_NAME);
 		}
@@ -103,7 +110,7 @@
 		}
 
 		const args = [];
-		const variables = block.getVars();
+		const variables = getProcedureVariableNames(block);
 		for (let i = 0; i < variables.length; i++) {
 			args[i] = generator.nameDB_.getName(variables[i], Blockly.VARIABLE_CATEGORY_NAME);
 		}
@@ -156,7 +163,7 @@
 	generator.forBlock['procedures_callnoreturn'] = function (block) {
 		const funcName = generator.nameDB_.getName(block.getFieldValue('NAME'), Blockly.PROCEDURE_CATEGORY_NAME);
 		const args = [];
-		const variables = block.getVars();
+		const variables = getProcedureVariableNames(block);
 		for (let i = 0; i < variables.length; i++) {
 			args[i] = generator.valueToCode(block, 'ARG' + i, generator.ORDER_NONE) || 'None';
 		}
@@ -170,7 +177,7 @@
 	generator.forBlock['procedures_callreturn'] = function (block) {
 		const funcName = generator.nameDB_.getName(block.getFieldValue('NAME'), Blockly.PROCEDURE_CATEGORY_NAME);
 		const args = [];
-		const variables = block.getVars();
+		const variables = getProcedureVariableNames(block);
 		for (let i = 0; i < variables.length; i++) {
 			args[i] = generator.valueToCode(block, 'ARG' + i, generator.ORDER_NONE) || 'None';
 		}

@@ -337,10 +337,15 @@ describe('WebView Preview', () => {
 		assert.deepStrictEqual(loadMessage.previewWarnings, []);
 	});
 
-	it('getPreviewContent should inject TXT preview resources', async () => {
-		const htmlTemplate = `<!DOCTYPE html><html><head><title>{fileName}</title></head><body>
+	it('getPreviewContent should inject TXT preview resources and escape workspace filenames', async () => {
+		const htmlTemplate = `<!DOCTYPE html><html><head>
+			<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src {cspSource}; script-src {cspSource} 'nonce-{nonce}'; connect-src {cspSource};">
+			<title>{fileName}</title></head><body>
 			<div class="preview-title">{fileName}</div>
+			<script nonce="{nonce}">window.previewFileName = {previewFileNameJson};</script>
+			<script nonce="{nonce}">{blocklyRuntimeBootstrap}</script>
 			<script src="{blocklyCompressedJsUri}"></script>
+			<script src="{blocklyRuntimeUri}"></script>
 			<script src="{txtGeneratorUri}"></script>
 			<script src="{txtBlocksUri}"></script>
 			{txtModules}
@@ -353,12 +358,29 @@ describe('WebView Preview', () => {
 		sinon.stub(webViewManager as any, 'discoverMicroPythonModules').resolves([]);
 		sinon.stub(webViewManager as any, 'discoverTxtModules').resolves(['txt.js']);
 
-		const html = await (webViewManager as any).getPreviewContent('test.json');
+		const html = await (webViewManager as any).getPreviewContent("bad'</script><img src=x onerror=alert(1)>.json");
 
 		assert(html.includes('media/blockly/generators/txt/index.js'));
 		assert(html.includes('media/blockly/blocks/txt.js'));
 		assert(html.includes('media/blockly/generators/txt/txt.js'));
 		assert(html.includes('media/js/txtVirtualControlsContrast.js'));
+		assert(html.includes('window.BLOCKLY_RUNTIME_CONFIG ='));
+		assert(html.includes('"mode":"preview"'));
+		assert(html.includes('"renderer":"thrasos"'));
+		assert(html.includes('node_modules/blockly/media/'));
+		assert(html.includes('node_modules/blockly/msg/en.js'));
+		assert(html.includes('media/js/blocklyRuntime.js'));
+		assert.match(html, /script-src vscode-webview: 'nonce-[A-Za-z0-9+/=]+'/);
+		assert(html.includes('style-src vscode-webview:'));
+		assert(html.includes('connect-src vscode-webview:'));
+		assert(html.includes('bad\'\\u003c/script\\u003e\\u003cimg src=x onerror=alert(1)\\u003e.json'));
+		assert(html.includes('bad&#39;&lt;/script&gt;&lt;img src=x onerror=alert(1)&gt;.json'));
+		assert(!html.includes("bad'</script><img"));
+		assert(!html.includes('{blocklyRuntimeBootstrap}'));
+		assert(!html.includes('{blocklyRuntimeUri}'));
+		assert(!html.includes('{previewFileNameJson}'));
+		assert(!html.includes('{cspSource}'));
+		assert(!html.includes('{nonce}'));
 		assert(
 			html.indexOf('media/js/txtVirtualControlsContrast.js') < html.indexOf('media/js/blocklyPreview.js'),
 			'TXT contrast helper should load before blocklyPreview.js'

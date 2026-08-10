@@ -290,7 +290,7 @@ window.arduinoGenerator.forBlock['arduino_setup_loop'] = function (block) {
 	let setupCode = window.arduinoGenerator.statementToCode(block, 'SETUP');
 	let loopCode = window.arduinoGenerator.statementToCode(block, 'LOOP'); // 【新增】通用掃描所有必須生成代碼的積木，不論位置
 	// 使用 alwaysGenerateBlocks_ 陣列來動態確定哪些積木類型需要自動掃描
-	const ws = Blockly.getMainWorkspace();
+	const ws = block.workspace;
 	ws.getAllBlocks(false)
 		.filter(b => window.arduinoGenerator.alwaysGenerateBlocks_.includes(b.type))
 		.forEach(b => window.arduinoGenerator.forBlock[b.type](b));

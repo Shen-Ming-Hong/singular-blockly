@@ -8,7 +8,7 @@
  * Singular theme configuration
  */
 const singularTheme = Blockly.Theme.defineTheme('singular', {
-	base: Blockly.Themes.Modern,
+	base: window.BlocklyModernTheme,
 	componentStyles: {
 		workspaceBackgroundColour: '#F5F5F5', // 溫暖的淺灰色背景
 		toolboxBackgroundColour: '#EEEEEE', // 更柔和的工具箱背景

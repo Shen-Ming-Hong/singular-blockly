@@ -10,6 +10,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+### ✨ 新增功能 Features
+
+- 將 Blockly 升級至 13.2.1，editor 與 preview 採用 Thrasos renderer、Singular 明暗主題、套件內媒體，以及新版焦點、無效輸入與高對比樣式
+  Upgraded Blockly to 13.2.1 with the Thrasos renderer, Singular light/dark themes, packaged media, and updated focus, invalid-input, and high-contrast styling in both editor and preview
+- 新增 15 語系官方 Blockly core 動態載入與安全 workspace 重建，確保畫面及 ARIA／快捷鍵訊息切換時不殘留前一語言
+  Added packaged Blockly core locale loading and safe workspace recreation for all 15 locales so visible and ARIA/shortcut messages do not leak across language switches
+
+### 🐛 修復 Bug Fixes
+
+- 修正切換語系時可能將尚未接受的 AI 影子建議還原成正式積木；重建 workspace 前現在會先安全撤銷暫時建議
+  Fixed language-driven workspace recreation potentially restoring an unaccepted AI shadow suggestion as a real block; temporary suggestions are now safely cleared before recreation
+- 修正快速切換語系時舊失敗請求覆蓋新選擇，以及 WebView 已拒絕的語系仍被寫入偏好設定；語系切換現在採 latest-wins 佇列並只保存成功結果
+  Fixed stale failed locale requests overriding newer selections and rejected WebView locales still being persisted; locale switching now uses a latest-wins queue and saves only successful results
+- 修正 Singular 明暗主題未實際繼承 `@blockly/theme-modern` 13.2.0 瀏覽器匯出，確保未覆寫的官方積木樣式仍取得 Modern theme 基底
+  Fixed Singular light and dark themes not inheriting the browser export from `@blockly/theme-modern` 13.2.0, preserving Modern theme defaults for official block styles not overridden by the app
+- 修正 Blockly 右鍵選單捲軸誤用 VS Code host 外觀；現在會與 toolbox、flyout 一樣跟隨 Singular 編輯器明／暗主題的共用 scrollbar tokens
+  Fixed Blockly context-menu scrollbars inheriting the VS Code host appearance; they now use the same Singular editor-owned light/dark scrollbar tokens as the toolbox and flyout
+- 修正 Blockly 13 將舊 workspace 的函式 XML `extraState` 直接交給 JSON hook，造成自訂函式呼叫名稱、參數與 ARG shadow 連線遺失；載入時現在會安全轉換舊狀態，首次儲存後自動升級為 JSON
+  Fixed Blockly 13 passing legacy function XML `extraState` directly to JSON hooks, which lost custom call names, parameters, and ARG shadow connections; legacy state is now safely migrated on load and saved back as JSON
+
+### ♻️ 重構 Refactoring
+
+- 將變數、事件、動態 flyout、shadow state、dialog 與 AI 快捷鍵改用 Blockly 13 公開 API；移除核心 prototype monkeypatch、private renderer DOM／field 存取及已移除的 workspace variable wrappers
+  Migrated variables, events, dynamic flyouts, shadow state, dialogs, and AI shortcuts to Blockly 13 public APIs, removing core prototype monkeypatches, private renderer DOM/fields, and removed workspace variable wrappers
+- 動態積木改以 JSON `saveExtraState`／`loadExtraState` 保存狀態，同時保留舊 XML mutation 匯入相容性
+  Migrated dynamic block state to JSON `saveExtraState`/`loadExtraState` while retaining legacy XML mutation import compatibility
+
+### 🧪 測試 Tests
+
+- 新增 v12 JSON/XML round-trip、三種 generator golden output、dialog、ShortcutRegistry、IME、ARIA、UI、locale A→B→A、rollback、離線資源及 500-block 效能契約
+  Added v12 JSON/XML round-trip, generator golden-output, dialog, ShortcutRegistry, IME, ARIA, UI, locale A→B→A, rollback, offline-resource, and 500-block performance coverage
+
 ## [0.84.1] - 2026-08-07
 
 ### 🐛 修復 Bug Fixes

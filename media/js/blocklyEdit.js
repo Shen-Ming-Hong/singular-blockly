@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 const vscode = acquireVsCodeApi();
+window.blocklyRuntime.installDialogAdapter(vscode, () => window.getCurrentBoard?.() || window.currentBoard || 'none');
 
 const SENSITIVE_LOG_KEY_PATTERN = /(password|token|secret|authorization|auth)/i;
 
@@ -160,25 +161,6 @@ function shouldBypassGlobalKeyboardShortcut(event) {
 	return isTextEditableElement(target) || isTextEditableElement(activeElement);
 }
 
-function installBlocklyTextInputImePatch() {
-	const fieldTextInputPrototype = Blockly && Blockly.FieldTextInput ? Blockly.FieldTextInput.prototype : null;
-	const fieldInputPrototype = fieldTextInputPrototype ? Object.getPrototypeOf(fieldTextInputPrototype) : null;
-	if (!fieldInputPrototype || typeof fieldInputPrototype.onHtmlInputKeyDown_ !== 'function') {
-		return;
-	}
-	if (fieldInputPrototype.onHtmlInputKeyDown_.__singularImeGuardInstalled) {
-		return;
-	}
-	const originalOnHtmlInputKeyDown = fieldInputPrototype.onHtmlInputKeyDown_;
-	fieldInputPrototype.onHtmlInputKeyDown_ = function (event) {
-		if (isBlocklyTextInputCompositionEvent(event)) {
-			return;
-		}
-		return originalOnHtmlInputKeyDown.call(this, event);
-	};
-	fieldInputPrototype.onHtmlInputKeyDown_.__singularImeGuardInstalled = true;
-}
-
 document.addEventListener(
 	'compositionstart',
 	event => {
@@ -212,6 +194,7 @@ document.addEventListener(
 );
 
 window.shouldBypassBlocklyGlobalShortcut = shouldBypassGlobalKeyboardShortcut;
+window.isBlocklyTextInputCompositionActive = () => isBlocklyTextInputComposing;
 
 const cyberBrickUploadSettingsState = {
 	loaded: false,
@@ -485,7 +468,7 @@ function getCurrentBoardId() {
 	return window.currentBoard || document.getElementById('boardSelect')?.value || 'none';
 }
 
-function clearCyberBrickNamingWarnings(workspace = Blockly.getMainWorkspace()) {
+function clearCyberBrickNamingWarnings(workspace = window.getBlocklyWorkspace()) {
 	workspace?.getAllBlocks(false).forEach(block => block.setWarningText?.(null, CYBERBRICK_NAMING_WARNING_ID));
 }
 
@@ -505,7 +488,7 @@ function applyCyberBrickNamingIssues(workspace, issues) {
 	}
 }
 
-function refreshCyberBrickNamingIssues(workspace = Blockly.getMainWorkspace()) {
+function refreshCyberBrickNamingIssues(workspace = window.getBlocklyWorkspace()) {
 	const api = window.cyberbrickNameValidation;
 	if (!workspace || !api?.collectWorkspaceIssues) {
 		return latestCyberBrickNamingValidation;
@@ -515,7 +498,7 @@ function refreshCyberBrickNamingIssues(workspace = Blockly.getMainWorkspace()) {
 	return latestCyberBrickNamingValidation;
 }
 
-function scheduleCyberBrickNamingIssueRefresh(workspace = Blockly.getMainWorkspace()) {
+function scheduleCyberBrickNamingIssueRefresh(workspace = window.getBlocklyWorkspace()) {
 	clearTimeout(cyberBrickNamingRefreshTimer);
 	cyberBrickNamingRefreshTimer = setTimeout(() => refreshCyberBrickNamingIssues(workspace), 0);
 }
@@ -870,7 +853,7 @@ function scheduleBlocklyResize() {
 	}
 	txtVirtualControlsState.resizeFrame = requestAnimationFrame(() => {
 		txtVirtualControlsState.resizeFrame = 0;
-		const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+		const workspace = typeof Blockly !== 'undefined' ? window.getBlocklyWorkspace() : null;
 		if (workspace) {
 			Blockly.svgResize(workspace);
 		}
@@ -1266,7 +1249,7 @@ function commitSelectedTxtVirtualControlName(rawValue, options = {}) {
 }
 
 function getTxtVirtualControlReferenceBlocks(stableId) {
-	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+	const workspace = typeof Blockly !== 'undefined' ? window.getBlocklyWorkspace() : null;
 	if (!workspace) {
 		return [];
 	}
@@ -1523,7 +1506,7 @@ function refreshTxtVirtualButtonReferenceForBlock(block) {
 }
 
 function refreshTxtVirtualButtonReferences() {
-	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+	const workspace = typeof Blockly !== 'undefined' ? window.getBlocklyWorkspace() : null;
 	if (!workspace) {
 		txtVirtualControlsState.invalidReferences = [];
 		refreshTxtVirtualControlsUI();
@@ -1916,7 +1899,7 @@ const quickBackup = {
 		}
 
 		// 2. 空工作區檢查
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
 			log.warn('快速備份：無法取得工作區');
 			return;
@@ -2194,24 +2177,29 @@ function updateLanguageSelectionUI() {
 /**
  * 套用語言更新（偏好 + 解析後語言）
  */
-function applyLanguageUpdate(languagePreference, resolvedLanguage) {
-	currentLanguagePreference = languagePreference || 'auto';
-	if (resolvedLanguage) {
-		currentResolvedLanguage = resolvedLanguage;
+async function applyLanguageUpdate(languagePreference, resolvedLanguage) {
+	const previousPreference = currentLanguagePreference;
+	const targetPreference = languagePreference || 'auto';
+	const targetLanguage = resolvedLanguage || currentResolvedLanguage;
+	if (window.languageManager && targetLanguage) {
+		const switched = await window.languageManager.setLanguage(targetLanguage);
+		if (!switched) {
+			currentLanguagePreference = previousPreference;
+			updateLanguageSelectionUI();
+			return false;
+		}
 	}
-
-	if (window.languageManager && currentResolvedLanguage) {
-		window.languageManager.setLanguage(currentResolvedLanguage);
-	}
-
+	currentLanguagePreference = targetPreference;
+	currentResolvedLanguage = targetLanguage;
 	updateLanguageSelectionUI();
+	return true;
 }
 
 /**
  * 重新載入工作區以套用最新語言
  */
-function refreshWorkspaceForLanguage() {
-	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+async function refreshWorkspaceForLanguage() {
+	const workspace = typeof Blockly !== 'undefined' ? window.getBlocklyWorkspace() : null;
 	if (!workspace) {
 		return;
 	}
@@ -2221,18 +2209,25 @@ function refreshWorkspaceForLanguage() {
 	}
 
 	if (typeof workspace.isDragging === 'function' && workspace.isDragging()) {
-		if (!pendingLanguageReloadTimer) {
+		if (pendingLanguageReloadTimer) clearTimeout(pendingLanguageReloadTimer);
+		return new Promise((resolve, reject) => {
 			pendingLanguageReloadTimer = setTimeout(() => {
 				pendingLanguageReloadTimer = null;
-				refreshWorkspaceForLanguage();
+				refreshWorkspaceForLanguage().then(resolve, reject);
 			}, 200);
-		}
-		return;
+		});
 	}
 
 	try {
 		isLanguageSwitchReloading = true;
+		if (window.shadowBlockManager?.isActive?.()) {
+			window.shadowBlockManager.clearSuggestion(false);
+		}
 		const state = Blockly.serialization.workspaces.save(workspace);
+		if (typeof window.rebuildEditorWorkspaceForLanguage === 'function') {
+			await window.rebuildEditorWorkspaceForLanguage(state);
+			return true;
+		}
 		const eventsWereEnabled = Blockly.Events?.isEnabled ? Blockly.Events.isEnabled() : false;
 
 		if (eventsWereEnabled && Blockly.Events?.disable) {
@@ -2241,37 +2236,38 @@ function refreshWorkspaceForLanguage() {
 
 		workspace.clear();
 		migrateWorkspaceState(state);
-		withCyberBrickNameHydrationScope(() => Blockly.serialization.workspaces.load(state, workspace));
+		withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(state, workspace));
 		rebuildPwmConfig(workspace);
 		workspace.render();
 
 		if (eventsWereEnabled && Blockly.Events?.enable) {
 			Blockly.Events.enable();
 		}
+		return true;
 	} catch (error) {
 		log.warn('語言切換後重載工作區失敗:', error);
+		throw error;
 	} finally {
-		setTimeout(() => {
-			isLanguageSwitchReloading = false;
-		}, 0);
+		isLanguageSwitchReloading = false;
 	}
 }
+
+window.rebuildBlocklyForLanguage = refreshWorkspaceForLanguage;
 
 /**
  * 處理語言選單點擊
  */
-function handleLanguageSelection(languageCode) {
+async function handleLanguageSelection(languageCode) {
 	if (!languageCode) {
 		return;
 	}
 
-	if (languageCode === currentLanguagePreference) {
-		closeLanguageDropdown();
-		return;
-	}
-
 	if (languageCode !== 'auto') {
-		applyLanguageUpdate(languageCode, languageCode);
+		const switched = await applyLanguageUpdate(languageCode, languageCode);
+		if (!switched) {
+			closeLanguageDropdown();
+			return;
+		}
 	} else {
 		currentLanguagePreference = 'auto';
 		updateLanguageSelectionUI();
@@ -2725,7 +2721,7 @@ const backupManager = {
 
 		// 獲取工作區狀態
 		try {
-			const workspace = Blockly.getMainWorkspace();
+			const workspace = window.getBlocklyWorkspace();
 			const state = Blockly.serialization.workspaces.save(workspace);
 			const boardSelect = document.getElementById('boardSelect');
 
@@ -2945,7 +2941,7 @@ const backupManager = {
 	// 建立自動備份
 	createAutoBackup: function () {
 		try {
-			const workspace = Blockly.getMainWorkspace();
+			const workspace = window.getBlocklyWorkspace();
 			if (!workspace) {
 				log.warn('無法建立自動備份: 未找到有效的工作區');
 				return;
@@ -3056,7 +3052,7 @@ const functionSearch = {
 
 		log.info(`執行函式積木搜尋: "${query}"`);
 
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
 			log.warn('無法執行搜尋: 未找到有效的工作區');
 			return;
@@ -3083,7 +3079,7 @@ const functionSearch = {
 
 	// 在工作區中搜尋積木
 	searchBlocks: function (query) {
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		const allBlocks = workspace.getAllBlocks(false);
 
 		return allBlocks.filter(block => {
@@ -3190,12 +3186,10 @@ const functionSearch = {
 	// 清除高亮顯示
 	clearHighlight: function () {
 		// 移除所有積木的高亮樣式
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		if (workspace) {
 			workspace.getAllBlocks().forEach(block => {
-				if (block.pathObject && block.pathObject.svgPath) {
-					block.pathObject.svgPath.classList.remove('highlight-block');
-				}
+				block.getSvgRoot()?.classList.remove('singular-search-highlight');
 			});
 		}
 	},
@@ -3213,9 +3207,7 @@ const functionSearch = {
 		const block = this.searchResults[this.currentResultIndex];
 
 		// 高亮顯示積木
-		if (block.pathObject && block.pathObject.svgPath) {
-			block.pathObject.svgPath.classList.add('highlight-block');
-		}
+		block.getSvgRoot()?.classList.add('singular-search-highlight');
 
 		// 移動到積木位置
 		this.centerOnBlock(block);
@@ -3242,7 +3234,7 @@ const functionSearch = {
 		}
 
 		// 通過 Blockly API 將視圖中心移動到積木位置
-		Blockly.getMainWorkspace().centerOnBlock(block.id);
+		window.getBlocklyWorkspace().centerOnBlock(block.id);
 	},
 
 	// 導航到下一個結果
@@ -3300,7 +3292,7 @@ function handleRefreshCode() {
 		refreshSvg.classList.add('spinning');
 
 		// 獲取工作區
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
 			log.error('無法獲取 Blockly 工作區');
 			return;
@@ -3358,16 +3350,16 @@ function updateTheme(theme) {
 		darkIcon.style.display = 'block';
 
 		// 套用深色主題到 Blockly
-		if (Blockly.getMainWorkspace()) {
-			Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme);
+		if (window.getBlocklyWorkspace()) {
+			window.getBlocklyWorkspace().setTheme(window.SingularBlocklyDarkTheme);
 		}
 	} else {
 		lightIcon.style.display = 'block';
 		darkIcon.style.display = 'none';
 
 		// 套用淺色主題到 Blockly
-		if (Blockly.getMainWorkspace()) {
-			Blockly.getMainWorkspace().setTheme(window.SingularBlocklyTheme);
+		if (window.getBlocklyWorkspace()) {
+			window.getBlocklyWorkspace().setTheme(window.SingularBlocklyTheme);
 		}
 	}
 
@@ -3393,23 +3385,6 @@ window.addEventListener('languageChanged', function (event) {
 	// 更新語言選單文字（例如 Auto 標籤）
 	populateLanguageDropdown();
 
-	// 更新工具箱翻譯與分類標籤
-	const workspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
-	if (workspace) {
-		const boardSelect = document.getElementById('boardSelect');
-		const currentBoard = window.currentBoard || (boardSelect ? boardSelect.value : 'none');
-		updateToolboxForBoard(workspace, currentBoard)
-			.then(() => {
-				if (workspace.toolbox_) {
-					workspace.toolbox_.refreshSelection();
-				}
-			})
-			.catch(error => {
-				log.warn('語言切換後更新工具箱失敗:', error);
-			});
-	}
-	// 重新載入工作區以刷新積木文字
-	refreshWorkspaceForLanguage();
 	// 如果備份列表已顯示，更新其UI
 	if (document.getElementById('backupModal').style.display === 'block') {
 		// 刷新備份列表以更新按鈕文字
@@ -3558,15 +3533,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 				return match; // 如果沒有語言管理器，返回原始匹配文本
 			});
 		},
-		textToDom: xmlString => {
-			// 檢查 XML utils API
-			if (Blockly.utils && Blockly.utils.xml && typeof Blockly.utils.xml.textToDom === 'function') {
-				return Blockly.utils.xml.textToDom(xmlString);
-			}
-			// 回退到 DOM 解析
-			const parser = new DOMParser();
-			return parser.parseFromString(xmlString, 'text/xml').documentElement;
-		},
 	};
 
 	// 新增：在注入前處理 toolbox 配置中的翻譯
@@ -3585,13 +3551,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 處理翻譯
 	processTranslations(toolboxConfig);
-	installBlocklyTextInputImePatch();
 
 	// 根據當前主題設定選擇初始主題
 	const theme = currentTheme === 'dark' ? window.SingularBlocklyDarkTheme : window.SingularBlocklyTheme;
-	const workspace = Blockly.inject('blocklyDiv', {
+	let workspace = window.blocklyRuntime.createWorkspace('blocklyDiv', {
 		toolbox: toolboxConfig,
 		theme: theme, // 使用根據設定選擇的主題
+		renderer: 'thrasos',
+		media: window.BLOCKLY_MEDIA_URL,
 		trashcan: true, // 添加垃圾桶
 		maxInstances: {
 			micropython_main: 1,
@@ -3628,121 +3595,67 @@ document.addEventListener('DOMContentLoaded', async () => {
 	await updateToolboxForBoard(workspace, initialBoard);
 
 	// 添加工作區點擊事件，用於清除搜尋高亮顯示
-	workspace.getInjectionDiv().addEventListener('click', e => {
+	const handleWorkspaceSurfaceClick = e => {
 		// 檢查點擊是否發生在積木上
 		const targetElement = e.target;
 		// 如果點擊的是工作區背景或空白區域 (非積木)
 		if (!targetElement.closest('.blocklyDraggable') && !targetElement.closest('.blocklyBubbleCanvas')) {
 			// 清除所有積木的高亮樣式
 			workspace.getAllBlocks().forEach(block => {
-				if (block.pathObject && block.pathObject.svgPath) {
-					block.pathObject.svgPath.classList.remove('highlight-block');
-				}
+				block.getSvgRoot()?.classList.remove('singular-search-highlight');
 			});
 		}
-	});
-
-	// 覆寫變數類別的flyout生成函數
-	workspace.registerToolboxCategoryCallback('VARIABLE', function (workspace) {
-		const variableBlocks = [];
-		// 添加"新增變數"按鈕
-		variableBlocks.push(
-			blocklyUtils.textToDom('<button text="' + Blockly.Msg['NEW_VARIABLE'] + '" callbackKey="CREATE_VARIABLE"></button>')
-		);
-
-		// 為每個現有變數創建積木
-		const variables = workspace.getVariableMap().getAllVariables();
-		if (variables.length > 0) {
-			variables.forEach(variable => {
-				variableBlocks.push(
-					blocklyUtils.textToDom(
-						`<block type="variables_get">
-							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
-						</block>`
-					),
-					blocklyUtils.textToDom(
-						`<block type="variables_set">
-							<field name="VAR" id="${variable.getId()}">${variable.name}</field>
-						</block>`
-					)
-				);
-			});
-		}
-
-		return variableBlocks;
-	});
-
-	// 註冊變數創建按鈕的回調
-	workspace.registerButtonCallback('CREATE_VARIABLE', function () {
-		vscode.postMessage({
-			command: 'promptNewVariable',
-			currentName: '',
-			isRename: false,
-			board: window.currentBoard,
-		});
-	});
+	};
 
 	// 註冊函式類別的 flyout callback
-	workspace.registerToolboxCategoryCallback('FUNCTION', function (workspace) {
-		const blocks = [];
+	const functionFlyoutCallback = function (workspace) {
+		const blocks = [{ kind: 'block', type: 'arduino_function' }];
 
-		// 首先創建函式定義積木
-		blocks.push(blocklyUtils.textToDom(`<block type="arduino_function"></block>`));
-
-		// 然後為每個已定義的函式創建調用積木
+		// 為每個已定義的函式建立 JSON call block state。
 		const functions = workspace.getBlocksByType('arduino_function', false);
 		if (functions.length > 0) {
 			functions.forEach(functionBlock => {
 				const funcName = functionBlock.getFieldValue('NAME');
 				if (funcName) {
-					// 為每個已定義的函數創建對應的呼叫積木
-					// 函式現在統一為 void 類型，不再有回傳值
-					const returnType = 'void'; // 使用新的 XML 格式，包含完整的 mutation 資訊，但統一無回傳值
-					let callBlockXml = `
-						<block type="arduino_function_call">
-							<mutation name="${funcName}" version="1" has_return="false" return_type="void">
-					`;
-
-					// 添加函數參數資訊（作為 mutation 的子元素）
-					const argShadows = [];
-					if (functionBlock.arguments_ && functionBlock.arguments_.length > 0) {
-						for (let i = 0; i < functionBlock.arguments_.length; i++) {
-							const argName = functionBlock.arguments_[i] || '';
-							const argType = functionBlock.argumentTypes_[i] || 'int';
-							callBlockXml += `<arg name="${argName}" type="${argType}"></arg>`;
-							argShadows.push({ index: i, type: argType });
+					const arguments_ = Array.isArray(functionBlock.arguments_) ? functionBlock.arguments_.slice() : [];
+					const argumentTypes = Array.isArray(functionBlock.argumentTypes_)
+						? functionBlock.argumentTypes_.slice()
+						: [];
+					const inputs = {};
+					argumentTypes.forEach((type, index) => {
+						const shadow = window.getParameterShadowState(type);
+						if (shadow) {
+							inputs[`ARG${index}`] = { shadow };
 						}
-					}
-
-					// 關閉 mutation 標籤
-					callBlockXml += '</mutation>';
-
-					// 為每個參數加入帶有 shadow block 的 value 元素
-					const shadowMap = window.PARAM_SHADOW_XML_MAP || {};
-					for (const arg of argShadows) {
-						const shadowXml = shadowMap[arg.type] || '';
-						if (shadowXml) {
-							callBlockXml += `<value name="ARG${arg.index}">${shadowXml}</value>`;
-						}
-					}
-
-					// 關閉 block 標籤
-					callBlockXml += '</block>';
-
-					// 轉換為 DOM 元素並添加到積木列表
-					const callBlockDom = blocklyUtils.textToDom(callBlockXml);
-					blocks.push(callBlockDom);
+					});
+					blocks.push({
+						kind: 'block',
+						type: 'arduino_function_call',
+						extraState: {
+							version: 1,
+							name: funcName,
+							arguments: arguments_,
+							argumentTypes,
+						},
+						...(Object.keys(inputs).length > 0 ? { inputs } : {}),
+					});
 				}
 			});
 		}
 
 		return blocks;
-	});
+	};
 
-	// T011b：設定函式積木 STACK 保護監聽（在 workspace 完整初始化後呼叫）
-	if (typeof window.setupFunctionStackProtection === 'function') {
-		window.setupFunctionStackProtection(workspace);
-	}
+	const attachWorkspaceBaseIntegrations = targetWorkspace => {
+		targetWorkspace.getInjectionDiv().addEventListener('click', handleWorkspaceSurfaceClick);
+		// Blockly 13 的公開 variables flyout 會回傳 JSON items，並使用 dialog adapter。
+		targetWorkspace.registerToolboxCategoryCallback('VARIABLE', Blockly.Variables.flyoutCategory);
+		targetWorkspace.registerToolboxCategoryCallback('FUNCTION', functionFlyoutCallback);
+		if (typeof window.setupFunctionStackProtection === 'function') {
+			window.setupFunctionStackProtection(targetWorkspace);
+		}
+	};
+	attachWorkspaceBaseIntegrations(workspace);
 
 	// 載入鎖定標記，防止 FileWatcher 觸發的 loadWorkspace 立即保存導致無限循環
 	let isLoadingFromFileWatcher = false;
@@ -4085,7 +3998,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 				if (pendingMessage.state) {
 					migrateWorkspaceState(pendingMessage.state);
-					withCyberBrickNameHydrationScope(() => Blockly.serialization.workspaces.load(pendingMessage.state, workspace));
+					withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(pendingMessage.state, workspace));
 					rebuildPwmConfig(workspace);
 					updateMainBlockDeletable(workspace);
 				}
@@ -4188,7 +4101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	};
 
 	// 單一的工作區變更監聯器
-	workspace.addChangeListener(event => {
+	const handleWorkspaceChange = event => {
 		// 視角鎖定機制：在刪除進行中時，立即恢復視角以防止閃爍
 		if (viewportLocked && event.type === Blockly.Events.VIEWPORT_CHANGE) {
 			// 立即將視角拉回鎖定位置
@@ -4478,14 +4391,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 				const block = workspace.getBlockById(event.blockId);
 				if (block && block.type === 'arduino_function') {
 					// 強制刷新函數類別
-					if (workspace.toolbox_) {
+					const toolbox = workspace.getToolbox();
+					if (toolbox) {
 						// 延遲執行以避免頻繁刷新
 						if (workspace._refreshFunctionTimeout) {
 							clearTimeout(workspace._refreshFunctionTimeout);
 						}
 
 						workspace._refreshFunctionTimeout = setTimeout(() => {
-							workspace.toolbox_.refreshSelection();
+							toolbox.refreshSelection();
 						}, 300);
 					}
 				}
@@ -4577,7 +4491,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 				debouncedCodeUpdate();
 			}
 		}
-	});
+	};
+	workspace.addChangeListener(handleWorkspaceChange);
+
+	window.rebuildEditorWorkspaceForLanguage = async state => {
+		workspace = window.blocklyRuntime.recreateWorkspace();
+		attachWorkspaceBaseIntegrations(workspace);
+		workspace.addChangeListener(handleWorkspaceChange);
+		const boardId = window.currentBoard || document.getElementById('boardSelect')?.value || 'arduino_uno';
+		await updateToolboxForBoard(workspace, boardId);
+
+		const eventsWereEnabled = Blockly.Events?.isEnabled ? Blockly.Events.isEnabled() : false;
+		if (eventsWereEnabled && Blockly.Events?.disable) Blockly.Events.disable();
+		try {
+			migrateWorkspaceState(state);
+			withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(state, workspace));
+		} finally {
+			if (eventsWereEnabled && Blockly.Events?.enable) Blockly.Events.enable();
+		}
+
+		if (!workspace.getVariableMap().getVariable('i')) {
+			workspace.getVariableMap().createVariable('i');
+		}
+		rebuildPwmConfig(workspace);
+		updateMainBlockDeletable(workspace);
+		refreshCyberBrickNamingIssues(workspace);
+		updateTheme(currentTheme);
+		workspace.render();
+		Blockly.svgResize(workspace);
+		return workspace;
+	};
 
 	// 處理開發板選擇
 	if (boardSelect) {
@@ -4708,7 +4651,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 
 	const handleWorkspaceLoadMessage = async message => {
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
 			log.warn('找不到主工作區，無法載入狀態');
 			return;
@@ -4795,7 +4738,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 				// 遷移舊版格式後再載入工作區內容
 				migrateWorkspaceState(workspaceState);
-				withCyberBrickNameHydrationScope(() => Blockly.serialization.workspaces.load(workspaceState, workspace));
+				withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(workspaceState, workspace));
 				applyTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode });
 				clearTxtVirtualControlPendingLoadOptions();
 
@@ -4898,71 +4841,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 監聽來自擴充功能的訊息
 	window.addEventListener('message', async event => {
 		const message = event.data;
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		log.info(`收到訊息: ${message.command}`, message);
 
 		switch (message.command) {
-			case 'createVariable':
-				if (message.name) {
-					if (message.isRename && message.oldName) {
-						// 修正：直接使用變數 ID 進行重命名
-						const variable = workspace.getVariableMap().getVariable(message.oldName);
-						if (variable) {
-							// 使用 workspace 的 renameVariableById 方法
-							workspace.renameVariableById(variable.getId(), message.name);
-							// 觸發工作區變更事件以更新程式碼
-							workspace.fireChangeListener({
-								type: Blockly.Events.VAR_RENAME,
-								varId: variable.getId(),
-								oldName: message.oldName,
-								newName: message.name,
-							});
-						}
-					} else {
-						// 新增變數，直接使用 workspace 的方法
-						const existingVar = workspace.getVariableMap().getVariable(message.name);
-						if (!existingVar) {
-							workspace.getVariableMap().createVariable(message.name);
-							// 觸發更新
-							const code = generateCode(workspace);
-							vscode.postMessage({
-								command: 'updateCode',
-								code: code,
-								language: window.currentProgrammingLanguage,
-							});
-							saveWorkspaceState();
-						}
-					}
-				}
-				break;
-			case 'deleteVariable':
-				if (message.confirmed) {
-					const variable = workspace.getVariableMap().getVariable(message.name);
-					if (variable) {
-						const varId = variable.getId();
-						// 先找出所有使用這個變數的積木
-						const blocks = workspace
-							.getBlocksByType('variables_get')
-							.concat(workspace.getBlocksByType('variables_set'))
-							.filter(block => block.getField('VAR').getText() === message.name);
-						// 移除所有使用這個變數的積木
-						blocks.forEach(block => {
-							block.dispose(false);
-						});
-						// 從工作區中移除變數定義
-						workspace.deleteVariableById(varId);
-						// 手動觸發更新
-						const code = generateCode(workspace);
-						vscode.postMessage({
-							command: 'updateCode',
-							code: code,
-							language: window.currentProgrammingLanguage,
-						});
-						saveWorkspaceState();
-					}
-				}
-				break;
-			case 'confirmDialogResult':
+		case 'confirmDialogResult':
 				// 處理從VSCode傳回的確認對話框結果
 				if (message.confirmId !== undefined) {
 					const callback = pendingConfirmCallbacks.get(message.confirmId);
@@ -5024,10 +4907,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 			case 'init':
 				await handleWorkspaceLoadMessage(message);
-				applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
+				await applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
 				break;
 			case 'languageUpdated':
-				applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
+				await applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
 				break;
 			case 'loadWorkspace':
 				await handleWorkspaceLoadMessage(message);
@@ -5263,7 +5146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					if (triggerConfig && triggerConfig.enabled === false) {
 						break;
 					}
-					var triggerWorkspace = typeof Blockly !== 'undefined' ? Blockly.getMainWorkspace() : null;
+					var triggerWorkspace = typeof Blockly !== 'undefined' ? window.getBlocklyWorkspace() : null;
 					if (triggerWorkspace && window.contextExtractor) {
 						var triggerDepth = (triggerConfig && triggerConfig.contextDepth) || 'minimal';
 						var triggerContext = window.contextExtractor.extractContext(triggerDepth, triggerWorkspace);
@@ -5361,7 +5244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 							// T008: 卡片載入按鈕事件
 							btn.addEventListener('click', () => {
-								const hasBlocks = Blockly.getMainWorkspace().getAllBlocks(false).length > 0;
+								const hasBlocks = window.getBlocklyWorkspace().getAllBlocks(false).length > 0;
 								vscode.postMessage({
 									command: 'loadSelectedSampleRequest',
 									filename: entry.filename,
@@ -5453,10 +5336,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始化 AI 影子建議模組
 	if (window.shadowBlockManager) {
-		window.shadowBlockManager.init(vscode);
+		window.shadowBlockManager.init(vscode, window.getBlocklyWorkspace);
 	}
 	if (window.shadowKeyboardHandler) {
-		window.shadowKeyboardHandler.init(vscode);
+		window.shadowKeyboardHandler.init(vscode, window.getBlocklyWorkspace);
 	}
 
 	// handleResize 的定義
@@ -5472,98 +5355,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 初始觸發一次 resize
 	handleResize();
 
-	// 添加監聽右鍵選單中的「整理方塊」操作
-	const originalCleanUp = Blockly.WorkspaceSvg.prototype.cleanUp;
-	if (originalCleanUp) {
-		Blockly.WorkspaceSvg.prototype.cleanUp = function () {
-			// 呼叫原始的清理函數
-			originalCleanUp.call(this);
-
-			// 當清理完成後，延遲一點時間儲存工作區狀態
-			// 這確保了「整理方塊」操作後座標變更會被正確儲存
-			setTimeout(() => {
-				const state = Blockly.serialization.workspaces.save(this);
-				vscode.postMessage(
-					appendTxtVirtualControlsPayload({
-					command: 'saveWorkspace',
-					state: state,
-					board: boardSelect.value,
-					}, boardSelect.value)
-				);
-				log.info('方塊整理完成，已儲存工作區狀態');
-			}, 300);
-		};
-	}
-
-	// 覆寫變數下拉選單的創建方法
-	Blockly.FieldVariable.dropdownCreate = function () {
-		const workspace = Blockly.getMainWorkspace();
-		// 修改這行：使用變數的 ID 作為值
-		const variableList = workspace
-			.getVariableMap()
-			.getAllVariables()
-			.map(variable => [variable.name, variable.getId()]);
-		// 加入分隔線與選項
-		if (variableList.length > 0) {
-			const currentName = this.getText(); // 獲取當前變數名稱
-			variableList.push(['---', '---']);
-			variableList.push([Blockly.Msg['RENAME_VARIABLE'], Blockly.Msg['RENAME_VARIABLE']]);
-			variableList.push([Blockly.Msg['DELETE_VARIABLE'].replace('%1', currentName), Blockly.Msg['DELETE_VARIABLE']]);
-			variableList.push(['---', '---']);
-		}
-		variableList.push([Blockly.Msg['NEW_VARIABLE'], Blockly.Msg['NEW_VARIABLE']]);
-		return variableList;
-	};
-
-	// 覆寫變數下拉選單的變更監聽器
-	Blockly.FieldVariable.prototype.onItemSelected_ = function (menu, menuItem) {
-		const workspace = this.sourceBlock_.workspace;
-		const value = menuItem.getValue();
-		if (value === Blockly.Msg['NEW_VARIABLE']) {
-			// 請求使用者輸入新變數名稱
-			vscode.postMessage({
-				command: 'promptNewVariable',
-				currentName: '',
-				board: window.currentBoard,
-			});
-		} else if (value === Blockly.Msg['RENAME_VARIABLE']) {
-			const id = this.getValue();
-			const variable = workspace.getVariableMap().getVariableById(id);
-			if (variable) {
-				// 請求使用者輸入新名稱
-				vscode.postMessage({
-					command: 'promptNewVariable',
-					currentName: variable.name,
-					isRename: true,
-					board: window.currentBoard,
-				});
-			}
-		} else if (value === Blockly.Msg['DELETE_VARIABLE']) {
-			const id = this.getValue();
-			const variable = workspace.getVariableMap().getVariableById(id);
-			if (variable) {
-				// 詢問使用者是否要刪除變數
-				vscode.postMessage({
-					command: 'confirmDeleteVariable',
-					variableName: variable.name,
-				});
-			}
-		} else if (value !== '---') {
-			// 正常選擇變數：直接使用變數 ID
-			this.setValue(value);
-		}
-	};
-
-	// 覆寫 Blockly 的變數創建函數，避免使用內建對話框
-	Blockly.Variables.createVariable = function (workspace, opt_callback, opt_type) {
-		// 直接發送訊息給 VS Code，要求輸入新變數名稱
-		vscode.postMessage({
-			command: 'promptNewVariable',
-			currentName: '',
-			type: opt_type || '',
-			board: window.currentBoard,
-		});
-	};
 });
 
 // 覆寫 Blockly 的字串替換函數以支援多語言
@@ -7132,7 +6923,7 @@ async function handleUploadClick() {
 		return;
 	}
 
-	const workspace = Blockly.getMainWorkspace();
+	const workspace = window.getBlocklyWorkspace();
 	if (!workspace) {
 		toast.show(window.languageManager?.getMessage('UPLOAD_FAILED', '上傳失敗') + ': 工作區未初始化', 'error');
 		return;
@@ -7751,7 +7542,7 @@ function initSampleBrowser() {
 
 			sampleModal.style.display = 'flex';
 
-			const hasBlocks = Blockly.getMainWorkspace().getAllBlocks(false).length > 0;
+			const hasBlocks = window.getBlocklyWorkspace().getAllBlocks(false).length > 0;
 			vscode.postMessage({
 				command: 'openSampleBrowserRequest',
 				hasBlocks: hasBlocks,

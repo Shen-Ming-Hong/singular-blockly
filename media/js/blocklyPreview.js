@@ -690,8 +690,10 @@ function initBlocklyWorkspace() {
 	log.info('初始化預覽模式 Blockly 工作區');
 	// 選擇適合的主題
 	const theme = currentTheme === 'dark' ? SingularBlocklyDarkTheme : SingularBlocklyTheme; // 初始化工作區 - 不需要工具箱
-	workspace = Blockly.inject('blocklyDiv', {
+	workspace = window.blocklyRuntime.createWorkspace('blocklyDiv', {
 		theme: theme,
+		renderer: 'thrasos',
+		media: window.BLOCKLY_MEDIA_URL,
 		readOnly: true, // 預覽模式設為真正的唯讀模式
 		move: {
 			scrollbars: true,
@@ -710,8 +712,6 @@ function initBlocklyWorkspace() {
 		trashcan: false, // 預覽模式不需要垃圾桶
 	});
 
-	// 將工作區註冊為全局變數 (用於除錯)
-	window.workspace = workspace;
 	// 請求載入備份數據
 	requestBackupData();
 
@@ -840,7 +840,7 @@ function loadWorkspaceFromState(workspaceState) {
 		workspace.clear();
 
 		// 使用 Blockly 的反序列化功能載入工作區狀態
-		Blockly.serialization.workspaces.load(workspaceState, workspace);
+		window.blocklyRuntime.loadWorkspaceState(workspaceState, workspace);
 
 		log.info('成功載入 workspace 狀態');
 	} catch (error) {
@@ -859,7 +859,7 @@ function loadWorkspaceFromState(workspaceState) {
 /**
  * 語言切換後重新載入工作區以刷新積木文字
  */
-function refreshWorkspaceForLanguage() {
+async function refreshWorkspaceForLanguage() {
 	if (!workspace) {
 		return;
 	}
@@ -869,40 +869,44 @@ function refreshWorkspaceForLanguage() {
 	}
 
 	if (typeof workspace.isDragging === 'function' && workspace.isDragging()) {
-		if (!pendingLanguageReloadTimer) {
+		if (pendingLanguageReloadTimer) clearTimeout(pendingLanguageReloadTimer);
+		return new Promise((resolve, reject) => {
 			pendingLanguageReloadTimer = setTimeout(() => {
 				pendingLanguageReloadTimer = null;
-				refreshWorkspaceForLanguage();
+				refreshWorkspaceForLanguage().then(resolve, reject);
 			}, 200);
-		}
-		return;
+		});
 	}
-
-	let eventsWereEnabled = false;
 
 	try {
 		isLanguageSwitchReloading = true;
 		const state = Blockly.serialization.workspaces.save(workspace);
-		eventsWereEnabled = Blockly.Events?.isEnabled ? Blockly.Events.isEnabled() : false;
+		const eventsWereEnabled = Blockly.Events?.isEnabled ? Blockly.Events.isEnabled() : false;
 
 		if (eventsWereEnabled && Blockly.Events?.disable) {
 			Blockly.Events.disable();
 		}
-
-		workspace.clear();
-		Blockly.serialization.workspaces.load(state, workspace);
-		workspace.render();
+		try {
+			workspace = window.blocklyRuntime.recreateWorkspace();
+			window.blocklyRuntime.loadWorkspaceState(state, workspace);
+			updateTheme(currentTheme, false);
+			workspace.render();
+			Blockly.svgResize(workspace);
+		} finally {
+			if (eventsWereEnabled && Blockly.Events?.enable) {
+				Blockly.Events.enable();
+			}
+		}
+		return workspace;
 	} catch (error) {
 		log.warn('語言切換後重載預覽工作區失敗:', error);
+		throw error;
 	} finally {
-		if (eventsWereEnabled && Blockly.Events?.enable) {
-			Blockly.Events.enable();
-		}
-		setTimeout(() => {
-			isLanguageSwitchReloading = false;
-		}, 0);
+		isLanguageSwitchReloading = false;
 	}
 }
+
+window.rebuildBlocklyForLanguage = refreshWorkspaceForLanguage;
 
 /**
  * 顯示開發板警告訊息
@@ -936,7 +940,7 @@ function showBoardWarning(message) {
 /**
  * 監聽來自擴充功能的訊息
  */
-window.addEventListener('message', event => {
+window.addEventListener('message', async event => {
 	const message = event.data;
 
 	switch (message.command) {
@@ -975,7 +979,7 @@ window.addEventListener('message', event => {
 			break;
 		case 'updateLanguage':
 			if (window.languageManager && message.resolvedLanguage) {
-				window.languageManager.setLanguage(message.resolvedLanguage);
+				await window.languageManager.setLanguage(message.resolvedLanguage);
 			} else {
 				log.warn('預覽視窗無法更新語言: 缺少 languageManager 或語言代碼', message);
 			}
@@ -1000,8 +1004,6 @@ window.addEventListener('languageChanged', function (event) {
 	if (currentPreviewBoard === 'txt' && txtPreviewState.panelOpen) {
 		renderTxtPreviewControls();
 	}
-	// 重新載入工作區以刷新積木文字
-	refreshWorkspaceForLanguage();
 });
 
 // 監聽語言檔案載入事件

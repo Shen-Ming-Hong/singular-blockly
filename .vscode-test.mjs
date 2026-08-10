@@ -4,14 +4,16 @@ import os from 'os';
 
 const testWorkspace = process.env.VSCODE_TEST_WORKSPACE || path.join(os.homedir(), 'test', 'debug_extension');
 const extensionsDir = process.env.VSCODE_EXTENSIONS_DIR || path.join(os.homedir(), '.vscode', 'extensions');
+const userDataDir = process.env.VSCODE_TEST_USER_DATA_DIR || path.join(process.cwd(), '.vscode-test', 'user-data-unit');
 
 export default defineConfig([
 	{
 		// Unit tests — opens test workspace for blockly editor tests
 		label: 'unit',
+		version: '1.105.0',
 		files: 'out/test/**/*.test.js',
 		workspaceFolder: testWorkspace,
-		launchArgs: [`--extensions-dir=${extensionsDir}`, '--disable-workspace-trust'],
+		launchArgs: [`--extensions-dir=${extensionsDir}`, `--user-data-dir=${userDataDir}`, '--disable-workspace-trust'],
 		env: { NODE_ENV: 'test' },
 		// Exclude integration tests from unit test run
 		mocha: {
@@ -23,6 +25,7 @@ export default defineConfig([
 		// Integration tests — opens real workspace with Copilot access
 		// Shares user's extensions dir for Copilot, uses separate user-data-dir
 		label: 'integration',
+		version: '1.105.0',
 		files: 'out/test/integration/**/*.test.js',
 		workspaceFolder: testWorkspace,
 		launchArgs: [`--extensions-dir=${extensionsDir}`],

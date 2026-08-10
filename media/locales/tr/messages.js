@@ -10,6 +10,8 @@
 
 // Define translations for Turkish
 window.languageManager.loadMessages('tr', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Yapılandırma',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Kilitli',
 	// UI Elements
 	BLOCKS_TAB: 'Bloklar',
 	CODE_TAB: 'Kod',

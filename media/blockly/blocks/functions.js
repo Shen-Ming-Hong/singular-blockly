@@ -7,14 +7,21 @@
 
 // 函式積木的 Mutator 定義
 
-// 參數型別對應的 shadow block XML 對應表（共享給 blocklyEdit.js flyout callback 使用）
-const PARAM_SHADOW_XML_MAP = {
-	int: '<shadow type="math_number"><field name="NUM">0</field></shadow>',
-	float: '<shadow type="math_number"><field name="NUM">0.0</field></shadow>',
-	bool: '<shadow type="logic_boolean"><field name="BOOL">TRUE</field></shadow>',
-	String: '<shadow type="text"><field name="TEXT"></field></shadow>',
+// Blockly 13 runtime 統一使用 JSON shadow state；XML 僅保留在 legacy mutation loader。
+const PARAM_SHADOW_STATE_MAP = {
+	int: { type: 'math_number', fields: { NUM: 0 } },
+	float: { type: 'math_number', fields: { NUM: 0.0 } },
+	bool: { type: 'logic_boolean', fields: { BOOL: 'TRUE' } },
+	String: { type: 'text', fields: { TEXT: '' } },
 };
-window.PARAM_SHADOW_XML_MAP = PARAM_SHADOW_XML_MAP;
+
+function getParameterShadowState(type) {
+	const state = PARAM_SHADOW_STATE_MAP[type];
+	return state ? { ...state, fields: { ...state.fields } } : null;
+}
+
+window.PARAM_SHADOW_STATE_MAP = PARAM_SHADOW_STATE_MAP;
+window.getParameterShadowState = getParameterShadowState;
 
 const CYBERBRICK_FUNCTION_NAMING_WARNING_ID = 'cyberbrick-naming';
 
@@ -110,6 +117,28 @@ const functionMutator = {
 			setTimeout(() => this.applyLockState_(true), 0);
 		}
 	},
+	saveExtraState: function () {
+		return {
+			version: 1,
+			arguments: Array.isArray(this.arguments_) ? this.arguments_.slice() : [],
+			argumentTypes: Array.isArray(this.argumentTypes_) ? this.argumentTypes_.slice() : [],
+			...(this.isLocked_ ? { locked: true } : {}),
+		};
+	},
+	loadExtraState: function (state) {
+		this.arguments_ = Array.isArray(state?.arguments) ? state.arguments.filter(value => typeof value === 'string') : [];
+		this.argumentTypes_ = Array.isArray(state?.argumentTypes)
+			? state.argumentTypes.map(value => (typeof value === 'string' ? value : 'int'))
+			: [];
+		while (this.argumentTypes_.length < this.arguments_.length) {
+			this.argumentTypes_.push('int');
+		}
+		this.updateShape_();
+		if (state?.locked === true) {
+			this.isLocked_ = true;
+			setTimeout(() => this.applyLockState_(true), 0);
+		}
+	},
 	decompose: function (workspace) {
 		const containerBlock = workspace.newBlock('arduino_function_mutator');
 		containerBlock.initSvg();
@@ -166,13 +195,6 @@ const functionMutator = {
 		const paramBlock = workspace.newBlock('arduino_function_parameter');
 		paramBlock.initSvg();
 		blocks.push(paramBlock);
-
-		// 設定飛出窗口高度
-		const blockHeight = paramBlock.getHeightWidth().height;
-		const minHeight = blockHeight * 3;
-
-		workspace.flyout_.setHeight(minHeight);
-		workspace.flyout_.workspace_.updateInverseScreenCTM();
 
 		let count = 0;
 		let block = workspace.getTopBlocks(false)[0];
@@ -256,7 +278,7 @@ const functionMutator = {
 					} else {
 						// 否則刪除此參數變數
 						log.info(`刪除不再使用的參數變數: ${varName}`);
-						workspace.deleteVariableById(variableId);
+						workspace.getVariableMap().deleteVariable(variable);
 					}
 				} catch (err) {
 					log.error(`刪除舊參數變數 ${variable.name} 失敗:`, err);
@@ -272,7 +294,7 @@ const functionMutator = {
 			const paramName = this.arguments_[i];
 			if (paramName) {
 				// 檢查變數是否已存在
-				let variable = workspace.getVariable(paramName);
+				let variable = workspace.getVariableMap().getVariable(paramName);
 				if (!variable) {
 					// 根據參數類型確定變數類型
 					let varType = null;
@@ -286,7 +308,7 @@ const functionMutator = {
 					// 創建變數
 					try {
 						log.info(`為參數創建變數: ${paramName} (型別: ${varType || 'default'})`);
-						variable = workspace.createVariable(paramName, varType);
+						variable = workspace.getVariableMap().createVariable(paramName, varType);
 						if (variable) {
 							this.registeredVarIds_.push(variable.getId());
 						}
@@ -428,7 +450,7 @@ Blockly.Blocks['arduino_function'] = {
 		}
 
 		// 處理複製貼上事件 - 檢測剛建立的積木是否是複製貼上的結果
-		if (e.type === Blockly.Events.CREATE && e.ids && e.ids.includes(this.id)) {
+		if (e.type === Blockly.Events.BLOCK_CREATE && e.ids && e.ids.includes(this.id)) {
 			// 判斷是否是從複製貼上產生的積木 (不是直接從工具箱拖出來的)
 			if (!this.workspace.isFlyout && !this.isInFlyout) {
 				// 獲取當前函式名稱
@@ -591,10 +613,11 @@ Blockly.Blocks['arduino_function'] = {
 					});
 
 					// 工具箱刷新 - 確保工具箱中顯示的函數名稱也更新
-					if (currentWorkspace.toolbox_) {
+					const toolbox = currentWorkspace.getToolbox();
+					if (toolbox) {
 						setTimeout(() => {
 							try {
-								currentWorkspace.toolbox_.refreshSelection();
+								toolbox.refreshSelection();
 							} catch (err) {
 								log.error('工具箱刷新失敗:', err);
 							}
@@ -645,13 +668,13 @@ Blockly.Blocks['arduino_function_parameter'] = {
 
 	onchange: function (e) {
 		if (
-			e.type === Blockly.Events.CHANGE ||
-			e.type === Blockly.Events.MOVE ||
-			e.type === Blockly.Events.CREATE ||
-			e.type === Blockly.Events.DELETE
+			e.type === Blockly.Events.BLOCK_CHANGE ||
+			e.type === Blockly.Events.BLOCK_MOVE ||
+			e.type === Blockly.Events.BLOCK_CREATE ||
+			e.type === Blockly.Events.BLOCK_DELETE
 		) {
 			// 處理自動命名
-			if (e.type === Blockly.Events.CREATE && e.blockId === this.id) {
+			if (e.type === Blockly.Events.BLOCK_CREATE && e.blockId === this.id) {
 				this.handleAutoNaming_();
 			}
 
@@ -704,6 +727,32 @@ Blockly.Blocks['arduino_function_call'] = {
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
 		this.setOutput(false);
+	},
+
+	saveExtraState: function () {
+		return {
+			version: 1,
+			name: this.getFieldValue('NAME') || 'myFunction',
+			arguments: Array.isArray(this.arguments_) ? this.arguments_.slice() : [],
+			argumentTypes: Array.isArray(this.argumentTypes_) ? this.argumentTypes_.slice() : [],
+		};
+	},
+
+	loadExtraState: function (state) {
+		const name = typeof state?.name === 'string' && state.name ? state.name : 'myFunction';
+		this.setFieldValue(name, 'NAME');
+		this.arguments_ = Array.isArray(state?.arguments) ? state.arguments.filter(value => typeof value === 'string') : [];
+		this.argumentTypes_ = Array.isArray(state?.argumentTypes)
+			? state.argumentTypes.map(value => (typeof value === 'string' ? value : 'int'))
+			: [];
+		while (this.argumentTypes_.length < this.arguments_.length) {
+			this.argumentTypes_.push('int');
+		}
+		this.hasReturn_ = false;
+		this.returnType_ = 'void';
+		this._clearExistingInputs();
+		this._createParameterInputs();
+		this.setTooltip('呼叫函數: ' + name);
 	},
 
 	// 將函數狀態序列化為 DOM
@@ -830,9 +879,9 @@ Blockly.Blocks['arduino_function_call'] = {
 				.setCheck(null);
 
 			// 根據參數型別附加對應的 shadow block 作為預設值
-			const shadowDom = this._getShadowDomForType(argType);
-			if (shadowDom) {
-				input.setShadowDom(shadowDom);
+			const shadowState = this._getShadowStateForType(argType);
+			if (shadowState) {
+				input.connection.setShadowState(shadowState);
 			}
 		}
 
@@ -1188,13 +1237,9 @@ Blockly.Blocks['arduino_function_call'] = {
 		}
 	},
 
-	// 根據參數型別回傳對應的 shadow DOM 元素
-	_getShadowDomForType: function (argType) {
-		const shadowXml = PARAM_SHADOW_XML_MAP[argType];
-		if (shadowXml) {
-			return Blockly.utils.xml.textToDom(shadowXml);
-		}
-		return null;
+	// 根據參數型別回傳新的 JSON shadow state，避免跨輸入共用可變物件。
+	_getShadowStateForType: function (argType) {
+		return getParameterShadowState(argType);
 	},
 
 	// 建立參數輸入
@@ -1211,9 +1256,9 @@ Blockly.Blocks['arduino_function_call'] = {
 				.setCheck(null);
 
 			// 根據參數型別附加對應的 shadow block 作為預設值
-			const shadowDom = this._getShadowDomForType(argType);
-			if (shadowDom) {
-				input.setShadowDom(shadowDom);
+			const shadowState = this._getShadowStateForType(argType);
+			if (shadowState) {
+				input.connection.setShadowState(shadowState);
 			}
 		}
 	},
@@ -1276,7 +1321,11 @@ function applyLockStateImpl(block, locked) {
 		block.setStyle('locked_procedure_blocks');
 		if (!block.getField('LOCK_ICON')) {
 			const mainInput = block.getInput('MAIN') || block.getInput('');
-			if (mainInput) mainInput.insertFieldAt(0, new Blockly.FieldLabel('🔒 '), 'LOCK_ICON');
+			if (mainInput) {
+				const lockIcon = new Blockly.FieldLabel('🔒 ');
+				lockIcon.setAriaTypeName(window.languageManager.getMessage('BLOCKLY_ARIA_LOCKED_ICON', 'Locked'));
+				mainInput.insertFieldAt(0, lockIcon, 'LOCK_ICON');
+			}
 		}
 	} else {
 		block.setStyle('procedure_blocks');
@@ -1460,9 +1509,5 @@ function setupFunctionStackProtection(workspace) {
 	});
 }
 
-// T011b 預先嘗試：若 blocklyEdit.js 已建立 workspace，直接保護（備援路徑）
-if (typeof window !== 'undefined' && window.workspace) {
-	setupFunctionStackProtection(window.workspace);
-}
-// 同時掛到全域以供 blocklyEdit.js 在 workspace 建立後呼叫
+// 由 workspace factory 建立完成後明確註冊。
 window.setupFunctionStackProtection = setupFunctionStackProtection;

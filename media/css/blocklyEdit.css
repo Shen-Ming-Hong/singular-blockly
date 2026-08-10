@@ -2963,6 +2963,7 @@ body.preview-mode .txt-preview-canvas,
 .sample-modal-content .modal-body,
 #functionSearchModal,
 .search-history-container,
+.blocklyWidgetDiv .blocklyContextMenu,
 .blocklyToolbox,
 .blocklyToolboxCategoryGroup,
 .blocklyToolboxDiv {
@@ -2984,6 +2985,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
 .sample-modal-content .modal-body::-webkit-scrollbar,
 #functionSearchModal::-webkit-scrollbar,
 .search-history-container::-webkit-scrollbar,
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar,
 .blocklyToolbox::-webkit-scrollbar,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar,
 .blocklyToolboxDiv::-webkit-scrollbar {
@@ -3005,6 +3007,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
 .sample-modal-content .modal-body::-webkit-scrollbar-track,
 #functionSearchModal::-webkit-scrollbar-track,
 .search-history-container::-webkit-scrollbar-track,
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-track,
 .blocklyToolbox::-webkit-scrollbar-track,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-track,
 .blocklyToolboxDiv::-webkit-scrollbar-track {
@@ -3028,6 +3031,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
 .sample-modal-content .modal-body::-webkit-scrollbar-thumb,
 #functionSearchModal::-webkit-scrollbar-thumb,
 .search-history-container::-webkit-scrollbar-thumb,
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb,
 .blocklyToolbox::-webkit-scrollbar-thumb,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb,
 .blocklyToolboxDiv::-webkit-scrollbar-thumb {
@@ -3051,6 +3055,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
 .sample-modal-content .modal-body::-webkit-scrollbar-thumb:hover,
 #functionSearchModal::-webkit-scrollbar-thumb:hover,
 .search-history-container::-webkit-scrollbar-thumb:hover,
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb:hover,
 .blocklyToolbox::-webkit-scrollbar-thumb:hover,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb:hover,
 .blocklyToolboxDiv::-webkit-scrollbar-thumb:hover {
@@ -3070,6 +3075,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 .sample-modal-content .modal-body::-webkit-scrollbar-corner,
 #functionSearchModal::-webkit-scrollbar-corner,
 .search-history-container::-webkit-scrollbar-corner,
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-corner,
 .blocklyToolbox::-webkit-scrollbar-corner,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-corner,
 .blocklyToolboxDiv::-webkit-scrollbar-corner {
@@ -3266,17 +3272,70 @@ body.theme-dark .search-history-item:hover {
 	position: relative;
 }
 
-/* 搜尋結果中積木高亮效果 */
-.highlight-block {
+/* 搜尋結果使用 app-owned root class；不存取 renderer 內部 path 物件。 */
+.blocklyDraggable.singular-search-highlight > .blocklyPath {
 	stroke: #ffd700 !important; /* 明顯的金黃色 */
 	stroke-width: 4px !important;
 	filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8)) !important;
 	animation: pulse-border 1.5s infinite alternate;
 }
 
-body.theme-dark .highlight-block {
+body.theme-dark .blocklyDraggable.singular-search-highlight > .blocklyPath {
 	stroke: #ffdf00 !important; /* 在深色主題中使用較亮的黃色 */
 	filter: drop-shadow(0 0 8px rgba(255, 223, 0, 0.8)) !important;
+}
+
+/* Blockly 13 / Thrasos integration tokens. */
+.injectionDiv {
+	--blockly-active-node-color: var(--editor-focus-ring);
+	--blockly-active-tree-color: var(--editor-focus-ring);
+	--blockly-selection-width: 3px;
+}
+
+.blocklyWidgetDiv,
+.blocklyDropDownDiv,
+.blocklyToolboxDiv,
+.blocklyFlyout,
+.blocklyWidgetDiv *,
+.blocklyDropDownDiv *,
+.blocklyToolboxDiv * {
+	box-sizing: border-box;
+}
+
+.blocklyKeyboardNavigation .blocklyActiveFocus.blocklyField > .blocklyFieldRect,
+.blocklyKeyboardNavigation .blocklyActiveFocus > .blocklyFocusRing {
+	stroke: var(--editor-focus-ring);
+	stroke-width: 3px;
+}
+
+.blocklyInvalidInput,
+.blocklyInputWarningInvalid {
+	outline: 2px solid var(--editor-danger-border, #c42b1c);
+	outline-offset: 2px;
+}
+
+.blocklyFlyoutButton:focus-visible,
+.blocklyToolboxCategoryContainer:focus-visible,
+.blocklyDialogInput:focus-visible,
+.blocklyDialog button:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+	.injectionDiv {
+		--blockly-active-node-color: Highlight;
+		--blockly-active-tree-color: Highlight;
+	}
+
+	.blocklyDraggable.singular-search-highlight > .blocklyPath,
+	.blocklyDraggable.singular-experimental-block > .blocklyPath,
+	.blocklyInvalidInput,
+	.blocklyInputWarningInvalid {
+		filter: none !important;
+		stroke: Highlight !important;
+		outline-color: Highlight;
+	}
 }
 
 @keyframes pulse-border {

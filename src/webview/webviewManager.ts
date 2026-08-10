@@ -6,6 +6,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { randomBytes } from 'crypto';
 import { log } from '../services/logging';
 import { FileService } from '../services/fileService';
 import { LocaleService } from '../services/localeService';
@@ -43,6 +44,32 @@ const BOARD_MAPPING: Record<string, BoardConfigKey> = {
 	mega: 'mega',
 	supermini: 'supermini',
 };
+
+function createWebviewNonce(): string {
+	return randomBytes(18).toString('base64');
+}
+
+function serializeForInlineScript(value: unknown): string {
+	return JSON.stringify(value)
+		.replace(/</g, '\\u003c')
+		.replace(/>/g, '\\u003e')
+		.replace(/&/g, '\\u0026')
+		.replace(/\u2028/g, '\\u2028')
+		.replace(/\u2029/g, '\\u2029');
+}
+
+function escapeHtml(value: string): string {
+	return value.replace(/[&<>"']/g, character => {
+		const entities: Record<string, string> = {
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;',
+			'"': '&quot;',
+			"'": '&#39;',
+		};
+		return entities[character];
+	});
+}
 
 interface TxtPreviewPayload {
 	txtVirtualControls?: TxtVirtualControlsDocument;
@@ -414,6 +441,10 @@ export class WebViewManager {
 			{
 				enableScripts: true,
 				retainContextWhenHidden: true, // 保持 WebView 內容，避免重新載入
+				localResourceRoots: [
+					vscode.Uri.file(path.join(this.context.extensionPath, 'media')),
+					vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules')),
+				],
 			}
 		);
 
@@ -498,6 +529,7 @@ export class WebViewManager {
 			// 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyEdit.js'));
+			const blocklyRuntimePath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyRuntime.js'));
 			const cyberbrickNameValidationPath = vscode.Uri.file(
 				path.join(this.context.extensionPath, 'media/js/cyberbrickNameValidation.js')
 			);
@@ -512,8 +544,10 @@ export class WebViewManager {
 
 			// 轉換為 WebView 可用的 URI
 			const webview = this.panel!.webview;
+			const nonce = createWebviewNonce();
 			const cssUri = webview.asWebviewUri(cssPath);
 			const jsUri = webview.asWebviewUri(jsPath);
+			const blocklyRuntimeUri = webview.asWebviewUri(blocklyRuntimePath);
 			const cyberbrickNameValidationUri = webview.asWebviewUri(cyberbrickNameValidationPath);
 			const cyberbrickOtaProvisioningStateUri = webview.asWebviewUri(cyberbrickOtaProvisioningStatePath);
 			const txtMOutputValidationUri = webview.asWebviewUri(txtMOutputValidationPath);
@@ -642,6 +676,7 @@ export class WebViewManager {
 
 			// 載入所有支援的語言文件
 			const localeScripts = await this.loadLocaleScripts(webview); // 主題文件
+			const blocklyRuntimeBootstrap = await this.createBlocklyRuntimeBootstrap(webview, 'edit');
 			const singularJsUri = webview.asWebviewUri(
 				vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/themes/singular.js'))
 			);
@@ -685,6 +720,7 @@ export class WebViewManager {
 
 			// 替換所有預留位置
 			htmlContent = htmlContent.replace("currentLanguage: '{vscodeLanguage}'", `currentLanguage: '${blocklyLanguage}'`);
+			htmlContent = htmlContent.replace('{blocklyRuntimeBootstrap}', blocklyRuntimeBootstrap);
 			htmlContent = htmlContent.replace(
 				'<script src="{blocklyCompressedJsUri}"></script>',
 				`<script src="${blocklyCompressedJsUri}"></script>
@@ -734,6 +770,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{langJsUri}', localePath.toString());
 			htmlContent = htmlContent.replace('{msgJsUri}', msgJsPath.toString());
 			htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
+			htmlContent = htmlContent.replace('{blocklyRuntimeUri}', blocklyRuntimeUri.toString());
 			htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{boardConfigsUri}', boardConfigsUri.toString());
@@ -761,6 +798,8 @@ export class WebViewManager {
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);
+			htmlContent = htmlContent.replace(/\{nonce\}/g, nonce);
+			htmlContent = htmlContent.replace(/\{cspSource\}/g, webview.cspSource);
 
 			return htmlContent;
 		} catch (error) {
@@ -820,6 +859,33 @@ export class WebViewManager {
 		const localeScripts = localeFiles.map(file => `<script src="${file.uri}"></script>`).join('\n    ');
 
 		return localeScripts;
+	}
+
+	private async createBlocklyRuntimeBootstrap(webview: vscode.Webview, mode: 'edit' | 'preview'): Promise<string> {
+		const supportedLocales = (await this.localeService.getSupportedLocales()).sort();
+		const localeUris = Object.fromEntries(
+			supportedLocales.map(locale => [
+				locale,
+				webview
+					.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, `node_modules/blockly/msg/${locale}.js`)))
+					.toString(),
+			])
+		);
+		const mediaUri = `${webview
+			.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules/blockly/media')))
+			.toString()
+			.replace(/\/$/, '')}/`;
+		const config = {
+			mode,
+			renderer: 'thrasos',
+			mediaUri,
+			localeUris,
+		};
+		return [
+			`window.BLOCKLY_MEDIA_URL = ${serializeForInlineScript(mediaUri)};`,
+			`window.BLOCKLY_CORE_LOCALE_URIS = ${serializeForInlineScript(localeUris)};`,
+			`window.BLOCKLY_RUNTIME_CONFIG = ${serializeForInlineScript(config)};`,
+		].join('\n        ');
 	}
 
 	/**
@@ -1314,6 +1380,7 @@ export class WebViewManager {
 	private async getPreviewContent(fileName: string): Promise<string> {
 		try {
 			let htmlContent = await this.extensionFileService.readFile('media/html/blocklyPreview.html');
+			const nonce = createWebviewNonce();
 
 			// 使用多語言模板更新 HTML <title> 標籤
 			const localizedWindowTitle = await this.localeService.getLocalizedMessage(
@@ -1321,7 +1388,10 @@ export class WebViewManager {
 				'Blockly Preview - {0}',
 				fileName
 			);
-			htmlContent = htmlContent.replace(/<title[^>]*>[\s\S]*?<\/title>/, `<title id="pageTitle">${localizedWindowTitle}</title>`);
+			htmlContent = htmlContent.replace(
+				/<title[^>]*>[\s\S]*?<\/title>/,
+				`<title id="pageTitle">${escapeHtml(localizedWindowTitle)}</title>`
+			);
 
 			// 取得當前語言和主題設定
 			const localeService = new LocaleService(this.context.extensionPath);
@@ -1343,6 +1413,7 @@ export class WebViewManager {
 			// 準備各種資源 URI
 			const cssPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/blocklyEdit.css'));
 			const jsPath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyPreview.js'));
+			const blocklyRuntimePath = vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blocklyRuntime.js'));
 			const txtVirtualControlsContrastPath = vscode.Uri.file(
 				path.join(this.context.extensionPath, 'media/js/txtVirtualControlsContrast.js')
 			);
@@ -1355,6 +1426,7 @@ export class WebViewManager {
 			// 轉換為 WebView 可用的 URI
 			const cssUri = tempWebview.asWebviewUri(cssPath);
 			const jsUri = tempWebview.asWebviewUri(jsPath);
+			const blocklyRuntimeUri = tempWebview.asWebviewUri(blocklyRuntimePath);
 			const txtVirtualControlsContrastUri = tempWebview.asWebviewUri(txtVirtualControlsContrastPath);
 			const boardConfigsUri = tempWebview.asWebviewUri(boardConfigsPath);
 			const experimentalCssUri = tempWebview.asWebviewUri(experimentalCssPath);
@@ -1482,6 +1554,7 @@ export class WebViewManager {
 
 			// 載入所有支援的語言文件
 			const localeScripts = await this.loadLocaleScripts(tempWebview); // 主題文件
+			const blocklyRuntimeBootstrap = await this.createBlocklyRuntimeBootstrap(tempWebview, 'preview');
 			const singularJsUri = tempWebview.asWebviewUri(
 				vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/themes/singular.js'))
 			);
@@ -1492,14 +1565,15 @@ export class WebViewManager {
 
 			// 替換所有預留位置
 			htmlContent = htmlContent.replace("currentLanguage: '{vscodeLanguage}'", `currentLanguage: '${blocklyLanguage}'`);
+			htmlContent = htmlContent.replace('{blocklyRuntimeBootstrap}', blocklyRuntimeBootstrap);
 			htmlContent = htmlContent.replace(
 				'<script src="{blocklyCompressedJsUri}"></script>',
 				`<script src="${blocklyCompressedJsUri}"></script>
     ${localeScripts}` // 注入語言腳本
 			);
 
-			// 設定檔案名稱
-			htmlContent = htmlContent.replace(/\{fileName\}/g, fileName);
+			// 檔名可能來自工作區；在 inline script 中必須使用 JSON 編碼。
+			htmlContent = htmlContent.replace('{previewFileNameJson}', serializeForInlineScript(fileName));
 			// 更新預覽頁面標題欄為多語言模板
 			const localizedInPageTitle = await this.localeService.getLocalizedMessage(
 				'PREVIEW_WINDOW_TITLE',
@@ -1508,7 +1582,7 @@ export class WebViewManager {
 			);
 			htmlContent = htmlContent.replace(
 				/<div class="preview-title">[\s\S]*?<\/div>/,
-				`<div class="preview-title">${localizedInPageTitle} <span class="preview-badge" id="previewBadge"></span></div>`
+				`<div class="preview-title">${escapeHtml(localizedInPageTitle)} <span class="preview-badge" id="previewBadge"></span></div>`
 			);
 
 			// 替換主題相關 URI
@@ -1527,6 +1601,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{langJsUri}', localePath.toString());
 			htmlContent = htmlContent.replace('{msgJsUri}', msgJsPath.toString());
 			htmlContent = htmlContent.replace('{themeModernJsUri}', themeModernJsUri.toString());
+			htmlContent = htmlContent.replace('{blocklyRuntimeUri}', blocklyRuntimeUri.toString());
 			htmlContent = htmlContent.replace('{arduinoGeneratorUri}', arduinoGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{arduinoBlocksUri}', arduinoBlocksUri.toString());
 			htmlContent = htmlContent.replace('{boardConfigsUri}', boardConfigsUri.toString());
@@ -1551,6 +1626,8 @@ export class WebViewManager {
 
 			// 注入主題偏好
 			htmlContent = htmlContent.replace(/\{theme\}/g, theme);
+			htmlContent = htmlContent.replace(/\{nonce\}/g, nonce);
+			htmlContent = htmlContent.replace(/\{cspSource\}/g, tempWebview.cspSource);
 
 			return htmlContent;
 		} catch (error) {

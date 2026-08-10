@@ -43,10 +43,10 @@ window.isInAllowedContext = function (block) {
 Blockly.Blocks['controls_duration'] = {
 	init: function () {
 		this.appendDummyInput().appendField(window.languageManager.getMessage('DURATION_REPEAT'));
-		this.appendValueInput('DURATION')
+		const durationInput = this.appendValueInput('DURATION')
 			.setCheck('Number')
-			.appendField(window.languageManager.getMessage('DURATION_TIME'))
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">1000</field></shadow>'));
+			.appendField(window.languageManager.getMessage('DURATION_TIME'));
+		durationInput.connection.setShadowState({ type: 'math_number', fields: { NUM: 1000 } });
 		this.appendDummyInput().appendField(window.languageManager.getMessage('DURATION_MS'));
 		this.appendStatementInput('DO').setCheck(null).appendField(window.languageManager.getMessage('DURATION_DO'));
 		this.setInputsInline(true);

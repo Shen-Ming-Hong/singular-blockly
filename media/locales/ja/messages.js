@@ -10,6 +10,8 @@
 
 // Define translations for Japanese
 window.languageManager.loadMessages('ja', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: '設定',
+	BLOCKLY_ARIA_LOCKED_ICON: 'ロック済み',
 	// UI Elements
 	BLOCKS_TAB: 'ブロック',
 	CODE_TAB: 'コード',

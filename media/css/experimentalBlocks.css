@@ -9,30 +9,30 @@
  */
 
 /* 為積木路徑添加虛線邊框樣式 - 通用樣式 */
-.blockly-experimental-block {
+.blocklyDraggable.singular-experimental-block > .blocklyPath {
 	stroke: #ffcc00 !important; /*使用適合亮暗模式的黃色 */
 	filter: drop-shadow(0 0 3px rgba(255, 204, 0, 0.6)) !important; /* 添加黃色發光效果 */
 }
 
 /* 為實驗積木添加流動的虛線效果 */
-.blockly-experimental-block {
+.blocklyDraggable.singular-experimental-block > .blocklyPath {
 	stroke-dasharray: 5, 3 !important; /* 調整虛線間距 */
 	stroke-width: 2.5px !important; /* 線條寬度 */
 	animation: dash-animation 8s linear infinite !important; /* 動畫速度*/
 }
 
 /* 淺色主題下增強對比度 */
-body.theme-light .blockly-experimental-block {
+body.theme-light .blocklyDraggable.singular-experimental-block > .blocklyPath {
 	filter: drop-shadow(0 0 3px rgba(255, 204, 0, 0.7)) !important; /* 增強亮色模式下的發光效果 */
 }
 
 /* 深色主題下增強可見性 */
-body.theme-dark .blockly-experimental-block {
+body.theme-dark .blocklyDraggable.singular-experimental-block > .blocklyPath {
 	filter: drop-shadow(0 0 3px rgba(255, 204, 0, 0.8)) !important; /* 增強暗色模式下的發光效果 */
 }
 
 /* 滑鼠懸停效果 - 增強發光 */
-.blocklyDraggable:hover .blockly-experimental-block {
+.blocklyDraggable.singular-experimental-block:hover > .blocklyPath {
 	filter: drop-shadow(0 0 4px rgba(255, 204, 0, 1)) !important; /* 懸停時增強發光 */
 	stroke-width: 3px !important; /*懸停時線條變粗*/
 }

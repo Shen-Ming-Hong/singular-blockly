@@ -10,6 +10,8 @@
 
 // Define translations for Czech
 window.languageManager.loadMessages('cs', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Nastavení',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Zamčeno',
 	// UI Elements
 	BLOCKS_TAB: 'Bloky',
 	CODE_TAB: 'Kód',

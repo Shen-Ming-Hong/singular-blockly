@@ -81,8 +81,8 @@ if (!window.pinModeTracker) {
 		getLastBlock: function (pin) {
 			const normalizedPin = this.normalizePin(pin);
 			const blockId = this.lastBlockId[normalizedPin];
-			if (blockId && Blockly.getMainWorkspace()) {
-				return Blockly.getMainWorkspace().getBlockById(blockId);
+			if (blockId && window.getBlocklyWorkspace()) {
+				return window.getBlocklyWorkspace().getBlockById(blockId);
 			}
 			return null;
 		},
@@ -102,7 +102,7 @@ if (!window.pinModeTracker) {
 			// 如果有時間戳記錄，使用它
 			if (this.lastUpdateTime[normalizedPin]) {
 				const lastBlockId = this.lastBlockId[normalizedPin];
-				const lastBlock = Blockly.getMainWorkspace().getBlockById(lastBlockId);
+				const lastBlock = window.getBlocklyWorkspace().getBlockById(lastBlockId);
 
 				// 如果找到最後設定的積木且它在當前工作區中，返回它
 				if (lastBlock) {
@@ -116,12 +116,12 @@ if (!window.pinModeTracker) {
 
 		// 獲取所有使用特定腳位的積木
 		getBlocksUsingPin: function (pin) {
-			if (!Blockly.getMainWorkspace()) {
+			if (!window.getBlocklyWorkspace()) {
 				return [];
 			}
 
 			const normalizedPin = this.normalizePin(pin);
-			const blocks = Blockly.getMainWorkspace().getAllBlocks(false);
+			const blocks = window.getBlocklyWorkspace().getAllBlocks(false);
 
 			return blocks.filter(block => {
 				if (
@@ -143,7 +143,7 @@ if (!window.pinModeTracker) {
 
 		// 更新所有使用特定腳位的積木警告
 		updateBlockWarnings: function (pin) {
-			if (!Blockly.getMainWorkspace()) {
+			if (!window.getBlocklyWorkspace()) {
 				return;
 			}
 
@@ -304,7 +304,7 @@ if (!window.pinModeTracker) {
 		// 監聽積木變化事件
 		handleBlockEvent: function (event) {
 			// 如果工作區被銷毀，直接返回
-			if (!Blockly.getMainWorkspace()) {
+			if (!window.getBlocklyWorkspace()) {
 				return;
 			}
 
@@ -313,7 +313,7 @@ if (!window.pinModeTracker) {
 				// 區塊移動後需要重新掃描所有腳位使用情況
 				setTimeout(() => {
 					// 獲取所有與Arduino IO相關的積木
-					const blocks = Blockly.getMainWorkspace()
+					const blocks = window.getBlocklyWorkspace()
 						.getAllBlocks(false)
 						.filter(block =>
 							[
@@ -341,7 +341,7 @@ if (!window.pinModeTracker) {
 			}
 			// 處理積木屬性變更或創建事件
 			else if (event.type === Blockly.Events.BLOCK_CHANGE || event.type === Blockly.Events.BLOCK_CREATE) {
-				const block = Blockly.getMainWorkspace().getBlockById(event.blockId);
+				const block = window.getBlocklyWorkspace().getBlockById(event.blockId);
 				if (block) {
 					if (
 						[
@@ -395,12 +395,12 @@ if (!window.pinModeTracker) {
 
 		// 更新所有積木警告
 		updateAllBlockWarnings: function () {
-			if (!Blockly.getMainWorkspace()) {
+			if (!window.getBlocklyWorkspace()) {
 				return;
 			}
 
 			// 先清除所有積木的警告
-			const blocks = Blockly.getMainWorkspace().getAllBlocks(false);
+			const blocks = window.getBlocklyWorkspace().getAllBlocks(false);
 			blocks.forEach(block => {
 				if (
 					[
@@ -424,9 +424,9 @@ if (!window.pinModeTracker) {
 	};
 
 	// 在工作區變化時添加事件監聽
-	if (Blockly.getMainWorkspace()) {
+	if (window.getBlocklyWorkspace()) {
 		// 添加工作區變化監聽器
-		Blockly.getMainWorkspace().addChangeListener(function (event) {
+		window.getBlocklyWorkspace().addChangeListener(function (event) {
 			if (event.type === Blockly.Events.FINISHED_LOADING) {
 				window.pinModeTracker.reset();
 			}
@@ -462,10 +462,10 @@ Blockly.Blocks['arduino_digital_write'] = {
 				'PIN'
 			);
 
-		this.appendValueInput('VALUE')
+		const valueInput = this.appendValueInput('VALUE')
 			.setCheck(['Boolean', 'Number', 'String'])
-			.appendField(window.languageManager.getMessage('ARDUINO_VALUE'))
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="arduino_level"><field name="LEVEL">LOW</field></shadow>'));
+			.appendField(window.languageManager.getMessage('ARDUINO_VALUE'));
+		valueInput.connection.setShadowState({ type: 'arduino_level', fields: { LEVEL: 'LOW' } });
 
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
@@ -488,10 +488,8 @@ Blockly.Blocks['arduino_digital_write'] = {
 		if (e.type === Blockly.Events.BLOCK_MOVE) {
 			const valueInput = this.getInput('VALUE');
 			if (valueInput && valueInput.connection && !valueInput.connection.targetConnection) {
-				if (!valueInput.connection.shadowDom_) {
-					valueInput.setShadowDom(
-						Blockly.utils.xml.textToDom('<shadow type="arduino_level"><field name="LEVEL">LOW</field></shadow>')
-					);
+				if (!valueInput.connection.getShadowState()) {
+					valueInput.connection.setShadowState({ type: 'arduino_level', fields: { LEVEL: 'LOW' } });
 				}
 			}
 		}
@@ -562,12 +560,10 @@ Blockly.Blocks['arduino_analog_write'] = {
 				'PIN'
 			);
 
-		this.appendValueInput('VALUE')
+		const valueInput = this.appendValueInput('VALUE')
 			.setCheck(['Number', 'String'])
-			.appendField(window.languageManager.getMessage('ARDUINO_VALUE'))
-			.setShadowDom(
-				Blockly.utils.xml.textToDom(`<shadow type="math_number"><field name="NUM">${range.defaultValue}</field></shadow>`)
-			);
+			.appendField(window.languageManager.getMessage('ARDUINO_VALUE'));
+		valueInput.connection.setShadowState({ type: 'math_number', fields: { NUM: range.defaultValue } });
 
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
@@ -605,10 +601,8 @@ Blockly.Blocks['arduino_analog_write'] = {
 			const valueInput = this.getInput('VALUE');
 			if (valueInput && valueInput.connection && !valueInput.connection.targetConnection) {
 				const range = window.getAnalogOutputRange();
-				if (!valueInput.connection.shadowDom_) {
-					valueInput.setShadowDom(
-						Blockly.utils.xml.textToDom(`<shadow type="math_number"><field name="NUM">${range.defaultValue}</field></shadow>`)
-					);
+				if (!valueInput.connection.getShadowState()) {
+					valueInput.connection.setShadowState({ type: 'math_number', fields: { NUM: range.defaultValue } });
 				}
 			}
 		}
@@ -746,7 +740,13 @@ Blockly.Blocks['arduino_pullup'] = {
 // ESP32 PWM 設定積木
 Blockly.Blocks['esp32_pwm_setup'] = {
 	init: function () {
-		this.appendDummyInput().appendField('⚙️').appendField(window.languageManager.getMessage('ESP32_PWM_SETUP', 'ESP32 PWM 設定'));
+		const configurationIcon = new Blockly.FieldLabel('⚙️');
+		configurationIcon.setAriaTypeName(
+			window.languageManager.getMessage('BLOCKLY_ARIA_CONFIGURATION_ICON', 'Configuration')
+		);
+		this.appendDummyInput()
+			.appendField(configurationIcon)
+			.appendField(window.languageManager.getMessage('ESP32_PWM_SETUP', 'ESP32 PWM 設定'));
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_PWM_FREQUENCY', '頻率'))
@@ -883,10 +883,10 @@ Blockly.Blocks['seven_segment_display'] = {
 				]),
 				'TYPE'
 			);
-		this.appendValueInput('NUMBER')
+		const numberInput = this.appendValueInput('NUMBER')
 			.setCheck('Number')
-			.appendField(window.languageManager.getMessage('SEVEN_SEGMENT_NUMBER'))
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">0</field></shadow>'));
+			.appendField(window.languageManager.getMessage('SEVEN_SEGMENT_NUMBER'));
+		numberInput.connection.setShadowState({ type: 'math_number', fields: { NUM: 0 } });
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('SEVEN_SEGMENT_DECIMAL_POINT'))
 			.appendField(new Blockly.FieldCheckbox('FALSE'), 'DECIMAL_POINT');
@@ -968,16 +968,18 @@ Blockly.Blocks['threshold_function_setup'] = {
 				}),
 				'PIN'
 			);
-		this.appendValueInput('THRESHOLD')
+		const thresholdInput = this.appendValueInput('THRESHOLD')
 			.setCheck('Number')
-			.appendField(window.languageManager.getMessage('THRESHOLD_VALUE'))
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">450</field></shadow>'));
-		this.appendValueInput('HIGH_VALUE')
-			.appendField(window.languageManager.getMessage('THRESHOLD_HIGH_VALUE'))
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">1</field></shadow>'));
-		this.appendValueInput('LOW_VALUE')
-			.appendField(window.languageManager.getMessage('THRESHOLD_LOW_VALUE'))
-			.setShadowDom(Blockly.utils.xml.textToDom('<shadow type="math_number"><field name="NUM">0</field></shadow>'));
+			.appendField(window.languageManager.getMessage('THRESHOLD_VALUE'));
+		thresholdInput.connection.setShadowState({ type: 'math_number', fields: { NUM: 450 } });
+		const highValueInput = this.appendValueInput('HIGH_VALUE').appendField(
+			window.languageManager.getMessage('THRESHOLD_HIGH_VALUE')
+		);
+		highValueInput.connection.setShadowState({ type: 'math_number', fields: { NUM: 1 } });
+		const lowValueInput = this.appendValueInput('LOW_VALUE').appendField(
+			window.languageManager.getMessage('THRESHOLD_LOW_VALUE')
+		);
+		lowValueInput.connection.setShadowState({ type: 'math_number', fields: { NUM: 0 } });
 		this.setInputsInline(true);
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
@@ -994,7 +996,7 @@ Blockly.Blocks['threshold_function_read'] = {
 		this.appendDummyInput().appendField(
 			new Blockly.FieldDropdown(() => {
 				// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-				const workspace = this.workspace || Blockly.getMainWorkspace();
+				const workspace = this.workspace;
 				if (!workspace) {
 					log.info('無法取得工作區，返回預設選項 Func0');
 					return [['Func0', 'Func0']];
@@ -1071,6 +1073,28 @@ Blockly.Blocks['threshold_function_read'] = {
 			}
 		} else {
 			log.warn('threshold_function_read: 變異資料中沒有找到函式名稱');
+		}
+	},
+
+	// Blockly 13 JSON persistence path; XML mutation methods above are legacy import-only.
+	saveExtraState: function () {
+		return {
+			func: this.getFieldValue('FUNC') || this.restoredFuncValue || 'Func0',
+		};
+	},
+
+	loadExtraState: function (state) {
+		const func = typeof state?.func === 'string' && state.func ? state.func : 'Func0';
+		this.restoredFuncValue = func;
+		const field = this.getField('FUNC');
+		if (field) {
+			try {
+				field.setValue(func);
+			} catch (error) {
+				this.restoredFuncValue = 'Func0';
+				field.setValue('Func0');
+				log.warn(`threshold_function_read: JSON 狀態中的函式名稱 "${func}" 無效，改用預設值`, error);
+			}
 		}
 	},
 

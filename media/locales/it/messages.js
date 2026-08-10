@@ -10,6 +10,8 @@
 
 // Define translations for Italian
 window.languageManager.loadMessages('it', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Configurazione',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Bloccato',
 	// UI Elements
 	BLOCKS_TAB: 'Blocchi',
 	CODE_TAB: 'Codice',

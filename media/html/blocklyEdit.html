@@ -9,25 +9,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src {cspSource} data:; media-src {cspSource}; style-src {cspSource} 'unsafe-inline'; script-src {cspSource} 'nonce-{nonce}'; connect-src {cspSource};">
     <title>Blockly Edit</title>
     <link rel="stylesheet" href="{cssUri}">
     <link rel="stylesheet" href="{experimentalCssUri}">
     <link rel="stylesheet" href="{shadowBlockCssUri}">
-    <script>window.TOOLBOX_URL = '{toolboxUri}';</script>
-    <script>window.CYBERBRICK_TOOLBOX_URL = '{cyberbrickToolboxUri}';</script>
-    <script>window.TXT_TOOLBOX_URL = '{txtToolboxUri}';</script>
-    <script>
+    <script nonce="{nonce}">window.TOOLBOX_URL = '{toolboxUri}';</script>
+    <script nonce="{nonce}">window.CYBERBRICK_TOOLBOX_URL = '{cyberbrickToolboxUri}';</script>
+    <script nonce="{nonce}">window.TXT_TOOLBOX_URL = '{txtToolboxUri}';</script>
+    <script nonce="{nonce}">{blocklyRuntimeBootstrap}</script>
+    <script nonce="{nonce}">
         // 設定初始主題
         window.initialTheme = '{theme}' || 'light';
 
         window.languageManager = {
             currentLanguage: '{vscodeLanguage}', // 將由 extension.ts 注入
+            appliedLanguage: '{vscodeLanguage}',
             messages: {},
+            requestSequence: 0,
+            switchQueue: Promise.resolve(),
             loadMessages: function (locale, messages) {
                 this.messages[locale] = messages;
 
-                // 自動同步翻譯到 Blockly.Msg
-                this.syncToBlocklyMsg(locale, messages);
+                // 初始語系的專案訊息覆寫官方 core；其他語系只先快取。
+                if (locale === this.currentLanguage) {
+                    this.syncToBlocklyMsg(locale, messages);
+                }
 
                 // 觸發語言檔案載入事件
                 window.dispatchEvent(new CustomEvent('messageLoaded', {
@@ -39,24 +46,66 @@
                 return messages[key] || defaultValue || key;
             },
             setLanguage: function (locale) {
-                // 檢查語言檔案是否已載入
                 if (!this.messages[locale]) {
                     console.warn(`Language ${locale} not loaded yet`);
-                    return;
+                    return Promise.resolve(false);
                 }
-                this.currentLanguage = locale;
-
-                // 切換語言時也同步翻譯到 Blockly.Msg
-                this.syncToBlocklyMsg(locale, this.messages[locale]);
-
-                // 觸發語言變更事件
-                window.dispatchEvent(new CustomEvent('languageChanged', {
-                    detail: { language: locale }
-                }));
-                // 重新渲染工作區
-                if (Blockly && Blockly.getMainWorkspace()) {
-                    Blockly.getMainWorkspace().render();
-                }
+                const request = ++this.requestSequence;
+                const runSwitch = async () => {
+                    if (request !== this.requestSequence) {
+                        return false;
+                    }
+                    if (locale === this.currentLanguage && locale === this.appliedLanguage) {
+                        return true;
+                    }
+                    const previousLanguage = this.currentLanguage;
+                    try {
+                        this.appliedLanguage = null;
+                        const applied = await window.blocklyRuntime.applyLocale(locale, this.messages[locale]);
+                        if (applied) {
+                            this.appliedLanguage = locale;
+                        }
+                        if (!applied || request !== this.requestSequence) {
+                            return false;
+                        }
+                        this.currentLanguage = locale;
+                        if (typeof window.rebuildBlocklyForLanguage === 'function') {
+                            await window.rebuildBlocklyForLanguage();
+                        }
+                        if (request !== this.requestSequence) {
+                            return false;
+                        }
+                        window.dispatchEvent(new CustomEvent('languageChanged', {
+                            detail: { language: locale, previousLanguage: previousLanguage }
+                        }));
+                        return true;
+                    } catch (error) {
+                        if (request !== this.requestSequence) {
+                            return false;
+                        }
+                        this.currentLanguage = previousLanguage;
+                        this.appliedLanguage = null;
+                        try {
+                            const restored = await window.blocklyRuntime.applyLocale(
+                                previousLanguage,
+                                this.messages[previousLanguage]
+                            );
+                            if (restored) {
+                                this.appliedLanguage = previousLanguage;
+                            }
+                            if (restored && request === this.requestSequence && typeof window.rebuildBlocklyForLanguage === 'function') {
+                                await window.rebuildBlocklyForLanguage();
+                            }
+                        } catch (rollbackError) {
+                            console.warn(`Language rollback to ${previousLanguage} failed`, rollbackError);
+                        }
+                        console.warn(`Language switch to ${locale} failed and was rolled back`, error);
+                        return false;
+                    }
+                };
+                const switchResult = this.switchQueue.then(runSwitch, runSwitch);
+                this.switchQueue = switchResult.catch(() => false);
+                return switchResult;
             }, syncToBlocklyMsg: function (locale, messages) {
                 // 確保 Blockly 和 Blockly.Msg 已經定義
                 if (typeof Blockly !== 'undefined' && Blockly.Msg) {
@@ -647,10 +696,13 @@
     <script src="{blocksCompressedJsUri}"></script>
     <script src="{javascriptCompressedJsUri}"></script>
     <script src="{msgJsUri}"></script>
+    <script nonce="{nonce}">window.BLOCKLY_INITIAL_CORE_MESSAGES = { ...Blockly.Msg };</script>
     <script src="{langJsUri}"></script>
     <script src="{themeModernJsUri}"></script>
+    <script nonce="{nonce}">window.BlocklyModernTheme = window.default; delete window.default;</script>
     <script src="{themesUri}/singular.js"></script>
     <script src="{themesUri}/singularDark.js"></script>
+    <script src="{blocklyRuntimeUri}"></script>
     <script src="{arduinoGeneratorUri}"></script>
     <script src="{micropythonGeneratorUri}"></script>
     <script src="{txtGeneratorUri}"></script>

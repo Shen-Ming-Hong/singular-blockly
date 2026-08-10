@@ -10,6 +10,8 @@
 
 // Define translations for Polish
 window.languageManager.loadMessages('pl', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Konfiguracja',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Zablokowano',
 	// UI Elements
 	BLOCKS_TAB: 'Bloki',
 	CODE_TAB: 'Kod',

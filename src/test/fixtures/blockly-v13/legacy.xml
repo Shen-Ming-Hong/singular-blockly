@@ -1,0 +1,24 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable id="legacy-counter">counter</variable>
+  </variables>
+  <block type="arduino_setup_loop" id="legacy-root" x="24" y="24" deletable="false">
+    <statement name="SETUP">
+      <block type="variables_set" id="legacy-set-counter">
+        <field name="VAR" id="legacy-counter">counter</field>
+        <value name="VALUE">
+          <shadow type="math_number" id="legacy-number-shadow">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+    </statement>
+  </block>
+  <block type="arduino_function" id="legacy-locked-function" x="360" y="24" deletable="false" movable="false" editable="false">
+    <mutation locked="1">
+      <arg name="次數" type="int"></arg>
+    </mutation>
+    <field name="NAME">閃爍</field>
+  </block>
+  <block type="controls_if" id="legacy-orphan" x="720" y="24"></block>
+</xml>

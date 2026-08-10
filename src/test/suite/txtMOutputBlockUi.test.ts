@@ -49,9 +49,13 @@ suite('TXT M Output Block UI Tests', () => {
 
 		assert.match(source, /TXT_M_OUTPUT_DEFAULT_VALUE\s*=\s*512/, '預設數字應為 512');
 		assert.match(source, /setTxtMOutputDefaultNumberShadow\(valueInput, shadowValue\)/, '重建 SPEED input 時應補上預設數字 shadow');
-		assert.match(source, /setShadowDom\(createTxtMOutputDefaultNumberShadow\(value\)\)/, '應透過 Blockly shadow DOM 顯示預設數字積木');
+		assert.match(
+			source,
+			/setShadowState\(createTxtMOutputDefaultNumberShadowState\(value\)\)/,
+			'應透過 Blockly 13 JSON shadow state 顯示預設數字積木'
+		);
 		assert.match(source, /math_number/, '預設 shadow 應使用 math_number');
-		assert.match(source, /field name=["']NUM["']/, '預設 shadow 應設定 NUM 欄位');
+		assert.match(source, /fields:\s*\{\s*NUM:\s*numericValue\s*\}/, '預設 shadow 應設定 NUM 欄位');
 		assert.match(source, /\.setCheck\(['"]Number['"]\)/, 'SPEED 仍應是 Number value input，可接受數字或數值型輸出積木');
 	});
 

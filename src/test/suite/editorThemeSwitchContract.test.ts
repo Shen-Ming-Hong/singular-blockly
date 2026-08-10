@@ -24,8 +24,8 @@ describe('Editor theme runtime switch contract', () => {
 
 		assert(updateThemeBody.includes("document.body.classList.remove('theme-light', 'theme-dark')"));
 		assert(updateThemeBody.includes('document.body.classList.add(`theme-${theme}`)'));
-		assert(updateThemeBody.includes('Blockly.getMainWorkspace().setTheme(window.SingularBlocklyDarkTheme)'));
-		assert(updateThemeBody.includes('Blockly.getMainWorkspace().setTheme(window.SingularBlocklyTheme)'));
+		assert(updateThemeBody.includes('window.getBlocklyWorkspace().setTheme(window.SingularBlocklyDarkTheme)'));
+		assert(updateThemeBody.includes('window.getBlocklyWorkspace().setTheme(window.SingularBlocklyTheme)'));
 		assert(updateThemeBody.includes('refreshTxtVirtualControlsUI()'));
 		assertNoWebViewReloadAntipatterns(updateThemeBody, 'blocklyEdit.js updateTheme(theme)');
 	});
