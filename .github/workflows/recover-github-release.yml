@@ -1,0 +1,137 @@
+name: Recover GitHub Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing annotated vX.Y.Z tag to recover
+        required: true
+        type: string
+      source_run_id:
+        description: Failed Publish VS Code Extension run containing the shared artifact
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-release-recovery-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    name: Recover GitHub Release from shared artifact
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    permissions:
+      actions: read
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Validate recovery inputs
+        shell: bash
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Invalid release tag: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          if [[ ! "$SOURCE_RUN_ID" =~ ^[1-9][0-9]*$ ]]; then
+            echo "Invalid source run ID: $SOURCE_RUN_ID" >&2
+            exit 1
+          fi
+
+      - name: Confirm source is a failed publish run
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" > source-run.json
+          jq -e '.name == "Publish VS Code Extension" and .conclusion == "failure"' source-run.json
+
+      - name: Checkout release tag and tags
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.release_tag }}
+          fetch-depth: 0
+
+      - name: Restore annotated release tag object
+        shell: bash
+        run: git fetch --force --no-tags origin "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
+
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.16.0
+
+      - name: Verify release metadata
+        id: metadata
+        run: npm run release:prepare -- --verify-tag
+
+      - name: Download shared artifact from failed run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ steps.metadata.outputs.artifact-name }}
+          path: release-artifacts
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.source_run_id }}
+
+      - name: Verify shared artifact
+        shell: bash
+        env:
+          VERSION: ${{ steps.metadata.outputs.version }}
+          VSIX_NAME: ${{ steps.metadata.outputs.vsix-name }}
+          CHECKSUM_NAME: ${{ steps.metadata.outputs.checksum-name }}
+        run: |
+          cd release-artifacts
+          unzip -tqq "$VSIX_NAME"
+          sha256sum --check "$CHECKSUM_NAME"
+          jq -e \
+            --arg tag "$RELEASE_TAG" \
+            --arg version "$VERSION" \
+            --arg vsix "$VSIX_NAME" \
+            --arg checksum "$CHECKSUM_NAME" \
+            '.tag == $tag and .version == $version and .vsix == $vsix and .checksumFile == $checksum' \
+            release-metadata.json
+
+      - name: Publish GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VSIX_NAME: ${{ steps.metadata.outputs.vsix-name }}
+          CHECKSUM_NAME: ${{ steps.metadata.outputs.checksum-name }}
+        run: |
+          if gh release view "$RELEASE_TAG" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" \
+              "release-artifacts/$VSIX_NAME" \
+              "release-artifacts/$CHECKSUM_NAME" \
+              --clobber
+            gh release edit "$RELEASE_TAG" \
+              --title "Singular Blockly $RELEASE_TAG" \
+              --notes-file release-artifacts/release-notes.md \
+              --latest
+          else
+            gh release create "$RELEASE_TAG" \
+              "release-artifacts/$VSIX_NAME" \
+              "release-artifacts/$CHECKSUM_NAME" \
+              --verify-tag \
+              --title "Singular Blockly $RELEASE_TAG" \
+              --notes-file release-artifacts/release-notes.md \
+              --latest
+          fi
+
+      - name: Verify GitHub Release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VSIX_NAME: ${{ steps.metadata.outputs.vsix-name }}
+          CHECKSUM_NAME: ${{ steps.metadata.outputs.checksum-name }}
+        run: |
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' > release-assets.txt
+          grep -Fx "$VSIX_NAME" release-assets.txt
+          grep -Fx "$CHECKSUM_NAME" release-assets.txt

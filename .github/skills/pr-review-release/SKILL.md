@@ -190,6 +190,16 @@ gh workflow run publish.yml --ref master -f release_tag=v{VERSION}
 
 手動 run 仍必須驗證 tag 格式、annotated object、tag 指向的 commit、版本檔與雙語 CHANGELOG，並從該 tag checkout 建置唯一 VSIX。
 
+若 Marketplace 與 Open VSX 已成功，但 GitHub Release 因 workflow 缺陷失敗，不得建立新 VSIX 或重發市集。先用 PR 修正 workflow，再以原失敗 run 的同一 artifact 只補 GitHub Release：
+
+```bash
+gh workflow run recover-github-release.yml --ref master \
+  -f release_tag=v{VERSION} \
+  -f source_run_id={FAILED_RUN_ID}
+```
+
+GitHub Release 復原 workflow 必須驗證來源是失敗的正式發布 run，並重新驗證 annotated tag、release metadata、VSIX archive 與 SHA-256。
+
 市集的第一次 publish 必須嚴格拒絕重複版本；只有 `github.run_attempt > 1` 的重跑 job 可使用 `--skip-duplicate`，以復原伺服器已接受但 runner 未取得成功回應的情況。
 
 ### 5.4 驗證三個發布端
