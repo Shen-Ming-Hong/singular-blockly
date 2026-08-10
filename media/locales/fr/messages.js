@@ -10,6 +10,8 @@
 
 // Define translations for French
 window.languageManager.loadMessages('fr', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Configuration',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Verrouillé',
 	// UI Elements
 	BLOCKS_TAB: 'Blocs',
 	CODE_TAB: 'Code',

@@ -10,6 +10,8 @@
 
 // Define translations for German
 window.languageManager.loadMessages('de', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Konfiguration',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Gesperrt',
 	// UI Elements
 	BLOCKS_TAB: 'Blöcke',
 	CODE_TAB: 'Code',

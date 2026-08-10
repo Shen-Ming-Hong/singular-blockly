@@ -45,8 +45,9 @@ describe('WebView Manager', () => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src {cspSource}; script-src {cspSource} 'nonce-{nonce}'; connect-src {cspSource};">
             <title>Blockly Edit</title>
-            <script>
+            <script nonce="{nonce}">
                 // 設定初始主題
                 window.initialTheme = '{theme}' || 'light';
                 window.languageManager = {
@@ -54,12 +55,14 @@ describe('WebView Manager', () => {
                 };
             </script>
             <link rel="stylesheet" href="{cssUri}">
+            <script nonce="{nonce}">{blocklyRuntimeBootstrap}</script>
             <script src="{blocklyCompressedJsUri}"></script>
             <script src="{langJsUri}"></script>
             <script src="{msgJsUri}"></script>
             <script src="{blocksCompressedJsUri}"></script>
             <script src="{javascriptCompressedJsUri}"></script>
             <script src="{themeModernJsUri}"></script>
+            <script src="{blocklyRuntimeUri}"></script>
             <script src="{arduinoGeneratorUri}"></script>
             {arduinoModules}
             <script src="{arduinoBlocksUri}"></script>
@@ -186,6 +189,34 @@ describe('WebView Manager', () => {
 		const createArgs = vscodeMock.window.createWebviewPanel.getCall(0).args;
 		assert.strictEqual(createArgs[0], 'blocklyEdit');
 		assert.strictEqual(createArgs[1], 'Blockly Edit');
+	});
+
+	it('should inject editor Blockly runtime, packaged media, and all core locale URIs', async () => {
+		const locales = ['bg', 'cs', 'de', 'en', 'es', 'fr', 'hu', 'it', 'ja', 'ko', 'pl', 'pt-br', 'ru', 'tr', 'zh-hant'];
+		for (const locale of locales) {
+			fsMock.addDirectory(path.join(extensionPath, 'media', 'locales', locale));
+		}
+
+		await webViewManager.createAndShowWebView();
+
+		const panel: any = vscodeMock.window.createWebviewPanel.getCall(0).returnValue;
+		const html = panel.webview.html as string;
+		assert(html.includes('window.BLOCKLY_RUNTIME_CONFIG ='));
+		assert(html.includes('"mode":"edit"'));
+		assert(html.includes('"renderer":"thrasos"'));
+		assert(html.includes('node_modules/blockly/media/'));
+		assert(html.includes('media/js/blocklyRuntime.js'));
+		assert.match(html, /script-src vscode-webview: 'nonce-[A-Za-z0-9+/=]+'/);
+		assert(html.includes('style-src vscode-webview:'));
+		assert(html.includes('connect-src vscode-webview:'));
+		assert.match(html, /<script nonce="[A-Za-z0-9+/=]+">/);
+		for (const locale of locales) {
+			assert(html.includes(`node_modules/blockly/msg/${locale}.js`), `missing core locale URI for ${locale}`);
+		}
+		assert(!html.includes('{blocklyRuntimeBootstrap}'));
+		assert(!html.includes('{blocklyRuntimeUri}'));
+		assert(!html.includes('{cspSource}'));
+		assert(!html.includes('{nonce}'));
 	});
 
 	it('should reveal existing panel instead of creating new one', async () => {

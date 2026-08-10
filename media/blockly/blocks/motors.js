@@ -35,7 +35,7 @@ Blockly.Blocks['servo_move'] = {
 			.appendField(
 				new Blockly.FieldDropdown(() => {
 					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-					const workspace = this.workspace || Blockly.getMainWorkspace();
+					const workspace = this.workspace;
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myServo');
 						return [['myServo', 'myServo']];
@@ -155,7 +155,7 @@ Blockly.Blocks['servo_stop'] = {
 			.appendField(
 				new Blockly.FieldDropdown(() => {
 					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-					const workspace = this.workspace || Blockly.getMainWorkspace();
+					const workspace = this.workspace;
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myServo');
 						return [['myServo', 'myServo']];
@@ -222,6 +222,24 @@ Blockly.Blocks['servo_stop'] = {
 			this.getField('VAR').setValue(servo);
 		} else {
 			log.warn('servo_stop: 變異資料中沒有找到馬達名稱');
+		}
+	},
+
+	// Blockly 13 JSON persistence path; XML mutation methods above are legacy import-only.
+	saveExtraState: function () {
+		return {
+			servo: this.getFieldValue('VAR') || this.restoredServoValue || 'myServo',
+		};
+	},
+
+	loadExtraState: function (state) {
+		if (typeof state?.servo !== 'string' || !state.servo) {
+			return;
+		}
+		this.restoredServoValue = state.servo;
+		const field = this.getField('VAR');
+		if (field) {
+			field.setValue(state.servo);
 		}
 	},
 };
@@ -374,7 +392,7 @@ Blockly.Blocks['encoder_read'] = {
 			.appendField(
 				new Blockly.FieldDropdown(() => {
 					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-					const workspace = this.workspace || Blockly.getMainWorkspace();
+					const workspace = this.workspace;
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myEncoder');
 						return [['myEncoder', 'myEncoder']];
@@ -481,7 +499,7 @@ Blockly.Blocks['encoder_reset'] = {
 			.appendField(
 				new Blockly.FieldDropdown(() => {
 					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-					const workspace = this.workspace || Blockly.getMainWorkspace();
+					const workspace = this.workspace;
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myEncoder');
 						return [['myEncoder', 'myEncoder']];
@@ -592,7 +610,7 @@ Blockly.Blocks['encoder_pid_setup'] = {
 			.appendField(
 				new Blockly.FieldDropdown(() => {
 					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-					const workspace = this.workspace || Blockly.getMainWorkspace();
+					const workspace = this.workspace;
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myEncoder');
 						return [['myEncoder', 'myEncoder']];
@@ -740,7 +758,7 @@ Blockly.Blocks['encoder_pid_compute'] = {
 			.appendField(
 				new Blockly.FieldDropdown(() => {
 					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-					const workspace = this.workspace || Blockly.getMainWorkspace();
+					const workspace = this.workspace;
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myPID');
 						return [['myPID', 'myPID']];
@@ -858,7 +876,7 @@ Blockly.Blocks['encoder_pid_reset'] = {
 			.appendField(
 				new Blockly.FieldDropdown(() => {
 					// 取得工作區 - 使用箭頭函數時 this 指向 Block 物件
-					const workspace = this.workspace || Blockly.getMainWorkspace();
+					const workspace = this.workspace;
 					if (!workspace) {
 						log.info('無法取得工作區，返回預設選項 myPID');
 						return [['myPID', 'myPID']];

@@ -482,9 +482,16 @@
 
 	// ── Functions ─────────────────────────────────────────────────────────────
 
+	function getProcedureVariableNames(block) {
+		if (!block || typeof block.getVarModels !== 'function') {
+			return [];
+		}
+		return block.getVarModels().map(variable => variable.name);
+	}
+
 	g.forBlock['procedures_defnoreturn'] = function (block) {
 		const funcName = g.nameDB_.getName(block.getFieldValue('NAME'), Blockly.PROCEDURE_CATEGORY_NAME);
-		const args = block.getVars().map(v => g.nameDB_.getName(v, Blockly.VARIABLE_CATEGORY_NAME));
+		const args = getProcedureVariableNames(block).map(name => g.nameDB_.getName(name, Blockly.VARIABLE_CATEGORY_NAME));
 
 		const prevFunc = g.currentFunction_;
 		g.currentFunction_ = funcName;
@@ -506,7 +513,7 @@
 
 	g.forBlock['procedures_defreturn'] = function (block) {
 		const funcName = g.nameDB_.getName(block.getFieldValue('NAME'), Blockly.PROCEDURE_CATEGORY_NAME);
-		const args = block.getVars().map(v => g.nameDB_.getName(v, Blockly.VARIABLE_CATEGORY_NAME));
+		const args = getProcedureVariableNames(block).map(name => g.nameDB_.getName(name, Blockly.VARIABLE_CATEGORY_NAME));
 
 		const prevFunc = g.currentFunction_;
 		g.currentFunction_ = funcName;
@@ -529,13 +536,13 @@
 
 	g.forBlock['procedures_callnoreturn'] = function (block) {
 		const funcName = g.nameDB_.getName(block.getFieldValue('NAME'), Blockly.PROCEDURE_CATEGORY_NAME);
-		const args = block.getVars().map((_, i) => g.valueToCode(block, 'ARG' + i, g.ORDER_NONE) || 'None');
+		const args = getProcedureVariableNames(block).map((_, i) => g.valueToCode(block, 'ARG' + i, g.ORDER_NONE) || 'None');
 		return funcName + '(' + args.join(', ') + ')\n';
 	};
 
 	g.forBlock['procedures_callreturn'] = function (block) {
 		const funcName = g.nameDB_.getName(block.getFieldValue('NAME'), Blockly.PROCEDURE_CATEGORY_NAME);
-		const args = block.getVars().map((_, i) => g.valueToCode(block, 'ARG' + i, g.ORDER_NONE) || 'None');
+		const args = getProcedureVariableNames(block).map((_, i) => g.valueToCode(block, 'ARG' + i, g.ORDER_NONE) || 'None');
 		return [funcName + '(' + args.join(', ') + ')', g.ORDER_FUNCTION_CALL];
 	};
 

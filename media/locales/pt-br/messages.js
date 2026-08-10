@@ -10,6 +10,8 @@
 
 // Define translations for Brazilian Portuguese
 window.languageManager.loadMessages('pt-br', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Configuração',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Bloqueado',
 	// UI Elements
 	BLOCKS_TAB: 'Blocos',
 	CODE_TAB: 'Código',

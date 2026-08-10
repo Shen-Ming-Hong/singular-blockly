@@ -10,6 +10,8 @@
 
 // Define translations for Hungarian
 window.languageManager.loadMessages('hu', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Beállítás',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Zárolt',
 	// UI Elements
 	BLOCKS_TAB: 'Blokkok',
 	CODE_TAB: 'Kód',

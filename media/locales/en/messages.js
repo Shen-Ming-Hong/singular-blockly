@@ -10,6 +10,8 @@
 
 // Define translations for English
 window.languageManager.loadMessages('en', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Configuration',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Locked',
 	// UI Elements
 	BLOCKS_TAB: 'Blocks',
 	CODE_TAB: 'Code',

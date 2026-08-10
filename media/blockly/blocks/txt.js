@@ -102,16 +102,16 @@ function getTxtMOutputShadowValue(block) {
 	return normalizeTxtMOutputDefaultNumber(block.getFieldValue('NUM'));
 }
 
-function createTxtMOutputDefaultNumberShadow(value = TXT_M_OUTPUT_DEFAULT_VALUE) {
+function createTxtMOutputDefaultNumberShadowState(value = TXT_M_OUTPUT_DEFAULT_VALUE) {
 	const numericValue = normalizeTxtMOutputDefaultNumber(value);
-	return Blockly.utils.xml.textToDom(`<shadow type="math_number"><field name="NUM">${numericValue}</field></shadow>`);
+	return { type: 'math_number', fields: { NUM: numericValue } };
 }
 
 function setTxtMOutputDefaultNumberShadow(valueInput, value = TXT_M_OUTPUT_DEFAULT_VALUE) {
-	if (!valueInput || typeof valueInput.setShadowDom !== 'function') {
+	if (!valueInput?.connection || typeof valueInput.connection.setShadowState !== 'function') {
 		return;
 	}
-	valueInput.setShadowDom(createTxtMOutputDefaultNumberShadow(value));
+	valueInput.connection.setShadowState(createTxtMOutputDefaultNumberShadowState(value));
 }
 
 function updateTxtMOutputShape(block, componentValue) {

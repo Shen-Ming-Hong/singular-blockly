@@ -40,6 +40,8 @@ const targetLanguages = validateAll
 	? ['ja', 'ko', 'de', 'zh-hant', 'es', 'fr', 'it', 'pl', 'pt-br', 'ru', 'tr', 'cs', 'hu', 'bg']
 	: [languageArg.split('=')[1]];
 
+const REQUIRED_PROJECT_ARIA_KEYS = ['BLOCKLY_ARIA_CONFIGURATION_ICON', 'BLOCKLY_ARIA_LOCKED_ICON'];
+
 /**
  * Check if translation preserves all placeholders from English source
  */
@@ -231,6 +233,26 @@ function validateLanguage(lang) {
 				},
 			],
 		};
+	}
+
+	for (const key of REQUIRED_PROJECT_ARIA_KEYS) {
+		if (typeof translatedMessages[key] !== 'string' || translatedMessages[key].trim().length === 0) {
+			allIssues.push({
+				type: 'missingAriaTranslation',
+				message: 'Required Blockly accessibility announcement is missing',
+				key,
+				lang,
+			});
+		}
+	}
+
+	const coreLocalePath = path.join(__dirname, `../../node_modules/blockly/msg/${lang}.js`);
+	if (!fs.existsSync(coreLocalePath)) {
+		allIssues.push({
+			type: 'missingBlocklyCoreLocale',
+			message: `Packaged Blockly core locale does not exist: ${coreLocalePath}`,
+			lang,
+		});
 	}
 
 	// Validate each translation key

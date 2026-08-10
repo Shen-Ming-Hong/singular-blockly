@@ -124,7 +124,7 @@ window.experimentalBlocksNotice = {
 		// 檢查是否有實驗積木
 		if (window.experimentalBlocks && window.experimentalBlocks.length > 0) {
 			// 檢查工作區中是否實際使用了實驗積木
-			const workspace = Blockly.getMainWorkspace();
+			const workspace = window.getBlocklyWorkspace();
 			if (workspace) {
 				const blocks = workspace.getAllBlocks();
 				const hasExperimentalBlock = blocks.some(block => window.experimentalBlocks.includes(block.type));
@@ -445,13 +445,14 @@ window.updateExperimentalBlocksList = function (workspace) {
 
 // 收集工具箱中的實驗積木，添加到實驗積木清單，並立即標記這些積木
 window.collectExperimentalBlocksFromFlyout = function () {
-	if (!Blockly || !Blockly.getMainWorkspace() || !Blockly.getMainWorkspace().getFlyout) {
+	const workspace = window.getBlocklyWorkspace();
+	if (!workspace || typeof workspace.getFlyout !== 'function') {
 		return;
 	}
 
 	try {
 		// 嘗試獲取工作區的飛出面板（工具箱）
-		const flyout = Blockly.getMainWorkspace().getFlyout();
+		const flyout = workspace.getFlyout();
 		if (!flyout) {
 			return;
 		}
@@ -550,15 +551,10 @@ class ExperimentalBlockMarker {
 			return; // 如果已經標記過或參數無效，直接返回
 		}
 
-		// 添加特殊樣式到積木本身，使用流動的黃色虛線邊框
+		// 僅在公開的 block SVG root 套用 app-owned class。
 		try {
-			const pathElement = blockSvg.querySelector('.blocklyPath');
-			if (pathElement) {
-				pathElement.classList.add('blockly-experimental-block');
-				expLog.info(`[實驗積木] 成功添加虛線動畫效果到積木: ${block.type}, id: ${block.id}`);
-			} else {
-				expLog.info(`[實驗積木] 找不到積木路徑元素: ${block.type}, id: ${block.id}`);
-			}
+			blockSvg.classList.add('singular-experimental-block');
+			expLog.info(`[實驗積木] 成功添加實驗標記到積木: ${block.type}, id: ${block.id}`);
 		} catch (e) {
 			expLog.info(`[實驗積木] 無法修改積木路徑樣式: ${e}`);
 		}
@@ -578,7 +574,7 @@ class ExperimentalBlockMarker {
 			return;
 		}
 
-		const workspace = Blockly.getMainWorkspace();
+			const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
 			expLog.info('[實驗積木] 工作區不存在');
 			return;
@@ -651,9 +647,9 @@ class ExperimentalBlockMarker {
 	 */
 	clearMarks() {
 		// 移除積木路徑上的標記樣式
-		const paths = document.querySelectorAll('.blockly-experimental-block');
-		paths.forEach(path => {
-			path.classList.remove('blockly-experimental-block');
+		const roots = document.querySelectorAll('.singular-experimental-block');
+		roots.forEach(root => {
+			root.classList.remove('singular-experimental-block');
 		});
 
 		this.markedBlocks.clear();
@@ -667,7 +663,7 @@ class ExperimentalBlockMarker {
 		this.clearMarks();
 
 		// 獲取工作區中所有積木
-		const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 		const hasExperimentalBlocks = this.markAllExperimentalBlocks();
 
 		// 如果工作區中沒有實驗積木，檢查是否需要隱藏通知
@@ -717,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		experimentalBlocksIsArray: Array.isArray(window.experimentalBlocks),
 		experimentalBlocksLength: window.experimentalBlocks ? window.experimentalBlocks.length : 0,
 		blocklyExists: typeof Blockly !== 'undefined',
-		workspaceExists: typeof Blockly !== 'undefined' && Blockly.getMainWorkspace() !== null,
+		workspaceExists: typeof Blockly !== 'undefined' && window.getBlocklyWorkspace() !== null,
 		cssLoaded: document.styleSheets.length,
 	});
 	// 確保實驗積木通知系統只初始化一次
@@ -752,47 +748,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		setTimeout(() => {
 			expLog.info('[實驗積木] 延遲初始化標記開始');
 			window.experimentalBlockMarker.markAllExperimentalBlocks();
-
-			// 監聽Blockly工具箱打開事件
-			try {
-				if (Blockly.getMainWorkspace() && Blockly.getMainWorkspace().toolbox_) {
-					const toolbox = Blockly.getMainWorkspace().toolbox_;
-
-					// 監聽工具箱飛出窗口展開事件
-					if (typeof Blockly.Events.listen === 'function') {
-						expLog.info('[實驗積木] 開始監聽工具箱飛出窗口事件');
-
-						// 覆寫Blockly.Flyout.prototype.show方法
-						const originalFlyoutShow = Blockly.Flyout.prototype.show;
-						if (originalFlyoutShow) {
-							Blockly.Flyout.prototype.show = function (flyoutContents) {
-								// 呼叫原來的方法
-								const result = originalFlyoutShow.call(this, flyoutContents);
-
-								// 在飛出窗口顯示後，延遲執行收集和標記操作
-								setTimeout(() => {
-									expLog.info('[實驗積木] 檢測到工具箱飛出窗口打開，嘗試收集和標記實驗積木');
-									if (typeof window.collectExperimentalBlocksFromFlyout === 'function') {
-										window.collectExperimentalBlocksFromFlyout();
-									}
-								}, 200);
-
-								return result;
-							};
-							expLog.info('[實驗積木] 已覆寫工具箱飛出窗口顯示方法');
-						}
-					}
-				}
-			} catch (err) {
-				expLog.warn('[實驗積木] 設置工具箱事件監聽失敗:', err);
-			}
 		}, 800);
 	} else {
 		expLog.info('[實驗積木] Blockly 尚未載入，等待載入後再初始化');
 
 		// 如果Blockly尚未載入，設置定時器每500毫秒檢查一次
 		const checkInterval = setInterval(() => {
-			if (typeof Blockly !== 'undefined' && Blockly.getMainWorkspace()) {
+			if (typeof Blockly !== 'undefined' && window.getBlocklyWorkspace()) {
 				clearInterval(checkInterval);
 				expLog.info('[實驗積木] Blockly 現在已載入，開始初始化標記');
 				window.experimentalBlockMarker.markAllExperimentalBlocks();
@@ -858,64 +820,27 @@ window.addEventListener('languageChanged', () => {
 	}
 });
 
-// 設置額外的監聽器和方法覆寫
+// 透過公開 workspace events 更新標記，不修改 Blockly 核心 prototype。
+const experimentalMarkerWorkspaceListeners = new WeakSet();
+
 function setupAdditionalListeners() {
-	// 監聽工作區變化事件，更新實驗性積木標記
-	if (typeof Blockly !== 'undefined') {
-		const originalBlockSvgInit = Blockly.BlockSvg.prototype.initSvg;
-		Blockly.BlockSvg.prototype.initSvg = function () {
-			// 調用原始方法
-			originalBlockSvgInit.call(this);
-
-			// 如果是實驗性積木，添加標記
-			if (window.experimentalBlocks && window.experimentalBlocks.includes(this.type) && window.experimentalBlockMarker) {
-				setTimeout(() => {
-					window.experimentalBlockMarker.markExperimentalBlock(this.getSvgRoot(), this);
-				}, 50);
-			}
-		};
-	}
-
-	// 監聽工具箱類別變更，確保收集並標記所有可能的實驗積木
-	if (typeof Blockly !== 'undefined') {
-		// 保存原始的 ToolboxCategory.prototype.setSelected 方法
-		const originalSetSelected = Blockly.ToolboxCategory.prototype.setSelected;
-
-		// 覆寫 setSelected 方法，在類別選擇變更時收集實驗積木
-		Blockly.ToolboxCategory.prototype.setSelected = function (selected) {
-			// 調用原始方法
-			originalSetSelected.call(this, selected);
-
-			// 如果類別被選中，嘗試收集該類別中的實驗積木並立即標記
-			if (selected && typeof window.collectExperimentalBlocksFromFlyout === 'function') {
-				// 延遲執行，確保飛出窗口已完全渲染
-				setTimeout(() => {
-					expLog.info(`[實驗積木] 工具箱類別 "${this.name_}" 被選中，檢查實驗積木`);
-					window.collectExperimentalBlocksFromFlyout();
-
-					// 刷新所有實驗積木的標記，確保新打開的類別中的實驗積木被正確標記
-					if (window.experimentalBlockMarker) {
-						expLog.info(`[實驗積木] 刷新所有實驗積木標記`);
-						window.experimentalBlockMarker.refreshMarks();
-					}
-				}, 300);
-			}
-		};
-	}
-
-	// 在 Blockly 工作區載入後設置事件監聽
 	setupBlocklyChangeListener();
 }
 
 // 當工作區變化時更新標記
 function setupBlocklyChangeListener() {
-	if (typeof Blockly === 'undefined' || !Blockly.getMainWorkspace()) {
+	if (typeof Blockly === 'undefined' || !window.getBlocklyWorkspace()) {
 		// 如果 Blockly 還沒載入，等待一段時間後再嘗試
 		setTimeout(setupBlocklyChangeListener, 200);
 		return;
 	}
 
-	Blockly.getMainWorkspace().addChangeListener(event => {
+	const workspace = window.getBlocklyWorkspace();
+	if (experimentalMarkerWorkspaceListeners.has(workspace)) {
+		return;
+	}
+	experimentalMarkerWorkspaceListeners.add(workspace);
+	workspace.addChangeListener(event => {
 		// 當積木類型變更或積木創建/刪除時，更新標記
 		if (
 			(event.type === Blockly.Events.BLOCK_CHANGE ||
@@ -935,7 +860,7 @@ function setupBlocklyChangeListener() {
 				// 特別處理 BLOCK_DELETE 事件，檢查是否還有實驗積木
 				if (event.type === Blockly.Events.BLOCK_DELETE) {
 					// 檢查工作區中是否還有實驗積木
-					const workspace = Blockly.getMainWorkspace();
+		const workspace = window.getBlocklyWorkspace();
 					if (workspace) {
 						const blocks = workspace.getAllBlocks();
 						const hasExperimentalBlock = blocks.some(block => window.experimentalBlocks.includes(block.type));
@@ -949,3 +874,5 @@ function setupBlocklyChangeListener() {
 		}
 	});
 }
+
+window.addEventListener('blocklyWorkspaceCreated', setupBlocklyChangeListener);

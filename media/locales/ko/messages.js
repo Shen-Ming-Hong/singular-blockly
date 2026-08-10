@@ -10,6 +10,8 @@
 
 // Define translations for Korean
 window.languageManager.loadMessages('ko', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: '설정',
+	BLOCKLY_ARIA_LOCKED_ICON: '잠김',
 	// UI Elements
 	BLOCKS_TAB: '블록',
 	CODE_TAB: '코드',

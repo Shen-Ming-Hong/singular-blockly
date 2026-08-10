@@ -55,9 +55,9 @@ describe('CyberBrick naming WebView contract', () => {
 
 	it('wraps every workspace deserialization path in the shared try/finally hydration scope', () => {
 		const source = readWorkspaceFile(editorPath);
-		const loadCalls = source.match(/Blockly\.serialization\.workspaces\.load\(/g) || [];
+		const loadCalls = source.match(/window\.blocklyRuntime\.loadWorkspaceState\(/g) || [];
 		const scopedCalls = source.match(/withCyberBrickNameHydrationScope\(\(\) =>/g) || [];
-		assert.strictEqual(loadCalls.length, 3, 'contract assumes the three current workspace load paths');
+		assert.strictEqual(loadCalls.length, 4, 'contract assumes the four current workspace load paths');
 		assert.strictEqual(scopedCalls.length, loadCalls.length, 'every load path must enter the shared hydration scope');
 		assertContainsAll(
 			source,

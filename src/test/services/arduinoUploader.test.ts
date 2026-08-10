@@ -382,7 +382,8 @@ suite('ArduinoUploader Tests', () => {
 				mockExecutor,
 				mockFileSystem,
 				mockSettingsManager,
-				mockStreamingExecutor
+				mockStreamingExecutor,
+				() => false
 			);
 			const result = await uploader.upload(request);
 

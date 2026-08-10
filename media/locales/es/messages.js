@@ -10,6 +10,8 @@
 
 // Define translations for Spanish
 window.languageManager.loadMessages('es', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Configuración',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Bloqueado',
 	// UI Elements
 	BLOCKS_TAB: 'Bloques',
 	CODE_TAB: 'Código',

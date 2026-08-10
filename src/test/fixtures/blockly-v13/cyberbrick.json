@@ -1,0 +1,92 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "micropython_main",
+          "id": "cyberbrick-root",
+          "x": 24,
+          "y": 24,
+          "deletable": false,
+          "inputs": {
+            "MAIN": {
+              "block": {
+                "type": "variables_set",
+                "id": "cyberbrick-set-speed",
+                "fields": {
+                  "VAR": {
+                    "id": "cyberbrick-speed"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "shadow": {
+                      "type": "math_number",
+                      "id": "cyberbrick-speed-shadow",
+                      "fields": {
+                        "NUM": 50
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "cyberbrick_delay_ms",
+                    "id": "cyberbrick-delay",
+                    "inputs": {
+                      "TIME": {
+                        "shadow": {
+                          "type": "math_number",
+                          "id": "cyberbrick-delay-shadow",
+                          "fields": {
+                            "NUM": 500
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "arduino_function",
+          "id": "cyberbrick-locked-function",
+          "x": 360,
+          "y": 24,
+          "deletable": false,
+          "extraState": "<mutation xmlns=\"http://www.w3.org/1999/xhtml\" locked=\"1\"><arg name=\"速度\" type=\"int\"></arg></mutation>",
+          "fields": {
+            "NAME": "移動"
+          }
+        },
+        {
+          "type": "controls_repeat_ext",
+          "id": "cyberbrick-orphan",
+          "x": 720,
+          "y": 24,
+          "inputs": {
+            "TIMES": {
+              "shadow": {
+                "type": "math_number",
+                "id": "cyberbrick-orphan-shadow",
+                "fields": {
+                  "NUM": 10
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "speed",
+        "id": "cyberbrick-speed"
+      }
+    ]
+  },
+  "board": "cyberbrick"
+}

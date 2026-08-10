@@ -10,6 +10,8 @@
 
 // Define translations for Russian
 window.languageManager.loadMessages('ru', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Настройка',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Заблокировано',
 	// UI Elements
 	BLOCKS_TAB: 'Блоки',
 	CODE_TAB: 'Код',

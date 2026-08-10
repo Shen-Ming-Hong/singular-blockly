@@ -10,6 +10,8 @@
 
 // Define translations for Bulgarian
 window.languageManager.loadMessages('bg', {
+	BLOCKLY_ARIA_CONFIGURATION_ICON: 'Настройки',
+	BLOCKLY_ARIA_LOCKED_ICON: 'Заключено',
 	// UI Elements
 	BLOCKS_TAB: 'Блокове',
 	CODE_TAB: 'Код',

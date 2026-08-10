@@ -48,6 +48,7 @@ export function buildCyberBrickRcMainOtaBootstrap(): string {
 		'            _singular_blockly_ota_yield(10)',
 		'    except Exception:',
 		'        _singular_blockly_ota_yield(500)',
+		'    _singular_blockly_ota_yield(300)',
 		'    try:',
 		'        import network as _singular_blockly_ota_net',
 		'        _singular_blockly_ota_wlan = _singular_blockly_ota_net.WLAN(_singular_blockly_ota_net.STA_IF)',

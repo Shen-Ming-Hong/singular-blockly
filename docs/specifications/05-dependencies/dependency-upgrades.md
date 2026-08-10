@@ -10,6 +10,26 @@
 
 ---
 
+## 2026 Blockly 13 現代化升級（065）
+
+| 套件 | 之前 | 之後 | 說明 |
+|---|---:|---:|---|
+| `blockly` | 12.3.1 | 13.2.1 | Thrasos、預設鍵盤／螢幕閱讀器支援、公開 dialog／ShortcutRegistry、ARIA API |
+| `@blockly/theme-modern` | 7.0.1 | 13.2.0 | 與 Blockly 13 renderer/theme API 對齊 |
+| Node.js engine | 未明確宣告 | >=22.16.0 | 與專案建置及 VS Code runtime 基準一致 |
+
+主要相容性處理：
+
+- `getVars()` 改用 `getVarModels()`；變數操作改走 `VariableMap`。
+- 舊事件別名改用 `BLOCK_CREATE`、`BLOCK_CHANGE`、`BLOCK_MOVE`、`BLOCK_DELETE`。
+- dynamic flyout、runtime shadow 與動態積木狀態以 JSON 表達；舊 XML 僅保留匯入 hooks。
+- 移除 `WorkspaceSvg`、`FieldVariable`、`FieldInput`、flyout 與 renderer DOM 的 prototype/private 整合。
+- editor／preview 明確使用 Thrasos、套件內 `media/` 與 15 個官方 core locale；切換語言時保存 JSON、重建 workspace 並支援失敗回滾。
+
+驗證結果：v12 fixtures 4/4 通過，500-block load/save 中位數均優於 v12 基線，`npm audit` 為 0 vulnerabilities。完整設計與驗收紀錄位於 `specs/065-blockly-v13-modernization/`。
+
+---
+
 ## 升級策略
 
 採用五階段漸進式升級，依風險等級排序：

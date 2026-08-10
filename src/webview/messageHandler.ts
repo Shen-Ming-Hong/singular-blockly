@@ -88,6 +88,64 @@ function hasOnlyKeys(value: Record<string, unknown>, allowedKeys: readonly strin
 	return Object.keys(value).every(key => allowedKeys.includes(key));
 }
 
+const BLOCKLY_DIALOG_REQUEST_ID_PATTERN = /^[A-Za-z0-9._:-]{1,128}$/;
+const BLOCKLY_DIALOG_MESSAGE_MAX_LENGTH = 10000;
+const BLOCKLY_DIALOG_VALUE_MAX_LENGTH = 1000;
+const BLOCKLY_BOARD_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+
+type BlocklyDialogPromptRequest = {
+	requestId: string;
+	message: string;
+	defaultValue: string;
+	board: string;
+};
+
+function parseBlocklyDialogPromptRequest(message: unknown): BlocklyDialogPromptRequest | null {
+	if (
+		!isPlainRecord(message) ||
+		!hasOnlyKeys(message, ['command', 'requestId', 'message', 'defaultValue', 'board']) ||
+		message.command !== 'blocklyDialogPrompt' ||
+		typeof message.requestId !== 'string' ||
+		!BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(message.requestId) ||
+		typeof message.message !== 'string' ||
+		!message.message.trim() ||
+		message.message.length > BLOCKLY_DIALOG_MESSAGE_MAX_LENGTH ||
+		typeof message.defaultValue !== 'string' ||
+		message.defaultValue.length > BLOCKLY_DIALOG_VALUE_MAX_LENGTH ||
+		typeof message.board !== 'string' ||
+		!BLOCKLY_BOARD_ID_PATTERN.test(message.board)
+	) {
+		return null;
+	}
+	return {
+		requestId: message.requestId,
+		message: message.message,
+		defaultValue: message.defaultValue,
+		board: message.board,
+	};
+}
+
+type BlocklyDialogConfirmRequest = {
+	requestId: string;
+	message: string;
+};
+
+function parseBlocklyDialogConfirmRequest(message: unknown): BlocklyDialogConfirmRequest | null {
+	if (
+		!isPlainRecord(message) ||
+		!hasOnlyKeys(message, ['command', 'requestId', 'message']) ||
+		message.command !== 'blocklyDialogConfirm' ||
+		typeof message.requestId !== 'string' ||
+		!BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(message.requestId) ||
+		typeof message.message !== 'string' ||
+		!message.message.trim() ||
+		message.message.length > BLOCKLY_DIALOG_MESSAGE_MAX_LENGTH
+	) {
+		return null;
+	}
+	return { requestId: message.requestId, message: message.message };
+}
+
 function parseCyberBrickOtaProvisioningRequest(message: unknown): { requestId: string; payload: OtaProvisioningRequest } | null {
 	if (
 		!isPlainRecord(message) ||
@@ -246,6 +304,7 @@ export class WebViewMessageHandler {
 	private cyberBrickOtaUploader: CyberBrickOtaUploader | null = null;
 	private activeTxtExecutionOperationId: string | null = null;
 	private stoppingTxtExecutionOperationIds = new Set<string>();
+	private activeBlocklyDialogRequestIds = new Set<string>();
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -374,6 +433,12 @@ export class WebViewMessageHandler {
 					break;
 				case 'confirmDialog':
 					await this.handleConfirmDialog(message);
+					break;
+				case 'blocklyDialogPrompt':
+					await this.handleBlocklyDialogPrompt(message);
+					break;
+				case 'blocklyDialogConfirm':
+					await this.handleBlocklyDialogConfirm(message);
 					break;
 				case 'updateTheme':
 					await this.handleUpdateTheme(message);
@@ -1223,6 +1288,134 @@ export class WebViewMessageHandler {
 			});
 		} catch (error) {
 			log('Failed to handle confirm dialog', 'error', error);
+		}
+	}
+
+	private async handleBlocklyDialogPrompt(message: unknown): Promise<void> {
+		const request = parseBlocklyDialogPromptRequest(message);
+		if (!request) {
+			log('Rejected malformed Blockly prompt request', 'warn');
+			return;
+		}
+		if (this.activeBlocklyDialogRequestIds.has(request.requestId)) {
+			log('Ignored duplicate Blockly prompt request', 'warn', { requestId: request.requestId });
+			return;
+		}
+
+		this.activeBlocklyDialogRequestIds.add(request.requestId);
+		try {
+			const isCyberBrick = request.board === 'cyberbrick';
+			const isMicroPython = getBoardLanguage(request.board) === 'micropython';
+			const emptyError = await this.localeService.getLocalizedMessage(
+				'VSCODE_VARIABLE_NAME_EMPTY',
+				'Variable name cannot be empty'
+			);
+			const invalidError = isMicroPython
+				? await this.localeService.getLocalizedMessage(
+						'VSCODE_VARIABLE_NAME_INVALID_MICROPYTHON',
+						'Variable name can only contain Chinese characters, letters, numbers, and underscores, and cannot start with a number'
+					)
+				: await this.localeService.getLocalizedMessage(
+						'VSCODE_VARIABLE_NAME_INVALID',
+						'Variable name can only contain letters, numbers, and underscores, and cannot start with a number'
+					);
+			const variableNamePattern = isMicroPython
+				? /^[A-Za-z_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff][A-Za-z0-9_\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]*$/
+				: /^[A-Za-z_][A-Za-z0-9_]*$/;
+			const cyberBrickValidationMessages = new Map<CyberBrickNameValidationCode, string>();
+			if (isCyberBrick) {
+				await Promise.all(
+					(Object.keys(CYBERBRICK_NAME_MESSAGE_KEYS) as CyberBrickNameValidationCode[])
+						.filter(code => code !== 'valid')
+						.map(async code => {
+							cyberBrickValidationMessages.set(
+								code,
+								await this.localeService.getLocalizedMessage(
+									CYBERBRICK_NAME_MESSAGE_KEYS[code],
+									CYBERBRICK_NAME_FALLBACK_MESSAGES[code]
+								)
+							);
+						})
+				);
+			}
+
+			const value = await vscodeApi.window.showInputBox({
+				prompt: request.message,
+				value: request.defaultValue,
+				ignoreFocusOut: true,
+				validateInput: (candidate: string) => {
+					if (candidate.length > BLOCKLY_DIALOG_VALUE_MAX_LENGTH) {
+						return invalidError;
+					}
+					if (isCyberBrick) {
+						const result = validateCyberBrickName({ name: candidate, kind: 'variable' });
+						if (result.severity === 'valid') {
+							return null;
+						}
+						return {
+							message:
+								cyberBrickValidationMessages.get(result.code) || CYBERBRICK_NAME_FALLBACK_MESSAGES[result.code],
+							severity:
+								result.severity === 'warning'
+									? vscodeApi.InputBoxValidationSeverity.Warning
+									: vscodeApi.InputBoxValidationSeverity.Error,
+						};
+					}
+					const trimmed = candidate.trim();
+					if (!trimmed) {
+						return emptyError;
+					}
+					return variableNamePattern.test(trimmed) ? null : invalidError;
+				},
+			});
+
+			await this.panel.webview.postMessage({
+				command: 'blocklyDialogPromptResult',
+				requestId: request.requestId,
+				value: value === undefined ? null : value.trim(),
+			});
+		} catch (error) {
+			log('Failed to handle Blockly prompt dialog', 'error', error);
+			await this.panel.webview.postMessage({
+				command: 'blocklyDialogPromptResult',
+				requestId: request.requestId,
+				value: null,
+			});
+		} finally {
+			this.activeBlocklyDialogRequestIds.delete(request.requestId);
+		}
+	}
+
+	private async handleBlocklyDialogConfirm(message: unknown): Promise<void> {
+		const request = parseBlocklyDialogConfirmRequest(message);
+		if (!request) {
+			log('Rejected malformed Blockly confirm request', 'warn');
+			return;
+		}
+		if (this.activeBlocklyDialogRequestIds.has(request.requestId)) {
+			log('Ignored duplicate Blockly confirm request', 'warn', { requestId: request.requestId });
+			return;
+		}
+
+		this.activeBlocklyDialogRequestIds.add(request.requestId);
+		try {
+			const okLabel = await this.localeService.getLocalizedMessage('VSCODE_OK', 'OK');
+			const cancelLabel = await this.localeService.getLocalizedMessage('VSCODE_CANCEL', 'Cancel');
+			const selection = await vscodeApi.window.showWarningMessage(request.message, { modal: true }, okLabel, cancelLabel);
+			await this.panel.webview.postMessage({
+				command: 'blocklyDialogConfirmResult',
+				requestId: request.requestId,
+				confirmed: selection === okLabel,
+			});
+		} catch (error) {
+			log('Failed to handle Blockly confirm dialog', 'error', error);
+			await this.panel.webview.postMessage({
+				command: 'blocklyDialogConfirmResult',
+				requestId: request.requestId,
+				confirmed: false,
+			});
+		} finally {
+			this.activeBlocklyDialogRequestIds.delete(request.requestId);
 		}
 	}
 

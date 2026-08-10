@@ -30,6 +30,8 @@
 	var config = null;
 	/** @type {*} VS Code API reference (set via init) */
 	var vsCodeApi = null;
+	/** @type {Function|null} Explicit canonical workspace provider */
+	var workspaceProvider = null;
 	/** @type {boolean} Guard flag to prevent concurrent showSuggestion renders */
 	var isRendering = false;
 	/** @type {boolean} Guard for rAF-throttled hint repositioning */
@@ -60,7 +62,8 @@
 				var field = block.getField(name);
 				if (field && typeof field.getVariable === 'function') {
 					// Look up existing variable by name
-					var allVars = workspace.getAllVariables ? workspace.getAllVariables() : [];
+					var variableMap = workspace.getVariableMap();
+					var allVars = variableMap ? variableMap.getAllVariables() : [];
 					var found = false;
 					for (var vi = 0; vi < allVars.length; vi++) {
 						if (allVars[vi].name === value) {
@@ -93,9 +96,11 @@
 	/**
 	 * Initialize the manager with VS Code API reference.
 	 * @param {*} api - The VS Code API object from acquireVsCodeApi()
+	 * @param {Function} getWorkspaceProvider - Canonical workspace accessor
 	 */
-	function init(api) {
+	function init(api, getWorkspaceProvider) {
 		vsCodeApi = api;
+		workspaceProvider = typeof getWorkspaceProvider === 'function' ? getWorkspaceProvider : null;
 	}
 
 	/**
@@ -103,8 +108,8 @@
 	 * @returns {*}
 	 */
 	function getWorkspace() {
-		if (typeof Blockly !== 'undefined') {
-			return Blockly.getMainWorkspace();
+		if (typeof Blockly !== 'undefined' && workspaceProvider) {
+			return workspaceProvider ? workspaceProvider() : null;
 		}
 		return null;
 	}
