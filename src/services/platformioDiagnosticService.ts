@@ -842,12 +842,12 @@ export class PlatformioDiagnosticService {
 	}
 
 	private getPenvScriptsDirectory(penvRootPath: string): string {
-		const pathApi = this.platform === 'win32' ? path.win32 : path;
+		const pathApi = this.platform === 'win32' ? path.win32 : path.posix;
 		return this.platform === 'win32' ? pathApi.join(penvRootPath, 'Scripts') : pathApi.join(penvRootPath, 'bin');
 	}
 
 	private isValidatedPenvRoot(penvRootPath: string, resolvedPioPath: string): boolean {
-		const pathApi = this.platform === 'win32' ? path.win32 : path;
+		const pathApi = this.platform === 'win32' ? path.win32 : path.posix;
 		if (pathApi.basename(penvRootPath).toLowerCase() !== 'penv') {
 			return false;
 		}
@@ -876,7 +876,7 @@ export class PlatformioDiagnosticService {
 	}
 
 	private isPathWithin(candidatePath: string, directoryPath: string): boolean {
-		const pathApi = this.platform === 'win32' ? path.win32 : path;
+		const pathApi = this.platform === 'win32' ? path.win32 : path.posix;
 		const normalizedCandidate = pathApi.resolve(candidatePath);
 		const normalizedDirectory = pathApi.resolve(directoryPath);
 		return normalizedCandidate === normalizedDirectory || normalizedCandidate.startsWith(`${normalizedDirectory}${pathApi.sep}`);
