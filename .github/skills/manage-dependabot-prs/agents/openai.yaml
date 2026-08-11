@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dependabot PR 管理"
+  short_description: "盤點、排序、評估並逐項處理 Dependabot PR"
+  default_prompt: "使用 $manage-dependabot-prs 盤點目前所有 Dependabot PR，排序優先級並判斷是否需要 SDD，先不要修改或合併。"
