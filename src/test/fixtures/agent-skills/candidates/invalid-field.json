@@ -1,0 +1,19 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "math_number",
+          "id": "invalid-field",
+          "fields": {
+            "NUM": {
+              "not": "a serializable field value"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "board": "uno"
+}

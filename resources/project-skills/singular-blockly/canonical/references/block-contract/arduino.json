@@ -1,0 +1,6185 @@
+{
+  "schemaVersion": 3,
+  "category": "arduino",
+  "blocks": [
+    {
+      "type": "arduino_analog_read",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "32",
+              "optionsMode": "dynamic",
+              "options": [
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_read",
+            "fields": {
+              "PIN": "32"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A13",
+                "A14",
+                "A15",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_read",
+            "fields": {
+              "PIN": "A0"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_read",
+            "fields": {
+              "PIN": "A0"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_read",
+            "fields": {
+              "PIN": "A0"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_read",
+            "fields": {
+              "PIN": "A0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_analog_write",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_write",
+            "fields": {
+              "PIN": "0"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "2",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "44",
+                "45",
+                "46",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_write",
+            "fields": {
+              "PIN": "2"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "3",
+                "5",
+                "6",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_write",
+            "fields": {
+              "PIN": "3"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "3",
+                "5",
+                "6",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_write",
+            "fields": {
+              "PIN": "3"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "3",
+                "5",
+                "6",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_analog_write",
+            "fields": {
+              "PIN": "3"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_delay",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TIME",
+              "kind": "number",
+              "defaultValue": 1000
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_delay",
+            "fields": {
+              "TIME": 1000
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TIME",
+              "kind": "number",
+              "defaultValue": 1000
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_delay",
+            "fields": {
+              "TIME": 1000
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TIME",
+              "kind": "number",
+              "defaultValue": 1000
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_delay",
+            "fields": {
+              "TIME": 1000
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TIME",
+              "kind": "number",
+              "defaultValue": 1000
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_delay",
+            "fields": {
+              "TIME": 1000
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TIME",
+              "kind": "number",
+              "defaultValue": 1000
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_delay",
+            "fields": {
+              "TIME": 1000
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_digital_read",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_read",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_read",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_read",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_read",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_read",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_digital_write",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean",
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_write",
+            "fields": {
+              "PIN": "0"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "arduino_level",
+                  "fields": {
+                    "LEVEL": "LOW"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean",
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_write",
+            "fields": {
+              "PIN": "0"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "arduino_level",
+                  "fields": {
+                    "LEVEL": "LOW"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean",
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_write",
+            "fields": {
+              "PIN": "0"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "arduino_level",
+                  "fields": {
+                    "LEVEL": "LOW"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean",
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_write",
+            "fields": {
+              "PIN": "0"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "arduino_level",
+                  "fields": {
+                    "LEVEL": "LOW"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean",
+                  "Number",
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_digital_write",
+            "fields": {
+              "PIN": "0"
+            },
+            "inputs": {
+              "VALUE": {
+                "shadow": {
+                  "type": "arduino_level",
+                  "fields": {
+                    "LEVEL": "LOW"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_level",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean",
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "LEVEL",
+              "kind": "dropdown",
+              "defaultValue": "HIGH",
+              "optionsMode": "static",
+              "options": [
+                "HIGH",
+                "LOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_level",
+            "fields": {
+              "LEVEL": "HIGH"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean",
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "LEVEL",
+              "kind": "dropdown",
+              "defaultValue": "HIGH",
+              "optionsMode": "static",
+              "options": [
+                "HIGH",
+                "LOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_level",
+            "fields": {
+              "LEVEL": "HIGH"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean",
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "LEVEL",
+              "kind": "dropdown",
+              "defaultValue": "HIGH",
+              "optionsMode": "static",
+              "options": [
+                "HIGH",
+                "LOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_level",
+            "fields": {
+              "LEVEL": "HIGH"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean",
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "LEVEL",
+              "kind": "dropdown",
+              "defaultValue": "HIGH",
+              "optionsMode": "static",
+              "options": [
+                "HIGH",
+                "LOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_level",
+            "fields": {
+              "LEVEL": "HIGH"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean",
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "LEVEL",
+              "kind": "dropdown",
+              "defaultValue": "HIGH",
+              "optionsMode": "static",
+              "options": [
+                "HIGH",
+                "LOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_level",
+            "fields": {
+              "LEVEL": "HIGH"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_pin_mode",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "INPUT",
+              "optionsMode": "static",
+              "options": [
+                "INPUT",
+                "OUTPUT"
+              ]
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pin_mode",
+            "fields": {
+              "PIN": "0",
+              "MODE": "INPUT"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "INPUT",
+              "optionsMode": "static",
+              "options": [
+                "INPUT",
+                "OUTPUT"
+              ]
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pin_mode",
+            "fields": {
+              "PIN": "0",
+              "MODE": "INPUT"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "INPUT",
+              "optionsMode": "static",
+              "options": [
+                "INPUT",
+                "OUTPUT"
+              ]
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pin_mode",
+            "fields": {
+              "PIN": "0",
+              "MODE": "INPUT"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "INPUT",
+              "optionsMode": "static",
+              "options": [
+                "INPUT",
+                "OUTPUT"
+              ]
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pin_mode",
+            "fields": {
+              "PIN": "0",
+              "MODE": "INPUT"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "INPUT",
+              "optionsMode": "static",
+              "options": [
+                "INPUT",
+                "OUTPUT"
+              ]
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pin_mode",
+            "fields": {
+              "PIN": "0",
+              "MODE": "INPUT"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_pullup",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pullup",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9",
+                "A0",
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A13",
+                "A14",
+                "A15",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pullup",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pullup",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pullup",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_pullup",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_setup_loop",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "LOOP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "SETUP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "arduino_setup_loop",
+            "deletable": false
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "LOOP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "SETUP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "arduino_setup_loop",
+            "deletable": false
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "LOOP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "SETUP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "arduino_setup_loop",
+            "deletable": false
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "LOOP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "SETUP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "arduino_setup_loop",
+            "deletable": false
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "LOOP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "SETUP",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "arduino_setup_loop",
+            "deletable": false
+          }
+        }
+      }
+    },
+    {
+      "type": "esp32_pwm_setup",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "supermini"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "FREQUENCY",
+              "kind": "number",
+              "defaultValue": 75000
+            },
+            {
+              "name": "RESOLUTION",
+              "kind": "dropdown",
+              "defaultValue": "8",
+              "optionsMode": "static",
+              "options": [
+                "10",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "8"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "esp32_pwm_setup",
+            "fields": {
+              "FREQUENCY": 75000,
+              "RESOLUTION": "8"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "FREQUENCY",
+              "kind": "number",
+              "defaultValue": 75000
+            },
+            {
+              "name": "RESOLUTION",
+              "kind": "dropdown",
+              "defaultValue": "8",
+              "optionsMode": "static",
+              "options": [
+                "10",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "8"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "esp32_pwm_setup",
+            "fields": {
+              "FREQUENCY": 75000,
+              "RESOLUTION": "8"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "seven_segment_display",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "DECIMAL_POINT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "COMMON_CATHODE",
+              "optionsMode": "static",
+              "options": [
+                "COMMON_ANODE",
+                "COMMON_CATHODE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_display",
+            "fields": {
+              "TYPE": "COMMON_CATHODE",
+              "DECIMAL_POINT": false
+            },
+            "inputs": {
+              "NUMBER": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "DECIMAL_POINT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "COMMON_CATHODE",
+              "optionsMode": "static",
+              "options": [
+                "COMMON_ANODE",
+                "COMMON_CATHODE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_display",
+            "fields": {
+              "TYPE": "COMMON_CATHODE",
+              "DECIMAL_POINT": false
+            },
+            "inputs": {
+              "NUMBER": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "DECIMAL_POINT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "COMMON_CATHODE",
+              "optionsMode": "static",
+              "options": [
+                "COMMON_ANODE",
+                "COMMON_CATHODE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_display",
+            "fields": {
+              "TYPE": "COMMON_CATHODE",
+              "DECIMAL_POINT": false
+            },
+            "inputs": {
+              "NUMBER": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "DECIMAL_POINT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "COMMON_CATHODE",
+              "optionsMode": "static",
+              "options": [
+                "COMMON_ANODE",
+                "COMMON_CATHODE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_display",
+            "fields": {
+              "TYPE": "COMMON_CATHODE",
+              "DECIMAL_POINT": false
+            },
+            "inputs": {
+              "NUMBER": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "DECIMAL_POINT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "COMMON_CATHODE",
+              "optionsMode": "static",
+              "options": [
+                "COMMON_ANODE",
+                "COMMON_CATHODE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_display",
+            "fields": {
+              "TYPE": "COMMON_CATHODE",
+              "DECIMAL_POINT": false
+            },
+            "inputs": {
+              "NUMBER": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "seven_segment_pins",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_C",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_D",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_DP",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_E",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_F",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_G",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_pins",
+            "fields": {
+              "PIN_A": "0",
+              "PIN_B": "0",
+              "PIN_C": "0",
+              "PIN_D": "0",
+              "PIN_E": "0",
+              "PIN_F": "0",
+              "PIN_G": "0",
+              "PIN_DP": "0"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_C",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_D",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_DP",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_E",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_F",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_G",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_pins",
+            "fields": {
+              "PIN_A": "0",
+              "PIN_B": "0",
+              "PIN_C": "0",
+              "PIN_D": "0",
+              "PIN_E": "0",
+              "PIN_F": "0",
+              "PIN_G": "0",
+              "PIN_DP": "0"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_C",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_D",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_DP",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_E",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_F",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_G",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_pins",
+            "fields": {
+              "PIN_A": "0",
+              "PIN_B": "0",
+              "PIN_C": "0",
+              "PIN_D": "0",
+              "PIN_E": "0",
+              "PIN_F": "0",
+              "PIN_G": "0",
+              "PIN_DP": "0"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_C",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_D",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_DP",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_E",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_F",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_G",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_pins",
+            "fields": {
+              "PIN_A": "0",
+              "PIN_B": "0",
+              "PIN_C": "0",
+              "PIN_D": "0",
+              "PIN_E": "0",
+              "PIN_F": "0",
+              "PIN_G": "0",
+              "PIN_DP": "0"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_C",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_D",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_DP",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_E",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_F",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_G",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "seven_segment_pins",
+            "fields": {
+              "PIN_A": "0",
+              "PIN_B": "0",
+              "PIN_C": "0",
+              "PIN_D": "0",
+              "PIN_E": "0",
+              "PIN_F": "0",
+              "PIN_G": "0",
+              "PIN_DP": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "threshold_function_read",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "FUNC",
+              "kind": "dropdown",
+              "defaultValue": "Func0",
+              "optionsMode": "dynamic",
+              "options": [
+                "Func0"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_read",
+            "extraState": {
+              "func": "Func0"
+            },
+            "fields": {
+              "FUNC": "Func0"
+            }
+          },
+          "extraState": {
+            "func": "Func0"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "FUNC",
+              "kind": "dropdown",
+              "defaultValue": "Func0",
+              "optionsMode": "dynamic",
+              "options": [
+                "Func0"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_read",
+            "extraState": {
+              "func": "Func0"
+            },
+            "fields": {
+              "FUNC": "Func0"
+            }
+          },
+          "extraState": {
+            "func": "Func0"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "FUNC",
+              "kind": "dropdown",
+              "defaultValue": "Func0",
+              "optionsMode": "dynamic",
+              "options": [
+                "Func0"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_read",
+            "extraState": {
+              "func": "Func0"
+            },
+            "fields": {
+              "FUNC": "Func0"
+            }
+          },
+          "extraState": {
+            "func": "Func0"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "FUNC",
+              "kind": "dropdown",
+              "defaultValue": "Func0",
+              "optionsMode": "dynamic",
+              "options": [
+                "Func0"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_read",
+            "extraState": {
+              "func": "Func0"
+            },
+            "fields": {
+              "FUNC": "Func0"
+            }
+          },
+          "extraState": {
+            "func": "Func0"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "FUNC",
+              "kind": "dropdown",
+              "defaultValue": "Func0",
+              "optionsMode": "dynamic",
+              "options": [
+                "Func0"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_read",
+            "extraState": {
+              "func": "Func0"
+            },
+            "fields": {
+              "FUNC": "Func0"
+            }
+          },
+          "extraState": {
+            "func": "Func0"
+          }
+        }
+      }
+    },
+    {
+      "type": "threshold_function_setup",
+      "categories": [
+        "arduino"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "HIGH_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "LOW_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "THRESHOLD",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "Func0"
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "32",
+              "optionsMode": "dynamic",
+              "options": [
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_setup",
+            "fields": {
+              "NAME": "Func0",
+              "PIN": "32"
+            },
+            "inputs": {
+              "THRESHOLD": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 450
+                  }
+                }
+              },
+              "HIGH_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 1
+                  }
+                }
+              },
+              "LOW_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "HIGH_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "LOW_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "THRESHOLD",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "Func0"
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A10",
+                "A11",
+                "A12",
+                "A13",
+                "A14",
+                "A15",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_setup",
+            "fields": {
+              "NAME": "Func0",
+              "PIN": "A0"
+            },
+            "inputs": {
+              "THRESHOLD": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 450
+                  }
+                }
+              },
+              "HIGH_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 1
+                  }
+                }
+              },
+              "LOW_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "HIGH_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "LOW_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "THRESHOLD",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "Func0"
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5",
+                "A6",
+                "A7"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_setup",
+            "fields": {
+              "NAME": "Func0",
+              "PIN": "A0"
+            },
+            "inputs": {
+              "THRESHOLD": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 450
+                  }
+                }
+              },
+              "HIGH_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 1
+                  }
+                }
+              },
+              "LOW_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "HIGH_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "LOW_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "THRESHOLD",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "Func0"
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_setup",
+            "fields": {
+              "NAME": "Func0",
+              "PIN": "A0"
+            },
+            "inputs": {
+              "THRESHOLD": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 450
+                  }
+                }
+              },
+              "HIGH_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 1
+                  }
+                }
+              },
+              "LOW_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "HIGH_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "LOW_VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "THRESHOLD",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "Func0"
+            },
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "A0",
+              "optionsMode": "dynamic",
+              "options": [
+                "A0",
+                "A1",
+                "A2",
+                "A3",
+                "A4",
+                "A5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "threshold_function_setup",
+            "fields": {
+              "NAME": "Func0",
+              "PIN": "A0"
+            },
+            "inputs": {
+              "THRESHOLD": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 450
+                  }
+                }
+              },
+              "HIGH_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 1
+                  }
+                }
+              },
+              "LOW_VALUE": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

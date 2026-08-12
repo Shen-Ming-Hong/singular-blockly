@@ -1,0 +1,7039 @@
+{
+  "schemaVersion": 3,
+  "category": "vision-sensors",
+  "blocks": [
+    {
+      "type": "huskylens_count_arrows",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_arrows"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_arrows"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_arrows"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_arrows"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_arrows"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_count_blocks",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_count_blocks_id",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks_id"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks_id"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks_id"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks_id"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_count_blocks_id"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_forget",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_forget"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_forget"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_forget"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_forget"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_forget"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_get_arrow_info",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xOrigin",
+              "optionsMode": "static",
+              "options": [
+                "ID",
+                "xOrigin",
+                "xTarget",
+                "yOrigin",
+                "yTarget"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_arrow_info",
+            "fields": {
+              "INFO_TYPE": "xOrigin"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xOrigin",
+              "optionsMode": "static",
+              "options": [
+                "ID",
+                "xOrigin",
+                "xTarget",
+                "yOrigin",
+                "yTarget"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_arrow_info",
+            "fields": {
+              "INFO_TYPE": "xOrigin"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xOrigin",
+              "optionsMode": "static",
+              "options": [
+                "ID",
+                "xOrigin",
+                "xTarget",
+                "yOrigin",
+                "yTarget"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_arrow_info",
+            "fields": {
+              "INFO_TYPE": "xOrigin"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xOrigin",
+              "optionsMode": "static",
+              "options": [
+                "ID",
+                "xOrigin",
+                "xTarget",
+                "yOrigin",
+                "yTarget"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_arrow_info",
+            "fields": {
+              "INFO_TYPE": "xOrigin"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xOrigin",
+              "optionsMode": "static",
+              "options": [
+                "ID",
+                "xOrigin",
+                "xTarget",
+                "yOrigin",
+                "yTarget"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_arrow_info",
+            "fields": {
+              "INFO_TYPE": "xOrigin"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_get_block_id",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_id",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_id",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_id",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_id",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_id",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_get_block_info",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_info",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_info",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_info",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_info",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "INDEX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INFO_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "xCenter",
+              "optionsMode": "static",
+              "options": [
+                "height",
+                "ID",
+                "width",
+                "xCenter",
+                "yCenter"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_get_block_info",
+            "fields": {
+              "INFO_TYPE": "xCenter"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_init_i2c",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_init_i2c"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_init_i2c"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_init_i2c"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_init_i2c"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_init_i2c"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_init_uart",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "16",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "17",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_init_uart",
+            "fields": {
+              "RX_PIN": "16",
+              "TX_PIN": "17"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "2",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_init_uart",
+            "fields": {
+              "RX_PIN": "2",
+              "TX_PIN": "3"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "2",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_init_uart",
+            "fields": {
+              "RX_PIN": "2",
+              "TX_PIN": "3"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_init_uart",
+            "fields": {
+              "RX_PIN": "0",
+              "TX_PIN": "0"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "2",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_init_uart",
+            "fields": {
+              "RX_PIN": "2",
+              "TX_PIN": "3"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_is_learned",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_is_learned"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_is_learned"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_is_learned"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_is_learned"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_is_learned"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_learn",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_learn"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_learn"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_learn"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_learn"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_learn"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_request",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_request_blocks_id",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request_blocks_id"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request_blocks_id"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request_blocks_id"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request_blocks_id"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "huskylens_request_blocks_id"
+          }
+        }
+      }
+    },
+    {
+      "type": "huskylens_set_algorithm",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ALGORITHM",
+              "kind": "dropdown",
+              "defaultValue": "ALGORITHM_FACE_RECOGNITION",
+              "optionsMode": "static",
+              "options": [
+                "ALGORITHM_COLOR_RECOGNITION",
+                "ALGORITHM_FACE_RECOGNITION",
+                "ALGORITHM_LINE_TRACKING",
+                "ALGORITHM_OBJECT_CLASSIFICATION",
+                "ALGORITHM_OBJECT_RECOGNITION",
+                "ALGORITHM_OBJECT_TRACKING",
+                "ALGORITHM_TAG_RECOGNITION"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_set_algorithm",
+            "fields": {
+              "ALGORITHM": "ALGORITHM_FACE_RECOGNITION"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ALGORITHM",
+              "kind": "dropdown",
+              "defaultValue": "ALGORITHM_FACE_RECOGNITION",
+              "optionsMode": "static",
+              "options": [
+                "ALGORITHM_COLOR_RECOGNITION",
+                "ALGORITHM_FACE_RECOGNITION",
+                "ALGORITHM_LINE_TRACKING",
+                "ALGORITHM_OBJECT_CLASSIFICATION",
+                "ALGORITHM_OBJECT_RECOGNITION",
+                "ALGORITHM_OBJECT_TRACKING",
+                "ALGORITHM_TAG_RECOGNITION"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_set_algorithm",
+            "fields": {
+              "ALGORITHM": "ALGORITHM_FACE_RECOGNITION"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ALGORITHM",
+              "kind": "dropdown",
+              "defaultValue": "ALGORITHM_FACE_RECOGNITION",
+              "optionsMode": "static",
+              "options": [
+                "ALGORITHM_COLOR_RECOGNITION",
+                "ALGORITHM_FACE_RECOGNITION",
+                "ALGORITHM_LINE_TRACKING",
+                "ALGORITHM_OBJECT_CLASSIFICATION",
+                "ALGORITHM_OBJECT_RECOGNITION",
+                "ALGORITHM_OBJECT_TRACKING",
+                "ALGORITHM_TAG_RECOGNITION"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_set_algorithm",
+            "fields": {
+              "ALGORITHM": "ALGORITHM_FACE_RECOGNITION"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ALGORITHM",
+              "kind": "dropdown",
+              "defaultValue": "ALGORITHM_FACE_RECOGNITION",
+              "optionsMode": "static",
+              "options": [
+                "ALGORITHM_COLOR_RECOGNITION",
+                "ALGORITHM_FACE_RECOGNITION",
+                "ALGORITHM_LINE_TRACKING",
+                "ALGORITHM_OBJECT_CLASSIFICATION",
+                "ALGORITHM_OBJECT_RECOGNITION",
+                "ALGORITHM_OBJECT_TRACKING",
+                "ALGORITHM_TAG_RECOGNITION"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_set_algorithm",
+            "fields": {
+              "ALGORITHM": "ALGORITHM_FACE_RECOGNITION"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ALGORITHM",
+              "kind": "dropdown",
+              "defaultValue": "ALGORITHM_FACE_RECOGNITION",
+              "optionsMode": "static",
+              "options": [
+                "ALGORITHM_COLOR_RECOGNITION",
+                "ALGORITHM_FACE_RECOGNITION",
+                "ALGORITHM_LINE_TRACKING",
+                "ALGORITHM_OBJECT_CLASSIFICATION",
+                "ALGORITHM_OBJECT_RECOGNITION",
+                "ALGORITHM_OBJECT_TRACKING",
+                "ALGORITHM_TAG_RECOGNITION"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "huskylens_set_algorithm",
+            "fields": {
+              "ALGORITHM": "ALGORITHM_FACE_RECOGNITION"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_apriltag_detect",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TAG_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_apriltag_detect"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TAG_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_apriltag_detect"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TAG_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_apriltag_detect"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TAG_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_apriltag_detect"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TAG_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_apriltag_detect"
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_color_detect",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "COLOR",
+              "kind": "dropdown",
+              "defaultValue": "RED",
+              "optionsMode": "static",
+              "options": [
+                "BLACK",
+                "BLUE",
+                "GREEN",
+                "ORANGE",
+                "PURPLE",
+                "RED",
+                "WHITE",
+                "YELLOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_color_detect",
+            "fields": {
+              "COLOR": "RED"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "COLOR",
+              "kind": "dropdown",
+              "defaultValue": "RED",
+              "optionsMode": "static",
+              "options": [
+                "BLACK",
+                "BLUE",
+                "GREEN",
+                "ORANGE",
+                "PURPLE",
+                "RED",
+                "WHITE",
+                "YELLOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_color_detect",
+            "fields": {
+              "COLOR": "RED"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "COLOR",
+              "kind": "dropdown",
+              "defaultValue": "RED",
+              "optionsMode": "static",
+              "options": [
+                "BLACK",
+                "BLUE",
+                "GREEN",
+                "ORANGE",
+                "PURPLE",
+                "RED",
+                "WHITE",
+                "YELLOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_color_detect",
+            "fields": {
+              "COLOR": "RED"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "COLOR",
+              "kind": "dropdown",
+              "defaultValue": "RED",
+              "optionsMode": "static",
+              "options": [
+                "BLACK",
+                "BLUE",
+                "GREEN",
+                "ORANGE",
+                "PURPLE",
+                "RED",
+                "WHITE",
+                "YELLOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_color_detect",
+            "fields": {
+              "COLOR": "RED"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "COLOR",
+              "kind": "dropdown",
+              "defaultValue": "RED",
+              "optionsMode": "static",
+              "options": [
+                "BLACK",
+                "BLUE",
+                "GREEN",
+                "ORANGE",
+                "PURPLE",
+                "RED",
+                "WHITE",
+                "YELLOW"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_color_detect",
+            "fields": {
+              "COLOR": "RED"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_face_detect",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_face_detect"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_face_detect"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_face_detect"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_face_detect"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_face_detect"
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_get_func_id",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_func_id"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_func_id"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_func_id"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_func_id"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_func_id"
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_get_position",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "POSITION_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "X",
+              "optionsMode": "static",
+              "options": [
+                "HEIGHT",
+                "WIDTH",
+                "X",
+                "Y"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_get_position",
+            "fields": {
+              "POSITION_TYPE": "X"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "POSITION_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "X",
+              "optionsMode": "static",
+              "options": [
+                "HEIGHT",
+                "WIDTH",
+                "X",
+                "Y"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_get_position",
+            "fields": {
+              "POSITION_TYPE": "X"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "POSITION_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "X",
+              "optionsMode": "static",
+              "options": [
+                "HEIGHT",
+                "WIDTH",
+                "X",
+                "Y"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_get_position",
+            "fields": {
+              "POSITION_TYPE": "X"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "POSITION_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "X",
+              "optionsMode": "static",
+              "options": [
+                "HEIGHT",
+                "WIDTH",
+                "X",
+                "Y"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_get_position",
+            "fields": {
+              "POSITION_TYPE": "X"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "POSITION_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "X",
+              "optionsMode": "static",
+              "options": [
+                "HEIGHT",
+                "WIDTH",
+                "X",
+                "Y"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_get_position",
+            "fields": {
+              "POSITION_TYPE": "X"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_get_type_id",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_type_id"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_type_id"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_type_id"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_type_id"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_get_type_id"
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_handwritten_digit",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "DIGIT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_handwritten_digit"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "DIGIT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_handwritten_digit"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "DIGIT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_handwritten_digit"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "DIGIT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_handwritten_digit"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "DIGIT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_handwritten_digit"
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_init",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_init",
+            "fields": {
+              "RX_PIN": "0",
+              "TX_PIN": "0"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_init",
+            "fields": {
+              "RX_PIN": "0",
+              "TX_PIN": "0"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_init",
+            "fields": {
+              "RX_PIN": "0",
+              "TX_PIN": "0"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_init",
+            "fields": {
+              "RX_PIN": "0",
+              "TX_PIN": "0"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "RX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TX_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_init",
+            "fields": {
+              "RX_PIN": "0",
+              "TX_PIN": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_is_detected",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_is_detected"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_is_detected"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_is_detected"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_is_detected"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_is_detected"
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_neural_network",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "CLASS_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_neural_network"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "CLASS_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_neural_network"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "CLASS_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_neural_network"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "CLASS_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_neural_network"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "CLASS_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "pixetto_neural_network"
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_road_detect",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ROAD_INFO",
+              "kind": "dropdown",
+              "defaultValue": "CENTER_X",
+              "optionsMode": "static",
+              "options": [
+                "CENTER_X",
+                "CENTER_Y",
+                "LEFT_X",
+                "RIGHT_X"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_road_detect",
+            "fields": {
+              "ROAD_INFO": "CENTER_X"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ROAD_INFO",
+              "kind": "dropdown",
+              "defaultValue": "CENTER_X",
+              "optionsMode": "static",
+              "options": [
+                "CENTER_X",
+                "CENTER_Y",
+                "LEFT_X",
+                "RIGHT_X"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_road_detect",
+            "fields": {
+              "ROAD_INFO": "CENTER_X"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ROAD_INFO",
+              "kind": "dropdown",
+              "defaultValue": "CENTER_X",
+              "optionsMode": "static",
+              "options": [
+                "CENTER_X",
+                "CENTER_Y",
+                "LEFT_X",
+                "RIGHT_X"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_road_detect",
+            "fields": {
+              "ROAD_INFO": "CENTER_X"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ROAD_INFO",
+              "kind": "dropdown",
+              "defaultValue": "CENTER_X",
+              "optionsMode": "static",
+              "options": [
+                "CENTER_X",
+                "CENTER_Y",
+                "LEFT_X",
+                "RIGHT_X"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_road_detect",
+            "fields": {
+              "ROAD_INFO": "CENTER_X"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ROAD_INFO",
+              "kind": "dropdown",
+              "defaultValue": "CENTER_X",
+              "optionsMode": "static",
+              "options": [
+                "CENTER_X",
+                "CENTER_Y",
+                "LEFT_X",
+                "RIGHT_X"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_road_detect",
+            "fields": {
+              "ROAD_INFO": "CENTER_X"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_set_mode",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "COLOR_DETECTION",
+              "optionsMode": "static",
+              "options": [
+                "APRILTAG_DETECTION",
+                "BALL_DETECTION",
+                "COLOR_DETECTION",
+                "FACE_DETECTION",
+                "HANDWRITTEN_DIGIT",
+                "NEURAL_NETWORK",
+                "ROAD_DETECTION",
+                "SHAPE_DETECTION",
+                "TEMPLATE_MATCHING"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_set_mode",
+            "fields": {
+              "MODE": "COLOR_DETECTION"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "COLOR_DETECTION",
+              "optionsMode": "static",
+              "options": [
+                "APRILTAG_DETECTION",
+                "BALL_DETECTION",
+                "COLOR_DETECTION",
+                "FACE_DETECTION",
+                "HANDWRITTEN_DIGIT",
+                "NEURAL_NETWORK",
+                "ROAD_DETECTION",
+                "SHAPE_DETECTION",
+                "TEMPLATE_MATCHING"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_set_mode",
+            "fields": {
+              "MODE": "COLOR_DETECTION"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "COLOR_DETECTION",
+              "optionsMode": "static",
+              "options": [
+                "APRILTAG_DETECTION",
+                "BALL_DETECTION",
+                "COLOR_DETECTION",
+                "FACE_DETECTION",
+                "HANDWRITTEN_DIGIT",
+                "NEURAL_NETWORK",
+                "ROAD_DETECTION",
+                "SHAPE_DETECTION",
+                "TEMPLATE_MATCHING"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_set_mode",
+            "fields": {
+              "MODE": "COLOR_DETECTION"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "COLOR_DETECTION",
+              "optionsMode": "static",
+              "options": [
+                "APRILTAG_DETECTION",
+                "BALL_DETECTION",
+                "COLOR_DETECTION",
+                "FACE_DETECTION",
+                "HANDWRITTEN_DIGIT",
+                "NEURAL_NETWORK",
+                "ROAD_DETECTION",
+                "SHAPE_DETECTION",
+                "TEMPLATE_MATCHING"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_set_mode",
+            "fields": {
+              "MODE": "COLOR_DETECTION"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "COLOR_DETECTION",
+              "optionsMode": "static",
+              "options": [
+                "APRILTAG_DETECTION",
+                "BALL_DETECTION",
+                "COLOR_DETECTION",
+                "FACE_DETECTION",
+                "HANDWRITTEN_DIGIT",
+                "NEURAL_NETWORK",
+                "ROAD_DETECTION",
+                "SHAPE_DETECTION",
+                "TEMPLATE_MATCHING"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_set_mode",
+            "fields": {
+              "MODE": "COLOR_DETECTION"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "pixetto_shape_detect",
+      "categories": [
+        "vision-sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "SHAPE",
+              "kind": "dropdown",
+              "defaultValue": "TRIANGLE",
+              "optionsMode": "static",
+              "options": [
+                "CIRCLE",
+                "HEXAGON",
+                "PENTAGON",
+                "RECTANGLE",
+                "TRIANGLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_shape_detect",
+            "fields": {
+              "SHAPE": "TRIANGLE"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "SHAPE",
+              "kind": "dropdown",
+              "defaultValue": "TRIANGLE",
+              "optionsMode": "static",
+              "options": [
+                "CIRCLE",
+                "HEXAGON",
+                "PENTAGON",
+                "RECTANGLE",
+                "TRIANGLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_shape_detect",
+            "fields": {
+              "SHAPE": "TRIANGLE"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "SHAPE",
+              "kind": "dropdown",
+              "defaultValue": "TRIANGLE",
+              "optionsMode": "static",
+              "options": [
+                "CIRCLE",
+                "HEXAGON",
+                "PENTAGON",
+                "RECTANGLE",
+                "TRIANGLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_shape_detect",
+            "fields": {
+              "SHAPE": "TRIANGLE"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "SHAPE",
+              "kind": "dropdown",
+              "defaultValue": "TRIANGLE",
+              "optionsMode": "static",
+              "options": [
+                "CIRCLE",
+                "HEXAGON",
+                "PENTAGON",
+                "RECTANGLE",
+                "TRIANGLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_shape_detect",
+            "fields": {
+              "SHAPE": "TRIANGLE"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "SHAPE",
+              "kind": "dropdown",
+              "defaultValue": "TRIANGLE",
+              "optionsMode": "static",
+              "options": [
+                "CIRCLE",
+                "HEXAGON",
+                "PENTAGON",
+                "RECTANGLE",
+                "TRIANGLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "pixetto_shape_detect",
+            "fields": {
+              "SHAPE": "TRIANGLE"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

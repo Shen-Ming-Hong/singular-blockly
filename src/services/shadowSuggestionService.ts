@@ -5,10 +5,9 @@
  */
 
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import { log } from './logging';
 import { AIModelManager } from './aiModelManager';
+import { BlockContractService } from './blockContractService';
 
 /** A single block suggestion from the AI model */
 export interface BlockSuggestion {
@@ -67,37 +66,23 @@ const BARE_ARRAY_RE = /\[[\s\S]*\]/;
 /** Default timeout for AI requests (ms) */
 const REQUEST_TIMEOUT_MS = 25_000;
 
-/** Map WebView board IDs to block-dictionary.json board names */
-const BOARD_NAME_MAP: Record<string, string> = {
-	uno: 'arduino_uno',
-	nano: 'arduino_nano',
-	mega: 'arduino_mega',
-	esp32: 'esp32',
-	supermini: 'esp32_supermini',
-	cyberbrick: 'cyberbrick',
-};
-
-/** Categories that are universal across all boards — skip board filtering */
-const UNIVERSAL_CATEGORIES = new Set(['logic', 'loops', 'math', 'text', 'lists', 'variables', 'functions']);
-
 /**
  * Shadow Block 建議服務
  * 接收工作區上下文，透過 AIModelManager 呼叫 LLM 產生積木建議
  */
 export class ShadowSuggestionService {
-	private _blockDictionaryCache = new Map<string, string>();
 	private _blockTypeSet: Set<string> | undefined;
 	private _blockTypeCategoryMap: Map<string, string> | undefined;
 	private _blockInputsMap: Map<string, Array<{ name: string; check?: string | string[] }>> = new Map();
 	private _blockStatementInputsMap: Map<string, string[]> = new Map();
-	private readonly _extensionPath: string;
+	private readonly _blockContractService: BlockContractService;
 	private _activeCancellationSource: vscode.CancellationTokenSource | undefined;
 
 	constructor(
 		private readonly _modelManager: AIModelManager,
 		extensionPath: string
 	) {
-		this._extensionPath = extensionPath;
+		this._blockContractService = new BlockContractService(extensionPath);
 	}
 
 	/**
@@ -229,7 +214,7 @@ export class ShadowSuggestionService {
 	 */
 	private buildPrompt(context: WorkspaceContext): vscode.LanguageModelChatMessage[] {
 		const config = this._modelManager.getEffectiveConfig();
-		const blockList = this.loadBlockDictionary(context.language, context.board);
+		const blockList = this.loadBlockContractSummary(context.language, context.board);
 
 		// Message 1: Static identity + instructions + few-shot examples (User)
 		const systemParts: string[] = [
@@ -725,85 +710,34 @@ export class ShadowSuggestionService {
 	}
 
 	/**
-	 * Load and cache a block dictionary summary with one-line descriptions, filtered by language.
+	 * Load a block contract summary filtered by the active board.
 	 * Format: "### Category\ntype — description\n..."
 	 */
-	private loadBlockDictionary(language: 'arduino' | 'micropython', board: string): string {
-		const cacheKey = `${language}:${board}`;
-		const cached = this._blockDictionaryCache.get(cacheKey);
-		if (cached) {
-			return cached;
-		}
-
-		// Categories exclusive to each platform
-		const arduinoOnlyCategories = new Set(['arduino', 'vision', 'motors', 'sensors', 'displays', 'communication']);
-		const micropythonOnlyCategories = new Set(['cyberbrick']);
-
+	private loadBlockContractSummary(language: 'arduino' | 'micropython', board: string): string {
 		try {
-			// Try multiple possible locations (dist for production, src for development)
-			const candidates = [
-				path.join(this._extensionPath, 'dist', 'block-dictionary.json'),
-				path.join(this._extensionPath, 'src', 'mcp', 'block-dictionary.json'),
-				path.join(this._extensionPath, 'block-dictionary.json'),
-			];
-			const dictPath = candidates.find(p => fs.existsSync(p));
-			if (!dictPath) {
-				log('Block dictionary not found in any expected location', 'warn');
-				const fallback = '(block dictionary unavailable)';
-				this._blockDictionaryCache.set(language, fallback);
-				return fallback;
-			}
-			const raw = fs.readFileSync(dictPath, 'utf-8');
-			const dict = JSON.parse(raw) as {
-				blocks: Array<{
-					type: string;
-					category: string;
-					descriptions?: Record<string, string>;
-					inputs?: Array<{ name: string; type: string; check?: string | string[] }>;
-					fields?: Array<{ name: string; type: string; options?: any }>;
-					internal?: boolean;
-					experimental?: boolean;
-					boards?: string[];
-				}>;
-			};
-
-			// Build block type set for validation (all blocks, unfiltered)
-			this._blockTypeSet = new Set(dict.blocks.map(b => b.type));
-
-			// Filter blocks by language and board
-			const dictBoardName = BOARD_NAME_MAP[board] || board;
-			const filtered = dict.blocks.filter(b => {
-				if (language === 'micropython' && arduinoOnlyCategories.has(b.category)) {
-					return false;
-				}
-				if (language === 'arduino' && micropythonOnlyCategories.has(b.category)) {
-					return false;
-				}
-				// Exclude internal and experimental blocks from AI suggestions
-				if (b.internal === true || b.experimental === true) {
-					return false;
-				}
-				// Filter by board compatibility (skip universal categories)
-				if (!UNIVERSAL_CATEGORIES.has(b.category) && b.boards && Array.isArray(b.boards) && !b.boards.includes(dictBoardName)) {
-					return false;
-				}
-				return true;
-			});
+			const dict = this._blockContractService.load().contract;
+			const filtered = dict.blocks.filter(block => block.boards.includes(board));
+			this._blockTypeSet = new Set(filtered.map(block => block.type));
 
 			// Build blockType → category map and inputs map
 			this._blockTypeCategoryMap = new Map<string, string>();
 			this._blockInputsMap.clear();
 			this._blockStatementInputsMap.clear();
 			for (const block of filtered) {
-				this._blockTypeCategoryMap.set(block.type, block.category);
-				const valueInputs = block.inputs?.filter(i => i.type === 'value');
+				const variant = block.variants[board];
+				if (!variant) {continue;}
+				this._blockTypeCategoryMap.set(block.type, block.categories[0] || 'uncategorized');
+				const valueInputs = variant.inputs.filter(input => input.kind === 'VALUE' && input.connection.enabled);
 				if (valueInputs && valueInputs.length > 0) {
 					this._blockInputsMap.set(
 						block.type,
-						valueInputs.map(i => ({ name: i.name, check: i.check }))
+						valueInputs.map(input => ({
+							name: input.name,
+							check: input.connection.check || undefined,
+						}))
 					);
 				}
-				const stmtInputs = block.inputs?.filter(i => i.type === 'statement');
+				const stmtInputs = variant.inputs.filter(input => input.kind === 'STATEMENT' && input.connection.enabled);
 				if (stmtInputs && stmtInputs.length > 0) {
 					this._blockStatementInputsMap.set(
 						block.type,
@@ -815,27 +749,26 @@ export class ShadowSuggestionService {
 			// Group by category
 			const byCategory = new Map<string, string[]>();
 			for (const block of filtered) {
-				const cat = block.category;
+				const variant = block.variants[board];
+				if (!variant) {continue;}
+				const cat = block.categories[0] || 'uncategorized';
 				if (!byCategory.has(cat)) {
 					byCategory.set(cat, []);
 				}
-				const valueInputs = block.inputs?.filter(i => i.type === 'value') ?? [];
+				const valueInputs = variant.inputs.filter(input => input.kind === 'VALUE' && input.connection.enabled);
 				const inputsSummary = valueInputs.length
 					? ' | inputs: ' +
-						valueInputs.map(i => `${i.name}(${Array.isArray(i.check) ? i.check.join('|') : i.check || 'Any'})`).join(', ')
+						valueInputs.map(input => `${input.name}(${input.connection.check?.join('|') || 'Any'})`).join(', ')
 					: '';
-				const stmtInputs = block.inputs?.filter(i => i.type === 'statement') ?? [];
+				const stmtInputs = variant.inputs.filter(input => input.kind === 'STATEMENT' && input.connection.enabled);
 				const stmtsSummary = stmtInputs.length ? ' | stmts: ' + stmtInputs.map(i => i.name).join(', ') : '';
 
 				// Build field dropdown summary
-				const dropdownFields = (block.fields ?? [])
-					.filter(f => f.type === 'dropdown' && f.options)
+				const dropdownFields = variant.fields
+					.filter(field => field.kind === 'dropdown' && field.options)
 					.map(f => {
-						if (typeof f.options === 'string') {
-							return `${f.name}[dynamic]`;
-						}
 						if (Array.isArray(f.options)) {
-							const values = (f.options as Array<{ value: string }>).map(o => o.value).filter(Boolean);
+							const values = f.options.filter(Boolean);
 							if (values.length > 4) {
 								return `${f.name}[${values.slice(0, 3).join('|')}|...]`;
 							}
@@ -860,14 +793,15 @@ export class ShadowSuggestionService {
 			}
 
 			const result = lines.join('\n').trimEnd();
-			this._blockDictionaryCache.set(cacheKey, result);
-			log(`Block dictionary loaded (${language}/${board}): ${filtered.length} blocks in ${byCategory.size} categories`, 'info');
+			log(`Block contract loaded (${language}/${board}): ${filtered.length} blocks in ${byCategory.size} categories`, 'info');
 			return result;
 		} catch (err) {
-			log(`Failed to load block dictionary: ${err}`, 'warn');
-			const fallback = '(block dictionary unavailable)';
-			this._blockDictionaryCache.set(cacheKey, fallback);
-			return fallback;
+			log(`Failed to load block contract: ${err}`, 'warn');
+			this._blockTypeSet = undefined;
+			this._blockTypeCategoryMap = undefined;
+			this._blockInputsMap.clear();
+			this._blockStatementInputsMap.clear();
+			return '(block contract unavailable)';
 		}
 	}
 
@@ -1227,8 +1161,8 @@ export class ShadowSuggestionService {
 			return false;
 		}
 
-		// Validate against block dictionary if loaded
-		// Allow variable blocks which are dynamic and not in the static dictionary
+		// Validate against the generated block contract when it is available.
+		// Variable blocks are dynamic and therefore are not part of the static contract.
 		const dynamicBlocks = new Set(['variables_get', 'variables_set']);
 		if (this._blockTypeSet && !this._blockTypeSet.has(suggestion.blockType) && !dynamicBlocks.has(suggestion.blockType)) {
 			log(`[AI Debug] Rejected: unknown blockType "${suggestion.blockType}"`, 'debug');

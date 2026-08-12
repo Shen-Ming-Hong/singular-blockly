@@ -5,12 +5,15 @@
  */
 
 import assert = require('assert');
+import * as path from 'path';
 import * as sinon from 'sinon';
 import { describe, it, before, beforeEach, after, afterEach } from 'mocha';
 import { activate, deactivate, _setVSCodeApi, _reset } from '../extension';
 import * as logging from '../services/logging';
 import { VSCodeMock, FSMock } from './helpers/mocks';
 import { WebViewManager } from '../webview/webviewManager';
+import { ProjectSkillService } from '../services/projectSkillService';
+import { WorkspaceCandidateService } from '../services/workspaceCandidateService';
 
 describe('Extension activate', () => {
 	let vscodeMock: VSCodeMock;
@@ -87,6 +90,102 @@ describe('Extension activate', () => {
 		// Note: AIStatusBar uses `vscode` directly (not injectable via _setVSCodeApi) and is only
 		// created when Copilot is available (tier !== 'none'). In the unit test environment
 		// there is no Copilot, so createStatusBarItem is not called here.
+	});
+
+	it('silently installs Skills for every existing Blockly workspace folder', async () => {
+		vscodeMock.workspace.workspaceFolders = [
+			{ uri: { fsPath: '/mock/first' } },
+			{ uri: { fsPath: '/mock/second' } },
+		];
+		fsMock.addDirectory('/mock/first/blockly');
+		fsMock.addDirectory('/mock/second/blockly');
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(true);
+		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+
+		await activate(context as any);
+		await new Promise(resolve => setImmediate(resolve));
+
+		assert.strictEqual(ensureInstalled.callCount, 2);
+		assert.strictEqual(vscodeMock.window.showInformationMessage.called, false);
+		assert.strictEqual(vscodeMock.window.showWarningMessage.called, false);
+	});
+
+	it('does not install into a general folder until opening the Blockly editor marks it as a project', async () => {
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/general' } }];
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(false);
+		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+
+		await activate(context as any);
+		await new Promise(resolve => setImmediate(resolve));
+		assert.strictEqual(ensureInstalled.called, false);
+
+		const open = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+		await open.args[1]();
+		await new Promise(resolve => setImmediate(resolve));
+		assert.strictEqual(ensureInstalled.callCount, 1);
+	});
+
+	it('opening the editor only marks the primary folder in a mixed multi-root workspace', async () => {
+		vscodeMock.workspace.workspaceFolders = [
+			{ uri: { fsPath: '/mock/primary' } },
+			{ uri: { fsPath: '/mock/unrelated' } },
+		];
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(false);
+		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+
+		await activate(context as any);
+		const open = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+		await open.args[1]();
+		await new Promise(resolve => setImmediate(resolve));
+
+		assert.strictEqual(ensureInstalled.callCount, 1);
+		assert.strictEqual((ensureInstalled.firstCall.thisValue as any).workspaceKey, path.resolve('/mock/primary'));
+	});
+
+	it('installs Skills for a Blockly folder added while the extension is running', async () => {
+		vscodeMock.workspace.workspaceFolders = undefined;
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(true);
+		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+		await activate(context as any);
+
+		fsMock.addDirectory('/mock/added/blockly');
+		vscodeMock.fireWorkspaceFoldersChanged([{ uri: { fsPath: '/mock/added' } }]);
+		await new Promise(resolve => setImmediate(resolve));
+
+		assert.strictEqual(ensureInstalled.callCount, 1);
+	});
+
+	it('disposes candidate monitoring when a workspace folder is removed', async () => {
+		const folder = { uri: { fsPath: '/mock/removed' } };
+		vscodeMock.workspace.workspaceFolders = [folder];
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(true);
+		const dispose = sinon.spy(WorkspaceCandidateService.prototype, 'dispose');
+
+		await activate(context as any);
+		vscodeMock.fireWorkspaceFoldersChanged([], [folder]);
+
+		assert.strictEqual(dispose.calledOnce, true);
+	});
+
+	it('replaces candidate monitoring when the primary workspace folder changes', async () => {
+		const first = { uri: { fsPath: '/mock/first-primary' } };
+		const second = { uri: { fsPath: '/mock/second-primary' } };
+		vscodeMock.workspace.workspaceFolders = [first];
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(true);
+		const start = sinon.spy(WorkspaceCandidateService.prototype, 'start');
+		const dispose = sinon.spy(WorkspaceCandidateService.prototype, 'dispose');
+
+		await activate(context as any);
+		vscodeMock.fireWorkspaceFoldersChanged([second], [first]);
+
+		assert.strictEqual(start.callCount, 2);
+		assert.strictEqual(dispose.calledOnce, true);
 	});
 
 	it('disposes output channel on deactivate', () => {

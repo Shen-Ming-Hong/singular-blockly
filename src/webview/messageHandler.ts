@@ -6,6 +6,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { randomUUID } from 'crypto';
 import { log, handleWebViewLog } from '../services/logging';
 import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
@@ -18,6 +19,14 @@ import { ArduinoMonitorService } from '../services/arduinoMonitorService';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
 import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSuggestionService';
+import { getWorkspaceCandidateService } from '../services/workspaceCandidateService';
+import {
+	isWorkspaceDocument,
+	isWorkspaceValidationIssue,
+	normalizeWorkspaceDocumentBoard,
+	WorkspaceDocument,
+	WorkspaceInitialLoadResultMessage,
+} from '../types/workspaceValidation';
 import { fetchSampleIndex, fetchSampleWorkspace, validateSampleWorkspace, applyNameTranslations } from '../services/sampleBrowserService';
 import { TxtConnectionService } from '../services/txtConnectionService';
 import { TxtUploader } from '../services/txtUploader';
@@ -305,6 +314,7 @@ export class WebViewMessageHandler {
 	private activeTxtExecutionOperationId: string | null = null;
 	private stoppingTxtExecutionOperationIds = new Set<string>();
 	private activeBlocklyDialogRequestIds = new Set<string>();
+	private pendingInitialWorkspaceLoad?: { requestId: string; sourceBytes: Buffer; recoveryAttempted: boolean };
 	private pendingBoardConfigRequests = new Map<
 		string,
 		{
@@ -425,6 +435,9 @@ export class WebViewMessageHandler {
 				case 'requestInitialState':
 					await this.handleRequestInitialState();
 					break;
+				case 'workspaceInitialLoadResult':
+					await this.handleWorkspaceInitialLoadResult(message);
+					break;
 				case 'promptNewVariable':
 					await this.handlePromptNewVariable(message);
 					break;
@@ -472,10 +485,6 @@ export class WebViewMessageHandler {
 					break;
 				case 'boardConfigResult':
 					this.handleBoardConfigResult(message);
-					break;
-				// MCP Server 整合 - T031: 處理工作區重載請求
-				case 'requestWorkspaceReload':
-					await this.handleRequestWorkspaceReload();
 					break;
 				// CyberBrick MicroPython 上傳功能
 				case 'requestUpload':
@@ -899,9 +908,6 @@ export class WebViewMessageHandler {
 			// 建立 blockly 目錄
 			await this.fileService.createDirectory(blocklyDir);
 
-			// 覆寫前備份
-			await this.createBackupBeforeSave(mainJsonPath);
-
 			// 驗證並清理資料
 			const cleanState = message.state ? JSON.parse(JSON.stringify(message.state)) : {};
 			const saveData = {
@@ -914,8 +920,20 @@ export class WebViewMessageHandler {
 			// 驗證 JSON 是否可序列化
 			JSON.parse(JSON.stringify(saveData));
 
-			// 寫入檔案
-			await this.fileService.writeJsonFile(mainJsonPath, saveData);
+			// The live Blockly runtime produced this document, so commit main and .bak together.
+			const workspaceRoot = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath;
+			const candidateService = workspaceRoot ? getWorkspaceCandidateService(workspaceRoot) : undefined;
+			if (candidateService) {
+				await candidateService.recordValidDocument(saveData);
+			} else {
+				const contents = `${JSON.stringify(saveData, null, 2)}\n`;
+				await this.fileService.writeFileAtomic(mainJsonPath, contents);
+				try {
+					await this.fileService.writeFileAtomic(`${mainJsonPath}.bak`, contents);
+				} catch {
+					log('Workspace backup update failed after a valid editor save', 'warn');
+				}
+			}
 		} catch (error) {
 			log('Failed to save workspace state:', 'error', error);
 			const errText = (error as Error).message;
@@ -1463,14 +1481,15 @@ export class WebViewMessageHandler {
 	/**
 	 * 處理請求初始狀態訊息
 	 */
-	private async handleRequestInitialState(): Promise<void> {
+	private async handleRequestInitialState(recoveryAttempted = false): Promise<void> {
 		try {
 			const mainJsonPath = path.join('blockly', 'main.json');
-			let saveData: { workspace: any; board: string; txtVirtualControls?: TxtVirtualControlsDocument } = {
+			let saveData: WorkspaceDocument = {
 				workspace: {},
 				board: 'none',
 				txtVirtualControls: createEmptyTxtVirtualControlsDocument(),
 			};
+			let sourceBytes: Buffer | undefined;
 
 			await this.migrateThemeFromMainJson(mainJsonPath);
 
@@ -1483,30 +1502,45 @@ export class WebViewMessageHandler {
 
 			if (this.fileService.fileExists(mainJsonPath)) {
 				try {
-					const existingData = await this.fileService.readJsonFile<any>(mainJsonPath, saveData);
-
-					// 驗證資料結構
-					if (existingData && typeof existingData === 'object' && existingData.workspace) {
-						saveData = {
-							workspace: existingData.workspace,
-							board: existingData.board || 'none',
-							txtVirtualControls: this.getNormalizedTxtVirtualControlsDocument(
-								existingData.board || 'none',
-								existingData.txtVirtualControls
-							),
-						};
-					} else {
-						throw new Error('Invalid workspace state format');
-					}
+					sourceBytes = await this.fileService.readBuffer(mainJsonPath);
+					const existingData = JSON.parse(sourceBytes.toString('utf8')) as unknown;
+					if (!isWorkspaceDocument(existingData)) {throw new Error('Invalid workspace state format');}
+					const normalizedExistingData = normalizeWorkspaceDocumentBoard(existingData);
+					const board = normalizedExistingData.board || 'none';
+					saveData = {
+						...normalizedExistingData,
+						board,
+						workspace: normalizedExistingData.workspace,
+						...(board === 'txt'
+							? { txtVirtualControls: this.getNormalizedTxtVirtualControlsDocument(board, normalizedExistingData.txtVirtualControls) }
+							: {}),
+					};
 				} catch (parseError) {
 					log('JSON parsing error:', 'error', parseError);
-					// 建立新的空白狀態
-					await this.fileService.writeJsonFile(mainJsonPath, saveData);
+					this.pendingInitialWorkspaceLoad = undefined;
+					sourceBytes = undefined;
+					const workspaceRoot = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath;
+					const candidateService = workspaceRoot ? getWorkspaceCandidateService(workspaceRoot) : undefined;
+					if (candidateService) {
+						await candidateService.processCandidate();
+						if (this.fileService.fileExists(mainJsonPath)) {
+							try {
+								sourceBytes = await this.fileService.readBuffer(mainJsonPath);
+								const recovered = JSON.parse(sourceBytes.toString('utf8')) as unknown;
+								if (isWorkspaceDocument(recovered)) {saveData = normalizeWorkspaceDocumentBoard(recovered);}
+								else {sourceBytes = undefined;}
+							} catch {
+								sourceBytes = undefined;
+							}
+						}
+					}
 				}
 			}
 
 			this.txtVirtualControlsDocument =
-				saveData.board === 'txt' ? saveData.txtVirtualControls || createEmptyTxtVirtualControlsDocument() : createEmptyTxtVirtualControlsDocument();
+				saveData.board === 'txt'
+					? this.getNormalizedTxtVirtualControlsDocument(saveData.board, saveData.txtVirtualControls)
+					: createEmptyTxtVirtualControlsDocument();
 
 			// 如果是 MicroPython 專案，提前刪除 platformio.ini 避免 PlatformIO 擴充功能鎖定檔案
 			if (saveData.board === 'cyberbrick') {
@@ -1523,8 +1557,13 @@ export class WebViewMessageHandler {
 
 			const resolvedLanguage = this.settingsManager.resolveLanguage(languagePreference);
 
+			const initialLoadRequestId = sourceBytes ? randomUUID() : undefined;
+			this.pendingInitialWorkspaceLoad = initialLoadRequestId && sourceBytes
+				? { requestId: initialLoadRequestId, sourceBytes: Buffer.from(sourceBytes), recoveryAttempted }
+				: undefined;
 			this.panel.webview.postMessage({
 				command: 'init',
+				...(initialLoadRequestId ? { initialLoadRequestId, document: saveData } : {}),
 				theme: theme,
 				board: saveData.board || 'none',
 				workspace: saveData.workspace || {},
@@ -1550,6 +1589,35 @@ export class WebViewMessageHandler {
 			}
 		} catch (error) {
 			log('Failed to read workspace state:', 'error', error);
+		}
+	}
+
+	private async handleWorkspaceInitialLoadResult(message: WorkspaceInitialLoadResultMessage): Promise<void> {
+		const pending = this.pendingInitialWorkspaceLoad;
+		if (!pending || message.requestId !== pending.requestId) {return;}
+		this.pendingInitialWorkspaceLoad = undefined;
+
+		const workspaceRoot = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath;
+		const candidateService = workspaceRoot ? getWorkspaceCandidateService(workspaceRoot) : undefined;
+		if (!candidateService) {return;}
+		if (!message.success || !isWorkspaceDocument(message.normalizedDocument)) {
+			const issue = isWorkspaceValidationIssue(message.issue) ? message.issue : { code: 'ROUND_TRIP_FAILED' as const };
+			try {
+				const rejected = await candidateService.rejectInitialCandidate(
+					pending.sourceBytes,
+					issue,
+					!pending.recoveryAttempted
+				);
+				if (rejected) {await this.handleRequestInitialState(true);}
+			} catch (error) {
+				log('Failed to reject initial workspace candidate', 'warn', error);
+			}
+			return;
+		}
+		try {
+			await candidateService.seedInitialValidDocument(message.normalizedDocument, pending.sourceBytes);
+		} catch (error) {
+			log('Failed to seed initial workspace recovery state', 'warn', error);
 		}
 	}
 
@@ -1594,9 +1662,9 @@ export class WebViewMessageHandler {
 				log(`Migrated theme from main.json to settings: ${storedTheme}`, 'info');
 			}
 
-			// 從 main.json 移除 theme 欄位
-			delete saveData.theme;
-			await this.fileService.writeJsonFile(mainJsonPath, saveData);
+			// Do not rewrite main.json while opening an existing project. A startup
+			// rewrite is indistinguishable from an external candidate to the watcher.
+			// The legacy field is omitted naturally on the next editor save.
 		} catch (error) {
 			log('Failed to migrate theme from main.json:', 'warn', error);
 		}
@@ -1992,51 +2060,6 @@ export class WebViewMessageHandler {
 			const errorMsg = await this.localeService.getLocalizedMessage(
 				'BACKUP_ERROR_UPDATE_SETTINGS_FAILED',
 				'Failed to update auto backup settings'
-			);
-			this.showErrorMessage(errorMsg);
-		}
-	}
-
-	// ===== MCP Server 整合 - T031 =====
-
-	/**
-	 * 處理工作區重載請求
-	 * 當 MCP Server 或 FileWatcher 觸發重載時呼叫
-	 */
-	private async handleRequestWorkspaceReload(): Promise<void> {
-		try {
-			log('Processing workspace reload request', 'info');
-
-			// 讀取最新的 main.json
-			const blocklyDir = 'blockly';
-			const mainJsonPath = path.join(blocklyDir, 'main.json');
-
-			if (!this.fileService.fileExists(mainJsonPath)) {
-				log('main.json not found, skipping reload', 'warn');
-				return;
-			}
-
-			const content = await this.fileService.readFile(mainJsonPath);
-			const state = JSON.parse(content);
-			const normalizedTxtVirtualControls = this.getNormalizedTxtVirtualControlsDocument(state.board, state.txtVirtualControls);
-			this.txtVirtualControlsDocument = state.board === 'txt' ? normalizedTxtVirtualControls : createEmptyTxtVirtualControlsDocument();
-
-			// 發送工作區狀態給 WebView
-			this.panel.webview.postMessage({
-				command: 'loadWorkspace',
-				state: state.workspace || {},
-				board: state.board || 'none',
-				txtVirtualControls: normalizedTxtVirtualControls,
-				source: 'mcpReload',
-			});
-
-			log('Workspace reloaded via MCP integration', 'info');
-		} catch (error) {
-			log('Failed to reload workspace:', 'error', error);
-			const errorMsg = await this.localeService.getLocalizedMessage(
-				'ERROR_RELOAD_WORKSPACE_FAILED',
-				'Failed to reload workspace: {0}',
-				String(error)
 			);
 			this.showErrorMessage(errorMsg);
 		}

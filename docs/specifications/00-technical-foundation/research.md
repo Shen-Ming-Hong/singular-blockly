@@ -1,7 +1,7 @@
 # 技術架構研究 (research.md)
 
 > 依據 Spec Kit 方法論，從專案原始碼分析技術架構、資料流、元件依賴關係。
-> 最後更新：2025-12-17
+> 最後更新：2026-08-12
 
 ---
 
@@ -22,14 +22,12 @@
 
 | 依賴項                    | 版本     | 用途           | 備註                     |
 | ------------------------- | -------- | -------------- | ------------------------ |
-| Blockly                   | 12.3.1   | 視覺化程式編輯 | Google 官方積木程式庫    |
-| @blockly/theme-modern     | 7.0.1    | 現代化 UI 主題 | 擴展主題套件             |
+| Blockly                   | 13.2.1   | 視覺化程式編輯 | Google 官方積木程式庫    |
+| @blockly/theme-modern     | 13.2.0   | 現代化 UI 主題 | 擴展主題套件             |
 | TypeScript                | 5.9.3    | 型別安全開發   | Extension Host 程式碼    |
-| Node.js                   | 22.16.0+ | 執行環境       | Extension Host 運行時    |
-| VS Code API               | 1.105.0+ | 編輯器整合     | WebView、Commands、MCP   |
+| Node.js                   | 22.16.0+ | 貢獻者工具鏈   | 建置、測試與封裝         |
+| VS Code API               | 1.109.0+ | 編輯器整合     | WebView、Commands、Skills |
 | Webpack                   | 5.102.1  | 打包工具       | 產出 `dist/extension.js` |
-| @modelcontextprotocol/sdk | 1.24.3   | MCP Server SDK | AI 工具整合              |
-| Zod                       | 4.1.13   | Schema 驗證    | MCP 工具輸入驗證         |
 
 ### 2.2 開發依賴
 
@@ -53,7 +51,7 @@ src/
 │   ├── activate()            # 啟用函數
 │   ├── registerCommands()    # 命令註冊
 │   ├── setupStatusBar()      # 狀態列設定
-│   └── registerMcpProvider() # MCP Provider 註冊
+│   └── ensureProjectSkills() # 專案 Skill 生命週期
 │
 ├── webview/
 │   ├── webviewManager.ts     # WebView 面板管理 (~970 行)
@@ -69,9 +67,12 @@ src/
 │       ├── handleSaveWorkspace()     # 工作區儲存
 │       ├── handleUpdateBoard()       # 開發板切換
 │       ├── handleCreateBackup()      # 備份建立
-│       └── handleRequestWorkspaceReload()  # MCP 重載
+│       └── handleSaveWorkspace()     # 有效狀態與 .bak 原子提交
 │
 ├── services/
+│   ├── projectSkillService.ts # Skill 安裝、更新、備份與 rollback
+│   ├── blockContractService.ts # runtime 衍生契約讀取
+│   ├── workspaceCandidateService.ts # 候選狀態機、隔離與恢復
 │   ├── fileService.ts        # 檔案操作服務
 │   │   ├── readFile() / writeFile()
 │   │   ├── readJsonFile() / writeJsonFile()
@@ -97,15 +98,6 @@ src/
 │   └── logging.ts            # 統一日誌服務
 │       ├── log.info() / log.error()
 │       └── handleWebViewLog()
-│
-└── mcp/
-    ├── mcpProvider.ts        # MCP Provider 註冊
-    ├── mcpServer.ts          # STDIO Transport Server
-    ├── blockDictionary.ts    # 積木元資料字典
-    └── tools/
-        ├── blockQuery.ts     # 積木查詢工具
-        ├── platformConfig.ts # 平台配置工具
-        └── workspaceOps.ts   # 工作區操作工具
 ```
 
 ### 3.2 WebView (瀏覽器環境)
@@ -316,94 +308,49 @@ window.arduinoGenerator.forBlock['servo_setup'] = function (block) {
 
 ---
 
-## 五、MCP Server 整合架構
+## 五、Agent Skills 與安全候選架構
 
-### 5.1 MCP Server 元件
+### 5.1 專案內能力
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    VSCode MCP Host                          │
-│  ┌──────────────────┐     ┌─────────────────────────────┐  │
-│  │   mcpProvider.ts │────►│ registerMcpProvider()       │  │
-│  │                  │     │ ├── McpServerDefinitionProvider │
-│  │                  │     │ └── resolveServerDefinition() │
-│  └──────────────────┘     └─────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              │ STDIO Transport
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    MCP Server Process                        │
-│  ┌──────────────────┐                                       │
-│  │   mcpServer.ts   │ ← 獨立 Node.js 進程                    │
-│  │   ├── main()     │                                       │
-│  │   ├── McpServer  │                                       │
-│  │   └── StdioServerTransport                               │
-│  └────────┬─────────┘                                       │
-│           │ 註冊工具                                         │
-│           ▼                                                 │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │                    MCP Tools                          │  │
-│  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐  │  │
-│  │  │ blockQuery   │ │platformConfig│ │workspaceOps  │  │  │
-│  │  │ ├── get_block│ │ ├── get_board│ │ ├── get_     │  │  │
-│  │  │ │   _usage   │ │ │   _config  │ │ │   workspace│  │  │
-│  │  │ ├── search_  │ │ └── list_    │ │ │   _state   │  │  │
-│  │  │ │   blocks   │ │     boards   │ │ ├── refresh_ │  │  │
-│  │  │ └── list_    │ └──────────────┘ │ │   editor   │  │  │
-│  │  │     blocks_  │                  │ └── get_     │  │  │
-│  │  │     by_cat   │                  │     generated│  │  │
-│  │  └──────────────┘                  │     _code    │  │  │
-│  │                                    └──────────────┘  │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+.agents/skills/singular-blockly/  ← 唯一正式英文契約
+├── SKILL.md
+├── managed-manifest.json
+├── project-notes.md              ← create-if-missing
+└── references/
+    ├── block-contract.json        ← category 分片索引
+    ├── block-contract/*.json      ← 真實 Blockly runtime 衍生分片
+    ├── workspace-format.md
+    └── workspace.schema.json
+
+.claude/skills/singular-blockly/SKILL.md
+    └── 只定位正式契約，不複製規則
 ```
 
-### 5.2 MCP 工具輸入驗證 (Zod Schema)
-
-```typescript
-// blockQuery.ts - get_block_usage 範例
-server.tool(
-  'get_block_usage',
-  '查詢積木用法並生成 JSON 模板',
-  {
-    blockType: z.string().describe('積木類型識別碼'),
-    language: z.enum(['en', 'zh-hant', 'ja', ...]).default('zh-hant'),
-    context: z.object({
-      functionName: z.string().optional(),
-      arguments: z.array(z.object({...})).optional(),
-      // ... 更多欄位
-    }).passthrough().optional()
-  },
-  async ({ blockType, language, context }) => {
-    // 工具實作
-  }
-);
-```
-
-### 5.3 FileWatcher 整合機制
+### 5.2 FileWatcher 與 runtime gate
 
 ```
 ┌─────────────────┐    修改    ┌─────────────────┐
-│   MCP Client    │ ─────────► │ blockly/main.json│
+│  支援的 AI 代理 │ ─────────► │ blockly/main.json│
 │ (AI Assistant)  │            └────────┬────────┘
 └─────────────────┘                     │
                                         │ FileWatcher 偵測
                                         ▼
                               ┌─────────────────────┐
-                              │ webviewManager.ts   │
-                              │ handleFileChange()  │
-                              │ ├── debounce 500ms  │
-                              │ └── triggerWorkspace│
-                              │     Reload()        │
+                              │ WorkspaceCandidate │
+                              │ Service             │
+                              │ ├── generation      │
+                              │ ├── 10 秒 deadline  │
+                              │ └── quarantine      │
                               └──────────┬──────────┘
                                          │ postMessage
                                          ▼
                               ┌─────────────────────┐
                               │     WebView         │
-                              │ loadWorkspace()     │
-                              │ ├── 載入新狀態      │
-                              │ └── 重新生成程式碼   │
+                              │ disposable runtime  │
+                              │ load/save/load      │
+                              │ → live ack          │
+                              │ → main + .bak commit│
                               └─────────────────────┘
 ```
 
@@ -719,21 +666,21 @@ const service = new FileService('/test', mockFs);
 
 ## 十一、決策記錄
 
-### 11.1 選擇 MCP over Language Server Protocol
+### 11.1 選擇專案 Agent Skills 與 runtime gate
 
-**決策**: 使用 Model Context Protocol (MCP) 而非 Language Server Protocol (LSP)
+**決策**：以專案內 Agent Skills 提供 AI 契約，並由真實 Blockly runtime 驗證外部工作區候選。
 
 **理由**:
 
--   MCP 專為 AI 助手工具整合設計
--   VS Code 1.105.0+ 原生支援 MCP
--   更簡單的工具定義方式 (Zod Schema)
--   與 Blockly 視覺編輯器整合更自然
+-   使用者不需安裝系統 Node.js 或管理背景程序。
+-   契約可納入版本控制，Codex 與 Claude Code 解析到同一正式來源。
+-   積木 metadata 從產品 runtime 與工具箱產生，不維護平行字典。
+-   AI 寫檔仍須經 disposable load/save/load 與正式載入 acknowledgement。
 
 **替代方案考慮**:
 
--   LSP: 過於複雜，主要用於文字編輯
--   REST API: 需要額外的伺服器管理
+-   LSP：主要服務文字編輯，不適合完整 Blockly 序列化契約。
+-   REST／外部程序：增加安裝、生命週期與安全維護成本。
 
 ### 11.2 選擇 FileWatcher 而非輪詢
 

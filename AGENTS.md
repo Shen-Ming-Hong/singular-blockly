@@ -7,14 +7,15 @@
 - VS Code extension for visual Arduino/MicroPython programming with Google Blockly.
 - Generates Arduino C++ through PlatformIO and MicroPython through `mpremote` for CyberBrick.
 - Supports 15 locales; validate localization changes before shipping.
-- Runtime/tooling baseline: TypeScript 5.9.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, VS Code `^1.105.0`, Node.js 22.16.0+.
+- Runtime/tooling baseline: TypeScript 5.9.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, VS Code `^1.109.0`, Node.js 22.16.0+ for contributors.
 - PlatformIO IDE (`platformio.platformio-ide`) is an extension dependency.
 
 ## Project Structure
-- `src/`: TypeScript extension source, services, MCP, and webview orchestration.
+- `src/`: TypeScript extension source, services, project-Skill management, and webview orchestration.
 - `src/test/`: Mocha/Sinon tests, including suite and integration coverage.
 - `media/`: Webview HTML/CSS/JS, Blockly blocks/generators, toolbox, and `media/locales/`.
-- `scripts/`: build, dictionary, and i18n utilities.
+- `resources/project-skills/`: packaged English project Skill, workspace schema, and runtime-derived block contract.
+- `scripts/`: build, Skill-contract, and i18n utilities.
 - `specs/`: Spec Kit feature specs with `spec.md`, `plan.md`, and `tasks.md`.
 - `docs/`: project documentation and testing coverage notes.
 - `dist/`, `out/`, and `coverage/`: generated outputs.
@@ -29,7 +30,8 @@
 - `npm run test:coverage`: write coverage output to `coverage/`.
 - `npm run test:bail`: stop tests on first failure.
 - `npm run test:integration`: integration tests.
-- `npm run generate:dictionary`: rebuild MCP block dictionary.
+- `npm run generate:skill-contract`: rebuild the runtime-derived project Skill contract.
+- `npm run check:project-skills`: verify tracked Skill assets and manifest hashes.
 - `npm run validate:i18n`: validate all locale files.
 - `npm run audit:i18n:ja`: Japanese translation audit.
 
@@ -77,25 +79,25 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - WebView code cannot be imported into Node.js tests; use contract-style tests.
 - Coverage target is documented in `docs/specifications/04-quality-testing/test-coverage.md`.
 
-## MCP Server
-- Entry: `src/mcp/mcpServer.ts`; provider: `src/mcp/mcpProvider.ts`.
-- Add tools under `src/mcp/tools/{name}.ts`, export them from `src/mcp/tools/index.ts`, then register them in `mcpServer.ts`.
-- Use Zod schemas for MCP tool input validation.
-- Run `npm run generate:dictionary` after block dictionary changes.
+## Product Agent Skill
+- `.agents/skills/singular-blockly/` is the installed canonical source; `.claude/skills/singular-blockly/SKILL.md` is a compact compatibility entry.
+- Edit packaged sources under `resources/project-skills/singular-blockly/`; all human-readable Skill content must remain English.
+- Run `npm run generate:project-skills` after block, toolbox, schema, or Skill changes, then run `npm run check:project-skills`.
+- External `blockly/main.json` changes must pass the real Blockly load/save/load gate before becoming the last valid workspace.
 
 ## Commit and Pull Request Guidelines
 - Use Conventional Commits, for example `feat(blocks): ...`, `fix(webview): ...`, `i18n(ja): ...`, `chore(deps): ...`.
-- Common scopes: `blocks`, `generators`, `i18n`, `webview`, `mcp`, `services`, `toolbox`, `deps`.
+- Common scopes: `blocks`, `generators`, `i18n`, `webview`, `skills`, `services`, `toolbox`, `deps`.
 - PRs require CI passing, maintainer approval, no merge conflicts, and clean ESLint.
 - Localization PRs should use `.github/PULL_REQUEST_TEMPLATE/localization.md` and include before/after examples, audit references, and screenshots when useful.
 
 ## Security and Configuration
 - Report security issues through `SECURITY.md`.
-- Prefer Node.js 22.16.0+ to match runtime requirements.
+- Contributors should use Node.js 22.16.0+ to match the build and test toolchain.
 - PlatformIO extension is required for hardware upload workflows.
 
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at `specs/065-blockly-v13-modernization/plan.md`
+at `specs/066-agent-skills-mcp-retirement/plan.md`
 <!-- SPECKIT END -->

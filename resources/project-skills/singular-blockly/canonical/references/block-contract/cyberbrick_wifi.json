@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 3,
+  "category": "cyberbrick_wifi",
+  "blocks": [
+    {
+      "type": "cyberbrick_wifi_connect",
+      "categories": [
+        "cyberbrick_wifi"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PASSWORD",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "SSID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_wifi_connect"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_wifi_disconnect",
+      "categories": [
+        "cyberbrick_wifi"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_wifi_disconnect"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_wifi_get_ip",
+      "categories": [
+        "cyberbrick_wifi"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_wifi_get_ip"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_wifi_is_connected",
+      "categories": [
+        "cyberbrick_wifi"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_wifi_is_connected"
+          }
+        }
+      }
+    }
+  ]
+}

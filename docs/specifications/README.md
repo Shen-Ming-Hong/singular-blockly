@@ -1,6 +1,6 @@
 # Singular Blockly 整合規格書
 
-> 本文件整合自 `specs/001-044` 的所有功能規格，按功能領域組織，追蹤專案從 2024 年 12 月至 2026 年 2 月的開發演進。
+> 本文件整合至 `specs/066` 的現行功能規格，按功能領域組織，並保留已退役設計的歷史脈絡。
 
 ## 文件結構
 
@@ -31,7 +31,7 @@ docs/specifications/
 ├── 05-dependencies/               # 依賴管理
 │   └── dependency-upgrades.md     # 005-009 依賴升級系列
 ├── 06-features/                   # 功能開發與整合
-│   ├── mcp-integration.md         # 015/040/041 MCP Server 整合、優雅降級、bundling 修復
+│   ├── agent-skills.md            # 066 專案 Skills、runtime 契約與安全工作區驗證
 │   ├── bug-fixes.md               # 014/031/039 序列化修復、1 月批次修復、print 換行修復
 │   ├── language-selector.md       # 030 語言選擇器
 │   ├── quick-backup.md            # 017 Ctrl+S 快速備份
@@ -64,7 +64,7 @@ docs/specifications/
 | P1     | 硬體   | [CyberBrick MicroPython](03-hardware-support/cyberbrick-micropython.md) | ✅ 完成   |
 | P1     | 硬體   | [CyberBrick 擴展板](03-hardware-support/cyberbrick-expansion-boards.md) | ✅ 完成   |
 | P1     | 硬體   | [CyberBrick RC 遙控](03-hardware-support/cyberbrick-rc.md)              | ✅ 完成   |
-| P1     | 整合   | [MCP Server](06-features/mcp-integration.md)                            | ✅ 完成   |
+| P1     | 整合   | [Agent Skills](06-features/agent-skills.md)                             | ✅ 完成   |
 | P1     | 功能   | [統一上傳 UI](06-features/unified-upload-ui.md)                         | ✅ 完成   |
 | P1     | 功能   | [Serial Monitor](06-features/serial-monitor.md)                         | ✅ 完成   |
 | P1     | 功能   | [防止孤立積木](06-features/orphan-blocks.md)                            | ✅ 完成   |
@@ -89,19 +89,21 @@ docs/specifications/
 8. **012** ESP32 Pixetto - 移除 ESP32 不需要的 SoftwareSerial
 9. **013** HuskyLens Tooltip - 動態腳位提示
 10. **014** 序列化修復 - JSON 序列化 hooks
-11. **015** MCP Server - AI 工具整合
+11. **015** 舊 AI server 整合（已由 066 Agent Skills 取代）
 12. **016** ESP32 WiFi/MQTT - IoT 功能
 
 **Phase 2 (017-028)**: 13. **017** Ctrl+S 快速備份 - 鍵盤快捷鍵、Toast 通知 14. **018-019** Workspace 安全防護 - 三層防護機制 15. **020** HuskyLens RX/TX - 腳位標籤修正 16. **021-022** CyberBrick MicroPython - 主板支援、mpremote 上傳 17. **023-024** i18n 優化 - 白名單更新、硬編碼修復 18. **025** 拖曳競態修復 - FileWatcher 衝突解決 19. **026** 統一上傳 UI - Arduino/MicroPython 整合 20. **027-028** CyberBrick X11/X12 - 擴展板積木
 
-**Phase 3 (029-044)**: 21. **029** CyberBrick RC 遙控 - ESP-NOW 自定義配對（Pair ID + 頻道） 22. **030** 語言選擇器 - 即時語言切換 UI 23. **031** 1 月批次修復 - 多主程式積木、備份預覽 URI、自動備份、i18n 鍵 24. **032-033** CyberBrick 計時積木 - `ticks_ms`/`ticks_diff` 移除實驗標記 25. **034** MicroPython 全域變數 - 函式內賦值自動注入 `global` 宣告 26. **035** HuskyLens 動態 INDEX - INDEX 欄位改為接受 Number 積木連接 27. **036** HuskyLens ID 導向積木 - 三個新積木按訓練 ID 存取辨識結果 28. **037** CyberBrick Output Monitor - mpremote REPL 即時輸出 29. **038** Arduino Serial Monitor - `pio device monitor` 整合 30. **039** MicroPython print 換行修復 - 讀取 `NEW_LINE` checkbox 31. **040** MCP 優雅降級 - Node.js 缺失偵測、啟動警告、自訂路徑 32. **041** MCP bundling 修復 - SDK 完整打包入 dist/mcp-server.js 33. **042** 上傳錯誤分類 - 三種錯誤類型明確提示 34. **044** 防止孤立積木 - 三層防護（過濾、guard、警告）
+**Phase 3 (029-044)**: 21. **029** CyberBrick RC 遙控 - ESP-NOW 自定義配對（Pair ID + 頻道） 22. **030** 語言選擇器 - 即時語言切換 UI 23. **031** 1 月批次修復 - 多主程式積木、備份預覽 URI、自動備份、i18n 鍵 24. **032-033** CyberBrick 計時積木 25. **034** MicroPython 全域變數 26. **035-036** HuskyLens 動態／ID 導向積木 27. **037-038** Serial Monitor 28. **039** MicroPython print 換行修復 29. **040-041** 舊 AI server 維護（已由 066 移除） 30. **042** 上傳錯誤分類 31. **044** 防止孤立積木。
+
+**Phase 6 (066)**: 專案內英文 Agent Skills、runtime 衍生積木契約、外部工作區驗證／隔離／復原，以及舊使用者端 AI server 與 Node.js 設定完整退役。
 
 ## 版本對照
 
 | 版本 | Blockly | TypeScript | VSCode API | 主要變更                            |
 | ---- | ------- | ---------- | ---------- | ----------------------------------- |
 | v1.x | 11.2.2  | 5.7.2      | 1.96.0     | 初始版本                            |
-| v2.0 | 12.3.1  | 5.9.3      | 1.105.0    | 架構重構、MCP 整合、CyberBrick 支援 |
+| v2.0 | 13.2.1  | 5.9.3      | 1.109.0    | Agent Skills、runtime 驗證、CyberBrick/TXT 支援 |
 
 ## 相關資源
 
@@ -116,13 +118,12 @@ docs/specifications/
 | ----------- | -------- | -------------------- |
 | Blockly     | 12.3.1   | 視覺化程式編輯核心   |
 | TypeScript  | 5.9.3    | Extension Host 開發  |
-| VS Code API | 1.105.0+ | 編輯器整合、MCP 支援 |
+| VS Code API | 1.109.0+ | 編輯器整合、Project Skills 支援 |
 | Webpack     | 5.102.1  | 模組打包             |
-| MCP SDK     | 1.24.3   | AI 工具整合          |
 | PlatformIO  | -        | Arduino 編譯與上傳   |
 
 詳細技術架構請參考 [技術架構研究](00-technical-foundation/research.md)。
 
 ---
 
-_最後更新：2025-12-17_
+_最後更新：2026-08-12_

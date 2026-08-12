@@ -1,0 +1,572 @@
+{
+  "schemaVersion": 3,
+  "category": "txt",
+  "blocks": [
+    {
+      "type": "txt_input_sensor",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INPUT",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8"
+              ]
+            },
+            {
+              "name": "SENSOR_TYPE",
+              "kind": "dropdown",
+              "defaultValue": "BUTTON",
+              "optionsMode": "static",
+              "options": [
+                "BUTTON",
+                "GATE",
+                "ULTRASONIC"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "txt_input_sensor",
+            "fields": {
+              "SENSOR_TYPE": "BUTTON",
+              "INPUT": "1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_motor_speed",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIRECTION_ROW",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "SPEED",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "COMPONENT",
+              "kind": "dropdown",
+              "defaultValue": "MOTOR",
+              "optionsMode": "dynamic",
+              "options": [
+                "LAMP",
+                "MOTOR"
+              ]
+            },
+            {
+              "name": "DIRECTION",
+              "kind": "dropdown",
+              "defaultValue": "FORWARD",
+              "optionsMode": "static",
+              "options": [
+                "BACKWARD",
+                "FORWARD"
+              ]
+            },
+            {
+              "name": "MOTOR",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "txt_motor_speed",
+            "fields": {
+              "MOTOR": "1",
+              "COMPONENT": "MOTOR",
+              "DIRECTION": "FORWARD"
+            },
+            "inputs": {
+              "SPEED": {
+                "shadow": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": 512
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_motor_stop",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "MOTOR",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "txt_motor_stop",
+            "fields": {
+              "MOTOR": "1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_output",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OUTPUT",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8"
+              ]
+            },
+            {
+              "name": "STATE",
+              "kind": "dropdown",
+              "defaultValue": "ON",
+              "optionsMode": "static",
+              "options": [
+                "OFF",
+                "ON"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "txt_output",
+            "fields": {
+              "OUTPUT": "1",
+              "STATE": "ON"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_process",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "DO",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": ""
+            }
+          ],
+          "minimalState": {
+            "type": "txt_process",
+            "fields": {
+              "NAME": ""
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_setup",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "txt_setup"
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_stop_all",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "txt_stop_all"
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_virtual_button_state",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BUTTON_ID",
+              "kind": "dropdown",
+              "defaultValue": "__none__",
+              "optionsMode": "dynamic",
+              "options": [
+                "__none__"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "txt_virtual_button_state",
+            "fields": {
+              "BUTTON_ID": "__none__"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "txt_wait",
+      "categories": [
+        "txt"
+      ],
+      "boards": [
+        "txt"
+      ],
+      "variants": {
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "MS",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "txt_wait"
+          }
+        }
+      }
+    }
+  ]
+}

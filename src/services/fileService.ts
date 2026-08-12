@@ -6,6 +6,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { randomUUID } from 'crypto';
 import { log } from './logging';
 
 /**
@@ -15,12 +16,14 @@ export interface FileSystem {
 	existsSync(path: string): boolean;
 	promises: {
 		mkdir(path: string, options?: any): Promise<string | void>;
-		writeFile(path: string, content: string): Promise<void>;
-		readFile(path: string, encoding: BufferEncoding): Promise<string>;
+		writeFile(path: string, content: string | Uint8Array): Promise<void>;
+		readFile(path: string, encoding?: BufferEncoding): Promise<string | Buffer>;
 		copyFile(src: string, dest: string): Promise<void>;
 		unlink(path: string): Promise<void>;
 		readdir(path: string): Promise<string[]>;
 		stat(path: string): Promise<fs.Stats>;
+		rename?(oldPath: string, newPath: string): Promise<void>;
+		lstat?(path: string): Promise<fs.Stats>;
 	};
 }
 
@@ -30,6 +33,7 @@ export interface FileSystem {
  */
 export class FileService {
 	private fs: FileSystem;
+	private readonly workspaceRoot: string;
 
 	/**
 	 * 建立檔案服務實例
@@ -38,6 +42,46 @@ export class FileService {
 	 */
 	constructor(private workspacePath: string, fileSystem?: FileSystem) {
 		this.fs = fileSystem || fs;
+		this.workspaceRoot = path.resolve(workspacePath);
+	}
+
+	/**
+	 * Resolve a project-relative path while preventing absolute paths and traversal.
+	 */
+	resolveSafePath(relativePath: string): string {
+		if (typeof relativePath !== 'string' || relativePath.includes('\0') || path.isAbsolute(relativePath)) {
+			throw new Error(`Unsafe project-relative path: ${String(relativePath)}`);
+		}
+
+		const resolved = path.resolve(this.workspaceRoot, relativePath || '.');
+		const prefix = this.workspaceRoot.endsWith(path.sep) ? this.workspaceRoot : `${this.workspaceRoot}${path.sep}`;
+		if (resolved !== this.workspaceRoot && !resolved.startsWith(prefix)) {
+			throw new Error(`Path escapes workspace root: ${relativePath}`);
+		}
+		return resolved;
+	}
+
+	/**
+	 * Reject existing symbolic-link path segments before a managed write.
+	 */
+	private async assertNoSymlinkSegments(fullPath: string, includeLeaf = false): Promise<void> {
+		if (!this.fs.promises.lstat) {
+			return;
+		}
+
+		const relative = path.relative(this.workspaceRoot, fullPath);
+		let current = this.workspaceRoot;
+		const segments = relative.split(path.sep).filter(Boolean);
+		for (const segment of includeLeaf ? segments : segments.slice(0, -1)) {
+			current = path.join(current, segment);
+			if (!this.fs.existsSync(current)) {
+				continue;
+			}
+			const stats = await this.fs.promises.lstat(current);
+			if (stats.isSymbolicLink()) {
+				throw new Error(`Symbolic-link path segment is not allowed: ${path.relative(this.workspaceRoot, current)}`);
+			}
+		}
 	}
 
 	/**
@@ -47,7 +91,8 @@ export class FileService {
 	 */
 	async writeFile(relativePath: string, content: string): Promise<void> {
 		try {
-			const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = this.resolveSafePath(relativePath);
+			await this.assertNoSymlinkSegments(fullPath, true);
 			const dirPath = path.dirname(fullPath);
 
 			if (!this.fs.existsSync(dirPath)) {
@@ -70,13 +115,15 @@ export class FileService {
 	 */
 	async readFile(relativePath: string, defaultContent: string = ''): Promise<string> {
 		try {
-			const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = this.resolveSafePath(relativePath);
 
 			if (!this.fs.existsSync(fullPath)) {
 				return defaultContent;
 			}
+			await this.assertNoSymlinkSegments(fullPath, true);
 
-			return await this.fs.promises.readFile(fullPath, 'utf8');
+			const content = await this.fs.promises.readFile(fullPath, 'utf8');
+			return typeof content === 'string' ? content : content.toString('utf8');
 		} catch (error) {
 			log(`Failed to read file: ${relativePath}`, 'error', error);
 			return defaultContent;
@@ -89,7 +136,7 @@ export class FileService {
 	 * @returns 檔案是否存在
 	 */
 	fileExists(relativePath: string): boolean {
-		const fullPath = path.join(this.workspacePath, relativePath);
+		const fullPath = this.resolveSafePath(relativePath);
 		return this.fs.existsSync(fullPath);
 	}
 
@@ -99,7 +146,8 @@ export class FileService {
 	 */
 	async createDirectory(relativePath: string): Promise<void> {
 		try {
-			const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = this.resolveSafePath(relativePath);
+			await this.assertNoSymlinkSegments(path.join(fullPath, '.directory-placeholder'));
 
 			if (!this.fs.existsSync(fullPath)) {
 				await this.fs.promises.mkdir(fullPath, { recursive: true });
@@ -118,8 +166,10 @@ export class FileService {
 	 */
 	async copyFile(sourceRelativePath: string, destRelativePath: string): Promise<void> {
 		try {
-			const sourcePath = path.join(this.workspacePath, sourceRelativePath);
-			const destPath = path.join(this.workspacePath, destRelativePath);
+			const sourcePath = this.resolveSafePath(sourceRelativePath);
+			const destPath = this.resolveSafePath(destRelativePath);
+			await this.assertNoSymlinkSegments(sourcePath, true);
+			await this.assertNoSymlinkSegments(destPath, true);
 			const destDir = path.dirname(destPath);
 
 			// 確保目標目錄存在
@@ -141,9 +191,10 @@ export class FileService {
 	 */
 	async deleteFile(relativePath: string): Promise<void> {
 		try {
-			const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = this.resolveSafePath(relativePath);
 
 			if (this.fs.existsSync(fullPath)) {
+				await this.assertNoSymlinkSegments(fullPath, true);
 				await this.fs.promises.unlink(fullPath);
 				log(`File deleted: ${relativePath}`, 'info');
 			}
@@ -160,11 +211,12 @@ export class FileService {
 	 */
 	async listFiles(relativePath: string): Promise<string[]> {
 		try {
-			const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = this.resolveSafePath(relativePath);
 
 			if (!this.fs.existsSync(fullPath)) {
 				return [];
 			}
+			await this.assertNoSymlinkSegments(fullPath, true);
 
 			return await this.fs.promises.readdir(fullPath);
 		} catch (error) {
@@ -211,6 +263,66 @@ export class FileService {
 		}
 	}
 
+	/** Read exact bytes and throw on I/O failure. */
+	async readBuffer(relativePath: string): Promise<Buffer> {
+		const fullPath = this.resolveSafePath(relativePath);
+		await this.assertNoSymlinkSegments(fullPath, true);
+		const content = await this.fs.promises.readFile(fullPath);
+		return Buffer.isBuffer(content) ? Buffer.from(content) : Buffer.from(content, 'utf8');
+	}
+
+	/** Write exact bytes through the normal workspace containment checks. */
+	async writeBuffer(relativePath: string, content: Uint8Array): Promise<void> {
+		const fullPath = this.resolveSafePath(relativePath);
+		await this.assertNoSymlinkSegments(fullPath, true);
+		const dirPath = path.dirname(fullPath);
+		if (!this.fs.existsSync(dirPath)) {
+			await this.fs.promises.mkdir(dirPath, { recursive: true });
+		}
+		await this.fs.promises.writeFile(fullPath, content);
+	}
+
+	/**
+	 * Write a complete file using a temporary sibling and atomic rename.
+	 */
+	async writeFileAtomic(relativePath: string, content: string | Uint8Array): Promise<void> {
+		if (!this.fs.promises.rename) {
+			throw new Error('Atomic rename is unavailable in the configured file system');
+		}
+		const fullPath = this.resolveSafePath(relativePath);
+		await this.assertNoSymlinkSegments(fullPath, true);
+		const dirPath = path.dirname(fullPath);
+		if (!this.fs.existsSync(dirPath)) {
+			await this.fs.promises.mkdir(dirPath, { recursive: true });
+		}
+		const tempPath = `${fullPath}.tmp-${process.pid}-${randomUUID()}`;
+		try {
+			await this.fs.promises.writeFile(tempPath, content);
+			await this.fs.promises.rename(tempPath, fullPath);
+		} catch (error) {
+			if (this.fs.existsSync(tempPath)) {
+				try {
+					await this.fs.promises.unlink(tempPath);
+				} catch {
+					// Preserve the original failure; stale temp files are safe and recognizable.
+				}
+			}
+			throw error;
+		}
+	}
+
+	/** Rename a file within the same workspace after validating both paths. */
+	async renameFile(sourceRelativePath: string, destinationRelativePath: string): Promise<void> {
+		if (!this.fs.promises.rename) {
+			throw new Error('Rename is unavailable in the configured file system');
+		}
+		const source = this.resolveSafePath(sourceRelativePath);
+		const destination = this.resolveSafePath(destinationRelativePath);
+		await this.assertNoSymlinkSegments(source, true);
+		await this.assertNoSymlinkSegments(destination, true);
+		await this.fs.promises.rename(source, destination);
+	}
+
 	/**
 	 * 獲取檔案的時間戳信息
 	 * @param relativePath 相對於工作區的檔案路徑
@@ -218,11 +330,12 @@ export class FileService {
 	 */
 	async getFileStats(relativePath: string): Promise<fs.Stats | null> {
 		try {
-			const fullPath = path.join(this.workspacePath, relativePath);
+			const fullPath = this.resolveSafePath(relativePath);
 
 			if (!this.fs.existsSync(fullPath)) {
 				return null;
 			}
+			await this.assertNoSymlinkSegments(fullPath, true);
 
 			return await this.fs.promises.stat(fullPath);
 		} catch (error) {

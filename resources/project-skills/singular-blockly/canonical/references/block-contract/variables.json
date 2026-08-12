@@ -1,0 +1,338 @@
+{
+  "schemaVersion": 3,
+  "category": "variables",
+  "blocks": [
+    {
+      "type": "variables_set",
+      "categories": [
+        "variables"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "variables_set",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "variables_set",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "variables_set",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "variables_set",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "variables_set",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "variables_set",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "variables_set",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

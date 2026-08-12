@@ -204,7 +204,7 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 		);
 	});
 
-	test('blocklyEdit should preserve running mode during file watcher reloads', () => {
+	test('blocklyEdit should preserve running mode during validated external reloads', () => {
 		const source = fs.readFileSync(path.join(process.cwd(), 'media/js/blocklyEdit.js'), 'utf8');
 
 		assert.ok(
@@ -216,17 +216,14 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 			'file watcher reloads should be able to preserve an active running mode'
 		);
 		assert.ok(
-			source.includes("const preserveTxtVirtualControlExecutionMode = isFromFileWatcher && txtVirtualControlsState.document.canvas.mode === 'running'"),
-			'loadWorkspace should only preserve execution state for file watcher reloads'
+			source.includes("const preserveTxtVirtualControlExecutionMode = isExternalCandidate && txtVirtualControlsState.document.canvas.mode === 'running'"),
+			'validated external reloads should preserve an active execution state'
 		);
 		assert.ok(
 			source.includes('applyTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode })'),
 			'workspace reload should pass the preservation flag when applying TXT virtual controls'
 		);
-		assert.ok(
-			source.includes('applyTxtVirtualControlsDocument(pendingMessage.txtVirtualControls, { preserveExecutionMode: true })'),
-			'deferred file watcher reloads should also preserve running mode'
-		);
+		assert.ok(source.includes('void handleWorkspaceLoadMessage(pendingMessage)'), 'deferred reloads should use the same guarded loader');
 	});
 
 	test('blocklyEdit CSS should expose a dark-theme running mode cue', () => {
@@ -293,6 +290,7 @@ suite('TXT Virtual Controls Persistence Tests', () => {
 
 		fileServiceStub.fileExists.callsFake((filePath: string) => filePath === mainJsonPath);
 		fileServiceStub.readJsonFile.resolves(savedState as any);
+		fileServiceStub.readBuffer.resolves(Buffer.from(JSON.stringify(savedState)));
 
 		await handler.handleMessage({ command: 'requestInitialState' });
 

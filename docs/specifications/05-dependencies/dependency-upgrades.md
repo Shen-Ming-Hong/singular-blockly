@@ -86,16 +86,13 @@
 
 | 套件            | 之前   | 之後    | 影響                   |
 | --------------- | ------ | ------- | ---------------------- |
-| @types/vscode   | 1.96.0 | 1.105.0 | **關鍵：MCP API 支援** |
+| @types/vscode   | 1.96.0 | 1.109.0 | **關鍵：Project Skills 支援基準** |
 | @types/node     | 20.x   | 22.x    | ES2023 特性            |
 | tsconfig target | ES2022 | ES2023  | 新語法支援             |
 
 ### 關鍵變更
 
-`@types/vscode` 1.105.0 新增：
-
--   `registerMcpServerDefinitionProvider` API
--   MCP Server 整合所需型別
+`@types/vscode` 1.109.0 是目前 extension 與專案 Agent Skills 的最低支援基準。舊版外部 server API 與其 SDK 不再屬於產品相依；Node.js 仍只用於貢獻者建置、測試與封裝。
 
 ---
 
@@ -243,7 +240,7 @@ npm test
 {
 	"devDependencies": {
 		"typescript": "5.9.3",
-		"@types/vscode": "1.105.0",
+		"@types/vscode": "1.109.0",
 		"@types/node": "22.x",
 		"blockly": "12.3.1",
 		"@blockly/theme-modern": "7.0.1",

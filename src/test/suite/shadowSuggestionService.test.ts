@@ -10,19 +10,20 @@
  * 測試 AI 影子建議功能的核心邏輯，不需要實際的 LLM 呼叫或 VS Code 擴充主機。
  *
  * 驗證項目：
- * - Block Dictionary 的完整性與結構
+ * - Runtime block contract 的完整性與結構
  * - LLM 回應的 JSON 解析邏輯
  * - 建議物件的形狀驗證
  * - 多樣性過濾演算法
  *
  * 參考:
  * - src/services/shadowSuggestionService.ts
- * - src/mcp/block-dictionary.json
+ * - resources/project-skills/singular-blockly/canonical/references/block-contract.json
  */
 
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
+import { BlockContractService } from '../../services/blockContractService';
 
 // Regex patterns from shadowSuggestionService.ts (lines 62-63)
 const FENCED_JSON_RE = /```(?:json)?\s*([\s\S]*?)```/;
@@ -167,58 +168,45 @@ const PROJECT_ROOT = path.join(__dirname, '..', '..', '..');
 
 suite('Shadow Suggestion Service Tests', () => {
 
-	// ── Block Dictionary ──────────────────────────────────────────
+	// ── Runtime Block Contract ────────────────────────────────────
 
-	suite('Block Dictionary', () => {
-		let dictionary: any;
-		const dictPath = path.join(PROJECT_ROOT, 'src', 'mcp', 'block-dictionary.json');
+	suite('Block Contract', () => {
+		let contract: any;
 
 		setup(() => {
-			const raw = fs.readFileSync(dictPath, 'utf-8');
-			dictionary = JSON.parse(raw);
+			contract = new BlockContractService(PROJECT_ROOT).load().contract;
 		});
 
 		test('JSON 檔案可成功解析', () => {
-			assert.ok(dictionary, 'dictionary should parse successfully');
-			assert.ok(dictionary.blocks, 'dictionary should have a blocks property');
+			assert.ok(contract, 'contract should parse successfully');
+			assert.ok(contract.blocks, 'contract should have a blocks property');
 		});
 
 		test('blocks 陣列至少包含 100 個項目', () => {
-			assert.ok(Array.isArray(dictionary.blocks), 'blocks should be an array');
+			assert.ok(Array.isArray(contract.blocks), 'blocks should be an array');
 			assert.ok(
-				dictionary.blocks.length >= 100,
-				`Expected at least 100 blocks, got ${dictionary.blocks.length}`
+				contract.blocks.length >= 100,
+				`Expected at least 100 blocks, got ${contract.blocks.length}`
 			);
 		});
 
-		test('每個積木都有必要欄位: type, category', () => {
-			for (const block of dictionary.blocks) {
+		test('每個積木都有必要欄位: type, categories, boards, variants', () => {
+			for (const block of contract.blocks) {
 				assert.ok(
 					typeof block.type === 'string' && block.type.length > 0,
 					`Block missing valid 'type': ${JSON.stringify(block)}`
 				);
-				assert.ok(
-					typeof block.category === 'string' && block.category.length > 0,
-					`Block ${block.type} missing valid 'category'`
-				);
-			}
-		});
-
-		test('每個積木都有 descriptions 物件且包含 en 鍵', () => {
-			for (const block of dictionary.blocks) {
-				assert.ok(
-					block.descriptions && typeof block.descriptions === 'object',
-					`Block ${block.type} missing 'descriptions' object`
-				);
-				assert.ok(
-					typeof block.descriptions.en === 'string' && block.descriptions.en.length > 0,
-					`Block ${block.type} missing 'descriptions.en'`
-				);
+				assert.ok(Array.isArray(block.categories) && block.categories.length > 0, `Block ${block.type} missing categories`);
+				assert.ok(Array.isArray(block.boards) && block.boards.length > 0, `Block ${block.type} missing boards`);
+				assert.deepStrictEqual(Object.keys(block.variants).sort(), block.boards);
+				for (const variant of Object.values(block.variants) as any[]) {
+					assert.strictEqual(variant.minimalState?.type, block.type);
+				}
 			}
 		});
 
 		test('沒有重複的積木類型', () => {
-			const types = dictionary.blocks.map((b: any) => b.type);
+			const types = contract.blocks.map((b: any) => b.type);
 			const duplicates = types.filter((t: string, i: number) => types.indexOf(t) !== i);
 			assert.deepStrictEqual(
 				duplicates, [],
@@ -226,8 +214,8 @@ suite('Shadow Suggestion Service Tests', () => {
 			);
 		});
 
-		test('關鍵積木都存在於字典中', () => {
-			const typeSet = new Set(dictionary.blocks.map((b: any) => b.type));
+		test('關鍵積木都存在於契約中', () => {
+			const typeSet = new Set(contract.blocks.map((b: any) => b.type));
 			const criticalBlocks = [
 				'arduino_setup_loop',
 				'micropython_main',
@@ -240,28 +228,26 @@ suite('Shadow Suggestion Service Tests', () => {
 			for (const blockType of criticalBlocks) {
 				assert.ok(
 					typeSet.has(blockType),
-					`Critical block '${blockType}' not found in dictionary`
+					`Critical block '${blockType}' not found in contract`
 				);
 			}
 		});
 	});
 
-	// ── Block Dictionary Completeness ─────────────────────────────
+	// ── Block Contract Completeness ───────────────────────────────
 
-	suite('Block Dictionary Completeness', () => {
-		let dictionaryTypes: Set<string>;
+	suite('Block Contract Completeness', () => {
+		let contractTypes: Set<string>;
 		const blocksDir = path.join(PROJECT_ROOT, 'media', 'blockly', 'blocks');
 		const generatorsArduinoDir = path.join(PROJECT_ROOT, 'media', 'blockly', 'generators', 'arduino');
 		const generatorsMpyDir = path.join(PROJECT_ROOT, 'media', 'blockly', 'generators', 'micropython');
 
 		setup(() => {
-			const dictPath = path.join(PROJECT_ROOT, 'src', 'mcp', 'block-dictionary.json');
-			const raw = fs.readFileSync(dictPath, 'utf-8');
-			const dictionary = JSON.parse(raw);
-			dictionaryTypes = new Set(dictionary.blocks.map((b: any) => b.type));
+			const contract = new BlockContractService(PROJECT_ROOT).load().contract;
+			contractTypes = new Set(contract.blocks.map((b: any) => b.type));
 		});
 
-		test('具有 generator 的積木定義都應存在於字典中', () => {
+		test('具有 generator 的公開積木定義大多存在於契約中', () => {
 			// Collect block types that have forBlock generators
 			const generatorBlockTypes = new Set<string>();
 			const forBlockPattern = /forBlock\['([^']+)'\]/g;
@@ -283,7 +269,7 @@ suite('Shadow Suggestion Service Tests', () => {
 
 			assert.ok(generatorBlockTypes.size > 0, 'Should find at least some generator block types');
 
-			// Internal/framework blocks that may not appear in the dictionary
+			// Internal/framework blocks that may not appear in the public contract.
 			const internalBlocks = new Set([
 				'procedures_defnoreturn', 'procedures_defreturn', 'procedures_callnoreturn',
 				'procedures_callreturn', 'procedures_ifreturn',
@@ -292,7 +278,7 @@ suite('Shadow Suggestion Service Tests', () => {
 
 			const missing: string[] = [];
 			for (const blockType of generatorBlockTypes) {
-				if (!dictionaryTypes.has(blockType) && !internalBlocks.has(blockType)) {
+				if (!contractTypes.has(blockType) && !internalBlocks.has(blockType)) {
 					missing.push(blockType);
 				}
 			}
@@ -300,11 +286,11 @@ suite('Shadow Suggestion Service Tests', () => {
 			// Allow tolerance for dynamic/internal/built-in Blockly blocks
 			assert.ok(
 				missing.length <= 20,
-				`Too many generator blocks missing from dictionary (${missing.length}): ${missing.join(', ')}`
+				`Too many generator blocks missing from contract (${missing.length}): ${missing.join(', ')}`
 			);
 		});
 
-		test('blocks 定義檔中的積木類型大多數存在於字典中', () => {
+		test('blocks 定義檔中的積木類型大多數存在於公開契約中', () => {
 			const blockDefPattern = /Blockly\.Blocks\['([^']+)'\]/g;
 			const definedBlockTypes = new Set<string>();
 
@@ -323,7 +309,7 @@ suite('Shadow Suggestion Service Tests', () => {
 
 			let coveredCount = 0;
 			for (const blockType of definedBlockTypes) {
-				if (dictionaryTypes.has(blockType)) {
+				if (contractTypes.has(blockType)) {
 					coveredCount++;
 				}
 			}
@@ -331,7 +317,7 @@ suite('Shadow Suggestion Service Tests', () => {
 			const coverageRatio = coveredCount / definedBlockTypes.size;
 			assert.ok(
 				coverageRatio >= 0.7,
-				`Dictionary coverage of block definitions is too low: ${(coverageRatio * 100).toFixed(1)}% (${coveredCount}/${definedBlockTypes.size})`
+				`Contract coverage of block definitions is too low: ${(coverageRatio * 100).toFixed(1)}% (${coveredCount}/${definedBlockTypes.size})`
 			);
 		});
 	});

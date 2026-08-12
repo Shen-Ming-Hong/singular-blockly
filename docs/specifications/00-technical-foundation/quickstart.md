@@ -1,7 +1,7 @@
 # 開發者快速入門指南 (quickstart.md)
 
 > 新開發者進入 Singular Blockly 專案的快速上手指南。
-> 最後更新：2025-12-17
+> 最後更新：2026-08-12
 
 ---
 
@@ -12,7 +12,7 @@
 -   🧩 **視覺化編程**：使用 Google Blockly 拖放積木
 -   🔧 **多板支援**：Arduino UNO/Nano/Mega、ESP32
 -   🌍 **多語言**：15 種語言支援
--   🤖 **AI 整合**：MCP Server 提供 AI 工具
+-   🤖 **AI 整合**：專案內 Agent Skills 提供目前積木與工作區契約
 
 ---
 
@@ -21,7 +21,7 @@
 ### 2.1 系統需求
 
 -   **Node.js**: 22.16.0+
--   **VS Code**: 1.105.0+
+-   **VS Code**: 1.109.0+
 -   **PlatformIO**: VS Code 擴充功能
 
 ### 2.2 初始設定
@@ -52,6 +52,10 @@ npm run test:coverage
 
 # 驗證 i18n 翻譯
 npm run validate:i18n
+
+# 重建並驗證產品 Agent Skill 契約
+npm run generate:project-skills
+npm run check:project-skills
 ```
 
 ---
@@ -63,14 +67,15 @@ singular-blockly/
 ├── src/                    # Extension Host (TypeScript)
 │   ├── extension.ts        # ⭐ 入口點
 │   ├── webview/            # WebView 管理
-│   ├── services/           # 核心服務
-│   └── mcp/                # MCP Server
+│   └── services/           # Skill 安裝、候選驗證與其他核心服務
 │
 ├── media/                  # WebView 資源 (Browser)
 │   ├── js/blocklyEdit.js   # ⭐ 主編輯器邏輯
 │   ├── blockly/            # 積木定義與生成器
 │   ├── locales/            # 多語言訊息
 │   └── toolbox/            # 工具箱配置
+│
+├── resources/project-skills/ # 封裝的英文產品 Skill 與 runtime 契約
 │
 ├── docs/specifications/    # 整合規格書
 │   ├── 00-technical-foundation/  # 技術基礎
@@ -111,6 +116,13 @@ singular-blockly/
 ```
 Blockly 積木 → main.json (狀態) → arduinoGenerator → main.cpp
 ```
+
+### 4.4 產品 Agent Skill 與候選驗證
+
+- 編輯 `resources/project-skills/singular-blockly/` 下的英文 Skill 來源；不要直接維護產生後的專案副本。
+- 積木或工具箱變更後執行 `npm run generate:project-skills`，並提交更新後的 contract 與 manifest。
+- 外部寫入 `blockly/main.json` 必須先通過 WebView 中的真實 Blockly load/save/load，再以原子方式更新 `main.json` 與 `.bak`。
+- 無效候選只能隔離至 `main.invalid.json` 與有限歷史，不能直接進入 live workspace。
 
 ---
 

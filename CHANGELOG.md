@@ -10,8 +10,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.86.0] - 2026-08-12
+
+### ✨ 新增功能 Features
+
+- 新增自動管理的英文專案 Agent Skills，讓 Codex 與 Claude Code 直接理解目前積木契約與 `blockly/main.json`，使用者不需額外安裝系統 Node.js、設定外部伺服器或確認更新
+  Added automatically managed English project Agent Skills so Codex and Claude Code can understand the current block contract and `blockly/main.json` without user-installed Node.js, external-server setup, or update prompts
+- 外部工作區修改現在會先經真實 Blockly runtime 的兩次載入與序列化驗證；無效內容會隔離並還原最後有效版本，保留最新隔離檔與最近五份歷史
+  External workspace changes now pass two real Blockly runtime load/serialization checks before acceptance; invalid content is quarantined and the last valid version restored, retaining the latest quarantine plus five histories
+
+### ⚠️ 破壞性變更 Breaking Changes
+
+- 最低 VS Code 版本提高至 1.109，並完整移除舊版使用者端 AI server、Node.js 路徑偵測、相關命令、設定、診斷與相依套件
+  Raised the minimum VS Code version to 1.109 and fully removed the legacy user-facing AI server, Node.js path detection, related commands, settings, diagnostics, and dependencies
+
+### ♻️ 重構 Refactoring
+
+- 將 166 個公開積木的 AI 契約改為小型索引與 19 個依 category 載入的分片，避免單一巨大產物，同時維持每個積木只有一份正式定義
+  Split the AI contract for 166 public blocks into a small index and 19 category-loaded shards, avoiding one oversized artifact while retaining a single canonical definition for every block
+
 ### 🐛 修復 Bug Fixes
 
+- 修正外部修改合法舊工作區時被誤判為非法連線或孤立積木；驗證現在相容舊版板卡 ID、動態選單與函式引用，並確保 runtime round-trip 不會靜默遺失既有連線
+  Fixed valid edits to legacy external workspaces being misclassified as invalid connections or orphan blocks; validation now supports legacy board IDs, dynamic dropdowns, and function references while preventing runtime round-trips from silently dropping existing connections
+- 修正候選隔離可能與一般編輯器儲存競爭、無恢復來源時移除主檔，以及切換多根工作區後沿用舊服務；所有 workspace 寫入現在序列化且受正確生命週期約束
+  Fixed candidate quarantine racing normal editor saves, removal of the main file when no recovery source exists, and stale services after multi-root workspace changes; workspace writes are now serialized and lifecycle-bound
 - 修正 GitHub Actions checkout 將 annotated tag 的本地 ref 展開成 commit，造成發布 metadata gate 誤判；並加入不重建既有 tag 的安全復原入口
   Fixed GitHub Actions checkout peeling the local annotated-tag ref into a commit and triggering a false metadata-gate failure, and added safe recovery for an existing tag without recreating it
 - 修正 GitHub Release job 缺少明確 repository context，並加入沿用原發布 run artifact、只補失敗 GitHub Release 的復原流程

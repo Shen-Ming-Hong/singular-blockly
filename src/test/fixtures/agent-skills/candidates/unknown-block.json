@@ -1,0 +1,14 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "singular_blockly_unknown_fixture",
+          "id": "unknown-block"
+        }
+      ]
+    }
+  },
+  "board": "uno"
+}

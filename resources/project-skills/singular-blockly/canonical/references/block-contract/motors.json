@@ -1,0 +1,3165 @@
+{
+  "schemaVersion": 3,
+  "category": "motors",
+  "blocks": [
+    {
+      "type": "encoder_pid_compute",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TARGET",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_compute",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TARGET",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_compute",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TARGET",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_compute",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TARGET",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_compute",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TARGET",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_compute",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        }
+      }
+    },
+    {
+      "type": "encoder_pid_reset",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_reset",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_reset",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_reset",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_reset",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PID_VAR",
+              "kind": "dropdown",
+              "defaultValue": "myPID",
+              "optionsMode": "dynamic",
+              "options": [
+                "myPID"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_reset",
+            "extraState": {
+              "pid": "myPID"
+            },
+            "fields": {
+              "PID_VAR": "myPID"
+            }
+          },
+          "extraState": {
+            "pid": "myPID"
+          }
+        }
+      }
+    },
+    {
+      "type": "encoder_pid_setup",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "KD",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KI",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KP",
+              "kind": "number",
+              "defaultValue": 1
+            },
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "POSITION",
+              "optionsMode": "static",
+              "options": [
+                "POSITION",
+                "SPEED"
+              ]
+            },
+            {
+              "name": "PID_VAR",
+              "kind": "text-input",
+              "defaultValue": "myPID"
+            },
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_setup",
+            "extraState": {
+              "encoder": "myEncoder",
+              "mode": "POSITION"
+            },
+            "fields": {
+              "PID_VAR": "myPID",
+              "VAR": "myEncoder",
+              "MODE": "POSITION",
+              "KP": 1,
+              "KI": 0,
+              "KD": 0
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder",
+            "mode": "POSITION"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "KD",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KI",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KP",
+              "kind": "number",
+              "defaultValue": 1
+            },
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "POSITION",
+              "optionsMode": "static",
+              "options": [
+                "POSITION",
+                "SPEED"
+              ]
+            },
+            {
+              "name": "PID_VAR",
+              "kind": "text-input",
+              "defaultValue": "myPID"
+            },
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_setup",
+            "extraState": {
+              "encoder": "myEncoder",
+              "mode": "POSITION"
+            },
+            "fields": {
+              "PID_VAR": "myPID",
+              "VAR": "myEncoder",
+              "MODE": "POSITION",
+              "KP": 1,
+              "KI": 0,
+              "KD": 0
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder",
+            "mode": "POSITION"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "KD",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KI",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KP",
+              "kind": "number",
+              "defaultValue": 1
+            },
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "POSITION",
+              "optionsMode": "static",
+              "options": [
+                "POSITION",
+                "SPEED"
+              ]
+            },
+            {
+              "name": "PID_VAR",
+              "kind": "text-input",
+              "defaultValue": "myPID"
+            },
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_setup",
+            "extraState": {
+              "encoder": "myEncoder",
+              "mode": "POSITION"
+            },
+            "fields": {
+              "PID_VAR": "myPID",
+              "VAR": "myEncoder",
+              "MODE": "POSITION",
+              "KP": 1,
+              "KI": 0,
+              "KD": 0
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder",
+            "mode": "POSITION"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "KD",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KI",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KP",
+              "kind": "number",
+              "defaultValue": 1
+            },
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "POSITION",
+              "optionsMode": "static",
+              "options": [
+                "POSITION",
+                "SPEED"
+              ]
+            },
+            {
+              "name": "PID_VAR",
+              "kind": "text-input",
+              "defaultValue": "myPID"
+            },
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_setup",
+            "extraState": {
+              "encoder": "myEncoder",
+              "mode": "POSITION"
+            },
+            "fields": {
+              "PID_VAR": "myPID",
+              "VAR": "myEncoder",
+              "MODE": "POSITION",
+              "KP": 1,
+              "KI": 0,
+              "KD": 0
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder",
+            "mode": "POSITION"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "KD",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KI",
+              "kind": "number",
+              "defaultValue": 0
+            },
+            {
+              "name": "KP",
+              "kind": "number",
+              "defaultValue": 1
+            },
+            {
+              "name": "MODE",
+              "kind": "dropdown",
+              "defaultValue": "POSITION",
+              "optionsMode": "static",
+              "options": [
+                "POSITION",
+                "SPEED"
+              ]
+            },
+            {
+              "name": "PID_VAR",
+              "kind": "text-input",
+              "defaultValue": "myPID"
+            },
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_pid_setup",
+            "extraState": {
+              "encoder": "myEncoder",
+              "mode": "POSITION"
+            },
+            "fields": {
+              "PID_VAR": "myPID",
+              "VAR": "myEncoder",
+              "MODE": "POSITION",
+              "KP": 1,
+              "KI": 0,
+              "KD": 0
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder",
+            "mode": "POSITION"
+          }
+        }
+      }
+    },
+    {
+      "type": "encoder_read",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_read",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_read",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_read",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_read",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_read",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        }
+      }
+    },
+    {
+      "type": "encoder_reset",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_reset",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_reset",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_reset",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_reset",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myEncoder",
+              "optionsMode": "dynamic",
+              "options": [
+                "myEncoder"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_reset",
+            "extraState": {
+              "encoder": "myEncoder"
+            },
+            "fields": {
+              "VAR": "myEncoder"
+            }
+          },
+          "extraState": {
+            "encoder": "myEncoder"
+          }
+        }
+      }
+    },
+    {
+      "type": "encoder_setup",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PIN_INPUTS",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myEncoder"
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_setup",
+            "extraState": {
+              "useInterrupt": false
+            },
+            "fields": {
+              "VAR": "myEncoder",
+              "USE_INTERRUPT": false,
+              "PIN_A": "0",
+              "PIN_B": "0"
+            }
+          },
+          "extraState": {
+            "useInterrupt": false
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PIN_INPUTS",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myEncoder"
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_setup",
+            "extraState": {
+              "useInterrupt": false
+            },
+            "fields": {
+              "VAR": "myEncoder",
+              "USE_INTERRUPT": false,
+              "PIN_A": "0",
+              "PIN_B": "0"
+            }
+          },
+          "extraState": {
+            "useInterrupt": false
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PIN_INPUTS",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myEncoder"
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_setup",
+            "extraState": {
+              "useInterrupt": false
+            },
+            "fields": {
+              "VAR": "myEncoder",
+              "USE_INTERRUPT": false,
+              "PIN_A": "0",
+              "PIN_B": "0"
+            }
+          },
+          "extraState": {
+            "useInterrupt": false
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PIN_INPUTS",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myEncoder"
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_setup",
+            "extraState": {
+              "useInterrupt": false
+            },
+            "fields": {
+              "VAR": "myEncoder",
+              "USE_INTERRUPT": false,
+              "PIN_A": "0",
+              "PIN_B": "0"
+            }
+          },
+          "extraState": {
+            "useInterrupt": false
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PIN_INPUTS",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN_A",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "PIN_B",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myEncoder"
+            }
+          ],
+          "minimalState": {
+            "type": "encoder_setup",
+            "extraState": {
+              "useInterrupt": false
+            },
+            "fields": {
+              "VAR": "myEncoder",
+              "USE_INTERRUPT": false,
+              "PIN_A": "0",
+              "PIN_B": "0"
+            }
+          },
+          "extraState": {
+            "useInterrupt": false
+          }
+        }
+      }
+    },
+    {
+      "type": "servo_move",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ANGLE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_move",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ANGLE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_move",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ANGLE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_move",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ANGLE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_move",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ANGLE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_move",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        }
+      }
+    },
+    {
+      "type": "servo_setup",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myServo"
+            }
+          ],
+          "minimalState": {
+            "type": "servo_setup",
+            "fields": {
+              "VAR": "myServo",
+              "PIN": "0"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "2",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "44",
+                "45",
+                "46",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myServo"
+            }
+          ],
+          "minimalState": {
+            "type": "servo_setup",
+            "fields": {
+              "VAR": "myServo",
+              "PIN": "2"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "3",
+                "5",
+                "6",
+                "9"
+              ]
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myServo"
+            }
+          ],
+          "minimalState": {
+            "type": "servo_setup",
+            "fields": {
+              "VAR": "myServo",
+              "PIN": "3"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "3",
+                "5",
+                "6",
+                "9"
+              ]
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myServo"
+            }
+          ],
+          "minimalState": {
+            "type": "servo_setup",
+            "fields": {
+              "VAR": "myServo",
+              "PIN": "3"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "3",
+              "optionsMode": "dynamic",
+              "options": [
+                "10",
+                "11",
+                "3",
+                "5",
+                "6",
+                "9"
+              ]
+            },
+            {
+              "name": "VAR",
+              "kind": "text-input",
+              "defaultValue": "myServo"
+            }
+          ],
+          "minimalState": {
+            "type": "servo_setup",
+            "fields": {
+              "VAR": "myServo",
+              "PIN": "3"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "servo_stop",
+      "categories": [
+        "motors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_stop",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_stop",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_stop",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_stop",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "dropdown",
+              "defaultValue": "myServo",
+              "optionsMode": "dynamic",
+              "options": [
+                "myServo"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "servo_stop",
+            "extraState": {
+              "servo": "myServo"
+            },
+            "fields": {
+              "VAR": "myServo"
+            }
+          },
+          "extraState": {
+            "servo": "myServo"
+          }
+        }
+      }
+    }
+  ]
+}

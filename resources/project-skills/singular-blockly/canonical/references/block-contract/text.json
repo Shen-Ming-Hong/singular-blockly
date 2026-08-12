@@ -1,0 +1,4854 @@
+{
+  "schemaVersion": 3,
+  "category": "text",
+  "blocks": [
+    {
+      "type": "text_append",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "text_append",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "text_append",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "text_append",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "text_append",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "text_append",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "text_append",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "VAR",
+              "kind": "variable",
+              "defaultValue": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          ],
+          "minimalState": {
+            "type": "text_append",
+            "fields": {
+              "VAR": {
+                "name": "item",
+                "type": ""
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "text_charAt",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "AT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START",
+                "LAST",
+                "RANDOM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_charAt",
+            "extraState": "<mutation at=\"true\"></mutation>",
+            "fields": {
+              "WHERE": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at=\"true\"></mutation>"
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "AT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START",
+                "LAST",
+                "RANDOM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_charAt",
+            "extraState": "<mutation at=\"true\"></mutation>",
+            "fields": {
+              "WHERE": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at=\"true\"></mutation>"
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "AT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START",
+                "LAST",
+                "RANDOM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_charAt",
+            "extraState": "<mutation at=\"true\"></mutation>",
+            "fields": {
+              "WHERE": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at=\"true\"></mutation>"
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "AT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START",
+                "LAST",
+                "RANDOM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_charAt",
+            "extraState": "<mutation at=\"true\"></mutation>",
+            "fields": {
+              "WHERE": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at=\"true\"></mutation>"
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "AT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START",
+                "LAST",
+                "RANDOM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_charAt",
+            "extraState": "<mutation at=\"true\"></mutation>",
+            "fields": {
+              "WHERE": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at=\"true\"></mutation>"
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "AT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START",
+                "LAST",
+                "RANDOM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_charAt",
+            "extraState": "<mutation at=\"true\"></mutation>",
+            "fields": {
+              "WHERE": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at=\"true\"></mutation>"
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "AT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START",
+                "LAST",
+                "RANDOM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_charAt",
+            "extraState": "<mutation at=\"true\"></mutation>",
+            "fields": {
+              "WHERE": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at=\"true\"></mutation>"
+        }
+      }
+    },
+    {
+      "type": "text_count",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "SUB",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_count"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "SUB",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_count"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "SUB",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_count"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "SUB",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_count"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "SUB",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_count"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "SUB",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_count"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "SUB",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_count"
+          }
+        }
+      }
+    },
+    {
+      "type": "text_getSubstring",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "AT1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "AT2",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "STRING",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "WHERE1_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "WHERE2_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE1",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START"
+              ]
+            },
+            {
+              "name": "WHERE2",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FROM_END",
+                "FROM_START",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_getSubstring",
+            "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>",
+            "fields": {
+              "WHERE1": "FROM_START",
+              "WHERE2": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>"
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "AT1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "AT2",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "STRING",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "WHERE1_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "WHERE2_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE1",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START"
+              ]
+            },
+            {
+              "name": "WHERE2",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FROM_END",
+                "FROM_START",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_getSubstring",
+            "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>",
+            "fields": {
+              "WHERE1": "FROM_START",
+              "WHERE2": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>"
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "AT1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "AT2",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "STRING",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "WHERE1_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "WHERE2_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE1",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START"
+              ]
+            },
+            {
+              "name": "WHERE2",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FROM_END",
+                "FROM_START",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_getSubstring",
+            "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>",
+            "fields": {
+              "WHERE1": "FROM_START",
+              "WHERE2": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>"
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "AT1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "AT2",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "STRING",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "WHERE1_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "WHERE2_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE1",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START"
+              ]
+            },
+            {
+              "name": "WHERE2",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FROM_END",
+                "FROM_START",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_getSubstring",
+            "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>",
+            "fields": {
+              "WHERE1": "FROM_START",
+              "WHERE2": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>"
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "AT1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "AT2",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "STRING",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "WHERE1_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "WHERE2_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE1",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START"
+              ]
+            },
+            {
+              "name": "WHERE2",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FROM_END",
+                "FROM_START",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_getSubstring",
+            "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>",
+            "fields": {
+              "WHERE1": "FROM_START",
+              "WHERE2": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>"
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "AT1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "AT2",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "STRING",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "WHERE1_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "WHERE2_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE1",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START"
+              ]
+            },
+            {
+              "name": "WHERE2",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FROM_END",
+                "FROM_START",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_getSubstring",
+            "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>",
+            "fields": {
+              "WHERE1": "FROM_START",
+              "WHERE2": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>"
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "AT1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "AT2",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "STRING",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "WHERE1_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "WHERE2_INPUT",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "WHERE1",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "FROM_END",
+                "FROM_START"
+              ]
+            },
+            {
+              "name": "WHERE2",
+              "kind": "dropdown",
+              "defaultValue": "FROM_START",
+              "optionsMode": "static",
+              "options": [
+                "FROM_END",
+                "FROM_START",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_getSubstring",
+            "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>",
+            "fields": {
+              "WHERE1": "FROM_START",
+              "WHERE2": "FROM_START"
+            }
+          },
+          "extraState": "<mutation at1=\"true\" at2=\"true\"></mutation>"
+        }
+      }
+    },
+    {
+      "type": "text_indexOf",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FIND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "END",
+              "kind": "dropdown",
+              "defaultValue": "FIRST",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_indexOf",
+            "fields": {
+              "END": "FIRST"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FIND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "END",
+              "kind": "dropdown",
+              "defaultValue": "FIRST",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_indexOf",
+            "fields": {
+              "END": "FIRST"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FIND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "END",
+              "kind": "dropdown",
+              "defaultValue": "FIRST",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_indexOf",
+            "fields": {
+              "END": "FIRST"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FIND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "END",
+              "kind": "dropdown",
+              "defaultValue": "FIRST",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_indexOf",
+            "fields": {
+              "END": "FIRST"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FIND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "END",
+              "kind": "dropdown",
+              "defaultValue": "FIRST",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_indexOf",
+            "fields": {
+              "END": "FIRST"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FIND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "END",
+              "kind": "dropdown",
+              "defaultValue": "FIRST",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_indexOf",
+            "fields": {
+              "END": "FIRST"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FIND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "END",
+              "kind": "dropdown",
+              "defaultValue": "FIRST",
+              "optionsMode": "static",
+              "options": [
+                "FIRST",
+                "LAST"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_indexOf",
+            "fields": {
+              "END": "FIRST"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "text_isEmpty",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_isEmpty"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_isEmpty"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_isEmpty"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_isEmpty"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_isEmpty"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_isEmpty"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_isEmpty"
+          }
+        }
+      }
+    },
+    {
+      "type": "text_join",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "ADD0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "ADD1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_join",
+            "extraState": {
+              "itemCount": 2
+            }
+          },
+          "extraState": {
+            "itemCount": 2
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "ADD0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "ADD1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_join",
+            "extraState": {
+              "itemCount": 2
+            }
+          },
+          "extraState": {
+            "itemCount": 2
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "ADD0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "ADD1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_join",
+            "extraState": {
+              "itemCount": 2
+            }
+          },
+          "extraState": {
+            "itemCount": 2
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "ADD0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "ADD1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_join",
+            "extraState": {
+              "itemCount": 2
+            }
+          },
+          "extraState": {
+            "itemCount": 2
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "ADD0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "ADD1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_join",
+            "extraState": {
+              "itemCount": 2
+            }
+          },
+          "extraState": {
+            "itemCount": 2
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "ADD0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "ADD1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_join",
+            "extraState": {
+              "itemCount": 2
+            }
+          },
+          "extraState": {
+            "itemCount": 2
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "ADD0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "ADD1",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_join",
+            "extraState": {
+              "itemCount": 2
+            }
+          },
+          "extraState": {
+            "itemCount": 2
+          }
+        }
+      }
+    },
+    {
+      "type": "text_length",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_length"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_length"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_length"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_length"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_length"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_length"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String",
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_length"
+          }
+        }
+      }
+    },
+    {
+      "type": "text_print",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NEW_LINE",
+              "kind": "checkbox",
+              "defaultValue": true
+            }
+          ],
+          "minimalState": {
+            "type": "text_print",
+            "fields": {
+              "NEW_LINE": true
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NEW_LINE",
+              "kind": "checkbox",
+              "defaultValue": true
+            }
+          ],
+          "minimalState": {
+            "type": "text_print",
+            "fields": {
+              "NEW_LINE": true
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NEW_LINE",
+              "kind": "checkbox",
+              "defaultValue": true
+            }
+          ],
+          "minimalState": {
+            "type": "text_print",
+            "fields": {
+              "NEW_LINE": true
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NEW_LINE",
+              "kind": "checkbox",
+              "defaultValue": true
+            }
+          ],
+          "minimalState": {
+            "type": "text_print",
+            "fields": {
+              "NEW_LINE": true
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NEW_LINE",
+              "kind": "checkbox",
+              "defaultValue": true
+            }
+          ],
+          "minimalState": {
+            "type": "text_print",
+            "fields": {
+              "NEW_LINE": true
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NEW_LINE",
+              "kind": "checkbox",
+              "defaultValue": true
+            }
+          ],
+          "minimalState": {
+            "type": "text_print",
+            "fields": {
+              "NEW_LINE": true
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NEW_LINE",
+              "kind": "checkbox",
+              "defaultValue": true
+            }
+          ],
+          "minimalState": {
+            "type": "text_print",
+            "fields": {
+              "NEW_LINE": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "text_prompt_ext",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "TEXT",
+              "optionsMode": "static",
+              "options": [
+                "NUMBER",
+                "TEXT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_prompt_ext",
+            "extraState": "<mutation type=\"TEXT\"></mutation>",
+            "fields": {
+              "TYPE": "TEXT"
+            }
+          },
+          "extraState": "<mutation type=\"TEXT\"></mutation>"
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "TEXT",
+              "optionsMode": "static",
+              "options": [
+                "NUMBER",
+                "TEXT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_prompt_ext",
+            "extraState": "<mutation type=\"TEXT\"></mutation>",
+            "fields": {
+              "TYPE": "TEXT"
+            }
+          },
+          "extraState": "<mutation type=\"TEXT\"></mutation>"
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "TEXT",
+              "optionsMode": "static",
+              "options": [
+                "NUMBER",
+                "TEXT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_prompt_ext",
+            "extraState": "<mutation type=\"TEXT\"></mutation>",
+            "fields": {
+              "TYPE": "TEXT"
+            }
+          },
+          "extraState": "<mutation type=\"TEXT\"></mutation>"
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "TEXT",
+              "optionsMode": "static",
+              "options": [
+                "NUMBER",
+                "TEXT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_prompt_ext",
+            "extraState": "<mutation type=\"TEXT\"></mutation>",
+            "fields": {
+              "TYPE": "TEXT"
+            }
+          },
+          "extraState": "<mutation type=\"TEXT\"></mutation>"
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "TEXT",
+              "optionsMode": "static",
+              "options": [
+                "NUMBER",
+                "TEXT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_prompt_ext",
+            "extraState": "<mutation type=\"TEXT\"></mutation>",
+            "fields": {
+              "TYPE": "TEXT"
+            }
+          },
+          "extraState": "<mutation type=\"TEXT\"></mutation>"
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "TEXT",
+              "optionsMode": "static",
+              "options": [
+                "NUMBER",
+                "TEXT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_prompt_ext",
+            "extraState": "<mutation type=\"TEXT\"></mutation>",
+            "fields": {
+              "TYPE": "TEXT"
+            }
+          },
+          "extraState": "<mutation type=\"TEXT\"></mutation>"
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "TEXT",
+              "optionsMode": "static",
+              "options": [
+                "NUMBER",
+                "TEXT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_prompt_ext",
+            "extraState": "<mutation type=\"TEXT\"></mutation>",
+            "fields": {
+              "TYPE": "TEXT"
+            }
+          },
+          "extraState": "<mutation type=\"TEXT\"></mutation>"
+        }
+      }
+    },
+    {
+      "type": "text_reverse",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_reverse"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_reverse"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_reverse"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_reverse"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_reverse"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_reverse"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "text_reverse"
+          }
+        }
+      }
+    },
+    {
+      "type": "text_to_number",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "INT",
+              "optionsMode": "static",
+              "options": [
+                "FLOAT",
+                "INT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_to_number",
+            "fields": {
+              "TYPE": "INT"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "INT",
+              "optionsMode": "static",
+              "options": [
+                "FLOAT",
+                "INT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_to_number",
+            "fields": {
+              "TYPE": "INT"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "INT",
+              "optionsMode": "static",
+              "options": [
+                "FLOAT",
+                "INT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_to_number",
+            "fields": {
+              "TYPE": "INT"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "INT",
+              "optionsMode": "static",
+              "options": [
+                "FLOAT",
+                "INT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_to_number",
+            "fields": {
+              "TYPE": "INT"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "INT",
+              "optionsMode": "static",
+              "options": [
+                "FLOAT",
+                "INT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_to_number",
+            "fields": {
+              "TYPE": "INT"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "INT",
+              "optionsMode": "static",
+              "options": [
+                "FLOAT",
+                "INT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_to_number",
+            "fields": {
+              "TYPE": "INT"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TEXT",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "String"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TYPE",
+              "kind": "dropdown",
+              "defaultValue": "INT",
+              "optionsMode": "static",
+              "options": [
+                "FLOAT",
+                "INT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "text_to_number",
+            "fields": {
+              "TYPE": "INT"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "to_string",
+      "categories": [
+        "text"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "to_string"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "to_string"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "to_string"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "to_string"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "to_string"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "to_string"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "String"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number",
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "to_string"
+          }
+        }
+      }
+    }
+  ]
+}

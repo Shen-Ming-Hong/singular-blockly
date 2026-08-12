@@ -1,0 +1,323 @@
+{
+  "schemaVersion": 3,
+  "blocklyVersion": "13.2.1",
+  "boards": [
+    {
+      "id": "cyberbrick",
+      "language": "micropython",
+      "toolbox": "cyberbrick"
+    },
+    {
+      "id": "esp32",
+      "language": "arduino",
+      "toolbox": "index"
+    },
+    {
+      "id": "mega",
+      "language": "arduino",
+      "toolbox": "index"
+    },
+    {
+      "id": "nano",
+      "language": "arduino",
+      "toolbox": "index"
+    },
+    {
+      "id": "supermini",
+      "language": "arduino",
+      "toolbox": "index"
+    },
+    {
+      "id": "txt",
+      "language": "txt",
+      "toolbox": "txt"
+    },
+    {
+      "id": "uno",
+      "language": "arduino",
+      "toolbox": "index"
+    }
+  ],
+  "shards": [
+    {
+      "category": "arduino",
+      "path": "block-contract/arduino.json",
+      "blockTypes": [
+        "arduino_analog_read",
+        "arduino_analog_write",
+        "arduino_delay",
+        "arduino_digital_read",
+        "arduino_digital_write",
+        "arduino_level",
+        "arduino_pin_mode",
+        "arduino_pullup",
+        "arduino_setup_loop",
+        "esp32_pwm_setup",
+        "seven_segment_display",
+        "seven_segment_pins",
+        "threshold_function_read",
+        "threshold_function_setup"
+      ]
+    },
+    {
+      "category": "communication",
+      "path": "block-contract/communication.json",
+      "blockTypes": [
+        "esp32_mqtt_connect",
+        "esp32_mqtt_get_message",
+        "esp32_mqtt_get_topic",
+        "esp32_mqtt_loop",
+        "esp32_mqtt_publish",
+        "esp32_mqtt_setup",
+        "esp32_mqtt_status",
+        "esp32_mqtt_subscribe",
+        "esp32_wifi_connect",
+        "esp32_wifi_disconnect",
+        "esp32_wifi_get_ip",
+        "esp32_wifi_get_rssi",
+        "esp32_wifi_get_ssid",
+        "esp32_wifi_scan",
+        "esp32_wifi_status"
+      ]
+    },
+    {
+      "category": "cyberbrick_core",
+      "path": "block-contract/cyberbrick_core.json",
+      "blockTypes": [
+        "cyberbrick_delay_ms",
+        "cyberbrick_delay_s",
+        "cyberbrick_gpio_read",
+        "cyberbrick_gpio_set",
+        "cyberbrick_led_digital",
+        "cyberbrick_led_off",
+        "cyberbrick_led_set_color",
+        "cyberbrick_ticks_diff",
+        "cyberbrick_ticks_ms",
+        "micropython_main"
+      ]
+    },
+    {
+      "category": "cyberbrick_rc",
+      "path": "block-contract/cyberbrick_rc.json",
+      "blockTypes": [
+        "rc_get_joystick",
+        "rc_get_joystick_mapped",
+        "rc_is_button_pressed",
+        "rc_is_connected",
+        "rc_master_init",
+        "rc_send",
+        "rc_slave_init",
+        "rc_wait_connection"
+      ]
+    },
+    {
+      "category": "cyberbrick_wifi",
+      "path": "block-contract/cyberbrick_wifi.json",
+      "blockTypes": [
+        "cyberbrick_wifi_connect",
+        "cyberbrick_wifi_disconnect",
+        "cyberbrick_wifi_get_ip",
+        "cyberbrick_wifi_is_connected"
+      ]
+    },
+    {
+      "category": "cyberbrick_x11",
+      "path": "block-contract/cyberbrick_x11.json",
+      "blockTypes": [
+        "x11_led_digital",
+        "x11_led_set_color",
+        "x11_motor_speed",
+        "x11_motor_stop",
+        "x11_servo_180_angle",
+        "x11_servo_360_speed",
+        "x11_servo_stop"
+      ]
+    },
+    {
+      "category": "cyberbrick_x12",
+      "path": "block-contract/cyberbrick_x12.json",
+      "blockTypes": [
+        "x12_get_joystick",
+        "x12_get_joystick_mapped",
+        "x12_is_button_pressed"
+      ]
+    },
+    {
+      "category": "functions",
+      "path": "block-contract/functions.json",
+      "blockTypes": [
+        "arduino_function",
+        "arduino_function_call"
+      ]
+    },
+    {
+      "category": "lists",
+      "path": "block-contract/lists.json",
+      "blockTypes": [
+        "lists_create_with",
+        "lists_getIndex",
+        "lists_getSublist",
+        "lists_indexOf",
+        "lists_isEmpty",
+        "lists_length",
+        "lists_repeat",
+        "lists_reverse",
+        "lists_setIndex",
+        "lists_sort",
+        "lists_split"
+      ]
+    },
+    {
+      "category": "logic",
+      "path": "block-contract/logic.json",
+      "blockTypes": [
+        "controls_if",
+        "logic_boolean",
+        "logic_compare",
+        "logic_negate",
+        "logic_null",
+        "logic_operation",
+        "logic_ternary"
+      ]
+    },
+    {
+      "category": "loops",
+      "path": "block-contract/loops.json",
+      "blockTypes": [
+        "controls_duration",
+        "controls_for",
+        "controls_forEach",
+        "controls_forever",
+        "controls_repeat_ext",
+        "controls_whileUntil",
+        "singular_flow_statements"
+      ]
+    },
+    {
+      "category": "math",
+      "path": "block-contract/math.json",
+      "blockTypes": [
+        "math_arithmetic",
+        "math_atan2",
+        "math_constant",
+        "math_constrain",
+        "math_map",
+        "math_modulo",
+        "math_number_property",
+        "math_on_list",
+        "math_random_float",
+        "math_random_int",
+        "math_round",
+        "math_single",
+        "math_trig"
+      ]
+    },
+    {
+      "category": "motors",
+      "path": "block-contract/motors.json",
+      "blockTypes": [
+        "encoder_pid_compute",
+        "encoder_pid_reset",
+        "encoder_pid_setup",
+        "encoder_read",
+        "encoder_reset",
+        "encoder_setup",
+        "servo_move",
+        "servo_setup",
+        "servo_stop"
+      ]
+    },
+    {
+      "category": "sensors",
+      "path": "block-contract/sensors.json",
+      "blockTypes": [
+        "ultrasonic_read",
+        "ultrasonic_sensor",
+        "ultrasonic_trigger"
+      ]
+    },
+    {
+      "category": "shared",
+      "path": "block-contract/shared.json",
+      "blockTypes": [
+        "math_number",
+        "text",
+        "variables_get"
+      ]
+    },
+    {
+      "category": "text",
+      "path": "block-contract/text.json",
+      "blockTypes": [
+        "text_append",
+        "text_charAt",
+        "text_count",
+        "text_getSubstring",
+        "text_indexOf",
+        "text_isEmpty",
+        "text_join",
+        "text_length",
+        "text_print",
+        "text_prompt_ext",
+        "text_reverse",
+        "text_to_number",
+        "to_string"
+      ]
+    },
+    {
+      "category": "txt",
+      "path": "block-contract/txt.json",
+      "blockTypes": [
+        "txt_input_sensor",
+        "txt_motor_speed",
+        "txt_motor_stop",
+        "txt_output",
+        "txt_process",
+        "txt_setup",
+        "txt_stop_all",
+        "txt_virtual_button_state",
+        "txt_wait"
+      ]
+    },
+    {
+      "category": "variables",
+      "path": "block-contract/variables.json",
+      "blockTypes": [
+        "variables_set"
+      ]
+    },
+    {
+      "category": "vision-sensors",
+      "path": "block-contract/vision-sensors.json",
+      "blockTypes": [
+        "huskylens_count_arrows",
+        "huskylens_count_blocks",
+        "huskylens_count_blocks_id",
+        "huskylens_forget",
+        "huskylens_get_arrow_info",
+        "huskylens_get_block_id",
+        "huskylens_get_block_info",
+        "huskylens_init_i2c",
+        "huskylens_init_uart",
+        "huskylens_is_learned",
+        "huskylens_learn",
+        "huskylens_request",
+        "huskylens_request_blocks_id",
+        "huskylens_set_algorithm",
+        "pixetto_apriltag_detect",
+        "pixetto_color_detect",
+        "pixetto_face_detect",
+        "pixetto_get_func_id",
+        "pixetto_get_position",
+        "pixetto_get_type_id",
+        "pixetto_handwritten_digit",
+        "pixetto_init",
+        "pixetto_is_detected",
+        "pixetto_neural_network",
+        "pixetto_road_detect",
+        "pixetto_set_mode",
+        "pixetto_shape_detect"
+      ]
+    }
+  ]
+}

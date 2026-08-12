@@ -1,0 +1,6 @@
+{
+  "baseBlockType": "text_print",
+  "count": 500,
+  "timeoutMs": 10000,
+  "description": "The test builds this deterministic workspace in memory to avoid tracking a large generated fixture."
+}

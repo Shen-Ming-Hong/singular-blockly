@@ -46,6 +46,7 @@ vsc-extension-quickstart.md
 **/specs/**
 **/docs/**
 **/scripts/**
+**/resources/**
 **/coverage/**
 **/release-artifacts/**
 **/RC_example/**

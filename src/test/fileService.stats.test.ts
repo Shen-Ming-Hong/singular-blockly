@@ -39,7 +39,7 @@ describe('File Service - getFileStats', () => {
 	});
 
 	it('should return file stats for existing file', async () => {
-		const fullPath = path.join(workspacePath, testFilePath);
+		const fullPath = path.resolve(workspacePath, testFilePath);
 		fsMock.addFile(fullPath, 'content');
 
 		const fakeStats = {

@@ -1,0 +1,534 @@
+{
+  "schemaVersion": 3,
+  "category": "cyberbrick_x11",
+  "blocks": [
+    {
+      "type": "x11_led_digital",
+      "categories": [
+        "cyberbrick_x11"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "B_STATE",
+              "kind": "dropdown",
+              "defaultValue": "ON",
+              "optionsMode": "dynamic",
+              "options": [
+                "OFF",
+                "ON"
+              ]
+            },
+            {
+              "name": "G_STATE",
+              "kind": "dropdown",
+              "defaultValue": "ON",
+              "optionsMode": "dynamic",
+              "options": [
+                "OFF",
+                "ON"
+              ]
+            },
+            {
+              "name": "INDEX",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "all"
+              ]
+            },
+            {
+              "name": "PORT",
+              "kind": "dropdown",
+              "defaultValue": "21",
+              "optionsMode": "static",
+              "options": [
+                "20",
+                "21"
+              ]
+            },
+            {
+              "name": "R_STATE",
+              "kind": "dropdown",
+              "defaultValue": "ON",
+              "optionsMode": "dynamic",
+              "options": [
+                "OFF",
+                "ON"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "x11_led_digital",
+            "fields": {
+              "PORT": "21",
+              "INDEX": "0",
+              "R_STATE": "ON",
+              "G_STATE": "ON",
+              "B_STATE": "ON"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "x11_led_set_color",
+      "categories": [
+        "cyberbrick_x11"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "BLUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "GREEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "RED",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "INDEX",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "all"
+              ]
+            },
+            {
+              "name": "PORT",
+              "kind": "dropdown",
+              "defaultValue": "21",
+              "optionsMode": "static",
+              "options": [
+                "20",
+                "21"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "x11_led_set_color",
+            "fields": {
+              "PORT": "21",
+              "INDEX": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "x11_motor_speed",
+      "categories": [
+        "cyberbrick_x11"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "SPEED",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PORT",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "x11_motor_speed",
+            "fields": {
+              "PORT": "1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "x11_motor_stop",
+      "categories": [
+        "cyberbrick_x11"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PORT",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "x11_motor_stop",
+            "fields": {
+              "PORT": "1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "x11_servo_180_angle",
+      "categories": [
+        "cyberbrick_x11"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "ANGLE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PORT",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "x11_servo_180_angle",
+            "fields": {
+              "PORT": "1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "x11_servo_360_speed",
+      "categories": [
+        "cyberbrick_x11"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "SPEED",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PORT",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "x11_servo_360_speed",
+            "fields": {
+              "PORT": "1"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "x11_servo_stop",
+      "categories": [
+        "cyberbrick_x11"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PORT",
+              "kind": "dropdown",
+              "defaultValue": "1",
+              "optionsMode": "static",
+              "options": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "x11_servo_stop",
+            "fields": {
+              "PORT": "1"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

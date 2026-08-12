@@ -25,7 +25,7 @@ export default defineConfig([
 	{
 		// Unit tests — opens test workspace for blockly editor tests
 		label: 'unit',
-		version: '1.105.0',
+		version: '1.109.0',
 		files: 'out/test/**/*.test.js',
 		extensionDevelopmentPath,
 		workspaceFolder: testWorkspace,
@@ -42,7 +42,7 @@ export default defineConfig([
 		// Integration tests — opens real workspace with Copilot access
 		// Shares user's extensions dir for Copilot, uses separate user-data-dir
 		label: 'integration',
-		version: '1.105.0',
+		version: '1.109.0',
 		files: 'out/test/integration/**/*.test.js',
 		workspaceFolder: testWorkspace,
 		launchArgs: [`--extensions-dir=${extensionsDir}`],

@@ -250,6 +250,56 @@
 		return true;
 	}
 
+	function findNewOrphanStatementBlock(candidateWorkspace, baselineWorkspace, allowedRootTypes) {
+		const allowedRoots = allowedRootTypes instanceof Set ? allowedRootTypes : new Set(allowedRootTypes || []);
+		const getSignature = block => {
+			if (!block || !block.previousConnection || block.outputConnection || allowedRoots.has(block.type)) {
+				return null;
+			}
+			return JSON.stringify([String(block.id || ''), String(block.type || '')]);
+		};
+		const baselineSignatures = new Set(
+			(baselineWorkspace?.getTopBlocks?.(false) || []).map(getSignature).filter(Boolean)
+		);
+		return (
+			(candidateWorkspace?.getTopBlocks?.(false) || []).find(block => {
+				const signature = getSignature(block);
+				return signature && !baselineSignatures.has(signature);
+			}) || null
+		);
+	}
+
+	function serializedConnectionsPreserved(candidateState, normalizedState) {
+		const candidateRoots = candidateState?.blocks?.blocks || [];
+		const normalizedRoots = normalizedState?.blocks?.blocks || [];
+		const compareBlock = (candidateBlock, normalizedBlock) => {
+			if (!candidateBlock || !normalizedBlock || candidateBlock.type !== normalizedBlock.type) {
+				return false;
+			}
+			if (typeof candidateBlock.id === 'string' && candidateBlock.id !== normalizedBlock.id) {
+				return false;
+			}
+			for (const [inputName, candidateInput] of Object.entries(candidateBlock.inputs || {})) {
+				const normalizedInput = normalizedBlock.inputs?.[inputName];
+				if (!normalizedInput) {return false;}
+				for (const slot of ['block', 'shadow']) {
+					const candidateChild = candidateInput?.[slot];
+					if (candidateChild && !compareBlock(candidateChild, normalizedInput[slot])) {return false;}
+				}
+			}
+			const candidateNext = candidateBlock.next?.block;
+			if (candidateNext && !compareBlock(candidateNext, normalizedBlock.next?.block)) {return false;}
+			return true;
+		};
+
+		return candidateRoots.every((candidateRoot, index) => {
+			const normalizedRoot = typeof candidateRoot.id === 'string'
+				? normalizedRoots.find(root => root.id === candidateRoot.id)
+				: normalizedRoots[index];
+			return compareBlock(candidateRoot, normalizedRoot);
+		});
+	}
+
 	function restoreBlocklyMessages(snapshot) {
 		for (const key of Object.keys(Blockly.Msg)) {
 			delete Blockly.Msg[key];
@@ -451,6 +501,8 @@
 		saveWorkspaceState,
 		normalizeWorkspaceState,
 		loadWorkspaceState,
+		findNewOrphanStatementBlock,
+		serializedConnectionsPreserved,
 		loadCoreLocale,
 		applyLocale,
 		installDialogAdapter,
