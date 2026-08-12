@@ -1,49 +1,32 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: 1.5.1 → 1.6.0
-Modified Principles: None
-Added Principles:
-  - Principle XI: Agent Skills Architecture (全新原則)
-    * 正式認可 Agent Skills 系統作為專案的核心能力擴展機制
-    * 定義六個官方技能：code-simplifier, git-workflow, pr-review-release,
-      security-checker, security-vulnerability-fix, skill-development
-    * 強調技能的模組化設計、漸進式載入策略與安全性要求
-    * 建立技能開發與維護的標準規範
+Version Change: 1.6.0 → 1.7.0
+Modified Principles:
+  - Principle V: Research-Driven Development (MCP-Powered)
+    → Research-Driven Development
+    * 保留使用最新官方與第一手來源查核技術決策的強制要求
+    * 將研究工具改為環境中可用的工具，MCP 為可選而非必要依賴
+  - Principle XI: Agent Skills Architecture
+    * 區分貢獻者工作流 Skills 與終端 Blockly 專案 Skills
+    * 移除容易過時的固定技能數量與清單
+    * 補充跨代理相容、漸進式揭露、使用者內容保護與安全要求
 Added Sections: None
 Removed Sections: None
 Templates Status:
-  ✅ plan-template.md - No updates needed
-  ✅ spec-template.md - No updates needed
-  ✅ tasks-template.md - No updates needed
-  ✅ checklist-template.md - No updates needed
-Skills Status:
-  ✅ code-simplifier v1.0.0 - 程式碼簡化與重構
-  ✅ git-workflow v1.0.0 - Git 工作流程自動化
-  ✅ pr-review-release v1.0.0 - PR 審查與發布流程
-  ✅ security-checker v1.0.0 - 程式碼安全檢查
-  ✅ security-vulnerability-fix v1.0.0 - 安全漏洞修復
-  ✅ skill-development v1.0.0 - 技能開發元技能
-Change Summary (v1.6.0):
-  - Added new Principle XI: Agent Skills Architecture
-    * Formalizes the Agent Skills system as an extensible capability framework
-    * Documents six official skills for development workflow automation
-    * Establishes standards for skill design, trigger keywords, and security
-    * Defines integration patterns with existing principles (esp. IX, X)
-  - Context from project evolution:
-    * Skills evolved from ad-hoc prompts to structured SKILL.md format
-    * All skills now follow consistent metadata and documentation standards
-    * Progressive disclosure strategy optimizes context window usage
+  ✅ plan-template.md - 執行階段讀取憲法，無須修改
+  ✅ spec-template.md - 無須修改
+  ✅ tasks-template.md - 無須修改
+  ✅ checklist-template.md - 無須修改
 Version Bump Rationale:
-  - MINOR version bump (1.5.1 → 1.6.0)
-  - New principle addition (backward compatible governance expansion)
-  - Formalizes existing practices without changing other principles
+  - MINOR version bump (1.6.0 → 1.7.0)
+  - 擴充 Principle XI 並放寬 Principle V 的工具限制，未移除核心原則
+  - 原有以 MCP 查核官方來源的流程仍符合修訂後規範
 Context:
-  - Amendment date: 2026-01-14
-  - Based on skills directory at .github/skills/ with 6 official skills
-  - Skills inspired by Anthropic official plugins and community best practices
+  - Amendment date: 2026-08-12
+  - 支援以專案內 Agent Skills 取代終端使用者 MCP 與系統 Node.js 依賴
 Follow-up TODOs:
-  - None, amendment is self-contained
+  - None
 -->
 
 # Singular Blockly Constitution
@@ -98,30 +81,25 @@ Code MUST accommodate changing requirements and diverse use cases. This means:
 
 **Rationale**: Arduino development spans multiple boards, languages, and educational contexts. The extension must adapt to different user needs without requiring code changes for each scenario.
 
-### V. Research-Driven Development (MCP-Powered)
+### V. Research-Driven Development
 
-Developers MUST leverage Model Context Protocol (MCP) tools to access current, authoritative information before making implementation decisions. This means:
+Developers MUST verify unstable or third-party facts against current, authoritative information before making implementation decisions. This means:
 
--   Use `resolve-library-id` and `get-library-docs` tools to fetch up-to-date library documentation
--   Search web resources (`webSearch`) for latest API changes, best practices, and breaking changes
--   **When `webSearch` is unavailable**: Use alternative tool combinations to complete research tasks:
-    -   `fetch_webpage` - Extract content from specific documentation URLs
-    -   `github_repo` - Search code patterns and implementations in GitHub repositories
-    -   `search_code` (mcp_github_github_search_code) - Fast code search across GitHub using native search engine
-    -   `search_repositories` (mcp_github_github_search_repositories) - Find relevant projects and examples on GitHub
--   Verify compatibility with current library versions (Blockly, VSCode API, PlatformIO)
--   Check official documentation before implementing third-party integrations
--   Document research findings in code comments or specification files
+-   Prioritize official documentation, release notes, specifications, and upstream source code
+-   Use the research capabilities available in the current environment, such as documentation search, web access, repository search, local source inspection, or MCP tools
+-   Treat MCP as an optional research transport; neither the product nor the development workflow may require MCP solely to satisfy this principle
+-   Verify compatibility with the project's current Blockly, VS Code API, PlatformIO, and other dependency versions
+-   Cross-check breaking changes, deprecations, security constraints, and migration guidance before adopting third-party integrations
+-   Record material findings and source references in specification research artifacts, plans, or concise code comments
 
-**Rationale**: Web development libraries (Blockly, VSCode API, PlatformIO) evolve rapidly with breaking changes and deprecated APIs. MCP tools provide real-time access to authoritative docs, preventing bugs from outdated assumptions. This principle ensures decisions are grounded in current reality, not stale knowledge. When primary search tools are unavailable, the alternative tool combination provides equivalent research capabilities through direct documentation access and code repository searches.
+**Rationale**: Blockly, the VS Code API, PlatformIO, and related tooling evolve rapidly. Requiring current first-party evidence prevents decisions based on stale assumptions, while tool-neutral research keeps the workflow usable across environments that expose different capabilities. MCP remains valid when available but is not a prerequisite for trustworthy research.
 
 **Example Use Cases**:
 
--   Before adding a Blockly feature: fetch Blockly docs to verify API signatures
--   When integrating a new library: use MCP to check compatibility and best practices
--   For VSCode API updates: search for migration guides and changelog information
--   When troubleshooting: query latest issues and solutions from official sources
--   **Fallback research workflow**: Use `search_repositories` to find relevant projects → `search_code` to locate specific implementations → `fetch_webpage` to read official documentation → `github_repo` to examine complete repository context
+-   Before adding a Blockly feature, verify the supported API and serialization behavior in official documentation or upstream source
+-   Before changing the minimum VS Code version, confirm the capability and release status in official VS Code documentation
+-   When integrating or removing a dependency, review its official compatibility, migration, and security guidance
+-   When troubleshooting, compare local behavior with current upstream issues, source code, and release notes
 
 ### VI. Structured Logging
 
@@ -292,51 +270,18 @@ All version releases MUST follow a standardized, automated workflow with compreh
 
 ### XI. Agent Skills Architecture
 
-Development workflows MUST leverage the Agent Skills system for consistent, reusable automation patterns. This means:
+The project MUST use Agent Skills as a structured, reusable capability layer while keeping development automation separate from end-user project guidance. This means:
 
--   **Official Skills**: The project maintains six official skills in `.github/skills/`:
-    -   `code-simplifier` — 程式碼簡化與重構，保留功能同時提升可讀性
-    -   `git-workflow` — Git 工作流程自動化，從 commit 到 PR 建立
-    -   `pr-review-release` — PR 審查評估與完整發布流程
-    -   `security-checker` — 編輯程式碼時的即時安全檢查
-    -   `security-vulnerability-fix` — npm 依賴安全漏洞修復工作流程
-    -   `skill-development` — 開發新技能的元技能規範
--   **Skill Design Standards**: All skills MUST follow SKILL.md format with:
-    -   YAML frontmatter containing `name`, `description`, and optional `metadata`
-    -   Bilingual documentation (Traditional Chinese + English) per Principle IX
-    -   Clear trigger keywords in description to guide AI activation
-    -   Progressive disclosure: SKILL.md < 500 lines, detailed docs in `references/`
--   **Security Requirements**: Third-party skills MUST pass security review before adoption
--   **Workflow Integration**: Skills complement but do not replace core principles
+-   **Contributor Workflow Skills**: Skills used to develop and maintain Singular Blockly MUST keep their source of truth under `.github/skills/` and be exposed to supported agents through the repository's integration layout, including `.agents/skills/`
+-   **End-User Project Skills**: Skills generated inside Blockly projects MUST describe how an AI reads, validates, and edits that project's workspace without requiring the user to install a separate MCP server
+-   **Canonical Contract**: A generated project MUST have one canonical Skill contract under `.agents/skills/`; agent-specific locations such as `.claude/skills/` MUST be compatibility entry points rather than divergent copies of the contract
+-   **Skill Design Standards**: Skills MUST use valid `SKILL.md` frontmatter, clear activation descriptions, and progressive disclosure with detailed contracts in `references/` when appropriate
+-   **Content Ownership**: Generated and extension-managed Skill files MUST be distinguishable from user-owned notes and custom files; automated updates MUST preserve user-owned content
+-   **Cross-Agent Compatibility**: Product Skills MUST provide equivalent workspace guidance to every explicitly supported AI agent without assuming one vendor-specific tool protocol
+-   **Security Requirements**: Third-party and generated Skills MUST be reviewable, MUST NOT silently execute untrusted project content, and MUST validate structured data before it affects a live workspace
+-   **Workflow Integration**: Skills complement but do not override the constitution, product validation, release gates, or explicit user approval requirements
 
-**Rationale**: Agent Skills provide a structured, extensible framework for automating development workflows. By standardizing skill design and maintaining official skills, the project ensures consistent quality, reduces repetitive work, and enables new contributors to leverage proven patterns. The skill system follows VS Code's official Agent Skills specification and draws inspiration from Anthropic's official plugins.
-
-**Official Skills Overview**:
-
-| Skill                        | Category     | Trigger Scenarios                     |
-| ---------------------------- | ------------ | ------------------------------------- |
-| `code-simplifier`            | code-quality | 簡化程式碼、重構、cleanup、refactor   |
-| `git-workflow`               | productivity | commit、push、建立 PR、提交程式碼     |
-| `pr-review-release`          | release      | code review、merge、發布版本、release |
-| `security-checker`           | security     | 編輯程式碼、code review、安全檢查     |
-| `security-vulnerability-fix` | security     | Dependabot alerts、CVE、npm audit     |
-| `skill-development`          | meta         | 建立新技能、SKILL.md 格式規範         |
-
-**Skill Development Guidelines**:
-
-1. **Identify Repetitive Workflows**: Document workflows that are executed frequently
-2. **Design Trigger Keywords**: Include both Chinese and English keywords in description
-3. **Follow Progressive Disclosure**: Keep SKILL.md concise, use `references/` for details
-4. **Test Activation**: Verify skills activate on expected trigger phrases
-5. **Maintain Version Discipline**: Follow semantic versioning for skill updates
-
-**Benefits**:
-
--   **Consistency**: Standardized workflows reduce errors and improve code quality
--   **Discoverability**: Clear trigger keywords help AI select appropriate skills
--   **Reusability**: Skills can be shared across projects and contributors
--   **Context Efficiency**: Progressive disclosure optimizes token usage
--   **Security**: Formal review process prevents malicious skill adoption
+**Rationale**: Agent Skills provide reusable guidance without requiring each user to operate an external server or duplicate project knowledge across AI products. Separating contributor workflow Skills from generated end-user Skills keeps ownership clear, while one canonical contract and thin compatibility entry points prevent behavioral drift. Progressive disclosure, content ownership, and validation requirements protect both context efficiency and project integrity.
 
 ## Development Standards
 
@@ -392,7 +337,7 @@ When refactoring code, follow these priorities and guidelines:
 
 -   Understand the code's purpose and functionality completely
 -   Read critical entry points: `src/extension.ts`, `media/js/blocklyEdit.js`, `media/html/blocklyEdit.html`
--   Use MCP tools to verify library compatibility and API changes (Principle V)
+-   Verify library compatibility and API changes with current authoritative sources using available research tools (Principle V)
 -   Ensure refactoring won't break existing functionality
 -   Maintain or improve test coverage to 100% target (Principle VII)
 -   Refactor business logic into pure functions where possible (Principle VIII)
@@ -493,4 +438,4 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.6.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2026-01-14
+**Version**: 1.7.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2026-08-12

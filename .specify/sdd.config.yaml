@@ -1,0 +1,25 @@
+project:
+  name: "Singular Blockly"
+  type: "VS Code extension with Blockly WebView"
+  primary_language: "TypeScript and JavaScript"
+  framework: "VS Code Extension API and Blockly"
+paths:
+  constitution: ".specify/memory/constitution.md"
+  context: ".specify/context"
+  specs: "specs"
+commands:
+  install: "npm install"
+  dev: "npm run watch"
+  test: "npm test"
+  lint: "npm run lint"
+  typecheck: "npm run compile-tests"
+  build: "npm run package"
+review:
+  require_user_approval_before_plan: true
+  require_user_approval_before_implementation: true
+chatgpt:
+  allow_browser_use: true
+  forbid_source_dump: true
+  require_bounded_output: true
+  archive_transcripts: true
+  max_context_slice_chars: 30000
