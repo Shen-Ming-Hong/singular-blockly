@@ -5,6 +5,7 @@
  */
 
 import assert = require('assert');
+import * as path from 'path';
 import * as sinon from 'sinon';
 import { describe, it, before, beforeEach, after, afterEach } from 'mocha';
 import { activate, deactivate, _setVSCodeApi, _reset } from '../extension';
@@ -144,7 +145,7 @@ describe('Extension activate', () => {
 		await new Promise(resolve => setImmediate(resolve));
 
 		assert.strictEqual(ensureInstalled.callCount, 1);
-		assert.strictEqual((ensureInstalled.firstCall.thisValue as any).workspaceKey, '/mock/primary');
+		assert.strictEqual((ensureInstalled.firstCall.thisValue as any).workspaceKey, path.resolve('/mock/primary'));
 	});
 
 	it('installs Skills for a Blockly folder added while the extension is running', async () => {

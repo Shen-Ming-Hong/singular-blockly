@@ -175,7 +175,7 @@ describe('File Service', () => {
 	});
 
 	it('should resolve empty paths and workspace roots with a trailing separator safely', () => {
-		assert.strictEqual(fileService.resolveSafePath(''), workspacePath);
+		assert.strictEqual(fileService.resolveSafePath(''), path.resolve(workspacePath));
 		assert.strictEqual(new FileService(path.parse(workspacePath).root).resolveSafePath('tmp'), path.resolve('/tmp'));
 	});
 
@@ -248,8 +248,10 @@ describe('File Service', () => {
 	it('should rename files within the workspace', async () => {
 		fsMock.addFile(path.join(workspacePath, 'source.txt'), 'source');
 		await fileService.renameFile('source.txt', 'target.txt');
-		assert.strictEqual(fsMock.files.has(path.join(workspacePath, 'source.txt')), false);
-		assert.strictEqual(fsMock.files.get(path.join(workspacePath, 'target.txt')), 'source');
+		const sourcePath = path.join(workspacePath, 'source.txt').replace(/\\/g, '/');
+		const targetPath = path.join(workspacePath, 'target.txt').replace(/\\/g, '/');
+		assert.strictEqual(fsMock.files.has(sourcePath), false);
+		assert.strictEqual(fsMock.files.get(targetPath), 'source');
 	});
 
 	it('should preserve exact UTF-8 bytes through buffer helpers', async () => {
@@ -261,7 +263,7 @@ describe('File Service', () => {
 	it('should reject writes through an existing symbolic-link segment', async () => {
 		const symlinkStats = { isSymbolicLink: () => true } as any;
 		const errorFs: any = {
-			existsSync: (candidate: string) => candidate.endsWith('/linked'),
+			existsSync: (candidate: string) => path.basename(candidate) === 'linked',
 			promises: {
 				lstat: async () => symlinkStats,
 				writeFile: async () => undefined,
@@ -276,7 +278,7 @@ describe('File Service', () => {
 	it('should reject exact-byte reads through a symbolic-link leaf', async () => {
 		const symlinkStats = { isSymbolicLink: () => true } as any;
 		const errorFs: any = {
-			existsSync: (candidate: string) => candidate.endsWith('/managed-link.txt'),
+			existsSync: (candidate: string) => path.basename(candidate) === 'managed-link.txt',
 			promises: {
 				lstat: async () => symlinkStats,
 				readFile: async () => Buffer.from('outside secret'),

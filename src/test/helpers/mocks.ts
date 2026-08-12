@@ -223,6 +223,13 @@ export class FSMock {
 	private _directories: Set<string> = new Set();
 
 	/**
+	 * Keep virtual test paths stable when path.resolve() adds a Windows drive.
+	 */
+	private normalizePath(candidatePath: string): string {
+		return candidatePath.replace(/\\/g, '/').replace(/^[A-Za-z]:(?=\/)/, '');
+	}
+
+	/**
 	 * 獲取檔案映射（用於測試）
 	 */
 	public get files(): Map<string, string> {
@@ -239,8 +246,9 @@ export class FSMock {
 	 * 模擬讀取檔案內容
 	 */
 	public readFileSync = sinon.stub().callsFake((path: string, encoding?: string) => {
-		if (this.files.has(path)) {
-			return this.files.get(path);
+		const normalizedPath = this.normalizePath(path);
+		if (this.files.has(normalizedPath)) {
+			return this.files.get(normalizedPath);
 		}
 		throw new Error(`ENOENT: no such file or directory, open '${path}'`);
 	});
@@ -249,7 +257,7 @@ export class FSMock {
 	 * 模擬寫入檔案
 	 */
 	public writeFileSync = sinon.stub().callsFake((path: string, content: string) => {
-		this.files.set(path, content);
+		this.files.set(this.normalizePath(path), content);
 		return true;
 	});
 
@@ -257,8 +265,7 @@ export class FSMock {
 	 * 模擬檢查檔案是否存在
 	 */
 	public existsSync = sinon.stub().callsFake((path: string) => {
-		// Normalize Windows backslashes to forward slashes for consistent lookup
-		const normalizedPath = path.replace(/\\/g, '/');
+		const normalizedPath = this.normalizePath(path);
 		return this.files.has(normalizedPath) || this.directories.has(normalizedPath);
 	});
 
@@ -266,8 +273,7 @@ export class FSMock {
 	 * 模擬列出目錄內容
 	 */
 	public readdirSync = sinon.stub().callsFake((dirPath: string) => {
-		// 正規化路徑分隔符（Windows 使用 \，但我們統一處理為 /）
-		const normalizedDirPath = dirPath.replace(/\\/g, '/');
+		const normalizedDirPath = this.normalizePath(dirPath);
 
 		if (!this.directories.has(normalizedDirPath)) {
 			throw new Error(`ENOENT: no such directory, readdir '${dirPath}'`);
@@ -278,7 +284,7 @@ export class FSMock {
 
 		// 找出以此路徑開頭的檔案
 		this.files.forEach((_, filePath) => {
-			const normalizedFilePath = filePath.replace(/\\/g, '/');
+			const normalizedFilePath = this.normalizePath(filePath);
 			if (normalizedFilePath.startsWith(pathPrefix)) {
 				const relativePath = normalizedFilePath.slice(pathPrefix.length);
 				const firstSegment = relativePath.split('/')[0];
@@ -290,7 +296,7 @@ export class FSMock {
 
 		// 找出直接子目錄
 		this.directories.forEach(subDir => {
-			const normalizedSubDir = subDir.replace(/\\/g, '/');
+			const normalizedSubDir = this.normalizePath(subDir);
 			if (normalizedSubDir.startsWith(pathPrefix) && normalizedSubDir !== normalizedDirPath) {
 				const relativePath = normalizedSubDir.slice(pathPrefix.length);
 				const firstSegment = relativePath.split('/')[0];
@@ -307,8 +313,7 @@ export class FSMock {
 	 * 添加模擬檔案
 	 */
 	public addFile(path: string, content: string, mtime?: Date): void {
-		// Normalize all paths to forward slashes for consistent storage
-		const normalizedPath = path.replace(/\\/g, '/');
+		const normalizedPath = this.normalizePath(path);
 		this.files.set(normalizedPath, content);
 
 		// Store file metadata (creation and modification time)
@@ -329,8 +334,7 @@ export class FSMock {
 	 * 添加模擬目錄
 	 */
 	public addDirectory(path: string): void {
-		// Normalize all paths to forward slashes for consistent storage
-		const normalizedPath = path.replace(/\\/g, '/');
+		const normalizedPath = this.normalizePath(path);
 		this.directories.add(normalizedPath);
 	}
 
@@ -340,21 +344,18 @@ export class FSMock {
 	public get promises() {
 		return {
 			readFile: async (path: string, encoding?: BufferEncoding) => {
-				// Normalize Windows backslashes to forward slashes
-				const normalizedPath = path.replace(/\\/g, '/');
+				const normalizedPath = this.normalizePath(path);
 				if (this.files.has(normalizedPath)) {
 					return this.files.get(normalizedPath);
 				}
 				throw new Error(`ENOENT: no such file or directory, open '${path}'`);
 			},
 			writeFile: async (path: string, content: string | Uint8Array) => {
-				// Normalize Windows backslashes to forward slashes
-				const normalizedPath = path.replace(/\\/g, '/');
+				const normalizedPath = this.normalizePath(path);
 				this.files.set(normalizedPath, typeof content === 'string' ? content : Buffer.from(content).toString('utf8'));
 			},
 			mkdir: async (path: string, options?: any) => {
-				// Normalize Windows backslashes to forward slashes
-				const normalizedPath = path.replace(/\\/g, '/');
+				const normalizedPath = this.normalizePath(path);
 				this.directories.add(normalizedPath);
 				return normalizedPath;
 			},
@@ -362,8 +363,7 @@ export class FSMock {
 				return this.readdirSync(path);
 			},
 			unlink: async (path: string) => {
-				// Normalize Windows backslashes to forward slashes
-				const normalizedPath = path.replace(/\\/g, '/');
+				const normalizedPath = this.normalizePath(path);
 				if (this.files.has(normalizedPath)) {
 					this.files.delete(normalizedPath);
 					this._fileMetadata.delete(normalizedPath);
@@ -372,9 +372,8 @@ export class FSMock {
 				throw new Error(`ENOENT: no such file or directory, unlink '${path}'`);
 			},
 			copyFile: async (src: string, dest: string) => {
-				// Normalize Windows backslashes to forward slashes
-				const normalizedSrc = src.replace(/\\/g, '/');
-				const normalizedDest = dest.replace(/\\/g, '/');
+				const normalizedSrc = this.normalizePath(src);
+				const normalizedDest = this.normalizePath(dest);
 				if (this.files.has(normalizedSrc)) {
 					this.files.set(normalizedDest, this.files.get(normalizedSrc)!);
 					return true;
@@ -382,8 +381,8 @@ export class FSMock {
 				throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
 			},
 			rename: async (src: string, dest: string) => {
-				const normalizedSrc = src.replace(/\\/g, '/');
-				const normalizedDest = dest.replace(/\\/g, '/');
+				const normalizedSrc = this.normalizePath(src);
+				const normalizedDest = this.normalizePath(dest);
 				if (!this.files.has(normalizedSrc)) {
 					throw new Error(`ENOENT: no such file or directory, rename '${src}'`);
 				}
@@ -398,8 +397,7 @@ export class FSMock {
 				};
 			},
 			stat: async (path: string) => {
-				// Normalize Windows backslashes to forward slashes
-				const normalizedPath = path.replace(/\\/g, '/');
+				const normalizedPath = this.normalizePath(path);
 				if (this.files.has(normalizedPath)) {
 					const metadata = this._fileMetadata.get(normalizedPath) || {
 						mtime: new Date(),
@@ -431,8 +429,7 @@ export class FSMock {
 	 * 模擬 statSync
 	 */
 	public statSync = sinon.stub().callsFake((path: string) => {
-		// 正規化路徑
-		const normalizedPath = path.replace(/\\/g, '/');
+		const normalizedPath = this.normalizePath(path);
 
 		if (this.files.has(normalizedPath)) {
 			const metadata = this._fileMetadata.get(normalizedPath) || {

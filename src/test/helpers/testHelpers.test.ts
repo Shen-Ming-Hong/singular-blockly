@@ -17,6 +17,14 @@ import {
 
 suite('Test Helpers', () => {
 	suite('T013: createIsolatedFileService', () => {
+		test('should treat Windows drive-qualified paths as the same virtual file', async () => {
+			const fsMock = new FSMock();
+			fsMock.addFile('/mock/workspace/test.txt', 'test content');
+
+			assert.strictEqual(fsMock.existsSync('D:\\mock\\workspace\\test.txt'), true);
+			assert.strictEqual(await fsMock.promises.readFile('D:\\mock\\workspace\\test.txt', 'utf8'), 'test content');
+		});
+
 		test('should create FileService with injected FSMock', () => {
 			const fsMock = new FSMock();
 			fsMock.addFile('/workspace/test.txt', 'test content');
