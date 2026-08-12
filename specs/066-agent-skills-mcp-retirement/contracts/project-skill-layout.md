@@ -9,7 +9,8 @@
 │   ├── managed-manifest.json            # extension 管理；英文 JSON
 │   ├── project-notes.md                 # 只建立一次；之後使用者擁有
 │   └── references/
-│       ├── block-contract.json          # extension 管理；runtime 產生；英文 JSON
+│       ├── block-contract.json          # extension 管理；category 分片索引；英文 JSON
+│       ├── block-contract/*.json        # extension 管理；runtime 產生；英文 JSON 分片
 │       ├── workspace-format.md           # extension 管理；英文
 │       └── workspace.schema.json         # extension 管理；英文 JSON Schema
 ├── .claude/skills/singular-blockly/
@@ -29,6 +30,7 @@
 - 本文必須直接引用：
   - `references/workspace-format.md`
   - `references/block-contract.json`
+  - 索引內 `shards[].path` 指定的 category 分片
   - `references/workspace.schema.json`
   - `project-notes.md`
 - 本文必須要求 AI：修改前先讀 `blockly/main.json` 與相關 references；只寫回完整文件；不得臆造 block type／field／connection；寫回後等待 runtime 驗證結果；若被隔離則讀取狀態與修正候選，不得刪除最後有效備份。

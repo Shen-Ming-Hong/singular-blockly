@@ -1,0 +1,14 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "txt_setup",
+          "id": "txt-on-arduino"
+        }
+      ]
+    }
+  },
+  "board": "uno"
+}

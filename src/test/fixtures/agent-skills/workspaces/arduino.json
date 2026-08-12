@@ -1,0 +1,17 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "arduino_setup_loop",
+          "id": "agent-skill-arduino-root",
+          "x": 24,
+          "y": 24,
+          "deletable": false
+        }
+      ]
+    }
+  },
+  "board": "uno"
+}

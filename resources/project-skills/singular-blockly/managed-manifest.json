@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "manager": "singular-blockly",
+  "skillVersion": "2.0.0",
+  "manifestTarget": ".agents/skills/singular-blockly/managed-manifest.json",
+  "managedFiles": [
+    {
+      "source": "canonical/SKILL.md",
+      "target": ".agents/skills/singular-blockly/SKILL.md",
+      "sha256": "45848d1f0d0549e1c6918e5e4745a1b34270c06773725ff2f4fadafb1a090a57",
+      "kind": "canonical"
+    },
+    {
+      "source": "canonical/references/block-contract.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract.json",
+      "sha256": "399faddd559c154f9235ceb4877c868129afef537a505c82743338e557c7a6b8",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/workspace-format.md",
+      "target": ".agents/skills/singular-blockly/references/workspace-format.md",
+      "sha256": "36fd0adb9c3b6d140dd7d1a2a837510e9fd99b89b0c1032eac7d56c98433837f",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/workspace.schema.json",
+      "target": ".agents/skills/singular-blockly/references/workspace.schema.json",
+      "sha256": "87fb50349e587a3a216e63151b199a88bc14f41900a6430f4b35b60cd12c2f18",
+      "kind": "reference"
+    },
+    {
+      "source": "compatibility/claude-SKILL.md",
+      "target": ".claude/skills/singular-blockly/SKILL.md",
+      "sha256": "ba6540d9574e1edc368f35da9a8f1915e746734a4563f91d2c0fb884f7c6dab9",
+      "kind": "compatibility"
+    },
+    {
+      "source": "canonical/references/block-contract/arduino.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/arduino.json",
+      "sha256": "29e1da13d9b1a16525ab45d8b413ee5e6b8e1cdbd213ab4be79517ad684ef765",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/communication.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/communication.json",
+      "sha256": "3bb248b199ef366ae6ee1ab2425bd601c9e374a7f317d5b975b38003177476cc",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/cyberbrick_core.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/cyberbrick_core.json",
+      "sha256": "ec885d7fc5578cb8d3cb1a14cd7ae2ec868e615ac34550a197b50d18ba375b95",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/cyberbrick_rc.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/cyberbrick_rc.json",
+      "sha256": "bc96062d10080659baedeb3d41adb15b25ced1a1ed39d4cb9d60d70a42cbddc9",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/cyberbrick_wifi.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/cyberbrick_wifi.json",
+      "sha256": "cc140d0ff942572ff8ae047354860cd601bbcc1f2c05feb631551cba0c627412",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/cyberbrick_x11.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/cyberbrick_x11.json",
+      "sha256": "86d1b2e2463cb447f64ac1156f0f357cdddd36168f7595da6c58787854b2b7a6",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/cyberbrick_x12.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/cyberbrick_x12.json",
+      "sha256": "c8153fbedcd3105ccf4c17a8acbe1d7837f9a61d01d0c3bdb7087c623125aa95",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/functions.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/functions.json",
+      "sha256": "499a123a0e22ae8a660cffdba39b4e8263f1d41eec9e5da3ee5286aa70a5e519",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/lists.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/lists.json",
+      "sha256": "3ad13da9ca567d1bb8a28dc0652510298f756e366db6db9fbdc1fd6161d0968c",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/logic.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/logic.json",
+      "sha256": "998e7cceab44ebbbfa9d4ecbab7a7122c346900db622fed7833cf9700bfa92f2",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/loops.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/loops.json",
+      "sha256": "546144771204c4a4851b594f209b215681c5864d67b3560f35f596ec89914377",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/math.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/math.json",
+      "sha256": "292e33d9cbef88dbf2ed0718a5661e5f2c3916c7f15d4bf0d169eb31897dd41b",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/motors.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/motors.json",
+      "sha256": "aa20efbb11e27eabad9300405e2c873ca76b2b26c988d5eb723469732acadc85",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/sensors.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/sensors.json",
+      "sha256": "c1dbe946f16e362c37f3cc09adc5a1bf2ff54df7bd24390389de204c7de04aa1",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/shared.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/shared.json",
+      "sha256": "220e0082dc5d0b22d18752312bc1c5e913cd64ffecf694bbd3bbf21cd9495e8f",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/text.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/text.json",
+      "sha256": "dcea2a9e2c4889f63805c2e047ccd2fa8e4d23de92052772008db4ae77b79928",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/txt.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/txt.json",
+      "sha256": "a7750c5369a3118b8b242feb8b4c1665062ceae3a4152c0e761c08ce5901e70f",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/variables.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/variables.json",
+      "sha256": "8235bf398437ecda89a220034bdfddcef25050df876d8e1d9b31160fa18e0e8d",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/vision-sensors.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/vision-sensors.json",
+      "sha256": "50a61fc76a8eb532e0c437bf5df1f90dcb20a2d03df10fc0142da5bf1a4ce0c0",
+      "kind": "reference"
+    }
+  ],
+  "preservedFiles": [
+    {
+      "source": "canonical/project-notes.md",
+      "target": ".agents/skills/singular-blockly/project-notes.md",
+      "policy": "create-if-missing"
+    }
+  ]
+}

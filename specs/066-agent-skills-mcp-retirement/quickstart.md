@@ -44,14 +44,14 @@ npm run package
 分別以 VS Code/Codex 與 Claude Code 從其專案入口開始：
 
 1. 要求代理說明目前板型、主要積木流程與輸出檔位置。
-2. 要求代理依 `block-contract.json` 新增一段合法流程，不能發明 type 或 field。
+2. 要求代理先查 `block-contract.json` 索引，再依指定的 category 分片新增一段合法流程，不能發明 type 或 field。
 3. 等待 `main.json` runtime 驗證後，在 Blockly 編輯器確認積木可見並可再次儲存。
 4. 重新開啟專案並確認工作區仍有效。
 5. 對代表性板型產生程式，確認 Arduino 為 `src/main.cpp`、CyberBrick 為 `src/rc_main.py`、TXT Controller 為 `src/main.py`。
 
-兩個代理應解析到相同 `.agents/skills/singular-blockly/SKILL.md` 與相同契約雜湊。
+兩個代理應解析到相同 `.agents/skills/singular-blockly/SKILL.md`、索引與受管理 category 分片。
 
-另以既有無效 `main.json` 初次開啟編輯器，確認該檔先經 disposable runtime gate、沒有短暫載入正式 workspace；再關閉面板後外部改檔，確認 activation 層 watcher 仍進入隔離／恢復。
+另以包含舊版動態積木狀態（例如帶 `ELSE` 的 `controls_if`）的既有有效 `main.json` 初次開啟編輯器，確認直接走正常 `init` 載入、不送出候選驗證、不建立隔離檔或備份，且啟動期間不改寫 `main.json`；再於啟動後外部改寫主檔，確認 activation 層 watcher 才進入驗證或隔離／恢復。
 
 ## 5. 無效候選資料保護
 

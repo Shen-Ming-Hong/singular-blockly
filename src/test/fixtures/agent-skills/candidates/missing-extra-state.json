@@ -1,0 +1,14 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "arduino_function_call",
+          "id": "dynamic-without-state"
+        }
+      ]
+    }
+  },
+  "board": "uno"
+}

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "manager": "singular-blockly",
+  "skillVersion": "0.1.0",
+  "managedFiles": [
+    {
+      "path": ".agents/skills/singular-blockly/SKILL.md",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "kind": "canonical"
+    }
+  ],
+  "preservedFiles": [
+    ".agents/skills/singular-blockly/project-notes.md"
+  ]
+}

@@ -106,8 +106,9 @@ resources/
         ├── canonical/
         │   ├── SKILL.md
         │   ├── project-notes.md
-        │   └── references/
-        │       ├── block-contract.json
+		│   └── references/
+		│       ├── block-contract.json
+		│       ├── block-contract/*.json
         │       ├── workspace-format.md
         │       └── workspace.schema.json
         ├── compatibility/
@@ -118,7 +119,7 @@ scripts/
 └── generate-skill-contract.js
 ```
 
-同一版本會刪除 `src/mcp/`、MCP／Node 偵測專用服務與型別、相關測試、webpack MCP bundle、命令、設定、在地化字串、依賴及文件。產生後的英文積木契約保留在 `resources/project-skills/singular-blockly/canonical/references/` 作為可審查的單一來源，封裝時複製到 `dist/project-skills/`；`ShadowSuggestionService` 也改讀此來源，避免再次產生平行字典。
+同一版本會刪除 `src/mcp/`、MCP／Node 偵測專用服務與型別、相關測試、webpack MCP bundle、命令、設定、在地化字串、依賴及文件。產生後的英文積木契約以 `block-contract.json` 小型索引與 `block-contract/*.json` category 分片保留在 `resources/project-skills/singular-blockly/canonical/references/`，封裝時複製到 `dist/project-skills/`；`ShadowSuggestionService` 透過 `BlockContractService` 組合相同來源，避免再次產生平行字典。
 
 **結構決策**：維持現有單一 extension 專案。`ProjectSkillService` 管理固定目標檔案的安裝交易，`BlockContractService` 讀取產生契約，activation 層建立的 `WorkspaceCandidateService` 依 workspace folder 管理 watcher、最後有效版本、隔離及恢復；`WebViewManager` 只在面板存在時向該服務附加真實 Blockly validator channel。這些服務透過既有 `FileService` 與可注入介面測試，不新增另一個套件或執行程序。
 
@@ -126,7 +127,7 @@ scripts/
 
 ### 1. 專案辨識與靜默安裝時機
 
-- 擴充套件於既有 `onStartupFinished` 啟動流程中檢查每個 workspace folder；已有 `blockly/` 的資料夾視為既有 Singular Blockly 專案。對尚未建立 `blockly/` 的新 workspace，首次執行 `singular-blockly.openBlocklyEdit` 即成為明確的專案建立訊號，並在開啟流程開始時呼叫同一個冪等檢查。執行中新增的 workspace folder 也使用相同規則檢查。
+- 擴充套件於既有 `onStartupFinished` 啟動流程中檢查每個 workspace folder；已有 `blockly/` 的資料夾視為既有 Singular Blockly 專案。對尚未建立 `blockly/` 的新 workspace，首次執行 `singular-blockly.openBlocklyEdit` 即成為目前 WebView 實際使用之第一個 workspace folder 的專案建立訊號，並在開啟流程開始時呼叫同一個冪等檢查。執行中新增的 workspace folder 也使用相同規則檢查。
 - 檢查不依賴 Blockly 面板已完成載入；既有專案在 extension activation、新專案在首次開啟編輯器時都能取得 Skills，重複觸發只比較 manifest 與雜湊。
 - 成功、無更新與一般失敗都不顯示通知或確認；失敗以結構化日誌及可安全寫入時的英文 AI 狀態表示，不能阻擋編輯器啟動。若現有 `ready` 狀態的 Skill 版本與 manifest 雜湊都未改變，不重寫 status 或任何專案檔案，避免每次啟動造成版本控制噪音。
 
@@ -150,14 +151,14 @@ scripts/
 
 - `generate-skill-contract.js` 在貢獻者建置環境載入英文 Blockly 訊息、目前專案 block definitions、所有開發板工具箱與已知動態 flyout 入口。
 - 可建立積木集合為「所有板型已解析工具箱出現的類型」加上「由變數／程序等動態 flyout 建立的公開類型」。動態來源只列類型識別，不手寫欄位或連線 metadata；內部 mutator、已移除或不可從 UI 建立的類型排除。
-- 對每個類型建立 headless block，依實際 runtime 序列化，擷取工具箱 category membership、板型可用性、輸出／前後連線、inputs、fields、預設 extra state 與最小可載入範例。產生器再於 disposable workspace 對每個範例執行 load/save round-trip。
-- 產生結果為穩定排序的英文 `block-contract.json` 與 `workspace.schema.json`。`--check` 模式在 CI 比對 tracked 產物，防止積木變更後契約過時。
-- `ShadowSuggestionService` 與 TXT metadata 契約測試改讀同一 `block-contract.json`；移除舊 `src/mcp/block-dictionary.json` 與 `generate:dictionary`。
+- 對每個類型與每個支援板型建立 headless block，切換至該板型的實際 runtime context 後序列化，擷取工具箱 category membership、板型可用性，以及各板型 variant 的輸出／前後連線、inputs、fields、預設 extra state 與最小可載入範例。產生器再於相同板型 context 的 disposable workspace 對每個範例執行 load/save round-trip。
+- 產生結果為穩定排序的英文 `block-contract.json` 索引、category 分片與 `workspace.schema.json`。每個積木只存在於一個分片；多 category 積木放入 `shared`。`--check` 模式在 CI 比對全部 tracked 產物並拒絕過時分片。
+- Agent 先用索引的 `shards[].blockTypes` 定位分片，只讀本次需要的 metadata；`ShadowSuggestionService` 與 TXT metadata 契約測試則透過 `BlockContractService` 組合相同契約。移除舊 `src/mcp/block-dictionary.json` 與 `generate:dictionary`。
 
 ### 5. 候選工作區驗證與復原
 
 - activation 層的 `WorkspaceCandidateService` 對每個已辨識專案監看 `blockly/main.json` 的建立、變更與刪除，不依賴面板生命週期；保留既有 500ms debounce、空狀態保護及內部寫入抑制。每次外部事件分配單調遞增 generation，較舊結果不得覆寫較新候選。WebView 面板存在時由 `WebViewManager` 附加 validator channel；面板關閉、disposed 或通道中斷時，要求在 10 秒 deadline 內失敗並走相同隔離／恢復流程。
-- 既有 `main.json` 初次進入正式 WebView 前也視為候選，必須先在 disposable workspace 完成 load/save/load；成功後才載入 live workspace、建立記憶體快照並初始化／更新 `.bak`。正式編輯器日後每次成功儲存則以同一 save document 更新記憶體快照及 `.bak`。
+- 啟動時已存在的 `main.json` 是使用者既有專案，不視為新的外部候選；首次開啟沿用正式編輯器既有的遷移與 Blockly runtime 載入流程，不得顯示候選隔離警告或要求額外操作。只有 activation 後由 watcher 實際觀察到的建立、變更或刪除事件才進入候選驗證。正式編輯器每次成功儲存則以同一 save document 更新記憶體快照及 `.bak`。
 - JSON 解析成功後，Extension Host 以 `requestId` 將完整候選文件送至 WebView。WebView 在不影響正式畫面的 disposable `Blockly.Workspace` 中，使用目前已註冊的相同 block definitions 執行 `Blockly.serialization.workspaces.load`，再執行 save round-trip 與文件層板型／控制資料檢查。
 - 只有成功回應且 `requestId` 仍為最新 generation 時，才把正規化結果送進正式 workspace。Extension Host 先保留提交前的記憶體快照與 `.bak` bytes，收到正式 workspace 載入成功 acknowledgement 後，才以暫存檔與 rename 提交 normalized `main.json` 及 `.bak`。任一磁碟提交或正式載入失敗都以保留 bytes／快照還原畫面、主檔與備份，不能先覆寫唯一恢復來源。
 - 每個要求建立 10 秒計時器。解析錯誤、runtime 驗證錯誤、WebView 關閉、刪除、通道中斷或逾時都進入相同保護流程：先保存原始候選為 `blockly/main.invalid.json` 與一份 UTC 檔名歷史，再以既有 `blockly/main.json.bak` 恢復主檔。若首次事件尚無磁碟備份，使用目前正式 workspace 最近一次成功序列化的記憶體快照；兩者都不存在時拒絕清空且只記錄失敗。

@@ -1,0 +1,23 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "math_number",
+          "id": "value-with-next",
+          "fields": {
+            "NUM": 1
+          },
+          "next": {
+            "block": {
+              "type": "text_print",
+              "id": "illegal-next"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "board": "uno"
+}

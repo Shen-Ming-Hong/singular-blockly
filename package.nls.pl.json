@@ -1,13 +1,10 @@
 {
-	"command.checkMcpStatus.title": "Sprawdź status MCP",
 	"command.checkPlatformioStatus.title": "Sprawdź status PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Ustawienia sugestii AI",
 	"command.toggleAIEnabled.title": "Singular Blockly: Przełącz sugestie AI",
 	"command.selectAIModel.title": "Singular Blockly: Wybierz model AI",
 	"command.openAISettings.title": "Singular Blockly: Otwórz ustawienia AI",
 	"command.triggerAISuggestion.title": "Singular Blockly: Wyzwól sugestię bloku AI",
-	"config.mcp.nodePath.description": "Ścieżka do pliku wykonywalnego Node.js dla serwera MCP. Domyślnie 'node' używa systemowego PATH. Użytkownicy nvm/fnm powinni podać pełną ścieżkę bezwzględną.",
-	"config.mcp.showStartupWarning.description": "Pokaż ostrzeżenie przy uruchomieniu, gdy Node.js nie jest dostępny lub wersja jest zbyt niska. Wyłącz, jeśli nie potrzebujesz funkcji MCP AI.",
 	"singularBlockly.ai.enabled.markdownDescription": "Włącz/wyłącz sugestie cieni bloków AI. Wymaga rozszerzenia GitHub Copilot.",
 	"singularBlockly.ai.model.markdownDescription": "Model językowy do sugestii AI. Wymienione są tylko lekkie modele odpowiednie do szybkich sugestii. Dostępne modele zależą od planu Copilot.",
 	"singularBlockly.ai.triggerDelay.markdownDescription": "Opóźnienie w milisekundach przed wyzwoleniem sugestii AI po zmianie obszaru roboczego.",

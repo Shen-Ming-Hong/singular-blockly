@@ -360,7 +360,7 @@ interface LoadWorkspaceMessage {
 	state: BlocklyWorkspace;
 	board: BoardType;
 	theme: 'light' | 'dark';
-	source?: 'fileWatcher' | 'mcpReload';
+	source?: 'fileWatcher' | 'validatedExternalCandidate';
 	isRestored?: boolean;
 	restoreName?: string;
 }
@@ -492,90 +492,73 @@ interface UpdateAutoBackupSettingsMessage {
 	interval: number;
 }
 
-interface RequestWorkspaceReloadMessage {
-	command: 'requestWorkspaceReload';
-}
 ```
 
 ---
 
-## 六、MCP 工具 Schema
+## 六、Agent Skill 與候選驗證資料
 
-### 6.1 get_block_usage
-
-```typescript
-// 輸入
-interface GetBlockUsageInput {
-	blockType: string;
-	language?: SupportedLocale;
-	context?: BlockContext;
-}
-
-// 輸出
-interface GetBlockUsageOutput {
-	type: string;
-	category: string;
-	description: string;
-	fields: FieldDefinition[];
-	inputs: InputSpec[];
-	connections: ConnectionSpec;
-	insertionGuide: InsertionGuide;
-	jsonTemplate?: BlockDefinition;
-	templateUsage?: TemplateUsageGuide;
-}
-
-type SupportedLocale = 'en' | 'zh-hant' | 'ja' | 'ko' | 'es' | 'pt-br' | 'fr' | 'de' | 'it' | 'ru' | 'pl' | 'hu' | 'tr' | 'bg' | 'cs';
-```
-
-### 6.2 search_blocks
+### 6.1 受管理 Skill manifest
 
 ```typescript
-// 輸入
-interface SearchBlocksInput {
-	query: string;
-	category?: string;
-	board?: BoardType;
-	language?: SupportedLocale;
-	limit?: number;
-}
-
-// 輸出
-interface SearchBlocksOutput {
-	query: string;
-	totalResults: number;
-	results: BlockSearchResult[];
-}
-
-interface BlockSearchResult {
-	type: string;
-	name: string;
-	category: string;
-	description: string;
-	relevanceScore: number;
+interface InstalledSkillManifest {
+	schemaVersion: 1;
+	manager: 'singular-blockly';
+	skillVersion: string;
+	managedFiles: Array<{
+		path: string;       // 僅限專案相對 allowlisted path
+		sha256: string;
+		kind: 'canonical' | 'reference' | 'compatibility';
+	}>;
+	preservedFiles: string[];
 }
 ```
 
-### 6.3 get_workspace_state
+### 6.2 AI 可讀狀態
 
 ```typescript
-// 輸入
-interface GetWorkspaceStateInput {
-	includeBlocks?: boolean;
+interface ProjectSkillStatus {
+	schemaVersion: 1;
+	status: 'ready' | 'conflict' | 'failed';
+	skillVersion: string | null;
+	manifestPath: '.agents/skills/singular-blockly/managed-manifest.json';
+	backupPaths: string[]; // 專案相對路徑
+	issues: Array<{ code: string; path: string | null; action: string }>;
+	lastAttemptAt: string;
+}
+```
+
+### 6.3 工作區驗證訊息
+
+```typescript
+interface ValidateWorkspaceCandidateMessage {
+	command: 'validateWorkspaceCandidate';
+	requestId: string;
+	generation: number;
+	document: WorkspaceDocument;
 }
 
-// 輸出
-interface GetWorkspaceStateOutput {
-	exists: boolean;
-	board?: BoardType;
-	theme?: string;
-	statistics?: {
-		topLevelBlocks: number;
-		totalBlocks: number;
-		uniqueBlockTypes: number;
-	};
-	blockTypes?: string[];
-	blocks?: BlockDefinition[];
-	lastModified?: string;
+type WorkspaceValidationIssueCode =
+	| 'INVALID_JSON'
+	| 'EMPTY_WORKSPACE'
+	| 'UNKNOWN_BLOCK_TYPE'
+	| 'INVALID_FIELD'
+	| 'INVALID_CONNECTION'
+	| 'INVALID_EXTRA_STATE'
+	| 'BOARD_MISMATCH'
+	| 'ORPHAN_BLOCK'
+	| 'ROUND_TRIP_FAILED'
+	| 'CHANNEL_UNAVAILABLE'
+	| 'VALIDATION_TIMEOUT'
+	| 'LIVE_LOAD_FAILED';
+
+interface WorkspaceCandidateValidationResult {
+	command: 'workspaceCandidateValidationResult';
+	requestId: string;
+	generation: number;
+	valid: boolean;
+	normalizedDocument?: WorkspaceDocument;
+	issue?: { code: WorkspaceValidationIssueCode; blockType?: string; field?: string };
 }
 ```
 

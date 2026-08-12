@@ -99,16 +99,15 @@ export const MAX_RETRY_COUNT = 3;
 ```
 Extension Host (Node.js)           WebView (Browser Context)
 ├── extension.ts                   ├── blocklyEdit.html
-│   └── 命令註冊、MCP Provider     │   └── DOM 結構、Script 載入
+│   └── 命令、Skill 與 watcher 生命週期 │   └── DOM 結構、Script 載入
 ├── webview/                       ├── blocklyEdit.js (~1930 行)
 │   ├── webviewManager.ts (~970)  │   └── Blockly 初始化、事件處理
 │   └── messageHandler.ts (~800)  └── blockly/
 │       └── 訊息處理、FileService      ├── blocks/*.js (積木定義)
-├── mcp/                              └── generators/arduino/*.js (程式碼生成)
-│   ├── mcpProvider.ts
-│   ├── mcpServer.ts
-│   └── tools/*.ts
 └── services/
+    ├── projectSkillService.ts # 專案 Skill 安裝／更新交易
+    ├── blockContractService.ts # 正式積木契約讀取
+    ├── workspaceCandidateService.ts # 外部候選隔離／復原
     ├── fileService.ts        # 檔案 I/O
     ├── settingsManager.ts    # VSCode/PlatformIO 設定
     ├── localeService.ts      # i18n 訊息載入

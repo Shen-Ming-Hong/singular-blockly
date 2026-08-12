@@ -104,14 +104,24 @@ inspect → no-change
 
 ## 5. BlockContract（積木契約）
 
-位置：正式 Skill 的 `references/block-contract.json`。由 runtime 產生且固定使用英文。
+位置：正式 Skill 的 `references/block-contract.json` 索引與 `references/block-contract/*.json` category 分片。由 runtime 產生且固定使用英文。每個 block type 只存在於一個分片；具有多個 category 的共用積木放入 `shared`。
+
+### BlockContractIndex
 
 | 欄位 | 型別 | 規則 |
 |------|------|------|
-| `schemaVersion` | integer | 契約 schema 版本。 |
+| `schemaVersion` | integer | 分片契約 schema 版本，目前為 3。 |
 | `blocklyVersion` | string | 產生時實際 Blockly 版本。 |
 | `boards` | BoardContract[] | 從 `window.BOARD_CONFIGS` 衍生的 Arduino、CyberBrick 與 TXT 支援板型識別，依 `id` 排序。 |
-| `blocks` | BlockTypeContract[] | 依 `type` 穩定排序且不得重複。 |
+| `shards` | BlockContractShardDescriptor[] | 依 category 排序；每項含安全相對 `path` 與已排序的 `blockTypes`，所有 type 全域不得重複。 |
+
+### BlockContractShard
+
+| 欄位 | 型別 | 規則 |
+|------|------|------|
+| `schemaVersion` | integer | 必須與索引相同。 |
+| `category` | string | 必須與索引 descriptor 及檔名一致。 |
+| `blocks` | BlockTypeContract[] | 必須與 descriptor 的 `blockTypes` 逐項一致。 |
 
 ### BlockTypeContract
 
@@ -120,6 +130,12 @@ inspect → no-change
 | `type` | string | `Blockly.Blocks` 已註冊且可由支援 UI 建立。 |
 | `categories` | string[] | 由解析後工具箱或動態 flyout owner 衍生的穩定英文 category ID，至少一個且排序去重。 |
 | `boards` | string[] | 至少一個可用板型，穩定排序。 |
+| `variants` | object | key 必須恰好等於 `boards`；每個值為該板型 runtime context 實例化所得的 `BlockVariantContract`。 |
+
+### BlockVariantContract
+
+| 欄位 | 型別 | 規則 |
+|------|------|------|
 | `connections` | object | `previous`、`next`、`output` 各使用 `ConnectionContract`，明確區分連線是否存在及其實際 check。 |
 | `inputs` | InputContract[] | 名稱、input kind、連線 check 及必要性。 |
 | `fields` | FieldContract[] | 欄位名稱、field type、預設序列化值與可選值。 |
@@ -145,11 +161,21 @@ inspect → no-change
 
 不得只以 `check: null` 表示連線不存在，因為 Blockly 合法的 unrestricted connection 也會回傳 `null` check。
 
+### FieldContract
+
+| 欄位 | 型別 | 規則 |
+|------|------|------|
+| `name` | string | runtime field name。 |
+| `kind` | string | runtime field constructor/type。 |
+| `defaultValue` | JSON value/absent | 產生契約時的預設序列化值。 |
+| `options` | string[]/absent | dropdown 產生時可見的值快照。 |
+| `optionsMode` | `static`/`dynamic`/absent | 固定選單為 `static` 且可依完整 options 白名單驗證；函式、變數等 runtime 選單為 `dynamic`，候選值必須由實際 workspace field 驗證。非 dropdown 省略。 |
+
 ### 不變條件
 
 - `blocks` 必須等於所有支援板型解析後 toolbox 類型與公開動態 flyout 類型的聯集，且每個 type 的 `categories` 與 `boards` 必須等於實際來源 membership。
 - 未註冊、內部 mutator/helper、已移除或 UI 不可建立類型不得出現。
-- 每個 `minimalState` 必須以目前 runtime round-trip 成功。
+- 每個 board variant 的 `minimalState` 必須在相同板型 runtime context 中 round-trip 成功。
 - 產物不得包含翻譯後的非英文說明、絕對檔案路徑或來源程式碼片段。
 
 ## 6. WorkspaceDocument（工作區文件）
@@ -159,7 +185,7 @@ inspect → no-change
 | 欄位 | 型別 | 說明 |
 |------|------|------|
 | `workspace` | object | Blockly JSON serialization state；正式驗證核心。 |
-| `board` | string/既有型別 | 目前選擇的板型；須為產品支援值。 |
+| `board` | string/既有型別 | 目前選擇的板型；須為產品支援值。已知舊版別名在 runtime 驗證前正規化為 canonical ID。 |
 | 其他既有欄位 | existing | TXT 虛擬控制及現有 metadata 保持相容。 |
 
 空物件、缺少可用 workspace 的文件、未知 block type、無法還原的 extra state、非法 field/connection 及不適用板型都不能成為有效候選。
@@ -189,7 +215,7 @@ observed → invalid(parse/delete/empty) → quarantine → recovered
 
 ## 8. LastValidWorkspace（最後有效工作區）
 
-持久化位置：`blockly/main.json.bak`；執行中另保留最近一次正式 workspace 成功序列化的記憶體快照。初次既有 `main.json` 必須先經 disposable runtime gate，只有成功載入正式 workspace 後才能初始化此狀態；之後每次正式編輯器儲存成功都會更新。
+持久化位置：`blockly/main.json.bak`；執行中另保留最近一次正式 workspace 成功序列化的記憶體快照。啟動時既有 `main.json` 由正式編輯器的既有遷移與 Blockly runtime 載入流程處理，不屬於 watcher 觀察到的新候選；首次成功儲存後初始化此狀態，之後每次正式編輯器儲存成功都會更新。
 
 - 外部候選只有 round-trip 成功、正式 workspace 載入 acknowledgement 成功且獲最新 generation 提交後才能更新；正式編輯器正常儲存成功也能更新。
 - 提交前必須保留舊 `.bak` bytes 與記憶體快照，正式載入或雙檔磁碟提交失敗時用於 rollback；恢復不得先覆寫唯一備份。

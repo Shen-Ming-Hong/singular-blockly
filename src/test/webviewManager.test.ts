@@ -454,6 +454,19 @@ describe('WebView Manager', () => {
 		assert.strictEqual(webViewManager.getPanel(), undefined);
 	});
 
+	it('should close a project-bound panel when the primary workspace folder changes', async () => {
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
+		await webViewManager.createAndShowWebView();
+		assert.strictEqual(webViewManager.isPanelCreated(), true);
+
+		vscodeMock.fireWorkspaceFoldersChanged(
+			[{ uri: { fsPath: '/mock/replacement' } }],
+			[{ uri: { fsPath: '/mock/workspace' } }]
+		);
+
+		assert.strictEqual(webViewManager.isPanelCreated(), false);
+	});
+
 	it('should ensure panel is visible', async () => {
 		// 設定 VS Code 工作區
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
@@ -471,9 +484,7 @@ describe('WebView Manager', () => {
 		assert(webViewManager.getPanel() !== undefined);
 	});
 
-	it('should include TXT virtual controls when reloading from file watcher', async () => {
-		const clock = sinon.useFakeTimers();
-		try {
+	it('should include TXT virtual controls when loading a validated candidate', async () => {
 			const panel = {
 				webview: {
 					postMessage: sinon.stub().resolves(),
@@ -496,30 +507,30 @@ describe('WebView Manager', () => {
 			};
 
 			(webViewManager as any).panel = panel;
-			(webViewManager as any).messageHandler = {};
-			fsMock.addDirectory('/mock/workspace/blockly');
-			fsMock.addFile(
-				'/mock/workspace/blockly/main.json',
-				JSON.stringify({
-					workspace: { blocks: { blocks: [] } },
-					board: 'txt',
-					txtVirtualControls,
-				})
-			);
-
-			await (webViewManager as any).triggerWorkspaceReload({ fsPath: '/mock/workspace/blockly/main.json' });
+			const result = (webViewManager as any).loadValidatedWorkspace('candidate-1', 4, Date.now() + 10_000, {
+				workspace: { blocks: { blocks: [] } },
+				board: 'txt',
+				txtVirtualControls,
+			});
+			await Promise.resolve();
 
 			assert(panel.webview.postMessage.calledOnce);
 			const loadMessage = panel.webview.postMessage.getCall(0).args[0];
 			assert.strictEqual(loadMessage.command, 'loadWorkspace');
-			assert.strictEqual(loadMessage.source, 'fileWatcher');
-			assert.strictEqual(loadMessage.board, 'txt');
-			assert.deepStrictEqual(loadMessage.txtVirtualControls.controls, txtVirtualControls.controls);
-
-			clock.tick(2000);
-		} finally {
-			clock.restore();
-		}
+			assert.strictEqual(loadMessage.source, 'validatedCandidate');
+			assert.strictEqual(loadMessage.requestId, 'candidate-1');
+			assert.strictEqual(loadMessage.generation, 4);
+				assert.strictEqual(loadMessage.board, 'txt');
+				assert.strictEqual(loadMessage.document.board, 'txt');
+				assert.deepStrictEqual(loadMessage.txtVirtualControls.controls, txtVirtualControls.controls);
+			const pending = (webViewManager as any).pendingLiveLoads.get('candidate-1');
+			clearTimeout(pending.timer);
+			(webViewManager as any).pendingLiveLoads.delete('candidate-1');
+				pending.resolve({
+					command: 'workspaceLiveLoadResult', requestId: 'candidate-1', generation: 4, success: true,
+					normalizedDocument: loadMessage.document,
+				});
+			await result;
 	});
 
 	it('should dispose panel when closePanel is called', async () => {

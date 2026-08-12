@@ -1,0 +1,485 @@
+{
+  "schemaVersion": 3,
+  "category": "cyberbrick_rc",
+  "blocks": [
+    {
+      "type": "rc_get_joystick",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CHANNEL",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "static",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "rc_get_joystick",
+            "fields": {
+              "CHANNEL": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "rc_get_joystick_mapped",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "MAX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "MIN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CHANNEL",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "static",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "rc_get_joystick_mapped",
+            "fields": {
+              "CHANNEL": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "rc_is_button_pressed",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BUTTON",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "static",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "rc_is_button_pressed",
+            "fields": {
+              "BUTTON": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "rc_is_connected",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "rc_is_connected"
+          }
+        }
+      }
+    },
+    {
+      "type": "rc_master_init",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PAIR_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CHANNEL",
+              "kind": "number",
+              "defaultValue": 1
+            }
+          ],
+          "minimalState": {
+            "type": "rc_master_init",
+            "fields": {
+              "CHANNEL": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "rc_send",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "rc_send"
+          }
+        }
+      }
+    },
+    {
+      "type": "rc_slave_init",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PAIR_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CHANNEL",
+              "kind": "number",
+              "defaultValue": 1
+            }
+          ],
+          "minimalState": {
+            "type": "rc_slave_init",
+            "fields": {
+              "CHANNEL": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "rc_wait_connection",
+      "categories": [
+        "cyberbrick_rc"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TIMEOUT",
+              "kind": "number",
+              "defaultValue": 30
+            }
+          ],
+          "minimalState": {
+            "type": "rc_wait_connection",
+            "fields": {
+              "TIMEOUT": 30
+            }
+          }
+        }
+      }
+    }
+  ]
+}

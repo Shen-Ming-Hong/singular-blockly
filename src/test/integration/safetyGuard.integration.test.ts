@@ -35,10 +35,13 @@ suite('Safety Guard Integration Tests - Project Type Detection', () => {
 		mockSettingsManager = {
 			readSetting: sinon.stub().resolves(false),
 			updateSetting: sinon.stub().resolves(),
+			getLanguage: sinon.stub().resolves('zh-hant'),
 		} as any;
 
 		// Mock LocaleService - 返回真實的訊息模板
 		mockLocaleService = {
+			getMessageSource: sinon.stub().resolves('integration-test'),
+			getCurrentLanguage: sinon.stub().returns('zh-hant'),
 			getLocalizedMessage: sinon.stub().callsFake(async (key: string, defaultValue: string) => {
 				const messages: Record<string, string> = {
 					[MESSAGE_KEYS.SAFETY_WARNING_BODY_WITH_TYPE]:

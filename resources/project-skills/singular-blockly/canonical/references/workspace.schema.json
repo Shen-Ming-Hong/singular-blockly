@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "singular-blockly://workspace.schema.json",
+  "title": "Singular Blockly workspace document",
+  "description": "Document-level shape for blockly/main.json. Blockly runtime validation is still required.",
+  "type": "object",
+  "required": [
+    "board",
+    "workspace"
+  ],
+  "properties": {
+    "board": {
+      "type": "string",
+      "enum": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ]
+    },
+    "workspace": {
+      "type": "object",
+      "description": "Blockly serialization state consumed by Blockly.serialization.workspaces.load."
+    },
+    "txtVirtualControls": {
+      "description": "Optional TXT Controller virtual control configuration."
+    }
+  },
+  "additionalProperties": true
+}

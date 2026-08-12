@@ -17,12 +17,20 @@ import { BoardConfigKey, LoadWorkspaceStateMessage, PreviewWarning, SetBoardMess
 import { TxtVirtualControlsDocument, normalizeTxtVirtualControlsDocument } from '../types/txtVirtualControls';
 import { AIModelManager } from '../services/aiModelManager';
 import { AIStatusBar } from '../services/aiStatusBar';
+import { BlockContractService } from '../services/blockContractService';
 import {
 	createDefaultDeps,
 	isProviderInstalled,
 	showInstallNotification,
 	type PenvProviderServiceDeps,
 } from '../services/penvProviderService';
+import { getWorkspaceCandidateService, WorkspaceCandidateService } from '../services/workspaceCandidateService';
+import {
+	ValidateWorkspaceCandidateMessage,
+	WorkspaceCandidateValidationResult,
+	WorkspaceDocument,
+	WorkspaceLiveLoadResultMessage,
+} from '../types/workspaceValidation';
 
 /**
  * 開發板值映射表
@@ -286,14 +294,20 @@ export class WebViewManager {
 	private previewPanels: Map<string, vscode.WebviewPanel> = new Map();
 	private currentTempToolboxFile: string | null = null;
 	private currentCyberbrickTempToolboxFile: string | null = null;
-	// FileWatcher 機制 - T011
-	private fileWatcher: vscode.FileSystemWatcher | undefined;
-	private fileWatcherDebounceTimer: NodeJS.Timeout | undefined;
-	// T024: 改用計數器機制，支援巢狀保存操作
-	private internalUpdateCount: number = 0; // 避免內部更新觸發 FileWatcher
 	private aiModelManager?: AIModelManager;
 	private aiStatusBar?: AIStatusBar;
 	private penvProviderSetup?: Promise<void>;
+	private workspaceCandidateService?: WorkspaceCandidateService;
+	private activeWorkspaceRoot?: string;
+	private readonly workspaceFileServiceInjected: boolean;
+	private pendingCandidateValidations = new Map<
+		string,
+		{ resolve: (result: WorkspaceCandidateValidationResult) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }
+	>();
+	private pendingLiveLoads = new Map<
+		string,
+		{ resolve: (result: WorkspaceLiveLoadResultMessage) => void; reject: (error: Error) => void; timer: NodeJS.Timeout }
+	>();
 	/** TXT Controller I/O Test Panel — T034 */
 
 	/**
@@ -312,6 +326,22 @@ export class WebViewManager {
 		this.localeService = localeService || new LocaleService(context.extensionPath);
 		this.extensionFileService = extensionFileService || new FileService(context.extensionPath);
 		this.fileService = workspaceFileService; // 在測試中可以預先注入
+		this.workspaceFileServiceInjected = workspaceFileService !== undefined;
+		if (typeof vscodeApi.workspace.onDidChangeWorkspaceFolders === 'function') {
+			context.subscriptions.push(vscodeApi.workspace.onDidChangeWorkspaceFolders(() => this.handlePrimaryWorkspaceChanged()));
+		}
+	}
+
+	private handlePrimaryWorkspaceChanged(): void {
+		const nextRoot = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath;
+		const resolvedNextRoot = nextRoot ? path.resolve(nextRoot) : undefined;
+		if (!this.activeWorkspaceRoot || resolvedNextRoot === this.activeWorkspaceRoot) {return;}
+		// The live editor, message handler, and validator channel are project-bound. Closing
+		// avoids validating a new primary folder through the previous project's runtime state.
+		this.closePanel();
+		this.workspaceCandidateService = undefined;
+		this.activeWorkspaceRoot = undefined;
+		if (!this.workspaceFileServiceInjected) {this.fileService = undefined;}
 	}
 
 	/**
@@ -371,9 +401,14 @@ export class WebViewManager {
 
 		// 初始化檔案服務 (如果還沒有建立的話,例如在測試中可能已注入)
 		const workspaceRoot = workspaceFolders[0].uri.fsPath;
-		if (!this.fileService) {
+		const resolvedWorkspaceRoot = path.resolve(workspaceRoot);
+		if (this.panel && this.activeWorkspaceRoot && this.activeWorkspaceRoot !== resolvedWorkspaceRoot) {
+			this.closePanel();
+		}
+		if (!this.fileService || (!this.workspaceFileServiceInjected && this.activeWorkspaceRoot !== resolvedWorkspaceRoot)) {
 			this.fileService = new FileService(workspaceRoot);
 		}
+		this.activeWorkspaceRoot = resolvedWorkspaceRoot;
 
 		// 設定 PlatformIO 不自動開啟 ini 檔案
 		const settingsManager = new SettingsManager(workspaceRoot);
@@ -453,6 +488,11 @@ export class WebViewManager {
 
 		// 建立訊息處理器
 		this.messageHandler = new WebViewMessageHandler(this.context, this.panel, this.localeService);
+		this.workspaceCandidateService = getWorkspaceCandidateService(workspaceRoot);
+		this.workspaceCandidateService?.attachChannels(
+			message => this.validateWorkspaceCandidate(message),
+			(requestId, generation, deadlineAt, document) => this.loadValidatedWorkspace(requestId, generation, deadlineAt, document)
+		);
 
 		// Initialize AI services if available
 		if (this.aiModelManager) {
@@ -461,13 +501,23 @@ export class WebViewManager {
 
 		// 監聽 WebView 訊息
 		this.panel.webview.onDidReceiveMessage(async message => {
-			// 攔截 saveWorkspace 命令，設置內部更新標記以避免 FileWatcher 觸發重載
-			if (message.command === 'saveWorkspace') {
-				this.markInternalUpdateStart();
-				// 延遲重置標記，確保檔案系統事件已完成
-				setTimeout(() => {
-					this.markInternalUpdateEnd();
-				}, 1000);
+			if (message.command === 'workspaceCandidateValidationResult') {
+				const pending = this.pendingCandidateValidations.get(message.requestId);
+				if (pending) {
+					this.pendingCandidateValidations.delete(message.requestId);
+					clearTimeout(pending.timer);
+					pending.resolve(message as WorkspaceCandidateValidationResult);
+				}
+				return;
+			}
+			if (message.command === 'workspaceLiveLoadResult') {
+				const pending = this.pendingLiveLoads.get(message.requestId);
+				if (pending) {
+					this.pendingLiveLoads.delete(message.requestId);
+					clearTimeout(pending.timer);
+					pending.resolve(message as WorkspaceLiveLoadResultMessage);
+				}
+				return;
 			}
 			await this.messageHandler?.handleMessage(message);
 
@@ -478,17 +528,88 @@ export class WebViewManager {
 
 		// 當面板關閉時清理資源
 		this.panel.onDidDispose(() => {
+			this.workspaceCandidateService?.detachChannels();
+			this.workspaceCandidateService = undefined;
+			for (const pending of this.pendingCandidateValidations.values()) {
+				clearTimeout(pending.timer);
+				pending.reject(new Error('CHANNEL_UNAVAILABLE'));
+			}
+			for (const pending of this.pendingLiveLoads.values()) {
+				clearTimeout(pending.timer);
+				pending.reject(new Error('CHANNEL_UNAVAILABLE'));
+			}
+			this.pendingCandidateValidations.clear();
+			this.pendingLiveLoads.clear();
 			this.panel = undefined;
 			this.messageHandler = undefined;
 			this.cleanupTempFile();
-			this.disposeFileWatcher(); // 清理 FileWatcher
 			log('WebView panel disposed', 'info');
 		});
 
-		// 設置 FileWatcher 監聽 main.json 變更 - T011
-		this.setupFileWatcher();
-
 		log('WebView panel created and shown', 'info');
+	}
+
+	private async validateWorkspaceCandidate(
+		message: ValidateWorkspaceCandidateMessage
+	): Promise<WorkspaceCandidateValidationResult> {
+		if (!this.panel) {throw new Error('CHANNEL_UNAVAILABLE');}
+		return await new Promise<WorkspaceCandidateValidationResult>((resolve, reject) => {
+			const timer = setTimeout(() => {
+				this.pendingCandidateValidations.delete(message.requestId);
+				reject(new Error('VALIDATION_TIMEOUT'));
+			}, Math.max(0, message.deadlineAt - Date.now()));
+			this.pendingCandidateValidations.set(message.requestId, { resolve, reject, timer });
+			Promise.resolve(this.panel?.webview.postMessage(message)).then(sent => {
+				if (sent === false) {
+					this.pendingCandidateValidations.delete(message.requestId);
+					clearTimeout(timer);
+					reject(new Error('CHANNEL_UNAVAILABLE'));
+				}
+			}, error => {
+				this.pendingCandidateValidations.delete(message.requestId);
+				clearTimeout(timer);
+				reject(error);
+			});
+		});
+	}
+
+	private async loadValidatedWorkspace(
+		requestId: string,
+		generation: number,
+		deadlineAt: number,
+		document: WorkspaceDocument
+	): Promise<WorkspaceLiveLoadResultMessage> {
+		if (!this.panel) {throw new Error('CHANNEL_UNAVAILABLE');}
+		return await new Promise<WorkspaceLiveLoadResultMessage>((resolve, reject) => {
+			const timer = setTimeout(() => {
+				this.pendingLiveLoads.delete(requestId);
+				reject(new Error('VALIDATION_TIMEOUT'));
+			}, Math.max(0, deadlineAt - Date.now()));
+			this.pendingLiveLoads.set(requestId, { resolve, reject, timer });
+			Promise.resolve(
+				this.panel?.webview.postMessage({
+					command: 'loadWorkspace',
+					requestId,
+					generation,
+					deadlineAt,
+					state: document.workspace,
+					document,
+					board: document.board,
+					txtVirtualControls: document.txtVirtualControls,
+					source: 'validatedCandidate',
+				})
+			).then(sent => {
+				if (sent === false) {
+					this.pendingLiveLoads.delete(requestId);
+					clearTimeout(timer);
+					reject(new Error('CHANNEL_UNAVAILABLE'));
+				}
+			}, error => {
+				this.pendingLiveLoads.delete(requestId);
+				clearTimeout(timer);
+				reject(error);
+			});
+		});
 	}
 
 	/**
@@ -881,10 +1002,19 @@ export class WebViewManager {
 			mediaUri,
 			localeUris,
 		};
+		let blockContract: unknown = null;
+		if (mode === 'edit') {
+			try {
+				blockContract = new BlockContractService(this.context.extensionPath).load().contract;
+			} catch (error) {
+				log('Blockly candidate contract is unavailable', 'warn', error);
+			}
+		}
 		return [
 			`window.BLOCKLY_MEDIA_URL = ${serializeForInlineScript(mediaUri)};`,
 			`window.BLOCKLY_CORE_LOCALE_URIS = ${serializeForInlineScript(localeUris)};`,
 			`window.BLOCKLY_RUNTIME_CONFIG = ${serializeForInlineScript(config)};`,
+			`window.SINGULAR_BLOCK_CONTRACT = ${serializeForInlineScript(blockContract)};`,
 		].join('\n        ');
 	}
 
@@ -1667,186 +1797,6 @@ export class WebViewManager {
 	 * @param webview WebView 實例
 	 * @returns 語言腳本 HTML
 	 */
-
-	// ===== FileWatcher 機制 - T011 =====
-
-	/**
-	 * 設置 FileWatcher 監聽 main.json 變更
-	 * 用於 MCP Server 修改工作區後自動重載編輯器
-	 */
-	private setupFileWatcher(): void {
-		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
-		if (!workspaceFolders) {
-			return;
-		}
-
-		const workspaceRoot = workspaceFolders[0].uri.fsPath;
-		const mainJsonPattern = new vscode.RelativePattern(workspaceRoot, 'blockly/main.json');
-
-		// 清理現有的 FileWatcher
-		this.disposeFileWatcher();
-
-		// 建立新的 FileWatcher
-		this.fileWatcher = vscodeApi.workspace.createFileSystemWatcher(mainJsonPattern);
-
-		// 監聽檔案變更
-		this.fileWatcher.onDidChange(uri => {
-			this.handleFileChange(uri);
-		});
-
-		// 監聽檔案建立（首次建立 main.json）
-		this.fileWatcher.onDidCreate(uri => {
-			this.handleFileChange(uri);
-		});
-
-		log('FileWatcher setup for main.json', 'info');
-	}
-
-	/**
-	 * 處理檔案變更事件
-	 * 實作去抖動邏輯（500ms debounce）- T033
-	 */
-	private handleFileChange(uri: vscode.Uri): void {
-		// T027: 避免內部更新觸發 - 使用計數器判斷
-		if (this.isInternalUpdateActive()) {
-			// T029: 新增日誌記錄
-			log(`Ignoring internal update to main.json (count: ${this.internalUpdateCount})`, 'debug');
-			return;
-		}
-
-		// 清除現有的 debounce timer
-		if (this.fileWatcherDebounceTimer) {
-			clearTimeout(this.fileWatcherDebounceTimer);
-		}
-
-		// 設定 500ms 去抖動
-		this.fileWatcherDebounceTimer = setTimeout(() => {
-			this.triggerWorkspaceReload(uri);
-		}, 500);
-	}
-
-	/**
-	 * 觸發工作區重載
-	 */
-	private async triggerWorkspaceReload(uri: vscode.Uri): Promise<void> {
-		log(`FileWatcher detected change in ${uri.fsPath}`, 'info');
-
-		// 確保面板存在
-		if (!this.panel || !this.messageHandler || !this.fileService) {
-			log('Panel or services not available for reload', 'warn');
-			return;
-		}
-
-		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
-		if (!workspaceFolders) {
-			log('No workspace folder available during FileWatcher reload', 'warn');
-			return;
-		}
-
-		const workspaceRoot = workspaceFolders[0].uri.fsPath;
-
-		try {
-			// 設置內部更新標記，防止後續保存操作觸發 FileWatcher 循環
-			this.markInternalUpdateStart();
-
-			// 讀取更新後的 workspace 狀態
-			const mainJsonPath = 'blockly/main.json';
-			const exists = await this.fileService.fileExists(mainJsonPath);
-
-			if (!exists) {
-				log('Workspace file not found, skipping reload', 'warn');
-				this.markInternalUpdateEnd();
-				return;
-			}
-
-			const content = await this.fileService.readFile(mainJsonPath);
-			const saveData = JSON.parse(content);
-
-			// 驗證資料結構並發送 loadWorkspace 命令
-			if (saveData && typeof saveData === 'object' && saveData.workspace) {
-				let theme = 'light';
-				try {
-					const settingsManager = new SettingsManager(workspaceRoot, this.fileService);
-					theme = await settingsManager.getTheme();
-				} catch (error) {
-					log('Failed to read theme during FileWatcher reload, using default', 'warn', { error });
-				}
-
-				const board = saveData.board || 'none';
-				const txtVirtualControls =
-					board === 'txt' ? normalizeTxtVirtualControlsDocument(saveData.txtVirtualControls, { forceEditingMode: true }) : undefined;
-
-				await this.panel.webview.postMessage({
-					command: 'loadWorkspace',
-					state: saveData.workspace,
-					board,
-					theme: theme,
-					source: 'fileWatcher', // 標記來源，讓 WebView 知道這是外部觸發的重載
-					...(txtVirtualControls ? { txtVirtualControls } : {}),
-				});
-				log('Workspace reload triggered via FileWatcher with loadWorkspace', 'info');
-			} else {
-				log('Invalid workspace state format in file', 'warn');
-			}
-
-			// 延遲重置內部更新標記，給 WebView 足夠時間完成載入和保存
-			setTimeout(() => {
-				this.markInternalUpdateEnd();
-			}, 2000);
-		} catch (error) {
-			log('Failed to trigger workspace reload', 'error', { error });
-			this.markInternalUpdateEnd();
-		}
-	}
-
-	/**
-	 * 清理 FileWatcher 資源
-	 */
-	private disposeFileWatcher(): void {
-		if (this.fileWatcherDebounceTimer) {
-			clearTimeout(this.fileWatcherDebounceTimer);
-			this.fileWatcherDebounceTimer = undefined;
-		}
-
-		if (this.fileWatcher) {
-			this.fileWatcher.dispose();
-			this.fileWatcher = undefined;
-			log('FileWatcher disposed', 'info');
-		}
-	}
-
-	/**
-	 * T028: 檢查內部更新是否進行中
-	 * @returns 如果有任何內部更新操作正在進行，返回 true
-	 */
-	public isInternalUpdateActive(): boolean {
-		return this.internalUpdateCount > 0;
-	}
-
-	/**
-	 * T025: 標記內部更新開始
-	 * 用於避免內部保存操作觸發 FileWatcher
-	 * 使用計數器支援巢狀保存操作
-	 */
-	public markInternalUpdateStart(): void {
-		this.internalUpdateCount++;
-		log(`Internal update started (count: ${this.internalUpdateCount})`, 'debug');
-	}
-
-	/**
-	 * T026: 標記內部更新結束
-	 * 使用 2000ms 延遲確保檔案系統事件已完成處理
-	 */
-	public markInternalUpdateEnd(): void {
-		// 延遲重置，確保檔案系統事件已完成
-		// 使用 2000ms 保護窗口，確保所有相關的檔案系統事件都已處理完畢
-		setTimeout(() => {
-			if (this.internalUpdateCount > 0) {
-				this.internalUpdateCount--;
-				log(`Internal update ended (count: ${this.internalUpdateCount})`, 'debug');
-			}
-		}, 2000);
-	}
 
 	// ── T034: TXT Controller I/O Test Panel ──────────────────────────────────
 

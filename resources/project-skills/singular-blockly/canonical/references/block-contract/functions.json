@@ -1,0 +1,810 @@
+{
+  "schemaVersion": 3,
+  "category": "functions",
+  "blocks": [
+    {
+      "type": "arduino_function",
+      "categories": [
+        "functions"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "STACK",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "myFunction"
+            },
+            {
+              "name": "PARAM_LABEL",
+              "kind": "label",
+              "defaultValue": ":"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function",
+            "extraState": {
+              "version": 1,
+              "arguments": [],
+              "argumentTypes": []
+            },
+            "fields": {
+              "NAME": "myFunction"
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "STACK",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "myFunction"
+            },
+            {
+              "name": "PARAM_LABEL",
+              "kind": "label",
+              "defaultValue": ":"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function",
+            "extraState": {
+              "version": 1,
+              "arguments": [],
+              "argumentTypes": []
+            },
+            "fields": {
+              "NAME": "myFunction"
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "STACK",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "myFunction"
+            },
+            {
+              "name": "PARAM_LABEL",
+              "kind": "label",
+              "defaultValue": ":"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function",
+            "extraState": {
+              "version": 1,
+              "arguments": [],
+              "argumentTypes": []
+            },
+            "fields": {
+              "NAME": "myFunction"
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "STACK",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "myFunction"
+            },
+            {
+              "name": "PARAM_LABEL",
+              "kind": "label",
+              "defaultValue": ":"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function",
+            "extraState": {
+              "version": 1,
+              "arguments": [],
+              "argumentTypes": []
+            },
+            "fields": {
+              "NAME": "myFunction"
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "STACK",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "myFunction"
+            },
+            {
+              "name": "PARAM_LABEL",
+              "kind": "label",
+              "defaultValue": ":"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function",
+            "extraState": {
+              "version": 1,
+              "arguments": [],
+              "argumentTypes": []
+            },
+            "fields": {
+              "NAME": "myFunction"
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "STACK",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "myFunction"
+            },
+            {
+              "name": "PARAM_LABEL",
+              "kind": "label",
+              "defaultValue": ":"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function",
+            "extraState": {
+              "version": 1,
+              "arguments": [],
+              "argumentTypes": []
+            },
+            "fields": {
+              "NAME": "myFunction"
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "STACK",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "text-input",
+              "defaultValue": "myFunction"
+            },
+            {
+              "name": "PARAM_LABEL",
+              "kind": "label",
+              "defaultValue": ":"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function",
+            "extraState": {
+              "version": 1,
+              "arguments": [],
+              "argumentTypes": []
+            },
+            "fields": {
+              "NAME": "myFunction"
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "arguments": [],
+            "argumentTypes": []
+          }
+        }
+      }
+    },
+    {
+      "type": "arduino_function_call",
+      "categories": [
+        "functions"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "label",
+              "defaultValue": "myFunction"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function_call",
+            "extraState": {
+              "version": 1,
+              "name": "myFunction",
+              "arguments": [],
+              "argumentTypes": []
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "name": "myFunction",
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "label",
+              "defaultValue": "myFunction"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function_call",
+            "extraState": {
+              "version": 1,
+              "name": "myFunction",
+              "arguments": [],
+              "argumentTypes": []
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "name": "myFunction",
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "label",
+              "defaultValue": "myFunction"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function_call",
+            "extraState": {
+              "version": 1,
+              "name": "myFunction",
+              "arguments": [],
+              "argumentTypes": []
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "name": "myFunction",
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "label",
+              "defaultValue": "myFunction"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function_call",
+            "extraState": {
+              "version": 1,
+              "name": "myFunction",
+              "arguments": [],
+              "argumentTypes": []
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "name": "myFunction",
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "label",
+              "defaultValue": "myFunction"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function_call",
+            "extraState": {
+              "version": 1,
+              "name": "myFunction",
+              "arguments": [],
+              "argumentTypes": []
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "name": "myFunction",
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "label",
+              "defaultValue": "myFunction"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function_call",
+            "extraState": {
+              "version": 1,
+              "name": "myFunction",
+              "arguments": [],
+              "argumentTypes": []
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "name": "myFunction",
+            "arguments": [],
+            "argumentTypes": []
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "NAME",
+              "kind": "label",
+              "defaultValue": "myFunction"
+            }
+          ],
+          "minimalState": {
+            "type": "arduino_function_call",
+            "extraState": {
+              "version": 1,
+              "name": "myFunction",
+              "arguments": [],
+              "argumentTypes": []
+            }
+          },
+          "extraState": {
+            "version": 1,
+            "name": "myFunction",
+            "arguments": [],
+            "argumentTypes": []
+          }
+        }
+      }
+    }
+  ]
+}

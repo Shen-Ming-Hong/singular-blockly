@@ -55,10 +55,19 @@ describe('CyberBrick naming WebView contract', () => {
 
 	it('wraps every workspace deserialization path in the shared try/finally hydration scope', () => {
 		const source = readWorkspaceFile(editorPath);
-		const loadCalls = source.match(/window\.blocklyRuntime\.loadWorkspaceState\(/g) || [];
+		const runtimeLoadCalls = source.match(/window\.blocklyRuntime\.loadWorkspaceState\(/g) || [];
+		const disposableLoadCalls = source.match(/Blockly\.serialization\.workspaces\.load\(/g) || [];
 		const scopedCalls = source.match(/withCyberBrickNameHydrationScope\(\(\) =>/g) || [];
-		assert.strictEqual(loadCalls.length, 4, 'contract assumes the four current workspace load paths');
-		assert.strictEqual(scopedCalls.length, loadCalls.length, 'every load path must enter the shared hydration scope');
+		assert.ok(
+			runtimeLoadCalls.length >= 4,
+			'contract requires live, rebuild, and a scoped helper shared by both disposable workspace loads'
+		);
+		assert.strictEqual(disposableLoadCalls.length, 0, 'candidate validation must use the shared runtime wrapper');
+		assert.strictEqual(
+			scopedCalls.length,
+			runtimeLoadCalls.length + disposableLoadCalls.length,
+			'every live and disposable load path must enter the shared hydration scope'
+		);
 		assertContainsAll(
 			source,
 			['function withCyberBrickNameHydrationScope', 'try {', 'finally {', 'api.beginHydration()', 'api.endHydration()', 'refreshCyberBrickNamingIssues()'],

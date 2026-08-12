@@ -1,0 +1,1010 @@
+{
+  "schemaVersion": 3,
+  "category": "sensors",
+  "blocks": [
+    {
+      "type": "ultrasonic_read",
+      "categories": [
+        "sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_read"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_read"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_read"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_read"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_read"
+          }
+        }
+      }
+    },
+    {
+      "type": "ultrasonic_sensor",
+      "categories": [
+        "sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ECHO_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "TRIG_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "21",
+                "22",
+                "23",
+                "25",
+                "26",
+                "27",
+                "3",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "39",
+                "4",
+                "5"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            }
+          ],
+          "minimalState": {
+            "type": "ultrasonic_sensor",
+            "fields": {
+              "TRIG_PIN": "0",
+              "ECHO_PIN": "0",
+              "USE_INTERRUPT": false
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ECHO_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TRIG_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "2",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28",
+                "29",
+                "3",
+                "30",
+                "31",
+                "32",
+                "33",
+                "34",
+                "35",
+                "36",
+                "37",
+                "38",
+                "39",
+                "4",
+                "40",
+                "41",
+                "42",
+                "43",
+                "44",
+                "45",
+                "46",
+                "47",
+                "48",
+                "49",
+                "5",
+                "50",
+                "51",
+                "52",
+                "53",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            }
+          ],
+          "minimalState": {
+            "type": "ultrasonic_sensor",
+            "fields": {
+              "TRIG_PIN": "0",
+              "ECHO_PIN": "0",
+              "USE_INTERRUPT": false
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ECHO_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TRIG_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            }
+          ],
+          "minimalState": {
+            "type": "ultrasonic_sensor",
+            "fields": {
+              "TRIG_PIN": "0",
+              "ECHO_PIN": "0",
+              "USE_INTERRUPT": false
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ECHO_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TRIG_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            }
+          ],
+          "minimalState": {
+            "type": "ultrasonic_sensor",
+            "fields": {
+              "TRIG_PIN": "0",
+              "ECHO_PIN": "0",
+              "USE_INTERRUPT": false
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "ECHO_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "TRIG_PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "11",
+                "12",
+                "13",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            },
+            {
+              "name": "USE_INTERRUPT",
+              "kind": "checkbox",
+              "defaultValue": false
+            }
+          ],
+          "minimalState": {
+            "type": "ultrasonic_sensor",
+            "fields": {
+              "TRIG_PIN": "0",
+              "ECHO_PIN": "0",
+              "USE_INTERRUPT": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "ultrasonic_trigger",
+      "categories": [
+        "sensors"
+      ],
+      "boards": [
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "uno"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_trigger"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_trigger"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_trigger"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_trigger"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "ultrasonic_trigger"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -5,6 +5,8 @@
  */
 
 import assert = require('assert');
+import * as fs from 'fs';
+import * as os from 'os';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import { describe, it, beforeEach, afterEach } from 'mocha';
@@ -131,6 +133,12 @@ describe('File Service', () => {
 		assert.deepStrictEqual(files.sort(), ['file1.txt', 'file2.txt']);
 	});
 
+	it('should return safe defaults for missing directories, JSON files, and stats', async () => {
+		assert.deepStrictEqual(await fileService.listFiles('missing'), []);
+		assert.deepStrictEqual(await fileService.readJsonFile('missing.json', { missing: true }), { missing: true });
+		assert.strictEqual(await fileService.getFileStats('missing.txt'), null);
+	});
+
 	it('should read JSON files', async () => {
 		// 準備 JSON 檔案
 		const jsonPath = 'test/config.json';
@@ -158,6 +166,152 @@ describe('File Service', () => {
 		const expectedPath = path.join(workspacePath, jsonPath).replace(/\\/g, '/');
 		const expectedContent = JSON.stringify(jsonData, null, 2);
 		assert.strictEqual(fsMock.files.get(expectedPath), expectedContent);
+	});
+
+	it('should reject absolute and traversal paths', async () => {
+		assert.throws(() => fileService.resolveSafePath('../outside.txt'), /escapes workspace root/);
+		assert.throws(() => fileService.resolveSafePath('/outside.txt'), /Unsafe project-relative path/);
+		await assert.rejects(() => fileService.writeFile('../outside.txt', 'unsafe'), /escapes workspace root/);
+	});
+
+	it('should resolve empty paths and workspace roots with a trailing separator safely', () => {
+		assert.strictEqual(fileService.resolveSafePath(''), workspacePath);
+		assert.strictEqual(new FileService(path.parse(workspacePath).root).resolveSafePath('tmp'), path.resolve('/tmp'));
+	});
+
+	it('should decode Buffer reads and support compact JSON writes', async () => {
+		const bufferFs: any = {
+			existsSync: () => true,
+			promises: { readFile: async () => Buffer.from('buffer content') },
+		};
+		assert.strictEqual(await new FileService(workspacePath, bufferFs).readFile(testFilePath), 'buffer content');
+		await fileService.writeJsonFile('test/compact.json', { value: 1 }, false);
+		assert.strictEqual(fsMock.files.get(`${workspacePath}/test/compact.json`), '{"value":1}');
+	});
+
+	it('should atomically replace a file without leaving a temporary sibling', async () => {
+		await fileService.writeFileAtomic(testFilePath, 'atomic content');
+
+		const expectedPath = path.join(workspacePath, testFilePath).replace(/\\/g, '/');
+		assert.strictEqual(fsMock.files.get(expectedPath), 'atomic content');
+		assert.strictEqual(
+			Array.from(fsMock.files.keys()).some(file => file.includes('.tmp-')),
+			false
+		);
+	});
+
+	it('should reject atomic writes and renames when rename support is unavailable', async () => {
+		const noRename: any = {
+			existsSync: () => false,
+			promises: { mkdir: async () => undefined, writeFile: async () => undefined },
+		};
+		const service = new FileService(workspacePath, noRename);
+		await assert.rejects(service.writeFileAtomic('test.txt', 'content'), /Atomic rename is unavailable/);
+		await assert.rejects(service.renameFile('source.txt', 'target.txt'), /Rename is unavailable/);
+	});
+
+	it('should clean a temporary sibling after atomic rename failure', async () => {
+		let temporaryExists = false;
+		let temporaryRemoved = false;
+		const failedRename: any = {
+			existsSync: (candidate: string) => candidate.includes('.tmp-') && temporaryExists,
+			promises: {
+				mkdir: async () => undefined,
+				writeFile: async () => {temporaryExists = true;},
+				rename: async () => {throw new Error('rename failed');},
+				unlink: async () => {
+					temporaryExists = false;
+					temporaryRemoved = true;
+				},
+			},
+		};
+		await assert.rejects(new FileService(workspacePath, failedRename).writeFileAtomic('test.txt', 'content'), /rename failed/);
+		assert.strictEqual(temporaryRemoved, true);
+	});
+
+	it('should preserve the original atomic failure when temporary cleanup also fails', async () => {
+		const failedCleanup: any = {
+			existsSync: (candidate: string) => candidate.includes('.tmp-'),
+			promises: {
+				mkdir: async () => undefined,
+				writeFile: async () => undefined,
+				rename: async () => {throw new Error('original rename failure');},
+				unlink: async () => {throw new Error('cleanup failure');},
+			},
+		};
+		await assert.rejects(
+			new FileService(workspacePath, failedCleanup).writeFileAtomic('test.txt', 'content'),
+			/original rename failure/
+		);
+	});
+
+	it('should rename files within the workspace', async () => {
+		fsMock.addFile(path.join(workspacePath, 'source.txt'), 'source');
+		await fileService.renameFile('source.txt', 'target.txt');
+		assert.strictEqual(fsMock.files.has(path.join(workspacePath, 'source.txt')), false);
+		assert.strictEqual(fsMock.files.get(path.join(workspacePath, 'target.txt')), 'source');
+	});
+
+	it('should preserve exact UTF-8 bytes through buffer helpers', async () => {
+		const bytes = Buffer.from('managed skill bytes\n', 'utf8');
+		await fileService.writeBuffer(testFilePath, bytes);
+		assert.deepStrictEqual(await fileService.readBuffer(testFilePath), bytes);
+	});
+
+	it('should reject writes through an existing symbolic-link segment', async () => {
+		const symlinkStats = { isSymbolicLink: () => true } as any;
+		const errorFs: any = {
+			existsSync: (candidate: string) => candidate.endsWith('/linked'),
+			promises: {
+				lstat: async () => symlinkStats,
+				writeFile: async () => undefined,
+				mkdir: async () => undefined,
+			},
+		};
+		const protectedService = new FileService(workspacePath, errorFs);
+
+		await assert.rejects(() => protectedService.writeFile('linked/file.txt', 'unsafe'), /Symbolic-link path segment/);
+	});
+
+	it('should reject exact-byte reads through a symbolic-link leaf', async () => {
+		const symlinkStats = { isSymbolicLink: () => true } as any;
+		const errorFs: any = {
+			existsSync: (candidate: string) => candidate.endsWith('/managed-link.txt'),
+			promises: {
+				lstat: async () => symlinkStats,
+				readFile: async () => Buffer.from('outside secret'),
+			},
+		};
+		const protectedService = new FileService(workspacePath, errorFs);
+
+		await assert.rejects(() => protectedService.readBuffer('managed-link.txt'), /Symbolic-link path segment/);
+	});
+
+	it('should not read, mutate, list, or inspect files through workspace symbolic links', async () => {
+		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-file-service-symlink-'));
+		const realWorkspace = path.join(temporaryRoot, 'workspace');
+		const outside = path.join(temporaryRoot, 'outside');
+		fs.mkdirSync(realWorkspace);
+		fs.mkdirSync(outside);
+		fs.writeFileSync(path.join(outside, 'secret.txt'), 'outside secret');
+		fs.symlinkSync(outside, path.join(realWorkspace, 'linked'), 'dir');
+		fs.symlinkSync(path.join(outside, 'secret.txt'), path.join(realWorkspace, 'secret-link.txt'));
+		const protectedService = new FileService(realWorkspace);
+
+		try {
+			assert.strictEqual(await protectedService.readFile('linked/secret.txt', 'blocked'), 'blocked');
+			assert.deepStrictEqual(await protectedService.listFiles('linked'), []);
+			assert.strictEqual(await protectedService.getFileStats('linked/secret.txt'), null);
+			await assert.rejects(() => protectedService.readBuffer('secret-link.txt'), /Symbolic-link path segment/);
+			await assert.rejects(() => protectedService.copyFile('linked/secret.txt', 'copy.txt'), /Symbolic-link path segment/);
+			await assert.rejects(() => protectedService.copyFile('secret-link.txt', 'copy.txt'), /Symbolic-link path segment/);
+			await assert.rejects(() => protectedService.renameFile('linked/secret.txt', 'renamed.txt'), /Symbolic-link path segment/);
+			await assert.rejects(() => protectedService.deleteFile('linked/secret.txt'), /Symbolic-link path segment/);
+			await assert.rejects(() => protectedService.writeFile('secret-link.txt', 'changed'), /Symbolic-link path segment/);
+			assert.strictEqual(fs.readFileSync(path.join(outside, 'secret.txt'), 'utf8'), 'outside secret');
+		} finally {
+			fs.rmSync(temporaryRoot, { recursive: true, force: true });
+		}
 	});
 
 	describe('Error Handling', () => {
@@ -283,6 +437,14 @@ describe('File Service', () => {
 			await assert.rejects(async () => await errorFileService.writeJsonFile('test.json', { data: 'test' }), {
 				message: 'Write JSON failed',
 			});
+		});
+
+		it('should return null when file stats fail', async () => {
+			const errorFs: any = {
+				existsSync: () => true,
+				promises: { stat: async () => {throw new Error('stat failed');} },
+			};
+			assert.strictEqual(await new FileService(workspacePath, errorFs).getFileStats(testFilePath), null);
 		});
 	});
 });

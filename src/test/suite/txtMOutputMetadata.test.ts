@@ -7,7 +7,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import { generateBlockJsonTemplate, getBlockByType } from '../../mcp/blockDictionary';
+import { BlockContractService } from '../../services/blockContractService';
 
 type TxtMOutputValidationApi = {
 	M_COMPONENTS: Record<string, {
@@ -63,15 +63,19 @@ suite('TXT M Output Metadata Tests', () => {
 		assert.match(helperSource, /sharedPinPolicy/);
 	});
 
-	test('block dictionary template 應為 txt_motor_speed SPEED 放入預設數字', () => {
-		const block = getBlockByType('txt_motor_speed');
-		assert.ok(block, 'txt_motor_speed should exist in block dictionary');
+	test('正式積木契約應為 txt_motor_speed SPEED 放入預設數字', () => {
+		const projectRoot = path.join(__dirname, '..', '..', '..');
+		const block = new BlockContractService(projectRoot).getBlock('txt_motor_speed');
+		assert.ok(block, 'txt_motor_speed should exist in the runtime contract');
+		const variant = block?.variants.txt;
+		assert.ok(variant, 'txt_motor_speed should expose a TXT-specific runtime variant');
 
-		const speedInput = block.inputs.find(input => input.name === 'SPEED');
-		assert.strictEqual(speedInput?.default, 512, 'SPEED input should record the same default number as the toolbox');
+		const speedInput = variant?.inputs.find(input => input.name === 'SPEED');
+		assert.strictEqual(speedInput?.connection.enabled, true);
+		assert.deepStrictEqual(speedInput?.connection.check, ['Number']);
 
-		const template = generateBlockJsonTemplate(block, {});
-		assert.strictEqual(template?.inputs?.SPEED?.block.type, 'math_number', 'SPEED should be filled by a math_number block');
-		assert.strictEqual(template?.inputs?.SPEED?.block.fields?.NUM, 512, 'SPEED template should default to 512');
+		const minimalState = variant?.minimalState as any;
+		assert.strictEqual(minimalState.inputs?.SPEED?.shadow?.type, 'math_number', 'SPEED should use a math_number shadow');
+		assert.strictEqual(minimalState.inputs?.SPEED?.shadow?.fields?.NUM, 512, 'SPEED should default to 512');
 	});
 });

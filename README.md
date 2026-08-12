@@ -11,7 +11,7 @@
 [![Rating](https://vsmarketplacebadges.dev/rating-star/Singular-Ray.singular-blockly.svg?color=E05D44&style=flat)](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Singular Blockly is a VS Code extension for Blockly-based visual programming across Arduino, CyberBrick MicroPython, and fischertechnik TXT Controller projects. It generates `src/main.cpp`, `src/rc_main.py`, or `src/main.py` for the selected board, supports PlatformIO, `mpremote`, and SSH-based TXT workflows, and includes MCP tooling for GitHub Copilot plus a 15-language UI.
+Singular Blockly is a VS Code extension for Blockly-based visual programming across Arduino, CyberBrick MicroPython, and fischertechnik TXT Controller projects. It generates `src/main.cpp`, `src/rc_main.py`, or `src/main.py` for the selected board, supports PlatformIO, `mpremote`, SSH-based TXT workflows, project-local Agent Skills, and a 15-language UI.
 
 ---
 
@@ -37,8 +37,8 @@ Singular Blockly is a VS Code extension for Blockly-based visual programming acr
 
 - **Blockly**: 13.2.1 - Visual programming library
 - **@blockly/theme-modern**: 13.2.0 - Modern theme with darker borders
-- **Node.js**: 22.16.0+ required
-- **VS Code**: 1.105.0+ required
+- **VS Code**: 1.109.0+ required
+- **Node.js**: 22.16.0+ for contributors only
 
 ## Features
 
@@ -143,9 +143,9 @@ Singular Blockly is a VS Code extension for Blockly-based visual programming acr
     - Conflict detection and warnings
     - Auto-add pinMode configurations
 
-### 🤖 AI Integration with MCP Server
+### 🤖 AI Integration with Project-Local Agent Skills
 
-Seamless integration with GitHub Copilot and AI assistants through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+Singular Blockly silently installs an English project Skill when a Blockly project starts. Supported AI agents can read the current workspace format and the runtime-derived block contract directly from the project. Users do not need to install Node.js, configure a server, approve Skill updates, or understand the hidden files.
 
 **AI-Assisted Block Programming:**
 
@@ -154,31 +154,17 @@ Seamless integration with GitHub Copilot and AI assistants through the [Model Co
 - **Natural Language**: Add blocks using commands like "Add an ultrasonic sensor block"
 - **Project Awareness**: AI knows your board type, pins, and current workspace state
 
-**Available MCP Tools:**
-
-| Tool                      | Description                                                     |
-| ------------------------- | --------------------------------------------------------------- |
-| `get_block_usage`         | Get detailed block documentation with fields and JSON templates |
-| `search_blocks`           | Search blocks by keyword (Chinese/English), sorted by relevance |
-| `list_blocks_by_category` | Browse blocks by category (15 categories available)             |
-| `get_workspace_state`     | Read current workspace, block arrangement, and board config     |
-| `update_workspace`        | Add, modify, delete, or replace blocks in workspace             |
-| `refresh_editor`          | Sync changes to the visual editor after workspace updates       |
-| `get_platform_config`     | Get board configuration and PlatformIO settings                 |
-| `get_board_pins`          | Query pin capabilities (digital, analog, PWM, I2C, SPI)         |
-| `get_generated_code`      | Read the generated Arduino/MicroPython code                     |
-
 **Getting Started with AI:**
 
-1. Open VS Code with Copilot Agent Mode enabled
-2. The MCP Server auto-registers when extension activates
-3. Use natural language in Copilot chat:
+1. Open a Singular Blockly project in VS Code 1.109 or later.
+2. Open the Blockly editor once for a new project. The extension installs and updates the project Skill silently.
+3. Ask a supported agent such as Codex or Claude Code to work with the Blockly workspace:
     - "What servo blocks are available?"
     - "Add a servo setup block on pin 9"
     - "Show me blocks in the motors category"
     - "Show me the generated Arduino code"
 
-> 💡 **Tip**: The AI maintains workspace backup (`main.json.bak`) for safe modifications. Use `get_block_usage` with context parameter to get ready-to-use JSON templates.
+The canonical Skill is stored under `.agents/skills/singular-blockly/`, with a compact Claude Code entry under `.claude/skills/singular-blockly/`. External changes to `blockly/main.json` are loaded into disposable Blockly runtimes before acceptance. Invalid changes are quarantined and the last valid `main.json.bak` is restored.
 
 ---
 
@@ -210,8 +196,7 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 
 ## Requirements
 
-- Visual Studio Code 1.105.0 or higher, or a compatible Open VSX-based editor such as VSCodium
-- Node.js 22.16.0 or higher
+- Visual Studio Code 1.109.0 or higher, or a compatible Open VSX-based editor such as VSCodium
 - Basic understanding of visual programming and your target board workflow
 - **PlatformIO environment provider (required for all boards):**
     - Singular Blockly automatically starts installation when the Blockly editor is first opened.

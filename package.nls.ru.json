@@ -1,13 +1,10 @@
 {
-	"command.checkMcpStatus.title": "Проверить статус MCP",
 	"command.checkPlatformioStatus.title": "Проверить статус PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Настройки предложений ИИ",
 	"command.toggleAIEnabled.title": "Singular Blockly: Переключить предложения ИИ",
 	"command.selectAIModel.title": "Singular Blockly: Выбрать модель ИИ",
 	"command.openAISettings.title": "Singular Blockly: Открыть параметры ИИ",
 	"command.triggerAISuggestion.title": "Singular Blockly: Вызвать предложение блока ИИ",
-	"config.mcp.nodePath.description": "Путь к исполняемому файлу Node.js для сервера MCP. По умолчанию 'node' использует системный PATH. Для пользователей nvm/fnm укажите полный абсолютный путь.",
-	"config.mcp.showStartupWarning.description": "Показывать предупреждение при запуске, если Node.js недоступен или версия слишком старая. Отключите, если вам не нужны функции MCP AI.",
 	"singularBlockly.ai.enabled.markdownDescription": "Включить/отключить предложения теневых блоков ИИ. Требуется расширение GitHub Copilot.",
 	"singularBlockly.ai.model.markdownDescription": "Языковая модель для предложений ИИ. Перечислены только лёгкие модели для быстрых предложений. Доступные модели зависят от вашего плана Copilot.",
 	"singularBlockly.ai.triggerDelay.markdownDescription": "Задержка в миллисекундах перед запуском предложения ИИ после изменения рабочей области.",

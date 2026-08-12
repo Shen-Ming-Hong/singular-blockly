@@ -1,0 +1,2323 @@
+{
+  "schemaVersion": 3,
+  "category": "logic",
+  "blocks": [
+    {
+      "type": "controls_if",
+      "categories": [
+        "logic"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO0",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "controls_if"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO0",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "controls_if"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO0",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "controls_if"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO0",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "controls_if"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO0",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "controls_if"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO0",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "controls_if"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "DO0",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF0",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "controls_if"
+          }
+        }
+      }
+    },
+    {
+      "type": "logic_boolean",
+      "categories": [
+        "logic"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BOOL",
+              "kind": "dropdown",
+              "defaultValue": "TRUE",
+              "optionsMode": "static",
+              "options": [
+                "FALSE",
+                "TRUE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_boolean",
+            "fields": {
+              "BOOL": "TRUE"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BOOL",
+              "kind": "dropdown",
+              "defaultValue": "TRUE",
+              "optionsMode": "static",
+              "options": [
+                "FALSE",
+                "TRUE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_boolean",
+            "fields": {
+              "BOOL": "TRUE"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BOOL",
+              "kind": "dropdown",
+              "defaultValue": "TRUE",
+              "optionsMode": "static",
+              "options": [
+                "FALSE",
+                "TRUE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_boolean",
+            "fields": {
+              "BOOL": "TRUE"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BOOL",
+              "kind": "dropdown",
+              "defaultValue": "TRUE",
+              "optionsMode": "static",
+              "options": [
+                "FALSE",
+                "TRUE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_boolean",
+            "fields": {
+              "BOOL": "TRUE"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BOOL",
+              "kind": "dropdown",
+              "defaultValue": "TRUE",
+              "optionsMode": "static",
+              "options": [
+                "FALSE",
+                "TRUE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_boolean",
+            "fields": {
+              "BOOL": "TRUE"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BOOL",
+              "kind": "dropdown",
+              "defaultValue": "TRUE",
+              "optionsMode": "static",
+              "options": [
+                "FALSE",
+                "TRUE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_boolean",
+            "fields": {
+              "BOOL": "TRUE"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BOOL",
+              "kind": "dropdown",
+              "defaultValue": "TRUE",
+              "optionsMode": "static",
+              "options": [
+                "FALSE",
+                "TRUE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_boolean",
+            "fields": {
+              "BOOL": "TRUE"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "logic_compare",
+      "categories": [
+        "logic"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "EQ",
+              "optionsMode": "static",
+              "options": [
+                "EQ",
+                "GT",
+                "GTE",
+                "LT",
+                "LTE",
+                "NEQ"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_compare",
+            "fields": {
+              "OP": "EQ"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "EQ",
+              "optionsMode": "static",
+              "options": [
+                "EQ",
+                "GT",
+                "GTE",
+                "LT",
+                "LTE",
+                "NEQ"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_compare",
+            "fields": {
+              "OP": "EQ"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "EQ",
+              "optionsMode": "static",
+              "options": [
+                "EQ",
+                "GT",
+                "GTE",
+                "LT",
+                "LTE",
+                "NEQ"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_compare",
+            "fields": {
+              "OP": "EQ"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "EQ",
+              "optionsMode": "static",
+              "options": [
+                "EQ",
+                "GT",
+                "GTE",
+                "LT",
+                "LTE",
+                "NEQ"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_compare",
+            "fields": {
+              "OP": "EQ"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "EQ",
+              "optionsMode": "static",
+              "options": [
+                "EQ",
+                "GT",
+                "GTE",
+                "LT",
+                "LTE",
+                "NEQ"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_compare",
+            "fields": {
+              "OP": "EQ"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "EQ",
+              "optionsMode": "static",
+              "options": [
+                "EQ",
+                "GT",
+                "GTE",
+                "LT",
+                "LTE",
+                "NEQ"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_compare",
+            "fields": {
+              "OP": "EQ"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "EQ",
+              "optionsMode": "static",
+              "options": [
+                "EQ",
+                "GT",
+                "GTE",
+                "LT",
+                "LTE",
+                "NEQ"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_compare",
+            "fields": {
+              "OP": "EQ"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "logic_negate",
+      "categories": [
+        "logic"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "BOOL",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_negate"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "BOOL",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_negate"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "BOOL",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_negate"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "BOOL",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_negate"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "BOOL",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_negate"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "BOOL",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_negate"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "BOOL",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_negate"
+          }
+        }
+      }
+    },
+    {
+      "type": "logic_null",
+      "categories": [
+        "logic"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_null"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_null"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_null"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_null"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_null"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_null"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_null"
+          }
+        }
+      }
+    },
+    {
+      "type": "logic_operation",
+      "categories": [
+        "logic"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "AND",
+              "optionsMode": "static",
+              "options": [
+                "AND",
+                "OR"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_operation",
+            "fields": {
+              "OP": "AND"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "AND",
+              "optionsMode": "static",
+              "options": [
+                "AND",
+                "OR"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_operation",
+            "fields": {
+              "OP": "AND"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "AND",
+              "optionsMode": "static",
+              "options": [
+                "AND",
+                "OR"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_operation",
+            "fields": {
+              "OP": "AND"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "AND",
+              "optionsMode": "static",
+              "options": [
+                "AND",
+                "OR"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_operation",
+            "fields": {
+              "OP": "AND"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "AND",
+              "optionsMode": "static",
+              "options": [
+                "AND",
+                "OR"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_operation",
+            "fields": {
+              "OP": "AND"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "AND",
+              "optionsMode": "static",
+              "options": [
+                "AND",
+                "OR"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_operation",
+            "fields": {
+              "OP": "AND"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "AND",
+              "optionsMode": "static",
+              "options": [
+                "AND",
+                "OR"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "logic_operation",
+            "fields": {
+              "OP": "AND"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "logic_ternary",
+      "categories": [
+        "logic"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ELSE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "THEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_ternary"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ELSE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "THEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_ternary"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ELSE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "THEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_ternary"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ELSE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "THEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_ternary"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ELSE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "THEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_ternary"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ELSE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "THEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_ternary"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "ELSE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            },
+            {
+              "name": "IF",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            },
+            {
+              "name": "THEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "logic_ternary"
+          }
+        }
+      }
+    }
+  ]
+}

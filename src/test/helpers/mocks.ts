@@ -17,6 +17,7 @@ import { afterEach, beforeEach } from 'mocha';
 export class VSCodeMock {
 	private _outputChannel: any = null;
 	private _configurationStore = new Map<string, Map<string, any>>();
+	private _workspaceFoldersChanged: Array<(event: any) => void> = [];
 
 	public window: any = {
 		createOutputChannel: sinon.stub().callsFake((name: string, options?: any) => {
@@ -137,7 +138,23 @@ export class VSCodeMock {
 				dispose: sinon.stub(),
 			};
 		}),
+		onDidChangeWorkspaceFolders: sinon.stub().callsFake((callback: (event: any) => void) => {
+			this._workspaceFoldersChanged.push(callback);
+			return {
+				dispose: sinon.stub().callsFake(() => {
+					this._workspaceFoldersChanged = this._workspaceFoldersChanged.filter(candidate => candidate !== callback);
+				}),
+			};
+		}),
+		onDidChangeConfiguration: sinon.stub().returns({ dispose: sinon.stub() }),
 	};
+
+	public fireWorkspaceFoldersChanged(added: any[], removed: any[] = []): void {
+		const removedPaths = new Set(removed.map(folder => folder.uri.fsPath));
+		const current = (this.workspace.workspaceFolders || []).filter((folder: any) => !removedPaths.has(folder.uri.fsPath));
+		this.workspace.workspaceFolders = [...current, ...added];
+		for (const callback of [...this._workspaceFoldersChanged]) {callback({ added, removed });}
+	}
 
 	public commands: any = {
 		executeCommand: sinon.stub().returns(Promise.resolve()),
@@ -330,10 +347,10 @@ export class FSMock {
 				}
 				throw new Error(`ENOENT: no such file or directory, open '${path}'`);
 			},
-			writeFile: async (path: string, content: string) => {
+			writeFile: async (path: string, content: string | Uint8Array) => {
 				// Normalize Windows backslashes to forward slashes
 				const normalizedPath = path.replace(/\\/g, '/');
-				this.files.set(normalizedPath, content);
+				this.files.set(normalizedPath, typeof content === 'string' ? content : Buffer.from(content).toString('utf8'));
 			},
 			mkdir: async (path: string, options?: any) => {
 				// Normalize Windows backslashes to forward slashes
@@ -364,6 +381,22 @@ export class FSMock {
 				}
 				throw new Error(`ENOENT: no such file or directory, copyFile '${src}'`);
 			},
+			rename: async (src: string, dest: string) => {
+				const normalizedSrc = src.replace(/\\/g, '/');
+				const normalizedDest = dest.replace(/\\/g, '/');
+				if (!this.files.has(normalizedSrc)) {
+					throw new Error(`ENOENT: no such file or directory, rename '${src}'`);
+				}
+				this.files.set(normalizedDest, this.files.get(normalizedSrc)!);
+				this.files.delete(normalizedSrc);
+				this._fileMetadata.delete(normalizedSrc);
+			},
+			lstat: async (path: string) => {
+				return {
+					...this.statSync(path),
+					isSymbolicLink: () => false,
+				};
+			},
 			stat: async (path: string) => {
 				// Normalize Windows backslashes to forward slashes
 				const normalizedPath = path.replace(/\\/g, '/');
@@ -375,6 +408,7 @@ export class FSMock {
 					return {
 						isFile: () => true,
 						isDirectory: () => false,
+						isSymbolicLink: () => false,
 						size: this.files.get(normalizedPath)!.length,
 						mtime: metadata.mtime,
 						ctime: metadata.ctime,
@@ -383,6 +417,7 @@ export class FSMock {
 					return {
 						isFile: () => false,
 						isDirectory: () => true,
+						isSymbolicLink: () => false,
 						size: 0,
 						mtime: new Date(),
 						ctime: new Date(),
@@ -407,6 +442,7 @@ export class FSMock {
 			return {
 				isFile: () => true,
 				isDirectory: () => false,
+				isSymbolicLink: () => false,
 				size: this.files.get(normalizedPath)!.length,
 				mtime: metadata.mtime,
 				ctime: metadata.ctime,
@@ -417,6 +453,7 @@ export class FSMock {
 			return {
 				isFile: () => false,
 				isDirectory: () => true,
+				isSymbolicLink: () => false,
 				size: 0,
 				mtime: new Date(),
 				ctime: new Date(),

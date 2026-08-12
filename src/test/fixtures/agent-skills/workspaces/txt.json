@@ -1,0 +1,21 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "txt_setup",
+          "id": "agent-skill-txt-root",
+          "x": 24,
+          "y": 24,
+          "deletable": false
+        }
+      ]
+    }
+  },
+  "board": "txt",
+  "txtVirtualControls": {
+    "version": 1,
+    "controls": []
+  }
+}

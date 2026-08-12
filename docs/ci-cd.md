@@ -6,7 +6,7 @@ Singular Blockly 以 PR 為唯一的 `master` 變更入口，並以 annotated `v
 
 `.github/workflows/ci.yml` 會在所有 PR、`master` push 與正式發布 workflow call 執行：
 
-- Node.js 固定為 22.16.0，VS Code 測試版固定為 1.105.0。
+- Node.js 固定為 22.16.0，VS Code 測試版固定為 1.109.0。
 - `npm ci` 使用 lockfile 與 npm cache。
 - 靜態檢查執行 TypeScript／webpack 編譯、`src` 與 i18n／release scripts ESLint、確定性翻譯驗證、whitelist tests、release helper tests，以及高嚴重度 `npm audit`。
 - Ubuntu、Windows、macOS 都執行 unit tests，並用 `--forbid-only` 阻擋 `.only`。

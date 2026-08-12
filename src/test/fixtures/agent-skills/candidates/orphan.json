@@ -1,0 +1,16 @@
+{
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "text_print",
+          "id": "orphan-statement",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    }
+  },
+  "board": "uno"
+}

@@ -1,0 +1,5015 @@
+{
+  "schemaVersion": 3,
+  "category": "math",
+  "blocks": [
+    {
+      "type": "math_arithmetic",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ADD",
+              "optionsMode": "static",
+              "options": [
+                "ADD",
+                "DIVIDE",
+                "MINUS",
+                "MULTIPLY",
+                "POWER"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_arithmetic",
+            "fields": {
+              "OP": "ADD"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ADD",
+              "optionsMode": "static",
+              "options": [
+                "ADD",
+                "DIVIDE",
+                "MINUS",
+                "MULTIPLY",
+                "POWER"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_arithmetic",
+            "fields": {
+              "OP": "ADD"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ADD",
+              "optionsMode": "static",
+              "options": [
+                "ADD",
+                "DIVIDE",
+                "MINUS",
+                "MULTIPLY",
+                "POWER"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_arithmetic",
+            "fields": {
+              "OP": "ADD"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ADD",
+              "optionsMode": "static",
+              "options": [
+                "ADD",
+                "DIVIDE",
+                "MINUS",
+                "MULTIPLY",
+                "POWER"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_arithmetic",
+            "fields": {
+              "OP": "ADD"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ADD",
+              "optionsMode": "static",
+              "options": [
+                "ADD",
+                "DIVIDE",
+                "MINUS",
+                "MULTIPLY",
+                "POWER"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_arithmetic",
+            "fields": {
+              "OP": "ADD"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ADD",
+              "optionsMode": "static",
+              "options": [
+                "ADD",
+                "DIVIDE",
+                "MINUS",
+                "MULTIPLY",
+                "POWER"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_arithmetic",
+            "fields": {
+              "OP": "ADD"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "A",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "B",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ADD",
+              "optionsMode": "static",
+              "options": [
+                "ADD",
+                "DIVIDE",
+                "MINUS",
+                "MULTIPLY",
+                "POWER"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_arithmetic",
+            "fields": {
+              "OP": "ADD"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "math_atan2",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "X",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "Y",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_atan2"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "X",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "Y",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_atan2"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "X",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "Y",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_atan2"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "X",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "Y",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_atan2"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "X",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "Y",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_atan2"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "X",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "Y",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_atan2"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "X",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "Y",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_atan2"
+          }
+        }
+      }
+    },
+    {
+      "type": "math_constant",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CONSTANT",
+              "kind": "dropdown",
+              "defaultValue": "PI",
+              "optionsMode": "static",
+              "options": [
+                "E",
+                "GOLDEN_RATIO",
+                "INFINITY",
+                "PI",
+                "SQRT1_2",
+                "SQRT2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_constant",
+            "fields": {
+              "CONSTANT": "PI"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CONSTANT",
+              "kind": "dropdown",
+              "defaultValue": "PI",
+              "optionsMode": "static",
+              "options": [
+                "E",
+                "GOLDEN_RATIO",
+                "INFINITY",
+                "PI",
+                "SQRT1_2",
+                "SQRT2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_constant",
+            "fields": {
+              "CONSTANT": "PI"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CONSTANT",
+              "kind": "dropdown",
+              "defaultValue": "PI",
+              "optionsMode": "static",
+              "options": [
+                "E",
+                "GOLDEN_RATIO",
+                "INFINITY",
+                "PI",
+                "SQRT1_2",
+                "SQRT2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_constant",
+            "fields": {
+              "CONSTANT": "PI"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CONSTANT",
+              "kind": "dropdown",
+              "defaultValue": "PI",
+              "optionsMode": "static",
+              "options": [
+                "E",
+                "GOLDEN_RATIO",
+                "INFINITY",
+                "PI",
+                "SQRT1_2",
+                "SQRT2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_constant",
+            "fields": {
+              "CONSTANT": "PI"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CONSTANT",
+              "kind": "dropdown",
+              "defaultValue": "PI",
+              "optionsMode": "static",
+              "options": [
+                "E",
+                "GOLDEN_RATIO",
+                "INFINITY",
+                "PI",
+                "SQRT1_2",
+                "SQRT2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_constant",
+            "fields": {
+              "CONSTANT": "PI"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CONSTANT",
+              "kind": "dropdown",
+              "defaultValue": "PI",
+              "optionsMode": "static",
+              "options": [
+                "E",
+                "GOLDEN_RATIO",
+                "INFINITY",
+                "PI",
+                "SQRT1_2",
+                "SQRT2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_constant",
+            "fields": {
+              "CONSTANT": "PI"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CONSTANT",
+              "kind": "dropdown",
+              "defaultValue": "PI",
+              "optionsMode": "static",
+              "options": [
+                "E",
+                "GOLDEN_RATIO",
+                "INFINITY",
+                "PI",
+                "SQRT1_2",
+                "SQRT2"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_constant",
+            "fields": {
+              "CONSTANT": "PI"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "math_constrain",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_constrain"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_constrain"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_constrain"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_constrain"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_constrain"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_constrain"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_constrain"
+          }
+        }
+      }
+    },
+    {
+      "type": "math_map",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "FROM_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "FROM_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_map"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "FROM_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "FROM_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_map"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "FROM_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "FROM_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_map"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "FROM_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "FROM_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_map"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "FROM_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "FROM_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_map"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "FROM_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "FROM_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_map"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "FROM_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "FROM_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_HIGH",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO_LOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_map"
+          }
+        }
+      }
+    },
+    {
+      "type": "math_modulo",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIVIDEND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "DIVISOR",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_modulo"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIVIDEND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "DIVISOR",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_modulo"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIVIDEND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "DIVISOR",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_modulo"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIVIDEND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "DIVISOR",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_modulo"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIVIDEND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "DIVISOR",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_modulo"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIVIDEND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "DIVISOR",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_modulo"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "DIVIDEND",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "DIVISOR",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_modulo"
+          }
+        }
+      }
+    },
+    {
+      "type": "math_number_property",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER_TO_CHECK",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PROPERTY",
+              "kind": "dropdown",
+              "defaultValue": "EVEN",
+              "optionsMode": "static",
+              "options": [
+                "DIVISIBLE_BY",
+                "EVEN",
+                "NEGATIVE",
+                "ODD",
+                "POSITIVE",
+                "PRIME",
+                "WHOLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_number_property",
+            "extraState": "<mutation divisor_input=\"false\"></mutation>",
+            "fields": {
+              "PROPERTY": "EVEN"
+            }
+          },
+          "extraState": "<mutation divisor_input=\"false\"></mutation>"
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER_TO_CHECK",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PROPERTY",
+              "kind": "dropdown",
+              "defaultValue": "EVEN",
+              "optionsMode": "static",
+              "options": [
+                "DIVISIBLE_BY",
+                "EVEN",
+                "NEGATIVE",
+                "ODD",
+                "POSITIVE",
+                "PRIME",
+                "WHOLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_number_property",
+            "extraState": "<mutation divisor_input=\"false\"></mutation>",
+            "fields": {
+              "PROPERTY": "EVEN"
+            }
+          },
+          "extraState": "<mutation divisor_input=\"false\"></mutation>"
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER_TO_CHECK",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PROPERTY",
+              "kind": "dropdown",
+              "defaultValue": "EVEN",
+              "optionsMode": "static",
+              "options": [
+                "DIVISIBLE_BY",
+                "EVEN",
+                "NEGATIVE",
+                "ODD",
+                "POSITIVE",
+                "PRIME",
+                "WHOLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_number_property",
+            "extraState": "<mutation divisor_input=\"false\"></mutation>",
+            "fields": {
+              "PROPERTY": "EVEN"
+            }
+          },
+          "extraState": "<mutation divisor_input=\"false\"></mutation>"
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER_TO_CHECK",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PROPERTY",
+              "kind": "dropdown",
+              "defaultValue": "EVEN",
+              "optionsMode": "static",
+              "options": [
+                "DIVISIBLE_BY",
+                "EVEN",
+                "NEGATIVE",
+                "ODD",
+                "POSITIVE",
+                "PRIME",
+                "WHOLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_number_property",
+            "extraState": "<mutation divisor_input=\"false\"></mutation>",
+            "fields": {
+              "PROPERTY": "EVEN"
+            }
+          },
+          "extraState": "<mutation divisor_input=\"false\"></mutation>"
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER_TO_CHECK",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PROPERTY",
+              "kind": "dropdown",
+              "defaultValue": "EVEN",
+              "optionsMode": "static",
+              "options": [
+                "DIVISIBLE_BY",
+                "EVEN",
+                "NEGATIVE",
+                "ODD",
+                "POSITIVE",
+                "PRIME",
+                "WHOLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_number_property",
+            "extraState": "<mutation divisor_input=\"false\"></mutation>",
+            "fields": {
+              "PROPERTY": "EVEN"
+            }
+          },
+          "extraState": "<mutation divisor_input=\"false\"></mutation>"
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER_TO_CHECK",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PROPERTY",
+              "kind": "dropdown",
+              "defaultValue": "EVEN",
+              "optionsMode": "static",
+              "options": [
+                "DIVISIBLE_BY",
+                "EVEN",
+                "NEGATIVE",
+                "ODD",
+                "POSITIVE",
+                "PRIME",
+                "WHOLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_number_property",
+            "extraState": "<mutation divisor_input=\"false\"></mutation>",
+            "fields": {
+              "PROPERTY": "EVEN"
+            }
+          },
+          "extraState": "<mutation divisor_input=\"false\"></mutation>"
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NUMBER_TO_CHECK",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PROPERTY",
+              "kind": "dropdown",
+              "defaultValue": "EVEN",
+              "optionsMode": "static",
+              "options": [
+                "DIVISIBLE_BY",
+                "EVEN",
+                "NEGATIVE",
+                "ODD",
+                "POSITIVE",
+                "PRIME",
+                "WHOLE"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_number_property",
+            "extraState": "<mutation divisor_input=\"false\"></mutation>",
+            "fields": {
+              "PROPERTY": "EVEN"
+            }
+          },
+          "extraState": "<mutation divisor_input=\"false\"></mutation>"
+        }
+      }
+    },
+    {
+      "type": "math_on_list",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "LIST",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SUM",
+              "optionsMode": "static",
+              "options": [
+                "AVERAGE",
+                "MAX",
+                "MEDIAN",
+                "MIN",
+                "MODE",
+                "RANDOM",
+                "STD_DEV",
+                "SUM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_on_list",
+            "extraState": "<mutation op=\"SUM\"></mutation>",
+            "fields": {
+              "OP": "SUM"
+            }
+          },
+          "extraState": "<mutation op=\"SUM\"></mutation>"
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "LIST",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SUM",
+              "optionsMode": "static",
+              "options": [
+                "AVERAGE",
+                "MAX",
+                "MEDIAN",
+                "MIN",
+                "MODE",
+                "RANDOM",
+                "STD_DEV",
+                "SUM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_on_list",
+            "extraState": "<mutation op=\"SUM\"></mutation>",
+            "fields": {
+              "OP": "SUM"
+            }
+          },
+          "extraState": "<mutation op=\"SUM\"></mutation>"
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "LIST",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SUM",
+              "optionsMode": "static",
+              "options": [
+                "AVERAGE",
+                "MAX",
+                "MEDIAN",
+                "MIN",
+                "MODE",
+                "RANDOM",
+                "STD_DEV",
+                "SUM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_on_list",
+            "extraState": "<mutation op=\"SUM\"></mutation>",
+            "fields": {
+              "OP": "SUM"
+            }
+          },
+          "extraState": "<mutation op=\"SUM\"></mutation>"
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "LIST",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SUM",
+              "optionsMode": "static",
+              "options": [
+                "AVERAGE",
+                "MAX",
+                "MEDIAN",
+                "MIN",
+                "MODE",
+                "RANDOM",
+                "STD_DEV",
+                "SUM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_on_list",
+            "extraState": "<mutation op=\"SUM\"></mutation>",
+            "fields": {
+              "OP": "SUM"
+            }
+          },
+          "extraState": "<mutation op=\"SUM\"></mutation>"
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "LIST",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SUM",
+              "optionsMode": "static",
+              "options": [
+                "AVERAGE",
+                "MAX",
+                "MEDIAN",
+                "MIN",
+                "MODE",
+                "RANDOM",
+                "STD_DEV",
+                "SUM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_on_list",
+            "extraState": "<mutation op=\"SUM\"></mutation>",
+            "fields": {
+              "OP": "SUM"
+            }
+          },
+          "extraState": "<mutation op=\"SUM\"></mutation>"
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "LIST",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SUM",
+              "optionsMode": "static",
+              "options": [
+                "AVERAGE",
+                "MAX",
+                "MEDIAN",
+                "MIN",
+                "MODE",
+                "RANDOM",
+                "STD_DEV",
+                "SUM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_on_list",
+            "extraState": "<mutation op=\"SUM\"></mutation>",
+            "fields": {
+              "OP": "SUM"
+            }
+          },
+          "extraState": "<mutation op=\"SUM\"></mutation>"
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "LIST",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Array"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SUM",
+              "optionsMode": "static",
+              "options": [
+                "AVERAGE",
+                "MAX",
+                "MEDIAN",
+                "MIN",
+                "MODE",
+                "RANDOM",
+                "STD_DEV",
+                "SUM"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_on_list",
+            "extraState": "<mutation op=\"SUM\"></mutation>",
+            "fields": {
+              "OP": "SUM"
+            }
+          },
+          "extraState": "<mutation op=\"SUM\"></mutation>"
+        }
+      }
+    },
+    {
+      "type": "math_random_float",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_float"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_float"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_float"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_float"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_float"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_float"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_float"
+          }
+        }
+      }
+    },
+    {
+      "type": "math_random_int",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FROM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_int"
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FROM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_int"
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FROM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_int"
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FROM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_int"
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FROM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_int"
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FROM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_int"
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "FROM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "TO",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "math_random_int"
+          }
+        }
+      }
+    },
+    {
+      "type": "math_round",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROUND",
+              "optionsMode": "static",
+              "options": [
+                "ROUND",
+                "ROUNDDOWN",
+                "ROUNDUP"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_round",
+            "fields": {
+              "OP": "ROUND"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROUND",
+              "optionsMode": "static",
+              "options": [
+                "ROUND",
+                "ROUNDDOWN",
+                "ROUNDUP"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_round",
+            "fields": {
+              "OP": "ROUND"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROUND",
+              "optionsMode": "static",
+              "options": [
+                "ROUND",
+                "ROUNDDOWN",
+                "ROUNDUP"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_round",
+            "fields": {
+              "OP": "ROUND"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROUND",
+              "optionsMode": "static",
+              "options": [
+                "ROUND",
+                "ROUNDDOWN",
+                "ROUNDUP"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_round",
+            "fields": {
+              "OP": "ROUND"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROUND",
+              "optionsMode": "static",
+              "options": [
+                "ROUND",
+                "ROUNDDOWN",
+                "ROUNDUP"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_round",
+            "fields": {
+              "OP": "ROUND"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROUND",
+              "optionsMode": "static",
+              "options": [
+                "ROUND",
+                "ROUNDDOWN",
+                "ROUNDUP"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_round",
+            "fields": {
+              "OP": "ROUND"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROUND",
+              "optionsMode": "static",
+              "options": [
+                "ROUND",
+                "ROUNDDOWN",
+                "ROUNDUP"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_round",
+            "fields": {
+              "OP": "ROUND"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "math_single",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROOT",
+              "optionsMode": "static",
+              "options": [
+                "ABS",
+                "EXP",
+                "LN",
+                "LOG10",
+                "NEG",
+                "POW10",
+                "ROOT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_single",
+            "fields": {
+              "OP": "ROOT"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROOT",
+              "optionsMode": "static",
+              "options": [
+                "ABS",
+                "EXP",
+                "LN",
+                "LOG10",
+                "NEG",
+                "POW10",
+                "ROOT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_single",
+            "fields": {
+              "OP": "ROOT"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROOT",
+              "optionsMode": "static",
+              "options": [
+                "ABS",
+                "EXP",
+                "LN",
+                "LOG10",
+                "NEG",
+                "POW10",
+                "ROOT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_single",
+            "fields": {
+              "OP": "ROOT"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROOT",
+              "optionsMode": "static",
+              "options": [
+                "ABS",
+                "EXP",
+                "LN",
+                "LOG10",
+                "NEG",
+                "POW10",
+                "ROOT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_single",
+            "fields": {
+              "OP": "ROOT"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROOT",
+              "optionsMode": "static",
+              "options": [
+                "ABS",
+                "EXP",
+                "LN",
+                "LOG10",
+                "NEG",
+                "POW10",
+                "ROOT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_single",
+            "fields": {
+              "OP": "ROOT"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROOT",
+              "optionsMode": "static",
+              "options": [
+                "ABS",
+                "EXP",
+                "LN",
+                "LOG10",
+                "NEG",
+                "POW10",
+                "ROOT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_single",
+            "fields": {
+              "OP": "ROOT"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "ROOT",
+              "optionsMode": "static",
+              "options": [
+                "ABS",
+                "EXP",
+                "LN",
+                "LOG10",
+                "NEG",
+                "POW10",
+                "ROOT"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_single",
+            "fields": {
+              "OP": "ROOT"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "math_trig",
+      "categories": [
+        "math"
+      ],
+      "boards": [
+        "cyberbrick",
+        "esp32",
+        "mega",
+        "nano",
+        "supermini",
+        "txt",
+        "uno"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SIN",
+              "optionsMode": "static",
+              "options": [
+                "ACOS",
+                "ASIN",
+                "ATAN",
+                "COS",
+                "SIN",
+                "TAN"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_trig",
+            "fields": {
+              "OP": "SIN"
+            }
+          }
+        },
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SIN",
+              "optionsMode": "static",
+              "options": [
+                "ACOS",
+                "ASIN",
+                "ATAN",
+                "COS",
+                "SIN",
+                "TAN"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_trig",
+            "fields": {
+              "OP": "SIN"
+            }
+          }
+        },
+        "mega": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SIN",
+              "optionsMode": "static",
+              "options": [
+                "ACOS",
+                "ASIN",
+                "ATAN",
+                "COS",
+                "SIN",
+                "TAN"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_trig",
+            "fields": {
+              "OP": "SIN"
+            }
+          }
+        },
+        "nano": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SIN",
+              "optionsMode": "static",
+              "options": [
+                "ACOS",
+                "ASIN",
+                "ATAN",
+                "COS",
+                "SIN",
+                "TAN"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_trig",
+            "fields": {
+              "OP": "SIN"
+            }
+          }
+        },
+        "supermini": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SIN",
+              "optionsMode": "static",
+              "options": [
+                "ACOS",
+                "ASIN",
+                "ATAN",
+                "COS",
+                "SIN",
+                "TAN"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_trig",
+            "fields": {
+              "OP": "SIN"
+            }
+          }
+        },
+        "txt": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SIN",
+              "optionsMode": "static",
+              "options": [
+                "ACOS",
+                "ASIN",
+                "ATAN",
+                "COS",
+                "SIN",
+                "TAN"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_trig",
+            "fields": {
+              "OP": "SIN"
+            }
+          }
+        },
+        "uno": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "NUM",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "OP",
+              "kind": "dropdown",
+              "defaultValue": "SIN",
+              "optionsMode": "static",
+              "options": [
+                "ACOS",
+                "ASIN",
+                "ATAN",
+                "COS",
+                "SIN",
+                "TAN"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "math_trig",
+            "fields": {
+              "OP": "SIN"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

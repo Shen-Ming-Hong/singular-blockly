@@ -73,14 +73,16 @@
 | Test       | 測試        |                  |
 | Coverage   | 覆蓋率      | 測試覆蓋率       |
 
-## MCP 相關
+## Agent Skills 相關
 
-| 英文       | 繁體中文   | 說明                   |
-| ---------- | ---------- | ---------------------- |
-| MCP        | MCP        | Model Context Protocol |
-| MCP Server | MCP 伺服器 |                        |
-| MCP Tool   | MCP 工具   |                        |
-| STDIO      | STDIO      | 標準輸入輸出           |
+| 英文                 | 繁體中文             | 說明                                      |
+| -------------------- | -------------------- | ----------------------------------------- |
+| Agent Skill          | 代理技能             | 專案內供 AI 自動發現的操作與知識契約      |
+| Canonical Skill      | 正式技能來源         | `.agents/skills/singular-blockly/`         |
+| Compatibility Entry  | 相容入口             | 指向正式來源的精簡一般檔案                |
+| Block Contract       | 積木契約             | 由真實 Blockly runtime 產生的公開 metadata |
+| Candidate Workspace  | 候選工作區           | 尚未通過 runtime 驗證的外部 `main.json`    |
+| Last Valid Workspace | 最後有效工作區       | 驗證失敗時的磁碟或記憶體復原來源          |
 
 ## i18n 相關
 

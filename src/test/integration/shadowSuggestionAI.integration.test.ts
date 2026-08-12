@@ -34,6 +34,13 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 		console.log(line);
 	}
 
+	async function selectModelsWithTimeout(selector: vscode.LanguageModelChatSelector): Promise<readonly vscode.LanguageModelChat[]> {
+		return await Promise.race([
+			vscode.lm.selectChatModels(selector),
+			new Promise<readonly vscode.LanguageModelChat[]>(resolve => setTimeout(() => resolve([]), 2_000)),
+		]);
+	}
+
 	suiteSetup(async () => {
 		// Ensure result directory exists
 		if (!fs.existsSync(resultDir)) {
@@ -49,7 +56,7 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 
 		while (Date.now() - startTime < maxWaitMs) {
 			try {
-				const models = await vscode.lm.selectChatModels({ family: 'gpt-5-mini' });
+				const models = await selectModelsWithTimeout({ family: 'gpt-5-mini' });
 				if (models.length > 0) {
 					copilotAvailable = true;
 					logResult(
@@ -58,7 +65,7 @@ suite('ShadowSuggestionService Integration (Real Copilot API)', function () {
 					break;
 				}
 				// Try all models as fallback
-				const allModels = await vscode.lm.selectChatModels({});
+				const allModels = await selectModelsWithTimeout({});
 				if (allModels.length > 0) {
 					copilotAvailable = true;
 					logResult(

@@ -1,13 +1,10 @@
 {
-	"command.checkMcpStatus.title": "Check MCP Status",
 	"command.checkPlatformioStatus.title": "Check PlatformIO Status",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI Suggestions Settings",
 	"command.toggleAIEnabled.title": "Singular Blockly: Toggle AI Suggestions",
 	"command.selectAIModel.title": "Singular Blockly: Select AI Model",
 	"command.openAISettings.title": "Singular Blockly: Open AI Settings",
 	"command.triggerAISuggestion.title": "Singular Blockly: Trigger AI Block Suggestion",
-	"config.mcp.nodePath.description": "Path to Node.js executable for MCP Server. Default 'node' uses system PATH. For nvm/fnm users, specify the full absolute path (e.g., C:\\Users\\username\\.nvm\\versions\\node\\v22.16.0\\node.exe).",
-	"config.mcp.showStartupWarning.description": "Show warning message when Node.js is not available or version is too low at startup. Disable this if you don't need MCP AI features.",
 	"singularBlockly.ai.enabled.markdownDescription": "Enable/disable AI shadow block suggestions. Requires GitHub Copilot extension.",
 	"singularBlockly.ai.model.markdownDescription": "Language model to use for AI suggestions. Only lightweight models suitable for fast suggestions are listed. Available models depend on your Copilot plan.",
 	"singularBlockly.ai.triggerDelay.markdownDescription": "Delay in milliseconds before triggering AI suggestion after a workspace change.",

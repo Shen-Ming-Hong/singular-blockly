@@ -1,6 +1,6 @@
 # Singular Blockly 開發歷程與功能演進
 
-> 本文件記錄專案從 specs/001 到 specs/044 的開發軌跡，包含功能新增、架構變更、已移除功能的前因後果。
+> 本文件記錄專案從 specs/001 到 specs/066 的開發軌跡，包含功能新增、架構變更、已移除功能的前因後果。
 
 ## 時間軸總覽
 
@@ -51,6 +51,9 @@
          ├─ 041 MCP bundling 修復
          ├─ 042 上傳錯誤分類
          └─ 044 防止孤立積木三層防護
+         │
+2026-08 ─┼─ 065 Blockly 13 現代化
+         └─ 066 Agent Skills 取代舊 AI server
 ```
 
 ---
@@ -373,7 +376,7 @@ if (window.currentBoard.includes('esp32')) {
 1. **漸進式依賴升級**：五階段策略避免大爆炸式升級風險
 2. **雙序列化 hooks**：保持 XML 向後相容同時支援新 JSON 系統
 3. **白名單機制**：i18n 誤報從 61 件降至 0 件
-4. **MCP 整合架構**：STDIO 傳輸、FileWatcher 模式、原子寫入備份
+4. **Agent Skills 架構**：專案內可版本化契約、runtime 衍生 metadata、原子更新與候選隔離
 
 ### 改進空間
 
@@ -444,4 +447,16 @@ Node.js 缺失時優雅降級不影響核心功能（040），SDK 完整打包�
 
 ---
 
-_最後更新：2026-02_
+## 第八階段：Blockly 13 與 Agent Skills（065-066）
+
+### 065 - Blockly 13 現代化（2026-08）
+
+升級至 Blockly 13.2.1 與 Modern Theme 13.2.0，統一 editor／preview runtime、locale、公開 API、動態狀態、可及性與相容性測試。
+
+### 066 - Agent Skills 取代舊 AI server（2026-08）
+
+將 AI 能力改為專案內英文 Agent Skills。公開積木契約由真實 Blockly runtime 與各板工具箱產生，Codex 與 Claude Code 讀取同一正式來源；外部工作區修改須通過 disposable load/save/load、正式載入 acknowledgement、隔離及最後有效版本復原。舊 server、SDK、Node.js 路徑偵測、使用者命令與設定在同一版本完整移除，最低 VS Code 提高至 1.109。
+
+---
+
+_最後更新：2026-08-12_

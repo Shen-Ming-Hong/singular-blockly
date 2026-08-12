@@ -1,0 +1,585 @@
+{
+  "schemaVersion": 3,
+  "category": "cyberbrick_core",
+  "blocks": [
+    {
+      "type": "cyberbrick_delay_ms",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TIME",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_delay_ms"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_delay_s",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "TIME",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_delay_s"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_gpio_read",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "cyberbrick_gpio_read",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_gpio_set",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "VALUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Boolean"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "PIN",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "dynamic",
+              "options": [
+                "0",
+                "1",
+                "10",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "cyberbrick_gpio_set",
+            "fields": {
+              "PIN": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_led_digital",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "B_STATE",
+              "kind": "dropdown",
+              "defaultValue": "ON",
+              "optionsMode": "dynamic",
+              "options": [
+                "OFF",
+                "ON"
+              ]
+            },
+            {
+              "name": "G_STATE",
+              "kind": "dropdown",
+              "defaultValue": "ON",
+              "optionsMode": "dynamic",
+              "options": [
+                "OFF",
+                "ON"
+              ]
+            },
+            {
+              "name": "R_STATE",
+              "kind": "dropdown",
+              "defaultValue": "ON",
+              "optionsMode": "dynamic",
+              "options": [
+                "OFF",
+                "ON"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "cyberbrick_led_digital",
+            "fields": {
+              "R_STATE": "ON",
+              "G_STATE": "ON",
+              "B_STATE": "ON"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_led_off",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_led_off"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_led_set_color",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "BLUE",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "GREEN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "RED",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_led_set_color"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_ticks_diff",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "NOW",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "START",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_ticks_diff"
+          }
+        }
+      }
+    },
+    {
+      "type": "cyberbrick_ticks_ms",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "cyberbrick_ticks_ms"
+          }
+        }
+      }
+    },
+    {
+      "type": "micropython_main",
+      "categories": [
+        "cyberbrick_core"
+      ],
+      "boards": [
+        "cyberbrick"
+      ],
+      "variants": {
+        "cyberbrick": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "MAIN",
+              "kind": "STATEMENT",
+              "connection": {
+                "enabled": true,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "micropython_main",
+            "deletable": false
+          }
+        }
+      }
+    }
+  ]
+}

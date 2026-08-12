@@ -19,6 +19,7 @@ const extensionConfig = {
 		path: path.resolve(__dirname, 'dist'),
 		filename: 'extension.js',
 		libraryTarget: 'commonjs2',
+		clean: true,
 	},
 	externals: {
 		vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
@@ -45,7 +46,7 @@ const extensionConfig = {
 	plugins: [
 		new CopyPlugin({
 			patterns: [
-				{ from: 'src/mcp/block-dictionary.json', to: 'block-dictionary.json' },
+				{ from: 'resources/project-skills/singular-blockly', to: 'project-skills/singular-blockly' },
 			],
 		}),
 	],
@@ -55,70 +56,4 @@ const extensionConfig = {
 	},
 };
 
-/** @type WebpackConfig */
-const mcpServerConfig = {
-	target: 'node',
-	mode: 'none',
-	entry: './src/mcp/mcpServer.ts',
-	output: {
-		path: path.resolve(__dirname, 'dist'),
-		filename: 'mcp-server.js',
-		libraryTarget: 'commonjs2',
-	},
-	externals: {
-		vscode: 'commonjs vscode',
-	},
-	resolve: {
-		extensions: ['.ts', '.js'],
-		plugins: [
-			{
-				// 自訂 resolver：僅對相對/絕對路徑的 .js import 嘗試 .ts 解析
-				// 取代全域 extensionAlias 以避免與 SDK exports map 衝突
-				apply(resolver) {
-					const target = resolver.ensureHook('resolve');
-					resolver.getHook('described-resolve').tapAsync('TsJsResolverPlugin', (request, resolveContext, callback) => {
-						const req = request.request;
-						if (
-							typeof req === 'string' &&
-							(req.startsWith('./') || req.startsWith('../') || req.startsWith('/')) &&
-							req.endsWith('.js')
-						) {
-							const tsRequest = req.replace(/\.js$/, '.ts');
-							resolver.doResolve(
-								target,
-								{ ...request, request: tsRequest },
-								'TsJsResolverPlugin: .js → .ts',
-								resolveContext,
-								(err, result) => {
-									if (result) return callback(null, result);
-									return callback(); // fallback to original .js
-								}
-							);
-						} else {
-							return callback();
-						}
-					});
-				},
-			},
-		],
-	},
-	module: {
-		rules: [
-			{
-				test: /\.ts$/,
-				exclude: /node_modules/,
-				use: [
-					{
-						loader: 'ts-loader',
-					},
-				],
-			},
-		],
-	},
-	devtool: 'nosources-source-map',
-	infrastructureLogging: {
-		level: 'log',
-	},
-};
-
-module.exports = [extensionConfig, mcpServerConfig];
+module.exports = extensionConfig;

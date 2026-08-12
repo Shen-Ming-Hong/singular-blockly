@@ -19,7 +19,7 @@ import { AIModelManager, TierConfig } from '../../services/aiModelManager';
  * 涵蓋範圍:
  * 1. requestSuggestion() - 建議請求與快取
  * 2. parseResponse() - JSON 解析策略
- * 3. Block dictionary 載入
+ * 3. Block contract 載入
  * 4. 錯誤處理
  */
 
@@ -29,8 +29,11 @@ suite('ShadowSuggestionService Tests', () => {
 	let mockModelManager: sinon.SinonStubbedInstance<AIModelManager>;
 	let tempDir: string;
 
-	// Mock block dictionary data
-	const mockDictionary = {
+	// Mock runtime-derived block contract data
+	const mockContract = {
+		schemaVersion: 3,
+		blocklyVersion: '13.2.1',
+		boards: [{ id: 'esp32', language: 'arduino', toolbox: 'index' }],
 		blocks: [
 			{ type: 'controls_if', category: 'logic', descriptions: { en: 'If block' } },
 			{ type: 'controls_repeat_ext', category: 'loops', descriptions: { en: 'Repeat block' } },
@@ -39,6 +42,63 @@ suite('ShadowSuggestionService Tests', () => {
 			{ type: 'controls_for', category: 'loops', descriptions: { en: 'For loop' } },
 		],
 	};
+
+	function contractEntries(source: any): any[] {
+		return source.blocks.map((block: any) => {
+			const boards = block.boards || ['esp32'];
+			return {
+				type: block.type,
+				categories: [block.category],
+				boards,
+				variants: Object.fromEntries(boards.map((board: string) => [board, {
+						connections: {
+							previous: { enabled: true, check: null },
+							next: { enabled: true, check: null },
+							output: { enabled: false, check: null },
+						},
+						inputs: (block.inputs || []).map((input: any) => ({
+							name: input.name,
+							kind: input.type === 'statement' ? 'STATEMENT' : 'VALUE',
+							connection: { enabled: true, check: input.check ? [input.check].flat() : null },
+						})),
+						fields: block.fields || [],
+						minimalState: { type: block.type },
+					}])),
+			};
+		});
+	}
+
+	function writeContract(source: any): void {
+		const contractDir = path.join(tempDir, 'resources', 'project-skills', 'singular-blockly', 'canonical', 'references');
+		const entries = contractEntries(source);
+		const groups = new Map<string, any[]>();
+		for (const entry of entries) {
+			const category = entry.categories[0];
+			groups.set(category, [...(groups.get(category) || []), entry]);
+		}
+		const shards = [...groups.entries()]
+			.sort(([left], [right]) => left.localeCompare(right, 'en'))
+			.map(([category, blocks]) => ({
+				category,
+				path: `block-contract/${category}.json`,
+				blockTypes: blocks.map(block => block.type).sort((left, right) => left.localeCompare(right, 'en')),
+				blocks: blocks.sort((left, right) => left.type.localeCompare(right.type, 'en')),
+			}));
+		fs.mkdirSync(path.join(contractDir, 'block-contract'), { recursive: true });
+		fs.writeFileSync(path.join(contractDir, 'block-contract.json'), JSON.stringify({
+			schemaVersion: 3,
+			blocklyVersion: source.blocklyVersion,
+			boards: source.boards,
+			shards: shards.map(({ category, path: shardPath, blockTypes }) => ({ category, path: shardPath, blockTypes })),
+		}));
+		for (const shard of shards) {
+			fs.writeFileSync(path.join(contractDir, 'block-contract', `${shard.category}.json`), JSON.stringify({
+				schemaVersion: 3,
+				category: shard.category,
+				blocks: shard.blocks,
+			}));
+		}
+	}
 
 	// Helper: create a basic workspace context
 	function createContext(overrides?: Partial<WorkspaceContext>): WorkspaceContext {
@@ -98,11 +158,9 @@ suite('ShadowSuggestionService Tests', () => {
 	setup(() => {
 		sandbox = sinon.createSandbox();
 
-		// Create a temp directory with mock block dictionary at expected path
+		// Create a temp directory with a mock block contract at the development path
 		tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-test-'));
-		const dictDir = path.join(tempDir, 'src', 'mcp');
-		fs.mkdirSync(dictDir, { recursive: true });
-		fs.writeFileSync(path.join(dictDir, 'block-dictionary.json'), JSON.stringify(mockDictionary));
+		writeContract(mockContract);
 
 		// Create a stubbed AIModelManager
 		mockModelManager = sandbox.createStubInstance(AIModelManager);
@@ -242,7 +300,7 @@ suite('ShadowSuggestionService Tests', () => {
 			assert.strictEqual(result!.suggestions[0].blockType, 'math_number');
 		});
 
-		test('Should validate block types against dictionary', async () => {
+		test('Should validate block types against the block contract', async () => {
 			const json = JSON.stringify([
 				{ blockType: 'controls_if', connectionType: 'next' },
 				{ blockType: 'fake_block_xyz', connectionType: 'next' },
@@ -255,35 +313,55 @@ suite('ShadowSuggestionService Tests', () => {
 			assert.strictEqual(result!.suggestions.length, 1, 'Should filter out unknown block type');
 			assert.strictEqual(result!.suggestions[0].blockType, 'controls_if');
 		});
+
+		test('Should reject block types that do not support the active board after board switches', async () => {
+			const boardScopedContract = {
+				...mockContract,
+				boards: [
+					{ id: 'uno', language: 'arduino', toolbox: 'index' },
+					{ id: 'esp32', language: 'arduino', toolbox: 'index' },
+				],
+				blocks: [
+					{ type: 'math_number', category: 'math', descriptions: { en: 'Number' }, boards: ['uno', 'esp32'] },
+					{ type: 'esp32_wifi_connect', category: 'communication', descriptions: { en: 'Wi-Fi' }, boards: ['esp32'] },
+				],
+			};
+			writeContract(boardScopedContract);
+			service = new ShadowSuggestionService(mockModelManager as any, tempDir);
+			mockModelManager.sendPrompt.resolves(createMockResponse('[{"blockType":"esp32_wifi_connect"}]'));
+
+			assert.ok(await service.requestSuggestion(createContext({ board: 'esp32' })));
+			assert.strictEqual(await service.requestSuggestion(createContext({ board: 'uno' })), null);
+		});
 	});
 
-	suite('Block dictionary loading', () => {
-		test('Should load and cache dictionary', async () => {
+	suite('Block contract loading', () => {
+		test('Should load and cache the block contract', async () => {
 			const json = JSON.stringify([{ blockType: 'controls_if', connectionType: 'next' }]);
 			// Use callsFake so each call creates a fresh async generator (resolves shares one exhausted instance)
 			mockModelManager.sendPrompt.callsFake(() => Promise.resolve(createMockResponse(json)));
 
-			// First request triggers dictionary load
+			// First request triggers contract load
 			await service.requestSuggestion(createContext());
 
-			// Second request should use cached dictionary (internal cache in service)
+			// Second request should use the cached contract (internal cache in service)
 			const result = await service.requestSuggestion(createContext());
 
-			assert.ok(result, 'Should work with cached dictionary');
+			assert.ok(result, 'Should work with the cached contract');
 		});
 
-		test('Should handle dictionary load failure gracefully', async () => {
+		test('Should handle contract load failure gracefully', async () => {
 			// Create a fresh service pointing to non-existent path
 			const freshService = new ShadowSuggestionService(mockModelManager as any, '/nonexistent/path');
 
-			// Response with suggestions — won't be validated against dictionary since load failed
+			// Response with suggestions is not validated against the contract when loading failed.
 			const json = JSON.stringify([{ blockType: 'any_block', connectionType: 'next' }]);
 			mockModelManager.sendPrompt.resolves(createMockResponse(json));
 
 			const result = await freshService.requestSuggestion(createContext());
 
-			// When dictionary fails, blockTypeSet is undefined and validation passes
-			assert.ok(result, 'Should still work when dictionary fails to load');
+			// When the contract fails, blockTypeSet is undefined and validation passes.
+			assert.ok(result, 'Should still work when the contract fails to load');
 		});
 	});
 
@@ -471,17 +549,16 @@ suite('ShadowSuggestionService Tests', () => {
 				},
 			]);
 
-			// Need math_arithmetic and variables_get in mock dictionary
+			// Need math_arithmetic and variables_get in the mock contract.
 			const extendedDict = {
 				blocks: [
-					...mockDictionary.blocks,
+					...mockContract.blocks,
 					{ type: 'math_arithmetic', category: 'math', descriptions: { en: 'Arithmetic' } },
 					{ type: 'variables_get', category: 'variables', descriptions: { en: 'Get variable' } },
 				],
 			};
-			const dictDir = path.join(tempDir, 'src', 'mcp');
-			fs.writeFileSync(path.join(dictDir, 'block-dictionary.json'), JSON.stringify(extendedDict));
-			// Re-create service so it picks up the new dictionary
+			writeContract(extendedDict as typeof mockContract);
+			// Re-create the service so it picks up the new contract.
 			service = new ShadowSuggestionService(mockModelManager as any, tempDir);
 			mockModelManager.sendPrompt.resolves(createMockResponse(badJson));
 
@@ -536,10 +613,9 @@ suite('ShadowSuggestionService Tests', () => {
 
 		test('Should normalize missing OP field on math_arithmetic to "ADD"', async () => {
 			const extendedDict = {
-				blocks: [...mockDictionary.blocks, { type: 'math_arithmetic', category: 'math', descriptions: { en: '' } }],
+				blocks: [...mockContract.blocks, { type: 'math_arithmetic', category: 'math', descriptions: { en: '' } }],
 			};
-			const dictDir = path.join(tempDir, 'src', 'mcp');
-			fs.writeFileSync(path.join(dictDir, 'block-dictionary.json'), JSON.stringify(extendedDict));
+			writeContract(extendedDict as typeof mockContract);
 			service = new ShadowSuggestionService(mockModelManager as any, tempDir);
 
 			const json = JSON.stringify([

@@ -3924,7 +3924,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// T002: 剪貼簿操作鎖定旗標 - 防止 Ctrl+C/V/X 期間觸發不完整儲存
 	let isClipboardOperationInProgress = false;
 	// T003: FileWatcher 重載請求暫存 - 延遲到拖曳結束後執行
-	let pendingReloadFromFileWatcher = null;
+	let pendingExternalWorkspaceLoad = null;
 	// T004: 剪貼簿操作鎖定計時器
 	let clipboardLockTimer = null;
 	// T004a: 剪貼簿操作最大鎖定時間（防止無限延長）
@@ -3974,44 +3974,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 	 * 在拖曳結束後檢查並執行暫存的重載請求
 	 */
 	const processPendingReload = () => {
-		if (pendingReloadFromFileWatcher && !isCurrentlyDragging()) {
-			log.info('拖曳結束，執行待處理的 FileWatcher 重載');
-			const pendingMessage = pendingReloadFromFileWatcher;
-			pendingReloadFromFileWatcher = null;
-
-			// 設置 FileWatcher 載入鎖定
-			isLoadingFromFileWatcher = true;
-
-			// 執行重載邏輯（模擬收到 loadWorkspace 訊息）
-			try {
-				if (pendingMessage.board) {
-					const boardSelect = document.getElementById('boardSelect');
-					if (boardSelect) {
-						boardSelect.value = pendingMessage.board;
-						updateBoardSelectionUI(boardSelect);
-						window.setCurrentBoard(pendingMessage.board);
-					}
-				}
-				if (pendingMessage.theme) {
-					currentTheme = pendingMessage.theme;
-					updateTheme(currentTheme);
-				}
-				if (pendingMessage.state) {
-					migrateWorkspaceState(pendingMessage.state);
-					withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(pendingMessage.state, workspace));
-					rebuildPwmConfig(workspace);
-					updateMainBlockDeletable(workspace);
-				}
-				applyTxtVirtualControlsDocument(pendingMessage.txtVirtualControls, { preserveExecutionMode: true });
-			} catch (error) {
-				log.error('執行待處理的 FileWatcher 重載失敗:', error);
-			}
-
-			// 延遲重置鎖定
-			setTimeout(() => {
-				isLoadingFromFileWatcher = false;
-				log.info('FileWatcher 重載完成，恢復保存操作');
-			}, 1500);
+		if (pendingExternalWorkspaceLoad && !isCurrentlyDragging()) {
+			log.info('拖曳結束，執行待處理的外部工作區重載');
+			const pendingMessage = pendingExternalWorkspaceLoad;
+			pendingExternalWorkspaceLoad = null;
+			void handleWorkspaceLoadMessage(pendingMessage);
 		}
 	};
 
@@ -4650,30 +4617,92 @@ document.addEventListener('DOMContentLoaded', async () => {
 		});
 	}
 
+	const postWorkspaceLoadFailure = (message, code = 'LIVE_LOAD_FAILED') => {
+		if (message.initialLoadRequestId) {
+			vscode.postMessage({
+				command: 'workspaceInitialLoadResult',
+				requestId: message.initialLoadRequestId,
+				success: false,
+				issue: { code },
+			});
+		}
+		if (message.requestId) {
+			vscode.postMessage({
+				command: 'workspaceLiveLoadResult',
+				requestId: message.requestId,
+				generation: message.generation,
+				success: false,
+				issue: { code },
+			});
+		}
+	};
+	const isWorkspaceLoadExpired = message => Boolean(message.deadlineAt && Date.now() >= message.deadlineAt);
+	const getFunctionNamesById = targetWorkspace => {
+		const names = new Map();
+		try {
+			targetWorkspace.getBlocksByType('arduino_function', false).forEach(block => {
+				const name = block.getFieldValue('NAME');
+				if (name) names.set(block.id, name);
+			});
+		} catch (error) {
+			log.info('取得現有函數名稱失敗', error);
+		}
+		return names;
+	};
+	const repairFunctionReferences = (targetWorkspace, previousNames, updateGeneratedCode = false) => {
+		const functionNameChanges = new Map();
+		targetWorkspace.getBlocksByType('arduino_function', false).forEach(block => {
+			const oldName = previousNames.get(block.id);
+			const newName = block.getFieldValue('NAME');
+			if (oldName && newName && oldName !== newName) {
+				functionNameChanges.set(oldName, newName);
+				block.oldName_ = newName;
+			}
+		});
+		const callBlocks = targetWorkspace.getBlocksByType('arduino_function_call', false);
+		for (const callBlock of callBlocks) {
+			const replacement = functionNameChanges.get(callBlock.getFieldValue('NAME'));
+			if (replacement) callBlock.getField('NAME')?.setValue(replacement);
+			if (typeof callBlock.updateFromFunctionBlock_ === 'function') callBlock.updateFromFunctionBlock_();
+		}
+		if (updateGeneratedCode) {
+			try {
+				vscode.postMessage({
+					command: 'updateCode',
+					code: generateCode(targetWorkspace),
+					language: window.currentProgrammingLanguage,
+				});
+			} catch (error) {
+				log.warn('更新程式碼失敗:', error);
+			}
+		}
+	};
+
 	const handleWorkspaceLoadMessage = async message => {
 		const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
 			log.warn('找不到主工作區，無法載入狀態');
+			postWorkspaceLoadFailure(message);
 			return;
 		}
 
 		try {
 			// 如果是 FileWatcher 觸發的重載，設置鎖定標記防止無限循環
 			const isFromFileWatcher = message.source === 'fileWatcher';
+			const isExternalCandidate = isFromFileWatcher || message.source === 'validatedCandidate';
 			const workspaceState = message.state?.workspace || message.state || message.workspace;
 			const txtVirtualControls = message.txtVirtualControls || message.state?.txtVirtualControls;
-			const preserveTxtVirtualControlExecutionMode = isFromFileWatcher && txtVirtualControlsState.document.canvas.mode === 'running';
+			const preserveTxtVirtualControlExecutionMode = isExternalCandidate && txtVirtualControlsState.document.canvas.mode === 'running';
 
-			// T008: 如果是 FileWatcher 觸發且正在拖曳，延遲執行重載
-			if (isFromFileWatcher && isCurrentlyDragging()) {
-				log.info('[FileWatcher] 偵測到拖曳中，延遲重載請求');
-				pendingReloadFromFileWatcher = {
-					state: workspaceState,
-					board: message.board,
-					theme: message.theme,
-					txtVirtualControls,
-				};
+			// 外部候選不得在拖曳期間改動 live workspace。
+			if (isExternalCandidate && isCurrentlyDragging()) {
+				log.info('[WorkspaceCandidate] 偵測到拖曳中，延遲重載請求');
+				pendingExternalWorkspaceLoad = message;
 				return; // 提前返回，等待拖曳結束後執行
+			}
+			if (isWorkspaceLoadExpired(message)) {
+				postWorkspaceLoadFailure(message, 'VALIDATION_TIMEOUT');
+				return;
 			}
 
 			setTxtVirtualControlPendingLoadOptions(workspaceState);
@@ -4682,9 +4711,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 				txtVirtualControlsState.selectedStableId = txtVirtualControlsState.document.controls[0]?.stableId || null;
 			}
 
-			if (isFromFileWatcher) {
+			if (isExternalCandidate) {
 				isLoadingFromFileWatcher = true;
-				log.info('FileWatcher 觸發的工作區重載，暫停保存操作');
+				log.info('外部工作區重載，暫停保存操作');
 			}
 
 			if (message.board) {
@@ -4720,21 +4749,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 				currentTheme = message.theme;
 				updateTheme(currentTheme);
 			}
+			if (isWorkspaceLoadExpired(message)) {
+				isLoadingFromFileWatcher = false;
+				clearTxtVirtualControlPendingLoadOptions();
+				postWorkspaceLoadFailure(message, 'VALIDATION_TIMEOUT');
+				return;
+			}
 
 			if (workspaceState) {
-				// 儲存函數名稱以用於追蹤變更
-				const preSaveFunctionNames = new Map();
-				try {
-					// 先取得工作區中的函數名稱以進行比較
-					workspace.getBlocksByType('arduino_function', false).forEach(block => {
-						const name = block.getFieldValue('NAME');
-						if (name) {
-							preSaveFunctionNames.set(block.id, name);
-						}
-					});
-				} catch (e) {
-					log.info('取得現有函數名稱失敗', e);
-				}
+				const preSaveFunctionNames = getFunctionNamesById(workspace);
 
 				// 遷移舊版格式後再載入工作區內容
 				migrateWorkspaceState(workspaceState);
@@ -4746,6 +4769,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				rebuildPwmConfig(workspace);
 				updateMainBlockDeletable(workspace);
 				refreshTxtVirtualButtonReferences();
+				repairFunctionReferences(workspace, preSaveFunctionNames, true);
 				if (txtVirtualControls?.canvas?.lastViewport) {
 					requestAnimationFrame(() => {
 						workspace.scroll(txtVirtualControls.canvas.lastViewport.scrollX || 0, txtVirtualControls.canvas.lastViewport.scrollY || 0);
@@ -4755,68 +4779,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 					});
 				}
 
-				// 工作區載入後，立即修復函數名稱關聯
-				setTimeout(() => {
-					log.info('工作區載入完成，修復函數名稱關聯');
-
-					// 取得所有函數積木
-					const functionBlocks = workspace.getBlocksByType('arduino_function', false);
-
-					// 記錄函數定義的名稱變更
-					const functionNameChanges = new Map();
-					functionBlocks.forEach(block => {
-						const oldName = preSaveFunctionNames.get(block.id);
-						const newName = block.getFieldValue('NAME');
-						if (oldName && newName && oldName !== newName) {
-							log.info(`檢測到函數名稱變更: ${oldName} -> ${newName}`);
-							functionNameChanges.set(oldName, newName);
-
-							// 將新名稱保存到 oldName_ 屬性中，以便後續修改名稱時能正確比較
-							block.oldName_ = newName;
-						}
-					});
-
-					// 應用名稱變更到所有函數呼叫積木
-					if (functionNameChanges.size > 0) {
-						const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
-						callBlocks.forEach(block => {
-							const currentName = block.getFieldValue('NAME');
-							const newName = functionNameChanges.get(currentName);
-							if (newName) {
-								log.info(`更新函數呼叫積木名稱: ${currentName} -> ${newName}`);
-
-								// 更新名稱
-								const nameField = block.getField('NAME');
-								if (nameField) {
-									nameField.setValue(newName);
-								}
-							}
-						});
-					}
-
-					// 強制更新所有函數呼叫積木
-					const callBlocks = workspace.getBlocksByType('arduino_function_call', false);
-					callBlocks.forEach(callBlock => {
-						try {
-							log.info(`更新函數呼叫積木: ${callBlock.getFieldValue('NAME')}`);
-							callBlock.updateFromFunctionBlock_();
-						} catch (err) {
-							log.error('更新函數呼叫積木失敗:', err);
-						}
-					});
-
-					// 更新程式碼
-					try {
-						const code = generateCode(workspace);
-						vscode.postMessage({
-							command: 'updateCode',
-							code: code,
-							language: window.currentProgrammingLanguage,
-						});
-					} catch (err) {
-						log.warn('更新程式碼失敗:', err);
-					}
-				}, 300);
 			}
 			if (!workspaceState) {
 				applyTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode });
@@ -4824,17 +4786,259 @@ document.addEventListener('DOMContentLoaded', async () => {
 			}
 
 			// 如果是 FileWatcher 觸發的重載，延遲後重置鎖定標記
-			if (isFromFileWatcher) {
+			if (isExternalCandidate) {
 				setTimeout(() => {
 					isLoadingFromFileWatcher = false;
 					log.info('FileWatcher 重載完成，恢復保存操作');
 				}, 1500); // 給足夠時間讓所有事件處理完成
+			}
+			if (isWorkspaceLoadExpired(message)) {
+				isLoadingFromFileWatcher = false;
+				postWorkspaceLoadFailure(message, 'VALIDATION_TIMEOUT');
+				return;
+			}
+			const normalizedDocument = appendTxtVirtualControlsPayload({
+				...(message.document || {}),
+				workspace: window.blocklyRuntime.saveWorkspaceState(workspace),
+				board: message.board || 'none',
+			}, message.board || 'none');
+			if (message.requestId) {
+				vscode.postMessage({
+					command: 'workspaceLiveLoadResult',
+					requestId: message.requestId,
+					generation: message.generation,
+					success: true,
+					normalizedDocument,
+				});
+			}
+			if (message.initialLoadRequestId) {
+				vscode.postMessage({
+					command: 'workspaceInitialLoadResult',
+					requestId: message.initialLoadRequestId,
+					success: true,
+					normalizedDocument,
+				});
 			}
 		} catch (error) {
 			log.error('載入工作區狀態失敗:', error);
 			// 發生錯誤時也要重置鎖定標記
 			isLoadingFromFileWatcher = false;
 			clearTxtVirtualControlPendingLoadOptions();
+			postWorkspaceLoadFailure(message);
+		}
+	};
+
+	const validateWorkspaceCandidateDocument = message => {
+		const documentState = message.document;
+		const originalBoard = window.currentBoard;
+		const originalLanguage = window.currentProgrammingLanguage;
+		const originalWorkspaceGetter = window.getBlocklyWorkspace;
+		const liveWorkspace = typeof originalWorkspaceGetter === 'function' ? originalWorkspaceGetter() : null;
+		let firstWorkspace;
+		let secondWorkspace;
+		try {
+			if (!documentState || typeof documentState !== 'object' || !documentState.workspace) {
+				throw { code: 'EMPTY_WORKSPACE' };
+			}
+			const contract = window.SINGULAR_BLOCK_CONTRACT;
+			const contractByType = new Map((contract?.blocks || []).map(block => [block.type, block]));
+			if (!window.BOARD_CONFIGS?.[documentState.board] || !contract?.boards?.some(board => board.id === documentState.board)) {
+				throw { code: 'BOARD_MISMATCH' };
+			}
+
+			const serialized = JSON.parse(JSON.stringify(documentState.workspace));
+			const candidateBlocks = serialized?.blocks?.blocks;
+			const normalizedTxtVirtualControls = documentState.board === 'txt'
+				? cloneTxtVirtualControlsDocument(documentState.txtVirtualControls, { forceEditingMode: true })
+				: undefined;
+			const hasCandidateBlocks = Array.isArray(candidateBlocks) && candidateBlocks.length > 0;
+			const hasTxtVirtualControls = Boolean(normalizedTxtVirtualControls?.controls.length);
+			if (!hasCandidateBlocks && !hasTxtVirtualControls) {
+				throw { code: 'EMPTY_WORKSPACE' };
+			}
+			const validateField = (field, value, blockType) => {
+				if (field.optionsMode !== 'dynamic' && field.options && !field.options.includes(String(value))) {
+					throw { code: 'INVALID_FIELD', blockType, field: field.name };
+				}
+				if (field.kind === 'number' || field.kind === 'angle') {
+					if ((typeof value !== 'number' && typeof value !== 'string') || !Number.isFinite(Number(value))) {
+						throw { code: 'INVALID_FIELD', blockType, field: field.name };
+					}
+				} else if (field.kind === 'variable') {
+					const validVariable =
+						typeof value === 'string' ||
+						(value && typeof value === 'object' && (typeof value.id === 'string' || typeof value.name === 'string'));
+					if (!validVariable) throw { code: 'INVALID_FIELD', blockType, field: field.name };
+				} else if (!['string', 'number', 'boolean'].includes(typeof value)) {
+					throw { code: 'INVALID_FIELD', blockType, field: field.name };
+				}
+			};
+			const validateDynamicDropdowns = (candidateState, normalizedState, targetWorkspace) => {
+				const compareBlock = (candidateBlock, normalizedBlock) => {
+					if (!candidateBlock || !normalizedBlock || candidateBlock.type !== normalizedBlock.type) {
+						throw { code: 'INVALID_CONNECTION', blockType: candidateBlock?.type };
+					}
+					const variant = contractByType.get(candidateBlock.type)?.variants?.[documentState.board];
+					const dynamicFields = new Map(
+						(variant?.fields || []).filter(field => field.optionsMode === 'dynamic').map(field => [field.name, field])
+					);
+					for (const [fieldName, candidateValue] of Object.entries(candidateBlock.fields || {})) {
+						if (!dynamicFields.has(fieldName)) continue;
+						const normalizedValue = normalizedBlock.fields?.[fieldName];
+						if (String(candidateValue) !== String(normalizedValue)) {
+							throw { code: 'INVALID_FIELD', blockType: candidateBlock.type, field: fieldName };
+						}
+						const runtimeBlock = typeof normalizedBlock.id === 'string' ? targetWorkspace.getBlockById(normalizedBlock.id) : null;
+						const runtimeField = runtimeBlock?.getField(fieldName);
+						if (!runtimeField || typeof runtimeField.getOptions !== 'function') {
+							throw { code: 'INVALID_FIELD', blockType: candidateBlock.type, field: fieldName };
+						}
+						let options;
+						try {
+							options = runtimeField.getOptions(false).map(option => String(option[1]));
+						} catch {
+							throw { code: 'INVALID_FIELD', blockType: candidateBlock.type, field: fieldName };
+						}
+						if (!options.includes(String(normalizedValue))) {
+							throw { code: 'INVALID_FIELD', blockType: candidateBlock.type, field: fieldName };
+						}
+					}
+					for (const [inputName, candidateInput] of Object.entries(candidateBlock.inputs || {})) {
+						const normalizedInput = normalizedBlock.inputs?.[inputName];
+						for (const slot of ['block', 'shadow']) {
+							if (candidateInput?.[slot]) compareBlock(candidateInput[slot], normalizedInput?.[slot]);
+						}
+					}
+					if (candidateBlock.next?.block) compareBlock(candidateBlock.next.block, normalizedBlock.next?.block);
+				};
+				const candidateRoots = candidateState?.blocks?.blocks || [];
+				const normalizedRoots = normalizedState?.blocks?.blocks || [];
+				candidateRoots.forEach((candidateRoot, index) => {
+					const normalizedRoot = typeof candidateRoot.id === 'string'
+						? normalizedRoots.find(root => root.id === candidateRoot.id)
+						: normalizedRoots[index];
+					compareBlock(candidateRoot, normalizedRoot);
+				});
+			};
+			const requiredExtraState = new Set(['arduino_function_call']);
+			const visitStates = states => {
+				for (const state of states || []) {
+					const blockContract = state && contractByType.get(state.type);
+					if (!state || typeof state.type !== 'string' || !Blockly.Blocks[state.type] || !blockContract) {
+						throw { code: 'UNKNOWN_BLOCK_TYPE', blockType: state?.type };
+					}
+					const blockVariant = blockContract.variants?.[documentState.board];
+					if (!blockContract.boards.includes(documentState.board) || !blockVariant) {
+						throw { code: 'BOARD_MISMATCH', blockType: state.type };
+					}
+					const fields = new Map(blockVariant.fields.map(field => [field.name, field]));
+					for (const [name, value] of Object.entries(state.fields || {})) {
+						const field = fields.get(name);
+						if (!field) throw { code: 'INVALID_FIELD', blockType: state.type, field: name };
+						validateField(field, value, state.type);
+					}
+					const hasSupportedExtraState =
+						state.extraState &&
+						(typeof state.extraState === 'object' ||
+							(typeof state.extraState === 'string' && state.extraState.trim().length > 0));
+					if (requiredExtraState.has(state.type) && !hasSupportedExtraState) {
+						throw { code: 'INVALID_EXTRA_STATE', blockType: state.type };
+					}
+					// The contract describes the block's minimal runtime shape. Dynamic
+					// inputs such as controls_if ELSE/IF1/DO1 and mutator-created function
+					// parameters are restored from extraState, so their connection shape
+					// must be decided by the real Blockly runtime rather than the minimal
+					// contract. Keep recursively checking their child types and fields here.
+					for (const inputState of Object.values(state.inputs || {})) {
+						if (!inputState || typeof inputState !== 'object') {
+							throw { code: 'INVALID_CONNECTION', blockType: state.type };
+						}
+						for (const childState of [inputState.block, inputState.shadow].filter(Boolean)) {
+							const childContract = contractByType.get(childState.type);
+							if (!childContract) throw { code: 'UNKNOWN_BLOCK_TYPE', blockType: childState.type };
+							visitStates([childState]);
+						}
+					}
+					if (state.next?.block) {
+						const childContract = contractByType.get(state.next.block.type);
+						if (!childContract) throw { code: 'UNKNOWN_BLOCK_TYPE', blockType: state.next.block.type };
+						visitStates([state.next.block]);
+					}
+				}
+			};
+			visitStates(candidateBlocks);
+			const loadWithConnectionClassification = (state, targetWorkspace) => {
+				try {
+					withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(state, targetWorkspace));
+				} catch (error) {
+					const message = error instanceof Error ? error.message : '';
+					if (/missing a\(n\) (?:next|previous|output)|cannot connect|could not connect|connection checks failed|unknown input|input .*does not exist/i.test(message)) {
+						throw { code: 'INVALID_CONNECTION' };
+					}
+					throw error;
+				}
+			};
+
+			window.currentBoard = documentState.board;
+			window.currentProgrammingLanguage = window.BOARD_CONFIGS[documentState.board]?.language || 'arduino';
+			firstWorkspace = new Blockly.Workspace();
+			window.getBlocklyWorkspace = () => firstWorkspace;
+			loadWithConnectionClassification(serialized, firstWorkspace);
+			repairFunctionReferences(firstWorkspace, getFunctionNamesById(liveWorkspace));
+
+			const allowedRoots = ['arduino_setup_loop', 'micropython_main', 'txt_setup', 'arduino_function'];
+			const newOrphan = window.blocklyRuntime.findNewOrphanStatementBlock(firstWorkspace, liveWorkspace, allowedRoots);
+			if (newOrphan) {
+				throw { code: 'ORPHAN_BLOCK', blockType: newOrphan.type };
+			}
+
+			const normalizedWorkspace = window.blocklyRuntime.saveWorkspaceState(firstWorkspace);
+			if (!window.blocklyRuntime.serializedConnectionsPreserved(serialized, normalizedWorkspace)) {
+				throw { code: 'INVALID_CONNECTION' };
+			}
+			validateDynamicDropdowns(serialized, normalizedWorkspace, firstWorkspace);
+			secondWorkspace = new Blockly.Workspace();
+			window.getBlocklyWorkspace = () => secondWorkspace;
+			loadWithConnectionClassification(normalizedWorkspace, secondWorkspace);
+			repairFunctionReferences(secondWorkspace, new Map());
+			const secondNormalized = window.blocklyRuntime.saveWorkspaceState(secondWorkspace);
+			if (!window.blocklyRuntime.serializedConnectionsPreserved(normalizedWorkspace, secondNormalized)) {
+				throw { code: 'INVALID_CONNECTION' };
+			}
+			validateDynamicDropdowns(normalizedWorkspace, secondNormalized, secondWorkspace);
+			if (!secondNormalized?.blocks?.blocks?.length && !hasTxtVirtualControls) throw { code: 'ROUND_TRIP_FAILED' };
+			const normalizedDocument = { ...documentState, workspace: secondNormalized };
+			if (normalizedTxtVirtualControls) {
+				normalizedDocument.txtVirtualControls = normalizedTxtVirtualControls;
+			} else {
+				delete normalizedDocument.txtVirtualControls;
+			}
+			return {
+				command: 'workspaceCandidateValidationResult',
+				requestId: message.requestId,
+				generation: message.generation,
+				valid: true,
+				normalizedDocument,
+			};
+		} catch (error) {
+			const issue = error && typeof error.code === 'string' ? error : { code: 'ROUND_TRIP_FAILED' };
+			return {
+				command: 'workspaceCandidateValidationResult',
+				requestId: message.requestId,
+				generation: message.generation,
+				valid: false,
+				issue: {
+					code: issue.code,
+					...(typeof issue.blockType === 'string' ? { blockType: issue.blockType } : {}),
+					...(typeof issue.field === 'string' ? { field: issue.field } : {}),
+				},
+			};
+		} finally {
+			firstWorkspace?.dispose();
+			secondWorkspace?.dispose();
+			window.getBlocklyWorkspace = originalWorkspaceGetter;
+			window.currentBoard = originalBoard;
+			window.currentProgrammingLanguage = originalLanguage;
 		}
 	};
 
@@ -4842,9 +5046,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 	window.addEventListener('message', async event => {
 		const message = event.data;
 		const workspace = window.getBlocklyWorkspace();
-		log.info(`收到訊息: ${message.command}`, message);
+		const containsWorkspaceDocument = ['validateWorkspaceCandidate', 'init', 'loadWorkspace'].includes(message.command);
+		log.info(
+			`收到訊息: ${message.command}`,
+			containsWorkspaceDocument
+				? { requestId: message.requestId, generation: message.generation, source: message.source }
+				: message
+		);
 
 		switch (message.command) {
+			case 'validateWorkspaceCandidate':
+				vscode.postMessage(validateWorkspaceCandidateDocument(message));
+				break;
 		case 'confirmDialogResult':
 				// 處理從VSCode傳回的確認對話框結果
 				if (message.confirmId !== undefined) {
@@ -5639,7 +5852,7 @@ async function updateToolboxForBoard(workspace, boardId) {
 		let toolboxConfig = await response.json();
 
 		// 檢查是否為 ESP32 系列開發板（包括 CyberBrick 的某些功能）
-		const isESP32Board = boardId === 'esp32' || boardId === 'esp32_super_mini';
+		const isESP32Board = boardId === 'esp32' || boardId === 'supermini';
 
 		// 如果不是 CyberBrick 也不是 TXT，才需要過濾 ESP32 專屬積木
 		if (!isCyberBrick && !isTxt) {

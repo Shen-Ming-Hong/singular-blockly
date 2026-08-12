@@ -218,7 +218,7 @@ describe('WebView Message Handler', () => {
 	it('should handle save workspace message', async () => {
 		// 準備測試
 		fileServiceStub.createDirectory.resolves();
-		fileServiceStub.writeJsonFile.resolves();
+		fileServiceStub.writeFileAtomic.resolves();
 		fileServiceStub.fileExists.returns(false); // 首次儲存，main.json 不存在
 
 		// 建立儲存工作區訊息（使用有效的方塊資料）
@@ -233,19 +233,20 @@ describe('WebView Message Handler', () => {
 
 		// 驗證檔案操作
 		assert(fileServiceStub.createDirectory.calledWith('blockly'));
-		assert(fileServiceStub.writeJsonFile.called);
+		assert.strictEqual(fileServiceStub.writeFileAtomic.callCount, 2);
 
-		const writeArgs = fileServiceStub.writeJsonFile.getCall(0).args;
+		const writeArgs = fileServiceStub.writeFileAtomic.getCall(0).args;
 		assert.strictEqual(writeArgs[0], path.join('blockly', 'main.json'));
-		assert.deepStrictEqual(writeArgs[1], {
+		assert.deepStrictEqual(JSON.parse(writeArgs[1] as string), {
 			workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'controls_if', id: 'test1' }] } },
 			board: 'arduino:avr:uno',
 		});
+		assert.strictEqual(fileServiceStub.writeFileAtomic.getCall(1).args[0], path.join('blockly', 'main.json.bak'));
 	});
 
 	it('should save TXT virtual controls even when the Blockly workspace is otherwise empty', async () => {
 		fileServiceStub.createDirectory.resolves();
-		fileServiceStub.writeJsonFile.resolves();
+		fileServiceStub.writeFileAtomic.resolves();
 		fileServiceStub.fileExists.returns(false);
 
 		const saveWorkspaceMessage = {
@@ -271,8 +272,8 @@ describe('WebView Message Handler', () => {
 
 		await messageHandler.handleMessage(saveWorkspaceMessage);
 
-		assert(fileServiceStub.writeJsonFile.calledOnce);
-		const saveData = fileServiceStub.writeJsonFile.getCall(0).args[1] as {
+		assert.strictEqual(fileServiceStub.writeFileAtomic.callCount, 2);
+		const saveData = JSON.parse(fileServiceStub.writeFileAtomic.getCall(0).args[1] as string) as {
 			board: string;
 			txtVirtualControls: unknown;
 		};
@@ -303,6 +304,7 @@ describe('WebView Message Handler', () => {
 
 		fileServiceStub.fileExists.returns(true);
 		fileServiceStub.readJsonFile.resolves(savedState);
+		fileServiceStub.readBuffer.resolves(Buffer.from(JSON.stringify(savedState)));
 		settingsManagerStub.getAutoBackupInterval.resolves(5);
 		settingsManagerStub.getTheme.resolves('dark');
 		settingsManagerStub.getLanguage.resolves('auto');
@@ -355,6 +357,7 @@ describe('WebView Message Handler', () => {
 
 		fileServiceStub.fileExists.returns(true);
 		fileServiceStub.readJsonFile.resolves(savedState);
+		fileServiceStub.readBuffer.resolves(Buffer.from(JSON.stringify(savedState)));
 		settingsManagerStub.getAutoBackupInterval.resolves(5);
 		settingsManagerStub.getTheme.resolves('dark');
 		settingsManagerStub.getLanguage.resolves('auto');
@@ -1573,7 +1576,7 @@ describe('WebView Message Handler', () => {
 		it('should handle saveWorkspace JSON serialization error', async () => {
 			fileServiceStub.createDirectory.resolves();
 			fileServiceStub.fileExists.returns(false);
-			fileServiceStub.writeJsonFile.rejects(new Error('JSON error'));
+			fileServiceStub.writeFileAtomic.rejects(new Error('JSON error'));
 
 			const saveWorkspaceMessage = {
 				command: 'saveWorkspace',
@@ -1588,33 +1591,32 @@ describe('WebView Message Handler', () => {
 
 		it('should handle requestInitialState with invalid JSON', async () => {
 			fileServiceStub.fileExists.returns(true);
-			fileServiceStub.readJsonFile.rejects(new Error('JSON parsing error'));
-			fileServiceStub.writeJsonFile.resolves();
+			fileServiceStub.readJsonFile.resolves(null);
+			fileServiceStub.readBuffer.resolves(Buffer.from('{'));
 			settingsManagerStub.getAutoBackupInterval.resolves(5);
 
 			const requestMessage = { command: 'requestInitialState' };
 			await messageHandler.handleMessage(requestMessage);
 
-			// Should create new state
-			assert(fileServiceStub.writeJsonFile.called);
+			assert.strictEqual(fileServiceStub.writeJsonFile.called, false, 'invalid bytes must never be overwritten during startup');
+			assert(fileServiceStub.readBuffer.calledWith(path.join('blockly', 'main.json')));
 		});
 
 		it('should handle requestInitialState with invalid workspace format', async () => {
 			fileServiceStub.fileExists.returns(true);
-			// Return invalid format (missing workspace property)
 			fileServiceStub.readJsonFile.resolves({ board: 'uno' } as any);
-			fileServiceStub.writeJsonFile.resolves();
+			fileServiceStub.readBuffer.resolves(Buffer.from(JSON.stringify({ board: 'uno' })));
 
 			const requestMessage = { command: 'requestInitialState' };
 			await messageHandler.handleMessage(requestMessage);
 
-			// Should create new state due to invalid format
-			assert(fileServiceStub.writeJsonFile.called);
+			assert.strictEqual(fileServiceStub.writeJsonFile.called, false, 'structurally invalid bytes must be preserved');
 		});
 
 		it('should handle requestInitialState auto backup settings error', async () => {
 			fileServiceStub.fileExists.returns(true);
 			fileServiceStub.readJsonFile.resolves({ workspace: {}, board: 'uno' });
+			fileServiceStub.readBuffer.resolves(Buffer.from(JSON.stringify({ workspace: {}, board: 'uno' })));
 			settingsManagerStub.getAutoBackupInterval.rejects(new Error('Settings error'));
 
 			const requestMessage = { command: 'requestInitialState' };
@@ -1801,14 +1803,14 @@ describe('WebView Message Handler', () => {
 
 		it('should handle requestInitialState workspace read error', async () => {
 			fileServiceStub.fileExists.returns(true);
-			fileServiceStub.readJsonFile.rejects(new Error('Read error'));
+			fileServiceStub.readJsonFile.resolves(null);
+			fileServiceStub.readBuffer.rejects(new Error('Read error'));
 			settingsManagerStub.getAutoBackupInterval.resolves(5);
 
 			const requestMessage = { command: 'requestInitialState' };
 			await messageHandler.handleMessage(requestMessage);
 
-			// Should log error but continue with default state
-			assert(fileServiceStub.writeJsonFile.called);
+			assert.strictEqual(fileServiceStub.writeJsonFile.called, false);
 		});
 
 		it('should handle getBackupList with file stats read error', async () => {
@@ -1882,7 +1884,7 @@ describe('WebView Message Handler', () => {
 			assert.strictEqual(fileServiceStub.writeJsonFile.called, false);
 		});
 
-		it('should create backup before save when file exists', async () => {
+		it('should atomically replace main and last-valid backup when a valid file exists', async () => {
 			const mainJsonPath = path.join('blockly', 'main.json');
 
 			// 設置已存在的 main.json（有有效方塊）
@@ -1892,8 +1894,7 @@ describe('WebView Message Handler', () => {
 				board: 'uno',
 			});
 			fileServiceStub.createDirectory.resolves();
-			fileServiceStub.copyFile.resolves();
-			fileServiceStub.writeJsonFile.resolves();
+			fileServiceStub.writeFileAtomic.resolves();
 
 			// 發送有效的 saveWorkspace 訊息
 			const saveWorkspaceMessage = {
@@ -1904,14 +1905,10 @@ describe('WebView Message Handler', () => {
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
 
-			// 驗證 copyFile 被呼叫以建立備份
-			assert(fileServiceStub.copyFile.called);
-			const copyArgs = fileServiceStub.copyFile.getCall(0).args;
-			assert.strictEqual(copyArgs[0], mainJsonPath);
-			assert.strictEqual(copyArgs[1], mainJsonPath + '.bak');
-
-			// 驗證 writeJsonFile 也被呼叫
-			assert(fileServiceStub.writeJsonFile.called);
+			assert.deepStrictEqual(
+				fileServiceStub.writeFileAtomic.getCalls().map(call => call.args[0]),
+				[mainJsonPath, `${mainJsonPath}.bak`]
+			);
 		});
 
 		it('should skip backup when main.json does not exist', async () => {
@@ -1920,7 +1917,7 @@ describe('WebView Message Handler', () => {
 			// 設置 main.json 不存在（新專案首次儲存）
 			fileServiceStub.fileExists.withArgs(mainJsonPath).returns(false);
 			fileServiceStub.createDirectory.resolves();
-			fileServiceStub.writeJsonFile.resolves();
+			fileServiceStub.writeFileAtomic.resolves();
 
 			// 發送有效的 saveWorkspace 訊息
 			const saveWorkspaceMessage = {
@@ -1931,11 +1928,10 @@ describe('WebView Message Handler', () => {
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
 
-			// 驗證 copyFile 未被呼叫（跳過備份）
-			assert.strictEqual(fileServiceStub.copyFile.called, false);
-
-			// 驗證 writeJsonFile 仍被呼叫
-			assert(fileServiceStub.writeJsonFile.called);
+			assert.deepStrictEqual(
+				fileServiceStub.writeFileAtomic.getCalls().map(call => call.args[0]),
+				[mainJsonPath, `${mainJsonPath}.bak`]
+			);
 		});
 
 		it('should skip backup when existing file is empty', async () => {
@@ -1948,7 +1944,7 @@ describe('WebView Message Handler', () => {
 				board: 'uno',
 			});
 			fileServiceStub.createDirectory.resolves();
-			fileServiceStub.writeJsonFile.resolves();
+			fileServiceStub.writeFileAtomic.resolves();
 
 			// 發送有效的 saveWorkspace 訊息
 			const saveWorkspaceMessage = {
@@ -1959,14 +1955,13 @@ describe('WebView Message Handler', () => {
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
 
-			// 驗證 copyFile 未被呼叫（現有檔案為空，跳過備份）
-			assert.strictEqual(fileServiceStub.copyFile.called, false);
-
-			// 驗證 writeJsonFile 仍被呼叫
-			assert(fileServiceStub.writeJsonFile.called);
+			assert.deepStrictEqual(
+				fileServiceStub.writeFileAtomic.getCalls().map(call => call.args[0]),
+				[mainJsonPath, `${mainJsonPath}.bak`]
+			);
 		});
 
-		it('should continue save when backup fails', async () => {
+		it('should retain the valid main file when the last-valid backup update fails', async () => {
 			const mainJsonPath = path.join('blockly', 'main.json');
 
 			// 設置已存在的 main.json
@@ -1976,8 +1971,8 @@ describe('WebView Message Handler', () => {
 				board: 'uno',
 			});
 			fileServiceStub.createDirectory.resolves();
-			fileServiceStub.copyFile.rejects(new Error('Backup failed'));
-			fileServiceStub.writeJsonFile.resolves();
+			fileServiceStub.writeFileAtomic.onFirstCall().resolves();
+			fileServiceStub.writeFileAtomic.onSecondCall().rejects(new Error('Backup failed'));
 
 			// 發送有效的 saveWorkspace 訊息
 			const saveWorkspaceMessage = {
@@ -1988,11 +1983,11 @@ describe('WebView Message Handler', () => {
 
 			await messageHandler.handleMessage(saveWorkspaceMessage);
 
-			// 驗證 copyFile 被呼叫但失敗
-			assert(fileServiceStub.copyFile.called);
-
-			// 驗證 writeJsonFile 仍被呼叫（備份失敗不阻止儲存）
-			assert(fileServiceStub.writeJsonFile.called);
+			assert.deepStrictEqual(
+				fileServiceStub.writeFileAtomic.getCalls().map(call => call.args[0]),
+				[mainJsonPath, `${mainJsonPath}.bak`]
+			);
+			assert.strictEqual(vscodeMock.window.showErrorMessage.called, false);
 		});
 
 		it('should handle promptNewVariable with empty input validation', async () => {
