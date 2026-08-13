@@ -4,7 +4,7 @@
 
 **建立日期**：2026-06-30
 
-**狀態**：草稿
+**狀態**：已實作（[PR #93](https://github.com/Shen-Ming-Hong/singular-blockly/pull/93) 於 2026-08-04 合併）
 
 ## 澄清記錄
 

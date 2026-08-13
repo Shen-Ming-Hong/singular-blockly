@@ -48,10 +48,15 @@ motors = MotorsController()
 
 ### LED 燈帶積木
 
-| 積木                | 埠位  | 用途                | 備註           |
-| ------------------- | ----- | ------------------- | -------------- |
-| `x11_led_set_color` | D1-D2 | 設定 LED 顏色 (RGB) | 支援單顆或全部 |
-| `x11_led_off`       | D1-D2 | 關閉 LED            | 設定為 (0,0,0) |
+> `x11_led_digital` 來源：specs/060-cyberbrick-led-digital（2026-05）；交付紀錄：[PR #83](https://github.com/Shen-Ming-Hong/singular-blockly/pull/83)
+
+| 積木                | 埠位  | 用途                      | 備註                     |
+| ------------------- | ----- | ------------------------- | ------------------------ |
+| `x11_led_set_color` | D1-D2 | 設定 LED 顏色 (RGB)       | 支援單顆或全部           |
+| `x11_led_digital`   | D1-D2 | 以 ON/OFF 分別控制 R/G/B | 支援第 1–4 顆或全部 4 顆 |
+| `x11_led_off`       | D1-D2 | 關閉 LED                  | 設定為 (0,0,0)           |
+
+數位 LED 積木的 R/G/B 欄位都保存為 `ON`／`OFF`，生成時分別映射為 `255`／`0`。選擇單顆時直接指定索引；選擇全部時生成四顆 LED 的迴圈，最後統一呼叫 `write()`。
 
 **硬體引入**：
 
@@ -139,4 +144,4 @@ generator.forBlock['x11_servo_180_angle'] = function (block) {
 ## 相關文件
 
 - [CyberBrick MicroPython](cyberbrick-micropython.md) - 主板核心功能
-- [RC 範例程式](../../../RC_example/) - 遙控器範例專案
+- [CyberBrick RC 遙控](cyberbrick-rc.md) - ESP-NOW 配對與相容性積木

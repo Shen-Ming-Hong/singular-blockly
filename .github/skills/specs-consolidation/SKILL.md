@@ -4,31 +4,19 @@ description: |
     整合 specs/ 資料夾的規格文件到 docs/specifications/ 的完整工作流程。
     當使用者提到整合規格、清理 specs、merge specs、整理技術規格、specs 到 docs、
     consolidate specs、spec cleanup、規格整合、歸檔規格文件時自動啟用。
-    依照規格編號由小到大依序整併，以較新的規格內容為準，刪除已整合的舊規格目錄，
-    僅保留最新一筆 specs。
+    依照規格編號由小到大依序整併，以較新的規格內容為準；以 Git／PR 合併紀錄修正
+    未同步的 Draft 或 tasks 狀態，保留所有未完成的 SDD 及編號最新的 5 個已完成 SDD，
+    只刪除其餘已確認整合完成的舊規格目錄。
     Consolidates specs/ documents into docs/specifications/ in chronological number order.
-    Newer spec content overrides older when overlapping. Deletes merged spec folders,
-    keeping only the latest spec.
-metadata:
-    author: singular-blockly
-    version: '1.0.0'
-    category: documentation
-license: Apache-2.0
+    Newer spec content overrides older when overlapping. Merged PR evidence overrides stale
+    Draft or task metadata. Keeps every incomplete SDD plus the five newest completed SDDs,
+    and removes older completed folders only after verification.
 ---
 
 # 規格整合技能 Specs Consolidation Skill
 
 將 `specs/` 目錄中按編號排列的規格文件，依序整合進 `docs/specifications/` 的對應分類，
 確保技術規格完整、無重複、以最新版本為準。
-
-## 適用情境 When to Use
-
-- `specs/` 積累了多個已完成的規格，需要歸檔到 `docs/`
-- 準備發布版本，需確認技術文件是最新狀態
-- 定期整理文件，刪除已不需要的 spec 目錄
-- 新人 onboarding 前，需要完整且一致的技術規格庫
-
----
 
 ## docs/specifications/ 目錄對應表 Category Mapping
 
@@ -53,25 +41,66 @@ license: Apache-2.0
 
 ```bash
 # 列出 specs/ 目錄（按編號排序）
-Get-ChildItem -Path specs/ -Directory | Sort-Object Name
+find specs -maxdepth 1 -mindepth 1 -type d -print | sort
 
-# 確認最後一筆 spec 編號（要保留，不刪除）
-# 例如：045-rc-remove-rc-get-button
+# 列出 GitHub feature PR 狀態；以 headRefName 對照 spec 的 Feature Branch
+gh pr list --state all --limit 300 \
+  --json number,title,state,headRefName,mergedAt,closedAt,url,mergeCommit
+
+# 依下方完成狀態規則分類，再找出最新 5 個已完成 SDD
 ```
 
-#### 0.2 確認已整合範圍
+#### 0.2 判定完成狀態與保留集合
+
+先將每個 `specs/{NNN}-{name}/` 分為「已完成」或「未完成」。從 `spec.md` 的
+`Feature Branch`／`功能分支` 取得分支名稱，並以規格編號、分支名稱和 PR 標題交叉比對 GitHub。
+
+完成證據依可靠性排序如下；較高順位證據可修正未同步的 Draft 或 tasks 核取方塊：
+
+1. 對應 feature PR 的 `state` 是 `MERGED` 且 `mergedAt` 非空。
+2. feature branch 的提交已確認可從預設分支到達，或由另一個已合併 PR／明確取代 PR 納入。
+3. `tasks.md` 存在、至少包含一項任務，且所有任務核取方塊皆為 `[x]` 或 `[X]`。
+4. `spec.md` 明確標示 `Shipped`、`Complete`、`已完成` 或 `已實作`，且沒有相反證據。
+
+對應 PR 已合併時，即使 `spec.md` 仍為 Draft、缺少 `tasks.md`，或 `tasks.md` 留有未同步的
+人工驗收項目，仍判定該 SDD 已完成，並在整合清單記錄 PR 編號、merge commit 與合併日期。
+
+以下情況仍判定為**未完成**：
+
+- 對應 PR 仍為 `OPEN`，且沒有其他合併／交付證據。
+- PR 只有 `CLOSED`、`mergedAt` 為空，且找不到另一個已合併 PR 或預設分支納入證據。
+- feature branch 尚未進入預設分支，文件也沒有完成證據。
+- 完成證據互相衝突，且無法從 Git 歷史確認實作已交付。
+
+GitHub 的「關閉」可能包含已合併與未合併兩種結果。不得只因遠端分支已刪除或 PR 顯示
+`CLOSED` 就判定完成；優先確認 `MERGED`／`mergedAt`／`mergeCommit`。如果 repository 無法連線，
+改以本地 `git branch --merged`、`git merge-base --is-ancestor` 與預設分支程式證據判斷；證據不足時保留。
+
+`Status: Draft` 與未勾選任務只能表示 SDD 文件尚未收尾，不能推翻已合併 PR 的交付證據。
+同樣地，不得因編號較舊就假定完成。
+
+建立兩個保留集合：
+
+1. 保留全部未完成 SDD。
+2. 將已完成 SDD 依三位數編號排序，保留編號最新的 5 個。
+
+只有「已完成、未列入最新 5 個已完成 SDD」的目錄可以進入待整合清單。若已完成 SDD 不足 5 個，不刪除任何已完成 SDD。
+
+#### 0.3 確認已整合範圍
 
 讀取 `docs/specifications/README.md` 的文件結構說明，確認最後整合到哪個 spec 編號。
 例如 "整合自 specs/001-031" → 尚未整合的從 032 開始。
 
 同時讀取 `docs/specifications/EVOLUTION.md` 的時間軸，確認最後記錄的 spec 編號。
 
-#### 0.3 彙整待整合清單
+`README.md` 宣告的整合編號只能作為線索，不能取代內容驗證。即使索引聲稱已整合，也必須確認每個待刪除 SDD 的核心知識確實存在於目標文件。
+
+#### 0.4 彙整待整合清單
 
 依以下欄位建立清單：
 
-| spec 編號 | 目錄名稱 | 主要功能描述 | 目標 docs 分類 | 是否有重疊（與哪個 docs 檔） |
-| --------- | -------- | ------------ | -------------- | ---------------------------- |
+| spec 編號 | Git／PR 完成證據 | 文件證據 | 保留／整合 | 主要功能描述 | 目標 docs 分類 | 是否有重疊 |
+| --------- | ---------------- | -------- | ----------- | ------------ | -------------- | ------------ |
 
 **重疊判斷原則**：
 
@@ -121,7 +150,7 @@ Get-ChildItem -Path specs/ -Directory | Sort-Object Name
 1. 找到舊內容段落（透過標題或關鍵字）
 2. **刪除舊段落**
 3. 插入新 spec 內容
-4. 在段落開頭標注來源：`> 來源：spec/{NNN}-{name}`
+4. 在段落開頭標注來源：`> 來源：specs/{NNN}-{name}`
 
 > ❗ 嚴禁保留兩個版本並存，這會誤導未來開發者。
 
@@ -140,19 +169,16 @@ YYYY-MM ─┼─ {NNN} {功能摘要}
 
 ---
 
-### Phase 2: 刪除已整合的 spec 目錄
+### Phase 2: 移除已整合的舊 spec 目錄
 
-整合完畢後，**刪除所有已整合的 spec 目錄**，只保留最新一筆（例如 `045-*`）。
+整合完畢後，只移除同時符合以下條件的 spec 目錄：
 
-```powershell
-# 範例：刪除 spec 029~044（根據實際情況調整）
-029, 030, 031, 032, ... | ForEach-Object {
-    $dir = "specs\0$_-*"
-    Remove-Item -Path $dir -Recurse -Force
-}
-```
+1. 已依 Phase 0 判定為完成。
+2. 不屬於編號最新的 5 個已完成 SDD。
+3. 核心技術知識已逐項確認存在於 `docs/specifications/`。
+4. 對應的 `README.md` 與 `EVOLUTION.md` 已更新。
 
-> ⚠️ 執行前需先確認所有 spec 都已整合，且 git diff 已包含對應 docs 更新。
+先列出精確目錄名稱並逐一核對，再執行移除。不得使用未解析的廣域 glob。執行前確認 git diff 已包含對應 docs 更新；移除後說明刪除了哪些目錄，以及可由 Git 歷史復原。
 
 ---
 
@@ -160,14 +186,17 @@ YYYY-MM ─┼─ {NNN} {功能摘要}
 
 #### 3.1 更新 docs/specifications/README.md
 
-1. 更新開頭說明：`整合自 specs/001-{最新已整合編號}`
+1. 更新開頭說明，清楚區分「文件涵蓋到的最高 spec 編號」與「本次實際歸檔的 spec 編號」
 2. 在文件結構表格中新增對應的新 docs 檔案條目
 3. 更新「快速導覽」表格
 
 #### 3.2 最終驗證清單
 
 ```
-[ ] specs/ 只剩最新一筆（如 045-*）
+[ ] specs/ 保留所有未完成 SDD
+[ ] specs/ 保留編號最新的 5 個已完成 SDD
+[ ] Draft／未勾選任務已用對應 PR 與預設分支歷史交叉核對
+[ ] 其餘已完成 SDD 都已完成內容驗證後才移除
 [ ] 每個已整合 spec 的核心技術規格都能在 docs/ 中找到
 [ ] EVOLUTION.md 時間軸已涵蓋新增的 spec
 [ ] README.md 的文件結構清單已同步更新
@@ -207,10 +236,10 @@ YYYY-MM ─┼─ {NNN} {功能摘要}
 每個從 spec 整合的主要章節，在標題下方加一行：
 
 ```markdown
-> 來源：spec/{NNN}-{name}（{YYYY-MM}）
+> 來源：specs/{NNN}-{name}（{YYYY-MM}）
 ```
 
-這讓未來開發者能快速找到原始雜訊細節（checklists、tasks 等）。
+這讓未來開發者能透過 Git 歷史快速找到原始細節（checklists、tasks 等）。
 
 ---
 

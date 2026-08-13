@@ -43,6 +43,8 @@
 
 ### 2.1 USB / OTA 上傳模式（059）
 
+> 來源：specs/059-cyberbrick-upload-modes（2026-05）；交付紀錄：[PR #82](https://github.com/Shen-Ming-Hong/singular-blockly/pull/82)
+
 CyberBrick 支援固定的上傳模式設定，但 **OTA 是上傳工具功能，不是 Blockly 積木**。學生不需要拖曳 Wi‑Fi 或 OTA 積木；上傳工具會在 `/app/rc_main.py` 開頭加入一段很小的 OTA agent 啟動呼叫，內容只會 `import cyberbrick_ota_agent` 並呼叫背景啟動函式，不包含 Wi‑Fi 密碼、OTA token 或 provisioning 邏輯。
 
 為維持官方出廠狀態與最高相容性，OTA provisioning 只允許新增/更新 Singular Blockly 自有檔案（`/cyberbrick_ota_agent.py`、`/cyberbrick_ota_config.py`）並修改 `/app/rc_main.py`；不得修改 `/boot.py`、WebREPL 設定、韌體/出廠設定或其他官方 runtime 檔案。
@@ -87,6 +89,19 @@ OTA v1 使用區域網路 HTTP API：
 
 上傳前會檢查主要目標裝置、token、最後 IP、agent health、`deviceId` 是否相符與 protocol version。OTA 失敗時只提供下一步（例如重新掃描、重新 provisioning、手動切回 USB），**不會自動 fallback 到 USB**，避免程式被送到錯誤裝置或造成教室多裝置混淆。
 
+#### OTA Agent 自動升級（061）
+
+> 來源：specs/061-cyberbrick-wifi-monitor-ota-upgrade（2026-05）；交付紀錄：[PR #84](https://github.com/Shen-Ming-Hong/singular-blockly/pull/84)
+
+OTA 上傳前會比較 `/api/v1/health` 回報的 agent 版本。現行目標版本是 `1.5.9`，支援無線自動升級的最低版本是 `1.4.0`：
+
+- `1.4.0` 以上但低於目標版本：以 `POST /api/v1/upload-agent` 傳送新 agent，驗證 SHA-256，等待重啟及 health readiness 後再上傳學生程式。
+- 等於或高於目標版本：直接上傳，不降級裝置上的較新 agent。
+- 低於 `1.4.0`、版本缺失或格式無效：視為舊版並盡力嘗試同一升級 endpoint；舊 agent 不支援時升級會失敗，但仍繼續既有 OTA 程式上傳。
+- 自動升級失敗：顯示警告並繼續程式上傳；不因維護 agent 版本而阻斷課堂工作。
+
+此規格曾設計 Wi‑Fi print monitor，但在合併前明確移除，現行產品未交付 Wi‑Fi log endpoint 或 Wi‑Fi monitor service。Monitor 有 USB 硬體連線時仍優先使用既有 USB serial monitor；`POST /api/v1/reset` 則保留供 OTA 上傳後復原程式執行。
+
 #### 完整清除 OTA / 回到 USB-only
 
 CyberBrick 設定 modal 提供進階清除動作，讓老師或使用者可透過 USB 把 Singular Blockly OTA 安裝內容完整移除。這是有線、明確確認的動作，不會透過 OTA 刪除 OTA agent 本身。
@@ -117,16 +132,19 @@ CyberBrick 設定 modal 提供進階清除動作，讓老師或使用者可透�
 
 ### Core 積木 (cyberbrick_core)
 
-| 積木                       | 用途           | 生成程式碼                                        |
-| -------------------------- | -------------- | ------------------------------------------------- |
-| `cyberbrick_main`          | 主程式進入點   | `async def main(): ...`                           |
-| `cyberbrick_led_set_color` | 設定板載 LED   | `onboard_led[0] = (r, g, b); onboard_led.write()` |
-| `cyberbrick_led_off`       | 關閉板載 LED   | `onboard_led[0] = (0, 0, 0); onboard_led.write()` |
-| `cyberbrick_delay_ms`      | 毫秒延遲       | `await asyncio.sleep_ms(ms)`                      |
-| `cyberbrick_delay_s`       | 秒延遲         | `await asyncio.sleep(s)`                          |
-| `cyberbrick_ticks_ms`      | 取得目前毫秒數 | `time.ticks_ms()`                                 |
-| `cyberbrick_ticks_diff`    | 計算時間差     | `time.ticks_diff(now, start)`                     |
-| `cyberbrick_print`         | 序列埠輸出     | `print(msg)`                                      |
+> `cyberbrick_led_digital` 來源：specs/060-cyberbrick-led-digital（2026-05）；交付紀錄：[PR #83](https://github.com/Shen-Ming-Hong/singular-blockly/pull/83)
+
+| 積木                       | 用途                     | 生成程式碼                                        |
+| -------------------------- | ------------------------ | ------------------------------------------------- |
+| `cyberbrick_main`          | 主程式進入點             | `async def main(): ...`                           |
+| `cyberbrick_led_set_color` | 設定板載 LED             | `onboard_led[0] = (r, g, b); onboard_led.write()` |
+| `cyberbrick_led_digital`   | 以 ON/OFF 分別控制 R/G/B | ON 對應 255，OFF 對應 0，再寫入 GPIO 8 NeoPixel  |
+| `cyberbrick_led_off`       | 關閉板載 LED             | `onboard_led[0] = (0, 0, 0); onboard_led.write()` |
+| `cyberbrick_delay_ms`      | 毫秒延遲                 | `await asyncio.sleep_ms(ms)`                      |
+| `cyberbrick_delay_s`       | 秒延遲                   | `await asyncio.sleep(s)`                          |
+| `cyberbrick_ticks_ms`      | 取得目前毫秒數           | `time.ticks_ms()`                                 |
+| `cyberbrick_ticks_diff`    | 計算時間差               | `time.ticks_diff(now, start)`                     |
+| `cyberbrick_print`         | 序列埠輸出               | `print(msg)`                                      |
 
 ### WiFi 積木 (cyberbrick_wifi)
 

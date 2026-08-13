@@ -18,6 +18,8 @@
 2025-03 ─┼─ 008 核心依賴升級（Blockly 12）
          ├─ 009 開發工具升級
          │
+2025-07 ─┼─ 047 專案安全警告完整在地化
+         │
 2025-10 ─┼─ 010 專案安全防護機制
          │
 2025-11 ─┼─ 011 ESP32 PWM 設定
@@ -50,7 +52,24 @@
          ├─ 040 MCP 優雅降級
          ├─ 041 MCP bundling 修復
          ├─ 042 上傳錯誤分類
-         └─ 044 防止孤立積木三層防護
+         ├─ 044 防止孤立積木三層防護
+         └─ 045 RC 工具箱隱藏舊數值按鈕積木
+         │
+2026-04 ─┼─ 048 CyberBrick 範例瀏覽器
+         ├─ 049 CyberBrick 範例名稱翻譯
+         └─ 050 函式積木鎖定
+         │
+2026-05 ─┼─ 051 TXT Controller 與多流程執行
+         ├─ 052 PlatformIO 狀態診斷面板
+         ├─ 053 TXT 虛擬控制器
+         ├─ 054 虛擬控制器備份預覽
+         ├─ 055 虛擬控制器主題樣式
+         ├─ 056 TXT M 輸出馬達／燈光
+         ├─ 057 編輯器主題表面一致化
+         ├─ 058 PlatformIO 引導式修復
+         ├─ 059 CyberBrick USB／OTA 上傳
+         ├─ 060 CyberBrick／X11 數位 LED 積木
+         └─ 061 OTA Agent 自動升級
          │
 2026-08 ─┼─ 065 Blockly 13 現代化
          └─ 066 Agent Skills 取代舊 AI server
@@ -403,7 +422,7 @@ Phase 2 功能強化（詳見個別文件）：快速備份（017）、Workspace
 
 ---
 
-## 第七階段：穩定化與使用者體驗（030-044）
+## 第七階段：穩定化與使用者體驗（030-045）
 
 ### 030 - 語言選擇器（2026-01）
 
@@ -445,9 +464,77 @@ Node.js 缺失時優雅降級不影響核心功能（040），SDK 完整打包�
 
 三層防護確保控制/流程積木只在合法容器中生成程式碼。
 
+### 045 - RC 工具箱隱藏舊數值按鈕積木（2026-02）
+
+從 CyberBrick RC 工具箱移除回傳 `0`／`1` 的 `rc_get_button`，引導新工作區使用 Boolean `rc_is_button_pressed`；舊積木的定義、generator 與翻譯仍保留，確保既有工作區向後相容。詳見[CyberBrick RC 遙控](03-hardware-support/cyberbrick-rc.md)。
+
 ---
 
-## 第八階段：Blockly 13 與 Agent Skills（065-066）
+## 第八階段：教學體驗與名稱在地化（047-050）
+
+### 047 - 專案安全警告完整在地化（2025-07）
+
+將非 Blockly 專案的安全警告、繼續／取消／不再提醒與結果回饋同步到 15 個語系。文案改以 8–14 歲使用者能理解的具體後果描述，並讓 Extension Host 的英文後援與語系檔一致。
+
+### 048 - CyberBrick 範例瀏覽器（2026-04）
+
+在 CyberBrick 工具列加入範例 modal，從雲端 index 取得多語系範例清單並在逾時或離線時回退到套件內建副本。載入前驗證檔名、workspace 結構與 `cyberbrick` 主板，只有目前工作區非空時才要求覆蓋確認。詳見[CyberBrick 範例瀏覽器](06-features/sample-browser.md)。
+
+### 049 - CyberBrick 範例名稱翻譯（2026-04）
+
+範例格式加入選用的 `nameTranslations`，同步翻譯變數、函式定義、參數與呼叫積木。解析採目標語系 → 英文 → 原始繁體中文，並以現行 ASCII 識別名稱規則驗證，舊範例維持相容。
+
+### 050 - 函式積木鎖定（2026-04）
+
+Arduino 與 MicroPython 函式定義可由右鍵選單鎖定，避免誤刪、改名、改參數或破壞 statement stack。鎖定狀態同時支援 XML mutation 與 JSON extra state，且不影響函式呼叫。
+
+詳見[使用者介面與範例名稱在地化](02-internationalization/user-facing-localization.md)與[函式積木鎖定](06-features/function-block-locking.md)。
+
+---
+
+## 第九階段：TXT Controller 與工具鏈可診斷性（051-058）
+
+### 051 - TXT Controller 與多流程執行（2026-05）
+
+建立 `txt_setup` 加一個以上 `txt_process` 的工作區模型，共用單一 ftrobopy 連線並以受管理執行緒執行流程；加入 SSH／SCP 上傳、工作區連線設定、SecretStorage 密碼及 M/O/I Test Panel。
+
+### 052、058 - PlatformIO 診斷與引導式修復（2026-05）
+
+先建立獨立診斷面板，統一呈現 pio、penv、Python、pip、mpremote 的路徑、版本、來源與修復建議；之後在同一面板加入使用者確認、無 shell、限時限量、只動使用者空間的修復流程。修復成功必須由重新診斷證明，歷史、AI packet 與 Issue draft 均先做隱私清理，且不得自動發布。
+
+### 053-055 - TXT 虛擬控制器、備份預覽與主題（2026-05）
+
+工作區可保存以穩定 ID 綁定的虛擬按鈕，執行時由獨立 companion runtime 提供狀態。備份預覽採專用唯讀 presenter；亮色與深色樣式分開保存，編輯器與預覽共用有效樣式解析，並補齊高對比模式的非色彩提示。
+
+### 056 - TXT M 輸出馬達／燈光（2026-05）
+
+既有 M 輸出積木增加 MOTOR／LAMP 元件模式，保留舊工作區的馬達預設。M 埠元件衝突及對應 O 埠共享腳位衝突在編輯時警告，於執行、上傳與匯出前硬性阻擋。
+
+### 057 - 編輯器主題表面一致化（2026-05）
+
+TXT 連線 modal、Sample Browser 與虛擬控制器 chrome 改由 Blockly 編輯器的亮／暗主題 class 與集中 CSS tokens 控制。切換主題不重載 WebView，也不遺失輸入、捲動位置或使用者自訂色彩；獨立的 host-themed 頁面維持明確 allowlist。
+
+詳見[TXT Controller 支援](03-hardware-support/txt-controller.md)、[PlatformIO 診斷與引導式修復](06-features/platformio-diagnostics.md)及[編輯器主題表面](06-features/editor-theme-surfaces.md)。
+
+---
+
+## 第十階段：CyberBrick OTA 與數位教學（059-061）
+
+### 059 - CyberBrick USB／OTA 上傳（2026-05）
+
+加入工作區保存的 USB／OTA 模式、USB-first provisioning、SecretStorage 憑證、穩定 `deviceId` 配對與 authenticated streaming upload。所有寫入限制在 Singular Blockly 自有 agent/config 與 `/app/rc_main.py` bootstrap；失敗不會偷偷回退 USB，清除動作也只移除自身管理內容。
+
+### 060 - CyberBrick／X11 數位 LED 積木（2026-05）
+
+主板與 X11 新增以 R/G/B `ON`／`OFF` 控制的教學積木；ON 映射 255、OFF 映射 0。X11 可選 D1／D2 與單顆或全部四顆 LED。詳見[CyberBrick MicroPython](03-hardware-support/cyberbrick-micropython.md)及[CyberBrick 擴展板](03-hardware-support/cyberbrick-expansion-boards.md)。
+
+### 061 - OTA Agent 自動升級（2026-05）
+
+OTA 上傳前可將支援升級協定的舊 agent 安全更新至目標版本，包含 SHA-256、重啟與 readiness 驗證；升級失敗只警告，不阻斷學生程式上傳。原先規劃的 Wi‑Fi print monitor 已在合併前移除，現行 Monitor 仍優先使用 USB。詳見[CyberBrick MicroPython](03-hardware-support/cyberbrick-micropython.md)。
+
+---
+
+## 第十一階段：Blockly 13 與 Agent Skills（065-066）
 
 ### 065 - Blockly 13 現代化（2026-08）
 
@@ -459,4 +546,4 @@ Node.js 缺失時優雅降級不影響核心功能（040），SDK 完整打包�
 
 ---
 
-_最後更新：2026-08-12_
+_最後更新：2026-08-13_
