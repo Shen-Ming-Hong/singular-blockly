@@ -42,7 +42,11 @@ function createRuntimeHarness() {
 		addEventListener() {},
 		removeEventListener() {},
 	};
+	class FieldTextInputStub {
+		onHtmlInputKeyDown_() {}
+	}
 	const blocklyStub: any = {
+		FieldTextInput: FieldTextInputStub,
 		inject() {
 			return { dispose() {} };
 		},

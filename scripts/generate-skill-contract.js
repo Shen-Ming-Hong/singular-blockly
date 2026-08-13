@@ -129,6 +129,11 @@ function loadRuntime() {
 		getBlocklyWorkspace() {
 			return currentWorkspace;
 		},
+		blocklyRuntime: {
+			createImeSafeFieldTextInput(initialValue, validator) {
+				return new Blockly.FieldTextInput(initialValue, validator);
+			},
+		},
 		languageManager: { getMessage: key => key },
 		addEventListener() {},
 		removeEventListener() {},

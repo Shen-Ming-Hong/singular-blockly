@@ -339,7 +339,13 @@ Blockly.Blocks['arduino_function'] = {
 	init: function () {
 		this.appendDummyInput('MAIN')
 			.appendField(window.languageManager.getMessage('FUNCTION_CREATE'))
-			.appendField(new Blockly.FieldTextInput('myFunction', createCyberBrickNameFieldValidator('function')), 'NAME')
+			.appendField(
+				window.blocklyRuntime.createImeSafeFieldTextInput(
+					'myFunction',
+					createCyberBrickNameFieldValidator('function')
+				),
+				'NAME'
+			)
 			.appendField(':', 'PARAM_LABEL');
 
 		this.appendStatementInput('STACK').setCheck(null);
@@ -658,7 +664,10 @@ Blockly.Blocks['arduino_function_parameter'] = {
 				]),
 				'TYPE'
 			)
-			.appendField(new Blockly.FieldTextInput('x', createCyberBrickNameFieldValidator('parameter')), 'NAME');
+			.appendField(
+				window.blocklyRuntime.createImeSafeFieldTextInput('x', createCyberBrickNameFieldValidator('parameter')),
+				'NAME'
+			);
 		this.setPreviousStatement(true);
 		this.setNextStatement(true);
 		this.setStyle('procedure_blocks'); // 修改這裡，使用主題中定義的顏色

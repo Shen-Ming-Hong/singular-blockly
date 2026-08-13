@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.86.1] - 2026-08-13
+
+### 🐛 修復 Bug Fixes
+
+- 修正 Blockly 13 內嵌函式與參數名稱欄位在中文 IME 組字期間，將選字 Enter 誤判為完成編輯；組字按鍵現在會保留給輸入法，後續 Enter 才會提交欄位
+  Fixed Blockly 13 inline function and parameter name fields treating the IME candidate-selection Enter key as edit completion; composition keys now remain with the input method and a later Enter commits the field
+
 ## [0.86.0] - 2026-08-12
 
 ### ✨ 新增功能 Features

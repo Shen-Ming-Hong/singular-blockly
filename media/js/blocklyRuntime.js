@@ -40,6 +40,29 @@
 		}
 	}
 
+	function isImeCompositionEvent(event) {
+		return Boolean(
+			(event &&
+				(event.isComposing || event.key === 'Process' || event.keyCode === 229 || event.which === 229)) ||
+				(typeof window.isBlocklyTextInputCompositionActive === 'function' &&
+					window.isBlocklyTextInputCompositionActive())
+		);
+	}
+
+	class ImeSafeFieldTextInput extends Blockly.FieldTextInput {
+		onHtmlInputKeyDown_(event) {
+			if (isImeCompositionEvent(event)) {
+				return;
+			}
+			super.onHtmlInputKeyDown_(event);
+		}
+	}
+
+	function createImeSafeFieldTextInput(initialValue, validator) {
+		ensureBlockly();
+		return new ImeSafeFieldTextInput(initialValue, validator);
+	}
+
 	function getWorkspace() {
 		return canonicalWorkspace;
 	}
@@ -490,6 +513,7 @@
 	window.getBlocklyWorkspace = getWorkspace;
 	window.blocklyRuntime = Object.freeze({
 		config,
+		createImeSafeFieldTextInput,
 		createWorkspace,
 		recreateWorkspace,
 		disposeWorkspace,
