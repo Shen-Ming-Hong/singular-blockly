@@ -1,5 +1,7 @@
 # 功能規格書：修正 CyberBrick OTA 與 RC 遙控的 Wi-Fi Channel 衝突
 
+**狀態**：已實作（[PR #92](https://github.com/Shen-Ming-Hong/singular-blockly/pull/92) 於 2026-06-30 合併）
+
 ## 摘要
 
 修正 CyberBrick 裝置同時使用 OTA 與 RC 遙控時的 Wi-Fi channel 判斷問題，避免裝置只因存在 OTA config 就跳過 RC channel 設定，導致 AP 未連線時 RC 遙控失效。此功能的目標是在 OTA 可用時保留 AP channel，在 OTA 不可用或 AP 不在線時，讓 RC 能於約 5 秒後退回積木設定的 channel，使學生與教師在課堂中能穩定使用 RC 遙控，同時維持已連上 AP 裝置的 OTA 上傳能力。

@@ -4,7 +4,7 @@
 
 **建立日期**：2026-08-12
 
-**狀態**：草稿
+**狀態**：已實作（[PR #121](https://github.com/Shen-Ming-Hong/singular-blockly/pull/121) 於 2026-08-12 合併）
 
 **輸入**：以專案內 Agent Skills 取代過時的 MCP 整合，讓支援的 AI 不需使用者安裝系統 Node.js，即可理解、建立及安全修改可由 Singular Blockly 載入的積木工作區。
 

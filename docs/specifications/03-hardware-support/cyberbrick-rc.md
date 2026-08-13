@@ -48,6 +48,14 @@ CyberBrick 官方 `rc_module` 使用 ESP-NOW 廣播模式，導致教室環境�
 
 ---
 
+## 相容性積木與工具箱精簡
+
+> 來源：specs/045-rc-remove-rc-get-button（2026-02）；交付紀錄：[PR #61](https://github.com/Shen-Ming-Hong/singular-blockly/pull/61)
+
+舊的 `rc_get_button` 數值積木只從 CyberBrick RC 工具箱移除，不刪除積木定義、MicroPython generator 或翻譯鍵。既有工作區因此仍可載入並生成原本的 `0`（按下）／`1`（放開）數值；新工作區則應使用回傳 Boolean 的 `rc_is_button_pressed`，避免學生混淆按鈕狀態。
+
+---
+
 ## 安全預設值
 
 | 資料類型 | 斷線預設值 | 說明                 |

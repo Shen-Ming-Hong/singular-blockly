@@ -4,7 +4,7 @@
 
 **建立日期**：2026-08-04
 
-**狀態**：草稿
+**狀態**：已實作（[PR #97](https://github.com/Shen-Ming-Hong/singular-blockly/pull/97) 於 2026-08-04 合併）
 
 **輸入**：改善 CyberBrick 開發版的 MicroPython 變數、函式及參數命名防呆，並在 OTA 設定期間提供清楚、不可重複送出的進度回饋。
 

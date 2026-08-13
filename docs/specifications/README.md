@@ -1,6 +1,6 @@
 # Singular Blockly 整合規格書
 
-> 本文件整合至 `specs/066` 的現行功能規格，按功能領域組織，並保留已退役設計的歷史脈絡。
+> 本文件庫收錄已歸檔規格與已同步的現行架構文件，最高同步至 `specs/066`。保留窗口內的 SDD 仍以 `specs/` 原始文件為準，不代表已全部提煉或歸檔。
 
 ## 文件結構
 
@@ -15,7 +15,8 @@ docs/specifications/
 ├── 01-architecture/               # 架構與核心系統
 │   └── architecture.md            # 001 架構重構
 ├── 02-internationalization/       # 國際化系統
-│   └── i18n.md                    # 002/023/024 i18n 翻譯品質與審計優化
+│   ├── i18n.md                    # 002/023/024 i18n 翻譯品質與審計優化
+│   └── user-facing-localization.md # 047/049 安全警告與範例名稱在地化
 ├── 03-hardware-support/           # 硬體支援與積木
 │   ├── huskylens.md               # 003/013/020/035/036 HuskyLens 驗證 + tooltip + RX/TX + 動態 INDEX + ID 積木
 │   ├── esp32-pwm.md               # 011 ESP32 PWM 設定
@@ -23,7 +24,8 @@ docs/specifications/
 │   ├── esp32-wifi-mqtt.md         # 016 ESP32 WiFi/MQTT
 │   ├── cyberbrick-micropython.md  # 021/022/032/033/034 CyberBrick MicroPython 支援
 │   ├── cyberbrick-rc.md           # 029 ESP-NOW 自定義配對 RC 遙控
-│   └── cyberbrick-expansion-boards.md # 027/028 X11/X12 擴展板積木
+│   ├── cyberbrick-expansion-boards.md # 027/028 X11/X12 擴展板積木
+│   └── txt-controller.md          # 051/053-056 TXT Controller 與虛擬控制器
 ├── 04-quality-testing/            # 品質保證與測試
 │   ├── test-coverage.md           # 004 測試覆蓋率提升
 │   ├── project-safety.md          # 010 專案安全防護
@@ -33,11 +35,15 @@ docs/specifications/
 ├── 06-features/                   # 功能開發與整合
 │   ├── agent-skills.md            # 066 專案 Skills、runtime 契約與安全工作區驗證
 │   ├── bug-fixes.md               # 014/031/039 序列化修復、1 月批次修復、print 換行修復
+│   ├── editor-theme-surfaces.md   # 057 編輯器主題表面
+│   ├── function-block-locking.md  # 050 函式積木鎖定
 │   ├── language-selector.md       # 030 語言選擇器
+│   ├── platformio-diagnostics.md  # 052/058 PlatformIO 診斷與引導式修復
 │   ├── quick-backup.md            # 017 Ctrl+S 快速備份
 │   ├── unified-upload-ui.md       # 026/042 統一上傳 UI、錯誤分類提示
 │   ├── serial-monitor.md          # 037/038 CyberBrick / Arduino Serial Monitor
-│   └── orphan-blocks.md           # 044 防止孤立積木
+│   ├── orphan-blocks.md           # 044 防止孤立積木
+│   └── sample-browser.md          # 048 CyberBrick 範例瀏覽器
 └── appendix/                      # 附錄
     └── glossary.md                # 術語對照表
 ```
@@ -65,10 +71,16 @@ docs/specifications/
 | P1     | 硬體   | [CyberBrick 擴展板](03-hardware-support/cyberbrick-expansion-boards.md) | ✅ 完成   |
 | P1     | 硬體   | [CyberBrick RC 遙控](03-hardware-support/cyberbrick-rc.md)              | ✅ 完成   |
 | P1     | 整合   | [Agent Skills](06-features/agent-skills.md)                             | ✅ 完成   |
+| P1     | 硬體   | [TXT Controller](03-hardware-support/txt-controller.md)                 | ✅ 完成   |
 | P1     | 功能   | [統一上傳 UI](06-features/unified-upload-ui.md)                         | ✅ 完成   |
 | P1     | 功能   | [Serial Monitor](06-features/serial-monitor.md)                         | ✅ 完成   |
 | P1     | 功能   | [防止孤立積木](06-features/orphan-blocks.md)                            | ✅ 完成   |
+| P1     | 功能   | [CyberBrick 範例瀏覽器](06-features/sample-browser.md)                  | ✅ 完成   |
+| P1     | 工具   | [PlatformIO 診斷](06-features/platformio-diagnostics.md)                | ✅ 完成   |
 | P2     | 國際化 | [i18n 品質](02-internationalization/i18n.md)                            | ✅ 完成   |
+| P2     | 國際化 | [使用者介面與範例名稱](02-internationalization/user-facing-localization.md) | ✅ 完成 |
+| P2     | 功能   | [函式積木鎖定](06-features/function-block-locking.md)                   | ✅ 完成   |
+| P2     | 功能   | [編輯器主題表面](06-features/editor-theme-surfaces.md)                  | ✅ 完成   |
 | P2     | 功能   | [快速備份](06-features/quick-backup.md)                                 | ✅ 完成   |
 | P2     | 功能   | [語言選擇器](06-features/language-selector.md)                          | ✅ 完成   |
 | P2     | 硬體   | [ESP32 PWM](03-hardware-support/esp32-pwm.md)                           | 📝 草稿   |
@@ -94,9 +106,26 @@ docs/specifications/
 
 **Phase 2 (017-028)**: 13. **017** Ctrl+S 快速備份 - 鍵盤快捷鍵、Toast 通知 14. **018-019** Workspace 安全防護 - 三層防護機制 15. **020** HuskyLens RX/TX - 腳位標籤修正 16. **021-022** CyberBrick MicroPython - 主板支援、mpremote 上傳 17. **023-024** i18n 優化 - 白名單更新、硬編碼修復 18. **025** 拖曳競態修復 - FileWatcher 衝突解決 19. **026** 統一上傳 UI - Arduino/MicroPython 整合 20. **027-028** CyberBrick X11/X12 - 擴展板積木
 
-**Phase 3 (029-044)**: 21. **029** CyberBrick RC 遙控 - ESP-NOW 自定義配對（Pair ID + 頻道） 22. **030** 語言選擇器 - 即時語言切換 UI 23. **031** 1 月批次修復 - 多主程式積木、備份預覽 URI、自動備份、i18n 鍵 24. **032-033** CyberBrick 計時積木 25. **034** MicroPython 全域變數 26. **035-036** HuskyLens 動態／ID 導向積木 27. **037-038** Serial Monitor 28. **039** MicroPython print 換行修復 29. **040-041** 舊 AI server 維護（已由 066 移除） 30. **042** 上傳錯誤分類 31. **044** 防止孤立積木。
+**Phase 3 (029-045)**: 21. **029** CyberBrick RC 遙控 - ESP-NOW 自定義配對（Pair ID + 頻道） 22. **030** 語言選擇器 - 即時語言切換 UI 23. **031** 1 月批次修復 - 多主程式積木、備份預覽 URI、自動備份、i18n 鍵 24. **032-033** CyberBrick 計時積木 25. **034** MicroPython 全域變數 26. **035-036** HuskyLens 動態／ID 導向積木 27. **037-038** Serial Monitor 28. **039** MicroPython print 換行修復 29. **040-041** 舊 AI server 維護（已由 066 移除） 30. **042** 上傳錯誤分類 31. **044** 防止孤立積木 32. **045** RC 工具箱移除舊數值按鈕積木並保留工作區相容性。
 
-**Phase 6 (066)**: 專案內英文 Agent Skills、runtime 衍生積木契約、外部工作區驗證／隔離／復原，以及舊使用者端 AI server 與 Node.js 設定完整退役。
+**Phase 4 (047-050)**：安全警告在地化、CyberBrick 範例瀏覽器、範例名稱在地化與函式積木鎖定。
+
+**Phase 5 (051-058)**：TXT Controller、多流程、虛擬控制器、唯讀備份預覽、主題與 M 輸出支援；PlatformIO 狀態診斷與安全的引導式修復。
+
+**Phase 6 (059-061)**：CyberBrick USB／OTA 上傳模式、主板與 X11 數位 LED 教學積木，以及 OTA agent 自動升級。
+
+**Phase 7 (062-066)**：目前的 SDD 保留窗口；詳細設計以 `specs/` 原始文件為準，其中 065 完成 Blockly 13 現代化，066 完成專案內 Agent Skills、runtime 契約、外部工作區驗證及舊使用者端 AI server 退役。
+
+## SDD 保留與歸檔狀態
+
+截至 2026-08-13，`specs/` 保留所有未完成 SDD，以及依規格編號排序後最近五個已完成 SDD：
+
+| 類別 | 保留編號 | 原因 |
+| ---- | -------- | ---- |
+| 未完成 | 無 | 現存 SDD 對應的 feature PR 都已有合併紀錄 |
+| 最近五個已完成 | 062、063、064、065、066 | 保留近期設計上下文，供維護與回溯 |
+
+完成狀態以 feature PR 的 `MERGED` 與 `mergedAt` 為優先證據；因此 PR 已合併時，過時的 `Draft` 標記、缺少 `tasks.md` 或未勾選的人工驗證項目不再誤判為未完成。本次完成內容提煉並自 `specs/` 歸檔的編號為 045、048、059–061；同一輪稍早已歸檔 047、049–058，更早的 001–044 已於先前批次整合。所有歸檔內容均可透過 Git 歷史回復。
 
 ## 版本對照
 
@@ -116,7 +145,7 @@ docs/specifications/
 
 | 技術        | 版本     | 用途                 |
 | ----------- | -------- | -------------------- |
-| Blockly     | 12.3.1   | 視覺化程式編輯核心   |
+| Blockly     | 13.2.1   | 視覺化程式編輯核心   |
 | TypeScript  | 5.9.3    | Extension Host 開發  |
 | VS Code API | 1.109.0+ | 編輯器整合、Project Skills 支援 |
 | Webpack     | 5.102.1  | 模組打包             |
@@ -126,4 +155,4 @@ docs/specifications/
 
 ---
 
-_最後更新：2026-08-12_
+_最後更新：2026-08-13_
