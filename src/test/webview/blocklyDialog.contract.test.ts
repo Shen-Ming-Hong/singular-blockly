@@ -30,7 +30,20 @@ function createRuntimeHarness() {
 			listeners.get(type)?.delete(listener);
 		},
 	};
+	class FieldTextInputStub {
+		readonly delegatedEvents: unknown[] = [];
+
+		constructor(
+			readonly value: unknown,
+			readonly validator?: unknown
+		) {}
+
+		onHtmlInputKeyDown_(event: unknown) {
+			this.delegatedEvents.push(event);
+		}
+	}
 	const blocklyStub: any = {
+		FieldTextInput: FieldTextInputStub,
 		inject: () => ({ dispose() {} }),
 		serialization: { workspaces: { save: () => ({}), load: () => undefined } },
 		dialog: {
@@ -75,6 +88,44 @@ function createRuntimeHarness() {
 		},
 	};
 }
+
+suite('Blockly IME-safe field contract', () => {
+	test('組字按鍵保留給 IME，一般完成編輯按鍵交回 Blockly', () => {
+		const harness = createRuntimeHarness();
+		const validator = () => undefined;
+		const field = harness.windowStub.blocklyRuntime.createImeSafeFieldTextInput('myFunction', validator);
+		let preventDefaultCalls = 0;
+		let stopPropagationCalls = 0;
+
+		field.onHtmlInputKeyDown_({
+			key: 'Enter',
+			isComposing: true,
+			preventDefault: () => preventDefaultCalls++,
+			stopPropagation: () => stopPropagationCalls++,
+		});
+		field.onHtmlInputKeyDown_({ key: 'Process' });
+		field.onHtmlInputKeyDown_({ key: 'Enter', keyCode: 229 });
+		field.onHtmlInputKeyDown_({ key: 'Escape', which: 229 });
+		harness.windowStub.isBlocklyTextInputCompositionActive = () => true;
+		field.onHtmlInputKeyDown_({ key: 'Tab' });
+
+		assert.strictEqual(field.delegatedEvents.length, 0);
+		assert.strictEqual(preventDefaultCalls, 0, 'IME composition must keep its default browser behavior');
+		assert.strictEqual(stopPropagationCalls, 0, 'IME composition must remain available to the browser input method');
+
+		harness.windowStub.isBlocklyTextInputCompositionActive = () => false;
+		for (const key of ['Enter', 'Escape', 'Tab']) {
+			field.onHtmlInputKeyDown_({ key });
+		}
+
+		assert.deepStrictEqual(
+			Array.from(field.delegatedEvents, (event: any) => event.key),
+			['Enter', 'Escape', 'Tab']
+		);
+		assert.strictEqual(field.value, 'myFunction');
+		assert.strictEqual(field.validator, validator);
+	});
+});
 
 suite('Blockly dialog adapter contract', () => {
 	test('prompt 以 request ID 配對取消結果，且重複結果只完成一次', () => {

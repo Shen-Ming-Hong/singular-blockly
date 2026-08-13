@@ -52,7 +52,11 @@ suite('Blockly 13 locale contract', () => {
 			addEventListener: (name: string, callback: Function) => listeners.set(name, [...(listeners.get(name) || []), callback]),
 			dispatchEvent: () => true,
 		};
+		class FieldTextInputStub {
+			onHtmlInputKeyDown_() {}
+		}
 		const Blockly = {
+			FieldTextInput: FieldTextInputStub,
 			Msg: { ...localeData.en, PROJECT: 'English project' },
 			inject: () => ({ dispose() {} }),
 			setLocale: (messages: Record<string, string>) => Object.assign(Blockly.Msg, messages),
