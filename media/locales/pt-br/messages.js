@@ -793,9 +793,9 @@ window.languageManager.loadMessages('pt-br', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bits (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Este lugar ainda não tem blocos de construção. Quer preparar tudo para começar a criar? Vamos deixar tudo pronto para você!',
+		'Esta pasta ainda não tem arquivos do Blockly. Se você continuar, uma pasta blockly/ e seus arquivos serão criados aqui. Escolha Cancelar para não fazer alterações.',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Este lugar já tem conteúdo {0}. Quer adicionar blocos de construção aqui também? Vamos deixar tudo pronto para você!',
+		'Esta pasta já contém arquivos de {0}. Se você continuar, uma pasta blockly/ e seus arquivos também serão criados aqui. Escolha Cancelar para não fazer alterações.',
 	BUTTON_CONTINUE: 'Sim, vamos lá!',
 	BUTTON_CANCEL: 'Cancelar',
 	BUTTON_SUPPRESS: 'Não perguntar',

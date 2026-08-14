@@ -795,8 +795,8 @@ window.languageManager.loadMessages('bg', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Тук все още няма блокчета. Искаш ли да подготвим всичко, за да може да започнеш да създаваш? Ще приготвим всичко за теб!',
-	SAFETY_WARNING_BODY_WITH_TYPE: 'Тук вече има {0} съдържание. Искаш ли да добавим блокчета тук също? Ще подготвим всичко за теб!',
+		'В тази папка все още няма Blockly файлове. Ако продължите, тук ще бъдат създадени папка blockly/ и файлове. Изберете „Отказ“, за да няма промени.',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'В тази папка вече има {0} файлове. Ако продължите, тук ще бъдат създадени и папка blockly/ и файлове. Изберете „Отказ“, за да няма промени.',
 	BUTTON_CONTINUE: 'Да, започваме!',
 	BUTTON_CANCEL: 'Отказ',
 	BUTTON_SUPPRESS: 'Не питай пак',
@@ -811,7 +811,7 @@ window.languageManager.loadMessages('bg', {
 	ESP32_WIFI_CONNECT: 'Свържи WiFi',
 	ESP32_WIFI_CONNECT_SSID: 'SSID',
 	ESP32_WIFI_CONNECT_PASSWORD: 'Парола',
-	ESP32_WIFI_CONNECT_TOOLTIP: 'Свържете ESP32 към WiFi мрежа с посочения SSID и парола',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Свързване към Wi-Fi мрежа (10 секунди време за изчакване)',
 	ESP32_WIFI_DISCONNECT: 'Прекъсни WiFi',
 	ESP32_WIFI_DISCONNECT_TOOLTIP: 'Прекъснете WiFi връзката на ESP32',
 	ESP32_WIFI_STATUS: 'Статус на WiFi',
@@ -858,7 +858,7 @@ window.languageManager.loadMessages('bg', {
 	TEXT_TO_NUMBER: 'Текст към число',
 	TEXT_TO_NUMBER_INT: 'цяло',
 	TEXT_TO_NUMBER_FLOAT: 'дробно',
-	TEXT_TO_NUMBER_TOOLTIP: 'Преобразувайте текст в число (цяло или дробно)',
+	TEXT_TO_NUMBER_TOOLTIP: 'Преобразува текста в число (при невалиден вход връща 0)',
 
 	// To String Block
 	TO_STRING: 'Към текст',

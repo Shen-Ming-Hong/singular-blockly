@@ -8,7 +8,7 @@ Singular Blockly 以 PR 為唯一的 `master` 變更入口，並以 annotated `v
 
 - Node.js 固定為 22.16.0，VS Code 測試版固定為 1.109.0。
 - `npm ci` 使用 lockfile 與 npm cache。
-- 靜態檢查執行 TypeScript／webpack 編譯、`src` 與 i18n／release scripts ESLint、確定性翻譯驗證、whitelist tests、release helper tests，以及高嚴重度 `npm audit`。
+- 靜態檢查執行 TypeScript／webpack 編譯、`src` 與 i18n／release scripts ESLint、確定性翻譯驗證、i18n contract tests、release helper tests，以及高嚴重度 `npm audit`。
 - Ubuntu、Windows、macOS 都執行 unit tests，並用 `--forbid-only` 阻擋 `.only`。
 - Linux 透過 Xvfb 產生 coverage artifact；目前只提供報告，不設未知基準的 hard gate。
 - VS Code 測試使用 `${{ runner.temp }}` 下的 workspace、user-data 與 extensions 目錄，並跳過 extension dependencies，不讀取開發者的 Copilot、PlatformIO 或已安裝擴充功能。
@@ -30,11 +30,11 @@ Linux coverage runner 使用：
 xvfb-run -a npm run test:coverage:ci
 ```
 
-## 翻譯驗證與月度稽核
+## 翻譯驗證與語意稽核
 
-PR 只執行 `npm run validate:i18n`。缺鍵、空字串、placeholder、schema 或編碼問題會失敗；長度比例只計數，使用 `npm run validate:i18n:verbose` 才展開警告。PR workflow 不再執行 pattern detector、留言或取得 PR 寫入權限。
+GitHub CI 執行 `npm run validate:i18n` 與 `npm run test:i18n`。15 個 locale 與 `package.nls` 的缺少／多餘 key、空字串、placeholder 次數、schema、編碼、必要 ARIA 或 Blockly core locale 問題都會失敗。CI 不執行模型語意判斷、不產生長度比例警告，也不需要 PR／Issue 寫入權限。
 
-`.github/workflows/i18n-audit.yml` 每月一日 02:00 UTC 及手動執行時稽核全部 14 個非英文語系。它會上傳 JSON、文字摘要與 pattern report，並寫入 Actions summary。高嚴重度問題超過 10 時，建立或更新唯一的 `[i18n] Translation Quality Audit` issue；回到門檻內會自動關閉。
+語意品質由工作區 `i18n-maintenance` Skill 在本地 diff、Git workflow 與發布 review 中檢查。Skill 讀取 repo audit state；距上次完整審計已滿 30 天、政策版本改變、checkpoint 未完成或使用者要求 `audit-all` 時，使用固定 manifest 與每批 200 組的 helper 續跑。全量審計不自動改寫既有翻譯；既有 Blocker 阻擋發布，Major 形成待辦。
 
 ## 發布流程
 
@@ -118,6 +118,6 @@ gh workflow run recover-github-release.yml --ref master \
 
 - Secrets 名稱維持 `VSCE_PAT`、`OVSX_PAT`，不得寫入 log、artifact 或 repository。
 - Workflow 預設只有 `contents: read`。
-- 只有 GitHub Release job 使用 `contents: write`；只有月度翻譯稽核使用 `issues: write`。
+- 只有 GitHub Release job 使用 `contents: write`；翻譯驗證不使用寫入權限。
 - 所有第三方 Actions 固定完整 commit SHA，Dependabot 每週追蹤 npm 與 GitHub Actions 更新。
 - 帳號、Copilot 與硬體 integration tests 保留在發布技能的人工驗收，不放入無憑證 CI。

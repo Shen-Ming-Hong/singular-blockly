@@ -285,9 +285,9 @@ export class WorkspaceValidator implements IWorkspaceValidator {
 		// 使用英文作為後備語言，符合 i18n 最佳實踐
 		const fallbackMessages: Record<string, string> = {
 			[MESSAGE_KEYS.SAFETY_WARNING_BODY_NO_TYPE]:
-				"This place doesn't have building blocks yet. Want to set things up so you can start creating? We'll get everything ready for you!",
+				'This folder does not have Blockly files yet. Continue to create a blockly/ folder and files here, or cancel to leave this folder unchanged.',
 			[MESSAGE_KEYS.SAFETY_WARNING_BODY_WITH_TYPE]:
-				"This place already has {0} stuff in it. Want to add building blocks here too? We'll set everything up for you!",
+				'This folder already contains {0} files. Continue to also create a blockly/ folder and files here, or cancel to leave this folder unchanged.',
 			[MESSAGE_KEYS.BUTTON_CONTINUE]: "Yes, let's go!",
 			[MESSAGE_KEYS.BUTTON_CANCEL]: 'Cancel',
 			[MESSAGE_KEYS.BUTTON_SUPPRESS]: "Don't ask again",

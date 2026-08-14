@@ -795,8 +795,8 @@ window.languageManager.loadMessages('pl', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bitów (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'To miejsce nie ma jeszcze klocków. Chcesz wszystko przygotować, żebyś mógł/mogła zacząć tworzyć? Przygotujemy wszystko dla ciebie!',
-	SAFETY_WARNING_BODY_WITH_TYPE: 'To miejsce ma już zawartość {0}. Chcesz tu też dodać klocki? Przygotujemy wszystko dla ciebie!',
+		'Ten folder nie zawiera jeszcze plików Blockly. Kontynuowanie utworzy tutaj folder blockly/ i pliki. Wybierz Anuluj, aby niczego nie zmieniać.',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'Ten folder zawiera już pliki {0}. Kontynuowanie utworzy tutaj także folder blockly/ i pliki. Wybierz Anuluj, aby niczego nie zmieniać.',
 	BUTTON_CONTINUE: 'Tak, zaczynamy!',
 	BUTTON_CANCEL: 'Anuluj',
 	BUTTON_SUPPRESS: 'Nie pytaj',
@@ -811,7 +811,7 @@ window.languageManager.loadMessages('pl', {
 	ESP32_WIFI_CONNECT: 'Połącz WiFi',
 	ESP32_WIFI_CONNECT_SSID: 'SSID',
 	ESP32_WIFI_CONNECT_PASSWORD: 'Hasło',
-	ESP32_WIFI_CONNECT_TOOLTIP: 'Połącz ESP32 z siecią WiFi przy użyciu podanego SSID i hasła',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Połącz z siecią Wi-Fi (limit czasu 10 sekund)',
 	ESP32_WIFI_DISCONNECT: 'Rozłącz WiFi',
 	ESP32_WIFI_DISCONNECT_TOOLTIP: 'Rozłącz ESP32 z sieci WiFi',
 	ESP32_WIFI_STATUS: 'Stan WiFi',
@@ -858,7 +858,7 @@ window.languageManager.loadMessages('pl', {
 	TEXT_TO_NUMBER: 'Tekst na liczbę',
 	TEXT_TO_NUMBER_INT: 'całkowita',
 	TEXT_TO_NUMBER_FLOAT: 'zmiennoprzecinkowa',
-	TEXT_TO_NUMBER_TOOLTIP: 'Konwertuj tekst na liczbę (całkowitą lub zmiennoprzecinkową)',
+	TEXT_TO_NUMBER_TOOLTIP: 'Konwertuje tekst na liczbę (dla nieprawidłowych danych zwraca 0)',
 
 	// To String Block
 	TO_STRING: 'Na tekst',

@@ -786,8 +786,8 @@ window.languageManager.loadMessages('zh-hant', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bit (0-65535)',
 
 	// Safety Guard (Project Safety Protection)
-	SAFETY_WARNING_BODY_NO_TYPE: '這裡還沒有積木內容喔！要幫你準備好，讓你可以開始創作嗎？我們會把一切都準備好！',
-	SAFETY_WARNING_BODY_WITH_TYPE: '這裡已經有 {0} 的程式內容了。要在這裡也加上積木功能嗎？我們會幫你準備好一切！',
+	SAFETY_WARNING_BODY_NO_TYPE: '這個資料夾還沒有 Blockly 檔案。繼續會在這裡建立 blockly/ 資料夾和檔案；若要保持不變，請選擇取消。',
+	SAFETY_WARNING_BODY_WITH_TYPE: '這個資料夾已有 {0} 檔案。繼續會另外在這裡建立 blockly/ 資料夾和檔案；若要保持不變，請選擇取消。',
 	BUTTON_CONTINUE: '好，開始吧！',
 	BUTTON_CANCEL: '取消',
 	BUTTON_SUPPRESS: '不再詢問',

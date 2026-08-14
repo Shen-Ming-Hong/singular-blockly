@@ -30,8 +30,10 @@ Automates Git operations during development, from commit to PR creation.
 | ---------------------- | -------------------------------------- | ---------------------------------------- |
 | 開發完成 → 本地提交    | **git-workflow**（本技能）             | commit 與變更範圍確認                    |
 | 本地審查 → 發布前核准  | `pr-review-release`                    | findings、修正、re-review 與兩次使用者 gate |
+| 審查收斂循環           | `local-code-review-loop`               | 評估、修正、驗證與重審到收斂             |
 | 發布核准 → PR／Release | **git-workflow** + `pr-review-release` | push、建立 PR、合併與發布                |
 | 程式碼簡化             | `code-simplifier`                      | push 前必須執行（阻塞型）                |
+| 翻譯結構與語意         | `i18n-maintenance`                     | i18n diff 的修復、審計與全量 checkpoint  |
 
 ---
 
@@ -84,12 +86,24 @@ git diff --cached  # 已 staged 的變更
 | `generators` | 程式碼生成器 (`media/blockly/generators/`) |
 | `i18n`       | 國際化 (`media/locales/`)                  |
 | `webview`    | WebView 相關 (`media/js/`, `src/webview/`) |
-| `mcp`        | MCP Server (`src/mcp/`)                    |
+| `skills`     | 工作區 Skills (`.github/skills/`)          |
 | `services`   | 服務層 (`src/services/`)                   |
 | `toolbox`    | 工具箱 (`media/toolbox/`)                  |
 | `deps`       | 依賴管理                                   |
 
-#### 1.3 執行 Commit
+#### 1.3 i18n 維護 Gate（有翻譯變更時必須）
+
+若 staged、unstaged 或分支差異包含以下任一範圍，先使用 `i18n-maintenance` 的增量修復模式：
+
+- `media/locales/*/messages.js`
+- `package.nls*.json`
+- `media/samples/index.json`
+- 範例 JSON 的 `nameTranslations`／`stringTranslations`
+- 新增或修改的使用者可見來源文字
+
+必須取得 `PASS` 或 `PASS_WITH_ADVISORIES`，並執行 `npm run validate:i18n`。`NEEDS_USER_DECISION` 必須先取得使用者對 finding ID 的明確選擇；`BLOCKED` 不得 commit、push 或建立 PR。Skill 因逾 30 天全量審計而更新的 audit state 應與本次變更一併提交。
+
+#### 1.4 執行 Commit
 
 ```bash
 # 先檢查範圍，再互動式或以明確檔案清單 stage
@@ -101,7 +115,7 @@ git add -p
 git commit -m "feat(scope): description"
 ```
 
-#### 1.4 多次 Commit 策略
+#### 1.5 多次 Commit 策略
 
 對於大型功能，建議分多次 commit：
 
@@ -179,7 +193,7 @@ Before creating a PR, you **must** use the `code-simplifier` skill to check and 
 
 **⚠️ 阻塞型步驟：必須完整執行 `pr-review-release` 的 Phase 0–3.5。**
 
-1. 以 base branch 為基準，本地審查已提交與未提交差異。
+1. 使用 `local-code-review-loop`，以 base branch 為基準審查已提交與未提交差異。
 2. 評估 findings，先取得使用者對修正方案的明確核准。
 3. 只修正已核准項目，完成測試、`code-simplifier` 與本地 re-review。
 4. 提交修正摘要、測試結果、殘餘風險與 re-review 結果。
@@ -340,6 +354,7 @@ gh pr create --fill --base master
 - [ ] 變更已通過 `npm run compile`
 - [ ] Commit message 符合 Conventional Commits 格式
 - [ ] Scope 正確反映變更範圍
+- [ ] 翻譯相關 diff 已通過 `i18n-maintenance` 與 `npm run validate:i18n`（如適用）
 
 ### 程式碼簡化階段（阻塞型）Before Code Simplification
 
@@ -393,3 +408,5 @@ gh pr create --fill --base master
 - [GitHub CLI 文件](https://cli.github.com/manual/)
 - [pr-review-release 技能](../pr-review-release/SKILL.md) - 本地審查、使用者核准與發布流程
 - [code-simplifier 技能](../code-simplifier/SKILL.md) - PR 前程式碼簡化（必須）
+- [i18n-maintenance 技能](../i18n-maintenance/SKILL.md) - 翻譯結構、語意與全量審計
+- [local-code-review-loop 技能](../local-code-review-loop/SKILL.md) - 本地 findings 評估、修正與重審收斂循環

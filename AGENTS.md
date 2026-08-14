@@ -33,7 +33,7 @@
 - `npm run generate:skill-contract`: rebuild the runtime-derived project Skill contract.
 - `npm run check:project-skills`: verify tracked Skill assets and manifest hashes.
 - `npm run validate:i18n`: validate all locale files.
-- `npm run audit:i18n:ja`: Japanese translation audit.
+- `npm run test:i18n`: run deterministic i18n contract tests.
 
 ## Architecture Rules
 - Extension Host code in `src/` and WebView code in `media/` are separate contexts; communicate only through `postMessage`.
@@ -90,6 +90,7 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Common scopes: `blocks`, `generators`, `i18n`, `webview`, `skills`, `services`, `toolbox`, `deps`.
 - PRs require CI passing, maintainer approval, no merge conflicts, and clean ESLint.
 - Localization PRs should use `.github/PULL_REQUEST_TEMPLATE/localization.md` and include before/after examples, audit references, and screenshots when useful.
+- Translation-bearing changes must use the workspace `i18n-maintenance` Skill before commit and release review.
 
 ## Security and Configuration
 - Report security issues through `SECURITY.md`.

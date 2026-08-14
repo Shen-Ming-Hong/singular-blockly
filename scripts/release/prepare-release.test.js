@@ -174,7 +174,7 @@ describe('GitHub Release recovery workflow contract', () => {
 });
 
 describe('GitHub workflow context contract', () => {
-	for (const workflowName of ['ci.yml', 'i18n-audit.yml', 'publish.yml', 'recover-github-release.yml']) {
+	for (const workflowName of ['ci.yml', 'publish.yml', 'recover-github-release.yml']) {
 		it(`${workflowName} does not evaluate runner.temp before a runner exists`, () => {
 			const workflow = fs.readFileSync(
 				path.join(__dirname, '..', '..', '.github', 'workflows', workflowName),

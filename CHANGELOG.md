@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [未發布] Unreleased
 
+## [0.86.2] - 2026-08-14
+
+### 🐛 修復 Bug Fixes
+
+- 強化 15 語系的專案安全警告，明確說明繼續會建立 `blockly/` 資料夾與檔案、取消會保持資料夾不變，並補回部分語系遺漏的 Wi-Fi 10 秒逾時與無效數字輸入回傳 0
+  Strengthened project safety warnings across all 15 locales to explain that continuing creates the `blockly/` folder and files while canceling leaves the folder unchanged, and restored missing 10-second Wi-Fi timeout and invalid-number input return-value details in affected locales
+
+### 🔧 維護 Maintenance
+
+- 以 deterministic 15 語系與 package NLS validator、工作區 `i18n-maintenance` Skill、版本化語意政策及可續跑完整審計，取代舊 regex detectors、whitelist、統計腳本與月度 audit workflow
+  Replaced legacy regex detectors, whitelist, statistics scripts, and the monthly audit workflow with a deterministic 15-locale and package NLS validator, the workspace `i18n-maintenance` Skill, versioned semantic policy, and resumable full audits
+- 新增專案專用 `local-code-review-loop` Skill，反覆評估、修正、驗證並重審本地差異直到 findings 收斂，同時保留發佈流程的使用者核准 gate
+  Added the project-local `local-code-review-loop` Skill to repeatedly assess, fix, validate, and re-review local changes until findings converge while preserving release approval gates
+
 ## [0.86.1] - 2026-08-13
 
 ### 🐛 修復 Bug Fixes

@@ -526,7 +526,7 @@ window.languageManager.loadMessages('es', {
 	CONTROLS_FOREVER_TOOLTIP: 'Sigue repitiendo las instrucciones de dentro hasta que el programa se detenga.',
 	CONTROLS_WHILEUNTIL_OPERATOR_WHILE: 'repetir mientras',
 	CONTROLS_WHILEUNTIL_OPERATOR_UNTIL: 'repetir hasta que',
-	CONTROLS_FOR_TITLE: 'contar con %1 desde %2 hasta %3 de %4 en %4',
+	CONTROLS_FOR_TITLE: 'contar con %1 desde %2 hasta %3 en incrementos de %4',
 	CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK: 'salir del bucle',
 	CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE: 'continuar con la siguiente iteración',
 	CONTROLS_REPEAT_TOOLTIP: 'Repite algunas instrucciones varias veces.',
@@ -797,9 +797,9 @@ window.languageManager.loadMessages('es', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bits (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Este lugar aún no tiene bloques de construcción. ¿Quieres que preparemos todo para que puedas empezar a crear? ¡Te dejamos todo listo!',
+		'Esta carpeta aún no tiene archivos de Blockly. Si continúas, se crearán aquí una carpeta blockly/ y sus archivos. Elige Cancelar para no hacer cambios.',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Este lugar ya tiene contenido de {0}. ¿Quieres agregar bloques de construcción aquí también? ¡Te dejamos todo listo!',
+		'Esta carpeta ya contiene archivos de {0}. Si continúas, también se crearán aquí una carpeta blockly/ y sus archivos. Elige Cancelar para no hacer cambios.',
 	BUTTON_CONTINUE: '¡Sí, vamos!',
 	BUTTON_CANCEL: 'Cancelar',
 	BUTTON_SUPPRESS: 'No preguntar',

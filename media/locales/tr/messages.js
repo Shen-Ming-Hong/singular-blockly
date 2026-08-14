@@ -793,9 +793,9 @@ window.languageManager.loadMessages('tr', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bits (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Burada henüz yapı taşları yok. Her şeyi hazırlayalım mı, böylece oluşturmaya başlayabilirsin? Senin için her şeyi hazırlayacağız!',
+		'Bu klasörde henüz Blockly dosyaları yok. Devam ederseniz burada bir blockly/ klasörü ve dosyalar oluşturulur. Değişiklik yapmamak için İptal\'i seçin.',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Burada zaten {0} içeriği var. Buraya da yapı taşları eklemek ister misin? Senin için her şeyi hazırlayacağız!',
+		'Bu klasörde zaten {0} dosyaları var. Devam ederseniz burada ayrıca bir blockly/ klasörü ve dosyalar oluşturulur. Değişiklik yapmamak için İptal\'i seçin.',
 	BUTTON_CONTINUE: 'Evet, başla!',
 	BUTTON_CANCEL: 'İptal',
 	BUTTON_SUPPRESS: 'Bir daha sorma',
@@ -810,7 +810,7 @@ window.languageManager.loadMessages('tr', {
 	ESP32_WIFI_CONNECT: 'WiFi Bağlan',
 	ESP32_WIFI_CONNECT_SSID: 'SSID',
 	ESP32_WIFI_CONNECT_PASSWORD: 'Şifre',
-	ESP32_WIFI_CONNECT_TOOLTIP: "ESP32'yi belirtilen SSID ve şifre ile WiFi ağına bağla",
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Wi-Fi ağına bağlan (10 saniye zaman aşımı)',
 	ESP32_WIFI_DISCONNECT: 'WiFi Bağlantısını Kes',
 	ESP32_WIFI_DISCONNECT_TOOLTIP: "ESP32'nin WiFi bağlantısını kes",
 	ESP32_WIFI_STATUS: 'WiFi Durumu',
@@ -857,7 +857,7 @@ window.languageManager.loadMessages('tr', {
 	TEXT_TO_NUMBER: 'Metin sayıya',
 	TEXT_TO_NUMBER_INT: 'tam sayı',
 	TEXT_TO_NUMBER_FLOAT: 'ondalık',
-	TEXT_TO_NUMBER_TOOLTIP: 'Metni sayıya dönüştür (tam sayı veya ondalık)',
+	TEXT_TO_NUMBER_TOOLTIP: 'Metni sayıya dönüştürür (geçersiz girişte 0 döndürür)',
 
 	// To String Block
 	TO_STRING: 'Metne Dönüştür',

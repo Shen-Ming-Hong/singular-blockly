@@ -793,8 +793,8 @@ window.languageManager.loadMessages('ja', {
 	ESP32_PWM_RESOLUTION_15BIT: '15ビット (0-32767)',
 	ESP32_PWM_RESOLUTION_16BIT: '16ビット (0-65535)',
 	// Safety Guard (Project Safety Protection)
-	SAFETY_WARNING_BODY_NO_TYPE: 'ここにはまだブロックがありません。準備をして、つくり始められるようにしますか？全部準備しておきますね！',
-	SAFETY_WARNING_BODY_WITH_TYPE: 'ここにはすでに {0} の内容があります。ここにもブロック機能を追加しますか？全部準備しておきますね！',
+	SAFETY_WARNING_BODY_NO_TYPE: 'このフォルダーにはまだ Blockly のファイルがありません。続行すると、ここに blockly/ フォルダーとファイルを作成します。変更しない場合はキャンセルしてください。',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'このフォルダーにはすでに {0} のファイルがあります。続行すると、ここに blockly/ フォルダーとファイルも作成します。変更しない場合はキャンセルしてください。',
 	BUTTON_CONTINUE: 'はい、始めよう！',
 	BUTTON_CANCEL: 'キャンセル',
 	BUTTON_SUPPRESS: 'もう聞かない',

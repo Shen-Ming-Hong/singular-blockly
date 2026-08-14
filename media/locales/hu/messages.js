@@ -796,9 +796,9 @@ window.languageManager.loadMessages('hu', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Ezen a helyen még nincsenek építőkockák. Szeretnéd, ha mindent előkészítenénk, hogy elkezdhess alkotni? Mindent beállítunk neked!',
+		'Ebben a mappában még nincsenek Blockly-fájlok. Folytatáskor itt létrejön egy blockly/ mappa és a fájljai. Ha nem szeretnél változtatást, válaszd a Mégse lehetőséget.',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Ezen a helyen már van {0} tartalom. Szeretnél ide is építőkockákat hozzáadni? Mindent beállítunk neked!',
+		'Ebben a mappában már vannak {0}-fájlok. Folytatáskor itt egy blockly/ mappa és a fájljai is létrejönnek. Ha nem szeretnél változtatást, válaszd a Mégse lehetőséget.',
 	BUTTON_CONTINUE: 'Igen, rajta!',
 	BUTTON_CANCEL: 'Mégse',
 	BUTTON_SUPPRESS: 'Ne kérdezd újra',
@@ -813,7 +813,7 @@ window.languageManager.loadMessages('hu', {
 	ESP32_WIFI_CONNECT: 'WiFi csatlakozás',
 	ESP32_WIFI_CONNECT_SSID: 'SSID',
 	ESP32_WIFI_CONNECT_PASSWORD: 'Jelszó',
-	ESP32_WIFI_CONNECT_TOOLTIP: 'ESP32 csatlakoztatása WiFi hálózathoz a megadott SSID-del és jelszóval',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Csatlakozás Wi-Fi-hálózathoz (10 másodperces időkorlát)',
 	ESP32_WIFI_DISCONNECT: 'WiFi leválasztás',
 	ESP32_WIFI_DISCONNECT_TOOLTIP: 'ESP32 leválasztása a WiFi hálózatról',
 	ESP32_WIFI_STATUS: 'WiFi állapot',
@@ -860,7 +860,7 @@ window.languageManager.loadMessages('hu', {
 	TEXT_TO_NUMBER: 'Szöveg számmá',
 	TEXT_TO_NUMBER_INT: 'egész',
 	TEXT_TO_NUMBER_FLOAT: 'tört',
-	TEXT_TO_NUMBER_TOOLTIP: 'Szöveg átalakítása számmá (egész vagy tört)',
+	TEXT_TO_NUMBER_TOOLTIP: 'A szöveget számmá alakítja (érvénytelen bemenet esetén 0-t ad vissza)',
 
 	// To String Block
 	TO_STRING: 'Szöveggé',

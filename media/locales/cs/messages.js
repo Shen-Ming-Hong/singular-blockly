@@ -792,8 +792,8 @@ window.languageManager.loadMessages('cs', {
 	ESP32_PWM_RESOLUTION_16BIT: '16 bitů (0-65535)',
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Toto místo zatím nemá žádné stavební bloky. Chceš vše připravit, abys mohl/a začít tvořit? Vše pro tebe připravíme!',
-	SAFETY_WARNING_BODY_WITH_TYPE: 'Na tomto místě už je {0} obsah. Chceš sem přidat i stavební bloky? Vše pro tebe připravíme!',
+		'Tato složka zatím neobsahuje soubory Blockly. Pokračováním se zde vytvoří složka blockly/ a soubory. Chcete-li vše ponechat beze změny, zvolte Zrušit.',
+	SAFETY_WARNING_BODY_WITH_TYPE: 'Tato složka již obsahuje soubory {0}. Pokračováním se zde navíc vytvoří složka blockly/ a soubory. Chcete-li vše ponechat beze změny, zvolte Zrušit.',
 	BUTTON_CONTINUE: 'Ano, pojďme!',
 	BUTTON_CANCEL: 'Zrušit',
 	BUTTON_SUPPRESS: 'Už se neptat',
@@ -808,7 +808,7 @@ window.languageManager.loadMessages('cs', {
 	ESP32_WIFI_CONNECT: 'Připojit WiFi',
 	ESP32_WIFI_CONNECT_SSID: 'SSID',
 	ESP32_WIFI_CONNECT_PASSWORD: 'Heslo',
-	ESP32_WIFI_CONNECT_TOOLTIP: 'Připojit ESP32 k WiFi síti s uvedeným SSID a heslem',
+	ESP32_WIFI_CONNECT_TOOLTIP: 'Připojit k síti Wi-Fi (časový limit 10 sekund)',
 	ESP32_WIFI_DISCONNECT: 'Odpojit WiFi',
 	ESP32_WIFI_DISCONNECT_TOOLTIP: 'Odpojit ESP32 od WiFi sítě',
 	ESP32_WIFI_STATUS: 'Stav WiFi',
@@ -855,7 +855,7 @@ window.languageManager.loadMessages('cs', {
 	TEXT_TO_NUMBER: 'Text na číslo',
 	TEXT_TO_NUMBER_INT: 'celé',
 	TEXT_TO_NUMBER_FLOAT: 'desetinné',
-	TEXT_TO_NUMBER_TOOLTIP: 'Převést text na číslo (celé nebo desetinné)',
+	TEXT_TO_NUMBER_TOOLTIP: 'Převede text na číslo (při neplatném vstupu vrátí 0)',
 
 	// To String Block
 	TO_STRING: 'Na text',
