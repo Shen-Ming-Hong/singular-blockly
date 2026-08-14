@@ -16,7 +16,7 @@
 
 ### 前置需求
 
--   Node.js 18 或更高版本
+-   Node.js 22.16.0 或更高版本
 -   npm 9 或更高版本
 -   Visual Studio Code
 
@@ -51,69 +51,47 @@ npm run compile
 
 ### 開始之前
 
-1. **閱讀指南**：查看 `specs/002-i18n-localization-review/guidelines/{lang}.md` 了解您的語言的具體指導原則
-2. **檢查詞彙表**：參考 `specs/002-i18n-localization-review/localization-glossary.json` 查看已核准的術語
-3. **執行審計**：使用 `node scripts/i18n/audit-translations.js --languages={lang}` 查看目前問題
+1. 閱讀 [i18n 規格](docs/specifications/02-internationalization/i18n.md)。
+2. 使用工作區 `i18n-maintenance` Skill 的 semantic policy 與目標 locale profile。
+3. 確認實際 call site 的操作、後果、fallback 與訊息類型。
 
 ### 翻譯工作流程
 
-#### 步驟 1：識別問題
-
-```bash
-# 對您的語言執行審計
-node scripts/i18n/audit-translations.js --languages=ja --verbose
-
-# 檢視摘要
-node scripts/i18n/audit-summary.js specs/002-i18n-localization-review/audit-reports/audit-{date}-baseline.json
-```
-
-#### 步驟 2：建立功能分支
+#### 步驟 1：建立功能分支
 
 ```bash
 git checkout -b localization/{lang}/fix-high-priority
 ```
 
-#### 步驟 3：編輯翻譯檔案
+#### 步驟 2：編輯翻譯
 
-檔案位置：`media/locales/{lang}/messages.js`
+翻譯可能位於：
 
-```javascript
-// 修改前
-window.languageManager.loadMessages({
-	CATEGORY_LOGIC: 'Logic', // 英文回退
-});
+- `media/locales/{lang}/messages.js`
+- `package.nls*.json`
+- `media/samples/index.json`
+- sample JSON 的 `nameTranslations`／`stringTranslations`
 
-// 修改後
-window.languageManager.loadMessages({
-	CATEGORY_LOGIC: '論理ブロック', // 文化適切的日文
-});
-```
+英文 locale 是一般訊息的 key／placeholder 結構基準，但語意以程式實際行為與核准規格為準。英文新增 key 時必須同步其他 14 個 locale。
 
-#### 步驟 4：驗證變更
+#### 步驟 3：執行結構與語意維護
 
 ```bash
-# 再次執行審計以確認修復
-node scripts/i18n/audit-translations.js --languages={lang}
-
-# 驗證解析正常
-node -e "require('./scripts/i18n/lib/translation-reader.js').loadMessagesFile('{lang}')"
-
-# 執行自動驗證（檢查佔位符、空翻譯、編碼、長度比例）
-node scripts/i18n/validate-translations.js --language={lang}
-
-# 檢測翻譯模式（直譯警告）
-node scripts/i18n/detect-patterns.js --language={lang}
-
-# 產生翻譯統計
-npm run stats:i18n
-
-# 或使用 npm 腳本（推薦）
-npm run validate:i18n          # 驗證所有語言
-npm run audit:i18n:ja          # 審計特定語言
-npm run detect:i18n            # 檢測所有語言的模式
-npm run stats:i18n             # 產生 Markdown 統計報告
-npm run stats:i18n:json        # 產生 JSON 統計數據
+npm run validate:i18n
+npm run validate:i18n:lang -- --language={lang}
+npm run test:i18n
+npm run lint:i18n
 ```
+
+使用 `i18n-maintenance` 的增量修復模式審計本次 diff。硬檢查最多修復三輪；結果必須為 `PASS` 或 `PASS_WITH_ADVISORIES`。`NEEDS_USER_DECISION` 必須由產品負責人選擇候選譯法；`BLOCKED` 不得提交。
+
+#### 步驟 4：手動驗證
+
+- 按鈕、選單與確認框動作符合實際效果。
+- 警告／錯誤包含具體後果及可行的下一步。
+- 8–14 歲使用者能理解發生什麼、要做什麼、結果是什麼。
+- 技術名稱、板型、腳位、數值、單位、識別字與 fallback 正確。
+- ARIA 描述用途／狀態；受影響 UI 沒有截斷或溢出。
 
 #### 步驟 5：提交 Pull Request
 
@@ -121,191 +99,37 @@ npm run stats:i18n:json        # 產生 JSON 統計數據
 
 包含：
 
--   前後對比範例（至少 3-5 個主要變更）
--   參考正在修復的審計問題
--   UI 渲染截圖（如適用）
--   自我評估分數（文化適切性、語氣、術語、清晰度各 1-5 分）
+- 重要前後對照與 semantic rule ID。
+- `i18n-maintenance` 結果與 deterministic 測試。
+- 使用者核准的 ambiguous finding／waiver（如有）。
+- UI 渲染截圖（如適用）。
+- full-audit 既有 Major backlog 與其他殘餘風險。
 
 ### 翻譯指南
 
-#### 高優先級鍵值（頻率 ≥70）
-
-優先處理這些 - 它們對使用者永遠可見：
-
--   `CATEGORY_*` - 工具箱分類
--   `BLOCKS_TAB`, `CODE_TAB` - 主要頁籤
--   `BOARD_SELECT_*` - 板子選擇 UI
--   常用積木標籤
-
 #### 品質標準
 
--   **文化適切性**：符合當地教育規範
--   **語氣**：友善、鼓勵性、適合學生
--   **術語**：使用已核准的詞彙表術語
--   **長度**：避免翻譯超過英文長度 150%（UI 溢出風險）
--   **完整性**：無空字串或英文回退
-
-#### 語言特定規則
-
-**日文（ja）**：
-
--   使用禮貌形式（です・ます）適合教育情境
--   避免過度片假名音譯
--   複雜術語使用漢字附注音
-
-**韓文（ko）**：
-
--   使用禮貌非正式（해요체），非正式（하십시오체）
--   當有韓文對應詞時避免英文外來語
-
-**德文（de）**：
-
--   使用非正式 "du"，非正式 "Sie"（目標：學生）
--   保持翻譯簡潔（德文通常長 20-30%）
-
-**繁體中文（zh-hant）**：
-
--   使用台灣用語，非大陸用語
--   範例："軟體"（台灣）非 "软件"（大陸）
-
-**西班牙文（es）**：
-
--   使用非正式 "tú"，非正式 "usted"
--   使用中性西班牙文（避免地區方言）
+- **意義與操作**：保留行為、否定、條件、數量、因果、可逆性與安全後果。
+- **兒少可理解性**：使用常見詞與具體動詞，不把必要技術名稱錯誤簡化掉。
+- **語氣與在地性**：友善、不責怪、不幼兒化；遵循版本化 locale policy。
+- **術語**：使用 `preferred`／`allowed` 詞彙，不在一般翻譯 PR 臨時改政策。
+- **可及性與版面**：ARIA 描述語意；字元比例本身不代表溢出，實際 UI 才是證據。
 
 ### 自動驗證工具
 
-Singular Blockly 提供多個自動化工具來協助維護翻譯品質。所有工具都可以透過 npm scripts 執行,也可以直接使用 node 命令。
-
-#### 驗證腳本 (`validate-translations.js`)
-
-檢查常見錯誤：
+`validate-translations.js` 只處理客觀、可重複的錯誤：
 
 ```bash
-# 驗證所有語言
 npm run validate:i18n
-
-# 驗證特定語言
 npm run validate:i18n:lang -- --language=ja
-# 或直接使用
-node scripts/i18n/validate-translations.js --language=ja
+node scripts/i18n/validate-translations.js --all --format=json
 ```
 
-**檢查項目**：
-
--   ✅ **佔位符保留**：{0}, %1 等必須完整保留
--   ✅ **無空翻譯**：所有訊息值為非空字串
--   ✅ **UTF-8 編碼**：檔案編碼正確
--   ✅ **長度比例警告**：翻譯長度 >150% 或 <50% 英文時警告（UI 溢出風險）
--   ✅ **Schema 驗證**：檔案結構符合規範
-
-#### 模式偵測 (`detect-patterns.js`)
-
-偵測直譯模式：
-
-```bash
-# 偵測所有語言
-npm run detect:i18n
-
-# 偵測特定語言
-npm run detect:i18n:lang -- --language=ja
-# 或直接使用
-node scripts/i18n/detect-patterns.js --language=ja
-```
-
-**偵測項目**：
-
--   ⚠️ **英文冠詞**：在非英文文字中出現 "a", "an", "the"
--   ⚠️ **英文大寫模式**：句中不當大寫單字
--   ⚠️ **過度使用省略號**：連續三個以上句點 "..."
--   ⚠️ **違反詞彙表術語**：使用未核准的術語替代
-
-#### 審計腳本 (`audit-translations.js`)
-
-執行深度品質分析：
-
-```bash
-# 審計主要語言
-npm run audit:i18n
-
-# 審計所有語言
-npm run audit:i18n:all
-
-# 審計特定語言
-npm run audit:i18n:ja
-# 或直接使用
-node scripts/i18n/audit-translations.js --languages=ja --verbose
-```
-
-#### 統計腳本 (`translation-stats.js`) ⭐ 新增
-
-產生翻譯覆蓋率和品質統計：
-
-```bash
-# 產生 Markdown 報告
-npm run stats:i18n
-
-# 產生 JSON 數據
-npm run stats:i18n:json
-
-# 指定輸出檔案
-node scripts/i18n/translation-stats.js --format both --output my-stats.json
-```
-
-**統計項目**：
-
--   📊 **覆蓋率**：每種語言的翻譯完整度百分比
--   📏 **平均長度**：翻譯字串的平均字元數
--   📐 **長度比例**：相對於英文基準的長度比較
--   ❌ **空鍵值計數**：需要翻譯的空字串數量
-
-**輸出格式**：
-
--   Markdown 表格報告（適合檢視）
--   JSON 結構化數據（適合程式處理）
+檢查 15 語系與 package NLS 的缺少／多餘 key、UTF-8／BOM、schema、空值、placeholder 次數、必要 ARIA 與 Blockly core locale。語意品質由 `i18n-maintenance` 處理，不使用 regex detector、whitelist 或總分取代 reviewer 判斷。
 
 ### CI/CD 整合
 
-所有翻譯 PR 會自動執行 GitHub Actions 工作流程：
-
-#### 必須通過的檢查 ✅
-
-1. **驗證檢查** (`validate-translations.js`)
-
-    - 佔位符保留
-    - 編碼正確性
-    - 無空字串
-    - 長度比例在合理範圍內
-
-2. **ESLint 檢查**
-    - JavaScript 語法正確
-    - 無程式碼風格問題
-
-#### 建議性警告 ⚠️
-
-1. **模式偵測** (`detect-patterns.js`)
-    - 直譯模式識別
-    - 詞彙表違規
-    - 這些是警告,不會阻擋 PR 合併
-
-#### 自動化報告
-
-GitHub Actions 會在 PR 中自動留言,包含：
-
--   ✅/❌ 驗證結果
--   ⚠️ 警告清單
--   📊 翻譯統計摘要
--   🔗 完整報告連結
-
-#### 月度審計
-
-每月 1 日自動執行完整審計：
-
--   所有 15 種語言的品質報告
--   自動建立 GitHub Issue 附帶審計結果
--   若高嚴重性問題增加 >10% 會通知維護者
-
-查看工作流程設定：`.github/workflows/i18n-validation.yml`
+GitHub Actions 只執行 deterministic gate、ESLint 與 i18n tests，不執行會隨模型改變的語意 detector。工作區 Skill 每次觸發時檢查 repo audit state；距完整審計已滿 30 天、政策版本改變或 audit 尚未完成時，以每批 200 組的 checkpoint 繼續全量審計，不建立固定月度 workflow。
 
 ### 測試清單
 
@@ -313,25 +137,24 @@ GitHub Actions 會在 PR 中自動留言,包含：
 
 #### 自動化測試
 
--   [ ] `validate-translations.js` 全部通過
--   [ ] `detect-patterns.js` 已檢視警告
--   [ ] ESLint 無錯誤
--   [ ] 翻譯檔案正確載入
+- [ ] `npm run validate:i18n` 全部通過
+- [ ] `npm run test:i18n` 全部通過
+- [ ] `npm run lint:i18n` 無錯誤
+- [ ] `i18n-maintenance` 結果為 `PASS` 或 `PASS_WITH_ADVISORIES`
 
 #### 手動測試
 
--   [ ] **建立積木**：開啟工具箱 → 選擇分類 → 拖曳積木 → 驗證工具提示
--   [ ] **變更板子**：偏好設定 → 板子下拉選單 → 驗證板子名稱本地化
--   [ ] **產生程式碼**：新增積木 → 點擊「產生程式碼」→ 驗證成功訊息
--   [ ] **錯誤處理**：故意製造錯誤 → 驗證錯誤訊息本地化
+- [ ] **建立積木**：開啟工具箱 → 選擇分類 → 拖曳積木 → 驗證工具提示
+- [ ] **變更板子**：偏好設定 → 板子下拉選單 → 驗證板子名稱本地化
+- [ ] **產生程式碼**：新增積木 → 點擊「產生程式碼」→ 驗證成功訊息
+- [ ] **錯誤處理**：故意製造錯誤 → 驗證錯誤訊息與復原步驟
 
 #### UI 渲染
 
--   [ ] 無文字溢出
--   [ ] 無文字截斷
--   [ ] 無空字串
--   [ ] 語言切換正常
--   [ ] 淺色和深色主題都測試
+- [ ] 無文字溢出或截斷
+- [ ] 無空字串
+- [ ] 語言切換與 fallback 正常
+- [ ] 受影響畫面已測試適用的淺色和深色主題
 
 ---
 
@@ -471,8 +294,8 @@ Fixes #123
 ### 文件
 
 -   [README.md](README.md) - 專案概述
--   [Translation Guidelines](specs/002-i18n-localization-review/guidelines/) - 語言特定指南
--   [Localization Glossary](specs/002-i18n-localization-review/localization-glossary.json) - 術語參考
+-   [i18n 規格](docs/specifications/02-internationalization/i18n.md) - 結構、語意與完整審計契約
+-   [i18n-maintenance Skill](.github/skills/i18n-maintenance/SKILL.md) - 維護工作流程與版本化政策
 -   [Architecture Guide](.github/copilot-instructions.md) - 專案架構說明
 
 ### 工具

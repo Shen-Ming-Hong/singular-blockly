@@ -60,7 +60,7 @@ https://raw.githubusercontent.com/Shen-Ming-Hong/singular-blockly/master/media/s
 | `title`       | 各語系標題（`en` 必填） | `"Line Follower"`                   |
 | `description` | 各語系描述（`en` 必填） | `"A workspace for line following."` |
 
-若使用者未提供翻譯，**僅填寫英文**，其他語系留空字串，並在最後提示使用者補充。
+若使用者未提供翻譯，先以 `i18n-maintenance` 產生並審計可明確判斷的翻譯。`en` 必須非空；其他語系屬 optional fallback，不得只因缺少值而製造硬錯誤，但必須在完成摘要列出未提供語系。不得用空字串冒充已完成翻譯。
 
 ### Phase 1: 取得工作區 JSON Get Workspace JSON
 
@@ -210,7 +210,7 @@ key 為原始中文名稱，value 為含以下 14 個語系的物件：
 
 #### 識別字合法性規則 Identifier Validity Rules
 
-每個翻譯值必須是合法的程式識別字，規則與 Python 3 PEP 3131 相同：
+每個翻譯值必須符合本專案的跨平台 ASCII 程式識別字規則：
 
 - ✅ 以字母（`a-z`、`A-Z`）或底線（`_`）開頭
 - ✅ 後接字母、數字（`0-9`）、底線
@@ -222,7 +222,7 @@ key 為原始中文名稱，value 為含以下 14 個語系的物件：
 **驗證腳本：**
 
 ```javascript
-const identRe = /^[^\d\W]\w*$/u;
+const identRe = /^[A-Za-z_][A-Za-z0-9_]*$/;
 for (const [key, entry] of Object.entries(nameTranslations.variables ?? {})) {
 	for (const [locale, val] of Object.entries(entry)) {
 		if (!identRe.test(val)) {
@@ -236,7 +236,7 @@ for (const [key, entry] of Object.entries(nameTranslations.variables ?? {})) {
 
 - [ ] 所有 `workspace.variables[].name` 均有對應的 `variables` 映射
 - [ ] 所有 `arduino_function.fields.NAME` 均有對應的 `functions` 映射
-- [ ] 所有翻譯值通過 `/^[^\d\W]\w*$/u` 識別字合法性驗證
+- [ ] 所有翻譯值通過 `/^[A-Za-z_][A-Za-z0-9_]*$/` 識別字合法性驗證
 - [ ] `en` 欄位已填（不允許空字串）
 - [ ] 若名稱為純 ASCII 英文（已是合法識別字），仍需填入 `nameTranslations`，以確保結構完整
 - [ ] 若工作區**完全無中文名稱**：可省略 `nameTranslations` 欄位（向後相容）
@@ -407,7 +407,7 @@ if (-not $entry) { Write-Error "id '{id}' not found in index.json" }
 }
 ```
 
-> 💡 若部分語言翻譯留空字串 `""`，範例瀏覽器會 fallback 到 `"en"` 顯示，功能不受影響。
+> 💡 `en` 必須存在且非空。尚未提供的其他 locale 應省略該 key，讓範例瀏覽器 fallback 到 `en`；已提供的 locale 必須是通過語意審計的非空字串。
 
 ### Phase 4: 本機驗證 Local Validation
 
@@ -448,7 +448,19 @@ npm run compile
 4. 確認新範例卡片出現、title/description 顯示正確
 5. 點擊「Load」確認積木能正確載入
 
-### Phase 5: 提交與推送 Commit & Push
+#### 4.4 i18n 結構與語意 Gate（必須）
+
+使用 `i18n-maintenance` 的增量修復模式審計本次變更的 title、description、`nameTranslations` 與 `stringTranslations`，並執行：
+
+```bash
+npm run validate:i18n
+```
+
+- 已提供的翻譯必須符合語意政策與 ASCII 識別字契約。
+- 缺少 optional target locale 時保留既有 `target → en → zh-hant` fallback，不得因此偽造翻譯。
+- `NEEDS_USER_DECISION` 必須由使用者選擇候選譯法；`BLOCKED` 不得進入 Git 流程。
+
+### Phase 5: 交接 Git 工作流程 Handoff to Git Workflow
 
 **依據模式選擇對應的 commit message 與 staged 檔案：**
 
@@ -471,11 +483,9 @@ git commit -m "i18n(samples): update {id} title/description"
 git add media/samples/{filename}.json media/samples/index.json
 git commit -m "feat(samples): update {id} workspace and metadata"
 
-git push origin master
 ```
 
-> **⚠️ 直接推送 master**：範例內容更新屬於內容性變更，不需 PR 流程。
-> GitHub CDN 會在推送後立即生效，使用者不需重新安裝 extension 即可看到新範例。
+完成本機檔案與驗證後，交由 `git-workflow` 執行 commit、本地 review、使用者核准、push 與 PR。不得直接推送 `master`。
 
 ---
 
@@ -519,13 +529,13 @@ description: "{英文描述}"
 
 - [ ] `media/samples/{filename}.json` 已建立，結構合規（有 `workspace` 物件、`board: "cyberbrick"`）
 - [ ] `media/samples/index.json` 已新增條目（`id` 唯一、`title.en` 和 `description.en` 非空）
-- [ ] 15 語系 title/description 已填寫（或至少 `en` + `zh-hant` 已填寫）
+- [ ] title/description 的 `en` 已填寫；其他已提供 locale 皆為通過語意審計的非空字串，未提供 locale 未以空字串佔位
 - [ ] 若含中文變數/函式名稱：`nameTranslations` 已填寫並通過識別字驗證
-- [ ] 若含中文 text 積木字串：`stringTranslations` 已填寫（14 語系，`en` 必填）
+- [ ] 若含中文 text 積木字串：`stringTranslations.en` 已填寫，其他已提供 locale 皆為非空字串
 - [ ] 本機 JSON 格式驗證通過
 - [ ] Extension 本機測試時**新卡片**顯示正確、積木可載入
 - [ ] 切換不同語系測試：中文標籤/變數名稱正確顯示對應語言
-- [ ] `git commit -m "feat(samples): add {id}..."` 已推送至 master
+- [ ] `i18n-maintenance` 與本機驗證通過，已交接 `git-workflow`
 
 ### UPDATE workspace 模式
 
@@ -534,18 +544,18 @@ description: "{英文描述}"
 - [ ] 若積木有新增/修改中文變數或函式名稱：`nameTranslations` 已同步更新
 - [ ] `media/samples/index.json` **未被異動**
 - [ ] 本機測試時載入範例確認積木內容為最新版本
-- [ ] `git commit -m "fix(samples): update {id} workspace content"` 已推送至 master
+- [ ] 本機驗證通過，已交接 `git-workflow`
 
 ### UPDATE translations 模式
 
 - [ ] `media/samples/{filename}.json` 已更新 `nameTranslations` 或 `stringTranslations`
 - [ ] `media/samples/index.json` **未被異動**
 - [ ] 切換 3 種以上語系測試翻譯結果正確
-- [ ] `git commit -m "i18n(samples): update {id} translations"` 已推送至 master
+- [ ] `i18n-maintenance` 通過，已交接 `git-workflow`
 
 ### UPDATE metadata 模式
 
 - [ ] `media/samples/index.json` 中對應條目的 title/description 已更新
 - [ ] `media/samples/{filename}.json` **未被異動**
 - [ ] 本機測試時卡片顯示更新後的 title/description
-- [ ] `git commit -m "i18n(samples): update {id} title/description"` 已推送至 master
+- [ ] `i18n-maintenance` 通過，已交接 `git-workflow`

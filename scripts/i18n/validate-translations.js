@@ -1,417 +1,371 @@
+#!/usr/bin/env node
 /**
  * @license
  * Copyright 2025 Singular Blockly Contributors
  * SPDX-License-Identifier: Apache-2.0
- *
- * Translation Validation Script
- *
- * Performs automated checks on translation files to catch common errors:
- * - Placeholder preservation ({0}, %1, etc.)
- * - Empty translations
- * - UTF-8 encoding validation
- * - Length ratio warnings (>150% or <50% of English)
- * - Schema validation
- *
- * Usage:
- *   node scripts/i18n/validate-translations.js --language=ja
- *   node scripts/i18n/validate-translations.js --all
- *   node scripts/i18n/validate-translations.js --all --verbose
- *
- * Exit codes:
- *   0 = All checks passed
- *   1 = Validation failed
  */
 
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const { isUtf8 } = require('node:buffer');
-const translationReader = require('./lib/translation-reader.js');
-const { log } = require('./lib/logger.js');
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const languageArg = args.find(arg => arg.startsWith('--language='));
-const validateAll = args.includes('--all');
-const verboseWarnings = args.includes('--verbose');
+const translationReader = require('./lib/translation-reader');
+const {
+	KNOWN_EMPTY_MESSAGE_KEYS,
+	LOCALES,
+	PROJECT_ROOT,
+	REQUIRED_PROJECT_ARIA_KEYS,
+	messageFile,
+	packageNlsFile,
+} = require('./lib/translation-config');
 
-const targetLanguages = validateAll
-	? ['ja', 'ko', 'de', 'zh-hant', 'es', 'fr', 'it', 'pl', 'pt-br', 'ru', 'tr', 'cs', 'hu', 'bg']
-	: languageArg
-		? [languageArg.split('=')[1]]
-		: [];
+const REPORT_SCHEMA_VERSION = 1;
+const PLACEHOLDER_PATTERNS = [/\{\d+\}/g, /%\d+/g, /\$\{\w+\}/g];
 
-const REQUIRED_PROJECT_ARIA_KEYS = ['BLOCKLY_ARIA_CONFIGURATION_ICON', 'BLOCKLY_ARIA_LOCKED_ICON'];
-
-/**
- * Check if translation preserves all placeholders from English source
- */
-function checkPlaceholders(key, englishText, translatedText) {
-	const issues = [];
-
-	// Extract placeholders like {0}, {1}, %1, %2, etc.
-	const placeholderPatterns = [
-		/\{(\d+)\}/g, // {0}, {1}
-		/%(\d+)/g, // %1, %2
-		/\$\{(\w+)\}/g, // ${variable}
-	];
-
-	for (const pattern of placeholderPatterns) {
-		const englishMatches = [...englishText.matchAll(pattern)].map(m => m[0]);
-		const translatedMatches = [...translatedText.matchAll(pattern)].map(m => m[0]);
-
-		// Check if all English placeholders exist in translation
-		for (const placeholder of englishMatches) {
-			if (!translatedMatches.includes(placeholder)) {
-				issues.push({
-					type: 'missingPlaceholder',
-					message: `Missing placeholder: ${placeholder}`,
-					key,
-					englishText,
-					translatedText,
-				});
-			}
-		}
-
-		// Check for extra placeholders in translation
-		for (const placeholder of translatedMatches) {
-			if (!englishMatches.includes(placeholder)) {
-				issues.push({
-					type: 'extraPlaceholder',
-					message: `Extra placeholder not in English: ${placeholder}`,
-					key,
-					englishText,
-					translatedText,
-				});
-			}
-		}
-	}
-
-	return issues;
+function issue(code, surface, locale, details = {}) {
+	return {
+		code,
+		type: code,
+		severity: 'error',
+		surface,
+		locale,
+		key: null,
+		expected: null,
+		actual: null,
+		...details,
+	};
 }
 
-/**
- * Keys that are intentionally empty in the English source
- * These are typically Blockly core keys where empty strings are valid
- */
-const KNOWN_EMPTY_KEYS = [
-	'PROCEDURES_DEFNORETURN_TITLE',
-	'PROCEDURES_DEFNORETURN_DO',
-	'PROCEDURES_DEFRETURN_DO',
-	// HuskyLens and Pixetto blocks - empty by design
-	'CONTROLS_IF_ELSE_TITLE_ELSE', // Used in Russian locale (inherited from Blockly core)
-	'HUSKYLENS_BLOCK_INFO_TYPE',
-	'HUSKYLENS_ARROW_INFO_TYPE',
-	'PIXETTO_ROAD_CENTER_X',
-	// HuskyLens ID-based block suffixes - empty for most languages (grammatical markers only needed in ja/ko/zh-hant)
-	'HUSKYLENS_REQUEST_BLOCKS_ID_SUFFIX',
-	'HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX',
-	'HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX',
-];
-
-/**
- * Check if translation is empty or whitespace-only
- */
-function checkEmpty(key, translatedText) {
-	// Skip validation for keys that are intentionally empty
-	if (KNOWN_EMPTY_KEYS.includes(key)) {
-		return [];
-	}
-
-	if (!translatedText || translatedText.trim().length === 0) {
-		return [
-			{
-				type: 'emptyTranslation',
-				message: 'Translation is empty or whitespace-only',
-				key,
-				translatedText,
-			},
-		];
-	}
-	return [];
-}
-
-/**
- * Check that the locale payload is a plain object containing only string values.
- */
-function checkSchema(lang, messages) {
-	if (!messages || typeof messages !== 'object' || Array.isArray(messages)) {
-		return [{ type: 'schemaError', message: 'Locale messages must be an object', lang }];
-	}
-
-	return Object.entries(messages)
-		.filter(([, value]) => typeof value !== 'string')
-		.map(([key, value]) => ({
-			type: 'schemaError',
-			message: `Translation must be a string, received ${Array.isArray(value) ? 'array' : typeof value}`,
-			key,
-			lang,
-		}));
-}
-
-/**
- * Check if file is valid UTF-8
- */
-function checkEncoding(lang, filePath) {
+function checkEncoding(locale, filePath, surface = 'messages') {
 	let content;
 	try {
 		content = fs.readFileSync(filePath);
 	} catch (error) {
-		return [
-			{
-				type: 'encodingError',
-				message: `Unable to read locale file: ${error.message}`,
-				lang,
-				filePath,
-			},
-		];
+		return [issue('fileReadError', surface, locale, { message: error.message })];
 	}
-
 	if (!isUtf8(content)) {
-		return [
-			{
-				type: 'encodingError',
-				message: 'File is not valid UTF-8',
-				lang,
-				filePath,
-			},
-		];
+		return [issue('encodingError', surface, locale, { message: 'File is not valid UTF-8' })];
 	}
-
 	const hasBom = content.length >= 3 && content[0] === 0xef && content[1] === 0xbb && content[2] === 0xbf;
-	if (!hasBom) {
-		return [];
-	}
-
-	return [
-		{
-			type: 'bomDetected',
-			message: 'UTF-8 BOM detected (should be removed)',
-			lang,
-			filePath,
-		},
-	];
+	return hasBom ? [issue('bomDetected', surface, locale, { message: 'UTF-8 BOM must be removed' })] : [];
 }
 
-/**
- * Check if translation length is within acceptable ratio
- */
-function checkLengthRatio(key, englishText, translatedText) {
+function checkSchema(locale, values, surface = 'messages') {
+	if (!values || typeof values !== 'object' || Array.isArray(values)) {
+		return [issue('schemaError', surface, locale, { message: 'Translations must be a plain object' })];
+	}
+	return Object.entries(values)
+		.filter(([, value]) => typeof value !== 'string')
+		.map(([key, value]) =>
+			issue('schemaError', surface, locale, {
+				key,
+				message: 'Translation value must be a string',
+				expected: 'string',
+				actual: Array.isArray(value) ? 'array' : typeof value,
+			})
+		);
+}
+
+function checkEmpty(key, value, surface = 'messages', locale = 'unknown') {
+	if (surface === 'messages' && KNOWN_EMPTY_MESSAGE_KEYS.has(key)) {
+		return [];
+	}
+	return typeof value !== 'string' || value.trim().length === 0
+		? [issue('emptyTranslation', surface, locale, { key, message: 'Translation is empty or whitespace-only' })]
+		: [];
+}
+
+function placeholderCounts(text) {
+	const counts = new Map();
+	for (const pattern of PLACEHOLDER_PATTERNS) {
+		for (const token of text.match(pattern) || []) {
+			counts.set(token, (counts.get(token) || 0) + 1);
+		}
+	}
+	return counts;
+}
+
+function checkPlaceholders(key, sourceText, translatedText, surface = 'messages', locale = 'unknown') {
+	const source = placeholderCounts(sourceText);
+	const target = placeholderCounts(translatedText);
+	const tokens = [...new Set([...source.keys(), ...target.keys()])].sort();
+	return tokens.flatMap(token => {
+		const expected = source.get(token) || 0;
+		const actual = target.get(token) || 0;
+		if (expected === actual) {
+			return [];
+		}
+		const code = actual < expected ? 'missingPlaceholder' : 'extraPlaceholder';
+		return [
+			issue(code, surface, locale, {
+				key,
+				message: `Placeholder ${token} must appear ${expected} time(s), received ${actual}`,
+				expected: { token, count: expected },
+				actual: { token, count: actual },
+			}),
+		];
+	});
+}
+
+function checkKeyParity(surface, sourceValues, targetValues, locale) {
+	const sourceKeys = new Set(Object.keys(sourceValues));
+	const targetKeys = new Set(Object.keys(targetValues));
+	const missing = [...sourceKeys]
+		.filter(key => !targetKeys.has(key))
+		.sort()
+		.map(key =>
+			issue('missingKey', surface, locale, {
+				key,
+				message: 'Key is missing from target locale',
+				expected: 'present',
+				actual: 'missing',
+			})
+		);
+	const extra = [...targetKeys]
+		.filter(key => !sourceKeys.has(key))
+		.sort()
+		.map(key =>
+			issue('extraKey', surface, locale, {
+				key,
+				message: 'Key does not exist in the English baseline',
+				expected: 'absent',
+				actual: 'present',
+			})
+		);
+	return [...missing, ...extra];
+}
+
+function checkValues(surface, sourceValues, targetValues, locale) {
 	const issues = [];
-	const englishLength = englishText.length;
-	const translatedLength = translatedText.length;
-
-	if (englishLength === 0) {
-		return issues;
+	for (const [key, sourceText] of Object.entries(sourceValues)) {
+		if (!(key in targetValues) || typeof targetValues[key] !== 'string') {
+			continue;
+		}
+		const translatedText = targetValues[key];
+		const emptyIssues = checkEmpty(key, translatedText, surface, locale);
+		issues.push(...emptyIssues);
+		if (emptyIssues.length === 0 && typeof sourceText === 'string') {
+			issues.push(...checkPlaceholders(key, sourceText, translatedText, surface, locale));
+		}
 	}
-
-	const ratio = translatedLength / englishLength;
-
-	// Warn if translation is >150% of English (overflow risk)
-	if (ratio > 1.5) {
-		issues.push({
-			type: 'lengthWarning',
-			severity: 'warning',
-			message: `Translation is ${Math.round(ratio * 100)}% of English length (>150% may cause UI overflow)`,
-			key,
-			englishLength,
-			translatedLength,
-			ratio: ratio.toFixed(2),
-		});
-	}
-
-	// Warn if translation is <50% of English (may be incomplete)
-	if (ratio < 0.5) {
-		issues.push({
-			type: 'lengthWarning',
-			severity: 'warning',
-			message: `Translation is ${Math.round(ratio * 100)}% of English length (<50% may indicate missing content)`,
-			key,
-			englishLength,
-			translatedLength,
-			ratio: ratio.toFixed(2),
-		});
-	}
-
 	return issues;
 }
 
-/**
- * Validate single language
- */
-function validateLanguage(lang) {
-	log.info(`Validating ${lang}...`);
+function loadJsonObject(filePath) {
+	return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
 
-	const filePath = path.join(__dirname, `../../media/locales/${lang}/messages.js`);
-	const allIssues = [];
+function validateLocaleFiles(locale, root = PROJECT_ROOT) {
+	const issues = [];
+	const messagesPath = messageFile(locale, root);
+	const packagePath = packageNlsFile(locale, root);
+	issues.push(...checkEncoding(locale, messagesPath, 'messages'));
+	issues.push(...checkEncoding(locale, packagePath, 'package-nls'));
 
-	// Check 1: Encoding validation
-	const encodingIssues = checkEncoding(lang, filePath);
-	allIssues.push(...encodingIssues);
-
-	// Load translations
-	let englishMessages, translatedMessages;
+	let messages;
+	let packageMessages;
+	let messagesLoaded = false;
+	let packageMessagesLoaded = false;
 	try {
-		englishMessages = translationReader.loadMessagesFile('en');
-		translatedMessages = translationReader.loadMessagesFile(lang);
+		messages = translationReader.loadMessagesFile(locale, root);
+		messagesLoaded = true;
 	} catch (error) {
-		log.error(`Failed to load translations for ${lang}: ${error.message}`);
-		return {
-			lang,
-			passed: false,
-			issues: [
-				{
-					type: 'loadError',
-					message: `Failed to load translation file: ${error.message}`,
-					lang,
-				},
-			],
-		};
+		issues.push(issue('parseError', 'messages', locale, { message: error.message }));
+	}
+	try {
+		packageMessages = loadJsonObject(packagePath);
+		packageMessagesLoaded = true;
+	} catch (error) {
+		issues.push(issue('parseError', 'package-nls', locale, { message: error.message }));
+	}
+	return { issues, messages, messagesLoaded, packageMessages, packageMessagesLoaded };
+}
+
+function appendSchemaIssues(issues, surface, locale, values, loaded) {
+	if (!loaded) {
+		return false;
+	}
+	const schemaIssues = checkSchema(locale, values, surface);
+	issues.push(...schemaIssues);
+	return schemaIssues.length === 0;
+}
+
+function validateTranslations(locales, root = PROJECT_ROOT) {
+	const loaded = new Map();
+	const issues = [];
+	const requiredLocales = [...new Set(['en', ...locales])];
+	for (const locale of requiredLocales) {
+		const result = validateLocaleFiles(locale, root);
+		loaded.set(locale, result);
+		issues.push(...result.issues);
 	}
 
-	const schemaIssues = checkSchema(lang, translatedMessages);
-	allIssues.push(...schemaIssues);
-	if (!englishMessages || typeof englishMessages !== 'object' || Array.isArray(englishMessages)) {
-		allIssues.push({
-			type: 'schemaError',
-			message: 'English baseline messages must be an object',
-			lang: 'en',
-		});
+	const english = loaded.get('en');
+	const englishMessagesValid = appendSchemaIssues(issues, 'messages', 'en', english.messages, english.messagesLoaded);
+	const englishPackageValid = appendSchemaIssues(
+		issues,
+		'package-nls',
+		'en',
+		english.packageMessages,
+		english.packageMessagesLoaded
+	);
+	if (englishMessagesValid) {
+		issues.push(...checkValues('messages', english.messages, english.messages, 'en'));
 	}
-	if (!englishMessages || !translatedMessages) {
-		return {
-			lang,
-			passed: false,
-			errors: allIssues,
-			warnings: [],
-			issues: allIssues,
-		};
+	if (englishPackageValid) {
+		issues.push(...checkValues('package-nls', english.packageMessages, english.packageMessages, 'en'));
 	}
 
-	for (const key of REQUIRED_PROJECT_ARIA_KEYS) {
-		if (typeof translatedMessages[key] !== 'string' || translatedMessages[key].trim().length === 0) {
-			allIssues.push({
-				type: 'missingAriaTranslation',
-				message: 'Required Blockly accessibility announcement is missing',
-				key,
-				lang,
-			});
+	for (const locale of locales.filter(candidate => candidate !== 'en')) {
+		const target = loaded.get(locale);
+		const messagesValid = appendSchemaIssues(issues, 'messages', locale, target.messages, target.messagesLoaded);
+		const packageMessagesValid = appendSchemaIssues(
+			issues,
+			'package-nls',
+			locale,
+			target.packageMessages,
+			target.packageMessagesLoaded
+		);
+		if (englishMessagesValid && messagesValid) {
+			issues.push(...checkKeyParity('messages', english.messages, target.messages, locale));
+			issues.push(...checkValues('messages', english.messages, target.messages, locale));
+		}
+		if (englishPackageValid && packageMessagesValid) {
+			issues.push(...checkKeyParity('package-nls', english.packageMessages, target.packageMessages, locale));
+			issues.push(...checkValues('package-nls', english.packageMessages, target.packageMessages, locale));
 		}
 	}
 
-	const coreLocalePath = path.join(__dirname, `../../node_modules/blockly/msg/${lang}.js`);
-	if (!fs.existsSync(coreLocalePath)) {
-		allIssues.push({
-			type: 'missingBlocklyCoreLocale',
-			message: `Packaged Blockly core locale does not exist: ${coreLocalePath}`,
-			lang,
-		});
-	}
-
-	// Validate each translation key
-	for (const [key, englishText] of Object.entries(englishMessages)) {
-		const rawTranslation = translatedMessages[key];
-		const translatedText = typeof rawTranslation === 'string' ? rawTranslation : '';
-
-		// Check 2: Empty translations
-		const emptyIssues = checkEmpty(key, translatedText);
-		allIssues.push(...emptyIssues);
-
-		// Skip further checks if translation is empty
-		if (emptyIssues.length > 0) {
-			continue;
+	for (const locale of requiredLocales) {
+		const messages = loaded.get(locale)?.messages;
+		for (const key of REQUIRED_PROJECT_ARIA_KEYS) {
+			if (!messages || typeof messages[key] !== 'string' || messages[key].trim().length === 0) {
+				issues.push(issue('missingAriaTranslation', 'messages', locale, { key, message: 'Required ARIA text is missing' }));
+			}
 		}
-
-		// Check 3: Placeholder preservation
-		const placeholderIssues = checkPlaceholders(key, englishText, translatedText);
-		allIssues.push(...placeholderIssues);
-
-		// Check 4: Length ratio warnings
-		const lengthIssues = checkLengthRatio(key, englishText, translatedText);
-		allIssues.push(...lengthIssues);
+		const coreLocalePath = path.join(root, 'node_modules', 'blockly', 'msg', `${locale}.js`);
+		if (!fs.existsSync(coreLocalePath)) {
+			issues.push(
+				issue('missingBlocklyCoreLocale', 'messages', locale, {
+					message: `Blockly core locale is missing: ${coreLocalePath}`,
+				})
+			);
+		}
 	}
 
-	// Separate errors from warnings
-	const errors = allIssues.filter(issue => issue.type !== 'lengthWarning' || issue.severity !== 'warning');
-	const warnings = allIssues.filter(issue => issue.type === 'lengthWarning' && issue.severity === 'warning');
+	issues.sort((left, right) => {
+		const leftKey = [left.surface, left.locale, left.key || '', left.code].join(':');
+		const rightKey = [right.surface, right.locale, right.key || '', right.code].join(':');
+		return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+	});
+	return createReport(locales, issues);
+}
 
-	const passed = errors.length === 0;
-
-	log.info(`${lang}: ${passed ? 'PASS' : 'FAIL'} (${errors.length} errors, ${warnings.length} warnings)`);
-
+function createReport(locales, issues) {
+	const bySurface = {};
+	const byLocale = {};
+	for (const finding of issues) {
+		bySurface[finding.surface] = (bySurface[finding.surface] || 0) + 1;
+		byLocale[finding.locale] = (byLocale[finding.locale] || 0) + 1;
+	}
 	return {
-		lang,
-		passed,
-		errors,
-		warnings,
-		issues: allIssues,
+		schemaVersion: REPORT_SCHEMA_VERSION,
+		status: issues.length === 0 ? 'PASS' : 'FAIL',
+		passed: issues.length === 0,
+		locales,
+		summary: { errors: issues.length, bySurface, byLocale },
+		issues,
 	};
 }
 
-/**
- * Main validation function
- */
-function main() {
-	if (targetLanguages.length === 0) {
-		console.error('Usage: node validate-translations.js --language=<lang> | --all [--verbose]');
-		process.exit(1);
+function parseArguments(argv) {
+	const allowedArguments = argument => argument === '--all' || argument.startsWith('--language=') || argument.startsWith('--format=');
+	const unexpectedArgument = argv.find(argument => !allowedArguments(argument));
+	if (unexpectedArgument) {
+		throw new Error(`Unsupported argument: ${unexpectedArgument}`);
+	}
+	const languageArguments = argv.filter(argument => argument.startsWith('--language='));
+	const formatArguments = argv.filter(argument => argument.startsWith('--format='));
+	if (languageArguments.length > 1 || formatArguments.length > 1 || argv.filter(argument => argument === '--all').length > 1) {
+		throw new Error('Duplicate i18n validator arguments are not allowed');
+	}
+	if (argv.includes('--all') && languageArguments.length > 0) {
+		throw new Error('Use either --all or --language, not both');
+	}
+	const languageArgument = languageArguments[0];
+	const formatArgument = formatArguments[0];
+	const format = formatArgument ? formatArgument.slice('--format='.length) : 'human';
+	if (!['human', 'json'].includes(format)) {
+		throw new Error(`Unsupported format: ${format}`);
+	}
+	if (argv.includes('--all')) {
+		return { format, locales: LOCALES };
+	}
+	if (!languageArgument) {
+		throw new Error('Usage: node validate-translations.js --all | --language=<locale> [--format=json]');
+	}
+	const locale = languageArgument.slice('--language='.length);
+	if (!LOCALES.includes(locale)) {
+		throw new Error(`Unsupported locale: ${locale}`);
+	}
+	return { format, locales: [locale] };
+}
+
+function printHumanReport(report) {
+	console.log(`i18n validation: ${report.status}`);
+	console.log(`Locales: ${report.locales.join(', ')}`);
+	console.log(`Errors: ${report.summary.errors}`);
+	for (const finding of report.issues) {
+		console.log(`- [${finding.code}] ${finding.surface}/${finding.locale}/${finding.key || '-'}: ${finding.message}`);
+	}
+}
+
+function main(argv = process.argv.slice(2), root = PROJECT_ROOT) {
+	let options;
+	try {
+		options = parseArguments(argv);
+	} catch (error) {
+		console.error(error.message);
+		return 2;
 	}
 
-	log.info('Starting translation validation', { languages: targetLanguages });
-
-	const results = [];
-	let allPassed = true;
-
-	for (const lang of targetLanguages) {
-		const result = validateLanguage(lang);
-		results.push(result);
-		if (!result.passed) {
-			allPassed = false;
+	try {
+		const report = validateTranslations(options.locales, root);
+		if (options.format === 'json') {
+			console.log(JSON.stringify(report, null, 2));
+		} else {
+			printHumanReport(report);
 		}
-	}
-
-	// Print summary
-	console.log('\n=== Validation Summary ===\n');
-
-	for (const result of results) {
-		const status = result.passed ? '✅ PASS' : '❌ FAIL';
-		console.log(`${status} ${result.lang}: ${result.errors?.length || 0} errors, ${result.warnings?.length || 0} warnings`);
-
-		// Print errors
-		if (result.errors && result.errors.length > 0) {
-			console.log(`\n  Errors in ${result.lang}:`);
-			for (const error of result.errors) {
-				console.log(`    - [${error.type}] ${error.key || error.lang}: ${error.message}`);
-			}
+		return report.passed ? 0 : 1;
+	} catch (error) {
+		if (options.format === 'json') {
+			console.log(
+				JSON.stringify({
+					schemaVersion: REPORT_SCHEMA_VERSION,
+					status: 'ERROR',
+					passed: false,
+					message: error.message,
+				})
+			);
+		} else {
+			console.error(`i18n validation could not run: ${error.message}`);
 		}
-
-		// Length-ratio warnings remain available for audits without flooding normal CI logs.
-		if (verboseWarnings && result.warnings && result.warnings.length > 0) {
-			console.log(`\n  Warnings in ${result.lang} (first 5):`);
-			for (const warning of result.warnings.slice(0, 5)) {
-				console.log(`    - [${warning.type}] ${warning.key}: ${warning.message}`);
-			}
-			if (result.warnings.length > 5) {
-				console.log(`    ... and ${result.warnings.length - 5} more warnings`);
-			}
-		}
-		console.log('');
-	}
-
-	// Overall result
-	const passedCount = results.filter(r => r.passed).length;
-	console.log(`\nOverall: ${passedCount}/${results.length} languages passed validation`);
-
-	if (allPassed) {
-		console.log('✅ All validation checks passed!\n');
-		process.exit(0);
-	} else {
-		console.log('❌ Some validation checks failed. Please fix the errors above.\n');
-		process.exit(1);
+		return 2;
 	}
 }
 
 if (require.main === module) {
-	main();
+	process.exitCode = main();
 }
 
-module.exports = { checkEmpty, checkEncoding, checkPlaceholders, checkSchema };
+module.exports = {
+	checkEmpty,
+	checkEncoding,
+	checkKeyParity,
+	checkPlaceholders,
+	checkSchema,
+	createReport,
+	main,
+	parseArguments,
+	validateTranslations,
+};

@@ -1,0 +1,4 @@
+interface:
+  display_name: "i18n Semantic Maintenance"
+  short_description: "Audit and repair 15-locale translation quality"
+  default_prompt: "Use $i18n-maintenance to validate and semantically audit the translation changes in this workspace."

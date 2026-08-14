@@ -799,9 +799,9 @@ window.languageManager.loadMessages('de', {
 
 	// Safety Guard (Project Safety Protection)
 	SAFETY_WARNING_BODY_NO_TYPE:
-		'Hier gibt es noch keine Bausteine. Möchtest du alles einrichten, damit du loslegen kannst? Wir machen alles für dich bereit!',
+		'Dieser Ordner enthält noch keine Blockly-Dateien. Beim Fortfahren werden hier ein blockly/-Ordner und Dateien erstellt. Mit „Abbrechen“ bleibt der Ordner unverändert.',
 	SAFETY_WARNING_BODY_WITH_TYPE:
-		'Hier gibt es schon {0}-Inhalte. Möchtest du hier auch Bausteine hinzufügen? Wir richten alles für dich ein!',
+		'Dieser Ordner enthält bereits {0}-Dateien. Beim Fortfahren werden hier zusätzlich ein blockly/-Ordner und Dateien erstellt. Mit „Abbrechen“ bleibt der Ordner unverändert.',
 	BUTTON_CONTINUE: 'Ja, los gehts!',
 	BUTTON_CANCEL: 'Abbrechen',
 	BUTTON_SUPPRESS: 'Frag nicht mehr',

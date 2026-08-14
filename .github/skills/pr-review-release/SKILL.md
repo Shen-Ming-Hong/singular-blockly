@@ -20,6 +20,7 @@ license: Apache-2.0
 - tag 推送後由 `.github/workflows/publish.yml` 重用 CI 產生的唯一 VSIX，發布到 GitHub Releases、VS Code Marketplace 與 Open VSX。
 - 未取得 Phase 3.5 明確發布核准，不得 push、建立／更新 PR、merge、建立 tag 或觸發 CD。
 - 若只要求 review 而未要求發布，完成 Phase 0–3 後停止；不得自行推定要建立 PR 或 release。
+- Phase 0–3 使用 `local-code-review-loop` 收斂 findings；本 Skill 的 Phase 1.5 與 Phase 3.5 核准 gate 優先。
 
 ## Phase 0：本地 Codex Review（必須）
 
@@ -33,9 +34,10 @@ license: Apache-2.0
     git diff
     ```
 
-2. 對照目前 spec、測試與架構規則，審查正確性、回歸、邊界條件、安全性及測試覆蓋。
-3. 以 P0–P3 列出可執行 findings，包含檔案、行號、影響與建議；若沒有 finding，明確記錄殘餘風險。
-4. 不等待 Copilot 或其他遠端 reviewer；PR 已存在時仍以本地 `HEAD` 為準。
+2. 使用 `local-code-review-loop` 完成第一輪審查，對照目前 spec、測試與架構規則檢查正確性、回歸、邊界條件、安全性及測試覆蓋。
+3. 若差異包含 locale、package NLS、範例翻譯或使用者可見來源文字，使用 `i18n-maintenance` 的唯讀 gate；把 `NEEDS_USER_DECISION` 或 `BLOCKED` finding 納入本地 review。
+4. 以 P0–P3 列出可執行 findings，包含檔案、行號、影響與建議；若沒有 finding，明確記錄殘餘風險。
+5. 不等待 Copilot 或其他遠端 reviewer；PR 已存在時仍以本地 `HEAD` 為準。
 
 ## Phase 1：Finding 與版本方案評估
 
@@ -62,27 +64,28 @@ license: Apache-2.0
 ## Phase 2：只實作已核准內容
 
 1. 修正已核准 findings；拒絕或未決項目保持不變。
-2. 若已核准正式發布版本，在目前功能分支執行：
+2. 已核准的 i18n findings 使用 `i18n-maintenance` 增量修復模式處理；不得順便改寫全量審計的既有 Major。
+3. 若已核准正式發布版本，在目前功能分支執行：
 
     ```bash
     npm version {VERSION} --no-git-tag-version
     ```
 
-3. 把 `CHANGELOG.md` 的 `[未發布]` 內容整理成核准的 `## [{VERSION}] - YYYY-MM-DD` 雙語區段。
-4. 驗證版本契約：
+4. 把 `CHANGELOG.md` 的 `[未發布]` 內容整理成核准的 `## [{VERSION}] - YYYY-MM-DD` 雙語區段。
+5. 驗證版本契約：
 
     ```bash
     npm run release:prepare
     ```
 
-5. 依變更範圍執行測試；至少執行：
+6. 依變更範圍執行測試；至少執行：
 
     ```bash
     npm run ci:static
     npm run test:unit:ci
     ```
 
-6. 使用 Conventional Commits 與繁體中文描述提交。發布檔可使用：
+7. 使用 Conventional Commits 與繁體中文描述提交。發布檔可使用：
 
     ```bash
     git add package.json package-lock.json CHANGELOG.md
@@ -93,8 +96,9 @@ license: Apache-2.0
 
 1. 對本次改動的 TS／JS 檔執行 `code-simplifier` 技能。
 2. 重跑受影響測試與 `npm run ci:static`。
-3. 重新審查 `origin/master...HEAD` 全部差異，確認沒有新增 P0–P3 finding。
-4. 確認版本、lockfile 與雙語 CHANGELOG 已在 PR 差異內，不會留到合併後修改。
+3. 若有 i18n diff，再次使用 `i18n-maintenance` 唯讀 gate；結果必須為 `PASS` 或 `PASS_WITH_ADVISORIES`。
+4. 使用 `local-code-review-loop` 重新審查 `origin/master...HEAD` 全部差異，直到 `CLEAR` 或只剩有具體理由的 `CLEAR_WITH_REJECTIONS`。`NEEDS_USER_DECISION` 或 `BLOCKED` 不得進入 Phase 3.5。
+5. 確認版本、lockfile 與雙語 CHANGELOG 已在 PR 差異內，不會留到合併後修改。
 
 ## Phase 3.5：發布前核准 Gate（必須）
 
@@ -215,6 +219,7 @@ GitHub Release 復原 workflow 必須驗證來源是失敗的正式發布 run，
 ## Checklist
 
 - [ ] 本地 review findings 已評估並取得修正核准
+- [ ] i18n diff 已通過 `i18n-maintenance` 唯讀 gate（如適用）
 - [ ] 只實作已核准內容，測試與 re-review 通過
 - [ ] 版本、lockfile 與雙語 CHANGELOG 已在功能分支／同一 PR
 - [ ] 已取得 Phase 3.5 明確發布核准
@@ -234,3 +239,5 @@ GitHub Release 復原 workflow 必須驗證來源是失敗的正式發布 run，
 - [CI/CD 操作手冊](../../../docs/ci-cd.md)
 - [git-workflow 技能](../git-workflow/SKILL.md)
 - [code-simplifier 技能](../code-simplifier/SKILL.md)
+- [i18n-maintenance 技能](../i18n-maintenance/SKILL.md)
+- [local-code-review-loop 技能](../local-code-review-loop/SKILL.md)

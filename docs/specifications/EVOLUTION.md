@@ -107,7 +107,7 @@
 
 1. ✅ 實作白名單機制過濾誤報（68.9% 高嚴重性誤報消除）
 2. ✅ 建立 16 條驗證規則
-3. ✅ 建立 CI/CD 整合（月度自動審計）
+3. ✅ 建立 CI/CD 整合（後續已由 deterministic CI gate 與 `i18n-maintenance` Skill 取代月度自動審計）
 4. 📌 GitHub Issue #16 關閉
 
 **白名單規則類型**：

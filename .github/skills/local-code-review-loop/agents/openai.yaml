@@ -1,0 +1,4 @@
+interface:
+  display_name: "本地 Code Review 循環"
+  short_description: "反覆評估本地 Review findings、修正並重審至收斂"
+  default_prompt: "使用 $local-code-review-loop 審查目前差異、修正採納項目並重審到收斂。"

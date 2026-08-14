@@ -793,8 +793,8 @@ window.languageManager.loadMessages('ko', {
 	ESP32_PWM_RESOLUTION_16BIT: '16비트 (0-65535)',
 
 	// Safety Guard (Project Safety Protection)
-	SAFETY_WARNING_BODY_NO_TYPE: '여기에는 아직 블록이 없어요. 만들기를 시작할 수 있도록 준비해 줄까요? 모든 걸 준비해 놓을게요!',
-	SAFETY_WARNING_BODY_WITH_TYPE: '여기에 이미 {0} 내용이 있어요. 여기에 블록 기능도 추가할까요? 모든 걸 준비해 놓을게요!',
+	SAFETY_WARNING_BODY_NO_TYPE: '이 폴더에는 아직 Blockly 파일이 없어요. 계속하면 여기에 blockly/ 폴더와 파일을 만들어요. 변경하지 않으려면 취소를 선택하세요.',
+	SAFETY_WARNING_BODY_WITH_TYPE: '이 폴더에는 이미 {0} 파일이 있어요. 계속하면 여기에 blockly/ 폴더와 파일도 만들어요. 변경하지 않으려면 취소를 선택하세요.',
 	BUTTON_CONTINUE: '네, 시작해요!',
 	BUTTON_CANCEL: '취소',
 	BUTTON_SUPPRESS: '다시 안 물어봐요',

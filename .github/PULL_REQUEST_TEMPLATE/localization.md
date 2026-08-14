@@ -1,164 +1,57 @@
 ## 🌍 Localization Changes
 
-**Language**: [ja / ko / de / zh-hant / es / fr / it / pl / pt-br / ru / tr / cs / hu / bg]  
-**Fixes Issue**: #[issue-number]  
-**Audit Report Reference**: [link to baseline audit or specific issue]
-
----
+**Locales / surfaces**: [例如 `ja`, `package-nls`, `sample-index`]
+**Fixes Issue**: #[issue-number]
+**i18n-maintenance result**: [PASS / PASS_WITH_ADVISORIES / NEEDS_USER_DECISION / BLOCKED]
 
 ## Changes Summary
 
-**Total Translations Modified**: [number]  
-**High-Frequency Strings Fixed**: [number] (frequency ≥70)
+- 變更的 key／範例數量：
+- 使用者可見行為或語意：
+- 使用的 policy version：
+- 是否觸發／恢復 full audit：
 
-**Issue Types Addressed**:
+## Important Before/After Examples
 
--   [ ] Direct translations replaced with culturally appropriate terms
--   [ ] Cultural tone adjusted for target audience
--   [ ] Length overflow/underflow fixed
--   [ ] Missing translations added
--   [ ] Terminology aligned with glossary
+只列有語意、術語或 UI 影響的代表性項目；不要求湊滿數量。
 
----
+| Surface / key | Before | After | Rule ID / rationale |
+| --- | --- | --- | --- |
+| | | | |
 
-## Before/After Examples
+## Automated Validation
 
-Please provide at least 3-5 examples of significant changes:
+- [ ] `npm run validate:i18n`
+- [ ] `npm run test:i18n`
+- [ ] `npm run lint:i18n`
+- [ ] `npm run ci:static`（發布前）
+- [ ] 所有 finding 都包含 rule ID、severity、evidence 與具體情境
+- [ ] 沒有未結案的 deterministic error、Blocker 或本次明確 Major
 
-| Key              | Before            | After                      | Frequency | Impact                           |
-| ---------------- | ----------------- | -------------------------- | --------- | -------------------------------- |
-| `CATEGORY_LOGIC` | 論理              | 論理ブロック               | 95        | High - Always visible in toolbox |
-| `CATEGORY_TEXT`  | テキスト          | 文字列                     | 95        | High - Common block category     |
-| `ERROR_NO_BOARD` | No board selected | ボードが選択されていません | 50        | Medium - Error message           |
-|                  |                   |                            |           |                                  |
-|                  |                   |                            |           |                                  |
+## User Decisions and Waivers
 
----
+若有 `ambiguous` Major，記錄產品負責人的明確決定；沒有則填「無」。
 
-## Validation Checklist
+| Finding ID | Literal back-translation | Options / risk | Decision and rationale |
+| --- | --- | --- | --- |
+| | | | |
 
-### Automated Checks
+## Manual and UI Validation
 
--   [ ] Ran `node scripts/i18n/validate-translations.js --language=[lang]` - All checks passed
--   [ ] Ran `node scripts/i18n/detect-patterns.js --language=[lang]` - Reviewed warnings
--   [ ] No ESLint errors (`npm run lint`)
--   [ ] Translation file loads correctly (no syntax errors)
+- [ ] 按鈕／選單動作與實際效果一致
+- [ ] 警告、錯誤與復原步驟可理解
+- [ ] 8–14 歲使用者能理解發生什麼、要做什麼、結果是什麼
+- [ ] 必要技術名稱、數值、單位與識別字保持正確
+- [ ] ARIA 說明用途／狀態，不只描述顏色或位置
+- [ ] 受影響 UI 無截斷或溢出，已測試適用的亮／暗主題
+- [ ] 語言切換與 fallback 正常
 
-### Manual Testing
+## Screenshots
 
--   [ ] **Create Block**: Opened toolbox → Selected category → Dragged block → Verified tooltip displays correctly
--   [ ] **Change Board**: Preferences → Board dropdown → Verified board names localized
--   [ ] **Generate Code**: Added blocks → Clicked "Generate Code" → Verified success message localized
--   [ ] **Error Handling**: Intentionally created error → Verified error message localized
+如翻譯影響按鈕、對話框、工具箱、tooltip 或範例卡片版面，附上前後截圖；否則說明不適用。
 
-### UI Rendering
+## Residual Risk
 
--   [ ] No text overflow in any UI element
--   [ ] No text truncation (all content visible)
--   [ ] No empty strings
--   [ ] Language switching works correctly
--   [ ] Tested on both light and dark themes
-
----
-
-## Translation Quality Self-Assessment
-
-Please rate your translations on these dimensions (1-5 scale):
-
-### Cultural Appropriateness
-
--   [ ] **5** - Perfect cultural fit, natural phrasing
--   [ ] **4** - Good fit, minor awkwardness
--   [ ] **3** - Adequate, some cultural mismatch
--   [ ] **2** - Poor fit, noticeable issues
--   [ ] **1** - Inappropriate, does not match culture
-
-**Comments**: [Explain your rating]
-
-### Tone Match (Educational/Friendly)
-
--   [ ] **5** - Perfect tone for student audience
--   [ ] **4** - Good tone, minor formality issues
--   [ ] **3** - Adequate, tone somewhat off
--   [ ] **2** - Poor tone (too formal/informal)
--   [ ] **1** - Inappropriate tone
-
-**Comments**: [Explain your rating]
-
-### Terminology Accuracy
-
--   [ ] **5** - All technical terms correct and consistent with glossary
--   [ ] **4** - Mostly correct, minor inconsistencies
--   [ ] **3** - Adequate, some incorrect terms
--   [ ] **2** - Poor terminology usage
--   [ ] **1** - Incorrect or confusing terms
-
-**Comments**: [Explain your rating]
-
-### Clarity
-
--   [ ] **5** - Perfectly clear, no ambiguity
--   [ ] **4** - Clear, minor confusion possible
--   [ ] **3** - Adequate clarity, some ambiguity
--   [ ] **2** - Unclear in places
--   [ ] **1** - Confusing or misleading
-
-**Comments**: [Explain your rating]
-
-**Average Self-Assessment Score**: [Calculate average] / 5.0
-
----
-
-## Reference Documents Used
-
-Please check which documents you referenced:
-
--   [ ] Language-specific guideline: `specs/002-i18n-localization-review/guidelines/[lang].md`
--   [ ] Localization glossary: `specs/002-i18n-localization-review/localization-glossary.json`
--   [ ] Baseline audit report: `specs/002-i18n-localization-review/audit-reports/audit-2025-10-17-baseline.json`
--   [ ] Other (specify): ******\_\_\_\_******
-
----
-
-## Additional Context
-
-[Add any additional information that reviewers should know about these translations. For example:
-
--   Rationale for specific translation choices
--   Known limitations or compromises
--   Areas where you're uncertain and want reviewer feedback
--   Related cultural considerations
-    ]
-
----
-
-## Screenshots (Optional)
-
-If your changes affect visible UI elements, please include before/after screenshots:
-
-**Before**:
-[Screenshot]
-
-**After**:
-[Screenshot]
-
----
-
-## Reviewer Notes
-
-For reviewers: Please focus on:
-
-1. Cultural appropriateness for target audience
-2. Terminology consistency with glossary
-3. UI rendering (no overflow/truncation)
-4. Tone matches educational context
-
----
-
-**Checklist for Maintainers**:
-
--   [ ] Translation quality score ≥4.0 average (if native speaker review conducted)
--   [ ] All automated checks passed (validation + patterns)
--   [ ] UI testing confirmed (no rendering issues)
--   [ ] High-frequency strings (≥70) prioritized
--   [ ] CHANGELOG.md updated (if applicable)
+- 未提供 optional sample locale：
+- Full-audit 既有 Major backlog：
+- 其他無法由非母語 reviewer 排除的風險：
