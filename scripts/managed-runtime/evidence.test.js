@@ -6,7 +6,7 @@ const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { collectEvidence } = require('./collect-evidence');
+const { collectEvidence, parseArgs } = require('./collect-evidence');
 const { verifyEvidence } = require('./verify-evidence');
 
 const headSha = 'a'.repeat(40);
@@ -15,6 +15,11 @@ const vsixSha256 = 'c'.repeat(64);
 const manifestSha256 = 'd'.repeat(64);
 const artifactSha256 = 'e'.repeat(64);
 const requiredPathCases = ['unicode', 'space', 'special-characters', 'offline-restart'];
+
+assert.deepStrictEqual(
+  parseArgs(['--evidence', 'linux.json', '--evidence', 'windows.json']).evidences,
+  ['linux.json', 'windows.json'],
+);
 
 function evidence(osName, arch = 'x64', overrides = {}) {
   return collectEvidence({

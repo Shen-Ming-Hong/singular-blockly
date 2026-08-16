@@ -206,6 +206,16 @@
 
 ---
 
+## Phase 14：PR 遠端安全與證據閘門收斂
+
+**目的**：修正 PR #126 首輪 CodeQL 與完整六平台矩陣揭露的 workflow trust-boundary 及 evidence CLI 缺口，不放寬既有候選身分驗證。
+
+- [x] T082 [P] 將 x64、ARM64 與 evidence gate 的可執行 checkout 綁定至 GitHub event immutable SHA，禁止以前一 job 的輸出 SHA 決定執行內容，同時保留輸出 SHA 作 evidence 身分比對於 `.github/workflows/runtime-installation.yml`
+- [x] T083 [P] 修正複數 `--evidence` CLI 參數的集合初始化，新增 parser 回歸測試，並以 PR #126 六平台真實 artifacts 重播 release verifier 於 `scripts/managed-runtime/collect-evidence.js` 與 `scripts/managed-runtime/evidence.test.js`
+- [x] T084 重跑本地靜態／release／evidence 測試與 Code Review，更新 PR 說明及驗證紀錄後提交推送，重新觸發 CI、CodeQL 與完整 runtime matrix
+
+---
+
 ## 相依與執行順序
 
 ### 階段相依
@@ -215,7 +225,7 @@
 - US1 → US2：CoreEnvironmentManager 需要可用的 managed provider。
 - US2 → US5／US4：provider 相容與診斷需要完成雙 Core 路由。
 - US3 可在 US1 完成後與 US2 並行；US6 可在 Phase 2 後先做 evidence 工具，但 workflow 完整驗證依 US1／US3。
-- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority，這些階段都不解除 T061 的遠端矩陣與實機發布閘門。
+- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority；Phase 14 收斂 PR 首輪遠端安全與證據閘門 finding，這些階段都不解除 T061 的遠端矩陣與實機發布閘門。
 - US7 的同意 gate 先於任何 workspace-local Skill／設定寫入；US8 與 managed runtime 安裝彼此獨立，可在 US7 測試完成後平行驗證。
 
 ### 平行機會
@@ -246,8 +256,8 @@
 7. Phase 9：全域驗證與文件。
 8. Phase 10：依 F5 回饋加固使用者同意邊界與 OTA 共用進度。
 9. Phase 11：以完整工作樹反覆 review／fix／verify，直到沒有可採納 finding。
-10. Phase 12－13：完成 `0.87.0` 本地發布契約，再對已提交完整差異執行安全重審與證據校正。
+10. Phase 12－14：完成 `0.87.0` 本地發布契約，對已提交完整差異執行安全重審，並收斂 PR 遠端 CodeQL／evidence finding。
 
 ## 任務格式驗證
 
-全部 83 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 保持未完成，直到遠端矩陣與實機 smoke 取得正式證據。
+全部 86 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 保持未完成，直到遠端矩陣與實機 smoke 取得正式證據。

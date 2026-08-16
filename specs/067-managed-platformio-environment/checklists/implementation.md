@@ -63,6 +63,11 @@
 
 ## 合併與發布前尚待完成
 
+- [x] PR #126 首輪 CI 的三 OS unit、static/security、VSIX smoke 與 CodeQL 三語言分析通過；x64 三 OS 與 ARM64 三 OS 的真實安裝／離線重啟也全部通過，其中 Windows ARM64 為 9 分 20 秒。
+- [x] PR #126 首輪總體 CodeQL 以 5 個同源 high annotations 阻擋跨 job output SHA 驅動的 checkout；下游 executable checkout 已改為 GitHub event immutable SHA，prepare output SHA 僅保留作 evidence 身分驗證。
+- [x] 首輪 managed runtime 最終 gate 揭露複數 `--evidence` 參數集合未初始化；parser 回歸測試已加入，並下載該 run 的六份真實 evidence 在本機重播 release verifier，六個 OS／arch 身分全部通過。
+- [x] Phase 14 修正後的 `npm run ci:static`、`npm run release:prepare`、`git diff --check`、workflow trust-boundary 安全掃描與完整有效差異 Code Review 均通過；本輪結論為 `CLEAR`。
+- [ ] PR #126 新 HEAD 必須重新通過總體 CodeQL、CI 與完整 x64／ARM64 runtime evidence gate；首輪結果不能替代修正後 commit 的正式證據。
 - [ ] 在 GitHub PR 執行三 OS x64 真實安裝矩陣，蒐集與 PR head／tree／VSIX／manifest 綁定的 evidence。
 - [ ] 對 release candidate 執行 Linux、Windows、macOS ARM64 矩陣；本機 macOS ARM64 結果只提供先期證據，不取代正式 workflow。
 - [ ] 在乾淨 Windows 與 Linux 帳號手動確認 Extension 啟用、活動列 editor-open 重查、權限錯誤訊息與離線重啟 UX。

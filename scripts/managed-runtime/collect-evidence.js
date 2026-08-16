@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 function parseArgs(argv) {
-  const result = { pathCases: [], evidence: [] };
+  const result = { pathCases: [], evidences: [] };
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
     if (!token.startsWith('--')) { throw new Error(`Unexpected argument: ${token}`); }
