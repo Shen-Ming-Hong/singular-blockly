@@ -1,8 +1,11 @@
 # 實作驗證紀錄：受管理的 PlatformIO 雙 Core 環境
 
-**驗證日期**：2026-08-17  
-**驗證分支**：`codex/067-managed-platformio-environment`  
-**功能規格**：[spec.md](../spec.md)  
+**驗證日期**：2026-08-17
+
+**驗證分支**：`codex/067-managed-platformio-environment`
+
+**功能規格**：[spec.md](../spec.md)
+
 **驗證方式**：[quickstart.md](../quickstart.md)
 
 ## 本機決定性驗證

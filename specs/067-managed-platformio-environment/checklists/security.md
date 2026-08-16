@@ -1,7 +1,9 @@
 # 安全審查紀錄：受管理的 PlatformIO 雙 Core 環境
 
-**審查日期**：2026-08-16  
-**功能規格**：[spec.md](../spec.md)  
+**審查日期**：2026-08-16
+
+**功能規格**：[spec.md](../spec.md)
+
 **供應鏈契約**：[managed-runtime-manifest.md](../contracts/managed-runtime-manifest.md)
 
 ## 下載與供應鏈
