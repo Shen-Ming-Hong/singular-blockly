@@ -94,16 +94,45 @@ suite('MicropythonUploader environment availability', () => {
 	});
 
 	test('falls back to the provider environment when managed setup fails locally', async () => {
-		const coreManager = {
-			run: async () => {throw Object.assign(new Error('hidden path'), { code: 'permission' });},
+		const managed: CoreEnvironmentProvider = {
+			id: 'managed',
+			resolve: async () => {throw Object.assign(new Error('permission denied'), { code: 'EACCES' });},
 		};
-		const uploader = new MicropythonUploader('/workspace', executor, () => true, coreManager as any);
-		sinon.stub(uploader, 'checkPythonEnvironment').resolves(true);
-		sinon.stub(uploader, 'checkMpremoteInstalled').resolves(true);
+		const manager = new CoreEnvironmentManager(provider('provider'), managed);
+		const uploader = new MicropythonUploader('/workspace', executor, () => true, manager);
 
 		const result = await uploader.ensureMpremoteAvailable();
 
 		assert.deepStrictEqual(result, { success: true });
+		assert.strictEqual(manager.getSelection('python', '/workspace').selected, 'provider');
+		assert.strictEqual(manager.getSelection('python', '/workspace').fallbackUsed, true);
+	});
+
+	test('does not bypass the Core manager after a TLS failure forbids fallback', async () => {
+		let providerCalls = 0;
+		const providerCore: CoreEnvironmentProvider = {
+			id: 'provider',
+			resolve: async () => {
+				providerCalls++;
+				return environment('provider');
+			},
+		};
+		const managed: CoreEnvironmentProvider = {
+			id: 'managed',
+			resolve: async () => {throw new Error('TLS certificate verification failed');},
+		};
+		const manager = new CoreEnvironmentManager(providerCore, managed);
+		const uploader = new MicropythonUploader('/workspace', executor, () => true, manager);
+		const legacyPythonProbe = sinon.stub(uploader, 'checkPythonEnvironment').resolves(true);
+
+		const result = await uploader.ensureMpremoteAvailable();
+
+		assert.strictEqual(result.success, false);
+		if (!result.success) {
+			assert.match(result.details ?? '', /fallback stopped \(tls\)/i);
+		}
+		assert.strictEqual(providerCalls, 0);
+		assert.strictEqual(legacyPythonProbe.called, false);
 	});
 
 	test('probes managed tools and falls back when the managed mpremote executable is broken', async () => {

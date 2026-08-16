@@ -314,9 +314,8 @@ export class MicropythonUploader {
 			message: 'Checking mpremote tool...',
 		});
 
-		if (await this.tryUseCoreEnvironment(onProgress)) {
-			return { success: true };
-		}
+		const coreAvailability = await this.tryUseCoreEnvironment(onProgress);
+		if (coreAvailability) {return coreAvailability;}
 
 		const hasPython = await this.checkPythonEnvironment();
 		if (!hasPython) {
@@ -356,8 +355,8 @@ export class MicropythonUploader {
 		return { success: true };
 	}
 
-	private async tryUseCoreEnvironment(onProgress?: ProgressCallback): Promise<boolean> {
-		if (!this.coreEnvironmentManager) {return false;}
+	private async tryUseCoreEnvironment(onProgress?: ProgressCallback): Promise<MpremoteAvailabilityResult | null> {
+		if (!this.coreEnvironmentManager) {return null;}
 		try {
 			const environment = await this.coreEnvironmentManager.run({
 				workload: 'python',
@@ -372,17 +371,27 @@ export class MicropythonUploader {
 			this.selectedStorageRoot = environment.id === 'managed' ? environment.storageRoot : null;
 			const selection = this.coreEnvironmentManager.getSelection('python', this.workspacePath);
 			log('[blockly] MicroPython 工具環境已選擇', 'info', { source: environment.id, fallbackUsed: selection.fallbackUsed });
-			return environment.mpremotePath !== null;
+			return environment.mpremotePath !== null
+				? { success: true }
+				: {
+						success: false,
+						stage: 'checking_tool',
+						message: 'The selected Python environment does not provide mpremote.',
+					};
 		} catch (error) {
-			log('[blockly] Singular 受管理 runtime 尚不可用，改試 provider 環境', 'warn', {
+			const failureClass = typeof error === 'object' && error !== null && 'failureClass' in error
+				? String((error as { failureClass?: unknown }).failureClass ?? 'unknown')
+				: 'unknown';
+			log('[blockly] 雙 Core 管理器未選出安全的 MicroPython 工具環境', 'warn', {
 				code: error instanceof Error && 'code' in error ? String((error as Error & { code?: unknown }).code) : 'unknown',
+				failureClass,
 			});
-			onProgress?.({
+			return {
+				success: false,
 				stage: 'checking_tool',
-				progress: 15,
-				message: 'Managed runtime unavailable; checking PlatformIO provider...',
-			});
-			return false;
+				message: 'No safe Python tool environment is available.',
+				details: `Automatic fallback stopped (${failureClass}). Open PlatformIO diagnostics and retry after resolving the reported environment issue.`,
+			};
 		}
 	}
 

@@ -13,7 +13,7 @@
 - [x] `npm run ci:static`：project Skill、managed manifest／evidence、TypeScript、webpack、ESLint、15 語系與 release contracts 全部通過。
 - [x] `npm run test:managed-runtime`：managed runtime、路由、rollback、cleanup、初始化 coordinator 與 uploader 共 117 項通過。
 - [x] `npm run test:managed-runtime:paths`：macOS ARM64 的中文、空白、特殊字元、Emoji／正規化與長路徑 fake-install cases 通過。
-- [x] 隔離 VS Code 1.109 執行最新工作樹的完整 unit suite：1211 項通過、1 項需 Copilot 服務的 AI E2E pending、0 項失敗；Code Review 最後修正另以 41 項診斷／鎖專項測試驗證。
+- [x] 隔離 VS Code 1.109 執行 Phase 12 程式碼快照的完整 unit suite：1211 項通過、1 項需 Copilot 服務的 AI E2E pending、0 項失敗；後續最終安全重審修正另以 10 項 storage 與 8 項 MicroPython fallback 精準測試驗證。
 - [x] `npm run test:integration`：9 項通過、3 項因隔離 profile 無可用 Copilot API 而 pending、0 項產品失敗。
 - [x] `npm run package`：production bundle 成功，包含 managed manifest 與第三方授權檔。
 - [x] 以 `vsce package` 產生 VSIX，並執行 `npm run test:managed-runtime:vsix`：VS Code 1.109 隔離 profile 實際安裝、列舉版本及封裝資產檢查通過；runtime 版本 `2026.08.1`。
@@ -29,13 +29,16 @@
 - [x] `npm run lint -- --max-warnings=0`、`git diff --check`、`npm run test:managed-runtime:paths` 與 41 項最後專項回歸全部通過。
 - [x] `npm audit --omit=dev --audit-level=high`：正式依賴 0 個已知漏洞。
 - [x] 15 語系結構、placeholder 與決定性契約通過；Code Review 採唯讀語意 gate，未覆寫既有 full-audit state。
+- [x] 最終重審修正 managed root symlink 在 ownership claim 前留下 marker 的零寫入缺口，並確認 symlink 外部目標保持空目錄；storage 精準測試 10 項通過。
+- [x] 最終重審移除 MicroPython 在 manager 禁止 TLS／proxy／registry／取消 fallback 後再走 legacy provider 的旁路；permission 可 fallback 與 TLS 不可 fallback 精準測試共 8 項通過。
+- [x] 最終工作樹再次執行 `npm run ci:static`、`npm run release:prepare`、15 語系 deterministic gate、secret-added diff scan 與 `git diff --check origin/master...HEAD`；全部通過。
 
 ## 0.87.0 本地發布準備
 
 - [x] `package.json`、`package-lock.json` 與雙語 `CHANGELOG.md` 已同步為 `0.87.0`；`npm run release:prepare` 驗證 `v0.87.0` 契約通過。
 - [x] 完成 92 批、18,257 個唯一語意單位的全量 i18n 審計；manifest `17cd6b52a9162eb567f3de9df17e2b47adf6014415122ede969e9c02542b8b55` 為 current，0 Blocker，既有 2,277 個 Major 保留為 backlog，結果 `PASS_WITH_ADVISORIES`。
 - [x] 修正匈牙利文把 cleanup 誤譯為 delete 的 `SEM-002` 阻擋項，並收斂捷克文、德文、西班牙文、法文、波蘭文、葡萄牙文、土耳其文與繁體中文的意圖唯一語法／隱私描述；15 語系 deterministic validator 為 `PASS`。
-- [x] `code-simplifier` 將本次新增的 OTA 進度、Core 診斷與 failure evidence 巢狀三元運算式改為等價明確分支；完整 unit suite 重新驗證為 1211 項通過、1 項 AI E2E pending、0 項失敗。
+- [x] `code-simplifier` 將本次新增的 OTA 進度、Core 診斷與 failure evidence 巢狀三元運算式改為等價明確分支；Phase 12 完整 unit suite 驗證為 1211 項通過、1 項 AI E2E pending、0 項失敗。
 - [x] unit profile 使用專案內隔離的 extensions dir，不再載入使用者安裝的 Copilot Chat；release contract 靜態測試鎖定 unit／integration 的 extensions dir 邊界。
 - [ ] macOS 26 的 `Documents` provenance 會讓下載至 workspace 的 VS Code 測試 app 在第一次完整執行後無法再次啟動；乾淨下載的完整 suite 已通過，PR 的乾淨 macOS runner 必須再次確認。此項不影響 Extension runtime，但保留為本機測試工具風險。
 

@@ -1,6 +1,6 @@
 # 安全審查紀錄：受管理的 PlatformIO 雙 Core 環境
 
-**審查日期**：2026-08-16
+**審查日期**：2026-08-17
 
 **功能規格**：[spec.md](../spec.md)
 
@@ -16,7 +16,7 @@
 ## Archive、檔案系統與交易
 
 - [x] archive 在解壓前拒絕絕對路徑、`..`、控制字元、escaping symlink、hardlink 與特殊裝置；安全的 archive-internal alias 只驗證、不建立連結。
-- [x] managed storage 拒絕 filesystem root、相對路徑、UNC／network path 與既有 symlink component，並以 realpath containment 防止 macOS alias 與路徑逃逸。
+- [x] managed storage 在 ownership marker 寫入前拒絕 filesystem root、相對路徑、UNC／network path 與完整根路徑鏈的既有 symlink component，並以 realpath containment 防止 macOS alias 與路徑逃逸；被拒絕的 symlink target 保持零寫入。
 - [x] `.singular-managed-runtime-root.json` ownership marker 只認領空目錄；非空未受管目錄與無效 marker 都保留並拒絕操作。
 - [x] install 與 cleanup 共用具 owner、PID、建立時間與 lease 的原子 lock；有效或 PID 仍存活的 lock 不刪除。序列化 stale-lock 回收的 guard 也具有短租約，owner 崩潰後可復原，malformed guard 維持 fail-closed。
 - [x] staging／version 只有在 marker 與 transaction ownership 可證明時才能清除；未知檔、provider penv 與 workspace 永不納入 cleanup。
@@ -24,9 +24,9 @@
 
 ## 程序、信任與 fallback
 
-- [x] 所有 Core、monitor 與 installer 程序使用 argv 邊界與 `shell: false`；特殊字元不會變成 shell 語法。取消／逾時會終止 POSIX process group 或 Windows process tree，等待 close 後才回報完成。
+- [x] managed Core、Arduino PlatformIO、monitor 與 installer 的新程序路徑使用 argv 邊界與 `shell: false`；特殊字元不會變成 shell 語法。既有 provider-only Windows compatibility path 保留原行為但不接收未驗證動態參數。取消／逾時會終止 POSIX process group 或 Windows process tree，等待 close 後才回報完成。
 - [x] runtime-only 安裝／probe 不讀取專案程式；pkg install、build、upload、monitor 與裝置操作在 workspace untrusted 時拒絕執行。
-- [x] fallback 採 fail-closed 分類，只允許 process spawn 前的本機 executable／import／permission／managed-store corruption；網路、編譯、設定、裝置、serial、取消與 post-spawn 錯誤不得切換 Core 或重複上傳。
+- [x] fallback 採 fail-closed 分類，只允許 process spawn 前的本機 executable／import／permission／managed-store corruption；`CoreEnvironmentManager` 是雙 Core 唯一 authority，MicroPython 不會在 manager 禁止後再走 legacy provider。網路、編譯、設定、裝置、serial、取消與 post-spawn 錯誤不得切換 Core 或重複上傳。
 - [x] Arduino provider 優先、Python managed 優先，sticky 選擇只影響 Singular 自己的操作，不修改或清理 provider 擁有的 Core。
 
 ## Workspace 同意與 WebView 呈現
@@ -45,7 +45,7 @@
 - [x] evidence 只記錄 OS／arch、runner、path case 名稱、PR／event、head／tree、VSIX／manifest／artifact SHA 與結果，不保存原始使用者路徑或環境變數。
 - [x] workflows 使用最小 `contents: read` 權限、SHA-pinned actions，未使用 `pull_request_target`；具網路與執行未信任程式碼的真實矩陣需由 label／release gate 核准。
 - [x] evidence verifier 拒絕錯誤 PR／event、過期 commit／tree、不同 VSIX／manifest／artifact、缺少或重複平台與未完成 path/offline cases。
-- [x] `npm audit --audit-level=high` 回報 0 個已知漏洞；本功能沒有新增 npm runtime dependency。
+- [x] `npm audit --omit=dev --audit-level=high` 回報正式依賴 0 個已知漏洞；新增的 runtime dependencies 固定為 `@vscode/proxy-agent@0.44.0` 與 `tar@7.5.22`，分別承接 VS Code proxy 設定與受控 archive 解析。
 
 ## 結論
 

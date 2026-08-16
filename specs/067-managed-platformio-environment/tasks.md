@@ -196,6 +196,16 @@
 
 ---
 
+## Phase 13：發布前最終安全重審
+
+**目的**：在建立本地提交後重新檢查完整 `origin/master...HEAD`，修正會繞過零寫入與 fallback authority 的最後缺口，並讓證據文件精確反映已執行測試。
+
+- [x] T079 [P] 在 ownership marker 寫入前唯讀驗證 managed root 的完整 symlink path chain，並新增外部 symlink target 零寫入回歸測試於 `src/services/fileService.ts`、`src/services/managedRuntimeStorage.ts` 與 `src/test/services/managedRuntimeStorage.test.ts`
+- [x] T080 [P] 讓 `CoreEnvironmentManager` 成為 MicroPython 雙 Core 的唯一 fallback authority，禁止 TLS 等 fail-closed 錯誤再進入 legacy provider 探測，並新增 permission 可 fallback／TLS 不可 fallback 測試於 `src/services/micropythonUploader.ts` 與 `src/test/services/micropythonUploaderAvailability.test.ts`
+- [x] T081 重跑精準回歸、`npm run ci:static`、release／i18n／安全 gate，並校正 `implementation.md` 與 `security.md` 的依賴及最終工作樹證據敘述
+
+---
+
 ## 相依與執行順序
 
 ### 階段相依
@@ -205,7 +215,7 @@
 - US1 → US2：CoreEnvironmentManager 需要可用的 managed provider。
 - US2 → US5／US4：provider 相容與診斷需要完成雙 Core 路由。
 - US3 可在 US1 完成後與 US2 並行；US6 可在 Phase 2 後先做 evidence 工具，但 workflow 完整驗證依 US1／US3。
-- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約，三者都不解除 T061 的遠端矩陣與實機發布閘門。
+- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority，這些階段都不解除 T061 的遠端矩陣與實機發布閘門。
 - US7 的同意 gate 先於任何 workspace-local Skill／設定寫入；US8 與 managed runtime 安裝彼此獨立，可在 US7 測試完成後平行驗證。
 
 ### 平行機會
@@ -236,7 +246,8 @@
 7. Phase 9：全域驗證與文件。
 8. Phase 10：依 F5 回饋加固使用者同意邊界與 OTA 共用進度。
 9. Phase 11：以完整工作樹反覆 review／fix／verify，直到沒有可採納 finding。
+10. Phase 12－13：完成 `0.87.0` 本地發布契約，再對已提交完整差異執行安全重審與證據校正。
 
 ## 任務格式驗證
 
-全部 76 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 保持未完成，直到遠端矩陣與實機 smoke 取得正式證據。
+全部 83 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 保持未完成，直到遠端矩陣與實機 smoke 取得正式證據。
