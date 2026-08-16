@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Singular tarafından yönetilen Python ve PlatformIO ortamı için isteğe bağlı mutlak yerel klasör. VS Code eklentisinin genel depolama alanını kullanmak için boş bırakın. UNC ve ağ yolları desteklenmez.",
 	"command.checkPlatformioStatus.title": "PlatformIO Durumunu Kontrol Et",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI Öneri Ayarları",
 	"command.toggleAIEnabled.title": "Singular Blockly: AI Önerilerini Aç/Kapat",

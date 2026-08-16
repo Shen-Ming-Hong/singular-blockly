@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Singular에서 관리하는 Python 및 PlatformIO 실행 환경을 저장할 선택적 로컬 절대 경로입니다. 비워 두면 VS Code 확장 프로그램의 전역 저장소를 사용해요. UNC 및 네트워크 경로는 지원하지 않아요.",
 	"command.checkPlatformioStatus.title": "PlatformIO 상태 확인",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI 제안 설정",
 	"command.toggleAIEnabled.title": "Singular Blockly: AI 제안 전환",

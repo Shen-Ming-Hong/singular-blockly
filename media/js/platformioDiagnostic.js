@@ -53,6 +53,8 @@ function cacheElements() {
 	elements.panelSubtitle = document.getElementById('panelSubtitle');
 	elements.retestButton = document.getElementById('retestButton');
 	elements.copySummaryButton = document.getElementById('copySummaryButton');
+	elements.repairManagedRuntimeButton = document.getElementById('repairManagedRuntimeButton');
+	elements.cleanupManagedRuntimeButton = document.getElementById('cleanupManagedRuntimeButton');
 	elements.autoRepairButton = document.getElementById('autoRepairButton');
 	elements.copyAiRepairPacketButton = document.getElementById('copyAiRepairPacketButton');
 	elements.createIssueDraftButton = document.getElementById('createIssueDraftButton');
@@ -65,6 +67,8 @@ function cacheElements() {
 	elements.contentRoot = document.getElementById('contentRoot');
 	elements.summaryTitle = document.getElementById('summaryTitle');
 	elements.toolsTitle = document.getElementById('toolsTitle');
+	elements.coreEnvironmentsTitle = document.getElementById('coreEnvironmentsTitle');
+	elements.coreEnvironmentList = document.getElementById('coreEnvironmentList');
 	elements.repairTitle = document.getElementById('repairTitle');
 	elements.exportsTitle = document.getElementById('exportsTitle');
 	elements.exportNotice = document.getElementById('exportNotice');
@@ -94,6 +98,25 @@ function bindEvents() {
 			return;
 		}
 		vscode.postMessage({ command: 'platformioDiagnostic:copySummary' });
+	});
+
+	elements.repairManagedRuntimeButton.addEventListener('click', () => {
+		if (!elements.repairManagedRuntimeButton.disabled) {
+			vscode.postMessage({ command: 'platformioDiagnostic:repairManagedRuntime' });
+		}
+	});
+
+	elements.cleanupManagedRuntimeButton.addEventListener('click', () => {
+		if (!elements.cleanupManagedRuntimeButton.disabled) {
+			vscode.postMessage({ command: 'platformioDiagnostic:cleanupManagedRuntime' });
+		}
+	});
+
+	elements.coreEnvironmentList.addEventListener('click', event => {
+		const target = findActionTarget(event);
+		if (target?.dataset.action === 'reveal-managed-runtime') {
+			vscode.postMessage({ command: 'platformioDiagnostic:revealManagedRuntime' });
+		}
 	});
 
 	elements.autoRepairButton.addEventListener('click', () => {
@@ -205,9 +228,72 @@ function renderReady() {
 	elements.workspaceValue.textContent = session.workspacePath || '—';
 	elements.requestedAtValue.textContent = formatTimestamp(session.requestedAt);
 	elements.scopeNotice.textContent = session.scopeNotice;
+	renderCoreEnvironments(session.coreDiagnostics);
 	renderToolList(session.items);
 	renderRepairSection(state.panelState?.repairState);
 	renderExportSection(state.panelState?.repairState);
+}
+
+function renderCoreEnvironments(coreDiagnostics) {
+	if (!coreDiagnostics?.environments) {
+		elements.coreEnvironmentList.innerHTML = `<div class="empty-state">${escapeHtml(state.strings.noDataDescription)}</div>`;
+		return;
+	}
+	const environments = [coreDiagnostics.environments.provider, coreDiagnostics.environments.managed];
+	const environmentCards = environments.map(environment => {
+		const title = environment.id === 'provider' ? state.strings.providerCoreLabel : state.strings.managedCoreLabel;
+		let statusClass = 'error';
+		if (environment.status === 'healthy') {
+			statusClass = 'operational';
+		} else if (environment.status === 'degraded' || environment.status === 'unknown') {
+			statusClass = 'warning';
+		}
+		const revealAction = environment.id === 'managed' && state.panelState?.availableActions?.includes('revealManagedRuntime')
+			? `<div class="repair-confirmation-actions"><button class="secondary-btn" type="button" data-action="reveal-managed-runtime">${escapeHtml(state.strings.actions.revealManagedRuntime)}</button></div>`
+			: '';
+		return `
+			<article class="tool-card">
+				<div class="tool-card-header">
+					<div class="tool-title-group">
+						<h3>${escapeHtml(title)}</h3>
+						<span class="status-pill status-pill-${escapeClass(statusClass)}">${escapeHtml(environment.status)}</span>
+					</div>
+				</div>
+				<dl class="detail-grid">
+					<div><dt>${escapeHtml(state.strings.versionLabel)}</dt><dd>${escapeHtml(environment.version || '—')}</dd></div>
+					<div><dt>${escapeHtml(state.strings.packageStatusLabel)}</dt><dd>${escapeHtml(environment.packageStatus || 'unknown')}</dd></div>
+					<div><dt>${escapeHtml(state.strings.pathLabel)}</dt><dd>${escapeHtml(environment.storageSummary || '—')}</dd></div>
+					<div><dt>${escapeHtml(state.strings.storageUsageLabel)}</dt><dd>${escapeHtml(formatBytes(environment.storageUsageBytes))}</dd></div>
+				</dl>
+				${renderDetailBlock(state.strings.reasonLabel, environment.reason || '—')}
+				${revealAction}
+			</article>`;
+	}).join('');
+	const selectionCards = ['arduino', 'python'].map(workload => {
+		const selection = coreDiagnostics.selection?.[workload];
+		if (!selection) {return '';}
+		const label = workload === 'arduino' ? state.strings.arduinoSelectionLabel : state.strings.pythonSelectionLabel;
+		return `<article class="tool-card">
+			<h3>${escapeHtml(label)}</h3>
+			<p>${escapeHtml(`primary=${selection.primary}; fallback=${selection.fallback}; selected=${selection.selected || 'none'}`)}</p>
+			<p>${escapeHtml(state.strings.fallbackUsedLabel)}: ${escapeHtml(String(selection.fallbackUsed))}</p>
+			<p>${escapeHtml(state.strings.reasonLabel)}: ${escapeHtml(selection.stickyReason || '—')}</p>
+		</article>`;
+	}).join('');
+	elements.coreEnvironmentList.innerHTML = environmentCards + selectionCards;
+}
+
+function formatBytes(bytes) {
+	if (!Number.isFinite(bytes) || bytes < 0) {return '—';}
+	if (bytes < 1024) {return `${bytes} B`;}
+	const units = ['KiB', 'MiB', 'GiB', 'TiB'];
+	let value = bytes / 1024;
+	let unitIndex = 0;
+	while (value >= 1024 && unitIndex < units.length - 1) {
+		value /= 1024;
+		unitIndex++;
+	}
+	return `${value.toFixed(value >= 10 ? 1 : 2)} ${units[unitIndex]}`;
 }
 
 function renderToolList(items) {
@@ -281,12 +367,15 @@ function applySharedLabels() {
 	elements.panelSubtitle.textContent = state.strings.panelSubtitle;
 	elements.retestButton.textContent = state.strings.actions.retest;
 	elements.copySummaryButton.textContent = state.strings.actions.copySummary;
+	elements.repairManagedRuntimeButton.textContent = state.strings.actions.repairManagedRuntime;
+	elements.cleanupManagedRuntimeButton.textContent = state.strings.actions.cleanupManagedRuntime;
 	elements.autoRepairButton.textContent = state.strings.actions.startAutoRepair;
 	elements.copyAiRepairPacketButton.textContent = state.strings.actions.copyAiRepairPacket;
 	elements.createIssueDraftButton.textContent = state.strings.actions.createIssueDraft;
 	elements.clearRepairHistoryButton.textContent = state.strings.actions.clearRepairHistory;
 	elements.summaryTitle.textContent = state.strings.summaryTitle;
 	elements.toolsTitle.textContent = state.strings.toolsTitle;
+	elements.coreEnvironmentsTitle.textContent = state.strings.coreEnvironmentsTitle;
 	elements.repairTitle.textContent = state.strings.repairTitle;
 	elements.exportsTitle.textContent = state.strings.exportsTitle || 'Support exports';
 	elements.exportNotice.textContent = state.strings.aiPacketRedactionNotice || state.strings.copySuccessMessage;
@@ -302,6 +391,8 @@ function setButtonsDisabled(retestDisabled, copyDisabled) {
 	const activeRun = !!repairState?.activeRun;
 	elements.retestButton.disabled = !!retestDisabled;
 	elements.copySummaryButton.disabled = !!copyDisabled;
+	elements.repairManagedRuntimeButton.disabled = !!retestDisabled || !state.panelState?.availableActions?.includes('repairManagedRuntime');
+	elements.cleanupManagedRuntimeButton.disabled = !!retestDisabled || !state.panelState?.availableActions?.includes('cleanupManagedRuntime');
 	elements.autoRepairButton.disabled = !!retestDisabled || !primaryFlow || activeRun;
 	elements.copyAiRepairPacketButton.disabled = !!copyDisabled;
 	elements.createIssueDraftButton.disabled = !!copyDisabled;
@@ -513,6 +604,14 @@ function createFallbackStrings() {
 		errorTitle: 'Diagnostic error',
 		summaryTitle: 'Summary',
 		toolsTitle: 'Resolved tools',
+		coreEnvironmentsTitle: 'Core environments',
+		providerCoreLabel: 'PlatformIO extension Core',
+		managedCoreLabel: 'Singular managed Core',
+		arduinoSelectionLabel: 'Arduino routing',
+		pythonSelectionLabel: 'Python routing',
+		packageStatusLabel: 'Package status',
+		storageUsageLabel: 'Storage usage',
+		fallbackUsedLabel: 'Fallback used',
 		repairTitle: 'Guided repair',
 		exportsTitle: 'Support exports',
 		scopeTitle: 'Scope',
@@ -555,6 +654,9 @@ function createFallbackStrings() {
 		actions: {
 			retest: 'Retest',
 			copySummary: 'Copy summary',
+			repairManagedRuntime: 'Repair managed runtime',
+			cleanupManagedRuntime: 'Clean managed files',
+			revealManagedRuntime: 'Open Singular Core folder',
 			startAutoRepair: 'Auto repair',
 			confirmAutoRepair: 'Confirm repair',
 			cancelAutoRepair: 'Cancel',

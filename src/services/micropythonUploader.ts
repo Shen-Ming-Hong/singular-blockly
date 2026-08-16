@@ -10,6 +10,8 @@ import { log } from './logging';
 import { getDefaultPlatformioExecutablePath, getExecutableDirectory, getExecutableSearchDirectories, resolveExecutable } from './executableResolver';
 import { isProviderInstalled } from './penvProviderService';
 import * as vscode from 'vscode';
+import type { CoreEnvironmentManager } from './coreEnvironmentManager';
+import type { CoreEnvironment, CoreEnvironmentId } from '../types/coreEnvironment';
 import { CYBERBRICK_OTA_AGENT_TARGET_VERSION, WifiNetworkSuggestion } from '../types/cyberbrickUpload';
 import {
 	buildCyberBrickRcMainOtaBootstrap,
@@ -122,18 +124,24 @@ export class MicropythonUploader {
 	private executor: CommandExecutor;
 	private pythonPath: string | null = null;
 	private mpremotePath: string | null = null;
+	private selectedCoreId: CoreEnvironmentId | null = null;
+	private selectedStorageRoot: string | null = null;
 
 	/**
 	 * 建立 MicropythonUploader 實例
 	 * @param workspacePath 工作區路徑
 	 * @param executor 指令執行器（可選，用於測試）
 	 * @param providerInstalled provider 安裝狀態探測（可選，用於測試）
+	 * @param coreEnvironmentManager 雙 Core 選擇器（可選，用於測試與依賴注入）
+	 * @param workspaceTrusted Workspace Trust 探測（可選，用於測試）
 	 */
 	constructor(
 		private workspacePath: string,
 		executor?: CommandExecutor,
 		private readonly providerInstalled: () => boolean = () =>
-			isProviderInstalled({ getExtension: id => vscode.extensions.getExtension(id) })
+			isProviderInstalled({ getExtension: id => vscode.extensions.getExtension(id) }),
+		private readonly coreEnvironmentManager?: CoreEnvironmentManager,
+		private readonly workspaceTrusted: () => boolean = () => vscode.workspace.isTrusted
 	) {
 		// 使用預設的 child_process 執行器或注入的執行器
 		this.executor = executor || {
@@ -181,6 +189,7 @@ export class MicropythonUploader {
 	 * @returns Python 執行檔路徑
 	 */
 	getPlatformioPythonPath(): string {
+		if (this.pythonPath) {return this.pythonPath;}
 		const defaultPath = getDefaultPlatformioExecutablePath('python');
 		return resolveExecutable({
 			candidatePaths: [defaultPath],
@@ -194,6 +203,7 @@ export class MicropythonUploader {
 	 * @returns mpremote 執行檔路徑
 	 */
 	getMpremotePath(): string {
+		if (this.mpremotePath) {return this.mpremotePath;}
 		const defaultPath = getDefaultPlatformioExecutablePath('mpremote');
 		return resolveExecutable({
 			candidatePaths: [defaultPath],
@@ -207,11 +217,11 @@ export class MicropythonUploader {
 	 * @returns 是否存在
 	 */
 	async checkPythonEnvironment(): Promise<boolean> {
-		const pythonPath = this.getPlatformioPythonPath();
+		const pythonPath = this.pythonPath ?? this.getPlatformioPythonPath();
 		const fs = require('fs');
 
 		if (!fs.existsSync(pythonPath)) {
-			log('[blockly] PlatformIO Python 環境不存在', 'warn', { path: pythonPath });
+			log('[blockly] PlatformIO Python 環境不存在', 'warn', { code: 'python-missing' });
 			return false;
 		}
 
@@ -221,7 +231,7 @@ export class MicropythonUploader {
 			this.pythonPath = pythonPath;
 			return true;
 		} catch (error) {
-			log('[blockly] PlatformIO Python 環境檢查失敗', 'error', error);
+			log('[blockly] PlatformIO Python 環境檢查失敗', 'error', { code: this.getCommandErrorCode(error) });
 			return false;
 		}
 	}
@@ -231,11 +241,11 @@ export class MicropythonUploader {
 	 * @returns 是否已安裝
 	 */
 	async checkMpremoteInstalled(): Promise<boolean> {
-		const mpremotePath = this.getMpremotePath();
+		const mpremotePath = this.mpremotePath ?? this.getMpremotePath();
 		const fs = require('fs');
 
 		if (!fs.existsSync(mpremotePath)) {
-			log('[blockly] mpremote 未安裝', 'info', { path: mpremotePath });
+			log('[blockly] mpremote 未安裝', 'info', { code: 'mpremote-missing' });
 			return false;
 		}
 
@@ -245,7 +255,7 @@ export class MicropythonUploader {
 			this.mpremotePath = mpremotePath;
 			return true;
 		} catch (error) {
-			log('[blockly] mpremote 版本檢查失敗', 'warn', error);
+			log('[blockly] mpremote 版本檢查失敗', 'warn', { code: this.getCommandErrorCode(error) });
 			return false;
 		}
 	}
@@ -271,7 +281,7 @@ export class MicropythonUploader {
 
 		try {
 			const pipPath = this.getPipPath();
-			log('[blockly] 開始安裝 mpremote', 'info', { pip: pipPath });
+			log('[blockly] 開始安裝 mpremote', 'info');
 
 			await this.execExecutable(pipPath, ['install', 'mpremote']);
 
@@ -285,7 +295,7 @@ export class MicropythonUploader {
 				return false;
 			}
 		} catch (error) {
-			log('[blockly] mpremote 安裝失敗', 'error', error);
+			log('[blockly] mpremote 安裝失敗', 'error', { code: this.getCommandErrorCode(error) });
 			return false;
 		}
 	}
@@ -303,6 +313,10 @@ export class MicropythonUploader {
 			progress: 10,
 			message: 'Checking mpremote tool...',
 		});
+
+		if (await this.tryUseCoreEnvironment(onProgress)) {
+			return { success: true };
+		}
 
 		const hasPython = await this.checkPythonEnvironment();
 		if (!hasPython) {
@@ -342,6 +356,59 @@ export class MicropythonUploader {
 		return { success: true };
 	}
 
+	private async tryUseCoreEnvironment(onProgress?: ProgressCallback): Promise<boolean> {
+		if (!this.coreEnvironmentManager) {return false;}
+		try {
+			const environment = await this.coreEnvironmentManager.run({
+				workload: 'python',
+				workspaceUri: this.workspacePath,
+				phase: 'probe',
+				onProgress: progress => this.reportManagedRuntimeProgress(progress, onProgress),
+				operation: candidate => this.probeCoreEnvironment(candidate),
+			});
+			this.pythonPath = environment.pythonPath;
+			this.mpremotePath = environment.mpremotePath;
+			this.selectedCoreId = environment.id;
+			this.selectedStorageRoot = environment.id === 'managed' ? environment.storageRoot : null;
+			const selection = this.coreEnvironmentManager.getSelection('python', this.workspacePath);
+			log('[blockly] MicroPython 工具環境已選擇', 'info', { source: environment.id, fallbackUsed: selection.fallbackUsed });
+			return environment.mpremotePath !== null;
+		} catch (error) {
+			log('[blockly] Singular 受管理 runtime 尚不可用，改試 provider 環境', 'warn', {
+				code: error instanceof Error && 'code' in error ? String((error as Error & { code?: unknown }).code) : 'unknown',
+			});
+			onProgress?.({
+				stage: 'checking_tool',
+				progress: 15,
+				message: 'Managed runtime unavailable; checking PlatformIO provider...',
+			});
+			return false;
+		}
+	}
+
+	private async probeCoreEnvironment(environment: CoreEnvironment): Promise<CoreEnvironment> {
+		if (!environment.pythonPath) {
+			throw Object.assign(new Error('Selected Core does not provide Python'), { code: 'ENOENT' });
+		}
+		await this.execExecutable(environment.pythonPath, ['--version'], undefined, environment.id === 'managed');
+		if (!environment.mpremotePath) {
+			if (environment.id === 'managed') {
+				throw Object.assign(new Error('Managed Core does not provide mpremote'), { code: 'ENOENT' });
+			}
+			return environment;
+		}
+		await this.execExecutable(environment.mpremotePath, ['version'], undefined, environment.id === 'managed');
+		return environment;
+	}
+
+	private reportManagedRuntimeProgress(progress: { stage: string; percent: number }, onProgress?: ProgressCallback): void {
+		onProgress?.({
+			stage: progress.stage === 'waiting-lock' || progress.stage === 'verifying' ? 'checking_tool' : 'installing_tool',
+			progress: Math.min(35, 10 + Math.round(progress.percent * 0.25)),
+			message: progress.stage === 'waiting-lock' ? 'Preparing managed tools...' : 'Installing managed tools...',
+		});
+	}
+
 	/**
 	 * 取得 pip 執行路徑
 	 * @returns pip 執行檔路徑
@@ -377,7 +444,7 @@ export class MicropythonUploader {
 			log('[blockly] 已列出 COM 埠', 'info', { count: filteredPorts.length, autoDetected });
 			return { ports: filteredPorts, autoDetected };
 		} catch (error) {
-			log('[blockly] 列出 COM 埠失敗', 'error', error);
+			log('[blockly] 列出 COM 埠失敗', 'error', { code: this.getCommandErrorCode(error) });
 			return { ports: [] };
 		}
 	}
@@ -431,7 +498,7 @@ export class MicropythonUploader {
 			log('[blockly] 已列出本機序列埠', 'info', { count: filteredPorts.length, autoDetected });
 			return { ports: filteredPorts, autoDetected };
 		} catch (error) {
-			log('[blockly] 本機序列埠偵測失敗', 'error', error);
+			log('[blockly] 本機序列埠偵測失敗', 'error', { code: this.getCommandErrorCode(error) });
 			return { ports: [] };
 		} finally {
 			try {
@@ -1003,8 +1070,10 @@ print(json.dumps(result))
 	}
 
 	private formatCommandError(error: unknown): string {
+		let message: string;
 		if (error instanceof Error) {
-			return this.enhanceWindowsErrorMessage(error.message);
+			message = this.enhanceWindowsErrorMessage(error.message);
+			return this.redactSelectedStoragePath(message);
 		}
 		if (error && typeof error === 'object') {
 			const errorRecord = error as { error?: unknown; stdout?: unknown; stderr?: unknown };
@@ -1020,9 +1089,24 @@ print(json.dumps(result))
 			if (typeof errorRecord.stdout === 'string' && errorRecord.stdout.trim()) {
 				parts.push(`stdout: ${this.truncateCommandOutput(errorRecord.stdout)}`);
 			}
-			return parts.length > 0 ? parts.join(' | ') : 'unknown command error';
+			message = parts.length > 0 ? parts.join(' | ') : 'unknown command error';
+			return this.redactSelectedStoragePath(message);
 		}
-		return String(error);
+		return this.redactSelectedStoragePath(String(error));
+	}
+
+	private redactSelectedStoragePath(value: string): string {
+		if (!this.selectedStorageRoot) {return value;}
+		return value.split(this.selectedStorageRoot).join('<managed-runtime>');
+	}
+
+	private getCommandErrorCode(error: unknown): string {
+		if (!error || typeof error !== 'object') {return 'command-failed';}
+		const candidate = error as { code?: unknown; error?: unknown };
+		const nested = candidate.error && typeof candidate.error === 'object'
+			? candidate.error as { code?: unknown }
+			: undefined;
+		return String(candidate.code ?? nested?.code ?? 'command-failed');
 	}
 
 	private truncateCommandOutput(output: string): string {
@@ -1081,6 +1165,16 @@ print(json.dumps(result))
 		// 驗證程式碼
 		if (!request.code || request.code.trim().length === 0) {
 			return this.createFailureResult(startTime, port || 'unknown', 'preparing', 'Code cannot be empty');
+		}
+
+		if (!this.workspaceTrusted()) {
+			return this.createFailureResult(
+				startTime,
+				port || 'unknown',
+				'preparing',
+				'Workspace is not trusted',
+				'Trust this workspace before uploading or monitoring a device.'
+			);
 		}
 
 		const mpremoteReady = await this.ensureMpremoteAvailable(onProgress);
@@ -1154,7 +1248,7 @@ print(json.dumps(result))
 			await this.restartDevice(port);
 		} catch (error) {
 			// 重啟失敗不影響上傳結果，只記錄警告
-			log('[blockly] 裝置重啟失敗（已忽略）', 'warn', error);
+			log('[blockly] 裝置重啟失敗（已忽略）', 'warn', { code: this.getCommandErrorCode(error) });
 		}
 
 		// 階段 8: 完成
@@ -1227,14 +1321,14 @@ print(json.dumps(result))
 			// 額外等待確保穩定
 			await this.delay(1000);
 		} catch (error) {
-			log('[blockly] pyserial 中斷失敗，嘗試硬體重置', 'warn', error);
+			log('[blockly] pyserial 中斷失敗，嘗試硬體重置', 'warn', { code: this.getCommandErrorCode(error) });
 			// 備用方案：使用 mpremote 硬體重置
 			try {
 				const normalizedPort = this.normalizeCOMPort(port);
 				await this.execMpremote(['connect', normalizedPort, 'reset'], 5000);
 				await this.delay(2000);
 			} catch (resetError) {
-				log('[blockly] 硬體重置也失敗', 'error', resetError);
+				log('[blockly] 硬體重置也失敗', 'error', { code: this.getCommandErrorCode(resetError) });
 				throw new Error('無法中斷裝置上的程式，請手動重置裝置');
 			}
 		} finally {
@@ -1263,10 +1357,18 @@ print(json.dumps(result))
 		return this.runWithTimeout(() => this.executor.exec(command), timeoutMs);
 	}
 
-	private async execExecutable(executable: string, args: string[], timeoutMs?: number): Promise<{ stdout: string; stderr: string }> {
+	private async execExecutable(
+		executable: string,
+		args: string[],
+		timeoutMs?: number,
+		forceArgv = this.selectedCoreId === 'managed'
+	): Promise<{ stdout: string; stderr: string }> {
 		const run = () => {
 			if (this.executor.execFile) {
 				return this.executor.execFile(executable, args);
+			}
+			if (forceArgv) {
+				throw Object.assign(new Error('Managed Core requires argument-array process execution'), { code: 'ENOSYS' });
 			}
 			return this.executor.exec(this.buildShellCommand(executable, args));
 		};
@@ -1305,7 +1407,7 @@ print(json.dumps(result))
 		windowsExecution: 'shell' | 'argv' = 'shell'
 	): Promise<{ stdout: string; stderr: string }> {
 		const mpremotePath = this.mpremotePath || this.getMpremotePath();
-		if (process.platform === 'win32' && windowsExecution === 'shell') {
+		if (process.platform === 'win32' && windowsExecution === 'shell' && this.selectedCoreId !== 'managed') {
 			const command = this.buildMpremoteCommand(mpremotePath, args);
 			return timeoutMs === undefined ? this.executor.exec(command) : this.execWithTimeout(command, timeoutMs);
 		}
@@ -1376,9 +1478,7 @@ print(json.dumps(result))
 			const normalizedPort = this.normalizeCOMPort(port);
 			const finalTempFile = this.getMpremoteLocalPath(tempFile, 'argv');
 			const args = ['connect', normalizedPort, 'resume', '+', 'fs', 'cp', finalTempFile, `:${DEVICE_PATH}`];
-			const mpremotePath = this.mpremotePath || this.getMpremotePath();
-			const command = this.buildMpremoteCommand(mpremotePath, args);
-			log('[blockly] 執行上傳指令', 'debug', { port, normalizedPort, command, mode: 'argv-fs-cp' });
+			log('[blockly] 執行上傳指令', 'debug', { port, normalizedPort, mode: 'argv-fs-cp' });
 
 			// Windows 平台重試機制：偵測 port busy 錯誤
 			const maxRetries = process.platform === 'win32' ? 3 : 1;
@@ -1428,9 +1528,7 @@ print(json.dumps(result))
 		// 使用 resume + 確保不會觸發額外的 soft-reset
 		const normalizedPort = this.normalizeCOMPort(port);
 		const args = ['connect', normalizedPort, 'resume', '+', 'reset'];
-		const mpremotePath = this.mpremotePath || this.getMpremotePath();
-		const command = this.buildMpremoteCommand(mpremotePath, args);
-		log('[blockly] 執行重啟指令', 'debug', { port, normalizedPort, command });
+		log('[blockly] 執行重啟指令', 'debug', { port, normalizedPort, mode: 'reset' });
 		await this.execMpremote(args);
 	}
 
@@ -1450,13 +1548,11 @@ print(json.dumps(result))
 		try {
 			const normalizedPort = this.normalizeCOMPort(port);
 			const args = ['connect', normalizedPort, 'fs', 'cat', `:${DEVICE_PATH}`];
-			const mpremotePath = this.mpremotePath || this.getMpremotePath();
-			const command = this.buildMpremoteCommand(mpremotePath, args);
-			log('[blockly] 讀取裝置程式', 'debug', { command });
+			log('[blockly] 讀取裝置程式', 'debug', { mode: 'fs-cat' });
 			const result = await this.execMpremote(args);
 			return result.stdout;
 		} catch (error) {
-			log('[blockly] 讀取裝置程式失敗', 'warn', error);
+			log('[blockly] 讀取裝置程式失敗', 'warn', { code: this.getCommandErrorCode(error) });
 			return null;
 		}
 	}
@@ -1484,12 +1580,12 @@ print(json.dumps(result))
 	 */
 	private getErrorMessage(error: unknown): string {
 		if (error && typeof error === 'object' && 'stderr' in error) {
-			return (error as { stderr: string }).stderr;
+			return this.redactSelectedStoragePath((error as { stderr: string }).stderr);
 		}
 		if (error instanceof Error) {
-			return error.message;
+			return this.redactSelectedStoragePath(error.message);
 		}
-		return String(error);
+		return this.redactSelectedStoragePath(String(error));
 	}
 
 	/**

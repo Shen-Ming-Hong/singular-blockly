@@ -3,6 +3,7 @@
 'use strict';
 
 const path = require('path');
+const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 
 //@ts-check
@@ -44,9 +45,14 @@ const extensionConfig = {
 		],
 	},
 	plugins: [
+		// @vscode/proxy-agent conditionally imports this Windows-only native addon.
+		// The managed fetch adapter disables that optional branch so one VSIX can be
+		// built on any supported OS without embedding a platform-specific binary.
+		new webpack.IgnorePlugin({ resourceRegExp: /^@vscode\/windows-ca-certs$/ }),
 		new CopyPlugin({
 			patterns: [
 				{ from: 'resources/project-skills/singular-blockly', to: 'project-skills/singular-blockly' },
+				{ from: 'resources/managed-runtime', to: 'managed-runtime' },
 			],
 		}),
 	],

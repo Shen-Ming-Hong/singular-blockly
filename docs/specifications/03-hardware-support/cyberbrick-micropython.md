@@ -41,6 +41,12 @@
 
 **實作**：`src/services/micropythonUploader.ts`
 
+### 2.0 Python／mpremote 執行環境
+
+CyberBrick 不要求使用者另外安裝系統 Python。Singular Blockly 在 Extension `onStartupFinished` 啟用後即背景準備自有 CPython、PlatformIO Core 與固定版本 `mpremote`；每次開啟 Blockly 編輯器都會重查並冪等續裝，但不阻塞積木編輯。USB 上傳仍在執行前呼叫 `ensureReady()`，因此背景初始化曾因離線或 proxy 失敗時可以安全重試。
+
+Python 工作負載以 Singular managed Core 為 primary，現有 PlatformIO／PIOArduino provider penv 為 compatibility fallback。只有 executable、Python import、權限或 managed store 損壞等本機 pre-start 錯誤可 fallback；裝置、serial、取消或上傳開始後錯誤不得改用另一 Core 重傳。
+
 ### 2.1 USB / OTA 上傳模式（059）
 
 > 來源：specs/059-cyberbrick-upload-modes（2026-05）；交付紀錄：[PR #82](https://github.com/Shen-Ming-Hong/singular-blockly/pull/82)
@@ -73,6 +79,10 @@ CyberBrick 支援固定的上傳模式設定，但 **OTA 是上傳工具功能�
 RC/ESP‑NOW 生成碼需要與 OTA agent 共存：如果裝置端已有 `/cyberbrick_ota_config.py` 且具備 OTA 設定，RC 初始化不得無條件呼叫 `_wlan.disconnect()` 或停用 reconnects，否則學生程式啟動後會把 OTA agent 的 STA Wi‑Fi 斷開，造成 `/api/v1/health` readiness timeout。未配對 OTA 的純 ESP‑NOW 情境仍可保留原本固定頻道初始化。
 
 Provisioning 完成後仍維持 `USB` 模式，必須由使用者明確切換到 `OTA`。
+
+OTA provisioning 與進階「清除 OTA」共用設定 modal 上方的同一張進度卡。Provisioning 依六個實際完成的里程碑呈現 determinate progress；清除流程沒有中間里程碑，因此執行中採 indeterminate sweep，不顯示或虛構百分比。兩個操作都會在送出 Extension Host request 前先顯示 running 狀態並鎖定衝突控制項，結果回來後在同一位置顯示成功或失敗。
+
+進度卡使用 Singular Blockly 既有亮色／暗色 theme token，forced-colors 改用系統 Highlight；`prefers-reduced-motion` 會停用 sweep、pulse 與寬度 transition，但保留靜態填色與狀態邊框。輔助科技方面，provisioning 提供實際 `aria-valuenow`，清除 running 時省略該值並設定 busy，兩者都提供在地化 `aria-valuetext`。
 
 #### OTA v1 protocol
 

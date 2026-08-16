@@ -99,6 +99,9 @@ jobs:
       - name: Compile extension and tests
         run: npm run compile-tests && npm run compile
 
+      - name: Run deterministic managed runtime path matrix
+        run: npm run test:managed-runtime:paths
+
       - name: Run unit tests with coverage
         if: runner.os == 'Linux'
         run: xvfb-run -a npm run test:coverage:ci
@@ -186,7 +189,7 @@ jobs:
           VSIX_PATH: release-artifacts/${{ steps.metadata.outputs.vsix-name }}
         shell: bash
         run: |
-          unzip -tqq "$VSIX_PATH"
+          npm run test:managed-runtime:vsix -- --vsix "$VSIX_PATH"
           if [[ -n "$RELEASE_TAG" ]]; then
             npm run release:prepare -- --verify-tag --finalize release-artifacts
           else

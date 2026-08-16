@@ -4,19 +4,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import * as vscode from 'vscode';
+import type * as VSCode from 'vscode';
+
+function loadVSCodeApi(): typeof VSCode | undefined {
+	try {
+		return require('vscode') as typeof VSCode;
+	} catch {
+		// Pure Node.js runtime/evidence tests intentionally run outside VS Code.
+		return undefined;
+	}
+}
 
 // 建立輸出頻道
-let outputChannel: vscode.LogOutputChannel | undefined;
+let outputChannel: VSCode.LogOutputChannel | undefined;
 
 // VSCode API 引用（可在測試中注入）
-let vscodeApi: typeof vscode = vscode;
+let vscodeApi: typeof VSCode | undefined = loadVSCodeApi();
 
 /**
  * 設置 VSCode API 引用（僅用於測試）
  * @param api VSCode API 實例
  */
-export function _setVSCodeApi(api: typeof vscode): void {
+export function _setVSCodeApi(api: typeof VSCode): void {
 	vscodeApi = api;
 	// 重置 output channel，以便使用新的 API
 	outputChannel = undefined;
@@ -25,7 +34,7 @@ export function _setVSCodeApi(api: typeof vscode): void {
 /**
  * 獲取當前的 output channel（僅用於測試）
  */
-export function _getOutputChannel(): vscode.LogOutputChannel | undefined {
+export function _getOutputChannel(): VSCode.LogOutputChannel | undefined {
 	return outputChannel;
 }
 
@@ -37,6 +46,7 @@ export function _getOutputChannel(): vscode.LogOutputChannel | undefined {
  * @param args 附加參數
  */
 export function log(message: string, level: 'debug' | 'info' | 'warn' | 'error' = 'info', ...args: any[]): void {
+	if (!vscodeApi) {return;}
 	// 確保輸出頻道已建立
 	if (!outputChannel) {
 		outputChannel = vscodeApi.window.createOutputChannel('Singular Blockly', { log: true });
@@ -89,6 +99,7 @@ export function handleWebViewLog(source: string, level: string, message: string,
  * 顯示輸出頻道
  */
 export function showOutputChannel(): void {
+	if (!vscodeApi) {return;}
 	if (!outputChannel) {
 		outputChannel = vscodeApi.window.createOutputChannel('Singular Blockly', { log: true });
 	}

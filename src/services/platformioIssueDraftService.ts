@@ -81,7 +81,7 @@ export class PlatformioIssueDraftService {
 			`- OS: ${input.session.environment?.platform ?? this.platform}/${input.session.environment?.arch ?? this.arch}`,
 			'- Singular Blockly version: unknown',
 			'- VS Code version: unknown',
-			'- PlatformIO extension: installed dependency, readiness unknown',
+			...this.formatCoreEnvironment(input.session),
 			`- Relevant PlatformIO settings: ${input.session.settingsEvidence?.summary ?? 'No settings evidence collected'}`,
 			`- Workspace: ${input.session.workspacePath ?? 'No workspace'}`,
 			'',
@@ -92,7 +92,7 @@ export class PlatformioIssueDraftService {
 			this.formatRepairAttempts(input.historySummary),
 			'',
 			'## Expected behavior',
-			'When the official PlatformIO extension is usable, Singular Blockly should resolve or guide repair of the PlatformIO/CyberBrick environment.',
+			'Singular Blockly should use the healthy primary Core or one safe pre-start fallback, while keeping provider and managed environments independently repairable.',
 			'',
 			'## Actual behavior',
 			blocker ? `${blocker.id}: ${blocker.reason}` : `Overall status is ${input.session.overallStatus}.`,
@@ -115,6 +115,24 @@ export class PlatformioIssueDraftService {
 			source: input.source,
 			redactionWarning: 'Review the privacy checklist before posting publicly.',
 		};
+	}
+
+	private formatCoreEnvironment(session: PlatformioDiagnosticSession): string[] {
+		const diagnostics = session.coreDiagnostics;
+		if (!diagnostics) {
+			return ['- Provider Core: readiness unknown', '- Singular managed Core: readiness unknown'];
+		}
+		const { provider, managed } = diagnostics.environments;
+		const route = (workload: 'arduino' | 'python') => {
+			const selection = diagnostics.selection[workload];
+			return `${selection.primary} -> ${selection.fallback}; selected=${selection.selected ?? 'none'}; fallbackUsed=${selection.fallbackUsed}`;
+		};
+		return [
+			`- Provider Core: ${provider.status}; version=${provider.version ?? 'unknown'}; ${provider.reason}`,
+			`- Singular managed Core: ${managed.status}; version=${managed.version ?? 'unknown'}; storage=${managed.storageSummary ?? 'unknown'}; ${managed.reason}`,
+			`- Arduino route: ${route('arduino')}`,
+			`- Python route: ${route('python')}`,
+		];
 	}
 
 	private createRedactor(sessionWorkspacePath?: string | null): PlatformioPrivacyRedactor {

@@ -8,7 +8,10 @@ const extensionDevelopmentPath = process.cwd();
 const testWorkspace =
 	process.env.VSCODE_TEST_WORKSPACE ||
 	(ciTempRoot ? path.join(ciTempRoot, 'workspace') : path.join(os.homedir(), 'test', 'debug_extension'));
-const extensionsDir =
+const unitExtensionsDir =
+	process.env.VSCODE_UNIT_EXTENSIONS_DIR ||
+	(ciTempRoot ? path.join(ciTempRoot, 'extensions-unit') : path.join(process.cwd(), '.vscode-test', 'extensions-unit'));
+const integrationExtensionsDir =
 	process.env.VSCODE_EXTENSIONS_DIR ||
 	(ciTempRoot ? path.join(ciTempRoot, 'extensions') : path.join(os.homedir(), '.vscode', 'extensions'));
 const userDataDir =
@@ -16,7 +19,7 @@ const userDataDir =
 	(ciTempRoot ? path.join(ciTempRoot, 'user-data') : path.join(process.cwd(), '.vscode-test', 'user-data-unit'));
 
 if (ciTempRoot) {
-	for (const directory of [testWorkspace, extensionsDir, userDataDir]) {
+	for (const directory of [testWorkspace, unitExtensionsDir, integrationExtensionsDir, userDataDir]) {
 		fs.mkdirSync(directory, { recursive: true });
 	}
 }
@@ -29,7 +32,7 @@ export default defineConfig([
 		files: 'out/test/**/*.test.js',
 		extensionDevelopmentPath,
 		workspaceFolder: testWorkspace,
-		launchArgs: [`--extensions-dir=${extensionsDir}`, `--user-data-dir=${userDataDir}`, '--disable-workspace-trust'],
+		launchArgs: [`--extensions-dir=${unitExtensionsDir}`, `--user-data-dir=${userDataDir}`, '--disable-workspace-trust'],
 		env: { NODE_ENV: 'test', SINGULAR_BLOCKLY_TEST_ROOT: extensionDevelopmentPath },
 		// Exclude integration tests from unit test run
 		mocha: {
@@ -44,8 +47,9 @@ export default defineConfig([
 		label: 'integration',
 		version: '1.109.0',
 		files: 'out/test/integration/**/*.test.js',
+		extensionDevelopmentPath,
 		workspaceFolder: testWorkspace,
-		launchArgs: [`--extensions-dir=${extensionsDir}`],
+		launchArgs: [`--extensions-dir=${integrationExtensionsDir}`, `--user-data-dir=${userDataDir}`, '--disable-workspace-trust'],
 		mocha: {
 			timeout: 120000,
 		},

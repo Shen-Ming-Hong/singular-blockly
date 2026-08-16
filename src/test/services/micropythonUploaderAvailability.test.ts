@@ -8,10 +8,29 @@ import assert = require('assert');
 import * as sinon from 'sinon';
 import { suite, test, teardown } from 'mocha';
 import { CommandExecutor, MicropythonUploader } from '../../services/micropythonUploader';
+import { CoreEnvironmentManager, CoreEnvironmentProvider } from '../../services/coreEnvironmentManager';
+import { CoreEnvironment, CoreEnvironmentId } from '../../types/coreEnvironment';
+
+function environment(id: CoreEnvironmentId): CoreEnvironment {
+	return {
+		id,
+		displaySource: id,
+		invocation: { command: `/${id}/pio`, prefixArgs: [], env: {}, source: id },
+		pythonPath: `/${id}/python`,
+		mpremotePath: `/${id}/mpremote`,
+		storageRoot: `/${id}`,
+		health: { status: 'healthy', checkedAt: null, packageStatus: 'unknown', failureClass: null },
+	};
+}
+
+function provider(id: CoreEnvironmentId): CoreEnvironmentProvider {
+	return { id, resolve: async () => environment(id) };
+}
 
 suite('MicropythonUploader environment availability', () => {
 	const executor: CommandExecutor = {
 		exec: async () => ({ stdout: '', stderr: '' }),
+		execFile: async () => ({ stdout: '', stderr: '' }),
 	};
 
 	teardown(() => {
@@ -43,5 +62,101 @@ suite('MicropythonUploader environment availability', () => {
 			assert.match(result.details ?? '', /Open the Blockly editor/);
 			assert.match(result.details ?? '', /pioarduino/);
 		}
+	});
+
+	test('uses managed Python and mpremote before probing the provider environment', async () => {
+		const calls: string[] = [];
+		const coreManager = {
+			run: async (options: {
+				onProgress?: (progress: { stage: string; percent: number }) => void;
+				operation: (candidate: CoreEnvironment) => Promise<CoreEnvironment>;
+			}) => {
+				calls.push('managed-ready');
+				options.onProgress?.({ stage: 'installing-platformio', percent: 40 });
+				calls.push('managed-environment');
+				return options.operation(environment('managed'));
+			},
+			getSelection: () => ({ fallbackUsed: false }),
+		};
+		const uploader = new MicropythonUploader('/workspace', executor, () => true, coreManager as any);
+		const providerProbe = sinon.stub(uploader, 'checkPythonEnvironment').callsFake(async () => {
+			calls.push('provider-python');
+			return true;
+		});
+		const progress: string[] = [];
+
+		const result = await uploader.ensureMpremoteAvailable(update => progress.push(update.stage));
+
+		assert.deepStrictEqual(result, { success: true });
+		assert.deepStrictEqual(calls, ['managed-ready', 'managed-environment']);
+		assert.strictEqual(providerProbe.called, false);
+		assert.ok(progress.includes('installing_tool'));
+	});
+
+	test('falls back to the provider environment when managed setup fails locally', async () => {
+		const coreManager = {
+			run: async () => {throw Object.assign(new Error('hidden path'), { code: 'permission' });},
+		};
+		const uploader = new MicropythonUploader('/workspace', executor, () => true, coreManager as any);
+		sinon.stub(uploader, 'checkPythonEnvironment').resolves(true);
+		sinon.stub(uploader, 'checkMpremoteInstalled').resolves(true);
+
+		const result = await uploader.ensureMpremoteAvailable();
+
+		assert.deepStrictEqual(result, { success: true });
+	});
+
+	test('probes managed tools and falls back when the managed mpremote executable is broken', async () => {
+		const manager = new CoreEnvironmentManager(provider('provider'), provider('managed'));
+		const probingExecutor: CommandExecutor = {
+			exec: async () => ({ stdout: '', stderr: '' }),
+			execFile: async file => {
+				if (file === '/managed/mpremote') {
+					throw Object.assign(new Error('managed mpremote probe failed'), {
+						error: Object.assign(new Error('missing managed mpremote'), { code: 'ENOENT' }),
+						stdout: '',
+						stderr: '',
+					});
+				}
+				return { stdout: 'ok', stderr: '' };
+			},
+		};
+		const uploader = new MicropythonUploader('/workspace', probingExecutor, () => true, manager);
+
+		const result = await uploader.ensureMpremoteAvailable();
+
+		assert.deepStrictEqual(result, { success: true });
+		assert.strictEqual(manager.getSelection('python', '/workspace').selected, 'provider');
+		assert.strictEqual(manager.getSelection('python', '/workspace').fallbackUsed, true);
+	});
+
+	test('does not prepare tools or access a device when the workspace is untrusted', async () => {
+		const coreManager = { run: sinon.stub() };
+		const uploader = new MicropythonUploader('/workspace', executor, () => true, coreManager as any, () => false);
+		const result = await uploader.upload({ code: 'print(1)', board: 'cyberbrick' });
+
+		assert.strictEqual(result.success, false);
+		assert.strictEqual(result.error?.message, 'Workspace is not trusted');
+		assert.strictEqual(coreManager.run.called, false);
+	});
+
+	test('does not reselect another Core after a device operation begins', async () => {
+		const coreManager = {
+			run: sinon.stub().callsFake((options: { operation: (candidate: CoreEnvironment) => Promise<CoreEnvironment> }) =>
+				options.operation(environment('managed'))),
+			getSelection: () => ({ fallbackUsed: false }),
+		};
+		const uploader = new MicropythonUploader('/workspace', executor, () => true, coreManager as any, () => true);
+		sinon.stub(uploader, 'listPorts').resolves({
+			ports: [{ path: 'COM7', vendorId: '303A', productId: '1001' }],
+			autoDetected: 'COM7',
+		});
+		sinon.stub(uploader as any, 'resetDevice').rejects(new Error('Could not open port COM7'));
+
+		const result = await uploader.upload({ code: 'print(1)', board: 'cyberbrick' });
+
+		assert.strictEqual(result.success, false);
+		assert.strictEqual(result.error?.stage, 'resetting');
+		assert.strictEqual(coreManager.run.callCount, 1);
 	});
 });

@@ -14,6 +14,7 @@ import { VSCodeMock, FSMock } from './helpers/mocks';
 import { WebViewManager } from '../webview/webviewManager';
 import { ProjectSkillService } from '../services/projectSkillService';
 import { WorkspaceCandidateService } from '../services/workspaceCandidateService';
+import { SettingsManager } from '../services/settingsManager';
 
 describe('Extension activate', () => {
 	let vscodeMock: VSCodeMock;
@@ -92,7 +93,7 @@ describe('Extension activate', () => {
 		// there is no Copilot, so createStatusBarItem is not called here.
 	});
 
-	it('silently installs Skills for every existing Blockly workspace folder', async () => {
+	it('does not install Skills during activation, including for existing Blockly workspace folders', async () => {
 		vscodeMock.workspace.workspaceFolders = [
 			{ uri: { fsPath: '/mock/first' } },
 			{ uri: { fsPath: '/mock/second' } },
@@ -105,16 +106,16 @@ describe('Extension activate', () => {
 		await activate(context as any);
 		await new Promise(resolve => setImmediate(resolve));
 
-		assert.strictEqual(ensureInstalled.callCount, 2);
+		assert.strictEqual(ensureInstalled.callCount, 0);
 		assert.strictEqual(vscodeMock.window.showInformationMessage.called, false);
 		assert.strictEqual(vscodeMock.window.showWarningMessage.called, false);
 	});
 
-	it('does not install into a general folder until opening the Blockly editor marks it as a project', async () => {
+	it('does not install into a general folder until the user accepts Blockly project initialization', async () => {
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/general' } }];
 		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(false);
 		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
-		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('opened');
 
 		await activate(context as any);
 		await new Promise(resolve => setImmediate(resolve));
@@ -128,6 +129,75 @@ describe('Extension activate', () => {
 		assert.strictEqual(ensureInstalled.callCount, 1);
 	});
 
+	it('does not install Skills or configure workspace settings when project initialization is cancelled', async () => {
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/general' } }];
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(false);
+		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+		const configurePlatformIOSettings = sinon.stub(SettingsManager.prototype, 'configurePlatformIOSettings').resolves();
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('cancelled');
+
+		await activate(context as any);
+		const open = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+		await open.args[1]();
+		await new Promise(resolve => setImmediate(resolve));
+
+		assert.strictEqual(ensureInstalled.called, false);
+		assert.strictEqual(configurePlatformIOSettings.called, false);
+	});
+
+	it('coalesces concurrent editor opens so one cancelled safety prompt cannot race another Skill install', async () => {
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/general' } }];
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(false);
+		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+		let resolveOpen!: (result: 'cancelled') => void;
+		const createAndShowWebView = sinon.stub(WebViewManager.prototype, 'createAndShowWebView').callsFake(
+			() => new Promise(resolve => {
+				resolveOpen = resolve;
+			})
+		);
+
+		await activate(context as any);
+		const open = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+		const first = open.args[1]();
+		const second = open.args[1]();
+		await new Promise(resolve => setImmediate(resolve));
+
+		assert.strictEqual(createAndShowWebView.callCount, 1);
+		resolveOpen('cancelled');
+		await Promise.all([first, second]);
+		assert.strictEqual(ensureInstalled.called, false);
+	});
+
+	it('does not install Skills into a replacement workspace after the safety prompt resolves', async () => {
+		const original = { uri: { fsPath: '/mock/original' } };
+		const replacement = { uri: { fsPath: '/mock/replacement' } };
+		vscodeMock.workspace.workspaceFolders = [original];
+		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(false);
+		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+		let resolveOpen!: (result: 'opened') => void;
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').callsFake(
+			() => new Promise(resolve => {
+				resolveOpen = resolve;
+			})
+		);
+
+		await activate(context as any);
+		const open = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+		const pendingOpen = open.args[1]();
+		await new Promise(resolve => setImmediate(resolve));
+		vscodeMock.workspace.workspaceFolders = [replacement];
+		resolveOpen('opened');
+		await pendingOpen;
+
+		assert.strictEqual(ensureInstalled.called, false);
+	});
+
 	it('opening the editor only marks the primary folder in a mixed multi-root workspace', async () => {
 		vscodeMock.workspace.workspaceFolders = [
 			{ uri: { fsPath: '/mock/primary' } },
@@ -135,7 +205,7 @@ describe('Extension activate', () => {
 		];
 		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(false);
 		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
-		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('opened');
 
 		await activate(context as any);
 		const open = vscodeMock.commands.registerCommand
@@ -148,14 +218,22 @@ describe('Extension activate', () => {
 		assert.strictEqual((ensureInstalled.firstCall.thisValue as any).workspaceKey, path.resolve('/mock/primary'));
 	});
 
-	it('installs Skills for a Blockly folder added while the extension is running', async () => {
+	it('waits for an accepted editor open before installing Skills in a newly added Blockly folder', async () => {
 		vscodeMock.workspace.workspaceFolders = undefined;
 		sinon.stub(ProjectSkillService, 'isBlocklyProject').returns(true);
 		const ensureInstalled = sinon.stub(ProjectSkillService.prototype, 'ensureInstalled').resolves('ready');
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('opened');
 		await activate(context as any);
 
 		fsMock.addDirectory('/mock/added/blockly');
 		vscodeMock.fireWorkspaceFoldersChanged([{ uri: { fsPath: '/mock/added' } }]);
+		await new Promise(resolve => setImmediate(resolve));
+		assert.strictEqual(ensureInstalled.callCount, 0);
+
+		const open = vscodeMock.commands.registerCommand
+			.getCalls()
+			.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+		await open.args[1]();
 		await new Promise(resolve => setImmediate(resolve));
 
 		assert.strictEqual(ensureInstalled.callCount, 1);
@@ -332,7 +410,7 @@ describe('Extension activate', () => {
 	});
 
 	it('should route stopTxtExecution command through WebViewManager', async () => {
-		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('opened');
 		sinon.stub(WebViewManager.prototype, 'isPanelCreated').returns(true);
 		const stopTxtExecutionStub = sinon.stub(WebViewManager.prototype, 'stopTxtExecutionFromExtension').resolves(true);
 
@@ -355,7 +433,7 @@ describe('Extension activate', () => {
 	});
 
 	it('should route txt.installRuntime command through WebViewManager', async () => {
-		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves();
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('opened');
 		sinon.stub(WebViewManager.prototype, 'isPanelCreated').returns(true);
 		const installTxtRuntimeStub = sinon.stub(WebViewManager.prototype, 'installTxtRuntimeFromExtension').resolves(true);
 

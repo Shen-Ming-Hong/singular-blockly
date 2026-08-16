@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Volitelná absolutní místní složka pro prostředí Python a PlatformIO spravované rozšířením Singular. Ponecháte-li pole prázdné, použije se globální úložiště rozšíření VS Code. Cesty UNC a síťové cesty nejsou podporovány.",
 	"command.checkPlatformioStatus.title": "Zkontrolovat stav PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Nastavení návrhů AI",
 	"command.toggleAIEnabled.title": "Singular Blockly: Přepnout návrhy AI",

@@ -1,6 +1,6 @@
 # 統一上傳 UI
 
-> 整合自 specs/026-unified-upload-ui
+> 整合自 specs/026-unified-upload-ui 與 specs/067-managed-platformio-environment
 
 ## 概述
 
@@ -19,6 +19,8 @@
 ---
 
 ## 上傳流程
+
+Extension 會在 `onStartupFinished` 後背景初始化 Singular managed Core，開啟 Blockly 編輯器時再次檢查；上傳端仍呼叫冪等 `ensureReady()` 作最後防線，因此第一次上傳通常不必才開始下載工具。背景失敗不阻止編輯器開啟。
 
 ### Arduino 板子（有連接硬體）
 
@@ -82,6 +84,8 @@ case 'upload':
 
 **位置**：`src/services/arduinoUploader.ts`
 
+Arduino 先使用官方 PlatformIO／PIOArduino provider Core，健康探測或 project package prepare 在程序啟動前遇到可分類的本機 runtime 錯誤時，最多 fallback 一次到 managed Core。`pio pkg install`、build 與 upload 前都要求 Workspace Trust；upload process 一旦 spawn 成功，後續任何錯誤都不換 Core 重傳。
+
 ### 編譯流程
 
 ```typescript
@@ -124,6 +128,8 @@ async upload(): Promise<boolean> {
 ## MicroPython 上傳器
 
 **位置**：`src/services/micropythonUploader.ts`
+
+CyberBrick USB 以 Singular managed Core 內固定版本 `mpremote` 為 primary，不要求系統 Python；既有 provider penv 只作 compatibility fallback。裝置、serial、取消與 mpremote 程序啟動後錯誤不得跨 Core 重傳。
 
 ### 上傳流程
 
@@ -193,10 +199,10 @@ function updateUploadTooltip(board) {
 
 | 錯誤類型          | 顯示訊息                   |
 | ----------------- | -------------------------- |
-| PlatformIO 未安裝 | 請安裝 PlatformIO 擴充功能 |
+| Provider PlatformIO 未安裝 | Arduino 可先使用 managed fallback，並保留官方 PlatformIO／PIOArduino 安裝引導 |
 | 編譯錯誤          | 編譯失敗：{錯誤摘要}       |
 | 上傳逾時          | 上傳逾時，請檢查連線       |
-| mpremote 未安裝   | 請安裝 mpremote 工具       |
+| mpremote 未就緒   | 重試 managed Core 初始化，或從 PlatformIO 診斷執行受管修復 |
 | 裝置未連接        | 找不到 CyberBrick 裝置     |
 
 ---

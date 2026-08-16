@@ -6,7 +6,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { randomUUID } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { log, handleWebViewLog } from '../services/logging';
 import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
@@ -62,6 +62,7 @@ import {
 	TxtVirtualControlsDocument,
 	VirtualControlRuntimeSession,
 } from '../types/txtVirtualControls';
+import type { CoreEnvironmentManager } from '../services/coreEnvironmentManager';
 
 // Timing constants
 const UI_MESSAGE_DELAY_MS = 100;
@@ -323,6 +324,7 @@ export class WebViewMessageHandler {
 			timeout: ReturnType<typeof setTimeout>;
 		}
 	>();
+	private readonly unpinnedPlatformWarnings = new Set<string>();
 
 	/**
 	 * 建立 WebView 訊息處理器
@@ -340,7 +342,8 @@ export class WebViewMessageHandler {
 		settingsManager?: SettingsManager,
 		cyberBrickUploadSettingsService?: CyberBrickUploadSettingsService,
 		cyberBrickOtaProvisioningService?: CyberBrickOtaProvisioningService,
-		cyberBrickOtaUploader?: CyberBrickOtaUploader
+		cyberBrickOtaUploader?: CyberBrickOtaUploader,
+		private readonly coreEnvironmentManager?: CoreEnvironmentManager
 	) {
 		this.cyberBrickUploadSettingsService = cyberBrickUploadSettingsService ?? null;
 		this.cyberBrickOtaProvisioningService = cyberBrickOtaProvisioningService ?? null;
@@ -361,7 +364,7 @@ export class WebViewMessageHandler {
 			this.fileService = new FileService(workspaceRoot);
 			this.settingsManager = new SettingsManager(workspaceRoot);
 			this.cyberBrickUploadSettingsService = new CyberBrickUploadSettingsService(this.context, workspaceFolders[0].uri);
-			const micropythonUploader = new MicropythonUploader(workspaceRoot);
+			const micropythonUploader = this.createMicropythonUploader(workspaceRoot);
 			this.cyberBrickOtaProvisioningService = new CyberBrickOtaProvisioningService(
 				this.cyberBrickUploadSettingsService,
 				micropythonUploader
@@ -369,7 +372,7 @@ export class WebViewMessageHandler {
 			this.cyberBrickOtaUploader = new CyberBrickOtaUploader(this.cyberBrickUploadSettingsService);
 
 			// 初始化 Serial Monitor 服務
-			this.serialMonitorService = new SerialMonitorService(workspaceRoot);
+			this.serialMonitorService = new SerialMonitorService(workspaceRoot, this.coreEnvironmentManager);
 			this.serialMonitorService.onStopped(reason => {
 				this.panel.webview.postMessage({
 					command: 'monitorStopped',
@@ -378,7 +381,9 @@ export class WebViewMessageHandler {
 			});
 
 			// 初始化 Arduino Monitor 服務
-			this.arduinoMonitorService = new ArduinoMonitorService(workspaceRoot);
+			this.arduinoMonitorService = new ArduinoMonitorService(workspaceRoot, {
+				coreEnvironmentManager: this.coreEnvironmentManager,
+			});
 			this.arduinoMonitorService.onStopped(reason => {
 				this.panel.webview.postMessage({
 					command: 'monitorStopped',
@@ -405,12 +410,44 @@ export class WebViewMessageHandler {
 		if (this.cyberBrickUploadSettingsService && !this.cyberBrickOtaProvisioningService && vscodeApi.workspace.workspaceFolders?.[0]) {
 			this.cyberBrickOtaProvisioningService = new CyberBrickOtaProvisioningService(
 				this.cyberBrickUploadSettingsService,
-				new MicropythonUploader(vscodeApi.workspace.workspaceFolders[0].uri.fsPath)
+				this.createMicropythonUploader(vscodeApi.workspace.workspaceFolders[0].uri.fsPath)
 			);
 		}
 		if (this.cyberBrickUploadSettingsService && !this.cyberBrickOtaUploader) {
 			this.cyberBrickOtaUploader = new CyberBrickOtaUploader(this.cyberBrickUploadSettingsService);
 		}
+	}
+
+	private createMicropythonUploader(workspaceRoot: string): MicropythonUploader {
+		return new MicropythonUploader(workspaceRoot, undefined, undefined, this.coreEnvironmentManager);
+	}
+
+	private createArduinoUploader(workspaceRoot: string): ArduinoUploader {
+		return new ArduinoUploader(
+			workspaceRoot,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			this.coreEnvironmentManager,
+			undefined,
+			packages => this.showUnpinnedPlatformWarning(workspaceRoot, packages)
+		);
+	}
+
+	private async showUnpinnedPlatformWarning(workspaceRoot: string, packages: readonly string[]): Promise<void> {
+		const workspaceKey = createHash('sha256').update(path.resolve(workspaceRoot)).digest('hex');
+		const stateKey = `managedRuntime.unpinnedPlatformWarning.${workspaceKey}`;
+		if (this.unpinnedPlatformWarnings.has(workspaceKey) || this.context.workspaceState?.get<boolean>(stateKey)) {return;}
+		this.unpinnedPlatformWarnings.add(workspaceKey);
+		await this.context.workspaceState?.update(stateKey, true);
+		const message = await this.localeService.getLocalizedMessage(
+			'PLATFORMIO_UNPINNED_PLATFORM_WARNING',
+			'This existing project uses an unpinned PlatformIO platform ({0}). It was not changed. Pin the platform version before a reproducible release.',
+			packages.join(', ')
+		);
+		await vscodeApi.window.showWarningMessage(message);
 	}
 
 	/**
@@ -2086,7 +2123,7 @@ export class WebViewMessageHandler {
 			}
 			this.cyberBrickOtaProvisioningService = new CyberBrickOtaProvisioningService(
 				this.getCyberBrickUploadSettingsService(),
-				new MicropythonUploader(workspaceFolders[0].uri.fsPath)
+				this.createMicropythonUploader(workspaceFolders[0].uri.fsPath)
 			);
 		}
 		return this.cyberBrickOtaProvisioningService;
@@ -2372,7 +2409,7 @@ export class WebViewMessageHandler {
 	 * @param message 上傳請求訊息
 	 */
 	private async handleMicropythonUpload(workspaceRoot: string, message: UploadRequestMessage): Promise<void> {
-		const uploader = new MicropythonUploader(workspaceRoot);
+		const uploader = this.createMicropythonUploader(workspaceRoot);
 
 		try {
 			// 先偵測 USB 連線（若已明確指定 port 則直接使用）
@@ -2481,7 +2518,7 @@ export class WebViewMessageHandler {
 	 * @param message 上傳請求訊息
 	 */
 	private async handleArduinoUpload(workspaceRoot: string, message: UploadRequestMessage): Promise<void> {
-		const uploader = new ArduinoUploader(workspaceRoot);
+		const uploader = this.createArduinoUploader(workspaceRoot);
 
 		try {
 			const request: ArduinoUploadRequest = {
@@ -2578,7 +2615,7 @@ export class WebViewMessageHandler {
 		}
 
 		const workspaceRoot = workspaceFolders[0].uri.fsPath;
-		const uploader = new MicropythonUploader(workspaceRoot);
+		const uploader = this.createMicropythonUploader(workspaceRoot);
 
 		try {
 			const { ports, autoDetected } = await uploader.listPorts(message.filter);

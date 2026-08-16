@@ -66,7 +66,7 @@ window.BOARD_CONFIGS = {
 		},
 		// 新增 platformio 設定
 		platformConfig: `[env:uno]
-platform = atmelavr
+platform = platformio/atmelavr@5.3.0
 board = uno
 framework = arduino`,
 	},
@@ -134,7 +134,7 @@ framework = arduino`,
 		},
 		// 新增 platformio 設定
 		platformConfig: `[env:nano]
-platform = atmelavr
+platform = platformio/atmelavr@5.3.0
 board = nanoatmega328new
 framework = arduino`,
 	},
@@ -302,7 +302,7 @@ framework = arduino`,
 		},
 		// 新增 platformio 設定
 		platformConfig: `[env:mega]
-platform = atmelavr
+platform = platformio/atmelavr@5.3.0
 board = megaatmega2560
 framework = arduino`,
 	},
@@ -429,7 +429,7 @@ framework = arduino`,
 		rtcPins: [0, 2, 4, 12, 13, 14, 15, 25, 26, 27, 32, 33, 34, 35, 36, 39], // RTC GPIO 引腳
 		// 新增 platformio 設定
 		platformConfig: `[env:esp32]
-platform = espressif32
+platform = platformio/espressif32@7.0.1
 board = esp32dev
 framework = arduino`,
 	},
@@ -493,7 +493,7 @@ framework = arduino`,
 		},
 		// 新增 platformio 設定
 		platformConfig: `[env:lolin_c3_mini]
-platform = espressif32
+platform = platformio/espressif32@7.0.1
 board = lolin_c3_mini
 framework = arduino`,
 	},

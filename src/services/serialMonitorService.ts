@@ -4,55 +4,104 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import * as vscode from 'vscode';
-import * as os from 'os';
-import * as path from 'path';
-import * as fs from 'fs';
+import { MonitorStartResult } from '../types/arduino';
+import type { CoreEnvironmentManager } from './coreEnvironmentManager';
 import { log } from './logging';
 import { MicropythonUploader } from './micropythonUploader';
-import { MonitorStartResult } from '../types/arduino';
+
+const PROCESS_START_TIMEOUT_MS = 5000;
+const PROCESS_STOP_TIMEOUT_MS = 5000;
+
+type SpawnMonitorProcess = (
+	command: string,
+	args: readonly string[],
+	options: { cwd: string; env: NodeJS.ProcessEnv; shell: false; windowsHide: true }
+) => ChildProcessWithoutNullStreams;
+
+class SerialMonitorPseudoterminal implements vscode.Pseudoterminal {
+	private readonly writeEmitter = new vscode.EventEmitter<string>();
+	private readonly closeEmitter = new vscode.EventEmitter<number>();
+	private opened = false;
+	private readonly bufferedOutput: string[] = [];
+	readonly onDidWrite = this.writeEmitter.event;
+	readonly onDidClose = this.closeEmitter.event;
+
+	constructor(private readonly child: ChildProcessWithoutNullStreams) {
+		child.stdout.on('data', chunk => this.write(String(chunk)));
+		child.stderr.on('data', chunk => this.write(String(chunk)));
+		child.once('close', code => this.closeEmitter.fire(code ?? 1));
+		child.once('error', () => this.write('Unable to start the monitor process.\r\n'));
+	}
+
+	open(): void {
+		this.opened = true;
+		for (const output of this.bufferedOutput) {this.writeEmitter.fire(output);}
+		this.bufferedOutput.length = 0;
+	}
+
+	close(): void {
+		if (this.child.exitCode === null && !this.child.killed) {this.child.kill();}
+	}
+
+	handleInput(data: string): void {
+		if (this.child.stdin.writable) {this.child.stdin.write(data);}
+	}
+
+	private write(value: string): void {
+		const output = value.replace(/\r?\n/g, '\r\n');
+		if (this.opened) {this.writeEmitter.fire(output);}
+		else {this.bufferedOutput.push(output);}
+	}
+}
 
 /**
- * Serial Monitor 服務
- * 提供 CyberBrick MicroPython 裝置的串口監控功能
+ * CyberBrick MicroPython USB Serial Monitor.
+ * Managed Core commands are always spawned with an argv array and never through a shell.
  */
 export class SerialMonitorService {
 	private terminal: vscode.Terminal | null = null;
 	private currentPort: string | null = null;
-	private disposables: vscode.Disposable[] = [];
-	private uploader: MicropythonUploader;
+	private readonly disposables: vscode.Disposable[] = [];
+	private readonly uploader: MicropythonUploader;
 	private isStoppingForUpload = false;
-
+	private activeProcess: ChildProcessWithoutNullStreams | null = null;
 	private onStoppedCallback?: (reason: 'user_closed' | 'upload_started' | 'device_disconnected') => void;
 
-	/**
-	 * 建立 SerialMonitorService 實例
-	 * @param workspacePath 工作區路徑
-	 */
-	constructor(workspacePath: string) {
-		this.uploader = new MicropythonUploader(workspacePath);
-
-		// 監聽終端機關閉事件
+	constructor(
+		private readonly workspacePath: string,
+		coreEnvironmentManager?: CoreEnvironmentManager,
+		private readonly workspaceTrusted: () => boolean = () => vscode.workspace.isTrusted,
+		private readonly spawnProcess: SpawnMonitorProcess = (command, args, options) => spawn(command, args, options)
+	) {
+		this.uploader = new MicropythonUploader(workspacePath, undefined, undefined, coreEnvironmentManager);
 		this.disposables.push(
 			vscode.window.onDidCloseTerminal(closedTerminal => {
-				if (closedTerminal === this.terminal) {
-					this.handleTerminalClosed();
-				}
+				if (closedTerminal === this.terminal) {this.handleTerminalClosed();}
 			})
 		);
 	}
 
-	/**
-	 * 啟動 Serial Monitor
-	 * @returns 啟動結果
-	 */
 	async start(): Promise<MonitorStartResult> {
-		// 若已在運行，返回成功
-		if (this.terminal) {
-			return { success: true, port: this.currentPort! };
+		if (!this.workspaceTrusted()) {
+			return {
+				success: false,
+				port: '',
+				error: { code: 'WORKSPACE_UNTRUSTED', message: '請先信任此工作區，再啟動裝置監控。' },
+			};
+		}
+		if (this.terminal) {return { success: true, port: this.currentPort! };}
+
+		const availability = await this.uploader.ensureMpremoteAvailable();
+		if (!availability.success) {
+			return {
+				success: false,
+				port: '',
+				error: { code: 'PIO_NOT_FOUND', message: availability.message },
+			};
 		}
 
-		// 偵測裝置
 		let detectionBackend: 'python' | 'mpremote' = 'python';
 		let { autoDetected } = await this.uploader.listSerialPorts('cyberbrick');
 		if (!autoDetected) {
@@ -67,42 +116,27 @@ export class SerialMonitorService {
 			return {
 				success: false,
 				port: '',
-				error: {
-					code: 'DEVICE_NOT_FOUND',
-					message: '找不到 CyberBrick 裝置',
-				},
+				error: { code: 'DEVICE_NOT_FOUND', message: '找不到 CyberBrick 裝置' },
 			};
 		}
 
-		// 建立終端機
-		this.terminal = vscode.window.createTerminal({
-			name: 'CyberBrick Monitor',
-			hideFromUser: false,
-			...(process.platform === 'win32'
-				? { shellPath: 'powershell.exe', shellArgs: ['-NoLogo'] }
-				: {}),
-		});
-
 		this.currentPort = autoDetected;
-		this.terminal.show(false);
-
-		if (detectionBackend === 'mpremote') {
-			this.startMpremoteMonitor(autoDetected);
-			log('[blockly] Monitor 已啟動', 'info', { port: autoDetected, backend: detectionBackend });
-			return { success: true, port: autoDetected };
-		}
-
-		// pyserial 已成功列出裝置，沿用同一個 Python 後端啟動 Monitor。
 		try {
-			await this.resetAndStartMonitor(autoDetected);
+			if (detectionBackend === 'mpremote') {
+				await this.startMpremoteMonitor(autoDetected);
+			} else {
+				await this.resetAndStartMonitor(autoDetected);
+			}
 		} catch (error) {
-			log('[blockly] 無法使用 pyserial 啟動 Monitor，嘗試 mpremote repl 備援', 'warn', error);
-			const hasMpremote = await this.uploader.checkMpremoteInstalled();
-			if (!hasMpremote) {
-				const terminal = this.terminal;
-				this.terminal = null;
+			if (detectionBackend === 'mpremote') {
 				this.currentPort = null;
-				terminal?.dispose();
+				return this.monitorStartFailure();
+			}
+			log('[blockly] 無法使用 pyserial 啟動 Monitor，嘗試 mpremote repl 備援', 'warn', {
+				code: this.commandErrorCode(error),
+			});
+			if (!await this.uploader.checkMpremoteInstalled()) {
+				this.currentPort = null;
 				return {
 					success: false,
 					port: '',
@@ -112,101 +146,60 @@ export class SerialMonitorService {
 					},
 				};
 			}
-
-			this.startMpremoteMonitor(autoDetected);
+			try {
+				await this.startMpremoteMonitor(autoDetected);
+			} catch {
+				this.currentPort = null;
+				return this.monitorStartFailure();
+			}
 		}
 
-		log('[blockly] Monitor 已啟動', 'info', { port: autoDetected });
-
+		log('[blockly] Monitor 已啟動', 'info', { port: autoDetected, backend: detectionBackend });
 		return { success: true, port: autoDetected };
 	}
 
-	/**
-	 * 停止 Serial Monitor
-	 */
 	async stop(): Promise<void> {
-		if (this.terminal) {
-			this.terminal.dispose();
-			this.terminal = null;
-			this.currentPort = null;
-			log('[blockly] Monitor 已停止', 'info');
-		}
+		await this.terminateActiveProcess();
+		this.terminal?.dispose();
+		this.terminal = null;
+		this.currentPort = null;
+		log('[blockly] Monitor 已停止', 'info');
 	}
 
-	/**
-	 * 為上傳作業停止 Monitor
-	 * 會通知 WebView 並等待 COM 埠釋放
-	 */
 	async stopForUpload(): Promise<void> {
-		if (this.terminal) {
-			this.isStoppingForUpload = true;
-			this.terminal.dispose();
-			this.terminal = null;
-			this.currentPort = null;
-			this.onStoppedCallback?.('upload_started');
-			// 等待 COM 埠釋放
-			await new Promise(resolve => setTimeout(resolve, 500));
-			this.isStoppingForUpload = false;
-		}
+		if (!this.terminal) {return;}
+		this.isStoppingForUpload = true;
+		await this.stop();
+		this.onStoppedCallback?.('upload_started');
+		await new Promise(resolve => setTimeout(resolve, 500));
+		this.isStoppingForUpload = false;
 	}
 
-	/**
-	 * 檢查 Monitor 是否正在運行
-	 * @returns 是否運行中
-	 */
 	isRunning(): boolean {
 		return this.terminal !== null;
 	}
 
-	/**
-	 * 取得當前連接的埠
-	 * @returns 埠名稱或 null
-	 */
 	getCurrentPort(): string | null {
 		return this.currentPort;
 	}
 
-	/**
-	 * 註冊 Monitor 停止回調
-	 * @param callback 停止時的回調函數
-	 */
 	onStopped(callback: (reason: 'user_closed' | 'upload_started' | 'device_disconnected') => void): void {
 		this.onStoppedCallback = callback;
 	}
 
-	/**
-	 * 處理終端機關閉事件
-	 */
 	private handleTerminalClosed(): void {
 		const wasStoppingForUpload = this.isStoppingForUpload;
+		if (this.activeProcess?.exitCode === null && !this.activeProcess.killed) {this.activeProcess.kill();}
+		this.activeProcess = null;
 		this.terminal = null;
 		const port = this.currentPort;
 		this.currentPort = null;
-
 		log('[blockly] Monitor 終端機已關閉', 'info', { port });
-
-		// 如果是上傳時自動關閉，不需要再次通知（已在 stopForUpload 中處理）
-		if (!wasStoppingForUpload) {
-			// 判斷是使用者手動關閉還是裝置斷線
-			// 注意：目前無法可靠區分，預設為使用者關閉
-			this.onStoppedCallback?.('user_closed');
-		}
+		if (!wasStoppingForUpload) {this.onStoppedCallback?.('user_closed');}
 	}
 
-	/**
-	 * 重置裝置並啟動 Monitor
-	 * 使用 pyserial 發送重置命令並持續監控輸出
-	 * @param port 連接埠
-	 */
 	private async resetAndStartMonitor(port: string): Promise<void> {
 		const pythonPath = this.uploader.getPlatformioPythonPath();
-		const isWindows = process.platform === 'win32';
-
-		const tempDir = os.tmpdir();
-		const scriptFile = path.join(tempDir, 'blockly_monitor.py');
-
-		// 寫入 Python 腳本：重置後持續監控輸出
-		// 這個腳本會保持 serial 連接並即時輸出，不會錯過任何 print
 		const monitorScript = `import serial
 import sys
 import time
@@ -214,42 +207,27 @@ import time
 port = ${JSON.stringify(port)}
 try:
     s = serial.Serial(port, 115200, timeout=0.1)
-    
-    # 發送雙重 Ctrl+C 中斷正在運行的程式
     s.write(b'\\x03\\x03')
     time.sleep(0.1)
-    
-    # 發送 Ctrl+D 觸發軟重置，重新執行裝置啟動流程（CyberBrick 會進入 /app/rc_main.py）
     s.write(b'\\x04')
-    
     print(f"Connected to {port}")
     print("Ctrl+C sends interrupt to device, close terminal to stop monitor")
     print("-" * 40)
     sys.stdout.flush()
-    
-    # 持續讀取並輸出
     while True:
         try:
             data = s.read(1024)
             if data:
-                # 直接輸出原始資料，解碼為 UTF-8
-                try:
-                    text = data.decode('utf-8', errors='replace')
-                    sys.stdout.write(text)
-                    sys.stdout.flush()
-                except:
-                    pass
+                sys.stdout.write(data.decode('utf-8', errors='replace'))
+                sys.stdout.flush()
         except KeyboardInterrupt:
-            # 使用者按 Ctrl+C - 傳送中斷指令到裝置
             s.write(b'\\x03')
             time.sleep(0.1)
             print("\\n[Interrupt sent to device]")
             sys.stdout.flush()
-            continue
         except Exception as e:
             print(f"\\nError: {e}")
             break
-    
     s.close()
 except serial.SerialException as e:
     print(f"Serial Error: {e}")
@@ -258,43 +236,89 @@ except Exception as e:
     print(f"Error: {e}")
     sys.exit(1)
 `;
-		fs.writeFileSync(scriptFile, monitorScript, 'utf8');
-
-		// 在終端機執行 Python 腳本
-		// Windows PowerShell 需要使用 & 運算符執行帶路徑的命令
-		// macOS/Linux 直接執行即可
-		if (this.terminal) {
-			const command = isWindows ? `& "${pythonPath}" "${scriptFile}"` : `"${pythonPath}" "${scriptFile}"`;
-			this.terminal.sendText(command, true);
-		}
-
-		log('[blockly] 使用 pyserial 啟動 Monitor', 'info', { port, scriptFile });
+		await this.startMonitorProcess(pythonPath, ['-u', '-c', monitorScript]);
+		log('[blockly] 使用 pyserial 啟動 Monitor', 'info', { port });
 	}
 
-	private quoteTerminalArgument(value: string): string {
-		if (process.platform === 'win32') {
-			if (/[\r\n]/.test(value)) {
-				throw new Error('Windows terminal argument contains unsupported characters');
-			}
-			return `'${value.replace(/'/g, "''")}'`;
-		}
-		return `'${value.replace(/'/g, `'\\''`)}'`;
+	private async startMpremoteMonitor(port: string): Promise<void> {
+		await this.startMonitorProcess(this.uploader.getMpremotePath(), ['connect', port, 'repl']);
 	}
 
-	private startMpremoteMonitor(port: string): void {
-		const values = [this.uploader.getMpremotePath(), 'connect', port, 'repl'];
-		const command = values.map(value => this.quoteTerminalArgument(value)).join(' ');
-		const terminalCommand = process.platform === 'win32' ? `& ${command}` : command;
-		setTimeout(() => {
-			this.terminal?.sendText(terminalCommand, true);
-		}, 500);
+	private async startMonitorProcess(command: string, args: readonly string[]): Promise<void> {
+		const child = this.spawnProcess(command, args, {
+			cwd: this.workspacePath,
+			env: { ...process.env },
+			shell: false,
+			windowsHide: true,
+		});
+		await this.waitForProcessStart(child);
+		this.activeProcess = child;
+		this.terminal = vscode.window.createTerminal({
+			name: 'CyberBrick Monitor',
+			pty: new SerialMonitorPseudoterminal(child),
+		});
+		this.terminal.show(false);
 	}
 
-	/**
-	 * 釋放資源
-	 */
+	private async waitForProcessStart(child: ChildProcessWithoutNullStreams): Promise<void> {
+		if (child.pid !== undefined) {return;}
+		await new Promise<void>((resolve, reject) => {
+			const timeout = setTimeout(() => {
+				cleanup();
+				if (!child.killed) {child.kill();}
+				reject(Object.assign(new Error('Monitor process did not start in time'), { code: 'ETIMEDOUT' }));
+			}, PROCESS_START_TIMEOUT_MS);
+			const onSpawn = () => {cleanup(); resolve();};
+			const onError = (error: Error) => {cleanup(); reject(error);};
+			const cleanup = () => {
+				clearTimeout(timeout);
+				child.off('spawn', onSpawn);
+				child.off('error', onError);
+			};
+			child.once('spawn', onSpawn);
+			child.once('error', onError);
+		});
+	}
+
+	private async terminateActiveProcess(): Promise<void> {
+		const child = this.activeProcess;
+		this.activeProcess = null;
+		if (!child || child.exitCode !== null) {return;}
+		if (!child.killed) {child.kill();}
+		await new Promise<void>(resolve => {
+			let settled = false;
+			const finish = () => {
+				if (settled) {return;}
+				settled = true;
+				clearTimeout(timeout);
+				child.off('close', finish);
+				resolve();
+			};
+			const timeout = setTimeout(() => {
+				if (child.exitCode === null) {child.kill('SIGKILL');}
+				finish();
+			}, PROCESS_STOP_TIMEOUT_MS);
+			child.once('close', finish);
+		});
+	}
+
+	private commandErrorCode(error: unknown): string {
+		return typeof error === 'object' && error !== null && 'code' in error
+			? String((error as { code?: unknown }).code ?? 'unknown')
+			: 'unknown';
+	}
+
+	private monitorStartFailure(): MonitorStartResult {
+		return {
+			success: false,
+			port: '',
+			error: { code: 'CONNECTION_FAILED', message: '無法啟動 CyberBrick USB Monitor。' },
+		};
+	}
+
 	dispose(): void {
-		this.stop();
-		this.disposables.forEach(d => d.dispose());
+		void this.stop();
+		this.disposables.forEach(disposable => disposable.dispose());
+		this.disposables.length = 0;
 	}
 }

@@ -574,6 +574,27 @@
                     <div id="cyberbrickPairedDevicesList" class="cyberbrick-paired-device-list" aria-live="polite">
                     </div>
                 </section>
+                <div id="cyberbrickProvisioningStatus"
+                    class="cyberbrick-provisioning-progress-card idle hidden" aria-live="polite" aria-atomic="true">
+                    <div class="cyberbrick-provisioning-progress-heading">
+                        <span id="cyberbrickProvisioningIcon" class="cyberbrick-provisioning-icon"
+                            aria-hidden="true"></span>
+                        <div>
+                            <strong id="cyberbrickProvisioningProgressLabel"></strong>
+                            <div id="cyberbrickProvisioningStage" class="cyberbrick-provisioning-stage"
+                                aria-live="polite"></div>
+                        </div>
+                    </div>
+                    <div id="cyberbrickProvisioningProgressbar"
+                        class="cyberbrick-provisioning-progress-track" role="progressbar"
+                        aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext=""
+                        aria-labelledby="cyberbrickProvisioningProgressLabel">
+                        <div id="cyberbrickProvisioningProgressFill"
+                            class="cyberbrick-provisioning-progress-fill"></div>
+                    </div>
+                    <p id="cyberbrickProvisioningKeepConnected"
+                        class="cyberbrick-provisioning-keep-connected"></p>
+                </div>
                 <section class="cyberbrick-upload-section cyberbrick-provisioning-section cyberbrick-accordion-section">
                     <button type="button" class="cyberbrick-accordion-toggle" id="cyberbrickProvisioningToggle"
                         aria-expanded="false" aria-controls="cyberbrickProvisioningBody">
@@ -626,27 +647,6 @@
                             </div>
                         </div>
                         <p id="cyberbrickSecretPresenceHint" class="cyberbrick-upload-help"></p>
-                        <div id="cyberbrickProvisioningStatus"
-                            class="cyberbrick-provisioning-progress-card idle hidden">
-                            <div class="cyberbrick-provisioning-progress-heading">
-                                <span id="cyberbrickProvisioningIcon" class="cyberbrick-provisioning-icon"
-                                    aria-hidden="true"></span>
-                                <div>
-                                    <strong id="cyberbrickProvisioningProgressLabel"></strong>
-                                    <div id="cyberbrickProvisioningStage" class="cyberbrick-provisioning-stage"
-                                        aria-live="polite"></div>
-                                </div>
-                            </div>
-                            <div id="cyberbrickProvisioningProgressbar"
-                                class="cyberbrick-provisioning-progress-track" role="progressbar"
-                                aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" aria-valuetext=""
-                                aria-labelledby="cyberbrickProvisioningProgressLabel">
-                                <div id="cyberbrickProvisioningProgressFill"
-                                    class="cyberbrick-provisioning-progress-fill"></div>
-                            </div>
-                            <p id="cyberbrickProvisioningKeepConnected"
-                                class="cyberbrick-provisioning-keep-connected"></p>
-                        </div>
                         <button id="cyberbrickProvisionButton" class="primary-btn" type="button">Set Up Wireless
                             Upload</button>
                     </div>
@@ -659,8 +659,6 @@
                     </button>
                     <div class="cyberbrick-accordion-body hidden" id="cyberbrickAdvancedBody">
                         <p id="cyberbrickOtaCleanupDescription" class="cyberbrick-upload-help"></p>
-                        <div id="cyberbrickOtaCleanupStatus" class="cyberbrick-ota-cleanup-status" aria-live="polite">
-                        </div>
                         <button id="cyberbrickOtaCleanupButton" class="secondary-btn cyberbrick-danger-btn"
                             type="button">Remove OTA from Device</button>
                     </div>

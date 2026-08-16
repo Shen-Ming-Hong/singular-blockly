@@ -362,4 +362,85 @@ suite('PlatformioDiagnosticService Tests', () => {
 		assert.strictEqual(pioItem.versionProbe?.command, 'python.exe -m platformio --version');
 		assert.ok(pioItem.versionProbe?.output?.includes('python -m platformio'));
 	});
+
+	test('reports both Core environments and workload selection without installing managed runtime', async () => {
+		const managedRuntime = {
+			getStatus: sinon.stub().resolves({
+				status: 'ready',
+				record: {
+					schemaVersion: 1, runtimeVersion: 'test', artifactId: 'darwin-arm64', manifestSha256: 'a'.repeat(64),
+					installedAt: now.toISOString(), versionDirectory: 'test-darwin-arm64',
+					tools: {
+						bootstrapPython: { relativePath: 'python/bin/python3', version: '3.11.16' },
+						python: { relativePath: 'venv/bin/python', version: '3.11.16' },
+						pip: { relativePath: 'venv/bin/pip', version: '26.0' },
+						pio: { relativePath: 'venv/bin/pio', version: '6.1.18' },
+						mpremote: { relativePath: 'venv/bin/mpremote', version: '1.28.0' },
+					},
+					health: { status: 'healthy', checkedAt: now.toISOString(), packageStatus: 'unknown', failureClass: null },
+				},
+			}),
+			getStorageSummary: sinon.stub().returns('<managed-storage:123456789abc>'),
+			getStorageUsageBytes: sinon.stub().resolves(4096),
+		};
+		const coreEnvironmentManager = {
+			getSelection: sinon.stub().callsFake((workload: 'arduino' | 'python') => ({
+				workload,
+				primary: workload === 'arduino' ? 'provider' : 'managed',
+				fallback: workload === 'arduino' ? 'managed' : 'provider',
+				selected: workload === 'arduino' ? 'managed' : 'provider',
+				fallbackUsed: true,
+				stickyReason: 'missing-executable',
+			})),
+		};
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub,
+			execFile: execFileStub,
+			env: { PATH: '' }, platform: 'darwin', homeDir: '/Users/tester', now: () => now, localeService,
+			managedRuntime,
+			coreEnvironmentManager,
+		});
+
+		const session = await service.collectDiagnostics('/workspace/demo');
+
+		assert.strictEqual(managedRuntime.getStatus.callCount, 1);
+		assert.strictEqual(session.coreDiagnostics?.environments.managed.status, 'healthy');
+		assert.strictEqual(session.coreDiagnostics?.environments.managed.packageStatus, 'unknown');
+		assert.strictEqual(session.coreDiagnostics?.environments.managed.storageSummary, '<managed-storage:123456789abc>');
+		assert.strictEqual(session.coreDiagnostics?.environments.managed.storageUsageBytes, 4096);
+		assert.strictEqual(session.coreDiagnostics?.selection.arduino.selected, 'managed');
+		assert.strictEqual(session.coreDiagnostics?.selection.python.selected, 'provider');
+	});
+
+	test('reports missing and corrupt managed runtimes without starting an installer', async () => {
+		for (const status of [
+			{ status: 'missing' as const },
+			{ status: 'invalid' as const, reason: 'record mismatch' },
+		]) {
+			const service = new PlatformioDiagnosticService({
+				existsSync: existsSyncStub, execFile: execFileStub, env: { PATH: '' }, platform: 'darwin', homeDir: '/Users/tester',
+				managedRuntime: { getStatus: sinon.stub().resolves(status), getStorageSummary: () => '<managed-storage:123456789abc>', getStorageUsageBytes: sinon.stub().resolves(0) },
+			});
+			const session = await service.collectDiagnostics(null);
+			assert.strictEqual(
+				session.coreDiagnostics?.environments.managed.status,
+				status.status === 'invalid' ? 'degraded' : 'unavailable'
+			);
+			assert.strictEqual(session.coreDiagnostics?.environments.managed.packageStatus, 'unknown');
+		}
+	});
+
+	test('clipboard summary includes only the managed storage privacy summary', async () => {
+		const privatePath = '/Users/tester/Library/Application Support/managed';
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub, execFile: execFileStub, env: { PATH: '' }, platform: 'darwin', homeDir: '/Users/tester',
+			managedRuntime: { getStatus: sinon.stub().resolves({ status: 'missing' }), getStorageSummary: () => '<managed-storage:123456789abc>', getStorageUsageBytes: sinon.stub().resolves(null) },
+		});
+		const session = await service.collectDiagnostics(null);
+		const summary = await service.buildClipboardSummary(session);
+		assert.ok(summary.plainText.includes('<managed-storage:123456789abc>'));
+		assert.ok(summary.plainText.includes('Storage usage: -'));
+		assert.ok(!summary.plainText.includes('Storage usage: - bytes'));
+		assert.ok(!summary.plainText.includes(privatePath));
+	});
 });

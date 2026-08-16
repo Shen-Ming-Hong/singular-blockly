@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Pasta local absoluta opcional para o ambiente Python e PlatformIO gerenciado pelo Singular. Deixe em branco para usar o armazenamento global da extensão do VS Code. Caminhos UNC e de rede não são compatíveis.",
 	"command.checkPlatformioStatus.title": "Verificar status do PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Configurações de sugestões IA",
 	"command.toggleAIEnabled.title": "Singular Blockly: Alternar sugestões IA",

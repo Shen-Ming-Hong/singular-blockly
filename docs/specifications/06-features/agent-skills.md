@@ -4,7 +4,7 @@
 
 ## 目標
 
-Singular Blockly 在專案啟動時靜默建立及更新專案內 Agent Skill，讓支援的 AI 直接讀取目前工作區格式與實際 Blockly runtime 衍生的積木契約。一般使用者不需要安裝系統 Node.js、啟動外部程序、回應設定確認或操作 Skill 檔案。
+Singular Blockly 對已成立的 Blockly 專案靜默建立及更新專案內 Agent Skill，讓支援的 AI 直接讀取目前工作區格式與實際 Blockly runtime 衍生的積木契約。一般使用者不需要安裝系統 Node.js、啟動外部程序或操作 Skill 檔案；任意一般資料夾只有在使用者明確同意建立 Blockly 專案後才會安裝 Skill。
 
 ## 專案內配置
 
@@ -27,7 +27,8 @@ Singular Blockly 在專案啟動時靜默建立及更新專案內 Agent Skill，
 
 ## 安裝與更新
 
-- 已有 `blockly/` 的 workspace folder 在 extension activation 時檢查；新專案第一次開啟 Blockly 編輯器時強制檢查。
+- Extension activation 與新增 workspace folder 都不安裝 Skill。開啟 Blockly 編輯器時，只有 `opened`（既有專案或明確選擇繼續）結果才檢查及安裝 Skill；既有 `blockly/` 專案不重複詢問，但仍需等 editor-open authority boundary。
+- 安全詢問前只讀取既有專案 marker 與偏好；缺少 `.vscode/settings.json` 時不建立 `.vscode/`。取消、Escape 或關閉詢問不得建立或修改 `.agents/`、`.claude/`、`blockly/` 或 `.vscode/`。
 - 受管理檔案由封裝 manifest 的固定相對路徑與 SHA-256 決定，installed manifest 最後提交。
 - 已修改的受管理檔案先逐位元備份到 `blockly/.singular-blockly/skill-backups/<UTC timestamp>/`，再以同目錄暫存檔和原子 rename 更新。
 - `project-notes.md`、自訂檔案與新 manifest 未明列的內容不會被覆寫。

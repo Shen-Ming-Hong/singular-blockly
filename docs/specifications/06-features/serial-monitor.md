@@ -1,6 +1,6 @@
 # Serial Monitor 規格
 
-> 來源：spec/037-cyberbrick-output-monitor（2026-01）、spec/038-arduino-serial-monitor（2026-01）
+> 來源：spec/037-cyberbrick-output-monitor（2026-01）、spec/038-arduino-serial-monitor（2026-01）、spec/067-managed-platformio-environment（2026-08）
 
 ## 概述
 
@@ -16,8 +16,8 @@
 
 | 板型                     | 實作方式                 | 工具           |
 | ------------------------ | ------------------------ | -------------- |
-| CyberBrick               | `mpremote run` REPL 輸出 | mpremote       |
-| Arduino (ESP32/UNO/Mega) | `pio device monitor`     | PlatformIO CLI |
+| CyberBrick               | `mpremote run` REPL 輸出 | managed Core 優先、provider fallback |
+| Arduino (ESP32/UNO/Mega) | `pio device monitor`     | provider Core 優先、managed fallback |
 
 ### Monitor 按鈕
 
@@ -66,6 +66,9 @@ Monitor 未開啟時點擊上傳 → 直接執行上傳
 - 開啟 VS Code Terminal，使用 `pio device monitor` 連接 Arduino 開發板
 - **自動讀取 Baud Rate**：從 `platformio.ini` 的 `monitor_speed` 設定讀取，預設 9600
 - **自動管理 Monitor 狀態**：上傳時自動關閉，上傳成功後自動重新開啟（上傳前已開啟）
+- **安全程序邊界**：先要求 Workspace Trust，再以參數陣列及 `shell: false` 啟動選定 Core；VS Code Pseudoterminal 只橋接 stdout／stderr 與停止生命週期，不拼接 shell command
+
+Arduino 與 CyberBrick monitor 都沿用雙 Core workload selection。只有程序真正啟動前的 missing executable、spawn、Python import、permission 或本機 Core store 損壞可 fallback 一次；裝置、serial、取消與程序啟動後錯誤不得改用另一 Core 重試。
 
 ### Baud Rate 邏輯
 

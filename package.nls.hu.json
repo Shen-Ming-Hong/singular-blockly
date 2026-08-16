@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Nem kötelező abszolút helyi mappa a Singular által kezelt Python- és PlatformIO-környezethez. Ha üresen hagyja, a VS Code-bővítmény globális tárhelye lesz használva. Az UNC- és hálózati elérési utak nem támogatottak.",
 	"command.checkPlatformioStatus.title": "PlatformIO állapot ellenőrzése",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI javaslat beállítások",
 	"command.toggleAIEnabled.title": "Singular Blockly: AI javaslatok be/kikapcsolása",

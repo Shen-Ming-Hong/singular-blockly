@@ -289,6 +289,33 @@ describe('File Service', () => {
 		await assert.rejects(() => protectedService.readBuffer('managed-link.txt'), /Symbolic-link path segment/);
 	});
 
+	it('should resolve only symlinks whose real target stays under the managed root', async function () {
+		if (process.platform === 'win32') {this.skip();}
+		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-contained-link-'));
+		const managedRoot = path.join(temporaryRoot, 'managed');
+		const outsideRoot = path.join(temporaryRoot, 'outside');
+		fs.mkdirSync(path.join(managedRoot, 'bin'), { recursive: true });
+		fs.mkdirSync(outsideRoot);
+		fs.writeFileSync(path.join(managedRoot, 'bin', 'python3.11'), 'runtime');
+		fs.writeFileSync(path.join(outsideRoot, 'python'), 'outside');
+		fs.symlinkSync('python3.11', path.join(managedRoot, 'bin', 'python'));
+		fs.symlinkSync(path.join(outsideRoot, 'python'), path.join(managedRoot, 'bin', 'outside-python'));
+		const managedFiles = new FileService(managedRoot);
+
+		assert.strictEqual(
+			await managedFiles.resolveContainedRealPath('bin/python'),
+			fs.realpathSync(path.join(managedRoot, 'bin', 'python3.11'))
+		);
+		assert.strictEqual(
+			await managedFiles.resolveValidatedContainedPath('bin/python'),
+			path.join(managedRoot, 'bin', 'python')
+		);
+		assert.ok((await managedFiles.getContainedFileStats('bin/python'))?.isFile());
+		await assert.rejects(() => managedFiles.resolveContainedRealPath('bin/outside-python'), /outside its root/);
+		assert.strictEqual(await managedFiles.getContainedFileStats('bin/outside-python'), null);
+		fs.rmSync(temporaryRoot, { recursive: true, force: true });
+	});
+
 	it('should not read, mutate, list, or inspect files through workspace symbolic links', async () => {
 		const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-file-service-symlink-'));
 		const realWorkspace = path.join(temporaryRoot, 'workspace');

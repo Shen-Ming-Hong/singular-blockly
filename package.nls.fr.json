@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Dossier local absolu facultatif pour l’environnement Python et PlatformIO géré par Singular. Laissez ce champ vide pour utiliser le stockage global de l’extension VS Code. Les chemins UNC et réseau ne sont pas pris en charge.",
 	"command.checkPlatformioStatus.title": "Vérifier l'état de PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Paramètres de suggestions IA",
 	"command.toggleAIEnabled.title": "Singular Blockly: Activer/désactiver les suggestions IA",

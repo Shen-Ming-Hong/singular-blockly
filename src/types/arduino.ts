@@ -178,6 +178,7 @@ export function getBoardLanguage(board: string): BoardLanguage | undefined {
  * Monitor 錯誤代碼
  */
 export type MonitorErrorCode =
+	| 'WORKSPACE_UNTRUSTED' // 工作區尚未信任，禁止執行裝置程序
 	| 'DEVICE_NOT_FOUND' // 找不到 CyberBrick 裝置
 	| 'MPREMOTE_NOT_INSTALLED' // mpremote 工具未安裝
 	| 'PORT_NOT_FOUND' // 找不到裝置 (Arduino)

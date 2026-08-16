@@ -7,21 +7,74 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { log } from './logging';
 import { createExecFilePromise } from './platformioProcess';
 import {
 	PlatformioInvocation,
-	formatPlatformioTerminalCommand,
 	parsePlatformioCustomPath,
 	resolvePlatformioInvocation,
 } from './platformioInvocationResolver';
 import { MonitorStartResult, MonitorStopReason, isEsp32Board } from '../types/arduino';
+import { CoreEnvironmentManager } from './coreEnvironmentManager';
 
 /**
  * 預設 Baud Rate
  * 與積木生成的 Serial.begin(9600) 保持一致
  */
 const DEFAULT_BAUD_RATE = 9600;
+const PROCESS_START_TIMEOUT_MS = 5000;
+
+interface MonitorInvocation {
+	command: string;
+	prefixArgs: readonly string[];
+	env?: Readonly<NodeJS.ProcessEnv>;
+}
+
+type SpawnMonitorProcess = (
+	command: string,
+	args: readonly string[],
+	options: { cwd: string; env: NodeJS.ProcessEnv; shell: false; windowsHide: true }
+) => ChildProcessWithoutNullStreams;
+
+export interface ArduinoMonitorServiceOptions {
+	resolvePlatformio?: () => Promise<PlatformioInvocation | null>;
+	coreEnvironmentManager?: CoreEnvironmentManager;
+	spawnProcess?: SpawnMonitorProcess;
+	isWorkspaceTrusted?: () => boolean;
+}
+
+class ArduinoMonitorPseudoterminal implements vscode.Pseudoterminal {
+	private readonly writeEmitter = new vscode.EventEmitter<string>();
+	private readonly closeEmitter = new vscode.EventEmitter<number>();
+	private opened = false;
+	private bufferedOutput: string[] = [];
+	readonly onDidWrite = this.writeEmitter.event;
+	readonly onDidClose = this.closeEmitter.event;
+
+	constructor(private readonly child: ChildProcessWithoutNullStreams) {
+		child.stdout.on('data', chunk => this.write(String(chunk)));
+		child.stderr.on('data', chunk => this.write(String(chunk)));
+		child.once('exit', code => this.closeEmitter.fire(code ?? 1));
+		child.once('error', error => this.write(`${error.message}\r\n`));
+	}
+
+	open(): void {
+		this.opened = true;
+		for (const output of this.bufferedOutput) {this.writeEmitter.fire(output);}
+		this.bufferedOutput = [];
+	}
+
+	close(): void {
+		if (this.child.exitCode === null && !this.child.killed) {this.child.kill();}
+	}
+
+	private write(value: string): void {
+		const output = value.replace(/\r?\n/g, '\r\n');
+		if (this.opened) {this.writeEmitter.fire(output);}
+		else {this.bufferedOutput.push(output);}
+	}
+}
 
 /**
  * Arduino Serial Monitor 服務
@@ -37,6 +90,10 @@ export class ArduinoMonitorService {
 	private onStoppedCallback: ((reason: MonitorStopReason) => void) | null = null;
 	private disposables: vscode.Disposable[] = [];
 	private readonly resolvePlatformio: () => Promise<PlatformioInvocation | null>;
+	private readonly coreEnvironmentManager?: CoreEnvironmentManager;
+	private readonly spawnProcess: SpawnMonitorProcess;
+	private readonly isWorkspaceTrusted: () => boolean;
+	private activeProcess: ChildProcessWithoutNullStreams | null = null;
 
 	/**
 	 * 建立 ArduinoMonitorService 實例
@@ -44,9 +101,15 @@ export class ArduinoMonitorService {
 	 */
 	constructor(
 		private workspacePath: string,
-		resolvePlatformio?: () => Promise<PlatformioInvocation | null>
+		optionsOrResolver: ArduinoMonitorServiceOptions | (() => Promise<PlatformioInvocation | null>) = {}
 	) {
-		this.resolvePlatformio = resolvePlatformio ?? (async () => {
+		const options = typeof optionsOrResolver === 'function'
+			? { resolvePlatformio: optionsOrResolver }
+			: optionsOrResolver;
+		this.coreEnvironmentManager = options.coreEnvironmentManager;
+		this.spawnProcess = options.spawnProcess ?? ((command, args, processOptions) => spawn(command, args, processOptions));
+		this.isWorkspaceTrusted = options.isWorkspaceTrusted ?? (() => vscode.workspace.isTrusted !== false);
+		this.resolvePlatformio = options.resolvePlatformio ?? (async () => {
 			const customPath = vscode.workspace.getConfiguration('platformio-ide').get<unknown>('customPATH');
 			const resolution = await resolvePlatformioInvocation({
 				existsSync: fs.existsSync,
@@ -74,6 +137,9 @@ export class ArduinoMonitorService {
 	 */
 	async start(board: string, workspacePath?: string): Promise<MonitorStartResult> {
 		const projectPath = workspacePath || this.workspacePath;
+		if (!this.isWorkspaceTrusted()) {
+			return { success: false, port: '', error: { code: 'WORKSPACE_UNTRUSTED', message: 'Trust this workspace before starting device processes.' } };
+		}
 
 		// 若已在運行，返回成功
 		if (this.isRunningFlag) {
@@ -82,7 +148,7 @@ export class ArduinoMonitorService {
 		}
 
 		try {
-			const invocation = await this.resolvePlatformio();
+			const invocation = await this.resolveInvocation(projectPath);
 			if (!invocation) {
 				return {
 					success: false,
@@ -106,16 +172,21 @@ export class ArduinoMonitorService {
 				log('[arduino-monitor] ESP32 系列，啟用 exception decoder', 'info');
 			}
 
-			// 建立終端機
+			const child = this.spawnProcess(invocation.command, [...invocation.prefixArgs, ...args], {
+				cwd: projectPath,
+				env: { ...process.env, ...invocation.env },
+				shell: false,
+				windowsHide: true,
+			});
+			await this.waitForProcessStart(child);
+			this.activeProcess = child;
+			const pty = new ArduinoMonitorPseudoterminal(child);
+
+			// 以 Pseudoterminal 顯示非 shell 子程序輸出。
 			this.terminal = vscode.window.createTerminal({
 				name: 'Serial Monitor',
-				cwd: projectPath,
-				...(process.platform === 'win32'
-					? { shellPath: 'powershell.exe', shellArgs: ['-NoLogo'] }
-					: {}),
+				pty,
 			});
-
-			this.terminal.sendText(formatPlatformioTerminalCommand(invocation, args));
 			this.terminal.show(true);
 
 			this.isRunningFlag = true;
@@ -126,13 +197,13 @@ export class ArduinoMonitorService {
 
 			return { success: true, port: 'auto' };
 		} catch (error) {
-			log('[arduino-monitor] 啟動 Serial Monitor 失敗', 'error', error);
+			log('[arduino-monitor] 啟動 Serial Monitor 失敗', 'error', { code: this.errorCode(error) });
 			return {
 				success: false,
 				port: '',
 				error: {
-					code: 'UNKNOWN',
-					message: error instanceof Error ? error.message : String(error),
+					code: 'CONNECTION_FAILED',
+					message: 'Unable to start the serial monitor process.',
 				},
 			};
 		}
@@ -142,12 +213,14 @@ export class ArduinoMonitorService {
 	 * 停止 Serial Monitor
 	 */
 	async stop(): Promise<void> {
+		const termination = this.terminateActiveProcess();
 		if (this.terminal) {
 			this.terminal.dispose();
 			this.terminal = null;
 		}
 		this.isRunningFlag = false;
 		this.currentPort = null;
+		await termination;
 		log('[arduino-monitor] Monitor 已停止', 'info');
 	}
 
@@ -214,6 +287,7 @@ export class ArduinoMonitorService {
 		this.terminal = null;
 		this.isRunningFlag = false;
 		this.currentPort = null;
+		this.activeProcess = null;
 
 		log('[arduino-monitor] Monitor 終端機已關閉', 'info', { port });
 
@@ -221,6 +295,61 @@ export class ArduinoMonitorService {
 		if (!this.isStoppingForUpload) {
 			this.onStoppedCallback?.('user_closed');
 		}
+	}
+
+	private async resolveInvocation(projectPath: string): Promise<MonitorInvocation | null> {
+		if (!this.coreEnvironmentManager) {return this.resolvePlatformio();}
+		const selection = await this.coreEnvironmentManager.getEnvironment('arduino', projectPath);
+		return selection.selected?.invocation ?? null;
+	}
+
+	private async waitForProcessStart(child: ChildProcessWithoutNullStreams): Promise<void> {
+		if (child.pid !== undefined) {return;}
+		await new Promise<void>((resolve, reject) => {
+			const timeout = setTimeout(() => {
+				cleanup();
+				if (!child.killed) {child.kill();}
+				reject(new Error('Serial monitor process did not start in time'));
+			}, PROCESS_START_TIMEOUT_MS);
+			const onSpawn = () => {cleanup(); resolve();};
+			const onError = (error: Error) => {cleanup(); reject(error);};
+			const cleanup = () => {
+				clearTimeout(timeout);
+				child.off('spawn', onSpawn);
+				child.off('error', onError);
+			};
+			child.once('spawn', onSpawn);
+			child.once('error', onError);
+		});
+	}
+
+	private async terminateActiveProcess(): Promise<void> {
+		const child = this.activeProcess;
+		this.activeProcess = null;
+		if (!child || child.exitCode !== null) {return;}
+		await new Promise<void>(resolve => {
+			let settled = false;
+			const finish = () => {
+				if (settled) {return;}
+				settled = true;
+				clearTimeout(timeout);
+				child.off('close', finish);
+				resolve();
+			};
+			const timeout = setTimeout(() => {
+				if (child.exitCode === null) {child.kill('SIGKILL');}
+				finish();
+			}, PROCESS_START_TIMEOUT_MS);
+			timeout.unref();
+			child.once('close', finish);
+			if (!child.killed) {child.kill();}
+		});
+	}
+
+	private errorCode(error: unknown): string {
+		return typeof error === 'object' && error !== null && 'code' in error
+			? String((error as { code?: unknown }).code ?? 'unknown')
+			: 'unknown';
 	}
 
 	/**

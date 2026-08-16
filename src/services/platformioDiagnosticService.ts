@@ -7,7 +7,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { LocaleService } from './localeService';
+import type { LocaleService } from './localeService';
 import { log } from './logging';
 import { createPlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
 import { createExecFilePromise } from './platformioProcess';
@@ -35,6 +35,8 @@ import {
 	PlatformioOverallStatus,
 	VersionProbeResult,
 } from '../types/platformioDiagnostic';
+import { ManagedRuntimeStatus } from '../types/managedRuntime';
+import { CoreWorkload, WorkloadSelection } from '../types/coreEnvironment';
 
 interface MessageLocalizer {
 	getLocalizedMessage(key: string, fallbackOrArg?: string | any, ...args: any[]): Promise<string>;
@@ -59,6 +61,14 @@ export interface PlatformioDiagnosticServiceOptions {
 	now?: () => Date;
 	localeService?: MessageLocalizer;
 	versionProbeTimeoutMs?: number;
+	managedRuntime?: {
+		getStatus(): Promise<ManagedRuntimeStatus>;
+		getStorageSummary(): string;
+		getStorageUsageBytes(): Promise<number | null>;
+	};
+	coreEnvironmentManager?: {
+		getSelection(workload: CoreWorkload, workspaceUri: string): WorkloadSelection;
+	};
 }
 
 interface ResolvedDiagnosticTarget {
@@ -80,7 +90,7 @@ interface PenvRootResolution {
 
 type MessageDefinitionRecord<TKey extends string> = Record<TKey, [messageKey: string, fallback: string]>;
 
-const DEFAULT_ACTIONS: PanelActionId[] = ['retest', 'copySummary'];
+const DEFAULT_ACTIONS: PanelActionId[] = ['retest', 'copySummary', 'repairManagedRuntime', 'cleanupManagedRuntime'];
 const DEFAULT_SECTION_ORDER: PlatformioDiagnosticPanelState['sectionOrder'] = ['summary', 'tools', 'repair', 'exports', 'scope'];
 const TOOL_LABEL_DEFINITIONS: MessageDefinitionRecord<DiagnosticItemId> = {
 	pio: ['PLATFORMIO_DIAGNOSTIC_TOOL_PIO', 'PlatformIO CLI (pio)'],
@@ -143,6 +153,8 @@ export class PlatformioDiagnosticService {
 	private readonly now: () => Date;
 	private readonly localeService?: MessageLocalizer;
 	private readonly versionProbeTimeoutMs: number;
+	private readonly managedRuntime?: PlatformioDiagnosticServiceOptions['managedRuntime'];
+	private readonly coreEnvironmentManager?: PlatformioDiagnosticServiceOptions['coreEnvironmentManager'];
 
 	constructor(options: PlatformioDiagnosticServiceOptions = {}) {
 		this.existsSync = options.existsSync ?? fs.existsSync;
@@ -154,6 +166,8 @@ export class PlatformioDiagnosticService {
 		this.now = options.now ?? (() => new Date());
 		this.localeService = options.localeService;
 		this.versionProbeTimeoutMs = options.versionProbeTimeoutMs ?? 1800;
+		this.managedRuntime = options.managedRuntime;
+		this.coreEnvironmentManager = options.coreEnvironmentManager;
 	}
 
 	createLoadingState(): PlatformioDiagnosticPanelState {
@@ -254,6 +268,7 @@ export class PlatformioDiagnosticService {
 				pathSeparator: this.platform === 'win32' ? ';' : ':',
 			},
 		};
+		session.coreDiagnostics = await this.buildCoreDiagnostics(pioItem, workspacePath ?? '');
 
 		log('[platformio-diagnostic] diagnostic collection completed', 'info', {
 			overallStatus,
@@ -262,6 +277,69 @@ export class PlatformioDiagnosticService {
 		});
 
 		return session;
+	}
+
+	private async buildCoreDiagnostics(
+		pioItem: PlatformioDiagnosticItem,
+		workspaceUri: string
+	): Promise<NonNullable<PlatformioDiagnosticSession['coreDiagnostics']>> {
+		let providerStatus: 'healthy' | 'degraded' | 'unavailable' = 'unavailable';
+		if (pioItem.status === 'ok') {
+			providerStatus = 'healthy';
+		} else if (pioItem.status === 'warning') {
+			providerStatus = 'degraded';
+		}
+		const managedStatus = this.managedRuntime ? await this.managedRuntime.getStatus() : { status: 'missing' } as const;
+		const managedStorageUsage = this.managedRuntime ? await this.managedRuntime.getStorageUsageBytes() : null;
+		const managed = managedStatus.status === 'ready'
+			? {
+				id: 'managed' as const,
+				status: 'healthy' as const,
+				version: managedStatus.record.tools.pio.version,
+				storageSummary: this.managedRuntime?.getStorageSummary() ?? null,
+				storageUsageBytes: managedStorageUsage,
+				packageStatus: 'unknown' as const,
+				failureClass: null,
+				reason: 'Managed runtime is installed and passed its local health checks.',
+			}
+			: {
+				id: 'managed' as const,
+				status: managedStatus.status === 'invalid' ? 'degraded' as const : 'unavailable' as const,
+				version: null,
+				storageSummary: this.managedRuntime?.getStorageSummary() ?? null,
+				storageUsageBytes: managedStorageUsage,
+				packageStatus: 'unknown' as const,
+				failureClass: managedStatus.status === 'invalid' ? 'local-store-corruption' as const : 'missing-executable' as const,
+				reason: managedStatus.status === 'missing'
+					? 'Managed runtime is not installed. Diagnostics did not start an installation.'
+					: managedStatus.reason,
+			};
+
+		return {
+			environments: {
+				provider: {
+					id: 'provider',
+					status: providerStatus,
+					version: pioItem.versionProbe?.output ?? null,
+					storageSummary: null,
+					storageUsageBytes: null,
+					packageStatus: 'unknown',
+					failureClass: providerStatus === 'healthy' ? null : 'missing-executable',
+					reason: pioItem.reason,
+				},
+				managed,
+			},
+			selection: {
+				arduino: this.getWorkloadSelection('arduino', workspaceUri),
+				python: this.getWorkloadSelection('python', workspaceUri),
+			},
+		};
+	}
+
+	private getWorkloadSelection(workload: CoreWorkload, workspaceUri: string): WorkloadSelection {
+		if (this.coreEnvironmentManager) {return this.coreEnvironmentManager.getSelection(workload, workspaceUri);}
+		const [primary, fallback] = workload === 'arduino' ? ['provider', 'managed'] as const : ['managed', 'provider'] as const;
+		return { workload, primary, fallback, selected: null, fallbackUsed: false, stickyReason: null };
 	}
 
 	private async buildFallbackPlatformioItem(
@@ -324,6 +402,7 @@ export class PlatformioDiagnosticService {
 		const scopeTitle = await this.message('PLATFORMIO_DIAGNOSTIC_SCOPE_TITLE', 'Scope');
 		const unresolvedPathLabel = await this.message('PLATFORMIO_DIAGNOSTIC_PATH_UNRESOLVED', 'Not resolved');
 		const settingsTitle = await this.message('PLATFORMIO_DIAGNOSTIC_SETTINGS_EVIDENCE', 'PlatformIO settings evidence');
+		const coreTitle = await this.message('PLATFORMIO_DIAGNOSTIC_CORE_ENVIRONMENTS_TITLE', 'Core environments');
 
 		const lines: string[] = [
 			panelTitle,
@@ -346,6 +425,23 @@ export class PlatformioDiagnosticService {
 			}
 			if (item.nextStep) {
 				lines.push(`  ${nextStepLabel}: ${item.nextStep}`);
+			}
+			lines.push('');
+		}
+
+		if (session.coreDiagnostics) {
+			lines.push(coreTitle);
+			for (const environment of Object.values(session.coreDiagnostics.environments)) {
+				lines.push(`- ${environment.id}: ${environment.status}`);
+				lines.push(`  Version: ${environment.version ?? '-'}`);
+				lines.push(`  Storage: ${environment.storageSummary ?? '-'}`);
+				lines.push(`  Storage usage: ${environment.storageUsageBytes === null ? '-' : `${environment.storageUsageBytes} bytes`}`);
+				lines.push(`  Package status: ${environment.packageStatus}`);
+				lines.push(`  Reason: ${environment.reason}`);
+			}
+			for (const workload of ['arduino', 'python'] as const) {
+				const selection = session.coreDiagnostics.selection[workload];
+				lines.push(`- ${workload}: primary=${selection.primary}; fallback=${selection.fallback}; selected=${selection.selected ?? 'none'}; fallbackUsed=${selection.fallbackUsed}; fallbackReason=${selection.stickyReason ?? 'none'}`);
 			}
 			lines.push('');
 		}

@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Singular 受管理 Python 與 PlatformIO 執行環境的選用本機絕對路徑。留空時使用 VS Code 擴充功能全域儲存空間；不支援 UNC 與網路路徑。",
 	"command.checkPlatformioStatus.title": "檢查 PlatformIO 狀態",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI 建議設定",
 	"command.toggleAIEnabled.title": "Singular Blockly: 切換 AI 建議",
