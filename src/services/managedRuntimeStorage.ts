@@ -81,6 +81,7 @@ export class ManagedRuntimeStorage {
 	}
 
 	async initialize(): Promise<void> {
+		await this.files.validateRootPathSafety();
 		await this.ensureOwnedRoot();
 		await this.files.validateWritableRoot();
 		for (const directory of ['downloads', 'staging', 'versions', 'locks', 'workspaces']) {

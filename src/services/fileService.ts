@@ -95,8 +95,8 @@ export class FileService {
 		}
 	}
 
-	/** Validate the complete managed root chain and prove that it is writable. */
-	async validateWritableRoot(): Promise<void> {
+	/** Reject symbolic links in the complete root chain without writing anything. */
+	async validateRootPathSafety(): Promise<void> {
 		if (this.fs.promises.lstat) {
 			const root = path.parse(this.workspaceRoot).root;
 			const segments = path.relative(root, this.workspaceRoot).split(path.sep).filter(Boolean);
@@ -110,6 +110,11 @@ export class FileService {
 				}
 			}
 		}
+	}
+
+	/** Validate the complete managed root chain and prove that it is writable. */
+	async validateWritableRoot(): Promise<void> {
+		await this.validateRootPathSafety();
 		await this.createDirectory('.');
 		const probe = `.write-probe-${process.pid}-${randomUUID()}`;
 		await this.writeFileAtomic(probe, 'managed-runtime-write-probe');

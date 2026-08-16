@@ -129,5 +129,6 @@ suite('ManagedRuntime Storage', () => {
 		fs.symlinkSync(outside, linked, 'dir');
 
 		await assert.rejects(() => new ManagedRuntimeStorage(path.join(linked, 'runtime')).initialize(), /symbolic-link/i);
+		assert.deepStrictEqual(fs.readdirSync(outside), [], 'symlink target must remain untouched');
 	});
 });
