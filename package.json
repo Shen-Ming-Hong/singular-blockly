@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support, project-local Agent Skills, AI camera integration, PlatformIO integration, and 15 languages.",
-	"version": "0.86.2",
+	"version": "0.87.0",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.109.0",
@@ -112,6 +112,12 @@
 		"configuration": {
 			"title": "Singular Blockly",
 			"properties": {
+				"singularBlockly.managedRuntime.path": {
+					"type": "string",
+					"default": "",
+					"scope": "machine",
+					"markdownDescription": "%singularBlockly.managedRuntime.path.markdownDescription%"
+				},
 				"singularBlockly.safetyGuard.suppressWarning": {
 					"type": "boolean",
 					"default": false,
@@ -212,6 +218,12 @@
 		"check:skill-contract": "node scripts/generate-skill-contract.js --check",
 		"generate:project-skills": "npm run generate:skill-contract && node scripts/generate-project-skill-manifest.js",
 		"check:project-skills": "npm run check:skill-contract && node scripts/generate-project-skill-manifest.js --check",
+		"check:managed-runtime": "node scripts/managed-runtime/validate-manifest.js",
+		"test:managed-runtime:paths": "node scripts/managed-runtime/test-installation.js",
+		"test:managed-runtime:evidence": "node scripts/managed-runtime/evidence.test.js",
+		"test:managed-runtime:e2e": "npm run compile-tests && node scripts/managed-runtime/test-real-installation.js",
+		"test:managed-runtime:vsix": "node scripts/managed-runtime/smoke-vsix.js",
+		"test:managed-runtime": "npm run compile-tests && vscode-test --label unit --forbid-only --fail-zero --skip-extension-dependencies --run out/test/services/managedRuntimeManifest.test.js out/test/services/managedRuntimeStorage.test.js out/test/services/managedRuntimeDownloader.test.js out/test/services/managedRuntimeArchive.test.js out/test/services/managedRuntimeInstaller.test.js out/test/services/managedRuntimeService.test.js out/test/services/managedRuntimeCleanup.test.js out/test/services/managedRuntimeInitializationCoordinator.test.js out/test/services/platformioProcess.test.js out/test/services/coreFailureClassifier.test.js out/test/services/coreEnvironmentManager.test.js out/test/services/micropythonUploaderAvailability.test.js out/test/services/arduinoUploader.test.js",
 		"watch": "webpack --watch",
 		"package": "webpack --mode production --devtool hidden-source-map",
 		"compile-tests": "node scripts/clean-test-output.js && tsc -p . --outDir out",
@@ -230,9 +242,9 @@
 		"validate:i18n": "node scripts/i18n/validate-translations.js --all",
 		"validate:i18n:lang": "node scripts/i18n/validate-translations.js",
 		"test": "vscode-test --label unit",
-		"test:integration": "vscode-test --label integration",
+		"test:integration": "vscode-test --label integration --forbid-only --fail-zero --skip-extension-dependencies",
 		"release:prepare": "node scripts/release/prepare-release.js --verify-files",
-		"ci:static": "npm run check:project-skills && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release"
+		"ci:static": "npm run check:project-skills && npm run check:managed-runtime && npm run test:managed-runtime:evidence && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release"
 	},
 	"devDependencies": {
 		"@types/mocha": "^10.0.10",
@@ -258,8 +270,10 @@
 	},
 	"dependencies": {
 		"@blockly/theme-modern": "^13.2.0",
+		"@vscode/proxy-agent": "0.44.0",
 		"form-data": "^4.0.6",
-		"node-ssh": "^13.2.1"
+		"node-ssh": "^13.2.1",
+		"tar": "7.5.22"
 	},
 	"overrides": {
 		"js-yaml": "^5.2.2",

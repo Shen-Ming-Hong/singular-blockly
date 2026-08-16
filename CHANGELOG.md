@@ -8,7 +8,26 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [未發布] Unreleased
+## [0.87.0] - 2026-08-17
+
+### ✨ 新增功能 Features
+
+- 新增由 Extension 自有儲存管理的 CPython、PlatformIO Core 與 mpremote，於 VS Code 啟用後背景預先初始化並在開啟 Blockly 編輯器時重查；Arduino 保留 provider 優先，CyberBrick 改為 managed Core 優先，且只允許上傳開始前的本機環境錯誤 fallback 一次
+  Added extension-owned CPython, PlatformIO Core, and mpremote with background initialization after VS Code activation and rechecks when opening Blockly; Arduino remains provider-first, CyberBrick becomes managed-Core-first, and fallback is limited to one local pre-upload environment failure
+- 新增雙 Core 診斷、受管修復／清理、由 Host 本機開啟 Singular Core 資料夾的隱私安全動作、三作業系統與 ARM64 真實安裝 evidence gate，以及正式 VSIX 實際安裝 smoke test
+  Added dual-Core diagnostics, managed repair/cleanup, a privacy-safe host-side action to reveal the Singular Core folder, three-OS and ARM64 real-install evidence gates, and an actual-install smoke test for release VSIX packages
+
+### 🔒 安全性 Security
+
+- PlatformIO 子程序與 Arduino monitor 全面使用參數陣列及 `shell: false`，並加入逐次重新驗證的下載重新導向、checksum、archive containment、root ownership marker、install／cleanup 共用鎖與安全回收、process-tree 取消、診斷操作互斥、PlatformIO 受測版本範圍、工作區信任、隱私摘要與 fail-closed release evidence 邊界
+  Moved PlatformIO processes and the Arduino monitor to argument arrays with `shell: false`, adding per-hop redirect validation, checksums, archive containment, root ownership markers, shared install/cleanup locking with safe recovery, process-tree cancellation, mutually exclusive diagnostic operations, an enforced tested PlatformIO version range, workspace trust, privacy summaries, and fail-closed release-evidence boundaries
+
+### 🐛 修復 Bug Fixes
+
+- 修正 activation 與新增 workspace folder 的背景流程可能在專案安全詢問獲得同意前安裝 Project Skill；Skill 現在只有在編輯器回報 `opened` 後才會安裝，取消、Escape 或關閉詢問會保持 workspace 完全不變
+  Fixed background activation and workspace-folder flows potentially installing Project Skills before project-safety consent; Skills are now installed only after the editor reports `opened`, while canceling, pressing Escape, or closing the prompt leaves the workspace unchanged
+- 修正 CyberBrick OTA 進度條使用未定義色彩變數而不可見，並讓 OTA 設定與清除共用主題化進度卡；設定顯示真實里程碑，清除使用不虛構百分比的 indeterminate 狀態
+  Fixed an invisible CyberBrick OTA progress bar caused by an undefined color token and unified OTA setup and cleanup on a themed progress card, using real setup milestones and indeterminate cleanup progress without fabricated percentages
 
 ## [0.86.2] - 2026-08-14
 
