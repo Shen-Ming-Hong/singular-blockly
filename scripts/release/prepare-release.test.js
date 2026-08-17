@@ -125,10 +125,26 @@ describe('release preparation', () => {
 
 describe('publish workflow retry contract', () => {
 	const workflow = fs.readFileSync(path.join(__dirname, '..', '..', '.github', 'workflows', 'publish.yml'), 'utf8');
+	const runtimeWorkflow = fs.readFileSync(
+		path.join(__dirname, '..', '..', '.github', 'workflows', 'runtime-installation.yml'),
+		'utf8'
+	);
 
 	it('supports recovery from an existing immutable annotated tag', () => {
 		assert.match(workflow, /workflow_dispatch:[\s\S]*?release_tag:/);
 		assert.match(workflow, /release_tag: \$\{\{ inputs\.release_tag \|\| github\.ref_name \}\}/);
+	});
+
+	it('binds the runtime matrix to the same immutable release tag', () => {
+		assert.match(workflow, /candidate_ref: \$\{\{ inputs\.release_tag \|\| github\.ref_name \}\}/);
+		assert.match(runtimeWorkflow, /inputs\.release_candidate == true/);
+		assert.ok(!runtimeWorkflow.includes("github.event_name == 'workflow_call'"));
+		assert.ok(!runtimeWorkflow.includes('cache: npm'));
+		const candidateRefs =
+			runtimeWorkflow.match(
+				/ref: \$\{\{ inputs\.candidate_ref \|\| github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}/gu
+			) || [];
+		assert.strictEqual(candidateRefs.length, 4);
 	});
 
 	it('keeps first marketplace attempts strict', () => {

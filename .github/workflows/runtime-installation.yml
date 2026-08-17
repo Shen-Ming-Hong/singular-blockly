@@ -12,6 +12,10 @@ on:
         type: boolean
   workflow_call:
     inputs:
+      candidate_ref:
+        description: Immutable release ref selected by the caller
+        required: false
+        type: string
       release_candidate:
         required: false
         default: true
@@ -28,7 +32,7 @@ jobs:
   prepare:
     name: Prepare bound candidate
     if: >-
-      github.event_name == 'workflow_call' ||
+      inputs.release_candidate == true ||
       github.event_name == 'workflow_dispatch' ||
       contains(github.event.pull_request.labels.*.name, 'runtime-e2e-approved') ||
       contains(github.event.pull_request.labels.*.name, 'release-candidate')
@@ -44,13 +48,12 @@ jobs:
       - name: Checkout the exact candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ inputs.candidate_ref || github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Node.js 22.16.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22.16.0
-          cache: npm
 
       - name: Install dependencies and package one shared VSIX
         run: |
@@ -105,13 +108,12 @@ jobs:
       - name: Checkout the exact candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ inputs.candidate_ref || github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Node.js 22.16.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22.16.0
-          cache: npm
 
       - name: Download bound candidate
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -176,13 +178,12 @@ jobs:
       - name: Checkout the exact candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ inputs.candidate_ref || github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Node.js 22.16.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22.16.0
-          cache: npm
 
       - name: Download bound candidate
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -243,7 +244,7 @@ jobs:
       - name: Checkout evidence verifier
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ inputs.candidate_ref || github.event.pull_request.head.sha || github.sha }}
 
       - name: Download evidence files
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1

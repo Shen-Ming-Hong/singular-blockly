@@ -154,7 +154,7 @@
 - [x] T058 [P] 更新 PlatformIO／MicroPython 架構與使用者操作文件於 `docs/specifications/01-architecture/architecture.md`、`docs/specifications/06-features/platformio-diagnostics.md` 與 `docs/specifications/03-hardware-support/cyberbrick-micropython.md`
 - [x] T059 [P] 更新測試覆蓋說明與雙語 CHANGELOG 未發布段落於 `docs/specifications/04-quality-testing/test-coverage.md` 與 `CHANGELOG*.md`
 - [x] T060 執行 `npm run validate:i18n`、`npm run check:project-skills`、compile、lint、unit、integration、package 與 VSIX 資源檢查並修正所有失敗
-- [ ] T061 依 `specs/067-managed-platformio-environment/quickstart.md` 完成決定性、手動與可用平台驗證並記錄結果於 `specs/067-managed-platformio-environment/checklists/implementation.md`
+- [x] T061 依 `specs/067-managed-platformio-environment/quickstart.md` 完成決定性、手動與可用平台驗證並記錄結果於 `specs/067-managed-platformio-environment/checklists/implementation.md`
 - [x] T062 執行安全審查，確認下載、archive、路徑、子程序、log、cleanup 與 workflow trust boundary 於 `specs/067-managed-platformio-environment/checklists/security.md`
 
 ---
@@ -216,6 +216,18 @@
 
 ---
 
+## Phase 15：v0.87.0 immutable tag 發布復原
+
+**目的**：修正首次 tag push 在所有發布端開始前揭露的 reusable caller-event 語意與 recovery tag 綁定缺口，保留既有 annotated tag 與 release commit 不變。
+
+- [x] T085 [P] 以 `inputs.release_candidate` 啟動 reusable prepare，新增 caller 提供的 `candidate_ref`，讓 prepare、x64、ARM64 與 evidence gate 都 checkout 同一 release tag，並移除動態 ref 矩陣的 npm dependency cache 於 `.github/workflows/runtime-installation.yml` 與 `.github/workflows/publish.yml`
+- [x] T086 [P] 新增 caller event 不得假設為 `workflow_call`、publish／runtime 必須共用 release tag、四個 executable checkout ref 及 runtime 不得寫入 npm cache 的回歸契約於 `scripts/release/prepare-release.test.js`
+- [x] T087 重跑 release／靜態／安全測試、code-simplifier 與完整本地 Code Review，更新 recovery SDD 證據於 `specs/067-managed-platformio-environment/checklists/implementation.md`
+- [ ] T088 建立 recovery 修正 PR，通過乾淨 runner unit、CI、CodeQL 與必要 runtime matrix後 squash merge
+- [ ] T089 從 `master` dispatch 同一 annotated `v0.87.0`，驗證 runtime、唯一 VSIX、checksum 與三個發布端，不刪除或重建 tag
+
+---
+
 ## 相依與執行順序
 
 ### 階段相依
@@ -225,7 +237,7 @@
 - US1 → US2：CoreEnvironmentManager 需要可用的 managed provider。
 - US2 → US5／US4：provider 相容與診斷需要完成雙 Core 路由。
 - US3 可在 US1 完成後與 US2 並行；US6 可在 Phase 2 後先做 evidence 工具，但 workflow 完整驗證依 US1／US3。
-- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority；Phase 14 收斂 PR 首輪遠端安全與證據閘門 finding，這些階段都不解除 T061 的遠端矩陣與實機發布閘門。
+- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority；Phase 14 收斂 PR 首輪遠端安全與證據閘門 finding；Phase 15 只修復既有 immutable tag 的 workflow recovery，不改變 `v0.87.0` release tree。
 - US7 的同意 gate 先於任何 workspace-local Skill／設定寫入；US8 與 managed runtime 安裝彼此獨立，可在 US7 測試完成後平行驗證。
 
 ### 平行機會
@@ -256,8 +268,8 @@
 7. Phase 9：全域驗證與文件。
 8. Phase 10：依 F5 回饋加固使用者同意邊界與 OTA 共用進度。
 9. Phase 11：以完整工作樹反覆 review／fix／verify，直到沒有可採納 finding。
-10. Phase 12－14：完成 `0.87.0` 本地發布契約，對已提交完整差異執行安全重審，並收斂 PR 遠端 CodeQL／evidence finding。
+10. Phase 12－15：完成 `0.87.0` 本地發布契約，對已提交完整差異執行安全重審，收斂 PR 遠端 CodeQL／evidence finding，並以新 PR 修復不可變 tag 的發布 workflow。
 
 ## 任務格式驗證
 
-全部 86 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 保持未完成，直到遠端矩陣與實機 smoke 取得正式證據。
+全部 91 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 已由遠端矩陣、F5、乾淨 OS 與實機 smoke 正式證據完成；T088 保持未完成直到 recovery PR 完成，T089 保持未完成直到同一 `v0.87.0` recovery publish run 驗證三個發布端。

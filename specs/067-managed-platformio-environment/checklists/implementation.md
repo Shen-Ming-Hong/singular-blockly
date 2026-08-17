@@ -59,20 +59,30 @@
 - [x] 一般資料夾取消路徑證明 `ProjectSkillService.ensureInstalled()` 與 `SettingsManager.configurePlatformIOSettings()` 呼叫次數皆為 0；缺少設定檔的唯讀查詢不建立 `.vscode/`。
 - [x] 依 F5 再現結果移除 activation 與 workspace-folder change 的背景 Skill 安裝入口，並合併並行 editor-open；隔離 VS Code 1.109 重新執行 activation、settings 與 WebView manager 共 99 項通過，包含既有 Blockly folder 在 activation 時也不安裝、取消前不建立 panel／settings／Skill，以及兩個並行開啟只呼叫一次 safety flow。
 - [x] OTA 契約證明設定與清除共用單一進度 DOM，兩者都在 Host request 前顯示；設定採實際里程碑、清除 running 省略 `aria-valuenow`，CSS 不再引用未定義的 `--button-primary-bg`。
-- [ ] 依 [quickstart.md](../quickstart.md) 步驟 9－12 完成實際 F5 視覺檢查（亮／暗／高對比／reduced-motion）與任意資料夾操作前後檔案樹比對。
+- [x] 依 [quickstart.md](../quickstart.md) 步驟 9－12 完成實際 F5 視覺檢查（亮／暗／高對比／reduced-motion）與任意資料夾操作前後檔案樹比對。
 
-## 合併與發布前尚待完成
+## PR #126 合併與發布閘門結果
 
 - [x] PR #126 首輪 CI 的三 OS unit、static/security、VSIX smoke 與 CodeQL 三語言分析通過；x64 三 OS 與 ARM64 三 OS 的真實安裝／離線重啟也全部通過，其中 Windows ARM64 為 9 分 20 秒。
 - [x] PR #126 首輪總體 CodeQL 以 5 個同源 high annotations 阻擋跨 job output SHA 驅動的 checkout；下游 executable checkout 已改為 GitHub event immutable SHA，prepare output SHA 僅保留作 evidence 身分驗證。
 - [x] 首輪 managed runtime 最終 gate 揭露複數 `--evidence` 參數集合未初始化；parser 回歸測試已加入，並下載該 run 的六份真實 evidence 在本機重播 release verifier，六個 OS／arch 身分全部通過。
 - [x] Phase 14 修正後的 `npm run ci:static`、`npm run release:prepare`、`git diff --check`、workflow trust-boundary 安全掃描與完整有效差異 Code Review 均通過；本輪結論為 `CLEAR`。
-- [ ] PR #126 新 HEAD 必須重新通過總體 CodeQL、CI 與完整 x64／ARM64 runtime evidence gate；首輪結果不能替代修正後 commit 的正式證據。
-- [ ] 在 GitHub PR 執行三 OS x64 真實安裝矩陣，蒐集與 PR head／tree／VSIX／manifest 綁定的 evidence。
-- [ ] 對 release candidate 執行 Linux、Windows、macOS ARM64 矩陣；本機 macOS ARM64 結果只提供先期證據，不取代正式 workflow。
-- [ ] 在乾淨 Windows 與 Linux 帳號手動確認 Extension 啟用、活動列 editor-open 重查、權限錯誤訊息與離線重啟 UX。
-- [ ] 發布候選以實體 Arduino 與 CyberBrick 各完成一次 build／upload／monitor smoke；cloud runner 不連接硬體。
+- [x] PR #126 新 HEAD 重新通過總體 CodeQL、CI 與完整 x64／ARM64 runtime evidence gate；首輪結果未替代修正後 commit 的正式證據。
+- [x] 在 GitHub PR 執行三 OS x64 真實安裝矩陣，蒐集與 PR head／tree／VSIX／manifest 綁定的 evidence。
+- [x] 對 release candidate 執行 Linux、Windows、macOS ARM64 矩陣；正式 workflow 證據已取代本機 macOS ARM64 先期證據。
+- [x] 在乾淨 Windows 與 Linux 帳號手動確認 Extension 啟用、活動列 editor-open 重查、權限錯誤訊息與離線重啟 UX。
+- [x] 發布候選以實體 Arduino 與 CyberBrick 各完成一次 build／upload／monitor smoke；cloud runner 不連接硬體。
+
+## v0.87.0 immutable tag 發布復原
+
+- [x] PR #126 已在 18 項遠端 checks、F5、乾淨 Windows／Linux 與 Arduino／CyberBrick 實機閘門通過後 squash merge；annotated `v0.87.0` 精確指向 merge commit `43948d49fce58fcfb9f4c34b703ce2b686c7cd99`，且 squash tree 與已測 PR tree 相同。
+- [x] 首次 tag push run `31981704124` 在所有發布 job 開始前失敗；GitHub Release、VS Code Marketplace 與 Open VSX 均為 skipped，tag 不得刪除、移動或重建。
+- [x] 根因為 reusable runtime workflow 的 `github.event_name` 沿用 tag caller 的 `push`，不會變成 `workflow_call`；原 prepare 條件因此錯誤跳過。Recovery 另須把同一 release tag 綁定至 runtime checkout，避免驗證修復後 master 而非發布內容。
+- [x] Recovery 本地 `npm run ci:static`、23 項 release contract、`release:prepare`、YAML parse、`git diff --check` 與連線 `npm audit`（0 vulnerabilities）通過；`code-simplifier` 與完整差異 review 在移除動態 ref 的 npm cache 後為 `CLEAR`。
+- [x] 本機 VS Code 1.109 unit launcher 在 macOS 26 仍於測試案例前以既知 `SIGABRT` 結束；未把它誤記為案例通過，正式 unit 證據由 recovery PR 的乾淨 runner 提供。
+- [ ] Recovery 修正 PR 必須通過乾淨 runner unit、CI、CodeQL 與必要 runtime matrix；合併後只能從 `master` dispatch 同一 immutable `v0.87.0`。
+- [ ] Recovery publish run 必須重新驗證 annotated tag、release tree、唯一 VSIX 與 checksum，並確認 GitHub Release、VS Code Marketplace、Open VSX 三端成功。
 
 ## 結論
 
-本機可完成的程式、封裝、真實 macOS ARM64 runtime、安全、本地 Code Review 與 `0.87.0` 發布契約均已通過。T061 保持未完成，直到 F5 視覺驗收、PR 遠端矩陣、乾淨 macOS runner 與發布前實機 smoke 取得證據；這些是既定 release gates，不是尚未實作的產品程式碼。
+本機程式、封裝、安全與 Code Review，以及 F5、PR 六平台 runtime、乾淨 Windows／Linux 與 Arduino／CyberBrick 實機閘門均已通過，T061 已完成。剩餘工作僅限 recovery 修正 PR 與同一 immutable `v0.87.0` 的三端發布驗證。

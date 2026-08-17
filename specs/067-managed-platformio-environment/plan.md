@@ -181,7 +181,7 @@ scripts/
 ### 7. CI、PR 與發布閘門
 
 - `ci.yml` 的每個 PR 在 Windows／macOS／Linux 以本機 fake artifact 執行安裝、Unicode／空白／特殊字元／長路徑、checksum、permission 與 rollback 測試，不連外，維持 `pull_request`、`contents: read`、零 secrets。
-- `runtime-installation.yml` 只由 `pull_request` 的 label gate 或受限 `workflow_dispatch` 執行。`runtime-e2e-approved` 執行三 OS x64 真實下載；`release-candidate` 加入目前宣告支援且可由標準 GitHub-hosted runner 執行的 ARM64。外部 PR 在維護者核准前不執行真實下載，且永不使用 `pull_request_target` 執行 PR 程式碼。所有會執行候選程式碼的 checkout 直接使用 GitHub event 綁定的 immutable SHA；prepare job 輸出的 SHA 只供 evidence 身分比對，不得再作為可執行 checkout ref。
+- `runtime-installation.yml` 只由 `pull_request` 的 label gate 或受限 `workflow_dispatch` 執行。`runtime-e2e-approved` 執行三 OS x64 真實下載；`release-candidate` 加入目前宣告支援且可由標準 GitHub-hosted runner 執行的 ARM64。外部 PR 在維護者核准前不執行真實下載，且永不使用 `pull_request_target` 執行 PR 程式碼。所有會執行候選程式碼的 checkout 直接使用 GitHub event 綁定的 immutable SHA；reusable publish caller 則明確傳入同一 release tag 作 `candidate_ref`，且動態 release ref 的真實矩陣不寫入 npm dependency cache。被呼叫 workflow 的 `github.event_name` 沿用 caller event，不能以 `workflow_call` 字串判斷是否執行；prepare job 輸出的 SHA 只供 evidence 身分比對，不得再作為可執行 checkout ref。
 - 底層 artifact selector 對 `release-candidate` 預設 fail closed；正式 Extension factory 因 publish workflow 強制要求完整 ARM64 release matrix，才明確啟用 manifest 內的 ARM64 候選。缺少對應 evidence 時不得發布該 factory policy。
 - evidence JSON 直接讀取真實 E2E result，記錄 PR／event、head SHA、tree SHA、VSIX SHA-256、runtime manifest SHA-256、runner image／arch、artifact id／SHA-256 與測試結果；verifier 必須將 artifact 逐項對回 manifest。新 commit 使 check 與 evidence 自動失效。
 - squash merge 後的 release 準備腳本比較 master tree 與 evidence 的已測 tree；只有內容相同才允許 annotated tag。tag 工作流重新建置正式 VSIX並執行不連外的封裝資源／fake-runtime smoke，成功後才讓 GitHub Release、Marketplace 與 Open VSX jobs 開始。
