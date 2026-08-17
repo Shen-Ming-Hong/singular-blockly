@@ -4,14 +4,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as os from 'os';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 import { ManagedRuntimeDownloader, ManagedRuntimeDownloadResult } from './managedRuntimeDownloader';
 import { extractManagedRuntimeArchive } from './managedRuntimeArchive';
 import { ManagedRuntimeStorage } from './managedRuntimeStorage';
-import { PlatformioProcessOptions, PlatformioProcessResult, runPlatformioProcess } from './platformioProcess';
+import {
+	PlatformioProcessError,
+	PlatformioProcessOptions,
+	PlatformioProcessResult,
+	runPlatformioProcess,
+} from './platformioProcess';
+import { createPlatformioPrivacyRedactor, PlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
 import { sha256 } from './managedRuntimeManifest';
 import {
+	ManagedRuntimeInstallStage,
 	ManagedRuntimeInstallRecord,
 	RuntimeArtifact,
 	RuntimeDownload,
@@ -39,14 +47,33 @@ export interface ManagedRuntimeInstallerOptions {
 }
 
 export interface ManagedRuntimeInstallProgress {
-	stage: 'waiting-lock' | 'downloading-python' | 'extracting-python' | 'installing-platformio' | 'installing-mpremote' | 'verifying' | 'committing';
+	stage: ManagedRuntimeInstallStage;
 	percent: number;
 }
 
 export class ManagedRuntimeInstallerError extends Error {
-	constructor(public readonly code: string, message: string) {
+	readonly failureDomain = 'managed-provisioning' as const;
+	readonly stage: ManagedRuntimeInstallStage;
+	readonly started: boolean;
+	readonly stdout: string;
+	readonly stderr: string;
+
+	constructor(
+		public readonly code: string,
+		message: string,
+		evidence: {
+			stage?: ManagedRuntimeInstallStage;
+			started?: boolean;
+			stdout?: string;
+			stderr?: string;
+		} = {}
+	) {
 		super(message);
 		this.name = 'ManagedRuntimeInstallerError';
+		this.stage = evidence.stage ?? 'waiting-lock';
+		this.started = evidence.started ?? false;
+		this.stdout = evidence.stdout ?? '';
+		this.stderr = evidence.stderr ?? '';
 	}
 }
 
@@ -63,6 +90,7 @@ const LOCK_RECLAIM_RELATIVE_PATH = path.join('locks', 'install.reclaim.lock');
 const LOCK_LEASE_MS = 120_000;
 const LOCK_RENEW_MS = 30_000;
 const LOCK_RECLAIM_LEASE_MS = 30_000;
+const MAX_DIAGNOSTIC_OUTPUT_LENGTH = 4000;
 
 function executableName(name: 'python' | 'pip' | 'pio' | 'mpremote', platform: NodeJS.Platform): string {
 	return platform === 'win32' ? `${name}.exe` : name;
@@ -115,6 +143,7 @@ export class ManagedRuntimeInstaller {
 	private readonly now: () => Date;
 	private readonly createId: () => string;
 	private readonly lockWaitMs: number;
+	private readonly privacyRedactor: PlatformioPrivacyRedactor;
 
 	constructor(options: ManagedRuntimeInstallerOptions) {
 		this.storage = options.storage;
@@ -126,21 +155,31 @@ export class ManagedRuntimeInstaller {
 		this.now = options.now ?? (() => new Date());
 		this.createId = options.createId ?? (() => crypto.randomUUID());
 		this.lockWaitMs = options.lockWaitMs ?? 60_000;
+		this.privacyRedactor = createPlatformioPrivacyRedactor({
+			homeDir: os.homedir(),
+			managedRuntimePath: options.storage.layout.root,
+		});
 	}
 
 	async install(
 		artifact: RuntimeArtifact,
 		options: { signal?: AbortSignal; onProgress?: (progress: ManagedRuntimeInstallProgress) => void } = {}
 	): Promise<ManagedRuntimeInstallRecord> {
-		options.onProgress?.({ stage: 'waiting-lock', percent: 0 });
-		const releaseLock = await this.acquireLock(options.signal);
+		let currentStage: ManagedRuntimeInstallStage = 'waiting-lock';
+		const reportProgress = (stage: ManagedRuntimeInstallStage, percent: number): void => {
+			currentStage = stage;
+			options.onProgress?.({ stage, percent });
+		};
+		reportProgress('waiting-lock', 0);
 		const transactionId = this.createId();
 		const transactionRelative = path.join('staging', transactionId);
-		const versionDirectory = `${this.manifest.runtimeVersion}-${artifact.id}-${transactionId}`;
+		const versionDirectory = transactionId;
 		const runtimeRelative = path.join('versions', versionDirectory);
 		let candidateCreated = false;
 		let currentCommitted = false;
+		let releaseLock: (() => Promise<void>) | undefined;
 		try {
+			releaseLock = await this.acquireLock(options.signal);
 			if (options.signal?.aborted) {
 				throw new ManagedRuntimeInstallerError('cancelled', 'Managed runtime installation was cancelled');
 			}
@@ -151,11 +190,11 @@ export class ManagedRuntimeInstaller {
 				createdAt: this.now().toISOString(),
 			}));
 
-			options.onProgress?.({ stage: 'downloading-python', percent: 5 });
+			reportProgress('downloading-python', 5);
 			const archiveRelative = await this.ensureDownload(artifact, 'tar.gz', options.signal);
 			const installerRelative = await this.ensureDownload(this.manifest.installer, 'py', options.signal);
 
-			options.onProgress?.({ stage: 'extracting-python', percent: 25 });
+			reportProgress('extracting-python', 25);
 			const archivePath = this.storage.files.resolveSafePath(archiveRelative);
 			const runtimePath = this.storage.files.resolveSafePath(runtimeRelative);
 			await this.extractArchive(archivePath, runtimePath);
@@ -187,7 +226,7 @@ export class ManagedRuntimeInstaller {
 				PLATFORMIO_NO_ANSI: 'true',
 			};
 
-			options.onProgress?.({ stage: 'installing-platformio', percent: 40 });
+			reportProgress('installing-platformio', 40);
 			await this.runProcess(
 				bootstrapPython,
 				[this.storage.files.resolveSafePath(installerRelative)],
@@ -201,14 +240,14 @@ export class ManagedRuntimeInstaller {
 				throw new ManagedRuntimeInstallerError('platformio-python-missing', 'PlatformIO installer did not create its managed Python environment');
 			}
 
-			options.onProgress?.({ stage: 'installing-mpremote', percent: 65 });
+			reportProgress('installing-mpremote', 65);
 			await this.runProcess(
 				penvPython,
 				['-m', 'pip', 'install', '--disable-pip-version-check', '--no-input', `mpremote==${this.manifest.mpremoteVersion}`],
 				{ env: runtimeEnvironment, cwd: runtimePath, timeout: 10 * 60_000, signal: options.signal }
 			);
 
-			options.onProgress?.({ stage: 'verifying', percent: 80 });
+			reportProgress('verifying', 80);
 			const probeOptions = { env: runtimeEnvironment, cwd: runtimePath, timeout: 30_000, signal: options.signal };
 			const bootstrapProbe = await this.runProcess(bootstrapPython, ['--version'], probeOptions);
 			const pythonProbe = await this.runProcess(penvPython, ['--version'], probeOptions);
@@ -218,7 +257,7 @@ export class ManagedRuntimeInstaller {
 			await this.runProcess(penvPython, ['-m', 'platformio', 'system', 'info', '--json-output'], probeOptions);
 			const mpremoteProbe = await this.runProcess(penvPython, ['-m', 'mpremote', 'version'], probeOptions);
 
-			options.onProgress?.({ stage: 'committing', percent: 95 });
+			reportProgress('committing', 95);
 			await this.storage.files.writeFileAtomic(path.join(runtimeRelative, '.singular-runtime-owned.json'), JSON.stringify({
 				schemaVersion: 1,
 				runtimeVersion: this.manifest.runtimeVersion,
@@ -243,7 +282,7 @@ export class ManagedRuntimeInstaller {
 			await this.storage.files.writeFileAtomic('current.json', `${JSON.stringify(record, null, 2)}\n`);
 			currentCommitted = true;
 			await this.storage.files.deleteDirectory(transactionRelative).catch(() => undefined);
-			options.onProgress?.({ stage: 'committing', percent: 100 });
+			reportProgress('committing', 100);
 			return record;
 		} catch (error) {
 			if (!currentCommitted && candidateCreated && this.storage.files.fileExists(runtimeRelative)) {
@@ -252,12 +291,31 @@ export class ManagedRuntimeInstaller {
 			if (this.storage.files.fileExists(transactionRelative)) {
 				await this.storage.files.deleteDirectory(transactionRelative).catch(() => undefined);
 			}
-			if (error instanceof ManagedRuntimeInstallerError) {throw error;}
-			const code = (error as NodeJS.ErrnoException).code || 'installation-failed';
-			throw new ManagedRuntimeInstallerError(String(code).toLowerCase(), 'Managed runtime installation did not complete');
+			throw this.toInstallerError(error, currentStage);
 		} finally {
-			await releaseLock().catch(() => undefined);
+			await releaseLock?.().catch(() => undefined);
 		}
+	}
+
+	private toInstallerError(error: unknown, stage: ManagedRuntimeInstallStage): ManagedRuntimeInstallerError {
+		const processError = error instanceof PlatformioProcessError ? error : undefined;
+		const installerError = error instanceof ManagedRuntimeInstallerError ? error : undefined;
+		const candidate = error && typeof error === 'object' ? error as NodeJS.ErrnoException : undefined;
+		const code = installerError?.code ?? processError?.code ?? candidate?.code ?? 'installation-failed';
+		const message = error instanceof Error ? error.message : 'Managed runtime installation did not complete';
+		return new ManagedRuntimeInstallerError(String(code).toLowerCase(), this.sanitizeDiagnosticOutput(message), {
+			stage,
+			started: processError?.started ?? installerError?.started ?? false,
+			stdout: this.sanitizeDiagnosticOutput(processError?.stdout ?? installerError?.stdout ?? ''),
+			stderr: this.sanitizeDiagnosticOutput(processError?.stderr ?? installerError?.stderr ?? ''),
+		});
+	}
+
+	private sanitizeDiagnosticOutput(value: string): string {
+		const withoutControlCharacters = value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
+		const redacted = this.privacyRedactor.redact(withoutControlCharacters).trim();
+		if (redacted.length <= MAX_DIAGNOSTIC_OUTPUT_LENGTH) {return redacted;}
+		return `[truncated]\n${redacted.slice(-MAX_DIAGNOSTIC_OUTPUT_LENGTH)}`;
 	}
 
 	private async ensureDownload(download: RuntimeDownload, extension: string, signal?: AbortSignal): Promise<string> {

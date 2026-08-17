@@ -36,6 +36,17 @@ suite('PlatformioPrivacyRedactor Tests', () => {
 		assert.ok(output.includes('<home>\\.platformio\\penv\\Scripts\\python.exe'));
 	});
 
+	test('redacts raw and URI-encoded managed runtime paths', () => {
+		const managedRuntimePath = 'C:\\Users\\王小明\\AppData\\Roaming\\Code\\User\\globalStorage\\Singular-Ray.singular-blockly\\runtime-v1';
+		const redactor = new PlatformioPrivacyRedactor({ managedRuntimePath });
+		const encodedPath = encodeURI(managedRuntimePath.replace(/\\/g, '/'));
+
+		const output = redactor.redact(`${managedRuntimePath} ${encodedPath}`);
+
+		assert.ok(!output.includes('王小明'));
+		assert.strictEqual(output, '<managed-runtime> <managed-runtime>');
+	});
+
 	test('redacts proxy credentials without removing the proxy host', () => {
 		const redactor = new PlatformioPrivacyRedactor();
 

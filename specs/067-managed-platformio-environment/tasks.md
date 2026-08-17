@@ -223,8 +223,21 @@
 - [x] T085 [P] 以 `inputs.release_candidate` 啟動 reusable prepare，新增 caller 提供的 `candidate_ref`，讓 prepare、x64、ARM64 與 evidence gate 都 checkout 同一 release tag，並移除動態 ref 矩陣的 npm dependency cache 於 `.github/workflows/runtime-installation.yml` 與 `.github/workflows/publish.yml`
 - [x] T086 [P] 新增 caller event 不得假設為 `workflow_call`、publish／runtime 必須共用 release tag、四個 executable checkout ref 及 runtime 不得寫入 npm cache 的回歸契約於 `scripts/release/prepare-release.test.js`
 - [x] T087 重跑 release／靜態／安全測試、code-simplifier 與完整本地 Code Review，更新 recovery SDD 證據於 `specs/067-managed-platformio-environment/checklists/implementation.md`
-- [ ] T088 建立 recovery 修正 PR，通過乾淨 runner unit、CI、CodeQL 與必要 runtime matrix後 squash merge
-- [ ] T089 從 `master` dispatch 同一 annotated `v0.87.0`，驗證 runtime、唯一 VSIX、checksum 與三個發布端，不刪除或重建 tag
+- [x] T088 建立 recovery 修正 PR，通過乾淨 runner unit、CI、CodeQL 與必要 runtime matrix後 squash merge
+- [x] T089 從 `master` dispatch 同一 annotated `v0.87.0`，驗證 runtime、唯一 VSIX、checksum 與三個發布端，不刪除或重建 tag
+
+---
+
+## Phase 16：issue #130 managed runtime hotfix 與 v0.87.1
+
+**目的**：修正 Windows 預設 global storage 路徑預算造成的 PlatformIO 安裝失敗，讓背景 provisioning 失敗可診斷並維持 fail-closed fallback，準備 `v0.87.1`。
+
+- [x] T090 [P] 以 Windows 預設 global storage 層級計算 issue #130 的最深 PlatformIO 路徑，確認原本 runtime／artifact／UUID 複合版本目錄會逼近傳統 Win32 路徑邊界
+- [x] T091 將新版本目錄縮短為固定長度 transaction UUID，保留 install record 的完整 runtime／artifact 身分與既有 record 向後相容於 `src/services/managedRuntimeInstaller.ts` 及相關測試
+- [x] T092 [P] 建立涵蓋 storage initialize 與 installer 的 attempt／trigger／stage／percent／recent failure provisioning state，保存遮蔽且有界的 message／stdout／stderr於 `src/types/managedRuntime.ts`、`src/services/managedRuntimeService.ts` 與 `src/services/managedRuntimeInstaller.ts`
+- [x] T093 將 `managed-provisioning` 納入 probe／prepare fallback、雙 Core 診斷卡片、AI repair packet 與人工 issue draft，補 cancellation／project-process fail-closed、WebView escaping 及 privacy regression 於 `src/services/`、`media/js/platformioDiagnostic.js` 與 `src/test/`
+- [x] T094 將真實 E2E root 改為預設 global storage 形狀，執行 managed runtime、特殊路徑、完整 unit／static／package／release gates，並更新 `specs/067-managed-platformio-environment/checklists/implementation.md`
+- [ ] T095 執行 security-checker、code-simplifier 與 local Code Review 收斂；同步 `0.87.1` 版本／雙語 CHANGELOG，取得 Phase 3.5 後才 push、建立 PR、執行完整 runtime matrix 與發布
 
 ---
 
@@ -237,7 +250,7 @@
 - US1 → US2：CoreEnvironmentManager 需要可用的 managed provider。
 - US2 → US5／US4：provider 相容與診斷需要完成雙 Core 路由。
 - US3 可在 US1 完成後與 US2 並行；US6 可在 Phase 2 後先做 evidence 工具，但 workflow 完整驗證依 US1／US3。
-- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority；Phase 14 收斂 PR 首輪遠端安全與證據閘門 finding；Phase 15 只修復既有 immutable tag 的 workflow recovery，不改變 `v0.87.0` release tree。
+- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority；Phase 14 收斂 PR 首輪遠端安全與證據閘門 finding；Phase 15 只修復既有 immutable tag 的 workflow recovery，不改變 `v0.87.0` release tree；Phase 16 以 issue #130 的 Windows 正式路徑形狀為 hotfix gate，完成後才進入 `v0.87.1` 發布。
 - US7 的同意 gate 先於任何 workspace-local Skill／設定寫入；US8 與 managed runtime 安裝彼此獨立，可在 US7 測試完成後平行驗證。
 
 ### 平行機會
@@ -269,7 +282,8 @@
 8. Phase 10：依 F5 回饋加固使用者同意邊界與 OTA 共用進度。
 9. Phase 11：以完整工作樹反覆 review／fix／verify，直到沒有可採納 finding。
 10. Phase 12－15：完成 `0.87.0` 本地發布契約，對已提交完整差異執行安全重審，收斂 PR 遠端 CodeQL／evidence finding，並以新 PR 修復不可變 tag 的發布 workflow。
+11. Phase 16：縮短 Windows managed runtime 內部路徑、補齊背景安裝失敗證據與 fallback 契約，通過完整 release-candidate 矩陣後發布 `0.87.1`。
 
 ## 任務格式驗證
 
-全部 91 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 已由遠端矩陣、F5、乾淨 OS 與實機 smoke 正式證據完成；T088 保持未完成直到 recovery PR 完成，T089 保持未完成直到同一 `v0.87.0` recovery publish run 驗證三個發布端。
+全部 97 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 已由遠端矩陣、F5、乾淨 OS 與實機 smoke 正式證據完成；T088／T089 已由 PR #127 與成功的 recovery publish run `31983230776` 證實完成；T095 在 v0.87.1 Phase 3.5、遠端矩陣與發布完成前保持未完成。

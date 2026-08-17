@@ -33,7 +33,12 @@ async function main() {
   const manifestSha256 = crypto.createHash('sha256').update(manifestBytes).digest('hex');
   const parent = path.resolve(argument('--root') || fs.realpathSync(os.tmpdir()));
   fs.mkdirSync(parent, { recursive: true });
-  const root = fs.mkdtempSync(path.join(parent, 'managed runtime 中文 & offline-'));
+  const sandboxRoot = fs.mkdtempSync(path.join(parent, '使用者 中文 & managed runtime-'));
+  const root = path.join(
+    sandboxRoot,
+    'AppData', 'Roaming', 'Code', 'User', 'globalStorage', 'Singular-Ray.singular-blockly', 'runtime-v1',
+  );
+  fs.mkdirSync(root, { recursive: true });
   const storage = new ManagedRuntimeStorage(root);
   let installerCalls = 0;
 
@@ -89,7 +94,7 @@ async function main() {
       arch: process.arch,
       artifactId: record.artifactId,
       artifactSha256: manifest.artifacts.find(artifact => artifact.id === record.artifactId)?.sha256,
-      pathCases: ['unicode', 'space', 'special-characters', 'offline-restart'],
+      pathCases: ['unicode', 'space', 'special-characters', 'default-global-storage-shape', 'offline-restart'],
       offlineRestart: true,
       success: true,
     };
@@ -98,8 +103,8 @@ async function main() {
     if (resultPath) { fs.writeFileSync(path.resolve(resultPath), `${JSON.stringify(result, null, 2)}\n`, { flag: 'wx' }); }
     process.stdout.write(`Real managed runtime installation passed on ${process.platform}/${process.arch}.\n`);
   } finally {
-    if (!hasFlag('--keep')) { fs.rmSync(root, { recursive: true, force: true }); }
-    else { process.stdout.write('Managed runtime test directory retained by explicit --keep.\n'); }
+    if (!hasFlag('--keep')) { fs.rmSync(sandboxRoot, { recursive: true, force: true }); }
+    else { process.stdout.write(`Managed runtime test directory retained at ${sandboxRoot}.\n`); }
   }
 }
 

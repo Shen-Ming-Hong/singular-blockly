@@ -21,12 +21,13 @@
 - [x] install 與 cleanup 共用具 owner、PID、建立時間與 lease 的原子 lock；有效或 PID 仍存活的 lock 不刪除。序列化 stale-lock 回收的 guard 也具有短租約，owner 崩潰後可復原，malformed guard 維持 fail-closed。
 - [x] staging／version 只有在 marker 與 transaction ownership 可證明時才能清除；未知檔、provider penv 與 workspace 永不納入 cleanup。
 - [x] 安裝在 immutable candidate 完成健康 probe 後才原子寫入 `current.json`；checksum、ENOSPC、權限、probe 或中斷失敗都保留上一個 current。
+- [x] 新 immutable version directory 只使用固定長度 transaction UUID；完整 runtime／artifact id 保留在 record，避免不受信任的上游名稱或預設 Windows global storage 深度無限制放大每個子檔案路徑。
 
 ## 程序、信任與 fallback
 
 - [x] managed Core、Arduino PlatformIO、monitor 與 installer 的新程序路徑使用 argv 邊界與 `shell: false`；特殊字元不會變成 shell 語法。既有 provider-only Windows compatibility path 保留原行為但不接收未驗證動態參數。取消／逾時會終止 POSIX process group 或 Windows process tree，等待 close 後才回報完成。
 - [x] runtime-only 安裝／probe 不讀取專案程式；pkg install、build、upload、monitor 與裝置操作在 workspace untrusted 時拒絕執行。
-- [x] fallback 採 fail-closed 分類，只允許 process spawn 前的本機 executable／import／permission／managed-store corruption；`CoreEnvironmentManager` 是雙 Core 唯一 authority，MicroPython 不會在 manager 禁止後再走 legacy provider。網路、編譯、設定、裝置、serial、取消與 post-spawn 錯誤不得切換 Core 或重複上傳。
+- [x] fallback 採 fail-closed 分類，只允許 process spawn 前的本機 executable／import／permission／managed-store corruption，以及明確 `managed-provisioning` probe／prepare 失敗；`CoreEnvironmentManager` 是雙 Core 唯一 authority，MicroPython 不會在 manager 禁止後再走 legacy provider。網路、編譯、設定、裝置、serial、取消與 project-process／post-spawn 錯誤不得切換 Core 或重複上傳。
 - [x] Arduino provider 優先、Python managed 優先，sticky 選擇只影響 Singular 自己的操作，不修改或清理 provider 擁有的 Core。
 
 ## Workspace 同意與 WebView 呈現
@@ -38,10 +39,12 @@
 - [x] OTA 共用進度只消費既有、已驗證的 operation state；動態摘要與步驟使用 `textContent`，未使用 `innerHTML`、`eval` 或可由 Host payload 注入的 selector／style。
 - [x] OTA 設定與清除互斥，running state 同時停用衝突控制項；清除 request 仍只傳已選 USB port，不擴張 WebView 到 Host 的權限或秘密資料面。
 - [x] 診斷面板的 managed repair、cleanup、既有 auto repair 與 retest 使用共用 busy gate，不在安裝交易或修復流程中交錯讀寫狀態。
+- [x] 同一 Extension Host 的 background ensure 與 explicit repair 共用單一 provisioning Promise，避免 installer lock 等待期間由兩個 attempt 互相覆寫診斷狀態；跨視窗仍由受管 store lock 序列化。
 
 ## 隱私、CI 與發布
 
 - [x] logs、診斷、clipboard 與 issue draft 遮蔽 home／workspace、proxy credentials、token-like secrets 與敏感 URL；managed storage 對 WebView 與可分享輸出只提供穩定摘要。顯示實際 managed root 時，WebView 只送固定 command，由 Extension Host 直接呼叫本機檔案管理員，不回傳或記錄完整路徑。
+- [x] managed installer failure evidence 在進入診斷、AI packet 或 issue draft 前遮蔽 raw／URI-encoded managed root、home、workspace、credentials 與 token，移除控制字元並限制為 4,000 字元；background log 只記 attempt／stage，不記 raw stdout／stderr。
 - [x] evidence 只記錄 OS／arch、runner、path case 名稱、PR／event、head／tree、VSIX／manifest／artifact SHA 與結果，不保存原始使用者路徑或環境變數。
 - [x] workflows 使用最小 `contents: read` 權限、SHA-pinned actions，未使用 `pull_request_target`；具網路與執行未信任程式碼的真實矩陣需由 label／release gate 核准。可執行 checkout 直接綁定 GitHub event immutable SHA；reusable release workflow 必須由 caller 傳入同一 annotated release tag 作 `candidate_ref`，runtime 矩陣不使用 npm dependency cache。跨 job 輸出的 candidate SHA 僅能用於 evidence 比對，不能決定後續執行內容。
 - [x] evidence verifier 拒絕錯誤 PR／event、過期 commit／tree、不同 VSIX／manifest／artifact、缺少或重複平台與未完成 path/offline cases。
@@ -49,4 +52,4 @@
 
 ## 結論
 
-下載、archive、路徑、子程序、workspace consent、WebView DOM、log、cleanup 與 GitHub workflow trust boundaries 均已有 fail-closed 實作與自動化負面測試。正式發布仍必須通過 `implementation.md` 中尚未完成的遠端矩陣、F5 視覺檢查與實機 smoke。
+下載、archive、路徑、子程序、workspace consent、WebView DOM、log、cleanup 與 GitHub workflow trust boundaries 均已有 fail-closed 實作與自動化負面測試。`v0.87.1` 正式發布仍必須通過 `implementation.md` 中尚未完成的六平台遠端矩陣、乾淨 Windows F5 與實機 smoke。

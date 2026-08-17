@@ -7,6 +7,7 @@
 export interface PlatformioPrivacyRedactorOptions {
 	homeDir?: string;
 	workspacePath?: string | null;
+	managedRuntimePath?: string | null;
 }
 
 export class PlatformioPrivacyRedactor {
@@ -15,6 +16,7 @@ export class PlatformioPrivacyRedactor {
 	redact(value: string): string {
 		let redacted = value;
 		redacted = this.redactPath(redacted, this.options.workspacePath, '<workspace>');
+		redacted = this.redactPath(redacted, this.options.managedRuntimePath, '<managed-runtime>');
 		redacted = this.redactPath(redacted, this.options.homeDir, '<home>');
 		redacted = this.redactProxyCredentials(redacted);
 		redacted = this.redactTokenLikeStrings(redacted);
@@ -28,14 +30,15 @@ export class PlatformioPrivacyRedactor {
 
 		const variants = this.createPathVariants(rawPath.trim());
 		return variants.reduce((current, variant) => {
-			return current.replace(new RegExp(this.escapeRegExp(variant), 'g'), replacement);
+			return current.replace(new RegExp(this.escapeRegExp(variant), 'gi'), replacement);
 		}, value);
 	}
 
 	private createPathVariants(rawPath: string): string[] {
 		const slashVariant = rawPath.replace(/\\/g, '/');
 		const backslashVariant = rawPath.replace(/\//g, '\\');
-		return [...new Set([rawPath, slashVariant, backslashVariant])].filter(variant => variant.length > 0);
+		return [...new Set([rawPath, slashVariant, backslashVariant, encodeURI(slashVariant)])]
+			.filter(variant => variant.length > 0);
 	}
 
 	private redactProxyCredentials(value: string): string {
@@ -63,5 +66,6 @@ export function createPlatformioPrivacyRedactor(
 	return new PlatformioPrivacyRedactor({
 		homeDir: options.homeDir,
 		workspacePath: options.workspacePath ?? sessionWorkspacePath,
+		managedRuntimePath: options.managedRuntimePath,
 	});
 }

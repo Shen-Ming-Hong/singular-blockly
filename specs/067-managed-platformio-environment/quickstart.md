@@ -32,7 +32,7 @@ VSCODE_TEST_TEMP_DIR=/tmp/singular-blockly-consent-progress npx vscode-test \
 2. 在背景安裝期間從活動列開啟中文與空白路徑 workspace 的 Blockly 編輯器，確認狀態重查但 editor 不被阻擋，且 installer 不重複啟動。
 3. 背景初始化完成後才執行 CyberBrick USB，確認上傳直接重用 managed runtime；上傳端 `ensureReady()` 仍能在背景失敗時續裝。
 4. 重新載入並離線，確認重用 current install record。
-5. 開啟診斷，確認兩套 Core 分區且複製摘要無完整 home／workspace。
+5. 開啟診斷，確認兩套 Core 分區且複製摘要無完整 home／workspace。另以受控 installer failure 模擬 `installing-platformio` 失敗，確認 managed 區段、AI packet 與 issue draft 都顯示相同 attempt／stage／code，但不含完整 managed root 或 raw credentials。
 6. 安裝官方 provider，確認 Arduino 選 provider；在 project process 前模擬本機 executable 故障，確認只 fallback 一次。
 7. 模擬編譯、DNS、serial 與 upload-started 後失敗，確認不 fallback。
 8. 把 workspace 設為不信任，確認 runtime 背景準備仍可做不載入專案的工具安裝，但 pkg install、build、upload 與 monitor 均不啟動。
@@ -50,3 +50,5 @@ npm run test:managed-runtime:e2e -- --allow-network
 ```
 
 沒有 `--allow-network` 必須拒絕連外。完成前另執行 `npm run ci:static`、unit、integration 與 package；tag 重建 VSIX smoke 成功後才能發布。
+
+真實 E2E evidence 的 `pathCases` 必須包含 `default-global-storage-shape`；在 Windows 檢查其 sandbox root 具有 `AppData/Roaming/Code/User/globalStorage/Singular-Ray.singular-blockly/runtime-v1` 層級及 Unicode／空白／特殊字元上層。若只在較短暫存目錄成功，不得視為 issue #130 的路徑驗證通過。

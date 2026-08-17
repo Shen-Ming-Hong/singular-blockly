@@ -8,6 +8,17 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.87.1] - 2026-08-17
+
+### 🐛 修復 Bug Fixes
+
+- 修正 Windows 預設 Extension 儲存位置可能因過長的 immutable runtime 目錄而使 Singular managed Core 安裝失敗；新安裝改用短版交易識別目錄，既有健康安裝仍保持相容
+  Fixed Singular managed Core installations potentially failing under the default Windows extension storage because of an overlong immutable runtime directory; new installations use a short transaction identifier while existing healthy installations remain compatible
+- 保留經隱私遮蔽的 managed installer 階段、exit code、stdout 與 stderr，並在診斷、AI repair packet 與 issue draft 顯示背景安裝中或最近失敗狀態，不再錯誤回報沒有 blocker
+  Preserved privacy-redacted managed installer stage, exit code, stdout, and stderr, and exposed active or recently failed background provisioning in diagnostics, AI repair packets, and issue drafts instead of incorrectly reporting no blocker
+- managed provisioning 在工作負載啟動前失敗時，允許 CyberBrick 安全使用健康的 PlatformIO provider 作為單次 fallback；取消及已啟動的專案或上傳程序仍維持禁止 fallback
+  Allowed CyberBrick to use a healthy PlatformIO provider as a one-time fallback when managed provisioning fails before the workload starts, while cancellation and already-started project or upload processes remain fail-closed
+
 ## [0.87.0] - 2026-08-17
 
 ### ✨ 新增功能 Features

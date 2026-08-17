@@ -14,6 +14,7 @@ suite('Core failure classifier', () => {
 		['python-import', new Error("ModuleNotFoundError: No module named 'platformio'"), 'prepare'],
 		['permission', Object.assign(new Error('permission denied'), { code: 'EACCES' }), 'prepare'],
 		['local-store-corruption', new Error('corrupt local core metadata'), 'prepare'],
+		['managed-provisioning', Object.assign(new Error('managed installer failed'), { failureDomain: 'managed-provisioning', started: true, code: 1 }), 'probe'],
 		['compile', new Error('main.cpp:2: error: missing symbol'), 'project-process'],
 		['project-config', new Error('Invalid project configuration in platformio.ini'), 'project-process'],
 		['dns', Object.assign(new Error('getaddrinfo failed'), { code: 'ENOTFOUND' }), 'prepare'],
@@ -34,6 +35,9 @@ suite('Core failure classifier', () => {
 			assert.strictEqual(isCoreFallbackAllowed(failure, 'prepare', false), true);
 			assert.strictEqual(isCoreFallbackAllowed(failure, 'project-process', true), false);
 		}
+		assert.strictEqual(isCoreFallbackAllowed('managed-provisioning', 'probe', true), true);
+		assert.strictEqual(isCoreFallbackAllowed('managed-provisioning', 'prepare', true), true);
+		assert.strictEqual(isCoreFallbackAllowed('managed-provisioning', 'project-process', false), false);
 		for (const failure of ['compile', 'project-config', 'dns', 'proxy', 'tls', 'registry', 'device', 'serial', 'cancelled', 'unknown-after-start'] as const) {
 			assert.strictEqual(isCoreFallbackAllowed(failure, 'prepare', false), false);
 		}
@@ -58,5 +62,14 @@ suite('Core failure classifier', () => {
 	test('allows a local prepare failure after the preflight process starts', () => {
 		assert.strictEqual(isCoreFallbackAllowed('python-import', 'prepare', true), true);
 		assert.strictEqual(isCoreFallbackAllowed('python-import', 'project-process', true), false);
+	});
+
+	test('keeps cancellation fail-closed even when provisioning evidence is present', () => {
+		const error = Object.assign(new Error('Managed runtime installation was cancelled'), {
+			failureDomain: 'managed-provisioning', code: 'ABORT_ERR', started: true,
+		});
+		const failure = classifyCoreFailure(error, 'probe');
+		assert.strictEqual(failure, 'cancelled');
+		assert.strictEqual(isCoreFallbackAllowed(failure, 'probe', true), false);
 	});
 });

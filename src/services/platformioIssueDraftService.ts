@@ -9,7 +9,6 @@ import { formatPlatformioDiagnosticFinding } from './platformioDiagnosticFormatt
 import * as os from 'os';
 import {
 	IssueDraftProposal,
-	PlatformioDiagnosticItem,
 	PlatformioDiagnosticSession,
 	RepairHistorySummary,
 } from '../types/platformioDiagnostic';
@@ -54,7 +53,7 @@ export class PlatformioIssueDraftService {
 		];
 		const duplicateSearchHints = this.buildDuplicateSearchHints(input.session);
 
-		if (input.session.overallStatus === 'operational') {
+		if (input.session.overallStatus === 'operational' && !this.hasManagedProvisioningBlocker(input.session)) {
 			return {
 				title: 'No PlatformIO issue draft recommended',
 				body: 'No issue draft recommended: diagnostics are operational.',
@@ -127,12 +126,27 @@ export class PlatformioIssueDraftService {
 			const selection = diagnostics.selection[workload];
 			return `${selection.primary} -> ${selection.fallback}; selected=${selection.selected ?? 'none'}; fallbackUsed=${selection.fallbackUsed}`;
 		};
-		return [
+		const lines = [
 			`- Provider Core: ${provider.status}; version=${provider.version ?? 'unknown'}; ${provider.reason}`,
 			`- Singular managed Core: ${managed.status}; version=${managed.version ?? 'unknown'}; storage=${managed.storageSummary ?? 'unknown'}; ${managed.reason}`,
 			`- Arduino route: ${route('arduino')}`,
 			`- Python route: ${route('python')}`,
 		];
+		const provisioning = managed.provisioning;
+		if (provisioning?.status === 'running') {
+			lines.push(`- Managed provisioning: running; attempt=${provisioning.attempt}; trigger=${provisioning.trigger}; stage=${provisioning.stage}; percent=${provisioning.percent}`);
+		}
+		if (provisioning?.status === 'failed') {
+			const failure = provisioning.failure;
+			lines.push(`- Managed provisioning: failed; attempt=${provisioning.attempt}; trigger=${provisioning.trigger}; stage=${failure.stage}; code=${failure.code}; started=${failure.started}`);
+			if (failure.stdout) {lines.push(`- Managed installer stdout: ${failure.stdout}`);}
+			if (failure.stderr) {lines.push(`- Managed installer stderr: ${failure.stderr}`);}
+		}
+		return lines;
+	}
+
+	private hasManagedProvisioningBlocker(session: PlatformioDiagnosticSession): boolean {
+		return this.findManagedProvisioningBlocker(session) !== undefined;
 	}
 
 	private createRedactor(sessionWorkspacePath?: string | null): PlatformioPrivacyRedactor {
@@ -142,8 +156,29 @@ export class PlatformioIssueDraftService {
 		}, sessionWorkspacePath);
 	}
 
-	private findBlocker(session: PlatformioDiagnosticSession): PlatformioDiagnosticItem | undefined {
-		return session.items.find(item => item.status === 'error') ?? session.items.find(item => item.status === 'warning');
+	private findBlocker(session: PlatformioDiagnosticSession): { id: string; reason: string } | undefined {
+		return this.findManagedProvisioningBlocker(session)
+			?? session.items.find(item => item.status === 'error')
+			?? session.items.find(item => item.status === 'warning');
+	}
+
+	private findManagedProvisioningBlocker(
+		session: PlatformioDiagnosticSession
+	): { id: string; reason: string } | undefined {
+		const provisioning = session.coreDiagnostics?.environments.managed.provisioning;
+		if (provisioning?.status === 'running') {
+			return {
+				id: 'managed-provisioning',
+				reason: `attempt ${provisioning.attempt} is running at ${provisioning.stage} (${provisioning.percent}%)`,
+			};
+		}
+		if (provisioning?.status === 'failed') {
+			return {
+				id: 'managed-provisioning',
+				reason: `attempt ${provisioning.attempt} failed at ${provisioning.failure.stage}: ${provisioning.failure.message}`,
+			};
+		}
+		return undefined;
 	}
 
 	private buildDuplicateSearchHints(session: PlatformioDiagnosticSession): string[] {

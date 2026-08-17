@@ -124,6 +124,30 @@ suite('PlatformioAiRepairPacketService Tests', () => {
 		assert.ok(!packet.plainText.includes('/tmp/secret-workspace'));
 		assert.ok(packet.plainText.includes('<workspace>'));
 	});
+
+	test('includes managed provisioning evidence as the current blocker with privacy redaction', () => {
+		const service = new PlatformioAiRepairPacketService({ homeDir: '/Users/alice' });
+		const coreDiagnostics = createCoreDiagnostics();
+		coreDiagnostics.environments.managed.provisioning = {
+			status: 'failed', attempt: 3, trigger: 'activation', stage: 'installing-platformio', percent: 40,
+			startedAt: '2026-01-02T03:00:00.000Z', failedAt: '2026-01-02T03:01:00.000Z',
+			failure: {
+				failureDomain: 'managed-provisioning', stage: 'installing-platformio', code: '1', started: true,
+				message: 'installer failed', stdout: '',
+				stderr: '/Users/alice/runtime token=ghp_abcdefghijklmnopqrstuvwxyz1234567890ABCD',
+			},
+		};
+		const session = createDiagnosticSession({ overallStatus: 'operational', coreDiagnostics });
+
+		const packet = service.buildPacket({ session });
+
+		assert.ok(packet.currentBlocker.includes('managed-runtime'));
+		assert.ok(packet.plainText.includes('Managed installer stderr'));
+		assert.ok(packet.plainText.includes('<home>'));
+		assert.ok(!packet.plainText.includes('/Users/alice'));
+		assert.ok(!packet.plainText.includes('ghp_'));
+		assert.ok(!packet.currentBlocker.includes('No current blocker'));
+	});
 });
 
 function createCoreDiagnostics(): NonNullable<ReturnType<typeof createDiagnosticSession>['coreDiagnostics']> {

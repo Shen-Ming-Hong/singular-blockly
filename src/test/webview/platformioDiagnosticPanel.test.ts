@@ -697,5 +697,9 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		assert.ok(script.includes('elements.feedbackBanner.textContent = message;'), 'Feedback messages must use textContent');
 		assert.ok(script.includes('elements.exportNotice.textContent = notice;'), 'Export notices must use textContent');
 		assert.ok(script.includes("vscode.postMessage({ command: 'platformioDiagnostic:revealManagedRuntime' });"), 'Managed runtime reveal must use a fixed command without a webview-provided path');
+		assert.ok(script.includes('${renderProvisioningDetails(environment.provisioning)}'), 'Managed runtime cards must render provisioning evidence');
+		assert.ok(script.includes("return renderDetailBlock('managed-provisioning', fields.join('; '));"), 'Provisioning evidence must use the existing escaped detail renderer');
+		assert.ok(script.includes('`stdout=${provisioning.failure.stdout}`'), 'Managed runtime cards must expose bounded installer stdout');
+		assert.ok(script.includes('`stderr=${provisioning.failure.stderr}`'), 'Managed runtime cards must expose bounded installer stderr');
 	});
 });

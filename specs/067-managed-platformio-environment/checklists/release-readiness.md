@@ -71,8 +71,18 @@
 - [x] CHK043 是否定義亮色、暗色、forced-colors、reduced-motion 及未定義 CSS token 的可驗收標準？[Accessibility, Spec §FR-036, SC-014]
 - [x] CHK044 動態進度文案、ARIA terminal state 與 15 語系需求是否一致，且沒有只驗收視覺動畫而忽略輔助科技？[Accessibility, Spec §FR-026, FR-035–FR-037]
 
+## issue #130／v0.87.1 增量品質
+
+- [x] CHK045 Windows 正式預設 global storage 形狀、Unicode／空白／特殊字元上層與固定長度 version directory 是否共同形成可重現的路徑預算驗收？[Measurability, Spec §FR-038, FR-041, SC-015]
+- [x] CHK046 runtime／artifact 身分移出目錄名稱後，是否仍由 install record 與 manifest SHA 保留供應鏈及向後相容依據？[Consistency, Spec §FR-004–FR-005, FR-038]
+- [x] CHK047 provisioning running／failed snapshot 是否完整定義 attempt、trigger、stage、percent、時間與最近失敗的建立、成功清除及 Extension 重啟行為？[Completeness, Spec §FR-039]
+- [x] CHK048 installer evidence 是否同時規定資料來源、最大長度、控制字元處理、home／workspace／managed root／credential／token 遮蔽與一般 log 禁止 raw output？[Security, Spec §FR-039, SC-016]
+- [x] CHK049 provider operational 時 managed provisioning blocker 是否仍須呈現，且診斷、AI packet 與人工 issue draft 的欄位一致？[Consistency, Spec §FR-015, FR-039, SC-016]
+- [x] CHK050 `managed-provisioning` 是否只在 probe／prepare 可 fallback，並對 cancellation、project-process 與 post-spawn 提供明確零 fallback 負面條件？[Security, Spec §FR-040, SC-017]
+
 ## 備註
 
 - 完成方式：由 PR reviewer 逐項判斷需求是否足以實作及驗收；若答案為否，先修訂規格再進入 release gate。
 - 本清單不替代 `tasks.md`、自動測試、實機 smoke 或安全審查紀錄。
 - 2026-08-16 已依更新後 spec／plan／contracts 與 F5 回饋完成 44 項需求品質復核。
+- 2026-08-17 已依 issue #130 hotfix 的 spec／plan／tests 完成 CHK045－CHK050 增量品質復核。

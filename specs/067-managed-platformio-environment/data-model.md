@@ -26,7 +26,7 @@
 
 ## InstallRecord
 
-只有完成健康檢查的版本才可建立；`current.json` 以它作為唯一 ready 訊號。包含 schema、runtime／artifact id、manifest SHA、安裝時間、`versions/` 下的相對目錄、工具相對路徑／版本及 probes。
+只有完成健康檢查的版本才可建立；`current.json` 以它作為唯一 ready 訊號。包含 schema、runtime／artifact id、manifest SHA、安裝時間、`versions/` 下的相對目錄、工具相對路徑／版本及 probes。新版本目錄使用固定長度 transaction UUID；完整 runtime／artifact id 不再重複編入路徑，但既有 record 的相對目錄仍可讀取，以維持升級相容。
 
 ```text
 missing -> staging -> verified -> committed
@@ -41,6 +41,10 @@ committed -> staging-update -> committed(new)
 
 接受 `activation|editor-open` trigger，先讀取本機狀態，再將同視窗同時發生的初始化合併為單一 in-flight Promise。`ready` 不安裝、`unsupported` 不下載、`missing|invalid` 進入同一 `ensureReady()` 交易；完成或失敗後釋放 in-flight 狀態，允許後續 editor-open 或上傳安全重試。
 
+## ManagedRuntimeProvisioningState
+
+記憶體內狀態為 `idle|running|failed`，每次交易遞增 `attempt`。running 保留 `trigger`、`stage`、`percent`、`startedAt` 與 `updatedAt`；failed 另含 `failedAt` 與 `ManagedRuntimeProvisioningFailure`。失敗物件固定 `failureDomain: managed-provisioning`，並包含 installer `stage`、穩定 `code`、子程序是否已開始、遮蔽且最多 4,000 字元的 message／stdout／stderr。這些資料不持久化，Extension 重啟後由實際 install record 重新判定。
+
 ## CoreEnvironment
 
 提供給工作負載的不可變執行描述：`provider|managed` id、來源、`CoreInvocation`、Python／mpremote 路徑、storage root 與 `CoreHealth`。
@@ -53,7 +57,7 @@ committed -> staging-update -> committed(new)
 
 ## FailureClass
 
-`spawn`、`missing-executable`、`python-import`、`permission`、`local-store-corruption` 可在 project process 前 fallback。
+`spawn`、`missing-executable`、`python-import`、`permission`、`local-store-corruption` 可在 project process 前 fallback。`managed-provisioning` 只允許於 probe／prepare 且非取消時 fallback。
 
 `compile`、`project-config`、`dns`、`proxy`、`tls`、`registry`、`device`、`serial`、`cancelled`、`unknown-after-start` 禁止 fallback。分類輸入包含 phase、是否 spawn、exit code、signal 與遮蔽後 stderr pattern；未知採禁止 fallback。
 

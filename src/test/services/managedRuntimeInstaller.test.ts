@@ -124,6 +124,7 @@ suite('ManagedRuntime Installer', () => {
 
 		assert.strictEqual(record.health.status, 'healthy');
 		assert.strictEqual(record.artifactId, artifact.id);
+		assert.strictEqual(record.versionDirectory, 'transaction-id', 'Immutable version directories should not repeat long manifest identifiers');
 		assert.ok(fs.existsSync(path.join(storage.layout.versions, record.versionDirectory, record.tools.pio.relativePath)));
 		assert.deepStrictEqual(JSON.parse(fs.readFileSync(storage.layout.currentRecord, 'utf8')), record);
 		assert.ok(processCalls.some(call => call.args.includes(`mpremote==${manifest.mpremoteVersion}`)));
@@ -143,6 +144,36 @@ suite('ManagedRuntime Installer', () => {
 		await assert.rejects(() => new ManagedRuntimeInstaller(failing).install(artifact), ManagedRuntimeInstallerError);
 		assert.strictEqual(JSON.parse(fs.readFileSync(storage.layout.currentRecord, 'utf8')).versionDirectory, first.versionDirectory);
 		assert.ok(!fs.existsSync(path.join(storage.layout.staging, 'failed-update')));
+	});
+
+	test('preserves redacted subprocess evidence and the failing installer stage', async () => {
+		const token = 'ghp_abcdefghijklmnopqrstuvwxyz1234567890ABCD';
+		const options = createOptions({
+			runProcess: async () => {
+				throw new PlatformioProcessError(
+					`installer failed under ${storage.layout.root}`,
+					true,
+					1,
+					`stdout token=${token}`,
+					`stderr path=${storage.layout.root}`
+				);
+			},
+		});
+
+		await assert.rejects(
+			() => new ManagedRuntimeInstaller(options).install(artifact),
+			(error: unknown) => {
+				if (!(error instanceof ManagedRuntimeInstallerError)) {return false;}
+				assert.strictEqual(error.failureDomain, 'managed-provisioning');
+				assert.strictEqual(error.stage, 'installing-platformio');
+				assert.strictEqual(error.started, true);
+				assert.strictEqual(error.code, '1');
+				assert.ok(error.stderr.includes('<managed-runtime>'));
+				assert.ok(!`${error.message}\n${error.stdout}\n${error.stderr}`.includes(storage.layout.root));
+				assert.ok(!error.stdout.includes(token));
+				return true;
+			}
+		);
 	});
 
 	test('does not create a ready record after ENOSPC', async () => {

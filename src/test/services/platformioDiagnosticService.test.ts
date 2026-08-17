@@ -7,6 +7,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { PlatformioDiagnosticService } from '../../services/platformioDiagnosticService';
+import type { ManagedRuntimeProvisioningState } from '../../types/managedRuntime';
 
 interface StubLocaleService {
 	getLocalizedMessage(key: string, fallbackOrArg?: string | any, ...args: any[]): Promise<string>;
@@ -410,6 +411,56 @@ suite('PlatformioDiagnosticService Tests', () => {
 		assert.strictEqual(session.coreDiagnostics?.environments.managed.storageUsageBytes, 4096);
 		assert.strictEqual(session.coreDiagnostics?.selection.arduino.selected, 'managed');
 		assert.strictEqual(session.coreDiagnostics?.selection.python.selected, 'provider');
+	});
+
+	test('reports active and failed managed provisioning as a diagnostic blocker', async () => {
+		const availablePaths = new Set([
+			'/custom/penv/bin/pio', '/custom/penv', '/custom/penv/bin/python3',
+			'/custom/penv/bin/pip3', '/custom/penv/bin/mpremote',
+		]);
+		existsSyncStub.callsFake(filePath => availablePaths.has(filePath));
+		execFileStub.resolves({ stdout: 'PlatformIO Core, version 6.1.19', stderr: '' });
+		let provisioning: ManagedRuntimeProvisioningState = {
+			status: 'failed' as const,
+			attempt: 3,
+			trigger: 'activation' as const,
+			stage: 'installing-platformio' as const,
+			percent: 40,
+			startedAt: now.toISOString(),
+			failedAt: now.toISOString(),
+			failure: {
+				failureDomain: 'managed-provisioning' as const,
+				stage: 'installing-platformio' as const,
+				code: '1', started: true, message: 'installer failed', stdout: '', stderr: 'pip failed',
+			},
+		};
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub, execFile: execFileStub, env: { PATH: '/custom/penv/bin' },
+			platform: 'darwin', homeDir: '/Users/tester', now: () => now, localeService,
+			managedRuntime: {
+				getStatus: sinon.stub().resolves({ status: 'missing' }),
+				getStorageSummary: () => '<managed-storage:123456789abc>',
+				getStorageUsageBytes: sinon.stub().resolves(0),
+				getProvisioningState: () => provisioning,
+			},
+		});
+
+		const session = await service.collectDiagnostics('/workspace/demo');
+
+		assert.strictEqual(session.overallStatus, 'degraded');
+		assert.strictEqual(session.coreDiagnostics?.environments.provider.status, 'healthy');
+		assert.strictEqual(session.coreDiagnostics?.environments.managed.failureClass, 'managed-provisioning');
+		assert.strictEqual(session.coreDiagnostics?.environments.managed.provisioning, provisioning);
+		assert.match(session.coreDiagnostics?.environments.managed.reason ?? '', /installing-platformio.*code 1/);
+
+		provisioning = {
+			status: 'running', attempt: 4, trigger: 'editor-open', stage: 'extracting-python', percent: 25,
+			startedAt: now.toISOString(), updatedAt: now.toISOString(),
+		};
+		const activeSession = await service.collectDiagnostics('/workspace/demo');
+		assert.strictEqual(activeSession.overallStatus, 'degraded');
+		assert.strictEqual(activeSession.coreDiagnostics?.environments.managed.provisioning, provisioning);
+		assert.match(activeSession.coreDiagnostics?.environments.managed.reason ?? '', /extracting-python.*25%/);
 	});
 
 	test('reports missing and corrupt managed runtimes without starting an installer', async () => {

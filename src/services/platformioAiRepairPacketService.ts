@@ -12,6 +12,8 @@ import {
 	PlatformioDiagnosticSession,
 	RepairHistorySummary,
 } from '../types/platformioDiagnostic';
+import type { WorkloadSelection } from '../types/coreEnvironment';
+import type { ManagedRuntimeProvisioningState } from '../types/managedRuntime';
 
 export interface PlatformioAiRepairPacketServiceOptions {
 	now?: () => Date;
@@ -148,15 +150,30 @@ export class PlatformioAiRepairPacketService {
 			return ['- Provider Core: readiness unknown', '- Singular managed Core: readiness unknown'];
 		}
 		const { provider, managed } = diagnostics.environments;
-		return [
+		const lines = [
 			`- Provider Core: ${provider.status}; version=${provider.version ?? 'unknown'}; ${provider.reason}`,
 			`- Singular managed Core: ${managed.status}; version=${managed.version ?? 'unknown'}; storage=${managed.storageSummary ?? 'unknown'}; ${managed.reason}`,
 			`- Arduino route: ${this.formatSelection(diagnostics.selection.arduino)}`,
 			`- Python route: ${this.formatSelection(diagnostics.selection.python)}`,
 		];
+		lines.push(...this.formatProvisioning(managed.provisioning));
+		return lines;
 	}
 
-	private formatSelection(selection: import('../types/coreEnvironment').WorkloadSelection): string {
+	private formatProvisioning(state: ManagedRuntimeProvisioningState | undefined): string[] {
+		if (!state || state.status === 'idle') {return [];}
+		if (state.status === 'running') {
+			return [`- Managed provisioning: running; attempt=${state.attempt}; trigger=${state.trigger}; stage=${state.stage}; percent=${state.percent}`];
+		}
+		const lines = [
+			`- Managed provisioning: failed; attempt=${state.attempt}; trigger=${state.trigger}; stage=${state.failure.stage}; code=${state.failure.code}; started=${state.failure.started}`,
+		];
+		if (state.failure.stdout) {lines.push(`- Managed installer stdout: ${state.failure.stdout}`);}
+		if (state.failure.stderr) {lines.push(`- Managed installer stderr: ${state.failure.stderr}`);}
+		return lines;
+	}
+
+	private formatSelection(selection: WorkloadSelection): string {
 		return `${selection.primary} -> ${selection.fallback}; selected=${selection.selected ?? 'none'}; fallbackUsed=${selection.fallbackUsed}`;
 	}
 
@@ -182,11 +199,15 @@ export class PlatformioAiRepairPacketService {
 
 	private buildCurrentBlocker(session: PlatformioDiagnosticSession): string {
 		const blocker = session.items.find(item => item.status === 'error') ?? session.items.find(item => item.status === 'warning');
-		if (!blocker) {
-			return 'No current blocker detected; diagnostics are operational.';
+		if (blocker) {return `${blocker.id}: ${blocker.reason}${blocker.nextStep ? ` Next step: ${blocker.nextStep}` : ''}`;}
+		const managed = session.coreDiagnostics?.environments.managed;
+		if (managed?.provisioning?.status === 'running') {
+			return `managed-runtime: provisioning is active at ${managed.provisioning.stage} (${managed.provisioning.percent}%).`;
 		}
-
-		return `${blocker.id}: ${blocker.reason}${blocker.nextStep ? ` Next step: ${blocker.nextStep}` : ''}`;
+		if (managed?.provisioning?.status === 'failed') {
+			return `managed-runtime: ${managed.reason}`;
+		}
+		return 'No current blocker detected; diagnostics are operational.';
 	}
 
 	private formatUnknown(value: boolean | undefined): string {

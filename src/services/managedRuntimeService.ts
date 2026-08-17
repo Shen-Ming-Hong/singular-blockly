@@ -4,18 +4,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import * as os from 'os';
 import * as path from 'path';
 import { createHash, randomUUID } from 'crypto';
 import { CoreEnvironment } from '../types/coreEnvironment';
 import {
 	ManagedRuntimeInstallRecord,
+	ManagedRuntimeInstallStage,
+	ManagedRuntimeProvisioningFailure,
+	ManagedRuntimeProvisioningState,
+	ManagedRuntimeProvisioningTrigger,
 	ManagedRuntimeStatus,
 	RuntimeArtifact,
 	RuntimeManifest,
 } from '../types/managedRuntime';
-import { ManagedRuntimeInstaller, ManagedRuntimeInstallProgress } from './managedRuntimeInstaller';
+import {
+	ManagedRuntimeInstaller,
+	ManagedRuntimeInstallerError,
+	ManagedRuntimeInstallProgress,
+} from './managedRuntimeInstaller';
 import { selectRuntimeArtifact } from './managedRuntimeManifest';
 import { createWorkspaceStorageKey, ManagedRuntimeStorage } from './managedRuntimeStorage';
+import { createPlatformioPrivacyRedactor, PlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
 
 interface RuntimeInstallerLike {
 	install(
@@ -33,6 +43,7 @@ export interface ManagedRuntimeServiceOptions {
 	arch?: string;
 	libc?: string | null;
 	allowReleaseCandidate?: boolean;
+	now?: () => Date;
 }
 
 export class ManagedRuntimeServiceError extends Error {
@@ -92,7 +103,10 @@ export class ManagedRuntimeService {
 	private readonly arch: string;
 	private readonly libc: string | null;
 	private readonly allowReleaseCandidate: boolean;
-	private ensurePromise?: Promise<ManagedRuntimeInstallRecord>;
+	private readonly now: () => Date;
+	private readonly privacyRedactor: PlatformioPrivacyRedactor;
+	private provisioningPromise?: Promise<ManagedRuntimeInstallRecord>;
+	private provisioningState: ManagedRuntimeProvisioningState = { status: 'idle', attempt: 0 };
 
 	constructor(options: ManagedRuntimeServiceOptions) {
 		this.storage = options.storage;
@@ -107,6 +121,11 @@ export class ManagedRuntimeService {
 		this.arch = options.arch ?? process.arch;
 		this.libc = options.libc === undefined ? detectLibc(this.platform) : options.libc;
 		this.allowReleaseCandidate = options.allowReleaseCandidate ?? false;
+		this.now = options.now ?? (() => new Date());
+		this.privacyRedactor = createPlatformioPrivacyRedactor({
+			homeDir: os.homedir(),
+			managedRuntimePath: options.storage.layout.root,
+		});
 	}
 
 	async getStatus(): Promise<ManagedRuntimeStatus> {
@@ -145,22 +164,31 @@ export class ManagedRuntimeService {
 	async ensureReady(options: {
 		signal?: AbortSignal;
 		onProgress?: (progress: ManagedRuntimeInstallProgress) => void;
+		trigger?: ManagedRuntimeProvisioningTrigger;
 	} = {}): Promise<ManagedRuntimeInstallRecord> {
-		if (this.ensurePromise) {return this.ensurePromise;}
-		this.ensurePromise = this.ensureReadyOnce(options).finally(() => {this.ensurePromise = undefined;});
-		return this.ensurePromise;
+		return this.runSingleProvisioning(() => this.ensureReadyOnce(options));
 	}
 
 	async repair(options: {
 		signal?: AbortSignal;
 		onProgress?: (progress: ManagedRuntimeInstallProgress) => void;
 	} = {}): Promise<ManagedRuntimeInstallRecord> {
-		await this.storage.initialize();
-		const artifact = this.getArtifact();
-		if (!artifact) {
-			throw new ManagedRuntimeServiceError('unsupported-runtime', 'No verified managed runtime is available for this platform');
+		const activeProvisioning = this.provisioningPromise;
+		if (activeProvisioning) {
+			const attempt = this.provisioningState.attempt;
+			if (this.provisioningState.status === 'running') {return activeProvisioning;}
+			try {
+				const record = await activeProvisioning;
+				if (this.provisioningState.attempt > attempt) {return record;}
+			} catch {
+				// An explicit repair may retry after a background readiness check fails.
+			}
 		}
-		return this.installer.install(artifact, options);
+		return this.runSingleProvisioning(() => this.repairOnce(options));
+	}
+
+	getProvisioningState(): ManagedRuntimeProvisioningState {
+		return this.provisioningState;
 	}
 
 	getStorageSummary(): string {
@@ -296,16 +324,98 @@ export class ManagedRuntimeService {
 	private async ensureReadyOnce(options: {
 		signal?: AbortSignal;
 		onProgress?: (progress: ManagedRuntimeInstallProgress) => void;
+		trigger?: ManagedRuntimeProvisioningTrigger;
 	}): Promise<ManagedRuntimeInstallRecord> {
-		await this.storage.initialize();
 		const status = await this.getStatus();
-		if (status.status === 'ready') {return status.record;}
+		if (status.status === 'ready') {
+			this.provisioningState = { status: 'idle', attempt: this.provisioningState.attempt };
+			return status.record;
+		}
 		const artifact = this.getArtifact();
 		if (!artifact) {
 			const reason = status.status === 'missing' ? 'Managed runtime is unsupported' : status.reason;
 			throw new ManagedRuntimeServiceError('unsupported-runtime', reason);
 		}
-		return this.installer.install(artifact, options);
+		return this.runProvisioning(artifact, options.trigger ?? 'workload', options);
+	}
+
+	private async repairOnce(options: {
+		signal?: AbortSignal;
+		onProgress?: (progress: ManagedRuntimeInstallProgress) => void;
+	}): Promise<ManagedRuntimeInstallRecord> {
+		const artifact = this.getArtifact();
+		if (!artifact) {
+			throw new ManagedRuntimeServiceError('unsupported-runtime', 'No verified managed runtime is available for this platform');
+		}
+		return this.runProvisioning(artifact, 'repair', options);
+	}
+
+	private runSingleProvisioning(
+		operation: () => Promise<ManagedRuntimeInstallRecord>
+	): Promise<ManagedRuntimeInstallRecord> {
+		if (this.provisioningPromise) {return this.provisioningPromise;}
+		this.provisioningPromise = operation().finally(() => {this.provisioningPromise = undefined;});
+		return this.provisioningPromise;
+	}
+
+	private async runProvisioning(
+		artifact: RuntimeArtifact,
+		trigger: ManagedRuntimeProvisioningTrigger,
+		options: { signal?: AbortSignal; onProgress?: (progress: ManagedRuntimeInstallProgress) => void }
+	): Promise<ManagedRuntimeInstallRecord> {
+		const attempt = this.provisioningState.attempt + 1;
+		const startedAt = this.now().toISOString();
+		let stage: ManagedRuntimeInstallStage = 'waiting-lock';
+		let percent = 0;
+		this.provisioningState = { status: 'running', attempt, trigger, stage, percent, startedAt, updatedAt: startedAt };
+		try {
+			await this.storage.initialize();
+			const record = await this.installer.install(artifact, {
+				signal: options.signal,
+				onProgress: progress => {
+					stage = progress.stage;
+					percent = progress.percent;
+					this.provisioningState = {
+						status: 'running', attempt, trigger, stage, percent, startedAt, updatedAt: this.now().toISOString(),
+					};
+					options.onProgress?.(progress);
+				},
+			});
+			this.provisioningState = { status: 'idle', attempt };
+			return record;
+		} catch (error) {
+			const failure = this.createProvisioningFailure(error, stage);
+			this.provisioningState = {
+				status: 'failed', attempt, trigger, stage: failure.stage, percent, startedAt,
+				failedAt: this.now().toISOString(), failure,
+			};
+			if (error instanceof ManagedRuntimeInstallerError) {throw error;}
+			throw new ManagedRuntimeInstallerError(failure.code, failure.message, failure);
+		}
+	}
+
+	private createProvisioningFailure(
+		error: unknown,
+		stage: ManagedRuntimeInstallStage
+	): ManagedRuntimeProvisioningFailure {
+		const installerError = error instanceof ManagedRuntimeInstallerError ? error : undefined;
+		const candidate = error && typeof error === 'object' ? error as NodeJS.ErrnoException : undefined;
+		return {
+			failureDomain: 'managed-provisioning',
+			stage: installerError?.stage ?? stage,
+			code: String(installerError?.code ?? candidate?.code ?? 'installation-failed').toLowerCase(),
+			started: installerError?.started ?? false,
+			message: this.sanitizeProvisioningEvidence(error instanceof Error ? error.message : String(error)),
+			stdout: this.sanitizeProvisioningEvidence(installerError?.stdout ?? ''),
+			stderr: this.sanitizeProvisioningEvidence(installerError?.stderr ?? ''),
+		};
+	}
+
+	private sanitizeProvisioningEvidence(value: string): string {
+		const redacted = this.privacyRedactor.redact(value)
+			.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')
+			.trim();
+		return redacted.length <= 4000 ? redacted : `[truncated]\n${redacted.slice(-4000)}`;
 	}
 
 	private getArtifact(): RuntimeArtifact | null {
