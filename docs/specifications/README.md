@@ -1,6 +1,6 @@
 # Singular Blockly 整合規格書
 
-> 本文件庫收錄已歸檔規格與已同步的現行架構文件，最高同步至 `specs/066`。保留窗口內的 SDD 仍以 `specs/` 原始文件為準，不代表已全部提煉或歸檔。
+> 本文件庫收錄已歸檔規格與已同步的現行架構文件，最高同步至進行中的 `specs/067`。保留窗口內的 SDD 仍以 `specs/` 原始文件為準，不代表已全部提煉或歸檔。
 
 ## 文件結構
 
@@ -28,6 +28,7 @@ docs/specifications/
 │   └── txt-controller.md          # 051/053-056 TXT Controller 與虛擬控制器
 ├── 04-quality-testing/            # 品質保證與測試
 │   ├── test-coverage.md           # 004 測試覆蓋率提升
+│   ├── managed-runtime-environment.md # 067 managed Core 跨平台驗證與發布閘門
 │   ├── project-safety.md          # 010 專案安全防護
 │   └── workspace-safety.md        # 018/019/025 Workspace 安全防護
 ├── 05-dependencies/               # 依賴管理
@@ -64,6 +65,7 @@ docs/specifications/
 | P0     | 核心   | [架構重構](01-architecture/architecture.md)                             | ✅ 完成   |
 | P0     | 核心   | [序列化修復](06-features/bug-fixes.md)                                  | ✅ 完成   |
 | P1     | 品質   | [測試覆蓋率](04-quality-testing/test-coverage.md)                       | 🔄 進行中 |
+| P1     | 品質   | [Managed Core 跨平台驗證](04-quality-testing/managed-runtime-environment.md) | 🔄 進行中 |
 | P1     | 品質   | [專案安全防護](04-quality-testing/project-safety.md)                    | ✅ 完成   |
 | P1     | 品質   | [Workspace 安全防護](04-quality-testing/workspace-safety.md)            | ✅ 完成   |
 | P1     | 硬體   | [HuskyLens](03-hardware-support/huskylens.md)                           | ✅ 完成   |
@@ -116,6 +118,8 @@ docs/specifications/
 
 **Phase 7 (062-066)**：目前的 SDD 保留窗口；詳細設計以 `specs/` 原始文件為準，其中 065 完成 Blockly 13 現代化，066 完成專案內 Agent Skills、runtime 契約、外部工作區驗證及舊使用者端 AI server 退役。
 
+**Phase 8 (067)**：Singular 自有 Python／PlatformIO／mpremote managed Core、provider 相容 fallback、無 shell monitor、跨平台路徑矩陣及合併／發布 evidence gate。
+
 ## SDD 保留與歸檔狀態
 
 截至 2026-08-13，`specs/` 保留所有未完成 SDD，以及依規格編號排序後最近五個已完成 SDD：
@@ -155,4 +159,4 @@ docs/specifications/
 
 ---
 
-_最後更新：2026-08-13_
+_最後更新：2026-08-16_

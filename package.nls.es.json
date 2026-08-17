@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Carpeta local absoluta opcional para el entorno de Python y PlatformIO administrado por Singular. Déjala vacía para usar el almacenamiento global de la extensión de VS Code. No se admiten rutas UNC ni de red.",
 	"command.checkPlatformioStatus.title": "Verificar estado de PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Configuración de sugerencias IA",
 	"command.toggleAIEnabled.title": "Singular Blockly: Alternar sugerencias IA",

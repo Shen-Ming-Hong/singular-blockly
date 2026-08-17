@@ -38,6 +38,7 @@ suite('PlatformioIssueDraftService Tests', () => {
 				candidatePathEntries: ['/Users/alice/.platformio/penv/bin'],
 				summary: 'customPATH entries=1; http.proxy=configured',
 			},
+			coreDiagnostics: createCoreDiagnostics(),
 		});
 		const history: RepairHistorySummary = {
 			status: 'current',
@@ -58,6 +59,9 @@ suite('PlatformioIssueDraftService Tests', () => {
 		assert.ok(draft.duplicateSearchHints.includes('mpremote not found CyberBrick'));
 		assert.ok(draft.labels.includes('platformio'));
 		assert.ok(draft.body.includes('Source: ai-assisted'));
+		assert.ok(draft.body.includes('Provider Core: healthy'));
+		assert.ok(draft.body.includes('Singular managed Core: degraded'));
+		assert.ok(draft.body.includes('Arduino route: provider -> managed'));
 		assert.ok(!draft.body.includes('/Users/alice'));
 		assert.ok(!draft.body.includes('秘密專案'));
 		assert.ok(!draft.body.includes('ghp_'));
@@ -92,3 +96,16 @@ suite('PlatformioIssueDraftService Tests', () => {
 		assert.strictEqual(draft.body, 'No issue draft recommended: diagnostics are operational.');
 	});
 });
+
+function createCoreDiagnostics(): NonNullable<ReturnType<typeof createDiagnosticSession>['coreDiagnostics']> {
+	return {
+		environments: {
+			provider: { id: 'provider', status: 'healthy', version: '6.1.18', storageSummary: null, storageUsageBytes: null, packageStatus: 'ready', failureClass: null, reason: 'ready' },
+			managed: { id: 'managed', status: 'degraded', version: null, storageSummary: '<managed-storage:123456789abc>', storageUsageBytes: 1024, packageStatus: 'unknown', failureClass: 'permission', reason: 'permission denied' },
+		},
+		selection: {
+			arduino: { workload: 'arduino', primary: 'provider', fallback: 'managed', selected: 'provider', fallbackUsed: false, stickyReason: null },
+			python: { workload: 'python', primary: 'managed', fallback: 'provider', selected: 'provider', fallbackUsed: true, stickyReason: 'permission' },
+		},
+	};
+}

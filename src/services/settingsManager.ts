@@ -80,10 +80,8 @@ export class SettingsManager {
 	 */
 	async readSetting<T>(key: string, defaultValue: T): Promise<T> {
 		try {
-			// 確保 .vscode 目錄存在
-			await this.fileService.createDirectory(this.VS_CODE_DIR);
-
-			// 讀取設定檔
+			// Read-only lookup: opening an unrelated folder must not create .vscode/
+			// before the user accepts Blockly project initialization.
 			const settings = await this.fileService.readJsonFile<Record<string, any>>(this.settingsPath, {});
 
 			return settings[key] !== undefined ? settings[key] : defaultValue;

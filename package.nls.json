@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Optional absolute local directory for the Singular managed Python and PlatformIO runtime. Leave empty to use VS Code extension global storage. UNC and network paths are not supported.",
 	"command.checkPlatformioStatus.title": "Check PlatformIO Status",
 	"command.showAIStatusMenu.title": "Singular Blockly: AI Suggestions Settings",
 	"command.toggleAIEnabled.title": "Singular Blockly: Toggle AI Suggestions",

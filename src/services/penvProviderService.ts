@@ -20,6 +20,7 @@ export interface PenvProviderServiceDeps {
 
 /** 支援的 penv provider extension ID */
 const PROVIDER_IDS = ['platformio.platformio-ide', 'pioarduino.pioarduino-ide'] as const;
+export type ProviderExtensionId = (typeof PROVIDER_IDS)[number];
 
 export type ProviderInstallResult =
 	| { status: 'installed'; providerId: (typeof PROVIDER_IDS)[number] }
@@ -37,7 +38,17 @@ async function t(deps: PenvProviderServiceDeps, key: string, fallback: string): 
  * 使用 getExtension() 判斷，不檢查 penv 路徑是否存在。
  */
 export function isProviderInstalled(deps: Pick<PenvProviderServiceDeps, 'getExtension'>): boolean {
-	return PROVIDER_IDS.some(id => deps.getExtension(id) !== undefined);
+	return getInstalledProviderId(deps) !== null;
+}
+
+/** Return the deterministic provider source, preferring the official extension. */
+export function getInstalledProviderId(
+	deps: Pick<PenvProviderServiceDeps, 'getExtension'>
+): ProviderExtensionId | null {
+	for (const id of PROVIDER_IDS) {
+		if (deps.getExtension(id) !== undefined) {return id;}
+	}
+	return null;
 }
 
 // ─── T007: attemptInstall ──────────────────────────────────────────────────────

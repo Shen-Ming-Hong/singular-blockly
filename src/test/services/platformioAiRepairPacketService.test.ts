@@ -38,6 +38,7 @@ suite('PlatformioAiRepairPacketService Tests', () => {
 				candidatePathEntries: ['/Users/alice/.platformio/penv/bin'],
 				summary: 'customPATH entries=1; http.proxy=configured',
 			},
+			coreDiagnostics: createCoreDiagnostics(),
 		});
 		const history: RepairHistorySummary = {
 			status: 'stale',
@@ -91,6 +92,9 @@ suite('PlatformioAiRepairPacketService Tests', () => {
 		assert.ok(packet.plainText.includes('## Repair Attempts'));
 		assert.ok(packet.plainText.includes('## Current Blocker'));
 		assert.ok(packet.plainText.includes('## Requested Response'));
+		assert.ok(packet.plainText.includes('Provider Core: healthy'));
+		assert.ok(packet.plainText.includes('Singular managed Core: degraded'));
+		assert.ok(packet.plainText.includes('Python route: managed -> provider'));
 		assert.ok(packet.plainText.includes('Some repair history may be stale'));
 		assert.ok(packet.plainText.includes('Likely root cause'));
 		assert.ok(!packet.plainText.includes('/Users/alice'));
@@ -121,3 +125,16 @@ suite('PlatformioAiRepairPacketService Tests', () => {
 		assert.ok(packet.plainText.includes('<workspace>'));
 	});
 });
+
+function createCoreDiagnostics(): NonNullable<ReturnType<typeof createDiagnosticSession>['coreDiagnostics']> {
+	return {
+		environments: {
+			provider: { id: 'provider', status: 'healthy', version: '6.1.18', storageSummary: null, storageUsageBytes: null, packageStatus: 'ready', failureClass: null, reason: 'ready' },
+			managed: { id: 'managed', status: 'degraded', version: null, storageSummary: '<managed-storage:123456789abc>', storageUsageBytes: 1024, packageStatus: 'unknown', failureClass: 'permission', reason: 'permission denied' },
+		},
+		selection: {
+			arduino: { workload: 'arduino', primary: 'provider', fallback: 'managed', selected: 'provider', fallbackUsed: false, stickyReason: null },
+			python: { workload: 'python', primary: 'managed', fallback: 'provider', selected: 'provider', fallbackUsed: true, stickyReason: 'permission' },
+		},
+	};
+}

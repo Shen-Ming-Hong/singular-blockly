@@ -7,6 +7,8 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
+import { EventEmitter } from 'events';
+import { PassThrough } from 'stream';
 import { ArduinoMonitorService } from '../../services/arduinoMonitorService';
 import { isEsp32Board, ESP32_BOARDS } from '../../types/arduino';
 
@@ -14,24 +16,49 @@ suite('ArduinoMonitorService Test Suite', () => {
 	let service: ArduinoMonitorService;
 	let sandbox: sinon.SinonSandbox;
 	let mockTerminal: any;
+	let spawnStub: sinon.SinonStub;
+	let terminalOptions: any;
+	let processes: any[];
+
+	function createProcess(): any {
+		const process = new EventEmitter() as any;
+		process.stdout = new PassThrough();
+		process.stderr = new PassThrough();
+		process.stdin = new PassThrough();
+		process.pid = 1234;
+		process.exitCode = null;
+		process.killed = false;
+		process.kill = sandbox.stub().callsFake(() => {
+			process.killed = true;
+			process.exitCode = 0;
+			process.emit('exit', 0);
+			process.emit('close', 0);
+			return true;
+		});
+		processes.push(process);
+		return process;
+	}
 
 	setup(() => {
 		sandbox = sinon.createSandbox();
 		mockTerminal = {
-			sendText: sandbox.stub(),
 			show: sandbox.stub(),
 			dispose: sandbox.stub(),
 		};
+		processes = [];
+		spawnStub = sandbox.stub().callsFake(() => createProcess());
 
 		// Mock vscode.window.createTerminal
-		sandbox.stub(vscode.window, 'createTerminal').returns(mockTerminal);
+		sandbox.stub(vscode.window, 'createTerminal').callsFake((options: any) => {
+			terminalOptions = options;
+			return mockTerminal;
+		});
 
-		service = new ArduinoMonitorService('e:\\test-workspace', async () => ({
-			command: 'pio',
-			prefixArgs: [],
-			mode: 'direct',
-			source: 'path-search',
-		}));
+		service = new ArduinoMonitorService('e:\\test-workspace', {
+			resolvePlatformio: async () => ({ command: 'pio', prefixArgs: [], mode: 'direct', source: 'path-search' }),
+			spawnProcess: spawnStub,
+			isWorkspaceTrusted: () => true,
+		});
 	});
 
 	teardown(() => {
@@ -75,7 +102,9 @@ suite('ArduinoMonitorService Test Suite', () => {
 			assert.strictEqual(result.port, 'auto');
 			assert.ok(service.isRunning());
 			assert.ok((vscode.window.createTerminal as sinon.SinonStub).calledOnce);
-			assert.ok(mockTerminal.sendText.calledOnce);
+			assert.ok(spawnStub.calledOnce);
+			assert.ok(terminalOptions.pty, 'Should use a Pseudoterminal');
+			assert.strictEqual(terminalOptions.shellPath, undefined);
 			assert.ok(mockTerminal.show.calledOnce);
 		});
 
@@ -85,9 +114,10 @@ suite('ArduinoMonitorService Test Suite', () => {
 			assert.strictEqual(result.success, true);
 
 			// Check that the command includes exception decoder filter
-			const sentCommand = mockTerminal.sendText.firstCall.args[0];
-			assert.ok(sentCommand.includes('--filter'));
-			assert.ok(sentCommand.includes('esp32_exception_decoder'));
+			const args = spawnStub.firstCall.args[1];
+			assert.ok(args.includes('--filter'));
+			assert.ok(args.includes('esp32_exception_decoder'));
+			assert.strictEqual(spawnStub.firstCall.args[2].shell, false);
 		});
 
 		test('should not include exception decoder for non-ESP32 boards', async () => {
@@ -96,25 +126,65 @@ suite('ArduinoMonitorService Test Suite', () => {
 			assert.strictEqual(result.success, true);
 
 			// Check that the command does not include exception decoder filter
-			const sentCommand = mockTerminal.sendText.firstCall.args[0];
-			assert.ok(!sentCommand.includes('esp32_exception_decoder'));
+			const args = spawnStub.firstCall.args[1];
+			assert.ok(!args.includes('esp32_exception_decoder'));
 		});
 
 		test('should use the resolved Python module fallback command', async () => {
-			const fallbackService = new ArduinoMonitorService('e:\\test-workspace', async () => ({
-				command: 'C:\\.platformio\\penv\\Scripts\\python.exe',
-				prefixArgs: ['-m', 'platformio'],
-				mode: 'python-module',
-				source: 'system-drive-core-dir',
-			}));
+			const fallbackService = new ArduinoMonitorService('e:\\test-workspace', {
+				resolvePlatformio: async () => ({
+					command: 'C:\\.platformio\\penv\\Scripts\\python.exe',
+					prefixArgs: ['-m', 'platformio'],
+					mode: 'python-module',
+					source: 'system-drive-core-dir',
+				}),
+				spawnProcess: spawnStub,
+				isWorkspaceTrusted: () => true,
+			});
 
 			const result = await fallbackService.start('uno', 'e:\\test-workspace');
 
 			assert.strictEqual(result.success, true);
-			const sentCommand = mockTerminal.sendText.firstCall.args[0];
-			assert.ok(sentCommand.includes('python.exe'));
-			assert.ok(sentCommand.includes("'-m' 'platformio'"));
+			assert.strictEqual(spawnStub.firstCall.args[0], 'C:\\.platformio\\penv\\Scripts\\python.exe');
+			assert.deepStrictEqual(spawnStub.firstCall.args[1].slice(0, 2), ['-m', 'platformio']);
 			fallbackService.dispose();
+		});
+
+		test('passes special-character project paths as one argument without a shell', async () => {
+			const projectPath = 'e:\\中文 & project (test)';
+			const result = await service.start('uno', projectPath);
+			assert.strictEqual(result.success, true);
+			const args = spawnStub.firstCall.args[1];
+			assert.strictEqual(args[args.indexOf('--project-dir') + 1], projectPath);
+			assert.strictEqual(spawnStub.firstCall.args[2].shell, false);
+		});
+
+		test('does not resolve or spawn in an untrusted workspace', async () => {
+			const resolvePlatformio = sandbox.stub();
+			const untrustedService = new ArduinoMonitorService('e:\\test-workspace', {
+				resolvePlatformio,
+				spawnProcess: spawnStub,
+				isWorkspaceTrusted: () => false,
+			});
+			const result = await untrustedService.start('uno');
+			assert.strictEqual(result.success, false);
+			assert.strictEqual(result.error?.code, 'WORKSPACE_UNTRUSTED');
+			assert.ok(resolvePlatformio.notCalled);
+			assert.ok(spawnStub.notCalled);
+			untrustedService.dispose();
+		});
+
+		test('forwards process output and closes the Pseudoterminal on exit', async () => {
+			await service.start('uno');
+			const output: string[] = [];
+			let closeCode: number | undefined;
+			terminalOptions.pty.onDidWrite((value: string) => output.push(value));
+			terminalOptions.pty.onDidClose((value: number) => {closeCode = value;});
+			terminalOptions.pty.open();
+			processes[0].stdout.write('hello\n');
+			processes[0].emit('exit', 7);
+			assert.deepStrictEqual(output, ['hello\r\n']);
+			assert.strictEqual(closeCode, 7);
 		});
 
 		test('should return success if already running', async () => {
@@ -134,6 +204,7 @@ suite('ArduinoMonitorService Test Suite', () => {
 
 			assert.strictEqual(service.isRunning(), false);
 			assert.strictEqual(service.getCurrentPort(), null);
+			assert.ok(processes[0].kill.calledOnce);
 			assert.ok(mockTerminal.dispose.calledOnce);
 		});
 
@@ -150,6 +221,7 @@ suite('ArduinoMonitorService Test Suite', () => {
 			await service.stopForUpload();
 
 			assert.strictEqual(service.isRunning(), false);
+			assert.ok(processes[0].kill.calledOnce);
 			assert.ok(mockTerminal.dispose.calledOnce);
 		});
 

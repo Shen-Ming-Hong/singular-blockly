@@ -12,6 +12,8 @@ import { WebViewManager, _setVSCodeApi as setWebViewManagerVSCodeApi, _reset as 
 import { _setVSCodeApi as setMessageHandlerVSCodeApi, _reset as resetMessageHandler } from '../webview/messageHandler';
 import { LocaleService } from '../services/localeService';
 import { FileService } from '../services/fileService';
+import { SettingsManager } from '../services/settingsManager';
+import { WorkspaceValidator } from '../services/workspaceValidator';
 import { VSCodeMock, FSMock } from './helpers/mocks';
 
 describe('WebView Manager', () => {
@@ -189,6 +191,36 @@ describe('WebView Manager', () => {
 		const createArgs = vscodeMock.window.createWebviewPanel.getCall(0).args;
 		assert.strictEqual(createArgs[0], 'blocklyEdit');
 		assert.strictEqual(createArgs[1], 'Blockly Edit');
+	});
+
+	it('should return cancelled before workspace settings or panel creation when safety consent is denied', async () => {
+		const previousNodeEnv = process.env.NODE_ENV;
+		process.env.NODE_ENV = 'development';
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/ordinary/workspace' } }];
+		sinon.stub(webViewManager as any, 'ensurePenvProviderSetup');
+		sinon.stub(WorkspaceValidator.prototype, 'validateWorkspace').resolves({
+			isBlocklyProject: false,
+			projectType: undefined,
+			shouldShowWarning: true,
+			suppressWarning: false,
+			workspacePath: '/ordinary/workspace',
+		});
+		sinon.stub(WorkspaceValidator.prototype, 'showSafetyWarning').resolves('cancel');
+		const configurePlatformIOSettings = sinon.stub(SettingsManager.prototype, 'configurePlatformIOSettings').resolves();
+
+		try {
+			const result = await webViewManager.createAndShowWebView();
+
+			assert.strictEqual(result, 'cancelled');
+			assert.strictEqual(configurePlatformIOSettings.called, false);
+			assert.strictEqual(vscodeMock.window.createWebviewPanel.called, false);
+		} finally {
+			if (previousNodeEnv === undefined) {
+				delete process.env.NODE_ENV;
+			} else {
+				process.env.NODE_ENV = previousNodeEnv;
+			}
+		}
 	});
 
 	it('should inject editor Blockly runtime, packaged media, and all core locale URIs', async () => {

@@ -203,3 +203,17 @@ describe('GitHub workflow context contract', () => {
 		assert.match(workflow, /git fetch --force --no-tags origin "refs\/tags\/\$\{RELEASE_TAG\}:refs\/tags\/\$\{RELEASE_TAG\}"/);
 	});
 });
+
+describe('VS Code test isolation contract', () => {
+	const config = fs.readFileSync(path.join(__dirname, '..', '..', '.vscode-test.mjs'), 'utf8');
+
+	it('keeps unit tests isolated from user-installed extensions', () => {
+		assert.match(config, /const unitExtensionsDir =/);
+		assert.match(config, /label: 'unit'[\s\S]*?--extensions-dir=\$\{unitExtensionsDir\}/);
+	});
+
+	it('reserves the user extension directory for integration tests', () => {
+		assert.match(config, /const integrationExtensionsDir =/);
+		assert.match(config, /label: 'integration'[\s\S]*?--extensions-dir=\$\{integrationExtensionsDir\}/);
+	});
+});

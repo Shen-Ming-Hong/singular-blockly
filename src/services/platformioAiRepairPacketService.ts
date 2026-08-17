@@ -57,7 +57,8 @@ export class PlatformioAiRepairPacketService {
 		const knownConstraints = [
 			'Do not recommend system-level changes unless explicitly asked.',
 			'Prefer user-space, reversible steps.',
-			'Account for Windows Unicode paths and VS Code/PlatformIO customPATH.',
+			'Account for Windows Unicode paths, the Singular managed Core, and VS Code/PlatformIO customPATH.',
+			'Do not delete or mutate a provider-owned PlatformIO environment when repairing the Singular managed Core.',
 		];
 		const requestedResponseContract = [
 			'Please reply with:',
@@ -123,7 +124,7 @@ export class PlatformioAiRepairPacketService {
 	}
 
 	private buildProblemStatement(session: PlatformioDiagnosticSession): string {
-		return `Singular Blockly PlatformIO diagnostics currently report ${session.overallStatus}. The user needs a safe, user-space repair path that does not depend on private PlatformIO extension internals.`;
+		return `Singular Blockly dual-Core diagnostics currently report ${session.overallStatus}. The user needs a safe, user-space repair path that preserves provider ownership and does not depend on private PlatformIO extension internals.`;
 	}
 
 	private buildEnvironmentSummary(session: PlatformioDiagnosticSession): string {
@@ -132,13 +133,31 @@ export class PlatformioAiRepairPacketService {
 			`- OS: ${session.environment?.platform ?? this.platform}/${session.environment?.arch ?? this.arch}`,
 			'- VS Code: unknown',
 			'- Singular Blockly: unknown',
-			'- PlatformIO Extension: installed dependency, readiness unknown',
+			...this.formatCoreEnvironment(session),
 			`- PlatformIO Settings Evidence: ${settings?.summary ?? 'No official PlatformIO settings evidence collected'}`,
 			`- customPATH: ${settings?.customPath ?? 'not-configured'}`,
 			`- useBuiltinPIOCore: ${this.formatUnknown(settings?.useBuiltinPIOCore)}`,
 			`- useBuiltinPython: ${this.formatUnknown(settings?.useBuiltinPython)}`,
 			`- http.proxy configured: ${settings?.httpProxyConfigured ?? false}`,
 		].join('\n');
+	}
+
+	private formatCoreEnvironment(session: PlatformioDiagnosticSession): string[] {
+		const diagnostics = session.coreDiagnostics;
+		if (!diagnostics) {
+			return ['- Provider Core: readiness unknown', '- Singular managed Core: readiness unknown'];
+		}
+		const { provider, managed } = diagnostics.environments;
+		return [
+			`- Provider Core: ${provider.status}; version=${provider.version ?? 'unknown'}; ${provider.reason}`,
+			`- Singular managed Core: ${managed.status}; version=${managed.version ?? 'unknown'}; storage=${managed.storageSummary ?? 'unknown'}; ${managed.reason}`,
+			`- Arduino route: ${this.formatSelection(diagnostics.selection.arduino)}`,
+			`- Python route: ${this.formatSelection(diagnostics.selection.python)}`,
+		];
+	}
+
+	private formatSelection(selection: import('../types/coreEnvironment').WorkloadSelection): string {
+		return `${selection.primary} -> ${selection.fallback}; selected=${selection.selected ?? 'none'}; fallbackUsed=${selection.fallbackUsed}`;
 	}
 
 	private buildDiagnosticSummary(session: PlatformioDiagnosticSession): string {

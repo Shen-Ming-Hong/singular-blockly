@@ -1,4 +1,5 @@
 {
+	"singularBlockly.managedRuntime.path.markdownDescription": "Необязательная абсолютная локальная папка для среды Python и PlatformIO, которой управляет Singular. Оставьте поле пустым, чтобы использовать глобальное хранилище расширения VS Code. Пути UNC и сетевые пути не поддерживаются.",
 	"command.checkPlatformioStatus.title": "Проверить статус PlatformIO",
 	"command.showAIStatusMenu.title": "Singular Blockly: Настройки предложений ИИ",
 	"command.toggleAIEnabled.title": "Singular Blockly: Переключить предложения ИИ",

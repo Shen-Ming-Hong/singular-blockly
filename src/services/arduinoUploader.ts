@@ -8,7 +8,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import { execFile, spawn } from 'child_process';
+import { execFile } from 'child_process';
 import { log } from './logging';
 import { SettingsManager } from './settingsManager';
 import { isProviderInstalled } from './penvProviderService';
@@ -19,6 +19,10 @@ import {
 	resolvePlatformioInvocation,
 } from './platformioInvocationResolver';
 import { ArduinoUploadStage, ArduinoUploadResult, ArduinoUploadRequest, ArduinoPortInfo, ArduinoProgressCallback } from '../types/arduino';
+import type { CoreEnvironment } from '../types/coreEnvironment';
+import type { CoreEnvironmentManager } from './coreEnvironmentManager';
+import { classifyCoreFailure, didCoreProcessStart, isCoreFallbackAllowed } from './coreFailureClassifier';
+import { PlatformioProcessError, runPlatformioProcess } from './platformioProcess';
 
 /**
  * 預設的編譯逾時時間（毫秒）
@@ -34,11 +38,11 @@ const DEFAULT_UPLOAD_TIMEOUT = 60000;
  * 指令執行介面（用於依賴注入）
  */
 export interface CommandExecutor {
-	exec?(command: string, options?: { timeout?: number; cwd?: string }): Promise<{ stdout: string; stderr: string }>;
+	exec?(command: string, options?: { timeout?: number; cwd?: string; env?: NodeJS.ProcessEnv }): Promise<{ stdout: string; stderr: string }>;
 	execFile?(
 		filePath: string,
 		args: string[],
-		options?: { timeout?: number; cwd?: string }
+		options?: { timeout?: number; cwd?: string; env?: NodeJS.ProcessEnv }
 	): Promise<{ stdout: string; stderr: string }>;
 }
 
@@ -49,7 +53,7 @@ export interface StreamingCommandExecutor {
 	spawn(
 		command: string,
 		args: string[],
-		options: { cwd?: string; timeout?: number },
+		options: { cwd?: string; timeout?: number; env?: NodeJS.ProcessEnv },
 		onStdout?: (data: string) => void,
 		onStderr?: (data: string) => void
 	): Promise<{ code: number; stdout: string; stderr: string }>;
@@ -62,6 +66,16 @@ export interface FileSystemInterface {
 	existsSync(path: string): boolean;
 	writeFileSync(path: string, data: string): void;
 	mkdirSync(path: string, options?: { recursive: boolean }): void;
+	readFileSync?(path: string, encoding: BufferEncoding): string;
+}
+
+export function findUnpinnedPlatformPackages(source: string): string[] {
+	const packages = new Set<string>();
+	for (const line of source.split(/\r?\n/)) {
+		const match = line.match(/^\s*platform\s*=\s*(atmelavr|espressif32)\s*(?:[;#].*)?$/i);
+		if (match) {packages.add(match[1].toLowerCase());}
+	}
+	return [...packages];
 }
 
 /**
@@ -70,6 +84,7 @@ export interface FileSystemInterface {
  */
 export class ArduinoUploader {
 	private pioInvocation: PlatformioInvocation | null = null;
+	private pioEnvironment: NodeJS.ProcessEnv | undefined;
 	private lastPioResolution: PlatformioInvocationResolution | null = null;
 	private executor: CommandExecutor;
 	private streamingExecutor: StreamingCommandExecutor;
@@ -79,6 +94,7 @@ export class ArduinoUploader {
 	private settingsManager: SettingsManager;
 	private readonly providerInstalled: () => boolean;
 	private startTime: number = 0;
+	private managedStorageRoot: string | null = null;
 
 	/**
 	 * 建立 ArduinoUploader 實例
@@ -88,6 +104,9 @@ export class ArduinoUploader {
 	 * @param settingsManager 設定管理器（可選，用於測試）
 	 * @param streamingExecutor 串流執行器（可選，用於測試）
 	 * @param providerInstalled provider 偵測函式（可選，用於測試）
+	 * @param coreEnvironmentManager 雙 Core 選擇器（可選，用於測試與依賴注入）
+	 * @param workspaceTrusted Workspace Trust 探測（可選，用於測試）
+	 * @param warnUnpinnedPlatform 既有未鎖版 platform 警告（可選，由 composition root 提供 i18n）
 	 */
 	constructor(
 		private workspacePath: string,
@@ -95,7 +114,10 @@ export class ArduinoUploader {
 		fileSystem?: FileSystemInterface,
 		settingsManager?: SettingsManager,
 		streamingExecutor?: StreamingCommandExecutor,
-		providerInstalled?: () => boolean
+		providerInstalled?: () => boolean,
+		private readonly coreEnvironmentManager?: CoreEnvironmentManager,
+		private readonly workspaceTrusted: () => boolean = () => vscode.workspace.isTrusted,
+		private readonly warnUnpinnedPlatform?: (packages: readonly string[]) => Promise<void>
 	) {
 		this.settingsManager = settingsManager || new SettingsManager(workspacePath);
 		this.fileSystem = fileSystem || fs;
@@ -110,7 +132,7 @@ export class ArduinoUploader {
 			execFile: (
 				filePath: string,
 				args: string[],
-				options?: { timeout?: number; cwd?: string }
+				options?: { timeout?: number; cwd?: string; env?: NodeJS.ProcessEnv }
 			) => {
 				return new Promise((resolve, reject) => {
 					execFile(
@@ -120,6 +142,7 @@ export class ArduinoUploader {
 							encoding: 'utf8',
 							timeout: options?.timeout || 0,
 							cwd: options?.cwd || this.workspacePath,
+							env: options?.env,
 							maxBuffer: 10 * 1024 * 1024,
 						},
 						(error, stdout, stderr) => {
@@ -139,58 +162,17 @@ export class ArduinoUploader {
 			spawn: (
 				command: string,
 				args: string[],
-				options: { cwd?: string; timeout?: number },
+				options: { cwd?: string; timeout?: number; env?: NodeJS.ProcessEnv },
 				onStdout?: (data: string) => void,
 				onStderr?: (data: string) => void
 			): Promise<{ code: number; stdout: string; stderr: string }> => {
-				return new Promise((resolve, reject) => {
-					let stdout = '';
-					let stderr = '';
-					let timeoutId: NodeJS.Timeout | undefined;
-
-					const child = spawn(command, args, {
-						cwd: options.cwd || this.workspacePath,
-						shell: false,
-						stdio: ['ignore', 'pipe', 'pipe'],
-					});
-
-					if (options.timeout) {
-						timeoutId = setTimeout(() => {
-							child.kill('SIGTERM');
-							reject(new Error('Command timed out'));
-						}, options.timeout);
-					}
-
-					child.stdout?.on('data', (data: Buffer) => {
-						const text = data.toString();
-						stdout += text;
-						onStdout?.(text);
-					});
-
-					child.stderr?.on('data', (data: Buffer) => {
-						const text = data.toString();
-						stderr += text;
-						onStderr?.(text);
-					});
-
-					child.on('close', (code: number | null) => {
-						if (timeoutId) {
-							clearTimeout(timeoutId);
-						}
-						if (code === 0) {
-							resolve({ code: code || 0, stdout, stderr });
-						} else {
-							reject({ code, stdout, stderr });
-						}
-					});
-
-					child.on('error', (error: Error) => {
-						if (timeoutId) {
-							clearTimeout(timeoutId);
-						}
-						reject({ error, stdout, stderr });
-					});
-				});
+				return runPlatformioProcess(command, args, {
+					cwd: options.cwd || this.workspacePath,
+					env: options.env,
+					timeout: options.timeout,
+					onStdout,
+					onStderr,
+				}).then(result => ({ code: result.exitCode ?? 0, stdout: result.stdout, stderr: result.stderr }));
 			},
 		};
 	}
@@ -205,7 +187,7 @@ export class ArduinoUploader {
 	private executeFile(
 		filePath: string,
 		args: string[],
-		options?: { timeout?: number; cwd?: string }
+		options?: { timeout?: number; cwd?: string; env?: NodeJS.ProcessEnv }
 	): Promise<{ stdout: string; stderr: string }> {
 		if (this.executor.execFile) {
 			return this.executor.execFile(filePath, args, options);
@@ -257,17 +239,46 @@ export class ArduinoUploader {
 		if (!invocation) {
 			throw new Error('PlatformIO Core is unavailable');
 		}
-		return this.executeFile(invocation.command, [...invocation.prefixArgs, ...args], options);
+		return this.executeFile(invocation.command, [...invocation.prefixArgs, ...args], {
+			...options,
+			env: this.pioEnvironment,
+		});
 	}
 
-	private getPlatformioSpawnCommand(args: string[]): { command: string; args: string[] } {
+	private getPlatformioSpawnCommand(args: string[]): { command: string; args: string[]; env?: NodeJS.ProcessEnv } {
 		if (!this.pioInvocation) {
 			throw new Error('PlatformIO Core is unavailable');
 		}
 		return {
 			command: this.pioInvocation.command,
 			args: [...this.pioInvocation.prefixArgs, ...args],
+			env: this.pioEnvironment,
 		};
+	}
+
+	private useCoreEnvironment(environment: CoreEnvironment): void {
+		this.pioInvocation = {
+			command: environment.invocation.command,
+			prefixArgs: [...environment.invocation.prefixArgs],
+			mode: environment.invocation.prefixArgs.includes('platformio') ? 'python-module' : 'direct',
+			source: 'path-search',
+		};
+		this.pioEnvironment = { ...environment.invocation.env };
+		this.managedStorageRoot = environment.id === 'managed' ? environment.storageRoot : null;
+	}
+
+	private redactManagedStorage(value: string): string {
+		if (!this.managedStorageRoot) {return value;}
+		const escaped = this.managedStorageRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		return value.replace(new RegExp(escaped, process.platform === 'win32' ? 'gi' : 'g'), '<managed-runtime>');
+	}
+
+	private commandErrorCode(error: unknown): string {
+		const candidate = error && typeof error === 'object' ? error as { code?: unknown; error?: unknown } : null;
+		const nested = candidate?.error && typeof candidate.error === 'object'
+			? candidate.error as { code?: unknown }
+			: null;
+		return String(candidate?.code ?? nested?.code ?? 'unknown');
 	}
 
 	/**
@@ -290,6 +301,16 @@ export class ArduinoUploader {
 	 * @returns 是否已安裝
 	 */
 	async checkPioInstalled(): Promise<boolean> {
+		if (this.coreEnvironmentManager) {
+			const selection = await this.coreEnvironmentManager.getEnvironment('arduino', this.workspacePath);
+			if (!selection.selected) {return false;}
+			this.useCoreEnvironment(selection.selected);
+			log('[arduino] PlatformIO Core 選擇完成', 'info', {
+				source: selection.selected.id,
+				fallbackUsed: selection.fallbackUsed,
+			});
+			return true;
+		}
 		const resolution = await this.resolveWorkingPlatformioInvocation();
 		if (!resolution.invocation) {
 			const level = resolution.foundCandidates.length > 0 ? 'error' : 'warn';
@@ -310,6 +331,26 @@ export class ArduinoUploader {
 			fallbackCount: resolution.failures.length,
 		});
 		return true;
+	}
+
+	private async prepareProjectPackages(): Promise<void> {
+		const platformio = this.getPlatformioSpawnCommand(['pkg', 'install', '--project-dir', this.workspacePath]);
+		const result = await this.streamingExecutor.spawn(
+			platformio.command,
+			platformio.args,
+			{ timeout: this.compileTimeout, cwd: this.workspacePath, env: platformio.env }
+		);
+		if (result.code !== 0) {
+			throw new PlatformioProcessError('PlatformIO package preparation failed', true, result.code, result.stdout, result.stderr);
+		}
+	}
+
+	private async warnForUnpinnedPlatform(): Promise<void> {
+		if (!this.warnUnpinnedPlatform || !this.fileSystem.readFileSync) {return;}
+		const iniPath = path.join(this.workspacePath, 'platformio.ini');
+		if (!this.fileSystem.existsSync(iniPath)) {return;}
+		const packages = findUnpinnedPlatformPackages(this.fileSystem.readFileSync(iniPath, 'utf8'));
+		if (packages.length > 0) {await this.warnUnpinnedPlatform(packages);}
 	}
 
 	/**
@@ -352,7 +393,7 @@ export class ArduinoUploader {
 
 			return { hasDevice: false, devices: [], commandFailed: false };
 		} catch (error) {
-			log('[arduino] 裝置偵測失敗', 'error', error);
+			log('[arduino] 裝置偵測失敗', 'error', { code: this.commandErrorCode(error) });
 			return { hasDevice: false, devices: [], commandFailed: true };
 		}
 	}
@@ -674,6 +715,7 @@ export class ArduinoUploader {
 				{
 					timeout: this.compileTimeout,
 					cwd: this.workspacePath,
+					env: platformio.env,
 				},
 				// stdout 回調
 				(data: string) => {
@@ -783,6 +825,7 @@ export class ArduinoUploader {
 				{
 					timeout: combinedTimeout,
 					cwd: this.workspacePath,
+					env: platformio.env,
 				},
 				// stdout 回調
 				(data: string) => {
@@ -896,6 +939,13 @@ export class ArduinoUploader {
 			log('[arduino] 編譯並上傳成功', 'info');
 			return { success: true };
 		} catch (error: any) {
+			const failureClass = classifyCoreFailure(error, 'project-process');
+			if (
+				this.coreEnvironmentManager &&
+				isCoreFallbackAllowed(failureClass, 'project-process', didCoreProcessStart(error))
+			) {
+				throw error;
+			}
 			const stdoutContent = error.stdout || '';
 			const stderrContent = error.stderr || error.message || String(error);
 			const reachedUploadPhase =
@@ -1101,7 +1151,11 @@ export class ArduinoUploader {
 			timestamp: new Date().toISOString(),
 			port,
 			duration: Date.now() - startTime,
-			error: { stage, message, details },
+			error: {
+				stage,
+				message: this.redactManagedStorage(message),
+				details: details === undefined ? undefined : this.redactManagedStorage(details),
+			},
 		};
 	}
 
@@ -1119,14 +1173,20 @@ export class ArduinoUploader {
 			onProgress?.({
 				stage,
 				progress,
-				message,
+				message: this.redactManagedStorage(message),
 				subProgress,
 				elapsed: this.getElapsed(),
-				error,
+				error: error === undefined ? undefined : this.redactManagedStorage(error),
 			});
 		};
 
 		try {
+			if (!this.workspaceTrusted()) {
+				const trustMessage = 'Trust this workspace before preparing packages, building, uploading, or monitoring a device.';
+				sendProgress('failed', 0, trustMessage, undefined, 'WORKSPACE_UNTRUSTED');
+				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'Workspace is not trusted', trustMessage);
+			}
+
 			// 階段 1: 同步設定 (5%)
 			sendProgress('syncing', 5, 'Syncing settings...');
 			await this.syncSettings(request);
@@ -1134,6 +1194,7 @@ export class ArduinoUploader {
 			// 階段 2: 儲存工作區 (10%)
 			sendProgress('saving', 10, 'Saving workspace...');
 			await this.saveCode(request.code);
+			await this.warnForUnpinnedPlatform();
 
 			// 階段 3: 檢查 PlatformIO (15%)
 			sendProgress('checking_pio', 15, 'Checking compiler...');
@@ -1144,6 +1205,19 @@ export class ArduinoUploader {
 				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found', notReady);
 			}
 
+			if (this.coreEnvironmentManager) {
+				sendProgress('checking_pio', 18, 'Preparing project packages...');
+				await this.coreEnvironmentManager.run({
+					workload: 'arduino',
+					workspaceUri: this.workspacePath,
+					phase: 'prepare',
+					operation: async environment => {
+						this.useCoreEnvironment(environment);
+						await this.prepareProjectPackages();
+					},
+				});
+			}
+
 			// 階段 4: 編譯並上傳 (20-95%)
 			// 使用 --target upload，PlatformIO 會自動：
 			// 1. 檢查是否需要重新編譯
@@ -1152,8 +1226,8 @@ export class ArduinoUploader {
 			// 若無板子，至少能確認編譯是否有語法錯誤
 			sendProgress('compiling', 20, 'Building & uploading...', 0);
 
-			const result = await this.compileAndUploadWithProgress(
-				'auto', // 讓 PlatformIO 自動偵測連接埠
+			const runCompileAndUpload = () => this.compileAndUploadWithProgress(
+				'auto',
 				// 編譯進度回調（映射到 20-55%）
 				(subProgress, subMessage) => {
 					const mappedProgress = 20 + Math.round(subProgress * 0.35);
@@ -1165,6 +1239,17 @@ export class ArduinoUploader {
 					sendProgress('uploading', mappedProgress, subMessage, subProgress);
 				}
 			);
+			const result = this.coreEnvironmentManager
+				? await this.coreEnvironmentManager.run({
+					workload: 'arduino',
+					workspaceUri: this.workspacePath,
+					phase: 'project-process',
+					operation: environment => {
+						this.useCoreEnvironment(environment);
+						return runCompileAndUpload();
+					},
+				})
+				: await runCompileAndUpload();
 
 			if (!result.success) {
 				const failStage = result.stage || 'uploading';
@@ -1190,8 +1275,8 @@ export class ArduinoUploader {
 				mode: 'upload',
 			};
 		} catch (error: any) {
-			const errorMessage = error instanceof Error ? error.message : String(error);
-			log('[arduino] 上傳過程發生未預期錯誤', 'error', error);
+			const errorMessage = this.redactManagedStorage(error instanceof Error ? error.message : String(error));
+			log('[arduino] 上傳過程發生未預期錯誤', 'error', { code: this.commandErrorCode(error) });
 			sendProgress('failed', 0, errorMessage, undefined, errorMessage);
 			return this.createFailureResult(this.startTime, 'auto', 'failed', errorMessage);
 		}

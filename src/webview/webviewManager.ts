@@ -31,6 +31,7 @@ import {
 	WorkspaceDocument,
 	WorkspaceLiveLoadResultMessage,
 } from '../types/workspaceValidation';
+import type { CoreEnvironmentManager } from '../services/coreEnvironmentManager';
 
 /**
  * 開發板值映射表
@@ -78,6 +79,8 @@ function escapeHtml(value: string): string {
 		return entities[character];
 	});
 }
+
+export type BlocklyEditorOpenResult = 'opened' | 'cancelled' | 'no-workspace';
 
 interface TxtPreviewPayload {
 	txtVirtualControls?: TxtVirtualControlsDocument;
@@ -321,7 +324,8 @@ export class WebViewManager {
 		private context: vscode.ExtensionContext,
 		localeService?: LocaleService,
 		extensionFileService?: FileService,
-		workspaceFileService?: FileService
+		workspaceFileService?: FileService,
+		private readonly coreEnvironmentManager?: CoreEnvironmentManager
 	) {
 		this.localeService = localeService || new LocaleService(context.extensionPath);
 		this.extensionFileService = extensionFileService || new FileService(context.extensionPath);
@@ -376,7 +380,7 @@ export class WebViewManager {
 	/**
 	 * 建立並顯示 WebView 面板
 	 */
-	async createAndShowWebView(): Promise<void> {
+	async createAndShowWebView(): Promise<BlocklyEditorOpenResult> {
 		// 【最優先】偵測 penv provider，不論工作區是否已開啟都立即檢查
 		// 測試環境略過； fire-and-forget，不阻擋後續流程
 		const isTestEnvironmentPenv = process.env.NODE_ENV === 'test';
@@ -396,7 +400,7 @@ export class WebViewManager {
 					vscodeApi.commands.executeCommand('workbench.action.files.openFolder');
 				}
 			});
-			return;
+			return 'no-workspace';
 		}
 
 		// 初始化檔案服務 (如果還沒有建立的話,例如在測試中可能已注入)
@@ -410,9 +414,9 @@ export class WebViewManager {
 		}
 		this.activeWorkspaceRoot = resolvedWorkspaceRoot;
 
-		// 設定 PlatformIO 不自動開啟 ini 檔案
+		// SettingsManager is created before validation for read-only preference lookup.
+		// Workspace writes remain deferred until the user accepts initialization.
 		const settingsManager = new SettingsManager(workspaceRoot);
-		await settingsManager.configurePlatformIOSettings();
 
 		// ===== Phase 3: 專案安全防護機制 =====
 		// 驗證工作區是否為 Blockly 專案,若不是則顯示警告
@@ -439,7 +443,7 @@ export class WebViewManager {
 					log('User cancelled opening Blockly editor', 'info');
 					const cancelMsg = await this.localeService.getLocalizedMessage('SAFETY_GUARD_CANCELLED', "No worries! We didn't make any changes.");
 					vscodeApi.window.showInformationMessage(cancelMsg);
-					return; // 中止開啟編輯器
+					return 'cancelled'; // 中止開啟編輯器且不得寫入工作區
 				} else if (userChoice === 'suppress') {
 					// 使用者選擇不再提醒
 					log('User chose to suppress future warnings', 'info');
@@ -459,10 +463,14 @@ export class WebViewManager {
 		}
 		// ===== End of Phase 3 =====
 
+		// Existing Blockly projects and explicitly accepted new projects may now
+		// receive workspace-local settings.
+		await settingsManager.configurePlatformIOSettings();
+
 		// 如果已有面板,則顯示已有的面板
 		if (this.panel) {
 			this.panel.reveal(vscode.ViewColumn.One, true);
-			return;
+			return 'opened';
 		}
 
 		// 建立新的 WebView 面板
@@ -487,7 +495,17 @@ export class WebViewManager {
 		this.panel.webview.html = await this.getWebviewContent();
 
 		// 建立訊息處理器
-		this.messageHandler = new WebViewMessageHandler(this.context, this.panel, this.localeService);
+		this.messageHandler = new WebViewMessageHandler(
+			this.context,
+			this.panel,
+			this.localeService,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+			this.coreEnvironmentManager
+		);
 		this.workspaceCandidateService = getWorkspaceCandidateService(workspaceRoot);
 		this.workspaceCandidateService?.attachChannels(
 			message => this.validateWorkspaceCandidate(message),
@@ -547,6 +565,7 @@ export class WebViewManager {
 		});
 
 		log('WebView panel created and shown', 'info');
+		return 'opened';
 	}
 
 	private async validateWorkspaceCandidate(

@@ -9,19 +9,20 @@ const cssPath = 'media/css/blocklyEdit.css';
 const manifestPath = 'package.json';
 
 describe('CyberBrick upload settings WebView contract', () => {
-	it('renders a child-friendly determinate progressbar without visible fractions or percentages', () => {
+	it('renders one theme-aware progress surface for determinate setup and indeterminate cleanup', () => {
 		const html = readWorkspaceFile(htmlPath);
 		const css = readWorkspaceFile(cssPath);
 		assertContainsAll(
 			html,
 			[
 				'id="cyberbrickProvisioningStatus"',
+				'aria-atomic="true"',
 				'id="cyberbrickProvisioningProgressLabel"',
 				'id="cyberbrickProvisioningIcon"',
 				'id="cyberbrickProvisioningProgressbar"',
 				'role="progressbar"',
 				'aria-valuemin="0"',
-				'aria-valuemax="6"',
+				'aria-valuemax="100"',
 				'aria-valuenow="0"',
 				'aria-labelledby="cyberbrickProvisioningProgressLabel"',
 				'id="cyberbrickProvisioningProgressFill"',
@@ -42,9 +43,20 @@ describe('CyberBrick upload settings WebView contract', () => {
 				'.cyberbrick-provisioning-progress-card.succeeded',
 				'.cyberbrick-provisioning-progress-card.failed',
 				'.cyberbrick-provisioning-icon',
+				'.cyberbrick-provisioning-progress-track::after',
+				'animation: cyberbrick-progress-sweep',
+				'@media (prefers-reduced-motion: reduce)',
+				'@media (forced-colors: active)',
+				'var(--editor-focus-ring)',
 			],
 			'CyberBrick progress styling'
 		);
+		assert(
+			html.indexOf('id="cyberbrickProvisioningStatus"') < html.indexOf('id="cyberbrickProvisioningToggle"') &&
+				html.indexOf('id="cyberbrickProvisioningStatus"') < html.indexOf('id="cyberbrickAdvancedToggle"'),
+			'shared progress should sit outside and before both operation accordions'
+		);
+		assert(!css.includes('var(--button-primary-bg)'), 'progress fill must not rely on an undefined theme token');
 		const visibleProgressMarkup = html.slice(html.indexOf('id="cyberbrickProvisioningStatus"'), html.indexOf('id="cyberbrickProvisionButton"'));
 		assert(!/\d\s*\/\s*6/.test(visibleProgressMarkup), 'student-facing progress must not show n/6');
 		assert(!visibleProgressMarkup.includes('%'), 'student-facing progress must not show a percentage');
@@ -76,6 +88,17 @@ describe('CyberBrick upload settings WebView contract', () => {
 		);
 		const requestBody = extractFunctionBody(script, 'requestCyberBrickOtaProvisioning');
 		assert(requestBody.indexOf("type: 'start'") < requestBody.indexOf("command: 'cyberbrickOtaProvisionRequest'"), 'empty progress must render before postMessage');
+		assertContainsAll(
+			extractFunctionBody(script, 'renderCyberBrickProvisioningProgress'),
+			[
+				'activeProgressOperation',
+				'cleanupProgressStatus',
+				"progressbar.removeAttribute('aria-valuenow')",
+				"progressbar.setAttribute('aria-busy', 'true')",
+				"progressbar.setAttribute('aria-valuemax', '100')",
+			],
+			'shared determinate and indeterminate progress behavior'
+		);
 		const pairedDevicesBody = extractFunctionBody(script, 'renderCyberBrickPairedDevices');
 		assertContainsAll(
 			pairedDevicesBody,
@@ -181,7 +204,6 @@ describe('CyberBrick upload settings WebView contract', () => {
 				'cyberbrick-password-eye-closed',
 				'id="cyberbrickProvisionButton"',
 				'id="cyberbrickOtaCleanupButton"',
-				'id="cyberbrickOtaCleanupStatus"',
 				'id="cyberbrickProvisioningBody"',
 				'id="cyberbrickAdvancedBody"',
 			],
@@ -314,10 +336,25 @@ describe('CyberBrick upload settings WebView contract', () => {
 			['window.confirm', "purpose: 'blocklyDelete'"],
 			'paired-device deletion must not reuse Blockly workspace deletion confirmation'
 		);
+		const cleanupRequestBody = extractFunctionBody(script, 'requestCyberBrickOtaCleanup');
 		assertContainsAll(
-			extractFunctionBody(script, 'requestCyberBrickOtaCleanup'),
+			cleanupRequestBody,
 			['await showAsyncConfirm', "command: 'cyberbrickOtaCleanupRequest'", 'payload: { usbPort }'],
 			'OTA cleanup should require confirmation and send only the USB port (USB physical connection is the trust anchor, not settings primary device)'
+		);
+		assertContainsAll(
+			cleanupRequestBody,
+			[
+				"activeProgressOperation = 'cleanup'",
+				"cleanupProgressStatus = 'running'",
+				'cleanupRequestId = requestId',
+				'renderCyberBrickProvisioningProgress()',
+			],
+			'OTA cleanup should render through the shared progress surface'
+		);
+		assert(
+			cleanupRequestBody.indexOf('renderCyberBrickProvisioningProgress()') < cleanupRequestBody.indexOf("command: 'cyberbrickOtaCleanupRequest'"),
+			'cleanup progress should become visible before the Host request starts'
 		);
 		assertDoesNotContainAny(
 			extractFunctionBody(script, 'requestCyberBrickOtaCleanup'),
@@ -333,6 +370,11 @@ describe('CyberBrick upload settings WebView contract', () => {
 			extractFunctionBody(script, 'requestCyberBrickOtaCleanup'),
 			['window.confirm', "purpose: 'blocklyDelete'"],
 			'OTA cleanup must not reuse Blockly workspace deletion confirmation'
+		);
+		assertContainsAll(
+			extractFunctionBody(script, 'handleCyberBrickOtaCleanupResult'),
+			['message.requestId !== cyberBrickUploadSettingsState.cleanupRequestId', 'cleanupRequestId = null'],
+			'stale cleanup results must not replace a newer shared-progress operation'
 		);
 	});
 

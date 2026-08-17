@@ -17,6 +17,11 @@ import { PlatformioDiagnosticService } from './services/platformioDiagnosticServ
 import { PlatformioDiagnosticPanel } from './webview/platformioDiagnosticPanel';
 import { ProjectSkillService } from './services/projectSkillService';
 import { WorkspaceCandidateService } from './services/workspaceCandidateService';
+import { createManagedRuntimeService } from './services/managedRuntimeFactory';
+import type { ManagedRuntimeService } from './services/managedRuntimeService';
+import { ManagedRuntimeInitializationCoordinator } from './services/managedRuntimeInitializationCoordinator';
+import { CoreEnvironmentManager } from './services/coreEnvironmentManager';
+import { ManagedCoreEnvironmentProvider, ProviderCoreEnvironmentProvider } from './services/coreEnvironmentProviders';
 
 // AI model manager (initialized when Copilot is available)
 let aiModelManager: AIModelManager | undefined;
@@ -50,12 +55,49 @@ export async function activate(context: vscode.ExtensionContext) {
 	try {
 		// 初始化服務
 		const localeService = new LocaleService(context.extensionPath);
+		let managedRuntimeService: ManagedRuntimeService | undefined;
+		try {
+			managedRuntimeService = await createManagedRuntimeService(context);
+		} catch (error) {
+			log('Managed runtime configuration is unavailable; provider compatibility remains enabled', 'warn', {
+				code: error instanceof Error && 'code' in error ? String((error as Error & { code?: unknown }).code) : 'invalid-configuration',
+			});
+		}
+		const coreEnvironmentManager = new CoreEnvironmentManager(
+			new ProviderCoreEnvironmentProvider({
+				getCustomPath: () => vscodeApi.workspace.getConfiguration('platformio-ide').get<unknown>('customPATH'),
+			}),
+			new ManagedCoreEnvironmentProvider(managedRuntimeService)
+		);
+		const managedRuntimeInitialization = managedRuntimeService
+			? new ManagedRuntimeInitializationCoordinator(managedRuntimeService)
+			: undefined;
+		const initializeManagedRuntime = (trigger: 'activation' | 'editor-open'): void => {
+			if (!managedRuntimeInitialization) {return;}
+			void managedRuntimeInitialization.initialize(trigger, progress => {
+				log('[managed-runtime] background initialization progress', 'info', {
+					trigger,
+					stage: progress.stage,
+					percent: progress.percent,
+				});
+			}).then(result => {
+				log('[managed-runtime] background initialization completed', 'info', result);
+			}).catch(error => {
+				log('[managed-runtime] background initialization deferred after failure', 'warn', {
+					trigger,
+					code: error instanceof Error && 'code' in error ? String((error as Error & { code?: unknown }).code) : 'initialization-failed',
+				});
+			});
+		};
+		initializeManagedRuntime('activation');
 		const platformioDiagnosticService = PlatformioDiagnosticService.fromLocaleService(localeService, {
 			configuration: {
 				get(section: string, key: string) {
 					return vscodeApi.workspace.getConfiguration(section).get(key);
 				},
 			},
+			managedRuntime: managedRuntimeService,
+			coreEnvironmentManager,
 		});
 
 		// 【最優先】檢查是否為 CyberBrick/MicroPython 專案，若是則刪除 platformio.ini
@@ -108,19 +150,19 @@ export async function activate(context: vscode.ExtensionContext) {
 				log('Error checking/deleting platformio.ini at activation', 'warn', err);
 			}
 
-			// 設定 PlatformIO 不自動開啟 ini 檔案
-			const settingsManager = new SettingsManager(workspaceRoot);
-			await settingsManager.configurePlatformIOSettings();
-			log('PlatformIO auto-open settings configured at activation', 'info');
+			// Activation may inspect any folder. Only established Blockly projects may
+			// receive workspace-local settings without a new-project confirmation.
+			if (ProjectSkillService.isBlocklyProject(workspaceRoot)) {
+				const settingsManager = new SettingsManager(workspaceRoot);
+				await settingsManager.configurePlatformIOSettings();
+				log('PlatformIO auto-open settings configured for Blockly project at activation', 'info');
+			}
 		}
 
-		// Existing Singular Blockly projects receive the project-local Agent Skill silently.
-		void ensureProjectSkills(context, workspaceFolders || [], false);
 		if (typeof vscodeApi.workspace.onDidChangeWorkspaceFolders === 'function') {
 			context.subscriptions.push(
-				vscodeApi.workspace.onDidChangeWorkspaceFolders(event => {
+				vscodeApi.workspace.onDidChangeWorkspaceFolders(() => {
 					syncPrimaryWorkspaceCandidateService();
-					void ensureProjectSkills(context, event.added, false);
 				})
 			);
 		}
@@ -139,7 +181,15 @@ export async function activate(context: vscode.ExtensionContext) {
 		});
 
 		// 註冊命令
-		registerCommands(context, localeService, platformioDiagnosticService, () => syncPrimaryWorkspaceCandidateService(true));
+		registerCommands(
+			context,
+			localeService,
+			platformioDiagnosticService,
+			() => syncPrimaryWorkspaceCandidateService(true),
+			coreEnvironmentManager,
+			managedRuntimeService,
+			() => initializeManagedRuntime('editor-open')
+		);
 
 		setupConfigurationListener(context);
 
@@ -188,31 +238,59 @@ function registerCommands(
 	context: vscode.ExtensionContext,
 	localeService: LocaleService,
 	platformioDiagnosticService: PlatformioDiagnosticService,
-	ensurePrimaryWorkspaceCandidateService: () => void
+	ensurePrimaryWorkspaceCandidateService: () => void,
+	coreEnvironmentManager?: CoreEnvironmentManager,
+	managedRuntimeService?: ManagedRuntimeService,
+	initializeManagedRuntime?: () => void
 ) {
 	log('Registering commands...', 'info');
 
 	// WebView 管理器（單例）
 	let webViewManager: WebViewManager | undefined;
-	const platformioDiagnosticPanel = new PlatformioDiagnosticPanel(context, localeService, platformioDiagnosticService);
+	let editorOpenInFlight: Promise<void> | undefined;
+	const platformioDiagnosticPanel = new PlatformioDiagnosticPanel(context, localeService, platformioDiagnosticService, fs, {
+		managedRuntimeService,
+		coreEnvironmentManager,
+	});
 
 	// 註冊開啟 Blockly 編輯器命令
 	const openBlocklyEdit = vscodeApi.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
 		try {
-			// Opening the editor is an explicit new-project signal, even before blockly/ exists.
-			const primaryFolder = vscodeApi.workspace.workspaceFolders?.[0];
-			ensurePrimaryWorkspaceCandidateService();
-			void ensureProjectSkills(context, primaryFolder ? [primaryFolder] : [], true);
+			initializeManagedRuntime?.();
 			// 懶初始化 WebView 管理器
 			if (!webViewManager) {
-				webViewManager = new WebViewManager(context);
+				webViewManager = new WebViewManager(context, undefined, undefined, undefined, coreEnvironmentManager);
 				// Inject AI model manager if available
 				if (aiModelManager) {
 					webViewManager.setAIModelManager(aiModelManager, aiStatusBarInstance);
 				}
 			}
 
-			await webViewManager.createAndShowWebView();
+			if (!editorOpenInFlight) {
+				const manager = webViewManager;
+				const requestedPrimaryPath = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath;
+				editorOpenInFlight = (async () => {
+					const openResult = await manager.createAndShowWebView();
+					if (openResult === 'opened') {
+						const acceptedPrimaryFolder = vscodeApi.workspace.workspaceFolders?.[0];
+						const workspaceUnchanged = requestedPrimaryPath !== undefined &&
+							acceptedPrimaryFolder !== undefined &&
+							path.resolve(acceptedPrimaryFolder.uri.fsPath) === path.resolve(requestedPrimaryPath);
+						// An existing Blockly workspace or an explicitly accepted new project may
+						// receive workspace watchers and the project-local Skill. Cancellation
+						// remains write-free. If the primary workspace changes while the prompt is
+						// open, the accepted result belongs to the old workspace and must not write
+						// into the replacement folder.
+						if (workspaceUnchanged) {
+							ensurePrimaryWorkspaceCandidateService();
+							await installProjectSkillAfterEditorOpened(context, [acceptedPrimaryFolder]);
+						}
+					}
+				})().finally(() => {
+					editorOpenInFlight = undefined;
+				});
+			}
+			await editorOpenInFlight;
 		} catch (error) {
 			log('Error opening Blockly editor:', 'error', error);
 			const errorMsg = await localeService.getLocalizedMessage(
@@ -325,7 +403,7 @@ function registerCommands(
 
 			// 懶初始化 WebView 管理器
 			if (!webViewManager) {
-				webViewManager = new WebViewManager(context);
+				webViewManager = new WebViewManager(context, undefined, undefined, undefined, coreEnvironmentManager);
 			}
 
 			// 調用預覽功能
@@ -415,15 +493,13 @@ function setupConfigurationListener(context: vscode.ExtensionContext) {
 	log('Configuration listener registered', 'info');
 }
 
-async function ensureProjectSkills(
+async function installProjectSkillAfterEditorOpened(
 	context: vscode.ExtensionContext,
-	folders: readonly vscode.WorkspaceFolder[],
-	force: boolean
+	folders: readonly vscode.WorkspaceFolder[]
 ): Promise<void> {
 	await Promise.all(
 		folders.map(async folder => {
 			const workspaceRoot = folder.uri.fsPath;
-			if (!force && !ProjectSkillService.isBlocklyProject(workspaceRoot)) {return;}
 			try {
 				await new ProjectSkillService(workspaceRoot, context.extensionPath).ensureInstalled();
 			} catch {

@@ -19,8 +19,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  runtime-quality:
+    name: Verify managed runtime release matrix
+    uses: ./.github/workflows/runtime-installation.yml
+    permissions:
+      contents: read
+    with:
+      release_candidate: true
+
   quality:
     name: Reuse verified CI artifact
+    needs: runtime-quality
     uses: ./.github/workflows/ci.yml
     permissions:
       contents: read

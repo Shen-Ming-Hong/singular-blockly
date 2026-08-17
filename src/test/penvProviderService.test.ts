@@ -12,6 +12,7 @@ import {
 	isProviderInstalled,
 	attemptInstall,
 	showInstallNotification,
+	getInstalledProviderId,
 } from '../services/penvProviderService';
 
 // ─── 測試輔助函數 ──────────────────────────────────────────────────────────────
@@ -54,6 +55,13 @@ describe('PenvProviderService', () => {
 			getExtension.withArgs('pioarduino.pioarduino-ide').returns({ id: 'pioarduino.pioarduino-ide' });
 			getExtension.returns(undefined);
 			assert.strictEqual(isProviderInstalled({ getExtension }), true);
+		});
+
+		it('should prefer the official provider when both extensions are installed', () => {
+			const getExtension = sinon.stub();
+			getExtension.withArgs('platformio.platformio-ide').returns({ id: 'platformio.platformio-ide' });
+			getExtension.withArgs('pioarduino.pioarduino-ide').returns({ id: 'pioarduino.pioarduino-ide' });
+			assert.strictEqual(getInstalledProviderId({ getExtension }), 'platformio.platformio-ide');
 		});
 	});
 

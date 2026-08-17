@@ -94,6 +94,22 @@ export class MessageHandler {
 
 ## 測試類型
 
+### Managed Core 與跨平台安裝（067）
+
+Managed runtime 的測試分成三層，避免每個 PR 都重複下載真實 Python：
+
+1. 每個 PR 執行不連網的 fake artifact、manifest、checksum、archive containment、root ownership、install／cleanup lock、PlatformIO 受測版本範圍、atomic rollback、Core 路由、fallback 與 Unicode／空白／特殊字元路徑測試。
+2. 維護者加上 `runtime-e2e-approved` 後，三作業系統 x64 runner 執行真實 CPython、PlatformIO、mpremote 安裝及離線重啟；`release-candidate` 再涵蓋 manifest 宣告的 ARM64。
+3. 正式發布重新執行完整矩陣，並以實際 VS Code CLI 安裝候選 VSIX，檢查封裝 runtime manifest 與授權資產。
+
+Activation／editor-open coordinator 以注入式服務驗證：ready 不安裝、missing／invalid 續裝、unsupported 不下載，同視窗並行只呼叫 installer 一次。Extension Host 測試另涵蓋 Arduino monitor Pseudoterminal 的 stdout、exit、kill、workspace trust 及 `shell: false`。
+
+Editor-open 同意邊界另以 Extension Host 回歸測試驗證：activation 與 workspace-folder change 即使面對既有 Blockly folder 也不安裝 Project Skill；`opened` 後只處理 primary workspace；`cancelled` 時 Skill 與 workspace settings 呼叫數皆為 0。`SettingsManager` 測試同時確認讀取不存在的偏好不會建立 `.vscode/`。
+
+CyberBrick WebView contract 驗證 OTA provisioning／cleanup 只使用單一進度 DOM、兩個 request 都在送出前 render running、設定以 reducer 里程碑計算 determinate progress、清除 running 省略 `aria-valuenow`，並檢查亮暗 theme token、forced-colors、reduced-motion 與 `textContent` 安全渲染。
+
+Evidence 會綁定 repository、PR、event、head、tree、VSIX SHA-256、runtime manifest SHA-256、runner 與真實 E2E 回報的 artifact id／SHA-256；缺矩陣、必要路徑案例不足、artifact 與 manifest 不符、新 commit、離線重啟失敗或包含疑似私密路徑／credential 時一律 fail closed。完整操作與成本說明見 [Managed Runtime 跨平台驗證與發布閘門](managed-runtime-environment.md)。
+
 ### 單元測試
 
 測試獨立功能單元，隔離外部依賴。

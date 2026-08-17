@@ -1481,6 +1481,7 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 }
 
 .cyberbrick-provisioning-progress-track {
+	position: relative;
 	overflow: hidden;
 	width: 100%;
 	min-height: 22px;
@@ -1493,12 +1494,24 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	width: 0;
 	min-height: 22px;
 	border-radius: inherit;
-	background: var(--button-primary-bg);
+	background: linear-gradient(90deg, var(--editor-card-hover-border), var(--editor-focus-ring));
 	transition: width 220ms ease;
 }
 
 .cyberbrick-provisioning-progress-card.running {
 	border-style: dashed;
+	box-shadow: 0 0 0 1px var(--editor-focus-ring);
+}
+
+.cyberbrick-provisioning-progress-card.running .cyberbrick-provisioning-progress-track::after {
+	position: absolute;
+	inset: 0;
+	width: 42%;
+	content: '';
+	border-radius: inherit;
+	background: linear-gradient(90deg, transparent, var(--editor-focus-ring), transparent);
+	opacity: 0.48;
+	animation: cyberbrick-progress-sweep 1.25s ease-in-out infinite;
 }
 
 .cyberbrick-provisioning-progress-card.running .cyberbrick-provisioning-icon {
@@ -1509,8 +1522,16 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	border-color: var(--editor-status-ok-fg);
 }
 
+.cyberbrick-provisioning-progress-card.succeeded .cyberbrick-provisioning-progress-fill {
+	background: var(--editor-status-ok-fg);
+}
+
 .cyberbrick-provisioning-progress-card.failed {
 	border-color: var(--editor-status-error-fg);
+}
+
+.cyberbrick-provisioning-progress-card.failed .cyberbrick-provisioning-progress-fill {
+	background: var(--editor-status-error-fg);
 }
 
 .cyberbrick-provisioning-progress-card.failed .cyberbrick-provisioning-progress-track {
@@ -1534,6 +1555,16 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	}
 }
 
+@keyframes cyberbrick-progress-sweep {
+	from {
+		transform: translateX(-120%);
+	}
+
+	to {
+		transform: translateX(340%);
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.cyberbrick-provisioning-progress-fill {
 		transition: none;
@@ -1541,6 +1572,19 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 
 	.cyberbrick-provisioning-progress-card.running .cyberbrick-provisioning-icon {
 		animation: none;
+	}
+
+	.cyberbrick-provisioning-progress-card.running .cyberbrick-provisioning-progress-track::after {
+		width: 100%;
+		animation: none;
+		opacity: 0.24;
+	}
+}
+
+@media (forced-colors: active) {
+	.cyberbrick-provisioning-progress-fill,
+	.cyberbrick-provisioning-progress-card.running .cyberbrick-provisioning-progress-track::after {
+		background: Highlight;
 	}
 }
 

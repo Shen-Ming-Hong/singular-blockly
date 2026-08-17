@@ -37,7 +37,7 @@ Build with Blockly, preview generated code instantly, and upload through Platfor
 4. Select a board and build your program from the toolbox.
 5. Preview the generated code, then use the shared upload button.
 
-The first editor launch checks for a PlatformIO environment provider. VS Code installs `platformio.platformio-ide`; Open VSX environments such as VSCodium fall back to `pioarduino.pioarduino-ide`.
+After VS Code startup, Singular Blockly begins preparing its own verified Python, tested-range PlatformIO Core, and `mpremote` runtime in extension-owned storage. Opening the Blockly editor checks that runtime again without blocking editing. Arduino keeps the existing provider-first route: VS Code uses `platformio.platformio-ide`, while Open VSX environments such as VSCodium can use `pioarduino.pioarduino-ide`; the Singular Core is the fallback. A custom managed-runtime folder must be empty when first claimed, preventing repair or cleanup from adopting unrelated files.
 
 <details>
 <summary><b>Offline VSIX installation</b></summary>
@@ -55,7 +55,7 @@ code --install-extension singular-blockly-X.Y.Z.vsix
 <details>
 <summary><b>CyberBrick USB troubleshooting</b></summary>
 
-`mpremote` is installed automatically in the PlatformIO provider's Python environment. If that repair fails, resolve the provider's Python path first, then run `<PlatformIO Python> -m pip install --user --upgrade mpremote` in that environment and retry the diagnostics. A separate system-wide Python installation is not a normal prerequisite.
+`mpremote` is installed automatically in the Singular managed runtime, which does not require a system Python. Open **PlatformIO Diagnostic** to check or repair it. The PlatformIO provider environment remains a compatibility fallback and is never removed or cleaned by Singular Blockly.
 
 </details>
 
@@ -153,7 +153,7 @@ Wi-Fi passwords, OTA tokens, pairing secrets, and TXT passwords are stored in VS
 - VS Code 1.109.0 or later, or a compatible Open VSX editor such as VSCodium.
 - A workspace folder with write access.
 - Arduino / ESP32: PlatformIO provider and the C/C++ extension (`ms-vscode.cpptools`).
-- CyberBrick: USB for normal upload and first-time OTA setup; a shared local network only for OTA. The extension installs `mpremote` into the provider-managed Python environment when needed.
+- CyberBrick: USB for normal upload and first-time OTA setup; a shared local network only for OTA. The extension prepares `mpremote` in its own managed Python runtime after activation and rechecks it when the Blockly editor opens.
 - TXT Controller: network access to the controller, with Python 3 and `ftrobopy` available on the device.
 
 Node.js is not required for extension users.

@@ -7,9 +7,28 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import { ArduinoUploader, CommandExecutor, FileSystemInterface, StreamingCommandExecutor } from '../../services/arduinoUploader';
+import { ArduinoUploader, CommandExecutor, FileSystemInterface, StreamingCommandExecutor, findUnpinnedPlatformPackages } from '../../services/arduinoUploader';
 import { SettingsManager } from '../../services/settingsManager';
 import { ArduinoUploadRequest, ArduinoUploadProgress } from '../../types/arduino';
+import { CoreEnvironmentManager, CoreEnvironmentProvider } from '../../services/coreEnvironmentManager';
+import { CoreEnvironment, CoreEnvironmentId } from '../../types/coreEnvironment';
+import { PlatformioProcessError } from '../../services/platformioProcess';
+
+function coreEnvironment(id: CoreEnvironmentId): CoreEnvironment {
+	return {
+		id,
+		displaySource: id,
+		invocation: { command: `${id}-pio`, prefixArgs: [], env: { CORE_SOURCE: id }, source: id },
+		pythonPath: null,
+		mpremotePath: null,
+		storageRoot: id === 'managed' ? '/private/managed core' : null,
+		health: { status: 'healthy', checkedAt: null, packageStatus: 'unknown', failureClass: null },
+	};
+}
+
+function coreProvider(id: CoreEnvironmentId): CoreEnvironmentProvider {
+	return { id, resolve: async () => coreEnvironment(id) };
+}
 
 /**
  * 測試套件: ArduinoUploader
@@ -94,6 +113,19 @@ suite('ArduinoUploader Tests', () => {
 			if (originalPlatform) {
 				Object.defineProperty(process, 'platform', originalPlatform);
 			}
+		});
+	});
+
+	suite('Platform package policy', () => {
+		test('detects only known unpinned platform declarations', () => {
+			assert.deepStrictEqual(
+				findUnpinnedPlatformPackages('[env:one]\nplatform = atmelavr\n[env:two]\nplatform=espressif32 ; old'),
+				['atmelavr', 'espressif32']
+			);
+			assert.deepStrictEqual(
+				findUnpinnedPlatformPackages('platform = platformio/atmelavr@5.3.0\nplatform = https://example.invalid/custom.git'),
+				[]
+			);
 		});
 	});
 
@@ -292,6 +324,140 @@ suite('ArduinoUploader Tests', () => {
 	});
 
 	suite('upload() - Complete Flow', () => {
+		test('Does not spawn or write project files when the workspace is untrusted', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				undefined,
+				manager,
+				() => false
+			);
+
+			const result = await uploader.upload({ code: 'void setup() {}', board: 'uno' });
+
+			assert.strictEqual(result.success, false);
+			assert.strictEqual(result.error?.message, 'Workspace is not trusted');
+			sinon.assert.notCalled(mockStreamingExecutor.spawn as sinon.SinonStub);
+			sinon.assert.notCalled(mockFileSystem.writeFileSync as sinon.SinonStub);
+			sinon.assert.notCalled(mockSettingsManager.syncPlatformIOSettings);
+		});
+
+		test('Prepares packages and falls back once when the provider process cannot start', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			const commands: string[] = [];
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (command: string, args: string[]) => {
+				commands.push(`${command}:${args[0]}`);
+				if (command === 'provider-pio') {
+					throw new PlatformioProcessError('provider executable disappeared', false, 'ENOENT');
+				}
+				return { code: 0, stdout: 'success', stderr: '' };
+			});
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				undefined,
+				manager,
+				() => true
+			);
+
+			const result = await uploader.upload({ code: 'void setup() {}', board: 'uno' });
+
+			assert.strictEqual(result.success, true);
+			assert.deepStrictEqual(commands, ['provider-pio:pkg', 'managed-pio:pkg', 'managed-pio:run']);
+			assert.strictEqual(manager.getSelection('arduino', testWorkspacePath).selected, 'managed');
+		});
+
+		test('Falls back during package preparation when a started provider reports a local import failure', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			const commands: string[] = [];
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (command: string, args: string[]) => {
+				commands.push(`${command}:${args[0]}`);
+				if (command === 'provider-pio' && args[0] === 'pkg') {
+					throw new PlatformioProcessError("No module named 'platformio'", true, 1);
+				}
+				return { code: 0, stdout: 'success', stderr: '' };
+			});
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				undefined,
+				manager,
+				() => true
+			);
+
+			const result = await uploader.upload({ code: 'void setup() {}', board: 'uno' });
+
+			assert.strictEqual(result.success, true);
+			assert.deepStrictEqual(commands, ['provider-pio:pkg', 'managed-pio:pkg', 'managed-pio:run']);
+		});
+
+		test('Never retries another Core after the upload command has spawned', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			const commands: string[] = [];
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (command: string, args: string[]) => {
+				commands.push(`${command}:${args[0]}`);
+				if (args[0] === 'run') {
+					throw new PlatformioProcessError('serial upload failed', true, 1, '', 'Could not open port COM7');
+				}
+				return { code: 0, stdout: 'success', stderr: '' };
+			});
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				undefined,
+				manager,
+				() => true
+			);
+
+			const result = await uploader.upload({ code: 'void setup() {}', board: 'uno' });
+
+			assert.strictEqual(result.success, false);
+			assert.deepStrictEqual(commands, ['provider-pio:pkg', 'provider-pio:run']);
+		});
+
+		test('redacts the managed runtime root from upload results and progress errors', async () => {
+			const unavailableProvider: CoreEnvironmentProvider = { id: 'provider', resolve: async () => null };
+			const manager = new CoreEnvironmentManager(unavailableProvider, coreProvider('managed'));
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (_command: string, args: string[]) => {
+				if (args[0] === 'pkg') {return { code: 0, stdout: '', stderr: '' };}
+				throw new Error('spawn /private/managed core/bin/pio ENOENT');
+			});
+			const progress: ArduinoUploadProgress[] = [];
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				undefined,
+				manager,
+				() => true
+			);
+
+			const result = await uploader.upload(
+				{ code: 'void setup() {}', board: 'uno' },
+				update => progress.push(update)
+			);
+
+			assert.strictEqual(result.success, false);
+			assert.ok(JSON.stringify(result).includes('<managed-runtime>'));
+			assert.ok(!JSON.stringify(result).includes('/private/managed core'));
+			assert.ok(!JSON.stringify(progress).includes('/private/managed core'));
+		});
+
 		test('Should complete upload flow with device (upload mode)', async () => {
 			const request: ArduinoUploadRequest = {
 				code: '#include <Arduino.h>\nvoid setup() {}\nvoid loop() {}',

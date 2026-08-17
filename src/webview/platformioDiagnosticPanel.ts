@@ -82,6 +82,14 @@ interface PlatformioDiagnosticPanelRepairOptions {
 	historyStore?: RepairHistoryStoreLike;
 	aiPacketService?: AiRepairPacketServiceLike;
 	issueDraftService?: IssueDraftServiceLike;
+	managedRuntimeService?: {
+		repair(): Promise<unknown>;
+		cleanup(): Promise<{ downloads: number; staging: number; versions: number }>;
+		getStorageRoot(): string;
+	};
+	coreEnvironmentManager?: {
+		reset(): void;
+	};
 }
 
 // VSCode API 引用（可在測試中注入）
@@ -115,6 +123,9 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 	private readonly historyStore: RepairHistoryStoreLike;
 	private readonly aiPacketService: AiRepairPacketServiceLike;
 	private readonly issueDraftService: IssueDraftServiceLike;
+	private readonly managedRuntimeService?: PlatformioDiagnosticPanelRepairOptions['managedRuntimeService'];
+	private readonly coreEnvironmentManager?: PlatformioDiagnosticPanelRepairOptions['coreEnvironmentManager'];
+	private activeManagedRuntimeOperation = false;
 
 	constructor(
 		private readonly context: vscode.ExtensionContext,
@@ -123,11 +134,13 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		private readonly fileSystem: FileSystemLike = fs,
 		repairOptions: PlatformioDiagnosticPanelRepairOptions = {},
 	) {
-		this.currentState = this.diagnosticService.createLoadingState();
 		this.repairService = repairOptions.repairService ?? new PlatformioRepairService();
 		this.historyStore = repairOptions.historyStore ?? new PlatformioRepairHistoryStore(context.workspaceState);
 		this.aiPacketService = repairOptions.aiPacketService ?? new PlatformioAiRepairPacketService();
 		this.issueDraftService = repairOptions.issueDraftService ?? new PlatformioIssueDraftService();
+		this.managedRuntimeService = repairOptions.managedRuntimeService;
+		this.coreEnvironmentManager = repairOptions.coreEnvironmentManager;
+		this.currentState = this.withPanelActions(this.diagnosticService.createLoadingState());
 	}
 
 	async show(): Promise<void> {
@@ -167,7 +180,7 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			this.activeRepairPromise = null;
 			this.cancellationRequested = false;
 			this.currentFingerprint = null;
-			this.currentState = this.diagnosticService.createLoadingState();
+			this.currentState = this.withPanelActions(this.diagnosticService.createLoadingState());
 			this.localizedStringsPromise = null;
 			log('[platformio-diagnostic] panel disposed', 'info');
 		});
@@ -197,17 +210,23 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 				await this.postCurrentState();
 				return;
 			case 'platformioDiagnostic:retest':
-				if (this.activeRepairPromise) {
-					await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
-						'PLATFORMIO_REPAIR_RETEST_BLOCKED_ACTIVE_RUN',
-						'Repair is currently running. Wait for it to finish before retesting.'
-					));
+				if (this.hasActiveRepairOperation()) {
+					await this.postRepairBusyWarning();
 					return;
 				}
 				void this.runDiagnostics();
 				return;
 			case 'platformioDiagnostic:copySummary':
 				await this.copySummary();
+				return;
+			case 'platformioDiagnostic:repairManagedRuntime':
+				void this.repairManagedRuntime();
+				return;
+			case 'platformioDiagnostic:cleanupManagedRuntime':
+				void this.cleanupManagedRuntime();
+				return;
+			case 'platformioDiagnostic:revealManagedRuntime':
+				await this.revealManagedRuntime();
 				return;
 			case 'platformioDiagnostic:startAutoRepair':
 				await this.startAutoRepair(message.flowId);
@@ -230,6 +249,83 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			default:
 				return;
 		}
+	}
+
+	private async revealManagedRuntime(): Promise<void> {
+		if (!this.managedRuntimeService) {return;}
+		try {
+			const storageRoot = this.managedRuntimeService.getStorageRoot();
+			await vscodeApi.commands.executeCommand('revealFileInOS', vscodeApi.Uri.file(storageRoot));
+		} catch {
+			log('[platformio-diagnostic] managed runtime folder reveal failed', 'warn', { code: 'reveal-failed' });
+			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED',
+				'Unable to open the Singular Core folder. Finish initialization or repair the runtime, then try again.'
+			));
+		}
+	}
+
+	private async repairManagedRuntime(): Promise<void> {
+		if (!this.managedRuntimeService || this.activeManagedRuntimeOperation) {return;}
+		if (this.activeRepairPromise) {
+			await this.postRepairBusyWarning();
+			return;
+		}
+		this.activeManagedRuntimeOperation = true;
+		this.currentState = this.withPanelActions(this.currentState);
+		await this.postCurrentState();
+		await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+			'PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_STARTED',
+			'Repairing the managed runtime. Downloads may be required.'
+		));
+		try {
+			await this.managedRuntimeService.repair();
+			this.coreEnvironmentManager?.reset();
+			await this.postCopyResult('success', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS',
+				'Managed runtime repair completed.'
+			));
+		} catch (error) {
+			log('[platformio-diagnostic] managed runtime repair failed', 'error', { code: this.errorCode(error) });
+			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED',
+				'Managed runtime repair failed. Open the output log for redacted details.'
+			));
+		} finally {
+			this.activeManagedRuntimeOperation = false;
+		}
+		await this.runDiagnostics();
+	}
+
+	private async cleanupManagedRuntime(): Promise<void> {
+		if (!this.managedRuntimeService || this.activeManagedRuntimeOperation) {return;}
+		if (this.activeRepairPromise) {
+			await this.postRepairBusyWarning();
+			return;
+		}
+		this.activeManagedRuntimeOperation = true;
+		this.currentState = this.withPanelActions(this.currentState);
+		await this.postCurrentState();
+		try {
+			const result = await this.managedRuntimeService.cleanup();
+			this.coreEnvironmentManager?.reset();
+			await this.postCopyResult('success', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS',
+				'Managed cleanup completed: {0} downloads, {1} staging directories, and {2} old versions removed.',
+				result.downloads,
+				result.staging,
+				result.versions
+			));
+		} catch (error) {
+			log('[platformio-diagnostic] managed runtime cleanup failed', 'error', { code: this.errorCode(error) });
+			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
+				'PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED',
+				'Managed runtime cleanup failed. Unknown files were left untouched.'
+			));
+		} finally {
+			this.activeManagedRuntimeOperation = false;
+		}
+		await this.runDiagnostics();
 	}
 
 	private async createIssueDraft(): Promise<void> {
@@ -308,14 +404,14 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			return this.runningDiagnostics;
 		}
 
-		this.currentState = this.diagnosticService.createLoadingState();
+		this.currentState = this.withPanelActions(this.diagnosticService.createLoadingState());
 		await this.postState('platformioDiagnostic:loading');
 
 		this.runningDiagnostics = (async () => {
 			try {
 				const workspacePath = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath ?? null;
 				const session = await this.diagnosticService.collectDiagnostics(workspacePath);
-				this.currentState = this.diagnosticService.createReadyState(session);
+				this.currentState = this.withPanelActions(this.diagnosticService.createReadyState(session));
 				this.currentState.repairState = await this.composeRepairState(session);
 				await this.postState('platformioDiagnostic:render');
 			} catch (error) {
@@ -325,7 +421,7 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 					'Unable to complete PlatformIO diagnostics: {0}',
 					String(error)
 				);
-				this.currentState = this.diagnosticService.createErrorState(errorMessage);
+				this.currentState = this.withPanelActions(this.diagnosticService.createErrorState(errorMessage));
 				await this.postState('platformioDiagnostic:error');
 			}
 		})();
@@ -337,7 +433,43 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		}
 	}
 
+	private withPanelActions(state: PlatformioDiagnosticPanelState): PlatformioDiagnosticPanelState {
+		const managedActions = new Set<PanelActionId>([
+			'repairManagedRuntime',
+			'cleanupManagedRuntime',
+			'revealManagedRuntime',
+		]);
+		const availableActions: PanelActionId[] = state.availableActions.filter(action =>
+			!managedActions.has(action) || Boolean(this.managedRuntimeService && !this.activeManagedRuntimeOperation)
+		);
+		if (this.managedRuntimeService && !this.activeManagedRuntimeOperation && !availableActions.includes('revealManagedRuntime')) {
+			availableActions.push('revealManagedRuntime');
+		}
+		return { ...state, availableActions };
+	}
+
+	private errorCode(error: unknown): string {
+		return typeof error === 'object' && error !== null && 'code' in error
+			? String((error as { code?: unknown }).code ?? 'unknown')
+			: 'unknown';
+	}
+
+	private hasActiveRepairOperation(): boolean {
+		return this.activeManagedRuntimeOperation || Boolean(this.activeRepairPromise);
+	}
+
+	private async postRepairBusyWarning(): Promise<void> {
+		await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
+			'PLATFORMIO_REPAIR_RETEST_BLOCKED_ACTIVE_RUN',
+			'Repair is currently running. Wait for it to finish before retesting.'
+		));
+	}
+
 	private async startAutoRepair(flowId: string): Promise<void> {
+		if (this.activeManagedRuntimeOperation) {
+			await this.postRepairBusyWarning();
+			return;
+		}
 		if (this.activeRepairPromise) {
 			await this.postCopyResult('warning', await this.localeService.getLocalizedMessage(
 				'PLATFORMIO_REPAIR_ALREADY_RUNNING',
@@ -366,6 +498,10 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 	}
 
 	private async confirmAutoRepair(flowId: string): Promise<void> {
+		if (this.activeManagedRuntimeOperation) {
+			await this.postRepairBusyWarning();
+			return;
+		}
 		if (this.activeRepairPromise || !this.currentState.session) {
 			return;
 		}
@@ -629,6 +765,9 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			const keyByAction: Record<PanelActionId, string> = {
 				retest: 'PLATFORMIO_DIAGNOSTIC_ACTION_RETEST',
 				copySummary: 'PLATFORMIO_DIAGNOSTIC_ACTION_COPY_SUMMARY',
+				repairManagedRuntime: 'PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME',
+				cleanupManagedRuntime: 'PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME',
+				revealManagedRuntime: 'PLATFORMIO_DIAGNOSTIC_ACTION_REVEAL_MANAGED_RUNTIME',
 				startAutoRepair: 'PLATFORMIO_REPAIR_ACTION_START_AUTO_REPAIR',
 				confirmAutoRepair: 'PLATFORMIO_REPAIR_ACTION_CONFIRM_AUTO_REPAIR',
 				cancelAutoRepair: 'PLATFORMIO_REPAIR_ACTION_CANCEL_AUTO_REPAIR',
@@ -695,6 +834,14 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			errorTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_ERROR_TITLE', 'Diagnostic error'),
 			summaryTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_SUMMARY_TITLE', 'Summary'),
 			toolsTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_TOOLS_TITLE', 'Resolved tools'),
+			coreEnvironmentsTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_CORE_ENVIRONMENTS_TITLE', 'Core environments'),
+			providerCoreLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_PROVIDER_CORE', 'PlatformIO extension Core'),
+			managedCoreLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_MANAGED_CORE', 'Singular managed Core'),
+			arduinoSelectionLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_ARDUINO_SELECTION', 'Arduino routing'),
+			pythonSelectionLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION', 'Python routing'),
+			packageStatusLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS', 'Package status'),
+			storageUsageLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE', 'Storage usage'),
+			fallbackUsedLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_FALLBACK_USED', 'Fallback used'),
 			scopeTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_SCOPE_TITLE', 'Scope'),
 			workspaceLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_WORKSPACE', 'Workspace'),
 			requestedAtLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_REQUESTED_AT', 'Generated at'),
@@ -770,6 +917,9 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			actions: {
 				retest: await actionLabel('retest', 'Retest'),
 				copySummary: await actionLabel('copySummary', 'Copy summary'),
+				repairManagedRuntime: await actionLabel('repairManagedRuntime', 'Repair managed runtime'),
+				cleanupManagedRuntime: await actionLabel('cleanupManagedRuntime', 'Clean managed files'),
+				revealManagedRuntime: await actionLabel('revealManagedRuntime', 'Open Singular Core folder'),
 				startAutoRepair: await actionLabel('startAutoRepair', 'Auto repair'),
 				confirmAutoRepair: await actionLabel('confirmAutoRepair', 'Confirm repair'),
 				cancelAutoRepair: await actionLabel('cancelAutoRepair', 'Cancel'),

@@ -28,6 +28,9 @@ export type DiagnosticRunState = 'idle' | 'loading' | 'ready' | 'error';
 export type PanelActionId =
 	| 'retest'
 	| 'copySummary'
+	| 'repairManagedRuntime'
+	| 'cleanupManagedRuntime'
+	| 'revealManagedRuntime'
 	| 'startAutoRepair'
 	| 'confirmAutoRepair'
 	| 'cancelAutoRepair'
@@ -122,6 +125,28 @@ export interface PlatformioDiagnosticEnvironment {
 	homeDir?: string;
 }
 
+export interface CoreDiagnosticEnvironment {
+	id: 'provider' | 'managed';
+	status: import('./coreEnvironment').CoreHealthStatus;
+	version: string | null;
+	storageSummary: string | null;
+	storageUsageBytes: number | null;
+	packageStatus: import('./coreEnvironment').PackageHealthStatus;
+	failureClass: import('./coreEnvironment').CoreFailureClass | null;
+	reason: string;
+}
+
+export interface CoreDiagnosticSummary {
+	environments: {
+		provider: CoreDiagnosticEnvironment;
+		managed: CoreDiagnosticEnvironment;
+	};
+	selection: {
+		arduino: import('./coreEnvironment').WorkloadSelection;
+		python: import('./coreEnvironment').WorkloadSelection;
+	};
+}
+
 export interface PlatformioDiagnosticSession {
 	sessionId?: string;
 	requestedAt: string;
@@ -137,6 +162,7 @@ export interface PlatformioDiagnosticSession {
 	scopeNotice: string;
 	settingsEvidence?: OfficialPlatformioSettingsEvidence;
 	environment?: PlatformioDiagnosticEnvironment;
+	coreDiagnostics?: CoreDiagnosticSummary;
 }
 
 export interface PlatformioDiagnosticPanelState {
@@ -299,6 +325,14 @@ export interface PlatformioDiagnosticLocalizedStrings {
 	errorTitle: string;
 	summaryTitle: string;
 	toolsTitle: string;
+	coreEnvironmentsTitle: string;
+	providerCoreLabel: string;
+	managedCoreLabel: string;
+	arduinoSelectionLabel: string;
+	pythonSelectionLabel: string;
+	packageStatusLabel: string;
+	storageUsageLabel: string;
+	fallbackUsedLabel: string;
 	scopeTitle: string;
 	workspaceLabel: string;
 	requestedAtLabel: string;
@@ -380,6 +414,18 @@ export interface PlatformioDiagnosticCopySummaryMessage {
 	command: 'platformioDiagnostic:copySummary';
 }
 
+export interface PlatformioDiagnosticRepairManagedRuntimeMessage {
+	command: 'platformioDiagnostic:repairManagedRuntime';
+}
+
+export interface PlatformioDiagnosticCleanupManagedRuntimeMessage {
+	command: 'platformioDiagnostic:cleanupManagedRuntime';
+}
+
+export interface PlatformioDiagnosticRevealManagedRuntimeMessage {
+	command: 'platformioDiagnostic:revealManagedRuntime';
+}
+
 export interface PlatformioDiagnosticStartAutoRepairMessage {
 	command: 'platformioDiagnostic:startAutoRepair';
 	flowId: string;
@@ -411,6 +457,9 @@ export type PlatformioDiagnosticWebviewToExtensionMessage =
 	| PlatformioDiagnosticReadyMessage
 	| PlatformioDiagnosticRetestMessage
 	| PlatformioDiagnosticCopySummaryMessage
+	| PlatformioDiagnosticRepairManagedRuntimeMessage
+	| PlatformioDiagnosticCleanupManagedRuntimeMessage
+	| PlatformioDiagnosticRevealManagedRuntimeMessage
 	| PlatformioDiagnosticStartAutoRepairMessage
 	| PlatformioDiagnosticConfirmAutoRepairMessage
 	| PlatformioDiagnosticCancelAutoRepairMessage

@@ -100,7 +100,7 @@ function createState(runState: PlatformioDiagnosticPanelState['runState'], sessi
 		runState,
 		session,
 		topLevelError,
-		availableActions: ['retest', 'copySummary'],
+		availableActions: ['retest', 'copySummary', 'repairManagedRuntime', 'cleanupManagedRuntime'],
 		sectionOrder: ['summary', 'tools', 'repair', 'exports', 'scope'],
 	};
 }
@@ -159,6 +159,8 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 	let historyStoreStub: any;
 	let aiPacketServiceStub: any;
 	let issueDraftServiceStub: any;
+	let managedRuntimeServiceStub: any;
+	let coreEnvironmentManagerStub: any;
 	let panelManager: PlatformioDiagnosticPanel;
 
 	setup(() => {
@@ -247,6 +249,12 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 				redactionWarning: 'Review privacy checklist',
 			}),
 		};
+		managedRuntimeServiceStub = {
+			repair: sinon.stub().resolves({}),
+			cleanup: sinon.stub().resolves({ downloads: 1, staging: 2, versions: 3 }),
+			getStorageRoot: sinon.stub().returns('/managed/runtime'),
+		};
+		coreEnvironmentManagerStub = { reset: sinon.stub() };
 
 		panelManager = new PlatformioDiagnosticPanel(
 			{ extensionPath: '/mock/extension', subscriptions: [] } as any,
@@ -263,6 +271,8 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 				historyStore: historyStoreStub,
 				aiPacketService: aiPacketServiceStub,
 				issueDraftService: issueDraftServiceStub,
+				managedRuntimeService: managedRuntimeServiceStub,
+				coreEnvironmentManager: coreEnvironmentManagerStub,
 			}
 		);
 	});
@@ -296,9 +306,80 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		const commands = panel.webview.postMessage.getCalls().map((call: any) => call.args[0].command);
 		assert.deepStrictEqual(commands.slice(0, 2), ['platformioDiagnostic:loading', 'platformioDiagnostic:render']);
 		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 1, 'Initial ready should run diagnostics once');
+		const renderMessage = panel.webview.postMessage
+			.getCalls()
+			.map((call: any) => call.args[0])
+			.find((message: any) => message.command === 'platformioDiagnostic:render');
+		assert.ok(
+			renderMessage.panelState.availableActions.includes('revealManagedRuntime'),
+			'Managed runtime reveal action should be available when the service is configured'
+		);
 
 		await panelManager.show();
 		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 1, 'Revealing the panel should not rerun diagnostics');
+	});
+
+	test('removes every managed runtime action when the service is unavailable', async () => {
+		const withoutManagedRuntime = new PlatformioDiagnosticPanel(
+			{ extensionPath: '/mock/extension', subscriptions: [] } as any,
+			createLocaleServiceStub() as any,
+			serviceStub,
+			{
+				promises: {
+					readFile: async () => '<html><link href="{cssUri}"><script src="{jsUri}"></script>{panelTitle}</html>',
+				},
+			} as any,
+			{
+				repairService: repairServiceStub,
+				historyStore: historyStoreStub,
+				aiPacketService: aiPacketServiceStub,
+				issueDraftService: issueDraftServiceStub,
+			}
+		);
+		await withoutManagedRuntime.show();
+		const panel = withoutManagedRuntime.getPanel() as any;
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:ready' });
+		await flushMicrotasks();
+		await flushMicrotasks();
+
+		const render = panel.webview.postMessage.getCalls()
+			.map((call: any) => call.args[0])
+			.find((message: any) => message.command === 'platformioDiagnostic:render');
+		assert.ok(!render.panelState.availableActions.includes('repairManagedRuntime'));
+		assert.ok(!render.panelState.availableActions.includes('cleanupManagedRuntime'));
+		assert.ok(!render.panelState.availableActions.includes('revealManagedRuntime'));
+		withoutManagedRuntime.dispose();
+	});
+
+	test('revealManagedRuntime opens the host folder without exposing its path to the webview', async () => {
+		await panelManager.show();
+		const panel = panelManager.getPanel() as any;
+		panel.webview.postMessage.resetHistory();
+
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:revealManagedRuntime' });
+
+		assert.ok(managedRuntimeServiceStub.getStorageRoot.calledOnce);
+		assert.ok(vscodeMock.commands.executeCommand.calledOnceWith(
+			'revealFileInOS',
+			sinon.match((uri: any) => uri.fsPath === '/managed/runtime')
+		));
+		const postedPayloads = panel.webview.postMessage.getCalls().map((call: any) => call.args[0]);
+		assert.ok(!JSON.stringify(postedPayloads).includes('/managed/runtime'));
+	});
+
+	test('revealManagedRuntime reports a path-free error when the host cannot open the folder', async () => {
+		vscodeMock.commands.executeCommand.rejects(new Error('failed for /managed/runtime'));
+		await panelManager.show();
+		const panel = panelManager.getPanel() as any;
+
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:revealManagedRuntime' });
+
+		assert.ok(panel.webview.postMessage.calledWithMatch({
+			command: 'platformioDiagnostic:copyResult',
+			status: 'error',
+		}));
+		const postedPayloads = panel.webview.postMessage.getCalls().map((call: any) => call.args[0]);
+		assert.ok(!JSON.stringify(postedPayloads).includes('/managed/runtime'));
 	});
 
 	test('copySummary writes clipboard text and reports success', async () => {
@@ -318,6 +399,78 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 				status: 'success',
 			})
 		);
+	});
+
+	test('repairManagedRuntime repairs, resets cached selection, and reruns read-only diagnostics', async () => {
+		await panelManager.show();
+		const panel = panelManager.getPanel() as any;
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:ready' });
+		await flushMicrotasks();
+		await flushMicrotasks();
+
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:repairManagedRuntime' });
+		await flushMicrotasks();
+		await flushMicrotasks();
+
+		assert.ok(managedRuntimeServiceStub.repair.calledOnce);
+		assert.ok(coreEnvironmentManagerStub.reset.calledOnce);
+		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 2);
+		assert.ok(panel.webview.postMessage.calledWithMatch({ command: 'platformioDiagnostic:copyResult', status: 'success' }));
+	});
+
+	test('cleanupManagedRuntime reports owned cleanup counts and reruns diagnostics', async () => {
+		await panelManager.show();
+		const panel = panelManager.getPanel() as any;
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:ready' });
+		await flushMicrotasks();
+		await flushMicrotasks();
+
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:cleanupManagedRuntime' });
+		await flushMicrotasks();
+		await flushMicrotasks();
+
+		assert.ok(managedRuntimeServiceStub.cleanup.calledOnce);
+		assert.ok(coreEnvironmentManagerStub.reset.calledOnce);
+		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 2);
+		assert.ok(panel.webview.postMessage.calledWithMatch({
+			command: 'platformioDiagnostic:copyResult',
+			status: 'success',
+			message: sinon.match(/1 downloads, 2 staging directories, and 3 old versions/),
+		}));
+	});
+
+	test('managed runtime repair blocks retest, cleanup, and automatic repair until it settles', async () => {
+		let resolveRepair!: () => void;
+		managedRuntimeServiceStub.repair.returns(new Promise<void>(resolve => {
+			resolveRepair = resolve;
+		}));
+
+		await panelManager.show();
+		const panel = panelManager.getPanel() as any;
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:ready' });
+		await flushMicrotasks();
+		await flushMicrotasks();
+
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:repairManagedRuntime' });
+		await flushMicrotasks();
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:retest' });
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:cleanupManagedRuntime' });
+		await panel.webview.dispatchMessage({
+			command: 'platformioDiagnostic:startAutoRepair',
+			flowId: 'repair-mpremote-in-detected-python',
+		});
+
+		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 1, 'Retest must wait for managed repair');
+		assert.strictEqual(managedRuntimeServiceStub.cleanup.callCount, 0, 'Cleanup must not overlap managed repair');
+		assert.strictEqual(repairServiceStub.executeRepairFlow.callCount, 0, 'Automatic repair must not overlap managed repair');
+		assert.ok(panel.webview.postMessage.calledWithMatch({
+			command: 'platformioDiagnostic:copyResult',
+			status: 'warning',
+		}));
+
+		resolveRepair();
+		await flushMicrotasks();
+		await flushMicrotasks();
 	});
 
 	test('retest message reruns diagnostics and posts a fresh render payload', async () => {
@@ -436,8 +589,10 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 			panelState: { repairState: { activeRun: { status: 'running' } } },
 		}), 'Panel should render an active repair run while repair is in progress');
 		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:retest' });
+		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:repairManagedRuntime' });
 
 		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 1, 'Retest should not start while repair is active');
+		assert.strictEqual(managedRuntimeServiceStub.repair.callCount, 0, 'Managed repair should not overlap automatic repair');
 		resolveRun({
 			runId: 'run-1',
 			flowId: 'repair-mpremote-in-detected-python',
@@ -541,5 +696,6 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		assert.ok(script.includes('event.target instanceof Element'), 'Repair action clicks must not call closest on text nodes');
 		assert.ok(script.includes('elements.feedbackBanner.textContent = message;'), 'Feedback messages must use textContent');
 		assert.ok(script.includes('elements.exportNotice.textContent = notice;'), 'Export notices must use textContent');
+		assert.ok(script.includes("vscode.postMessage({ command: 'platformioDiagnostic:revealManagedRuntime' });"), 'Managed runtime reveal must use a fixed command without a webview-provided path');
 	});
 });

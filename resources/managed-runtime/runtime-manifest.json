@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "runtimeVersion": "2026.08.1",
+  "pythonVersion": "3.11.16",
+  "installer": {
+    "url": "https://raw.githubusercontent.com/platformio/platformio-core-installer/30e73f7e60283a653b9bb09205f91b6b9175a135/get-platformio.py",
+    "sha256": "068d5dca983b22ed36a00dea7d42e58b646f0ac495885892f5746357f39a0470",
+    "size": 935208,
+    "license": "Apache-2.0",
+    "source": "https://github.com/platformio/platformio-core-installer/tree/30e73f7e60283a653b9bb09205f91b6b9175a135"
+  },
+  "platformio": {
+    "channel": "stable",
+    "testedVersionRange": ">=6.1.0 <7.0.0"
+  },
+  "mpremoteVersion": "1.28.0",
+  "platformPackages": {
+    "atmelavr": "platformio/atmelavr@5.3.0",
+    "espressif32": "platformio/espressif32@7.0.1"
+  },
+  "artifacts": [
+    {
+      "id": "cpython-3.11.16-20260814-darwin-x64",
+      "platform": "darwin",
+      "arch": "x64",
+      "libc": null,
+      "support": "stable",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.11.16%2B20260814-x86_64-apple-darwin-install_only.tar.gz",
+      "sha256": "d9117d31251ba5c9a81ac7ad7c00dab1d5228e261eb0cda94550b4da1cc73bd1",
+      "size": 27155089,
+      "archiveFormat": "tar.gz",
+      "pythonRelativePath": "python/bin/python3.11",
+      "license": "MIT",
+      "source": "https://github.com/astral-sh/python-build-standalone/releases/tag/20260814"
+    },
+    {
+      "id": "cpython-3.11.16-20260814-darwin-arm64",
+      "platform": "darwin",
+      "arch": "arm64",
+      "libc": null,
+      "support": "release-candidate",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.11.16%2B20260814-aarch64-apple-darwin-install_only.tar.gz",
+      "sha256": "fcba9f3f676c83e07225e38116649f0c6eb94cb4fcc166632cf92769462b6e39",
+      "size": 27248161,
+      "archiveFormat": "tar.gz",
+      "pythonRelativePath": "python/bin/python3.11",
+      "license": "MIT",
+      "source": "https://github.com/astral-sh/python-build-standalone/releases/tag/20260814"
+    },
+    {
+      "id": "cpython-3.11.16-20260814-linux-x64",
+      "platform": "linux",
+      "arch": "x64",
+      "libc": "glibc",
+      "support": "stable",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.11.16%2B20260814-x86_64-unknown-linux-gnu-install_only.tar.gz",
+      "sha256": "33994fad90145ba559ebbe8a18d69fa7e56653502f7ba14ba07199b52cde3775",
+      "size": 49136084,
+      "archiveFormat": "tar.gz",
+      "pythonRelativePath": "python/bin/python3.11",
+      "license": "MIT",
+      "source": "https://github.com/astral-sh/python-build-standalone/releases/tag/20260814"
+    },
+    {
+      "id": "cpython-3.11.16-20260814-linux-arm64",
+      "platform": "linux",
+      "arch": "arm64",
+      "libc": "glibc",
+      "support": "release-candidate",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.11.16%2B20260814-aarch64-unknown-linux-gnu-install_only.tar.gz",
+      "sha256": "9142c12dd3559eaac58a18d8905b99a293979d5e5a1b4fb5cf4cebbf82ef6f33",
+      "size": 49124197,
+      "archiveFormat": "tar.gz",
+      "pythonRelativePath": "python/bin/python3.11",
+      "license": "MIT",
+      "source": "https://github.com/astral-sh/python-build-standalone/releases/tag/20260814"
+    },
+    {
+      "id": "cpython-3.11.16-20260814-win32-x64",
+      "platform": "win32",
+      "arch": "x64",
+      "libc": null,
+      "support": "stable",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.11.16%2B20260814-x86_64-pc-windows-msvc-install_only.tar.gz",
+      "sha256": "ffaee1e94c8488f833473e56e1c980ca1a58d91126d21ddf0f6ba052e69cf511",
+      "size": 48397940,
+      "archiveFormat": "tar.gz",
+      "pythonRelativePath": "python/python.exe",
+      "license": "MIT",
+      "source": "https://github.com/astral-sh/python-build-standalone/releases/tag/20260814"
+    },
+    {
+      "id": "cpython-3.11.16-20260814-win32-arm64",
+      "platform": "win32",
+      "arch": "arm64",
+      "libc": null,
+      "support": "release-candidate",
+      "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260814/cpython-3.11.16%2B20260814-aarch64-pc-windows-msvc-install_only.tar.gz",
+      "sha256": "450cbf91ff0dbfce7fa1d40ba19103187852076496b6153e528fa6dc43a88a58",
+      "size": 45271587,
+      "archiveFormat": "tar.gz",
+      "pythonRelativePath": "python/python.exe",
+      "license": "MIT",
+      "source": "https://github.com/astral-sh/python-build-standalone/releases/tag/20260814"
+    }
+  ]
+}

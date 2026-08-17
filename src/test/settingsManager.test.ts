@@ -43,6 +43,13 @@ describe('Settings Manager', () => {
 		assert.strictEqual(result, 'default');
 	});
 
+	it('should not create .vscode while reading a missing setting', async () => {
+		const result = await settingsManager.readSetting('test.setting', 'default');
+
+		assert.strictEqual(result, 'default');
+		assert.strictEqual(fsMock.directories.has(path.join(workspacePath, '.vscode').replace(/\\/g, '/')), false);
+	});
+
 	it('should read existing settings', async () => {
 		// 設定包含測試設定的設定檔
 		fsMock.addFile(

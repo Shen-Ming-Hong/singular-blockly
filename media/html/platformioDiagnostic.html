@@ -24,6 +24,8 @@
             <div class="panel-actions">
                 <button id="retestButton" class="primary-btn" type="button">Retest</button>
                 <button id="copySummaryButton" class="secondary-btn" type="button">Copy summary</button>
+                <button id="repairManagedRuntimeButton" class="secondary-btn" type="button">Repair managed runtime</button>
+                <button id="cleanupManagedRuntimeButton" class="secondary-btn" type="button">Clean managed files</button>
                 <button id="autoRepairButton" class="secondary-btn" type="button">Auto repair</button>
                 <button id="copyAiRepairPacketButton" class="secondary-btn" type="button">Copy AI repair
                     summary</button>
@@ -66,6 +68,13 @@
                         </div>
                     </dl>
                 </div>
+            </section>
+
+            <section class="card core-environments-card">
+                <div class="section-header">
+                    <h2 id="coreEnvironmentsTitle">Core environments</h2>
+                </div>
+                <div id="coreEnvironmentList" class="tool-list"></div>
             </section>
 
             <section class="card tools-card">

@@ -108,12 +108,37 @@ Extension Host (Node.js)           WebView (Browser Context)
     ├── projectSkillService.ts # 專案 Skill 安裝／更新交易
     ├── blockContractService.ts # 正式積木契約讀取
     ├── workspaceCandidateService.ts # 外部候選隔離／復原
+    ├── managedRuntimeInitializationCoordinator.ts # activation／editor-open 預熱去重
+    ├── managedRuntimeService.ts # 自有 Python／PlatformIO／mpremote ensure、診斷與修復
+    ├── managedRuntimeInstaller.ts # checksum、staging、lock、健康檢查與原子提交
+    ├── coreEnvironmentManager.ts # Provider／Managed 雙 Core 路由與安全 fallback
     ├── fileService.ts        # 檔案 I/O
     ├── settingsManager.ts    # VSCode/PlatformIO 設定
     ├── localeService.ts      # i18n 訊息載入
     ├── workspaceValidator.ts # 專案類型偵測
     └── logging.ts            # 統一日誌
 ```
+
+## 受管理 Runtime 與雙 Core
+
+Extension 的 `onStartupFinished` activation 完成後，`ManagedRuntimeInitializationCoordinator` 先讀取本機 `current.json`；缺失或損壞時在背景呼叫冪等 `ensureReady()`，不等待第一次上傳。使用者每次從活動列或命令開啟 Blockly 編輯器都會再次檢查；同視窗共用單一 in-flight Promise，跨視窗由 install lock 序列化。背景網路失敗不阻止編輯器開啟，上傳器仍自行 `ensureReady()` 作最後防線。
+
+受管理環境位於 Extension `globalStorageUri` 或經驗證的 machine-scoped 本機路徑。根目錄必須為空目錄或已有有效 Singular ownership marker；安裝、修復與 cleanup 共用同一把跨視窗 lock。系統使用固定 SHA-256 manifest 下載 CPython 與 PlatformIO installer，以 pip constraint 限制 PlatformIO 受測版本範圍，完成 staging transaction、工具 probe 與原子 `current.json` 後才視為 ready。它不使用系統 Python，也不修改 provider penv。
+
+工作負載路由固定如下：
+
+| 工作負載 | Primary | Fallback |
+|----------|---------|----------|
+| Arduino build／upload／monitor | PlatformIO／PIOArduino Provider Core | Singular managed Core |
+| CyberBrick USB／Python／mpremote | Singular managed Core | Provider Core |
+
+只有找不到 executable、spawn、Python import、權限或本機 store 損壞等「專案程序啟動前」錯誤可 fallback 一次。編譯、project config、DNS、proxy、TLS、registry、裝置、serial、取消或 upload spawn 後錯誤都不換 Core。
+
+## 編輯器開啟與 Workspace 寫入授權
+
+`WebViewManager.createAndShowWebView()` 以 `opened`、`cancelled`、`no-workspace` 回報開啟結果。對一般資料夾，`WorkspaceValidator` 的專案辨識與偏好查詢發生在任何 workspace-local 寫入之前；`SettingsManager.readSetting()` 不得為缺少的設定檔建立 `.vscode/`。只有 `opened` 代表既有 Blockly 專案或使用者已明確繼續，呼叫端才可初始化設定與強制安裝 Project Skill。
+
+因此 managed Core 的 extension-owned 背景初始化可以在 activation 進行，但不代表一般資料夾已同意成為專案。`cancelled` 與 `no-workspace` 都不得建立 `.agents/`、`.claude/`、`blockly/` 或 `.vscode/`；activation 與 workspace-folder change 不具有 Skill 安裝入口。已有 `blockly/` marker 的專案開啟 editor 時不重複詢問，並在 `opened` 後靜默維護 Skill。
 
 ---
 

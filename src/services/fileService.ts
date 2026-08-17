@@ -9,6 +9,14 @@ import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { log } from './logging';
 
+function fileErrorDetails(error: unknown): { code: string } {
+	return {
+		code: typeof error === 'object' && error !== null && 'code' in error
+			? String((error as NodeJS.ErrnoException).code ?? 'unknown')
+			: 'unknown',
+	};
+}
+
 /**
  * 檔案系統介面（用於依賴注入）
  */
@@ -22,8 +30,11 @@ export interface FileSystem {
 		unlink(path: string): Promise<void>;
 		readdir(path: string): Promise<string[]>;
 		stat(path: string): Promise<fs.Stats>;
+		realpath?(path: string): Promise<string>;
 		rename?(oldPath: string, newPath: string): Promise<void>;
 		lstat?(path: string): Promise<fs.Stats>;
+		rm?(path: string, options?: fs.RmOptions): Promise<void>;
+		open?(path: string, flags: string): Promise<fs.promises.FileHandle>;
 	};
 }
 
@@ -84,6 +95,36 @@ export class FileService {
 		}
 	}
 
+	/** Reject symbolic links in the complete root chain without writing anything. */
+	async validateRootPathSafety(): Promise<void> {
+		if (this.fs.promises.lstat) {
+			const root = path.parse(this.workspaceRoot).root;
+			const segments = path.relative(root, this.workspaceRoot).split(path.sep).filter(Boolean);
+			let current = root;
+			for (const segment of segments) {
+				current = path.join(current, segment);
+				if (!this.fs.existsSync(current)) {continue;}
+				const stats = await this.fs.promises.lstat(current);
+				if (stats.isSymbolicLink()) {
+					throw new Error('Managed storage cannot contain symbolic-link path segments');
+				}
+			}
+		}
+	}
+
+	/** Validate the complete managed root chain and prove that it is writable. */
+	async validateWritableRoot(): Promise<void> {
+		await this.validateRootPathSafety();
+		await this.createDirectory('.');
+		const probe = `.write-probe-${process.pid}-${randomUUID()}`;
+		await this.writeFileAtomic(probe, 'managed-runtime-write-probe');
+		const result = await this.readFile(probe);
+		if (result !== 'managed-runtime-write-probe') {
+			throw new Error('Managed storage write verification failed');
+		}
+		await this.deleteFile(probe);
+	}
+
 	/**
 	 * 寫入檔案內容，如果目錄不存在會自動建立
 	 * @param relativePath 相對於工作區的檔案路徑
@@ -102,7 +143,7 @@ export class FileService {
 			await this.fs.promises.writeFile(fullPath, content);
 			log(`File written successfully: ${relativePath}`, 'info');
 		} catch (error) {
-			log(`Failed to write file: ${relativePath}`, 'error', error);
+			log(`Failed to write file: ${relativePath}`, 'error', fileErrorDetails(error));
 			throw error;
 		}
 	}
@@ -125,7 +166,7 @@ export class FileService {
 			const content = await this.fs.promises.readFile(fullPath, 'utf8');
 			return typeof content === 'string' ? content : content.toString('utf8');
 		} catch (error) {
-			log(`Failed to read file: ${relativePath}`, 'error', error);
+			log(`Failed to read file: ${relativePath}`, 'error', fileErrorDetails(error));
 			return defaultContent;
 		}
 	}
@@ -154,7 +195,7 @@ export class FileService {
 				log(`Directory created: ${relativePath}`, 'info');
 			}
 		} catch (error) {
-			log(`Failed to create directory: ${relativePath}`, 'error', error);
+			log(`Failed to create directory: ${relativePath}`, 'error', fileErrorDetails(error));
 			throw error;
 		}
 	}
@@ -180,7 +221,7 @@ export class FileService {
 			await this.fs.promises.copyFile(sourcePath, destPath);
 			log(`File copied from ${sourceRelativePath} to ${destRelativePath}`, 'info');
 		} catch (error) {
-			log(`Failed to copy file from ${sourceRelativePath} to ${destRelativePath}`, 'error', error);
+			log(`Failed to copy file from ${sourceRelativePath} to ${destRelativePath}`, 'error', fileErrorDetails(error));
 			throw error;
 		}
 	}
@@ -199,7 +240,7 @@ export class FileService {
 				log(`File deleted: ${relativePath}`, 'info');
 			}
 		} catch (error) {
-			log(`Failed to delete file: ${relativePath}`, 'error', error);
+			log(`Failed to delete file: ${relativePath}`, 'error', fileErrorDetails(error));
 			throw error;
 		}
 	}
@@ -220,7 +261,7 @@ export class FileService {
 
 			return await this.fs.promises.readdir(fullPath);
 		} catch (error) {
-			log(`Failed to list files in directory: ${relativePath}`, 'error', error);
+			log(`Failed to list files in directory: ${relativePath}`, 'error', fileErrorDetails(error));
 			return [];
 		}
 	}
@@ -241,7 +282,7 @@ export class FileService {
 
 			return JSON.parse(content) as T;
 		} catch (error) {
-			log(`Failed to parse JSON file: ${relativePath}`, 'error', error);
+			log(`Failed to parse JSON file: ${relativePath}`, 'error', fileErrorDetails(error));
 			return defaultValue;
 		}
 	}
@@ -258,7 +299,7 @@ export class FileService {
 
 			await this.writeFile(relativePath, jsonString);
 		} catch (error) {
-			log(`Failed to write JSON file: ${relativePath}`, 'error', error);
+			log(`Failed to write JSON file: ${relativePath}`, 'error', fileErrorDetails(error));
 			throw error;
 		}
 	}
@@ -269,6 +310,42 @@ export class FileService {
 		await this.assertNoSymlinkSegments(fullPath, true);
 		const content = await this.fs.promises.readFile(fullPath);
 		return Buffer.isBuffer(content) ? Buffer.from(content) : Buffer.from(content, 'utf8');
+	}
+
+	/** Resolve a file through symlinks only when its final target remains under this root. */
+	async resolveContainedRealPath(relativePath: string): Promise<string> {
+		const fullPath = this.resolveSafePath(relativePath);
+		if (!this.fs.existsSync(fullPath)) {
+			throw new Error(`Managed file does not exist: ${relativePath}`);
+		}
+		if (!this.fs.promises.realpath) {
+			await this.assertNoSymlinkSegments(fullPath, true);
+			return fullPath;
+		}
+		const realRoot = path.resolve(await this.fs.promises.realpath(this.workspaceRoot));
+		const realPath = path.resolve(await this.fs.promises.realpath(fullPath));
+		const prefix = realRoot.endsWith(path.sep) ? realRoot : `${realRoot}${path.sep}`;
+		if (realPath !== realRoot && !realPath.startsWith(prefix)) {
+			throw new Error(`Managed file resolves outside its root: ${relativePath}`);
+		}
+		return realPath;
+	}
+
+	/** Validate a contained real target while preserving the original path semantics (for Python venvs). */
+	async resolveValidatedContainedPath(relativePath: string): Promise<string> {
+		await this.resolveContainedRealPath(relativePath);
+		return this.resolveSafePath(relativePath);
+	}
+
+	/** Stat a managed file while allowing only root-contained symlink targets. */
+	async getContainedFileStats(relativePath: string): Promise<fs.Stats | null> {
+		try {
+			const realPath = await this.resolveContainedRealPath(relativePath);
+			return await this.fs.promises.stat(realPath);
+		} catch (error) {
+			log(`Failed to inspect contained managed file: ${relativePath}`, 'error', fileErrorDetails(error));
+			return null;
+		}
 	}
 
 	/** Write exact bytes through the normal workspace containment checks. */
@@ -323,6 +400,55 @@ export class FileService {
 		await this.fs.promises.rename(source, destination);
 	}
 
+	/** Create a file only when it does not already exist. */
+	async createExclusiveFile(relativePath: string, content: string): Promise<boolean> {
+		if (!this.fs.promises.open) {
+			throw new Error('Exclusive file creation is unavailable in the configured file system');
+		}
+		const fullPath = this.resolveSafePath(relativePath);
+		await this.assertNoSymlinkSegments(fullPath, true);
+		await this.createDirectory(path.relative(this.workspaceRoot, path.dirname(fullPath)) || '.');
+		let handle: fs.promises.FileHandle | undefined;
+		try {
+			handle = await this.fs.promises.open(fullPath, 'wx');
+			await handle.writeFile(content, 'utf8');
+			await handle.sync();
+			return true;
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code === 'EEXIST') {return false;}
+			throw error;
+		} finally {
+			await handle?.close();
+		}
+	}
+
+	/** Remove one managed directory without allowing root deletion or symlink traversal. */
+	async deleteDirectory(relativePath: string): Promise<void> {
+		if (!this.fs.promises.rm) {
+			throw new Error('Recursive directory removal is unavailable in the configured file system');
+		}
+		const fullPath = this.resolveSafePath(relativePath);
+		if (fullPath === this.workspaceRoot) {
+			throw new Error('Refusing to remove the FileService root');
+		}
+		if (!this.fs.existsSync(fullPath)) {return;}
+		await this.assertNoSymlinkSegments(fullPath, true);
+		await this.fs.promises.rm(fullPath, { recursive: true, force: false });
+	}
+
+	/** Calculate storage use without following symbolic links. */
+	async calculateStorageUsage(relativePath = '.'): Promise<number> {
+		const stats = await this.getFileStats(relativePath);
+		if (!stats) {return 0;}
+		if (stats.isFile()) {return stats.size;}
+		if (!stats.isDirectory()) {return 0;}
+		let total = 0;
+		for (const name of await this.listFiles(relativePath)) {
+			total += await this.calculateStorageUsage(path.join(relativePath, name));
+		}
+		return total;
+	}
+
 	/**
 	 * 獲取檔案的時間戳信息
 	 * @param relativePath 相對於工作區的檔案路徑
@@ -339,7 +465,7 @@ export class FileService {
 
 			return await this.fs.promises.stat(fullPath);
 		} catch (error) {
-			log(`Failed to get file stats: ${relativePath}`, 'error', error);
+			log(`Failed to get file stats: ${relativePath}`, 'error', fileErrorDetails(error));
 			return null;
 		}
 	}
