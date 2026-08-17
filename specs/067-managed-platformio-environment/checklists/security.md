@@ -43,7 +43,7 @@
 
 - [x] logs、診斷、clipboard 與 issue draft 遮蔽 home／workspace、proxy credentials、token-like secrets 與敏感 URL；managed storage 對 WebView 與可分享輸出只提供穩定摘要。顯示實際 managed root 時，WebView 只送固定 command，由 Extension Host 直接呼叫本機檔案管理員，不回傳或記錄完整路徑。
 - [x] evidence 只記錄 OS／arch、runner、path case 名稱、PR／event、head／tree、VSIX／manifest／artifact SHA 與結果，不保存原始使用者路徑或環境變數。
-- [x] workflows 使用最小 `contents: read` 權限、SHA-pinned actions，未使用 `pull_request_target`；具網路與執行未信任程式碼的真實矩陣需由 label／release gate 核准。可執行 checkout 直接綁定 GitHub event immutable SHA，跨 job 輸出的 candidate SHA 僅能用於 evidence 比對，不能決定後續執行內容。
+- [x] workflows 使用最小 `contents: read` 權限、SHA-pinned actions，未使用 `pull_request_target`；具網路與執行未信任程式碼的真實矩陣需由 label／release gate 核准。可執行 checkout 直接綁定 GitHub event immutable SHA；reusable release workflow 必須由 caller 傳入同一 annotated release tag 作 `candidate_ref`，runtime 矩陣不使用 npm dependency cache。跨 job 輸出的 candidate SHA 僅能用於 evidence 比對，不能決定後續執行內容。
 - [x] evidence verifier 拒絕錯誤 PR／event、過期 commit／tree、不同 VSIX／manifest／artifact、缺少或重複平台與未完成 path/offline cases。
 - [x] `npm audit --omit=dev --audit-level=high` 回報正式依賴 0 個已知漏洞；新增的 runtime dependencies 固定為 `@vscode/proxy-agent@0.44.0` 與 `tar@7.5.22`，分別承接 VS Code proxy 設定與受控 archive 解析。
 

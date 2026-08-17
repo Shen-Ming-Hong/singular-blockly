@@ -25,6 +25,7 @@ jobs:
     permissions:
       contents: read
     with:
+      candidate_ref: ${{ inputs.release_tag || github.ref_name }}
       release_candidate: true
 
   quality:
