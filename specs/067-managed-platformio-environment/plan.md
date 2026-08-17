@@ -211,6 +211,7 @@ scripts/
 
 - installer 以 `os.tmpdir()/singular-blockly/core-installer/<20-hex>` 作 scratch。20-hex 由 managed root 與完整 transaction id 的 SHA-256 衍生，避免把 UUID、runtime id 或使用者輸入直接放入短路徑；外部檔案操作仍由以系統暫存根為 containment boundary 的 `FileService` 完成。
 - Windows 預檢分別為 immutable runtime 與 installer scratch 保留已量測的後代路徑餘裕，投影達 260 字元即在執行 artifact 前以 `path-too-long` fail closed；PlatformIO/pip 回傳明確 long-path hint 時也正規化為同一錯誤碼。
+- 真實 Windows runtime matrix 的 sandbox 前綴仍涵蓋 Unicode、空白與特殊字元，但整體 default-global-storage fixture 必須落在同一預算內；過長 managed root 由無網路 preflight regression 驗證，不能讓成功安裝案例本身先被預期中的 `path-too-long` 擋下。
 - scratch leaf 只由獨占交易 marker 認領；marker 碰撞時不使用也不刪除未知 leaf，成功認領後才於 `finally` 清理。候選 runtime rollback、lock release 與 scratch cleanup 彼此獨立，任何清理失敗不得擴大到 temp root、managed root 或 provider `.platformio`。
 - `ManagedRuntimeProgressPresenter` 在 ready／unsupported 前置檢查後才呼叫 `withProgress`，activation 與 editor-open 共用同一 notification promise。等待 lock 只回報在地化訊息；其餘 stage 將 installer 絕對百分比轉為單調 `increment`。
 - VS Code cancellation token 只轉為 `AbortController.abort()`，由既有 downloader／process／installer 交易邊界負責停止與 rollback。取消不顯示一般錯誤；其他失敗只顯示已在地化、無路徑內容的訊息與固定安全動作。

@@ -159,6 +159,20 @@ suite('ManagedRuntime Installer', () => {
 		));
 	});
 
+	test('accepts a budgeted Windows E2E path containing Unicode, spaces, and special characters', () => {
+		assert.doesNotThrow(() => assertWindowsManagedRuntimePathBudget(
+			path.win32.join(
+				'D:\\a\\_temp',
+				'使 用&-123456',
+				'AppData', 'Roaming', 'Code', 'User', 'globalStorage',
+				'Singular-Ray.singular-blockly', 'runtime-v1', 'versions',
+				'01234567-89ab-cdef-0123-456789abcdef'
+			),
+			'D:\\a\\_temp\\singular-blockly\\core-installer\\0123456789abcdef0123',
+			'win32'
+		));
+	});
+
 	test('does not claim or delete a pre-existing installer temp directory', async () => {
 		const installerTempRoot = path.join(root, 'installer-temp');
 		const leaf = createHash('sha256')

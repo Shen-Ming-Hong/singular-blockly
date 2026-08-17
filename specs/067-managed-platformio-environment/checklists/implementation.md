@@ -106,7 +106,9 @@
 - [x] `npm run compile-tests` 與 `npm run compile` 通過；installer、service、coordinator 與 presenter 的 47 項純 Node 精準回歸通過。本機 VS Code 1.109 test host 仍在載入測試案例前因既有 macOS 26 Electron provenance 問題以 `SIGABRT` 結束，未將它誤記為案例通過，正式 unit 證據由乾淨 PR runner 提供。
 - [x] `code-simplifier` 移除 presenter 的巢狀訊息三元運算；security-checker 與三輪本地 Code Review 修正「等待背景失敗後並行 repair 產生重複通知」及「預先存在但無 marker 的 scratch leaf 被認領／刪除」兩項 finding，結論為 `CLEAR`。
 - [x] `npm run ci:static`、5 組 macOS ARM64 路徑矩陣、15 語系 deterministic gate、production package、`npm run release:prepare`、`git diff --check` 全部通過；`npm audit --omit=dev --audit-level=high` 回報 0 vulnerabilities，版本與雙語 CHANGELOG 已同步為 `0.87.2`。
-- [ ] issue #132 的 release-candidate PR 須通過 CI、CodeQL 與 Windows／macOS／Linux x64＋ARM64 真實 runtime evidence；乾淨 Windows `LongPathsEnabled=0` F5 與 provider／managed hardware smoke 通過後才 squash merge、annotated tag 與三端發布。
+- [x] release-candidate 首輪 Windows matrix 正確以 `path-too-long` 擋下超出預算的測試 sandbox；fixture 已縮短為預算內但仍涵蓋 Unicode、空白與特殊字元，過長 custom root 仍由執行 artifact 前的 regression fail closed。
+- [x] 使用者回報乾淨 Windows `LongPathsEnabled=0` F5、Arduino provider-primary 與 CyberBrick managed-primary 實機 smoke 全部通過。
+- [ ] issue #132 的 release-candidate PR 尚須在修正後通過 CI、CodeQL 與 Windows／macOS／Linux x64＋ARM64 真實 runtime evidence，才可 squash merge、建立 annotated tag 並完成三端發布。
 
 ## 結論
 

@@ -250,6 +250,7 @@
 - [x] T098 [P] [US9] 建立 Notification presenter 的首次安裝、ready 零通知、絕對轉增量、取消、失敗動作、repair 與同視窗去重測試及實作於 `src/services/managedRuntimeProgressPresenter.ts` 與 `src/test/services/managedRuntimeProgressPresenter.test.ts`
 - [x] T099 [US9] 將 presenter 接到 activation／editor-open／diagnostic repair，新增隱私化 repair packet 命令並完成 15 語系新增 key 與 deterministic i18n PASS 於 `src/extension.ts`、`media/locales/*/messages.js` 與 `src/test/`
 - [x] T100 更新 spec、plan、quickstart、requirements／UX／security／release checklists 與測試文件；執行安全檢查、code-simplifier、本地 review、完整 static／unit／i18n／runtime path 驗證
+- [x] T100a [P] 校正 Windows 真實 E2E 的 Unicode／空白／特殊字元 sandbox，使 default-global-storage 成功案例維持在 260 字元預算內；過長路徑繼續由執行 artifact 前的 fail-closed regression 覆蓋
 - [ ] T101 同步 `0.87.2` 版本與雙語 CHANGELOG，push 修復分支、建立關聯 #132 的 release-candidate PR，通過 CI／CodeQL／六平台 runtime matrix 後 squash merge、annotated tag 與三端發布
 
 ---
