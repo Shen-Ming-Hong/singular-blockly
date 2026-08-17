@@ -39,8 +39,17 @@
 - [x] 已區分 OTA 設定的真實 determinate 里程碑與 OTA 清除的 indeterminate 狀態，禁止虛構百分比
 - [x] 已涵蓋亮色、暗色、高對比、reduced-motion、ARIA 與 15 語系需求
 
+## issue #130 hotfix 需求覆蓋
+
+- [x] 已定義固定長度內部版本目錄與 install record 身分分離，並保留既有 record 相容性
+- [x] 已明定真實 E2E 必須使用 VS Code 預設 global storage 形狀，不得以短暫存根替代 Windows 路徑預算驗證
+- [x] 已定義 provisioning attempt／trigger／stage／percent／recent failure 的生命週期、資料邊界與遮蔽上限
+- [x] 已把 `managed-provisioning` fallback 限制在 probe／prepare，取消與 project-process 保持 fail closed
+- [x] 已為預設路徑真實安裝、診斷證據一致性、隱私與 fallback 次數建立可量測成功指標
+
 ## 備註
 
 - 既有 spec 063 的 provider 引導被視為相容性契約，不在本功能中移除。
 - 路徑、權限、外部 PR 安全與發布閘門已在前期討論完成產品決策，無需額外澄清標記。
 - 2026-08-16 依 F5 回饋新增 US7／US8、FR-032－FR-037 與 SC-012－SC-014；需求與既有 Project Skill、OTA、i18n 及安全契約一致。
+- 2026-08-17 依 issue #130 新增 FR-038－FR-041 與 SC-015－SC-017；路徑預算、背景安裝可觀測性、隱私與 fail-closed fallback 契約一致。

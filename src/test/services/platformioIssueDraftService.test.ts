@@ -95,6 +95,28 @@ suite('PlatformioIssueDraftService Tests', () => {
 		assert.ok(draft.noDraftReason?.includes('operational'));
 		assert.strictEqual(draft.body, 'No issue draft recommended: diagnostics are operational.');
 	});
+
+	test('recommends a draft when provider tools are operational but managed provisioning failed', () => {
+		const service = new PlatformioIssueDraftService({ homeDir: '/Users/alice' });
+		const coreDiagnostics = createCoreDiagnostics();
+		coreDiagnostics.environments.managed.provisioning = {
+			status: 'failed', attempt: 1, trigger: 'activation', stage: 'installing-platformio', percent: 40,
+			startedAt: '2026-01-02T03:00:00.000Z', failedAt: '2026-01-02T03:01:00.000Z',
+			failure: {
+				failureDomain: 'managed-provisioning', stage: 'installing-platformio', code: '1', started: true,
+				message: 'installer failed', stdout: '', stderr: '/Users/alice/private-runtime',
+			},
+		};
+		const session = createDiagnosticSession({ overallStatus: 'operational', coreDiagnostics });
+
+		const draft = service.buildDraft({ session, source: 'human-confirmed' });
+
+		assert.strictEqual(draft.candidacy, 'recommended');
+		assert.ok(draft.title.includes('managed-provisioning'));
+		assert.ok(draft.body.includes('Managed provisioning: failed'));
+		assert.ok(draft.body.includes('managed-provisioning: attempt 1 failed at installing-platformio'));
+		assert.ok(!draft.body.includes('/Users/alice'));
+	});
 });
 
 function createCoreDiagnostics(): NonNullable<ReturnType<typeof createDiagnosticSession>['coreDiagnostics']> {

@@ -6,7 +6,7 @@
 
 命令 `singular-blockly.checkPlatformioStatus` 開啟獨立、單例的 WebView 面板，不需先執行上傳。診斷必須重用既有 executable resolver 與 uploader 的解析語意，不另建互相矛盾的路徑偵測器。
 
-面板依固定順序檢查 provider 的 `pio`、`penvRoot`、Python、pip、mpremote，並另顯示 Provider Core 與 Singular managed Core 兩個環境區段。每個 Core 包含 healthy／degraded／unavailable、版本、package 狀態、原因與隱私化 storage 摘要；Arduino／Python 路由另外顯示 primary、fallback、目前選擇及是否已 fallback。工具單項仍包含 `ok`／`warning`／`error`、解析路徑與來源、原因、建議步驟及版本資訊。
+面板依固定順序檢查 provider 的 `pio`、`penvRoot`、Python、pip、mpremote，並另顯示 Provider Core 與 Singular managed Core 兩個環境區段。每個 Core 包含 healthy／degraded／unavailable、版本、package 狀態、原因與隱私化 storage 摘要；managed Core 卡片另以既有安全轉義的 detail 區塊顯示最近 provisioning 的 running／failed attempt、trigger、stage、percent、code 與有界 installer evidence。Arduino／Python 路由另外顯示 primary、fallback、目前選擇及是否已 fallback。工具單項仍包含 `ok`／`warning`／`error`、解析路徑與來源、原因、建議步驟及版本資訊。
 
 UI 狀態為 loading、ready、error，固定提供摘要、雙 Core、工具狀態與檢查範圍說明。診斷只呼叫本機 `getStatus()` 與版本 probe，不啟動 managed runtime 安裝、不做 package 網路探測；尚未真實準備的 package 狀態保持 `unknown`。它也不保證 USB、裝置權限或硬體連線正常。
 
@@ -28,6 +28,6 @@ UI 狀態為 loading、ready、error，固定提供摘要、雙 Core、工具狀
 
 修復歷史保存在 workspace state，最多 20 筆，並以環境 fingerprint 判定 current、stale 或 unknown。歷史與 fingerprint 只保存必要摘要及雜湊，不保存密碼、token 或原始敏感值。
 
-提供 AI 協助時，只建立經隱私清理的結構化 packet，包含 findings、修復歷史及任務描述，不直接附上未處理的 raw logs。Issue draft 也只能在去重與隱私檢查後產生，必須由使用者審閱並主動發布，絕不自動送出。
+提供 AI 協助時，只建立經隱私清理的結構化 packet，包含 findings、修復歷史及任務描述。managed installer stdout／stderr 只有在先遮蔽 home、workspace、managed root、credentials 與 token，移除控制字元並限制長度後才能加入；未處理 raw logs 不得流入 packet。即使 provider operational，最近 managed provisioning running／failed 仍是目前 blocker，不得被摘要成「No current blocker」。Issue draft 也只能在去重與隱私檢查後產生，必須由使用者審閱並主動發布，絕不自動送出。
 
 WebView 只接收可序列化的安全狀態；所有訊息仍由 Extension Host 驗證。核心資料模型包含 DiagnosticFinding、RepairFlow、RepairStep、AutoRepairRun、RepairStepResult、EnvironmentFingerprint、RepairHistorySnapshot、AIRepairPacket、IssueDraftProposal 與 PanelRepairState。

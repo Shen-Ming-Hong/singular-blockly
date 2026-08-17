@@ -89,3 +89,15 @@ Archive 解壓前列舉全部 entry。`python-build-standalone` 的 `install_onl
 **理由**：官方 installer 的 stable 流程會以 pip `-U platformio` 取得最新版本，未提供產品所需的精確 Core pin；只把測試範圍寫在文件卻不執行會讓未驗證大版本進入環境。constraint 保留官方 penv 建立流程，同時在安裝前解析與安裝後 probe 兩側限制相容性。
 
 **來源**：[PlatformIO custom integration](https://docs.platformio.org/en/stable/core/installation/integration.html)、[PlatformIO installer source](https://github.com/platformio/platformio-core-installer/blob/develop/pioinstaller/core.py)。
+
+## 決策 12：用固定長度版本目錄保留 Windows global storage 路徑預算
+
+**決策**：`versions/` 下的新不可變候選只使用 transaction UUID；runtime version 與 artifact id 繼續寫入 install／transaction record，不再編入目錄名稱。真實 E2E 根目錄模擬 VS Code 預設 `AppData/Roaming/Code/User/globalStorage/<extension-id>/runtime-v1` 層級，並保留 Unicode、空白與合法特殊字元上層。
+
+**理由**：issue #130 的 Windows 安裝在 `installing-platformio` 結束，但因舊版遺失 stderr，無法證明單一底層根因。獨立路徑預算分析顯示，原始版本目錄同時重複 runtime version、完整 artifact id 與 UUID；加上預設 global storage 與 PlatformIO 套件深層檔名後，常見路徑可逼近傳統 Win32 260 字元邊界。先前真實矩陣使用較短暫存根，因此能驗證 artifact／架構，卻未驗證實際安裝路徑預算。固定長度內部識別碼可降低所有套件檔案深度，且不犧牲 record 身分、原子交易或向後讀取既有版本；結構化 evidence 則用來確認任何仍存在的實際 installer 根因。
+
+## 決策 13：背景安裝失敗保留有界結構化證據
+
+**決策**：installer 以 stage、code、started、message、stdout、stderr 建立 `managed-provisioning` 失敗；service 保留最近 running／failed snapshot，診斷、AI packet 與人工 issue draft使用相同資料。所有字串先遮蔽 home／managed root／workspace／credentials／token，再移除控制字元並限制為 4,000 字元；一般 background log 僅記 stage 與 attempt。
+
+**理由**：只回報 exit code 1 無法區分路徑、proxy、pip 或權限原因；但把原始安裝器輸出直接寫入 log 或 issue 會洩漏本機路徑與秘密。有界、共用且先遮蔽的 volatile evidence 能讓 provider 仍可工作時也看見 managed Core 阻擋，並避免建立新的永久敏感資料面。

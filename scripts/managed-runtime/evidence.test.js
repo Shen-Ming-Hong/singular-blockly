@@ -14,7 +14,7 @@ const treeSha = 'b'.repeat(40);
 const vsixSha256 = 'c'.repeat(64);
 const manifestSha256 = 'd'.repeat(64);
 const artifactSha256 = 'e'.repeat(64);
-const requiredPathCases = ['unicode', 'space', 'special-characters', 'offline-restart'];
+const requiredPathCases = ['unicode', 'space', 'special-characters', 'default-global-storage-shape', 'offline-restart'];
 
 assert.deepStrictEqual(
   parseArgs(['--evidence', 'linux.json', '--evidence', 'windows.json']).evidences,
@@ -56,6 +56,10 @@ try {
   assert.throws(() => verifyEvidence([evidence('darwin', 'x64', { eventName: 'workflow_dispatch' }), ...x64.slice(1)], baseOptions), /eventName/);
   assert.throws(() => verifyEvidence([evidence('darwin', 'x64', { pathCases: ['/Users/private/project'] }), ...x64.slice(1)], baseOptions), /forbidden path/);
   assert.throws(() => verifyEvidence([evidence('darwin', 'x64', { pathCases: ['unicode'] }), ...x64.slice(1)], baseOptions), /Evidence failed/);
+  assert.throws(() => verifyEvidence([
+    evidence('darwin', 'x64', { pathCases: requiredPathCases.filter(pathCase => pathCase !== 'default-global-storage-shape') }),
+    ...x64.slice(1),
+  ], baseOptions), /Evidence failed/);
   assert.throws(() => verifyEvidence([evidence('darwin', 'x64', { offlineRestart: 'false' }), ...x64.slice(1)], baseOptions), /Evidence failed/);
   assert.throws(() => verifyEvidence([evidence('darwin', 'x64', { artifactSha256: 'f'.repeat(64) }), ...x64.slice(1)], baseOptions), /artifact/);
   assert.throws(() => verifyEvidence([evidence('darwin'), ...x64], baseOptions), /Duplicate evidence/);

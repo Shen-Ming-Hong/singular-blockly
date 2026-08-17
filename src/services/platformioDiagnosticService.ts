@@ -30,12 +30,13 @@ import {
 	OfficialPlatformioSettingsEvidence,
 	PanelActionId,
 	PlatformioDiagnosticItem,
+	CoreDiagnosticEnvironment,
 	PlatformioDiagnosticPanelState,
 	PlatformioDiagnosticSession,
 	PlatformioOverallStatus,
 	VersionProbeResult,
 } from '../types/platformioDiagnostic';
-import { ManagedRuntimeStatus } from '../types/managedRuntime';
+import { ManagedRuntimeProvisioningState, ManagedRuntimeStatus } from '../types/managedRuntime';
 import { CoreWorkload, WorkloadSelection } from '../types/coreEnvironment';
 
 interface MessageLocalizer {
@@ -65,6 +66,7 @@ export interface PlatformioDiagnosticServiceOptions {
 		getStatus(): Promise<ManagedRuntimeStatus>;
 		getStorageSummary(): string;
 		getStorageUsageBytes(): Promise<number | null>;
+		getProvisioningState?(): ManagedRuntimeProvisioningState;
 	};
 	coreEnvironmentManager?: {
 		getSelection(workload: CoreWorkload, workspaceUri: string): WorkloadSelection;
@@ -248,11 +250,17 @@ export class PlatformioDiagnosticService {
 		}
 
 		const items: PlatformioDiagnosticSession['items'] = [pioItem, penvRootItem, pythonItem, pipItem, mpremoteItem];
-		const overallStatus = this.getOverallStatus(items);
+		let overallStatus = this.getOverallStatus(items);
 		const scopeNotice = await this.message(
 			'PLATFORMIO_DIAGNOSTIC_SCOPE_NOTICE',
 			'This report reflects the VS Code extension runtime on this machine. It may differ from the shell environment you use in an external terminal.'
 		);
+
+		const coreDiagnostics = await this.buildCoreDiagnostics(pioItem, workspacePath ?? '');
+		const provisioningStatus = coreDiagnostics.environments.managed.provisioning?.status;
+		if (overallStatus === 'operational' && (provisioningStatus === 'running' || provisioningStatus === 'failed')) {
+			overallStatus = 'degraded';
+		}
 
 		const session: PlatformioDiagnosticSession = {
 			sessionId: requestedAt,
@@ -267,8 +275,8 @@ export class PlatformioDiagnosticService {
 				arch: process.arch,
 				pathSeparator: this.platform === 'win32' ? ';' : ':',
 			},
+			coreDiagnostics,
 		};
-		session.coreDiagnostics = await this.buildCoreDiagnostics(pioItem, workspacePath ?? '');
 
 		log('[platformio-diagnostic] diagnostic collection completed', 'info', {
 			overallStatus,
@@ -291,29 +299,8 @@ export class PlatformioDiagnosticService {
 		}
 		const managedStatus = this.managedRuntime ? await this.managedRuntime.getStatus() : { status: 'missing' } as const;
 		const managedStorageUsage = this.managedRuntime ? await this.managedRuntime.getStorageUsageBytes() : null;
-		const managed = managedStatus.status === 'ready'
-			? {
-				id: 'managed' as const,
-				status: 'healthy' as const,
-				version: managedStatus.record.tools.pio.version,
-				storageSummary: this.managedRuntime?.getStorageSummary() ?? null,
-				storageUsageBytes: managedStorageUsage,
-				packageStatus: 'unknown' as const,
-				failureClass: null,
-				reason: 'Managed runtime is installed and passed its local health checks.',
-			}
-			: {
-				id: 'managed' as const,
-				status: managedStatus.status === 'invalid' ? 'degraded' as const : 'unavailable' as const,
-				version: null,
-				storageSummary: this.managedRuntime?.getStorageSummary() ?? null,
-				storageUsageBytes: managedStorageUsage,
-				packageStatus: 'unknown' as const,
-				failureClass: managedStatus.status === 'invalid' ? 'local-store-corruption' as const : 'missing-executable' as const,
-				reason: managedStatus.status === 'missing'
-					? 'Managed runtime is not installed. Diagnostics did not start an installation.'
-					: managedStatus.reason,
-			};
+		const provisioning = this.managedRuntime?.getProvisioningState?.() ?? { status: 'idle', attempt: 0 };
+		const managed = this.buildManagedDiagnosticEnvironment(managedStatus, managedStorageUsage, provisioning);
 
 		return {
 			environments: {
@@ -333,6 +320,65 @@ export class PlatformioDiagnosticService {
 				arduino: this.getWorkloadSelection('arduino', workspaceUri),
 				python: this.getWorkloadSelection('python', workspaceUri),
 			},
+		};
+	}
+
+	private buildManagedDiagnosticEnvironment(
+		status: ManagedRuntimeStatus,
+		storageUsageBytes: number | null,
+		provisioning: ManagedRuntimeProvisioningState
+	): CoreDiagnosticEnvironment {
+		const base = {
+			id: 'managed' as const,
+			storageSummary: this.managedRuntime?.getStorageSummary() ?? null,
+			storageUsageBytes,
+			packageStatus: 'unknown' as const,
+			provisioning,
+		};
+		if (status.status === 'ready') {
+			return {
+				...base,
+				status: 'healthy',
+				version: status.record.tools.pio.version,
+				failureClass: null,
+				reason: 'Managed runtime is installed and passed its local health checks.',
+			};
+		}
+		if (provisioning.status === 'running') {
+			return {
+				...base,
+				status: 'unavailable',
+				version: null,
+				failureClass: 'managed-provisioning',
+				reason: `Managed runtime provisioning is active at ${provisioning.stage} (${provisioning.percent}%).`,
+			};
+		}
+		if (provisioning.status === 'failed') {
+			return {
+				...base,
+				status: 'unavailable',
+				version: null,
+				failureClass: 'managed-provisioning',
+				reason: `Managed runtime provisioning failed at ${provisioning.stage} (code ${provisioning.failure.code}). ${provisioning.failure.message}`,
+			};
+		}
+		if (status.status === 'invalid') {
+			return {
+				...base,
+				status: 'degraded',
+				version: null,
+				failureClass: 'local-store-corruption',
+				reason: status.reason,
+			};
+		}
+		return {
+			...base,
+			status: 'unavailable',
+			version: null,
+			failureClass: 'missing-executable',
+			reason: status.status === 'missing'
+				? 'Managed runtime is not installed. Diagnostics did not start an installation.'
+				: status.reason,
 		};
 	}
 
@@ -438,6 +484,15 @@ export class PlatformioDiagnosticService {
 				lines.push(`  Storage usage: ${environment.storageUsageBytes === null ? '-' : `${environment.storageUsageBytes} bytes`}`);
 				lines.push(`  Package status: ${environment.packageStatus}`);
 				lines.push(`  Reason: ${environment.reason}`);
+				if (environment.provisioning?.status === 'running') {
+					lines.push(`  Provisioning: running; attempt=${environment.provisioning.attempt}; trigger=${environment.provisioning.trigger}; stage=${environment.provisioning.stage}; percent=${environment.provisioning.percent}`);
+				}
+				if (environment.provisioning?.status === 'failed') {
+					const failure = environment.provisioning.failure;
+					lines.push(`  Provisioning: failed; attempt=${environment.provisioning.attempt}; trigger=${environment.provisioning.trigger}; stage=${failure.stage}; code=${failure.code}; started=${failure.started}`);
+					if (failure.stdout) {lines.push(`  Installer stdout: ${failure.stdout}`);}
+					if (failure.stderr) {lines.push(`  Installer stderr: ${failure.stderr}`);}
+				}
 			}
 			for (const workload of ['arduino', 'python'] as const) {
 				const selection = session.coreDiagnostics.selection[workload];

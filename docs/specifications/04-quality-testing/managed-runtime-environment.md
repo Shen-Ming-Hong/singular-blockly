@@ -33,6 +33,8 @@ npm run test:managed-runtime:e2e -- --allow-network
 ARM64 release-candidate artifact 另需 `--allow-release-candidate`。腳本將 runtime 放在自己建立的暫存子目錄；完成後只刪除該子目錄，不接受把 workspace、home 或磁碟根目錄當作清理目標。
 正式 Extension factory 會啟用 manifest 已宣告的 ARM64 release-candidate artifact；這個產品政策的前提是發布 workflow 把對應 ARM64 矩陣設為必要門檻。底層 service 與本機腳本仍預設 fail closed，需明確 flag 才能選取候選 artifact。
 
+真實 E2E 的 sandbox 上層名稱包含 Unicode、空白與合法特殊字元，managed root 再置於 `AppData/Roaming/Code/User/globalStorage/Singular-Ray.singular-blockly/runtime-v1` 等同形狀下；各 OS 都使用同一形狀，Windows 特別用來驗證正式預設路徑預算。evidence 的 path cases 必須包含 `default-global-storage-shape`，不可用較短暫存根替代。
+
 自訂 managed path 只能是空的本機目錄，或先前已有有效 Singular root ownership marker 的目錄；非空且未受管的位置會在建立任何 runtime 子目錄前拒絕。cleanup 與 install 共用 lock，因此安裝進行中的 staging 不會被同時清理。
 
 ## Evidence 契約

@@ -9,7 +9,7 @@ const { parseArgs, sha256File } = require('./collect-evidence');
 const SHA = /^[a-f0-9]{40,64}$/;
 const SHA256 = /^[a-f0-9]{64}$/;
 const MATRIX_X64 = ['darwin/x64', 'linux/x64', 'win32/x64'];
-const REQUIRED_PATH_CASES = ['offline-restart', 'space', 'special-characters', 'unicode'];
+const REQUIRED_PATH_CASES = ['default-global-storage-shape', 'offline-restart', 'space', 'special-characters', 'unicode'];
 const SENSITIVE_PATH = /(?:^|[\s"'])(?:[A-Za-z]:\\Users\\|\/Users\/|\/home\/|\/root\/)/;
 
 function readEvidence(filePath) {

@@ -2,7 +2,7 @@
 
 **驗證日期**：2026-08-17
 
-**驗證分支**：`codex/067-managed-platformio-environment`
+**驗證分支**：`codex/130-managed-runtime-hotfix`
 
 **功能規格**：[spec.md](../spec.md)
 
@@ -80,9 +80,21 @@
 - [x] 根因為 reusable runtime workflow 的 `github.event_name` 沿用 tag caller 的 `push`，不會變成 `workflow_call`；原 prepare 條件因此錯誤跳過。Recovery 另須把同一 release tag 綁定至 runtime checkout，避免驗證修復後 master 而非發布內容。
 - [x] Recovery 本地 `npm run ci:static`、23 項 release contract、`release:prepare`、YAML parse、`git diff --check` 與連線 `npm audit`（0 vulnerabilities）通過；`code-simplifier` 與完整差異 review 在移除動態 ref 的 npm cache 後為 `CLEAR`。
 - [x] 本機 VS Code 1.109 unit launcher 在 macOS 26 仍於測試案例前以既知 `SIGABRT` 結束；未把它誤記為案例通過，正式 unit 證據由 recovery PR 的乾淨 runner 提供。
-- [ ] Recovery 修正 PR 必須通過乾淨 runner unit、CI、CodeQL 與必要 runtime matrix；合併後只能從 `master` dispatch 同一 immutable `v0.87.0`。
-- [ ] Recovery publish run 必須重新驗證 annotated tag、release tree、唯一 VSIX 與 checksum，並確認 GitHub Release、VS Code Marketplace、Open VSX 三端成功。
+- [x] Recovery PR #127 已通過必要 checks 並 squash merge 為 `225b950`；後續只從 `master` dispatch 同一 immutable `v0.87.0`。
+- [x] Recovery publish run `31983230776` 重新驗證 annotated tag、六平台 runtime、release tree、唯一 VSIX 與 checksum；GitHub Release、VS Code Marketplace、Open VSX 及最終三端 gate 全部成功。
+
+## issue #130／v0.87.1 hotfix 驗證
+
+- [x] 路徑預算分析確認預設 Windows `AppData/Roaming/Code/User/globalStorage/Singular-Ray.singular-blockly/runtime-v1` 加上原複合版本目錄後，PlatformIO 深層檔案路徑可逼近傳統 Win32 260 字元邊界；這是 issue #130 的風險因子而非已證實的唯一 installer 根因，先前真實 E2E 暫存根較短，未覆蓋正式路徑形狀。
+- [x] 新版本目錄改用固定長度 transaction UUID；install／transaction record 仍保留完整 runtime version、artifact id 與 manifest SHA，既有 `current.json` 相對目錄讀取契約不變。
+- [x] storage initialize 與 installer failure 都進入 provisioning 狀態；installer 新增 `managed-provisioning`、stage、code、started 與遮蔽／有界 stdout／stderr，service 保留 activation／editor-open／repair／workload 的 attempt 與 running／failed snapshot。
+- [x] 診斷 Core 卡片、複製摘要、AI repair packet 與 issue draft 納入 provisioning blocker 與有界 evidence；provider operational 不再掩蓋 managed 失敗，且 cancellation／project-process 仍 fail closed。
+- [x] `npm run test:managed-runtime` 139 項、`npm run test:managed-runtime:paths` 5 組、正式 `test:unit:ci` 1,225 項通過（1 項既有 Copilot AI E2E pending）；`npm run ci:static`、15 語系、production package、`npm run release:prepare` 與 `git diff --check` 全數通過。
+- [x] macOS ARM64 以 `--allow-release-candidate` 在 Unicode／空白／特殊字元上層與預設 global-storage 深度完成第二次真實 CPython／PlatformIO／mpremote 安裝、健康 probe 與離線重啟；省略候選旗標時依政策 fail closed。
+- [x] `npm audit --omit=dev --audit-level=high` 回報正式依賴 0 個已知漏洞；WebView provisioning evidence 使用既有 `escapeHtml` detail renderer，raw／URI-encoded managed root 與 token regression 通過。
+- [ ] Runtime-sensitive PR 的 Windows／macOS／Linux x64 與 release-candidate ARM64 真實 E2E evidence 都包含 `default-global-storage-shape` 並通過；乾淨 Windows F5 診斷可看到 attempt／stage 與遮蔽 installer evidence。
+- [ ] Arduino／CyberBrick 實機 smoke 確認 provider-primary 與 managed-primary 路由未回歸後，才允許 squash merge、annotated `v0.87.1` tag 與三端發布。
 
 ## 結論
 
-本機程式、封裝、安全與 Code Review，以及 F5、PR 六平台 runtime、乾淨 Windows／Linux 與 Arduino／CyberBrick 實機閘門均已通過，T061 已完成。剩餘工作僅限 recovery 修正 PR 與同一 immutable `v0.87.0` 的三端發布驗證。
+`v0.87.0` recovery 與三端發布已由 run `31983230776` 完成。`v0.87.1` hotfix 的程式、SDD、本地全量 gate、code-simplifier、安全審查與本地 Code Review 已完成；仍需 Phase 3.5 核准後的六平台 runtime evidence、乾淨 Windows F5 與 Arduino／CyberBrick 實機 smoke，才能 squash merge、建立 annotated tag 並發布。

@@ -11,6 +11,7 @@ interface ManagedRuntimeInitializationTarget {
 	getStatus(): Promise<ManagedRuntimeStatus>;
 	ensureReady(options?: {
 		onProgress?: (progress: ManagedRuntimeInstallProgress) => void;
+		trigger?: ManagedRuntimeInitializationTrigger;
 	}): Promise<ManagedRuntimeInstallRecord>;
 }
 
@@ -46,7 +47,7 @@ export class ManagedRuntimeInitializationCoordinator {
 		const status = await this.runtime.getStatus();
 		if (status.status === 'ready') {return { trigger, status: 'already-ready' };}
 		if (status.status === 'unsupported') {return { trigger, status: 'unsupported' };}
-		await this.runtime.ensureReady({ onProgress });
+		await this.runtime.ensureReady({ onProgress, trigger });
 		return { trigger, status: 'installed' };
 	}
 }

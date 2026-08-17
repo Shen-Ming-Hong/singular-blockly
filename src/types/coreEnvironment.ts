@@ -15,6 +15,7 @@ export type CoreFailureClass =
 	| 'python-import'
 	| 'permission'
 	| 'local-store-corruption'
+	| 'managed-provisioning'
 	| 'compile'
 	| 'project-config'
 	| 'dns'

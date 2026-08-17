@@ -83,9 +83,12 @@ export async function activate(context: vscode.ExtensionContext) {
 			}).then(result => {
 				log('[managed-runtime] background initialization completed', 'info', result);
 			}).catch(error => {
+				const provisioning = managedRuntimeService?.getProvisioningState();
 				log('[managed-runtime] background initialization deferred after failure', 'warn', {
 					trigger,
 					code: error instanceof Error && 'code' in error ? String((error as Error & { code?: unknown }).code) : 'initialization-failed',
+					stage: provisioning?.status === 'failed' ? provisioning.failure.stage : 'unknown',
+					attempt: provisioning?.attempt ?? 0,
 				});
 			});
 		};

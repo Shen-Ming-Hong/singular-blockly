@@ -266,6 +266,7 @@ function renderCoreEnvironments(coreDiagnostics) {
 					<div><dt>${escapeHtml(state.strings.storageUsageLabel)}</dt><dd>${escapeHtml(formatBytes(environment.storageUsageBytes))}</dd></div>
 				</dl>
 				${renderDetailBlock(state.strings.reasonLabel, environment.reason || '—')}
+				${renderProvisioningDetails(environment.provisioning)}
 				${revealAction}
 			</article>`;
 	}).join('');
@@ -281,6 +282,27 @@ function renderCoreEnvironments(coreDiagnostics) {
 		</article>`;
 	}).join('');
 	elements.coreEnvironmentList.innerHTML = environmentCards + selectionCards;
+}
+
+function renderProvisioningDetails(provisioning) {
+	if (!provisioning || provisioning.status === 'idle') {return '';}
+	const fields = [
+		`status=${provisioning.status}`,
+		`attempt=${provisioning.attempt}`,
+		`trigger=${provisioning.trigger}`,
+		`stage=${provisioning.stage}`,
+		`percent=${provisioning.percent}`,
+	];
+	if (provisioning.status === 'failed' && provisioning.failure) {
+		fields.push(
+			`code=${provisioning.failure.code}`,
+			`started=${provisioning.failure.started}`,
+			`message=${provisioning.failure.message}`
+		);
+		if (provisioning.failure.stdout) {fields.push(`stdout=${provisioning.failure.stdout}`);}
+		if (provisioning.failure.stderr) {fields.push(`stderr=${provisioning.failure.stderr}`);}
+	}
+	return renderDetailBlock('managed-provisioning', fields.join('; '));
 }
 
 function formatBytes(bytes) {

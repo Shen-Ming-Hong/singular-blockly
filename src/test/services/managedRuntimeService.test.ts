@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { ManagedRuntimeService, ManagedRuntimeServiceError } from '../../services/managedRuntimeService';
+import { ManagedRuntimeInstallerError } from '../../services/managedRuntimeInstaller';
 import { ManagedRuntimeStorage } from '../../services/managedRuntimeStorage';
 import { ManagedRuntimeInstallRecord, RuntimeArtifact, RuntimeManifest } from '../../types/managedRuntime';
 
@@ -91,6 +92,117 @@ suite('ManagedRuntime Service', () => {
 
 		assert.strictEqual(first.versionDirectory, second.versionDirectory);
 		assert.strictEqual(installCalls, 1);
+	});
+
+	test('shares one provisioning transaction between concurrent ensure and repair', async () => {
+		const service = createService();
+		const [ensured, repaired] = await Promise.all([service.ensureReady(), service.repair()]);
+
+		assert.strictEqual(ensured.versionDirectory, repaired.versionDirectory);
+		assert.strictEqual(installCalls, 1);
+	});
+
+	test('does not swallow an explicit repair behind a ready-state check', async () => {
+		await writeInstalledRecord();
+		const repairedRecord = createRecord('repaired-v2');
+		const service = createService(repairedRecord);
+
+		const [ensured, repaired] = await Promise.all([service.ensureReady(), service.repair()]);
+
+		assert.strictEqual(ensured.versionDirectory, 'installed-v1');
+		assert.strictEqual(repaired.versionDirectory, 'repaired-v2');
+		assert.strictEqual(installCalls, 1);
+	});
+
+	test('exposes an in-flight background provisioning stage without starting another attempt', async () => {
+		const record = createRecord();
+		let finishInstallation: (() => void) | undefined;
+		let markInstallationStarted: (() => void) | undefined;
+		const installationStarted = new Promise<void>(resolve => {markInstallationStarted = resolve;});
+		const service = new ManagedRuntimeService({
+			storage, manifest, manifestSha256, platform: 'linux', arch: 'x64', libc: 'glibc',
+			now: () => new Date('2026-08-17T04:00:00.000Z'),
+			installer: {
+				install: async (_artifact, options) => {
+					options?.onProgress?.({ stage: 'installing-platformio', percent: 40 });
+					markInstallationStarted?.();
+					await new Promise<void>(resolve => {finishInstallation = resolve;});
+					return record;
+				},
+			},
+		});
+
+		const installation = service.ensureReady({ trigger: 'activation' });
+		await installationStarted;
+		const running = service.getProvisioningState();
+		assert.strictEqual(running.status, 'running');
+		if (running.status === 'running') {
+			assert.strictEqual(running.trigger, 'activation');
+			assert.strictEqual(running.stage, 'installing-platformio');
+			assert.strictEqual(running.percent, 40);
+		}
+		finishInstallation?.();
+		await installation;
+		assert.deepStrictEqual(service.getProvisioningState(), { status: 'idle', attempt: 1 });
+	});
+
+	test('records storage initialization failures as the first provisioning stage', async () => {
+		let installerCalled = false;
+		storage.initialize = async () => {
+			throw Object.assign(new Error(`permission denied at ${storage.layout.root}`), { code: 'EACCES' });
+		};
+		const service = new ManagedRuntimeService({
+			storage, manifest, manifestSha256, platform: 'linux', arch: 'x64', libc: 'glibc',
+			now: () => new Date('2026-08-17T04:00:00.000Z'),
+			installer: { install: async () => {installerCalled = true; return createRecord();} },
+		});
+
+		await assert.rejects(
+			() => service.ensureReady({ trigger: 'editor-open' }),
+			(error: unknown) => error instanceof ManagedRuntimeInstallerError &&
+				error.failureDomain === 'managed-provisioning' &&
+				error.code === 'eacces' &&
+				!error.message.includes(storage.layout.root)
+		);
+
+		assert.strictEqual(installerCalled, false);
+		const failed = service.getProvisioningState();
+		assert.strictEqual(failed.status, 'failed');
+		if (failed.status === 'failed') {
+			assert.strictEqual(failed.attempt, 1);
+			assert.strictEqual(failed.trigger, 'editor-open');
+			assert.strictEqual(failed.failure.stage, 'waiting-lock');
+			assert.strictEqual(failed.failure.code, 'eacces');
+			assert.ok(!failed.failure.message.includes(storage.layout.root));
+		}
+	});
+
+	test('retains only privacy-redacted evidence after provisioning fails', async () => {
+		const token = 'ghp_abcdefghijklmnopqrstuvwxyz1234567890ABCD';
+		const service = new ManagedRuntimeService({
+			storage, manifest, manifestSha256, platform: 'linux', arch: 'x64', libc: 'glibc',
+			now: () => new Date('2026-08-17T04:00:00.000Z'),
+			installer: {
+				install: async (_artifact, options) => {
+					options?.onProgress?.({ stage: 'installing-platformio', percent: 40 });
+					throw new ManagedRuntimeInstallerError(`1`, `failed under ${storage.layout.root}`, {
+						stage: 'installing-platformio', started: true,
+						stdout: `token=${token}`, stderr: `path=${storage.layout.root}`,
+					});
+				},
+			},
+		});
+
+		await assert.rejects(() => service.ensureReady({ trigger: 'activation' }));
+		const failed = service.getProvisioningState();
+		assert.strictEqual(failed.status, 'failed');
+		if (failed.status === 'failed') {
+			assert.strictEqual(failed.failure.stage, 'installing-platformio');
+			assert.strictEqual(failed.failure.started, true);
+			assert.ok(failed.failure.stderr.includes('<managed-runtime>'));
+			assert.ok(!JSON.stringify(failed).includes(storage.layout.root));
+			assert.ok(!JSON.stringify(failed).includes(token));
+		}
 	});
 
 	test('reuses a valid current record without any download or install', async () => {

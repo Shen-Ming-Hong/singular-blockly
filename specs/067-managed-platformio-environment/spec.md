@@ -202,6 +202,10 @@
 - **FR-035**：CyberBrick OTA 設定與 OTA 清除必須共用單一進度呈現區，且在各自 Host request 送出前進入可見的 running state。
 - **FR-036**：共用進度呈現必須使用已定義的專案 theme token，支援亮色、暗色、forced-colors 與 prefers-reduced-motion；不得依賴未定義的 CSS 變數。
 - **FR-037**：OTA 設定必須依已完成里程碑提供 determinate progress；沒有中間事件的 OTA 清除必須省略 `aria-valuenow` 並呈現 indeterminate progress，直到成功或失敗結果才進入 terminal state。
+- **FR-038**：不可變版本目錄必須使用固定長度、與 runtime／artifact 顯示名稱解耦的交易識別碼；完整 runtime 與 artifact 身分保留在 install record，不得重複編入 Windows 深層預設儲存路徑。
+- **FR-039**：activation、editor-open、repair 或 workload 觸發的 managed runtime provisioning 必須保留記憶體內的 attempt、trigger、stage、percent、開始／更新／失敗時間與最近一次結構化失敗；失敗證據必須限制長度並遮蔽 home、managed root、workspace、credentials 與 token。
+- **FR-040**：`managed-provisioning` 失敗只可在 probe／prepare 且專案程序尚未開始時觸發單次 Core fallback；使用者取消與任何 project-process 階段一律禁止 fallback。
+- **FR-041**：Windows 真實 runtime E2E 必須在形狀等同 VS Code 預設 `AppData/Roaming/Code/User/globalStorage/<extension-id>/runtime-v1`、且上層含 Unicode、空白與合法特殊字元的隔離路徑執行，不得以過短暫存根取代正式路徑預算驗證。
 
 ### 核心概念
 
@@ -231,6 +235,9 @@
 - **SC-012**：一般資料夾在安全詢問取消後，Project Skill 安裝與 workspace 設定呼叫次數皆為 0，且受保護目錄的檔案差異數為 0。
 - **SC-013**：OTA 設定與清除的自動化契約 100% 證明共用進度卡在 Host request 前可見；清除執行期間不得出現虛構的 `aria-valuenow`。
 - **SC-014**：共用進度元件在亮色、暗色、高對比與 reduced-motion 驗收中都具有可辨識 running、succeeded 與 failed 狀態，未定義 theme token 使用數為 0。
+- **SC-015**：預設 Windows global storage 形狀的 x64／ARM64 真實安裝、版本 probe 與離線重啟全數通過，且最深受測 PlatformIO 檔案路徑不因版本目錄的冗長名稱超出相容預算。
+- **SC-016**：所有 managed installer 階段失敗都能在診斷摘要、AI repair packet 與人工 issue draft 中看到同一 attempt／stage／code 與有界 stdout／stderr；未遮蔽完整本機路徑數量為 0。
+- **SC-017**：`managed-provisioning` 在 probe／prepare 的允許案例最多 fallback 一次；取消及 project-process 案例的自動 fallback 次數為 0。
 
 ## 假設
 

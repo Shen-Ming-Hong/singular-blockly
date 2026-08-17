@@ -144,17 +144,17 @@ scripts/
 ### 2. 儲存、權限與原子交易
 
 - 預設根目錄為 `context.globalStorageUri/runtime-v1`；自訂 `singularBlockly.managedRuntime.path` 為 machine scope，只接受本機絕對路徑，不允許 workspace-relative、UNC／network path、根目錄或既有 symlink component。
-- 儲存根先以 `.singular-managed-runtime-root.json` 證明所有權；全新目錄只有在為空時可認領，非空且未受管理的自訂路徑直接拒絕。其下含 `downloads/`、`staging/`、`versions/<runtime-id>/`、`current.json`、`locks/install.lock` 與 `workspaces/<sha256-workspace>/`。工作區 hash 使用 canonical URI，不把原始路徑寫入公開診斷。
+- 儲存根先以 `.singular-managed-runtime-root.json` 證明所有權；全新目錄只有在為空時可認領，非空且未受管理的自訂路徑直接拒絕。其下含 `downloads/`、`staging/`、`versions/<transaction-uuid>/`、`current.json`、`locks/install.lock` 與 `workspaces/<sha256-workspace>/`。固定長度 UUID 為 Windows 預設 global storage 保留路徑預算；完整 runtime／artifact id 只存於 record。工作區 hash 使用 canonical URI，不把原始路徑寫入公開診斷。
 - 安裝先取得跨視窗 lock，再於同一檔案系統建立具 transaction marker 的 staging metadata，並直接準備不可變候選版本以保留 Python venv 的絕對路徑語意。健康檢查至少涵蓋 Python、pip、受測範圍內的 `pio --version`、`pio system info --json-output` 與 `mpremote version`；全部成功後最後原子替換 `current.json`。
 - `current.json` 永遠指向完整且已驗證版本。cleanup 與安裝／修復共用同一 lock，只清理由有效 transaction marker、版本 ownership marker 或 manifest hash 證明屬於 Singular 的項目；未知 staging／版本與非受管檔案保持不動。更新失敗保留 current 與前一個可用版本。
-- `onStartupFinished` 呼叫 background coordinator；若狀態不是 ready／unsupported，開始 `ensureReady()`。開啟 Blockly 再呼叫同一 coordinator，同視窗共用 in-flight Promise，跨視窗使用 install lock。背景失敗只記錄遮蔽後錯誤並允許之後重試，不阻止編輯器或 provider 引導。
+- `onStartupFinished` 呼叫 background coordinator；若狀態不是 ready／unsupported，開始 `ensureReady()`。開啟 Blockly 再呼叫同一 coordinator；同一 Extension Host 的 ensure／repair 共用單一 in-flight provisioning Promise，跨視窗使用 install lock。service 在記憶體保留 provisioning attempt、trigger、stage、percent 與最近失敗；installer 將受限長度且完成 privacy redaction 的 message／stdout／stderr 附在結構化失敗。背景 log 只寫 stage／attempt，不輸出 raw evidence；失敗不阻止編輯器或 provider 引導。
 
 ### 3. 雙 Core 選擇與 fallback
 
 - Provider Core 仍由 `PlatformioInvocationResolver` 從官方 customPATH、provider penv 與 PATH 探測；同時存在時固定優先官方 `platformio.platformio-ide` 再 PIOArduino，診斷呈現來源。
 - Singular Core 由 install record 產生絕對 Python／pio／pip／mpremote 路徑與專用環境變數：`PLATFORMIO_CORE_DIR`、`PLATFORMIO_CACHE_DIR`、`PLATFORMIO_WORKSPACE_DIR`、`PLATFORMIO_BUILD_DIR`、`PLATFORMIO_LIBDEPS_DIR`、`PLATFORMIO_SETTING_ENABLE_TELEMETRY=No`、`PLATFORMIO_SETTING_ENABLE_PROMPTS=No`、`PLATFORMIO_NO_ANSI=true`。
 - Arduino 操作選擇 provider → managed；Python／mpremote 選擇 managed → provider。選擇結果與最近本機故障在視窗記憶體中依 workload sticky，重新測試、修復或視窗重啟清除。
-- 每個候選先執行不載入專案的版本／能力探測。Arduino 真正啟動前先在已信任 workspace 執行 `pio pkg install --project-dir <project>`；只有 spawn、missing executable、Python import、permission、local Core store corruption 等本機環境錯誤可在真正 `pio run -t upload` 之前切換一次。
+- 每個候選先執行不載入專案的版本／能力探測。Arduino 真正啟動前先在已信任 workspace 執行 `pio pkg install --project-dir <project>`；只有 spawn、missing executable、Python import、permission、local Core store corruption，以及明確標記為 `managed-provisioning` 的 probe／prepare 失敗，可在真正 `pio run -t upload` 之前切換一次。
 - 編譯／設定、DNS／proxy／TLS／registry、裝置／serial 與 cancellation 錯誤不 fallback；`pio run -t upload` spawn 成功即視為上傳已開始，後續任何 exit code 都不以另一 Core 重試。
 
 ### 4. 子程序、監控與 Workspace Trust
@@ -168,6 +168,7 @@ scripts/
 
 - 現有 PlatformIO 診斷 schema 升級為雙環境：每個 Core 顯示來源、版本、健康、受管理根目錄摘要、用量、工具與 package 狀態；另顯示 Arduino／Python 目前選擇及最近 fallback 類別。
 - package 狀態在尚未執行真實 project package install 前為 `unknown`，不以網路探測或假 install 宣告健康。
+- 診斷 session 會納入 managed provisioning 的 running／failed snapshot；失敗時整體狀態至少為 degraded，即使 provider 可用也不得把背景安裝失敗誤報為完全 operational。複製摘要、AI repair packet 與 issue draft 共用遮蔽後 attempt／stage／code／bounded stdout／stderr。
 - 複製摘要使用現有 privacy redactor，workspace 與 home 轉成穩定 token；不輸出完整 manifest URL query、專案內容、環境變數值或 secrets。
 - managed Core 卡片提供「開啟 Singular Core 資料夾」動作；WebView 只送出固定 command，不攜帶路徑，Extension Host 才以本機 `revealFileInOS` 開啟 managed root。完整路徑不進入 WebView state、log、clipboard 或 issue draft。
 - repair 建立新交易並只切換 managed current；cleanup 列出並驗證目標後只刪除 managed-owned 項目，不觸碰 provider、專案或自訂路徑中的未知檔案。新增文字全部經 15 語系流程。
@@ -180,7 +181,7 @@ scripts/
 
 ### 7. CI、PR 與發布閘門
 
-- `ci.yml` 的每個 PR 在 Windows／macOS／Linux 以本機 fake artifact 執行安裝、Unicode／空白／特殊字元／長路徑、checksum、permission 與 rollback 測試，不連外，維持 `pull_request`、`contents: read`、零 secrets。
+- `ci.yml` 的每個 PR 在 Windows／macOS／Linux 以本機 fake artifact 執行安裝、Unicode／空白／特殊字元／長路徑、checksum、permission 與 rollback 測試，不連外，維持 `pull_request`、`contents: read`、零 secrets。真實 E2E 的 sandbox 需模擬 VS Code 預設 global storage 層級，且上層目錄含 Unicode、空白與合法特殊字元，避免短暫存根掩蓋 Windows 路徑預算缺陷。
 - `runtime-installation.yml` 只由 `pull_request` 的 label gate 或受限 `workflow_dispatch` 執行。`runtime-e2e-approved` 執行三 OS x64 真實下載；`release-candidate` 加入目前宣告支援且可由標準 GitHub-hosted runner 執行的 ARM64。外部 PR 在維護者核准前不執行真實下載，且永不使用 `pull_request_target` 執行 PR 程式碼。所有會執行候選程式碼的 checkout 直接使用 GitHub event 綁定的 immutable SHA；reusable publish caller 則明確傳入同一 release tag 作 `candidate_ref`，且動態 release ref 的真實矩陣不寫入 npm dependency cache。被呼叫 workflow 的 `github.event_name` 沿用 caller event，不能以 `workflow_call` 字串判斷是否執行；prepare job 輸出的 SHA 只供 evidence 身分比對，不得再作為可執行 checkout ref。
 - 底層 artifact selector 對 `release-candidate` 預設 fail closed；正式 Extension factory 因 publish workflow 強制要求完整 ARM64 release matrix，才明確啟用 manifest 內的 ARM64 候選。缺少對應 evidence 時不得發布該 factory policy。
 - evidence JSON 直接讀取真實 E2E result，記錄 PR／event、head SHA、tree SHA、VSIX SHA-256、runtime manifest SHA-256、runner image／arch、artifact id／SHA-256 與測試結果；verifier 必須將 artifact 逐項對回 manifest。新 commit 使 check 與 evidence 自動失效。

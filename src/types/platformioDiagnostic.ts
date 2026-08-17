@@ -134,6 +134,7 @@ export interface CoreDiagnosticEnvironment {
 	packageStatus: import('./coreEnvironment').PackageHealthStatus;
 	failureClass: import('./coreEnvironment').CoreFailureClass | null;
 	reason: string;
+	provisioning?: import('./managedRuntime').ManagedRuntimeProvisioningState;
 }
 
 export interface CoreDiagnosticSummary {

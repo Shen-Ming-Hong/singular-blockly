@@ -65,6 +65,24 @@ suite('CoreEnvironmentManager', () => {
 		}
 	});
 
+	test('uses a healthy provider when managed provisioning fails before a Python workload starts', async () => {
+		const calls: string[] = [];
+		const provisioningError = Object.assign(new Error('managed installer exited with code 1'), {
+			failureDomain: 'managed-provisioning', started: true, code: 1,
+		});
+		const manager = new CoreEnvironmentManager(
+			fakeProvider('provider', calls, async () => environment('provider')),
+			fakeProvider('managed', calls, async () => {throw provisioningError;})
+		);
+
+		const result = await manager.getEnvironment('python', 'file:///workspace');
+
+		assert.strictEqual(result.selected?.id, 'provider');
+		assert.strictEqual(result.fallbackUsed, true);
+		assert.deepStrictEqual(calls, ['managed', 'provider']);
+		assert.strictEqual(manager.getSelection('python', 'file:///workspace').stickyReason, 'managed-provisioning');
+	});
+
 	test('retries a pre-start local operation failure with the other Core and makes it sticky', async () => {
 		const calls: string[] = [];
 		const operations: string[] = [];

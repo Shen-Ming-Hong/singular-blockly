@@ -14,6 +14,7 @@ export interface CoreFailureEvidence {
 	message?: string;
 	stdout?: string;
 	stderr?: string;
+	failureDomain?: unknown;
 }
 
 const LOCAL_FALLBACK_FAILURES = new Set<CoreFailureClass>([
@@ -53,6 +54,7 @@ function evidenceFromError(error: unknown, phase: CoreOperationPhase): Required<
 		message: extractErrorMessage(error, candidate, nested),
 		stdout: error instanceof PlatformioProcessError ? error.stdout : String(candidate.stdout ?? ''),
 		stderr: error instanceof PlatformioProcessError ? error.stderr : String(candidate.stderr ?? ''),
+		failureDomain: candidate.failureDomain ?? nested.failureDomain ?? '',
 	};
 }
 
@@ -63,6 +65,7 @@ export function classifyCoreFailure(error: unknown, phase: CoreOperationPhase): 
 	const text = `${evidence.message}\n${evidence.stdout}\n${evidence.stderr}`.toLowerCase();
 
 	if (code === 'ABORT_ERR' || /\b(abort(?:ed)?|cancel(?:led|ed))\b/.test(text)) {return 'cancelled';}
+	if (evidence.failureDomain === 'managed-provisioning') {return 'managed-provisioning';}
 	if (/\b(cert(?:ificate)?|self[- ]signed|unable to verify|tls|ssl)\b/.test(text)) {return 'tls';}
 	if (/\b(proxy|407 proxy authentication)\b/.test(text)) {return 'proxy';}
 	if (code === 'ENOTFOUND' || code === 'EAI_AGAIN' || /\b(dns|name resolution|getaddrinfo)\b/.test(text)) {return 'dns';}
@@ -87,6 +90,7 @@ export function isCoreFallbackAllowed(
 	started: boolean
 ): boolean {
 	if (failureClass === 'cancelled' || phase === 'project-process' && started) {return false;}
+	if (failureClass === 'managed-provisioning') {return phase === 'probe' || phase === 'prepare';}
 	return (phase === 'probe' || phase === 'prepare' || phase === 'project-process') && LOCAL_FALLBACK_FAILURES.has(failureClass);
 }
 

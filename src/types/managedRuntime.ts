@@ -8,6 +8,49 @@ export type ManagedRuntimePlatform = 'win32' | 'darwin' | 'linux';
 export type ManagedRuntimeArch = 'x64' | 'arm64';
 export type RuntimeSupportStatus = 'stable' | 'release-candidate';
 
+export type ManagedRuntimeInstallStage =
+	| 'waiting-lock'
+	| 'downloading-python'
+	| 'extracting-python'
+	| 'installing-platformio'
+	| 'installing-mpremote'
+	| 'verifying'
+	| 'committing';
+
+export type ManagedRuntimeProvisioningTrigger = 'activation' | 'editor-open' | 'workload' | 'repair';
+
+export interface ManagedRuntimeProvisioningFailure {
+	failureDomain: 'managed-provisioning';
+	stage: ManagedRuntimeInstallStage;
+	code: string;
+	started: boolean;
+	message: string;
+	stdout: string;
+	stderr: string;
+}
+
+export type ManagedRuntimeProvisioningState =
+	| { status: 'idle'; attempt: number }
+	| {
+		status: 'running';
+		attempt: number;
+		trigger: ManagedRuntimeProvisioningTrigger;
+		stage: ManagedRuntimeInstallStage;
+		percent: number;
+		startedAt: string;
+		updatedAt: string;
+	}
+	| {
+		status: 'failed';
+		attempt: number;
+		trigger: ManagedRuntimeProvisioningTrigger;
+		stage: ManagedRuntimeInstallStage;
+		percent: number;
+		startedAt: string;
+		failedAt: string;
+		failure: ManagedRuntimeProvisioningFailure;
+	};
+
 export interface RuntimeDownload {
 	url: string;
 	sha256: string;
