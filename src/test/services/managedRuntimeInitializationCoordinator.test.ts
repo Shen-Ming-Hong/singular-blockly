@@ -34,6 +34,25 @@ suite('ManagedRuntimeInitializationCoordinator', () => {
 		assert.ok(runtime.ensureReady.calledOnce);
 	});
 
+	test('forwards cancellation to background provisioning', async () => {
+		const controller = new AbortController();
+		const runtime = {
+			getStatus: sinon.stub().resolves({ status: 'missing' }),
+			ensureReady: sinon.stub().callsFake(async options => {
+				assert.strictEqual(options.signal, controller.signal);
+				return record();
+			}),
+		};
+
+		await new ManagedRuntimeInitializationCoordinator(runtime).initialize(
+			'activation',
+			undefined,
+			controller.signal
+		);
+
+		assert.ok(runtime.ensureReady.calledOnce);
+	});
+
 	test('deduplicates simultaneous activation and editor-open initialization', async () => {
 		let release!: () => void;
 		const pending = new Promise<void>(resolve => {release = resolve;});

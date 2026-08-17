@@ -338,6 +338,20 @@ window.languageManager.loadMessages('tr', {
 
 	// PlatformIO Diagnostic Panel
 	PLATFORMIO_DIAGNOSTIC_PANEL_TITLE: 'PlatformIO Tanılama',
+	MANAGED_RUNTIME_PROGRESS_INITIALIZE_TITLE: 'Singular Core hazırlanıyor',
+	MANAGED_RUNTIME_PROGRESS_REPAIR_TITLE: 'Singular Core onarılıyor',
+	MANAGED_RUNTIME_PROGRESS_STAGE_PERCENT: '{0} (%{1})',
+	MANAGED_RUNTIME_PROGRESS_WAITING_LOCK: 'Başka bir penceredeki Singular Core hazırlığının bitmesi bekleniyor',
+	MANAGED_RUNTIME_PROGRESS_DOWNLOADING_PYTHON: 'Yönetilen Python çalışma ortamı indiriliyor',
+	MANAGED_RUNTIME_PROGRESS_EXTRACTING_PYTHON: 'Yönetilen Python çalışma ortamı çıkarılıyor',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_PLATFORMIO: 'PlatformIO Core yükleniyor',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'CyberBrick cihaz yardımcısı yükleniyor',
+	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Yönetilen araçlar doğrulanıyor',
+	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Doğrulanan Singular Core tamamlanıyor',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core için bu Windows sisteminde daha kısa bir yerel klasör gerekiyor. Provider Core değiştirilmedi.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Singular Core kurulumu tamamlanmadı. Provider Core değiştirilmedi.',
+	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Tanılamayı aç',
+	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Daha kısa klasör seç',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
 		'Uzantının PlatformIO CLI, penv ve CyberBrick yardımcı araçlarını çözümleyip çözümleyemediğini denetleyin.',
 	PLATFORMIO_DIAGNOSTIC_LOADING_TITLE: 'PlatformIO ortamı denetleniyor...',

@@ -20,8 +20,10 @@ import { WorkspaceCandidateService } from './services/workspaceCandidateService'
 import { createManagedRuntimeService } from './services/managedRuntimeFactory';
 import type { ManagedRuntimeService } from './services/managedRuntimeService';
 import { ManagedRuntimeInitializationCoordinator } from './services/managedRuntimeInitializationCoordinator';
+import { ManagedRuntimeProgressPresenter } from './services/managedRuntimeProgressPresenter';
 import { CoreEnvironmentManager } from './services/coreEnvironmentManager';
 import { ManagedCoreEnvironmentProvider, ProviderCoreEnvironmentProvider } from './services/coreEnvironmentProviders';
+import { PlatformioAiRepairPacketService } from './services/platformioAiRepairPacketService';
 
 // AI model manager (initialized when Copilot is available)
 let aiModelManager: AIModelManager | undefined;
@@ -72,15 +74,42 @@ export async function activate(context: vscode.ExtensionContext) {
 		const managedRuntimeInitialization = managedRuntimeService
 			? new ManagedRuntimeInitializationCoordinator(managedRuntimeService)
 			: undefined;
+		const platformioDiagnosticService = PlatformioDiagnosticService.fromLocaleService(localeService, {
+			configuration: {
+				get(section: string, key: string) {
+					return vscodeApi.workspace.getConfiguration(section).get(key);
+				},
+			},
+			managedRuntime: managedRuntimeService,
+			coreEnvironmentManager,
+		});
+		const managedRuntimeProgress = managedRuntimeService && managedRuntimeInitialization
+			? new ManagedRuntimeProgressPresenter(managedRuntimeService, managedRuntimeInitialization, localeService, {
+				withProgress: async (options, task) => vscodeApi.window.withProgress(
+					{ location: vscodeApi.ProgressLocation.Notification, ...options },
+					task
+				),
+				showErrorMessage: async (message, ...actions) => vscodeApi.window.showErrorMessage(message, ...actions),
+				openDiagnostics: async () => {
+					await vscodeApi.commands.executeCommand('singular-blockly.checkPlatformioStatus');
+				},
+				chooseShorterFolder: async () => {
+					await vscodeApi.commands.executeCommand(
+						'workbench.action.openSettings',
+						'singularBlockly.managedRuntime.path'
+					);
+				},
+				copyRepairPacket: async () => {
+					await vscodeApi.commands.executeCommand('singular-blockly.copyPlatformioRepairPacket');
+				},
+			})
+			: undefined;
 		const initializeManagedRuntime = (trigger: 'activation' | 'editor-open'): void => {
 			if (!managedRuntimeInitialization) {return;}
-			void managedRuntimeInitialization.initialize(trigger, progress => {
-				log('[managed-runtime] background initialization progress', 'info', {
-					trigger,
-					stage: progress.stage,
-					percent: progress.percent,
-				});
-			}).then(result => {
+			const initialization = managedRuntimeProgress
+				? managedRuntimeProgress.initialize(trigger)
+				: managedRuntimeInitialization.initialize(trigger);
+			void initialization.then(result => {
 				log('[managed-runtime] background initialization completed', 'info', result);
 			}).catch(error => {
 				const provisioning = managedRuntimeService?.getProvisioningState();
@@ -93,15 +122,6 @@ export async function activate(context: vscode.ExtensionContext) {
 			});
 		};
 		initializeManagedRuntime('activation');
-		const platformioDiagnosticService = PlatformioDiagnosticService.fromLocaleService(localeService, {
-			configuration: {
-				get(section: string, key: string) {
-					return vscodeApi.workspace.getConfiguration(section).get(key);
-				},
-			},
-			managedRuntime: managedRuntimeService,
-			coreEnvironmentManager,
-		});
 
 		// 【最優先】檢查是否為 CyberBrick/MicroPython 專案，若是則刪除 platformio.ini
 		// 必須在 PlatformIO 擴充功能偵測到 ini 檔案之前執行
@@ -191,6 +211,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			() => syncPrimaryWorkspaceCandidateService(true),
 			coreEnvironmentManager,
 			managedRuntimeService,
+			managedRuntimeProgress,
 			() => initializeManagedRuntime('editor-open')
 		);
 
@@ -244,6 +265,7 @@ function registerCommands(
 	ensurePrimaryWorkspaceCandidateService: () => void,
 	coreEnvironmentManager?: CoreEnvironmentManager,
 	managedRuntimeService?: ManagedRuntimeService,
+	managedRuntimeProgress?: ManagedRuntimeProgressPresenter,
 	initializeManagedRuntime?: () => void
 ) {
 	log('Registering commands...', 'info');
@@ -251,8 +273,15 @@ function registerCommands(
 	// WebView 管理器（單例）
 	let webViewManager: WebViewManager | undefined;
 	let editorOpenInFlight: Promise<void> | undefined;
+	const diagnosticManagedRuntime = managedRuntimeService
+		? {
+			repair: () => managedRuntimeProgress?.repair() ?? managedRuntimeService.repair(),
+			cleanup: () => managedRuntimeService.cleanup(),
+			getStorageRoot: () => managedRuntimeService.getStorageRoot(),
+		}
+		: undefined;
 	const platformioDiagnosticPanel = new PlatformioDiagnosticPanel(context, localeService, platformioDiagnosticService, fs, {
-		managedRuntimeService,
+		managedRuntimeService: diagnosticManagedRuntime,
 		coreEnvironmentManager,
 	});
 
@@ -435,6 +464,32 @@ function registerCommands(
 			vscodeApi.window.showErrorMessage(errorMsg);
 		}
 	});
+	const copyPlatformioRepairPacketCommand = vscodeApi.commands.registerCommand(
+		'singular-blockly.copyPlatformioRepairPacket',
+		async () => {
+			try {
+				const workspacePath = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath ?? null;
+				const session = await platformioDiagnosticService.collectDiagnostics(workspacePath);
+				const packet = new PlatformioAiRepairPacketService().buildPacket({ session });
+				await vscodeApi.env.clipboard.writeText(packet.plainText);
+				vscodeApi.window.showInformationMessage(await localeService.getLocalizedMessage(
+					'PLATFORMIO_REPAIR_AI_PACKET_COPY_SUCCESS',
+					'AI repair packet copied with sensitive details redacted.'
+				));
+			} catch (error) {
+				log('[managed-runtime] failed to copy repair packet', 'error', {
+					code: error instanceof Error && 'code' in error
+						? String((error as Error & { code?: unknown }).code)
+						: 'copy-failed',
+				});
+				vscodeApi.window.showErrorMessage(await localeService.getLocalizedMessage(
+					'PLATFORMIO_REPAIR_AI_PACKET_COPY_FAILED',
+					'Unable to copy the AI repair packet: {0}',
+					'copy-failed'
+				));
+			}
+		}
+	);
 
 	// 註冊手動觸發 AI 積木建議命令（透過 keybinding Ctrl+Shift+. 觸發）
 	const triggerAISuggestionCommand = vscodeApi.commands.registerCommand('singular-blockly.triggerAISuggestion', () => {
@@ -477,6 +532,7 @@ function registerCommands(
 	context.subscriptions.push(showOutputCommand);
 	context.subscriptions.push(previewBackupCommand);
 	context.subscriptions.push(checkPlatformioStatusCommand);
+	context.subscriptions.push(copyPlatformioRepairPacketCommand);
 	context.subscriptions.push(triggerAISuggestionCommand);
 	context.subscriptions.push(stopTxtExecutionCommand);
 	context.subscriptions.push(installTxtRuntimeCommand);

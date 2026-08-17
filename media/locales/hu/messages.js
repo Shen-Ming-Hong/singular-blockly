@@ -338,6 +338,20 @@ window.languageManager.loadMessages('hu', {
 
 	// PlatformIO Diagnostic Panel
 	PLATFORMIO_DIAGNOSTIC_PANEL_TITLE: 'PlatformIO Diagnostic',
+	MANAGED_RUNTIME_PROGRESS_INITIALIZE_TITLE: 'A Singular Core előkészítése',
+	MANAGED_RUNTIME_PROGRESS_REPAIR_TITLE: 'A Singular Core javítása',
+	MANAGED_RUNTIME_PROGRESS_STAGE_PERCENT: '{0} ({1}%)',
+	MANAGED_RUNTIME_PROGRESS_WAITING_LOCK: 'Várakozás arra, hogy egy másik ablak befejezze a Singular Core előkészítését',
+	MANAGED_RUNTIME_PROGRESS_DOWNLOADING_PYTHON: 'A felügyelt Python futtatókörnyezet letöltése',
+	MANAGED_RUNTIME_PROGRESS_EXTRACTING_PYTHON: 'A felügyelt Python futtatókörnyezet kibontása',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_PLATFORMIO: 'A PlatformIO Core telepítése',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'A CyberBrick eszközsegéd telepítése',
+	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'A felügyelt eszközök ellenőrzése',
+	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Az ellenőrzött Singular Core véglegesítése',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'A Singular Core rövidebb helyi mappát igényel ezen a Windows rendszeren. A Provider Core nem változott.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'A Singular Core beállítása nem fejeződött be. A Provider Core nem változott.',
+	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Diagnosztika megnyitása',
+	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Rövidebb mappa választása',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
 		'Check whether the extension can resolve PlatformIO CLI, penv, and the CyberBrick helper tools.',
 	PLATFORMIO_DIAGNOSTIC_LOADING_TITLE: 'Checking PlatformIO environment...',

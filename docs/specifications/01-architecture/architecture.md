@@ -109,6 +109,7 @@ Extension Host (Node.js)           WebView (Browser Context)
     ├── blockContractService.ts # 正式積木契約讀取
     ├── workspaceCandidateService.ts # 外部候選隔離／復原
     ├── managedRuntimeInitializationCoordinator.ts # activation／editor-open 預熱去重
+    ├── managedRuntimeProgressPresenter.ts # 原生 Notification 進度、取消與復原動作
     ├── managedRuntimeService.ts # 自有 Python／PlatformIO／mpremote ensure、診斷與修復
     ├── managedRuntimeInstaller.ts # checksum、staging、lock、健康檢查與原子提交
     ├── coreEnvironmentManager.ts # Provider／Managed 雙 Core 路由與安全 fallback
@@ -121,9 +122,9 @@ Extension Host (Node.js)           WebView (Browser Context)
 
 ## 受管理 Runtime 與雙 Core
 
-Extension 的 `onStartupFinished` activation 完成後，`ManagedRuntimeInitializationCoordinator` 先讀取本機 `current.json`；缺失或損壞時在背景呼叫冪等 `ensureReady()`，不等待第一次上傳。使用者每次從活動列或命令開啟 Blockly 編輯器都會再次檢查；同視窗共用單一 in-flight Promise，跨視窗由 install lock 序列化。背景網路失敗不阻止編輯器開啟，上傳器仍自行 `ensureReady()` 作最後防線。
+Extension 的 `onStartupFinished` activation 完成後，`ManagedRuntimeInitializationCoordinator` 先讀取本機 `current.json`；缺失或損壞時在背景呼叫冪等 `ensureReady()`，不等待第一次上傳。`ManagedRuntimeProgressPresenter` 只在缺少／無效 Core 或明確 repair 時使用 VS Code 原生 Notification 呈現真實 stage、進度與取消；ready／unsupported 保持安靜。使用者每次從活動列或命令開啟 Blockly 編輯器都會再次檢查；同視窗共用單一 in-flight Promise，跨視窗由 install lock 序列化並在取得 lock 後採用另一視窗已完成的健康 current。背景網路失敗不阻止編輯器開啟，上傳器仍自行 `ensureReady()` 作最後防線。
 
-受管理環境位於 Extension `globalStorageUri` 或經驗證的 machine-scoped 本機路徑。根目錄必須為空目錄或已有有效 Singular ownership marker；安裝、修復與 cleanup 共用同一把跨視窗 lock。系統使用固定 SHA-256 manifest 下載 CPython 與 PlatformIO installer，以 pip constraint 限制 PlatformIO 受測版本範圍；`versions/` 下的新候選以固定長度 transaction UUID 命名，完整 runtime／artifact 身分留在 record，為 Windows 預設 global storage 保留路徑預算。完成 staging transaction、工具 probe 與原子 `current.json` 後才視為 ready。它不使用系統 Python，也不修改 provider penv。
+受管理環境位於 Extension `globalStorageUri` 或經驗證的 machine-scoped 本機路徑。根目錄必須為空目錄或已有有效 Singular ownership marker；安裝、修復與 cleanup 共用同一把跨視窗 lock。系統使用固定 SHA-256 manifest 下載 CPython 與 PlatformIO installer，以 pip constraint 限制 PlatformIO 受測版本範圍；`versions/` 下的新候選以固定長度 transaction UUID 命名，完整 runtime／artifact 身分留在 record。PlatformIO installer scratch 則移到系統暫存根下的固定產品前綴、20-hex 交易 leaf，並以獨占 marker 限定清理所有權；Windows 在執行 artifact 前分別預檢 runtime 與 scratch 的後代路徑餘裕。完成 staging transaction、工具 probe 與原子 `current.json` 後才視為 ready。它不使用系統 Python，也不修改 provider penv。
 
 工作負載路由固定如下：
 

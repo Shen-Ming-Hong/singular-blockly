@@ -337,6 +337,20 @@ window.languageManager.loadMessages('ko', {
 
 	// PlatformIO Diagnostic Panel
 	PLATFORMIO_DIAGNOSTIC_PANEL_TITLE: 'PlatformIO Diagnostic',
+	MANAGED_RUNTIME_PROGRESS_INITIALIZE_TITLE: 'Singular Core를 준비하고 있어요',
+	MANAGED_RUNTIME_PROGRESS_REPAIR_TITLE: 'Singular Core를 복구하고 있어요',
+	MANAGED_RUNTIME_PROGRESS_STAGE_PERCENT: '{0} ({1}%)',
+	MANAGED_RUNTIME_PROGRESS_WAITING_LOCK: '다른 창에서 Singular Core 준비가 끝나기를 기다리고 있어요',
+	MANAGED_RUNTIME_PROGRESS_DOWNLOADING_PYTHON: '관리형 Python 실행 환경을 다운로드하고 있어요',
+	MANAGED_RUNTIME_PROGRESS_EXTRACTING_PYTHON: '관리형 Python 실행 환경의 압축을 풀고 있어요',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_PLATFORMIO: 'PlatformIO Core를 설치하고 있어요',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'CyberBrick 장치 도우미를 설치하고 있어요',
+	MANAGED_RUNTIME_PROGRESS_VERIFYING: '관리형 도구를 확인하고 있어요',
+	MANAGED_RUNTIME_PROGRESS_COMMITTING: '확인된 Singular Core를 적용하고 있어요',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: '이 Windows 시스템에서는 Singular Core에 더 짧은 로컬 폴더가 필요해요. Provider Core는 변경되지 않았어요.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Singular Core 설정을 완료하지 못했어요. Provider Core는 변경되지 않았어요.',
+	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: '진단 열기',
+	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: '더 짧은 폴더 선택',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
 		'Check whether the extension can resolve PlatformIO CLI, penv, and the CyberBrick helper tools.',
 	PLATFORMIO_DIAGNOSTIC_LOADING_TITLE: 'Checking PlatformIO environment...',

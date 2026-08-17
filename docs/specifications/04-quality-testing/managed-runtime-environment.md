@@ -33,7 +33,7 @@ npm run test:managed-runtime:e2e -- --allow-network
 ARM64 release-candidate artifact 另需 `--allow-release-candidate`。腳本將 runtime 放在自己建立的暫存子目錄；完成後只刪除該子目錄，不接受把 workspace、home 或磁碟根目錄當作清理目標。
 正式 Extension factory 會啟用 manifest 已宣告的 ARM64 release-candidate artifact；這個產品政策的前提是發布 workflow 把對應 ARM64 矩陣設為必要門檻。底層 service 與本機腳本仍預設 fail closed，需明確 flag 才能選取候選 artifact。
 
-真實 E2E 的 sandbox 上層名稱包含 Unicode、空白與合法特殊字元，managed root 再置於 `AppData/Roaming/Code/User/globalStorage/Singular-Ray.singular-blockly/runtime-v1` 等同形狀下；各 OS 都使用同一形狀，Windows 特別用來驗證正式預設路徑預算。evidence 的 path cases 必須包含 `default-global-storage-shape`，不可用較短暫存根替代。
+真實 E2E 的 sandbox 上層名稱包含 Unicode、空白與合法特殊字元，managed root 再置於 `AppData/Roaming/Code/User/globalStorage/Singular-Ray.singular-blockly/runtime-v1` 等同形狀下；各 OS 都使用同一形狀，Windows 特別用來驗證正式預設路徑預算。PlatformIO installer scratch 必須落在系統暫存根下的短交易 leaf，不得回到 `versions/<uuid>/installer-tmp`；Windows path-budget preflight 要同時通過 immutable runtime 與 scratch 投影。evidence 的 path cases 必須包含 `default-global-storage-shape`，不可用較短 managed root 替代。
 
 自訂 managed path 只能是空的本機目錄，或先前已有有效 Singular root ownership marker 的目錄；非空且未受管的位置會在建立任何 runtime 子目錄前拒絕。cleanup 與 install 共用 lock，因此安裝進行中的 staging 不會被同時清理。
 
@@ -88,3 +88,6 @@ Cloud runner 不接實體裝置。正式發布前仍需人工確認：
 - 上傳程序開始後的裝置／serial 失敗不會改用另一 Core 重傳；
 - 不受信任 workspace 不啟動 pkg install、build、upload 或 monitor；
 - Extension 啟用後不按上傳即開始 managed Core 背景初始化，活動列開啟編輯器會重查但不阻塞 UI。
+- 乾淨 Windows 在 `LongPathsEnabled=0` 與預設 global storage 形狀完成首次初始化；右下角 Notification 可取消、stage 單調前進，完成後 reload 不重複顯示。
+- 兩個視窗同時初始化時只安裝一次，等候視窗採用相同 current record；取消及失敗後不留下本次 installer scratch 或 ready 半成品。
+- 人為設定過長 managed path 時，在 artifact 執行前得到 `path-too-long` 與三個安全復原動作；診斷／AI packet 不含完整敏感路徑，provider Core 維持不變。

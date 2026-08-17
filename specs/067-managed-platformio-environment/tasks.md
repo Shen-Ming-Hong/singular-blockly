@@ -237,7 +237,20 @@
 - [x] T092 [P] 建立涵蓋 storage initialize 與 installer 的 attempt／trigger／stage／percent／recent failure provisioning state，保存遮蔽且有界的 message／stdout／stderr於 `src/types/managedRuntime.ts`、`src/services/managedRuntimeService.ts` 與 `src/services/managedRuntimeInstaller.ts`
 - [x] T093 將 `managed-provisioning` 納入 probe／prepare fallback、雙 Core 診斷卡片、AI repair packet 與人工 issue draft，補 cancellation／project-process fail-closed、WebView escaping 及 privacy regression 於 `src/services/`、`media/js/platformioDiagnostic.js` 與 `src/test/`
 - [x] T094 將真實 E2E root 改為預設 global storage 形狀，執行 managed runtime、特殊路徑、完整 unit／static／package／release gates，並更新 `specs/067-managed-platformio-environment/checklists/implementation.md`
-- [ ] T095 執行 security-checker、code-simplifier 與 local Code Review 收斂；同步 `0.87.1` 版本／雙語 CHANGELOG，取得 Phase 3.5 後才 push、建立 PR、執行完整 runtime matrix 與發布
+- [x] T095 執行 security-checker、code-simplifier 與 local Code Review 收斂；同步 `0.87.1` 版本／雙語 CHANGELOG，取得 Phase 3.5 後才 push、建立 PR、執行完整 runtime matrix 與發布
+
+---
+
+## Phase 17：issue #132 Windows MAX_PATH、通知進度與 v0.87.2
+
+**目的**：讓未啟用 Windows long paths 的預設安裝能保留 PlatformIO／pip scratch 餘裕，並把首次安裝與 repair 的真實進度、取消及復原動作帶到 VS Code Notification。
+
+- [x] T096 [P] [US9] 新增預設／過長 Windows path budget、短 scratch、交易清理、long-path hint 分類與跨視窗採用測試於 `src/test/services/managedRuntimeInstaller.test.ts` 與 `src/test/services/managedRuntimeService.test.ts`
+- [x] T097 [US9] 將 installer scratch 移到短的使用者暫存交易目錄，加入執行前 Windows 路徑預算與 `path-too-long` 正規化於 `src/services/managedRuntimeInstaller.ts`
+- [x] T098 [P] [US9] 建立 Notification presenter 的首次安裝、ready 零通知、絕對轉增量、取消、失敗動作、repair 與同視窗去重測試及實作於 `src/services/managedRuntimeProgressPresenter.ts` 與 `src/test/services/managedRuntimeProgressPresenter.test.ts`
+- [x] T099 [US9] 將 presenter 接到 activation／editor-open／diagnostic repair，新增隱私化 repair packet 命令並完成 15 語系新增 key 與 deterministic i18n PASS 於 `src/extension.ts`、`media/locales/*/messages.js` 與 `src/test/`
+- [x] T100 更新 spec、plan、quickstart、requirements／UX／security／release checklists 與測試文件；執行安全檢查、code-simplifier、本地 review、完整 static／unit／i18n／runtime path 驗證
+- [ ] T101 同步 `0.87.2` 版本與雙語 CHANGELOG，push 修復分支、建立關聯 #132 的 release-candidate PR，通過 CI／CodeQL／六平台 runtime matrix 後 squash merge、annotated tag 與三端發布
 
 ---
 
@@ -250,7 +263,7 @@
 - US1 → US2：CoreEnvironmentManager 需要可用的 managed provider。
 - US2 → US5／US4：provider 相容與診斷需要完成雙 Core 路由。
 - US3 可在 US1 完成後與 US2 並行；US6 可在 Phase 2 後先做 evidence 工具，但 workflow 完整驗證依 US1／US3。
-- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority；Phase 14 收斂 PR 首輪遠端安全與證據閘門 finding；Phase 15 只修復既有 immutable tag 的 workflow recovery，不改變 `v0.87.0` release tree；Phase 16 以 issue #130 的 Windows 正式路徑形狀為 hotfix gate，完成後才進入 `v0.87.1` 發布。
+- Phase 9 依所有納入發布的故事完成；Phase 10 是 F5 驗收回饋的收斂增量；Phase 11 重新審查完整有效差異；Phase 12 完成本地發布契約；Phase 13 再驗證已提交分支的零寫入與 fallback authority；Phase 14 收斂 PR 首輪遠端安全與證據閘門 finding；Phase 15 只修復既有 immutable tag 的 workflow recovery，不改變 `v0.87.0` release tree；Phase 16 以 issue #130 的 Windows 正式路徑形狀完成 `v0.87.1`；Phase 17 以 issue #132 的 short scratch、Notification 與跨視窗採用 gate 完成 `v0.87.2`。
 - US7 的同意 gate 先於任何 workspace-local Skill／設定寫入；US8 與 managed runtime 安裝彼此獨立，可在 US7 測試完成後平行驗證。
 
 ### 平行機會
@@ -283,7 +296,8 @@
 9. Phase 11：以完整工作樹反覆 review／fix／verify，直到沒有可採納 finding。
 10. Phase 12－15：完成 `0.87.0` 本地發布契約，對已提交完整差異執行安全重審，收斂 PR 遠端 CodeQL／evidence finding，並以新 PR 修復不可變 tag 的發布 workflow。
 11. Phase 16：縮短 Windows managed runtime 內部路徑、補齊背景安裝失敗證據與 fallback 契約，通過完整 release-candidate 矩陣後發布 `0.87.1`。
+12. Phase 17：把 installer scratch 移出 managed version、加入執行前 Windows path-budget 與原生通知進度，通過完整矩陣後發布 `0.87.2`。
 
 ## 任務格式驗證
 
-全部 97 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 已由遠端矩陣、F5、乾淨 OS 與實機 smoke 正式證據完成；T088／T089 已由 PR #127 與成功的 recovery publish run `31983230776` 證實完成；T095 在 v0.87.1 Phase 3.5、遠端矩陣與發布完成前保持未完成。
+全部 103 個任務（含 T024A／T024B）皆使用 `- [ ] Txxx [P?] [US?] 描述＋明確檔案路徑`；Setup、Foundational 與收斂任務不含故事標籤，故事階段皆含對應 `[USn]`。T061 已由遠端矩陣、F5、乾淨 OS 與實機 smoke 正式證據完成；T088／T089 已由 PR #127 與成功的 recovery publish run `31983230776` 證實完成；T095 已由 PR #131、v0.87.1 完整矩陣與三端發布完成；T100／T101 追蹤 issue #132 的本地收斂與 v0.87.2 發布。

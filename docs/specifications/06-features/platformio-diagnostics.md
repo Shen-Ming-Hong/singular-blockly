@@ -10,9 +10,9 @@
 
 UI 狀態為 loading、ready、error，固定提供摘要、雙 Core、工具狀態與檢查範圍說明。診斷只呼叫本機 `getStatus()` 與版本 probe，不啟動 managed runtime 安裝、不做 package 網路探測；尚未真實準備的 package 狀態保持 `unknown`。它也不保證 USB、裝置權限或硬體連線正常。
 
-面板提供重新檢查、複製結果、修復 managed runtime、清理受管檔案，以及 managed Core 卡片中的「開啟 Singular Core 資料夾」。修復是使用者明確觸發的新安裝交易；清理先驗證 managed root ownership marker，再與安裝共用同一把 lock，只列舉後刪除具版本 marker 的舊版本、manifest 已知下載與具有效 transaction marker 的 staging，不觸碰目前版本、provider、專案或未知檔案。顯示與剪貼簿只使用 `<managed-storage:hash>`，不輸出完整 managed root；開啟資料夾時 WebView 只送固定 command，實際路徑由 Extension Host 直接交給作業系統檔案管理員，不進入 WebView state、日誌或剪貼簿。
+面板提供重新檢查、複製結果、修復 managed runtime、清理受管檔案，以及 managed Core 卡片中的「開啟 Singular Core 資料夾」。修復是使用者明確觸發的新安裝交易，與首次初始化共用 VS Code 原生可取消 Notification；非取消失敗提供開啟診斷、選擇較短 managed folder 與複製隱私化 AI repair packet。清理先驗證 managed root ownership marker，再與安裝共用同一把 lock，只列舉後刪除具版本 marker 的舊版本、manifest 已知下載與具有效 transaction marker 的 staging，不觸碰目前版本、provider、專案或未知檔案。顯示與剪貼簿只使用 `<managed-storage:hash>`，不輸出完整 managed root；開啟資料夾時 WebView 只送固定 command，實際路徑由 Extension Host 直接交給作業系統檔案管理員，不進入 WebView state、日誌或剪貼簿。
 
-診斷唯讀不代表 Extension 不會在其他生命週期預先安裝：`onStartupFinished` activation 與每次開啟 Blockly 編輯器會由獨立 coordinator 背景檢查 managed Core。面板本身不啟動該流程，避免「只想看狀態」意外產生網路副作用。
+診斷唯讀不代表 Extension 不會在其他生命週期預先安裝：`onStartupFinished` activation 與每次開啟 Blockly 編輯器會由獨立 coordinator 背景檢查 managed Core；缺少／無效 Core 才顯示進度，ready／unsupported 不顯示。面板本身不啟動該流程，避免「只想看狀態」意外產生網路副作用。
 
 ## 引導式修復
 

@@ -33,7 +33,17 @@
 - [x] UX015 reduced-motion 是否停止非必要動畫，同時保留靜態 running 提示而不讓進度看似消失？[Accessibility, Spec §US8.5, FR-036]
 - [x] UX016 所有使用者可見進度文案是否沿用 15 語系契約，且不直接呈現 Host 傳入的 HTML 或未在地化 step message？[Localization/Security, Spec §FR-026, FR-035–FR-037]
 
+## Singular Core Notification progress
+
+- [x] UX017 首次缺少／無效 Core 與明確 repair 是否顯示右下角非阻塞 Notification，ready／unsupported 與成功後 reload 是否保持安靜？[Visibility, Spec §FR-044]
+- [x] UX018 等待另一視窗時是否只有狀態訊息，其餘 stage 才呈現單調的真實百分比，且不以跳動或倒退誤導使用者？[Truthfulness, Spec §FR-045]
+- [x] UX019 取消是否立即傳入 installer 並避免顯示一般失敗提示，非取消失敗是否提供診斷、短路徑與 AI 修復摘要三個可行動選項？[Control/Recovery, Spec §FR-046]
+- [x] UX020 `path-too-long` 訊息是否明確指出需要較短本機資料夾及 provider Core 未被修改，且不顯示完整敏感路徑？[Clarity/Privacy, Spec §FR-043, FR-046]
+- [x] UX021 activation 與 editor-open 同時觸發是否只出現一張通知，跨視窗完成後是否採用同一 Core 並自然結束等待？[Continuity, Spec §FR-044, FR-047]
+- [x] UX022 title、七個 stage、錯誤與動作是否全數支援 15 語系，並沿用 VS Code 原生 Notification 的鍵盤與高對比支援？[Localization/Accessibility, Spec §FR-026, FR-045]
+
 ## 備註
 
 - 自動化契約負責 DOM 位置、操作前 render、ARIA 狀態、theme token 與安全文字渲染；人工 F5 仍需確認實際視覺層級、對比與 reduced-motion 體感。
 - 若人工驗收發現 running state 不明顯，應先修訂 FR-036／SC-014 的可量測門檻，再調整樣式，避免以未記錄的主觀樣式變更取代需求決策。
+- Singular Core 使用 VS Code 原生 Notification surface，不另造 WebView progress DOM；人工 F5 仍需在乾淨 Windows 檢查顯示位置、取消回饋及跨視窗等待體感。

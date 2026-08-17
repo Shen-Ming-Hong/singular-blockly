@@ -47,6 +47,13 @@ export class VSCodeMock {
 		showErrorMessage: sinon.stub().returns(Promise.resolve()),
 		showInformationMessage: sinon.stub().returns(Promise.resolve()),
 		showWarningMessage: sinon.stub().returns(Promise.resolve()),
+		withProgress: sinon.stub().callsFake(async (_options: any, task: any) => task(
+			{ report: sinon.stub() },
+			{
+				isCancellationRequested: false,
+				onCancellationRequested: sinon.stub().returns({ dispose: sinon.stub() }),
+			}
+		)),
 		createWebviewPanel: sinon.stub().callsFake((viewType: string, title: string, showOptions: any, options: any) => {
 			const panel = {
 				webview: {
@@ -182,6 +189,10 @@ export class VSCodeMock {
 	public ViewColumn = {
 		One: 1,
 		Two: 2,
+	};
+
+	public ProgressLocation = {
+		Notification: 15,
 	};
 
 	/**
