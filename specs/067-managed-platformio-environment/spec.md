@@ -4,7 +4,7 @@
 
 **建立日期**：2026-08-15
 
-**狀態**：實作完成，待跨平台 CI 與實機發布驗證
+**狀態**：`v0.87.1` 已發布；issue #132／`v0.87.2` hotfix 實作與發布中
 
 **輸入**：建立不依賴系統 Python 的 Singular 受管理 PlatformIO 環境，在 Extension 啟用後背景預先初始化並於每次開啟積木編輯器時重查狀態，保留既有 PlatformIO／PIOArduino provider，引入依工作負載選擇與安全 fallback 的雙 Core 模型，並在合併與發布前完成跨作業系統、路徑及架構驗證。
 
@@ -146,6 +146,24 @@
 4. **給定** 任一操作成功或失敗，**當** WebView 收到結果，**則** 同一進度卡顯示對應圖示、在地化摘要與 terminal 樣式並解除控制項鎖定。
 5. **給定** 使用者採用亮色、暗色、高對比或 reduced-motion 偏好，**當** 進度卡顯示，**則** 使用專案既有 theme token 且仍具清楚的靜態或動態視覺差異。
 
+### 使用者故事 9－Windows 短路徑安裝與首次進度通知（優先級：P1）
+
+使用 Windows 預設 VS Code global storage、且未啟用系統 long-path policy 的學生，仍能完成 Singular Core 安裝；首次安裝與明確修復期間能在右下角看見可取消、已在地化且反映真實階段的通知進度。
+
+**優先此項的理由**：PlatformIO installer 與 pip 會在 scratch 目錄下再建立多層隨機路徑。若 scratch 位於 `versions/<uuid>`，即使 managed root 本身正常也可能跨過傳統 Win32 260 字元邊界，使無系統 Python 的核心承諾在常見 Windows 設定下失效。
+
+**獨立測試方式**：在 `LongPathsEnabled=0` 的乾淨 Windows x64，以預設 global storage 形狀安裝並修復；同時以決定性測試驗證短 scratch、路徑預算、增量 progress、取消、失敗動作、跨視窗採用及 ready 後零通知。
+
+**驗收情境**：
+
+1. **給定** Windows 未啟用 long paths 且 managed root 使用預設 global storage，**當** PlatformIO installer 與 pip 建立 scratch 子目錄，**則** scratch 位於短的使用者暫存區，不在 immutable runtime candidate 下，並在成功、失敗或取消後移除該交易目錄。
+2. **給定** 自訂 managed root 或系統暫存根過長，**當** 安裝尚未執行下載內容，**則** 系統以 `path-too-long` 拒絕並引導選擇較短的本機資料夾，不要求修改 registry 或管理員權限。
+3. **給定** managed Core 缺少、無效或使用者明確要求修復，**當** provisioning 開始，**則** 右下角顯示 Notification progress；ready 或 unsupported 狀態不得顯示或閃爍通知。
+4. **給定** installer 回報絕對百分比，**當** 通知進度更新，**則** presenter 轉為 VS Code 所需的增量值，並顯示等待 lock、下載、解壓、安裝 PlatformIO、安裝 mpremote、驗證與提交等 15 語系階段文字。
+5. **給定** 使用者取消通知，**當** cancellation token 觸發，**則** AbortSignal 傳到下載器與子程序，候選 runtime 與 scratch 依交易規則清理，且不得把取消顯示成安裝失敗。
+6. **給定** 另一個 VS Code 視窗正在準備同一 managed root，**當** 目前視窗等待 lock，**則** 顯示不虛構百分比的等候狀態；另一視窗提交有效 current 後，等待中的視窗採用該 runtime，不重複安裝或顯示一般失敗。
+7. **給定** provisioning 失敗，**當** 顯示錯誤通知，**則** 提供開啟診斷、選擇較短資料夾與複製已遮蔽 repair packet 的動作，且明確說明 Provider Core 未被修改。
+
 ### 邊界情境
 
 - 安裝中斷、編輯器被關閉、下載只完成一部分或 checksum 不符時，不得提交 ready 狀態。
@@ -160,6 +178,8 @@
 - 活動列 resolve 與 visibility change 同時觸發開啟命令時，並行呼叫必須共用同一個 editor-open Promise 與安全詢問結果，不得讓一條取消、另一條繼續安裝 Skill。
 - OTA 設定與 OTA 清除不得同時執行；切換 operation 時只能由最新明確啟動或有效 Host 回應決定共用進度卡內容。
 - reduced-motion 關閉動畫後，執行中進度仍必須以邊框、色彩與靜態填色清楚可見。
+- Windows `LongPathsEnabled=0` 時，測試不得以開啟 registry policy 作為主要修復；預設 managed root 與短 installer scratch 的投影路徑必須同時保留 pip 子路徑餘裕。
+- Notification cancellation 可能發生在等待 lock、下載、解壓或子程序階段；每個階段都不得留下 ready record，且取消本身不得觸發 Core fallback。
 
 ## 需求 *(必填)*
 
@@ -206,6 +226,12 @@
 - **FR-039**：activation、editor-open、repair 或 workload 觸發的 managed runtime provisioning 必須保留記憶體內的 attempt、trigger、stage、percent、開始／更新／失敗時間與最近一次結構化失敗；失敗證據必須限制長度並遮蔽 home、managed root、workspace、credentials 與 token。
 - **FR-040**：`managed-provisioning` 失敗只可在 probe／prepare 且專案程序尚未開始時觸發單次 Core fallback；使用者取消與任何 project-process 階段一律禁止 fallback。
 - **FR-041**：Windows 真實 runtime E2E 必須在形狀等同 VS Code 預設 `AppData/Roaming/Code/User/globalStorage/<extension-id>/runtime-v1`、且上層含 Unicode、空白與合法特殊字元的隔離路徑執行，不得以過短暫存根取代正式路徑預算驗證。
+- **FR-042**：PlatformIO installer scratch 必須位於短的 extension-owned 使用者暫存子目錄，以不可預測的交易識別隔離；不得位於 `versions/<uuid>` 下，並必須在成功、失敗及取消後嘗試清除，不得觸碰 provider-owned 目錄。
+- **FR-043**：Windows 安裝在下載或執行 artifact 前必須同時檢查 immutable runtime 與 installer scratch 的投影路徑預算；預算不足或 installer 回報 long-path hint 時使用穩定 `path-too-long` 錯誤碼。
+- **FR-044**：managed Core 缺少、無效或明確 repair 時必須以 `ProgressLocation.Notification` 顯示非阻塞進度；ready／unsupported 狀態與成功後的後續 activation 不得顯示重複通知。
+- **FR-045**：進度 presenter 必須把 installer 絕對百分比轉為單調的增量 `increment`，等待跨視窗 lock 時採不帶虛構完成率的訊息，全部 title、stage、error 與 action 支援 15 語系。
+- **FR-046**：Notification cancellation 必須橋接至 installer `AbortSignal` 並保留 transactional cleanup；非取消失敗提供開啟診斷、選擇較短資料夾及複製隱私化 repair packet 的操作。
+- **FR-047**：取得 install lock 後必須重新檢查可用 current；若另一視窗已完成相同 manifest／artifact 的健康 runtime，採用該 record 並結束目前 attempt，不得重複安裝。
 
 ### 核心概念
 
@@ -238,6 +264,8 @@
 - **SC-015**：預設 Windows global storage 形狀的 x64／ARM64 真實安裝、版本 probe 與離線重啟全數通過，且最深受測 PlatformIO 檔案路徑不因版本目錄的冗長名稱超出相容預算。
 - **SC-016**：所有 managed installer 階段失敗都能在診斷摘要、AI repair packet 與人工 issue draft 中看到同一 attempt／stage／code 與有界 stdout／stderr；未遮蔽完整本機路徑數量為 0。
 - **SC-017**：`managed-provisioning` 在 probe／prepare 的允許案例最多 fallback 一次；取消及 project-process 案例的自動 fallback 次數為 0。
+- **SC-018**：`LongPathsEnabled=0` 的乾淨 Windows x64 預設 global storage 安裝與修復均成功，且受測 installer scratch 加上保留子路徑的投影長度低於 260 字元。
+- **SC-019**：首次安裝、明確修復、取消、失敗動作、跨視窗採用與 ready 後重啟的進度契約測試全數通過；絕對百分比轉換後的增量總和不超過 100，重複成功通知數為 0。
 
 ## 假設
 

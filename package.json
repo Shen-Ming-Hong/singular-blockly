@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support, project-local Agent Skills, AI camera integration, PlatformIO integration, and 15 languages.",
-	"version": "0.87.1",
+	"version": "0.87.2",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.109.0",
@@ -223,7 +223,7 @@
 		"test:managed-runtime:evidence": "node scripts/managed-runtime/evidence.test.js",
 		"test:managed-runtime:e2e": "npm run compile-tests && node scripts/managed-runtime/test-real-installation.js",
 		"test:managed-runtime:vsix": "node scripts/managed-runtime/smoke-vsix.js",
-		"test:managed-runtime": "npm run compile-tests && vscode-test --label unit --forbid-only --fail-zero --skip-extension-dependencies --run out/test/services/managedRuntimeManifest.test.js out/test/services/managedRuntimeStorage.test.js out/test/services/managedRuntimeDownloader.test.js out/test/services/managedRuntimeArchive.test.js out/test/services/managedRuntimeInstaller.test.js out/test/services/managedRuntimeService.test.js out/test/services/managedRuntimeCleanup.test.js out/test/services/managedRuntimeInitializationCoordinator.test.js out/test/services/platformioProcess.test.js out/test/services/coreFailureClassifier.test.js out/test/services/coreEnvironmentManager.test.js out/test/services/micropythonUploaderAvailability.test.js out/test/services/arduinoUploader.test.js",
+		"test:managed-runtime": "npm run compile-tests && vscode-test --label unit --forbid-only --fail-zero --skip-extension-dependencies --run out/test/services/managedRuntimeManifest.test.js out/test/services/managedRuntimeStorage.test.js out/test/services/managedRuntimeDownloader.test.js out/test/services/managedRuntimeArchive.test.js out/test/services/managedRuntimeInstaller.test.js out/test/services/managedRuntimeService.test.js out/test/services/managedRuntimeCleanup.test.js out/test/services/managedRuntimeInitializationCoordinator.test.js out/test/services/managedRuntimeProgressPresenter.test.js out/test/services/platformioProcess.test.js out/test/services/coreFailureClassifier.test.js out/test/services/coreEnvironmentManager.test.js out/test/services/micropythonUploaderAvailability.test.js out/test/services/arduinoUploader.test.js",
 		"watch": "webpack --watch",
 		"package": "webpack --mode production --devtool hidden-source-map",
 		"compile-tests": "node scripts/clean-test-output.js && tsc -p . --outDir out",

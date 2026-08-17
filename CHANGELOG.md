@@ -8,6 +8,17 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.87.2] - 2026-08-17
+
+### 🐛 修復 Bug Fixes
+
+- 修正未啟用 Windows long paths 時，PlatformIO installer 暫存目錄疊加於預設 Extension 儲存位置而超出 `MAX_PATH`；installer scratch 現在使用具交易所有權的短系統暫存路徑，並在執行前驗證 runtime 與 scratch 路徑預算
+  Fixed PlatformIO installer scratch paths exceeding `MAX_PATH` under the default extension storage when Windows long paths are disabled; installer scratch now uses a short transaction-owned system temporary path with preflight checks for both runtime and scratch path budgets
+- 首次準備或修復 Singular Core 現在會顯示可取消的 VS Code 原生通知與真實安裝階段；取消不再顯示誤導性的失敗提示，其他失敗提供診斷、較短資料夾與隱私化 AI 修復摘要動作
+  Added cancellable native VS Code notifications with real installation stages when Singular Core is first prepared or repaired; cancellation no longer shows a misleading failure prompt, while other failures offer diagnostics, a shorter-folder setting, and a privacy-redacted AI repair summary
+- 修正多個 VS Code 視窗同時準備 Core 時，等待中的視窗可能在另一視窗完成後仍回報鎖定或重複安裝；取得鎖或等待逾時邊界會重新驗證並採用相同健康 runtime
+  Fixed waiting VS Code windows potentially reporting a lock failure or reinstalling after another window completed Core setup; lock acquisition and timeout boundaries now revalidate and adopt the same healthy runtime
+
 ## [0.87.1] - 2026-08-17
 
 ### 🐛 修復 Bug Fixes

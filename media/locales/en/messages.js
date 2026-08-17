@@ -337,6 +337,20 @@ window.languageManager.loadMessages('en', {
 
 	// PlatformIO Diagnostic Panel
 	PLATFORMIO_DIAGNOSTIC_PANEL_TITLE: 'PlatformIO Diagnostic',
+	MANAGED_RUNTIME_PROGRESS_INITIALIZE_TITLE: 'Preparing Singular Core',
+	MANAGED_RUNTIME_PROGRESS_REPAIR_TITLE: 'Repairing Singular Core',
+	MANAGED_RUNTIME_PROGRESS_STAGE_PERCENT: '{0} ({1}%)',
+	MANAGED_RUNTIME_PROGRESS_WAITING_LOCK: 'Waiting for another window that may be preparing Singular Core',
+	MANAGED_RUNTIME_PROGRESS_DOWNLOADING_PYTHON: 'Downloading the managed Python runtime',
+	MANAGED_RUNTIME_PROGRESS_EXTRACTING_PYTHON: 'Extracting the managed Python runtime',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_PLATFORMIO: 'Installing PlatformIO Core',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Installing the CyberBrick device helper',
+	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Verifying the managed tools',
+	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Committing the verified Singular Core',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core needs a shorter local folder on this Windows system. The provider Core was not changed.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Singular Core setup did not complete. The provider Core was not changed.',
+	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Open diagnostics',
+	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Choose shorter folder',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
 		'Check whether the extension can resolve PlatformIO CLI, penv, and the CyberBrick helper tools.',
 	PLATFORMIO_DIAGNOSTIC_LOADING_TITLE: 'Checking PlatformIO environment...',

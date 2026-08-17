@@ -6,7 +6,9 @@
 
 import * as os from 'os';
 import * as path from 'path';
+import { createHash } from 'crypto';
 import { pathToFileURL } from 'url';
+import { FileService } from './fileService';
 import { ManagedRuntimeDownloader, ManagedRuntimeDownloadResult } from './managedRuntimeDownloader';
 import { extractManagedRuntimeArchive } from './managedRuntimeArchive';
 import { ManagedRuntimeStorage } from './managedRuntimeStorage';
@@ -44,6 +46,7 @@ export interface ManagedRuntimeInstallerOptions {
 	now?: () => Date;
 	createId?: () => string;
 	lockWaitMs?: number;
+	installerTempRoot?: string;
 }
 
 export interface ManagedRuntimeInstallProgress {
@@ -91,6 +94,34 @@ const LOCK_LEASE_MS = 120_000;
 const LOCK_RENEW_MS = 30_000;
 const LOCK_RECLAIM_LEASE_MS = 30_000;
 const MAX_DIAGNOSTIC_OUTPUT_LENGTH = 4000;
+const INSTALLER_TEMP_RELATIVE_ROOT = path.join('singular-blockly', 'core-installer');
+const INSTALLER_TEMP_OWNERSHIP_FILE = '.singular-installer-transaction';
+const WINDOWS_MAX_PATH = 260;
+const WINDOWS_RUNTIME_DESCENDANT_RESERVE = 110;
+const WINDOWS_INSTALLER_TEMP_DESCENDANT_RESERVE = 128;
+
+export function assertWindowsManagedRuntimePathBudget(
+	runtimePath: string,
+	installerTempPath: string,
+	platform: NodeJS.Platform
+): void {
+	if (platform !== 'win32') {return;}
+	const projectedRuntimeLength = runtimePath.length + WINDOWS_RUNTIME_DESCENDANT_RESERVE;
+	const projectedInstallerTempLength = installerTempPath.length + WINDOWS_INSTALLER_TEMP_DESCENDANT_RESERVE;
+	if (Math.max(projectedRuntimeLength, projectedInstallerTempLength) < WINDOWS_MAX_PATH) {return;}
+	throw new ManagedRuntimeInstallerError(
+		'path-too-long',
+		'Managed runtime storage leaves insufficient Windows path headroom; choose a shorter local managed-runtime folder'
+	);
+}
+
+function installerTempId(managedRoot: string, transactionId: string): string {
+	return createHash('sha256').update(`${managedRoot}\0${transactionId}`).digest('hex').slice(0, 20);
+}
+
+function isWindowsLongPathFailure(value: string): boolean {
+	return /long path support|path(?:name)? (?:is )?too long|filename or extension is too long|exceeds? (?:the )?(?:windows )?max_path/i.test(value);
+}
 
 function executableName(name: 'python' | 'pip' | 'pio' | 'mpremote', platform: NodeJS.Platform): string {
 	return platform === 'win32' ? `${name}.exe` : name;
@@ -144,6 +175,7 @@ export class ManagedRuntimeInstaller {
 	private readonly createId: () => string;
 	private readonly lockWaitMs: number;
 	private readonly privacyRedactor: PlatformioPrivacyRedactor;
+	private readonly installerTempFiles: FileService;
 
 	constructor(options: ManagedRuntimeInstallerOptions) {
 		this.storage = options.storage;
@@ -155,6 +187,7 @@ export class ManagedRuntimeInstaller {
 		this.now = options.now ?? (() => new Date());
 		this.createId = options.createId ?? (() => crypto.randomUUID());
 		this.lockWaitMs = options.lockWaitMs ?? 60_000;
+		this.installerTempFiles = new FileService(options.installerTempRoot ?? os.tmpdir());
 		this.privacyRedactor = createPlatformioPrivacyRedactor({
 			homeDir: os.homedir(),
 			managedRuntimePath: options.storage.layout.root,
@@ -163,7 +196,11 @@ export class ManagedRuntimeInstaller {
 
 	async install(
 		artifact: RuntimeArtifact,
-		options: { signal?: AbortSignal; onProgress?: (progress: ManagedRuntimeInstallProgress) => void } = {}
+		options: {
+			signal?: AbortSignal;
+			onProgress?: (progress: ManagedRuntimeInstallProgress) => void;
+			adoptExisting?: () => Promise<ManagedRuntimeInstallRecord | null>;
+		} = {}
 	): Promise<ManagedRuntimeInstallRecord> {
 		let currentStage: ManagedRuntimeInstallStage = 'waiting-lock';
 		const reportProgress = (stage: ManagedRuntimeInstallStage, percent: number): void => {
@@ -175,13 +212,26 @@ export class ManagedRuntimeInstaller {
 		const transactionRelative = path.join('staging', transactionId);
 		const versionDirectory = transactionId;
 		const runtimeRelative = path.join('versions', versionDirectory);
+		const runtimePath = this.storage.files.resolveSafePath(runtimeRelative);
+		const installerTempRelative = path.join(
+			INSTALLER_TEMP_RELATIVE_ROOT,
+			installerTempId(this.storage.layout.root, transactionId)
+		);
+		const installerTempPath = this.installerTempFiles.resolveSafePath(installerTempRelative);
+		assertWindowsManagedRuntimePathBudget(runtimePath, installerTempPath, artifact.platform);
 		let candidateCreated = false;
 		let currentCommitted = false;
+		let installerTempOwned = false;
 		let releaseLock: (() => Promise<void>) | undefined;
 		try {
 			releaseLock = await this.acquireLock(options.signal);
 			if (options.signal?.aborted) {
 				throw new ManagedRuntimeInstallerError('cancelled', 'Managed runtime installation was cancelled');
+			}
+			const existing = await options.adoptExisting?.();
+			if (existing) {
+				reportProgress('committing', 100);
+				return existing;
 			}
 			await this.storage.files.createDirectory(transactionRelative);
 			await this.storage.files.writeFileAtomic(path.join(transactionRelative, 'transaction.json'), JSON.stringify({
@@ -196,7 +246,6 @@ export class ManagedRuntimeInstaller {
 
 			reportProgress('extracting-python', 25);
 			const archivePath = this.storage.files.resolveSafePath(archiveRelative);
-			const runtimePath = this.storage.files.resolveSafePath(runtimeRelative);
 			await this.extractArchive(archivePath, runtimePath);
 			candidateCreated = true;
 			const bootstrapPython = path.join(runtimePath, ...artifact.pythonRelativePath.split('/'));
@@ -205,9 +254,23 @@ export class ManagedRuntimeInstaller {
 			}
 
 			const coreRoot = path.join(runtimePath, 'core');
-			const installerTempRelative = path.join(runtimeRelative, 'installer-tmp');
 			const constraintRelative = path.join(runtimeRelative, 'platformio-constraints.txt');
-			await this.storage.files.createDirectory(installerTempRelative);
+			if (this.installerTempFiles.fileExists(installerTempRelative)) {
+				throw new ManagedRuntimeInstallerError(
+					'installer-temp-collision',
+					'Managed runtime installer temporary directory already exists'
+				);
+			}
+			installerTempOwned = await this.installerTempFiles.createExclusiveFile(
+				path.join(installerTempRelative, INSTALLER_TEMP_OWNERSHIP_FILE),
+				transactionId
+			);
+			if (!installerTempOwned) {
+				throw new ManagedRuntimeInstallerError(
+					'installer-temp-collision',
+					'Managed runtime installer temporary directory is already owned by another transaction'
+				);
+			}
 			await this.storage.files.writeFileAtomic(
 				constraintRelative,
 				`${platformioConstraint(this.manifest.platformio.testedVersionRange)}\n`
@@ -220,7 +283,7 @@ export class ManagedRuntimeInstaller {
 				// local file URL preserves spaces, Unicode, and Windows path separators.
 				PIP_CONSTRAINT: pathToFileURL(this.storage.files.resolveSafePath(constraintRelative)).href,
 				PLATFORMIO_CORE_DIR: coreRoot,
-				PLATFORMIO_INSTALLER_TMPDIR: this.storage.files.resolveSafePath(installerTempRelative),
+				PLATFORMIO_INSTALLER_TMPDIR: installerTempPath,
 				PLATFORMIO_SETTING_ENABLE_TELEMETRY: 'No',
 				PLATFORMIO_SETTING_ENABLE_PROMPTS: 'No',
 				PLATFORMIO_NO_ANSI: 'true',
@@ -291,18 +354,30 @@ export class ManagedRuntimeInstaller {
 			if (this.storage.files.fileExists(transactionRelative)) {
 				await this.storage.files.deleteDirectory(transactionRelative).catch(() => undefined);
 			}
-			throw this.toInstallerError(error, currentStage);
+			throw this.toInstallerError(error, currentStage, artifact.platform);
 		} finally {
+			if (installerTempOwned) {
+				await this.installerTempFiles.deleteDirectory(installerTempRelative).catch(() => undefined);
+			}
 			await releaseLock?.().catch(() => undefined);
 		}
 	}
 
-	private toInstallerError(error: unknown, stage: ManagedRuntimeInstallStage): ManagedRuntimeInstallerError {
+	private toInstallerError(
+		error: unknown,
+		stage: ManagedRuntimeInstallStage,
+		platform: NodeJS.Platform
+	): ManagedRuntimeInstallerError {
 		const processError = error instanceof PlatformioProcessError ? error : undefined;
 		const installerError = error instanceof ManagedRuntimeInstallerError ? error : undefined;
 		const candidate = error && typeof error === 'object' ? error as NodeJS.ErrnoException : undefined;
-		const code = installerError?.code ?? processError?.code ?? candidate?.code ?? 'installation-failed';
 		const message = error instanceof Error ? error.message : 'Managed runtime installation did not complete';
+		const rawEvidence = [message, processError?.stdout, processError?.stderr, installerError?.stdout, installerError?.stderr]
+			.filter(Boolean)
+			.join('\n');
+		const code = platform === 'win32' && isWindowsLongPathFailure(rawEvidence)
+			? 'path-too-long'
+			: installerError?.code ?? processError?.code ?? candidate?.code ?? 'installation-failed';
 		return new ManagedRuntimeInstallerError(String(code).toLowerCase(), this.sanitizeDiagnosticOutput(message), {
 			stage,
 			started: processError?.started ?? installerError?.started ?? false,

@@ -80,9 +80,20 @@
 - [x] CHK049 provider operational 時 managed provisioning blocker 是否仍須呈現，且診斷、AI packet 與人工 issue draft 的欄位一致？[Consistency, Spec §FR-015, FR-039, SC-016]
 - [x] CHK050 `managed-provisioning` 是否只在 probe／prepare 可 fallback，並對 cancellation、project-process 與 post-spawn 提供明確零 fallback 負面條件？[Security, Spec §FR-040, SC-017]
 
+## issue #132／v0.87.2 增量品質
+
+- [x] CHK051 short scratch 是否明確限定在 extension-owned 使用者暫存子目錄、固定長度不可預測 leaf 與本次交易 ownership，且禁止刪除碰撞目錄？[Security, Spec §FR-042]
+- [x] CHK052 Windows path-budget 是否同時涵蓋 immutable runtime 與 installer scratch 的最深後代，並在任何 artifact 執行前以穩定錯誤碼拒絕？[Measurability, Spec §FR-043, SC-018]
+- [x] CHK053 首次安裝、editor-open、ready／unsupported、repair、取消與成功後 reload 的 Notification 生命週期是否完整且互不矛盾？[Completeness, Spec §FR-044–FR-046]
+- [x] CHK054 絕對百分比轉增量與 waiting-lock 零虛構進度是否具有單調、可由自動測試驗證的判定方式？[Truthfulness, Spec §FR-045]
+- [x] CHK055 非取消失敗的三個 action 是否固定、在地化、隱私安全，且 `path-too-long` 明確保證 provider Core 未變更？[Recovery/Security, Spec §FR-046]
+- [x] CHK056 同視窗去重與跨視窗 lock 後採用是否分別定義，且採用前必須重新驗證 current manifest／artifact／health？[Concurrency, Spec §FR-044, FR-047]
+- [x] CHK057 乾淨 Windows `LongPathsEnabled=0`、六平台 runtime、15 語系與 provider 不變是否都列入 PR／release gate？[Coverage, Spec §SC-018–SC-019]
+
 ## 備註
 
 - 完成方式：由 PR reviewer 逐項判斷需求是否足以實作及驗收；若答案為否，先修訂規格再進入 release gate。
 - 本清單不替代 `tasks.md`、自動測試、實機 smoke 或安全審查紀錄。
 - 2026-08-16 已依更新後 spec／plan／contracts 與 F5 回饋完成 44 項需求品質復核。
 - 2026-08-17 已依 issue #130 hotfix 的 spec／plan／tests 完成 CHK045－CHK050 增量品質復核。
+- 2026-08-17 已依 issue #132 hotfix 的 spec／plan／tests 完成 CHK051－CHK057 增量品質復核。

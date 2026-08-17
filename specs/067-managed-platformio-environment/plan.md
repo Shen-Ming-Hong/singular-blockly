@@ -12,6 +12,8 @@
 
 F5 驗收補充兩項邊界修正：一般資料夾在安全詢問明確同意前只允許唯讀檢查，Project Skill 與 workspace 設定延後到編輯器成功開啟後；CyberBrick OTA 設定與清除改用 modal 中同一個主題化進度卡，設定使用真實里程碑的 determinate progress，沒有中間事件的清除使用 indeterminate progress。
 
+issue #132 再補強 Windows 預設安裝：PlatformIO/pip scratch 改到短的使用者暫存交易目錄並在所有 terminal path 清理；安裝前對 runtime 與 scratch 保留後代路徑預算，將上游 long-path hint 分類為 `path-too-long`。新增 `ManagedRuntimeProgressPresenter` 以 Notification 呈現首次安裝與 repair，負責絕對轉增量進度、取消橋接、跨視窗等待及三個安全復原動作，不阻塞 Extension activation 或 Blockly editor。
+
 ## 技術背景
 
 **語言／版本**：TypeScript 5.9.3、Node.js 22.16.0+（貢獻者與 Extension Host 基準）、受管理 CPython 3.11
@@ -84,6 +86,7 @@ src/
 ├── services/
 │   ├── coreEnvironmentManager.ts
 │   ├── managedRuntimeInstaller.ts
+│   ├── managedRuntimeProgressPresenter.ts
 │   ├── managedRuntimeService.ts
 │   ├── managedRuntimeStorage.ts
 │   ├── platformioDiagnosticService.ts
@@ -203,6 +206,16 @@ scripts/
 - OTA 設定沿用 reducer 的六個已完成里程碑計算實際進度；OTA 清除服務沒有中間事件，running 時不設定 `aria-valuenow`，以主題化 sweep 表示 indeterminate，收到 terminal result 後才設為完成。
 - 填色、邊框與動畫只使用既有 `--editor-*` token。forced-colors 使用系統 `Highlight`；reduced-motion 停止 transition／pulse／sweep，但保留靜態 overlay 與狀態邊框。
 - 所有動態文案仍經 15 語系既有 key 並以 `textContent` 寫入；不渲染 Host HTML、不新增可控制 DOM 的 WebView message payload。
+
+### 10. Windows scratch 路徑與 Notification progress
+
+- installer 以 `os.tmpdir()/singular-blockly/core-installer/<20-hex>` 作 scratch。20-hex 由 managed root 與完整 transaction id 的 SHA-256 衍生，避免把 UUID、runtime id 或使用者輸入直接放入短路徑；外部檔案操作仍由以系統暫存根為 containment boundary 的 `FileService` 完成。
+- Windows 預檢分別為 immutable runtime 與 installer scratch 保留已量測的後代路徑餘裕，投影達 260 字元即在執行 artifact 前以 `path-too-long` fail closed；PlatformIO/pip 回傳明確 long-path hint 時也正規化為同一錯誤碼。
+- 真實 Windows runtime matrix 的 sandbox 前綴仍涵蓋 Unicode、空白與特殊字元，但整體 default-global-storage fixture 必須落在同一預算內；過長 managed root 由無網路 preflight regression 驗證，不能讓成功安裝案例本身先被預期中的 `path-too-long` 擋下。
+- scratch leaf 只由獨占交易 marker 認領；marker 碰撞時不使用也不刪除未知 leaf，成功認領後才於 `finally` 清理。候選 runtime rollback、lock release 與 scratch cleanup 彼此獨立，任何清理失敗不得擴大到 temp root、managed root 或 provider `.platformio`。
+- `ManagedRuntimeProgressPresenter` 在 ready／unsupported 前置檢查後才呼叫 `withProgress`，activation 與 editor-open 共用同一 notification promise。等待 lock 只回報在地化訊息；其餘 stage 將 installer 絕對百分比轉為單調 `increment`。
+- VS Code cancellation token 只轉為 `AbortController.abort()`，由既有 downloader／process／installer 交易邊界負責停止與 rollback。取消不顯示一般錯誤；其他失敗只顯示已在地化、無路徑內容的訊息與固定安全動作。
+- 跨視窗取得 lock 後由 installer 回呼 service 重新驗證 `current.json`；健康且符合目前 manifest／artifact 時直接採用。若等候逾時但另一視窗剛完成，service 在形成失敗 snapshot 前再做一次相同採用檢查。
 
 ## 複雜度追蹤
 

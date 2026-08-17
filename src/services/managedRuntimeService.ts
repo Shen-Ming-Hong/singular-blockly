@@ -30,7 +30,11 @@ import { createPlatformioPrivacyRedactor, PlatformioPrivacyRedactor } from './pl
 interface RuntimeInstallerLike {
 	install(
 		artifact: RuntimeArtifact,
-		options?: { signal?: AbortSignal; onProgress?: (progress: ManagedRuntimeInstallProgress) => void }
+		options?: {
+			signal?: AbortSignal;
+			onProgress?: (progress: ManagedRuntimeInstallProgress) => void;
+			adoptExisting?: () => Promise<ManagedRuntimeInstallRecord | null>;
+		}
 	): Promise<ManagedRuntimeInstallRecord>;
 }
 
@@ -372,6 +376,10 @@ export class ManagedRuntimeService {
 			await this.storage.initialize();
 			const record = await this.installer.install(artifact, {
 				signal: options.signal,
+				adoptExisting: async () => {
+					const current = await this.getStatus();
+					return current.status === 'ready' ? current.record : null;
+				},
 				onProgress: progress => {
 					stage = progress.stage;
 					percent = progress.percent;
@@ -384,6 +392,13 @@ export class ManagedRuntimeService {
 			this.provisioningState = { status: 'idle', attempt };
 			return record;
 		} catch (error) {
+			if (error instanceof ManagedRuntimeInstallerError && error.code === 'install-locked') {
+				const current = await this.getStatus();
+				if (current.status === 'ready') {
+					this.provisioningState = { status: 'idle', attempt };
+					return current.record;
+				}
+			}
 			const failure = this.createProvisioningFailure(error, stage);
 			this.provisioningState = {
 				status: 'failed', attempt, trigger, stage: failure.stage, percent, startedAt,

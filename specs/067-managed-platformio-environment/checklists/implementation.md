@@ -2,7 +2,7 @@
 
 **驗證日期**：2026-08-17
 
-**驗證分支**：`codex/130-managed-runtime-hotfix`
+**驗證分支**：`codex/132-windows-max-path-progress`
 
 **功能規格**：[spec.md](../spec.md)
 
@@ -92,9 +92,24 @@
 - [x] `npm run test:managed-runtime` 139 項、`npm run test:managed-runtime:paths` 5 組、正式 `test:unit:ci` 1,225 項通過（1 項既有 Copilot AI E2E pending）；`npm run ci:static`、15 語系、production package、`npm run release:prepare` 與 `git diff --check` 全數通過。
 - [x] macOS ARM64 以 `--allow-release-candidate` 在 Unicode／空白／特殊字元上層與預設 global-storage 深度完成第二次真實 CPython／PlatformIO／mpremote 安裝、健康 probe 與離線重啟；省略候選旗標時依政策 fail closed。
 - [x] `npm audit --omit=dev --audit-level=high` 回報正式依賴 0 個已知漏洞；WebView provisioning evidence 使用既有 `escapeHtml` detail renderer，raw／URI-encoded managed root 與 token regression 通過。
-- [ ] Runtime-sensitive PR 的 Windows／macOS／Linux x64 與 release-candidate ARM64 真實 E2E evidence 都包含 `default-global-storage-shape` 並通過；乾淨 Windows F5 診斷可看到 attempt／stage 與遮蔽 installer evidence。
-- [ ] Arduino／CyberBrick 實機 smoke 確認 provider-primary 與 managed-primary 路由未回歸後，才允許 squash merge、annotated `v0.87.1` tag 與三端發布。
+- [x] PR #131 的 Windows／macOS／Linux x64 與 release-candidate ARM64 真實 E2E evidence 都包含 `default-global-storage-shape` 並通過；乾淨 Windows F5 診斷可看到 attempt／stage 與遮蔽 installer evidence。
+- [x] 乾淨 Windows F5、Arduino provider-primary 與 CyberBrick managed-primary 實機 smoke 全部通過；PR #131 已 squash merge 為 `bcc86b7`，annotated `v0.87.1` tag 指向相同 release tree，publish run `32003616269` 完成三端發布。
+
+## issue #132／v0.87.2 hotfix 驗證
+
+- [x] 根因分析確認 `versions/<uuid>/installer-tmp` 會把 PlatformIO／pip 的 scratch 再疊加於 Windows 預設 global storage 深度；issue #132 回報的最深路徑達 262 字元，且系統未啟用 long paths。
+- [x] installer scratch 改為系統暫存根下的 `singular-blockly/core-installer/<20-hex>`；本次交易必須先取得獨占 ownership marker，碰撞時不使用或刪除未知 leaf，成功／失敗／取消後才清理自有 leaf。
+- [x] Windows 在下載或執行 artifact 前預檢 immutable runtime 與 scratch 的後代餘裕；預設 global-storage 形狀通過，過長自訂路徑與 upstream long-path hint 統一為 `path-too-long`。
+- [x] `ManagedRuntimeProgressPresenter` 在首次缺少／無效 Core 與 repair 使用 VS Code Notification；stage 百分比單調、waiting-lock 不虛構進度、取消橋接 `AbortSignal` 且不顯示失敗 prompt，ready／unsupported 與成功後 reload 保持安靜。
+- [x] 同視窗 activation／editor-open 共用單一通知；跨視窗取得 lock 後重查並採用另一視窗完成的健康 current，lock timeout 邊界也在形成失敗前再次採用。
+- [x] 非取消失敗提供固定的診斷、短路徑設定與隱私化 AI repair packet 動作；新增 title、七個 stage、錯誤與 action 已涵蓋 15 語系，deterministic validator 為 PASS。
+- [x] `npm run compile-tests` 與 `npm run compile` 通過；installer、service、coordinator 與 presenter 的 47 項純 Node 精準回歸通過。本機 VS Code 1.109 test host 仍在載入測試案例前因既有 macOS 26 Electron provenance 問題以 `SIGABRT` 結束，未將它誤記為案例通過，正式 unit 證據由乾淨 PR runner 提供。
+- [x] `code-simplifier` 移除 presenter 的巢狀訊息三元運算；security-checker 與三輪本地 Code Review 修正「等待背景失敗後並行 repair 產生重複通知」及「預先存在但無 marker 的 scratch leaf 被認領／刪除」兩項 finding，結論為 `CLEAR`。
+- [x] `npm run ci:static`、5 組 macOS ARM64 路徑矩陣、15 語系 deterministic gate、production package、`npm run release:prepare`、`git diff --check` 全部通過；`npm audit --omit=dev --audit-level=high` 回報 0 vulnerabilities，版本與雙語 CHANGELOG 已同步為 `0.87.2`。
+- [x] release-candidate 首輪 Windows matrix 正確以 `path-too-long` 擋下超出預算的測試 sandbox；fixture 已縮短為預算內但仍涵蓋 Unicode、空白與特殊字元，過長 custom root 仍由執行 artifact 前的 regression fail closed。
+- [x] 使用者回報乾淨 Windows `LongPathsEnabled=0` F5、Arduino provider-primary 與 CyberBrick managed-primary 實機 smoke 全部通過。
+- [ ] issue #132 的 release-candidate PR 尚須在修正後通過 CI、CodeQL 與 Windows／macOS／Linux x64＋ARM64 真實 runtime evidence，才可 squash merge、建立 annotated tag 並完成三端發布。
 
 ## 結論
 
-`v0.87.0` recovery 與三端發布已由 run `31983230776` 完成。`v0.87.1` hotfix 的程式、SDD、本地全量 gate、code-simplifier、安全審查與本地 Code Review 已完成；仍需 Phase 3.5 核准後的六平台 runtime evidence、乾淨 Windows F5 與 Arduino／CyberBrick 實機 smoke，才能 squash merge、建立 annotated tag 並發布。
+`v0.87.0` recovery 已由 run `31983230776` 完成；`v0.87.1` 也已由 PR #131、六平台矩陣、乾淨 Windows F5、實機 smoke 與 publish run `32003616269` 完成。issue #132 的 short scratch、path-budget、Notification progress、取消、跨視窗採用、SDD、本地靜態／安全／i18n／package gate 與 Code Review 已完成；目前進入 `v0.87.2` PR 遠端與發布閘門。

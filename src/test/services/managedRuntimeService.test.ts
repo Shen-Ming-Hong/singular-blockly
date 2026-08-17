@@ -102,6 +102,40 @@ suite('ManagedRuntime Service', () => {
 		assert.strictEqual(installCalls, 1);
 	});
 
+	test('lets the installer adopt a ready runtime committed by another window', async () => {
+		const existing = createRecord('other-window');
+		const service = new ManagedRuntimeService({
+			storage, manifest, manifestSha256, platform: 'linux', arch: 'x64', libc: 'glibc',
+			installer: {
+				install: async (_artifact, options) => {
+					await writeInstalledRecord(existing);
+					const adopted = await options?.adoptExisting?.();
+					assert.strictEqual(adopted?.versionDirectory, existing.versionDirectory);
+					return adopted!;
+				},
+			},
+		});
+
+		assert.strictEqual((await service.ensureReady()).versionDirectory, existing.versionDirectory);
+		assert.deepStrictEqual(service.getProvisioningState(), { status: 'idle', attempt: 1 });
+	});
+
+	test('adopts a completed runtime when an install-lock wait reaches its timeout boundary', async () => {
+		const existing = createRecord('completed-during-wait');
+		const service = new ManagedRuntimeService({
+			storage, manifest, manifestSha256, platform: 'linux', arch: 'x64', libc: 'glibc',
+			installer: {
+				install: async () => {
+					await writeInstalledRecord(existing);
+					throw new ManagedRuntimeInstallerError('install-locked', 'another window');
+				},
+			},
+		});
+
+		assert.strictEqual((await service.ensureReady()).versionDirectory, existing.versionDirectory);
+		assert.deepStrictEqual(service.getProvisioningState(), { status: 'idle', attempt: 1 });
+	});
+
 	test('does not swallow an explicit repair behind a ready-state check', async () => {
 		await writeInstalledRecord();
 		const repairedRecord = createRecord('repaired-v2');

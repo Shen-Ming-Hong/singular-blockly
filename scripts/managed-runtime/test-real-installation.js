@@ -33,7 +33,8 @@ async function main() {
   const manifestSha256 = crypto.createHash('sha256').update(manifestBytes).digest('hex');
   const parent = path.resolve(argument('--root') || fs.realpathSync(os.tmpdir()));
   fs.mkdirSync(parent, { recursive: true });
-  const sandboxRoot = fs.mkdtempSync(path.join(parent, '使用者 中文 & managed runtime-'));
+  const sandboxPrefix = process.platform === 'win32' ? '使 用&-' : '使用者 中文 & managed runtime-';
+  const sandboxRoot = fs.mkdtempSync(path.join(parent, sandboxPrefix));
   const root = path.join(
     sandboxRoot,
     'AppData', 'Roaming', 'Code', 'User', 'globalStorage', 'Singular-Ray.singular-blockly', 'runtime-v1',

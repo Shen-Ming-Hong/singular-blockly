@@ -337,6 +337,20 @@ window.languageManager.loadMessages('cs', {
 
 	// PlatformIO Diagnostic Panel
 	PLATFORMIO_DIAGNOSTIC_PANEL_TITLE: 'PlatformIO Diagnostic',
+	MANAGED_RUNTIME_PROGRESS_INITIALIZE_TITLE: 'Příprava Singular Core',
+	MANAGED_RUNTIME_PROGRESS_REPAIR_TITLE: 'Oprava Singular Core',
+	MANAGED_RUNTIME_PROGRESS_STAGE_PERCENT: '{0} ({1} %)',
+	MANAGED_RUNTIME_PROGRESS_WAITING_LOCK: 'Čeká se na dokončení přípravy Singular Core v jiném okně',
+	MANAGED_RUNTIME_PROGRESS_DOWNLOADING_PYTHON: 'Stahuje se spravované prostředí Python',
+	MANAGED_RUNTIME_PROGRESS_EXTRACTING_PYTHON: 'Rozbaluje se spravované prostředí Python',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_PLATFORMIO: 'Instaluje se PlatformIO Core',
+	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Instaluje se pomocný nástroj zařízení CyberBrick',
+	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Ověřují se spravované nástroje',
+	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Potvrzuje se ověřené Singular Core',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core potřebuje v tomto systému Windows kratší místní složku. Provider Core nebylo změněno.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Nastavení Singular Core nebylo dokončeno. Provider Core nebylo změněno.',
+	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Otevřít diagnostiku',
+	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Vybrat kratší složku',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
 		'Check whether the extension can resolve PlatformIO CLI, penv, and the CyberBrick helper tools.',
 	PLATFORMIO_DIAGNOSTIC_LOADING_TITLE: 'Checking PlatformIO environment...',

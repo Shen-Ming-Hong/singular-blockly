@@ -22,6 +22,9 @@
 - [x] staging／version 只有在 marker 與 transaction ownership 可證明時才能清除；未知檔、provider penv 與 workspace 永不納入 cleanup。
 - [x] 安裝在 immutable candidate 完成健康 probe 後才原子寫入 `current.json`；checksum、ENOSPC、權限、probe 或中斷失敗都保留上一個 current。
 - [x] 新 immutable version directory 只使用固定長度 transaction UUID；完整 runtime／artifact id 保留在 record，避免不受信任的上游名稱或預設 Windows global storage 深度無限制放大每個子檔案路徑。
+- [x] PlatformIO installer scratch 位於系統暫存根內的固定產品前綴與 20-hex 交易 leaf，不位於 managed version；leaf 以獨占交易 marker 證明本次所有權，碰撞時 fail closed 且不得使用或刪除未知目錄。
+- [x] Windows 在下載或執行 artifact 前同時預檢 runtime 與 scratch 的後代路徑餘裕；預算不足或 upstream long-path hint 正規化為 `path-too-long`，不要求修改 registry 或系統政策。
+- [x] scratch cleanup 只在本次獨占 marker 建立成功後執行，成功、失敗與取消都不擴張到暫存根、managed root 或 provider `.platformio`。
 
 ## 程序、信任與 fallback
 
@@ -40,11 +43,13 @@
 - [x] OTA 設定與清除互斥，running state 同時停用衝突控制項；清除 request 仍只傳已選 USB port，不擴張 WebView 到 Host 的權限或秘密資料面。
 - [x] 診斷面板的 managed repair、cleanup、既有 auto repair 與 retest 使用共用 busy gate，不在安裝交易或修復流程中交錯讀寫狀態。
 - [x] 同一 Extension Host 的 background ensure 與 explicit repair 共用單一 provisioning Promise，避免 installer lock 等待期間由兩個 attempt 互相覆寫診斷狀態；跨視窗仍由受管 store lock 序列化。
+- [x] Notification 取消只橋接到既有 `AbortSignal`，即使底層停止回傳一般錯誤也不顯示誤導性的失敗 prompt；lock 後採用只接受 service 重新驗證為目前 manifest／artifact 且健康的 record。
 
 ## 隱私、CI 與發布
 
 - [x] logs、診斷、clipboard 與 issue draft 遮蔽 home／workspace、proxy credentials、token-like secrets 與敏感 URL；managed storage 對 WebView 與可分享輸出只提供穩定摘要。顯示實際 managed root 時，WebView 只送固定 command，由 Extension Host 直接呼叫本機檔案管理員，不回傳或記錄完整路徑。
 - [x] managed installer failure evidence 在進入診斷、AI packet 或 issue draft 前遮蔽 raw／URI-encoded managed root、home、workspace、credentials 與 token，移除控制字元並限制為 4,000 字元；background log 只記 attempt／stage，不記 raw stdout／stderr。
+- [x] Notification 失敗 action 綁定固定 Extension command；短路徑 action 只開啟已知設定項，AI action 重用同一隱私化 packet builder 與 clipboard 邊界，不將原始 exception 或路徑放入 UI。
 - [x] evidence 只記錄 OS／arch、runner、path case 名稱、PR／event、head／tree、VSIX／manifest／artifact SHA 與結果，不保存原始使用者路徑或環境變數。
 - [x] workflows 使用最小 `contents: read` 權限、SHA-pinned actions，未使用 `pull_request_target`；具網路與執行未信任程式碼的真實矩陣需由 label／release gate 核准。可執行 checkout 直接綁定 GitHub event immutable SHA；reusable release workflow 必須由 caller 傳入同一 annotated release tag 作 `candidate_ref`，runtime 矩陣不使用 npm dependency cache。跨 job 輸出的 candidate SHA 僅能用於 evidence 比對，不能決定後續執行內容。
 - [x] evidence verifier 拒絕錯誤 PR／event、過期 commit／tree、不同 VSIX／manifest／artifact、缺少或重複平台與未完成 path/offline cases。
@@ -52,4 +57,4 @@
 
 ## 結論
 
-下載、archive、路徑、子程序、workspace consent、WebView DOM、log、cleanup 與 GitHub workflow trust boundaries 均已有 fail-closed 實作與自動化負面測試。`v0.87.1` 正式發布仍必須通過 `implementation.md` 中尚未完成的六平台遠端矩陣、乾淨 Windows F5 與實機 smoke。
+下載、archive、路徑、子程序、workspace consent、Notification／WebView UI、log、cleanup 與 GitHub workflow trust boundaries 均已有 fail-closed 實作與自動化負面測試。`v0.87.1` 已完成 PR #131、六平台矩陣、乾淨 Windows F5、實機 smoke 與三端發布；`v0.87.2` 仍須依 `implementation.md` 完成本地審查、PR 遠端矩陣及發布驗證。
