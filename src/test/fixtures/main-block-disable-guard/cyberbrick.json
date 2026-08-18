@@ -1,0 +1,32 @@
+{
+  "board": "cyberbrick",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "micropython_main",
+          "id": "cyberbrick-main-disabled",
+          "disabledReasons": ["MANUALLY_DISABLED", "UNKNOWN_IMPORTED_REASON"],
+          "inputs": {
+            "MAIN": {
+              "block": {
+                "type": "text_print",
+                "id": "cyberbrick-main-print",
+                "inputs": {
+                  "TEXT": {
+                    "shadow": {
+                      "type": "text",
+                      "id": "cyberbrick-main-text",
+                      "fields": { "TEXT": "CyberBrick main" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

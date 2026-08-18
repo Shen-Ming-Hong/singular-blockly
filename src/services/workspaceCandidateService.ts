@@ -144,15 +144,20 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 	}
 
 	/** Seed recovery state after the existing project has loaded successfully in Blockly. */
-	async seedInitialValidDocument(document: WorkspaceDocument, expectedMainBytes: Buffer): Promise<boolean> {
+	async seedInitialValidDocument(
+		document: WorkspaceDocument,
+		expectedMainBytes: Buffer,
+		mainBlockStateRepaired = false
+	): Promise<boolean> {
 		return await this.runExclusiveWorkspaceTransaction(
-			() => this.seedInitialValidDocumentTransaction(document, expectedMainBytes)
+			() => this.seedInitialValidDocumentTransaction(document, expectedMainBytes, mainBlockStateRepaired)
 		);
 	}
 
 	private async seedInitialValidDocumentTransaction(
 		document: WorkspaceDocument,
-		expectedMainBytes: Buffer
+		expectedMainBytes: Buffer,
+		mainBlockStateRepaired: boolean
 	): Promise<boolean> {
 		if (this.disposed || !isWorkspaceDocument(document) || !this.fileService.fileExists(MAIN_PATH)) {return false;}
 		let currentMain: Buffer;
@@ -164,9 +169,45 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 		if (!currentMain.equals(expectedMainBytes)) {return false;}
 
 		const bytes = Buffer.from(`${JSON.stringify(document, null, 2)}\n`);
-		await this.fileService.writeFileAtomic(BACKUP_PATH, bytes);
-		this.lastValidMemory = bytes;
-		return true;
+		if (mainBlockStateRepaired !== true) {
+			await this.fileService.writeFileAtomic(BACKUP_PATH, bytes);
+			this.lastValidMemory = bytes;
+			return true;
+		}
+
+		const previousMemory = this.lastValidMemory ? Buffer.from(this.lastValidMemory) : undefined;
+		const previousBackup = await this.readExistingBytes(BACKUP_PATH);
+		try {
+			this.expectedInternalMainHash = WorkspaceCandidateService.sha256(bytes);
+			await this.fileService.writeFileAtomic(MAIN_PATH, bytes);
+			await this.fileService.writeFileAtomic(BACKUP_PATH, bytes);
+			const committedMain = await this.readExistingBytes(MAIN_PATH);
+			if (!committedMain?.equals(bytes)) {
+				this.lastValidMemory = previousMemory;
+				this.expectedInternalMainHash = undefined;
+				await this.restoreSnapshotIfUnchanged(BACKUP_PATH, previousBackup, bytes);
+				return false;
+			}
+			this.lastValidMemory = bytes;
+			return true;
+		} catch (error) {
+			this.lastValidMemory = previousMemory;
+			const rollbackErrors: unknown[] = [];
+			for (const [relativePath, snapshot] of [
+				[MAIN_PATH, currentMain],
+				[BACKUP_PATH, previousBackup],
+			] as const) {
+				try {
+					await this.restoreSnapshotIfUnchanged(relativePath, snapshot, bytes);
+				} catch (rollbackError) {
+					rollbackErrors.push(rollbackError);
+				}
+			}
+			if (rollbackErrors.length > 0) {
+				throw new AggregateError([error, ...rollbackErrors], 'Initial workspace repair rollback failed');
+			}
+			throw error;
+		}
 	}
 
 	/** Reject a startup document that parsed but failed the real Blockly runtime load. */
@@ -552,6 +593,24 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 			}
 			await this.fileService.deleteFile(relativePath);
 		}
+	}
+
+	private async restoreSnapshotIfUnchanged(
+		relativePath: string,
+		snapshot: Buffer | undefined,
+		transactionBytes: Buffer
+	): Promise<boolean> {
+		const current = await this.readExistingBytes(relativePath);
+		const isUnchanged =
+			(current === undefined && snapshot === undefined) ||
+			Boolean(current?.equals(transactionBytes)) ||
+			Boolean(current && snapshot && current.equals(snapshot));
+		if (!isUnchanged) {
+			if (relativePath === MAIN_PATH) {this.expectedInternalMainHash = undefined;}
+			return false;
+		}
+		await this.restoreBytes(relativePath, snapshot);
+		return true;
 	}
 
 	private async rotateHistory(): Promise<void> {

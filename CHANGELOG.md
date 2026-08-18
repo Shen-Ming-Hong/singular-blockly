@@ -8,6 +8,15 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.87.3] - 2026-08-18
+
+### 🐛 修復 Bug Fixes
+
+- Arduino Uno、Nano、Mega、ESP32、SuperMini、CyberBrick 與 TXT Controller 的必要主程式積木不再顯示停用選項；既有或外部文件中的所有主程式停用原因會靜默清除，而普通積木、函式與 TXT process 仍可正常停用
+  Removed the disable option from required main-program blocks on Arduino Uno, Nano, Mega, ESP32, SuperMini, CyberBrick, and TXT Controller; all legacy or externally supplied main-block disable reasons are silently repaired while ordinary blocks, functions, and TXT processes remain disableable
+- 主程式狀態修復只會在初次載入來源位元仍一致時交易性更新 `main.json` 與備份；外部競態或任一寫入失敗會保留較新資料並回復先前的磁碟與記憶體狀態
+  Made main-block state repair update `main.json` and its backup transactionally only while the initial source bytes remain current; external races or write failures preserve newer data and restore the previous disk and memory state
+
 ## [0.87.2] - 2026-08-17
 
 ### 🐛 修復 Bug Fixes

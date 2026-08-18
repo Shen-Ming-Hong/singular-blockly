@@ -616,6 +616,95 @@ suite('WorkspaceCandidateService Tests', () => {
 		assert.deepStrictEqual(JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json.bak'), 'utf8')), normalized);
 	});
 
+	test('transactionally commits and rolls back repaired initial documents', async () => {
+		const originalMain = Buffer.from(JSON.stringify({ ...valid, disabled: true }));
+		const originalBackup = Buffer.from(`${JSON.stringify({ ...valid, recovery: true })}\n`);
+		const repaired = { ...valid, repaired: true };
+		fs.writeFileSync(path.join(workspace, 'blockly', 'main.json'), originalMain);
+		fs.writeFileSync(path.join(workspace, 'blockly', 'main.json.bak'), originalBackup);
+		const success = new WorkspaceCandidateService(workspace);
+		assert.strictEqual(
+			await (success as any).seedInitialValidDocument(repaired, originalMain, true),
+			true
+		);
+		const committed = Buffer.from(`${JSON.stringify(repaired, null, 2)}\n`);
+		assert.deepStrictEqual(fs.readFileSync(path.join(workspace, 'blockly', 'main.json')), committed);
+		assert.deepStrictEqual(fs.readFileSync(path.join(workspace, 'blockly', 'main.json.bak')), committed);
+
+		for (const scenario of [
+			{ failPath: 'blockly/main.json', failAfterWrite: false, backupExists: true },
+			{ failPath: 'blockly/main.json.bak', failAfterWrite: false, backupExists: true },
+			{ failPath: 'blockly/main.json.bak', failAfterWrite: true, backupExists: true },
+			{ failPath: 'blockly/main.json.bak', failAfterWrite: true, backupExists: false },
+		]) {
+			fs.writeFileSync(path.join(workspace, 'blockly', 'main.json'), originalMain);
+			if (scenario.backupExists) {
+				fs.writeFileSync(path.join(workspace, 'blockly', 'main.json.bak'), originalBackup);
+			} else if (fs.existsSync(path.join(workspace, 'blockly', 'main.json.bak'))) {
+				fs.unlinkSync(path.join(workspace, 'blockly', 'main.json.bak'));
+			}
+			const fileService = new FileService(workspace);
+			const originalWrite = fileService.writeFileAtomic.bind(fileService);
+			let failureInjected = false;
+			sinon.stub(fileService, 'writeFileAtomic').callsFake(async (relative, content) => {
+				if (relative === scenario.failPath && !failureInjected) {
+					failureInjected = true;
+					if (scenario.failAfterWrite) {await originalWrite(relative, content);}
+					throw new Error('injected initial repair failure');
+				}
+				await originalWrite(relative, content);
+			});
+			const service = new WorkspaceCandidateService(workspace, fileService);
+			(service as any).lastValidMemory = Buffer.from('memory-before');
+			await assert.rejects(
+				(service as any).seedInitialValidDocument(repaired, originalMain, true),
+				/injected initial repair failure/
+			);
+			assert.deepStrictEqual(fs.readFileSync(path.join(workspace, 'blockly', 'main.json')), originalMain);
+			if (scenario.backupExists) {
+				assert.deepStrictEqual(fs.readFileSync(path.join(workspace, 'blockly', 'main.json.bak')), originalBackup);
+			} else {
+				assert.strictEqual(fs.existsSync(path.join(workspace, 'blockly', 'main.json.bak')), false);
+			}
+			assert.deepStrictEqual((service as any).lastValidMemory, Buffer.from('memory-before'));
+			sinon.restore();
+		}
+	});
+
+	test('commits the formally normalized external document after required-main repair', async () => {
+		const external = {
+			board: 'cyberbrick',
+			workspace: {
+				blocks: {
+					languageVersion: 0,
+					blocks: [{
+						type: 'micropython_main', id: 'main', disabledReasons: ['MANUALLY_DISABLED', 'UNKNOWN'],
+						inputs: { MAIN: { block: { type: 'text_print', id: 'content' } } },
+					}],
+				},
+			},
+		};
+		fs.writeFileSync(path.join(workspace, 'blockly', 'main.json'), JSON.stringify(external));
+		const service = new WorkspaceCandidateService(workspace, undefined, 100);
+		service.attachChannels(
+			async request => ({
+				command: 'workspaceCandidateValidationResult', requestId: request.requestId,
+				generation: request.generation, valid: true, normalizedDocument: request.document,
+			}),
+			async (requestId, generation, _deadlineAt, document) => {
+				const normalized = JSON.parse(JSON.stringify(document));
+				delete normalized.workspace.blocks.blocks[0].disabledReasons;
+				return liveLoadSucceeded(requestId, generation, normalized);
+			}
+		);
+		await service.processCandidate();
+		const main = JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json'), 'utf8'));
+		const backup = JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json.bak'), 'utf8'));
+		assert.strictEqual(main.workspace.blocks.blocks[0].disabledReasons, undefined);
+		assert.strictEqual(main.workspace.blocks.blocks[0].inputs.MAIN.block.id, 'content');
+		assert.deepStrictEqual(backup, main);
+	});
+
 	test('rejects invalid or unreadable initial recovery seeds', async () => {
 		const service = new WorkspaceCandidateService(workspace);
 		assert.strictEqual(await service.seedInitialValidDocument({ workspace: {}, board: 1 } as any, Buffer.from('')), false);

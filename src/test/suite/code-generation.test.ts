@@ -12,6 +12,8 @@
  */
 
 import * as assert from 'assert';
+import * as fs from 'fs';
+import * as path from 'path';
 import { TXT_VIRTUAL_CONTROL_RUNTIME_STATE_FILE } from '../../types/txtVirtualControls';
 
 suite('ESP32 PWM Code Generation Tests', () => {
@@ -407,6 +409,20 @@ suite('ESP32 PWM Code Generation Tests', () => {
 			const generatedExpression = "_txt_virtual_button_state('btn-stable-123')";
 			assert.match(generatedExpression, /_txt_virtual_button_state\('btn-stable-123'\)/);
 			assert.ok(!generatedExpression.includes('Start Button'), 'generator 不應直接把顯示名稱寫進執行期 helper 呼叫');
+		});
+	});
+
+	suite('Required main block enable generation contract', () => {
+		test('Arduino and CyberBrick generators emit enabled main roots and skip disabled top-level blocks', () => {
+			const generatorRoot = path.join(__dirname, '..', '..', '..', 'media', 'blockly', 'generators');
+			const arduino = fs.readFileSync(path.join(generatorRoot, 'arduino', 'index.js'), 'utf8');
+			const micropython = fs.readFileSync(path.join(generatorRoot, 'micropython', 'index.js'), 'utf8');
+			const cyberbrick = fs.readFileSync(path.join(generatorRoot, 'micropython', 'cyberbrick.js'), 'utf8');
+			assert.match(arduino, /if \(!block\.isEnabled\(\) \|\| block\.getInheritedDisabled\(\)\)/);
+			assert.match(arduino, /void setup\(\)/);
+			assert.match(arduino, /void loop\(\)/);
+			assert.match(micropython, /if \(!block\.isEnabled\(\) \|\| block\.getInheritedDisabled\(\)\)/);
+			assert.match(cyberbrick, /forBlock\['micropython_main'\]/);
 		});
 	});
 });
