@@ -22,6 +22,7 @@ import { ShadowSuggestionService, WorkspaceContext } from '../services/shadowSug
 import { getWorkspaceCandidateService } from '../services/workspaceCandidateService';
 import {
 	isWorkspaceDocument,
+	isWorkspaceInitialLoadResultMessage,
 	isWorkspaceValidationIssue,
 	normalizeWorkspaceDocumentBoard,
 	WorkspaceDocument,
@@ -473,7 +474,9 @@ export class WebViewMessageHandler {
 					await this.handleRequestInitialState();
 					break;
 				case 'workspaceInitialLoadResult':
-					await this.handleWorkspaceInitialLoadResult(message);
+					if (isWorkspaceInitialLoadResultMessage(message)) {
+						await this.handleWorkspaceInitialLoadResult(message);
+					}
 					break;
 				case 'promptNewVariable':
 					await this.handlePromptNewVariable(message);
@@ -1652,7 +1655,11 @@ export class WebViewMessageHandler {
 			return;
 		}
 		try {
-			await candidateService.seedInitialValidDocument(message.normalizedDocument, pending.sourceBytes);
+			await candidateService.seedInitialValidDocument(
+				message.normalizedDocument,
+				pending.sourceBytes,
+				message.mainBlockStateRepaired === true
+			);
 		} catch (error) {
 			log('Failed to seed initial workspace recovery state', 'warn', error);
 		}

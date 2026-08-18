@@ -2239,6 +2239,7 @@ async function refreshWorkspaceForLanguage() {
 		workspace.clear();
 		migrateWorkspaceState(state);
 		withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(state, workspace));
+		window.blocklyRuntime.repairRequiredMainBlockDisabledReasons(workspace);
 		rebuildPwmConfig(workspace);
 		workspace.render();
 
@@ -3862,10 +3863,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		});
 	};
 
-	const updateMainBlockDeletable = workspace => {
+	const protectMainBlockState = workspace => {
 		if (!workspace) {
-			return;
+			return false;
 		}
+		window.blocklyRuntime.installRequiredMainBlockDisableGuard();
+		const mainBlockStateRepaired = window.blocklyRuntime.repairRequiredMainBlockDisabledReasons(workspace);
 
 		const boardId = window.currentBoard || (boardSelect ? boardSelect.value : 'arduino_uno');
 		const blockType = getMainBlockType(boardId);
@@ -3878,7 +3881,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			if (isTxtBoard) {
 				updateTxtWorkspaceValidation(workspace);
 			}
-			return;
+			return mainBlockStateRepaired;
 		}
 
 		const shouldBeDeletable = blocks.length > 1;
@@ -3915,6 +3918,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (isTxtBoard) {
 			updateTxtWorkspaceValidation(workspace);
 		}
+		return mainBlockStateRepaired;
 	};
 
 	// 拖動狀態追蹤：避免在拖動過程中執行昂貴的操作
@@ -4248,8 +4252,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 			}, 100);
 		}
 
-		if (event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE) {
-			updateMainBlockDeletable(workspace);
+		if (
+			event.type === Blockly.Events.BLOCK_CREATE ||
+			event.type === Blockly.Events.BLOCK_DELETE ||
+			(event.type === Blockly.Events.BLOCK_CHANGE && event.element === 'disabled')
+		) {
+			protectMainBlockState(workspace);
 		}
 
 		// 工作區完全載入後修復函數呼叫積木和連接點
@@ -4483,7 +4491,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			workspace.getVariableMap().createVariable('i');
 		}
 		rebuildPwmConfig(workspace);
-		updateMainBlockDeletable(workspace);
+		protectMainBlockState(workspace);
 		refreshCyberBrickNamingIssues(workspace);
 		updateTheme(currentTheme);
 		workspace.render();
@@ -4576,7 +4584,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			window.setCurrentBoard(selectedBoard);
 			// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
 			await updateToolboxForBoard(workspace, selectedBoard);
-			updateMainBlockDeletable(workspace);
+			protectMainBlockState(workspace);
 			refreshCyberBrickNamingIssues(workspace);
 			// 觸發工作區更新以重新整理積木
 			workspace.getAllBlocks().forEach(block => {
@@ -4689,6 +4697,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 
 		try {
+			let mainBlockStateRepaired = false;
 			// 如果是 FileWatcher 觸發的重載，設置鎖定標記防止無限循環
 			const isFromFileWatcher = message.source === 'fileWatcher';
 			const isExternalCandidate = isFromFileWatcher || message.source === 'validatedCandidate';
@@ -4727,7 +4736,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				window.setCurrentBoard(message.board);
 				// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
 				await updateToolboxForBoard(workspace, message.board);
-				updateMainBlockDeletable(workspace);
+				protectMainBlockState(workspace);
 				// 只有當板子實際變更時才發送 updateBoard 訊息
 				// 避免載入工作區時誤觸發 PlatformIO 重新檢查
 				if (previousBoard !== message.board) {
@@ -4769,7 +4778,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 				// 重建 ESP32 PWM 配置
 				rebuildPwmConfig(workspace);
-				updateMainBlockDeletable(workspace);
+				mainBlockStateRepaired = protectMainBlockState(workspace);
 				refreshTxtVirtualButtonReferences();
 				repairFunctionReferences(workspace, preSaveFunctionNames, true);
 				if (txtVirtualControls?.canvas?.lastViewport) {
@@ -4819,6 +4828,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					requestId: message.initialLoadRequestId,
 					success: true,
 					normalizedDocument,
+					...(mainBlockStateRepaired ? { mainBlockStateRepaired: true } : {}),
 				});
 			}
 		} catch (error) {

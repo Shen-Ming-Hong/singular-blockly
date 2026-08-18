@@ -1,0 +1,32 @@
+{
+  "board": "uno",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "arduino_setup_loop",
+          "id": "arduino-main-disabled",
+          "disabledReasons": ["MANUALLY_DISABLED", "EXTERNAL_POLICY"],
+          "inputs": {
+            "LOOP": {
+              "block": {
+                "type": "text_print",
+                "id": "arduino-loop-print",
+                "inputs": {
+                  "TEXT": {
+                    "shadow": {
+                      "type": "text",
+                      "id": "arduino-loop-text",
+                      "fields": { "TEXT": "Arduino main" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

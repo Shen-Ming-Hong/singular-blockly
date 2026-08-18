@@ -30,6 +30,8 @@
 	let dialogSequence = 0;
 	let dialogListenerInstalled = false;
 	const pendingDialogs = new Map();
+	const REQUIRED_MAIN_BLOCK_TYPES = new Set(['arduino_setup_loop', 'micropython_main', 'txt_setup']);
+	const REQUIRED_MAIN_BLOCK_DISABLE_GUARD = Symbol('requiredMainBlockDisableGuard');
 	if (window.languageManager && window.languageManager.currentLanguage && window.BLOCKLY_INITIAL_CORE_MESSAGES) {
 		coreLocaleCache.set(window.languageManager.currentLanguage, { ...window.BLOCKLY_INITIAL_CORE_MESSAGES });
 	}
@@ -71,6 +73,69 @@
 		return lifecycleStatus;
 	}
 
+	function installRequiredMainBlockDisableGuard() {
+		ensureBlockly();
+		const registry = Blockly.ContextMenuRegistry?.registry;
+		const coreItem = registry?.getItem?.('blockDisable');
+		if (!coreItem || coreItem[REQUIRED_MAIN_BLOCK_DISABLE_GUARD]) {
+			return false;
+		}
+
+		const guardedItem = {
+			...coreItem,
+			preconditionFn(scope, menuOpenEvent) {
+				if (scope?.block && REQUIRED_MAIN_BLOCK_TYPES.has(scope.block.type)) {
+					return 'hidden';
+				}
+				return coreItem.preconditionFn.call(this, scope, menuOpenEvent);
+			},
+			[REQUIRED_MAIN_BLOCK_DISABLE_GUARD]: true,
+		};
+
+		registry.unregister('blockDisable');
+		try {
+			registry.register(guardedItem);
+		} catch (error) {
+			registry.register(coreItem);
+			throw error;
+		}
+		return true;
+	}
+
+	function repairRequiredMainBlockDisabledReasons(workspace = canonicalWorkspace) {
+		if (!workspace || typeof workspace.getAllBlocks !== 'function') {
+			return false;
+		}
+
+		const repairs = [];
+		for (const block of workspace.getAllBlocks(false)) {
+			if (!REQUIRED_MAIN_BLOCK_TYPES.has(block.type) || typeof block.getDisabledReasons !== 'function') {
+				continue;
+			}
+			for (const reason of block.getDisabledReasons()) {
+				repairs.push({ block, reason });
+			}
+		}
+		if (repairs.length === 0) {
+			return false;
+		}
+
+		const eventsWereEnabled = Boolean(Blockly.Events?.isEnabled?.());
+		if (eventsWereEnabled) {
+			Blockly.Events.disable();
+		}
+		try {
+			for (const { block, reason } of repairs) {
+				block.setDisabledReason(false, reason);
+			}
+			return true;
+		} finally {
+			if (eventsWereEnabled) {
+				Blockly.Events.enable();
+			}
+		}
+	}
+
 	function isRebuilding() {
 		return rebuildDepth > 0;
 	}
@@ -80,6 +145,7 @@
 		if (canonicalWorkspace) {
 			throw new Error('Dispose the current Blockly workspace before creating another one');
 		}
+		installRequiredMainBlockDisableGuard();
 
 		lifecycleStatus = isRebuilding() ? 'rebuilding' : 'initializing';
 		try {
@@ -514,6 +580,8 @@
 	window.blocklyRuntime = Object.freeze({
 		config,
 		createImeSafeFieldTextInput,
+		installRequiredMainBlockDisableGuard,
+		repairRequiredMainBlockDisabledReasons,
 		createWorkspace,
 		recreateWorkspace,
 		disposeWorkspace,

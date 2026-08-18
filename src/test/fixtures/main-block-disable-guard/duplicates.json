@@ -1,0 +1,39 @@
+{
+  "arduino": {
+    "board": "uno",
+    "workspace": {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          { "type": "arduino_setup_loop", "id": "arduino-main-1", "disabledReasons": ["MANUALLY_DISABLED"] },
+          { "type": "arduino_setup_loop", "id": "arduino-main-2", "disabledReasons": ["DUPLICATE_IMPORTED"] }
+        ]
+      }
+    }
+  },
+  "cyberbrick": {
+    "board": "cyberbrick",
+    "workspace": {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          { "type": "micropython_main", "id": "cyberbrick-main-1", "disabledReasons": ["MANUALLY_DISABLED"] },
+          { "type": "micropython_main", "id": "cyberbrick-main-2", "disabledReasons": ["DUPLICATE_IMPORTED"] }
+        ]
+      }
+    }
+  },
+  "txt": {
+    "board": "txt",
+    "workspace": {
+      "blocks": {
+        "languageVersion": 0,
+        "blocks": [
+          { "type": "txt_setup", "id": "txt-setup-1", "disabledReasons": ["MANUALLY_DISABLED"] },
+          { "type": "txt_setup", "id": "txt-setup-2", "disabledReasons": ["DUPLICATE_IMPORTED"] },
+          { "type": "txt_process", "id": "txt-process-active", "fields": { "NAME": "process1" } }
+        ]
+      }
+    }
+  }
+}

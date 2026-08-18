@@ -106,6 +106,93 @@ suite('Initial workspace load boundary', () => {
 		}
 	});
 
+	test('commits a repaired initial CyberBrick document to main and backup without changing its program', async () => {
+		const source = JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json'), 'utf8'));
+		source.workspace.blocks.blocks[0].disabledReasons = ['MANUALLY_DISABLED', 'EXTERNAL_POLICY'];
+		fs.writeFileSync(path.join(workspace, 'blockly', 'main.json'), JSON.stringify(source));
+		const vscodeMock = new VSCodeMock();
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: workspace } }];
+		_setVSCodeApi(vscodeMock as any);
+		setHandlerVSCodeApi(vscodeMock as any);
+		const candidate = new WorkspaceCandidateService(workspace).start(vscodeMock.workspace);
+		const manager = new WebViewManager(
+			{ extensionPath: ROOT, subscriptions: [] } as any,
+			new LocaleService(ROOT, undefined, vscodeMock as any),
+			new FileService(ROOT),
+			new FileService(workspace)
+		);
+
+		try {
+			await manager.createAndShowWebView();
+			const panel: any = manager.getPanel();
+			await panel.webview.dispatchMessage({ command: 'requestInitialState' });
+			const init = panel.webview.postMessage.getCalls().map((call: any) => call.args[0])
+				.find((message: any) => message.command === 'init');
+			const repaired = JSON.parse(JSON.stringify(init.document));
+			delete repaired.workspace.blocks.blocks[0].disabledReasons;
+			await panel.webview.dispatchMessage({
+				command: 'workspaceInitialLoadResult',
+				requestId: init.initialLoadRequestId,
+				success: true,
+				normalizedDocument: repaired,
+				mainBlockStateRepaired: true,
+			});
+
+			const main = JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json'), 'utf8'));
+			const backup = JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json.bak'), 'utf8'));
+			assert.deepStrictEqual(main, repaired);
+			assert.deepStrictEqual(backup, repaired);
+			assert.strictEqual(main.workspace.blocks.blocks[0].inputs.MAIN.block.inputs.ELSE.block.type, 'text_print');
+		} finally {
+			manager.closePanel();
+			candidate.dispose();
+		}
+	});
+
+	test('ignores stale or malformed repair acknowledgements and never overwrites newer source bytes', async () => {
+		const vscodeMock = new VSCodeMock();
+		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: workspace } }];
+		_setVSCodeApi(vscodeMock as any);
+		setHandlerVSCodeApi(vscodeMock as any);
+		const candidate = new WorkspaceCandidateService(workspace).start(vscodeMock.workspace);
+		const manager = new WebViewManager(
+			{ extensionPath: ROOT, subscriptions: [] } as any,
+			new LocaleService(ROOT, undefined, vscodeMock as any),
+			new FileService(ROOT),
+			new FileService(workspace)
+		);
+
+		try {
+			await manager.createAndShowWebView();
+			const panel: any = manager.getPanel();
+			await panel.webview.dispatchMessage({ command: 'requestInitialState' });
+			const init = panel.webview.postMessage.getCalls().map((call: any) => call.args[0])
+				.find((message: any) => message.command === 'init');
+			const normalized = { ...init.document, repaired: true };
+			await panel.webview.dispatchMessage({
+				command: 'workspaceInitialLoadResult', requestId: 'stale-request', success: true,
+				normalizedDocument: normalized, mainBlockStateRepaired: true,
+			});
+			await panel.webview.dispatchMessage({
+				command: 'workspaceInitialLoadResult', requestId: init.initialLoadRequestId, success: true,
+				normalizedDocument: normalized, mainBlockStateRepaired: 'true',
+			});
+			assert.strictEqual(fs.existsSync(path.join(workspace, 'blockly', 'main.json.bak')), false);
+
+			const newer = Buffer.from(JSON.stringify({ ...init.document, newer: true }));
+			fs.writeFileSync(path.join(workspace, 'blockly', 'main.json'), newer);
+			await panel.webview.dispatchMessage({
+				command: 'workspaceInitialLoadResult', requestId: init.initialLoadRequestId, success: true,
+				normalizedDocument: normalized, mainBlockStateRepaired: true,
+			});
+			assert.deepStrictEqual(fs.readFileSync(path.join(workspace, 'blockly', 'main.json')), newer);
+			assert.strictEqual(fs.existsSync(path.join(workspace, 'blockly', 'main.json.bak')), false);
+		} finally {
+			manager.closePanel();
+			candidate.dispose();
+		}
+	});
+
 	test('requestInitialState canonicalizes a legacy board id without rewriting the original main bytes', async () => {
 		const legacy = {
 			board: 'arduino_uno',

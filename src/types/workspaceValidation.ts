@@ -166,6 +166,21 @@ export interface WorkspaceInitialLoadResultMessage {
 	success: boolean;
 	normalizedDocument?: WorkspaceDocument;
 	issue?: WorkspaceValidationIssue;
+	mainBlockStateRepaired?: boolean;
+}
+
+export function isWorkspaceInitialLoadResultMessage(value: unknown): value is WorkspaceInitialLoadResultMessage {
+	if (!value || typeof value !== 'object') {return false;}
+	const result = value as WorkspaceInitialLoadResultMessage;
+	return (
+		result.command === 'workspaceInitialLoadResult' &&
+		typeof result.requestId === 'string' &&
+		typeof result.success === 'boolean' &&
+		(result.issue === undefined || isWorkspaceValidationIssue(result.issue)) &&
+		(result.mainBlockStateRepaired === undefined || typeof result.mainBlockStateRepaired === 'boolean') &&
+		(result.success === true || result.mainBlockStateRepaired !== true) &&
+		(result.success === false || isWorkspaceDocument(result.normalizedDocument))
+	);
 }
 
 export type WorkspaceCandidateState =

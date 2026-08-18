@@ -113,6 +113,35 @@ suite('Workspace Candidate Runtime Contract', () => {
 		);
 	});
 
+	test('initial-load acknowledgements strictly validate the optional repair flag', () => {
+		const validation = require('../../types/workspaceValidation');
+		assert.strictEqual(typeof validation.isWorkspaceInitialLoadResultMessage, 'function');
+		const document = {
+			board: 'cyberbrick',
+			workspace: { blocks: { languageVersion: 0, blocks: [{ type: 'micropython_main' }] } },
+		};
+		const base = {
+			command: 'workspaceInitialLoadResult',
+			requestId: 'initial-1',
+			success: true,
+			normalizedDocument: document,
+		};
+		assert.strictEqual(validation.isWorkspaceInitialLoadResultMessage(base), true);
+		assert.strictEqual(validation.isWorkspaceInitialLoadResultMessage({ ...base, mainBlockStateRepaired: true }), true);
+		assert.strictEqual(validation.isWorkspaceInitialLoadResultMessage({ ...base, mainBlockStateRepaired: false }), true);
+		for (const invalid of ['true', 1, null, {}]) {
+			assert.strictEqual(
+				validation.isWorkspaceInitialLoadResultMessage({ ...base, mainBlockStateRepaired: invalid }),
+				false
+			);
+		}
+		assert.strictEqual(validation.isWorkspaceInitialLoadResultMessage({
+			command: 'workspaceInitialLoadResult', requestId: 'failed', success: false,
+			issue: { code: 'ROUND_TRIP_FAILED' }, mainBlockStateRepaired: true,
+		}), false);
+		assert.strictEqual(validation.isWorkspaceInitialLoadResultMessage({ ...base, normalizedDocument: undefined }), false);
+	});
+
 	test('TXT virtual-control-only candidates remain valid and normalize their companion document', () => {
 		const source = fs.readFileSync(path.join(ROOT, 'media', 'js', 'blocklyEdit.js'), 'utf8');
 		assert.match(source, /cloneTxtVirtualControlsDocument\(documentState\.txtVirtualControls, \{ forceEditingMode: true \}\)/);

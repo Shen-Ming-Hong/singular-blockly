@@ -1,0 +1,32 @@
+{
+  "board": "txt",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "txt_setup",
+          "id": "txt-setup-disabled",
+          "disabledReasons": ["MANUALLY_DISABLED", "RESTORED_POLICY"]
+        },
+        {
+		  "type": "txt_process",
+		  "id": "txt-process-disabled",
+		  "disabledReasons": ["MANUALLY_DISABLED"],
+		  "fields": { "NAME": "process1" }
+		},
+		{
+		  "type": "txt_process",
+		  "id": "txt-process-enabled",
+		  "fields": { "NAME": "active_process" }
+		},
+        {
+          "type": "procedures_defnoreturn",
+          "id": "txt-function-disabled",
+          "disabledReasons": ["MANUALLY_DISABLED"],
+          "fields": { "NAME": "helper" }
+        }
+      ]
+    }
+  }
+}

@@ -290,5 +290,16 @@ suite('TXT Multi-flow Code Generation Tests', () => {
 				'process blocks 應仍在 txt_setup 前先掃描，確保 buildPreCreations 可取得硬體 usage'
 			);
 		});
+
+		test('停用非必要頂層積木應被跳過，但啟用的 setup 與 process 仍會產生', () => {
+			const generatorIndexPath = path.join(
+				__dirname, '..', '..', '..', 'media', 'blockly', 'generators', 'txt', 'index.js'
+			);
+			const source = fs.readFileSync(generatorIndexPath, 'utf8');
+			assert.match(source, /if \(!block\.isEnabled\(\) \|\| block\.getInheritedDisabled\(\)\)/);
+			assert.match(source, /case 'txt_setup':[\s\S]*setupBlocks\.push\(block\)/);
+			assert.match(source, /case 'txt_process':[\s\S]*processBlocks\.push\(block\)/);
+			assert.match(source, /for \(const block of processBlocks\)[\s\S]*if \(primarySetupBlock\)/);
+		});
 	});
 });
