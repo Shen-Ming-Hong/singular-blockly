@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.87.5] - 2026-08-19
+
+### 🔒 安全性 Security
+
+- 移除 Project Skill 備份與無效工作區隔離檔名時間戳中的無效字串替換，在維持既有 UTC 格式不變的同時修復 CodeQL `js/identity-replacement`（CWE-116）Code Scanning Alerts #12 與 #13
+  Removed ineffective string replacements from Project Skill backup and invalid-workspace quarantine filename timestamps, preserving the existing UTC format while fixing CodeQL `js/identity-replacement` (CWE-116) Code Scanning Alerts #12 and #13
+- 強化 `security-vulnerability-fix` Skill，要求每次漏洞分析同時查詢 Dependabot、GitHub Code Scanning 與 `npm audit`，避免將 `npm audit` 為 0 誤報為沒有任何安全 finding
+  Strengthened the `security-vulnerability-fix` Skill to query Dependabot, GitHub Code Scanning, and `npm audit` on every vulnerability analysis, preventing a zero-result npm audit from being misreported as no security findings
+
+### 🧪 測試 Tests
+
+- 補強 Project Skill 備份與無效工作區隔離檔名的精確 UTC 時間戳回歸驗證
+  Strengthened exact UTC timestamp regression coverage for Project Skill backup and invalid-workspace quarantine filenames
+
 ## [0.87.4] - 2026-08-19
 
 ### 🐛 修復 Bug Fixes

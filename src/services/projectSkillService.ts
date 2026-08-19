@@ -335,6 +335,6 @@ export class ProjectSkillService {
 	}
 
 	private static timestamp(date: Date): string {
-		return date.toISOString().replace(/[-:.]/g, '').replace('Z', 'Z');
+		return date.toISOString().replace(/[-:.]/g, '');
 	}
 }
