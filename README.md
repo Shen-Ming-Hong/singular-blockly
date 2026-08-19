@@ -198,7 +198,7 @@ Example project: [CyberBrick SoccerBot](https://github.com/Shen-Ming-Hong/Blockl
 
 ## Development
 
-Contributor baseline: Node.js 22.16.0+, TypeScript 5.9.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, and VS Code 1.109.0+.
+Contributor baseline: Node.js 22.16.0+, TypeScript 6.0.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, and VS Code 1.109.0+.
 
 ```bash
 npm install
