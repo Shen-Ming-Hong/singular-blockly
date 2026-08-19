@@ -174,7 +174,7 @@ suite('ArduinoMonitorService Test Suite', () => {
 			untrustedService.dispose();
 		});
 
-		test('forwards process output and closes the Pseudoterminal on exit', async () => {
+		test('forwards process output and closes the Pseudoterminal after stdio closes', async () => {
 			await service.start('uno');
 			const output: string[] = [];
 			let closeCode: number | undefined;
@@ -182,9 +182,30 @@ suite('ArduinoMonitorService Test Suite', () => {
 			terminalOptions.pty.onDidClose((value: number) => {closeCode = value;});
 			terminalOptions.pty.open();
 			processes[0].stdout.write('hello\n');
-			processes[0].emit('exit', 7);
+			processes[0].emit('close', 7);
 			assert.deepStrictEqual(output, ['hello\r\n']);
 			assert.strictEqual(closeCode, 7);
+		});
+
+		test('decodes split UTF-8 stdout and stderr without replacement characters', async () => {
+			await service.start('uno');
+			const output: string[] = [];
+			terminalOptions.pty.onDidWrite((value: string) => output.push(value));
+			terminalOptions.pty.open();
+			const stdout = Buffer.from('中文');
+			const stderr = Buffer.from('測試');
+
+			processes[0].stdout.write(stdout.subarray(0, 1));
+			processes[0].stdout.write(stdout.subarray(1, 4));
+			processes[0].stdout.write(stdout.subarray(4));
+			processes[0].stderr.write(stderr.subarray(0, 2));
+			processes[0].stderr.write(stderr.subarray(2, 5));
+			processes[0].stderr.write(stderr.subarray(5));
+			processes[0].exitCode = 7;
+			processes[0].emit('close', 7);
+
+			assert.strictEqual(output.join(''), '中文測試');
+			assert.ok(!output.join('').includes('�'));
 		});
 
 		test('should return success if already running', async () => {
@@ -212,6 +233,47 @@ suite('ArduinoMonitorService Test Suite', () => {
 			// Should not throw
 			await service.stop();
 			assert.strictEqual(service.isRunning(), false);
+		});
+
+		test('should report manual stop once with PTY exit code zero', async () => {
+			const reasons: string[] = [];
+			service.onStopped(reason => reasons.push(reason));
+			await service.start('uno');
+			let closeCode: number | void | undefined;
+			terminalOptions.pty.onDidClose((code: number | void) => {closeCode = code;});
+
+			await service.stop('manual_stop');
+
+			assert.deepStrictEqual(reasons, ['manual_stop']);
+			assert.strictEqual(closeCode, 0);
+		});
+
+		test('should report terminal user close once with PTY exit code zero', async () => {
+			const reasons: string[] = [];
+			service.onStopped(reason => reasons.push(reason));
+			await service.start('uno');
+			let closeCode: number | void | undefined;
+			terminalOptions.pty.onDidClose((code: number | void) => {closeCode = code;});
+
+			terminalOptions.pty.close();
+
+			assert.deepStrictEqual(reasons, ['user_closed']);
+			assert.strictEqual(closeCode, 0);
+		});
+
+		test('should preserve unexpected non-zero exit and report device disconnect once', async () => {
+			const reasons: string[] = [];
+			service.onStopped(reason => reasons.push(reason));
+			await service.start('uno');
+			let closeCode: number | void | undefined;
+			terminalOptions.pty.onDidClose((code: number | void) => {closeCode = code;});
+
+			processes[0].exitCode = 8;
+			processes[0].emit('exit', 8);
+			processes[0].emit('close', 8);
+
+			assert.deepStrictEqual(reasons, ['device_disconnected']);
+			assert.strictEqual(closeCode, 8);
 		});
 	});
 
@@ -287,15 +349,18 @@ suite('ArduinoMonitorService Test Suite', () => {
 
 	suite('onStopped() callback', () => {
 		test('should trigger callback with upload_started reason on stopForUpload', async () => {
-			let callbackReason: string | null = null;
+			const callbackReasons: string[] = [];
 			service.onStopped(reason => {
-				callbackReason = reason;
+				callbackReasons.push(reason);
 			});
 
 			await service.start('uno', 'e:\\test-workspace');
+			let closeCode: number | void | undefined;
+			terminalOptions.pty.onDidClose((code: number | void) => {closeCode = code;});
 			await service.stopForUpload();
 
-			assert.strictEqual(callbackReason, 'upload_started');
+			assert.deepStrictEqual(callbackReasons, ['upload_started']);
+			assert.strictEqual(closeCode, 0);
 		});
 	});
 

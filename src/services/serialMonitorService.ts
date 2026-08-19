@@ -5,8 +5,9 @@
  */
 
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { StringDecoder } from 'string_decoder';
 import * as vscode from 'vscode';
-import { MonitorStartResult } from '../types/arduino';
+import { MonitorStartResult, MonitorStopReason } from '../types/arduino';
 import type { CoreEnvironmentManager } from './coreEnvironmentManager';
 import { log } from './logging';
 import { MicropythonUploader } from './micropythonUploader';
@@ -27,11 +28,21 @@ class SerialMonitorPseudoterminal implements vscode.Pseudoterminal {
 	private readonly bufferedOutput: string[] = [];
 	readonly onDidWrite = this.writeEmitter.event;
 	readonly onDidClose = this.closeEmitter.event;
+	private readonly stdoutDecoder = new StringDecoder('utf8');
+	private readonly stderrDecoder = new StringDecoder('utf8');
+	private decodersFlushed = false;
 
-	constructor(private readonly child: ChildProcessWithoutNullStreams) {
-		child.stdout.on('data', chunk => this.write(String(chunk)));
-		child.stderr.on('data', chunk => this.write(String(chunk)));
-		child.once('close', code => this.closeEmitter.fire(code ?? 1));
+	constructor(
+		private readonly child: ChildProcessWithoutNullStreams,
+		private readonly onUserClose: () => void,
+		private readonly isExpectedClose: () => boolean
+	) {
+		child.stdout.on('data', chunk => this.write(this.stdoutDecoder.write(chunk)));
+		child.stderr.on('data', chunk => this.write(this.stderrDecoder.write(chunk)));
+		child.once('close', code => {
+			this.flushDecoders();
+			this.closeEmitter.fire(this.isExpectedClose() ? 0 : code ?? 1);
+		});
 		child.once('error', () => this.write('Unable to start the monitor process.\r\n'));
 	}
 
@@ -42,6 +53,7 @@ class SerialMonitorPseudoterminal implements vscode.Pseudoterminal {
 	}
 
 	close(): void {
+		this.onUserClose();
 		if (this.child.exitCode === null && !this.child.killed) {this.child.kill();}
 	}
 
@@ -50,9 +62,17 @@ class SerialMonitorPseudoterminal implements vscode.Pseudoterminal {
 	}
 
 	private write(value: string): void {
+		if (!value) {return;}
 		const output = value.replace(/\r?\n/g, '\r\n');
 		if (this.opened) {this.writeEmitter.fire(output);}
 		else {this.bufferedOutput.push(output);}
+	}
+
+	private flushDecoders(): void {
+		if (this.decodersFlushed) {return;}
+		this.decodersFlushed = true;
+		this.write(this.stdoutDecoder.end());
+		this.write(this.stderrDecoder.end());
 	}
 }
 
@@ -65,9 +85,10 @@ export class SerialMonitorService {
 	private currentPort: string | null = null;
 	private readonly disposables: vscode.Disposable[] = [];
 	private readonly uploader: MicropythonUploader;
-	private isStoppingForUpload = false;
 	private activeProcess: ChildProcessWithoutNullStreams | null = null;
-	private onStoppedCallback?: (reason: 'user_closed' | 'upload_started' | 'device_disconnected') => void;
+	private expectedStopReason?: MonitorStopReason;
+	private lifecycleActive = false;
+	private onStoppedCallback?: (reason: MonitorStopReason) => void;
 
 	constructor(
 		private readonly workspacePath: string,
@@ -158,21 +179,22 @@ export class SerialMonitorService {
 		return { success: true, port: autoDetected };
 	}
 
-	async stop(): Promise<void> {
+	async stop(reason: MonitorStopReason = 'manual_stop'): Promise<void> {
+		if (!this.terminal && !this.activeProcess) {return;}
+		this.markExpectedStop(reason);
+		const terminal = this.terminal;
 		await this.terminateActiveProcess();
-		this.terminal?.dispose();
-		this.terminal = null;
+		terminal?.dispose();
+		if (this.terminal === terminal) {this.terminal = null;}
 		this.currentPort = null;
+		this.reportStoppedOnce(reason);
 		log('[blockly] Monitor 已停止', 'info');
 	}
 
 	async stopForUpload(): Promise<void> {
 		if (!this.terminal) {return;}
-		this.isStoppingForUpload = true;
-		await this.stop();
-		this.onStoppedCallback?.('upload_started');
+		await this.stop('upload_started');
 		await new Promise(resolve => setTimeout(resolve, 500));
-		this.isStoppingForUpload = false;
 	}
 
 	isRunning(): boolean {
@@ -183,19 +205,20 @@ export class SerialMonitorService {
 		return this.currentPort;
 	}
 
-	onStopped(callback: (reason: 'user_closed' | 'upload_started' | 'device_disconnected') => void): void {
+	onStopped(callback: (reason: MonitorStopReason) => void): void {
 		this.onStoppedCallback = callback;
 	}
 
 	private handleTerminalClosed(): void {
-		const wasStoppingForUpload = this.isStoppingForUpload;
+		const reason = this.expectedStopReason ?? 'user_closed';
+		this.markExpectedStop(reason);
 		if (this.activeProcess?.exitCode === null && !this.activeProcess.killed) {this.activeProcess.kill();}
 		this.activeProcess = null;
 		this.terminal = null;
 		const port = this.currentPort;
 		this.currentPort = null;
 		log('[blockly] Monitor 終端機已關閉', 'info', { port });
-		if (!wasStoppingForUpload) {this.onStoppedCallback?.('user_closed');}
+		this.reportStoppedOnce(reason);
 	}
 
 	private async resetAndStartMonitor(port: string): Promise<void> {
@@ -247,15 +270,21 @@ except Exception as e:
 	private async startMonitorProcess(command: string, args: readonly string[]): Promise<void> {
 		const child = this.spawnProcess(command, args, {
 			cwd: this.workspacePath,
-			env: { ...process.env },
+			env: { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8' },
 			shell: false,
 			windowsHide: true,
 		});
 		await this.waitForProcessStart(child);
+		this.beginLifecycle();
 		this.activeProcess = child;
+		child.once('close', code => this.handleProcessClosed(child, code));
 		this.terminal = vscode.window.createTerminal({
 			name: 'CyberBrick Monitor',
-			pty: new SerialMonitorPseudoterminal(child),
+			pty: new SerialMonitorPseudoterminal(
+				child,
+				() => this.markExpectedStop('user_closed'),
+				() => this.expectedStopReason !== undefined
+			),
 		});
 		this.terminal.show(false);
 	}
@@ -282,9 +311,7 @@ except Exception as e:
 
 	private async terminateActiveProcess(): Promise<void> {
 		const child = this.activeProcess;
-		this.activeProcess = null;
 		if (!child || child.exitCode !== null) {return;}
-		if (!child.killed) {child.kill();}
 		await new Promise<void>(resolve => {
 			let settled = false;
 			const finish = () => {
@@ -299,7 +326,36 @@ except Exception as e:
 				finish();
 			}, PROCESS_STOP_TIMEOUT_MS);
 			child.once('close', finish);
+			if (!child.killed) {child.kill();}
 		});
+		if (this.activeProcess === child) {this.activeProcess = null;}
+	}
+
+	private beginLifecycle(): void {
+		this.expectedStopReason = undefined;
+		this.lifecycleActive = true;
+	}
+
+	private markExpectedStop(reason: MonitorStopReason): void {
+		if (this.lifecycleActive && !this.expectedStopReason) {this.expectedStopReason = reason;}
+	}
+
+	private handleProcessClosed(child: ChildProcessWithoutNullStreams, code: number | null): void {
+		if (this.activeProcess !== child) {return;}
+		this.activeProcess = null;
+		this.terminal = null;
+		this.currentPort = null;
+		const reason = this.expectedStopReason ?? 'device_disconnected';
+		if (reason === 'device_disconnected') {
+			log('[blockly] Monitor 程序非預期結束', 'warn', { exitCode: code ?? 1 });
+		}
+		this.reportStoppedOnce(reason);
+	}
+
+	private reportStoppedOnce(reason: MonitorStopReason): void {
+		if (!this.lifecycleActive) {return;}
+		this.lifecycleActive = false;
+		this.onStoppedCallback?.(reason);
 	}
 
 	private commandErrorCode(error: unknown): string {
@@ -317,7 +373,7 @@ except Exception as e:
 	}
 
 	dispose(): void {
-		void this.stop();
+		void this.stop('user_closed');
 		this.disposables.forEach(disposable => disposable.dispose());
 		this.disposables.length = 0;
 	}

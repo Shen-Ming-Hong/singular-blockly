@@ -47,6 +47,7 @@ function createRuntimeHarness() {
 	}
 	const blocklyStub: any = {
 		FieldTextInput: FieldTextInputStub,
+		fieldRegistry: { unregister() {}, register() {} },
 		inject() {
 			return { dispose() {} };
 		},

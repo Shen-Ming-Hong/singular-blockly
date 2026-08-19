@@ -5,14 +5,19 @@
  */
 
 import assert = require('assert');
+import * as fs from 'fs';
 import { describe, it } from 'mocha';
-import { normalizeWhitespace, readWorkspaceFile } from './editorThemeSurfaceContractUtils';
+import * as path from 'path';
+import { normalizeWhitespace, readWorkspaceFile, REPOSITORY_ROOT } from './editorThemeSurfaceContractUtils';
 
 describe('Blockly IME keyboard compatibility contract', () => {
 	it('uses app-owned IME-safe fields without patching Blockly core prototypes', () => {
 		const editorSource = readWorkspaceFile('media/js/blocklyEdit.js');
 		const runtimeSource = readWorkspaceFile('media/js/blocklyRuntime.js');
-		const functionBlocksSource = readWorkspaceFile('media/blockly/blocks/functions.js');
+		const blockDirectory = path.join(REPOSITORY_ROOT, 'media', 'blockly', 'blocks');
+		const customBlockSources = fs.readdirSync(blockDirectory)
+			.filter(file => file.endsWith('.js'))
+			.map(file => readWorkspaceFile(`media/blockly/blocks/${file}`));
 
 		assert.ok(
 			!editorSource.includes('installBlocklyTextInputImePatch'),
@@ -27,19 +32,33 @@ describe('Blockly IME keyboard compatibility contract', () => {
 			runtimeSource.includes('createImeSafeFieldTextInput,'),
 			'Runtime should expose the IME-safe field factory'
 		);
-		assert.strictEqual(
-			(functionBlocksSource.match(/window\.blocklyRuntime\.createImeSafeFieldTextInput\(/g) || []).length,
-			2,
-			'Function and parameter name fields should both use the IME-safe factory'
+		assert.ok(
+			runtimeSource.includes("Blockly.fieldRegistry.unregister('field_input')"),
+			'Runtime should replace the public field_input registry entry before registering the IME-safe class'
 		);
 		assert.ok(
-			!functionBlocksSource.includes('new Blockly.FieldTextInput'),
-			'Function name fields should not bypass the IME-safe factory'
+			runtimeSource.includes("Blockly.fieldRegistry.register('field_input', ImeSafeFieldTextInput)"),
+			'Built-in JSON field_input definitions should resolve to the IME-safe class'
 		);
+		assert.strictEqual(
+			customBlockSources.reduce(
+				(count, source) => count + (source.match(/window\.blocklyRuntime\.createImeSafeFieldTextInput\(/g) || []).length,
+				0
+			),
+			13,
+			'All thirteen custom text fields should use the IME-safe factory'
+		);
+		for (const source of customBlockSources) {
+			assert.ok(!source.includes('new Blockly.FieldTextInput'), 'Custom text fields should not bypass the IME-safe factory');
+		}
 		assert.ok(runtimeSource.includes("event.key === 'Process'"), 'IME detection should recognize browser Process key events');
 		assert.ok(
 			runtimeSource.includes('event.keyCode === 229'),
 			'IME detection should recognize legacy composition keyCode 229 events'
+		);
+		assert.ok(
+			runtimeSource.includes('event.which === 229'),
+			'IME detection should recognize legacy composition which 229 events'
 		);
 	});
 

@@ -65,6 +65,14 @@
 		return new ImeSafeFieldTextInput(initialValue, validator);
 	}
 
+	function installImeSafeFieldTextInput() {
+		ensureBlockly();
+		Blockly.fieldRegistry.unregister('field_input');
+		Blockly.fieldRegistry.register('field_input', ImeSafeFieldTextInput);
+	}
+
+	installImeSafeFieldTextInput();
+
 	function getWorkspace() {
 		return canonicalWorkspace;
 	}
@@ -580,6 +588,7 @@
 	window.blocklyRuntime = Object.freeze({
 		config,
 		createImeSafeFieldTextInput,
+		installImeSafeFieldTextInput,
 		installRequiredMainBlockDisableGuard,
 		repairRequiredMainBlockDisabledReasons,
 		createWorkspace,

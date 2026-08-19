@@ -13,7 +13,7 @@ import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, UploadStage, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
-import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStartResult, MonitorStopReason } from '../types/arduino';
+import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStartResult } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
 import { AIModelManager } from '../services/aiModelManager';
@@ -2723,18 +2723,13 @@ export class WebViewMessageHandler {
 	private async handleStopMonitor(): Promise<void> {
 		// 停止 Serial Monitor（如果正在運行）
 		if (this.serialMonitorService?.isRunning()) {
-			await this.serialMonitorService.stop();
+			await this.serialMonitorService.stop('manual_stop');
 		}
 
 		// 停止 Arduino Monitor（如果正在運行）
 		if (this.arduinoMonitorService?.isRunning()) {
-			await this.arduinoMonitorService.stop();
+			await this.arduinoMonitorService.stop('manual_stop');
 		}
-
-		this.panel.webview.postMessage({
-			command: 'monitorStopped',
-			reason: 'manual_stop' as MonitorStopReason,
-		});
 	}
 
 	private showErrorMessage(message: string): void {

@@ -53,6 +53,10 @@ interface CandidateCommitPrecondition {
 	candidate: Buffer;
 }
 
+type ExpectedMainState =
+	| { kind: 'present'; hash: string }
+	| { kind: 'absent' };
+
 const services = new Map<string, WorkspaceCandidateService>();
 
 export function getWorkspaceCandidateService(workspaceRoot: string): WorkspaceCandidateService | undefined {
@@ -68,8 +72,7 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 	private generation = 0;
 	private observationRevision = 0;
 	private lastValidMemory?: Buffer;
-	private expectedInternalMainHash?: string;
-	private suppressNextInternalDelete = false;
+	private expectedInternalMainState?: ExpectedMainState;
 	private workspaceTransactionTail: Promise<void> = Promise.resolve();
 	private disposed = false;
 
@@ -130,7 +133,7 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 			)
 		) {return false;}
 		try {
-			this.expectedInternalMainHash = WorkspaceCandidateService.sha256(bytes);
+			this.expectMainBytes(bytes);
 			await this.fileService.writeFileAtomic(MAIN_PATH, bytes);
 			await this.fileService.writeFileAtomic(BACKUP_PATH, bytes);
 			this.lastValidMemory = bytes;
@@ -172,19 +175,20 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 		if (mainBlockStateRepaired !== true) {
 			await this.fileService.writeFileAtomic(BACKUP_PATH, bytes);
 			this.lastValidMemory = bytes;
+			this.expectMainBytes(currentMain);
 			return true;
 		}
 
 		const previousMemory = this.lastValidMemory ? Buffer.from(this.lastValidMemory) : undefined;
 		const previousBackup = await this.readExistingBytes(BACKUP_PATH);
 		try {
-			this.expectedInternalMainHash = WorkspaceCandidateService.sha256(bytes);
+			this.expectMainBytes(bytes);
 			await this.fileService.writeFileAtomic(MAIN_PATH, bytes);
 			await this.fileService.writeFileAtomic(BACKUP_PATH, bytes);
 			const committedMain = await this.readExistingBytes(MAIN_PATH);
 			if (!committedMain?.equals(bytes)) {
 				this.lastValidMemory = previousMemory;
-				this.expectedInternalMainHash = undefined;
+				this.expectedInternalMainState = undefined;
 				await this.restoreSnapshotIfUnchanged(BACKUP_PATH, previousBackup, bytes);
 				return false;
 			}
@@ -458,22 +462,16 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 
 	private async processObservedCandidate(deleted: boolean, observationRevision = this.observationRevision): Promise<void> {
 		if (observationRevision !== this.observationRevision) {return;}
-		if (deleted && this.suppressNextInternalDelete) {
-			this.suppressNextInternalDelete = false;
-			return;
-		}
-		if (!deleted && this.expectedInternalMainHash && this.fileService.fileExists(MAIN_PATH)) {
+		const expected = this.expectedInternalMainState;
+		if (deleted && expected?.kind === 'absent' && !this.fileService.fileExists(MAIN_PATH)) {return;}
+		if (!deleted && expected?.kind === 'present' && this.fileService.fileExists(MAIN_PATH)) {
 			try {
 				const currentHash = WorkspaceCandidateService.sha256(await this.fileService.readBuffer(MAIN_PATH));
-				if (currentHash === this.expectedInternalMainHash) {
-					this.expectedInternalMainHash = undefined;
-					return;
-				}
+				if (currentHash === expected.hash) {return;}
 			} catch {
 				// Process the event through the normal recovery path.
 			}
 		}
-		this.expectedInternalMainHash = undefined;
 		await this.processCandidate(deleted, observationRevision);
 	}
 
@@ -502,7 +500,7 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 		if (!await this.isRejectedCandidateCurrent(generation, observationRevision, candidate, deleted)) {return;}
 		if (recovery) {
 			try {
-				this.expectedInternalMainHash = WorkspaceCandidateService.sha256(recovery);
+				this.expectMainBytes(recovery);
 				await this.fileService.writeFileAtomic(MAIN_PATH, recovery);
 				this.lastValidMemory = recovery;
 				outcome = 'restored';
@@ -584,13 +582,10 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 
 	private async restoreBytes(relativePath: string, bytes: Buffer | undefined): Promise<void> {
 		if (bytes !== undefined) {
-			if (relativePath === MAIN_PATH) {this.expectedInternalMainHash = WorkspaceCandidateService.sha256(bytes);}
+			if (relativePath === MAIN_PATH) {this.expectMainBytes(bytes);}
 			await this.fileService.writeFileAtomic(relativePath, bytes);
 		} else {
-			if (relativePath === MAIN_PATH) {
-				this.expectedInternalMainHash = undefined;
-				this.suppressNextInternalDelete = this.fileService.fileExists(relativePath);
-			}
+			if (relativePath === MAIN_PATH) {this.expectedInternalMainState = { kind: 'absent' };}
 			await this.fileService.deleteFile(relativePath);
 		}
 	}
@@ -606,7 +601,7 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 			Boolean(current?.equals(transactionBytes)) ||
 			Boolean(current && snapshot && current.equals(snapshot));
 		if (!isUnchanged) {
-			if (relativePath === MAIN_PATH) {this.expectedInternalMainHash = undefined;}
+			if (relativePath === MAIN_PATH) {this.expectedInternalMainState = undefined;}
 			return false;
 		}
 		await this.restoreBytes(relativePath, snapshot);
@@ -696,5 +691,12 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 
 	private static sha256(bytes: Uint8Array): string {
 		return createHash('sha256').update(bytes).digest('hex');
+	}
+
+	private expectMainBytes(bytes: Uint8Array): void {
+		this.expectedInternalMainState = {
+			kind: 'present',
+			hash: WorkspaceCandidateService.sha256(bytes),
+		};
 	}
 }
