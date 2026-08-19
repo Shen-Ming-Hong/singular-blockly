@@ -8,6 +8,24 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.87.4] - 2026-08-19
+
+### 🐛 修復 Bug Fixes
+
+- 修正 `main.json` 同一次內部寫入產生多個檔案事件時，舊快照可能被誤判為外部修改並載回工作區；監看器現在持續記錄最後內部提交的存在狀態與內容雜湊，重複事件會冪等忽略，同時保留真正外部候選的驗證、世代控制與拖曳延後保護
+  Fixed duplicate filesystem events from one internal `main.json` write being misclassified as external edits and reloading an older workspace; the watcher now persistently tracks the last internally committed presence state and content hash, ignores matching events idempotently, and retains external-candidate validation, generation control, and drag deferral
+- 將 Blockly 內建 `field_input` 與所有自訂文字欄位統一套用 IME-safe 輸入處理，讓 macOS 繁體中文組字不再被欄位或全域快捷鍵提前攔截，且維持既有 validator、序列化與程式碼產生契約
+  Applied the IME-safe input behavior to Blockly's built-in `field_input` registry and every custom text field so macOS Traditional Chinese composition is no longer intercepted by field or global shortcuts while preserving existing validators, serialization, and code-generation contracts
+- 修正 Windows CyberBrick pyserial 與 mpremote 終端的中文亂碼；Python 子程序現在明確使用 UTF-8，CyberBrick 與 Arduino Monitor 分別以獨立串流 decoder 處理 stdout／stderr 及跨片段多位元字元
+  Fixed garbled Chinese output in Windows CyberBrick pyserial and mpremote terminals by enforcing UTF-8 for Python subprocesses and using independent streaming decoders for stdout, stderr, and split multibyte characters in both CyberBrick and Arduino monitors
+- 修正手動關閉 Monitor、關閉終端頁籤或上傳前自動停止可能被 VS Code 視為異常結束，並移除會遮擋後續上傳資訊的重複或殘留提示；真正的程序失敗與裝置斷線警告仍會顯示
+  Fixed manual Monitor stops, terminal-tab closes, and upload-triggered stops being treated as abnormal exits, and removed duplicate or stale notifications that could obscure subsequent upload progress while retaining real process-failure and device-disconnection warnings
+
+### 🧪 測試 Tests
+
+- 新增重複 watcher 事件、快速 A／B 提交、完整文字欄位 IME 稽核、UTF-8 分片解碼、Monitor 停止原因／PTY 結束碼及通知生命週期回歸測試，並完成 macOS、Windows、Linux 與 CyberBrick 實機人工矩陣
+  Added regression coverage for duplicate watcher events, rapid A/B commits, complete text-field IME auditing, split UTF-8 decoding, Monitor stop reasons and PTY exit codes, and notification lifecycles, with the macOS, Windows, Linux, and CyberBrick hardware matrix manually verified
+
 ## [0.87.3] - 2026-08-18
 
 ### 🐛 修復 Bug Fixes
