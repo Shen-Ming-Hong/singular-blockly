@@ -31,11 +31,11 @@ Blockly.Blocks['esp32_wifi_connect'] = {
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_WIFI_CONNECT_SSID', 'SSID'))
-			.appendField(new Blockly.FieldTextInput('MyWiFi'), 'SSID');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput('MyWiFi'), 'SSID');
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_WIFI_CONNECT_PASSWORD', '密碼'))
-			.appendField(new Blockly.FieldTextInput(''), 'PASSWORD');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput(''), 'PASSWORD');
 
 		this.setInputsInline(false);
 		this.setPreviousStatement(true, null);
@@ -178,7 +178,7 @@ Blockly.Blocks['esp32_mqtt_setup'] = {
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_MQTT_SETUP_SERVER', '伺服器'))
-			.appendField(new Blockly.FieldTextInput('broker.hivemq.com'), 'SERVER');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput('broker.hivemq.com'), 'SERVER');
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_MQTT_SETUP_PORT', '埠號'))
@@ -186,7 +186,7 @@ Blockly.Blocks['esp32_mqtt_setup'] = {
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_MQTT_SETUP_CLIENT_ID', '客戶端 ID'))
-			.appendField(new Blockly.FieldTextInput('esp32client'), 'CLIENT_ID');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput('esp32client'), 'CLIENT_ID');
 
 		this.setInputsInline(false);
 		this.setPreviousStatement(true, null);
@@ -210,11 +210,11 @@ Blockly.Blocks['esp32_mqtt_connect'] = {
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_MQTT_CONNECT_USERNAME', '帳號'))
-			.appendField(new Blockly.FieldTextInput(''), 'USERNAME');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput(''), 'USERNAME');
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ESP32_MQTT_CONNECT_PASSWORD', '密碼'))
-			.appendField(new Blockly.FieldTextInput(''), 'PASSWORD');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput(''), 'PASSWORD');
 
 		this.setInputsInline(false);
 		this.setPreviousStatement(true, null);

@@ -207,7 +207,7 @@ suite('WorkspaceCandidateService Tests', () => {
 
 		await Promise.race([
 			service.processCandidate(),
-			new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error('recovery blocked on UI')), 50)),
+			new Promise<never>((_resolve, reject) => setTimeout(() => reject(new Error('recovery blocked on UI')), 500)),
 		]);
 		assert.deepStrictEqual(fs.readFileSync(path.join(workspace, 'blockly', 'main.json')), recovery);
 	});
@@ -966,6 +966,59 @@ suite('WorkspaceCandidateService Tests', () => {
 		assert.strictEqual(process.callCount, 1);
 	});
 
+	test('idempotently suppresses every duplicate event for one internal write', async () => {
+		const service = new WorkspaceCandidateService(workspace);
+		await service.recordValidDocument(valid);
+		const process = sinon.spy(service, 'processCandidate');
+
+		for (let event = 0; event < 5; event++) {
+			await (service as any).processObservedCandidate(false);
+		}
+
+		assert.strictEqual(process.callCount, 0);
+	});
+
+	test('idempotently suppresses duplicate events for one internal deletion', async () => {
+		writeMain(valid);
+		const service = new WorkspaceCandidateService(workspace);
+		await (service as any).restoreBytes('blockly/main.json', undefined);
+		const process = sinon.spy(service, 'processCandidate');
+
+		await (service as any).processObservedCandidate(true);
+		await (service as any).processObservedCandidate(true);
+
+		assert.strictEqual(process.callCount, 0);
+	});
+
+	test('seeds the exact initial main bytes as an idempotent watcher baseline', async () => {
+		const initialBytes = Buffer.from(`${JSON.stringify(valid)}\n`);
+		fs.writeFileSync(path.join(workspace, 'blockly', 'main.json'), initialBytes);
+		const service = new WorkspaceCandidateService(workspace);
+
+		assert.strictEqual(await service.seedInitialValidDocument(valid, initialBytes), true);
+		const process = sinon.spy(service, 'processCandidate');
+		await (service as any).processObservedCandidate(false);
+		await (service as any).processObservedCandidate(false);
+
+		assert.strictEqual(process.callCount, 0);
+	});
+
+	test('keeps the newest rapid internal save as the watcher baseline', async () => {
+		const service = new WorkspaceCandidateService(workspace);
+		const first = { ...valid, revision: 'A' };
+		const second = { ...valid, revision: 'B' };
+		await service.recordValidDocument(first);
+		await service.recordValidDocument(second);
+		const process = sinon.spy(service, 'processCandidate');
+
+		await (service as any).processObservedCandidate(false);
+		await (service as any).processObservedCandidate(false);
+
+		assert.strictEqual(process.callCount, 0);
+		assert.deepStrictEqual(JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json'), 'utf8')), second);
+		assert.deepStrictEqual(JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json.bak'), 'utf8')), second);
+	});
+
 	test('covers watcher, disposal, deletion, and stale defensive branches', async () => {
 		const clock = sinon.useFakeTimers();
 		const watcher = {
@@ -1011,7 +1064,7 @@ suite('WorkspaceCandidateService Tests', () => {
 			return await originalRead(relative);
 		});
 		const service = new WorkspaceCandidateService(workspace, fileService, 100);
-		(service as any).expectedInternalMainHash = 'not-the-current-hash';
+		(service as any).expectedInternalMainState = { kind: 'present', hash: 'not-the-current-hash' };
 		service.attachChannels(
 			async request => ({
 				command: 'workspaceCandidateValidationResult', requestId: request.requestId, generation: request.generation,
@@ -1150,9 +1203,9 @@ suite('WorkspaceCandidateService Tests', () => {
 		const service = new WorkspaceCandidateService(workspace, fileService);
 		await assert.rejects(service.recordValidDocument(valid), /backup failed/);
 		assert.strictEqual(fs.existsSync(path.join(workspace, 'blockly', 'main.json')), false);
-		assert.strictEqual((service as any).expectedInternalMainHash, undefined);
+		assert.deepStrictEqual((service as any).expectedInternalMainState, { kind: 'absent' });
 		await (service as any).restoreBytes('blockly/main.json', undefined);
-		assert.strictEqual((service as any).suppressNextInternalDelete, false);
+		assert.deepStrictEqual((service as any).expectedInternalMainState, { kind: 'absent' });
 	});
 
 	test('rolls back both main and backup when a valid editor save cannot commit both files', async () => {

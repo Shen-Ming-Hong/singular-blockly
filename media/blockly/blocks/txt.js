@@ -200,7 +200,7 @@ Blockly.Blocks['txt_process'] = {
 	init: function () {
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('TXT_PROCESS_PREFIX', 'TXT Process:'))
-			.appendField(new Blockly.FieldTextInput(''), 'NAME');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput(''), 'NAME');
 		this.appendStatementInput('DO').setCheck(null);
 		this.setStyle('procedure_blocks');
 		this.setTooltip(

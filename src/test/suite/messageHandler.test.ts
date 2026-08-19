@@ -112,6 +112,48 @@ function makeHandlerHarness(
 }
 
 // ---------------------------------------------------------------------------
+// Suite: Monitor stop routing
+// ---------------------------------------------------------------------------
+
+suite('MessageHandler – Monitor stop routing', () => {
+	let sandbox: sinon.SinonSandbox;
+
+	setup(() => {
+		sandbox = sinon.createSandbox();
+	});
+
+	teardown(() => {
+		_reset();
+		sandbox.restore();
+	});
+
+	test('delegates manual stop reason without posting a duplicate monitorStopped message', async () => {
+		const vscodeMock = {
+			window: { showWarningMessage: sandbox.stub().resolves(), showErrorMessage: sandbox.stub().resolves() },
+			workspace: { workspaceFolders: [{ uri: { fsPath: '/mock/workspace' } }] },
+		};
+		_setVSCodeApi(vscodeMock as any);
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock as any);
+		const serialMonitor = {
+			isRunning: sandbox.stub().returns(true),
+			stop: sandbox.stub().resolves(),
+		};
+		const arduinoMonitor = {
+			isRunning: sandbox.stub().returns(true),
+			stop: sandbox.stub().resolves(),
+		};
+		(handler as any).serialMonitorService = serialMonitor;
+		(handler as any).arduinoMonitorService = arduinoMonitor;
+
+		await (handler as any).handleStopMonitor();
+
+		assert.ok(serialMonitor.stop.calledOnceWithExactly('manual_stop'));
+		assert.ok(arduinoMonitor.stop.calledOnceWithExactly('manual_stop'));
+		assert.strictEqual(webviewPostMessage.called, false);
+	});
+});
+
+// ---------------------------------------------------------------------------
 // Suite: generic requestUpload OTA fallback
 // ---------------------------------------------------------------------------
 

@@ -8001,11 +8001,11 @@ function handleMonitorStopped(message) {
 	monitorState.currentPort = null;
 	monitorState.mode = null;
 	updateMonitorButtonState();
+	if (message.reason !== 'upload_started') {
+		toast.hide();
+	}
 
-	if (message.reason === 'upload_started') {
-		const uploadMsg = window.languageManager?.getMessage('MONITOR_CLOSED_FOR_UPLOAD', 'Monitor 已為上傳作業暫停');
-		toast.show(uploadMsg, 'info');
-	} else if (message.reason === 'device_disconnected') {
+	if (message.reason === 'device_disconnected') {
 		const disconnectedMsg = window.languageManager?.getMessage('MONITOR_DEVICE_DISCONNECTED', 'CyberBrick 裝置已斷線');
 		toast.show(disconnectedMsg, 'warning');
 	}

@@ -57,6 +57,7 @@ suite('Blockly 13 locale contract', () => {
 		}
 		const Blockly = {
 			FieldTextInput: FieldTextInputStub,
+			fieldRegistry: { unregister: () => undefined, register: () => undefined },
 			Msg: { ...localeData.en, PROJECT: 'English project' },
 			inject: () => ({ dispose() {} }),
 			setLocale: (messages: Record<string, string>) => Object.assign(Blockly.Msg, messages),

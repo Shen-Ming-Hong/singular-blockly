@@ -8,6 +8,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { StringDecoder } from 'string_decoder';
 import { log } from './logging';
 import { createExecFilePromise } from './platformioProcess';
 import {
@@ -49,13 +50,23 @@ class ArduinoMonitorPseudoterminal implements vscode.Pseudoterminal {
 	private readonly closeEmitter = new vscode.EventEmitter<number>();
 	private opened = false;
 	private bufferedOutput: string[] = [];
+	private readonly stdoutDecoder = new StringDecoder('utf8');
+	private readonly stderrDecoder = new StringDecoder('utf8');
+	private decodersFlushed = false;
 	readonly onDidWrite = this.writeEmitter.event;
 	readonly onDidClose = this.closeEmitter.event;
 
-	constructor(private readonly child: ChildProcessWithoutNullStreams) {
-		child.stdout.on('data', chunk => this.write(String(chunk)));
-		child.stderr.on('data', chunk => this.write(String(chunk)));
-		child.once('exit', code => this.closeEmitter.fire(code ?? 1));
+	constructor(
+		private readonly child: ChildProcessWithoutNullStreams,
+		private readonly onUserClose: () => void,
+		private readonly isExpectedClose: () => boolean
+	) {
+		child.stdout.on('data', chunk => this.write(this.stdoutDecoder.write(chunk)));
+		child.stderr.on('data', chunk => this.write(this.stderrDecoder.write(chunk)));
+		child.once('close', code => {
+			this.flushDecoders();
+			this.closeEmitter.fire(this.isExpectedClose() ? 0 : code ?? 1);
+		});
 		child.once('error', error => this.write(`${error.message}\r\n`));
 	}
 
@@ -66,13 +77,22 @@ class ArduinoMonitorPseudoterminal implements vscode.Pseudoterminal {
 	}
 
 	close(): void {
+		this.onUserClose();
 		if (this.child.exitCode === null && !this.child.killed) {this.child.kill();}
 	}
 
 	private write(value: string): void {
+		if (!value) {return;}
 		const output = value.replace(/\r?\n/g, '\r\n');
 		if (this.opened) {this.writeEmitter.fire(output);}
 		else {this.bufferedOutput.push(output);}
+	}
+
+	private flushDecoders(): void {
+		if (this.decodersFlushed) {return;}
+		this.decodersFlushed = true;
+		this.write(this.stdoutDecoder.end());
+		this.write(this.stderrDecoder.end());
 	}
 }
 
@@ -86,7 +106,8 @@ export class ArduinoMonitorService {
 	private currentPort: string | null = null;
 	private currentBoard: string | null = null;
 	private wasRunningBeforeUpload = false;
-	private isStoppingForUpload = false;
+	private expectedStopReason?: MonitorStopReason;
+	private lifecycleActive = false;
 	private onStoppedCallback: ((reason: MonitorStopReason) => void) | null = null;
 	private disposables: vscode.Disposable[] = [];
 	private readonly resolvePlatformio: () => Promise<PlatformioInvocation | null>;
@@ -179,8 +200,14 @@ export class ArduinoMonitorService {
 				windowsHide: true,
 			});
 			await this.waitForProcessStart(child);
+			this.beginLifecycle();
 			this.activeProcess = child;
-			const pty = new ArduinoMonitorPseudoterminal(child);
+			child.once('close', code => this.handleProcessClosed(child, code));
+			const pty = new ArduinoMonitorPseudoterminal(
+				child,
+				() => this.markExpectedStop('user_closed'),
+				() => this.expectedStopReason !== undefined
+			);
 
 			// 以 Pseudoterminal 顯示非 shell 子程序輸出。
 			this.terminal = vscode.window.createTerminal({
@@ -212,15 +239,17 @@ export class ArduinoMonitorService {
 	/**
 	 * 停止 Serial Monitor
 	 */
-	async stop(): Promise<void> {
+	async stop(reason: MonitorStopReason = 'manual_stop'): Promise<void> {
+		if (!this.terminal && !this.activeProcess) {return;}
+		this.markExpectedStop(reason);
+		const terminal = this.terminal;
 		const termination = this.terminateActiveProcess();
-		if (this.terminal) {
-			this.terminal.dispose();
-			this.terminal = null;
-		}
+		terminal?.dispose();
+		if (this.terminal === terminal) {this.terminal = null;}
 		this.isRunningFlag = false;
 		this.currentPort = null;
 		await termination;
+		this.reportStoppedOnce(reason);
 		log('[arduino-monitor] Monitor 已停止', 'info');
 	}
 
@@ -233,10 +262,7 @@ export class ArduinoMonitorService {
 
 		if (this.isRunningFlag) {
 			log('[arduino-monitor] 為上傳作業停止 Monitor', 'info');
-			this.isStoppingForUpload = true;
-			await this.stop();
-			this.isStoppingForUpload = false;
-			this.onStoppedCallback?.('upload_started');
+			await this.stop('upload_started');
 			// 等待 COM 埠釋放
 			await new Promise(resolve => setTimeout(resolve, 500));
 		}
@@ -283,18 +309,17 @@ export class ArduinoMonitorService {
 	 * 處理終端機關閉事件
 	 */
 	private handleTerminalClosed(): void {
+		const reason = this.expectedStopReason ?? 'user_closed';
+		this.markExpectedStop(reason);
 		const port = this.currentPort;
+		if (this.activeProcess?.exitCode === null && !this.activeProcess.killed) {this.activeProcess.kill();}
 		this.terminal = null;
 		this.isRunningFlag = false;
 		this.currentPort = null;
 		this.activeProcess = null;
 
 		log('[arduino-monitor] Monitor 終端機已關閉', 'info', { port });
-
-		// 通知回調（如果不是上傳時關閉的，避免雙重回調）
-		if (!this.isStoppingForUpload) {
-			this.onStoppedCallback?.('user_closed');
-		}
+		this.reportStoppedOnce(reason);
 	}
 
 	private async resolveInvocation(projectPath: string): Promise<MonitorInvocation | null> {
@@ -325,7 +350,6 @@ export class ArduinoMonitorService {
 
 	private async terminateActiveProcess(): Promise<void> {
 		const child = this.activeProcess;
-		this.activeProcess = null;
 		if (!child || child.exitCode !== null) {return;}
 		await new Promise<void>(resolve => {
 			let settled = false;
@@ -344,6 +368,35 @@ export class ArduinoMonitorService {
 			child.once('close', finish);
 			if (!child.killed) {child.kill();}
 		});
+		if (this.activeProcess === child) {this.activeProcess = null;}
+	}
+
+	private beginLifecycle(): void {
+		this.expectedStopReason = undefined;
+		this.lifecycleActive = true;
+	}
+
+	private markExpectedStop(reason: MonitorStopReason): void {
+		if (this.lifecycleActive && !this.expectedStopReason) {this.expectedStopReason = reason;}
+	}
+
+	private handleProcessClosed(child: ChildProcessWithoutNullStreams, code: number | null): void {
+		if (this.activeProcess !== child) {return;}
+		this.activeProcess = null;
+		this.terminal = null;
+		this.isRunningFlag = false;
+		this.currentPort = null;
+		const reason = this.expectedStopReason ?? 'device_disconnected';
+		if (reason === 'device_disconnected') {
+			log('[arduino-monitor] Monitor 程序非預期結束', 'warn', { exitCode: code ?? 1 });
+		}
+		this.reportStoppedOnce(reason);
+	}
+
+	private reportStoppedOnce(reason: MonitorStopReason): void {
+		if (!this.lifecycleActive) {return;}
+		this.lifecycleActive = false;
+		this.onStoppedCallback?.(reason);
 	}
 
 	private errorCode(error: unknown): string {
@@ -385,7 +438,7 @@ export class ArduinoMonitorService {
 	 * 釋放資源
 	 */
 	dispose(): void {
-		this.stop();
+		void this.stop('user_closed');
 		this.disposables.forEach(d => d.dispose());
 		this.disposables = [];
 	}

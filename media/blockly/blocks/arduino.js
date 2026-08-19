@@ -959,7 +959,7 @@ Blockly.Blocks['seven_segment_pins'] = {
 
 Blockly.Blocks['threshold_function_setup'] = {
 	init: function () {
-		this.appendDummyInput().appendField(new Blockly.FieldTextInput('Func0'), 'NAME');
+		this.appendDummyInput().appendField(window.blocklyRuntime.createImeSafeFieldTextInput('Func0'), 'NAME');
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('THRESHOLD_PIN'))
 			.appendField(

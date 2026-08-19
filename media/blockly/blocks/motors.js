@@ -8,7 +8,7 @@ Blockly.Blocks['servo_setup'] = {
 	init: function () {
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('SERVO_SETUP'))
-			.appendField(new Blockly.FieldTextInput('myServo'), 'VAR')
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput('myServo'), 'VAR')
 			.appendField(window.languageManager.getMessage('SERVO_PIN'))
 			.appendField(
 				new Blockly.FieldDropdown(function () {
@@ -251,7 +251,7 @@ Blockly.Blocks['encoder_setup'] = {
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ENCODER_SETUP'))
-			.appendField(new Blockly.FieldTextInput('myEncoder'), 'VAR');
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput('myEncoder'), 'VAR');
 
 		this.appendDummyInput()
 			.appendField(new Blockly.FieldCheckbox('FALSE'), 'USE_INTERRUPT')
@@ -605,7 +605,7 @@ Blockly.Blocks['encoder_pid_setup'] = {
 
 		this.appendDummyInput()
 			.appendField(window.languageManager.getMessage('ENCODER_PID_SETUP'))
-			.appendField(new Blockly.FieldTextInput('myPID'), 'PID_VAR')
+			.appendField(window.blocklyRuntime.createImeSafeFieldTextInput('myPID'), 'PID_VAR')
 			.appendField(window.languageManager.getMessage('ENCODER_PID_MOTOR'))
 			.appendField(
 				new Blockly.FieldDropdown(() => {
