@@ -686,7 +686,7 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 	}
 
 	private static timestamp(date: Date): string {
-		return date.toISOString().replace(/[-:.]/g, '').replace('Z', 'Z');
+		return date.toISOString().replace(/[-:.]/g, '');
 	}
 
 	private static sha256(bytes: Uint8Array): string {

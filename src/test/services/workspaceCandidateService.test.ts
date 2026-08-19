@@ -480,6 +480,7 @@ suite('WorkspaceCandidateService Tests', () => {
 		const names = fs.readdirSync(path.join(workspace, 'blockly'));
 		assert.ok(names.includes('main.invalid.json'));
 		assert.ok(names.includes('main.invalid.keep.json'));
+		assert.ok(names.includes('main.invalid.20260812T081530123Z-6.json'));
 		assert.strictEqual(names.filter(name => /^main\.invalid\.\d{8}T\d{9}Z-\d+\.json$/.test(name)).length, 5);
 	});
 
