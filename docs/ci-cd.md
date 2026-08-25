@@ -90,10 +90,19 @@ gh workflow run recover-github-release.yml --ref master \
 ### Release environment
 
 - 建立名為 `release` 的 environment。
-- 既有 repository secrets `VSCE_PAT`、`OVSX_PAT` 可直接沿用；GitHub 不提供既有 secret 值的讀回或複製功能。
-- 日後輪替 PAT 時，可改存為同名 environment secrets；environment secrets 會覆蓋同名 repository secrets。
+- VS Code Marketplace 使用 Microsoft Entra workload identity federation，不保存 `VSCE_PAT`。在 environment variables 設定 `AZURE_CLIENT_ID` 與 `AZURE_TENANT_ID`；這兩項是識別碼，不是秘密。
+- Open VSX 仍使用 `OVSX_PAT` environment secret；GitHub 不提供既有 secret 值的讀回或複製功能。
 - Deployment branches and tags 限制為 `v*` tags 與受保護的 `master` branch；`master` 僅供不可變 tag 與原 run artifact 的復原 workflow 使用。
 - 不新增 environment reviewer；人工發布核准由 `pr-review-release` Phase 3.5 負責。
+
+### VS Code Marketplace Entra 身分
+
+- Azure 資源群組為 `rg-singular-blockly-release`，user-assigned managed identity 為 `singular-blockly-marketplace-publisher`。
+- Federated credential 的 issuer 為 GitHub Actions，audience 為 `api://AzureADTokenExchange`，subject 只允許 `Shen-Ming-Hong/singular-blockly` 的 `release` environment；Azure 入口網站產生的 subject 同時固定 GitHub owner 與 repository 的 immutable numeric ID，避免名稱刪除後被冒用。
+- 該身分不需要 Azure subscription 或 resource group RBAC；`azure/login` 使用 `allow-no-subscriptions: true`，權限只來自 Marketplace publisher 的 Contributor 成員資格。
+- `.github/workflows/verify-marketplace-identity.yml` 只在人工觸發時登入該身分並解析 Marketplace User ID，不會封裝或發布 extension。第一次以 `verify_membership=false` 取得 User ID，將其加入 Marketplace publisher `Singular-Ray` 並設為 Contributor；第二次以 `verify_membership=true` 執行唯讀的 `vsce verify-pat`。
+- `.github/workflows/publish.yml` 只在 `publish-marketplace` job 授予 `id-token: write`，使用固定 commit SHA 的 `azure/login`，先執行 `vsce verify-pat Singular-Ray --azure-credential`，再以同一短效身分發布。
+- 身分驗證與一次不發布的檢查成功後，應撤銷／刪除舊 `VSCE_PAT`；不要把 Entra access token、Azure CLI cache 或 Marketplace 短效憑證存進 secret、artifact 或 log。
 
 ### `master` ruleset
 
@@ -116,8 +125,8 @@ gh workflow run recover-github-release.yml --ref master \
 
 ## Secrets 與權限
 
-- Secrets 名稱維持 `VSCE_PAT`、`OVSX_PAT`，不得寫入 log、artifact 或 repository。
+- 長期發布 secret 只保留 Open VSX 的 `OVSX_PAT`，不得寫入 log、artifact 或 repository；VS Code Marketplace 改用 GitHub OIDC 取得 Entra 短效權杖。
 - Workflow 預設只有 `contents: read`。
-- 只有 GitHub Release job 使用 `contents: write`；翻譯驗證不使用寫入權限。
+- 只有 GitHub Release job 使用 `contents: write`；只有 Marketplace 身分驗證／發布 job 使用 `id-token: write`；翻譯驗證不使用寫入權限。
 - 所有第三方 Actions 固定完整 commit SHA，Dependabot 每週追蹤 npm 與 GitHub Actions 更新。
 - 帳號、Copilot 與硬體 integration tests 保留在發布技能的人工驗收，不放入無憑證 CI。
