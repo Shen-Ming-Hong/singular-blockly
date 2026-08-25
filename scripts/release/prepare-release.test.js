@@ -125,6 +125,10 @@ describe('release preparation', () => {
 
 describe('publish workflow retry contract', () => {
 	const workflow = fs.readFileSync(path.join(__dirname, '..', '..', '.github', 'workflows', 'publish.yml'), 'utf8');
+	const identityWorkflow = fs.readFileSync(
+		path.join(__dirname, '..', '..', '.github', 'workflows', 'verify-marketplace-identity.yml'),
+		'utf8'
+	);
 	const runtimeWorkflow = fs.readFileSync(
 		path.join(__dirname, '..', '..', '.github', 'workflows', 'runtime-installation.yml'),
 		'utf8'
@@ -157,6 +161,29 @@ describe('publish workflow retry contract', () => {
 		const retrySteps = workflow.match(/if: github\.run_attempt > 1[\s\S]*?run: [^\n]+/gu) || [];
 		assert.strictEqual(retrySteps.length, 2);
 		assert.ok(retrySteps.every(step => step.includes('--skip-duplicate')));
+	});
+
+	it('uses Entra workload identity for Marketplace publishing without a VSCE PAT', () => {
+		const marketplaceJob = workflow.match(/  publish-marketplace:[\s\S]*?(?=\n  publish-open-vsx:)/u)?.[0];
+		assert.ok(marketplaceJob);
+		assert.match(marketplaceJob, /id-token: write/);
+		assert.match(marketplaceJob, /azure\/login@[0-9a-f]{40} # v3\.0\.1/);
+		assert.match(marketplaceJob, /client-id: \$\{\{ vars\.AZURE_CLIENT_ID \}\}/);
+		assert.match(marketplaceJob, /allow-no-subscriptions: true/);
+		assert.ok(!marketplaceJob.includes('subscription-id:'));
+		assert.match(marketplaceJob, /vsce verify-pat Singular-Ray --azure-credential/);
+		assert.strictEqual((marketplaceJob.match(/vsce publish --azure-credential/gu) || []).length, 2);
+		assert.ok(!marketplaceJob.includes('VSCE_PAT'));
+	});
+
+	it('keeps the Marketplace identity resolver non-publishing', () => {
+		assert.match(identityWorkflow, /workflow_dispatch:/);
+		assert.match(identityWorkflow, /verify_membership:/);
+		assert.match(identityWorkflow, /id-token: write/);
+		assert.match(identityWorkflow, /_apis\/profile\/profiles\/me/);
+		assert.match(identityWorkflow, /vsce verify-pat Singular-Ray --azure-credential/);
+		assert.ok(!identityWorkflow.includes('vsce publish'));
+		assert.ok(!identityWorkflow.includes('ovsx publish'));
 	});
 
 	it('provides explicit repository context to GitHub CLI jobs', () => {

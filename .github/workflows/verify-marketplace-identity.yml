@@ -1,0 +1,72 @@
+name: Verify Marketplace Entra Identity
+
+on:
+  workflow_dispatch:
+    inputs:
+      verify_membership:
+        description: Verify Contributor membership after the Marketplace User ID is added
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  resolve-profile:
+    name: Resolve Marketplace User ID
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Sign in to Azure with the Marketplace publishing identity
+        uses: azure/login@f5d393ae46f8fde4be8b75f32e3fc50e654ad0ca # v3.0.1
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Resolve the Marketplace profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          profile_json="$(az rest \
+            --method get \
+            --url 'https://app.vssps.visualstudio.com/_apis/profile/profiles/me' \
+            --resource '499b84ac-1321-427f-aa17-267ca6975798')"
+          profile_id="$(jq -r '.id // empty' <<< "$profile_json")"
+          if [[ ! "$profile_id" =~ ^[0-9a-fA-F-]{36}$ ]]; then
+            echo 'Marketplace did not return a valid profile ID.' >&2
+            exit 1
+          fi
+
+          echo "::notice title=Marketplace identity User ID::$profile_id"
+          {
+            echo '## Marketplace Entra identity'
+            echo
+            echo "User ID: \`$profile_id\`"
+            echo
+            echo 'This diagnostic workflow does not package or publish an extension.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout repository
+        if: inputs.verify_membership
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js 22.16.0
+        if: inputs.verify_membership
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.16.0
+          cache: npm
+
+      - name: Install pinned publishing tools
+        if: inputs.verify_membership
+        run: npm ci
+
+      - name: Verify Marketplace Contributor membership
+        if: inputs.verify_membership
+        run: npm exec -- vsce verify-pat Singular-Ray --azure-credential
