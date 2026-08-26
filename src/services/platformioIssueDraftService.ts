@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { createPlatformioPrivacyRedactor, PlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
+import { createPrivacyRedactor, PrivacyRedactor } from './privacyRedactor';
 import { formatPlatformioDiagnosticFinding } from './platformioDiagnosticFormatting';
 import * as os from 'os';
 import {
@@ -149,8 +149,8 @@ export class PlatformioIssueDraftService {
 		return this.findManagedProvisioningBlocker(session) !== undefined;
 	}
 
-	private createRedactor(sessionWorkspacePath?: string | null): PlatformioPrivacyRedactor {
-		return createPlatformioPrivacyRedactor({
+	private createRedactor(sessionWorkspacePath?: string | null): PrivacyRedactor {
+		return createPrivacyRedactor({
 			homeDir: this.homeDir,
 			workspacePath: this.workspacePath,
 		}, sessionWorkspacePath);

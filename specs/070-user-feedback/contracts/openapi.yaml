@@ -1,0 +1,452 @@
+openapi: 3.1.0
+info:
+  title: Singular Blockly Feedback API
+  version: 1.0.0
+  description: >-
+    匿名回報者的回饋、訊息、刪除與 session exchange 契約。
+    所有自由文字皆為不可信資料；所有 response 都使用 Cache-Control: no-store。
+servers:
+  - url: https://blockly-support.singular-ai.org
+security:
+  - reporterSecret: []
+  - reporterSession: []
+paths:
+  /api/v1/feedback:
+    post:
+      operationId: createFeedback
+      summary: 建立回饋；可附一張已淨化截圖
+      security:
+        - reporterSecret: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [payload]
+              properties:
+                payload:
+                  $ref: '#/components/schemas/CreateFeedbackInput'
+                screenshot:
+                  oneOf:
+                    - type: string
+                      contentMediaType: image/png
+                      contentEncoding: binary
+                    - type: string
+                      contentMediaType: image/jpeg
+                      contentEncoding: binary
+      responses:
+        '201':
+          description: 回饋已保存；GitHub 同步可仍在排程中
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedbackDetail' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '413': { $ref: '#/components/responses/TooLarge' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    get:
+      operationId: listFeedback
+      summary: 列出目前回報者自己的回饋
+      parameters:
+        - name: cursor
+          in: query
+          schema: { type: string, maxLength: 256 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: 個人回饋清單
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/FeedbackSummary' }
+                  nextCursor: { type: [string, 'null'] }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/feedback/{feedbackId}:
+    parameters:
+      - $ref: '#/components/parameters/FeedbackId'
+    get:
+      operationId: getFeedback
+      summary: 取得自己的單筆回饋與公開時間軸
+      responses:
+        '200':
+          description: 回饋明細
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedbackDetail' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deleteFeedback
+      summary: 刪除自己的單筆回饋
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '204': { description: 主要資料、附件與私密 GitHub 副本均已清除 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/v1/feedback/{feedbackId}/messages:
+    parameters:
+      - $ref: '#/components/parameters/FeedbackId'
+    get:
+      operationId: listFeedbackMessages
+      summary: 以 cursor 分頁取得自己的公開訊息時間軸
+      parameters:
+        - name: cursor
+          in: query
+          schema: { type: string, maxLength: 256 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: 公開訊息分頁
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedbackMessageListResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    post:
+      operationId: addReporterMessage
+      summary: 回報者補充純文字訊息
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [body]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 4000 }
+      responses:
+        '201':
+          description: 訊息已建立
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FeedbackMessage' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '410': { $ref: '#/components/responses/Gone' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/reporter:
+    delete:
+      operationId: deleteReporter
+      summary: 刪除目前回報者全部回饋並撤銷 secret/session
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '204': { description: 所有私密回饋均不可取回且本識別已撤銷 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/v1/session/exchange:
+    post:
+      operationId: exchangeReporterSecret
+      summary: 將 fragment 中的 reporter secret 換成短期 portal session
+      security: []
+      parameters:
+        - name: Origin
+          in: header
+          required: true
+          schema: { type: string, const: https://blockly-support.singular-ai.org }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [secret]
+              properties:
+                secret: { type: string, minLength: 43, maxLength: 43 }
+      responses:
+        '204':
+          description: Session cookie 已設定；CSRF token 由 X-CSRF-Token response header 回傳
+          headers:
+            Set-Cookie:
+              schema: { type: string }
+            X-CSRF-Token:
+              schema: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/v1/github/webhooks:
+    post:
+      operationId: processGitHubWebhook
+      summary: 驗證並處理 GitHub App webhook
+      security: []
+      parameters:
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          schema: { type: string, pattern: '^sha256=[0-9a-f]{64}$' }
+        - name: X-GitHub-Delivery
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+        - name: X-GitHub-Event
+          in: header
+          required: true
+          schema: { type: string, enum: [issues, issue_comment, ping] }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '202': { description: 已接受或已冪等處理 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /admin/attachments/{attachmentId}:
+    get:
+      operationId: getAdminAttachment
+      summary: 經 Cloudflare Access 驗證的維護者附件串流
+      security:
+        - cloudflareAccess: []
+      parameters:
+        - name: attachmentId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: 私密圖片；回應禁止 cache 與 content sniffing
+          headers:
+            Cache-Control: { schema: { type: string, const: 'private, no-store' } }
+            X-Content-Type-Options: { schema: { type: string, const: nosniff } }
+          content:
+            image/png: { schema: { type: string, contentEncoding: binary } }
+            image/jpeg: { schema: { type: string, contentEncoding: binary } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+components:
+  securitySchemes:
+    reporterSecret:
+      type: http
+      scheme: bearer
+      bearerFormat: 256-bit base64url reporter secret
+    reporterSession:
+      type: apiKey
+      in: cookie
+      name: sb_feedback_session
+    cloudflareAccess:
+      type: apiKey
+      in: header
+      name: Cf-Access-Jwt-Assertion
+  parameters:
+    FeedbackId:
+      name: feedbackId
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+    CsrfToken:
+      name: X-CSRF-Token
+      in: header
+      required: false
+      description: Session cookie authentication 時必填；Bearer authentication 時忽略
+      schema: { type: string, minLength: 32, maxLength: 128 }
+  schemas:
+    CreateFeedbackInput:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, kind, title, description, diagnostics]
+      properties:
+        schemaVersion: { type: integer, const: 1 }
+        kind: { $ref: '#/components/schemas/FeedbackKind' }
+        title: { type: string, minLength: 5, maxLength: 120 }
+        description: { type: string, minLength: 10, maxLength: 8000 }
+        steps: { type: string, maxLength: 4000 }
+        expected: { type: string, maxLength: 2000 }
+        diagnostics: { $ref: '#/components/schemas/Diagnostics' }
+    Diagnostics:
+      type: object
+      additionalProperties: false
+      properties:
+        extensionVersion: { type: string, maxLength: 32, pattern: '^[0-9][0-9A-Za-z.+_-]{0,31}$' }
+        vscodeVersion: { type: string, maxLength: 32, pattern: '^[0-9][0-9A-Za-z.+_-]{0,31}$' }
+        osFamily: { type: string, enum: [windows, macos, linux, unknown] }
+        osMajor: { type: string, maxLength: 16, pattern: '^\d{1,16}$' }
+        architecture: { type: string, enum: [x64, arm64, arm, ia32, unknown] }
+        locale: { type: string, maxLength: 32, pattern: '^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})?$' }
+        hostKind: { type: string, enum: [local, ssh, container, wsl, codespaces, other-remote] }
+        workspaceKind: { type: string, enum: [none, single-folder, multi-root] }
+        workspaceTrusted: { type: boolean }
+        board: { type: string, maxLength: 40, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$' }
+        language: { type: string, enum: [arduino, micropython, unknown] }
+        tools:
+          type: array
+          maxItems: 8
+          items:
+            type: object
+            additionalProperties: false
+            required: [name, readiness]
+            properties:
+              name: { type: string, enum: [platformio, python, mpremote] }
+              version: { type: string, maxLength: 32, pattern: '^[0-9][0-9A-Za-z.+_-]{0,31}$' }
+              readiness: { type: string, enum: [ready, unavailable, degraded, unknown] }
+        lastError:
+          type: object
+          additionalProperties: false
+          required: [stage, code]
+          properties:
+            stage: { type: string, maxLength: 40, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$' }
+            code: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$' }
+        recentEvents:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            additionalProperties: false
+            required: [at, stage, code, outcome]
+            properties:
+              at: { type: string, format: date-time }
+              stage: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$' }
+              code: { type: string, maxLength: 64, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$' }
+              outcome: { type: string, enum: [started, succeeded, failed, cancelled] }
+    FeedbackKind:
+      type: string
+      enum: [bug, feature, question, other]
+    PublicStatus:
+      type: string
+      enum: [received, triaging, needs-info, planned, in-progress, resolved, closed]
+    Decision:
+      type: string
+      enum: [unreviewed, actionable, not-actionable]
+    Resolution:
+      type: [string, 'null']
+      enum: [duplicate, not-product, unsupported, out-of-scope, cannot-reproduce, insufficient-info, spam, null]
+    FeedbackSummary:
+      type: object
+      additionalProperties: false
+      required: [id, reference, kind, title, status, decision, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        reference: { type: string }
+        kind: { $ref: '#/components/schemas/FeedbackKind' }
+        title: { type: string }
+        status: { $ref: '#/components/schemas/PublicStatus' }
+        decision: { $ref: '#/components/schemas/Decision' }
+        resolution: { $ref: '#/components/schemas/Resolution' }
+        publicReason: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    FeedbackDetail:
+      type: object
+      additionalProperties: false
+      required: [id, reference, kind, title, status, decision, resolution, publicReason, createdAt, updatedAt, description, steps, expected, diagnostics, hasAttachment, messages, nextMessageCursor]
+      properties:
+        id: { type: string, format: uuid }
+        reference: { type: string }
+        kind: { $ref: '#/components/schemas/FeedbackKind' }
+        title: { type: string }
+        status: { $ref: '#/components/schemas/PublicStatus' }
+        decision: { $ref: '#/components/schemas/Decision' }
+        resolution: { $ref: '#/components/schemas/Resolution' }
+        publicReason: { type: [string, 'null'] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        description: { type: string }
+        steps: { type: [string, 'null'] }
+        expected: { type: [string, 'null'] }
+        diagnostics: { $ref: '#/components/schemas/Diagnostics' }
+        hasAttachment: { type: boolean }
+        messages:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/FeedbackMessage' }
+        nextMessageCursor: { type: [string, 'null'], maxLength: 256 }
+    FeedbackMessage:
+      type: object
+      additionalProperties: false
+      required: [id, author, body, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        author: { type: string, enum: [reporter, maintainer] }
+        body: { type: string, maxLength: 4000 }
+        createdAt: { type: string, format: date-time }
+    FeedbackMessageListResponse:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/FeedbackMessage' }
+        nextCursor: { type: [string, 'null'], maxLength: 256 }
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required: [code, message]
+          properties:
+            code: { type: string, maxLength: 64 }
+            message: { type: string, maxLength: 240 }
+            field: { type: string, maxLength: 80 }
+  responses:
+    BadRequest:
+      description: Schema/field validation failed
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    Unauthorized:
+      description: Missing, invalid, expired, or revoked credential
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    Forbidden:
+      description: CSRF/origin/access policy denied
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    NotFound:
+      description: Resource not found or not owned by current reporter
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    Conflict:
+      description: Idempotency conflict or invalid state transition
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    Gone:
+      description: The original resource was deleted; retained idempotency metadata contains no feedback content
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    TooLarge:
+      description: Request or screenshot exceeds feature limits
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    RateLimited:
+      description: Too many requests
+      headers:
+        Retry-After: { schema: { type: integer, minimum: 1 } }
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+    Unavailable:
+      description: External private-copy deletion or the feedback service is temporarily unavailable
+      content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }

@@ -29,6 +29,8 @@ describe('WebView Message Handler', () => {
 	let localeServiceStub: sinon.SinonStubbedInstance<LocaleService>;
 	let fileServiceStub: sinon.SinonStubbedInstance<FileService>;
 	let settingsManagerStub: sinon.SinonStubbedInstance<SettingsManager>;
+	let workspaceStateGetStub: sinon.SinonStub;
+	let workspaceStateUpdateStub: sinon.SinonStub;
 	let originalFsExports: any; // 儲存原始的 fs 模組
 	const extensionPath = '/mock/extension';
 	const workspacePath = '/mock/workspace';
@@ -118,10 +120,18 @@ describe('WebView Message Handler', () => {
 		settingsManagerStub.readSetting.resolves('__unset__');
 		settingsManagerStub.updateTheme.resolves();
 		settingsManagerStub.updateLanguage.resolves();
+		workspaceStateGetStub = sinon.stub().returns(undefined);
+		workspaceStateUpdateStub = sinon.stub().resolves();
 
 		// 初始化訊息處理器，注入所有 stubs
 		messageHandler = new WebViewMessageHandler(
-			{ extensionPath } as any,
+			{
+				extensionPath,
+				workspaceState: {
+					get: workspaceStateGetStub,
+					update: workspaceStateUpdateStub,
+				},
+			} as any,
 			panelMock,
 			localeServiceStub as any,
 			fileServiceStub as any,
@@ -332,6 +342,30 @@ describe('WebView Message Handler', () => {
 		assert.strictEqual(messageArg.theme, 'dark');
 		assert.strictEqual(messageArg.languagePreference, 'auto');
 		assert.strictEqual(messageArg.resolvedLanguage, 'en');
+		assert.strictEqual(messageArg.toolbarActionsExpanded, false);
+	});
+
+	it('should restore and strictly persist the project-scoped toolbar state', async () => {
+		workspaceStateGetStub.withArgs('blocklyEditor.toolbarActionsExpanded').returns(true);
+		fileServiceStub.fileExists.returns(false);
+		settingsManagerStub.getAutoBackupInterval.resolves(5);
+
+		await messageHandler.handleMessage({ command: 'requestInitialState' });
+
+		const initCall = webviewMock.postMessage.getCalls().find((call: any) => call.args[0].command === 'init');
+		assert(initCall, 'init message should be sent');
+		assert.strictEqual(initCall.args[0].toolbarActionsExpanded, true);
+
+		await messageHandler.handleMessage({ command: 'toolbarActionsStateChanged', expanded: false });
+		assert.deepStrictEqual(
+			workspaceStateUpdateStub.lastCall.args,
+			['blocklyEditor.toolbarActionsExpanded', false]
+		);
+
+		workspaceStateUpdateStub.resetHistory();
+		await messageHandler.handleMessage({ command: 'toolbarActionsStateChanged', expanded: true, extra: 'rejected' });
+		await messageHandler.handleMessage({ command: 'toolbarActionsStateChanged', expanded: 'true' });
+		assert.strictEqual(workspaceStateUpdateStub.callCount, 0);
 	});
 
 	it('should include TXT virtual controls in the init payload for TXT workspaces', async () => {
@@ -1426,6 +1460,16 @@ describe('WebView Message Handler', () => {
 		// 驗證沒有呼叫任何 service 方法
 		assert.strictEqual(webviewMock.postMessage.called, false);
 		assert.strictEqual(settingsManagerStub.getAutoBackupInterval.called, false);
+	});
+
+	it('should open feedback only for the exact product-entry message', async () => {
+		await messageHandler.handleMessage({ command: 'provideFeedback' });
+
+		assert(vscodeMock.commands.executeCommand.calledOnceWith('singular-blockly.provideFeedback'));
+
+		vscodeMock.commands.executeCommand.resetHistory();
+		await messageHandler.handleMessage({ command: 'provideFeedback', payload: 'unexpected' });
+		assert.strictEqual(vscodeMock.commands.executeCommand.called, false);
 	});
 
 	it('should handle unknown command with warning', async () => {

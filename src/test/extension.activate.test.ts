@@ -88,6 +88,7 @@ describe('Extension activate', () => {
 		assert(registered.includes('singular-blockly.showOutput'));
 		assert(registered.includes('singular-blockly.previewBackup'));
 		assert(registered.includes('singular-blockly.checkPlatformioStatus'));
+		assert(registered.includes('singular-blockly.provideFeedback'));
 		assert(registered.includes('singular-blockly.copyPlatformioRepairPacket'));
 		// Note: AIStatusBar uses `vscode` directly (not injectable via _setVSCodeApi) and is only
 		// created when Copilot is available (tier !== 'none'). In the unit test environment

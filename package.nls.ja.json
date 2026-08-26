@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "AIブロック提案の推論深度を制御します。\n\n- **low**：最速応答、最小推論（インライン提案に推奨）\n- **medium**：速度と品質のバランス\n- **high**：最深推論、応答が遅い",
 	"singularBlockly.ai.reasoningEffort.low.description": "最速、最小推論（推奨）",
 	"singularBlockly.ai.reasoningEffort.medium.description": "速度と品質のバランス",
-	"singularBlockly.ai.reasoningEffort.high.description": "最深推論、最も遅い応答"
+	"singularBlockly.ai.reasoningEffort.high.description": "最深推論、最も遅い応答",
+	"command.provideFeedback.title": "フィードバックを送る",
+	"command.showMyFeedback.title": "自分のフィードバック"
 }

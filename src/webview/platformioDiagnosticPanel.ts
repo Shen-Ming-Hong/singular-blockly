@@ -14,6 +14,7 @@ import { PlatformioDiagnosticService } from '../services/platformioDiagnosticSer
 import { PlatformioIssueDraftService } from '../services/platformioIssueDraftService';
 import { PlatformioRepairHistoryStore } from '../services/platformioRepairHistoryStore';
 import { PlatformioRepairService } from '../services/platformioRepairService';
+import type { FeedbackPanelPrefill } from './feedbackPanel';
 import {
 	AiRepairPacket,
 	AutoRepairRun,
@@ -90,6 +91,8 @@ interface PlatformioDiagnosticPanelRepairOptions {
 	coreEnvironmentManager?: {
 		reset(): void;
 	};
+	openFeedback?: (prefill: FeedbackPanelPrefill) => Promise<void>;
+	recordFeedbackEvent?: (event: { stage: string; code: string; outcome: 'started' | 'succeeded' | 'failed' | 'cancelled' }) => void;
 }
 
 // VSCode API 引用（可在測試中注入）
@@ -125,6 +128,8 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 	private readonly issueDraftService: IssueDraftServiceLike;
 	private readonly managedRuntimeService?: PlatformioDiagnosticPanelRepairOptions['managedRuntimeService'];
 	private readonly coreEnvironmentManager?: PlatformioDiagnosticPanelRepairOptions['coreEnvironmentManager'];
+	private readonly openFeedback?: PlatformioDiagnosticPanelRepairOptions['openFeedback'];
+	private readonly recordFeedbackEvent?: PlatformioDiagnosticPanelRepairOptions['recordFeedbackEvent'];
 	private activeManagedRuntimeOperation = false;
 
 	constructor(
@@ -140,6 +145,8 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		this.issueDraftService = repairOptions.issueDraftService ?? new PlatformioIssueDraftService();
 		this.managedRuntimeService = repairOptions.managedRuntimeService;
 		this.coreEnvironmentManager = repairOptions.coreEnvironmentManager;
+		this.openFeedback = repairOptions.openFeedback;
+		this.recordFeedbackEvent = repairOptions.recordFeedbackEvent;
 		this.currentState = this.withPanelActions(this.diagnosticService.createLoadingState());
 	}
 
@@ -344,27 +351,44 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 				source: 'human-confirmed',
 			});
 
-			if (draft.candidacy === 'not-recommended') {
-				await this.postCopyResult('warning', draft.noDraftReason ?? await this.localeService.getLocalizedMessage(
-					'PLATFORMIO_REPAIR_ISSUE_DRAFT_NOT_RECOMMENDED',
-					'No issue draft is recommended for the current diagnostics.'
-				));
-				return;
+			if (!this.openFeedback) {
+				throw new Error('feedback-panel-unavailable');
 			}
-
-			await vscodeApi.env.clipboard.writeText(draft.body);
+			const title = draft.candidacy === 'recommended'
+				? draft.title
+				: await this.localeService.getLocalizedMessage(
+					'PLATFORMIO_DIAGNOSTIC_PANEL_TITLE',
+					'PlatformIO diagnostics'
+				);
+			await this.openFeedback({
+				kind: 'bug',
+				title,
+				description: await this.buildAllowlistedFeedbackDescription(this.currentState.session),
+			});
 			await this.postCopyResult('success', await this.localeService.getLocalizedMessage(
-				'PLATFORMIO_REPAIR_ISSUE_DRAFT_COPY_SUCCESS',
-				'Issue draft copied locally. Review privacy and duplicate-search checklist before posting.'
+				'PLATFORMIO_REPAIR_FEEDBACK_OPENED',
+				'The feedback form was opened with redacted PlatformIO details. Review the complete payload before sending.'
 			));
 		} catch (error) {
-			log('[platformio-diagnostic] failed to create issue draft', 'error', error);
+			log('[platformio-diagnostic] failed to open feedback form', 'error', { code: 'feedback-open-failed' });
 			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
-				'PLATFORMIO_REPAIR_ISSUE_DRAFT_COPY_FAILED',
-				'Unable to create the issue draft: {0}',
-				String(error)
+				'FEEDBACK_OPEN_FAILED',
+				'Unable to open the feedback form. Please try again.'
 			));
 		}
+	}
+
+	private async buildAllowlistedFeedbackDescription(session: PlatformioDiagnosticSession): Promise<string> {
+		const affectedChecks = session.items
+			.filter(item => item.status !== 'ok')
+			.map(item => `${item.id}: ${item.status}`)
+			.join(', ');
+		return this.localeService.getLocalizedMessage(
+			'PLATFORMIO_REPAIR_FEEDBACK_PREFILL',
+			'PlatformIO diagnostics did not complete the expected workflow.\nOverall status: {0}.\nAffected checks: {1}.\nPlease describe what you were doing and what you expected to happen.',
+			session.overallStatus,
+			affectedChecks || '—',
+		);
 	}
 
 	private async copyAiRepairPacket(): Promise<void> {
@@ -405,16 +429,23 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		}
 
 		this.currentState = this.withPanelActions(this.diagnosticService.createLoadingState());
+		this.recordFeedbackEvent?.({ stage: 'platformio-diagnostics', code: 'collection', outcome: 'started' });
 		await this.postState('platformioDiagnostic:loading');
 
 		this.runningDiagnostics = (async () => {
 			try {
 				const workspacePath = vscodeApi.workspace.workspaceFolders?.[0]?.uri.fsPath ?? null;
 				const session = await this.diagnosticService.collectDiagnostics(workspacePath);
+				this.recordFeedbackEvent?.({
+					stage: 'platformio-diagnostics',
+					code: session.overallStatus,
+					outcome: 'succeeded',
+				});
 				this.currentState = this.withPanelActions(this.diagnosticService.createReadyState(session));
 				this.currentState.repairState = await this.composeRepairState(session);
 				await this.postState('platformioDiagnostic:render');
 			} catch (error) {
+				this.recordFeedbackEvent?.({ stage: 'platformio-diagnostics', code: 'collection-failed', outcome: 'failed' });
 				log('[platformio-diagnostic] failed to collect diagnostics', 'error', error);
 				const errorMessage = await this.localeService.getLocalizedMessage(
 					'PLATFORMIO_DIAGNOSTIC_TOP_LEVEL_ERROR',

@@ -64,5 +64,9 @@ test-results/
 .env
 .env.local
 .env*
+**/.dev.vars
+**/.dev.vars.*
+!**/.dev.vars.example
+**/.wrangler/
 RC_example/*
 extension_test/*

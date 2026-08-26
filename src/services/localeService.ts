@@ -211,6 +211,14 @@ export class LocaleService {
 	 */
 	private extractMessagesFromJs(content: string): UIMessages {
 		const messages: UIMessages = {};
+		const decodeMessageValue = (value: string): string => value.replace(/\\(\\|'|"|n|r|t)/g, (_match, escape: string) => ({
+			'\\': '\\',
+			"'": "'",
+			'"': '"',
+			n: '\n',
+			r: '\r',
+			t: '\t',
+		}[escape] ?? escape));
 
 		// 處理 Blockly.Msg['KEY'] = 'value' 格式 (標準 Blockly 訊息格式)
 		const blocklyMsgRegex = /Blockly\.Msg\[['"](\w+)['"]\]\s*=\s*['"](.+?)['"]/g;
@@ -219,7 +227,7 @@ export class LocaleService {
 		while ((blocklyMatch = blocklyMsgRegex.exec(content)) !== null) {
 			const key = blocklyMatch[1];
 			const value = blocklyMatch[2];
-			messages[key] = value;
+			messages[key] = decodeMessageValue(value);
 		}
 
 		// 優先處理 VSCODE_ 開頭的訊息，保持向下兼容
@@ -229,7 +237,7 @@ export class LocaleService {
 		while ((vscodeMatch = vscodeRegex.exec(content)) !== null) {
 			const key = 'VSCODE_' + vscodeMatch[1];
 			const value = vscodeMatch[2];
-			messages[key] = value;
+			messages[key] = decodeMessageValue(value);
 		}
 
 		// 處理所有其他訊息
@@ -240,14 +248,14 @@ export class LocaleService {
 		while ((blockMatch = messageBlockRegex.exec(content)) !== null) {
 			const messageBlock = blockMatch[1];
 			// 分別匹配單引號與雙引號值，避免值中的撇號/引號導致截斷
-			const singleQuoteKV = /\s*(\w+):\s*'([^']*)'/g;
-			const doubleQuoteKV = /\s*(\w+):\s*"([^"]*)"/g;
+			const singleQuoteKV = /\s*(\w+):\s*'((?:\\.|[^'\\])*)'/g;
+			const doubleQuoteKV = /\s*(\w+):\s*"((?:\\.|[^"\\])*)"/g;
 			let keyValueMatch;
 			while ((keyValueMatch = singleQuoteKV.exec(messageBlock)) !== null) {
-				messages[keyValueMatch[1]] = keyValueMatch[2];
+				messages[keyValueMatch[1]] = decodeMessageValue(keyValueMatch[2]);
 			}
 			while ((keyValueMatch = doubleQuoteKV.exec(messageBlock)) !== null) {
-				messages[keyValueMatch[1]] = keyValueMatch[2];
+				messages[keyValueMatch[1]] = decodeMessageValue(keyValueMatch[2]);
 			}
 		}
 

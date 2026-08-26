@@ -161,6 +161,9 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 	let issueDraftServiceStub: any;
 	let managedRuntimeServiceStub: any;
 	let coreEnvironmentManagerStub: any;
+	let openFeedbackStub: sinon.SinonStub;
+	let recordFeedbackEventStub: sinon.SinonStub;
+	let localeServiceStub: ReturnType<typeof createLocaleServiceStub>;
 	let panelManager: PlatformioDiagnosticPanel;
 
 	setup(() => {
@@ -255,10 +258,13 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 			getStorageRoot: sinon.stub().returns('/managed/runtime'),
 		};
 		coreEnvironmentManagerStub = { reset: sinon.stub() };
+		openFeedbackStub = sinon.stub().resolves();
+		recordFeedbackEventStub = sinon.stub();
+		localeServiceStub = createLocaleServiceStub();
 
 		panelManager = new PlatformioDiagnosticPanel(
 			{ extensionPath: '/mock/extension', subscriptions: [] } as any,
-			createLocaleServiceStub() as any,
+			localeServiceStub as any,
 			serviceStub,
 			{
 				promises: {
@@ -273,6 +279,8 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 				issueDraftService: issueDraftServiceStub,
 				managedRuntimeService: managedRuntimeServiceStub,
 				coreEnvironmentManager: coreEnvironmentManagerStub,
+				openFeedback: openFeedbackStub,
+				recordFeedbackEvent: recordFeedbackEventStub,
 			}
 		);
 	});
@@ -306,6 +314,10 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		const commands = panel.webview.postMessage.getCalls().map((call: any) => call.args[0].command);
 		assert.deepStrictEqual(commands.slice(0, 2), ['platformioDiagnostic:loading', 'platformioDiagnostic:render']);
 		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 1, 'Initial ready should run diagnostics once');
+		assert.deepStrictEqual(recordFeedbackEventStub.getCalls().map(call => call.args[0]), [
+			{ stage: 'platformio-diagnostics', code: 'collection', outcome: 'started' },
+			{ stage: 'platformio-diagnostics', code: 'operational', outcome: 'succeeded' },
+		]);
 		const renderMessage = panel.webview.postMessage
 			.getCalls()
 			.map((call: any) => call.args[0])
@@ -638,7 +650,11 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		}));
 	});
 
-	test('createIssueDraft writes local draft text and does not publish automatically', async () => {
+	test('createIssueDraft opens the generic feedback form with redacted prefill and does not publish automatically', async () => {
+		const localized = sinon.stub(localeServiceStub, 'getLocalizedMessage').callsFake(async (key: string, fallbackOrArg?: string | any, ...args: any[]) => {
+			if (key === 'PLATFORMIO_REPAIR_FEEDBACK_PREFILL') {return `localized:${args[0]}:${args[1]}`;}
+			return typeof fallbackOrArg === 'string' ? fallbackOrArg : key;
+		});
 		await panelManager.show();
 		const panel = panelManager.getPanel() as any;
 		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:ready' });
@@ -649,7 +665,14 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:createIssueDraft' });
 
 		assert.ok(issueDraftServiceStub.buildDraft.calledOnce);
-		assert.ok(vscodeMock.env.clipboard.writeText.calledWith('Issue draft body'));
+		assert.ok(openFeedbackStub.calledWith({
+			kind: 'bug',
+			title: 'Draft title',
+			description: sinon.match((value: string) => value.includes('localized:operational:')
+				&& !value.includes('Issue draft body')),
+		}));
+		assert.ok(localized.calledWith('PLATFORMIO_REPAIR_FEEDBACK_PREFILL'));
+		assert.strictEqual(vscodeMock.env.clipboard.writeText.callCount, 0);
 		assert.strictEqual(vscodeMock.commands.executeCommand.callCount, 0, 'Should not call GitHub or any publish command');
 		assert.ok(panel.webview.postMessage.calledWithMatch({
 			command: 'platformioDiagnostic:copyResult',
@@ -657,7 +680,7 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		}));
 	});
 
-	test('createIssueDraft reports no-draft reason without writing clipboard', async () => {
+	test('createIssueDraft still opens generic feedback when an issue draft is not recommended', async () => {
 		issueDraftServiceStub.buildDraft.returns({
 			title: 'No draft',
 			body: 'No issue draft recommended: diagnostics are operational.',
@@ -679,9 +702,14 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		await panel.webview.dispatchMessage({ command: 'platformioDiagnostic:createIssueDraft' });
 
 		assert.ok(vscodeMock.env.clipboard.writeText.neverCalledWith('No issue draft recommended: diagnostics are operational.'));
+		assert.ok(openFeedbackStub.calledWith({
+			kind: 'bug',
+			title: 'PlatformIO diagnostics',
+			description: sinon.match((value: string) => value.includes('Overall status: operational')),
+		}));
 		assert.ok(panel.webview.postMessage.calledWithMatch({
 			command: 'platformioDiagnostic:copyResult',
-			status: 'warning',
+			status: 'success',
 		}));
 	});
 

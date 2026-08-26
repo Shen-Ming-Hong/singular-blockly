@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "Управлява дълбочината на разсъждение за AI предложения на блокове.\n\n- **low**: Най-бърз отговор, минимално разсъждение (препоръчително за вградени предложения)\n- **medium**: Баланс между скорост и качество\n- **high**: Най-дълбоко разсъждение, по-бавен отговор",
 	"singularBlockly.ai.reasoningEffort.low.description": "Най-бърз, минимално разсъждение (препоръчително)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Баланс между скорост и качество",
-	"singularBlockly.ai.reasoningEffort.high.description": "Най-дълбоко разсъждение, най-бавен отговор"
+	"singularBlockly.ai.reasoningEffort.high.description": "Най-дълбоко разсъждение, най-бавен отговор",
+	"command.provideFeedback.title": "Изпращане на обратна връзка",
+	"command.showMyFeedback.title": "Моите отзиви"
 }

@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "AI 블록 제안의 추론 깊이를 제어합니다.\n\n- **low**: 가장 빠른 응답, 최소 추론 (인라인 제안에 권장)\n- **medium**: 속도와 품질의 균형\n- **high**: 가장 깊은 추론, 느린 응답",
 	"singularBlockly.ai.reasoningEffort.low.description": "가장 빠름, 최소 추론 (권장)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "속도와 품질의 균형",
-	"singularBlockly.ai.reasoningEffort.high.description": "가장 깊은 추론, 가장 느린 응답"
+	"singularBlockly.ai.reasoningEffort.high.description": "가장 깊은 추론, 가장 느린 응답",
+	"command.provideFeedback.title": "의견 보내기",
+	"command.showMyFeedback.title": "내 피드백"
 }

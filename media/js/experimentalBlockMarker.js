@@ -285,7 +285,7 @@ window.experimentalBlocksNotice = {
 			setTimeout(() => {
 				if (this.indicatorElement) {
 					this.indicatorElement.style.width = '32px';
-					this.indicatorElement.style.margin = '0 10px 0 0';
+						this.indicatorElement.style.margin = '0';
 				}
 			}, 0);
 

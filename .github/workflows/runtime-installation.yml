@@ -60,6 +60,7 @@ jobs:
           npm ci
           mkdir -p runtime-candidate
           npm exec -- vsce package --out runtime-candidate/runtime-candidate.vsix
+          npm run feedback:verify-vsix -- runtime-candidate/runtime-candidate.vsix
 
       - name: Record candidate identities
         id: identity

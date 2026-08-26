@@ -24,11 +24,17 @@ vsc-extension-quickstart.md
 !README.md
 !CHANGELOG.md
 !package.json
+!PRIVACY.md
+!SUPPORT.md
+!TERMS.md
 
 !node_modules/blockly/**
 !node_modules/@blockly/**
 !node_modules/node-ssh/**
-!node_modules/ssh2/**
+!node_modules/ssh2/package.json
+!node_modules/ssh2/LICENSE
+!node_modules/ssh2/lib/**
+!node_modules/ssh2/util/pagent.exe
 !node_modules/asn1/**
 !node_modules/bcrypt-pbkdf/**
 !node_modules/is-stream/**
@@ -37,6 +43,8 @@ vsc-extension-quickstart.md
 !node_modules/sb-scandir/**
 !node_modules/shell-escape/**
 !node_modules/semver/**
+
+# ssh2 僅保留執行期檔案；不得用廣域 negate 重新納入 test/ 私鑰 fixtures
 
 # 排除發布不需的內部資料
 **/.agents/**
@@ -47,6 +55,7 @@ vsc-extension-quickstart.md
 **/docs/**
 **/scripts/**
 **/resources/**
+**/workers/**
 **/coverage/**
 **/release-artifacts/**
 **/RC_example/**

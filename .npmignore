@@ -4,6 +4,7 @@ specs/
 scripts/
 test/
 docs/
+workers/
 coverage/
 dist/
 out/
@@ -20,3 +21,5 @@ node_modules/
 Thumbs.db
 .env
 .env.*
+.dev.vars
+.wrangler/

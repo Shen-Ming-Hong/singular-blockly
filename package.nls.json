@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "Controls the reasoning depth for AI block suggestions.\n\n- **low**: Fastest response, minimal reasoning (recommended for inline suggestions)\n- **medium**: Balanced speed and quality\n- **high**: Deepest reasoning, slower response",
 	"singularBlockly.ai.reasoningEffort.low.description": "Fastest, minimal reasoning (recommended)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Balanced speed and quality",
-	"singularBlockly.ai.reasoningEffort.high.description": "Deepest reasoning, slowest response"
+	"singularBlockly.ai.reasoningEffort.high.description": "Deepest reasoning, slowest response",
+	"command.provideFeedback.title": "Provide Feedback",
+	"command.showMyFeedback.title": "My Feedback"
 }

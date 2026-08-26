@@ -1,0 +1,21 @@
+{
+	"diagnostics": [
+		"workspacePath",
+		"filePath",
+		"folderName",
+		"sourceCode",
+		"workspaceXml",
+		"generatedCode",
+		"serialPort",
+		"wifiSsid",
+		"wifiPassword",
+		"ipAddress",
+		"environmentVariables",
+		"token",
+		"credential",
+		"rawError",
+		"rawLog",
+		"stackTrace"
+	],
+	"screenshot": ["originalName", "path", "lastModified", "exif"]
+}

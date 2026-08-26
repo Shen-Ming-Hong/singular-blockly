@@ -36,6 +36,11 @@ body {
 	--editor-status-ok-fg: #2e7d32;
 	--editor-status-error-fg: #c62828;
 	--editor-focus-ring: #007acc;
+	--editor-primary-action-bg: #0e639c;
+	--editor-primary-action-fg: #ffffff;
+	--editor-primary-action-hover-bg: #1177bb;
+	--editor-primary-action-border: transparent;
+	--editor-toolbar-divider: #d9d9d9;
 	--editor-scrollbar-track: #f1f1f1;
 	--editor-scrollbar-thumb: #c1c1c1;
 	--editor-scrollbar-thumb-hover: #a8a8a8;
@@ -90,6 +95,11 @@ body.theme-light {
 	--editor-scrollbar-thumb-hover: #a8a8a8;
 	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
 	--editor-focus-ring: #007acc;
+	--editor-primary-action-bg: #0e639c;
+	--editor-primary-action-fg: #ffffff;
+	--editor-primary-action-hover-bg: #1177bb;
+	--editor-primary-action-border: transparent;
+	--editor-toolbar-divider: #d9d9d9;
 	--txt-virtual-controls-panel-bg: #ffffff;
 	--txt-virtual-controls-panel-fg: #1e1e1e;
 	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
@@ -134,6 +144,11 @@ body.theme-dark {
 	--editor-scrollbar-thumb-hover: #888888;
 	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
 	--editor-focus-ring: #8ab4f8;
+	--editor-primary-action-bg: #0e639c;
+	--editor-primary-action-fg: #ffffff;
+	--editor-primary-action-hover-bg: #1177bb;
+	--editor-primary-action-border: transparent;
+	--editor-toolbar-divider: #666666;
 	--txt-virtual-controls-panel-bg: #252526;
 	--txt-virtual-controls-panel-fg: #cccccc;
 	--txt-virtual-controls-panel-border: rgba(255, 255, 255, 0.16);
@@ -174,6 +189,11 @@ body.vscode-high-contrast-light {
 	--editor-status-ok-fg: CanvasText;
 	--editor-status-error-fg: CanvasText;
 	--editor-focus-ring: var(--vscode-contrastActiveBorder, Highlight);
+	--editor-primary-action-bg: Highlight;
+	--editor-primary-action-fg: HighlightText;
+	--editor-primary-action-hover-bg: Highlight;
+	--editor-primary-action-border: Highlight;
+	--editor-toolbar-divider: CanvasText;
 	--editor-scrollbar-track: Canvas;
 	--editor-scrollbar-thumb: CanvasText;
 	--editor-scrollbar-thumb-hover: Highlight;
@@ -632,6 +652,12 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	z-index: 1000;
 	display: flex;
 	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	column-gap: 10px;
+	row-gap: 8px;
+	max-width: calc(100% - 20px);
+	box-sizing: border-box;
 	background-color: white;
 	padding: 8px;
 	border-radius: 4px;
@@ -639,10 +665,72 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	transition: right 0.25s ease;
 }
 
+.toolbar-action-group {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.toolbar-action-group[hidden] {
+	display: none !important;
+}
+
+/* Outrank legacy one-class switch margins declared later; gap is the sole toolbar spacing source. */
+.controls-container .toolbar-action-group > * {
+	margin: 0;
+}
+
+#toolbarActionsToggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 32px;
+	width: 32px;
+	height: 32px;
+	margin: 0;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background-color: #f0f0f0;
+	color: #333333;
+	cursor: pointer;
+	transition:
+		background-color 0.2s ease,
+		transform 0.2s ease;
+}
+
+#toolbarActionsToggle:hover {
+	background-color: #e0e0e0;
+}
+
+#toolbarActionsToggle:active {
+	transform: translateY(1px);
+}
+
+#toolbarActionsToggle:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.toolbar-actions-toggle-icon polyline {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+#toolbarActionsToggle[aria-expanded='true'] .toolbar-expand-icon,
+#toolbarActionsToggle[aria-expanded='false'] .toolbar-collapse-icon {
+	display: none;
+}
+
 .board-select {
 	display: flex;
 	align-items: center;
-	margin-right: 10px;
+	margin: 0;
 	gap: 8px;
 }
 
@@ -698,6 +786,51 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 .board-select-caret {
 	flex-shrink: 0;
 	transition: transform 0.2s ease;
+}
+
+.feedback-entry {
+	display: flex;
+	align-items: center;
+}
+
+.feedback-entry-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 1px solid var(--editor-primary-action-border);
+	border-radius: 50%;
+	background: var(--editor-primary-action-bg);
+	color: var(--editor-primary-action-fg);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+	cursor: pointer;
+	transition:
+		background-color 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+.feedback-entry-button:hover {
+	background: var(--editor-primary-action-hover-bg);
+}
+
+.feedback-entry-button:active {
+	transform: translateY(1px);
+	box-shadow: none;
+}
+
+.feedback-entry-button:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.feedback-entry-icon {
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
 }
 
 #boardSelectToggle[aria-expanded='true'] .board-select-caret {
@@ -970,6 +1103,8 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 	.preview-info,
 	.preview-controls,
 	.preview-controls #themeToggle,
+	.feedback-entry-button,
+	#toolbarActionsToggle,
 	.preview-badge,
 	.board-warning,
 	.sample-card,
@@ -989,6 +1124,8 @@ body.preview-mode .txt-preview-readonly-splitter.open {
 
 	.txt-connection-input:focus-visible,
 	.preview-controls #themeToggle:focus-visible,
+	.feedback-entry-button:focus-visible,
+	#toolbarActionsToggle:focus-visible,
 	.txt-virtual-control-button:focus-visible,
 	.txt-virtual-control-button.selected {
 		outline-color: Highlight;
@@ -2544,6 +2681,15 @@ body.theme-dark #autoBackupMinutesText {
 body.theme-dark .controls-container {
 	background-color: #333333;
 	color: #e0e0e0;
+}
+
+body.theme-dark #toolbarActionsToggle {
+	background-color: #444444;
+	color: #e0e0e0;
+}
+
+body.theme-dark #toolbarActionsToggle:hover {
+	background-color: #555555;
 }
 
 body.theme-dark #boardSelectToggle {

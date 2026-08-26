@@ -6,6 +6,12 @@
 const vscode = acquireVsCodeApi();
 window.blocklyRuntime.installDialogAdapter(vscode, () => window.getCurrentBoard?.() || window.currentBoard || 'none');
 
+const TOOLBAR_EXPANDED_STATE_KEY = 'toolbarActionsExpanded';
+const savedState = vscode.getState();
+let toolbarActionsExpanded = typeof savedState?.[TOOLBAR_EXPANDED_STATE_KEY] === 'boolean'
+	? savedState[TOOLBAR_EXPANDED_STATE_KEY]
+	: false;
+
 const SENSITIVE_LOG_KEY_PATTERN = /(password|token|secret|authorization|auth)/i;
 
 function sanitizeLogValue(value, depth = 0) {
@@ -2325,6 +2331,55 @@ function toggleLanguageDropdown() {
 	}
 }
 
+function updateToolbarActionsText() {
+	const toggleButton = document.getElementById('toolbarActionsToggle');
+	if (!toggleButton) {
+		return;
+	}
+	const languageManager = window.languageManager;
+	const label = toolbarActionsExpanded
+		? languageManager?.getMessage('TOOLBAR_ACTIONS_COLLAPSE', 'Show fewer actions') || 'Show fewer actions'
+		: languageManager?.getMessage('TOOLBAR_ACTIONS_EXPAND', 'Show more actions') || 'Show more actions';
+	toggleButton.title = label;
+	toggleButton.setAttribute('aria-label', label);
+}
+
+function setToolbarActionsExpanded(isExpanded, options = {}) {
+	const secondaryActions = document.getElementById('toolbarSecondaryActions');
+	const toggleButton = document.getElementById('toolbarActionsToggle');
+	if (!secondaryActions || !toggleButton) {
+		return;
+	}
+
+	toolbarActionsExpanded = isExpanded;
+	secondaryActions.hidden = !isExpanded;
+	toggleButton.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+	updateToolbarActionsText();
+
+	if (options.persist) {
+		const currentState = vscode.getState() || {};
+		vscode.setState({
+			...currentState,
+			[TOOLBAR_EXPANDED_STATE_KEY]: isExpanded,
+		});
+		vscode.postMessage({
+			command: 'toolbarActionsStateChanged',
+			expanded: isExpanded,
+		});
+	}
+}
+
+function initToolbarActions() {
+	const toggleButton = document.getElementById('toolbarActionsToggle');
+	if (!toggleButton) {
+		return;
+	}
+	toggleButton.addEventListener('click', () => {
+		setToolbarActionsExpanded(!toolbarActionsExpanded, { persist: true });
+	});
+	setToolbarActionsExpanded(toolbarActionsExpanded);
+}
+
 /**
  * 更新主編輯視窗的UI文字為多語言版本
  */
@@ -2347,6 +2402,14 @@ function updateEditorUITexts() {
 	if (languageToggle) {
 		languageToggle.setAttribute('title', languageManager.getMessage('LANGUAGE_SELECT_TOOLTIP', 'Select Language'));
 	}
+
+	const provideFeedbackButton = document.getElementById('provideFeedbackButton');
+	if (provideFeedbackButton) {
+		const label = languageManager.getMessage('FEEDBACK_PROVIDE_ACTION', 'Provide feedback');
+		provideFeedbackButton.title = label;
+		provideFeedbackButton.setAttribute('aria-label', label);
+	}
+	updateToolbarActionsText();
 
 	// 更新語言下拉選單內容
 	populateLanguageDropdown();
@@ -3398,6 +3461,7 @@ window.addEventListener('languageChanged', function (event) {
 document.addEventListener('DOMContentLoaded', async () => {
 	log.info('Blockly Edit page loaded');
 
+	initToolbarActions();
 	// 更新主編輯視窗UI文字的多語言支援
 	updateEditorUITexts();
 	// 更新 TXT 連線設定視窗的多語言支援
@@ -3421,6 +3485,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		boardSelect.addEventListener('change', () => updateBoardSelectionUI(boardSelect));
 	}
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+	const provideFeedbackButton = document.getElementById('provideFeedbackButton');
+	if (provideFeedbackButton) {
+		provideFeedbackButton.addEventListener('click', () => {
+			vscode.postMessage({ command: 'provideFeedback' });
+		});
+	}
 	// 註冊語言切換按鈕事件
 	const languageToggle = document.getElementById('languageToggle');
 	if (languageToggle) {
@@ -5131,6 +5201,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 				break;
 			case 'init':
+				if (typeof message.toolbarActionsExpanded === 'boolean') {
+					setToolbarActionsExpanded(message.toolbarActionsExpanded);
+				}
 				await handleWorkspaceLoadMessage(message);
 				await applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
 				break;
@@ -7920,6 +7993,7 @@ function initMonitorButton() {
 
 	newMonitorBtn.addEventListener('click', toggleMonitor);
 	updateMonitorButtonVisibility();
+	updateMonitorButtonState();
 }
 
 /**
@@ -8046,6 +8120,10 @@ function handleMonitorError(message) {
 function updateMonitorButtonState() {
 	const monitorBtn = document.getElementById('monitorBtn');
 	if (!monitorBtn) return;
+	const setAccessibleLabel = label => {
+		monitorBtn.title = label;
+		monitorBtn.setAttribute('aria-label', label);
+	};
 
 	monitorBtn.classList.remove('active', 'connecting');
 	monitorBtn.setAttribute('aria-busy', monitorState.isConnecting ? 'true' : 'false');
@@ -8053,15 +8131,16 @@ function updateMonitorButtonState() {
 
 	if (monitorState.isConnecting) {
 		monitorBtn.classList.add('connecting');
+		setAccessibleLabel(window.languageManager?.getMessage('MONITOR_STARTING', '正在連接裝置...') || 'Starting Monitor...');
 		return;
 	}
 
 	if (monitorState.isRunning) {
 		monitorBtn.classList.add('active');
-		monitorBtn.title = window.languageManager?.getMessage('MONITOR_BUTTON_STOP_TITLE', '關閉 Monitor') || 'Stop Monitor';
+		setAccessibleLabel(window.languageManager?.getMessage('MONITOR_BUTTON_STOP_TITLE', '關閉 Monitor') || 'Stop Monitor');
 	} else {
 		monitorBtn.classList.remove('active');
-		monitorBtn.title = window.languageManager?.getMessage('MONITOR_BUTTON_TITLE', '開啟 Monitor') || 'Open Monitor';
+		setAccessibleLabel(window.languageManager?.getMessage('MONITOR_BUTTON_TITLE', '開啟 Monitor') || 'Open Monitor');
 	}
 }
 

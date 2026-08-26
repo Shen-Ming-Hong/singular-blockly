@@ -1,0 +1,57 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"name": "singular-blockly-support",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-08-19",
+	"workers_dev": true,
+	"routes": [
+		{
+			"pattern": "blockly-support.singular-ai.org",
+			"custom_domain": true
+		}
+	],
+	"observability": {
+		"enabled": false
+	},
+	"triggers": {
+		"crons": ["* * * * *"]
+	},
+	"d1_databases": [
+		{
+			"binding": "FEEDBACK_DB",
+			"database_name": "singular-blockly-feedback",
+			"database_id": "bb1cf596-3454-489a-b7a5-3acefe33ae1d",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "FEEDBACK_SCREENSHOTS",
+			"bucket_name": "singular-blockly-feedback-screenshots"
+		}
+	],
+	"ratelimits": [
+		{
+			"name": "REPORTER_RATE_LIMITER",
+			"namespace_id": "7001",
+			"simple": { "limit": 60, "period": 60 }
+		},
+		{
+			"name": "ANONYMOUS_RATE_LIMITER",
+			"namespace_id": "7002",
+			"simple": { "limit": 10, "period": 60 }
+		},
+		{
+			"name": "SOURCE_RATE_LIMITER",
+			"namespace_id": "7003",
+			"simple": { "limit": 120, "period": 60 }
+		}
+	],
+	"vars": {
+		"SERVICE_ORIGIN": "https://blockly-support.singular-ai.org",
+		"CLOUDFLARE_ACCESS_TEAM_DOMAIN": "innovationspark.cloudflareaccess.com",
+		"CLOUDFLARE_ACCESS_AUD": "6abf44e50fdca184c1cb1768bfbde831b6df7dc469ee1b8da17ff2283a2c210d",
+		"PRIVATE_GITHUB_REPOSITORY": "Shen-Ming-Hong/singular-blockly-feedback",
+		"PUBLIC_GITHUB_REPOSITORY": "Shen-Ming-Hong/singular-blockly"
+	}
+}
