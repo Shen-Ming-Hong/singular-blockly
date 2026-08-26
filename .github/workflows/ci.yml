@@ -183,6 +183,7 @@ jobs:
         run: |
           mkdir -p release-artifacts
           npm exec -- vsce package --out "$VSIX_PATH"
+          npm run feedback:verify-vsix -- "$VSIX_PATH"
 
       - name: Smoke test and finalize release files
         env:

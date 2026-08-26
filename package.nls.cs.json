@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "Řídí hloubku uvažování pro návrhy bloků AI.\n\n- **low**: Nejrychlejší odpověď, minimální uvažování (doporučeno pro inline návrhy)\n- **medium**: Vyvážená rychlost a kvalita\n- **high**: Nejhlubší uvažování, pomalejší odpověď",
 	"singularBlockly.ai.reasoningEffort.low.description": "Nejrychlejší, minimální uvažování (doporučeno)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Vyvážená rychlost a kvalita",
-	"singularBlockly.ai.reasoningEffort.high.description": "Nejhlubší uvažování, nejpomalejší odpověď"
+	"singularBlockly.ai.reasoningEffort.high.description": "Nejhlubší uvažování, nejpomalejší odpověď",
+	"command.provideFeedback.title": "Odeslat zpětnou vazbu",
+	"command.showMyFeedback.title": "Moje zpětná vazba"
 }

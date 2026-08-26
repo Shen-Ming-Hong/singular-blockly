@@ -8,6 +8,113 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.88.0] - 2026-08-26
+
+### ✨ 新增功能 Features
+
+- 新增不需 GitHub 帳號的原生回饋流程，使用者可在送出前檢查完整內容、選擇是否附上允許清單式環境資訊、近期結構化事件或一張已淨化截圖，並以私人備援憑證追蹤、補充及刪除自己的回饋
+  Added a native feedback flow that requires no GitHub account, lets users review the complete submission and choose allowlisted environment data, recent structured events, or one sanitized screenshot, and uses a private recovery credential for tracking, follow-up, and deletion
+- 將主要回饋入口放在 Blockly 編輯器自己的控制區，以獨立藍色圓形圖示、tooltip 與 ARIA 名稱呈現；工具列可由最右側按鈕收合，收合時只保留備份、上傳與 Monitor，並在 200% zoom 自動換列，避免與其他擴充套件的通用編輯器標題圖示混淆
+  Placed the primary feedback entry in Blockly's own control area as a distinct blue circular icon with a tooltip and ARIA name; a rightmost toggle collapses the evenly spaced toolbar to backup, upload, and Monitor while preserving clean wrapping at 200% zoom
+- 新增 Cloudflare Worker、D1、私有 R2 與最小權限 GitHub App 的私密維護流程，包含匿名 recovery portal、狀態更新、維護者公開回覆及經專案負責人核准的去識別化公開開發紀錄
+  Added a private maintainer workflow using Cloudflare Worker, D1, private R2, and a least-privilege GitHub App, including an anonymous recovery portal, status updates, explicit maintainer replies, and project-owner-approved de-identified public development records
+
+### 🔒 安全性 Security
+
+- 回饋服務現在以串流硬限制 request body、32-byte HMAC／webhook secrets、fail-closed production 設定與 D1 readiness health check 保護公開 API，並拒絕在公開摘要中出現個資、路徑、機器資訊、私密識別碼、診斷值或原文片段
+  The feedback service now protects public APIs with streaming request-body limits, 32-byte HMAC and webhook secrets, fail-closed production configuration, and a D1 readiness health check, while rejecting personal data, paths, machine information, private identifiers, diagnostic values, and verbatim private excerpts from public summaries
+- 公開摘要的去識別化檢查現在涵蓋建立後的所有 reporter 與 maintainer 訊息；截圖 JPEG 也必須在受限的記憶體與解析度預算內完成實際解碼，只有 marker 結構的偽造圖片會被拒絕
+  Public-summary de-identification now covers every reporter and maintainer message added after creation; screenshot JPEGs must also fully decode within bounded memory and resolution budgets, rejecting fabricated images that contain only marker structure
+- 強化刪除、delete-all 冪等與 transactional outbox；Worker 中斷後會回收逾時 lease，建立私密 Issue 與刪除競態時會立即清除孤兒內容，避免已刪除資料重新出現
+  Hardened deletion, delete-all idempotency, and the transactional outbox; expired leases are reclaimed after Worker interruption, and create-versus-delete races immediately scrub orphaned private issues so deleted content cannot reappear
+- 公開建立回饋 API 現在會在讀取 request body、解析 multipart 或驗證截圖前先套用 reporter 與來源速率限制，避免超額請求仍消耗圖片處理資源
+  The public create-feedback API now applies reporter and source rate limits before reading the request body, parsing multipart data, or validating screenshots, preventing over-quota requests from consuming image-processing resources
+- delete-all 現在會在列舉資料前原子撤銷回報者與工作階段，建立交易也會再次確認憑證尚未撤銷；公開摘要檢查同時涵蓋完整私密 Issue 討論，並拒絕被括號等標點包住的私密編號與 Unix 路徑
+  Delete-all now atomically revokes the reporter and sessions before enumerating data, while creation transactions recheck that the credential remains active; public-summary checks also cover the complete private issue discussion and reject private numbers or Unix paths wrapped in punctuation
+- delete-all 現在會在撤銷憑證的同一交易持久化每筆刪除工作，且隱私刪除事件不會永久進入 dead-letter；Worker 也以穩定值與版本格式允許清單拒絕診斷欄位中的路徑、原文與憑證形狀資料
+  Delete-all now durably queues every deletion in the same transaction that revokes credentials, and privacy-deletion events never remain permanently dead-lettered; the Worker also rejects paths, raw text, and credential-shaped diagnostic values with stable-value and version-format allowlists
+- 私密 GitHub Issue 的標題與本文現在只保存不含回饋內容的路由 shell；原文、診斷與附件入口改放在可真正刪除的初始私密留言，避免 Issue 編輯歷史在刪除後保留原文，公開摘要檢查也涵蓋先前所有私密 slash command
+  Private GitHub Issue titles and bodies now contain only a content-free routing shell; original text, diagnostics, and attachment access move to a truly deletable initial private comment so Issue edit history cannot retain deleted content, and public-summary checks now include every earlier private slash command
+- 私密留言清除達安全批次上限後會再次確認完全清空，session 與 bearer 共用 reporter 限速鍵；截圖也在 Webview 解碼前接受原始容量、尺寸與像素預算限制
+  Private-comment scrubbing now verifies complete removal after the safety batch limit, sessions and bearer access share one reporter rate-limit key, and screenshots receive source-size, dimension, and pixel-budget checks before Webview decoding
+- 公開摘要的原文防護加入中文、日文與韓文 CJK 字元片段比對；公開狀態命令也以舊狀態與 GitHub comment id 原子綁定訊息及 delivery，避免並行命令形成禁止轉移
+  Public-summary protection now compares CJK character fragments for Chinese, Japanese, and Korean; public-status commands also atomically bind the previous state, GitHub comment id, message, and delivery so concurrent commands cannot create forbidden transitions
+- 私密維護者命令現在以 GitHub comment id marker 回覆不含私密內容的穩定結果，並持久保存確認狀態；GitHub 暫時失敗時同一 delivery 只補送確認，不會重複執行命令
+  Private maintainer commands now acknowledge stable, content-free results with a GitHub comment-id marker and persist acknowledgement state; temporary GitHub failures retry only the acknowledgement for the same delivery without executing the command again
+- 私密 Issue 刪除現在會先鎖定 conversation、阻止新的維護者留言，再清除及確認所有既有留言，避免刪除完成後重新留下私密內容
+  Private-issue deletion now locks the conversation before removing and verifying every existing comment, preventing new maintainer comments from restoring private content after deletion completes
+
+### 🐛 修復 Bug Fixes
+
+- 修正 Cloudflare workerd 原生 `fetch` 失去 global receiver 時，GitHub App installation token 交換會以 `illegal invocation` 失敗；GitHub 請求現在保留正確 receiver 並明確送出必要的 `User-Agent`
+  Fixed GitHub App installation-token exchange failing with `illegal invocation` when Cloudflare workerd's native `fetch` lost its global receiver; GitHub requests now retain the correct receiver and explicitly send the required `User-Agent`
+- 修正正式 VSIX 使用 `--no-dependencies` 而遺漏 Blockly 與 SSH 執行期；封裝現在保留必要 production dependencies、排除 `ssh2/test` 測試憑證，並以 fail-closed verifier 驗證兩端條件
+  Fixed production VSIX packages omitting Blockly and SSH runtime files because of `--no-dependencies`; packaging now retains required production dependencies, excludes `ssh2/test` credential fixtures, and verifies both conditions with a fail-closed gate
+- 將公開隱私、支援與條款頁從簡短摘要擴充為版本化完整政策，並修正 Cloudflare Access JWKS 下載可能失去 workerd 原生 `fetch` receiver 的問題
+  Expanded the public privacy, support, and terms pages from short summaries into complete versioned policies and fixed Cloudflare Access JWKS retrieval potentially losing the workerd native `fetch` receiver
+- 修正 D1 建立交易失敗可能留下無法回收的 R2 截圖；upload 前現在先寫持久補償 marker，成功交易會原子清除，失敗則由排程安全重試刪除 orphan
+  Fixed failed D1 creation transactions potentially leaving unrecoverable R2 screenshots; uploads now receive a durable compensation marker that successful transactions remove atomically while scheduled cleanup safely retries failed orphans
+- 修正合法的大型回饋清單、超過 500 則的訊息 timeline 與 response body 卡住時的客戶端失敗；API 現在分頁訊息、接受契約內 payload，並讓 timeout 涵蓋完整 response stream
+  Fixed client failures for legal large feedback lists, timelines beyond 500 messages, and stalled response bodies; the API now paginates messages, accepts contract-bounded payloads, and applies timeouts to the complete response stream
+- 修正刪除回饋與進行中的私密訊息同步競態；刪除流程現在保留 processing lease、等待同步完成後再清除私密 Issue，且已進入刪除狀態的回饋不再啟動新同步
+  Fixed the race between feedback deletion and in-flight private-message synchronization; deletion now preserves processing leases, waits for synchronization before scrubbing the private issue, and prevents new synchronization after deletion begins
+- 修正建立回饋與備援入口操作在逾時、預覽到期或頁面重載後產生新的冪等鍵；相同內容會安全重用原鍵，入口網站也能續載超過 20 則訊息
+  Fixed feedback creation and recovery-portal mutations generating new idempotency keys after timeouts, preview expiry, or reloads; identical content now safely reuses its key, and the portal can continue timelines beyond 20 messages
+- 修正近期事件誤受基本診斷開關控制、解析例外可能外洩為 API 錯誤碼，以及刪除確認欄位缺少可存取名稱
+  Fixed recent events incorrectly depending on the basic-diagnostics toggle, parser exceptions potentially surfacing as API error codes, and delete-confirmation fields lacking accessible names
+- 修正單筆刪除與 delete-all 控制旁未一致揭露備份／匿名公開紀錄例外、成功送出後仍保留舊表單與截圖，以及 GitHub 留言 marker 搜尋只檢查前 1,000 則留言的問題
+  Fixed inconsistent backup and anonymized-public-record disclosures beside single-delete and delete-all controls, stale forms and screenshots remaining after successful submission, and GitHub comment-marker searches stopping after the first 1,000 comments
+- 修正備援入口 delete-all 後舊安裝持續重用已撤銷憑證、建立成功但 response body 不可信時遺失原冪等鍵，以及成功畫面未顯示目前狀態；擴充套件現在會以新匿名憑證和相同 key 安全重試一次、保留不確定建立結果，並顯示本地化狀態
+  Fixed old installations reusing revoked credentials after recovery-portal delete-all, losing the original idempotency key when a successful create response body is untrusted, and omitting current status from the success screen; the extension now retries once with a new anonymous credential and the same key, preserves uncertain create results, and displays localized status
+- 修正補充訊息在 Webview 重開後可能以新冪等鍵重複送出、備援連結複製失敗顯示在隱藏表單，以及 Extension／備援入口的明細省略重現步驟、預期結果、環境資訊與附件狀態
+  Fixed follow-up messages potentially using a new idempotency key after reopening the Webview, recovery-link copy failures appearing on a hidden form, and Extension/recovery details omitting reproduction steps, expected results, environment information, and attachment status
+- 修正 Access 金鑰輪替在 JWKS 快取期間拒絕新 `kid`、成功補充訊息的截斷回應遺失冪等鍵，以及截圖、分頁與明細的晚到非同步結果覆蓋目前使用者選擇
+  Fixed new Access signing-key IDs being rejected during JWKS caching, truncated successful message responses losing their idempotency key, and stale screenshot, pagination, or detail results overriding the user's current selection
+- 修正 recovery portal 在補充訊息回應截斷或快速重複點擊時清除／覆寫冪等鍵，以及 `closed` 回饋仍可被 reopen 的狀態模型違反
+  Fixed the recovery portal clearing or overwriting message idempotency keys after truncated responses or rapid repeat clicks, and fixed the state-model violation that allowed closed feedback to be reopened
+- 修正超過 1,000 筆 GitHub Issue 時 marker 搜尋把未窮盡結果誤判為不存在、括號中的 GitHub mention 可進入公開摘要、刪除後舊清單未刷新，以及 recovery portal 空白正規化造成補充訊息冪等鍵殘留
+  Fixed capped GitHub issue-marker searches treating incomplete results as absent, GitHub mentions in parentheses passing public-summary checks, stale list items remaining after deletion, and whitespace normalization leaving recovery-portal message idempotency keys behind
+- 修正單筆刪除在回應遺失並重開 VS Code 後改用新冪等鍵，以及 recovery portal 已執行 delete-all 時擴充套件仍保留撤銷憑證；單筆刪除鍵現在會安全持久化，撤銷狀態則回復為無憑證空清單
+  Fixed single-item deletion using a new idempotency key after a lost response and VS Code restart, and the extension retaining a revoked credential after recovery-portal delete-all; deletion keys now persist safely and revoked state resets to an empty credential-free list
+- 修正不同未決補充訊息互相覆寫冪等鍵，以及契約內含大量 JSON 跳脫字元的回饋或 4,000 個 CJK 字元訊息被過小 request 預檢拒絕
+  Fixed distinct pending follow-up messages overwriting each other's idempotency keys and undersized request prechecks rejecting contract-valid escaped feedback or 4,000-character CJK messages
+- 修正未限制的截圖 base64 解碼、診斷欄位敏感值形狀、無效維護者命令缺少冪等確認，以及 PlatformIO 回饋預填顯示可見 `\\n` 的問題
+  Fixed unbounded screenshot base64 decoding, sensitive diagnostic value shapes, missing idempotent acknowledgements for invalid maintainer commands, and visible `\\n` text in PlatformIO feedback prefill
+
+### 🌐 語系 Localization
+
+- 補齊 15 語系的回饋導覽、狀態、建立時間與訊息作者文案，日期依使用者 locale 顯示，並移除明細頁硬編碼英文與原始狀態代碼
+  Added localized feedback navigation, status, creation-time, and message-author copy across all 15 locales, formatted dates with the user locale, and removed hard-coded English and raw status codes from the detail view
+- 補齊 15 語系的完整回饋明細與 PlatformIO 安全預填文案，工具入口不再以硬編碼英文描述診斷狀態
+  Added complete feedback-detail and safe PlatformIO-prefill copy across all 15 locales, removing hard-coded English diagnostic descriptions from the tool entry point
+- 隱私權、支援與條款服務頁現在為全部 15 個既有語系提供完整本文，不再讓已支援語系的詳細政策回退成英文
+  Privacy, support, and terms service pages now provide complete content in all 15 supported locales instead of falling back to English for detailed policy text
+
+### 🧪 測試 Tests
+
+- 新增 request 串流容量、production 設定、刪除重試、outbox lease、GitHub 建立／刪除競態、公開摘要去識別化、近期事件 producer 與不可信 API response 的回歸測試
+  Added regression coverage for streaming request limits, production configuration, deletion retries, outbox leases, GitHub create/delete races, public-summary de-identification, recent-event producers, and untrusted API responses
+- 新增 GitHub App 520 字元 installation token 相容性測試，避免新版 token 在服務端被誤判為無效
+  Added compatibility coverage for 520-character GitHub App installation tokens so newer token formats are not rejected by the service
+- 新增 D1/R2 orphan 補償、跨頁訊息 cursor、合法大型回應、body-stall timeout、後續私密訊息摘要阻擋與完整 JPEG decode 回歸測試
+  Added regression coverage for D1/R2 orphan compensation, cross-page message cursors, legal large responses, stalled-body timeouts, later private-message summary blocking, and full JPEG decoding
+- 新增刪除期間的 processing outbox lease、跨預覽／Webview／portal reload 的冪等重試、獨立近期事件同意、入口網站訊息分頁、固定解析錯誤碼與刪除欄位可存取名稱回歸測試
+  Added regression coverage for processing outbox leases during deletion, idempotent retries across preview/Webview/portal reloads, independent recent-event consent, portal message pagination, stable parse error codes, and accessible delete-field names
+- 新增 delete-all／建立競態、完整私密 Issue 留言摘要阻擋、標點識別碼、刪除例外揭露、成功草稿清除及超過 1,000 則 GitHub 留言 marker 的回歸測試
+  Added regression coverage for delete-all/create races, complete private-issue-comment summary blocking, punctuated identifiers, deletion-exception disclosures, successful draft cleanup, and GitHub comment markers beyond 1,000 comments
+- 新增私密 Issue content-free shell、可刪除初始留言、先前命令摘要阻擋、撤銷憑證復原、不可信成功回應冪等重試與成功狀態畫面的回歸測試
+  Added regression coverage for content-free private Issue shells, deletable initial comments, earlier-command summary blocking, revoked-credential recovery, idempotent retries after untrusted success responses, and status on the success screen
+- 新增超過 10,000 則私密留言的 fail-closed 刪除、Access JWKS 輪替、跨 session 限速鍵、補充訊息結果未定，以及 Webview 非同步 request identity 的回歸測試
+  Added regression coverage for fail-closed deletion beyond 10,000 private comments, Access JWKS rotation, rate keys shared across sessions, uncertain message results, and asynchronous Webview request identity
+- 新增 CJK 私密片段、並行狀態命令、終止狀態、入口網站訊息回應／in-flight guard，以及 13 個新增完整政策語系的回歸測試
+  Added regression coverage for CJK private excerpts, concurrent status commands, terminal states, portal message-response and in-flight guards, and the 13 newly completed policy locales
+- 新增 GitHub Issue 搜尋上限、標點 mention、刪除後清單 correlation、補充訊息 trim，以及可重試且不重複 mutation 的私密命令確認回歸測試
+  Added regression coverage for GitHub issue-search limits, punctuated mentions, post-deletion list correlation, follow-up-message trimming, and retryable private-command acknowledgements without duplicate mutations
+- 新增刪除前 GitHub conversation lock、跨重開單筆刪除冪等鍵與外部撤銷本機憑證復原的回歸測試
+  Added regression coverage for pre-deletion GitHub conversation locking, single-delete idempotency across restarts, and local recovery from externally revoked credentials
+- 新增多筆未決補充訊息共存、最大跳脫回饋 payload 與 4,000 個 CJK 字元訊息的回歸測試
+  Added regression coverage for coexisting pending follow-up messages, maximum escaped feedback payloads, and 4,000-character CJK messages
+
 ## [0.87.5] - 2026-08-19
 
 ### 🔒 安全性 Security

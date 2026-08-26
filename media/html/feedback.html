@@ -1,0 +1,150 @@
+<!--
+  @license
+  Copyright 2026 Singular Blockly Contributors
+  SPDX-License-Identifier: Apache-2.0
+-->
+<!doctype html>
+<html lang="{lang}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="{csp}">
+    <title>Provide Feedback</title>
+    <link rel="stylesheet" href="{cssUri}">
+</head>
+<body>
+    <main class="shell">
+			<nav id="modeNavigation" class="mode-nav" aria-label="Feedback sections">
+			<button id="provideFeedbackTab" type="button" aria-pressed="true">Provide feedback</button>
+			<button id="myFeedbackTab" type="button" aria-pressed="false">My feedback</button>
+		</nav>
+        <section id="formStep" class="card" aria-labelledby="panelTitle">
+            <h1 id="panelTitle" tabindex="-1">Provide Feedback</h1>
+            <p id="intro" class="lead">Tell us what happened or what would make Singular Blockly better. No GitHub account is needed.</p>
+			<p id="personalDataWarning" class="notice warning">Do not include names, email addresses, student information, credentials, source code, private paths, or complete logs.</p>
+            <form id="feedbackForm">
+                <label for="kind" id="kindLabel">Feedback type</label>
+                <select id="kind" name="kind" required>
+                    <option value="bug">Problem report</option>
+                    <option value="feature">Feature suggestion</option>
+                    <option value="question">Usage question</option>
+                    <option value="other">Other feedback</option>
+                </select>
+
+                <label for="feedbackTitle" id="feedbackTitleLabel">Short summary</label>
+				<input id="feedbackTitle" name="title" type="text" required>
+
+                <label for="description" id="descriptionLabel">What would you like us to know?</label>
+				<textarea id="description" name="description" rows="8" required></textarea>
+
+                <label for="steps" id="stepsLabel">Steps to reproduce (optional)</label>
+				<textarea id="steps" name="steps" rows="4"></textarea>
+
+                <label for="expected" id="expectedLabel">What did you expect? (optional)</label>
+				<textarea id="expected" name="expected" rows="3"></textarea>
+
+                <fieldset>
+                    <legend id="dataLegend">Information sent with your feedback</legend>
+                    <label class="check-row"><input id="includeDiagnostics" type="checkbox" checked> <span id="basicDiagnosticsLabel">Include basic environment information</span></label>
+					<p id="basicDiagnosticsHelp" class="help">Includes app versions, OS family, architecture, language, host and workspace type. Never includes source code, paths, device IDs, network details, or raw logs.</p>
+					<p id="diagnosticsOffWarning" class="notice warning hidden" role="status" aria-live="polite">Basic environment information is off. You can still send feedback, but diagnosis may be less effective.</p>
+                    <label class="check-row"><input id="includeRecentEvents" type="checkbox"> <span id="recentEventsLabel">Include recent structured events</span></label>
+                    <p id="recentEventsHelp" class="help">Off by default. Includes only bounded timestamps, stages, stable event codes, and outcomes.</p>
+                </fieldset>
+
+				<fieldset>
+					<legend id="screenshotLegend">Optional screenshot</legend>
+					<label for="screenshotFile" id="screenshotLabel">Choose one screenshot</label>
+					<input id="screenshotFile" type="file" accept="image/png,image/jpeg">
+					<p id="screenshotHelp" class="help">The image is re-encoded on this device, limited to 1920 pixels and 3 MiB, and sent only after confirmation.</p>
+					<p id="screenshotPrivacyWarning" class="notice warning">Before sending, check the image for names, email addresses, paths, program content, and other private information.</p>
+					<div id="screenshotPreview" class="screenshot-preview hidden">
+                        <img id="screenshotImage" alt="Selected screenshot preview">
+						<button id="removeScreenshotButton" type="button">Remove screenshot</button>
+					</div>
+					<div id="screenshotError" class="notice error hidden" role="alert"></div>
+				</fieldset>
+
+                <div id="formError" class="notice error hidden" role="alert"></div>
+                <button id="reviewButton" class="primary" type="submit">Review what will be sent</button>
+            </form>
+        </section>
+
+        <section id="reviewStep" class="card hidden" aria-labelledby="reviewTitle">
+            <h1 id="reviewTitle" tabindex="-1">Review before sending</h1>
+            <p id="reviewHelp" class="lead">This is the complete payload. Nothing is sent until you confirm below.</p>
+			<p id="serviceDisclosure" class="notice">Sending stores feedback in Cloudflare D1/R2 and a private GitHub maintainer workspace until you delete it. Provider backups may persist briefly. An anonymized public development summary is created only with project-owner approval.</p>
+            <pre id="payloadPreview" tabindex="0"></pre>
+			<div id="reviewScreenshot" class="screenshot-preview hidden"><img id="reviewScreenshotImage" alt="Screenshot that will be sent"></div>
+            <div id="submitError" class="notice error hidden" role="alert"></div>
+            <div class="actions">
+                <button id="backButton" type="button">Back</button>
+                <button id="confirmButton" class="primary" type="button">Confirm and send</button>
+            </div>
+        </section>
+
+        <section id="resultStep" class="card hidden" aria-labelledby="successTitle">
+            <h1 id="successTitle" tabindex="-1">Thank you. Your feedback was received.</h1>
+			<dl>
+				<dt id="referenceLabel">Feedback number</dt><dd id="referenceValue"></dd>
+				<dt id="resultStatusLabel">Status</dt><dd id="resultStatusValue"></dd>
+			</dl>
+            <button id="copyRecoveryButton" type="button">Copy backup access link</button>
+            <p id="recoveryStatus" class="notice" role="status" aria-live="polite"></p>
+        </section>
+
+		<section id="myFeedbackStep" class="card hidden" aria-labelledby="myFeedbackTitle">
+			<h1 id="myFeedbackTitle" tabindex="-1">My feedback</h1>
+			<p id="myFeedbackHelp" class="lead">Only feedback created with this private backup credential appears here.</p>
+			<p id="myFeedbackStatus" class="notice" role="status" aria-live="polite"></p>
+			<ul id="feedbackList" class="feedback-list"></ul>
+			<button id="loadMoreButton" class="hidden" type="button">Load more</button>
+
+			<article id="feedbackDetail" class="feedback-detail hidden" aria-labelledby="detailTitle">
+				<h2 id="detailTitle" tabindex="-1"></h2>
+				<dl id="detailMetadata"></dl>
+				<h3 id="detailDescriptionLabel">Description</h3>
+				<p id="detailDescription"></p>
+				<section id="detailStepsSection" class="hidden">
+					<h3 id="detailStepsLabel">Steps to reproduce</h3>
+					<p id="detailSteps"></p>
+				</section>
+				<section id="detailExpectedSection" class="hidden">
+					<h3 id="detailExpectedLabel">Expected result</h3>
+					<p id="detailExpected"></p>
+				</section>
+				<h3 id="detailDiagnosticsLabel">Environment information</h3>
+				<pre id="detailDiagnostics"></pre>
+				<p id="detailAttachmentStatus" class="notice"></p>
+				<ol id="messageTimeline" class="timeline"></ol>
+				<button id="messageLoadMoreButton" class="hidden" type="button">Load more</button>
+				<label id="messageLabel" for="additionalMessage">Additional information</label>
+				<textarea id="additionalMessage" rows="4"></textarea>
+				<button id="addMessageButton" type="button">Add information</button>
+				<fieldset class="danger-zone">
+					<legend id="deleteOneLabel">Delete this feedback</legend>
+					<p id="deleteOneHelp" class="help">Type DELETE to confirm.</p>
+					<p id="deleteOneBackup" class="notice warning">Primary content is removed immediately; provider security backups may briefly retain encrypted copies, and an owner-approved anonymized public development record may remain.</p>
+					<input id="deleteOneConfirmation" type="text" autocomplete="off" spellcheck="false" aria-labelledby="deleteOneLabel deleteOneHelp">
+					<button id="deleteOneButton" type="button">Delete this feedback</button>
+				</fieldset>
+			</article>
+
+			<fieldset id="deleteAllZone" class="danger-zone hidden">
+				<legend id="deleteAllLabel">Delete all feedback and backup access</legend>
+				<p id="deleteAllHelp" class="help">Type DELETE ALL to confirm. This also invalidates your backup link.</p>
+				<p id="deleteAllBackup" class="notice warning">Primary content is removed immediately; provider security backups may briefly retain encrypted copies, and an owner-approved anonymized public development record may remain.</p>
+				<input id="deleteAllConfirmation" type="text" autocomplete="off" spellcheck="false" aria-labelledby="deleteAllLabel deleteAllHelp">
+				<button id="deleteAllButton" type="button">Delete all feedback and backup access</button>
+			</fieldset>
+		</section>
+
+		<footer class="policy-links">
+			<button id="privacyButton" type="button">Privacy</button>
+			<button id="supportButton" type="button">Support</button>
+			<button id="termsButton" type="button">Terms</button>
+		</footer>
+    </main>
+    <script nonce="{nonce}" src="{jsUri}"></script>
+</body>
+</html>

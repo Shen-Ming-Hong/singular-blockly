@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "AI blok önerileri için akıl yürütme derinliğini kontrol eder.\n\n- **low**: En hızlı yanıt, minimum akıl yürütme (satır içi öneriler için önerilir)\n- **medium**: Hız ve kalite dengesi\n- **high**: En derin akıl yürütme, yavaş yanıt",
 	"singularBlockly.ai.reasoningEffort.low.description": "En hızlı, minimum akıl yürütme (önerilir)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Hız ve kalite dengesi",
-	"singularBlockly.ai.reasoningEffort.high.description": "En derin akıl yürütme, en yavaş yanıt"
+	"singularBlockly.ai.reasoningEffort.high.description": "En derin akıl yürütme, en yavaş yanıt",
+	"command.provideFeedback.title": "Geri bildirim gönder",
+	"command.showMyFeedback.title": "Geri bildirimlerim"
 }

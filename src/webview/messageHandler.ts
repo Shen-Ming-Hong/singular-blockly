@@ -103,6 +103,7 @@ const BLOCKLY_DIALOG_REQUEST_ID_PATTERN = /^[A-Za-z0-9._:-]{1,128}$/;
 const BLOCKLY_DIALOG_MESSAGE_MAX_LENGTH = 10000;
 const BLOCKLY_DIALOG_VALUE_MAX_LENGTH = 1000;
 const BLOCKLY_BOARD_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+const TOOLBAR_ACTIONS_EXPANDED_WORKSPACE_STATE_KEY = 'blocklyEditor.toolbarActionsExpanded';
 
 type BlocklyDialogPromptRequest = {
 	requestId: string;
@@ -458,7 +459,25 @@ export class WebViewMessageHandler {
 	async handleMessage(message: any): Promise<void> {
 		try {
 			switch (message.command) {
-				case 'log':
+			case 'provideFeedback':
+					if (isPlainRecord(message) && hasOnlyKeys(message, ['command'])) {
+						await vscodeApi.commands.executeCommand('singular-blockly.provideFeedback');
+					} else {
+						log('Rejected malformed provideFeedback message', 'warn');
+				}
+				break;
+			case 'toolbarActionsStateChanged':
+				if (
+					isPlainRecord(message)
+					&& hasOnlyKeys(message, ['command', 'expanded'])
+					&& typeof message.expanded === 'boolean'
+				) {
+					await this.context.workspaceState?.update(TOOLBAR_ACTIONS_EXPANDED_WORKSPACE_STATE_KEY, message.expanded);
+				} else {
+					log('Rejected malformed toolbarActionsStateChanged message', 'warn');
+				}
+				break;
+			case 'log':
 					this.handleLogMessage(message);
 					break;
 				case 'updateCode':
@@ -1610,6 +1629,8 @@ export class WebViewMessageHandler {
 				txtVirtualControls: this.txtVirtualControlsDocument,
 				languagePreference: languagePreference,
 				resolvedLanguage: resolvedLanguage,
+				toolbarActionsExpanded:
+					this.context.workspaceState?.get<boolean>(TOOLBAR_ACTIONS_EXPANDED_WORKSPACE_STATE_KEY) ?? false,
 			});
 
 			// 發送自動備份設定

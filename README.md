@@ -20,12 +20,20 @@ Build with Blockly, preview generated code instantly, and upload through Platfor
 
 [Install from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly) · [Install from Open VSX](https://open-vsx.org/extension/Singular-Ray/singular-blockly) · [Read the documentation](docs/specifications/README.md)
 
+## Feedback, Online Services, and Data Use
+
+Use the clearly labeled **Provide Feedback** button inside the Blockly editor, run **Singular Blockly: Provide Feedback** from the Command Palette, or use VS Code's issue reporter. No GitHub account is required. Opening or filling the form makes no network request; before sending, the form shows the complete payload and asks for explicit confirmation.
+
+Basic environment diagnostics are on by default and can be disabled. Recent structured events are off by default. The allowlist excludes source code, Blockly workspace content, generated code, file and folder names, paths, machine and device identifiers, serial ports, Wi-Fi and IP information, environment variables, credentials, raw errors, and raw logs. One optional screenshot is locally re-encoded, stripped of original metadata, limited to 1920 pixels and 3 MiB, previewed, and sent only after confirmation.
+
+Feedback uses an anonymous secret stored in VS Code SecretStorage and a dedicated Cloudflare D1/R2 service; a private GitHub repository is used for maintainer workflow. This user-initiated support transfer is not telemetry or analytics. See the [Privacy Notice](PRIVACY.md), [Support Policy](SUPPORT.md), [Feedback Service Terms](TERMS.md), and [Security Policy](SECURITY.md).
+
 ## Why Singular Blockly?
 
 - **One visual editor, three programming workflows**: Arduino C++, CyberBrick MicroPython, and TXT Controller Python.
 - **Hardware-ready uploads**: PlatformIO for Arduino, USB or paired LAN OTA for CyberBrick, and SSH for TXT Controller.
 - **Classroom-friendly tools**: localized samples, virtual TXT controls, I/O testing, backups, and clear hardware diagnostics.
-- **Modern Blockly experience**: Blockly 13.2.1 with `@blockly/theme-modern`, light and dark themes, block search, touch support, keyboard navigation, and screen-reader labels—all packaged for offline use.
+- **Modern Blockly experience**: Blockly 13.2.1 with `@blockly/theme-modern`, light and dark themes, block search, touch support, keyboard navigation, and semantic control labels—all packaged for offline use.
 - **Safe project files**: automatic persistence, backup recovery, orphan-block guards, and runtime validation of external workspace edits.
 - **AI-aware projects**: project-local Agent Skills plus optional GitHub Copilot shadow-block suggestions.
 

@@ -98,7 +98,7 @@ gh workflow run recover-github-release.yml --ref master \
 ### VS Code Marketplace Entra 身分
 
 - Azure 資源群組為 `rg-singular-blockly-release`，user-assigned managed identity 為 `singular-blockly-marketplace-publisher`。
-- Federated credential 的 issuer 為 GitHub Actions，audience 為 `api://AzureADTokenExchange`，subject 只允許 `Shen-Ming-Hong/singular-blockly` 的 `release` environment；Azure 入口網站產生的 subject 同時固定 GitHub owner 與 repository 的 immutable numeric ID，避免名稱刪除後被冒用。
+- Federated credential 的 issuer 為 GitHub Actions，audience 為 `api://AzureADTokenExchange`，subject 固定為 `repo:Shen-Ming-Hong/singular-blockly:environment:release`，只允許該 repository 的 `release` environment。GitHub OIDC 的 subject 是名稱型 claim，不含 repository numeric ID；因此 repository 轉移或重新命名時必須先重新審查並更新 FIC，不得把名稱型 subject 描述為不可變 ID 綁定。
 - 該身分不需要 Azure subscription 或 resource group RBAC；`azure/login` 使用 `allow-no-subscriptions: true`，權限只來自 Marketplace publisher 的 Contributor 成員資格。
 - `.github/workflows/verify-marketplace-identity.yml` 只在人工觸發時登入該身分並解析 Marketplace User ID，不會封裝或發布 extension。第一次以 `verify_membership=false` 取得 User ID，將其加入 Marketplace publisher `Singular-Ray` 並設為 Contributor；第二次以 `verify_membership=true` 執行唯讀的 `vsce verify-pat`。
 - `.github/workflows/publish.yml` 只在 `publish-marketplace` job 授予 `id-token: write`，使用固定 commit SHA 的 `azure/login`，先執行 `vsce verify-pat Singular-Ray --azure-credential`，再以同一短效身分發布。

@@ -1,0 +1,13 @@
+export interface Env extends FeedbackEnv {
+	SOURCE_RATE_LIMITER: RateLimit;
+	REPORTER_HMAC_PEPPER: string;
+	IP_HMAC_PEPPER: string;
+	GITHUB_APP_ID: string;
+	GITHUB_INSTALLATION_ID: string;
+	GITHUB_PRIVATE_KEY: string;
+	GITHUB_WEBHOOK_SECRET: string;
+	PRIVATE_GITHUB_REPOSITORY_ID: string;
+	PUBLIC_GITHUB_REPOSITORY_ID: string;
+	MAINTAINER_ACTOR_IDS: string;
+	OWNER_ACTOR_IDS: string;
+}

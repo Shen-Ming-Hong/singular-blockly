@@ -7,6 +7,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as os from 'os';
 import { log, showOutputChannel, disposeOutputChannel } from './services/logging';
 import { LocaleService } from './services/localeService';
 import { SettingsManager } from './services/settingsManager';
@@ -24,6 +25,11 @@ import { ManagedRuntimeProgressPresenter } from './services/managedRuntimeProgre
 import { CoreEnvironmentManager } from './services/coreEnvironmentManager';
 import { ManagedCoreEnvironmentProvider, ProviderCoreEnvironmentProvider } from './services/coreEnvironmentProviders';
 import { PlatformioAiRepairPacketService } from './services/platformioAiRepairPacketService';
+import { FeedbackClient } from './services/feedbackClient';
+import { FeedbackEventRecorder } from './services/feedbackDiagnostics';
+import { FeedbackIdentityService } from './services/feedbackIdentity';
+import { createManagedRuntimeFetch } from './services/managedRuntimeProxy';
+import { FeedbackPanel } from './webview/feedbackPanel';
 
 // AI model manager (initialized when Copilot is available)
 let aiModelManager: AIModelManager | undefined;
@@ -279,11 +285,45 @@ function registerCommands(
 			cleanup: () => managedRuntimeService.cleanup(),
 			getStorageRoot: () => managedRuntimeService.getStorageRoot(),
 		}
-		: undefined;
+			: undefined;
+	let feedbackPanel: FeedbackPanel;
+	const feedbackEvents = new FeedbackEventRecorder();
+	feedbackEvents.record({ stage: 'extension', code: 'activated', outcome: 'succeeded' });
 	const platformioDiagnosticPanel = new PlatformioDiagnosticPanel(context, localeService, platformioDiagnosticService, fs, {
 		managedRuntimeService: diagnosticManagedRuntime,
 		coreEnvironmentManager,
+		openFeedback: prefill => feedbackPanel.show(prefill),
+		recordFeedbackEvent: event => feedbackEvents.record(event),
 	});
+	const feedbackIdentity = new FeedbackIdentityService(context.secrets);
+	const feedbackFetch = createManagedRuntimeFetch(() => {
+		const configuration = vscodeApi.workspace.getConfiguration('http');
+		return {
+			proxy: configuration.get<string>('proxy'),
+			proxySupport: configuration.get<string>('proxySupport'),
+			noProxy: configuration.get<string[]>('noProxy', []),
+		};
+	});
+	feedbackPanel = new FeedbackPanel(
+		context,
+		localeService,
+		feedbackIdentity,
+		new FeedbackClient(feedbackFetch),
+		() => ({
+			extensionVersion: typeof context.extension?.packageJSON?.version === 'string'
+				? context.extension.packageJSON.version
+				: '',
+			vscodeVersion: typeof vscodeApi.version === 'string' ? vscodeApi.version : '',
+			platform: process.platform,
+			release: os.release(),
+			arch: os.arch(),
+			locale: vscodeApi.env.language,
+			remoteName: vscodeApi.env.remoteName,
+			workspaceFoldersCount: vscodeApi.workspace.workspaceFolders?.length ?? 0,
+			workspaceTrusted: vscodeApi.workspace.isTrusted === true,
+			recentEvents: feedbackEvents.snapshot(),
+		})
+	);
 
 	// 註冊開啟 Blockly 編輯器命令
 	const openBlocklyEdit = vscodeApi.commands.registerCommand('singular-blockly.openBlocklyEdit', async () => {
@@ -464,6 +504,36 @@ function registerCommands(
 			vscodeApi.window.showErrorMessage(errorMsg);
 		}
 	});
+	const provideFeedbackCommand = vscodeApi.commands.registerCommand('singular-blockly.provideFeedback', async () => {
+		try {
+			await feedbackPanel.show();
+		} catch (error) {
+			log('[feedback] failed to open panel', 'error', {
+				code: error instanceof Error && 'code' in error
+					? String((error as Error & { code?: unknown }).code)
+					: 'panel-open-failed',
+			});
+			vscodeApi.window.showErrorMessage(await localeService.getLocalizedMessage(
+				'FEEDBACK_OPEN_FAILED',
+				'Unable to open the feedback form. Please try again.'
+			));
+		}
+	});
+	const showMyFeedbackCommand = vscodeApi.commands.registerCommand('singular-blockly.showMyFeedback', async () => {
+		try {
+			await feedbackPanel.showMyFeedback();
+		} catch (error) {
+			log('[feedback] failed to open personal feedback', 'error', {
+				code: error instanceof Error && 'code' in error
+					? String((error as Error & { code?: unknown }).code)
+					: 'panel-open-failed',
+			});
+			vscodeApi.window.showErrorMessage(await localeService.getLocalizedMessage(
+				'FEEDBACK_OPEN_FAILED',
+				'Unable to open the feedback form. Please try again.'
+			));
+		}
+	});
 	const copyPlatformioRepairPacketCommand = vscodeApi.commands.registerCommand(
 		'singular-blockly.copyPlatformioRepairPacket',
 		async () => {
@@ -527,11 +597,14 @@ function registerCommands(
 
 	// 添加到訂閱清單
 	context.subscriptions.push(platformioDiagnosticPanel);
+	context.subscriptions.push(feedbackPanel);
 	context.subscriptions.push(openBlocklyEdit);
 	context.subscriptions.push(toggleThemeCommand);
 	context.subscriptions.push(showOutputCommand);
 	context.subscriptions.push(previewBackupCommand);
 	context.subscriptions.push(checkPlatformioStatusCommand);
+	context.subscriptions.push(provideFeedbackCommand);
+	context.subscriptions.push(showMyFeedbackCommand);
 	context.subscriptions.push(copyPlatformioRepairPacketCommand);
 	context.subscriptions.push(triggerAISuggestionCommand);
 	context.subscriptions.push(stopTxtExecutionCommand);

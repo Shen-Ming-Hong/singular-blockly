@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "控制 AI 積木建議的推理深度。\n\n- **low**：最快回應，最少推理（建議用於內嵌建議）\n- **medium**：速度與品質的平衡\n- **high**：最深入推理，回應較慢",
 	"singularBlockly.ai.reasoningEffort.low.description": "最快，最少推理（建議）",
 	"singularBlockly.ai.reasoningEffort.medium.description": "速度與品質平衡",
-	"singularBlockly.ai.reasoningEffort.high.description": "最深入推理，回應最慢"
+	"singularBlockly.ai.reasoningEffort.high.description": "最深入推理，回應最慢",
+	"command.provideFeedback.title": "提供回饋",
+	"command.showMyFeedback.title": "我的回饋"
 }

@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "Steuert die Denktiefe für KI-Block-Vorschläge.\n\n- **low**: Schnellste Antwort, minimales Denken (empfohlen für Inline-Vorschläge)\n- **medium**: Ausgewogenes Verhältnis von Geschwindigkeit und Qualität\n- **high**: Tiefstes Denken, langsamste Antwort",
 	"singularBlockly.ai.reasoningEffort.low.description": "Schnellste, minimales Denken (empfohlen)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Ausgewogenes Verhältnis von Geschwindigkeit und Qualität",
-	"singularBlockly.ai.reasoningEffort.high.description": "Tiefstes Denken, langsamste Antwort"
+	"singularBlockly.ai.reasoningEffort.high.description": "Tiefstes Denken, langsamste Antwort",
+	"command.provideFeedback.title": "Feedback geben",
+	"command.showMyFeedback.title": "Mein Feedback"
 }

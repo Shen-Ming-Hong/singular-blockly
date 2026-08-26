@@ -1,0 +1,23 @@
+{
+	"schemaVersion": 1,
+	"kind": "bug",
+	"title": "Upload stops before the board is detected",
+	"description": "The upload action stops at the device detection step.",
+	"steps": "Open a Blockly project and select Upload.",
+	"expected": "The connected board should be detected.",
+	"diagnostics": {
+		"extensionVersion": "0.0.0-test",
+		"vscodeVersion": "1.109.0",
+		"osFamily": "linux",
+		"osMajor": "6",
+		"architecture": "x64",
+		"locale": "en",
+		"hostKind": "local",
+		"workspaceKind": "single-folder",
+		"workspaceTrusted": true,
+		"board": "uno",
+		"language": "arduino",
+		"tools": [],
+		"recentEvents": []
+	}
+}

@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support, project-local Agent Skills, AI camera integration, PlatformIO integration, and 15 languages.",
-	"version": "0.87.5",
+	"version": "0.88.0",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.109.0",
@@ -17,6 +17,10 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Shen-Ming-Hong/singular-blockly"
+	},
+	"homepage": "https://github.com/Shen-Ming-Hong/singular-blockly#readme",
+	"bugs": {
+		"url": "https://blockly-support.singular-ai.org/support"
 	},
 	"keywords": [
 		"arduino",
@@ -46,6 +50,18 @@
 				"command": "singular-blockly.checkPlatformioStatus",
 				"title": "%command.checkPlatformioStatus.title%",
 				"category": "Singular Blockly"
+			},
+			{
+				"command": "singular-blockly.provideFeedback",
+				"title": "%command.provideFeedback.title%",
+				"category": "Singular Blockly",
+				"icon": "$(feedback)"
+			},
+			{
+				"command": "singular-blockly.showMyFeedback",
+				"title": "%command.showMyFeedback.title%",
+				"category": "Singular Blockly",
+				"icon": "$(history)"
 			},
 			{
 				"command": "singular-blockly.showAIStatusMenu",
@@ -91,6 +107,13 @@
 				"when": "activeWebviewPanelId == 'blocklyEdit'"
 			}
 		],
+		"menus": {
+			"issue/reporter": [
+				{
+					"command": "singular-blockly.provideFeedback"
+				}
+			]
+		},
 		"viewsContainers": {
 			"activitybar": [
 				{
@@ -244,9 +267,22 @@
 		"test": "vscode-test --label unit",
 		"test:integration": "vscode-test --label integration --forbid-only --fail-zero --skip-extension-dependencies",
 		"release:prepare": "node scripts/release/prepare-release.js --verify-files",
-		"ci:static": "npm run check:project-skills && npm run check:managed-runtime && npm run test:managed-runtime:evidence && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release"
+		"feedback:types": "wrangler types --config workers/feedback/wrangler.jsonc --env-interface FeedbackEnv workers/feedback/worker-configuration.d.ts",
+		"feedback:contracts": "node scripts/feedback/validate-contracts.js",
+		"feedback:portal-locales": "node scripts/feedback/generate-portal-locales.js",
+		"feedback:portal-locales:check": "node scripts/feedback/generate-portal-locales.js --check",
+		"feedback:test": "vitest run --config workers/feedback/vitest.config.mts",
+		"feedback:typecheck": "tsc --noEmit -p workers/feedback/tsconfig.json",
+		"feedback:dev": "wrangler dev --config workers/feedback/wrangler.jsonc --local",
+		"feedback:migrate:local": "wrangler d1 migrations apply singular-blockly-feedback --config workers/feedback/wrangler.jsonc --local",
+		"feedback:verify-vsix": "node scripts/feedback/verify-vsix-privacy.js",
+		"feedback:package": "vsce package",
+		"feedback:verify-vsix:test": "mocha scripts/feedback/verify-vsix-privacy.test.js",
+		"feedback:triage-skill:test": "mocha scripts/feedback/validate-triage-skill.test.js",
+		"ci:static": "npm run check:project-skills && npm run check:managed-runtime && npm run test:managed-runtime:evidence && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release && npm run feedback:portal-locales:check && npm run feedback:contracts && npm run feedback:typecheck && npm run feedback:verify-vsix:test && npm run feedback:triage-skill:test && npm run feedback:test"
 	},
 	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.22.0",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^22.0.0",
 		"@types/sinon": "^22.0.0",
@@ -261,12 +297,15 @@
 		"copy-webpack-plugin": "^14.0.0",
 		"eslint": "^10.8.1",
 		"fs-extra": "^11.4.0",
+		"jpeg-js": "^0.4.4",
 		"ovsx": "1.1.1",
 		"sinon": "^22.1.0",
 		"ts-loader": "^9.6.2",
 		"typescript": "^6.0.3",
+		"vitest": "^4.1.11",
 		"webpack": "^5.109.2",
-		"webpack-cli": "^7.2.2"
+		"webpack-cli": "^7.2.2",
+		"wrangler": "^4.124.0"
 	},
 	"dependencies": {
 		"@blockly/theme-modern": "^13.2.0",

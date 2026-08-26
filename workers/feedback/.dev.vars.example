@@ -1,0 +1,11 @@
+# Copy to .dev.vars for local development only. Never commit real values.
+REPORTER_HMAC_PEPPER=development-placeholder-change-locally
+IP_HMAC_PEPPER=development-placeholder-change-locally
+GITHUB_APP_ID=0
+GITHUB_INSTALLATION_ID=0
+GITHUB_PRIVATE_KEY=development-placeholder-change-locally
+GITHUB_WEBHOOK_SECRET=development-placeholder-change-locally
+PRIVATE_GITHUB_REPOSITORY_ID=0
+PUBLIC_GITHUB_REPOSITORY_ID=0
+MAINTAINER_ACTOR_IDS=0
+OWNER_ACTOR_IDS=0

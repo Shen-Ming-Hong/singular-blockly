@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "Kontroluje głębokość rozumowania dla sugestii bloków AI.\n\n- **low**: Najszybsza odpowiedź, minimalne rozumowanie (zalecane dla sugestii inline)\n- **medium**: Zrównoważona szybkość i jakość\n- **high**: Najgłębsze rozumowanie, wolniejsza odpowiedź",
 	"singularBlockly.ai.reasoningEffort.low.description": "Najszybsze, minimalne rozumowanie (zalecane)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Zrównoważona szybkość i jakość",
-	"singularBlockly.ai.reasoningEffort.high.description": "Najgłębsze rozumowanie, najwolniejsza odpowiedź"
+	"singularBlockly.ai.reasoningEffort.high.description": "Najgłębsze rozumowanie, najwolniejsza odpowiedź",
+	"command.provideFeedback.title": "Prześlij opinię",
+	"command.showMyFeedback.title": "Moje opinie"
 }

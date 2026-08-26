@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "Controla a profundidade de raciocínio para sugestões de blocos de IA.\n\n- **low**: Resposta mais rápida, raciocínio mínimo (recomendado para sugestões em linha)\n- **medium**: Equilíbrio entre velocidade e qualidade\n- **high**: Raciocínio mais profundo, resposta mais lenta",
 	"singularBlockly.ai.reasoningEffort.low.description": "Mais rápido, raciocínio mínimo (recomendado)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Equilíbrio entre velocidade e qualidade",
-	"singularBlockly.ai.reasoningEffort.high.description": "Raciocínio mais profundo, resposta mais lenta"
+	"singularBlockly.ai.reasoningEffort.high.description": "Raciocínio mais profundo, resposta mais lenta",
+	"command.provideFeedback.title": "Enviar feedback",
+	"command.showMyFeedback.title": "Meus comentários"
 }

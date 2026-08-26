@@ -160,6 +160,19 @@ window.languageManager.loadMessages('en', {
 		assert.strictEqual(messages['BUTTON_CANCEL'], 'Cancel');
 	});
 
+	it('should decode escaped line breaks and quotes in localized messages', () => {
+		const contentWithEscapes = String.raw`
+window.languageManager.loadMessages('en', {
+	MULTILINE: 'First line\nSecond line',
+	QUOTED: 'It\'s ready',
+});`;
+		const extractMethod = (localeService as any).extractMessagesFromJs.bind(localeService);
+		const messages = extractMethod(contentWithEscapes);
+
+		assert.strictEqual(messages.MULTILINE, 'First line\nSecond line');
+		assert.strictEqual(messages.QUOTED, "It's ready");
+	});
+
 	it('should use file cache for repeated loads', async () => {
 		// 首次載入
 		await localeService.loadUIMessages();

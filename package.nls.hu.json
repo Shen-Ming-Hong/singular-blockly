@@ -14,5 +14,7 @@
 	"singularBlockly.ai.reasoningEffort.markdownDescription": "Az AI blokk javaslatok gondolkodási mélységét vezérli.\n\n- **low**: Leggyorsabb válasz, minimális gondolkodás (javasolt az inline javaslatokhoz)\n- **medium**: Egyensúly a sebesség és minőség között\n- **high**: Legmélyebb gondolkodás, lassabb válasz",
 	"singularBlockly.ai.reasoningEffort.low.description": "Leggyorsabb, minimális gondolkodás (javasolt)",
 	"singularBlockly.ai.reasoningEffort.medium.description": "Egyensúly a sebesség és minőség között",
-	"singularBlockly.ai.reasoningEffort.high.description": "Legmélyebb gondolkodás, leglassabb válasz"
+	"singularBlockly.ai.reasoningEffort.high.description": "Legmélyebb gondolkodás, leglassabb válasz",
+	"command.provideFeedback.title": "Visszajelzés küldése",
+	"command.showMyFeedback.title": "Visszajelzéseim"
 }

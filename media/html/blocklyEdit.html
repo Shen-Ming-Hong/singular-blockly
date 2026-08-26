@@ -150,14 +150,6 @@
 <body class="theme-{theme}">
     <div class="container">
         <div class="controls-container">
-            <div id="experimentalBlocksIndicator" class="experimental-blocks-indicator hidden" title="">
-                <div class="indicator-icon">
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path fill="currentColor"
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                    </svg>
-                </div>
-            </div>
             <div class="board-select">
                 <label for="boardSelectToggle" id="boardSelectLabel"></label>
                 <div class="board-select-control">
@@ -172,6 +164,25 @@
                 <select id="boardSelect" aria-hidden="true" tabindex="-1">
                     <!-- 板子選項會由 JS 動態生成 -->
                 </select>
+            </div>
+            <div id="toolbarSecondaryActions" class="toolbar-action-group toolbar-secondary-actions" hidden>
+            <div id="experimentalBlocksIndicator" class="experimental-blocks-indicator hidden" title="">
+                <div class="indicator-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor"
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="feedback-entry">
+                <button id="provideFeedbackButton" class="feedback-entry-button" type="button" title=""
+                    aria-label="">
+                    <svg class="feedback-entry-icon" viewBox="0 0 24 24" width="16" height="16"
+                        aria-hidden="true">
+                        <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+                        <path d="M8 9h8M8 13h5" />
+                    </svg>
+                </button>
             </div>
             <div class="language-switch">
                 <button id="languageToggle" title="" aria-haspopup="true" aria-expanded="false">
@@ -216,14 +227,6 @@
                     </svg>
                 </button>
             </div>
-            <div class="backup-switch">
-                <button id="backupButton" title="備份管理">
-                    <svg class="backup-icon" viewBox="0 0 24 24" width="16" height="16">
-                        <path fill="currentColor"
-                            d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
-                    </svg>
-                </button>
-            </div>
             <div class="refresh-switch"> <button id="refreshButton" title="重新整理程式碼">
                     <svg class="refresh-svg" viewBox="0 0 24 24" width="16" height="16">
                         <style>
@@ -260,83 +263,6 @@
                             <path class="refresh-path" d="M23 20v-6h-6" />
                             <path class="refresh-path" d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10" />
                             <path class="refresh-path" d="M3.51 15A9 9 0 0 0 18.36 18.36L23 14" />
-                        </g>
-                    </svg>
-                </button>
-            </div>
-            <!-- CyberBrick 上傳按鈕（僅在選擇 CyberBrick 時顯示） -->
-            <div class="upload-switch" id="uploadContainer" style="display: none;">
-                <button id="uploadButton" title="">
-                    <svg class="upload-svg" viewBox="0 0 24 24" width="16" height="16">
-                        <style>
-                            .upload-svg {
-                                transform-origin: center center;
-                                animation: rotate 1s linear infinite;
-                                animation-play-state: paused;
-                            }
-
-                            @keyframes rotate {
-                                from {
-                                    transform: rotate(0deg);
-                                }
-
-                                to {
-                                    transform: rotate(360deg);
-                                }
-                            }
-
-                            .upload-path {
-                                stroke: currentColor;
-                                stroke-width: 2;
-                                stroke-linecap: round;
-                                stroke-linejoin: round;
-                                fill: none;
-                            }
-                        </style>
-                        <g class="upload-icon">
-                            <path class="upload-path" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline class="upload-path" points="17 8 12 3 7 8" />
-                            <line class="upload-path" x1="12" y1="3" x2="12" y2="15" />
-                        </g>
-                        <!-- TXT 播放圖示（三角形） -->
-                        <g class="play-icon">
-                            <polygon fill="currentColor" points="6,3 20,12 6,21" />
-                        </g>
-                        <!-- TXT 停止圖示（方形） -->
-                        <g class="stop-icon">
-                            <rect fill="currentColor" x="4" y="4" width="16" height="16" rx="2" />
-                        </g>
-                    </svg>
-                </button>
-            </div>
-            <!-- CyberBrick Monitor 按鈕（僅在選擇 CyberBrick 時顯示） -->
-            <div class="monitor-switch" id="monitorContainer" style="display: none;">
-                <button id="monitorBtn" title="">
-                    <svg class="monitor-svg" viewBox="0 0 24 24" width="16" height="16">
-                        <style>
-                            .monitor-svg {
-                                transition: color 0.2s ease;
-                            }
-
-                            .monitor-svg.active {
-                                color: var(--vscode-terminal-ansiGreen, #4ec9b0);
-                            }
-
-                            .monitor-path {
-                                stroke: currentColor;
-                                stroke-width: 2;
-                                stroke-linecap: round;
-                                stroke-linejoin: round;
-                                fill: none;
-                            }
-                        </style>
-                        <g class="monitor-icon">
-                            <!-- Terminal / Console icon -->
-                            <rect class="monitor-path" x="2" y="4" width="20" height="14" rx="2" ry="2" />
-                            <line class="monitor-path" x1="8" y1="21" x2="16" y2="21" />
-                            <line class="monitor-path" x1="12" y1="18" x2="12" y2="21" />
-                            <polyline class="monitor-path" points="7 9 9 11 7 13" />
-                            <line class="monitor-path" x1="11" y1="13" x2="16" y2="13" />
                         </g>
                     </svg>
                 </button>
@@ -396,6 +322,103 @@
                     </svg>
                 </button>
             </div>
+            </div>
+            <div id="toolbarPrimaryActions" class="toolbar-action-group toolbar-primary-actions">
+                <div class="backup-switch">
+                    <button id="backupButton" title="備份管理">
+                        <svg class="backup-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                            <path fill="currentColor"
+                                d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                        </svg>
+                    </button>
+                </div>
+                <!-- 所有已選擇的開發板皆顯示上傳按鈕 -->
+                <div class="upload-switch" id="uploadContainer" style="display: none;">
+                    <button id="uploadButton" title="">
+                        <svg class="upload-svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                            <style>
+                                .upload-svg {
+                                    transform-origin: center center;
+                                    animation: rotate 1s linear infinite;
+                                    animation-play-state: paused;
+                                }
+
+                                @keyframes rotate {
+                                    from {
+                                        transform: rotate(0deg);
+                                    }
+
+                                    to {
+                                        transform: rotate(360deg);
+                                    }
+                                }
+
+                                .upload-path {
+                                    stroke: currentColor;
+                                    stroke-width: 2;
+                                    stroke-linecap: round;
+                                    stroke-linejoin: round;
+                                    fill: none;
+                                }
+                            </style>
+                            <g class="upload-icon">
+                                <path class="upload-path" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline class="upload-path" points="17 8 12 3 7 8" />
+                                <line class="upload-path" x1="12" y1="3" x2="12" y2="15" />
+                            </g>
+                            <g class="play-icon">
+                                <polygon fill="currentColor" points="6,3 20,12 6,21" />
+                            </g>
+                            <g class="stop-icon">
+                                <rect fill="currentColor" x="4" y="4" width="16" height="16" rx="2" />
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Monitor 對所有有效開發板顯示 -->
+                <div class="monitor-switch" id="monitorContainer" style="display: none;">
+                    <button id="monitorBtn" title="">
+                        <svg class="monitor-svg" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                            <style>
+                                .monitor-svg {
+                                    transition: color 0.2s ease;
+                                }
+
+                                .monitor-svg.active {
+                                    color: var(--vscode-terminal-ansiGreen, #4ec9b0);
+                                }
+
+                                .monitor-path {
+                                    stroke: currentColor;
+                                    stroke-width: 2;
+                                    stroke-linecap: round;
+                                    stroke-linejoin: round;
+                                    fill: none;
+                                }
+                            </style>
+                            <g class="monitor-icon">
+                                <rect class="monitor-path" x="2" y="4" width="20" height="14" rx="2" ry="2" />
+                                <line class="monitor-path" x1="8" y1="21" x2="16" y2="21" />
+                                <line class="monitor-path" x1="12" y1="18" x2="12" y2="21" />
+                                <polyline class="monitor-path" points="7 9 9 11 7 13" />
+                                <line class="monitor-path" x1="11" y1="13" x2="16" y2="13" />
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button id="toolbarActionsToggle" type="button" aria-controls="toolbarSecondaryActions"
+                aria-expanded="false" title="" aria-label="">
+                <svg class="toolbar-actions-toggle-icon" viewBox="0 0 24 24" width="16" height="16"
+                    aria-hidden="true">
+                    <g class="toolbar-collapse-icon">
+                        <polyline points="9 6 15 12 9 18" />
+                    </g>
+                    <g class="toolbar-expand-icon">
+                        <polyline points="15 6 9 12 15 18" />
+                    </g>
+                </svg>
+            </button>
         </div>
 
         <!-- 實驗積木提示容器 -->

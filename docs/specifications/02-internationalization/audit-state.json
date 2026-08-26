@@ -2,8 +2,8 @@
 	"schemaVersion": 1,
 	"policyVersion": "1.0.0",
 	"lastFullAudit": {
-		"completedAt": "2026-08-16T15:46:50.000Z",
-		"manifestHash": "17cd6b52a9162eb567f3de9df17e2b47adf6014415122ede969e9c02542b8b55",
+		"completedAt": "2026-08-25T17:17:39.000Z",
+		"manifestHash": "97d4904234605a02d063b8b03dc6e63f7038f45e349c4d947393f8f024125d6a",
 		"result": "PASS_WITH_ADVISORIES",
 		"counts": {
 			"Blocker": 0,

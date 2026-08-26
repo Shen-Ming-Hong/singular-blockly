@@ -8,3 +8,7 @@ Copyright 2012 Google LLC
 
 This product includes software developed by PlatformIO (<https://platformio.org/>).
 PlatformIO is licensed under the Apache License, Version 2.0.
+
+This product includes jpeg-js (<https://github.com/jpeg-js/jpeg-js>).
+jpeg-js is licensed under the BSD 3-Clause License.
+Copyright (c) 2014, Einar Lielmanis, Eddie Wellman
