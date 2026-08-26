@@ -355,8 +355,8 @@
 - [x] T237 [DEPLOY:migration-worker] 核對正式 D1 的 `0003` schema 後補齊 migration registry、套用 `0004_detached_development_approvals.sql`，部署回饋 Worker 並確認目前版本、健康檢查、政策頁與 Access 保護路徑
 - [x] T238 [DEPLOY:github-webhook] 在私人 feedback repository 建立只訂閱 Issues／Issue comment 的 webhook，以同一組未落盤隨機密鑰同步 Cloudflare secret，並以正式 issue-comment delivery 驗證 HTTP 202
 - [x] T239 [VERIFY:production-smoke] 以無敏感內容的單一 production synthetic reporter 完成 create/list/detail/message replay、recovery session、私密同步、status、public-reply、owner 匿名核准、單筆刪除、delete-all、session 撤銷、GitHub tombstone 與核准證據斷鏈；刪除 synthetic public Issue 並確認 active synthetic feedback／pending outbox 均為 0
-- [ ] T240 [RELEASE:publisher-gates] 由發布者完成 VS Code Marketplace 後台身分／隱私／支援／條款／掃描，以及 Open VSX Publisher Agreement／namespace／專用 token／server-side scans；由資料控制者確認教育與未成年人情境後，才可上傳或發布候選 VSIX
-- [x] T241 [LEGAL:data-controller-authorization] 2026-08-26 由專案負責人明確確認具資料控制者授權，接受 Cloudflare／GitHub 跨境與備份限制、保存與刪除邊界、教育／未成年人告知及必要同意責任、使用者主動輸入／截圖風險與匿名憑證遺失限制；平台 server-side scans 與發布後 metadata 仍保留於 T240
+- [x] T240 [RELEASE:publisher-gates] 2026-08-26 由發布者完成 VS Code Marketplace 後台身分／隱私／支援／條款與發布驗證，以及 Open VSX Publisher Agreement／namespace／專用 token／公開 `verified` 版本與發布後 metadata 檢查；GitHub Actions run `32924281240` 以同一 SHA-256 `a99f01a6d8db79651c63b12733af3f67ccda398c712a653562aad4e7051e782b` VSIX 完成 0.88.0 三目的地發布，舊 Open VSX rollback token 於新 token 使用成功後經負責人核准永久撤銷，且未略過真實平台 finding
+- [x] T241 [LEGAL:data-controller-authorization] 2026-08-26 由專案負責人明確確認具資料控制者授權，接受 Cloudflare／GitHub 跨境與備份限制、保存與刪除邊界、教育／未成年人告知及必要同意責任、使用者主動輸入／截圖風險與匿名憑證遺失限制；平台發布與 metadata 證據已於 T240 完成
 - [x] T242 [LCR:vsix-fine-grained-github-pat] VSIX 隱私 verifier 同時拒絕 `gh*_*` 舊式與 `github_pat_*` fine-grained GitHub token，並以合成 token fixture 防止掃描規則回歸；既有 0.88.0 候選 VSIX 重新掃描通過
 - [x] T243 [CodeQL:biased-cryptographic-random] 將 32 字元公開回報編號的隨機位元組映射改為等價位元遮罩並加入固定邊界位元組測試，修復 PR #142 的 Code Scanning Alert #19，且不以 dismissal 或 suppressions 略過高風險 finding
 
