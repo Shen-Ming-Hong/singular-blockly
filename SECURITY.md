@@ -4,8 +4,8 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.87.x  | :white_check_mark: |
-| < 0.87  | :x:                |
+| 0.88.x  | :white_check_mark: |
+| < 0.88  | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.87.5 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.88.0 |
+
+> **0.88.0 更新 Update**: 公開回報編號的 32 字元均勻映射改用等價位元遮罩，消除 GitHub Code Scanning Alert #19（CodeQL `js/biased-cryptographic-random`）並以固定邊界位元組補足回歸測試。
+> Public feedback references now map random bytes uniformly to the 32-character alphabet with an equivalent bit mask, resolving GitHub Code Scanning Alert #19 (CodeQL `js/biased-cryptographic-random`) with regression coverage for boundary bytes.
 
 > **0.87.5 更新 Update**: 移除 Project Skill 備份與無效工作區隔離檔名時間戳中的無效字串替換，在維持既有 UTC 格式不變的同時修復 GitHub Code Scanning Alerts #12 與 #13（CodeQL `js/identity-replacement`、CWE-116）；本地 `npm audit` 顯示 0 vulnerabilities，GitHub Dependabot open alerts 為 0。
 > Removed ineffective string replacements from Project Skill backup and invalid-workspace quarantine filename timestamps, preserving the existing UTC format while fixing GitHub Code Scanning Alerts #12 and #13 (CodeQL `js/identity-replacement`, CWE-116); local `npm audit` reports 0 vulnerabilities and GitHub Dependabot has 0 open alerts.
@@ -64,4 +67,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-08-19_
+_Last updated: 2026-08-26_

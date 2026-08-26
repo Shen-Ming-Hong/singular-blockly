@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔒 安全性 Security
 
+- 將公開回報編號的 32 字元均勻映射改為等價的位元遮罩，避免取模運算觸發 CodeQL `js/biased-cryptographic-random` 高風險警報，並新增固定邊界位元組的回歸測試（Code Scanning Alert #19）
+  Replaced modulo with an equivalent bit mask for the uniformly mapped 32-character public feedback reference, clearing the high-severity CodeQL `js/biased-cryptographic-random` alert and adding regression coverage for boundary bytes (Code Scanning Alert #19)
 - 回饋服務現在以串流硬限制 request body、32-byte HMAC／webhook secrets、fail-closed production 設定與 D1 readiness health check 保護公開 API，並拒絕在公開摘要中出現個資、路徑、機器資訊、私密識別碼、診斷值或原文片段
   The feedback service now protects public APIs with streaming request-body limits, 32-byte HMAC and webhook secrets, fail-closed production configuration, and a D1 readiness health check, while rejecting personal data, paths, machine information, private identifiers, diagnostic values, and verbatim private excerpts from public summaries
 - 公開摘要的去識別化檢查現在涵蓋建立後的所有 reporter 與 maintainer 訊息；截圖 JPEG 也必須在受限的記憶體與解析度預算內完成實際解碼，只有 marker 結構的偽造圖片會被拒絕

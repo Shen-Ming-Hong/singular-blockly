@@ -1,5 +1,8 @@
 import type { ValidatedCreateFeedback } from './schemas';
 
+const PUBLIC_REFERENCE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const PUBLIC_REFERENCE_ALPHABET_MASK = 0b11111;
+
 export interface CreatedFeedbackResponse {
 	id: string;
 	reference: string;
@@ -21,8 +24,9 @@ export interface CreatedFeedbackResponse {
 }
 
 export function publicReference(randomBytes = crypto.getRandomValues(new Uint8Array(8))): string {
-	const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-	return `SB-${[...randomBytes].map(byte => alphabet[byte % alphabet.length]).join('')}`;
+	return `SB-${[...randomBytes]
+		.map(byte => PUBLIC_REFERENCE_ALPHABET[byte & PUBLIC_REFERENCE_ALPHABET_MASK])
+		.join('')}`;
 }
 
 export async function sha256Json(value: unknown): Promise<string> {
