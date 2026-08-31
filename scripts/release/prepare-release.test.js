@@ -167,7 +167,7 @@ describe('publish workflow retry contract', () => {
 		const marketplaceJob = workflow.match(/  publish-marketplace:[\s\S]*?(?=\n  publish-open-vsx:)/u)?.[0];
 		assert.ok(marketplaceJob);
 		assert.match(marketplaceJob, /id-token: write/);
-		assert.match(marketplaceJob, /azure\/login@[0-9a-f]{40} # v3\.0\.1/);
+		assert.match(marketplaceJob, /azure\/login@[0-9a-f]{40} # v3\.0\.2/);
 		assert.match(marketplaceJob, /client-id: \$\{\{ vars\.AZURE_CLIENT_ID \}\}/);
 		assert.match(marketplaceJob, /allow-no-subscriptions: true/);
 		assert.ok(!marketplaceJob.includes('subscription-id:'));
