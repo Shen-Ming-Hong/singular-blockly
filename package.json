@@ -286,7 +286,7 @@
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^22.0.0",
 		"@types/sinon": "^22.0.0",
-		"@types/vscode": "^1.109.0",
+		"@types/vscode": "^1.134.0",
 		"@typescript-eslint/eslint-plugin": "^8.68.0",
 		"@typescript-eslint/parser": "^8.68.0",
 		"@vscode/test-cli": "^0.0.15",
@@ -303,9 +303,9 @@
 		"ts-loader": "^9.6.2",
 		"typescript": "^6.0.3",
 		"vitest": "^4.1.11",
-		"webpack": "^5.109.2",
+		"webpack": "^5.110.1",
 		"webpack-cli": "^7.2.2",
-		"wrangler": "^4.124.0"
+		"wrangler": "^4.127.0"
 	},
 	"dependencies": {
 		"@blockly/theme-modern": "^13.2.0",
