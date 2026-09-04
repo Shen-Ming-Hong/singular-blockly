@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support, project-local Agent Skills, AI camera integration, PlatformIO integration, and 15 languages.",
-	"version": "0.88.0",
+	"version": "0.88.1",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.109.0",
@@ -316,9 +316,9 @@
 	},
 	"overrides": {
 		"js-yaml": "^5.2.2",
-		"qs": "^6.15.2",
+		"qs": "^6.16.0",
 		"serialize-javascript": "^7.0.5",
-		"fast-uri": "^3.1.5",
+		"fast-uri": "^3.1.7",
 		"diff": ">=8.0.3",
 		"flatted": ">=3.4.0",
 		"picomatch": "2.3.2",

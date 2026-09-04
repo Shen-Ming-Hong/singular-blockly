@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.88.0 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.88.1 |
+
+> **0.88.1 更新 Update**: 間接開發相依 `fast-uri` 升級至 `3.1.7`，修復 Dependabot Alerts #105、#106、#108 與 #109 的四項高風險 host confusion／SSRF 漏洞，以及 GHSA-qw65-cvwx-89v3 與 GHSA-58mr-gqgx-xq4g 的兩項新增高風險公告；`browserslist` 升級至 `4.28.7`，修復兩項高風險記憶體耗盡與 prototype-write 漏洞；`qs` 升級至 `6.16.0`，修復兩項中風險拒絕服務漏洞。本地 `npm audit` 顯示 0 vulnerabilities。
+> Transitive development dependency `fast-uri` was upgraded to `3.1.7`, fixing four high-severity host-confusion/SSRF vulnerabilities in Dependabot Alerts #105, #106, #108, and #109 plus two newly disclosed high-severity advisories, GHSA-qw65-cvwx-89v3 and GHSA-58mr-gqgx-xq4g; `browserslist` was upgraded to `4.28.7`, fixing two high-severity memory-exhaustion and prototype-write vulnerabilities; `qs` was upgraded to `6.16.0`, fixing two medium-severity denial-of-service vulnerabilities. Local `npm audit` reports 0 vulnerabilities.
 
 > **0.88.0 更新 Update**: 公開回報編號的 32 字元均勻映射改用等價位元遮罩，消除 GitHub Code Scanning Alert #19（CodeQL `js/biased-cryptographic-random`）並以固定邊界位元組補足回歸測試。
 > Public feedback references now map random bytes uniformly to the 32-character alphabet with an equivalent bit mask, resolving GitHub Code Scanning Alert #19 (CodeQL `js/biased-cryptographic-random`) with regression coverage for boundary bytes.
@@ -67,4 +70,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-08-26_
+_Last updated: 2026-09-04_
