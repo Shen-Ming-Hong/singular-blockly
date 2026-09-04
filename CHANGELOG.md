@@ -8,6 +8,17 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.88.1] - 2026-09-04
+
+### 🔒 安全性 Security
+
+- 將間接開發相依的 `fast-uri` override 從 3.1.5 升級至 3.1.7，修復四項 CVSS 7.5 host confusion／SSRF 高風險漏洞（CVE-2026-75931、CVE-2026-75899、CVE-2026-75975、CVE-2026-76172），以及兩項新增的 authority injection／IP-literal bracket host confusion 高風險公告（GHSA-qw65-cvwx-89v3、GHSA-58mr-gqgx-xq4g）；並關閉 Dependabot Alerts #105、#106、#108 與 #109
+  Upgraded the transitive development dependency `fast-uri` override from 3.1.5 to 3.1.7, fixing four CVSS 7.5 high-severity host-confusion/SSRF vulnerabilities (CVE-2026-75931, CVE-2026-75899, CVE-2026-75975, and CVE-2026-76172) plus two newly disclosed high-severity authority-injection/IP-literal-bracket host-confusion advisories (GHSA-qw65-cvwx-89v3 and GHSA-58mr-gqgx-xq4g), and closing Dependabot Alerts #105, #106, #108, and #109
+- 將間接開發相依 `browserslist` 從 4.28.1 升級至 4.28.7，修復未限制快取記憶體成長與不可信自訂統計造成的崩潰／prototype write 高風險漏洞（CVE-2026-73089、CVE-2026-73088；CVSS 7.5）
+  Upgraded the transitive development dependency `browserslist` from 4.28.1 to 4.28.7, fixing high-severity unbounded cache growth and untrusted custom-stat crash/prototype-write vulnerabilities (CVE-2026-73089 and CVE-2026-73088; CVSS 7.5)
+- 將間接開發相依的 `qs` override 從 6.15.2 升級至 6.16.0，修復 array-limit bypass 與攻擊者控制 `isBuffer` 造成的中風險拒絕服務漏洞（CVE-2026-82562，CVSS 3.7；CVE-2026-82417，CVSS 5.3）
+  Upgraded the transitive development dependency `qs` override from 6.15.2 to 6.16.0, fixing medium-severity denial-of-service vulnerabilities caused by an array-limit bypass and attacker-controlled `isBuffer` handling (CVE-2026-82562, CVSS 3.7; CVE-2026-82417, CVSS 5.3)
+
 ## [0.88.0] - 2026-08-26
 
 ### ✨ 新增功能 Features
