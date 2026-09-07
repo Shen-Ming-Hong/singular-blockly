@@ -286,8 +286,8 @@
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^22.0.0",
 		"@types/sinon": "^22.0.0",
-		"@types/vscode": "^1.109.0",
-		"@typescript-eslint/eslint-plugin": "^8.68.0",
+		"@types/vscode": "^1.136.0",
+		"@typescript-eslint/eslint-plugin": "^8.69.0",
 		"@typescript-eslint/parser": "^8.68.0",
 		"@vscode/test-cli": "^0.0.15",
 		"@vscode/test-electron": "^3.1.0",
@@ -303,13 +303,13 @@
 		"ts-loader": "^9.6.2",
 		"typescript": "^6.0.3",
 		"vitest": "^4.1.11",
-		"webpack": "^5.110.1",
-		"webpack-cli": "^7.2.2",
-		"wrangler": "^4.127.0"
+		"webpack": "^5.110.3",
+		"webpack-cli": "^7.2.3",
+		"wrangler": "^4.129.0"
 	},
 	"dependencies": {
 		"@blockly/theme-modern": "^13.2.0",
-		"@vscode/proxy-agent": "0.44.0",
+		"@vscode/proxy-agent": "0.45.0",
 		"form-data": "^4.0.6",
 		"node-ssh": "^13.2.1",
 		"tar": "7.5.22"
