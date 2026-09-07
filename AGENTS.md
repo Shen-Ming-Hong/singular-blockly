@@ -7,7 +7,7 @@
 - VS Code extension for visual Arduino/MicroPython programming with Google Blockly.
 - Generates Arduino C++ through PlatformIO and MicroPython through `mpremote` for CyberBrick.
 - Supports 15 locales; validate localization changes before shipping.
-- Runtime/tooling baseline: TypeScript 6.0.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, VS Code `^1.109.0`, Node.js 24.20.0 for the default contributor toolchain (minimum supported: 22.16.0).
+- Runtime/tooling baseline: TypeScript 6.0.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, VS Code `^1.126.0`, Node.js 24.20.0 for the default contributor toolchain (minimum supported: 22.16.0).
 - PlatformIO IDE (`platformio.platformio-ide`) is an extension dependency.
 
 ## Project Structure

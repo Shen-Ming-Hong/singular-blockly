@@ -158,7 +158,7 @@ Wi-Fi passwords, OTA tokens, pairing secrets, and TXT passwords are stored in VS
 
 ## Requirements
 
-- VS Code 1.109.0 or later, or a compatible Open VSX editor such as VSCodium.
+- VS Code 1.126.0 or later, or VSCodium 1.126.04524 or later. Upgrade older editors before installing this extension version.
 - A workspace folder with write access.
 - Arduino / ESP32: PlatformIO provider and the C/C++ extension (`ms-vscode.cpptools`).
 - CyberBrick: USB for normal upload and first-time OTA setup; a shared local network only for OTA. The extension prepares `mpremote` in its own managed Python runtime after activation and rechecks it when the Blockly editor opens.
@@ -206,7 +206,7 @@ Example project: [CyberBrick SoccerBot](https://github.com/Shen-Ming-Hong/Blockl
 
 ## Development
 
-Contributor baseline: Node.js 24.20.0 (minimum supported: 22.16.0), TypeScript 6.0.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, and VS Code 1.109.0+.
+Contributor baseline: Node.js 24.20.0 (minimum supported: 22.16.0), TypeScript 6.0.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, and VS Code 1.126.0+.
 
 ```bash
 npm install

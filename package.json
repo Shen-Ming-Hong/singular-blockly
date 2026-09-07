@@ -5,7 +5,7 @@
 	"version": "0.88.1",
 	"license": "Apache-2.0",
 	"engines": {
-		"vscode": "^1.109.0",
+		"vscode": "^1.126.0",
 		"node": ">=22.16.0"
 	},
 	"preview": true,
@@ -284,9 +284,9 @@
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.22.0",
 		"@types/mocha": "^10.0.10",
-		"@types/node": "^22.0.0",
+		"@types/node": "~24.13.3",
 		"@types/sinon": "^22.0.0",
-		"@types/vscode": "^1.109.0",
+		"@types/vscode": "~1.125.0",
 		"@typescript-eslint/eslint-plugin": "^8.69.0",
 		"@typescript-eslint/parser": "^8.69.0",
 		"@vscode/test-cli": "^0.0.15",

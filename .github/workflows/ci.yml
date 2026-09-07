@@ -94,12 +94,13 @@ jobs:
           npm run release:prepare
 
   unit:
-    name: Unit tests (${{ matrix.os }})
+    name: Unit tests (${{ matrix.editor }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
+        editor: [vscode, vscodium]
         os:
           - ubuntu-latest
           - windows-latest
@@ -124,6 +125,10 @@ jobs:
           npm --version
           npm ci
 
+      - name: Download verified VSCodium
+        if: matrix.editor == 'vscodium'
+        run: node scripts/editors/download-vscodium.js
+
       - name: Configure isolated VS Code test directories
         shell: bash
         run: echo "VSCODE_TEST_TEMP_DIR=$RUNNER_TEMP/singular-blockly-vscode-test" >> "$GITHUB_ENV"
@@ -135,15 +140,27 @@ jobs:
         run: npm run test:managed-runtime:paths
 
       - name: Run unit tests with coverage
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.editor == 'vscode'
         run: xvfb-run -a npm run test:coverage:ci
 
       - name: Run unit tests
         if: runner.os != 'Linux'
         run: npm run test:unit:ci
 
+      - name: Run VSCodium Linux unit tests
+        if: runner.os == 'Linux' && matrix.editor == 'vscodium'
+        run: xvfb-run -a npm run test:unit:ci
+
+      - name: Package and install VSCodium VSIX
+        if: matrix.editor == 'vscodium'
+        shell: bash
+        run: |
+          npm exec -- vsce package --out vscodium-smoke.vsix
+          npm run feedback:verify-vsix -- vscodium-smoke.vsix
+          npm run test:managed-runtime:vsix -- --vsix vscodium-smoke.vsix
+
       - name: Archive coverage report for cross-platform download
-        if: runner.os == 'Linux' && always()
+        if: runner.os == 'Linux' && matrix.editor == 'vscode' && always()
         shell: bash
         run: |
           if [[ -d coverage ]]; then
@@ -151,7 +168,7 @@ jobs:
           fi
 
       - name: Upload coverage report
-        if: runner.os == 'Linux' && always()
+        if: runner.os == 'Linux' && matrix.editor == 'vscode' && always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage-linux

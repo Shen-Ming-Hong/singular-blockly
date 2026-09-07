@@ -6,7 +6,7 @@ Singular Blockly 以 PR 為唯一的 `master` 變更入口，並以 annotated `v
 
 `.github/workflows/ci.yml` 會在所有 PR、`master` push 與正式發布 workflow call 執行：
 
-- 主要建置、三平台測試與封裝使用 Node.js 24.20.0 及其隨附 npm；另以 Node.js 22.16.0 執行最低工具鏈相容性檢查，並納入 CI Gate。VS Code 測試版仍固定為 1.109.0，其 Extension Host 使用 Node.js 22.21.1，共用 @types/node 維持 22。
+- 主要建置、三平台測試與封裝使用 Node.js 24.20.0 及其隨附 npm；另以 Node.js 22.16.0 執行最低工具鏈相容性檢查，並納入 CI Gate。VS Code 測試版仍固定為 1.126.0，其 Extension Host 使用 Node.js 24.15.0，共用 @types/node 使用 24.13.3。
 - `npm ci` 使用 lockfile 與 npm cache。
 - 靜態檢查執行 TypeScript／webpack 編譯、`src` 與 i18n／release scripts ESLint、確定性翻譯驗證、i18n contract tests、release helper tests，以及高嚴重度 `npm audit`。
 - Ubuntu、Windows、macOS 都執行 unit tests，並用 `--forbid-only` 阻擋 `.only`。
@@ -130,3 +130,7 @@ gh workflow run recover-github-release.yml --ref master \
 - 只有 GitHub Release job 使用 `contents: write`；只有 Marketplace 身分驗證／發布 job 使用 `id-token: write`；翻譯驗證不使用寫入權限。
 - 所有第三方 Actions 固定完整 commit SHA，Dependabot 每週追蹤 npm 與 GitHub Actions 更新。
 - 帳號、Copilot 與硬體 integration tests 保留在發布技能的人工驗收，不放入無憑證 CI。
+
+VSCodium 最低驗收版為 1.126.04524（上游 VS Code 1.126.0）；CI 在三平台分別執行 VS Code 與 VSCodium 測試，兩者使用隔離 profile。VSCodium 官方下載檔必須先通過 SHA-256，測試 setup 會確認宿主 Node 24 與 API 1.126 基線。
+
+本地 VSCodium 驗證：先執行 `node scripts/editors/download-vscodium.js`，再將輸出的完整執行檔路徑設為 `VSCODE_EXECUTABLE_PATH`，並設定獨立的 `VSCODE_TEST_TEMP_DIR`，執行 `npm run test:unit:ci`。同一個 `VSCODE_EXECUTABLE_PATH` 亦適用 `npm run test:managed-runtime:vsix -- --vsix <測試產物>`。不設定此變數時使用固定的最低 VS Code。

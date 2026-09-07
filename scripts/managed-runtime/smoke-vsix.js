@@ -16,6 +16,18 @@ function argument(name) {
   return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
+async function runEditorCommand(args) {
+  const executable = process.env.VSCODE_EXECUTABLE_PATH;
+  if (!executable) { return runVSCodeCommand(args, { version: '1.126.0' }); }
+  const resources = process.platform === 'darwin'
+    ? path.resolve(path.dirname(executable), '..', 'Resources')
+    : path.join(path.dirname(executable), 'resources');
+  const cli = path.join(resources, 'app', 'out', 'cli.js');
+  return { stdout: execFileSync(executable, [cli, ...args], {
+    encoding: 'utf8', env: { ...process.env, ELECTRON_RUN_AS_NODE: '1' }, timeout: 120000,
+  }) };
+}
+
 async function main() {
   const vsix = path.resolve(argument('--vsix') || process.env.VSIX_PATH || '');
   if (!vsix || !fs.statSync(vsix).isFile()) { throw new Error('A valid --vsix path is required'); }
@@ -46,8 +58,8 @@ async function main() {
       '--user-data-dir', path.join(temporary, 'user-data'),
       '--extensions-dir', path.join(temporary, 'extensions'),
     ];
-    await runVSCodeCommand([...profileArgs, '--install-extension', vsix, '--force'], { version: '1.109.0' });
-    const listed = await runVSCodeCommand([...profileArgs, '--list-extensions', '--show-versions'], { version: '1.109.0' });
+    await runEditorCommand([...profileArgs, '--install-extension', vsix, '--force']);
+    const listed = await runEditorCommand([...profileArgs, '--list-extensions', '--show-versions']);
     const expected = `${extensionPackage.publisher}.${extensionPackage.name}@${extensionPackage.version}`.toLowerCase();
     assert.ok(listed.stdout.toLowerCase().split(/\r?\n/).includes(expected), `Installed extension list did not contain ${expected}`);
   } finally {
