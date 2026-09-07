@@ -9,7 +9,13 @@ updates:
       timezone: Asia/Taipei
     open-pull-requests-limit: 10
     groups:
+      worker-tests:
+        patterns:
+          - vitest
+          - "@cloudflare/vitest-pool-workers"
       npm-minor-and-patch:
+        exclude-patterns:
+          - "@types/vscode"
         update-types:
           - minor
           - patch
