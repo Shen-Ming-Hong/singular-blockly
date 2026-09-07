@@ -13,7 +13,7 @@ const ROOT = path.join(__dirname, '..', '..', '..');
 suite('Legacy MCP Retirement Contract', () => {
 	test('package contributions and dependencies expose no legacy server or user Node setup', () => {
 		const packageJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
-		assert.strictEqual(packageJson.engines.vscode, '^1.109.0');
+		assert.strictEqual(packageJson.engines.vscode, '^1.126.0');
 		assert.strictEqual(packageJson.engines.node, '>=22.16.0', 'contributor/build Node baseline remains allowed');
 		assert.ok(!packageJson.contributes.mcpServerDefinitionProviders);
 		assert.ok(!packageJson.contributes.commands.some((command: any) => /mcp/i.test(command.command)));

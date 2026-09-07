@@ -28,7 +28,8 @@ export default defineConfig([
 	{
 		// Unit tests — opens test workspace for blockly editor tests
 		label: 'unit',
-		version: '1.109.0',
+		version: '1.126.0',
+		useInstallation: process.env.VSCODE_EXECUTABLE_PATH ? { fromPath: process.env.VSCODE_EXECUTABLE_PATH } : undefined,
 		files: 'out/test/**/*.test.js',
 		extensionDevelopmentPath,
 		workspaceFolder: testWorkspace,
@@ -45,7 +46,8 @@ export default defineConfig([
 		// Integration tests — opens real workspace with Copilot access
 		// Shares user's extensions dir for Copilot, uses separate user-data-dir
 		label: 'integration',
-		version: '1.109.0',
+		version: '1.126.0',
+		useInstallation: process.env.VSCODE_EXECUTABLE_PATH ? { fromPath: process.env.VSCODE_EXECUTABLE_PATH } : undefined,
 		files: 'out/test/integration/**/*.test.js',
 		extensionDevelopmentPath,
 		workspaceFolder: testWorkspace,
