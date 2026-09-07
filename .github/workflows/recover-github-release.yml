@@ -63,10 +63,10 @@ jobs:
         shell: bash
         run: git fetch --force --no-tags origin "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
 
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 24.20.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22.16.0
+          node-version: 24.20.0
 
       - name: Verify release metadata
         id: metadata

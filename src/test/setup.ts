@@ -6,3 +6,12 @@ if (!repositoryRoot || !path.isAbsolute(repositoryRoot)) {
 }
 
 process.chdir(repositoryRoot);
+
+process.stdout.write(
+	`Test Extension Host: ${JSON.stringify({
+		node: process.versions.node,
+		electron: process.versions.electron,
+		platform: process.platform,
+		arch: process.arch,
+	})}\n`
+);
