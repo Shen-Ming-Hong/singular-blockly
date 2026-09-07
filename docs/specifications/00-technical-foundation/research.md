@@ -25,7 +25,7 @@
 | Blockly                   | 13.2.1   | 視覺化程式編輯 | Google 官方積木程式庫    |
 | @blockly/theme-modern     | 13.2.0   | 現代化 UI 主題 | 擴展主題套件             |
 | TypeScript                | 5.9.3    | 型別安全開發   | Extension Host 程式碼    |
-| Node.js                   | 22.16.0+ | 貢獻者工具鏈   | 建置、測試與封裝         |
+| Node.js                   | 24.20.0（最低 22.16.0） | 貢獻者工具鏈   | 建置、測試與封裝         |
 | VS Code API               | 1.109.0+ | 編輯器整合     | WebView、Commands、Skills |
 | Webpack                   | 5.102.1  | 打包工具       | 產出 `dist/extension.js` |
 

@@ -242,7 +242,7 @@ describe('GitHub workflow context contract', () => {
 			'utf8'
 		);
 		const releaseRefs = workflow.match(/ref: \$\{\{ inputs\.release_tag \|\| github\.sha \}\}/gu) || [];
-		assert.strictEqual(releaseRefs.length, 3);
+		assert.strictEqual(releaseRefs.length, 4);
 		assert.match(workflow, /git fetch --force --no-tags origin "refs\/tags\/\$\{RELEASE_TAG\}:refs\/tags\/\$\{RELEASE_TAG\}"/);
 	});
 });

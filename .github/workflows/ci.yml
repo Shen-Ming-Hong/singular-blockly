@@ -43,14 +43,17 @@ jobs:
         with:
           ref: ${{ inputs.release_tag || github.sha }}
 
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 24.20.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22.16.0
+          node-version: 24.20.0
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          node --version
+          npm --version
+          npm ci
 
       - name: Review dependency changes
         if: github.event_name == 'pull_request'
@@ -63,6 +66,32 @@ jobs:
 
       - name: Audit production and development dependencies
         run: npm audit --audit-level=high
+
+  node22:
+    name: Minimum Node.js 22 compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_tag || github.sha }}
+
+      - name: Set up Node.js 22.16.0
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22.16.0
+          cache: npm
+
+      - name: Install dependencies and verify minimum toolchain
+        run: |
+          node --version
+          npm --version
+          npm ci
+          npm run compile-tests
+          npm run compile
+          npm run test:release
+          npm run release:prepare
 
   unit:
     name: Unit tests (${{ matrix.os }})
@@ -83,14 +112,17 @@ jobs:
         with:
           ref: ${{ inputs.release_tag || github.sha }}
 
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 24.20.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22.16.0
+          node-version: 24.20.0
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          node --version
+          npm --version
+          npm ci
 
       - name: Configure isolated VS Code test directories
         shell: bash
@@ -131,6 +163,7 @@ jobs:
     name: Package VSIX smoke test
     needs:
       - static
+      - node22
       - unit
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -158,14 +191,17 @@ jobs:
           fi
           git fetch --force --no-tags origin "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
 
-      - name: Set up Node.js 22.16.0
+      - name: Set up Node.js 24.20.0
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22.16.0
+          node-version: 24.20.0
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          node --version
+          npm --version
+          npm ci
 
       - name: Verify release metadata
         id: metadata
@@ -214,6 +250,7 @@ jobs:
     if: always()
     needs:
       - static
+      - node22
       - unit
       - package
     runs-on: ubuntu-latest
@@ -221,10 +258,12 @@ jobs:
     steps:
       - name: Confirm every required job passed
         env:
+          NODE22_RESULT: ${{ needs.node22.result }}
           STATIC_RESULT: ${{ needs.static.result }}
           UNIT_RESULT: ${{ needs.unit.result }}
           PACKAGE_RESULT: ${{ needs.package.result }}
         run: |
+          test "$NODE22_RESULT" = success
           test "$STATIC_RESULT" = success
           test "$UNIT_RESULT" = success
           test "$PACKAGE_RESULT" = success
