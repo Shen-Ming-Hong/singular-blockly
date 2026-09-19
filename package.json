@@ -293,7 +293,7 @@
 		"@vscode/test-electron": "^3.1.0",
 		"@vscode/vsce": "3.9.2",
 		"ajv": "^8.20.0",
-		"blockly": "^13.2.1",
+		"blockly": "^13.3.0",
 		"copy-webpack-plugin": "^14.0.0",
 		"eslint": "^10.9.1",
 		"fs-extra": "^11.4.0",
@@ -308,7 +308,7 @@
 		"wrangler": "^4.129.0"
 	},
 	"dependencies": {
-		"@blockly/theme-modern": "^13.2.0",
+		"@blockly/theme-modern": "^13.3.0",
 		"@vscode/proxy-agent": "0.45.0",
 		"form-data": "^4.0.6",
 		"node-ssh": "^13.2.1",
