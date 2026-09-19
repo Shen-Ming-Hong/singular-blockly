@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.88.2] - 2026-09-19
+
+### 🔒 安全性 Security
+
+- 將間接開發相依 `sharp` override 至 0.35.4，修復特製圖片可能觸發越界寫入的高風險漏洞（GHSA-rgj7-g3m4-5g8c），並關閉 Dependabot Alert #110
+  Overrode the transitive development dependency `sharp` to 0.35.4, fixing a high-severity out-of-bounds write vulnerability triggered by crafted images (GHSA-rgj7-g3m4-5g8c) and closing Dependabot Alert #110
+
 ## [0.88.1] - 2026-09-04
 
 ### 🔒 安全性 Security
