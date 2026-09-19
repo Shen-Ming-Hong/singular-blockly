@@ -13,7 +13,7 @@
     {
       "source": "canonical/references/block-contract.json",
       "target": ".agents/skills/singular-blockly/references/block-contract.json",
-      "sha256": "399faddd559c154f9235ceb4877c868129afef537a505c82743338e557c7a6b8",
+      "sha256": "dda850df01b28f7985233a8a697bb204a3858a2edef2008beb881ad1ce7f7203",
       "kind": "reference"
     },
     {
