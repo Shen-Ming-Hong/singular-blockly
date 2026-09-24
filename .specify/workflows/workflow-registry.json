@@ -2,12 +2,12 @@
   "schema_version": "1.0",
   "workflows": {
     "speckit": {
-      "name": "Full SDD Cycle",
-      "version": "1.0.0",
-      "description": "Runs specify \u2192 plan \u2192 tasks \u2192 implement with review gates",
+      "name": "Core SDD Steps",
+      "version": "1.1.0",
+      "description": "Runs core steps with review gates; use AGENTS.md for the full SDD sequence",
       "source": "bundled",
       "installed_at": "2026-05-03T10:48:03.528539+00:00",
-      "updated_at": "2026-05-03T10:48:03.528548+00:00"
+      "updated_at": "2026-09-24T04:11:33.398894+00:00"
     }
   }
 }
