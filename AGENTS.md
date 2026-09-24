@@ -59,7 +59,9 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Spec Kit is configured with Codex as the default integration. Use `.agents/skills` as the Codex skill root.
 - Copilot SDD support is intentionally kept alongside Codex through `.github/agents/speckit.*.agent.md` and `.github/prompts/speckit.*.prompt.md`.
 - Do not remove Copilot SDD files just because `default_integration` is `codex`; Copilot remains not multi-install safe, so `integration.json` stays Codex-only to keep `specify integration status` clean.
-- In Codex, use the Spec Kit skills in this order when a feature needs full SDD: `$speckit-clarify`, `$speckit-specify`, `$speckit-plan`, `$speckit-tasks`, `$speckit-analyze`, `$speckit-implement`, `$speckit-checklist`.
+- Use full SDD for changes to Extension Host/WebView contracts, Blockly block/generator contracts, persisted workspace formats, board upload flows, managed runtime, security boundaries, or major compatibility. Classify major dependency upgrades by actual impact. Documentation, translations, and isolated fixes that preserve contracts may use their focused maintenance skills.
+- In Codex, use the Spec Kit skills in this order for full SDD: `$speckit-specify`, `$speckit-clarify`, `$speckit-plan`, `$speckit-tasks`, `$speckit-analyze`, `$speckit-implement`, `$speckit-converge`; use `$speckit-checklist` when a quality checklist is needed. Clarify requires an existing spec.
+- At the start of new full SDD work, check the installed Spec Kit CLI, `specify integration status`, and the official stable release; upgrade only when required by compatibility or the task. The installed `speckit` workflow runs core stages only; it does not replace the full skill sequence above.
 - In Copilot, use the matching `speckit.*` agents/prompts from `.github/agents` and `.github/prompts`.
 - Feature specs live in `specs/{NNN}-feature-name/`; check existing specs before creating a new one.
 - Keep generated `spec.md`, `plan.md`, and `tasks.md` in the feature spec folder.

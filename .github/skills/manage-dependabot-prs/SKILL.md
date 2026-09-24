@@ -102,7 +102,7 @@ Language／compiler major（例如 TypeScript major）不得在未讀官方 migr
 - 有多種遷移方案、重大 breaking change 或不可逆決策。
 - 需大規模程式碼遷移，現有驗收標準不足以界定完成狀態。
 
-先檢查既有 `specs/` 是否已有相符 feature；需要完整 SDD 時依專案順序使用：`$speckit-clarify` → `$speckit-specify` → `$speckit-plan` → `$speckit-tasks` → `$speckit-analyze` → `$speckit-implement` → `$speckit-checklist`。未通過對應 gate 前不得開始依賴實作。
+先檢查既有 `specs/` 是否已有相符 feature；需要完整 SDD 時依專案順序使用：`$speckit-specify` → `$speckit-clarify` → `$speckit-plan` → `$speckit-tasks` → `$speckit-analyze` → `$speckit-implement` → `$speckit-converge`，需要品質檢查表時使用 `$speckit-checklist`。未通過對應 gate 前不得開始依賴實作。
 
 ## Phase 4：提交 Triage 報告並停止
 
