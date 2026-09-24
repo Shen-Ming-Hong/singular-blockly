@@ -1,9 +1,9 @@
 ---
 name: add-cyberbrick-sample
-description: 新增或更新 CyberBrick MicroPython 範例工作區的完整工作流程。當使用者提到新增範例、更新範例、add sample、update sample、修改範例積木、建立範例積木、新增 CyberBrick 示範程式、sample workspace、範例工作區、更新翻譯、stringTranslations、nameTranslations、字串翻譯、標籤翻譯 時自動啟用。包含從 Blockly 工作區匯出 JSON、建立或覆蓋範例檔、更新索引、15 語系翻譯填寫（含識別字名稱翻譯 nameTranslations 與 text 積木字串翻譯 stringTranslations）、本機驗證到推送上線的完整流程。Full workflow for adding or updating a CyberBrick MicroPython sample workspace: export Blockly JSON, create or overwrite sample file, update index, fill 15-language translations (nameTranslations for identifiers, stringTranslations for text labels), local validation, and push to production.
+description: 新增或更新 media/samples/ 的 CyberBrick MicroPython 範例工作區、索引與範例翻譯時使用。涵蓋 Blockly JSON、nameTranslations、stringTranslations 與本機驗證；一般翻譯審計和 Git／發布各使用專用技能。
 metadata:
     author: singular-blockly
-    version: '1.3.0'
+    version: '1.3.1'
     category: content
 argument-hint: 'add | update，以及範例名稱（英文 kebab-case），例如 update cyberbrick-soccer-robot'
 license: Apache-2.0
@@ -462,30 +462,7 @@ npm run validate:i18n
 
 ### Phase 5: 交接 Git 工作流程 Handoff to Git Workflow
 
-**依據模式選擇對應的 commit message 與 staged 檔案：**
-
-```powershell
-# ADD 模式（新增範例）
-git add media/samples/{filename}.json media/samples/index.json
-git commit -m "feat(samples): add {id} sample workspace"
-
-# UPDATE workspace 模式（只更新積木內容）
-git add media/samples/{filename}.json
-git commit -m "fix(samples): update {id} workspace content"
-# UPDATE translations 模式（只更新翻譯映射）
-git add media/samples/{filename}.json
-git commit -m "i18n(samples): update {id} translations"
-# UPDATE metadata 模式（只更新翻譯/描述）
-git add media/samples/index.json
-git commit -m "i18n(samples): update {id} title/description"
-
-# UPDATE both 模式
-git add media/samples/{filename}.json media/samples/index.json
-git commit -m "feat(samples): update {id} workspace and metadata"
-
-```
-
-完成本機檔案與驗證後，交由 `git-workflow` 執行 commit、本地 review、使用者核准、push 與 PR。不得直接推送 `master`。
+完成本機檔案與驗證後，若本次只要求新增或更新範例，就回報結果。只有使用者要求 commit、push 或 PR 時，才交由 `git-workflow` 處理精確 staging 與繁體中文 Conventional Commit；審查、合併或發布則交由 `pr-review-release`。不得直接推送 `master`。
 
 ---
 
