@@ -112,7 +112,8 @@ license: Apache-2.0
 2. PR 描述包含版本、雙語 CHANGELOG 摘要與測試結果。
 3. 等待並確認：
    - `CI Gate` 通過。
-   - CodeQL 通過。
+   - 目前 PR head 已實際產生 CodeQL 結果且通過；不能只因 `CI Gate` 綠燈就假定 CodeQL 已完成。
+   - 若 PR 曾是 draft，轉 ready 後仍沒有 CodeQL result，先確認 ruleset 與 CodeQL/default setup。只有在目前遠端操作已核准、human-owned branch 且 tree 不變時，才可建立 empty commit 觸發新的 PR commit event，之後重新等待全部 required checks；不得繞過 ruleset。
    - 儲存庫發布擁有者在 Phase 3.5 的明確核准視為 maintainer approval；ruleset 將 required approvals 設為 0，允許發布擁有者直接完成 PR 發布。
    - review 對話已解決、沒有 merge conflict。
    - 單一 maintainer 直發仍必須走 PR、通過必要檢查並使用 squash merge；不得直接 push `master` 或略過 Phase 3.5。
