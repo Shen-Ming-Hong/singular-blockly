@@ -25,3 +25,9 @@
 - **問題：** PR #183 先以 draft 建立，之後轉為 ready；原本的 CI Gate 已成功，但 branch rules 仍因目前 head 沒有 CodeQL 結果而拒絕 squash merge。單純 `ready_for_review` 沒有讓該 head 產生 required CodeQL result。
 - **規則：** 已核准且準備立即驗證的 human-owned PR 預設直接建立 ready PR。合併前必須檢查目前 PR head 的 CodeQL 結果，不能只看 `CI Gate`。若 PR 曾是 draft 且轉 ready 後仍沒有 CodeQL，在確認 branch rules、CodeQL default setup 與 tree 內容後，可在已核准的 human-owned branch 建立不改檔案內容的 empty commit 觸發新的 PR commit event；不得繞過 ruleset，也不得把此復原手段當成一般流程。
 - **證據：** PR #183、repository ruleset `master protection` 的 `code_scanning: CodeQL` 規則，以及 PR #183 後續空 commit 觸發的 Actions／Python／JavaScript-TypeScript CodeQL 全綠結果。
+
+## [依賴] Vitest major 必須跟隨 Cloudflare plugin 的 peer contract
+
+- **問題：** Dependabot PR #175 與 #185 都嘗試把 Vitest 4 升到 Vitest 5，但 `@cloudflare/vitest-plugin` 目前最新版 1.3.0 的 `peerDependencies.vitest` 仍為 `^4.1.0`；直接升級會讓 `npm ci` 因 peer dependency 衝突失敗。
+- **規則：** 自 2026-09-28 起，例行 `vitest` semver-major version update 暫時由 Dependabot ignore；Vitest 4.x 的 minor／patch 更新仍照常評估，security update 不得以此規則延後。當 Cloudflare plugin 官方 peer contract 支援 Vitest 5 時，移除此 major hold 並重新做 Lightweight plan／相容性驗證。
+- **證據：** PR #175、PR #185，以及 `cloudflare/workers-sdk` 的 `packages/vitest-plugin/package.json`（1.3.0：`vitest ^4.1.0`）。
