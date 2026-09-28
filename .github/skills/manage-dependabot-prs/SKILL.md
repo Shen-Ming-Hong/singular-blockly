@@ -143,6 +143,7 @@ Recommendation 只能是：
 2. 先檢查 Dependabot diff；不得假設 bot 產生的 lockfile 一定正確。
 3. 若可原樣合併，直接在隔離環境驗證該 PR commit，不新增無關變更。
 4. 若需程式碼、設定、測試或多 PR 合併：建立 human-owned branch，重做最小版本更新並加入必要修正；保留原 PR URL 作為追蹤依據。
+   - 若使用者已核准建立／更新 replacement PR 且內容已可驗證，預設直接建立 ready PR；不要只因保守而先建 draft。刻意未完成或使用者要求 draft 時才使用 draft。
 5. npm 更新至少驗證：`npm ci`、`npm audit`、`npm ls {PACKAGE}`、`npm run ci:static`、`npm run test:unit:ci`。工具鏈／發布相關更新再執行 `npm run test:release` 與 `npm run release:prepare`。
 6. GitHub Actions 更新必須保留完整 commit SHA pin，核對 upstream tag／SHA，並執行 workflow YAML、release contract 與受影響 CI 驗證。
 7. 使用本地 code review 比較 `origin/master...HEAD`，檢查 regression、breaking changes、lockfile 異常、engine／peer mismatch 與供應鏈風險。
@@ -154,6 +155,7 @@ Recommendation 只能是：
 - grouped PR 建置失敗時，可在核准後使用 `@dependabot recreate`；若單一套件持續失敗，調整 `exclude-patterns` 或建立獨立人工 PR。
 - ignore 必須記錄套件、版本範圍、原因、風險、重新評估條件與日期；不得用 ignore 掩蓋 Security Alert。
 - 只在 required checks、review 與 branch rules 全部通過後 merge。
+- 合併前必須確認目前 PR head 已有 CodeQL 結果，不能只看 `CI Gate`。若 human-owned PR 曾是 draft，轉 ready 後仍沒有 CodeQL，先確認 CodeQL/default setup 與 ruleset；在目前遠端操作核准範圍內，可建立不改 tree 的 empty commit 觸發新的 PR commit event並重新跑 required checks。不得在 Dependabot bot branch 使用此復原手段，也不得繞過 ruleset。
 - merge 後同步 `master`，重新盤點剩餘 PR；確認 Dependabot 是否自動 rebase／關閉 superseded PR，再開始下一項。
 
 每項完成時回報：PR／replacement PR、實際版本、SDD 決定、測試、merge 狀態、剩餘風險，以及下一個佇列項目。不得聲稱整批完成，除非重新 triage 後已無待處理項目。

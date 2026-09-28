@@ -19,3 +19,9 @@
 - **問題：** Extension 啟動或管理 Runtime 預熱時，工作區不一定已是 Singular Blockly 專案。
 - **規則：** 保留專案辨識與 editor-open 的 `opened` 邊界；一般資料夾在取消或沒有 workspace 時，不應由 Skill 安裝或設定讀取建立專案檔案。
 - **證據：** `docs/specifications/06-features/agent-skills.md`、`src/services/projectSkillService.ts`、`src/test/services/projectSkillService.test.ts`。
+
+## [PR / CodeQL] Ready PR 必須確認目前 head 已產生 CodeQL 結果
+
+- **問題：** PR #183 先以 draft 建立，之後轉為 ready；原本的 CI Gate 已成功，但 branch rules 仍因目前 head 沒有 CodeQL 結果而拒絕 squash merge。單純 `ready_for_review` 沒有讓該 head 產生 required CodeQL result。
+- **規則：** 已核准且準備立即驗證的 human-owned PR 預設直接建立 ready PR。合併前必須檢查目前 PR head 的 CodeQL 結果，不能只看 `CI Gate`。若 PR 曾是 draft 且轉 ready 後仍沒有 CodeQL，在確認 branch rules、CodeQL default setup 與 tree 內容後，可在已核准的 human-owned branch 建立不改檔案內容的 empty commit 觸發新的 PR commit event；不得繞過 ruleset，也不得把此復原手段當成一般流程。
+- **證據：** PR #183、repository ruleset `master protection` 的 `code_scanning: CodeQL` 規則，以及 PR #183 後續空 commit 觸發的 Actions／Python／JavaScript-TypeScript CodeQL 全綠結果。
