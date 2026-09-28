@@ -305,7 +305,7 @@
 		"vitest": "^4.1.11",
 		"webpack": "^5.111.1",
 		"webpack-cli": "^7.2.3",
-		"wrangler": "^4.139.0"
+		"wrangler": "^4.140.0"
 	},
 	"dependencies": {
 		"@blockly/theme-modern": "^13.3.0",
