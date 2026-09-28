@@ -155,7 +155,7 @@ Recommendation 只能是：
 - grouped PR 建置失敗時，可在核准後使用 `@dependabot recreate`；若單一套件持續失敗，調整 `exclude-patterns` 或建立獨立人工 PR。
 - ignore 必須記錄套件、版本範圍、原因、風險、重新評估條件與日期；不得用 ignore 掩蓋 Security Alert。
 - 只在 required checks、review 與 branch rules 全部通過後 merge。
-- 合併前必須確認目前 PR head 已有 CodeQL 結果，不能只看 `CI Gate`。若 human-owned PR 曾是 draft，轉 ready 後仍沒有 CodeQL，先確認 CodeQL/default setup 與 ruleset；在目前遠端操作核准範圍內，可建立不改 tree 的 empty commit 觸發新的 PR commit event並重新跑 required checks。不得在 Dependabot bot branch 使用此復原手段，也不得繞過 ruleset。
+- 合併前必須確認目前 PR head 已有 CodeQL 結果，不能只看 `CI Gate`。若 human-owned PR 曾是 draft，轉 ready 後仍沒有 CodeQL，先確認 CodeQL/default setup 與 ruleset；在目前遠端操作核准範圍內，可建立不改 tree 的 empty commit 觸發新的 PR commit event，並重新跑 required checks。不得在 Dependabot bot branch 使用此復原手段，也不得繞過 ruleset。
 - merge 後同步 `master`，重新盤點剩餘 PR；確認 Dependabot 是否自動 rebase／關閉 superseded PR，再開始下一項。
 
 每項完成時回報：PR／replacement PR、實際版本、SDD 決定、測試、merge 狀態、剩餘風險，以及下一個佇列項目。不得聲稱整批完成，除非重新 triage 後已無待處理項目。
