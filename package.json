@@ -282,7 +282,7 @@
 		"ci:static": "npm run check:project-skills && npm run check:managed-runtime && npm run test:managed-runtime:evidence && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release && npm run feedback:portal-locales:check && npm run feedback:contracts && npm run feedback:typecheck && npm run feedback:verify-vsix:test && npm run feedback:triage-skill:test && npm run feedback:test"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.22.0",
+		"@cloudflare/vitest-plugin": "^1.2.8",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "~24.13.6",
 		"@types/sinon": "^22.0.0",
