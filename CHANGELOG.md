@@ -8,6 +8,21 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.88.3] - 2026-09-30
+
+### 🔒 安全性 Security
+
+- 將 `@cloudflare/vitest-plugin` 升級至 1.3.3、`wrangler` 升級至 4.144.0，並將間接相依 `undici` 從 7.29.0 升級至 7.29.1，修復 WebSocket 拒絕服務（CVE-2026-85024、GHSA-rfgv-xxqx-mfg5、Dependabot Alert #111）、TLS 驗證繞過（GHSA-w293-vg96-wgc3）及其餘 npm 安全公告
+  Upgraded `@cloudflare/vitest-plugin` to 1.3.3 and `wrangler` to 4.144.0, updating transitive `undici` from 7.29.0 to 7.29.1 to fix WebSocket denial of service (CVE-2026-85024, GHSA-rfgv-xxqx-mfg5, Dependabot Alert #111), TLS validation bypass (GHSA-w293-vg96-wgc3), and other npm advisories
+- 將間接執行階段相依 `ip-address` 從 10.5.0 升級至 10.7.2，修復 NAT64 分類造成的 SSRF 風險（CVE-2026-101910、Dependabot Alert #112）及其他位址分類與解析漏洞
+  Upgraded transitive runtime dependency `ip-address` from 10.5.0 to 10.7.2, fixing NAT64 classification SSRF risk (CVE-2026-101910, Dependabot Alert #112) and other address classification and parsing vulnerabilities
+- 將間接開發相依 `js-yaml` 從 5.2.3 升級至 5.4.2（同步提高 override 下限），修復 merge key 處理造成的 CPU 拒絕服務（GHSA-r3ph-w7gj-g6xm、Dependabot Alert #113）
+  Upgraded transitive development dependency `js-yaml` from 5.2.3 to 5.4.2 and raised the override minimum, fixing CPU denial of service in merge key handling (GHSA-r3ph-w7gj-g6xm, Dependabot Alert #113)
+- 將 `brace-expansion` 的 2.x／5.x override 分別升級至 2.1.7／5.0.12，修復巢狀大括號遞迴與展開造成的高風險拒絕服務（GHSA-q2hr-2g5m-vwhr、GHSA-qhr7-859c-m2p7、GHSA-6j4f-fj2g-mc7p）
+  Upgraded the `brace-expansion` 2.x and 5.x overrides to 2.1.7 and 5.0.12, fixing high-severity denial of service from nested brace recursion and expansion (GHSA-q2hr-2g5m-vwhr, GHSA-qhr7-859c-m2p7, GHSA-6j4f-fj2g-mc7p)
+- 將 `fast-uri` override 從 3.1.7 升級至 3.1.8，修復百分比編碼主機名稱的大小寫正規化漏洞（GHSA-hrr3-gc8f-f4qj）
+  Upgraded the `fast-uri` override from 3.1.7 to 3.1.8, fixing inconsistent case normalization of percent-encoded hostnames (GHSA-hrr3-gc8f-f4qj)
+
 ## [0.88.2] - 2026-09-19
 
 ### 🔒 安全性 Security
