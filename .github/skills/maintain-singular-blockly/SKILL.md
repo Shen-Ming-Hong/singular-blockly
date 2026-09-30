@@ -1,11 +1,11 @@
 ---
 name: maintain-singular-blockly
-description: 維護或除錯 Singular Blockly 擴充套件時，依變更範圍定位 Extension Host、Blockly WebView、板型上傳、受管理 Runtime、範例或專案 Skill 的正式來源，並選擇對應驗證。適用於跨檔案的產品維護；翻譯、資安、Git、發布與完整 SDD 另依其專用技能處理。
+description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離任務 worktree 與分支，再依變更範圍定位正式來源並選擇驗證。翻譯、資安、Git、發布與完整 SDD 另依其專用技能處理。
 ---
 
 # 維護 Singular Blockly
 
-先讀 `AGENTS.md`，確認目前 Git 狀態與使用者變更。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD。
+先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支與既有變更；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD。
 
 ## 動手前
 

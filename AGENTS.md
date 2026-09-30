@@ -66,7 +66,7 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Feature specs live in `specs/{NNN}-feature-name/`; check existing specs before creating a new one.
 - Keep generated `spec.md`, `plan.md`, and `tasks.md` in the feature spec folder.
 - Project-specific skills from `.github/skills` are linked into `.agents/skills`; update the source under `.github/skills`.
-- For cross-file product maintenance, use `maintain-singular-blockly` to locate the owning files and select affected checks; specialized skills keep their own workflows.
+- For repository write tasks, use `maintain-singular-blockly` to establish a task-owned worktree and branch; for cross-file product maintenance, also use it to locate owning files and select affected checks. Specialized skills keep their own workflows.
 
 ## Coding Style
 - TypeScript uses strict compiler options from `tsconfig.json`.
