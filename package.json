@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support, project-local Agent Skills, AI camera integration, PlatformIO integration, and 15 languages.",
-	"version": "0.88.2",
+	"version": "0.88.3",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.126.0",
@@ -282,7 +282,7 @@
 		"ci:static": "npm run check:project-skills && npm run check:managed-runtime && npm run test:managed-runtime:evidence && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release && npm run feedback:portal-locales:check && npm run feedback:contracts && npm run feedback:typecheck && npm run feedback:verify-vsix:test && npm run feedback:triage-skill:test && npm run feedback:test"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-plugin": "^1.2.8",
+		"@cloudflare/vitest-plugin": "^1.3.3",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "~24.13.6",
 		"@types/sinon": "^22.0.0",
@@ -305,7 +305,7 @@
 		"vitest": "^4.1.11",
 		"webpack": "^5.111.1",
 		"webpack-cli": "^7.2.3",
-		"wrangler": "^4.140.0"
+		"wrangler": "^4.144.0"
 	},
 	"dependencies": {
 		"@blockly/theme-modern": "^13.3.0",
@@ -316,10 +316,10 @@
 	},
 	"overrides": {
 		"sharp": "0.35.4",
-		"js-yaml": "^5.2.2",
+		"js-yaml": "^5.4.2",
 		"qs": "^6.16.0",
 		"serialize-javascript": "^7.0.5",
-		"fast-uri": "^3.1.7",
+		"fast-uri": "^3.1.8",
 		"diff": ">=8.0.3",
 		"flatted": ">=3.4.0",
 		"picomatch": "2.3.2",
@@ -333,10 +333,10 @@
 			"brace-expansion": "^1.1.18"
 		},
 		"minimatch@9.0.9": {
-			"brace-expansion": "^2.1.4"
+			"brace-expansion": "^2.1.7"
 		},
 		"minimatch@10.2.4": {
-			"brace-expansion": "^5.0.9"
+			"brace-expansion": "^5.0.12"
 		}
 	}
 }
