@@ -2,28 +2,28 @@
 
 This gate must be completed for every release that enables the hosted feedback service. Source-code checks cannot prove publisher-console settings or production infrastructure, so unchecked items block release.
 
-Local evidence below was fully refreshed for version 0.88.0 on 2026-08-26. The current review candidate is `/private/tmp/singular-blockly-feedback-0.88.0-20260826.vsix` (1,085 entries, 6,827,557 bytes) with SHA-256 `ccb0c88011fcc72ce55b0f1c7d1e8951af16a5ce955d2c39b6890a3e22f54a21`. It remains a local temporary artifact and has not been uploaded or published.
+Release evidence below was fully refreshed for version 0.88.0 on 2026-08-26. Annotated tag `v0.88.0` points to squash commit `ca5c086d101300c0a43b9c5798951623d9cd635d`, and GitHub Actions run `32924281240` published one shared VSIX to GitHub Releases, VS Code Marketplace, and Open VSX. The official artifact contains 1,085 entries, is 6,701,128 bytes, and has SHA-256 `a99f01a6d8db79651c63b12733af3f67ccda398c712a653562aad4e7051e782b`; the Marketplace gzip transport expands byte-for-byte to the same VSIX.
 
 ## Automated evidence
 
-- [x] `npm run ci:static`（compile、lint、15 語系驗證、i18n 21、release 25、Worker contracts/typecheck、VSIX verifier 6、triage Skill 4、Worker 151 全數通過；Worker test 因沙箱限制改在核准的本機程序重跑一次）
+- [x] `npm run ci:static`（compile、lint、15 語系驗證、i18n 21、release 25、Worker contracts/typecheck、VSIX verifier 6、triage Skill 4、Worker 152 全數通過；Worker test 因沙箱限制改在核准的本機程序重跑一次）
 - [x] T233–T235 targeted regression suites（Extension 16、portal 20）
-- [x] `npm run feedback:contracts` and `npm run feedback:test` (151 passing)
+- [x] `npm run feedback:contracts` and `npm run feedback:test` (152 passing)
 - [x] `npm run validate:i18n` and `npm run test:i18n` (21 passing)
 - [x] `npm run test:unit:ci` (1363 passing, 1 provider-dependent pending) and `npm run test:integration` (9 passing, 3 provider-dependent pending)
-- [x] Production VSIX created with the current `@vscode/vsce` and passed to `npm run feedback:verify-vsix -- /private/tmp/singular-blockly-feedback-0.88.0-20260826.vsix` (1,085 entries; SHA-256 `ccb0c88011fcc72ce55b0f1c7d1e8951af16a5ce955d2c39b6890a3e22f54a21`)
+- [x] GitHub Actions run `32924281240` created the production VSIX with the pinned `@vscode/vsce`, passed the fail-closed verifier and package smoke test, and published the shared artifact with SHA-256 `a99f01a6d8db79651c63b12733af3f67ccda398c712a653562aad4e7051e782b`
 - [x] Production VSIX contains the required Blockly, theme, `node-ssh`, and `ssh2` runtime files while excluding `ssh2/test` credential fixtures
 - [x] VSIX contains `PRIVACY.md`, `SUPPORT.md`, and `TERMS.md`, and excludes `workers/`, deployment files, tests, Skills, fixtures, and secrets
 - [x] Marketplace homepage and hosted `bugs.url` support link return HTTP 200 without authentication; `/privacy`, `/support`, and `/terms` also return 200
 
 ## VS Code Marketplace publisher console — manual blockers
 
-- [x] 2026-08-26 publisher console is accessible, `Singular Blockly` 0.87.5 is public under `Singular-Ray`, the Entra managed identity remains a Contributor, and the signed-in maintainer remains Owner
+- [x] 2026-08-26 publisher console is accessible, `Singular Blockly` 0.88.0 is public under `Singular-Ray`, the Entra managed identity remains a Contributor, and the signed-in maintainer remains Owner
 - [x] Candidate listing links to the public, version-matching privacy notice, and the hosted URL returns HTTP 200
 - [x] 2026-08-26 Marketplace publisher profile Support is `https://blockly-support.singular-ai.org/support`; the candidate manifest uses the same public `bugs.url`, and the in-product feedback path does not require GitHub
 - [x] Candidate listing disclosure points to the public service terms
 - [x] Candidate README describes Cloudflare/GitHub processing and the user-initiated support transfer without calling it telemetry
-- [ ] Marketplace malware/secret scan completed without suppression of a real credential
+- [x] Marketplace accepted and publicly serves 0.88.0 after the Entra/OIDC publish; the publisher-console version row has no validation error or warning, the exact-version package is downloadable, and no real finding was suppressed
 - [x] Azure user-assigned managed identity、限制於 `repo:Shen-Ming-Hong/singular-blockly:environment:release` 的 GitHub environment federated credential 與 `release` environment variables 已建立，正式 workflow 已改用 `--azure-credential`
 - [x] 已以 `verify_membership=false` 解析 Marketplace User ID `c10b08d9-c997-6e25-b64c-eb0b4e3c6a11`，以 Contributor 加入 `Singular-Ray`，並以 `verify_membership=true` 完成不發布的 `vsce verify-pat Singular-Ray --azure-credential` 驗證（GitHub Actions run `32875470418`）
 - [x] Entra workflow 已經 PR #141 squash merge 至 `master`；不發布驗證成功後，舊 repository secret `VSCE_PAT` 與不再需要的 `AZURE_SUBSCRIPTION_ID` 已刪除
@@ -35,14 +35,14 @@ The `Singular-Ray` public publisher profile now describes Singular Blockly and l
 ## Open VSX — manual blockers
 
 - [x] 2026-08-26 Open VSX profile reports that the Eclipse Foundation Open VSX Publisher Agreement is signed
-- [x] 2026-08-26 `Singular-Ray` namespace exists, contains the current 0.87.5 extension, and lists `Shen-Ming-Hong` / Ray Shen as Owner
+- [x] 2026-08-26 `Singular-Ray` namespace exists, contains the current 0.88.0 extension, and lists `Shen-Ming-Hong` / Ray Shen as Owner
 - [x] 2026-08-26 created a dedicated `singular-blockly GitHub Actions release environment` token and stored it only as GitHub `release` environment secret `OVSX_PAT`; the legacy repository-level secret was deleted after post-write verification
-- [ ] Open VSX secret, blocklist, and namespace-similarity scans pass; no real finding is suppressed
-- [ ] Published metadata, icon, license, homepage, support, and policy links render correctly
+- [x] Open VSX accepted and publicly serves 0.88.0 with `verified: true`, a signature, and a matching SHA-256 file; no secret, blocklist, namespace-similarity, or other publication finding was suppressed
+- [x] Published 0.88.0 metadata, icon, Apache-2.0 license, README, install links, and privacy, support, terms, and security-policy links render correctly
 
 Token inventory before rotation: Open VSX had one undescribed token created about two months earlier, with no expiry and last accessed six days earlier. GitHub had repository-level `OVSX_PAT` dated 2026-06-30 and no `release` environment `OVSX_PAT`.
 
-Rotation result: the new token was generated in the official Open VSX UI, transferred without logging or writing it to disk, and saved as the sole GitHub Actions `release` environment secret. GitHub API verification confirmed exactly one environment `OVSX_PAT` before the repository-level secret was deleted, then confirmed the repository count was zero and environment count remained one. Both the browser token display and isolated clipboard were cleared. A separate non-publishing `ovsx verify-pat` could not reach `open-vsx.org` from the local command network, so the old Open VSX server-side token remains a temporary rollback credential; revoke that legacy token immediately after the first authorized publish proves the new environment secret works. Do not expose or copy it back into GitHub.
+Rotation result: the new token was generated in the official Open VSX UI, transferred without logging or writing it to disk, and saved as the sole GitHub Actions `release` environment secret. GitHub API verification confirmed exactly one environment `OVSX_PAT` before the repository-level secret was deleted, then confirmed the repository count was zero and environment count remained one. Both the browser token display and isolated clipboard were cleared. The successful 0.88.0 publish accessed the named `singular-blockly GitHub Actions release environment` token, proving the environment secret works. At 2026-08-26 12:12 CST, the project owner authorized permanent revocation of the undescribed legacy token created on 2026-06-30; the Open VSX UI then showed only the named release token. The legacy token is not recoverable and was not copied back into GitHub.
 
 The `Singular-Ray` namespace profile now links to the project homepage, public support page and `Shen-Ming-Hong` GitHub profile, with the reviewed Singular Blockly description.
 
