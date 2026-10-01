@@ -165,6 +165,7 @@ suite('ShadowSuggestionService Tests', () => {
 		// Create a stubbed AIModelManager
 		mockModelManager = sandbox.createStubInstance(AIModelManager);
 		mockModelManager.getEffectiveConfig.returns(enabledConfig());
+		mockModelManager.isReady.returns(true);
 		mockModelManager.getTier.returns('pro');
 		mockModelManager.sendPrompt.resolves(null);
 
@@ -172,6 +173,7 @@ suite('ShadowSuggestionService Tests', () => {
 	});
 
 	teardown(() => {
+		service.dispose();
 		sandbox.restore();
 		// Clean up temp directory
 		try {
@@ -188,6 +190,43 @@ suite('ShadowSuggestionService Tests', () => {
 			const result = await service.requestSuggestion(createContext());
 
 			assert.strictEqual(result, null);
+			assert.strictEqual(mockModelManager.sendPrompt.called, false);
+		});
+
+		test('Should not send a prompt before the model manager is ready', async () => {
+			mockModelManager.isReady.returns(false);
+			assert.strictEqual(await service.requestSuggestion(createContext()), null);
+			assert.strictEqual(mockModelManager.sendPrompt.called, false);
+		});
+
+		test('Should cancel a pending request on dispose and discard its late response', async () => {
+			let resolveResponse!: (response: vscode.LanguageModelChatResponse) => void;
+			mockModelManager.sendPrompt.returns(new Promise(resolve => { resolveResponse = resolve; }));
+			const pending = service.requestSuggestion(createContext());
+			const token = mockModelManager.sendPrompt.firstCall.args[1]!;
+			service.dispose();
+			assert.strictEqual(token.isCancellationRequested, true);
+			resolveResponse(createMockResponse('[{"blockType":"math_number","fields":{"NUM":"10"}}]'));
+			assert.strictEqual(await pending, null);
+			assert.strictEqual(await service.requestSuggestion(createContext()), null);
+			assert.strictEqual(mockModelManager.sendPrompt.callCount, 1);
+		});
+
+		test('An older completion must not release the newer request cancellation source', async () => {
+			let resolveFirst!: (response: null) => void;
+			let resolveSecond!: (response: null) => void;
+			mockModelManager.sendPrompt.onFirstCall().returns(new Promise(resolve => { resolveFirst = resolve; }));
+			mockModelManager.sendPrompt.onSecondCall().returns(new Promise(resolve => { resolveSecond = resolve; }));
+			const first = service.requestSuggestion(createContext());
+			const second = service.requestSuggestion(createContext());
+			const secondToken = mockModelManager.sendPrompt.secondCall.args[1]!;
+			resolveFirst(null);
+			assert.strictEqual(await first, null);
+			assert.strictEqual(secondToken.isCancellationRequested, false);
+			service.dispose();
+			assert.strictEqual(secondToken.isCancellationRequested, true);
+			resolveSecond(null);
+			assert.strictEqual(await second, null);
 		});
 
 		test('Should return null when no selected block in context', async () => {

@@ -1139,6 +1139,11 @@ window.languageManager.loadMessages('hu', {
 
 	// === RC Csatlakozás ===
 	CATEGORY_RC: 'RC Csatlakozás',
+	ESP32_RC_LABEL_CYBERBRICK: 'CyberBrick távirányító',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'A párosítási azonosító (1–255) és a csatorna (1–11) egyezzen a CyberBrick adóéval. A Wi-Fi/MQTT csatornát válthat, és megszakíthatja az RC-kapcsolatot.',
+	ESP32_RC_WAIT_TOOLTIP: 'Várj érvényes CyberBrick RC-jelre; az idő lejárta után folytasd.',
+	ESP32_RC_ONLY_WARNING: 'Ez az RC-blokk csak ESP32 DevKit lapon működik.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'Az RC inicializálása bontja a Wi-Fi-kapcsolatot. Előbb inicializáld az RC-t, majd csatlakozz az RC-vel azonos csatornára állított Wi-Fi-hozzáférési ponthoz. Másik csatornán megszakad az RC-vétel.',
 	RC_LABEL_MASTER: '📡 Adó',
 	RC_LABEL_SLAVE: '📻 Vevő',
 	RC_LABEL_DATA: '📊 Adatok',

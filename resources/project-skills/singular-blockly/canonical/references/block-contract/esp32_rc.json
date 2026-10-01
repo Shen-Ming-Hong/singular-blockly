@@ -1,0 +1,376 @@
+{
+  "schemaVersion": 3,
+  "category": "esp32_rc",
+  "blocks": [
+    {
+      "type": "esp32_rc_get_joystick",
+      "categories": [
+        "esp32_rc"
+      ],
+      "boards": [
+        "esp32"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CHANNEL",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "static",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "esp32_rc_get_joystick",
+            "fields": {
+              "CHANNEL": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "esp32_rc_get_joystick_mapped",
+      "categories": [
+        "esp32_rc"
+      ],
+      "boards": [
+        "esp32"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Number"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "MAX",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            },
+            {
+              "name": "MIN",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CHANNEL",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "static",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "esp32_rc_get_joystick_mapped",
+            "fields": {
+              "CHANNEL": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "esp32_rc_is_button_pressed",
+      "categories": [
+        "esp32_rc"
+      ],
+      "boards": [
+        "esp32"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "BUTTON",
+              "kind": "dropdown",
+              "defaultValue": "0",
+              "optionsMode": "static",
+              "options": [
+                "0",
+                "1",
+                "2",
+                "3"
+              ]
+            }
+          ],
+          "minimalState": {
+            "type": "esp32_rc_is_button_pressed",
+            "fields": {
+              "BUTTON": "0"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "esp32_rc_is_connected",
+      "categories": [
+        "esp32_rc"
+      ],
+      "boards": [
+        "esp32"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": false,
+              "check": null
+            },
+            "next": {
+              "enabled": false,
+              "check": null
+            },
+            "output": {
+              "enabled": true,
+              "check": [
+                "Boolean"
+              ]
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [],
+          "minimalState": {
+            "type": "esp32_rc_is_connected"
+          }
+        }
+      }
+    },
+    {
+      "type": "esp32_rc_receiver_init",
+      "categories": [
+        "esp32_rc"
+      ],
+      "boards": [
+        "esp32"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            },
+            {
+              "name": "PAIR_ID",
+              "kind": "VALUE",
+              "connection": {
+                "enabled": true,
+                "check": [
+                  "Number"
+                ]
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "CHANNEL",
+              "kind": "number",
+              "defaultValue": 1
+            }
+          ],
+          "minimalState": {
+            "type": "esp32_rc_receiver_init",
+            "fields": {
+              "CHANNEL": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "esp32_rc_wait_connection",
+      "categories": [
+        "esp32_rc"
+      ],
+      "boards": [
+        "esp32"
+      ],
+      "variants": {
+        "esp32": {
+          "connections": {
+            "previous": {
+              "enabled": true,
+              "check": null
+            },
+            "next": {
+              "enabled": true,
+              "check": null
+            },
+            "output": {
+              "enabled": false,
+              "check": null
+            }
+          },
+          "inputs": [
+            {
+              "name": "",
+              "kind": "DUMMY",
+              "connection": {
+                "enabled": false,
+                "check": null
+              }
+            }
+          ],
+          "fields": [
+            {
+              "name": "TIMEOUT",
+              "kind": "number",
+              "defaultValue": 30
+            }
+          ],
+          "minimalState": {
+            "type": "esp32_rc_wait_connection",
+            "fields": {
+              "TIMEOUT": 30
+            }
+          }
+        }
+      }
+    }
+  ]
+}

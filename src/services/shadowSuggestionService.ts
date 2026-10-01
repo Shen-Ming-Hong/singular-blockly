@@ -77,6 +77,7 @@ export class ShadowSuggestionService {
 	private _blockStatementInputsMap: Map<string, string[]> = new Map();
 	private readonly _blockContractService: BlockContractService;
 	private _activeCancellationSource: vscode.CancellationTokenSource | undefined;
+	private _disposed = false;
 
 	constructor(
 		private readonly _modelManager: AIModelManager,
@@ -90,6 +91,10 @@ export class ShadowSuggestionService {
 	 */
 	async requestSuggestion(context: WorkspaceContext): Promise<SuggestionResult | null> {
 		const config = this._modelManager.getEffectiveConfig();
+		if (this._disposed || !this._modelManager.isReady() || config.enabled !== true) {
+			this.cancelCurrentRequest();
+			return null;
+		}
 
 		const hasBlocks =
 			(context.workspaceTree && context.workspaceTree.length > 0) || (context.blockTree && context.blockTree.length > 0);
@@ -98,20 +103,15 @@ export class ShadowSuggestionService {
 			return null;
 		}
 
-		// Cancel any in-flight request
-		if (this._activeCancellationSource) {
-			this._activeCancellationSource.cancel();
-			this._activeCancellationSource.dispose();
-			this._activeCancellationSource = undefined;
-		}
+		this.cancelCurrentRequest();
+		const cts = new vscode.CancellationTokenSource();
+		this._activeCancellationSource = cts;
 
 		const t0 = performance.now();
 		try {
 			const messages = this.buildPrompt(context);
 			const t1 = performance.now();
 			log(`[AI Perf] Prompt built in ${(t1 - t0).toFixed(0)}ms`, 'info');
-			const cts = new vscode.CancellationTokenSource();
-			this._activeCancellationSource = cts;
 
 			// Apply configurable timeout
 			const timeoutId = setTimeout(() => cts.cancel(), REQUEST_TIMEOUT_MS);
@@ -125,9 +125,7 @@ export class ShadowSuggestionService {
 			const t2 = performance.now();
 			log(`[AI Perf] Model responded in ${(t2 - t1).toFixed(0)}ms`, 'info');
 
-			if (!response) {
-				cts.dispose();
-				this._activeCancellationSource = undefined;
+			if (!response || cts.token.isCancellationRequested || this._disposed) {
 				log('No response from AI model', 'debug');
 				return null;
 			}
@@ -146,12 +144,9 @@ export class ShadowSuggestionService {
 
 			// If this request was superseded by a newer one, discard the result
 			if (cts.token.isCancellationRequested) {
-				cts.dispose();
 				return null;
 			}
 
-			cts.dispose();
-			this._activeCancellationSource = undefined;
 
 			log(`[AI Debug] Raw response (first 500 chars): ${text.substring(0, 500)}`, 'debug');
 			if (text.length > 500) {
@@ -184,7 +179,6 @@ export class ShadowSuggestionService {
 			log(`[AI Perf] Total pipeline: ${(performance.now() - t0).toFixed(0)}ms`, 'info');
 			return result;
 		} catch (err) {
-			this._activeCancellationSource = undefined;
 			if (err instanceof vscode.CancellationError) {
 				log(`[AI Perf] Request cancelled/timed out after ${(performance.now() - t0).toFixed(0)}ms`, 'info');
 				log('Shadow suggestion request cancelled or timed out', 'debug');
@@ -192,6 +186,11 @@ export class ShadowSuggestionService {
 			}
 			log(`Shadow suggestion request failed: ${err}`, 'error');
 			return null;
+		} finally {
+			if (this._activeCancellationSource === cts) {
+				this._activeCancellationSource = undefined;
+			}
+			cts.dispose();
 		}
 	}
 
@@ -205,6 +204,12 @@ export class ShadowSuggestionService {
 			this._activeCancellationSource.dispose();
 			this._activeCancellationSource = undefined;
 		}
+	}
+
+	/** Release pending requests when the owning editor closes. */
+	dispose(): void {
+		this._disposed = true;
+		this.cancelCurrentRequest();
 	}
 
 	/**

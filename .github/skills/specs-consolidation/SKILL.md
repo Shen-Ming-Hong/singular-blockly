@@ -1,16 +1,6 @@
 ---
 name: specs-consolidation
-description: |
-    整合 specs/ 資料夾的規格文件到 docs/specifications/ 的完整工作流程。
-    當使用者提到整合規格、清理 specs、merge specs、整理技術規格、specs 到 docs、
-    consolidate specs、spec cleanup、規格整合、歸檔規格文件時自動啟用。
-    依照規格編號由小到大依序整併，以較新的規格內容為準；以 Git／PR 合併紀錄修正
-    未同步的 Draft 或 tasks 狀態，保留所有未完成的 SDD 及編號最新的 5 個已完成 SDD，
-    只刪除其餘已確認整合完成的舊規格目錄。
-    Consolidates specs/ documents into docs/specifications/ in chronological number order.
-    Newer spec content overrides older when overlapping. Merged PR evidence overrides stale
-    Draft or task metadata. Keeps every incomplete SDD plus the five newest completed SDDs,
-    and removes older completed folders only after verification.
+description: 整合或歸檔 specs/ 規格到 docs/specifications/ 時使用；依 Git／PR 交付證據判定完成狀態，保留未完成規格及編號最新的 5 個已完成規格。Use when consolidating or archiving project specs.
 ---
 
 # 規格整合技能 Specs Consolidation Skill

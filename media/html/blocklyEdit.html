@@ -166,14 +166,6 @@
                 </select>
             </div>
             <div id="toolbarSecondaryActions" class="toolbar-action-group toolbar-secondary-actions" hidden>
-            <div id="experimentalBlocksIndicator" class="experimental-blocks-indicator hidden" title="">
-                <div class="indicator-icon">
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path fill="currentColor"
-                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                    </svg>
-                </div>
-            </div>
             <div class="feedback-entry">
                 <button id="provideFeedbackButton" class="feedback-entry-button" type="button" title=""
                     aria-label="">
@@ -324,6 +316,14 @@
             </div>
             </div>
             <div id="toolbarPrimaryActions" class="toolbar-action-group toolbar-primary-actions">
+                <div id="experimentalBlocksIndicator" class="experimental-blocks-indicator hidden" title="">
+                    <div class="indicator-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor"
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                        </svg>
+                    </div>
+                </div>
                 <div class="backup-switch">
                     <button id="backupButton" title="備份管理">
                         <svg class="backup-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -742,6 +742,7 @@
     <script src="{pixettoBlocksUri}"></script>
     <script src="{huskyLensBlocksUri}"></script>
     <script src="{esp32WifiMqttBlocksUri}"></script>
+    <script src="{esp32RcBlocksUri}"></script>
     {arduinoModules}
     {micropythonModules}
     {txtModules}

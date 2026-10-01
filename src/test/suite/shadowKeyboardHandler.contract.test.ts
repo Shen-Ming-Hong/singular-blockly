@@ -74,7 +74,7 @@ function createHarness() {
 		filename: 'shadowKeyboardHandler.js',
 	});
 	const handler = (context.window as typeof context.window & {
-		shadowKeyboardHandler: { init: (api: unknown, provider: () => unknown) => void; dispose: () => void };
+		shadowKeyboardHandler: { init: (api: unknown, provider: () => unknown) => void; dispose: () => void; updateConfig: (config: unknown) => void };
 	}).shadowKeyboardHandler;
 	handler.init({ postMessage: (message: unknown) => messages.push(message) }, () => workspace);
 
@@ -107,6 +107,55 @@ suite('Shadow suggestion ShortcutRegistry contract', () => {
 		assert.doesNotMatch(source, /document\.addEventListener\(['"]keydown/);
 		harness.handler.dispose();
 		assert.strictEqual(harness.shortcuts.size, 0);
+	});
+
+	test('trigger leaves the shortcut available before config arrives or when disabled', () => {
+		const harness = createHarness();
+		const shortcut = harness.shortcuts.get('singular.shadowSuggestion.trigger')!;
+		assert.strictEqual(shortcut.preconditionFn(harness.workspace), false);
+		assert.strictEqual(shortcut.callback(harness.workspace, keyboardEvent()), false);
+		harness.handler.updateConfig({ enabled: false });
+		assert.strictEqual(shortcut.preconditionFn(harness.workspace), false);
+		assert.strictEqual(shortcut.callback(harness.workspace, keyboardEvent()), false);
+		assert.deepStrictEqual(harness.messages, []);
+	});
+
+	test('trigger sends a request only when enabled on the canonical workspace', () => {
+		const harness = createHarness();
+		const shortcut = harness.shortcuts.get('singular.shadowSuggestion.trigger')!;
+		harness.handler.updateConfig({ enabled: true });
+		assert.strictEqual(shortcut.preconditionFn({}), false);
+		assert.strictEqual(shortcut.preconditionFn(harness.workspace), true);
+		assert.strictEqual(shortcut.callback(harness.workspace, keyboardEvent()), true);
+		assert.strictEqual(JSON.stringify(harness.messages), JSON.stringify([{ command: 'requestShadowSuggestion', context: null }]));
+	});
+
+	test('VS Code trigger rejects absent config and disabling config clears the ghost', () => {
+		const source = fs.readFileSync(path.join(PROJECT_ROOT, 'media/js/blocklyEdit.js'), 'utf8');
+		const start = source.indexOf("case 'updateAIConfig':");
+		const end = source.indexOf('// T007:', start);
+		const branch = source.slice(start, end);
+		const messages: unknown[] = [];
+		const clears: boolean[] = [];
+		let config: unknown = null;
+		const run = (message: unknown) => vm.runInNewContext('switch (message.command) {' + branch + '}', {
+			message, Blockly: {}, vscode: { postMessage: (value: unknown) => messages.push(value) },
+			window: {
+				getBlocklyWorkspace: () => ({}),
+				contextExtractor: { extractContext: () => ({ board: 'uno' }) },
+				shadowKeyboardHandler: { getConfig: () => config, updateConfig: (value: unknown) => { config = value; } },
+				shadowBlockManager: { clearSuggestion: (value: boolean) => clears.push(value) },
+			},
+		});
+		run({ command: 'triggerAISuggestion' });
+		assert.strictEqual(messages.length, 0);
+		run({ command: 'updateAIConfig', config: { enabled: false } });
+		run({ command: 'triggerAISuggestion' });
+		assert.strictEqual(messages.length, 0);
+		assert.deepStrictEqual(clears, [false]);
+		run({ command: 'updateAIConfig', config: { enabled: true } });
+		run({ command: 'triggerAISuggestion' });
+		assert.strictEqual(messages.length, 1);
 	});
 
 	test('Tab only accepts an active suggestion on the canonical workspace', () => {

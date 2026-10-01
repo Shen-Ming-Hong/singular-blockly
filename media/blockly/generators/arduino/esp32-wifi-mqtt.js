@@ -48,6 +48,7 @@ window.arduinoGenerator.forBlock['esp32_wifi_connect'] = function (block) {
 	// 生成連線代碼（含 10 秒超時）
 	let code = `// WiFi 連線到 ${ssid}\n`;
 	code += `WiFi.mode(WIFI_STA);\n`;
+	code += `WiFi.setAutoReconnect(true);\n`;
 	code += `WiFi.begin("${ssid}", "${password}");\n`;
 	code += `unsigned long _wifiStartTime = millis();\n`;
 	code += `while (WiFi.status() != WL_CONNECTED && millis() - _wifiStartTime < 10000) {\n`;

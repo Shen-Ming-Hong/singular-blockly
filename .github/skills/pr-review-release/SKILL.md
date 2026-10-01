@@ -2,9 +2,9 @@
 name: pr-review-release
 description: 本地 Codex Code Review 評估、使用者核准與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
 metadata:
-    author: singular-blockly
-    version: '2.0.0'
-    category: productivity
+  author: singular-blockly
+  version: '2.0.0'
+  category: productivity
 license: Apache-2.0
 ---
 

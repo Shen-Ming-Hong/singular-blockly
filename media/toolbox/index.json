@@ -17,6 +17,9 @@
 			"$include": "./categories/communication.json"
 		},
 		{
+			"$include": "./categories/esp32_rc.json"
+		},
+		{
 			"$include": "./categories/logic.json"
 		},
 		{

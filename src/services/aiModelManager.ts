@@ -88,6 +88,7 @@ const DEFAULT_MODEL_FAMILY = 'gpt-5-mini';
 const BASE_MODEL_FAMILIES = ['gpt-5-mini', 'gpt-4.1', 'gpt-4o'];
 const RETRY_BACKOFF_MS = 2000;
 const MAX_RETRIES = 3;
+const MODEL_DISCOVERY_TIMEOUT_MS = 10_000;
 
 /**
  * AI 模型管理器
@@ -97,6 +98,13 @@ export class AIModelManager implements vscode.Disposable {
 	private _tier: CopilotTier = 'none';
 	private _cachedModel: vscode.LanguageModelChat | undefined;
 	private _redetectTimer: ReturnType<typeof setInterval> | undefined;
+	private _initialization: Promise<void> | undefined;
+	private _ready = false;
+	private _disposed = false;
+	private _generation = 0;
+	private readonly _pendingQueries = new Set<() => void>();
+	private readonly _onDidChangeReadiness = new vscode.EventEmitter<boolean>();
+	readonly onDidChangeReadiness = this._onDidChangeReadiness.event;
 
 	private readonly _onTierChanged = new vscode.EventEmitter<CopilotTier>();
 	/** Fires when the detected Copilot tier changes */
@@ -110,29 +118,108 @@ export class AIModelManager implements vscode.Disposable {
 	 * Initialize the manager: detect tier, restore saved model preference,
 	 * and start periodic re-detection.
 	 */
-	async initialize(): Promise<void> {
-		await this.detectCopilotTier();
+	initialize(): Promise<void> {
+		if (this._disposed) { return Promise.resolve(); }
+		if (!this.isConfiguredEnabled()) {
+			this.stop();
+			return Promise.resolve();
+		}
+		if (this._initialization) { return this._initialization; }
+		if (this.isReady()) { return Promise.resolve(); }
 
+		this._cachedModel = undefined;
+		const generation = this._generation;
+		const initialization = this.initializeModels(generation).finally(() => {
+			if (this._initialization === initialization) { this._initialization = undefined; }
+		});
+		this._initialization = initialization;
+		return initialization;
+	}
+
+	private async initializeModels(generation: number): Promise<void> {
+		await this.detectCopilotTier();
+		if (!this.isCurrent(generation) || !this.isConfiguredEnabled()) { return; }
 		if (this._tier !== 'none') {
-			// Restore the user's saved model preference so _cachedModel is ready
-			// before the first sendPrompt() call.
 			const savedFamily = vscode.workspace.getConfiguration('singularBlockly.ai').get<string>('model');
 			await this.selectModel(savedFamily || undefined);
 		}
+		if (!this.isCurrent(generation) || !this.isConfiguredEnabled()) { return; }
+		this.setReady(this._tier !== 'none' && !!this._cachedModel);
+		if (!this.isCurrent(generation)) { return; }
 
-		this._redetectTimer = setInterval(async () => {
-			try {
-				await this.detectCopilotTier();
-			} catch (err) {
-				log(`Periodic tier re-detection failed: ${err}`, 'warn');
-			}
-		}, REDETECT_INTERVAL_MS);
+		if (!this._redetectTimer) {
+			this._redetectTimer = setInterval(() => {
+				// Refresh through the same single-flight path, including model selection.
+				this.setReady(false);
+				void this.initialize().catch(err => log(`Periodic model re-detection failed: ${err}`, 'warn'));
+			}, REDETECT_INTERVAL_MS);
+		}
+	}
+
+	/** Suggestions are available only after discovery and selection have completed. */
+	isReady(): boolean {
+		return !this._disposed && this._ready && !!this._cachedModel && this._tier !== 'none' && this.isConfiguredEnabled();
+	}
+
+	/** Stop background discovery and reset state; initialize may be called after re-enabling. */
+	stop(): void {
+		this._generation++;
+		for (const cancel of this._pendingQueries) { cancel(); }
+		this._initialization = undefined;
+		if (this._redetectTimer) {
+			clearInterval(this._redetectTimer);
+			this._redetectTimer = undefined;
+		}
+		this._cachedModel = undefined;
+		this.setReady(false);
+		if (this._tier !== 'none') {
+			this._tier = 'none';
+			this._onTierChanged.fire(this._tier);
+		}
+	}
+
+	private isConfiguredEnabled(): boolean {
+		return vscode.workspace.getConfiguration('singularBlockly.ai').get<boolean>('enabled', false);
+	}
+
+	private isCurrent(generation: number): boolean {
+		return !this._disposed && generation === this._generation;
+	}
+
+	private setReady(ready: boolean): void {
+		if (this._ready !== ready) {
+			this._ready = ready;
+			this._onDidChangeReadiness.fire(ready);
+		}
+	}
+
+	/** The LM discovery API has no cancellation token; ignore results after stop or timeout. */
+	private queryModels(selector: vscode.LanguageModelChatSelector): Promise<readonly vscode.LanguageModelChat[]> {
+		if (this._disposed) { return Promise.resolve([]); }
+		return new Promise((resolve, reject) => {
+			let settled = false;
+			const finish = (models: readonly vscode.LanguageModelChat[], error?: unknown) => {
+				if (settled) { return; }
+				settled = true;
+				clearTimeout(timeout);
+				this._pendingQueries.delete(cancel);
+				if (error) { reject(error); } else { resolve(models); }
+			};
+			const cancel = () => finish([]);
+			const timeout = setTimeout(() => finish([], new Error('AI model discovery timed out')), MODEL_DISCOVERY_TIMEOUT_MS);
+			this._pendingQueries.add(cancel);
+			Promise.resolve()
+				.then(() => settled ? [] : vscode.lm.selectChatModels(selector))
+				.then(models => finish(models || []), err => finish([], err));
+		});
 	}
 
 	/**
 	 * Detect the Copilot subscription tier based on available model families
 	 */
 	async detectCopilotTier(): Promise<CopilotTier> {
+		const generation = this._generation;
+		if (!this.isCurrent(generation)) { return 'none'; }
 		const previousTier = this._tier;
 
 		if (typeof vscode.lm === 'undefined' || typeof vscode.lm.selectChatModels !== 'function') {
@@ -145,7 +232,8 @@ export class AIModelManager implements vscode.Disposable {
 		}
 
 		try {
-			const models = await vscode.lm.selectChatModels({ vendor: 'copilot' });
+			const models = await this.queryModels({ vendor: 'copilot' });
+			if (!this.isCurrent(generation)) { return 'none'; }
 			if (!models || models.length === 0) {
 				this._tier = 'none';
 			} else {
@@ -159,8 +247,13 @@ export class AIModelManager implements vscode.Disposable {
 				}
 			}
 		} catch (err) {
+			if (!this.isCurrent(generation)) { return 'none'; }
 			log(`Failed to detect Copilot tier: ${err}`, 'warn');
 			this._tier = 'none';
+		}
+		if (this._tier === 'none') {
+			this._cachedModel = undefined;
+			this.setReady(false);
 		}
 
 		if (previousTier !== this._tier) {
@@ -191,7 +284,7 @@ export class AIModelManager implements vscode.Disposable {
 		}
 
 		try {
-			const models = await vscode.lm.selectChatModels({ vendor: 'copilot' });
+			const models = await this.queryModels({ vendor: 'copilot' });
 			return (models || [])
 				.filter(m => {
 					const familyLower = m.family.toLowerCase();
@@ -209,6 +302,8 @@ export class AIModelManager implements vscode.Disposable {
 	 * @param family Model family to select, defaults to gpt-4o
 	 */
 	async selectModel(family?: string): Promise<vscode.LanguageModelChat | undefined> {
+		const generation = this._generation;
+		if (!this.isCurrent(generation)) { return undefined; }
 		if (typeof vscode.lm === 'undefined' || typeof vscode.lm.selectChatModels !== 'function') {
 			log('vscode.lm API not available, cannot select model', 'warn');
 			return undefined;
@@ -217,7 +312,8 @@ export class AIModelManager implements vscode.Disposable {
 		const targetFamily = family || DEFAULT_MODEL_FAMILY;
 
 		try {
-			const models = await vscode.lm.selectChatModels({ vendor: 'copilot', family: targetFamily });
+			const models = await this.queryModels({ vendor: 'copilot', family: targetFamily });
+			if (!this.isCurrent(generation)) { return undefined; }
 			if (models && models.length > 0) {
 				this._cachedModel = models[0];
 				log(`Selected model: ${this._cachedModel.name} (${this._cachedModel.family})`, 'info');
@@ -226,7 +322,8 @@ export class AIModelManager implements vscode.Disposable {
 			}
 
 			log(`No model found for family "${targetFamily}", falling back to any available`, 'warn');
-			const fallback = await vscode.lm.selectChatModels({ vendor: 'copilot' });
+			const fallback = await this.queryModels({ vendor: 'copilot' });
+			if (!this.isCurrent(generation)) { return undefined; }
 			if (fallback && fallback.length > 0) {
 				this._cachedModel = fallback[0];
 				log(`Fallback model selected: ${this._cachedModel.name} (${this._cachedModel.family})`, 'info');
@@ -237,6 +334,7 @@ export class AIModelManager implements vscode.Disposable {
 			log('No Copilot models available', 'warn');
 			return undefined;
 		} catch (err) {
+			if (!this.isCurrent(generation)) { return undefined; }
 			log(`Failed to select model: ${err}`, 'error');
 			return undefined;
 		}
@@ -252,10 +350,13 @@ export class AIModelManager implements vscode.Disposable {
 		messages: vscode.LanguageModelChatMessage[],
 		token: vscode.CancellationToken
 	): Promise<vscode.LanguageModelChatResponse | null> {
+		const generation = this._generation;
+		if (!this.isCurrent(generation) || token.isCancellationRequested) { return null; }
 		if (!this._cachedModel) {
 			// Re-read saved preference so we never silently fall through to gpt-5-mini
 			const savedFamily = vscode.workspace.getConfiguration('singularBlockly.ai').get<string>('model');
 			const model = await this.selectModel(savedFamily || undefined);
+			if (!this.isCurrent(generation) || token.isCancellationRequested) { return null; }
 			if (!model) {
 				log('No model available for sendPrompt', 'warn');
 				return null;
@@ -265,11 +366,14 @@ export class AIModelManager implements vscode.Disposable {
 		const config = this.getEffectiveConfig();
 
 		for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+			if (!this.isCurrent(generation) || token.isCancellationRequested || !this._cachedModel) { return null; }
 			try {
 				const modelOpts = this.buildModelOptions(this._cachedModel!, config.reasoningEffort);
 				const response = await this._cachedModel!.sendRequest(messages, { modelOptions: modelOpts }, token);
+				if (!this.isCurrent(generation) || token.isCancellationRequested) { return null; }
 				return response;
 			} catch (err) {
+				if (!this.isCurrent(generation) || token.isCancellationRequested) { return null; }
 				if (err instanceof vscode.LanguageModelError) {
 					if (err.code === 'rate_limit') {
 						if (attempt < MAX_RETRIES) {
@@ -290,12 +394,15 @@ export class AIModelManager implements vscode.Disposable {
 							}
 							log(`Premium quota exhausted, trying base model: ${family}`, 'info');
 							const fallbackModel = await this.selectModel(family);
+							if (!this.isCurrent(generation) || token.isCancellationRequested) { return null; }
 							if (fallbackModel) {
 								try {
 									const fallbackOpts = this.buildModelOptions(fallbackModel, config.reasoningEffort);
 									const retryResponse = await fallbackModel.sendRequest(messages, { modelOptions: fallbackOpts }, token);
+									if (!this.isCurrent(generation) || token.isCancellationRequested) { return null; }
 									return retryResponse;
 								} catch (retryErr) {
+									if (!this.isCurrent(generation) || token.isCancellationRequested) { return null; }
 									log(`Base model ${family} also failed: ${retryErr}`, 'warn');
 								}
 							}
@@ -323,7 +430,7 @@ export class AIModelManager implements vscode.Disposable {
 
 		// Only read settings that exist in package.json; the rest come from tier defaults
 		return {
-			enabled: userConfig.get<boolean>('enabled', defaults.enabled),
+			enabled: this.isReady() && userConfig.get<boolean>('enabled', defaults.enabled),
 			triggerDelay: userConfig.get<number>('triggerDelay', defaults.triggerDelay),
 			maxPerMinute: userConfig.get<number>('maxSuggestionsPerMinute', defaults.maxPerMinute),
 			contextDepth: defaults.contextDepth,
@@ -344,7 +451,7 @@ export class AIModelManager implements vscode.Disposable {
 		}
 
 		try {
-			const models = await vscode.lm.selectChatModels({ vendor: 'copilot' });
+			const models = await this.queryModels({ vendor: 'copilot' });
 			return (models || []).filter(m => {
 				const familyLower = m.family.toLowerCase();
 				return !EXCLUDED_MODEL_PATTERNS.some(p => familyLower.includes(p));
@@ -357,10 +464,10 @@ export class AIModelManager implements vscode.Disposable {
 
 	/** Clean up resources */
 	dispose(): void {
-		if (this._redetectTimer) {
-			clearInterval(this._redetectTimer);
-			this._redetectTimer = undefined;
-		}
+		if (this._disposed) { return; }
+		this._disposed = true;
+		this.stop();
+		this._onDidChangeReadiness.dispose();
 		this._onTierChanged.dispose();
 		this._onQuotaExhausted.dispose();
 		this._cachedModel = undefined;

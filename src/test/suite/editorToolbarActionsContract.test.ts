@@ -12,14 +12,14 @@ suite('Blockly editor toolbar actions contract', () => {
 	const root = path.resolve(__dirname, '../../..');
 	const read = (file: string) => fs.readFileSync(path.join(root, file), 'utf8');
 
-	test('keeps only backup, upload, and monitor in the primary action group', () => {
+	test('keeps backup, upload, monitor, and the experimental indicator in the primary group', () => {
 		const html = read('media/html/blocklyEdit.html');
 		const primaryStart = html.indexOf('id="toolbarPrimaryActions"');
 		const primaryEnd = html.indexOf('id="toolbarActionsToggle"', primaryStart);
 		const primary = html.slice(primaryStart, primaryEnd);
 
 		assert.ok(primaryStart >= 0, 'primary toolbar action group is missing');
-		for (const id of ['backupButton', 'uploadButton', 'monitorBtn']) {
+		for (const id of ['backupButton', 'uploadButton', 'monitorBtn', 'experimentalBlocksIndicator']) {
 			assert.ok(primary.includes(`id="${id}"`), `${id} must remain visible when the toolbar is collapsed`);
 		}
 		for (const id of ['provideFeedbackButton', 'languageToggle', 'themeToggle', 'functionSearchToggle', 'refreshButton']) {
@@ -42,7 +42,7 @@ suite('Blockly editor toolbar actions contract', () => {
 		);
 		assert.match(html, /id="toolbarSecondaryActions"[^>]*hidden/);
 		const indicator = html.indexOf('id="experimentalBlocksIndicator"');
-		assert.ok(indicator > secondary && indicator < primary, 'experimental indicator must collapse with secondary actions');
+		assert.ok(indicator > primary && indicator < toggle, 'experimental indicator must remain visible when secondary actions collapse');
 		assert.match(html, /id="provideFeedbackButton"[^>]*class="feedback-entry-button"[\s\S]*class="feedback-entry-icon"/);
 		assert.doesNotMatch(html, /id="provideFeedbackButtonLabel"/);
 	});

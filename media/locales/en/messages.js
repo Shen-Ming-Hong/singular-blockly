@@ -1131,6 +1131,11 @@ window.languageManager.loadMessages('en', {
 
 	// === RC Connection ===
 	CATEGORY_RC: 'RC Connection',
+	ESP32_RC_LABEL_CYBERBRICK: 'CyberBrick remote',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'Use the same pair ID (1–255) and channel (1–11) as the CyberBrick transmitter. Wi-Fi/MQTT may change the channel and interrupt RC.',
+	ESP32_RC_WAIT_TOOLTIP: 'Wait for a valid CyberBrick RC signal; continue when the time limit ends.',
+	ESP32_RC_ONLY_WARNING: 'This RC block works only on ESP32 DevKit.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'RC initialization disconnects Wi-Fi. Initialize RC before connecting Wi-Fi, and set the Wi-Fi access point to the same channel as RC; another channel stops RC reception.',
 	RC_LABEL_MASTER: '📡 Transmitter',
 	RC_LABEL_SLAVE: '📻 Receiver',
 	RC_LABEL_DATA: '📊 Data Reading',
