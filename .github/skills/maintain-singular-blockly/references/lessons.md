@@ -31,3 +31,15 @@
 - **問題：** Dependabot PR #175 與 #185 都嘗試把 Vitest 4 升到 Vitest 5，但 `@cloudflare/vitest-plugin` 目前最新版 1.3.0 的 `peerDependencies.vitest` 仍為 `^4.1.0`；直接升級會讓 `npm ci` 因 peer dependency 衝突失敗。
 - **規則：** 自 2026-09-28 起，例行 `vitest` semver-major version update 暫時由 Dependabot ignore；Vitest 4.x 的 minor／patch 更新仍照常評估，security update 不得以此規則延後。當 Cloudflare plugin 官方 peer contract 支援 Vitest 5 時，移除此 major hold 並重新做 Lightweight plan／相容性驗證。
 - **證據：** PR #175、PR #185，以及 `cloudflare/workers-sdk` 的 `packages/vitest-plugin/package.json`（1.3.0：`vitest ^4.1.0`）。
+
+## [啟動] Copilot 偵測不得阻塞普通編輯命令
+
+- **問題：** activation 在註冊主要命令前等待 AI 模型清單及選取，Copilot 尚未就緒時會連帶延遲普通 Blockly 編輯；關閉 AI 設定也不應觸發模型查詢。
+- **規則：** 先連接可延後就緒的 AI manager，再在背景初始化；只有 ready 且 enabled 才允許影子建議。保留模型查詢期限、停用／dispose 的晚回結果隔離，以及 WebView 關閉時的請求取消與 listener 清理。Blockly 原生參數 shadow 不依賴 AI。
+- **證據：** `src/extension.ts`、`src/services/aiModelManager.ts`、`src/test/extension.activate.test.ts`、`src/test/services/aiModelManager.test.ts`、`src/test/suite/messageHandlerAI.test.ts`、`src/test/suite/shadowKeyboardHandler.contract.test.ts`。
+
+## [Blockly] 不同來源的警告使用獨立 ID
+
+- **問題：** Blockly 的 `setWarningText(null)` 未帶 ID 時會清除全部警告；板型刷新可能連帶清掉孤立積木警告。
+- **規則：** 板型、孤立及其他獨立警告的設定與清除都帶各自的 ID；新積木仍保留產生器與 onchange 的三層孤立 guard。
+- **證據：** `media/js/blocklyEdit.js`、`media/blockly/blocks/esp32-rc.js`、`src/test/suite/esp32Rc.contract.test.ts`。

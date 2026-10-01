@@ -31,9 +31,10 @@ import { FeedbackIdentityService } from './services/feedbackIdentity';
 import { createManagedRuntimeFetch } from './services/managedRuntimeProxy';
 import { FeedbackPanel } from './webview/feedbackPanel';
 
-// AI model manager (initialized when Copilot is available)
+// AI services are connected immediately; model discovery runs in the background.
 let aiModelManager: AIModelManager | undefined;
 let aiStatusBarInstance: AIStatusBar | undefined;
+let disposeAIServices: (() => void) | undefined;
 
 // VSCode API 引用（可在測試中注入）
 let vscodeApi: typeof vscode = vscode;
@@ -50,6 +51,7 @@ export function _setVSCodeApi(api: typeof vscode): void {
  * 重置為生產環境預設值（僅用於測試）
  */
 export function _reset(): void {
+	disposeAIServices?.();
 	vscodeApi = vscode;
 }
 
@@ -204,10 +206,12 @@ export async function activate(context: vscode.ExtensionContext) {
 		// 註冊活動欄視圖
 		registerActivityBarView(context);
 
-		// 初始化 AI 影子建議服務（在註冊命令前完成，確保 WebViewManager 可取得 AIModelManager）
-		await initializeAIServices(context).catch(err => {
-			log('AI services initialization failed (non-critical)', 'warn', err);
-		});
+		// Connect the manager before commands can create a WebView, without waiting for Copilot.
+		try {
+			initializeAIServices(context);
+		} catch (error) {
+			log('AI services setup failed (non-critical)', 'warn', error);
+		}
 
 		// 註冊命令
 		registerCommands(
@@ -660,38 +664,65 @@ function createWorkspaceCandidateService(workspaceRoot: string, localeService: L
 /**
  * 初始化 AI 影子建議服務
  */
-async function initializeAIServices(context: vscode.ExtensionContext): Promise<void> {
+function initializeAIServices(context: vscode.ExtensionContext): void {
 	// Unit Extension Hosts can have a user's Copilot extension installed. Avoid triggering
 	// authentication or network-backed model discovery in the isolated unit test process.
 	if (process.env.NODE_ENV === 'test') {
 		log('Skipping AI model discovery in the unit test environment', 'info');
 		return;
 	}
+	disposeAIServices?.();
 	const manager = new AIModelManager();
-	await manager.initialize();
-
-	if (manager.getTier() === 'none') {
-		log('No Copilot available, AI suggestions inactive', 'info');
+	let disposed = false;
+	let aiStatusBar: AIStatusBar | undefined;
+	let configurationListener: vscode.Disposable | undefined;
+	const dispose = (): void => {
+		if (disposed) {return;}
+		disposed = true;
+		configurationListener?.dispose();
 		manager.dispose();
-		return;
+		aiStatusBar?.dispose();
+		if (aiModelManager === manager) {
+			aiModelManager = undefined;
+			aiStatusBarInstance = undefined;
+		}
+		if (disposeAIServices === dispose) {disposeAIServices = undefined;}
+	};
+	disposeAIServices = dispose;
+	context.subscriptions.push({ dispose });
+	try {
+		aiModelManager = manager;
+		aiStatusBar = new AIStatusBar(manager);
+		aiStatusBarInstance = aiStatusBar;
+		const start = (): void => {
+			if (disposed) {return;}
+			void manager.initialize().then(() => {
+				if (!disposed) {
+					log(`AI suggestions initialization completed (ready: ${manager.isReady()})`, 'info');
+				}
+			}).catch(error => {
+				if (!disposed) {log('AI services initialization failed (non-critical)', 'warn', error);}
+			});
+		};
+		configurationListener = vscodeApi.workspace.onDidChangeConfiguration(event => {
+			if (!event.affectsConfiguration('singularBlockly.ai.enabled') &&
+				!event.affectsConfiguration('singularBlockly.ai.model')) {return;}
+			// Invalidate an older model selection before reinitializing from the new settings.
+			manager.stop();
+			start();
+		});
+		start();
+	} catch (error) {
+		dispose();
+		throw error;
 	}
-
-	// Store globally so WebViewManager can access it
-	aiModelManager = manager;
-
-	// Create status bar UI
-	const aiStatusBar = new AIStatusBar(manager, context);
-	aiStatusBarInstance = aiStatusBar;
-	context.subscriptions.push(aiStatusBar);
-	context.subscriptions.push(manager);
-
-	log(`AI suggestions initialized (tier: ${manager.getTier()})`, 'info');
 }
 
 /**
  * 停用擴充功能
  */
 export function deactivate() {
+	disposeAIServices?.();
 	// 清理資源
 	disposeOutputChannel();
 }

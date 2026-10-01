@@ -7,13 +7,13 @@
     {
       "source": "canonical/SKILL.md",
       "target": ".agents/skills/singular-blockly/SKILL.md",
-      "sha256": "45848d1f0d0549e1c6918e5e4745a1b34270c06773725ff2f4fadafb1a090a57",
+      "sha256": "b7173d25bd41a0161e85aead0bc8f3186e7f18ea94ee4b9a57e8f3310dd9a7d0",
       "kind": "canonical"
     },
     {
       "source": "canonical/references/block-contract.json",
       "target": ".agents/skills/singular-blockly/references/block-contract.json",
-      "sha256": "dda850df01b28f7985233a8a697bb204a3858a2edef2008beb881ad1ce7f7203",
+      "sha256": "042445b968d18fb8ca36334b7bc1ff144d25a43a52d57bc6ab6637f257eb2f60",
       "kind": "reference"
     },
     {
@@ -74,6 +74,12 @@
       "source": "canonical/references/block-contract/cyberbrick_x12.json",
       "target": ".agents/skills/singular-blockly/references/block-contract/cyberbrick_x12.json",
       "sha256": "c8153fbedcd3105ccf4c17a8acbe1d7837f9a61d01d0c3bdb7087c623125aa95",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-contract/esp32_rc.json",
+      "target": ".agents/skills/singular-blockly/references/block-contract/esp32_rc.json",
+      "sha256": "36bf5036fe699e7fca05ce08d6931133e3b60f1e78f517bca158be0356f0df80",
       "kind": "reference"
     },
     {

@@ -1137,6 +1137,11 @@ window.languageManager.loadMessages('pl', {
 
 	// === Połączenie RC ===
 	CATEGORY_RC: 'Połączenie RC',
+	ESP32_RC_LABEL_CYBERBRICK: 'Pilot CyberBrick',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'Ustaw taki sam identyfikator pary (1–255) i kanał (1–11) jak w nadajniku CyberBrick. Wi-Fi/MQTT może zmienić kanał i przerwać łączność RC.',
+	ESP32_RC_WAIT_TOOLTIP: 'Czekaj na prawidłowy sygnał RC CyberBrick; po upływie czasu kontynuuj.',
+	ESP32_RC_ONLY_WARNING: 'Ten blok RC działa tylko na ESP32 DevKit.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'Inicjalizacja RC rozłącza Wi-Fi. Najpierw zainicjuj RC, a potem połącz Wi-Fi z punktem dostępu ustawionym na ten sam kanał co RC. Inny kanał przerywa odbiór RC.',
 	RC_LABEL_MASTER: '📡 Nadajnik',
 	RC_LABEL_SLAVE: '📻 Odbiornik',
 	RC_LABEL_DATA: '📊 Dane',

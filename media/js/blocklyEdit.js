@@ -4328,6 +4328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			(event.type === Blockly.Events.BLOCK_CHANGE && event.element === 'disabled')
 		) {
 			protectMainBlockState(workspace);
+			updateEsp32BlockWarnings(workspace, window.getCurrentBoard());
 		}
 
 		// 工作區完全載入後修復函數呼叫積木和連接點
@@ -4563,9 +4564,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		rebuildPwmConfig(workspace);
 		protectMainBlockState(workspace);
 		refreshCyberBrickNamingIssues(workspace);
+		updateEsp32BlockWarnings(workspace, boardId);
 		updateTheme(currentTheme);
 		workspace.render();
 		Blockly.svgResize(workspace);
+		window.updateExperimentalBlocksList?.(workspace);
+		window.experimentalBlockMarker?.refreshMarks();
 		return workspace;
 	};
 
@@ -4849,6 +4853,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				// 重建 ESP32 PWM 配置
 				rebuildPwmConfig(workspace);
 				mainBlockStateRepaired = protectMainBlockState(workspace);
+				updateEsp32BlockWarnings(workspace, message.board || window.getCurrentBoard());
 				refreshTxtVirtualButtonReferences();
 				repairFunctionReferences(workspace, preSaveFunctionNames, true);
 				if (txtVirtualControls?.canvas?.lastViewport) {
@@ -4859,7 +4864,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 						}
 					});
 				}
-
+				requestAnimationFrame(() => {
+					if (workspace !== window.getBlocklyWorkspace()) return;
+					window.updateExperimentalBlocksList?.(workspace);
+					window.experimentalBlockMarker?.refreshMarks();
+				});
 			}
 			if (!workspaceState) {
 				applyTxtVirtualControlsDocument(txtVirtualControls, { preserveExecutionMode: preserveTxtVirtualControlExecutionMode });
@@ -5428,6 +5437,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 				break;
 			case 'updateAIConfig':
+				if (!message.config || message.config.enabled !== true) {
+					window.shadowBlockManager?.clearSuggestion(false);
+				}
 				if (window.shadowKeyboardHandler) {
 					window.shadowKeyboardHandler.updateConfig(message.config);
 				}
@@ -5441,7 +5453,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 							? window.shadowKeyboardHandler.getConfig()
 							: null;
 					// Manual trigger requires AI to be enabled
-					if (triggerConfig && triggerConfig.enabled === false) {
+					if (!triggerConfig || triggerConfig.enabled !== true) {
 						break;
 					}
 					var triggerWorkspace = typeof Blockly !== 'undefined' ? window.getBlocklyWorkspace() : null;
@@ -5946,6 +5958,9 @@ async function updateToolboxForBoard(workspace, boardId) {
 				if (!contents || !Array.isArray(contents)) return contents;
 
 				return contents.filter(item => {
+					if (item.kind === 'category' && item.name === '%{CATEGORY_RC}') {
+						return boardId === 'esp32';
+					}
 					// 如果是 esp32_pwm_setup 積木,只在 ESP32 開發板時顯示
 					if (item.type === 'esp32_pwm_setup') {
 						return isESP32Board;
@@ -6008,10 +6023,8 @@ async function updateToolboxForBoard(workspace, boardId) {
 		// 更新 UI 元素（上傳按鈕、生成器切換等）
 		updateUIForBoard(boardId, isCyberBrick, isTxt);
 
-		// 更新工作區中已存在的 ESP32 專屬積木警告（僅針對 Arduino 板）
-		if (!isCyberBrick && !isTxt) {
-			updateEsp32BlockWarnings(workspace, isESP32Board);
-		}
+		// 更新工作區中已存在的 ESP32 專屬積木警告
+		updateEsp32BlockWarnings(workspace, boardId);
 	} catch (error) {
 		log.error('[blockly] 工具箱更新失敗:', error);
 	}
@@ -7927,9 +7940,19 @@ function handlePortListResponse(message) {
 /**
  * 更新工作區中 ESP32 專屬積木的警告
  * @param {Blockly.WorkspaceSvg} workspace - Blockly 工作區實例
- * @param {boolean} isESP32Board - 是否為 ESP32 開發板
+ * @param {string} boardId - 目前開發板 ID
  */
-function updateEsp32BlockWarnings(workspace, isESP32Board) {
+function updateEsp32BlockWarnings(workspace, boardId) {
+	const warningId = 'esp32-board';
+	const isESP32Board = boardId === 'esp32' || boardId === 'supermini';
+	const rcBlockTypes = [
+		'esp32_rc_receiver_init',
+		'esp32_rc_wait_connection',
+		'esp32_rc_is_connected',
+		'esp32_rc_get_joystick',
+		'esp32_rc_get_joystick_mapped',
+		'esp32_rc_is_button_pressed',
+	];
 	// ESP32 專屬積木類型列表
 	const esp32BlockTypes = [
 		'esp32_wifi_connect',
@@ -7948,21 +7971,35 @@ function updateEsp32BlockWarnings(workspace, isESP32Board) {
 		'esp32_mqtt_get_message',
 		'esp32_mqtt_status',
 		'esp32_pwm_setup',
+		...rcBlockTypes,
 	];
 
 	const warningMessage = window.languageManager
 		? window.languageManager.getMessage('ESP32_ONLY_BLOCK_WARNING', '此積木僅支援 ESP32 系列開發板')
 		: '此積木僅支援 ESP32 系列開發板';
+	const rcWarningMessage = window.languageManager
+		? window.languageManager.getMessage('ESP32_RC_ONLY_WARNING', '此 RC 積木僅支援 ESP32 DevKit')
+		: '此 RC 積木僅支援 ESP32 DevKit';
+
+	const blocks = workspace.getAllBlocks();
+	const wifiRcConflict = boardId === 'esp32' &&
+		blocks.some(block => block.type === 'esp32_rc_receiver_init' && block.isEnabled()) &&
+		blocks.some(block => block.type === 'esp32_wifi_connect' && block.isEnabled());
+	const wifiRcWarningMessage = window.languageManager
+		? window.languageManager.getMessage('ESP32_RC_WIFI_COEXIST_WARNING', 'RC 初始化會斷開 Wi-Fi。請先初始化 RC，再連線至相同頻道的 Wi-Fi 基地台；頻道不同會使 RC 失聯。')
+		: 'RC 初始化會斷開 Wi-Fi。請先初始化 RC，再連線至相同頻道的 Wi-Fi 基地台；頻道不同會使 RC 失聯。';
 
 	// 遍歷工作區中所有積木
-	workspace.getAllBlocks().forEach(block => {
+	blocks.forEach(block => {
 		if (esp32BlockTypes.includes(block.type)) {
-			if (!isESP32Board) {
+			if (rcBlockTypes.includes(block.type) ? boardId !== 'esp32' : !isESP32Board) {
 				// 非 ESP32 板子：顯示警告
-				block.setWarningText(warningMessage);
+				block.setWarningText(rcBlockTypes.includes(block.type) ? rcWarningMessage : warningMessage, warningId);
+			} else if (wifiRcConflict && (block.type === 'esp32_rc_receiver_init' || block.type === 'esp32_wifi_connect')) {
+				block.setWarningText(wifiRcWarningMessage, warningId);
 			} else {
 				// ESP32 板子：移除警告
-				block.setWarningText(null);
+				block.setWarningText(null, warningId);
 			}
 		}
 	});

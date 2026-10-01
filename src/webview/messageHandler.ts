@@ -303,6 +303,7 @@ export class WebViewMessageHandler {
 	private shadowSuggestionService?: ShadowSuggestionService;
 	private aiStatusBar?: AIStatusBar;
 	private _shadowRequestSeq = 0;
+	private aiDisposables: vscode.Disposable[] = [];
 	private txtConnectionService: TxtConnectionService | null = null;
 	private txtUploader: TxtUploader | null = null;
 	private txtTestService: TxtTestService | null = null;
@@ -2767,26 +2768,36 @@ export class WebViewMessageHandler {
 	 * Initialize AI suggestion services
 	 */
 	initAIServices(aiModelManager: AIModelManager, aiStatusBar?: AIStatusBar): void {
+		if (this.aiModelManager === aiModelManager) {
+			this.aiStatusBar = aiStatusBar;
+			this.sendAIConfig();
+			return;
+		}
+		this.disposeAIServices();
 		this.aiModelManager = aiModelManager;
 		this.aiStatusBar = aiStatusBar;
 		this.shadowSuggestionService = new ShadowSuggestionService(aiModelManager, this.context.extensionPath);
-
-		log(`AI services initialized in MessageHandler (tier: ${aiModelManager.getTier()})`, 'info');
-
-		// Send initial AI config to WebView
-		this.sendAIConfig();
-
-		// Update WebView when tier changes
-		aiModelManager.onTierChanged(() => this.sendAIConfig());
-
-		// Update WebView when user changes AI settings
-		this.context.subscriptions.push(
+		this.aiDisposables.push(
+			aiModelManager.onTierChanged(() => this.sendAIConfig()),
+			aiModelManager.onDidChangeReadiness(() => this.sendAIConfig()),
 			vscode.workspace.onDidChangeConfiguration(e => {
 				if (e.affectsConfiguration('singularBlockly.ai')) {
 					this.sendAIConfig();
 				}
 			})
 		);
+		this.sendAIConfig();
+	}
+
+	/** Release editor-owned AI listeners and invalidate any pending suggestion. */
+	disposeAIServices(): void {
+		this.handleCancelShadowSuggestion();
+		this.shadowSuggestionService?.dispose();
+		this.aiDisposables.forEach(disposable => disposable.dispose());
+		this.aiDisposables = [];
+		this.shadowSuggestionService = undefined;
+		this.aiModelManager = undefined;
+		this.aiStatusBar = undefined;
 	}
 
 	/**
@@ -2801,7 +2812,11 @@ export class WebViewMessageHandler {
 		}
 
 		try {
-			const config = this.aiModelManager.getEffectiveConfig();
+			const effectiveConfig = this.aiModelManager.getEffectiveConfig();
+			const config = { ...effectiveConfig, enabled: this.aiModelManager.isReady() && effectiveConfig.enabled === true };
+			if (!config.enabled) {
+				this.handleCancelShadowSuggestion();
+			}
 			const tier = this.aiModelManager.getTier();
 
 			log(`Sending AI config to WebView: tier=${tier}, enabled=${config.enabled}`, 'info');
@@ -2823,6 +2838,11 @@ export class WebViewMessageHandler {
 	private async handleRequestShadowSuggestion(message: any): Promise<void> {
 		if (!this.shadowSuggestionService || !this.aiModelManager) {
 			log('Shadow suggestion skipped: service not initialized', 'debug');
+			return;
+		}
+
+		if (!this.aiModelManager.isReady() || this.aiModelManager.getEffectiveConfig().enabled !== true) {
+			this.handleCancelShadowSuggestion();
 			return;
 		}
 
@@ -2870,7 +2890,9 @@ export class WebViewMessageHandler {
 			log(`[AI Perf] Full round-trip failed after ${(performance.now() - t0).toFixed(0)}ms: ${error}`, 'error');
 			log(`Shadow suggestion request failed: ${error}`, 'error');
 		} finally {
-			this.aiStatusBar?.hideLoading();
+			if (requestSeq === this._shadowRequestSeq) {
+				this.aiStatusBar?.hideLoading();
+			}
 		}
 	}
 

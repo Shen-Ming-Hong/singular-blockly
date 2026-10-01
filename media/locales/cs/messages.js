@@ -1134,6 +1134,11 @@ window.languageManager.loadMessages('cs', {
 
 	// === RC Připojení ===
 	CATEGORY_RC: 'RC Připojení',
+	ESP32_RC_LABEL_CYBERBRICK: 'Ovladač CyberBrick',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'Nastav stejné ID páru (1–255) a kanál (1–11) jako na vysílači CyberBrick. Wi-Fi/MQTT může změnit kanál a přerušit spojení RC.',
+	ESP32_RC_WAIT_TOOLTIP: 'Čekej na platný signál RC z CyberBrick; po uplynutí času pokračuj.',
+	ESP32_RC_ONLY_WARNING: 'Tento blok RC funguje jen na ESP32 DevKit.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'Inicializace RC odpojí Wi-Fi. Nejprve inicializuj RC a potom připoj Wi-Fi k přístupovému bodu nastavenému na stejný kanál jako RC. Jiný kanál přeruší příjem RC.',
 	RC_LABEL_MASTER: '📡 Vysílač',
 	RC_LABEL_SLAVE: '📻 Přijímač',
 	RC_LABEL_DATA: '📊 Data',

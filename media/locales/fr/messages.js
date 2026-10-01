@@ -1125,6 +1125,11 @@ window.languageManager.loadMessages('fr', {
 
 	// === ESP-NOW RC Appairage Personnalisé ===
 	CATEGORY_RC: 'Connexion RC',
+	ESP32_RC_LABEL_CYBERBRICK: 'Télécommande CyberBrick',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'Utilise le même ID de paire (1–255) et le même canal (1–11) que l’émetteur CyberBrick. Wi-Fi/MQTT peut changer le canal et interrompre la liaison RC.',
+	ESP32_RC_WAIT_TOOLTIP: 'Attends un signal RC CyberBrick valide ; continue à la fin du délai.',
+	ESP32_RC_ONLY_WARNING: 'Ce bloc RC fonctionne uniquement sur ESP32 DevKit.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'L’initialisation de RC coupe Wi-Fi. Initialise RC avant de connecter Wi-Fi, puis utilise un point d’accès réglé sur le même canal que RC. Un autre canal interrompt la réception RC.',
 	RC_LABEL_MASTER: '📡 Émetteur',
 	RC_LABEL_SLAVE: '📻 Récepteur',
 	RC_LABEL_DATA: '📊 Lecture de données',

@@ -50,6 +50,7 @@ const BLOCK_DEFINITION_FILES = [
 	'pixetto.js',
 	'huskylens.js',
 	'esp32-wifi-mqtt.js',
+	'esp32-rc.js',
 	'cyberbrick.js',
 	'txt.js',
 	'x11.js',
@@ -101,7 +102,9 @@ function resolveToolbox(toolboxFile, boards, membership) {
 function addMembership(membership, type, category, boards) {
 	const value = membership.get(type) || { categories: new Set(), boards: new Set() };
 	value.categories.add(category);
-	const supportedBoards = category === 'communication' || type === 'esp32_pwm_setup'
+	const supportedBoards = category === 'esp32_rc'
+		? boards.filter(board => board === 'esp32')
+		: category === 'communication' || type === 'esp32_pwm_setup'
 		? boards.filter(board => ESP32_BOARD_IDS.has(board))
 		: boards;
 	supportedBoards.forEach(board => value.boards.add(board));

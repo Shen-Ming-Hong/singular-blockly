@@ -1117,6 +1117,11 @@ window.languageManager.loadMessages('zh-hant', {
 
 	// === RC 遙控通訊 ===
 	CATEGORY_RC: 'RC連線',
+	ESP32_RC_LABEL_CYBERBRICK: 'CyberBrick 遙控器',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: '配對 ID（1–255）與頻道（1–11）須和 CyberBrick 發射端相同。Wi-Fi／MQTT 可能改變頻道，導致 RC 中斷。',
+	ESP32_RC_WAIT_TOOLTIP: '等待有效的 CyberBrick RC 訊號；時間到後繼續執行。',
+	ESP32_RC_ONLY_WARNING: '此 RC 積木僅支援 ESP32 DevKit。',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'RC 初始化會斷開 Wi-Fi。請先初始化 RC，再連線至與 RC 相同頻道的 Wi-Fi 基地台；頻道不同會使 RC 失聯。',
 	RC_LABEL_MASTER: '📡 發射端',
 	RC_LABEL_SLAVE: '📻 接收端',
 	RC_LABEL_DATA: '📊 資料讀取',

@@ -8,6 +8,30 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.89.0] - 2026-10-01
+
+### ✨ 新增功能 Features
+
+- 新增 ESP32 DevKit 實驗性 RC 接收積木，支援 CyberBrick ESP-NOW 的六軸、四按鈕、限時等待與連線狀態；工具箱、備份預覽、15 語系及產品 Skill 合約同步支援
+  Added experimental ESP32 DevKit RC receiver blocks for CyberBrick ESP-NOW, including six joystick axes, four buttons, timed connection waiting, and connection status, with toolbox, backup preview, 15 locales, and project Skill contract support
+
+### 🐛 修復 Bug Fixes
+
+- RC 接收拒收越界搖桿與非法按鈕封包，不更新資料或延長連線有效時間；補齊孤立積木警告，避免板型刷新清除其他警告
+  RC receivers now reject out-of-range joystick values and invalid button packets without updating data or extending connection validity; orphan block warnings are preserved across board-warning refreshes
+- Wi-Fi 連線積木恢復自動重連，並在 RC 與 Wi-Fi 並存時顯示初始化順序及同頻道要求
+  Wi-Fi connection blocks now restore automatic reconnection, and RC/Wi-Fi coexistence warnings explain initialization order and the shared-channel requirement
+- Copilot 模型初始化改在背景執行，避免阻塞一般編輯命令；停用 AI 或關閉編輯器時取消請求並隔離晚回結果
+  Copilot model initialization now runs in the background without blocking ordinary editor commands; disabling AI or closing the editor cancels requests and discards late results
+- 修正 RC 實驗標記在工作區載入、語言重建與飛出選單的刷新，並讓實驗提醒圖示在工具列收合時持續顯示
+  Fixed RC experimental marker refreshes after workspace loading, language rebuilds, and flyout selection, and kept the experimental indicator visible when the toolbar is collapsed
+
+### 🔧 維護 Maintenance
+
+- 精簡貢獻者與產品 Skill 指引，補充背景測試、AI 生命週期及獨立警告 ID 的維護規則
+  Simplified contributor and project Skill guidance and documented background testing, AI lifecycle handling, and independent warning IDs
+
+
 ## [0.88.3] - 2026-09-30
 
 ### 🔒 安全性 Security

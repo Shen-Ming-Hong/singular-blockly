@@ -2,11 +2,11 @@
 name: code-simplifier
 description: 程式碼簡化與重構工作流程。當使用者提到簡化程式碼、清理 PR、重構、程式碼優化、code cleanup、refactor、simplify code、clean up complex code 時自動啟用。靈感來源於 Anthropic Claude Code 團隊內部使用的 code-simplifier agent。A code simplification and refactoring workflow. Inspired by the official code-simplifier agent used internally by the Claude Code team at Anthropic.
 metadata:
-    author: singular-blockly
-    version: '1.1.0'
-    category: code-quality
-    type: blocking
-    inspired-by: anthropics/claude-plugins-official/code-simplifier
+  author: singular-blockly
+  version: '1.1.0'
+  category: code-quality
+  type: blocking
+  inspired-by: anthropics/claude-plugins-official/code-simplifier
 ---
 
 # 程式碼簡化技能 Code Simplifier Skill
@@ -81,8 +81,7 @@ Simplifies and refines code for clarity, consistency, and maintainability while 
 - 使用 ES modules 並正確排序 imports
 - 頂層函式使用 `function` 關鍵字 (非 arrow functions)
 - 為頂層函式加入明確的 return type annotations
-- React 元件使用明確的 Props types
-- 正確的錯誤處理模式 (盡量避免 try/catch)
+- 保留必要的錯誤處理與例外邊界
 - 一致的命名慣例
 
 #### 3. 提升清晰度 Enhance Clarity
@@ -104,6 +103,7 @@ if (a && b) {
 ```
 
 - 減少不必要的複雜度和巢狀
+- 多個條件若只是同一動作的共同前提，且合併不改變行為，使用一個 guard；不要把一個短 guard 拆成多個相同的 `return`
 - 消除冗餘程式碼和抽象
 - 透過清晰的變數和函式名稱提升可讀性
 - 合併相關邏輯
@@ -143,23 +143,19 @@ function processPositiveValues(data: DataItem[]): number[] {
 1. **執行測試確保功能不變**
 
     ```bash
-    npm run test
+    npm test
     ```
 
 2. **執行 linting 確保風格一致**
 
     ```bash
     npm run lint
-    # 或
-    npx eslint . --fix
     ```
 
 3. **執行 build 確保沒有編譯錯誤**
 
     ```bash
     npm run compile
-    # 或
-    npm run package
     ```
 
 4. **審查變更**
@@ -169,6 +165,8 @@ function processPositiveValues(data: DataItem[]): number[] {
 
 ### Phase 5: 提交變更 Commit Changes
 
+只有使用者要求 commit，或已授權的 PR 流程需要提交時，才執行本階段；單純簡化程式碼後直接回報變更與驗證。
+
 1. **分階段提交** (如有多個簡化類型)
 
     ```bash
@@ -177,9 +175,9 @@ function processPositiveValues(data: DataItem[]): number[] {
 
 2. **使用 Conventional Commits 格式**
     ```bash
-    git commit -m "refactor: simplify {component/module} for better readability"
-    git commit -m "style: apply consistent naming conventions"
-    git commit -m "refactor: reduce nesting in {function}"
+    git commit -m "refactor(webview): 簡化工作區載入流程"
+    git commit -m "style(services): 統一命名格式"
+    git commit -m "refactor(generators): 減少程式碼生成的巢狀邏輯"
     ```
 
 ## 簡化模式參考 Simplification Patterns
@@ -226,29 +224,6 @@ if (isAdult && isFromTaiwan && isVerifiedUser) {
 }
 ```
 
-### 簡化條件邏輯 Simplify Conditionals
-
-```typescript
-// ❌ 重複的條件
-if (type === 'A') {
-	return handleA();
-} else if (type === 'B') {
-	return handleB();
-} else if (type === 'C') {
-	return handleC();
-} else {
-	return handleDefault();
-}
-
-// ✅ 使用物件映射
-const handlers = {
-	A: handleA,
-	B: handleB,
-	C: handleC,
-};
-return (handlers[type] || handleDefault)();
-```
-
 ### 移除不必要的註解 Remove Unnecessary Comments
 
 ```typescript
@@ -267,7 +242,7 @@ counter++;
 
 - [ ] 確認要簡化的程式碼範圍
 - [ ] 閱讀專案的 coding standards (copilot-instructions.md)
-- [ ] 確保 git 工作目錄乾淨或已提交重要變更
+- [ ] 確認並保留與本次任務無關的既有變更
 
 ### 簡化過程 During Simplification
 
@@ -285,7 +260,7 @@ counter++;
 - [ ] Linting 無錯誤
 - [ ] Build 成功
 - [ ] 審查 git diff 確認變更合理
-- [ ] 使用 Conventional Commits 格式提交
+- [ ] 若使用者要求提交，使用繁體中文 Conventional Commit
 
 ## Token 效益 Token Efficiency Benefit
 
@@ -295,7 +270,6 @@ counter++;
 - Claude 可以在相同 token 預算內閱讀更多程式碼
 - 後續的 AI 輔助開發成本更低
 
-> 有開發者報告使用 code-simplifier 後，token 消耗減少 20-30%。
 
 ## 相關資源 Related Resources
 
