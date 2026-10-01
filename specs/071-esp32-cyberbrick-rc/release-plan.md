@@ -1,6 +1,6 @@
 # 071 發佈方案（2026-10-01）
 
-狀態：使用者於 2026-10-01 核准 Phase 1.5 的 v0.89.0 與雙語 CHANGELOG 方案；Phase 2 本地整合、版本更新及 Phase 3 重審已完成，以下成果納入本地提交。Phase 3.5 遠端發布尚待最終核准。
+狀態：使用者於 2026-10-01 核准 Phase 1.5 的 v0.89.0 與雙語 CHANGELOG 方案；Phase 2 本地整合、版本更新及 Phase 3 重審已完成並提交。使用者另於同日明確核准 Phase 3.5 的 push／PR／squash merge／annotated tag／GitHub Actions CD，遠端流程進行中。
 
 ## 版本與範圍
 
@@ -23,7 +23,7 @@
 
 ## 仍須完成
 
-1. 提交以上具體成果與限制，取得 Phase 3.5 的 push／PR／squash merge／annotated tag／GitHub Actions CD 核准。目前尚未執行任何遠端發布動作。
+1. 已取得 Phase 3.5 核准；推送目前功能分支並建立單一發布 PR。
 2. 完整 `test:unit:ci`／真實 VS Code 主機測試本輪未執行：Mac 背景測試指引不允許無法保證不搶焦點的啟動，改由 PR CI 的 unit job 執行，發布前核准須明示此安排。必須確認目前 PR head 的 CI Gate 與 CodeQL 均通過後才能合併及推 tag。
 3. 核准後依發布技能完成 PR、受保護分支 squash merge、annotated tag 與三端同一 VSIX 發布驗證，不在本機建立正式 VSIX。
 

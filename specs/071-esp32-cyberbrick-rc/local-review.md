@@ -52,4 +52,4 @@
 - Node.js **24.20.0** 的整合後 `npm ci`、完整 `ci:static` 均 exit 0；定向契約 **97 passing**、AI 邏輯 **91 passing**，共 **188 個不同案例**。詳見 [validation.md](./validation.md)，不把前輪 185 或 2026-09-24 的 1369 項加總為本輪成果。
 - 全量 i18n 審計實際完成 19,832 組／100 批：`PASS_WITH_ADVISORIES`，0 Blocker／2304 Major／2 Minor／0 Info；既有 Major 為待辦，本次增量沒有未決 Major。最終 15 語系 validator exit 0，audit helper 確認 current。
 - 未重啟外部 reviewer 或 subagent，外部 reviewer 合計仍為 **0 輪**。較早的大型工具讀取曾截斷，已改成定向小段補讀；沒有未讀完的整合邊界。未改變的完整驗證沿用成功日誌，不重複執行。
-- 使用者 Phase 1.5 核准包含以上本地整合、版本與提交；Phase 3.5 的遠端 push／PR／merge／tag／CD 尚待核准。完整 `test:unit:ci` 改由 PR CI 執行；硬體、PlatformIO 及真實 Copilot 的本輪限制仍保留，不能視為已通過。
+- 使用者 Phase 1.5 核准包含以上本地整合、版本與提交，已完成於 `da8f128`；2026-10-01 另明確核准 Phase 3.5 的遠端 push／PR／squash merge／annotated tag／GitHub Actions CD。完整 `test:unit:ci` 改由 PR CI 執行；硬體、PlatformIO 及真實 Copilot 的本輪限制仍保留，不能視為已通過。
