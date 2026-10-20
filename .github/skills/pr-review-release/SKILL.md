@@ -185,7 +185,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 | `gh workflow run ... -f release_tag=...` | `actions_run_trigger`（`run_workflow`，`ref: master`、`inputs`） |
 | 失敗 log | `get_job_logs` |
 
-雲端工作階段通常只能推送指定的 `claude/…` 分支，不直接推 tag。Phase 5.1–5.2 改為以 `actions_run_trigger`（`run_workflow`、`workflow_id: create-release-tag.yml`、`ref: master`、`inputs: {release_tag: "v{VERSION}"}`）觸發 `.github/workflows/create-release-tag.yml`（Ray 2026-10-20 同意）：它在最新 `master` 驗證 `release:prepare`、確認 tag 不存在後建立 annotated tag，並在同一 run 呼叫 `publish.yml`。之後依 5.3–5.4 追蹤該 run；失敗時只重跑失敗 jobs，不重新觸發此 workflow（tag 已存在會被拒）。此 workflow 也失敗於建立 tag 前時，才告訴 Ray 在本機執行 5.1–5.2 的確切指令。前提是 ruleset「release tag creation」的 bypass list 含 GitHub Actions（Repository app）；缺少時推 tag 會出現 `Cannot create ref due to creations being restricted`，這是儲存庫設定，回報 Ray 補上（或由 Ray 本機推 tag）後只重跑失敗 jobs。
+雲端工作階段通常只能推送指定的 `claude/…` 分支，不直接推 tag。Phase 5.1–5.2 改為以 `actions_run_trigger`（`run_workflow`、`workflow_id: create-release-tag.yml`、`ref: master`、`inputs: {release_tag: "v{VERSION}"}`）觸發 `.github/workflows/create-release-tag.yml`（Ray 2026-10-20 同意）：它在最新 `master` 驗證 `release:prepare`、確認 tag 不存在後建立 annotated tag，以 `release` environment secret `RELEASE_TAG_DEPLOY_KEY` 的 deploy key 推送；這個 tag push 會像本機推送一樣觸發 `publish.yml`。之後依 5.3–5.4 追蹤 `publish.yml` 的 run；tag 已建立後失敗只重跑失敗 jobs，不重新觸發 `create-release-tag.yml`（tag 已存在會被拒）。tag 尚未建立就失敗時（例如缺少 secret，或 ruleset「release tag creation」的 bypass 沒有「Deploy keys」而出現 `Cannot create ref due to creations being restricted`），這是儲存庫設定，回報 Ray 補上後再觸發一次，或請 Ray 在本機執行 5.1–5.2。個人 repo 不能把 GitHub Actions 加進 ruleset bypass，不要再走 `GITHUB_TOKEN` 推 tag。
 
 ## Phase 5：Annotated Tag 與 Actions CD
 
@@ -217,7 +217,7 @@ git push origin v{VERSION}
 
 `git cat-file -t` 必須輸出 `tag`。禁止 `git tag v{VERSION}` 產生 lightweight tag。
 
-不能推 tag 的環境（雲端工作階段）以 `create-release-tag.yml` 完成 5.1–5.2，見上方「雲端工作階段的對照」；該 workflow 在 GitHub 上執行同樣的檢查並在同一 run 發布，5.3 改追蹤它的 run（`actions_list`，`list_workflow_runs`、`resource_id: create-release-tag.yml`）。
+不能推 tag 的環境（雲端工作階段）以 `create-release-tag.yml` 完成 5.1–5.2，見上方「雲端工作階段的對照」；該 workflow 在 GitHub 上執行同樣的檢查並推 tag，5.3 先確認它成功，再追蹤 tag push 觸發的 `publish.yml` run（`actions_list`，`list_workflow_runs`、`resource_id: publish.yml`）。
 
 ### 5.3 等待發布 workflow
 
