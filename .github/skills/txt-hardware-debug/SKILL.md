@@ -19,6 +19,8 @@ metadata:
 本技能封裝了透過 SSH 連入 fischertechnik TXT 控制器、探索 ftrobopy API、
 確認正確感測器讀值方法的完整除錯流程與關鍵知識。
 
+> 需要與 TXT 同一個 USB／區域網路的機器（例如 Ray 的電腦上的 Codex 或 Claude Code 桌面版）。雲端容器連不到 TXT，只能做程式碼層面的檢查。
+
 ---
 
 ## TXT 環境基礎資訊
@@ -261,4 +263,4 @@ sleep 2 && curl -s http://192.168.0.85:8080/io
 - ftrobopy 原始碼位置（TXT 上）：`/media/sdcard/root/usr/lib/python3.11/site-packages/ftrobopy.pyc`
 - 官方 ftrobopy GitHub：https://github.com/ftrobopy/ftrobopy
 - io_server.py 本地路徑：`txt-runtime/io_server.py`
-- 相關 spec：`specs/051-txt-controller-support/`
+- 相關規格：`docs/specifications/03-hardware-support/txt-controller.md`（spec 051 已整合歸檔）

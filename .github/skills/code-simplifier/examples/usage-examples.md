@@ -32,8 +32,8 @@
 3. **驗證變更不影響功能**
 
     ```bash
-    npm run test
-    npm run compile
+    npm run ci:static
+    npm run test:unit:ci
     ```
 
 4. **提交**
@@ -62,7 +62,7 @@
     重點檢查：
 
     - 是否有過度工程化 (over-engineering)
-    - 是否遵循專案的 copilot-instructions.md 規範
+    - 是否遵循專案的 `AGENTS.md` 規範
     - 是否有可合併的重複邏輯
 
 3. **產生簡化建議** (範例)

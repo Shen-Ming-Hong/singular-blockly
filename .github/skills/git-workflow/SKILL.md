@@ -31,7 +31,7 @@ git commit -m "fix(webview): 修正工作區載入錯誤"
 
 ## Push、PR 與發布
 
-- 先閱讀 [pr-review-release](../pr-review-release/SKILL.md)，完成其本地 review、必要修正、驗證、版本與雙語 CHANGELOG、發布前核准，再進入遠端步驟。單純本地 commit 不會自動觸發 push 或 PR。
+- 先閱讀 [pr-review-release](../pr-review-release/SKILL.md)，完成其本地 review、必要修正與驗證，再進入遠端步驟。只有發布 PR 需要版本、雙語 CHANGELOG 版本區段與 Phase 3.5 發布核准；非發布 PR 依該技能的「非發布 PR 的自主合併」與整合佇列文件進行。單純本地 commit 不會自動觸發 push 或 PR。
 - 分支命名依 [並行開發工作目錄](../maintain-singular-blockly/references/parallel-worktrees.md)：Codex 用 `codex/`，Claude Code 用 `claude/`，雲端工作階段沿用系統指定分支；若 Spec Kit 或使用者指定分支名稱，沿用該名稱。不得直接 push `master`。
 - 建立 PR 時，從實際 diff、測試與相關 spec 撰寫描述，用 `gh pr create --body-file`（雲端工作階段用 GitHub MCP `create_pull_request`）。開 PR 前依並行開發文件檢查與其他開啟中 PR 的重疊。合併順序與條件依整合佇列文件；tag 與 Actions 發布條件以 `pr-review-release` 為準。
 - CI 或 review 出現新 finding 時，在本任務範圍內修正；超出範圍或需要產品決策時，依該技能的評估流程問使用者，不自行擴大修正。
