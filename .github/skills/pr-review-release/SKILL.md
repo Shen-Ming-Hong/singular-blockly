@@ -216,6 +216,8 @@ git push origin v{VERSION}
 
 `git cat-file -t` 必須輸出 `tag`。禁止 `git tag v{VERSION}` 產生 lightweight tag。
 
+不能推 tag 的環境（雲端工作階段）以 `create-release-tag.yml` 完成 5.1–5.2，見上方「雲端工作階段的對照」；該 workflow 在 GitHub 上執行同樣的檢查並在同一 run 發布，5.3 改追蹤它的 run（`actions_list`，`list_workflow_runs`、`resource_id: create-release-tag.yml`）。
+
 ### 5.3 等待發布 workflow
 
 tag push 只負責觸發 `.github/workflows/publish.yml`。不得執行本機正式打包、全域安裝 `vsce`／`ovsx` 或 `gh release create`。
