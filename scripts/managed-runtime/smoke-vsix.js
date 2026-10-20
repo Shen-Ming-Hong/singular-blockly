@@ -36,6 +36,9 @@ async function main() {
     'extension/package.json',
     'extension/dist/managed-runtime/runtime-manifest.json',
     'extension/dist/managed-runtime/THIRD_PARTY_NOTICES.md',
+    'extension/dist/THIRD_PARTY_NOTICES.md',
+    'extension/NOTICE',
+    'extension/LICENSE.txt',
   ];
   for (const name of required) { assert.ok(archive.file(name), `VSIX is missing ${name}`); }
   const extensionPackage = JSON.parse(await archive.file('extension/package.json').async('string'));
@@ -62,6 +65,12 @@ async function main() {
     const listed = await runEditorCommand([...profileArgs, '--list-extensions', '--show-versions']);
     const expected = `${extensionPackage.publisher}.${extensionPackage.name}@${extensionPackage.version}`.toLowerCase();
     assert.ok(listed.stdout.toLowerCase().split(/\r?\n/).includes(expected), `Installed extension list did not contain ${expected}`);
+
+    // node-ssh is loaded lazily from the VSIX node_modules, so a missing transitive dependency only fails at TXT upload time.
+    const extensionsDirectory = path.join(temporary, 'extensions');
+    const installed = fs.readdirSync(extensionsDirectory).find(name => name.toLowerCase().startsWith(`${extensionPackage.publisher}.${extensionPackage.name}-`.toLowerCase()));
+    assert.ok(installed, `Installed extension directory for ${expected} was not found`);
+    execFileSync(process.execPath, ['-e', 'require(require.resolve("node-ssh", { paths: [process.argv[1]] }))', path.join(extensionsDirectory, installed)], { stdio: 'pipe' });
   } finally {
     fs.rmSync(temporary, { recursive: true, force: true });
   }
