@@ -49,7 +49,8 @@ const PANEL_COMMAND_BY_STATE: Record<
 
 interface FileSystemLike {
 	promises: {
-		readFile(path: string, encoding?: BufferEncoding): Promise<string | Buffer>;
+		readFile(path: string): Promise<string | Buffer>;
+		readFile(path: string, encoding: BufferEncoding): Promise<string | Buffer>;
 	};
 }
 
