@@ -69,6 +69,7 @@ vsc-extension-quickstart.md
 **/test/**
 **/tests/**
 **/.editorconfig
+**/.nvmrc
 **/.prettierrc
 **/*.test.js
 **/extension_test/**
@@ -83,6 +84,5 @@ media/toolbox/temp_toolbox*.json
 **/temp_toolbox*.json
 AGENTS.md
 CLAUDE.md
-.npmignore
 .prettierignore
 package-lock.json
