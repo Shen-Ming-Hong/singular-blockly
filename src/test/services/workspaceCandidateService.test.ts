@@ -34,7 +34,8 @@ suite('WorkspaceCandidateService Tests', () => {
 		fs.mkdirSync(path.join(workspace, 'blockly'), { recursive: true });
 	});
 
-	teardown(() => fs.rmSync(workspace, { recursive: true, force: true }));
+	// Windows 上被取代的候選仍可能在 teardown 時寫入暫存檔，重試以避免 ENOTEMPTY／EBUSY。
+	teardown(() => fs.rmSync(workspace, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 }));
 	teardown(() => sinon.restore());
 
 	function writeMain(value: unknown): void {
