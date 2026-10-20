@@ -308,16 +308,21 @@ describe('feedback outbox', () => {
 			},
 		), env, id, client);
 
+		const finishedAt = Math.floor(Date.now() / 1000);
 		expect(response.status).toBe(204);
 		expect(client.findPublicIssueByOutboxId).toHaveBeenCalledWith(publicEventId);
-		expect(await env.FEEDBACK_DB.prepare(`SELECT feedback_id, public_repo_id,
+		const approval = await env.FEEDBACK_DB.prepare(`SELECT feedback_id, public_repo_id,
 			public_issue_number, link_severed_at FROM development_approvals WHERE approval_id = ?1`
-		).bind(id).first<Record<string, unknown>>()).toEqual({
+		).bind(id).first<Record<string, unknown>>();
+		// The handler reads its own clock, so the request may cross a second boundary.
+		expect(approval).toEqual({
 			feedback_id: null,
 			public_repo_id: env.PUBLIC_GITHUB_REPOSITORY_ID,
 			public_issue_number: 98057,
-			link_severed_at: now,
+			link_severed_at: expect.any(Number),
 		});
+		expect(approval?.link_severed_at).toBeGreaterThanOrEqual(now);
+		expect(approval?.link_severed_at).toBeLessThanOrEqual(finishedAt);
 	});
 
 	it('scrubs a private issue and leaves a content-free tombstone', async () => {

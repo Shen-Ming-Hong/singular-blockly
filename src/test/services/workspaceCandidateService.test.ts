@@ -35,7 +35,15 @@ suite('WorkspaceCandidateService Tests', () => {
 	});
 
 	// Windows 上被取代的候選仍可能在 teardown 時寫入暫存檔，重試以避免 ENOTEMPTY／EBUSY。
-	teardown(() => fs.rmSync(workspace, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 }));
+	// 防毒掃描等外部程序可能更久持有剛寫入的檔案；暫存目錄清理失敗不代表測試失敗，留給系統清理。
+	teardown(() => {
+		try {
+			fs.rmSync(workspace, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 });
+		} catch (error) {
+			const code = (error as NodeJS.ErrnoException).code;
+			if (process.platform !== 'win32' || (code !== 'EPERM' && code !== 'EBUSY')) {throw error;}
+		}
+	});
 	teardown(() => sinon.restore());
 
 	function writeMain(value: unknown): void {
@@ -557,6 +565,7 @@ suite('WorkspaceCandidateService Tests', () => {
 		assert.strictEqual(JSON.parse(fs.readFileSync(path.join(workspace, 'blockly', 'main.json'), 'utf8')).candidate, 'B');
 		assert.deepStrictEqual(liveDocuments.map(document => document.candidate), ['B']);
 		service.dispose();
+		await (service as any).workspaceTransactionTail;
 	});
 
 	test('serializes live transactions and rolls back a candidate superseded during formal load', async () => {
