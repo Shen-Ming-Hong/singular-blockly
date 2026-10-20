@@ -47,5 +47,5 @@
 ## [發布] 雲端工作階段不推 tag，改由 Actions 建立
 
 - **問題：** 2026-10-20 發布 0.90.0 時，發布 PR 已合併，但雲端工作階段推 annotated tag 被安全檢查擋下，發布卡在最後一步，只能請 Ray 回本機推。
-- **規則：** 雲端發布在發布 PR 合併、`master` CI 綠燈後，從 `master` 觸發 `create-release-tag.yml`，由它建立 tag 並在同一 run 發布；不要在雲端嘗試 `git push origin v*`，也不要因 workflow 已建立 tag 就重新觸發它，失敗時只重跑失敗 jobs。
+- **規則：** 雲端發布在發布 PR 合併、`master` CI 綠燈後，由工作階段自行排程檢查並立即從 `master` 觸發 `create-release-tag.yml`（不等 Ray 提醒），由它建立 tag 並在同一 run 發布；不要在雲端嘗試 `git push origin v*`，也不要因 workflow 已建立 tag 就重新觸發它，失敗時只重跑失敗 jobs。
 - **證據：** `.github/workflows/create-release-tag.yml`、`publish.yml` 的 `workflow_call` 入口、`scripts/release/prepare-release.test.js` 的契約測試。
