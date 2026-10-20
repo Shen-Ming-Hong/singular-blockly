@@ -88,10 +88,11 @@ window.arduinoGenerator.forBlock['controls_forEach'] = function (block) {
 	const varField = block.getField('VAR');
 	const variable = varField ? varField.getText() : 'x'; // 使用 getText() 獲取實際顯示的變數名稱
 
-	const list = window.arduinoGenerator.valueToCode(block, 'LIST', window.arduinoGenerator.ORDER_ASSIGNMENT) || '[]';
+	window.arduinoGenerator.useListRuntime();
+	const list = window.arduinoGenerator.valueToCode(block, 'LIST', window.arduinoGenerator.ORDER_ASSIGNMENT) || 'SBList()';
 	const branch = window.arduinoGenerator.statementToCode(block, 'DO');
 
-	return `for (auto ${variable} : ${list}) {\n${branch}}\n`;
+	return `for (float ${variable} : ${list}) {\n${branch}}\n`;
 };
 
 window.arduinoGenerator.forBlock['singular_flow_statements'] = function (block) {

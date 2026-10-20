@@ -51,7 +51,9 @@ window.arduinoGenerator.forBlock['variables_set'] = function (block) {
 	const valueBlock = block.getInputTargetBlock('VALUE');
 	let varType = 'int'; // 預設類型
 
-	if (valueBlock) {
+	if (window.arduinoGenerator.isListBlock?.(valueBlock)) {
+		varType = 'SBList';
+	} else if (valueBlock) {
 		// 根據連接的積木類型決定變數型態，符合 Arduino 標準
 		switch (valueBlock.type) {
 			case 'text':
@@ -78,8 +80,9 @@ window.arduinoGenerator.forBlock['variables_set'] = function (block) {
 			case 'logic_boolean':
 				varType = 'boolean';
 				break;
-			case 'lists_create_with':
-				varType = 'int[]';
+			case 'lists_getIndex':
+			case 'math_on_list':
+				varType = 'float';
 				break;
 			case 'arduino_analog_read':
 				varType = 'uint16_t'; // analog read 回傳 0-1023

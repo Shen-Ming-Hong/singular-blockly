@@ -17,9 +17,6 @@ import * as vm from 'vm';
 
 const PROJECT_ROOT = path.join(__dirname, '..', '..', '..');
 
-// Arduino 清單積木的 C++ 陣列模型待重新設計，修好後從清單移除
-const KNOWN_ARDUINO_GAPS = new Set(['math_on_list', 'lists_getSublist', 'lists_split', 'lists_sort', 'lists_reverse']);
-
 const TARGETS = [
 	{ board: 'uno', toolbox: 'index.json', root: 'arduino_setup_loop', generator: 'arduinoGenerator' },
 	{ board: 'esp32', toolbox: 'index.json', root: 'arduino_setup_loop', generator: 'arduinoGenerator' },
@@ -116,7 +113,6 @@ suite('Toolbox generator coverage contract', () => {
 			assert.ok(blocks.length > 0, 'toolbox should contain blocks');
 
 			for (const definition of blocks) {
-				if (target.generator === 'arduinoGenerator' && KNOWN_ARDUINO_GAPS.has(definition.type)) {continue;}
 				workspace.clear();
 				try {
 					const root = workspace.newBlock(target.root);
@@ -140,4 +136,48 @@ suite('Toolbox generator coverage contract', () => {
 			assert.deepStrictEqual(failures, []);
 		});
 	}
+
+	test('arduino: list variables use the SBList runtime declared before globals', () => {
+		(global as any).window.currentBoard = 'uno';
+		const workspace = new Blockly.Workspace();
+		const number = (value: number) => ({ block: { type: 'math_number', fields: { NUM: value } } });
+		Blockly.serialization.workspaces.load(
+			{
+				variables: [{ name: 'list', id: 'L' }],
+				blocks: {
+					languageVersion: 0,
+					blocks: [
+						{
+							type: 'arduino_setup_loop',
+							inputs: {
+								SETUP: {
+									block: {
+										type: 'variables_set',
+										fields: { VAR: { id: 'L' } },
+										inputs: {
+											VALUE: {
+												block: {
+													type: 'lists_create_with',
+													extraState: { itemCount: 2 },
+													inputs: { ADD0: number(1), ADD1: number(2) },
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					],
+				},
+			},
+			workspace
+		);
+		const code: string = generators.arduinoGenerator.workspaceToCode(workspace);
+		workspace.dispose();
+		assert.ok(!code.includes('int[]'), code);
+		assert.ok(code.includes('list = sbListOf(2, (double)(1), (double)(2));'), code);
+		const runtime = code.indexOf('struct SBList');
+		const declaration = code.indexOf('SBList list;');
+		assert.ok(runtime >= 0 && declaration > runtime, code);
+	});
 });
