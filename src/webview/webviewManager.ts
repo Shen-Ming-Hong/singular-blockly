@@ -15,8 +15,6 @@ import { SettingsManager } from '../services/settingsManager';
 import { WebViewMessageHandler } from './messageHandler';
 import { BoardConfigKey, LoadWorkspaceStateMessage, PreviewWarning, SetBoardMessage } from '../types/previewMessages';
 import { TxtVirtualControlsDocument, normalizeTxtVirtualControlsDocument } from '../types/txtVirtualControls';
-import { AIModelManager } from '../services/aiModelManager';
-import { AIStatusBar } from '../services/aiStatusBar';
 import { BlockContractService } from '../services/blockContractService';
 import {
 	createDefaultDeps,
@@ -297,8 +295,6 @@ export class WebViewManager {
 	private previewPanels: Map<string, vscode.WebviewPanel> = new Map();
 	private currentTempToolboxFile: string | null = null;
 	private currentCyberbrickTempToolboxFile: string | null = null;
-	private aiModelManager?: AIModelManager;
-	private aiStatusBar?: AIStatusBar;
 	private penvProviderSetup?: Promise<void>;
 	private workspaceCandidateService?: WorkspaceCandidateService;
 	private activeWorkspaceRoot?: string;
@@ -346,18 +342,6 @@ export class WebViewManager {
 		this.workspaceCandidateService = undefined;
 		this.activeWorkspaceRoot = undefined;
 		if (!this.workspaceFileServiceInjected) {this.fileService = undefined;}
-	}
-
-	/**
-	 * Set AI model manager for shadow suggestion features
-	 */
-	setAIModelManager(aiModelManager: AIModelManager, aiStatusBar?: AIStatusBar): void {
-		this.aiModelManager = aiModelManager;
-		this.aiStatusBar = aiStatusBar;
-		// If message handler already exists, initialize AI services
-		if (this.messageHandler) {
-			this.messageHandler.initAIServices(aiModelManager, aiStatusBar);
-		}
 	}
 
 	private ensurePenvProviderSetup(deps: PenvProviderServiceDeps): void {
@@ -512,11 +496,6 @@ export class WebViewManager {
 			(requestId, generation, deadlineAt, document) => this.loadValidatedWorkspace(requestId, generation, deadlineAt, document)
 		);
 
-		// Initialize AI services if available
-		if (this.aiModelManager) {
-			this.messageHandler.initAIServices(this.aiModelManager, this.aiStatusBar);
-		}
-
 		// 監聽 WebView 訊息
 		this.panel.webview.onDidReceiveMessage(async message => {
 			if (message.command === 'workspaceCandidateValidationResult') {
@@ -558,7 +537,6 @@ export class WebViewManager {
 			}
 			this.pendingCandidateValidations.clear();
 			this.pendingLiveLoads.clear();
-			this.messageHandler?.disposeAIServices();
 			this.panel = undefined;
 			this.messageHandler = undefined;
 			this.cleanupTempFile();
@@ -889,22 +867,6 @@ export class WebViewManager {
 				webview
 					.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/experimentalBlockMarker.js')))
 					.toString()
-			);
-			htmlContent = htmlContent.replace(
-				'{shadowBlockCssUri}',
-				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/css/shadowBlock.css'))).toString()
-			);
-			htmlContent = htmlContent.replace(
-				'{contextExtractorUri}',
-				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/contextExtractor.js'))).toString()
-			);
-			htmlContent = htmlContent.replace(
-				'{shadowBlockManagerUri}',
-				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/shadowBlockManager.js'))).toString()
-			);
-			htmlContent = htmlContent.replace(
-				'{shadowKeyboardHandlerUri}',
-				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/shadowKeyboardHandler.js'))).toString()
 			);
 			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());

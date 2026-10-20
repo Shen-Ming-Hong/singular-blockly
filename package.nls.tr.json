@@ -1,20 +1,6 @@
 {
 	"singularBlockly.managedRuntime.path.markdownDescription": "Singular tarafından yönetilen Python ve PlatformIO ortamı için isteğe bağlı mutlak yerel klasör. VS Code eklentisinin genel depolama alanını kullanmak için boş bırakın. UNC ve ağ yolları desteklenmez.",
 	"command.checkPlatformioStatus.title": "PlatformIO Durumunu Kontrol Et",
-	"command.showAIStatusMenu.title": "Singular Blockly: AI Öneri Ayarları",
-	"command.toggleAIEnabled.title": "Singular Blockly: AI Önerilerini Aç/Kapat",
-	"command.selectAIModel.title": "Singular Blockly: AI Modeli Seç",
-	"command.openAISettings.title": "Singular Blockly: AI Ayarlarını Aç",
-	"command.triggerAISuggestion.title": "Singular Blockly: AI Blok Önerisini Tetikle",
-	"singularBlockly.ai.enabled.markdownDescription": "AI gölge blok önerilerini etkinleştir/devre dışı bırak. GitHub Copilot uzantısı gereklidir.",
-	"singularBlockly.ai.model.markdownDescription": "AI önerileri için kullanılacak dil modeli. Yalnızca hızlı öneriler için uygun hafif modeller listelenir. Kullanılabilir modeller Copilot planınıza bağlıdır.",
-	"singularBlockly.ai.triggerDelay.markdownDescription": "Çalışma alanı değişikliğinden sonra AI önerisini tetiklemeden önceki gecikme süresi (milisaniye).",
-	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Dakika başına maksimum AI öneri isteği sayısı.",
-	"singularBlockly.ai.reasoningEffort.description": "AI blok önerileri için akıl yürütme derinliğini kontrol eder. 'low' hızı önceliklendirir, 'high' kaliteyi önceliklendirir.",
-	"singularBlockly.ai.reasoningEffort.markdownDescription": "AI blok önerileri için akıl yürütme derinliğini kontrol eder.\n\n- **low**: En hızlı yanıt, minimum akıl yürütme (satır içi öneriler için önerilir)\n- **medium**: Hız ve kalite dengesi\n- **high**: En derin akıl yürütme, yavaş yanıt",
-	"singularBlockly.ai.reasoningEffort.low.description": "En hızlı, minimum akıl yürütme (önerilir)",
-	"singularBlockly.ai.reasoningEffort.medium.description": "Hız ve kalite dengesi",
-	"singularBlockly.ai.reasoningEffort.high.description": "En derin akıl yürütme, en yavaş yanıt",
 	"command.provideFeedback.title": "Geri bildirim gönder",
 	"command.showMyFeedback.title": "Geri bildirimlerim"
 }

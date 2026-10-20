@@ -1199,10 +1199,6 @@ window.languageManager.loadMessages('tr', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Bu blok, kod üretmek için setup(), loop() veya bir fonksiyonun içine yerleştirilmelidir.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Bu blok, kod üretmek için main() veya bir fonksiyonun içine yerleştirilmelidir.',
-	// === AI Shadow Suggestions ===
-	AI_SUGGESTION_TAB_HINT: 'Kabul etmek için Tab · Yoksaymak için Esc',
-	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab kabul · Alt+]/[ geçiş · Esc yoksay',
-	AI_QUOTA_EXHAUSTED: 'Copilot kotası tükendi. Gelecek ay sıfırlanır veya planınızı yükseltin.',
 
 	// === Sample Browser ===
 	SAMPLE_BROWSER_BUTTON_TITLE: 'Örnek yükle',

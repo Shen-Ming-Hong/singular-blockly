@@ -12,8 +12,6 @@ import { log, showOutputChannel, disposeOutputChannel } from './services/logging
 import { LocaleService } from './services/localeService';
 import { SettingsManager } from './services/settingsManager';
 import { WebViewManager } from './webview/webviewManager';
-import { AIModelManager } from './services/aiModelManager';
-import { AIStatusBar } from './services/aiStatusBar';
 import { PlatformioDiagnosticService } from './services/platformioDiagnosticService';
 import { PlatformioDiagnosticPanel } from './webview/platformioDiagnosticPanel';
 import { ProjectSkillService } from './services/projectSkillService';
@@ -31,11 +29,6 @@ import { FeedbackIdentityService } from './services/feedbackIdentity';
 import { createManagedRuntimeFetch } from './services/managedRuntimeProxy';
 import { FeedbackPanel } from './webview/feedbackPanel';
 
-// AI services are connected immediately; model discovery runs in the background.
-let aiModelManager: AIModelManager | undefined;
-let aiStatusBarInstance: AIStatusBar | undefined;
-let disposeAIServices: (() => void) | undefined;
-
 // VSCode API 引用（可在測試中注入）
 let vscodeApi: typeof vscode = vscode;
 
@@ -51,7 +44,6 @@ export function _setVSCodeApi(api: typeof vscode): void {
  * 重置為生產環境預設值（僅用於測試）
  */
 export function _reset(): void {
-	disposeAIServices?.();
 	vscodeApi = vscode;
 }
 
@@ -206,13 +198,6 @@ export async function activate(context: vscode.ExtensionContext) {
 		// 註冊活動欄視圖
 		registerActivityBarView(context);
 
-		// Connect the manager before commands can create a WebView, without waiting for Copilot.
-		try {
-			initializeAIServices(context);
-		} catch (error) {
-			log('AI services setup failed (non-critical)', 'warn', error);
-		}
-
 		// 註冊命令
 		registerCommands(
 			context,
@@ -336,10 +321,6 @@ function registerCommands(
 			// 懶初始化 WebView 管理器
 			if (!webViewManager) {
 				webViewManager = new WebViewManager(context, undefined, undefined, undefined, coreEnvironmentManager);
-				// Inject AI model manager if available
-				if (aiModelManager) {
-					webViewManager.setAIModelManager(aiModelManager, aiStatusBarInstance);
-				}
 			}
 
 			if (!editorOpenInFlight) {
@@ -565,14 +546,6 @@ function registerCommands(
 		}
 	);
 
-	// 註冊手動觸發 AI 積木建議命令（透過 keybinding Ctrl+Shift+. 觸發）
-	const triggerAISuggestionCommand = vscodeApi.commands.registerCommand('singular-blockly.triggerAISuggestion', () => {
-		if (webViewManager && webViewManager.isPanelCreated()) {
-			const panel = webViewManager.getPanel();
-			panel?.webview.postMessage({ command: 'triggerAISuggestion' });
-		}
-	});
-
 	const stopTxtExecutionCommand = vscodeApi.commands.registerCommand('singular-blockly.stopTxtExecution', async () => {
 		if (!webViewManager || !webViewManager.isPanelCreated()) {
 			return;
@@ -610,7 +583,6 @@ function registerCommands(
 	context.subscriptions.push(provideFeedbackCommand);
 	context.subscriptions.push(showMyFeedbackCommand);
 	context.subscriptions.push(copyPlatformioRepairPacketCommand);
-	context.subscriptions.push(triggerAISuggestionCommand);
 	context.subscriptions.push(stopTxtExecutionCommand);
 	context.subscriptions.push(installTxtRuntimeCommand);
 }
@@ -662,67 +634,9 @@ function createWorkspaceCandidateService(workspaceRoot: string, localeService: L
 }
 
 /**
- * 初始化 AI 影子建議服務
- */
-function initializeAIServices(context: vscode.ExtensionContext): void {
-	// Unit Extension Hosts can have a user's Copilot extension installed. Avoid triggering
-	// authentication or network-backed model discovery in the isolated unit test process.
-	if (process.env.NODE_ENV === 'test') {
-		log('Skipping AI model discovery in the unit test environment', 'info');
-		return;
-	}
-	disposeAIServices?.();
-	const manager = new AIModelManager();
-	let disposed = false;
-	let aiStatusBar: AIStatusBar | undefined;
-	let configurationListener: vscode.Disposable | undefined;
-	const dispose = (): void => {
-		if (disposed) {return;}
-		disposed = true;
-		configurationListener?.dispose();
-		manager.dispose();
-		aiStatusBar?.dispose();
-		if (aiModelManager === manager) {
-			aiModelManager = undefined;
-			aiStatusBarInstance = undefined;
-		}
-		if (disposeAIServices === dispose) {disposeAIServices = undefined;}
-	};
-	disposeAIServices = dispose;
-	context.subscriptions.push({ dispose });
-	try {
-		aiModelManager = manager;
-		aiStatusBar = new AIStatusBar(manager);
-		aiStatusBarInstance = aiStatusBar;
-		const start = (): void => {
-			if (disposed) {return;}
-			void manager.initialize().then(() => {
-				if (!disposed) {
-					log(`AI suggestions initialization completed (ready: ${manager.isReady()})`, 'info');
-				}
-			}).catch(error => {
-				if (!disposed) {log('AI services initialization failed (non-critical)', 'warn', error);}
-			});
-		};
-		configurationListener = vscodeApi.workspace.onDidChangeConfiguration(event => {
-			if (!event.affectsConfiguration('singularBlockly.ai.enabled') &&
-				!event.affectsConfiguration('singularBlockly.ai.model')) {return;}
-			// Invalidate an older model selection before reinitializing from the new settings.
-			manager.stop();
-			start();
-		});
-		start();
-	} catch (error) {
-		dispose();
-		throw error;
-	}
-}
-
-/**
  * 停用擴充功能
  */
 export function deactivate() {
-	disposeAIServices?.();
 	// 清理資源
 	disposeOutputChannel();
 }

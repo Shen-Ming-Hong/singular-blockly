@@ -35,7 +35,7 @@ Feedback uses an anonymous secret stored in VS Code SecretStorage and a dedicate
 - **Classroom-friendly tools**: localized samples, virtual TXT controls, I/O testing, backups, and clear hardware diagnostics.
 - **Modern Blockly experience**: Blockly 13.2.1 with `@blockly/theme-modern`, light and dark themes, block search, touch support, keyboard navigation, and semantic control labels—all packaged for offline use.
 - **Safe project files**: automatic persistence, backup recovery, orphan-block guards, and runtime validation of external workspace edits.
-- **AI-aware projects**: project-local Agent Skills plus optional GitHub Copilot shadow-block suggestions.
+- **AI-aware projects**: project-local Agent Skills give coding agents the current board, workspace format, and block contract.
 
 ## Quick Start
 
@@ -116,10 +116,7 @@ TXT passwords are stored in VS Code SecretStorage. The default target is `192.16
 
 ### AI-Assisted Workflows
 
-Singular Blockly provides two separate AI experiences:
-
-- **Project-local Agent Skills** give Codex and Claude Code the current board, workspace format, and runtime-derived block contract. No user-installed Node.js server is required.
-- **Optional GitHub Copilot suggestions** can display temporary shadow blocks in the editor. They are disabled by default and remain unsaved until accepted. Use the AI status-bar item to inspect or configure the feature, or request a suggestion with `Ctrl+Shift+Space` (`Cmd+Shift+Space` on macOS).
+Project-local Agent Skills give Codex and Claude Code the current board, workspace format, and runtime-derived block contract. No user-installed Node.js server is required.
 
 External changes to `blockly/main.json` pass through disposable Blockly runtimes before reaching the live workspace. Invalid candidates are quarantined and the last valid workspace is restored.
 
@@ -143,11 +140,6 @@ Settings are available through VS Code's Settings UI. Defaults below match the e
 | Setting                                             | Default                                      | Purpose                                      |
 | --------------------------------------------------- | -------------------------------------------- | -------------------------------------------- |
 | `singularBlockly.safetyGuard.suppressWarning`       | `false`                                      | Hide the non-Blockly-project safety warning  |
-| `singularBlockly.ai.enabled`                        | `false`                                      | Enable Copilot shadow-block suggestions      |
-| `singularBlockly.ai.model`                          | `gpt-4o-mini`                                | Select the suggestion model                  |
-| `singularBlockly.ai.triggerDelay`                   | `1500` ms                                    | Delay before automatic suggestions           |
-| `singularBlockly.ai.maxSuggestionsPerMinute`        | `5`                                          | Rate-limit suggestions                       |
-| `singularBlockly.ai.reasoningEffort`                | `low`                                        | Use `low`, `medium`, or `high` reasoning      |
 | `singular-blockly.txt.host`                         | `192.168.7.2`                                | TXT Controller host                          |
 | `singular-blockly.txt.username`                     | `ftc`                                        | TXT SSH username                             |
 | `singular-blockly.txt.remotePath`                   | `/tmp/singular_blockly/main.py`              | TXT upload destination                       |

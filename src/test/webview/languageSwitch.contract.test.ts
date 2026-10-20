@@ -80,8 +80,6 @@ suite('Blockly language rebuild contract', () => {
 			source.indexOf('window.rebuildBlocklyForLanguage = refreshWorkspaceForLanguage')
 		);
 		assert.match(source, /serialization\.workspaces\.save\(workspace\)[\s\S]*rebuildEditorWorkspaceForLanguage\(state\)/);
-		assert.match(rebuildSource, /shadowBlockManager\?\.isActive\?\.\(\)[\s\S]*clearSuggestion\(false\)/);
-		assert.ok(rebuildSource.indexOf('clearSuggestion(false)') < rebuildSource.indexOf('serialization.workspaces.save(workspace)'));
 		assert.match(source, /workspace = window\.blocklyRuntime\.recreateWorkspace\(\)/);
 		assert.match(source, /attachWorkspaceBaseIntegrations\(workspace\)/);
 		assert.match(source, /workspace\.addChangeListener\(handleWorkspaceChange\)/);

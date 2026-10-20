@@ -1201,10 +1201,6 @@ window.languageManager.loadMessages('hu', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Ezt a blokkot a setup(), loop() vagy egy függvényen belül kell elhelyezni a kódgeneráláshoz.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Ezt a blokkot a main() vagy egy függvényen belül kell elhelyezni a kódgeneráláshoz.',
-	// === AI Shadow Suggestions ===
-	AI_SUGGESTION_TAB_HINT: 'Tab az elfogadáshoz · Esc az elvetéshez',
-	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab elfogad · Alt+]/[ váltás · Esc elvet',
-	AI_QUOTA_EXHAUSTED: 'A Copilot kvóta kimürlt. Jövő hónapban újraindul vagy frísítse a csomagot.',
 
 	// === Sample Browser ===
 	SAMPLE_BROWSER_BUTTON_TITLE: 'Példa betöltése',

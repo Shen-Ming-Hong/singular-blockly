@@ -1,20 +1,6 @@
 {
 	"singularBlockly.managedRuntime.path.markdownDescription": "Volitelná absolutní místní složka pro prostředí Python a PlatformIO spravované rozšířením Singular. Ponecháte-li pole prázdné, použije se globální úložiště rozšíření VS Code. Cesty UNC a síťové cesty nejsou podporovány.",
 	"command.checkPlatformioStatus.title": "Zkontrolovat stav PlatformIO",
-	"command.showAIStatusMenu.title": "Singular Blockly: Nastavení návrhů AI",
-	"command.toggleAIEnabled.title": "Singular Blockly: Přepnout návrhy AI",
-	"command.selectAIModel.title": "Singular Blockly: Vybrat model AI",
-	"command.openAISettings.title": "Singular Blockly: Otevřít nastavení AI",
-	"command.triggerAISuggestion.title": "Singular Blockly: Spustit návrh bloku AI",
-	"singularBlockly.ai.enabled.markdownDescription": "Zapnout/vypnout návrhy stínových bloků AI. Vyžaduje rozšíření GitHub Copilot.",
-	"singularBlockly.ai.model.markdownDescription": "Jazykový model pro návrhy AI. Jsou uvedeny pouze lehké modely vhodné pro rychlé návrhy. Dostupné modely závisí na vašem plánu Copilot.",
-	"singularBlockly.ai.triggerDelay.markdownDescription": "Prodleva v milisekundách před spuštěním návrhu AI po změně pracovní plochy.",
-	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Maximální počet požadavků na návrhy AI za minutu.",
-	"singularBlockly.ai.reasoningEffort.description": "Řídí hloubku uvažování pro návrhy bloků AI. 'low' upřednostňuje rychlost, 'high' upřednostňuje kvalitu.",
-	"singularBlockly.ai.reasoningEffort.markdownDescription": "Řídí hloubku uvažování pro návrhy bloků AI.\n\n- **low**: Nejrychlejší odpověď, minimální uvažování (doporučeno pro inline návrhy)\n- **medium**: Vyvážená rychlost a kvalita\n- **high**: Nejhlubší uvažování, pomalejší odpověď",
-	"singularBlockly.ai.reasoningEffort.low.description": "Nejrychlejší, minimální uvažování (doporučeno)",
-	"singularBlockly.ai.reasoningEffort.medium.description": "Vyvážená rychlost a kvalita",
-	"singularBlockly.ai.reasoningEffort.high.description": "Nejhlubší uvažování, nejpomalejší odpověď",
 	"command.provideFeedback.title": "Odeslat zpětnou vazbu",
 	"command.showMyFeedback.title": "Moje zpětná vazba"
 }

@@ -1199,10 +1199,6 @@ window.languageManager.loadMessages('pl', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Ten blok musi być umieszczony w setup(), loop() lub funkcji, aby wygenerować kod.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Ten blok musi być umieszczony w main() lub funkcji, aby wygenerować kod.',
-	// === AI Shadow Suggestions ===
-	AI_SUGGESTION_TAB_HINT: 'Tab aby zaakceptować · Esc aby odrzucić',
-	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab akceptuj · Alt+]/[ przełącz · Esc odrzuć',
-	AI_QUOTA_EXHAUSTED: 'Limit Copilot wyczerpany. Reset w przyszłym miesiącu lub zaktualizuj plan.',
 
 	// === Sample Browser ===
 	SAMPLE_BROWSER_BUTTON_TITLE: 'Załaduj przykład',
