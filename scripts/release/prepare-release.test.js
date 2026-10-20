@@ -192,6 +192,35 @@ describe('publish workflow retry contract', () => {
 	});
 });
 
+describe('cloud release tag workflow contract', () => {
+	const workflow = fs.readFileSync(
+		path.join(__dirname, '..', '..', '.github', 'workflows', 'create-release-tag.yml'),
+		'utf8'
+	);
+	const publishWorkflow = fs.readFileSync(
+		path.join(__dirname, '..', '..', '.github', 'workflows', 'publish.yml'),
+		'utf8'
+	);
+
+	it('creates a new annotated tag only from the latest master', () => {
+		assert.match(workflow, /if: github\.ref == 'refs\/heads\/master'/);
+		assert.match(workflow, /git rev-parse HEAD\)" != "\$\(git rev-parse origin\/master\)/);
+		assert.match(workflow, /git ls-remote --exit-code --tags origin "refs\/tags\/\$RELEASE_TAG"/);
+		assert.match(workflow, /npm run release:prepare/);
+		assert.match(workflow, /git tag -a "\$RELEASE_TAG"/);
+		assert.match(workflow, /test "\$\(git cat-file -t "\$RELEASE_TAG"\)" = tag/);
+		assert.ok(!/--force|-f origin/u.test(workflow));
+	});
+
+	it('publishes through the shared publish workflow in the same run', () => {
+		assert.match(workflow, /uses: \.\/\.github\/workflows\/publish\.yml/);
+		assert.match(workflow, /needs: create-tag/);
+		assert.match(workflow, /release_tag: \$\{\{ inputs\.release_tag \}\}/);
+		assert.match(publishWorkflow, /workflow_call:[\s\S]*?release_tag:/);
+		assert.doesNotMatch(workflow, /group: release-\$\{\{ inputs\.release_tag \}\}\n/);
+	});
+});
+
 describe('GitHub Release recovery workflow contract', () => {
 	const workflow = fs.readFileSync(
 		path.join(__dirname, '..', '..', '.github', 'workflows', 'recover-github-release.yml'),

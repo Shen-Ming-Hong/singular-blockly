@@ -55,6 +55,14 @@ GitHub CI 執行 `npm run validate:i18n` 與 `npm run test:i18n`。15 個 locale
 
     第二個指令必須輸出 `tag`。
 
+    不能推 tag 的環境（例如雲端工作階段）改從 `master` 觸發 `.github/workflows/create-release-tag.yml`：
+
+    ```bash
+    gh workflow run create-release-tag.yml --ref master -f release_tag=vX.Y.Z
+    ```
+
+    它在最新 `master` 執行 `release:prepare`、確認 tag 不存在，以 `github-actions[bot]` 建立 annotated tag，並在同一 run 以 `workflow_call` 呼叫 `publish.yml`。`GITHUB_TOKEN` 推送的 tag 不會再觸發 `publish.yml`，所以只會發布一次。
+
 5. `.github/workflows/publish.yml` 呼叫共用 CI；helper 會拒絕 lightweight tag、版本不一致或缺少 CHANGELOG 區段。
 6. `quality` job 只產生一份 versioned artifact。GitHub Release、VS Code Marketplace 與 Open VSX jobs 各自下載同一 artifact，可單獨重跑失敗 job。
 7. GitHub Release notes 直接來自對應 CHANGELOG 區段，並附 VSIX 與 `.sha256`。

@@ -184,7 +184,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 | `gh workflow run ... -f release_tag=...` | `actions_run_trigger`（`run_workflow`，`ref: master`、`inputs`） |
 | 失敗 log | `get_job_logs` |
 
-雲端工作階段通常只能推送指定的 `claude/…` 分支；推送 tag 被拒時，不改用其他方式繞過，告訴 Ray 在本機執行的確切指令（Phase 5.1 檢查與 5.2 建立、推送 annotated tag），其餘步驟仍可在雲端追蹤。
+雲端工作階段通常只能推送指定的 `claude/…` 分支，不直接推 tag。Phase 5.1–5.2 改為以 `actions_run_trigger`（`run_workflow`、`workflow_id: create-release-tag.yml`、`ref: master`、`inputs: {release_tag: "v{VERSION}"}`）觸發 `.github/workflows/create-release-tag.yml`（Ray 2026-10-20 同意）：它在最新 `master` 驗證 `release:prepare`、確認 tag 不存在後建立 annotated tag，並在同一 run 呼叫 `publish.yml`。之後依 5.3–5.4 追蹤該 run；失敗時只重跑失敗 jobs，不重新觸發此 workflow（tag 已存在會被拒）。此 workflow 也失敗於建立 tag 前時，才告訴 Ray 在本機執行 5.1–5.2 的確切指令。
 
 ## Phase 5：Annotated Tag 與 Actions CD
 
