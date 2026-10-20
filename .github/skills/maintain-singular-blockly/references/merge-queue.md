@@ -69,17 +69,17 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
 4. 移除 `merge-lease`；遠端分支由 GitHub 自動刪除，確認後清理本地 worktree 與分支。
 5. 通知重疊或疊加在本 PR 上的任務：雲端工作階段在討論串回報合併 SHA；疊加 PR 依「疊加 PR」rebase。
 6. 有可重用根因時，依技能主文件更新 `lessons.md`（下一個 PR 或同一 PR 內，不直接推 `master`）。
-7. 依 `pr-review-release` 的「何時發布」判斷是否需要向 Ray 提議發布：已發布功能壞掉或安全問題當下提議 patch；使用者可見的新功能累積後提議 minor；不進 VSIX 的改動不提。
+7. 依 `pr-review-release` 的「何時發布」判斷是否需要發布：已發布功能壞掉或安全問題當下發 patch；使用者可見的新功能累積後發 minor；不進 VSIX 的改動不發。由協調者決定（見該技能的「誰決定發布」）；其他工作階段把判斷回報給協調者。
 
 ## 仍須先問 Ray
 
 下列事項即使所有檢查都通過，也要先取得 Ray 在對話中的明確同意：
 
-- **發布相關：** 改版號（`package.json`／`package-lock.json` 的 version）、`CHANGELOG.md` 的版本區段、建立或推送 tag、觸發 `publish.yml`／`recover-github-release.yml`，以及 `pr-review-release` Phase 4–5 的所有步驟。
+- **發布相關：** major 候選，以及沒有協調者決定的發布。patch／minor（改版號、`CHANGELOG.md` 版本區段、tag、`publish.yml`／`recover-github-release.yml`）由協調者依 `pr-review-release` 的「何時發布」與「誰決定發布」判斷執行，發布後回報 Ray。
 - **移除或改變使用者可見功能，而範圍不明確時：** 例如需求只說「拿掉 X」，但 X 牽涉多個入口、設定或已存檔的工作區格式；或 modify/delete 衝突無法判斷該保留哪一方。
 - **產品決策：** `NEEDS_USER_DECISION` 的 review 或 i18n finding、需求有多種合理解讀且會影響使用者行為、不相容的工作區格式變更。
 - **儲存庫與帳號設定：** ruleset、required checks、secrets、GitHub App／Marketplace 身分、`release` environment、workflow 權限（`permissions:`、`id-token`）的擴大。
 - **他人的 PR：** 外部貢獻者或其他工作階段開的 PR，除非該工作階段已停止且 Ray 指派接手。Dependabot PR 依 `manage-dependabot-prs` 的核准佇列。
-- **不可逆或對外的操作：** 對 `master` 強制推送或改寫歷史、刪除他人分支、對外發佈（VS Code Marketplace、Open VSX、GitHub Release）。
+- **不可逆或對外的操作：** 對 `master` 強制推送或改寫歷史、刪除他人分支、刪除或重建已發布的 tag 與 release；協調者決定的 patch／minor 發布除外。
 
 問的時候說明 PR、已完成的驗證、需要決定的一件事與建議選項；等待期間釋放合併權，讓佇列中的下一個 PR 繼續。

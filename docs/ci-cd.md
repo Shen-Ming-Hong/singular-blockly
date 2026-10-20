@@ -38,13 +38,13 @@ GitHub CI 執行 `npm run validate:i18n` 與 `npm run test:i18n`。15 個 locale
 
 ## 一般 PR 合併
 
-不含版本、CHANGELOG 版本區段或 tag 的 PR，依 `.github/skills/maintain-singular-blockly/references/merge-queue.md` 的整合佇列與前置條件，由開 PR 的工作階段自行 squash 合併（Ray 2026-10-20 常設授權）；發布仍依下方流程取得核准。何時該發布（馬上 patch、累積 minor 或不用發）見 `.github/skills/pr-review-release/SKILL.md` 的「何時發布」。
+不含版本、CHANGELOG 版本區段或 tag 的 PR，依 `.github/skills/maintain-singular-blockly/references/merge-queue.md` 的整合佇列與前置條件，由開 PR 的工作階段自行 squash 合併（Ray 2026-10-20 常設授權）；發布由協調者依「何時發布」決定（patch／minor，發布後回報 Ray；major 先問 Ray），依下方流程執行。何時該發布（馬上 patch、累積 minor 或不用發）見 `.github/skills/pr-review-release/SKILL.md` 的「何時發布」。
 
 ## 發布流程
 
 1. 在功能分支完成 SemVer、`package.json`、`package-lock.json` 與雙語 `CHANGELOG.md`。
 2. 執行 `npm run release:prepare`，確認四者契約完整。
-3. 依 `git-workflow` 與 `pr-review-release` 完成本地 review、兩次使用者 gate、PR、CI 與 squash merge；發布擁有者的 Phase 3.5 明確核准即為 maintainer approval，不要求作者無法完成的自我 GitHub review。
+3. 依 `git-workflow` 與 `pr-review-release` 完成本地 review、Phase 1.5／3.5 兩道 gate、PR、CI 與 squash merge；通過 Phase 3.5（協調者決定或 Ray 核准）即為 maintainer approval，不要求作者無法完成的自我 GitHub review。
 4. 同步最新 `master`，建立 annotated tag：
 
     ```bash

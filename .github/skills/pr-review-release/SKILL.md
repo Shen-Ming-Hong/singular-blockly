@@ -1,6 +1,6 @@
 ---
 name: pr-review-release
-description: 本地 Code Review（Codex 或 Claude Code）評估、非發布 PR 的自主合併，以及需使用者核准的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
+description: 本地 Code Review（Codex 或 Claude Code）評估、非發布 PR 的自主合併，以及由協調者依「何時發布」判斷執行的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
 metadata:
   author: singular-blockly
   version: '2.0.0'
@@ -18,7 +18,7 @@ license: Apache-2.0
 - `package.json`、`package-lock.json`、`CHANGELOG.md` 與 tag 必須是同一版本。
 - 版本與雙語 CHANGELOG 必須在功能分支完成，隨同一 PR 通過 `CI Gate` 與 CodeQL。
 - tag 推送後由 `.github/workflows/publish.yml` 重用 CI 產生的唯一 VSIX，發布到 GitHub Releases、VS Code Marketplace 與 Open VSX。
-- 發布範圍（改版號、CHANGELOG 版本區段、tag、CD）未取得 Phase 3.5 明確發布核准，不得 push、建立／更新 PR、merge、建立 tag 或觸發 CD。
+- 發布範圍（改版號、CHANGELOG 版本區段、tag、CD）未通過 Phase 3.5 發布 gate（協調者決定或使用者核准，見「誰決定發布」），不得 push、建立／更新 PR、merge、建立 tag 或觸發 CD。
 - 非發布 PR 依下方「非發布 PR 的自主合併」處理，不需 Phase 1.5／3.5 的使用者核准。
 - 若只要求 review 而未要求修改或發布，完成 Phase 0–3 後停止；不得自行推定要建立 PR 或 release。
 - Phase 0–3 使用 `local-code-review-loop` 收斂 findings；本 Skill 的 Phase 1.5 與 Phase 3.5 核准 gate 優先。
@@ -33,10 +33,19 @@ license: Apache-2.0
 | 新增、移除或改變使用者可見功能，新增板子或積木，設定變更 | **累積**後提議 minor；一兩週整理一次，或湊齊一個主題就發 | 移除影子積木 AI 功能 |
 | 只動 CI、文件、技能、測試、開發工具相依（不進 VSIX） | **不用發** | 本技能、`docs/`、`.github/workflows/`、`src/test/`、devDependencies |
 
-- 這張表只決定何時**向 Ray 提議**發布。改版號、CHANGELOG 版本區段、tag 與 CD 一律先取得 Ray 明確同意，再依下方 Phase 0–5 完成（`npm version`、雙語 CHANGELOG、`npm run release:prepare`、annotated tag）。
+- 依這張表決定要不要發、發哪一級；patch／minor 由協調者自行判斷並執行，發布後回報 Ray（Ray 2026-10-20 授權）。流程依下方 Phase 0–5 完成（`npm version`、雙語 CHANGELOG、`npm run release:prepare`、annotated tag）。
 - 一般 PR 不改版號、不寫 CHANGELOG 版本區段。要發布時，發布 PR 依 Phase 1 從 `git log <上一個 vX.Y.Z tag>..origin/master` 整理進 VSIX 的變更，寫成雙語 CHANGELOG。
-- 合併後依此表判斷：需要 patch 時當下向 Ray 提議；屬於 minor 的先累積，湊齊一個主題或距上次發布一兩週時提議；不用發的不提。提議時附上自上一個 tag 以來進 VSIX 的變更摘要、建議的 SemVer 與理由。
+- 合併後依此表判斷：需要 patch 時當下發布；屬於 minor 的先累積，湊齊一個主題或距上次發布一兩週時發布；不用發的不發。
 - 不相容的工作區格式或設定移除（major 候選）一律先問 Ray，不自行歸類。
+
+## 誰決定發布 Release Authority
+
+Ray 於 2026-10-20 授權：patch 與 minor 發布由協調者依「何時發布」判斷並執行，不先問 Ray，發布後回報 Ray。
+
+- 協調者指 claude.ai 專案中負責整個專案的協調工作階段；它可以把發布交給一個討論串執行。不在專案中的工作階段（例如本機 Codex、單獨的 Claude Code）沒有這份授權，仍須 Ray 指派或同意。
+- 協調者的決定取代 Phase 1.5 與 Phase 3.5 的使用者核准；兩個 gate 的檢查內容不能省，由執行發布的工作階段自行確認並寫進發布 PR 描述。
+- 仍先問 Ray：major 候選、`NEEDS_USER_DECISION` finding、repository／帳號／secrets／ruleset 設定變更，以及必須由 Ray 在本機操作的步驟。
+- 發布後回報 Ray：版本、CHANGELOG 重點、PR、publish run、GitHub Release 與兩個市集的結果。
 
 ## 非發布 PR 的自主合併
 
@@ -45,7 +54,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 1. Phase 0 與 Phase 3 照常執行；Phase 1 的評估由工作階段自行決定採納範圍，只修本任務範圍內的 finding。
 2. Phase 1.5 與 Phase 3.5 的使用者核准由常設授權取代。但有 `NEEDS_USER_DECISION`、`BLOCKED`、產品決策或 [整合佇列與自主合併](../maintain-singular-blockly/references/merge-queue.md)「仍須先問 Ray」列出的事項時，仍須先問 Ray。
 3. 推送、開 PR 後，依同一文件取得合併權、確認合併前置條件（同步最新 `master`、雲端本地驗證含視覺互動、`CI Gate` 與 CodeQL 對目前 head 成功、無衝突），以 squash 帶 `expectedHeadSha` 合併，再做合併後驗證。
-4. 不進入 Phase 5。要發布時另開發布 PR，回到下方完整流程取得兩次核准。
+4. 不進入 Phase 5。要發布時另開發布 PR，依「誰決定發布」走下方完整流程。
 
 ## Phase 0：本地 Code Review（必須）
 
@@ -129,7 +138,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 
 向使用者提交最終變更摘要、完整測試結果、殘餘風險、本地 re-review、確切版本與 CHANGELOG 摘要。明確詢問是否核准後續的 push、PR、squash merge、annotated tag 與 GitHub Actions CD。
 
-只有使用者明確核准才可進入 Phase 4。若最終差異、版本或風險在核准後實質改變，回到此 gate 重新取得核准。
+只有使用者明確核准，或協調者依「誰決定發布」決定的 patch／minor 且上述各項都成立、沒有 `NEEDS_USER_DECISION` 或 `BLOCKED`，才可進入 Phase 4。若最終差異、版本或風險在核准後實質改變，回到此 gate 重新取得核准。
 
 ## Phase 4：PR 與受保護主分支
 
@@ -175,7 +184,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 | `gh workflow run ... -f release_tag=...` | `actions_run_trigger`（`run_workflow`，`ref: master`、`inputs`） |
 | 失敗 log | `get_job_logs` |
 
-雲端工作階段通常只能推送指定的 `claude/…` 分支；推送 tag 被拒時，不改用其他方式繞過，回報 Ray 由本機完成 Phase 5.2，其餘步驟仍可在雲端追蹤。
+雲端工作階段通常只能推送指定的 `claude/…` 分支；推送 tag 被拒時，不改用其他方式繞過，告訴 Ray 在本機執行的確切指令（Phase 5.1 檢查與 5.2 建立、推送 annotated tag），其餘步驟仍可在雲端追蹤。
 
 ## Phase 5：Annotated Tag 與 Actions CD
 
@@ -263,7 +272,7 @@ GitHub Release 復原 workflow 必須驗證來源是失敗的正式發布 run，
 - [ ] i18n diff 已通過 `i18n-maintenance` 唯讀 gate（如適用）
 - [ ] 只實作已核准內容，測試與 re-review 通過
 - [ ] 版本、lockfile 與雙語 CHANGELOG 已在功能分支／同一 PR
-- [ ] 已取得 Phase 3.5 明確發布核准
+- [ ] 已通過 Phase 3.5 發布 gate（協調者決定或使用者核准）
 - [ ] `CI Gate`、CodeQL、發布擁有者的 Phase 3.5 明確核准與對話解決條件通過
 - [ ] PR 已 squash merge，未直接提交到 `master`
 - [ ] annotated tag 已驗證為 `tag` 並推送
