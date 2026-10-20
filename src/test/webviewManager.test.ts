@@ -695,13 +695,13 @@ describe('WebView Manager', () => {
 			vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: workspacePath } }];
 
 			// Don't add backup file - will cause error
-			await assert.rejects(async () => await webViewManager.previewBackup(backupPath), /備份檔案不存在/);
+			await assert.rejects(async () => await webViewManager.previewBackup(backupPath), /Backup file not found/);
 		});
 
 		it('should throw error if no workspace folder open', async () => {
 			vscodeMock.workspace.workspaceFolders = undefined;
 
-			await assert.rejects(async () => await webViewManager.previewBackup('/some/path.json'), /請先開啟項目資料夾/);
+			await assert.rejects(async () => await webViewManager.previewBackup('/some/path.json'), /Please open a project folder first/);
 		});
 	});
 

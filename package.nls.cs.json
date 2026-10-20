@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Volitelná absolutní místní složka pro prostředí Python a PlatformIO spravované rozšířením Singular. Ponecháte-li pole prázdné, použije se globální úložiště rozšíření VS Code. Cesty UNC a síťové cesty nejsou podporovány.",
 	"command.checkPlatformioStatus.title": "Zkontrolovat stav PlatformIO",
 	"command.provideFeedback.title": "Odeslat zpětnou vazbu",
-	"command.showMyFeedback.title": "Moje zpětná vazba"
+	"command.showMyFeedback.title": "Moje zpětná vazba",
+	"command.openBlocklyEdit.title": "Otevřít editor Blockly",
+	"command.previewBackup.title": "Náhled zálohy",
+	"command.stopTxtExecution.title": "Zastavit běh na TXT",
+	"command.installTxtRuntime.title": "Nainstalovat běhové prostředí TXT",
+	"singularBlockly.safetyGuard.suppressWarning.description": "Nezobrazovat bezpečnostní upozornění u projektů, které nejsou Blockly",
+	"singular-blockly.txt.host.description": "IP adresa řídicí jednotky fischertechnik TXT",
+	"singular-blockly.txt.username.description": "Uživatelské jméno SSH pro řídicí jednotku TXT",
+	"singular-blockly.txt.remotePath.description": "Cesta na řídicí jednotce TXT, kam se program nahraje",
+	"singular-blockly.txt.runtimePort.description": "Port běhového prostředí řídicí jednotky TXT",
+	"singular-blockly.cyberbrick.uploadSettings.description": "Seznam spárovaných zařízení CyberBrick OTA a nastavení nahrávání. Citlivé údaje, jako hesla k Wi-Fi a tokeny OTA, se ukládají zvlášť do VS Code SecretStorage."
 }

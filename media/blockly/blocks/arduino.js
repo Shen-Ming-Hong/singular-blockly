@@ -203,25 +203,35 @@ if (!window.pinModeTracker) {
 					// 根據積木類型顯示適當的警告
 					let warningText = '';
 					const blockPin = block.getFieldValue('PIN');
+					const conflict = (operation, requiredText) =>
+						window.languageManager
+							.getMessage('PIN_MODE_CONFLICT_WARNING', 'Pin {0} is set to {1} mode, but {2} requires {3} mode')
+							.replace('{0}', blockPin)
+							.replace('{1}', currentMode)
+							.replace('{2}', operation)
+							.replace('{3}', requiredText);
 					switch (block.type) {
 						case 'arduino_digital_write':
-							warningText = `腳位 ${blockPin} 被設為 ${currentMode} 模式，但 digitalWrite 需要 OUTPUT 模式`;
+							warningText = conflict('digitalWrite', 'OUTPUT');
 							break;
 						case 'arduino_analog_write':
-							warningText = `腳位 ${blockPin} 被設為 ${currentMode} 模式，但 analogWrite 需要 OUTPUT 模式`;
+							warningText = conflict('analogWrite', 'OUTPUT');
 							break;
 						case 'arduino_digital_read':
-							warningText = `腳位 ${blockPin} 被設為 ${currentMode} 模式，但 digitalRead 需要 INPUT 或 INPUT_PULLUP 模式`;
+							warningText = conflict('digitalRead', 'INPUT / INPUT_PULLUP');
 							break;
 						case 'arduino_analog_read':
-							warningText = `腳位 ${blockPin} 被設為 ${currentMode} 模式，但 analogRead 需要 INPUT 或 INPUT_PULLUP 模式`;
+							warningText = conflict('analogRead', 'INPUT / INPUT_PULLUP');
 							break;
 						case 'arduino_pullup':
-							warningText = `腳位 ${blockPin} 被設為 ${currentMode} 模式，但 內部上拉電阻 需要 INPUT 模式`;
+							warningText = conflict('INPUT_PULLUP', 'INPUT');
 							break;
 						case 'arduino_pin_mode':
-							const mode = block.getFieldValue('MODE');
-							warningText = `腳位 ${blockPin} 被設為 ${currentMode} 模式，但嘗試設置為 ${mode} 模式`;
+							warningText = window.languageManager
+								.getMessage('PIN_MODE_CHANGE_WARNING', 'Pin {0} is set to {1} mode, but this block sets it to {2} mode')
+								.replace('{0}', blockPin)
+								.replace('{1}', currentMode)
+								.replace('{2}', block.getFieldValue('MODE'));
 							break;
 					}
 
@@ -442,7 +452,7 @@ Blockly.Blocks['arduino_setup_loop'] = {
 		this.appendStatementInput('SETUP').setCheck(null).appendField(window.languageManager.getMessage('ARDUINO_SETUP'));
 		this.appendStatementInput('LOOP').setCheck(null).appendField(window.languageManager.getMessage('ARDUINO_LOOP'));
 		this.setStyle('arduino_blocks');
-		this.setTooltip('Arduino 程式的基本結構');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_SETUP_LOOP_TOOLTIP', 'Basic structure of an Arduino program'));
 		this.setHelpUrl('');
 		this.setDeletable(false);
 	},
@@ -471,7 +481,7 @@ Blockly.Blocks['arduino_digital_write'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('arduino_blocks');
-		this.setTooltip('寫入數位輸出值到指定的腳位，可以是布林值、數字或變數');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_DIGITAL_WRITE_TOOLTIP', 'Write a digital output value to the selected pin'));
 		this.setHelpUrl('');
 	},
 
@@ -520,7 +530,7 @@ Blockly.Blocks['arduino_digital_read'] = {
 			);
 		this.setOutput(true, 'Boolean');
 		this.setStyle('arduino_blocks');
-		this.setTooltip('從指定的腳位讀取數位輸入值');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_DIGITAL_READ_TOOLTIP', 'Read the digital input value from the selected pin'));
 		this.setHelpUrl('');
 	},
 
@@ -569,7 +579,11 @@ Blockly.Blocks['arduino_analog_write'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('arduino_blocks');
-		this.setTooltip(`寫入類比值(${range.min}-${range.max})到指定的腳位`);
+		this.setTooltip(
+			window.languageManager.getMessage('ARDUINO_ANALOG_WRITE_TOOLTIP', 'Write an analog value ({0}-{1}) to the selected pin')
+				.replace('{0}', range.min)
+				.replace('{1}', range.max)
+		);
 		this.setHelpUrl('');
 	},
 
@@ -593,7 +607,11 @@ Blockly.Blocks['arduino_analog_write'] = {
 					numField.setValue(range.max);
 				}
 			}
-			this.setTooltip(`寫入類比值(${range.min}-${range.max})到指定的腳位`);
+			this.setTooltip(
+				window.languageManager.getMessage('ARDUINO_ANALOG_WRITE_TOOLTIP', 'Write an analog value ({0}-{1}) to the selected pin')
+					.replace('{0}', range.min)
+					.replace('{1}', range.max)
+			);
 			this.render();
 		}
 
@@ -633,7 +651,7 @@ Blockly.Blocks['arduino_analog_read'] = {
 			);
 		this.setOutput(true, 'Number');
 		this.setStyle('arduino_blocks');
-		this.setTooltip('從指定的腳位讀取類比值');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_ANALOG_READ_TOOLTIP', 'Read the analog value from the selected pin'));
 		this.setHelpUrl('');
 	},
 
@@ -667,7 +685,7 @@ Blockly.Blocks['arduino_delay'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('loop_blocks');
-		this.setTooltip('暫停程式執行指定的毫秒數');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_DELAY_TOOLTIP', 'Pause the program for the specified number of milliseconds'));
 		this.setHelpUrl('');
 	},
 };
@@ -683,7 +701,7 @@ Blockly.Blocks['arduino_level'] = {
 		);
 		this.setOutput(true, ['Boolean', 'Number']);
 		this.setStyle('arduino_blocks');
-		this.setTooltip('Arduino 的 HIGH (1) 或 LOW (0) 常數');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_LEVEL_TOOLTIP', 'Arduino HIGH (1) or LOW (0) constant'));
 		this.setHelpUrl('https://www.arduino.cc/reference/en/language/variables/constants/constants/');
 	},
 };
@@ -801,7 +819,7 @@ Blockly.Blocks['text_print'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('text_blocks');
-		this.setTooltip('在序列埠監控視窗顯示文字');
+		this.setTooltip(window.languageManager.getMessage('TEXT_PRINT_TOOLTIP', 'Show text in the serial monitor'));
 		this.setHelpUrl('');
 	},
 };
@@ -832,7 +850,7 @@ Blockly.Blocks['arduino_pin_mode'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('arduino_blocks');
-		this.setTooltip('設定指定腳位的運作模式（輸入/輸出）');
+		this.setTooltip(window.languageManager.getMessage('ARDUINO_PIN_MODE_TOOLTIP', 'Set the selected pin to input or output mode'));
 		this.setHelpUrl('');
 	},
 

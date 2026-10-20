@@ -40,11 +40,13 @@
 		"commands": [
 			{
 				"command": "singular-blockly.openBlocklyEdit",
-				"title": "Singular Blockly: Open Blockly Edit"
+				"title": "%command.openBlocklyEdit.title%",
+				"category": "Singular Blockly"
 			},
 			{
 				"command": "singular-blockly.previewBackup",
-				"title": "Singular Blockly: Preview Backup"
+				"title": "%command.previewBackup.title%",
+				"category": "Singular Blockly"
 			},
 			{
 				"command": "singular-blockly.checkPlatformioStatus",
@@ -65,12 +67,12 @@
 			},
 			{
 				"command": "singular-blockly.stopTxtExecution",
-				"title": "Singular Blockly: Stop TXT Execution",
+				"title": "%command.stopTxtExecution.title%",
 				"category": "Singular Blockly"
 			},
 			{
 				"command": "singular-blockly.txt.installRuntime",
-				"title": "Singular Blockly: Install TXT Runtime",
+				"title": "%command.installTxtRuntime.title%",
 				"category": "Singular Blockly"
 			}
 		],
@@ -111,27 +113,27 @@
 				"singularBlockly.safetyGuard.suppressWarning": {
 					"type": "boolean",
 					"default": false,
-					"description": "不再顯示非 Blockly 專案的安全警告 (Do not show safety warning for non-Blockly projects)"
+					"description": "%singularBlockly.safetyGuard.suppressWarning.description%"
 				},
 				"singular-blockly.txt.host": {
 					"type": "string",
 					"default": "192.168.7.2",
-					"description": "fischertechnik TXT Controller IP address"
+					"description": "%singular-blockly.txt.host.description%"
 				},
 				"singular-blockly.txt.username": {
 					"type": "string",
 					"default": "ftc",
-					"description": "SSH username for TXT Controller"
+					"description": "%singular-blockly.txt.username.description%"
 				},
 				"singular-blockly.txt.remotePath": {
 					"type": "string",
 					"default": "/tmp/singular_blockly/main.py",
-					"description": "Remote path on TXT Controller where the program is uploaded"
+					"description": "%singular-blockly.txt.remotePath.description%"
 				},
 				"singular-blockly.txt.runtimePort": {
 					"type": "number",
 					"default": 8080,
-					"description": "TXT Controller runtime port"
+					"description": "%singular-blockly.txt.runtimePort.description%"
 				},
 				"singular-blockly.cyberbrick.uploadSettings": {
 					"type": "object",
@@ -140,7 +142,7 @@
 						"schemaVersion": 2,
 						"pairedDevices": []
 					},
-					"description": "CyberBrick paired OTA device registry and upload settings. Sensitive values such as Wi-Fi passwords and OTA tokens are stored separately in VS Code SecretStorage.",
+					"description": "%singular-blockly.cyberbrick.uploadSettings.description%",
 					"properties": {
 						"schemaVersion": {
 							"type": "number",

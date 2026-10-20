@@ -2772,12 +2772,17 @@ const backupManager = {
 	createBackup: function () {
 		const backupName = document.getElementById('backupName').value.trim();
 		if (!backupName) {
-			alert('請輸入備份名稱');
+			alert(window.languageManager.getMessage('BACKUP_ERROR_NAME_REQUIRED', 'Enter a backup name'));
 			return;
 		}
 		// 安全性檢查：確保檔案名稱有效
 		if (!this.isValidFilename(backupName)) {
-			alert('備份名稱包含無效字符，請避免使用 \\ / : * ? " < > | 等特殊字符');
+			alert(
+				window.languageManager.getMessage(
+					'BACKUP_ERROR_NAME_INVALID',
+					'The backup name contains invalid characters. Avoid \\ / : * ? " < > |'
+				)
+			);
 			return;
 		}
 
@@ -2805,7 +2810,7 @@ const backupManager = {
 			log.info(`建立備份 "${backupName}" 成功`);
 		} catch (error) {
 			log.error('建立備份失敗:', error);
-			alert('建立備份失敗: ' + error.message);
+			alert(window.languageManager.getMessage('BACKUP_ERROR_CREATE_FAILED', 'Failed to create backup: {0}').replace('{0}', error.message));
 		}
 	},
 

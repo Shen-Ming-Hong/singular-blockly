@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Dossier local absolu facultatif pour l’environnement Python et PlatformIO géré par Singular. Laissez ce champ vide pour utiliser le stockage global de l’extension VS Code. Les chemins UNC et réseau ne sont pas pris en charge.",
 	"command.checkPlatformioStatus.title": "Vérifier l'état de PlatformIO",
 	"command.provideFeedback.title": "Donner votre avis",
-	"command.showMyFeedback.title": "Mes retours"
+	"command.showMyFeedback.title": "Mes retours",
+	"command.openBlocklyEdit.title": "Ouvrir l'éditeur Blockly",
+	"command.previewBackup.title": "Aperçu de la sauvegarde",
+	"command.stopTxtExecution.title": "Arrêter l'exécution sur le TXT",
+	"command.installTxtRuntime.title": "Installer l'environnement d'exécution TXT",
+	"singularBlockly.safetyGuard.suppressWarning.description": "Ne pas afficher l'avertissement de sécurité pour les projets non Blockly",
+	"singular-blockly.txt.host.description": "Adresse IP du contrôleur fischertechnik TXT",
+	"singular-blockly.txt.username.description": "Nom d'utilisateur SSH du contrôleur TXT",
+	"singular-blockly.txt.remotePath.description": "Chemin sur le contrôleur TXT où le programme est téléversé",
+	"singular-blockly.txt.runtimePort.description": "Port de l'environnement d'exécution du contrôleur TXT",
+	"singular-blockly.cyberbrick.uploadSettings.description": "Registre des appareils OTA CyberBrick appairés et paramètres de téléversement. Les valeurs sensibles comme les mots de passe Wi-Fi et les jetons OTA sont stockées séparément dans le SecretStorage de VS Code."
 }

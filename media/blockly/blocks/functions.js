@@ -540,7 +540,11 @@ Blockly.Blocks['arduino_function'] = {
 							this.setFieldValue(oldName, 'NAME');
 
 							// 給用戶顯示警告
-							this.setWarningText(`函式名稱 "${newName}" 已存在，請使用不同的名稱`);
+							this.setWarningText(
+								window.languageManager
+									.getMessage('FUNCTION_NAME_EXISTS_WARNING', 'Function name "{0}" already exists. Use a different name.')
+									.replace('{0}', newName)
+							);
 
 							// 延遲清除警告
 							setTimeout(() => {
@@ -725,7 +729,7 @@ Blockly.Blocks['arduino_function_call'] = {
 
 		this.setInputsInline(true);
 		this.setStyle('procedure_blocks');
-		this.setTooltip('呼叫一個自定義函數');
+		this.setTooltip(window.languageManager.getMessage('FUNCTION_CALL_TOOLTIP', 'Call a custom function'));
 		this.setHelpUrl('');
 
 		// 用於存儲參數相關信息
@@ -761,7 +765,7 @@ Blockly.Blocks['arduino_function_call'] = {
 		this.returnType_ = 'void';
 		this._clearExistingInputs();
 		this._createParameterInputs();
-		this.setTooltip('呼叫函數: ' + name);
+		this.setTooltip(window.languageManager.getMessage('FUNCTION_CALL_TOOLTIP_NAMED', 'Call function: {0}').replace('{0}', name));
 	},
 
 	// 將函數狀態序列化為 DOM
@@ -878,7 +882,7 @@ Blockly.Blocks['arduino_function_call'] = {
 
 		// 重新創建參數輸入 - 始終使用 null 作為檢查類型以確保最大兼容性
 		for (let i = 0; i < this.arguments_.length; i++) {
-			const argName = this.arguments_[i] || `參數${i + 1}`;
+			const argName = this.arguments_[i] || `arg${i + 1}`;
 			const argType = this.argumentTypes_[i] || 'int';
 
 			// 參數輸入使用 null 檢查類型，允許連接任何類型的積木
@@ -895,10 +899,12 @@ Blockly.Blocks['arduino_function_call'] = {
 		}
 
 		// 設定提示
-		let tooltip = '呼叫函數: ' + name;
-		if (this.hasReturn_) {
-			tooltip += ` (回傳型別: ${this.returnType_})`;
-		}
+		const tooltip = this.hasReturn_
+			? window.languageManager
+					.getMessage('FUNCTION_CALL_TOOLTIP_RETURNS', 'Call function: {0} (returns {1})')
+					.replace('{0}', name)
+					.replace('{1}', this.returnType_)
+			: window.languageManager.getMessage('FUNCTION_CALL_TOOLTIP_NAMED', 'Call function: {0}').replace('{0}', name);
 		this.setTooltip(tooltip);
 
 		// 簡化連接還原機制
@@ -1255,7 +1261,7 @@ Blockly.Blocks['arduino_function_call'] = {
 	_createParameterInputs: function () {
 		// 為每個參數建立輸入
 		for (let i = 0; i < this.arguments_.length; i++) {
-			const argName = this.arguments_[i] || `參數${i + 1}`;
+			const argName = this.arguments_[i] || `arg${i + 1}`;
 			const argType = this.argumentTypes_[i] || 'int';
 
 			// 參數輸入使用 null 檢查類型，允許最大兼容性

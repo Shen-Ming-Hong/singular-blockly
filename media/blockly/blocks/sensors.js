@@ -156,13 +156,16 @@ Blockly.Blocks['ultrasonic_read'] = {
 // 新增超音波觸發積木
 Blockly.Blocks['ultrasonic_trigger'] = {
 	init: function () {
-		this.appendDummyInput().appendField(window.languageManager.getMessage('ULTRASONIC_TRIGGER', '發送超音波訊號'));
+		this.appendDummyInput().appendField(window.languageManager.getMessage('ULTRASONIC_TRIGGER', 'Trigger ultrasonic measurement'));
 
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('sensor_blocks');
 		this.setTooltip(
-			window.languageManager.getMessage('ULTRASONIC_TOOLTIP_TRIGGER', '發送超音波感測器的觸發訊號，在中斷模式下使用以手動觸發測量。')
+			window.languageManager.getMessage(
+				'ULTRASONIC_TOOLTIP_TRIGGER',
+				'Send a trigger pulse to the ultrasonic sensor. Use it in interrupt mode to start a measurement manually.'
+			)
 		);
 		this.setHelpUrl('');
 	},
@@ -183,7 +186,7 @@ Blockly.Blocks['ultrasonic_trigger'] = {
 
 			// 如果沒有找到超音波感測器積木，顯示警告
 			if (!hasUltrasonicSensor) {
-				this.setWarningText(window.languageManager.getMessage('ULTRASONIC_WARNING_NO_SENSOR', '請先添加超音波感測器設定積木！'));
+				this.setWarningText(window.languageManager.getMessage('ULTRASONIC_WARNING_NO_SENSOR', 'Add the ultrasonic sensor setup block first.'));
 			} else {
 				this.setWarningText(null);
 			}
