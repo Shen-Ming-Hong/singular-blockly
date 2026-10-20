@@ -1,6 +1,6 @@
 ---
 name: pr-review-release
-description: 本地 Codex Code Review 評估、使用者核准與完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
+description: 本地 Codex Code Review 評估、非發布 PR 的自主合併，以及需使用者核准的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
 metadata:
   author: singular-blockly
   version: '2.0.0'
@@ -18,9 +18,19 @@ license: Apache-2.0
 - `package.json`、`package-lock.json`、`CHANGELOG.md` 與 tag 必須是同一版本。
 - 版本與雙語 CHANGELOG 必須在功能分支完成，隨同一 PR 通過 `CI Gate` 與 CodeQL。
 - tag 推送後由 `.github/workflows/publish.yml` 重用 CI 產生的唯一 VSIX，發布到 GitHub Releases、VS Code Marketplace 與 Open VSX。
-- 未取得 Phase 3.5 明確發布核准，不得 push、建立／更新 PR、merge、建立 tag 或觸發 CD。
-- 若只要求 review 而未要求發布，完成 Phase 0–3 後停止；不得自行推定要建立 PR 或 release。
+- 發布範圍（改版號、CHANGELOG 版本區段、tag、CD）未取得 Phase 3.5 明確發布核准，不得 push、建立／更新 PR、merge、建立 tag 或觸發 CD。
+- 非發布 PR 依下方「非發布 PR 的自主合併」處理，不需 Phase 1.5／3.5 的使用者核准。
+- 若只要求 review 而未要求修改或發布，完成 Phase 0–3 後停止；不得自行推定要建立 PR 或 release。
 - Phase 0–3 使用 `local-code-review-loop` 收斂 findings；本 Skill 的 Phase 1.5 與 Phase 3.5 核准 gate 優先。
+
+## 非發布 PR 的自主合併
+
+Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不建立 tag 的 PR（功能、修正、文件、依賴、CI 等），由執行任務的工作階段自行合併，不再詢問。
+
+1. Phase 0 與 Phase 3 照常執行；Phase 1 的評估由工作階段自行決定採納範圍，只修本任務範圍內的 finding。
+2. Phase 1.5 與 Phase 3.5 的使用者核准由常設授權取代。但有 `NEEDS_USER_DECISION`、`BLOCKED`、產品決策或 [整合佇列與自主合併](../maintain-singular-blockly/references/merge-queue.md)「仍須先問 Ray」列出的事項時，仍須先問 Ray。
+3. 推送、開 PR 後，依同一文件取得合併權、確認合併前置條件（同步最新 `master`、雲端本地驗證含視覺互動、`CI Gate` 與 CodeQL 對目前 head 成功、無衝突），以 squash 帶 `expectedHeadSha` 合併，再做合併後驗證。
+4. 不進入 Phase 5。要發布時另開發布 PR，回到下方完整流程取得兩次核准。
 
 ## Phase 0：本地 Codex Review（必須）
 

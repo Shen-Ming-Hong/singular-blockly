@@ -36,6 +36,10 @@ GitHub CI 執行 `npm run validate:i18n` 與 `npm run test:i18n`。15 個 locale
 
 語意品質由工作區 `i18n-maintenance` Skill 在本地 diff、Git workflow 與發布 review 中檢查。Skill 讀取 repo audit state；距上次完整審計已滿 30 天、政策版本改變、checkpoint 未完成或使用者要求 `audit-all` 時，使用固定 manifest 與每批 200 組的 helper 續跑。全量審計不自動改寫既有翻譯；既有 Blocker 阻擋發布，Major 形成待辦。
 
+## 一般 PR 合併
+
+不含版本、CHANGELOG 版本區段或 tag 的 PR，依 `.github/skills/maintain-singular-blockly/references/merge-queue.md` 的整合佇列與前置條件，由開 PR 的工作階段自行 squash 合併（Ray 2026-10-20 常設授權）；發布仍依下方流程取得核准。
+
 ## 發布流程
 
 1. 在功能分支完成 SemVer、`package.json`、`package-lock.json` 與雙語 `CHANGELOG.md`。

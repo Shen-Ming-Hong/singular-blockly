@@ -82,6 +82,7 @@ media/toolbox/temp_toolbox*.json
 **/media/toolbox/temp_toolbox*.json
 **/temp_toolbox*.json
 AGENTS.md
+CLAUDE.md
 .npmignore
 .prettierignore
 package-lock.json

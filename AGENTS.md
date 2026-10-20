@@ -67,6 +67,7 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Keep generated `spec.md`, `plan.md`, and `tasks.md` in the feature spec folder.
 - Project-specific skills from `.github/skills` are linked into `.agents/skills`; update the source under `.github/skills`.
 - For repository write tasks, use `maintain-singular-blockly` to establish a task-owned worktree and branch; for cross-file product maintenance, also use it to locate owning files and select affected checks. Specialized skills keep their own workflows.
+- Contributor skills under `.github/skills` are linked into both `.agents/skills` (Codex) and `.claude/skills` (Claude Code); `CLAUDE.md` imports this file.
 
 ## Coding Style
 - TypeScript uses strict compiler options from `tsconfig.json`.
@@ -91,9 +92,16 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 ## Commit and Pull Request Guidelines
 - Use Conventional Commits, for example `feat(blocks): ...`, `fix(webview): ...`, `i18n(ja): ...`, `chore(deps): ...`.
 - Common scopes: `blocks`, `generators`, `i18n`, `webview`, `skills`, `services`, `toolbox`, `deps`.
-- PRs require CI passing, maintainer approval, no merge conflicts, and clean ESLint.
+- PRs require CI passing (`CI Gate` and CodeQL on the current head), no merge conflicts, and clean ESLint. Branch naming, merge order, and merge preconditions follow the parallel development rules below.
 - Localization PRs should use `.github/PULL_REQUEST_TEMPLATE/localization.md` and include before/after examples, audit references, and screenshots when useful.
 - Translation-bearing changes must use the workspace `i18n-maintenance` Skill before commit and release review.
+
+## Parallel Development and Merging
+- Codex and Claude Code sessions (desktop or cloud) may work in parallel. Each write task uses its own worktree and branch: `codex/<task>` for Codex, `claude/<task>` for Claude Code, and the system-assigned `claude/…` branch in cloud sessions. See `.github/skills/maintain-singular-blockly/references/parallel-worktrees.md`.
+- Before editing and again before opening a PR, list open PRs and their changed files. When two tasks touch the same shared contract (dependencies, WebView messages, blocks/generators/toolbox, Skill contract, workspace format, workflows, locales, shared summaries), split the shared part into a first PR and order the rest after it.
+- Open PRs form the integration queue; only the PR carrying the `merge-lease` label may sync `master` and merge. Waiting PRs do not chase `master`. If `master` itself is red, fix the base in a separate PR at the front of the queue.
+- Standing authorization from Ray (2026-10-20): non-release PRs may be squash-merged by the session that opened them, without asking, once all preconditions in `.github/skills/maintain-singular-blockly/references/merge-queue.md` hold: in-scope local review is clear, the branch contains the latest `origin/master`, cloud-local verification (including visual and interaction checks for UI changes) passed on the final head, `CI Gate` and CodeQL succeeded on that head, there are no conflicts or unresolved review threads, and the merge uses `expectedHeadSha`. After merging, confirm the `master` CI run.
+- Still ask Ray first for version bumps, CHANGELOG release sections, tags, publishing, removing or changing user-visible features when the scope is unclear, product decisions, repository settings/secrets/ruleset changes, and other people's PRs.
 
 ## Security and Configuration
 - Report security issues through `SECURITY.md`.
