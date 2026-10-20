@@ -16,7 +16,6 @@ node_modules/
 
 # 擴充套件相關
 *.vsix
-.vscodeignore
 
 # 作業系統相關
 .DS_Store
@@ -49,9 +48,6 @@ performance-baseline.txt
 .idea/
 *.swp
 *.swo
-
-# Codex skills (Junction 連結到 .github/skills/)
-.codex/skills/
 
 # Agent skills (Junction 連結到 .github/skills/)
 .agent/
