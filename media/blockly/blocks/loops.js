@@ -53,7 +53,7 @@ Blockly.Blocks['controls_duration'] = {
 		this.setPreviousStatement(true, null);
 		this.setNextStatement(true, null);
 		this.setStyle('loop_blocks');
-		this.setTooltip('在指定的時間內重複執行程式');
+		this.setTooltip(window.languageManager.getMessage('CONTROLS_DURATION_TOOLTIP', 'Repeat the blocks inside for the specified time'));
 		this.setHelpUrl('');
 	}
 };

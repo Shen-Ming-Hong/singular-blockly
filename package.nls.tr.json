@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Singular tarafından yönetilen Python ve PlatformIO ortamı için isteğe bağlı mutlak yerel klasör. VS Code eklentisinin genel depolama alanını kullanmak için boş bırakın. UNC ve ağ yolları desteklenmez.",
 	"command.checkPlatformioStatus.title": "PlatformIO Durumunu Kontrol Et",
 	"command.provideFeedback.title": "Geri bildirim gönder",
-	"command.showMyFeedback.title": "Geri bildirimlerim"
+	"command.showMyFeedback.title": "Geri bildirimlerim",
+	"command.openBlocklyEdit.title": "Blockly düzenleyicisini aç",
+	"command.previewBackup.title": "Yedeği önizle",
+	"command.stopTxtExecution.title": "TXT yürütmesini durdur",
+	"command.installTxtRuntime.title": "TXT çalışma ortamını yükle",
+	"singularBlockly.safetyGuard.suppressWarning.description": "Blockly olmayan projeler için güvenlik uyarısını gösterme",
+	"singular-blockly.txt.host.description": "fischertechnik TXT denetleyicisinin IP adresi",
+	"singular-blockly.txt.username.description": "TXT denetleyicisi için SSH kullanıcı adı",
+	"singular-blockly.txt.remotePath.description": "Programın yükleneceği TXT denetleyicisindeki uzak yol",
+	"singular-blockly.txt.runtimePort.description": "TXT denetleyicisi çalışma ortamı bağlantı noktası",
+	"singular-blockly.cyberbrick.uploadSettings.description": "Eşleştirilmiş CyberBrick OTA cihaz kaydı ve yükleme ayarları. Wi-Fi parolaları ve OTA belirteçleri gibi hassas değerler VS Code SecretStorage içinde ayrıca saklanır."
 }

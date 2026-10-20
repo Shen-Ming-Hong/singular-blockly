@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Незадължителна абсолютна локална папка за управляваната от Singular среда с Python и PlatformIO. Оставете празно, за да се използва глобалното хранилище на разширението във VS Code. UNC и мрежови пътища не се поддържат.",
 	"command.checkPlatformioStatus.title": "Проверка на състоянието на PlatformIO",
 	"command.provideFeedback.title": "Изпращане на обратна връзка",
-	"command.showMyFeedback.title": "Моите отзиви"
+	"command.showMyFeedback.title": "Моите отзиви",
+	"command.openBlocklyEdit.title": "Отвори редактора Blockly",
+	"command.previewBackup.title": "Преглед на резервно копие",
+	"command.stopTxtExecution.title": "Спри изпълнението на TXT",
+	"command.installTxtRuntime.title": "Инсталирай средата за изпълнение на TXT",
+	"singularBlockly.safetyGuard.suppressWarning.description": "Не показвай предупреждението за сигурност за проекти, които не са Blockly",
+	"singular-blockly.txt.host.description": "IP адрес на контролера fischertechnik TXT",
+	"singular-blockly.txt.username.description": "SSH потребителско име за контролера TXT",
+	"singular-blockly.txt.remotePath.description": "Път на контролера TXT, където се качва програмата",
+	"singular-blockly.txt.runtimePort.description": "Порт на средата за изпълнение на контролера TXT",
+	"singular-blockly.cyberbrick.uploadSettings.description": "Списък на сдвоените OTA устройства CyberBrick и настройки за качване. Чувствителни данни като Wi-Fi пароли и OTA токени се съхраняват отделно във VS Code SecretStorage."
 }

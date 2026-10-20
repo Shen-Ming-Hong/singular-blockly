@@ -468,7 +468,7 @@ function registerCommands(
 		} catch (error) {
 			log('Error previewing backup:', 'error', error);
 			const errorMsg = await localeService.getLocalizedMessage(
-				'VSCODE_FAILED_PREVIEW_BACKUP',
+				'BACKUP_ERROR_PREVIEW_FAILED',
 				'Failed to preview backup: {0}',
 				String(error)
 			);

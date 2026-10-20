@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Singular 受管理 Python 與 PlatformIO 執行環境的選用本機絕對路徑。留空時使用 VS Code 擴充功能全域儲存空間；不支援 UNC 與網路路徑。",
 	"command.checkPlatformioStatus.title": "檢查 PlatformIO 狀態",
 	"command.provideFeedback.title": "提供回饋",
-	"command.showMyFeedback.title": "我的回饋"
+	"command.showMyFeedback.title": "我的回饋",
+	"command.openBlocklyEdit.title": "開啟 Blockly 編輯器",
+	"command.previewBackup.title": "預覽備份",
+	"command.stopTxtExecution.title": "停止 TXT 程式執行",
+	"command.installTxtRuntime.title": "安裝 TXT 執行環境",
+	"singularBlockly.safetyGuard.suppressWarning.description": "不再顯示非 Blockly 專案的安全警告",
+	"singular-blockly.txt.host.description": "fischertechnik TXT 控制器的 IP 位址",
+	"singular-blockly.txt.username.description": "TXT 控制器的 SSH 使用者名稱",
+	"singular-blockly.txt.remotePath.description": "程式上傳到 TXT 控制器上的遠端路徑",
+	"singular-blockly.txt.runtimePort.description": "TXT 控制器執行環境的連接埠",
+	"singular-blockly.cyberbrick.uploadSettings.description": "CyberBrick 已配對的 OTA 裝置清單與上傳設定。Wi-Fi 密碼、OTA 權杖等敏感資料另外存放在 VS Code SecretStorage。"
 }

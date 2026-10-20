@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Singular が管理する Python と PlatformIO の実行環境を保存する、任意のローカル絶対パスです。空欄にすると、VS Code 拡張機能のグローバルストレージを使用します。UNC パスとネットワークパスには対応していません。",
 	"command.checkPlatformioStatus.title": "PlatformIO ステータスを確認",
 	"command.provideFeedback.title": "フィードバックを送る",
-	"command.showMyFeedback.title": "自分のフィードバック"
+	"command.showMyFeedback.title": "自分のフィードバック",
+	"command.openBlocklyEdit.title": "Blockly エディターを開く",
+	"command.previewBackup.title": "バックアップをプレビュー",
+	"command.stopTxtExecution.title": "TXT の実行を停止",
+	"command.installTxtRuntime.title": "TXT ランタイムをインストール",
+	"singularBlockly.safetyGuard.suppressWarning.description": "Blockly 以外のプロジェクトで安全警告を表示しない",
+	"singular-blockly.txt.host.description": "fischertechnik TXT コントローラーの IP アドレス",
+	"singular-blockly.txt.username.description": "TXT コントローラーの SSH ユーザー名",
+	"singular-blockly.txt.remotePath.description": "プログラムをアップロードする TXT コントローラー上のパス",
+	"singular-blockly.txt.runtimePort.description": "TXT コントローラーのランタイムポート",
+	"singular-blockly.cyberbrick.uploadSettings.description": "CyberBrick のペアリング済み OTA デバイス一覧とアップロード設定です。Wi-Fi パスワードや OTA トークンなどの機密情報は VS Code SecretStorage に別途保存されます。"
 }

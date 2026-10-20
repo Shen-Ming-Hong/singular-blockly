@@ -1198,6 +1198,13 @@ export class WebViewManager {
 	}
 
 	/**
+	 * 建立使用目前語系訊息的 Error，讓錯誤通知跟著介面語言
+	 */
+	private async localizedError(key: string, fallback: string, ...args: unknown[]): Promise<Error> {
+		return new Error(await this.localeService.getLocalizedMessage(key, fallback, ...args));
+	}
+
+	/**
 	 * 預覽備份內容
 	 * @param backupPath 備份檔案的完整路徑
 	 */
@@ -1208,7 +1215,7 @@ export class WebViewManager {
 			// 檢查檔案是否存在 (backupPath is absolute, need to make it relative to workspace)
 			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
-				throw new Error('請先開啟項目資料夾');
+				throw await this.localizedError('ERROR_ARDUINO_NO_WORKSPACE', 'Please open a project folder first');
 			}
 			const workspaceRoot = workspaceFolders[0].uri.fsPath;
 			const relativeBackupPath = path.relative(workspaceRoot, backupPath);
@@ -1220,7 +1227,7 @@ export class WebViewManager {
 
 			if (!this.fileService.fileExists(relativeBackupPath)) {
 				log(`備份檔案不存在: ${backupPath}`, 'error');
-				throw new Error(`備份檔案不存在: ${backupPath}`);
+				throw await this.localizedError('BACKUP_ERROR_FILE_NOT_FOUND', 'Backup file not found: {0}', backupPath);
 			}
 
 			const fileName = path.basename(backupPath);
@@ -1235,7 +1242,7 @@ export class WebViewManager {
 			if (!this.fileService) {
 				const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 				if (!workspaceFolders) {
-					throw new Error('請先開啟項目資料夾');
+					throw await this.localizedError('ERROR_ARDUINO_NO_WORKSPACE', 'Please open a project folder first');
 				}
 				const workspaceRoot = workspaceFolders[0].uri.fsPath;
 				this.fileService = new FileService(workspaceRoot);
@@ -1379,7 +1386,7 @@ export class WebViewManager {
 			// 根據絕對路徑獲取相對路徑
 			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
-				throw new Error('請先開啟項目資料夾');
+				throw await this.localizedError('ERROR_ARDUINO_NO_WORKSPACE', 'Please open a project folder first');
 			}
 
 			const workspaceRoot = workspaceFolders[0].uri.fsPath;
@@ -1399,7 +1406,7 @@ export class WebViewManager {
 
 			// 檢查檔案是否存在
 			if (!this.fileService.fileExists(relativePath)) {
-				throw new Error(`備份檔案不存在: ${relativePath}`);
+				throw await this.localizedError('BACKUP_ERROR_FILE_NOT_FOUND', 'Backup file not found: {0}', relativePath);
 			}
 
 			// 使用 FileService 讀取檔案
@@ -1407,7 +1414,7 @@ export class WebViewManager {
 
 			// 檢查內容是否為空
 			if (!content || content.trim() === '') {
-				throw new Error('備份檔案內容為空');
+				throw await this.localizedError('BACKUP_ERROR_FILE_EMPTY', 'The backup file is empty');
 			}
 
 			log(`成功讀取備份檔案，準備解析JSON`, 'info');
@@ -1416,11 +1423,11 @@ export class WebViewManager {
 				const backupData = JSON.parse(content);
 
 				if (!backupData) {
-					throw new Error('解析JSON後得到空對象');
+					throw await this.localizedError('BACKUP_ERROR_INVALID_CONTENT', 'The backup file does not contain a valid workspace');
 				}
 
 				if (!backupData.workspace) {
-					throw new Error('備份檔案中缺少有效的workspace欄位');
+					throw await this.localizedError('BACKUP_ERROR_INVALID_CONTENT', 'The backup file does not contain a valid workspace');
 				}
 
 				// 取得工作區狀態

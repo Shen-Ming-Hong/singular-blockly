@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Singular에서 관리하는 Python 및 PlatformIO 실행 환경을 저장할 선택적 로컬 절대 경로입니다. 비워 두면 VS Code 확장 프로그램의 전역 저장소를 사용해요. UNC 및 네트워크 경로는 지원하지 않아요.",
 	"command.checkPlatformioStatus.title": "PlatformIO 상태 확인",
 	"command.provideFeedback.title": "의견 보내기",
-	"command.showMyFeedback.title": "내 피드백"
+	"command.showMyFeedback.title": "내 피드백",
+	"command.openBlocklyEdit.title": "Blockly 편집기 열기",
+	"command.previewBackup.title": "백업 미리 보기",
+	"command.stopTxtExecution.title": "TXT 실행 중지",
+	"command.installTxtRuntime.title": "TXT 런타임 설치",
+	"singularBlockly.safetyGuard.suppressWarning.description": "Blockly가 아닌 프로젝트에서 안전 경고를 표시하지 않음",
+	"singular-blockly.txt.host.description": "fischertechnik TXT 컨트롤러 IP 주소",
+	"singular-blockly.txt.username.description": "TXT 컨트롤러 SSH 사용자 이름",
+	"singular-blockly.txt.remotePath.description": "프로그램이 업로드되는 TXT 컨트롤러의 원격 경로",
+	"singular-blockly.txt.runtimePort.description": "TXT 컨트롤러 런타임 포트",
+	"singular-blockly.cyberbrick.uploadSettings.description": "CyberBrick 페어링된 OTA 기기 목록과 업로드 설정입니다. Wi-Fi 비밀번호, OTA 토큰 같은 민감한 값은 VS Code SecretStorage에 따로 저장됩니다."
 }

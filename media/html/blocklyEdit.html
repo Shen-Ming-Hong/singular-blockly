@@ -41,8 +41,12 @@
                 }));
             },
             getMessage: function (key, defaultValue) {
-                const messages = this.messages[this.currentLanguage] || this.messages['en'];
-                return messages[key] || defaultValue || key;
+                const messages = this.messages[this.currentLanguage] || this.messages['en'] || {};
+                // 空字串是刻意的翻譯（例如語序不需要後綴），不能退回預設文字
+                if (typeof messages[key] === 'string') {
+                    return messages[key];
+                }
+                return defaultValue || key;
             },
             setLanguage: function (locale) {
                 if (!this.messages[locale]) {

@@ -2,5 +2,15 @@
 	"singularBlockly.managedRuntime.path.markdownDescription": "Nem kötelező abszolút helyi mappa a Singular által kezelt Python- és PlatformIO-környezethez. Ha üresen hagyja, a VS Code-bővítmény globális tárhelye lesz használva. Az UNC- és hálózati elérési utak nem támogatottak.",
 	"command.checkPlatformioStatus.title": "PlatformIO állapot ellenőrzése",
 	"command.provideFeedback.title": "Visszajelzés küldése",
-	"command.showMyFeedback.title": "Visszajelzéseim"
+	"command.showMyFeedback.title": "Visszajelzéseim",
+	"command.openBlocklyEdit.title": "Blockly szerkesztő megnyitása",
+	"command.previewBackup.title": "Biztonsági mentés előnézete",
+	"command.stopTxtExecution.title": "TXT futtatás leállítása",
+	"command.installTxtRuntime.title": "TXT futtatókörnyezet telepítése",
+	"singularBlockly.safetyGuard.suppressWarning.description": "Ne jelenjen meg a biztonsági figyelmeztetés nem Blockly projekteknél",
+	"singular-blockly.txt.host.description": "A fischertechnik TXT vezérlő IP-címe",
+	"singular-blockly.txt.username.description": "SSH felhasználónév a TXT vezérlőhöz",
+	"singular-blockly.txt.remotePath.description": "A TXT vezérlőn lévő útvonal, ahová a program feltöltődik",
+	"singular-blockly.txt.runtimePort.description": "A TXT vezérlő futtatókörnyezetének portja",
+	"singular-blockly.cyberbrick.uploadSettings.description": "A párosított CyberBrick OTA eszközök listája és a feltöltési beállítások. Az érzékeny adatokat, például a Wi-Fi jelszavakat és OTA tokeneket, külön a VS Code SecretStorage tárolja."
 }
