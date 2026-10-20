@@ -27,3 +27,4 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
 - Commit／push／PR 交給 `git-workflow`，本地審查與發布交給 `pr-review-release`。非發布 PR 依 Ray 的常設授權，在 [整合佇列與自主合併](references/merge-queue.md) 的前置條件全部成立時自行 squash 合併，不再另外詢問；改版號、CHANGELOG 版本區段、tag、發布，以及該文件「仍須先問 Ray」列出的事項，仍先取得 Ray 明確同意。
 - 合併後在乾淨的整合 worktree 確認 `master` 包含本次 commit，並等 `master` 的完整 CI 結束；失敗時依該文件處理，不把合併當成完成。
+- 何時發布依 `pr-review-release` 的「何時發布」：以改動是否進到使用者安裝的 VSIX、使用者是否感受得到判斷 patch、累積 minor 或不用發；發版、打 tag、改版號仍先問 Ray。

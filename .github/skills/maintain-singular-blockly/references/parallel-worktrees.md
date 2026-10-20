@@ -43,7 +43,7 @@
 
 ## 分支內的紀錄
 
-- 分支只改本任務直接相關的檔案。共用摘要（`AGENTS.md`、`lessons.md`、`project-map.md`、`CHANGELOG.md` 的 `[未發布]`）只新增或修改本任務直接相關的條目，不順手整理其他段落，減少文字衝突。
+- 分支只改本任務直接相關的檔案。共用摘要（`AGENTS.md`、`lessons.md`、`project-map.md`、`CHANGELOG.md`）只新增或修改本任務直接相關的條目，不順手整理其他段落，減少文字衝突。
 - 任務證據（截圖、測試輸出）放在 PR 描述或專案共用資料夾，不提交到儲存庫，除非規格要求。
 - 生成檔（Skill 契約、manifest、lockfile）不手寫；整合時一律以生成命令重建，見 [整合佇列與自主合併](merge-queue.md) 的衝突處理。
 

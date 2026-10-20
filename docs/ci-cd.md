@@ -38,7 +38,7 @@ GitHub CI 執行 `npm run validate:i18n` 與 `npm run test:i18n`。15 個 locale
 
 ## 一般 PR 合併
 
-不含版本、CHANGELOG 版本區段或 tag 的 PR，依 `.github/skills/maintain-singular-blockly/references/merge-queue.md` 的整合佇列與前置條件，由開 PR 的工作階段自行 squash 合併（Ray 2026-10-20 常設授權）；發布仍依下方流程取得核准。
+不含版本、CHANGELOG 版本區段或 tag 的 PR，依 `.github/skills/maintain-singular-blockly/references/merge-queue.md` 的整合佇列與前置條件，由開 PR 的工作階段自行 squash 合併（Ray 2026-10-20 常設授權）；發布仍依下方流程取得核准。何時該發布（馬上 patch、累積 minor 或不用發）見 `.github/skills/pr-review-release/SKILL.md` 的「何時發布」。
 
 ## 發布流程
 

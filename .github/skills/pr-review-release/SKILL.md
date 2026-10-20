@@ -1,6 +1,6 @@
 ---
 name: pr-review-release
-description: 本地 Codex Code Review 評估、非發布 PR 的自主合併，以及需使用者核准的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
+description: 本地 Code Review（Codex 或 Claude Code）評估、非發布 PR 的自主合併，以及需使用者核准的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
 metadata:
   author: singular-blockly
   version: '2.0.0'
@@ -23,6 +23,21 @@ license: Apache-2.0
 - 若只要求 review 而未要求修改或發布，完成 Phase 0–3 後停止；不得自行推定要建立 PR 或 release。
 - Phase 0–3 使用 `local-code-review-loop` 收斂 findings；本 Skill 的 Phase 1.5 與 Phase 3.5 核准 gate 優先。
 
+## 何時發布 Release Timing
+
+判斷依據只有一個：**改動是否進到使用者安裝的 VSIX，使用者是否感受得到。** VSIX 內容以 `.vscodeignore` 與 `npx vsce ls` 為準。
+
+| 情況 | 建議 | 例子 |
+| --- | --- | --- |
+| 已發布版本有功能壞掉或安全問題 | 合併修正後**馬上**提議 patch | TXT SSH 因 VSIX 缺 `safer-buffer`／`tweetnacl` 而失效；`security-vulnerability-fix` 的修補 |
+| 新增、移除或改變使用者可見功能，新增板子或積木，設定變更 | **累積**後提議 minor；一兩週整理一次，或湊齊一個主題就發 | 移除影子積木 AI 功能 |
+| 只動 CI、文件、技能、測試、開發工具相依（不進 VSIX） | **不用發** | 本技能、`docs/`、`.github/workflows/`、`src/test/`、devDependencies |
+
+- 這張表只決定何時**向 Ray 提議**發布。改版號、CHANGELOG 版本區段、tag 與 CD 一律先取得 Ray 明確同意，再依下方 Phase 0–5 完成（`npm version`、雙語 CHANGELOG、`npm run release:prepare`、annotated tag）。
+- 一般 PR 不改版號、不寫 CHANGELOG 版本區段。要發布時，發布 PR 依 Phase 1 從 `git log <上一個 vX.Y.Z tag>..origin/master` 整理進 VSIX 的變更，寫成雙語 CHANGELOG。
+- 合併後依此表判斷：需要 patch 時當下向 Ray 提議；屬於 minor 的先累積，湊齊一個主題或距上次發布一兩週時提議；不用發的不提。提議時附上自上一個 tag 以來進 VSIX 的變更摘要、建議的 SemVer 與理由。
+- 不相容的工作區格式或設定移除（major 候選）一律先問 Ray，不自行歸類。
+
 ## 非發布 PR 的自主合併
 
 Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不建立 tag 的 PR（功能、修正、文件、依賴、CI 等），由執行任務的工作階段自行合併，不再詢問。
@@ -32,7 +47,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 3. 推送、開 PR 後，依同一文件取得合併權、確認合併前置條件（同步最新 `master`、雲端本地驗證含視覺互動、`CI Gate` 與 CodeQL 對目前 head 成功、無衝突），以 squash 帶 `expectedHeadSha` 合併，再做合併後驗證。
 4. 不進入 Phase 5。要發布時另開發布 PR，回到下方完整流程取得兩次核准。
 
-## Phase 0：本地 Codex Review（必須）
+## Phase 0：本地 Code Review（必須）
 
 1. 確認 base、HEAD、工作區與差異範圍：
 
@@ -131,7 +146,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 5. 只使用 squash merge，並刪除遠端功能分支：
 
     ```bash
-    gh pr merge --squash --delete-branch
+    gh pr merge --squash --delete-branch --match-head-commit {HEAD_SHA}
     ```
 
 6. 明確切換並同步本地 `master`，確認 squash commit 已包含版本與 CHANGELOG。不得在此時執行 `npm version` 或新增 release commit：
@@ -146,6 +161,21 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
     ```
 
     `git status --short` 必須沒有輸出，兩個 revision 必須完全相同；否則不得建立 tag。
+
+### 雲端工作階段的對照
+
+雲端工作階段（claude.ai 專案討論串、Claude Code on the web）沒有 `gh`，改用 GitHub MCP；條件與順序不變：
+
+| 本機 `gh` | 雲端 GitHub MCP |
+| --- | --- |
+| `gh pr checks`／`gh pr view --json statusCheckRollup` | `pull_request_read`（`get_check_runs`） |
+| `gh pr merge --squash --match-head-commit {HEAD_SHA}` | `merge_pull_request`（`merge_method: squash`、`expectedHeadSha`） |
+| `gh run list --workflow publish.yml`、`gh run view` | `actions_list`（`list_workflow_runs`、`list_workflow_jobs`） |
+| `gh run rerun --failed` | `actions_run_trigger`（`rerun_failed_jobs`） |
+| `gh workflow run ... -f release_tag=...` | `actions_run_trigger`（`run_workflow`，`ref: master`、`inputs`） |
+| 失敗 log | `get_job_logs` |
+
+雲端工作階段通常只能推送指定的 `claude/…` 分支；推送 tag 被拒時，不改用其他方式繞過，回報 Ray 由本機完成 Phase 5.2，其餘步驟仍可在雲端追蹤。
 
 ## Phase 5：Annotated Tag 與 Actions CD
 
