@@ -1,6 +1,6 @@
 ---
 name: pr-review-release
-description: 本地 Codex Code Review 評估、非發布 PR 的自主合併，以及需使用者核准的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
+description: 本地 Code Review（Codex 或 Claude Code）評估、非發布 PR 的自主合併，以及需使用者核准的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
 metadata:
   author: singular-blockly
   version: '2.0.0'
@@ -47,7 +47,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 3. 推送、開 PR 後，依同一文件取得合併權、確認合併前置條件（同步最新 `master`、雲端本地驗證含視覺互動、`CI Gate` 與 CodeQL 對目前 head 成功、無衝突），以 squash 帶 `expectedHeadSha` 合併，再做合併後驗證。
 4. 不進入 Phase 5。要發布時另開發布 PR，回到下方完整流程取得兩次核准。
 
-## Phase 0：本地 Codex Review（必須）
+## Phase 0：本地 Code Review（必須）
 
 1. 確認 base、HEAD、工作區與差異範圍：
 
@@ -146,7 +146,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 5. 只使用 squash merge，並刪除遠端功能分支：
 
     ```bash
-    gh pr merge --squash --delete-branch
+    gh pr merge --squash --delete-branch --match-head-commit {HEAD_SHA}
     ```
 
 6. 明確切換並同步本地 `master`，確認 squash commit 已包含版本與 CHANGELOG。不得在此時執行 `npm version` 或新增 release commit：
@@ -161,6 +161,21 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
     ```
 
     `git status --short` 必須沒有輸出，兩個 revision 必須完全相同；否則不得建立 tag。
+
+### 雲端工作階段的對照
+
+雲端工作階段（claude.ai 專案討論串、Claude Code on the web）沒有 `gh`，改用 GitHub MCP；條件與順序不變：
+
+| 本機 `gh` | 雲端 GitHub MCP |
+| --- | --- |
+| `gh pr checks`／`gh pr view --json statusCheckRollup` | `pull_request_read`（`get_check_runs`） |
+| `gh pr merge --squash --match-head-commit {HEAD_SHA}` | `merge_pull_request`（`merge_method: squash`、`expectedHeadSha`） |
+| `gh run list --workflow publish.yml`、`gh run view` | `actions_list`（`list_workflow_runs`、`list_workflow_jobs`） |
+| `gh run rerun --failed` | `actions_run_trigger`（`rerun_failed_jobs`） |
+| `gh workflow run ... -f release_tag=...` | `actions_run_trigger`（`run_workflow`，`ref: master`、`inputs`） |
+| 失敗 log | `get_job_logs` |
+
+雲端工作階段通常只能推送指定的 `claude/…` 分支；推送 tag 被拒時，不改用其他方式繞過，回報 Ray 由本機完成 Phase 5.2，其餘步驟仍可在雲端追蹤。
 
 ## Phase 5：Annotated Tag 與 Actions CD
 
