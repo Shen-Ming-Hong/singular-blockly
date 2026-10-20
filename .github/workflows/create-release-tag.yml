@@ -1,0 +1,79 @@
+name: Create Release Tag
+
+# 雲端工作階段無法推送 tag 時的發布入口：在最新 master 建立 annotated tag，
+# 再以同一個 run 呼叫 publish.yml。GITHUB_TOKEN 推送的 tag 不會再觸發 publish.yml，
+# 因此不會重複發布。
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: New annotated vX.Y.Z tag to create on the latest master and publish
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.release_tag }}-tag
+  cancel-in-progress: false
+
+jobs:
+  create-tag:
+    name: Create annotated tag on latest master
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: master
+          fetch-depth: 0
+
+      - name: Set up Node.js 24.20.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.20.0
+
+      - name: Verify release candidate
+        shell: bash
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Invalid release tag: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          git fetch --no-tags origin master
+          if [[ "$(git rev-parse HEAD)" != "$(git rev-parse origin/master)" ]]; then
+            echo "Checkout is not the latest master" >&2
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG" > /dev/null; then
+            echo "$RELEASE_TAG already exists; use publish.yml recovery instead of recreating it" >&2
+            exit 1
+          fi
+          npm run release:prepare
+
+      - name: Create and push annotated tag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG"
+          test "$(git cat-file -t "$RELEASE_TAG")" = tag
+          git push origin "refs/tags/$RELEASE_TAG"
+
+  publish:
+    name: Publish
+    needs: create-tag
+    uses: ./.github/workflows/publish.yml
+    permissions:
+      contents: write
+      id-token: write
+    secrets: inherit
+    with:
+      release_tag: ${{ inputs.release_tag }}

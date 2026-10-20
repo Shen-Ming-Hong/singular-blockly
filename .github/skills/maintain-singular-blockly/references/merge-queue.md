@@ -75,7 +75,7 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
 
 下列事項即使所有檢查都通過，也要先取得 Ray 在對話中的明確同意：
 
-- **發布相關：** major 候選，以及沒有協調者決定的發布。patch／minor（改版號、`CHANGELOG.md` 版本區段、tag、`publish.yml`／`recover-github-release.yml`）由協調者依 `pr-review-release` 的「何時發布」與「誰決定發布」判斷執行，發布後回報 Ray。
+- **發布相關：** major 候選，以及沒有協調者決定的發布。patch／minor（改版號、`CHANGELOG.md` 版本區段、tag、`create-release-tag.yml`／`publish.yml`／`recover-github-release.yml`）由協調者依 `pr-review-release` 的「何時發布」與「誰決定發布」判斷執行，發布後回報 Ray。
 - **移除或改變使用者可見功能，而範圍不明確時：** 例如需求只說「拿掉 X」，但 X 牽涉多個入口、設定或已存檔的工作區格式；或 modify/delete 衝突無法判斷該保留哪一方。
 - **產品決策：** `NEEDS_USER_DECISION` 的 review 或 i18n finding、需求有多種合理解讀且會影響使用者行為、不相容的工作區格式變更。
 - **儲存庫與帳號設定：** ruleset、required checks、secrets、GitHub App／Marketplace 身分、`release` environment、workflow 權限（`permissions:`、`id-token`）的擴大。

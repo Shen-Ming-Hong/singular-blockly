@@ -43,3 +43,9 @@
 - **問題：** 2026-10-20 時 #195–#198 與 #179 全部紅燈，看起來像各自的問題；實際上 `master` 的 `npm audit --audit-level=high` 有 11 個 high（sharp、braces、source-map-js），每個 PR 的 Static and security checks 都因此失敗。#198 另外還有 Blockly 版本寫入 Skill contract、`@types/node` 型別變更兩個真正的失敗。
 - **規則：** 多個 PR 同一個 check 失敗時，先在 `master` 重現；base 的問題以獨立 PR 修並排在合併佇列最前面，再逐一同步其他 PR，依 `references/merge-queue.md` 的「base 紅燈先修 base」處理。不要把 base 修補混進各 PR 的主要變更。
 - **證據：** PR #199（audit 修補）、#200（取代 #198 並疊在 #199 上）、#179 與 #201 以 merge 併入 #199 後轉綠。
+
+## [發布] 雲端工作階段不推 tag，改由 Actions 建立
+
+- **問題：** 2026-10-20 發布 0.90.0 時，發布 PR 已合併，但雲端工作階段推 annotated tag 被安全檢查擋下，發布卡在最後一步，只能請 Ray 回本機推。
+- **規則：** 雲端發布在發布 PR 合併、`master` CI 綠燈後，從 `master` 觸發 `create-release-tag.yml`，由它建立 tag 並在同一 run 發布；不要在雲端嘗試 `git push origin v*`，也不要因 workflow 已建立 tag 就重新觸發它，失敗時只重跑失敗 jobs。
+- **證據：** `.github/workflows/create-release-tag.yml`、`publish.yml` 的 `workflow_call` 入口、`scripts/release/prepare-release.test.js` 的契約測試。
