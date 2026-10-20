@@ -129,7 +129,7 @@ gh workflow run recover-github-release.yml --ref master \
 - Workflow 預設只有 `contents: read`。
 - 只有 GitHub Release job 使用 `contents: write`；只有 Marketplace 身分驗證／發布 job 使用 `id-token: write`；翻譯驗證不使用寫入權限。
 - 所有第三方 Actions 固定完整 commit SHA，Dependabot 每週追蹤 npm 與 GitHub Actions 更新。
-- 帳號、Copilot 與硬體 integration tests 保留在發布技能的人工驗收，不放入無憑證 CI。
+- 帳號與硬體 integration tests 保留在發布技能的人工驗收，不放入無憑證 CI。
 
 VSCodium 最低驗收版為 1.126.04524（上游 VS Code 1.126.0）；CI 在三平台分別執行 VS Code 與 VSCodium 測試，兩者使用隔離 profile。VSCodium 官方下載檔必須先通過 SHA-256，測試 setup 會確認宿主 Node 24 與 API 1.126 基線。
 

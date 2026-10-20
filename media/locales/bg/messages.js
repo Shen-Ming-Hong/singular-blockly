@@ -1201,10 +1201,6 @@ window.languageManager.loadMessages('bg', {
 	// Orphan Block Warnings
 	ORPHAN_BLOCK_WARNING_ARDUINO: 'Този блок трябва да бъде поставен в setup(), loop() или функция, за да генерира код.',
 	ORPHAN_BLOCK_WARNING_MICROPYTHON: 'Този блок трябва да бъде поставен в main() или функция, за да генерира код.',
-	// === AI Shadow Suggestions ===
-	AI_SUGGESTION_TAB_HINT: 'Tab за приемане · Esc за отхвърляне',
-	AI_SUGGESTION_TAB_HINT_MULTI: 'Tab приемане · Alt+]/[ превключване · Esc отхвърляне',
-	AI_QUOTA_EXHAUSTED: 'Квотата на Copilot е изчерпана. Нулира се следващия месец или надградете плана.',
 
 	// === Sample Browser ===
 	SAMPLE_BROWSER_BUTTON_TITLE: 'Зареди пример',

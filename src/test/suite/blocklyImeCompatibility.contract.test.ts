@@ -71,10 +71,6 @@ describe('Blockly IME keyboard compatibility contract', () => {
 			'WebView should centralize the keyboard shortcut bypass guard'
 		);
 		assert.ok(
-			source.includes('window.shouldBypassBlocklyGlobalShortcut = shouldBypassGlobalKeyboardShortcut;'),
-			'shared keyboard guard should be exposed for other WebView helpers'
-		);
-		assert.ok(
 			source.includes('window.isBlocklyTextInputCompositionActive = () => isBlocklyTextInputComposing;'),
 			'ShortcutRegistry preconditions should be able to inspect the current composition state'
 		);
@@ -93,20 +89,6 @@ describe('Blockly IME keyboard compatibility contract', () => {
 		assert.ok(
 			normalized.includes('if (shouldBypassGlobalKeyboardShortcut(event)) { return; }'),
 			'Escape-based global handlers should skip while the user is editing text'
-		);
-	});
-
-	it('keeps shadow suggestion shortcuts from stealing IME keystrokes', () => {
-		const source = readWorkspaceFile('media/js/shadowKeyboardHandler.js');
-
-		assert.ok(source.includes('function shouldIgnoreShortcut(event)'), 'shadow keyboard handler should define an editing-context guard');
-		assert.ok(
-			source.includes('if (shouldIgnoreShortcut(event)) return false;'),
-			'shadow suggestion shortcuts should be disabled while text editing is active'
-		);
-		assert.ok(
-			source.includes('window.shouldBypassBlocklyGlobalShortcut(event)'),
-			'shadow suggestion shortcuts should defer to the shared Blockly text-input guard when available'
 		);
 	});
 });

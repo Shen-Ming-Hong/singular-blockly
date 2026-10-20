@@ -64,31 +64,6 @@
 				"icon": "$(history)"
 			},
 			{
-				"command": "singular-blockly.showAIStatusMenu",
-				"title": "%command.showAIStatusMenu.title%",
-				"category": "Singular Blockly"
-			},
-			{
-				"command": "singular-blockly.toggleAIEnabled",
-				"title": "%command.toggleAIEnabled.title%",
-				"category": "Singular Blockly"
-			},
-			{
-				"command": "singular-blockly.selectAIModel",
-				"title": "%command.selectAIModel.title%",
-				"category": "Singular Blockly"
-			},
-			{
-				"command": "singular-blockly.openAISettings",
-				"title": "%command.openAISettings.title%",
-				"category": "Singular Blockly"
-			},
-			{
-				"command": "singular-blockly.triggerAISuggestion",
-				"title": "%command.triggerAISuggestion.title%",
-				"category": "Singular Blockly"
-			},
-			{
 				"command": "singular-blockly.stopTxtExecution",
 				"title": "Singular Blockly: Stop TXT Execution",
 				"category": "Singular Blockly"
@@ -97,14 +72,6 @@
 				"command": "singular-blockly.txt.installRuntime",
 				"title": "Singular Blockly: Install TXT Runtime",
 				"category": "Singular Blockly"
-			}
-		],
-		"keybindings": [
-			{
-				"command": "singular-blockly.triggerAISuggestion",
-				"key": "ctrl+shift+space",
-				"mac": "cmd+shift+space",
-				"when": "activeWebviewPanelId == 'blocklyEdit'"
 			}
 		],
 		"menus": {
@@ -145,46 +112,6 @@
 					"type": "boolean",
 					"default": false,
 					"description": "不再顯示非 Blockly 專案的安全警告 (Do not show safety warning for non-Blockly projects)"
-				},
-				"singularBlockly.ai.enabled": {
-					"type": "boolean",
-					"default": false,
-					"markdownDescription": "%singularBlockly.ai.enabled.markdownDescription%"
-				},
-				"singularBlockly.ai.model": {
-					"type": "string",
-					"default": "gpt-4o-mini",
-					"markdownDescription": "%singularBlockly.ai.model.markdownDescription%"
-				},
-				"singularBlockly.ai.triggerDelay": {
-					"type": "number",
-					"default": 1500,
-					"minimum": 500,
-					"maximum": 10000,
-					"markdownDescription": "%singularBlockly.ai.triggerDelay.markdownDescription%"
-				},
-				"singularBlockly.ai.maxSuggestionsPerMinute": {
-					"type": "number",
-					"default": 5,
-					"minimum": 1,
-					"maximum": 30,
-					"markdownDescription": "%singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription%"
-				},
-				"singularBlockly.ai.reasoningEffort": {
-					"type": "string",
-					"default": "low",
-					"enum": [
-						"low",
-						"medium",
-						"high"
-					],
-					"enumDescriptions": [
-						"%singularBlockly.ai.reasoningEffort.low.description%",
-						"%singularBlockly.ai.reasoningEffort.medium.description%",
-						"%singularBlockly.ai.reasoningEffort.high.description%"
-					],
-					"description": "%singularBlockly.ai.reasoningEffort.description%",
-					"markdownDescription": "%singularBlockly.ai.reasoningEffort.markdownDescription%"
 				},
 				"singular-blockly.txt.host": {
 					"type": "string",

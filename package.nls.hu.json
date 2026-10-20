@@ -1,20 +1,6 @@
 {
 	"singularBlockly.managedRuntime.path.markdownDescription": "Nem kötelező abszolút helyi mappa a Singular által kezelt Python- és PlatformIO-környezethez. Ha üresen hagyja, a VS Code-bővítmény globális tárhelye lesz használva. Az UNC- és hálózati elérési utak nem támogatottak.",
 	"command.checkPlatformioStatus.title": "PlatformIO állapot ellenőrzése",
-	"command.showAIStatusMenu.title": "Singular Blockly: AI javaslat beállítások",
-	"command.toggleAIEnabled.title": "Singular Blockly: AI javaslatok be/kikapcsolása",
-	"command.selectAIModel.title": "Singular Blockly: AI modell kiválasztása",
-	"command.openAISettings.title": "Singular Blockly: AI beállítások megnyitása",
-	"command.triggerAISuggestion.title": "Singular Blockly: AI blokk javaslat aktiválása",
-	"singularBlockly.ai.enabled.markdownDescription": "AI árnyék blokk javaslatok engedélyezése/letiltása. GitHub Copilot bővítmény szükséges.",
-	"singularBlockly.ai.model.markdownDescription": "Nyelvmodell az AI javaslatokhoz. Csak a gyors javaslatokhoz alkalmas könnyű modellek kerülnek felsorolásra. Az elérhető modellek a Copilot csomagtol függenek.",
-	"singularBlockly.ai.triggerDelay.markdownDescription": "Késedelem ezredmásodpercben az AI javaslat aktiválása előtt a munkaterület változása után.",
-	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Percenkénti maximális AI javaslatkérések száma.",
-	"singularBlockly.ai.reasoningEffort.description": "Az AI blokk javaslatok gondolkodási mélységét vezérli. A 'low' a sebességet helyezi előtérbe, a 'high' a minőséget.",
-	"singularBlockly.ai.reasoningEffort.markdownDescription": "Az AI blokk javaslatok gondolkodási mélységét vezérli.\n\n- **low**: Leggyorsabb válasz, minimális gondolkodás (javasolt az inline javaslatokhoz)\n- **medium**: Egyensúly a sebesség és minőség között\n- **high**: Legmélyebb gondolkodás, lassabb válasz",
-	"singularBlockly.ai.reasoningEffort.low.description": "Leggyorsabb, minimális gondolkodás (javasolt)",
-	"singularBlockly.ai.reasoningEffort.medium.description": "Egyensúly a sebesség és minőség között",
-	"singularBlockly.ai.reasoningEffort.high.description": "Legmélyebb gondolkodás, leglassabb válasz",
 	"command.provideFeedback.title": "Visszajelzés küldése",
 	"command.showMyFeedback.title": "Visszajelzéseim"
 }

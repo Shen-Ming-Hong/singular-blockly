@@ -1,20 +1,6 @@
 {
 	"singularBlockly.managedRuntime.path.markdownDescription": "Dossier local absolu facultatif pour l’environnement Python et PlatformIO géré par Singular. Laissez ce champ vide pour utiliser le stockage global de l’extension VS Code. Les chemins UNC et réseau ne sont pas pris en charge.",
 	"command.checkPlatformioStatus.title": "Vérifier l'état de PlatformIO",
-	"command.showAIStatusMenu.title": "Singular Blockly: Paramètres de suggestions IA",
-	"command.toggleAIEnabled.title": "Singular Blockly: Activer/désactiver les suggestions IA",
-	"command.selectAIModel.title": "Singular Blockly: Sélectionner le modèle IA",
-	"command.openAISettings.title": "Singular Blockly: Ouvrir les paramètres IA",
-	"command.triggerAISuggestion.title": "Singular Blockly: Déclencher une suggestion de bloc IA",
-	"singularBlockly.ai.enabled.markdownDescription": "Activer/désactiver les suggestions de blocs IA. Nécessite l'extension GitHub Copilot.",
-	"singularBlockly.ai.model.markdownDescription": "Modèle de langage pour les suggestions IA. Seuls les modèles légers adaptés aux suggestions rapides sont listés. Les modèles disponibles dépendent de votre plan Copilot.",
-	"singularBlockly.ai.triggerDelay.markdownDescription": "Délai en millisecondes avant de déclencher la suggestion IA après un changement de l'espace de travail.",
-	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Nombre maximum de requêtes de suggestions IA par minute.",
-	"singularBlockly.ai.reasoningEffort.description": "Contrôle la profondeur de raisonnement pour les suggestions de blocs IA. 'low' privilégie la vitesse, 'high' privilégie la qualité.",
-	"singularBlockly.ai.reasoningEffort.markdownDescription": "Contrôle la profondeur de raisonnement pour les suggestions de blocs IA.\n\n- **low** : Réponse la plus rapide, raisonnement minimal (recommandé pour les suggestions en ligne)\n- **medium** : Équilibre entre vitesse et qualité\n- **high** : Raisonnement le plus approfondi, réponse plus lente",
-	"singularBlockly.ai.reasoningEffort.low.description": "Le plus rapide, raisonnement minimal (recommandé)",
-	"singularBlockly.ai.reasoningEffort.medium.description": "Équilibre entre vitesse et qualité",
-	"singularBlockly.ai.reasoningEffort.high.description": "Raisonnement le plus approfondi, réponse la plus lente",
 	"command.provideFeedback.title": "Donner votre avis",
 	"command.showMyFeedback.title": "Mes retours"
 }

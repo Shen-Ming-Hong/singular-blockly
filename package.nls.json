@@ -1,20 +1,6 @@
 {
 	"singularBlockly.managedRuntime.path.markdownDescription": "Optional absolute local directory for the Singular managed Python and PlatformIO runtime. Leave empty to use VS Code extension global storage. UNC and network paths are not supported.",
 	"command.checkPlatformioStatus.title": "Check PlatformIO Status",
-	"command.showAIStatusMenu.title": "Singular Blockly: AI Suggestions Settings",
-	"command.toggleAIEnabled.title": "Singular Blockly: Toggle AI Suggestions",
-	"command.selectAIModel.title": "Singular Blockly: Select AI Model",
-	"command.openAISettings.title": "Singular Blockly: Open AI Settings",
-	"command.triggerAISuggestion.title": "Singular Blockly: Trigger AI Block Suggestion",
-	"singularBlockly.ai.enabled.markdownDescription": "Enable/disable AI shadow block suggestions. Requires GitHub Copilot extension.",
-	"singularBlockly.ai.model.markdownDescription": "Language model to use for AI suggestions. Only lightweight models suitable for fast suggestions are listed. Available models depend on your Copilot plan.",
-	"singularBlockly.ai.triggerDelay.markdownDescription": "Delay in milliseconds before triggering AI suggestion after a workspace change.",
-	"singularBlockly.ai.maxSuggestionsPerMinute.markdownDescription": "Maximum number of AI suggestion requests per minute.",
-	"singularBlockly.ai.reasoningEffort.description": "Controls the reasoning depth for AI block suggestions. 'low' prioritizes speed, 'high' prioritizes quality.",
-	"singularBlockly.ai.reasoningEffort.markdownDescription": "Controls the reasoning depth for AI block suggestions.\n\n- **low**: Fastest response, minimal reasoning (recommended for inline suggestions)\n- **medium**: Balanced speed and quality\n- **high**: Deepest reasoning, slower response",
-	"singularBlockly.ai.reasoningEffort.low.description": "Fastest, minimal reasoning (recommended)",
-	"singularBlockly.ai.reasoningEffort.medium.description": "Balanced speed and quality",
-	"singularBlockly.ai.reasoningEffort.high.description": "Deepest reasoning, slowest response",
 	"command.provideFeedback.title": "Provide Feedback",
 	"command.showMyFeedback.title": "My Feedback"
 }

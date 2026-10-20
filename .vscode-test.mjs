@@ -43,8 +43,7 @@ export default defineConfig([
 		},
 	},
 	{
-		// Integration tests — opens real workspace with Copilot access
-		// Shares user's extensions dir for Copilot, uses separate user-data-dir
+		// Integration tests — opens real workspace with the user's extensions dir and a separate user-data-dir
 		label: 'integration',
 		version: '1.126.0',
 		useInstallation: process.env.VSCODE_EXECUTABLE_PATH ? { fromPath: process.env.VSCODE_EXECUTABLE_PATH } : undefined,
