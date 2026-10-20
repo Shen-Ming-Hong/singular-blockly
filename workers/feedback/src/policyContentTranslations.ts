@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 export interface CompactPolicyCopy {
 	updated: string;
 	privacy: { intro: string; heading: string; body: string };

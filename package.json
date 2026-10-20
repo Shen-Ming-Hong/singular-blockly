@@ -162,8 +162,9 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "node scripts/cleanup-temp-toolbox.js && npm run package",
+		"vscode:prepublish": "node scripts/cleanup-temp-toolbox.js && npm run package && npm run generate:third-party-notices",
 		"compile": "webpack",
+		"generate:third-party-notices": "node scripts/generate-third-party-notices.js",
 		"generate:skill-contract": "node scripts/generate-skill-contract.js",
 		"check:skill-contract": "node scripts/generate-skill-contract.js --check",
 		"generate:project-skills": "npm run generate:skill-contract && node scripts/generate-project-skill-manifest.js",

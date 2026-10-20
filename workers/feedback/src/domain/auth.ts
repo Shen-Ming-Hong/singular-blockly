@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const encoder = new TextEncoder();
 
 function toBase64Url(bytes: Uint8Array): string {

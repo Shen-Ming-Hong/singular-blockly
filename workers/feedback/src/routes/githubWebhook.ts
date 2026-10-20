@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { parseGitHubCommand, type GitHubCommand } from '../domain/githubCommands';
 import { createHmac } from '../domain/auth';
 import { apiError, isUuid, jsonResponse, readRequestText, RequestTooLargeError } from '../domain/http';

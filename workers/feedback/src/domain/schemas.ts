@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { containsSensitiveFeedbackText } from '../../../../src/services/feedbackContentSafety';
 
 const KINDS = ['bug', 'feature', 'question', 'other'] as const;

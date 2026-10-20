@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { createHmac, createSessionCredentials, isAllowedOrigin } from '../domain/auth';
 import { apiError, rateLimitError, readRequestText, RequestTooLargeError, withSecurityHeaders } from '../domain/http';
 import { sessionCookie } from '../domain/reporterAuth';

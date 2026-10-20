@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { feedbackContentSafetyBrowserSource } from '../../../../src/services/feedbackContentSafety';
 import { withSecurityHeaders } from '../domain/http';
 import { detailedPolicy, type PolicyKind } from '../policyContent';

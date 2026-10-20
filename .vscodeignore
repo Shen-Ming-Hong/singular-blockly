@@ -15,7 +15,7 @@ vsc-extension-quickstart.md
 
 # 必要的資源文件
 !media/**
-!dist/**
+!dist/**/!(*.map)
 !images/**
 
 # 必要的文件
@@ -36,7 +36,9 @@ vsc-extension-quickstart.md
 !node_modules/ssh2/lib/**
 !node_modules/ssh2/util/pagent.exe
 !node_modules/asn1/**
+!node_modules/safer-buffer/**
 !node_modules/bcrypt-pbkdf/**
+!node_modules/tweetnacl/**
 !node_modules/is-stream/**
 !node_modules/make-dir/**
 !node_modules/sb-promise-queue/**

@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { COMPACT_POLICY_LOCALES, type CompactPolicyCopy } from './policyContentTranslations';
 
 export type PolicyKind = 'privacy' | 'support' | 'terms';

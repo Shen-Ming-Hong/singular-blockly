@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { decode as decodeJpeg } from 'jpeg-js';
 
 const SCREENSHOT_BYTES_MAX = 3 * 1024 * 1024;

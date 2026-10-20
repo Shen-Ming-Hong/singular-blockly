@@ -1,4 +1,10 @@
 /**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/**
  * TXT Controller 連線設定
  */
 export interface TxtConnectionConfig {
