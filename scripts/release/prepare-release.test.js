@@ -212,12 +212,14 @@ describe('cloud release tag workflow contract', () => {
 		assert.ok(!/--force|-f origin/u.test(workflow));
 	});
 
-	it('publishes through the shared publish workflow in the same run', () => {
-		assert.match(workflow, /uses: \.\/\.github\/workflows\/publish\.yml/);
-		assert.match(workflow, /needs: create-tag/);
-		assert.match(workflow, /release_tag: \$\{\{ inputs\.release_tag \}\}/);
-		assert.match(publishWorkflow, /workflow_call:[\s\S]*?release_tag:/);
-		assert.doesNotMatch(workflow, /group: release-\$\{\{ inputs\.release_tag \}\}\n/);
+	it('pushes the tag with the release deploy key so publish.yml runs on the tag push', () => {
+		assert.match(workflow, /environment: release/);
+		assert.match(workflow, /ssh-key: \$\{\{ secrets\.RELEASE_TAG_DEPLOY_KEY \}\}/);
+		assert.match(workflow, /git push origin "refs\/tags\/\$RELEASE_TAG"/);
+		assert.doesNotMatch(workflow, /contents: write/);
+		assert.doesNotMatch(workflow, /uses: \.\/\.github\/workflows\/publish\.yml/);
+		assert.match(publishWorkflow, /push:\n\s+tags:/);
+		assert.doesNotMatch(publishWorkflow, /workflow_call:/);
 	});
 });
 

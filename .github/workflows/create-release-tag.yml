@@ -1,13 +1,14 @@
 name: Create Release Tag
 
 # 雲端工作階段無法推送 tag 時的發布入口：在最新 master 建立 annotated tag，
-# 再以同一個 run 呼叫 publish.yml。GITHUB_TOKEN 推送的 tag 不會再觸發 publish.yml，
-# 因此不會重複發布。
+# 以 release environment 的 deploy key 推送。個人 repo 的 ruleset 不能讓 GitHub Actions
+# bypass，GITHUB_TOKEN 推 tag 會被「release tag creation」拒絕；deploy key 推送的 tag
+# 則與本機推送相同，會觸發 publish.yml 正式發布。
 on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: New annotated vX.Y.Z tag to create on the latest master and publish
+        description: New annotated vX.Y.Z tag to create on the latest master (publish.yml runs on the tag push)
         required: true
         type: string
 
@@ -24,16 +25,28 @@ jobs:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: release
     permissions:
-      contents: write
+      contents: read
     env:
       RELEASE_TAG: ${{ inputs.release_tag }}
     steps:
+      - name: Require release tag deploy key
+        shell: bash
+        env:
+          HAS_DEPLOY_KEY: ${{ secrets.RELEASE_TAG_DEPLOY_KEY != '' }}
+        run: |
+          if [[ "$HAS_DEPLOY_KEY" != "true" ]]; then
+            echo "RELEASE_TAG_DEPLOY_KEY is missing from the release environment" >&2
+            exit 1
+          fi
+
       - name: Checkout master
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: master
           fetch-depth: 0
+          ssh-key: ${{ secrets.RELEASE_TAG_DEPLOY_KEY }}
 
       - name: Set up Node.js 24.20.0
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -66,14 +79,3 @@ jobs:
           git tag -a "$RELEASE_TAG" -m "Release $RELEASE_TAG"
           test "$(git cat-file -t "$RELEASE_TAG")" = tag
           git push origin "refs/tags/$RELEASE_TAG"
-
-  publish:
-    name: Publish
-    needs: create-tag
-    uses: ./.github/workflows/publish.yml
-    permissions:
-      contents: write
-      id-token: write
-    secrets: inherit
-    with:
-      release_tag: ${{ inputs.release_tag }}

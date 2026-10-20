@@ -61,7 +61,7 @@ GitHub CI 執行 `npm run validate:i18n` 與 `npm run test:i18n`。15 個 locale
     gh workflow run create-release-tag.yml --ref master -f release_tag=vX.Y.Z
     ```
 
-    它在最新 `master` 執行 `release:prepare`、確認 tag 不存在，以 `github-actions[bot]` 建立 annotated tag，並在同一 run 以 `workflow_call` 呼叫 `publish.yml`。`GITHUB_TOKEN` 推送的 tag 不會再觸發 `publish.yml`，所以只會發布一次。
+    它在最新 `master` 執行 `release:prepare`、確認 tag 不存在，建立 annotated tag，再以 `release` environment secret `RELEASE_TAG_DEPLOY_KEY` 的 deploy key 推送；這個 tag push 與本機推送相同，會觸發 `publish.yml`。個人 repo 的 ruleset 不能讓 GitHub Actions bypass，所以不用 `GITHUB_TOKEN` 推 tag。
 
 5. `.github/workflows/publish.yml` 呼叫共用 CI；helper 會拒絕 lightweight tag、版本不一致或缺少 CHANGELOG 區段。
 6. `quality` job 只產生一份 versioned artifact。GitHub Release、VS Code Marketplace 與 Open VSX jobs 各自下載同一 artifact，可單獨重跑失敗 job。
@@ -104,6 +104,7 @@ gh workflow run recover-github-release.yml --ref master \
 - 建立名為 `release` 的 environment。
 - VS Code Marketplace 使用 Microsoft Entra workload identity federation，不保存 `VSCE_PAT`。在 environment variables 設定 `AZURE_CLIENT_ID` 與 `AZURE_TENANT_ID`；這兩項是識別碼，不是秘密。
 - Open VSX 仍使用 `OVSX_PAT` environment secret；GitHub 不提供既有 secret 值的讀回或複製功能。
+- `RELEASE_TAG_DEPLOY_KEY`：`create-release-tag.yml` 推 tag 用的 deploy key 私鑰（對應 repository deploy key `release tag (Actions)`，需寫入權限）。
 - Deployment branches and tags 限制為 `v*` tags 與受保護的 `master` branch；`master` 僅供不可變 tag 與原 run artifact 的復原 workflow 使用。
 - 不新增 environment reviewer；人工發布核准由 `pr-review-release` Phase 3.5 負責。
 
@@ -125,7 +126,7 @@ gh workflow run recover-github-release.yml --ref master \
 
 ### `v*` tag rulesets
 
-- `release tag creation` 只限制建立，bypass 為 Repository admin 與 GitHub Actions（Repository app，供 `create-release-tag.yml` 以 `GITHUB_TOKEN` 建立 tag）；少了後者，該 workflow 推 tag 會被拒。
+- `release tag creation` 只限制建立，bypass 為 Repository admin 與 Deploy keys（供 `create-release-tag.yml` 推 tag）。唯一有寫入權限的 deploy key 是 `release tag (Actions)`，私鑰只存在 `release` environment secret `RELEASE_TAG_DEPLOY_KEY`；`master protection` 不讓 deploy key bypass，所以它不能直接推 `master`。
 - `release tag immutability` 禁止更新與刪除，且不設 bypass。
 - GitHub ruleset 的 bypass 會略過整組規則，因此必須拆成兩條才能同時允許 maintainer 建立並禁止任何人更新／刪除。
 - workflow 仍會以 Git object type 再驗證 annotated tag。
@@ -137,7 +138,7 @@ gh workflow run recover-github-release.yml --ref master \
 
 ## Secrets 與權限
 
-- 長期發布 secret 只保留 Open VSX 的 `OVSX_PAT`，不得寫入 log、artifact 或 repository；VS Code Marketplace 改用 GitHub OIDC 取得 Entra 短效權杖。
+- 長期發布 secret 只有 Open VSX 的 `OVSX_PAT` 與建 tag 用的 `RELEASE_TAG_DEPLOY_KEY`，不得寫入 log、artifact 或 repository；VS Code Marketplace 改用 GitHub OIDC 取得 Entra 短效權杖。
 - Workflow 預設只有 `contents: read`。
 - 只有 GitHub Release job 使用 `contents: write`；只有 Marketplace 身分驗證／發布 job 使用 `id-token: write`；翻譯驗證不使用寫入權限。
 - 所有第三方 Actions 固定完整 commit SHA，Dependabot 每週追蹤 npm 與 GitHub Actions 更新。
