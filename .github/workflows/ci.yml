@@ -33,6 +33,44 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  changes:
+    name: Detect code changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - name: Checkout pull request history
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - name: Classify changed files
+        id: diff
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # 只有 pull_request 能略過測試矩陣；master push 與發版 workflow_call 一律完整驗證。
+          if [[ "$EVENT_NAME" != pull_request ]]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+          printf '%s\n' "$changed"
+          # 這些路徑不進 VSIX、也不被建置或測試讀取；技能清單仍由 static 的 check:project-skills 檢查。
+          docs_only='^(docs/|specs/|\.(agents|claude)/skills/|\.github/(skills|prompts|agents|PULL_REQUEST_TEMPLATE)/|\.github/(copilot-instructions|pull_request_template)\.md$|AGENTS\.md$|CONTRIBUTING\.md$)'
+          if [[ -n "$changed" ]] && ! grep -qvE "$docs_only" <<< "$changed"; then
+            echo "code=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Documentation-only change; skipping the test matrix and VSIX packaging."
+          else
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          fi
+
   static:
     name: Static and security checks
     runs-on: ubuntu-latest
@@ -69,6 +107,8 @@ jobs:
 
   node22:
     name: Minimum Node.js 22 compatibility
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -95,6 +135,8 @@ jobs:
 
   unit:
     name: Unit tests (${{ matrix.editor }}, ${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     strategy:
@@ -179,9 +221,11 @@ jobs:
   package:
     name: Package VSIX smoke test
     needs:
+      - changes
       - static
       - node22
       - unit
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     outputs:
@@ -266,6 +310,7 @@ jobs:
     name: CI Gate
     if: always()
     needs:
+      - changes
       - static
       - node22
       - unit
@@ -275,12 +320,19 @@ jobs:
     steps:
       - name: Confirm every required job passed
         env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          CODE_CHANGED: ${{ needs.changes.outputs.code }}
           NODE22_RESULT: ${{ needs.node22.result }}
           STATIC_RESULT: ${{ needs.static.result }}
           UNIT_RESULT: ${{ needs.unit.result }}
           PACKAGE_RESULT: ${{ needs.package.result }}
         run: |
-          test "$NODE22_RESULT" = success
+          test "$CHANGES_RESULT" = success
           test "$STATIC_RESULT" = success
+          if [[ "$CODE_CHANGED" == false ]]; then
+            echo "Documentation-only change: static checks passed, test matrix intentionally skipped."
+            exit 0
+          fi
+          test "$NODE22_RESULT" = success
           test "$UNIT_RESULT" = success
           test "$PACKAGE_RESULT" = success
