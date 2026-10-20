@@ -1170,9 +1170,6 @@ window.languageManager.loadMessages('ko', {
 	RC_IS_BUTTON_PRESSED_PREFIX: 'RC 버튼',
 	RC_IS_BUTTON_PRESSED_SUFFIX: '눌림?',
 	RC_IS_BUTTON_PRESSED_TOOLTIP: '원격 버튼이 눌렸는지 확인',
-	RC_GET_BUTTON_PREFIX: 'RC 버튼',
-	RC_GET_BUTTON_SUFFIX: '상태',
-	RC_GET_BUTTON_TOOLTIP: '원격 버튼 상태 읽기 (0=눌림, 1=해제)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: '모니터 열기',

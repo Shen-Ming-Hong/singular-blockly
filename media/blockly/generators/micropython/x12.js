@@ -80,19 +80,6 @@ def _x12_read():
 		return [code, generator.ORDER_RELATIONAL];
 	};
 
-	// === 讀取本機按鈕狀態 ===
-	generator.forBlock['x12_get_button'] = function (block) {
-		// 確保 X12 初始化
-		ensureX12Init();
-
-		// 取得參數 (按鈕 index: 6=K1, 7=K2, 8=K3, 9=K4)
-		const button = block.getFieldValue('BUTTON');
-
-		// 生成程式碼 (原始狀態: 0=按下, 1=放開)
-		const code = `_x12_btn[${button}].value()`;
-		return [code, generator.ORDER_FUNCTION_CALL];
-	};
-
 	// 記錄載入訊息
 	console.log('[blockly] X12 MicroPython 生成器已載入 (直接硬體存取)');
 })();

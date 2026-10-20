@@ -359,45 +359,6 @@ function registerCommands(
 		}
 	});
 
-	// 註冊主題切換命令
-	const toggleThemeCommand = vscodeApi.commands.registerCommand('singular-blockly.toggleTheme', async () => {
-		try {
-			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
-			if (!workspaceFolders) {
-				return;
-			}
-
-			const workspaceRoot = workspaceFolders[0].uri.fsPath;
-			const settingsManager = new SettingsManager(workspaceRoot);
-
-			// 切換主題
-			const newTheme = await settingsManager.toggleTheme();
-
-			log(`Theme toggled to: ${newTheme}`, 'info');
-
-			// 如果 WebView 已經開啟，通知更新主題
-			if (webViewManager && webViewManager.isPanelCreated()) {
-				const panel = webViewManager.getPanel();
-				panel?.webview.postMessage({
-					command: 'updateTheme',
-					theme: newTheme,
-				});
-			}
-
-			// 如果 Blockly 編輯器已開啟,通知它更新主題
-			vscodeApi.window.visibleTextEditors.forEach(editor => {
-				if (editor.document.fileName.endsWith('blocklyEdit.html')) {
-					editor.document.save();
-				}
-			});
-		} catch (error) {
-			log('Error toggling theme:', 'error', error);
-		}
-	});
-	// 註冊顯示輸出窗口命令
-	const showOutputCommand = vscodeApi.commands.registerCommand('singular-blockly.showOutput', () => {
-		showOutputChannel();
-	});
 	// 註冊預覽備份命令
 	const previewBackupCommand = vscodeApi.commands.registerCommand('singular-blockly.previewBackup', async (backupPath?: string) => {
 		try {
@@ -576,8 +537,6 @@ function registerCommands(
 	context.subscriptions.push(platformioDiagnosticPanel);
 	context.subscriptions.push(feedbackPanel);
 	context.subscriptions.push(openBlocklyEdit);
-	context.subscriptions.push(toggleThemeCommand);
-	context.subscriptions.push(showOutputCommand);
 	context.subscriptions.push(previewBackupCommand);
 	context.subscriptions.push(checkPlatformioStatusCommand);
 	context.subscriptions.push(provideFeedbackCommand);

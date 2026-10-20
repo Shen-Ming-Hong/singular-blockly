@@ -85,8 +85,8 @@ describe('Extension activate', () => {
 
 		const registered = vscodeMock.commands.registerCommand.getCalls().map((c: any) => c.args[0]);
 		assert(registered.includes('singular-blockly.openBlocklyEdit'));
-		assert(registered.includes('singular-blockly.toggleTheme'));
-		assert(registered.includes('singular-blockly.showOutput'));
+		assert(!registered.includes('singular-blockly.toggleTheme'));
+		assert(!registered.includes('singular-blockly.showOutput'));
 		assert(registered.includes('singular-blockly.previewBackup'));
 		assert(registered.includes('singular-blockly.checkPlatformioStatus'));
 		assert(registered.includes('singular-blockly.provideFeedback'));
@@ -342,73 +342,6 @@ describe('Extension activate', () => {
 		assert(vscodeMock.window.showErrorMessage.called, 'Should surface panel launch failures');
 	});
 
-	it('should handle toggleTheme command when workspace exists', async () => {
-		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
-
-		// 添加必要的目錄和檔案
-		fsMock.addDirectory('/mock/workspace/.vscode');
-		fsMock.addFile('/mock/workspace/.vscode/settings.json', JSON.stringify({ 'singular-blockly.theme': 'light' }));
-
-		await activate(context as any);
-
-		// 取得 toggleTheme 命令處理器
-		const toggleThemeCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.toggleTheme');
-
-		assert(toggleThemeCall, 'toggleTheme command should be registered');
-
-		const commandHandler = toggleThemeCall.args[1];
-
-		// 執行命令處理器
-		await commandHandler();
-
-		// 驗證 settings 檔案存在(檢查檔案是否被添加到 FSMock)
-		const settingsExists = fsMock.existsSync('/mock/workspace/.vscode/settings.json');
-		assert.strictEqual(settingsExists, true, 'Settings file should exist');
-	});
-
-	it('should handle toggleTheme command when no workspace', async () => {
-		vscodeMock.workspace.workspaceFolders = undefined;
-
-		await activate(context as any);
-
-		// 取得 toggleTheme 命令處理器
-		const toggleThemeCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.toggleTheme');
-
-		assert(toggleThemeCall, 'toggleTheme command should be registered');
-
-		const commandHandler = toggleThemeCall.args[1];
-
-		// 執行命令處理器(應該直接返回,不執行任何操作)
-		await commandHandler();
-
-		// 驗證沒有錯誤(如果有 workspace folders 檢查,應該提前返回)
-		// toggleTheme 在沒有 workspace 時會直接 return,不執行任何操作
-		assert(true, 'Should complete without errors');
-	});
-
-	it('should execute showOutput command', async () => {
-		const showOutputStub = sinon.stub(logging, 'showOutputChannel');
-
-		await activate(context as any);
-
-		// 取得 showOutput 命令處理器
-		const showOutputCall = vscodeMock.commands.registerCommand.getCalls().find((c: any) => c.args[0] === 'singular-blockly.showOutput');
-
-		assert(showOutputCall, 'showOutput command should be registered');
-
-		const commandHandler = showOutputCall.args[1];
-
-		// 執行命令處理器
-		commandHandler();
-
-		// 驗證 showOutputChannel 被呼叫
-		assert(showOutputStub.calledOnce, 'showOutputChannel should be called');
-	});
-
 	it('should route stopTxtExecution command through WebViewManager', async () => {
 		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('opened');
 		sinon.stub(WebViewManager.prototype, 'isPanelCreated').returns(true);
@@ -634,124 +567,6 @@ describe('Extension activate', () => {
 		}
 	});
 
-	it('should handle toggleTheme with webview panel', async () => {
-		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
-		fsMock.addDirectory('/mock/workspace/.vscode');
-		fsMock.addFile('/mock/workspace/.vscode/settings.json', JSON.stringify({ 'singular-blockly.theme': 'light' }));
-
-		// Add required files for WebViewManager
-		fsMock.addFile('/mock/extension/media/html/blocklyEdit.html', '<html>{{CSS_URI}}{{JS_URI}}</html>');
-		fsMock.addFile('/mock/extension/media/toolbox/index.json', JSON.stringify({ kind: 'categoryToolbox', contents: [] }));
-		fsMock.addDirectory('/mock/extension/media/blockly/generators/arduino');
-		fsMock.addFile('/mock/extension/media/blockly/generators/arduino/index.js', '');
-
-		await activate(context as any);
-
-		// First create a webview panel by executing openBlocklyEdit
-		const openBlocklyEditCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.openBlocklyEdit');
-		const openHandler = openBlocklyEditCall.args[1];
-
-		try {
-			await openHandler();
-		} catch (e) {
-			// Ignore errors from opening
-		}
-
-		// Get toggleTheme handler
-		const toggleThemeCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.toggleTheme');
-		const toggleHandler = toggleThemeCall.args[1];
-
-		// Execute toggle
-		await toggleHandler();
-
-		// Verify postMessage was called if panel exists
-		// (may not be called if panel creation failed in mock environment)
-		assert(true, 'toggleTheme should complete without errors');
-	});
-
-	it('should handle toggleTheme error', async () => {
-		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
-
-		// Make SettingsManager throw error
-		fsMock.addDirectory('/mock/workspace/.vscode');
-		// Corrupt settings file to cause error
-		fsMock.addFile('/mock/workspace/.vscode/settings.json', 'invalid json');
-
-		await activate(context as any);
-
-		const toggleThemeCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.toggleTheme');
-		const toggleHandler = toggleThemeCall.args[1];
-
-		// Execute toggle (should handle error gracefully)
-		await toggleHandler();
-
-		// Verify no crash (error logged but execution continues)
-		assert(true, 'Should handle toggleTheme errors gracefully');
-	});
-
-	it('should handle toggleTheme with panel postMessage', async () => {
-		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
-		fsMock.addDirectory('/mock/workspace/.vscode');
-		fsMock.addFile('/mock/workspace/.vscode/settings.json', JSON.stringify({ 'singular-blockly.theme': 'dark' }));
-		fsMock.addFile('/mock/extension/media/html/blocklyEdit.html', '<html></html>');
-		fsMock.addFile('/mock/extension/media/toolbox/index.json', JSON.stringify({ kind: 'categoryToolbox', contents: [] }));
-
-		await activate(context as any);
-
-		// Create a mock webview panel
-		const mockPanel = {
-			webview: {
-				postMessage: sinon.stub().resolves(),
-			},
-			reveal: sinon.stub(),
-		};
-
-		// Execute toggle theme
-		const toggleThemeCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.toggleTheme');
-		const toggleHandler = toggleThemeCall.args[1];
-
-		await toggleHandler();
-
-		// Theme should toggle from dark to light
-		assert(fsMock.files.has('/mock/workspace/.vscode/settings.json'));
-	});
-
-	it('should handle toggleTheme with visible editor check', async () => {
-		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
-		fsMock.addDirectory('/mock/workspace/.vscode');
-		fsMock.addFile('/mock/workspace/.vscode/settings.json', JSON.stringify({ 'singular-blockly.theme': 'light' }));
-
-		// Add mock visible editor
-		vscodeMock.window.visibleTextEditors = [
-			{
-				document: {
-					fileName: '/mock/workspace/blocklyEdit.html',
-					save: sinon.stub().resolves(),
-				},
-			},
-		];
-
-		await activate(context as any);
-
-		const toggleThemeCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.toggleTheme');
-		const toggleHandler = toggleThemeCall.args[1];
-
-		await toggleHandler();
-
-		// Should check visible editors
-		assert(true, 'Should handle visible editor checks');
-	});
-
 	it('should handle previewBackup with backups directory check', async () => {
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
 
@@ -862,28 +677,5 @@ describe('Extension activate', () => {
 
 		// Should handle error
 		assert(true, 'Should handle preview error');
-	});
-
-	it('should handle toggleTheme error logging', async () => {
-		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
-
-		// Don't add settings file to trigger read error
-		// fsMock already empty by default
-
-		await activate(context as any);
-
-		const toggleThemeCall = vscodeMock.commands.registerCommand
-			.getCalls()
-			.find((c: any) => c.args[0] === 'singular-blockly.toggleTheme');
-		const toggleHandler = toggleThemeCall.args[1];
-
-		try {
-			await toggleHandler();
-		} catch (error) {
-			// Error expected
-		}
-
-		// Error should be logged
-		assert(true, 'Should log toggle theme errors');
 	});
 });

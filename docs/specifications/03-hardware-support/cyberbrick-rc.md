@@ -6,7 +6,7 @@
 
 CyberBrick 的 `rc_master_init` 和 `rc_send` 直接讀取 X12 的六個搖桿通道與四個按鈕，以 ESP-NOW 廣播。封包為小端序 `<B10h`，長度 21 bytes：第一個 byte 是配對 ID（1–255），後面依序是 L1、L2、L3、R1、R2、R3、K1、K2、K3、K4 的有號 16 位數值。頻道可設 1–11；發射與接收端必須使用相同頻道。配對 ID 只用於過濾教室裡其他組別的訊號，並非身分驗證或加密。
 
-CyberBrick 接收端使用 `rc_slave_init`、`rc_wait_connection`、`rc_is_connected`、`rc_get_joystick`、`rc_get_joystick_mapped`、`rc_is_button_pressed`。舊數值按鈕積木 `rc_get_button` 只從工具箱移除，定義與產生器仍保留，以便舊工作區載入。
+CyberBrick 接收端使用 `rc_slave_init`、`rc_wait_connection`、`rc_is_connected`、`rc_get_joystick`、`rc_get_joystick_mapped`、`rc_is_button_pressed`。舊數值按鈕積木 `rc_get_button`（與發射端的 `x12_get_button`）已完全移除；舊工作區載入時由 `blocklyRuntime.normalizeWorkspaceState` 改寫成「`rc_is_button_pressed` ? 0 : 1」，行為不變。
 
 ## ESP32 DevKit 實驗性接收
 

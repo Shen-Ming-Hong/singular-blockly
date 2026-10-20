@@ -1179,9 +1179,6 @@ window.languageManager.loadMessages('de', {
 	RC_IS_BUTTON_PRESSED_PREFIX: 'RC Taste',
 	RC_IS_BUTTON_PRESSED_SUFFIX: 'gedrückt?',
 	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Prüfen ob Remote-Taste gedrückt ist',
-	RC_GET_BUTTON_PREFIX: 'RC Taste',
-	RC_GET_BUTTON_SUFFIX: 'Status',
-	RC_GET_BUTTON_TOOLTIP: 'Remote-Tasten-Status lesen (0=gedrückt, 1=losgelassen)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Monitor öffnen',

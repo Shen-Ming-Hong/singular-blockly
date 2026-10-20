@@ -188,20 +188,6 @@
 		},
 	};
 
-	// === 讀取遠端按鈕狀態 ===
-	Blockly.Blocks['rc_get_button'] = {
-		init: function () {
-			this.appendDummyInput()
-				.appendField(getMessage('RC_GET_BUTTON_PREFIX', '遠端按鈕'))
-				.appendField(new Blockly.FieldDropdown(RC_BUTTON_CHANNEL_OPTIONS), 'BUTTON')
-				.appendField(getMessage('RC_GET_BUTTON_SUFFIX', '狀態'));
-			this.setOutput(true, 'Number');
-			this.setColour(160);
-			this.setTooltip(getMessage('RC_GET_BUTTON_TOOLTIP', '讀取遠端按鈕狀態 (0=按下, 1=放開)'));
-			this.setHelpUrl('');
-		},
-	};
-
 	// 記錄載入訊息
 	console.log('[blockly] RC 遙控通訊積木定義已載入');
 })();

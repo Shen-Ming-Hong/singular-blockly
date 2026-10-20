@@ -368,21 +368,6 @@ onboard_led.write()
 		return [code, generator.ORDER_RELATIONAL];
 	};
 
-	// === 讀取遠端按鈕狀態 ===
-	generator.forBlock['rc_get_button'] = function (block) {
-		// 衝突檢測：接收端依賴積木
-		if (_hasRcConflict(block.workspace)) {
-			return ['1', generator.ORDER_ATOMIC];
-		}
-		// 取得參數 (按鈕 index: 0-3 對應 K1-K4，資料 index 為 6-9)
-		const buttonIndex = Number(block.getFieldValue('BUTTON'));
-		const dataIndex = 6 + buttonIndex;
-
-		// 生成程式碼 (原始狀態: 0=按下, 1=放開)
-		const code = `(_rc_data[${dataIndex}] if _rc_connected else 1)`;
-		return [code, generator.ORDER_MEMBER];
-	};
-
 	// 記錄載入訊息
 	console.log('[blockly] RC MicroPython 生成器已載入');
 })();

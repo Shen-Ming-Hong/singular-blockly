@@ -81,7 +81,7 @@ src/
 │   │
 │   ├── settingsManager.ts    # 設定管理服務
 │   │   ├── readSetting() / updateSetting()
-│   │   ├── getTheme() / toggleTheme()
+│   │   ├── getTheme() / updateTheme()
 │   │   ├── syncPlatformIOSettings()
 │   │   └── getAutoBackupInterval()
 │   │
