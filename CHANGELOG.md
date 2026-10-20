@@ -8,6 +8,35 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.90.0] - 2026-10-20
+
+### ⚠️ 移除 Removed
+
+- 移除 Copilot 影子積木 AI 建議功能，包括五個 AI 指令、`Ctrl/Cmd+Shift+Space` 快捷鍵、狀態列項目與 `singularBlockly.ai.*` 五個設定；可自行從 `settings.json` 刪除殘留的 `singularBlockly.ai.*` 設定，留著也不影響使用。Blockly 原生的參數 shadow 不受影響
+  Removed the Copilot shadow-block AI suggestion feature, including its five AI commands, the `Ctrl/Cmd+Shift+Space` shortcut, the status bar item, and the five `singularBlockly.ai.*` settings; leftover `singularBlockly.ai.*` entries in `settings.json` can be deleted and are otherwise ignored. Blockly's native parameter shadows are unaffected
+- 移除工具箱以外的 CyberBrick `x12_get_button` 與 `rc_get_button` 舊按鈕積木；舊專案載入時自動轉換成等效的「按鈕是否按下」積木，行為不變
+  Removed the legacy CyberBrick `x12_get_button` and `rc_get_button` blocks that were not in the toolbox; existing projects are converted on load to equivalent "is button pressed" blocks with unchanged behavior
+
+### 🐛 修復 Bug Fixes
+
+- 修正 VSIX 缺少 `safer-buffer` 與 `tweetnacl`，導致 fischertechnik TXT 的 SSH 上傳與執行無法載入 `node-ssh`
+  Fixed fischertechnik TXT SSH upload and execution failing to load `node-ssh` because the VSIX was missing `safer-buffer` and `tweetnacl`
+- 補齊 TXT 文字、清單與 `math_on_list` 共 22 塊積木，以及 CyberBrick `math_atan2`、`text_append`、`text_to_number`、`to_string` 的程式碼產生器，放進主程式不再讓程式碼預覽與上傳失敗；`atan2` 在 Arduino 與 TXT 依積木說明回傳角度
+  Added missing code generators for 22 TXT text, list, and `math_on_list` blocks and for CyberBrick `math_atan2`, `text_append`, `text_to_number`, and `to_string`, so placing them in the main program no longer breaks code preview and upload; `atan2` now returns degrees on Arduino and TXT as the block describes
+- 以自帶長度的 `SBList` 重寫 Arduino 清單積木，產生可編譯的 C++，並支援數學統計、子清單、分割／合併、排序、反轉與所有取得／移除／插入位置
+  Rewrote Arduino list blocks on a length-aware `SBList` so they generate compilable C++, with support for list statistics, sublists, split/join, sort, reverse, and every get/remove/insert position
+- 移除寫死的中文提示與警告，補齊缺漏翻譯鍵，並把 13 種語言仍為英文的 CyberBrick OTA、PlatformIO 診斷、TXT 虛擬控制、備份預覽與上傳錯誤文字翻譯完成；指令標題與設定說明也改用各語系
+  Replaced hard-coded Chinese tooltips and warnings with localized messages, added missing translation keys, and translated CyberBrick OTA, PlatformIO diagnostics, TXT virtual control, backup preview, and upload error text that was still English in 13 languages; command titles and setting descriptions are now localized too
+
+### 🔧 維護 Maintenance
+
+- 升級 Blockly 至 13.4.0 及 npm minor／patch 依賴群組
+  Upgraded Blockly to 13.4.0 and the npm minor/patch dependency group
+- LICENSE 改為 Apache-2.0 完整條文，VSIX 附上第三方授權聲明，不再出貨擴充本身的 source map
+  LICENSE now contains the full Apache-2.0 text, the VSIX ships third-party license notices, and the extension's own source map is no longer packaged
+- 移除未公開的 `toggleTheme`／`showOutput` 隱藏指令與未使用的相依套件
+  Removed the unlisted `toggleTheme`/`showOutput` hidden commands and unused dependencies
+
 ## [0.89.0] - 2026-10-01
 
 ### ✨ 新增功能 Features
