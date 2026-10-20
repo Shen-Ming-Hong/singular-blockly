@@ -68,6 +68,7 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
 4. 移除 `merge-lease`；遠端分支由 GitHub 自動刪除，確認後清理本地 worktree 與分支。
 5. 通知重疊或疊加在本 PR 上的任務：雲端工作階段在討論串回報合併 SHA；疊加 PR 依「疊加 PR」rebase。
 6. 有可重用根因時，依技能主文件更新 `lessons.md`（下一個 PR 或同一 PR 內，不直接推 `master`）。
+7. 依 `pr-review-release` 的「何時發布」判斷是否需要向 Ray 提議發布：已發布功能壞掉或安全問題當下提議 patch；使用者可見的新功能累積後提議 minor；不進 VSIX 的改動不提。
 
 ## 仍須先問 Ray
 
