@@ -1,6 +1,6 @@
 # Agent Skills 與安全工作區整合
 
-> 現行設計整合自 `specs/066-agent-skills-mcp-retirement/`。舊版外部伺服器整合已退役，不再屬於產品架構。
+> 來源：specs/066-agent-skills-mcp-retirement（2026-08）；交付紀錄：[PR #121](https://github.com/Shen-Ming-Hong/singular-blockly/pull/121)。舊版外部伺服器整合已退役，不再屬於產品架構。
 
 ## 目標
 
@@ -65,7 +65,7 @@ Singular Blockly 對已成立的 Blockly 專案靜默建立及更新專案內 Ag
 
 ## 支援基準
 
-- VS Code 1.109 以上；
+- VS Code 最低版本以 `package.json` 的 `engines.vscode` 為準（066 交付時為 1.109，之後已隨編輯器基線提高）；
 - Codex 從 `.agents/skills` 發現正式契約；
 - Claude Code 從 `.claude/skills` 相容入口定位相同契約；
 - Arduino、CyberBrick 與 TXT 的既有輸出分別維持 `src/main.cpp`、`src/rc_main.py`、`src/main.py`。

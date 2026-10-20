@@ -12,6 +12,8 @@
 
 ## 2026 Blockly 13 現代化升級（065）
 
+> 來源：specs/065-blockly-v13-modernization（2026-08）；交付紀錄：[PR #99](https://github.com/Shen-Ming-Hong/singular-blockly/pull/99)
+
 | 套件 | 之前 | 之後 | 說明 |
 |---|---:|---:|---|
 | `blockly` | 12.3.1 | 13.2.1 | Thrasos、預設鍵盤／螢幕閱讀器支援、公開 dialog／ShortcutRegistry、ARIA API |
@@ -26,7 +28,7 @@
 - 移除 `WorkspaceSvg`、`FieldVariable`、`FieldInput`、flyout 與 renderer DOM 的 prototype/private 整合。
 - editor／preview 明確使用 Thrasos、套件內 `media/` 與 15 個官方 core locale；切換語言時保存 JSON、重建 workspace 並支援失敗回滾。
 
-驗證結果：v12 fixtures 4/4 通過，500-block load/save 中位數均優於 v12 基線，`npm audit` 為 0 vulnerabilities。完整設計與驗收紀錄位於 `specs/065-blockly-v13-modernization/`。
+驗證結果：v12 fixtures 4/4 通過，500-block load/save 中位數均優於 v12 基線，`npm audit` 為 0 vulnerabilities。完整設計與驗收紀錄（`specs/065-blockly-v13-modernization/`，2026-10 歸檔）可由 Git 歷史取回。
 
 ---
 

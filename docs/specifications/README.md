@@ -1,6 +1,6 @@
 # Singular Blockly 整合規格書
 
-> 本文件庫收錄已歸檔規格與已同步的現行架構文件，最高同步至進行中的 `specs/067`。保留窗口內的 SDD 仍以 `specs/` 原始文件為準，不代表已全部提煉或歸檔。
+> 本文件庫收錄已歸檔規格與已同步的現行架構文件。已歸檔並移出 `specs/` 的範圍是 001–066；文件另引用保留中的 `specs/067`、`specs/071`，保留窗口（067–071）內的 SDD 仍以 `specs/` 原始文件為準。
 
 ## 文件結構
 
@@ -22,8 +22,8 @@ docs/specifications/
 │   ├── esp32-pwm.md               # 011 ESP32 PWM 設定
 │   ├── esp32-pixetto.md           # 012 ESP32 Pixetto 修正
 │   ├── esp32-wifi-mqtt.md         # 016 ESP32 WiFi/MQTT
-│   ├── cyberbrick-micropython.md  # 021/022/032/033/034 CyberBrick MicroPython 支援
-│   ├── cyberbrick-rc.md           # 029 ESP-NOW 自定義配對 RC 遙控
+│   ├── cyberbrick-micropython.md  # 021/022/032-034/059/061/064 CyberBrick MicroPython、OTA 與命名防呆
+│   ├── cyberbrick-rc.md           # 029/045/062 ESP-NOW RC 遙控與 OTA channel 共存
 │   ├── cyberbrick-expansion-boards.md # 027/028 X11/X12 擴展板積木
 │   └── txt-controller.md          # 051/053-056 TXT Controller 與虛擬控制器
 ├── 04-quality-testing/            # 品質保證與測試
@@ -32,14 +32,14 @@ docs/specifications/
 │   ├── project-safety.md          # 010 專案安全防護
 │   └── workspace-safety.md        # 018/019/025 Workspace 安全防護
 ├── 05-dependencies/               # 依賴管理
-│   └── dependency-upgrades.md     # 005-009 依賴升級系列
+│   └── dependency-upgrades.md     # 005-009/065 依賴升級系列與 Blockly 13
 ├── 06-features/                   # 功能開發與整合
 │   ├── agent-skills.md            # 066 專案 Skills、runtime 契約與安全工作區驗證
 │   ├── bug-fixes.md               # 014/031/039 序列化修復、1 月批次修復、print 換行修復
 │   ├── editor-theme-surfaces.md   # 057 編輯器主題表面
 │   ├── function-block-locking.md  # 050 函式積木鎖定
 │   ├── language-selector.md       # 030 語言選擇器
-│   ├── platformio-diagnostics.md  # 052/058 PlatformIO 診斷與引導式修復
+│   ├── platformio-diagnostics.md  # 052/058/063 PlatformIO 診斷、引導式修復與 provider 自動安裝
 │   ├── quick-backup.md            # 017 Ctrl+S 快速備份
 │   ├── unified-upload-ui.md       # 026/042 統一上傳 UI、錯誤分類提示
 │   ├── serial-monitor.md          # 037/038 CyberBrick / Arduino Serial Monitor
@@ -116,20 +116,22 @@ docs/specifications/
 
 **Phase 6 (059-061)**：CyberBrick USB／OTA 上傳模式、主板與 X11 數位 LED 教學積木，以及 OTA agent 自動升級。
 
-**Phase 7 (062-066)**：目前的 SDD 保留窗口；詳細設計以 `specs/` 原始文件為準，其中 065 完成 Blockly 13 現代化，066 完成專案內 Agent Skills、runtime 契約、外部工作區驗證及舊使用者端 AI server 退役。
+**Phase 7 (062-066)**：CyberBrick OTA 與 RC Wi-Fi channel 共存、VSCodium／Open VSX provider 自動安裝、CyberBrick 命名防呆與 OTA 設定進度、Blockly 13 現代化，以及專案內 Agent Skills、runtime 契約、外部工作區驗證與舊使用者端 AI server 退役。
 
 **Phase 8 (067)**：Singular 自有 Python／PlatformIO／mpremote managed Core、provider 相容 fallback、無 shell monitor、跨平台路徑矩陣及合併／發布 evidence gate。
 
 ## SDD 保留與歸檔狀態
 
-截至 2026-08-13，`specs/` 保留所有未完成 SDD，以及依規格編號排序後最近五個已完成 SDD：
+截至 2026-10-20，`specs/` 保留所有未完成 SDD，以及依規格編號排序後最近五個已完成 SDD：
 
 | 類別 | 保留編號 | 原因 |
 | ---- | -------- | ---- |
 | 未完成 | 無 | 現存 SDD 對應的 feature PR 都已有合併紀錄 |
-| 最近五個已完成 | 062、063、064、065、066 | 保留近期設計上下文，供維護與回溯 |
+| 最近五個已完成 | 067、068、069、070、071 | 保留近期設計上下文，供維護與回溯 |
 
-完成狀態以 feature PR 的 `MERGED` 與 `mergedAt` 為優先證據；因此 PR 已合併時，過時的 `Draft` 標記、缺少 `tasks.md` 或未勾選的人工驗證項目不再誤判為未完成。本次完成內容提煉並自 `specs/` 歸檔的編號為 045、048、059–061；同一輪稍早已歸檔 047、049–058，更早的 001–044 已於先前批次整合。所有歸檔內容均可透過 Git 歷史回復。
+完成狀態以 feature PR 的 `MERGED` 與 `mergedAt` 為優先證據；因此 PR 已合併時，過時的 `Draft` 標記、缺少 `tasks.md` 或未勾選的人工驗證項目不再誤判為未完成。保留窗口的交付證據：067 [#126](https://github.com/Shen-Ming-Hong/singular-blockly/pull/126)、068 [#134](https://github.com/Shen-Ming-Hong/singular-blockly/pull/134)、069 [#135](https://github.com/Shen-Ming-Hong/singular-blockly/pull/135)、070 [#142](https://github.com/Shen-Ming-Hong/singular-blockly/pull/142)、071 [#191](https://github.com/Shen-Ming-Hong/singular-blockly/pull/191)。
+
+本次（2026-10-20）提煉並自 `specs/` 歸檔的編號為 062（[#92](https://github.com/Shen-Ming-Hong/singular-blockly/pull/92)）、063（[#93](https://github.com/Shen-Ming-Hong/singular-blockly/pull/93)）、064（[#97](https://github.com/Shen-Ming-Hong/singular-blockly/pull/97)）、065（[#99](https://github.com/Shen-Ming-Hong/singular-blockly/pull/99)）、066（[#121](https://github.com/Shen-Ming-Hong/singular-blockly/pull/121)）；2026-08 批次歸檔 045、047–061，更早的 001–044 已於先前批次整合。所有歸檔內容均可透過 Git 歷史回復。
 
 ## 版本對照
 
@@ -159,4 +161,4 @@ docs/specifications/
 
 ---
 
-_最後更新：2026-08-16_
+_最後更新：2026-10-20_

@@ -1,6 +1,6 @@
 # Singular Blockly 開發歷程與功能演進
 
-> 本文件記錄專案從 specs/001 到 specs/066 的開發軌跡，包含功能新增、架構變更、已移除功能的前因後果。
+> 本文件記錄專案從 specs/001 到 specs/066 的開發軌跡（067 以後仍保留在 `specs/`），包含功能新增、架構變更、已移除功能的前因後果。
 
 ## 時間軸總覽
 
@@ -71,7 +71,11 @@
          ├─ 060 CyberBrick／X11 數位 LED 積木
          └─ 061 OTA Agent 自動升級
          │
-2026-08 ─┼─ 065 Blockly 13 現代化
+2026-06 ─┼─ 062 CyberBrick OTA／RC Wi-Fi channel 共存
+         └─ 063 VSCodium／Open VSX provider 自動安裝
+         │
+2026-08 ─┼─ 064 CyberBrick 命名防呆與 OTA 設定進度
+         ├─ 065 Blockly 13 現代化
          └─ 066 Agent Skills 取代舊 AI server
 ```
 
@@ -534,7 +538,23 @@ OTA 上傳前可將支援升級協定的舊 agent 安全更新至目標版本，
 
 ---
 
-## 第十一階段：Blockly 13 與 Agent Skills（065-066）
+## 第十一階段：OTA 共存、編輯器相容與 CyberBrick 防呆（062-064）
+
+### 062 - CyberBrick OTA／RC Wi-Fi channel 共存（2026-06）
+
+RC 初始化改為「有 OTA 設定**且** STA 已連上 AP」才保留 Wi-Fi，否則照積木 channel 初始化；OTA bootstrap 最多等約 5 秒讓 Wi-Fi 穩定，仍未連線就停止背景掃描。兩台都有 OTA 但 AP 不在線時，約 5 秒後恢復 RC；一台連 AP、另一台沒有 OTA 的情境列為接受的設計邊界。RC 初始化 tooltip 與 OTA 完成提示補上學生可讀的 channel 說明。詳見[CyberBrick RC](03-hardware-support/cyberbrick-rc.md)。
+
+### 063 - VSCodium／Open VSX provider 自動安裝（2026-06）
+
+移除對 PlatformIO IDE 的 `extensionDependencies`，改在開啟積木編輯器時偵測並自動安裝 provider：官方 PlatformIO IDE 優先，失敗改裝 pioarduino，再失敗開啟 Extensions 搜尋；安裝後開 PlatformIO Home 觸發 Core 初始化。Core 可用性改以實際 `--version` 判斷，並支援自訂 Core 位置與 Windows `python -m platformio` fallback。詳見[PlatformIO 診斷與引導式修復](06-features/platformio-diagnostics.md)。
+
+### 064 - CyberBrick 命名防呆與 OTA 設定進度（2026-08）
+
+CyberBrick 工作區的變數、函式與參數改用 MicroPython 命名規則：保留中文命名，非法字元、關鍵字與重複名稱阻擋，常見執行環境與內建名稱只警告；舊工作區不自動改名，但有錯誤時阻擋上傳。OTA provisioning 改為六里程碑、不顯示數字的大型進度條，前後端單一執行並以請求識別碼隔離延遲訊息。詳見[CyberBrick MicroPython](03-hardware-support/cyberbrick-micropython.md)。
+
+---
+
+## 第十二階段：Blockly 13 與 Agent Skills（065-066）
 
 ### 065 - Blockly 13 現代化（2026-08）
 
@@ -546,4 +566,4 @@ OTA 上傳前可將支援升級協定的舊 agent 安全更新至目標版本，
 
 ---
 
-_最後更新：2026-08-13_
+_最後更新：2026-10-20_
