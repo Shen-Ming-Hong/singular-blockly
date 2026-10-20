@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import type { Env } from '../env';
 
 const encoder = new TextEncoder();

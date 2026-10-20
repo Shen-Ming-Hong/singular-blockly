@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 export const PUBLIC_STATUSES = [
 	'received', 'triaging', 'needs-info', 'planned', 'in-progress', 'resolved', 'closed',
 ] as const;

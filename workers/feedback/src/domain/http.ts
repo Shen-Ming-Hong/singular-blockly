@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const SECURITY_HEADERS: Readonly<Record<string, string>> = Object.freeze({
 	'Cache-Control': 'no-store',
 	'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",

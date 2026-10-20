@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright 2026 Singular Blockly Contributors
+# SPDX-License-Identifier: Apache-2.0
 """
 io_server.py - fischertechnik TXT Controller I/O HTTP Server
 Singular Blockly Extension Runtime - v1

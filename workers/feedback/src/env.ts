@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 export interface Env extends FeedbackEnv {
 	SOURCE_RATE_LIMITER: RateLimit;
 	REPORTER_HMAC_PEPPER: string;

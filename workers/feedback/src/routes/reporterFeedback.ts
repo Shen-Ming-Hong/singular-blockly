@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { createHmac, verifyHmac } from '../domain/auth';
 import { sha256Json } from '../domain/feedback';
 import { apiError, isUuid, jsonResponse, rateLimitError, readRequestText, RequestTooLargeError, withSecurityHeaders } from '../domain/http';

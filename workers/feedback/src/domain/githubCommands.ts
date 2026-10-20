@@ -1,3 +1,9 @@
+/**
+ * @license
+ * Copyright 2026 Singular Blockly Contributors
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import { PUBLIC_STATUSES, RESOLUTIONS, validateDecisionUpdate, type PublicStatus, type Resolution } from './stateMachine';
 
 export type GitHubCommand =
