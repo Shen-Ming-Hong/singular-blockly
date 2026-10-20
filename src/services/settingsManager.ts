@@ -208,17 +208,6 @@ export class SettingsManager {
 	}
 
 	/**
-	 * 切換主題
-	 * @returns 切換後的主題
-	 */
-	async toggleTheme(): Promise<string> {
-		const currentTheme = await this.getTheme();
-		const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-		await this.updateTheme(newTheme);
-		return newTheme;
-	}
-
-	/**
 	 * 將 VSCode 語言代碼映射到 Blockly 語言代碼
 	 * @param vscodeLanguage VSCode 語言代碼
 	 * @returns Blockly 語言代碼

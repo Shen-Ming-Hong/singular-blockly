@@ -1172,9 +1172,6 @@ window.languageManager.loadMessages('en', {
 	RC_IS_BUTTON_PRESSED_PREFIX: 'RC button',
 	RC_IS_BUTTON_PRESSED_SUFFIX: 'pressed?',
 	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Check if remote button is pressed',
-	RC_GET_BUTTON_PREFIX: 'RC button',
-	RC_GET_BUTTON_SUFFIX: 'state',
-	RC_GET_BUTTON_TOOLTIP: 'Read remote button state (0=pressed, 1=released)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Open Monitor',

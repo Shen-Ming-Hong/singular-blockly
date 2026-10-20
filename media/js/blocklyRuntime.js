@@ -319,12 +319,35 @@
 		visitSerializedBlock(blockState.next && blockState.next.block, visitor);
 	}
 
+	// 已移除的「按鈕狀態」積木（0=按下、1=放開）改寫成「按鈕被按下? ? 0 : 1」，舊專案載入後行為不變
+	const LEGACY_BUTTON_STATE_BLOCKS = {
+		x12_get_button: 'x12_is_button_pressed',
+		rc_get_button: 'rc_is_button_pressed',
+	};
+
+	function migrateLegacyButtonStateBlock(blockState) {
+		const pressedType = LEGACY_BUTTON_STATE_BLOCKS[blockState.type];
+		if (!pressedType) {
+			return;
+		}
+		const button = blockState.fields && blockState.fields.BUTTON;
+		blockState.type = 'logic_ternary';
+		delete blockState.fields;
+		delete blockState.extraState;
+		blockState.inputs = {
+			IF: { block: { type: pressedType, fields: button === undefined ? {} : { BUTTON: button } } },
+			THEN: { block: { type: 'math_number', fields: { NUM: 0 } } },
+			ELSE: { block: { type: 'math_number', fields: { NUM: 1 } } },
+		};
+	}
+
 	function normalizeWorkspaceState(state) {
 		if (!state || typeof state !== 'object') {
 			return state;
 		}
 		for (const topBlock of (state.blocks && state.blocks.blocks) || []) {
 			visitSerializedBlock(topBlock, blockState => {
+				migrateLegacyButtonStateBlock(blockState);
 				if (
 					(blockState.type === 'arduino_function' || blockState.type === 'arduino_function_call') &&
 					typeof blockState.extraState === 'string'

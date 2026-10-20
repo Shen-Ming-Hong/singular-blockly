@@ -1167,9 +1167,6 @@ window.languageManager.loadMessages('fr', {
 	RC_IS_BUTTON_PRESSED_PREFIX: 'RC bouton',
 	RC_IS_BUTTON_PRESSED_SUFFIX: 'appuyé?',
 	RC_IS_BUTTON_PRESSED_TOOLTIP: 'Vérifier si bouton distant est appuyé',
-	RC_GET_BUTTON_PREFIX: 'RC bouton',
-	RC_GET_BUTTON_SUFFIX: 'état',
-	RC_GET_BUTTON_TOOLTIP: 'Lire état bouton distant (0=appuyé, 1=relâché)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'Ouvrir le moniteur',

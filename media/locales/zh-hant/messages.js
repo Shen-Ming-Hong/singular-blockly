@@ -1158,9 +1158,6 @@ window.languageManager.loadMessages('zh-hant', {
 	RC_IS_BUTTON_PRESSED_PREFIX: 'RC 按鈕',
 	RC_IS_BUTTON_PRESSED_SUFFIX: '被按下?',
 	RC_IS_BUTTON_PRESSED_TOOLTIP: '檢查遠端按鈕是否被按下',
-	RC_GET_BUTTON_PREFIX: 'RC 按鈕',
-	RC_GET_BUTTON_SUFFIX: '狀態',
-	RC_GET_BUTTON_TOOLTIP: '讀取遠端按鈕狀態 (0=按下, 1=放開)',
 
 	// CyberBrick Serial Monitor
 	MONITOR_BUTTON_TITLE: '開啟 Monitor',

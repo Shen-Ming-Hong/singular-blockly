@@ -72,19 +72,5 @@ Blockly.Blocks['x12_is_button_pressed'] = {
 	},
 };
 
-// === 讀取本機按鈕狀態 ===
-Blockly.Blocks['x12_get_button'] = {
-	init: function () {
-		this.appendDummyInput()
-			.appendField(window.languageManager.getMessage('X12_GET_BUTTON_PREFIX', '本機按鈕'))
-			.appendField(new Blockly.FieldDropdown(X12_BUTTON_CHANNEL_OPTIONS), 'BUTTON')
-			.appendField(window.languageManager.getMessage('X12_GET_BUTTON_SUFFIX', '狀態'));
-		this.setOutput(true, 'Number');
-		this.setColour(150);
-		this.setTooltip(window.languageManager.getMessage('X12_GET_BUTTON_TOOLTIP', '讀取發射端本機按鈕狀態 (0=按下, 1=放開)'));
-		this.setHelpUrl('');
-	},
-};
-
 // 記錄載入訊息
 console.log('[blockly] X12 發射端擴展板積木定義已載入');

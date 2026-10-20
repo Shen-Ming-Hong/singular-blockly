@@ -156,46 +156,6 @@ describe('Settings Manager', () => {
 		assert.strictEqual(updatedSettings['singular-blockly.theme'], 'dark');
 	});
 
-	it('should toggle theme from light to dark', async () => {
-		// 設定主題為 light
-		fsMock.addFile(
-			settingsPath,
-			JSON.stringify({
-				'singular-blockly.theme': 'light',
-			})
-		);
-
-		// 測試切換主題
-		const newTheme = await settingsManager.toggleTheme();
-
-		// 驗證主題切換
-		assert.strictEqual(newTheme, 'dark');
-		const updatedContent = fsMock.files.get(settingsPath);
-		assert.ok(updatedContent);
-		const updatedSettings = JSON.parse(updatedContent);
-		assert.strictEqual(updatedSettings['singular-blockly.theme'], 'dark');
-	});
-
-	it('should toggle theme from dark to light', async () => {
-		// 設定主題為 dark
-		fsMock.addFile(
-			settingsPath,
-			JSON.stringify({
-				'singular-blockly.theme': 'dark',
-			})
-		);
-
-		// 測試切換主題
-		const newTheme = await settingsManager.toggleTheme();
-
-		// 驗證主題切換
-		assert.strictEqual(newTheme, 'light');
-		const updatedContent = fsMock.files.get(settingsPath);
-		assert.ok(updatedContent);
-		const updatedSettings = JSON.parse(updatedContent);
-		assert.strictEqual(updatedSettings['singular-blockly.theme'], 'light');
-	});
-
 	it('should get auto backup interval', async () => {
 		fsMock.addFile(
 			settingsPath,

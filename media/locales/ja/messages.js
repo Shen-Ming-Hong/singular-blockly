@@ -1170,9 +1170,6 @@ window.languageManager.loadMessages('ja', {
 	RC_IS_BUTTON_PRESSED_PREFIX: 'RC ボタン',
 	RC_IS_BUTTON_PRESSED_SUFFIX: '押された?',
 	RC_IS_BUTTON_PRESSED_TOOLTIP: 'リモートボタンが押されているか確認',
-	RC_GET_BUTTON_PREFIX: 'RC ボタン',
-	RC_GET_BUTTON_SUFFIX: '状態',
-	RC_GET_BUTTON_TOOLTIP: 'リモートボタンの状態を読取 (0=押下, 1=解放)',
 
 	// === Serial Monitor ===
 	MONITOR_BUTTON_TITLE: 'モニターを開く',

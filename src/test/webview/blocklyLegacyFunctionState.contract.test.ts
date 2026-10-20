@@ -155,6 +155,35 @@ suite('Blockly legacy function state contract', () => {
 		assert.strictEqual(definition.extraState.locked, true);
 	});
 
+	test('已移除的 x12_get_button／rc_get_button 載入時改寫成等價的按鈕被按下三元運算', () => {
+		const harness = createRuntimeHarness();
+		const state = {
+			blocks: {
+				blocks: [
+					{
+						type: 'controls_if',
+						inputs: { IF0: { block: { type: 'x12_get_button', id: 'legacy-x12', fields: { BUTTON: '7' } } } },
+						next: { block: { type: 'text_print', inputs: { TEXT: { block: { type: 'rc_get_button', fields: { BUTTON: '3' } } } } } },
+					},
+				],
+			},
+		};
+
+		harness.windowStub.blocklyRuntime.loadWorkspaceState(state, {});
+		const blocks = collectBlocks(harness.loadedStates[0]);
+		assert.ok(!blocks.some(block => block.type === 'x12_get_button' || block.type === 'rc_get_button'));
+		const [x12, rc] = blocks.filter(block => block.type === 'logic_ternary');
+		assert.strictEqual(x12.id, 'legacy-x12');
+		assert.strictEqual(x12.fields, undefined);
+		assert.deepStrictEqual(JSON.parse(JSON.stringify(x12.inputs)), {
+			IF: { block: { type: 'x12_is_button_pressed', fields: { BUTTON: '7' } } },
+			THEN: { block: { type: 'math_number', fields: { NUM: 0 } } },
+			ELSE: { block: { type: 'math_number', fields: { NUM: 1 } } },
+		});
+		assert.strictEqual(rc.inputs.IF.block.type, 'rc_is_button_pressed');
+		assert.strictEqual(rc.inputs.IF.block.fields.BUTTON, '3');
+	});
+
 	test('migration 不使用 DOM injection 或擴大 legacy Blockly API allowlist', () => {
 		const source = fs.readFileSync(path.join(PROJECT_ROOT, 'media', 'js', 'blocklyRuntime.js'), 'utf8');
 		assert.doesNotMatch(source, /DOMParser|innerHTML|Blockly\.Xml\./);
