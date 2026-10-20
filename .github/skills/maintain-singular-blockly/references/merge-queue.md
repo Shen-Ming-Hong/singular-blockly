@@ -41,7 +41,7 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
 
 - **自己的分支、沒有他人 commit：** `git rebase origin/master`，重跑檢查後 `git push --force-with-lease`。只對自己建立的分支這樣做。
 - **分支已有 merge commit，或曾有他人推送：** `git merge origin/master`，不改寫歷史。
-- **他人與 Dependabot 分支：** 只用 GitHub「Update branch」（merge）同步；不推 commit、不強制推送。需要相容性修正時，依 `manage-dependabot-prs` 開人工替代 PR。
+- **他人與 Dependabot 分支：** 只用 GitHub「Update branch」（merge）同步；不推 commit，任何情況都不得對他人分支 `--force` 或 `--force-with-lease`。需要相容性修正時，依 `manage-dependabot-prs` 開人工替代 PR。
 - **疊加 PR：** 必須建立在未合併 PR 上的分支，從那個分支切出，PR 描述寫「依賴 #N，請先合併」。#N squash 合併後，在自己的分支 `git rebase --onto origin/master <#N 的 head> <自己的分支>` 丟掉已合併的 commit，再 `--force-with-lease` 推送。
 - 每個 PR 分支同時只推送一個待驗證的 head。修正集中在本機完成後一次推送，等 CI 結束再推下一次；不要用空 commit、關閉再開啟 PR 來重跑 CI。
 
@@ -55,6 +55,7 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
   3. 本 PR 刪除、`master` 修改：檢查 `master` 的修改是否仍需要（例如修了 bug 或安全問題），需要的部分移植到取代它的程式；確認沒有遺失後才保留刪除。
   4. 無法判斷刪除是否應保留，而且牽涉使用者可見功能時，停止整合、釋放合併權並問 Ray。
 - 解完衝突後重跑受影響的檢查；衝突碰到 UI 或積木時重做視覺與互動驗證。
+- **防止覆蓋他人已合併的改動。** 每次同步（rebase、merge、解衝突）後、推送前，用 `git diff --stat origin/master...HEAD` 與 `git diff origin/master HEAD` 確認差異只剩本任務要的檔案與行；若出現本任務沒打算改的檔案，或 `master` 上別人新增的內容變成刪除行，就是用舊內容蓋掉了已合併的改動，回頭重解，不可推送。
 
 ## base 紅燈先修 base
 
@@ -62,7 +63,7 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
 
 ## 合併後
 
-1. 在乾淨的整合 worktree（見 [並行開發工作目錄](parallel-worktrees.md)）確認 `HEAD` 等於最新 `origin/master`，且包含本 PR 的 squash commit。
+1. 在乾淨的整合 worktree（見 [並行開發工作目錄](parallel-worktrees.md)）確認 `HEAD` 等於最新 `origin/master`，且包含本 PR 的 squash commit；以 `git show --stat <squash SHA>` 核對改動檔案與 PR 的檔案清單一致，沒有夾帶還原他人改動的差異。
 2. 等 `master` push 觸發的完整 CI 結束。純文件 PR 在 PR 階段略過的單元矩陣、Node 22 與 VSIX 打包會在這裡執行，必須確認成功。
 3. `master` CI 失敗時，先判斷是否由本 PR 造成：是，就立即開修正 PR（或 revert 自己的 PR）並排在佇列最前面；不是，依「base 紅燈先修 base」處理。修好前不釋放後續合併。
 4. 移除 `merge-lease`；遠端分支由 GitHub 自動刪除，確認後清理本地 worktree 與分支。
