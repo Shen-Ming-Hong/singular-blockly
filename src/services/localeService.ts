@@ -22,7 +22,8 @@ export interface UIMessages {
 export interface FileSystem {
 	existsSync(path: string): boolean;
 	promises: {
-		readFile(path: string, encoding?: BufferEncoding | null): Promise<string | Buffer>;
+		readFile(path: string): Promise<string | Buffer>;
+		readFile(path: string, encoding: BufferEncoding): Promise<string | Buffer>;
 		readdir(path: string): Promise<string[]>;
 	};
 }
