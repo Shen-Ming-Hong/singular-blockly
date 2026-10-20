@@ -5,7 +5,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 # 維護 Singular Blockly
 
-先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支與既有變更；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD。
+先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支與既有變更；同時有多個 PR 時依同一文件的整合順序一次合併一個；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD。
 
 ## 動手前
 
