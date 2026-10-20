@@ -224,7 +224,7 @@
 		g.addImport('import math');
 		const x = g.valueToCode(block, 'X', g.ORDER_NONE) || '0';
 		const y = g.valueToCode(block, 'Y', g.ORDER_NONE) || '0';
-		return ['math.atan2(' + y + ', ' + x + ') / math.pi * 180', g.ORDER_FUNCTION_CALL];
+		return ['math.atan2(' + y + ', ' + x + ') / math.pi * 180', g.ORDER_MULTIPLICATIVE];
 	};
 
 	g.forBlock['math_map'] = function (block) {

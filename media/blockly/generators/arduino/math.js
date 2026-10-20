@@ -177,7 +177,8 @@ window.arduinoGenerator.forBlock['math_random_float'] = function (block) {
 window.arduinoGenerator.forBlock['math_atan2'] = function (block) {
 	const x = window.arduinoGenerator.valueToCode(block, 'X', window.arduinoGenerator.ORDER_NONE) || '0';
 	const y = window.arduinoGenerator.valueToCode(block, 'Y', window.arduinoGenerator.ORDER_NONE) || '0';
-	const code = `atan2(${y}, ${x})`;
+	// Blockly 的 atan2 積木以角度（-180~180）回傳
+	const code = `(atan2(${y}, ${x}) * 180.0 / PI)`;
 	return [code, window.arduinoGenerator.ORDER_ATOMIC];
 };
 

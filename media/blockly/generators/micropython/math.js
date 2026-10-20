@@ -334,5 +334,15 @@
 		return [code, generator.ORDER_FUNCTION_CALL];
 	};
 
+	/**
+	 * 反正切 atan2（回傳角度，與 Blockly 積木說明一致）
+	 */
+	generator.forBlock['math_atan2'] = function (block) {
+		generator.addImport('import math');
+		const x = generator.valueToCode(block, 'X', generator.ORDER_NONE) || '0';
+		const y = generator.valueToCode(block, 'Y', generator.ORDER_NONE) || '0';
+		return ['math.atan2(' + y + ', ' + x + ') / math.pi * 180', generator.ORDER_MULTIPLICATIVE];
+	};
+
 	console.log('[blockly] MicroPython 數學生成器已載入');
 })();

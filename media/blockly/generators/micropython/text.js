@@ -244,5 +244,60 @@
 		return [code, generator.ORDER_MEMBER];
 	};
 
+	/**
+	 * 附加文字到變數
+	 */
+	generator.forBlock['text_append'] = function (block) {
+		const varName = generator.nameDB_.getName(block.getFieldValue('VAR'), Blockly.VARIABLE_CATEGORY_NAME);
+		const value = generator.valueToCode(block, 'TEXT', generator.ORDER_NONE) || "''";
+
+		generator.addVariable(varName, 'None');
+		const currentFunc = generator.currentFunction_ || 'main';
+		if (!generator.functionGlobals_) {
+			generator.functionGlobals_ = new Map();
+		}
+		if (!generator.functionGlobals_.has(currentFunc)) {
+			generator.functionGlobals_.set(currentFunc, new Set());
+		}
+		generator.functionGlobals_.get(currentFunc).add(varName);
+
+		return `${varName} = str(${varName}) + str(${value})\n`;
+	};
+
+	/**
+	 * 字串轉數字（無效輸入回傳 0，與 Arduino String.toInt()/toFloat() 一致）
+	 */
+	generator.forBlock['text_to_number'] = function (block) {
+		const text = generator.valueToCode(block, 'TEXT', generator.ORDER_NONE) || "''";
+		if (block.getFieldValue('TYPE') === 'FLOAT') {
+			generator.addFunction(
+				'text_to_float',
+				`def text_to_float(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0`
+			);
+			return ['text_to_float(' + text + ')', generator.ORDER_FUNCTION_CALL];
+		}
+		generator.addFunction(
+			'text_to_int',
+			`def text_to_int(value):
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return 0`
+		);
+		return ['text_to_int(' + text + ')', generator.ORDER_FUNCTION_CALL];
+	};
+
+	/**
+	 * 轉為字串
+	 */
+	generator.forBlock['to_string'] = function (block) {
+		const value = generator.valueToCode(block, 'VALUE', generator.ORDER_NONE) || '0';
+		return ['str(' + value + ')', generator.ORDER_FUNCTION_CALL];
+	};
+
 	console.log('[blockly] MicroPython 文字生成器已載入');
 })();
