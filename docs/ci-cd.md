@@ -125,7 +125,7 @@ gh workflow run recover-github-release.yml --ref master \
 
 ### `v*` tag rulesets
 
-- `release tag creation` 只限制建立，僅 Repository admin 可 bypass。
+- `release tag creation` 只限制建立，bypass 為 Repository admin 與 GitHub Actions（Repository app，供 `create-release-tag.yml` 以 `GITHUB_TOKEN` 建立 tag）；少了後者，該 workflow 推 tag 會被拒。
 - `release tag immutability` 禁止更新與刪除，且不設 bypass。
 - GitHub ruleset 的 bypass 會略過整組規則，因此必須拆成兩條才能同時允許 maintainer 建立並禁止任何人更新／刪除。
 - workflow 仍會以 Git object type 再驗證 annotated tag。

@@ -46,6 +46,7 @@ Ray 於 2026-10-20 授權：patch 與 minor 發布由協調者依「何時發布
 - 協調者的決定取代 Phase 1.5 與 Phase 3.5 的使用者核准；兩個 gate 的檢查內容不能省，由執行發布的工作階段自行確認並寫進發布 PR 描述。
 - 仍先問 Ray：major 候選、`NEEDS_USER_DECISION` finding、repository／帳號／secrets／ruleset 設定變更，以及必須由 Ray 在本機操作的步驟。
 - 發布後回報 Ray：版本、CHANGELOG 重點、PR、publish run、GitHub Release 與兩個市集的結果。
+- 執行發布的工作階段自己推進到底，不等 Ray 或協調者提醒（Ray 2026-10-20）：發布 PR 合併後，`master` push 的 CI 不會喚醒工作階段，要自行排程檢查（例如 `send_later` 約 10 分鐘）；綠燈、tag 不存在且沒有其他 PR 持有 `merge-lease` 時，立即依 Phase 5 觸發發布（雲端用 `create-release-tag.yml`），再同樣排程追蹤 run 直到三端驗證完成。期間 `master` 若又前進，只要新 commit 的 CI 也綠且未改動版本檔與 CHANGELOG，就在最新 `master` 發布。
 
 ## 非發布 PR 的自主合併
 
@@ -184,7 +185,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 | `gh workflow run ... -f release_tag=...` | `actions_run_trigger`（`run_workflow`，`ref: master`、`inputs`） |
 | 失敗 log | `get_job_logs` |
 
-雲端工作階段通常只能推送指定的 `claude/…` 分支，不直接推 tag。Phase 5.1–5.2 改為以 `actions_run_trigger`（`run_workflow`、`workflow_id: create-release-tag.yml`、`ref: master`、`inputs: {release_tag: "v{VERSION}"}`）觸發 `.github/workflows/create-release-tag.yml`（Ray 2026-10-20 同意）：它在最新 `master` 驗證 `release:prepare`、確認 tag 不存在後建立 annotated tag，並在同一 run 呼叫 `publish.yml`。之後依 5.3–5.4 追蹤該 run；失敗時只重跑失敗 jobs，不重新觸發此 workflow（tag 已存在會被拒）。此 workflow 也失敗於建立 tag 前時，才告訴 Ray 在本機執行 5.1–5.2 的確切指令。
+雲端工作階段通常只能推送指定的 `claude/…` 分支，不直接推 tag。Phase 5.1–5.2 改為以 `actions_run_trigger`（`run_workflow`、`workflow_id: create-release-tag.yml`、`ref: master`、`inputs: {release_tag: "v{VERSION}"}`）觸發 `.github/workflows/create-release-tag.yml`（Ray 2026-10-20 同意）：它在最新 `master` 驗證 `release:prepare`、確認 tag 不存在後建立 annotated tag，並在同一 run 呼叫 `publish.yml`。之後依 5.3–5.4 追蹤該 run；失敗時只重跑失敗 jobs，不重新觸發此 workflow（tag 已存在會被拒）。此 workflow 也失敗於建立 tag 前時，才告訴 Ray 在本機執行 5.1–5.2 的確切指令。前提是 ruleset「release tag creation」的 bypass list 含 GitHub Actions（Repository app）；缺少時推 tag 會出現 `Cannot create ref due to creations being restricted`，這是儲存庫設定，回報 Ray 補上（或由 Ray 本機推 tag）後只重跑失敗 jobs。
 
 ## Phase 5：Annotated Tag 與 Actions CD
 
