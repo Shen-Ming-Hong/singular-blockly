@@ -25,7 +25,8 @@ export interface FileSystem {
 	promises: {
 		mkdir(path: string, options?: any): Promise<string | void>;
 		writeFile(path: string, content: string | Uint8Array): Promise<void>;
-		readFile(path: string, encoding?: BufferEncoding): Promise<string | Buffer>;
+		readFile(path: string): Promise<string | Buffer>;
+		readFile(path: string, encoding: BufferEncoding): Promise<string | Buffer>;
 		copyFile(src: string, dest: string): Promise<void>;
 		unlink(path: string): Promise<void>;
 		readdir(path: string): Promise<string[]>;
