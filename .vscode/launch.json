@@ -11,7 +11,7 @@
 			"request": "launch",
 			"args": ["--extensionDevelopmentPath=${workspaceFolder}"],
 			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
-			"preLaunchTask": "${defaultBuildTask}",
+			"preLaunchTask": "npm: compile",
 			"trace": true,
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
@@ -24,7 +24,7 @@
 			"request": "launch",
 			"args": ["--extensionDevelopmentPath=${workspaceFolder}"],
 			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
-			"preLaunchTask": "${defaultBuildTask}",
+			"preLaunchTask": "npm: compile",
 			// Keeps Extension Host breakpoints; WebView JavaScript is not auto-attached.
 			"debugWebviews": false,
 			"trace": true,
