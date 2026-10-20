@@ -9,7 +9,7 @@ import * as sinon from 'sinon';
 import * as path from 'path';
 import { describe, it, before, beforeEach, after, afterEach } from 'mocha';
 import { WebViewManager, _setVSCodeApi as setWebViewManagerVSCodeApi, _reset as resetWebViewManager } from '../webview/webviewManager';
-import { _setVSCodeApi as setMessageHandlerVSCodeApi, _reset as resetMessageHandler } from '../webview/messageHandler';
+import { WebViewMessageHandler, _setVSCodeApi as setMessageHandlerVSCodeApi, _reset as resetMessageHandler } from '../webview/messageHandler';
 import { LocaleService } from '../services/localeService';
 import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
@@ -453,6 +453,7 @@ describe('WebView Manager', () => {
 	});
 
 	it('should handle panel disposal', async () => {
+		const disposeAIServices = sinon.spy(WebViewMessageHandler.prototype, 'disposeAIServices');
 		// 設定 VS Code 工作區
 		vscodeMock.workspace.workspaceFolders = [{ uri: { fsPath: '/mock/workspace' } }];
 
@@ -484,6 +485,7 @@ describe('WebView Manager', () => {
 		// 驗證 WebView 狀態已更新
 		assert.strictEqual(webViewManager.isPanelCreated(), false);
 		assert.strictEqual(webViewManager.getPanel(), undefined);
+		assert.strictEqual(disposeAIServices.callCount, 1, 'Closing the panel cancels AI work and releases its listeners');
 	});
 
 	it('should close a project-bound panel when the primary workspace folder changes', async () => {

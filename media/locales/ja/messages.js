@@ -1129,6 +1129,11 @@ window.languageManager.loadMessages('ja', {
 
 	// === RC接続 ===
 	CATEGORY_RC: 'RC接続',
+	ESP32_RC_LABEL_CYBERBRICK: 'CyberBrick リモコン',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'ペア ID（1～255）とチャンネル（1～11）を CyberBrick 送信側に合わせてください。Wi-Fi／MQTT でチャンネルが変わると RC が途切れることがあります。',
+	ESP32_RC_WAIT_TOOLTIP: '有効な CyberBrick RC 信号を待ちます。時間切れ後は処理を続けます。',
+	ESP32_RC_ONLY_WARNING: 'この RC ブロックは ESP32 DevKit でのみ使えます。',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'RC を初期化すると Wi-Fi が切断されます。先に RC を初期化し、RC と同じチャンネルに固定した Wi-Fi アクセスポイントに接続してください。チャンネルが違うと RC 信号を受信できません。',
 	RC_LABEL_MASTER: '📡 送信機',
 	RC_LABEL_SLAVE: '📻 受信機',
 	RC_LABEL_DATA: '📊 データ読取',

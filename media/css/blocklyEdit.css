@@ -3505,7 +3505,6 @@ body.theme-dark .blocklyDraggable.singular-search-highlight > .blocklyPath {
 }
 
 .blocklyFlyoutButton:focus-visible,
-.blocklyToolboxCategoryContainer:focus-visible,
 .blocklyDialogInput:focus-visible,
 .blocklyDialog button:focus-visible {
 	outline: 2px solid var(--editor-focus-ring);

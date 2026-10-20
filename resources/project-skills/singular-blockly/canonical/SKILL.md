@@ -5,13 +5,9 @@ description: Understand existing Singular Blockly workspaces and create or modif
 
 # Work with Singular Blockly
 
-1. Read `blockly/main.json` before proposing or applying a workspace change.
-2. Read [workspace-format.md](references/workspace-format.md) for the document and editing rules.
-3. Read [workspace.schema.json](references/workspace.schema.json) for the document-level shape.
-4. Read the [block contract index](references/block-contract.json), locate every block type you will use in `shards[].blockTypes`, and read only the referenced category shard files. Treat each block's board membership and the selected board's `variants[board]` fields, inputs, connections, extra state, and minimal state as authoritative.
-5. Read [project-notes.md](project-notes.md) when it exists. Preserve all user notes and project-specific constraints.
-6. Write a complete `blockly/main.json` document. Never invent a block type, field, input, connection, or extra state.
-7. Wait for Singular Blockly runtime validation after writing. A valid candidate is normalized and loaded by the real Blockly runtime.
-8. If the candidate is quarantined, inspect `blockly/.singular-blockly/workspace-validation-status.json` and its stable issue code, correct the candidate, and try again. Do not delete `blockly/main.json.bak`, `blockly/main.invalid.json`, or recovery history.
-
-Keep the existing board unless the user explicitly requests a board change. Use the generator output locations described in [workspace-format.md](references/workspace-format.md); do not hand-edit generated source as a substitute for workspace changes.
+1. Read `blockly/main.json` before changing or explaining a workspace.
+2. For edits or format questions, read [workspace-format.md](references/workspace-format.md) and [workspace.schema.json](references/workspace.schema.json).
+3. When block metadata matters, use the [block contract index](references/block-contract.json) `shards[].blockTypes` to locate types; read only the referenced category shard files, extracting matching `blocks[]` entries. The selected board's `variants[board]` defines legal fields, inputs, connections, extra state, and minimal state.
+4. Before edits or when relevant to an answer, read [project-notes.md](project-notes.md) if present; preserve its constraints.
+5. Edit the complete `blockly/main.json` document. Never invent block metadata or change the board without a request. Let Singular Blockly generate source at the paths in [workspace-format.md](references/workspace-format.md).
+6. After writing, wait for runtime validation; report it as unverified if unavailable. If quarantined, inspect `blockly/.singular-blockly/workspace-validation-status.json`, correct the candidate, and retry. Never delete `blockly/main.json.bak`, `blockly/main.invalid.json`, or recovery history.

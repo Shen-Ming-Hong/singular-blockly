@@ -1133,6 +1133,11 @@ window.languageManager.loadMessages('ru', {
 
 	// === RC Подключение ===
 	CATEGORY_RC: 'RC Подключение',
+	ESP32_RC_LABEL_CYBERBRICK: 'Пульт CyberBrick',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'Укажи тот же ID пары (1–255) и канал (1–11), что и на передатчике CyberBrick. Wi-Fi/MQTT может сменить канал и прервать RC-связь.',
+	ESP32_RC_WAIT_TOOLTIP: 'Жди корректный RC-сигнал CyberBrick; после истечения времени продолжай работу.',
+	ESP32_RC_ONLY_WARNING: 'Этот RC-блок работает только на ESP32 DevKit.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'Инициализация RC отключает Wi-Fi. Сначала инициализируйте RC, затем подключите Wi-Fi к точке доступа с тем же каналом, что и у RC. Другой канал прерывает приём сигнала RC.',
 	RC_LABEL_MASTER: '📡 Передатчик',
 	RC_LABEL_SLAVE: '📻 Приёмник',
 	RC_LABEL_DATA: '📊 Данные',

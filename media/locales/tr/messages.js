@@ -1137,6 +1137,11 @@ window.languageManager.loadMessages('tr', {
 
 	// === RC Bağlantı ===
 	CATEGORY_RC: 'RC Bağlantı',
+	ESP32_RC_LABEL_CYBERBRICK: 'CyberBrick kumanda',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'Eşleştirme kimliği (1–255) ve kanal (1–11), CyberBrick vericisiyle aynı olmalı. Wi-Fi/MQTT kanalı değiştirebilir ve RC bağlantısını kesebilir.',
+	ESP32_RC_WAIT_TOOLTIP: 'Geçerli bir CyberBrick RC sinyali bekle; süre dolunca devam et.',
+	ESP32_RC_ONLY_WARNING: 'Bu RC bloğu yalnızca ESP32 DevKit üzerinde çalışır.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'RC başlatma Wi-Fi bağlantısını keser. Önce RC’yi başlat, sonra RC ile aynı kanala sabitlenmiş bir Wi-Fi erişim noktasına bağlan. Farklı kanal RC alımını durdurur.',
 	RC_LABEL_MASTER: '📡 Verici',
 	RC_LABEL_SLAVE: '📻 Alıcı',
 	RC_LABEL_DATA: '📊 Veri',

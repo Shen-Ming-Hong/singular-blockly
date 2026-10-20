@@ -143,6 +143,18 @@
       ]
     },
     {
+      "category": "esp32_rc",
+      "path": "block-contract/esp32_rc.json",
+      "blockTypes": [
+        "esp32_rc_get_joystick",
+        "esp32_rc_get_joystick_mapped",
+        "esp32_rc_is_button_pressed",
+        "esp32_rc_is_connected",
+        "esp32_rc_receiver_init",
+        "esp32_rc_wait_connection"
+      ]
+    },
+    {
       "category": "functions",
       "path": "block-contract/functions.json",
       "blockTypes": [

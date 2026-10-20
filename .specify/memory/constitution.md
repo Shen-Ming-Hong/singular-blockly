@@ -1,4 +1,20 @@
 <!--
+SYNC IMPACT REPORT — 2026-09-24
+==============================
+Version Change: 1.7.0 → 1.8.0
+Modified Principles:
+  - VII. Comprehensive Test Coverage: clarify when tests are required
+  - X. Professional Release Management: align with annotated-tag GitHub Actions release
+Added Sections:
+  - Development Standards / Spec-Driven Development: define the full SDD threshold
+Removed Sections:
+  - Obsolete local VSIX and gh release create checklist
+Templates Status:
+  - Spec Kit templates read the constitution at runtime; no template changes
+Follow-up TODOs: None
+-->
+
+<!--
 SYNC IMPACT REPORT
 ==================
 Version Change: 1.6.0 → 1.7.0
@@ -132,7 +148,7 @@ Code MUST strive for 100% test coverage with safe, maintainable test design. Thi
 -   Manual test scenarios are explicitly documented in the feature specification
 -   Manual tests are executed and results recorded after each significant change
 -   The complexity and ROI of automating WebView tests (requiring Playwright/WebdriverIO setup) outweigh the benefits for the specific feature
--   Core business logic remains independently testable with 100% coverage
+-   Core business logic remains independently testable and follows the documented coverage target
 
 **Rationale for Exception**: VSCode Extension WebView automation requires significant infrastructure (headless browser, extension host simulation) with limited reusability. For educational tools like Blockly visual programming, manual testing of drag-and-drop interactions provides sufficient quality assurance while maintaining development velocity.
 
@@ -197,76 +213,18 @@ All specifications, implementation plans, and user-facing documentation MUST be 
 
 ### X. Professional Release Management
 
-All version releases MUST follow a standardized, automated workflow with comprehensive bilingual documentation to ensure quality distribution and user accessibility. This means:
+正式版本 MUST 遵循語意化版本，並在同一個待合併 PR 中同步更新 `package.json`、
+`package-lock.json` 與繁體中文／英文並列的 `CHANGELOG.md`。發布前 MUST 完成
+本地審查、使用者發布核准、PR 的必要 CI／CodeQL 檢查及受保護分支合併。
 
--   **Semantic Versioning Compliance**: Follow MAJOR.MINOR.PATCH strictly (breaking/new feature/bugfix)
--   **Version Synchronization**: Update `package.json` version and create CHANGELOG entry before tagging
--   **VSIX Packaging**: Build production bundle (`npm run package`) and generate VSIX (`npx @vscode/vsce package`) for offline installation
--   **Bilingual Release Notes**: Create comprehensive documentation in both Traditional Chinese and English covering:
-    -   Major features and changes (with technical details)
-    -   Test metrics breakdown (unit/integration/manual/hardware)
-    -   Internationalization status (supported languages)
-    -   Installation methods (multiple approaches with step-by-step guides)
-    -   Related documentation links (specs, changelog, project home)
-    -   **⚠️ CRITICAL: Every section MUST have parallel bilingual content** - each heading, paragraph, and list item must present both languages side-by-side or in clearly labeled blocks (繁體中文 followed by English), not just Chinese-only content
--   **GitHub Release Publication**: Use `gh release create` CLI to publish releases with:
-    -   Descriptive title format: `[Project Name] vX.Y.Z - [Feature Highlight 中文] / [Feature Highlight English]`
-    -   VSIX file as downloadable asset (with SHA256 for verification)
-    -   Markdown-formatted release notes with emoji markers for readability
--   **Asset Management**: Host VSIX on GitHub Releases (not in repository), exclude via `.gitignore: *.vsix`
--   **Verification Steps**: Confirm release URL accessibility, asset download functionality, and release notes rendering
+合併後，正式發布 MUST 只以指向該合併提交的 annotated `vX.Y.Z` tag 觸發
+`.github/workflows/publish.yml`。GitHub Actions MUST 建置並重用同一份 VSIX，
+發布至 GitHub Releases、VS Code Marketplace 與 Open VSX；不得在本機建立
+正式 VSIX 或執行 `gh release create`。完成後 MUST 驗證發布端版本一致、
+GitHub Release 資產可下載且 SHA-256 正確，並確認發布說明的雙語內容。
 
-**Rationale**: Professional release management establishes credibility, enables offline installation for restricted environments (企業內網, 教育環境), and serves both Chinese and international users. Automating the workflow via gh CLI reduces human error and ensures consistency. Bilingual documentation maximizes accessibility while maintaining the project's Traditional Chinese focus (Principle IX). VSIX distribution provides an alternative to VS Code Marketplace for users with network restrictions.
-
-**Release Workflow Checklist**:
-
-1. **Pre-Release Validation**:
-
-    - All feature PRs merged to master branch
-    - Feature branches deleted (local + remote)
-    - Repository cleaned of redundant/temporary files
-    - All tests passing (unit, integration, manual, hardware)
-    - `.gitignore` updated to prevent development artifacts
-
-2. **Version Management**:
-
-    - Update `package.json` version following semantic versioning
-    - Move CHANGELOG "未發布" section to new dated version section
-    - Add comprehensive bilingual entries (新增 Added, 變更 Changed, 測試 Tests, 維護 Maintenance)
-    - Commit: `git commit -m "chore(release): 發布版本 X.Y.Z"`
-
-3. **Build and Package**:
-
-    - Run production build: `npm run package` (webpack production mode)
-    - Generate VSIX: `npx @vscode/vsce package`
-    - Verify output: Check file size, file count, no critical warnings
-
-4. **Git Tagging**:
-
-    - Create annotated tag: `git tag -a vX.Y.Z -m "Release version X.Y.Z\n\n[detailed message]"`
-    - Push commit and tag: `git push origin master --follow-tags`
-
-5. **GitHub Release Creation**:
-
-    - Create bilingual release notes file (temporary, will be deleted)
-    - **⚠️ Pre-publish verification**: Review release notes to ensure EVERY section has both 繁體中文 AND English content - reject if any section is monolingual
-    - Execute: `gh release create vX.Y.Z --title "..." --notes-file "release-notes.md" "*.vsix#Singular Blockly Extension Package"`
-    - Verify: Check release URL, asset availability, notes rendering, **bilingual completeness**
-    - Cleanup: Remove temporary release notes file
-
-6. **Post-Release**:
-    - Announce release in project channels (if applicable)
-    - Monitor for user feedback and issues
-    - Update documentation if installation methods changed
-
-**Benefits**:
-
--   **User Accessibility**: Offline installation support for restricted networks
--   **International Reach**: Bilingual documentation serves global audience
--   **Distribution Reliability**: GitHub Releases provides versioned, persistent download links
--   **Quality Assurance**: Structured checklist prevents incomplete releases
--   **Automation Ready**: gh CLI workflow enables future CI/CD integration
--   **Professional Image**: Comprehensive release notes establish project credibility
+**Rationale**: 由同一個 tag 與 CI 產物發布，可避免本機與市集產物不同，並保留
+可追溯的驗證證據。GitHub Release 的 VSIX 同時提供離線安裝管道。
 
 ### XI. Agent Skills Architecture
 
@@ -284,6 +242,22 @@ The project MUST use Agent Skills as a structured, reusable capability layer whi
 **Rationale**: Agent Skills provide reusable guidance without requiring each user to operate an external server or duplicate project knowledge across AI products. Separating contributor workflow Skills from generated end-user Skills keeps ownership clear, while one canonical contract and thin compatibility entry points prevent behavioral drift. Progressive disclosure, content ownership, and validation requirements protect both context efficiency and project integrity.
 
 ## Development Standards
+
+### Spec-Driven Development
+
+新增或改動跨 Extension Host／WebView 的契約、Blockly 積木與產生器契約、
+工作區持久格式、板型上傳流程、受管理 Runtime、安全邊界或重大相容性時，
+MUST 先檢查既有 `specs/`，並以完整 Spec Kit 流程定義可觀察的需求與驗收條件。
+文件、翻譯及不改變契約的獨立錯誤修正 MAY 依對應維護技能處理；重大依賴升級
+MUST 先依實際影響判定是否需要完整 SDD。
+
+完整流程依序為 `specify`、`clarify`、`plan`、`tasks`、`analyze`、
+`implement`、`converge`；需要品質檢查表時使用 `checklist`。開始新的完整 SDD
+工作時 MUST 查核 Spec Kit CLI 與專案整合狀態，並對照官方穩定版；是否升級依
+相容性與本次需求決定，不因每次接續對話而自動升級。
+
+**Rationale**: 以契約變更界定完整 SDD，可讓跨執行環境的功能先建立共同驗收依據，
+同時避免一般維護產生不必要的規格文件。
 
 ### Code Quality
 
@@ -318,7 +292,7 @@ The project MUST use Agent Skills as a structured, reusable capability layer whi
 -   Design testable code with pure functions and clear module boundaries (Principle VIII)
 -   Focus on integration tests for file operations and webview communication
 -   Use mocks and dependency injection for VSCode API and external dependencies
--   Tests are OPTIONAL unless explicitly required by feature specification
+-   Non-trivial behavior changes MUST have focused automated tests; documentation-only changes need no new tests
 -   Validate both happy paths and error scenarios comprehensively
 -   Use timeouts and exit conditions to prevent test suite hangs
 
@@ -438,4 +412,4 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.7.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2026-08-12
+**Version**: 1.8.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2026-09-24

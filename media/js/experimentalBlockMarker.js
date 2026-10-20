@@ -841,6 +841,11 @@ function setupBlocklyChangeListener() {
 	}
 	experimentalMarkerWorkspaceListeners.add(workspace);
 	workspace.addChangeListener(event => {
+		if (event.type === Blockly.Events.TOOLBOX_ITEM_SELECT) {
+			window.collectExperimentalBlocksFromFlyout();
+			return;
+		}
+
 		// 當積木類型變更或積木創建/刪除時，更新標記
 		if (
 			(event.type === Blockly.Events.BLOCK_CHANGE ||

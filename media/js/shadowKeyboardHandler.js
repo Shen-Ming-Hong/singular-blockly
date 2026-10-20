@@ -86,7 +86,7 @@
 
 	/** Request an AI suggestion from the Extension Host. */
 	function requestSuggestion() {
-		if (!vsCodeApi) return;
+		if (!vsCodeApi || !config || config.enabled !== true) return;
 		var workspace = typeof Blockly !== 'undefined' && workspaceProvider ? workspaceProvider() : null;
 		if (!workspace) return;
 
@@ -128,14 +128,14 @@
 			return canHandleShortcut(workspace, true);
 		};
 		var triggerPrecondition = function (workspace) {
-			return canHandleShortcut(workspace, false);
+			return Boolean(config && config.enabled === true && canHandleShortcut(workspace, false));
 		};
 
 		registerShortcut(registry, {
 			name: 'singular.shadowSuggestion.trigger',
 			preconditionFn: triggerPrecondition,
 			callback: function (workspace, event) {
-				if (shouldIgnoreShortcut(event)) return false;
+				if (shouldIgnoreShortcut(event) || !triggerPrecondition(workspace)) return false;
 				event.preventDefault();
 				requestSuggestion();
 				return true;

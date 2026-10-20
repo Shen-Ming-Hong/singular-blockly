@@ -17,6 +17,21 @@
 			"env": {
 				"VSCODE_DEBUG_FILTER": "singular-blockly*"
 			}
+		},
+		{
+			"name": "Run Extension (Insiders Compatibility - no WebView debug)",
+			"type": "extensionHost",
+			"request": "launch",
+			"args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
+			"preLaunchTask": "${defaultBuildTask}",
+			// Keeps Extension Host breakpoints; WebView JavaScript is not auto-attached.
+			"debugWebviews": false,
+			"trace": true,
+			"internalConsoleOptions": "openOnSessionStart",
+			"env": {
+				"VSCODE_DEBUG_FILTER": "singular-blockly*"
+			}
 		}
 	]
 }

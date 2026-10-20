@@ -1,0 +1,46 @@
+{
+    "kind": "category",
+    "name": "%{CATEGORY_RC}",
+    "colour": "160",
+    "contents": [
+        {
+            "kind": "label",
+            "text": "%{ESP32_RC_LABEL_CYBERBRICK}"
+        },
+        {
+            "kind": "block",
+            "type": "esp32_rc_receiver_init",
+            "inputs": {
+                "PAIR_ID": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": { "NUM": 1 }
+                    }
+                }
+            },
+            "fields": { "CHANNEL": 1 }
+        },
+        { "kind": "block", "type": "esp32_rc_wait_connection" },
+        { "kind": "block", "type": "esp32_rc_is_connected" },
+        { "kind": "block", "type": "esp32_rc_get_joystick" },
+        {
+            "kind": "block",
+            "type": "esp32_rc_get_joystick_mapped",
+            "inputs": {
+                "MIN": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": { "NUM": -100 }
+                    }
+                },
+                "MAX": {
+                    "shadow": {
+                        "type": "math_number",
+                        "fields": { "NUM": 100 }
+                    }
+                }
+            }
+        },
+        { "kind": "block", "type": "esp32_rc_is_button_pressed" }
+    ]
+}

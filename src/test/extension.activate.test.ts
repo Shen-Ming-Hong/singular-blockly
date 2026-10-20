@@ -7,6 +7,7 @@
 import assert = require('assert');
 import * as path from 'path';
 import * as sinon from 'sinon';
+import * as vscode from 'vscode';
 import { describe, it, before, beforeEach, after, afterEach } from 'mocha';
 import { activate, deactivate, _setVSCodeApi, _reset } from '../extension';
 import * as logging from '../services/logging';
@@ -15,6 +16,7 @@ import { WebViewManager } from '../webview/webviewManager';
 import { ProjectSkillService } from '../services/projectSkillService';
 import { WorkspaceCandidateService } from '../services/workspaceCandidateService';
 import { SettingsManager } from '../services/settingsManager';
+import { AIModelManager } from '../services/aiModelManager';
 
 describe('Extension activate', () => {
 	let vscodeMock: VSCodeMock;
@@ -93,6 +95,99 @@ describe('Extension activate', () => {
 		// Note: AIStatusBar uses `vscode` directly (not injectable via _setVSCodeApi) and is only
 		// created when Copilot is available (tier !== 'none'). In the unit test environment
 		// there is no Copilot, so createStatusBarItem is not called here.
+	});
+
+	it('makes the editor command usable while Copilot initialization is still pending', async () => {
+		const previousEnvironment = process.env.NODE_ENV;
+		let resolveInitialization!: () => void;
+		const initialize = sinon.stub(AIModelManager.prototype, 'initialize').returns(
+			new Promise<void>(resolve => {resolveInitialization = resolve;})
+		);
+		const inject = sinon.spy(WebViewManager.prototype, 'setAIModelManager');
+		const showEditor = sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('cancelled');
+		try {
+			process.env.NODE_ENV = 'development';
+			await activate(context);
+			assert.strictEqual(initialize.callCount, 1);
+			const open = vscodeMock.commands.registerCommand.getCalls()
+				.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+			assert.ok(open, 'The ordinary editor command must not wait for a model');
+			await open.args[1]();
+			assert.strictEqual(showEditor.callCount, 1);
+			assert.strictEqual(inject.callCount, 1, 'An early WebView receives the pending manager for later readiness updates');
+			resolveInitialization();
+			await new Promise(resolve => setImmediate(resolve));
+			assert.strictEqual(inject.callCount, 1, 'Readiness updates must not recreate the editor or its AI service');
+		} finally {
+			if (previousEnvironment === undefined) {delete process.env.NODE_ENV;}
+			else {process.env.NODE_ENV = previousEnvironment;}
+		}
+	});
+
+	it('keeps ordinary commands available when AI initialization rejects', async () => {
+		const previousEnvironment = process.env.NODE_ENV;
+		sinon.stub(AIModelManager.prototype, 'initialize').rejects(new Error('Copilot unavailable'));
+		try {
+			process.env.NODE_ENV = 'development';
+			await activate(context);
+			await new Promise(resolve => setImmediate(resolve));
+			assert.ok(vscodeMock.commands.registerCommand.getCalls()
+				.some((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit'));
+			assert.strictEqual(vscodeMock.window.showErrorMessage.called, false);
+		} finally {
+			if (previousEnvironment === undefined) {delete process.env.NODE_ENV;}
+			else {process.env.NODE_ENV = previousEnvironment;}
+		}
+	});
+
+	it('disposes pending AI services before a delayed initialization settles', async () => {
+		const previousEnvironment = process.env.NODE_ENV;
+		let resolveInitialization!: () => void;
+		sinon.stub(AIModelManager.prototype, 'initialize').returns(
+			new Promise<void>(resolve => {resolveInitialization = resolve;})
+		);
+		const dispose = sinon.spy(AIModelManager.prototype, 'dispose');
+		try {
+			process.env.NODE_ENV = 'development';
+			await activate(context);
+			deactivate();
+			assert.ok(dispose.called);
+			const calls = vscodeMock.commands.registerCommand.callCount;
+			resolveInitialization();
+			await new Promise(resolve => setImmediate(resolve));
+			assert.strictEqual(vscodeMock.commands.registerCommand.callCount, calls);
+		} finally {
+			if (previousEnvironment === undefined) {delete process.env.NODE_ENV;}
+			else {process.env.NODE_ENV = previousEnvironment;}
+		}
+	});
+
+	it('rolls back partial AI UI setup without blocking the ordinary editor command', async () => {
+		const previousEnvironment = process.env.NODE_ENV;
+		const firstCommandDispose = sinon.stub();
+		const statusDispose = sinon.stub();
+		sinon.stub(vscode.window, 'createStatusBarItem').returns({ dispose: statusDispose } as any);
+		const registerAICommand = sinon.stub(vscode.commands, 'registerCommand');
+		registerAICommand.onFirstCall().returns({ dispose: firstCommandDispose });
+		registerAICommand.onSecondCall().throws(new Error('AI command registration failed'));
+		const dispose = sinon.spy(AIModelManager.prototype, 'dispose');
+		const inject = sinon.spy(WebViewManager.prototype, 'setAIModelManager');
+		sinon.stub(WebViewManager.prototype, 'createAndShowWebView').resolves('cancelled');
+		try {
+			process.env.NODE_ENV = 'development';
+			await activate(context);
+			assert.strictEqual(firstCommandDispose.callCount, 1);
+			assert.strictEqual(statusDispose.callCount, 1);
+			assert.strictEqual(dispose.callCount, 1);
+			const open = vscodeMock.commands.registerCommand.getCalls()
+				.find((call: any) => call.args[0] === 'singular-blockly.openBlocklyEdit');
+			assert.ok(open);
+			await open.args[1]();
+			assert.strictEqual(inject.called, false, 'Failed setup must not leave a global manager');
+		} finally {
+			if (previousEnvironment === undefined) {delete process.env.NODE_ENV;}
+			else {process.env.NODE_ENV = previousEnvironment;}
+		}
 	});
 
 	it('does not install Skills during activation, including for existing Blockly workspace folders', async () => {

@@ -23,45 +23,39 @@ export class AIStatusBar implements vscode.Disposable {
 	private readonly statusBarItem: vscode.StatusBarItem;
 	private readonly disposables: vscode.Disposable[] = [];
 	private quotaExhausted = false;
+	private disposed = false;
 	private _previousText: string | undefined;
 
-	constructor(
-		private readonly aiModelManager: AIModelManager,
-		context: vscode.ExtensionContext
-	) {
+	constructor(private readonly aiModelManager: AIModelManager) {
 		this.statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 		this.statusBarItem.command = 'singular-blockly.showAIStatusMenu';
 
-		// Register commands
-		this.disposables.push(
-			vscode.commands.registerCommand('singular-blockly.showAIStatusMenu', () => this.showStatusMenu()),
-			vscode.commands.registerCommand('singular-blockly.toggleAIEnabled', () => this.toggleAIEnabled()),
-			vscode.commands.registerCommand('singular-blockly.selectAIModel', () => this.selectModel()),
-			vscode.commands.registerCommand('singular-blockly.openAISettings', () =>
+		try {
+			// Record ownership after each registration, so partial setup can be rolled back.
+			this.disposables.push(vscode.commands.registerCommand('singular-blockly.showAIStatusMenu', () => this.showStatusMenu()));
+			this.disposables.push(vscode.commands.registerCommand('singular-blockly.toggleAIEnabled', () => this.toggleAIEnabled()));
+			this.disposables.push(vscode.commands.registerCommand('singular-blockly.selectAIModel', () => this.selectModel()));
+			this.disposables.push(vscode.commands.registerCommand('singular-blockly.openAISettings', () =>
 				vscode.commands.executeCommand('workbench.action.openSettings', 'singularBlockly.ai')
-			)
-		);
-		context.subscriptions.push(...this.disposables);
-
-		// Subscribe to dynamic updates
-		this.disposables.push(
-			this.aiModelManager.onTierChanged(() => {
+			));
+			this.disposables.push(this.aiModelManager.onDidChangeReadiness(() => this.update()));
+			this.disposables.push(this.aiModelManager.onTierChanged(() => {
 				this.quotaExhausted = false;
 				this.update();
-			}),
-			this.aiModelManager.onQuotaExhausted(() => {
+			}));
+			this.disposables.push(this.aiModelManager.onQuotaExhausted(() => {
 				this.quotaExhausted = true;
 				this.update();
-			}),
-			vscode.workspace.onDidChangeConfiguration(e => {
-				if (e.affectsConfiguration('singularBlockly.ai')) {
-					this.update();
-				}
-			})
-		);
-
-		this.update();
-		log('AIStatusBar initialized', 'info');
+			}));
+			this.disposables.push(vscode.workspace.onDidChangeConfiguration(e => {
+				if (e.affectsConfiguration('singularBlockly.ai')) {this.update();}
+			}));
+			this.update();
+			log('AIStatusBar initialized', 'info');
+		} catch (error) {
+			this.dispose();
+			throw error;
+		}
 	}
 
 	/**
@@ -70,7 +64,7 @@ export class AIStatusBar implements vscode.Disposable {
 	private update(): void {
 		const tier = this.aiModelManager.getTier();
 
-		if (tier === 'none') {
+		if (tier === 'none' || !this.aiModelManager.isReady()) {
 			this.statusBarItem.hide();
 			return;
 		}
@@ -133,7 +127,7 @@ export class AIStatusBar implements vscode.Disposable {
 		const modelSetting = vscode.workspace.getConfiguration('singularBlockly.ai').get<string>('model', 'gpt-4o-mini');
 
 		const items: vscode.QuickPickItem[] = [
-			{ label: `$(sparkle) Status: Ready (${tierLabel})`, kind: vscode.QuickPickItemKind.Default, description: '' },
+			{ label: `$(sparkle) Status: ${this.aiModelManager.isReady() ? 'Ready' : TIER_LABELS.none} (${tierLabel})`, kind: vscode.QuickPickItemKind.Default, description: '' },
 			{ label: '', kind: vscode.QuickPickItemKind.Separator },
 			{ label: '$(rocket) Change Model...', description: modelSetting },
 			{ label: '$(settings-gear) Edit Settings...', description: '' },
@@ -210,12 +204,13 @@ export class AIStatusBar implements vscode.Disposable {
 
 		const family = selected.description!;
 		await vscode.workspace.getConfiguration('singularBlockly.ai').update('model', family, vscode.ConfigurationTarget.Global);
-		await this.aiModelManager.selectModel(family);
+		// The configuration listener invalidates and selects the new model in the background.
 		log(`AI model changed to ${family}`, 'info');
 	}
 
 	/** Show loading state in status bar during AI request */
 	showLoading(): void {
+		if (this.disposed) {return;}
 		if (this._previousText === undefined) {
 			this._previousText = this.statusBarItem.text;
 		}
@@ -226,6 +221,7 @@ export class AIStatusBar implements vscode.Disposable {
 
 	/** Restore status bar to normal state */
 	hideLoading(): void {
+		if (this.disposed) {return;}
 		// Always restore to the sparkle icon, regardless of _previousText.
 		// Guards against stale loading state caused by overlapping requests.
 		this.statusBarItem.text = this._previousText ?? '$(sparkle)';
@@ -234,6 +230,8 @@ export class AIStatusBar implements vscode.Disposable {
 	}
 
 	dispose(): void {
+		if (this.disposed) {return;}
+		this.disposed = true;
 		this.statusBarItem.dispose();
 		for (const d of this.disposables) {
 			d.dispose();

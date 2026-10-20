@@ -1,15 +1,15 @@
 schema_version: "1.0"
 workflow:
   id: "speckit"
-  name: "Full SDD Cycle"
-  version: "1.0.0"
+  name: "Core SDD Steps"
+  version: "1.1.0"
   author: "GitHub"
-  description: "Runs specify → plan → tasks → implement with review gates"
+  description: "Runs core steps with review gates; use AGENTS.md for the full SDD sequence"
 
 requires:
   speckit_version: ">=0.7.2"
   integrations:
-    any: ["copilot", "claude", "gemini"]
+    any: ["codex", "copilot", "claude", "gemini"]
 
 inputs:
   spec:
@@ -18,8 +18,8 @@ inputs:
     prompt: "Describe what you want to build"
   integration:
     type: string
-    default: "copilot"
-    prompt: "Integration to use (e.g. claude, copilot, gemini)"
+    default: "codex"
+    prompt: "Integration to use (e.g. codex, copilot, claude, gemini)"
   scope:
     type: string
     default: "full"

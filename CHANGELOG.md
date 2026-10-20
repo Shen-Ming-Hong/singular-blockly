@@ -8,6 +8,45 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.89.0] - 2026-10-01
+
+### ✨ 新增功能 Features
+
+- 新增 ESP32 DevKit 實驗性 RC 接收積木，支援 CyberBrick ESP-NOW 的六軸、四按鈕、限時等待與連線狀態；工具箱、備份預覽、15 語系及產品 Skill 合約同步支援
+  Added experimental ESP32 DevKit RC receiver blocks for CyberBrick ESP-NOW, including six joystick axes, four buttons, timed connection waiting, and connection status, with toolbox, backup preview, 15 locales, and project Skill contract support
+
+### 🐛 修復 Bug Fixes
+
+- RC 接收拒收越界搖桿與非法按鈕封包，不更新資料或延長連線有效時間；補齊孤立積木警告，避免板型刷新清除其他警告
+  RC receivers now reject out-of-range joystick values and invalid button packets without updating data or extending connection validity; orphan block warnings are preserved across board-warning refreshes
+- Wi-Fi 連線積木恢復自動重連，並在 RC 與 Wi-Fi 並存時顯示初始化順序及同頻道要求
+  Wi-Fi connection blocks now restore automatic reconnection, and RC/Wi-Fi coexistence warnings explain initialization order and the shared-channel requirement
+- Copilot 模型初始化改在背景執行，避免阻塞一般編輯命令；停用 AI 或關閉編輯器時取消請求並隔離晚回結果
+  Copilot model initialization now runs in the background without blocking ordinary editor commands; disabling AI or closing the editor cancels requests and discards late results
+- 修正 RC 實驗標記在工作區載入、語言重建與飛出選單的刷新，並讓實驗提醒圖示在工具列收合時持續顯示
+  Fixed RC experimental marker refreshes after workspace loading, language rebuilds, and flyout selection, and kept the experimental indicator visible when the toolbar is collapsed
+
+### 🔧 維護 Maintenance
+
+- 精簡貢獻者與產品 Skill 指引，補充背景測試、AI 生命週期及獨立警告 ID 的維護規則
+  Simplified contributor and project Skill guidance and documented background testing, AI lifecycle handling, and independent warning IDs
+
+
+## [0.88.3] - 2026-09-30
+
+### 🔒 安全性 Security
+
+- 將 `@cloudflare/vitest-plugin` 升級至 1.3.3、`wrangler` 升級至 4.144.0，並將間接相依 `undici` 從 7.29.0 升級至 7.29.1，修復 WebSocket 拒絕服務（CVE-2026-85024、GHSA-rfgv-xxqx-mfg5、Dependabot Alert #111）、TLS 驗證繞過（GHSA-w293-vg96-wgc3）及其餘 npm 安全公告
+  Upgraded `@cloudflare/vitest-plugin` to 1.3.3 and `wrangler` to 4.144.0, updating transitive `undici` from 7.29.0 to 7.29.1 to fix WebSocket denial of service (CVE-2026-85024, GHSA-rfgv-xxqx-mfg5, Dependabot Alert #111), TLS validation bypass (GHSA-w293-vg96-wgc3), and other npm advisories
+- 將間接執行階段相依 `ip-address` 從 10.5.0 升級至 10.7.2，修復 NAT64 分類造成的 SSRF 風險（CVE-2026-101910、Dependabot Alert #112）及其他位址分類與解析漏洞
+  Upgraded transitive runtime dependency `ip-address` from 10.5.0 to 10.7.2, fixing NAT64 classification SSRF risk (CVE-2026-101910, Dependabot Alert #112) and other address classification and parsing vulnerabilities
+- 將間接開發相依 `js-yaml` 從 5.2.3 升級至 5.4.2（同步提高 override 下限），修復 merge key 處理造成的 CPU 拒絕服務（GHSA-r3ph-w7gj-g6xm、Dependabot Alert #113）
+  Upgraded transitive development dependency `js-yaml` from 5.2.3 to 5.4.2 and raised the override minimum, fixing CPU denial of service in merge key handling (GHSA-r3ph-w7gj-g6xm, Dependabot Alert #113)
+- 將 `brace-expansion` 的 2.x／5.x override 分別升級至 2.1.7／5.0.12，修復巢狀大括號遞迴與展開造成的高風險拒絕服務（GHSA-q2hr-2g5m-vwhr、GHSA-qhr7-859c-m2p7、GHSA-6j4f-fj2g-mc7p）
+  Upgraded the `brace-expansion` 2.x and 5.x overrides to 2.1.7 and 5.0.12, fixing high-severity denial of service from nested brace recursion and expansion (GHSA-q2hr-2g5m-vwhr, GHSA-qhr7-859c-m2p7, GHSA-6j4f-fj2g-mc7p)
+- 將 `fast-uri` override 從 3.1.7 升級至 3.1.8，修復百分比編碼主機名稱的大小寫正規化漏洞（GHSA-hrr3-gc8f-f4qj）
+  Upgraded the `fast-uri` override from 3.1.7 to 3.1.8, fixing inconsistent case normalization of percent-encoded hostnames (GHSA-hrr3-gc8f-f4qj)
+
 ## [0.88.2] - 2026-09-19
 
 ### 🔒 安全性 Security

@@ -15,7 +15,10 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 | Package  | Severity | Advisory | Reason                                                    |
 | -------- | -------- | -------- | --------------------------------------------------------- |
-| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.88.2 |
+| _(none)_ | —        | —        | All known vulnerabilities have been resolved as of 0.88.3 |
+
+> **0.88.3 更新 Update**: 升級 `undici`、`ip-address`、`js-yaml`、`brace-expansion` 與 `fast-uri` 至安全版本，修復 Dependabot Alerts #111–#113 及本地 npm 安全公告；`npm audit` 顯示 0 vulnerabilities，Code Scanning 在 `master` 為 0 個 open alert。
+> Upgraded `undici`, `ip-address`, `js-yaml`, `brace-expansion`, and `fast-uri` to safe versions, addressing Dependabot Alerts #111–#113 and local npm advisories; `npm audit` reports 0 vulnerabilities, and Code Scanning has 0 open alerts on `master`.
 
 > **0.88.2 更新 Update**: 間接開發相依 `sharp` override 至 `0.35.4`，修復特製圖片可能觸發越界寫入的高風險漏洞（GHSA-rgj7-g3m4-5g8c），並關閉 Dependabot Alert #110；本地 `npm audit` 顯示 0 vulnerabilities。
 > Transitive development dependency `sharp` was overridden to `0.35.4`, fixing a high-severity out-of-bounds write vulnerability triggered by crafted images (GHSA-rgj7-g3m4-5g8c) and closing Dependabot Alert #110; local `npm audit` reports 0 vulnerabilities.
@@ -73,4 +76,4 @@ Please report security vulnerabilities by opening a [GitHub Security Advisory](h
 
 ---
 
-_Last updated: 2026-09-19_
+_Last updated: 2026-09-30_

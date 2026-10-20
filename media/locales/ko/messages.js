@@ -1129,6 +1129,11 @@ window.languageManager.loadMessages('ko', {
 
 	// === RC 연결 ===
 	CATEGORY_RC: 'RC 연결',
+	ESP32_RC_LABEL_CYBERBRICK: 'CyberBrick 리모컨',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: '페어 ID(1~255)와 채널(1~11)을 CyberBrick 송신기와 같게 설정해요. Wi-Fi/MQTT가 채널을 바꾸면 RC 연결이 끊길 수 있어요.',
+	ESP32_RC_WAIT_TOOLTIP: '유효한 CyberBrick RC 신호를 기다려요. 제한 시간이 지나면 계속 실행해요.',
+	ESP32_RC_ONLY_WARNING: '이 RC 블록은 ESP32 DevKit에서만 사용할 수 있어요.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'RC를 초기화하면 Wi-Fi 연결이 끊겨요. RC를 먼저 초기화한 다음 RC와 같은 채널로 고정한 Wi-Fi 액세스 포인트에 연결하세요. 채널이 다르면 RC 신호를 받을 수 없어요.',
 	RC_LABEL_MASTER: '📡 송신기',
 	RC_LABEL_SLAVE: '📻 수신기',
 	RC_LABEL_DATA: '📊 데이터 읽기',

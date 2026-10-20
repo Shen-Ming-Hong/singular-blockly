@@ -1138,6 +1138,11 @@ window.languageManager.loadMessages('bg', {
 
 	// === RC Връзка ===
 	CATEGORY_RC: 'RC Връзка',
+	ESP32_RC_LABEL_CYBERBRICK: 'Дистанционно CyberBrick',
+	ESP32_RC_RECEIVER_INIT_TOOLTIP: 'Задай същия ID за сдвояване (1–255) и канал (1–11) като на предавателя CyberBrick. Wi-Fi/MQTT може да смени канала и да прекъсне RC връзката.',
+	ESP32_RC_WAIT_TOOLTIP: 'Изчакай валиден RC сигнал от CyberBrick; продължи след изтичане на времето.',
+	ESP32_RC_ONLY_WARNING: 'Този RC блок работи само с ESP32 DevKit.',
+	ESP32_RC_WIFI_COEXIST_WARNING: 'Инициализирането на RC прекъсва Wi-Fi. Първо инициализирай RC, после свържи Wi-Fi към точка за достъп на същия канал като RC. Друг канал спира приемането на RC сигнала.',
 	RC_LABEL_MASTER: '📡 Предавател',
 	RC_LABEL_SLAVE: '📻 Приемник',
 	RC_LABEL_DATA: '📊 Данни',

@@ -75,6 +75,209 @@ suite('AIModelManager Tests', () => {
 		sandbox.restore();
 	});
 
+	function configureEnabled(enabled: boolean): void {
+		getConfigurationStub.returns({
+			get: (key: string, defaultValue: unknown) => key === 'enabled' ? enabled : defaultValue,
+		} as any);
+	}
+
+	function deferredModels(): { promise: Promise<any[]>; resolve: (models: any[]) => void } {
+		let resolve!: (models: any[]) => void;
+		const promise = new Promise<any[]>(res => { resolve = res; });
+		return { promise, resolve };
+	}
+
+	suite('initialize lifecycle', () => {
+		test('Disabled AI does not discover models or start a timer', async () => {
+			configureEnabled(false);
+			await manager.initialize();
+			assert.ok(selectChatModelsStub.notCalled);
+			assert.strictEqual(manager.isReady(), false);
+			assert.strictEqual(manager.getEffectiveConfig().enabled, false);
+			assert.strictEqual((manager as any)._redetectTimer, undefined);
+		});
+
+		test('Shares pending initialization and becomes ready only after selection', async () => {
+			configureEnabled(true);
+			const clock = sandbox.useFakeTimers();
+			const selected = deferredModels();
+			const model = createMockModel('gpt-4o');
+			selectChatModelsStub.onFirstCall().resolves([model]);
+			selectChatModelsStub.onSecondCall().returns(selected.promise);
+			const events: boolean[] = [];
+			manager.onDidChangeReadiness(ready => events.push(ready));
+
+			const first = manager.initialize();
+			assert.strictEqual(manager.initialize(), first);
+			await clock.tickAsync(0);
+			assert.strictEqual(manager.getTier(), 'free');
+			assert.strictEqual(manager.isReady(), false);
+			assert.strictEqual(manager.getEffectiveConfig().enabled, false);
+			selected.resolve([model]);
+			await first;
+			assert.strictEqual(manager.isReady(), true);
+			assert.strictEqual(manager.getEffectiveConfig().enabled, true);
+			assert.deepStrictEqual(events, [true]);
+			const timer = (manager as any)._redetectTimer;
+			await manager.initialize();
+			assert.strictEqual(selectChatModelsStub.callCount, 2);
+			assert.strictEqual((manager as any)._redetectTimer, timer);
+		});
+
+		test('Discovery timeout returns safely and ignores a late result, then permits retry', async () => {
+			configureEnabled(true);
+			const clock = sandbox.useFakeTimers();
+			const pending = deferredModels();
+			selectChatModelsStub.returns(pending.promise);
+			const initialization = manager.initialize();
+			await clock.tickAsync(9_999);
+			assert.strictEqual(manager.isReady(), false);
+			await clock.tickAsync(1);
+			await initialization;
+			pending.resolve([createMockModel('gpt-4.1')]);
+			await clock.tickAsync(0);
+			assert.strictEqual(manager.getTier(), 'none');
+			assert.strictEqual(manager.getCachedModel(), undefined);
+			selectChatModelsStub.resolves([createMockModel('gpt-4o')]);
+			await manager.initialize();
+			assert.strictEqual(manager.isReady(), true);
+		});
+
+		test('Model selection timeout never reports ready and ignores its late result', async () => {
+			configureEnabled(true);
+			const clock = sandbox.useFakeTimers();
+			const pending = deferredModels();
+			selectChatModelsStub.onFirstCall().resolves([createMockModel('gpt-4o')]);
+			selectChatModelsStub.onSecondCall().returns(pending.promise);
+			const initialization = manager.initialize();
+			await clock.tickAsync(10_000);
+			await initialization;
+			pending.resolve([createMockModel('gpt-4o')]);
+			await clock.tickAsync(0);
+			assert.strictEqual(manager.isReady(), false);
+			assert.strictEqual(manager.getCachedModel(), undefined);
+		});
+
+		for (const failure of ['empty', 'error']) {
+			test(`Selection ${failure} leaves AI unavailable despite a detected tier`, async () => {
+				configureEnabled(true);
+				selectChatModelsStub.onFirstCall().resolves([createMockModel('gpt-4o')]);
+				if (failure === 'empty') { selectChatModelsStub.resolves([]); }
+				else { selectChatModelsStub.rejects(new Error('Selection unavailable')); }
+				await manager.initialize();
+				assert.strictEqual(manager.getTier(), 'free');
+				assert.strictEqual(manager.isReady(), false);
+				assert.strictEqual(manager.getCachedModel(), undefined);
+			});
+		}
+
+		test('Dispose invalidates a pending fallback selection', async () => {
+			configureEnabled(true);
+			const clock = sandbox.useFakeTimers();
+			const pending = deferredModels();
+			selectChatModelsStub.onFirstCall().resolves([createMockModel('gpt-4o')]);
+			selectChatModelsStub.onSecondCall().resolves([]);
+			selectChatModelsStub.onThirdCall().returns(pending.promise);
+			const initialization = manager.initialize();
+			await clock.tickAsync(0);
+			assert.strictEqual(selectChatModelsStub.callCount, 3);
+			manager.dispose();
+			await initialization;
+			pending.resolve([createMockModel('gpt-4o')]);
+			await clock.tickAsync(0);
+			assert.strictEqual(manager.getCachedModel(), undefined);
+			assert.strictEqual(manager.isReady(), false);
+			assert.strictEqual(clock.countTimers(), 0);
+		});
+
+		test('A readiness listener disposing the manager cannot create a late timer', async () => {
+			configureEnabled(true);
+			selectChatModelsStub.resolves([createMockModel('gpt-4o')]);
+			manager.onDidChangeReadiness(ready => { if (ready) { manager.dispose(); } });
+			await manager.initialize();
+			assert.strictEqual(manager.isReady(), false);
+			assert.strictEqual((manager as any)._redetectTimer, undefined);
+		});
+
+		for (const failure of ['empty', 'error']) {
+			test(`Discovery ${failure} leaves AI unavailable and can be retried`, async () => {
+				configureEnabled(true);
+				if (failure === 'empty') { selectChatModelsStub.resolves([]); }
+				else { selectChatModelsStub.rejects(new Error('Provider unavailable')); }
+				await manager.initialize();
+				assert.strictEqual(manager.isReady(), false);
+				assert.strictEqual(manager.getEffectiveConfig().enabled, false);
+				selectChatModelsStub.resolves([createMockModel('gpt-4o')]);
+				await manager.initialize();
+				assert.strictEqual(manager.isReady(), true);
+			});
+		}
+
+		test('Stop settles pending discovery immediately and re-enabling starts a fresh generation', async () => {
+			configureEnabled(true);
+			const clock = sandbox.useFakeTimers();
+			const pending = deferredModels();
+			selectChatModelsStub.returns(pending.promise);
+			const old = manager.initialize();
+			await clock.tickAsync(0);
+			configureEnabled(false);
+			manager.stop();
+			await old;
+			assert.strictEqual(clock.countTimers(), 0);
+			configureEnabled(true);
+			const model = createMockModel('gpt-4o');
+			selectChatModelsStub.resolves([model]);
+			await manager.initialize();
+			pending.resolve([createMockModel('gpt-4.1')]);
+			await clock.tickAsync(0);
+			assert.strictEqual(manager.isReady(), true);
+			assert.strictEqual(manager.getCachedModel(), model);
+			assert.strictEqual(manager.getTier(), 'free');
+			assert.strictEqual(clock.countTimers(), 1);
+		});
+
+		test('Disabling a ready manager resets readiness, cache and timer', async () => {
+			configureEnabled(true);
+			selectChatModelsStub.resolves([createMockModel('gpt-4o')]);
+			await manager.initialize();
+			const events: boolean[] = [];
+			manager.onDidChangeReadiness(ready => events.push(ready));
+			configureEnabled(false);
+			assert.strictEqual(manager.isReady(), false);
+			await manager.initialize();
+			assert.strictEqual(manager.getCachedModel(), undefined);
+			assert.strictEqual(manager.getTier(), 'none');
+			assert.strictEqual((manager as any)._redetectTimer, undefined);
+			assert.deepStrictEqual(events, [false]);
+		});
+
+		for (const phase of ['discovery', 'selection']) {
+			test(`Dispose during ${phase} ignores late results and creates no timer`, async () => {
+				configureEnabled(true);
+				const clock = sandbox.useFakeTimers();
+				const pending = deferredModels();
+				if (phase === 'discovery') { selectChatModelsStub.returns(pending.promise); }
+				else {
+					selectChatModelsStub.onFirstCall().resolves([createMockModel('gpt-4o')]);
+					selectChatModelsStub.onSecondCall().returns(pending.promise);
+				}
+				const initialization = manager.initialize();
+				await clock.tickAsync(0);
+				manager.dispose();
+				await initialization;
+				pending.resolve([createMockModel('gpt-4.1')]);
+				await clock.tickAsync(0);
+				assert.strictEqual(manager.isReady(), false);
+				assert.strictEqual(manager.getCachedModel(), undefined);
+				assert.strictEqual(manager.getTier(), 'none');
+				assert.strictEqual(clock.countTimers(), 0);
+				const calls = selectChatModelsStub.callCount;
+				await manager.initialize();
+				assert.strictEqual(selectChatModelsStub.callCount, calls);
+			});
+		}
+	});
+
 	suite('detectCopilotTier()', () => {
 		test('Should return "none" when selectChatModels returns empty array', async () => {
 			selectChatModelsStub.resolves([]);
@@ -309,6 +512,23 @@ suite('AIModelManager Tests', () => {
 		let mockModel: any;
 		let mockToken: vscode.CancellationToken;
 
+		function pendingResponse(): {
+			promise: Promise<vscode.LanguageModelChatResponse>;
+			resolve: (response: vscode.LanguageModelChatResponse) => void;
+			reject: (error: unknown) => void;
+		} {
+			let resolve!: (response: vscode.LanguageModelChatResponse) => void;
+			let reject!: (error: unknown) => void;
+			const promise = new Promise<vscode.LanguageModelChatResponse>((res, rej) => { resolve = res; reject = rej; });
+			return { promise, resolve, reject };
+		}
+
+		function quotaError(): Error {
+			const error = Object.assign(new Error('Quota exhausted'), { code: 'quota_exceeded' });
+			Object.setPrototypeOf(error, vscode.LanguageModelError.prototype);
+			return error;
+		}
+
 		setup(() => {
 			mockModel = createMockModel('gpt-4o', 'GPT 4o');
 			mockToken = {
@@ -328,6 +548,66 @@ suite('AIModelManager Tests', () => {
 
 			assert.ok(response, 'Should return a response');
 		});
+
+		for (const invalidation of ['stop', 'cancel']) {
+			test(`Late quota rejection after ${invalidation} does not select a fallback`, async () => {
+				const cts = new vscode.CancellationTokenSource();
+				try {
+					const pending = pendingResponse();
+					mockModel.sendRequest.returns(pending.promise);
+					selectChatModelsStub.resolves([mockModel]);
+					await manager.selectModel();
+					const calls = selectChatModelsStub.callCount;
+					const request = manager.sendPrompt([vscode.LanguageModelChatMessage.User('test')], cts.token);
+					assert.ok(mockModel.sendRequest.calledOnce);
+					if (invalidation === 'stop') { manager.stop(); }
+					else { cts.cancel(); }
+					pending.reject(quotaError());
+					assert.strictEqual(await request, null);
+					assert.strictEqual(selectChatModelsStub.callCount, calls, 'Stale request must not rediscover a model');
+					assert.strictEqual(manager.getCachedModel(), invalidation === 'stop' ? undefined : mockModel);
+				} finally { cts.dispose(); }
+			});
+
+			test(`Late successful response after ${invalidation} is discarded`, async () => {
+				const cts = new vscode.CancellationTokenSource();
+				try {
+					const pending = pendingResponse();
+					mockModel.sendRequest.returns(pending.promise);
+					selectChatModelsStub.resolves([mockModel]);
+					await manager.selectModel();
+					const request = manager.sendPrompt([vscode.LanguageModelChatMessage.User('test')], cts.token);
+					if (invalidation === 'stop') { manager.stop(); }
+					else { cts.cancel(); }
+					pending.resolve({ text: [] } as any);
+					assert.strictEqual(await request, null);
+				} finally { cts.dispose(); }
+			});
+		}
+
+		for (const outcome of ['reject', 'resolve']) {
+			test(`A fallback ${outcome} after stop cannot return a response or try another family`, async () => {
+				const clock = sandbox.useFakeTimers();
+				const pending = pendingResponse();
+				const fallbackModel = createMockModel('gpt-5-mini');
+				mockModel.sendRequest.rejects(quotaError());
+				fallbackModel.sendRequest.returns(pending.promise);
+				selectChatModelsStub.onFirstCall().resolves([mockModel]);
+				selectChatModelsStub.onSecondCall().resolves([fallbackModel]);
+				await manager.selectModel();
+				const request = manager.sendPrompt([vscode.LanguageModelChatMessage.User('test')], mockToken);
+				await clock.tickAsync(0);
+				assert.ok(fallbackModel.sendRequest.calledOnce, 'Fallback request must already be in flight');
+				assert.strictEqual(selectChatModelsStub.callCount, 2);
+				manager.stop();
+				if (outcome === 'reject') { pending.reject(new Error('Late fallback failure')); }
+				else { pending.resolve({ text: [] } as any); }
+				assert.strictEqual(await request, null);
+				assert.strictEqual(selectChatModelsStub.callCount, 2, 'Stopped request must not query the next family');
+				assert.strictEqual(manager.getCachedModel(), undefined);
+				assert.strictEqual(clock.countTimers(), 0);
+			});
+		}
 
 		test('Should return null when no model available', async () => {
 			selectChatModelsStub.resolves([]);
@@ -468,6 +748,7 @@ suite('AIModelManager Tests', () => {
 
 	suite('dispose()', () => {
 		test('Should clear the redetect timer', async () => {
+			configureEnabled(true);
 			selectChatModelsStub.resolves([createMockModel('gpt-4o')]);
 			await manager.initialize();
 
