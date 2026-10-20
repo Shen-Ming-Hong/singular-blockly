@@ -5,7 +5,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 # 維護 Singular Blockly
 
-先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支與既有變更；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD。
+先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支與既有變更；同時有多個 PR 時依同一文件的整合順序一次合併一個；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD。
 
 ## 動手前
 
@@ -22,6 +22,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 ## 驗證與交付
 
 - 先執行受影響範圍的測試；依 [專案地圖](references/project-map.md) 補上該變更需要的建置、契約或 i18n 檢查。不要把未執行的檢查寫成通過。
+- 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。
 - Blockly 積木、工具箱、schema 或產品 Skill 變更：執行 `npm run generate:project-skills`，檢查生成差異，再執行 `npm run check:project-skills`。
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
 - Commit／push／PR 交給 `git-workflow`，審查／合併／發布交給 `pr-review-release`；依使用者本次要求及既有授權決定是否進入那些流程。本技能不另寫一套 Git 或發布步驟。

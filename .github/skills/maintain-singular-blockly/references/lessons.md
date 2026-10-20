@@ -43,3 +43,9 @@
 - **問題：** Blockly 的 `setWarningText(null)` 未帶 ID 時會清除全部警告；板型刷新可能連帶清掉孤立積木警告。
 - **規則：** 板型、孤立及其他獨立警告的設定與清除都帶各自的 ID；新積木仍保留產生器與 onchange 的三層孤立 guard。
 - **證據：** `media/js/blocklyEdit.js`、`media/blockly/blocks/esp32-rc.js`、`src/test/suite/esp32Rc.contract.test.ts`。
+
+## [PR / 並行] base 紅燈會讓所有開啟中的 PR 同時失敗
+
+- **問題：** 2026-10-20 時 #195–#198 與 #179 全部紅燈，看起來像各自的問題；實際上 `master` 的 `npm audit --audit-level=high` 有 11 個 high（sharp、braces、source-map-js），每個 PR 的 Static and security checks 都因此失敗。#198 另外還有 Blockly 版本寫入 Skill contract、`@types/node` 型別變更兩個真正的失敗。
+- **規則：** 多個 PR 同一個 check 失敗時，先在 `master` 重現；base 的問題以獨立 PR 修並排在合併佇列最前面，再逐一同步其他 PR，依 `references/parallel-worktrees.md` 的「多個 PR 並行時的整合順序」處理。不要把 base 修補混進各 PR 的主要變更。
+- **證據：** PR #199（audit 修補）、#200（取代 #198 並疊在 #199 上）、#179 與 #201 以 merge 併入 #199 後轉綠。

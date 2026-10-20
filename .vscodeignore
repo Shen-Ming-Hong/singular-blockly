@@ -50,6 +50,7 @@ vsc-extension-quickstart.md
 **/.agents/**
 **/.agent/**
 **/.codex/**
+**/.claude/**
 **/.specify/**
 **/specs/**
 **/docs/**
