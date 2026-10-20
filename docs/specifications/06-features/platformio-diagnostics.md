@@ -1,5 +1,19 @@
 # PlatformIO 診斷與引導式修復
 
+## Provider 自動安裝與 Open VSX 相容
+
+> 來源：specs/063-vscodium-openvsx-guided-install（2026-06）；交付紀錄：[PR #93](https://github.com/Shen-Ming-Hong/singular-blockly/pull/93)
+
+`package.json` 不再以 `extensionDependencies` 強制要求 `platformio.platformio-ide`，讓 VSCodium、Firebase Studio、Google Antigravity 等使用 Open VSX 的編輯器也能啟用擴充功能。改由執行期安裝 penv provider（`src/services/penvProviderService.ts`）：
+
+- 每次建立積木編輯器面板時，對所有板子以 `vscode.extensions.getExtension()` 偵測 `platformio.platformio-ide` 或 `pioarduino.pioarduino-ide` 是否已安裝；不以 Core 路徑存在與否判斷，也不在此檢查 penv。
+- 兩者皆未安裝時直接執行 `workbench.extensions.installExtension`，不先顯示確認按鈕：先裝官方 PlatformIO IDE，被拒（marketplace 沒有或無網路）再裝 pioarduino；兩者都失敗則開啟 Extensions 搜尋「platformio」，訊息同時點名兩個選項，且不開 Home、不宣稱已就緒。
+- 任一 provider 安裝成功後先執行 `platformio-ide.showHome` 觸發 provider／Core 初始化，再顯示重新載入提示。Home 失敗只記錄不含例外細節的警告，不改裝另一個 provider。
+- `WebViewManager` 共用進行中的 setup Promise：安裝期間重複開啟編輯器不會重複安裝、開 Home 或顯示 reload；結束後清除，下次可重新偵測與重試。
+- 上傳與 Serial Monitor 路徑不重複觸發安裝，只顯示可行動的提示（請開啟積木編輯器自動設定，或環境初始化中請稍候）。`platformio-ide.*` 工作區設定只在偵測到 provider 後才寫入。
+
+Core 可用性以實際執行 `--version` 判斷，不以檔案存在為準。`platformioInvocationResolver.ts` 依序探測 `platformio-ide.customPATH`、`PLATFORMIO_CORE_DIR`、Windows 系統磁碟根目錄、預設 `~/.platformio` 與 `PATH`；Windows 的 `pio.exe` 無法執行時改試同一 penv 的 `python -m platformio`，成功的啟動方式沿用到編譯、上傳與 Arduino Serial Monitor。Serial Monitor 使用實際偵測成功的後端（pyserial 的 Python 或 mpremote fallback），不以固定 penv 路徑排除可用的 Python。067 之後 Python 工作負載改以 Singular managed Core 為主、provider penv 為相容 fallback，見 [Managed Runtime 驗證](../04-quality-testing/managed-runtime-environment.md)。
+
 ## 狀態診斷面板
 
 > 來源：`specs/052-platformio-diagnostic-ui`（2026-05）

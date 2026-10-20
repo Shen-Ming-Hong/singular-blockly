@@ -76,9 +76,11 @@ CyberBrick 支援固定的上傳模式設定，但 **OTA 是上傳工具功能�
 
 之後不論 USB 或 OTA 寫入 `/app/rc_main.py`，Extension Host 都會重新包裝同一段啟動呼叫，避免後續上傳覆蓋掉 OTA 啟動點。這段 bootstrap 以 start/end marker 管理，重複上傳不會累積多份。
 
-RC/ESP‑NOW 生成碼需要與 OTA agent 共存：如果裝置端已有 `/cyberbrick_ota_config.py` 且具備 OTA 設定，RC 初始化不得無條件呼叫 `_wlan.disconnect()` 或停用 reconnects，否則學生程式啟動後會把 OTA agent 的 STA Wi‑Fi 斷開，造成 `/api/v1/health` readiness timeout。未配對 OTA 的純 ESP‑NOW 情境仍可保留原本固定頻道初始化。
+RC/ESP‑NOW 生成碼需要與 OTA agent 共存。RC 初始化只有在「`/cyberbrick_ota_config.py` 具備 SSID 與 OTA token」**且** STA Wi‑Fi 目前已連上 AP 時才保留 Wi‑Fi（不呼叫 `_wlan.disconnect()`、不停用 reconnects、不改 channel）；只有 OTA 設定但 AP 不在線時，仍照積木設定的 channel 初始化。詳細的 bootstrap 等待與 channel fallback 見 [CyberBrick RC：與 OTA 共存的 Wi‑Fi channel](cyberbrick-rc.md#與-ota-共存的-wi-fi-channel062)。
 
 Provisioning 完成後仍維持 `USB` 模式，必須由使用者明確切換到 `OTA`。
+
+> 來源：specs/064-cyberbrick-naming-ota-progress（2026-08）；交付紀錄：[PR #97](https://github.com/Shen-Ming-Hong/singular-blockly/pull/97)
 
 OTA provisioning 與進階「清除 OTA」共用設定 modal 上方的同一張進度卡。Provisioning 依六個實際完成的里程碑呈現 determinate progress；清除流程沒有中間里程碑，因此執行中採 indeterminate sweep，不顯示或虛構百分比。兩個操作都會在送出 Extension Host request 前先顯示 running 狀態並鎖定衝突控制項，結果回來後在同一位置顯示成功或失敗。
 
@@ -249,7 +251,41 @@ async def my_func():
 
 ---
 
+## MicroPython 命名防呆（064）
+
+> 來源：specs/064-cyberbrick-naming-ota-progress（2026-08）；交付紀錄：[PR #97](https://github.com/Shen-Ming-Hong/singular-blockly/pull/97)
+
+只有目前板子為 CyberBrick 時，變數、函式與函式參數的建立／重新命名才套用 MicroPython 命名檢查；Arduino 與 TXT Controller 維持既有行為，切換離開 CyberBrick 時清除本功能專用警告，切回時重新掃描。純驗證邏輯位於 `media/js/cyberbrickNameValidation.js`，契約測試為 `src/test/webview/cyberbrickNaming.contract.test.ts`。
+
+### 規則
+
+- 只移除前後空白；不改內部空白、不轉換中文、不改大小寫。整理後為空字串即為錯誤。
+- 合法字元：第一字元為 ASCII 英文字母、底線或 CJK（U+3400–4DBF、U+4E00–9FFF、U+F900–FAFF），後續字元另可包含 ASCII 數字。中文命名維持原樣。
+- **阻擋錯誤**：數字開頭、內部空白、連字號與其他非法符號；Python hard keywords（`False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield`）；函式名稱與工作區內另一函式重複；同一函式內參數重複（不同函式可用相同參數名）。
+- **警告但允許**：執行環境名稱 `machine`、`time`、`network`、`Pin`、`PWM`、`ADC`、`UART`、`I2C`、`SPI`、`Timer`、`NeoPixel`；內建名稱 `print`、`input`、`len`、`range`、`int`、`float`、`str`、`bool`、`list`、`dict`、`tuple`、`set`、`min`、`max`、`sum`、`abs`、`round`、`type`、`isinstance`、`enumerate`、`zip`、`map`、`filter`、`open`。`match`、`case`、`_` 不視為關鍵字。
+
+### 互動與上傳
+
+| 介面 | 錯誤 | 警告 |
+| ---- | ---- | ---- |
+| 變數（Extension Host InputBox） | 即時顯示原因，不能按 Enter 送出 | 顯示警告，可送出整理後名稱 |
+| 函式／參數（Blockly 行內欄位） | validator 回傳 `null`，保留先前名稱並顯示錯誤 | 提交新值並保留警告 |
+
+所有 `Blockly.serialization.workspaces.load()` 入口由共用 hydration scope 包住，反序列化期間行內 validator 原樣接受舊值，**不自動改名或刪除**；載入完成後才掃描並以專用 warning ID 標示問題積木，不覆蓋其他安全警告。每次按上傳都重新掃描：仍有任何錯誤就不送出上傳請求，顯示在地化摘要（`CYBERBRICK_NAME_UPLOAD_BLOCKED`）並引導到第一個問題積木；只有警告則照常上傳。程式碼預覽不因命名問題停用。本功能不改變工作區或使用者設定的持久化格式。
+
+### OTA 設定進度的一致性
+
+六個 provisioning 里程碑依序為：USB 已選擇、裝置身分已讀取或建立、OTA agent 已安裝、Wi‑Fi 已設定、OTA agent 已驗證、配對與機密已儲存（最後一項須秘密與配對設定都持久化後才完成）；Wi‑Fi 掃描是獨立前置操作，不計入里程碑。學生畫面不顯示分數或百分比，只顯示大型進度條、執行中圖示、目前階段文字與「請勿重複按下或拔除 USB」提示。
+
+- 同一里程碑的多次狀態只更新文字，進度條只前進一次，不倒退、不超出範圍。
+- 前後端都只允許一個進行中的設定；重複要求回覆專用的「設定進行中」結果，不再次操作裝置。每次請求帶識別碼，畫面忽略舊請求的延遲訊息；所有進度訊息先驗證結構與允許值。
+- 關閉再開啟對話框會恢復目前請求的進度與鎖定狀態。成功時清除 Wi‑Fi 密碼；失敗時進度停在已到達位置、標示失敗階段並保留密碼供重試。成功、失敗或例外都會釋放執行中狀態。
+- 進度、錯誤與日誌不得包含 Wi‑Fi 密碼、OTA token 或配對秘密。
+
+---
+
 ## 相關文件
 
 - [擴展板積木](cyberbrick-expansion-boards.md) - X11/X12 擴展板
+- [CyberBrick RC](cyberbrick-rc.md) - ESP-NOW 遙控與 OTA channel 共存
 - [統一上傳 UI](../06-features/unified-upload-ui.md) - Arduino/MicroPython 統一介面
