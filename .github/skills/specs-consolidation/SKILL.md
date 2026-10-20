@@ -18,7 +18,7 @@ description: 整合或歸檔 specs/ 規格到 docs/specifications/ 時使用；�
 | `03-hardware-support/`     | 硬體積木與板子支援     | CyberBrick、HuskyLens、ESP32、RC 相關 |
 | `04-quality-testing/`      | 測試覆蓋率、安全防護   | 測試、品質、workspace 驗證            |
 | `05-dependencies/`         | 依賴管理與升級         | npm 依賴、安全性修補                  |
-| `06-features/`             | 功能開發與整合         | MCP、上傳 UI、語言選擇器、Bug 修復    |
+| `06-features/`             | 功能開發與整合         | Agent Skills、上傳 UI、語言選擇器、Bug 修復 |
 | `appendix/`                | 附錄                   | 術語表、名詞定義                      |
 
 ---
@@ -34,6 +34,7 @@ description: 整合或歸檔 specs/ 規格到 docs/specifications/ 時使用；�
 find specs -maxdepth 1 -mindepth 1 -type d -print | sort
 
 # 列出 GitHub feature PR 狀態；以 headRefName 對照 spec 的 Feature Branch
+# （雲端工作階段沒有 gh，改用 GitHub MCP 的 list_pull_requests state=all 並分頁讀完）
 gh pr list --state all --limit 300 \
   --json number,title,state,headRefName,mergedAt,closedAt,url,mergeCommit
 

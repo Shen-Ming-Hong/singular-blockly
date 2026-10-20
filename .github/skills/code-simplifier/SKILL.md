@@ -3,7 +3,7 @@ name: code-simplifier
 description: 程式碼簡化與重構工作流程。當使用者提到簡化程式碼、清理 PR、重構、程式碼優化、code cleanup、refactor、simplify code、clean up complex code 時自動啟用。靈感來源於 Anthropic Claude Code 團隊內部使用的 code-simplifier agent。A code simplification and refactoring workflow. Inspired by the official code-simplifier agent used internally by the Claude Code team at Anthropic.
 metadata:
   author: singular-blockly
-  version: '1.1.0'
+  version: '1.2.0'
   category: code-quality
   type: blocking
   inspired-by: anthropics/claude-plugins-official/code-simplifier
@@ -14,13 +14,11 @@ metadata:
 簡化與精煉程式碼以提升清晰度、一致性和可維護性，同時完整保留原有功能。
 Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality.
 
-> **⚠️ 阻塞型技能 BLOCKING SKILL**
+> **⚠️ 必要步驟 REQUIRED STEP**
 >
-> 此技能是 PR 發布流程中的**必須步驟**，非可選的建議型。
-> 在 `pr-review-release` 流程中，必須完成此技能才能進入 Git 操作階段。
+> 此技能是 `pr-review-release` Phase 3（簡化與本地 Re-review）的必要步驟，發布與非發布 PR 都適用；完成後才進入 re-review 與 push／PR。
 >
-> This skill is a **REQUIRED step** in the PR release workflow, not an optional suggestion.
-> In `pr-review-release` workflow, this skill must be completed before proceeding to Git operations.
+> This skill is the required Phase 3 step of `pr-review-release` for both release and non-release PRs, run before re-review and push.
 
 ## 核心原則 Core Principles
 
@@ -53,9 +51,8 @@ Simplifies and refines code for clarity, consistency, and maintainability while 
 ### Phase 2: 分析程式碼 Analyze Code
 
 1. **遵循專案標準** (Project Standards)
-    - 閱讀專案的 `CLAUDE.md`、`copilot-instructions.md` 或 `.editorconfig`
+    - 閱讀專案根目錄的 `AGENTS.md`（`CLAUDE.md` 與 `.github/copilot-instructions.md` 都指向它）與 `.editorconfig`
     - 遵循已建立的 coding standards 和 patterns
-    - 對於本專案，參考 `.github/copilot-instructions.md` 中的規範
 
 2. **識別簡化機會**
     - 不必要的複雜度和巢狀結構
@@ -78,9 +75,8 @@ Simplifies and refines code for clarity, consistency, and maintainability while 
 
 對於本專案 (singular-blockly)：
 
-- 使用 ES modules 並正確排序 imports
-- 頂層函式使用 `function` 關鍵字 (非 arrow functions)
-- 為頂層函式加入明確的 return type annotations
+- `src/` 的 TypeScript：使用 ES modules 並正確排序 imports、頂層函式使用 `function` 關鍵字（非 arrow functions）、加入明確的 return type annotations
+- `media/` 的 WebView JavaScript 不在 ESLint 範圍內，也不是 ES modules；沿用該檔既有寫法，不要改成模組或引入建置步驟
 - 保留必要的錯誤處理與例外邊界
 - 一致的命名慣例
 
@@ -140,23 +136,21 @@ function processPositiveValues(data: DataItem[]): number[] {
 
 ### Phase 4: 驗證變更 Verify Changes
 
-1. **執行測試確保功能不變**
+1. **執行與 CI 一致的靜態檢查**（含 compile、lint、i18n 與 Skill 契約）
 
     ```bash
-    npm test
+    npm run ci:static
     ```
 
-2. **執行 linting 確保風格一致**
+2. **執行單元測試確保功能不變**
 
     ```bash
-    npm run lint
+    npm run test:unit:ci
     ```
 
-3. **執行 build 確保沒有編譯錯誤**
+    雲端容器沒有螢幕時，依 [cloud-local-verification](../cloud-local-verification/SKILL.md) 的 `xvfb-run` 方式執行。
 
-    ```bash
-    npm run compile
-    ```
+3. **改到 `media/` WebView 或積木時**，依 `cloud-local-verification` 做視覺與互動檢查；單元測試無法載入 WebView 程式碼。
 
 4. **審查變更**
     ```bash
@@ -241,7 +235,7 @@ counter++;
 ### 開始前 Before Starting
 
 - [ ] 確認要簡化的程式碼範圍
-- [ ] 閱讀專案的 coding standards (copilot-instructions.md)
+- [ ] 閱讀專案的 coding standards（`AGENTS.md`）
 - [ ] 確認並保留與本次任務無關的既有變更
 
 ### 簡化過程 During Simplification
@@ -256,20 +250,9 @@ counter++;
 
 ### 完成後 After Completion
 
-- [ ] 所有測試通過
-- [ ] Linting 無錯誤
-- [ ] Build 成功
+- [ ] `npm run ci:static` 與 `npm run test:unit:ci` 通過
 - [ ] 審查 git diff 確認變更合理
 - [ ] 若使用者要求提交，使用繁體中文 Conventional Commit
-
-## Token 效益 Token Efficiency Benefit
-
-簡化程式碼的額外好處：**減少未來 session 的 token 消耗**。
-
-- 簡潔的程式碼在 context window 中佔用更少空間
-- Claude 可以在相同 token 預算內閱讀更多程式碼
-- 後續的 AI 輔助開發成本更低
-
 
 ## 相關資源 Related Resources
 

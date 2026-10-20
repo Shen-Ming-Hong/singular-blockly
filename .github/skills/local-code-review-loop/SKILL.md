@@ -62,10 +62,10 @@ description: 對目前專案差異執行有成本上限的本地 Code Review 收
 ## 4. 修正與驗證
 
 1. 使用者明確要求完整 review／fix／re-review 循環時，可執行本地、可逆且不擴張範圍的採納修正。若只要求 review，保持唯讀。
-2. 若由 `pr-review-release` 呼叫，該 Skill 的 Phase 1.5 修正核准與 Phase 3.5 發布核准優先；取得核准前只完成審查與採納評估。
+2. 若由 `pr-review-release` 呼叫，依該 Skill 判斷核准來源：發布 PR 須先取得 Phase 1.5 修正核准與 Phase 3.5 發布核准，取得前只完成審查與採納評估；非發布 PR 由其「非發布 PR 的自主合併」常設授權取代這兩個 gate，可直接修正本任務範圍內的採納項目。
 3. 只修正已授權的採納項目；不修改 `REJECT` 或 `NEEDS_USER_DECISION` 項目。
 4. 依風險執行最小相關測試，再執行專案要求的靜態檢查。遵守第 0 節的驗證去重與單次完整驗證上限；測試失敗視為新 finding，不得忽略。
-5. 不自行 commit、push、建立 PR、merge、tag 或發布；只有呼叫流程或使用者明確授權時才執行。
+5. 不自行 commit、push、建立 PR、merge、tag 或發布；只有呼叫流程、使用者明確授權或 [整合佇列與自主合併](../maintain-singular-blockly/references/merge-queue.md) 的常設授權涵蓋時才執行。
 
 ## 5. 有界重新送審
 
