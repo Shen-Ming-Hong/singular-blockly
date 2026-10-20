@@ -37,6 +37,7 @@ GitHub CI 是第二道把關，不是唯一證據。每個要交付或合併的�
 - `ci:static` 不含 `npm audit`；CI 的安全步驟是獨立的，兩者都要跑。
 - Blockly 版本寫在產品 Skill contract 中。升級 `blockly` 後 `check:skill-contract` 會回報 stale，需重新產生並提交。
 - 失敗時先判斷是否為既有問題：在 merge-base 的乾淨 worktree 重跑相同命令。base 也失敗（例如 master 的 audit 紅燈）時，先以獨立 PR 修 base，再讓其他 PR 跟上。
+- 只改文件的 PR（`docs/`、`specs/`、`.github/skills|prompts|agents/`、`.agents/skills/`、`.claude/skills/`、`AGENTS.md`、`CONTRIBUTING.md` 等，完整清單見 `.github/workflows/ci.yml` 的 `changes` job）在 CI 只跑 static，不跑 Node 22、單元矩陣與 VSIX 打包；合併後 `master` push 仍跑完整 CI。若文件 PR 夾帶技能腳本（例如 `.github/skills/*/scripts/*.mjs`），本地實際執行一次該腳本並回報結果。
 - 最低 Node 檢查使用容器內現有的 Node 22（例如 `/opt/node22/bin`）時，回報實際版本；與 CI 的 22.16.0 不同時要寫明。
 
 ## 3. 視覺與互動驗證
