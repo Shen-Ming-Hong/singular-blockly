@@ -5,7 +5,7 @@ description: 盤點、排序、分類並逐項處理本專案的 Dependabot Pull
 
 # Dependabot PR 管理
 
-把大量自動 PR 轉成可審查的工作佇列。先完成全體唯讀盤點並取得使用者對順序與處置的核准，再一次處理一個獨立風險群組。
+把大量自動 PR 轉成可審查的工作佇列。先完成全體唯讀盤點，再一次處理一個獨立風險群組。符合「自主合併範圍」的例行更新可直接處理到合併；其餘項目先取得使用者對順序與處置的核准。
 
 ## 核心規則
 
@@ -18,6 +18,18 @@ description: 盤點、排序、分類並逐項處理本專案的 Dependabot Pull
 - 不使用 `npm audit fix --force`、寬鬆 `npm update` 或未限定範圍的 overrides。
 - 依賴與 Actions 的 breaking change 必須查官方 release notes／migration guide；技術判斷只採一手來源。
 
+## 自主合併範圍
+
+Ray 的常設授權（2026-10-20）：同時符合以下條件的 Version Update，處理它的工作階段可不問直接 squash 合併。
+
+- 不是 Security Update，也不在處理任何 Dependabot Alert、CodeQL 或 `npm audit` finding。
+- PR 內每個套件或 Action 都只升 minor 或 patch；grouped PR 只要有一項是 major，整個 PR 就不在範圍內。
+- Phase 3 判定不需要 SDD，也不需要改產品程式碼、設定或測試；`package.json` 與 lockfile 以外只允許 Actions 的 SHA pin 變更。
+- 處置是 `merge as-is after validation`，或由本工作階段開的 replacement PR 只做同一個最小版本更新。
+- `maintain-singular-blockly` 的 [merge-queue](../maintain-singular-blockly/references/merge-queue.md) 前置條件全部成立：持有 `merge-lease`、head 含最新 `origin/master`、Version Update 第 5–7 步驗證通過、`CI Gate` 與 CodeQL 在目前 head 成功、沒有 conflict 或未解決的 review thread、合併帶 `expectedHeadSha`。合併後確認 `master` CI。
+
+範圍外一律先問 Ray：major、需要 SDD、需要程式碼修正、Security Update、`ignore`／`defer`／`close`／`split`、`dependabot.yml` 變更，以及任何會觸發發布或版本號變更的項目。不確定是否在範圍內時，視為範圍外。
+
 ## Phase 0：確認操作模式
 
 把請求分類為：
@@ -26,7 +38,7 @@ description: 盤點、排序、分類並逐項處理本專案的 Dependabot Pull
 - **Resolve one item**：處理已核准佇列中的一項或一個同風險群組。
 - **Reconfigure Dependabot**：調整 grouping、cooldown、ignore 或 open PR limit；視為獨立設定變更，不混入套件升級。
 
-使用者只說「處理 Dependabot PR」時，預設先執行 Triage only，不得直接合併。
+使用者只說「處理 Dependabot PR」時，先完成 Triage；之後只有在自主合併範圍內的項目可以直接逐項處理到合併，其他項目停在報告。
 
 ## Phase 1：唯讀盤點
 
@@ -104,7 +116,7 @@ Language／compiler major（例如 TypeScript major）不得在未讀官方 migr
 
 先檢查既有 `specs/` 是否已有相符 feature；需要完整 SDD 時依專案順序使用：`$speckit-specify` → `$speckit-clarify` → `$speckit-plan` → `$speckit-tasks` → `$speckit-analyze` → `$speckit-implement` → `$speckit-converge`，需要品質檢查表時使用 `$speckit-checklist`。未通過對應 gate 前不得開始依賴實作。
 
-## Phase 4：提交 Triage 報告並停止
+## Phase 4：提交 Triage 報告
 
 輸出固定表格：
 
@@ -127,7 +139,7 @@ Recommendation 只能是：
 3. 適合另開新對話的工作項目及 handoff prompt。
 4. 需要使用者決定的 ignore、defer、split、close 或 SDD 選項。
 
-等待使用者核准排序與指定第一個工作項目。Triage 核准不自動授權後續所有 merge 或發布。
+自主合併範圍內的項目依建議順序逐項處理，不必等待；其餘項目等待使用者核准排序與處置。Triage 核准不自動授權範圍外的 merge 或任何發布。
 
 ## Phase 5：逐項處理
 
@@ -151,7 +163,7 @@ Recommendation 只能是：
 
 ## Phase 6：遠端動作與完成條件
 
-- comment、`@dependabot recreate`、ignore、close、push、建立替代 PR 或 merge 都是遠端 mutation；執行前重述確切 PR 與動作，並確認已在使用者核准範圍內。
+- comment、`@dependabot recreate`、ignore、close、push、建立替代 PR 或 merge 都是遠端 mutation；執行前重述確切 PR 與動作，並確認已在使用者核准範圍或自主合併範圍內。自主合併範圍只涵蓋該項的 replacement PR、GitHub「Update branch」同步與合併。
 - grouped PR 建置失敗時，可在核准後使用 `@dependabot recreate`；若單一套件持續失敗，調整 `exclude-patterns` 或建立獨立人工 PR。
 - ignore 必須記錄套件、版本範圍、原因、風險、重新評估條件與日期；不得用 ignore 掩蓋 Security Alert。
 - 只在 required checks、review 與 branch rules 全部通過後 merge。

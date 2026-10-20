@@ -43,7 +43,7 @@
 - Preserve the empty-state guard before writing Blockly workspace data.
 - WebView resources must use `webview.asWebviewUri()`.
 - Use `window.getCurrentBoard()` in Blockly generators; `window.currentBoard` is deprecated.
-- Board-aware upload flow routes through `ArduinoUploader` for PlatformIO and `MicropythonUploader` for CyberBrick/mpremote.
+- Board-aware upload flow routes through `ArduinoUploader` for PlatformIO, `MicropythonUploader` (USB, mpremote) or `CyberBrickOtaUploader` (Wi-Fi) for CyberBrick, and `TxtUploader` (SSH) for the fischertechnik TXT Controller.
 - Orphan Blockly blocks must keep the three-layer guard: `workspaceToCode` skip, `forBlock` context guard, and `onchange` warning.
 
 ## Adding New Blocks
@@ -60,14 +60,16 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Copilot SDD support is intentionally kept alongside Codex through `.github/agents/speckit.*.agent.md` and `.github/prompts/speckit.*.prompt.md`.
 - Do not remove Copilot SDD files just because `default_integration` is `codex`; Copilot remains not multi-install safe, so `integration.json` stays Codex-only to keep `specify integration status` clean.
 - Use full SDD for changes to Extension Host/WebView contracts, Blockly block/generator contracts, persisted workspace formats, board upload flows, managed runtime, security boundaries, or major compatibility. Classify major dependency upgrades by actual impact. Documentation, translations, and isolated fixes that preserve contracts may use their focused maintenance skills.
-- In Codex, use the Spec Kit skills in this order for full SDD: `$speckit-specify`, `$speckit-clarify`, `$speckit-plan`, `$speckit-tasks`, `$speckit-analyze`, `$speckit-implement`, `$speckit-converge`; use `$speckit-checklist` when a quality checklist is needed. Clarify requires an existing spec.
+- In Codex and Claude Code, use the Spec Kit skills in this order for full SDD: `$speckit-specify`, `$speckit-clarify`, `$speckit-plan`, `$speckit-tasks`, `$speckit-analyze`, `$speckit-implement`, `$speckit-converge`; use `$speckit-checklist` when a quality checklist is needed (Claude Code invokes the same skills as `/speckit-*`). Clarify requires an existing spec.
 - At the start of new full SDD work, check the installed Spec Kit CLI, `specify integration status`, and the official stable release; upgrade only when required by compatibility or the task. The installed `speckit` workflow runs core stages only; it does not replace the full skill sequence above.
 - In Copilot, use the matching `speckit.*` agents/prompts from `.github/agents` and `.github/prompts`.
+- Claude Code reads the Spec Kit skills through `.claude/skills/speckit-*` relative links to `.agents/skills/speckit-*`; do not install a Claude integration or edit the linked copies.
+- Feature branches follow the parallel development rules below, not the bare `NNN-name` default. Before `$speckit-specify`, get the next number with `.specify/extensions/git/scripts/bash/create-new-feature.sh --json --dry-run --short-name <name> "<description>"` and confirm no open PR already uses it. On a desktop, create the task worktree with branch `codex/NNN-name` or `claude/NNN-name` from the latest `origin/master` (see `parallel-worktrees.md`); in a cloud session, stay on the system-assigned `claude/…` branch. Run the `before_specify` hook (`speckit.git.feature`) inside that worktree with `GIT_BRANCH_NAME` set to the current branch and `--allow-existing-branch`, so it keeps the task branch instead of creating another one, and set `SPECIFY_FEATURE_DIRECTORY=specs/NNN-name` so the spec folder still uses the numbered name.
 - Feature specs live in `specs/{NNN}-feature-name/`; check existing specs before creating a new one.
 - Keep generated `spec.md`, `plan.md`, and `tasks.md` in the feature spec folder.
 - Project-specific skills from `.github/skills` are linked into `.agents/skills`; update the source under `.github/skills`.
 - For repository write tasks, use `maintain-singular-blockly` to establish a task-owned worktree and branch; for cross-file product maintenance, also use it to locate owning files and select affected checks. Specialized skills keep their own workflows.
-- Contributor skills under `.github/skills` are linked into both `.agents/skills` (Codex) and `.claude/skills` (Claude Code); `CLAUDE.md` imports this file.
+- Contributor skills under `.github/skills` are linked into both `.agents/skills` (Codex) and `.claude/skills` (Claude Code); Spec Kit skills live in `.agents/skills` and are linked into `.claude/skills`. `CLAUDE.md` imports this file.
 
 ## Coding Style
 - TypeScript uses strict compiler options from `tsconfig.json`.
@@ -84,8 +86,8 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Coverage target is documented in `docs/specifications/04-quality-testing/test-coverage.md`.
 
 ## Product Agent Skill
-- `.agents/skills/singular-blockly/` is the installed canonical source; `.claude/skills/singular-blockly/SKILL.md` is a compact compatibility entry.
-- Edit packaged sources under `resources/project-skills/singular-blockly/`; all human-readable Skill content must remain English.
+- This repository ships the Product Agent Skill to users; it is not one of the contributor skills above. The extension installs it into the user's project as `.agents/skills/singular-blockly/` (canonical) and `.claude/skills/singular-blockly/SKILL.md` (compact compatibility entry); neither path exists in this repository.
+- Edit only the packaged sources under `resources/project-skills/singular-blockly/` (`canonical/` and `compatibility/claude-SKILL.md`); all human-readable Skill content must remain English.
 - Run `npm run generate:project-skills` after block, toolbox, schema, or Skill changes, then run `npm run check:project-skills`.
 - External `blockly/main.json` changes must pass the real Blockly load/save/load gate before becoming the last valid workspace.
 
@@ -100,7 +102,7 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Codex and Claude Code sessions (desktop or cloud) may work in parallel. Each write task uses its own worktree and branch: `codex/<task>` for Codex, `claude/<task>` for Claude Code, and the system-assigned `claude/…` branch in cloud sessions. See `.github/skills/maintain-singular-blockly/references/parallel-worktrees.md`.
 - Before editing and again before opening a PR, list open PRs and their changed files. When two tasks touch the same shared contract (dependencies, WebView messages, blocks/generators/toolbox, Skill contract, workspace format, workflows, locales, shared summaries), split the shared part into a first PR and order the rest after it.
 - Open PRs form the integration queue; only the PR carrying the `merge-lease` label may sync `master` and merge. Waiting PRs do not chase `master`. If `master` itself is red, fix the base in a separate PR at the front of the queue.
-- Standing authorization from Ray (2026-10-20): non-release PRs may be squash-merged by the session that opened them, without asking, once all preconditions in `.github/skills/maintain-singular-blockly/references/merge-queue.md` hold: in-scope local review is clear, the branch contains the latest `origin/master`, cloud-local verification (including visual and interaction checks for UI changes) passed on the final head, `CI Gate` and CodeQL succeeded on that head, there are no conflicts or unresolved review threads, and the merge uses `expectedHeadSha`. After merging, confirm the `master` CI run.
+- Standing authorization from Ray (2026-10-20): non-release PRs may be squash-merged by the session that opened them, and routine Dependabot version updates within the scope defined in `manage-dependabot-prs` by the session handling them, without asking, once all preconditions in `.github/skills/maintain-singular-blockly/references/merge-queue.md` hold: in-scope local review is clear, the branch contains the latest `origin/master`, cloud-local verification (including visual and interaction checks for UI changes) passed on the final head, `CI Gate` and CodeQL succeeded on that head, there are no conflicts or unresolved review threads, and the merge uses `expectedHeadSha`. After merging, confirm the `master` CI run.
 - Never overwrite other work: after every rebase, merge, or conflict resolution, check `git diff origin/master...HEAD` contains only this task's changes (no reverted lines from already-merged PRs) before pushing; never force-push someone else's branch; merge with `expectedHeadSha`.
 - Still ask Ray first for version bumps, CHANGELOG release sections, tags, publishing, removing or changing user-visible features when the scope is unclear, product decisions, repository settings/secrets/ruleset changes, and other people's PRs.
 
@@ -112,5 +114,5 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at `specs/066-agent-skills-mcp-retirement/plan.md`
+at `specs/071-esp32-cyberbrick-rc/plan.md`
 <!-- SPECKIT END -->
