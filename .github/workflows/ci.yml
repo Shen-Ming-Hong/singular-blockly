@@ -63,7 +63,7 @@ jobs:
           changed="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
           printf '%s\n' "$changed"
           # 這些路徑不進 VSIX、也不被建置或測試讀取；技能清單仍由 static 的 check:project-skills 檢查。
-          docs_only='^(docs/|specs/|\.(agents|claude)/skills/|\.github/(skills|prompts|agents|PULL_REQUEST_TEMPLATE)/|\.github/(copilot-instructions|pull_request_template)\.md$|AGENTS\.md$|CONTRIBUTING\.md$)'
+          docs_only='^(docs/|specs/|\.(agents|claude)/skills/|\.github/(skills|prompts|agents|PULL_REQUEST_TEMPLATE)/|\.github/(copilot-instructions|pull_request_template)\.md$|AGENTS\.md$|CLAUDE\.md$|CONTRIBUTING\.md$)'
           if [[ -n "$changed" ]] && ! grep -qvE "$docs_only" <<< "$changed"; then
             echo "code=false" >> "$GITHUB_OUTPUT"
             echo "::notice::Documentation-only change; skipping the test matrix and VSIX packaging."
