@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.91.1] - 2026-10-21
+
+### 🔧 維護 Maintenance
+
+- 更新 VS Code Marketplace 與 Open VSX 的擴充功能說明：描述改為直接列出 Arduino、ESP32、CyberBrick MicroPython 與 fischertechnik TXT，新增「Education」與「Visualization」分類，並補上 ESP32、MicroPython、Scratch、STEM 等搜尋關鍵字，讓老師和學生更容易找到
+  Updated the VS Code Marketplace and Open VSX listing: the description now names Arduino, ESP32, CyberBrick MicroPython, and fischertechnik TXT up front, the extension is listed under the Education and Visualization categories, and search keywords such as ESP32, MicroPython, Scratch, and STEM were added so teachers and students can find it more easily
+
 ## [0.91.0] - 2026-10-21
 
 ### 🌐 在地化 Localization
