@@ -23,6 +23,8 @@
 
 2026-08-26 08:04–08:07（Asia/Taipei）完成正式 Worker deployment rollback drill：先由 `aa5f5203-2ad4-4fd8-97f8-8c57fe10cb70` 回復至上一個已驗證版本 `f6ccc71a-1966-4e79-a44b-88d1a2bbc4ce`，Dashboard 顯示舊版承接 100% 流量；在回復會同步還原 `GITHUB_WEBHOOK_SECRET` 的明確警告下取得專案負責人核准後執行。舊版的 `/health`、`/privacy`、`/support`、`/terms` 均回傳 HTTP 200。隨後立即將 `aa5f5203-2ad4-4fd8-97f8-8c57fe10cb70` 提升回 100% 流量，四個公開端點再次全部回傳 HTTP 200。演練未修改或回復 D1／R2、未使用 D1 Time Travel、未建立測試回饋，最終正式版本與演練前相同。
 
+2026-10-21 隨擴充套件 0.91.0 部署 #225 的公開頁面在地化字串（無 migration、無 secret 變動），由雲端工作階段在 Ray 於專案討論串明確同意後以 `wrangler deploy` 執行：部署前 `d1 migrations list --remote` 為 No migrations to apply，新版本 `380f8105-5ea3-4195-bd2e-a5d7a6d3ffa5` 承接 100% 流量（上一版 `aa5f5203-2ad4-4fd8-97f8-8c57fe10cb70`）。部署後 `/health`、`/privacy`、`/support`、`/terms` 均為 HTTP 200，繁體中文 `/support` 顯示「不需要 GitHub 帳號」，未認證 attachment route 仍為 Access 302。
+
 ## Worker secrets
 
 以下值只能放入 Cloudflare secret store，不能寫入 `.dev.vars` 以外的本機暫存、Git、VSIX、CI log 或文件：
