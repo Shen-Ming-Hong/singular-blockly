@@ -1,7 +1,7 @@
 {
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
-	"description": "VS Code extension for visual Arduino & MicroPython programming with Blockly. Multi-board support, project-local Agent Skills, AI camera integration, PlatformIO integration, and 15 languages.",
+	"description": "Blockly visual programming for Arduino, ESP32, CyberBrick MicroPython, and fischertechnik TXT. Drag-and-drop blocks, live C++/Python code preview, PlatformIO and one-click upload, AI camera blocks, Agent Skills, and 15 languages.",
 	"version": "0.91.0",
 	"license": "Apache-2.0",
 	"engines": {
@@ -12,6 +12,8 @@
 	"publisher": "Singular-Ray",
 	"icon": "images/icon.png",
 	"categories": [
+		"Education",
+		"Visualization",
 		"Other"
 	],
 	"repository": {
@@ -30,7 +32,19 @@
 		"microcontroller",
 		"programming",
 		"code-generator",
-		"drag-and-drop"
+		"drag-and-drop",
+		"esp32",
+		"micropython",
+		"cyberbrick",
+		"fischertechnik",
+		"platformio",
+		"scratch",
+		"block-based",
+		"stem",
+		"robotics",
+		"kids",
+		"huskylens",
+		"no-code"
 	],
 	"activationEvents": [
 		"onStartupFinished"
