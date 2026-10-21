@@ -8,6 +8,20 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.91.0] - 2026-10-21
+
+### 🌐 在地化 Localization
+
+- 15 種語系改用在地慣用詞與國小學生易讀的介面用語：繁體中文改用臺灣用語與「你」，韓文改為해요체，日文、德文、西班牙文改用較親切的說法；PlatformIO 診斷的 Yes／No 改為各語言，並修正法、義、葡、捷、匈、俄等語系殘留的英文與字序
+  Reworded all 15 locales with familiar local terms and wording that elementary school students can read: Traditional Chinese now uses Taiwanese terms and the informal "you", Korean uses the 해요체 polite-casual style, and Japanese, German, and Spanish use friendlier phrasing; PlatformIO diagnostic Yes/No prompts are now localized, and leftover English and word-order issues in French, Italian, Portuguese, Czech, Hungarian, Russian, and others were fixed
+- 範例說明與繁體中文、韓文的指令與設定說明同步更新
+  Sample descriptions and Traditional Chinese and Korean command and setting descriptions were updated to match
+
+### 🐛 修復 Bug Fixes
+
+- Arduino 與 MicroPython 產生的程式碼不再出現寫死的中文註解與訊息（例如 `pinMode` 註解、腳位模式警告、HUSKYLENS 序列埠訊息、RC 與 X12 註解），一律改用英文，避免在非中文環境或序列埠監看出現亂碼
+  Generated Arduino and MicroPython code no longer contains hard-coded Chinese comments and messages (such as `pinMode` comments, pin-mode warnings, HUSKYLENS serial messages, and RC and X12 comments); they are now in English, avoiding garbled text in non-Chinese environments and the serial monitor
+
 ## [0.90.0] - 2026-10-20
 
 ### ⚠️ 移除 Removed
