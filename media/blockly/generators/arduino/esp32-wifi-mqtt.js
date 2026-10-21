@@ -22,7 +22,7 @@ function isEsp32Board() {
  * @returns {string} 警告註解
  */
 function generateBoardWarning() {
-	return '// 警告：WiFi/MQTT 功能僅支援 ESP32 系列板子\n';
+	return '// Warning: WiFi/MQTT is only supported on ESP32 boards\n';
 }
 
 // =============================================================================
@@ -46,7 +46,7 @@ window.arduinoGenerator.forBlock['esp32_wifi_connect'] = function (block) {
 	window.arduinoGenerator.includes_['wifi'] = '#include <WiFi.h>';
 
 	// 生成連線代碼（含 10 秒超時）
-	let code = `// WiFi 連線到 ${ssid}\n`;
+	let code = `// Connect WiFi to ${ssid}\n`;
 	code += `WiFi.mode(WIFI_STA);\n`;
 	code += `WiFi.setAutoReconnect(true);\n`;
 	code += `WiFi.begin("${ssid}", "${password}");\n`;
@@ -70,7 +70,7 @@ window.arduinoGenerator.forBlock['esp32_wifi_disconnect'] = function (block) {
 	// 添加 WiFi 標頭檔
 	window.arduinoGenerator.includes_['wifi'] = '#include <WiFi.h>';
 
-	let code = `// WiFi 斷線\n`;
+	let code = `// Disconnect WiFi\n`;
 	code += `WiFi.disconnect();\n`;
 
 	return code;
@@ -187,7 +187,7 @@ window.arduinoGenerator.forBlock['esp32_mqtt_setup'] = function (block) {
 
 	// 添加全域變數
 	window.arduinoGenerator.variables_['mqtt_vars'] = `
-// MQTT 全域變數
+// MQTT global variables
 WiFiClient _wifiClient;
 PubSubClient mqttClient(_wifiClient);
 String lastMqttTopic = "";
@@ -197,7 +197,7 @@ const char* _mqttClientId = "${clientId}";
 
 	// 添加 callback 函數
 	window.arduinoGenerator.functions_['mqtt_callback'] = `
-// MQTT 訊息回調函數
+// MQTT message callback
 void _mqttCallback(char* topic, byte* payload, unsigned int length) {
   lastMqttTopic = String(topic);
   lastMqttMessage = "";
@@ -208,7 +208,7 @@ void _mqttCallback(char* topic, byte* payload, unsigned int length) {
 `;
 
 	// 生成 setup 代碼
-	let code = `// MQTT 設定 - 伺服器: ${server}:${port}\n`;
+	let code = `// MQTT setup - server: ${server}:${port}\n`;
 	code += `mqttClient.setServer("${server}", ${port});\n`;
 	code += `mqttClient.setCallback(_mqttCallback);\n`;
 
@@ -232,7 +232,7 @@ window.arduinoGenerator.forBlock['esp32_mqtt_connect'] = function (block) {
 	window.arduinoGenerator.includes_['wifi'] = '#include <WiFi.h>';
 	window.arduinoGenerator.includes_['pubsubclient'] = '#include <PubSubClient.h>';
 
-	let code = `// MQTT 連線\n`;
+	let code = `// MQTT connect\n`;
 
 	// 根據是否提供帳密選擇連線方式
 	if (username && password) {
@@ -259,7 +259,7 @@ window.arduinoGenerator.forBlock['esp32_mqtt_publish'] = function (block) {
 	// 添加標頭檔
 	window.arduinoGenerator.includes_['pubsubclient'] = '#include <PubSubClient.h>';
 
-	let code = `// MQTT 發布訊息\n`;
+	let code = `// MQTT publish\n`;
 	code += `mqttClient.publish(String(${topic}).c_str(), String(${message}).c_str());\n`;
 
 	return code;
@@ -279,7 +279,7 @@ window.arduinoGenerator.forBlock['esp32_mqtt_subscribe'] = function (block) {
 	// 添加標頭檔
 	window.arduinoGenerator.includes_['pubsubclient'] = '#include <PubSubClient.h>';
 
-	let code = `// MQTT 訂閱主題\n`;
+	let code = `// MQTT subscribe\n`;
 	code += `mqttClient.subscribe(String(${topic}).c_str());\n`;
 
 	return code;

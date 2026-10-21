@@ -49,7 +49,7 @@
 
 		if (condition === 'True' && !hasDelayAtTopLevel(branch)) {
 			generator.addImport('import time');
-			branch += generator.INDENT + 'time.sleep_ms(10)  # 確保可中斷\n';
+			branch += generator.INDENT + 'time.sleep_ms(10)  # Keep the loop interruptible\n';
 		}
 
 		return 'while ' + condition + ':\n' + branch;

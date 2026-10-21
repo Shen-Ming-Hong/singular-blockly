@@ -32,7 +32,7 @@ window.arduinoGenerator.forBlock['servo_setup'] = function (block) {
 		const currentBoard = window.getCurrentBoard();
 
 		// 添加對伺服馬達引腳的註釋說明
-		window.arduinoGenerator.comments_['servo_pin'] = '// 注意：伺服馬達需要PWM（脈衝寬度調變）輸出腳位\n';
+		window.arduinoGenerator.comments_['servo_pin'] = '// Note: servos need a PWM (pulse-width modulation) capable pin\n';
 
 		// 根據開發板選擇適當的伺服馬達庫
 		if (currentBoard === 'esp32') {
@@ -40,7 +40,7 @@ window.arduinoGenerator.forBlock['servo_setup'] = function (block) {
 			window.arduinoGenerator.includes_['servo'] = '#include <ESP32Servo.h>';
 
 			// 需要為 ESP32 設置定時器
-			window.arduinoGenerator.setupCode_.unshift('// 允許分配所有定時器');
+			window.arduinoGenerator.setupCode_.unshift('// Allow allocation of all timers');
 			window.arduinoGenerator.setupCode_.unshift('ESP32PWM::allocateTimer(0);');
 			window.arduinoGenerator.setupCode_.unshift('ESP32PWM::allocateTimer(1);');
 			window.arduinoGenerator.setupCode_.unshift('ESP32PWM::allocateTimer(2);');
@@ -72,9 +72,9 @@ window.arduinoGenerator.forBlock['servo_setup'] = function (block) {
 		// 根據開發板設置伺服馬達
 		if (currentBoard === 'esp32') {
 			// ESP32 需要設置 PWM 頻率
-			window.arduinoGenerator.setupCode_.push(`${varName}.setPeriodHertz(50);  // 標準 50hz 伺服馬達`);
+			window.arduinoGenerator.setupCode_.push(`${varName}.setPeriodHertz(50);  // Standard 50 Hz servo`);
 			window.arduinoGenerator.setupCode_.push(
-				`${varName}.attach(${pin}, 500, 2400);  // 使用 SG90 伺服馬達的最小/最大值 500us 和 2400us`
+				`${varName}.attach(${pin}, 500, 2400);  // SG90 servo min/max pulse: 500us and 2400us`
 			);
 		} else {
 			// 標準 Arduino 設置
@@ -140,9 +140,9 @@ window.arduinoGenerator.forBlock['encoder_setup'] = function (block) {
 		const currentBoard = window.getCurrentBoard();
 		// 添加對編碼馬達引腳的註釋說明
 		if (useInterrupt) {
-			window.arduinoGenerator.comments_['encoder_pin'] = '// 注意：編碼馬達已設定使用支援硬體中斷的引腳\n';
+			window.arduinoGenerator.comments_['encoder_pin'] = '// Note: encoder motor uses hardware-interrupt capable pins\n';
 		} else {
-			window.arduinoGenerator.comments_['encoder_pin'] = '// 注意：建議將編碼馬達連接到支援硬體中斷的引腳以獲得更好的效能\n';
+			window.arduinoGenerator.comments_['encoder_pin'] = '// Note: connect the encoder motor to hardware-interrupt capable pins for better performance\n';
 		}
 
 		// 根據開發板選擇適當的編碼馬達庫
@@ -160,7 +160,7 @@ window.arduinoGenerator.forBlock['encoder_setup'] = function (block) {
 
 			// 宣告編碼馬達變數
 			window.arduinoGenerator.variables_['encoder_' + varName] = `ESP32Encoder ${varName};`; // 設置 ESP32 編碼馬達
-			window.arduinoGenerator.setupCode_.push(`// 設定編碼馬達 ${varName}`);
+			window.arduinoGenerator.setupCode_.push(`// Set up encoder motor ${varName}`);
 			window.arduinoGenerator.setupCode_.push(`ESP32Encoder::useInternalWeakPullResistors=puType::up;`);
 			window.arduinoGenerator.setupCode_.push(`${varName}.attachHalfQuad(${pinA}, ${pinB});`);
 			window.arduinoGenerator.setupCode_.push(`${varName}.clearCount();`);
@@ -270,11 +270,11 @@ window.arduinoGenerator.forBlock['encoder_pid_setup'] = function (block) {
 		}
 
 		// 設置 PID 控制器
-		const modeComment = mode === 'SPEED' ? '速度控制' : '位置控制';
-		window.arduinoGenerator.setupCode_.push(`// 設定PID控制器 ${pidVarName} 用於編碼馬達 ${encoderVarName} (${modeComment})`);
+		const modeComment = mode === 'SPEED' ? 'speed control' : 'position control';
+		window.arduinoGenerator.setupCode_.push(`// Set up PID controller ${pidVarName} for encoder motor ${encoderVarName} (${modeComment})`);
 		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetMode(QuickPID::Control::automatic);`);
 		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetOutputLimits(-255, 255);`);
-		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetSampleTimeUs(10000);  // 10ms 更新頻率`);
+		window.arduinoGenerator.setupCode_.push(`${pidVarName}.SetSampleTimeUs(10000);  // 10 ms update interval`);
 
 		return '';
 	} catch (e) {
@@ -303,7 +303,7 @@ window.arduinoGenerator.forBlock['encoder_pid_compute'] = function (block) {
 		if (mode === 'SPEED') {
 			// 速度模式：計算編碼器讀數的變化量作為輸入
 			window.arduinoGenerator.functions_[funcName] = `
-// PID 速度控制計算函數 - ${pidVarName}
+// PID speed control computation - ${pidVarName}
 float ${funcName}(float targetSpeed) {
   long ${pidVarName}_currentCount = ${encoderVarName}.${encoderReadMethod};
   ${pidVarName}_input = ${pidVarName}_currentCount - ${pidVarName}_lastCount;
@@ -316,7 +316,7 @@ float ${funcName}(float targetSpeed) {
 		} else {
 			// 位置模式：直接使用編碼器讀數作為輸入
 			window.arduinoGenerator.functions_[funcName] = `
-// PID 位置控制計算函數 - ${pidVarName}
+// PID position control computation - ${pidVarName}
 float ${funcName}(float targetPosition) {
   ${pidVarName}_input = ${encoderVarName}.${encoderReadMethod};
   ${pidVarName}_setpoint = targetPosition;
@@ -343,7 +343,7 @@ window.arduinoGenerator.forBlock['encoder_pid_reset'] = function (block) {
 		const pidConfig = window.arduinoGenerator.pidEncoderMap_?.[pidVarName];
 		const mode = pidConfig?.mode || 'POSITION';
 
-		let code = `// 重設 PID 控制器 - ${pidVarName}\n`;
+		let code = `// Reset PID controller - ${pidVarName}\n`;
 
 		// 重設 PID 控制器的積分項和輸出
 		code += `${pidVarName}_input = 0;\n`;

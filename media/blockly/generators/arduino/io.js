@@ -32,9 +32,9 @@ window.validateAndAdjustPwmConfig = function (frequency, resolution) {
 				resolution: adjustedResolution,
 				adjusted: true,
 				warning:
-					`⚠️ 警告：原始設定 ${frequency}Hz @ ${resolution}bit 超出限制\n` +
+					`⚠️ Warning: requested ${frequency}Hz @ ${resolution}bit exceeds the limit\n` +
 					`   (${frequency} × ${Math.pow(2, resolution)} = ${maxValue} > ${APB_CLK})\n` +
-					`   已自動調整為 ${frequency}Hz @ ${adjustedResolution}bit`,
+					`   Adjusted to ${frequency}Hz @ ${adjustedResolution}bit`,
 			};
 		}
 
@@ -42,7 +42,7 @@ window.validateAndAdjustPwmConfig = function (frequency, resolution) {
 			frequency: frequency,
 			resolution: resolution,
 			adjusted: false,
-			info: `✓ 驗證: ${frequency} × ${Math.pow(2, resolution)} = ${maxValue} < ${APB_CLK}`,
+			info: `✓ Check: ${frequency} × ${Math.pow(2, resolution)} = ${maxValue} < ${APB_CLK}`,
 		};
 	} catch (error) {
 		// 容錯處理：返回安全的預設配置
@@ -51,7 +51,7 @@ window.validateAndAdjustPwmConfig = function (frequency, resolution) {
 			frequency: 75000,
 			resolution: 8,
 			adjusted: true,
-			warning: '⚠️ 驗證過程發生錯誤，已重設為預設值 75000Hz @ 8bit',
+			warning: '⚠️ Validation error, reset to default 75000Hz @ 8bit',
 		};
 	}
 };
@@ -102,7 +102,7 @@ window.arduinoGenerator.checkPinMode = function (pin, requiredMode) {
 	if (currentMode && currentMode !== requiredMode) {
 		// 只在腳位模式衝突時才添加警告
 		window.arduinoGenerator.warnings_.push(
-			`提示：腳位 ${pin} 已被設為 ${currentMode} 模式，現在正被用作 ${requiredMode} 模式。若在同一程式流程中，可能需要重新設定腳位模式。`
+			`Note: pin ${pin} was set to ${currentMode} mode and is now used as ${requiredMode}. You may need to set the pin mode again in the same program flow.`
 		);
 
 		// 更新腳位模式為當前要求的模式
@@ -113,7 +113,7 @@ window.arduinoGenerator.checkPinMode = function (pin, requiredMode) {
 		return false; // 返回 false 表示有衝突
 	} else if (!currentMode) {
 		// 如果之前沒設定過模式，則記錄並自動加入設定
-		window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, ${requiredMode}); // 自動設定腳位模式`);
+		window.arduinoGenerator.setupCode_.push(`pinMode(${pin}, ${requiredMode}); // Auto-set pin mode`);
 		window.arduinoGenerator.pinModes_[normalizedPin] = requiredMode;
 	}
 
@@ -209,9 +209,9 @@ window.arduinoGenerator.forBlock['arduino_analog_write'] = function (block) {
 				// 插入 LEDC 設定
 				window.arduinoGenerator.setupCode_.push(`// ${setupKey}`);
 				window.arduinoGenerator.setupCode_.push(
-					`ledcSetup(${channel}, ${finalFreq}, ${finalRes});  // 通道${channel}, ${finalFreq}Hz PWM, ${finalRes}位解析度`
+					`ledcSetup(${channel}, ${finalFreq}, ${finalRes});  // Channel ${channel}, ${finalFreq}Hz PWM, ${finalRes}-bit resolution`
 				);
-				window.arduinoGenerator.setupCode_.push(`ledcAttachPin(${pin}, ${channel});  // 將通道${channel}附加到 GPIO${pin}`);
+				window.arduinoGenerator.setupCode_.push(`ledcAttachPin(${pin}, ${channel});  // Attach channel ${channel} to GPIO${pin}`);
 			}
 
 			window.arduinoGenerator.includes_['esp32_ledc'] = '#include <esp32-hal-ledc.h>';
@@ -314,21 +314,21 @@ window.arduinoGenerator.forBlock['seven_segment_pins'] = function (block) {
 
 		// 定義七段顯示器腳位陣列
 		window.arduinoGenerator.variables_['seven_segment_pins'] = `
-// 七段顯示器的引腳連接 (A, B, C, D, E, F, G, DP)
+// Seven-segment display pins (A, B, C, D, E, F, G, DP)
 byte sevenSegmentPins[] = {${pinValues.join(', ')}};
         `;
 
 		// 將設置引腳模式的程式碼添加到 setup 區塊
 		window.arduinoGenerator.setupCode_.push(`
-  // 設置七段顯示器引腳為輸出模式
+  // Set seven-segment display pins as outputs
   for (int i = 0; i < 8; i++) {
     pinMode(sevenSegmentPins[i], OUTPUT);
-    // 記錄這些腳位是 OUTPUT 模式
-    // 無法直接獲取腳位編號，七段顯示器會使用 digitalWrite
+    // These pins are in OUTPUT mode
+    // Pin numbers are not tracked here; the display uses digitalWrite
   }
         `);
 
-		return '// 七段顯示器引腳已設定\n';
+		return '// Seven-segment display pins configured\n';
 	} catch (e) {
 		log.error('Seven segment pins block code generation error:', e);
 		return ''; // 發生錯誤時返回空字串
@@ -343,7 +343,7 @@ window.arduinoGenerator.forBlock['seven_segment_display'] = function (block) {
 
 		// 七段顯示器碼位定義 (0-9)
 		window.arduinoGenerator.definitions_['seven_segment_digits'] = `
-// 七段顯示器碼位定義 (0-9)
+// Seven-segment digit patterns (0-9)
 const byte SEVEN_SEGMENT_DIGITS[] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -365,13 +365,13 @@ void displaySevenSegment(byte pins[], byte value, bool isCommonAnode, bool decim
   
   byte segmentValue = SEVEN_SEGMENT_DIGITS[value];
   if (decimalPoint) {
-    segmentValue |= 0b10000000; // 添加小數點
+    segmentValue |= 0b10000000; // Add decimal point
   }
   
   for (int i = 0; i < 8; i++) {
     bool segmentState = bitRead(segmentValue, i);
     if (isCommonAnode) {
-      segmentState = !segmentState; // 如果是共陽極，反轉信號
+      segmentState = !segmentState; // Invert signal for common anode
     }
     digitalWrite(pins[i], segmentState);
   }
@@ -381,16 +381,16 @@ void displaySevenSegment(byte pins[], byte value, bool isCommonAnode, bool decim
 		// 檢查是否已定義 sevenSegmentPins 數組
 		if (!window.arduinoGenerator.variables_['seven_segment_pins']) {
 			window.arduinoGenerator.variables_['seven_segment_pins'] = `
-// 七段顯示器的引腳連接 (A, B, C, D, E, F, G, DP)
-byte sevenSegmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9}; // 預設引腳連接
+// Seven-segment display pins (A, B, C, D, E, F, G, DP)
+byte sevenSegmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9}; // Default pin wiring
             `;
 
 			// 添加設置引腳模式的程式碼
 			window.arduinoGenerator.setupCode_.push(`
-  // 設置七段顯示器引腳為輸出模式
+  // Set seven-segment display pins as outputs
   for (int i = 0; i < 8; i++) {
     pinMode(sevenSegmentPins[i], OUTPUT);
-    // 預設腳位不可直接透過索引獲取，因此不記錄特定狀態
+    // Default pins are not tracked individually
   }
             `);
 		}

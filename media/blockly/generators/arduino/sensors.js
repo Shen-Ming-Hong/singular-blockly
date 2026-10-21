@@ -39,32 +39,32 @@ window.arduinoGenerator.forBlock['ultrasonic_sensor'] = function (block) {
 
 		// 定義全域變數
 		window.arduinoGenerator.variables_['ultrasonic_vars'] = `
-// 超音波感測器變數
-const int ultrasonic_trigPin = ${trigPin};  // 超音波 Trig 腳位
-const int ultrasonic_echoPin = ${echoPin};  // 超音波 Echo 腳位
-float ultrasonic_distance = 0;  // 儲存測量的距離
+// Ultrasonic sensor variables
+const int ultrasonic_trigPin = ${trigPin};  // Ultrasonic Trig pin
+const int ultrasonic_echoPin = ${echoPin};  // Ultrasonic Echo pin
+float ultrasonic_distance = 0;  // Last measured distance
 `;
 		// 如果使用中斷
 		if (useInterrupt) {
 			log.info('ultrasonic_sensor: 使用中斷模式，設定中斷相關變數和函數');
 			window.arduinoGenerator.variables_['ultrasonic_interrupt_vars'] = `
-// 超音波中斷模式變數
-volatile unsigned long ultrasonic_echoStart = 0;  // 開始時間
-volatile unsigned long ultrasonic_echoEnd = 0;    // 結束時間
+// Ultrasonic interrupt-mode variables
+volatile unsigned long ultrasonic_echoStart = 0;  // Echo start time
+volatile unsigned long ultrasonic_echoEnd = 0;    // Echo end time
 `;
 
 			// 中斷處理函數
 			window.arduinoGenerator.functions_['ultrasonic_echo_isr'] = `
 void ultrasonicEchoISR() {
   if (digitalRead(ultrasonic_echoPin) == HIGH) {
-    // 記錄回波信號開始時間
+    // Record echo start time
     ultrasonic_echoStart = micros();
   } else {
-    // 記錄回波信號結束時間
+    // Record echo end time
     ultrasonic_echoEnd = micros();
-    // 計算持續時間
+    // Compute pulse duration
     unsigned long duration = ultrasonic_echoEnd - ultrasonic_echoStart;
-    // 計算距離 (聲音速度 / 2) = 29.1 cm/µs
+    // Distance = (duration / 2) / 29.1 (speed of sound, cm/µs)
     ultrasonic_distance = (duration / 2.0) / 29.1;
   }
 }
@@ -72,7 +72,7 @@ void ultrasonicEchoISR() {
 
 			// 在 setup 區塊中添加中斷設定，不再重複 pinMode
 			window.arduinoGenerator.setupCode_.push(`
-  // 設定超音波感測器中斷
+  // Attach ultrasonic sensor interrupt
   attachInterrupt(digitalPinToInterrupt(${echoPin}), ultrasonicEchoISR, CHANGE);
 `);
 		} else {
@@ -80,19 +80,19 @@ void ultrasonicEchoISR() {
 			// 添加測距函數
 			log.info('ultrasonic_sensor: 使用非中斷模式，設定測距函數');
 			window.arduinoGenerator.functions_['ultrasonic_measure'] = `
-// 測量超音波距離的函數
+// Measure ultrasonic distance
 float ultrasonicMeasureDistance() {
-  // 先發送 10 微秒的觸發訊號
+  // Send a 10 µs trigger pulse
   digitalWrite(ultrasonic_trigPin, LOW);
   delayMicroseconds(2);
   digitalWrite(ultrasonic_trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(ultrasonic_trigPin, LOW);
   
-  // 測量回波時間
+  // Measure echo time
   unsigned long duration = pulseIn(ultrasonic_echoPin, HIGH);
   
-  // 計算距離 (聲音速度 / 2) = 29.1 cm/µs
+  // Distance = (duration / 2) / 29.1 (speed of sound, cm/µs)
   return (duration / 2.0) / 29.1;
 }
 `;
@@ -145,7 +145,7 @@ window.arduinoGenerator.forBlock['ultrasonic_read'] = function (block) {
 
 		// 如果仍然沒有找到或設定感測器，顯示警告
 		if (!hasSensorBlock) {
-			window.arduinoGenerator.warnings_.push('嘗試讀取超音波距離，但未設定超音波感測器。請先在程式中添加超音波感測器設定積木。');
+			window.arduinoGenerator.warnings_.push('Reading ultrasonic distance without an ultrasonic sensor setup block. Add the ultrasonic sensor setup block first.');
 			log.warn('ultrasonic_read: 未能設定超音波感測器變數');
 			return ['0', window.arduinoGenerator.ORDER_ATOMIC]; // 返回安全的默認值
 		} // 判斷使用哪種模式讀取距離
@@ -204,16 +204,16 @@ window.arduinoGenerator.forBlock['ultrasonic_trigger'] = function (block) {
 
 		// 如果仍然沒有找到或設定感測器，顯示警告
 		if (!hasSensorBlock) {
-			window.arduinoGenerator.warnings_.push('嘗試觸發超音波，但未設定超音波感測器。請先在程式中添加超音波感測器設定積木。');
+			window.arduinoGenerator.warnings_.push('Triggering ultrasonic without an ultrasonic sensor setup block. Add the ultrasonic sensor setup block first.');
 			log.warn('ultrasonic_trigger: 未能設定超音波感測器變數');
-			return '// 錯誤：未設定超音波感測器\n'; // 返回註解提示
+			return '// Error: ultrasonic sensor is not set up\n'; // 返回註解提示
 		} // 確保函數定義只加入一次
 		if (!window.arduinoGenerator.functions_['triggerUltrasonic']) {
 			log.info('ultrasonic_trigger: 新增超音波觸發函數定義');
 			window.arduinoGenerator.functions_['triggerUltrasonic'] = `
-// 超音波觸發函數
+// Ultrasonic trigger function
 void triggerUltrasonic() {
-  // 發送超音波觸發信號
+  // Send ultrasonic trigger pulse
   digitalWrite(ultrasonic_trigPin, LOW);
   delayMicroseconds(2);
   digitalWrite(ultrasonic_trigPin, HIGH);
@@ -225,7 +225,7 @@ void triggerUltrasonic() {
 
 		// 返回函數調用的程式碼
 		log.debug('ultrasonic_trigger: 生成超音波觸發函數調用');
-		return 'triggerUltrasonic();  // 發送超音波訊號\n';
+		return 'triggerUltrasonic();  // Send ultrasonic pulse\n';
 	} catch (e) {
 		log.error('ultrasonic_trigger: 程式碼生成錯誤', e);
 		return ''; // 發生錯誤時返回空字串

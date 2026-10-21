@@ -86,19 +86,19 @@ window.arduinoGenerator.forBlock['pixetto_init'] = function (block) {
 		window.arduinoGenerator.lib_ldf_mode_ = 'deep+';
 
 		// 定義全域變數（標明開發板類型）
-		const boardComment = isESP32 ? '// ESP32 使用硬體 Serial2' : '// Arduino AVR 使用 SoftwareSerial';
+		const boardComment = isESP32 ? '// ESP32 uses hardware Serial2' : '// Arduino AVR uses SoftwareSerial';
 		window.arduinoGenerator.variables_['pixetto_vars'] = `
 ${boardComment}
-Pixetto pixetto(${rxPin}, ${txPin});  // 建立 Pixetto 物件，設定 RX 和 TX 腳位
+Pixetto pixetto(${rxPin}, ${txPin});  // Pixetto object on the RX and TX pins
 `;
 		// 在 setup() 函數中初始化
 		if (!window.arduinoGenerator.setupCode_) {
 			window.arduinoGenerator.setupCode_ = [];
 		}
 
-		const setupCodeComment = '// 初始化 Pixetto 智慧鏡頭';
+		const setupCodeComment = '// Initialize Pixetto smart camera';
 		const setupCodeBegin = 'pixetto.begin();';
-		const setupCodeDelay = 'delay(1000);  // 等待初始化完成';
+		const setupCodeDelay = 'delay(1000);  // Wait for initialization';
 
 		if (!window.arduinoGenerator.setupCode_.includes(setupCodeComment)) {
 			window.arduinoGenerator.setupCode_.push(setupCodeComment);

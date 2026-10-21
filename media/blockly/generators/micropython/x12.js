@@ -28,7 +28,7 @@
 		generator.addImport('from machine import Pin, ADC');
 		generator.addHardwareInit(
 			'x12_driver',
-			`# X12 驅動初始化 (直接硬體存取)
+			`# X12 driver init (direct hardware access)
 _x12_adc = {}
 for _i, _p in enumerate([0, 1, 2, 3, 4, 5]):
     _x12_adc[_i] = ADC(Pin(_p))
