@@ -176,7 +176,7 @@ window.languageManager.loadMessages('pt-br', {
 
 	// Block Categories
 	CATEGORY_LOGIC: 'Lógica',
-	CATEGORY_LOOPS: 'Loops',
+	CATEGORY_LOOPS: 'Repetições',
 	CATEGORY_MATH: 'Matemática',
 	CATEGORY_TEXT: 'Texto',
 	CATEGORY_LISTS: 'Listas',
@@ -322,8 +322,8 @@ window.languageManager.loadMessages('pt-br', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'Não foi possível salvar o estado do espaço de trabalho: {0}',
 	VSCODE_FAILED_START: 'Falha ao iniciar o Singular Blockly: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Tem certeza que deseja excluir a variável "{0}"?',
-	VSCODE_BOARD_UPDATED: 'Configuração da placa atualizada para: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Por favor, recarregue a janela para completar a configuração',
+	VSCODE_BOARD_UPDATED: 'Placa alterada para: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Recarregue a janela para concluir a configuração.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Digite o nome da nova variável',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Digite o novo nome da variável (atual: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'O nome da variável não pode estar vazio',
@@ -350,8 +350,8 @@ window.languageManager.loadMessages('pt-br', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Instalando o auxiliar de dispositivo CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Verificando as ferramentas gerenciadas',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Confirmando o Singular Core verificado',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'O Singular Core precisa de uma pasta local mais curta neste sistema Windows. O Provider Core não foi alterado.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'A configuração do Singular Core não foi concluída. O Provider Core não foi alterado.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'O Singular Core precisa de uma pasta local com um caminho mais curto neste Windows. O Core da extensão PlatformIO não foi alterado.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'A configuração do Singular Core não foi concluída. O Core da extensão PlatformIO não foi alterado.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Abrir diagnóstico',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Escolher pasta mais curta',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -391,8 +391,8 @@ window.languageManager.loadMessages('pt-br', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Próximo passo",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Verificação de versão",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Do penv detectado",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Sim',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Não',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Ainda sem dados",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Execute o diagnóstico uma vez para ver os caminhos localizados e os detalhes das ferramentas.",
 	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: "Testar novamente",
@@ -525,7 +525,7 @@ window.languageManager.loadMessages('pt-br', {
 	RENAME_VARIABLE: 'Renomear variável...',
 	NEW_VARIABLE: 'Criar variável...',
 	DELETE_VARIABLE: 'Excluir variável %1',
-	PROCEDURE_ALREADY_EXISTS: 'Um procedimento chamado "%1" já existe.',
+	PROCEDURE_ALREADY_EXISTS: 'Já existe uma função chamada "%1".',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'se',
@@ -1100,7 +1100,7 @@ window.languageManager.loadMessages('pt-br', {
 	X11_LED_INDEX_ALL: 'Todos',
 
 	// === Placa de extensão X12 Transmissor ===
-	CATEGORY_X12: 'X12 Extensão',
+	CATEGORY_X12: 'Extensão X12',
 	X12_LABEL_JOYSTICK: 'Joystick',
 	X12_LABEL_BUTTON: 'Botão',
 
@@ -1154,14 +1154,14 @@ window.languageManager.loadMessages('pt-br', {
 	RC_SLAVE_INIT_CHANNEL: 'canal',
 	RC_SLAVE_INIT_TOOLTIP: 'Inicializar receptor RC com ID pareamento (1-255) e canal (1-11). Nota sobre canal: se ambos os dispositivos estiverem conectados ao mesmo Wi-Fi, o RC usa o canal Wi-Fi; se nenhum estiver conectado, o RC usa o canal configurado.',
 	RC_WAIT_CONNECTION: 'Aguardar pareamento',
-	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_TIMEOUT: 'até',
 	RC_WAIT_SECONDS: 'seg',
 	RC_WAIT_TOOLTIP: 'Aguardar conexão transmissor, LED pisca azul, continua após timeout',
 
 	// Blocos leitura dados RC
-	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_TOOLTIP: 'Ler valor joystick remoto (0-4095), 2048 é centro',
-	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_MAPPED_MIN: 'mapear para',
 	RC_GET_JOYSTICK_MAPPED_MAX: '~',
 	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Ler joystick remoto e mapear para intervalo especificado',

@@ -1,5 +1,5 @@
 {
-	"singularBlockly.managedRuntime.path.markdownDescription": "Singular 受管理 Python 與 PlatformIO 執行環境的選用本機絕對路徑。留空時使用 VS Code 擴充功能全域儲存空間；不支援 UNC 與網路路徑。",
+	"singularBlockly.managedRuntime.path.markdownDescription": "Singular 管理的 Python 與 PlatformIO 執行環境要放在哪個本機資料夾（選填，請填完整路徑）。留空時使用 VS Code 擴充功能全域儲存空間；不支援 UNC 與網路路徑。",
 	"command.checkPlatformioStatus.title": "檢查 PlatformIO 狀態",
 	"command.provideFeedback.title": "提供回饋",
 	"command.showMyFeedback.title": "我的回饋",

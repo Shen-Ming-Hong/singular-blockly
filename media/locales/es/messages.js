@@ -117,12 +117,12 @@ window.languageManager.loadMessages('es', {
 	CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED: 'El parche OTA de CyberBrick falló.',
 	OTA_AGENT_UPGRADING: 'Actualizando agente OTA {0} → {1}...',
 	OTA_AGENT_UPGRADED: 'Agente OTA actualizado a {0}. Reanudando carga...',
-	OTA_AGENT_UPGRADE_NEEDED: 'El agente OTA {0} está desactualizado. Vuelva a emparejar el CyberBrick para habilitar la actualización automática.',
+	OTA_AGENT_UPGRADE_NEEDED: 'El agente OTA {0} es una versión antigua. Vuelve a emparejar el CyberBrick para que se actualice solo.',
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Bloques experimentales detectados',
 	EXPERIMENTAL_BLOCKS_DESC:
-		'Su espacio de trabajo contiene bloques experimentales (resaltados con bordes amarillos discontinuos). Estas funciones pueden cambiar o eliminarse en futuras actualizaciones, úselas con precaución.',
+		'Tu espacio de trabajo tiene bloques experimentales (con borde amarillo de rayas). Estos bloques pueden cambiar o desaparecer en próximas versiones, así que úsalos con cuidado.',
 
 	// Preview Mode UI
 	PREVIEW_BADGE: 'Vista previa',
@@ -136,7 +136,7 @@ window.languageManager.loadMessages('es', {
 	BACKUP_MANAGER_TITLE: 'Gestor de copias de seguridad',
 	BACKUP_CREATE_NEW: 'Crear nueva copia',
 	BACKUP_NAME_LABEL: 'Nombre:',
-	BACKUP_NAME_PLACEHOLDER: 'Introduzca nombre de la copia',
+	BACKUP_NAME_PLACEHOLDER: 'Escribe un nombre para la copia',
 	BACKUP_CONFIRM: 'Confirmar',
 	BACKUP_CANCEL: 'Cancelar',
 	BACKUP_LIST_TITLE: 'Lista de copias',
@@ -164,7 +164,7 @@ window.languageManager.loadMessages('es', {
 	// Block Search UI
 	FUNCTION_SEARCH_TITLE: 'Buscar Bloques',
 	FUNCTION_SEARCH_BUTTON_TITLE: 'Buscar Bloques',
-	FUNCTION_SEARCH_PLACEHOLDER: 'Introduzca nombre o parámetros del bloque...',
+	FUNCTION_SEARCH_PLACEHOLDER: 'Escribe el nombre o los parámetros del bloque...',
 	FUNCTION_SEARCH_BTN: 'Buscar',
 	FUNCTION_SEARCH_PREV: 'Anterior',
 	FUNCTION_SEARCH_NEXT: 'Siguiente',
@@ -189,7 +189,7 @@ window.languageManager.loadMessages('es', {
 	// Servo Block Labels
 	SERVO_SETUP: 'Configurar Motor Servo',
 	SERVO_PIN: 'Pin',
-	SERVO_SETUP_TOOLTIP: 'Declarar variable de motor servo y establecer pin',
+	SERVO_SETUP_TOOLTIP: 'Crea una variable para el servomotor y elige su pin',
 	SERVO_MOVE: 'Girar Motor Servo',
 	SERVO_ANGLE: 'Ángulo',
 	SERVO_MOVE_TOOLTIP: 'Girar motor servo a un ángulo específico',
@@ -202,11 +202,11 @@ window.languageManager.loadMessages('es', {
 	ENCODER_PIN_A: 'Pin A',
 	ENCODER_PIN_B: 'Pin B',
 	ENCODER_USE_INTERRUPT: 'Usar Interrupción',
-	ENCODER_SETUP_TOOLTIP: 'Configurar motor encoder con configuraciones de nombre y pines',
+	ENCODER_SETUP_TOOLTIP: 'Configura el motor con encoder: su nombre y sus pines',
 	ENCODER_READ: 'Leer Encoder',
 	ENCODER_READ_TOOLTIP: 'Obtener posición actual del encoder',
-	ENCODER_RESET: 'Resetear Encoder',
-	ENCODER_RESET_TOOLTIP: 'Resetear posición del encoder a cero',
+	ENCODER_RESET: 'Poner Encoder a cero',
+	ENCODER_RESET_TOOLTIP: 'Pone la posición del encoder en cero',
 	ENCODER_PID_SETUP: 'Configurar Control PID',
 	ENCODER_PID_MOTOR: 'Motor',
 	ENCODER_PID_KP: 'Kp',
@@ -215,7 +215,7 @@ window.languageManager.loadMessages('es', {
 	ENCODER_PID_MODE: 'Modo',
 	ENCODER_PID_MODE_POSITION: 'Posición',
 	ENCODER_PID_MODE_SPEED: 'Velocidad',
-	ENCODER_PID_SETUP_TOOLTIP: 'Configurar control PID para control preciso del motor. Seleccione modo de posición o velocidad.',
+	ENCODER_PID_SETUP_TOOLTIP: 'Configura el control PID para mover el motor con precisión. Elige el modo posición o velocidad.',
 	ENCODER_PID_COMPUTE: 'Calcular PID',
 	ENCODER_PID_TARGET: 'Objetivo',
 	ENCODER_PID_COMPUTE_TOOLTIP: 'Calcular salida de control PID basado en posición objetivo',
@@ -246,7 +246,7 @@ window.languageManager.loadMessages('es', {
 	ULTRASONIC_READ: 'Leer Distancia Ultrasónica (cm)',
 	ULTRASONIC_TOOLTIP_SETUP: 'Configura el sensor ultrasónico con pines Trig y Echo. Interrupción hardware opcional para mayor precisión.',
 	ULTRASONIC_TOOLTIP_READ: 'Lee la distancia medida por el sensor ultrasónico en centímetros.',
-	ULTRASONIC_WARNING: 'El pin Echo {0} seleccionado no soporta interrupciones hardware. Por favor, elija uno de estos pines: {1}',
+	ULTRASONIC_WARNING: 'El pin Echo {0} no admite interrupciones de hardware. Elige uno de estos pines: {1}',
 
 	// Threshold Function Block Labels
 	THRESHOLD_PIN: 'en',
@@ -295,7 +295,7 @@ window.languageManager.loadMessages('es', {
 	LOOP_UNTIL: 'hasta que',
 	LOOP_FOR: 'para',
 	LOOP_FOREACH: 'para cada',
-	LOOP_BREAK: 'romper',
+	LOOP_BREAK: 'salir del bucle',
 	LOOP_CONTINUE: 'continuar',
 
 	// Math Block Labels
@@ -309,22 +309,22 @@ window.languageManager.loadMessages('es', {
 	MATH_POWER: 'potencia',
 
 	// Math Map Block
-	MATH_MAP_VALUE: 'mapear',
+	MATH_MAP_VALUE: 'convertir rango',
 	MATH_MAP_TOOLTIP:
-		'Remapea un número de un rango a otro. Por ejemplo, map(valor, 0, 1023, 0, 255) escalará una entrada analógica a una salida PWM de 8 bits.',
+		'Convierte un número de un rango a otro. Por ejemplo, map(valor, 0, 1023, 0, 255) pasa una lectura analógica a una salida PWM de 8 bits.',
 
 	// VS Code UI Messages
 	VSCODE_OPEN_FOLDER: 'Abrir Carpeta',
-	VSCODE_PLEASE_OPEN_PROJECT: '¡Por favor, abra primero una carpeta de proyecto!',
+	VSCODE_PLEASE_OPEN_PROJECT: '¡Primero abre una carpeta de proyecto!',
 	VSCODE_FAILED_SAVE_FILE: 'Error al guardar el archivo: {0}',
 	VSCODE_FAILED_UPDATE_INI: 'Error al actualizar platformio.ini: {0}',
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'No se pudo guardar el estado del espacio de trabajo: {0}',
 	VSCODE_FAILED_START: 'Error al iniciar Singular Blockly: {0}',
-	VSCODE_CONFIRM_DELETE_VARIABLE: '¿Está seguro de que desea eliminar la variable "{0}"?',
-	VSCODE_BOARD_UPDATED: 'Configuración de la placa actualizada a: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Por favor, recargue la ventana para completar la configuración',
-	VSCODE_ENTER_VARIABLE_NAME: 'Introduzca el nombre de la nueva variable',
-	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Introduzca el nuevo nombre de la variable (actual: {0})',
+	VSCODE_CONFIRM_DELETE_VARIABLE: '¿Seguro que quieres eliminar la variable "{0}"?',
+	VSCODE_BOARD_UPDATED: 'La placa cambió a: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Vuelve a cargar la ventana para terminar la configuración.',
+	VSCODE_ENTER_VARIABLE_NAME: 'Escribe el nombre de la nueva variable',
+	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Escribe el nuevo nombre de la variable (ahora: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'El nombre de la variable no puede estar vacío',
 	VSCODE_VARIABLE_NAME_INVALID:
 		'El nombre de la variable solo puede contener letras, números y guiones bajos, y no puede comenzar con un número',
@@ -349,8 +349,8 @@ window.languageManager.loadMessages('es', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Instalando el asistente de dispositivos CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Verificando las herramientas administradas',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Confirmando Singular Core verificado',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core necesita una carpeta local más corta en este sistema Windows. Provider Core no se modificó.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'La configuración de Singular Core no se completó. Provider Core no se modificó.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core necesita una carpeta local con una ruta más corta en este Windows. El Core de la extensión PlatformIO no se modificó.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'La configuración de Singular Core no terminó. El Core de la extensión PlatformIO no se modificó.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Abrir diagnóstico',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Elegir una carpeta más corta',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -390,7 +390,7 @@ window.languageManager.loadMessages('es', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Siguiente paso",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Comprobación de versión",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Desde el penv detectado",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Sí',
 	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Aún no hay datos",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Ejecuta el diagnóstico una vez para ver las rutas localizadas y los detalles de las herramientas.",
@@ -491,7 +491,7 @@ window.languageManager.loadMessages('es', {
 	PLATFORMIO_REPAIR_ISSUE_DRAFT_COPY_FAILED: "No se pudo crear el borrador de issue: {0}",
 
 	// Error Messages
-	ERROR_BOARD_NOT_SELECTED: 'Por favor, seleccione una placa primero',
+	ERROR_BOARD_NOT_SELECTED: 'Primero elige una placa',
 	ERROR_INVALID_PIN: 'Número de pin inválido',
 	ERROR_INVALID_VALUE: 'Valor inválido',
 	ERROR_MISSING_TRANSLATION: 'Traducción faltante',
@@ -524,7 +524,7 @@ window.languageManager.loadMessages('es', {
 	RENAME_VARIABLE: 'Renombrar variable...',
 	NEW_VARIABLE: 'Crear variable...',
 	DELETE_VARIABLE: 'Eliminar variable %1',
-	PROCEDURE_ALREADY_EXISTS: 'Ya existe un procedimiento con el nombre "%1".',
+	PROCEDURE_ALREADY_EXISTS: 'Ya existe una función llamada "%1".',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'si',
@@ -903,13 +903,13 @@ window.languageManager.loadMessages('es', {
 	// Quick Backup Toast Messages
 	BACKUP_QUICK_SAVE_SUCCESS: 'Copia guardada: {0}',
 	BACKUP_QUICK_SAVE_EMPTY: 'El espacio de trabajo está vacío, no se necesita copia de seguridad',
-	BACKUP_QUICK_SAVE_COOLDOWN: 'Por favor espere, la copia de seguridad acaba de completarse',
+	BACKUP_QUICK_SAVE_COOLDOWN: 'Espera un momento, la copia de seguridad acaba de terminar',
 	MAIN_BLOCK_DUPLICATE_WARNING: 'Se detectaron varios bloques de programa principal. Elimina los bloques sobrantes.',
 
 	// Board Switch Warning
 	BOARD_SWITCH_WARNING_TITLE: 'Cambiar tipo de placa',
 	BOARD_SWITCH_WARNING_MESSAGE:
-		'Cambiar a un tipo de placa diferente borrará el espacio de trabajo actual.\nSu trabajo se respaldará automáticamente primero.\n\n¿Desea continuar?',
+		'Si cambias a otro tipo de placa, se borrará el espacio de trabajo actual.\nAntes se hará una copia de seguridad de tu trabajo.\n\n¿Quieres continuar?',
 
 	// CyberBrick Board
 	BOARD_CYBERBRICK: 'CyberBrick',
@@ -981,13 +981,13 @@ window.languageManager.loadMessages('es', {
 
 	// CyberBrick Upload
 	UPLOAD_BUTTON_TITLE: 'Subir a CyberBrick',
-	UPLOAD_BUTTON_DISABLED_TITLE: 'Guarde el espacio de trabajo primero para habilitar la carga',
+	UPLOAD_BUTTON_DISABLED_TITLE: 'Primero guarda el espacio de trabajo para poder subir el programa',
 	UPLOAD_STARTING: 'Iniciando carga...',
 	UPLOAD_SUCCESS: '¡Carga exitosa!',
 	UPLOAD_FAILED: 'Carga fallida: {0}',
 	UPLOAD_NO_PORT: 'No se encontró dispositivo CyberBrick',
 	UPLOAD_IN_PROGRESS: 'Cargando...',
-	UPLOAD_EMPTY_WORKSPACE: 'El espacio de trabajo está vacío, agregue bloques primero',
+	UPLOAD_EMPTY_WORKSPACE: 'El espacio de trabajo está vacío. Primero agrega bloques.',
 	UPLOAD_NO_CODE: 'No se puede generar código',
 
 	// Upload progress stages
@@ -1004,16 +1004,16 @@ window.languageManager.loadMessages('es', {
 	// Upload error messages
 	ERROR_UPLOAD_BOARD_UNSUPPORTED: 'Solo se admite la placa CyberBrick',
 	ERROR_UPLOAD_CODE_EMPTY: 'El código no puede estar vacío',
-	ERROR_UPLOAD_NO_PYTHON: 'No se encontró el entorno Python de PlatformIO. Por favor, instale PlatformIO primero.',
+	ERROR_UPLOAD_NO_PYTHON: 'No se encontró el entorno Python de PlatformIO. Primero instala PlatformIO.',
 	ERROR_UPLOAD_MPREMOTE_FAILED: 'Fallo en la instalación de mpremote',
-	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'No se encontró el dispositivo CyberBrick. Por favor, asegúrese de que esté conectado.',
+	ERROR_UPLOAD_DEVICE_NOT_FOUND: 'No se encontró el CyberBrick. Revisa que esté conectado.',
 	ERROR_UPLOAD_RESET_FAILED: 'Error al reiniciar el dispositivo',
 	ERROR_UPLOAD_UPLOAD_FAILED: 'Error al cargar el programa',
 	ERROR_UPLOAD_RESTART_FAILED: 'Error al reiniciar el dispositivo',
 
 	// Arduino Upload Button
 	UPLOAD_BUTTON_TITLE_ARDUINO: 'Compilar y Cargar',
-	UPLOAD_SELECT_BOARD: 'Por favor seleccione una placa primero',
+	UPLOAD_SELECT_BOARD: 'Primero elige una placa',
 
 	// Arduino Upload Stages
 	ARDUINO_STAGE_SYNCING: 'Sincronizando configuración',
@@ -1028,21 +1028,21 @@ window.languageManager.loadMessages('es', {
 	ARDUINO_UPLOAD_SUCCESS: '¡Carga exitosa!',
 
 	// Arduino Upload Errors
-	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI no encontrado. Por favor instale PlatformIO primero.',
+	ERROR_ARDUINO_PIO_NOT_FOUND: 'No se encontró PlatformIO CLI. Primero instala PlatformIO.',
 	ERROR_ARDUINO_COMPILE_FAILED: 'Fallo en la compilación',
 	ERROR_ARDUINO_UPLOAD_FAILED: 'Fallo en la carga',
-	ERROR_ARDUINO_NO_WORKSPACE: 'Por favor abra una carpeta de proyecto primero',
+	ERROR_ARDUINO_NO_WORKSPACE: 'Primero abre una carpeta de proyecto',
 	ERROR_ARDUINO_TIMEOUT: 'La operación expiró',
-	ERROR_ARDUINO_NO_DEVICE: 'No se detectó ningún dispositivo. Conecte su placa.',
+	ERROR_ARDUINO_NO_DEVICE: 'No se encontró ningún dispositivo. Conecta tu placa.',
 	ERROR_ARDUINO_PORT_BUSY: 'El puerto está siendo utilizado por otro programa. Cierre otros monitores serie.',
 	ERROR_ARDUINO_DEVICE_DISCONNECT: 'El dispositivo se desconectó durante la carga.',
-	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'Tiempo de carga agotado. Verifique su conexión.',
-	ERROR_ARDUINO_UPLOAD_CONNECTION: 'Error en la carga. Verifique la conexión del dispositivo.',
+	ERROR_ARDUINO_UPLOAD_TIMEOUT: 'La subida tardó demasiado. Revisa la conexión.',
+	ERROR_ARDUINO_UPLOAD_CONNECTION: 'La subida falló. Revisa la conexión del dispositivo.',
 
 	// Backup messages
-	BACKUP_CONFIRM_DELETE: '¿Está seguro de que desea eliminar la copia de seguridad "{0}"?',
+	BACKUP_CONFIRM_DELETE: '¿Seguro que quieres eliminar la copia de seguridad "{0}"?',
 	BACKUP_CONFIRM_RESTORE:
-		'¿Está seguro de que desea restaurar la copia de seguridad "{0}"? Esto sobrescribirá el espacio de trabajo actual.',
+		'¿Seguro que quieres restaurar la copia de seguridad "{0}"? Esto reemplazará el espacio de trabajo actual.',
 	BACKUP_ERROR_NOT_FOUND: 'Copia de seguridad "{0}" no encontrada',
 	BACKUP_ERROR_CREATE_FAILED: 'Error al crear la copia de seguridad: {0}',
 	BACKUP_ERROR_DELETE_FAILED: 'Error al eliminar la copia de seguridad: {0}',
@@ -1060,7 +1060,7 @@ window.languageManager.loadMessages('es', {
 	ERROR_PROCESSING_MESSAGE: 'Error al procesar el mensaje: {0}',
 	ERROR_SETTINGS_UPDATE_FAILED: 'Error al actualizar la configuración',
 	ERROR_RELOAD_WORKSPACE_FAILED: 'Error al recargar el espacio de trabajo: {0}',
-	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Por favor, abra una carpeta de proyecto primero',
+	ERROR_OPEN_PROJECT_FOLDER_FIRST: 'Primero abre una carpeta de proyecto',
 
 	// Info messages
 	INFO_NO_BACKUPS_TO_PREVIEW: 'No hay archivos de copia de seguridad para previsualizar',
@@ -1105,7 +1105,7 @@ window.languageManager.loadMessages('es', {
 	X11_LED_INDEX_ALL: 'Todos',
 
 	// === Placa de extensión X12 Transmisor ===
-	CATEGORY_X12: 'X12 Extensión',
+	CATEGORY_X12: 'Extensión X12',
 	X12_LABEL_JOYSTICK: 'Joystick',
 	X12_LABEL_BUTTON: 'Botón',
 
@@ -1159,7 +1159,7 @@ window.languageManager.loadMessages('es', {
 	RC_SLAVE_INIT_CHANNEL: 'Canal',
 	RC_SLAVE_INIT_TOOLTIP: 'Inicializar receptor RC con ID pareja (1-255) y canal (1-11). Nota de canal: si ambos dispositivos se conectan al mismo Wi-Fi, RC usa el canal Wi-Fi; si ninguno está conectado, RC usa el canal configurado.',
 	RC_WAIT_CONNECTION: 'Esperar emparejamiento',
-	RC_WAIT_TIMEOUT: 'tiempo límite',
+	RC_WAIT_TIMEOUT: 'hasta',
 	RC_WAIT_SECONDS: 'segundos',
 	RC_WAIT_TOOLTIP: 'Esperar conexión transmisor, LED parpadea azul, continúa después del tiempo',
 	RC_IS_CONNECTED: '¿RC conectado?',
@@ -1168,9 +1168,9 @@ window.languageManager.loadMessages('es', {
 		'⚠ El transmisor y el receptor no pueden estar activados al mismo tiempo. Desactive uno (clic derecho → Desactivar bloque)',
 
 	// Bloques Lectura de datos RC
-	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_TOOLTIP: 'Leer valor joystick remoto (0-4095), 2048 es centro',
-	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_MAPPED_MIN: 'mapear a',
 	RC_GET_JOYSTICK_MAPPED_MAX: '~',
 	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Leer joystick remoto y mapear al rango especificado',
@@ -1335,11 +1335,11 @@ window.languageManager.loadMessages('es', {
 	TXT_PROCESS_REQUIRED_WARNING: 'El espacio de trabajo TXT requiere al menos un bloque "Proceso TXT".',
 	CATEGORY_TXT: "Controlador TXT",
 
-        PENV_PROVIDER_INSTALL_FAILED: 'La instalación automática falló. Por favor instale "PlatformIO IDE" (VS Code Marketplace) o "pioarduino" (Open VSX para VSCodium) desde el panel de extensiones.',
-        PENV_PROVIDER_PENDING: 'Entorno PlatformIO inicializándose, por favor espere...',
+        PENV_PROVIDER_INSTALL_FAILED: 'La instalación automática falló. Instala "PlatformIO IDE" (VS Code Marketplace) o "pioarduino" (Open VSX para VSCodium) desde el panel de extensiones.',
+        PENV_PROVIDER_PENDING: 'Preparando el entorno de PlatformIO, espera un momento...',
 
         PLATFORMIO_UNPINNED_PLATFORM_WARNING: 'Este proyecto existente usa una plataforma PlatformIO sin versión fija ({0}). No se modificó. Fija la versión de la plataforma antes de una publicación reproducible.',
-        PENV_PROVIDER_RELOAD_REQUIRED: 'La extensión de entorno PlatformIO se instaló correctamente. Recargue VS Code ahora para completar la configuración.',
+        PENV_PROVIDER_RELOAD_REQUIRED: 'La extensión de PlatformIO se instaló correctamente. Vuelve a cargar VS Code para terminar la configuración.',
         PENV_PROVIDER_RELOAD_BUTTON: 'Recargar ahora',
 
 	FEEDBACK_PANEL_TITLE: "Enviar comentarios",

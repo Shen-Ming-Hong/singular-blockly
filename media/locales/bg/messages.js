@@ -322,8 +322,8 @@ window.languageManager.loadMessages('bg', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'Не може да се запише състоянието на работната среда: {0}',
 	VSCODE_FAILED_START: 'Неуспешно стартиране на Singular Blockly: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Наистина ли искате да изтриете променливата "{0}"?',
-	VSCODE_BOARD_UPDATED: 'Конфигурацията на платката е актуализирана до: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Моля, презаредете прозореца, за да завършите настройката',
+	VSCODE_BOARD_UPDATED: 'Платката е сменена на: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Презаредете прозореца, за да завършите настройката.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Въведете име на новата променлива',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Въведете ново име на променливата (текущо: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Името на променливата не може да бъде празно',
@@ -350,8 +350,8 @@ window.languageManager.loadMessages('bg', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Инсталиране на помощния инструмент за CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Проверка на управляваните инструменти',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Запазване на проверения Singular Core',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core изисква по-кратка локална папка в тази система Windows. Provider Core не е променен.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'Настройката на Singular Core не завърши. Provider Core не е променен.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core има нужда от локална папка с по-кратък път в тази система Windows. Core на разширението PlatformIO не е променен.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Настройката на Singular Core не завърши. Core на разширението PlatformIO не е променен.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Отвори диагностиката',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Избери по-кратка папка',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -391,8 +391,8 @@ window.languageManager.loadMessages('bg', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Следваща стъпка",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Проверка на версията",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "От открития penv",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Да',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Не',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Все още няма данни",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Изпълнете диагностиката веднъж, за да видите откритите пътища и подробностите за инструментите.",
 	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: "Провери отново",
@@ -525,7 +525,7 @@ window.languageManager.loadMessages('bg', {
 	RENAME_VARIABLE: 'Преименувай променлива...',
 	NEW_VARIABLE: 'Създай променлива...',
 	DELETE_VARIABLE: 'Изтрий променлива %1',
-	PROCEDURE_ALREADY_EXISTS: 'Процедура с име "%1" вече съществува.',
+	PROCEDURE_ALREADY_EXISTS: 'Вече има функция с име „%1“.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'ако',
@@ -1108,7 +1108,7 @@ window.languageManager.loadMessages('bg', {
 	X11_LED_INDEX_ALL: 'Всички',
 
 	// === X12 Разширителна плочка Предавател ===
-	CATEGORY_X12: 'X12 Разширение',
+	CATEGORY_X12: 'Разширение X12',
 	X12_LABEL_JOYSTICK: 'Джойстик',
 	X12_LABEL_BUTTON: 'Бутон',
 
@@ -1162,7 +1162,7 @@ window.languageManager.loadMessages('bg', {
 	RC_SLAVE_INIT_CHANNEL: 'канал',
 	RC_SLAVE_INIT_TOOLTIP: 'Инициализирай приемник RC с ID на сдвояване (1-255) и канал (1-11). Бележка за канала: ако двете устройства са свързани към еднаква Wi-Fi, RC използва Wi-Fi канала; ако нито едно няма Wi-Fi, RC използва настроения канал.',
 	RC_WAIT_CONNECTION: 'Изчакай сдвояване',
-	RC_WAIT_TIMEOUT: 'таймаут',
+	RC_WAIT_TIMEOUT: 'до',
 	RC_WAIT_SECONDS: 'сек',
 	RC_WAIT_TOOLTIP: 'Изчакай свързване на предавател, LED мига синьо, продължава след таймаут',
 

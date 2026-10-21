@@ -4,7 +4,7 @@ import { portalPage } from '../../src/routes/portal';
 describe('public policy portal', () => {
 	for (const [path, phrase] of [
 	['/privacy', 'Cloudflare D1/R2'],
-	['/support', '無需 GitHub 帳號'],
+	['/support', '不需要 GitHub 帳號'],
 		['/terms', '不保證回覆'],
 		] as const) {
 		it(`serves ${path} without authentication`, async () => {

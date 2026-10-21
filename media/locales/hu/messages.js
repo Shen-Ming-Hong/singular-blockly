@@ -322,8 +322,8 @@ window.languageManager.loadMessages('hu', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'Nem sikerült menteni a munkaterület állapotát: {0}',
 	VSCODE_FAILED_START: 'A Singular Blockly indítása nem sikerült: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Biztosan törli a(z) "{0}" változót?',
-	VSCODE_BOARD_UPDATED: 'A panel konfigurációja frissítve: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Kérjük, töltse újra az ablakot a beállítás befejezéséhez',
+	VSCODE_BOARD_UPDATED: 'Új panel: {0}',
+	VSCODE_RELOAD_REQUIRED: '. A beállítás befejezéséhez töltse újra az ablakot.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Adja meg az új változó nevét',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Adja meg az új változó nevét (jelenlegi: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'A változó neve nem lehet üres',
@@ -350,8 +350,8 @@ window.languageManager.loadMessages('hu', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'A CyberBrick eszközsegéd telepítése',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'A felügyelt eszközök ellenőrzése',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Az ellenőrzött Singular Core véglegesítése',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'A Singular Core rövidebb helyi mappát igényel ezen a Windows rendszeren. A Provider Core nem változott.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'A Singular Core beállítása nem fejeződött be. A Provider Core nem változott.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'A Singular Core ezen a Windows rendszeren rövidebb elérési útú helyi mappát igényel. A PlatformIO bővítmény Core-ja nem változott.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'A Singular Core beállítása nem fejeződött be. A PlatformIO bővítmény Core-ja nem változott.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Diagnosztika megnyitása',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Rövidebb mappa választása',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -391,8 +391,8 @@ window.languageManager.loadMessages('hu', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Következő lépés",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Verzió lekérdezése",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Az észlelt penv-ből",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Igen',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Nem',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Még nincs adat",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Futtasd le egyszer a diagnosztikát a megtalált útvonalak és eszközadatok megtekintéséhez.",
 	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: "Újratesztelés",
@@ -525,7 +525,7 @@ window.languageManager.loadMessages('hu', {
 	RENAME_VARIABLE: 'Változó átnevezése...',
 	NEW_VARIABLE: 'Változó létrehozása...',
 	DELETE_VARIABLE: '%1 változó törlése',
-	PROCEDURE_ALREADY_EXISTS: 'A(z) "%1" nevű eljárás már létezik.',
+	PROCEDURE_ALREADY_EXISTS: 'Már van „%1” nevű függvény.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'ha',
@@ -740,7 +740,7 @@ window.languageManager.loadMessages('hu', {
 	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
 	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Adott ID-jú blokkok számának lekérése',
 	HUSKYLENS_GET_BLOCK_ID: 'blok lekérése ID-val',
-	HUSKYLENS_GET_BLOCK_ID_INDEX: 'index',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'sorszám',
 	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
 	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Adott ID-jú blok pozíciójának, méretének vagy ID-jának lekérése',
 
@@ -859,10 +859,10 @@ window.languageManager.loadMessages('hu', {
 	ESP32_WIFI_SCAN: 'WiFi hálózatok keresése',
 	ESP32_WIFI_SCAN_TOOLTIP: 'Elérhető WiFi hálózatok keresése és a talált hálózatok számának visszaadása',
 	ESP32_WIFI_GET_SSID: 'Hálózat SSID lekérése',
-	ESP32_WIFI_GET_SSID_INDEX: 'index',
+	ESP32_WIFI_GET_SSID_INDEX: 'sorszám',
 	ESP32_WIFI_GET_SSID_TOOLTIP: 'A megadott indexű WiFi hálózat SSID nevének lekérése',
 	ESP32_WIFI_GET_RSSI: 'Hálózat RSSI lekérése',
-	ESP32_WIFI_GET_RSSI_INDEX: 'index',
+	ESP32_WIFI_GET_RSSI_INDEX: 'sorszám',
 	ESP32_WIFI_GET_RSSI_TOOLTIP: 'A megadott indexű WiFi hálózat jelerősségének (RSSI) lekérése',
 
 	// ESP32 MQTT
@@ -1102,7 +1102,7 @@ window.languageManager.loadMessages('hu', {
 
 	// X11 LED blokkok
 	X11_LED_SET_COLOR_PREFIX: 'LED szalag',
-	X11_LED_SET_COLOR_INDEX: 'index',
+	X11_LED_SET_COLOR_INDEX: 'sorszám',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Állítsd be a LED szalag pixel színét (index 0=első pixel, vagy mind)',
 	X11_LED_DIGITAL_TOOLTIP: 'X11 LED szalag csatorna állapotainak beállítása BE/KI',
@@ -1163,7 +1163,7 @@ window.languageManager.loadMessages('hu', {
 	RC_SLAVE_INIT_CHANNEL: 'csatorna',
 	RC_SLAVE_INIT_TOOLTIP: 'RC vevő inicializálása párosítási ID-vel (1-255) és csatornával (1-11). Csatornajelzés: ha mindkét eszköz ugyanahhoz a Wi-Fi-hez csatlakozik, az RC a Wi-Fi csatornát használja; ha egyik sem csatlakozik, az RC a beállított csatornát használja.',
 	RC_WAIT_CONNECTION: 'Párosításra várás',
-	RC_WAIT_TIMEOUT: 'időtúllépés',
+	RC_WAIT_TIMEOUT: 'legfeljebb',
 	RC_WAIT_SECONDS: 'mp',
 	RC_WAIT_TOOLTIP: 'Várakozás adó csatlakozására, LED kéken villog, folytatás időtúllépés után',
 
@@ -1321,7 +1321,7 @@ window.languageManager.loadMessages('hu', {
 	TXT_SENSOR_BUTTON: 'Gomb',
 	TXT_SENSOR_GATE: 'Fénysorompó',
 	TXT_SENSOR_ULTRASONIC: 'Ultrahang',
-	TXT_INPUT_SENSOR_TOOLTIP: 'Válasszon szenzortípust és olvassa be az értéket (gomb/fénysorompó 0 vagy 1 értéket ad, ultrahang távolságot ad cm-ben)',
+	TXT_INPUT_SENSOR_TOOLTIP: 'Válasszon érzékelőtípust, és olvassa be az értéket (a gomb és a fénysorompó 0-t vagy 1-et ad, az ultrahangos érzékelő a távolságot adja cm-ben)',
 	TXT_WAIT: 'Várakozás',
 	TXT_WAIT_UNIT: 'ms',
 	TXT_WAIT_TOOLTIP: 'Várakozás a megadott számú milliszekundum ideig',

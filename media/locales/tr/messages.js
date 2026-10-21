@@ -322,8 +322,8 @@ window.languageManager.loadMessages('tr', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'Çalışma alanı durumu kaydedilemedi: {0}',
 	VSCODE_FAILED_START: 'Singular Blockly başlatılamadı: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: '"{0}" değişkenini silmek istediğinizden emin misiniz?',
-	VSCODE_BOARD_UPDATED: 'Kart yapılandırması güncellendi: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Kurulumu tamamlamak için lütfen pencereyi yeniden yükleyin',
+	VSCODE_BOARD_UPDATED: 'Kart değiştirildi: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Kurulumu tamamlamak için pencereyi yeniden yükleyin.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Yeni değişken adını girin',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Yeni değişken adını girin (mevcut: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Değişken adı boş olamaz',
@@ -350,8 +350,8 @@ window.languageManager.loadMessages('tr', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'CyberBrick cihaz yardımcısı yükleniyor',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Yönetilen araçlar doğrulanıyor',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Doğrulanan Singular Core tamamlanıyor',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core için bu Windows sisteminde daha kısa bir yerel klasör gerekiyor. Provider Core değiştirilmedi.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'Singular Core kurulumu tamamlanmadı. Provider Core değiştirilmedi.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core için bu Windows sisteminde yolu daha kısa bir yerel klasör gerekiyor. PlatformIO eklentisinin Core\'u değiştirilmedi.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Singular Core kurulumu tamamlanmadı. PlatformIO eklentisinin Core\'u değiştirilmedi.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Tanılamayı aç',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Daha kısa klasör seç',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -525,7 +525,7 @@ window.languageManager.loadMessages('tr', {
 	RENAME_VARIABLE: 'Değişkeni yeniden adlandır...',
 	NEW_VARIABLE: 'Değişken oluştur...',
 	DELETE_VARIABLE: 'Değişken %1 sil',
-	PROCEDURE_ALREADY_EXISTS: '"%1" adlı bir prosedür zaten var.',
+	PROCEDURE_ALREADY_EXISTS: '"%1" adlı bir fonksiyon zaten var.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'eğer',
@@ -1161,7 +1161,7 @@ window.languageManager.loadMessages('tr', {
 	RC_SLAVE_INIT_CHANNEL: 'kanal',
 	RC_SLAVE_INIT_TOOLTIP: 'RC alıcıyı eşleştirme ID (1-255) ve kanal (1-11) ile başlat. Kanal notu: her iki cihaz da aynı Wi-Fi\'ye bağlıysa, RC Wi-Fi kanalını kullanır; hiçbiri bağlı değilse, RC yapılandırılmış kanalı kullanır.',
 	RC_WAIT_CONNECTION: 'Eşleşmeyi bekle',
-	RC_WAIT_TIMEOUT: 'zaman aşımı',
+	RC_WAIT_TIMEOUT: 'en fazla',
 	RC_WAIT_SECONDS: 'sn',
 	RC_WAIT_TOOLTIP: 'Verici bağlantısını bekle, LED mavi yanıp söner, zaman aşımından sonra devam et',
 
