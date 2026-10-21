@@ -322,8 +322,8 @@ window.languageManager.loadMessages('it', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: "Impossibile salvare lo stato dell'area di lavoro: {0}",
 	VSCODE_FAILED_START: 'Avvio di Singular Blockly fallito: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Sei sicuro di voler eliminare la variabile "{0}"?',
-	VSCODE_BOARD_UPDATED: 'Configurazione della scheda aggiornata a: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Riavviare la finestra per completare la configurazione',
+	VSCODE_BOARD_UPDATED: 'Scheda cambiata in: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Ricarica la finestra per completare la configurazione.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Inserisci il nome della nuova variabile',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Inserisci il nuovo nome della variabile (attuale: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Il nome della variabile non può essere vuoto',
@@ -351,8 +351,8 @@ window.languageManager.loadMessages('it', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Installazione dello strumento per dispositivi CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Verifica degli strumenti gestiti',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Conferma di Singular Core verificato',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core richiede una cartella locale più breve su questo sistema Windows. Provider Core non è stato modificato.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'La configurazione di Singular Core non è stata completata. Provider Core non è stato modificato.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core ha bisogno di una cartella locale con un percorso più corto su questo Windows. Il Core dell’estensione PlatformIO non è stato modificato.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'La configurazione di Singular Core non è stata completata. Il Core dell’estensione PlatformIO non è stato modificato.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Apri diagnostica',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Scegli una cartella più breve',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -392,7 +392,7 @@ window.languageManager.loadMessages('it', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Passaggio successivo",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Verifica della versione",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Dal penv rilevato",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Sì',
 	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Nessun dato per ora",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Esegui la diagnostica una volta per vedere i percorsi individuati e i dettagli degli strumenti.",
@@ -526,7 +526,7 @@ window.languageManager.loadMessages('it', {
 	RENAME_VARIABLE: 'Rinomina variabile...',
 	NEW_VARIABLE: 'Crea variabile...',
 	DELETE_VARIABLE: 'Elimina variabile %1',
-	PROCEDURE_ALREADY_EXISTS: 'Una procedura chiamata "%1" esiste già.',
+	PROCEDURE_ALREADY_EXISTS: 'Esiste già una funzione chiamata "%1".',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'se',
@@ -1103,7 +1103,7 @@ window.languageManager.loadMessages('it', {
 	X11_LED_INDEX_ALL: 'Tutti',
 
 	// === Scheda di espansione X12 Trasmettitore ===
-	CATEGORY_X12: 'X12 Estensione',
+	CATEGORY_X12: 'Estensione X12',
 	X12_LABEL_JOYSTICK: 'Joystick',
 	X12_LABEL_BUTTON: 'Pulsante',
 
@@ -1157,7 +1157,7 @@ window.languageManager.loadMessages('it', {
 	RC_SLAVE_INIT_CHANNEL: 'Canale',
 	RC_SLAVE_INIT_TOOLTIP: 'Inizializza ricevitore RC con ID coppia (1-255) e canale (1-11). Nota sul canale: se entrambi i dispositivi si connettono allo stesso Wi-Fi, RC usa il canale Wi-Fi; se nessuno è connesso, RC usa il canale configurato.',
 	RC_WAIT_CONNECTION: 'Attendi accoppiamento',
-	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_TIMEOUT: 'fino a',
 	RC_WAIT_SECONDS: 'secondi',
 	RC_WAIT_TOOLTIP: 'Attendi connessione trasmettitore, LED lampeggia blu, continua dopo timeout',
 	RC_IS_CONNECTED: 'RC connesso?',
@@ -1166,9 +1166,9 @@ window.languageManager.loadMessages('it', {
 		'⚠ Trasmettitore e ricevitore non possono essere attivi contemporaneamente. Disattivane uno (clic destro → Disattiva blocco)',
 
 	// Blocchi Lettura dati RC
-	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_TOOLTIP: 'Leggi valore joystick remoto (0-4095), 2048 è centro',
-	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_MAPPED_MIN: 'mappa su',
 	RC_GET_JOYSTICK_MAPPED_MAX: '~',
 	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Leggi joystick remoto e mappa su intervallo specificato',
@@ -1331,7 +1331,7 @@ window.languageManager.loadMessages('it', {
 	TXT_SETUP_DUPLICATE_WARNING: 'Rilevati più blocchi "Inizializzazione TXT". Elimina i blocchi extra.',
 	TXT_SETUP_REQUIRED_WARNING: 'L’area di lavoro TXT richiede un blocco "Inizializzazione TXT".',
 	TXT_PROCESS_REQUIRED_WARNING: 'L’area di lavoro TXT richiede almeno un blocco "Processo TXT".',
-	CATEGORY_TXT: 'TXT Controller',
+	CATEGORY_TXT: 'Controller TXT',
 
         PENV_PROVIDER_INSTALL_FAILED: 'Installazione automatica non riuscita. Installare "PlatformIO IDE" (VS Code Marketplace) o "pioarduino" (Open VSX per VSCodium) dal pannello delle estensioni.',
         PENV_PROVIDER_PENDING: 'Inizializzazione ambiente PlatformIO in corso, attendere...',

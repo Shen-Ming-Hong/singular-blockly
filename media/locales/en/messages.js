@@ -322,7 +322,7 @@ window.languageManager.loadMessages('en', {
 	VSCODE_FAILED_START: 'Failed to start Singular Blockly: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Are you sure you want to delete variable "{0}"?',
 	VSCODE_BOARD_UPDATED: 'Board configuration updated to: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Please reload window to complete setup',
+	VSCODE_RELOAD_REQUIRED: '. Please reload the window to finish setup.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Enter new variable name',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Enter new variable name (current: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Variable name cannot be empty',
@@ -524,7 +524,7 @@ window.languageManager.loadMessages('en', {
 	RENAME_VARIABLE: 'Rename variable...',
 	NEW_VARIABLE: 'Create variable...',
 	DELETE_VARIABLE: 'Delete variable %1',
-	PROCEDURE_ALREADY_EXISTS: 'A procedure named "%1" already exists.',
+	PROCEDURE_ALREADY_EXISTS: 'A function named "%1" already exists.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'if',
@@ -1155,7 +1155,7 @@ window.languageManager.loadMessages('en', {
 	RC_SLAVE_INIT_CHANNEL: 'Channel',
 	RC_SLAVE_INIT_TOOLTIP: 'Initialize RC receiver with pair ID (1-255) and channel (1-11). Channel note: if both devices connect to the same Wi-Fi, RC uses the Wi-Fi channel; if neither has Wi-Fi, RC uses the configured channel.',
 	RC_WAIT_CONNECTION: 'Wait for pairing',
-	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_TIMEOUT: 'up to',
 	RC_WAIT_SECONDS: 'seconds',
 	RC_WAIT_TOOLTIP: 'Wait for transmitter connection, LED flashes blue, continues after timeout',
 	RC_IS_CONNECTED: 'RC connected?',

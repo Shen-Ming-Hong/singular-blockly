@@ -185,7 +185,7 @@ window.languageManager.loadMessages('ru', {
 	CATEGORY_ARDUINO: 'Arduino',
 	CATEGORY_SENSORS: 'Датчики',
 	CATEGORY_MOTORS: 'Моторы',
-	VISION_SENSORS_CATEGORY: 'Зрительные сенсоры',
+	VISION_SENSORS_CATEGORY: 'Датчики зрения',
 	// Servo Block Labels
 	SERVO_SETUP: 'Настроить сервопривод',
 	SERVO_PIN: 'Пин',
@@ -322,8 +322,8 @@ window.languageManager.loadMessages('ru', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'Не удалось сохранить состояние рабочего пространства: {0}',
 	VSCODE_FAILED_START: 'Не удалось запустить Singular Blockly: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Вы уверены, что хотите удалить переменную "{0}"?',
-	VSCODE_BOARD_UPDATED: 'Конфигурация платы обновлена до: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Пожалуйста, перезагрузите окно для завершения настройки',
+	VSCODE_BOARD_UPDATED: 'Плата изменена на: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Перезагрузите окно, чтобы завершить настройку.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Введите имя новой переменной',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Введите новое имя переменной (текущее: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Имя переменной не может быть пустым',
@@ -351,8 +351,8 @@ window.languageManager.loadMessages('ru', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Установка помощника для устройства CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Проверка управляемых инструментов',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Сохранение проверенного Singular Core',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Для Singular Core на этой системе Windows нужна более короткая локальная папка. Provider Core не изменён.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'Настройка Singular Core не завершена. Provider Core не изменён.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Для Singular Core в этой Windows нужна локальная папка с более коротким путём. Core расширения PlatformIO не изменён.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Настройка Singular Core не завершена. Core расширения PlatformIO не изменён.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Открыть диагностику',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Выбрать более короткую папку',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -392,8 +392,8 @@ window.languageManager.loadMessages('ru', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Следующий шаг",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Проверка версии",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Из обнаруженного penv",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Да',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Нет',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Данных пока нет",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Запустите диагностику, чтобы увидеть найденные пути и сведения об инструментах.",
 	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: "Проверить снова",
@@ -526,7 +526,7 @@ window.languageManager.loadMessages('ru', {
 	RENAME_VARIABLE: 'Переименовать переменную...',
 	NEW_VARIABLE: 'Создать переменную...',
 	DELETE_VARIABLE: 'Удалить переменную %1',
-	PROCEDURE_ALREADY_EXISTS: 'Процедура с именем "%1" уже существует.',
+	PROCEDURE_ALREADY_EXISTS: 'Функция с именем «%1» уже есть.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'если',
@@ -1103,7 +1103,7 @@ window.languageManager.loadMessages('ru', {
 	X11_LED_INDEX_ALL: 'Все',
 
 	// === Плата расширения X12 Передатчик ===
-	CATEGORY_X12: 'X12 Расширение',
+	CATEGORY_X12: 'Расширение X12',
 	X12_LABEL_JOYSTICK: 'Джойстик',
 	X12_LABEL_BUTTON: 'Кнопка',
 
@@ -1157,14 +1157,14 @@ window.languageManager.loadMessages('ru', {
 	RC_SLAVE_INIT_CHANNEL: 'канал',
 	RC_SLAVE_INIT_TOOLTIP: 'Инициализировать приёмник RC с ID сопряжения (1-255) и каналом (1-11). Примечание о канале: если оба устройства подключены к одному Wi-Fi, RC использует канал Wi-Fi; если ни одно не подключено, RC использует настроенный канал.',
 	RC_WAIT_CONNECTION: 'Ждать сопряжения',
-	RC_WAIT_TIMEOUT: 'таймаут',
+	RC_WAIT_TIMEOUT: 'не дольше',
 	RC_WAIT_SECONDS: 'сек',
 	RC_WAIT_TOOLTIP: 'Ждать подключения передатчика, LED мигает синим, продолжить после таймаута',
 
 	// Блоки чтения данных RC
-	RC_GET_JOYSTICK_PREFIX: 'RC джойстик',
+	RC_GET_JOYSTICK_PREFIX: 'джойстик RC',
 	RC_GET_JOYSTICK_TOOLTIP: 'Читать значение джойстика (0-4095), 2048 - центр',
-	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC джойстик',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'джойстик RC',
 	RC_GET_JOYSTICK_MAPPED_MIN: 'отобразить в',
 	RC_GET_JOYSTICK_MAPPED_MAX: '~',
 	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Читать джойстик и отобразить в указанный диапазон',

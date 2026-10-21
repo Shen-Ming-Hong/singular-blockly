@@ -177,7 +177,7 @@ window.languageManager.loadMessages('fr', {
 	// Block Categories
 	CATEGORY_LOGIC: 'Logique',
 	CATEGORY_LOOPS: 'Boucles',
-	CATEGORY_MATH: 'Math',
+	CATEGORY_MATH: 'Maths',
 	CATEGORY_TEXT: 'Texte',
 	CATEGORY_LISTS: 'Listes',
 	CATEGORY_VARIABLES: 'Variables',
@@ -323,8 +323,8 @@ window.languageManager.loadMessages('fr', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: "Impossible d'enregistrer l'état de l'espace de travail : {0}",
 	VSCODE_FAILED_START: 'Échec du démarrage de Singular Blockly : {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Êtes-vous sûr de vouloir supprimer la variable "{0}" ?',
-	VSCODE_BOARD_UPDATED: 'Configuration de la carte mise à jour vers : {0}',
-	VSCODE_RELOAD_REQUIRED: '，Veuillez recharger la fenêtre pour terminer la configuration',
+	VSCODE_BOARD_UPDATED: 'La carte est maintenant : {0}',
+	VSCODE_RELOAD_REQUIRED: '. Recharge la fenêtre pour terminer la configuration.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Entrez un nouveau nom de variable',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Entrez un nouveau nom de variable (actuel : {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Le nom de la variable ne peut pas être vide',
@@ -351,8 +351,8 @@ window.languageManager.loadMessages('fr', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Installation de l’assistant pour appareil CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Vérification des outils gérés',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Validation de Singular Core vérifié',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core nécessite un dossier local plus court sur ce système Windows. Provider Core n’a pas été modifié.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'La configuration de Singular Core ne s’est pas terminée. Provider Core n’a pas été modifié.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core a besoin d’un dossier local avec un chemin plus court sur ce Windows. Le Core de l’extension PlatformIO n’a pas été modifié.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'La configuration de Singular Core ne s’est pas terminée. Le Core de l’extension PlatformIO n’a pas été modifié.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Ouvrir le diagnostic',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Choisir un dossier plus court',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -392,8 +392,8 @@ window.languageManager.loadMessages('fr', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Étape suivante",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Vérification de version",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Depuis le penv détecté",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Oui',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Non',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Aucune donnée pour l'instant",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Lancez le diagnostic une fois pour voir les chemins localisés et le détail des outils.",
 	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: "Retester",
@@ -526,7 +526,7 @@ window.languageManager.loadMessages('fr', {
 	RENAME_VARIABLE: 'Renommer la variable...',
 	NEW_VARIABLE: 'Créer une variable...',
 	DELETE_VARIABLE: 'Supprimer la variable %1',
-	PROCEDURE_ALREADY_EXISTS: 'Une procédure nommée "%1" existe déjà.',
+	PROCEDURE_ALREADY_EXISTS: 'Une fonction nommée « %1 » existe déjà.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'si',
@@ -799,7 +799,7 @@ window.languageManager.loadMessages('fr', {
 	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
 	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Obtenir le nombre de blocs avec un ID spécifique',
 	HUSKYLENS_GET_BLOCK_ID: 'obtenir bloc avec ID',
-	HUSKYLENS_GET_BLOCK_ID_INDEX: 'index',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'numéro',
 	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
 	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: "Obtenir la position, taille ou ID d'un bloc avec un ID spécifique",
 
@@ -860,10 +860,10 @@ window.languageManager.loadMessages('fr', {
 	ESP32_WIFI_SCAN: 'Scanner Réseaux WiFi',
 	ESP32_WIFI_SCAN_TOOLTIP: 'Scanner et retourner le nombre de réseaux WiFi à proximité',
 	ESP32_WIFI_GET_SSID: 'Obtenir SSID WiFi',
-	ESP32_WIFI_GET_SSID_INDEX: 'index',
+	ESP32_WIFI_GET_SSID_INDEX: 'numéro',
 	ESP32_WIFI_GET_SSID_TOOLTIP: "Obtenir le nom WiFi à l'index spécifié",
 	ESP32_WIFI_GET_RSSI: 'Obtenir Force Signal WiFi',
-	ESP32_WIFI_GET_RSSI_INDEX: 'index',
+	ESP32_WIFI_GET_RSSI_INDEX: 'numéro',
 	ESP32_WIFI_GET_RSSI_TOOLTIP: "Obtenir la force du signal à l'index spécifié (dBm)",
 	ESP32_MQTT_SETUP: 'Configuration MQTT',
 	ESP32_MQTT_SETUP_SERVER: 'Serveur',
@@ -1098,14 +1098,14 @@ window.languageManager.loadMessages('fr', {
 
 	// Blocs LED X11
 	X11_LED_SET_COLOR_PREFIX: 'Bande LED',
-	X11_LED_SET_COLOR_INDEX: 'index',
+	X11_LED_SET_COLOR_INDEX: 'numéro',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Définir la couleur du pixel de la bande LED (index 0=premier pixel, ou tous)',
 	X11_LED_DIGITAL_TOOLTIP: 'Activer ou désactiver les canaux de la bande LED X11',
 	X11_LED_INDEX_ALL: 'Tous',
 
 	// === Carte d'extension X12 Émetteur ===
-	CATEGORY_X12: 'X12 Extension',
+	CATEGORY_X12: 'Extension X12',
 	X12_LABEL_JOYSTICK: 'Joystick',
 	X12_LABEL_BUTTON: 'Bouton',
 
@@ -1149,7 +1149,7 @@ window.languageManager.loadMessages('fr', {
 	RC_SLAVE_INIT_CHANNEL: 'Canal',
 	RC_SLAVE_INIT_TOOLTIP: 'Initialiser récepteur RC avec ID paire (1-255) et canal (1-11). Note sur le canal: si les deux appareils se connectent au même Wi-Fi, RC utilise le canal Wi-Fi; si aucun n\'est connecté, RC utilise le canal configuré.',
 	RC_WAIT_CONNECTION: 'Attendre appairage',
-	RC_WAIT_TIMEOUT: 'délai',
+	RC_WAIT_TIMEOUT: 'jusqu’à',
 	RC_WAIT_SECONDS: 'secondes',
 	RC_WAIT_TOOLTIP: 'Attendre connexion émetteur, LED clignote bleu, continue après délai',
 	RC_IS_CONNECTED: 'RC connecté?',
@@ -1158,9 +1158,9 @@ window.languageManager.loadMessages('fr', {
 		"⚠ L'émetteur et le récepteur ne peuvent pas être activés en même temps. Désactivez l'un d'eux (clic droit → Désactiver le bloc)",
 
 	// Blocs Lecture de données RC
-	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_TOOLTIP: 'Lire valeur joystick distant (0-4095), 2048 est centre',
-	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_MAPPED_MIN: 'mapper vers',
 	RC_GET_JOYSTICK_MAPPED_MAX: '~',
 	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Lire joystick distant et mapper vers plage spécifiée',

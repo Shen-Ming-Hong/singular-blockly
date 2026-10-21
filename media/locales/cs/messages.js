@@ -321,8 +321,8 @@ window.languageManager.loadMessages('cs', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'Nelze uložit stav pracovního prostoru: {0}',
 	VSCODE_FAILED_START: 'Nepodařilo se spustit Singular Blockly: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Opravdu chcete smazat proměnnou "{0}"?',
-	VSCODE_BOARD_UPDATED: 'Konfigurace desky aktualizována na: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Prosím, znovu načtěte okno pro dokončení nastavení',
+	VSCODE_BOARD_UPDATED: 'Deska změněna na: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Pro dokončení nastavení znovu načtěte okno.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Zadejte název nové proměnné',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Zadejte nový název proměnné (aktuální: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Název proměnné nemůže být prázdný',
@@ -349,8 +349,8 @@ window.languageManager.loadMessages('cs', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Instaluje se pomocný nástroj zařízení CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Ověřují se spravované nástroje',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Potvrzuje se ověřené Singular Core',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core potřebuje v tomto systému Windows kratší místní složku. Provider Core nebylo změněno.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'Nastavení Singular Core nebylo dokončeno. Provider Core nebylo změněno.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core potřebuje v tomto systému Windows místní složku s kratší cestou. Core rozšíření PlatformIO se nezměnilo.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Nastavení Singular Core nebylo dokončeno. Core rozšíření PlatformIO se nezměnilo.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Otevřít diagnostiku',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Vybrat kratší složku',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -390,8 +390,8 @@ window.languageManager.loadMessages('cs', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Další krok",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Zjištění verze",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Z nalezeného penv",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Ano',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Ne',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Zatím žádná data",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Spusťte diagnostiku, abyste viděli nalezené cesty a podrobnosti o nástrojích.",
 	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: "Znovu otestovat",
@@ -524,7 +524,7 @@ window.languageManager.loadMessages('cs', {
 	RENAME_VARIABLE: 'Přejmenovat proměnnou...',
 	NEW_VARIABLE: 'Vytvořit proměnnou...',
 	DELETE_VARIABLE: 'Smazat proměnnou %1',
-	PROCEDURE_ALREADY_EXISTS: 'Procedura s názvem "%1" již existuje.',
+	PROCEDURE_ALREADY_EXISTS: 'Funkce s názvem „%1“ už existuje.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'když',
@@ -739,7 +739,7 @@ window.languageManager.loadMessages('cs', {
 	HUSKYLENS_COUNT_BLOCKS_ID_SUFFIX: '',
 	HUSKYLENS_COUNT_BLOCKS_ID_TOOLTIP: 'Získat počet bloků s určitým ID',
 	HUSKYLENS_GET_BLOCK_ID: 'získat blok s ID',
-	HUSKYLENS_GET_BLOCK_ID_INDEX: 'index',
+	HUSKYLENS_GET_BLOCK_ID_INDEX: 'číslo',
 	HUSKYLENS_GET_BLOCK_ID_INDEX_SUFFIX: '',
 	HUSKYLENS_GET_BLOCK_ID_TOOLTIP: 'Získat pozici, velikost nebo ID bloku s určitým ID',
 
@@ -854,10 +854,10 @@ window.languageManager.loadMessages('cs', {
 	ESP32_WIFI_SCAN: 'Vyhledat WiFi sítě',
 	ESP32_WIFI_SCAN_TOOLTIP: 'Vyhledat dostupné WiFi sítě a vrátit počet nalezených',
 	ESP32_WIFI_GET_SSID: 'Získat SSID sítě',
-	ESP32_WIFI_GET_SSID_INDEX: 'index',
+	ESP32_WIFI_GET_SSID_INDEX: 'číslo',
 	ESP32_WIFI_GET_SSID_TOOLTIP: 'Získat název SSID WiFi sítě na daném indexu',
 	ESP32_WIFI_GET_RSSI: 'Získat RSSI sítě',
-	ESP32_WIFI_GET_RSSI_INDEX: 'index',
+	ESP32_WIFI_GET_RSSI_INDEX: 'číslo',
 	ESP32_WIFI_GET_RSSI_TOOLTIP: 'Získat sílu signálu (RSSI) WiFi sítě na daném indexu',
 
 	// ESP32 MQTT
@@ -1097,14 +1097,14 @@ window.languageManager.loadMessages('cs', {
 
 	// X11 LED bloky
 	X11_LED_SET_COLOR_PREFIX: 'LED pásek',
-	X11_LED_SET_COLOR_INDEX: 'index',
+	X11_LED_SET_COLOR_INDEX: 'číslo',
 	X11_LED_SET_COLOR_INDEX_SUFFIX: 'pixel',
 	X11_LED_SET_COLOR_TOOLTIP: 'Nastav barvu pixelu LED pásku (index 0=první pixel, nebo všechny)',
 	X11_LED_DIGITAL_TOOLTIP: 'Nastavit stavy kanálů LED pásku X11 na ZAP nebo VYP',
 	X11_LED_INDEX_ALL: 'Všechny',
 
 	// === X12 Rozšiřující deska Vysílač ===
-	CATEGORY_X12: 'X12 Rozšíření',
+	CATEGORY_X12: 'Rozšíření X12',
 	X12_LABEL_JOYSTICK: 'Joystick',
 	X12_LABEL_BUTTON: 'Tlačítko',
 
@@ -1158,14 +1158,14 @@ window.languageManager.loadMessages('cs', {
 	RC_SLAVE_INIT_CHANNEL: 'kanál',
 	RC_SLAVE_INIT_TOOLTIP: 'Inicializovat přijímač RC s ID párování (1-255) a kanálem (1-11). Poznámka ke kanálu: pokud jsou obě zařízení připojena ke stejné Wi-Fi, RC používá kanál Wi-Fi; pokud ani jedno není připojeno, RC používá nastavený kanál.',
 	RC_WAIT_CONNECTION: 'Čekat na párování',
-	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_TIMEOUT: 'nejvýše',
 	RC_WAIT_SECONDS: 'sek',
 	RC_WAIT_TOOLTIP: 'Čekat na připojení vysílače, LED bliká modře, pokračovat po timeout',
 
 	// Bloky čtení dat RC
-	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_TOOLTIP: 'Číst hodnotu joysticku (0-4095), 2048 je střed',
-	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_MAPPED_MIN: 'mapovat na',
 	RC_GET_JOYSTICK_MAPPED_MAX: '~',
 	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Číst joystick a mapovat na určený rozsah',

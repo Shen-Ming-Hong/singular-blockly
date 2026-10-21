@@ -322,8 +322,8 @@ window.languageManager.loadMessages('pl', {
 	VSCODE_UNABLE_SAVE_WORKSPACE: 'Nie można zapisać stanu obszaru roboczego: {0}',
 	VSCODE_FAILED_START: 'Nie udało się uruchomić Singular Blockly: {0}',
 	VSCODE_CONFIRM_DELETE_VARIABLE: 'Czy na pewno chcesz usunąć zmienną "{0}"?',
-	VSCODE_BOARD_UPDATED: 'Konfiguracja płytki zaktualizowana do: {0}',
-	VSCODE_RELOAD_REQUIRED: '，Proszę przeładować okno, aby zakończyć konfigurację',
+	VSCODE_BOARD_UPDATED: 'Zmieniono płytkę na: {0}',
+	VSCODE_RELOAD_REQUIRED: '. Załaduj ponownie okno, aby zakończyć konfigurację.',
 	VSCODE_ENTER_VARIABLE_NAME: 'Wprowadź nazwę nowej zmiennej',
 	VSCODE_ENTER_NEW_VARIABLE_NAME: 'Wprowadź nową nazwę zmiennej (obecna: {0})',
 	VSCODE_VARIABLE_NAME_EMPTY: 'Nazwa zmiennej nie może być pusta',
@@ -350,8 +350,8 @@ window.languageManager.loadMessages('pl', {
 	MANAGED_RUNTIME_PROGRESS_INSTALLING_MPREMOTE: 'Instalowanie narzędzia pomocniczego urządzenia CyberBrick',
 	MANAGED_RUNTIME_PROGRESS_VERIFYING: 'Sprawdzanie zarządzanych narzędzi',
 	MANAGED_RUNTIME_PROGRESS_COMMITTING: 'Zatwierdzanie sprawdzonego Singular Core',
-	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core wymaga krótszego folderu lokalnego w tym systemie Windows. Provider Core nie został zmieniony.',
-	MANAGED_RUNTIME_PROGRESS_FAILED: 'Konfiguracja Singular Core nie została ukończona. Provider Core nie został zmieniony.',
+	MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG: 'Singular Core potrzebuje w tym systemie Windows folderu lokalnego z krótszą ścieżką. Core rozszerzenia PlatformIO nie został zmieniony.',
+	MANAGED_RUNTIME_PROGRESS_FAILED: 'Konfiguracja Singular Core nie została ukończona. Core rozszerzenia PlatformIO nie został zmieniony.',
 	MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS: 'Otwórz diagnostykę',
 	MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER: 'Wybierz krótszy folder',
 	PLATFORMIO_DIAGNOSTIC_PANEL_SUBTITLE:
@@ -391,8 +391,8 @@ window.languageManager.loadMessages('pl', {
 	PLATFORMIO_DIAGNOSTIC_NEXT_STEP: "Następny krok",
 	PLATFORMIO_DIAGNOSTIC_VERSION: "Sprawdzenie wersji",
 	PLATFORMIO_DIAGNOSTIC_FROM_DETECTED_PENV: "Z wykrytego penv",
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Yes',
-	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'No',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_YES: 'Tak',
+	PLATFORMIO_DIAGNOSTIC_BOOLEAN_NO: 'Nie',
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_TITLE: "Brak danych",
 	PLATFORMIO_DIAGNOSTIC_NO_DATA_DESCRIPTION: "Uruchom diagnostykę, aby zobaczyć odnalezione ścieżki i szczegóły narzędzi.",
 	PLATFORMIO_DIAGNOSTIC_ACTION_RETEST: "Sprawdź ponownie",
@@ -525,7 +525,7 @@ window.languageManager.loadMessages('pl', {
 	RENAME_VARIABLE: 'Zmień nazwę zmiennej...',
 	NEW_VARIABLE: 'Utwórz zmienną...',
 	DELETE_VARIABLE: 'Usuń zmienną %1',
-	PROCEDURE_ALREADY_EXISTS: 'Procedura o nazwie "%1" już istnieje.',
+	PROCEDURE_ALREADY_EXISTS: 'Funkcja o nazwie „%1” już istnieje.',
 
 	// Logic block messages
 	CONTROLS_IF_MSG_IF: 'jeśli',
@@ -1107,7 +1107,7 @@ window.languageManager.loadMessages('pl', {
 	X11_LED_INDEX_ALL: 'Wszystkie',
 
 	// === Płytka rozszerzeń X12 Nadajnik ===
-	CATEGORY_X12: 'X12 Rozszerzenie',
+	CATEGORY_X12: 'Rozszerzenie X12',
 	X12_LABEL_JOYSTICK: 'Joystick',
 	X12_LABEL_BUTTON: 'Przycisk',
 
@@ -1161,14 +1161,14 @@ window.languageManager.loadMessages('pl', {
 	RC_SLAVE_INIT_CHANNEL: 'kanał',
 	RC_SLAVE_INIT_TOOLTIP: 'Inicjalizuj odbiornik RC z ID parowania (1-255) i kanałem (1-11). Uwaga dotycząca kanału: jeśli oba urządzenia są podłączone do tej samej sieci Wi-Fi, RC używa kanału Wi-Fi; jeśli żadne nie jest podłączone, RC używa skonfigurowanego kanału.',
 	RC_WAIT_CONNECTION: 'Czekaj na połączenie RC',
-	RC_WAIT_TIMEOUT: 'timeout',
+	RC_WAIT_TIMEOUT: 'maks.',
 	RC_WAIT_SECONDS: 'sek',
 	RC_WAIT_TOOLTIP: 'Czekaj na połączenie nadajnika, LED miga na niebiesko, kontynuuj po timeout',
 
 	// Bloki odczytu danych RC
-	RC_GET_JOYSTICK_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_TOOLTIP: 'Odczytaj wartość joysticka zdalnego (0-4095), 2048 to środek',
-	RC_GET_JOYSTICK_MAPPED_PREFIX: 'RC joystick',
+	RC_GET_JOYSTICK_MAPPED_PREFIX: 'joystick RC',
 	RC_GET_JOYSTICK_MAPPED_MIN: 'mapuj na',
 	RC_GET_JOYSTICK_MAPPED_MAX: '~',
 	RC_GET_JOYSTICK_MAPPED_TOOLTIP: 'Odczytaj joystick zdalny i mapuj na określony zakres',
