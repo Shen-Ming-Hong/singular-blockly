@@ -10,6 +10,8 @@
 [![Rating](https://vsmarketplacebadges.dev/rating-star/Singular-Ray.singular-blockly.svg?color=E05D44&style=flat)](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+**English** · [繁體中文](docs/readme/README.zh-hant.md) · [日本語](docs/readme/README.ja.md) · [한국어](docs/readme/README.ko.md) · [Deutsch](docs/readme/README.de.md) · [Español](docs/readme/README.es.md) · [Français](docs/readme/README.fr.md) · [Italiano](docs/readme/README.it.md) · [Polski](docs/readme/README.pl.md) · [Português (Brasil)](docs/readme/README.pt-br.md) · [Русский](docs/readme/README.ru.md) · [Türkçe](docs/readme/README.tr.md) · [Čeština](docs/readme/README.cs.md) · [Magyar](docs/readme/README.hu.md) · [Български](docs/readme/README.bg.md)
+
 <p align="center">
   <img src="images/icon.png" width="112" alt="Singular Blockly icon">
 </p>
@@ -19,6 +21,22 @@
 Build with Blockly, preview generated code instantly, and upload through PlatformIO, USB, local-network OTA, or SSH.
 
 [Install from VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly) · [Install from Open VSX](https://open-vsx.org/extension/Singular-Ray/singular-blockly) · [Read the documentation](docs/specifications/README.md)
+
+## See It in Action
+
+These recordings were captured in a real VS Code window with the current extension build.
+
+**1. Open the editor and choose a board.** Click the Singular Blockly icon in the activity bar, then pick your board from **Select Board**.
+
+![Open the Blockly editor from the activity bar and select Arduino Uno](docs/images/readme/open-editor-and-select-board.gif)
+
+**2. Drag blocks and watch the code update.** Drag blocks from the toolbox into **Setup** and **Loop**, change values with the dropdowns, and keep `src/main.cpp` open next to the editor to see the generated program change as you work.
+
+![Build a blink program with drag and drop while src/main.cpp updates](docs/images/readme/build-program-with-live-code.gif)
+
+**3. Switch the language and theme.** Expand the toolbar with the arrow button, use the globe menu to change the editor language immediately, and use the theme button to switch between light and dark.
+
+![Switch the editor to Traditional Chinese and the dark theme](docs/images/readme/switch-language-and-theme.gif)
 
 ## Feedback, Online Services, and Data Use
 
@@ -33,7 +51,7 @@ Feedback uses an anonymous secret stored in VS Code SecretStorage and a dedicate
 - **One visual editor, three programming workflows**: Arduino C++, CyberBrick MicroPython, and TXT Controller Python.
 - **Hardware-ready uploads**: PlatformIO for Arduino, USB or paired LAN OTA for CyberBrick, and SSH for TXT Controller.
 - **Classroom-friendly tools**: localized samples, virtual TXT controls, I/O testing, backups, and clear hardware diagnostics.
-- **Modern Blockly experience**: Blockly 13.2.1 with `@blockly/theme-modern`, light and dark themes, block search, touch support, keyboard navigation, and semantic control labels—all packaged for offline use.
+- **Modern Blockly experience**: Blockly 13.4.0 with `@blockly/theme-modern`, light and dark themes, block search, touch support, keyboard navigation, and semantic control labels—all packaged for offline use.
 - **Safe project files**: automatic persistence, backup recovery, orphan-block guards, and runtime validation of external workspace edits.
 - **AI-aware projects**: project-local Agent Skills give coding agents the current board, workspace format, and block contract.
 
@@ -41,9 +59,9 @@ Feedback uses an anonymous secret stored in VS Code SecretStorage and a dedicate
 
 1. Install Singular Blockly from the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Singular-Ray.singular-blockly) or [Open VSX](https://open-vsx.org/extension/Singular-Ray/singular-blockly).
 2. Open a writable folder in VS Code.
-3. Click the wand icon in the status bar or the Singular Blockly activity-bar icon.
+3. Click the Singular Blockly icon in the activity bar, or run **Singular Blockly: Open Blockly Edit** from the Command Palette.
 4. Select a board and build your program from the toolbox.
-5. Preview the generated code, then use the shared upload button.
+5. Open the generated file (for example `src/main.cpp`) to review the code, then click the upload button in the editor toolbar.
 
 After VS Code startup, Singular Blockly begins preparing its own verified Python, tested-range PlatformIO Core, and `mpremote` runtime in extension-owned storage. Opening the Blockly editor checks that runtime again without blocking editing. Arduino keeps the existing provider-first route: VS Code uses `platformio.platformio-ide`, while Open VSX environments such as VSCodium can use `pioarduino.pioarduino-ide`; the Singular Core is the fallback. A custom managed-runtime folder must be empty when first claimed, preventing repair or cleanup from adopting unrelated files.
 
@@ -89,6 +107,7 @@ Arduino projects keep `platformio.ini`; CyberBrick and TXT projects use Python w
 - Compile and upload through PlatformIO with board-aware port detection and actionable error messages.
 - Monitor serial output in a VS Code terminal; ESP32 projects enable exception decoding automatically.
 - Build with I/O, PWM, servo, encoder motor, Wi-Fi/MQTT, Pixetto, HUSKYLENS, and standard programming blocks.
+- Receive CyberBrick ESP-NOW remote-control input on an ESP32 DevKit with the experimental RC receiver blocks.
 
 ### CyberBrick
 
@@ -139,6 +158,7 @@ Settings are available through VS Code's Settings UI. Defaults below match the e
 
 | Setting                                             | Default                                      | Purpose                                      |
 | --------------------------------------------------- | -------------------------------------------- | -------------------------------------------- |
+| `singularBlockly.managedRuntime.path`               | `""`                                         | Optional folder for the managed runtime      |
 | `singularBlockly.safetyGuard.suppressWarning`       | `false`                                      | Hide the non-Blockly-project safety warning  |
 | `singular-blockly.txt.host`                         | `192.168.7.2`                                | TXT Controller host                          |
 | `singular-blockly.txt.username`                     | `ftc`                                        | TXT SSH username                             |
@@ -160,30 +180,7 @@ Node.js is not required for extension users.
 
 ## Documentation and Help
 
-The interface ships in 15 languages with **99.36% average coverage**. Auto mode follows the VS Code display language, while the editor's globe menu can switch languages immediately.
-
-<details>
-<summary><b>Current language coverage</b></summary>
-
-| Language            | Code      | Coverage |
-| ------------------- | --------- | -------- |
-| English             | `en`      | 99.45%   |
-| Japanese            | `ja`      | 99.72%   |
-| Korean              | `ko`      | 99.72%   |
-| German              | `de`      | 99.26%   |
-| Traditional Chinese | `zh-hant` | 99.72%   |
-| Spanish             | `es`      | 99.26%   |
-| French              | `fr`      | 99.26%   |
-| Italian             | `it`      | 99.26%   |
-| Polish              | `pl`      | 99.26%   |
-| Portuguese (Brazil) | `pt-br`   | 99.26%   |
-| Russian             | `ru`      | 99.26%   |
-| Turkish             | `tr`      | 99.26%   |
-| Czech               | `cs`      | 99.26%   |
-| Hungarian           | `hu`      | 99.26%   |
-| Bulgarian           | `bg`      | 99.26%   |
-
-</details>
+The interface ships in 15 languages: English, Traditional Chinese, Japanese, Korean, German, Spanish, French, Italian, Polish, Portuguese (Brazil), Russian, Turkish, Czech, Hungarian, and Bulgarian. Auto mode follows the VS Code display language, while the editor's globe menu can switch languages immediately. This README is available in the same 15 languages; see the language links at the top.
 
 - [Integrated specifications](docs/specifications/README.md)
 - [PlatformIO diagnostics and guided repair](docs/specifications/06-features/platformio-diagnostics.md)
@@ -198,7 +195,7 @@ Example project: [CyberBrick SoccerBot](https://github.com/Shen-Ming-Hong/Blockl
 
 ## Development
 
-Contributor baseline: Node.js 24.20.0 (minimum supported: 22.16.0), TypeScript 6.0.3, Blockly 13.2.1, `@blockly/theme-modern` 13.2.0, and VS Code 1.126.0+.
+Contributor baseline: Node.js 24.20.0 (minimum supported: 22.16.0), TypeScript 6.0.3, Blockly 13.4.0, `@blockly/theme-modern` 13.4.0, and VS Code 1.126.0+.
 
 ```bash
 npm install
@@ -209,7 +206,7 @@ npm run validate:i18n
 npm run check:project-skills
 ```
 
-When block definitions, toolbox entries, the workspace schema, or packaged Skill content changes, run `npm run generate:project-skills` before the freshness check. Add new user-facing block messages to all 15 locale files.
+When block definitions, toolbox entries, the workspace schema, or packaged Skill content changes, run `npm run generate:project-skills` before the freshness check. Add new user-facing block messages to all 15 locale files. When this README changes, update the translated copies in `docs/readme/` in the same pull request.
 
 ## License
 

@@ -64,6 +64,10 @@ NODE_PATH=/tmp/sb-pw/node_modules xvfb-run -a -s "-screen 0 1440x900x24" \
 - 已知雜訊：以 root 執行的警告、Singular Core／PlatformIO Core 安裝進度通知、切換板子後的 reload 提示。它們不是本次變更造成的，除非變更本身與這些流程有關。
 - 需要更深的互動（特定積木、右鍵選單、程式碼預覽）時，沿用腳本找出 Blockly frame 的方式，在 frame 內用 `Blockly.getMainWorkspace()` 與 DOM 操作補充步驟；新增的流程若可重用，更新本腳本。
 
+### README 操作說明 GIF
+
+README 的 `docs/images/readme/*.gif` 由 `scripts/record-readme-gifs.mjs` 在真實 VS Code 中錄製（開啟編輯器與選板子、拖積木並在下方看 `src/main.cpp` 更新、切換語言與深色主題）。積木、工具列或主題的外觀明顯改變時重錄：準備步驟同上，再依腳本開頭的命令跑 `open`、`build`、`language` 三個場景（`build` 要在 `language` 之前），需要 `ffmpeg`。看過輸出的 GIF 再複製到 `docs/images/readme/`，三個檔案合計保持在約 1.5 MB 以內。`docs/**` 已被 `.vscodeignore` 排除，不會進 VSIX。
+
 ## 4. 回報
 
 - 在 PR 描述的測試計劃中列出實際執行的命令、Node 版本與結果數字（例如 `1403 passing, 2 pending`）。
