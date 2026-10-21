@@ -202,7 +202,7 @@
 		// 生成連線程式碼
 		let code = 'wlan.active(True)\n';
 		code += `wlan.connect(${ssid}, ${password})\n`;
-		code += '# 等待連線（最多 10 秒）\n';
+		code += '# Wait for connection (up to 10 seconds)\n';
 		code += 'for _ in range(20):\n';
 		code += '    if wlan.isconnected():\n';
 		code += '        break\n';

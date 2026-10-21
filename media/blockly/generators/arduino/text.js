@@ -190,7 +190,7 @@ int countSubstring(String text, String sub) {
     int pos = 0;
     while ((pos = text.indexOf(sub, pos)) != -1) {
         count++;
-        pos += 1; // 只移動一個位置，確保重疊的情況也能計數
+        pos += 1; // Advance by one so overlapping matches are counted
     }
     return count;
 }`;
@@ -206,7 +206,7 @@ window.arduinoGenerator.forBlock['text_reverse'] = function (block) {
 String reverseString(String str) {
     int length = str.length();
     String reversed;
-    reversed.reserve(length); // 預先分配空間以提高效能
+    reversed.reserve(length); // Pre-allocate for performance
     for (int i = length - 1; i >= 0; i--) {
         reversed += str[i];
     }
@@ -246,7 +246,7 @@ String serialPrompt(String msg) {
                 input += c;
             }
         }
-        // 10秒超時保護
+        // 10-second timeout guard
         if (millis() - startTime > 10000) {
             Serial.println("Timeout!");
             return "";

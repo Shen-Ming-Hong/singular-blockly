@@ -50,7 +50,7 @@
 	generator.forBlock['rc_master_init'] = function (block) {
 		// 衝突檢測：如果接收端也啟用，跳過產生程式碼
 		if (_hasRcConflict(block.workspace)) {
-			return '# [Skipped] RC 發射端與接收端不能同時啟用\n';
+			return '# [Skipped] RC transmitter and receiver cannot be used together\n';
 		}
 
 		// 取得參數 (PAIR_ID 支援變數輸入，CHANNEL 僅支援數字字面量)
@@ -83,7 +83,7 @@ _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
 if not _rc_keep_wifi_for_ota:
     _wlan.disconnect()
-    _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
+    _wlan.config(reconnects=0)  # Disable auto-reconnect so channel scans do not disturb ESP-NOW
     time.sleep_ms(100)
     _wlan.config(channel=${channel})
 _espnow = espnow.ESPNow()
@@ -100,7 +100,7 @@ _espnow.add_peer(_rc_broadcast)`.replace(/\t/g, '    ')
 	generator.forBlock['rc_send'] = function (block) {
 		// 衝突檢測：發射端依賴積木
 		if (_hasRcConflict(block.workspace)) {
-			return '# [Skipped] RC 衝突：發射端與接收端不能同時啟用\n';
+			return '# [Skipped] RC conflict: transmitter and receiver cannot be used together\n';
 		}
 		// 使用 X12 直接硬體存取（不使用 rc_module，與 ESP-NOW 完全相容）
 		generator.addImport('from machine import Pin, ADC');
@@ -108,7 +108,7 @@ _espnow.add_peer(_rc_broadcast)`.replace(/\t/g, '    ')
 		// 確保 X12 初始化 (使用與 x12.js 相同的 key 避免重複)
 		generator.addHardwareInit(
 			'x12_driver',
-			`# X12 驅動初始化 (直接硬體存取)
+			`# X12 driver init (direct hardware access)
 _x12_adc = {}
 for _i, _p in enumerate([0, 1, 2, 3, 4, 5]):
     _x12_adc[_i] = ADC(Pin(_p))
@@ -164,7 +164,7 @@ _rc_led.write()
 	generator.forBlock['rc_slave_init'] = function (block) {
 		// 衝突檢測：如果發射端也啟用，跳過產生程式碼
 		if (_hasRcConflict(block.workspace)) {
-			return '# [Skipped] RC 接收端與發射端不能同時啟用\n';
+			return '# [Skipped] RC receiver and transmitter cannot be used together\n';
 		}
 
 		// 取得參數 (PAIR_ID 支援變數輸入，CHANNEL 僅支援數字字面量)
@@ -209,14 +209,14 @@ def _rc_recv_cb(e):
             mac, msg = e.irecv(0)
             if mac is None:
                 return
-            # 檢查封包長度 (>= 21 bytes) 和配對 ID
+            # Check packet length (>= 21 bytes) and pairing ID
             if len(msg) >= 21 and msg[0] == _rc_pair_id:
                 _rc_data = struct.unpack('<10h', msg[1:21])
                 _rc_connected = True
                 _rc_last_recv = time.ticks_ms()
                 _rc_recv_count += 1
     except Exception:
-        pass  # 防止 irq 異常導致系統卡死
+        pass  # Keep IRQ errors from hanging the system
 
 def _reinit_espnow():
 	global _rc_connected
@@ -247,14 +247,14 @@ def _reinit_espnow():
 		pass
 
 def _rc_maintenance():
-    """定期維護：垃圾回收 + 斷線重連，回傳連線狀態"""
+    """Periodic maintenance: GC + reconnect; returns connection state"""
     global _rc_last_gc, _rc_connected, _rc_last_reinit
     now = time.ticks_ms()
-    # 每 30 秒執行一次垃圾回收
+    # Run garbage collection every 30 seconds
     if time.ticks_diff(now, _rc_last_gc) > 30000:
         gc.collect()
         _rc_last_gc = now
-    # 條件 A：曾連線但超過 3 秒沒封包；條件 B：從未連線且距上次重試超過 10 秒
+    # A: was connected but no packet for 3 s; B: never connected and 10 s since last retry
     need_reinit = (
         (_rc_connected and time.ticks_diff(now, _rc_last_recv) > 3000) or
         (not _rc_connected and time.ticks_diff(now, _rc_last_reinit) > 10000)
@@ -262,14 +262,14 @@ def _rc_maintenance():
     if need_reinit and time.ticks_diff(now, _rc_last_reinit) > 5000:
         _reinit_espnow()
         _rc_last_reinit = time.ticks_ms()
-    # 回傳連線狀態 (1500ms 內有收到資料，容許偶發封包延遲)
+    # Connected if data arrived within 1500 ms (tolerates occasional delays)
     return _rc_connected and time.ticks_diff(now, _rc_last_recv) < 1500
 
 _wlan = network.WLAN(network.WLAN.IF_STA)
 _wlan.active(True)
 if not _rc_keep_wifi_for_ota:
     _wlan.disconnect()
-    _wlan.config(reconnects=0)  # 禁止自動重連避免頻道掃描干擾 ESP-NOW
+    _wlan.config(reconnects=0)  # Disable auto-reconnect so channel scans do not disturb ESP-NOW
     time.sleep_ms(100)
     _wlan.config(channel=_rc_channel)
 _espnow = espnow.ESPNow()
@@ -288,7 +288,7 @@ _rc_last_gc = time.ticks_ms()`.replace(/\t/g, '    ')
 	generator.forBlock['rc_wait_connection'] = function (block) {
 		// 衝突檢測：接收端依賴積木
 		if (_hasRcConflict(block.workspace)) {
-			return '# [Skipped] RC 衝突：發射端與接收端不能同時啟用\n';
+			return '# [Skipped] RC conflict: transmitter and receiver cannot be used together\n';
 		}
 		// 取得參數
 		const timeout = Math.max(1, Math.min(60, Number(block.getFieldValue('TIMEOUT')) || 30));

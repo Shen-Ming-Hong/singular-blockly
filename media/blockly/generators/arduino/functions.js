@@ -37,7 +37,7 @@ window.arduinoGenerator.forBlock['arduino_function'] = function (block) {
 	// 函式回傳型態固定為 void
 	const returnType = 'void';
 	// 生成函式定義，並在註解中保留原始名稱
-	let code = `// 原始函式名稱: ${displayName}\n`;
+	let code = `// Original function name: ${displayName}\n`;
 	code += `${returnType} ${funcName}(${args.join(', ')}) {\n`;
 
 	// 添加函式內容
@@ -61,7 +61,7 @@ window.arduinoGenerator.forBlock['arduino_function_call'] = function (block) {
 		const displayName = block.getFieldValue('NAME');
 		if (!displayName) {
 			log.warn('函數呼叫積木缺少函數名稱');
-			code = '/* 未定義函數 */';
+			code = '/* undefined function */';
 			return code + ';\n';
 		}
 
@@ -148,7 +148,7 @@ window.arduinoGenerator.forBlock['arduino_function_call'] = function (block) {
 		code = `${funcName}(${args.join(', ')})`;
 	} catch (e) {
 		log.error('函數呼叫生成錯誤:', e);
-		code = '/* 函數呼叫錯誤 */';
+		code = '/* function call error */';
 	}
 
 	// 加上分號和換行符

@@ -245,13 +245,13 @@ window.arduinoGenerator.finish = function (code) {
 	// 輸出前向宣告和原始順序的函數定義
 	let functions = '';
 	if (forwardDeclarations) {
-		functions = '// 函數前向宣告\n' + forwardDeclarations + '\n';
+		functions = '// Function forward declarations\n' + forwardDeclarations + '\n';
 	}
 	functions += functionDefinitions;
 	// 輸出警告訊息為註解
 	let warnings = '';
 	if (window.arduinoGenerator.warnings_ && window.arduinoGenerator.warnings_.length > 0) {
-		warnings += '/* 腳位模式警告:\n';
+		warnings += '/* Pin mode warnings:\n';
 		warnings += window.arduinoGenerator.warnings_.map(w => ' * ' + w).join('\n');
 		warnings += '\n */\n\n';
 	}
@@ -403,5 +403,5 @@ window.arduinoGenerator.scrubNakedValue = function (line) {
 	}
 
 	// 將裸露表達式轉為註釋
-	return '// 未連接的表達式: ' + trimmed + '\n';
+	return '// Unattached expression: ' + trimmed + '\n';
 };

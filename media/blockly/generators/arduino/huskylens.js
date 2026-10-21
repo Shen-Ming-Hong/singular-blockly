@@ -128,16 +128,16 @@ window.arduinoGenerator.forBlock['huskylens_init_i2c'] = function (block) {
 		}
 
 		// 初始化代碼
-		const initCode = `  // 初始化 HUSKYLENS (I2C)
+		const initCode = `  // Initialize HUSKYLENS (I2C)
   Serial.begin(9600);
   Wire.begin();
   while (!huskylens.begin(Wire)) {
-    Serial.println(F("HUSKYLENS 初始化失敗，請檢查連線！"));
-    Serial.println(F("1. 檢查接線是否正確？"));
-    Serial.println(F("2. 檢查 HUSKYLENS 是否正常工作？"));
+    Serial.println(F("HUSKYLENS init failed, please check the connection!"));
+    Serial.println(F("1. Is the wiring correct?"));
+    Serial.println(F("2. Is HUSKYLENS powered on and working?"));
     delay(100);
   }
-  Serial.println(F("HUSKYLENS 初始化成功！"));`;
+  Serial.println(F("HUSKYLENS init OK!"));`;
 
 		// 確保 setupCode_ 存在
 		if (!window.arduinoGenerator.setupCode_) {
@@ -217,16 +217,16 @@ window.arduinoGenerator.forBlock['huskylens_init_uart'] = function (block) {
 				window.arduinoGenerator.variables_['huskylens_obj'] = 'HUSKYLENS huskylens;';
 			}
 
-			initCode = `  // 初始化 HUSKYLENS (UART - ESP32 使用 HardwareSerial)
+			initCode = `  // Initialize HUSKYLENS (UART - ESP32 uses HardwareSerial)
   Serial.begin(9600);
   huskySerial.begin(9600, SERIAL_8N1, ${rxPin}, ${txPin});
   while (!huskylens.begin(huskySerial)) {
-    Serial.println(F("HUSKYLENS 初始化失敗，請檢查連線！"));
-    Serial.println(F("1. 檢查接線是否正確？"));
-    Serial.println(F("2. 檢查 HUSKYLENS 是否正常工作？"));
+    Serial.println(F("HUSKYLENS init failed, please check the connection!"));
+    Serial.println(F("1. Is the wiring correct?"));
+    Serial.println(F("2. Is HUSKYLENS powered on and working?"));
     delay(100);
   }
-  Serial.println(F("HUSKYLENS 初始化成功！"));`;
+  Serial.println(F("HUSKYLENS init OK!"));`;
 		} else {
 			// Arduino AVR 使用 SoftwareSerial - 避免重複添加/宣告
 			if (!window.arduinoGenerator.includes_['softwareserial']) {
@@ -239,16 +239,16 @@ window.arduinoGenerator.forBlock['huskylens_init_uart'] = function (block) {
 				window.arduinoGenerator.variables_['huskylens_obj'] = 'HUSKYLENS huskylens;';
 			}
 
-			initCode = `  // 初始化 HUSKYLENS (UART - Arduino AVR 使用 SoftwareSerial)
+			initCode = `  // Initialize HUSKYLENS (UART - Arduino AVR uses SoftwareSerial)
   Serial.begin(9600);
   huskySerial.begin(9600);
   while (!huskylens.begin(huskySerial)) {
-    Serial.println(F("HUSKYLENS 初始化失敗，請檢查連線！"));
-    Serial.println(F("1. 檢查接線是否正確？"));
-    Serial.println(F("2. 檢查 HUSKYLENS 是否正常工作？"));
+    Serial.println(F("HUSKYLENS init failed, please check the connection!"));
+    Serial.println(F("1. Is the wiring correct?"));
+    Serial.println(F("2. Is HUSKYLENS powered on and working?"));
     delay(100);
   }
-  Serial.println(F("HUSKYLENS 初始化成功！"));`;
+  Serial.println(F("HUSKYLENS init OK!"));`;
 		}
 
 		// 確保 setupCode_ 存在
