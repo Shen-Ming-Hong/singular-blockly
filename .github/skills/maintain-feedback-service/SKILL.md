@@ -67,7 +67,9 @@ metadata:
 ## 雲端工作階段
 
 - 可以：修改程式、跑上面所有本地驗證、讀部署手冊、用 GitHub MCP 開 PR。
-- 不要從雲端工作階段執行 `wrangler deploy`、`wrangler d1 migrations apply`（非 `--local`）或 `wrangler secret`。正式操作由 Ray 核准後，在 Ray 指定的環境執行。
+- 雲端工作階段可以執行正式部署（Ray 2026-10-21 決定）：上一節「必須先問 Ray 的事」仍須先在討論串取得 Ray 對該次操作的明確同意（例如「同意部署回饋網頁」）。環境的 `api.cloudflare.com` 由 proxy 注入 `CLOUDFLARE_API_TOKEN`，網路允許清單含 `blockly-support.singular-ai.org` 供部署後檢查。
+- 部署步驟：在乾淨的 `origin/master` worktree 設 `CLOUDFLARE_API_TOKEN=proxy-injected`（實際值由 proxy 注入）與 `CLOUDFLARE_ACCOUNT_ID`（由 `GET /client/v4/accounts` 取得），先以 `npx wrangler d1 migrations list singular-blockly-feedback --config workers/feedback/wrangler.jsonc --remote` 確認待套用項目，再 `npx wrangler deploy --config workers/feedback/wrangler.jsonc`，最後依部署手冊檢查公開頁面並把 version id 寫回手冊。
+- `wrangler secret` 與正式 D1 migration 一樣各自需要 Ray 同意；secret 值不得出現在雲端命令參數、log 或對話。
 - 需要讀正式狀態（例如目前流量版本）時，只做唯讀查詢，結果只回報摘要。
 
 ## 回報
