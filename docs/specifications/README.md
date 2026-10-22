@@ -79,6 +79,7 @@ docs/specifications/
 | P1     | 功能   | [防止孤立積木](06-features/orphan-blocks.md)                            | ✅ 完成   |
 | P1     | 功能   | [CyberBrick 範例瀏覽器](06-features/sample-browser.md)                  | ✅ 完成   |
 | P1     | 工具   | [PlatformIO 診斷](06-features/platformio-diagnostics.md)                | ✅ 完成   |
+| P1     | 功能   | [ESP32 積木包](06-features/block-packs.md)                              | ✅ 完成   |
 | P2     | 國際化 | [i18n 品質](02-internationalization/i18n.md)                            | ✅ 完成   |
 | P2     | 國際化 | [使用者介面與範例名稱](02-internationalization/user-facing-localization.md) | ✅ 完成 |
 | P2     | 功能   | [函式積木鎖定](06-features/function-block-locking.md)                   | ✅ 完成   |

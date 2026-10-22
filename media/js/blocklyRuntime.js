@@ -359,6 +359,10 @@
 				}
 			});
 		}
+		// 積木包：缺定義的 pack_ 積木換成佔位積木，積木包回來時還原
+		if (window.blockPacks && typeof window.blockPacks.prepareState === 'function') {
+			window.blockPacks.prepareState(state);
+		}
 		return state;
 	}
 
@@ -615,6 +619,7 @@
 		installRequiredMainBlockDisableGuard,
 		repairRequiredMainBlockDisabledReasons,
 		createWorkspace,
+		getWorkspace,
 		recreateWorkspace,
 		disposeWorkspace,
 		getStatus,

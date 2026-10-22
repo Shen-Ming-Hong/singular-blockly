@@ -1,0 +1,9 @@
+{
+	"formatVersion": 1,
+	"id": "uno_only",
+	"version": "1.0.0",
+	"defaultLocale": "en",
+	"category": { "name": "Uno only", "colour": 120 },
+	"blocks": [{ "name": "blink", "shape": "statement", "label": "blink" }],
+	"targets": { "uno": { "blocks": { "blink": "digitalWrite(13, HIGH);\n" } } }
+}

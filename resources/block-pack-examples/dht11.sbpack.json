@@ -1,0 +1,58 @@
+{
+	"$schema": "../../media/schemas/block-pack.schema.json",
+	"formatVersion": 1,
+	"id": "dht11",
+	"version": "1.0.0",
+	"author": "Singular Blockly",
+	"defaultLocale": "en",
+	"category": {
+		"name": { "en": "Temperature", "zh-hant": "溫濕度" },
+		"colour": 20
+	},
+	"blocks": [
+		{
+			"name": "read",
+			"shape": "value",
+			"output": "Number",
+			"label": {
+				"en": "DHT11 on {PIN} read {WHAT}",
+				"zh-hant": "DHT11 腳位 {PIN} 讀取 {WHAT}"
+			},
+			"inputs": [
+				{ "name": "PIN", "kind": "pin", "mode": "digital", "direction": "input", "exclusive": true },
+				{
+					"name": "WHAT",
+					"kind": "dropdown",
+					"options": [
+						[{ "en": "temperature (°C)", "zh-hant": "溫度（°C）" }, "false"],
+						[{ "en": "humidity (%)", "zh-hant": "濕度（%）" }, "true"]
+					]
+				}
+			]
+		},
+		{
+			"name": "when_hot",
+			"shape": "statement",
+			"label": {
+				"en": "if DHT11 on {PIN} is above {LIMIT} °C do {DO}",
+				"zh-hant": "如果 DHT11 腳位 {PIN} 溫度高於 {LIMIT} °C 就執行 {DO}"
+			},
+			"inputs": [
+				{ "name": "PIN", "kind": "pin", "mode": "digital", "direction": "input", "exclusive": true },
+				{ "name": "LIMIT", "kind": "value", "check": "Number", "default": 30 },
+				{ "name": "DO", "kind": "statement" }
+			]
+		}
+	],
+	"targets": {
+		"esp32": {
+			"includes": ["DHT.h"],
+			"libDeps": ["adafruit/DHT sensor library@^1.4.6", "adafruit/Adafruit Unified Sensor@^1.1.14"],
+			"globals": "float dht11Read(int pin, bool humidity) {\n  static DHT *sensors[40] = {nullptr};\n  if (pin < 0 || pin >= 40) return NAN;\n  if (!sensors[pin]) {\n    sensors[pin] = new DHT(pin, DHT11);\n    sensors[pin]->begin();\n  }\n  return humidity ? sensors[pin]->readHumidity() : sensors[pin]->readTemperature();\n}\n",
+			"blocks": {
+				"read": "dht11Read({{PIN}}, {{WHAT}})",
+				"when_hot": "if (dht11Read({{PIN}}, false) > {{LIMIT}}) {\n{{DO}}}\n"
+			}
+		}
+	}
+}

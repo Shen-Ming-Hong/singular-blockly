@@ -10,6 +10,7 @@ Use `workspace.schema.json` for the outer document. Use `block-contract.json` as
 
 - `board`: One board ID listed in `workspace.schema.json` and the block contract index.
 - `workspace`: A Blockly serialization object accepted by `Blockly.serialization.workspaces.load`.
+- `workspace.customBlocks`: Optional imported ESP32 block packs. Preserve it and follow `block-packs.md` when it exists or when a block type starts with `pack_`.
 - `txtVirtualControls`: Optional TXT Controller virtual controls. Preserve it unless the requested change concerns those controls. A TXT document may contain valid virtual controls even when its Blockly workspace has no blocks.
 
 Preserve unknown top-level properties. They may belong to a newer extension version or a project-specific workflow.

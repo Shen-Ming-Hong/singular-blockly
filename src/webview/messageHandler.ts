@@ -13,6 +13,7 @@ import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, UploadStage, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
+import { BlockPackService, parseInstalledSummaries, readBlockPackFile } from '../services/blockPackService';
 import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStartResult } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
@@ -641,6 +642,12 @@ export class WebViewMessageHandler {
 						});
 					}
 					break;
+				case 'importBlockPack':
+					await this.handleImportBlockPack(message);
+					break;
+				case 'confirmBlockPackChange':
+					await this.handleConfirmBlockPackChange(message);
+					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
 					break;
@@ -672,6 +679,107 @@ export class WebViewMessageHandler {
 		}
 
 		await this.txtTestService.installRuntime();
+	}
+
+	/**
+	 * 匯入積木包：選檔與驗證在 Extension Host 完成，WebView 收到結果後顯示預覽
+	 */
+	private async handleImportBlockPack(message: unknown): Promise<void> {
+		const requestId = isPlainRecord(message) ? message.requestId : undefined;
+		const installed = isPlainRecord(message) ? parseInstalledSummaries(message.installed) : null;
+		if (typeof requestId !== 'string' || !BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(requestId) || !installed) {
+			log('Rejected malformed importBlockPack message', 'warn');
+			return;
+		}
+		const service = new BlockPackService({
+			pickFile: async () => {
+				const title = await this.localeService.getLocalizedMessage('BLOCK_PACK_SELECT_FILE', 'Select a block pack');
+				const filterName = await this.localeService.getLocalizedMessage('BLOCK_PACK_FILE_FILTER', 'Block pack');
+				const uris = await vscodeApi.window.showOpenDialog({
+					canSelectFiles: true,
+					canSelectFolders: false,
+					canSelectMany: false,
+					title,
+					filters: { [filterName]: ['json'] },
+				});
+				return uris?.[0]?.fsPath;
+			},
+			readFile: readBlockPackFile,
+			isWorkspaceTrusted: () => vscodeApi.workspace.isTrusted !== false,
+			confirmLibDeps: async (_pack, libDeps) => {
+				const prompt = await this.localeService.getLocalizedMessage(
+					'BLOCK_PACK_LIBDEPS_CONFIRM',
+					'This block pack downloads these PlatformIO libraries when you build: {0}. Only import block packs you trust. Continue?',
+					libDeps.join(', ')
+				);
+				const continueLabel = await this.localeService.getLocalizedMessage('BLOCK_PACK_CONTINUE', 'Continue');
+				const selection = await vscodeApi.window.showWarningMessage(prompt, { modal: true }, continueLabel);
+				return selection === continueLabel;
+			},
+		});
+		const outcome = await service.importPack(installed);
+		if (outcome.kind === 'ready') {
+			await this.panel.webview.postMessage({
+				command: 'blockPackReady',
+				requestId,
+				pack: outcome.pack,
+				sourceName: outcome.sourceName,
+				change: outcome.change,
+				previousVersion: outcome.previousVersion,
+				removedBlocks: outcome.removedBlocks,
+			});
+			return;
+		}
+		await this.panel.webview.postMessage({
+			command: 'blockPackRejected',
+			requestId,
+			...(outcome.kind === 'cancelled'
+				? { cancelled: true }
+				: { errors: outcome.errors, sourceName: outcome.sourceName }),
+		});
+	}
+
+	/**
+	 * 移除或更新積木包會讓積木變成佔位積木時，以 modal 確認
+	 */
+	private async handleConfirmBlockPackChange(message: unknown): Promise<void> {
+		if (
+			!isPlainRecord(message) ||
+			!hasOnlyKeys(message, ['command', 'requestId', 'kind', 'packName', 'affectedBlocks']) ||
+			typeof message.requestId !== 'string' ||
+			!BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(message.requestId) ||
+			(message.kind !== 'remove' && message.kind !== 'update') ||
+			typeof message.packName !== 'string' ||
+			message.packName.length > 200 ||
+			!Number.isInteger(message.affectedBlocks) ||
+			(message.affectedBlocks as number) < 0
+		) {
+			log('Rejected malformed confirmBlockPackChange message', 'warn');
+			return;
+		}
+		const isRemove = message.kind === 'remove';
+		const prompt = isRemove
+			? await this.localeService.getLocalizedMessage(
+					'BLOCK_PACK_REMOVE_CONFIRM',
+					'Remove the block pack "{0}"? Blocks in this project that become placeholders: {1}. Import the block pack again to restore them.',
+					message.packName,
+					String(message.affectedBlocks)
+				)
+			: await this.localeService.getLocalizedMessage(
+					'BLOCK_PACK_UPDATE_CONFIRM',
+					'Update the block pack "{0}"? Blocks that the new version no longer has become placeholders: {1}.',
+					message.packName,
+					String(message.affectedBlocks)
+				);
+		const actionLabel = isRemove
+			? await this.localeService.getLocalizedMessage('BLOCK_PACK_REMOVE', 'Remove')
+			: await this.localeService.getLocalizedMessage('BLOCK_PACK_UPDATE', 'Update');
+		const selection = await vscodeApi.window.showWarningMessage(prompt, { modal: true }, actionLabel);
+		await this.panel.webview.postMessage({
+			command: 'blockPackChangeConfirmed',
+			requestId: message.requestId,
+			confirmed: selection === actionLabel,
+		});
 	}
 
 	/**

@@ -1,0 +1,14 @@
+{
+	"formatVersion": 1,
+	"id": "url_dep",
+	"version": "1.0.0",
+	"defaultLocale": "en",
+	"category": { "name": "URL dependency", "colour": 60 },
+	"blocks": [{ "name": "noop", "shape": "statement", "label": "do nothing" }],
+	"targets": {
+		"esp32": {
+			"libDeps": ["https://example.com/library.zip"],
+			"blocks": { "noop": "\n" }
+		}
+	}
+}

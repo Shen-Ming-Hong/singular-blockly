@@ -1,0 +1,395 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "singular-blockly://block-pack.schema.json",
+	"title": "Singular Blockly block pack",
+	"description": "A set of custom blocks with C++ templates. Version 1 supports the ESP32 DevKit board only.",
+	"type": "object",
+	"required": [
+		"formatVersion",
+		"id",
+		"version",
+		"defaultLocale",
+		"category",
+		"blocks",
+		"targets"
+	],
+	"additionalProperties": false,
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"formatVersion": {
+			"const": 1
+		},
+		"id": {
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9_]{1,31}$",
+			"description": "Block types become pack_<id>_<block name>."
+		},
+		"version": {
+			"type": "string",
+			"pattern": "^\\d+\\.\\d+\\.\\d+$"
+		},
+		"author": {
+			"type": "string",
+			"minLength": 1,
+			"maxLength": 80
+		},
+		"defaultLocale": {
+			"enum": [
+				"bg",
+				"cs",
+				"de",
+				"en",
+				"es",
+				"fr",
+				"hu",
+				"it",
+				"ja",
+				"ko",
+				"pl",
+				"pt-br",
+				"ru",
+				"tr",
+				"zh-hant"
+			]
+		},
+		"category": {
+			"type": "object",
+			"required": [
+				"name",
+				"colour"
+			],
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"$ref": "#/$defs/localizedText"
+				},
+				"colour": {
+					"type": "number",
+					"minimum": 0,
+					"maximum": 360
+				}
+			}
+		},
+		"blocks": {
+			"type": "array",
+			"minItems": 1,
+			"maxItems": 50,
+			"items": {
+				"$ref": "#/$defs/block"
+			}
+		},
+		"targets": {
+			"type": "object",
+			"minProperties": 1,
+			"additionalProperties": false,
+			"properties": {
+				"esp32": {
+					"$ref": "#/$defs/target"
+				}
+			}
+		}
+	},
+	"$defs": {
+		"localizedText": {
+			"description": "Plain text, or an object keyed by locale. The object must include defaultLocale.",
+			"oneOf": [
+				{
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 200
+				},
+				{
+					"type": "object",
+					"minProperties": 1,
+					"propertyNames": {
+						"enum": [
+							"bg",
+							"cs",
+							"de",
+							"en",
+							"es",
+							"fr",
+							"hu",
+							"it",
+							"ja",
+							"ko",
+							"pl",
+							"pt-br",
+							"ru",
+							"tr",
+							"zh-hant"
+						]
+					},
+					"additionalProperties": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 200
+					}
+				}
+			]
+		},
+		"block": {
+			"type": "object",
+			"required": [
+				"name",
+				"shape",
+				"label"
+			],
+			"additionalProperties": false,
+			"properties": {
+				"name": {
+					"type": "string",
+					"pattern": "^[a-z][a-z0-9_]{0,31}$"
+				},
+				"shape": {
+					"enum": [
+						"statement",
+						"value"
+					]
+				},
+				"output": {
+					"enum": [
+						"Number",
+						"Boolean",
+						"String"
+					],
+					"description": "Only for value blocks."
+				},
+				"label": {
+					"$ref": "#/$defs/localizedText",
+					"description": "Each input appears exactly once as {NAME}."
+				},
+				"tooltip": {
+					"$ref": "#/$defs/localizedText"
+				},
+				"inputs": {
+					"type": "array",
+					"maxItems": 10,
+					"items": {
+						"oneOf": [
+							{
+								"type": "object",
+								"required": [
+									"name",
+									"kind"
+								],
+								"properties": {
+									"name": {
+										"type": "string",
+										"pattern": "^[A-Z][A-Z0-9_]{0,31}$",
+										"description": "Input name. Use it as {NAME} in the label and {{NAME}} in the template."
+									},
+									"kind": {
+										"const": "value"
+									},
+									"check": {
+										"enum": [
+											"Number",
+											"Boolean",
+											"String"
+										]
+									},
+									"default": {
+										"type": [
+											"number",
+											"string"
+										]
+									}
+								},
+								"additionalProperties": false
+							},
+							{
+								"type": "object",
+								"required": [
+									"name",
+									"kind",
+									"default"
+								],
+								"properties": {
+									"name": {
+										"type": "string",
+										"pattern": "^[A-Z][A-Z0-9_]{0,31}$",
+										"description": "Input name. Use it as {NAME} in the label and {{NAME}} in the template."
+									},
+									"kind": {
+										"const": "number"
+									},
+									"default": {
+										"type": "number"
+									},
+									"min": {
+										"type": "number"
+									},
+									"max": {
+										"type": "number"
+									},
+									"precision": {
+										"type": "number",
+										"minimum": 0
+									}
+								},
+								"additionalProperties": false
+							},
+							{
+								"type": "object",
+								"required": [
+									"name",
+									"kind",
+									"default"
+								],
+								"properties": {
+									"name": {
+										"type": "string",
+										"pattern": "^[A-Z][A-Z0-9_]{0,31}$",
+										"description": "Input name. Use it as {NAME} in the label and {{NAME}} in the template."
+									},
+									"kind": {
+										"const": "text"
+									},
+									"default": {
+										"type": "string",
+										"maxLength": 200
+									}
+								},
+								"additionalProperties": false
+							},
+							{
+								"type": "object",
+								"required": [
+									"name",
+									"kind",
+									"options"
+								],
+								"properties": {
+									"name": {
+										"type": "string",
+										"pattern": "^[A-Z][A-Z0-9_]{0,31}$",
+										"description": "Input name. Use it as {NAME} in the label and {{NAME}} in the template."
+									},
+									"kind": {
+										"const": "dropdown"
+									},
+									"options": {
+										"type": "array",
+										"minItems": 1,
+										"maxItems": 50,
+										"items": {
+											"type": "array",
+											"prefixItems": [
+												{
+													"$ref": "#/$defs/localizedText"
+												},
+												{
+													"type": "string",
+													"pattern": "^[A-Za-z0-9_]+$"
+												}
+											],
+											"minItems": 2,
+											"maxItems": 2
+										}
+									}
+								},
+								"additionalProperties": false
+							},
+							{
+								"type": "object",
+								"required": [
+									"name",
+									"kind",
+									"mode"
+								],
+								"properties": {
+									"name": {
+										"type": "string",
+										"pattern": "^[A-Z][A-Z0-9_]{0,31}$",
+										"description": "Input name. Use it as {NAME} in the label and {{NAME}} in the template."
+									},
+									"kind": {
+										"const": "pin"
+									},
+									"mode": {
+										"enum": [
+											"digital",
+											"analog"
+										]
+									},
+									"direction": {
+										"enum": [
+											"input",
+											"output"
+										]
+									},
+									"exclusive": {
+										"type": "boolean",
+										"description": "Warn when another exclusive pin field selects the same pin."
+									}
+								},
+								"additionalProperties": false
+							},
+							{
+								"type": "object",
+								"required": [
+									"name",
+									"kind"
+								],
+								"properties": {
+									"name": {
+										"type": "string",
+										"pattern": "^[A-Z][A-Z0-9_]{0,31}$",
+										"description": "Input name. Use it as {NAME} in the label and {{NAME}} in the template."
+									},
+									"kind": {
+										"const": "statement"
+									}
+								},
+								"additionalProperties": false
+							}
+						]
+					}
+				}
+			}
+		},
+		"target": {
+			"type": "object",
+			"required": [
+				"blocks"
+			],
+			"additionalProperties": false,
+			"properties": {
+				"includes": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"pattern": "^[A-Za-z0-9_./-]+\\.h(pp)?$"
+					}
+				},
+				"libDeps": {
+					"type": "array",
+					"items": {
+						"type": "string",
+						"pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.][A-Za-z0-9_. -]*@[~^]?\\d+\\.\\d+\\.\\d+$"
+					},
+					"description": "PlatformIO registry owner/name@version only. URLs are rejected."
+				},
+				"globals": {
+					"type": "string",
+					"maxLength": 20000
+				},
+				"setup": {
+					"type": "string",
+					"maxLength": 20000
+				},
+				"blocks": {
+					"type": "object",
+					"description": "One C++ template per block name. Use {{NAME}} for inputs.",
+					"additionalProperties": {
+						"type": "string",
+						"maxLength": 20000
+					}
+				}
+			}
+		}
+	}
+}

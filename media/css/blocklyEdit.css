@@ -3151,6 +3151,8 @@ body.preview-mode .txt-preview-canvas,
 #txtTestPanelDialog .modal-body,
 .modal,
 .sample-modal-content .modal-body,
+.block-pack-modal-content .modal-body,
+.block-pack-code,
 #functionSearchModal,
 .search-history-container,
 .blocklyWidgetDiv .blocklyContextMenu,
@@ -3173,6 +3175,8 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar,
 .modal::-webkit-scrollbar,
 .sample-modal-content .modal-body::-webkit-scrollbar,
+.block-pack-modal-content .modal-body::-webkit-scrollbar,
+.block-pack-code::-webkit-scrollbar,
 #functionSearchModal::-webkit-scrollbar,
 .search-history-container::-webkit-scrollbar,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar,
@@ -3195,6 +3199,8 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-track,
 .modal::-webkit-scrollbar-track,
 .sample-modal-content .modal-body::-webkit-scrollbar-track,
+.block-pack-modal-content .modal-body::-webkit-scrollbar-track,
+.block-pack-code::-webkit-scrollbar-track,
 #functionSearchModal::-webkit-scrollbar-track,
 .search-history-container::-webkit-scrollbar-track,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-track,
@@ -3219,6 +3225,8 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-thumb,
 .modal::-webkit-scrollbar-thumb,
 .sample-modal-content .modal-body::-webkit-scrollbar-thumb,
+.block-pack-modal-content .modal-body::-webkit-scrollbar-thumb,
+.block-pack-code::-webkit-scrollbar-thumb,
 #functionSearchModal::-webkit-scrollbar-thumb,
 .search-history-container::-webkit-scrollbar-thumb,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb,
@@ -3243,6 +3251,8 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-thumb:hover,
 .modal::-webkit-scrollbar-thumb:hover,
 .sample-modal-content .modal-body::-webkit-scrollbar-thumb:hover,
+.block-pack-modal-content .modal-body::-webkit-scrollbar-thumb:hover,
+.block-pack-code::-webkit-scrollbar-thumb:hover,
 #functionSearchModal::-webkit-scrollbar-thumb:hover,
 .search-history-container::-webkit-scrollbar-thumb:hover,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb:hover,
@@ -3263,6 +3273,8 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-corner,
 .modal::-webkit-scrollbar-corner,
 .sample-modal-content .modal-body::-webkit-scrollbar-corner,
+.block-pack-modal-content .modal-body::-webkit-scrollbar-corner,
+.block-pack-code::-webkit-scrollbar-corner,
 #functionSearchModal::-webkit-scrollbar-corner,
 .search-history-container::-webkit-scrollbar-corner,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-corner,
@@ -3688,4 +3700,204 @@ body.theme-dark .toast.error {
 
 body.theme-dark .toast.info {
 	background-color: #1976d2;
+}
+
+/* 積木包按鈕與管理對話框（ESP32） */
+.block-pack-switch {
+	margin-left: 10px;
+}
+
+#blockPackButton {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	border: none;
+	background-color: #8e24aa;
+	color: #ffffff;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+#blockPackButton:hover {
+	background-color: #6a1b9a;
+}
+
+#blockPackButton:focus-visible,
+.block-pack-primary:focus-visible,
+.block-pack-secondary:focus-visible,
+.block-pack-remove:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.block-pack-modal-content {
+	max-width: 640px;
+	margin: 6vh auto;
+	display: flex;
+	flex-direction: column;
+	max-height: 88vh;
+}
+
+.block-pack-modal-content .modal-body {
+	overflow-y: auto;
+}
+
+.block-pack-view {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.block-pack-view[hidden] {
+	display: none;
+}
+
+.block-pack-description,
+.block-pack-empty {
+	margin: 0;
+	color: var(--editor-description-fg);
+	line-height: 1.5;
+}
+
+.block-pack-subtitle {
+	margin: 4px 0 0;
+	font-size: 1.05rem;
+	color: var(--editor-surface-fg);
+}
+
+.block-pack-actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.block-pack-primary,
+.block-pack-secondary,
+.block-pack-remove {
+	border-radius: 4px;
+	padding: 6px 14px;
+	font-size: 0.9rem;
+	cursor: pointer;
+}
+
+.block-pack-primary {
+	background-color: var(--editor-primary-action-bg);
+	color: var(--editor-primary-action-fg);
+	border: 1px solid var(--editor-primary-action-border);
+}
+
+.block-pack-primary:hover {
+	background-color: var(--editor-primary-action-hover-bg);
+}
+
+.block-pack-secondary,
+.block-pack-remove {
+	background-color: transparent;
+	color: var(--editor-surface-fg);
+	border: 1px solid var(--editor-field-border);
+}
+
+.block-pack-remove {
+	color: var(--editor-status-error-fg);
+}
+
+.block-pack-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.block-pack-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 12px;
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+	border: 1px solid var(--editor-card-border);
+	border-left-width: 6px;
+	border-radius: 6px;
+}
+
+.block-pack-item-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.block-pack-item-name {
+	font-weight: 600;
+}
+
+.block-pack-item-meta {
+	font-size: 0.85rem;
+	color: var(--editor-description-fg);
+	overflow-wrap: anywhere;
+}
+
+.block-pack-notice,
+.block-pack-errors {
+	margin: 0;
+	padding: 8px 12px;
+	border-radius: 4px;
+	line-height: 1.5;
+}
+
+.block-pack-notice {
+	background-color: var(--editor-notice-bg);
+	color: var(--editor-notice-fg);
+	border: 1px solid var(--editor-notice-border);
+}
+
+.block-pack-errors {
+	background-color: var(--editor-warning-bg);
+	color: var(--editor-warning-fg);
+	border: 1px solid var(--editor-warning-border);
+}
+
+.block-pack-errors[hidden] {
+	display: none;
+}
+
+.block-pack-errors ul {
+	margin: 4px 0 0;
+	padding-left: 20px;
+}
+
+.block-pack-errors code {
+	font-family: var(--vscode-editor-font-family, monospace);
+	color: inherit;
+	background: none;
+}
+
+.block-pack-preview-blocks {
+	height: 220px;
+	border: 1px solid var(--editor-card-border);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.block-pack-code-title {
+	margin: 0;
+	font-size: 0.95rem;
+	color: var(--editor-surface-fg);
+}
+
+.block-pack-code {
+	margin: 0;
+	max-height: 220px;
+	overflow: auto;
+	padding: 10px 12px;
+	border-radius: 6px;
+	background-color: var(--txt-virtual-controls-code-bg);
+	color: var(--txt-virtual-controls-code-fg);
+	border: 1px solid var(--txt-virtual-controls-code-border);
+	font-family: var(--vscode-editor-font-family, monospace);
+	font-size: 0.85rem;
+	white-space: pre;
 }

@@ -3537,6 +3537,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始化範例瀏覽器功能
 	initSampleBrowser();
+	// 初始化積木包管理（ESP32）
+	blockPackManager.init();
 	// 初始化 CyberBrick 上傳設定齒輪與對話框
 	initCyberBrickUploadSettingsPanel();
 
@@ -4277,7 +4279,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (
 			event.type === Blockly.Events.BLOCK_CREATE ||
 			event.type === Blockly.Events.BLOCK_DELETE ||
-			(event.type === Blockly.Events.BLOCK_CHANGE && event.element === 'disabled')
+			(event.type === Blockly.Events.BLOCK_CHANGE && event.element === 'disabled') ||
+			(event.type === Blockly.Events.BLOCK_CHANGE &&
+				event.element === 'field' &&
+				window.blockPacks?.isPackBlockType(workspace.getBlockById(event.blockId)?.type))
 		) {
 			protectMainBlockState(workspace);
 			updateEsp32BlockWarnings(workspace, window.getCurrentBoard());
@@ -4707,6 +4712,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	};
 
+	// 積木包更新或移除後重新載入目前工作區：重新初始化積木並保留視角
+	window.reloadBlocklyWorkspaceForBlockPacks = state => {
+		const target = window.getBlocklyWorkspace();
+		const previousNames = getFunctionNamesById(target);
+		const view = { scrollX: target.scrollX, scrollY: target.scrollY, scale: target.getScale() };
+		withCyberBrickNameHydrationScope(() => window.blocklyRuntime.loadWorkspaceState(state, target));
+		rebuildPwmConfig(target);
+		protectMainBlockState(target);
+		repairFunctionReferences(target, previousNames, true);
+		target.setScale(view.scale);
+		target.scroll(view.scrollX, view.scrollY);
+	};
+
 	const handleWorkspaceLoadMessage = async message => {
 		const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
@@ -4878,6 +4896,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 			}
 			const contract = window.SINGULAR_BLOCK_CONTRACT;
 			const contractByType = new Map((contract?.blocks || []).map(block => [block.type, block]));
+			// 積木包快照已由 Extension Host 驗證；把它推導出的積木與佔位積木加入 contract，並在結束時還原註冊
+			if (window.blockPacks) {
+				const candidatePacks = window.blockPacks.normalizeSnapshot(documentState.workspace?.customBlocks);
+				for (const entry of window.blockPacks.contractEntries(candidatePacks, contract?.boards)) {
+					contractByType.set(entry.type, entry);
+				}
+				window.blockPacks.activatePacks(candidatePacks);
+			}
 			if (!window.BOARD_CONFIGS?.[documentState.board] || !contract?.boards?.some(board => board.id === documentState.board)) {
 				throw { code: 'BOARD_MISMATCH' };
 			}
@@ -5072,6 +5098,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		} finally {
 			firstWorkspace?.dispose();
 			secondWorkspace?.dispose();
+			window.blockPacks?.activatePacks(window.blockPacks.getPacks(liveWorkspace));
 			window.getBlocklyWorkspace = originalWorkspaceGetter;
 			window.currentBoard = originalBoard;
 			window.currentProgrammingLanguage = originalLanguage;
@@ -5093,6 +5120,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 		switch (message.command) {
 			case 'validateWorkspaceCandidate':
 				vscode.postMessage(validateWorkspaceCandidateDocument(message));
+				break;
+			case 'blockPackReady':
+			case 'blockPackRejected':
+			case 'blockPackChangeConfirmed':
+				blockPackManager.handleMessage(message);
 				break;
 		case 'confirmDialogResult':
 				// 處理從VSCode傳回的確認對話框結果
@@ -5909,6 +5941,15 @@ async function updateToolboxForBoard(workspace, boardId) {
 
 		processTranslations(toolboxConfig);
 
+		// 積木包分類（作者文字不經過 %{} 翻譯替換）插在「函式」分類前，只在 ESP32 DevKit 顯示
+		if (boardId === 'esp32' && window.blockPacks && Array.isArray(toolboxConfig.contents)) {
+			const packCategories = window.blockPacks.toolboxCategories(window.blockPacks.getPacks(workspace));
+			if (packCategories.length > 0) {
+				const functionIndex = toolboxConfig.contents.findIndex(item => item.kind === 'category' && item.custom === 'FUNCTION');
+				toolboxConfig.contents.splice(functionIndex >= 0 ? functionIndex : toolboxConfig.contents.length, 0, ...packCategories);
+			}
+		}
+
 		// 更新 workspace 的 toolbox
 		workspace.updateToolbox(toolboxConfig);
 		log.info(`[blockly] 已根據開發板 ${boardId} 更新工具箱 (CyberBrick: ${isCyberBrick}, TXT: ${isTxt}, ESP32: ${isESP32Board})`);
@@ -5979,6 +6020,7 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 		sampleContainer.style.display = isCyberBrick ? 'flex' : 'none';
 	}
 	updateCyberBrickUploadSettingsVisibility(boardId);
+	blockPackManager.updateVisibility(boardId);
 	if (isCyberBrick) {
 		requestCyberBrickUploadSettingsLoad();
 	}
@@ -7896,7 +7938,422 @@ function updateEsp32BlockWarnings(workspace, boardId) {
 			}
 		}
 	});
+	updateBlockPackWarnings(blocks, boardId);
 }
+
+/**
+ * 積木包積木：非 ESP32 DevKit 顯示板型警告；標記 exclusive 的腳位被同一積木包的
+ * 不同輸入（例如超音波的 TRIG 與 ECHO）或不同積木包共用時顯示衝突警告。
+ * 同一積木包的同名腳位輸入視為同一個感測器，可以重複使用。
+ */
+function updateBlockPackWarnings(blocks, boardId) {
+	if (!window.blockPacks) return;
+	const packBlocks = blocks.filter(block => window.blockPacks.isPackBlockType(block.type));
+	const boardWarning = formatBlockPackMessage(
+		'BLOCK_PACK_BOARD_WARNING',
+		'Block pack blocks only work on ESP32 DevKit. On this board they only generate a comment.'
+	);
+	const pinUsers = new Map();
+	for (const block of packBlocks) {
+		const packBlock = window.blockPacks.getPackBlockForType(block.type);
+		const pack = window.blockPacks.getPackForType(block.type);
+		if (!packBlock || !pack || !block.isEnabled()) continue;
+		for (const input of packBlock.inputs || []) {
+			if (input.kind !== 'pin' || !input.exclusive) continue;
+			const pin = String(block.getFieldValue(input.name));
+			if (!pinUsers.has(pin)) pinUsers.set(pin, []);
+			pinUsers.get(pin).push({ block, role: `${pack.id}.${input.name}` });
+		}
+	}
+	const conflicts = new Map();
+	for (const [pin, users] of pinUsers) {
+		if (new Set(users.map(user => user.role)).size < 2) continue;
+		for (const { block } of users) conflicts.set(block, pin);
+	}
+	const placeholderWarning = formatBlockPackMessage(
+		'BLOCK_PACK_PLACEHOLDER_WARNING',
+		'Import the block pack again to restore this block. It does not generate code.'
+	);
+	for (const block of blocks) {
+		if (window.blockPacks.isPlaceholderType(block.type)) block.setWarningText(placeholderWarning, 'block-pack-placeholder');
+	}
+	for (const block of packBlocks) {
+		block.setWarningText(boardId === window.blockPacks.SUPPORTED_BOARD ? null : boardWarning, 'block-pack-board');
+		block.setWarningText(
+			conflicts.has(block)
+				? formatBlockPackMessage(
+						'BLOCK_PACK_PIN_CONFLICT_WARNING',
+						'GPIO{0} is also used by another block pack input that needs the pin by itself.',
+						conflicts.get(block)
+					)
+				: null,
+			'block-pack-pin'
+		);
+	}
+}
+
+// ===== 積木包（ESP32） =====
+
+const BLOCK_PACK_ERROR_FALLBACKS = {
+	INVALID_JSON: 'The file is not valid JSON or is larger than 256 KB.',
+	UNSUPPORTED_FORMAT_VERSION: 'This block pack format version is not supported.',
+	MISSING_FIELD: 'A required field is missing.',
+	INVALID_VALUE: 'A value has the wrong type, format, or range.',
+	UNKNOWN_FIELD: 'The file has a field that block packs do not use.',
+	UNSUPPORTED_BOARD: 'Block packs only support ESP32 DevKit (targets.esp32).',
+	DUPLICATE_NAME: 'Two blocks or inputs use the same name.',
+	LABEL_INPUT_MISMATCH: 'The label must use each input exactly once as {NAME}.',
+	MISSING_TEMPLATE: 'A block has no ESP32 code template.',
+	UNKNOWN_TEMPLATE_INPUT: 'A code template uses an input that the block does not have.',
+	INVALID_LIB_DEP: 'Libraries must be written as owner/name@version. Web addresses are not allowed.',
+	UNTRUSTED_WORKSPACE: 'This block pack needs libraries. Trust this workspace in VS Code before importing it.',
+};
+
+function formatBlockPackMessage(key, fallback, ...args) {
+	const text = window.languageManager ? window.languageManager.getMessage(key, fallback) : fallback;
+	return args.reduce((result, value, index) => result.split(`{${index}}`).join(String(value)), text);
+}
+
+const blockPackManager = {
+	requestSequence: 0,
+	pendingImportId: null,
+	pendingChange: null,
+	pendingConfirm: null,
+	previewWorkspace: null,
+	toolboxSignatures: new WeakMap(),
+	toolboxSyncScheduled: false,
+
+	init() {
+		const button = document.getElementById('blockPackButton');
+		const modal = document.getElementById('blockPackModal');
+		if (!button || !modal || !window.blockPacks) return;
+		button.addEventListener('click', () => this.open());
+		document.getElementById('blockPackModalClose').addEventListener('click', () => this.close());
+		document.getElementById('blockPackModalClose').addEventListener('keydown', event => {
+			if (event.key === 'Enter' || event.key === ' ') this.close();
+		});
+		modal.addEventListener('keydown', event => {
+			if (event.key === 'Escape') this.close();
+		});
+		document.getElementById('blockPackImportButton').addEventListener('click', () => this.requestImport());
+		document.getElementById('blockPackConfirmButton').addEventListener('click', () => this.confirmPreview());
+		document.getElementById('blockPackCancelButton').addEventListener('click', () => this.cancelPreview());
+		window.addEventListener('blockPacksLoaded', event => this.onPacksLoaded(event.detail && event.detail.workspace));
+		this.updateTexts();
+	},
+
+	workspace() {
+		return window.blocklyRuntime.getWorkspace();
+	},
+
+	updateTexts() {
+		const setText = (id, key, fallback) => {
+			const element = document.getElementById(id);
+			if (element) element.textContent = formatBlockPackMessage(key, fallback);
+		};
+		const button = document.getElementById('blockPackButton');
+		if (button) button.title = formatBlockPackMessage('BLOCK_PACK_BUTTON_TITLE', 'Block packs');
+		setText('blockPackModalTitle', 'BLOCK_PACK_TITLE', 'Block packs');
+		setText(
+			'blockPackIntro',
+			'BLOCK_PACK_INTRO',
+			'A block pack adds blocks for a sensor or module, made by a teacher or the community. It is saved in this project, so anyone who opens the project gets the same blocks. Block packs work on ESP32 DevKit.'
+		);
+		setText('blockPackImportButton', 'BLOCK_PACK_IMPORT', 'Import block pack…');
+		setText('blockPackInstalledTitle', 'BLOCK_PACK_INSTALLED', 'In this project');
+		setText('blockPackEmpty', 'BLOCK_PACK_EMPTY', 'No block packs yet.');
+		setText('blockPackPreviewCodeTitle', 'BLOCK_PACK_CODE_TITLE', 'Code it generates (with default values)');
+		setText('blockPackCancelButton', 'BLOCK_PACK_CANCEL', 'Cancel');
+	},
+
+	updateVisibility(boardId) {
+		const container = document.getElementById('blockPackContainer');
+		if (container) container.style.display = boardId === window.blockPacks?.SUPPORTED_BOARD ? 'flex' : 'none';
+		if (boardId !== window.blockPacks?.SUPPORTED_BOARD) this.close();
+	},
+
+	open() {
+		this.updateTexts();
+		this.showListView();
+		this.renderList();
+		document.getElementById('blockPackModal').style.display = 'block';
+		document.getElementById('blockPackImportButton').focus();
+	},
+
+	close() {
+		const modal = document.getElementById('blockPackModal');
+		if (!modal || modal.style.display === 'none') return;
+		this.disposePreview(true);
+		this.pendingImportId = null;
+		this.pendingChange = null;
+		modal.style.display = 'none';
+		document.getElementById('blockPackButton')?.focus();
+	},
+
+	showListView() {
+		document.getElementById('blockPackListView').hidden = false;
+		document.getElementById('blockPackPreviewView').hidden = true;
+	},
+
+	installedSummaries() {
+		return window.blockPacks.getPacks(this.workspace()).map(pack => ({
+			id: pack.id,
+			version: pack.version,
+			blocks: pack.blocks.map(block => block.name),
+		}));
+	},
+
+	renderList() {
+		const list = document.getElementById('blockPackList');
+		const packs = window.blockPacks.getPacks(this.workspace());
+		list.textContent = '';
+		document.getElementById('blockPackEmpty').hidden = packs.length > 0;
+		for (const pack of packs) {
+			const item = document.createElement('li');
+			item.className = 'block-pack-item';
+			item.style.borderLeftColor = `hsl(${Number(pack.category?.colour) || 0}, 45%, 55%)`;
+			const info = document.createElement('div');
+			info.className = 'block-pack-item-info';
+			const name = document.createElement('div');
+			name.className = 'block-pack-item-name';
+			name.textContent = window.blockPacks.localize(pack.category?.name, pack) || pack.id;
+			const meta = document.createElement('div');
+			meta.className = 'block-pack-item-meta';
+			meta.textContent = formatBlockPackMessage(
+				'BLOCK_PACK_ITEM_META',
+				'{0} · version {1} · blocks: {2} · in use: {3}',
+				pack.id,
+				pack.version,
+				pack.blocks.length,
+				window.blockPacks.countPackBlocks(this.workspace(), pack.id)
+			);
+			info.append(name, meta);
+			const remove = document.createElement('button');
+			remove.type = 'button';
+			remove.className = 'block-pack-remove';
+			remove.textContent = formatBlockPackMessage('BLOCK_PACK_REMOVE', 'Remove');
+			remove.addEventListener('click', () => this.requestRemove(pack));
+			item.append(info, remove);
+			list.appendChild(item);
+		}
+	},
+
+	nextRequestId() {
+		this.requestSequence += 1;
+		return `blockpack-${Date.now()}-${this.requestSequence}`;
+	},
+
+	requestImport() {
+		this.showErrors(null);
+		this.pendingImportId = this.nextRequestId();
+		vscode.postMessage({ command: 'importBlockPack', requestId: this.pendingImportId, installed: this.installedSummaries() });
+	},
+
+	showErrors(message) {
+		const box = document.getElementById('blockPackErrors');
+		box.textContent = '';
+		if (!message || !Array.isArray(message.errors) || message.errors.length === 0) {
+			box.hidden = true;
+			return;
+		}
+		const title = document.createElement('div');
+		title.textContent = formatBlockPackMessage('BLOCK_PACK_ERROR_TITLE', '{0} could not be imported:', message.sourceName || '');
+		const list = document.createElement('ul');
+		for (const error of message.errors.slice(0, 10)) {
+			const item = document.createElement('li');
+			const code = String(error.code || '');
+			item.append(formatBlockPackMessage(`BLOCK_PACK_ERROR_${code}`, BLOCK_PACK_ERROR_FALLBACKS[code] || code));
+			if (error.path) {
+				const location = document.createElement('code');
+				location.textContent = ` (${error.path})`;
+				item.append(location);
+			}
+			list.appendChild(item);
+		}
+		box.append(title, list);
+		box.hidden = false;
+	},
+
+	handleMessage(message) {
+		if (message.command === 'blockPackReady' && message.requestId === this.pendingImportId) {
+			this.pendingImportId = null;
+			this.showPreview(message);
+		} else if (message.command === 'blockPackRejected' && message.requestId === this.pendingImportId) {
+			this.pendingImportId = null;
+			if (!message.cancelled) this.showErrors(message);
+		} else if (message.command === 'blockPackChangeConfirmed' && this.pendingConfirm?.requestId === message.requestId) {
+			const { onConfirmed } = this.pendingConfirm;
+			this.pendingConfirm = null;
+			if (message.confirmed) onConfirmed();
+		}
+	},
+
+	showPreview(message) {
+		const pack = message.pack;
+		if (!pack || !window.blockPacks.normalizeSnapshot({ packs: [pack] }).length) return;
+		this.pendingChange = message;
+		const name = window.blockPacks.localize(pack.category?.name, pack) || pack.id;
+		document.getElementById('blockPackPreviewTitle').textContent = formatBlockPackMessage(
+			'BLOCK_PACK_PREVIEW_TITLE',
+			'Preview: {0} (version {1})',
+			name,
+			pack.version
+		);
+		const changeText =
+			message.change === 'update'
+				? formatBlockPackMessage('BLOCK_PACK_CHANGE_UPDATE', 'This replaces version {0} in the project.', message.previousVersion)
+				: message.change === 'same'
+					? formatBlockPackMessage(
+							'BLOCK_PACK_CHANGE_SAME',
+							'Version {0} is already in the project. Importing it again replaces the saved copy.',
+							pack.version
+						)
+					: formatBlockPackMessage('BLOCK_PACK_CHANGE_NEW', 'This block pack will be added to the project.');
+		document.getElementById('blockPackPreviewChange').textContent = changeText;
+		document.getElementById('blockPackPreviewCode').textContent = window.blockPacks.previewCode(pack);
+		const libDeps = pack.targets?.esp32?.libDeps || [];
+		const deps = document.getElementById('blockPackPreviewDeps');
+		deps.hidden = libDeps.length === 0;
+		deps.textContent = formatBlockPackMessage('BLOCK_PACK_LIBDEPS', 'Libraries downloaded when you build: {0}', libDeps.join(', '));
+		document.getElementById('blockPackConfirmButton').textContent =
+			message.change === 'new'
+				? formatBlockPackMessage('BLOCK_PACK_ADD', 'Add to project')
+				: formatBlockPackMessage('BLOCK_PACK_UPDATE', 'Update');
+		document.getElementById('blockPackListView').hidden = true;
+		document.getElementById('blockPackPreviewView').hidden = false;
+		this.renderPreviewBlocks(pack);
+		document.getElementById('blockPackConfirmButton').focus();
+	},
+
+	renderPreviewBlocks(pack) {
+		this.disposePreview(false);
+		const others = window.blockPacks.getPacks(this.workspace()).filter(existing => existing.id !== pack.id);
+		window.blockPacks.activatePacks([...others, pack]);
+		const container = document.getElementById('blockPackPreviewBlocks');
+		this.previewWorkspace = Blockly.inject(container, {
+			readOnly: true,
+			renderer: 'thrasos',
+			media: window.BLOCKLY_MEDIA_URL,
+			theme: currentTheme === 'dark' ? window.SingularBlocklyDarkTheme : window.SingularBlocklyTheme,
+			move: { scrollbars: true, drag: true, wheel: true },
+			zoom: { startScale: 0.85 },
+		});
+		// inject 會把預覽設成 Blockly 主工作區，改回編輯器的工作區
+		Blockly.common.setMainWorkspace(this.workspace());
+		let y = 16;
+		const [category] = window.blockPacks.toolboxCategories([pack]);
+		for (const item of category.contents) {
+			const block = this.previewWorkspace.newBlock(item.type);
+			for (const [field, value] of Object.entries(item.fields || {})) block.setFieldValue(value, field);
+			block.initSvg();
+			block.render();
+			block.moveBy(16, y);
+			y += block.getHeightWidth().height + 16;
+		}
+	},
+
+	disposePreview(restoreRegistry) {
+		if (this.previewWorkspace) {
+			this.previewWorkspace.dispose();
+			this.previewWorkspace = null;
+			document.getElementById('blockPackPreviewBlocks').textContent = '';
+		}
+		if (restoreRegistry) window.blockPacks.activatePacks(window.blockPacks.getPacks(this.workspace()));
+	},
+
+	cancelPreview() {
+		this.pendingChange = null;
+		this.disposePreview(true);
+		this.showListView();
+		this.renderList();
+	},
+
+	/** 需要 Extension Host 以 modal 確認時先詢問，否則直接執行 */
+	confirmThen(kind, pack, affectedBlocks, onConfirmed) {
+		if (affectedBlocks <= 0) {
+			onConfirmed();
+			return;
+		}
+		const requestId = this.nextRequestId();
+		this.pendingConfirm = { requestId, onConfirmed };
+		vscode.postMessage({
+			command: 'confirmBlockPackChange',
+			requestId,
+			kind,
+			packName: window.blockPacks.localize(pack.category?.name, pack) || pack.id,
+			affectedBlocks,
+		});
+	},
+
+	confirmPreview() {
+		const message = this.pendingChange;
+		if (!message) return;
+		const pack = message.pack;
+		const affected = message.removedBlocks?.length
+			? window.blockPacks.countPackBlocks(this.workspace(), pack.id, message.removedBlocks)
+			: 0;
+		this.confirmThen('update', pack, affected, () => {
+			const installed = { ...pack, importedAt: new Date().toISOString(), sourceName: message.sourceName };
+			const others = window.blockPacks.getPacks(this.workspace()).filter(existing => existing.id !== pack.id);
+			const packs = message.change === 'new' ? [...others, installed] : window.blockPacks.getPacks(this.workspace()).map(existing => (existing.id === pack.id ? installed : existing));
+			this.pendingChange = null;
+			this.disposePreview(false);
+			// 更新、或專案中已有此積木包的佔位積木時，重新載入讓積木重建或還原
+			this.applyPacks(packs, message.change !== 'new' || window.blockPacks.countPackBlocks(this.workspace(), pack.id) > 0);
+			toast.show(formatBlockPackMessage('BLOCK_PACK_IMPORTED', 'Block pack "{0}" is ready in the toolbox.', window.blockPacks.localize(pack.category?.name, pack) || pack.id));
+			this.showListView();
+			this.renderList();
+		});
+	},
+
+	requestRemove(pack) {
+		const affected = window.blockPacks.countPackBlocks(this.workspace(), pack.id);
+		this.confirmThen('remove', pack, affected, () => {
+			const packs = window.blockPacks.getPacks(this.workspace()).filter(existing => existing.id !== pack.id);
+			this.applyPacks(packs, affected > 0);
+			toast.show(formatBlockPackMessage('BLOCK_PACK_REMOVED', 'Removed block pack "{0}".', window.blockPacks.localize(pack.category?.name, pack) || pack.id));
+			this.renderList();
+		});
+	},
+
+	/**
+	 * 套用新的積木包清單；會影響既有積木（更新或移除）時重新載入工作區，
+	 * 讓積木重新初始化並把缺定義的積木換成佔位積木。
+	 */
+	applyPacks(packs, reloadBlocks) {
+		const workspace = this.workspace();
+		if (!workspace) return;
+		if (reloadBlocks) {
+			const state = Blockly.serialization.workspaces.save(workspace);
+			if (packs.length > 0) state.customBlocks = { formatVersion: 1, packs };
+			else delete state.customBlocks;
+			window.reloadBlocklyWorkspaceForBlockPacks(state);
+		} else {
+			window.blockPacks.setPacks(workspace, packs);
+		}
+		this.onPacksLoaded(workspace);
+		updateEsp32BlockWarnings(workspace, window.getCurrentBoard());
+		window.saveBlocklyWorkspaceState?.();
+	},
+
+	/** 主工作區的積木包清單或語系改變時重新整理工具箱 */
+	onPacksLoaded(workspace) {
+		if (!workspace || workspace !== this.workspace() || this.toolboxSyncScheduled) return;
+		this.toolboxSyncScheduled = true;
+		// 載入時 serializer 會先 clear 再 load，等這一輪完成後再比較
+		setTimeout(() => {
+			this.toolboxSyncScheduled = false;
+			if (workspace !== this.workspace()) return;
+			const signature = JSON.stringify([
+				window.languageManager?.currentLanguage,
+				window.blockPacks.getPacks(workspace).map(pack => [pack.id, pack.version, pack.importedAt]),
+			]);
+			if (this.toolboxSignatures.get(workspace) === signature) return;
+			this.toolboxSignatures.set(workspace, signature);
+			updateToolboxForBoard(workspace, window.getCurrentBoard());
+		}, 0);
+	},
+};
 
 // ===== Serial Monitor 功能 =====
 
