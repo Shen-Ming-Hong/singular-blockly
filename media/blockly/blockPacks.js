@@ -249,9 +249,21 @@
 		const open = code.indexOf('(');
 		if (open <= 0 || !/^[A-Za-z_][A-Za-z0-9_:.>-]*$/.test(code.slice(0, open)) || !code.endsWith(')')) return false;
 		let depth = 0;
+		let quote = '';
 		for (let index = open; index < code.length; index++) {
-			if (code[index] === '(') depth++;
-			if (code[index] === ')' && --depth === 0) return index === code.length - 1;
+			const char = code[index];
+			// 跳過字串與字元常值內的括號
+			if (quote) {
+				if (char === '\\') index++;
+				else if (char === quote) quote = '';
+				continue;
+			}
+			if (char === '"' || char === "'") {
+				quote = char;
+				continue;
+			}
+			if (char === '(') depth++;
+			if (char === ')' && --depth === 0) return index === code.length - 1;
 		}
 		return false;
 	}

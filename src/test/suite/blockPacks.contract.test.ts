@@ -133,11 +133,12 @@ suite('Block pack WebView runtime contract', () => {
 					],
 				},
 				{ name: 'sum', shape: 'value', output: 'Number', label: 'sum', inputs: [] },
+				{ name: 'mix', shape: 'value', output: 'Number', label: 'mix', inputs: [] },
 			],
 			targets: {
 				esp32: {
 					setup: 'Serial.begin(115200);\ndelay(10);',
-					blocks: { say: 'say({{MSG}}, {{TIMES}}, {{PIN}}, {{EXTRA}});', sum: '1 + 2' },
+					blocks: { say: 'say({{MSG}}, {{TIMES}}, {{PIN}}, {{EXTRA}});', sum: '1 + 2', mix: 'f("(") + g(")")' },
 				},
 			},
 		};
@@ -160,6 +161,9 @@ suite('Block pack WebView runtime contract', () => {
 			assert.strictEqual(code.match(/\/\/ Block pack: demo\n {2}Serial\.begin\(115200\);\n {2}delay\(10\);/g)?.length, 1);
 			sum.dispose();
 			assert.match(generator.workspaceToCode(workspace), /say\(.*, \(7\)\);/);
+			const mix = workspace.newBlock('pack_demo_mix');
+			block.getInput('EXTRA').connection.connect(mix.outputConnection);
+			assert.match(generator.workspaceToCode(workspace), /, \(\(f\("\("\) \+ g\("\)"\)\)\)\);/);
 		} finally {
 			workspace.dispose();
 		}
