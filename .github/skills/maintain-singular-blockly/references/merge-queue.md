@@ -29,11 +29,12 @@ Ray 於 2026-10-20 授權：**一般 PR 合併不需再問 Ray。** 執行任務
 輪到合併時，在**同步後的最終 head** 上逐項確認；任一項不成立就不合併。
 
 1. **範圍。** PR 只含本任務要求的變更，不屬於「仍須先問 Ray」的事項；`pr-review-release` 的本地 review（`local-code-review-loop`）結論為 `CLEAR`，或只剩有具體理由的 `CLEAR_WITH_REJECTIONS`。`NEEDS_USER_DECISION`、`BLOCKED` 或 i18n gate 未達 `PASS`／`PASS_WITH_ADVISORIES` 時不合併。
-2. **同步最新 `master`。** `git fetch origin master` 後，`origin/master` 必須是 PR head 的祖先（`git merge-base --is-ancestor origin/master HEAD`）。不是就依下方「同步與 rebase 策略」整合一次並推送。
-3. **雲端本地驗證。** 依 `cloud-local-verification` 在最終 head 執行與變更範圍相符的檢查，至少 `npm run ci:static` 與 `npm audit --audit-level=high`；程式碼變更另跑 `xvfb-run -a npm run test:unit:ci`；影響 WebView、積木、工具箱、主題或 i18n 顯示時，做真實 VS Code 的視覺與互動驗證（開啟編輯器、展開工具箱、拖曳積木）並附截圖。同步進來的 `master` 變更碰到本 PR 驗過的程式時，視覺與互動驗證也要在同步後重做。
-4. **GitHub 檢查。** PR 不是草稿；目前 head 的 `CI Gate` 成功，且 CodeQL 的 `Analyze (javascript-typescript)` 已對**這個 head** 產生結果並成功，不能只看 `CI Gate`。純文件 PR 在 CI 只跑 static，仍要等 `CI Gate` 與 CodeQL 完成。
-5. **無衝突與對話。** GitHub 顯示可合併、沒有 merge conflict；review 對話都已處理（修正，或回覆不修的理由後 resolve）。
-6. **合併。** 以 squash 合併並帶最終 head SHA，避免合併到沒驗過的 head：本機 `gh pr merge <N> --squash --delete-branch --match-head-commit <SHA>`；雲端用 GitHub MCP `merge_pull_request`（`merge_method: squash`、`expectedHeadSha`）。合併前若 `master` 又前進，回到第 2 步。
+2. **發布門檻。** 新的使用者可見介面或涉及硬體行為的變更，依 `pr-review-release` 的「發布門檻」：已取得 Ray 的外觀確認或實體硬體測試結果並寫進 PR 描述，或功能藏在預設關閉的實驗性設定後。兩者皆無就不合併。雲端本地驗證的截圖不算 Ray 確認。
+3. **同步最新 `master`。** `git fetch origin master` 後，`origin/master` 必須是 PR head 的祖先（`git merge-base --is-ancestor origin/master HEAD`）。不是就依下方「同步與 rebase 策略」整合一次並推送。
+4. **雲端本地驗證。** 依 `cloud-local-verification` 在最終 head 執行與變更範圍相符的檢查，至少 `npm run ci:static` 與 `npm audit --audit-level=high`；程式碼變更另跑 `xvfb-run -a npm run test:unit:ci`；影響 WebView、積木、工具箱、主題或 i18n 顯示時，做真實 VS Code 的視覺與互動驗證（開啟編輯器、展開工具箱、拖曳積木）並附截圖。同步進來的 `master` 變更碰到本 PR 驗過的程式時，視覺與互動驗證也要在同步後重做。
+5. **GitHub 檢查。** PR 不是草稿；目前 head 的 `CI Gate` 成功，且 CodeQL 的 `Analyze (javascript-typescript)` 已對**這個 head** 產生結果並成功，不能只看 `CI Gate`。純文件 PR 在 CI 只跑 static，仍要等 `CI Gate` 與 CodeQL 完成。
+6. **無衝突與對話。** GitHub 顯示可合併、沒有 merge conflict；review 對話都已處理（修正，或回覆不修的理由後 resolve）。
+7. **合併。** 以 squash 合併並帶最終 head SHA，避免合併到沒驗過的 head：本機 `gh pr merge <N> --squash --delete-branch --match-head-commit <SHA>`；雲端用 GitHub MCP `merge_pull_request`（`merge_method: squash`、`expectedHeadSha`）。合併前若 `master` 又前進，回到第 3 步。
 
 PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依本文件自主合併。
 
@@ -69,7 +70,7 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
 4. 移除 `merge-lease`；遠端分支由 GitHub 自動刪除，確認後清理本地 worktree 與分支。
 5. 通知重疊或疊加在本 PR 上的任務：雲端工作階段在討論串回報合併 SHA；疊加 PR 依「疊加 PR」rebase。
 6. 有可重用根因時，依技能主文件更新 `lessons.md`（下一個 PR 或同一 PR 內，不直接推 `master`）。
-7. 依 `pr-review-release` 的「何時發布」判斷是否需要發布：已發布功能壞掉或安全問題當下發 patch；使用者可見的新功能累積後發 minor；不進 VSIX 的改動不發。由協調者決定（見該技能的「誰決定發布」）；其他工作階段把判斷回報給協調者。
+7. 依 `pr-review-release` 的「何時發布」判斷是否需要發布：已發布功能壞掉或安全問題當下發 patch；使用者可見的新功能累積後發 minor；不進 VSIX 的改動不發。由協調者決定（見該技能的「誰決定發布」）；其他工作階段把判斷回報給協調者，並註明本 PR 是否還在等 Ray 的外觀確認或硬體測試（見「發布門檻」）。
 
 ## 仍須先問 Ray
 
@@ -78,6 +79,7 @@ PR 描述要寫明本地驗證的命令、結果與截圖位置，並註明依�
 - **發布相關：** major 候選，以及沒有協調者決定的發布。patch／minor（改版號、`CHANGELOG.md` 版本區段、tag、`create-release-tag.yml`／`publish.yml`／`recover-github-release.yml`）由協調者依 `pr-review-release` 的「何時發布」與「誰決定發布」判斷執行，發布後回報 Ray。
 - **移除或改變使用者可見功能，而範圍不明確時：** 例如需求只說「拿掉 X」，但 X 牽涉多個入口、設定或已存檔的工作區格式；或 modify/delete 衝突無法判斷該保留哪一方。
 - **產品決策：** `NEEDS_USER_DECISION` 的 review 或 i18n finding、需求有多種合理解讀且會影響使用者行為、不相容的工作區格式變更。
+- **未通過發布門檻的新介面或硬體變更：** 新的使用者可見介面在 Ray 確認外觀前、涉及硬體行為的功能在 Ray 完成實體硬體測試前，若無法藏在預設關閉的設定後，就不合併也不發布（見 `pr-review-release` 的「發布門檻」）。
 - **儲存庫與帳號設定：** ruleset、required checks、secrets、GitHub App／Marketplace 身分、`release` environment、workflow 權限（`permissions:`、`id-token`）的擴大。
 - **他人的 PR：** 外部貢獻者或其他工作階段開的 PR，除非該工作階段已停止且 Ray 指派接手。Dependabot PR 依 `manage-dependabot-prs` 的核准佇列。
 - **不可逆或對外的操作：** 對 `master` 強制推送或改寫歷史、刪除他人分支、刪除或重建已發布的 tag 與 release；協調者決定的 patch／minor 發布除外。

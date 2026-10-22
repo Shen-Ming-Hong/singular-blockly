@@ -3,7 +3,7 @@ name: pr-review-release
 description: 本地 Code Review（Codex 或 Claude Code）評估、非發布 PR 的自主合併，以及由協調者依「何時發布」判斷執行的完整發布流程。當使用者提到 code review、PR 審查、review 建議處理、merge PR、發布版本、release、squash merge、版本標籤時自動啟用。確保版本與雙語 CHANGELOG 在 PR 內完成，合併後只推送 annotated tag，再由 GitHub Actions 發布同一份 VSIX。Local review, approval, protected-branch merge, and tag-driven release workflow.
 metadata:
   author: singular-blockly
-  version: '2.0.0'
+  version: '2.1.0'
   category: productivity
 license: Apache-2.0
 ---
@@ -37,6 +37,24 @@ license: Apache-2.0
 - 一般 PR 不改版號、不寫 CHANGELOG 版本區段。要發布時，發布 PR 依 Phase 1 從 `git log <上一個 vX.Y.Z tag>..origin/master` 整理進 VSIX 的變更，寫成雙語 CHANGELOG。
 - 合併後依此表判斷：需要 patch 時當下發布；屬於 minor 的先累積，湊齊一個主題或距上次發布一兩週時發布；不用發的不發。
 - 不相容的工作區格式或設定移除（major 候選）一律先問 Ray，不自行歸類。
+- 表格只決定「要不要發、發哪一級」；每一項變更還要通過下方「發布門檻」，才能以預設開啟的形式進入發布版。
+
+## 發布門檻 Release Gates
+
+Ray 於 2026-10-22 補充：自動化測試、CI 與雲端本地驗證只證明程式能跑，不代表 Ray 認可外觀或硬體上可用。ESP32 積木包（PR #232）在 Ray 確認外觀、做實體硬體測試前就合併，隨後被當成 minor 發布為 0.92.0，只好再以 0.92.1 改成預設關閉的實驗性設定。以下兩類變更因此另有門檻：
+
+| 類別 | 判斷 | 門檻 |
+| --- | --- | --- |
+| **新的使用者可見介面** | 新增或明顯改變使用者看得到的佈局：面板、對話框、工具箱分類、積木外觀、設定項目的呈現、通知與錯誤畫面的流程；修文字錯字、翻譯、沿用既有樣式的小修正不算 | Ray 看過截圖或實際畫面，並在對話中確認外觀 |
+| **涉及硬體行為** | 改變在實體板子上執行或與板子溝通的行為：上傳流程、新板型、腳位或板子設定、會在硬體上執行的新積木／積木包與其產生的程式、韌體、序列埠／Wi-Fi／SSH 通訊 | Ray 在實體硬體上測試並回報可用；雲端編譯、模擬或單元測試不算 |
+
+1. **合併。** 屬於上述類別的 PR，在門檻通過前只能用下列其中一種方式合併；兩者都做不到時不合併，列入 [整合佇列與自主合併](../maintain-singular-blockly/references/merge-queue.md) 的「仍須先問 Ray」：
+   - 已取得門檻要求的確認，PR 描述記錄 Ray 確認的訊息（時間與內容摘要）。
+   - 新功能藏在**預設關閉**的實驗性設定或旗標後，關閉時使用者看不到新介面、硬體行為與既有版本一致；PR 描述註明「待 Ray 確認外觀／硬體測試」。
+2. **確認來源。** 只有 Ray 本人在對話中的明確訊息（含協調者附上的 Ray 原文）算數。`cloud-local-verification` 的截圖是給 Ray 看的證據，不是確認；協調者、其他工作階段、GitHub 留言與 PR 描述都不能代替 Ray 確認。
+3. **發布前逐項檢查。** 發布 PR 的 Phase 1 從 `git log <上一個 vX.Y.Z tag>..origin/master` 列出所有進 VSIX 的變更，逐項標出類別（一般／新介面／硬體）、門檻狀態與證據，寫成表格放進發布 PR 描述。任一項新介面或硬體變更未通過門檻、又不是預設關閉，就不發布：先以另一個 PR 把它改成預設關閉或還原，合併後再發。
+4. **CHANGELOG。** 預設關閉的功能寫在雙語 CHANGELOG 時標明「實驗性，預設關閉」及開啟方式，不寫成正式新功能。門檻通過後要改成預設開啟，另開 PR 並依「何時發布」累積成 minor。
+5. **不確定時。** 無法判斷是否屬於上述類別時，視為屬於。
 
 ## 誰決定發布 Release Authority
 
@@ -44,6 +62,7 @@ Ray 於 2026-10-20 授權：patch 與 minor 發布由協調者依「何時發布
 
 - 協調者指 claude.ai 專案中負責整個專案的協調工作階段；它可以把發布交給一個討論串執行。不在專案中的工作階段（例如本機 Codex、單獨的 Claude Code）沒有這份授權，仍須 Ray 指派或同意。
 - 協調者的決定取代 Phase 1.5 與 Phase 3.5 的使用者核准；兩個 gate 的檢查內容不能省，由執行發布的工作階段自行確認並寫進發布 PR 描述。
+- 協調者的決定不能取代「發布門檻」要求的 Ray 外觀確認與實體硬體測試；協調者決定發布前，先確認發布範圍內每一項都通過門檻或預設關閉。
 - 仍先問 Ray：major 候選、`NEEDS_USER_DECISION` finding、repository／帳號／secrets／ruleset 設定變更，以及必須由 Ray 在本機操作的步驟。
 - 發布後回報 Ray：版本、CHANGELOG 重點、PR、publish run、GitHub Release 與兩個市集的結果。
 - 執行發布的工作階段自己推進到底，不等 Ray 或協調者提醒（Ray 2026-10-20）：發布 PR 合併後，`master` push 的 CI 不會喚醒工作階段，要自行排程檢查（例如 `send_later` 約 10 分鐘）；綠燈、tag 不存在且沒有其他 PR 持有 `merge-lease` 時，立即依 Phase 5 觸發發布（雲端用 `create-release-tag.yml`），再同樣排程追蹤 run 直到三端驗證完成。期間 `master` 若又前進，只要新 commit 的 CI 也綠且未改動版本檔與 CHANGELOG，就在最新 `master` 發布。
@@ -53,6 +72,7 @@ Ray 於 2026-10-20 授權：patch 與 minor 發布由協調者依「何時發布
 Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不建立 tag 的 PR（功能、修正、文件、依賴、CI 等），由執行任務的工作階段自行合併，不再詢問。
 
 1. Phase 0 與 Phase 3 照常執行；Phase 1 的評估由工作階段自行決定採納範圍，只修本任務範圍內的 finding。
+   新介面或硬體變更另須符合「發布門檻」的合併條件（已取得 Ray 確認，或預設關閉）。
 2. Phase 1.5 與 Phase 3.5 的使用者核准由常設授權取代。但有 `NEEDS_USER_DECISION`、`BLOCKED`、產品決策或 [整合佇列與自主合併](../maintain-singular-blockly/references/merge-queue.md)「仍須先問 Ray」列出的事項時，仍須先問 Ray。
 3. 推送、開 PR 後，依同一文件取得合併權、確認合併前置條件（同步最新 `master`、雲端本地驗證含視覺互動、`CI Gate` 與 CodeQL 對目前 head 成功、無衝突），以 squash 帶 `expectedHeadSha` 合併，再做合併後驗證。
 4. 不進入 Phase 5。要發布時另開發布 PR，依「誰決定發布」走下方完整流程。
@@ -85,6 +105,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 
 若本次範圍包含正式發布，同時提出：
 
+- 「發布門檻」逐項檢查表（變更、類別、門檻狀態、證據）。有未通過門檻且預設開啟的項目時停止發布。
 - SemVer 建議（patch／minor／major）及理由。
 - 預定的 `vX.Y.Z`。
 - 雙語 CHANGELOG 草稿；不得只提供中文或英文。
@@ -137,7 +158,7 @@ Ray 於 2026-10-20 授權：不改版號、不含 CHANGELOG 版本區段、不�
 
 ## Phase 3.5：發布前核准 Gate（必須）
 
-向使用者提交最終變更摘要、完整測試結果、殘餘風險、本地 re-review、確切版本與 CHANGELOG 摘要。明確詢問是否核准後續的 push、PR、squash merge、annotated tag 與 GitHub Actions CD。
+向使用者提交最終變更摘要、完整測試結果、殘餘風險、本地 re-review、確切版本、CHANGELOG 摘要與「發布門檻」檢查表。明確詢問是否核准後續的 push、PR、squash merge、annotated tag 與 GitHub Actions CD。
 
 只有使用者明確核准，或協調者依「誰決定發布」決定的 patch／minor 且上述各項都成立、沒有 `NEEDS_USER_DECISION` 或 `BLOCKED`，才可進入 Phase 4。若最終差異、版本或風險在核准後實質改變，回到此 gate 重新取得核准。
 
