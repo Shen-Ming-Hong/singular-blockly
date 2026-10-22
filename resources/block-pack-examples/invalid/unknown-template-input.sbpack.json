@@ -1,0 +1,16 @@
+{
+	"formatVersion": 1,
+	"id": "broken_template",
+	"version": "1.0.0",
+	"defaultLocale": "en",
+	"category": { "name": "Broken", "colour": 0 },
+	"blocks": [
+		{
+			"name": "beep",
+			"shape": "statement",
+			"label": "beep on {PIN}",
+			"inputs": [{ "name": "PIN", "kind": "pin", "mode": "digital", "direction": "output" }]
+		}
+	],
+	"targets": { "esp32": { "blocks": { "beep": "tone({{BUZZER}}, 440, 100);\n" } } }
+}

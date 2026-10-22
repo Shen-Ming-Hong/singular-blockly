@@ -7,7 +7,7 @@
 - [ ] T001 在 `src/types/blockPack.ts` 定義 BlockPack、PackBlock、PackInput、PackTarget、快照與驗證錯誤型別
 - [ ] T002 在 `src/test/suite/blockPackValidator.test.ts` 先寫合法範例與每個錯誤代碼的失敗測試
 - [ ] T003 在 `src/services/blockPackValidator.ts` 實作純函式驗證器，使 T002 通過
-- [ ] T004 [P] 新增 `resources/schemas/block-pack.schema.json`、`package.json` 的 `jsonValidation`，並在測試中以同組 fixture 比對 Schema 與驗證器結論
+- [ ] T004 [P] 新增 `media/schemas/block-pack.schema.json`、`package.json` 的 `jsonValidation`，並在測試中以同組 fixture 比對 Schema 與驗證器結論
 - [ ] T005 [P] 新增 `resources/block-pack-examples/hc-sr04.sbpack.json`、含 `libDeps` 與 `statement` 輸入的範例，以及 `invalid/` 錯誤範例
 
 ## Phase 2：使用情境一—匯入與使用（P1）

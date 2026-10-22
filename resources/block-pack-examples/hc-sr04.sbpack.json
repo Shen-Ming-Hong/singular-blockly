@@ -1,0 +1,39 @@
+{
+	"$schema": "../../media/schemas/block-pack.schema.json",
+	"formatVersion": 1,
+	"id": "hc_sr04",
+	"version": "1.0.0",
+	"author": "Singular Blockly",
+	"defaultLocale": "en",
+	"category": {
+		"name": { "en": "Ultrasonic", "zh-hant": "超音波" },
+		"colour": 200
+	},
+	"blocks": [
+		{
+			"name": "distance",
+			"shape": "value",
+			"output": "Number",
+			"label": {
+				"en": "distance (cm) trig {TRIG} echo {ECHO}",
+				"zh-hant": "距離（公分） trig {TRIG} echo {ECHO}"
+			},
+			"tooltip": {
+				"en": "Measure distance with an HC-SR04 sensor. Returns 0 when nothing is detected.",
+				"zh-hant": "用 HC-SR04 測距離，沒有偵測到物體時回傳 0。"
+			},
+			"inputs": [
+				{ "name": "TRIG", "kind": "pin", "mode": "digital", "direction": "output", "exclusive": true },
+				{ "name": "ECHO", "kind": "pin", "mode": "digital", "direction": "input", "exclusive": true }
+			]
+		}
+	],
+	"targets": {
+		"esp32": {
+			"globals": "float hcSr04Distance(int trigPin, int echoPin) {\n  pinMode(trigPin, OUTPUT);\n  pinMode(echoPin, INPUT);\n  digitalWrite(trigPin, LOW);\n  delayMicroseconds(2);\n  digitalWrite(trigPin, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(trigPin, LOW);\n  return pulseIn(echoPin, HIGH, 30000) / 58.0;\n}\n",
+			"blocks": {
+				"distance": "hcSr04Distance({{TRIG}}, {{ECHO}})"
+			}
+		}
+	}
+}

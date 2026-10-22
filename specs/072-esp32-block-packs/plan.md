@@ -21,7 +21,7 @@
 
 ## 設計
 
-1. **格式與驗證（Extension Host）**：新增 `src/types/blockPack.ts` 與純函式驗證器 `src/services/blockPackValidator.ts`，涵蓋 [contracts/block-pack-format.md](./contracts/block-pack-format.md) 的全部規則，錯誤以穩定代碼加積木／欄位路徑回傳。`resources/schemas/block-pack.schema.json` 透過 `package.json` 的 `jsonValidation` 套用到 `*.sbpack.json`；測試以同一組 fixture 確認 Schema 與驗證器結論一致。
+1. **格式與驗證（Extension Host）**：新增 `src/types/blockPack.ts` 與純函式驗證器 `src/services/blockPackValidator.ts`，涵蓋 [contracts/block-pack-format.md](./contracts/block-pack-format.md) 的全部規則，錯誤以穩定代碼加積木／欄位路徑回傳。`media/schemas/block-pack.schema.json` 透過 `package.json` 的 `jsonValidation` 套用到 `*.sbpack.json`；測試以同一組 fixture 確認 Schema 與驗證器結論一致。
 2. **匯入、更新、移除（Extension Host）**：新增 `src/services/blockPackService.ts`。`importBlockPack` 訊息觸發 `showOpenDialog`，經 `FileService` 讀檔、驗證、比對已匯入版本；含 `libDeps` 時要求 `vscode.workspace.isTrusted` 並以 modal 列出依賴取得確認。通過後回傳 `blockPackReady`（含積木包與差異摘要），由 WebView 套用。訊息定義見 [contracts/messages.md](./contracts/messages.md)。
 3. **快照與載入（WebView）**：新增 `media/blockly/blockPacks.js`（編輯與預覽 WebView 都載入）。以 `Blockly.serialization.registry.register('customBlocks', …)` 註冊 priority 200 的 serializer：`load` 依快照註冊 `Blockly.Blocks` 與 `arduinoGenerator.forBlock`，狀態存在各 workspace 物件上，`save` 無積木包時回傳 null，避免改動既有專案檔。`blocklyRuntime.loadWorkspaceState` 在呼叫 Blockly 前把找不到定義的 `pack_` 型別換成佔位積木，原始狀態放進 `extraState`。
 4. **積木與產生器（WebView）**：依 [data-model.md](./data-model.md) 把輸入對應到 Blockly 欄位或輸入；腳位下拉取自 `BOARD_CONFIGS.esp32`，`direction: "output"` 排除 GPIO34–39，`analog` 只用 `analogPins`（ADC1）。產生器替換 `{{NAME}}`：值輸入以 `valueToCode`（ORDER_ATOMIC 並加括號）、文字以 C++ 字串跳脫、語句以 `statementToCode`；`includes`、`globals`、`setup`、`libDeps` 以積木包 id 為鍵寫入 `includes_`、`definitions_`、`setups_`、`lib_deps_`。所有積木包語句積木走 `isInAllowedContext` 守衛與 `onchange` 孤立警告；非 `esp32` 板子產生 `// [block pack] … not supported on this board` 註解。
@@ -34,7 +34,7 @@
 - 規格與證據：`specs/072-esp32-block-packs/`。
 - Extension Host：`src/types/blockPack.ts`、`src/services/blockPackValidator.ts`、`src/services/blockPackService.ts`、`src/webview/messageHandler.ts`、`src/webview/webviewManager.ts`。
 - WebView：`media/blockly/blockPacks.js`、`media/js/blocklyEdit.js`、`media/js/blocklyRuntime.js`、`media/html/blocklyEdit.html`、`media/css/blocklyEdit.css`。
-- Schema 與範例：`resources/schemas/block-pack.schema.json`、`resources/block-pack-examples/`。
+- Schema 與範例：`media/schemas/block-pack.schema.json`、`resources/block-pack-examples/`。
 - 產品 Skill：`resources/project-skills/singular-blockly/`。
 - 語系與測試：`media/locales/*/messages.js`、`src/test/`。
 

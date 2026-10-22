@@ -1,0 +1,16 @@
+{
+	"formatVersion": 1,
+	"id": "label_mismatch",
+	"version": "1.0.0",
+	"defaultLocale": "en",
+	"category": { "name": "Mismatch", "colour": 300 },
+	"blocks": [
+		{
+			"name": "show",
+			"shape": "statement",
+			"label": "show {TEXT}",
+			"inputs": [{ "name": "MESSAGE", "kind": "text", "default": "hi" }]
+		}
+	],
+	"targets": { "esp32": { "blocks": { "show": "Serial.println({{MESSAGE}});\n" } } }
+}

@@ -175,7 +175,13 @@
 					}
 				}
 			}
-		}
+		},
+		"jsonValidation": [
+			{
+				"fileMatch": "*.sbpack.json",
+				"url": "./media/schemas/block-pack.schema.json"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "node scripts/cleanup-temp-toolbox.js && npm run package && npm run generate:third-party-notices",
