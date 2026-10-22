@@ -761,13 +761,13 @@ export class WebViewMessageHandler {
 		const prompt = isRemove
 			? await this.localeService.getLocalizedMessage(
 					'BLOCK_PACK_REMOVE_CONFIRM',
-					'Remove the block pack "{0}"? {1} block(s) in this project will become placeholders until you import it again.',
+					'Remove the block pack "{0}"? Blocks in this project that become placeholders: {1}. Import the block pack again to restore them.',
 					message.packName,
 					String(message.affectedBlocks)
 				)
 			: await this.localeService.getLocalizedMessage(
 					'BLOCK_PACK_UPDATE_CONFIRM',
-					'Update the block pack "{0}"? {1} block(s) no longer exist in the new version and will become placeholders.',
+					'Update the block pack "{0}"? Blocks that the new version no longer has become placeholders: {1}.',
 					message.packName,
 					String(message.affectedBlocks)
 				);

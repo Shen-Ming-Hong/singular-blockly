@@ -639,6 +639,12 @@
 		return lines.join('\n').replace(/\n+$/, '\n');
 	}
 
+	/** 讓編輯器在主工作區的積木包改變時重新整理工具箱 */
+	function notifyLoaded(workspace) {
+		if (typeof window.dispatchEvent !== 'function' || typeof CustomEvent !== 'function') return;
+		window.dispatchEvent(new CustomEvent('blockPacksLoaded', { detail: { workspace } }));
+	}
+
 	Blockly.serialization.registry.register(SERIALIZER_NAME, {
 		priority: SERIALIZER_PRIORITY,
 		save(workspace) {
@@ -647,9 +653,12 @@
 		},
 		load(state, workspace) {
 			setPacks(workspace, normalizeSnapshot(state));
+			notifyLoaded(workspace);
 		},
 		clear(workspace) {
+			const hadPacks = getPacks(workspace).length > 0;
 			workspaceStates.delete(workspace);
+			if (hadPacks) notifyLoaded(workspace);
 		},
 	});
 

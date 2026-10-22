@@ -9,6 +9,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { FileService } from './fileService';
 import { log } from './logging';
+import { validateBlockPackSnapshot } from './blockPackValidator';
 import {
 	ValidateWorkspaceCandidateMessage,
 	hasWorkspaceDocumentContent,
@@ -287,6 +288,21 @@ export class WorkspaceCandidateService implements vscode.Disposable {
 			return;
 		}
 		document = normalizeWorkspaceDocumentBoard(document);
+		// 積木包快照只在 Extension Host 驗證；WebView 只會收到通過驗證的快照
+		const customBlocks = (document.workspace as { customBlocks?: unknown } | undefined)?.customBlocks;
+		if (customBlocks !== undefined) {
+			const packResult = validateBlockPackSnapshot(customBlocks);
+			if (!packResult.ok) {
+				await this.rejectCandidate({
+					generation,
+					observationRevision,
+					candidate: bytes,
+					issue: { code: 'INVALID_BLOCK_PACK', field: packResult.errors[0].path.slice(0, 128) },
+					deleted: false,
+				});
+				return;
+			}
+		}
 		if (!this.validationChannel || !this.liveLoadChannel) {
 			await this.rejectCandidate({
 				generation, observationRevision, candidate: bytes, issue: { code: 'CHANNEL_UNAVAILABLE' }, deleted: false,

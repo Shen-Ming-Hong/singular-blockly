@@ -619,6 +619,7 @@
 		installRequiredMainBlockDisableGuard,
 		repairRequiredMainBlockDisabledReasons,
 		createWorkspace,
+		getWorkspace,
 		recreateWorkspace,
 		disposeWorkspace,
 		getStatus,

@@ -340,11 +340,11 @@ function collectPack(c: Collector, value: unknown, path: string, allowedKeys: st
 	for (const key of ['id', 'version', 'defaultLocale', 'category', 'blocks', 'targets']) {
 		c.required(value, key, path);
 	}
-	if (value.id !== undefined) c.string(value.id, at('id'), PACK_ID);
-	if (value.version !== undefined) c.string(value.version, at('version'), SEMVER);
-	if (value.author !== undefined) c.string(value.author, at('author'), undefined, 80);
-	if (value.importedAt !== undefined) c.string(value.importedAt, at('importedAt'));
-	if (value.sourceName !== undefined) c.string(value.sourceName, at('sourceName'));
+	if (value.id !== undefined) {c.string(value.id, at('id'), PACK_ID);}
+	if (value.version !== undefined) {c.string(value.version, at('version'), SEMVER);}
+	if (value.author !== undefined) {c.string(value.author, at('author'), undefined, 80);}
+	if (value.importedAt !== undefined) {c.string(value.importedAt, at('importedAt'));}
+	if (value.sourceName !== undefined) {c.string(value.sourceName, at('sourceName'));}
 	let defaultLocale = 'en';
 	if (value.defaultLocale !== undefined) {
 		if ((BLOCK_PACK_LOCALES as readonly string[]).includes(value.defaultLocale as string)) {
