@@ -40,8 +40,8 @@
 ## Phase 6：語系與整合
 
 - [x] T021 依 `i18n-maintenance` 補齊 15 語系 `media/locales/*/messages.js` 新字串並通過 `validate:i18n`、`test:i18n`
-- [ ] T022 更新 `docs/specifications/` 相關說明與 `CHANGELOG.md` 未發布段落
-- [ ] T023 執行 `npm run lint`、`npm test`，並以範例積木包產生的 `src/main.cpp` 跑 `espressif32@7.0.1` 編譯
+- [x] T022 更新 `docs/specifications/` 相關說明與 `CHANGELOG.md` 未發布段落
+- [x] T023 執行 `npm run lint`、`npm test`，並以範例積木包產生的 `src/main.cpp` 跑 `espressif32@7.0.1` 編譯
 - [x] T024 依 [quickstart.md](./quickstart.md) 以 `cloud-local-verification` 做截圖與拖曳互動驗證（匯入、拖用、換板子、佔位還原、明暗主題）
 
 ## 依賴與執行順序
