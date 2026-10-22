@@ -48,5 +48,4 @@
 | `MISSING_TEMPLATE` | 積木沒有 `targets.esp32.blocks` 模板 |
 | `UNKNOWN_TEMPLATE_INPUT` | 模板引用不存在的輸入 |
 | `INVALID_LIB_DEP` | 依賴不是 `owner/name@版本` |
-| `ID_CONFLICT` | 匯入時已有同 id 但使用者未選擇更新 |
 | `UNTRUSTED_WORKSPACE` | 含 `libDeps` 但工作區未受信任 |

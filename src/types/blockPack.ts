@@ -96,7 +96,6 @@ export type BlockPackErrorCode =
 	| 'MISSING_TEMPLATE'
 	| 'UNKNOWN_TEMPLATE_INPUT'
 	| 'INVALID_LIB_DEP'
-	| 'ID_CONFLICT'
 	| 'UNTRUSTED_WORKSPACE';
 
 export interface BlockPackError {

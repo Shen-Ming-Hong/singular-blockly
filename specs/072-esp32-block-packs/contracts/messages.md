@@ -2,10 +2,10 @@
 
 | 方向 | command | 內容 | 說明 |
 | --- | --- | --- | --- |
-| WebView → Host | `importBlockPack` | `{ requestId, installed: [{ id, version }] }` | 開啟檔案選擇並驗證 |
-| Host → WebView | `blockPackReady` | `{ requestId, pack, change: "new" \| "update" \| "same", previousVersion?, removedBlocks: string[] }` | 已驗證、已確認依賴，等待 WebView 預覽確認 |
-| Host → WebView | `blockPackRejected` | `{ requestId, errors: [{ code, path }] }` 或 `{ requestId, cancelled: true }` | 驗證失敗或使用者取消 |
-| WebView → Host | `confirmBlockPackChange` | `{ requestId, kind: "remove" \| "update", packId, affectedBlocks }` | 會產生佔位積木時請 Host 顯示 modal 確認 |
+| WebView → Host | `importBlockPack` | `{ requestId, installed: [{ id, version, blocks: string[] }] }` | 開啟檔案選擇並驗證 |
+| Host → WebView | `blockPackReady` | `{ requestId, pack, sourceName, change: "new" \| "update" \| "same", previousVersion?, removedBlocks: string[] }` | 已驗證、已確認依賴，等待 WebView 預覽確認 |
+| Host → WebView | `blockPackRejected` | `{ requestId, sourceName?, errors: [{ code, path }] }` 或 `{ requestId, cancelled: true }` | 驗證失敗或使用者取消 |
+| WebView → Host | `confirmBlockPackChange` | `{ requestId, kind: "remove" \| "update", packName, affectedBlocks: number }` | 會產生佔位積木時請 Host 顯示 modal 確認 |
 | Host → WebView | `blockPackChangeConfirmed` | `{ requestId, confirmed: boolean }` | |
 
 外部候選驗證沿用 `validateWorkspaceCandidate`，新增欄位 `blockPackValidation: { ok: true } \| { ok: false, errors }`，由 Host 在送出前對 `document.workspace.customBlocks` 執行驗證器；`ok: false` 時 WebView 以 `INVALID_BLOCK_PACK` 拒絕候選。
