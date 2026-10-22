@@ -189,6 +189,65 @@ suite('Block pack WebView runtime contract', () => {
 		}
 	});
 
+	test('missing pack blocks become placeholders that keep the full original state and are restored later', () => {
+		const dht = readExample('dht11.sbpack.json');
+		const source = new Blockly.Workspace();
+		const withoutPack = new Blockly.Workspace();
+		try {
+			win.blockPacks.setPacks(source, [dht, readExample('hc-sr04.sbpack.json')]);
+			buildProgram(source);
+			const original = Blockly.serialization.workspaces.save(source);
+			const missing = JSON.parse(JSON.stringify(original));
+			missing.customBlocks.packs = missing.customBlocks.packs.filter((pack: any) => pack.id !== 'dht11');
+			win.blockPacks.activatePacks([]);
+			Blockly.serialization.workspaces.load(win.blockPacks.prepareState(missing), withoutPack);
+			const types = withoutPack.getAllBlocks(false).map((block: any) => block.type).sort();
+			assert.deepStrictEqual(types, ['arduino_setup_loop', 'block_pack_placeholder_statement', 'block_pack_placeholder_value', 'text_print']);
+			win.currentBoard = 'esp32';
+			assert.match(generator.workspaceToCode(withoutPack), /\/\/ \[block pack\] missing pack_dht11_when_hot/);
+			assert.match(generator.workspaceToCode(withoutPack), /Serial\.println\(0 \/\* \[block pack\] missing pack_dht11_read \*\/\);/);
+			assert.strictEqual(win.blockPacks.countPackBlocks(withoutPack, 'dht11'), 2);
+			assert.strictEqual(win.blockPacks.countPackBlocks(withoutPack, 'dht11', ['read']), 1);
+
+			const saved = Blockly.serialization.workspaces.save(withoutPack);
+			saved.customBlocks = { formatVersion: 1, packs: [dht, readExample('hc-sr04.sbpack.json')] };
+			const restored = win.blockPacks.prepareState(saved);
+			assert.strictEqual(JSON.stringify(restored.blocks), JSON.stringify(original.blocks));
+		} finally {
+			source.dispose();
+			withoutPack.dispose();
+		}
+	});
+
+	test('derives toolbox categories, contract entries and a code preview from a pack', () => {
+		const dht = readExample('dht11.sbpack.json');
+		const hc = readExample('hc-sr04.sbpack.json');
+		const [category] = win.blockPacks.toolboxCategories([hc]);
+		assert.strictEqual(category.kind, 'category');
+		assert.strictEqual(category.colour, '200');
+		assert.deepStrictEqual(category.contents, [{ kind: 'block', type: 'pack_hc_sr04_distance', fields: { TRIG: '4', ECHO: '5' } }]);
+		const [, , ...rest] = win.blockPacks.toolboxCategories([dht])[0].contents;
+		assert.deepStrictEqual(rest, []);
+		assert.deepStrictEqual(win.blockPacks.toolboxCategories([dht])[0].contents[1].inputs, {
+			LIMIT: { shadow: { type: 'math_number', fields: { NUM: 30 } } },
+		});
+
+		const entries = win.blockPacks.contractEntries([dht], [
+			{ id: 'esp32', language: 'arduino' },
+			{ id: 'uno', language: 'arduino' },
+			{ id: 'cyberbrick', language: 'micropython' },
+		]);
+		const read = entries.find((entry: any) => entry.type === 'pack_dht11_read');
+		assert.deepStrictEqual(read.boards, ['esp32', 'uno']);
+		assert.deepStrictEqual(read.variants.esp32.fields[1], { name: 'WHAT', kind: 'dropdown', optionsMode: 'static', options: ['false', 'true'] });
+		assert.ok(entries.some((entry: any) => entry.type === 'block_pack_placeholder_value'));
+
+		const preview = win.blockPacks.previewCode(dht);
+		assert.match(preview, /^#include <DHT\.h>/);
+		assert.match(preview, /dht11Read\(4, false\);/);
+		assert.match(preview, /if \(dht11Read\(4, false\) > \(30\)\) \{/);
+	});
+
 	test('the edit and preview WebViews load the block pack runtime after the generators', () => {
 		const manager = fs.readFileSync(path.join(ROOT, 'src', 'webview', 'webviewManager.ts'), 'utf8');
 		assert.strictEqual(manager.match(/media\/blockly\/blockPacks\.js/g)?.length, 2);
