@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "TXT 실행 중지",
 	"command.installTxtRuntime.title": "TXT 런타임 설치",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Blockly가 아닌 프로젝트에서 안전 경고를 표시하지 않음",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "실험 기능: ESP32 DevKit에서 **블록 팩**(`.sbpack.json` 파일에서 사용자 블록 가져오기)을 표시해요. 아직 하드웨어에서 테스트 중이에요. 설정을 바꾼 뒤 Blockly 편집기를 다시 열어 주세요. 꺼져 있어도 이미 블록 팩이 들어 있는 프로젝트는 그대로 쓸 수 있어요.",
 	"singular-blockly.txt.host.description": "fischertechnik TXT 컨트롤러 IP 주소",
 	"singular-blockly.txt.username.description": "TXT 컨트롤러 SSH 사용자 이름",
 	"singular-blockly.txt.remotePath.description": "프로그램이 업로드되는 TXT 컨트롤러의 원격 경로",

@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "停止 TXT 程式執行",
 	"command.installTxtRuntime.title": "安裝 TXT 執行環境",
 	"singularBlockly.safetyGuard.suppressWarning.description": "不再顯示非 Blockly 專案的安全警告",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "實驗功能：在 ESP32 DevKit 顯示**積木包**（從 `.sbpack.json` 檔匯入自訂積木）。目前還在做硬體測試。修改後請重新開啟 Blockly 編輯器。關閉時，已經有積木包的專案仍可正常使用。",
 	"singular-blockly.txt.host.description": "fischertechnik TXT 控制器的 IP 位址",
 	"singular-blockly.txt.username.description": "TXT 控制器的 SSH 使用者名稱",
 	"singular-blockly.txt.remotePath.description": "程式上傳到 TXT 控制器上的遠端路徑",

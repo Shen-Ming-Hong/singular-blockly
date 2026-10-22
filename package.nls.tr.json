@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "TXT yürütmesini durdur",
 	"command.installTxtRuntime.title": "TXT çalışma ortamını yükle",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Blockly olmayan projeler için güvenlik uyarısını gösterme",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "Deneysel: ESP32 DevKit için **blok paketlerini** gösterir (`.sbpack.json` dosyalarından özel bloklar içe aktarma). Hâlâ donanım üzerinde test ediliyor. Bu ayarı değiştirdikten sonra Blockly düzenleyicisini yeniden aç. Kapalıyken, zaten blok paketi içeren projeler çalışmaya devam eder.",
 	"singular-blockly.txt.host.description": "fischertechnik TXT denetleyicisinin IP adresi",
 	"singular-blockly.txt.username.description": "TXT denetleyicisi için SSH kullanıcı adı",
 	"singular-blockly.txt.remotePath.description": "Programın yükleneceği TXT denetleyicisindeki uzak yol",

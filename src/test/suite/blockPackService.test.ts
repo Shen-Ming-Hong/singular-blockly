@@ -11,6 +11,9 @@ import * as path from 'path';
 import {
 	BlockPackService,
 	BlockPackServiceDeps,
+	BLOCK_PACKS_SETTING_KEY,
+	BLOCK_PACKS_SETTING_SECTION,
+	isBlockPacksEnabled,
 	parseInstalledSummaries,
 	readBlockPackFile,
 } from '../../services/blockPackService';
@@ -111,5 +114,21 @@ suite('Block pack import service', () => {
 		]);
 		assert.strictEqual(parseInstalledSummaries([{ id: 'a1', version: '1.0.0' }]), null);
 		assert.strictEqual(parseInstalledSummaries('nope'), null);
+	});
+
+	test('block packs stay behind an experimental setting that is off by default', () => {
+		const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
+		const setting = manifest.contributes.configuration.properties[`${BLOCK_PACKS_SETTING_SECTION}.${BLOCK_PACKS_SETTING_KEY}`];
+		assert.strictEqual(setting.type, 'boolean');
+		assert.strictEqual(setting.default, false);
+		assert.strictEqual(isBlockPacksEnabled({ get: <T>(_key: string, fallback: T) => fallback }), false);
+		assert.strictEqual(isBlockPacksEnabled({ get: <T>() => true as unknown as T }), true);
+
+		const html = fs.readFileSync(path.join(ROOT, 'media', 'html', 'blocklyEdit.html'), 'utf8');
+		assert.match(html, /id="blockPackContainer" data-enabled="\{blockPacksEnabled\}"/);
+		const editor = fs.readFileSync(path.join(ROOT, 'media', 'js', 'blocklyEdit.js'), 'utf8');
+		assert.match(editor, /boardId === 'esp32' && blockPackManager\.isEnabled\(\)/);
+		const manager = fs.readFileSync(path.join(ROOT, 'src', 'webview', 'webviewManager.ts'), 'utf8');
+		assert.match(manager, /replace\(\s*'\{blockPacksEnabled\}'/);
 	});
 });

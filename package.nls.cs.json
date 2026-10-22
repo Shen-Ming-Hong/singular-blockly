@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "Zastavit běh na TXT",
 	"command.installTxtRuntime.title": "Nainstalovat běhové prostředí TXT",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Nezobrazovat bezpečnostní upozornění u projektů, které nejsou Blockly",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "Experimentální: zobrazí **balíčky bloků** pro ESP32 DevKit (import vlastních bloků ze souborů `.sbpack.json`). Zatím se testují na hardwaru. Po změně nastavení znovu otevři editor Blockly. Když je vypnuté, projekty, které už balíčky bloků obsahují, dál fungují.",
 	"singular-blockly.txt.host.description": "IP adresa řídicí jednotky fischertechnik TXT",
 	"singular-blockly.txt.username.description": "Uživatelské jméno SSH pro řídicí jednotku TXT",
 	"singular-blockly.txt.remotePath.description": "Cesta na řídicí jednotce TXT, kam se program nahraje",

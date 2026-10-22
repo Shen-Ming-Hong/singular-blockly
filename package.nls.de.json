@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "TXT-Ausführung stoppen",
 	"command.installTxtRuntime.title": "TXT-Laufzeit installieren",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Sicherheitswarnung für Nicht-Blockly-Projekte nicht anzeigen",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "Experimentell: Zeigt **Blockpakete** für ESP32 DevKit an (eigene Blöcke aus `.sbpack.json`-Dateien importieren). Wird noch auf Hardware getestet. Öffne den Blockly-Editor nach einer Änderung neu. Ist die Einstellung aus, funktionieren Projekte mit Blockpaketen trotzdem weiter.",
 	"singular-blockly.txt.host.description": "IP-Adresse des fischertechnik TXT Controllers",
 	"singular-blockly.txt.username.description": "SSH-Benutzername für den TXT Controller",
 	"singular-blockly.txt.remotePath.description": "Pfad auf dem TXT Controller, in den das Programm hochgeladen wird",

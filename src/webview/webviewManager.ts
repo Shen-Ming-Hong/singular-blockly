@@ -23,6 +23,7 @@ import {
 	type PenvProviderServiceDeps,
 } from '../services/penvProviderService';
 import { getWorkspaceCandidateService, WorkspaceCandidateService } from '../services/workspaceCandidateService';
+import { BLOCK_PACKS_SETTING_SECTION, isBlockPacksEnabled } from '../services/blockPackService';
 import {
 	ValidateWorkspaceCandidateMessage,
 	WorkspaceCandidateValidationResult,
@@ -889,6 +890,10 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32RcBlocksUri}', esp32RcBlocksUri.toString());
 			htmlContent = htmlContent.replace('{blockPacksUri}', blockPacksUri.toString());
+			htmlContent = htmlContent.replace(
+				'{blockPacksEnabled}',
+				isBlockPacksEnabled(vscode.workspace.getConfiguration(BLOCK_PACKS_SETTING_SECTION)) ? 'true' : 'false'
+			);
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{txtGeneratorUri}', txtGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());

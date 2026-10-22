@@ -11,6 +11,14 @@ import { blockPackLibDeps, BLOCK_PACK_MAX_BYTES, parseBlockPack } from './blockP
 import type { BlockPack, BlockPackError } from '../types/blockPack';
 
 /** WebView 告知目前專案已匯入的積木包 */
+/** 積木包尚未完成硬體測試前以實驗性設定開啟，預設關閉 */
+export const BLOCK_PACKS_SETTING_SECTION = 'singular-blockly';
+export const BLOCK_PACKS_SETTING_KEY = 'experimental.blockPacks';
+
+export function isBlockPacksEnabled(config: { get<T>(section: string, defaultValue: T): T }): boolean {
+	return config.get<boolean>(BLOCK_PACKS_SETTING_KEY, false) === true;
+}
+
 export interface InstalledBlockPackSummary {
 	id: string;
 	version: string;
