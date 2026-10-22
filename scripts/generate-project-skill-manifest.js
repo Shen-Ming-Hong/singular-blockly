@@ -19,6 +19,7 @@ const STATIC_MANAGED_FILES = [
 	[CONTRACT_INDEX_SOURCE, '.agents/skills/singular-blockly/references/block-contract.json', 'reference'],
 	['canonical/references/workspace-format.md', '.agents/skills/singular-blockly/references/workspace-format.md', 'reference'],
 	['canonical/references/workspace.schema.json', '.agents/skills/singular-blockly/references/workspace.schema.json', 'reference'],
+	['canonical/references/block-packs.md', '.agents/skills/singular-blockly/references/block-packs.md', 'reference'],
 	['compatibility/claude-SKILL.md', '.claude/skills/singular-blockly/SKILL.md', 'compatibility'],
 ];
 const SHARD_PATH_PATTERN = /^block-contract\/[a-z0-9][a-z0-9_-]*\.json$/;

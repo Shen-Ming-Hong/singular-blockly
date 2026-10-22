@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### ✨ 新功能 Features
+
+- ESP32 積木包：老師可以把感測器或模組包成 `.sbpack.json` 積木包，學生在 ESP32 專案中匯入後，工具箱就會多出這個分類，直接拖用就能產生 C++。積木包定義存在專案裡，複製專案不需要原始檔；缺少積木包時積木會變成佔位積木，重新匯入即可還原。需要 Arduino 函式庫的積木包只能在受信任的工作區匯入，並會先請你確認
+  ESP32 block packs: teachers can package a sensor or module as a `.sbpack.json` block pack; after students import it into an ESP32 project, a new toolbox category appears and its blocks generate C++ when dragged in. Pack definitions are stored in the project, so copies work without the original file; blocks from a missing pack become placeholders and are restored when the pack is imported again. Packs that need Arduino libraries can only be imported in a trusted workspace, after you confirm the libraries
+
 ## [0.91.1] - 2026-10-21
 
 ### 🔧 維護 Maintenance

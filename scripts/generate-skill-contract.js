@@ -404,7 +404,8 @@ function buildWorkspaceSchema(boardIds) {
 			board: { type: 'string', enum: boardIds },
 			workspace: {
 				type: 'object',
-				description: 'Blockly serialization state consumed by Blockly.serialization.workspaces.load.',
+				description:
+					'Blockly serialization state consumed by Blockly.serialization.workspaces.load. Optional customBlocks holds imported ESP32 block packs; see block-packs.md.',
 			},
 			txtVirtualControls: {
 				description: 'Optional TXT Controller virtual control configuration.',

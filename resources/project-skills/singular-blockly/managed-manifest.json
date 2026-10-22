@@ -7,7 +7,7 @@
     {
       "source": "canonical/SKILL.md",
       "target": ".agents/skills/singular-blockly/SKILL.md",
-      "sha256": "b7173d25bd41a0161e85aead0bc8f3186e7f18ea94ee4b9a57e8f3310dd9a7d0",
+      "sha256": "d3e352dd988bf4207cb774c4bcbd3f2acd4108e32218874febc4c3b7cf101987",
       "kind": "canonical"
     },
     {
@@ -19,13 +19,19 @@
     {
       "source": "canonical/references/workspace-format.md",
       "target": ".agents/skills/singular-blockly/references/workspace-format.md",
-      "sha256": "36fd0adb9c3b6d140dd7d1a2a837510e9fd99b89b0c1032eac7d56c98433837f",
+      "sha256": "23eb1b780c1737fda554daba24e98c191cceb57bda76c2bc34ac5e41265205f0",
       "kind": "reference"
     },
     {
       "source": "canonical/references/workspace.schema.json",
       "target": ".agents/skills/singular-blockly/references/workspace.schema.json",
-      "sha256": "87fb50349e587a3a216e63151b199a88bc14f41900a6430f4b35b60cd12c2f18",
+      "sha256": "bc2e7c1ed382813b28e148dc9a527681c326ea3c45c31a9cbd66ed695a62bbdf",
+      "kind": "reference"
+    },
+    {
+      "source": "canonical/references/block-packs.md",
+      "target": ".agents/skills/singular-blockly/references/block-packs.md",
+      "sha256": "38dbf62777e854ab95d6d808176346fcbaddedd86c125356acdc1441b0ef81d4",
       "kind": "reference"
     },
     {

@@ -8,6 +8,6 @@
 | WebView → Host | `confirmBlockPackChange` | `{ requestId, kind: "remove" \| "update", packName, affectedBlocks: number }` | 會產生佔位積木時請 Host 顯示 modal 確認 |
 | Host → WebView | `blockPackChangeConfirmed` | `{ requestId, confirmed: boolean }` | |
 
-外部候選驗證沿用 `validateWorkspaceCandidate`，新增欄位 `blockPackValidation: { ok: true } \| { ok: false, errors }`，由 Host 在送出前對 `document.workspace.customBlocks` 執行驗證器；`ok: false` 時 WebView 以 `INVALID_BLOCK_PACK` 拒絕候選。
+外部候選驗證沿用既有 `validateWorkspaceCandidate` 流程：Host 在送出候選前對 `document.workspace.customBlocks` 執行驗證器，失敗時直接以 `INVALID_BLOCK_PACK`（`field` 為錯誤路徑）拒絕，不送到 WebView。驗證通過的候選在 WebView 內暫時啟用其積木包，經 Blockly load/save/load 檢查後恢復原登錄表。
 
 快照實際寫入 `main.json` 仍經既有 `saveWorkspace`（Blockly serializer 輸出），不另設寫檔訊息。
