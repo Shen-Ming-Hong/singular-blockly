@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "TXT futtatás leállítása",
 	"command.installTxtRuntime.title": "TXT futtatókörnyezet telepítése",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Ne jelenjen meg a biztonsági figyelmeztetés nem Blockly projekteknél",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "Kísérleti funkció: megjeleníti a **blokkcsomagokat** ESP32 DevKithez (saját blokkok importálása `.sbpack.json` fájlokból). Még hardveres tesztelés alatt áll. A beállítás módosítása után nyisd meg újra a Blockly szerkesztőt. Kikapcsolt állapotban is működnek azok a projektek, amelyekben már vannak blokkcsomagok.",
 	"singular-blockly.txt.host.description": "A fischertechnik TXT vezérlő IP-címe",
 	"singular-blockly.txt.username.description": "SSH felhasználónév a TXT vezérlőhöz",
 	"singular-blockly.txt.remotePath.description": "A TXT vezérlőn lévő útvonal, ahová a program feltöltődik",

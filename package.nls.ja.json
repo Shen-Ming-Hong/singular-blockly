@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "TXT の実行を停止",
 	"command.installTxtRuntime.title": "TXT ランタイムをインストール",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Blockly 以外のプロジェクトで安全警告を表示しない",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "実験的機能：ESP32 DevKit で**ブロックパック**（`.sbpack.json` ファイルからカスタムブロックを読み込む機能）を表示します。現在ハードウェアで検証中です。変更後は Blockly エディターを開き直してください。オフでも、すでにブロックパックを含むプロジェクトはそのまま使えます。",
 	"singular-blockly.txt.host.description": "fischertechnik TXT コントローラーの IP アドレス",
 	"singular-blockly.txt.username.description": "TXT コントローラーの SSH ユーザー名",
 	"singular-blockly.txt.remotePath.description": "プログラムをアップロードする TXT コントローラー上のパス",

@@ -5942,7 +5942,7 @@ async function updateToolboxForBoard(workspace, boardId) {
 		processTranslations(toolboxConfig);
 
 		// 積木包分類（作者文字不經過 %{} 翻譯替換）插在「函式」分類前，只在 ESP32 DevKit 顯示
-		if (boardId === 'esp32' && window.blockPacks && Array.isArray(toolboxConfig.contents)) {
+		if (boardId === 'esp32' && blockPackManager.isEnabled() && window.blockPacks && Array.isArray(toolboxConfig.contents)) {
 			const packCategories = window.blockPacks.toolboxCategories(window.blockPacks.getPacks(workspace));
 			if (packCategories.length > 0) {
 				const functionIndex = toolboxConfig.contents.findIndex(item => item.kind === 'category' && item.custom === 'FUNCTION');
@@ -8066,10 +8066,16 @@ const blockPackManager = {
 		setText('blockPackCancelButton', 'BLOCK_PACK_CANCEL', 'Cancel');
 	},
 
+	/** 實驗性設定 singular-blockly.experimental.blockPacks 開啟時才顯示入口與工具箱分類 */
+	isEnabled() {
+		return document.getElementById('blockPackContainer')?.dataset.enabled === 'true';
+	},
+
 	updateVisibility(boardId) {
+		const visible = this.isEnabled() && boardId === window.blockPacks?.SUPPORTED_BOARD;
 		const container = document.getElementById('blockPackContainer');
-		if (container) container.style.display = boardId === window.blockPacks?.SUPPORTED_BOARD ? 'flex' : 'none';
-		if (boardId !== window.blockPacks?.SUPPORTED_BOARD) this.close();
+		if (container) container.style.display = visible ? 'flex' : 'none';
+		if (!visible) this.close();
 	},
 
 	open() {

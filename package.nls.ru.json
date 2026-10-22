@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "Остановить выполнение на TXT",
 	"command.installTxtRuntime.title": "Установить среду выполнения TXT",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Не показывать предупреждение безопасности для проектов не Blockly",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "Экспериментальная функция: показывает **пакеты блоков** для ESP32 DevKit (импорт своих блоков из файлов `.sbpack.json`). Пока проходит проверку на оборудовании. После изменения настройки открой редактор Blockly заново. Если настройка выключена, проекты, в которых уже есть пакеты блоков, продолжают работать.",
 	"singular-blockly.txt.host.description": "IP-адрес контроллера fischertechnik TXT",
 	"singular-blockly.txt.username.description": "Имя пользователя SSH для контроллера TXT",
 	"singular-blockly.txt.remotePath.description": "Путь на контроллере TXT, куда загружается программа",

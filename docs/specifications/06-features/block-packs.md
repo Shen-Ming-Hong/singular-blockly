@@ -6,7 +6,7 @@
 
 **目標**：讓老師把一個感測器或模組包成「積木包」(`.sbpack.json`)，學生匯入後就能在工具箱直接拖用，不必寫 C++。
 
-**狀態**：✅ 完成（第一版僅支援 ESP32 DevKit，`esp32`）
+**狀態**：🧪 實驗功能（第一版僅支援 ESP32 DevKit，`esp32`）。硬體測試完成前以設定 `singular-blockly.experimental.blockPacks` 開啟，預設關閉；關閉時隱藏工具列按鈕與工具箱分類，Extension Host 拒絕 `importBlockPack`，但專案中已有的積木包仍會載入與產生程式碼。
 
 已有的「函式」積木負責把內建積木組合成新積木，所以積木包只處理內建積木做不到的事：包裝 Arduino 函式庫與硬體呼叫。
 

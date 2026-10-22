@@ -301,3 +301,52 @@ suite('MessageHandler – generic requestUpload OTA fallback', () => {
 		assert.strictEqual(result.error.details, 'Please run manually: pip install mpremote');
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Suite: Block packs experimental setting
+// ---------------------------------------------------------------------------
+
+suite('MessageHandler – Block pack import setting', () => {
+	let sandbox: sinon.SinonSandbox;
+
+	setup(() => {
+		sandbox = sinon.createSandbox();
+	});
+
+	teardown(() => {
+		sandbox.restore();
+		_reset();
+	});
+
+	test('rejects importBlockPack without opening a file dialog while block packs are disabled', async () => {
+		const showOpenDialog = sandbox.stub().resolves(undefined);
+		const get = sandbox.stub().callsFake((_key: string, defaultValue: unknown) => defaultValue);
+		const vscodeMock = {
+			window: { showWarningMessage: sandbox.stub(), showOpenDialog },
+			workspace: { workspaceFolders: [], isTrusted: true, getConfiguration: sandbox.stub().returns({ get }) },
+		};
+		_setVSCodeApi(vscodeMock as any);
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
+
+		await handler.handleMessage({ command: 'importBlockPack', requestId: 'pack-1', installed: [] });
+
+		assert.ok(showOpenDialog.notCalled);
+		assert.ok(get.calledWith('experimental.blockPacks', false));
+		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackRejected', requestId: 'pack-1', cancelled: true }));
+	});
+
+	test('opens the file dialog when the experimental setting is on', async () => {
+		const showOpenDialog = sandbox.stub().resolves(undefined);
+		const vscodeMock = {
+			window: { showWarningMessage: sandbox.stub(), showOpenDialog },
+			workspace: { workspaceFolders: [], isTrusted: true, getConfiguration: sandbox.stub().returns({ get: () => true }) },
+		};
+		_setVSCodeApi(vscodeMock as any);
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
+
+		await handler.handleMessage({ command: 'importBlockPack', requestId: 'pack-2', installed: [] });
+
+		assert.ok(showOpenDialog.calledOnce);
+		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackRejected', requestId: 'pack-2', cancelled: true }));
+	});
+});

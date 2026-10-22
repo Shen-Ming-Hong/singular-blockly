@@ -8,6 +8,13 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🔧 維護 Maintenance
+
+- ESP32 積木包還在做硬體測試，先改成實驗功能、預設關閉：工具列不再顯示積木包按鈕，工具箱也不會出現積木包分類。要試用請在設定開啟 `singular-blockly.experimental.blockPacks`，再重新開啟 Blockly 編輯器。已經匯入積木包的專案在關閉時仍可正常載入與產生程式碼
+  ESP32 block packs are still being tested on hardware, so they are now an experimental feature that is off by default: the toolbar no longer shows the block pack button and the toolbox shows no block pack categories. To try them, turn on `singular-blockly.experimental.blockPacks` in Settings and reopen the Blockly editor. Projects that already contain block packs still load and generate code while the setting is off
+
 ## [0.92.0] - 2026-10-22
 
 ### ✨ 新功能 Features

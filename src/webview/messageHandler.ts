@@ -13,7 +13,13 @@ import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
 import { MicropythonUploader, UploadProgress, UploadResult, UploadStage, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
-import { BlockPackService, parseInstalledSummaries, readBlockPackFile } from '../services/blockPackService';
+import {
+	BLOCK_PACKS_SETTING_SECTION,
+	BlockPackService,
+	isBlockPacksEnabled,
+	parseInstalledSummaries,
+	readBlockPackFile,
+} from '../services/blockPackService';
 import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStartResult } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
@@ -689,6 +695,11 @@ export class WebViewMessageHandler {
 		const installed = isPlainRecord(message) ? parseInstalledSummaries(message.installed) : null;
 		if (typeof requestId !== 'string' || !BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(requestId) || !installed) {
 			log('Rejected malformed importBlockPack message', 'warn');
+			return;
+		}
+		if (!isBlockPacksEnabled(vscodeApi.workspace.getConfiguration(BLOCK_PACKS_SETTING_SECTION))) {
+			log('Rejected importBlockPack because block packs are disabled', 'warn');
+			await this.panel.webview.postMessage({ command: 'blockPackRejected', requestId, cancelled: true });
 			return;
 		}
 		const service = new BlockPackService({

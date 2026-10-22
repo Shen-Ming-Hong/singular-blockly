@@ -41,4 +41,6 @@ Pack files use the `.sbpack.json` extension. The rules below match the extension
 - Templates may reference only their own block's inputs as `{{NAME}}`. Value inputs are wrapped in parentheses, text inputs become escaped C++ string literals, and statement inputs become the inner code. `includes`, `globals`, `setup`, and `libDeps` are emitted once per program.
 - Templates are plain text substitution. Nothing in a pack runs inside the editor.
 
+Importing, updating, or removing packs in the editor requires the experimental `singular-blockly.experimental.blockPacks` setting, which is off by default; packs already in `blockly/main.json` still load and generate code without it.
+
 Importing a pack with `libDeps` requires a trusted VS Code workspace and the user's confirmation, because PlatformIO downloads those libraries when building.

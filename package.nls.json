@@ -8,6 +8,7 @@
 	"command.stopTxtExecution.title": "Stop TXT Execution",
 	"command.installTxtRuntime.title": "Install TXT Runtime",
 	"singularBlockly.safetyGuard.suppressWarning.description": "Do not show the safety warning for non-Blockly projects",
+	"singular-blockly.experimental.blockPacks.markdownDescription": "Experimental: show **block packs** for ESP32 DevKit (import custom blocks from `.sbpack.json` files). Still being tested on hardware. Reopen the Blockly editor after changing this setting. Projects that already contain block packs keep working when this is off.",
 	"singular-blockly.txt.host.description": "fischertechnik TXT Controller IP address",
 	"singular-blockly.txt.username.description": "SSH username for TXT Controller",
 	"singular-blockly.txt.remotePath.description": "Remote path on TXT Controller where the program is uploaded",
