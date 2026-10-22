@@ -20,6 +20,12 @@
 - **規則：** 保留專案辨識與 editor-open 的 `opened` 邊界；一般資料夾在取消或沒有 workspace 時，不應由 Skill 安裝或設定讀取建立專案檔案。
 - **證據：** `docs/specifications/06-features/agent-skills.md`、`src/services/projectSkillService.ts`、`src/test/services/projectSkillService.test.ts`。
 
+## [發布] 測試通過不等於 Ray 認可外觀與硬體
+
+- **問題：** ESP32 積木包（PR #232）通過 CI、雲端本地驗證與截圖後自主合併，協調者再依「使用者可見功能累積後發 minor」發布 0.92.0；但 Ray 尚未確認新介面的外觀，也未在實體 ESP32 上測試，只好以 0.92.1 改成預設關閉的實驗性設定。
+- **規則：** 依 `pr-review-release` 的「發布門檻」，新介面先取得 Ray 的外觀確認、硬體行為先取得 Ray 的實體測試結果；未取得前只以預設關閉的設定合併。發布 PR 逐項列出門檻狀態，不能只看「進 VSIX、使用者感受得到」。
+- **證據：** PR #232、0.92.0 發布 PR #233，以及 Ray 2026-10-22 指出「我們沒有討論外觀佈局」與「牽涉到硬體測試，暫時沒測完不能發佈」。
+
 ## [PR / CodeQL] Ready PR 必須確認目前 head 已產生 CodeQL 結果
 
 - **問題：** PR #183 先以 draft 建立，之後轉為 ready；原本的 CI Gate 已成功，但 branch rules 仍因目前 head 沒有 CodeQL 結果而拒絕 squash merge。單純 `ready_for_review` 沒有讓該 head 產生 required CodeQL result。
