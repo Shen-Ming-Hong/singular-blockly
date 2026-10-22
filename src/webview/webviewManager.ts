@@ -720,6 +720,7 @@ export class WebViewManager {
 			);
 			const esp32WifiMqttBlocksUri = webview.asWebviewUri(esp32WifiMqttBlocksPath);
 			const esp32RcBlocksUri = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/esp32-rc.js')));
+			const blockPacksUri = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blockPacks.js')));
 
 			// MicroPython 生成器
 			const micropythonGeneratorPath = vscode.Uri.file(
@@ -887,6 +888,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32RcBlocksUri}', esp32RcBlocksUri.toString());
+			htmlContent = htmlContent.replace('{blockPacksUri}', blockPacksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{txtGeneratorUri}', txtGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
@@ -1600,6 +1602,7 @@ export class WebViewManager {
 			);
 			const esp32WifiMqttBlocksUri = tempWebview.asWebviewUri(esp32WifiMqttBlocksPath);
 			const esp32RcBlocksUri = tempWebview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/esp32-rc.js')));
+			const blockPacksUri = tempWebview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blockPacks.js')));
 
 			// MicroPython 生成器
 			const micropythonGeneratorPath = vscode.Uri.file(
@@ -1737,6 +1740,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{huskyLensBlocksUri}', huskyLensBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32RcBlocksUri}', esp32RcBlocksUri.toString());
+			htmlContent = htmlContent.replace('{blockPacksUri}', blockPacksUri.toString());
 			htmlContent = htmlContent.replace('{micropythonGeneratorUri}', micropythonGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{txtGeneratorUri}', txtGeneratorUri.toString());
 			htmlContent = htmlContent.replace('{cyberbrickBlocksUri}', cyberbrickBlocksUri.toString());
