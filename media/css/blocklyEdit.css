@@ -3871,6 +3871,8 @@ body.theme-dark .toast.info {
 
 .block-pack-errors code {
 	font-family: var(--vscode-editor-font-family, monospace);
+	color: inherit;
+	background: none;
 }
 
 .block-pack-preview-blocks {

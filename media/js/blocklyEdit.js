@@ -7970,6 +7970,13 @@ function updateBlockPackWarnings(blocks, boardId) {
 		if (new Set(users.map(user => user.role)).size < 2) continue;
 		for (const { block } of users) conflicts.set(block, pin);
 	}
+	const placeholderWarning = formatBlockPackMessage(
+		'BLOCK_PACK_PLACEHOLDER_WARNING',
+		'Import the block pack again to restore this block. It does not generate code.'
+	);
+	for (const block of blocks) {
+		if (window.blockPacks.isPlaceholderType(block.type)) block.setWarningText(placeholderWarning, 'block-pack-placeholder');
+	}
 	for (const block of packBlocks) {
 		block.setWarningText(boardId === window.blockPacks.SUPPORTED_BOARD ? null : boardWarning, 'block-pack-board');
 		block.setWarningText(
@@ -8291,7 +8298,8 @@ const blockPackManager = {
 			const packs = message.change === 'new' ? [...others, installed] : window.blockPacks.getPacks(this.workspace()).map(existing => (existing.id === pack.id ? installed : existing));
 			this.pendingChange = null;
 			this.disposePreview(false);
-			this.applyPacks(packs, message.change !== 'new');
+			// 更新、或專案中已有此積木包的佔位積木時，重新載入讓積木重建或還原
+			this.applyPacks(packs, message.change !== 'new' || window.blockPacks.countPackBlocks(this.workspace(), pack.id) > 0);
 			toast.show(formatBlockPackMessage('BLOCK_PACK_IMPORTED', 'Block pack "{0}" is ready in the toolbox.', window.blockPacks.localize(pack.category?.name, pack) || pack.id));
 			this.showListView();
 			this.renderList();

@@ -178,7 +178,8 @@
 	}
 
 	function updateOrphanWarning(event) {
-		if (!this.workspace || this.workspace.isFlyout) return;
+		// 工具箱與積木包預覽（唯讀）不顯示孤立警告
+		if (!this.workspace || this.workspace.isFlyout || (this.workspace.options && this.workspace.options.readOnly)) return;
 		if (
 			event &&
 			event.type !== Blockly.Events.BLOCK_MOVE &&
@@ -491,7 +492,9 @@
 				delete original.next;
 				delete original.x;
 				delete original.y;
-				const isValue = connection === 'value';
+				// 頂層積木無法從位置判斷形狀；移除或更新積木包時舊定義仍在註冊表中，可作為依據
+				const knownShape = registeredTypes.has(current.type) ? registeredTypes.get(current.type).block.shape : null;
+				const isValue = connection === 'value' || (connection === 'top' && knownShape === 'value');
 				current = {
 					type: isValue ? PLACEHOLDER_VALUE : PLACEHOLDER_STATEMENT,
 					...(current.id !== undefined ? { id: current.id } : {}),
