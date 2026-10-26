@@ -8,6 +8,19 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.92.2] - 2026-10-26
+
+### 🔒 安全性 Security
+
+- 更新內建的網路相依套件 undici 與 ip-address，修補已公開的安全漏洞
+  Updated the bundled networking dependencies undici and ip-address to fix publicly disclosed vulnerabilities
+- 備份的建立、刪除、還原與預覽會再次檢查備份名稱，只允許存取專案 `blockly/backup` 資料夾內的檔案
+  Creating, deleting, restoring, and previewing backups now re-checks the backup name so only files inside the project's `blockly/backup` folder can be accessed
+- PlatformIO 診斷面板加上內容安全政策（CSP），只執行擴充功能自己的腳本
+  The PlatformIO diagnostic panel now has a Content Security Policy that only runs the extension's own script
+- 回饋面板只會開啟隱私權、支援與服務條款這三個政策頁面
+  The feedback panel only opens the privacy, support, and terms policy pages
+
 ## [0.92.1] - 2026-10-22
 
 ### 🔧 維護 Maintenance
