@@ -12,6 +12,15 @@ const CONFIG_SECTION = 'singular-blockly';
 const SECRET_KEY = 'singular-blockly.txt.password';
 /** ftCommunity 韌體預設 SSH 密碼，讓小朋友插上 USB 不需設定即可連線 */
 const DEFAULT_TXT_PASSWORD = 'ftc';
+const DEFAULT_RUNTIME_PORT = 8080;
+
+/**
+ * TXT runtime port 會被組進遠端 shell 指令與 HTTP URL；只接受整數埠號。
+ * 上限保留 1，讓虛擬控制 runtime 使用的 port + 1 仍是合法埠號。
+ */
+export function isValidTxtRuntimePort(value: unknown): value is number {
+	return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 65534;
+}
 
 function quoteShellArg(value: string): string {
 	return `'${value.replace(/'/g, `'\\''`)}'`;
@@ -73,6 +82,9 @@ export class TxtConnectionService {
 			updates.push(cfg.update('txt.remotePath', config.remotePath, vscode.ConfigurationTarget.Workspace));
 		}
 		if (config.runtimePort !== undefined) {
+			if (!isValidTxtRuntimePort(config.runtimePort)) {
+				throw new Error('Invalid TXT runtime port');
+			}
 			updates.push(cfg.update('txt.runtimePort', config.runtimePort, vscode.ConfigurationTarget.Workspace));
 		}
 		await Promise.all(updates);
@@ -88,7 +100,7 @@ export class TxtConnectionService {
 			host: cfg.get<string>('txt.host', '192.168.7.2'),
 			username: cfg.get<string>('txt.username', 'ftc'),
 			remotePath: cfg.get<string>('txt.remotePath', '/tmp/singular_blockly/main.py'),
-			runtimePort: cfg.get<number>('txt.runtimePort', 8080),
+			runtimePort: this.normalizeRuntimePort(cfg.get<unknown>('txt.runtimePort', DEFAULT_RUNTIME_PORT)),
 		};
 	}
 
@@ -129,8 +141,16 @@ export class TxtConnectionService {
 			host: overrides?.host?.trim() || baseConfig.host,
 			username: overrides?.username?.trim() || baseConfig.username,
 			remotePath: overrides?.remotePath?.trim() || baseConfig.remotePath,
-			runtimePort: overrides?.runtimePort ?? baseConfig.runtimePort,
+			runtimePort: isValidTxtRuntimePort(overrides?.runtimePort) ? overrides.runtimePort : baseConfig.runtimePort,
 		};
+	}
+
+	private normalizeRuntimePort(value: unknown): number {
+		if (isValidTxtRuntimePort(value)) {
+			return value;
+		}
+		log('Ignoring invalid TXT runtime port setting; using default', 'warn');
+		return DEFAULT_RUNTIME_PORT;
 	}
 
 	private async resolvePassword(options?: TxtConnectionTestOptions): Promise<string> {

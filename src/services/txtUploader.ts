@@ -167,14 +167,15 @@ export class TxtUploader {
 			// 建立遠端目錄
 			await ssh.execCommand(`mkdir -p ${quoteShellArg(remoteDir)}`);
 
-			// 寫入臨時本地檔案然後 SCP 到遠端
-			const tmpLocalPath = path.join(os.tmpdir(), `singular_blockly_${Date.now()}.py`);
+			// 寫入只有目前使用者可存取的暫存目錄，再 SCP 到遠端；共用 /tmp 的可猜檔名可能被他人搶先建立
 			const fs = await import('fs/promises');
-			await fs.writeFile(tmpLocalPath, code, 'utf-8');
+			const tmpLocalDir = await fs.mkdtemp(path.join(os.tmpdir(), 'singular-blockly-'));
+			const tmpLocalPath = path.join(tmpLocalDir, 'main.py');
 			try {
+				await fs.writeFile(tmpLocalPath, code, { encoding: 'utf-8', flag: 'wx', mode: 0o600 });
 				await ssh.putFile(tmpLocalPath, config.remotePath);
 			} finally {
-				await fs.unlink(tmpLocalPath).catch(() => {});
+				await fs.rm(tmpLocalDir, { recursive: true, force: true }).catch(() => {});
 			}
 
 			report('uploading', 60, 'Program uploaded successfully.');

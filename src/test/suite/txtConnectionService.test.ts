@@ -64,9 +64,27 @@ suite('TxtConnectionService Test Suite', () => {
 			assert.strictEqual(config.remotePath, '/tmp/singular_blockly/main.py');
 			assert.strictEqual(config.runtimePort, 8080);
 		});
+
+		test('should fall back to the default runtime port when the setting is not a valid port', () => {
+			const service = new TxtConnectionService(mockContext);
+			for (const invalid of ['8080; reboot', 8080.5, 0, 65535, -1, null]) {
+				configValues['txt.runtimePort'] = invalid;
+				assert.strictEqual(service.loadConfig().runtimePort, 8080, `invalid port ${String(invalid)} should not be used`);
+			}
+		});
 	});
 
 	suite('saveConfig()', () => {
+		test('should reject a runtime port that is not an integer port number', async () => {
+			const service = new TxtConnectionService(mockContext);
+
+			await assert.rejects(
+				() => service.saveConfig({ runtimePort: '8080; reboot' as unknown as number }),
+				/Invalid TXT runtime port/
+			);
+			assert.strictEqual(mockConfigUpdate.callCount, 0);
+		});
+
 		test('should save connection settings to workspace scope', async () => {
 			const service = new TxtConnectionService(mockContext);
 

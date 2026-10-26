@@ -1,5 +1,7 @@
 import assert = require('assert');
 import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import { suite, test } from 'mocha';
 import {
 	buildCyberBrickOtaAgentSource,
@@ -165,6 +167,36 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.deepStrictEqual(execFileCalls.map(call => call.file), ['/mock/python']);
 		assert.ok(helperScript.includes('from serial.tools import list_ports'));
 		assert.ok(helperScript.includes("getattr(info, 'serial_number', None)"));
+	});
+
+	test('writes helper scripts into a private per-call temp directory and removes it afterwards', async () => {
+		const seenPaths: string[] = [];
+		const uploader = createUploader({
+			exec: async () => ({ stdout: '', stderr: '' }),
+			execFile: async (_file, args) => {
+				const scriptPath = args[0];
+				seenPaths.push(scriptPath);
+				const dir = path.dirname(scriptPath);
+				assert.notStrictEqual(dir, os.tmpdir(), 'helper scripts must not be written directly into the shared temp directory');
+				assert.ok(path.basename(dir).startsWith('singular-blockly-'));
+				if (process.platform !== 'win32') {
+					assert.strictEqual(fs.statSync(dir).mode & 0o077, 0, 'temp directory must be private to the current user');
+					assert.strictEqual(fs.statSync(scriptPath).mode & 0o077, 0, 'temp file must be private to the current user');
+				}
+				return { stdout: 'OK\n', stderr: '' };
+			},
+		});
+		const interruptApi = uploader as unknown as { interruptDevice(port: string): Promise<void>; delay(ms: number): Promise<void> };
+		interruptApi.delay = async () => undefined;
+
+		await interruptApi.interruptDevice('/dev/ttyACM0');
+		await interruptApi.interruptDevice('/dev/ttyACM0');
+
+		assert.strictEqual(seenPaths.length, 2);
+		assert.notStrictEqual(path.dirname(seenPaths[0]), path.dirname(seenPaths[1]), 'each call should get its own directory');
+		for (const scriptPath of seenPaths) {
+			assert.strictEqual(fs.existsSync(path.dirname(scriptPath)), false, 'temp directory should be removed after use');
+		}
 	});
 
 	test('runs Windows pyserial interrupt helper through execFile argv', async () => {
