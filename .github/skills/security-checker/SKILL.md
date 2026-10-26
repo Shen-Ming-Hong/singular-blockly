@@ -41,6 +41,8 @@ license: Apache-2.0
 - **命令執行**：追蹤值是否進入命令字串。刪除少數特殊字元不能防止注入；驗證工具名稱、選項與業務允許值。
 - **訊息邊界**：WebView 的 `event.source === window` 不能取代內容驗證；Extension Host 不信任 WebView 送來的路徑、board ID 或檔名。
 - **檔案路徑**：檔案 I/O 經 `FileService`；先確認 `vscode.workspace.workspaceFolders`；拒絕越界、符號連結逃逸與非預期副檔名。`startsWith(basePath)` 會錯收同字首的相鄰目錄。
+- **暫存檔**：要執行或上傳的腳本不可用固定或可猜的檔名直接寫進 `os.tmpdir()`（Linux 的 `/tmp` 由所有使用者共用，可被預先建立或換成符號連結）；用 `mkdtemp` 建立每次呼叫專屬的目錄，以 `wx` 與 `0o600` 寫入，用完整個刪除。
+- **設定值進入命令**：從 VS Code 設定或 WebView 讀到的埠號、路徑等，組進遠端或本機命令前先驗證型別與範圍，不能只依 `package.json` 的設定 schema。
 - **反序列化**：`JSON.parse` 前後檢查大小與結構，再交給 workspace、board 或 command 流程。
 - **憑證與隱私**：不硬編碼金鑰；`log(message, level)` 只記非敏感診斷；錯誤訊息、PR 差異、截圖與回饋診斷不含密碼、token、絕對路徑或使用者檔案內容。
 - **動態執行**：區分 Blockly 產生的程式文字與實際執行；不可信資料不到達 `eval`、`new Function`、字串式 timer 或動態 `require`／`import`。

@@ -8,6 +8,15 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🔒 安全性 Security
+
+- CyberBrick 上傳、序列埠偵測、OTA 設定與 TXT 上傳時產生的暫存腳本，改放在每次專屬、只有目前使用者能存取的暫存資料夾，用完即刪除，避免共用電腦上的其他使用者搶先建立同名檔案
+  Temporary scripts created during CyberBrick uploads, serial port detection, OTA setup, and TXT uploads now go into a private per-run temporary folder that only the current user can access and that is deleted afterwards, so other users on a shared computer cannot pre-create files with the same name
+- TXT 執行環境埠號只接受 1–65534 的整數；設定值無效時改用預設的 8080，不再把它組進 TXT 上執行的指令
+  The TXT runtime port only accepts whole numbers from 1 to 65534; an invalid setting falls back to the default 8080 instead of being placed into commands run on the TXT
+
 ## [0.92.2] - 2026-10-26
 
 ### 🔒 安全性 Security

@@ -463,9 +463,6 @@ export class MicropythonUploader {
 	 * 供 USB monitor 偵測使用，避免把 Wi‑Fi fallback 綁死在 mpremote 狀態上。
 	 */
 	async listSerialPorts(filter?: 'all' | 'cyberbrick'): Promise<{ ports: ComPortInfo[]; autoDetected?: string }> {
-		const fs = require('fs');
-		const tempDir = os.tmpdir();
-		const scriptFile = path.join(tempDir, `cyberbrick_serial_ports_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
 		const pythonPath = this.getPythonPath();
 		const script = [
 			'import json',
@@ -482,7 +479,7 @@ export class MicropythonUploader {
 			"    print(json.dumps({'ports': ports}))",
 			'',
 		].join('\n');
-		fs.writeFileSync(scriptFile, script, 'utf8');
+		const { filePath: scriptFile, cleanup } = this.writePrivateTempFile('cyberbrick_serial_ports.py', script);
 
 		try {
 			const result = await this.execExecutable(pythonPath, [scriptFile], 10000);
@@ -510,11 +507,7 @@ export class MicropythonUploader {
 			log('[blockly] 本機序列埠偵測失敗', 'error', { code: this.getCommandErrorCode(error) });
 			return { ports: [] };
 		} finally {
-			try {
-				fs.unlinkSync(scriptFile);
-			} catch {
-				// 忽略清理錯誤
-			}
+			cleanup();
 		}
 	}
 
@@ -524,10 +517,7 @@ export class MicropythonUploader {
 	 */
 	async runCyberBrickPython(port: string, script: string, timeoutMs = 15000): Promise<{ stdout: string; stderr: string }> {
 		await this.ensureMpremoteReady();
-		const fs = require('fs');
-		const tempDir = os.tmpdir();
-		const scriptFile = path.join(tempDir, `cyberbrick_exec_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
-		fs.writeFileSync(scriptFile, script, 'utf8');
+		const { filePath: scriptFile, cleanup } = this.writePrivateTempFile('cyberbrick_exec_helper.py', script);
 
 		try {
 			// CyberBrick 上通常會自動執行 /app/rc_main.py；直接 `mpremote run` 會先 soft-reset，
@@ -578,11 +568,7 @@ export class MicropythonUploader {
 			
 			throw new Error(`CyberBrick helper failed: ${this.formatCommandError(lastError)}`);
 		} finally {
-			try {
-				fs.unlinkSync(scriptFile);
-			} catch {
-				// 忽略清理錯誤
-			}
+			cleanup();
 		}
 	}
 
@@ -646,10 +632,7 @@ print('OK')
 
 	async deployCyberBrickOtaAgent(port: string, agentSource: string): Promise<void> {
 		await this.ensureMpremoteReady();
-		const fs = require('fs');
-		const tempDir = os.tmpdir();
-		const sourceFile = path.join(tempDir, `cyberbrick_ota_agent_${Date.now()}_${Math.random().toString(16).slice(2)}.py`);
-		fs.writeFileSync(sourceFile, agentSource, 'utf8');
+		const { filePath: sourceFile, cleanup } = this.writePrivateTempFile('cyberbrick_ota_agent.py', agentSource);
 
 		const normalizedPort = this.normalizeCOMPort(port);
 		try {
@@ -662,11 +645,7 @@ print('OK')
 		} catch (error) {
 			throw new Error(`CyberBrick OTA agent deploy failed: ${this.formatCommandError(error)}`);
 		} finally {
-			try {
-				fs.unlinkSync(sourceFile);
-			} catch {
-				// 忽略清理錯誤
-			}
+			cleanup();
 		}
 	}
 
@@ -988,6 +967,30 @@ print(json.dumps(result))
 	}
 
 	/**
+	 * 在每次呼叫專屬的暫存目錄寫入檔案（mkdtemp 只有目前使用者可存取）。
+	 * 共用 /tmp 中固定或可猜到的檔名，可能被同一台電腦的其他使用者先建立或換成符號連結。
+	 */
+	private writePrivateTempFile(fileName: string, content: string): { filePath: string; cleanup: () => void } {
+		const fs = require('fs');
+		const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'singular-blockly-'));
+		const cleanup = () => {
+			try {
+				fs.rmSync(dir, { recursive: true, force: true });
+			} catch {
+				// 忽略清理錯誤
+			}
+		};
+		const filePath = path.join(dir, fileName);
+		try {
+			fs.writeFileSync(filePath, content, { encoding: 'utf8', flag: 'wx', mode: 0o600 });
+		} catch (error) {
+			cleanup();
+			throw error;
+		}
+		return { filePath, cleanup };
+	}
+
+	/**
 	 * 跨平台 shell 參數引號處理
 	 * Python helpers, non-Windows mpremote, and Windows fs cp uploads use execFile argv when available;
 	 * Windows resume + run helpers still use shell commands for compatibility.
@@ -1290,10 +1293,7 @@ print(json.dumps(result))
 		// 3. 等待裝置穩定
 		// 這個方法比 mpremote 的 soft-reset 更可靠，因為 soft-reset 會觸發程式重新執行
 
-		const fs = require('fs');
 		const pythonPath = this.getPythonPath();
-		const tempDir = os.tmpdir();
-		const scriptFile = path.join(tempDir, 'blockly_interrupt.py');
 
 		// 寫入 Python 腳本到臨時檔案（避免命令行轉義問題）
 		const normalizedPort = this.normalizeCOMPort(port);
@@ -1315,7 +1315,7 @@ print(json.dumps(result))
 			'    exit(1)',
 			'',
 		].join('\n');
-		fs.writeFileSync(scriptFile, serialScript, 'utf8');
+		const { filePath: scriptFile, cleanup } = this.writePrivateTempFile('blockly_interrupt.py', serialScript);
 
 		try {
 			log('[blockly] 使用 pyserial 發送中斷信號', 'debug', { port, scriptFile });
@@ -1342,11 +1342,7 @@ print(json.dumps(result))
 			}
 		} finally {
 			// 清理臨時檔案
-			try {
-				fs.unlinkSync(scriptFile);
-			} catch {
-				// 忽略清理錯誤
-			}
+			cleanup();
 		}
 	}
 
@@ -1457,9 +1453,6 @@ print(json.dumps(result))
 	 * @param port 連接埠
 	 */
 	private async uploadCode(code: string, port: string): Promise<void> {
-		const fs = require('fs');
-		const tempDir = os.tmpdir();
-		const tempFile = path.join(tempDir, 'blockly_upload.py');
 
 		// 檢查裝置是否已設定 OTA（檢查 /cyberbrick_ota_config.py 是否存在）
 		// 失敗時採保守策略：注入 bootstrap。
@@ -1478,7 +1471,7 @@ print(json.dumps(result))
 
 		// 如果已設定 OTA，則在程式碼中注入 OTA bootstrap；否則使用純淨程式碼
 		const finalCode = hasOtaConfig ? withCyberBrickRcMainOtaBootstrap(code) : code;
-		fs.writeFileSync(tempFile, finalCode, 'utf8');
+		const { filePath: tempFile, cleanup } = this.writePrivateTempFile('blockly_upload.py', finalCode);
 		log('[blockly] 暫存檔已建立', 'debug', { path: tempFile, hasOtaBootstrap: hasOtaConfig });
 
 		try {
@@ -1521,11 +1514,7 @@ print(json.dumps(result))
 			throw lastError;
 		} finally {
 			// 清理暫存檔
-			try {
-				fs.unlinkSync(tempFile);
-			} catch {
-				// 忽略清理錯誤
-			}
+			cleanup();
 		}
 	}
 
