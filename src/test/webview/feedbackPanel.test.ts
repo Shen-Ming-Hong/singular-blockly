@@ -106,6 +106,21 @@ suite('FeedbackPanel Tests', () => {
 		assert.strictEqual(client.createFeedback.callCount, 0);
 	});
 
+	test('opens only the known policy pages from the feedback panel', async () => {
+		(identity as any).serviceOrigin = 'https://support.example.test';
+		vscodeMock.env.openExternal = sinon.stub().resolves(true);
+		vscodeMock.Uri.parse = sinon.stub().callsFake((value: string) => ({ toString: () => value }));
+		const manager = createPanel();
+		await manager.show();
+		const panel = manager.getPanel() as any;
+
+		await panel.webview.dispatchMessage({ command: 'feedback:openPolicy', policy: '@attacker.example/phish' });
+		await panel.webview.dispatchMessage({ command: 'feedback:openPolicy', policy: 'privacy' });
+
+		assert.strictEqual(vscodeMock.env.openExternal.callCount, 1);
+		assert.strictEqual(vscodeMock.Uri.parse.firstCall.args[0], 'https://support.example.test/privacy?lang=en');
+	});
+
 	test('rejects sensitive reporter text locally before creating a credential or invoking the client', async () => {
 		const manager = createPanel();
 		await manager.show();

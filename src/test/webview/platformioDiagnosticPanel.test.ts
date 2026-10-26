@@ -331,6 +331,24 @@ suite('PlatformioDiagnosticPanel Tests', () => {
 		assert.strictEqual(serviceStub.collectDiagnostics.callCount, 1, 'Revealing the panel should not rerun diagnostics');
 	});
 
+	test('serves the diagnostic panel with a nonce-only script CSP', async () => {
+		const realTemplatePanel = new PlatformioDiagnosticPanel(
+			{ extensionPath: path.resolve(__dirname, '../../..'), subscriptions: [] } as any,
+			createLocaleServiceStub() as any,
+			serviceStub,
+			fs as any
+		);
+		await realTemplatePanel.show();
+		const html: string = (realTemplatePanel.getPanel() as any).webview.html;
+		const nonce = /script-src 'nonce-([A-Za-z0-9_-]+)'/.exec(html)?.[1];
+
+		assert.ok(html.includes(`content="default-src 'none';`), 'CSP meta should deny by default');
+		assert.ok(nonce, 'CSP should allow scripts only by nonce');
+		assert.ok(html.includes(`<script nonce="${nonce}" src=`), 'The panel script should carry the CSP nonce');
+		assert.ok(!html.includes('{csp}') && !html.includes('{nonce}'), 'Template placeholders should be replaced');
+		realTemplatePanel.dispose();
+	});
+
 	test('removes every managed runtime action when the service is unavailable', async () => {
 		const withoutManagedRuntime = new PlatformioDiagnosticPanel(
 			{ extensionPath: '/mock/extension', subscriptions: [] } as any,

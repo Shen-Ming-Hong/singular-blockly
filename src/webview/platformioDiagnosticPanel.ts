@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { randomBytes } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -778,7 +779,13 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			'PlatformIO Diagnostic'
 		);
 
+		const nonce = randomBytes(24).toString('base64url');
+		const webview = this.panel!.webview;
+		const csp = `default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} data:;`;
+
 		return htmlContent
+			.replace(/\{csp\}/g, csp)
+			.replace(/\{nonce\}/g, nonce)
 			.replace(/\{cssUri\}/g, cssUri.toString())
 			.replace(/\{jsUri\}/g, jsUri.toString())
 			.replace(/\{panelTitle\}/g, panelTitle);

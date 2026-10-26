@@ -73,6 +73,20 @@ import type { CoreEnvironmentManager } from '../services/coreEnvironmentManager'
 const UI_MESSAGE_DELAY_MS = 100;
 const UI_REVEAL_DELAY_MS = 200;
 const BOARD_CONFIG_REQUEST_TIMEOUT_MS = 10000;
+const MAX_BACKUP_NAME_LENGTH = 200;
+// 與 WebView 的 isValidFilename 一致，另外排除控制字元，讓備份名稱只能指向 blockly/backup 內的檔案
+const UNSAFE_BACKUP_NAME_CHARS = /[\\/:*?"<>|\u0000-\u001f\u007f]/;
+
+function isSafeBackupName(name: unknown): name is string {
+	return (
+		typeof name === 'string' &&
+		name.trim().length > 0 &&
+		name.length <= MAX_BACKUP_NAME_LENGTH &&
+		name !== '.' &&
+		name !== '..' &&
+		!UNSAFE_BACKUP_NAME_CHARS.test(name)
+	);
+}
 const CYBERBRICK_COUNTED_PROVISIONING_STEPS = new Set<CyberBrickCountedProvisioningStep>([
 	'detect-usb',
 	'read-device-id',
@@ -1833,6 +1847,27 @@ export class WebViewMessageHandler {
 	}
 
 	/**
+	 * WebView 傳來的備份名稱要在 Extension Host 重新驗證，避免路徑穿越到 blockly/backup 以外
+	 * @returns 名稱不安全且已回報錯誤時為 true
+	 */
+	private async rejectUnsafeBackupName(name: unknown, responseCommand?: string): Promise<boolean> {
+		if (isSafeBackupName(name)) {
+			return false;
+		}
+		log('Rejected unsafe backup name from WebView', 'warn');
+		const errorMsg = await this.localeService.getLocalizedMessage(
+			'BACKUP_ERROR_NAME_INVALID',
+			'The backup name contains invalid characters. Avoid \\ / : * ? " < > |'
+		);
+		if (responseCommand) {
+			this.panel.webview.postMessage({ command: responseCommand, success: false, error: errorMsg });
+		} else {
+			this.showErrorMessage(errorMsg);
+		}
+		return true;
+	}
+
+	/**
 	 * 建立備份檔案
 	 * @param message 建立備份訊息物件
 	 */
@@ -1849,6 +1884,10 @@ export class WebViewMessageHandler {
 				success: false,
 				error: errorMsg,
 			});
+			return;
+		}
+
+		if (await this.rejectUnsafeBackupName(backupName, 'backupCreated')) {
 			return;
 		}
 
@@ -1994,6 +2033,10 @@ export class WebViewMessageHandler {
 			return;
 		}
 
+		if (await this.rejectUnsafeBackupName(backupName, 'backupDeleted')) {
+			return;
+		}
+
 		const backupPath = path.join('blockly', 'backup', `${backupName}.json`);
 		if (!this.fileService.fileExists(backupPath)) {
 			const errorMsg = await this.localeService.getLocalizedMessage(
@@ -2065,6 +2108,10 @@ export class WebViewMessageHandler {
 				success: false,
 				error: errorMsg,
 			});
+			return;
+		}
+
+		if (await this.rejectUnsafeBackupName(backupName, 'backupRestored')) {
 			return;
 		}
 
@@ -2159,6 +2206,10 @@ export class WebViewMessageHandler {
 		if (!backupName) {
 			const errorMsg = await this.localeService.getLocalizedMessage('BACKUP_ERROR_NAME_NOT_SPECIFIED', 'Backup name not specified');
 			this.showErrorMessage(errorMsg);
+			return;
+		}
+
+		if (await this.rejectUnsafeBackupName(backupName)) {
 			return;
 		}
 
