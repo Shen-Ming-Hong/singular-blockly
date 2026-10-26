@@ -1739,6 +1739,32 @@ describe('WebView Message Handler', () => {
 			assert(vscodeMock.window.showErrorMessage.called);
 		});
 
+		it('should reject backup names that escape the backup folder', async () => {
+			fileServiceStub.fileExists.returns(true);
+			const unsafeNames = ['../main', '..\\..\\package', 'nested/name', 'C:evil', 'line\nbreak', '..', 42];
+			for (const [command, responseCommand] of [
+				['createBackup', 'backupCreated'],
+				['deleteBackup', 'backupDeleted'],
+				['restoreBackup', 'backupRestored'],
+			]) {
+				for (const name of unsafeNames) {
+					webviewMock.postMessage.resetHistory();
+					await messageHandler.handleMessage({ command, name, state: {} });
+					const messageArg = webviewMock.postMessage.getCall(0).args[0];
+					assert.strictEqual(messageArg.command, responseCommand);
+					assert.strictEqual(messageArg.success, false);
+				}
+			}
+			await messageHandler.handleMessage({ command: 'previewBackup', name: '../main' });
+
+			assert(fileServiceStub.writeJsonFile.notCalled);
+			assert(fileServiceStub.deleteFile.notCalled);
+			assert(fileServiceStub.copyFile.notCalled);
+			assert(fileServiceStub.createDirectory.notCalled);
+			assert(vscodeMock.window.showErrorMessage.called);
+			assert(!vscodeMock.commands.executeCommand.calledWith('singular-blockly.previewBackup'));
+		});
+
 		it('should handle general message processing error', async () => {
 			// Make handleMessage throw by corrupting internal state
 			fileServiceStub.createDirectory.rejects(new Error('Unexpected error'));

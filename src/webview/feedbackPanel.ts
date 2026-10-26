@@ -27,6 +27,9 @@ import {
 	isSanitizedFeedbackScreenshot,
 } from '../types/feedback';
 
+/** 回饋面板可開啟的服務政策頁面，與 media/js/feedback.js 的按鈕一致 */
+const FEEDBACK_POLICY_PAGES = new Set<unknown>(['privacy', 'support', 'terms']);
+
 interface FeedbackAssetReader {
 	readFile(relativePath: string, defaultContent?: string): Promise<string>;
 }
@@ -356,6 +359,10 @@ export class FeedbackPanel implements vscode.Disposable {
 		if (message.command === 'feedback:deleteOne') {await this.deleteOne(message); return;}
 		if (message.command === 'feedback:deleteAll') {await this.deleteAll(message); return;}
 		if (message.command === 'feedback:openPolicy') {
+			if (!FEEDBACK_POLICY_PAGES.has(message.policy)) {
+				log('Rejected unknown feedback policy page', 'warn');
+				return;
+			}
 			const locale = this.diagnosticsSource().locale;
 			await vscodeApi.env.openExternal(vscodeApi.Uri.parse(
 				`${this.identityService.serviceOrigin}/${message.policy}?lang=${encodeURIComponent(locale)}`
