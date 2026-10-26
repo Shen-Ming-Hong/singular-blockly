@@ -2,7 +2,7 @@
 	"name": "singular-blockly",
 	"displayName": "Singular Blockly",
 	"description": "Blockly visual programming for Arduino, ESP32, CyberBrick MicroPython, and fischertechnik TXT. Drag-and-drop blocks, live C++/Python code preview, PlatformIO and one-click upload, AI camera blocks, Agent Skills, and 15 languages.",
-	"version": "0.92.1",
+	"version": "0.92.2",
 	"license": "Apache-2.0",
 	"engines": {
 		"vscode": "^1.126.0",
