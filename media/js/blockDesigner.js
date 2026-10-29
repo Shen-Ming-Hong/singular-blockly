@@ -39,19 +39,35 @@
 		return CPP_IDENTIFIER.test(trimmed) ? trimmed : null;
 	}
 
-	/** 形狀選擇器：SVG 外形依 Blockly thrasos 的接頭樣式簡化繪製 */
-	const STATEMENT_PATH = 'M2 6 h10 l5 5 h10 l5 -5 h62 v28 h-62 l-5 5 h-10 l-5 -5 h-10 z';
-	const VALUE_PATH = 'M16 6 h78 v28 h-78 v-9 c-11 0 -11 -10 0 -10 z';
+	/**
+	 * 形狀選擇器：外形取自編輯器實際使用的 Blockly thrasos 渲染器，
+	 * 與工具箱中的積木一致（陳述積木上缺口下凸榫、值積木左側輸出接頭）。
+	 */
+	const SAMPLE_PREFIX = 'bd_shape_';
 	const SHAPES = [
-		{ value: 'statement', key: 'BLOCK_DESIGNER_SHAPE_STATEMENT', fallback: 'does something', path: STATEMENT_PATH, sample: '▶ ▶' },
-		{ value: 'Number', key: 'BLOCK_DESIGNER_SHAPE_NUMBER', fallback: 'returns a number', path: VALUE_PATH, sample: '123' },
-		{ value: 'Boolean', key: 'BLOCK_DESIGNER_SHAPE_BOOLEAN', fallback: 'returns true/false', path: VALUE_PATH, sample: '✓ ✗' },
-		{ value: 'String', key: 'BLOCK_DESIGNER_SHAPE_STRING', fallback: 'returns text', path: VALUE_PATH, sample: '"abc"' },
+		{ value: 'statement', key: 'BLOCK_DESIGNER_SHAPE_STATEMENT', fallback: 'does something', sample: '▶ ▶ ▶' },
+		{ value: 'Number', key: 'BLOCK_DESIGNER_SHAPE_NUMBER', fallback: 'returns a number', sample: '123' },
+		{ value: 'Boolean', key: 'BLOCK_DESIGNER_SHAPE_BOOLEAN', fallback: 'returns true/false', sample: '✓ ✗' },
+		{ value: 'String', key: 'BLOCK_DESIGNER_SHAPE_STRING', fallback: 'returns text', sample: '"abc"' },
 	];
 
 	// ===== 設計用積木 =====
 
 	function defineDesignBlocks() {
+		for (const shape of SHAPES) {
+			Blockly.Blocks[SAMPLE_PREFIX + shape.value] = {
+				init() {
+					this.appendDummyInput().appendField(shape.sample);
+					if (shape.value === 'statement') {
+						this.setPreviousStatement(true);
+						this.setNextStatement(true);
+					} else {
+						this.setOutput(true, shape.value);
+					}
+				},
+			};
+		}
+
 		Blockly.Blocks[ROOT_TYPE] = {
 			init() {
 				// 形狀由設計器上方的圖形選擇器設定，欄位只負責保存
@@ -436,6 +452,13 @@
 			on('blockDesignerSave', 'click', () => this.save());
 			on('blockDesignerExport', 'click', () => this.exportPack());
 			on('blockDesignerAddBlock', 'click', () => this.addBlock());
+			on('blockDesignerLibSearch', 'click', () => this.searchLibraries());
+			on('blockDesignerLibQuery', 'keydown', event => {
+				if (event.key === 'Enter') {
+					event.preventDefault();
+					this.searchLibraries();
+				}
+			});
 			this.buildShapePicker();
 			on('blockDesignerCategoryName', 'input', () => this.markDirty());
 			on('blockDesignerColour', 'input', () => {
@@ -481,6 +504,13 @@
 			setText('blockDesignerLibDepsLabel', 'BLOCK_DESIGNER_LIBDEPS', 'PlatformIO libraries (one per line, owner/name@version)');
 			setText('blockDesignerGlobalsLabel', 'BLOCK_DESIGNER_GLOBALS', 'Shared variables and objects');
 			setText('blockDesignerSetupLabel', 'BLOCK_DESIGNER_SETUP', 'Run once in setup()');
+			setText(
+				'blockDesignerLibHelp',
+				'BLOCK_DESIGNER_LIB_HELP',
+				'To use an Arduino library (for example DHT, Servo, or NeoPixel), search for it below and choose Add. PlatformIO downloads the library when you build, and its header file is added for you. Put shared objects such as DHT dht(4, DHT11); in Shared variables and objects, and start-up code such as dht.begin(); in Run once in setup(). Then use them in the function.'
+			);
+			setText('blockDesignerLibSearch', 'BLOCK_DESIGNER_LIB_SEARCH', 'Search libraries');
+			document.getElementById('blockDesignerLibQuery').placeholder = t('BLOCK_DESIGNER_LIB_PLACEHOLDER', 'e.g. DHT, Servo, NeoPixel');
 			setText('blockDesignerExport', 'BLOCK_DESIGNER_EXPORT', 'Export block pack…');
 			setText('blockDesignerCancel', 'BLOCK_PACK_CANCEL', 'Cancel');
 			setText('blockDesignerSave', 'BLOCK_DESIGNER_SAVE', 'Save to project');
@@ -565,6 +595,30 @@
 				zoom: { startScale: 1 },
 			});
 			Blockly.common.setMainWorkspace(this.mainWorkspace());
+			this.measureShapes();
+		},
+
+		/** 在預覽工作區實際渲染範例積木，取出外形路徑畫到形狀選擇器 */
+		measureShapes() {
+			for (const shape of SHAPES) {
+				const block = this.previewWorkspace.newBlock(SAMPLE_PREFIX + shape.value);
+				block.initSvg();
+				block.render();
+				const svgPath = block.getSvgRoot().querySelector('.blocklyPath');
+				const box = svgPath.getBBox();
+				const pad = 2;
+				const button = document.querySelector(`#blockDesignerShapes [data-shape="${shape.value}"]`);
+				const svg = button.querySelector('svg');
+				svg.setAttribute('viewBox', `${box.x - pad} ${box.y - pad} ${box.width + pad * 2} ${box.height + pad * 2}`);
+				button.querySelector('path').setAttribute('d', svgPath.getAttribute('d'));
+				const text = button.querySelector('text');
+				// 值積木的左側接頭不算在文字置中範圍內；陳述積木扣掉下方凸榫
+				const tab = shape.value === 'statement' ? 0 : -box.x;
+				const bodyHeight = shape.value === 'statement' ? block.height : box.height;
+				text.setAttribute('x', String(box.x + tab + (box.width - tab) / 2));
+				text.setAttribute('y', String(bodyHeight / 2));
+				block.dispose();
+			}
 		},
 
 		buildShapePicker() {
@@ -577,13 +631,9 @@
 				button.setAttribute('role', 'radio');
 				button.dataset.shape = shape.value;
 				const svg = document.createElementNS(svgNs, 'svg');
-				svg.setAttribute('viewBox', '0 0 96 44');
 				svg.setAttribute('aria-hidden', 'true');
 				const path = document.createElementNS(svgNs, 'path');
-				path.setAttribute('d', shape.path);
 				const text = document.createElementNS(svgNs, 'text');
-				text.setAttribute('x', shape.value === 'statement' ? '48' : '55');
-				text.setAttribute('y', '25');
 				text.setAttribute('text-anchor', 'middle');
 				text.setAttribute('dominant-baseline', 'middle');
 				text.textContent = shape.sample;
@@ -630,6 +680,99 @@
 				button.tabIndex = checked ? 0 : -1;
 				button.querySelector('path').setAttribute('fill', colour);
 			});
+		},
+
+		libraryRequest: 0,
+		pendingLibrarySearch: null,
+		pendingHeaders: new Map(),
+
+		nextLibraryRequestId() {
+			this.libraryRequest += 1;
+			return `blockdesigner-${Date.now()}-${this.libraryRequest}`;
+		},
+
+		searchLibraries() {
+			const query = document.getElementById('blockDesignerLibQuery').value.trim();
+			if (!query) return;
+			this.pendingLibrarySearch = this.nextLibraryRequestId();
+			document.getElementById('blockDesignerLibStatus').textContent = t('BLOCK_DESIGNER_LIB_SEARCHING', 'Searching…');
+			document.getElementById('blockDesignerLibResults').textContent = '';
+			vscode.postMessage({ command: 'searchBlockPackLibraries', requestId: this.pendingLibrarySearch, query });
+		},
+
+		libDepLines() {
+			return document
+				.getElementById('blockDesignerLibDeps')
+				.value.split('\n')
+				.map(line => line.trim())
+				.filter(Boolean);
+		},
+
+		hasLibrary(item) {
+			return this.libDepLines().some(line => line.toLowerCase().startsWith(`${item.owner}/${item.name}@`.toLowerCase()));
+		},
+
+		handleMessage(message) {
+			if (message.command === 'blockPackLibraryResults' && message.requestId === this.pendingLibrarySearch) {
+				this.pendingLibrarySearch = null;
+				this.renderLibraryResults(message);
+			} else if (message.command === 'blockPackLibraryHeaders' && this.pendingHeaders.has(message.requestId)) {
+				this.pendingHeaders.delete(message.requestId);
+				const field = document.getElementById('blockDesignerIncludes');
+				const includes = splitOptions(field.value);
+				for (const header of message.headers || []) {
+					if (!includes.includes(header)) includes.push(header);
+				}
+				field.value = includes.join(', ');
+				this.markDirty();
+			}
+		},
+
+		renderLibraryResults(message) {
+			const status = document.getElementById('blockDesignerLibStatus');
+			const list = document.getElementById('blockDesignerLibResults');
+			list.textContent = '';
+			const items = Array.isArray(message.items) ? message.items : [];
+			if (message.failed) {
+				status.textContent = t('BLOCK_DESIGNER_LIB_FAILED', 'Could not reach the PlatformIO library registry. Check the network and try again.');
+				return;
+			}
+			status.textContent = items.length
+				? t('BLOCK_DESIGNER_LIB_RESULTS', 'Libraries for ESP32, most popular first:')
+				: t('BLOCK_DESIGNER_LIB_NONE', 'No libraries found. Try another word.');
+			for (const item of items) {
+				const row = document.createElement('li');
+				const info = document.createElement('div');
+				info.className = 'block-designer-lib-info';
+				const name = document.createElement('div');
+				name.className = 'block-designer-lib-name';
+				name.textContent = `${item.name} · ${item.owner} · ${item.version}`;
+				const description = document.createElement('div');
+				description.className = 'block-designer-lib-description';
+				description.textContent = item.description || '';
+				info.append(name, description);
+				const add = document.createElement('button');
+				add.type = 'button';
+				add.className = 'block-pack-secondary';
+				const setAdded = () => {
+					add.textContent = t('BLOCK_DESIGNER_LIB_ADDED', 'Added');
+					add.disabled = true;
+				};
+				add.textContent = t('BLOCK_DESIGNER_LIB_ADD', 'Add');
+				if (this.hasLibrary(item)) setAdded();
+				add.addEventListener('click', () => {
+					if (this.hasLibrary(item)) return;
+					const field = document.getElementById('blockDesignerLibDeps');
+					field.value = [...this.libDepLines(), item.libDep].join('\n');
+					const requestId = this.nextLibraryRequestId();
+					this.pendingHeaders.set(requestId, item);
+					vscode.postMessage({ command: 'getBlockPackLibraryHeaders', requestId, owner: item.owner, name: item.name });
+					this.markDirty();
+					setAdded();
+				});
+				row.append(info, add);
+				list.append(row);
+			}
 		},
 
 		currentEntry() {
@@ -811,7 +954,7 @@
 				}
 			}
 			for (const line of document.getElementById('blockDesignerLibDeps').value.split('\n').map(item => item.trim()).filter(Boolean)) {
-				if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+@[A-Za-z0-9_.^~*<>=-]+$/.test(line)) {
+				if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.][A-Za-z0-9_. -]*@[~^]?\d+\.\d+\.\d+$/.test(line)) {
 					problems.push(t('BLOCK_DESIGNER_PROBLEM_LIBDEP', 'Write libraries as owner/name@version: {0}', line));
 				}
 			}

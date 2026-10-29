@@ -62,6 +62,13 @@ export interface PackTarget {
 	blocks: Record<string, string>;
 }
 
+/** 圖形化積木設計器（073）保存的設計資訊，重新開啟設計器時用來還原 */
+export interface BlockPackDesign {
+	formatVersion: 1;
+	globals?: string;
+	blocks: Array<{ name: string; state: Record<string, unknown>; body: string | null }>;
+}
+
 export interface BlockPack {
 	formatVersion: 1;
 	id: string;
@@ -71,6 +78,7 @@ export interface BlockPack {
 	category: { name: LocalizedText; colour: number };
 	blocks: PackBlock[];
 	targets: Partial<Record<BlockPackBoard, PackTarget>>;
+	designer?: BlockPackDesign;
 }
 
 /** 存進專案工作區的積木包，多了匯入資訊 */

@@ -28,12 +28,16 @@ const BLOCK_NAME = /^[a-z][a-z0-9_]{0,31}$/;
 const INPUT_NAME = /^[A-Z][A-Z0-9_]{0,31}$/;
 const SEMVER = /^\d+\.\d+\.\d+$/;
 const OPTION_VALUE = /^[A-Za-z0-9_]+$/;
-const INCLUDE = /^[A-Za-z0-9_./-]+\.h(pp)?$/;
-const LIB_DEP = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.][A-Za-z0-9_. -]*@[~^]?\d+\.\d+\.\d+$/;
+export const INCLUDE = /^[A-Za-z0-9_./-]+\.h(pp)?$/;
+export const LIB_DEP = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.][A-Za-z0-9_. -]*@[~^]?\d+\.\d+\.\d+$/;
 const LABEL_SLOT = /\{([A-Z][A-Z0-9_]*)\}/g;
 const TEMPLATE_SLOT = /\{\{([A-Z][A-Z0-9_]*)\}\}/g;
 
-const PACK_KEYS = ['$schema', 'formatVersion', 'id', 'version', 'author', 'defaultLocale', 'category', 'blocks', 'targets'];
+const PACK_KEYS = ['$schema', 'formatVersion', 'id', 'version', 'author', 'defaultLocale', 'category', 'blocks', 'targets', 'designer'];
+const DESIGNER_KEYS = ['formatVersion', 'globals', 'blocks'];
+const DESIGNER_BLOCK_KEYS = ['name', 'state', 'body'];
+/** 設計器保存的 Blockly 設計工作區狀態上限（JSON 字元數） */
+const MAX_DESIGN_STATE = 100000;
 const INSTALLED_KEYS = [...PACK_KEYS, 'importedAt', 'sourceName'];
 const BLOCK_KEYS = ['name', 'shape', 'output', 'label', 'tooltip', 'inputs'];
 const TARGET_KEYS = ['includes', 'libDeps', 'globals', 'setup', 'blocks'];
@@ -327,6 +331,41 @@ function validateTarget(c: Collector, target: unknown, path: string, blocks: Map
 	}
 }
 
+/**
+ * 圖形化積木設計器（073）保存的設計資訊：只做結構與大小檢查。
+ * 程式碼產生只依 targets，designer 僅供重新開啟設計器時還原。
+ */
+function collectDesigner(c: Collector, value: unknown, path: string): void {
+	if (!isObject(value)) {
+		c.add('INVALID_VALUE', path);
+		return;
+	}
+	c.keys(value, DESIGNER_KEYS, path);
+	if (value.formatVersion !== 1) {
+		c.add(value.formatVersion === undefined ? 'MISSING_FIELD' : 'UNSUPPORTED_FORMAT_VERSION', `${path}.formatVersion`);
+	}
+	c.code(value.globals, `${path}.globals`);
+	if (!Array.isArray(value.blocks) || value.blocks.length > MAX_BLOCKS) {
+		c.add('INVALID_VALUE', `${path}.blocks`);
+		return;
+	}
+	value.blocks.forEach((entry, index) => {
+		const at = `${path}.blocks[${index}]`;
+		if (!isObject(entry)) {
+			c.add('INVALID_VALUE', at);
+			return;
+		}
+		c.keys(entry, DESIGNER_BLOCK_KEYS, at);
+		c.string(entry.name, `${at}.name`, BLOCK_NAME);
+		if (entry.body !== null) {
+			c.code(entry.body, `${at}.body`);
+		}
+		if (!isObject(entry.state) || JSON.stringify(entry.state).length > MAX_DESIGN_STATE) {
+			c.add('INVALID_VALUE', `${at}.state`);
+		}
+	});
+}
+
 function collectPack(c: Collector, value: unknown, path: string, allowedKeys: string[]): void {
 	const at = (key: string) => `${path}${path ? '.' : ''}${key}`;
 	if (!isObject(value)) {
@@ -346,6 +385,7 @@ function collectPack(c: Collector, value: unknown, path: string, allowedKeys: st
 	if (value.author !== undefined) {c.string(value.author, at('author'), undefined, 80);}
 	if (value.importedAt !== undefined) {c.string(value.importedAt, at('importedAt'));}
 	if (value.sourceName !== undefined) {c.string(value.sourceName, at('sourceName'));}
+	if (value.designer !== undefined) {collectDesigner(c, value.designer, at('designer'));}
 	let defaultLocale = 'en';
 	if (value.defaultLocale !== undefined) {
 		if ((BLOCK_PACK_LOCALES as readonly string[]).includes(value.defaultLocale as string)) {

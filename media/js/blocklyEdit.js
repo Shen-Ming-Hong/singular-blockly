@@ -5126,6 +5126,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 			case 'blockPackChangeConfirmed':
 				blockPackManager.handleMessage(message);
 				break;
+			case 'blockPackLibraryResults':
+			case 'blockPackLibraryHeaders':
+				window.blockDesigner?.handleMessage(message);
+				break;
 		case 'confirmDialogResult':
 				// 處理從VSCode傳回的確認對話框結果
 				if (message.confirmId !== undefined) {

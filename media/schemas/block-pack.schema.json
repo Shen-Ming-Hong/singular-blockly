@@ -97,6 +97,53 @@
 					"$ref": "#/$defs/target"
 				}
 			}
+		},
+		"designer": {
+			"type": "object",
+			"description": "Saved by the block designer so the blocks can be edited again. Code generation uses targets only.",
+			"required": [
+				"formatVersion",
+				"blocks"
+			],
+			"additionalProperties": false,
+			"properties": {
+				"formatVersion": {
+					"const": 1
+				},
+				"globals": {
+					"type": "string",
+					"maxLength": 20000
+				},
+				"blocks": {
+					"type": "array",
+					"maxItems": 50,
+					"items": {
+						"type": "object",
+						"required": [
+							"name",
+							"state",
+							"body"
+						],
+						"additionalProperties": false,
+						"properties": {
+							"name": {
+								"type": "string",
+								"pattern": "^[a-z][a-z0-9_]{0,31}$"
+							},
+							"state": {
+								"type": "object"
+							},
+							"body": {
+								"type": [
+									"string",
+									"null"
+								],
+								"maxLength": 20000
+							}
+						}
+					}
+				}
+			}
 		}
 	},
 	"$defs": {

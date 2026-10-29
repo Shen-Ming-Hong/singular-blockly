@@ -4257,3 +4257,71 @@ body.theme-dark .toast.info {
 	outline: 2px solid var(--editor-focus-ring);
 	outline-offset: 2px;
 }
+
+.block-designer-help {
+	margin: 4px 0 0;
+	font-size: 0.85rem;
+	line-height: 1.5;
+	color: var(--editor-description-fg);
+}
+
+.block-designer-help:empty {
+	display: none;
+}
+
+.block-designer-lib-search {
+	display: flex;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+.block-designer-lib-search input {
+	flex: 1;
+	min-width: 0;
+	margin-top: 0;
+}
+
+.block-designer-lib-results {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.block-designer-lib-results li {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 8px;
+	border-radius: 6px;
+	border: 1px solid var(--editor-card-border);
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+}
+
+.block-designer-lib-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.block-designer-lib-name {
+	font-weight: 600;
+	font-size: 0.85rem;
+	overflow-wrap: anywhere;
+}
+
+.block-designer-lib-description {
+	font-size: 0.8rem;
+	color: var(--editor-description-fg);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.block-designer-lib-results button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
