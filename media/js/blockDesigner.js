@@ -578,8 +578,9 @@
 				media: window.BLOCKLY_MEDIA_URL,
 				theme: this.theme(),
 				trashcan: true,
-				move: { scrollbars: true, drag: true, wheel: true },
-				zoom: { controls: true, wheel: true, startScale: 0.85 },
+				// 與主編輯器一致：滾輪縮放，拖曳移動
+				move: { scrollbars: true, drag: true, wheel: false },
+				zoom: { controls: true, wheel: true, startScale: 0.85, maxScale: 3, minScale: 0.3, scaleSpeed: 1.2, pinch: true },
 			});
 			this.workspace.addChangeListener(event => {
 				if (this.loading || event.isUiEvent) return;
