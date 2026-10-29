@@ -4188,3 +4188,64 @@ body.theme-dark .toast.info {
 		min-height: 320px;
 	}
 }
+
+.block-designer-shape-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.block-designer-shape-title {
+	font-size: 0.9rem;
+	color: var(--editor-description-fg);
+}
+
+.block-designer-shapes {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.block-designer-shape {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 10px 6px;
+	border-radius: 6px;
+	border: 1px solid var(--editor-card-border);
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+	cursor: pointer;
+}
+
+.block-designer-shape svg {
+	width: 84px;
+	height: 38px;
+}
+
+.block-designer-shape text {
+	fill: #ffffff;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.block-designer-shape-label {
+	font-size: 0.8rem;
+}
+
+.block-designer-shape:hover {
+	border-color: var(--editor-card-hover-border);
+}
+
+.block-designer-shape[aria-checked='true'] {
+	border-color: var(--editor-primary-action-border);
+	background-color: var(--editor-notice-bg);
+	box-shadow: 0 0 0 2px var(--editor-primary-action-border);
+}
+
+.block-designer-shape:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}

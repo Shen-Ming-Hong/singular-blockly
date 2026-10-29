@@ -39,25 +39,27 @@
 		return CPP_IDENTIFIER.test(trimmed) ? trimmed : null;
 	}
 
+	/** 形狀選擇器：SVG 外形依 Blockly thrasos 的接頭樣式簡化繪製 */
+	const STATEMENT_PATH = 'M2 6 h10 l5 5 h10 l5 -5 h62 v28 h-62 l-5 5 h-10 l-5 -5 h-10 z';
+	const VALUE_PATH = 'M16 6 h78 v28 h-78 v-9 c-11 0 -11 -10 0 -10 z';
+	const SHAPES = [
+		{ value: 'statement', key: 'BLOCK_DESIGNER_SHAPE_STATEMENT', fallback: 'does something', path: STATEMENT_PATH, sample: '▶ ▶' },
+		{ value: 'Number', key: 'BLOCK_DESIGNER_SHAPE_NUMBER', fallback: 'returns a number', path: VALUE_PATH, sample: '123' },
+		{ value: 'Boolean', key: 'BLOCK_DESIGNER_SHAPE_BOOLEAN', fallback: 'returns true/false', path: VALUE_PATH, sample: '✓ ✗' },
+		{ value: 'String', key: 'BLOCK_DESIGNER_SHAPE_STRING', fallback: 'returns text', path: VALUE_PATH, sample: '"abc"' },
+	];
+
 	// ===== 設計用積木 =====
 
 	function defineDesignBlocks() {
 		Blockly.Blocks[ROOT_TYPE] = {
 			init() {
-				this.appendDummyInput()
-					.appendField(t('BLOCK_DESIGNER_ROOT_SHAPE', 'Block shape'))
-					.appendField(
-						new Blockly.FieldDropdown(() => [
-							[t('BLOCK_DESIGNER_SHAPE_STATEMENT', 'does something'), 'statement'],
-							[t('BLOCK_DESIGNER_SHAPE_NUMBER', 'returns a number'), 'Number'],
-							[t('BLOCK_DESIGNER_SHAPE_BOOLEAN', 'returns true/false'), 'Boolean'],
-							[t('BLOCK_DESIGNER_SHAPE_STRING', 'returns text'), 'String'],
-						]),
-						'SHAPE'
-					);
+				// 形狀由設計器上方的圖形選擇器設定，欄位只負責保存
 				this.appendDummyInput()
 					.appendField(t('BLOCK_DESIGNER_ROOT_FUNCTION', 'function name'))
-					.appendField(new Blockly.FieldTextInput('readSensor', nameValidator), 'FUNCTION');
+					.appendField(new Blockly.FieldTextInput('readSensor', nameValidator), 'FUNCTION')
+					.appendField(new Blockly.FieldDropdown(SHAPES.map(shape => [shape.value, shape.value])), 'SHAPE');
+				this.getField('SHAPE').setVisible(false);
 				this.appendStatementInput('PIECES').setCheck(PIECE_CHECK).appendField(t('BLOCK_DESIGNER_ROOT_PIECES', 'pieces, left to right'));
 				this.setColour(60);
 				this.setDeletable(false);
@@ -392,6 +394,7 @@
 			on('blockDesignerSave', 'click', () => this.save());
 			on('blockDesignerExport', 'click', () => this.exportPack());
 			on('blockDesignerAddBlock', 'click', () => this.addBlock());
+			this.buildShapePicker();
 			on('blockDesignerCategoryName', 'input', () => this.markDirty());
 			on('blockDesignerColour', 'input', () => {
 				this.updateColour();
@@ -425,6 +428,10 @@
 			setText('blockDesignerBlocksTitle', 'BLOCK_DESIGNER_BLOCKS', 'Blocks');
 			setText('blockDesignerAddBlock', 'BLOCK_DESIGNER_ADD_BLOCK', '+ New block');
 			setText('blockDesignerShapeTitle', 'BLOCK_DESIGNER_SHAPE_TITLE', '1. Build the block from pieces');
+			setText('blockDesignerShapePickerTitle', 'BLOCK_DESIGNER_ROOT_SHAPE', 'Block shape');
+			document.querySelectorAll('#blockDesignerShapes .block-designer-shape-label').forEach((label, index) => {
+				label.textContent = t(SHAPES[index].key, SHAPES[index].fallback);
+			});
 			setText('blockDesignerPreviewTitle', 'BLOCK_DESIGNER_PREVIEW_TITLE', 'What students see');
 			setText('blockDesignerCodeTitle', 'BLOCK_DESIGNER_CODE_TITLE', '2. Fill in the function');
 			setText('blockDesignerAdvancedTitle', 'BLOCK_DESIGNER_ADVANCED', 'Libraries and setup (optional)');
@@ -516,6 +523,71 @@
 				zoom: { startScale: 1 },
 			});
 			Blockly.common.setMainWorkspace(this.mainWorkspace());
+		},
+
+		buildShapePicker() {
+			const container = document.getElementById('blockDesignerShapes');
+			const svgNs = 'http://www.w3.org/2000/svg';
+			SHAPES.forEach(shape => {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'block-designer-shape';
+				button.setAttribute('role', 'radio');
+				button.dataset.shape = shape.value;
+				const svg = document.createElementNS(svgNs, 'svg');
+				svg.setAttribute('viewBox', '0 0 96 44');
+				svg.setAttribute('aria-hidden', 'true');
+				const path = document.createElementNS(svgNs, 'path');
+				path.setAttribute('d', shape.path);
+				const text = document.createElementNS(svgNs, 'text');
+				text.setAttribute('x', shape.value === 'statement' ? '48' : '55');
+				text.setAttribute('y', '25');
+				text.setAttribute('text-anchor', 'middle');
+				text.setAttribute('dominant-baseline', 'middle');
+				text.textContent = shape.sample;
+				svg.append(path, text);
+				const label = document.createElement('span');
+				label.className = 'block-designer-shape-label';
+				label.textContent = t(shape.key, shape.fallback);
+				button.append(svg, label);
+				button.addEventListener('click', () => {
+					const root = this.rootBlock();
+					if (!root || root.getFieldValue('SHAPE') === shape.value) return;
+					// 函式本體還是預設內容時，跟著新的回傳型別換成對應的預設內容
+					const body = document.getElementById('blockDesignerBody');
+					const before = compileDesign(root).returnType;
+					root.setFieldValue(shape.value, 'SHAPE');
+					if (body.value === defaultBody(before)) {
+						body.value = defaultBody(compileDesign(root).returnType);
+						this.currentEntry().body = body.value;
+					}
+					clearTimeout(this.renderTimer);
+					this.render();
+				});
+				container.append(button);
+			});
+			container.addEventListener('keydown', event => {
+				if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+				event.preventDefault();
+				const buttons = [...container.querySelectorAll('.block-designer-shape')];
+				const current = buttons.findIndex(button => button.getAttribute('aria-checked') === 'true');
+				const step = event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1;
+				const next = buttons[(current + step + buttons.length) % buttons.length];
+				next.click();
+				next.focus();
+			});
+		},
+
+		syncShapePicker() {
+			const root = this.rootBlock();
+			const value = root ? root.getFieldValue('SHAPE') : 'Number';
+			const colour = Blockly.utils.colour.hueToHex(Number(document.getElementById('blockDesignerColour').value) || 0);
+			document.querySelectorAll('#blockDesignerShapes .block-designer-shape').forEach(button => {
+				const checked = button.dataset.shape === value;
+				button.setAttribute('aria-checked', checked ? 'true' : 'false');
+				button.tabIndex = checked ? 0 : -1;
+				button.querySelector('path').setAttribute('fill', colour);
+			});
 		},
 
 		currentEntry() {
@@ -702,6 +774,7 @@
 		render() {
 			const root = this.rootBlock();
 			if (!root) return;
+			this.syncShapePicker();
 			const compiled = compileDesign(root);
 			const fnLines = [...compiled.notes, `${compiled.signature} {`];
 			document.getElementById('blockDesignerCodeHead').textContent = fnLines.join('\n');
