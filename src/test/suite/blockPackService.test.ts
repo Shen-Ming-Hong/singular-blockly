@@ -13,9 +13,11 @@ import {
 	BlockPackServiceDeps,
 	BLOCK_PACKS_SETTING_KEY,
 	BLOCK_PACKS_SETTING_SECTION,
+	exportBlockPack,
 	isBlockPacksEnabled,
 	parseInstalledSummaries,
 	readBlockPackFile,
+	writeBlockPackFile,
 } from '../../services/blockPackService';
 
 const ROOT = path.join(__dirname, '..', '..', '..');
@@ -106,6 +108,43 @@ suite('Block pack import service', () => {
 			deps({ readFile: async () => Promise.reject(new Error('EACCES')) })
 		).importPack([]);
 		assert.deepStrictEqual(unreadable, { kind: 'rejected', sourceName: 'hc-sr04.sbpack.json', errors: [{ code: 'INVALID_JSON', path: '' }] });
+	});
+
+	test('exports a valid pack to the chosen file and refuses invalid packs before asking for a location', async () => {
+		const pack = JSON.parse(fs.readFileSync(path.join(EXAMPLES, 'hc-sr04.sbpack.json'), 'utf8'));
+		const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-pack-export-'));
+		try {
+			const defaults: string[] = [];
+			const target = path.join(folder, 'shared.sbpack.json');
+			const saved = await exportBlockPack(pack, {
+				pickSaveFile: async name => {
+					defaults.push(name);
+					return target;
+				},
+				writeFile: writeBlockPackFile,
+			});
+			assert.deepStrictEqual(saved, { kind: 'saved', fileName: 'shared.sbpack.json' });
+			assert.deepStrictEqual(defaults, ['hc_sr04.sbpack.json']);
+			const reimported = await new BlockPackService(deps({ pickFile: async () => target })).importPack([]);
+			assert.strictEqual(reimported.kind, 'ready');
+			assert.deepStrictEqual(reimported.kind === 'ready' && reimported.pack, pack);
+
+			const cancelled = await exportBlockPack(pack, { pickSaveFile: async () => undefined, writeFile: writeBlockPackFile });
+			assert.deepStrictEqual(cancelled, { kind: 'cancelled' });
+
+			let asked = false;
+			const rejected = await exportBlockPack({ ...pack, id: 'Bad-Id' }, {
+				pickSaveFile: async () => {
+					asked = true;
+					return target;
+				},
+				writeFile: writeBlockPackFile,
+			});
+			assert.deepStrictEqual(rejected, { kind: 'rejected', errors: [{ code: 'INVALID_VALUE', path: 'id' }] });
+			assert.strictEqual(asked, false);
+		} finally {
+			fs.rmSync(folder, { recursive: true, force: true });
+		}
 	});
 
 	test('validates the installed summary list from the WebView', () => {

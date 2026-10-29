@@ -45,6 +45,14 @@ function minimalPack(): any {
 	};
 }
 
+function designerSection(): any {
+	return {
+		formatVersion: 1,
+		globals: '',
+		blocks: [{ name: 'beep', state: { blocks: { languageVersion: 0, blocks: [] } }, body: '  tone(pin, 440, ms);\n' }],
+	};
+}
+
 function codes(value: unknown): string[] {
 	const result = validateBlockPack(value);
 	return result.ok ? [] : result.errors.map(error => `${error.code}@${error.path}`);
@@ -138,5 +146,34 @@ suite('Block pack validator', () => {
 		for (const name of ['unsupported-board.sbpack.json', 'url-lib-dep.sbpack.json']) {
 			assert.strictEqual(validate(readExample(path.join('invalid', name))), false, name);
 		}
+		const designed = { ...minimalPack(), category: { name: 'Buzzer', colour: '#a5745b' }, designer: designerSection() };
+		assert.strictEqual(validate(designed), true, JSON.stringify(validate.errors));
+		assert.strictEqual(validate({ ...minimalPack(), category: { name: 'Buzzer', colour: 'red' } }), false);
+	});
+
+	test('accepts hex category colours and the designer section, and rejects malformed ones', () => {
+		assert.deepStrictEqual(codes({ ...minimalPack(), category: { name: 'Buzzer', colour: '#A5745b' } }), []);
+		assert.deepStrictEqual(codes({ ...minimalPack(), category: { name: 'Buzzer', colour: '#abc' } }), ['INVALID_VALUE@category.colour']);
+		assert.deepStrictEqual(codes({ ...minimalPack(), designer: designerSection() }), []);
+
+		const withNullBody = designerSection();
+		withNullBody.blocks[0].body = null;
+		assert.deepStrictEqual(codes({ ...minimalPack(), designer: withNullBody }), []);
+
+		const broken = designerSection();
+		broken.formatVersion = 2;
+		broken.blocks[0].extra = 1;
+		broken.blocks[0].name = 'Bad Name';
+		broken.blocks[0].state = 'not an object';
+		assert.deepStrictEqual(codes({ ...minimalPack(), designer: broken }), [
+			'UNSUPPORTED_FORMAT_VERSION@designer.formatVersion',
+			'UNKNOWN_FIELD@designer.blocks[0].extra',
+			'INVALID_VALUE@designer.blocks[0].name',
+			'INVALID_VALUE@designer.blocks[0].state',
+		]);
+
+		const huge = designerSection();
+		huge.blocks[0].state = { padding: 'x'.repeat(100001) };
+		assert.deepStrictEqual(codes({ ...minimalPack(), designer: huge }), ['INVALID_VALUE@designer.blocks[0].state']);
 	});
 });

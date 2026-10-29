@@ -5128,6 +5128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				break;
 			case 'blockPackLibraryResults':
 			case 'blockPackLibraryHeaders':
+			case 'blockPackExported':
 				window.blockDesigner?.handleMessage(message);
 				break;
 		case 'confirmDialogResult':

@@ -737,6 +737,7 @@
 
 		libraryRequest: 0,
 		pendingLibrarySearch: null,
+		pendingExport: null,
 		pendingHeaders: new Map(),
 
 		nextLibraryRequestId() {
@@ -766,7 +767,11 @@
 		},
 
 		handleMessage(message) {
-			if (message.command === 'blockPackLibraryResults' && message.requestId === this.pendingLibrarySearch) {
+			if (message.command === 'blockPackExported' && message.requestId === this.pendingExport) {
+				this.pendingExport = null;
+				if (message.fileName) toast.show(t('BLOCK_DESIGNER_EXPORTED', 'Exported to {0}.', message.fileName));
+				else if (message.errors) this.showProblems([t('BLOCK_DESIGNER_EXPORT_FAILED', 'This category cannot be exported yet. Fix the problems and try again.')]);
+			} else if (message.command === 'blockPackLibraryResults' && message.requestId === this.pendingLibrarySearch) {
 				this.pendingLibrarySearch = null;
 				this.renderLibraryResults(message);
 			} else if (message.command === 'blockPackLibraryHeaders' && this.pendingHeaders.has(message.requestId)) {
@@ -1124,7 +1129,8 @@
 		exportPack() {
 			const { compiledList, problems } = this.collect();
 			if (problems.length || compiledList.some(compiled => !compiled || compiled.problems.length)) return;
-			vscode.postMessage({ command: 'exportBlockPack', pack: this.draftPack(compiledList) });
+			this.pendingExport = this.nextLibraryRequestId();
+			vscode.postMessage({ command: 'exportBlockPack', requestId: this.pendingExport, pack: this.draftPack(compiledList) });
 		},
 
 		async requestClose() {
@@ -1145,6 +1151,8 @@
 		},
 	};
 
+	// 純邏輯部分給 Node 契約測試使用
+	designer.internals = { defineDesignBlocks, starterState, compileDesign, returnProblems, functionSource };
 	window.blockDesigner = designer;
 	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => designer.init());
 	else designer.init();

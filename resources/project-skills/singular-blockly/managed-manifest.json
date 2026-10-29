@@ -31,7 +31,7 @@
     {
       "source": "canonical/references/block-packs.md",
       "target": ".agents/skills/singular-blockly/references/block-packs.md",
-      "sha256": "de8b6dfac3477bc83bb29d6ea06a55d946c383948555d949c69041901f74e19b",
+      "sha256": "1def63fef6a5c43ecc0f67d58a56e4845d2dbd9c5cc20f0ac8965aed65910132",
       "kind": "reference"
     },
     {

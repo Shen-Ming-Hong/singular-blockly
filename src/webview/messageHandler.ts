@@ -16,9 +16,11 @@ import { ArduinoUploader } from '../services/arduinoUploader';
 import {
 	BLOCK_PACKS_SETTING_SECTION,
 	BlockPackService,
+	exportBlockPack,
 	isBlockPacksEnabled,
 	parseInstalledSummaries,
 	readBlockPackFile,
+	writeBlockPackFile,
 } from '../services/blockPackService';
 import {
 	FetchJson,
@@ -678,6 +680,9 @@ export class WebViewMessageHandler {
 				case 'confirmBlockPackChange':
 					await this.handleConfirmBlockPackChange(message);
 					break;
+				case 'exportBlockPack':
+					await this.handleExportBlockPack(message);
+					break;
 				case 'searchBlockPackLibraries':
 					await this.handleSearchBlockPackLibraries(message);
 					break;
@@ -777,6 +782,49 @@ export class WebViewMessageHandler {
 			...(outcome.kind === 'cancelled'
 				? { cancelled: true }
 				: { errors: outcome.errors, sourceName: outcome.sourceName }),
+		});
+	}
+
+	/**
+	 * 匯出積木設計器的分類：驗證後以存檔對話框寫成積木包檔
+	 */
+	private async handleExportBlockPack(message: unknown): Promise<void> {
+		if (
+			!isPlainRecord(message) ||
+			!hasOnlyKeys(message, ['command', 'requestId', 'pack']) ||
+			typeof message.requestId !== 'string' ||
+			!BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(message.requestId)
+		) {
+			log('Rejected malformed exportBlockPack message', 'warn');
+			return;
+		}
+		const requestId = message.requestId;
+		if (!isBlockPacksEnabled(vscodeApi.workspace.getConfiguration(BLOCK_PACKS_SETTING_SECTION))) {
+			await this.panel.webview.postMessage({ command: 'blockPackExported', requestId, cancelled: true });
+			return;
+		}
+		const outcome = await exportBlockPack(message.pack, {
+			pickSaveFile: async defaultName => {
+				const title = await this.localeService.getLocalizedMessage('BLOCK_PACK_EXPORT_TITLE', 'Export block pack');
+				const filterName = await this.localeService.getLocalizedMessage('BLOCK_PACK_FILE_FILTER', 'Block pack');
+				const folder = vscodeApi.workspace.workspaceFolders?.[0]?.uri;
+				const uri = await vscodeApi.window.showSaveDialog({
+					title,
+					filters: { [filterName]: ['json'] },
+					...(folder ? { defaultUri: vscodeApi.Uri.joinPath(folder, defaultName) } : {}),
+				});
+				return uri?.fsPath;
+			},
+			writeFile: writeBlockPackFile,
+		});
+		await this.panel.webview.postMessage({
+			command: 'blockPackExported',
+			requestId,
+			...(outcome.kind === 'saved'
+				? { fileName: outcome.fileName }
+				: outcome.kind === 'rejected'
+					? { errors: outcome.errors }
+					: { cancelled: true }),
 		});
 	}
 

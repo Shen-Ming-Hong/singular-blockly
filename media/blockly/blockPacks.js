@@ -538,6 +538,21 @@
 				else delete restored.next;
 				current = restored;
 			}
+			// 設計器刪除或改變輸入種類後，舊實例接在該輸入上的積木改放到頂層，避免載入失敗與遺失
+			const definition = packsByType.get(current.type);
+			if (definition && current.inputs) {
+				for (const inputName of Object.keys(current.inputs)) {
+					const input = (definition.block.inputs || []).find(candidate => candidate.name === inputName);
+					if (input && (input.kind === 'value' || input.kind === 'statement')) continue;
+					const detached = current.inputs[inputName] && current.inputs[inputName].block;
+					delete current.inputs[inputName];
+					if (detached && typeof detached === 'object') {
+						detached.x = (rootPosition.x || 0) + 40;
+						detached.y = (rootPosition.y || 0) + 80 + orphans.length * 40;
+						orphans.push(detached);
+					}
+				}
+			}
 			for (const [inputName, input] of Object.entries(current.inputs || {})) {
 				if (!input || typeof input !== 'object') continue;
 				const statement = isStatementInput(current.type, inputName, packsByType);
@@ -549,7 +564,17 @@
 			return current;
 		};
 
-		state.blocks.blocks = state.blocks.blocks.map(block => transform(block, 'top'));
+		const orphans = [];
+		let rootPosition = {};
+		state.blocks.blocks = state.blocks.blocks.map(block => {
+			rootPosition = block && typeof block === 'object' ? block : {};
+			return transform(block, 'top');
+		});
+		// 移到頂層的積木也可能含已失效的積木包積木，逐一轉換（轉換中可能再產生新的頂層積木）
+		for (let index = 0; index < orphans.length; index++) {
+			rootPosition = orphans[index];
+			state.blocks.blocks.push(transform(orphans[index], 'top'));
+		}
 		return state;
 	}
 

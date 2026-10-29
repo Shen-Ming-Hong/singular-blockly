@@ -349,4 +349,83 @@ suite('MessageHandler – Block pack import setting', () => {
 		assert.ok(showOpenDialog.calledOnce);
 		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackRejected', requestId: 'pack-2', cancelled: true }));
 	});
+
+	test('exports a designed pack through the save dialog only while block packs are enabled', async () => {
+		const pack = JSON.parse(
+			require('fs').readFileSync(require('path').join(__dirname, '..', '..', '..', 'resources', 'block-pack-examples', 'hc-sr04.sbpack.json'), 'utf8')
+		);
+		const showSaveDialog = sandbox.stub().resolves(undefined);
+		let enabled = false;
+		const vscodeMock = {
+			window: { showWarningMessage: sandbox.stub(), showSaveDialog },
+			workspace: { workspaceFolders: [], isTrusted: true, getConfiguration: sandbox.stub().returns({ get: () => enabled }) },
+		};
+		_setVSCodeApi(vscodeMock as any);
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
+
+		await handler.handleMessage({ command: 'exportBlockPack', requestId: 'export-1', pack });
+		assert.ok(showSaveDialog.notCalled);
+		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackExported', requestId: 'export-1', cancelled: true }));
+
+		enabled = true;
+		await handler.handleMessage({ command: 'exportBlockPack', requestId: 'export-2', pack: { ...pack, id: 'Bad-Id' } });
+		assert.ok(showSaveDialog.notCalled);
+		assert.ok(
+			webviewPostMessage.calledWith({ command: 'blockPackExported', requestId: 'export-2', errors: [{ code: 'INVALID_VALUE', path: 'id' }] })
+		);
+
+		await handler.handleMessage({ command: 'exportBlockPack', requestId: 'export-3', pack });
+		assert.ok(showSaveDialog.calledOnce);
+		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackExported', requestId: 'export-3', cancelled: true }));
+
+		const before = webviewPostMessage.callCount;
+		await handler.handleMessage({ command: 'exportBlockPack', requestId: 'export-4', pack, extra: true });
+		await handler.handleMessage({ command: 'exportBlockPack', requestId: '../bad', pack });
+		assert.strictEqual(webviewPostMessage.callCount, before);
+	});
+
+	test('library search reaches the registry only while block packs are enabled', async () => {
+		let enabled = false;
+		const vscodeMock = {
+			window: { showWarningMessage: sandbox.stub() },
+			workspace: { workspaceFolders: [], isTrusted: true, getConfiguration: sandbox.stub().returns({ get: () => enabled }) },
+		};
+		_setVSCodeApi(vscodeMock as any);
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
+		const fetchJson = sandbox.stub().callsFake(async (url: string) =>
+			url.includes('/search?')
+				? { items: [{ name: 'Servo', owner: { username: 'arduino-libraries' }, version: { name: '1.2.2' }, description: 'Servo' }] }
+				: { headers: ['Servo.h'] }
+		);
+		handler.blockPackLibraryFetch = fetchJson;
+
+		await handler.handleMessage({ command: 'searchBlockPackLibraries', requestId: 'lib-1', query: 'servo' });
+		assert.ok(fetchJson.notCalled);
+		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackLibraryResults', requestId: 'lib-1', items: [], failed: true }));
+
+		enabled = true;
+		await handler.handleMessage({ command: 'searchBlockPackLibraries', requestId: 'lib-2', query: 'servo' });
+		assert.ok(
+			webviewPostMessage.calledWith({
+				command: 'blockPackLibraryResults',
+				requestId: 'lib-2',
+				items: [
+					{
+						owner: 'arduino-libraries',
+						name: 'Servo',
+						version: '1.2.2',
+						description: 'Servo',
+						libDep: 'arduino-libraries/Servo@^1.2.2',
+					},
+				],
+			})
+		);
+
+		await handler.handleMessage({ command: 'getBlockPackLibraryHeaders', requestId: 'lib-3', owner: 'arduino-libraries', name: 'Servo' });
+		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackLibraryHeaders', requestId: 'lib-3', headers: ['Servo.h'] }));
+
+		fetchJson.rejects(new Error('offline'));
+		await handler.handleMessage({ command: 'searchBlockPackLibraries', requestId: 'lib-4', query: 'servo' });
+		assert.ok(webviewPostMessage.calledWith({ command: 'blockPackLibraryResults', requestId: 'lib-4', items: [], failed: true }));
+	});
 });

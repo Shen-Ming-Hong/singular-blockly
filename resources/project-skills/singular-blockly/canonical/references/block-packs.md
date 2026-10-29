@@ -24,6 +24,14 @@ A block pack adds blocks for one sensor or module. Its definition lives inside t
 - Pack blocks follow the same orphan rules as built-in blocks: put them inside `setup()`, `loop()`, or a function.
 - On other boards pack blocks stay in the workspace but generate only a comment; do not add them to non-ESP32 projects.
 
+## Packs made in the block designer
+
+Most packs are made in the editor's block designer instead of written by hand. A designed pack has an extra `designer` section: `{ "formatVersion": 1, "globals": "...", "blocks": [{ "name", "state", "body" }] }`. `state` is the designer's own Blockly workspace and `body` is the function body the user wrote; the designer regenerates `blocks`, `targets.esp32.blocks`, and the function definitions in `targets.esp32.globals` from them.
+
+- Do not edit a designed pack's `blocks`, `targets`, or `designer` by hand. The next save in the designer would overwrite the hand edits. Ask the user to change the block in the designer instead.
+- Each designed block calls one C++ function: value blocks use `fn(args)`, statement blocks use `fn(args);`, and a block with an inner statement input uses `if (fn(args)) { ... }`.
+- When the designer removes an input, blocks that were plugged into that input on existing pack blocks are moved to the top level of the workspace instead of being deleted.
+
 ## Placeholders
 
 When a pack is missing, its blocks load as `block_pack_placeholder_statement` or `block_pack_placeholder_value`. `extraState.original` keeps the complete original block. Never edit or delete a placeholder's `extraState.original`; the extension restores the block when the pack is imported again.
@@ -32,7 +40,7 @@ When a pack is missing, its blocks load as `block_pack_placeholder_statement` or
 
 Pack files use the `.sbpack.json` extension. The rules below match the extension's validator.
 
-- Top level: `formatVersion: 1`, `id` (`^[a-z][a-z0-9_]{1,31}$`), `version` (`MAJOR.MINOR.PATCH`), optional `author` (80 characters or fewer), `defaultLocale` (one of `en`, `zh-hant`, `ja`, `ko`, `de`, `fr`, `es`, `it`, `pt-br`, `ru`, `pl`, `cs`, `hu`, `bg`, `tr`), `category: { name, colour }` with `colour` from 0 to 360, `blocks` (1 to 50), and `targets` containing only `esp32`. No other keys are allowed except `$schema`.
+- Top level: `formatVersion: 1`, `id` (`^[a-z][a-z0-9_]{1,31}$`), `version` (`MAJOR.MINOR.PATCH`), optional `author` (80 characters or fewer), `defaultLocale` (one of `en`, `zh-hant`, `ja`, `ko`, `de`, `fr`, `es`, `it`, `pt-br`, `ru`, `pl`, `cs`, `hu`, `bg`, `tr`), `category: { name, colour }` with `colour` either a hue from 0 to 360 or a `#rrggbb` string, `blocks` (1 to 50), `targets` containing only `esp32`, and optional `designer` (see above). No other keys are allowed except `$schema`.
 - Text that people read (`category.name`, `label`, `tooltip`, dropdown option labels) is either a string or an object keyed by locale that includes `defaultLocale`.
 - Each block has `name` (`^[a-z][a-z0-9_]{0,31}$`, unique in the pack), `shape`, `label`, optional `tooltip`, optional `output` for value blocks, and up to 10 `inputs`.
 - Each input has `name` (`^[A-Z][A-Z0-9_]{0,31}$`, unique in the block) and `kind`: `value` (optional `check` and `default`), `number` (`default`, optional `min`, `max`, `precision`), `text` (`default`), `dropdown` (`options: [[label, value], ...]`, values match `^[A-Za-z0-9_]+$`), `pin` (`mode: "digital" | "analog"`, optional `direction: "input" | "output"` and `exclusive`), or `statement`.
@@ -41,6 +49,6 @@ Pack files use the `.sbpack.json` extension. The rules below match the extension
 - Templates may reference only their own block's inputs as `{{NAME}}`. Value inputs are wrapped in parentheses, text inputs become escaped C++ string literals, and statement inputs become the inner code. `includes`, `globals`, `setup`, and `libDeps` are emitted once per program.
 - Templates are plain text substitution. Nothing in a pack runs inside the editor.
 
-Importing, updating, or removing packs in the editor requires the experimental `singular-blockly.experimental.blockPacks` setting, which is off by default; packs already in `blockly/main.json` still load and generate code without it.
+Designing, importing, exporting, updating, or removing packs in the editor requires the experimental `singular-blockly.experimental.blockPacks` setting, which is off by default; packs already in `blockly/main.json` still load and generate code without it.
 
 Importing a pack with `libDeps` requires a trusted VS Code workspace and the user's confirmation, because PlatformIO downloads those libraries when building.
