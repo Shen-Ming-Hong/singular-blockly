@@ -61,6 +61,13 @@
 		return typeof type === 'string' && type.startsWith(TYPE_PREFIX);
 	}
 
+	/** 分類顏色：色相（0–360）或設計器的 #rrggbb 色碼 */
+	function packColour(pack) {
+		const colour = pack && pack.category && pack.category.colour;
+		if (typeof colour === 'string' && /^#[0-9a-fA-F]{6}$/.test(colour)) return colour;
+		return Number(colour) || 0;
+	}
+
 	function packTarget(pack) {
 		return pack && pack.targets && pack.targets[SUPPORTED_BOARD];
 	}
@@ -164,7 +171,7 @@
 			type: blockType(pack.id, block.name),
 			message0: message0.trim() || block.name,
 			args0: args,
-			colour: Number(pack.category && pack.category.colour) || 0,
+			colour: packColour(pack),
 			tooltip: localize(block.tooltip, pack),
 			inputsInline: !(block.inputs || []).some(input => input.kind === 'statement'),
 		};
@@ -210,6 +217,7 @@
 
 	function fallbackValue(input) {
 		if (input.default === undefined) return FALLBACK_VALUES[input.check] || '0';
+		if (input.check === 'Boolean') return input.default === 'false' ? 'false' : 'true';
 		return typeof input.default === 'number' ? String(input.default) : cppString(input.default);
 	}
 
@@ -530,6 +538,21 @@
 				else delete restored.next;
 				current = restored;
 			}
+			// 設計器刪除或改變輸入種類後，舊實例接在該輸入上的積木改放到頂層，避免載入失敗與遺失
+			const definition = packsByType.get(current.type);
+			if (definition && current.inputs) {
+				for (const inputName of Object.keys(current.inputs)) {
+					const input = (definition.block.inputs || []).find(candidate => candidate.name === inputName);
+					if (input && (input.kind === 'value' || input.kind === 'statement')) continue;
+					const detached = current.inputs[inputName] && current.inputs[inputName].block;
+					delete current.inputs[inputName];
+					if (detached && typeof detached === 'object') {
+						detached.x = (rootPosition.x || 0) + 40;
+						detached.y = (rootPosition.y || 0) + 80 + orphans.length * 40;
+						orphans.push(detached);
+					}
+				}
+			}
 			for (const [inputName, input] of Object.entries(current.inputs || {})) {
 				if (!input || typeof input !== 'object') continue;
 				const statement = isStatementInput(current.type, inputName, packsByType);
@@ -541,7 +564,17 @@
 			return current;
 		};
 
-		state.blocks.blocks = state.blocks.blocks.map(block => transform(block, 'top'));
+		const orphans = [];
+		let rootPosition = {};
+		state.blocks.blocks = state.blocks.blocks.map(block => {
+			rootPosition = block && typeof block === 'object' ? block : {};
+			return transform(block, 'top');
+		});
+		// 移到頂層的積木也可能含已失效的積木包積木，逐一轉換（轉換中可能再產生新的頂層積木）
+		for (let index = 0; index < orphans.length; index++) {
+			rootPosition = orphans[index];
+			state.blocks.blocks.push(transform(orphans[index], 'top'));
+		}
 		return state;
 	}
 
@@ -584,10 +617,14 @@
 		const inputs = {};
 		for (const input of packBlock.inputs || []) {
 			if (input.kind !== 'value' || input.default === undefined) continue;
-			inputs[input.name] =
-				typeof input.default === 'number'
-					? { shadow: { type: 'math_number', fields: { NUM: input.default } } }
-					: { shadow: { type: 'text', fields: { TEXT: String(input.default) } } };
+			if (input.check === 'Boolean') {
+				inputs[input.name] = { shadow: { type: 'logic_boolean', fields: { BOOL: input.default === 'false' ? 'FALSE' : 'TRUE' } } };
+			} else {
+				inputs[input.name] =
+					typeof input.default === 'number'
+						? { shadow: { type: 'math_number', fields: { NUM: input.default } } }
+						: { shadow: { type: 'text', fields: { TEXT: String(input.default) } } };
+			}
 		}
 		if (Object.keys(inputs).length > 0) item.inputs = inputs;
 		return item;
@@ -597,7 +634,7 @@
 		return (packs || []).map(pack => ({
 			kind: 'category',
 			name: localize(pack.category && pack.category.name, pack) || pack.id,
-			colour: String(Number(pack.category && pack.category.colour) || 0),
+			colour: String(packColour(pack)),
 			contents: pack.blocks.map(packBlock => toolboxBlock(pack, packBlock)),
 		}));
 	}
@@ -693,6 +730,7 @@
 		isPlaceholderType,
 		localize,
 		normalizeSnapshot,
+		packColour,
 		pinOptions,
 		prepareState,
 		previewCode,

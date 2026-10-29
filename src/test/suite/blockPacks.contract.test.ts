@@ -39,9 +39,11 @@ suite('Block pack WebView runtime contract', () => {
 		runScript('media/blockly/generators/arduino/index.js');
 		runScript('media/blockly/generators/arduino/text.js');
 		runScript('media/blockly/generators/arduino/math.js');
-		if (!Blockly.serialization.registry.hasItem?.(Blockly.registry.Type.SERIALIZER, 'customBlocks')) {
-			runScript('media/blockly/blockPacks.js');
+		// 每個 suite 都重新載入，讓積木包產生器註冊在這次建立的 arduinoGenerator 上
+		if (Blockly.registry.hasItem(Blockly.registry.Type.SERIALIZER, 'customBlocks')) {
+			Blockly.registry.unregister(Blockly.registry.Type.SERIALIZER, 'customBlocks');
 		}
+		runScript('media/blockly/blockPacks.js');
 		generator = win.arduinoGenerator;
 	});
 

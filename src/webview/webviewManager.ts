@@ -722,6 +722,7 @@ export class WebViewManager {
 			const esp32WifiMqttBlocksUri = webview.asWebviewUri(esp32WifiMqttBlocksPath);
 			const esp32RcBlocksUri = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blocks/esp32-rc.js')));
 			const blockPacksUri = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/blockly/blockPacks.js')));
+			const blockDesignerUri = webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/blockDesigner.js')));
 
 			// MicroPython 生成器
 			const micropythonGeneratorPath = vscode.Uri.file(
@@ -890,6 +891,7 @@ export class WebViewManager {
 			htmlContent = htmlContent.replace('{esp32WifiMqttBlocksUri}', esp32WifiMqttBlocksUri.toString());
 			htmlContent = htmlContent.replace('{esp32RcBlocksUri}', esp32RcBlocksUri.toString());
 			htmlContent = htmlContent.replace('{blockPacksUri}', blockPacksUri.toString());
+			htmlContent = htmlContent.replace('{blockDesignerUri}', blockDesignerUri.toString());
 			htmlContent = htmlContent.replace(
 				'{blockPacksEnabled}',
 				isBlockPacksEnabled(vscode.workspace.getConfiguration(BLOCK_PACKS_SETTING_SECTION)) ? 'true' : 'false'

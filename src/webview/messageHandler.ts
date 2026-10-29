@@ -16,10 +16,20 @@ import { ArduinoUploader } from '../services/arduinoUploader';
 import {
 	BLOCK_PACKS_SETTING_SECTION,
 	BlockPackService,
+	exportBlockPack,
 	isBlockPacksEnabled,
 	parseInstalledSummaries,
 	readBlockPackFile,
+	writeBlockPackFile,
 } from '../services/blockPackService';
+import {
+	FetchJson,
+	defaultFetchJson,
+	getBlockPackLibraryHeaders,
+	isValidLibraryName,
+	isValidLibraryQuery,
+	searchBlockPackLibraries,
+} from '../services/blockPackLibrarySearch';
 import { ArduinoUploadProgress, ArduinoUploadRequest, getBoardLanguage, MonitorStartResult } from '../types/arduino';
 import { SerialMonitorService } from '../services/serialMonitorService';
 import { ArduinoMonitorService } from '../services/arduinoMonitorService';
@@ -341,6 +351,8 @@ export class WebViewMessageHandler {
 		}
 	>();
 	private readonly unpinnedPlatformWarnings = new Set<string>();
+	/** 積木設計器函式庫搜尋的 HTTP 讀取；測試時替換 */
+	blockPackLibraryFetch: FetchJson = defaultFetchJson;
 
 	/**
 	 * 建立 WebView 訊息處理器
@@ -668,6 +680,15 @@ export class WebViewMessageHandler {
 				case 'confirmBlockPackChange':
 					await this.handleConfirmBlockPackChange(message);
 					break;
+				case 'exportBlockPack':
+					await this.handleExportBlockPack(message);
+					break;
+				case 'searchBlockPackLibraries':
+					await this.handleSearchBlockPackLibraries(message);
+					break;
+				case 'getBlockPackLibraryHeaders':
+					await this.handleGetBlockPackLibraryHeaders(message);
+					break;
 				default:
 					log(`Unhandled message command: ${message.command}`, 'warn');
 					break;
@@ -762,6 +783,101 @@ export class WebViewMessageHandler {
 				? { cancelled: true }
 				: { errors: outcome.errors, sourceName: outcome.sourceName }),
 		});
+	}
+
+	/**
+	 * 匯出積木設計器的分類：驗證後以存檔對話框寫成積木包檔
+	 */
+	private async handleExportBlockPack(message: unknown): Promise<void> {
+		if (
+			!isPlainRecord(message) ||
+			!hasOnlyKeys(message, ['command', 'requestId', 'pack']) ||
+			typeof message.requestId !== 'string' ||
+			!BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(message.requestId)
+		) {
+			log('Rejected malformed exportBlockPack message', 'warn');
+			return;
+		}
+		const requestId = message.requestId;
+		if (!isBlockPacksEnabled(vscodeApi.workspace.getConfiguration(BLOCK_PACKS_SETTING_SECTION))) {
+			await this.panel.webview.postMessage({ command: 'blockPackExported', requestId, cancelled: true });
+			return;
+		}
+		const outcome = await exportBlockPack(message.pack, {
+			pickSaveFile: async defaultName => {
+				const title = await this.localeService.getLocalizedMessage('BLOCK_PACK_EXPORT_TITLE', 'Export block pack');
+				const filterName = await this.localeService.getLocalizedMessage('BLOCK_PACK_FILE_FILTER', 'Block pack');
+				const folder = vscodeApi.workspace.workspaceFolders?.[0]?.uri;
+				const uri = await vscodeApi.window.showSaveDialog({
+					title,
+					filters: { [filterName]: ['json'] },
+					...(folder ? { defaultUri: vscodeApi.Uri.joinPath(folder, defaultName) } : {}),
+				});
+				return uri?.fsPath;
+			},
+			writeFile: writeBlockPackFile,
+		});
+		await this.panel.webview.postMessage({
+			command: 'blockPackExported',
+			requestId,
+			...(outcome.kind === 'saved'
+				? { fileName: outcome.fileName }
+				: outcome.kind === 'rejected'
+					? { errors: outcome.errors }
+					: { cancelled: true }),
+		});
+	}
+
+	/**
+	 * 積木設計器搜尋 PlatformIO 函式庫；只在實驗設定開啟時連線
+	 */
+	private async handleSearchBlockPackLibraries(message: unknown): Promise<void> {
+		if (
+			!isPlainRecord(message) ||
+			!hasOnlyKeys(message, ['command', 'requestId', 'query']) ||
+			typeof message.requestId !== 'string' ||
+			!BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(message.requestId) ||
+			!isValidLibraryQuery(message.query)
+		) {
+			log('Rejected malformed searchBlockPackLibraries message', 'warn');
+			return;
+		}
+		if (!isBlockPacksEnabled(vscodeApi.workspace.getConfiguration(BLOCK_PACKS_SETTING_SECTION))) {
+			await this.panel.webview.postMessage({ command: 'blockPackLibraryResults', requestId: message.requestId, items: [], failed: true });
+			return;
+		}
+		try {
+			const items = await searchBlockPackLibraries(message.query, this.blockPackLibraryFetch);
+			await this.panel.webview.postMessage({ command: 'blockPackLibraryResults', requestId: message.requestId, items });
+		} catch (error) {
+			log('Block pack library search failed', 'warn', { error: String(error) });
+			await this.panel.webview.postMessage({ command: 'blockPackLibraryResults', requestId: message.requestId, items: [], failed: true });
+		}
+	}
+
+	/**
+	 * 取得函式庫的標頭檔，讓設計器自動填入 #include
+	 */
+	private async handleGetBlockPackLibraryHeaders(message: unknown): Promise<void> {
+		if (
+			!isPlainRecord(message) ||
+			!hasOnlyKeys(message, ['command', 'requestId', 'owner', 'name']) ||
+			typeof message.requestId !== 'string' ||
+			!BLOCKLY_DIALOG_REQUEST_ID_PATTERN.test(message.requestId) ||
+			!isValidLibraryName(message.owner, message.name)
+		) {
+			log('Rejected malformed getBlockPackLibraryHeaders message', 'warn');
+			return;
+		}
+		let headers: string[] = [];
+		if (isBlockPacksEnabled(vscodeApi.workspace.getConfiguration(BLOCK_PACKS_SETTING_SECTION))) {
+			try {
+				headers = await getBlockPackLibraryHeaders(message.owner as string, message.name as string, this.blockPackLibraryFetch);
+			} catch (error) {
+				log('Block pack library headers request failed', 'warn', { error: String(error) });
+			}
+		}
+		await this.panel.webview.postMessage({ command: 'blockPackLibraryHeaders', requestId: message.requestId, headers });
 	}
 
 	/**

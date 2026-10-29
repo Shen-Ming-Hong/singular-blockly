@@ -5126,6 +5126,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			case 'blockPackChangeConfirmed':
 				blockPackManager.handleMessage(message);
 				break;
+			case 'blockPackLibraryResults':
+			case 'blockPackLibraryHeaders':
+			case 'blockPackExported':
+				window.blockDesigner?.handleMessage(message);
+				break;
 		case 'confirmDialogResult':
 				// 處理從VSCode傳回的確認對話框結果
 				if (message.confirmId !== undefined) {
@@ -8036,6 +8041,7 @@ const blockPackManager = {
 			if (event.key === 'Escape') this.close();
 		});
 		document.getElementById('blockPackImportButton').addEventListener('click', () => this.requestImport());
+		document.getElementById('blockPackDesignButton')?.addEventListener('click', () => this.openDesigner(null));
 		document.getElementById('blockPackConfirmButton').addEventListener('click', () => this.confirmPreview());
 		document.getElementById('blockPackCancelButton').addEventListener('click', () => this.cancelPreview());
 		window.addEventListener('blockPacksLoaded', event => this.onPacksLoaded(event.detail && event.detail.workspace));
@@ -8060,6 +8066,7 @@ const blockPackManager = {
 			'A block pack adds blocks for a sensor or module, made by a teacher or the community. It is saved in this project, so anyone who opens the project gets the same blocks. Block packs work on ESP32 DevKit.'
 		);
 		setText('blockPackImportButton', 'BLOCK_PACK_IMPORT', 'Import block pack…');
+		setText('blockPackDesignButton', 'BLOCK_DESIGNER_NEW', 'Design new blocks');
 		setText('blockPackInstalledTitle', 'BLOCK_PACK_INSTALLED', 'In this project');
 		setText('blockPackEmpty', 'BLOCK_PACK_EMPTY', 'No block packs yet.');
 		setText('blockPackPreviewCodeTitle', 'BLOCK_PACK_CODE_TITLE', 'Code it generates (with default values)');
@@ -8083,7 +8090,14 @@ const blockPackManager = {
 		this.showListView();
 		this.renderList();
 		document.getElementById('blockPackModal').style.display = 'block';
-		document.getElementById('blockPackImportButton').focus();
+		(document.getElementById('blockPackDesignButton') || document.getElementById('blockPackImportButton')).focus();
+	},
+
+	/** 關閉積木包清單並開啟圖形化設計器；pack 為 null 時建立新分類 */
+	openDesigner(pack) {
+		if (!window.blockDesigner) return;
+		this.close();
+		window.blockDesigner.open(pack);
 	},
 
 	close() {
@@ -8117,7 +8131,8 @@ const blockPackManager = {
 		for (const pack of packs) {
 			const item = document.createElement('li');
 			item.className = 'block-pack-item';
-			item.style.borderLeftColor = `hsl(${Number(pack.category?.colour) || 0}, 45%, 55%)`;
+			const colour = window.blockPacks.packColour(pack);
+			item.style.borderLeftColor = typeof colour === 'string' ? colour : `hsl(${colour}, 45%, 55%)`;
 			const info = document.createElement('div');
 			info.className = 'block-pack-item-info';
 			const name = document.createElement('div');
@@ -8139,7 +8154,16 @@ const blockPackManager = {
 			remove.className = 'block-pack-remove';
 			remove.textContent = formatBlockPackMessage('BLOCK_PACK_REMOVE', 'Remove');
 			remove.addEventListener('click', () => this.requestRemove(pack));
-			item.append(info, remove);
+			item.append(info);
+			if (pack.designer && window.blockDesigner) {
+				const edit = document.createElement('button');
+				edit.type = 'button';
+				edit.className = 'block-pack-secondary';
+				edit.textContent = formatBlockPackMessage('BLOCK_DESIGNER_EDIT', 'Edit');
+				edit.addEventListener('click', () => this.openDesigner(pack));
+				item.append(edit);
+			}
+			item.append(remove);
 			list.appendChild(item);
 		}
 	},

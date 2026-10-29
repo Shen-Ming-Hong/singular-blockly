@@ -578,7 +578,8 @@
                 <section id="blockPackListView" class="block-pack-view">
                     <p id="blockPackIntro" class="block-pack-description"></p>
                     <div class="block-pack-actions">
-                        <button id="blockPackImportButton" class="block-pack-primary" type="button"></button>
+                        <button id="blockPackDesignButton" class="block-pack-primary" type="button"></button>
+                        <button id="blockPackImportButton" class="block-pack-secondary" type="button"></button>
                     </div>
                     <div id="blockPackErrors" class="block-pack-errors" role="alert" hidden></div>
                     <h3 id="blockPackInstalledTitle" class="block-pack-subtitle"></h3>
@@ -597,6 +598,78 @@
                         <button id="blockPackCancelButton" class="block-pack-secondary" type="button"></button>
                     </div>
                 </section>
+            </div>
+        </div>
+    </div>
+    <!-- 積木設計器（073） -->
+    <div id="blockDesignerModal" class="modal block-designer-modal" style="display: none;">
+        <div class="modal-content block-designer-content" role="dialog" aria-modal="true"
+            aria-labelledby="blockDesignerTitle">
+            <div class="modal-header block-designer-header">
+                <h2 id="blockDesignerTitle"></h2>
+                <label class="block-designer-field" for="blockDesignerCategoryName">
+                    <span id="blockDesignerCategoryLabel"></span>
+                    <input id="blockDesignerCategoryName" type="text" maxlength="40">
+                </label>
+                <label class="block-designer-field" for="blockDesignerColour">
+                    <span id="blockDesignerColourLabel"></span>
+                    <input id="blockDesignerColour" type="color" class="block-designer-swatch">
+                </label>
+                <span class="modal-close" id="blockDesignerClose" role="button" tabindex="0">&times;</span>
+            </div>
+            <div class="block-designer-body">
+                <aside class="block-designer-list">
+                    <h3 id="blockDesignerBlocksTitle" class="block-designer-pane-title"></h3>
+                    <ul id="blockDesignerBlockList"></ul>
+                    <button id="blockDesignerAddBlock" class="block-pack-secondary" type="button"></button>
+                </aside>
+                <section class="block-designer-canvas">
+                    <h3 id="blockDesignerShapeTitle" class="block-designer-pane-title"></h3>
+                    <div class="block-designer-shape-row">
+                        <span id="blockDesignerShapePickerTitle" class="block-designer-shape-title"></span>
+                        <div id="blockDesignerShapes" class="block-designer-shapes" role="radiogroup"
+                            aria-labelledby="blockDesignerShapePickerTitle"></div>
+                    </div>
+                    <div id="blockDesignerWorkspace"></div>
+                </section>
+                <section class="block-designer-side">
+                    <h3 id="blockDesignerPreviewTitle" class="block-designer-pane-title"></h3>
+                    <div id="blockDesignerPreview"></div>
+                    <h3 id="blockDesignerCodeTitle" class="block-designer-pane-title"></h3>
+                    <div class="block-designer-code">
+                        <pre id="blockDesignerCodeHead"></pre>
+                        <textarea id="blockDesignerBody" spellcheck="false" aria-labelledby="blockDesignerCodeTitle"></textarea>
+                        <pre id="blockDesignerCodeTail">}</pre>
+                    </div>
+                    <p id="blockDesignerCall" class="block-designer-call"></p>
+                    <div id="blockDesignerProblems" class="block-pack-errors" role="status" hidden></div>
+                    <details id="blockDesignerAdvanced" class="block-designer-advanced">
+                        <summary id="blockDesignerAdvancedTitle"></summary>
+                        <p id="blockDesignerLibHelp" class="block-designer-help"></p>
+                        <div class="block-designer-lib-search">
+                            <input id="blockDesignerLibQuery" type="search" spellcheck="false" maxlength="80"
+                                aria-labelledby="blockDesignerLibSearch">
+                            <button id="blockDesignerLibSearch" class="block-pack-secondary" type="button"></button>
+                        </div>
+                        <p id="blockDesignerLibStatus" class="block-designer-help" role="status"></p>
+                        <ul id="blockDesignerLibResults" class="block-designer-lib-results"></ul>
+                        <label for="blockDesignerIncludes" id="blockDesignerIncludesLabel"></label>
+                        <input id="blockDesignerIncludes" type="text" spellcheck="false" placeholder="DHT.h">
+                        <label for="blockDesignerLibDeps" id="blockDesignerLibDepsLabel"></label>
+                        <textarea id="blockDesignerLibDeps" rows="2" spellcheck="false"
+                            placeholder="adafruit/DHT sensor library@^1.4.6"></textarea>
+                        <label for="blockDesignerGlobals" id="blockDesignerGlobalsLabel"></label>
+                        <textarea id="blockDesignerGlobals" rows="3" spellcheck="false"></textarea>
+                        <label for="blockDesignerSetup" id="blockDesignerSetupLabel"></label>
+                        <textarea id="blockDesignerSetup" rows="2" spellcheck="false"></textarea>
+                    </details>
+                </section>
+            </div>
+            <div class="block-designer-footer">
+                <button id="blockDesignerExport" class="block-pack-secondary" type="button"></button>
+                <span class="block-designer-spacer"></span>
+                <button id="blockDesignerCancel" class="block-pack-secondary" type="button"></button>
+                <button id="blockDesignerSave" class="block-pack-primary" type="button"></button>
             </div>
         </div>
     </div>
@@ -798,6 +871,7 @@
     <script src="{cyberbrickOtaProvisioningStateUri}"></script>
     <script src="{jsUri}"></script>
     <script src="{experimentalMarkerUri}"></script>
+    <script src="{blockDesignerUri}"></script>
 
     <!-- TXT I/O Test Panel Dialog -->
     <dialog id="txtTestPanelDialog">

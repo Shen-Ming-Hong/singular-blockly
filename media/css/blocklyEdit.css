@@ -3153,6 +3153,9 @@ body.preview-mode .txt-preview-canvas,
 .sample-modal-content .modal-body,
 .block-pack-modal-content .modal-body,
 .block-pack-code,
+.block-designer-list,
+.block-designer-side,
+.block-designer-body,
 #functionSearchModal,
 .search-history-container,
 .blocklyWidgetDiv .blocklyContextMenu,
@@ -3177,6 +3180,9 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
 .sample-modal-content .modal-body::-webkit-scrollbar,
 .block-pack-modal-content .modal-body::-webkit-scrollbar,
 .block-pack-code::-webkit-scrollbar,
+.block-designer-list::-webkit-scrollbar,
+.block-designer-side::-webkit-scrollbar,
+.block-designer-body::-webkit-scrollbar,
 #functionSearchModal::-webkit-scrollbar,
 .search-history-container::-webkit-scrollbar,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar,
@@ -3201,6 +3207,9 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
 .sample-modal-content .modal-body::-webkit-scrollbar-track,
 .block-pack-modal-content .modal-body::-webkit-scrollbar-track,
 .block-pack-code::-webkit-scrollbar-track,
+.block-designer-list::-webkit-scrollbar-track,
+.block-designer-side::-webkit-scrollbar-track,
+.block-designer-body::-webkit-scrollbar-track,
 #functionSearchModal::-webkit-scrollbar-track,
 .search-history-container::-webkit-scrollbar-track,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-track,
@@ -3227,6 +3236,9 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
 .sample-modal-content .modal-body::-webkit-scrollbar-thumb,
 .block-pack-modal-content .modal-body::-webkit-scrollbar-thumb,
 .block-pack-code::-webkit-scrollbar-thumb,
+.block-designer-list::-webkit-scrollbar-thumb,
+.block-designer-side::-webkit-scrollbar-thumb,
+.block-designer-body::-webkit-scrollbar-thumb,
 #functionSearchModal::-webkit-scrollbar-thumb,
 .search-history-container::-webkit-scrollbar-thumb,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb,
@@ -3253,6 +3265,9 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
 .sample-modal-content .modal-body::-webkit-scrollbar-thumb:hover,
 .block-pack-modal-content .modal-body::-webkit-scrollbar-thumb:hover,
 .block-pack-code::-webkit-scrollbar-thumb:hover,
+.block-designer-list::-webkit-scrollbar-thumb:hover,
+.block-designer-side::-webkit-scrollbar-thumb:hover,
+.block-designer-body::-webkit-scrollbar-thumb:hover,
 #functionSearchModal::-webkit-scrollbar-thumb:hover,
 .search-history-container::-webkit-scrollbar-thumb:hover,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb:hover,
@@ -3275,6 +3290,9 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 .sample-modal-content .modal-body::-webkit-scrollbar-corner,
 .block-pack-modal-content .modal-body::-webkit-scrollbar-corner,
 .block-pack-code::-webkit-scrollbar-corner,
+.block-designer-list::-webkit-scrollbar-corner,
+.block-designer-side::-webkit-scrollbar-corner,
+.block-designer-body::-webkit-scrollbar-corner,
 #functionSearchModal::-webkit-scrollbar-corner,
 .search-history-container::-webkit-scrollbar-corner,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-corner,
@@ -3900,4 +3918,442 @@ body.theme-dark .toast.info {
 	font-family: var(--vscode-editor-font-family, monospace);
 	font-size: 0.85rem;
 	white-space: pre;
+}
+
+/* ===== 積木設計器（073） ===== */
+.block-designer-content {
+	width: min(1280px, calc(100vw - 32px));
+	max-width: none;
+	height: calc(100vh - 48px);
+	margin: 24px auto;
+	display: flex;
+	flex-direction: column;
+	animation: none;
+}
+
+.block-designer-header {
+	gap: 16px;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+.block-designer-header h2 {
+	margin-right: 8px;
+}
+
+.block-designer-header .modal-close {
+	margin-left: auto;
+}
+
+.block-designer-field {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 0.9rem;
+	color: var(--editor-description-fg);
+}
+
+.block-designer-field input[type='text'] {
+	width: 180px;
+	padding: 4px 8px;
+	border-radius: 4px;
+	border: 1px solid var(--editor-field-border);
+	background-color: var(--editor-field-bg);
+	color: var(--editor-field-fg);
+	font-size: 0.95rem;
+}
+
+.block-designer-field input[type='range'] {
+	width: 140px;
+}
+
+.block-designer-swatch {
+	width: 36px;
+	height: 28px;
+	padding: 2px;
+	border-radius: 4px;
+	border: 1px solid var(--editor-field-border);
+	background-color: var(--editor-field-bg);
+	cursor: pointer;
+}
+
+.block-designer-swatch:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.block-designer-body {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: 200px minmax(0, 1fr) minmax(320px, 400px);
+}
+
+.block-designer-list,
+.block-designer-canvas,
+.block-designer-side {
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 12px 14px;
+}
+
+.block-designer-list {
+	border-right: 1px solid var(--editor-surface-border);
+	overflow-y: auto;
+}
+
+.block-designer-side {
+	border-left: 1px solid var(--editor-surface-border);
+	overflow-y: auto;
+}
+
+.block-designer-pane-title {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--editor-surface-fg);
+}
+
+#blockDesignerBlockList {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+#blockDesignerBlockList li {
+	display: flex;
+	align-items: stretch;
+	gap: 4px;
+}
+
+.block-designer-list-item {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 8px 10px;
+	text-align: left;
+	border-radius: 6px;
+	border: 1px solid var(--editor-card-border);
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+	cursor: pointer;
+}
+
+.block-designer-list-item[aria-current='true'] {
+	border-color: var(--editor-primary-action-border);
+	box-shadow: inset 3px 0 0 var(--editor-primary-action-bg);
+}
+
+.block-designer-list-name {
+	font-size: 0.9rem;
+	overflow-wrap: anywhere;
+}
+
+.block-designer-list-fn {
+	font-size: 0.8rem;
+	color: var(--editor-description-fg);
+	font-family: var(--vscode-editor-font-family, monospace);
+}
+
+.block-designer-list-remove {
+	width: 28px;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--editor-description-fg);
+	font-size: 1.1rem;
+	cursor: pointer;
+}
+
+.block-designer-list-remove:hover {
+	color: var(--editor-status-error-fg);
+	border-color: var(--editor-card-border);
+}
+
+#blockDesignerWorkspace {
+	flex: 1;
+	min-height: 240px;
+	border: 1px solid var(--editor-card-border);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+#blockDesignerPreview {
+	height: 110px;
+	flex: none;
+	border: 1px solid var(--editor-card-border);
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.block-designer-code {
+	display: flex;
+	flex-direction: column;
+	border-radius: 6px;
+	overflow: hidden;
+	border: 1px solid var(--txt-virtual-controls-code-border);
+	background-color: var(--txt-virtual-controls-code-bg);
+	color: var(--txt-virtual-controls-code-fg);
+	font-family: var(--vscode-editor-font-family, monospace);
+	font-size: 0.85rem;
+}
+
+.block-designer-code pre {
+	margin: 0;
+	padding: 6px 10px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	opacity: 0.7;
+	user-select: text;
+}
+
+.block-designer-code textarea {
+	min-height: 160px;
+	resize: vertical;
+	margin: 0 6px;
+	padding: 6px 8px;
+	border: 1px solid var(--editor-field-border);
+	border-radius: 4px;
+	background-color: var(--editor-field-bg);
+	color: var(--editor-field-fg);
+	font: inherit;
+	line-height: 1.5;
+	tab-size: 2;
+}
+
+.block-designer-call {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--editor-description-fg);
+	font-family: var(--vscode-editor-font-family, monospace);
+	overflow-wrap: anywhere;
+}
+
+.block-designer-advanced {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	font-size: 0.9rem;
+}
+
+.block-designer-advanced summary {
+	cursor: pointer;
+	font-weight: 600;
+	color: var(--editor-surface-fg);
+}
+
+.block-designer-advanced[open] {
+	display: flex;
+}
+
+.block-designer-advanced label {
+	display: block;
+	margin-top: 8px;
+	color: var(--editor-description-fg);
+}
+
+.block-designer-advanced input,
+.block-designer-advanced textarea {
+	width: 100%;
+	box-sizing: border-box;
+	margin-top: 4px;
+	padding: 4px 8px;
+	border-radius: 4px;
+	border: 1px solid var(--editor-field-border);
+	background-color: var(--editor-field-bg);
+	color: var(--editor-field-fg);
+	font-family: var(--vscode-editor-font-family, monospace);
+	font-size: 0.85rem;
+}
+
+.block-designer-footer {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 20px;
+	border-top: 1px solid var(--editor-surface-border);
+}
+
+.block-designer-spacer {
+	flex: 1;
+}
+
+.block-designer-footer button:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.block-designer-list-item:focus-visible,
+.block-designer-list-remove:focus-visible,
+.block-designer-advanced summary:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+	.block-designer-body {
+		grid-template-columns: minmax(0, 1fr);
+		/* 窄螢幕改成上下排列，每一區依內容高度展開，由整個本體捲動 */
+		grid-auto-rows: max-content;
+		overflow-y: auto;
+	}
+
+	.block-designer-list,
+	.block-designer-side {
+		border: 0;
+		border-top: 1px solid var(--editor-surface-border);
+	}
+
+	#blockDesignerWorkspace {
+		min-height: 320px;
+	}
+}
+
+.block-designer-shape-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.block-designer-shape-title {
+	font-size: 0.9rem;
+	color: var(--editor-description-fg);
+}
+
+.block-designer-shapes {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.block-designer-shape {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 10px 6px;
+	border-radius: 6px;
+	border: 1px solid var(--editor-card-border);
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+	cursor: pointer;
+}
+
+.block-designer-shape svg {
+	width: 84px;
+	height: 38px;
+}
+
+.block-designer-shape text {
+	fill: #ffffff;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.block-designer-shape-label {
+	font-size: 0.8rem;
+}
+
+.block-designer-shape:hover {
+	border-color: var(--editor-card-hover-border);
+}
+
+.block-designer-shape[aria-checked='true'] {
+	border-color: var(--editor-primary-action-border);
+	background-color: var(--editor-notice-bg);
+	box-shadow: 0 0 0 2px var(--editor-primary-action-border);
+}
+
+.block-designer-shape:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+.block-designer-help {
+	margin: 4px 0 0;
+	font-size: 0.85rem;
+	line-height: 1.5;
+	color: var(--editor-description-fg);
+}
+
+.block-designer-help:empty {
+	display: none;
+}
+
+.block-designer-lib-search {
+	display: flex;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+.block-designer-lib-search input {
+	flex: 1;
+	min-width: 0;
+	margin-top: 0;
+}
+
+.block-designer-lib-results {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.block-designer-lib-results li {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 8px;
+	border-radius: 6px;
+	border: 1px solid var(--editor-card-border);
+	background-color: var(--editor-card-bg);
+	color: var(--editor-card-fg);
+}
+
+.block-designer-lib-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.block-designer-lib-name {
+	font-weight: 600;
+	font-size: 0.85rem;
+	overflow-wrap: anywhere;
+}
+
+.block-designer-lib-description {
+	font-size: 0.8rem;
+	color: var(--editor-description-fg);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.block-designer-lib-results button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+.block-designer-list-chip {
+	display: inline-block;
+	padding: 0 6px;
+	border-radius: 4px;
+	border: 1px solid var(--editor-card-border);
+	background-color: var(--editor-field-bg);
+	color: var(--editor-description-fg);
+	font-family: var(--vscode-editor-font-family, monospace);
+	font-size: 0.78rem;
+	line-height: 1.5;
 }

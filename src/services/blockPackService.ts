@@ -7,7 +7,7 @@
 import * as path from 'path';
 import { FileService } from './fileService';
 import { log } from './logging';
-import { blockPackLibDeps, BLOCK_PACK_MAX_BYTES, parseBlockPack } from './blockPackValidator';
+import { blockPackLibDeps, BLOCK_PACK_MAX_BYTES, parseBlockPack, validateBlockPack } from './blockPackValidator';
 import type { BlockPack, BlockPackError } from '../types/blockPack';
 
 /** WebView 告知目前專案已匯入的積木包 */
@@ -43,6 +43,41 @@ export interface BlockPackServiceDeps {
 	readFile(filePath: string): Promise<Buffer>;
 	isWorkspaceTrusted(): boolean;
 	confirmLibDeps(pack: BlockPack, libDeps: string[]): Promise<boolean>;
+}
+
+export type BlockPackExportOutcome =
+	| { kind: 'saved'; fileName: string }
+	| { kind: 'rejected'; errors: BlockPackError[] }
+	| { kind: 'cancelled' };
+
+/** 匯出積木包的外部相依：存檔對話框與寫檔 */
+export interface BlockPackExportDeps {
+	pickSaveFile(defaultName: string): Promise<string | undefined>;
+	writeFile(filePath: string, content: string): Promise<void>;
+}
+
+/** 透過 FileService 寫入使用者選擇的匯出位置（以檔案所在資料夾為根目錄） */
+export async function writeBlockPackFile(filePath: string, content: string): Promise<void> {
+	await new FileService(path.dirname(filePath)).writeFile(path.basename(filePath), content);
+}
+
+/**
+ * 積木設計器的匯出：先用與匯入相同的驗證器檢查，通過才讓使用者選位置並寫檔，
+ * 確保匯出的檔案一定能被匯入流程接受。
+ */
+export async function exportBlockPack(value: unknown, deps: BlockPackExportDeps): Promise<BlockPackExportOutcome> {
+	const result = validateBlockPack(value);
+	if (!result.ok) {
+		log('Rejected block pack export', 'info', { errors: result.errors });
+		return { kind: 'rejected', errors: result.errors };
+	}
+	const filePath = await deps.pickSaveFile(`${result.pack.id}.sbpack.json`);
+	if (!filePath) {
+		return { kind: 'cancelled' };
+	}
+	await deps.writeFile(filePath, `${JSON.stringify(result.pack, null, 2)}\n`);
+	log('Exported block pack', 'info', { id: result.pack.id, version: result.pack.version });
+	return { kind: 'saved', fileName: path.basename(filePath) };
 }
 
 /** 透過 FileService 讀取使用者選擇的檔案（以檔案所在資料夾為根目錄） */

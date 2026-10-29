@@ -1,6 +1,6 @@
 # ESP32 積木包
 
-> 整合自 specs/072-esp32-block-packs
+> 整合自 specs/072-esp32-block-packs、specs/073-block-designer
 
 ## 概述
 
@@ -18,6 +18,19 @@
 2. Extension Host 讀檔（256 KB 上限）並驗證；含 `libDeps` 的積木包需要受信任的工作區，且會跳出確認框列出要下載的函式庫。
 3. WebView 顯示預覽：積木外觀、產生的 C++、函式庫清單與版本變化，確認後才寫入專案。
 4. 積木包分類出現在工具箱「函式」之前，分類名稱用積木包自己的名稱。
+
+## 積木設計器（073）
+
+積木包視窗的主要入口是「設計新積木」，匯入改為分享用途。
+
+1. **拼外觀**：用零件（文字、腳位、數字、文字欄位、選單、接積木的插槽、內層積木）由左到右拼出積木；積木形狀用圖形點選（執行動作、回傳數字、回傳真假、回傳文字），形狀取自 Blockly 實際渲染結果；顏色用色塊開啟完整調色盤，存成 `#rrggbb`。
+2. **填函式**：設計器依形狀與零件產生函式開頭（回傳型別、名稱、參數），使用者只寫函式本體；改零件時只重產開頭，本體保留。插槽可設預設值，工具箱中的積木會帶著對應的預設積木。
+3. **檢查**：回傳值基本檢查（缺 return、空 return、只做動作卻回傳值、型別明顯不符）、函式名稱重複、函式庫格式；有問題時不能儲存。本體引用已刪除的參數時提醒。
+4. **函式庫**：在進階區搜尋 PlatformIO Registry（只連 `api.registry.platformio.org`，限 ESP32 Arduino，最多 10 筆），按「加入」寫入 `libDeps` 並自動填入標頭檔。
+5. **儲存與分享**：存成專案內的積木包（含 `designer` 區段保存設計與本體），工具箱立即更新；「匯出積木包」先經同一驗證器檢查，再以存檔對話框寫成 `.sbpack.json`。
+6. **既有積木**：刪除插槽後，專案中舊積木接在該插槽上的積木改放到工作區頂層，不會讓載入失敗；刪除整個積木時沿用移除確認與佔位積木。
+
+沒有 `designer` 區段的手寫積木包不顯示編輯按鈕，只能整包更新或移除。
 
 ## 儲存格式
 
@@ -43,6 +56,6 @@
 ## 相關檔案
 
 - `src/services/blockPackValidator.ts`、`src/services/blockPackService.ts`、`src/types/blockPack.ts`
-- `media/blockly/blockPacks.js`、`media/js/blocklyEdit.js`（`blockPackManager`）
+- `media/blockly/blockPacks.js`、`media/js/blocklyEdit.js`（`blockPackManager`）、`media/js/blockDesigner.js`（設計器）、`src/services/blockPackLibrarySearch.ts`
 - `media/schemas/block-pack.schema.json`、`resources/block-pack-examples/`
 - 產品 Skill：`resources/project-skills/singular-blockly/canonical/references/block-packs.md`
