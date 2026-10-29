@@ -169,14 +169,42 @@
 			'value',
 			block => {
 				nameField(block, t('BLOCK_DESIGNER_PIECE_VALUE', 'slot for a block'), 'value');
-				block.inputList[0].appendField(
-					new Blockly.FieldDropdown(() => [
-						[t('BLOCK_DESIGNER_TYPE_NUMBER', 'number'), 'Number'],
-						[t('BLOCK_DESIGNER_TYPE_BOOLEAN', 'true/false'), 'Boolean'],
-						[t('BLOCK_DESIGNER_TYPE_STRING', 'text'), 'String'],
-					]),
+				const input = block.inputList[0];
+				// 預設值欄位依資料型別切換：數字輸入框、真假選單、文字輸入框
+				const setDefaultField = check => {
+					const previous = block.getField('DEFAULT');
+					const old = previous ? previous.getValue() : null;
+					if (previous) input.removeField('DEFAULT');
+					let field;
+					if (check === 'Boolean') {
+						field = new Blockly.FieldDropdown(() => [
+							[t('BLOCK_DESIGNER_TRUE', 'true'), 'true'],
+							[t('BLOCK_DESIGNER_FALSE', 'false'), 'false'],
+						]);
+						if (old === 'false') field.setValue('false');
+					} else if (check === 'String') {
+						field = new Blockly.FieldTextInput(typeof old === 'string' && !/^(true|false)$/.test(old) ? old : '');
+					} else {
+						field = new Blockly.FieldNumber(Number.isFinite(Number(old)) && old !== 'true' && old !== 'false' ? Number(old) : 0);
+					}
+					input.appendField(field, 'DEFAULT');
+				};
+				input.appendField(
+					new Blockly.FieldDropdown(
+						() => [
+							[t('BLOCK_DESIGNER_TYPE_NUMBER', 'number'), 'Number'],
+							[t('BLOCK_DESIGNER_TYPE_BOOLEAN', 'true/false'), 'Boolean'],
+							[t('BLOCK_DESIGNER_TYPE_STRING', 'text'), 'String'],
+						],
+						check => {
+							if (check !== block.getFieldValue('CHECK')) setDefaultField(check);
+							return check;
+						}
+					),
 					'CHECK'
 				);
+				input.appendField(t('BLOCK_DESIGNER_DEFAULT', 'default'));
+				setDefaultField('Number');
 			},
 			'BLOCK_DESIGNER_PIECE_VALUE_TOOLTIP',
 			'A slot where students plug in another block, such as a number or a variable.'
@@ -314,7 +342,11 @@
 				}
 				case 'bd_value': {
 					const check = piece.getFieldValue('CHECK');
+					const value = piece.getFieldValue('DEFAULT');
 					input = { name: inputName, kind: 'value', check };
+					if (check === 'Number') input.default = Number(value) || 0;
+					else if (check === 'Boolean') input.default = value === 'false' ? 'false' : 'true';
+					else input.default = String(value ?? '');
 					type = { Number: 'float', Boolean: 'bool', String: 'String' }[check];
 					break;
 				}
@@ -362,6 +394,25 @@
 		};
 		if (shape !== 'statement') block.output = shape;
 		return { block, template, signature: `${returnType} ${functionName}(${params.join(', ')})`, returnType, notes, problems, paramNames };
+	}
+
+	/** 積木清單中顯示積木文字，輸入欄位以參數名稱的小標籤表示 */
+	function fillLabel(element, compiled) {
+		element.textContent = '';
+		const parts = compiled.block.label.split(/(\{[A-Z0-9_]+\})/).filter(part => part.trim());
+		for (const part of parts) {
+			const match = /^\{([A-Z0-9_]+)\}$/.exec(part);
+			if (match) {
+				const chip = document.createElement('span');
+				chip.className = 'block-designer-list-chip';
+				chip.textContent = compiled.paramNames[match[1]] || match[1];
+				element.append(chip);
+			} else {
+				element.append(document.createTextNode(part.trim()));
+			}
+			element.append(' ');
+		}
+		if (!parts.length) element.textContent = compiled.block.name;
 	}
 
 	function defaultBody(returnType) {
@@ -838,7 +889,8 @@
 				button.setAttribute('aria-current', index === this.selected ? 'true' : 'false');
 				const name = document.createElement('span');
 				name.className = 'block-designer-list-name';
-				name.textContent = entry ? entry.block.label.replace(/\{[A-Z0-9_]+\}/g, '▢') || entry.block.name : '?';
+				if (entry) fillLabel(name, entry);
+				else name.textContent = '?';
 				const fn = document.createElement('span');
 				fn.className = 'block-designer-list-fn';
 				fn.textContent = entry ? `${entry.signature.split('(')[0].split(' ').pop()}()` : '';
@@ -996,10 +1048,9 @@
 			const [category] = window.blockPacks.toolboxCategories([pack]);
 			const item = category.contents[this.selected];
 			if (item && Blockly.Blocks[item.type]) {
-				const block = this.previewWorkspace.newBlock(item.type);
-				for (const [field, value] of Object.entries(item.fields || {})) block.setFieldValue(value, field);
-				block.initSvg();
-				block.render();
+				// 與工具箱相同：腳位預設值與插槽中的預設積木
+				const { kind, ...state } = item;
+				const block = Blockly.serialization.blocks.append(state, this.previewWorkspace);
 				// 積木比預覽框寬時縮小到放得下
 				const width = block.getHeightWidth().width;
 				const available = this.previewWorkspace.getParentSvg().clientWidth - 32;
@@ -1015,7 +1066,7 @@
 			const fns = document.querySelectorAll('#blockDesignerBlockList .block-designer-list-fn');
 			compiledList.forEach((compiled, index) => {
 				if (!compiled || !names[index]) return;
-				names[index].textContent = compiled.block.label.replace(/\{[A-Z0-9_]+\}/g, '▢') || compiled.block.name;
+				fillLabel(names[index], compiled);
 				fns[index].textContent = `${compiled.signature.split('(')[0].split(' ').pop()}()`;
 			});
 		},

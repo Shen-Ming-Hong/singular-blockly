@@ -4325,3 +4325,15 @@ body.theme-dark .toast.info {
 	opacity: 0.6;
 	cursor: default;
 }
+
+.block-designer-list-chip {
+	display: inline-block;
+	padding: 0 6px;
+	border-radius: 4px;
+	border: 1px solid var(--editor-card-border);
+	background-color: var(--editor-field-bg);
+	color: var(--editor-description-fg);
+	font-family: var(--vscode-editor-font-family, monospace);
+	font-size: 0.78rem;
+	line-height: 1.5;
+}

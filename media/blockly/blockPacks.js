@@ -217,6 +217,7 @@
 
 	function fallbackValue(input) {
 		if (input.default === undefined) return FALLBACK_VALUES[input.check] || '0';
+		if (input.check === 'Boolean') return input.default === 'false' ? 'false' : 'true';
 		return typeof input.default === 'number' ? String(input.default) : cppString(input.default);
 	}
 
@@ -591,10 +592,14 @@
 		const inputs = {};
 		for (const input of packBlock.inputs || []) {
 			if (input.kind !== 'value' || input.default === undefined) continue;
-			inputs[input.name] =
-				typeof input.default === 'number'
-					? { shadow: { type: 'math_number', fields: { NUM: input.default } } }
-					: { shadow: { type: 'text', fields: { TEXT: String(input.default) } } };
+			if (input.check === 'Boolean') {
+				inputs[input.name] = { shadow: { type: 'logic_boolean', fields: { BOOL: input.default === 'false' ? 'FALSE' : 'TRUE' } } };
+			} else {
+				inputs[input.name] =
+					typeof input.default === 'number'
+						? { shadow: { type: 'math_number', fields: { NUM: input.default } } }
+						: { shadow: { type: 'text', fields: { TEXT: String(input.default) } } };
+			}
 		}
 		if (Object.keys(inputs).length > 0) item.inputs = inputs;
 		return item;

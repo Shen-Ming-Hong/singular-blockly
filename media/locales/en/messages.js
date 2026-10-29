@@ -1575,4 +1575,6 @@ window.languageManager.loadMessages('en', {
 	BLOCK_DESIGNER_TYPE_BOOLEAN: "true/false",
 	BLOCK_DESIGNER_TYPE_NUMBER: "number",
 	BLOCK_DESIGNER_TYPE_STRING: "text",
+	BLOCK_DESIGNER_TRUE: "true",
+	BLOCK_DESIGNER_FALSE: "false",
 });

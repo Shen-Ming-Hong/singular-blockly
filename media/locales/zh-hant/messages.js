@@ -1554,4 +1554,6 @@ window.languageManager.loadMessages('zh-hant', {
 	BLOCK_DESIGNER_TYPE_BOOLEAN: "真假",
 	BLOCK_DESIGNER_TYPE_NUMBER: "數字",
 	BLOCK_DESIGNER_TYPE_STRING: "文字",
+	BLOCK_DESIGNER_TRUE: "真",
+	BLOCK_DESIGNER_FALSE: "假",
 });
