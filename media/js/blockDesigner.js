@@ -354,6 +354,48 @@
 		return returns[returnType] ? `${comment}\n  ${returns[returnType]}\n` : `${comment}\n`;
 	}
 
+	/** 去掉註解，字串與字元常值換成記號，避免誤判裡面的 return */
+	function codeOnly(body) {
+		return String(body || '')
+			.replace(/\/\*[\s\S]*?\*\//g, ' ')
+			.replace(/\/\/[^\n]*/g, ' ')
+			.replace(/"(?:\\.|[^"\\\n])*"/g, ' __TEXT__ ')
+			.replace(/'(?:\\.|[^'\\\n])*'/g, ' 0 ');
+	}
+
+	/** 基本回傳值檢查：有回傳型別時要有 return 與值，void 不能回傳值，明顯的型別錯誤 */
+	function returnProblems(returnType, body) {
+		const code = codeOnly(body);
+		const values = [...code.matchAll(/\breturn\b([^;]*);/g)].map(match => match[1].trim());
+		const typeName = {
+			float: t('BLOCK_DESIGNER_TYPE_NUMBER', 'number'),
+			int: t('BLOCK_DESIGNER_TYPE_NUMBER', 'number'),
+			bool: t('BLOCK_DESIGNER_TYPE_BOOLEAN', 'true/false'),
+			String: t('BLOCK_DESIGNER_TYPE_STRING', 'text'),
+		}[returnType];
+		if (returnType === 'void') {
+			return values.some(Boolean)
+				? [t('BLOCK_DESIGNER_PROBLEM_VOID_RETURN', 'This block only does something, so return cannot have a value. Use return; or remove it.')]
+				: [];
+		}
+		// 空白本體會自動補上預設回傳值
+		if (!code.trim()) return [];
+		if (values.length === 0) {
+			return [t('BLOCK_DESIGNER_PROBLEM_MISSING_RETURN', 'The function must return a {0}, but the code has no return.', typeName)];
+		}
+		const problems = [];
+		if (values.some(value => !value)) {
+			problems.push(t('BLOCK_DESIGNER_PROBLEM_EMPTY_RETURN', 'Every return needs a {0} value after it.', typeName));
+		}
+		const wrongType = values.some(value => {
+			if (!value) return false;
+			if (returnType === 'String') return /^(true|false)$/.test(value);
+			return /^__TEXT__$/.test(value);
+		});
+		if (wrongType) problems.push(t('BLOCK_DESIGNER_PROBLEM_RETURN_TYPE', 'A return gives the wrong kind of value. This block returns a {0}.', typeName));
+		return problems;
+	}
+
 	function functionSource(compiled, body) {
 		const content = String(body || '').replace(/\s+$/, '');
 		const fallback = { float: DEFAULT_RETURNS.Number, bool: DEFAULT_RETURNS.Boolean, String: DEFAULT_RETURNS.String }[compiled.returnType];
@@ -461,7 +503,7 @@
 					version: pack.version,
 					isNew: false,
 					name: window.blockPacks.localize(pack.category?.name, pack) || pack.id,
-					colour: Number(pack.category?.colour) || 0,
+					colour: this.hexColour(window.blockPacks.packColour(pack)),
 					entries: pack.designer.blocks.map(entry => ({ state: entry.state, body: entry.body })),
 					target: pack.targets.esp32,
 					designerGlobals: pack.designer.globals || '',
@@ -474,14 +516,14 @@
 					version: '1.0.0',
 					isNew: true,
 					name: t('BLOCK_DESIGNER_NEW_CATEGORY', 'My blocks'),
-					colour: 20,
+					colour: '#a5745b',
 					entries: [{ state: starterState('readSensor', t('BLOCK_DESIGNER_DEFAULT_TEXT', 'read sensor')), body: null }],
 					target: {},
 					designerGlobals: '',
 				};
 			}
 			document.getElementById('blockDesignerCategoryName').value = this.draft.name;
-			document.getElementById('blockDesignerColour').value = String(this.draft.colour);
+			document.getElementById('blockDesignerColour').value = this.draft.colour;
 			document.getElementById('blockDesignerIncludes').value = (this.draft.target.includes || []).join(', ');
 			document.getElementById('blockDesignerLibDeps').value = (this.draft.target.libDeps || []).join('\n');
 			document.getElementById('blockDesignerGlobals').value = this.draft.designerGlobals;
@@ -581,7 +623,7 @@
 		syncShapePicker() {
 			const root = this.rootBlock();
 			const value = root ? root.getFieldValue('SHAPE') : 'Number';
-			const colour = Blockly.utils.colour.hueToHex(Number(document.getElementById('blockDesignerColour').value) || 0);
+			const colour = document.getElementById('blockDesignerColour').value;
 			document.querySelectorAll('#blockDesignerShapes .block-designer-shape').forEach(button => {
 				const checked = button.dataset.shape === value;
 				button.setAttribute('aria-checked', checked ? 'true' : 'false');
@@ -694,9 +736,13 @@
 			this.loadEntry(Math.min(this.selected >= index ? Math.max(this.selected - 1, 0) : this.selected, this.draft.entries.length - 1));
 		},
 
+		/** 舊積木包的色相轉成色碼，讓 RGB 調色盤能顯示 */
+		hexColour(colour) {
+			return typeof colour === 'string' ? colour.toLowerCase() : Blockly.utils.colour.hueToHex(colour);
+		},
+
 		updateColour() {
-			const hue = Number(document.getElementById('blockDesignerColour').value) || 0;
-			document.getElementById('blockDesignerColourSwatch').style.backgroundColor = Blockly.utils.colour.hueToHex(hue);
+			this.syncShapePicker();
 		},
 
 		markDirty() {
@@ -731,7 +777,7 @@
 				id: this.draft.id,
 				version: this.draft.version,
 				defaultLocale: window.languageManager?.currentLanguage || 'en',
-				category: { name, colour: Number(document.getElementById('blockDesignerColour').value) || 0 },
+				category: { name, colour: document.getElementById('blockDesignerColour').value },
 				blocks: compiledList.map(compiled => compiled.block),
 				targets: { esp32: target },
 				designer: {
@@ -749,6 +795,7 @@
 			const names = new Map();
 			compiledList.forEach((compiled, index) => {
 				if (!compiled) return;
+				problems.push(...returnProblems(compiled.returnType, this.draft.entries[index].body));
 				const fn = compiled.signature.split('(')[0].split(' ').pop();
 				if (names.has(fn)) problems.push(t('BLOCK_DESIGNER_PROBLEM_SAME_FUNCTION', 'Two blocks use the function name "{0}".', fn));
 				names.set(fn, index);
@@ -792,6 +839,7 @@
 			const missing = [...entry.knownParams].filter(name => !params.includes(name) && new RegExp(`\\b${name}\\b`).test(body));
 			this.showProblems([
 				...compiled.problems,
+				...returnProblems(compiled.returnType, body),
 				...missing.map(name => t('BLOCK_DESIGNER_PROBLEM_REMOVED_PARAM', 'The function body still uses "{0}", which is no longer a piece.', name)),
 			]);
 

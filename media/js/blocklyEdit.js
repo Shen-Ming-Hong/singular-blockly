@@ -8126,7 +8126,8 @@ const blockPackManager = {
 		for (const pack of packs) {
 			const item = document.createElement('li');
 			item.className = 'block-pack-item';
-			item.style.borderLeftColor = `hsl(${Number(pack.category?.colour) || 0}, 45%, 55%)`;
+			const colour = window.blockPacks.packColour(pack);
+			item.style.borderLeftColor = typeof colour === 'string' ? colour : `hsl(${colour}, 45%, 55%)`;
 			const info = document.createElement('div');
 			info.className = 'block-pack-item-info';
 			const name = document.createElement('div');

@@ -66,9 +66,17 @@
 					"$ref": "#/$defs/localizedText"
 				},
 				"colour": {
-					"type": "number",
-					"minimum": 0,
-					"maximum": 360
+					"oneOf": [
+						{
+							"type": "number",
+							"minimum": 0,
+							"maximum": 360
+						},
+						{
+							"type": "string",
+							"pattern": "^#[0-9a-fA-F]{6}$"
+						}
+					]
 				}
 			}
 		},

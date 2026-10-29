@@ -23,6 +23,7 @@ const MAX_TEXT = 200;
 const MAX_CODE = 20000;
 
 const PACK_ID = /^[a-z][a-z0-9_]{1,31}$/;
+const HEX_COLOUR = /^#[0-9a-fA-F]{6}$/;
 const BLOCK_NAME = /^[a-z][a-z0-9_]{0,31}$/;
 const INPUT_NAME = /^[A-Z][A-Z0-9_]{0,31}$/;
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -362,7 +363,12 @@ function collectPack(c: Collector, value: unknown, path: string, allowedKeys: st
 				localizedTexts(c, value.category.name, at('category.name'), defaultLocale);
 			}
 			if (c.required(value.category, 'colour', at('category'))) {
-				c.number(value.category.colour, at('category.colour'), 0, 360);
+				// 色相 0–360，或設計器的 RGB 十六進位色碼 #rrggbb
+				if (typeof value.category.colour === 'string') {
+					c.string(value.category.colour, at('category.colour'), HEX_COLOUR);
+				} else {
+					c.number(value.category.colour, at('category.colour'), 0, 360);
+				}
 			}
 		}
 	}

@@ -61,6 +61,13 @@
 		return typeof type === 'string' && type.startsWith(TYPE_PREFIX);
 	}
 
+	/** 分類顏色：色相（0–360）或設計器的 #rrggbb 色碼 */
+	function packColour(pack) {
+		const colour = pack && pack.category && pack.category.colour;
+		if (typeof colour === 'string' && /^#[0-9a-fA-F]{6}$/.test(colour)) return colour;
+		return Number(colour) || 0;
+	}
+
 	function packTarget(pack) {
 		return pack && pack.targets && pack.targets[SUPPORTED_BOARD];
 	}
@@ -164,7 +171,7 @@
 			type: blockType(pack.id, block.name),
 			message0: message0.trim() || block.name,
 			args0: args,
-			colour: Number(pack.category && pack.category.colour) || 0,
+			colour: packColour(pack),
 			tooltip: localize(block.tooltip, pack),
 			inputsInline: !(block.inputs || []).some(input => input.kind === 'statement'),
 		};
@@ -597,7 +604,7 @@
 		return (packs || []).map(pack => ({
 			kind: 'category',
 			name: localize(pack.category && pack.category.name, pack) || pack.id,
-			colour: String(Number(pack.category && pack.category.colour) || 0),
+			colour: String(packColour(pack)),
 			contents: pack.blocks.map(packBlock => toolboxBlock(pack, packBlock)),
 		}));
 	}
@@ -693,6 +700,7 @@
 		isPlaceholderType,
 		localize,
 		normalizeSnapshot,
+		packColour,
 		pinOptions,
 		prepareState,
 		previewCode,
