@@ -456,7 +456,8 @@
 		}
 		const wrongType = values.some(value => {
 			if (!value) return false;
-			if (returnType === 'String') return /^(true|false)$/.test(value);
+			// 數字常值能編譯成 String，但幾乎都是改形狀後留下的舊回傳值
+			if (returnType === 'String') return /^(true|false|-?\d+(\.\d+)?[fF]?)$/.test(value);
 			return /^__TEXT__$/.test(value);
 		});
 		if (wrongType) problems.push(t('BLOCK_DESIGNER_PROBLEM_RETURN_TYPE', 'A return gives the wrong kind of value. This block returns a {0}.', typeName));
