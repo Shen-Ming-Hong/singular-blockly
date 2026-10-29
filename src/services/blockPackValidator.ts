@@ -38,6 +38,7 @@ const DESIGNER_KEYS = ['formatVersion', 'globals', 'blocks'];
 const DESIGNER_BLOCK_KEYS = ['name', 'state', 'body'];
 /** 設計器保存的 Blockly 設計工作區狀態上限（JSON 字元數） */
 const MAX_DESIGN_STATE = 100000;
+const DESIGN_BLOCK_TYPE = /^bd_[a-z_]+$/;
 const INSTALLED_KEYS = [...PACK_KEYS, 'importedAt', 'sourceName'];
 const BLOCK_KEYS = ['name', 'shape', 'output', 'label', 'tooltip', 'inputs'];
 const TARGET_KEYS = ['includes', 'libDeps', 'globals', 'setup', 'blocks'];
@@ -331,11 +332,32 @@ function validateTarget(c: Collector, target: unknown, path: string, blocks: Map
 	}
 }
 
+/** 設計狀態只能含設計器自己的積木（bd_ 開頭），且要有一個 bd_block 根積木 */
+function isDesignState(state: Record<string, unknown>): boolean {
+	let hasRoot = false;
+	const visit = (node: unknown): boolean => {
+		if (Array.isArray(node)) {
+			return node.every(visit);
+		}
+		if (!isObject(node)) {
+			return true;
+		}
+		if ('type' in node) {
+			if (typeof node.type !== 'string' || !DESIGN_BLOCK_TYPE.test(node.type)) {
+				return false;
+			}
+			hasRoot ||= node.type === 'bd_block';
+		}
+		return Object.values(node).every(visit);
+	};
+	return visit(state) && hasRoot;
+}
+
 /**
- * 圖形化積木設計器（073）保存的設計資訊：只做結構與大小檢查。
+ * 圖形化積木設計器（073）保存的設計資訊：結構、大小，以及每個設計對應一個積木。
  * 程式碼產生只依 targets，designer 僅供重新開啟設計器時還原。
  */
-function collectDesigner(c: Collector, value: unknown, path: string): void {
+function collectDesigner(c: Collector, value: unknown, path: string, blockNames: string[]): void {
 	if (!isObject(value)) {
 		c.add('INVALID_VALUE', path);
 		return;
@@ -360,10 +382,15 @@ function collectDesigner(c: Collector, value: unknown, path: string): void {
 		if (entry.body !== null) {
 			c.code(entry.body, `${at}.body`);
 		}
-		if (!isObject(entry.state) || JSON.stringify(entry.state).length > MAX_DESIGN_STATE) {
+		if (!isObject(entry.state) || JSON.stringify(entry.state).length > MAX_DESIGN_STATE || !isDesignState(entry.state)) {
 			c.add('INVALID_VALUE', `${at}.state`);
 		}
 	});
+	// 設計器以順序對應積木，名稱與數量必須和 blocks 一致
+	const designed = value.blocks.map(entry => (isObject(entry) ? entry.name : undefined));
+	if (designed.length !== blockNames.length || designed.some((name, index) => name !== blockNames[index])) {
+		c.add('INVALID_VALUE', `${path}.blocks`);
+	}
 }
 
 function collectPack(c: Collector, value: unknown, path: string, allowedKeys: string[]): void {
@@ -385,7 +412,10 @@ function collectPack(c: Collector, value: unknown, path: string, allowedKeys: st
 	if (value.author !== undefined) {c.string(value.author, at('author'), undefined, 80);}
 	if (value.importedAt !== undefined) {c.string(value.importedAt, at('importedAt'));}
 	if (value.sourceName !== undefined) {c.string(value.sourceName, at('sourceName'));}
-	if (value.designer !== undefined) {collectDesigner(c, value.designer, at('designer'));}
+	if (value.designer !== undefined) {
+		const blockNames = Array.isArray(value.blocks) ? value.blocks.map(block => (isObject(block) ? block.name : undefined)) : [];
+		collectDesigner(c, value.designer, at('designer'), blockNames as string[]);
+	}
 	let defaultLocale = 'en';
 	if (value.defaultLocale !== undefined) {
 		if ((BLOCK_PACK_LOCALES as readonly string[]).includes(value.defaultLocale as string)) {

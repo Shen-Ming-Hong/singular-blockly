@@ -847,7 +847,17 @@
 			Blockly.Events.disable();
 			try {
 				this.workspace.clear();
-				Blockly.serialization.workspaces.load(this.currentEntry().state, this.workspace);
+				try {
+					Blockly.serialization.workspaces.load(this.currentEntry().state, this.workspace);
+				} catch (error) {
+					log.warn('[blockDesigner] design state could not be loaded', error);
+				}
+				// 設計狀態壞掉時換成起始設計，函式本體仍保留
+				if (!this.workspace.getTopBlocks(false).some(block => block.type === ROOT_TYPE)) {
+					this.workspace.clear();
+					this.currentEntry().state = starterState(`block${index + 1}`, t('BLOCK_DESIGNER_DEFAULT_TEXT', 'read sensor'));
+					Blockly.serialization.workspaces.load(this.currentEntry().state, this.workspace);
+				}
 			} finally {
 				Blockly.Events.enable();
 				this.loading = false;

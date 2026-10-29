@@ -75,7 +75,8 @@ export interface BlockPack {
 	version: string;
 	author?: string;
 	defaultLocale: string;
-	category: { name: LocalizedText; colour: number };
+	/** 色相 0–360，或設計器使用的 #rrggbb */
+	category: { name: LocalizedText; colour: number | string };
 	blocks: PackBlock[];
 	targets: Partial<Record<BlockPackBoard, PackTarget>>;
 	designer?: BlockPackDesign;

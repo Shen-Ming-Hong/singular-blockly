@@ -49,7 +49,18 @@ function designerSection(): any {
 	return {
 		formatVersion: 1,
 		globals: '',
-		blocks: [{ name: 'beep', state: { blocks: { languageVersion: 0, blocks: [] } }, body: '  tone(pin, 440, ms);\n' }],
+		blocks: [
+			{
+				name: 'beep',
+				state: {
+					blocks: {
+						languageVersion: 0,
+						blocks: [{ type: 'bd_block', fields: { SHAPE: 'statement' }, inputs: { PIECES: { block: { type: 'bd_text', fields: { TEXT: 'beep' } } } } }],
+					},
+				},
+				body: '  tone(pin, 440, ms);\n',
+			},
+		],
 	};
 }
 
@@ -170,7 +181,17 @@ suite('Block pack validator', () => {
 			'UNKNOWN_FIELD@designer.blocks[0].extra',
 			'INVALID_VALUE@designer.blocks[0].name',
 			'INVALID_VALUE@designer.blocks[0].state',
+			'INVALID_VALUE@designer.blocks',
 		]);
+
+		// 設計狀態只能有設計器積木，且每個積木都要有一份設計
+		const foreign = designerSection();
+		foreign.blocks[0].state.blocks.blocks[0].inputs.PIECES.block.type = 'text_print';
+		assert.deepStrictEqual(codes({ ...minimalPack(), designer: foreign }), ['INVALID_VALUE@designer.blocks[0].state']);
+		const noRoot = designerSection();
+		noRoot.blocks[0].state = { blocks: { languageVersion: 0, blocks: [] } };
+		assert.deepStrictEqual(codes({ ...minimalPack(), designer: noRoot }), ['INVALID_VALUE@designer.blocks[0].state']);
+		assert.deepStrictEqual(codes({ ...minimalPack(), designer: { ...designerSection(), blocks: [] } }), ['INVALID_VALUE@designer.blocks']);
 
 		const huge = designerSection();
 		huge.blocks[0].state = { padding: 'x'.repeat(100001) };

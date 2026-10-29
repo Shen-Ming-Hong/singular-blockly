@@ -119,7 +119,7 @@ suite('Block designer WebView contract', () => {
 					blocks: { [compiled.block.name]: compiled.template },
 				},
 			},
-			designer: { formatVersion: 1, globals: '', blocks: [{ name: compiled.block.name, state: {}, body }] },
+			designer: { formatVersion: 1, globals: '', blocks: [{ name: compiled.block.name, state: designer.starterState('readSensor', 'read sensor'), body }] },
 		};
 	}
 
