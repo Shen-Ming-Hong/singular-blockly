@@ -12,7 +12,6 @@ node_modules/
 !.vscode/extensions.json
 !.vscode/launch.json
 !.vscode/tasks.json
-.vscode/settings.json
 
 # 擴充套件相關
 *.vsix
@@ -48,8 +47,18 @@ performance-baseline.txt
 .idea/
 *.swp
 *.swo
+*~
+.eslintcache
+*.tsbuildinfo
 
-# Agent skills (Junction 連結到 .github/skills/)
+# Python（RC_FM、MicroPython 範例與本機工具）
+__pycache__/
+*.py[cod]
+
+# AI 代理本機狀態（技能本身追蹤在 .agents/ 與 .claude/skills/）
+.claude/settings.local.json
+.claude/worktrees/
+# 舊版 Junction 連結目錄，現已改用 .agents/
 .agent/
 
 # 生成的報告檔案
@@ -57,12 +66,12 @@ translation-stats.md
 test-results/
 
 # 環境設定
-.env
-.env.local
 .env*
 **/.dev.vars
 **/.dev.vars.*
 !**/.dev.vars.example
 **/.wrangler/
+
+# 本機測試與範例資料夾
 RC_example/*
 extension_test/*
