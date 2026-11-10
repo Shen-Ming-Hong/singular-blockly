@@ -1,0 +1,149 @@
+name: Notify Claude
+
+# 把 Dependabot PR 與新的安全發現送到 Claude 專案的收件排程（API 觸發）。
+# 只用 curl／jq／gh，不安裝依賴、不執行 PR 內容。
+# 需要的設定：
+#   - secrets.CLAUDE_ROUTINE_TOKEN：排程 API 觸發的權杖（sk-ant-oat01-…）。
+#     Dependabot 觸發的 job 讀的是 Dependabot secrets，所以 Actions 與 Dependabot
+#     兩邊都要建立同名 secret。沒設定時 job 只留 notice，不會失敗。
+
+on:
+  pull_request_target:
+    types: [opened, reopened]
+  schedule:
+    # 每天台灣時間 09:47（Dependabot 週一 09:00／09:30 開 PR 之後）
+    - cron: "47 1 * * *"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 只送測試訊息，確認通知流程
+        type: boolean
+        default: true
+
+permissions: {}
+
+env:
+  FIRE_URL: https://api.anthropic.com/v1/claude_code/routines/trig_014XrLAeWzEWPZJ9ngtMcjgj/fire
+
+jobs:
+  dependabot-pr:
+    name: Dependabot PR
+    # pull_request_target 不 checkout、不執行 PR 程式碼，只送 PR 編號。
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions: {}
+    steps:
+      - name: Fire Claude routine
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.CLAUDE_ROUTINE_TOKEN }}
+          ACTION: ${{ github.event.action }}
+          NUMBER: ${{ github.event.pull_request.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$TOKEN" ]]; then
+            echo "::notice::CLAUDE_ROUTINE_TOKEN 未設定，略過通知。"
+            exit 0
+          fi
+          payload=$(jq -cn --arg action "$ACTION" --argjson number "$NUMBER" --arg run "$RUN_URL" \
+            '{source:"github-actions",event:"dependabot_pr",action:$action,repo:"Shen-Ming-Hong/singular-blockly",number:$number,run:$run}')
+          jq -cn --arg text "$payload" '{text:$text}' > body.json
+          curl --fail-with-body -sS --retry 3 --retry-all-errors --max-time 30 \
+            -X POST "$FIRE_URL" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
+            -H "Content-Type: application/json" \
+            --data-binary @body.json -o response.json
+          jq -r '"已觸發：" + .claude_code_session_url' response.json
+
+  security-scan:
+    name: Security scan
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      security-events: read
+    steps:
+      - name: Checkout lockfile only
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            package.json
+            package-lock.json
+          sparse-checkout-cone-mode: false
+
+      - name: Restore last findings
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: .notify-claude/last.txt
+          key: notify-claude-findings-${{ github.run_id }}
+          restore-keys: notify-claude-findings-
+
+      - name: Collect findings
+        id: scan
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          mkdir -p .notify-claude
+          touch .notify-claude/last.txt
+          # npm audit 只讀 lockfile，查的是與 Dependabot alerts 相同的 GitHub Advisory Database。
+          npm audit --package-lock-only --omit=optional --json > audit.json || true
+          # 與 CI 的 npm audit --audit-level=high 一致，只通知 high／critical。
+          jq -r '[.vulnerabilities[]?.via[]? | objects
+                   | select(.severity == "high" or .severity == "critical") | .url // empty
+                   | capture("(?<id>GHSA-[0-9a-z-]+)").id] | unique[] | "npm:" + .' audit.json > current.txt
+          gh api --paginate "repos/$REPO/code-scanning/alerts?state=open&per_page=100" \
+            --jq '.[].number | "code:" + tostring' >> current.txt \
+            || echo "::warning::讀不到 Code Scanning 警示，這次只看 npm audit。"
+          sort -u -o current.txt current.txt
+          comm -13 .notify-claude/last.txt current.txt > new.txt
+          cp current.txt .notify-claude/last.txt
+          echo "目前 $(wc -l < current.txt) 項，新出現 $(wc -l < new.txt) 項"
+          cat new.txt
+          echo "new=$(wc -l < new.txt | tr -d ' ')" >> "$GITHUB_OUTPUT"
+
+      - name: Save findings
+        # 測試觸發不更新紀錄，避免把真的新發現吞掉。
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.test) }}
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: .notify-claude/last.txt
+          key: notify-claude-findings-${{ github.run_id }}
+
+      - name: Fire Claude routine
+        if: steps.scan.outputs.new != '0' || (github.event_name == 'workflow_dispatch' && inputs.test)
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.CLAUDE_ROUTINE_TOKEN }}
+          TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.test }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$TOKEN" ]]; then
+            echo "::notice::CLAUDE_ROUTINE_TOKEN 未設定，略過通知。"
+            exit 0
+          fi
+          payload=$(jq -cn --rawfile new new.txt --arg run "$RUN_URL" --argjson test "$TEST" '
+            ($new | split("\n") | map(select(length > 0))) as $items
+            | {source:"github-actions",event:"security_scan",repo:"Shen-Ming-Hong/singular-blockly",
+               npm_advisories:[$items[] | select(startswith("npm:")) | ltrimstr("npm:")],
+               code_scanning_alerts:[$items[] | select(startswith("code:")) | ltrimstr("code:") | tonumber],
+               run:$run}
+            | if $test then . + {test:true} else . end')
+          jq -cn --arg text "$payload" '{text:$text}' > body.json
+          curl --fail-with-body -sS --retry 3 --retry-all-errors --max-time 30 \
+            -X POST "$FIRE_URL" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "anthropic-beta: experimental-cc-routine-2026-04-01" \
+            -H "Content-Type: application/json" \
+            --data-binary @body.json -o response.json
+          jq -r '"已觸發：" + .claude_code_session_url' response.json
