@@ -1,6 +1,7 @@
 name: Notify Claude
 
-# 把 Dependabot PR 與新的安全發現送到 Claude 專案的收件排程（API 觸發）。
+# 把 Dependabot PR 送到 Claude 專案的收件排程（API 觸發），不做定時檢查。
+# 安全漏洞靠 Dependabot security updates 開的 PR 觸發；security-scan 只供手動執行。
 # 只用 curl／jq／gh，不安裝依賴、不執行 PR 內容。
 # 需要的設定：
 #   - secrets.CLAUDE_ROUTINE_TOKEN：排程 API 觸發的權杖（sk-ant-oat01-…）。
@@ -10,9 +11,6 @@ name: Notify Claude
 on:
   pull_request_target:
     types: [opened, reopened]
-  schedule:
-    # 每天台灣時間 09:47（Dependabot 週一 09:00／09:30 開 PR 之後）
-    - cron: "47 1 * * *"
   workflow_dispatch:
     inputs:
       test:
@@ -61,7 +59,7 @@ jobs:
 
   security-scan:
     name: Security scan
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
