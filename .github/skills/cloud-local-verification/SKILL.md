@@ -56,9 +56,9 @@ NODE_PATH=/tmp/sb-pw/node_modules xvfb-run -a -s "-screen 0 1440x900x24" \
   --out /tmp/sb-visual --board uno --theme light
 ```
 
-- 參數：`--board`（`uno`、`esp32`、`cyberbrick` 等 `main.json` 的 board 值）、`--theme light|dark`、`--repo`（預設目前目錄）。依變更挑選會受影響的組合，例如主題變更就各跑一次 light／dark。
+- 參數：`--board`（`uno`、`esp32`、`cyberbrick` 等 `main.json` 的 board 值）、`--theme light|dark`、`--repo`（預設目前目錄）、`--overlay-scrollbars`（開啟 Chromium 浮動捲軸，近似 macOS 預設，用來檢查捲軸樣式在 Mac 上是否仍生效）。依變更挑選會受影響的組合，例如主題變更就各跑一次 light／dark。
 - 腳本會建立隔離的使用者資料與工作區，並放一個 PlatformIO 擴充空殼，讓擴充在沒有真實 PlatformIO IDE 時也能啟用；結束後刪除暫存目錄。
-- 輸出：`01-editor-open.png`、`02-flyout-open.png`、`03-after-drag.png`（失敗時 `99-failure.png`）與 `result.json`。
+- 輸出：`01-editor-open.png`、`02-flyout-open.png`、`03-after-drag.png`、`04-context-menu.png`（在積木上按右鍵並把選單高度限制為 48px，強制出現捲軸）（失敗時 `99-failure.png`）與 `result.json`；`checks.contextMenu` 記錄選單是否溢出與計算後的 `scrollbar-color`／`scrollbar-width`。
 - `result.json` 判讀：`workspaceRendered` 為 true、`blocklyVersion` 符合預期、`toolboxCategories` 大於 0、`dragAddedBlocks` 為 1、`generatedCode` 有內容；`webviewErrors` 只收 webview 內的 console error，與 base 分支比較後只回報新增的錯誤。
 - 一定要用圖片檢視工具實際看截圖，確認版面、配色與文字，不能只依數值判斷。
 - UI/UX 變更：截圖拿來對照 `maintain-singular-blockly`「動手前」選定的業界參考，亮色與深色主題各看一次，並檢查受影響元件（含右鍵選單、捲軸、對話框等）在兩個主題下的配色與狀態是否一致。

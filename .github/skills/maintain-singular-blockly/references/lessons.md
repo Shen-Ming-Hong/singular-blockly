@@ -55,3 +55,9 @@
 - **問題：** 2026-10-20 發布 0.90.0 時，發布 PR 已合併，但雲端工作階段推 annotated tag 被安全檢查擋下，發布卡在最後一步，只能請 Ray 回本機推。
 - **規則：** 雲端發布在發布 PR 合併、`master` CI 綠燈後，由工作階段自行排程檢查並立即從 `master` 觸發 `create-release-tag.yml`（不等 Ray 提醒），由它以 deploy key 推 tag，tag push 觸發 `publish.yml` 發布；不要在雲端嘗試 `git push origin v*`，tag 已建立後不要再觸發它，`publish.yml` 失敗時只重跑失敗 jobs。個人 repo 的 ruleset 不能讓 GitHub Actions bypass（API 回 422），`GITHUB_TOKEN` 推 tag 一定被「release tag creation」拒絕；0.90.0 首次 run（39443756197）因此失敗，改由 release environment secret `RELEASE_TAG_DEPLOY_KEY` 的 deploy key 推送，ruleset bypass 加「Deploy keys」。
 - **證據：** `.github/workflows/create-release-tag.yml`、`publish.yml` 的 tag push 觸發、`scripts/release/prepare-release.test.js` 的契約測試。
+
+## [WebView / CSS] 自訂捲軸要在 macOS 浮動捲軸下仍生效
+
+- **問題：** Chromium 121+ 只要元素的 `scrollbar-color`／`scrollbar-width` 不是 `auto` 就忽略 `::-webkit-scrollbar`；macOS 預設的浮動捲軸又不套用 `scrollbar-color`，亮色主題的右鍵選單因此出現系統的黑色粗滑桿。VS Code 也會在 webview 的 `html` 設定會繼承的 `scrollbar-color`。
+- **規則：** 需要在 Mac 上維持自訂外觀的捲軸（浮動選單等），在該元素把標準屬性重設為 `auto`、改用 `::-webkit-scrollbar`，並以 `@supports not selector(::-webkit-scrollbar)` 保留標準屬性的後備；用 `vscode-webview-smoke.mjs --overlay-scrollbars` 檢查。
+- **證據：** `media/css/blocklyEdit.css` 的浮動選單捲軸區塊、`src/test/suite/editorThemeBlocklyToolboxScrollbarContract.test.ts`。

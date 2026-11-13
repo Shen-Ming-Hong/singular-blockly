@@ -90,6 +90,30 @@ describe('Editor theme contract: scrollbars', () => {
 		);
 	});
 
+	it('gives floating Blockly menus a theme-aware overlay-style scrollbar that macOS cannot replace', () => {
+		const css = readWorkspaceFile('media/css/blocklyEdit.css');
+		const lightThemeBlocks = collectCssRuleBlocks(css, [/body\.theme-light/]);
+		const darkThemeBlocks = collectCssRuleBlocks(css, [/body\.theme-dark/]);
+		for (const blocks of [lightThemeBlocks, darkThemeBlocks]) {
+			assert.match(blocks, /--editor-menu-scrollbar-thumb\s*:/);
+			assert.match(blocks, /--editor-menu-scrollbar-thumb-hover\s*:/);
+		}
+
+		const menuBlocks = getCssRuleBlocks(css, /\.blocklyWidgetDiv \.blocklyContextMenu/).join('\n');
+		// Chromium ignores ::-webkit-scrollbar when scrollbar-color/width are not auto, and macOS overlay
+		// scrollbars ignore scrollbar-color, which left the native black thumb on light menus.
+		assert.match(menuBlocks, /\.blocklyDropDownDiv \.blocklyMenu/, 'field dropdown menus share the menu scrollbar');
+		assert.match(menuBlocks, /scrollbar-color\s*:\s*auto/);
+		assert.match(menuBlocks, /scrollbar-width\s*:\s*auto/);
+		assert.match(menuBlocks, /::-webkit-scrollbar-track[\s\S]*background\s*:\s*transparent/);
+		assert.match(menuBlocks, /::-webkit-scrollbar-thumb[\s\S]*background-color\s*:\s*var\(--editor-menu-scrollbar-thumb\)/);
+		assert.match(
+			menuBlocks,
+			/::-webkit-scrollbar-thumb:hover[\s\S]*background-color\s*:\s*var\(--editor-menu-scrollbar-thumb-hover\)/
+		);
+		assert.match(css, /@supports not selector\(::-webkit-scrollbar\)[\s\S]*scrollbar-color\s*:\s*var\(--editor-menu-scrollbar-thumb\) transparent/);
+	});
+
 	it('styles Blockly flyout SVG scrollbars with the same shared editor tokens', () => {
 		const css = readWorkspaceFile('media/css/blocklyEdit.css');
 		const flyoutBlocks = getCssRuleBlocks(css, /\.blocklyFlyout\s+\.blocklyScrollbar/).join('\n');
