@@ -47,6 +47,8 @@ body {
 	--editor-scrollbar-size: 12px;
 	--editor-scrollbar-radius: 6px;
 	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+	--editor-menu-scrollbar-thumb: rgba(0, 0, 0, 0.28);
+	--editor-menu-scrollbar-thumb-hover: rgba(0, 0, 0, 0.45);
 	--txt-virtual-controls-panel-bg: #ffffff;
 	--txt-virtual-controls-panel-fg: #1e1e1e;
 	--txt-virtual-controls-panel-border: rgba(0, 0, 0, 0.12);
@@ -94,6 +96,8 @@ body.theme-light {
 	--editor-scrollbar-thumb: #c1c1c1;
 	--editor-scrollbar-thumb-hover: #a8a8a8;
 	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.1);
+	--editor-menu-scrollbar-thumb: rgba(0, 0, 0, 0.28);
+	--editor-menu-scrollbar-thumb-hover: rgba(0, 0, 0, 0.45);
 	--editor-focus-ring: #007acc;
 	--editor-primary-action-bg: #0e639c;
 	--editor-primary-action-fg: #ffffff;
@@ -143,6 +147,9 @@ body.theme-dark {
 	--editor-scrollbar-thumb: #666666;
 	--editor-scrollbar-thumb-hover: #888888;
 	--editor-scrollbar-track-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+	/* Blockly 右鍵選單在暗色主題仍是白底、欄位下拉選單用積木色，滑桿維持深色半透明 */
+	--editor-menu-scrollbar-thumb: rgba(0, 0, 0, 0.28);
+	--editor-menu-scrollbar-thumb-hover: rgba(0, 0, 0, 0.45);
 	--editor-focus-ring: #8ab4f8;
 	--editor-primary-action-bg: #0e639c;
 	--editor-primary-action-fg: #ffffff;
@@ -198,6 +205,8 @@ body.vscode-high-contrast-light {
 	--editor-scrollbar-thumb: CanvasText;
 	--editor-scrollbar-thumb-hover: Highlight;
 	--editor-scrollbar-track-shadow: none;
+	--editor-menu-scrollbar-thumb: CanvasText;
+	--editor-menu-scrollbar-thumb-hover: Highlight;
 	--txt-virtual-controls-panel-bg: Canvas;
 	--txt-virtual-controls-panel-fg: CanvasText;
 	--txt-virtual-controls-panel-border: var(--vscode-contrastBorder, CanvasText);
@@ -3158,7 +3167,6 @@ body.preview-mode .txt-preview-canvas,
 .block-designer-body,
 #functionSearchModal,
 .search-history-container,
-.blocklyWidgetDiv .blocklyContextMenu,
 .blocklyToolbox,
 .blocklyToolboxCategoryGroup,
 .blocklyToolboxDiv {
@@ -3185,7 +3193,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
 .block-designer-body::-webkit-scrollbar,
 #functionSearchModal::-webkit-scrollbar,
 .search-history-container::-webkit-scrollbar,
-.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar,
 .blocklyToolbox::-webkit-scrollbar,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar,
 .blocklyToolboxDiv::-webkit-scrollbar {
@@ -3212,7 +3219,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
 .block-designer-body::-webkit-scrollbar-track,
 #functionSearchModal::-webkit-scrollbar-track,
 .search-history-container::-webkit-scrollbar-track,
-.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-track,
 .blocklyToolbox::-webkit-scrollbar-track,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-track,
 .blocklyToolboxDiv::-webkit-scrollbar-track {
@@ -3241,7 +3247,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
 .block-designer-body::-webkit-scrollbar-thumb,
 #functionSearchModal::-webkit-scrollbar-thumb,
 .search-history-container::-webkit-scrollbar-thumb,
-.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb,
 .blocklyToolbox::-webkit-scrollbar-thumb,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb,
 .blocklyToolboxDiv::-webkit-scrollbar-thumb {
@@ -3270,7 +3275,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
 .block-designer-body::-webkit-scrollbar-thumb:hover,
 #functionSearchModal::-webkit-scrollbar-thumb:hover,
 .search-history-container::-webkit-scrollbar-thumb:hover,
-.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb:hover,
 .blocklyToolbox::-webkit-scrollbar-thumb:hover,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb:hover,
 .blocklyToolboxDiv::-webkit-scrollbar-thumb:hover {
@@ -3295,7 +3299,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 .block-designer-body::-webkit-scrollbar-corner,
 #functionSearchModal::-webkit-scrollbar-corner,
 .search-history-container::-webkit-scrollbar-corner,
-.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-corner,
 .blocklyToolbox::-webkit-scrollbar-corner,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-corner,
 .blocklyToolboxDiv::-webkit-scrollbar-corner {
@@ -3305,6 +3308,55 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 .backup-list-container::-webkit-scrollbar-corner,
 .modal-content .search-results-container::-webkit-scrollbar-corner {
 	background: var(--editor-scrollbar-track) !important;
+}
+
+/*
+ * 浮動選單（積木右鍵選單、欄位下拉選單）沿用 VS Code、Google Docs、Figma 的做法：
+ * 細的圓角半透明滑桿、不畫軌道，讓捲軸融入選單表面而不是另一塊色塊。
+ * Chromium 121+ 只要 scrollbar-color／scrollbar-width 不是 auto 就忽略 ::-webkit-scrollbar，
+ * 而 macOS 的浮動捲軸又不套用 scrollbar-color，會畫出系統預設的黑色滑桿；
+ * 因此在支援 ::-webkit-scrollbar 的 webview 中把標準屬性重設為 auto（也擋掉 VS Code 在 html 上繼承下來的顏色），
+ * 只有不支援的瀏覽器才改用標準屬性。
+ */
+.blocklyWidgetDiv .blocklyContextMenu,
+.blocklyDropDownDiv .blocklyMenu {
+	scrollbar-width: auto;
+	scrollbar-color: auto;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+	.blocklyWidgetDiv .blocklyContextMenu,
+	.blocklyDropDownDiv .blocklyMenu {
+		scrollbar-width: thin;
+		scrollbar-color: var(--editor-menu-scrollbar-thumb) transparent;
+	}
+}
+
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar,
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-track,
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-corner,
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-track,
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb,
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb {
+	min-height: 24px;
+	background-color: var(--editor-menu-scrollbar-thumb);
+	background-clip: padding-box;
+	border: 2px solid transparent;
+	border-radius: 999px;
+}
+
+.blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb:hover,
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb:hover {
+	background-color: var(--editor-menu-scrollbar-thumb-hover);
 }
 
 .blocklyFlyout .blocklyScrollbarBackground {
