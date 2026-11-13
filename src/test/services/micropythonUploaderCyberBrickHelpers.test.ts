@@ -5,7 +5,11 @@ import * as path from 'path';
 import { suite, test } from 'mocha';
 import {
 	buildCyberBrickOtaAgentSource,
+	CYBERBRICK_OTA_KEEP_ALIVE_MARKER,
 	CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START,
+	CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_END,
+	CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_START,
+	stripCyberBrickRcMainOtaBootstrap,
 	withCyberBrickRcMainOtaBootstrap,
 } from '../../services/cyberbrickOtaAgentSource';
 import { MicropythonUploader, CommandExecutor } from '../../services/micropythonUploader';
@@ -385,6 +389,25 @@ suite('MicropythonUploader CyberBrick helper commands', () => {
 		assert.strictEqual(wrappedAgain.split(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START).length - 1, 1);
 		assert.strictEqual(wrapped.includes('WIFI_PASSWORD'), false);
 		assert.strictEqual(wrapped.includes('OTA_TOKEN'), false);
+	});
+
+	test('keeps the OTA agent reachable after the student program finishes', () => {
+		const wrapped = withCyberBrickRcMainOtaBootstrap('def main():\n    print("hello")\n');
+		const keepAliveIndex = wrapped.indexOf(CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_START);
+		const userCodeIndex = wrapped.indexOf('print("hello")');
+
+		assert.ok(keepAliveIndex > userCodeIndex, 'keep-alive must be defined after the student main() so it can wrap it');
+		assert.ok(wrapped.trimEnd().endsWith(CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_END));
+		assert.ok(wrapped.includes('_singular_blockly_ota_user_main = globals().get("main")'), 'boot.py calls rc_main.main(), so the wrapper must replace main()');
+		assert.ok(wrapped.includes('\ndef main():\n    if callable(_singular_blockly_ota_user_main):'));
+		assert.ok(wrapped.includes('        except KeyboardInterrupt:\n            raise'), 'Ctrl+C must still stop the program for USB tools');
+		assert.ok(wrapped.includes('_singular_blockly_ota_main_sys.print_exception(_singular_blockly_ota_main_exc)'), 'runtime errors are printed before idling');
+		assert.ok(wrapped.includes('    while True:\n        _singular_blockly_ota_idle_time.sleep_ms(200)'), 'idle loop must sleep so the OTA thread gets CPU time');
+		assert.ok(wrapped.includes(CYBERBRICK_OTA_KEEP_ALIVE_MARKER));
+
+		const wrappedAgain = withCyberBrickRcMainOtaBootstrap(wrapped);
+		assert.strictEqual(wrappedAgain.split(CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_START).length - 1, 1, 're-wrapping must not stack keep-alive blocks');
+		assert.strictEqual(stripCyberBrickRcMainOtaBootstrap(wrapped).includes(CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_START), false);
 	});
 
 	test('configures Wi-Fi and starts OTA agent in the same USB setup run', async () => {
