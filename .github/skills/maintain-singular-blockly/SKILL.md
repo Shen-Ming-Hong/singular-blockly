@@ -9,7 +9,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 ## 動手前
 
-1. **SDD 判斷（必做，寫程式前）。** 對照 `AGENTS.md`「Spec-Driven Development」的觸發清單，逐項判斷本次變更是否碰到：Extension Host 與 WebView 的訊息約定、Blockly 積木與產生器的約定、持久化的工作區格式、開發板上傳流程、managed runtime、安全邊界、重大相容性變動（重大依賴升級依實際影響判斷）。符合任何一項，先依 `AGENTS.md` 的順序跑完 Spec Kit 流程（`speckit-specify` 起）再寫程式；修 bug 也一樣，只要改到上述流程的行為。都不符合才走一般維護。判斷結果（符合哪一項、或逐項說明為何不符合）寫進 PR 描述的「SDD 判斷」段落；無法確定時視為符合，或先問 Ray。
+1. **SDD 判斷（必做，寫程式前）。** 對照 `AGENTS.md`「Spec-Driven Development」的觸發清單，逐項判斷本次變更是否碰到：Extension Host 與 WebView 的訊息約定、Blockly 積木與產生器的約定、持久化的工作區格式、開發板上傳流程、managed runtime、安全邊界、重大相容性變動（重大依賴升級依實際影響判斷）。符合任何一項，先依 `AGENTS.md` 的順序跑完 Spec Kit 流程（`speckit-specify` 起）再寫程式；修 bug 也一樣，只要改到上述流程的行為。都不符合才走一般維護。判斷結果（符合哪一項、或逐項說明為何不符合）寫進 PR 描述的「SDD 判斷」段落；無法確定時視為符合，或先問 Ray。依 [SDD 分級與版本門檻](references/sdd-gate.md) 再依規模分成 No SDD、Lightweight plan、Full SDD 三級；走 Full SDD 或接續既有 SDD 前，先通過該文件的 Spec Kit 版本門檻。
 2. 從入口追到寫入、產生程式碼或硬體操作的終點，查找所有共用函式的呼叫者；在共同根因處修正。
 3. 分清楚貢獻者技能與產品技能：前者以 `.github/skills/` 為來源、由 `.agents/skills/` 連結；後者由 `resources/project-skills/singular-blockly/` 封裝並安裝到使用者專案。不要直接改生成或已安裝副本。
 4. 沿用 `AGENTS.md` 的架構與安全規則。處理程式碼安全時使用 `security-checker`；有翻譯變更時使用 `i18n-maintenance`；範例、依賴、回饋或硬體問題使用相應專用技能。
@@ -35,7 +35,8 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 ## 驗證與交付
 
-- 先執行受影響範圍的測試；依 [專案地圖](references/project-map.md) 補上該變更需要的建置、契約或 i18n 檢查。不要把未執行的檢查寫成通過。
+- 先執行受影響範圍的測試；依 [專案地圖](references/project-map.md) 補上該變更需要的建置、契約或 i18n 檢查。開跑前寫下這次的驗證範圍與理由，拿不準時往大的範圍測。
+- PR 描述的驗證結果逐項只寫「通過」「失敗」「沒驗到」三種；瀏覽器起不來、網路或權限這類工具與環境問題算「沒驗到」並寫明原因，不能當成通過。有失敗就修好再合併；有沒驗到的項目時，回報 Ray 時逐項列出。
 - 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 5 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。
 - Blockly 積木、工具箱、schema 或產品 Skill 變更：執行 `npm run generate:project-skills`，檢查生成差異，再執行 `npm run check:project-skills`。
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
