@@ -22,7 +22,8 @@ suite('ManagedRuntime Archive', () => {
 		root = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'managed-archive-'));
 	});
 
-	teardown(() => fs.rmSync(root, { recursive: true, force: true }));
+	// Windows may still hold the archive handle briefly after tar resolves; retry like workspaceCandidateService.test.ts.
+	teardown(() => fs.rmSync(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 50 }));
 
 	test('extracts regular Unicode files into a new staging directory', async () => {
 		const source = path.join(root, 'source');
