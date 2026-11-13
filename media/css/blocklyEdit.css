@@ -3574,6 +3574,14 @@ body.theme-dark .blocklyDraggable.singular-search-highlight > .blocklyPath {
 	box-sizing: border-box;
 }
 
+/*
+ * Blockly 以 content-box 量測右鍵選單高度，再把 widget div 設成同高、選單 max-height: 100%。
+ * 上面的 border-box 會讓選單的 1px 邊框吃掉內容高度，項目全部放得下仍多出 2px 而出現捲軸。
+ */
+.blocklyWidgetDiv .blocklyContextMenu {
+	box-sizing: content-box;
+}
+
 .blocklyKeyboardNavigation .blocklyActiveFocus.blocklyField > .blocklyFieldRect,
 .blocklyKeyboardNavigation .blocklyActiveFocus > .blocklyFocusRing {
 	stroke: var(--editor-focus-ring);
