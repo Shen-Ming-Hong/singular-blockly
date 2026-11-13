@@ -114,6 +114,14 @@ describe('Editor theme contract: scrollbars', () => {
 		assert.match(css, /@supports not selector\(::-webkit-scrollbar\)[\s\S]*scrollbar-color\s*:\s*var\(--editor-menu-scrollbar-thumb\) transparent/);
 	});
 
+	it('keeps the Blockly context menu content-box so a menu that fits never shows a scrollbar', () => {
+		const css = readWorkspaceFile('media/css/blocklyEdit.css');
+		const menuBlocks = getCssRuleBlocks(css, /^\.blocklyWidgetDiv \.blocklyContextMenu$/).join('\n');
+		// Blockly sizes the widget div from the content-box menu height and caps the menu at max-height: 100%;
+		// border-box would subtract the 1px borders and leave a 2px phantom overflow.
+		assert.match(menuBlocks, /box-sizing\s*:\s*content-box/);
+	});
+
 	it('styles Blockly flyout SVG scrollbars with the same shared editor tokens', () => {
 		const css = readWorkspaceFile('media/css/blocklyEdit.css');
 		const flyoutBlocks = getCssRuleBlocks(css, /\.blocklyFlyout\s+\.blocklyScrollbar/).join('\n');

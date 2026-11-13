@@ -216,10 +216,13 @@ try {
     results.checks.contextMenu = await blocklyFrame.evaluate(() => {
       const menu = document.querySelector(".blocklyWidgetDiv .blocklyContextMenu");
       if (!menu) return null;
+      // 項目都放得下時不應出現捲軸（Blockly 以 content-box 量測選單高度）。
+      const fitsWithoutScrollbar = menu.scrollHeight <= menu.clientHeight;
       menu.style.maxHeight = "48px";
       menu.scrollTop = 1;
       const style = getComputedStyle(menu);
       return {
+        fitsWithoutScrollbar,
         overflows: menu.scrollHeight > menu.clientHeight,
         scrollbarWidth: style.scrollbarWidth,
         scrollbarColor: style.scrollbarColor,
