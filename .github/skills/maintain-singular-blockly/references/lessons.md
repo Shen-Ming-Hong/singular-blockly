@@ -61,3 +61,9 @@
 - **問題：** Chromium 121+ 只要元素的 `scrollbar-color`／`scrollbar-width` 不是 `auto` 就忽略 `::-webkit-scrollbar`；macOS 預設的浮動捲軸又不套用 `scrollbar-color`，亮色主題的右鍵選單因此出現系統的黑色粗滑桿。VS Code 也會在 webview 的 `html` 設定會繼承的 `scrollbar-color`。
 - **規則：** 需要在 Mac 上維持自訂外觀的捲軸（浮動選單等），在該元素把標準屬性重設為 `auto`、改用 `::-webkit-scrollbar`，並以 `@supports not selector(::-webkit-scrollbar)` 保留標準屬性的後備；用 `vscode-webview-smoke.mjs --overlay-scrollbars` 檢查。
 - **證據：** `media/css/blocklyEdit.css` 的浮動選單捲軸區塊、`src/test/suite/editorThemeBlocklyToolboxScrollbarContract.test.ts`。
+
+## [SDD] 改到上傳流程等契約的修正也要先走 Spec Kit
+
+- **問題：** 2026-11-13 的 CyberBrick OTA 修正（PR #257）改變了開發板上傳流程的行為，依 `AGENTS.md` 屬於完整 SDD 範圍，卻被當成一般 bug 修正直接實作，沒有 spec、plan 與 tasks。
+- **規則：** 寫程式前先做技能主文件「動手前」第 1 步的 SDD 判斷，並把結果寫進 PR 描述；「只是修 bug」不是跳過 SDD 的理由，判斷依據是改到哪個契約或流程。
+- **證據：** PR #257、`AGENTS.md`「Spec-Driven Development」的觸發清單，以及 Ray 2026-11-13 指示「不用補，但是要修改專案維護技能避免再次發生」。
