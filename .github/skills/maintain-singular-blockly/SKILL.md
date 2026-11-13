@@ -12,6 +12,10 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 1. 從入口追到寫入、產生程式碼或硬體操作的終點，查找所有共用函式的呼叫者；在共同根因處修正。
 2. 分清楚貢獻者技能與產品技能：前者以 `.github/skills/` 為來源、由 `.agents/skills/` 連結；後者由 `resources/project-skills/singular-blockly/` 封裝並安裝到使用者專案。不要直接改生成或已安裝副本。
 3. 沿用 `AGENTS.md` 的架構與安全規則。處理程式碼安全時使用 `security-checker`；有翻譯變更時使用 `i18n-maintenance`；範例、依賴、回饋或硬體問題使用相應專用技能。
+4. 修改元件的 UI/UX（WebView 面板、對話框、選單、工具箱、捲軸、按鈕、主題配色、通知與錯誤畫面等）之前，先查看現代主流產品與網站怎麼呈現同類元件，再回來評估本站最合適的做法：
+   - 至少比對兩個參考，優先找同類工具：VS Code 本身與其 Webview UI 規範、Scratch／MakeCode 等積木編輯器，再加上 Material、Fluent、Apple HIG、GitHub、Figma 等主流設計系統或產品；查實際畫面或官方文件，不憑印象。
+   - 對照它們在亮色／深色主題、狀態（hover、focus、disabled、選取）、間距與互動上的共同做法，再依本站情境取捨：VS Code 主題變數與 Blockly 既有樣式優先，兒童與教學使用者需要的可讀性與點擊範圍，以及不破壞既有使用者的習慣。
+   - 在 PR 描述寫下參考了哪些產品、採用或不採用的理由；之後的視覺驗證截圖要拿來對照這個結論。純文字、翻譯或不改外觀的修正不需要這一步。
 
 ## Mac 測試與使用者工作並行
 
@@ -22,7 +26,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 ## 驗證與交付
 
 - 先執行受影響範圍的測試；依 [專案地圖](references/project-map.md) 補上該變更需要的建置、契約或 i18n 檢查。不要把未執行的檢查寫成通過。
-- 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。
+- 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 4 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。
 - Blockly 積木、工具箱、schema 或產品 Skill 變更：執行 `npm run generate:project-skills`，檢查生成差異，再執行 `npm run check:project-skills`。
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
 - Commit／push／PR 交給 `git-workflow`，本地審查與發布交給 `pr-review-release`。非發布 PR 依 Ray 的常設授權，在 [整合佇列與自主合併](references/merge-queue.md) 的前置條件全部成立時自行 squash 合併，不再另外詢問；該文件「仍須先問 Ray」列出的事項仍先取得 Ray 明確同意。
