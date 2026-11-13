@@ -76,6 +76,8 @@ CyberBrick 支援固定的上傳模式設定，但 **OTA 是上傳工具功能�
 
 之後不論 USB 或 OTA 寫入 `/app/rc_main.py`，Extension Host 都會重新包裝同一段啟動呼叫，避免後續上傳覆蓋掉 OTA 啟動點。這段 bootstrap 以 start/end marker 管理，重複上傳不會累積多份。
 
+官方 `boot.py` 以 `import rc_main` 載入後呼叫 `rc_main.main()`；`main()` 結束後 `boot.py` 也跟著結束，背景 OTA agent 就無法穩定連線，學生過去必須在最後放「一直重複做」。因此同一次包裝會在檔尾加上以 keep-alive start/end marker 管理的區塊：它把產生的 `main()` 換成外層函式，學生程式結束（或未捕捉的例外先以 `sys.print_exception` 印出）後進入每 200 ms 休眠一次的待命迴圈，並印出 `[Singular Blockly] Program finished; Wi-Fi upload stays ready`。這與 Arduino 的 `loop()` 讓 `ArduinoOTA.handle()` 持續執行是同一個做法。`KeyboardInterrupt`（mpremote 的 Ctrl+C）仍會中斷待命，USB 上傳與序列監看不受影響；含無限迴圈的程式不會走到待命區塊。沒有 OTA 設定的裝置不加這段，行為與原本相同。
+
 RC/ESP‑NOW 生成碼需要與 OTA agent 共存。RC 初始化只有在「`/cyberbrick_ota_config.py` 具備 SSID 與 OTA token」**且** STA Wi‑Fi 目前已連上 AP 時才保留 Wi‑Fi（不呼叫 `_wlan.disconnect()`、不停用 reconnects、不改 channel）；只有 OTA 設定但 AP 不在線時，仍照積木設定的 channel 初始化。詳細的 bootstrap 等待與 channel fallback 見 [CyberBrick RC：與 OTA 共存的 Wi‑Fi channel](cyberbrick-rc.md#與-ota-共存的-wi-fi-channel062)。
 
 Provisioning 完成後仍維持 `USB` 模式，必須由使用者明確切換到 `OTA`。
