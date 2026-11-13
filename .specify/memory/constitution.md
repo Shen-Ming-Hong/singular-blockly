@@ -1,4 +1,17 @@
 <!--
+SYNC IMPACT REPORT — 2026-11-13
+==============================
+Version Change: 1.8.0 → 1.9.0
+Modified Sections:
+  - Development Standards / Spec-Driven Development: Spec Kit must be upgraded to the
+    latest official stable release before starting or resuming full SDD (Ray, 2026-11-13);
+    SDD need is tiered as No SDD / Lightweight plan / Full SDD
+Templates Status:
+  - Spec Kit templates read the constitution at runtime; no template changes
+Follow-up TODOs: None
+-->
+
+<!--
 SYNC IMPACT REPORT — 2026-09-24
 ==============================
 Version Change: 1.7.0 → 1.8.0
@@ -252,9 +265,10 @@ MUST 先檢查既有 `specs/`，並以完整 Spec Kit 流程定義可觀察的�
 MUST 先依實際影響判定是否需要完整 SDD。
 
 完整流程依序為 `specify`、`clarify`、`plan`、`tasks`、`analyze`、
-`implement`、`converge`；需要品質檢查表時使用 `checklist`。開始新的完整 SDD
-工作時 MUST 查核 Spec Kit CLI 與專案整合狀態，並對照官方穩定版；是否升級依
-相容性與本次需求決定，不因每次接續對話而自動升級。
+`implement`、`converge`；需要品質檢查表時使用 `checklist`。開始或接續完整 SDD
+前 MUST 通過 `maintain-singular-blockly` 的 Spec Kit 版本門檻：查核官方最新穩定版，
+將 CLI 與專案整合升級到該版並保留專案自訂內容；查核或升級失敗時 MUST 停止 SDD。
+是否需要 SDD 依同一技能的 No SDD、Lightweight plan、Full SDD 三級判斷。
 
 **Rationale**: 以契約變更界定完整 SDD，可讓跨執行環境的功能先建立共同驗收依據，
 同時避免一般維護產生不必要的規格文件。
@@ -412,4 +426,4 @@ This constitution supersedes all other development practices. All code changes, 
 -   MINOR: New principle addition, expanded guidance
 -   PATCH: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.8.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2026-09-24
+**Version**: 1.9.0 | **Ratified**: 2025-10-17 | **Last Amended**: 2026-11-13
