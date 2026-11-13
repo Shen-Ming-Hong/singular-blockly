@@ -21,11 +21,15 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 - 本專案在 Mac 上測試時，預設使用背景日誌、CLI 與不搶焦點的受控驗證。即使測試需要有畫面，也保持在背景；不得呼叫 activate／focus／bring-to-front，或反覆開啟 Extension Development Host 打斷使用者操作其他程式。
 - 先確認目前工具有文件支援且已實測能保持背景；`open -g` 等啟動參數不能保證子視窗不搶焦點。無法保證背景時，不啟動該測試；說明尚待驗證的項目，若必須前景操作，先告知並等使用者同意適當時段後再進行。
-- **需要 Ray 親自確認的修改先同步到 Ray 的本機專案，由 Ray 按 F5 確認。** 範圍依 `pr-review-release`「發布門檻」：涉及硬體行為的改動，Ray 實測通過後才開 PR；新的使用者可見介面可以先開 PR 跑 CI，但 Ray 在 F5 中確認外觀後才合併。改動完成並跑過本地檢查後，同步到 Ray Mac 上的本機專案 `/Users/user/Documents/singular-blockly`：
-  - 先看該專案的 `git status` 與目前分支；有 Ray 未提交的改動或不在 `master` 時不覆蓋，先告訴 Ray 並等 Ray 決定。
-  - 乾淨時推送任務分支，在該專案 `git fetch` 後切到任務分支，再跑 `npm install`（依賴有變時）與 `npm run compile`，確認 F5 會載入新版本。雲端工作階段透過 Remote Control 在該資料夾執行這些命令；桌面工作階段可直接在該資料夾操作，或請 Ray 改開任務 worktree。
-  - 準備好就主動通知 Ray 可以 F5 確認了，說明已切到哪個分支、要看哪些畫面（亮色／深色主題、受影響的互動）或要測哪些板子與流程；由 Ray 自己按 F5，不替 Ray 啟動 Extension Development Host。
-  - Ray 回報通過後，在 PR 描述記錄 Ray 的回報（時間與內容摘要）作為「發布門檻」的外觀確認或硬體測試證據，硬體改動此時才開 PR；發現問題就修正後再同步一次、再通知 Ray。測完後依 Ray 意思切回 `master`。
+- **需要 Ray 親自確認的修改併進本機整合分支，由 Ray 在同一個 VS Code 視窗按 F5 確認。** 範圍依 `pr-review-release`「發布門檻」：涉及硬體行為的改動，Ray 實測通過後才開 PR；新的使用者可見介面可以先開 PR 跑 CI，但 Ray 在 F5 中確認外觀後才合併。Ray 的 Mac 主資料夾 `/Users/user/Documents/singular-blockly` 固定停在本機整合分支 `local/integration`，Ray 永遠開這個資料夾測試，多個任務的改動都在這裡一起測：
+  - 每個任務仍在自己的分支開發與開 PR。需要 Ray 實測時，先看主資料夾的 `git status`；有 Ray 未提交的改動就不動，先告訴 Ray 並等 Ray 決定。乾淨時推送任務分支，在主資料夾 `git fetch` 後切到 `local/integration`（不存在就從最新 `origin/master` 建立），以 `git merge --no-ff origin/<任務分支>` 併入；不要 rebase、不要 force，也不要改寫整合分支上其他任務的 merge。
+  - 衝突由該任務自行解決，並確認沒有吃掉其他任務已併入的改動；解決不了就停止、還原這次 merge（`git merge --abort`），回報 Ray。
+  - 併入後依需要跑 `npm install`（依賴有變時）與 `npm run compile`，確認 F5 會載入新版本。雲端工作階段透過 Remote Control 在該資料夾執行這些命令；桌面工作階段可直接在該資料夾操作。
+  - 準備好就主動通知 Ray 可以 F5 確認了，說明併入了哪個分支、要看哪些畫面（亮色／深色主題、受影響的互動）或要測哪些板子與流程；由 Ray 自己按 F5，不替 Ray 啟動 Extension Development Host。
+  - Ray 回報通過後，在 PR 描述記錄 Ray 的回報（時間與內容摘要）作為「發布門檻」的外觀確認或硬體測試證據，硬體改動此時才開 PR；發現問題就在任務分支修正，再 merge 一次、再通知 Ray。
+  - `local/integration` 只在本機，不推上遠端、不從它開 PR，也不在上面直接改檔。
+  - 某個 PR 合併後，或整合分支累積太多已過時的 merge 時，從最新 `origin/master` 重建：先確認沒有 Ray 未提交的改動，`git switch -C local/integration origin/master`，再把仍在等測試的任務分支一個個 merge 回來，重新 compile 並告訴 Ray。
+  - 不要把未提交的檔案留在 `master` 或整合分支上；測試用的改動一律先提交到任務分支再併入。
 - 不得停止使用者正在工作的進程，也不得為了測試更動全域安全設定。需清理本次測試時，先確認實例屬於自己的隔離測試；使用者要求停止搶焦點操作後，立即停止相關 UI／F5 動作，並轉為背景檢查。
 
 ## 驗證與交付
