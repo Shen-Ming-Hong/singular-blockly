@@ -21,11 +21,11 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 - 本專案在 Mac 上測試時，預設使用背景日誌、CLI 與不搶焦點的受控驗證。即使測試需要有畫面，也保持在背景；不得呼叫 activate／focus／bring-to-front，或反覆開啟 Extension Development Host 打斷使用者操作其他程式。
 - 先確認目前工具有文件支援且已實測能保持背景；`open -g` 等啟動參數不能保證子視窗不搶焦點。無法保證背景時，不啟動該測試；說明尚待驗證的項目，若必須前景操作，先告知並等使用者同意適當時段後再進行。
-- **涉及硬體行為的修改（判斷同 `pr-review-release`「發布門檻」的硬體類別）先交給 Ray 在本機實測，通過後才開 PR。** 改動完成並跑過本地檢查後，同步到 Ray Mac 上的本機專案 `/Users/user/Documents/singular-blockly`，讓 Ray 能直接在 VS Code 按 F5 除錯實測：
+- **需要 Ray 親自確認的修改先同步到 Ray 的本機專案，由 Ray 按 F5 確認。** 範圍依 `pr-review-release`「發布門檻」：涉及硬體行為的改動，Ray 實測通過後才開 PR；新的使用者可見介面可以先開 PR 跑 CI，但 Ray 在 F5 中確認外觀後才合併。改動完成並跑過本地檢查後，同步到 Ray Mac 上的本機專案 `/Users/user/Documents/singular-blockly`：
   - 先看該專案的 `git status` 與目前分支；有 Ray 未提交的改動或不在 `master` 時不覆蓋，先告訴 Ray 並等 Ray 決定。
   - 乾淨時推送任務分支，在該專案 `git fetch` 後切到任務分支，再跑 `npm install`（依賴有變時）與 `npm run compile`，確認 F5 會載入新版本。雲端工作階段透過 Remote Control 在該資料夾執行這些命令；桌面工作階段可直接在該資料夾操作，或請 Ray 改開任務 worktree。
-  - 告訴 Ray 已切到哪個分支、要測哪些板子與流程，由 Ray 自己按 F5，不替 Ray 啟動 Extension Development Host。
-  - Ray 回報實測通過後才開 PR，並在 PR 描述記錄 Ray 的回報（時間與內容摘要）作為「發布門檻」的硬體測試證據；實測發現問題就修正後再同步一次。測完後依 Ray 意思切回 `master`。
+  - 準備好就主動通知 Ray 可以 F5 確認了，說明已切到哪個分支、要看哪些畫面（亮色／深色主題、受影響的互動）或要測哪些板子與流程；由 Ray 自己按 F5，不替 Ray 啟動 Extension Development Host。
+  - Ray 回報通過後，在 PR 描述記錄 Ray 的回報（時間與內容摘要）作為「發布門檻」的外觀確認或硬體測試證據，硬體改動此時才開 PR；發現問題就修正後再同步一次、再通知 Ray。測完後依 Ray 意思切回 `master`。
 - 不得停止使用者正在工作的進程，也不得為了測試更動全域安全設定。需清理本次測試時，先確認實例屬於自己的隔離測試；使用者要求停止搶焦點操作後，立即停止相關 UI／F5 動作，並轉為背景檢查。
 
 ## 驗證與交付
@@ -34,6 +34,6 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 - 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 4 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。
 - Blockly 積木、工具箱、schema 或產品 Skill 變更：執行 `npm run generate:project-skills`，檢查生成差異，再執行 `npm run check:project-skills`。
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
-- Commit／push／PR 交給 `git-workflow`，本地審查與發布交給 `pr-review-release`。只有純介面與純軟體的改動能從開發一路自行做到合併；涉及硬體行為的改動先依「Mac 測試與使用者工作並行」讓 Ray 在本機按 F5 實測通過，才開 PR、進整合佇列（Ray，2026-11-13）。非發布 PR 依 Ray 的常設授權，在 [整合佇列與自主合併](references/merge-queue.md) 的前置條件全部成立時自行 squash 合併，不再另外詢問；該文件「仍須先問 Ray」列出的事項仍先取得 Ray 明確同意。
+- Commit／push／PR 交給 `git-workflow`，本地審查與發布交給 `pr-review-release`。只有純介面與純軟體的改動能從開發一路自行做到合併；涉及硬體行為的改動先依「Mac 測試與使用者工作並行」讓 Ray 在本機按 F5 實測通過，才開 PR、進整合佇列；新的使用者可見介面同樣在本機讓 Ray 按 F5 確認外觀後才合併（Ray，2026-11-13）。非發布 PR 依 Ray 的常設授權，在 [整合佇列與自主合併](references/merge-queue.md) 的前置條件全部成立時自行 squash 合併，不再另外詢問；該文件「仍須先問 Ray」列出的事項仍先取得 Ray 明確同意。
 - 合併後在乾淨的整合 worktree 確認 `master` 包含本次 commit，並等 `master` 的完整 CI 結束；失敗時依該文件處理，不把合併當成完成。
 - 何時發布依 `pr-review-release` 的「何時發布」：以改動是否進到使用者安裝的 VSIX、使用者是否感受得到判斷 patch、累積 minor 或不用發；patch／minor 由協調者判斷並執行、發布後回報 Ray（見 `pr-review-release` 的「誰決定發布」），major 候選仍先問 Ray。新的使用者可見介面須 Ray 確認外觀、涉及硬體行為須 Ray 完成實體硬體測試，未通過前只能以預設關閉的形式合併與發布（見該技能的「發布門檻」）。
