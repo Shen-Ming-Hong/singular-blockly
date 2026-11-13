@@ -5,14 +5,15 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 # 維護 Singular Blockly
 
-先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支命名、既有變更與其他開啟中 PR 的檔案重疊；PR 依 [整合佇列與自主合併](references/merge-queue.md) 取得合併權、一次合併一個；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD。
+先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支命名、既有變更與其他開啟中 PR 的檔案重疊；PR 依 [整合佇列與自主合併](references/merge-queue.md) 取得合併權、一次合併一個；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD，但也不要把該走 SDD 的變更當成一般修正（見「動手前」第 1 步）。
 
 ## 動手前
 
-1. 從入口追到寫入、產生程式碼或硬體操作的終點，查找所有共用函式的呼叫者；在共同根因處修正。
-2. 分清楚貢獻者技能與產品技能：前者以 `.github/skills/` 為來源、由 `.agents/skills/` 連結；後者由 `resources/project-skills/singular-blockly/` 封裝並安裝到使用者專案。不要直接改生成或已安裝副本。
-3. 沿用 `AGENTS.md` 的架構與安全規則。處理程式碼安全時使用 `security-checker`；有翻譯變更時使用 `i18n-maintenance`；範例、依賴、回饋或硬體問題使用相應專用技能。
-4. 修改元件的 UI/UX（WebView 面板、對話框、選單、工具箱、捲軸、按鈕、主題配色、通知與錯誤畫面等）之前，先查看現代主流產品與網站怎麼呈現同類元件，再回來評估本站最合適的做法：
+1. **SDD 判斷（必做，寫程式前）。** 對照 `AGENTS.md`「Spec-Driven Development」的觸發清單，逐項判斷本次變更是否碰到：Extension Host 與 WebView 的訊息約定、Blockly 積木與產生器的約定、持久化的工作區格式、開發板上傳流程、managed runtime、安全邊界、重大相容性變動（重大依賴升級依實際影響判斷）。符合任何一項，先依 `AGENTS.md` 的順序跑完 Spec Kit 流程（`speckit-specify` 起）再寫程式；修 bug 也一樣，只要改到上述流程的行為。都不符合才走一般維護。判斷結果（符合哪一項、或逐項說明為何不符合）寫進 PR 描述的「SDD 判斷」段落；無法確定時視為符合，或先問 Ray。
+2. 從入口追到寫入、產生程式碼或硬體操作的終點，查找所有共用函式的呼叫者；在共同根因處修正。
+3. 分清楚貢獻者技能與產品技能：前者以 `.github/skills/` 為來源、由 `.agents/skills/` 連結；後者由 `resources/project-skills/singular-blockly/` 封裝並安裝到使用者專案。不要直接改生成或已安裝副本。
+4. 沿用 `AGENTS.md` 的架構與安全規則。處理程式碼安全時使用 `security-checker`；有翻譯變更時使用 `i18n-maintenance`；範例、依賴、回饋或硬體問題使用相應專用技能。
+5. 修改元件的 UI/UX（WebView 面板、對話框、選單、工具箱、捲軸、按鈕、主題配色、通知與錯誤畫面等）之前，先查看現代主流產品與網站怎麼呈現同類元件，再回來評估本站最合適的做法：
    - 至少比對兩個參考，優先找同類工具：VS Code 本身與其 Webview UI 規範、Scratch／MakeCode 等積木編輯器，再加上 Material、Fluent、Apple HIG、GitHub、Figma 等主流設計系統或產品；查實際畫面或官方文件，不憑印象。
    - 對照它們在亮色／深色主題、狀態（hover、focus、disabled、選取）、間距與互動上的共同做法，再依本站情境取捨：VS Code 主題變數與 Blockly 既有樣式優先，兒童與教學使用者需要的可讀性與點擊範圍，以及不破壞既有使用者的習慣。
    - 在 PR 描述寫下參考了哪些產品、採用或不採用的理由；之後的視覺驗證截圖要拿來對照這個結論。純文字、翻譯或不改外觀的修正不需要這一步。
@@ -35,7 +36,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 ## 驗證與交付
 
 - 先執行受影響範圍的測試；依 [專案地圖](references/project-map.md) 補上該變更需要的建置、契約或 i18n 檢查。不要把未執行的檢查寫成通過。
-- 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 4 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。
+- 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 5 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。
 - Blockly 積木、工具箱、schema 或產品 Skill 變更：執行 `npm run generate:project-skills`，檢查生成差異，再執行 `npm run check:project-skills`。
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
 - Commit／push／PR 交給 `git-workflow`，本地審查與發布交給 `pr-review-release`。只有純介面與純軟體的改動能從開發一路自行做到合併；涉及硬體行為的改動先依「Mac 測試與使用者工作並行」讓 Ray 在本機按 F5 實測通過，才開 PR、進整合佇列；新的使用者可見介面同樣在本機讓 Ray 按 F5 確認外觀後才合併（Ray，2026-11-13）。非發布 PR 依 Ray 的常設授權，在 [整合佇列與自主合併](references/merge-queue.md) 的前置條件全部成立時自行 squash 合併，不再另外詢問；該文件「仍須先問 Ray」列出的事項仍先取得 Ray 明確同意。
