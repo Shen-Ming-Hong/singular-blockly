@@ -29,7 +29,7 @@ Ray 於 2026-10-20 授權：**一般 PR 合併不需再問 Ray。** 執行任務
 輪到合併時，在**同步後的最終 head** 上逐項確認；任一項不成立就不合併。
 
 1. **範圍。** PR 只含本任務要求的變更，不屬於「仍須先問 Ray」的事項；`pr-review-release` 的本地 review（`local-code-review-loop`）結論為 `CLEAR`，或只剩有具體理由的 `CLEAR_WITH_REJECTIONS`。`NEEDS_USER_DECISION`、`BLOCKED` 或 i18n gate 未達 `PASS`／`PASS_WITH_ADVISORIES` 時不合併。
-2. **發布門檻。** 新的使用者可見介面或涉及硬體行為的變更，依 `pr-review-release` 的「發布門檻」：已取得 Ray 的外觀確認或實體硬體測試結果並寫進 PR 描述，或功能藏在預設關閉的實驗性設定後。兩者皆無就不合併。雲端本地驗證的截圖不算 Ray 確認。
+2. **發布門檻。** 新的使用者可見介面或涉及硬體行為的變更，依 `pr-review-release` 的「發布門檻」：已取得 Ray 的外觀確認或實體硬體測試結果並寫進 PR 描述，或功能藏在預設關閉的實驗性設定後。兩者皆無就不合併。涉及硬體行為的 PR 不論是否預設關閉，都須在開 PR 前已由 Ray 在本機以 F5 實測通過（見技能主文件「Mac 測試與使用者工作並行」）。雲端本地驗證的截圖不算 Ray 確認。
 3. **同步最新 `master`。** `git fetch origin master` 後，`origin/master` 必須是 PR head 的祖先（`git merge-base --is-ancestor origin/master HEAD`）。不是就依下方「同步與 rebase 策略」整合一次並推送。
 4. **雲端本地驗證。** 依 `cloud-local-verification` 在最終 head 執行與變更範圍相符的檢查，至少 `npm run ci:static` 與 `npm audit --audit-level=high`；程式碼變更另跑 `xvfb-run -a npm run test:unit:ci`；影響 WebView、積木、工具箱、主題或 i18n 顯示時，做真實 VS Code 的視覺與互動驗證（開啟編輯器、展開工具箱、拖曳積木）並附截圖。同步進來的 `master` 變更碰到本 PR 驗過的程式時，視覺與互動驗證也要在同步後重做。
 5. **GitHub 檢查。** PR 不是草稿；目前 head 的 `CI Gate` 成功，且 CodeQL 的 `Analyze (javascript-typescript)` 已對**這個 head** 產生結果並成功，不能只看 `CI Gate`。純文件 PR 在 CI 只跑 static，仍要等 `CI Gate` 與 CodeQL 完成。
