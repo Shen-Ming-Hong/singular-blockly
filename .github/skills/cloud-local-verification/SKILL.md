@@ -61,6 +61,7 @@ NODE_PATH=/tmp/sb-pw/node_modules xvfb-run -a -s "-screen 0 1440x900x24" \
 - 輸出：`01-editor-open.png`、`02-flyout-open.png`、`03-after-drag.png`（失敗時 `99-failure.png`）與 `result.json`。
 - `result.json` 判讀：`workspaceRendered` 為 true、`blocklyVersion` 符合預期、`toolboxCategories` 大於 0、`dragAddedBlocks` 為 1、`generatedCode` 有內容；`webviewErrors` 只收 webview 內的 console error，與 base 分支比較後只回報新增的錯誤。
 - 一定要用圖片檢視工具實際看截圖，確認版面、配色與文字，不能只依數值判斷。
+- UI/UX 變更：截圖拿來對照 `maintain-singular-blockly`「動手前」選定的業界參考，亮色與深色主題各看一次，並檢查受影響元件（含右鍵選單、捲軸、對話框等）在兩個主題下的配色與狀態是否一致。
 - 已知雜訊：以 root 執行的警告、Singular Core／PlatformIO Core 安裝進度通知、切換板子後的 reload 提示。它們不是本次變更造成的，除非變更本身與這些流程有關。
 - 需要更深的互動（特定積木、右鍵選單、程式碼預覽）時，沿用腳本找出 Blockly frame 的方式，在 frame 內用 `Blockly.getMainWorkspace()` 與 DOM 操作補充步驟；新增的流程若可重用，更新本腳本。
 
