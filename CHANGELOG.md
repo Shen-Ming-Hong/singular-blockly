@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 積木包新增「積木設計器」（仍在預設關閉的 `singular-blockly.experimental.blockPacks` 設定後面，只支援 ESP32 DevKit）：用零件拼出積木外觀、點選積木形狀、挑選顏色，編輯器自動產生 C++ 函式框架，使用者只填函式內容；可搜尋 PlatformIO 函式庫並自動加入標頭檔，也能把分類匯出成積木包檔分享
   Block packs gain a block designer (still behind the default-off `singular-blockly.experimental.blockPacks` setting, ESP32 DevKit only): build a block's look from pieces, pick its shape and colour, and the editor writes the C++ function frame so you only fill in the body; search PlatformIO libraries with their header added for you, and export a category as a block pack file to share
 
+### 🐛 修復 Bug Fixes
+
+- 已設定 Wi-Fi 上傳的 CyberBrick，主程式執行完後會保持待命，不必再在最後放「一直重複做」，下一次 Wi-Fi 上傳也能穩定連上；程式出錯時會先在序列埠印出錯誤，再保持待命
+  CyberBrick boards set up for Wi-Fi upload now stay on standby after the main program finishes, so you no longer need a trailing "repeat forever" block for the next Wi-Fi upload to connect reliably; if the program hits an error, the error is printed to the serial port first and the board then stays on standby
+
 ### 🔒 安全性 Security
 
 - CyberBrick 上傳、序列埠偵測、OTA 設定與 TXT 上傳時產生的暫存腳本，改放在每次專屬、只有目前使用者能存取的暫存資料夾，用完即刪除，避免共用電腦上的其他使用者搶先建立同名檔案

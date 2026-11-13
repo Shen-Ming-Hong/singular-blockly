@@ -10,6 +10,9 @@ export const CYBERBRICK_OTA_AGENT_VERSION = CYBERBRICK_OTA_AGENT_TARGET_VERSION;
 export const CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START = '# Singular Blockly CyberBrick OTA bootstrap START';
 export const CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END = '# Singular Blockly CyberBrick OTA bootstrap END';
 export const CYBERBRICK_OTA_BOOTSTRAP_READY_MARKER = '[Singular Blockly] OTA bootstrap ready';
+export const CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_START = '# Singular Blockly CyberBrick OTA keep-alive START';
+export const CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_END = '# Singular Blockly CyberBrick OTA keep-alive END';
+export const CYBERBRICK_OTA_KEEP_ALIVE_MARKER = '[Singular Blockly] Program finished; Wi-Fi upload stays ready';
 
 export interface CyberBrickOtaAgentConfig {
 	deviceId: string;
@@ -69,18 +72,60 @@ export function buildCyberBrickRcMainOtaBootstrap(): string {
 	].join('\n');
 }
 
+/**
+ * Keeps the CyberBrick program alive after the student's `main()` returns.
+ *
+ * The official CyberBrick `boot.py` runs `import rc_main` and then `rc_main.main()`.
+ * Once `main()` returns, `boot.py` ends and the background OTA agent thread is no longer
+ * reliably reachable, so students had to add a trailing forever loop to keep Wi-Fi uploads
+ * working. Like Arduino's `loop()` keeping `ArduinoOTA.handle()` alive, this block wraps
+ * `main()` so the program idles after it finishes (or after an uncaught error is printed)
+ * and the OTA agent keeps listening. Ctrl+C (KeyboardInterrupt) still stops the idle loop
+ * so USB tools such as mpremote can take over.
+ */
+export function buildCyberBrickRcMainOtaKeepAlive(): string {
+	return [
+		CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_START,
+		'def _singular_blockly_ota_keep_alive():',
+		'    try:',
+		`        print(${JSON.stringify(CYBERBRICK_OTA_KEEP_ALIVE_MARKER)})`,
+		'    except Exception:',
+		'        pass',
+		'    import time as _singular_blockly_ota_idle_time',
+		'    while True:',
+		'        _singular_blockly_ota_idle_time.sleep_ms(200)',
+		'_singular_blockly_ota_user_main = globals().get("main")',
+		'def main():',
+		'    if callable(_singular_blockly_ota_user_main):',
+		'        try:',
+		'            _singular_blockly_ota_user_main()',
+		'        except KeyboardInterrupt:',
+		'            raise',
+		'        except Exception as _singular_blockly_ota_main_exc:',
+		'            try:',
+		'                import sys as _singular_blockly_ota_main_sys',
+		'                _singular_blockly_ota_main_sys.print_exception(_singular_blockly_ota_main_exc)',
+		'            except Exception:',
+		'                pass',
+		'    _singular_blockly_ota_keep_alive()',
+		CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_END,
+	].join('\n');
+}
+
+function stripMarkedBlock(code: string, start: string, end: string): string {
+	const pattern = new RegExp(`\\n?${escapeRegExp(start)}[\\s\\S]*?${escapeRegExp(end)}\\n?`, 'g');
+	return code.replace(pattern, '\n');
+}
+
 export function stripCyberBrickRcMainOtaBootstrap(code: string): string {
-	const pattern = new RegExp(
-		`\\n?${escapeRegExp(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START)}[\\s\\S]*?${escapeRegExp(CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END)}\\n?`,
-		'g'
-	);
-	return code.replace(pattern, '\n').replace(/^\n+/, '');
+	const withoutBootstrap = stripMarkedBlock(code, CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_START, CYBERBRICK_OTA_RC_MAIN_BOOTSTRAP_END);
+	return stripMarkedBlock(withoutBootstrap, CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_START, CYBERBRICK_OTA_RC_MAIN_KEEP_ALIVE_END).replace(/^\n+/, '');
 }
 
 export function withCyberBrickRcMainOtaBootstrap(code: string): string {
 	const cleanedCode = stripCyberBrickRcMainOtaBootstrap(code).replace(/^\n+/, '');
 	const wrappedCode = indentPythonBlock(cleanedCode);
-	return `${buildCyberBrickRcMainOtaBootstrap()}\n\ntry:\n${wrappedCode}\nexcept KeyboardInterrupt:\n    raise\nexcept Exception as _singular_blockly_ota_exc:\n    try:\n        import sys as _singular_blockly_ota_sys\n        _singular_blockly_ota_sys.print_exception(_singular_blockly_ota_exc)\n    except Exception:\n        pass\n    raise\n`;
+	return `${buildCyberBrickRcMainOtaBootstrap()}\n\ntry:\n${wrappedCode}\nexcept KeyboardInterrupt:\n    raise\nexcept Exception as _singular_blockly_ota_exc:\n    try:\n        import sys as _singular_blockly_ota_sys\n        _singular_blockly_ota_sys.print_exception(_singular_blockly_ota_exc)\n    except Exception:\n        pass\n    raise\n\n${buildCyberBrickRcMainOtaKeepAlive()}\n`;
 }
 
 /**
