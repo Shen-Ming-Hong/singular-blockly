@@ -105,6 +105,8 @@ const app = await electron.launch({
     "--disable-gpu",
     "--no-sandbox",
     "--new-window",
+    // macOS 預設的浮動捲軸會忽略 scrollbar-color；加上 --overlay-scrollbars 在 Linux 重現。
+    ...(args["overlay-scrollbars"] ? ["--enable-features=OverlayScrollbar"] : []),
   ],
   timeout: 120000,
 });
@@ -199,6 +201,51 @@ try {
       results.checks.dragAddedBlocks = (await count()) - before;
       await shot(window, "03-after-drag");
     }
+  }
+
+  // 右鍵選單：在積木上按右鍵，限制選單高度強制出現捲軸，記錄捲軸配色並截圖。
+  const contextTarget = await blocklyFrame.evaluateHandle(() => {
+    const block = Blockly.getMainWorkspace().getTopBlocks(false)[0];
+    return block ? block.getSvgRoot().querySelector(".blocklyPath") : null;
+  });
+  const contextElement = contextTarget.asElement();
+  if (contextElement) {
+    const box = await contextElement.boundingBox();
+    await window.mouse.click(box.x + 8, box.y + 8, { button: "right" });
+    await window.waitForTimeout(800);
+    results.checks.contextMenu = await blocklyFrame.evaluate(() => {
+      const menu = document.querySelector(".blocklyWidgetDiv .blocklyContextMenu");
+      if (!menu) return null;
+      menu.style.maxHeight = "48px";
+      menu.scrollTop = 1;
+      const style = getComputedStyle(menu);
+      return {
+        overflows: menu.scrollHeight > menu.clientHeight,
+        scrollbarWidth: style.scrollbarWidth,
+        scrollbarColor: style.scrollbarColor,
+        colorScheme: style.colorScheme,
+        background: style.backgroundColor,
+        htmlScrollbarColor: getComputedStyle(document.documentElement).scrollbarColor,
+      };
+    });
+    await window.waitForTimeout(400);
+    const menuBox = await blocklyFrame
+      .$(".blocklyWidgetDiv .blocklyContextMenu")
+      .then((menu) => menu && menu.boundingBox());
+    if (menuBox) {
+      const file = path.join(outDir, "04-context-menu.png");
+      await window.screenshot({
+        path: file,
+        clip: {
+          x: Math.max(menuBox.x - 40, 0),
+          y: Math.max(menuBox.y - 40, 0),
+          width: menuBox.width + 80,
+          height: menuBox.height + 80,
+        },
+      });
+      results.screenshots.push(file);
+    }
+    await window.keyboard.press("Escape");
   }
 
   // 產生程式碼確認 generator 可在拖曳後正常運作（只記錄長度與開頭，避免結果過長）。
