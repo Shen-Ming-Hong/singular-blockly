@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.92.3] - 2026-11-13
 
 ### 🧪 實驗功能 Experimental
 
@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 已設定 Wi-Fi 上傳的 CyberBrick，主程式執行完後會保持待命，不必再在最後放「一直重複做」，下一次 Wi-Fi 上傳也能穩定連上；程式出錯時會先在序列埠印出錯誤，再保持待命
   CyberBrick boards set up for Wi-Fi upload now stay on standby after the main program finishes, so you no longer need a trailing "repeat forever" block for the next Wi-Fi upload to connect reliably; if the program hits an error, the error is printed to the serial port first and the board then stays on standby
+- 積木右鍵選單在項目都放得下時不再出現捲軸，macOS 上不會再看到黑色的系統滑桿；項目太多需要捲動時，亮色與暗色主題都改用細的圓角半透明滑桿，欄位下拉選單也一樣
+  The block context menu no longer shows a scrollbar when all its items fit, so the black system scrollbar no longer appears on macOS; when a menu does need to scroll, light and dark themes now both use a thin, rounded, translucent scrollbar, and field dropdowns match
 
 ### 🔒 安全性 Security
 
@@ -26,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Temporary scripts created during CyberBrick uploads, serial port detection, OTA setup, and TXT uploads now go into a private per-run temporary folder that only the current user can access and that is deleted afterwards, so other users on a shared computer cannot pre-create files with the same name
 - TXT 執行環境埠號只接受 1–65534 的整數；設定值無效時改用預設的 8080，不再把它組進 TXT 上執行的指令
   The TXT runtime port only accepts whole numbers from 1 to 65534; an invalid setting falls back to the default 8080 instead of being placed into commands run on the TXT
+
+### 🔧 維護 Maintenance
+
+- 更新內建的 `@vscode/proxy-agent` 至 0.46.0
+  Updated the bundled `@vscode/proxy-agent` to 0.46.0
 
 ## [0.92.2] - 2026-10-26
 
