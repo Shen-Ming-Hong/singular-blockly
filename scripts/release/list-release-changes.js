@@ -38,6 +38,11 @@ function isVsixPath(file) {
 	return VSIX_PATTERNS.some(pattern => pattern.test(file));
 }
 
+// Markdown 表格儲存格：先跳脫反斜線，再跳脫欄位分隔符號。
+function escapeTableCell(text) {
+	return text.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
+}
+
 function git(root, args) {
 	return execFileSync('git', args, { cwd: root, encoding: 'utf8' });
 }
@@ -94,7 +99,7 @@ function main() {
 	process.stdout.write('| 進 VSIX | PR | commit | 標題 |\n| --- | --- | --- | --- |\n');
 	for (const change of result.changes) {
 		const pr = change.pullNumber ? `#${change.pullNumber}` : '—';
-		process.stdout.write(`| ${change.inVsix ? '是' : '否'} | ${pr} | ${change.sha} | ${change.subject.replace(/\|/g, '\\|')} |\n`);
+		process.stdout.write(`| ${change.inVsix ? '是' : '否'} | ${pr} | ${change.sha} | ${escapeTableCell(change.subject)} |\n`);
 	}
 }
 
@@ -107,4 +112,4 @@ if (require.main === module) {
 	}
 }
 
-module.exports = { isVsixPath, parsePullNumber, listReleaseChanges };
+module.exports = { escapeTableCell, isVsixPath, parsePullNumber, listReleaseChanges };

@@ -4,7 +4,7 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const { isVsixPath, parsePullNumber, listReleaseChanges } = require('./list-release-changes');
+const { escapeTableCell, isVsixPath, parsePullNumber, listReleaseChanges } = require('./list-release-changes');
 
 function git(root, args) {
 	return execFileSync('git', args, { cwd: root, encoding: 'utf8' });
@@ -31,6 +31,10 @@ describe('release change list', () => {
 	it('reads the pull request number from a squash subject', () => {
 		assert.strictEqual(parsePullNumber('fix(webview): 修正捲軸 (#258)'), 258);
 		assert.strictEqual(parsePullNumber('docs: 沒有編號'), null);
+	});
+
+	it('escapes backslashes and pipes for a Markdown table cell', () => {
+		assert.strictEqual(escapeTableCell('a|b\\c'), 'a\\|b\\\\c');
 	});
 
 	it('lists commits after the latest release tag', () => {
