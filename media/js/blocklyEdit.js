@@ -2651,6 +2651,73 @@ function updateTxtConnectionPanelTexts() {
 // 註冊工具箱元件
 Blockly.registry.register(Blockly.registry.Type.TOOLBOX_ITEM, Blockly.ToolboxCategory.registrationName, Blockly.ToolboxCategory);
 
+/**
+ * 積木清單（flyout）避開右上角的浮動工具列。
+ *
+ * 工具列（.controls-container）疊在工作區上方；編輯器較窄時，打開分類後最上面的積木
+ * 會被工具列蓋住。開啟分類時若頂端的積木和工具列重疊，就把清單內容整體往下移到工具列
+ * 下方；寬到不會重疊時維持原樣。捲動高度同步加上這段位移，最後一個積木仍捲得到。
+ */
+class SingularVerticalFlyout extends Blockly.VerticalFlyout {
+	constructor(workspaceOptions) {
+		super(workspaceOptions);
+		this.toolbarInset_ = 0;
+		const metricsManager = this.getWorkspace().getMetricsManager();
+		const getScrollMetrics = metricsManager.getScrollMetrics.bind(metricsManager);
+		metricsManager.getScrollMetrics = (getWorkspaceCoordinates, cachedViewMetrics, cachedContentMetrics) => {
+			const metrics = getScrollMetrics(getWorkspaceCoordinates, cachedViewMetrics, cachedContentMetrics);
+			if (this.toolbarInset_ > 0) {
+				const scale = this.getWorkspace().scale;
+				metrics.height += (this.toolbarInset_ * scale) / (getWorkspaceCoordinates ? scale : 1);
+			}
+			return metrics;
+		};
+	}
+
+	layout_(contents) {
+		super.layout_(contents);
+		this.toolbarInset_ = this.getToolbarInset_(contents);
+		if (this.toolbarInset_ > 0) {
+			for (const item of contents) {
+				item.getElement().moveBy(0, this.toolbarInset_);
+			}
+		}
+	}
+
+	/** 回傳要往下移的距離（flyout 工作區單位）；工具列沒有蓋到積木時回傳 0。 */
+	getToolbarInset_(contents) {
+		const toolbar = document.querySelector('.controls-container');
+		const target = this.targetWorkspace;
+		if (!toolbar || !target || this.RTL) {
+			return 0;
+		}
+		const bar = toolbar.getBoundingClientRect();
+		const scale = this.getWorkspace().scale;
+		if (bar.width === 0 || bar.height === 0 || !scale) {
+			return 0;
+		}
+		const svg = target.getParentSvg().getBoundingClientRect();
+		const toolbox = target.getToolbox();
+		const flyoutLeft = svg.left + (toolbox ? toolbox.getWidth() : 0);
+		const barTop = (bar.top - svg.top) / scale;
+		const barBottom = (bar.bottom - svg.top) / scale;
+		const barLeft = (bar.left - flyoutLeft) / scale;
+		for (const item of contents) {
+			const rect = item.getElement().getBoundingRectangle();
+			if (rect.top >= barBottom) {
+				break;
+			}
+			const overlaps = rect.getWidth() > 0 && rect.bottom > barTop && rect.right > barLeft;
+			if (overlaps) {
+				return barBottom - this.MARGIN + this.GAP_Y / 2;
+			}
+		}
+		return 0;
+	}
+}
+
+Blockly.registry.register(Blockly.registry.Type.FLYOUTS_VERTICAL_TOOLBOX, 'singularVerticalFlyout', SingularVerticalFlyout);
+
 // 用來儲存等待回應的確認對話框回調函數
 const pendingConfirmCallbacks = new Map();
 let confirmCounter = 0;
@@ -3636,6 +3703,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		renderer: 'thrasos',
 		media: window.BLOCKLY_MEDIA_URL,
 		trashcan: true, // 添加垃圾桶
+		plugins: { flyoutsVerticalToolbox: 'singularVerticalFlyout' }, // 積木清單避開浮動工具列
 		maxInstances: {
 			micropython_main: 1,
 			txt_setup: 1,
