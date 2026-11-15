@@ -5,7 +5,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 # 維護 Singular Blockly
 
-先讀 `AGENTS.md`。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支命名、既有變更與其他開啟中 PR 的檔案重疊；PR 依 [整合佇列與自主合併](references/merge-queue.md) 取得合併權、一次合併一個；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD，但也不要把該走 SDD 的變更當成一般修正（見「動手前」第 1 步）。
+先讀 `AGENTS.md`。以名稱載不到本技能或其他技能時（工具清單沒有、`.claude/skills`／`.agents/skills` 的連結沒被建立或跟隨），直接讀 `.github/skills/<名稱>/SKILL.md`，不可因此跳過。寫入前依 [並行開發工作目錄](references/parallel-worktrees.md) 確認任務目錄、分支命名、既有變更與其他開啟中 PR 的檔案重疊；PR 依 [整合佇列與自主合併](references/merge-queue.md) 取得合併權、一次合併一個；唯讀檢查不需建立 worktree。沿實際呼叫路徑追查問題；只讀 [專案地圖](references/project-map.md) 中與本次變更相關的區段，以及 [維護經驗](references/lessons.md) 中相關的規則。遇到規格化功能，檢查對應的 `specs/` 與現行 `docs/specifications/`；不要把一般修正自動擴張成完整 SDD，但也不要把該走 SDD 的變更當成一般修正（見「動手前」第 1 步）。
 
 ## 動手前
 
@@ -17,6 +17,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
    - 至少比對兩個參考，優先找同類工具：VS Code 本身與其 Webview UI 規範、Scratch／MakeCode 等積木編輯器，再加上 Material、Fluent、Apple HIG、GitHub、Figma 等主流設計系統或產品；查實際畫面或官方文件，不憑印象。
    - 對照它們在亮色／深色主題、狀態（hover、focus、disabled、選取）、間距與互動上的共同做法，再依本站情境取捨：VS Code 主題變數與 Blockly 既有樣式優先，兒童與教學使用者需要的可讀性與點擊範圍，以及不破壞既有使用者的習慣。
    - 在 PR 描述寫下參考了哪些產品、採用或不採用的理由；之後的視覺驗證截圖要拿來對照這個結論。純文字、翻譯或不改外觀的修正不需要這一步。
+   - **新的使用者可見介面先給 Ray 看提案，Ray 確認才實作。** 用 `cloud-local-verification` 的腳本截目前畫面（改前），再做改後示意：示意要用本專案真實的 webview 與 CSS 呈現（例如在任務分支做出最小可看的版本後截圖），不用另畫的圖或外部設計稿；亮色與深色各一張，窄視窗受影響時也附上。把改前、改後與上面的參考結論一起給 Ray，Ray 確認後再寫完整實作；Ray 的回覆記進 PR 描述。既有元件的小幅調整（配色、間距、捲軸）不需要先提案，照上面的參考流程做完再給 Ray 在 F5 確認。
 
 ## Mac 測試與使用者工作並行
 
@@ -33,12 +34,24 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
   - 不要把未提交的檔案留在 `master` 或整合分支上；測試用的改動一律先提交到任務分支再併入。
 - 不得停止使用者正在工作的進程，也不得為了測試更動全域安全設定。需清理本次測試時，先確認實例屬於自己的隔離測試；使用者要求停止搶焦點操作後，立即停止相關 UI／F5 動作，並轉為背景檢查。
 
+## 子代理與 Workflow
+
+用子代理或 Workflow 分工時（只在使用者、本專案指示或技能要求時才用），主代理對結果負全責：
+
+1. 主代理寫每個子代理的 prompt 時，寫清楚可以改的檔案範圍、要做什麼、驗收條件（要跑哪些檢查、輸出長什麼樣子）；範圍外的檔案不准動。
+2. 子代理的產出一律不直接進 PR。主代理逐檔看 diff、對照原始檔案與驗收條件，自己重跑測試與檢查；不採信子代理自述的「已通過」「已檢查」。
+3. 不合格就退回重做並寫明哪裡不對，或主代理自己改；同一項退回兩次還不合格就收回自己做。有疑點寧可退回，不要放行。
+4. 子代理不 commit、push、合併、部署或發布，不操作 Ray 的 Mac 與 `local/integration`，也不呼叫對使用者發訊息的工具；`references/lessons.md`、CHANGELOG、技能這類共用摘要由主代理在整合時統一更新。
+5. 唯讀的調查子代理（找檔案、核對文件）可以直接採用結論，但寫進 PR 或技能的事實，主代理要自己再看過一次原始來源。
+
 ## 驗證與交付
 
 - 先執行受影響範圍的測試；依 [專案地圖](references/project-map.md) 補上該變更需要的建置、契約或 i18n 檢查。開跑前寫下這次的驗證範圍與理由，拿不準時往大的範圍測。
 - PR 描述的驗證結果逐項只寫「通過」「失敗」「沒驗到」三種；瀏覽器起不來、網路或權限這類工具與環境問題算「沒驗到」並寫明原因，不能當成通過。有失敗就修好再合併；有沒驗到的項目時，回報 Ray 時逐項列出。
 - 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 5 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。
 - Blockly 積木、工具箱、schema 或產品 Skill 變更：執行 `npm run generate:project-skills`，檢查生成差異，再執行 `npm run check:project-skills`。
+- 改到貢獻者技能（`.github/skills`）、它們的連結、`AGENTS.md` 或 `CLAUDE.md`：執行 `npm run check:skills`（連結、frontmatter、相對連結、SKILL.md 與 `lessons.md` 大小；也在 `ci:static` 中執行）。
+- 新增第三方素材（圖示、SVG、字型、圖片、音效）或複製外部程式片段時，確認授權允許再散布，並在 PR 描述逐項寫明來源與授權；不確定的不加入。打包進 `dist/` 的 npm 套件授權由 `generate:third-party-notices` 處理，`media/` 裡直接放的素材不在它的範圍內。
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
 - Commit／push／PR 交給 `git-workflow`，本地審查與發布交給 `pr-review-release`。只有純介面與純軟體的改動能從開發一路自行做到合併；涉及硬體行為的改動先依「Mac 測試與使用者工作並行」讓 Ray 在本機按 F5 實測通過，才開 PR、進整合佇列；新的使用者可見介面同樣在本機讓 Ray 按 F5 確認外觀後才合併（Ray，2026-11-13）。非發布 PR 依 Ray 的常設授權，在 [整合佇列與自主合併](references/merge-queue.md) 的前置條件全部成立時自行 squash 合併，不再另外詢問；該文件「仍須先問 Ray」列出的事項仍先取得 Ray 明確同意。
 - 合併後在乾淨的整合 worktree 確認 `master` 包含本次 commit，並等 `master` 的完整 CI 結束；失敗時依該文件處理，不把合併當成完成。

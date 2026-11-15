@@ -32,6 +32,8 @@
 - `npm run test:integration`: integration tests.
 - `npm run generate:skill-contract`: rebuild the runtime-derived project Skill contract.
 - `npm run check:project-skills`: verify tracked Skill assets and manifest hashes.
+- `npm run check:skills`: verify contributor skills under `.github/skills`, their `.agents/skills` and `.claude/skills` links, frontmatter, relative links, and size limits.
+- `npm run release:changes`: list commits since the last release tag and mark the ones that ship in the VSIX, for the release PR's CHANGELOG check.
 - `npm run validate:i18n`: validate all locale files.
 - `npm run test:i18n`: run deterministic i18n contract tests.
 
@@ -70,6 +72,8 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Project-specific skills from `.github/skills` are linked into `.agents/skills`; update the source under `.github/skills`.
 - For repository write tasks, use `maintain-singular-blockly` to establish a task-owned worktree and branch; for cross-file product maintenance, also use it to locate owning files and select affected checks. Specialized skills keep their own workflows.
 - Contributor skills under `.github/skills` are linked into both `.agents/skills` (Codex) and `.claude/skills` (Claude Code); Spec Kit skills live in `.agents/skills` and are linked into `.claude/skills`. `CLAUDE.md` imports this file.
+- If a skill cannot be loaded by name (missing from the tool list, symlink not followed, or a checkout without symlinks), read `.github/skills/<name>/SKILL.md` (Spec Kit: `.agents/skills/<name>/SKILL.md`) directly; never skip the skill. Run `npm run check:skills` after changing contributor skills, their links, `AGENTS.md`, or `CLAUDE.md`.
+- Subagents and workflows: the main agent gives each subagent an explicit file scope, task, and acceptance checks, then reviews every diff itself and reruns the checks instead of trusting the subagent's report. Subagents never commit, push, merge, deploy, or edit shared summaries such as `lessons.md`. See "子代理與 Workflow" in `maintain-singular-blockly`.
 
 ## Coding Style
 - TypeScript uses strict compiler options from `tsconfig.json`.

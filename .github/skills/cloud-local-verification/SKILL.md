@@ -32,7 +32,8 @@ GitHub CI 是第二道把關，不是唯一證據。每個要交付或合併的�
 | 靜態                | `npm run ci:static`                                                                                                       | Static and security checks              |
 | 單元                | `xvfb-run -a npm run test:unit:ci`                                                                                        | Unit tests（vscode／vscodium × 三平台） |
 | 最低 Node           | 用 Node 22.x 執行 `npm ci && npm run compile-tests && npm run compile && npm run test:release && npm run release:prepare` | Minimum Node.js 22 compatibility        |
-| 積木／工具箱／Skill | `npm run generate:project-skills` 後 `npm run check:project-skills`                                                       | `ci:static` 第一步                      |
+| 積木／工具箱／Skill | `npm run generate:project-skills` 後 `npm run check:project-skills`                                                       | `ci:static`                             |
+| 貢獻者技能          | `npm run check:skills`                                                                                                    | `ci:static` 第一步                      |
 
 - `ci:static` 不含 `npm audit`；CI 的安全步驟是獨立的，兩者都要跑。
 - Blockly 版本寫在產品 Skill contract 中。升級 `blockly` 後 `check:skill-contract` 會回報 stale，需重新產生並提交。
@@ -56,12 +57,14 @@ NODE_PATH=/tmp/sb-pw/node_modules xvfb-run -a -s "-screen 0 1440x900x24" \
   --out /tmp/sb-visual --board uno --theme light
 ```
 
-- 參數：`--board`（`uno`、`esp32`、`cyberbrick` 等 `main.json` 的 board 值）、`--theme light|dark`、`--repo`（預設目前目錄）、`--overlay-scrollbars`（開啟 Chromium 浮動捲軸，近似 macOS 預設，用來檢查捲軸樣式在 Mac 上是否仍生效）。依變更挑選會受影響的組合，例如主題變更就各跑一次 light／dark。
+- 參數：`--board`（`uno`、`esp32`、`cyberbrick` 等 `main.json` 的 board 值）、`--theme light|dark`、`--repo`（預設目前目錄）、`--size 寬x高`（調整 VS Code 視窗大小，`result.json` 的 `checks.windowSize` 記錄實際內容區大小）、`--overlay-scrollbars`（開啟 Chromium 浮動捲軸，近似 macOS 預設，用來檢查捲軸樣式在 Mac 上是否仍生效）。依變更挑選會受影響的組合，例如主題變更就各跑一次 light／dark。
 - 腳本會建立隔離的使用者資料與工作區，並放一個 PlatformIO 擴充空殼，讓擴充在沒有真實 PlatformIO IDE 時也能啟用；結束後刪除暫存目錄。
 - 輸出：`01-editor-open.png`、`02-flyout-open.png`、`03-after-drag.png`、`04-context-menu.png`（在積木上按右鍵並把選單高度限制為 48px，強制出現捲軸）（失敗時 `99-failure.png`）與 `result.json`；`checks.contextMenu` 記錄未限制高度時 `fitsWithoutScrollbar` 應為 true、限制後是否溢出，以及計算後的 `scrollbar-color`／`scrollbar-width`。
 - `result.json` 判讀：`workspaceRendered` 為 true、`blocklyVersion` 符合預期、`toolboxCategories` 大於 0、`dragAddedBlocks` 為 1、`generatedCode` 有內容；`webviewErrors` 只收 webview 內的 console error，與 base 分支比較後只回報新增的錯誤。
 - 一定要用圖片檢視工具實際看截圖，確認版面、配色與文字，不能只依數值判斷。
 - UI/UX 變更：截圖拿來對照 `maintain-singular-blockly`「動手前」選定的業界參考，亮色與深色主題各看一次，並檢查受影響元件（含右鍵選單、捲軸、對話框等）在兩個主題下的配色與狀態是否一致。
+- **窄視窗：** 改到工具列、工具箱、右鍵選單、對話框或面板版面時，除了預設大小，再用 `--size 900x700` 跑一次（約等於 13 吋筆電開著側邊欄或分割編輯器時的編輯器寬度），確認按鈕沒有被擠掉、文字沒有截斷到看不懂、選單沒有超出畫面。
+- **改前改後比對：** 不該改變外觀的變更（重構、依賴升級、Blockly 或 VS Code 相容性修正），在 `origin/master` 的乾淨 worktree 與本分支用同一組參數各跑一次，逐張比對 `01`～`04` 截圖（例如 ImageMagick 的 `compare -metric AE`，再用圖片檢視工具看差異位置）。有差異就查出原因，確認是預期內的才放行；本來就要改外觀的變更，用這組改前截圖做 PR 的前後對照。比對時兩邊用同一個 `.vscode-test/` 的 VS Code 與同一組字型，不另外塞測試用 CSS，避免差異來自環境而不是程式。
 - 已知雜訊：以 root 執行的警告、Singular Core／PlatformIO Core 安裝進度通知、切換板子後的 reload 提示。它們不是本次變更造成的，除非變更本身與這些流程有關。
 - 需要更深的互動（特定積木、右鍵選單、程式碼預覽）時，沿用腳本找出 Blockly frame 的方式，在 frame 內用 `Blockly.getMainWorkspace()` 與 DOM 操作補充步驟；新增的流程若可重用，更新本腳本。
 
