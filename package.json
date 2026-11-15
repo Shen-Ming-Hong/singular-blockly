@@ -195,6 +195,8 @@
 		"generate:skill-contract": "node scripts/generate-skill-contract.js",
 		"check:skill-contract": "node scripts/generate-skill-contract.js --check",
 		"generate:project-skills": "npm run generate:skill-contract && node scripts/generate-project-skill-manifest.js",
+		"check:skills": "node scripts/check-contributor-skills.js",
+		"release:changes": "node scripts/release/list-release-changes.js",
 		"check:project-skills": "npm run check:skill-contract && node scripts/generate-project-skill-manifest.js --check",
 		"check:managed-runtime": "node scripts/managed-runtime/validate-manifest.js",
 		"test:managed-runtime:paths": "node scripts/managed-runtime/test-installation.js",
@@ -210,7 +212,7 @@
 		"test:bail": "vscode-test --bail",
 		"test:coverage": "vscode-test --coverage",
 		"test:i18n": "mocha scripts/i18n/*.test.js",
-		"test:release": "mocha scripts/release/prepare-release.test.js",
+		"test:release": "mocha scripts/release/prepare-release.test.js scripts/release/list-release-changes.test.js",
 		"test:unit:ci": "vscode-test --label unit --forbid-only --fail-zero --skip-extension-dependencies",
 		"test:coverage:ci": "vscode-test --label unit --coverage --coverage-output coverage --coverage-reporter html --coverage-reporter lcov --coverage-reporter text-summary --forbid-only --fail-zero --skip-extension-dependencies",
 		"lint": "eslint src",
@@ -234,7 +236,7 @@
 		"feedback:package": "vsce package",
 		"feedback:verify-vsix:test": "mocha scripts/feedback/verify-vsix-privacy.test.js",
 		"feedback:triage-skill:test": "mocha scripts/feedback/validate-triage-skill.test.js",
-		"ci:static": "npm run check:project-skills && npm run check:managed-runtime && npm run test:managed-runtime:evidence && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release && npm run feedback:portal-locales:check && npm run feedback:contracts && npm run feedback:typecheck && npm run feedback:verify-vsix:test && npm run feedback:triage-skill:test && npm run feedback:test"
+		"ci:static": "npm run check:skills && npm run check:project-skills && npm run check:managed-runtime && npm run test:managed-runtime:evidence && npm run compile-tests && npm run compile && npm run lint && npm run lint:i18n && npm run lint:release && npm run validate:i18n && npm run test:i18n && npm run test:release && npm run feedback:portal-locales:check && npm run feedback:contracts && npm run feedback:typecheck && npm run feedback:verify-vsix:test && npm run feedback:triage-skill:test && npm run feedback:test"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-plugin": "^1.6.0",

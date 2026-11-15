@@ -4,7 +4,7 @@
 //
 // 用法（在 repo 根目錄，先完成 `npm run compile` 與一次 `xvfb-run -a npm run test:unit:ci`）：
 //   xvfb-run -a -s "-screen 0 1440x900x24" node .github/skills/cloud-local-verification/scripts/vscode-webview-smoke.mjs \
-//     --out /tmp/sb-visual [--board uno|esp32|cyberbrick] [--theme light|dark] [--repo <path>]
+//     --out /tmp/sb-visual [--board uno|esp32|cyberbrick] [--theme light|dark] [--repo <path>] [--size 900x700]
 //
 // playwright-core 裝在 repo 外的暫存目錄，以 NODE_PATH 指向其 node_modules；不要加入專案依賴。
 import { createRequire } from "node:module";
@@ -31,6 +31,9 @@ const outDir = path.resolve(
 );
 const board = args.board || "uno";
 const theme = args.theme || "light";
+// 視窗大小（寬x高）；用來檢查 VS Code 視窗變窄（側邊欄開著、分割編輯器）時的版面。
+const sizeMatch = /^(\d{3,4})x(\d{3,4})$/.exec(args.size || "");
+if (args.size && !sizeMatch) throw new Error(`--size 格式應為 寬x高，例如 900x700：${args.size}`);
 fs.mkdirSync(outDir, { recursive: true });
 
 function findVSCode() {
@@ -126,6 +129,21 @@ const shot = async (page, name) => {
 
 try {
   const window = await app.firstWindow();
+  if (sizeMatch) {
+    const [width, height] = [Number(sizeMatch[1]), Number(sizeMatch[2])];
+    await app.evaluate(
+      ({ BrowserWindow }, size) => {
+        const win = BrowserWindow.getAllWindows()[0];
+        win.unmaximize();
+        win.setSize(size.width, size.height);
+      },
+      { width, height },
+    );
+    results.checks.windowSize = await window.evaluate(() => [
+      window.innerWidth,
+      window.innerHeight,
+    ]);
+  }
   window.on("console", (message) => {
     if (
       message.type() === "error" &&
@@ -179,9 +197,20 @@ try {
     await category.click();
     await window.waitForTimeout(1200);
     await shot(window, "02-flyout-open");
-    const flyoutBlock = await blocklyFrame.$(
+    // 窄視窗時工具列會蓋住 flyout 上方的積木；挑第一個起點沒被遮住的積木。
+    const flyoutBlocks = await blocklyFrame.$$(
       ".blocklyFlyout .blocklyDraggable",
     );
+    const visibleIndex = await blocklyFrame.evaluate(() =>
+      Array.from(
+        document.querySelectorAll(".blocklyFlyout .blocklyDraggable"),
+      ).findIndex((block) => {
+        const rect = block.getBoundingClientRect();
+        const hit = document.elementFromPoint(rect.left + 10, rect.top + 10);
+        return Boolean(hit && block.contains(hit));
+      }),
+    );
+    const flyoutBlock = flyoutBlocks[Math.max(visibleIndex, 0)];
     const canvas = await blocklyFrame.$(".blocklyMainBackground");
     if (flyoutBlock && canvas) {
       const count = () =>
