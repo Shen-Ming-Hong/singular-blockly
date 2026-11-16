@@ -103,6 +103,9 @@ describe('Editor theme contract: scrollbars', () => {
 		// Chromium ignores ::-webkit-scrollbar when scrollbar-color/width are not auto, and macOS overlay
 		// scrollbars ignore scrollbar-color, which left the native black thumb on light menus.
 		assert.match(menuBlocks, /\.blocklyDropDownDiv \.blocklyMenu/, 'field dropdown menus share the menu scrollbar');
+		assert.match(menuBlocks, /\.controls-container \.board-dropdown/, 'toolbar board menu shares the menu scrollbar');
+		assert.match(menuBlocks, /\.controls-container \.language-dropdown/, 'toolbar language menu shares the menu scrollbar');
+		assert.match(css, /body\.theme-dark \.controls-container \.language-dropdown \{[^}]*--editor-menu-scrollbar-thumb: rgba\(255, 255, 255/);
 		assert.match(menuBlocks, /scrollbar-color\s*:\s*auto/);
 		assert.match(menuBlocks, /scrollbar-width\s*:\s*auto/);
 		assert.match(menuBlocks, /::-webkit-scrollbar-track[\s\S]*background\s*:\s*transparent/);

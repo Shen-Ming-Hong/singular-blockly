@@ -3333,7 +3333,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 }
 
 /*
- * 浮動選單（積木右鍵選單、欄位下拉選單）沿用 VS Code、Google Docs、Figma 的做法：
+ * 浮動選單（積木右鍵選單、欄位下拉選單、工具列的開發板與語言選單）沿用 VS Code、Google Docs、Figma 的做法：
  * 細的圓角半透明滑桿、不畫軌道，讓捲軸融入選單表面而不是另一塊色塊。
  * Chromium 121+ 只要 scrollbar-color／scrollbar-width 不是 auto 就忽略 ::-webkit-scrollbar，
  * 而 macOS 的浮動捲軸又不套用 scrollbar-color，會畫出系統預設的黑色滑桿；
@@ -3341,21 +3341,34 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
  * 只有不支援的瀏覽器才改用標準屬性。
  */
 .blocklyWidgetDiv .blocklyContextMenu,
-.blocklyDropDownDiv .blocklyMenu {
+.blocklyDropDownDiv .blocklyMenu,
+.controls-container .board-dropdown,
+.controls-container .language-dropdown {
 	scrollbar-width: auto;
 	scrollbar-color: auto;
 }
 
+/* 工具列的開發板與語言選單在深色主題是深色底，滑桿改用淺色半透明。 */
+body.theme-dark .controls-container .board-dropdown,
+body.theme-dark .controls-container .language-dropdown {
+	--editor-menu-scrollbar-thumb: rgba(255, 255, 255, 0.28);
+	--editor-menu-scrollbar-thumb-hover: rgba(255, 255, 255, 0.45);
+}
+
 @supports not selector(::-webkit-scrollbar) {
 	.blocklyWidgetDiv .blocklyContextMenu,
-	.blocklyDropDownDiv .blocklyMenu {
+	.blocklyDropDownDiv .blocklyMenu,
+	.controls-container .board-dropdown,
+	.controls-container .language-dropdown {
 		scrollbar-width: thin;
 		scrollbar-color: var(--editor-menu-scrollbar-thumb) transparent;
 	}
 }
 
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar,
+.controls-container .board-dropdown::-webkit-scrollbar,
+.controls-container .language-dropdown::-webkit-scrollbar {
 	width: 10px;
 	height: 10px;
 }
@@ -3363,12 +3376,16 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-track,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-corner,
 .blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-track,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-corner {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-corner,
+.controls-container .board-dropdown::-webkit-scrollbar-corner,
+.controls-container .language-dropdown::-webkit-scrollbar-corner {
 	background: transparent;
 }
 
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb,
+.controls-container .board-dropdown::-webkit-scrollbar-thumb,
+.controls-container .language-dropdown::-webkit-scrollbar-thumb {
 	min-height: 24px;
 	background-color: var(--editor-menu-scrollbar-thumb);
 	background-clip: padding-box;
@@ -3377,7 +3394,9 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 }
 
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb:hover,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb:hover {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb:hover,
+.controls-container .board-dropdown::-webkit-scrollbar-thumb:hover,
+.controls-container .language-dropdown::-webkit-scrollbar-thumb:hover {
 	background-color: var(--editor-menu-scrollbar-thumb-hover);
 }
 
