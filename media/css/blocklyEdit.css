@@ -5161,3 +5161,161 @@ body.theme-dark #backupModal .backup-list {
 		margin-left: 0;
 	}
 }
+
+/* ===== 互動式新手導覽（media/js/guidedTour.js） ===== */
+#guidedTourButton {
+	background-color: #f0f0f0;
+	color: #333;
+	border: none;
+	cursor: pointer;
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border-radius: 50%;
+	transition: background-color 0.2s;
+}
+
+#guidedTourButton:hover {
+	background-color: #e0e0e0;
+}
+
+#guidedTourButton:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+body.theme-dark #guidedTourButton {
+	background-color: #444444;
+	color: #e0e0e0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+body.theme-dark #guidedTourButton:hover {
+	background-color: #555555;
+}
+
+.guided-tour-layer {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+}
+
+.guided-tour-spotlight {
+	position: fixed;
+	border-radius: 8px;
+	pointer-events: none;
+	box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+	outline: 3px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+	transition:
+		top 0.25s ease,
+		left 0.25s ease,
+		width 0.25s ease,
+		height 0.25s ease;
+}
+
+.guided-tour-spotlight[hidden] {
+	display: block;
+	width: 0;
+	height: 0;
+	top: 50%;
+	left: 50%;
+	outline: none;
+}
+
+.guided-tour-card {
+	position: fixed;
+	width: min(320px, calc(100vw - 32px));
+	box-sizing: border-box;
+	padding: 16px 16px 12px;
+	border-radius: 8px;
+	background: var(--editor-surface-bg);
+	color: var(--editor-surface-fg);
+	border: 1px solid var(--editor-surface-border);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.guided-tour-progress {
+	font-size: 12px;
+	color: var(--editor-description-fg);
+	margin-bottom: 4px;
+}
+
+.guided-tour-title {
+	font-size: 15px;
+	font-weight: 600;
+	margin: 0 0 6px;
+}
+
+.guided-tour-body {
+	margin: 0 0 14px;
+}
+
+.guided-tour-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.guided-tour-spacer {
+	flex: 1;
+}
+
+.guided-tour-actions button {
+	font: inherit;
+	min-height: 28px;
+	border-radius: 4px;
+	padding: 4px 12px;
+	cursor: pointer;
+	border: 1px solid var(--editor-field-border);
+	background: transparent;
+	color: inherit;
+}
+
+.guided-tour-actions button[hidden] {
+	display: none;
+}
+
+.guided-tour-actions .guided-tour-skip {
+	border-color: transparent;
+	color: var(--editor-description-fg);
+	padding-left: 0;
+}
+
+.guided-tour-actions .guided-tour-next {
+	background: var(--editor-primary-action-bg);
+	color: var(--editor-primary-action-fg);
+	border-color: var(--editor-primary-action-border);
+}
+
+.guided-tour-actions .guided-tour-next:hover {
+	background: var(--editor-primary-action-hover-bg);
+}
+
+.guided-tour-actions button:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.guided-tour-spotlight {
+		transition: none;
+	}
+}
+
+@media (forced-colors: active) {
+	.guided-tour-card,
+	#guidedTourButton {
+		forced-color-adjust: auto;
+		border: 1px solid CanvasText;
+		box-shadow: none;
+	}
+
+	.guided-tour-spotlight {
+		outline-color: Highlight;
+	}
+}

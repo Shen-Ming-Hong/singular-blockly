@@ -871,6 +871,10 @@ export class WebViewManager {
 					.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/experimentalBlockMarker.js')))
 					.toString()
 			);
+			htmlContent = htmlContent.replace(
+				'{guidedTourUri}',
+				webview.asWebviewUri(vscode.Uri.file(path.join(this.context.extensionPath, 'media/js/guidedTour.js'))).toString()
+			);
 			htmlContent = htmlContent.replace('{blocklyCompressedJsUri}', blocklyCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{blocksCompressedJsUri}', blocksCompressedJsUri.toString());
 			htmlContent = htmlContent.replace('{javascriptCompressedJsUri}', javascriptCompressedJsUri.toString());
