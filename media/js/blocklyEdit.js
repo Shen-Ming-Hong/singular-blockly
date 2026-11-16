@@ -5009,6 +5009,71 @@ document.addEventListener('DOMContentLoaded', async () => {
 		target.scroll(view.scrollX, view.scrollY);
 	};
 
+	/**
+	 * 開啟編輯器（含 Ctrl+R 重新載入）或還原備份後，把主程式積木移到可見區正中間。
+	 * - 水平置中於工具箱右側的可見區；垂直置中，但積木頂端不躲到浮動工具列下面。
+	 * - 主程式積木比可見區高時改成頂端對齊，讓使用者先看到開頭。
+	 * - 沒有主程式積木時置中全部積木；TXT 存有上次視角時沿用該視角。
+	 */
+	const centerMainBlockInView = workspace => {
+		if (!workspace || workspace !== window.getBlocklyWorkspace() || workspace.isDragging?.()) {
+			return;
+		}
+		const boardId = window.getCurrentBoard?.() || boardSelect?.value;
+		if (isTxtBoardId(boardId) && txtVirtualControlsState.document?.canvas?.lastViewport) {
+			return;
+		}
+		Blockly.svgResize(workspace);
+		const block = workspace.getBlocksByType(getMainBlockType(boardId), false).find(candidate => !candidate.isInFlyout);
+		if (!block) {
+			if (workspace.getTopBlocks(false).length > 0) {
+				workspace.scrollCenter();
+			}
+			return;
+		}
+
+		const margin = 16;
+		const scale = workspace.scale;
+		const view = workspace.getMetricsManager().getViewMetrics();
+		const xy = block.getRelativeToSurfaceXY();
+		const size = block.getHeightWidth();
+		const blockLeft = (workspace.RTL ? xy.x - size.width : xy.x) * scale;
+		const blockTop = xy.y * scale;
+		const blockWidth = size.width * scale;
+		const blockHeight = size.height * scale;
+
+		// 浮動工具列蓋住可見區上方的部分（像素，相對於可見區頂端）。
+		let topInset = 0;
+		const toolbar = document.querySelector('.controls-container');
+		const svgRect = workspace.getParentSvg().getBoundingClientRect();
+		const barRect = toolbar?.getBoundingClientRect();
+		if (barRect && barRect.width > 0 && barRect.height > 0) {
+			topInset = Math.max(0, barRect.bottom - svgRect.top - workspace.getMetricsManager().getAbsoluteMetrics().top);
+		}
+
+		const viewLeft = blockLeft + blockWidth / 2 - view.width / 2;
+		let viewTop;
+		if (blockHeight + margin * 2 > view.height - topInset) {
+			viewTop = blockTop - topInset - margin;
+		} else {
+			viewTop = blockTop + blockHeight / 2 - view.height / 2;
+			// 只有工具列真的擋到積木（水平上有重疊）時才往下讓。
+			const absLeft = workspace.getMetricsManager().getAbsoluteMetrics().left;
+			const blockScreenLeft = svgRect.left + absLeft + (view.width - blockWidth) / 2;
+			const overlapsBar = barRect && blockScreenLeft + blockWidth > barRect.left && blockScreenLeft < barRect.right;
+			const minViewTop = blockTop - topInset - margin;
+			if (overlapsBar && viewTop > minViewTop) {
+				viewTop = minViewTop;
+			}
+		}
+		// Workspace.scroll 的座標是內容原點相對於可見區左上角的偏移（取負值）。
+		workspace.scroll(-viewLeft, -viewTop);
+	};
+
+	const scheduleMainBlockCentering = workspace => {
+		requestAnimationFrame(() => requestAnimationFrame(() => centerMainBlockInView(workspace || window.getBlocklyWorkspace())));
+	};
+
 	const handleWorkspaceLoadMessage = async message => {
 		const workspace = window.getBlocklyWorkspace();
 		if (!workspace) {
@@ -5481,12 +5546,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 				await handleWorkspaceLoadMessage(message);
 				await applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
+				// 語言切換可能重建工作區，所以等語言套用完才置中主程式積木。
+				scheduleMainBlockCentering();
 				break;
 			case 'languageUpdated':
 				await applyLanguageUpdate(message.languagePreference || 'auto', message.resolvedLanguage || currentResolvedLanguage);
 				break;
 			case 'loadWorkspace':
 				await handleWorkspaceLoadMessage(message);
+				// 還原備份會換掉整個工作區，置中主程式積木；外部檔案變更的重載保留目前視角。
+				if (!message.source && !message.requestId) {
+					scheduleMainBlockCentering();
+				}
 				break;
 			case 'updateTheme':
 			case 'setTheme':
