@@ -13,5 +13,19 @@
 	"singular-blockly.txt.username.description": "SSH username for TXT Controller",
 	"singular-blockly.txt.remotePath.description": "Remote path on TXT Controller where the program is uploaded",
 	"singular-blockly.txt.runtimePort.description": "TXT Controller runtime port",
-	"singular-blockly.cyberbrick.uploadSettings.description": "CyberBrick paired OTA device registry and upload settings. Sensitive values such as Wi-Fi passwords and OTA tokens are stored separately in VS Code SecretStorage."
+	"singular-blockly.cyberbrick.uploadSettings.description": "CyberBrick paired OTA device registry and upload settings. Sensitive values such as Wi-Fi passwords and OTA tokens are stored separately in VS Code SecretStorage.",
+	"walkthrough.gettingStarted.title": "Get Started with Singular Blockly",
+	"walkthrough.gettingStarted.description": "Build your first Arduino, CyberBrick, or TXT Controller program with blocks and upload it to your board.",
+	"walkthrough.gettingStarted.openEditor.title": "Open the editor and choose a board",
+	"walkthrough.gettingStarted.openEditor.description": "Open a writable folder first; your blocks are saved in it. Then click the Singular Blockly icon in the activity bar and pick your board from **Select Board**.\n[Open Blockly Editor](command:singular-blockly.openBlocklyEdit)",
+	"walkthrough.gettingStarted.openEditor.altText": "Opening the Blockly editor from the activity bar and selecting Arduino Uno.",
+	"walkthrough.gettingStarted.buildProgram.title": "Drag blocks and watch the code",
+	"walkthrough.gettingStarted.buildProgram.description": "Drag blocks from the toolbox into **Setup** and **Loop**, then change values with the dropdowns. Keep the generated file (for example `src/main.cpp`) open beside the editor to see the program update as you work.",
+	"walkthrough.gettingStarted.buildProgram.altText": "Building a blink program by dragging blocks while src/main.cpp updates next to the editor.",
+	"walkthrough.gettingStarted.upload.title": "Upload to your board",
+	"walkthrough.gettingStarted.upload.description": "Connect your board and click **Upload** in the editor toolbar. Arduino boards upload through PlatformIO, CyberBrick through USB or paired Wi-Fi, and the TXT Controller through SSH. If an Arduino upload fails, check PlatformIO first.\n[Check PlatformIO Status](command:singular-blockly.checkPlatformioStatus)",
+	"walkthrough.gettingStarted.upload.altText": "The Upload button in the Blockly editor toolbar.",
+	"walkthrough.gettingStarted.personalize.title": "Switch the language and theme",
+	"walkthrough.gettingStarted.personalize.description": "Expand the toolbar with the arrow button, use the globe menu to change the editor language, and use the theme button to switch between light and dark. Stuck or have an idea? Tell us without a GitHub account.\n[Provide Feedback](command:singular-blockly.provideFeedback)",
+	"walkthrough.gettingStarted.personalize.altText": "Switching the editor to Traditional Chinese and the dark theme."
 }

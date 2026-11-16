@@ -186,6 +186,58 @@
 				"fileMatch": "*.sbpack.json",
 				"url": "./media/schemas/block-pack.schema.json"
 			}
+		],
+		"walkthroughs": [
+			{
+				"id": "gettingStarted",
+				"title": "%walkthrough.gettingStarted.title%",
+				"description": "%walkthrough.gettingStarted.description%",
+				"steps": [
+					{
+						"id": "openEditor",
+						"title": "%walkthrough.gettingStarted.openEditor.title%",
+						"description": "%walkthrough.gettingStarted.openEditor.description%",
+						"media": {
+							"image": "media/walkthrough/open-editor-and-select-board.gif",
+							"altText": "%walkthrough.gettingStarted.openEditor.altText%"
+						},
+						"completionEvents": [
+							"onCommand:singular-blockly.openBlocklyEdit",
+							"onView:singular-blockly-view"
+						]
+					},
+					{
+						"id": "buildProgram",
+						"title": "%walkthrough.gettingStarted.buildProgram.title%",
+						"description": "%walkthrough.gettingStarted.buildProgram.description%",
+						"media": {
+							"image": "media/walkthrough/build-program-with-live-code.gif",
+							"altText": "%walkthrough.gettingStarted.buildProgram.altText%"
+						}
+					},
+					{
+						"id": "upload",
+						"title": "%walkthrough.gettingStarted.upload.title%",
+						"description": "%walkthrough.gettingStarted.upload.description%",
+						"media": {
+							"image": "media/walkthrough/upload-toolbar.png",
+							"altText": "%walkthrough.gettingStarted.upload.altText%"
+						},
+						"completionEvents": [
+							"onCommand:singular-blockly.checkPlatformioStatus"
+						]
+					},
+					{
+						"id": "personalize",
+						"title": "%walkthrough.gettingStarted.personalize.title%",
+						"description": "%walkthrough.gettingStarted.personalize.description%",
+						"media": {
+							"image": "media/walkthrough/switch-language-and-theme.gif",
+							"altText": "%walkthrough.gettingStarted.personalize.altText%"
+						}
+					}
+				]
+			}
 		]
 	},
 	"scripts": {

@@ -13,5 +13,19 @@
 	"singular-blockly.txt.username.description": "TXT 控制器的 SSH 使用者名稱",
 	"singular-blockly.txt.remotePath.description": "程式上傳到 TXT 控制器上的遠端路徑",
 	"singular-blockly.txt.runtimePort.description": "TXT 控制器執行環境的連接埠",
-	"singular-blockly.cyberbrick.uploadSettings.description": "CyberBrick 已配對的 OTA 裝置清單與上傳設定。Wi-Fi 密碼、OTA 權杖等敏感資料另外存放在 VS Code SecretStorage。"
+	"singular-blockly.cyberbrick.uploadSettings.description": "CyberBrick 已配對的 OTA 裝置清單與上傳設定。Wi-Fi 密碼、OTA 權杖等敏感資料另外存放在 VS Code SecretStorage。",
+	"walkthrough.gettingStarted.title": "開始使用 Singular Blockly",
+	"walkthrough.gettingStarted.description": "用積木做出第一個 Arduino、CyberBrick 或 TXT 控制器程式，並上傳到開發板。",
+	"walkthrough.gettingStarted.openEditor.title": "開啟編輯器並選擇開發板",
+	"walkthrough.gettingStarted.openEditor.description": "先開啟一個可寫入的資料夾，積木會存在裡面。接著點活動列的 Singular Blockly 圖示，從**選擇開發板**挑你的板子。\n[開啟 Blockly 編輯器](command:singular-blockly.openBlocklyEdit)",
+	"walkthrough.gettingStarted.openEditor.altText": "從活動列開啟 Blockly 編輯器並選擇 Arduino Uno。",
+	"walkthrough.gettingStarted.buildProgram.title": "拖曳積木，即時看到程式碼",
+	"walkthrough.gettingStarted.buildProgram.description": "從工具箱把積木拖進 **Setup** 與 **Loop**，再用下拉選單調整數值。把產生的檔案（例如 `src/main.cpp`）開在編輯器旁邊，就能邊做邊看程式更新。",
+	"walkthrough.gettingStarted.buildProgram.altText": "拖曳積木做出閃爍程式，旁邊的 src/main.cpp 同步更新。",
+	"walkthrough.gettingStarted.upload.title": "上傳到開發板",
+	"walkthrough.gettingStarted.upload.description": "接上開發板，按編輯器工具列的**上傳**。Arduino 透過 PlatformIO 上傳，CyberBrick 透過 USB 或已配對的 Wi-Fi，TXT 控制器透過 SSH。Arduino 上傳失敗時，先檢查 PlatformIO。\n[檢查 PlatformIO 狀態](command:singular-blockly.checkPlatformioStatus)",
+	"walkthrough.gettingStarted.upload.altText": "Blockly 編輯器工具列上的上傳按鈕。",
+	"walkthrough.gettingStarted.personalize.title": "切換語言與主題",
+	"walkthrough.gettingStarted.personalize.description": "用箭頭按鈕展開工具列，從地球選單切換編輯器語言，用主題按鈕切換亮色或暗色。遇到問題或有點子？不需要 GitHub 帳號也能告訴我們。\n[提供意見回饋](command:singular-blockly.provideFeedback)",
+	"walkthrough.gettingStarted.personalize.altText": "把編輯器切換成繁體中文與暗色主題。"
 }
