@@ -73,6 +73,10 @@ describe('Editor theme contract: scrollbars', () => {
 			/scrollbar-color\s*:\s*var\(--editor-scrollbar-thumb\)\s+var\(--editor-scrollbar-track\)/,
 			'Firefox scrollbar colors must follow the Blockly editor theme'
 		);
+		// macOS overlay scrollbars ignore scrollbar-color and Chromium 121+ ignores ::-webkit-scrollbar unless the
+		// standard properties stay auto, so the shared surfaces keep auto and only the fallback uses the standard ones.
+		assert.match(css, /\.blocklyToolboxDiv \{\s*scrollbar-width: auto;\s*scrollbar-color: auto;/);
+		assert.match(css, /@supports not selector\(::-webkit-scrollbar\) \{[\s\S]*?\.blocklyToolboxDiv \{\s*scrollbar-width: thin;/);
 		assert.match(
 			scrollbarBlocks,
 			/::-webkit-scrollbar-track[\s\S]*background(?:-color)?\s*:\s*var\(--editor-scrollbar-track\)/,

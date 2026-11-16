@@ -3171,6 +3171,12 @@ body.theme-dark .empty-backup-list {
 	border: initial;
 }
 
+/*
+ * Chromium 121+ 只要 scrollbar-color／scrollbar-width 不是 auto 就忽略 ::-webkit-scrollbar，
+ * 而 macOS 的浮動捲軸又不套用 scrollbar-color，會畫出系統預設的粗黑滑桿。
+ * 支援 ::-webkit-scrollbar 的 webview 一律把標準屬性設為 auto（也擋掉 VS Code 在 html 上繼承的顏色），
+ * 交給下面的 ::-webkit-scrollbar 規則畫；只有不支援的瀏覽器才用標準屬性。
+ */
 .board-dropdown,
 .language-dropdown,
 body.preview-mode .txt-preview-canvas,
@@ -3188,15 +3194,45 @@ body.preview-mode .txt-preview-canvas,
 .blocklyToolbox,
 .blocklyToolboxCategoryGroup,
 .blocklyToolboxDiv {
-	scrollbar-width: thin;
-	scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track);
+	scrollbar-width: auto;
+	scrollbar-color: auto;
 }
 
 .backup-list-container,
 .modal-content .search-results-container {
-	scrollbar-width: thin !important;
-	scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track) !important;
+	scrollbar-width: auto !important;
+	scrollbar-color: auto !important;
 }
+
+@supports not selector(::-webkit-scrollbar) {
+	.board-dropdown,
+	.language-dropdown,
+	body.preview-mode .txt-preview-canvas,
+	#txtTestPanelDialog .modal-body,
+	.modal,
+	.sample-modal-content .modal-body,
+	.block-pack-modal-content .modal-body,
+	.block-pack-code,
+	.block-designer-list,
+	.block-designer-side,
+	.block-designer-body,
+	#functionSearchModal,
+	#backupModal .backup-list,
+	.search-history-container,
+	.blocklyToolbox,
+	.blocklyToolboxCategoryGroup,
+	.blocklyToolboxDiv {
+		scrollbar-width: thin;
+		scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track);
+	}
+
+	.backup-list-container,
+	.modal-content .search-results-container {
+		scrollbar-width: thin !important;
+		scrollbar-color: var(--editor-scrollbar-thumb) var(--editor-scrollbar-track) !important;
+	}
+}
+
 
 .board-dropdown::-webkit-scrollbar,
 .language-dropdown::-webkit-scrollbar,
@@ -4958,6 +4994,9 @@ body .controls-container .toolbar-action-group button#txtVirtualControlsToggle.h
 }
 
 #backupModal .backup-list-container {
+	/* 只讓下面的清單捲動；外層也捲動會出現兩條捲軸，並切掉清單右邊框。 */
+	max-height: none;
+	overflow: visible;
 	padding: 0;
 	border: 0;
 	background-color: transparent;
@@ -4970,6 +5009,47 @@ body .controls-container .toolbar-action-group button#txtVirtualControlsToggle.h
 	border: 1px solid var(--ui-border);
 	border-radius: 10px;
 	background-color: transparent;
+}
+
+/* 清單捲軸和浮動選單一樣用細的半透明滑桿；macOS 浮動捲軸不套用 scrollbar-color，標準屬性要維持 auto。 */
+#backupModal .backup-list {
+	scrollbar-width: auto;
+	scrollbar-color: auto;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+	#backupModal .backup-list {
+		scrollbar-width: thin;
+		scrollbar-color: var(--editor-menu-scrollbar-thumb) transparent;
+	}
+}
+
+#backupModal .backup-list::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+#backupModal .backup-list::-webkit-scrollbar-track,
+#backupModal .backup-list::-webkit-scrollbar-corner {
+	background: transparent;
+	box-shadow: none;
+}
+
+#backupModal .backup-list::-webkit-scrollbar-thumb {
+	min-height: 24px;
+	background-color: var(--editor-menu-scrollbar-thumb);
+	background-clip: padding-box;
+	border: 2px solid transparent;
+	border-radius: 999px;
+}
+
+#backupModal .backup-list::-webkit-scrollbar-thumb:hover {
+	background-color: var(--editor-menu-scrollbar-thumb-hover);
+}
+
+body.theme-dark #backupModal .backup-list {
+	--editor-menu-scrollbar-thumb: rgba(255, 255, 255, 0.28);
+	--editor-menu-scrollbar-thumb-hover: rgba(255, 255, 255, 0.45);
 }
 
 #backupModal .backup-item {
@@ -5014,7 +5094,8 @@ body .controls-container .toolbar-action-group button#txtVirtualControlsToggle.h
 	display: flex;
 	flex: 0 0 auto;
 	gap: 4px;
-	margin-left: auto;
+	/* 舊的 .backup-actions 另有 margin-bottom: 20px，會把按鈕推到列的上方。 */
+	margin: 0 0 0 auto;
 }
 
 #backupModal .backup-actions button {
