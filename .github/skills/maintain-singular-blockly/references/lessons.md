@@ -30,11 +30,12 @@
 - **規則：** 依 `pr-review-release` 的「發布門檻」，新介面先取得 Ray 的外觀確認、硬體行為先取得 Ray 的實體測試結果；未取得前只以預設關閉的設定合併。發布 PR 逐項列出門檻狀態，不能只看「進 VSIX、使用者感受得到」。
 - **證據：** PR #232、0.92.0 發布 PR #233，以及 Ray 2026-10-22 指出「我們沒有討論外觀佈局」與「牽涉到硬體測試，暫時沒測完不能發佈」。
 
-## [PR / CodeQL] Ready PR 必須確認目前 head 已產生 CodeQL 結果
+## [PR / CodeQL] 合併前必須確認目前 head 已產生 CodeQL 結果
 
 - **問題：** PR #183 先以 draft 建立，之後轉為 ready；原本的 CI Gate 已成功，但 branch rules 仍因目前 head 沒有 CodeQL 結果而拒絕 squash merge。單純 `ready_for_review` 沒有讓該 head 產生 required CodeQL result。
 - **規則：** 已核准且準備立即驗證的 human-owned PR 預設直接建立 ready PR。合併前必須檢查目前 PR head 的 CodeQL 結果，不能只看 `CI Gate`。若 PR 曾是 draft 且轉 ready 後仍沒有 CodeQL，在確認 branch rules、CodeQL default setup 與 tree 內容後，可在已核准的 human-owned branch 建立不改檔案內容的 empty commit 觸發新的 PR commit event；不得繞過 ruleset，也不得把此復原手段當成一般流程。
-- **證據：** PR #183、repository ruleset `master protection` 的 `code_scanning: CodeQL` 規則，以及 PR #183 後續空 commit 觸發的 Actions／Python／JavaScript-TypeScript CodeQL 全綠結果。
+- **Dependabot：** Dependabot 推送的 head 一律沒有 `Analyze` 結果，處理方式見 `manage-dependabot-prs`「Phase 6」（Update branch 或同 tree 的 replacement PR），不要在 bot branch 推 empty commit。
+- **證據：** PR #183、repository ruleset `master protection` 的 `code_scanning: CodeQL` 規則，以及 PR #183 後續空 commit 觸發的 Actions／Python／JavaScript-TypeScript CodeQL 全綠結果；2026-11-16 Dependabot PR #264 原 head 只有 neutral `CodeQL`，「Update branch」後才有 `Analyze`；#269、#267／#268 改以 replacement PR #270、#271 取得 CodeQL 後合併。
 
 ## [依賴] Vitest major 必須跟隨 Cloudflare plugin 的 peer contract
 
