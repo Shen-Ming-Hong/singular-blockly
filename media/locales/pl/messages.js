@@ -121,6 +121,7 @@ window.languageManager.loadMessages('pl', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Wykryto bloki eksperymentalne',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Bloki eksperymentalne',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Twój obszar roboczy zawiera bloki eksperymentalne (wyróżnione żółtymi przerywanymi krawędziami). Te funkcje mogą ulec zmianie lub zostać usunięte w przyszłych aktualizacjach, używaj ich ostrożnie.',
 

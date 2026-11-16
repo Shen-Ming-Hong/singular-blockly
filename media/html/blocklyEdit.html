@@ -168,6 +168,15 @@
                     <!-- 板子選項會由 JS 動態生成 -->
                 </select>
             </div>
+            <!-- 實驗積木標籤：放在開發板旁，工具列展開、收合時都看得到 -->
+            <button id="experimentalBlocksIndicator" class="experimental-blocks-indicator hidden" type="button" title="">
+                <svg class="experimental-blocks-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+                    <path d="M12 9v4" />
+                    <path d="M12 17h.01" />
+                </svg>
+                <span class="experimental-blocks-label"></span>
+            </button>
             <div id="toolbarSecondaryActions" class="toolbar-action-group toolbar-secondary-actions" hidden>
             <div class="feedback-entry">
                 <button id="provideFeedbackButton" class="feedback-entry-button" type="button" title=""
@@ -333,14 +342,6 @@
             </div>
             </div>
             <div id="toolbarPrimaryActions" class="toolbar-action-group toolbar-primary-actions">
-                <div id="experimentalBlocksIndicator" class="experimental-blocks-indicator hidden" title="">
-                    <div class="indicator-icon">
-                        <svg viewBox="0 0 24 24" width="20" height="20">
-                            <path fill="currentColor"
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                        </svg>
-                    </div>
-                </div>
                 <div class="backup-switch">
                     <button id="backupButton" title="備份管理">
                         <svg class="backup-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -754,8 +755,8 @@
                             <label for="cyberbrickUsbPortSelect" id="cyberbrickUsbPortLabel">USB Port</label>
                             <div class="cyberbrick-upload-inline-field">
                                 <select id="cyberbrickUsbPortSelect" class="cyberbrick-upload-input"></select>
-                                <button id="cyberbrickRefreshUsbPorts" class="secondary-btn"
-                                    type="button">Refresh</button>
+                                <button id="cyberbrickRefreshUsbPorts" class="secondary-btn cyberbrick-icon-btn"
+                                    type="button" title="Refresh" aria-label="Refresh"><svg class="cyberbrick-icon-btn-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg></button>
                             </div>
                             <label for="cyberbrickFriendlyNameInput" id="cyberbrickFriendlyNameLabel">Device
                                 Name</label>
@@ -765,8 +766,8 @@
                             <div class="cyberbrick-wifi-ssid-field">
                                 <div class="cyberbrick-upload-inline-field">
                                     <select id="cyberbrickWifiSsidSelect" class="cyberbrick-upload-input"></select>
-                                    <button id="cyberbrickWifiScanButton" class="secondary-btn"
-                                        type="button">Rescan</button>
+                                    <button id="cyberbrickWifiScanButton" class="secondary-btn cyberbrick-icon-btn"
+                                    type="button" title="Rescan" aria-label="Rescan"><svg class="cyberbrick-icon-btn-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg></button>
                                 </div>
                             </div>
                             <label for="cyberbrickWifiPasswordInput" id="cyberbrickWifiPasswordLabel">Wi-Fi

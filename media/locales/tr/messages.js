@@ -121,6 +121,7 @@ window.languageManager.loadMessages('tr', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Deneysel Bloklar Tespit Edildi',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Deneysel bloklar',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Çalışma alanınız deneysel bloklar içeriyor (sarı kesikli kenarlıklarla vurgulanmış). Bu özellikler gelecekteki güncellemelerde değişebilir veya kaldırılabilir, dikkatli kullanın.',
 

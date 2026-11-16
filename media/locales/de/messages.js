@@ -121,6 +121,7 @@ window.languageManager.loadMessages('de', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Experimentelle Blöcke erkannt',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Experimentelle Blöcke',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Dein Arbeitsbereich enthält experimentelle Blöcke (mit gelb gestricheltem Rand markiert). Diese Funktionen können sich in künftigen Updates ändern oder wegfallen. Benutze sie deshalb vorsichtig.',
 

@@ -3183,6 +3183,7 @@ body.preview-mode .txt-preview-canvas,
 .block-designer-side,
 .block-designer-body,
 #functionSearchModal,
+#backupModal .backup-list,
 .search-history-container,
 .blocklyToolbox,
 .blocklyToolboxCategoryGroup,
@@ -3209,6 +3210,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
 .block-designer-side::-webkit-scrollbar,
 .block-designer-body::-webkit-scrollbar,
 #functionSearchModal::-webkit-scrollbar,
+#backupModal .backup-list::-webkit-scrollbar,
 .search-history-container::-webkit-scrollbar,
 .blocklyToolbox::-webkit-scrollbar,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar,
@@ -3235,6 +3237,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
 .block-designer-side::-webkit-scrollbar-track,
 .block-designer-body::-webkit-scrollbar-track,
 #functionSearchModal::-webkit-scrollbar-track,
+#backupModal .backup-list::-webkit-scrollbar-track,
 .search-history-container::-webkit-scrollbar-track,
 .blocklyToolbox::-webkit-scrollbar-track,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-track,
@@ -3263,6 +3266,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
 .block-designer-side::-webkit-scrollbar-thumb,
 .block-designer-body::-webkit-scrollbar-thumb,
 #functionSearchModal::-webkit-scrollbar-thumb,
+#backupModal .backup-list::-webkit-scrollbar-thumb,
 .search-history-container::-webkit-scrollbar-thumb,
 .blocklyToolbox::-webkit-scrollbar-thumb,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb,
@@ -3291,6 +3295,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
 .block-designer-side::-webkit-scrollbar-thumb:hover,
 .block-designer-body::-webkit-scrollbar-thumb:hover,
 #functionSearchModal::-webkit-scrollbar-thumb:hover,
+#backupModal .backup-list::-webkit-scrollbar-thumb:hover,
 .search-history-container::-webkit-scrollbar-thumb:hover,
 .blocklyToolbox::-webkit-scrollbar-thumb:hover,
 .blocklyToolboxCategoryGroup::-webkit-scrollbar-thumb:hover,
@@ -4433,4 +4438,626 @@ body.theme-dark .toast.info {
 	font-family: var(--vscode-editor-font-family, monospace);
 	font-size: 0.78rem;
 	line-height: 1.5;
+}
+
+/* ==========================================================================
+ * 工具列與對話框外觀（Ray 2026-11-16 選定）
+ * 工具列：一般按鈕透明、滑過才有底色，只有「上傳」用主色。
+ * 對話框：CyberBrick 上傳設定與備份管理改用同一組按鈕與欄位樣式。
+ * 用 :not(#ui-none) 提高優先度，蓋過舊的 id 選擇器與深色主題規則，不用 !important。
+ * ========================================================================== */
+body {
+	--ui-surface: #ffffff;
+	--ui-surface-subtle: #f6f7f9;
+	--ui-border: #dfe2e7;
+	--ui-text: #1f2328;
+	--ui-muted: #5c6470;
+	--ui-hover: rgba(31, 35, 40, 0.07);
+	--ui-pressed: rgba(31, 35, 40, 0.12);
+	--ui-primary: #0f6cbd;
+	--ui-primary-hover: #0c5aa0;
+	--ui-on-primary: #ffffff;
+	--ui-danger: #c42b1c;
+	--ui-danger-hover: #a52417;
+	--ui-success: #107c10;
+	--ui-warning: #a86b00;
+	--ui-warn-bg: #fff4ce;
+	--ui-warn-fg: #6b4e00;
+	--ui-warn-border: #f2d47c;
+	--ui-warn-icon: #d29b00;
+	--ui-input: #ffffff;
+	--ui-focus: #0f6cbd;
+	--ui-disabled-bg: rgba(31, 35, 40, 0.06);
+	--ui-disabled-fg: #9aa1ab;
+	--ui-toolbar-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+	--ui-dialog-shadow: 0 16px 48px rgba(0, 0, 0, 0.24);
+}
+
+body.theme-dark {
+	--ui-surface: #25272b;
+	--ui-surface-subtle: #1e2023;
+	--ui-border: #3a3d43;
+	--ui-text: #e7e9ec;
+	--ui-muted: #a3a9b3;
+	--ui-hover: rgba(255, 255, 255, 0.08);
+	--ui-pressed: rgba(255, 255, 255, 0.14);
+	--ui-primary: #3b8eea;
+	--ui-primary-hover: #5aa2f0;
+	--ui-on-primary: #ffffff;
+	--ui-danger: #f1707b;
+	--ui-danger-hover: #f58f98;
+	--ui-success: #6ccb5f;
+	--ui-warning: #f4c430;
+	--ui-warn-bg: #3b3115;
+	--ui-warn-fg: #f4d36b;
+	--ui-warn-border: #6a5517;
+	--ui-warn-icon: #f4c430;
+	--ui-input: #1b1d20;
+	--ui-focus: #5aa2f0;
+	--ui-disabled-bg: rgba(255, 255, 255, 0.06);
+	--ui-disabled-fg: #6f757e;
+	--ui-toolbar-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+	--ui-dialog-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- 工具列容器 ---- */
+body .controls-container.controls-container {
+	background-color: var(--ui-surface);
+	color: var(--ui-text);
+	border: 1px solid var(--ui-border);
+	border-radius: 12px;
+	box-shadow: var(--ui-toolbar-shadow);
+	padding: 6px 8px;
+	column-gap: 6px;
+	row-gap: 6px;
+}
+
+.controls-container .toolbar-action-group.toolbar-action-group {
+	gap: 4px;
+}
+
+/* 次要動作與主要動作之間的分隔線 */
+.controls-container .toolbar-secondary-actions:not([hidden])::after {
+	content: '';
+	align-self: center;
+	width: 1px;
+	height: 20px;
+	margin-left: 2px;
+	background-color: var(--ui-border);
+}
+
+body .controls-container #boardSelectLabel:not(#ui-none) {
+	color: var(--ui-muted);
+	font-size: 12px;
+}
+
+body .controls-container #boardSelectToggle:not(#ui-none) {
+	height: 32px;
+	background-color: var(--ui-input);
+	color: var(--ui-text);
+	border: 1px solid var(--ui-border);
+	border-radius: 8px;
+	box-shadow: none;
+}
+
+body .controls-container #boardSelectToggle:not(#ui-none):hover {
+	border-color: var(--ui-muted);
+}
+
+/* ---- 工具列圖示按鈕 ---- */
+body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none),
+body .controls-container #toolbarActionsToggle:not(#ui-none) {
+	display: grid;
+	place-items: center;
+	flex: 0 0 32px;
+	width: 32px;
+	height: 32px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 8px;
+	background-color: transparent;
+	color: var(--ui-text);
+	box-shadow: none;
+	transform: none;
+	cursor: pointer;
+	transition:
+		background-color 0.15s ease,
+		color 0.15s ease;
+}
+
+body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none) svg,
+body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none) svg *,
+body .controls-container #toolbarActionsToggle:not(#ui-none) svg {
+	color: inherit;
+}
+
+body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):hover,
+body .controls-container #toolbarActionsToggle:not(#ui-none):hover {
+	background-color: var(--ui-hover);
+}
+
+body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):active,
+body .controls-container #toolbarActionsToggle:not(#ui-none):active {
+	background-color: var(--ui-pressed);
+}
+
+body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):focus-visible,
+body .controls-container #toolbarActionsToggle:not(#ui-none):focus-visible {
+	outline: 2px solid var(--ui-focus);
+	outline-offset: 1px;
+}
+
+body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):disabled {
+	background-color: transparent;
+	color: var(--ui-disabled-fg);
+	cursor: not-allowed;
+}
+
+/* 上傳是整列唯一的主要按鈕 */
+body .controls-container .toolbar-action-group button#uploadButton:not(#ui-none) {
+	background-color: var(--ui-primary);
+	color: var(--ui-on-primary);
+}
+
+body .controls-container .toolbar-action-group button#uploadButton:not(#ui-none):hover {
+	background-color: var(--ui-primary-hover);
+}
+
+body .controls-container .toolbar-action-group button#uploadButton:not(#ui-none):disabled {
+	background-color: var(--ui-disabled-bg);
+	color: var(--ui-disabled-fg);
+}
+
+/* TXT 執行中：按鈕變成「停止」 */
+body .controls-container .toolbar-action-group button#uploadButton.txt-running:not(#ui-none) {
+	background-color: var(--ui-danger);
+	color: var(--ui-on-primary);
+}
+
+body .controls-container .toolbar-action-group button#uploadButton.txt-running:not(#ui-none):hover {
+	background-color: var(--ui-danger-hover);
+}
+
+/* 序列埠監控與 TXT 虛擬控制的狀態色 */
+body .controls-container .toolbar-action-group button#monitorBtn.active:not(#ui-none) {
+	color: var(--ui-success);
+	background-color: color-mix(in srgb, var(--ui-success) 14%, transparent);
+}
+
+body .controls-container .toolbar-action-group button#monitorBtn.connecting:not(#ui-none) {
+	color: var(--ui-warning);
+	background-color: color-mix(in srgb, var(--ui-warning) 14%, transparent);
+	cursor: progress;
+}
+
+body .controls-container .toolbar-action-group button#txtVirtualControlsToggle.active:not(#ui-none) {
+	color: var(--ui-primary);
+	background-color: color-mix(in srgb, var(--ui-primary) 14%, transparent);
+}
+
+body .controls-container .toolbar-action-group button#txtVirtualControlsToggle.has-invalid-references:not(#ui-none) {
+	color: var(--ui-warn-fg);
+	background-color: var(--ui-warn-bg);
+	box-shadow: inset 0 0 0 1px var(--ui-warn-border);
+}
+
+/* ---- 對話框：CyberBrick 上傳設定、備份管理 ---- */
+:is(#backupModal, #cyberbrickUploadSettingsModal) .modal-content {
+	background-color: var(--ui-surface);
+	color: var(--ui-text);
+	border: 1px solid var(--ui-border);
+	border-radius: 12px;
+	box-shadow: var(--ui-dialog-shadow);
+	overflow: hidden;
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .modal-header {
+	padding: 14px 20px;
+	background-color: transparent;
+	border-bottom: 1px solid var(--ui-border);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .modal-header h2 {
+	margin: 0;
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--ui-text);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .modal-close {
+	display: grid;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	font-size: 18px;
+	line-height: 1;
+	color: var(--ui-muted);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .modal-close:hover {
+	background-color: var(--ui-hover);
+	color: var(--ui-text);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .modal-close:focus-visible {
+	outline: 2px solid var(--ui-focus);
+	outline-offset: 1px;
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .modal-body {
+	padding: 16px 20px 20px;
+	background-color: transparent;
+	color: var(--ui-text);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) h3 {
+	margin: 0 0 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--ui-text);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .primary-btn {
+	min-height: 32px;
+	padding: 0 14px;
+	border: 0;
+	border-radius: 6px;
+	background-color: var(--ui-primary);
+	color: var(--ui-on-primary);
+	font-weight: 600;
+	box-shadow: none;
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .primary-btn:hover:not(:disabled) {
+	background-color: var(--ui-primary-hover);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .secondary-btn {
+	min-height: 32px;
+	padding: 0 12px;
+	border: 1px solid var(--ui-border);
+	border-radius: 6px;
+	background-color: transparent;
+	color: var(--ui-text);
+	box-shadow: none;
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) .secondary-btn:hover:not(:disabled) {
+	background-color: var(--ui-hover);
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) :is(.primary-btn, .secondary-btn):disabled {
+	background-color: var(--ui-disabled-bg);
+	color: var(--ui-disabled-fg);
+	border-color: transparent;
+	cursor: not-allowed;
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) :is(.primary-btn, .secondary-btn, button):focus-visible {
+	outline: 2px solid var(--ui-focus);
+	outline-offset: 1px;
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) :is(input:not([type='checkbox']):not([type='radio']), select) {
+	box-sizing: border-box;
+	min-height: 32px;
+	padding: 0 10px;
+	border: 1px solid var(--ui-border);
+	border-radius: 6px;
+	background-color: var(--ui-input);
+	color: var(--ui-text);
+	font-size: 13px;
+}
+
+:is(#backupModal, #cyberbrickUploadSettingsModal) :is(input, select):focus-visible {
+	outline: 2px solid var(--ui-focus);
+	outline-offset: -1px;
+}
+
+/* CyberBrick 上傳設定 */
+#cyberbrickUploadSettingsModal .cyberbrick-upload-modal-content {
+	width: min(560px, calc(100vw - 32px));
+	max-width: none;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-upload-section {
+	margin: 0 0 16px;
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-paired-device-empty {
+	padding: 14px 16px;
+	border: 1px dashed var(--ui-border);
+	border-radius: 10px;
+	background-color: var(--ui-surface-subtle);
+	color: var(--ui-muted);
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-paired-device-card {
+	border: 1px solid var(--ui-border);
+	border-radius: 10px;
+	background-color: transparent;
+	box-shadow: none;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-paired-device-card.primary {
+	border-color: var(--ui-primary);
+	background-color: color-mix(in srgb, var(--ui-primary) 6%, transparent);
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-accordion-toggle {
+	padding: 12px 0;
+	border: 0;
+	border-top: 1px solid var(--ui-border);
+	border-radius: 0;
+	background-color: transparent;
+	color: var(--ui-text);
+	font-size: 13px;
+	font-weight: 600;
+	box-shadow: none;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-accordion-toggle:hover {
+	background-color: transparent;
+	color: var(--ui-primary);
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-ota-cleanup-section .cyberbrick-accordion-toggle {
+	background-color: transparent;
+	border-color: var(--ui-border);
+	color: var(--ui-muted);
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-accordion-arrow {
+	color: var(--ui-muted);
+	font-size: 10px;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-accordion-body {
+	padding: 4px 0 0;
+	border: 0;
+	background-color: transparent;
+}
+
+/* 欄位標籤放在欄位上方，窄視窗也不會擠 */
+#cyberbrickUploadSettingsModal .cyberbrick-upload-grid {
+	grid-template-columns: minmax(0, 1fr);
+	gap: 6px 0;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-upload-grid > label {
+	margin-top: 8px;
+	color: var(--ui-muted);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+#cyberbrickUploadSettingsModal :is(.cyberbrick-upload-inline-field, .cyberbrick-password-field) {
+	display: flex;
+	gap: 6px;
+}
+
+#cyberbrickUploadSettingsModal :is(.cyberbrick-upload-inline-field, .cyberbrick-password-field) .cyberbrick-upload-input {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+#cyberbrickUploadSettingsModal :is(.cyberbrick-icon-btn, .cyberbrick-password-toggle) {
+	display: grid;
+	place-items: center;
+	flex: 0 0 32px;
+	width: 32px;
+	min-width: 32px;
+	padding: 0;
+	color: var(--ui-text);
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-password-toggle svg {
+	fill: none;
+	stroke: currentColor;
+}
+
+#cyberbrickUploadSettingsModal #cyberbrickProvisionButton {
+	display: block;
+	width: auto;
+	margin: 16px 0 0 auto;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-upload-help {
+	color: var(--ui-muted);
+	font-size: 12px;
+}
+
+#cyberbrickUploadSettingsModal .cyberbrick-danger-btn {
+	color: var(--ui-danger);
+	border-color: color-mix(in srgb, var(--ui-danger) 45%, transparent);
+}
+
+/* 備份管理 */
+#backupModal .modal-content {
+	width: min(620px, calc(100vw - 32px));
+	max-width: none;
+}
+
+#backupModal .backup-control-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+	box-shadow: none;
+}
+
+#backupModal .backup-control-divider {
+	display: none;
+}
+
+#backupModal .auto-backup-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+#backupModal .auto-backup-controls label,
+#backupModal #autoBackupMinutesText {
+	color: var(--ui-muted);
+	font-size: 12px;
+}
+
+#backupModal .auto-backup-input-group {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+#backupModal #autoBackupInterval {
+	width: 64px;
+}
+
+/* 建立新備份：主要按鈕前加「＋」 */
+#backupModal #createBackupBtn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+#backupModal #createBackupBtn::before {
+	content: '';
+	width: 14px;
+	height: 14px;
+	background-color: currentColor;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M5 12h14M12 5v14'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+#backupModal .backup-list-container {
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+}
+
+#backupModal .backup-list {
+	max-height: 340px;
+	padding: 0;
+	overflow-y: auto;
+	border: 1px solid var(--ui-border);
+	border-radius: 10px;
+	background-color: transparent;
+}
+
+#backupModal .backup-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+	padding: 10px 12px;
+	border: 0;
+	border-bottom: 1px solid var(--ui-border);
+	border-radius: 0;
+	background-color: transparent;
+	box-shadow: none;
+}
+
+#backupModal .backup-item:last-child {
+	border-bottom: 0;
+}
+
+#backupModal .backup-item:hover {
+	background-color: var(--ui-hover);
+	transform: none;
+}
+
+#backupModal .backup-info {
+	min-width: 0;
+}
+
+#backupModal .backup-name {
+	overflow-wrap: anywhere;
+	color: var(--ui-text);
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#backupModal .backup-date {
+	color: var(--ui-muted);
+	font-size: 12px;
+}
+
+#backupModal .backup-actions {
+	display: flex;
+	flex: 0 0 auto;
+	gap: 4px;
+	margin-left: auto;
+}
+
+#backupModal .backup-actions button {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 28px;
+	padding: 0 10px;
+	border: 1px solid var(--ui-border);
+	border-radius: 6px;
+	background-color: transparent;
+	color: var(--ui-text);
+	font-size: 12px;
+	box-shadow: none;
+	transform: none;
+}
+
+#backupModal .backup-actions button:hover {
+	background-color: var(--ui-hover);
+}
+
+#backupModal .backup-actions button svg {
+	width: 14px;
+	height: 14px;
+	margin: 0;
+}
+
+#backupModal .backup-actions .backup-restore {
+	border-color: var(--ui-primary);
+	background-color: var(--ui-primary);
+	color: var(--ui-on-primary);
+}
+
+#backupModal .backup-actions .backup-restore:hover {
+	background-color: var(--ui-primary-hover);
+}
+
+#backupModal .backup-actions .backup-delete {
+	justify-content: center;
+	width: 28px;
+	padding: 0;
+	color: var(--ui-danger);
+}
+
+#backupModal .backup-actions .backup-delete:hover {
+	background-color: color-mix(in srgb, var(--ui-danger) 10%, transparent);
+}
+
+#backupModal .empty-backup-list {
+	border: 0;
+	background-color: var(--ui-surface-subtle);
+	color: var(--ui-muted);
+	font-style: normal;
+}
+
+/* 很窄時，備份的操作按鈕換到名稱下方 */
+@media (max-width: 520px) {
+	#backupModal .backup-item {
+		flex-wrap: wrap;
+	}
+
+	#backupModal .backup-actions {
+		margin-left: 0;
+	}
 }

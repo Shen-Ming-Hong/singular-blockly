@@ -3157,32 +3157,20 @@ const backupManager = {
 			const previewBtn = document.createElement('button');
 			previewBtn.className = 'backup-preview';
 			const previewText = window.languageManager ? window.languageManager.getMessage('BACKUP_PREVIEW_BTN', '預覽') : '預覽';
-			previewBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="currentColor" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
-                </svg>
-                ${previewText}
-            `;
+			previewBtn.innerHTML = `<svg class="backup-action-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg><span>${previewText}</span>`;
 			previewBtn.addEventListener('click', () => this.previewBackup(backup.name)); // 還原按鈕
 			const restoreBtn = document.createElement('button');
 			restoreBtn.className = 'backup-restore';
 			const restoreText = window.languageManager ? window.languageManager.getMessage('BACKUP_RESTORE_BTN', '還原') : '還原';
-			restoreBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="currentColor" d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" />
-                </svg>
-                ${restoreText}
-            `;
+			restoreBtn.innerHTML = `<svg class="backup-action-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg><span>${restoreText}</span>`;
 			restoreBtn.addEventListener('click', () => this.restoreBackup(backup.name)); // 刪除按鈕
 			const deleteBtn = document.createElement('button');
 			deleteBtn.className = 'backup-delete';
 			const deleteText = window.languageManager ? window.languageManager.getMessage('BACKUP_DELETE_BTN', '刪除') : '刪除';
-			deleteBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
-                </svg>
-                ${deleteText}
-            `;
+			deleteBtn.innerHTML = `<svg class="backup-action-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>`;
+			// 刪除只留圖示，避免和還原一樣醒目；名稱放在 title 與 aria-label。
+			deleteBtn.title = deleteText;
+			deleteBtn.setAttribute('aria-label', deleteText);
 			deleteBtn.addEventListener('click', () => this.deleteBackup(backup.name));
 
 			backupActions.appendChild(restoreBtn);
@@ -6485,10 +6473,18 @@ function updateCyberBrickUploadSettingsTexts() {
 	setText('cyberbrickPairedDevicesTitle', languageManager.getMessage('CYBERBRICK_PAIRED_DEVICES_TITLE', 'My CyberBricks'));
 	setText('cyberbrickProvisioningTitle', languageManager.getMessage('CYBERBRICK_PROVISIONING_TITLE', 'Add CyberBrick Wireless Upload'));
 	setText('cyberbrickUsbPortLabel', languageManager.getMessage('CYBERBRICK_USB_PORT_LABEL', 'USB Port'));
-	setText('cyberbrickRefreshUsbPorts', languageManager.getMessage('CYBERBRICK_USB_PORT_REFRESH', 'Refresh'));
+	// 重新整理、重新掃描是圖示按鈕，文字放在 title 與 aria-label。
+	const setIconButtonLabel = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.title = value;
+			element.setAttribute('aria-label', value);
+		}
+	};
+	setIconButtonLabel('cyberbrickRefreshUsbPorts', languageManager.getMessage('CYBERBRICK_USB_PORT_REFRESH', 'Refresh'));
 	setText('cyberbrickFriendlyNameLabel', languageManager.getMessage('CYBERBRICK_FRIENDLY_NAME_LABEL', 'Device Name'));
 	setText('cyberbrickWifiSsidLabel', languageManager.getMessage('CYBERBRICK_WIFI_SSID_LABEL', 'Wi-Fi SSID'));
-	setText('cyberbrickWifiScanButton', languageManager.getMessage('CYBERBRICK_WIFI_SCAN_BUTTON', 'Rescan'));
+	setIconButtonLabel('cyberbrickWifiScanButton', languageManager.getMessage('CYBERBRICK_WIFI_SCAN_BUTTON', 'Rescan'));
 	setText('cyberbrickWifiPasswordLabel', languageManager.getMessage('CYBERBRICK_WIFI_PASSWORD_LABEL', 'Wi-Fi Password'));
 	updateCyberBrickWifiPasswordToggleState();
 	setText('cyberbrickProvisionButton', languageManager.getMessage('CYBERBRICK_PROVISION_BUTTON', 'Set Up Wireless Upload'));
@@ -6891,7 +6887,7 @@ function renderCyberBrickPairedDevices() {
 	const devices = cyberBrickUploadSettingsState.settings.pairedDevices || [];
 	if (devices.length === 0) {
 		const empty = document.createElement('div');
-		empty.className = 'cyberbrick-upload-help';
+		empty.className = 'cyberbrick-upload-help cyberbrick-paired-device-empty';
 		empty.textContent =
 			window.languageManager?.getMessage('CYBERBRICK_PAIRED_DEVICES_EMPTY', 'No CyberBrick added yet. Expand \'Add CyberBrick Wireless Upload\' below to get started.') ||
 			"No CyberBrick added yet. Expand 'Add CyberBrick Wireless Upload' below to get started.";

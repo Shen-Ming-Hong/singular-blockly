@@ -121,6 +121,7 @@ window.languageManager.loadMessages('hu', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Kísérleti blokkok észlelve',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Kísérleti blokkok',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'A munkaterület kísérleti blokkokat tartalmaz (sárga szaggatott szegéllyel kiemelve). Ezek a funkciók változhatnak vagy eltávolításra kerülhetnek a jövőbeni frissítésekben, óvatosan használja őket.',
 

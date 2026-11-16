@@ -121,6 +121,7 @@ window.languageManager.loadMessages('ko', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: '실험적 블록 감지됨',
+	EXPERIMENTAL_BLOCKS_LABEL: '실험적 블록',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'작업 공간에 실험적 블록(노란색 점선 테두리로 강조 표시됨)이 포함되어 있어요. 이러한 기능은 향후 업데이트에서 변경되거나 제거될 수 있으므로 주의해서 사용하세요.',
 

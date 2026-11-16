@@ -12,14 +12,14 @@ suite('Blockly editor toolbar actions contract', () => {
 	const root = path.resolve(__dirname, '../../..');
 	const read = (file: string) => fs.readFileSync(path.join(root, file), 'utf8');
 
-	test('keeps backup, upload, monitor, and the experimental indicator in the primary group', () => {
+	test('keeps backup, upload, and monitor in the primary group', () => {
 		const html = read('media/html/blocklyEdit.html');
 		const primaryStart = html.indexOf('id="toolbarPrimaryActions"');
 		const primaryEnd = html.indexOf('id="toolbarActionsToggle"', primaryStart);
 		const primary = html.slice(primaryStart, primaryEnd);
 
 		assert.ok(primaryStart >= 0, 'primary toolbar action group is missing');
-		for (const id of ['backupButton', 'uploadButton', 'monitorBtn', 'experimentalBlocksIndicator']) {
+		for (const id of ['backupButton', 'uploadButton', 'monitorBtn']) {
 			assert.ok(primary.includes(`id="${id}"`), `${id} must remain visible when the toolbar is collapsed`);
 		}
 		for (const id of ['provideFeedbackButton', 'languageToggle', 'themeToggle', 'functionSearchToggle', 'refreshButton']) {
@@ -41,8 +41,9 @@ suite('Blockly editor toolbar actions contract', () => {
 			/id="toolbarActionsToggle"[^>]*aria-controls="toolbarSecondaryActions"[^>]*aria-expanded="false"/
 		);
 		assert.match(html, /id="toolbarSecondaryActions"[^>]*hidden/);
+		// Ray 2026-11-16：實驗積木改為開發板旁的標籤，放在可收合的次要群組之前，收合時仍可見。
 		const indicator = html.indexOf('id="experimentalBlocksIndicator"');
-		assert.ok(indicator > primary && indicator < toggle, 'experimental indicator must remain visible when secondary actions collapse');
+		assert.ok(indicator >= 0 && indicator < secondary, 'experimental indicator must remain visible when secondary actions collapse');
 		assert.match(html, /id="provideFeedbackButton"[^>]*class="feedback-entry-button"[\s\S]*class="feedback-entry-icon"/);
 		assert.doesNotMatch(html, /id="provideFeedbackButtonLabel"/);
 	});
@@ -53,7 +54,7 @@ suite('Blockly editor toolbar actions contract', () => {
 		assert.match(script, /const TOOLBAR_EXPANDED_STATE_KEY = 'toolbarActionsExpanded'/);
 		assert.match(script, /typeof savedState\?\.\[TOOLBAR_EXPANDED_STATE_KEY\] === 'boolean'[\s\S]*:\s*false/);
 		assert.match(script, /secondaryActions\.hidden = !isExpanded/);
-		assert.match(markerScript, /indicatorElement\.style\.margin = '0'/);
+		assert.doesNotMatch(markerScript, /indicatorElement\.style\.(width|margin) =/, 'chip layout belongs to CSS, not inline styles');
 		assert.match(script, /toggleButton\.setAttribute\('aria-expanded', isExpanded \? 'true' : 'false'\)/);
 		assert.match(script, /vscode\.setState\(\{[\s\S]*\[TOOLBAR_EXPANDED_STATE_KEY\]: isExpanded/);
 		assert.match(script, /command:\s*'toolbarActionsStateChanged'[\s\S]*expanded:\s*isExpanded/);

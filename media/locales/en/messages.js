@@ -121,6 +121,7 @@ window.languageManager.loadMessages('en', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Experimental Blocks Detected',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Experimental blocks',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Your workspace contains experimental blocks (highlighted with yellow dashed borders). These features may change or be removed in future updates, use with caution.',
 

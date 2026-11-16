@@ -51,4 +51,31 @@ describe('Blockly editor keyboard and toolbar accessibility', () => {
 			assert.match(readWorkspaceFile(`media/locales/${locale}/messages.js`), /MODAL_CLOSE_LABEL: '[^']+'/, locale);
 		}
 	});
+	it('shows experimental blocks as a labelled chip next to the board selector', () => {
+		const html = readWorkspaceFile('media/html/blocklyEdit.html');
+		const chipCss = readWorkspaceFile('media/css/experimentalBlocks.css');
+		const marker = readWorkspaceFile('media/js/experimentalBlockMarker.js');
+		const board = html.indexOf('class="board-select"');
+		const chip = html.indexOf('<button id="experimentalBlocksIndicator"');
+		const secondary = html.indexOf('id="toolbarSecondaryActions"');
+		assert.ok(board > -1 && chip > board && chip < secondary, 'chip sits between the board selector and the collapsible actions');
+		assert.match(html, /class="experimental-blocks-label"/);
+		assert.match(chipCss, /\.experimental-blocks-indicator:not\(#ui-none\) \{[^}]*border-radius: 999px;/);
+		assert.match(chipCss, /@media \(prefers-reduced-motion: reduce\)/);
+		assert.match(marker, /EXPERIMENTAL_BLOCKS_LABEL/);
+		for (const locale of ['bg', 'cs', 'de', 'en', 'es', 'fr', 'hu', 'it', 'ja', 'ko', 'pl', 'pt-br', 'ru', 'tr', 'zh-hant']) {
+			assert.match(readWorkspaceFile(`media/locales/${locale}/messages.js`), /EXPERIMENTAL_BLOCKS_LABEL: '[^']+'/, locale);
+		}
+	});
+
+	it('keeps toolbar buttons neutral and only Upload in the primary colour', () => {
+		assert.match(css, /--ui-primary: #[0-9a-f]{6};/i);
+		assert.match(css, /button#uploadButton:not\(#ui-none\) \{[^}]*background-color: var\(--ui-primary\)/);
+	});
+
+	it('names the CyberBrick refresh and backup delete icon buttons', () => {
+		assert.match(source, /setIconButtonLabel\('cyberbrickRefreshUsbPorts'/);
+		assert.match(source, /setIconButtonLabel\('cyberbrickWifiScanButton'/);
+		assert.match(source, /deleteBtn\.setAttribute\('aria-label', deleteText\)/);
+	});
 });

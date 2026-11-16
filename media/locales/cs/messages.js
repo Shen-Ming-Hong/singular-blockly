@@ -121,6 +121,7 @@ window.languageManager.loadMessages('cs', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Nalezeny experimentální bloky',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Experimentální bloky',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Váš pracovní prostor obsahuje experimentální bloky (zvýrazněné žlutým přerušovaným okrajem). Tyto funkce se mohou v budoucích aktualizacích změnit nebo být odstraněny, používejte je s opatrností.',
 

@@ -152,56 +152,82 @@ body.theme-dark .experimental-notice-description {
 	animation: fade-out 0.5s forwards ease-in;
 }
 
-/* 實驗積木持久性指示器樣式 - 已整合到controls-container中 */
-.experimental-blocks-indicator {
-	/* 不再需要固定位置，因為已經包含在controls-container中 */
+/* 實驗積木標籤：放在開發板選單旁，工具列展開、收合時都看得到（Ray 2026-11-16） */
+body .controls-container .experimental-blocks-indicator:not(#ui-none) {
 	position: relative;
-	display: flex;
+	display: inline-flex;
 	align-items: center;
-	justify-content: center;
-	width: 32px;
-	height: 32px;
-	cursor: pointer;
-	margin-right: 10px; /* 與其他控制元素保持間距 */
-	transition: all 0.3s ease;
-}
-
-.experimental-blocks-indicator:hover {
-	transform: scale(1.1);
-	z-index: 100; /* 確保懸停時在其他控制項之上 */
-}
-
-.experimental-blocks-indicator.hidden {
-	display: none; /* 簡單地不顯示而不佔據空間 */
-	opacity: 0;
-	width: 0;
+	gap: 6px;
+	height: 28px;
 	margin: 0;
-	overflow: hidden;
+	padding: 0 10px 0 8px;
+	border: 1px solid var(--ui-warn-border);
+	border-radius: 999px;
+	background-color: var(--ui-warn-bg);
+	color: var(--ui-warn-fg);
+	font: inherit;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+	cursor: pointer;
+	animation: experimental-chip-in 0.6s ease-out 1;
 }
 
-.indicator-icon {
-	color: #ffcc00;
-	display: flex;
-	align-items: center;
-	font-size: 18px; /* 增大圖標尺寸 */
-	filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5)); /* 為圖標添加陰影效果 */
-	animation: pulse 2s infinite; /* 添加脈衝動畫引起注意 */
+body .controls-container .experimental-blocks-indicator:not(#ui-none):hover {
+	background-color: color-mix(in srgb, var(--ui-warn-bg) 80%, var(--ui-warn-icon));
 }
 
-@keyframes pulse {
+body .controls-container .experimental-blocks-indicator:not(#ui-none):focus-visible {
+	outline: 2px solid var(--ui-focus);
+	outline-offset: 1px;
+}
+
+body .controls-container .experimental-blocks-indicator.hidden:not(#ui-none) {
+	display: none;
+}
+
+.experimental-blocks-indicator .experimental-blocks-icon {
+	flex: 0 0 auto;
+	color: var(--ui-warn-icon);
+}
+
+/* 第一次出現時提醒一下，之後不再跳動 */
+@keyframes experimental-chip-in {
 	0% {
-		transform: scale(1);
+		transform: scale(0.9);
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--ui-warn-icon) 60%, transparent);
 	}
-	50% {
-		transform: scale(1.1);
+	60% {
+		transform: scale(1.04);
+		box-shadow: 0 0 0 6px transparent;
 	}
 	100% {
 		transform: scale(1);
+		box-shadow: 0 0 0 0 transparent;
 	}
 }
 
-body.theme-dark .indicator-icon {
-	color: #ffdd33; /* 深色模式下使圖標顏色更亮 */
+@media (prefers-reduced-motion: reduce) {
+	body .controls-container .experimental-blocks-indicator:not(#ui-none) {
+		animation: none;
+	}
+}
+
+/* 很窄時只留圖示，文字仍是按鈕名稱 */
+@media (max-width: 560px) {
+	body .controls-container .experimental-blocks-indicator:not(#ui-none) {
+		padding: 0 7px;
+	}
+
+	.experimental-blocks-indicator .experimental-blocks-label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
 }
 
 /* 移除不需要的深色主題背景樣式 */

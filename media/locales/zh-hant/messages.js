@@ -121,6 +121,7 @@ window.languageManager.loadMessages('zh-hant', {
 
 	// 實驗積木提示
 	EXPERIMENTAL_BLOCKS_TITLE: '發現實驗性積木',
+	EXPERIMENTAL_BLOCKS_LABEL: '實驗積木',
 	EXPERIMENTAL_BLOCKS_DESC: '你的作品裡有用黃色虛線標示的實驗性積木。這些功能以後可能會改變或移除，使用時請多留意。',
 
 	// Preview Mode UI

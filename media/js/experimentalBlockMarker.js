@@ -90,12 +90,28 @@ window.experimentalBlocksNotice = {
 		}
 		// 更新多語言文字
 		this.updateTexts();
+	},
+	// 開發板旁「實驗積木」標籤的文字；窄視窗時只顯示圖示，文字仍是按鈕名稱。
+	updateIndicatorLabel: function () {
+		if (!this.indicatorElement) {
+			return;
+		}
+		const label = window.languageManager
+			? window.languageManager.getMessage('EXPERIMENTAL_BLOCKS_LABEL', 'Experimental blocks')
+			: 'Experimental blocks';
+		const labelElement = this.indicatorElement.querySelector('.experimental-blocks-label');
+		if (labelElement) {
+			labelElement.textContent = label;
+		}
+		this.indicatorElement.setAttribute('aria-label', label);
 	}, // 更新提示文字
 	updateTexts: function () {
 		// 檢查是否在預覽模式，預覽模式下不需要更新文字
 		if (window.isPreviewMode) {
 			return;
 		}
+
+		this.updateIndicatorLabel();
 
 		// 如果元素不存在，記錄錯誤並返回（不要再次調用 init 避免無限遞迴）
 		if (!this.titleElement || !this.descriptionElement) {
@@ -277,17 +293,11 @@ window.experimentalBlocksNotice = {
 				: '您的作品中含有黃色虛線標示的實驗性積木，這些功能在未來可能會變更或移除，請謹慎使用。';
 
 			this.indicatorElement.setAttribute('title', tooltipText);
+			this.updateIndicatorLabel();
 
 			// 確保元素可見 - 直接移除hidden類
 			this.indicatorElement.classList.remove('hidden');
 
-			// 將寬度設置回來，因為在hidden狀態下寬度可能被設為0
-			setTimeout(() => {
-				if (this.indicatorElement) {
-					this.indicatorElement.style.width = '32px';
-						this.indicatorElement.style.margin = '0';
-				}
-			}, 0);
 
 			expLog.info('[實驗積木] 顯示實驗積木持久性指示器', {
 				element: this.indicatorElement ? 'exists' : 'missing',
@@ -307,13 +317,6 @@ window.experimentalBlocksNotice = {
 				// 添加hidden類以隱藏元素
 				this.indicatorElement.classList.add('hidden');
 
-				// 在次幀調整寬度和邊距確保不佔空間
-				setTimeout(() => {
-					if (this.indicatorElement) {
-						this.indicatorElement.style.width = '0';
-						this.indicatorElement.style.margin = '0';
-					}
-				}, 0);
 			}
 		} catch (e) {
 			expLog.error('隱藏所有實驗積木提示時發生錯誤:', e);

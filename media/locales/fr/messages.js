@@ -121,6 +121,7 @@ window.languageManager.loadMessages('fr', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Blocs expérimentaux détectés',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Blocs expérimentaux',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Votre espace de travail contient des blocs expérimentaux (surlignés avec des bordures jaunes en pointillés). Ces fonctionnalités peuvent changer ou être supprimées dans les futures mises à jour, utilisez-les avec prudence.',
 
