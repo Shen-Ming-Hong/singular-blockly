@@ -1596,8 +1596,12 @@ window.languageManager.loadMessages('pl', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Kliknij kategorię, aby otworzyć jej bloki, a potem przeciągnij blok na obszar roboczy.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Połącz bloki",
 	GUIDED_TOUR_WORKSPACE_BODY: "Dołączaj bloki do tego bloku głównego. Kod zapisuje się w pliku projektu na bieżąco.",
+	GUIDED_TOUR_CONNECT_TITLE: "Podłącz płytkę",
+	GUIDED_TOUR_CONNECT_BODY: "Przed przesłaniem podłącz płytkę do tego komputera kablem USB. Sparowany CyberBrick może też przesyłać przez Wi-Fi. Gdy płytka jest podłączona, kliknij Dalej.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Prześlij na płytkę",
-	GUIDED_TOUR_UPLOAD_BODY: "Podłącz płytkę i kliknij tutaj, aby skompilować i przesłać program.",
+	GUIDED_TOUR_UPLOAD_BODY: "Kliknij tutaj, aby skompilować i przesłać program. Pierwsze przesyłanie może potrwać kilka minut, bo trzeba przygotować narzędzia.",
 	GUIDED_TOUR_THEME_TITLE: "Jasny czy ciemny",
 	GUIDED_TOUR_THEME_BODY: "Tutaj przełączasz edytor między motywem jasnym i ciemnym. Aby obejrzeć przewodnik ponownie, kliknij przycisk ? na pasku narzędzi.",
+	GUIDED_TOUR_TRY_IT: "Spróbuj teraz. Możesz też kliknąć Dalej.",
+	GUIDED_TOUR_STEP_DONE: "Świetnie!",
 });

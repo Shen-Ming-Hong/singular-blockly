@@ -1593,8 +1593,12 @@ window.languageManager.loadMessages('cs', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Klikni na kategorii, otevři její bloky a přetáhni blok na pracovní plochu.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Spoj bloky",
 	GUIDED_TOUR_WORKSPACE_BODY: "Připojuj bloky k tomuto hlavnímu bloku. Kód se během práce zapisuje do souboru projektu.",
+	GUIDED_TOUR_CONNECT_TITLE: "Připoj desku",
+	GUIDED_TOUR_CONNECT_BODY: "Před nahráním připoj desku k tomuto počítači kabelem USB. Spárovaný CyberBrick umí nahrávat i přes Wi-Fi. Až bude připojená, klikni na Další.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Nahraj do desky",
-	GUIDED_TOUR_UPLOAD_BODY: "Připoj desku a kliknutím sem program sestavíš a nahraješ.",
+	GUIDED_TOUR_UPLOAD_BODY: "Kliknutím sem program sestavíš a nahraješ. První nahrání může trvat několik minut, než se připraví nástroje.",
 	GUIDED_TOUR_THEME_TITLE: "Světlý nebo tmavý",
 	GUIDED_TOUR_THEME_BODY: "Tady přepínáš editor mezi světlým a tmavým vzhledem. Průvodce znovu spustíš tlačítkem ? na panelu nástrojů.",
+	GUIDED_TOUR_TRY_IT: "Zkus to hned. Můžeš také kliknout na Další.",
+	GUIDED_TOUR_STEP_DONE: "Výborně!",
 });

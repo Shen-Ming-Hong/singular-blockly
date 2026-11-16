@@ -1586,8 +1586,12 @@ window.languageManager.loadMessages('ko', {
 	GUIDED_TOUR_TOOLBOX_BODY: "분류를 클릭해 블록 목록을 열고, 블록을 작업 공간으로 끌어 놓으세요.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "블록 연결하기",
 	GUIDED_TOUR_WORKSPACE_BODY: "이 메인 블록에 블록을 연결하세요. 작업하는 동안 코드가 프로젝트 파일에 기록됩니다.",
+	GUIDED_TOUR_CONNECT_TITLE: "보드 연결하기",
+	GUIDED_TOUR_CONNECT_BODY: "업로드하기 전에 USB 케이블로 보드를 이 컴퓨터에 연결하세요. 페어링된 CyberBrick은 Wi-Fi로도 업로드할 수 있습니다. 연결했으면 다음을 클릭하세요.",
 	GUIDED_TOUR_UPLOAD_TITLE: "보드에 업로드",
-	GUIDED_TOUR_UPLOAD_BODY: "보드를 연결한 다음 여기를 클릭하면 프로그램을 빌드하고 업로드합니다.",
+	GUIDED_TOUR_UPLOAD_BODY: "여기를 클릭하면 프로그램을 빌드하고 업로드합니다. 처음 업로드할 때는 도구를 준비하느라 몇 분 걸릴 수 있습니다.",
 	GUIDED_TOUR_THEME_TITLE: "밝게 또는 어둡게",
 	GUIDED_TOUR_THEME_BODY: "여기에서 편집기를 밝은 테마와 어두운 테마로 바꿉니다. 둘러보기를 다시 보려면 도구 모음의 ? 버튼을 클릭하세요.",
+	GUIDED_TOUR_TRY_IT: "지금 직접 해 보세요. 다음을 클릭해도 됩니다.",
+	GUIDED_TOUR_STEP_DONE: "잘했어요!",
 });

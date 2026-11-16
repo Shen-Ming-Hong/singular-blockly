@@ -1596,8 +1596,12 @@ window.languageManager.loadMessages('tr', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Bloklarını açmak için bir kategoriye tıkla, sonra bir bloğu çalışma alanına sürükle.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Blokları birleştir",
 	GUIDED_TOUR_WORKSPACE_BODY: "Blokları bu ana bloğa tak. Sen çalıştıkça kod proje dosyasına yazılır.",
+	GUIDED_TOUR_CONNECT_TITLE: "Kartını bağla",
+	GUIDED_TOUR_CONNECT_BODY: "Yüklemeden önce kartını USB kablosuyla bu bilgisayara bağla. Eşleştirilmiş bir CyberBrick Wi-Fi ile de yükleyebilir. Bağladığında İleri düğmesine tıkla.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Karta yükle",
-	GUIDED_TOUR_UPLOAD_BODY: "Kartını bağla, sonra programını derleyip yüklemek için buraya tıkla.",
+	GUIDED_TOUR_UPLOAD_BODY: "Programını derleyip yüklemek için buraya tıkla. İlk yükleme, araçlar hazırlanırken birkaç dakika sürebilir.",
 	GUIDED_TOUR_THEME_TITLE: "Açık veya koyu",
 	GUIDED_TOUR_THEME_BODY: "Düzenleyiciyi buradan açık ve koyu tema arasında değiştir. Bu turu tekrar görmek için araç çubuğundaki ? düğmesine tıkla.",
+	GUIDED_TOUR_TRY_IT: "Şimdi dene. İstersen İleri düğmesine de tıklayabilirsin.",
+	GUIDED_TOUR_STEP_DONE: "Harika!",
 });

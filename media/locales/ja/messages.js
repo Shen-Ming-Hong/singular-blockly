@@ -1586,8 +1586,12 @@ window.languageManager.loadMessages('ja', {
 	GUIDED_TOUR_TOOLBOX_BODY: "カテゴリをクリックしてブロック一覧を開き、ブロックをワークスペースへドラッグします。",
 	GUIDED_TOUR_WORKSPACE_TITLE: "ブロックをつなげる",
 	GUIDED_TOUR_WORKSPACE_BODY: "このメインブロックにブロックをつなげます。作業に合わせてコードがプロジェクトのファイルに書き込まれます。",
+	GUIDED_TOUR_CONNECT_TITLE: "ボードを接続する",
+	GUIDED_TOUR_CONNECT_BODY: "書き込む前に、USB ケーブルでボードをこのコンピューターに接続します。ペアリング済みの CyberBrick は Wi-Fi でも書き込めます。接続できたら「次へ」をクリックします。",
 	GUIDED_TOUR_UPLOAD_TITLE: "ボードに書き込む",
-	GUIDED_TOUR_UPLOAD_BODY: "ボードを接続してからここをクリックすると、プログラムをビルドして書き込みます。",
+	GUIDED_TOUR_UPLOAD_BODY: "ここをクリックすると、プログラムをビルドして書き込みます。初回はツールの準備に数分かかることがあります。",
 	GUIDED_TOUR_THEME_TITLE: "ライトまたはダーク",
 	GUIDED_TOUR_THEME_BODY: "ここでエディターのライトとダークを切り替えます。もう一度ツアーを見るには、ツールバーの ? ボタンをクリックします。",
+	GUIDED_TOUR_TRY_IT: "実際に操作してみましょう。「次へ」をクリックして進むこともできます。",
+	GUIDED_TOUR_STEP_DONE: "よくできました！",
 });

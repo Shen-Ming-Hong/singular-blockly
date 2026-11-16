@@ -1574,8 +1574,12 @@ window.languageManager.loadMessages('zh-hant', {
 	GUIDED_TOUR_TOOLBOX_BODY: "點一個分類打開積木清單，再把積木拖到工作區。",
 	GUIDED_TOUR_WORKSPACE_TITLE: "把積木接起來",
 	GUIDED_TOUR_WORKSPACE_BODY: "把積木接到這塊主程式積木上。程式碼會邊做邊寫進專案檔案。",
+	GUIDED_TOUR_CONNECT_TITLE: "先接上開發板",
+	GUIDED_TOUR_CONNECT_BODY: "上傳前，先用 USB 線把開發板接到這台電腦。已配對的 CyberBrick 也可以用 Wi-Fi 上傳。接好後按「下一步」。",
 	GUIDED_TOUR_UPLOAD_TITLE: "上傳到開發板",
-	GUIDED_TOUR_UPLOAD_BODY: "接上開發板後按這裡，程式就會編譯並上傳。",
+	GUIDED_TOUR_UPLOAD_BODY: "按這裡編譯並上傳程式。第一次上傳要準備工具，可能需要幾分鐘。",
 	GUIDED_TOUR_THEME_TITLE: "亮色或暗色",
 	GUIDED_TOUR_THEME_BODY: "在這裡切換編輯器的亮色與暗色。想再看一次導覽，按工具列的「?」按鈕。",
+	GUIDED_TOUR_TRY_IT: "現在就試試看，也可以直接按「下一步」。",
+	GUIDED_TOUR_STEP_DONE: "做得好！",
 });

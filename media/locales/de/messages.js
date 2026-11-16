@@ -1595,8 +1595,12 @@ window.languageManager.loadMessages('de', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Klicke auf eine Kategorie, um ihre Blöcke zu öffnen, und ziehe einen Block auf die Arbeitsfläche.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Blöcke zusammenstecken",
 	GUIDED_TOUR_WORKSPACE_BODY: "Hänge Blöcke an diesen Hauptblock. Der Code wird beim Arbeiten in deine Projektdatei geschrieben.",
+	GUIDED_TOUR_CONNECT_TITLE: "Board anschließen",
+	GUIDED_TOUR_CONNECT_BODY: "Schließe dein Board vor dem Hochladen mit einem USB-Kabel an diesen Computer an. Ein gekoppelter CyberBrick kann auch über WLAN hochladen. Klicke auf Weiter, wenn es angeschlossen ist.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Auf das Board hochladen",
-	GUIDED_TOUR_UPLOAD_BODY: "Schließe dein Board an und klicke hier, um dein Programm zu kompilieren und hochzuladen.",
+	GUIDED_TOUR_UPLOAD_BODY: "Klicke hier, um dein Programm zu kompilieren und hochzuladen. Beim ersten Hochladen kann die Vorbereitung der Werkzeuge einige Minuten dauern.",
 	GUIDED_TOUR_THEME_TITLE: "Hell oder dunkel",
 	GUIDED_TOUR_THEME_BODY: "Hier schaltest du den Editor zwischen hell und dunkel um. Um diese Einführung erneut zu sehen, klicke auf die ?-Schaltfläche in der Symbolleiste.",
+	GUIDED_TOUR_TRY_IT: "Probier es jetzt aus. Du kannst auch auf Weiter klicken.",
+	GUIDED_TOUR_STEP_DONE: "Gut gemacht!",
 });

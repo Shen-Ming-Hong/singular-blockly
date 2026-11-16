@@ -1598,8 +1598,12 @@ window.languageManager.loadMessages('hu', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Kattints egy kategóriára a blokkjai megnyitásához, majd húzz egy blokkot a munkaterületre.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Kapcsold össze a blokkokat",
 	GUIDED_TOUR_WORKSPACE_BODY: "Csatlakoztass blokkokat ehhez a fő blokkhoz. A kód munka közben a projekt fájljába kerül.",
+	GUIDED_TOUR_CONNECT_TITLE: "Csatlakoztasd a táblát",
+	GUIDED_TOUR_CONNECT_BODY: "Feltöltés előtt csatlakoztasd a táblát USB-kábellel ehhez a számítógéphez. A párosított CyberBrick Wi-Fi-n is tud feltölteni. Ha csatlakoztattad, kattints a Tovább gombra.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Feltöltés a táblára",
-	GUIDED_TOUR_UPLOAD_BODY: "Csatlakoztasd a táblát, majd kattints ide a program fordításához és feltöltéséhez.",
+	GUIDED_TOUR_UPLOAD_BODY: "Kattints ide a program fordításához és feltöltéséhez. Az első feltöltés néhány percig tarthat, amíg az eszközök elkészülnek.",
 	GUIDED_TOUR_THEME_TITLE: "Világos vagy sötét",
 	GUIDED_TOUR_THEME_BODY: "Itt válthatsz a szerkesztő világos és sötét témája között. A bemutató újbóli megtekintéséhez kattints az eszköztár ? gombjára.",
+	GUIDED_TOUR_TRY_IT: "Próbáld ki most. A Tovább gombra is kattinthatsz.",
+	GUIDED_TOUR_STEP_DONE: "Szép munka!",
 });

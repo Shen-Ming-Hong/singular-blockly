@@ -1583,8 +1583,12 @@ window.languageManager.loadMessages('fr', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Clique sur une catégorie pour ouvrir ses blocs, puis fais glisser un bloc dans l’espace de travail.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Assemble les blocs",
 	GUIDED_TOUR_WORKSPACE_BODY: "Accroche des blocs à ce bloc principal. Le code est écrit dans le fichier du projet au fur et à mesure.",
+	GUIDED_TOUR_CONNECT_TITLE: "Branche ta carte",
+	GUIDED_TOUR_CONNECT_BODY: "Avant de téléverser, branche ta carte à cet ordinateur avec un câble USB. Un CyberBrick appairé peut aussi téléverser par Wi-Fi. Clique sur Suivant une fois branchée.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Téléverse sur ta carte",
-	GUIDED_TOUR_UPLOAD_BODY: "Branche ta carte, puis clique ici pour compiler et téléverser ton programme.",
+	GUIDED_TOUR_UPLOAD_BODY: "Clique ici pour compiler et téléverser ton programme. Le premier téléversement peut prendre quelques minutes, le temps de préparer les outils.",
 	GUIDED_TOUR_THEME_TITLE: "Clair ou sombre",
 	GUIDED_TOUR_THEME_BODY: "Bascule ici l’éditeur entre clair et sombre. Pour revoir cette visite, clique sur le bouton ? de la barre d’outils.",
+	GUIDED_TOUR_TRY_IT: "Essaie maintenant. Tu peux aussi cliquer sur Suivant.",
+	GUIDED_TOUR_STEP_DONE: "Bravo !",
 });

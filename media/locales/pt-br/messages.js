@@ -1590,8 +1590,12 @@ window.languageManager.loadMessages('pt-br', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Clique em uma categoria para abrir os blocos e arraste um bloco para a área de trabalho.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Encaixe os blocos",
 	GUIDED_TOUR_WORKSPACE_BODY: "Encaixe blocos neste bloco principal. O código é gravado no arquivo do projeto enquanto você trabalha.",
+	GUIDED_TOUR_CONNECT_TITLE: "Conecte sua placa",
+	GUIDED_TOUR_CONNECT_BODY: "Antes de enviar, conecte a placa a este computador com um cabo USB. Um CyberBrick pareado também pode enviar por Wi-Fi. Clique em Próximo quando estiver conectada.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Envie para sua placa",
-	GUIDED_TOUR_UPLOAD_BODY: "Conecte sua placa e clique aqui para compilar e enviar o programa.",
+	GUIDED_TOUR_UPLOAD_BODY: "Clique aqui para compilar e enviar seu programa. O primeiro envio pode levar alguns minutos enquanto as ferramentas são preparadas.",
 	GUIDED_TOUR_THEME_TITLE: "Claro ou escuro",
 	GUIDED_TOUR_THEME_BODY: "Aqui você alterna o editor entre claro e escuro. Para ver este tour de novo, clique no botão ? na barra de ferramentas.",
+	GUIDED_TOUR_TRY_IT: "Experimente agora. Você também pode clicar em Próximo.",
+	GUIDED_TOUR_STEP_DONE: "Muito bem!",
 });

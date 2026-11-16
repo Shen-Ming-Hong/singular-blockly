@@ -1595,8 +1595,12 @@ window.languageManager.loadMessages('en', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Click a category to open its blocks, then drag a block onto the workspace.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Snap blocks together",
 	GUIDED_TOUR_WORKSPACE_BODY: "Attach blocks to this main block. The code is written to your project file as you work.",
+	GUIDED_TOUR_CONNECT_TITLE: "Connect your board",
+	GUIDED_TOUR_CONNECT_BODY: "Plug your board into this computer with a USB cable before you upload. A paired CyberBrick can also upload over Wi-Fi. Click Next when it is connected.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Upload to your board",
-	GUIDED_TOUR_UPLOAD_BODY: "Connect your board, then click here to build and upload your program.",
+	GUIDED_TOUR_UPLOAD_BODY: "Click here to build and upload your program. The first upload may take a few minutes while tools are prepared.",
 	GUIDED_TOUR_THEME_TITLE: "Light or dark",
 	GUIDED_TOUR_THEME_BODY: "Switch the editor between light and dark here. To see this tour again, click the ? button in the toolbar.",
+	GUIDED_TOUR_TRY_IT: "Try it now. You can also click Next.",
+	GUIDED_TOUR_STEP_DONE: "Nice work!",
 });

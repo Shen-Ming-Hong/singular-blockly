@@ -1591,8 +1591,12 @@ window.languageManager.loadMessages('it', {
 	GUIDED_TOUR_TOOLBOX_BODY: "Fai clic su una categoria per aprirne i blocchi, poi trascina un blocco nell’area di lavoro.",
 	GUIDED_TOUR_WORKSPACE_TITLE: "Collega i blocchi",
 	GUIDED_TOUR_WORKSPACE_BODY: "Aggancia i blocchi a questo blocco principale. Il codice viene scritto nel file del progetto mentre lavori.",
+	GUIDED_TOUR_CONNECT_TITLE: "Collega la scheda",
+	GUIDED_TOUR_CONNECT_BODY: "Prima di caricare, collega la scheda a questo computer con un cavo USB. Un CyberBrick associato può caricare anche via Wi-Fi. Fai clic su Avanti quando è collegata.",
 	GUIDED_TOUR_UPLOAD_TITLE: "Carica sulla scheda",
-	GUIDED_TOUR_UPLOAD_BODY: "Collega la scheda, poi fai clic qui per compilare e caricare il programma.",
+	GUIDED_TOUR_UPLOAD_BODY: "Fai clic qui per compilare e caricare il programma. Il primo caricamento può richiedere qualche minuto per preparare gli strumenti.",
 	GUIDED_TOUR_THEME_TITLE: "Chiaro o scuro",
 	GUIDED_TOUR_THEME_BODY: "Qui passi l’editor dal tema chiaro a quello scuro. Per rivedere questa visita, fai clic sul pulsante ? nella barra degli strumenti.",
+	GUIDED_TOUR_TRY_IT: "Provalo ora. Puoi anche fare clic su Avanti.",
+	GUIDED_TOUR_STEP_DONE: "Ottimo lavoro!",
 });

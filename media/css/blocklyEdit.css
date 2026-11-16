@@ -5200,6 +5200,14 @@ body.theme-dark #guidedTourButton:hover {
 	position: fixed;
 	inset: 0;
 	z-index: 10000;
+	/* 遮罩只做視覺提示，使用者可以直接操作被圈起來的地方 */
+	pointer-events: none;
+}
+
+.guided-tour-layer.is-dragging .guided-tour-spotlight,
+.guided-tour-layer.is-dragging .guided-tour-card {
+	opacity: 0;
+	transition: opacity 0.15s ease;
 }
 
 .guided-tour-spotlight {
@@ -5218,15 +5226,12 @@ body.theme-dark #guidedTourButton:hover {
 
 .guided-tour-spotlight[hidden] {
 	display: block;
-	width: 0;
-	height: 0;
-	top: 50%;
-	left: 50%;
 	outline: none;
 }
 
 .guided-tour-card {
 	position: fixed;
+	pointer-events: auto;
 	width: min(320px, calc(100vw - 32px));
 	box-sizing: border-box;
 	padding: 16px 16px 12px;
@@ -5252,7 +5257,22 @@ body.theme-dark #guidedTourButton:hover {
 }
 
 .guided-tour-body {
-	margin: 0 0 14px;
+	margin: 0 0 8px;
+}
+
+.guided-tour-hint {
+	margin: 0 0 12px;
+	font-size: 12px;
+	color: var(--editor-notice-fg);
+}
+
+.guided-tour-hint[hidden] {
+	display: none;
+}
+
+.guided-tour-hint.is-done {
+	color: var(--editor-status-ok-fg);
+	font-weight: 600;
 }
 
 .guided-tour-actions {
