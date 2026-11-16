@@ -64,8 +64,8 @@
 ## [WebView / CSS] 自訂捲軸要在 macOS 浮動捲軸下仍生效
 
 - **問題：** Chromium 121+ 只要元素的 `scrollbar-color`／`scrollbar-width` 不是 `auto` 就忽略 `::-webkit-scrollbar`；macOS 預設的浮動捲軸又不套用 `scrollbar-color`，亮色主題的右鍵選單因此出現系統的黑色粗滑桿。VS Code 也會在 webview 的 `html` 設定會繼承的 `scrollbar-color`。
-- **規則：** 需要在 Mac 上維持自訂外觀的捲軸（浮動選單等），在該元素把標準屬性重設為 `auto`、改用 `::-webkit-scrollbar`，並以 `@supports not selector(::-webkit-scrollbar)` 保留標準屬性的後備；用 `vscode-webview-smoke.mjs --overlay-scrollbars` 檢查。
-- **證據：** `media/css/blocklyEdit.css` 的浮動選單捲軸區塊、`src/test/suite/editorThemeBlocklyToolboxScrollbarContract.test.ts`。
+- **規則：** 需要在 Mac 上維持自訂外觀的捲軸，沿用共用捲軸規則（支援 `::-webkit-scrollbar` 時把標準屬性重設為 `auto`，以 `@supports not selector(::-webkit-scrollbar)` 保留標準屬性的後備），不要在個別元件另寫 `scrollbar-color`；新增或改到捲動區域時依 `cloud-local-verification`「Mac 捲軸」用 `--overlay-scrollbars` 檢查。
+- **證據：** `media/css/blocklyEdit.css` 的共用捲軸規則、`src/test/suite/editorThemeBlocklyToolboxScrollbarContract.test.ts`；#255 只修了右鍵選單，#266 的語言選單與備份清單在 Ray 的 Mac 上再犯，才改成共用規則並把檢查寫進驗證步驟。
 
 ## [SDD] 改到上傳流程等契約的修正也要先走 Spec Kit
 
