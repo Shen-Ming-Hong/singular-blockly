@@ -121,6 +121,7 @@ window.languageManager.loadMessages('ru', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Обнаружены экспериментальные блоки',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Экспериментальные блоки',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Ваша рабочая область содержит экспериментальные блоки (выделенные желтыми пунктирными границами). Эти функции могут измениться или быть удалены в будущих обновлениях, используйте их с осторожностью.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('ru', {
 	THEME_TOGGLE: 'Сменить тему',
 	TOOLBAR_ACTIONS_EXPAND: 'Показать больше действий',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Показать меньше действий',
+	MODAL_CLOSE_LABEL: 'Закрыть',
 	PREVIEW_WINDOW_TITLE: 'Blockly Предпросмотр - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Предпросмотр - {0}',
 

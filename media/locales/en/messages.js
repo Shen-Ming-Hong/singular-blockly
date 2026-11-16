@@ -121,6 +121,7 @@ window.languageManager.loadMessages('en', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Experimental Blocks Detected',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Experimental blocks',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Your workspace contains experimental blocks (highlighted with yellow dashed borders). These features may change or be removed in future updates, use with caution.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('en', {
 	THEME_TOGGLE: 'Toggle Theme',
 	TOOLBAR_ACTIONS_EXPAND: 'Show more actions',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Show fewer actions',
+	MODAL_CLOSE_LABEL: 'Close',
 	PREVIEW_WINDOW_TITLE: 'Blockly Preview - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Preview - {0}',
 

@@ -121,6 +121,7 @@ window.languageManager.loadMessages('tr', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Deneysel Bloklar Tespit Edildi',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Deneysel bloklar',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Çalışma alanınız deneysel bloklar içeriyor (sarı kesikli kenarlıklarla vurgulanmış). Bu özellikler gelecekteki güncellemelerde değişebilir veya kaldırılabilir, dikkatli kullanın.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('tr', {
 	THEME_TOGGLE: 'Temayı değiştir',
 	TOOLBAR_ACTIONS_EXPAND: 'Daha fazla işlem göster',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Daha az işlem göster',
+	MODAL_CLOSE_LABEL: 'Kapat',
 	PREVIEW_WINDOW_TITLE: 'Blockly Önizleme - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Önizleme - {0}',
 

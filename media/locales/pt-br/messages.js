@@ -121,6 +121,7 @@ window.languageManager.loadMessages('pt-br', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Blocos experimentais detectados',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Blocos experimentais',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Seu espaço de trabalho contém blocos experimentais (destacados com bordas amarelas tracejadas). Esses recursos podem ser alterados ou removidos em atualizações futuras, use com cautela.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('pt-br', {
 	THEME_TOGGLE: 'Alternar tema',
 	TOOLBAR_ACTIONS_EXPAND: 'Mostrar mais ações',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Mostrar menos ações',
+	MODAL_CLOSE_LABEL: 'Fechar',
 	PREVIEW_WINDOW_TITLE: 'Pré-visualização Blockly - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Pré-visualização - {0}',
 

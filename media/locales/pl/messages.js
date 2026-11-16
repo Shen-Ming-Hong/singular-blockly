@@ -121,6 +121,7 @@ window.languageManager.loadMessages('pl', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Wykryto bloki eksperymentalne',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Bloki eksperymentalne',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Twój obszar roboczy zawiera bloki eksperymentalne (wyróżnione żółtymi przerywanymi krawędziami). Te funkcje mogą ulec zmianie lub zostać usunięte w przyszłych aktualizacjach, używaj ich ostrożnie.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('pl', {
 	THEME_TOGGLE: 'Zmień motyw',
 	TOOLBAR_ACTIONS_EXPAND: 'Pokaż więcej działań',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Pokaż mniej działań',
+	MODAL_CLOSE_LABEL: 'Zamknij',
 	PREVIEW_WINDOW_TITLE: 'Blockly Podgląd - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Podgląd - {0}',
 

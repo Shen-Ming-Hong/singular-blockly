@@ -121,6 +121,7 @@ window.languageManager.loadMessages('bg', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Открити са експериментални блокове',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Експериментални блокове',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Вашето работно пространство съдържа експериментални блокове (откроени с жълти пунктирани граници). Тези функции могат да бъдат променени или премахнати в бъдещи актуализации, използвайте ги с повишено внимание.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('bg', {
 	THEME_TOGGLE: 'Смяна на тема',
 	TOOLBAR_ACTIONS_EXPAND: 'Показване на още действия',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Показване на по-малко действия',
+	MODAL_CLOSE_LABEL: 'Затваряне',
 	PREVIEW_WINDOW_TITLE: 'Blockly Преглед - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Преглед - {0}',
 

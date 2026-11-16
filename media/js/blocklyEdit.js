@@ -854,6 +854,218 @@ function clearTxtVirtualControlPendingLoadOptions() {
 	txtVirtualControlsState.pendingLoadButtonReferences = new Map();
 }
 
+// 工具列只有圖示的按鈕：名稱跟著 title 寫進 aria-label，圖示本身對輔助技術隱藏。
+function getVisibleButtonText(button) {
+	const clone = button.cloneNode(true);
+	clone.querySelectorAll('svg, style').forEach(node => node.remove());
+	return clone.textContent.trim();
+}
+
+function syncIconButtonLabel(button) {
+	if (!(button instanceof HTMLButtonElement) || getVisibleButtonText(button)) {
+		return;
+	}
+	const title = button.getAttribute('title');
+	if (title && button.getAttribute('aria-label') !== title) {
+		button.setAttribute('aria-label', title);
+	}
+	button.querySelectorAll('svg').forEach(svg => svg.setAttribute('aria-hidden', 'true'));
+}
+
+function initToolbarIconButtonLabels() {
+	const toolbar = document.querySelector('.controls-container');
+	if (!toolbar) {
+		return;
+	}
+	toolbar.querySelectorAll('button').forEach(syncIconButtonLabel);
+	toolbar.querySelectorAll('button svg').forEach(svg => svg.setAttribute('aria-hidden', 'true'));
+	// 按鈕可能被複製替換（例如上傳按鈕重新綁定事件），新加入的按鈕也要同步。
+	new MutationObserver(records => {
+		for (const record of records) {
+			if (record.type === 'attributes') {
+				syncIconButtonLabel(record.target);
+				continue;
+			}
+			for (const node of record.addedNodes) {
+				if (node instanceof Element) {
+					[node, ...node.querySelectorAll('button')].forEach(syncIconButtonLabel);
+				}
+			}
+		}
+	}).observe(toolbar, { subtree: true, childList: true, attributes: true, attributeFilter: ['title'] });
+}
+
+// 舊式對話框（.modal + style.display）的鍵盤與焦點：Esc 關閉、開啟時焦點進入、關閉後回到開啟它的按鈕。
+// 積木包與積木設計器自己處理，TXT 測試面板是原生 <dialog>。
+const MANAGED_MODALS = [
+	{ id: 'backupModal', close: '#backupModal .modal-close' },
+	{ id: 'functionSearchModal', close: '#functionSearchModal .modal-close' },
+	{ id: 'sampleModal', close: '#sampleModalClose' },
+	{ id: 'txtConnectionModal', close: '#txtModalClose' },
+	{ id: 'cyberbrickUploadSettingsModal', close: '#cyberbrickUploadSettingsClose' },
+];
+const modalOpeners = new Map();
+let lastFocusOutsideModals = null;
+
+function isModalShown(modal) {
+	return Boolean(modal) && modal.isConnected && getComputedStyle(modal).display !== 'none';
+}
+
+function isFocusableAndVisible(element) {
+	return Boolean(element) && element.isConnected && element.getClientRects().length > 0 && !element.closest('[hidden]');
+}
+
+function getModalFocusTarget(modal) {
+	const candidates = modal.querySelectorAll(
+		'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+	);
+	return Array.from(candidates).find(isFocusableAndVisible) || null;
+}
+
+function updateModalCloseLabels() {
+	const label = window.languageManager?.getMessage('MODAL_CLOSE_LABEL', 'Close') || 'Close';
+	for (const { close } of MANAGED_MODALS) {
+		const button = document.querySelector(close);
+		if (button) {
+			button.setAttribute('aria-label', label);
+			button.setAttribute('title', label);
+		}
+	}
+}
+
+function handleManagedModalShown(modal) {
+	// 開啟流程可能已先把焦點移進對話框（例如搜尋欄），所以用最後一個在對話框外的焦點當開啟者。
+	const active = document.activeElement;
+	const opener = active && active !== document.body && !modal.contains(active) ? active : lastFocusOutsideModals;
+	if (opener) {
+		modalOpeners.set(modal.id, opener);
+	}
+	// 等開啟流程自己設定焦點（例如搜尋欄）後，焦點仍在外面才移進對話框。
+	setTimeout(() => {
+		if (!isModalShown(modal) || modal.contains(document.activeElement)) {
+			return;
+		}
+		const content = modal.querySelector('.modal-content') || modal;
+		const target = getModalFocusTarget(modal);
+		if (target) {
+			target.focus();
+		} else {
+			content.setAttribute('tabindex', '-1');
+			content.focus();
+		}
+	}, 0);
+}
+
+function handleManagedModalHidden(modal) {
+	const opener = modalOpeners.get(modal.id);
+	modalOpeners.delete(modal.id);
+	const active = document.activeElement;
+	if (active && active !== document.body && !modal.contains(active)) {
+		return;
+	}
+	// 開啟它的按鈕若被收起（例如工具列收合），改回到展開更多動作的按鈕。
+	const fallback = document.getElementById('toolbarActionsToggle');
+	const target = isFocusableAndVisible(opener) ? opener : isFocusableAndVisible(fallback) ? fallback : null;
+	target?.focus();
+}
+
+function initModalAccessibility() {
+	for (const { id, close } of MANAGED_MODALS) {
+		const modal = document.getElementById(id);
+		if (!modal) {
+			continue;
+		}
+		const content = modal.querySelector('.modal-content') || modal;
+		if (!content.hasAttribute('role')) {
+			content.setAttribute('role', 'dialog');
+		}
+		content.setAttribute('aria-modal', 'true');
+		const title = modal.querySelector('.modal-header h2[id]');
+		if (title && !content.hasAttribute('aria-labelledby')) {
+			content.setAttribute('aria-labelledby', title.id);
+		}
+		const closeButton = document.querySelector(close);
+		if (closeButton && closeButton.tagName !== 'BUTTON') {
+			closeButton.setAttribute('role', 'button');
+			closeButton.setAttribute('tabindex', '0');
+		}
+		let wasShown = isModalShown(modal);
+		new MutationObserver(() => {
+			const shown = isModalShown(modal);
+			if (shown === wasShown) {
+				return;
+			}
+			wasShown = shown;
+			if (shown) {
+				handleManagedModalShown(modal);
+			} else {
+				handleManagedModalHidden(modal);
+			}
+		}).observe(modal, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+	}
+	updateModalCloseLabels();
+
+	document.addEventListener('focusin', event => {
+		const target = event.target instanceof Element ? event.target : null;
+		if (target && !target.closest('.modal')) {
+			lastFocusOutsideModals = target;
+		}
+	});
+
+	// 關閉鈕是 <span>（TXT 的會被複製替換），用委派處理 Enter／空白鍵。
+	const closeSelector = MANAGED_MODALS.map(entry => entry.close).join(', ');
+	document.addEventListener('keydown', event => {
+		const target = event.target instanceof Element ? event.target : null;
+		if ((event.key === 'Enter' || event.key === ' ') && target && target.tagName !== 'BUTTON' && target.matches(closeSelector)) {
+			event.preventDefault();
+			target.click();
+		}
+	});
+
+	document.addEventListener('keydown', event => {
+		if (event.key !== 'Escape' || event.defaultPrevented || isBlocklyTextInputCompositionEvent(event)) {
+			return;
+		}
+		if (typeof Blockly !== 'undefined' && (Blockly.WidgetDiv?.isVisible?.() || Blockly.DropDownDiv?.isVisible?.())) {
+			return;
+		}
+		const open = MANAGED_MODALS.map(entry => ({ entry, modal: document.getElementById(entry.id) })).filter(({ modal }) =>
+			isModalShown(modal)
+		);
+		const top = open[open.length - 1];
+		const closeButton = top && document.querySelector(top.entry.close);
+		if (closeButton) {
+			event.preventDefault();
+			closeButton.click();
+		}
+	});
+}
+
+let toolboxClearanceObserver = null;
+let observedToolboxElement = null;
+
+/** 把工具箱寬度寫進 CSS 變數，讓浮動工具列只在工具箱右側排列。 */
+function updateToolbarToolboxClearance() {
+	const workspace = typeof Blockly !== 'undefined' && window.getBlocklyWorkspace ? window.getBlocklyWorkspace() : null;
+	const toolbox = workspace && workspace.getToolbox ? workspace.getToolbox() : null;
+	const width = toolbox ? Math.ceil(toolbox.getWidth()) : 0;
+	document.documentElement.style.setProperty('--blockly-toolbox-width', `${width}px`);
+
+	const element = document.querySelector('.blocklyToolbox');
+	if (element !== observedToolboxElement && typeof ResizeObserver !== 'undefined') {
+		toolboxClearanceObserver = toolboxClearanceObserver || new ResizeObserver(() => updateToolbarToolboxClearance());
+		if (observedToolboxElement) {
+			toolboxClearanceObserver.unobserve(observedToolboxElement);
+		}
+		if (element) {
+			toolboxClearanceObserver.observe(element);
+		}
+		observedToolboxElement = element;
+	}
+}
+
+window.addEventListener('resize', () => updateToolbarToolboxClearance());
+
 function scheduleBlocklyResize() {
 	if (txtVirtualControlsState.resizeFrame) {
 		cancelAnimationFrame(txtVirtualControlsState.resizeFrame);
@@ -2098,9 +2310,14 @@ function closeBoardDropdown() {
 	if (!dropdown) {
 		return;
 	}
+	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
+	const focusWasInside = dropdown.contains(document.activeElement);
 	dropdown.classList.remove('open');
 	dropdown.setAttribute('aria-hidden', 'true');
 	isBoardDropdownOpen = false;
+	if (focusWasInside) {
+		document.getElementById('boardSelectToggle')?.focus();
+	}
 
 	const toggleButton = document.getElementById('boardSelectToggle');
 	if (toggleButton) {
@@ -2309,9 +2526,14 @@ function closeLanguageDropdown() {
 	if (!dropdown) {
 		return;
 	}
+	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
+	const focusWasInside = dropdown.contains(document.activeElement);
 	dropdown.classList.remove('open');
 	dropdown.setAttribute('aria-hidden', 'true');
 	isLanguageDropdownOpen = false;
+	if (focusWasInside) {
+		document.getElementById('languageToggle')?.focus();
+	}
 
 	const toggleButton = document.getElementById('languageToggle');
 	if (toggleButton) {
@@ -2386,6 +2608,8 @@ function updateEditorUITexts() {
 		log.warn('語言管理器尚未載入，無法更新主編輯視窗文字');
 		return;
 	}
+
+	updateModalCloseLabels();
 
 	// 更新主題切換按鈕title屬性
 	const themeToggle = document.getElementById('themeToggle');
@@ -2933,32 +3157,20 @@ const backupManager = {
 			const previewBtn = document.createElement('button');
 			previewBtn.className = 'backup-preview';
 			const previewText = window.languageManager ? window.languageManager.getMessage('BACKUP_PREVIEW_BTN', '預覽') : '預覽';
-			previewBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="currentColor" d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
-                </svg>
-                ${previewText}
-            `;
+			previewBtn.innerHTML = `<svg class="backup-action-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></svg><span>${previewText}</span>`;
 			previewBtn.addEventListener('click', () => this.previewBackup(backup.name)); // 還原按鈕
 			const restoreBtn = document.createElement('button');
 			restoreBtn.className = 'backup-restore';
 			const restoreText = window.languageManager ? window.languageManager.getMessage('BACKUP_RESTORE_BTN', '還原') : '還原';
-			restoreBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="currentColor" d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" />
-                </svg>
-                ${restoreText}
-            `;
+			restoreBtn.innerHTML = `<svg class="backup-action-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg><span>${restoreText}</span>`;
 			restoreBtn.addEventListener('click', () => this.restoreBackup(backup.name)); // 刪除按鈕
 			const deleteBtn = document.createElement('button');
 			deleteBtn.className = 'backup-delete';
 			const deleteText = window.languageManager ? window.languageManager.getMessage('BACKUP_DELETE_BTN', '刪除') : '刪除';
-			deleteBtn.innerHTML = `
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                    <path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
-                </svg>
-                ${deleteText}
-            `;
+			deleteBtn.innerHTML = `<svg class="backup-action-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>`;
+			// 刪除只留圖示，避免和還原一樣醒目；名稱放在 title 與 aria-label。
+			deleteBtn.title = deleteText;
+			deleteBtn.setAttribute('aria-label', deleteText);
 			deleteBtn.addEventListener('click', () => this.deleteBackup(backup.name));
 
 			backupActions.appendChild(restoreBtn);
@@ -3529,6 +3741,7 @@ window.addEventListener('languageChanged', function (event) {
 document.addEventListener('DOMContentLoaded', async () => {
 	log.info('Blockly Edit page loaded');
 
+	initToolbarIconButtonLabels();
 	initToolbarActions();
 	// 更新主編輯視窗UI文字的多語言支援
 	updateEditorUITexts();
@@ -3597,6 +3810,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始化備份管理器
 	backupManager.init();
+	initModalAccessibility();
 	// 初始化函式積木搜尋功能
 	functionSearch.init();
 	// 初始化快速備份功能 (Ctrl+S / Cmd+S)
@@ -3726,6 +3940,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	});
 	// 根據初始主題設定更新 UI
 	updateTheme(currentTheme);
+	updateToolbarToolboxClearance();
 	initTxtVirtualControlsUI();
 
 	// 創建預設變數 i
@@ -4586,6 +4801,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		updateTheme(currentTheme);
 		workspace.render();
 		Blockly.svgResize(workspace);
+		updateToolbarToolboxClearance();
 		window.updateExperimentalBlocksList?.(workspace);
 		window.experimentalBlockMarker?.refreshMarks();
 		return workspace;
@@ -6257,10 +6473,18 @@ function updateCyberBrickUploadSettingsTexts() {
 	setText('cyberbrickPairedDevicesTitle', languageManager.getMessage('CYBERBRICK_PAIRED_DEVICES_TITLE', 'My CyberBricks'));
 	setText('cyberbrickProvisioningTitle', languageManager.getMessage('CYBERBRICK_PROVISIONING_TITLE', 'Add CyberBrick Wireless Upload'));
 	setText('cyberbrickUsbPortLabel', languageManager.getMessage('CYBERBRICK_USB_PORT_LABEL', 'USB Port'));
-	setText('cyberbrickRefreshUsbPorts', languageManager.getMessage('CYBERBRICK_USB_PORT_REFRESH', 'Refresh'));
+	// 重新整理、重新掃描是圖示按鈕，文字放在 title 與 aria-label。
+	const setIconButtonLabel = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.title = value;
+			element.setAttribute('aria-label', value);
+		}
+	};
+	setIconButtonLabel('cyberbrickRefreshUsbPorts', languageManager.getMessage('CYBERBRICK_USB_PORT_REFRESH', 'Refresh'));
 	setText('cyberbrickFriendlyNameLabel', languageManager.getMessage('CYBERBRICK_FRIENDLY_NAME_LABEL', 'Device Name'));
 	setText('cyberbrickWifiSsidLabel', languageManager.getMessage('CYBERBRICK_WIFI_SSID_LABEL', 'Wi-Fi SSID'));
-	setText('cyberbrickWifiScanButton', languageManager.getMessage('CYBERBRICK_WIFI_SCAN_BUTTON', 'Rescan'));
+	setIconButtonLabel('cyberbrickWifiScanButton', languageManager.getMessage('CYBERBRICK_WIFI_SCAN_BUTTON', 'Rescan'));
 	setText('cyberbrickWifiPasswordLabel', languageManager.getMessage('CYBERBRICK_WIFI_PASSWORD_LABEL', 'Wi-Fi Password'));
 	updateCyberBrickWifiPasswordToggleState();
 	setText('cyberbrickProvisionButton', languageManager.getMessage('CYBERBRICK_PROVISION_BUTTON', 'Set Up Wireless Upload'));
@@ -6663,7 +6887,7 @@ function renderCyberBrickPairedDevices() {
 	const devices = cyberBrickUploadSettingsState.settings.pairedDevices || [];
 	if (devices.length === 0) {
 		const empty = document.createElement('div');
-		empty.className = 'cyberbrick-upload-help';
+		empty.className = 'cyberbrick-upload-help cyberbrick-paired-device-empty';
 		empty.textContent =
 			window.languageManager?.getMessage('CYBERBRICK_PAIRED_DEVICES_EMPTY', 'No CyberBrick added yet. Expand \'Add CyberBrick Wireless Upload\' below to get started.') ||
 			"No CyberBrick added yet. Expand 'Add CyberBrick Wireless Upload' below to get started.";

@@ -121,6 +121,7 @@ window.languageManager.loadMessages('cs', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Nalezeny experimentální bloky',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Experimentální bloky',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Váš pracovní prostor obsahuje experimentální bloky (zvýrazněné žlutým přerušovaným okrajem). Tyto funkce se mohou v budoucích aktualizacích změnit nebo být odstraněny, používejte je s opatrností.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('cs', {
 	THEME_TOGGLE: 'Přepnout motiv',
 	TOOLBAR_ACTIONS_EXPAND: 'Zobrazit další akce',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Zobrazit méně akcí',
+	MODAL_CLOSE_LABEL: 'Zavřít',
 	PREVIEW_WINDOW_TITLE: 'Blockly Náhled - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Náhled - {0}',
 

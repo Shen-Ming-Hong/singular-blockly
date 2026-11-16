@@ -121,6 +121,7 @@ window.languageManager.loadMessages('ja', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: '実験的ブロックが検出されました',
+	EXPERIMENTAL_BLOCKS_LABEL: '実験的ブロック',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'作品の中に、黄色の点線で囲まれた実験的なブロックがあります。これらの機能は今後のアップデートで変わったり、なくなったりすることがあるので、気をつけて使ってください。',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('ja', {
 	THEME_TOGGLE: 'テーマ切替',
 	TOOLBAR_ACTIONS_EXPAND: 'その他の操作を表示',
 	TOOLBAR_ACTIONS_COLLAPSE: '操作を折りたたむ',
+	MODAL_CLOSE_LABEL: '閉じる',
 	PREVIEW_WINDOW_TITLE: 'Blockly プレビュー - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'プレビュー - {0}',
 

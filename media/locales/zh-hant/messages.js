@@ -121,6 +121,7 @@ window.languageManager.loadMessages('zh-hant', {
 
 	// 實驗積木提示
 	EXPERIMENTAL_BLOCKS_TITLE: '發現實驗性積木',
+	EXPERIMENTAL_BLOCKS_LABEL: '實驗積木',
 	EXPERIMENTAL_BLOCKS_DESC: '你的作品裡有用黃色虛線標示的實驗性積木。這些功能以後可能會改變或移除，使用時請多留意。',
 
 	// Preview Mode UI
@@ -128,6 +129,7 @@ window.languageManager.loadMessages('zh-hant', {
 	THEME_TOGGLE: '切換主題',
 	TOOLBAR_ACTIONS_EXPAND: '顯示更多操作',
 	TOOLBAR_ACTIONS_COLLAPSE: '顯示較少操作',
+	MODAL_CLOSE_LABEL: '關閉',
 	PREVIEW_WINDOW_TITLE: 'Blockly 預覽 - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: '預覽 - {0}',
 

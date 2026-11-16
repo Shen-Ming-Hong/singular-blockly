@@ -121,6 +121,7 @@ window.languageManager.loadMessages('es', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Bloques experimentales detectados',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Bloques experimentales',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'Tu espacio de trabajo tiene bloques experimentales (con borde amarillo de rayas). Estos bloques pueden cambiar o desaparecer en próximas versiones, así que úsalos con cuidado.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('es', {
 	THEME_TOGGLE: 'Cambiar tema',
 	TOOLBAR_ACTIONS_EXPAND: 'Mostrar más acciones',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Mostrar menos acciones',
+	MODAL_CLOSE_LABEL: 'Cerrar',
 	PREVIEW_WINDOW_TITLE: 'Vista previa Blockly - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Vista previa - {0}',
 

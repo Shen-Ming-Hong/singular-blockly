@@ -121,6 +121,7 @@ window.languageManager.loadMessages('hu', {
 
 	// Experimental Blocks Notice
 	EXPERIMENTAL_BLOCKS_TITLE: 'Kísérleti blokkok észlelve',
+	EXPERIMENTAL_BLOCKS_LABEL: 'Kísérleti blokkok',
 	EXPERIMENTAL_BLOCKS_DESC:
 		'A munkaterület kísérleti blokkokat tartalmaz (sárga szaggatott szegéllyel kiemelve). Ezek a funkciók változhatnak vagy eltávolításra kerülhetnek a jövőbeni frissítésekben, óvatosan használja őket.',
 
@@ -129,6 +130,7 @@ window.languageManager.loadMessages('hu', {
 	THEME_TOGGLE: 'Téma váltása',
 	TOOLBAR_ACTIONS_EXPAND: 'További műveletek megjelenítése',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Kevesebb művelet megjelenítése',
+	MODAL_CLOSE_LABEL: 'Bezárás',
 	PREVIEW_WINDOW_TITLE: 'Blockly Előnézet - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Előnézet - {0}',
 

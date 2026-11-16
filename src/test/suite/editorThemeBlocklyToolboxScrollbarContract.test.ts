@@ -73,6 +73,10 @@ describe('Editor theme contract: scrollbars', () => {
 			/scrollbar-color\s*:\s*var\(--editor-scrollbar-thumb\)\s+var\(--editor-scrollbar-track\)/,
 			'Firefox scrollbar colors must follow the Blockly editor theme'
 		);
+		// macOS overlay scrollbars ignore scrollbar-color and Chromium 121+ ignores ::-webkit-scrollbar unless the
+		// standard properties stay auto, so the shared surfaces keep auto and only the fallback uses the standard ones.
+		assert.match(css, /\.blocklyToolboxDiv \{\s*scrollbar-width: auto;\s*scrollbar-color: auto;/);
+		assert.match(css, /@supports not selector\(::-webkit-scrollbar\) \{[\s\S]*?\.blocklyToolboxDiv \{\s*scrollbar-width: thin;/);
 		assert.match(
 			scrollbarBlocks,
 			/::-webkit-scrollbar-track[\s\S]*background(?:-color)?\s*:\s*var\(--editor-scrollbar-track\)/,
@@ -103,6 +107,9 @@ describe('Editor theme contract: scrollbars', () => {
 		// Chromium ignores ::-webkit-scrollbar when scrollbar-color/width are not auto, and macOS overlay
 		// scrollbars ignore scrollbar-color, which left the native black thumb on light menus.
 		assert.match(menuBlocks, /\.blocklyDropDownDiv \.blocklyMenu/, 'field dropdown menus share the menu scrollbar');
+		assert.match(menuBlocks, /\.controls-container \.board-dropdown/, 'toolbar board menu shares the menu scrollbar');
+		assert.match(menuBlocks, /\.controls-container \.language-dropdown/, 'toolbar language menu shares the menu scrollbar');
+		assert.match(css, /body\.theme-dark \.controls-container \.language-dropdown \{[^}]*--editor-menu-scrollbar-thumb: rgba\(255, 255, 255/);
 		assert.match(menuBlocks, /scrollbar-color\s*:\s*auto/);
 		assert.match(menuBlocks, /scrollbar-width\s*:\s*auto/);
 		assert.match(menuBlocks, /::-webkit-scrollbar-track[\s\S]*background\s*:\s*transparent/);
