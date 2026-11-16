@@ -8,6 +8,43 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.93.0] - 2026-11-16
+
+### ✨ 新功能 Features
+
+- 第一次打開積木編輯器時，會有互動式新手導覽依序帶你認識語言、開發板、工具箱、主程式積木、接上開發板、上傳與主題；每一步可以直接動手操作，完成後自動前往下一步，之後隨時可按工具列的「?」按鈕重看
+  The first time you open the block editor, an interactive guided tour walks you through the language, board, toolbox, main program block, connecting your board, uploading, and theme; you can try each step yourself and the tour moves on when you finish, and the "?" button in the toolbar replays it at any time
+
+### 🎨 介面 UI
+
+- 工具列與對話框換上新外觀：按鈕改為中性配色、只有上傳使用主色，圖示統一為線條風格，亮色與暗色主題共用同一套色彩
+  The toolbar and dialogs have a new look: buttons use neutral colours with only Upload in the accent colour, icons share one line style, and light and dark themes use the same colour set
+- 工作區有實驗積木時，提示改為開發板選單旁的「實驗積木」標籤，收起工具列時也看得到
+  When the workspace contains experimental blocks, the notice is now an "Experimental blocks" label next to the board menu that stays visible when the toolbar is collapsed
+- 備份管理與 CyberBrick 上傳設定對話框重新排版：欄位標籤放在上方，還原、重新整理、刪除等動作改為有名稱的圖示按鈕
+  The backup manager and CyberBrick upload settings dialogs have a clearer layout: field labels sit above their fields, and actions such as restore, refresh, and delete are labelled icon buttons
+- 開發板與語言選單、備份清單的捲軸在 macOS 上也改用細的圓角半透明滑桿，不再出現粗黑的系統滑桿
+  The board and language menus and the backup list now use the thin, rounded, translucent scrollbar on macOS too, instead of the thick black system scrollbar
+
+### ♿ 無障礙 Accessibility
+
+- 備份、搜尋積木、範例、TXT 連線與 CyberBrick 上傳設定對話框可按 Esc 關閉；開啟時焦點移進對話框，關閉後回到原本的按鈕
+  The backup, block search, samples, TXT connection, and CyberBrick upload settings dialogs close with Esc; focus moves into the dialog when it opens and returns to the button that opened it when it closes
+- 工具列只有圖示的按鈕都有螢幕閱讀器能讀出的名稱；收起的開發板與語言選單不會再被 Tab 鍵走到
+  Icon-only toolbar buttons now have names that screen readers announce, and the collapsed board and language menus are no longer reachable with Tab
+
+### 🐛 修復 Bug Fixes
+
+- 開啟積木編輯器、重新載入或還原備份後，主程式積木會出現在可見區正中間，不再卡在左上角
+  After opening or reloading the block editor, or restoring a backup, the main program block now appears in the middle of the visible area instead of the top-left corner
+- 編輯器變窄時，右上角的浮動工具列不再蓋住積木清單最上面的積木，也不再蓋住工具箱分類
+  When the editor is narrow, the floating toolbar in the top-right corner no longer covers the top blocks in the block list or the toolbox categories
+
+### 🔧 維護 Maintenance
+
+- 更新內建的 `tar` 至 7.5.23
+  Updated the bundled `tar` to 7.5.23
+
 ## [0.92.3] - 2026-11-13
 
 ### 🧪 實驗功能 Experimental
