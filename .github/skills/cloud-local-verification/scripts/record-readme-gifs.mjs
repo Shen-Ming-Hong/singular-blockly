@@ -44,6 +44,8 @@ async function launch({ repo, board = "none", theme = "light", language, files =
     "editor.minimap.enabled": false,
     "workbench.activityBar.location": "default",
     "window.zoomLevel": 0,
+    // README 示範用 VS Code 預設亮色主題（Ray 2026-11-16），不跟著執行環境的深色預設。
+    "workbench.colorTheme": "Default Light Modern",
     ...settings,
   }));
   fs.writeFileSync(path.join(workspace, "blockly", "main.json"), JSON.stringify({ workspace: workspaceState || { blocks: { languageVersion: 0, blocks: [] } }, board }));

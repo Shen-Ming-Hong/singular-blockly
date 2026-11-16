@@ -72,7 +72,7 @@ NODE_PATH=/tmp/sb-pw/node_modules xvfb-run -a -s "-screen 0 1440x900x24" \
 
 ### README 操作說明 GIF
 
-README 的 `docs/images/readme/*.gif` 由 `scripts/record-readme-gifs.mjs` 在真實 VS Code 中錄製（開啟編輯器與選板子、拖積木並在下方看 `src/main.cpp` 更新、切換語言與深色主題）。積木、工具列或主題的外觀明顯改變時重錄：準備步驟同上，再依腳本開頭的命令跑 `open`、`build`、`language` 三個場景（`build` 要在 `language` 之前），需要 `ffmpeg`。看過輸出的 GIF 再複製到 `docs/images/readme/`，三個檔案合計保持在約 1.5 MB 以內。`docs/**` 已被 `.vscodeignore` 排除，不會進 VSIX。
+README 的 `docs/images/readme/*.gif` 由 `scripts/record-readme-gifs.mjs` 在真實 VS Code 中錄製（開啟編輯器與選板子、拖積木並在下方看 `src/main.cpp` 更新、切換語言與深色主題），VS Code 本身固定用預設亮色主題（Default Light Modern）。積木、工具列或主題的外觀明顯改變時重錄：準備步驟同上，再依腳本開頭的命令跑 `open`、`build`、`language` 三個場景（`build` 要在 `language` 之前），需要 `ffmpeg`。看過輸出的 GIF 再複製到 `docs/images/readme/`，三個檔案合計保持在約 1.5 MB 以內。`docs/**` 已被 `.vscodeignore` 排除，不會進 VSIX。
 
 ## 4. 回報
 
