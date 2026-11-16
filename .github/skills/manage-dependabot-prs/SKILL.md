@@ -168,6 +168,7 @@ Recommendation 只能是：
 - ignore 必須記錄套件、版本範圍、原因、風險、重新評估條件與日期；不得用 ignore 掩蓋 Security Alert。
 - 只在 required checks、review 與 branch rules 全部通過後 merge。
 - 合併前必須確認目前 PR head 已有 CodeQL 結果，不能只看 `CI Gate`。若 human-owned PR 曾是 draft，轉 ready 後仍沒有 CodeQL，先確認 CodeQL/default setup 與 ruleset；在目前遠端操作核准範圍內，可建立不改 tree 的 empty commit 觸發新的 PR commit event，並重新跑 required checks。不得在 Dependabot bot branch 使用此復原手段，也不得繞過 ruleset。
+- Dependabot 推送的 head 不會觸發 CodeQL default setup 的 `Analyze` job，`CodeQL` check 只回 neutral「configurations not found」。`master` 已前進時，用 GitHub「Update branch」同步，由我們推出的 merge commit 會產生 CodeQL 結果；head 已含最新 `master` 時，從最新 `master` 建立本工作階段的 human-owned 分支，cherry-pick 同一個 Dependabot commit（`git diff <bot head> HEAD` 必須為空），開 replacement PR 合併，再留言關閉原 PR。同一 workflow 的多張 Actions PR（例如 cache restore／save）可合成一張 replacement PR。
 - merge 後同步 `master`，重新盤點剩餘 PR；確認 Dependabot 是否自動 rebase／關閉 superseded PR，再開始下一項。
 
 每項完成時回報：PR／replacement PR、實際版本、SDD 決定、測試、merge 狀態、剩餘風險，以及下一個佇列項目。不得聲稱整批完成，除非重新 triage 後已無待處理項目。
