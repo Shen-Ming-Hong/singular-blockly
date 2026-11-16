@@ -129,6 +129,7 @@ window.languageManager.loadMessages('bg', {
 	THEME_TOGGLE: 'Смяна на тема',
 	TOOLBAR_ACTIONS_EXPAND: 'Показване на още действия',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Показване на по-малко действия',
+	MODAL_CLOSE_LABEL: 'Затваряне',
 	PREVIEW_WINDOW_TITLE: 'Blockly Преглед - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Преглед - {0}',
 

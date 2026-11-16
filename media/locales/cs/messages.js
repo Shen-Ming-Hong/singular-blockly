@@ -129,6 +129,7 @@ window.languageManager.loadMessages('cs', {
 	THEME_TOGGLE: 'Přepnout motiv',
 	TOOLBAR_ACTIONS_EXPAND: 'Zobrazit další akce',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Zobrazit méně akcí',
+	MODAL_CLOSE_LABEL: 'Zavřít',
 	PREVIEW_WINDOW_TITLE: 'Blockly Náhled - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Náhled - {0}',
 

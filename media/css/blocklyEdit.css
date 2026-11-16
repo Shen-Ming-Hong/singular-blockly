@@ -665,7 +665,8 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	flex-wrap: wrap;
 	column-gap: 10px;
 	row-gap: 8px;
-	max-width: calc(100% - 20px);
+	/* 工具列只在工具箱右邊排列，展開或變窄時不蓋住積木分類。 */
+	max-width: calc(100% - 20px - var(--blockly-toolbox-width, 0px) - var(--txt-virtual-controls-toolbar-offset, 0px));
 	box-sizing: border-box;
 	background-color: white;
 	padding: 8px;
@@ -871,9 +872,12 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	transform: translateY(-6px);
 	transform-origin: top left;
 	pointer-events: none;
+	/* 收起時用 visibility 讓選項離開 Tab 順序；淡出結束後才隱藏。 */
+	visibility: hidden;
 	transition:
 		opacity 0.2s ease,
-		transform 0.2s ease;
+		transform 0.2s ease,
+		visibility 0s linear 0.2s;
 	z-index: 1100;
 }
 
@@ -881,6 +885,11 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	opacity: 1;
 	transform: translateY(0);
 	pointer-events: auto;
+	visibility: visible;
+	transition:
+		opacity 0.2s ease,
+		transform 0.2s ease,
+		visibility 0s;
 }
 
 /* 語言切換按鈕與下拉選單 */
@@ -952,9 +961,12 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	transform: translateY(-6px);
 	transform-origin: top right;
 	pointer-events: none;
+	/* 收起時用 visibility 讓選項離開 Tab 順序；淡出結束後才隱藏。 */
+	visibility: hidden;
 	transition:
 		opacity 0.2s ease,
-		transform 0.2s ease;
+		transform 0.2s ease,
+		visibility 0s linear 0.2s;
 	z-index: 1100;
 }
 
@@ -962,6 +974,11 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	opacity: 1;
 	transform: translateY(0);
 	pointer-events: auto;
+	visibility: visible;
+	transition:
+		opacity 0.2s ease,
+		transform 0.2s ease,
+		visibility 0s;
 }
 
 .language-option,

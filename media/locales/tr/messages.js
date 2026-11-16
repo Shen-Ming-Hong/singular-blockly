@@ -129,6 +129,7 @@ window.languageManager.loadMessages('tr', {
 	THEME_TOGGLE: 'Temayı değiştir',
 	TOOLBAR_ACTIONS_EXPAND: 'Daha fazla işlem göster',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Daha az işlem göster',
+	MODAL_CLOSE_LABEL: 'Kapat',
 	PREVIEW_WINDOW_TITLE: 'Blockly Önizleme - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Önizleme - {0}',
 

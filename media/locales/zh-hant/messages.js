@@ -128,6 +128,7 @@ window.languageManager.loadMessages('zh-hant', {
 	THEME_TOGGLE: '切換主題',
 	TOOLBAR_ACTIONS_EXPAND: '顯示更多操作',
 	TOOLBAR_ACTIONS_COLLAPSE: '顯示較少操作',
+	MODAL_CLOSE_LABEL: '關閉',
 	PREVIEW_WINDOW_TITLE: 'Blockly 預覽 - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: '預覽 - {0}',
 

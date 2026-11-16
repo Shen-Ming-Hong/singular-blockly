@@ -129,6 +129,7 @@ window.languageManager.loadMessages('fr', {
 	THEME_TOGGLE: 'Changer de thème',
 	TOOLBAR_ACTIONS_EXPAND: 'Afficher plus d’actions',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Afficher moins d’actions',
+	MODAL_CLOSE_LABEL: 'Fermer',
 	PREVIEW_WINDOW_TITLE: 'Aperçu Blockly - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Aperçu - {0}',
 

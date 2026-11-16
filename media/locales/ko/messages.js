@@ -129,6 +129,7 @@ window.languageManager.loadMessages('ko', {
 	THEME_TOGGLE: '테마 전환',
 	TOOLBAR_ACTIONS_EXPAND: '더 많은 작업 표시',
 	TOOLBAR_ACTIONS_COLLAPSE: '작업 접기',
+	MODAL_CLOSE_LABEL: '닫기',
 	PREVIEW_WINDOW_TITLE: 'Blockly 미리보기 - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: '미리보기 - {0}',
 

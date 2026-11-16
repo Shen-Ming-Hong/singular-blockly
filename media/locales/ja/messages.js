@@ -129,6 +129,7 @@ window.languageManager.loadMessages('ja', {
 	THEME_TOGGLE: 'テーマ切替',
 	TOOLBAR_ACTIONS_EXPAND: 'その他の操作を表示',
 	TOOLBAR_ACTIONS_COLLAPSE: '操作を折りたたむ',
+	MODAL_CLOSE_LABEL: '閉じる',
 	PREVIEW_WINDOW_TITLE: 'Blockly プレビュー - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'プレビュー - {0}',
 

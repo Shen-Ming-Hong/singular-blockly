@@ -129,6 +129,7 @@ window.languageManager.loadMessages('pl', {
 	THEME_TOGGLE: 'Zmień motyw',
 	TOOLBAR_ACTIONS_EXPAND: 'Pokaż więcej działań',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Pokaż mniej działań',
+	MODAL_CLOSE_LABEL: 'Zamknij',
 	PREVIEW_WINDOW_TITLE: 'Blockly Podgląd - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Podgląd - {0}',
 

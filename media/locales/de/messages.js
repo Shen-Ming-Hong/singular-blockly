@@ -129,6 +129,7 @@ window.languageManager.loadMessages('de', {
 	THEME_TOGGLE: 'Design wechseln',
 	TOOLBAR_ACTIONS_EXPAND: 'Weitere Aktionen anzeigen',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Weniger Aktionen anzeigen',
+	MODAL_CLOSE_LABEL: 'Schließen',
 	PREVIEW_WINDOW_TITLE: 'Blockly Vorschau - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Vorschau - {0}',
 

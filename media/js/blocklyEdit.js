@@ -854,6 +854,218 @@ function clearTxtVirtualControlPendingLoadOptions() {
 	txtVirtualControlsState.pendingLoadButtonReferences = new Map();
 }
 
+// 工具列只有圖示的按鈕：名稱跟著 title 寫進 aria-label，圖示本身對輔助技術隱藏。
+function getVisibleButtonText(button) {
+	const clone = button.cloneNode(true);
+	clone.querySelectorAll('svg, style').forEach(node => node.remove());
+	return clone.textContent.trim();
+}
+
+function syncIconButtonLabel(button) {
+	if (!(button instanceof HTMLButtonElement) || getVisibleButtonText(button)) {
+		return;
+	}
+	const title = button.getAttribute('title');
+	if (title && button.getAttribute('aria-label') !== title) {
+		button.setAttribute('aria-label', title);
+	}
+	button.querySelectorAll('svg').forEach(svg => svg.setAttribute('aria-hidden', 'true'));
+}
+
+function initToolbarIconButtonLabels() {
+	const toolbar = document.querySelector('.controls-container');
+	if (!toolbar) {
+		return;
+	}
+	toolbar.querySelectorAll('button').forEach(syncIconButtonLabel);
+	toolbar.querySelectorAll('button svg').forEach(svg => svg.setAttribute('aria-hidden', 'true'));
+	// 按鈕可能被複製替換（例如上傳按鈕重新綁定事件），新加入的按鈕也要同步。
+	new MutationObserver(records => {
+		for (const record of records) {
+			if (record.type === 'attributes') {
+				syncIconButtonLabel(record.target);
+				continue;
+			}
+			for (const node of record.addedNodes) {
+				if (node instanceof Element) {
+					[node, ...node.querySelectorAll('button')].forEach(syncIconButtonLabel);
+				}
+			}
+		}
+	}).observe(toolbar, { subtree: true, childList: true, attributes: true, attributeFilter: ['title'] });
+}
+
+// 舊式對話框（.modal + style.display）的鍵盤與焦點：Esc 關閉、開啟時焦點進入、關閉後回到開啟它的按鈕。
+// 積木包與積木設計器自己處理，TXT 測試面板是原生 <dialog>。
+const MANAGED_MODALS = [
+	{ id: 'backupModal', close: '#backupModal .modal-close' },
+	{ id: 'functionSearchModal', close: '#functionSearchModal .modal-close' },
+	{ id: 'sampleModal', close: '#sampleModalClose' },
+	{ id: 'txtConnectionModal', close: '#txtModalClose' },
+	{ id: 'cyberbrickUploadSettingsModal', close: '#cyberbrickUploadSettingsClose' },
+];
+const modalOpeners = new Map();
+let lastFocusOutsideModals = null;
+
+function isModalShown(modal) {
+	return Boolean(modal) && modal.isConnected && getComputedStyle(modal).display !== 'none';
+}
+
+function isFocusableAndVisible(element) {
+	return Boolean(element) && element.isConnected && element.getClientRects().length > 0 && !element.closest('[hidden]');
+}
+
+function getModalFocusTarget(modal) {
+	const candidates = modal.querySelectorAll(
+		'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+	);
+	return Array.from(candidates).find(isFocusableAndVisible) || null;
+}
+
+function updateModalCloseLabels() {
+	const label = window.languageManager?.getMessage('MODAL_CLOSE_LABEL', 'Close') || 'Close';
+	for (const { close } of MANAGED_MODALS) {
+		const button = document.querySelector(close);
+		if (button) {
+			button.setAttribute('aria-label', label);
+			button.setAttribute('title', label);
+		}
+	}
+}
+
+function handleManagedModalShown(modal) {
+	// 開啟流程可能已先把焦點移進對話框（例如搜尋欄），所以用最後一個在對話框外的焦點當開啟者。
+	const active = document.activeElement;
+	const opener = active && active !== document.body && !modal.contains(active) ? active : lastFocusOutsideModals;
+	if (opener) {
+		modalOpeners.set(modal.id, opener);
+	}
+	// 等開啟流程自己設定焦點（例如搜尋欄）後，焦點仍在外面才移進對話框。
+	setTimeout(() => {
+		if (!isModalShown(modal) || modal.contains(document.activeElement)) {
+			return;
+		}
+		const content = modal.querySelector('.modal-content') || modal;
+		const target = getModalFocusTarget(modal);
+		if (target) {
+			target.focus();
+		} else {
+			content.setAttribute('tabindex', '-1');
+			content.focus();
+		}
+	}, 0);
+}
+
+function handleManagedModalHidden(modal) {
+	const opener = modalOpeners.get(modal.id);
+	modalOpeners.delete(modal.id);
+	const active = document.activeElement;
+	if (active && active !== document.body && !modal.contains(active)) {
+		return;
+	}
+	// 開啟它的按鈕若被收起（例如工具列收合），改回到展開更多動作的按鈕。
+	const fallback = document.getElementById('toolbarActionsToggle');
+	const target = isFocusableAndVisible(opener) ? opener : isFocusableAndVisible(fallback) ? fallback : null;
+	target?.focus();
+}
+
+function initModalAccessibility() {
+	for (const { id, close } of MANAGED_MODALS) {
+		const modal = document.getElementById(id);
+		if (!modal) {
+			continue;
+		}
+		const content = modal.querySelector('.modal-content') || modal;
+		if (!content.hasAttribute('role')) {
+			content.setAttribute('role', 'dialog');
+		}
+		content.setAttribute('aria-modal', 'true');
+		const title = modal.querySelector('.modal-header h2[id]');
+		if (title && !content.hasAttribute('aria-labelledby')) {
+			content.setAttribute('aria-labelledby', title.id);
+		}
+		const closeButton = document.querySelector(close);
+		if (closeButton && closeButton.tagName !== 'BUTTON') {
+			closeButton.setAttribute('role', 'button');
+			closeButton.setAttribute('tabindex', '0');
+		}
+		let wasShown = isModalShown(modal);
+		new MutationObserver(() => {
+			const shown = isModalShown(modal);
+			if (shown === wasShown) {
+				return;
+			}
+			wasShown = shown;
+			if (shown) {
+				handleManagedModalShown(modal);
+			} else {
+				handleManagedModalHidden(modal);
+			}
+		}).observe(modal, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+	}
+	updateModalCloseLabels();
+
+	document.addEventListener('focusin', event => {
+		const target = event.target instanceof Element ? event.target : null;
+		if (target && !target.closest('.modal')) {
+			lastFocusOutsideModals = target;
+		}
+	});
+
+	// 關閉鈕是 <span>（TXT 的會被複製替換），用委派處理 Enter／空白鍵。
+	const closeSelector = MANAGED_MODALS.map(entry => entry.close).join(', ');
+	document.addEventListener('keydown', event => {
+		const target = event.target instanceof Element ? event.target : null;
+		if ((event.key === 'Enter' || event.key === ' ') && target && target.tagName !== 'BUTTON' && target.matches(closeSelector)) {
+			event.preventDefault();
+			target.click();
+		}
+	});
+
+	document.addEventListener('keydown', event => {
+		if (event.key !== 'Escape' || event.defaultPrevented || isBlocklyTextInputCompositionEvent(event)) {
+			return;
+		}
+		if (typeof Blockly !== 'undefined' && (Blockly.WidgetDiv?.isVisible?.() || Blockly.DropDownDiv?.isVisible?.())) {
+			return;
+		}
+		const open = MANAGED_MODALS.map(entry => ({ entry, modal: document.getElementById(entry.id) })).filter(({ modal }) =>
+			isModalShown(modal)
+		);
+		const top = open[open.length - 1];
+		const closeButton = top && document.querySelector(top.entry.close);
+		if (closeButton) {
+			event.preventDefault();
+			closeButton.click();
+		}
+	});
+}
+
+let toolboxClearanceObserver = null;
+let observedToolboxElement = null;
+
+/** 把工具箱寬度寫進 CSS 變數，讓浮動工具列只在工具箱右側排列。 */
+function updateToolbarToolboxClearance() {
+	const workspace = typeof Blockly !== 'undefined' && window.getBlocklyWorkspace ? window.getBlocklyWorkspace() : null;
+	const toolbox = workspace && workspace.getToolbox ? workspace.getToolbox() : null;
+	const width = toolbox ? Math.ceil(toolbox.getWidth()) : 0;
+	document.documentElement.style.setProperty('--blockly-toolbox-width', `${width}px`);
+
+	const element = document.querySelector('.blocklyToolbox');
+	if (element !== observedToolboxElement && typeof ResizeObserver !== 'undefined') {
+		toolboxClearanceObserver = toolboxClearanceObserver || new ResizeObserver(() => updateToolbarToolboxClearance());
+		if (observedToolboxElement) {
+			toolboxClearanceObserver.unobserve(observedToolboxElement);
+		}
+		if (element) {
+			toolboxClearanceObserver.observe(element);
+		}
+		observedToolboxElement = element;
+	}
+}
+
+window.addEventListener('resize', () => updateToolbarToolboxClearance());
+
 function scheduleBlocklyResize() {
 	if (txtVirtualControlsState.resizeFrame) {
 		cancelAnimationFrame(txtVirtualControlsState.resizeFrame);
@@ -2098,9 +2310,14 @@ function closeBoardDropdown() {
 	if (!dropdown) {
 		return;
 	}
+	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
+	const focusWasInside = dropdown.contains(document.activeElement);
 	dropdown.classList.remove('open');
 	dropdown.setAttribute('aria-hidden', 'true');
 	isBoardDropdownOpen = false;
+	if (focusWasInside) {
+		document.getElementById('boardSelectToggle')?.focus();
+	}
 
 	const toggleButton = document.getElementById('boardSelectToggle');
 	if (toggleButton) {
@@ -2309,9 +2526,14 @@ function closeLanguageDropdown() {
 	if (!dropdown) {
 		return;
 	}
+	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
+	const focusWasInside = dropdown.contains(document.activeElement);
 	dropdown.classList.remove('open');
 	dropdown.setAttribute('aria-hidden', 'true');
 	isLanguageDropdownOpen = false;
+	if (focusWasInside) {
+		document.getElementById('languageToggle')?.focus();
+	}
 
 	const toggleButton = document.getElementById('languageToggle');
 	if (toggleButton) {
@@ -2386,6 +2608,8 @@ function updateEditorUITexts() {
 		log.warn('語言管理器尚未載入，無法更新主編輯視窗文字');
 		return;
 	}
+
+	updateModalCloseLabels();
 
 	// 更新主題切換按鈕title屬性
 	const themeToggle = document.getElementById('themeToggle');
@@ -3529,6 +3753,7 @@ window.addEventListener('languageChanged', function (event) {
 document.addEventListener('DOMContentLoaded', async () => {
 	log.info('Blockly Edit page loaded');
 
+	initToolbarIconButtonLabels();
 	initToolbarActions();
 	// 更新主編輯視窗UI文字的多語言支援
 	updateEditorUITexts();
@@ -3597,6 +3822,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	// 初始化備份管理器
 	backupManager.init();
+	initModalAccessibility();
 	// 初始化函式積木搜尋功能
 	functionSearch.init();
 	// 初始化快速備份功能 (Ctrl+S / Cmd+S)
@@ -3726,6 +3952,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	});
 	// 根據初始主題設定更新 UI
 	updateTheme(currentTheme);
+	updateToolbarToolboxClearance();
 	initTxtVirtualControlsUI();
 
 	// 創建預設變數 i
@@ -4586,6 +4813,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		updateTheme(currentTheme);
 		workspace.render();
 		Blockly.svgResize(workspace);
+		updateToolbarToolboxClearance();
 		window.updateExperimentalBlocksList?.(workspace);
 		window.experimentalBlockMarker?.refreshMarks();
 		return workspace;

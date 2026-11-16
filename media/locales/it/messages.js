@@ -129,6 +129,7 @@ window.languageManager.loadMessages('it', {
 	THEME_TOGGLE: 'Cambia tema',
 	TOOLBAR_ACTIONS_EXPAND: 'Mostra altre azioni',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Mostra meno azioni',
+	MODAL_CLOSE_LABEL: 'Chiudi',
 	PREVIEW_WINDOW_TITLE: 'Anteprima Blockly - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Anteprima - {0}',
 

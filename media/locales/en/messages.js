@@ -129,6 +129,7 @@ window.languageManager.loadMessages('en', {
 	THEME_TOGGLE: 'Toggle Theme',
 	TOOLBAR_ACTIONS_EXPAND: 'Show more actions',
 	TOOLBAR_ACTIONS_COLLAPSE: 'Show fewer actions',
+	MODAL_CLOSE_LABEL: 'Close',
 	PREVIEW_WINDOW_TITLE: 'Blockly Preview - {0}',
 	PREVIEW_WINDOW_TITLE_WITH_NAME: 'Preview - {0}',
 
