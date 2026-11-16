@@ -3406,7 +3406,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 }
 
 .icon-btn .search-icon {
-	fill: currentColor; /* 使用當前文字顏色填充SVG */
+	fill: none; /* Lucide 線條圖示，顏色來自 stroke: currentColor */
 }
 
 #functionSearchToggle {
