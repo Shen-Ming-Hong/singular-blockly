@@ -29,6 +29,9 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
   - 每個任務仍在自己的分支開發與開 PR。需要 Ray 實測時，先看主資料夾的 `git status`；有 Ray 未提交的改動就不動，先告訴 Ray 並等 Ray 決定。乾淨時推送任務分支，在主資料夾 `git fetch` 後切到 `local/integration`（不存在就從最新 `origin/master` 建立），以 `git merge --no-ff origin/<任務分支>` 併入；不要 rebase、不要 force，也不要改寫整合分支上其他任務的 merge。
   - 衝突由該任務自行解決，並確認沒有吃掉其他任務已併入的改動；解決不了就停止、還原這次 merge（`git merge --abort`），回報 Ray。
   - 併入後依需要跑 `npm install`（依賴有變時）與 `npm run compile`，確認 F5 會載入新版本。雲端工作階段透過 Remote Control 在該資料夾執行這些命令；桌面工作階段可直接在該資料夾操作。
+  - **Remote Control 的起始目錄不一定是要求的資料夾**（2026-11-15、11-16 幾次都開在 Ray 另一個已核准的資料夾）。給它的指令第一步一律 `cd /Users/user/Documents/singular-blockly`，並確認 `package.json` 的 `name` 是 `singular-blockly` 才往下做；不要寫「在這個資料夾」。
+  - 每次併入前先看 `git log --oneline origin/master..local/integration`：上面有已合併進 `master` 的任務 merge 時，先依下方步驟重建再併入，不要疊在舊 merge 上（2026-11-16 導覽分支併入時就因此在兩個檔案衝突）。
+  - 收到 Remote Control 回報 compile 成功後才請 Ray 測，請求連線時先說「先不用按 F5，編譯好會通知」。通知時寫明重載方式：在原本的 VS Code 按 Shift+F5 停止偵錯再按 F5；Mac 上 Ctrl+R 不會重新載入（Ray 2026-11-16 用 Ctrl+R 看到的仍是舊版）。只在雲端截圖的原型（例如注入編輯器的樣式或腳本）還沒進 Ray 的整合分支，給 Ray 看時直接說明本機還看不到。
   - 準備好就主動通知 Ray 可以 F5 確認了，說明併入了哪個分支、要看哪些畫面（亮色／深色主題、受影響的互動）或要測哪些板子與流程；由 Ray 自己按 F5，不替 Ray 啟動 Extension Development Host。
   - Ray 回報通過後，在 PR 描述記錄 Ray 的回報（時間與內容摘要）作為「發布門檻」的外觀確認或硬體測試證據，硬體改動此時才開 PR；發現問題就在任務分支修正，再 merge 一次、再通知 Ray。
   - `local/integration` 只在本機，不推上遠端、不從它開 PR，也不在上面直接改檔。
@@ -60,7 +63,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 - 先執行受影響範圍的測試；依 [專案地圖](references/project-map.md) 補上該變更需要的建置、契約或 i18n 檢查。開跑前寫下這次的驗證範圍與理由，拿不準時往大的範圍測。
 - PR 描述的驗證結果逐項只寫「通過」「失敗」「沒驗到」三種；瀏覽器起不來、網路或權限這類工具與環境問題算「沒驗到」並寫明原因，不能當成通過。有失敗就修好再合併；有沒驗到的項目時，回報 Ray 時逐項列出。
-- 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 5 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。
+- 在雲端容器或無螢幕環境驗證 PR、或需要 Blockly webview 截圖與拖曳互動證據時，使用 `cloud-local-verification`；不要只依賴 GitHub CI。UI/UX 變更的截圖要涵蓋亮色與深色主題及受影響的互動狀態，並對照「動手前」第 5 步選定的業界參考；同一元件在不同主題或狀態下呈現不一致（例如某主題的捲軸顏色與周圍元件不協調）就還沒完成。改變工具列、積木、對話框或主題外觀的 PR，合併後檢查 README 操作說明 GIF 是否還符合畫面，不符合就接著依 `cloud-local-verification` 的「README 操作說明 GIF」重錄，不等 Ray 提醒（2026-11-16 #266 合併後由 Ray 要求才重錄）。
 - Blockly 積木、工具箱、schema 或產品 Skill 變更：執行 `npm run generate:project-skills`，檢查生成差異，再執行 `npm run check:project-skills`。
 - 改到貢獻者技能（`.github/skills`）、它們的連結、`AGENTS.md` 或 `CLAUDE.md`：執行 `npm run check:skills`（連結、frontmatter、相對連結、SKILL.md 與 `lessons.md` 大小；也在 `ci:static` 中執行）。
 - 新增第三方素材（圖示、SVG、字型、圖片、音效）或複製外部程式片段時，確認授權允許再散布，並在 PR 描述逐項寫明來源與授權；不確定的不加入。打包進 `dist/` 的 npm 套件授權由 `generate:third-party-notices` 處理，`media/` 裡直接放的素材不在它的範圍內。
