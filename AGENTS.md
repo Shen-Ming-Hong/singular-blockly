@@ -75,6 +75,10 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - If a skill cannot be loaded by name (missing from the tool list, symlink not followed, or a checkout without symlinks), read `.github/skills/<name>/SKILL.md` (Spec Kit: `.agents/skills/<name>/SKILL.md`) directly; never skip the skill. Run `npm run check:skills` after changing contributor skills, their links, `AGENTS.md`, or `CLAUDE.md`.
 - Subagents and workflows: the main agent gives each subagent an explicit file scope, task, and acceptance checks, then reviews every diff itself and reruns the checks instead of trusting the subagent's report. Subagents never commit, push, merge, deploy, or edit shared summaries such as `lessons.md`. See "子代理與 Workflow" in `maintain-singular-blockly`.
 
+## Design and UX Proposals
+- Every proposal and every UI/UX change must start from current mainstream industry standards (for example VS Code UX Guidelines, WCAG 2.2, Material, Fluent, Apple HIG, and Blockly/Scratch/MakeCode conventions), checked against official docs or real product screens.
+- Every such report to Ray and every such PR description must state (1) which specific standards or product patterns were referenced, with names or links; (2) the gap between the current state and those standards; and (3) the recommended next design step with its reasoning and trade-offs. Use the template in `.github/skills/maintain-singular-blockly/references/industry-standards.md`.
+
 ## Coding Style
 - TypeScript uses strict compiler options from `tsconfig.json`.
 - Follow ESLint and existing formatting.
