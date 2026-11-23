@@ -5,6 +5,13 @@
 // 用法（在 repo 根目錄，先完成 `npm run compile` 與一次 `xvfb-run -a npm run test:unit:ci`）：
 //   xvfb-run -a -s "-screen 0 1440x900x24" node .github/skills/cloud-local-verification/scripts/vscode-webview-smoke.mjs \
 //     --out /tmp/sb-visual [--board uno|esp32|cyberbrick] [--theme light|dark] [--repo <path>] [--size 900x700]
+//     [--main-json <file>] [--click "<selector>,<selector>"] [--skip-default] [--keep-tour]
+//     [--command "Singular Blockly: Provide Feedback" --ready "#feedbackForm"]
+//
+// --main-json 直接放入準備好的 blockly/main.json（不靠拖曳備資料）；--click 依序點擊指定元素，
+// 每一步截圖並自動檢查；--skip-default 略過工具箱、拖曳與右鍵選單；--command／--ready 開其他面板。
+// 每個狀態都會自動檢查 webview 錯誤、原生對話框、水平捲動、小於 12px 的字與小於 24px 的點擊目標，
+// 結果在 result.json 的 checks.uiAudit。
 //
 // playwright-core 裝在 repo 外的暫存目錄，以 NODE_PATH 指向其 node_modules；不要加入專案依賴。
 import { createRequire } from "node:module";
@@ -30,6 +37,13 @@ const outDir = path.resolve(
   args.out || path.join(os.tmpdir(), "singular-blockly-visual"),
 );
 const board = args.board || "uno";
+const openCommand = args.command || "Singular Blockly: Open Blockly Edit";
+const readySelector = args.ready || ".blocklySvg";
+const isBlocklyEditor = readySelector === ".blocklySvg";
+const clickSelectors = (args.click || "")
+  .split(",")
+  .map((selector) => selector.trim())
+  .filter(Boolean);
 const theme = args.theme || "light";
 // 視窗大小（寬x高）；用來檢查 VS Code 視窗變窄（側邊欄開著、分割編輯器）時的版面。
 const sizeMatch = /^(\d{3,4})x(\d{3,4})$/.exec(args.size || "");
@@ -83,10 +97,12 @@ fs.writeFileSync(
 );
 fs.writeFileSync(
   path.join(workspace, "blockly", "main.json"),
-  JSON.stringify({
-    workspace: { blocks: { languageVersion: 0, blocks: [] } },
-    board,
-  }),
+  args["main-json"]
+    ? fs.readFileSync(path.resolve(args["main-json"]), "utf8")
+    : JSON.stringify({
+        workspace: { blocks: { languageVersion: 0, blocks: [] } },
+        board,
+      }),
 );
 // 主題由 SettingsManager 從工作區 .vscode/settings.json 讀取。
 fs.mkdirSync(path.join(workspace, ".vscode"), { recursive: true });
@@ -118,13 +134,85 @@ const results = {
   board,
   theme,
   screenshots: [],
-  checks: {},
+  checks: { uiAudit: {} },
   webviewErrors: [],
+  nativeDialogs: [],
 };
+
+// 在 webview frame 內檢查目前畫面：水平捲動、字級小於 12px、點擊目標小於 24x24 CSS px
+// （WCAG 2.2 SC 2.5.8 的最低尺寸；行內連結與有足夠間距的目標屬例外，候選項要人工判斷）、
+// 以及 frame 內被呼叫的 alert／confirm／prompt。只列前 10 筆，避免結果過長。
+const auditFrame = (frame) =>
+  frame.evaluate(() => {
+    const visible = (element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return (
+        rect.width > 0 &&
+        rect.height > 0 &&
+        style.visibility !== "hidden" &&
+        style.display !== "none" &&
+        style.opacity !== "0" &&
+        rect.bottom > 0 &&
+        rect.right > 0 &&
+        rect.top < innerHeight &&
+        rect.left < innerWidth
+      );
+    };
+    const describe = (element) =>
+      element.getAttribute("data-testid")
+        ? `[data-testid="${element.getAttribute("data-testid")}"]`
+        : element.id
+          ? `#${element.id}`
+          : `${element.tagName.toLowerCase()}${element.classList.length ? "." + [...element.classList].slice(0, 2).join(".") : ""}`;
+    const root = document.scrollingElement || document.documentElement;
+    const smallText = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const element = node.parentElement;
+      if (!element || !node.textContent.trim() || !visible(element)) continue;
+      // Blockly 的 SVG 積木文字隨工作區縮放，不在此檢查範圍。
+      if (element.closest("svg")) continue;
+      const size = parseFloat(getComputedStyle(element).fontSize);
+      if (size < 12 && !smallText.some((item) => item.element === describe(element))) {
+        smallText.push({ element: describe(element), fontSize: size, text: node.textContent.trim().slice(0, 40) });
+      }
+    }
+    const smallTargets = [];
+    for (const element of document.querySelectorAll(
+      'button, a[href], input:not([type="hidden"]), select, textarea, [role="button"], [role="menuitem"], [role="tab"], [role="option"]',
+    )) {
+      // 隱藏的原生元件（例如被自訂下拉取代的 #boardSelect）不是點擊目標。
+      if (!visible(element) || element.closest("svg") || getComputedStyle(element).pointerEvents === "none") continue;
+      const rect = element.getBoundingClientRect();
+      if (rect.width < 24 || rect.height < 24) {
+        smallTargets.push({ element: describe(element), width: Math.round(rect.width), height: Math.round(rect.height) });
+      }
+    }
+    return {
+      horizontalScroll: root.scrollWidth > root.clientWidth + 1,
+      scrollWidth: root.scrollWidth,
+      clientWidth: root.clientWidth,
+      smallText: smallText.slice(0, 10),
+      smallTextCount: smallText.length,
+      smallTargets: smallTargets.slice(0, 10),
+      smallTargetCount: smallTargets.length,
+      nativeDialogs: window.__sbNativeDialogs || [],
+    };
+  });
+let auditTarget = null;
 const shot = async (page, name) => {
   const file = path.join(outDir, `${name}.png`);
   await page.screenshot({ path: file });
   results.screenshots.push(file);
+  if (auditTarget) {
+    results.checks.uiAudit[name] = await auditFrame(auditTarget).catch(
+      (error) => ({ error: String(error) }),
+    );
+    // VS Code 自己的模態對話框（例如 showWarningMessage 的 modal）。
+    if (await page.$(".monaco-dialog-box")) results.nativeDialogs.push(`${name}: VS Code modal dialog`);
+  }
 };
 
 try {
@@ -153,33 +241,65 @@ try {
     }
   });
   window.on("pageerror", (error) => results.webviewErrors.push(String(error)));
+  window.on("dialog", async (dialog) => {
+    results.nativeDialogs.push(`${dialog.type()}: ${dialog.message()}`);
+    await dialog.dismiss().catch(() => {});
+  });
   await window.waitForSelector(".monaco-workbench", { timeout: 120000 });
   await window.waitForTimeout(3000);
 
   // 透過命令選擇區開啟 Blockly 編輯器。
   await window.keyboard.press("F1");
   await window.waitForSelector(".quick-input-widget input", { timeout: 15000 });
-  await window.keyboard.type("Singular Blockly: Open Blockly Edit");
+  await window.keyboard.type(openCommand);
   await window.waitForTimeout(800);
   await window.keyboard.press("Enter");
 
-  // Webview 位於巢狀 iframe（workbench > webview host > active-frame），逐一探測 .blocklySvg。
+  // Webview 位於巢狀 iframe（workbench > webview host > active-frame），逐一探測 ready 選擇器。
   let blocklyFrame;
   const deadline = Date.now() + 90000;
   while (!blocklyFrame && Date.now() < deadline) {
     for (const frame of window.frames()) {
       try {
-        if (await frame.$(".blocklySvg")) blocklyFrame = frame;
+        if (await frame.$(readySelector)) blocklyFrame = frame;
       } catch {
         // 探測時 frame 已卸載。
       }
     }
     if (!blocklyFrame) await window.waitForTimeout(1000);
   }
-  if (!blocklyFrame) throw new Error("Webview 中沒有渲染出 Blockly 工作區");
+  if (!blocklyFrame) throw new Error(`Webview 中沒有出現 ${readySelector}`);
+  // 記錄之後在 frame 內被呼叫的原生對話框，並讓呼叫不阻塞。
+  await blocklyFrame.evaluate(() => {
+    window.__sbNativeDialogs = [];
+    for (const name of ["alert", "confirm", "prompt"]) {
+      window[name] = (message) => {
+        window.__sbNativeDialogs.push(`${name}: ${String(message).slice(0, 80)}`);
+        return name === "confirm" ? false : null;
+      };
+    }
+  });
+  auditTarget = blocklyFrame;
   await window.waitForTimeout(2500);
+  // 全新使用者資料會自動開導覽，蓋住工作區；除非要驗導覽（--keep-tour），先按「略過」。
+  if (!args["keep-tour"]) {
+    const skipTour = await blocklyFrame.$("#guidedTour .guided-tour-skip");
+    if (skipTour && (await skipTour.isVisible())) {
+      await skipTour.click();
+      await window.waitForTimeout(500);
+      results.checks.guidedTourSkipped = true;
+    }
+  }
   results.checks.workspaceRendered = true;
   await shot(window, "01-editor-open");
+
+  // 只點這次改到的元件：每一步截圖並自動檢查。選擇器優先用 data-testid，其次是固定的 id。
+  for (const [index, selector] of clickSelectors.entries()) {
+    const element = await blocklyFrame.waitForSelector(selector, { state: "visible", timeout: 15000 });
+    await element.click();
+    await window.waitForTimeout(800);
+    await shot(window, `${String(5 + index).padStart(2, "0")}-click-${index + 1}`);
+  }
 
   results.checks.blocklyVersion = await blocklyFrame.evaluate(
     () => window.Blockly?.VERSION || null,
@@ -189,8 +309,9 @@ try {
     (nodes) => nodes.length,
   );
 
+  const runDefault = isBlocklyEditor && !args["skip-default"];
   // 互動：開啟第一個工具箱分類，把 flyout 的第一個積木拖到工作區。
-  const category = await blocklyFrame.$(
+  const category = runDefault && await blocklyFrame.$(
     ".blocklyToolboxCategory, .blocklyTreeRow",
   );
   if (category) {
@@ -233,10 +354,11 @@ try {
   }
 
   // 右鍵選單：在積木上按右鍵，限制選單高度強制出現捲軸，記錄捲軸配色並截圖。
-  const contextTarget = await blocklyFrame.evaluateHandle(() => {
+  const contextTarget = await blocklyFrame.evaluateHandle((enabled) => {
+    if (!enabled) return null;
     const block = Blockly.getMainWorkspace().getTopBlocks(false)[0];
     return block ? block.getSvgRoot().querySelector(".blocklyPath") : null;
-  });
+  }, runDefault);
   const contextElement = contextTarget.asElement();
   if (contextElement) {
     const box = await contextElement.boundingBox();
@@ -276,12 +398,14 @@ try {
         },
       });
       results.screenshots.push(file);
+      results.checks.uiAudit["04-context-menu"] = await auditFrame(blocklyFrame);
     }
     await window.keyboard.press("Escape");
   }
 
   // 產生程式碼確認 generator 可在拖曳後正常運作（只記錄長度與開頭，避免結果過長）。
   results.checks.generatedCode = await blocklyFrame.evaluate(() => {
+    if (!window.Blockly) return null;
     const workspace = Blockly.getMainWorkspace();
     const generator = window.arduinoGenerator;
     if (!generator) return null;
@@ -296,6 +420,18 @@ try {
     // 視窗已關閉。
   }
 } finally {
+  // 彙總：任何一項不為 0／false 都要看截圖判斷，並和 base 分支比較是否為本次新增。
+  const audits = Object.values(results.checks.uiAudit).filter((audit) => !audit.error);
+  results.auditSummary = {
+    states: Object.keys(results.checks.uiAudit).length,
+    webviewErrors: results.webviewErrors.length,
+    nativeDialogs:
+      results.nativeDialogs.length +
+      Math.max(0, ...audits.map((audit) => audit.nativeDialogs.length)),
+    horizontalScrollStates: audits.filter((audit) => audit.horizontalScroll).length,
+    maxSmallText: Math.max(0, ...audits.map((audit) => audit.smallTextCount)),
+    maxSmallTargets: Math.max(0, ...audits.map((audit) => audit.smallTargetCount)),
+  };
   fs.writeFileSync(
     path.join(outDir, "result.json"),
     JSON.stringify(results, null, 2),
