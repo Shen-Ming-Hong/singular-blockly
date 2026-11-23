@@ -37,7 +37,7 @@ metadata:
 ## 修改流程
 
 1. 讀 `docs/feedback-deployment.md` 中與本次相關的段落，以及 `maintain-singular-blockly` 的 lessons 相關條目。
-2. 改程式，沿用既有寫法。新的 D1 欄位或表一律新增下一個編號的 migration，並在部署手冊記下「必須在哪個 Worker 版本切換流量前完成」。
+2. 改程式，沿用既有寫法。權限（401／403、Access、owner 限定）、資料規則與連動行為寫成 `workers/feedback/test/` 的 API 測試（Vitest 跑在 workerd、本機 D1），不開瀏覽器；新增規則時先故意改壞、只跑該測試檔確認會失敗再還原。新的 D1 欄位或表一律新增下一個編號的 migration，並在部署手冊記下「必須在哪個 Worker 版本切換流量前完成」；改欄位或移除欄位依 expand／contract 分成新增、搬資料、移除三步（見 `maintain-singular-blockly` 的 [驗證分層](../maintain-singular-blockly/references/verification-tiers.md) 第 8 條）。
 3. 本地驗證（雲端容器同樣可跑）：
 
    ```bash
@@ -57,7 +57,7 @@ metadata:
 下列都會改到正式環境或使用者資料，即使 CI 全綠也要先取得 Ray 在對話中的明確同意，並附上要執行的步驟、驗證方式與回復計畫：
 
 - 部署 Worker 新版本、切換或回復流量版本。
-- 對正式 D1 套用 migration，或任何正式 D1／R2 的寫入與刪除。
+- 對正式 D1 套用 migration，或任何正式 D1／R2 的寫入與刪除。執行前先用 `npx wrangler d1 time-travel info singular-blockly-feedback --config workers/feedback/wrangler.jsonc` 取得 bookmark 記進部署紀錄作為回復點。
 - 新增、輪替或刪除 secret（輪替 reporter pepper 會讓現有匿名憑證失效，需要使用者通知計畫）。
 - 改 DNS route、Cloudflare Access policy、GitHub App 權限、安裝範圍或 webhook。
 - 在正式環境建立 synthetic 回饋做 smoke test。

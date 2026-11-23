@@ -92,6 +92,7 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 - Use `.only` temporarily to focus a single Mocha test, then remove it before finishing.
 - WebView code cannot be imported into Node.js tests; use contract-style tests.
 - Coverage target is documented in `docs/specifications/04-quality-testing/test-coverage.md`.
+- Verification tiers (Ray, 2026-11-23): keep each PR's verification to minutes. The merge gate is type check, unit tests, API-layer tests (feedback Worker via Vitest with local D1; Extension Host services and WebView message contracts), build, and visual checks of only the affected screens; run the full click-through and every-width sweep only for global style or layout-frame changes, major Blockly/VS Code upgrades, or when Ray asks. Report time from done-editing to merge and the verification time. See `.github/skills/maintain-singular-blockly/references/verification-tiers.md`.
 
 ## Product Agent Skill
 - This repository ships the Product Agent Skill to users; it is not one of the contributor skills above. The extension installs it into the user's project as `.agents/skills/singular-blockly/` (canonical) and `.claude/skills/singular-blockly/SKILL.md` (compact compatibility entry); neither path exists in this repository.
