@@ -10,7 +10,7 @@ metadata:
 
 # 維護回饋服務
 
-回饋服務處理使用者的私密資料。程式修改照一般 PR 流程；任何會改到正式環境的動作都先問 Ray。寫入任務先依 `maintain-singular-blockly` 建立分支與檢查重疊；涉及資料流、驗證或權限時同時使用 `security-checker`。
+回饋服務處理使用者的私密資料。程式修改照一般 PR 流程；Worker 程式合併後自動部署（見「合併後自動部署」），其他會改到正式資料或設定的動作仍先問 Ray。寫入任務先依 `maintain-singular-blockly` 建立分支與檢查重疊；涉及資料流、驗證或權限時同時使用 `security-checker`。
 
 ## 服務在哪裡
 
@@ -50,13 +50,23 @@ metadata:
    ```
 
    改到擴充套件端回饋面板時另跑 `xvfb-run -a npm run test:unit:ci`，並依 `cloud-local-verification` 做視覺與互動驗證。改到政策頁或 portal 文字時依 `i18n-maintenance` 檢查 15 語系。
-4. 依 `pr-review-release` 與整合佇列開 PR、合併。合併 PR 不會部署 Worker；正式部署是另一個步驟（見下節）。
+4. 依 `pr-review-release` 與整合佇列開 PR、合併。合併後由開 PR 的工作階段依下節自動部署，不另外問 Ray。
+
+## 合併後自動部署
+
+Ray 2026-11-23 決定：改到 `workers/feedback/` 的 PR 合併後，Worker 自動部署，不必先問；部署後回報 Ray。合併本身不會觸發部署，由開 PR 的工作階段在 `master` CI 綠燈後接著做，不等人提醒（`master` CI 不會喚醒工作階段，用 `send_later` 約 10 分鐘後檢查）。
+
+1. 在乾淨的最新 `origin/master` worktree 執行 `npx wrangler d1 migrations list singular-blockly-feedback --config workers/feedback/wrangler.jsonc --remote`。有待套用的 migration 時停下，依下節先問 Ray；Worker 等 migration 套用後才部署（expand／contract 的順序）。
+2. `npx wrangler deploy --config workers/feedback/wrangler.jsonc`，記下新的 version id 與上一版的 version id。
+3. 部署後核對用命令一次跑完，不人工逐頁點：`/health`、`/privacy`、`/support`、`/terms` 為 HTTP 200，未認證的 attachment route 為 Access 302，`npx wrangler deployments list --config workers/feedback/wrangler.jsonc` 的最新一筆是新版本且承接 100% 流量。
+4. 任何一項不通過，立刻用 `npx wrangler rollback <上一版 version id> --config workers/feedback/wrangler.jsonc` 回到上一個已驗證版本，再跑一次第 3 步，然後回報 Ray。兩版之間有 secret 變更時（回復會連 secret 一起還原），不自行回復，先問 Ray。
+5. 開一個小 PR 把新的 version id 與核對結果寫進 `docs/feedback-deployment.md`（不寫秘密或使用者內容），依整合佇列自行合併；在討論串回報版本、核對結果，回復過的話也一併說明。
 
 ## 必須先問 Ray 的事
 
 下列都會改到正式環境或使用者資料，即使 CI 全綠也要先取得 Ray 在對話中的明確同意，並附上要執行的步驟、驗證方式與回復計畫：
 
-- 部署 Worker 新版本、切換或回復流量版本。
+- 合併後自動部署以外的流量切換：部署未合併的程式、手動指定流量比例，或回復到「上一個已驗證版本」以外的版本。
 - 對正式 D1 套用 migration，或任何正式 D1／R2 的寫入與刪除。執行前先用 `npx wrangler d1 time-travel info singular-blockly-feedback --config workers/feedback/wrangler.jsonc` 取得 bookmark 記進部署紀錄作為回復點。
 - 新增、輪替或刪除 secret（輪替 reporter pepper 會讓現有匿名憑證失效，需要使用者通知計畫）。
 - 改 DNS route、Cloudflare Access policy、GitHub App 權限、安裝範圍或 webhook。
@@ -67,11 +77,11 @@ metadata:
 ## 雲端工作階段
 
 - 可以：修改程式、跑上面所有本地驗證、讀部署手冊、用 GitHub MCP 開 PR。
-- 雲端工作階段可以執行正式部署（Ray 2026-10-21 決定）：上一節「必須先問 Ray 的事」仍須先在討論串取得 Ray 對該次操作的明確同意（例如「同意部署回饋網頁」）。環境的 `api.cloudflare.com` 由 proxy 注入 `CLOUDFLARE_API_TOKEN`，網路允許清單含 `blockly-support.singular-ai.org` 供部署後檢查。
-- 部署步驟：在乾淨的 `origin/master` worktree 設 `CLOUDFLARE_API_TOKEN=proxy-injected`（實際值由 proxy 注入）與 `CLOUDFLARE_ACCOUNT_ID`（由 `GET /client/v4/accounts` 取得），先以 `npx wrangler d1 migrations list singular-blockly-feedback --config workers/feedback/wrangler.jsonc --remote` 確認待套用項目，再 `npx wrangler deploy --config workers/feedback/wrangler.jsonc`，最後依部署手冊檢查公開頁面並把 version id 寫回手冊。
+- 雲端工作階段可以執行正式部署（Ray 2026-10-21 決定；2026-11-23 起合併後的 Worker 部署不必先問，見「合併後自動部署」）。「必須先問 Ray 的事」仍須先在討論串取得 Ray 對該次操作的明確同意。環境的 `api.cloudflare.com` 由 proxy 注入 `CLOUDFLARE_API_TOKEN`，網路允許清單含 `blockly-support.singular-ai.org` 供部署後檢查。
+- wrangler 的環境變數：`CLOUDFLARE_API_TOKEN=proxy-injected`（實際值由 proxy 注入）與 `CLOUDFLARE_ACCOUNT_ID`（由 `GET /client/v4/accounts` 取得）。部署步驟見「合併後自動部署」。
 - `wrangler secret` 與正式 D1 migration 一樣各自需要 Ray 同意；secret 值不得出現在雲端命令參數、log 或對話。
 - 需要讀正式狀態（例如目前流量版本）時，只做唯讀查詢，結果只回報摘要。
 
 ## 回報
 
-列出改了哪些路由、資料表或流程、跑過的驗證與結果、是否需要新的 migration 或部署，以及部署前要 Ray 決定的事項。
+列出改了哪些路由、資料表或流程、跑過的驗證與結果、部署的 version id 與核對結果（有回復也要寫），以及需要 Ray 決定的事項（例如待套用的 migration）。

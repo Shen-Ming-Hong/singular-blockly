@@ -75,7 +75,7 @@ VS Code 擴充套件沒有手機版（vscode.dev 在手機瀏覽器不是支援�
 ## 7. 合併後的部署與版本核對
 
 - **擴充套件：** 合併不會發布。發布由協調者依 `pr-review-release` 推 annotated tag，`publish.yml` 自動發到 GitHub Release、Marketplace 與 Open VSX，`verify` job 核對 checksum 與 Release 資產。等 workflow 結束的通知，不要手動一直查。Marketplace 與 Open VSX 上架版本還沒有自動核對，目前由發布流程人工確認。
-- **回饋服務：** 部分不適用。Ray 2026-10-21 定的規則是每次正式部署都要 Ray 在討論串同意（見 `maintain-feedback-service`），所以合併後不會自動部署。部署後的核對（`/health`、三個政策頁、新的 version id）照部署手冊用命令一次跑完，不要人工逐頁點。
+- **回饋服務：** Ray 2026-11-23 決定合併後自動部署：開 PR 的工作階段在 `master` CI 綠燈後部署，用命令一次核對 `/health`、三個政策頁、Access 與新的 version id，不通過就回到上一個已驗證版本再回報（步驟見 `maintain-feedback-service`「合併後自動部署」）。有待套用的 D1 migration 或 secret 變更時仍先問 Ray。
 - 本專案沒有網站要部署。
 
 ## 8. 資料遷移：expand／contract
