@@ -103,13 +103,22 @@ jobs:
           jq -r '[.vulnerabilities[]?.via[]? | objects | .url // empty
                    | capture("(?<id>GHSA-[0-9a-z-]+)").id] | unique[] | "npm:" + .' audit.json > current.txt
           # 能讀到 Dependabot alerts 時一併納入；GITHUB_TOKEN 沒有這個權限時以 npm audit 為準。
-          gh api --paginate "repos/$REPO/dependabot/alerts?state=open&per_page=100" \
-            --jq '.[].security_advisory.ghsa_id | "npm:" + .' >> current.txt \
-            || echo "::notice::讀不到 Dependabot alerts，這次以 npm audit 為準。"
-          gh api --paginate "repos/$REPO/code-scanning/alerts?state=open&per_page=100" \
-            --jq '.[].number | "code:" + tostring' >> current.txt \
-            || echo "::warning::讀不到 Code Scanning 警示，這次只看 npm audit。"
-          sort -u -o current.txt current.txt
+          # gh api 失敗時會把錯誤 JSON 印到 stdout，所以先寫暫存檔，成功才併入。
+          if gh api --paginate "repos/$REPO/dependabot/alerts?state=open&per_page=100" \
+            --jq '.[].security_advisory.ghsa_id | "npm:" + .' > dependabot.txt; then
+            cat dependabot.txt >> current.txt
+          else
+            echo "::notice::讀不到 Dependabot alerts，這次以 npm audit 為準。"
+          fi
+          if gh api --paginate "repos/$REPO/code-scanning/alerts?state=open&per_page=100" \
+            --jq '.[].number | "code:" + tostring' > code.txt; then
+            cat code.txt >> current.txt
+          else
+            echo "::warning::讀不到 Code Scanning 警示，這次只看 npm audit。"
+          fi
+          # 只保留 npm:GHSA-… 與 code:N 兩種格式的行。
+          grep -E '^(npm:GHSA-[0-9a-z-]+|code:[0-9]+)$' current.txt | sort -u > current.tmp || true
+          mv current.tmp current.txt
           comm -13 .notify-claude/last.txt current.txt > new.txt
           cp current.txt .notify-claude/last.txt
           echo "目前 $(wc -l < current.txt) 項，新出現 $(wc -l < new.txt) 項"
