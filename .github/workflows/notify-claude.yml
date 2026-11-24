@@ -1,7 +1,9 @@
 name: Notify Claude
 
-# 把 Dependabot PR 送到 Claude 專案的收件排程（API 觸發），不做定時檢查。
-# 安全漏洞靠 Dependabot security updates 開的 PR 觸發；security-scan 只供手動執行。
+# 把 Dependabot PR 與新的安全警示送到 Claude 專案的收件排程（API 觸發）。
+# GitHub 的 dependabot_alert 事件不能觸發 workflow，而 Dependabot security updates
+# 在修補需要跨 major（例如間接依賴超出上游宣告的範圍）時不會開 PR，警示就只會寄 email。
+# 所以 security-scan 每天定時查一次，只有出現新的 GHSA 或 Code Scanning 警示時才觸發 Claude。
 # 只用 curl／jq／gh，不安裝依賴、不執行 PR 內容。
 # 需要的設定：
 #   - secrets.CLAUDE_ROUTINE_TOKEN：排程 API 觸發的權杖（sk-ant-oat01-…）。
@@ -11,6 +13,9 @@ name: Notify Claude
 on:
   pull_request_target:
     types: [opened, reopened]
+  schedule:
+    # 每天台灣時間 09:17（避開整點排隊）。沒有新警示時不觸發 Claude。
+    - cron: '17 1 * * *'
   workflow_dispatch:
     inputs:
       test:
@@ -59,7 +64,7 @@ jobs:
 
   security-scan:
     name: Security scan
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -93,11 +98,14 @@ jobs:
           mkdir -p .notify-claude
           touch .notify-claude/last.txt
           # npm audit 只讀 lockfile，查的是與 Dependabot alerts 相同的 GitHub Advisory Database。
-          npm audit --package-lock-only --omit=optional --json > audit.json || true
-          # 與 CI 的 npm audit --audit-level=high 一致，只通知 high／critical。
-          jq -r '[.vulnerabilities[]?.via[]? | objects
-                   | select(.severity == "high" or .severity == "critical") | .url // empty
+          # 所有嚴重度都通知（含 moderate／low），與 Dependabot 寄出的 email 一致。
+          npm audit --package-lock-only --json > audit.json || true
+          jq -r '[.vulnerabilities[]?.via[]? | objects | .url // empty
                    | capture("(?<id>GHSA-[0-9a-z-]+)").id] | unique[] | "npm:" + .' audit.json > current.txt
+          # 能讀到 Dependabot alerts 時一併納入；GITHUB_TOKEN 沒有這個權限時以 npm audit 為準。
+          gh api --paginate "repos/$REPO/dependabot/alerts?state=open&per_page=100" \
+            --jq '.[].security_advisory.ghsa_id | "npm:" + .' >> current.txt \
+            || echo "::notice::讀不到 Dependabot alerts，這次以 npm audit 為準。"
           gh api --paginate "repos/$REPO/code-scanning/alerts?state=open&per_page=100" \
             --jq '.[].number | "code:" + tostring' >> current.txt \
             || echo "::warning::讀不到 Code Scanning 警示，這次只看 npm audit。"
