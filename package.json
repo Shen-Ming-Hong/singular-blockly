@@ -287,8 +287,8 @@
 		"minimatch@3.1.5": {
 			"brace-expansion": "^1.1.18"
 		},
-		"minimatch@>=7.0.0 <11.0.1": "^11.0.9",
-		"glob@>=9.0.0 <14.0.2": "^14.0.6",
+		"minimatch": "^11.0.9",
+		"glob": "^14.0.6",
 		"undici": "^7.30.1",
 		"zod": "^4.6.7",
 		"@azure/identity": {
