@@ -124,5 +124,5 @@ Setup blocks that must always be emitted should register with `arduinoGenerator.
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at `specs/071-esp32-cyberbrick-rc/plan.md`
+at `specs/074-windows-core-short-paths/plan.md`
 <!-- SPECKIT END -->
