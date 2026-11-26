@@ -266,7 +266,7 @@
 	"dependencies": {
 		"@blockly/theme-modern": "^13.5.0",
 		"@vscode/proxy-agent": "0.46.0",
-		"node-ssh": "^13.2.1",
+		"node-ssh": "^14.0.0",
 		"tar": "7.5.23"
 	},
 	"overrides": {

@@ -20,7 +20,7 @@ const REQUIRED_PATHS = [
 	'extension/node_modules/blockly/blocks_compressed.js',
 	'extension/node_modules/blockly/javascript_compressed.js',
 	'extension/node_modules/@blockly/theme-modern/dist/index.js',
-	'extension/node_modules/node-ssh/lib/cjs/index.js',
+	'extension/node_modules/node-ssh/lib/index.js',
 	'extension/node_modules/ssh2/lib/client.js',
 ];
 const MAX_SCANNED_ENTRY_BYTES = 10 * 1024 * 1024;

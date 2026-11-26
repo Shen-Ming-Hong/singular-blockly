@@ -16,9 +16,9 @@ describe('VSIX privacy verifier', () => {
 
 	it('rejects archives missing Blockly or SSH runtime dependencies', () => {
 		const withoutBlockly = required.filter(name => name !== 'extension/node_modules/blockly/blockly_compressed.js');
-		const withoutSsh = required.filter(name => name !== 'extension/node_modules/node-ssh/lib/cjs/index.js');
+		const withoutSsh = required.filter(name => name !== 'extension/node_modules/node-ssh/lib/index.js');
 		assert.ok(validateEntryNames(withoutBlockly).includes('missing:extension/node_modules/blockly/blockly_compressed.js'));
-		assert.ok(validateEntryNames(withoutSsh).includes('missing:extension/node_modules/node-ssh/lib/cjs/index.js'));
+		assert.ok(validateEntryNames(withoutSsh).includes('missing:extension/node_modules/node-ssh/lib/index.js'));
 	});
 
 	it('rejects Worker, deployment secret, and private-key files', () => {
