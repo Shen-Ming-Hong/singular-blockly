@@ -9,7 +9,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { FileService } from '../services/fileService';
 import type { FeedbackClient } from '../services/feedbackClient';
-import { containsSensitiveFeedbackText } from '../services/feedbackContentSafety';
+import { containsBlockedFeedbackText, redactFeedbackText } from '../services/feedbackContentSafety';
 import type { FeedbackDiagnosticsSource } from '../services/feedbackDiagnostics';
 import { buildFeedbackDiagnostics } from '../services/feedbackDiagnostics';
 import { validateSanitizedScreenshot } from '../services/feedbackScreenshot';
@@ -158,9 +158,20 @@ function validDraft(draft: FeedbackDraft): boolean {
 		&& (draft.expected === undefined || textLength(draft.expected.trim()) <= FEEDBACK_LIMITS.expectedMax);
 }
 
-function containsSensitiveDraftText(draft: FeedbackDraft): boolean {
+function containsBlockedDraftText(draft: FeedbackDraft): boolean {
 	return [draft.title, draft.description, draft.steps, draft.expected]
-		.some(value => typeof value === 'string' && containsSensitiveFeedbackText(value));
+		.some(value => typeof value === 'string' && containsBlockedFeedbackText(value));
+}
+
+/** Replaces paths, serial ports, IP addresses, and IDs before preview and submit. */
+function redactDraft(draft: FeedbackDraft): FeedbackDraft {
+	return {
+		...draft,
+		title: redactFeedbackText(draft.title),
+		description: redactFeedbackText(draft.description),
+		...(typeof draft.steps === 'string' ? { steps: redactFeedbackText(draft.steps) } : {}),
+		...(typeof draft.expected === 'string' ? { expected: redactFeedbackText(draft.expected) } : {}),
+	};
 }
 
 function isPreviewMessage(value: unknown): value is FeedbackPreviewRequest {
@@ -446,10 +457,14 @@ export class FeedbackPanel implements vscode.Disposable {
 	}
 
 	private async addMessage(message: FeedbackAddMessageRequest): Promise<void> {
-		const body = message.body.trim();
 		const requestIdentity = { feedbackId: message.feedbackId, idempotencyKey: message.idempotencyKey };
-		if (containsSensitiveFeedbackText(body)) {
+		if (containsBlockedFeedbackText(message.body)) {
 			await this.postStableOperationError('addMessage', { code: 'sensitive_content' }, requestIdentity);
+			return;
+		}
+		const body = redactFeedbackText(message.body.trim());
+		if (textLength(body) > 4000) {
+			await this.postStableOperationError('addMessage', { code: 'invalid_input' }, requestIdentity);
 			return;
 		}
 		const digest = createHash('sha256').update(JSON.stringify({ feedbackId: message.feedbackId, body })).digest('hex');
@@ -534,8 +549,13 @@ export class FeedbackPanel implements vscode.Disposable {
 			await this.postError('invalid_input');
 			return;
 		}
-		if (containsSensitiveDraftText(message.draft)) {
+		if (containsBlockedDraftText(message.draft)) {
 			await this.postError('sensitive_content');
+			return;
+		}
+		message = { ...message, draft: redactDraft(message.draft) };
+		if (!validDraft(message.draft)) {
+			await this.postError('invalid_input');
 			return;
 		}
 		const screenshot = message.screenshot === undefined ? undefined : validateSanitizedScreenshot(message.screenshot);
@@ -561,8 +581,13 @@ export class FeedbackPanel implements vscode.Disposable {
 			await this.postError('invalid_input');
 			return;
 		}
-		if (containsSensitiveDraftText(message.draft)) {
+		if (containsBlockedDraftText(message.draft)) {
 			await this.postError('sensitive_content');
+			return;
+		}
+		message = { ...message, draft: redactDraft(message.draft) };
+		if (!validDraft(message.draft)) {
+			await this.postError('invalid_input');
 			return;
 		}
 		const screenshot = message.screenshot === undefined ? undefined : validateSanitizedScreenshot(message.screenshot);
@@ -693,7 +718,7 @@ export class FeedbackPanel implements vscode.Disposable {
 		const entries: Array<[string, string, string]> = [
 			['title', 'FEEDBACK_PANEL_TITLE', 'Provide Feedback'],
 			['intro', 'FEEDBACK_INTRO', 'Tell us what happened or what would make Singular Blockly better. No GitHub account is needed.'],
-			['personalDataWarning', 'FEEDBACK_PERSONAL_DATA_WARNING', 'Do not include names, email addresses, student information, credentials, source code, private paths, or complete logs.'],
+			['personalDataWarning', 'FEEDBACK_PERSONAL_DATA_WARNING', 'Do not include names, email addresses, student information, or credentials such as passwords and tokens. Local paths, serial ports, and IP addresses in pasted errors are replaced automatically.'],
 			['kind', 'FEEDBACK_KIND_LABEL', 'Feedback type'],
 			['bug', 'FEEDBACK_KIND_BUG', 'Problem report'],
 			['feature', 'FEEDBACK_KIND_FEATURE', 'Feature suggestion'],
@@ -734,7 +759,7 @@ export class FeedbackPanel implements vscode.Disposable {
 			['errorServiceUnavailable', 'FEEDBACK_ERROR_SERVICE_UNAVAILABLE', 'The feedback service is temporarily unavailable. Your form is still here; try again later.'],
 			['errorAttachment', 'FEEDBACK_ERROR_ATTACHMENT', 'The screenshot was rejected. Remove it or choose a newly captured PNG or JPEG, then review again.'],
 			['errorValidation', 'FEEDBACK_ERROR_VALIDATION', 'Some feedback fields are invalid. Review the highlighted information and try again.'],
-			['errorSensitiveContent', 'FEEDBACK_ERROR_SENSITIVE_CONTENT', 'Sensitive information was detected. Remove credentials, private paths, IP addresses, source code, or terminal output and review again.'],
+			['errorSensitiveContent', 'FEEDBACK_ERROR_SENSITIVE_CONTENT', 'A credential such as a password, token, or private key was detected. Remove it and review again.'],
 			['provideFeedback', 'FEEDBACK_PROVIDE_ACTION', 'Provide feedback'],
 			['myFeedback', 'FEEDBACK_MY_FEEDBACK_ACTION', 'My feedback'],
 			['myFeedbackTitle', 'FEEDBACK_MY_FEEDBACK_TITLE', 'My feedback'],

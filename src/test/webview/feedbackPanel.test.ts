@@ -121,7 +121,7 @@ suite('FeedbackPanel Tests', () => {
 		assert.strictEqual(vscodeMock.Uri.parse.firstCall.args[0], 'https://support.example.test/privacy?lang=en');
 	});
 
-	test('rejects sensitive reporter text locally before creating a credential or invoking the client', async () => {
+	test('rejects credentials locally before creating a credential or invoking the client', async () => {
 		const manager = createPanel();
 		await manager.show();
 		const panel = manager.getPanel() as any;
@@ -131,7 +131,7 @@ suite('FeedbackPanel Tests', () => {
 			draft: {
 				kind: 'bug',
 				title: 'Upload fails after build',
-				description: 'The selected serial port COM3 stops responding during upload.',
+				description: 'My copied config has GITHUB_TOKEN=do-not-store-this in it.',
 			},
 			includeDiagnostics: true,
 			includeRecentEvents: false,
@@ -140,6 +140,40 @@ suite('FeedbackPanel Tests', () => {
 		assert.strictEqual(client.createFeedback.callCount, 0);
 		assert.strictEqual(identity.getOrCreateSecret.callCount, 0);
 		assert.ok(panel.webview.postMessage.calledWithMatch({ command: 'feedback:error', code: 'sensitive_content' }));
+		assert.ok(!panel.webview.postMessage.calledWithMatch({ command: 'feedback:previewReady' }));
+	});
+
+	test('previews and submits pasted errors with paths, ports, and addresses replaced', async () => {
+		const manager = createPanel();
+		await manager.show();
+		const panel = manager.getPanel() as any;
+		const draft = {
+			kind: 'bug',
+			title: 'Upload fails on COM3',
+			description: 'Error: C:\\Users\\Ada Lovelace\\blink\\blink.ino:4:2 then 192.168.1.20 timed out.',
+			steps: 'Run digitalWrite(13, HIGH); and upload from /Users/ada/blink',
+		};
+		await panel.webview.dispatchMessage({ command: 'feedback:preview', draft, includeDiagnostics: false, includeRecentEvents: false });
+		const preview = panel.webview.postMessage.getCalls()
+			.map((call: any) => call.args[0])
+			.find((message: any) => message.command === 'feedback:previewReady');
+
+		assert.ok(preview, 'preview should be ready');
+		assert.strictEqual(preview.preview.input.title, 'Upload fails on [serial port]');
+		assert.strictEqual(preview.preview.input.description, 'Error: [path]:4:2 then [IP] timed out.');
+		assert.strictEqual(preview.preview.input.steps, 'Run digitalWrite(13, HIGH); and upload from [path]');
+
+		await panel.webview.dispatchMessage({
+			command: 'feedback:submit',
+			confirmationId: preview.preview.confirmationId,
+			draft,
+			includeDiagnostics: false,
+			includeRecentEvents: false,
+		});
+		assert.strictEqual(client.createFeedback.callCount, 1);
+		const sent = client.createFeedback.firstCall.args[1];
+		assert.strictEqual(sent.description, 'Error: [path]:4:2 then [IP] timed out.');
+		assert.ok(!JSON.stringify(sent).includes('Lovelace'));
 	});
 
 	test('counts Unicode code points when validating reporter-authored text', async () => {

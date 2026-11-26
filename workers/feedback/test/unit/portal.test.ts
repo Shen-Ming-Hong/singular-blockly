@@ -79,14 +79,18 @@ describe('public policy portal', () => {
 		expect(html).toContain('if (!selectedId || messageMutation) return');
 		expect(html).toContain('addMessageButton.disabled = true');
 		expect(html).toContain('const messageDrafts = new Map()');
-		expect(html).toContain("const body = prompt(strings.messageLabel, messageDrafts.get(selectedId) || '')?.trim()");
+		expect(html).toContain("const typed = prompt(strings.messageLabel, messageDrafts.get(selectedId) || '')?.trim()");
 		expect(html).toContain('messageDrafts.set(pending.feedbackId, pending.body)');
 		expect(html).toContain('messageDrafts.delete(pending.feedbackId)');
-		expect(html).toContain('containsSensitiveFeedbackText(pending.body)');
-		const guardDefinition = html?.indexOf('const sensitiveFeedbackDirectPatterns') ?? -1;
+		// Credentials stop the send; other private details are replaced before the
+		// request so the echoed body matches what the Worker stores.
+		const guardDefinition = html?.indexOf('const blockedFeedbackPatterns') ?? -1;
+		const blockedCheck = html?.indexOf('if (containsBlockedFeedbackText(typed))') ?? -1;
+		const redaction = html?.indexOf('const body = redactFeedbackText(typed)') ?? -1;
 		expect(guardDefinition).toBeGreaterThanOrEqual(0);
-		expect(guardDefinition).toBeLessThan(html?.indexOf('containsSensitiveFeedbackText(pending.body)') ?? -1);
-		expect(html?.indexOf('containsSensitiveFeedbackText(pending.body)')).toBeLessThan(
+		expect(guardDefinition).toBeLessThan(blockedCheck);
+		expect(blockedCheck).toBeLessThan(redaction);
+		expect(redaction).toBeLessThan(
 			html?.indexOf("request('/api/v1/feedback/' + pending.feedbackId + '/messages'") ?? -1
 		);
 		expect(html).toContain("value.author === 'reporter' && value.body === pending.body");

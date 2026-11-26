@@ -293,6 +293,13 @@ try {
   results.checks.workspaceRendered = true;
   await shot(window, "01-editor-open");
 
+  // --fill-json <檔案>：點擊前先填表單，內容為 [{ "selector": "#id", "value": "文字" }]。
+  if (args["fill-json"]) {
+    for (const { selector, value } of JSON.parse(fs.readFileSync(args["fill-json"], "utf8"))) {
+      await blocklyFrame.fill(selector, value);
+    }
+  }
+
   // 只點這次改到的元件：每一步截圖並自動檢查。選擇器優先用 data-testid，其次是固定的 id。
   for (const [index, selector] of clickSelectors.entries()) {
     const element = await blocklyFrame.waitForSelector(selector, { state: "visible", timeout: 15000 });

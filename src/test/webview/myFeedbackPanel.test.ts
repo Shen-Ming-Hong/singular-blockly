@@ -228,14 +228,14 @@ suite('My Feedback Panel Tests', () => {
 		}));
 	});
 
-	test('rejects sensitive message text locally before reading credentials or invoking the client', async () => {
+	test('rejects credential message text locally before reading credentials or invoking the client', async () => {
 		const suppliedKey = '99999999-9999-4999-8999-999999999999';
 		await manager.showMyFeedback();
 		const panel = manager.getPanel() as any;
 
 		await panel.webview.dispatchMessage({
 			command: 'feedback:addMessage', feedbackId: id,
-			body: 'Calling digitalWrite(LED_BUILTIN, HIGH); makes the upload fail.',
+			body: `Here is my key sk-proj-${'A'.repeat(24)} for reference.`,
 			idempotencyKey: suppliedKey,
 		});
 
@@ -245,6 +245,20 @@ suite('My Feedback Panel Tests', () => {
 			command: 'feedback:mutationResult', operation: 'addMessage', success: false,
 			code: 'sensitive_content', feedbackId: id, idempotencyKey: suppliedKey,
 		}));
+	});
+
+	test('replaces ports and paths in a supplemental message before sending it', async () => {
+		await manager.showMyFeedback();
+		const panel = manager.getPanel() as any;
+
+		await panel.webview.dispatchMessage({
+			command: 'feedback:addMessage', feedbackId: id,
+			body: 'Still fails on COM7 with /home/ada/blink/src/main.cpp',
+			idempotencyKey: '12121212-1212-4121-8121-121212121212',
+		});
+
+		assert.strictEqual(client.addMessage.callCount, 1);
+		assert.strictEqual(client.addMessage.firstCall.args[2], 'Still fails on [serial port] with [path]');
 	});
 
 	test('keeps different uncertain message keys so an older body can retry without duplication', async () => {
