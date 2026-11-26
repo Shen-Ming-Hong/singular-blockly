@@ -100,7 +100,8 @@ export function classifyCoreFailure(error: unknown, phase: CoreOperationPhase): 
 	}
 	if (/no module named ['"]?platformio|modulenotfounderror.*platformio|cannot import name.*platformio/.test(text)) {return 'python-import';}
 	if (code === 'EACCES' || code === 'EPERM' || /permission denied|operation not permitted|access is denied/.test(text)) {return 'permission';}
-	if (/corrupt|invalid distribution|bad metadata|cannot read.*core|malformed.*json|checksum.*local/.test(text)) {return 'local-store-corruption';}
+	// PlatformIO raises MissingPackageManifestError for a half-installed package folder (no package.json).
+	if (/corrupt|invalid distribution|bad metadata|cannot read.*core|malformed.*json|checksum.*local|missingpackagemanifesterror|could not find one of .*manifest files/.test(text)) {return 'local-store-corruption';}
 	if (!evidence.started && /spawn|failed to start|could not start/.test(text)) {return 'spawn';}
 	return 'unknown-after-start';
 }

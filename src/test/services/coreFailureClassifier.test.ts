@@ -14,6 +14,7 @@ suite('Core failure classifier', () => {
 		['python-import', new Error("ModuleNotFoundError: No module named 'platformio'"), 'prepare'],
 		['permission', Object.assign(new Error('permission denied'), { code: 'EACCES' }), 'prepare'],
 		['local-store-corruption', new Error('corrupt local core metadata'), 'prepare'],
+		['local-store-corruption', new PlatformioProcessError('PlatformIO package preparation failed', true, 1, 'Resolving esp32 dependencies...', "MissingPackageManifestError: Could not find one of 'package.json' manifest files in the package"), 'prepare'],
 		['managed-provisioning', Object.assign(new Error('managed installer failed'), { failureDomain: 'managed-provisioning', started: true, code: 1 }), 'probe'],
 		['compile', new Error('main.cpp:2: error: missing symbol'), 'project-process'],
 		['project-config', new Error('Invalid project configuration in platformio.ini'), 'project-process'],

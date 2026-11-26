@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Building ESP32 projects with Singular Core on Windows no longer fails because folder paths exceed 260 characters: PlatformIO packages and build files now go to a shorter folder, and an installed Singular Core does not need to be downloaded again
 - 如果路徑仍然太長，編輯器會說明原因，並提供開啟診斷與選擇較短資料夾的按鈕，不再只顯示一般的編譯錯誤
   If a path is still too long, the editor explains why and offers buttons to open diagnostics or choose a shorter folder, instead of a generic compile error
+- PlatformIO IDE 自己的套件資料夾損壞（例如下載中斷留下不完整的套件）時，Arduino 編譯會自動改用 Singular Core，不再直接失敗
+  When the PlatformIO IDE's own package folder is damaged (for example a package left incomplete by an interrupted download), Arduino builds now switch to Singular Core automatically instead of failing
 
 ### ✨ 新功能 Features
 
