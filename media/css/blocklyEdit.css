@@ -3836,6 +3836,25 @@ body.theme-dark .result-preview {
 	color: white;
 }
 
+/* 長時間工作的進度提示：持續顯示到成功或失敗，右側顯示經過時間 */
+.toast.progress {
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+	max-width: min(560px, calc(100vw - 40px));
+}
+
+.toast.progress .toast-message {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.toast.progress .toast-elapsed {
+	flex: none;
+	font-variant-numeric: tabular-nums;
+	opacity: 0.85;
+}
+
 /* 深色主題 Toast 樣式 */
 body.theme-dark .toast {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
