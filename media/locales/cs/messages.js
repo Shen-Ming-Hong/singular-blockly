@@ -1363,7 +1363,6 @@ window.languageManager.loadMessages('cs', {
 	FEEDBACK_REVIEW_ACTION: "Zkontrolovat odesílaná data",
 	FEEDBACK_REVIEW_TITLE: "Kontrola před odesláním",
 	FEEDBACK_REVIEW_HELP: "Níže jsou všechna data, která se odešlou. Dokud je nepotvrdíte, nic se nepřenese.",
-	FEEDBACK_REDACTION_NOTICE: "Místní cesty, sériové porty, IP adresy a ID zařízení byly nahrazeny zástupnými texty, například [path]. Před odesláním zkontrolujte text níže.",
 	FEEDBACK_BACK_ACTION: "Zpět",
 	FEEDBACK_CONFIRM_ACTION: "Potvrdit a odeslat",
 	FEEDBACK_SENDING: "Odesílání zpětné vazby…",

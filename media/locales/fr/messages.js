@@ -1353,7 +1353,6 @@ window.languageManager.loadMessages('fr', {
 	FEEDBACK_REVIEW_ACTION: "Vérifier les données envoyées",
 	FEEDBACK_REVIEW_TITLE: "Vérifier avant l’envoi",
 	FEEDBACK_REVIEW_HELP: "Voici l’intégralité des données à envoyer. Rien ne sera transmis avant votre confirmation ci-dessous.",
-	FEEDBACK_REDACTION_NOTICE: "Les chemins locaux, ports série, adresses IP et identifiants d’appareil ont été remplacés par des espaces réservés comme [path]. Vérifiez le texte ci-dessous avant l’envoi.",
 	FEEDBACK_BACK_ACTION: "Retour",
 	FEEDBACK_CONFIRM_ACTION: "Confirmer et envoyer",
 	FEEDBACK_SENDING: "Envoi du retour…",

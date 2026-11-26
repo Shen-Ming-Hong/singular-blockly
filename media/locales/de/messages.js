@@ -1365,7 +1365,6 @@ window.languageManager.loadMessages('de', {
 	FEEDBACK_REVIEW_ACTION: "Sendedaten prüfen",
 	FEEDBACK_REVIEW_TITLE: "Vor dem Senden prüfen",
 	FEEDBACK_REVIEW_HELP: "Dies sind alle Daten, die gesendet werden. Erst nach deiner Bestätigung unten wird etwas übertragen.",
-	FEEDBACK_REDACTION_NOTICE: "Lokale Pfade, serielle Ports, IP-Adressen und Geräte-IDs wurden durch Platzhalter wie [path] ersetzt. Prüfe den Text unten vor dem Senden.",
 	FEEDBACK_BACK_ACTION: "Zurück",
 	FEEDBACK_CONFIRM_ACTION: "Bestätigen und senden",
 	FEEDBACK_SENDING: "Feedback wird gesendet…",

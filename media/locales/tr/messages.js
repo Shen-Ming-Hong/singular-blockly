@@ -1366,7 +1366,6 @@ window.languageManager.loadMessages('tr', {
 	FEEDBACK_REVIEW_ACTION: "Gönderilecek verileri gözden geçir",
 	FEEDBACK_REVIEW_TITLE: "Göndermeden önce gözden geçirin",
 	FEEDBACK_REVIEW_HELP: "Gönderilecek verilerin tamamı aşağıdadır. Siz aşağıdan onaylayana kadar hiçbir şey aktarılmaz.",
-	FEEDBACK_REDACTION_NOTICE: "Yerel yollar, seri portlar, IP adresleri ve cihaz kimlikleri [path] gibi yer tutucularla değiştirildi. Göndermeden önce aşağıdaki metni kontrol edin.",
 	FEEDBACK_BACK_ACTION: "Geri",
 	FEEDBACK_CONFIRM_ACTION: "Onayla ve gönder",
 	FEEDBACK_SENDING: "Geri bildirim gönderiliyor…",

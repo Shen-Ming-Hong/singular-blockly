@@ -1368,7 +1368,6 @@ window.languageManager.loadMessages('hu', {
 	FEEDBACK_REVIEW_ACTION: "Az elküldendő adatok ellenőrzése",
 	FEEDBACK_REVIEW_TITLE: "Ellenőrzés küldés előtt",
 	FEEDBACK_REVIEW_HELP: "Az alábbiak az elküldendő összes adat. A lenti megerősítésig semmi nem kerül továbbításra.",
-	FEEDBACK_REDACTION_NOTICE: "A helyi elérési utakat, soros portokat, IP-címeket és eszközazonosítókat helyőrzőkre, például [path] szövegre cseréltük. Küldés előtt ellenőrizze az alábbi szöveget.",
 	FEEDBACK_BACK_ACTION: "Vissza",
 	FEEDBACK_CONFIRM_ACTION: "Megerősítés és küldés",
 	FEEDBACK_SENDING: "Visszajelzés küldése…",

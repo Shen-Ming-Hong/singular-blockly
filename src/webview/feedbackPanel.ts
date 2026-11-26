@@ -745,7 +745,6 @@ export class FeedbackPanel implements vscode.Disposable {
 			['review', 'FEEDBACK_REVIEW_ACTION', 'Review what will be sent'],
 			['reviewTitle', 'FEEDBACK_REVIEW_TITLE', 'Review before sending'],
 			['reviewHelp', 'FEEDBACK_REVIEW_HELP', 'This is the complete payload. Nothing is sent until you confirm below.'],
-			['redactionNotice', 'FEEDBACK_REDACTION_NOTICE', 'Local paths, serial ports, IP addresses, and device IDs were replaced with placeholders such as [path]. Check the text below before sending.'],
 			['serviceDisclosure', 'FEEDBACK_SERVICE_DISCLOSURE', 'Sending stores feedback in Cloudflare D1/R2 and a private GitHub maintainer workspace until you delete it. Provider backups may persist briefly. An anonymized public development summary is created only with project-owner approval.'],
 			['back', 'FEEDBACK_BACK_ACTION', 'Back'],
 			['confirm', 'FEEDBACK_CONFIRM_ACTION', 'Confirm and send'],

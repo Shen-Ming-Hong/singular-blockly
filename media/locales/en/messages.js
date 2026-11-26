@@ -1365,7 +1365,6 @@ window.languageManager.loadMessages('en', {
 	FEEDBACK_REVIEW_ACTION: "Review what will be sent",
 	FEEDBACK_REVIEW_TITLE: "Review before sending",
 	FEEDBACK_REVIEW_HELP: "This is the complete payload. Nothing is sent until you confirm below.",
-	FEEDBACK_REDACTION_NOTICE: "Local paths, serial ports, IP addresses, and device IDs were replaced with placeholders such as [path]. Check the text below before sending.",
 	FEEDBACK_BACK_ACTION: "Back",
 	FEEDBACK_CONFIRM_ACTION: "Confirm and send",
 	FEEDBACK_SENDING: "Sending feedback…",

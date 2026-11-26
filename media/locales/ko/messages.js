@@ -1356,7 +1356,6 @@ window.languageManager.loadMessages('ko', {
 	FEEDBACK_REVIEW_ACTION: "보낼 내용 확인",
 	FEEDBACK_REVIEW_TITLE: "보내기 전에 확인해 주세요",
 	FEEDBACK_REVIEW_HELP: "아래 내용이 전송되는 전체 자료예요. 아래에서 확인하기 전에는 아무것도 보내지 않아요.",
-	FEEDBACK_REDACTION_NOTICE: "로컬 경로, 시리얼 포트, IP 주소, 장치 ID를 [path] 같은 자리표시자로 바꿨어요. 보내기 전에 아래 내용을 확인해 주세요.",
 	FEEDBACK_BACK_ACTION: "뒤로",
 	FEEDBACK_CONFIRM_ACTION: "확인하고 보내기",
 	FEEDBACK_SENDING: "의견을 보내는 중…",

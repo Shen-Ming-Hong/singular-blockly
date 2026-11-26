@@ -1356,7 +1356,6 @@ window.languageManager.loadMessages('ja', {
 	FEEDBACK_REVIEW_ACTION: "送信内容を確認",
 	FEEDBACK_REVIEW_TITLE: "送信前に確認",
 	FEEDBACK_REVIEW_HELP: "以下が送信されるすべての内容です。下のボタンで確認するまで何も送信されません。",
-	FEEDBACK_REDACTION_NOTICE: "ローカルパス、シリアルポート、IP アドレス、デバイス ID を [path] などの代替テキストに置き換えました。送信前に下の内容を確認してください。",
 	FEEDBACK_BACK_ACTION: "戻る",
 	FEEDBACK_CONFIRM_ACTION: "確認して送信",
 	FEEDBACK_SENDING: "フィードバックを送信しています…",

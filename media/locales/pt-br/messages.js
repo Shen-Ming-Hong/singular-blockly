@@ -1360,7 +1360,6 @@ window.languageManager.loadMessages('pt-br', {
 	FEEDBACK_REVIEW_ACTION: "Revisar o que será enviado",
 	FEEDBACK_REVIEW_TITLE: "Revise antes de enviar",
 	FEEDBACK_REVIEW_HELP: "Estes são todos os dados que serão enviados. Nada será transmitido até você confirmar abaixo.",
-	FEEDBACK_REDACTION_NOTICE: "Caminhos locais, portas seriais, endereços IP e IDs de dispositivo foram substituídos por marcadores como [path]. Confira o texto abaixo antes de enviar.",
 	FEEDBACK_BACK_ACTION: "Voltar",
 	FEEDBACK_CONFIRM_ACTION: "Confirmar e enviar",
 	FEEDBACK_SENDING: "Enviando feedback…",

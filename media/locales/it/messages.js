@@ -1361,7 +1361,6 @@ window.languageManager.loadMessages('it', {
 	FEEDBACK_REVIEW_ACTION: "Controlla cosa verrà inviato",
 	FEEDBACK_REVIEW_TITLE: "Controlla prima di inviare",
 	FEEDBACK_REVIEW_HELP: "Questi sono tutti i dati che verranno inviati. Non sarà trasmesso nulla finché non confermi qui sotto.",
-	FEEDBACK_REDACTION_NOTICE: "Percorsi locali, porte seriali, indirizzi IP e ID dei dispositivi sono stati sostituiti con segnaposto come [path]. Controlla il testo qui sotto prima di inviare.",
 	FEEDBACK_BACK_ACTION: "Indietro",
 	FEEDBACK_CONFIRM_ACTION: "Conferma e invia",
 	FEEDBACK_SENDING: "Invio del feedback…",

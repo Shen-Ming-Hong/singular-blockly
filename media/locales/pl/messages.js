@@ -1366,7 +1366,6 @@ window.languageManager.loadMessages('pl', {
 	FEEDBACK_REVIEW_ACTION: "Sprawdź wysyłane dane",
 	FEEDBACK_REVIEW_TITLE: "Sprawdź przed wysłaniem",
 	FEEDBACK_REVIEW_HELP: "Poniżej znajdują się wszystkie wysyłane dane. Nic nie zostanie przesłane bez potwierdzenia.",
-	FEEDBACK_REDACTION_NOTICE: "Lokalne ścieżki, porty szeregowe, adresy IP i identyfikatory urządzeń zastąpiono symbolami zastępczymi, np. [path]. Sprawdź poniższy tekst przed wysłaniem.",
 	FEEDBACK_BACK_ACTION: "Wstecz",
 	FEEDBACK_CONFIRM_ACTION: "Potwierdź i wyślij",
 	FEEDBACK_SENDING: "Wysyłanie opinii…",

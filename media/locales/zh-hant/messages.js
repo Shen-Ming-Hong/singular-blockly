@@ -1344,7 +1344,6 @@ window.languageManager.loadMessages('zh-hant', {
 	FEEDBACK_REVIEW_ACTION: "檢視將傳送的內容",
 	FEEDBACK_REVIEW_TITLE: "送出前請先檢視",
 	FEEDBACK_REVIEW_HELP: "下面是會傳送的完整內容。在你按下確認之前，不會傳送任何資料。",
-	FEEDBACK_REDACTION_NOTICE: "本機路徑、序列埠、IP 位址與裝置 ID 已換成 [path] 這類佔位文字。傳送前請確認下面的內容。",
 	FEEDBACK_BACK_ACTION: "上一步",
 	FEEDBACK_CONFIRM_ACTION: "確認並送出",
 	FEEDBACK_SENDING: "正在送出回饋…",

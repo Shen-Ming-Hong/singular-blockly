@@ -1368,7 +1368,6 @@ window.languageManager.loadMessages('bg', {
 	FEEDBACK_REVIEW_ACTION: "Преглед на изпращаните данни",
 	FEEDBACK_REVIEW_TITLE: "Преглед преди изпращане",
 	FEEDBACK_REVIEW_HELP: "По-долу са всички данни, които ще бъдат изпратени. Нищо няма да се предаде, преди да потвърдите.",
-	FEEDBACK_REDACTION_NOTICE: "Локалните пътища, серийните портове, IP адресите и идентификаторите на устройства са заменени с контейнери като [path]. Проверете текста по-долу преди изпращане.",
 	FEEDBACK_BACK_ACTION: "Назад",
 	FEEDBACK_CONFIRM_ACTION: "Потвърждаване и изпращане",
 	FEEDBACK_SENDING: "Изпращане на обратната връзка…",

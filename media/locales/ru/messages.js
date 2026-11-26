@@ -1362,7 +1362,6 @@ window.languageManager.loadMessages('ru', {
 	FEEDBACK_REVIEW_ACTION: "Проверить отправляемые данные",
 	FEEDBACK_REVIEW_TITLE: "Проверка перед отправкой",
 	FEEDBACK_REVIEW_HELP: "Ниже показаны все отправляемые данные. До подтверждения ничего не будет передано.",
-	FEEDBACK_REDACTION_NOTICE: "Локальные пути, последовательные порты, IP-адреса и идентификаторы устройств заменены заполнителями, например [path]. Проверьте текст ниже перед отправкой.",
 	FEEDBACK_BACK_ACTION: "Назад",
 	FEEDBACK_CONFIRM_ACTION: "Подтвердить и отправить",
 	FEEDBACK_SENDING: "Отзыв отправляется…",
