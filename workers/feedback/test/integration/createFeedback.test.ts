@@ -76,8 +76,7 @@ describe('POST /api/v1/feedback', () => {
 		).first<{ count: number }>())?.count;
 		for (const description of [
 			`The copied output contains github_pat_${'A'.repeat(24)}`,
-			'Failure at /secret.txt during upload',
-			'Host 2001:db8::1 failed during upload',
+			'-----BEGIN OPENSSH PRIVATE KEY----- copied by mistake',
 		]) {
 			const response = await exports.default.fetch(createRequest({ ...fixture, description }));
 
@@ -96,6 +95,16 @@ describe('POST /api/v1/feedback', () => {
 		expect((await env.FEEDBACK_DB.prepare(
 			'SELECT count(*) AS count FROM outbox_events',
 		).first<{ count: number }>())?.count).toBe(outboxBefore);
+	});
+
+	it('stores pasted upload errors with paths, ports, and addresses replaced', async () => {
+		const description = 'Upload failed: C:\\Users\\Ada Lovelace\\Documents\\blink\\blink.ino:7:1 on COM4 via 192.168.4.1';
+		const response = await exports.default.fetch(createRequest({ ...fixture, description }));
+		expect(response.status).toBe(201);
+		const { id } = await response.json() as { id: string };
+		const stored = await env.FEEDBACK_DB.prepare('SELECT description FROM feedback WHERE id = ?1')
+			.bind(id).first<{ description: string }>();
+		expect(stored?.description).toBe('Upload failed: [path]:7:1 on [serial port] via [IP]');
 	});
 
 	it('maps malformed multipart and JSON bodies to fixed allowlisted error codes', async () => {

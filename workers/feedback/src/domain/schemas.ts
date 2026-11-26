@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { containsSensitiveFeedbackText } from '../../../../src/services/feedbackContentSafety';
+import { containsBlockedFeedbackText, redactFeedbackText } from '../../../../src/services/feedbackContentSafety';
 
 const KINDS = ['bug', 'feature', 'question', 'other'] as const;
 const OS_FAMILIES = ['windows', 'macos', 'linux', 'unknown'] as const;
@@ -160,22 +160,31 @@ export function validateCreateFeedbackInput(value: unknown): ValidationResult<Va
 	}
 	for (const field of ['title', 'description', 'steps', 'expected'] as const) {
 		const text = value[field];
-		if (typeof text === 'string' && containsSensitiveFeedbackText(text)) {
+		if (typeof text === 'string' && containsBlockedFeedbackText(text)) {
 			return { ok: false, error: { code: 'sensitive_content', field } };
 		}
 	}
 	if (!validateDiagnostics(value.diagnostics)) {
 		return { ok: false, error: { code: 'invalid_diagnostics', field: 'diagnostics' } };
 	}
+	// Placeholders can be longer than what they replace, so bounds are checked
+	// again on the stored (redacted) text.
+	const title = redactFeedbackText(value.title.trim());
+	const description = redactFeedbackText(value.description.trim());
+	const steps = typeof value.steps === 'string' && value.steps.trim() ? redactFeedbackText(value.steps.trim()) : undefined;
+	const expected = typeof value.expected === 'string' && value.expected.trim() ? redactFeedbackText(value.expected.trim()) : undefined;
+	if (!isBoundedString(title, 5, 120)) {return { ok: false, error: { code: 'invalid_field', field: 'title' } };}
+	if (!isBoundedString(description, 10, 8000)) {return { ok: false, error: { code: 'invalid_field', field: 'description' } };}
+	if (!optionalString(steps, 4000) || !optionalString(expected, 2000)) {return { ok: false, error: { code: 'invalid_field' } };}
 	return {
 		ok: true,
 		value: {
 			schemaVersion: 1,
 			kind: value.kind,
-			title: value.title.trim(),
-			description: value.description.trim(),
-			...(typeof value.steps === 'string' && value.steps.trim() ? { steps: value.steps.trim() } : {}),
-			...(typeof value.expected === 'string' && value.expected.trim() ? { expected: value.expected.trim() } : {}),
+			title,
+			description,
+			...(steps ? { steps } : {}),
+			...(expected ? { expected } : {}),
 			diagnostics: value.diagnostics,
 		},
 	};
@@ -185,8 +194,10 @@ export function validateReporterMessage(value: unknown): ValidationResult<{ body
 	if (!isRecord(value) || !hasOnlyKeys(value, ['body']) || !isBoundedString(value.body, 1, 4000)) {
 		return { ok: false, error: { code: 'invalid_message', field: 'body' } };
 	}
-	if (containsSensitiveFeedbackText(value.body)) {
+	if (containsBlockedFeedbackText(value.body)) {
 		return { ok: false, error: { code: 'sensitive_content', field: 'body' } };
 	}
-	return { ok: true, value: { body: value.body.trim() } };
+	const body = redactFeedbackText(value.body.trim());
+	if (!isBoundedString(body, 1, 4000)) {return { ok: false, error: { code: 'invalid_message', field: 'body' } };}
+	return { ok: true, value: { body } };
 }

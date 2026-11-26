@@ -21,7 +21,7 @@
         <section id="formStep" class="card" aria-labelledby="panelTitle">
             <h1 id="panelTitle" tabindex="-1">Provide Feedback</h1>
             <p id="intro" class="lead">Tell us what happened or what would make Singular Blockly better. No GitHub account is needed.</p>
-			<p id="personalDataWarning" class="notice warning">Do not include names, email addresses, student information, credentials, source code, private paths, or complete logs.</p>
+			<p id="personalDataWarning" class="notice warning">Do not include names, email addresses, student information, or credentials such as passwords and tokens. Local paths, serial ports, and IP addresses in pasted errors are replaced automatically.</p>
             <form id="feedbackForm">
                 <label for="kind" id="kindLabel">Feedback type</label>
                 <select id="kind" name="kind" required>
@@ -73,6 +73,7 @@
         <section id="reviewStep" class="card hidden" aria-labelledby="reviewTitle">
             <h1 id="reviewTitle" tabindex="-1">Review before sending</h1>
             <p id="reviewHelp" class="lead">This is the complete payload. Nothing is sent until you confirm below.</p>
+            <p id="redactionNotice" class="notice hidden" role="status">Local paths, serial ports, IP addresses, and device IDs were replaced with placeholders such as [path]. Check the text below before sending.</p>
 			<p id="serviceDisclosure" class="notice">Sending stores feedback in Cloudflare D1/R2 and a private GitHub maintainer workspace until you delete it. Provider backups may persist briefly. An anonymized public development summary is created only with project-owner approval.</p>
             <pre id="payloadPreview" tabindex="0"></pre>
 			<div id="reviewScreenshot" class="screenshot-preview hidden"><img id="reviewScreenshotImage" alt="Screenshot that will be sent"></div>

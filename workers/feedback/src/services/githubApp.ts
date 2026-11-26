@@ -5,6 +5,7 @@
  */
 
 import type { Env } from '../env';
+import { redactFeedbackText } from '../../../../src/services/feedbackContentSafety';
 
 const encoder = new TextEncoder();
 const tokenCache = new Map<string, { token: string; expiresAt: number }>();
@@ -91,7 +92,9 @@ export function renderPrivateComment(source: PrivateIssueSource, outboxId: strin
 }
 
 export function renderPublicIssue(summary: string, outboxId?: string): { title: string; body: string } {
-	const normalized = summary.trim();
+	// The owner writes the public summary; mask any path, port, or address it
+	// still carries before it leaves the private boundary.
+	const normalized = redactFeedbackText(summary.trim());
 	const firstLine = normalized.split(/\r?\n/)
 		.map(line => line.replace(/^#+\s*/, '').trim())
 		.find(Boolean)

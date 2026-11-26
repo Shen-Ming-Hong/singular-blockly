@@ -95,6 +95,13 @@ describe('GitHub App service', () => {
 		expect(renderPublicIssue('###').title).toBe('[Approved feedback]');
 	});
 
+	it('masks paths, ports, and addresses left in an approved public summary', () => {
+		const rendered = renderPublicIssue('Upload fails on COM5\nSeen at /Users/alice/blink/blink.ino with 10.0.0.8');
+		expect(rendered.title).toBe('Upload fails on [serial port]');
+		expect(rendered.body).toContain('Seen at [path] with [IP]');
+		expect(rendered.body).not.toMatch(/alice|COM5|10\.0\.0\.8/);
+	});
+
 	it('uses stable errors instead of exposing a raw GitHub response', async () => {
 		const key = await crypto.subtle.generateKey(
 			{ name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },

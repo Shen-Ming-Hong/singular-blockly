@@ -72,7 +72,7 @@ describe('feedback schemas', () => {
 		expect(validateCreateFeedbackInput({ ...fixture, description: body.padEnd(20, ' ') }).ok).toBe(true);
 	});
 
-	it('rejects known sensitive text in every reporter-authored text field', () => {
+	it('rejects credentials in every reporter-authored text field', () => {
 		const samples = [
 			`github_pat_${'A'.repeat(24)}`,
 			`sk-proj-${'A'.repeat(24)}`,
@@ -82,25 +82,6 @@ describe('feedback schemas', () => {
 			'GITHUB_TOKEN=do-not-store-this-value',
 			'-----BEGIN PRIVATE KEY-----',
 			'https://alice:password@example.com/private',
-			'Connection failed at 192.168.1.20',
-			'C:\\Users\\alice\\secret.txt',
-			'/Users/alice/private/project.py',
-				'/workspace/student/main.py',
-				'/srv/app/config.yaml',
-				'/secret.txt',
-				'path=/alice',
-				'Please inspect /tmp',
-				'path=/home/alice/main.py',
-				'src/private/main.py',
-				'Please inspect ../private/main.py',
-				'Host 2001:db8::1 failed',
-			'PS C:\\Users\\alice> npm test',
-			'Traceback (most recent call last):\n  File "main.py", line 1',
-			'```python\nprint("private source")\n```',
-			'The selected serial port COM3 stops responding during upload.',
-			'Device 550e8400-e29b-41d4-a716-446655440000 stops responding during upload.',
-			'Calling digitalWrite(LED_BUILTIN, HIGH); makes the upload fail.',
-			'The loop calls machine.Pin(5, machine.Pin.OUT) before upload.',
 		];
 		for (const field of ['title', 'description', 'steps', 'expected'] as const) {
 			for (const sample of samples) {
@@ -114,5 +95,53 @@ describe('feedback schemas', () => {
 				error: { code: 'sensitive_content', field: 'body' },
 			});
 		}
+	});
+
+	it.each([
+		['Connection failed at 192.168.1.20', 'Connection failed at [IP]'],
+		['C:\\Users\\alice\\secret.txt', '[path]'],
+		['C:\\Users\\Ada Lovelace\\Documents\\Arduino\\blink\\blink.ino:12:5: error: x was not declared', '[path]:12:5: error: x was not declared'],
+		['\\\\server\\share\\student\\main.py', '[path]'],
+		['/Users/alice/private/project.py', '[path]'],
+		['/Users/Ada Lovelace/Library/project.py:3: error', '[path]:3: error'],
+		['/workspace/student/main.py', '[path]'],
+		['/secret.txt', '[path]'],
+		['path=/alice', 'path=[path]'],
+		['Please inspect /tmp', 'Please inspect [path]'],
+		['src/private/main.py', '[path]'],
+		['Please inspect ../private/main.py', 'Please inspect [path]'],
+		['See ~/project/main.py', 'See [path]'],
+		['Host 2001:db8::1 failed', 'Host [IP] failed'],
+		['PS C:\\Users\\alice> npm test', 'PS [path]> npm test'],
+		['The selected serial port COM3 stops responding during upload.', 'The selected serial port [serial port] stops responding during upload.'],
+		['Upload to /dev/ttyUSB0 and /dev/cu.usbserial-1410 fails', 'Upload to [serial port] and [serial port] fails'],
+		['Device 550e8400-e29b-41d4-a716-446655440000 stops responding.', 'Device [ID] stops responding.'],
+		['Open http://192.168.4.1/update and https://github.com/org/repo/issues/1', 'Open http://[IP]/update and https://github.com/org/repo/issues/1'],
+	])('replaces private details with placeholders: %s', (input, expected) => {
+		const result = validateCreateFeedbackInput({ ...fixture, description: `Context ${input} details` });
+		expect(result).toMatchObject({ ok: true, value: { description: `Context ${expected} details` } });
+		expect(validateReporterMessage({ body: `Context ${input} details` })).toEqual({
+			ok: true,
+			value: { body: `Context ${expected} details` },
+		});
+	});
+
+	it.each([
+		'Traceback (most recent call last):\n  File "main.py", line 1',
+		'```python\nprint("hello")\n```',
+		'Calling digitalWrite(LED_BUILTIN, HIGH); makes the upload fail.',
+		'The loop calls machine.Pin(5, machine.Pin.OUT) before upload.',
+		'npm ERR! code ELIFECYCLE',
+	])('keeps pasted code and terminal output that has no private details: %s', text => {
+		const result = validateCreateFeedbackInput({ ...fixture, description: `Context ${text} details` });
+		expect(result).toMatchObject({ ok: true, value: { description: `Context ${text} details` } });
+	});
+
+	it('rejects text that grows past the stored limit after placeholders are added', () => {
+		const description = 'COM1 '.repeat(1600).trim();
+		expect(validateCreateFeedbackInput({ ...fixture, description })).toEqual({
+			ok: false,
+			error: { code: 'invalid_field', field: 'description' },
+		});
 	});
 });

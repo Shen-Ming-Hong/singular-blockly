@@ -15,7 +15,7 @@
 	};
     const elements = Object.fromEntries([
         'formStep', 'reviewStep', 'resultStep', 'feedbackForm', 'kind', 'feedbackTitle', 'description', 'steps',
-        'expected', 'includeDiagnostics', 'includeRecentEvents', 'payloadPreview', 'backButton', 'confirmButton',
+        'expected', 'includeDiagnostics', 'includeRecentEvents', 'payloadPreview', 'redactionNotice', 'backButton', 'confirmButton',
 		'formError', 'submitError', 'referenceValue', 'resultStatusValue', 'copyRecoveryButton', 'recoveryStatus', 'screenshotFile',
         'screenshotPreview', 'screenshotImage', 'removeScreenshotButton', 'screenshotError', 'reviewScreenshot',
         'reviewScreenshotImage', 'provideFeedbackTab', 'myFeedbackTab', 'myFeedbackStep', 'myFeedbackTitle',
@@ -113,6 +113,7 @@
             recentEventsLabel: strings.recentEvents, recentEventsHelp: strings.recentEventsHelp,
             dataLegend: strings.dataLegend,
             reviewButton: strings.review, reviewTitle: strings.reviewTitle, reviewHelp: strings.reviewHelp,
+            redactionNotice: strings.redactionNotice,
 			serviceDisclosure: strings.serviceDisclosure,
             backButton: strings.back, confirmButton: strings.confirm, successTitle: strings.success,
 			referenceLabel: strings.reference, resultStatusLabel: strings.statusLabel, copyRecoveryButton: strings.copyRecovery,
@@ -294,6 +295,7 @@
 		reviewedDraft = null;
 		reviewedScreenshot = null;
 		elements.payloadPreview.textContent = '';
+		elements.redactionNotice.classList.add('hidden');
 		elements.reviewScreenshotImage.removeAttribute('src');
 		elements.reviewScreenshot.classList.add('hidden');
 		elements.formError.classList.add('hidden');
@@ -694,6 +696,11 @@
                 } } : {}),
             };
             elements.payloadPreview.textContent = JSON.stringify(summary, null, 2);
+			// The Extension Host replaces paths, ports, and addresses; say so when the
+			// reviewed text differs from what was typed.
+			const redacted = ['title', 'description', 'steps', 'expected'].some(field =>
+				(reviewedDraft[field] || '').trim() !== (message.preview.input[field] || ''));
+			elements.redactionNotice.classList.toggle('hidden', !redacted);
 			elements.submitError.classList.add('hidden');
 			elements.confirmButton.disabled = false;
 			setText('confirmButton', strings.confirm);
