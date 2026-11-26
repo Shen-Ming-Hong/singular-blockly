@@ -41,7 +41,12 @@ ARM64 release-candidate artifact 另需 `--allow-release-candidate`。腳本將 
 
 Windows 的 Arduino 工作負載不把 PlatformIO 套件放在 managed root 底下，而是放在短的工作位置：使用者自訂 managed 資料夾時用 `<自訂資料夾>\pio`；否則依序嘗試 `%LOCALAPPDATA%\SingularBlockly\pio` 與 `%SystemDrive%\SingularBlockly-<8 hex>`。後者會移除繼承權限，只授權目前使用者、SYSTEM 與 Administrators，並且只採用帶有正確擁有權標記的資料夾。Core 本身留在原位，既有使用者不需要重新下載；Python 工作負載與 macOS／Linux 不受影響。
 
-Windows x64 的真實安裝 job 另外帶 `--esp32-packages`：以非 ASCII 的使用者資料夾強制走 system-drive 候選，實際下載 `espressif32@7.0.1` 並編譯 `esp32dev` Arduino 專案，量測工作位置底下最長的路徑。evidence 必須包含 `esp32-work-root` 路徑案例、`workRootKind` 與小於 260 的 `longestPathLength`；`verify-evidence.js` 對 `win32/x64` 缺少這些欄位時拒絕。這個 job 因此把逾時放寬到 55 分鐘。
+Windows x64 的真實安裝 job 另外帶 `--esp32-packages`，模擬兩種學生帳號：
+
+- 非 ASCII 的使用者資料夾：必須改用 system-drive 候選，並在那裡實際下載、編譯 `espressif32@7.0.1`（`esp32dev`）與 `atmelavr@5.3.0`（`uno`）。
+- 長度等同 `C:\Users\<45 字元>\AppData\Local` 的 ASCII 資料夾：必須仍放得進 local-app-data 候選，並編譯 ESP32。
+
+兩種情況都會檢查 Python（CyberBrick／MicroPython）工作負載沒有改用工作位置，並量測工作位置底下最長的路徑。evidence 必須包含 `esp32-work-root` 路徑案例、`workRootKind` 與小於 260 的 `longestPathLength`；`verify-evidence.js` 對 `win32/x64` 缺少這些欄位時拒絕。這個 job 因此把逾時放寬到 80 分鐘。USB 上傳無法在 CI 執行，仍需實機或虛擬機確認。
 
 ## Evidence 契約
 
