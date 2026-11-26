@@ -252,6 +252,7 @@ const LANGUAGE_OPTIONS = [
 const toast = {
 	currentToast: null,
 	currentTimeout: null,
+	progress: null, // 進行中的長時間工作：{ text, startTime, timer }
 
 	/**
 	 * 顯示 Toast 通知
@@ -278,8 +279,9 @@ const toast = {
 			toastEl.classList.add('visible');
 		});
 
-		// 自動隱藏
+		// 自動隱藏；上傳仍在進行時，短暫通知結束後回到進度提示
 		this.currentTimeout = setTimeout(() => {
+			this.currentTimeout = null;
 			toastEl.classList.remove('visible');
 			setTimeout(() => {
 				if (toastEl.parentNode) {
@@ -287,9 +289,94 @@ const toast = {
 				}
 				if (this.currentToast === toastEl) {
 					this.currentToast = null;
+					if (this.progress) {
+						this.showProgress(this.progress.text);
+					}
 				}
 			}, 300); // 等待淡出動畫完成
 		}, duration);
+	},
+
+	/**
+	 * 顯示或更新長時間工作的進度提示（編譯、上傳）
+	 * 不會自動計時隱藏，只在 endProgress() 時結束；經過時間每秒更新。
+	 * 已顯示時就地更新文字，不重播進場動畫，避免提示閃爍或看起來消失又出現。
+	 * @param {string} message - 目前狀態文字
+	 * @param {number} startTime - 工作開始時間（Date.now()），用於顯示經過時間
+	 */
+	showProgress: function (message, startTime) {
+		if (!this.progress) {
+			this.progress = { text: message, startTime: startTime || Date.now(), timer: null };
+		}
+		this.progress.text = message;
+		if (startTime) {
+			this.progress.startTime = startTime;
+		}
+
+		const current = this.currentToast;
+		if (current && current.classList.contains('progress')) {
+			current.querySelector('.toast-message').textContent = message;
+			this.updateProgressElapsed();
+			return;
+		}
+		if (current) {
+			// 其他短暫通知顯示中：等它結束後再回到進度提示
+			return;
+		}
+
+		this.hide();
+		const toastEl = document.createElement('div');
+		toastEl.className = 'toast info progress';
+		const messageEl = document.createElement('span');
+		messageEl.className = 'toast-message';
+		messageEl.setAttribute('role', 'status');
+		messageEl.setAttribute('aria-live', 'polite');
+		messageEl.textContent = message;
+		// 經過時間每秒變動，不交給螢幕閱讀器朗讀（WCAG 4.1.3 只需要宣告狀態變化）
+		const elapsedEl = document.createElement('span');
+		elapsedEl.className = 'toast-elapsed';
+		elapsedEl.setAttribute('aria-hidden', 'true');
+		toastEl.append(messageEl, elapsedEl);
+		document.body.appendChild(toastEl);
+		this.currentToast = toastEl;
+		this.updateProgressElapsed();
+
+		requestAnimationFrame(() => {
+			toastEl.classList.add('visible');
+		});
+
+		if (!this.progress.timer) {
+			this.progress.timer = setInterval(() => this.updateProgressElapsed(), 1000);
+		}
+	},
+
+	/**
+	 * 更新進度提示的經過時間
+	 */
+	updateProgressElapsed: function () {
+		if (!this.progress || !this.currentToast || !this.currentToast.classList.contains('progress')) {
+			return;
+		}
+		const elapsedEl = this.currentToast.querySelector('.toast-elapsed');
+		if (elapsedEl) {
+			elapsedEl.textContent = formatProgressElapsed(Date.now() - this.progress.startTime);
+		}
+	},
+
+	/**
+	 * 結束進度提示（成功、失敗或取消時呼叫）
+	 */
+	endProgress: function () {
+		if (!this.progress) {
+			return;
+		}
+		if (this.progress.timer) {
+			clearInterval(this.progress.timer);
+		}
+		this.progress = null;
+		if (this.currentToast && this.currentToast.classList.contains('progress')) {
+			this.hide();
+		}
 	},
 
 	/**
@@ -308,6 +395,21 @@ const toast = {
 		document.querySelectorAll('.toast').forEach(el => el.remove());
 	},
 };
+
+/**
+ * 把經過毫秒數格式化成進度提示用的短字串，例如 "8s"、"1:05"
+ * @param {number} ms - 經過時間（毫秒）
+ * @returns {string}
+ */
+function formatProgressElapsed(ms) {
+	const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+	if (totalSeconds < 60) {
+		return `${totalSeconds}s`;
+	}
+	const minutes = Math.floor(totalSeconds / 60);
+	const seconds = String(totalSeconds % 60).padStart(2, '0');
+	return `${minutes}:${seconds}`;
+}
 
 /**
  * 當前程式語言（用於決定使用哪個生成器）
@@ -7396,12 +7498,13 @@ function handleCyberBrickOtaReadinessResult(message) {
 function handleCyberBrickOtaUploadProgress(message) {
 	if (message.payload?.stageMessage) {
 		setUploadButtonState('uploading');
-		toast.show(message.payload.stageMessage, 'success', 1500);
+		toast.showProgress(message.payload.stageMessage);
 	}
 }
 
 function handleCyberBrickOtaUploadResult(message) {
 	setUploadButtonState('ready');
+	toast.endProgress();
 	if (message.success) {
 		toast.show(message.payload?.userFacingSummary || window.languageManager?.getMessage('CYBERBRICK_OTA_UPLOAD_SUCCEEDED', 'CyberBrick OTA upload complete.'), 'success', 5000);
 		requestCyberBrickUploadSettingsLoad();
@@ -7870,25 +7973,14 @@ function handleUploadProgress(message) {
 		progressText = `${stageText} (${message.progress}%)`;
 	}
 
-	// 如果有耗時資訊，附加顯示
-	if (message.elapsed !== undefined && message.elapsed > 0) {
-		const elapsedSec = (message.elapsed / 1000).toFixed(1);
-		progressText += ` [${elapsedSec}s]`;
-	}
-
 	// 智慧過濾：避免訊息跳太快或重複顯示
-	// 傳入進度百分比，讓進度變化時優先顯示
+	// 傳入進度百分比，讓進度變化時優先顯示；被略過時提示仍保留上一個狀態
 	if (!uploadProgressFilter.shouldShow(progressText, message.progress)) {
 		return; // 跳過此訊息
 	}
 
-	// 根據訊息重要性決定顯示時間
-	// 重要訊息顯示較久，一般訊息持續到下一個更新
-	const isImportant = uploadProgressFilter.isImportant(progressText);
-	const duration = isImportant ? 60000 : 30000; // 重要訊息 60 秒，一般 30 秒
-
-	// 顯示帶有進度的 toast
-	toast.show(progressText, 'info', duration);
+	// 進度提示持續顯示到成功或失敗（handleUploadResult），經過時間由提示本身每秒更新
+	toast.showProgress(progressText, uploadState.startTime || undefined);
 }
 
 /**
@@ -7898,8 +7990,9 @@ function handleUploadProgress(message) {
 function handleUploadResult(message) {
 	log.info('[blockly] 上傳結果', { success: message.success, hasError: Boolean(message.error), mode: message.mode });
 
-	// 重置按鈕狀態
+	// 重置按鈕狀態並結束進度提示
 	setUploadButtonState(message.success ? 'success' : 'error');
+	toast.endProgress();
 
 	if (message.success) {
 		// T040: 根據 mode 區分「編譯成功」與「上傳成功」
