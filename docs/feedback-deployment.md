@@ -25,6 +25,8 @@
 
 2026-10-21 隨擴充套件 0.91.0 部署 #225 的公開頁面在地化字串（無 migration、無 secret 變動），由雲端工作階段在 Ray 於專案討論串明確同意後以 `wrangler deploy` 執行：部署前 `d1 migrations list --remote` 為 No migrations to apply，新版本 `380f8105-5ea3-4195-bd2e-a5d7a6d3ffa5` 承接 100% 流量（上一版 `aa5f5203-2ad4-4fd8-97f8-8c57fe10cb70`）。部署後 `/health`、`/privacy`、`/support`、`/terms` 均為 HTTP 200，繁體中文 `/support` 顯示「不需要 GitHub 帳號」，未認證 attachment route 仍為 Access 302。
 
+2026-11-26 隨 #295（意見回饋改為自動遮蔽路徑、序列埠、IP 與裝置 ID，只拒收憑證；無 migration、無 secret 變動）由雲端工作階段依「合併後自動部署」以 `wrangler deploy` 執行：部署前 `d1 migrations list --remote` 為 No migrations to apply，新版本 `6a3b4597-f1f7-4f08-b9a3-e153dd520ef8` 承接 100% 流量（上一版 `380f8105-5ea3-4195-bd2e-a5d7a6d3ffa5`）。部署後 `/health`、`/privacy`、`/support`、`/terms` 均為 HTTP 200，英文 `/privacy` 已顯示遮蔽說明、繁中隱私頁日期為 2026 年 11 月 26 日，未認證 attachment route 為 Access 302，未認證回饋 API 為 401。未建立 production synthetic 回饋。
+
 ## Worker secrets
 
 以下值只能放入 Cloudflare secret store，不能寫入 `.dev.vars` 以外的本機暫存、Git、VSIX、CI log 或文件：
