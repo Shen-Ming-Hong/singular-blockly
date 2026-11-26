@@ -129,6 +129,9 @@ export class PlatformioIssueDraftService {
 		const lines = [
 			`- Provider Core: ${provider.status}; version=${provider.version ?? 'unknown'}; ${provider.reason}`,
 			`- Singular managed Core: ${managed.status}; version=${managed.version ?? 'unknown'}; storage=${managed.storageSummary ?? 'unknown'}; ${managed.reason}`,
+			...(managed.windowsLongPaths === undefined
+				? []
+				: [`- PlatformIO work folder: ${managed.workRootSummary ?? 'not created'}; Windows long paths=${managed.windowsLongPaths}`]),
 			`- Arduino route: ${route('arduino')}`,
 			`- Python route: ${route('python')}`,
 		];

@@ -372,6 +372,8 @@ window.languageManager.loadMessages('fr', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Routage Python',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'État des paquets',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Espace de stockage utilisé',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'Dossier de travail PlatformIO',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Chemins longs Windows',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Solution de secours utilisée',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Réparer l’environnement géré',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Nettoyer les fichiers gérés',
@@ -380,6 +382,7 @@ window.languageManager.loadMessages('fr', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Réparation de l’environnement géré terminée.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Échec de la réparation. Consultez le journal de sortie dont les données sensibles sont masquées.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Nettoyage terminé : {0} téléchargements, {1} dossiers temporaires et {2} anciennes versions supprimés.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: '{0} dossiers de paquets PlatformIO inutilisés et {1} anciens dossiers de compilation de projets ont aussi été supprimés.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Échec du nettoyage de l’environnement géré. Les fichiers inconnus sont restés intacts.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Impossible d’ouvrir le dossier Singular Core. Terminez l’initialisation ou réparez l’environnement géré, puis réessayez.',
@@ -1029,6 +1032,7 @@ window.languageManager.loadMessages('fr', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Compilation réussie !',
 	ARDUINO_UPLOAD_SUCCESS: 'Téléversement réussi !',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'Les chemins de fichiers sont trop longs pour ce Windows. Choisissez un dossier Singular Core plus court dans les paramètres.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: "PlatformIO CLI introuvable. Veuillez d'abord installer PlatformIO.",

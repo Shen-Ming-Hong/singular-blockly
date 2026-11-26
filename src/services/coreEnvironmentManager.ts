@@ -20,7 +20,10 @@ export interface CoreEnvironmentProvider {
 	readonly id: CoreEnvironmentId;
 	resolve(
 		workspaceUri: string,
-		options?: { onProgress?: (progress: { stage: string; percent: number }) => void }
+		options?: {
+			onProgress?: (progress: { stage: string; percent: number }) => void;
+			workload?: CoreWorkload;
+		}
 	): Promise<CoreEnvironment | null>;
 }
 
@@ -59,9 +62,9 @@ export class CoreEnvironmentManager {
 		for (let index = 0; index < order.length; index++) {
 			const coreId = order[index];
 			try {
-				const environmentKey = this.environmentKey(coreId, workspaceUri);
+				const environmentKey = this.environmentKey(coreId, workload, workspaceUri);
 				const environment = this.environments.get(environmentKey) ??
-					await this.providers.get(coreId)?.resolve(workspaceUri, options) ?? null;
+					await this.providers.get(coreId)?.resolve(workspaceUri, { ...options, workload }) ?? null;
 				if (environment) {
 					this.environments.set(environmentKey, environment);
 					const fallbackUsed = index > 0 || Boolean(sticky && coreId !== profile[0]);
@@ -109,7 +112,10 @@ export class CoreEnvironmentManager {
 
 			const fallbackId = this.profile(options.workload).find(id => id !== selection.selected?.id);
 			const fallback = fallbackId
-				? await this.providers.get(fallbackId)?.resolve(options.workspaceUri, { onProgress: options.onProgress })
+				? await this.providers.get(fallbackId)?.resolve(options.workspaceUri, {
+					onProgress: options.onProgress,
+					workload: options.workload,
+				})
 				: null;
 			if (!fallback) {throw error;}
 			this.sticky.set(this.key(options.workload, options.workspaceUri), { coreId: fallback.id, reason: failureClass });
@@ -136,12 +142,11 @@ export class CoreEnvironmentManager {
 				this.lastSelection.delete(key);
 			}
 		}
-		if (workspaceUri) {
-			for (const id of ['provider', 'managed'] as const) {this.environments.delete(this.environmentKey(id, workspaceUri));}
-		} else if (workload) {
-			// Environment cache keys are shared by workloads. A workload-wide retest
-			// therefore has to invalidate both providers for every workspace.
-			this.environments.clear();
+		for (const key of [...this.environments.keys()]) {
+			const [, keyWorkload, keyWorkspace] = key.split('\0', 3);
+			if ((!workload || workload === keyWorkload) && (!workspaceUri || workspaceUri === keyWorkspace)) {
+				this.environments.delete(key);
+			}
 		}
 	}
 
@@ -153,8 +158,10 @@ export class CoreEnvironmentManager {
 		return `${workload}\0${workspaceUri}`;
 	}
 
-	private environmentKey(coreId: CoreEnvironmentId, workspaceUri: string): string {
-		return `${coreId}\0${workspaceUri}`;
+	private environmentKey(coreId: CoreEnvironmentId, workload: CoreWorkload, workspaceUri: string): string {
+		// Spec 074: the managed Arduino environment uses a Windows work root that
+		// the Python workload does not, so cache entries are per workload.
+		return `${coreId}\0${workload}\0${workspaceUri}`;
 	}
 
 	private remember(workload: CoreWorkload, workspaceUri: string, selected: CoreEnvironmentId | null, fallbackUsed: boolean): void {

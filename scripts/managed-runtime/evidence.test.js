@@ -41,7 +41,8 @@ try {
     sha256: artifactSha256,
   })));
   fs.writeFileSync(manifestPath, JSON.stringify({ artifacts }));
-  const x64 = [evidence('darwin'), evidence('linux'), evidence('win32')];
+  const windowsWorkRoot = { pathCases: [...requiredPathCases, 'esp32-work-root'], workRootKind: 'system-drive', longestPathLength: '231' };
+  const x64 = [evidence('darwin'), evidence('linux'), evidence('win32', 'x64', windowsWorkRoot)];
   const baseOptions = {
     mode: 'pr', repository: 'singular/singular-blockly', headSha, treeSha, vsixSha256, manifestSha256,
     manifest: manifestPath, pullRequestNumber: '42', eventName: 'pull_request',
@@ -63,6 +64,15 @@ try {
   assert.throws(() => verifyEvidence([evidence('darwin', 'x64', { offlineRestart: 'false' }), ...x64.slice(1)], baseOptions), /Evidence failed/);
   assert.throws(() => verifyEvidence([evidence('darwin', 'x64', { artifactSha256: 'f'.repeat(64) }), ...x64.slice(1)], baseOptions), /artifact/);
   assert.throws(() => verifyEvidence([evidence('darwin'), ...x64], baseOptions), /Duplicate evidence/);
+
+  // Spec 074: Windows x64 must carry ESP32 work-root proof below MAX_PATH.
+  assert.strictEqual(x64[2].results[0].workRootKind, 'system-drive');
+  assert.strictEqual(x64[2].results[0].longestPathLength, 231);
+  assert.strictEqual(x64[0].results[0].workRootKind, undefined);
+  assert.throws(() => verifyEvidence([...x64.slice(0, 2), evidence('win32')], baseOptions), /ESP32 work-root/);
+  assert.throws(() => evidence('win32', 'x64', { ...windowsWorkRoot, longestPathLength: '260' }), /below 260/);
+  assert.throws(() => evidence('win32', 'x64', { ...windowsWorkRoot, workRootKind: 'C:\\Users\\private' }), /work root kind/);
+  assert.throws(() => evidence('win32', 'x64', { ...windowsWorkRoot, longestPathLength: undefined }), /below 260/);
 
   const release = [...x64, evidence('darwin', 'arm64'), evidence('linux', 'arm64'), evidence('win32', 'arm64')];
   assert.strictEqual(verifyEvidence(release, { ...baseOptions, mode: 'release', manifest: manifestPath }).matrix.length, 6);

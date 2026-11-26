@@ -19,15 +19,23 @@ import {
 	resolvePlatformioInvocation,
 } from './platformioInvocationResolver';
 import { ArduinoUploadStage, ArduinoUploadResult, ArduinoUploadRequest, ArduinoPortInfo, ArduinoProgressCallback } from '../types/arduino';
-import type { CoreEnvironment } from '../types/coreEnvironment';
+import type { CoreEnvironment, CoreFailureClass } from '../types/coreEnvironment';
 import type { CoreEnvironmentManager } from './coreEnvironmentManager';
-import { classifyCoreFailure, didCoreProcessStart, isCoreFallbackAllowed } from './coreFailureClassifier';
+import {
+	classifyCoreFailure,
+	didCoreProcessStart,
+	isCoreFallbackAllowed,
+	isWindowsPathLengthFailure,
+} from './coreFailureClassifier';
 import { PlatformioProcessError, runPlatformioProcess } from './platformioProcess';
 
 /**
  * 預設的編譯逾時時間（毫秒）
  */
 const DEFAULT_COMPILE_TIMEOUT = 120000;
+
+/** English fallback; the WebView localizes the `path-too-long` error code (spec 074). */
+const PATH_TOO_LONG_MESSAGE = 'Singular Core needs a shorter local folder on this Windows system. The provider Core was not changed.';
 
 /**
  * 預設的上傳逾時時間（毫秒）
@@ -95,6 +103,8 @@ export class ArduinoUploader {
 	private readonly providerInstalled: () => boolean;
 	private startTime: number = 0;
 	private managedStorageRoot: string | null = null;
+	private managedWorkRoot: string | null = null;
+	private lastCoreSelectionFailure: CoreFailureClass | null = null;
 
 	/**
 	 * 建立 ArduinoUploader 實例
@@ -265,12 +275,21 @@ export class ArduinoUploader {
 		};
 		this.pioEnvironment = { ...environment.invocation.env };
 		this.managedStorageRoot = environment.id === 'managed' ? environment.storageRoot : null;
+		this.managedWorkRoot = environment.id === 'managed' ? environment.workRoot ?? null : null;
 	}
 
 	private redactManagedStorage(value: string): string {
-		if (!this.managedStorageRoot) {return value;}
-		const escaped = this.managedStorageRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-		return value.replace(new RegExp(escaped, process.platform === 'win32' ? 'gi' : 'g'), '<managed-runtime>');
+		const flags = process.platform === 'win32' ? 'gi' : 'g';
+		let redacted = value;
+		for (const [root, label] of [
+			[this.managedWorkRoot, '<pio-work-root>'],
+			[this.managedStorageRoot, '<managed-runtime>'],
+		] as const) {
+			if (!root) {continue;}
+			const escaped = root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			redacted = redacted.replace(new RegExp(escaped, flags), label);
+		}
+		return redacted;
 	}
 
 	private commandErrorCode(error: unknown): string {
@@ -303,6 +322,7 @@ export class ArduinoUploader {
 	async checkPioInstalled(): Promise<boolean> {
 		if (this.coreEnvironmentManager) {
 			const selection = await this.coreEnvironmentManager.getEnvironment('arduino', this.workspacePath);
+			this.lastCoreSelectionFailure = selection.selected ? null : selection.failureClass ?? null;
 			if (!selection.selected) {return false;}
 			this.useCoreEnvironment(selection.selected);
 			log('[arduino] PlatformIO Core 選擇完成', 'info', {
@@ -799,7 +819,13 @@ export class ArduinoUploader {
 		port: string,
 		onCompileProgress?: (subProgress: number, message: string) => void,
 		onUploadProgress?: (subProgress: number, message: string) => void
-	): Promise<{ success: boolean; error?: string; details?: string; stage?: 'compiling' | 'uploading' }> {
+	): Promise<{
+		success: boolean;
+		error?: string;
+		details?: string;
+		stage?: 'compiling' | 'uploading';
+		errorCode?: 'path-too-long';
+	}> {
 		try {
 			log('[arduino] 開始編譯並上傳（串流模式）', 'info', { port });
 
@@ -923,6 +949,16 @@ export class ArduinoUploader {
 				const isCompileError = !reachedUploadPhase || stderrOutput.includes('error:') || stderrOutput.includes('Error:');
 				const stage = isCompileError ? 'compiling' : 'uploading';
 				const stderrForParsing = stderrOutput || result.stderr || '';
+				if (isWindowsPathLengthFailure(`${stdoutContent}\n${stderrForParsing}`)) {
+					log(`[arduino] ${stage === 'compiling' ? '編譯' : '上傳'}失敗：Windows 路徑過長`, 'error', { code: result.code });
+					return {
+						success: false,
+						error: 'Path too long',
+						details: this.redactManagedStorage(this.parseCompileError(stderrForParsing || 'Path too long')).slice(0, 200),
+						stage,
+						errorCode: 'path-too-long',
+					};
+				}
 				const errorMessage = isCompileError
 					? this.parseCompileError(stderrForParsing || 'Compilation failed')
 					: this.parseUploadError(stderrForParsing || 'Upload failed');
@@ -1144,7 +1180,8 @@ export class ArduinoUploader {
 		port: string,
 		stage: ArduinoUploadStage,
 		message: string,
-		details?: string
+		details?: string,
+		errorCode?: 'path-too-long'
 	): ArduinoUploadResult {
 		return {
 			success: false,
@@ -1155,6 +1192,7 @@ export class ArduinoUploader {
 				stage,
 				message: this.redactManagedStorage(message),
 				details: details === undefined ? undefined : this.redactManagedStorage(details),
+				...(errorCode ? { errorCode } : {}),
 			},
 		};
 	}
@@ -1200,6 +1238,12 @@ export class ArduinoUploader {
 			sendProgress('checking_pio', 15, 'Checking compiler...');
 			const hasPio = await this.checkPioInstalled();
 			if (!hasPio) {
+				if (this.lastCoreSelectionFailure === 'path-too-long') {
+					sendProgress('failed', 15, PATH_TOO_LONG_MESSAGE, undefined, 'PATH_TOO_LONG');
+					return this.createFailureResult(
+						this.startTime, 'none', 'checking_pio', 'Path too long', PATH_TOO_LONG_MESSAGE, 'path-too-long'
+					);
+				}
 				const notReady = this.getPlatformioUnavailableMessage();
 				sendProgress('failed', 15, notReady, undefined, 'PIO_NOT_FOUND');
 				return this.createFailureResult(this.startTime, 'none', 'checking_pio', 'PlatformIO CLI not found', notReady);
@@ -1262,7 +1306,9 @@ export class ArduinoUploader {
 					: 'Upload failed - check device connection'; // 硬體連接問題
 
 				sendProgress('failed', failProgress, errorMessage, undefined, result.details);
-				return this.createFailureResult(this.startTime, 'auto', failStage, result.error || errorMessage, result.details);
+				return this.createFailureResult(
+					this.startTime, 'auto', failStage, result.error || errorMessage, result.details, result.errorCode
+				);
 			}
 
 			// 完成
@@ -1275,6 +1321,13 @@ export class ArduinoUploader {
 				mode: 'upload',
 			};
 		} catch (error: any) {
+			if (classifyCoreFailure(error, 'prepare') === 'path-too-long') {
+				log('[arduino] PlatformIO 套件或編譯路徑過長', 'error', { code: this.commandErrorCode(error) });
+				sendProgress('failed', 0, PATH_TOO_LONG_MESSAGE, undefined, 'PATH_TOO_LONG');
+				return this.createFailureResult(
+					this.startTime, 'auto', 'failed', 'Path too long', PATH_TOO_LONG_MESSAGE, 'path-too-long'
+				);
+			}
 			const errorMessage = this.redactManagedStorage(error instanceof Error ? error.message : String(error));
 			log('[arduino] 上傳過程發生未預期錯誤', 'error', { code: this.commandErrorCode(error) });
 			sendProgress('failed', 0, errorMessage, undefined, errorMessage);

@@ -371,6 +371,8 @@ window.languageManager.loadMessages('hu', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Python-útválasztás',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Csomagállapot',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Tárhelyhasználat',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'PlatformIO munkamappa',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Hosszú elérési utak (Windows)',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Tartalék használva',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Kezelt környezet javítása',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Kezelt fájlok tisztítása',
@@ -379,6 +381,7 @@ window.languageManager.loadMessages('hu', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'A kezelt környezet javítása befejeződött.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'A javítás sikertelen. A kitakart részletekért nyissa meg a kimeneti naplót.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Tisztítás kész: {0} letöltés, {1} ideiglenes könyvtár és {2} régi verzió eltávolítva.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Emellett {0} nem használt PlatformIO-csomagmappa és {1} régi projektfordítási mappa is törölve lett.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'A tisztítás sikertelen. Az ismeretlen fájlok érintetlenek maradtak.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'A Singular Core mappa nem nyitható meg. Fejezd be az inicializálást, vagy javítsd meg a kezelt környezetet, majd próbáld újra.',
@@ -1033,6 +1036,7 @@ window.languageManager.loadMessages('hu', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Fordítás sikeres!',
 	ARDUINO_UPLOAD_SUCCESS: 'Feltöltés sikeres!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'A fájlok elérési útja túl hosszú ehhez a Windows rendszerhez. A beállításokban válassz rövidebb mappát a Singular Core számára.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI nem található. Kérjük, először telepítse a PlatformIO-t.',

@@ -55,6 +55,33 @@ interface ManagedRuntimeProgressLocalizer {
 	getLocalizedMessage(key: string, fallback?: string, ...args: unknown[]): Promise<string>;
 }
 
+export interface ManagedRuntimePathTooLongUi {
+	showErrorMessage(message: string, ...actions: string[]): Promise<string | undefined>;
+	openDiagnostics(): Promise<void>;
+	chooseShorterFolder(): Promise<void>;
+}
+
+/**
+ * Show the Windows path-too-long notice with diagnostics and shorter-folder
+ * actions. Shared by first-run provisioning and Arduino builds (spec 074).
+ */
+export async function showManagedRuntimePathTooLong(
+	localizer: ManagedRuntimeProgressLocalizer,
+	ui: ManagedRuntimePathTooLongUi
+): Promise<void> {
+	const [message, openDiagnostics, chooseShorterFolder] = await Promise.all([
+		localizer.getLocalizedMessage(
+			'MANAGED_RUNTIME_PROGRESS_PATH_TOO_LONG',
+			'Singular Core needs a shorter local folder on this Windows system. The provider Core was not changed.'
+		),
+		localizer.getLocalizedMessage('MANAGED_RUNTIME_ACTION_OPEN_DIAGNOSTICS', 'Open diagnostics'),
+		localizer.getLocalizedMessage('MANAGED_RUNTIME_ACTION_CHOOSE_SHORTER_FOLDER', 'Choose shorter folder'),
+	]);
+	const selection = await ui.showErrorMessage(message, openDiagnostics, chooseShorterFolder);
+	if (selection === openDiagnostics) {await ui.openDiagnostics();}
+	if (selection === chooseShorterFolder) {await ui.chooseShorterFolder();}
+}
+
 const STAGE_COPY: Record<ManagedRuntimeInstallStage, { key: string; fallback: string }> = {
 	'waiting-lock': {
 		key: 'MANAGED_RUNTIME_PROGRESS_WAITING_LOCK',

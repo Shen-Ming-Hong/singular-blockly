@@ -40,7 +40,7 @@ PlatformIO 的編譯輸出形如 `<build_dir>\<env>\lib<3 hex>\<函式庫名稱>
 **決定**：
 
 1. 使用者自訂 managed runtime 資料夾時，只用 `<自訂資料夾>\pio`。
-2. 否則先用 `%LOCALAPPDATA%\SingularBlockly\pio`：這是每位使用者私有的位置（ACL 只授權本人、SYSTEM 與 Administrators），而且不會漫遊。以 `C:\Users\<名稱>\AppData\Local\` 計算，套件資料夾長度為 52 加上名稱長度，加上 160 的保留後，名稱可長達 47 字元。
+2. 否則先用 `%LOCALAPPDATA%\SingularBlockly\pio`：這是每位使用者私有的位置（ACL 只授權本人、SYSTEM 與 Administrators），而且不會漫遊。以 `C:\Users\<名稱>\AppData\Local\` 計算，平台資料夾長度為 53 加上名稱長度，加上分隔字元與 160 的保留後，名稱可長達 45 字元。
 3. 再用 `%SystemDrive%\SingularBlockly-<8 個隨機十六進位字元>`：直接放在磁碟根目錄下，不使用多人共用的上層資料夾。
 
 **理由**：磁碟根目錄的預設 ACL 會讓 Authenticated Users 對新建資料夾的子項目擁有修改權限（繼承自 `C:\`）。因此必須移除繼承，並只授權目前使用者的 SID、SYSTEM 與 Administrators。
@@ -48,6 +48,8 @@ PlatformIO 的編譯輸出形如 `<build_dir>\<env>\lib<3 hex>\<函式庫名稱>
 不使用共用的上層資料夾（例如 `C:\SingularBlockly\<使用者>`），是因為上層資料夾的建立者（可能是另一個帳號）是擁有者，可以重新取得刪除子項目的權限，進而替換我們的資料夾。直接放在 `C:\` 下時，上層資料夾的擁有者是系統帳號，一般使用者沒有刪除子項目的權限。
 
 名稱加上隨機字尾並記錄在 Extension 自己的儲存中，讓其他帳號無法預先佔用我們的位置。被佔用的情況只會導致改試下一個候選（阻斷服務），不會讓我們採用對方的檔案。
+
+在 `mkdir` 與 `icacls` 之間，其他帳號仍可依繼承的權限修改新資料夾。因此設定權限後會再檢查一次：資料夾的識別碼（`ino`）與建立時相同、不是 reparse point，而且是空的；任一項不符就放棄這個候選，不刪除也不使用裡面的內容。剩下的風險是對方在 `mkdir` 與第一次 `lstat` 之間（微秒等級）猜中隨機名稱並替換整個資料夾，這需要即時監看 `C:\` 並搶在 Extension 之前完成，風險可以接受。
 
 **考慮過但不採用**：
 

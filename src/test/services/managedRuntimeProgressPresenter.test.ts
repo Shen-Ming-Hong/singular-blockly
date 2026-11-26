@@ -6,7 +6,11 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ManagedRuntimeProgressPresenter, ManagedRuntimeProgressUi } from '../../services/managedRuntimeProgressPresenter';
+import {
+	ManagedRuntimeProgressPresenter,
+	ManagedRuntimeProgressUi,
+	showManagedRuntimePathTooLong,
+} from '../../services/managedRuntimeProgressPresenter';
 
 function record(): any {
 	return {
@@ -211,5 +215,18 @@ suite('ManagedRuntimeProgressPresenter', () => {
 		);
 		assert.deepStrictEqual(ui.reports.map(report => report.increment), [80, 20]);
 		assert.strictEqual(ui.showErrorMessage.called, false);
+	});
+
+	test('shared path-too-long notice opens the shorter-folder setting for Arduino builds (spec 074)', async () => {
+		const ui = {
+			showErrorMessage: sinon.stub().callsFake(async (_message: string, ..._actions: string[]) => 'Choose shorter folder'),
+			openDiagnostics: sinon.stub().resolves(),
+			chooseShorterFolder: sinon.stub().resolves(),
+		};
+		await showManagedRuntimePathTooLong(localizer(), ui);
+		assert.match(ui.showErrorMessage.firstCall.args[0], /shorter local folder/);
+		assert.deepStrictEqual(ui.showErrorMessage.firstCall.args.slice(1), ['Open diagnostics', 'Choose shorter folder']);
+		assert.strictEqual(ui.chooseShorterFolder.calledOnce, true);
+		assert.strictEqual(ui.openDiagnostics.called, false);
 	});
 });

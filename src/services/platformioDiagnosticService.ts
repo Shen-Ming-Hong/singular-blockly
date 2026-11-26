@@ -67,6 +67,7 @@ export interface PlatformioDiagnosticServiceOptions {
 		getStorageSummary(): string;
 		getStorageUsageBytes(): Promise<number | null>;
 		getProvisioningState?(): ManagedRuntimeProvisioningState;
+		getWorkRootSummary?(): Promise<string | null>;
 	};
 	coreEnvironmentManager?: {
 		getSelection(workload: CoreWorkload, workspaceUri: string): WorkloadSelection;
@@ -301,6 +302,10 @@ export class PlatformioDiagnosticService {
 		const managedStorageUsage = this.managedRuntime ? await this.managedRuntime.getStorageUsageBytes() : null;
 		const provisioning = this.managedRuntime?.getProvisioningState?.() ?? { status: 'idle', attempt: 0 };
 		const managed = this.buildManagedDiagnosticEnvironment(managedStatus, managedStorageUsage, provisioning);
+		if (this.platform === 'win32') {
+			managed.workRootSummary = await this.managedRuntime?.getWorkRootSummary?.().catch(() => null) ?? null;
+			managed.windowsLongPaths = await this.readWindowsLongPaths();
+		}
 
 		return {
 			environments: {
@@ -380,6 +385,23 @@ export class PlatformioDiagnosticService {
 				? 'Managed runtime is not installed. Diagnostics did not start an installation.'
 				: status.reason,
 		};
+	}
+
+	/** Read-only LongPathsEnabled probe; this extension never changes the registry (FR-014). */
+	private async readWindowsLongPaths(): Promise<'enabled' | 'disabled' | 'unknown'> {
+		const systemRoot = this.env.SystemRoot || this.env.SYSTEMROOT || 'C:\\Windows';
+		try {
+			const result = await this.execFile(
+				path.win32.join(systemRoot, 'System32', 'reg.exe'),
+				['query', 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem', '/v', 'LongPathsEnabled'],
+				{ timeout: this.versionProbeTimeoutMs }
+			);
+			const match = /LongPathsEnabled\s+REG_DWORD\s+0x([0-9a-f]+)/i.exec(result.stdout);
+			if (!match) {return 'unknown';}
+			return Number.parseInt(match[1], 16) === 1 ? 'enabled' : 'disabled';
+		} catch {
+			return 'unknown';
+		}
 	}
 
 	private getWorkloadSelection(workload: CoreWorkload, workspaceUri: string): WorkloadSelection {

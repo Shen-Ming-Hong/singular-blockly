@@ -132,4 +132,26 @@ suite('CoreEnvironmentManager', () => {
 		manager.reset('arduino');
 		assert.strictEqual((await manager.getEnvironment('arduino', 'file:///workspace')).selected?.id, 'provider');
 	});
+
+	test('caches environments per workload so Windows Arduino paths never leak into Python', async () => {
+		const workloads: Array<string | undefined> = [];
+		const managed: CoreEnvironmentProvider = {
+			id: 'managed',
+			resolve: async (_workspaceUri, options) => {
+				workloads.push(options?.workload);
+				return { ...environment('managed'), workRoot: options?.workload === 'arduino' ? 'C:\\SB' : null };
+			},
+		};
+		const manager = new CoreEnvironmentManager(fakeProvider('provider', [], async () => null), managed);
+		const arduino = await manager.getEnvironment('arduino', 'file:///workspace');
+		const python = await manager.getEnvironment('python', 'file:///workspace');
+		await manager.getEnvironment('python', 'file:///workspace');
+		assert.strictEqual(arduino.selected?.workRoot, 'C:\\SB');
+		assert.strictEqual(python.selected?.workRoot, null);
+		assert.deepStrictEqual(workloads, ['arduino', 'python']);
+		manager.reset('python');
+		await manager.getEnvironment('python', 'file:///workspace');
+		await manager.getEnvironment('arduino', 'file:///workspace');
+		assert.deepStrictEqual(workloads, ['arduino', 'python', 'python'], 'reset only clears the requested workload');
+	});
 });

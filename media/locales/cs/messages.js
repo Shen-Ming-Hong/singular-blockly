@@ -370,6 +370,8 @@ window.languageManager.loadMessages('cs', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Směrování Python',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Stav balíčků',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Využití úložiště',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'Pracovní složka PlatformIO',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Dlouhé cesty ve Windows',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Použito záložní řešení',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Opravit spravované prostředí',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Vyčistit spravované soubory',
@@ -378,6 +380,7 @@ window.languageManager.loadMessages('cs', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Oprava spravovaného prostředí byla dokončena.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Oprava selhala. Podrobnosti bez citlivých údajů najdete ve výstupním protokolu.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Čištění dokončeno: odstraněno {0} stažení, {1} dočasných adresářů a {2} starých verzí.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Odstraněny byly také nepoužívané složky balíčků PlatformIO ({0}) a staré složky sestavení projektů ({1}).',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Čištění selhalo. Neznámé soubory zůstaly beze změny.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Složku Singular Core nelze otevřít. Dokončete inicializaci nebo opravte spravované prostředí a zkuste to znovu.',
@@ -1028,6 +1031,7 @@ window.languageManager.loadMessages('cs', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Kompilace úspěšná!',
 	ARDUINO_UPLOAD_SUCCESS: 'Nahrávání úspěšné!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'Cesty k souborům jsou pro tento systém Windows příliš dlouhé. V nastavení zvolte pro Singular Core kratší složku.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI nenalezeno. Nejprve nainstalujte PlatformIO.',

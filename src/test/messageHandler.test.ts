@@ -1486,6 +1486,44 @@ describe('WebView Message Handler', () => {
 	});
 
 	// Error handling branch coverage tests
+	describe('Arduino path-too-long result (spec 074)', () => {
+		function stubUploader(error: { stage: string; message: string; errorCode?: 'path-too-long' }) {
+			const upload = sinon.stub().resolves({
+				success: false,
+				timestamp: '2026-11-26T00:00:00.000Z',
+				port: 'COM3',
+				duration: 10,
+				mode: 'compile-only',
+				error,
+			});
+			sinon.stub(messageHandler as any, 'createArduinoUploader').returns({ upload });
+		}
+
+		it('forwards the path-too-long code and offers diagnostics', async () => {
+			stubUploader({ stage: 'compiling', message: 'Build failed', errorCode: 'path-too-long' });
+			vscodeMock.window.showErrorMessage.resolves('Open diagnostics');
+
+			await (messageHandler as any).handleArduinoUpload(workspacePath, { command: 'requestUpload', code: '', board: 'esp32' });
+			await new Promise(resolve => setImmediate(resolve));
+
+			const result = webviewMock.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0]).find((message: any) => message.command === 'uploadResult');
+			assert.strictEqual(result.error.errorCode, 'path-too-long');
+			assert.ok(vscodeMock.window.showErrorMessage.calledWith(sinon.match.string, 'Open diagnostics', 'Choose shorter folder'));
+			assert.ok(vscodeMock.commands.executeCommand.calledWith('singular-blockly.checkPlatformioStatus'));
+		});
+
+		it('keeps ordinary compile failures free of the path-too-long notice', async () => {
+			stubUploader({ stage: 'compiling', message: 'Build failed' });
+
+			await (messageHandler as any).handleArduinoUpload(workspacePath, { command: 'requestUpload', code: '', board: 'esp32' });
+			await new Promise(resolve => setImmediate(resolve));
+
+			const result = webviewMock.postMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0]).find((message: any) => message.command === 'uploadResult');
+			assert.strictEqual(result.error.errorCode, undefined);
+			assert.strictEqual(vscodeMock.window.showErrorMessage.called, false);
+		});
+	});
+
 	describe('Error Handling Branches', () => {
 		it('should handle error when no workspace folder open in constructor', async () => {
 			// Remove workspace folders

@@ -90,13 +90,21 @@ async function main() {
       throw new Error('Offline restart did not reuse the committed runtime');
     }
 
+    const pathCases = ['unicode', 'space', 'special-characters', 'default-global-storage-shape', 'offline-restart'];
+    let esp32 = null;
+    if (hasFlag('--esp32-packages')) {
+      esp32 = await installEsp32Packages({ compiledRoot, storage, manifest, manifestSha256, sandboxRoot });
+      pathCases.push('esp32-work-root');
+    }
+
     const result = {
       os: process.platform,
       arch: process.arch,
       artifactId: record.artifactId,
       artifactSha256: manifest.artifacts.find(artifact => artifact.id === record.artifactId)?.sha256,
-      pathCases: ['unicode', 'space', 'special-characters', 'default-global-storage-shape', 'offline-restart'],
+      pathCases,
       offlineRestart: true,
+      ...(esp32 ? { workRootKind: esp32.workRootKind, longestPathLength: esp32.longestPathLength } : {}),
       success: true,
     };
 		if (!result.artifactSha256) { throw new Error('Installed artifact is not present in the packaged manifest'); }
@@ -106,6 +114,84 @@ async function main() {
   } finally {
     if (!hasFlag('--keep')) { fs.rmSync(sandboxRoot, { recursive: true, force: true }); }
     else { process.stdout.write(`Managed runtime test directory retained at ${sandboxRoot}.\n`); }
+  }
+}
+
+const ESP32_PLATFORM = 'espressif32@7.0.1';
+const WINDOWS_MAX_PATH = 260;
+
+/** Longest absolute path below a directory, without following links. */
+function longestPathBelow(directory) {
+  let longest = directory.length;
+  const pending = [directory];
+  while (pending.length > 0) {
+    const current = pending.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const target = path.join(current, entry.name);
+      longest = Math.max(longest, target.length);
+      if (entry.isDirectory() && !entry.isSymbolicLink()) { pending.push(target); }
+    }
+  }
+  return longest;
+}
+
+/**
+ * Spec 074: install and build an ESP32 Arduino project through Singular Core
+ * on Windows, using the short PlatformIO work root, and measure the longest
+ * real path. The sandbox LOCALAPPDATA contains non-ASCII characters, so the
+ * system-drive fallback with hardened ACLs is exercised.
+ */
+async function installEsp32Packages({ compiledRoot, storage, manifest, manifestSha256, sandboxRoot }) {
+  if (process.platform !== 'win32') { throw new Error('--esp32-packages is supported only on Windows'); }
+  const { ManagedRuntimeService } = require(path.join(compiledRoot, 'managedRuntimeService.js'));
+  const { PlatformioWorkRootService } = require(path.join(compiledRoot, 'managedRuntimeWorkRoot.js'));
+  const localAppData = path.join(sandboxRoot, 'AppData', 'Local');
+  fs.mkdirSync(localAppData, { recursive: true });
+  const workRoot = new PlatformioWorkRootService({
+    storage,
+    customManagedRoot: false,
+    env: { ...process.env, LOCALAPPDATA: localAppData },
+  });
+  const service = new ManagedRuntimeService({
+    storage, manifest, manifestSha256,
+    allowReleaseCandidate: hasFlag('--allow-release-candidate'),
+    installer: { async install() { throw new Error('ESP32 check must reuse the installed runtime'); } },
+    workRoot,
+  });
+  await service.ensureReady();
+  const projectDir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'sb-esp32-'));
+  let selected = null;
+  try {
+    fs.mkdirSync(path.join(projectDir, 'src'));
+    fs.writeFileSync(path.join(projectDir, 'platformio.ini'), [
+      '[env:esp32]',
+      `platform = ${ESP32_PLATFORM}`,
+      'board = esp32dev',
+      'framework = arduino',
+      '',
+    ].join('\n'));
+    fs.writeFileSync(path.join(projectDir, 'src', 'main.cpp'), '#include <Arduino.h>\nvoid setup() {}\nvoid loop() {}\n');
+    const environment = await service.getCoreEnvironment(`file:///${projectDir.replace(/\\/g, '/')}`, { workload: 'arduino' });
+    selected = await workRoot.current();
+    if (!selected || environment.workRoot !== selected.root) { throw new Error('Arduino workload did not use the PlatformIO work root'); }
+    const run = args => execFileSync(environment.invocation.command, [...environment.invocation.prefixArgs, ...args], {
+      cwd: projectDir, env: { ...process.env, ...environment.invocation.env }, stdio: 'pipe', timeout: 20 * 60 * 1000,
+    });
+    process.stdout.write(`[managed-runtime-e2e] installing ${ESP32_PLATFORM} into the ${selected.kind} work root\n`);
+    run(['pkg', 'install', '--project-dir', projectDir]);
+    process.stdout.write('[managed-runtime-e2e] building the ESP32 Arduino project\n');
+    run(['run', '--project-dir', projectDir]);
+    const longestPathLength = longestPathBelow(selected.root);
+    process.stdout.write(`[managed-runtime-e2e] longest work-root path: ${longestPathLength} characters\n`);
+    if (longestPathLength >= WINDOWS_MAX_PATH) {
+      throw new Error(`PlatformIO work root produced a ${longestPathLength}-character path`);
+    }
+    return { workRootKind: selected.kind, longestPathLength };
+  } finally {
+    fs.rmSync(projectDir, { recursive: true, force: true });
+    if (selected && selected.kind === 'system-drive' && !hasFlag('--keep')) {
+      fs.rmSync(selected.root, { recursive: true, force: true });
+    }
   }
 }
 

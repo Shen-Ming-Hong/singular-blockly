@@ -264,6 +264,7 @@ function renderCoreEnvironments(coreDiagnostics) {
 					<div><dt>${escapeHtml(state.strings.packageStatusLabel)}</dt><dd>${escapeHtml(environment.packageStatus || 'unknown')}</dd></div>
 					<div><dt>${escapeHtml(state.strings.pathLabel)}</dt><dd>${escapeHtml(environment.storageSummary || '—')}</dd></div>
 					<div><dt>${escapeHtml(state.strings.storageUsageLabel)}</dt><dd>${escapeHtml(formatBytes(environment.storageUsageBytes))}</dd></div>
+					${renderWindowsWorkRootRows(environment)}
 				</dl>
 				${renderDetailBlock(state.strings.reasonLabel, environment.reason || '—')}
 				${renderProvisioningDetails(environment.provisioning)}
@@ -282,6 +283,16 @@ function renderCoreEnvironments(coreDiagnostics) {
 		</article>`;
 	}).join('');
 	elements.coreEnvironmentList.innerHTML = environmentCards + selectionCards;
+}
+
+// Spec 074: Windows-only rows for the Singular Core PlatformIO work folder.
+function renderWindowsWorkRootRows(environment) {
+	if (environment.id !== 'managed' || environment.windowsLongPaths === undefined) {
+		return '';
+	}
+	return `
+					<div><dt>${escapeHtml(state.strings.workRootLabel)}</dt><dd>${escapeHtml(environment.workRootSummary || '—')}</dd></div>
+					<div><dt>${escapeHtml(state.strings.windowsLongPathsLabel)}</dt><dd>${escapeHtml(environment.windowsLongPaths)}</dd></div>`;
 }
 
 function renderProvisioningDetails(provisioning) {
@@ -633,6 +644,8 @@ function createFallbackStrings() {
 		pythonSelectionLabel: 'Python routing',
 		packageStatusLabel: 'Package status',
 		storageUsageLabel: 'Storage usage',
+		workRootLabel: 'PlatformIO work folder',
+		windowsLongPathsLabel: 'Windows long paths',
 		fallbackUsedLabel: 'Fallback used',
 		repairTitle: 'Guided repair',
 		exportsTitle: 'Support exports',

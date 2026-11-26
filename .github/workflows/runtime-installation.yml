@@ -104,7 +104,8 @@ jobs:
             platform: darwin
             artifact: macos-x64
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 35
+    # Spec 074: the Windows job also downloads and builds the ESP32 packages.
+    timeout-minutes: 55
     steps:
       - name: Checkout the exact candidate
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -126,7 +127,10 @@ jobs:
         shell: bash
         run: |
           npm ci
-          npm run test:managed-runtime:e2e -- --allow-network --root "$RUNNER_TEMP" --result runtime-result.json
+          extra=()
+          # Spec 074: prove an ESP32 build through the short Windows PlatformIO work root.
+          if [ "${{ matrix.platform }}" = "win32" ]; then extra+=(--esp32-packages); fi
+          npm run test:managed-runtime:e2e -- --allow-network --root "$RUNNER_TEMP" --result runtime-result.json "${extra[@]}"
 
       - name: Collect privacy-safe evidence
         shell: bash

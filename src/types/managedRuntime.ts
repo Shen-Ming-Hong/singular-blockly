@@ -17,6 +17,17 @@ export type ManagedRuntimeInstallStage =
 	| 'verifying'
 	| 'committing';
 
+/** Windows short PlatformIO work-root location class (spec 074). */
+export type PlatformioWorkRootKind = 'custom' | 'local-app-data' | 'system-drive';
+
+export interface PlatformioWorkRootRecord {
+	schemaVersion: 1;
+	kind: PlatformioWorkRootKind;
+	path: string;
+	ownerId: string;
+	createdAt: string;
+}
+
 export type ManagedRuntimeProvisioningTrigger = 'activation' | 'editor-open' | 'workload' | 'repair';
 
 export interface ManagedRuntimeProvisioningFailure {

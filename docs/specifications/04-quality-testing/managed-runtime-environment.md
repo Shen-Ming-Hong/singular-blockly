@@ -37,6 +37,12 @@ ARM64 release-candidate artifact 另需 `--allow-release-candidate`。腳本將 
 
 自訂 managed path 只能是空的本機目錄，或先前已有有效 Singular root ownership marker 的目錄；非空且未受管的位置會在建立任何 runtime 子目錄前拒絕。cleanup 與 install 共用 lock，因此安裝進行中的 staging 不會被同時清理。
 
+### Windows 短路徑工作區（spec 074）
+
+Windows 的 Arduino 工作負載不把 PlatformIO 套件放在 managed root 底下，而是放在短的工作位置：使用者自訂 managed 資料夾時用 `<自訂資料夾>\pio`；否則依序嘗試 `%LOCALAPPDATA%\SingularBlockly\pio` 與 `%SystemDrive%\SingularBlockly-<8 hex>`。後者會移除繼承權限，只授權目前使用者、SYSTEM 與 Administrators，並且只採用帶有正確擁有權標記的資料夾。Core 本身留在原位，既有使用者不需要重新下載；Python 工作負載與 macOS／Linux 不受影響。
+
+Windows x64 的真實安裝 job 另外帶 `--esp32-packages`：以非 ASCII 的使用者資料夾強制走 system-drive 候選，實際下載 `espressif32@7.0.1` 並編譯 `esp32dev` Arduino 專案，量測工作位置底下最長的路徑。evidence 必須包含 `esp32-work-root` 路徑案例、`workRootKind` 與小於 260 的 `longestPathLength`；`verify-evidence.js` 對 `win32/x64` 缺少這些欄位時拒絕。這個 job 因此把逾時放寬到 55 分鐘。
+
 ## Evidence 契約
 
 每個 runner 產生一份不含本機絕對路徑的 JSON，綁定：
@@ -44,6 +50,7 @@ ARM64 release-candidate artifact 另需 `--allow-release-candidate`。腳本將 
 - repository、PR number、事件來源、head SHA 與 Git tree SHA；
 - 共用候選 VSIX SHA-256 與 runtime manifest SHA-256；
 - OS、CPU、runner label、真實 E2E 回報的 artifact id／SHA-256、路徑案例與 offline restart 結果。
+- Windows x64 另含 ESP32 工作位置的種類與最長路徑長度（只有長度，不含路徑本身）。
 
 `verify-evidence.js` 會把 PR／event、artifact id／SHA-256 與 packaged manifest 逐項對回，並對未知 schema、重複或缺少矩陣、必要路徑案例不足、失敗結果、新 commit、tree／VSIX 不同、未完成離線重啟或疑似 home／proxy／credential 內容全部拒絕。Squash merge 可改變 commit SHA；如果採用先前 PR evidence，必須另外以 tree 模式證明合併後內容完全相同。本次 release workflow 選擇更保守的作法：在 tag 所指內容重新執行完整矩陣。
 

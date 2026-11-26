@@ -11,6 +11,7 @@ import { log, handleWebViewLog } from '../services/logging';
 import { FileService } from '../services/fileService';
 import { SettingsManager } from '../services/settingsManager';
 import { LocaleService } from '../services/localeService';
+import { showManagedRuntimePathTooLong } from '../services/managedRuntimeProgressPresenter';
 import { MicropythonUploader, UploadProgress, UploadResult, UploadStage, ComPortInfo } from '../services/micropythonUploader';
 import { ArduinoUploader } from '../services/arduinoUploader';
 import {
@@ -2849,9 +2850,13 @@ export class WebViewMessageHandler {
 							stage: result.error.stage as any,
 							message: result.error.message,
 							details: result.error.details,
+							...(result.error.errorCode ? { errorCode: result.error.errorCode } : {}),
 						}
 					: undefined,
 			});
+			if (result.error?.errorCode === 'path-too-long') {
+				void this.showManagedRuntimePathTooLong();
+			}
 		} catch (error) {
 			log('[blockly] Arduino 上傳過程發生未預期錯誤', 'error', error);
 			this.sendUploadResult({
@@ -2864,6 +2869,23 @@ export class WebViewMessageHandler {
 					message: error instanceof Error ? error.message : String(error),
 				},
 			});
+		}
+	}
+
+	/** Offer diagnostics and the shorter-folder setting after a Windows long-path build failure (spec 074). */
+	private async showManagedRuntimePathTooLong(): Promise<void> {
+		try {
+			await showManagedRuntimePathTooLong(this.localeService, {
+				showErrorMessage: async (message, ...actions) => vscodeApi.window.showErrorMessage(message, ...actions),
+				openDiagnostics: async () => {
+					await vscodeApi.commands.executeCommand('singular-blockly.checkPlatformioStatus');
+				},
+				chooseShorterFolder: async () => {
+					await vscodeApi.commands.executeCommand('workbench.action.openSettings', 'singularBlockly.managedRuntime.path');
+				},
+			});
+		} catch (error) {
+			log('[blockly] 無法顯示路徑過長提示', 'warn', { code: error instanceof Error ? error.name : 'unknown' });
 		}
 	}
 

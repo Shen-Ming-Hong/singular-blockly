@@ -370,6 +370,8 @@ window.languageManager.loadMessages('es', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Enrutamiento de Python',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Estado de paquetes',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Uso del almacenamiento',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'Carpeta de trabajo de PlatformIO',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Rutas largas de Windows',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Respaldo utilizado',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Reparar entorno administrado',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Limpiar archivos administrados',
@@ -378,6 +380,7 @@ window.languageManager.loadMessages('es', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Se completó la reparación del entorno administrado.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Falló la reparación del entorno administrado. Abre el registro de salida para ver los detalles con los datos confidenciales ocultos.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Limpieza completada: se eliminaron {0} descargas, {1} directorios temporales y {2} versiones antiguas.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'También se eliminaron {0} carpetas de paquetes de PlatformIO sin usar y {1} carpetas de compilación de proyectos antiguas.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Falló la limpieza del entorno administrado. Los archivos desconocidos no se modificaron.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'No se puede abrir la carpeta de Singular Core. Completa la inicialización o repara el entorno administrado y vuelve a intentarlo.',
@@ -1028,6 +1031,7 @@ window.languageManager.loadMessages('es', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: '¡Compilación exitosa!',
 	ARDUINO_UPLOAD_SUCCESS: '¡Carga exitosa!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'Las rutas de archivo son demasiado largas para este Windows. Elige una carpeta más corta para Singular Core en la configuración.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'No se encontró PlatformIO CLI. Primero instala PlatformIO.',

@@ -534,6 +534,61 @@ suite('ArduinoUploader Tests', () => {
 			assert.strictEqual(result.error?.stage, 'uploading', 'Should fail at uploading stage (hardware issue)');
 		});
 
+		test('Should report path-too-long when a Windows package path exceeds MAX_PATH (spec 074)', async () => {
+			const request: ArduinoUploadRequest = {
+				code: '#include <Arduino.h>\nvoid setup() {}\nvoid loop() {}',
+				board: 'esp32',
+			};
+			const deepHeader = `C:\\Users\\ray\\AppData\\Roaming\\Code\\User\\globalStorage\\singular-ray.singular-blockly\\runtime-v1\\versions\\${'a'.repeat(36)}\\core\\packages\\framework-arduinoespressif32\\tools\\sdk\\esp32\\include\\libsodium\\libsodium\\src\\libsodium\\include\\sodium\\crypto_box_curve25519xchacha20poly1305.h`;
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(true);
+			(mockExecutor.exec as sinon.SinonStub)
+				.withArgs(sinon.match(/--version/))
+				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
+				code: 1,
+				stdout: 'Compiling .pio/build/esp32/src/main.cpp.o',
+				stderr: `fatal error: ${deepHeader}: No such file or directory`,
+			});
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.success, false);
+			assert.strictEqual(result.error?.stage, 'compiling');
+			assert.strictEqual(result.error?.errorCode, 'path-too-long');
+		});
+
+		test('Should keep an ordinary missing include as a compile error', async () => {
+			const request: ArduinoUploadRequest = { code: 'void setup() {}', board: 'uno' };
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(true);
+			(mockExecutor.exec as sinon.SinonStub)
+				.withArgs(sinon.match(/--version/))
+				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
+				code: 1,
+				stdout: 'Compiling .pio/build/uno/src/main.cpp.o',
+				stderr: 'src/main.cpp:1:10: fatal error: Servo.h: No such file or directory',
+			});
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.error?.stage, 'compiling');
+			assert.strictEqual(result.error?.errorCode, undefined);
+		});
+
 		test('Should fail when PlatformIO is not installed', async () => {
 			const request: ArduinoUploadRequest = {
 				code: 'void setup() {}',
