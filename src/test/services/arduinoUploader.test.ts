@@ -554,6 +554,7 @@ suite('ArduinoUploader Tests', () => {
 			let realFileSystem: FileSystemInterface;
 			let failNobuildBeforeUpload: boolean;
 			let boardMac: string;
+			let defaultSpawn: (command: string, args: string[]) => Promise<{ code: number; stdout: string; stderr: string }>;
 
 			const ini = '[env:esp32dev]\nplatform = platformio/espressif32@7.0.1\nboard = esp32dev\nframework = arduino\n';
 			const flashOutput = () => `Auto-detected: COM35\nUploading .pio/build/esp32dev/firmware.bin\nesptool.py v4.5.1\nSerial port COM35\nMAC: ${boardMac}\nWriting at 0x00010000... (100 %)`;
@@ -573,7 +574,7 @@ suite('ArduinoUploader Tests', () => {
 					mkdirSync: (target, options) => { fs.mkdirSync(target, options); },
 					readFileSync: (target, encoding) => fs.readFileSync(target, encoding),
 				};
-				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (_command: string, args: string[]) => {
+				defaultSpawn = async (_command: string, args: string[]) => {
 					commands.push(args);
 					if (args[0] === 'pkg') {
 						fs.mkdirSync(path.join(coreDir, 'platforms', 'espressif32'), { recursive: true });
@@ -589,7 +590,8 @@ suite('ArduinoUploader Tests', () => {
 					fs.mkdirSync(build, { recursive: true });
 					fs.writeFileSync(path.join(build, 'firmware.bin'), `firmware ${commands.length}`);
 					return { code: 0, stdout: `Linking .pio/build/esp32dev/firmware.elf\nConfiguring upload protocol...\n${flashOutput()}`, stderr: '' };
-				});
+				};
+				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(defaultSpawn);
 			});
 
 			teardown(() => {
@@ -666,6 +668,23 @@ suite('ArduinoUploader Tests', () => {
 				commands = [];
 				await createUploader().upload({ code, board: 'esp32' });
 				assert.deepStrictEqual(kinds(), ['nobuild-upload'], 'the new board is remembered');
+			});
+
+			test('goes back to automatic port detection when the remembered ESP32 port fails', async () => {
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				await createUploader().upload({ code, board: 'esp32' });
+				commands = [];
+				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (command: string, args: string[]) => {
+					if (args.includes('nobuild')) {
+						commands.push(args);
+						return { code: 1, stdout: 'Uploading .pio/build/esp32dev/firmware.bin\nSerial port COM35', stderr: 'could not open port COM35' };
+					}
+					return defaultSpawn(command, args);
+				});
+				const result = await createUploader().upload({ code, board: 'esp32' });
+				assert.strictEqual(result.success, true);
+				assert.deepStrictEqual(kinds(), ['nobuild-upload', 'build-upload']);
+				assert.ok(!commands[1].includes('--upload-port'), 'full upload detects the port again');
 			});
 
 			test('never skips the ESP32 build without a chip MAC from the last full upload', async () => {

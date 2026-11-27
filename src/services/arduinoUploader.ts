@@ -1441,11 +1441,12 @@ export class ArduinoUploader {
 					if (otherBoard) {
 						// ESP32 的 nobuild 只寫主程式；換了板子就馬上完整燒錄一次，補上 bootloader 與分割表
 						log('[arduino] 連接的是另一塊板子，改為完整燒錄', 'info');
-					} else if (reused.success || reused.reachedUpload) {
+					} else if (reused.success || (reused.reachedUpload && reuse.port === 'auto')) {
 						return reused;
 					} else {
-						// 還沒進入燒錄就失敗（例如韌體被刪掉）：忘掉紀錄，改走完整編譯
-						log('[arduino] 直接上傳上次的韌體失敗，改為完整編譯', 'warn');
+						// 還沒進入燒錄就失敗（例如韌體被刪掉），或 ESP32 在上次的固定連接埠燒錄失敗
+						// （板子可能換到別的埠）：改走完整流程並自動偵測連接埠
+						log('[arduino] 直接上傳上次的韌體失敗，改為完整流程', 'warn', { reachedUpload: Boolean(reused.reachedUpload) });
 					}
 				}
 				sendProgress('compiling', 20, 'Building & uploading...', 0);
