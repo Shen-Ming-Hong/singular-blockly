@@ -125,8 +125,6 @@ let currentTheme = window.initialTheme || 'light';
 // 儲存語言偏好與解析後語言
 let currentLanguagePreference = 'auto';
 let currentResolvedLanguage = window.languageManager ? window.languageManager.currentLanguage : 'en';
-let isLanguageDropdownOpen = false;
-let isBoardDropdownOpen = false;
 let isLanguageSwitchReloading = false;
 let pendingLanguageReloadTimer = null;
 let txtSshSetupDone = false;
@@ -2310,144 +2308,16 @@ function populateBoardOptions() {
 	} else {
 		boardSelect.value = 'none';
 	}
-
-	populateBoardDropdown(boardSelect);
 }
 
 /**
- * 依據原生 select 生成自訂開發板下拉選單
+ * 動態生成語言選單選項。原生 <select>（appearance: base-select）由瀏覽器處理鍵盤與無障礙；
+ * 第一個子元素是顯示地球圖示的 <button>，重建選項時保留。
  */
-function populateBoardDropdown(boardSelect) {
-	const dropdown = document.getElementById('boardDropdown');
-	if (!dropdown || !boardSelect) {
-		return;
-	}
-
-	dropdown.replaceChildren();
-
-	Array.from(boardSelect.options).forEach(option => {
-		const optionButton = document.createElement('button');
-		optionButton.type = 'button';
-		optionButton.className = 'board-option';
-		optionButton.dataset.board = option.value;
-		optionButton.setAttribute('role', 'option');
-
-		const label = document.createElement('span');
-		label.className = 'board-option-label';
-		label.textContent = option.textContent || option.value;
-
-		const check = document.createElement('span');
-		check.className = 'board-option-check';
-		check.textContent = '✓';
-
-		optionButton.appendChild(label);
-		optionButton.appendChild(check);
-
-		optionButton.addEventListener('click', event => {
-			event.stopPropagation();
-			if (boardSelect.value !== option.value) {
-				boardSelect.value = option.value;
-				boardSelect.dispatchEvent(new Event('change', { bubbles: true }));
-			}
-			updateBoardSelectionUI(boardSelect);
-			closeBoardDropdown();
-		});
-
-		dropdown.appendChild(optionButton);
-	});
-
-	updateBoardSelectionUI(boardSelect);
-}
-
-/**
- * 更新開發板下拉選單的目前選取狀態
- */
-function updateBoardSelectionUI(boardSelect) {
-	const dropdown = document.getElementById('boardDropdown');
-	const label = document.getElementById('boardSelectText');
-	const select = boardSelect || document.getElementById('boardSelect');
+function populateLanguageSelect() {
+	const select = document.getElementById('languageSelect');
 	if (!select) {
-		return;
-	}
-
-	const selectedOption =
-		select.selectedOptions && select.selectedOptions.length > 0
-			? select.selectedOptions[0]
-			: select.querySelector(`option[value="${select.value}"]`);
-
-	if (label) {
-		label.textContent = selectedOption ? selectedOption.textContent : '';
-	}
-
-	if (!dropdown) {
-		return;
-	}
-
-	dropdown.querySelectorAll('.board-option').forEach(optionEl => {
-		const value = optionEl.dataset.board;
-		if (value === select.value) {
-			optionEl.classList.add('selected');
-			optionEl.setAttribute('aria-selected', 'true');
-		} else {
-			optionEl.classList.remove('selected');
-			optionEl.setAttribute('aria-selected', 'false');
-		}
-	});
-}
-
-function openBoardDropdown() {
-	const dropdown = document.getElementById('boardDropdown');
-	if (!dropdown) {
-		return;
-	}
-
-	closeLanguageDropdown();
-
-	dropdown.classList.add('open');
-	dropdown.setAttribute('aria-hidden', 'false');
-	isBoardDropdownOpen = true;
-
-	const toggleButton = document.getElementById('boardSelectToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'true');
-	}
-}
-
-function closeBoardDropdown() {
-	const dropdown = document.getElementById('boardDropdown');
-	if (!dropdown) {
-		return;
-	}
-	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
-	const focusWasInside = dropdown.contains(document.activeElement);
-	dropdown.classList.remove('open');
-	dropdown.setAttribute('aria-hidden', 'true');
-	isBoardDropdownOpen = false;
-	if (focusWasInside) {
-		document.getElementById('boardSelectToggle')?.focus();
-	}
-
-	const toggleButton = document.getElementById('boardSelectToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'false');
-	}
-}
-
-function toggleBoardDropdown() {
-	if (isBoardDropdownOpen) {
-		closeBoardDropdown();
-	} else {
-		openBoardDropdown();
-	}
-}
-
-/**
- * 動態生成語言選擇下拉選單選項
- */
-function populateLanguageDropdown() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		log.warn('找不到語言下拉選單元素');
+		log.warn('找不到語言選單元素');
 		return;
 	}
 
@@ -2457,53 +2327,25 @@ function populateLanguageDropdown() {
 		return;
 	}
 
-	dropdown.replaceChildren();
-
+	select.querySelectorAll('option').forEach(option => option.remove());
 	LANGUAGE_OPTIONS.forEach(option => {
-		const optionButton = document.createElement('button');
-		optionButton.type = 'button';
-		optionButton.className = 'language-option';
-		optionButton.dataset.language = option.code;
-
-		const label = document.createElement('span');
-		label.className = 'language-option-label';
-		label.textContent = option.isAuto ? languageManager.getMessage('LANGUAGE_AUTO', 'Auto (follow VS Code)') : option.nativeName;
-
-		const check = document.createElement('span');
-		check.className = 'language-option-check';
-		check.textContent = '✓';
-
-		optionButton.appendChild(label);
-		optionButton.appendChild(check);
-
-		optionButton.addEventListener('click', event => {
-			event.stopPropagation();
-			handleLanguageSelection(option.code);
-		});
-
-		dropdown.appendChild(optionButton);
+		const optionEl = document.createElement('option');
+		optionEl.value = option.code;
+		optionEl.textContent = option.isAuto ? languageManager.getMessage('LANGUAGE_AUTO', 'Auto (follow VS Code)') : option.nativeName;
+		select.appendChild(optionEl);
 	});
 
 	updateLanguageSelectionUI();
 }
 
 /**
- * 更新語言選單的目前選取狀態
+ * 讓語言選單顯示目前的語言偏好
  */
 function updateLanguageSelectionUI() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		return;
+	const select = document.getElementById('languageSelect');
+	if (select && select.value !== currentLanguagePreference) {
+		select.value = currentLanguagePreference;
 	}
-
-	dropdown.querySelectorAll('.language-option').forEach(optionEl => {
-		const code = optionEl.dataset.language;
-		if (code === currentLanguagePreference) {
-			optionEl.classList.add('selected');
-		} else {
-			optionEl.classList.remove('selected');
-		}
-	});
 }
 
 /**
@@ -2595,7 +2437,6 @@ async function handleLanguageSelection(languageCode) {
 	if (languageCode !== 'auto') {
 		const switched = await applyLanguageUpdate(languageCode, languageCode);
 		if (!switched) {
-			closeLanguageDropdown();
 			return;
 		}
 	} else {
@@ -2607,54 +2448,6 @@ async function handleLanguageSelection(languageCode) {
 		command: 'updateLanguage',
 		language: languageCode,
 	});
-
-	closeLanguageDropdown();
-}
-
-function openLanguageDropdown() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		return;
-	}
-
-	closeBoardDropdown();
-
-	dropdown.classList.add('open');
-	dropdown.setAttribute('aria-hidden', 'false');
-	isLanguageDropdownOpen = true;
-
-	const toggleButton = document.getElementById('languageToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'true');
-	}
-}
-
-function closeLanguageDropdown() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		return;
-	}
-	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
-	const focusWasInside = dropdown.contains(document.activeElement);
-	dropdown.classList.remove('open');
-	dropdown.setAttribute('aria-hidden', 'true');
-	isLanguageDropdownOpen = false;
-	if (focusWasInside) {
-		document.getElementById('languageToggle')?.focus();
-	}
-
-	const toggleButton = document.getElementById('languageToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'false');
-	}
-}
-
-function toggleLanguageDropdown() {
-	if (isLanguageDropdownOpen) {
-		closeLanguageDropdown();
-	} else {
-		openLanguageDropdown();
-	}
 }
 
 function updateToolbarActionsText() {
@@ -2725,10 +2518,12 @@ function updateEditorUITexts() {
 		themeToggle.setAttribute('title', languageManager.getMessage('THEME_TOGGLE', '切換主題'));
 	}
 
-	// 更新語言切換按鈕title屬性
-	const languageToggle = document.getElementById('languageToggle');
-	if (languageToggle) {
-		languageToggle.setAttribute('title', languageManager.getMessage('LANGUAGE_SELECT_TOOLTIP', 'Select Language'));
+	// 語言選單只有圖示，名稱同時寫在 title 與 aria-label
+	const languageSelect = document.getElementById('languageSelect');
+	if (languageSelect) {
+		const label = languageManager.getMessage('LANGUAGE_SELECT_TOOLTIP', 'Select Language');
+		languageSelect.setAttribute('title', label);
+		languageSelect.setAttribute('aria-label', label);
 	}
 
 	const provideFeedbackButton = document.getElementById('provideFeedbackButton');
@@ -2740,7 +2535,7 @@ function updateEditorUITexts() {
 	updateToolbarActionsText();
 
 	// 更新語言下拉選單內容
-	populateLanguageDropdown();
+	populateLanguageSelect();
 
 	// 更新選擇開發板標籤文字
 	const boardSelectLabel = document.getElementById('boardSelectLabel');
@@ -3864,7 +3659,7 @@ window.addEventListener('languageChanged', function (event) {
 	refreshTxtSensorSelectOptions();
 	refreshTxtVirtualControlsUI();
 	// 更新語言選單文字（例如 Auto 標籤）
-	populateLanguageDropdown();
+	populateLanguageSelect();
 
 	// 如果備份列表已顯示，更新其UI
 	if (document.getElementById('backupModal').open) {
@@ -3886,20 +3681,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 動態生成開發板選項
 	populateBoardOptions();
 	// 動態生成語言選單
-	populateLanguageDropdown();
-	// Board dropdown toggle
-	const boardSelectToggle = document.getElementById('boardSelectToggle');
-	if (boardSelectToggle) {
-		boardSelectToggle.addEventListener('click', event => {
-			event.stopPropagation();
-			toggleBoardDropdown();
-		});
-	}
-	// Sync board dropdown UI on change
-	const boardSelect = document.getElementById('boardSelect');
-	if (boardSelect) {
-		boardSelect.addEventListener('change', () => updateBoardSelectionUI(boardSelect));
-	}
+	populateLanguageSelect();
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 	const provideFeedbackButton = document.getElementById('provideFeedbackButton');
 	if (provideFeedbackButton) {
@@ -3907,39 +3689,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			vscode.postMessage({ command: 'provideFeedback' });
 		});
 	}
-	// 註冊語言切換按鈕事件
-	const languageToggle = document.getElementById('languageToggle');
-	if (languageToggle) {
-		languageToggle.addEventListener('click', event => {
-			event.stopPropagation();
-			toggleLanguageDropdown();
-		});
+	// 語言選單：選了就切換；切換失敗時 updateLanguageSelectionUI 會改回原本的選項
+	const languageSelect = document.getElementById('languageSelect');
+	if (languageSelect) {
+		languageSelect.addEventListener('change', () => handleLanguageSelection(languageSelect.value));
 	}
-	// 點擊外部區域時關閉語言選單
-	document.addEventListener('click', event => {
-		const languageSwitch = document.querySelector('.language-switch');
-		if (isLanguageDropdownOpen && languageSwitch && !languageSwitch.contains(event.target)) {
-			closeLanguageDropdown();
-		}
-		const boardSelectWrapper = document.querySelector('.board-select');
-		if (isBoardDropdownOpen && boardSelectWrapper && !boardSelectWrapper.contains(event.target)) {
-			closeBoardDropdown();
-		}
-	});
-	// Esc 鍵關閉語言選單
-	document.addEventListener('keydown', event => {
-		if (shouldBypassGlobalKeyboardShortcut(event)) {
-			return;
-		}
-		if (event.key === 'Escape') {
-			if (isLanguageDropdownOpen) {
-				closeLanguageDropdown();
-			}
-			if (isBoardDropdownOpen) {
-				closeBoardDropdown();
-			}
-		}
-	});
 	// 註冊重新整理按鈕事件
 	document.getElementById('refreshButton').addEventListener('click', handleRefreshCode);
 
@@ -4987,7 +4741,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 					// 用戶取消，恢復原來的板子選擇
 					log.info('[blockly] 用戶取消切換，恢復原板子選擇');
 					boardSelect.value = previousBoard;
-					updateBoardSelectionUI(boardSelect);
 					return;
 				}
 
@@ -5253,7 +5006,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 				const previousBoard = boardSelect.value;
 				// 先設定板子類型
 				boardSelect.value = message.board;
-				updateBoardSelectionUI(boardSelect);
 				window.setCurrentBoard(message.board);
 				// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
 				await updateToolboxForBoard(workspace, message.board);

@@ -748,55 +748,6 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	margin-right: 0;
 }
 
-.board-select-control {
-	position: relative;
-}
-
-#boardSelectToggle {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	min-width: 180px;
-	max-width: 240px;
-	height: 32px;
-	padding: 0 10px;
-	border-radius: 8px;
-	border: 1px solid #e0e0e0;
-	background-color: #ffffff;
-	color: #333;
-	cursor: pointer;
-	font-size: 0.9rem;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-	transition:
-		border-color 0.2s ease,
-		box-shadow 0.2s ease,
-		background-color 0.2s ease;
-}
-
-#boardSelectToggle:hover {
-	border-color: #cfcfcf;
-	background-color: #f8f8f8;
-}
-
-#boardSelectToggle:focus-visible {
-	outline: 2px solid var(--editor-focus-ring);
-	outline-offset: 2px;
-}
-
-#boardSelectText {
-	flex: 1;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	text-align: left;
-}
-
-.board-select-caret {
-	flex-shrink: 0;
-	transition: transform 0.2s ease;
-}
-
 .feedback-entry {
 	display: flex;
 	align-items: center;
@@ -842,76 +793,10 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 	stroke-linejoin: round;
 }
 
-#boardSelectToggle[aria-expanded='true'] .board-select-caret {
-	transform: rotate(180deg);
-}
-
-#boardSelect {
-	position: absolute;
-	width: 0;
-	height: 0;
-	opacity: 0;
-	pointer-events: none;
-}
-
-.board-dropdown {
-	position: absolute;
-	top: 40px;
-	left: 0;
-	min-width: 180px;
-	max-width: 260px;
-	max-height: 280px;
-	overflow-y: auto;
-	background-color: #ffffff;
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-	padding: 6px;
-	opacity: 0;
-	transform: translateY(-6px);
-	transform-origin: top left;
-	pointer-events: none;
-	/* 收起時用 visibility 讓選項離開 Tab 順序；淡出結束後才隱藏。 */
-	visibility: hidden;
-	transition:
-		opacity 0.2s ease,
-		transform 0.2s ease,
-		visibility 0s linear 0.2s;
-	z-index: 1100;
-}
-
-.board-dropdown.open {
-	opacity: 1;
-	transform: translateY(0);
-	pointer-events: auto;
-	visibility: visible;
-	transition:
-		opacity 0.2s ease,
-		transform 0.2s ease,
-		visibility 0s;
-}
-
-/* 語言切換按鈕與下拉選單 */
+/* 語言選單（原生 select，樣式在檔尾的工具列區） */
 .language-switch {
 	position: relative;
 	margin-left: 10px;
-}
-
-#languageToggle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 32px;
-	height: 32px;
-	border-radius: 50%;
-	border: none;
-	background-color: #f0f0f0;
-	cursor: pointer;
-	transition: background-color 0.3s;
-}
-
-#languageToggle:hover {
-	background-color: #e0e0e0;
 }
 
 .language-icon {
@@ -942,88 +827,6 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 .language-icon .globe-roll {
 	transform-box: fill-box;
 	transform-origin: center;
-}
-
-.language-dropdown {
-	position: absolute;
-	top: 40px;
-	right: 0;
-	min-width: 180px;
-	max-height: 280px;
-	overflow-y: auto;
-	background-color: #ffffff;
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-	padding: 6px;
-	opacity: 0;
-	transform: translateY(-6px);
-	transform-origin: top right;
-	pointer-events: none;
-	/* 收起時用 visibility 讓選項離開 Tab 順序；淡出結束後才隱藏。 */
-	visibility: hidden;
-	transition:
-		opacity 0.2s ease,
-		transform 0.2s ease,
-		visibility 0s linear 0.2s;
-	z-index: 1100;
-}
-
-.language-dropdown.open {
-	opacity: 1;
-	transform: translateY(0);
-	pointer-events: auto;
-	visibility: visible;
-	transition:
-		opacity 0.2s ease,
-		transform 0.2s ease,
-		visibility 0s;
-}
-
-.language-option,
-.board-option {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
-	border: none;
-	background: transparent;
-	padding: 6px 8px;
-	border-radius: 6px;
-	cursor: pointer;
-	color: #333;
-	font-size: 13px;
-	text-align: left;
-}
-
-.language-option:hover,
-.board-option:hover {
-	background-color: #f2f2f2;
-}
-
-.language-option.selected,
-.board-option.selected {
-	background-color: #e9e9e9;
-	font-weight: 600;
-}
-
-.language-option-check,
-.board-option-check {
-	opacity: 0;
-	font-size: 12px;
-}
-
-.language-option.selected .language-option-check,
-.board-option.selected .board-option-check {
-	opacity: 1;
-}
-
-.language-option-label,
-.board-option-label {
-	flex: 1;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 /* 主題切換按鈕樣式 */
@@ -2756,18 +2559,6 @@ body.theme-dark #toolbarActionsToggle:hover {
 	background-color: #555555;
 }
 
-body.theme-dark #boardSelectToggle {
-	background-color: #333333;
-	border-color: #555555;
-	color: #e0e0e0;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-body.theme-dark #boardSelectToggle:hover {
-	border-color: #666666;
-	background-color: #3a3a3a;
-}
-
 body.theme-dark #themeToggle {
 	background-color: #444444;
 }
@@ -2780,50 +2571,8 @@ body.theme-dark .theme-icon {
 	color: #e0e0e0;
 }
 
-body.theme-dark #languageToggle {
-	background-color: #444444;
-}
-
-body.theme-dark #languageToggle:hover {
-	background-color: #555555;
-}
-
 body.theme-dark .language-icon {
 	color: #e0e0e0;
-}
-
-body.theme-dark .language-dropdown {
-	background-color: #333333;
-	border-color: #555555;
-}
-
-body.theme-dark .board-dropdown {
-	background-color: #333333;
-	border-color: #555555;
-}
-
-body.theme-dark .language-option {
-	color: #e0e0e0;
-}
-
-body.theme-dark .board-option {
-	color: #e0e0e0;
-}
-
-body.theme-dark .language-option:hover {
-	background-color: #444444;
-}
-
-body.theme-dark .board-option:hover {
-	background-color: #444444;
-}
-
-body.theme-dark .language-option.selected {
-	background-color: #4a4a4a;
-}
-
-body.theme-dark .board-option.selected {
-	background-color: #4a4a4a;
 }
 
 body.theme-dark #backupButton {
@@ -3222,8 +2971,6 @@ body.theme-dark .empty-backup-list {
  * 支援 ::-webkit-scrollbar 的 webview 一律把標準屬性設為 auto（也擋掉 VS Code 在 html 上繼承的顏色），
  * 交給下面的 ::-webkit-scrollbar 規則畫；只有不支援的瀏覽器才用標準屬性。
  */
-.board-dropdown,
-.language-dropdown,
 body.preview-mode .txt-preview-canvas,
 #txtTestPanelDialog .modal-body,
 .modal,
@@ -3250,8 +2997,6 @@ body.preview-mode .txt-preview-canvas,
 }
 
 @supports not selector(::-webkit-scrollbar) {
-	.board-dropdown,
-	.language-dropdown,
 	body.preview-mode .txt-preview-canvas,
 	#txtTestPanelDialog .modal-body,
 	.modal,
@@ -3279,8 +3024,6 @@ body.preview-mode .txt-preview-canvas,
 }
 
 
-.board-dropdown::-webkit-scrollbar,
-.language-dropdown::-webkit-scrollbar,
 body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar,
 .modal::-webkit-scrollbar,
@@ -3306,8 +3049,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar,
 	height: var(--editor-scrollbar-size) !important;
 }
 
-.board-dropdown::-webkit-scrollbar-track,
-.language-dropdown::-webkit-scrollbar-track,
 body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-track,
 .modal::-webkit-scrollbar-track,
@@ -3335,8 +3076,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-track,
 	box-shadow: var(--editor-scrollbar-track-shadow) !important;
 }
 
-.board-dropdown::-webkit-scrollbar-thumb,
-.language-dropdown::-webkit-scrollbar-thumb,
 body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-thumb,
 .modal::-webkit-scrollbar-thumb,
@@ -3364,8 +3103,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb,
 	border-radius: var(--editor-scrollbar-radius) !important;
 }
 
-.board-dropdown::-webkit-scrollbar-thumb:hover,
-.language-dropdown::-webkit-scrollbar-thumb:hover,
 body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-thumb:hover,
 .modal::-webkit-scrollbar-thumb:hover,
@@ -3389,8 +3126,6 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-thumb:hover,
 	background: var(--editor-scrollbar-thumb-hover) !important;
 }
 
-.board-dropdown::-webkit-scrollbar-corner,
-.language-dropdown::-webkit-scrollbar-corner,
 body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 #txtTestPanelDialog .modal-body::-webkit-scrollbar-corner,
 .modal::-webkit-scrollbar-corner,
@@ -3414,7 +3149,7 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
 }
 
 /*
- * 浮動選單（積木右鍵選單、欄位下拉選單、工具列的開發板與語言選單）沿用 VS Code、Google Docs、Figma 的做法：
+ * 浮動選單（積木右鍵選單、欄位下拉選單）沿用 VS Code、Google Docs、Figma 的做法：
  * 細的圓角半透明滑桿、不畫軌道，讓捲軸融入選單表面而不是另一塊色塊。
  * Chromium 121+ 只要 scrollbar-color／scrollbar-width 不是 auto 就忽略 ::-webkit-scrollbar，
  * 而 macOS 的浮動捲軸又不套用 scrollbar-color，會畫出系統預設的黑色滑桿；
@@ -3422,34 +3157,27 @@ body.preview-mode .txt-preview-canvas::-webkit-scrollbar-corner,
  * 只有不支援的瀏覽器才改用標準屬性。
  */
 .blocklyWidgetDiv .blocklyContextMenu,
-.blocklyDropDownDiv .blocklyMenu,
-.controls-container .board-dropdown,
-.controls-container .language-dropdown {
+.blocklyDropDownDiv .blocklyMenu {
 	scrollbar-width: auto;
 	scrollbar-color: auto;
 }
 
-/* 工具列的開發板與語言選單在深色主題是深色底，滑桿改用淺色半透明。 */
-body.theme-dark .controls-container .board-dropdown,
-body.theme-dark .controls-container .language-dropdown {
+/* 工具列的開發板與語言選單（原生 select 的 ::picker）在深色主題是深色底，滑桿改用淺色半透明。 */
+body.theme-dark .controls-container select {
 	--editor-menu-scrollbar-thumb: rgba(255, 255, 255, 0.28);
 	--editor-menu-scrollbar-thumb-hover: rgba(255, 255, 255, 0.45);
 }
 
 @supports not selector(::-webkit-scrollbar) {
 	.blocklyWidgetDiv .blocklyContextMenu,
-	.blocklyDropDownDiv .blocklyMenu,
-	.controls-container .board-dropdown,
-	.controls-container .language-dropdown {
+	.blocklyDropDownDiv .blocklyMenu {
 		scrollbar-width: thin;
 		scrollbar-color: var(--editor-menu-scrollbar-thumb) transparent;
 	}
 }
 
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar,
-.controls-container .board-dropdown::-webkit-scrollbar,
-.controls-container .language-dropdown::-webkit-scrollbar {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar {
 	width: 10px;
 	height: 10px;
 }
@@ -3457,16 +3185,12 @@ body.theme-dark .controls-container .language-dropdown {
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-track,
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-corner,
 .blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-track,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-corner,
-.controls-container .board-dropdown::-webkit-scrollbar-corner,
-.controls-container .language-dropdown::-webkit-scrollbar-corner {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-corner {
 	background: transparent;
 }
 
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb,
-.controls-container .board-dropdown::-webkit-scrollbar-thumb,
-.controls-container .language-dropdown::-webkit-scrollbar-thumb {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb {
 	min-height: 24px;
 	background-color: var(--editor-menu-scrollbar-thumb);
 	background-clip: padding-box;
@@ -3475,9 +3199,7 @@ body.theme-dark .controls-container .language-dropdown {
 }
 
 .blocklyWidgetDiv .blocklyContextMenu::-webkit-scrollbar-thumb:hover,
-.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb:hover,
-.controls-container .board-dropdown::-webkit-scrollbar-thumb:hover,
-.controls-container .language-dropdown::-webkit-scrollbar-thumb:hover {
+.blocklyDropDownDiv .blocklyMenu::-webkit-scrollbar-thumb:hover {
 	background-color: var(--editor-menu-scrollbar-thumb-hover);
 }
 
@@ -4650,21 +4372,170 @@ body .controls-container #boardSelectLabel:not(#ui-none) {
 	font-size: 12px;
 }
 
-body .controls-container #boardSelectToggle:not(#ui-none) {
-	height: 32px;
-	background-color: var(--ui-input);
-	color: var(--ui-text);
-	border: 1px solid var(--ui-border);
-	border-radius: 8px;
-	box-shadow: none;
+/*
+ * ---- 開發板與語言選單 ----
+ * 原生 <select> 加 appearance: base-select（可自訂樣式的 select，Chromium 135+；VS Code 1.126 內建 Chromium 148），
+ * 鍵盤（方向鍵、Home／End、輸入字首跳選項、Esc）、無障礙角色與彈出位置都由瀏覽器處理。
+ * 不支援 base-select 的環境會退回一般原生 select，功能不變。
+ */
+body .controls-container #boardSelect:not(#ui-none),
+body .controls-container #boardSelect:not(#ui-none)::picker(select),
+body .controls-container #languageSelect:not(#ui-none),
+body .controls-container #languageSelect:not(#ui-none)::picker(select) {
+	appearance: base-select;
 }
 
-body .controls-container #boardSelectToggle:not(#ui-none):hover {
+body .controls-container #boardSelect:not(#ui-none) {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 150px;
+	max-width: 240px;
+	height: 32px;
+	padding: 0 8px 0 10px;
+	border: 1px solid var(--ui-border);
+	border-radius: 8px;
+	background-color: var(--ui-input);
+	color: var(--ui-text);
+	font: inherit;
+	font-size: 13px;
+	cursor: pointer;
+	transition: border-color 0.15s ease;
+}
+
+body .controls-container #boardSelect:not(#ui-none):hover {
 	border-color: var(--ui-muted);
 }
 
+body .controls-container #boardSelect:not(#ui-none)::picker-icon {
+	content: '';
+	flex-shrink: 0;
+	width: 16px;
+	height: 16px;
+	margin-left: auto;
+	background-color: currentColor;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+	transition: rotate 0.2s ease;
+}
+
+body .controls-container #boardSelect:not(#ui-none):open::picker-icon {
+	rotate: 180deg;
+}
+
+body .controls-container #languageSelect:not(#ui-none) {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 0;
+	border-radius: 8px;
+	background-color: transparent;
+	color: var(--ui-text);
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+}
+
+body .controls-container #languageSelect:not(#ui-none):hover {
+	background-color: var(--ui-hover);
+}
+
+body .controls-container #languageSelect:not(#ui-none)::picker-icon {
+	display: none;
+}
+
+/* 第一個子元素 <button> 只負責顯示地球圖示；焦點與點擊都由 select 本身處理 */
+body .controls-container #languageSelect:not(#ui-none) > .language-select-button {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	cursor: inherit;
+}
+
+body .controls-container #languageSelect:not(#ui-none) .language-icon {
+	color: inherit;
+}
+
+body .controls-container #boardSelect:not(#ui-none):focus-visible,
+body .controls-container #languageSelect:not(#ui-none):focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
+}
+
+body .controls-container #boardSelect:not(#ui-none)::picker(select),
+body .controls-container #languageSelect:not(#ui-none)::picker(select) {
+	margin-block: 6px;
+	max-height: min(540px, 75vh);
+	padding: 6px;
+	border: 1px solid var(--ui-border);
+	border-radius: 8px;
+	background-color: var(--ui-surface);
+	color: var(--ui-text);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* ::picker 不能再接 ::-webkit-scrollbar，捲軸只能用標準屬性，顏色沿用浮動選單的 token */
+body .controls-container #boardSelect:not(#ui-none)::picker(select),
+body .controls-container #languageSelect:not(#ui-none)::picker(select) {
+	scrollbar-width: thin;
+	scrollbar-color: var(--editor-menu-scrollbar-thumb) transparent;
+}
+
+body .controls-container #boardSelect:not(#ui-none)::picker(select) {
+	min-width: anchor-size(width);
+}
+
+/* 地球按鈕在工具列右側，選單向左展開 */
+body .controls-container #languageSelect:not(#ui-none)::picker(select) {
+	min-width: 220px;
+	position-area: block-end span-inline-start;
+}
+
+body .controls-container #boardSelect:not(#ui-none) option,
+body .controls-container #languageSelect:not(#ui-none) option {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 10px;
+	border-radius: 6px;
+	font-size: 13px;
+	line-height: 19px;
+	cursor: pointer;
+}
+
+body .controls-container #boardSelect:not(#ui-none) option:hover,
+body .controls-container #boardSelect:not(#ui-none) option:focus-visible,
+body .controls-container #languageSelect:not(#ui-none) option:hover,
+body .controls-container #languageSelect:not(#ui-none) option:focus-visible {
+	background-color: var(--ui-hover);
+	outline: none;
+}
+
+body .controls-container #boardSelect:not(#ui-none) option:focus-visible,
+body .controls-container #languageSelect:not(#ui-none) option:focus-visible {
+	box-shadow: inset 0 0 0 2px var(--editor-focus-ring);
+}
+
+body .controls-container #boardSelect:not(#ui-none) option:checked,
+body .controls-container #languageSelect:not(#ui-none) option:checked {
+	font-weight: 600;
+}
+
+body .controls-container #boardSelect:not(#ui-none) option::checkmark,
+body .controls-container #languageSelect:not(#ui-none) option::checkmark {
+	order: 1;
+	margin-left: auto;
+	content: '✓';
+	color: var(--editor-focus-ring);
+}
+
 /* ---- 工具列圖示按鈕 ---- */
-body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none),
+body .controls-container .toolbar-action-group button:not(.language-select-button):not(#ui-none),
 body .controls-container #toolbarActionsToggle:not(#ui-none) {
 	display: grid;
 	place-items: center;
@@ -4685,29 +4556,29 @@ body .controls-container #toolbarActionsToggle:not(#ui-none) {
 		color 0.15s ease;
 }
 
-body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none) svg,
-body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none) svg *,
+body .controls-container .toolbar-action-group button:not(.language-select-button):not(#ui-none) svg,
+body .controls-container .toolbar-action-group button:not(.language-select-button):not(#ui-none) svg *,
 body .controls-container #toolbarActionsToggle:not(#ui-none) svg {
 	color: inherit;
 }
 
-body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):hover,
+body .controls-container .toolbar-action-group button:not(.language-select-button):not(#ui-none):hover,
 body .controls-container #toolbarActionsToggle:not(#ui-none):hover {
 	background-color: var(--ui-hover);
 }
 
-body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):active,
+body .controls-container .toolbar-action-group button:not(.language-select-button):not(#ui-none):active,
 body .controls-container #toolbarActionsToggle:not(#ui-none):active {
 	background-color: var(--ui-pressed);
 }
 
-body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):focus-visible,
+body .controls-container .toolbar-action-group button:not(.language-select-button):not(#ui-none):focus-visible,
 body .controls-container #toolbarActionsToggle:not(#ui-none):focus-visible {
 	outline: 2px solid var(--ui-focus);
 	outline-offset: 1px;
 }
 
-body .controls-container .toolbar-action-group button:not(.board-option):not(.language-option):not(#ui-none):disabled {
+body .controls-container .toolbar-action-group button:not(.language-select-button):not(#ui-none):disabled {
 	background-color: transparent;
 	color: var(--ui-disabled-fg);
 	cursor: not-allowed;

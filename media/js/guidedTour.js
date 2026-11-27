@@ -74,7 +74,7 @@
 	}
 
 	function currentBoardText() {
-		return document.getElementById('boardSelectText')?.textContent || '';
+		return document.getElementById('boardSelect')?.value || '';
 	}
 
 	function blockCount() {
@@ -88,7 +88,7 @@
 	/**
 	 * 導覽步驟。
 	 * target：要圈起來的元素；找不到或看不見的步驟會略過。
-	 * extra：使用者操作時要一起圈進來的元素（下拉選單、積木清單）。
+	 * extra：使用者操作時要一起圈進來的元素（積木清單）。開發板與語言的原生選單在 top layer，不必圈。
 	 * snapshot／done：記下開始時的狀態，之後狀態改變就代表使用者做完了。
 	 */
 	function buildSteps() {
@@ -96,15 +96,13 @@
 			{
 				key: 'LANGUAGE',
 				fallbackTitle: 'Choose your language',
-				target: () => document.getElementById('languageToggle'),
-				extra: () => [document.getElementById('languageDropdown')],
+				target: () => document.getElementById('languageSelect'),
 				events: ['languageChanged'],
 			},
 			{
 				key: 'BOARD',
 				fallbackTitle: 'Choose your board',
 				target: () => document.querySelector('.board-select'),
-				extra: () => [document.getElementById('boardDropdown')],
 				snapshot: currentBoardText,
 				done: (before) => currentBoardText() !== before,
 			},
@@ -359,10 +357,8 @@
 		const onKeydown = (event) => {
 			if (event.key !== 'Escape' || event.defaultPrevented) return;
 			if (document.querySelector('dialog[open], .blocklyWidgetDiv:not(:empty), .blocklyDropDownDiv[style*="display: block"]')) return;
-			const menuOpen = ['languageToggle', 'boardSelectToggle'].some(
-				(id) => document.getElementById(id)?.getAttribute('aria-expanded') === 'true'
-			);
-			if (menuOpen) return;
+			// 原生 select 的選單開著時，Esc 由瀏覽器關閉選單
+			if (document.querySelector('select:open')) return;
 			stop();
 		};
 		const onLanguageChanged = () => {

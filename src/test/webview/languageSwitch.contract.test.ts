@@ -175,13 +175,16 @@ suite('Blockly language rebuild contract', () => {
 		const source = read('media/js/blocklyEdit.js');
 		const selectionSource = source.slice(
 			source.indexOf('async function handleLanguageSelection'),
-			source.indexOf('function openLanguageDropdown')
+			source.indexOf('function updateToolbarActionsText')
 		);
 		assert.doesNotMatch(selectionSource, /languageCode === currentLanguagePreference/);
 		const failureGuardIndex = selectionSource.indexOf('if (!switched)');
 		const postMessageIndex = selectionSource.indexOf("command: 'updateLanguage'");
 		assert.ok(failureGuardIndex >= 0 && failureGuardIndex < postMessageIndex);
-		assert.match(selectionSource.slice(failureGuardIndex, postMessageIndex), /closeLanguageDropdown\(\);[\s\S]*return;/);
+		assert.match(selectionSource.slice(failureGuardIndex, postMessageIndex), /if \(!switched\) \{\s*return;/);
+		// 失敗時 applyLanguageUpdate 把原生 select 改回原本的偏好
+		const applySource = source.slice(source.indexOf('async function applyLanguageUpdate'), source.indexOf('async function refreshWorkspaceForLanguage'));
+		assert.match(applySource, /currentLanguagePreference = previousPreference;\s*updateLanguageSelectionUI\(\);\s*return false;/);
 	});
 
 	test('rebuild is guarded during drag and never writes an intermediate empty state', () => {

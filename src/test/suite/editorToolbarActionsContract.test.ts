@@ -22,7 +22,7 @@ suite('Blockly editor toolbar actions contract', () => {
 		for (const id of ['backupButton', 'uploadButton', 'monitorBtn']) {
 			assert.ok(primary.includes(`id="${id}"`), `${id} must remain visible when the toolbar is collapsed`);
 		}
-		for (const id of ['provideFeedbackButton', 'languageToggle', 'themeToggle', 'functionSearchToggle', 'refreshButton']) {
+		for (const id of ['provideFeedbackButton', 'languageSelect', 'themeToggle', 'functionSearchToggle', 'refreshButton']) {
 			assert.ok(!primary.includes(`id="${id}"`), `${id} must be a secondary toolbar action`);
 		}
 	});

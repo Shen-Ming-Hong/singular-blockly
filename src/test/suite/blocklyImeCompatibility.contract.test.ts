@@ -86,9 +86,10 @@ describe('Blockly IME keyboard compatibility contract', () => {
 			normalized.includes('if (shouldBypassGlobalKeyboardShortcut(e)) { return; }'),
 			'Ctrl/Cmd shortcuts should skip while the user is editing text'
 		);
+		// 開發板與語言改用原生 select 後，Esc 由瀏覽器處理；剩下的全域 Esc（關閉對話框）在選字中不動作
 		assert.ok(
-			normalized.includes('if (shouldBypassGlobalKeyboardShortcut(event)) { return; }'),
-			'Escape-based global handlers should skip while the user is editing text'
+			normalized.includes("if (event.key !== 'Escape' || event.defaultPrevented || isBlocklyTextInputCompositionEvent(event)) { return; }"),
+			'Escape-based dialog handler should skip during IME composition'
 		);
 	});
 });
