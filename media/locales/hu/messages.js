@@ -1031,6 +1031,8 @@ window.languageManager.loadMessages('hu', {
 	ARDUINO_STAGE_CHECKING: 'Fordító ellenőrzése',
 	ARDUINO_STAGE_DETECTING: 'Panel észlelése',
 	ARDUINO_STAGE_COMPILING: 'Fordítás',
+	UPLOAD_PACKAGES_DOWNLOADING: '{0} eszközök letöltése',
+	UPLOAD_PACKAGES_INSTALLING: '{0} eszközök telepítése',
 	ARDUINO_STAGE_UPLOADING: 'Feltöltés',
 
 	// Arduino Upload Results

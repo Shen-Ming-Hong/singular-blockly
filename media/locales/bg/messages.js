@@ -1029,6 +1029,8 @@ window.languageManager.loadMessages('bg', {
 	ARDUINO_STAGE_CHECKING: 'Проверка на компилатора',
 	ARDUINO_STAGE_DETECTING: 'Откриване на платката',
 	ARDUINO_STAGE_COMPILING: 'Компилиране',
+	UPLOAD_PACKAGES_DOWNLOADING: 'Изтегляне на инструменти за {0}',
+	UPLOAD_PACKAGES_INSTALLING: 'Инсталиране на инструменти за {0}',
 	ARDUINO_STAGE_UPLOADING: 'Качване',
 
 	// Arduino Upload Results

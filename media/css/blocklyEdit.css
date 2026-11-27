@@ -3606,12 +3606,63 @@ body.theme-dark .result-preview {
 /* 長時間工作的進度提示：持續顯示到成功或失敗，右側顯示經過時間 */
 .toast.progress {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: baseline;
-	gap: 12px;
+	column-gap: 12px;
+	row-gap: 8px;
+	min-width: min(280px, calc(100vw - 40px));
 	max-width: min(560px, calc(100vw - 40px));
 }
 
+/* 細進度條（spec 076）：白色填滿在藍色提示上對比超過 3:1（WCAG 2.2 SC 1.4.11） */
+.toast.progress .toast-progress-bar {
+	position: relative;
+	flex: 1 0 100%;
+	height: 4px;
+	border-radius: 2px;
+	overflow: hidden;
+	background-color: rgba(255, 255, 255, 0.35);
+}
+
+.toast.progress .toast-progress-fill {
+	height: 100%;
+	width: 0;
+	border-radius: inherit;
+	background-color: #ffffff;
+	transition: width 0.4s ease;
+}
+
+/* 不知道總量時：一段填滿來回移動，不顯示假的數字 */
+.toast.progress .toast-progress-bar.indeterminate .toast-progress-fill {
+	position: absolute;
+	left: 0;
+	width: 35%;
+	animation: toast-progress-indeterminate 1.6s ease-in-out infinite;
+}
+
+@keyframes toast-progress-indeterminate {
+	0% {
+		left: -35%;
+	}
+	100% {
+		left: 100%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.toast.progress .toast-progress-fill {
+		transition: none;
+	}
+
+	.toast.progress .toast-progress-bar.indeterminate .toast-progress-fill {
+		left: 0;
+		width: 35%;
+		animation: none;
+	}
+}
+
 .toast.progress .toast-message {
+	flex: 1 1 auto;
 	min-width: 0;
 	overflow-wrap: anywhere;
 }

@@ -1022,6 +1022,8 @@ window.languageManager.loadMessages('pt-br', {
 	ARDUINO_STAGE_CHECKING: 'Verificando compilador',
 	ARDUINO_STAGE_DETECTING: 'Detectando placa',
 	ARDUINO_STAGE_COMPILING: 'Compilando',
+	UPLOAD_PACKAGES_DOWNLOADING: 'Baixando ferramentas da {0}',
+	UPLOAD_PACKAGES_INSTALLING: 'Instalando ferramentas da {0}',
 	ARDUINO_STAGE_UPLOADING: 'Enviando',
 
 	// Arduino Upload Results

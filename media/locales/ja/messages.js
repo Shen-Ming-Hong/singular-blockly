@@ -1021,6 +1021,8 @@ window.languageManager.loadMessages('ja', {
 	ARDUINO_STAGE_CHECKING: 'コンパイラを確認中',
 	ARDUINO_STAGE_DETECTING: 'ボードを検出中',
 	ARDUINO_STAGE_COMPILING: 'コンパイル中',
+	UPLOAD_PACKAGES_DOWNLOADING: '{0} のツールをダウンロード中',
+	UPLOAD_PACKAGES_INSTALLING: '{0} のツールをインストール中',
 	ARDUINO_STAGE_UPLOADING: 'アップロード中',
 
 	// Arduino アップロード結果

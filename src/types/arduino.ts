@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import type { PackageProgress } from '../services/packageInstallProgress';
+
 /**
  * Arduino 上傳階段類型
  * 定義 Arduino C++ 編譯/上傳流程的各個階段
@@ -43,6 +45,9 @@ export interface ArduinoUploadProgress {
 
 	/** 預估總時間（毫秒，可選） */
 	estimatedTotal?: number;
+
+	/** 第一次準備套件時的下載／安裝進度（spec 076） */
+	packages?: PackageProgress;
 }
 
 /**

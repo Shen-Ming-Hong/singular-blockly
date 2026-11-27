@@ -1026,6 +1026,8 @@ window.languageManager.loadMessages('cs', {
 	ARDUINO_STAGE_CHECKING: 'Kontrola kompilátoru',
 	ARDUINO_STAGE_DETECTING: 'Detekce desky',
 	ARDUINO_STAGE_COMPILING: 'Kompilace',
+	UPLOAD_PACKAGES_DOWNLOADING: 'Stahování nástrojů {0}',
+	UPLOAD_PACKAGES_INSTALLING: 'Instalace nástrojů {0}',
 	ARDUINO_STAGE_UPLOADING: 'Nahrávání',
 
 	// Arduino Upload Results

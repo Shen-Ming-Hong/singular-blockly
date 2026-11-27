@@ -12,6 +12,7 @@ import { isProviderInstalled } from './penvProviderService';
 import * as vscode from 'vscode';
 import type { CoreEnvironmentManager } from './coreEnvironmentManager';
 import type { CoreEnvironment, CoreEnvironmentId } from '../types/coreEnvironment';
+import type { PackageProgress } from './packageInstallProgress';
 import { CYBERBRICK_OTA_AGENT_TARGET_VERSION, WifiNetworkSuggestion } from '../types/cyberbrickUpload';
 import {
 	buildCyberBrickRcMainOtaBootstrap,
@@ -43,6 +44,8 @@ export interface UploadProgress {
 	progress: number; // 0-100
 	message: string;
 	error?: string;
+	/** 第一次準備 Arduino 套件時的下載／安裝進度（spec 076） */
+	packages?: PackageProgress;
 }
 
 /**

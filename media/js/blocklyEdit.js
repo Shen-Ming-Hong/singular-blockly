@@ -288,7 +288,7 @@ const toast = {
 				if (this.currentToast === toastEl) {
 					this.currentToast = null;
 					if (this.progress) {
-						this.showProgress(this.progress.text);
+						this.showProgress(this.progress.text, undefined, this.progress.value);
 					}
 				}
 			}, 300); // 等待淡出動畫完成
@@ -298,15 +298,19 @@ const toast = {
 	/**
 	 * 顯示或更新長時間工作的進度提示（編譯、上傳）
 	 * 不會自動計時隱藏，只在 endProgress() 時結束；經過時間每秒更新。
-	 * 已顯示時就地更新文字，不重播進場動畫，避免提示閃爍或看起來消失又出現。
-	 * @param {string} message - 目前狀態文字
-	 * @param {number} startTime - 工作開始時間（Date.now()），用於顯示經過時間
+	 * 已顯示時就地更新文字與進度條，不重播進場動畫，避免提示閃爍或看起來消失又出現。
+	 * @param {string} message - 目前狀態的短標籤，例如「編譯中 65%」
+	 * @param {number} [startTime] - 工作開始時間（Date.now()），用於顯示經過時間
+	 * @param {number|null} [value] - 進度條數值 0-100；null 或省略時顯示不定進度（spec 076）
 	 */
-	showProgress: function (message, startTime) {
+	showProgress: function (message, startTime, value) {
 		if (!this.progress) {
-			this.progress = { text: message, startTime: startTime || Date.now(), timer: null };
+			this.progress = { text: message, value: null, startTime: startTime || Date.now(), timer: null };
 		}
 		this.progress.text = message;
+		if (value !== undefined) {
+			this.progress.value = typeof value === 'number' && isFinite(value) ? Math.max(0, Math.min(100, Math.round(value))) : null;
+		}
 		if (startTime) {
 			this.progress.startTime = startTime;
 		}
@@ -314,6 +318,7 @@ const toast = {
 		const current = this.currentToast;
 		if (current && current.classList.contains('progress')) {
 			current.querySelector('.toast-message').textContent = message;
+			this.updateProgressBar();
 			this.updateProgressElapsed();
 			return;
 		}
@@ -327,6 +332,7 @@ const toast = {
 		toastEl.className = 'toast info progress';
 		const messageEl = document.createElement('span');
 		messageEl.className = 'toast-message';
+		messageEl.id = 'uploadProgressLabel';
 		messageEl.setAttribute('role', 'status');
 		messageEl.setAttribute('aria-live', 'polite');
 		messageEl.textContent = message;
@@ -334,9 +340,20 @@ const toast = {
 		const elapsedEl = document.createElement('span');
 		elapsedEl.className = 'toast-elapsed';
 		elapsedEl.setAttribute('aria-hidden', 'true');
-		toastEl.append(messageEl, elapsedEl);
+		// 細進度條：以狀態文字為名稱，螢幕閱讀器可讀到數值（WAI-ARIA progressbar）
+		const barEl = document.createElement('div');
+		barEl.className = 'toast-progress-bar';
+		barEl.setAttribute('role', 'progressbar');
+		barEl.setAttribute('aria-labelledby', 'uploadProgressLabel');
+		barEl.setAttribute('aria-valuemin', '0');
+		barEl.setAttribute('aria-valuemax', '100');
+		const fillEl = document.createElement('div');
+		fillEl.className = 'toast-progress-fill';
+		barEl.appendChild(fillEl);
+		toastEl.append(messageEl, elapsedEl, barEl);
 		document.body.appendChild(toastEl);
 		this.currentToast = toastEl;
+		this.updateProgressBar();
 		this.updateProgressElapsed();
 
 		requestAnimationFrame(() => {
@@ -345,6 +362,30 @@ const toast = {
 
 		if (!this.progress.timer) {
 			this.progress.timer = setInterval(() => this.updateProgressElapsed(), 1000);
+		}
+	},
+
+	/**
+	 * 依 progress.value 更新進度條：有數值時為確定進度，null 時為不定進度（不宣告 aria-valuenow）
+	 */
+	updateProgressBar: function () {
+		if (!this.progress || !this.currentToast) {
+			return;
+		}
+		const barEl = this.currentToast.querySelector('.toast-progress-bar');
+		const fillEl = this.currentToast.querySelector('.toast-progress-fill');
+		if (!barEl || !fillEl) {
+			return;
+		}
+		const value = this.progress.value;
+		if (typeof value === 'number') {
+			barEl.classList.remove('indeterminate');
+			barEl.setAttribute('aria-valuenow', String(value));
+			fillEl.style.width = `${value}%`;
+		} else {
+			barEl.classList.add('indeterminate');
+			barEl.removeAttribute('aria-valuenow');
+			fillEl.style.width = '';
 		}
 	},
 
@@ -7277,7 +7318,8 @@ function handleCyberBrickOtaReadinessResult(message) {
 function handleCyberBrickOtaUploadProgress(message) {
 	if (message.payload?.stageMessage) {
 		setUploadButtonState('uploading');
-		toast.showProgress(message.payload.stageMessage);
+		// OTA 沒有百分比：顯示不定進度條
+		toast.showProgress(message.payload.stageMessage, undefined, null);
 	}
 }
 
@@ -7494,9 +7536,6 @@ async function handleUploadClick() {
 		return;
 	}
 
-	// 重置進度過濾器狀態
-	uploadProgressFilter.reset();
-
 	// 紀錄上傳開始時間
 	uploadState.startTime = Date.now();
 
@@ -7602,115 +7641,34 @@ function setUploadButtonState(state) {
 }
 
 /**
- * 上傳進度智慧過濾狀態
+ * 把上傳進度訊息轉成提示用的短標籤與進度條數值（spec 076）
+ * 第一次準備套件時顯示「正在下載／安裝 {板子} 工具 N%」，其餘顯示「階段 N%」；不使用 message 原文。
+ * @param {Object} message - uploadProgress 訊息
+ * @param {Object<string, string>} stageMessages - 階段代號對應的本地化名稱
+ * @param {string} boardName - 目前開發板的顯示名稱
+ * @param {(key: string, fallback: string) => string} getMessage - 取得本地化字串
+ * @returns {{ text: string, value: number|null }}
  */
-const uploadProgressFilter = {
-	lastMessage: '',
-	lastShowTime: 0,
-	lastImportantTime: 0, // 上次顯示重要訊息的時間
-	lastProgress: -1, // 上次顯示的進度百分比
-	minInterval: 300, // 一般訊息最小顯示間隔（毫秒）
-	importantMinDisplay: 800, // 重要訊息最少顯示時間（毫秒），縮短以避免錯過進度
-	// 重要訊息關鍵字（這些訊息會顯示較久）
-	importantPatterns: [
-		/^RAM:/i, // 記憶體使用
-		/^Flash:/i, // Flash 使用
-		/^Chip:/i, // 晶片資訊
-		/^Port:/i, // 連接埠
-		/^Features:/i, // 功能特性
-		/^Compressed:/i, // 壓縮資訊
-		/^Wrote\s/i, // 寫入完成
-		/^Done\s/i, // 完成時間
-		/✓$/, // 成功標記
-		/successful/i, // 成功訊息
-	],
-	// 可跳過的重複訊息（快速變化的進度）
-	skipPatterns: [
-		/^Writing flash:/i, // 寫入進度（快速變化）
-		/^Erasing flash/i, // 擦除進度
-		/^Uploading:/i, // 上傳百分比
-	],
-
-	/**
-	 * 判斷訊息是否重要
-	 */
-	isImportant(text) {
-		return this.importantPatterns.some(pattern => pattern.test(text));
-	},
-
-	/**
-	 * 判斷訊息是否可跳過（快速變化的進度訊息）
-	 */
-	isSkippable(text) {
-		return this.skipPatterns.some(pattern => pattern.test(text));
-	},
-
-	/**
-	 * 決定是否應該顯示此訊息
-	 * @param {string} text - 要顯示的文字
-	 * @param {number} progress - 當前進度百分比（用於判斷是否有實質進度變化）
-	 */
-	shouldShow(text, progress = -1) {
-		const now = Date.now();
-
-		// 進度百分比有變化時，優先顯示（跳過時間限制）
-		const hasProgressChange = progress >= 0 && progress !== this.lastProgress;
-		if (hasProgressChange) {
-			this.lastProgress = progress;
-		}
-
-		// 如果上一個是重要訊息，確保它至少顯示 importantMinDisplay 時間
-		// 但如果進度有變化，允許更新
-		if (this.lastImportantTime > 0 && now - this.lastImportantTime < this.importantMinDisplay) {
-			// 除非新訊息也是重要訊息，或進度有變化，否則延遲顯示
-			if (!this.isImportant(text) && !hasProgressChange) {
-				return false;
-			}
-		}
-
-		// 重要訊息：一定顯示，且記錄時間
-		if (this.isImportant(text)) {
-			this.lastMessage = text;
-			this.lastShowTime = now;
-			this.lastImportantTime = now;
-			return true;
-		}
-
-		// 完全相同的訊息：跳過
-		if (text === this.lastMessage) {
-			return false;
-		}
-
-		// 快速變化的進度訊息：套用最小間隔（但進度有變化時放寬限制）
-		if (this.isSkippable(text) && !hasProgressChange) {
-			if (now - this.lastShowTime < this.minInterval) {
-				return false;
-			}
-		}
-
-		// 一般訊息：更新狀態並顯示
-		this.lastMessage = text;
-		this.lastShowTime = now;
-		return true;
-	},
-
-	/**
-	 * 重置過濾器狀態（上傳開始時呼叫）
-	 */
-	reset() {
-		this.lastMessage = '';
-		this.lastShowTime = 0;
-		this.lastImportantTime = 0;
-		this.lastProgress = -1;
-	},
-};
+function formatUploadProgress(message, stageMessages, boardName, getMessage) {
+	const packages = message.packages;
+	if (packages && (packages.phase === 'download' || packages.phase === 'install')) {
+		const key = packages.phase === 'download' ? 'UPLOAD_PACKAGES_DOWNLOADING' : 'UPLOAD_PACKAGES_INSTALLING';
+		const fallback = packages.phase === 'download' ? 'Downloading {0} tools' : 'Installing {0} tools';
+		const label = getMessage(key, fallback).replace('{0}', boardName).replace(/\s+/g, ' ').trim();
+		const percent = typeof packages.percent === 'number' ? packages.percent : null;
+		return { text: percent === null ? label : `${label} ${percent}%`, value: percent };
+	}
+	const stageText = stageMessages[message.stage] || message.stage || '';
+	const percent = typeof message.progress === 'number' && isFinite(message.progress) ? Math.round(message.progress) : null;
+	return { text: percent === null ? stageText : `${stageText} ${percent}%`, value: percent };
+}
 
 /**
  * 處理上傳進度訊息
  * @param {Object} message - 進度訊息
  */
 function handleUploadProgress(message) {
-	log.info('[blockly] 上傳進度', { stage: message.stage, progress: message.progress, message: message.message });
+	log.info('[blockly] 上傳進度', { stage: message.stage, progress: message.progress, message: message.message, packages: message.packages });
 
 	// T041: 階段訊息對應（支援 MicroPython 與 Arduino）
 	const stageMessages = {
@@ -7736,30 +7694,15 @@ function handleUploadProgress(message) {
 		agent_upgrade_needed: window.languageManager?.getMessage('OTA_AGENT_UPGRADE_NEEDED', 'Agent upgrade needed'),
 	};
 
-	const stageText = stageMessages[message.stage] || message.stage;
+	const boardKey = window.getCurrentBoard?.() || window.currentBoard;
+	const boardName = window.BOARD_CONFIGS?.[boardKey]?.name || boardKey || '';
+	const view = formatUploadProgress(message, stageMessages, boardName, (key, fallback) =>
+		window.languageManager?.getMessage(key, fallback) || fallback
+	);
 
-	// 建構進度文字：保留完整資訊 "階段 (進度%) - 詳細訊息"
-	let progressText;
-
-	if (message.message) {
-		// 組合完整進度資訊：階段 (進度%) - 詳細訊息
-		progressText = `${stageText} (${message.progress}%) - ${message.message}`;
-	} else if (message.subProgress !== undefined && message.subProgress > 0) {
-		// 有子進度但無詳細訊息，顯示子進度
-		progressText = `${stageText} (${message.subProgress}%)`;
-	} else {
-		// 一般階段只顯示總進度
-		progressText = `${stageText} (${message.progress}%)`;
-	}
-
-	// 智慧過濾：避免訊息跳太快或重複顯示
-	// 傳入進度百分比，讓進度變化時優先顯示；被略過時提示仍保留上一個狀態
-	if (!uploadProgressFilter.shouldShow(progressText, message.progress)) {
-		return; // 跳過此訊息
-	}
-
+	// 只顯示短標籤與進度條；工具原始輸出由 Extension 寫到輸出面板（spec 076）
 	// 進度提示持續顯示到成功或失敗（handleUploadResult），經過時間由提示本身每秒更新
-	toast.showProgress(progressText, uploadState.startTime || undefined);
+	toast.showProgress(view.text, uploadState.startTime || undefined, view.value);
 }
 
 /**

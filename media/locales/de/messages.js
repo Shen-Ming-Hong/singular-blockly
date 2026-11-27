@@ -1028,6 +1028,8 @@ window.languageManager.loadMessages('de', {
 	ARDUINO_STAGE_CHECKING: 'Compiler überprüfen',
 	ARDUINO_STAGE_DETECTING: 'Board erkennen',
 	ARDUINO_STAGE_COMPILING: 'Kompilieren',
+	UPLOAD_PACKAGES_DOWNLOADING: '{0}-Werkzeuge werden heruntergeladen',
+	UPLOAD_PACKAGES_INSTALLING: '{0}-Werkzeuge werden installiert',
 	ARDUINO_STAGE_UPLOADING: 'Hochladen',
 
 	// Arduino Upload Results

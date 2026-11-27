@@ -1025,6 +1025,8 @@ window.languageManager.loadMessages('ru', {
 	ARDUINO_STAGE_CHECKING: 'Проверка компилятора',
 	ARDUINO_STAGE_DETECTING: 'Обнаружение платы',
 	ARDUINO_STAGE_COMPILING: 'Компиляция',
+	UPLOAD_PACKAGES_DOWNLOADING: 'Загрузка инструментов {0}',
+	UPLOAD_PACKAGES_INSTALLING: 'Установка инструментов {0}',
 	ARDUINO_STAGE_UPLOADING: 'Загрузка',
 
 	// Arduino Upload Results

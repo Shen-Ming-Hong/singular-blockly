@@ -1029,6 +1029,8 @@ window.languageManager.loadMessages('pl', {
 	ARDUINO_STAGE_CHECKING: 'Sprawdzanie kompilatora',
 	ARDUINO_STAGE_DETECTING: 'Wykrywanie płytki',
 	ARDUINO_STAGE_COMPILING: 'Kompilacja',
+	UPLOAD_PACKAGES_DOWNLOADING: 'Pobieranie narzędzi {0}',
+	UPLOAD_PACKAGES_INSTALLING: 'Instalowanie narzędzi {0}',
 	ARDUINO_STAGE_UPLOADING: 'Wgrywanie',
 
 	// Arduino Upload Results
