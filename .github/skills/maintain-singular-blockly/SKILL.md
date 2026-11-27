@@ -14,6 +14,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 3. 分清楚貢獻者技能與產品技能：前者以 `.github/skills/` 為來源、由 `.agents/skills/` 連結；後者由 `resources/project-skills/singular-blockly/` 封裝並安裝到使用者專案。不要直接改生成或已安裝副本。
 4. 沿用 `AGENTS.md` 的架構與安全規則。處理程式碼安全時使用 `security-checker`；有翻譯變更時使用 `i18n-maintenance`；範例、依賴、回饋或硬體問題使用相應專用技能。
 5. **任何提案與任何 UI/UX 修改都要先查業界現代主流標準（強制）。** 提案（新功能、新畫面、互動流程、開發流程或工具鏈的方向）與修改元件的 UI/UX（WebView 面板、對話框、選單、工具箱、捲軸、按鈕、主題配色、通知與錯誤畫面等）之前，先查現代主流標準與同類產品怎麼做，再回來評估本站最合適的做法。依 [業界標準參考與回報](references/industry-standards.md) 選參考並套用回報模板：交給 Ray 的每則提案或 UI/UX 回報、PR 描述都要有 (1) 業界參考（名稱與連結）、(2) 現況與標準的差距、(3) 建議的下一步與理由取捨，少一段就是還沒完成。
+   - 改到 WebView 的 HTML、CSS、JavaScript 或 CSP 時，先用 `modern-web-guidance` 查現代網頁平台做法（原生 `<dialog>`、Popover、捲軸、焦點、Trusted Types 等），並照它的平台條件套用：webview 只跑 VS Code 內建的 Chromium、沙箱擋掉 `alert()`／`confirm()`、配色用 `--vscode-*` 變數。
    - 至少比對兩個參考，其中一個是同類工具：VS Code UX Guidelines 與 Webview 規範、Blockly／Scratch／MakeCode 等積木編輯器，再加上 WCAG 2.2、Material、Fluent、Apple HIG、GitHub Primer 等標準或設計系統；查實際畫面或官方文件，不憑印象。
    - 對照它們在亮色／深色主題、狀態（hover、focus、disabled、選取）、間距、對比與互動上的共同做法，再依本站情境取捨：VS Code 主題變數與 Blockly 既有樣式優先，兒童與教學使用者需要的可讀性與點擊範圍，以及不破壞既有使用者的習慣。
    - 判斷 UX 好不好，用「第一次用的學生或老師會不會卡住」，純視覺偏好不算問題。逐項看：找不到下一步、看不懂標示、主要按鈕要捲很遠才找得到、不能復原的動作沒有確認、浮動元件蓋住內容、停用的按鈕沒說原因、空白區沒有引導。
