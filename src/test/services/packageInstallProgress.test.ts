@@ -7,6 +7,7 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import {
+	PACKAGE_PHASE_SETTLE_MS,
 	PACKAGE_PROGRESS_CAP,
 	PackageInstallProgressTracker,
 	ProgressFileSystem,
@@ -58,14 +59,48 @@ suite('packageInstallProgress (spec 076)', () => {
 	});
 
 	test('reports nothing until PlatformIO starts installing, then follows download and unpack lines', () => {
-		const tracker = new PackageInstallProgressTracker(dirs, 100, fakeFileSystem({}));
+		let now = 0;
+		const tracker = new PackageInstallProgressTracker(dirs, 100, fakeFileSystem({}), () => now);
 		assert.strictEqual(tracker.snapshot(), null);
 		assert.strictEqual(tracker.observeOutput('Resolving esp32 dependencies...\n'), false);
-		assert.strictEqual(tracker.observeOutput('Tool Manager: Installing platformio/tool @ 1.0\nDownloading 0% 10%'), true);
+		assert.strictEqual(tracker.observeOutput('Tool Manager: Installing platformio/tool @ 1.0\nDownloading 0% 10%'), true, 'First phase shows at once');
 		assert.strictEqual(tracker.snapshot()?.phase, 'download');
-		assert.strictEqual(tracker.observeOutput('Unpacking 0% 10%\n'), true);
-		assert.strictEqual(tracker.snapshot()?.phase, 'install');
+		assert.strictEqual(tracker.observeOutput('Unpacking 0% 10%\n'), false, 'A new phase waits to settle');
+		assert.strictEqual(tracker.snapshot()?.phase, 'download');
+		now += PACKAGE_PHASE_SETTLE_MS;
+		assert.strictEqual(tracker.snapshot()?.phase, 'install', 'A phase that lasts switches the label');
 		assert.strictEqual(tracker.observeOutput('  Downloading six-1.17.0.whl (pip, indented)\n'), false, 'Indented pip lines do not switch phase');
+	});
+
+	test('does not flicker when small packages alternate download and unpack quickly', () => {
+		let now = 0;
+		const tracker = new PackageInstallProgressTracker(dirs, 100, fakeFileSystem({}), () => now);
+		tracker.observeOutput('Tool Manager: Installing platformio/toolchain @ 1.0\nDownloading 0%');
+		now += 10_000;
+		tracker.observeOutput('Unpacking 0%\n');
+		now += 10_000;
+		assert.strictEqual(tracker.snapshot()?.phase, 'install');
+		for (let i = 0; i < 5; i++) {
+			tracker.observeOutput('Tool Manager: Installing platformio/small @ 1.0\nDownloading 0%');
+			now += 500;
+			tracker.observeOutput('Unpacking 0%\n');
+			now += 500;
+			assert.strictEqual(tracker.snapshot()?.phase, 'install', 'Short downloads do not flip the label');
+		}
+	});
+
+	test('measures downloads through an open handle when available (Windows lags path-based sizes)', async () => {
+		const file = path.join(dirs.downloads, 'tmp1234');
+		const files: Record<string, number> = { [file]: 0 };
+		const fileSystem = { ...fakeFileSystem(files), openFileSize: async (target: string) => (target === file ? 42_000 : 0) };
+		const tracker = new PackageInstallProgressTracker(dirs, 100_000, fileSystem);
+		await tracker.start();
+		delete files[file];
+		files[path.join(dirs.downloads, 'tmp5678')] = 0;
+		fileSystem.openFileSize = async () => 42_000;
+		tracker.observeOutput('Tool Manager: Installing platformio/toolchain @ 1.0\n');
+		assert.strictEqual(await tracker.sample(), 42_000);
+		assert.strictEqual(tracker.snapshot()?.percent, 42);
 	});
 
 	test('counts only new entries, keeps temp peaks after cleanup, and never goes backwards', async () => {

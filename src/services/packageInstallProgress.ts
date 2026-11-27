@@ -56,12 +56,29 @@ export function resolvePlatformioDirectories(env: NodeJS.ProcessEnv = process.en
 export interface ProgressFileSystem {
 	readdir(dir: string): Promise<string[]>;
 	lstat(target: string): Promise<{ size: number; isDirectory(): boolean; isSymbolicLink(): boolean }>;
+	/**
+	 * Size of a file that may still be open for writing. On Windows, path-based stat can
+	 * return the directory entry's size, which lags until the writer closes the file
+	 * (seen on Ray's PC: download stayed at 0%), so measure through an open handle.
+	 */
+	openFileSize?(target: string): Promise<number>;
 }
 
 export const nodeProgressFileSystem: ProgressFileSystem = {
 	readdir: dir => fs.promises.readdir(dir),
 	lstat: target => fs.promises.lstat(target),
+	openFileSize: async target => {
+		const handle = await fs.promises.open(target, 'r');
+		try {
+			return (await handle.stat()).size;
+		} finally {
+			await handle.close();
+		}
+	},
 };
+
+/** A new phase must last this long before the label switches, so small packages do not make it flicker. */
+export const PACKAGE_PHASE_SETTLE_MS = 3000;
 
 const PHASE_PATTERN = /^(?:[\w ]+Manager:\s*)?(Installing|Downloading|Unpacking)\b/gm;
 
@@ -73,13 +90,16 @@ export class PackageInstallProgressTracker {
 	private readonly baseline = { downloads: new Set<string>(), packages: new Set<string>(), platforms: new Set<string>() };
 	private readonly tmpPeaks = new Map<string, number>();
 	private phase: PackageProgressPhase | null = null;
+	private rawPhase: PackageProgressPhase | null = null;
+	private rawSince = 0;
 	private measured = 0;
 	private sampling = false;
 
 	constructor(
 		private readonly dirs: PlatformioDirectories,
 		private readonly expectedBytes: number | undefined,
-		private readonly fileSystem: ProgressFileSystem = nodeProgressFileSystem
+		private readonly fileSystem: ProgressFileSystem = nodeProgressFileSystem,
+		private readonly now: () => number = Date.now
 	) {}
 
 	async start(): Promise<void> {
@@ -90,15 +110,32 @@ export class PackageInstallProgressTracker {
 		}
 	}
 
-	/** Update the phase from PlatformIO output. Returns true when the phase changed. */
+	/** Update the phase from PlatformIO output. Returns true when the shown phase changed. */
 	observeOutput(text: string): boolean {
-		let next: PackageProgressPhase | null = this.phase;
+		let next = this.rawPhase;
 		for (const match of text.matchAll(PHASE_PATTERN)) {
 			next = match[1] === 'Unpacking' ? 'install' : 'download';
 		}
-		const changed = next !== this.phase;
-		this.phase = next;
-		return changed;
+		if (next !== this.rawPhase) {
+			this.rawPhase = next;
+			this.rawSince = this.now();
+		}
+		return this.settlePhase();
+	}
+
+	/**
+	 * PlatformIO alternates download/unpack for every package; show a new phase only after
+	 * it has lasted PACKAGE_PHASE_SETTLE_MS, except for the very first one.
+	 */
+	private settlePhase(): boolean {
+		if (this.rawPhase === this.phase) {
+			return false;
+		}
+		if (this.phase === null || this.now() - this.rawSince >= PACKAGE_PHASE_SETTLE_MS) {
+			this.phase = this.rawPhase;
+			return true;
+		}
+		return false;
 	}
 
 	/** Measure new bytes; never decreases. Skips when a previous sample is still running. */
@@ -109,7 +146,12 @@ export class PackageInstallProgressTracker {
 		this.sampling = true;
 		try {
 			let total = 0;
-			for (const key of ['downloads', 'packages', 'platforms'] as const) {
+			for (const name of await this.list(this.dirs.downloads)) {
+				if (!this.baseline.downloads.has(name)) {
+					total += await this.downloadSize(path.join(this.dirs.downloads, name));
+				}
+			}
+			for (const key of ['packages', 'platforms'] as const) {
 				for (const name of await this.list(this.dirs[key])) {
 					if (!this.baseline[key].has(name)) {
 						total += await this.sizeOf(path.join(this.dirs[key], name));
@@ -138,6 +180,7 @@ export class PackageInstallProgressTracker {
 
 	/** Null until PlatformIO starts installing something. */
 	snapshot(): PackageProgress | null {
+		this.settlePhase();
 		if (!this.phase) {
 			return null;
 		}
@@ -150,6 +193,18 @@ export class PackageInstallProgressTracker {
 		} catch {
 			return [];
 		}
+	}
+
+	/** Downloads may still be open for writing; prefer the handle-based size. */
+	private async downloadSize(target: string): Promise<number> {
+		if (this.fileSystem.openFileSize) {
+			try {
+				return await this.fileSystem.openFileSize(target);
+			} catch {
+				// Directory, vanished, or locked: fall back to the path-based size.
+			}
+		}
+		return this.sizeOf(target);
 	}
 
 	private async sizeOf(target: string): Promise<number> {

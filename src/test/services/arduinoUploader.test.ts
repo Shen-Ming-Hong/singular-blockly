@@ -477,7 +477,6 @@ suite('ArduinoUploader Tests', () => {
 			const packages = prepare.map(update => update.packages).filter(Boolean);
 			assert.ok(packages.length >= 2, 'Package progress is reported');
 			assert.strictEqual(packages[0]?.phase, 'download');
-			assert.strictEqual(packages[packages.length - 1]?.phase, 'install');
 			const percents = packages.map(item => item?.percent).filter((value): value is number => typeof value === 'number');
 			assert.ok(percents.length > 0, 'Measured bytes become a percent');
 			assert.deepStrictEqual(percents, [...percents].sort((a, b) => a - b), 'Percent never goes backwards');
