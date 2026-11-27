@@ -244,5 +244,9 @@ describe('Upload progress toast contract', () => {
 			format({ stage: 'checking_pio', progress: 18, message: 'x', packages: { phase: 'install', percent: null } }, stages, 'ESP32', get),
 			{ text: 'Installing ESP32 tools', value: null }
 		);
+		assert.deepStrictEqual(
+			format({ stage: 'checking_pio', progress: 18, message: 'x', packages: { phase: 'finishing', percent: null } }, stages, 'ESP32', get),
+			{ text: 'Almost done setting up ESP32 tools', value: null }
+		);
 	});
 });

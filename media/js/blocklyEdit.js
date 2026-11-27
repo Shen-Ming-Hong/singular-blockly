@@ -7642,7 +7642,7 @@ function setUploadButtonState(state) {
 
 /**
  * 把上傳進度訊息轉成提示用的短標籤與進度條數值（spec 076）
- * 第一次準備套件時顯示「正在下載／安裝 {板子} 工具 N%」，其餘顯示「階段 N%」；不使用 message 原文。
+ * 第一次準備套件時顯示「正在下載／安裝 {板子} 工具 N%」或「即將完成」，其餘顯示「階段 N%」；不使用 message 原文。
  * @param {Object} message - uploadProgress 訊息
  * @param {Object<string, string>} stageMessages - 階段代號對應的本地化名稱
  * @param {string} boardName - 目前開發板的顯示名稱
@@ -7651,9 +7651,14 @@ function setUploadButtonState(state) {
  */
 function formatUploadProgress(message, stageMessages, boardName, getMessage) {
 	const packages = message.packages;
-	if (packages && (packages.phase === 'download' || packages.phase === 'install')) {
-		const key = packages.phase === 'download' ? 'UPLOAD_PACKAGES_DOWNLOADING' : 'UPLOAD_PACKAGES_INSTALLING';
-		const fallback = packages.phase === 'download' ? 'Downloading {0} tools' : 'Installing {0} tools';
+	const packageLabels = {
+		download: ['UPLOAD_PACKAGES_DOWNLOADING', 'Downloading {0} tools'],
+		install: ['UPLOAD_PACKAGES_INSTALLING', 'Installing {0} tools'],
+		// 預估量用完後的最後一段（小工具、pip）：不顯示停住的 95%，改成「即將完成」加來回移動的進度條
+		finishing: ['UPLOAD_PACKAGES_FINISHING', 'Almost done setting up {0} tools'],
+	};
+	if (packages && packageLabels[packages.phase]) {
+		const [key, fallback] = packageLabels[packages.phase];
 		const label = getMessage(key, fallback).replace('{0}', boardName).replace(/\s+/g, ' ').trim();
 		const percent = typeof packages.percent === 'number' ? packages.percent : null;
 		return { text: percent === null ? label : `${label} ${percent}%`, value: percent };

@@ -1028,6 +1028,7 @@ window.languageManager.loadMessages('cs', {
 	ARDUINO_STAGE_COMPILING: 'Kompilace',
 	UPLOAD_PACKAGES_DOWNLOADING: 'Stahování nástrojů {0}',
 	UPLOAD_PACKAGES_INSTALLING: 'Instalace nástrojů {0}',
+	UPLOAD_PACKAGES_FINISHING: 'Instalace nástrojů {0} je téměř hotová',
 	ARDUINO_STAGE_UPLOADING: 'Nahrávání',
 
 	// Arduino Upload Results

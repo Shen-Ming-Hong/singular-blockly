@@ -9,7 +9,8 @@ import * as os from 'os';
 import * as path from 'path';
 
 /** Package preparation phase shown to the user (spec 076). */
-export type PackageProgressPhase = 'download' | 'install';
+/** `finishing`: the byte estimate is used up (small tools, pip); shown with a moving bar instead of a stuck 95%. */
+export type PackageProgressPhase = 'download' | 'install' | 'finishing';
 
 /** Progress of `pio pkg install`; `percent: null` means indeterminate. */
 export interface PackageProgress {
@@ -186,7 +187,11 @@ export class PackageInstallProgressTracker {
 		if (!this.phase) {
 			return null;
 		}
-		return { phase: this.phase, percent: computePackagePercent(this.measured, this.expectedBytes) };
+		const percent = computePackagePercent(this.measured, this.expectedBytes);
+		if (percent !== null && percent >= PACKAGE_PROGRESS_CAP) {
+			return { phase: 'finishing', percent: null };
+		}
+		return { phase: this.phase, percent };
 	}
 
 	private async list(dir: string): Promise<string[]> {

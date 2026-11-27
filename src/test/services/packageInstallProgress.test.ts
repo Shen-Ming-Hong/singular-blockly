@@ -122,6 +122,10 @@ suite('packageInstallProgress (spec 076)', () => {
 		delete files[path.join(dirs.downloads, 'new.tar.gz')];
 		assert.strictEqual(await tracker.sample(), 800, 'Measured bytes never decrease');
 		assert.deepStrictEqual(tracker.snapshot(), { phase: 'download', percent: 80 });
+
+		files[path.join(dirs.platforms, 'espressif32', 'x')] = 400;
+		await tracker.sample();
+		assert.deepStrictEqual(tracker.snapshot(), { phase: 'finishing', percent: null }, 'At the cap it shows finishing with a moving bar, not a stuck 95%');
 	});
 
 	test('ignores unreadable folders instead of failing the upload', async () => {

@@ -480,7 +480,7 @@ suite('ArduinoUploader Tests', () => {
 			const percents = packages.map(item => item?.percent).filter((value): value is number => typeof value === 'number');
 			assert.ok(percents.length > 0, 'Measured bytes become a percent');
 			assert.deepStrictEqual(percents, [...percents].sort((a, b) => a - b), 'Percent never goes backwards');
-			assert.ok(percents.every(value => value <= 95), 'Percent is capped at 95');
+			assert.ok(percents.every(value => value < 95), 'Percent stays below the cap; the cap becomes the finishing phase');
 			assert.ok(downloaded > 0);
 		});
 

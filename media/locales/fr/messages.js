@@ -1029,6 +1029,7 @@ window.languageManager.loadMessages('fr', {
 	ARDUINO_STAGE_COMPILING: 'Compilation',
 	UPLOAD_PACKAGES_DOWNLOADING: 'Téléchargement des outils {0}',
 	UPLOAD_PACKAGES_INSTALLING: 'Installation des outils {0}',
+	UPLOAD_PACKAGES_FINISHING: 'Installation des outils {0} presque terminée',
 	ARDUINO_STAGE_UPLOADING: 'Téléversement',
 
 	// Arduino Upload Results

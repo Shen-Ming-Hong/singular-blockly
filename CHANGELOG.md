@@ -28,8 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🎨 介面 UI
 
-- 上傳進度提示改成一句短標籤加一條進度條，例如「編譯中 35%」；第一次準備 ESP32 等開發板的工具時，會顯示「正在下載 ESP32 工具 12%」與「正在安裝 ESP32 工具 63%」，不再長時間停在同一個數字。PlatformIO 的詳細訊息改到「Singular Blockly」輸出面板
-  The upload progress notice is now one short label with a progress bar, for example "Compiling 35%"; the first time tools for a board such as ESP32 are prepared, it shows "Downloading ESP32 tools 12%" and "Installing ESP32 tools 63%" instead of sitting on one number for a long time. Detailed PlatformIO output now goes to the "Singular Blockly" output panel
+- 上傳進度提示改成一句短標籤加一條進度條，例如「編譯中 35%」；第一次準備 ESP32 等開發板的工具時，會顯示「正在下載 ESP32 工具 12%」與「正在安裝 ESP32 工具 63%」，最後裝小工具的階段顯示「即將完成」，不再長時間停在同一個數字。PlatformIO 的詳細訊息改到「Singular Blockly」輸出面板
+  The upload progress notice is now one short label with a progress bar, for example "Compiling 35%"; the first time tools for a board such as ESP32 are prepared, it shows "Downloading ESP32 tools 12%" and "Installing ESP32 tools 63%" and "Almost done" for the last small tools, instead of sitting on one number for a long time. Detailed PlatformIO output now goes to the "Singular Blockly" output panel
 
 ## [0.93.0] - 2026-11-16
 
