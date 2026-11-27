@@ -20,14 +20,16 @@ export interface PackageProgress {
 /**
  * Bytes written by a first-time `pio pkg install` per board: downloaded archives
  * + largest unpack temp folder + new package folders (spec 076 research R2,
- * measured with PlatformIO 6.1.18). The 95% cap absorbs per-OS differences.
+ * measured with PlatformIO 6.1.18). ESP32 uses the Windows measurement (2.75 GB,
+ * Linux 2.51 GB); the other boards scale their Linux numbers by the same 1.1.
+ * The 95% cap absorbs the rest.
  */
 export const PACKAGE_INSTALL_ESTIMATED_BYTES: Readonly<Record<string, number>> = {
-	uno: 550_000_000,
-	nano: 550_000_000,
-	mega: 550_000_000,
-	esp32: 2_550_000_000,
-	supermini: 3_900_000_000,
+	uno: 600_000_000,
+	nano: 600_000_000,
+	mega: 600_000_000,
+	esp32: 2_800_000_000,
+	supermini: 4_300_000_000,
 };
 
 /** Highest percent shown before PlatformIO reports completion. */
