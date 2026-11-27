@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.94.0] - 2026-11-27
 
 ### 🐛 修復 Bug Fixes
 
@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Downloading ESP32 packages for the first time is no longer stopped after two minutes: preparing packages may take up to 30 minutes and building up to 10 minutes. Singular Core removes packages left incomplete by an earlier stop and downloads them again
 - Windows 使用者名稱較長（超過 13 字元，或網域帳號）時，ESP32 編譯改用 `C:\SingularBlockly-…` 資料夾，避免編譯指令超過 Windows 的長度上限而失敗
   On Windows accounts with longer user names (over 13 characters, or domain accounts), ESP32 builds use a `C:\SingularBlockly-…` folder so the compile command stays within the Windows length limit
+- 編譯與上傳進度提示會一直顯示到成功或失敗，不再在 30 秒沒有新進度時消失又重新跳出；提示右側會顯示經過時間
+  The compile and upload progress notice now stays until the upload succeeds or fails, instead of disappearing after 30 seconds without new progress and popping up again; it also shows the elapsed time
+- 在備份管理建立備份時，名稱空白、含不允許的字元或建立失敗，錯誤訊息會直接顯示在對話框內，不再按「確認」完全沒有反應
+  When creating a backup in the backup manager with an empty name, a name with characters that are not allowed, or a failed save, the error now appears inside the dialog instead of nothing happening when you press Confirm
+- 意見回饋不再因為內容含有檔案路徑、序列埠、IP 位址、程式碼或終端機輸出而整段被拒收：路徑、序列埠、IP 與 ID 會自動換成 `[path]`、`[serial port]`、`[IP]`、`[ID]`，預覽會顯示遮蔽後的內容；密碼、權杖、私密金鑰與帶帳密的網址仍會被拒絕
+  Feedback is no longer rejected for containing file paths, serial ports, IP addresses, code, or terminal output: paths, serial ports, IPs, and IDs are replaced with `[path]`, `[serial port]`, `[IP]`, and `[ID]` automatically and the preview shows the redacted text; passwords, tokens, private keys, and URLs with credentials are still rejected
 
 ### ⚡ 效能 Performance
 
@@ -39,6 +45,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - 上傳進度提示改成一句短標籤加一條進度條，例如「編譯中 35%」；第一次準備 ESP32 等開發板的工具時，會顯示「正在下載 ESP32 工具 12%」與「正在安裝 ESP32 工具 63%」，最後裝小工具的階段顯示「即將完成」，不再長時間停在同一個數字。PlatformIO 的詳細訊息改到「Singular Blockly」輸出面板
   The upload progress notice is now one short label with a progress bar, for example "Compiling 35%"; the first time tools for a board such as ESP32 are prepared, it shows "Downloading ESP32 tools 12%" and "Installing ESP32 tools 63%" and "Almost done" for the last small tools, instead of sitting on one number for a long time. Detailed PlatformIO output now goes to the "Singular Blockly" output panel
+
+### ♿ 無障礙 Accessibility
+
+- 備份管理、搜尋積木、CyberBrick 範例、TXT 連線設定與 CyberBrick 上傳設定對話框開著時，Tab 鍵不會再跑到背後的編輯區與工具列；關閉鈕改成真正的按鈕
+  While the backup manager, block search, CyberBrick samples, TXT connection settings, or CyberBrick upload settings dialog is open, Tab no longer moves to the editor and toolbar behind it, and the close buttons are real buttons
+- 工具列的開發板與語言選單可以用方向鍵選擇，螢幕閱讀器也能正確讀出目前選項
+  The board and language menus in the toolbar can be operated with the arrow keys, and screen readers announce the current option correctly
+
+### 🔧 維護 Maintenance
+
+- 更新內建的 Blockly 與 `@blockly/theme-modern` 至 13.5.0、`node-ssh` 至 14.0.0（fischertechnik TXT 連線已實機測試）
+  Updated the bundled Blockly and `@blockly/theme-modern` to 13.5.0 and `node-ssh` to 14.0.0 (the fischertechnik TXT connection was tested on hardware)
 
 ## [0.93.0] - 2026-11-16
 
