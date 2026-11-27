@@ -1028,6 +1028,9 @@ window.languageManager.loadMessages('tr', {
 	ARDUINO_STAGE_CHECKING: 'Derleyici kontrol ediliyor',
 	ARDUINO_STAGE_DETECTING: 'Kart algılanıyor',
 	ARDUINO_STAGE_COMPILING: 'Derleniyor',
+	UPLOAD_PACKAGES_DOWNLOADING: '{0} araçları indiriliyor',
+	UPLOAD_PACKAGES_INSTALLING: '{0} araçları kuruluyor',
+	UPLOAD_PACKAGES_FINISHING: '{0} araçlarının kurulumu bitmek üzere',
 	ARDUINO_STAGE_UPLOADING: 'Yükleniyor',
 
 	// Arduino Upload Results

@@ -1021,6 +1021,9 @@ window.languageManager.loadMessages('ko', {
 	ARDUINO_STAGE_CHECKING: '컴파일러 확인 중',
 	ARDUINO_STAGE_DETECTING: '보드 감지 중',
 	ARDUINO_STAGE_COMPILING: '컴파일 중',
+	UPLOAD_PACKAGES_DOWNLOADING: '{0} 도구 다운로드 중',
+	UPLOAD_PACKAGES_INSTALLING: '{0} 도구 설치 중',
+	UPLOAD_PACKAGES_FINISHING: '{0} 도구 설치가 곧 끝납니다',
 	ARDUINO_STAGE_UPLOADING: '업로드 중',
 
 	// Arduino 업로드 결과

@@ -5,6 +5,7 @@
  */
 
 import * as assert from 'assert';
+import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { ArduinoUploader, CommandExecutor, FileSystemInterface, StreamingCommandExecutor, findUnpinnedPlatformPackages } from '../../services/arduinoUploader';
@@ -428,12 +429,35 @@ suite('ArduinoUploader Tests', () => {
 			assert.ok((timeouts.run ?? 0) >= 10 * 60 * 1000);
 		});
 
-		test('Shows PlatformIO install lines while preparing packages (spec 074)', async () => {
+		test('Reports package download and install progress without raw PlatformIO lines (spec 076)', async () => {
 			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			let downloaded = 0;
+			const files: Record<string, number> = {};
+			const fakeFs = {
+				readdir: async (dir: string) => {
+					const prefix = dir.endsWith(path.sep) ? dir : dir + path.sep;
+					const names = Object.keys(files).filter(file => file.startsWith(prefix)).map(file => file.slice(prefix.length).split(path.sep)[0]);
+					if (names.length === 0) {throw new Error('ENOENT');}
+					return [...new Set(names)];
+				},
+				lstat: async (target: string) => ({
+					size: files[target] ?? 0,
+					isDirectory: () => !(target in files),
+					isSymbolicLink: () => false,
+				}),
+			};
+			const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(
-				async (_command: string, args: string[], _options: unknown, onStdout?: (data: string) => void) => {
+				async (_command: string, args: string[], options: { env?: NodeJS.ProcessEnv }, onStdout?: (data: string) => void) => {
 					if (args[0] === 'pkg') {
-						onStdout?.('Resolving esp32 dependencies...\nTool Manager: Installing platformio/toolchain-xtensa-esp32 @ 8.4.0\nsome other line\nUnpacking\n');
+						const core = options.env?.PLATFORMIO_CORE_DIR ?? path.join(os.homedir(), '.platformio');
+						onStdout?.('Resolving esp32 dependencies...\nTool Manager: Installing platformio/toolchain-xtensa-esp32 @ 8.4.0\nDownloading 0% 10%');
+						downloaded = 1_000_000_000;
+						files[path.join(core, '.cache', 'downloads', 'archive')] = downloaded;
+						await wait(40);
+						onStdout?.('Unpacking 0% 10% 20%\n');
+						files[path.join(core, '.cache', 'tmp', 'pkg-installing-a', 'f')] = 900_000_000;
+						await wait(40);
 					}
 					return { code: 0, stdout: 'success', stderr: '' };
 				}
@@ -442,17 +466,26 @@ suite('ArduinoUploader Tests', () => {
 				testWorkspacePath, mockExecutor, mockFileSystem, mockSettingsManager, mockStreamingExecutor,
 				undefined, manager, () => true
 			);
+			uploader.progressFileSystem = fakeFs;
+			uploader.packageProgressIntervalMs = 5;
 			const progress: ArduinoUploadProgress[] = [];
 
 			await uploader.upload({ code: 'void setup() {}', board: 'esp32' }, update => progress.push(update));
 
-			const prepare = progress.filter(update => update.stage === 'checking_pio' && update.progress === 18).map(update => update.message);
-			assert.deepStrictEqual(prepare, [
-				'Preparing project packages...',
-				'Resolving esp32 dependencies...',
-				'Tool Manager: Installing platformio/toolchain-xtensa-esp32 @ 8.4.0',
-				'Unpacking',
-			]);
+			const prepare = progress.filter(update => update.stage === 'checking_pio' && update.progress === 18);
+			assert.ok(prepare.every(update => update.message === 'Preparing project packages...'), 'Raw PlatformIO lines stay out of the progress message');
+			const packages = prepare.map(update => update.packages).filter(Boolean);
+			assert.ok(packages.length >= 2, 'Package progress is reported');
+			assert.strictEqual(packages[0]?.phase, 'download');
+			const percents = packages.map(item => item?.percent).filter((value): value is number => typeof value === 'number');
+			assert.ok(percents.length > 0, 'Measured bytes become a percent');
+			assert.deepStrictEqual(percents, [...percents].sort((a, b) => a - b), 'Percent never goes backwards');
+			assert.ok(percents.every(value => value < 95), 'Percent stays below the cap; the cap becomes the finishing phase');
+			assert.ok(downloaded > 0);
+			await new Promise(resolve => setTimeout(resolve, 30));
+			const lastPackages = progress.map((update, index) => (update.packages ? index : -1)).reduce((a, b) => Math.max(a, b), -1);
+			const firstCompile = progress.findIndex(update => update.stage === 'compiling');
+			assert.ok(firstCompile < 0 || lastPackages < firstCompile, 'No package progress after the compile stage starts');
 		});
 
 		test('Never retries another Core after the upload command has spawned', async () => {

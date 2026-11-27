@@ -28,6 +28,14 @@ import {
 	isWindowsPathLengthFailure,
 } from './coreFailureClassifier';
 import { PlatformioProcessError, runPlatformioProcess } from './platformioProcess';
+import {
+	PACKAGE_INSTALL_ESTIMATED_BYTES,
+	PackageInstallProgressTracker,
+	nodeProgressFileSystem,
+	resolvePlatformioDirectories,
+	type PackageProgress,
+	type ProgressFileSystem,
+} from './packageInstallProgress';
 
 /**
  * 預設的編譯逾時時間（毫秒）。ESP32 第一次編譯在較慢的電腦上可能超過兩分鐘，
@@ -113,6 +121,9 @@ export class ArduinoUploader {
 	private managedStorageRoot: string | null = null;
 	private managedWorkRoot: string | null = null;
 	private lastCoreSelectionFailure: CoreFailureClass | null = null;
+	/** Read-only file system and interval for package install progress (spec 076; injectable for tests). */
+	progressFileSystem: ProgressFileSystem = nodeProgressFileSystem;
+	packageProgressIntervalMs = 1000;
 
 	/**
 	 * 建立 ArduinoUploader 實例
@@ -362,26 +373,59 @@ export class ArduinoUploader {
 		return true;
 	}
 
-	private async prepareProjectPackages(onStatus?: (message: string) => void): Promise<void> {
+	private async prepareProjectPackages(board: string, onPackages?: (progress: PackageProgress) => void): Promise<void> {
 		const platformio = this.getPlatformioSpawnCommand(['pkg', 'install', '--project-dir', this.workspacePath]);
-		// The first ESP32 install downloads several hundred MB, so pass PlatformIO's
-		// install/download/unpack lines through instead of a frozen progress message.
-		const forward = (data: string): void => {
-			if (!onStatus) {return;}
-			for (const raw of data.split(/\r?\n|\r/)) {
-				const line = raw.trim();
-				if (/^(?:.*Manager:\s*)?(Installing|Downloading|Unpacking|Resolving)\b/i.test(line)) {
-					onStatus(this.redactManagedStorage(line).slice(0, 160));
-				}
+		// Spec 076: measure what PlatformIO writes (download, unpack, copy) so the editor
+		// can show one short label and a progress bar; raw lines go to the output panel only.
+		const tracker = new PackageInstallProgressTracker(
+			resolvePlatformioDirectories(platformio.env ?? process.env),
+			PACKAGE_INSTALL_ESTIMATED_BYTES[board],
+			this.progressFileSystem
+		);
+		await tracker.start();
+		let lastSent = '';
+		// A sample still running when PlatformIO exits must not report after the compile stage started.
+		let finished = false;
+		const report = (): void => {
+			const snapshot = finished ? null : tracker.snapshot();
+			if (!snapshot || !onPackages) {return;}
+			const key = `${snapshot.phase}:${snapshot.percent}`;
+			if (key !== lastSent) {
+				lastSent = key;
+				onPackages(snapshot);
 			}
 		};
-		const result = await this.streamingExecutor.spawn(
-			platformio.command,
-			platformio.args,
-			{ timeout: this.prepareTimeout, cwd: this.workspacePath, env: platformio.env },
-			forward,
-			forward
-		);
+		const forward = (data: string): void => {
+			for (const raw of data.split(/\r?\n|\r/)) {
+				const line = raw.trim();
+				if (/^(?:.*Manager:\s*)?(Installing|Resolving)\b|has been installed/i.test(line)) {
+					log('[arduino] PlatformIO 套件', 'info', { line: this.redactManagedStorage(line).slice(0, 200) });
+				}
+			}
+			if (tracker.observeOutput(data)) {
+				report();
+			}
+		};
+		const timer = setInterval(() => {
+			void tracker.sample().then(report, () => undefined);
+		}, this.packageProgressIntervalMs);
+		let result: { code: number; stdout: string; stderr: string };
+		try {
+			result = await this.streamingExecutor.spawn(
+				platformio.command,
+				platformio.args,
+				{ timeout: this.prepareTimeout, cwd: this.workspacePath, env: platformio.env },
+				forward,
+				forward
+			);
+		} finally {
+			finished = true;
+			clearInterval(timer);
+		}
+		if (tracker.snapshot()) {
+			const measured = await tracker.sample();
+			log('[arduino] 專案套件準備完成', 'info', { board, measuredBytes: measured, estimatedBytes: PACKAGE_INSTALL_ESTIMATED_BYTES[board] ?? null });
+		}
 		if (result.code !== 0) {
 			const tail = `${result.stdout}\n${result.stderr}`.split(/\r?\n/).filter(line => line.trim()).slice(-12).join('\n');
 			log('[arduino] PlatformIO 套件準備失敗', 'warn', { code: result.code, output: this.redactManagedStorage(tail) });
@@ -1231,7 +1275,9 @@ export class ArduinoUploader {
 		this.startTime = Date.now();
 
 		// 輔助函式：發送帶耗時的進度
-		const sendProgress = (stage: ArduinoUploadStage, progress: number, message: string, subProgress?: number, error?: string) => {
+		const sendProgress = (
+			stage: ArduinoUploadStage, progress: number, message: string, subProgress?: number, error?: string, packages?: PackageProgress
+		) => {
 			onProgress?.({
 				stage,
 				progress,
@@ -1239,6 +1285,7 @@ export class ArduinoUploader {
 				subProgress,
 				elapsed: this.getElapsed(),
 				error: error === undefined ? undefined : this.redactManagedStorage(error),
+				...(packages ? { packages } : {}),
 			});
 		};
 
@@ -1281,7 +1328,10 @@ export class ArduinoUploader {
 					phase: 'prepare',
 					operation: async environment => {
 						this.useCoreEnvironment(environment);
-						await this.prepareProjectPackages(message => sendProgress('checking_pio', 18, message));
+						await this.prepareProjectPackages(
+							request.board,
+							packages => sendProgress('checking_pio', 18, 'Preparing project packages...', undefined, undefined, packages)
+						);
 					},
 				});
 			}

@@ -2830,6 +2830,7 @@ export class WebViewMessageHandler {
 					progress: progress.progress,
 					message: progress.message,
 					error: progress.error,
+					packages: progress.packages,
 				});
 			});
 

@@ -274,6 +274,22 @@ suite('MessageHandler – generic requestUpload OTA fallback', () => {
 		assert.ok(messages.some((message: { command?: string; success?: boolean; port?: string }) => message.command === 'uploadResult' && message.success === true && message.port === 'COM7'));
 	});
 
+	test('requestUpload forwards Arduino package progress to the webview (spec 076)', async () => {
+		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
+		(handler as any).arduinoMonitorService = undefined;
+		(handler as any).createArduinoUploader = () => ({
+			upload: async (_request: unknown, onProgress: (progress: unknown) => void) => {
+				onProgress({ stage: 'checking_pio', progress: 18, message: 'Preparing project packages...', packages: { phase: 'install', percent: 42 } });
+				return { success: true, timestamp: '2026-11-27T00:00:00.000Z', port: 'auto', duration: 1, mode: 'upload' };
+			},
+		});
+
+		await (handler as any).handleArduinoUpload('/mock/workspace', { command: 'requestUpload', board: 'esp32', code: 'void setup() {}' });
+
+		const progress = webviewPostMessage.getCalls().map((call: sinon.SinonSpyCall) => call.args[0]).find((message: { command?: string }) => message.command === 'uploadProgress');
+		assert.deepStrictEqual(progress?.packages, { phase: 'install', percent: 42 });
+	});
+
 	test('requestUpload reports mpremote setup failure before falling back to OTA', async () => {
 		const { handler, webviewPostMessage } = makeHandlerHarness(sandbox, vscodeMock);
 		sandbox.stub(MicropythonUploader.prototype, 'ensureMpremoteAvailable').resolves({

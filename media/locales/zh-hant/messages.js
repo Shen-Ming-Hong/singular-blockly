@@ -1019,6 +1019,9 @@ window.languageManager.loadMessages('zh-hant', {
 	ARDUINO_STAGE_CHECKING: '檢查編譯器',
 	ARDUINO_STAGE_DETECTING: '偵測開發板',
 	ARDUINO_STAGE_COMPILING: '編譯中',
+	UPLOAD_PACKAGES_DOWNLOADING: '正在下載 {0} 工具',
+	UPLOAD_PACKAGES_INSTALLING: '正在安裝 {0} 工具',
+	UPLOAD_PACKAGES_FINISHING: '即將完成 {0} 工具的安裝',
 	ARDUINO_STAGE_UPLOADING: '上傳中',
 
 	// Arduino 上傳結果
