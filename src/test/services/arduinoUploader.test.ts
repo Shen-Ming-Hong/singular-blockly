@@ -428,6 +428,33 @@ suite('ArduinoUploader Tests', () => {
 			assert.ok((timeouts.run ?? 0) >= 10 * 60 * 1000);
 		});
 
+		test('Shows PlatformIO install lines while preparing packages (spec 074)', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(
+				async (_command: string, args: string[], _options: unknown, onStdout?: (data: string) => void) => {
+					if (args[0] === 'pkg') {
+						onStdout?.('Resolving esp32 dependencies...\nTool Manager: Installing platformio/toolchain-xtensa-esp32 @ 8.4.0\nsome other line\nUnpacking\n');
+					}
+					return { code: 0, stdout: 'success', stderr: '' };
+				}
+			);
+			const uploader = new ArduinoUploader(
+				testWorkspacePath, mockExecutor, mockFileSystem, mockSettingsManager, mockStreamingExecutor,
+				undefined, manager, () => true
+			);
+			const progress: ArduinoUploadProgress[] = [];
+
+			await uploader.upload({ code: 'void setup() {}', board: 'esp32' }, update => progress.push(update));
+
+			const prepare = progress.filter(update => update.stage === 'checking_pio' && update.progress === 18).map(update => update.message);
+			assert.deepStrictEqual(prepare, [
+				'Preparing project packages...',
+				'Resolving esp32 dependencies...',
+				'Tool Manager: Installing platformio/toolchain-xtensa-esp32 @ 8.4.0',
+				'Unpacking',
+			]);
+		});
+
 		test('Never retries another Core after the upload command has spawned', async () => {
 			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
 			const commands: string[] = [];

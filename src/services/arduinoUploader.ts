@@ -362,12 +362,25 @@ export class ArduinoUploader {
 		return true;
 	}
 
-	private async prepareProjectPackages(): Promise<void> {
+	private async prepareProjectPackages(onStatus?: (message: string) => void): Promise<void> {
 		const platformio = this.getPlatformioSpawnCommand(['pkg', 'install', '--project-dir', this.workspacePath]);
+		// The first ESP32 install downloads several hundred MB, so pass PlatformIO's
+		// install/download/unpack lines through instead of a frozen progress message.
+		const forward = (data: string): void => {
+			if (!onStatus) {return;}
+			for (const raw of data.split(/\r?\n|\r/)) {
+				const line = raw.trim();
+				if (/^(?:.*Manager:\s*)?(Installing|Downloading|Unpacking|Resolving)\b/i.test(line)) {
+					onStatus(this.redactManagedStorage(line).slice(0, 160));
+				}
+			}
+		};
 		const result = await this.streamingExecutor.spawn(
 			platformio.command,
 			platformio.args,
-			{ timeout: this.prepareTimeout, cwd: this.workspacePath, env: platformio.env }
+			{ timeout: this.prepareTimeout, cwd: this.workspacePath, env: platformio.env },
+			forward,
+			forward
 		);
 		if (result.code !== 0) {
 			const tail = `${result.stdout}\n${result.stderr}`.split(/\r?\n/).filter(line => line.trim()).slice(-12).join('\n');
@@ -1268,7 +1281,7 @@ export class ArduinoUploader {
 					phase: 'prepare',
 					operation: async environment => {
 						this.useCoreEnvironment(environment);
-						await this.prepareProjectPackages();
+						await this.prepareProjectPackages(message => sendProgress('checking_pio', 18, message));
 					},
 				});
 			}
