@@ -370,6 +370,8 @@ window.languageManager.loadMessages('en', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Python routing',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Package status',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Storage usage',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'PlatformIO work folder',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Windows long paths',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Fallback used',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Repair managed runtime',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Clean managed files',
@@ -378,6 +380,7 @@ window.languageManager.loadMessages('en', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Managed runtime repair completed.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Managed runtime repair failed. Open the output log for redacted details.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Managed cleanup completed: {0} downloads, {1} staging directories, and {2} old versions removed.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Also removed {0} unused PlatformIO package folders and {1} old project build folders.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Managed runtime cleanup failed. Unknown files were left untouched.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Unable to open the Singular Core folder. Finish initialization or repair the runtime, then try again.',
@@ -1035,6 +1038,7 @@ window.languageManager.loadMessages('en', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Compile successful!',
 	ARDUINO_UPLOAD_SUCCESS: 'Upload successful!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'File paths are too long for this Windows system. Choose a shorter Singular Core folder in Settings.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI not found. Please install PlatformIO first.',

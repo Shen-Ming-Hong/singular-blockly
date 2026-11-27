@@ -135,6 +135,10 @@ export interface CoreDiagnosticEnvironment {
 	failureClass: import('./coreEnvironment').CoreFailureClass | null;
 	reason: string;
 	provisioning?: import('./managedRuntime').ManagedRuntimeProvisioningState;
+	/** Windows only: privacy-safe PlatformIO work-root summary such as `local-app-data <pio-work-root:…>` (spec 074). */
+	workRootSummary?: string | null;
+	/** Windows only: read-only LongPathsEnabled state (spec 074). */
+	windowsLongPaths?: 'enabled' | 'disabled' | 'unknown';
 }
 
 export interface CoreDiagnosticSummary {
@@ -333,6 +337,8 @@ export interface PlatformioDiagnosticLocalizedStrings {
 	pythonSelectionLabel: string;
 	packageStatusLabel: string;
 	storageUsageLabel: string;
+	workRootLabel: string;
+	windowsLongPathsLabel: string;
 	fallbackUsedLabel: string;
 	scopeTitle: string;
 	workspaceLabel: string;

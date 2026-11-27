@@ -371,6 +371,8 @@ window.languageManager.loadMessages('pt-br', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Roteamento do Python',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Status dos pacotes',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Uso do armazenamento',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'Pasta de trabalho do PlatformIO',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Caminhos longos do Windows',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Alternativa usada',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Reparar ambiente gerenciado',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Limpar arquivos gerenciados',
@@ -379,6 +381,7 @@ window.languageManager.loadMessages('pt-br', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Reparo do ambiente gerenciado concluído.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Falha no reparo. Consulte o log de saída para ver os detalhes com dados confidenciais ocultos.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Limpeza concluída: {0} downloads, {1} diretórios temporários e {2} versões antigas removidos.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Também foram removidas {0} pastas de pacotes do PlatformIO sem uso e {1} pastas de compilação de projetos antigas.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Falha na limpeza do ambiente gerenciado. Arquivos desconhecidos não foram alterados.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Não foi possível abrir a pasta do Singular Core. Conclua a inicialização ou repare o ambiente gerenciado e tente novamente.',
@@ -1024,6 +1027,7 @@ window.languageManager.loadMessages('pt-br', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Compilação bem-sucedida!',
 	ARDUINO_UPLOAD_SUCCESS: 'Envio bem-sucedido!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'Os caminhos de arquivo são longos demais para este Windows. Escolha uma pasta mais curta para o Singular Core nas configurações.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI não encontrado. Por favor, instale o PlatformIO primeiro.',

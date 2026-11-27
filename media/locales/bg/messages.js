@@ -371,6 +371,8 @@ window.languageManager.loadMessages('bg', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Маршрутизиране на Python',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Състояние на пакетите',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Използвано място',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'Работна папка на PlatformIO',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Дълги пътища в Windows',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Използван резервен вариант',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Поправи управляваната среда',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Почисти управляваните файлове',
@@ -379,6 +381,7 @@ window.languageManager.loadMessages('bg', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Поправката на управляваната среда завърши.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Поправката е неуспешна. Вижте изходния журнал със скрити чувствителни данни.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Почистването завърши: премахнати са {0} изтегляния, {1} временни директории и {2} стари версии.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Премахнати са и неизползвани папки с пакети на PlatformIO ({0}) и стари папки за компилация на проекти ({1}).',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Почистването е неуспешно. Неизвестните файлове не са променени.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Папката на Singular Core не може да се отвори. Завършете инициализацията или поправете управляваната среда и опитайте отново.',
@@ -1031,6 +1034,7 @@ window.languageManager.loadMessages('bg', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Компилацията е успешна!',
 	ARDUINO_UPLOAD_SUCCESS: 'Качването е успешно!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'Пътищата на файловете са твърде дълги за тази система Windows. Изберете в настройките папка с по-кратък път за Singular Core.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI не е намерен. Моля, първо инсталирайте PlatformIO.',

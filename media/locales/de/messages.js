@@ -371,6 +371,8 @@ window.languageManager.loadMessages('de', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Python-Routing',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Paketstatus',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Speicherbelegung',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'PlatformIO-Arbeitsordner',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Lange Pfade unter Windows',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Ersatzweg verwendet',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Verwaltete Laufzeit reparieren',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Verwaltete Dateien bereinigen',
@@ -379,6 +381,7 @@ window.languageManager.loadMessages('de', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Reparatur der verwalteten Laufzeit abgeschlossen.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Reparatur der verwalteten Laufzeit fehlgeschlagen. Öffne das Ausgabeprotokoll, um Details mit geschwärzten vertraulichen Angaben zu sehen.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Bereinigung abgeschlossen: {0} Downloads, {1} temporäre Verzeichnisse und {2} alte Versionen entfernt.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Außerdem wurden {0} nicht mehr verwendete PlatformIO-Paketordner und {1} alte Build-Ordner von Projekten entfernt.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Bereinigung der verwalteten Laufzeit fehlgeschlagen. Unbekannte Dateien blieben unverändert.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Der Singular-Core-Ordner kann nicht geöffnet werden. Schließe die Initialisierung ab oder repariere die verwaltete Laufzeit und versuche es erneut.',
@@ -1030,6 +1033,7 @@ window.languageManager.loadMessages('de', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Kompilierung erfolgreich!',
 	ARDUINO_UPLOAD_SUCCESS: 'Hochladen erfolgreich!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'Die Dateipfade sind für dieses Windows-System zu lang. Wähle in den Einstellungen einen kürzeren Ordner für Singular Core.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI nicht gefunden. Installiere bitte zuerst PlatformIO.',

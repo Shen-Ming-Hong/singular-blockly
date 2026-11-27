@@ -7940,6 +7940,8 @@ function getLocalizedOtaErrorDetail(errorCode) {
 		'ota-upload-failed': 'CYBERBRICK_ERROR_OTA_FAILED',
 		'rc-main-patch-failed': 'CYBERBRICK_ERROR_RC_MAIN_PATCH_FAILED',
 		'agent-upgrade-failed': 'OTA_AGENT_UPGRADE_NEEDED',
+		// Spec 074: Windows long-path failure from Singular Core (Arduino builds)
+		'path-too-long': 'ARDUINO_PATH_TOO_LONG_DETAILS',
 	};
 	const key = otaErrorKeyMap[errorCode];
 	if (!key) { return null; }

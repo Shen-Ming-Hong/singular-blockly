@@ -5,7 +5,7 @@
  */
 
 import * as assert from 'assert';
-import { classifyCoreFailure, isCoreFallbackAllowed } from '../../services/coreFailureClassifier';
+import { classifyCoreFailure, isCoreFallbackAllowed, isWindowsPathLengthFailure } from '../../services/coreFailureClassifier';
 import { PlatformioProcessError } from '../../services/platformioProcess';
 
 suite('Core failure classifier', () => {
@@ -14,6 +14,7 @@ suite('Core failure classifier', () => {
 		['python-import', new Error("ModuleNotFoundError: No module named 'platformio'"), 'prepare'],
 		['permission', Object.assign(new Error('permission denied'), { code: 'EACCES' }), 'prepare'],
 		['local-store-corruption', new Error('corrupt local core metadata'), 'prepare'],
+		['local-store-corruption', new PlatformioProcessError('PlatformIO package preparation failed', true, 1, 'Resolving esp32 dependencies...', "MissingPackageManifestError: Could not find one of 'package.json' manifest files in the package"), 'prepare'],
 		['managed-provisioning', Object.assign(new Error('managed installer failed'), { failureDomain: 'managed-provisioning', started: true, code: 1 }), 'probe'],
 		['compile', new Error('main.cpp:2: error: missing symbol'), 'project-process'],
 		['project-config', new Error('Invalid project configuration in platformio.ini'), 'project-process'],
@@ -24,6 +25,8 @@ suite('Core failure classifier', () => {
 		['device', new Error('No device connected'), 'project-process'],
 		['serial', new Error('Could not open port COM7'), 'project-process'],
 		['cancelled', Object.assign(new Error('aborted'), { code: 'ABORT_ERR' }), 'prepare'],
+		['path-too-long', Object.assign(new Error('No short local folder'), { code: 'path-too-long' }), 'probe'],
+		['path-too-long', new PlatformioProcessError('PlatformIO package preparation failed', true, 1, '', 'OSError: [WinError 206] The filename or extension is too long'), 'prepare'],
 	];
 
 	for (const [expected, error, phase] of cases) {
@@ -71,5 +74,37 @@ suite('Core failure classifier', () => {
 		const failure = classifyCoreFailure(error, 'probe');
 		assert.strictEqual(failure, 'cancelled');
 		assert.strictEqual(isCoreFallbackAllowed(failure, 'probe', true), false);
+	});
+
+	suite('Windows path length failures (spec 074)', () => {
+		const deepPath = `C:\\Users\\ray\\AppData\\Roaming\\Code\\User\\globalStorage\\singular-ray.singular-blockly\\runtime-v1\\versions\\${'a'.repeat(36)}\\core\\packages\\framework-arduinoespressif32\\tools\\sdk\\esp32s3\\include\\libsodium\\libsodium\\src\\libsodium\\include\\sodium\\crypto_box_curve25519xchacha20poly1305.h`;
+
+		test('detects explicit long-path messages from Windows, pip, and PlatformIO', () => {
+			for (const message of [
+				'The filename or extension is too long.',
+				'This error might have occurred since this system does not have Windows Long Path support enabled.',
+				'Path too long',
+				'The filename, directory name, or volume label syntax is incorrect.',
+			]) {
+				assert.strictEqual(isWindowsPathLengthFailure(message), true, message);
+			}
+		});
+
+		test('detects a missing file only when its Windows path is near MAX_PATH', () => {
+			assert.ok(deepPath.length >= 248);
+			assert.strictEqual(isWindowsPathLengthFailure(`fatal error: ${deepPath}: No such file or directory`), true);
+			assert.strictEqual(isWindowsPathLengthFailure(`ERROR: [Errno 2] No such file or directory: '${deepPath.replace('ray', 'Ray Chen')}'`), true);
+			assert.strictEqual(
+				classifyCoreFailure(new Error('src/main.cpp:1:10: fatal error: Servo.h: No such file or directory'), 'project-process'),
+				'compile',
+				'an ordinary missing include stays a compile error'
+			);
+			assert.strictEqual(isWindowsPathLengthFailure('C:\\Users\\ray\\project\\src\\main.cpp: No such file or directory'), false);
+		});
+
+		test('allows a pre-start fallback to the other Core', () => {
+			assert.strictEqual(isCoreFallbackAllowed('path-too-long', 'probe', false), true);
+			assert.strictEqual(isCoreFallbackAllowed('path-too-long', 'project-process', true), false);
+		});
 	});
 });

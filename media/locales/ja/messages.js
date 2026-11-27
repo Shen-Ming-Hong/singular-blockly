@@ -369,6 +369,8 @@ window.languageManager.loadMessages('ja', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Python が使う Core',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'パッケージ状態',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'ストレージ使用量',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'PlatformIO の作業フォルダー',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Windows の長いパスのサポート',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: '代わりの方法を使用',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: '管理ランタイムを修復',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: '管理ファイルを整理',
@@ -377,6 +379,7 @@ window.languageManager.loadMessages('ja', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: '管理ランタイムの修復が完了しました。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: '管理ランタイムの修復に失敗しました。機密情報を伏せた詳細は出力ログを確認してください。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: '整理完了：ダウンロード {0} 件、一時ディレクトリ {1} 件、旧バージョン {2} 件を削除しました。',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: '使われなくなった PlatformIO パッケージのフォルダー {0} 個と、古いプロジェクトのビルドフォルダー {1} 個も削除しました。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: '管理ランタイムの整理に失敗しました。不明なファイルは変更していません。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Singular Core フォルダーを開けません。初期化を完了するか管理ランタイムを修復してから、もう一度お試しください。',
@@ -1023,6 +1026,7 @@ window.languageManager.loadMessages('ja', {
 	// Arduino アップロード結果
 	ARDUINO_COMPILE_SUCCESS: 'コンパイル成功！',
 	ARDUINO_UPLOAD_SUCCESS: 'アップロード成功！',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'この Windows ではファイルのパスが長すぎます。設定で Singular Core にもっと短いフォルダーを指定してください。',
 
 	// Arduino アップロードエラー
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLIが見つかりません。先にPlatformIOをインストールしてください。',

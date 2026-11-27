@@ -308,6 +308,100 @@ suite('ManagedRuntime Service', () => {
 		assert.strictEqual(environment.invocation.env.PLATFORMIO_SETTING_ENABLE_TELEMETRY, 'No');
 	});
 
+	suite('Windows PlatformIO work root (spec 074)', () => {
+		function createWindowsService(workRoot?: { root: string; failure?: Error }): ManagedRuntimeService {
+			const windowsArtifact: RuntimeArtifact = { ...artifact, id: 'win32-x64', platform: 'win32', libc: null };
+			return new ManagedRuntimeService({
+				storage,
+				manifest: { ...manifest, artifacts: [windowsArtifact] },
+				manifestSha256,
+				platform: 'win32',
+				arch: 'x64',
+				libc: null,
+				installer: { install: async () => {throw new Error('must not install');} },
+				workRoot: workRoot && {
+					resolve: async () => {
+						if (workRoot.failure) {throw workRoot.failure;}
+						return { kind: 'local-app-data', root: workRoot.root };
+					},
+					current: async () => workRoot.failure ? null : { kind: 'local-app-data', root: workRoot.root },
+				},
+			});
+		}
+
+		test('routes Arduino packages, platforms, cache, and builds to the short work root', async () => {
+			await writeInstalledRecord({ ...createRecord(), artifactId: 'win32-x64' });
+			const service = createWindowsService({ root: 'C:\\Users\\ray\\AppData\\Local\\SingularBlockly\\pio' });
+			const environment = await service.getCoreEnvironment('file:///c%3A/Users/ray/project', { workload: 'arduino' });
+			const env = environment.invocation.env;
+			assert.strictEqual(env.PLATFORMIO_PACKAGES_DIR, 'C:\\Users\\ray\\AppData\\Local\\SingularBlockly\\pio\\packages');
+			assert.strictEqual(env.PLATFORMIO_PLATFORMS_DIR, 'C:\\Users\\ray\\AppData\\Local\\SingularBlockly\\pio\\platforms');
+			assert.strictEqual(env.PLATFORMIO_CACHE_DIR, 'C:\\Users\\ray\\AppData\\Local\\SingularBlockly\\pio\\cache');
+			assert.match(env.PLATFORMIO_BUILD_DIR ?? '', /^C:\\Users\\ray\\AppData\\Local\\SingularBlockly\\pio\\w\\[0-9a-f]{16}\\build$/);
+			assert.match(env.PLATFORMIO_LIBDEPS_DIR ?? '', /\\w\\[0-9a-f]{16}\\libdeps$/);
+			assert.ok(env.PLATFORMIO_CORE_DIR?.startsWith(storage.layout.versions), 'the installed Core stays in place');
+			assert.strictEqual(environment.workRoot, 'C:\\Users\\ray\\AppData\\Local\\SingularBlockly\\pio');
+			assert.match(await service.getWorkRootSummary() ?? '', /^local-app-data <pio-work-root:[0-9a-f]{12}>$/);
+		});
+
+		test('removes package folders left half-installed by a stopped install', async () => {
+			await writeInstalledRecord({ ...createRecord(), artifactId: 'win32-x64' });
+			const workRoot = path.join(root, 'pio');
+			const old = new Date(Date.now() - 60 * 60 * 1000);
+			const makeDir = (relative: string, files: string[], aged = true): string => {
+				const dir = path.join(workRoot, relative);
+				fs.mkdirSync(dir, { recursive: true });
+				for (const file of files) {fs.writeFileSync(path.join(dir, file), '{}');}
+				if (aged) {fs.utimesSync(dir, old, old);}
+				return dir;
+			};
+			const broken = makeDir(path.join('packages', 'toolchain-xtensa-esp32'), ['.piopm']);
+			const healthy = makeDir(path.join('packages', 'tool-scons'), ['.piopm', 'package.json']);
+			const platform = makeDir(path.join('platforms', 'espressif32'), ['.piopm', 'platform.json']);
+			const installing = makeDir(path.join('packages', 'framework-arduinoespressif32'), ['.piopm'], false);
+			const staleTmp = makeDir(path.join('cache', 'tmp', 'pkg-installing-m50u6t7v'), ['package.json']);
+			const download = makeDir(path.join('cache', 'downloads'), ['archive.tar.gz']);
+
+			const service = createWindowsService({ root: workRoot });
+			await service.getCoreEnvironment('file:///c%3A/Users/ray/project', { workload: 'arduino' });
+
+			assert.strictEqual(fs.existsSync(broken), false, 'manifest-less package is removed so PlatformIO reinstalls it');
+			assert.strictEqual(fs.existsSync(staleTmp), false, 'stale install folder is removed');
+			assert.ok(fs.existsSync(healthy) && fs.existsSync(platform) && fs.existsSync(download));
+			assert.ok(fs.existsSync(installing), 'a folder changed in the last minutes may still be installing');
+		});
+
+		test('keeps the Python workload unchanged even when no work root can be created', async () => {
+			await writeInstalledRecord({ ...createRecord(), artifactId: 'win32-x64' });
+			const failure = Object.assign(new Error('too long'), { code: 'path-too-long' });
+			const service = createWindowsService({ root: 'C:\\unused', failure });
+			const environment = await service.getCoreEnvironment('file:///workspace', { workload: 'python' });
+			assert.strictEqual(environment.invocation.env.PLATFORMIO_PACKAGES_DIR, undefined);
+			assert.ok(environment.invocation.env.PLATFORMIO_BUILD_DIR?.startsWith(storage.layout.workspaces));
+			assert.strictEqual(environment.workRoot, null);
+			await assert.rejects(
+				service.getCoreEnvironment('file:///workspace', { workload: 'arduino' }),
+				(error: Error & { code?: string }) => error.code === 'path-too-long'
+			);
+		});
+
+		test('leaves macOS and Linux layouts unchanged for Arduino', async () => {
+			await writeInstalledRecord();
+			const service = new ManagedRuntimeService({
+				storage, manifest, manifestSha256, platform: 'linux', arch: 'x64', libc: 'glibc',
+				installer: { install: async () => {throw new Error('must not install');} },
+				workRoot: {
+					resolve: async () => {throw new Error('must not resolve a work root outside Windows');},
+					current: async () => null,
+				},
+			});
+			const environment = await service.getCoreEnvironment('file:///workspace', { workload: 'arduino' });
+			assert.strictEqual(environment.invocation.env.PLATFORMIO_PACKAGES_DIR, undefined);
+			assert.ok(environment.invocation.env.PLATFORMIO_CACHE_DIR?.startsWith(storage.layout.versions));
+			assert.strictEqual(await service.getWorkRootSummary(), null);
+		});
+	});
+
 	test('rejects unsupported or unverified targets before installation', async () => {
 		const service = new ManagedRuntimeService({
 			storage, manifest, manifestSha256, platform: 'linux', arch: 'arm64', libc: 'glibc',

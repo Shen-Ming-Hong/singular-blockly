@@ -15,6 +15,7 @@ export type CoreFailureClass =
 	| 'python-import'
 	| 'permission'
 	| 'local-store-corruption'
+	| 'path-too-long'
 	| 'managed-provisioning'
 	| 'compile'
 	| 'project-config'
@@ -49,6 +50,8 @@ export interface CoreEnvironment {
 	pythonPath: string | null;
 	mpremotePath: string | null;
 	storageRoot: string | null;
+	/** Windows short PlatformIO work root used by the Arduino workload (spec 074). */
+	workRoot?: string | null;
 	health: CoreHealth;
 }
 

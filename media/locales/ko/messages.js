@@ -370,6 +370,8 @@ window.languageManager.loadMessages('ko', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Python 라우팅',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: '패키지 상태',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: '저장 공간 사용량',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'PlatformIO 작업 폴더',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Windows 긴 경로 지원',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: '대체 경로 사용',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: '관리 런타임 복구',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: '관리 파일 정리',
@@ -378,6 +380,7 @@ window.languageManager.loadMessages('ko', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: '관리 런타임 복구가 완료되었어요.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: '관리 런타임 복구에 실패했어요. 민감한 정보가 가려진 세부 정보는 출력 로그를 확인하세요.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: '정리 완료: 다운로드 {0}개, 임시 디렉터리 {1}개, 이전 버전 {2}개를 제거했어요.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: '사용하지 않는 PlatformIO 패키지 폴더 {0}개와 오래된 프로젝트 빌드 폴더 {1}개도 제거했어요.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: '관리 런타임 정리에 실패했어요. 알 수 없는 파일은 변경하지 않았어요.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Singular Core 폴더를 열 수 없어요. 초기화를 마치거나 관리 런타임을 복구한 후 다시 시도해 주세요.',
@@ -1023,6 +1026,7 @@ window.languageManager.loadMessages('ko', {
 	// Arduino 업로드 결과
 	ARDUINO_COMPILE_SUCCESS: '컴파일 성공!',
 	ARDUINO_UPLOAD_SUCCESS: '업로드 성공!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: '이 Windows 시스템에서는 파일 경로가 너무 길어요. 설정에서 Singular Core에 더 짧은 폴더를 지정해 주세요.',
 
 	// Arduino 업로드 오류
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI를 찾을 수 없어요. 먼저 PlatformIO를 설치해 주세요.',

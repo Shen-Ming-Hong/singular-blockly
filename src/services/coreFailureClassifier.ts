@@ -23,7 +23,26 @@ const LOCAL_FALLBACK_FAILURES = new Set<CoreFailureClass>([
 	'python-import',
 	'permission',
 	'local-store-corruption',
+	'path-too-long',
 ]);
+
+const WINDOWS_PATH_LIMIT_HINTS = /filename or extension is too long|path(?:name)? (?:is )?too long|long path support|exceeds? (?:the )?(?:windows )?max_path|filename, directory name, or volume label syntax is incorrect/i;
+/** Win32 CreateDirectory limit: 260 minus room for an 8.3 file name. */
+const NEAR_LIMIT_PATH_LENGTH = 248;
+// Quoted paths may contain spaces (pip quotes them); unquoted ones stop at whitespace.
+const WINDOWS_ABSOLUTE_PATH = /'[A-Za-z]:[\\/][^'\r\n]+'|"[A-Za-z]:[\\/][^"\r\n]+"|[A-Za-z]:[\\/][^\s'"<>|*?\r\n]+/g;
+const MISSING_FILE_HINT = /no such file or directory|cannot open|cannot find|errno 2\b|enoent/i;
+
+/** Detect Windows MAX_PATH failures without mistaking ordinary missing includes for them. */
+export function isWindowsPathLengthFailure(text: string): boolean {
+	if (WINDOWS_PATH_LIMIT_HINTS.test(text)) {return true;}
+	return text.split(/\r?\n/).some(line => {
+		if (!MISSING_FILE_HINT.test(line)) {return false;}
+		return (line.match(WINDOWS_ABSOLUTE_PATH) ?? [])
+			.map(candidate => candidate.replace(/^['"]|['"]$/g, ''))
+			.some(candidate => candidate.length >= NEAR_LIMIT_PATH_LENGTH);
+	});
+}
 
 function extractErrorMessage(
 	error: unknown,
@@ -62,10 +81,12 @@ function evidenceFromError(error: unknown, phase: CoreOperationPhase): Required<
 export function classifyCoreFailure(error: unknown, phase: CoreOperationPhase): CoreFailureClass {
 	const evidence = evidenceFromError(error, phase);
 	const code = String(evidence.code).toUpperCase();
-	const text = `${evidence.message}\n${evidence.stdout}\n${evidence.stderr}`.toLowerCase();
+	const rawText = `${evidence.message}\n${evidence.stdout}\n${evidence.stderr}`;
+	const text = rawText.toLowerCase();
 
 	if (code === 'ABORT_ERR' || /\b(abort(?:ed)?|cancel(?:led|ed))\b/.test(text)) {return 'cancelled';}
 	if (evidence.failureDomain === 'managed-provisioning') {return 'managed-provisioning';}
+	if (code === 'PATH-TOO-LONG' || isWindowsPathLengthFailure(rawText)) {return 'path-too-long';}
 	if (/\b(cert(?:ificate)?|self[- ]signed|unable to verify|tls|ssl)\b/.test(text)) {return 'tls';}
 	if (/\b(proxy|407 proxy authentication)\b/.test(text)) {return 'proxy';}
 	if (code === 'ENOTFOUND' || code === 'EAI_AGAIN' || /\b(dns|name resolution|getaddrinfo)\b/.test(text)) {return 'dns';}
@@ -79,7 +100,8 @@ export function classifyCoreFailure(error: unknown, phase: CoreOperationPhase): 
 	}
 	if (/no module named ['"]?platformio|modulenotfounderror.*platformio|cannot import name.*platformio/.test(text)) {return 'python-import';}
 	if (code === 'EACCES' || code === 'EPERM' || /permission denied|operation not permitted|access is denied/.test(text)) {return 'permission';}
-	if (/corrupt|invalid distribution|bad metadata|cannot read.*core|malformed.*json|checksum.*local/.test(text)) {return 'local-store-corruption';}
+	// PlatformIO raises MissingPackageManifestError for a half-installed package folder (no package.json).
+	if (/corrupt|invalid distribution|bad metadata|cannot read.*core|malformed.*json|checksum.*local|missingpackagemanifesterror|could not find one of .*manifest files/.test(text)) {return 'local-store-corruption';}
 	if (!evidence.started && /spawn|failed to start|could not start/.test(text)) {return 'spawn';}
 	return 'unknown-after-start';
 }

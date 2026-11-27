@@ -7,7 +7,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import { createHash, randomUUID } from 'crypto';
-import { CoreEnvironment } from '../types/coreEnvironment';
+import { CoreEnvironment, CoreWorkload } from '../types/coreEnvironment';
 import {
 	ManagedRuntimeInstallRecord,
 	ManagedRuntimeInstallStage,
@@ -23,9 +23,12 @@ import {
 	ManagedRuntimeInstallerError,
 	ManagedRuntimeInstallProgress,
 } from './managedRuntimeInstaller';
+import { FileService } from './fileService';
+import { log } from './logging';
 import { selectRuntimeArtifact } from './managedRuntimeManifest';
 import { createWorkspaceStorageKey, ManagedRuntimeStorage } from './managedRuntimeStorage';
 import { createPlatformioPrivacyRedactor, PlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
+import { createWorkRootLayout, PlatformioWorkRootResolver } from './managedRuntimeWorkRoot';
 
 interface RuntimeInstallerLike {
 	install(
@@ -48,7 +51,25 @@ export interface ManagedRuntimeServiceOptions {
 	libc?: string | null;
 	allowReleaseCandidate?: boolean;
 	now?: () => Date;
+	/** Windows short PlatformIO work root for the Arduino workload (spec 074). */
+	workRoot?: PlatformioWorkRootResolver;
 }
+
+export interface ManagedRuntimeCleanupCounts {
+	downloads: number;
+	staging: number;
+	versions: number;
+	/** PlatformIO package, platform, and cache folders left under the active version (spec 074). */
+	packages: number;
+	/** Windows work-root project folders unused for 30 days (spec 074). */
+	projects: number;
+}
+
+const WORK_ROOT_PROJECT_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+/** Leave very recent folders alone in case another window is installing right now. */
+const WORK_ROOT_INCOMPLETE_GRACE_MS = 10 * 60 * 1000;
+/** Any one of these marks a fully installed PlatformIO package or platform. */
+const PLATFORMIO_MANIFEST_FILES = ['package.json', 'platform.json', 'library.json', 'library.properties', 'module.json'];
 
 export class ManagedRuntimeServiceError extends Error {
 	constructor(public readonly code: string, message: string) {
@@ -109,6 +130,7 @@ export class ManagedRuntimeService {
 	private readonly allowReleaseCandidate: boolean;
 	private readonly now: () => Date;
 	private readonly privacyRedactor: PlatformioPrivacyRedactor;
+	private readonly workRoot?: PlatformioWorkRootResolver;
 	private provisioningPromise?: Promise<ManagedRuntimeInstallRecord>;
 	private provisioningState: ManagedRuntimeProvisioningState = { status: 'idle', attempt: 0 };
 
@@ -126,6 +148,7 @@ export class ManagedRuntimeService {
 		this.libc = options.libc === undefined ? detectLibc(this.platform) : options.libc;
 		this.allowReleaseCandidate = options.allowReleaseCandidate ?? false;
 		this.now = options.now ?? (() => new Date());
+		this.workRoot = options.workRoot;
 		this.privacyRedactor = createPlatformioPrivacyRedactor({
 			homeDir: os.homedir(),
 			managedRuntimePath: options.storage.layout.root,
@@ -200,6 +223,21 @@ export class ManagedRuntimeService {
 		return `<managed-storage:${digest}>`;
 	}
 
+	/** Windows only: privacy-safe summary of the verified PlatformIO work root (spec 074). */
+	async getWorkRootSummary(): Promise<string | null> {
+		if (this.platform !== 'win32' || !this.workRoot) {return null;}
+		const current = await this.workRoot.current();
+		if (!current) {return null;}
+		const digest = createHash('sha256').update(current.root).digest('hex').slice(0, 12);
+		return `${current.kind} <pio-work-root:${digest}>`;
+	}
+
+	/** Absolute verified work root for host-only redaction; never sent to the WebView. */
+	async getWorkRootPath(): Promise<string | null> {
+		if (this.platform !== 'win32' || !this.workRoot) {return null;}
+		return (await this.workRoot.current())?.root ?? null;
+	}
+
 	getStorageRoot(): string {
 		return this.storage.layout.root;
 	}
@@ -209,9 +247,9 @@ export class ManagedRuntimeService {
 		return this.storage.files.calculateStorageUsage();
 	}
 
-	async cleanup(): Promise<{ downloads: number; staging: number; versions: number }> {
+	async cleanup(): Promise<ManagedRuntimeCleanupCounts> {
 		await this.storage.initialize();
-		const counts = { downloads: 0, staging: 0, versions: 0 };
+		const counts: ManagedRuntimeCleanupCounts = { downloads: 0, staging: 0, versions: 0, packages: 0, projects: 0 };
 		const releaseLock = await this.tryAcquireCleanupLock();
 		if (!releaseLock) {
 			throw new ManagedRuntimeServiceError('install-locked', 'Managed runtime installation is active');
@@ -279,13 +317,95 @@ export class ManagedRuntimeService {
 				await this.storage.files.deleteDirectory(relative);
 				counts.versions++;
 			}
+			await this.cleanupPlatformioWorkRoot(activeVersion, counts);
 			return counts;
 		} finally {
 			await releaseLock();
 		}
 	}
 
-	async getCoreEnvironment(workspaceUri: string): Promise<CoreEnvironment> {
+	/**
+	 * Spec 074: once the Windows work root exists, PlatformIO folders left under
+	 * the active version by older releases are unused, and project build
+	 * folders untouched for 30 days can be rebuilt on demand.
+	 */
+	private async cleanupPlatformioWorkRoot(
+		activeVersion: string | null,
+		counts: ManagedRuntimeCleanupCounts
+	): Promise<void> {
+		if (this.platform !== 'win32' || !this.workRoot) {return;}
+		const workRoot = await this.workRoot.current();
+		if (!workRoot) {return;}
+		if (activeVersion) {
+			for (const relative of [
+				path.join('versions', activeVersion, 'core', 'packages'),
+				path.join('versions', activeVersion, 'core', 'platforms'),
+				path.join('versions', activeVersion, 'cache'),
+			]) {
+				const stats = await this.storage.files.getFileStats(relative);
+				if (!stats?.isDirectory()) {continue;}
+				await this.storage.files.deleteDirectory(relative);
+				counts.packages++;
+			}
+		}
+		const workFiles = new FileService(workRoot.root);
+		const cutoff = this.now().getTime() - WORK_ROOT_PROJECT_RETENTION_MS;
+		for (const name of await workFiles.listFiles('w')) {
+			if (!/^[0-9a-f]{16}$/.test(name)) {continue;}
+			const relative = path.join('w', name);
+			const stats = await workFiles.getFileStats(relative);
+			if (!stats?.isDirectory() || stats.mtimeMs > cutoff) {continue;}
+			await workFiles.deleteDirectory(relative);
+			counts.projects++;
+		}
+	}
+
+	/**
+	 * Spec 074: an install that was stopped part-way (timeout, closed window) can leave
+	 * a package folder with `.piopm` but no manifest. PlatformIO then fails every later
+	 * `pkg install` with MissingPackageManifestError, so remove those folders and stale
+	 * `cache/tmp` install folders from the work root we own and let PlatformIO reinstall.
+	 */
+	private async repairIncompleteWorkRootPackages(root: string): Promise<void> {
+		try {
+			const files = new FileService(root);
+			const cutoff = this.now().getTime() - WORK_ROOT_INCOMPLETE_GRACE_MS;
+			const removed: string[] = [];
+			for (const parent of ['packages', 'platforms']) {
+				for (const name of await files.listFiles(parent)) {
+					const relative = path.join(parent, name);
+					const stats = await files.getFileStats(relative);
+					if (!stats?.isDirectory() || stats.mtimeMs > cutoff) {continue;}
+					if (!(await files.getFileStats(path.join(relative, '.piopm')))?.isFile()) {continue;}
+					let complete = false;
+					for (const manifest of PLATFORMIO_MANIFEST_FILES) {
+						if ((await files.getFileStats(path.join(relative, manifest)))?.isFile()) {complete = true; break;}
+					}
+					if (complete) {continue;}
+					await files.deleteDirectory(relative);
+					removed.push(relative);
+				}
+			}
+			const tmp = path.join('cache', 'tmp');
+			for (const name of await files.listFiles(tmp)) {
+				if (!name.startsWith('pkg-installing-')) {continue;}
+				const relative = path.join(tmp, name);
+				const stats = await files.getFileStats(relative);
+				if (!stats?.isDirectory() || stats.mtimeMs > cutoff) {continue;}
+				await files.deleteDirectory(relative);
+				removed.push(relative);
+			}
+			if (removed.length > 0) {
+				log('[managed-runtime] removed incomplete PlatformIO packages from the work root', 'warn', { removed });
+			}
+		} catch (error) {
+			log('[managed-runtime] could not check the work root for incomplete packages', 'warn', {
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
+	}
+
+	async getCoreEnvironment(workspaceUri: string, options: { workload?: CoreWorkload } = {}): Promise<CoreEnvironment> {
 		const record = await this.ensureReady();
 		const versionRoot = this.storage.files.resolveSafePath(path.join('versions', record.versionDirectory));
 		const pythonPath = await this.storage.files.resolveValidatedContainedPath(
@@ -308,6 +428,23 @@ export class ManagedRuntimeService {
 			PLATFORMIO_SETTING_ENABLE_PROMPTS: 'No',
 			PLATFORMIO_NO_ANSI: 'true',
 		};
+		let workRoot: string | null = null;
+		if (this.platform === 'win32' && options.workload === 'arduino' && this.workRoot) {
+			// Spec 074: keep deep PlatformIO packages and build trees under a short
+			// Windows work root so they stay within the classic 260-character limit.
+			const selected = await this.workRoot.resolve();
+			await this.repairIncompleteWorkRootPackages(selected.root);
+			const layout = createWorkRootLayout(selected.root, workspaceUri);
+			workRoot = selected.root;
+			Object.assign(environment, {
+				PLATFORMIO_PACKAGES_DIR: layout.packages,
+				PLATFORMIO_PLATFORMS_DIR: layout.platforms,
+				PLATFORMIO_CACHE_DIR: layout.cache,
+				PLATFORMIO_WORKSPACE_DIR: layout.workspace,
+				PLATFORMIO_BUILD_DIR: layout.build,
+				PLATFORMIO_LIBDEPS_DIR: layout.libdeps,
+			});
+		}
 		return {
 			id: 'managed',
 			displaySource: 'Singular managed runtime',
@@ -315,6 +452,7 @@ export class ManagedRuntimeService {
 			pythonPath,
 			mpremotePath,
 			storageRoot: this.storage.layout.root,
+			workRoot,
 			health: {
 				status: 'healthy',
 				checkedAt: record.health.checkedAt,

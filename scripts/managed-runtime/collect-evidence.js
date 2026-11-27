@@ -38,6 +38,19 @@ function readRuntimeResult(filePath) {
   return result;
 }
 
+/** Spec 074: privacy-safe ESP32 work-root evidence (kind and length only, never the path). */
+function workRootEvidence(runtimeResult) {
+  if (runtimeResult.workRootKind === undefined && runtimeResult.longestPathLength === undefined) { return {}; }
+  if (!['custom', 'local-app-data', 'system-drive'].includes(runtimeResult.workRootKind)) {
+    throw new Error('Invalid work root kind');
+  }
+  const longestPathLength = Number(runtimeResult.longestPathLength);
+  if (!Number.isSafeInteger(longestPathLength) || longestPathLength <= 0 || longestPathLength >= 260) {
+    throw new Error('Work root longest path must be below 260 characters');
+  }
+  return { workRootKind: runtimeResult.workRootKind, longestPathLength };
+}
+
 function collectEvidence(options) {
   const repository = assertIdentity(options.repository, 'repository', /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/);
   const headSha = assertIdentity(options.headSha, 'head SHA', /^[a-f0-9]{40,64}$/);
@@ -53,6 +66,8 @@ function collectEvidence(options) {
     artifactSha256: options.artifactSha256,
     pathCases: options.pathCases,
     offlineRestart: String(options.offlineRestart) === 'true',
+    workRootKind: options.workRootKind,
+    longestPathLength: options.longestPathLength,
     success: String(options.success) === 'true',
   };
   if (!['win32', 'darwin', 'linux'].includes(runtimeResult.os)) { throw new Error('Invalid OS'); }
@@ -86,6 +101,7 @@ function collectEvidence(options) {
       artifactSha256: assertIdentity(runtimeResult.artifactSha256, 'artifact SHA-256', /^[a-f0-9]{64}$/),
       pathCases: [...new Set(runtimeResult.pathCases)].sort(),
       offlineRestart: runtimeResult.offlineRestart === true,
+      ...workRootEvidence(runtimeResult),
       success: runtimeResult.success === true,
     }],
   };

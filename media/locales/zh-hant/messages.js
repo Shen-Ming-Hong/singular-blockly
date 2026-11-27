@@ -364,6 +364,8 @@ window.languageManager.loadMessages('zh-hant', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Python 使用的 Core',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: '套件狀態',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: '儲存空間用量',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'PlatformIO 工作資料夾',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Windows 長路徑支援',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: '已改用備用方案',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: '修復內建執行環境',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: '清理內建工具檔案',
@@ -372,6 +374,7 @@ window.languageManager.loadMessages('zh-hant', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: '內建執行環境修復完成。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: '內建執行環境修復失敗。請開啟輸出記錄查看詳細資料（敏感資訊已遮蔽）。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: '清理完成：已移除 {0} 個下載檔、{1} 個暫存資料夾和 {2} 個舊版本。',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: '另外移除了 {0} 個不再使用的 PlatformIO 套件資料夾和 {1} 個舊的專案編譯資料夾。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: '內建執行環境清理失敗；不認得的檔案都沒有被更動。',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'無法開啟 Singular Core 資料夾。請先完成初始化或修復內建執行環境，再試一次。',
@@ -1021,6 +1024,7 @@ window.languageManager.loadMessages('zh-hant', {
 	// Arduino 上傳結果
 	ARDUINO_COMPILE_SUCCESS: '編譯成功！',
 	ARDUINO_UPLOAD_SUCCESS: '上傳成功！',
+	ARDUINO_PATH_TOO_LONG_DETAILS: '檔案路徑超過這台 Windows 電腦的長度限制，請在設定中改用路徑比較短的 Singular Core 資料夾。',
 
 	// Arduino 上傳錯誤
 	ERROR_ARDUINO_PIO_NOT_FOUND: '找不到 PlatformIO CLI，請先安裝 PlatformIO',

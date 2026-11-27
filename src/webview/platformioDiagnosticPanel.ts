@@ -87,7 +87,7 @@ interface PlatformioDiagnosticPanelRepairOptions {
 	issueDraftService?: IssueDraftServiceLike;
 	managedRuntimeService?: {
 		repair(): Promise<unknown>;
-		cleanup(): Promise<{ downloads: number; staging: number; versions: number }>;
+		cleanup(): Promise<{ downloads: number; staging: number; versions: number; packages?: number; projects?: number }>;
 		getStorageRoot(): string;
 	};
 	coreEnvironmentManager?: {
@@ -318,13 +318,24 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 		try {
 			const result = await this.managedRuntimeService.cleanup();
 			this.coreEnvironmentManager?.reset();
-			await this.postCopyResult('success', await this.localeService.getLocalizedMessage(
+			const summary = await this.localeService.getLocalizedMessage(
 				'PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS',
 				'Managed cleanup completed: {0} downloads, {1} staging directories, and {2} old versions removed.',
 				result.downloads,
 				result.staging,
 				result.versions
-			));
+			);
+			const packages = result.packages ?? 0;
+			const projects = result.projects ?? 0;
+			const workRootSummary = packages + projects > 0
+				? await this.localeService.getLocalizedMessage(
+					'PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT',
+					'Also removed {0} unused PlatformIO package folders and {1} old project build folders.',
+					packages,
+					projects
+				)
+				: '';
+			await this.postCopyResult('success', workRootSummary ? `${summary} ${workRootSummary}` : summary);
 		} catch (error) {
 			log('[platformio-diagnostic] managed runtime cleanup failed', 'error', { code: this.errorCode(error) });
 			await this.postCopyResult('error', await this.localeService.getLocalizedMessage(
@@ -880,6 +891,8 @@ export class PlatformioDiagnosticPanel implements vscode.Disposable {
 			pythonSelectionLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION', 'Python routing'),
 			packageStatusLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS', 'Package status'),
 			storageUsageLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE', 'Storage usage'),
+			workRootLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_WORK_ROOT', 'PlatformIO work folder'),
+			windowsLongPathsLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS', 'Windows long paths'),
 			fallbackUsedLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_FALLBACK_USED', 'Fallback used'),
 			scopeTitle: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_SCOPE_TITLE', 'Scope'),
 			workspaceLabel: await this.localeService.getLocalizedMessage('PLATFORMIO_DIAGNOSTIC_WORKSPACE', 'Workspace'),

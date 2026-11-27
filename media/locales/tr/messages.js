@@ -371,6 +371,8 @@ window.languageManager.loadMessages('tr', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Python yönlendirmesi',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Paket durumu',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Depolama kullanımı',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'PlatformIO çalışma klasörü',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Windows uzun yol desteği',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Yedek kullanıldı',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Yönetilen ortamı onar',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Yönetilen dosyaları temizle',
@@ -379,6 +381,7 @@ window.languageManager.loadMessages('tr', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Yönetilen ortam onarımı tamamlandı.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Yönetilen ortam onarılamadı. Hassas bilgilerin maskelendiği ayrıntılar için çıktı günlüğünü açın.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Temizlik tamamlandı: {0} indirme, {1} geçici dizin ve {2} eski sürüm kaldırıldı.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Ayrıca kullanılmayan {0} PlatformIO paket klasörü ve {1} eski proje derleme klasörü kaldırıldı.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Yönetilen ortam temizlenemedi. Bilinmeyen dosyalara dokunulmadı.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Singular Core klasörü açılamadı. Başlatmayı tamamlayın veya yönetilen ortamı onarın ve yeniden deneyin.',
@@ -1030,6 +1033,7 @@ window.languageManager.loadMessages('tr', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Derleme başarılı!',
 	ARDUINO_UPLOAD_SUCCESS: 'Yükleme başarılı!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'Dosya yolları bu Windows sistemi için çok uzun. Ayarlardan Singular Core için daha kısa bir klasör seçin.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI bulunamadı. Lütfen önce PlatformIO kurun.',

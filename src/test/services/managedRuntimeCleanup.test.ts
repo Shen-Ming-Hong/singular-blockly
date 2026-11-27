@@ -58,7 +58,7 @@ suite('ManagedRuntime cleanup ownership', () => {
 
 		const result = await service.cleanup();
 
-		assert.deepStrictEqual(result, { downloads: 1, staging: 0, versions: 1 });
+		assert.deepStrictEqual(result, { downloads: 1, staging: 0, versions: 1, packages: 0, projects: 0 });
 		assert.strictEqual(fs.existsSync(path.join(storage.layout.downloads, `${'d'.repeat(64)}.py`)), true);
 		assert.strictEqual(fs.existsSync(path.join(storage.layout.versions, 'unknown-user-folder', 'keep.txt')), true);
 	});
@@ -79,7 +79,7 @@ suite('ManagedRuntime cleanup ownership', () => {
 
 		const result = await service.cleanup();
 
-		assert.deepStrictEqual(result, { downloads: 0, staging: 1, versions: 1 });
+		assert.deepStrictEqual(result, { downloads: 0, staging: 1, versions: 1, packages: 0, projects: 0 });
 		assert.strictEqual(fs.existsSync(path.join(storage.layout.staging, unknownTransaction, 'keep.txt')), true);
 	});
 
@@ -126,5 +126,74 @@ suite('ManagedRuntime cleanup ownership', () => {
 		await storage.files.writeFileAtomic('downloads/usage.py', '12345');
 
 		assert.strictEqual(await service.getStorageUsageBytes(), (baseline ?? 0) + 5);
+	});
+
+	test('on Windows removes old PlatformIO folders under the active version and stale work-root projects (spec 074)', async () => {
+		const workRoot = path.join(parent, 'pio-work-root');
+		const record = {
+			schemaVersion: 1,
+			runtimeVersion: 'test-1',
+			artifactId: 'win32-x64',
+			manifestSha256: 'c'.repeat(64),
+			installedAt: '2026-08-15T00:00:00.000Z',
+			versionDirectory: 'active',
+			tools: {
+				bootstrapPython: { relativePath: 'python/python.exe', version: 'Python 3.11.16' },
+				python: { relativePath: 'core/penv/Scripts/python.exe', version: 'Python 3.11.16' },
+				pip: { relativePath: 'core/penv/Scripts/pip.exe', version: 'pip 25' },
+				pio: { relativePath: 'core/penv/Scripts/pio.exe', version: 'PlatformIO Core, version 6.1.18' },
+				mpremote: { relativePath: 'core/penv/Scripts/mpremote.exe', version: 'mpremote 1.28.0' },
+			},
+			health: { status: 'healthy', checkedAt: '2026-08-15T00:00:00.000Z' },
+		};
+		for (const tool of Object.values(record.tools)) {
+			await storage.files.writeFile(path.join('versions', 'active', tool.relativePath), 'tool');
+		}
+		await storage.files.writeFileAtomic('current.json', JSON.stringify(record));
+		for (const folder of ['core/packages/framework-arduinoespressif32', 'core/platforms/espressif32', 'cache/downloads']) {
+			await storage.files.writeFile(path.join('versions', 'active', folder, 'file.txt'), 'old');
+		}
+		const staleProject = path.join(workRoot, 'w', '0123456789abcdef');
+		const freshProject = path.join(workRoot, 'w', 'fedcba9876543210');
+		const unknownProject = path.join(workRoot, 'w', 'not-a-project-key');
+		for (const folder of [staleProject, freshProject, unknownProject]) {fs.mkdirSync(folder, { recursive: true });}
+		const old = new Date('2026-09-01T00:00:00.000Z');
+		fs.utimesSync(staleProject, old, old);
+
+		const windowsService = new ManagedRuntimeService({
+			storage,
+			manifest: {
+				schemaVersion: 1,
+				runtimeVersion: 'test-1',
+				pythonVersion: '3.11.16',
+				installer: { url: 'https://raw.githubusercontent.com/a/b', sha256: 'a'.repeat(64), size: 1, license: 'MIT', source: 'source' },
+				platformio: { channel: 'stable', testedVersionRange: '>=6 <7' },
+				mpremoteVersion: '1.28.0',
+				platformPackages: { atmelavr: 'platformio/atmelavr@5.3.0' },
+				artifacts: [{
+					id: 'win32-x64', platform: 'win32', arch: 'x64', libc: null, support: 'stable', archiveFormat: 'tar.gz',
+					pythonRelativePath: 'python/python.exe', url: 'https://github.com/a/b', sha256: 'b'.repeat(64), size: 1,
+					license: 'MIT', source: 'source',
+				}],
+			},
+			manifestSha256: 'c'.repeat(64),
+			installer: { install: async () => {throw new Error('not used');} },
+			platform: 'win32', arch: 'x64', libc: null,
+			now: () => new Date('2026-11-26T00:00:00.000Z'),
+			workRoot: {
+				resolve: async () => ({ kind: 'local-app-data', root: workRoot }),
+				current: async () => ({ kind: 'local-app-data', root: workRoot }),
+			},
+		});
+		assert.strictEqual((await windowsService.getStatus()).status, 'ready');
+
+		const result = await windowsService.cleanup();
+
+		assert.deepStrictEqual(result, { downloads: 0, staging: 0, versions: 0, packages: 3, projects: 1 });
+		assert.strictEqual(fs.existsSync(path.join(storage.layout.versions, 'active', 'core', 'penv', 'Scripts', 'pio.exe')), true);
+		assert.strictEqual(fs.existsSync(path.join(storage.layout.versions, 'active', 'core', 'packages')), false);
+		assert.strictEqual(fs.existsSync(staleProject), false);
+		assert.strictEqual(fs.existsSync(freshProject), true);
+		assert.strictEqual(fs.existsSync(unknownProject), true);
 	});
 });

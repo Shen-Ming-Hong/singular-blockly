@@ -95,6 +95,15 @@ function verifyEvidence(evidenceList, options) {
         throw new Error(`Evidence failed for ${result.os}/${result.arch}`);
       }
       const matrix = `${result.os}/${result.arch}`;
+      // Spec 074: Windows x64 must prove an ESP32 build through the short work root.
+      if (
+        matrix === 'win32/x64' &&
+        (!result.pathCases.includes('esp32-work-root') ||
+          !Number.isSafeInteger(result.longestPathLength) ||
+          result.longestPathLength >= 260)
+      ) {
+        throw new Error('Evidence failed for win32/x64: missing ESP32 work-root proof');
+      }
       if (completed.has(matrix)) { throw new Error(`Duplicate evidence for ${matrix}`); }
       const expectedArtifact = expectedArtifacts.get(matrix);
       if (options.manifest && (!expectedArtifact || result.artifactId !== expectedArtifact.id || result.artifactSha256 !== expectedArtifact.sha256)) {

@@ -13,6 +13,7 @@ import { parseRuntimeManifest, sha256 } from './managedRuntimeManifest';
 import { createManagedRuntimeFetch } from './managedRuntimeProxy';
 import { ManagedRuntimeService } from './managedRuntimeService';
 import { ManagedRuntimeStorage, resolveManagedRuntimeRoot } from './managedRuntimeStorage';
+import { PlatformioWorkRootService } from './managedRuntimeWorkRoot';
 
 const MANIFEST_RELATIVE_PATH = path.join('dist', 'managed-runtime', 'runtime-manifest.json');
 
@@ -50,8 +51,13 @@ export async function createManagedRuntimeService(
 		manifestSha256: sha256(manifestSource),
 		downloader,
 	});
+	const platform = options.platform ?? process.platform;
+	const workRoot = platform === 'win32'
+		? new PlatformioWorkRootService({ storage, customManagedRoot: Boolean(customPath?.trim()), platform })
+		: undefined;
 	return new ManagedRuntimeService({
 		storage,
+		workRoot,
 		manifest,
 		manifestSha256: sha256(manifestSource),
 		installer,

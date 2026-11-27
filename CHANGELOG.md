@@ -8,6 +8,26 @@ All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🐛 修復 Bug Fixes
+
+- 在 Windows 上用 Singular Core 編譯 ESP32 時，不再因為資料夾路徑超過 260 字元而失敗：PlatformIO 套件與編譯檔改放在較短的資料夾，已安裝的 Singular Core 不需要重新下載
+  Building ESP32 projects with Singular Core on Windows no longer fails because folder paths exceed 260 characters: PlatformIO packages and build files now go to a shorter folder, and an installed Singular Core does not need to be downloaded again
+- 如果路徑仍然太長，編輯器會說明原因，並提供開啟診斷與選擇較短資料夾的按鈕，不再只顯示一般的編譯錯誤
+  If a path is still too long, the editor explains why and offers buttons to open diagnostics or choose a shorter folder, instead of a generic compile error
+- PlatformIO IDE 自己的套件資料夾損壞（例如下載中斷留下不完整的套件）時，Arduino 編譯會自動改用 Singular Core，不再直接失敗
+  When the PlatformIO IDE's own package folder is damaged (for example a package left incomplete by an interrupted download), Arduino builds now switch to Singular Core automatically instead of failing
+- 第一次下載 ESP32 套件不再在兩分鐘後被中止：準備套件最多等 30 分鐘，編譯最多等 10 分鐘。之前中止時留下的不完整套件，Singular Core 會自動清掉並重新下載
+  Downloading ESP32 packages for the first time is no longer stopped after two minutes: preparing packages may take up to 30 minutes and building up to 10 minutes. Singular Core removes packages left incomplete by an earlier stop and downloads them again
+- Windows 使用者名稱較長（超過 13 字元，或網域帳號）時，ESP32 編譯改用 `C:\SingularBlockly-…` 資料夾，避免編譯指令超過 Windows 的長度上限而失敗
+  On Windows accounts with longer user names (over 13 characters, or domain accounts), ESP32 builds use a `C:\SingularBlockly-…` folder so the compile command stays within the Windows length limit
+
+### ✨ 新功能 Features
+
+- Windows 的 PlatformIO 診斷面板會顯示 PlatformIO 工作位置與系統長路徑設定；清理受管檔案時也會移除舊位置的套件與久未使用的編譯資料夾
+  The PlatformIO diagnostics panel on Windows shows the PlatformIO work folder and the system long-path setting; cleaning managed files also removes packages left in the old location and build folders unused for a long time
+
 ## [0.93.0] - 2026-11-16
 
 ### ✨ 新功能 Features

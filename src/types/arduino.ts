@@ -70,6 +70,8 @@ export interface ArduinoUploadResult {
 		stage: ArduinoUploadStage;
 		message: string;
 		details?: string;
+		/** Machine-readable cause; `path-too-long` triggers the shorter-folder notice (spec 074). */
+		errorCode?: 'path-too-long';
 	};
 }
 

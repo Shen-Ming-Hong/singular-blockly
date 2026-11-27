@@ -372,6 +372,8 @@ window.languageManager.loadMessages('it', {
 	PLATFORMIO_DIAGNOSTIC_PYTHON_SELECTION: 'Instradamento Python',
 	PLATFORMIO_DIAGNOSTIC_PACKAGE_STATUS: 'Stato pacchetti',
 	PLATFORMIO_DIAGNOSTIC_STORAGE_USAGE: 'Utilizzo dello spazio',
+	PLATFORMIO_DIAGNOSTIC_WORK_ROOT: 'Cartella di lavoro di PlatformIO',
+	PLATFORMIO_DIAGNOSTIC_WINDOWS_LONG_PATHS: 'Percorsi lunghi di Windows',
 	PLATFORMIO_DIAGNOSTIC_FALLBACK_USED: 'Fallback utilizzato',
 	PLATFORMIO_DIAGNOSTIC_ACTION_REPAIR_MANAGED_RUNTIME: 'Ripara ambiente gestito',
 	PLATFORMIO_DIAGNOSTIC_ACTION_CLEANUP_MANAGED_RUNTIME: 'Pulisci file gestiti',
@@ -380,6 +382,7 @@ window.languageManager.loadMessages('it', {
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_SUCCESS: 'Riparazione dell’ambiente gestito completata.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REPAIR_FAILED: 'Riparazione dell’ambiente gestito non riuscita. Consultare il registro con dettagli oscurati.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_SUCCESS: 'Pulizia completata: rimossi {0} download, {1} directory temporanee e {2} versioni precedenti.',
+	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_WORK_ROOT: 'Sono state rimosse anche {0} cartelle di pacchetti PlatformIO non usate e {1} vecchie cartelle di compilazione dei progetti.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_CLEANUP_FAILED: 'Pulizia dell’ambiente gestito non riuscita. I file sconosciuti non sono stati modificati.',
 	PLATFORMIO_DIAGNOSTIC_MANAGED_REVEAL_FAILED:
 		'Impossibile aprire la cartella Singular Core. Completa l’inizializzazione o ripara l’ambiente gestito, quindi riprova.',
@@ -1027,6 +1030,7 @@ window.languageManager.loadMessages('it', {
 	// Arduino Upload Results
 	ARDUINO_COMPILE_SUCCESS: 'Compilazione riuscita!',
 	ARDUINO_UPLOAD_SUCCESS: 'Caricamento riuscito!',
+	ARDUINO_PATH_TOO_LONG_DETAILS: 'I percorsi dei file sono troppo lunghi per questo Windows. Scegli una cartella più corta per Singular Core nelle impostazioni.',
 
 	// Arduino Upload Errors
 	ERROR_ARDUINO_PIO_NOT_FOUND: 'PlatformIO CLI non trovato. Installa prima PlatformIO.',

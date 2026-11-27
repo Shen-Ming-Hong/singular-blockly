@@ -401,6 +401,60 @@ suite('ArduinoUploader Tests', () => {
 			assert.deepStrictEqual(commands, ['provider-pio:pkg', 'managed-pio:pkg', 'managed-pio:run']);
 		});
 
+		test('Gives first-time package downloads and ESP32 builds enough time (spec 074)', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			const timeouts: Record<string, number | undefined> = {};
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(
+				async (_command: string, args: string[], options: { timeout?: number }) => {
+					timeouts[args[0]] = options.timeout;
+					return { code: 0, stdout: 'success', stderr: '' };
+				}
+			);
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				undefined,
+				manager,
+				() => true
+			);
+
+			const result = await uploader.upload({ code: 'void setup() {}', board: 'esp32' });
+
+			assert.strictEqual(result.success, true);
+			assert.strictEqual(timeouts.pkg, 30 * 60 * 1000);
+			assert.ok((timeouts.run ?? 0) >= 10 * 60 * 1000);
+		});
+
+		test('Shows PlatformIO install lines while preparing packages (spec 074)', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(
+				async (_command: string, args: string[], _options: unknown, onStdout?: (data: string) => void) => {
+					if (args[0] === 'pkg') {
+						onStdout?.('Resolving esp32 dependencies...\nTool Manager: Installing platformio/toolchain-xtensa-esp32 @ 8.4.0\nsome other line\nUnpacking\n');
+					}
+					return { code: 0, stdout: 'success', stderr: '' };
+				}
+			);
+			const uploader = new ArduinoUploader(
+				testWorkspacePath, mockExecutor, mockFileSystem, mockSettingsManager, mockStreamingExecutor,
+				undefined, manager, () => true
+			);
+			const progress: ArduinoUploadProgress[] = [];
+
+			await uploader.upload({ code: 'void setup() {}', board: 'esp32' }, update => progress.push(update));
+
+			const prepare = progress.filter(update => update.stage === 'checking_pio' && update.progress === 18).map(update => update.message);
+			assert.deepStrictEqual(prepare, [
+				'Preparing project packages...',
+				'Resolving esp32 dependencies...',
+				'Tool Manager: Installing platformio/toolchain-xtensa-esp32 @ 8.4.0',
+				'Unpacking',
+			]);
+		});
+
 		test('Never retries another Core after the upload command has spawned', async () => {
 			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
 			const commands: string[] = [];
@@ -532,6 +586,61 @@ suite('ArduinoUploader Tests', () => {
 			// 編譯成功但上傳失敗 = 硬體連接問題
 			assert.strictEqual(result.success, false, 'Should fail');
 			assert.strictEqual(result.error?.stage, 'uploading', 'Should fail at uploading stage (hardware issue)');
+		});
+
+		test('Should report path-too-long when a Windows package path exceeds MAX_PATH (spec 074)', async () => {
+			const request: ArduinoUploadRequest = {
+				code: '#include <Arduino.h>\nvoid setup() {}\nvoid loop() {}',
+				board: 'esp32',
+			};
+			const deepHeader = `C:\\Users\\ray\\AppData\\Roaming\\Code\\User\\globalStorage\\singular-ray.singular-blockly\\runtime-v1\\versions\\${'a'.repeat(36)}\\core\\packages\\framework-arduinoespressif32\\tools\\sdk\\esp32\\include\\libsodium\\libsodium\\src\\libsodium\\include\\sodium\\crypto_box_curve25519xchacha20poly1305.h`;
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(true);
+			(mockExecutor.exec as sinon.SinonStub)
+				.withArgs(sinon.match(/--version/))
+				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
+				code: 1,
+				stdout: 'Compiling .pio/build/esp32/src/main.cpp.o',
+				stderr: `fatal error: ${deepHeader}: No such file or directory`,
+			});
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.success, false);
+			assert.strictEqual(result.error?.stage, 'compiling');
+			assert.strictEqual(result.error?.errorCode, 'path-too-long');
+		});
+
+		test('Should keep an ordinary missing include as a compile error', async () => {
+			const request: ArduinoUploadRequest = { code: 'void setup() {}', board: 'uno' };
+			(mockFileSystem.existsSync as sinon.SinonStub).returns(true);
+			(mockExecutor.exec as sinon.SinonStub)
+				.withArgs(sinon.match(/--version/))
+				.resolves({ stdout: 'PlatformIO Core, version 6.1.11', stderr: '' });
+			(mockStreamingExecutor.spawn as sinon.SinonStub).resolves({
+				code: 1,
+				stdout: 'Compiling .pio/build/uno/src/main.cpp.o',
+				stderr: 'src/main.cpp:1:10: fatal error: Servo.h: No such file or directory',
+			});
+
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor
+			);
+			const result = await uploader.upload(request);
+
+			assert.strictEqual(result.error?.stage, 'compiling');
+			assert.strictEqual(result.error?.errorCode, undefined);
 		});
 
 		test('Should fail when PlatformIO is not installed', async () => {

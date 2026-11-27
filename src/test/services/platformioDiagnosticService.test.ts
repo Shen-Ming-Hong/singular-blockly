@@ -494,4 +494,38 @@ suite('PlatformioDiagnosticService Tests', () => {
 		assert.ok(!summary.plainText.includes('Storage usage: - bytes'));
 		assert.ok(!summary.plainText.includes(privatePath));
 	});
+
+	test('reports the Windows work root summary and read-only long path state (spec 074)', async () => {
+		execFileStub.callsFake(async (filePath: string, args: string[]) => {
+			if (filePath.toLowerCase().endsWith('reg.exe')) {
+				assert.deepStrictEqual(args, ['query', 'HKLM\\SYSTEM\\CurrentControlSet\\Control\\FileSystem', '/v', 'LongPathsEnabled']);
+				return { stdout: '\r\nHKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\FileSystem\r\n    LongPathsEnabled    REG_DWORD    0x0\r\n', stderr: '' };
+			}
+			throw new Error('not installed');
+		});
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub, execFile: execFileStub, env: { PATH: '', SystemRoot: 'C:\\Windows' }, platform: 'win32', homeDir: 'C:\\Users\\Tester',
+			managedRuntime: {
+				getStatus: sinon.stub().resolves({ status: 'missing' }),
+				getStorageSummary: () => '<managed-storage:123456789abc>',
+				getStorageUsageBytes: sinon.stub().resolves(null),
+				getWorkRootSummary: sinon.stub().resolves('local-app-data <pio-work-root:abcdef012345>'),
+			},
+		});
+		const session = await service.collectDiagnostics(null);
+		const managed = session.coreDiagnostics?.environments.managed;
+		assert.strictEqual(managed?.workRootSummary, 'local-app-data <pio-work-root:abcdef012345>');
+		assert.strictEqual(managed?.windowsLongPaths, 'disabled');
+		const calledReg = execFileStub.getCalls().filter(call => String(call.args[0]).toLowerCase().endsWith('reg.exe'));
+		assert.ok(calledReg.every(call => !call.args[1].includes('add')), 'the registry is only queried');
+	});
+
+	test('does not probe Windows long paths on other platforms', async () => {
+		const service = new PlatformioDiagnosticService({
+			existsSync: existsSyncStub, execFile: execFileStub, env: { PATH: '' }, platform: 'darwin', homeDir: '/Users/tester',
+			managedRuntime: { getStatus: sinon.stub().resolves({ status: 'missing' }), getStorageSummary: () => '<managed-storage:123456789abc>', getStorageUsageBytes: sinon.stub().resolves(null) },
+		});
+		const session = await service.collectDiagnostics(null);
+		assert.strictEqual(session.coreDiagnostics?.environments.managed.windowsLongPaths, undefined);
+	});
 });

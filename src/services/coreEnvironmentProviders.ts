@@ -7,7 +7,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { CoreEnvironment } from '../types/coreEnvironment';
+import { CoreEnvironment, CoreWorkload } from '../types/coreEnvironment';
 import { getDefaultPlatformioExecutablePath } from './executableResolver';
 import { CoreEnvironmentProvider } from './coreEnvironmentManager';
 import { ManagedRuntimeService } from './managedRuntimeService';
@@ -98,10 +98,13 @@ export class ManagedCoreEnvironmentProvider implements CoreEnvironmentProvider {
 
 	async resolve(
 		workspaceUri: string,
-		options: { onProgress?: (progress: { stage: string; percent: number }) => void } = {}
+		options: {
+			onProgress?: (progress: { stage: string; percent: number }) => void;
+			workload?: CoreWorkload;
+		} = {}
 	): Promise<CoreEnvironment | null> {
 		if (!this.service) {return null;}
 		await this.service.ensureReady({ onProgress: options.onProgress });
-		return this.service.getCoreEnvironment(workspaceUri);
+		return this.service.getCoreEnvironment(workspaceUri, { workload: options.workload });
 	}
 }
