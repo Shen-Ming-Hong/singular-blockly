@@ -2277,7 +2277,7 @@ function populateBoardOptions() {
 	}
 
 	// 清空現有選項
-	boardSelect.innerHTML = '';
+	boardSelect.replaceChildren();
 
 	// 添加 "None" 選項
 	const noneOption = document.createElement('option');
@@ -2317,7 +2317,7 @@ function populateBoardDropdown(boardSelect) {
 		return;
 	}
 
-	dropdown.innerHTML = '';
+	dropdown.replaceChildren();
 
 	Array.from(boardSelect.options).forEach(option => {
 		const optionButton = document.createElement('button');
@@ -2451,7 +2451,7 @@ function populateLanguageDropdown() {
 		return;
 	}
 
-	dropdown.innerHTML = '';
+	dropdown.replaceChildren();
 
 	LANGUAGE_OPTIONS.forEach(option => {
 		const optionButton = document.createElement('button');
@@ -2907,7 +2907,7 @@ function refreshTxtSensorSelectOptions() {
 
 		const currentValue = select.value || txtTestState.sensorTypes[i - 1] || 'BUTTON';
 		const options = getTxtSensorOptions();
-		select.innerHTML = '';
+		select.replaceChildren();
 
 		options.forEach(option => {
 			const optionEl = document.createElement('option');
@@ -3108,6 +3108,7 @@ const backupManager = {
 		document.getElementById('createBackupBtn').addEventListener('click', this.showBackupForm.bind(this));
 		document.getElementById('confirmBackupBtn').addEventListener('click', this.createBackup.bind(this));
 		document.getElementById('cancelBackupBtn').addEventListener('click', this.hideBackupForm.bind(this));
+		document.getElementById('backupName').addEventListener('input', this.clearBackupError.bind(this));
 		document.getElementById('saveAutoBackupBtn').addEventListener('click', this.saveAutoBackupSettings.bind(this));
 
 		// 更新多國語言文字
@@ -3149,12 +3150,36 @@ const backupManager = {
 		const seconds = String(now.getSeconds()).padStart(2, '0');
 		const defaultName = `backup_${year}${month}${day}_${hours}${minutes}${seconds}`;
 
+		this.clearBackupError();
 		document.getElementById('backupName').value = defaultName;
 		document.getElementById('backupName').focus();
 	},
 
+	// 顯示備份名稱錯誤。VS Code webview 的沙箱沒有 allow-modals，alert() 會被忽略，所以錯誤寫在欄位下方。
+	showBackupError: function (message) {
+		const errorEl = document.getElementById('backupNameError');
+		const input = document.getElementById('backupName');
+		if (!errorEl || !input) {
+			return;
+		}
+		errorEl.textContent = message;
+		errorEl.hidden = false;
+		input.setAttribute('aria-invalid', 'true');
+		input.focus();
+	},
+
+	clearBackupError: function () {
+		const errorEl = document.getElementById('backupNameError');
+		if (errorEl) {
+			errorEl.textContent = '';
+			errorEl.hidden = true;
+		}
+		document.getElementById('backupName')?.removeAttribute('aria-invalid');
+	},
+
 	// 隱藏建立備份表單
 	hideBackupForm: function () {
+		this.clearBackupError();
 		// 顯示控制欄
 		document.querySelector('.backup-control-bar:not(.backup-create-form .backup-control-bar)').style.display = 'flex';
 		// 隱藏表單
@@ -3165,12 +3190,12 @@ const backupManager = {
 	createBackup: function () {
 		const backupName = document.getElementById('backupName').value.trim();
 		if (!backupName) {
-			alert(window.languageManager.getMessage('BACKUP_ERROR_NAME_REQUIRED', 'Enter a backup name'));
+			this.showBackupError(window.languageManager.getMessage('BACKUP_ERROR_NAME_REQUIRED', 'Enter a backup name'));
 			return;
 		}
 		// 安全性檢查：確保檔案名稱有效
 		if (!this.isValidFilename(backupName)) {
-			alert(
+			this.showBackupError(
 				window.languageManager.getMessage(
 					'BACKUP_ERROR_NAME_INVALID',
 					'The backup name contains invalid characters. Avoid \\ / : * ? " < > |'
@@ -3203,7 +3228,9 @@ const backupManager = {
 			log.info(`建立備份 "${backupName}" 成功`);
 		} catch (error) {
 			log.error('建立備份失敗:', error);
-			alert(window.languageManager.getMessage('BACKUP_ERROR_CREATE_FAILED', 'Failed to create backup: {0}').replace('{0}', error.message));
+			this.showBackupError(
+				window.languageManager.getMessage('BACKUP_ERROR_CREATE_FAILED', 'Failed to create backup: {0}').replace('{0}', error.message)
+			);
 		}
 	},
 
@@ -3224,7 +3251,7 @@ const backupManager = {
 	updateBackupListUI: function (backups) {
 		const backupListEl = document.getElementById('backupList');
 		// 清空列表
-		backupListEl.innerHTML = '';
+		backupListEl.replaceChildren();
 
 		// 如果沒有備份，顯示空白訊息
 		if (!backups || backups.length === 0) {
@@ -3557,7 +3584,7 @@ const functionSearch = {
 	// 顯示搜尋結果
 	displayResults: function () {
 		const resultsContainer = document.getElementById('searchResults');
-		resultsContainer.innerHTML = '';
+		resultsContainer.replaceChildren();
 
 		if (this.searchResults.length === 0) {
 			const emptyMessage = window.languageManager
@@ -3628,7 +3655,7 @@ const functionSearch = {
 	clearResults: function () {
 		this.searchResults = [];
 		this.currentResultIndex = -1;
-		document.getElementById('searchResults').innerHTML = '';
+		document.getElementById('searchResults').replaceChildren();
 	},
 
 	// 清除高亮顯示
@@ -5905,7 +5932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 				// 清空、選染卡片
 				if (sampleCardContainer) {
-					sampleCardContainer.innerHTML = '';
+					sampleCardContainer.replaceChildren();
 					const samples = message.samples || [];
 					const categories = message.categories || [];
 					const lang = message.language || 'en';
@@ -8288,7 +8315,7 @@ function initSampleBrowser() {
 				sampleLoadingText.textContent = window.languageManager.getMessage('SAMPLE_BROWSER_LOADING', 'Loading samples...');
 			}
 			if (sampleSpinner) sampleSpinner.style.display = 'flex';
-			if (sampleCardContainer) sampleCardContainer.innerHTML = '';
+			if (sampleCardContainer) sampleCardContainer.replaceChildren();
 			if (sampleEmptyNotice) sampleEmptyNotice.style.display = 'none';
 			if (sampleOfflineNotice) sampleOfflineNotice.style.display = 'none';
 
@@ -9040,7 +9067,7 @@ function initTxtTestDialog() {
 	// Build Motors UI (M1–M4)
 	const motorsEl = document.getElementById('txtTestMotors');
 	if (motorsEl) {
-		motorsEl.innerHTML = '';
+		motorsEl.replaceChildren();
 		for (let i = 1; i <= 4; i++) {
 			const row = document.createElement('div');
 			row.className = 'txt-motor-row';
@@ -9073,7 +9100,7 @@ function initTxtTestDialog() {
 	// Build Outputs UI (O1–O8)
 	const outputsEl = document.getElementById('txtTestOutputs');
 	if (outputsEl) {
-		outputsEl.innerHTML = '';
+		outputsEl.replaceChildren();
 		for (let i = 1; i <= 8; i++) {
 			const btn = document.createElement('button');
 			btn.className = 'txt-output-btn';
@@ -9092,7 +9119,7 @@ function initTxtTestDialog() {
 	// Build Inputs UI (I1–I8)
 	const inputsEl = document.getElementById('txtTestInputs');
 	if (inputsEl) {
-		inputsEl.innerHTML = '';
+		inputsEl.replaceChildren();
 		const sensorOptions = getTxtSensorOptions();
 		const optionsHtml = sensorOptions.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
 		for (let i = 1; i <= 8; i++) {
