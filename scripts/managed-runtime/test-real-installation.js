@@ -120,8 +120,11 @@ async function main() {
 const ESP32_PLATFORM = 'platformio/espressif32@7.0.1';
 const AVR_PLATFORM = 'platformio/atmelavr@5.3.0';
 const WINDOWS_MAX_PATH = 260;
-/** Length of `C:\Users\<45-character name>\AppData\Local`, the longest supported profile (research R4). */
-const LONGEST_SUPPORTED_LOCAL_APP_DATA_LENGTH = 'C:\\Users\\'.length + 45 + '\\AppData\\Local'.length;
+/**
+ * Length of `C:\Users\<13-character name>\AppData\Local`, the longest profile
+ * whose work root stays within WORK_ROOT_MAX_LENGTH (research R7).
+ */
+const LONGEST_SUPPORTED_LOCAL_APP_DATA_LENGTH = 'C:\\Users\\'.length + 13 + '\\AppData\\Local'.length;
 
 /** Longest absolute path below a directory, without following links. */
 function longestPathBelow(directory) {
@@ -145,8 +148,9 @@ function longestPathBelow(directory) {
  *
  * - a non-ASCII LOCALAPPDATA (the sandbox path), which must fall back to the
  *   hardened system-drive folder; ESP32 and AVR are both built there;
- * - an ASCII LOCALAPPDATA exactly as long as `C:\Users\<45 characters>\AppData\Local`,
- *   which must still fit in the local-app-data folder; ESP32 is built there.
+ * - an ASCII LOCALAPPDATA exactly as long as `C:\Users\<13 characters>\AppData\Local`,
+ *   which must still fit in the local-app-data folder; ESP32 is built there, so
+ *   its compile command must stay under the Windows command-line limit.
  *
  * Each case also checks that the Python (CyberBrick/MicroPython) workload keeps
  * its original PlatformIO folders.

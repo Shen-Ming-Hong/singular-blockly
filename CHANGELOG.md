@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   When the PlatformIO IDE's own package folder is damaged (for example a package left incomplete by an interrupted download), Arduino builds now switch to Singular Core automatically instead of failing
 - 第一次下載 ESP32 套件不再在兩分鐘後被中止：準備套件最多等 30 分鐘，編譯最多等 10 分鐘。之前中止時留下的不完整套件，Singular Core 會自動清掉並重新下載
   Downloading ESP32 packages for the first time is no longer stopped after two minutes: preparing packages may take up to 30 minutes and building up to 10 minutes. Singular Core removes packages left incomplete by an earlier stop and downloads them again
+- Windows 使用者名稱較長（超過 13 字元，或網域帳號）時，ESP32 編譯改用 `C:\SingularBlockly-…` 資料夾，避免編譯指令超過 Windows 的長度上限而失敗
+  On Windows accounts with longer user names (over 13 characters, or domain accounts), ESP32 builds use a `C:\SingularBlockly-…` folder so the compile command stays within the Windows length limit
 
 ### ✨ 新功能 Features
 

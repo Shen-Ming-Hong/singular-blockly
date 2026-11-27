@@ -11,6 +11,7 @@ import * as path from 'path';
 import { ManagedRuntimeStorage } from '../../services/managedRuntimeStorage';
 import {
 	checkWorkRootBudget,
+	WORK_ROOT_MAX_LENGTH,
 	createIcaclsArguments,
 	createProjectKey,
 	createWorkRootLayout,
@@ -160,13 +161,16 @@ suite('ManagedRuntime Windows work root', () => {
 		assert.strictEqual(isShortPathEligible('C:\\'), false);
 	});
 
-	test('local app data fits user names up to 45 characters and fails beyond the budget', () => {
+	test('local app data fits user names up to 13 characters so ESP32 command lines stay under the Windows limit', () => {
 		const root = (name: string) => `C:\\Users\\${name}\\AppData\\Local\\SingularBlockly\\pio`;
-		for (const length of [1, 20, 45]) {
+		for (const length of [1, 9, 13]) {
 			assert.strictEqual(checkWorkRootBudget(root('u'.repeat(length))).ok, true, `length ${length}`);
 		}
-		assert.strictEqual(checkWorkRootBudget(root('u'.repeat(46))).ok, false);
-		assert.strictEqual(checkWorkRootBudget(root('student.SCHOOL-DOMAIN')).ok, true);
+		assert.strictEqual(root('u'.repeat(13)).length, WORK_ROOT_MAX_LENGTH);
+		for (const length of [14, 20, 45]) {
+			assert.strictEqual(checkWorkRootBudget(root('u'.repeat(length))).ok, false, `length ${length}`);
+		}
+		assert.strictEqual(checkWorkRootBudget(root('student.SCHOOL-DOMAIN')).ok, false);
 		assert.strictEqual(checkWorkRootBudget('C:\\SingularBlockly-0a1b2c3d').ok, true);
 	});
 
