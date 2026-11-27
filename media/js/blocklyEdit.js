@@ -997,8 +997,9 @@ function initToolbarIconButtonLabels() {
 	}).observe(toolbar, { subtree: true, childList: true, attributes: true, attributeFilter: ['title'] });
 }
 
-// 舊式對話框（.modal + style.display）的鍵盤與焦點：Esc 關閉、開啟時焦點進入、關閉後回到開啟它的按鈕。
-// 積木包與積木設計器自己處理，TXT 測試面板是原生 <dialog>。
+// 原生 <dialog class="modal"> 對話框的鍵盤與焦點：showModal() 讓背景不能操作、焦點留在對話框內；
+// 這裡另外處理 Esc 走各自的關閉流程、開啟時焦點進入、關閉後回到開啟它的按鈕。
+// 積木包與積木設計器（內含 Blockly 小工具）仍是 div，自己處理焦點；TXT 測試面板另外管理。
 const MANAGED_MODALS = [
 	{ id: 'backupModal', close: '#backupModal .modal-close' },
 	{ id: 'functionSearchModal', close: '#functionSearchModal .modal-close' },
@@ -1010,7 +1011,22 @@ const modalOpeners = new Map();
 let lastFocusOutsideModals = null;
 
 function isModalShown(modal) {
-	return Boolean(modal) && modal.isConnected && getComputedStyle(modal).display !== 'none';
+	if (!modal || !modal.isConnected) {
+		return false;
+	}
+	return modal instanceof HTMLDialogElement ? modal.open : getComputedStyle(modal).display !== 'none';
+}
+
+function showModalDialog(modal) {
+	if (modal && !modal.open) {
+		modal.showModal();
+	}
+}
+
+function closeModalDialog(modal) {
+	if (modal?.open) {
+		modal.close();
+	}
 }
 
 function isFocusableAndVisible(element) {
@@ -1077,19 +1093,10 @@ function initModalAccessibility() {
 		if (!modal) {
 			continue;
 		}
-		const content = modal.querySelector('.modal-content') || modal;
-		if (!content.hasAttribute('role')) {
-			content.setAttribute('role', 'dialog');
-		}
-		content.setAttribute('aria-modal', 'true');
+		// 原生 <dialog> 本身就是 dialog 角色，showModal() 時是 modal；只補上標題關聯。
 		const title = modal.querySelector('.modal-header h2[id]');
-		if (title && !content.hasAttribute('aria-labelledby')) {
-			content.setAttribute('aria-labelledby', title.id);
-		}
-		const closeButton = document.querySelector(close);
-		if (closeButton && closeButton.tagName !== 'BUTTON') {
-			closeButton.setAttribute('role', 'button');
-			closeButton.setAttribute('tabindex', '0');
+		if (title && !modal.hasAttribute('aria-labelledby')) {
+			modal.setAttribute('aria-labelledby', title.id);
 		}
 		let wasShown = isModalShown(modal);
 		new MutationObserver(() => {
@@ -1103,7 +1110,15 @@ function initModalAccessibility() {
 			} else {
 				handleManagedModalHidden(modal);
 			}
-		}).observe(modal, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+		}).observe(modal, { attributes: true, attributeFilter: ['open', 'style', 'class', 'hidden'] });
+		// 原生 Esc（close request）也走各自的關閉按鈕，讓收起表單等清理照常執行。
+		modal.addEventListener('cancel', event => {
+			const closeButton = document.querySelector(close);
+			if (closeButton) {
+				event.preventDefault();
+				closeButton.click();
+			}
+		});
 	}
 	updateModalCloseLabels();
 
@@ -1114,16 +1129,7 @@ function initModalAccessibility() {
 		}
 	});
 
-	// 關閉鈕是 <span>（TXT 的會被複製替換），用委派處理 Enter／空白鍵。
-	const closeSelector = MANAGED_MODALS.map(entry => entry.close).join(', ');
-	document.addEventListener('keydown', event => {
-		const target = event.target instanceof Element ? event.target : null;
-		if ((event.key === 'Enter' || event.key === ' ') && target && target.tagName !== 'BUTTON' && target.matches(closeSelector)) {
-			event.preventDefault();
-			target.click();
-		}
-	});
-
+	// 先攔下 Esc 交給各自的關閉按鈕；cancel 事件是沒攔到時（例如連按 Esc）的備援。
 	document.addEventListener('keydown', event => {
 		if (event.key !== 'Escape' || event.defaultPrevented || isBlocklyTextInputCompositionEvent(event)) {
 			return;
@@ -3123,14 +3129,14 @@ const backupManager = {
 
 	// 打開模態對話框
 	openModal: function () {
-		document.getElementById('backupModal').style.display = 'block';
+		showModalDialog(document.getElementById('backupModal'));
 		// 刷新備份列表
 		this.refreshBackupList();
 	},
 
 	// 關閉模態對話框
 	closeModal: function () {
-		document.getElementById('backupModal').style.display = 'none';
+		closeModalDialog(document.getElementById('backupModal'));
 		this.hideBackupForm();
 	},
 	// 顯示建立備份表單
@@ -3509,13 +3515,13 @@ const functionSearch = {
 
 	// 打開搜尋對話框
 	openModal: function () {
-		document.getElementById('functionSearchModal').style.display = 'block';
+		showModalDialog(document.getElementById('functionSearchModal'));
 		document.getElementById('functionSearchInput').focus();
 	},
 
 	// 關閉搜尋對話框
 	closeModal: function () {
-		document.getElementById('functionSearchModal').style.display = 'none';
+		closeModalDialog(document.getElementById('functionSearchModal'));
 	},
 
 	// 執行搜尋
@@ -3861,7 +3867,7 @@ window.addEventListener('languageChanged', function (event) {
 	populateLanguageDropdown();
 
 	// 如果備份列表已顯示，更新其UI
-	if (document.getElementById('backupModal').style.display === 'block') {
+	if (document.getElementById('backupModal').open) {
 		// 刷新備份列表以更新按鈕文字
 		backupManager.refreshBackupList();
 	}
@@ -6054,7 +6060,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// T009: 載入工作區
 			case 'loadSampleWorkspace': {
 				const sampleModalEl = document.getElementById('sampleModal');
-				if (sampleModalEl) sampleModalEl.style.display = 'none';
+				closeModalDialog(sampleModalEl);
 				await handleWorkspaceLoadMessage(message);
 				break;
 			}
@@ -6529,7 +6535,7 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 	if (isTxt) {
 		const txtModal = document.getElementById('txtConnectionModal');
 		if (txtModal) {
-			txtModal.style.display = 'block';
+			showModalDialog(txtModal);
 		}
 		// 載入已儲存的 TXT 設定
 		vscode.postMessage({ command: 'txtLoadConfig' });
@@ -6547,7 +6553,7 @@ function initTxtConnectionPanel() {
 	// 關閉 modal 的輔助函式
 	function closeTxtModal() {
 		const modal = document.getElementById('txtConnectionModal');
-		if (modal) modal.style.display = 'none';
+		closeModalDialog(modal);
 	}
 
 	// 綁定 modal close 按鈕（X）
@@ -6573,7 +6579,7 @@ function initTxtConnectionPanel() {
 		txtConfigButton.parentNode.replaceChild(newBtn, txtConfigButton);
 		newBtn.addEventListener('click', () => {
 			const m = document.getElementById('txtConnectionModal');
-			if (m) m.style.display = 'block';
+			showModalDialog(m);
 		});
 	}
 
@@ -6758,10 +6764,7 @@ function initCyberBrickUploadSettingsPanel() {
 }
 
 function openCyberBrickUploadSettingsModal() {
-	const modal = document.getElementById('cyberbrickUploadSettingsModal');
-	if (modal) {
-		modal.style.display = 'block';
-	}
+	showModalDialog(document.getElementById('cyberbrickUploadSettingsModal'));
 	renderCyberBrickUploadSettings();
 	if (cyberBrickUploadSettingsState.otaProvisioningState.status === 'running') {
 		return;
@@ -6771,10 +6774,7 @@ function openCyberBrickUploadSettingsModal() {
 }
 
 function closeCyberBrickUploadSettingsModal() {
-	const modal = document.getElementById('cyberbrickUploadSettingsModal');
-	if (modal) {
-		modal.style.display = 'none';
-	}
+	closeModalDialog(document.getElementById('cyberbrickUploadSettingsModal'));
 	const passwordInput = document.getElementById('cyberbrickWifiPasswordInput');
 	if (passwordInput) {
 		passwordInput.type = 'password';
@@ -8298,7 +8298,7 @@ function initSampleBrowser() {
 	if (sampleButton && sampleModal) {
 		sampleButton.addEventListener('click', () => {
 			// 若 modal 已開啟則略過
-			if (sampleModal.style.display !== 'none') return;
+			if (sampleModal.open) return;
 
 			// 顯示模態並啟動 spinner
 			const sampleSpinner = document.getElementById('sampleSpinner');
@@ -8319,7 +8319,7 @@ function initSampleBrowser() {
 			if (sampleEmptyNotice) sampleEmptyNotice.style.display = 'none';
 			if (sampleOfflineNotice) sampleOfflineNotice.style.display = 'none';
 
-			sampleModal.style.display = 'flex';
+			showModalDialog(sampleModal);
 
 			const hasBlocks = window.getBlocklyWorkspace().getAllBlocks(false).length > 0;
 			vscode.postMessage({
@@ -8331,7 +8331,7 @@ function initSampleBrowser() {
 
 	if (sampleModalClose && sampleModal) {
 		sampleModalClose.addEventListener('click', () => {
-			sampleModal.style.display = 'none';
+			closeModalDialog(sampleModal);
 		});
 	}
 
@@ -8339,7 +8339,7 @@ function initSampleBrowser() {
 	if (sampleModal) {
 		sampleModal.addEventListener('click', event => {
 			if (event.target === sampleModal) {
-				sampleModal.style.display = 'none';
+				closeModalDialog(sampleModal);
 			}
 		});
 	}
@@ -8517,9 +8517,6 @@ const blockPackManager = {
 		if (!button || !modal || !window.blockPacks) return;
 		button.addEventListener('click', () => this.open());
 		document.getElementById('blockPackModalClose').addEventListener('click', () => this.close());
-		document.getElementById('blockPackModalClose').addEventListener('keydown', event => {
-			if (event.key === 'Enter' || event.key === ' ') this.close();
-		});
 		modal.addEventListener('keydown', event => {
 			if (event.key === 'Escape') this.close();
 		});
