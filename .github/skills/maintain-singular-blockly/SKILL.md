@@ -9,7 +9,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 
 ## 動手前
 
-1. **SDD 判斷（必做，寫程式前）。** 對照 `AGENTS.md`「Spec-Driven Development」的觸發清單，逐項判斷本次變更是否碰到：Extension Host 與 WebView 的訊息約定、Blockly 積木與產生器的約定、持久化的工作區格式、開發板上傳流程、managed runtime、安全邊界、重大相容性變動（重大依賴升級依實際影響判斷）。符合任何一項，先依 `AGENTS.md` 的順序跑完 Spec Kit 流程（`speckit-specify` 起）再寫程式；修 bug 也一樣，只要改到上述流程的行為。都不符合才走一般維護。判斷結果（符合哪一項、或逐項說明為何不符合）寫進 PR 描述的「SDD 判斷」段落；無法確定時視為符合，或先問 Ray。依 [SDD 分級與版本門檻](references/sdd-gate.md) 再依規模分成 No SDD、Lightweight plan、Full SDD 三級；走 Full SDD 或接續既有 SDD 前，先通過該文件的 Spec Kit 版本門檻。
+1. **SDD 判斷（必做，寫程式前）。** 對照 `AGENTS.md`「Spec-Driven Development」的觸發清單，逐項判斷本次變更是否碰到：Extension Host 與 WebView 的訊息約定、Blockly 積木與產生器的約定、持久化的工作區格式、開發板上傳流程、managed runtime、安全邊界、重大相容性變動（重大依賴升級依實際影響判斷）。符合任何一項，先依 `AGENTS.md` 的順序跑完 Spec Kit 流程（`speckit-specify` 起）再寫程式；修 bug 也一樣，只要改到上述流程的行為。都不符合才走一般維護。這一步放在任務 checklist 的第一項，做完才開始改檔（2026-11-26 回饋遮蔽 #295 先實作、開了草稿 PR 才發現碰到安全邊界而補 SDD）。判斷結果（符合哪一項、或逐項說明為何不符合）寫進 PR 描述的「SDD 判斷」段落；無法確定時視為符合，或先問 Ray。依 [SDD 分級與版本門檻](references/sdd-gate.md) 再依規模分成 No SDD、Lightweight plan、Full SDD 三級；走 Full SDD 或接續既有 SDD 前，先通過該文件的 Spec Kit 版本門檻。
 2. 從入口追到寫入、產生程式碼或硬體操作的終點，查找所有共用函式的呼叫者；在共同根因處修正。
 3. 分清楚貢獻者技能與產品技能：前者以 `.github/skills/` 為來源、由 `.agents/skills/` 連結；後者由 `resources/project-skills/singular-blockly/` 封裝並安裝到使用者專案。不要直接改生成或已安裝副本。
 4. 沿用 `AGENTS.md` 的架構與安全規則。處理程式碼安全時使用 `security-checker`；有翻譯變更時使用 `i18n-maintenance`；範例、依賴、回饋或硬體問題使用相應專用技能。
@@ -38,6 +38,7 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
   - `local/integration` 只在本機，不推上遠端、不從它開 PR，也不在上面直接改檔。
   - 某個 PR 合併後，或整合分支累積太多已過時的 merge 時，從最新 `origin/master` 重建：先確認沒有 Ray 未提交的改動，`git switch -C local/integration origin/master`，再把仍在等測試的任務分支一個個 merge 回來，重新 compile 並告訴 Ray。
   - 不要把未提交的檔案留在 `master` 或整合分支上；測試用的改動一律先提交到任務分支再併入。
+- **Windows 專屬的問題**（路徑或命令列長度、PlatformIO 在 Windows 的速度、COM 埠與驅動）不在 Mac 的整合分支測，改照 [Windows 實機測試](references/windows-testing.md)：CI 的 runtime e2e 驗下載與編譯，Ray 的 Windows 測試機驗上傳與秒數，PR 版 VSIX 從雲端打包後由 Remote Control 安裝。
 - 不得停止使用者正在工作的進程，也不得為了測試更動全域安全設定。需清理本次測試時，先確認實例屬於自己的隔離測試；使用者要求停止搶焦點操作後，立即停止相關 UI／F5 動作，並轉為背景檢查。
 
 ## UI 元件通則
@@ -72,4 +73,5 @@ description: 在 Singular Blockly 儲存庫進行寫入型維護時，先隔離�
 - 完成有可重用根因與實際證據的工作時，精簡更新 [維護經驗](references/lessons.md) 的現有規則；只有新規則確實影響未來決策才新增條目。
 - Commit／push／PR 交給 `git-workflow`，本地審查與發布交給 `pr-review-release`。只有純介面與純軟體的改動能從開發一路自行做到合併；涉及硬體行為的改動先依「Mac 測試與使用者工作並行」讓 Ray 在本機按 F5 實測通過，才開 PR、進整合佇列；新的使用者可見介面同樣在本機讓 Ray 按 F5 確認外觀後才合併（Ray，2026-11-13）。非發布 PR 依 Ray 的常設授權，在 [整合佇列與自主合併](references/merge-queue.md) 的前置條件全部成立時自行 squash 合併，不再另外詢問；該文件「仍須先問 Ray」列出的事項仍先取得 Ray 明確同意。
 - 合併後在乾淨的整合 worktree 確認 `master` 包含本次 commit，並等 `master` 的完整 CI 結束；失敗時依該文件處理，不把合併當成完成。
+- **等 CI、發布 run、部署或 Remote Control 結果時用背景監看，不用長間隔提醒（Ray，2026-11-27：「每次都等過頭」）。** 開一個背景程式每 30–60 秒查一次狀態，結束（成功、失敗、取消、逾時都算）就喚醒自己接著做，例如 Bash 背景執行的 `until` 迴圈，或會在狀態改變時輸出的 Monitor。公開 repo 的 Actions 狀態可用 `curl -s https://api.github.com/repos/Shen-Ming-Hong/singular-blockly/actions/runs?head_sha=<SHA>` 唯讀查詢，tag 用 `git ls-remote --tags origin`；PR 的 CI 另外用 `subscribe_pr_activity`。`send_later` 這類定時提醒只當 20 分鐘以上的保底，不當主要的等待方式。
 - 何時發布依 `pr-review-release` 的「何時發布」：以改動是否進到使用者安裝的 VSIX、使用者是否感受得到判斷 patch、累積 minor 或不用發；patch／minor 由協調者判斷並執行、發布後回報 Ray（見 `pr-review-release` 的「誰決定發布」），major 候選仍先問 Ray。新的使用者可見介面須 Ray 確認外觀、涉及硬體行為須 Ray 完成實體硬體測試，未通過前只能以預設關閉的形式合併與發布（見該技能的「發布門檻」）。

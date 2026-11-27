@@ -71,4 +71,22 @@
 
 - **問題：** 2026-11-13 的 CyberBrick OTA 修正（PR #257）改變了開發板上傳流程的行為，依 `AGENTS.md` 屬於完整 SDD 範圍，卻被當成一般 bug 修正直接實作，沒有 spec、plan 與 tasks。
 - **規則：** 寫程式前先做技能主文件「動手前」第 1 步的 SDD 判斷，並把結果寫進 PR 描述；「只是修 bug」不是跳過 SDD 的理由，判斷依據是改到哪個契約或流程。
-- **證據：** PR #257、`AGENTS.md`「Spec-Driven Development」的觸發清單，以及 Ray 2026-11-13 指示「不用補，但是要修改專案維護技能避免再次發生」。
+- **證據：** PR #257、`AGENTS.md`「Spec-Driven Development」的觸發清單，以及 Ray 2026-11-13 指示「不用補，但是要修改專案維護技能避免再次發生」；2026-11-26 回饋遮蔽 #295 又是先實作才補 SDD（改到安全邊界），因此把 SDD 判斷固定為任務 checklist 的第一項。
+
+## [上傳 / Windows] 備援切換要留紀錄，診斷時確認實際用了哪一套工具
+
+- **問題：** #293 在 Ray 的 Windows 上測 Singular Core，診斷面板顯示 managed，編譯卻一直報 `pins_arduino.h` 找不到。實際上 Singular Core 準備套件時被 2 分鐘逾時砍斷、留下半套套件，之後每次失敗都默默退回 PlatformIO IDE 的 Core，而那邊的框架也被砍在解壓縮中途。沒有紀錄，花了多輪才查到。
+- **規則：** Core 或上傳路徑的備援切換一定寫 log 並記下失敗輸出；套件準備的逾時以 Windows 實測的首次安裝時間（13–18 分鐘）設定。診斷實機問題時，用行程命令列或 log 確認那次實際啟動的是哪個執行檔，不要只信診斷面板的路由。
+- **證據：** PR #293（30 分鐘準備逾時、清除半套套件、備援 log）、`references/windows-testing.md`。
+
+## [Windows] 路徑與命令列有兩個上限，各要用對的環境驗
+
+- **問題：** #293 原本只防單一路徑 260 字元，Ray 的 Windows（工作資料夾 52 字元）也全部通過；Windows CI 用 45 字元的帳號名稱才抓到 ESP32 編譯命令列（約 19,200 + 198 × 工作資料夾長度）超過約 32,767 字元，出現 `CreateProcess: No such file or directory`。
+- **規則：** 改到 Windows 的工具路徑時，同時檢查單一路徑與整條命令列的長度，並用 Windows CI 的 runtime e2e 跑極端帳號名稱；實機只證明一般情況可用。
+- **證據：** PR #293 的 `managedRuntimeWorkRoot.ts`（工作資料夾上限 56 字元）與 Windows runtime e2e 結果。
+
+## [自動化] 改了排程 workflow 要手動跑一次
+
+- **問題：** #290 把 Notify Claude 改回每日掃描安全警示，合併後手動觸發一次，才發現 `GITHUB_TOKEN` 讀不到 Dependabot alerts 時，錯誤 JSON 被當成一筆新警示。
+- **規則：** 新增或修改排程、只在特定事件觸發的 workflow，合併後用 `workflow_dispatch` 實跑一次並看輸出，確認沒有誤觸發也沒有漏接，再當成完成。
+- **證據：** PR #290、修正 PR #291、`.github/workflows/notify-claude.yml`。
