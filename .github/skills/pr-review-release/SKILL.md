@@ -46,7 +46,7 @@ Ray 於 2026-10-22 補充：自動化測試、CI 與雲端本地驗證只證明�
 | 類別 | 判斷 | 門檻 |
 | --- | --- | --- |
 | **新的使用者可見介面** | 新增或明顯改變使用者看得到的佈局：面板、對話框、工具箱分類、積木外觀、設定項目的呈現、通知與錯誤畫面的流程；修文字錯字、翻譯、沿用既有樣式的小修正不算 | Ray 看過截圖或實際畫面，並在對話中確認外觀。改動先併進 Ray 本機的 `local/integration` 整合分支、通知 Ray 按 F5 確認（流程見 `maintain-singular-blockly` 的「Mac 測試與使用者工作並行」） |
-| **涉及硬體行為** | 改變在實體板子上執行或與板子溝通的行為：上傳流程、新板型、腳位或板子設定、會在硬體上執行的新積木／積木包與其產生的程式、韌體、序列埠／Wi-Fi／SSH 通訊 | Ray 在實體硬體上測試並回報可用；雲端編譯、模擬或單元測試不算。改動先併進 Ray 本機的 `local/integration` 整合分支讓 Ray 按 F5 實測，通過後才開 PR（流程見 `maintain-singular-blockly` 的「Mac 測試與使用者工作並行」） |
+| **涉及硬體行為** | 改變在實體板子上執行或與板子溝通的行為：上傳流程、新板型、腳位或板子設定、會在硬體上執行的新積木／積木包與其產生的程式、韌體、序列埠／Wi-Fi／SSH 通訊 | Ray 在實體硬體上測試並回報可用；雲端編譯、模擬或單元測試不算。改動先併進 Ray 本機的 `local/integration` 整合分支讓 Ray 按 F5 實測，通過後才開 PR（流程見 `maintain-singular-blockly` 的「Mac 測試與使用者工作並行」）。只在 Windows 出現的行為改在 Windows 測試機實測，PR 可以先開好跑 CI，Ray 實測通過才合併（見該技能的 `references/windows-testing.md`） |
 
 1. **合併。** 屬於上述類別的 PR，在門檻通過前只能用下列其中一種方式合併；兩者都做不到時不合併，列入 [整合佇列與自主合併](../maintain-singular-blockly/references/merge-queue.md) 的「仍須先問 Ray」：
    - 已取得門檻要求的確認，PR 描述記錄 Ray 確認的訊息（時間與內容摘要）。
@@ -65,7 +65,7 @@ Ray 於 2026-10-20 授權：patch 與 minor 發布由協調者依「何時發布
 - 協調者的決定不能取代「發布門檻」要求的 Ray 外觀確認與實體硬體測試；協調者決定發布前，先確認發布範圍內每一項都通過門檻或預設關閉。
 - 仍先問 Ray：major 候選、`NEEDS_USER_DECISION` finding、repository／帳號／secrets／ruleset 設定變更，以及必須由 Ray 在本機操作的步驟。
 - 發布後回報 Ray：版本、CHANGELOG 重點、PR、publish run、GitHub Release 與兩個市集的結果。
-- 執行發布的工作階段自己推進到底，不等 Ray 或協調者提醒（Ray 2026-10-20）：發布 PR 合併後，`master` push 的 CI 不會喚醒工作階段，要自行排程檢查（例如 `send_later` 約 10 分鐘）；綠燈、tag 不存在且沒有其他 PR 持有 `merge-lease` 時，立即依 Phase 5 觸發發布（雲端用 `create-release-tag.yml`），再同樣排程追蹤 run 直到三端驗證完成。期間 `master` 若又前進，只要新 commit 的 CI 也綠且未改動版本檔與 CHANGELOG，就在最新 `master` 發布。
+- 執行發布的工作階段自己推進到底，不等 Ray 或協調者提醒（Ray 2026-10-20）：發布 PR 合併後，`master` push 的 CI 不會喚醒工作階段，要自行用背景監看每 30–60 秒查一次（見 `maintain-singular-blockly`「驗證與交付」的背景監看規則，不用約 10 分鐘的 `send_later`，Ray 2026-11-27 指出這樣每次都等過頭）；綠燈、tag 不存在且沒有其他 PR 持有 `merge-lease` 時，立即依 Phase 5 觸發發布（雲端用 `create-release-tag.yml`），再同樣用背景監看追蹤 tag 與 publish run，結束立刻做三端驗證。期間 `master` 若又前進，只要新 commit 的 CI 也綠且未改動版本檔與 CHANGELOG，就在最新 `master` 發布。
 
 ## 非發布 PR 的自主合併
 

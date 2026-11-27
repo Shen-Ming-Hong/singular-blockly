@@ -54,7 +54,7 @@ metadata:
 
 ## 合併後自動部署
 
-Ray 2026-11-23 決定：改到 `workers/feedback/` 的 PR 合併後，Worker 自動部署，不必先問；部署後回報 Ray。合併本身不會觸發部署，由開 PR 的工作階段在 `master` CI 綠燈後接著做，不等人提醒（`master` CI 不會喚醒工作階段，用 `send_later` 約 10 分鐘後檢查）。
+Ray 2026-11-23 決定：改到 `workers/feedback/` 的 PR 合併後，Worker 自動部署，不必先問；部署後回報 Ray。合併本身不會觸發部署，由開 PR 的工作階段在 `master` CI 綠燈後接著做，不等人提醒（`master` CI 不會喚醒工作階段，依 `maintain-singular-blockly`「驗證與交付」用背景監看每 30–60 秒查一次，綠燈就部署）。
 
 1. 在乾淨的最新 `origin/master` worktree 執行 `npx wrangler d1 migrations list singular-blockly-feedback --config workers/feedback/wrangler.jsonc --remote`。有待套用的 migration 時停下，依下節先問 Ray；Worker 等 migration 套用後才部署（expand／contract 的順序）。
 2. `npx wrangler deploy --config workers/feedback/wrangler.jsonc`，記下新的 version id 與上一版的 version id。
