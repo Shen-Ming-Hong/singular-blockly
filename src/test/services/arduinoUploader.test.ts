@@ -5,6 +5,7 @@
  */
 
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
@@ -543,6 +544,190 @@ suite('ArduinoUploader Tests', () => {
 			assert.ok(JSON.stringify(result).includes('<managed-runtime>'));
 			assert.ok(!JSON.stringify(result).includes('/private/managed core'));
 			assert.ok(!JSON.stringify(progress).includes('/private/managed core'));
+		});
+
+		suite('Unchanged re-upload (spec 077)', () => {
+			let root: string;
+			let workspace: string;
+			let coreDir: string;
+			let commands: string[][];
+			let realFileSystem: FileSystemInterface;
+			let failNobuildBeforeUpload: boolean;
+			let boardMac: string;
+
+			const ini = '[env:esp32dev]\nplatform = platformio/espressif32@7.0.1\nboard = esp32dev\nframework = arduino\n';
+			const flashOutput = () => `Auto-detected: COM35\nUploading .pio/build/esp32dev/firmware.bin\nesptool.py v4.5.1\nSerial port COM35\nMAC: ${boardMac}\nWriting at 0x00010000... (100 %)`;
+
+			setup(() => {
+				root = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-reupload-'));
+				workspace = path.join(root, 'project');
+				coreDir = path.join(root, 'core');
+				fs.mkdirSync(workspace, { recursive: true });
+				fs.writeFileSync(path.join(workspace, 'platformio.ini'), ini);
+				commands = [];
+				failNobuildBeforeUpload = false;
+				boardMac = '24:6f:28:aa:bb:01';
+				realFileSystem = {
+					existsSync: target => fs.existsSync(target),
+					writeFileSync: sandbox.spy((target: string, data: string) => fs.writeFileSync(target, data)),
+					mkdirSync: (target, options) => { fs.mkdirSync(target, options); },
+					readFileSync: (target, encoding) => fs.readFileSync(target, encoding),
+				};
+				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (_command: string, args: string[]) => {
+					commands.push(args);
+					if (args[0] === 'pkg') {
+						fs.mkdirSync(path.join(coreDir, 'platforms', 'espressif32'), { recursive: true });
+						return { code: 0, stdout: '', stderr: '' };
+					}
+					if (args.includes('nobuild')) {
+						if (failNobuildBeforeUpload) {
+							return { code: 1, stdout: '', stderr: 'Error: firmware.bin not found' };
+						}
+						return { code: 0, stdout: `Configuring upload protocol...\n${flashOutput()}`, stderr: '' };
+					}
+					const build = path.join(workspace, '.pio', 'build', 'esp32dev');
+					fs.mkdirSync(build, { recursive: true });
+					fs.writeFileSync(path.join(build, 'firmware.bin'), `firmware ${commands.length}`);
+					return { code: 0, stdout: `Linking .pio/build/esp32dev/firmware.elf\nConfiguring upload protocol...\n${flashOutput()}`, stderr: '' };
+				});
+			});
+
+			teardown(() => {
+				fs.rmSync(root, { recursive: true, force: true });
+			});
+
+			function createUploader(): ArduinoUploader {
+				const managed: CoreEnvironment = {
+					...coreEnvironment('managed'),
+					invocation: { command: 'managed-pio', prefixArgs: [], env: { PLATFORMIO_CORE_DIR: coreDir }, source: 'managed' },
+				};
+				const manager = new CoreEnvironmentManager(
+					{ id: 'provider', resolve: async () => null },
+					{ id: 'managed', resolve: async () => managed }
+				);
+				return new ArduinoUploader(
+					workspace, mockExecutor, realFileSystem, mockSettingsManager, mockStreamingExecutor, undefined, manager, () => true
+				);
+			}
+
+			const kinds = () => commands.map(args => (args[0] === 'pkg' ? 'pkg' : args.includes('nobuild') ? 'nobuild-upload' : 'build-upload'));
+
+			test('skips package preparation and the build when nothing changed', async () => {
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				const first = await createUploader().upload({ code, board: 'esp32' });
+				assert.strictEqual(first.success, true);
+				assert.deepStrictEqual(kinds(), ['pkg', 'build-upload']);
+
+				commands = [];
+				const progress: ArduinoUploadProgress[] = [];
+				const second = await createUploader().upload({ code, board: 'esp32' }, p => progress.push(p));
+				assert.strictEqual(second.success, true);
+				assert.deepStrictEqual(kinds(), ['nobuild-upload']);
+				assert.deepStrictEqual(commands[0].slice(0, 7), ['run', '--target', 'nobuild', '--target', 'upload', '--upload-port', 'COM35']);
+				assert.ok(!progress.some(p => p.stage === 'compiling'), 'no compile stage when reusing the build');
+				assert.strictEqual((realFileSystem.writeFileSync as sinon.SinonSpy).callCount, 1, 'main.cpp written only once');
+			});
+
+			test('rebuilds after the code changes, without re-preparing packages', async () => {
+				await createUploader().upload({ code: 'void setup() {}\nvoid loop() {}\n', board: 'esp32' });
+				commands = [];
+				const result = await createUploader().upload({ code: 'void setup() { delay(1); }\nvoid loop() {}\n', board: 'esp32' });
+				assert.strictEqual(result.success, true);
+				assert.deepStrictEqual(kinds(), ['build-upload']);
+			});
+
+			test('prepares packages again when platformio.ini changes', async () => {
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				await createUploader().upload({ code, board: 'esp32' });
+				fs.appendFileSync(path.join(workspace, 'platformio.ini'), 'monitor_speed = 115200\n');
+				commands = [];
+				await createUploader().upload({ code, board: 'esp32' });
+				assert.deepStrictEqual(kinds(), ['pkg', 'build-upload']);
+			});
+
+			test('falls back to a full build when reusing the firmware fails before flashing', async () => {
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				await createUploader().upload({ code, board: 'esp32' });
+				commands = [];
+				failNobuildBeforeUpload = true;
+				const result = await createUploader().upload({ code, board: 'esp32' });
+				assert.strictEqual(result.success, true);
+				assert.deepStrictEqual(kinds(), ['nobuild-upload', 'build-upload']);
+			});
+
+			test('flashes everything right away when the same port has another ESP32', async () => {
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				await createUploader().upload({ code, board: 'esp32' });
+				boardMac = '24:6f:28:aa:bb:02';
+				commands = [];
+				const swapped = await createUploader().upload({ code, board: 'esp32' });
+				assert.strictEqual(swapped.success, true);
+				assert.deepStrictEqual(kinds(), ['nobuild-upload', 'build-upload']);
+				commands = [];
+				await createUploader().upload({ code, board: 'esp32' });
+				assert.deepStrictEqual(kinds(), ['nobuild-upload'], 'the new board is remembered');
+			});
+
+			test('never skips the ESP32 build without a chip MAC from the last full upload', async () => {
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				(mockStreamingExecutor.spawn as sinon.SinonStub).onCall(1).callsFake(async (_command: string, args: string[]) => {
+					commands.push(args);
+					const build = path.join(workspace, '.pio', 'build', 'esp32dev');
+					fs.mkdirSync(build, { recursive: true });
+					fs.writeFileSync(path.join(build, 'firmware.bin'), 'firmware');
+					return { code: 0, stdout: 'Configuring upload protocol...\nUploading .pio/build/esp32dev/firmware.bin', stderr: '' };
+				});
+				await createUploader().upload({ code, board: 'esp32' });
+				commands = [];
+				await createUploader().upload({ code, board: 'esp32' });
+				assert.deepStrictEqual(kinds(), ['build-upload']);
+			});
+
+			test('reuses an AVR build on any port, since its upload writes the whole program', async () => {
+				fs.writeFileSync(path.join(workspace, 'platformio.ini'), '[env:uno]\nplatform = platformio/atmelavr@5.3.0\nboard = uno\nframework = arduino\n');
+				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (_command: string, args: string[]) => {
+					commands.push(args);
+					if (args[0] === 'pkg') {
+						fs.mkdirSync(path.join(coreDir, 'platforms', 'atmelavr'), { recursive: true });
+						return { code: 0, stdout: '', stderr: '' };
+					}
+					if (!args.includes('nobuild')) {
+						const build = path.join(workspace, '.pio', 'build', 'uno');
+						fs.mkdirSync(build, { recursive: true });
+						fs.writeFileSync(path.join(build, 'firmware.hex'), ':00000001FF');
+					}
+					return { code: 0, stdout: 'Configuring upload protocol...\nLooking for upload port...\nAuto-detected: /dev/ttyACM0', stderr: '' };
+				});
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				await createUploader().upload({ code, board: 'uno' });
+				commands = [];
+				await createUploader().upload({ code, board: 'uno' });
+				assert.deepStrictEqual(kinds(), ['nobuild-upload']);
+				assert.ok(!commands[0].includes('--upload-port'), 'AVR keeps automatic port detection');
+			});
+
+			test('keeps the build record when flashing fails, so the retry skips the build', async () => {
+				fs.writeFileSync(path.join(workspace, 'platformio.ini'), '[env:uno]\nplatform = atmelavr\nboard = uno\nframework = arduino\n');
+				fs.mkdirSync(path.join(coreDir, 'platforms', 'atmelavr'), { recursive: true });
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				(mockStreamingExecutor.spawn as sinon.SinonStub).onCall(1).callsFake(async () => {
+					const build = path.join(workspace, '.pio', 'build', 'uno');
+					fs.mkdirSync(build, { recursive: true });
+					fs.writeFileSync(path.join(build, 'firmware.hex'), ':00000001FF');
+					commands.push(['run', '--target', 'upload']);
+					return { code: 1, stdout: 'Looking for upload port...', stderr: 'Error: Please specify `upload_port`' };
+				});
+				const failed = await createUploader().upload({ code, board: 'uno' });
+				assert.strictEqual(failed.success, false);
+				commands = [];
+				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (_command: string, args: string[]) => {
+					commands.push(args);
+					return { code: 0, stdout: 'Configuring upload protocol...\nLooking for upload port...', stderr: '' };
+				});
+				const retry = await createUploader().upload({ code, board: 'uno' });
+				assert.strictEqual(retry.success, true);
+				assert.deepStrictEqual(kinds(), ['nobuild-upload']);
+			});
 		});
 
 		test('Should complete upload flow with device (upload mode)', async () => {
