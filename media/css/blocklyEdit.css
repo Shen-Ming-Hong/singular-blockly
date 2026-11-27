@@ -780,9 +780,8 @@ body.vscode-high-contrast-light .txt-virtual-controls-mode-badge.running {
 }
 
 #boardSelectToggle:focus-visible {
-	outline: none;
-	border-color: #8ab4f8;
-	box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 2px;
 }
 
 #boardSelectText {
@@ -2730,11 +2729,6 @@ body.theme-dark #boardSelectToggle:hover {
 	background-color: #3a3a3a;
 }
 
-body.theme-dark #boardSelectToggle:focus-visible {
-	border-color: #8ab4f8;
-	box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.25);
-}
-
 body.theme-dark #themeToggle {
 	background-color: #444444;
 }
@@ -2965,6 +2959,18 @@ body.theme-dark .txt-input-sensor-select {
 	font-size: 1rem;
 	border: 1px solid #ccc;
 	border-radius: 4px;
+}
+
+/* 備份名稱錯誤：webview 沙箱會擋掉 alert()，錯誤顯示在欄位下方 */
+.backup-name-error {
+	flex-basis: 100%;
+	margin: 0;
+	font-size: 0.9rem;
+	color: var(--editor-status-error-fg);
+}
+
+#backupName[aria-invalid='true'] {
+	border-color: var(--editor-status-error-fg);
 }
 
 #confirmBackupBtn {

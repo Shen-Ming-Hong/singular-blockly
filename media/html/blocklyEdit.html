@@ -536,10 +536,11 @@
                         <div class="backup-create-container">
                             <label for="backupName" id="backupNameLabel"></label>
                             <div class="backup-name-input-group">
-                                <input type="text" id="backupName" placeholder="">
+                                <input type="text" id="backupName" placeholder="" aria-describedby="backupNameError">
                                 <button id="confirmBackupBtn" class="primary-btn"></button>
                                 <button id="cancelBackupBtn" class="secondary-btn"></button>
                             </div>
+                            <p id="backupNameError" class="backup-name-error" role="alert" hidden></p>
                         </div>
                     </div>
                 </div>
