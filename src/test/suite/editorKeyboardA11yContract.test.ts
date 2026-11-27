@@ -19,12 +19,19 @@ describe('Blockly editor keyboard and toolbar accessibility', () => {
 		assert.match(source, /updateTheme\(currentTheme\);\n\tupdateToolbarToolboxClearance\(\);/);
 	});
 
-	it('removes closed board and language options from the tab order', () => {
-		for (const name of ['board-dropdown', 'language-dropdown']) {
-			const closed = new RegExp(`\\.${name} \\{[^}]*visibility: hidden;`);
-			const open = new RegExp(`\\.${name}\\.open \\{[^}]*visibility: visible;`);
-			assert.match(css, closed, `${name} closed state`);
-			assert.match(css, open, `${name} open state`);
+	// Modern Web Guidance `customizable-select`：開發板與語言選單用原生 <select>，鍵盤與無障礙由瀏覽器處理。
+	it('uses native customizable selects for the board and language menus', () => {
+		const html = readWorkspaceFile('media/html/blocklyEdit.html');
+		assert.match(html, /<label for="boardSelect" id="boardSelectLabel">/);
+		assert.match(html, /<select id="boardSelect">/);
+		assert.match(html, /<select id="languageSelect" class="language-select" title="" aria-label="">\s*<!--[\s\S]*?-->\s*<button type="button" class="language-select-button">/);
+		assert.doesNotMatch(html, /boardSelectToggle|boardDropdown|languageToggle|languageDropdown/);
+		assert.doesNotMatch(source, /function (open|close|toggle)(Board|Language)Dropdown/);
+		assert.match(source, /languageSelect\.addEventListener\('change', \(\) => handleLanguageSelection\(languageSelect\.value\)\)/);
+		assert.match(source, /languageSelect\.setAttribute\('aria-label', label\)/);
+		for (const id of ['boardSelect', 'languageSelect']) {
+			assert.match(css, new RegExp(`#${id}:not\\(#ui-none\\)::picker\\(select\\)[^{]*\\{[^}]*appearance: base-select;`));
+			assert.match(css, new RegExp(`#${id}:not\\(#ui-none\\):focus-visible[^{]*\\{[^}]*outline: 2px solid var\\(--editor-focus-ring\\)`));
 		}
 	});
 
@@ -33,10 +40,22 @@ describe('Blockly editor keyboard and toolbar accessibility', () => {
 			assert.match(source, new RegExp(`\\{ id: '${id}', close: `), id);
 		}
 		assert.match(source, /event\.key !== 'Escape'/);
-		assert.match(source, /content\.setAttribute\('aria-modal', 'true'\)/);
+		assert.match(source, /modal\.addEventListener\('cancel', event => \{/);
 		assert.match(source, /modalOpeners\.set\(modal\.id, opener\)/);
 		assert.match(source, /target\?\.focus\(\)/);
 		assert.match(source, /initModalAccessibility\(\);/);
+	});
+
+	// Modern Web Guidance `dialog`：用原生 <dialog> + showModal()，背景不能操作、焦點留在對話框內。
+	it('uses native modal dialogs with real close buttons', () => {
+		const html = readWorkspaceFile('media/html/blocklyEdit.html');
+		for (const id of ['backupModal', 'functionSearchModal', 'sampleModal', 'txtConnectionModal', 'cyberbrickUploadSettingsModal']) {
+			assert.match(html, new RegExp(`<dialog id="${id}" class="modal"`), id);
+			assert.doesNotMatch(source, new RegExp(`getElementById\\('${id}'\\)\\.style\\.display`), `${id} toggles display instead of showModal()`);
+		}
+		assert.doesNotMatch(html, /<span class="modal-close"/);
+		assert.match(source, /modal\.showModal\(\);/);
+		assert.match(css, /dialog\.modal::backdrop \{/);
 	});
 
 	it('names icon-only toolbar buttons and hides their icons', () => {

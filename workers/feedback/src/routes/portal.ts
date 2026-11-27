@@ -332,12 +332,13 @@ function reporterPortalPage(locale: PortalLocale): Response {
 		messageLoadMore.addEventListener('click', () => loadMessages().catch(() => { status.textContent = strings.error; }));
 		addMessageButton.addEventListener('click', async () => {
 			if (!selectedId || messageMutation) return;
-			const body = prompt(strings.messageLabel, messageDrafts.get(selectedId) || '')?.trim();
-			if (!body) return;
+			const typed = prompt(strings.messageLabel, messageDrafts.get(selectedId) || '')?.trim();
+			if (!typed) return;
+			if (containsBlockedFeedbackText(typed)) { messageDrafts.set(selectedId, typed); status.textContent = strings.personalWarning; return; }
+			const body = redactFeedbackText(typed);
 			const pending = { feedbackId: selectedId, body };
 			messageDrafts.set(pending.feedbackId, pending.body);
 			if (textLength(pending.body) > 4000) { status.textContent = strings.error; return; }
-			if (containsSensitiveFeedbackText(pending.body)) { status.textContent = strings.personalWarning; return; }
 			messageMutation = pending;
 			addMessageButton.disabled = true;
 			try {

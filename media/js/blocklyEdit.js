@@ -125,8 +125,6 @@ let currentTheme = window.initialTheme || 'light';
 // 儲存語言偏好與解析後語言
 let currentLanguagePreference = 'auto';
 let currentResolvedLanguage = window.languageManager ? window.languageManager.currentLanguage : 'en';
-let isLanguageDropdownOpen = false;
-let isBoardDropdownOpen = false;
 let isLanguageSwitchReloading = false;
 let pendingLanguageReloadTimer = null;
 let txtSshSetupDone = false;
@@ -252,6 +250,7 @@ const LANGUAGE_OPTIONS = [
 const toast = {
 	currentToast: null,
 	currentTimeout: null,
+	progress: null, // 進行中的長時間工作：{ text, startTime, timer }
 
 	/**
 	 * 顯示 Toast 通知
@@ -278,8 +277,9 @@ const toast = {
 			toastEl.classList.add('visible');
 		});
 
-		// 自動隱藏
+		// 自動隱藏；上傳仍在進行時，短暫通知結束後回到進度提示
 		this.currentTimeout = setTimeout(() => {
+			this.currentTimeout = null;
 			toastEl.classList.remove('visible');
 			setTimeout(() => {
 				if (toastEl.parentNode) {
@@ -287,9 +287,94 @@ const toast = {
 				}
 				if (this.currentToast === toastEl) {
 					this.currentToast = null;
+					if (this.progress) {
+						this.showProgress(this.progress.text);
+					}
 				}
 			}, 300); // 等待淡出動畫完成
 		}, duration);
+	},
+
+	/**
+	 * 顯示或更新長時間工作的進度提示（編譯、上傳）
+	 * 不會自動計時隱藏，只在 endProgress() 時結束；經過時間每秒更新。
+	 * 已顯示時就地更新文字，不重播進場動畫，避免提示閃爍或看起來消失又出現。
+	 * @param {string} message - 目前狀態文字
+	 * @param {number} startTime - 工作開始時間（Date.now()），用於顯示經過時間
+	 */
+	showProgress: function (message, startTime) {
+		if (!this.progress) {
+			this.progress = { text: message, startTime: startTime || Date.now(), timer: null };
+		}
+		this.progress.text = message;
+		if (startTime) {
+			this.progress.startTime = startTime;
+		}
+
+		const current = this.currentToast;
+		if (current && current.classList.contains('progress')) {
+			current.querySelector('.toast-message').textContent = message;
+			this.updateProgressElapsed();
+			return;
+		}
+		if (current) {
+			// 其他短暫通知顯示中：等它結束後再回到進度提示
+			return;
+		}
+
+		this.hide();
+		const toastEl = document.createElement('div');
+		toastEl.className = 'toast info progress';
+		const messageEl = document.createElement('span');
+		messageEl.className = 'toast-message';
+		messageEl.setAttribute('role', 'status');
+		messageEl.setAttribute('aria-live', 'polite');
+		messageEl.textContent = message;
+		// 經過時間每秒變動，不交給螢幕閱讀器朗讀（WCAG 4.1.3 只需要宣告狀態變化）
+		const elapsedEl = document.createElement('span');
+		elapsedEl.className = 'toast-elapsed';
+		elapsedEl.setAttribute('aria-hidden', 'true');
+		toastEl.append(messageEl, elapsedEl);
+		document.body.appendChild(toastEl);
+		this.currentToast = toastEl;
+		this.updateProgressElapsed();
+
+		requestAnimationFrame(() => {
+			toastEl.classList.add('visible');
+		});
+
+		if (!this.progress.timer) {
+			this.progress.timer = setInterval(() => this.updateProgressElapsed(), 1000);
+		}
+	},
+
+	/**
+	 * 更新進度提示的經過時間
+	 */
+	updateProgressElapsed: function () {
+		if (!this.progress || !this.currentToast || !this.currentToast.classList.contains('progress')) {
+			return;
+		}
+		const elapsedEl = this.currentToast.querySelector('.toast-elapsed');
+		if (elapsedEl) {
+			elapsedEl.textContent = formatProgressElapsed(Date.now() - this.progress.startTime);
+		}
+	},
+
+	/**
+	 * 結束進度提示（成功、失敗或取消時呼叫）
+	 */
+	endProgress: function () {
+		if (!this.progress) {
+			return;
+		}
+		if (this.progress.timer) {
+			clearInterval(this.progress.timer);
+		}
+		this.progress = null;
+		if (this.currentToast && this.currentToast.classList.contains('progress')) {
+			this.hide();
+		}
 	},
 
 	/**
@@ -308,6 +393,21 @@ const toast = {
 		document.querySelectorAll('.toast').forEach(el => el.remove());
 	},
 };
+
+/**
+ * 把經過毫秒數格式化成進度提示用的短字串，例如 "8s"、"1:05"
+ * @param {number} ms - 經過時間（毫秒）
+ * @returns {string}
+ */
+function formatProgressElapsed(ms) {
+	const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+	if (totalSeconds < 60) {
+		return `${totalSeconds}s`;
+	}
+	const minutes = Math.floor(totalSeconds / 60);
+	const seconds = String(totalSeconds % 60).padStart(2, '0');
+	return `${minutes}:${seconds}`;
+}
 
 /**
  * 當前程式語言（用於決定使用哪個生成器）
@@ -895,8 +995,9 @@ function initToolbarIconButtonLabels() {
 	}).observe(toolbar, { subtree: true, childList: true, attributes: true, attributeFilter: ['title'] });
 }
 
-// 舊式對話框（.modal + style.display）的鍵盤與焦點：Esc 關閉、開啟時焦點進入、關閉後回到開啟它的按鈕。
-// 積木包與積木設計器自己處理，TXT 測試面板是原生 <dialog>。
+// 原生 <dialog class="modal"> 對話框的鍵盤與焦點：showModal() 讓背景不能操作、焦點留在對話框內；
+// 這裡另外處理 Esc 走各自的關閉流程、開啟時焦點進入、關閉後回到開啟它的按鈕。
+// 積木包與積木設計器（內含 Blockly 小工具）仍是 div，自己處理焦點；TXT 測試面板另外管理。
 const MANAGED_MODALS = [
 	{ id: 'backupModal', close: '#backupModal .modal-close' },
 	{ id: 'functionSearchModal', close: '#functionSearchModal .modal-close' },
@@ -908,7 +1009,22 @@ const modalOpeners = new Map();
 let lastFocusOutsideModals = null;
 
 function isModalShown(modal) {
-	return Boolean(modal) && modal.isConnected && getComputedStyle(modal).display !== 'none';
+	if (!modal || !modal.isConnected) {
+		return false;
+	}
+	return modal instanceof HTMLDialogElement ? modal.open : getComputedStyle(modal).display !== 'none';
+}
+
+function showModalDialog(modal) {
+	if (modal && !modal.open) {
+		modal.showModal();
+	}
+}
+
+function closeModalDialog(modal) {
+	if (modal?.open) {
+		modal.close();
+	}
 }
 
 function isFocusableAndVisible(element) {
@@ -975,19 +1091,10 @@ function initModalAccessibility() {
 		if (!modal) {
 			continue;
 		}
-		const content = modal.querySelector('.modal-content') || modal;
-		if (!content.hasAttribute('role')) {
-			content.setAttribute('role', 'dialog');
-		}
-		content.setAttribute('aria-modal', 'true');
+		// 原生 <dialog> 本身就是 dialog 角色，showModal() 時是 modal；只補上標題關聯。
 		const title = modal.querySelector('.modal-header h2[id]');
-		if (title && !content.hasAttribute('aria-labelledby')) {
-			content.setAttribute('aria-labelledby', title.id);
-		}
-		const closeButton = document.querySelector(close);
-		if (closeButton && closeButton.tagName !== 'BUTTON') {
-			closeButton.setAttribute('role', 'button');
-			closeButton.setAttribute('tabindex', '0');
+		if (title && !modal.hasAttribute('aria-labelledby')) {
+			modal.setAttribute('aria-labelledby', title.id);
 		}
 		let wasShown = isModalShown(modal);
 		new MutationObserver(() => {
@@ -1001,7 +1108,15 @@ function initModalAccessibility() {
 			} else {
 				handleManagedModalHidden(modal);
 			}
-		}).observe(modal, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+		}).observe(modal, { attributes: true, attributeFilter: ['open', 'style', 'class', 'hidden'] });
+		// 原生 Esc（close request）也走各自的關閉按鈕，讓收起表單等清理照常執行。
+		modal.addEventListener('cancel', event => {
+			const closeButton = document.querySelector(close);
+			if (closeButton) {
+				event.preventDefault();
+				closeButton.click();
+			}
+		});
 	}
 	updateModalCloseLabels();
 
@@ -1012,16 +1127,7 @@ function initModalAccessibility() {
 		}
 	});
 
-	// 關閉鈕是 <span>（TXT 的會被複製替換），用委派處理 Enter／空白鍵。
-	const closeSelector = MANAGED_MODALS.map(entry => entry.close).join(', ');
-	document.addEventListener('keydown', event => {
-		const target = event.target instanceof Element ? event.target : null;
-		if ((event.key === 'Enter' || event.key === ' ') && target && target.tagName !== 'BUTTON' && target.matches(closeSelector)) {
-			event.preventDefault();
-			target.click();
-		}
-	});
-
+	// 先攔下 Esc 交給各自的關閉按鈕；cancel 事件是沒攔到時（例如連按 Esc）的備援。
 	document.addEventListener('keydown', event => {
 		if (event.key !== 'Escape' || event.defaultPrevented || isBlocklyTextInputCompositionEvent(event)) {
 			return;
@@ -2175,7 +2281,7 @@ function populateBoardOptions() {
 	}
 
 	// 清空現有選項
-	boardSelect.innerHTML = '';
+	boardSelect.replaceChildren();
 
 	// 添加 "None" 選項
 	const noneOption = document.createElement('option');
@@ -2202,144 +2308,16 @@ function populateBoardOptions() {
 	} else {
 		boardSelect.value = 'none';
 	}
-
-	populateBoardDropdown(boardSelect);
 }
 
 /**
- * 依據原生 select 生成自訂開發板下拉選單
+ * 動態生成語言選單選項。原生 <select>（appearance: base-select）由瀏覽器處理鍵盤與無障礙；
+ * 第一個子元素是顯示地球圖示的 <button>，重建選項時保留。
  */
-function populateBoardDropdown(boardSelect) {
-	const dropdown = document.getElementById('boardDropdown');
-	if (!dropdown || !boardSelect) {
-		return;
-	}
-
-	dropdown.innerHTML = '';
-
-	Array.from(boardSelect.options).forEach(option => {
-		const optionButton = document.createElement('button');
-		optionButton.type = 'button';
-		optionButton.className = 'board-option';
-		optionButton.dataset.board = option.value;
-		optionButton.setAttribute('role', 'option');
-
-		const label = document.createElement('span');
-		label.className = 'board-option-label';
-		label.textContent = option.textContent || option.value;
-
-		const check = document.createElement('span');
-		check.className = 'board-option-check';
-		check.textContent = '✓';
-
-		optionButton.appendChild(label);
-		optionButton.appendChild(check);
-
-		optionButton.addEventListener('click', event => {
-			event.stopPropagation();
-			if (boardSelect.value !== option.value) {
-				boardSelect.value = option.value;
-				boardSelect.dispatchEvent(new Event('change', { bubbles: true }));
-			}
-			updateBoardSelectionUI(boardSelect);
-			closeBoardDropdown();
-		});
-
-		dropdown.appendChild(optionButton);
-	});
-
-	updateBoardSelectionUI(boardSelect);
-}
-
-/**
- * 更新開發板下拉選單的目前選取狀態
- */
-function updateBoardSelectionUI(boardSelect) {
-	const dropdown = document.getElementById('boardDropdown');
-	const label = document.getElementById('boardSelectText');
-	const select = boardSelect || document.getElementById('boardSelect');
+function populateLanguageSelect() {
+	const select = document.getElementById('languageSelect');
 	if (!select) {
-		return;
-	}
-
-	const selectedOption =
-		select.selectedOptions && select.selectedOptions.length > 0
-			? select.selectedOptions[0]
-			: select.querySelector(`option[value="${select.value}"]`);
-
-	if (label) {
-		label.textContent = selectedOption ? selectedOption.textContent : '';
-	}
-
-	if (!dropdown) {
-		return;
-	}
-
-	dropdown.querySelectorAll('.board-option').forEach(optionEl => {
-		const value = optionEl.dataset.board;
-		if (value === select.value) {
-			optionEl.classList.add('selected');
-			optionEl.setAttribute('aria-selected', 'true');
-		} else {
-			optionEl.classList.remove('selected');
-			optionEl.setAttribute('aria-selected', 'false');
-		}
-	});
-}
-
-function openBoardDropdown() {
-	const dropdown = document.getElementById('boardDropdown');
-	if (!dropdown) {
-		return;
-	}
-
-	closeLanguageDropdown();
-
-	dropdown.classList.add('open');
-	dropdown.setAttribute('aria-hidden', 'false');
-	isBoardDropdownOpen = true;
-
-	const toggleButton = document.getElementById('boardSelectToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'true');
-	}
-}
-
-function closeBoardDropdown() {
-	const dropdown = document.getElementById('boardDropdown');
-	if (!dropdown) {
-		return;
-	}
-	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
-	const focusWasInside = dropdown.contains(document.activeElement);
-	dropdown.classList.remove('open');
-	dropdown.setAttribute('aria-hidden', 'true');
-	isBoardDropdownOpen = false;
-	if (focusWasInside) {
-		document.getElementById('boardSelectToggle')?.focus();
-	}
-
-	const toggleButton = document.getElementById('boardSelectToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'false');
-	}
-}
-
-function toggleBoardDropdown() {
-	if (isBoardDropdownOpen) {
-		closeBoardDropdown();
-	} else {
-		openBoardDropdown();
-	}
-}
-
-/**
- * 動態生成語言選擇下拉選單選項
- */
-function populateLanguageDropdown() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		log.warn('找不到語言下拉選單元素');
+		log.warn('找不到語言選單元素');
 		return;
 	}
 
@@ -2349,53 +2327,25 @@ function populateLanguageDropdown() {
 		return;
 	}
 
-	dropdown.innerHTML = '';
-
+	select.querySelectorAll('option').forEach(option => option.remove());
 	LANGUAGE_OPTIONS.forEach(option => {
-		const optionButton = document.createElement('button');
-		optionButton.type = 'button';
-		optionButton.className = 'language-option';
-		optionButton.dataset.language = option.code;
-
-		const label = document.createElement('span');
-		label.className = 'language-option-label';
-		label.textContent = option.isAuto ? languageManager.getMessage('LANGUAGE_AUTO', 'Auto (follow VS Code)') : option.nativeName;
-
-		const check = document.createElement('span');
-		check.className = 'language-option-check';
-		check.textContent = '✓';
-
-		optionButton.appendChild(label);
-		optionButton.appendChild(check);
-
-		optionButton.addEventListener('click', event => {
-			event.stopPropagation();
-			handleLanguageSelection(option.code);
-		});
-
-		dropdown.appendChild(optionButton);
+		const optionEl = document.createElement('option');
+		optionEl.value = option.code;
+		optionEl.textContent = option.isAuto ? languageManager.getMessage('LANGUAGE_AUTO', 'Auto (follow VS Code)') : option.nativeName;
+		select.appendChild(optionEl);
 	});
 
 	updateLanguageSelectionUI();
 }
 
 /**
- * 更新語言選單的目前選取狀態
+ * 讓語言選單顯示目前的語言偏好
  */
 function updateLanguageSelectionUI() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		return;
+	const select = document.getElementById('languageSelect');
+	if (select && select.value !== currentLanguagePreference) {
+		select.value = currentLanguagePreference;
 	}
-
-	dropdown.querySelectorAll('.language-option').forEach(optionEl => {
-		const code = optionEl.dataset.language;
-		if (code === currentLanguagePreference) {
-			optionEl.classList.add('selected');
-		} else {
-			optionEl.classList.remove('selected');
-		}
-	});
 }
 
 /**
@@ -2487,7 +2437,6 @@ async function handleLanguageSelection(languageCode) {
 	if (languageCode !== 'auto') {
 		const switched = await applyLanguageUpdate(languageCode, languageCode);
 		if (!switched) {
-			closeLanguageDropdown();
 			return;
 		}
 	} else {
@@ -2499,54 +2448,6 @@ async function handleLanguageSelection(languageCode) {
 		command: 'updateLanguage',
 		language: languageCode,
 	});
-
-	closeLanguageDropdown();
-}
-
-function openLanguageDropdown() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		return;
-	}
-
-	closeBoardDropdown();
-
-	dropdown.classList.add('open');
-	dropdown.setAttribute('aria-hidden', 'false');
-	isLanguageDropdownOpen = true;
-
-	const toggleButton = document.getElementById('languageToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'true');
-	}
-}
-
-function closeLanguageDropdown() {
-	const dropdown = document.getElementById('languageDropdown');
-	if (!dropdown) {
-		return;
-	}
-	// 收起後選項不可聚焦；焦點原本在選項上時交回開關按鈕。
-	const focusWasInside = dropdown.contains(document.activeElement);
-	dropdown.classList.remove('open');
-	dropdown.setAttribute('aria-hidden', 'true');
-	isLanguageDropdownOpen = false;
-	if (focusWasInside) {
-		document.getElementById('languageToggle')?.focus();
-	}
-
-	const toggleButton = document.getElementById('languageToggle');
-	if (toggleButton) {
-		toggleButton.setAttribute('aria-expanded', 'false');
-	}
-}
-
-function toggleLanguageDropdown() {
-	if (isLanguageDropdownOpen) {
-		closeLanguageDropdown();
-	} else {
-		openLanguageDropdown();
-	}
 }
 
 function updateToolbarActionsText() {
@@ -2617,10 +2518,12 @@ function updateEditorUITexts() {
 		themeToggle.setAttribute('title', languageManager.getMessage('THEME_TOGGLE', '切換主題'));
 	}
 
-	// 更新語言切換按鈕title屬性
-	const languageToggle = document.getElementById('languageToggle');
-	if (languageToggle) {
-		languageToggle.setAttribute('title', languageManager.getMessage('LANGUAGE_SELECT_TOOLTIP', 'Select Language'));
+	// 語言選單只有圖示，名稱同時寫在 title 與 aria-label
+	const languageSelect = document.getElementById('languageSelect');
+	if (languageSelect) {
+		const label = languageManager.getMessage('LANGUAGE_SELECT_TOOLTIP', 'Select Language');
+		languageSelect.setAttribute('title', label);
+		languageSelect.setAttribute('aria-label', label);
 	}
 
 	const provideFeedbackButton = document.getElementById('provideFeedbackButton');
@@ -2632,7 +2535,7 @@ function updateEditorUITexts() {
 	updateToolbarActionsText();
 
 	// 更新語言下拉選單內容
-	populateLanguageDropdown();
+	populateLanguageSelect();
 
 	// 更新選擇開發板標籤文字
 	const boardSelectLabel = document.getElementById('boardSelectLabel');
@@ -2805,7 +2708,7 @@ function refreshTxtSensorSelectOptions() {
 
 		const currentValue = select.value || txtTestState.sensorTypes[i - 1] || 'BUTTON';
 		const options = getTxtSensorOptions();
-		select.innerHTML = '';
+		select.replaceChildren();
 
 		options.forEach(option => {
 			const optionEl = document.createElement('option');
@@ -3006,6 +2909,7 @@ const backupManager = {
 		document.getElementById('createBackupBtn').addEventListener('click', this.showBackupForm.bind(this));
 		document.getElementById('confirmBackupBtn').addEventListener('click', this.createBackup.bind(this));
 		document.getElementById('cancelBackupBtn').addEventListener('click', this.hideBackupForm.bind(this));
+		document.getElementById('backupName').addEventListener('input', this.clearBackupError.bind(this));
 		document.getElementById('saveAutoBackupBtn').addEventListener('click', this.saveAutoBackupSettings.bind(this));
 
 		// 更新多國語言文字
@@ -3020,14 +2924,14 @@ const backupManager = {
 
 	// 打開模態對話框
 	openModal: function () {
-		document.getElementById('backupModal').style.display = 'block';
+		showModalDialog(document.getElementById('backupModal'));
 		// 刷新備份列表
 		this.refreshBackupList();
 	},
 
 	// 關閉模態對話框
 	closeModal: function () {
-		document.getElementById('backupModal').style.display = 'none';
+		closeModalDialog(document.getElementById('backupModal'));
 		this.hideBackupForm();
 	},
 	// 顯示建立備份表單
@@ -3047,12 +2951,36 @@ const backupManager = {
 		const seconds = String(now.getSeconds()).padStart(2, '0');
 		const defaultName = `backup_${year}${month}${day}_${hours}${minutes}${seconds}`;
 
+		this.clearBackupError();
 		document.getElementById('backupName').value = defaultName;
 		document.getElementById('backupName').focus();
 	},
 
+	// 顯示備份名稱錯誤。VS Code webview 的沙箱沒有 allow-modals，alert() 會被忽略，所以錯誤寫在欄位下方。
+	showBackupError: function (message) {
+		const errorEl = document.getElementById('backupNameError');
+		const input = document.getElementById('backupName');
+		if (!errorEl || !input) {
+			return;
+		}
+		errorEl.textContent = message;
+		errorEl.hidden = false;
+		input.setAttribute('aria-invalid', 'true');
+		input.focus();
+	},
+
+	clearBackupError: function () {
+		const errorEl = document.getElementById('backupNameError');
+		if (errorEl) {
+			errorEl.textContent = '';
+			errorEl.hidden = true;
+		}
+		document.getElementById('backupName')?.removeAttribute('aria-invalid');
+	},
+
 	// 隱藏建立備份表單
 	hideBackupForm: function () {
+		this.clearBackupError();
 		// 顯示控制欄
 		document.querySelector('.backup-control-bar:not(.backup-create-form .backup-control-bar)').style.display = 'flex';
 		// 隱藏表單
@@ -3063,12 +2991,12 @@ const backupManager = {
 	createBackup: function () {
 		const backupName = document.getElementById('backupName').value.trim();
 		if (!backupName) {
-			alert(window.languageManager.getMessage('BACKUP_ERROR_NAME_REQUIRED', 'Enter a backup name'));
+			this.showBackupError(window.languageManager.getMessage('BACKUP_ERROR_NAME_REQUIRED', 'Enter a backup name'));
 			return;
 		}
 		// 安全性檢查：確保檔案名稱有效
 		if (!this.isValidFilename(backupName)) {
-			alert(
+			this.showBackupError(
 				window.languageManager.getMessage(
 					'BACKUP_ERROR_NAME_INVALID',
 					'The backup name contains invalid characters. Avoid \\ / : * ? " < > |'
@@ -3101,7 +3029,9 @@ const backupManager = {
 			log.info(`建立備份 "${backupName}" 成功`);
 		} catch (error) {
 			log.error('建立備份失敗:', error);
-			alert(window.languageManager.getMessage('BACKUP_ERROR_CREATE_FAILED', 'Failed to create backup: {0}').replace('{0}', error.message));
+			this.showBackupError(
+				window.languageManager.getMessage('BACKUP_ERROR_CREATE_FAILED', 'Failed to create backup: {0}').replace('{0}', error.message)
+			);
 		}
 	},
 
@@ -3122,7 +3052,7 @@ const backupManager = {
 	updateBackupListUI: function (backups) {
 		const backupListEl = document.getElementById('backupList');
 		// 清空列表
-		backupListEl.innerHTML = '';
+		backupListEl.replaceChildren();
 
 		// 如果沒有備份，顯示空白訊息
 		if (!backups || backups.length === 0) {
@@ -3380,13 +3310,13 @@ const functionSearch = {
 
 	// 打開搜尋對話框
 	openModal: function () {
-		document.getElementById('functionSearchModal').style.display = 'block';
+		showModalDialog(document.getElementById('functionSearchModal'));
 		document.getElementById('functionSearchInput').focus();
 	},
 
 	// 關閉搜尋對話框
 	closeModal: function () {
-		document.getElementById('functionSearchModal').style.display = 'none';
+		closeModalDialog(document.getElementById('functionSearchModal'));
 	},
 
 	// 執行搜尋
@@ -3455,7 +3385,7 @@ const functionSearch = {
 	// 顯示搜尋結果
 	displayResults: function () {
 		const resultsContainer = document.getElementById('searchResults');
-		resultsContainer.innerHTML = '';
+		resultsContainer.replaceChildren();
 
 		if (this.searchResults.length === 0) {
 			const emptyMessage = window.languageManager
@@ -3526,7 +3456,7 @@ const functionSearch = {
 	clearResults: function () {
 		this.searchResults = [];
 		this.currentResultIndex = -1;
-		document.getElementById('searchResults').innerHTML = '';
+		document.getElementById('searchResults').replaceChildren();
 	},
 
 	// 清除高亮顯示
@@ -3729,10 +3659,10 @@ window.addEventListener('languageChanged', function (event) {
 	refreshTxtSensorSelectOptions();
 	refreshTxtVirtualControlsUI();
 	// 更新語言選單文字（例如 Auto 標籤）
-	populateLanguageDropdown();
+	populateLanguageSelect();
 
 	// 如果備份列表已顯示，更新其UI
-	if (document.getElementById('backupModal').style.display === 'block') {
+	if (document.getElementById('backupModal').open) {
 		// 刷新備份列表以更新按鈕文字
 		backupManager.refreshBackupList();
 	}
@@ -3751,20 +3681,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	// 動態生成開發板選項
 	populateBoardOptions();
 	// 動態生成語言選單
-	populateLanguageDropdown();
-	// Board dropdown toggle
-	const boardSelectToggle = document.getElementById('boardSelectToggle');
-	if (boardSelectToggle) {
-		boardSelectToggle.addEventListener('click', event => {
-			event.stopPropagation();
-			toggleBoardDropdown();
-		});
-	}
-	// Sync board dropdown UI on change
-	const boardSelect = document.getElementById('boardSelect');
-	if (boardSelect) {
-		boardSelect.addEventListener('change', () => updateBoardSelectionUI(boardSelect));
-	}
+	populateLanguageSelect();
 	document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 	const provideFeedbackButton = document.getElementById('provideFeedbackButton');
 	if (provideFeedbackButton) {
@@ -3772,39 +3689,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			vscode.postMessage({ command: 'provideFeedback' });
 		});
 	}
-	// 註冊語言切換按鈕事件
-	const languageToggle = document.getElementById('languageToggle');
-	if (languageToggle) {
-		languageToggle.addEventListener('click', event => {
-			event.stopPropagation();
-			toggleLanguageDropdown();
-		});
+	// 語言選單：選了就切換；切換失敗時 updateLanguageSelectionUI 會改回原本的選項
+	const languageSelect = document.getElementById('languageSelect');
+	if (languageSelect) {
+		languageSelect.addEventListener('change', () => handleLanguageSelection(languageSelect.value));
 	}
-	// 點擊外部區域時關閉語言選單
-	document.addEventListener('click', event => {
-		const languageSwitch = document.querySelector('.language-switch');
-		if (isLanguageDropdownOpen && languageSwitch && !languageSwitch.contains(event.target)) {
-			closeLanguageDropdown();
-		}
-		const boardSelectWrapper = document.querySelector('.board-select');
-		if (isBoardDropdownOpen && boardSelectWrapper && !boardSelectWrapper.contains(event.target)) {
-			closeBoardDropdown();
-		}
-	});
-	// Esc 鍵關閉語言選單
-	document.addEventListener('keydown', event => {
-		if (shouldBypassGlobalKeyboardShortcut(event)) {
-			return;
-		}
-		if (event.key === 'Escape') {
-			if (isLanguageDropdownOpen) {
-				closeLanguageDropdown();
-			}
-			if (isBoardDropdownOpen) {
-				closeBoardDropdown();
-			}
-		}
-	});
 	// 註冊重新整理按鈕事件
 	document.getElementById('refreshButton').addEventListener('click', handleRefreshCode);
 
@@ -4852,7 +4741,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 					// 用戶取消，恢復原來的板子選擇
 					log.info('[blockly] 用戶取消切換，恢復原板子選擇');
 					boardSelect.value = previousBoard;
-					updateBoardSelectionUI(boardSelect);
 					return;
 				}
 
@@ -5118,7 +5006,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 				const previousBoard = boardSelect.value;
 				// 先設定板子類型
 				boardSelect.value = message.board;
-				updateBoardSelectionUI(boardSelect);
 				window.setCurrentBoard(message.board);
 				// 根據開發板更新 toolbox (顯示/隱藏 ESP32 專屬積木)
 				await updateToolboxForBoard(workspace, message.board);
@@ -5803,7 +5690,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 				// 清空、選染卡片
 				if (sampleCardContainer) {
-					sampleCardContainer.innerHTML = '';
+					sampleCardContainer.replaceChildren();
 					const samples = message.samples || [];
 					const categories = message.categories || [];
 					const lang = message.language || 'en';
@@ -5925,7 +5812,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			// T009: 載入工作區
 			case 'loadSampleWorkspace': {
 				const sampleModalEl = document.getElementById('sampleModal');
-				if (sampleModalEl) sampleModalEl.style.display = 'none';
+				closeModalDialog(sampleModalEl);
 				await handleWorkspaceLoadMessage(message);
 				break;
 			}
@@ -6400,7 +6287,7 @@ function updateUIForBoard(boardId, isCyberBrick, isTxt = false) {
 	if (isTxt) {
 		const txtModal = document.getElementById('txtConnectionModal');
 		if (txtModal) {
-			txtModal.style.display = 'block';
+			showModalDialog(txtModal);
 		}
 		// 載入已儲存的 TXT 設定
 		vscode.postMessage({ command: 'txtLoadConfig' });
@@ -6418,7 +6305,7 @@ function initTxtConnectionPanel() {
 	// 關閉 modal 的輔助函式
 	function closeTxtModal() {
 		const modal = document.getElementById('txtConnectionModal');
-		if (modal) modal.style.display = 'none';
+		closeModalDialog(modal);
 	}
 
 	// 綁定 modal close 按鈕（X）
@@ -6444,7 +6331,7 @@ function initTxtConnectionPanel() {
 		txtConfigButton.parentNode.replaceChild(newBtn, txtConfigButton);
 		newBtn.addEventListener('click', () => {
 			const m = document.getElementById('txtConnectionModal');
-			if (m) m.style.display = 'block';
+			showModalDialog(m);
 		});
 	}
 
@@ -6629,10 +6516,7 @@ function initCyberBrickUploadSettingsPanel() {
 }
 
 function openCyberBrickUploadSettingsModal() {
-	const modal = document.getElementById('cyberbrickUploadSettingsModal');
-	if (modal) {
-		modal.style.display = 'block';
-	}
+	showModalDialog(document.getElementById('cyberbrickUploadSettingsModal'));
 	renderCyberBrickUploadSettings();
 	if (cyberBrickUploadSettingsState.otaProvisioningState.status === 'running') {
 		return;
@@ -6642,10 +6526,7 @@ function openCyberBrickUploadSettingsModal() {
 }
 
 function closeCyberBrickUploadSettingsModal() {
-	const modal = document.getElementById('cyberbrickUploadSettingsModal');
-	if (modal) {
-		modal.style.display = 'none';
-	}
+	closeModalDialog(document.getElementById('cyberbrickUploadSettingsModal'));
 	const passwordInput = document.getElementById('cyberbrickWifiPasswordInput');
 	if (passwordInput) {
 		passwordInput.type = 'password';
@@ -7396,12 +7277,13 @@ function handleCyberBrickOtaReadinessResult(message) {
 function handleCyberBrickOtaUploadProgress(message) {
 	if (message.payload?.stageMessage) {
 		setUploadButtonState('uploading');
-		toast.show(message.payload.stageMessage, 'success', 1500);
+		toast.showProgress(message.payload.stageMessage);
 	}
 }
 
 function handleCyberBrickOtaUploadResult(message) {
 	setUploadButtonState('ready');
+	toast.endProgress();
 	if (message.success) {
 		toast.show(message.payload?.userFacingSummary || window.languageManager?.getMessage('CYBERBRICK_OTA_UPLOAD_SUCCEEDED', 'CyberBrick OTA upload complete.'), 'success', 5000);
 		requestCyberBrickUploadSettingsLoad();
@@ -7870,25 +7752,14 @@ function handleUploadProgress(message) {
 		progressText = `${stageText} (${message.progress}%)`;
 	}
 
-	// 如果有耗時資訊，附加顯示
-	if (message.elapsed !== undefined && message.elapsed > 0) {
-		const elapsedSec = (message.elapsed / 1000).toFixed(1);
-		progressText += ` [${elapsedSec}s]`;
-	}
-
 	// 智慧過濾：避免訊息跳太快或重複顯示
-	// 傳入進度百分比，讓進度變化時優先顯示
+	// 傳入進度百分比，讓進度變化時優先顯示；被略過時提示仍保留上一個狀態
 	if (!uploadProgressFilter.shouldShow(progressText, message.progress)) {
 		return; // 跳過此訊息
 	}
 
-	// 根據訊息重要性決定顯示時間
-	// 重要訊息顯示較久，一般訊息持續到下一個更新
-	const isImportant = uploadProgressFilter.isImportant(progressText);
-	const duration = isImportant ? 60000 : 30000; // 重要訊息 60 秒，一般 30 秒
-
-	// 顯示帶有進度的 toast
-	toast.show(progressText, 'info', duration);
+	// 進度提示持續顯示到成功或失敗（handleUploadResult），經過時間由提示本身每秒更新
+	toast.showProgress(progressText, uploadState.startTime || undefined);
 }
 
 /**
@@ -7898,8 +7769,9 @@ function handleUploadProgress(message) {
 function handleUploadResult(message) {
 	log.info('[blockly] 上傳結果', { success: message.success, hasError: Boolean(message.error), mode: message.mode });
 
-	// 重置按鈕狀態
+	// 重置按鈕狀態並結束進度提示
 	setUploadButtonState(message.success ? 'success' : 'error');
+	toast.endProgress();
 
 	if (message.success) {
 		// T040: 根據 mode 區分「編譯成功」與「上傳成功」
@@ -8180,7 +8052,7 @@ function initSampleBrowser() {
 	if (sampleButton && sampleModal) {
 		sampleButton.addEventListener('click', () => {
 			// 若 modal 已開啟則略過
-			if (sampleModal.style.display !== 'none') return;
+			if (sampleModal.open) return;
 
 			// 顯示模態並啟動 spinner
 			const sampleSpinner = document.getElementById('sampleSpinner');
@@ -8197,11 +8069,11 @@ function initSampleBrowser() {
 				sampleLoadingText.textContent = window.languageManager.getMessage('SAMPLE_BROWSER_LOADING', 'Loading samples...');
 			}
 			if (sampleSpinner) sampleSpinner.style.display = 'flex';
-			if (sampleCardContainer) sampleCardContainer.innerHTML = '';
+			if (sampleCardContainer) sampleCardContainer.replaceChildren();
 			if (sampleEmptyNotice) sampleEmptyNotice.style.display = 'none';
 			if (sampleOfflineNotice) sampleOfflineNotice.style.display = 'none';
 
-			sampleModal.style.display = 'flex';
+			showModalDialog(sampleModal);
 
 			const hasBlocks = window.getBlocklyWorkspace().getAllBlocks(false).length > 0;
 			vscode.postMessage({
@@ -8213,7 +8085,7 @@ function initSampleBrowser() {
 
 	if (sampleModalClose && sampleModal) {
 		sampleModalClose.addEventListener('click', () => {
-			sampleModal.style.display = 'none';
+			closeModalDialog(sampleModal);
 		});
 	}
 
@@ -8221,7 +8093,7 @@ function initSampleBrowser() {
 	if (sampleModal) {
 		sampleModal.addEventListener('click', event => {
 			if (event.target === sampleModal) {
-				sampleModal.style.display = 'none';
+				closeModalDialog(sampleModal);
 			}
 		});
 	}
@@ -8399,9 +8271,6 @@ const blockPackManager = {
 		if (!button || !modal || !window.blockPacks) return;
 		button.addEventListener('click', () => this.open());
 		document.getElementById('blockPackModalClose').addEventListener('click', () => this.close());
-		document.getElementById('blockPackModalClose').addEventListener('keydown', event => {
-			if (event.key === 'Enter' || event.key === ' ') this.close();
-		});
 		modal.addEventListener('keydown', event => {
 			if (event.key === 'Escape') this.close();
 		});
@@ -8949,7 +8818,7 @@ function initTxtTestDialog() {
 	// Build Motors UI (M1–M4)
 	const motorsEl = document.getElementById('txtTestMotors');
 	if (motorsEl) {
-		motorsEl.innerHTML = '';
+		motorsEl.replaceChildren();
 		for (let i = 1; i <= 4; i++) {
 			const row = document.createElement('div');
 			row.className = 'txt-motor-row';
@@ -8982,7 +8851,7 @@ function initTxtTestDialog() {
 	// Build Outputs UI (O1–O8)
 	const outputsEl = document.getElementById('txtTestOutputs');
 	if (outputsEl) {
-		outputsEl.innerHTML = '';
+		outputsEl.replaceChildren();
 		for (let i = 1; i <= 8; i++) {
 			const btn = document.createElement('button');
 			btn.className = 'txt-output-btn';
@@ -9001,7 +8870,7 @@ function initTxtTestDialog() {
 	// Build Inputs UI (I1–I8)
 	const inputsEl = document.getElementById('txtTestInputs');
 	if (inputsEl) {
-		inputsEl.innerHTML = '';
+		inputsEl.replaceChildren();
 		const sensorOptions = getTxtSensorOptions();
 		const optionsHtml = sensorOptions.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
 		for (let i = 1; i <= 8; i++) {

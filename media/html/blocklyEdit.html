@@ -154,17 +154,9 @@
     <div class="container">
         <div class="controls-container">
             <div class="board-select">
-                <label for="boardSelectToggle" id="boardSelectLabel"></label>
-                <div class="board-select-control">
-                    <button id="boardSelectToggle" type="button" aria-haspopup="listbox" aria-expanded="false">
-                        <span id="boardSelectText"></span>
-                        <svg class="board-select-caret" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="m6 9 6 6 6-6" />
-                        </svg>
-                    </button>
-                    <div id="boardDropdown" class="board-dropdown" role="listbox" aria-hidden="true"></div>
-                </div>
-                <select id="boardSelect" aria-hidden="true" tabindex="-1">
+                <label for="boardSelect" id="boardSelectLabel"></label>
+                <!-- 原生 select（appearance: base-select）：鍵盤、無障礙與彈出位置由瀏覽器處理 -->
+                <select id="boardSelect">
                     <!-- 板子選項會由 JS 動態生成 -->
                 </select>
             </div>
@@ -189,7 +181,9 @@
                 </button>
             </div>
             <div class="language-switch">
-                <button id="languageToggle" title="" aria-haspopup="true" aria-expanded="false">
+                <select id="languageSelect" class="language-select" title="" aria-label="">
+                    <!-- base-select 的第一個子元素 <button> 取代預設的選取值顯示，這裡只放地球圖示；語言選項由 JS 動態生成 -->
+                    <button type="button" class="language-select-button">
                     <svg class="language-icon lucide-globe" viewBox="0 0 24 24" width="16" height="16"
                         aria-hidden="true">
                         <defs>
@@ -204,8 +198,8 @@
                                 d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                         </g>
                     </svg>
-                </button>
-                <div id="languageDropdown" class="language-dropdown" role="menu" aria-hidden="true"></div>
+                    </button>
+                </select>
             </div>
             <div class="theme-switch">
                 <button id="themeToggle" title="">
@@ -510,11 +504,11 @@
             </div>
         </aside>
     </div> <!-- 備份管理對話框 -->
-    <div id="backupModal" class="modal">
+    <dialog id="backupModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="backupModalTitle"></h2>
-                <span class="modal-close">&times;</span>
+                <button type="button" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="backup-control-bar">
@@ -536,10 +530,11 @@
                         <div class="backup-create-container">
                             <label for="backupName" id="backupNameLabel"></label>
                             <div class="backup-name-input-group">
-                                <input type="text" id="backupName" placeholder="">
+                                <input type="text" id="backupName" placeholder="" aria-describedby="backupNameError">
                                 <button id="confirmBackupBtn" class="primary-btn"></button>
                                 <button id="cancelBackupBtn" class="secondary-btn"></button>
                             </div>
+                            <p id="backupNameError" class="backup-name-error" role="alert" hidden></p>
                         </div>
                     </div>
                 </div>
@@ -552,12 +547,12 @@
                 </div>
             </div>
         </div>
-    </div> <!-- 積木搜尋對話框 -->
-    <div id="functionSearchModal" class="modal">
+    </dialog> <!-- 積木搜尋對話框 -->
+    <dialog id="functionSearchModal" class="modal">
         <div class="modal-content function-search-content">
             <div class="modal-header">
                 <h2 id="functionSearchModalTitle">搜尋積木</h2>
-                <span class="modal-close">&times;</span>
+                <button type="button" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="search-input-container">
@@ -582,14 +577,14 @@
                 </div>
             </div>
         </div>
-    </div>
+    </dialog>
     <!-- 積木包管理對話框 -->
     <div id="blockPackModal" class="modal" style="display: none;">
         <div class="modal-content block-pack-modal-content" role="dialog" aria-modal="true"
             aria-labelledby="blockPackModalTitle">
             <div class="modal-header">
                 <h2 id="blockPackModalTitle"></h2>
-                <span class="modal-close" id="blockPackModalClose" role="button" tabindex="0">&times;</span>
+                <button type="button" class="modal-close" id="blockPackModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <section id="blockPackListView" class="block-pack-view">
@@ -632,7 +627,7 @@
                     <span id="blockDesignerColourLabel"></span>
                     <input id="blockDesignerColour" type="color" class="block-designer-swatch">
                 </label>
-                <span class="modal-close" id="blockDesignerClose" role="button" tabindex="0">&times;</span>
+                <button type="button" class="modal-close" id="blockDesignerClose">&times;</button>
             </div>
             <div class="block-designer-body">
                 <aside class="block-designer-list">
@@ -691,11 +686,11 @@
         </div>
     </div>
     <!-- TXT 連線設定對話框 -->
-    <div id="txtConnectionModal" class="modal">
+    <dialog id="txtConnectionModal" class="modal">
         <div class="modal-content txt-connection-modal-content">
             <div class="modal-header">
                 <h2 id="txtConnectionPanelTitle">TXT Controller 連線設定</h2>
-                <span class="modal-close" id="txtModalClose">&times;</span>
+                <button type="button" class="modal-close" id="txtModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="txt-connection-form-grid">
@@ -717,15 +712,14 @@
                 <p id="txtSshHint" class="txt-connection-hint"></p>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- CyberBrick 上傳設定對話框 -->
-    <div id="cyberbrickUploadSettingsModal" class="modal" style="display: none;">
-        <div class="modal-content cyberbrick-upload-modal-content" role="dialog"
-            aria-labelledby="cyberbrickUploadSettingsTitle">
+    <dialog id="cyberbrickUploadSettingsModal" class="modal" aria-labelledby="cyberbrickUploadSettingsTitle">
+        <div class="modal-content cyberbrick-upload-modal-content">
             <div class="modal-header">
                 <h2 id="cyberbrickUploadSettingsTitle">CyberBrick Upload Settings</h2>
-                <span class="modal-close" id="cyberbrickUploadSettingsClose">&times;</span>
+                <button type="button" class="modal-close" id="cyberbrickUploadSettingsClose">&times;</button>
             </div>
             <div class="modal-body">
                 <section class="cyberbrick-upload-section">
@@ -824,14 +818,14 @@
                 </section>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- CyberBrick 範例瀏覽器對話框 -->
-    <div id="sampleModal" class="modal" style="display: none;">
+    <dialog id="sampleModal" class="modal">
         <div class="modal-content sample-modal-content">
             <div class="modal-header">
                 <h2 id="sampleModalTitle"></h2>
-                <span class="modal-close" id="sampleModalClose">&times;</span>
+                <button type="button" class="modal-close" id="sampleModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <!-- 離線提示橫幅 -->
@@ -847,7 +841,7 @@
                 <div id="sampleEmptyNotice" class="sample-empty-notice" style="display: none;"></div>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <script src="{blocklyCompressedJsUri}"></script>
     <script src="{blocksCompressedJsUri}"></script>
@@ -901,7 +895,7 @@
                     <span id="txtTestStatusText"></span>
 
                 </div>
-                <span class="modal-close" id="txtTestCloseBtn">&times;</span>
+                <button type="button" class="modal-close" id="txtTestCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
                 <button class="txt-test-stop-all" id="txtTestStopAllBtn"></button>

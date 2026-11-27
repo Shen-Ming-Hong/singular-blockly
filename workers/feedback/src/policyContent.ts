@@ -24,13 +24,13 @@ type DetailedPolicyLocale = 'en' | 'zh-hant' | keyof typeof COMPACT_POLICY_LOCAL
 const POLICIES: Record<'en' | 'zh-hant', Record<PolicyKind, PolicyDocument>> = {
 	en: {
 		privacy: {
-			updated: 'Last updated: August 20, 2026',
+			updated: 'Last updated: November 26, 2026',
 			intro: 'This policy explains how the Provide feedback and My feedback features handle data. This is a user-initiated support submission, not telemetry or behavior analytics. Opening, editing, or closing the form does not transmit data.',
 			sections: [
 				{
 					heading: 'Information collected and purpose',
 					paragraphs: [
-						'Before anything is sent, the extension shows the complete payload and requires explicit confirmation. Required fields are the feedback type, title, and user-written description. Reproduction steps and the expected result are optional.',
+						'Before anything is sent, the extension shows the complete payload and requires explicit confirmation. Required fields are the feedback type, title, and user-written description. Reproduction steps and the expected result are optional. Before the preview is shown, local paths, serial ports, IP addresses, and device IDs typed or pasted into these fields are replaced with placeholders such as [path]; text containing a credential such as a password, token, or private key is rejected and not sent.',
 						'Basic environment information is enabled by default but can be disabled. It is limited to allowlisted values such as the Singular Blockly and VS Code versions, operating-system family and major version, architecture, interface language, normalized host and workspace types, workspace trust, selected board, programming language, relevant tool versions or readiness, and the last stable error stage and code. Recent structured events are disabled by default and, when enabled, contain only bounded timestamps, stages, stable event codes, and outcomes.',
 						'The feature does not automatically read or send source code, Blockly workspace content, generated code, file or folder names, full or partial paths, machine or device identifiers, serial ports, Wi-Fi information, IP addresses, environment variables, tokens, credentials, raw errors, or raw logs.',
 						'One screenshot may be attached voluntarily. It is re-encoded locally, original metadata is removed, and it is limited to 1920 pixels and 3 MiB before a second server-side check. Visible names, email addresses, paths, program content, or other private information may still appear, so the preview must be checked before sending.',
@@ -105,10 +105,10 @@ const POLICIES: Record<'en' | 'zh-hant', Record<PolicyKind, PolicyDocument>> = {
 	},
 	'zh-hant': {
 		privacy: {
-			updated: '最後更新：2026 年 8 月 20 日',
+			updated: '最後更新：2026 年 11 月 26 日',
 			intro: '本說明解釋「提供回饋」與「我的回饋」功能如何處理資料。這是使用者主動啟動的支援傳送，不是遙測或行為分析；只開啟、填寫或關閉表單不會對外傳送資料。',
 			sections: [
-				{ heading: '收集的資料與目的', paragraphs: ['送出前會顯示完整傳送內容並要求明確確認。必填內容為回饋種類、標題與使用者撰寫的說明；重現步驟與預期結果為選填。', '基本環境資訊預設開啟但可關閉，僅限允許清單中的 Singular Blockly 與 VS Code 版本、作業系統家族與主版本、處理器架構、介面語系、標準化主機與工作區類型、工作區信任狀態、目前開發板、程式語言、相關工具版本或就緒狀態，以及最近一次穩定錯誤的階段與代碼。近期結構化事件預設關閉；開啟後也只包含有上限的時間、階段、穩定事件代碼與結果。', '系統不會為回饋自動讀取或傳送原始碼、Blockly 工作區內容、產生的程式碼、檔案或資料夾名稱、完整或部分路徑、機器或裝置識別碼、序列埠、Wi-Fi 資訊、IP 位址、環境變數、權杖、憑證、原始錯誤訊息或原始紀錄。', '使用者可主動附加一張截圖。截圖會先在本機重新編碼並移除原始中繼資料，限制最長邊 1920 像素與 3 MiB，服務端再做第二次檢查。截圖仍可能包含畫面上可見的姓名、電子郵件、路徑、程式內容或其他私人資訊，因此送出前必須自行檢查預覽。'] },
+				{ heading: '收集的資料與目的', paragraphs: ['送出前會顯示完整傳送內容並要求明確確認。必填內容為回饋種類、標題與使用者撰寫的說明；重現步驟與預期結果為選填。顯示預覽前，這些欄位中輸入或貼上的本機路徑、序列埠、IP 位址與裝置 ID 會換成 [path] 這類佔位文字；含有密碼、權杖或私密金鑰等憑證的文字會被拒絕，不會送出。', '基本環境資訊預設開啟但可關閉，僅限允許清單中的 Singular Blockly 與 VS Code 版本、作業系統家族與主版本、處理器架構、介面語系、標準化主機與工作區類型、工作區信任狀態、目前開發板、程式語言、相關工具版本或就緒狀態，以及最近一次穩定錯誤的階段與代碼。近期結構化事件預設關閉；開啟後也只包含有上限的時間、階段、穩定事件代碼與結果。', '系統不會為回饋自動讀取或傳送原始碼、Blockly 工作區內容、產生的程式碼、檔案或資料夾名稱、完整或部分路徑、機器或裝置識別碼、序列埠、Wi-Fi 資訊、IP 位址、環境變數、權杖、憑證、原始錯誤訊息或原始紀錄。', '使用者可主動附加一張截圖。截圖會先在本機重新編碼並移除原始中繼資料，限制最長邊 1920 像素與 3 MiB，服務端再做第二次檢查。截圖仍可能包含畫面上可見的姓名、電子郵件、路徑、程式內容或其他私人資訊，因此送出前必須自行檢查預覽。'] },
 				{ heading: '識別、網路與安全資料', paragraphs: ['擴充套件會在 VS Code SecretStorage 建立不含個人資訊的 256-bit 隨機秘密，讓回報者查看、補充或刪除自己的回饋。服務端只保存以伺服器秘密計算的不可逆 HMAC 表示。備援連結把秘密放在 URL fragment；一般 HTTP 請求不會傳送 fragment。交換後會改用最長 24 小時的 HttpOnly、Secure、SameSite 工作階段。', '為防止濫用，Cloudflare 可能短時間處理來源網路位址；應用程式只使用 HMAC 衍生值做速率限制，不把原始 IP 寫入回饋資料庫。Cloudflare、網路供應商與 GitHub 仍可能依各自的安全紀錄政策處理請求中繼資料。'] },
 				{ heading: '處理者、資料位置與跨境', paragraphs: ['回饋文字與狀態保存在 Cloudflare D1，截圖保存在非公開 Cloudflare R2。維護工作副本會同步到只有專案維護者可存取的 GitHub 私有儲存庫。', 'Cloudflare 與 GitHub 可能在不同國家或地區處理及備援資料，因此資料可能依其基礎設施、條款與安全備份政策跨境傳輸。'] },
 				{ heading: '維護者存取與公開摘要', paragraphs: ['內部維護者留言預設不會顯示給回報者；只有明確的公開回覆或公開狀態操作才會同步。', '任何公開開發 Issue 都必須由專案負責人另外核准，而且只能包含去識別化摘要。公開 Issue 不會連回私密回饋紀錄。'] },

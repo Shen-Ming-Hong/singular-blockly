@@ -497,9 +497,6 @@
 			defineDesignBlocks();
 			const on = (id, event, handler) => document.getElementById(id).addEventListener(event, handler);
 			on('blockDesignerClose', 'click', () => this.requestClose());
-			on('blockDesignerClose', 'keydown', event => {
-				if (event.key === 'Enter' || event.key === ' ') this.requestClose();
-			});
 			on('blockDesignerCancel', 'click', () => this.requestClose());
 			on('blockDesignerSave', 'click', () => this.save());
 			on('blockDesignerExport', 'click', () => this.exportPack());
