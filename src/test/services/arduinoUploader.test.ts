@@ -401,6 +401,33 @@ suite('ArduinoUploader Tests', () => {
 			assert.deepStrictEqual(commands, ['provider-pio:pkg', 'managed-pio:pkg', 'managed-pio:run']);
 		});
 
+		test('Gives first-time package downloads and ESP32 builds enough time (spec 074)', async () => {
+			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
+			const timeouts: Record<string, number | undefined> = {};
+			(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(
+				async (_command: string, args: string[], options: { timeout?: number }) => {
+					timeouts[args[0]] = options.timeout;
+					return { code: 0, stdout: 'success', stderr: '' };
+				}
+			);
+			const uploader = new ArduinoUploader(
+				testWorkspacePath,
+				mockExecutor,
+				mockFileSystem,
+				mockSettingsManager,
+				mockStreamingExecutor,
+				undefined,
+				manager,
+				() => true
+			);
+
+			const result = await uploader.upload({ code: 'void setup() {}', board: 'esp32' });
+
+			assert.strictEqual(result.success, true);
+			assert.strictEqual(timeouts.pkg, 30 * 60 * 1000);
+			assert.ok((timeouts.run ?? 0) >= 10 * 60 * 1000);
+		});
+
 		test('Never retries another Core after the upload command has spawned', async () => {
 			const manager = new CoreEnvironmentManager(coreProvider('provider'), coreProvider('managed'));
 			const commands: string[] = [];

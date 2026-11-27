@@ -15,6 +15,7 @@ import {
 	WorkloadSelection,
 } from '../types/coreEnvironment';
 import { classifyCoreFailure, didCoreProcessStart, isCoreFallbackAllowed } from './coreFailureClassifier';
+import { log } from './logging';
 
 export interface CoreEnvironmentProvider {
 	readonly id: CoreEnvironmentId;
@@ -129,6 +130,14 @@ export class CoreEnvironmentManager {
 				})
 				: null;
 			if (!fallback) {throw error;}
+			// Spec 074: a silent switch hid that Arduino builds ran on the other Core.
+			log('[core] switching to fallback Core after a local failure', 'warn', {
+				workload: options.workload,
+				phase: options.phase,
+				from: selection.selected.id,
+				to: fallback.id,
+				failureClass,
+			});
 			this.sticky.set(this.key(options.workload, options.workspaceUri), { coreId: fallback.id, reason: failureClass });
 			this.remember(options.workload, options.workspaceUri, fallback.id, true);
 			return options.operation(fallback);

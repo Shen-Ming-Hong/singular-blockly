@@ -24,6 +24,7 @@ import {
 	ManagedRuntimeInstallProgress,
 } from './managedRuntimeInstaller';
 import { FileService } from './fileService';
+import { log } from './logging';
 import { selectRuntimeArtifact } from './managedRuntimeManifest';
 import { createWorkspaceStorageKey, ManagedRuntimeStorage } from './managedRuntimeStorage';
 import { createPlatformioPrivacyRedactor, PlatformioPrivacyRedactor } from './platformioPrivacyRedactor';
@@ -65,6 +66,10 @@ export interface ManagedRuntimeCleanupCounts {
 }
 
 const WORK_ROOT_PROJECT_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
+/** Leave very recent folders alone in case another window is installing right now. */
+const WORK_ROOT_INCOMPLETE_GRACE_MS = 10 * 60 * 1000;
+/** Any one of these marks a fully installed PlatformIO package or platform. */
+const PLATFORMIO_MANIFEST_FILES = ['package.json', 'platform.json', 'library.json', 'library.properties', 'module.json'];
 
 export class ManagedRuntimeServiceError extends Error {
 	constructor(public readonly code: string, message: string) {
@@ -355,6 +360,51 @@ export class ManagedRuntimeService {
 		}
 	}
 
+	/**
+	 * Spec 074: an install that was stopped part-way (timeout, closed window) can leave
+	 * a package folder with `.piopm` but no manifest. PlatformIO then fails every later
+	 * `pkg install` with MissingPackageManifestError, so remove those folders and stale
+	 * `cache/tmp` install folders from the work root we own and let PlatformIO reinstall.
+	 */
+	private async repairIncompleteWorkRootPackages(root: string): Promise<void> {
+		try {
+			const files = new FileService(root);
+			const cutoff = this.now().getTime() - WORK_ROOT_INCOMPLETE_GRACE_MS;
+			const removed: string[] = [];
+			for (const parent of ['packages', 'platforms']) {
+				for (const name of await files.listFiles(parent)) {
+					const relative = path.join(parent, name);
+					const stats = await files.getFileStats(relative);
+					if (!stats?.isDirectory() || stats.mtimeMs > cutoff) {continue;}
+					if (!(await files.getFileStats(path.join(relative, '.piopm')))?.isFile()) {continue;}
+					let complete = false;
+					for (const manifest of PLATFORMIO_MANIFEST_FILES) {
+						if ((await files.getFileStats(path.join(relative, manifest)))?.isFile()) {complete = true; break;}
+					}
+					if (complete) {continue;}
+					await files.deleteDirectory(relative);
+					removed.push(relative);
+				}
+			}
+			const tmp = path.join('cache', 'tmp');
+			for (const name of await files.listFiles(tmp)) {
+				if (!name.startsWith('pkg-installing-')) {continue;}
+				const relative = path.join(tmp, name);
+				const stats = await files.getFileStats(relative);
+				if (!stats?.isDirectory() || stats.mtimeMs > cutoff) {continue;}
+				await files.deleteDirectory(relative);
+				removed.push(relative);
+			}
+			if (removed.length > 0) {
+				log('[managed-runtime] removed incomplete PlatformIO packages from the work root', 'warn', { removed });
+			}
+		} catch (error) {
+			log('[managed-runtime] could not check the work root for incomplete packages', 'warn', {
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
+	}
+
 	async getCoreEnvironment(workspaceUri: string, options: { workload?: CoreWorkload } = {}): Promise<CoreEnvironment> {
 		const record = await this.ensureReady();
 		const versionRoot = this.storage.files.resolveSafePath(path.join('versions', record.versionDirectory));
@@ -383,6 +433,7 @@ export class ManagedRuntimeService {
 			// Spec 074: keep deep PlatformIO packages and build trees under a short
 			// Windows work root so they stay within the classic 260-character limit.
 			const selected = await this.workRoot.resolve();
+			await this.repairIncompleteWorkRootPackages(selected.root);
 			const layout = createWorkRootLayout(selected.root, workspaceUri);
 			workRoot = selected.root;
 			Object.assign(environment, {

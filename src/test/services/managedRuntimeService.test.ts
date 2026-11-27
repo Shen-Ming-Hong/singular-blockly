@@ -344,6 +344,33 @@ suite('ManagedRuntime Service', () => {
 			assert.match(await service.getWorkRootSummary() ?? '', /^local-app-data <pio-work-root:[0-9a-f]{12}>$/);
 		});
 
+		test('removes package folders left half-installed by a stopped install', async () => {
+			await writeInstalledRecord({ ...createRecord(), artifactId: 'win32-x64' });
+			const workRoot = path.join(root, 'pio');
+			const old = new Date(Date.now() - 60 * 60 * 1000);
+			const makeDir = (relative: string, files: string[], aged = true): string => {
+				const dir = path.join(workRoot, relative);
+				fs.mkdirSync(dir, { recursive: true });
+				for (const file of files) {fs.writeFileSync(path.join(dir, file), '{}');}
+				if (aged) {fs.utimesSync(dir, old, old);}
+				return dir;
+			};
+			const broken = makeDir(path.join('packages', 'toolchain-xtensa-esp32'), ['.piopm']);
+			const healthy = makeDir(path.join('packages', 'tool-scons'), ['.piopm', 'package.json']);
+			const platform = makeDir(path.join('platforms', 'espressif32'), ['.piopm', 'platform.json']);
+			const installing = makeDir(path.join('packages', 'framework-arduinoespressif32'), ['.piopm'], false);
+			const staleTmp = makeDir(path.join('cache', 'tmp', 'pkg-installing-m50u6t7v'), ['package.json']);
+			const download = makeDir(path.join('cache', 'downloads'), ['archive.tar.gz']);
+
+			const service = createWindowsService({ root: workRoot });
+			await service.getCoreEnvironment('file:///c%3A/Users/ray/project', { workload: 'arduino' });
+
+			assert.strictEqual(fs.existsSync(broken), false, 'manifest-less package is removed so PlatformIO reinstalls it');
+			assert.strictEqual(fs.existsSync(staleTmp), false, 'stale install folder is removed');
+			assert.ok(fs.existsSync(healthy) && fs.existsSync(platform) && fs.existsSync(download));
+			assert.ok(fs.existsSync(installing), 'a folder changed in the last minutes may still be installing');
+		});
+
 		test('keeps the Python workload unchanged even when no work root can be created', async () => {
 			await writeInstalledRecord({ ...createRecord(), artifactId: 'win32-x64' });
 			const failure = Object.assign(new Error('too long'), { code: 'path-too-long' });

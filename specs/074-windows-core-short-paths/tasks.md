@@ -79,6 +79,14 @@ description: "Singular Core 的 Windows 短路徑工作區任務清單"
 - [x] T027 執行 quickstart 第 1 節（雲端容器）全部檢查，並截取診斷面板 managed 卡片的亮色與深色截圖
 - [x] T028 依 `local-code-review-loop` 做本地審查；依 `security-checker` 審查 ACL 與子行程呼叫
 
+## Phase 9：實機測試後的修正（2026-11-27）
+
+Ray 在 Windows 實機測試時，第一次 ESP32 安裝被兩分鐘逾時中止，工作位置留下沒有 `package.json` 的工具鏈；之後 Singular Core 的 `pkg install` 一律 MissingPackageManifestError，並在沒有紀錄的情況下改用 PlatformIO IDE 的 Core。
+
+- [x] T029 `pio pkg install` 改用 30 分鐘逾時，編譯改用 10 分鐘逾時（`arduinoUploader.ts`）
+- [x] T030 取得工作位置環境時，移除超過 10 分鐘、有 `.piopm` 卻沒有 manifest 的套件，以及 `cache/tmp/pkg-installing-*`（`managedRuntimeService.ts`）
+- [x] T031 改用備援 Core 時記錄 workload、階段、來源與失敗分類；套件準備失敗時記錄輸出尾段（隱私化）
+
 ## 相依與順序
 
 - T001 → T002 → 各故事。

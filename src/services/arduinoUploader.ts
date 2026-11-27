@@ -30,9 +30,16 @@ import {
 import { PlatformioProcessError, runPlatformioProcess } from './platformioProcess';
 
 /**
- * 預設的編譯逾時時間（毫秒）
+ * 預設的編譯逾時時間（毫秒）。ESP32 第一次編譯在較慢的電腦上可能超過兩分鐘，
+ * 而且 `pio run` 也會安裝 lib_deps，所以保留足夠餘裕。
  */
-const DEFAULT_COMPILE_TIMEOUT = 120000;
+const DEFAULT_COMPILE_TIMEOUT = 10 * 60 * 1000;
+
+/**
+ * 準備專案套件（`pio pkg install`）的逾時。第一次下載 ESP32 平台與工具鏈有數百 MB，
+ * 原本沿用兩分鐘的編譯逾時會在下載或解壓縮途中中止，留下不完整的套件。
+ */
+const DEFAULT_PREPARE_TIMEOUT = 30 * 60 * 1000;
 
 /** English fallback; the WebView localizes the `path-too-long` error code (spec 074). */
 const PATH_TOO_LONG_MESSAGE = 'Singular Core needs a shorter local folder on this Windows system. The provider Core was not changed.';
@@ -99,6 +106,7 @@ export class ArduinoUploader {
 	private fileSystem: FileSystemInterface;
 	private compileTimeout: number;
 	private uploadTimeout: number;
+	private prepareTimeout: number;
 	private settingsManager: SettingsManager;
 	private readonly providerInstalled: () => boolean;
 	private startTime: number = 0;
@@ -136,6 +144,7 @@ export class ArduinoUploader {
 		}));
 		this.compileTimeout = DEFAULT_COMPILE_TIMEOUT;
 		this.uploadTimeout = DEFAULT_UPLOAD_TIMEOUT;
+		this.prepareTimeout = DEFAULT_PREPARE_TIMEOUT;
 
 		// 使用預設的 child_process 執行器或注入的執行器
 		this.executor = executor || {
@@ -358,9 +367,11 @@ export class ArduinoUploader {
 		const result = await this.streamingExecutor.spawn(
 			platformio.command,
 			platformio.args,
-			{ timeout: this.compileTimeout, cwd: this.workspacePath, env: platformio.env }
+			{ timeout: this.prepareTimeout, cwd: this.workspacePath, env: platformio.env }
 		);
 		if (result.code !== 0) {
+			const tail = `${result.stdout}\n${result.stderr}`.split(/\r?\n/).filter(line => line.trim()).slice(-12).join('\n');
+			log('[arduino] PlatformIO 套件準備失敗', 'warn', { code: result.code, output: this.redactManagedStorage(tail) });
 			throw new PlatformioProcessError('PlatformIO package preparation failed', true, result.code, result.stdout, result.stderr);
 		}
 	}
