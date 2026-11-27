@@ -33,10 +33,22 @@ describe('Blockly editor keyboard and toolbar accessibility', () => {
 			assert.match(source, new RegExp(`\\{ id: '${id}', close: `), id);
 		}
 		assert.match(source, /event\.key !== 'Escape'/);
-		assert.match(source, /content\.setAttribute\('aria-modal', 'true'\)/);
+		assert.match(source, /modal\.addEventListener\('cancel', event => \{/);
 		assert.match(source, /modalOpeners\.set\(modal\.id, opener\)/);
 		assert.match(source, /target\?\.focus\(\)/);
 		assert.match(source, /initModalAccessibility\(\);/);
+	});
+
+	// Modern Web Guidance `dialog`：用原生 <dialog> + showModal()，背景不能操作、焦點留在對話框內。
+	it('uses native modal dialogs with real close buttons', () => {
+		const html = readWorkspaceFile('media/html/blocklyEdit.html');
+		for (const id of ['backupModal', 'functionSearchModal', 'sampleModal', 'txtConnectionModal', 'cyberbrickUploadSettingsModal']) {
+			assert.match(html, new RegExp(`<dialog id="${id}" class="modal"`), id);
+			assert.doesNotMatch(source, new RegExp(`getElementById\\('${id}'\\)\\.style\\.display`), `${id} toggles display instead of showModal()`);
+		}
+		assert.doesNotMatch(html, /<span class="modal-close"/);
+		assert.match(source, /modal\.showModal\(\);/);
+		assert.match(css, /dialog\.modal::backdrop \{/);
 	});
 
 	it('names icon-only toolbar buttons and hides their icons', () => {

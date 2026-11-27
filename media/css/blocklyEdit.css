@@ -2363,6 +2363,29 @@ body.txt-virtual-controls-resizing * {
 	overflow-y: auto;
 }
 
+/* 原生 <dialog class="modal">：showModal() 放在頂層並讓背景不能操作；版面沿用全畫面外框加置中卡片。 */
+dialog.modal {
+	max-width: none;
+	max-height: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background-color: transparent;
+	color: inherit;
+}
+
+dialog.modal[open] {
+	display: block;
+}
+
+dialog.modal::backdrop {
+	background-color: var(--editor-modal-backdrop);
+}
+
+#sampleModal[open] {
+	display: flex;
+}
+
 .modal-content {
 	position: relative;
 	margin: 10% auto;
@@ -2410,11 +2433,24 @@ body.txt-virtual-controls-resizing * {
 }
 
 .modal-close {
+	min-width: 28px;
+	min-height: 28px;
+	padding: 0 4px;
+	border: 0;
+	border-radius: 6px;
+	background: none;
+	font-family: inherit;
 	font-size: 1.8rem;
 	font-weight: bold;
+	line-height: 1;
 	color: var(--editor-description-fg);
 	cursor: pointer;
 	transition: color 0.2s;
+}
+
+.modal-close:focus-visible {
+	outline: 2px solid var(--editor-focus-ring);
+	outline-offset: 1px;
 }
 
 .modal-close:hover {
@@ -2438,7 +2474,6 @@ body.txt-virtual-controls-resizing * {
 
 /* 搜尋對話框額外樣式 */
 #functionSearchModal {
-	display: none;
 	position: fixed;
 	z-index: 2001; /* 確保比其他元素高 */
 	top: 0;
@@ -2449,6 +2484,10 @@ body.txt-virtual-controls-resizing * {
 	overflow-y: auto;
 	margin-top: 0; /* 確保沒有頂部外邊距 */
 	pointer-events: auto; /* 啟用點擊事件處理 */
+}
+
+#functionSearchModal::backdrop {
+	background-color: transparent;
 }
 
 /* 只讓模態框內容區域接收點擊事件 */

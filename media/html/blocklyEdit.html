@@ -510,11 +510,11 @@
             </div>
         </aside>
     </div> <!-- 備份管理對話框 -->
-    <div id="backupModal" class="modal">
+    <dialog id="backupModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="backupModalTitle"></h2>
-                <span class="modal-close">&times;</span>
+                <button type="button" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="backup-control-bar">
@@ -553,12 +553,12 @@
                 </div>
             </div>
         </div>
-    </div> <!-- 積木搜尋對話框 -->
-    <div id="functionSearchModal" class="modal">
+    </dialog> <!-- 積木搜尋對話框 -->
+    <dialog id="functionSearchModal" class="modal">
         <div class="modal-content function-search-content">
             <div class="modal-header">
                 <h2 id="functionSearchModalTitle">搜尋積木</h2>
-                <span class="modal-close">&times;</span>
+                <button type="button" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="search-input-container">
@@ -583,14 +583,14 @@
                 </div>
             </div>
         </div>
-    </div>
+    </dialog>
     <!-- 積木包管理對話框 -->
     <div id="blockPackModal" class="modal" style="display: none;">
         <div class="modal-content block-pack-modal-content" role="dialog" aria-modal="true"
             aria-labelledby="blockPackModalTitle">
             <div class="modal-header">
                 <h2 id="blockPackModalTitle"></h2>
-                <span class="modal-close" id="blockPackModalClose" role="button" tabindex="0">&times;</span>
+                <button type="button" class="modal-close" id="blockPackModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <section id="blockPackListView" class="block-pack-view">
@@ -633,7 +633,7 @@
                     <span id="blockDesignerColourLabel"></span>
                     <input id="blockDesignerColour" type="color" class="block-designer-swatch">
                 </label>
-                <span class="modal-close" id="blockDesignerClose" role="button" tabindex="0">&times;</span>
+                <button type="button" class="modal-close" id="blockDesignerClose">&times;</button>
             </div>
             <div class="block-designer-body">
                 <aside class="block-designer-list">
@@ -692,11 +692,11 @@
         </div>
     </div>
     <!-- TXT 連線設定對話框 -->
-    <div id="txtConnectionModal" class="modal">
+    <dialog id="txtConnectionModal" class="modal">
         <div class="modal-content txt-connection-modal-content">
             <div class="modal-header">
                 <h2 id="txtConnectionPanelTitle">TXT Controller 連線設定</h2>
-                <span class="modal-close" id="txtModalClose">&times;</span>
+                <button type="button" class="modal-close" id="txtModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="txt-connection-form-grid">
@@ -718,15 +718,14 @@
                 <p id="txtSshHint" class="txt-connection-hint"></p>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- CyberBrick 上傳設定對話框 -->
-    <div id="cyberbrickUploadSettingsModal" class="modal" style="display: none;">
-        <div class="modal-content cyberbrick-upload-modal-content" role="dialog"
-            aria-labelledby="cyberbrickUploadSettingsTitle">
+    <dialog id="cyberbrickUploadSettingsModal" class="modal" aria-labelledby="cyberbrickUploadSettingsTitle">
+        <div class="modal-content cyberbrick-upload-modal-content">
             <div class="modal-header">
                 <h2 id="cyberbrickUploadSettingsTitle">CyberBrick Upload Settings</h2>
-                <span class="modal-close" id="cyberbrickUploadSettingsClose">&times;</span>
+                <button type="button" class="modal-close" id="cyberbrickUploadSettingsClose">&times;</button>
             </div>
             <div class="modal-body">
                 <section class="cyberbrick-upload-section">
@@ -825,14 +824,14 @@
                 </section>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- CyberBrick 範例瀏覽器對話框 -->
-    <div id="sampleModal" class="modal" style="display: none;">
+    <dialog id="sampleModal" class="modal">
         <div class="modal-content sample-modal-content">
             <div class="modal-header">
                 <h2 id="sampleModalTitle"></h2>
-                <span class="modal-close" id="sampleModalClose">&times;</span>
+                <button type="button" class="modal-close" id="sampleModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <!-- 離線提示橫幅 -->
@@ -848,7 +847,7 @@
                 <div id="sampleEmptyNotice" class="sample-empty-notice" style="display: none;"></div>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <script src="{blocklyCompressedJsUri}"></script>
     <script src="{blocksCompressedJsUri}"></script>
@@ -902,7 +901,7 @@
                     <span id="txtTestStatusText"></span>
 
                 </div>
-                <span class="modal-close" id="txtTestCloseBtn">&times;</span>
+                <button type="button" class="modal-close" id="txtTestCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
                 <button class="txt-test-stop-all" id="txtTestStopAllBtn"></button>
