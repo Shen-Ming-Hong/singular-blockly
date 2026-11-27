@@ -290,10 +290,10 @@ try {
     await mouse.click(box.x + box.width / 2, box.y + box.height / 2, 900);
     frame = await findBlocklyFrame(win);
     await win.waitForTimeout(2500);
-    const toggle = await centerOf(frame, "#boardSelectToggle");
+    const toggle = await centerOf(frame, "#boardSelect");
     await mouse.click(toggle.x, toggle.y, 800);
     await win.waitForTimeout(900);
-    const uno = await centerOf(frame, '#boardDropdown .board-option[data-board="uno"]');
+    const uno = await centerOf(frame, '#boardSelect option[value="uno"]');
     await mouse.move(uno.x, uno.y + 120, 500);
     await mouse.move(uno.x, uno.y, 600);
     await win.waitForTimeout(300);
@@ -364,10 +364,10 @@ try {
     const more = await centerOf(frame, "#toolbarActionsToggle");
     await mouse.click(more.x, more.y, 800);
     await win.waitForTimeout(900);
-    const globe = await centerOf(frame, "#languageToggle");
+    const globe = await centerOf(frame, "#languageSelect");
     await mouse.click(globe.x, globe.y, 700);
     await win.waitForTimeout(900);
-    const zh = await centerOf(frame, '#languageDropdown .language-option[data-language="zh-hant"]');
+    const zh = await centerOf(frame, '#languageSelect option[value="zh-hant"]');
     await mouse.move(zh.x, zh.y, 700);
     await win.waitForTimeout(300);
     await mouse.click(zh.x, zh.y, 200);
