@@ -482,6 +482,10 @@ suite('ArduinoUploader Tests', () => {
 			assert.deepStrictEqual(percents, [...percents].sort((a, b) => a - b), 'Percent never goes backwards');
 			assert.ok(percents.every(value => value < 95), 'Percent stays below the cap; the cap becomes the finishing phase');
 			assert.ok(downloaded > 0);
+			await new Promise(resolve => setTimeout(resolve, 30));
+			const lastPackages = progress.map((update, index) => (update.packages ? index : -1)).reduce((a, b) => Math.max(a, b), -1);
+			const firstCompile = progress.findIndex(update => update.stage === 'compiling');
+			assert.ok(firstCompile < 0 || lastPackages < firstCompile, 'No package progress after the compile stage starts');
 		});
 
 		test('Never retries another Core after the upload command has spawned', async () => {

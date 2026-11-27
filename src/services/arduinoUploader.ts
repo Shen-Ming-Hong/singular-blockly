@@ -384,8 +384,10 @@ export class ArduinoUploader {
 		);
 		await tracker.start();
 		let lastSent = '';
+		// A sample still running when PlatformIO exits must not report after the compile stage started.
+		let finished = false;
 		const report = (): void => {
-			const snapshot = tracker.snapshot();
+			const snapshot = finished ? null : tracker.snapshot();
 			if (!snapshot || !onPackages) {return;}
 			const key = `${snapshot.phase}:${snapshot.percent}`;
 			if (key !== lastSent) {
@@ -417,6 +419,7 @@ export class ArduinoUploader {
 				forward
 			);
 		} finally {
+			finished = true;
 			clearInterval(timer);
 		}
 		if (tracker.snapshot()) {
