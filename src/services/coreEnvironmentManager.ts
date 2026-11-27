@@ -44,8 +44,19 @@ export class CoreEnvironmentManager {
 	private readonly lastSelection = new Map<string, WorkloadSelection>();
 	private readonly environments = new Map<string, CoreEnvironment>();
 
-	constructor(provider: CoreEnvironmentProvider, managed: CoreEnvironmentProvider) {
+	private readonly preferManagedForArduino: boolean;
+
+	constructor(
+		provider: CoreEnvironmentProvider,
+		managed: CoreEnvironmentProvider,
+		options: { env?: NodeJS.ProcessEnv } = {}
+	) {
 		this.providers = new Map([[provider.id, provider], [managed.id, managed]]);
+		// Maintainer test hook (spec 074): the PlatformIO IDE extension reinstalls its own
+		// Core when it is removed, so hardware tests of the Singular Core Arduino path need
+		// an explicit switch. The order only swaps between the two trusted Cores.
+		this.preferManagedForArduino =
+			(options.env ?? process.env).SINGULAR_BLOCKLY_ARDUINO_CORE?.trim().toLowerCase() === 'managed';
 	}
 
 	async getEnvironment(
@@ -151,7 +162,8 @@ export class CoreEnvironmentManager {
 	}
 
 	private profile(workload: CoreWorkload): readonly [CoreEnvironmentId, CoreEnvironmentId] {
-		return workload === 'arduino' ? ['provider', 'managed'] : ['managed', 'provider'];
+		if (workload === 'arduino' && !this.preferManagedForArduino) {return ['provider', 'managed'];}
+		return ['managed', 'provider'];
 	}
 
 	private key(workload: CoreWorkload, workspaceUri: string): string {

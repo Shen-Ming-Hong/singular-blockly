@@ -37,6 +37,27 @@ suite('CoreEnvironmentManager', () => {
 		assert.deepStrictEqual(calls, ['provider', 'managed']);
 	});
 
+	test('SINGULAR_BLOCKLY_ARDUINO_CORE=managed puts Singular Core first for Arduino only', async () => {
+		const calls: string[] = [];
+		const manager = new CoreEnvironmentManager(
+			fakeProvider('provider', calls, async () => environment('provider')),
+			fakeProvider('managed', calls, async () => environment('managed')),
+			{ env: { SINGULAR_BLOCKLY_ARDUINO_CORE: ' Managed ' } }
+		);
+		const arduino = await manager.getEnvironment('arduino', 'file:///workspace');
+		assert.strictEqual(arduino.selected?.id, 'managed');
+		assert.strictEqual(arduino.fallbackUsed, false);
+		assert.strictEqual(manager.getSelection('arduino', 'file:///workspace').primary, 'managed');
+		assert.strictEqual((await manager.getEnvironment('python', 'file:///workspace')).selected?.id, 'managed');
+
+		const ignored = new CoreEnvironmentManager(
+			fakeProvider('provider', [], async () => environment('provider')),
+			fakeProvider('managed', [], async () => environment('managed')),
+			{ env: { SINGULAR_BLOCKLY_ARDUINO_CORE: 'provider' } }
+		);
+		assert.strictEqual((await ignored.getEnvironment('arduino', 'file:///workspace')).selected?.id, 'provider');
+	});
+
 	test('falls back once for a missing primary and keeps the fallback sticky', async () => {
 		const calls: string[] = [];
 		const manager = new CoreEnvironmentManager(

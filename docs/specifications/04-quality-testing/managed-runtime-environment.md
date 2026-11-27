@@ -48,6 +48,10 @@ Windows x64 的真實安裝 job 另外帶 `--esp32-packages`，模擬兩種學�
 
 兩種情況都會檢查 Python（CyberBrick／MicroPython）工作負載沒有改用工作位置，並量測工作位置底下最長的路徑。evidence 必須包含 `esp32-work-root` 路徑案例、`workRootKind` 與小於 260 的 `longestPathLength`；`verify-evidence.js` 對 `win32/x64` 缺少這些欄位時拒絕。這個 job 因此把逾時放寬到 80 分鐘。USB 上傳無法在 CI 執行，仍需實機或虛擬機確認。
 
+### 實機測試 Singular Core 的 Arduino 路徑
+
+Arduino 預設先用 PlatformIO IDE 的 Core，而 PlatformIO IDE 被移除或 `.platformio` 被改名時會自動重新安裝，所以實機上很難讓 Arduino 走到 Singular Core。維護者測試時可以設定使用者環境變數 `SINGULAR_BLOCKLY_ARDUINO_CORE=managed`，再完全關閉並重開 VS Code。這會讓 Arduino 也先用 Singular Core，PlatformIO IDE 的 Core 改為備援；只有值為 `managed` 時生效，其他值一律忽略。測完刪除這個環境變數即可恢復。
+
 ## Evidence 契約
 
 每個 runner 產生一份不含本機絕對路徑的 JSON，綁定：
