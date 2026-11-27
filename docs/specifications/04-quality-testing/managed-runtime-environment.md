@@ -44,7 +44,7 @@ Windows 的 Arduino 工作負載不把 PlatformIO 套件放在 managed root 底�
 Windows x64 的真實安裝 job 另外帶 `--esp32-packages`，模擬兩種學生帳號：
 
 - 非 ASCII 的使用者資料夾：必須改用 system-drive 候選，並在那裡實際下載、編譯 `espressif32@7.0.1`（`esp32dev`）與 `atmelavr@5.3.0`（`uno`）。
-- 長度等同 `C:\Users\<45 字元>\AppData\Local` 的 ASCII 資料夾：必須仍放得進 local-app-data 候選，並編譯 ESP32。
+- 長度等同 `C:\Users\<13 字元>\AppData\Local` 的 ASCII 資料夾：工作位置剛好是 56 字元的上限，必須仍放得進 local-app-data 候選，並編譯 ESP32（確認編譯指令低於 Windows 32,767 字元的命令列上限；見 spec 074 research R7）。
 
 兩種情況都會檢查 Python（CyberBrick／MicroPython）工作負載沒有改用工作位置，並量測工作位置底下最長的路徑。evidence 必須包含 `esp32-work-root` 路徑案例、`workRootKind` 與小於 260 的 `longestPathLength`；`verify-evidence.js` 對 `win32/x64` 缺少這些欄位時拒絕。這個 job 因此把逾時放寬到 80 分鐘。USB 上傳無法在 CI 執行，仍需實機或虛擬機確認。
 

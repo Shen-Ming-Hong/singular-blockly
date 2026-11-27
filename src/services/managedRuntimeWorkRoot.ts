@@ -28,6 +28,13 @@ export const WORK_ROOT_PACKAGE_DESCENDANT_RESERVE = 160;
 /** Deepest expected build/libdeps descendant; see research R2. */
 export const WORK_ROOT_PROJECT_DESCENDANT_RESERVE = 120;
 export const WORK_ROOT_PROJECT_KEY_LENGTH = 16;
+/**
+ * Longest work root an ESP32 build accepts (research R7). Every compile passes
+ * about 200 include folders under the work root to cc1plus, and Windows limits
+ * one command line to 32,767 characters: measured as 19,200 + 198 x root length
+ * for platformio/espressif32@7.0.1, plus room for about ten project libraries.
+ */
+export const WORK_ROOT_MAX_LENGTH = 56;
 
 const RECORD_RELATIVE_PATH = 'work-root.json';
 const LOCK_RELATIVE_PATH = path.join('locks', 'work-root.lock');
@@ -118,7 +125,7 @@ export function createWorkRootLayout(root: string, workspaceUri: string): WorkRo
 	};
 }
 
-/** Check the three projected path budgets from data-model.md. */
+/** Check the three projected path budgets from data-model.md and the ESP32 command-line limit. */
 export function checkWorkRootBudget(root: string): { ok: boolean; longestProjectedLength: number } {
 	const sample = createWorkRootLayout(root, 'budget-probe');
 	const projected = [
@@ -127,7 +134,10 @@ export function checkWorkRootBudget(root: string): { ok: boolean; longestProject
 		sample.build.length + 1 + WORK_ROOT_PROJECT_DESCENDANT_RESERVE,
 	];
 	const longestProjectedLength = Math.max(...projected);
-	return { ok: longestProjectedLength < WINDOWS_MAX_PATH, longestProjectedLength };
+	return {
+		ok: longestProjectedLength < WINDOWS_MAX_PATH && win.normalize(root).length <= WORK_ROOT_MAX_LENGTH,
+		longestProjectedLength,
+	};
 }
 
 export type CommandRunner = (file: string, args: readonly string[]) => Promise<{ stdout: string }>;

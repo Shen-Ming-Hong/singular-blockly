@@ -40,7 +40,7 @@ PlatformIO 的編譯輸出形如 `<build_dir>\<env>\lib<3 hex>\<函式庫名稱>
 **決定**：
 
 1. 使用者自訂 managed runtime 資料夾時，只用 `<自訂資料夾>\pio`。
-2. 否則先用 `%LOCALAPPDATA%\SingularBlockly\pio`：這是每位使用者私有的位置（ACL 只授權本人、SYSTEM 與 Administrators），而且不會漫遊。以 `C:\Users\<名稱>\AppData\Local\` 計算，平台資料夾長度為 53 加上名稱長度，加上分隔字元與 160 的保留後，名稱可長達 45 字元。
+2. 否則先用 `%LOCALAPPDATA%\SingularBlockly\pio`：這是每位使用者私有的位置（ACL 只授權本人、SYSTEM 與 Administrators），而且不會漫遊。以 `C:\Users\<名稱>\AppData\Local\` 計算，平台資料夾長度為 53 加上名稱長度，加上分隔字元與 160 的保留後，名稱可長達 45 字元；但 ESP32 的編譯指令長度另外把工作位置限制在 56 字元以內（見 R7），所以名稱實際最多 13 字元，更長的名稱改用下一個候選。
 3. 再用 `%SystemDrive%\SingularBlockly-<8 個隨機十六進位字元>`：直接放在磁碟根目錄下，不使用多人共用的上層資料夾。
 
 **理由**：磁碟根目錄的預設 ACL 會讓 Authenticated Users 對新建資料夾的子項目擁有修改權限（繼承自 `C:\`）。因此必須移除繼承，並只授權目前使用者的 SID、SYSTEM 與 Administrators。
@@ -80,3 +80,11 @@ PlatformIO 的編譯輸出形如 `<build_dir>\<env>\lib<3 hex>\<函式庫名稱>
 2. 輸出中出現長度達到 248 字元以上的 Windows 絕對路徑（`<磁碟>:\…`），而且同一行有 `No such file or directory`、`cannot open` 或 `cannot find`。
 
 **理由**：只看 `No such file or directory` 會把一般的 `#include` 打錯也誤判為路徑過長；加上路徑長度條件後，只有真正接近上限的路徑才會被歸入此類。248 取自 Win32 `CreateDirectory` 的上限（260 減去 8.3 檔名的 12 字元）。
+
+## R7：ESP32 編譯指令的長度上限
+
+**發現**（2026-11-27，PR #293 的 Windows CI）：LOCALAPPDATA 等同 `C:\Users\<45 字元>\AppData\Local` 時，工作位置 88 字元，所有路徑都低於 260，但 ESP32 編譯仍以 `xtensa-esp32-elf-g++: error: CreateProcess: No such file or directory` 失敗。工作位置 52 字元（Ray 的電腦）與 27 字元（system-drive）都成功。
+
+**原因**：PlatformIO 用回應檔把參數交給 `g++`，但 `g++` 展開後以一般命令列啟動 `cc1plus`，而 Windows 單一命令列上限是 32,767 字元。以 `espressif32@7.0.1`（framework 3.20017）實測 `g++ -###`：`cc1plus` 命令列約為 19,200 + 198 × 工作位置長度（約 197 個 include 資料夾都在工作位置底下）。88 字元約 36,600，超過上限；52 字元約 29,500。
+
+**決定**：工作位置最長 56 字元（`WORK_ROOT_MAX_LENGTH`），超過就視為預算不足並改試下一個候選。56 字元時約 30,300，另外保留約十個專案函式庫各一個 include 資料夾的空間（每個約工作位置加 60 字元），仍有約 1,300 字元餘裕。`%LOCALAPPDATA%\SingularBlockly\pio` 因此支援最多 13 字元的使用者名稱；更長的名稱與網域帳號改用 `%SystemDrive%\SingularBlockly-<8 hex>`（27 字元）。自訂資料夾超過上限時照舊回報路徑過長，請使用者選較短的位置。
