@@ -36,6 +36,7 @@ import {
 	type PackageProgress,
 	type ProgressFileSystem,
 } from './packageInstallProgress';
+import { ArduinoBuildCache, parseEsptoolMac, reuseModeFor, type BuildInputs, type CoreIdentity } from './arduinoBuildCache';
 
 /**
  * 預設的編譯逾時時間（毫秒）。ESP32 第一次編譯在較慢的電腦上可能超過兩分鐘，
@@ -124,6 +125,9 @@ export class ArduinoUploader {
 	/** Read-only file system and interval for package install progress (spec 076; injectable for tests). */
 	progressFileSystem: ProgressFileSystem = nodeProgressFileSystem;
 	packageProgressIntervalMs = 1000;
+	/** Skips unchanged package preparation and rebuilds (spec 077; replaceable in tests). */
+	buildCache: ArduinoBuildCache;
+	private coreId: string | null = null;
 
 	/**
 	 * 建立 ArduinoUploader 實例
@@ -156,6 +160,7 @@ export class ArduinoUploader {
 		this.compileTimeout = DEFAULT_COMPILE_TIMEOUT;
 		this.uploadTimeout = DEFAULT_UPLOAD_TIMEOUT;
 		this.prepareTimeout = DEFAULT_PREPARE_TIMEOUT;
+		this.buildCache = new ArduinoBuildCache(workspacePath);
 
 		// 使用預設的 child_process 執行器或注入的執行器
 		this.executor = executor || {
@@ -294,6 +299,7 @@ export class ArduinoUploader {
 			source: 'path-search',
 		};
 		this.pioEnvironment = { ...environment.invocation.env };
+		this.coreId = environment.id;
 		this.managedStorageRoot = environment.id === 'managed' ? environment.storageRoot : null;
 		this.managedWorkRoot = environment.id === 'managed' ? environment.workRoot ?? null : null;
 	}
@@ -504,6 +510,49 @@ export class ArduinoUploader {
 		await this.settingsManager.syncPlatformIOSettings(libDeps, buildFlags, libLdfMode);
 	}
 
+	private coreIdentity(): CoreIdentity | null {
+		if (!this.pioInvocation) {return null;}
+		return {
+			id: this.coreId ?? `local:${this.pioInvocation.source}`,
+			command: [this.pioInvocation.command, ...this.pioInvocation.prefixArgs].join('\0'),
+			env: this.pioEnvironment,
+		};
+	}
+
+	/** Fingerprint the project; any failure only turns the shortcut off (spec 077). */
+	private async computeBuildInputs(): Promise<{ inputs: BuildInputs; core: CoreIdentity } | null> {
+		const core = this.coreIdentity();
+		if (!core) {return null;}
+		try {
+			const inputs = await this.buildCache.computeInputs(core);
+			return inputs ? { inputs, core } : null;
+		} catch (error) {
+			log('[arduino] 無法計算建置快取鍵，改走完整流程', 'warn', { code: this.commandErrorCode(error) });
+			return null;
+		}
+	}
+
+	/**
+	 * 可以跳過編譯時回傳要燒錄的連接埠，否則回傳 null（spec 077）。
+	 * AVR 的 nobuild 上傳和平常一樣寫入整個程式；ESP32 只寫 firmware.bin，
+	 * 所以只用在上次完整燒錄過的連接埠，並在燒錄後比對晶片 MAC。
+	 */
+	private async findReuse(inputs: BuildInputs, core: CoreIdentity): Promise<{ port: string; mac: string | null } | null> {
+		try {
+			if (!(await this.buildCache.canReuseBuild(inputs, core))) {return null;}
+			const mode = reuseModeFor(inputs.platforms);
+			if (mode === 'whole') {return { port: 'auto', mac: null };}
+			if (mode !== 'app-only') {return null;}
+			const flashed = await this.buildCache.flashedDevice(core);
+			// 快取檔在工作區裡，只接受像 COM35、/dev/ttyUSB0 這樣的連接埠名稱
+			if (!flashed || !/^(?!-)[\w./:\\-]+$/.test(flashed.port)) {return null;}
+			return { port: flashed.port, mac: flashed.mac };
+		} catch (error) {
+			log('[arduino] 無法判斷能否沿用上次的韌體，改走完整流程', 'warn', { code: this.commandErrorCode(error) });
+			return null;
+		}
+	}
+
 	/**
 	 * 儲存程式碼到 src/main.cpp
 	 * @param code 程式碼內容
@@ -515,6 +564,18 @@ export class ArduinoUploader {
 		// 確保 src 目錄存在
 		if (!this.fileSystem.existsSync(srcDir)) {
 			this.fileSystem.mkdirSync(srcDir, { recursive: true });
+		}
+
+		// 內容相同就不重寫，保留檔案時間，避免 PlatformIO 以為程式改了（spec 077）
+		if (this.fileSystem.readFileSync && this.fileSystem.existsSync(mainCppPath)) {
+			try {
+				if (this.fileSystem.readFileSync(mainCppPath, 'utf8') === code) {
+					log('[arduino] 程式碼沒有變更，保留 main.cpp', 'info', { path: mainCppPath });
+					return;
+				}
+			} catch {
+				// 讀不到就照常覆寫
+			}
 		}
 
 		this.fileSystem.writeFileSync(mainCppPath, code);
@@ -886,16 +947,23 @@ export class ArduinoUploader {
 	private async compileAndUploadWithProgress(
 		port: string,
 		onCompileProgress?: (subProgress: number, message: string) => void,
-		onUploadProgress?: (subProgress: number, message: string) => void
+		onUploadProgress?: (subProgress: number, message: string) => void,
+		reuseBuild = false
 	): Promise<{
 		success: boolean;
 		error?: string;
 		details?: string;
 		stage?: 'compiling' | 'uploading';
 		errorCode?: 'path-too-long';
+		/** PlatformIO got as far as flashing, so the firmware was built (spec 077). */
+		reachedUpload?: boolean;
+		/** Serial port PlatformIO flashed, read from its output (spec 077). */
+		uploadPort?: string;
+		/** Chip MAC esptool printed while flashing (ESP32, spec 077). */
+		chipMac?: string;
 	}> {
 		try {
-			log('[arduino] 開始編譯並上傳（串流模式）', 'info', { port });
+			log(reuseBuild ? '[arduino] 程式沒有變更，直接上傳上次的韌體' : '[arduino] 開始編譯並上傳（串流模式）', 'info', { port });
 
 			let lastCompileProgress = 0;
 			let lastUploadProgress = 0;
@@ -907,10 +975,12 @@ export class ArduinoUploader {
 
 			// 建構命令參數
 			// 如果 port 是 'auto'，不指定 --upload-port，讓 PlatformIO 自動偵測
-			const args = ['run', '--target', 'upload', '--project-dir', this.workspacePath];
+			// reuseBuild：`-t nobuild` 讓 PlatformIO 跳過相依掃描與編譯，直接燒錄上次的韌體（spec 077）
+			const args = ['run', ...(reuseBuild ? ['--target', 'nobuild'] : []), '--target', 'upload'];
 			if (port !== 'auto') {
-				args.splice(3, 0, '--upload-port', port);
+				args.push('--upload-port', port);
 			}
+			args.push('--project-dir', this.workspacePath);
 			const platformio = this.getPlatformioSpawnCommand(args);
 
 			const result = await this.streamingExecutor.spawn(
@@ -1025,6 +1095,7 @@ export class ArduinoUploader {
 						details: this.redactManagedStorage(this.parseCompileError(stderrForParsing || 'Path too long')).slice(0, 200),
 						stage,
 						errorCode: 'path-too-long',
+						reachedUpload: reachedUploadPhase,
 					};
 				}
 				const errorMessage = isCompileError
@@ -1037,11 +1108,19 @@ export class ArduinoUploader {
 					error: classifiedError,
 					details: errorMessage.slice(0, 200),
 					stage,
+					reachedUpload: reachedUploadPhase,
 				};
 			}
 
+			// 從完整輸出讀燒錄的連接埠與晶片 MAC（串流片段可能把一行切斷）
+			let uploadPort: string | undefined;
+			let chipMac: string | undefined;
+			for (const line of (result.stdout || '').split(/\r?\n/)) {
+				uploadPort = uploadPort ?? line.match(/^(?:Auto-detected:|Using manually specified:|Serial port)\s+(\S+)/)?.[1];
+				chipMac = chipMac ?? parseEsptoolMac(line) ?? undefined;
+			}
 			log('[arduino] 編譯並上傳成功', 'info');
-			return { success: true };
+			return { success: true, uploadPort, chipMac };
 		} catch (error: any) {
 			const failureClass = classifyCoreFailure(error, 'project-process');
 			if (
@@ -1068,6 +1147,7 @@ export class ArduinoUploader {
 				error: classifiedError,
 				details: errorMessage.slice(0, 200),
 				stage,
+				reachedUpload: reachedUploadPhase,
 			};
 		}
 	}
@@ -1328,10 +1408,18 @@ export class ArduinoUploader {
 					phase: 'prepare',
 					operation: async environment => {
 						this.useCoreEnvironment(environment);
+						// 同一份 platformio.ini 與 Core 已準備過、平台也還在，就不再跑 pio pkg install（spec 077）
+						const fingerprint = await this.computeBuildInputs();
+						const platformsDir = resolvePlatformioDirectories(this.pioEnvironment ?? process.env).platforms;
+						if (fingerprint && await this.buildCache.isPrepared(fingerprint.inputs, fingerprint.core, platformsDir)) {
+							log('[arduino] 專案套件已就緒，略過套件準備', 'info');
+							return;
+						}
 						await this.prepareProjectPackages(
 							request.board,
 							packages => sendProgress('checking_pio', 18, 'Preparing project packages...', undefined, undefined, packages)
 						);
+						if (fingerprint) {await this.buildCache.markPrepared(fingerprint.inputs, fingerprint.core);}
 					},
 				});
 			}
@@ -1342,10 +1430,39 @@ export class ArduinoUploader {
 			// 2. 編譯（如有需要）
 			// 3. 嘗試上傳到連接的裝置
 			// 若無板子，至少能確認編譯是否有語法錯誤
-			sendProgress('compiling', 20, 'Building & uploading...', 0);
-
-			const runCompileAndUpload = () => this.compileAndUploadWithProgress(
-				'auto',
+			const runCompileAndUpload = async () => {
+				// 程式、設定與 Core 都沒變、上次的韌體也還在：跳過約半分鐘的相依掃描，直接燒錄（spec 077）
+				const fingerprint = await this.computeBuildInputs();
+				const reuse = fingerprint ? await this.findReuse(fingerprint.inputs, fingerprint.core) : null;
+				if (fingerprint && reuse) {
+					sendProgress('uploading', 60, 'Uploading previous build (no changes)...', 0);
+					const reused = await runPlatformio(true, reuse.port);
+					const otherBoard = reused.success && reuse.mac !== null && reused.chipMac !== reuse.mac;
+					if (otherBoard) {
+						// ESP32 的 nobuild 只寫主程式；換了板子就馬上完整燒錄一次，補上 bootloader 與分割表
+						log('[arduino] 連接的是另一塊板子，改為完整燒錄', 'info');
+					} else if (reused.success || (reused.reachedUpload && reuse.port === 'auto')) {
+						return reused;
+					} else {
+						// 還沒進入燒錄就失敗（例如韌體被刪掉），或 ESP32 在上次的固定連接埠燒錄失敗
+						// （板子可能換到別的埠）：改走完整流程並自動偵測連接埠
+						log('[arduino] 直接上傳上次的韌體失敗，改為完整流程', 'warn', { reachedUpload: Boolean(reused.reachedUpload) });
+					}
+				}
+				sendProgress('compiling', 20, 'Building & uploading...', 0);
+				if (fingerprint) {await this.buildCache.invalidateBuild(fingerprint.core);}
+				const built = await runPlatformio(false, 'auto');
+				// 編譯成功（即使燒錄失敗）就記下這次的韌體，下次沒改程式可以直接燒錄
+				if (fingerprint && (built.success || built.reachedUpload)) {
+					const recorded = await this.buildCache.markBuilt(fingerprint.inputs, fingerprint.core);
+					if (recorded && built.success && built.uploadPort && built.chipMac && reuseModeFor(fingerprint.inputs.platforms) === 'app-only') {
+						await this.buildCache.recordDevice(fingerprint.inputs, fingerprint.core, { port: built.uploadPort, mac: built.chipMac });
+					}
+				}
+				return built;
+			};
+			const runPlatformio = (reuseBuild: boolean, port: string) => this.compileAndUploadWithProgress(
+				port,
 				// 編譯進度回調（映射到 20-55%）
 				(subProgress, subMessage) => {
 					const mappedProgress = 20 + Math.round(subProgress * 0.35);
@@ -1355,7 +1472,8 @@ export class ArduinoUploader {
 				(subProgress, subMessage) => {
 					const mappedProgress = 60 + Math.round(subProgress * 0.35);
 					sendProgress('uploading', mappedProgress, subMessage, subProgress);
-				}
+				},
+				reuseBuild
 			);
 			const result = this.coreEnvironmentManager
 				? await this.coreEnvironmentManager.run({

@@ -23,6 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Windows 使用者名稱較長（超過 13 字元，或網域帳號）時，ESP32 編譯改用 `C:\SingularBlockly-…` 資料夾，避免編譯指令超過 Windows 的長度上限而失敗
   On Windows accounts with longer user names (over 13 characters, or domain accounts), ESP32 builds use a `C:\SingularBlockly-…` folder so the compile command stays within the Windows length limit
 
+### ⚡ 效能 Performance
+
+- 沒有改程式時再按一次上傳，會直接燒錄上次編好的韌體，不再重新確認套件、也不再花約半分鐘檢查每個檔案有沒有變更。ESP32 只會在上次完整燒錄過的同一塊板子上這樣做；換了板子會立刻再完整燒錄一次，補上開機程式與分割表
+  Pressing Upload again without changing the program now flashes the firmware built last time, without checking packages again or spending about half a minute checking every file for changes. On ESP32 this only happens for the same board that was fully flashed last time; a different board gets a full upload right away so its bootloader and partition table are written too
+- 程式內容相同時不再重寫 `src/main.cpp`
+  `src/main.cpp` is no longer rewritten when the program has not changed
+
 ### ✨ 新功能 Features
 
 - Windows 的 PlatformIO 診斷面板會顯示 PlatformIO 工作位置與系統長路徑設定；清理受管檔案時也會移除舊位置的套件與久未使用的編譯資料夾
