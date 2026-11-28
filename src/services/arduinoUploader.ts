@@ -532,6 +532,18 @@ export class ArduinoUploader {
 		}
 	}
 
+	/** True when src/, platformio.ini, and the Core still hash to what the build started with (spec 078). */
+	private async isUnchangedSince(fingerprint: { inputs: BuildInputs; core: CoreIdentity }): Promise<boolean> {
+		const after = await this.computeBuildInputs();
+		const unchanged = after !== null
+			&& after.inputs.buildKey === fingerprint.inputs.buildKey
+			&& after.inputs.prepareKey === fingerprint.inputs.prepareKey;
+		if (!unchanged) {
+			log('[arduino] 編譯期間專案檔案有變更，不記錄這次的韌體', 'info');
+		}
+		return unchanged;
+	}
+
 	/**
 	 * 可以跳過編譯時回傳要燒錄的連接埠，否則回傳 null（spec 077）。
 	 * AVR 的 nobuild 上傳和平常一樣寫入整個程式；ESP32 只寫 firmware.bin，
@@ -1452,8 +1464,10 @@ export class ArduinoUploader {
 				sendProgress('compiling', 20, 'Building & uploading...', 0);
 				if (fingerprint) {await this.buildCache.invalidateBuild(fingerprint.core);}
 				const built = await runPlatformio(false, 'auto');
-				// 編譯成功（即使燒錄失敗）就記下這次的韌體，下次沒改程式可以直接燒錄
-				if (fingerprint && (built.success || built.reachedUpload)) {
+				// 編譯成功（即使燒錄失敗）就記下這次的韌體，下次沒改程式可以直接燒錄。
+				// 編譯期間 src/ 或 platformio.ini 被改過（指紋不同）就不記，避免把別份程式的韌體記在這個指紋下（spec 078）
+				const unchanged = fingerprint ? await this.isUnchangedSince(fingerprint) : false;
+				if (fingerprint && unchanged && (built.success || built.reachedUpload)) {
 					const recorded = await this.buildCache.markBuilt(fingerprint.inputs, fingerprint.core);
 					if (recorded && built.success && built.uploadPort && built.chipMac && reuseModeFor(fingerprint.inputs.platforms) === 'app-only') {
 						await this.buildCache.recordDevice(fingerprint.inputs, fingerprint.core, { port: built.uploadPort, mac: built.chipMac });

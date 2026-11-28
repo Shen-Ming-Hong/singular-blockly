@@ -1486,6 +1486,77 @@ describe('WebView Message Handler', () => {
 	});
 
 	// Error handling branch coverage tests
+	describe('Editor code writes during an upload (spec 078)', () => {
+		function stubPendingUpload() {
+			const pending = createDeferred<any>();
+			const upload = sinon.stub().returns(pending.promise);
+			sinon.stub(messageHandler as any, 'createArduinoUploader').returns({ upload });
+			const finish = () => pending.resolve({
+				success: true, timestamp: '2026-11-28T00:00:00.000Z', port: 'auto', duration: 1, mode: 'upload',
+			});
+			return { upload, finish, fail: (error: Error) => pending.reject(error) };
+		}
+		const mainCppWrites = () => fileServiceStub.writeFile.getCalls()
+			.filter(call => call.args[0] === 'src/main.cpp')
+			.map(call => call.args[1]);
+
+		beforeEach(() => {
+			fileServiceStub.createDirectory.resolves();
+			fileServiceStub.writeFile.resolves();
+			settingsManagerStub.syncPlatformIOSettings.resolves();
+		});
+
+		it('holds editor updates until the upload ends, then writes only the latest', async () => {
+			const { upload, finish } = stubPendingUpload();
+			const uploading = messageHandler.handleMessage({ command: 'requestUpload', code: 'A', board: 'esp32' });
+			await new Promise(resolve => setImmediate(resolve));
+			assert.ok(upload.calledOnce);
+
+			await messageHandler.handleMessage({ command: 'updateCode', code: 'B', language: 'arduino' });
+			await messageHandler.handleMessage({ command: 'updateCode', code: 'C', language: 'arduino' });
+			assert.deepStrictEqual(mainCppWrites(), []);
+			assert.strictEqual(settingsManagerStub.syncPlatformIOSettings.called, false);
+
+			finish();
+			await uploading;
+			assert.deepStrictEqual(mainCppWrites(), ['C']);
+		});
+
+		it('writes the held update even when the upload throws', async () => {
+			const { fail } = stubPendingUpload();
+			const uploading = messageHandler.handleMessage({ command: 'requestUpload', code: 'A', board: 'esp32' });
+			await new Promise(resolve => setImmediate(resolve));
+			await messageHandler.handleMessage({ command: 'updateCode', code: 'B', language: 'arduino' });
+			assert.deepStrictEqual(mainCppWrites(), []);
+
+			fail(new Error('boom'));
+			await uploading;
+			assert.deepStrictEqual(mainCppWrites(), ['B']);
+		});
+
+		it('starts the upload only after an editor write already in progress has finished', async () => {
+			const { upload, finish } = stubPendingUpload();
+			const directory = createDeferred<void>();
+			fileServiceStub.createDirectory.returns(directory.promise);
+			const writing = messageHandler.handleMessage({ command: 'updateCode', code: 'B', language: 'arduino' });
+			const uploading = messageHandler.handleMessage({ command: 'requestUpload', code: 'B', board: 'esp32' });
+			await new Promise(resolve => setImmediate(resolve));
+			assert.strictEqual(upload.called, false);
+
+			directory.resolve();
+			await writing;
+			await new Promise(resolve => setImmediate(resolve));
+			assert.ok(upload.calledOnce);
+			finish();
+			await uploading;
+		});
+
+		it('writes editor updates right away when no upload is running', async () => {
+			await messageHandler.handleMessage({ command: 'updateCode', code: 'B', language: 'arduino' });
+			assert.deepStrictEqual(mainCppWrites(), ['B']);
+		});
+	});
+
 	describe('Arduino path-too-long result (spec 074)', () => {
 		function stubUploader(error: { stage: string; message: string; errorCode?: 'path-too-long' }) {
 			const upload = sinon.stub().resolves({
