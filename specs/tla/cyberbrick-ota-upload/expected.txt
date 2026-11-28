@@ -1,0 +1,7 @@
+# 現況（CyberBrick Wi-Fi 上傳）；修正後改成 holds
+invariant NoTornFile violated
+invariant SuccessMeansNewProgram violated
+invariant SuccessNeverOnTornFile violated
+invariant FailureKeepsBoardBootable violated
+property UploadEnds holds
+property EventuallyConsistent violated
