@@ -19,7 +19,7 @@ bash specs/tla/run-tlc.sh upload-build-cache    # 只跑一個
 
 | 資料夾 | 建模的功能 | 現況 |
 | --- | --- | --- |
-| [upload-build-cache](upload-build-cache/README.md) | Arduino 快速重新上傳的建置快取（spec 077），和編輯器上傳中仍會自動存檔的互動 | 3 條性質都有反例 |
+| [upload-build-cache](upload-build-cache/README.md) | Arduino 快速重新上傳的建置快取（spec 077），和編輯器上傳中仍會自動存檔的互動 | spec 078 修正後 3 條性質都成立 |
 | [cyberbrick-ota-upload](cyberbrick-ota-upload/README.md) | CyberBrick 透過 Wi-Fi 上傳 `rc_main.py`：兩次嘗試、逾時後的「回復」判斷、板子端的寫檔 | 6 條裡 5 條有反例，「上傳一定會結束」成立 |
 
 ## 第 1 步盤點：程式裡的隱藏狀態機

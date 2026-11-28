@@ -1,4 +1,4 @@
-# 現況（spec 077 的快速重新上傳）；修正後改成 holds
-invariant RecordSound violated
-invariant ReuseFlashesCurrentSource violated
-property EventuallyConsistent violated
+# spec 078 修正後（上傳中延後寫入 + 記錄前重算指紋）
+invariant RecordSound holds
+invariant ReuseFlashesCurrentSource holds
+property EventuallyConsistent holds

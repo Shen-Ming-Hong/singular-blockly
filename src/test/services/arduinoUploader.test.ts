@@ -630,6 +630,25 @@ suite('ArduinoUploader Tests', () => {
 				assert.strictEqual((realFileSystem.writeFileSync as sinon.SinonSpy).callCount, 1, 'main.cpp written only once');
 			});
 
+			test('does not record a build when src/ changes while it compiles (spec 078)', async () => {
+				const code = 'void setup() {}\nvoid loop() {}\n';
+				const mainCpp = path.join(workspace, 'src', 'main.cpp');
+				// Someone edits main.cpp outside the Blockly editor while PlatformIO builds.
+				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(async (command: string, args: string[]) => {
+					if (args[0] === 'run' && !args.includes('nobuild')) {
+						fs.writeFileSync(mainCpp, 'void setup() { delay(5); }\nvoid loop() {}\n');
+					}
+					return defaultSpawn(command, args);
+				});
+				await createUploader().upload({ code, board: 'esp32' });
+				(mockStreamingExecutor.spawn as sinon.SinonStub).callsFake(defaultSpawn);
+
+				commands = [];
+				const result = await createUploader().upload({ code, board: 'esp32' });
+				assert.strictEqual(result.success, true);
+				assert.deepStrictEqual(kinds(), ['build-upload'], 'the firmware built from the edited file is not reused');
+			});
+
 			test('rebuilds after the code changes, without re-preparing packages', async () => {
 				await createUploader().upload({ code: 'void setup() {}\nvoid loop() {}\n', board: 'esp32' });
 				commands = [];

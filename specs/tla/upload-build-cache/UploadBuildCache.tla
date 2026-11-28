@@ -1,14 +1,14 @@
 --------------------------- MODULE UploadBuildCache ---------------------------
 (***************************************************************************)
-(* Fast re-upload build cache (spec 077) as it works today.                *)
+(* Fast re-upload build cache (spec 077) with the spec 078 fix.           *)
 (*                                                                         *)
 (* Source of truth:                                                        *)
 (*   src/services/arduinoUploader.ts  upload() / runCompileAndUpload       *)
 (*   src/services/arduinoBuildCache.ts computeInputs / canReuseBuild /     *)
 (*                                     invalidateBuild / markBuilt         *)
-(*   src/webview/messageHandler.ts     handleUpdateCode (auto-save of      *)
-(*                                     src/main.cpp, not serialized with   *)
-(*                                     the upload)                         *)
+(*   src/webview/messageHandler.ts     handleUpdateCode: while an upload   *)
+(*                                     runs, only the latest update is     *)
+(*                                     kept and written when it ends       *)
 (*   media/js/blocklyEdit.js           debounced updateCode; the editor    *)
 (*                                     stays editable during an upload     *)
 (*                                                                         *)
@@ -20,8 +20,11 @@
 EXTENDS Naturals
 
 CONSTANTS
-    Code,       \* possible contents of src/main.cpp, e.g. {1, 2}
-    MaxEdits    \* bound on editor changes so the state space is finite
+    Code,               \* possible contents of src/main.cpp, e.g. {1, 2}
+    MaxEdits,           \* bound on editor changes so the state space is finite
+    MaxExternal,        \* edits to src/ the extension cannot see (VS Code editor, git)
+    DeferWrites,        \* spec 078 fix 1: hold editor writes while an upload runs
+    RecheckBeforeMark   \* spec 078 fix 2: re-hash src/ before markBuilt
 
 None == 0
 
@@ -29,6 +32,9 @@ VARIABLES
     screen,     \* code the Blockly editor currently shows
     disk,       \* code in src/main.cpp
     edits,      \* number of editor changes so far
+    sent,       \* code of the last updateCode the editor sent
+    pending,    \* deferred updateCode content (None = nothing held)
+    external,   \* number of external edits so far
     pc,         \* uploader step
     req,        \* code the user clicked Upload with (request.code)
     fp,         \* code hashed by computeInputs (the buildKey)
@@ -40,11 +46,12 @@ VARIABLES
     lastVia,    \* "none" | "build" | "reuse": how the last flash happened
     lastSrc     \* code computeInputs hashed for the last flash
 
-vars == <<screen, disk, edits, pc, req, fp, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
+vars == <<screen, disk, edits, sent, pending, external, pc, req, fp, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
 
 TypeOK ==
     /\ screen \in Code /\ disk \in Code
-    /\ edits \in 0..MaxEdits
+    /\ edits \in 0..MaxEdits /\ sent \in Code
+    /\ pending \in Code \cup {None} /\ external \in 0..MaxExternal
     /\ pc \in {"idle", "fingerprint", "decide", "reuse", "invalidate", "scons", "link", "flash", "mark"}
     /\ req \in Code \cup {None} /\ fp \in Code \cup {None}
     /\ compiled \in Code \cup {None} /\ art \in Code \cup {None}
@@ -55,7 +62,7 @@ TypeOK ==
 Init ==
     /\ screen = CHOOSE c \in Code : TRUE
     /\ disk = screen
-    /\ edits = 0
+    /\ edits = 0 /\ sent = screen /\ pending = None /\ external = 0
     /\ pc = "idle"
     /\ req = None /\ fp = None /\ compiled = None /\ art = None
     /\ recKey = None /\ recArt = None
@@ -71,13 +78,27 @@ Edit ==
     /\ edits < MaxEdits
     /\ \E c \in Code \ {screen} : screen' = c
     /\ edits' = edits + 1
-    /\ UNCHANGED <<disk>> /\ UNCHANGED UploaderVars
+    /\ UNCHANGED <<disk, sent, pending, external>> /\ UNCHANGED UploaderVars
 
-\* debounced updateCode -> handleUpdateCode -> fileService.writeFile('src/main.cpp')
+\* debounced updateCode -> handleUpdateCode: writes src/main.cpp, or holds it
+\* while an upload runs (DeferWrites).
 AutoSave ==
-    /\ disk # screen
-    /\ disk' = screen
-    /\ UNCHANGED <<screen, edits>> /\ UNCHANGED UploaderVars
+    /\ sent # screen
+    /\ sent' = screen
+    /\ IF DeferWrites /\ pc # "idle"
+         THEN /\ pending' = screen /\ UNCHANGED disk
+         ELSE /\ disk' = screen /\ UNCHANGED pending
+    /\ UNCHANGED <<screen, edits, external>> /\ UNCHANGED UploaderVars
+
+\* Someone changes src/main.cpp outside the Blockly editor.
+ExternalEdit ==
+    /\ external < MaxExternal
+    /\ \E c \in Code \ {disk} : disk' = c
+    /\ external' = external + 1
+    /\ UNCHANGED <<screen, edits, sent, pending>> /\ UNCHANGED UploaderVars
+
+\* When the upload ends, the held update is written (handleRequestUpload finally).
+Flush(d) == IF pending # None THEN pending ELSE d
 
 (***************************************************************************)
 (* Uploader: one upload at a time (the webview disables the button).       *)
@@ -88,14 +109,14 @@ Click ==
     /\ req' = screen
     /\ disk' = screen
     /\ pc' = "fingerprint"
-    /\ UNCHANGED <<screen, edits, fp, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
+    /\ UNCHANGED <<screen, edits, sent, pending, external, fp, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
 
 \* computeBuildInputs() -> buildCache.computeInputs(): hashes src/ as it is now
 Fingerprint ==
     /\ pc = "fingerprint"
     /\ fp' = disk
     /\ pc' = "decide"
-    /\ UNCHANGED <<screen, disk, edits, req, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
+    /\ UNCHANGED <<screen, disk, edits, sent, pending, external, req, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
 
 \* findReuse(): canReuseBuild compares build.key and the firmware stamps
 Decide ==
@@ -103,7 +124,7 @@ Decide ==
     /\ IF recKey = fp /\ recKey # None /\ recArt = art
          THEN pc' = "reuse"
          ELSE pc' = "invalidate"
-    /\ UNCHANGED <<screen, disk, edits, req, fp, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
+    /\ UNCHANGED <<screen, disk, edits, sent, pending, external, req, fp, compiled, art, recKey, recArt, board, lastVia, lastSrc>>
 
 \* runPlatformio(true, port): pio run -t nobuild -t upload flashes the files on disk
 ReuseFlash ==
@@ -111,45 +132,50 @@ ReuseFlash ==
     /\ board' = art
     /\ lastVia' = "reuse" /\ lastSrc' = fp
     /\ pc' = "idle"
-    /\ UNCHANGED <<screen, disk, edits, req, fp, compiled, art, recKey, recArt>>
+    /\ disk' = Flush(disk) /\ pending' = None
+    /\ UNCHANGED <<screen, edits, sent, external, req, fp, compiled, art, recKey, recArt>>
 
 \* buildCache.invalidateBuild() before a full build
 Invalidate ==
     /\ pc = "invalidate"
     /\ recKey' = None /\ recArt' = None
     /\ pc' = "scons"
-    /\ UNCHANGED <<screen, disk, edits, req, fp, compiled, art, board, lastVia, lastSrc>>
+    /\ UNCHANGED <<screen, disk, edits, sent, pending, external, req, fp, compiled, art, board, lastVia, lastSrc>>
 
 \* pio run: about half a minute of dependency scan, then SCons reads src/main.cpp
 SconsRead ==
     /\ pc = "scons"
     /\ compiled' = disk
     /\ pc' = "link"
-    /\ UNCHANGED <<screen, disk, edits, req, fp, art, recKey, recArt, board, lastVia, lastSrc>>
+    /\ UNCHANGED <<screen, disk, edits, sent, pending, external, req, fp, art, recKey, recArt, board, lastVia, lastSrc>>
 
 Link ==
     /\ pc = "link"
     /\ art' = compiled
     /\ pc' = "flash"
-    /\ UNCHANGED <<screen, disk, edits, req, fp, compiled, recKey, recArt, board, lastVia, lastSrc>>
+    /\ UNCHANGED <<screen, disk, edits, sent, pending, external, req, fp, compiled, recKey, recArt, board, lastVia, lastSrc>>
 
 Flash ==
     /\ pc = "flash"
     /\ board' = art
     /\ lastVia' = "build" /\ lastSrc' = fp
     /\ pc' = "mark"
-    /\ UNCHANGED <<screen, disk, edits, req, fp, compiled, art, recKey, recArt>>
+    /\ UNCHANGED <<screen, disk, edits, sent, pending, external, req, fp, compiled, art, recKey, recArt>>
 
-\* buildCache.markBuilt(fingerprint.inputs, ...): the key computed BEFORE the build
+\* buildCache.markBuilt(fingerprint.inputs, ...) with the key computed before the
+\* build; with RecheckBeforeMark only when src/ still hashes to that key.
 MarkBuilt ==
     /\ pc = "mark"
-    /\ recKey' = fp /\ recArt' = art
+    /\ IF ~RecheckBeforeMark \/ disk = fp
+         THEN recKey' = fp /\ recArt' = art
+         ELSE UNCHANGED <<recKey, recArt>>
     /\ pc' = "idle"
-    /\ UNCHANGED <<screen, disk, edits, req, fp, compiled, art, board, lastVia, lastSrc>>
+    /\ disk' = Flush(disk) /\ pending' = None
+    /\ UNCHANGED <<screen, edits, sent, external, req, fp, compiled, art, board, lastVia, lastSrc>>
 
 UploaderStep == Fingerprint \/ Decide \/ ReuseFlash \/ Invalidate \/ SconsRead \/ Link \/ Flash \/ MarkBuilt
 
-Next == Edit \/ AutoSave \/ Click \/ UploaderStep
+Next == Edit \/ AutoSave \/ ExternalEdit \/ Click \/ UploaderStep
 
 \* The student uploads again whenever the board does not run what the screen shows.
 ClickStale == board # screen /\ Click

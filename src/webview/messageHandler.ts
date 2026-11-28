@@ -352,6 +352,12 @@ export class WebViewMessageHandler {
 		}
 	>();
 	private readonly unpinnedPlatformWarnings = new Set<string>();
+	/** True from requestUpload until its result; editor code writes wait meanwhile (spec 078). */
+	private uploadInProgress = false;
+	/** The latest updateCode received during an upload, written when the upload ends. */
+	private deferredCodeUpdate: any;
+	/** Every editor code write runs after the previous one, so an upload can wait for them. */
+	private codeWriteTail: Promise<void> = Promise.resolve();
 	/** 積木設計器函式庫搜尋的 HTTP 讀取；測試時替換 */
 	blockPackLibraryFetch: FetchJson = defaultFetchJson;
 
@@ -1004,6 +1010,18 @@ export class WebViewMessageHandler {
 	 * @param message 更新程式碼訊息物件
 	 */
 	private async handleUpdateCode(message: any): Promise<void> {
+		// 上傳期間不改 src/ 與 platformio.ini：先留著最新一份，上傳結束再寫（spec 078）
+		if (this.uploadInProgress) {
+			this.deferredCodeUpdate = message;
+			log('[blockly] 上傳中，程式碼更新延到上傳結束後寫入', 'info');
+			return;
+		}
+		const write = this.codeWriteTail.then(() => this.writeCodeUpdate(message));
+		this.codeWriteTail = write.catch(() => undefined);
+		await write;
+	}
+
+	private async writeCodeUpdate(message: any): Promise<void> {
 		try {
 			const workspaceFolders = vscodeApi.workspace.workspaceFolders;
 			if (!workspaceFolders) {
@@ -2645,6 +2663,22 @@ export class WebViewMessageHandler {
 	 * @param message 上傳請求訊息
 	 */
 	private async handleRequestUpload(message: UploadRequestMessage): Promise<void> {
+		// 上傳期間 src/ 保持不變：先等已開始的寫入完成，之後的更新延到結束再寫（spec 078）
+		this.uploadInProgress = true;
+		try {
+			await this.codeWriteTail;
+			await this.runRequestedUpload(message);
+		} finally {
+			this.uploadInProgress = false;
+			const deferred = this.deferredCodeUpdate;
+			this.deferredCodeUpdate = undefined;
+			if (deferred) {
+				await this.handleUpdateCode(deferred);
+			}
+		}
+	}
+
+	private async runRequestedUpload(message: UploadRequestMessage): Promise<void> {
 		log('[blockly] 收到上傳請求', 'info', { board: message.board, hasPort: !!message.port });
 
 		const workspaceFolders = vscodeApi.workspace.workspaceFolders;
