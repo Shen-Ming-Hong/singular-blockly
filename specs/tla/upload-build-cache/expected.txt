@@ -1,0 +1,4 @@
+# 現況（spec 077 的快速重新上傳）；修正後改成 holds
+invariant RecordSound violated
+invariant ReuseFlashesCurrentSource violated
+property EventuallyConsistent violated
